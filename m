@@ -2,215 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 383F947B2A6
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 19:11:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7596C47B342
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 19:54:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240391AbhLTSLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 13:11:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4508 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240332AbhLTSLO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 13:11:14 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BKHeCK1005451;
-        Mon, 20 Dec 2021 18:11:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=t72i+Dq83P6W1gV3t4uMZkELP7j3o4ceSic8RDozuEg=;
- b=Wt8wqOohTThFCnvxpRyDlM8mSTILaVqal76QYDTJ1wptB6bfk1jq3nGlXFg98p98I+25
- htU4nT7P9f8t1gqAVUkjWX1CS2mznbQiIFtciFp/Ai2pDKQjTdOGrwS5ELrKyiVZ3Qj4
- fQHrM/tv2lwH3ASzhwrGLZsIdTov8ggKfgqVFtRP4eWD+87MJXHcXNlbEBEIXyxGd5U7
- g1zEeqvHg+bjEOg+fjojmr7YFWbHA+uiNMgUXHk88QAvd379iI0ijzIdoauXbITtvCes
- iq42aH7rLHflvW87Kv/hTwqA8TLXS6c5++diEMh4Q9sB+3AGhrchvPfEFnBi7U2G27cD uA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3d2q0jtgtw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 18:11:13 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BKHO757014616;
-        Mon, 20 Dec 2021 18:11:13 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3d2q0jtgt6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 18:11:13 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BKI4WHE006870;
-        Mon, 20 Dec 2021 18:11:10 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3d16wjfbnb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 18:11:10 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BKIB7P143516404
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Dec 2021 18:11:07 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2AA4BAE051;
-        Mon, 20 Dec 2021 18:11:07 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 124D0AE057;
-        Mon, 20 Dec 2021 18:11:07 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 20 Dec 2021 18:11:07 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id BBD63E63A4; Mon, 20 Dec 2021 19:11:06 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Subject: [GIT PULL 6/6] KVM: s390: Clarify SIGP orders versus STOP/RESTART
-Date:   Mon, 20 Dec 2021 19:11:04 +0100
-Message-Id: <20211220181104.595009-7-borntraeger@linux.ibm.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211220181104.595009-1-borntraeger@linux.ibm.com>
-References: <20211220181104.595009-1-borntraeger@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3NeCVFPWu8SziFQehV5KyMj_OvWGmxQn
-X-Proofpoint-ORIG-GUID: 7BXltx974cbVFvObvrNgvjDwtSpp366T
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S240601AbhLTSyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 13:54:20 -0500
+Received: from mail-co1nam11on2046.outbound.protection.outlook.com ([40.107.220.46]:16225
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S240001AbhLTSyT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Dec 2021 13:54:19 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IafgjFcMPQKMnAtGgHTA0ldtdw6tjg7n1HY87M9B9hiEXX1L461IFx5JjQzOVJO1aowwDVKSbVj/K5YzXxPAWvQfz1/p/HQhqi8GdiVpKTBgxhQ+zEXPRK+/SmjfmmsRj3pKkY387TMYOeOUux+z/BESEfcgk7bZxjRQfYm0yVZimFRouiaTe8UfD5bqr6vEl251EANUu6DKngqHJAIodnCfgibR80ktpa8yGN9/uAkKQiWaB31wHawVFiYMzzXHmxxELKro6bY3YTPdlg4ltz5FkNnQtKwtrBYyUCUHZhRg9fEL4hE/L9yfYENP+bMYJGWWp6yotBfta2MDuIbNpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tZKztYSy6whYimuSblE7amRhV99EjWbZm3x3QHu86q4=;
+ b=oePbvlaqNzvt/Ro9JSwc3wS4nglEOTg5ZazGVFmPAT4EUeHLg/fkCqXTR/X8KXkhRPdSg1AbAmnCfnF3zvSTS7DTbPP4AjKeLmXiPiHFMkx6ZjX+JQV8YQXWmqFoTJMdJ81ljAdeZAKNZ7bZsKBukGCvDtmFokGgSkSvZU96pg6Rj+eD9vAz83++g21PgxjJMZ51hSEA+kbwu8aijxjrEwvFAEnElklk32YbQVDTfa2qB5+eqpFuWYA8l53Ko9Vi189t8cPQXePwA2H234p5muU4r9AzSTqJWs0/mVnTm5YBoDJLynYbWM2eFc69VpIPk50FDJYaTj7WR68KEQa0gA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tZKztYSy6whYimuSblE7amRhV99EjWbZm3x3QHu86q4=;
+ b=UUHFBGfTCKVGwZWqXCwfbhRgwvsV6EAbKfiZlVVG4XzZkmoJ0GRVslLFsg3jFe5PHt7j5ve+JDtK77dLm5lx3mZbC0sQ+HIgFmbmQXapZ5fJeMqOGsIpTgqnHP8Cvq/jN54PsMivAXfk3/yD8Wjib7CNBUJkrt1XavNmWD72xmA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM6PR12MB5549.namprd12.prod.outlook.com (2603:10b6:5:209::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Mon, 20 Dec
+ 2021 18:54:15 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::2429:24de:1fd2:12c5]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::2429:24de:1fd2:12c5%5]) with mapi id 15.20.4801.020; Mon, 20 Dec 2021
+ 18:54:15 +0000
+Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Igor Mammedov <imammedo@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "mimoja@mimoja.de" <mimoja@mimoja.de>,
+        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
+        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
+        "luolongjun@huawei.com" <luolongjun@huawei.com>,
+        "hejingxian@huawei.com" <hejingxian@huawei.com>
+References: <20211215145633.5238-1-dwmw2@infradead.org>
+ <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
+ <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
+ <b13eac6c-ea87-aef9-437f-7266be2e2031@amd.com>
+ <721484e0fa719e99f9b8f13e67de05033dd7cc86.camel@infradead.org>
+ <20211217110906.5c38fe7b@redhat.com>
+ <d4cde50b4aab24612823714dfcbe69bc4bb63b60.camel@infradead.org>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <36cc857b-7331-8305-ee25-55f6ba733ca6@amd.com>
+Date:   Mon, 20 Dec 2021 12:54:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <d4cde50b4aab24612823714dfcbe69bc4bb63b60.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL0PR01CA0030.prod.exchangelabs.com (2603:10b6:208:71::43)
+ To DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-20_08,2021-12-20_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- impostorscore=0 bulkscore=0 clxscore=1015 mlxlogscore=999 phishscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112200101
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5a06be61-d729-4c62-4b59-08d9c3ea1e98
+X-MS-TrafficTypeDiagnostic: DM6PR12MB5549:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB55492D4A2F752D33842585ABEC7B9@DM6PR12MB5549.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1824;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tRgtXWJCOwvPtn54RsQ+zuq1xCvtcq+/1AQu8+n3ZbsNMPvZ06A2we61OQvP0lP9kn+nedfI+FlkirlKdZLznUlG8MOc6pyA03IwuhtNuxtGYVmlTlhwGfnvlVyf3Ccrq6pv1tDjGE60ZNf7K4N14KcqOLu9jQaRnoUlfACk/9uag56NdyqQEyqUxqCUfqKsiB2vqECQVQBX4tDzUe64Qc/jf8z/X5xFnfHcSbhcdFjYKOIrd1RYx25icICh6gTItap28DZWHcLH2gR+XLe5m+CAybB+2GWD7uJtRPVl0Hi0dlEbk2kQ3iUedhQxeNEI0HXtEXDQqhEpTsQnoExYSGLM+pfRJN4Qg35D1+hrWRyXScAHK5pFWVPZ6DoT34bdt2whqE2mh9cvLOyMVTWcm3ySC38QN/8zeqf0+Vd+L3jkRHBGO4L1QPl3w6GxMUEheDSQeny19m7yxbFAnDxwe+B8AJQ88NDYfbnaqnYqS9wT90bBA+9BLrvj2IBlJrmqK/YOn9fDQvul3o4A/7VhLaXv+Z4b4LL8SVa7qo7Hnb0uoEXWmP1FimHQoU1VVd3Se7qJj5uQgYaToLzjbn1mfU1BcgSK3TpGs30qZpIovjYfkhW8vZCgAmEEj6FJ9RMTpFhOQMThAU0NWAx7R5CJjKWRfTjUuG9zb2u4KODjQAg6Qx3jjego5rnaxZFskjDUAxqJWv0KoDhZBRXPt998hnRH2WFMVW3VekMzDjNj1z81aqdpmG7uRvMIxkqJn5TJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(31696002)(186003)(6486002)(83380400001)(5660300002)(54906003)(110136005)(316002)(26005)(2906002)(53546011)(8676002)(6512007)(8936002)(4326008)(38100700002)(6506007)(66556008)(66476007)(66946007)(31686004)(36756003)(7416002)(6666004)(2616005)(4001150100001)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NzVaeitEc1lxQmk3bk1rYzlIeFRrbFFoNWsyMEh5cW51MjkrMzhLNkFwVTlJ?=
+ =?utf-8?B?dExzNFRIM2wxeGdicHF2d3Fodnd6d0JudnRwK1RneFhidjZZOG93RGJ3ZG8z?=
+ =?utf-8?B?VUlxeHZnMTlEODV4SzBxWXVRNnlYK3dtWGJSVG0ydFlscTdnZWp3MkNYMlB1?=
+ =?utf-8?B?bjBjZHBrQXBUTEE2MmtNNGx5bnBHdExlc29CUm1FVjlEam0ybnROZDNpcnZ3?=
+ =?utf-8?B?UWkreU04SkFoK1poYkMyY1JDRzJsc2VoVlRiSUQyZWdWUUxoWlZlb0Z4UGxP?=
+ =?utf-8?B?NnNUV0R5eUtHTzhqNUhQSnM5YWJJNXpBald4ZUk5LzFnRHpScUVtR1QxUVlI?=
+ =?utf-8?B?OXYwc2xJNnI5dXhINEFnSlppb2x4ZW5RdC8va3Y5aWJ0YXZQS041eDVyZXBp?=
+ =?utf-8?B?R3AxSVVQQ2dobnVXWC95N3RuaCtRSUhDUDZOa2hSbUE0QmJlSTdGSExLSTFO?=
+ =?utf-8?B?cmliK1NZQVlCdm9TT3lvaEE1dUNqZklnQkVta21mWlZkSGl5YitpakZaRy9x?=
+ =?utf-8?B?eUFEellOc25DVCtSbkI5T21RTEVDTE0vQ1FoZEIzYUJ1R3VObWgycFhocTMv?=
+ =?utf-8?B?MkRGeWk1bW5Xb2hLbHJnRXBUcG5VWk9nT2Q4ZkxGcFBXMlV4M21yWC9XaUhX?=
+ =?utf-8?B?VXBzSks4c3BjdmdBYlFhQmU1OHhkMEdGRzF3MU55ZmVFZEJMWlQvL0FDS2Zu?=
+ =?utf-8?B?RWVQaDE0WXQzL1NHMStuc1poNHEyTUZENU5pU1NJL2ZoeG1ZMUovbDg4dllH?=
+ =?utf-8?B?NVQ2YUs5dmF1V2Y0QkxMNXFrYlpZQU5HeVRzRW5hNjNkaWJVYWtqZ3d4OHRl?=
+ =?utf-8?B?NFZxSjZsYkd6RFZhZXFYbzM0V0V2a1VLWW1WMDlCeVNEYS9qZ21OVWd3bUV3?=
+ =?utf-8?B?TVFWbmZKUkYwemtmQmpFM0JzR1VCclV5bzVqOXZjdEZmT0NaeU1sS2xFaThL?=
+ =?utf-8?B?WkxlekhNanV2SGtzT3IwVkZmVmpkbHVCUzI0WTkwUzNCdWt6VlRoVnNnelNh?=
+ =?utf-8?B?WHBBZlpPbllVNkpZeS85NVRoNFBDeVdYbkJWNUJHU2tKWU1OOTJEQU9IT1VV?=
+ =?utf-8?B?ZkJlamJwRWNMRmVreGJhclNpS1ZYTXFTbHpYTm1QL1VMSG9rQ05qdUk5VHZi?=
+ =?utf-8?B?dGpwQlg0Yk9wR3BINDZJa3VIL1pjM2tQMGdUY0dMQzM5N2NIdFpxanJSc1R6?=
+ =?utf-8?B?Yk0yc2tvTjNjaXZ4N1pMWjBidEd3NkVGQXY5UG5Jd0I3YmY2UjRoeEEwYmQw?=
+ =?utf-8?B?bHA3a3dnYWVMWnEzbFpIOUJZZExUREtvblhIaXk5ZHlkNHllaDVxSFgyUXQ4?=
+ =?utf-8?B?OWJrUG85T0pTZ29kYS9VTzk1aEhPQzluYW5pTk9WYTk2cURHUVM5aE9FK3RS?=
+ =?utf-8?B?dkRscitqd05jamdCdDZDRFFkNzlsWkp1dEN3ZmxXVHR2WTNNNUh1OEVQRmhX?=
+ =?utf-8?B?b1cvOE85M1Z6OCt5T2hlSDlHMkNHTm5GZG5nTFUvcEpQZ2hER0NldXVwcVNm?=
+ =?utf-8?B?UndwZnliZzA4dDBEMXh2bDRsYStFRmpLV1dCVTl4L0RKSVhKQzJIY0tMWFJ6?=
+ =?utf-8?B?allKWEV6Yjl5ckg3TlhkREF1YkFEZzlqWEZvUkJEK2Z3aFI1WXN0ZW5rUWx3?=
+ =?utf-8?B?c3hpVzlxWmpMOE1DM2FqMkJYVE5TWHBrNUw2ektxeXRTclRPZXhQV25NZFhz?=
+ =?utf-8?B?QStOUk56NjNLRXI3Q3JjVTY1UHk4eXkvSlNZRUY0dHlKRzNENXBGaCsvREUr?=
+ =?utf-8?B?eGUvcGFFWHZTa043ZlpvbitPanBUMDIzenRkYVZldjcvV0doS0hhZWpsbjQ3?=
+ =?utf-8?B?ZlcvMGJZbUJnSVBIcC9PSXBzaS9DNW5CdFJSWU0vNi93ODBkR212L3FMMGdD?=
+ =?utf-8?B?aDJvNU5QMTQxU1hwT0N1dVkzczJ0dWswOFJnVU1uOC9MK1NYcDBGbFNCRnlQ?=
+ =?utf-8?B?a1JGTXdzSVlNZk1HUTE0SjNwRlhNQWVMdlk0TkNYRS9kL2NtMmFDSWdSNjEv?=
+ =?utf-8?B?emdmN0JzRkV1UXBVN3o4UXJUWGdqNFNFUHEycVE2QVRhRkRPOVpxZDA4R2Va?=
+ =?utf-8?B?N0ZaZE52MTVXc3ZKMFlSU1BNVHN3TDlxVWFhM0RheU94SEhzZlFrRGpqNEd3?=
+ =?utf-8?B?bDdRMU16MUMvWDMxTTNwRUc3clU0QnJIcFoyQW1hdXdvUDdiaTlrZ28xSUVX?=
+ =?utf-8?Q?+KwQmdVkv/7xY+TcM+1gs9E=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a06be61-d729-4c62-4b59-08d9c3ea1e98
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2021 18:54:15.6146
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m68zIk3lnLdvsDWEJIQF3g4jORCpHbFHzhEO/r8wRHcfeAT+0JhiRJ/j++M1z3j0fF+V6PDsgbHLdf66B26AKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5549
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Eric Farman <farman@linux.ibm.com>
+On 12/20/21 11:10 AM, David Woodhouse wrote:
+> On Fri, 2021-12-17 at 11:09 +0100, Igor Mammedov wrote:
+>> On Fri, 17 Dec 2021 00:13:16 +0000
+>> David Woodhouse <dwmw2@infradead.org> wrote:
+>>
+>>> On Thu, 2021-12-16 at 16:52 -0600, Tom Lendacky wrote:
+>>>> On baremetal, I haven't seen an issue. This only seems to have a problem
+>>>> with Qemu/KVM.
+>>>>
+>>>> With 191f08997577 I could boot without issues with and without the
+>>>> no_parallel_bringup. Only after I applied e78fa57dd642 did the failure happen.
+>>>>
+>>>> With e78fa57dd642 I could boot 64 vCPUs pretty consistently, but when I
+>>>> jumped to 128 vCPUs it failed again. When I moved the series to
+>>>> df9726cb7178, then 64 vCPUs also failed pretty consistently.
+>>>>
+>>>> Strange thing is it is random. Sometimes (rarely) it works on the first
+>>>> boot and then sometimes it doesn't, at which point it will reset and
+>>>> reboot 3 or 4 times and then make it past the failure and fully boot.
+>>>
+>>> Hm, some of that is just artifacts of timing, I'm sure. But now I'm
+>>
+>> that's most likely the case (there is a race somewhere left).
+>> To trigger CPU bringup (hotplug) races, I used to run QEMU guest with
+>> heavy vCPU overcommit. It helps to induce unexpected delays at CPU bringup
+>> time.
+> 
+> That last commit which actually enables parallel bringup does *two*
+> things. It makes the generic cpuhp code bring all the CPUs through all
+> the CPUHP_*_PREPARE stages and then actually brings them up. With that
+> test patch I sent, the bringup basically *wasn't* parallel any more;
+> they were using the trampoline lock all the way to the point where they
+> start waiting on cpu_callin_mask.
+> 
+> So maybe it's the 'prepare' ordering, like the x2apic one I already
+> fixed... but some weirdness that only triggers on some CPUs. Can we
+> back out the actual pseudo-parallel bringup and do *only* the prepare
+> part, by doing something like this on top...
+> 
+> --- a/arch/x86/kernel/smpboot.c
+> +++ b/arch/x86/kernel/smpboot.c
+> @@ -1337,7 +1337,7 @@ int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
+>          int ret;
+>   
+>          /* If parallel AP bringup isn't enabled, perform the first steps now. */
+> -       if (!do_parallel_bringup) {
+> +       if (1 || !do_parallel_bringup) {
+>                  ret = do_cpu_up(cpu, tidle);
+>                  if (ret)
+>                          return ret;
+> @@ -1366,7 +1366,8 @@ int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
+>   /* Bringup step one: Send INIT/SIPI to the target AP */
+>   static int native_cpu_kick(unsigned int cpu)
+>   {
+> -       return do_cpu_up(cpu, idle_thread_get(cpu));
+> +       return 0;
+> +       //      return do_cpu_up(cpu, idle_thread_get(cpu));
+>   }
 
-With KVM_CAP_S390_USER_SIGP, there are only five Signal Processor
-orders (CONDITIONAL EMERGENCY SIGNAL, EMERGENCY SIGNAL, EXTERNAL CALL,
-SENSE, and SENSE RUNNING STATUS) which are intended for frequent use
-and thus are processed in-kernel. The remainder are sent to userspace
-with the KVM_CAP_S390_USER_SIGP capability. Of those, three orders
-(RESTART, STOP, and STOP AND STORE STATUS) have the potential to
-inject work back into the kernel, and thus are asynchronous.
+Took the tree back to commit df9726cb7178 and then applied this change. 
+I'm unable to trigger any kind of failure with this change.
 
-Let's look for those pending IRQs when processing one of the in-kernel
-SIGP orders, and return BUSY (CC2) if one is in process. This is in
-agreement with the Principles of Operation, which states that only one
-order can be "active" on a CPU at a time.
+Thanks,
+Tom
 
-Cc: stable@vger.kernel.org
-Suggested-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Acked-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20211213210550.856213-2-farman@linux.ibm.com
-[borntraeger@linux.ibm.com: add stable tag]
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
----
- arch/s390/kvm/interrupt.c |  7 +++++++
- arch/s390/kvm/kvm-s390.c  |  9 +++++++--
- arch/s390/kvm/kvm-s390.h  |  1 +
- arch/s390/kvm/sigp.c      | 28 ++++++++++++++++++++++++++++
- 4 files changed, 43 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index c3bd993fdd0c..0576d5c99138 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -2115,6 +2115,13 @@ int kvm_s390_is_stop_irq_pending(struct kvm_vcpu *vcpu)
- 	return test_bit(IRQ_PEND_SIGP_STOP, &li->pending_irqs);
- }
- 
-+int kvm_s390_is_restart_irq_pending(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
-+
-+	return test_bit(IRQ_PEND_RESTART, &li->pending_irqs);
-+}
-+
- void kvm_s390_clear_stop_irq(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 14a18ba5ff2c..ef299aad4009 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4645,10 +4645,15 @@ int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	/* SIGP STOP and SIGP STOP AND STORE STATUS has been fully processed */
-+	/*
-+	 * Set the VCPU to STOPPED and THEN clear the interrupt flag,
-+	 * now that the SIGP STOP and SIGP STOP AND STORE STATUS orders
-+	 * have been fully processed. This will ensure that the VCPU
-+	 * is kept BUSY if another VCPU is inquiring with SIGP SENSE.
-+	 */
-+	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
- 	kvm_s390_clear_stop_irq(vcpu);
- 
--	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
- 	__disable_ibs_on_vcpu(vcpu);
- 
- 	for (i = 0; i < online_vcpus; i++) {
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index c07a050d757d..1876ab0c293f 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -427,6 +427,7 @@ void kvm_s390_destroy_adapters(struct kvm *kvm);
- int kvm_s390_ext_call_pending(struct kvm_vcpu *vcpu);
- extern struct kvm_device_ops kvm_flic_ops;
- int kvm_s390_is_stop_irq_pending(struct kvm_vcpu *vcpu);
-+int kvm_s390_is_restart_irq_pending(struct kvm_vcpu *vcpu);
- void kvm_s390_clear_stop_irq(struct kvm_vcpu *vcpu);
- int kvm_s390_set_irq_state(struct kvm_vcpu *vcpu,
- 			   void __user *buf, int len);
-diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
-index cf4de80bd541..8aaee2892ec3 100644
---- a/arch/s390/kvm/sigp.c
-+++ b/arch/s390/kvm/sigp.c
-@@ -276,6 +276,34 @@ static int handle_sigp_dst(struct kvm_vcpu *vcpu, u8 order_code,
- 	if (!dst_vcpu)
- 		return SIGP_CC_NOT_OPERATIONAL;
- 
-+	/*
-+	 * SIGP RESTART, SIGP STOP, and SIGP STOP AND STORE STATUS orders
-+	 * are processed asynchronously. Until the affected VCPU finishes
-+	 * its work and calls back into KVM to clear the (RESTART or STOP)
-+	 * interrupt, we need to return any new non-reset orders "busy".
-+	 *
-+	 * This is important because a single VCPU could issue:
-+	 *  1) SIGP STOP $DESTINATION
-+	 *  2) SIGP SENSE $DESTINATION
-+	 *
-+	 * If the SIGP SENSE would not be rejected as "busy", it could
-+	 * return an incorrect answer as to whether the VCPU is STOPPED
-+	 * or OPERATING.
-+	 */
-+	if (order_code != SIGP_INITIAL_CPU_RESET &&
-+	    order_code != SIGP_CPU_RESET) {
-+		/*
-+		 * Lockless check. Both SIGP STOP and SIGP (RE)START
-+		 * properly synchronize everything while processing
-+		 * their orders, while the guest cannot observe a
-+		 * difference when issuing other orders from two
-+		 * different VCPUs.
-+		 */
-+		if (kvm_s390_is_stop_irq_pending(dst_vcpu) ||
-+		    kvm_s390_is_restart_irq_pending(dst_vcpu))
-+			return SIGP_CC_BUSY;
-+	}
-+
- 	switch (order_code) {
- 	case SIGP_SENSE:
- 		vcpu->stat.instruction_sigp_sense++;
--- 
-2.33.1
-
+>   
+>   /**
+> 
+> 
