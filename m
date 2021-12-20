@@ -2,163 +2,603 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F3A947B55A
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 22:47:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E099F47B5DE
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 23:26:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231660AbhLTVr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 16:47:28 -0500
-Received: from mail-dm6nam11on2054.outbound.protection.outlook.com ([40.107.223.54]:35969
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229618AbhLTVr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Dec 2021 16:47:26 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D8Kc56pTxBW7FjaKL0OPIER/LLVgZNAsvlFau3P+vgFe6LkTTxF1M8P1llIOFNjIo7w0j2L+dyb28SliEhVgQ4biwYdrvUloP1RyxFsMcq3uMNS9jVmkUbvn8hRhovFMvRS5Jq4N8U2AfIma5s+9V5hn9lzxGZMWzl1L7tZ0oyNmkwQz3OYX6UbJF3nox50om716j9tyd7Mu4pL+GZNOKdkiwrqzIKkOb13qCCwb22u8f5gj7CgWG91xPNW3vwi6+enFrvVjbfs6UnuZRRCs+r9B7jWF/bjwD8Kj7L+UxOReZeiIdnWF2gSMFf8W+Qi37kKoBzY8uTpOf0Wn+oXXzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4X0AmDQLIB7Cwber1PRmFnAEO8IB6AA7evXRXeOsIzE=;
- b=QjpPbGH5xOol7mZxgBHhb1Fd2H0/Ra4omBqXY/+kw4oI8DesgWe9hv3pOjpzf9beqVEJs6RYwVLRNEHnZH3hw3avGJo6J27d3wUbuIfmGehVACBhNpTP6gdfPuE2f8Q5a7u7VIQWsr6UwHU52FK7hOumphoTGQ6uLnQEG/MX/wzcvgahWHp6Mto5MBmc/1YfIVj/kKNKWgKGMtku2+iGF+CRG6y1ATRVxNTUvj+JRmWdgF5UIK4dIWblt95cjWxnwvjifgEajF75d4mcR8MhiGX9nKHRu7WYcdYk1gopWnO3+4QuWBnjsYgUgD6O96I3hawHtePgfzBlzEiChzhKEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4X0AmDQLIB7Cwber1PRmFnAEO8IB6AA7evXRXeOsIzE=;
- b=2w7Vgpbv2u+QmZp6A81Mt/yj0yUI0rgOIJO31m1o+gcrgIFyg1Pp3uCqbdiMlmb7YtFcklOusJymUbvGY8dxIdQoCx/g8tYmsXMhnDb2PNaSFURIMp9nJ0W6ZWVUe4WkzDFv1A6XuaBaD7dclgr4vIk47NA7u+4nIq5HbnsrdR4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM8PR12MB5463.namprd12.prod.outlook.com (2603:10b6:8:27::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.17; Mon, 20 Dec
- 2021 21:47:24 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::2429:24de:1fd2:12c5]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::2429:24de:1fd2:12c5%5]) with mapi id 15.20.4801.020; Mon, 20 Dec 2021
- 21:47:24 +0000
-Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Igor Mammedov <imammedo@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
-        "luolongjun@huawei.com" <luolongjun@huawei.com>,
-        "hejingxian@huawei.com" <hejingxian@huawei.com>
-References: <20211215145633.5238-1-dwmw2@infradead.org>
- <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
- <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
- <b13eac6c-ea87-aef9-437f-7266be2e2031@amd.com>
- <721484e0fa719e99f9b8f13e67de05033dd7cc86.camel@infradead.org>
- <20211217110906.5c38fe7b@redhat.com>
- <d4cde50b4aab24612823714dfcbe69bc4bb63b60.camel@infradead.org>
- <36cc857b-7331-8305-ee25-55f6ba733ca6@amd.com>
- <c1726334d337de7d7a8361be27218b44784887f6.camel@infradead.org>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <02be2ef0-8a18-553f-2bd7-1754c3f53477@amd.com>
-Date:   Mon, 20 Dec 2021 15:47:21 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-In-Reply-To: <c1726334d337de7d7a8361be27218b44784887f6.camel@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR03CA0205.namprd03.prod.outlook.com
- (2603:10b6:610:e4::30) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S232244AbhLTW0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 17:26:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58273 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231994AbhLTW0a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 17:26:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640039189;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=emx9UNcufTg5ljqwXEgsyyAj+XH1AHd70GHIvHSUCik=;
+        b=ehduGr9d+P5zynQH1YNG9hCF9ysELErN2ewRpLFx0yG2iLlsvJqf0O/TBHPtWubuiORHWJ
+        9f5nCbIxe8GqlPOpnI5a6aaYQjiYALB5PV/c27dlEmjroqoh378akMlncx10/mFX3CQzNt
+        GcutHzN5nIqTVRDbdFNQ1JDUCigvcjg=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-55-1mD2WHW3Msyfc-RzqIKxtw-1; Mon, 20 Dec 2021 17:26:27 -0500
+X-MC-Unique: 1mD2WHW3Msyfc-RzqIKxtw-1
+Received: by mail-ot1-f71.google.com with SMTP id z16-20020a056830129000b0055c7b3ceaf5so3793751otp.8
+        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 14:26:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=emx9UNcufTg5ljqwXEgsyyAj+XH1AHd70GHIvHSUCik=;
+        b=k21y6hLhdVf2qXGkyD0xr2YpHZtkqFyws9ioKEB6sLM5daW2epbwiVs+uOfY6en6j7
+         2Jt/7srPJXcGsjbH21u91hBXhAc2zp2k+k8/OvHPdGmMDV3xuU1pmWdUiI4ul5foy6ff
+         Vx02fZqh+QWIb3rzViTWsdvhwYbOSwWK1TiqYz1S0kmzCvIGvR0I0wxYtlRbnPTjNgCw
+         Wfs8Sjb7SmQZbJF/SyzmojZEf7MvSU13QZU50dqmQGukmafsTj4ry9ZF6Pd8XrWa25Go
+         7yX/TMLz4s5m5+c5w/DlsPOt8n0P1QjmKlmeN7fVPCyKpyiTGQrZ60jTvSjLjDU9/TPb
+         AzHw==
+X-Gm-Message-State: AOAM5333+1imbvQg5/QpKZEjYbwKG7nsmJq5U2I+57HcglvjnrbXhZhH
+        ZvRnL3+hwodAuPhCPPqkhUtI2+n2x+XegDTuJJ/iRQMkiPolJhtMfS3DX/Xy/9urY+cB7NXHtjW
+        6etHjJsGrnlEU
+X-Received: by 2002:a05:6808:1784:: with SMTP id bg4mr138377oib.70.1640039186694;
+        Mon, 20 Dec 2021 14:26:26 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxaG9Auh081YHPjxp6+PzJrUuShNaWfw0/NQvujUgZYNr1P59EWRoQ2FVh4c3n6s6HCkiUfKg==
+X-Received: by 2002:a05:6808:1784:: with SMTP id bg4mr138354oib.70.1640039186157;
+        Mon, 20 Dec 2021 14:26:26 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e14sm3428832oow.3.2021.12.20.14.26.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Dec 2021 14:26:25 -0800 (PST)
+Date:   Mon, 20 Dec 2021 15:26:23 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     cohuck@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com
+Subject: Re: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
+Message-ID: <20211220152623.50d753ec.alex.williamson@redhat.com>
+In-Reply-To: <20211214162654.GJ6385@nvidia.com>
+References: <163909282574.728533.7460416142511440919.stgit@omen>
+        <20211210012529.GC6385@nvidia.com>
+        <20211213134038.39bb0618.alex.williamson@redhat.com>
+        <20211214162654.GJ6385@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 43bbea13-f5c8-43fd-e999-08d9c4024eba
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5463:EE_
-X-Microsoft-Antispam-PRVS: <DM8PR12MB546304FED6DC4B057BD59833EC7B9@DM8PR12MB5463.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UVT2gAlzU8MAjuD8NX7U5Mq22wcTomPi2LvShvMsn+6jUxCq6sL17qeM4I7C7EEmHYrfdyAv86+RqeJYPuysD9KIJ4eigsMVUHBomiL5mBd25nbufGlx+Z+71pqjQCMa1YJX1ULzcNswMDZumjvboPHRUAlI56xJw7i5JjOU5O8YHIys6l4xZ+GCyyGl3tepm5qyRZgP5VQxpFV5hnLDzw7EflPPPLKNZSCoUxbarz+qxabkA+mpmDPpWpN2ZL2juLL++18iYjslFIy1NntWpLzzMn/YOL1AOfZcLqRIPCbKnp+HWawjf5KM1L9RNSHqM8Q1+S4YK7KjPX+7+sWJk+X6aY1KiFGx9G3uzGprcZa1fyYRuovP19T/v4jt51Ifk9d/GRb42QgqwqiZyycVyO0CYkRjNhDtOrJdGp2oq8jxL8nZPMY+74oCx09pGZnSHcIzj4Bkzv4KkdRVSA4ZLXbTCit+InuhYldGvUshpgpUMjgnNwGwBi1r+O6VGBqRh+Yp62nEOyfWqeJU2uN7OsigEzlgPHwYz1DBRDtYV298D4dKc9098X//gNv5loWcQPIQLvr1xfjkZjPeMnLf97Nk/r8OwO7YbigdT5a7On0K2z3D2+tnAFj0+3oxiFL1c4G05ISyvPrrnqMOYf0DbQG/5ERVRCq+7o+B+UVYhqx3AFx0Q6jEODNRXxNrVJMLcU6NLNCQdoH1ABI+tWpPCRMuRcePShjFdFkn8OPM64IO7JeZGJtUdHN1UmEfHGPL
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(2906002)(53546011)(6486002)(186003)(110136005)(7416002)(4001150100001)(36756003)(31686004)(508600001)(5660300002)(66946007)(6666004)(66476007)(86362001)(26005)(38100700002)(31696002)(83380400001)(6512007)(2616005)(8936002)(6506007)(316002)(4744005)(4326008)(66556008)(8676002)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dHpMMnI0OGZHREhJM3pUUjk3NWcyZ09UTjFyem93MCtXV3NwbGNOWW0rbm9F?=
- =?utf-8?B?YjRwcEdlQ3l2dStaQnRhYlNLZGZPSUJERGZrZzZDRmwvZVdaZXpPQkphUTly?=
- =?utf-8?B?T1FFWjJ3Z2RNVUdnd29Fc0R1VUpvZGlsR1ZhdmpxNDRMZTFpcy9sTG96VlZC?=
- =?utf-8?B?UzZVNFo5ZmRsTnpKYWZ3NjJOODlmU3FKbTdxZzZkNk9ML1JScFZxcVJHdk5F?=
- =?utf-8?B?Nk1yVWpWUmlzRWdqeFM4bFV1SlYxL0RGTEhTZ0xCbTFGcWx1ckgvc3U1eUxO?=
- =?utf-8?B?Y2x1ek9wVUF1QVE4QWs1NW1tRXgzTmZhaVA3YWJndE5mcWNQVzVLT0dXeUIy?=
- =?utf-8?B?a3NJb1V6RmZ3ZWFQTkJXNjZoK1k3NTlNOHIwNW55Z3NMbU5oTVJxQVhaOEFG?=
- =?utf-8?B?N1dUOGpJREE2WG5VcStIaThYNXBWeS92NXRRQ2ZpdXRmeU1Qc0RHVFhyUDZS?=
- =?utf-8?B?SDl1bDlTa09zOXFwYW1TNjVFYjYyU1pXa1hrZVM2dGllRjhDMUFadWMwN3FQ?=
- =?utf-8?B?ZVNGa3RBRVlUVzlDa1ZOUUlUN3ZiVUYxR3FGZzAzNUFYQjlCR1hvMTUvdlBo?=
- =?utf-8?B?NTlPaEoyREZrSVh5VDdRQ3UxMXFNMWlPWC9ZQ0ZDV0VNZU14bkhla0J6TGZK?=
- =?utf-8?B?aGlvU2tGaitta05ZVXovN3J5d2ozTHhabUdxMGl2WThlbktISHZwbGVaRjR2?=
- =?utf-8?B?MVdDbmpyQUxtdjhjOThVVnRpdDF4R2hCK3JDdWFVOWZvVXZNUzltVWsxYTBT?=
- =?utf-8?B?allrREZwVWtYeGxQbTdpTmRZUmhzTHFFZEVzRmdKcWJBaFAzTWIxY05mUVlV?=
- =?utf-8?B?L0M3M3M5L0pVYUh6dTdkNHNuZGpMQ0Z0ZHIvMmQ3dnhQL0oyTGdKOG5palNX?=
- =?utf-8?B?bCs4ZUtwalFGMVplaklKa3MrdEpOcjlISTRMbDdGTzN6OVZnRWxZUG5UOTkw?=
- =?utf-8?B?OHhFTTRCcXcxQThMcnk3bnBHMDFaZmZubi95NmhZeDJzb1pEcEZwQm5icGlm?=
- =?utf-8?B?VkJRUnRlbW1lTTVCQW8vUVZlRzVjQU1PQ1lWRm52eEx5SktjTXVoazQvemFo?=
- =?utf-8?B?dlk4VnluOEpBVmlyczlDZ25RNG5NK2FsUTJHeTBVZk4xMnhua21PYXJ4Wklp?=
- =?utf-8?B?Y2syTlc1Tkc2cG53QnFVSndweGQwa3pHYzVITHBsRWtBczNoTExJdHA3NEQz?=
- =?utf-8?B?NUxXVGVETG42UC81UDczNHZDYm5YKytJVDZYdUtTM05LTzZTQldiK1RHVXdS?=
- =?utf-8?B?MmlSdG1hUXJicTlGdzUrREhiZ0hnaWJOV2hFbnVWd0hreHlzaFEzSFkrOTl5?=
- =?utf-8?B?clhjSVRVZGpnS2IyWEdpaEs2UXZpdE1IWlpNY3BkcXR0a2xoQTFkUUppWTcw?=
- =?utf-8?B?T0FjbDJ3cWN3SWtrUloydXg3KzhwaFRaYTdXamQ5K24zMkJCQVYvcE93WkhI?=
- =?utf-8?B?TFY2Y0pzZVlNSjBKREw0NTJHMGR5d2VvYXE2d25nZVBaTWkvWE5DNmFVZ0ZP?=
- =?utf-8?B?dlN4YTAyMDgxUWZHM292MEE5S3Ird0l1Nm9Ed2tQaWhUOTZJQVNLZk11eDJI?=
- =?utf-8?B?NTcwTktSOWtoc0pwOUNIZ2tZcWtYK1dsUGpUbkdTa3VrM3ZZK2ZwREkzRjc0?=
- =?utf-8?B?NHpzcm9yRytUTVJmTGlWQmljSnlXZGN5TzN3NTJGWEg4eEpUeFd5M1VUQ2dI?=
- =?utf-8?B?MGl2QldDamJvNDV3Z2hEY0xzRHRNTFZnK01xOFdYci92a0VMSkVZeFVQbDcy?=
- =?utf-8?B?bm9sQ0hrNXRrRjRvZXZ5dUVBaUhBc1ozM1ZaSVBBTFRqd2hDTmxHZjJWZzF4?=
- =?utf-8?B?SC9Fd3JNUnk3RmFFOWRCdFVxTGlTcXl6Ym9CN0puMHRUbWZXMDNockNwaFA2?=
- =?utf-8?B?YUJKSkV4ZG5xVm9uZEZmMjQxaUxBM3BUY29pMHlrdElFYllmL2xrU2taYjI0?=
- =?utf-8?B?a3pjZFhoclB4WUk2VnlsWkZYNms1RytCaVlqWlFBN0VnaXprZHEwYU90dk1P?=
- =?utf-8?B?ZDhYKzVJUHNVL1NNQ2pja2dCbS83OHFna3pHMUVJKzVzVWVNcVhqRStEdFRF?=
- =?utf-8?B?T1R0L1g0cWNlaHVtdFdsMk12dm5MY3pXZWJ4UlY4NXRFSjhGTlFIQ0tOOTh6?=
- =?utf-8?B?Z1NFWmIxWHNPaVprQllQZjlvSjd5NUdIQkYyOVZiajF1Q1dWcWQyQmROQ1VU?=
- =?utf-8?Q?Ta4zh4QqlIPjPTxMfQHKUjI=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43bbea13-f5c8-43fd-e999-08d9c4024eba
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2021 21:47:24.4161
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WqRIoo+J843ufEfPMny9mvuD9Wa+CMGWJUJEVZB6lIGJy5xU7LEf8zEhfOvsupSvYYR9TezcOlw99Yuq1RaECg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5463
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/20/21 3:29 PM, David Woodhouse wrote:
-> On Mon, 2021-12-20 at 12:54 -0600, Tom Lendacky wrote:
->> Took the tree back to commit df9726cb7178 and then applied this change.
->> I'm unable to trigger any kind of failure with this change.
-> 
-> Hm... I fired up an EC2 m6a.48xlarge instance (192 CPUs) to play with.
-> 
-> I can reproduce your triple-fault on SMP bringup, but only with kexec.
-> And I basically can't get *anything* to kexec without that triple-
-> fault. Not a clean 5.16-rc2, not the Fedora stock 5.14.10 kernel.
-> 
-> If I *boot* instead of kexec, I have not yet seen the problem at all.
-> This is using Legacy BIOS not UEFI.
+On Tue, 14 Dec 2021 12:26:54 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Let me try with a legacy BIOS and see if I can repro. Might not be until 
-tomorrow, though, since I had to let someone borrow the machine.
+> On Mon, Dec 13, 2021 at 01:40:38PM -0700, Alex Williamson wrote:
+> 
+> > We do specify that a migration driver has discretion in using the error
+> > state for failed transitions, so there are options to simplify error
+> > handling.  
+> 
+> This could be OK if we can agree ERROR has undefined behavior.
+> 
+> > I think the basis of your priority scheme comes from that.  Ordering
+> > of the remaining items is more subtle though, for instance
+> > 0 -> SAVING | RUNNING can be broken down as:
+> > 
+> >   0 -> SAVING
+> >   SAVING -> SAVING | RUNNING 
+> > 
+> >   vs
+> > 
+> >   0 -> RUNNING
+> >   RUNNING -> SAVING | RUNNING
+> >
+> > I'd give preference to enabling logging before running and I believe
+> > that holds for transition (e) -> (d) as well.  
+> 
+> IMHO, any resolution to an arbitary choice should pick an order that
+> follows the reference flow because we know those are useful sequences
+> to have today.
+> 
+> Generally we have no use for the sequence SAVING -> SAVING | RUNNING,
+> while RUNNING -> SAVING | RUNNING is part of the standard flow.
 
-Thanks,
-Tom
+SAVING -> SAVING | RUNNING or SAVING -> RUNNING could both be used as
+recovery sequences should the target VM fail.  The latter might be a
+full abort of the migration while the former might be a means to reset
+the downtime clock without fully restarting the migration.
+
+> It also raises the question that it seems not well defined what the
+> sequence:
+> 
+> SAVING -> SAVING | RUNNING
+> 
+> Even does to the migration window?
+> 
+> Nor can I imagine what mlx5 could do beyond fail this or corrupt the
+> migration..
+
+I think this comes down to the robustness of the migration driver.  The
+migration data window and control of how userspace is to interact with
+it is essentially meant to allow the migration driver to implement its
+own transport protocol.  In the case of mlx5 where it expects only to
+apply the received migration data on the RESUMING -> RUNNING
+transition, a "short" data segment might be reserved for providing
+sequencing information.  Each time the device enters SAVING | !RUNNING
+the driver might begin by presenting a new sequence header.  On the
+target, a new sequence header would cause any previously received
+migration data to be discarded.  A similar header would also be
+suggested to validate the migration data stream is appropriate for the
+target device.
+
+Also, I hope it goes without saying, but I'll say it anyway, the
+migration data stream would make for an excellent exploit vector and
+each migration driver needs to be responsible to make sure that
+userspace cannot use it to break containment of the device.
+ 
+> If we keep the "should implement transitions" language below then I
+> expect mlx5 to fail this, and then we have a conflict where mlx5
+> cannot implement these precedence rules.
+
+Per above, I think it can.
+
+> This is the kind of precedence resolution I was trying to avoid.
+> 
+> As far as I can see the requirements are broadly:
+>  - Do not transit through an invalid state
+>  - Do not loose NDMA during the transit, eg NDMA | SAVING | RUNNING -> 0
+>    should not have a race where a DMA can leak out
+>  - Do not do transit through things like SAVING -> SAVING | RUNNING,
+>    and I'm not confident I have a good list of these
+
+"Things like", yeah, that's not really spec material.  There's nothing
+special about that transition.  The migration driver should take into
+account management of the migration data stream and support such
+states, or error the transition if it isn't sufficient ROI and expect
+device specific bug reports at some point in the future.
+
+For NDMA, that's a valid consideration.  I think that means though that
+NDMA doesn't simply bookend the pseudo algorithm I provided.  Perhaps
+it's nested between RUNNING and SAVING handlers on either end.
+ 
+> > And I think that also addresses the claim that we're doomed to untested
+> > and complicated error code handling, we unwind by simply swapping the
+> > args to our set state function and enter the ERROR state should that
+> > recursive call fail.  
+> 
+> I had the same thought the day after I wrote this, it seems workable.
+> 
+> I remain concerned however that we still can't seem to reach to a
+> working precedence after all this time. This is a very bad sign. 
+> 
+> Even if we work something out adding a new state someday is
+> terrifying. What if we can't work out any precedence that is
+> compatible with todays and supports the new state?
+> 
+> IMHO, we should be simplifing this before it becomes permanent API,
+> not trying to force it to work.
+
+I agree, this is our opportunity to simplify before we're committed,
+but I don't see how we can throw out perfectly valid transitions like
+SAVING -> SAVING | RUNNING just because the driver hasn't accounted for
+managing data in the data stream.
+
+> > If we put it in the user's hands and prescribe only single bit flips,
+> > they don't really have device knowledge to optimize further than this
+> > like a migration driver might be able to do.  
+> 
+> If so this argues we should go back to the enforced FSM that the v1
+> mlx5 posting had and forget about device_state as a bunch of bits.
+> 
+> Most of things I brought up in this post are resolved by the forced
+> FSM.
+
+Until userspace tries to do something different than exactly what it
+does today, and then what?
+ 
+> Yes, we give up some flexability, but I think the quest for
+> flexability is a little misguided. If the drivers don't consistently
+> implement the flexability then it is just cruft we cannot make use of
+> from userspace.
+> 
+> eg what practical use is SAVING -> SAVING | RUNNING if today's mlx5
+> implementation silently corrupts the migration stream? That instantly
+> makes that a no-go for userspace from an interoperability perspective
+> and we've accomplished nothing by allowing for it.
+
+Failure to support that transition is a deficiency of the driver and
+represented by a non-silent error in making that transition.  Silently
+corrupting the migration stream is simply a driver bug.
+ 
+> Please think about it, it looks like an easy resolution to all this
+> discussion to simply specify a fixed FSM and be done with it.
+> 
+> > > I thought we could tackled this when you first suggested it (eg copy
+> > > the mlx5 logic and be OK), but now I'm very skeptical. The idea that
+> > > every driver can do this right in all the corner cases doesn't seem
+> > > reasonable given we've made so many errors here already just in mlx5.
+> > >   
+> > > > + *     - Bit 1 (SAVING) [REQUIRED]:
+> > > > + *        - Setting this bit enables and initializes the migration region data    
+> > > 
+> > > I would use the word clear instead of initialize - the point of this
+> > > is to throw away any data that may be left over in the window from any
+> > > prior actions.  
+> > 
+> > "Clear" to me suggests that there's some sort of internal shared buffer
+> > implementation that needs to be wiped between different modes.  I chose
+> > "initialize" because I think it offers more independence to the
+> > implementation.  
+> 
+> The data window is expressed as a shared buffer in this API, there is
+> only one data_offset/size and data window for everything.
+
+Any access to the data window outside of that directed by the driver is
+undefined, it's up to the driver where and how to populate the data.  A
+driver might make a portion of the data window available as an mmap
+that gets zapped and faulted to the correct device backing between
+operations.
+ 
+> I think it is fine to rely on that for the description, and like all
+> abstractions an implementation can do whatever so long as externally
+> it looks like this shared buffer API.
+> 
+> The requirement here is that anything that pre-existed in the data
+> window from any prior operation is cleaned and the data window starts
+> empty before any data related to this SAVING is transfered.
+
+IOW, it's initialized.  We're picking out colors for the bike shed at
+this point.
+
+> > > > + *          window and associated fields within vfio_device_migration_info for
+> > > > + *          capturing the migration data stream for the device.  The migration
+> > > > + *          driver may perform actions such as enabling dirty logging of device
+> > > > + *          state with this bit.  The SAVING bit is mutually exclusive with the
+> > > > + *          RESUMING bit defined below.
+> > > > + *        - Clearing this bit (ie. !SAVING) de-initializes the migration region
+> > > > + *          data window and indicates the completion or termination of the
+> > > > + *          migration data stream for the device.    
+> > > 
+> > > I don't know what "de-initialized" means as something a device should
+> > > do? IMHO there is no need to talk about the migration window here,
+> > > SAVING says initialize/clear - and data_offset/etc say their values
+> > > are undefined outside SAVING/RUNNING. That is enough.  
+> > 
+> > If "initializing" the migration data region puts in place handlers for
+> > pending_bytes and friends, "de-initializing" would undo that operation.
+> > Perhaps I should use "deactivates"?  
+> 
+> And if you don't use "initializing" we don't need to talk about
+> "de-initializating".
+> 
+> Reading the data window outside SAVING is undefined behavior it seems,
+> so nothing needs to be said.
+
+Exactly why I thought simply describing it as the reciprocal of setting
+the bit would be sufficient.  Taupe!
+
+> > > > + *     - Bit 2 (RESUMING) [REQUIRED]:
+> > > > + *        - Setting this bit enables and initializes the migration region data
+> > > > + *          window and associated fields within vfio_device_migration_info for
+> > > > + *          restoring the device from a migration data stream captured from a
+> > > > + *          SAVING session with a compatible device.  The migration driver may
+> > > > + *          perform internal device resets as necessary to reinitialize the
+> > > > + *          internal device state for the incoming migration data.
+> > > > + *        - Clearing this bit (ie. !RESUMING) de-initializes the migration
+> > > > + *          region data window and indicates the end of a resuming session for
+> > > > + *          the device.  The kernel migration driver should complete the
+> > > > + *          incorporation of data written to the migration data window into the
+> > > > + *          device internal state and perform final validity and consistency
+> > > > + *          checking of the new device state.  If the user provided data is
+> > > > + *          found to be incomplete, inconsistent, or otherwise invalid, the
+> > > > + *          migration driver must indicate a write(2) error and follow the
+> > > > + *          previously described protocol to return either the previous state
+> > > > + *          or an error state.    
+> > > 
+> > > Prefer this is just 'go to an error state' to avoid unnecessary
+> > > implementation differences.  
+> > 
+> > Then it becomes a special case versus other device_state changes and
+> > we're forcing what you've described as an undefined state into the
+> > protocol.  
+> 
+> Lets look at what recovery actions something the VMM would need to
+> take along the reference flow:
+> 
+> RUNNING -> SAVING | RUNNING
+>   If this fails and we are still in RUNNING and can continue
+> 
+>  -> SAVING | RUNNING | NDMA
+>  -> SAVING  
+>   If these fail we need to go to RUNNING
+>   -> RUNNING  
+>     If this fails we need to RESET
+
+I won't argue that there aren't transition failures where the next
+logical step is likely a reset, but I also don't see the point in
+defining special rules for certain cases.  When in doubt, leave policy
+decisions to userspace?
 
 > 
+>  -> 0  
+>   Migration succeeded? Failure here should RESET
+>
+> RUNNING -> RESUMING
+>   If this fails and we are still in RUNNING continue
+>  -> NDMA | RUNNING  
+>   If this fails RESET
+>  -> RUNNING  
+>   If this fails RESET, VM could be corrupted.
 > 
+> One view is that what the device does is irrelevant as qemu should
+> simply unconditionally reset in these case.
+> 
+> Another view is that staying in a useless state is also pointless and
+> we may as well return ERROR anyhow. Eg if exiting RESUMING failed
+> there is no other action to take besides RESET, so why didn't we
+> return ERROR to tell this directly to userspace?
+
+And then the last packet arrives, gets written to the device that's
+still in RESUMING, and now can transition to RUNNING.
+ 
+> Both are reasonable views, which is why I wrote "prefer".
+
+There's no going back from the ERROR state, the only path the user has
+forward is to reset the device.  Therefore the only case I'm willing to
+say it's the preferred next state is in the case of an irrecoverable
+internal fault.  I'd also like to avoid another lengthy discussion
+trying to define which specific transitions should default to an ERROR
+state if they fail versus simply return -errno.  Userspace is free to
+define a policy where an -errno is considered fatal for the device.  I
+prefer consistent userspace handling, letting userspace define policy,
+and robust drivers that avoid forcing unnecessary user decisions.
+
+> > > > + *     - Bit 3 (NDMA) [OPTIONAL]:
+> > > > + *        The NDMA or "No DMA" state is intended to be a quiescent state for
+> > > > + *        the device for the purposes of managing multiple devices within a
+> > > > + *        user context where peer-to-peer DMA between devices may be active.
+> > > > + *        Support for the NDMA bit is indicated through the presence of the
+> > > > + *        VFIO_REGION_INFO_CAP_MIG_NDMA capability as reported by
+> > > > + *        VFIO_DEVICE_GET_REGION_INFO for the associated device migration
+> > > > + *        region.
+> > > > + *        - Setting this bit must prevent the device from initiating any
+> > > > + *          new DMA or interrupt transactions.  The migration driver must    
+> > > 
+> > > I'm not sure about interrupts.  
+> > 
+> > In the common case an interrupt is a DMA write, so the name, if not
+> > intention of this state gets a bit shaky if interrupts are allowed.  
+> 
+> Interrupts have their own masking protocol. For instance a device like
+> the huawei one is halting DMA by manipulating the queue registers, it
+> may still generate interrupts.
+> 
+> Yes, MSI is a MemWr, but I've never heard anyone call it a DMA - there
+> is no memory access here since the TLP is routed to the interrupt
+> controller.
+
+That's a pretty subtle distinction.  Can't that controller live in MMIO
+space and isn't it then just a peer-to-peer DMA?  I know I'm not the
+first to consider MSI to be just another DMA, that seems to be the
+basis of it's handling on ARM SMMU.
+ 
+> This is why I'm not sure. A hostile VM certainly can corrupt the MSI,
+> even today and thus turn it into a DMA. As we talked before this may
+> be OK, but is security risky that it allows the guest to impact the
+> hypervisor.
+>
+> Overall it seems like this is more trouble for a device like huawei's
+> if they want to implement NDMA using the trapping or something. Given
+> your right concern that NDMA should be implemented as widely as
+> possible making it more difficult that stricly necessary is perhaps
+> not good.
+> 
+> Other peope should comment here.
+
+Yeah, I'm not clear on what devices can and cannot do in the NDMA state.
+Ultimately the goal is that once all devices are in the NDMA state, we
+can safely transition them to the !RUNNING state without concern
+regarding access from another device.  Specifically we want to avoid
+things like DeviceA moves to !RUNNING while DeviceB initiates a DMA
+access to DeviceA which now cannot respond without advancing internal
+state which violates the condition of !RUNNING.
+
+But I think we're really only after that p2p behavior and we've
+discussed that disabling p2p mappings in the VM would be a sufficient
+condition to support multiple devices without NDMA support.  I think
+that means DMA to memory is fine and DMA related to MSI is fine... but
+how does a device know which DMA is memory and which DMA is another
+device?
+
+> > > > + *          complete any such outstanding operations prior to completing
+> > > > + *          the transition to the NDMA state.  The NDMA device_state    
+> > > 
+> > > Reading this as you wrote it and I suddenly have a doubt about the PRI
+> > > use case. Is it reasonable that the kernel driver will block on NDMA
+> > > waiting for another userspace thread to resolve any outstanding PRIs?
+> > > 
+> > > Can that allow userspace to deadlock the kernel or device? Is there an
+> > > alterative?  
+> > 
+> > I'd hope we could avoid deadlock in the kernel, but it seems trickier
+> > for userspace to be waiting on a write(2) operation to the device while
+> > also handling page request events for that same device.  Is this
+> > something more like a pending transaction bit where userspace asks the
+> > device to go quiescent and polls for that to occur?  
+> 
+> Hum. I'm still looking into this question, but some further thoughts.
+> 
+> PRI doesn't do DMA, it just transfers a physical address into the PCI
+> device's cache that can be later used with DMA.
+> 
+> PRI also doesn't imply the vPRI Intel is talking about.
+> 
+> For PRI controlled by the hypervisor, it is completely reasonable that
+> NDMA returns synchronously after the PRI and the DMA that triggered it
+> completes. The VMM would have to understand this and ensure it doesn't
+> block the kernel's fault path while going to NDMA eg with userfaultfd
+> or something else crazy.
+> 
+> The other reasonable option is that NDMA cancels the DMA that
+> triggered the PRI and simply doesn't care how the PRI is completed
+> after NDMA returns.
+> 
+> The later is interesting because it is a possible better path to solve
+> the vPRI problem Intel brought up. Waiting for the VCPU is just asking
+> for a DOS, if NDMA can cancel the DMAs we can then just directly fail
+> the open PRI in the hypervisor and we don't need to care about the
+> VCPU. Some mess to fixup in the vIOMMU protocol on resume, but the
+> resume'd device simply issues a new DMA with an empty ATS cache and
+> does a new PRI.
+> 
+> It is uncertain enough that qemu should not support vPRI with
+> migration until we define protocol(s) and a cap flag to say the device
+> supports it.
+> 
+> > > > + *   All combinations for the above defined device_state bits are considered
+> > > > + *   valid with the following exceptions:
+> > > > + *     - RESUMING and SAVING are mutually exclusive, all combinations of
+> > > > + *       (RESUMING | SAVING) are invalid.  Furthermore the specific combination
+> > > > + *       (!NDMA | RESUMING | SAVING | !RUNNING) is reserved to indicate the
+> > > > + *       device error state VFIO_DEVICE_STATE_ERROR.  This variant is
+> > > > + *       specifically chosen due to the !RUNNING state of the device as the
+> > > > + *       migration driver should do everything possible, including an internal
+> > > > + *       reset of the device, to ensure that the device is fully stopped in
+> > > > + *       this state.      
+> > > 
+> > > Prefer we don't specify this. ERROR is undefined behavior and
+> > > userspace should reset. Any path that leads along to ERROR already
+> > > includes possiblities for wild DMAs and what not, so there is nothing
+> > > to be gained by this other than causing a lot of driver complexity,
+> > > IMHO.  
+> > 
+> > This seems contrary to your push for consistent, interoperable
+> > behavior.  
+> 
+> Formal "undefined behavior" can be a useful part of a spec, especially
+> if the spec is 'when you see ERROR you must do RESET', we don't really
+> need to constrain the device further to continue to have
+> interoperability.
+> 
+> > What's the benefit to actually leaving the state undefined or the
+> > drawback to preemptively resetting a device if the migration driver
+> > cannot determine if the device is quiesced,   
+> 
+> RESET puts the device back to RUNNING, so RESET alone does not remedy
+> the problem.
+> 
+> RESET followed by !RUNNING can fail, meaning the best mlx5 can do is
+> "SHOULD", in which case lets omit the RESET since userspace can't rely
+> on it.
+> 
+> Even if it did work reliably, the requirement is userspace must issue
+> RESET to exit ERROR and if we say the driver has to issue reset to
+> enter ERROR we are just doing a pointless double RESET.
+
+Please read what I wrote:
+
+    This variant is specifically chosen due to the !RUNNING state of
+    the device as the migration driver should do everything possible,
+    including an internal reset of the device, to ensure that the
+    device is fully stopped in this state.
+
+That does not say that a driver must issue a reset to enter the ERROR
+state.  Perhaps it's wrong that I'm equating this so formally to the
+!RUNNING state when really we don't care about the internal state of
+the device, we just want it to not corrupt memory or generate spurious
+interrupts.  I'm thinking the equivalent of clear bus-master for PCI
+devices.  Would it be sufficient if I clarified !RUNNING relative to
+DMA and interrupt generation?
+
+> > would need to reset the device to enter a new state anyway?  I added
+> > this because language in your doc suggested the error state was far
+> > more undefined that I understood it to be, ie. !RUNNING.  
+> 
+> Yes it was like that, because the implementation of this strict
+> requirement is not nice.
+> 
+> Perhaps a middle ground can work:
+> 
+>   For device_state ERROR the device SHOULD have the device
+>   !RUNNING. If the ERROR arose due to a device_state change and
+>   if the new and old states have NDMA behavior then the device MUST
+>   maintain NDMA behavior while processing the device_state and
+>   continuing while in ERROR. Userspace MUST reset the device to
+>   recover from ERROR, therefore devices SHOULD NOT do a redundant
+>   internal reset
+
+I don't have a problem if the reset is redundant to one the user needs
+to do anyway, I'd rather see any externally visible operation of the
+device stopped ASAP.  The new and old state NDMA-like properties is
+also irrelevant, if a device enters an ERROR state moving from RUNNING
+-> SAVING | RUNNING it shouldn't continue manipulating memory and
+generating interrupts in the background.  What about:
+
+    The !RUNNING variant is used here specifically to reflect that the
+    device should immediately cease all external operations such as DMA
+    and interrupts.  The migration driver should do everything
+    possible, up to and including an internal reset of the device, to
+    ensure that the device is externally quiescent in this state.
+
+> > > > + *   Migration drivers should attempt to support any
+> > > >     transition between valid    
+> > > 
+> > > should? must, I think.  
+> > 
+> > I think that "must" terminology is a bit contrary to the fact that
+> >     we have a defined error state that can be used at the
+> >     discretion of the migration driver.  To me, "should" tells the
+> >     migration drivers that they ought to make an attempt to support
+> >     all transitions, but userspace needs to be be prepared that
+> >     they might not work.    
+> 
+> IMHO this is not inter-operable. At a minimum we should expect that a
+> driver implements a set of standard transitions, or it has to
+> implement all of them.
+> 
+> Otherwise what is the point?
+> 
+> If you go back to the mlx5 v1 version it did effectively this. It
+> enforced a FSM and only allowed some transitions. That meets the
+> language here with "should" but you didn't like it, and I agreed with
+> you then.
+> 
+> This is when the trouble stated :)
+> 
+> The mlx5 v1 with the FSM didn't have alot of these problems we are
+> discussing. It didn't have precedence issues, it didn't have problems
+> executing odd combinations it can't support, it worked and was simple
+> to understand.
+
+And an audit of that driver during review found that it grossly failed
+to meet the spirit of a "should" requirement.
+
+Using "should" terminology here is meant to give the driver some
+leeway, it's not an invitation for abuse.  Even below there's still a
+notion that a given state transitions is unsupportable by your device,
+what if that was actually true?
+
+> So, if we say should here, then I vote mlx5 goes back to enforcing
+> its FSM and that becomes the LCD that userspace must implement to.
+> 
+> In which case, why not formally specify the FSM now and avoid a driver
+> pushing a defacto spec?
+
+It really only takes one driver implementing something like SAVING ->
+SAVING | RUNNING and QEMU taking advantage of it as a supported
+transition per the uAPI for mlx5 to be left out of the feature that
+might provide.
+
+> If we say MUST here then we need to figure out a precedence and 
+> say that some transitions are undefined behavior, like SAVING ->
+> SAVING|RUNNING.
+
+If we say "should" and don't do those thing, then we're still not
+implementing to the spirit of the uAPI.  I'm hearing a lot of "may" in
+your interpretation of "should".  And again, nothing wrong with that
+transition, manage the migration stream better.  Thanks,
+
+Alex
+
