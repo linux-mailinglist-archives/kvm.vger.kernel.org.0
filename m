@@ -2,110 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CECF447AA2C
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 14:09:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 498A247AA3F
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 14:20:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232815AbhLTNJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 08:09:50 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:30146 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232793AbhLTNJu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Dec 2021 08:09:50 -0500
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JHfy96BDBz8vrT;
-        Mon, 20 Dec 2021 21:07:29 +0800 (CST)
-Received: from kwepemm600017.china.huawei.com (7.193.23.234) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 20 Dec 2021 21:09:48 +0800
-Received: from huawei.com (10.174.186.236) by kwepemm600017.china.huawei.com
- (7.193.23.234) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 20 Dec
- 2021 21:09:47 +0800
-From:   Yifei Jiang <jiangyifei@huawei.com>
-To:     <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-CC:     <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <libvir-list@redhat.com>, <anup.patel@wdc.com>,
-        <palmer@dabbelt.com>, <Alistair.Francis@wdc.com>,
-        <bin.meng@windriver.com>, <fanliang@huawei.com>,
-        <wu.wubin@huawei.com>, <wanghaibin.wang@huawei.com>,
-        <wanbo13@huawei.com>, Yifei Jiang <jiangyifei@huawei.com>,
-        Mingwang Li <limingwang@huawei.com>
-Subject: [PATCH v3 12/12] target/riscv: Support virtual time context synchronization
-Date:   Mon, 20 Dec 2021 21:09:19 +0800
-Message-ID: <20211220130919.413-13-jiangyifei@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20211220130919.413-1-jiangyifei@huawei.com>
-References: <20211220130919.413-1-jiangyifei@huawei.com>
+        id S232800AbhLTNUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 08:20:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231194AbhLTNUC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Dec 2021 08:20:02 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E0BC061574;
+        Mon, 20 Dec 2021 05:20:01 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id e3so38243237edu.4;
+        Mon, 20 Dec 2021 05:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sznSBYv8ZRRqDdS/2Qsbhy2f6IN9OI8osrxjG8Xj5LI=;
+        b=TvWBRzsSITWz4iGYO28BrrdkIqMHhav+rpgRxv6vqS6SOuueX3zs5DP2CONkx+quHO
+         qCEl+9lhe9IP0o1OeBkBn55lMdn5ln8fiz5/xmUvyC0Xa7FV3ZmdPD1Mby/8l1h9CG/C
+         EKbkAFntS63UfhGKblYbRo/XZ5cD19492ZlL/S9EHrmhsfYtXTTfyIHF8gAUvrlKNrB4
+         0DFrlWqAAmA2pu+IJBKG8EuvhlHB6dyQLHDS+BflhojVxdvzoOJ/FyDX0CB1ScQAsAFz
+         tQT2Uus+eLUE8/BJo1s+ImHnN0YN3SepslJ7xmSMWtSbTbChE4cf1n2zwV2vm+P5wgmG
+         Bk/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sznSBYv8ZRRqDdS/2Qsbhy2f6IN9OI8osrxjG8Xj5LI=;
+        b=Tdz0810Fd7f0GA8kE0jOQUxziZAEqbqeoV1OpT6BV+Ie//SI0s9YSzQOQFgu3b4acL
+         f25JXS9hJLbbINWssSFHonkPCklJ3XlVBt6xMEBs+2KqKoA4hsnBxnncT5aJk6g6uhvR
+         XLlzBGXfd6aE0nOWokhSXmk68w3Uo2u1rN4ioIg/6mSw7IIpwbgaauzMwVrndQYglDB2
+         kmRnH9y7+wDE6kBec+os8Dd8rYQnMO0qR18mufNATx2W1AQtM2fPSWLx2kByqfW4uyHr
+         MomKazPUg/LKryExi09t0Tagsv81XCNYnB3zgnZUoqCxVQRoB4FPD8V9mxZeKH8UksvS
+         D38A==
+X-Gm-Message-State: AOAM532+5o2jsauGQBuW4anZMemD46AfQkFrJh3mgJ0Zu9rEfltzi01V
+        Bj3cvMqx/iTtxiG3EYG15h8=
+X-Google-Smtp-Source: ABdhPJyTBIHrCoL/bg48I4qJRB9AS/YnRAl5DgSTMqM63PNQWNfZuFmuhHtU7NM0trEkiCOcdhvyYg==
+X-Received: by 2002:a50:9ec9:: with SMTP id a67mr15927283edf.238.1640006400247;
+        Mon, 20 Dec 2021 05:20:00 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id bx6sm1306840edb.78.2021.12.20.05.19.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Dec 2021 05:19:59 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <e20f590b-b9d9-237d-3b9c-77dd82a24b40@redhat.com>
+Date:   Mon, 20 Dec 2021 14:19:57 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v2 19/23] kvm: selftests: Add support for KVM_CAP_XSAVE2
+Content-Language: en-US
+To:     Jing Liu <jing2.liu@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com
+Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, guang.zeng@intel.com,
+        wei.w.wang@intel.com, yang.zhong@intel.com
+References: <20211217153003.1719189-1-jing2.liu@intel.com>
+ <20211217153003.1719189-20-jing2.liu@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211217153003.1719189-20-jing2.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.186.236]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600017.china.huawei.com (7.193.23.234)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add virtual time context description to vmstate_kvmtimer. After cpu being
-loaded, virtual time context is updated to KVM.
+On 12/17/21 16:29, Jing Liu wrote:
+> @@ -370,6 +397,10 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
+>   #ifdef __x86_64__
+>   	vm_create_irqchip(vm);
+>   #endif
+> +	/*
+> +	 * Permission needs to be requested before KVM_SET_CPUID2.
+> +	 */
+> +	vm_xsave_req_perm();
+>   
+>   	for (i = 0; i < nr_vcpus; ++i) {
+>   		uint32_t vcpuid = vcpuids ? vcpuids[i] : i;
 
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Mingwang Li <limingwang@huawei.com>
-Reviewed-by: Anup Patel <anup.patel@wdc.com>
----
- target/riscv/machine.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+I don't think it's necessary to enable this unconditionally?
 
-diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-index ad8248ebfd..95eb82792a 100644
---- a/target/riscv/machine.c
-+++ b/target/riscv/machine.c
-@@ -164,6 +164,35 @@ static const VMStateDescription vmstate_pointermasking = {
-     }
- };
- 
-+static bool kvmtimer_needed(void *opaque)
-+{
-+    return kvm_enabled();
-+}
-+
-+static int cpu_post_load(void *opaque, int version_id)
-+{
-+    RISCVCPU *cpu = opaque;
-+    CPURISCVState *env = &cpu->env;
-+
-+    env->kvm_timer_dirty = true;
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_kvmtimer = {
-+    .name = "cpu/kvmtimer",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = kvmtimer_needed,
-+    .post_load = cpu_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.kvm_timer_time, RISCVCPU),
-+        VMSTATE_UINT64(env.kvm_timer_compare, RISCVCPU),
-+        VMSTATE_UINT64(env.kvm_timer_state, RISCVCPU),
-+
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_riscv_cpu = {
-     .name = "cpu",
-     .version_id = 3,
-@@ -218,6 +247,7 @@ const VMStateDescription vmstate_riscv_cpu = {
-         &vmstate_hyper,
-         &vmstate_vector,
-         &vmstate_pointermasking,
-+        &vmstate_kvmtimer,
-         NULL
-     }
- };
--- 
-2.19.1
-
+Paolo
