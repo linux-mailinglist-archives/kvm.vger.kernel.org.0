@@ -2,111 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12DF847A6F9
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 10:27:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F296347A74F
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 10:39:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230263AbhLTJ1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 04:27:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41075 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229926AbhLTJ1N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 04:27:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639992432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9IkdL23yNRLEYMxVab7u73BGV3lZNI1vsDJ3NZLqO74=;
-        b=hyRff8e97TOjmonXskjZktRnBbJr3LR4coTfk9qpXQKdAX0MpqKC0u7b7FgmB+DfCu03nZ
-        d0l6jN9iOtd5wwhXChAG6rkrfrc3cSxopDT18dn4LEXvuFvF51ApTT8kzvNMZgruKDzza6
-        5ru7QEcQG9ABYdMPdJNeSZ2BAO2qnMM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-507-ebXaDYAFOfypAoubw9ZdyA-1; Mon, 20 Dec 2021 04:27:11 -0500
-X-MC-Unique: ebXaDYAFOfypAoubw9ZdyA-1
-Received: by mail-ed1-f70.google.com with SMTP id h22-20020a056402281600b003f839627a38so3192968ede.23
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 01:27:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=9IkdL23yNRLEYMxVab7u73BGV3lZNI1vsDJ3NZLqO74=;
-        b=LQISjWKTkCCLiiuXeaw6rX1XJzfwf89pURRxMUe/LYDijBCBWJkyAIsqrHj/brZ08O
-         yeDJUSqtpTWdtIyLOv7LjBaD6TVN2AtMiCL+13dtEpT2+aSb1/nztX04zuPXut/dTtwA
-         m6dJjT+HScv9ysftix67QoGqENEQGTNbW6VblF+C6osdrxx9+bMCt4eYc63Eph8Y/pni
-         wP0UEWTBmSa6/P68Sifp5T+67GdVD7FipaHOkWj8XD7aLN8iJcWEtuIQEnJ+xTmQqKF1
-         WJqUJXEGOWDZthqJ6iBUyoTRvhb7mtwm983n88QExpt1HQHzBV4t3PCd3gfWnLsvibG2
-         RBtA==
-X-Gm-Message-State: AOAM532etEAFkQcCvqY4um+DBIMG6aoNpnzxbdRCfsH16BDZ2k36lvaL
-        fLiuYH9UuEuqW5fmXzKJddpsbLyWiPK/8yHycjjWWa24iQMfqzrHizqJUjIuJjVKK72+qkY9nR8
-        5Oa5X9GPPAa/c
-X-Received: by 2002:a05:6402:34ca:: with SMTP id w10mr4770306edc.106.1639992430481;
-        Mon, 20 Dec 2021 01:27:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwM8KhSmPNIRgPd6dTe2R2O5YzHMVaTkyQKkGLcmqKwqeprqs3Exvl3OO6bz9RJhSGEWxataQ==
-X-Received: by 2002:a05:6402:34ca:: with SMTP id w10mr4770296edc.106.1639992430294;
-        Mon, 20 Dec 2021 01:27:10 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f8sm559744edd.73.2021.12.20.01.27.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Dec 2021 01:27:09 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Quanfa Fu <quanfafu@gmail.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Quanfa Fu <quanfafu@gmail.com>, pbonzini@redhat.com,
-        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com
-Subject: Re: [PATCH] KVM/X86: Remove unneeded variable
-In-Reply-To: <20211219150307.179306-1-quanfafu@gmail.com>
-References: <20211219150307.179306-1-quanfafu@gmail.com>
-Date:   Mon, 20 Dec 2021 10:27:08 +0100
-Message-ID: <87lf0ftymr.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S229887AbhLTJjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 04:39:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47056 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229842AbhLTJjL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Dec 2021 04:39:11 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EA2C061574
+        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 01:39:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CDE91B80C8D
+        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 09:39:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6BBC36AE8;
+        Mon, 20 Dec 2021 09:39:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639993148;
+        bh=8uqK3NceI45AFjqWjabQhkzy6OyB8l6tZbp7LghvIPU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RX8e5eMEk4RDyeQGulOkOgxMG4kHuZ26vU8V2tfRww7hqIdmjC3pEcL9wLxlw66qI
+         0/ld8agKowe1G0Dkk+4uCU6FQukTYi3brHqjQQGQGwyyOrRdBkUZ0I5ovUNFztuYJ6
+         xCLepJgI63eTJlODabNrOtGv6qwrw5ohKFbDEIjuLjJdSkY2qIHT2+hm40AzCYb6Xs
+         HWeHaswpxhg94mxJART9fKnUrknTcW/hAcF/7/ugF30nVFlgKAJBgHpH7/Yt39GaUi
+         9LiGntmonRo3XZkrOjPpijKIuEFhxwd6UqBnDypTTiKvWThJRwrw1HBXT/KttDgfa4
+         ohzUY5iek5AVw==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mzF8M-00DFb8-LE; Mon, 20 Dec 2021 09:39:06 +0000
+Date:   Mon, 20 Dec 2021 09:39:06 +0000
+Message-ID: <87ilvjwr7p.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 31/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+In-Reply-To: <c43ede47-ef06-96bf-b8c2-af323d244969@os.amperecomputing.com>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-32-maz@kernel.org>
+        <c43ede47-ef06-96bf-b8c2-af323d244969@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quanfa Fu <quanfafu@gmail.com> writes:
+On Mon, 20 Dec 2021 07:18:51 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> 
+> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack@cs.columbia.edu>
+> > 
+> > Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
+> > virtual HCR_EL2.NV bit is set.
+> > 
+> > This is for recursive nested virtualization.
+> > 
+> > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/kvm_arm.h |  1 +
+> >   arch/arm64/kvm/sys_regs.c        | 28 +++++++++++++++++++++++++++-
+> >   2 files changed, 28 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 9759bc893a51..68af5509e4b0 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -20,6 +20,7 @@
+> >   #define HCR_AMVOFFEN	(UL(1) << 51)
+> >   #define HCR_FIEN	(UL(1) << 47)
+> >   #define HCR_FWB		(UL(1) << 46)
+> > +#define HCR_NV1		(UL(1) << 43)
+> >   #define HCR_NV		(UL(1) << 42)
+> >   #define HCR_API		(UL(1) << 41)
+> >   #define HCR_APK		(UL(1) << 40)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index e96877fc3b2a..511e06b6f603 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -288,6 +288,22 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+> >   	return true;
+> >   }
+> >   +/* This function is to support the recursive nested
+> > virtualization */
+> > +static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+> > +{
+> > +	return forward_traps(vcpu, HCR_NV1);
+> > +}
+> > +
+> 
+> Shall we move this helper to emulate-nested.c?
 
-> Remove unneeded variable used to store return value.
->
-> No functional change intended.
->
-> Signed-off-by: Quanfa Fu <quanfafu@gmail.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e2e1d012df22..7603db81b902 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2553,16 +2553,13 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
->  static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
->  {
->  	gpa_t gpa;
-> -	int r;
->  
->  	if (vcpu->arch.mmu->direct_map)
->  		return 0;
->  
->  	gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, NULL);
->  
-> -	r = kvm_mmu_unprotect_page(vcpu->kvm, gpa >> PAGE_SHIFT);
-> -
-> -	return r;
-> +	return kvm_mmu_unprotect_page(vcpu->kvm, gpa >> PAGE_SHIFT);
+Sure, that shouldn't be a problem.
 
-While on it, you could've switched to using gpa_to_gfn() here.
-
->  }
->  
->  static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
