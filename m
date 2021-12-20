@@ -2,148 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95CC947A6F1
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 10:23:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12DF847A6F9
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 10:27:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232129AbhLTJX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 04:23:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:34834 "EHLO
+        id S230263AbhLTJ1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 04:27:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41075 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232516AbhLTJXl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 04:23:41 -0500
+        by vger.kernel.org with ESMTP id S229926AbhLTJ1N (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 04:27:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639992220;
+        s=mimecast20190719; t=1639992432;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Nnk2J4ZoXBtJE9rH5Olhc2v3ow2o0jQFMpDHq6LmjfY=;
-        b=TfUuygAu0jRp4T5XYyqcyep5VUHpjZCfSaJvixdiMl7f/bNK3hXvIu5VwuYyXIrseo+3Cs
-        ihiwuMh2xaJ5Mkqj61lN7bxfMC0xnOqVu/Ea++dpe/xz2k3ml1z2XeD+p5CyFXLItsSbgP
-        11uCFlBP1MQDQyNQXRT+HmnSvFa8myk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=9IkdL23yNRLEYMxVab7u73BGV3lZNI1vsDJ3NZLqO74=;
+        b=hyRff8e97TOjmonXskjZktRnBbJr3LR4coTfk9qpXQKdAX0MpqKC0u7b7FgmB+DfCu03nZ
+        d0l6jN9iOtd5wwhXChAG6rkrfrc3cSxopDT18dn4LEXvuFvF51ApTT8kzvNMZgruKDzza6
+        5ru7QEcQG9ABYdMPdJNeSZ2BAO2qnMM=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613-bapgra1gNZK9FuasX-NYsQ-1; Mon, 20 Dec 2021 04:23:39 -0500
-X-MC-Unique: bapgra1gNZK9FuasX-NYsQ-1
-Received: by mail-ed1-f72.google.com with SMTP id dm10-20020a05640222ca00b003f808b5aa18so7079604edb.4
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 01:23:38 -0800 (PST)
+ us-mta-507-ebXaDYAFOfypAoubw9ZdyA-1; Mon, 20 Dec 2021 04:27:11 -0500
+X-MC-Unique: ebXaDYAFOfypAoubw9ZdyA-1
+Received: by mail-ed1-f70.google.com with SMTP id h22-20020a056402281600b003f839627a38so3192968ede.23
+        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 01:27:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=Nnk2J4ZoXBtJE9rH5Olhc2v3ow2o0jQFMpDHq6LmjfY=;
-        b=jGJL/o61mF9La1WC2vsH4ryN6YdXqHB8/oAyKoMiutS56LLRhDBwZubiQMgXCLp3+E
-         dGs8qahScPxu2KdcVixkF79gkVRFSB+FWXTHsWMt3h15f4O7NcmpvYT+h8jO+AFh9b8m
-         1n1zWIRmor8xNbXENlAQpUsmZEgExWUSlGzesX9vgvvLAZ+DAGn8GXCKhyKAb0lVhiRM
-         sLMs5mvzoNx0EnIN9fpTz24HctA8pruuA93s6F1dleaEb0WEDIKcczAx05q1IPtFAHAd
-         Jqpml812UJGvY1eFbkSYUSwZ+a+9Q+EsgPY9SdpPVV8xyqUGy1DcZyRMYNHJjvt4TgFF
-         qVzg==
-X-Gm-Message-State: AOAM5317kM+iOjAArZ21xZtyXT79pEpTTF576BVyrjDyNwLW6Yhfibg+
-        ke3wHUTrVN3jjjEO80hR1i3xffO7dmc//edNZBt1y1WxvKqOdwNbaYCcJsuIBEOKxHoE6c4daHp
-        0056/SxPsNCo4
-X-Received: by 2002:a05:6402:c0a:: with SMTP id co10mr14695522edb.295.1639992217400;
-        Mon, 20 Dec 2021 01:23:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzUAbBEWaDB55xFPv1shMHEPRY0K/FLkT72nUjo6PPZahsoOBnw0777NBsB1oiVAcMaXdj8AQ==
-X-Received: by 2002:a05:6402:c0a:: with SMTP id co10mr14695500edb.295.1639992217232;
-        Mon, 20 Dec 2021 01:23:37 -0800 (PST)
+        bh=9IkdL23yNRLEYMxVab7u73BGV3lZNI1vsDJ3NZLqO74=;
+        b=LQISjWKTkCCLiiuXeaw6rX1XJzfwf89pURRxMUe/LYDijBCBWJkyAIsqrHj/brZ08O
+         yeDJUSqtpTWdtIyLOv7LjBaD6TVN2AtMiCL+13dtEpT2+aSb1/nztX04zuPXut/dTtwA
+         m6dJjT+HScv9ysftix67QoGqENEQGTNbW6VblF+C6osdrxx9+bMCt4eYc63Eph8Y/pni
+         wP0UEWTBmSa6/P68Sifp5T+67GdVD7FipaHOkWj8XD7aLN8iJcWEtuIQEnJ+xTmQqKF1
+         WJqUJXEGOWDZthqJ6iBUyoTRvhb7mtwm983n88QExpt1HQHzBV4t3PCd3gfWnLsvibG2
+         RBtA==
+X-Gm-Message-State: AOAM532etEAFkQcCvqY4um+DBIMG6aoNpnzxbdRCfsH16BDZ2k36lvaL
+        fLiuYH9UuEuqW5fmXzKJddpsbLyWiPK/8yHycjjWWa24iQMfqzrHizqJUjIuJjVKK72+qkY9nR8
+        5Oa5X9GPPAa/c
+X-Received: by 2002:a05:6402:34ca:: with SMTP id w10mr4770306edc.106.1639992430481;
+        Mon, 20 Dec 2021 01:27:10 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwM8KhSmPNIRgPd6dTe2R2O5YzHMVaTkyQKkGLcmqKwqeprqs3Exvl3OO6bz9RJhSGEWxataQ==
+X-Received: by 2002:a05:6402:34ca:: with SMTP id w10mr4770296edc.106.1639992430294;
+        Mon, 20 Dec 2021 01:27:10 -0800 (PST)
 Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j11sm6434339edv.0.2021.12.20.01.23.36
+        by smtp.gmail.com with ESMTPSA id f8sm559744edd.73.2021.12.20.01.27.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Dec 2021 01:23:36 -0800 (PST)
+        Mon, 20 Dec 2021 01:27:09 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Andra Paraschiv <andraprs@amazon.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Cc:     Alexandru Ciobotaru <alcioa@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Alexandru Vasile <lexnv@amazon.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Tim Gardner <tim.gardner@canonical.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        stable <stable@vger.kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>
-Subject: Re: [PATCH =?utf-8?Q?v1=C2=A0=5D?= nitro_enclaves: Add
- mmap_read_lock() for the
- get_user_pages() call
-In-Reply-To: <20211218103525.26739-1-andraprs@amazon.com>
-References: <20211218103525.26739-1-andraprs@amazon.com>
-Date:   Mon, 20 Dec 2021 10:23:35 +0100
-Message-ID: <87o85btyso.fsf@redhat.com>
+To:     Quanfa Fu <quanfafu@gmail.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Quanfa Fu <quanfafu@gmail.com>, pbonzini@redhat.com,
+        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com
+Subject: Re: [PATCH] KVM/X86: Remove unneeded variable
+In-Reply-To: <20211219150307.179306-1-quanfafu@gmail.com>
+References: <20211219150307.179306-1-quanfafu@gmail.com>
+Date:   Mon, 20 Dec 2021 10:27:08 +0100
+Message-ID: <87lf0ftymr.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andra Paraschiv <andraprs@amazon.com> writes:
+Quanfa Fu <quanfafu@gmail.com> writes:
 
-> After commit 5b78ed24e8ec (mm/pagemap: add mmap_assert_locked()
-> annotations to find_vma*()), the call to get_user_pages() will trigger
-> the mmap assert.
+> Remove unneeded variable used to store return value.
 >
-> static inline void mmap_assert_locked(struct mm_struct *mm)
-> {
-> 	lockdep_assert_held(&mm->mmap_lock);
-> 	VM_BUG_ON_MM(!rwsem_is_locked(&mm->mmap_lock), mm);
-> }
+> No functional change intended.
 >
-> [   62.521410] kernel BUG at include/linux/mmap_lock.h:156!
-> ...........................................................
-> [   62.538938] RIP: 0010:find_vma+0x32/0x80
-> ...........................................................
-> [   62.605889] Call Trace:
-> [   62.608502]  <TASK>
-> [   62.610956]  ? lock_timer_base+0x61/0x80
-> [   62.614106]  find_extend_vma+0x19/0x80
-> [   62.617195]  __get_user_pages+0x9b/0x6a0
-> [   62.620356]  __gup_longterm_locked+0x42d/0x450
-> [   62.623721]  ? finish_wait+0x41/0x80
-> [   62.626748]  ? __kmalloc+0x178/0x2f0
-> [   62.629768]  ne_set_user_memory_region_ioctl.isra.0+0x225/0x6a0 [nitro_enclaves]
-> [   62.635776]  ne_enclave_ioctl+0x1cf/0x6d7 [nitro_enclaves]
-> [   62.639541]  __x64_sys_ioctl+0x82/0xb0
-> [   62.642620]  do_syscall_64+0x3b/0x90
-> [   62.645642]  entry_SYSCALL_64_after_hwframe+0x44/0xae
->
-> Add mmap_read_lock() for the get_user_pages() call when setting the
-> enclave memory regions.
->
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-> Cc: stable@vger.kernel.org
-
-In case commit 5b78ed24e8ec broke Nitro Enclaves driver, we need to
-explicitly state this:
-
-Fixes: 5b78ed24e8ec ("mm/pagemap: add mmap_assert_locked() annotations to find_vma*()")
-
+> Signed-off-by: Quanfa Fu <quanfafu@gmail.com>
 > ---
->  drivers/virt/nitro_enclaves/ne_misc_dev.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  arch/x86/kvm/mmu/mmu.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 >
-> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> index 8939612ee0e0..6c51ff024036 100644
-> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> @@ -886,8 +886,13 @@ static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
->  			goto put_pages;
->  		}
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e2e1d012df22..7603db81b902 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2553,16 +2553,13 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
+>  static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
+>  {
+>  	gpa_t gpa;
+> -	int r;
 >  
-> +		mmap_read_lock(current->mm);
-> +
->  		gup_rc = get_user_pages(mem_region.userspace_addr + memory_size, 1, FOLL_GET,
->  					ne_mem_region->pages + i, NULL);
-> +
-> +		mmap_read_unlock(current->mm);
-> +
+>  	if (vcpu->arch.mmu->direct_map)
+>  		return 0;
+>  
+>  	gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, NULL);
+>  
+> -	r = kvm_mmu_unprotect_page(vcpu->kvm, gpa >> PAGE_SHIFT);
+> -
+> -	return r;
+> +	return kvm_mmu_unprotect_page(vcpu->kvm, gpa >> PAGE_SHIFT);
 
-This looks very much like get_user_pages_unlocked(), I think we can use
-it instead of open-coding it.
+While on it, you could've switched to using gpa_to_gfn() here.
 
->  		if (gup_rc < 0) {
->  			rc = gup_rc;
+>  }
+>  
+>  static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
 Vitaly
