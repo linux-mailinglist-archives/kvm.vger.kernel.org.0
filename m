@@ -2,222 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CCDC47AFF3
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 16:23:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55BCF47B15D
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 17:41:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239619AbhLTPXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 10:23:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51795 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235407AbhLTPWP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 10:22:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640013735;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S4vm94AontPUUDpv6N5LmQArLZIh/Id9fIuoPMPnvzg=;
-        b=eSE2b+IQf55esKQH+BMjCbsABLbXuvuYeMReQ7U7VKY8opXwlKUCYpywFHJ0al/nbwQ6CQ
-        1afx6L0Yc1/tQw/s4zlBfnSAqlUnHDfVTm/wTH27aKWX8DvnGmeBoBWu0VLghhVxMvG0Z/
-        l5fnKc8x5dPsvk7wlYPXgdhlOQtWiJs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-648-C7w-NKczOWCePYgGNL1JJg-1; Mon, 20 Dec 2021 10:22:10 -0500
-X-MC-Unique: C7w-NKczOWCePYgGNL1JJg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S233291AbhLTQlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 11:41:07 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:60774 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233061AbhLTQlG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Dec 2021 11:41:06 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B20E6801AC5;
-        Mon, 20 Dec 2021 15:22:08 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E6657B6CE;
-        Mon, 20 Dec 2021 15:21:56 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] KVM: nSVM: Implement Enlightened MSR-Bitmap feature
-Date:   Mon, 20 Dec 2021 16:21:39 +0100
-Message-Id: <20211220152139.418372-6-vkuznets@redhat.com>
-In-Reply-To: <20211220152139.418372-1-vkuznets@redhat.com>
-References: <20211220152139.418372-1-vkuznets@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A788761219;
+        Mon, 20 Dec 2021 16:41:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8EC6C36AE2;
+        Mon, 20 Dec 2021 16:41:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1640018465;
+        bh=TuP185pT5gdSlNtfNfQ+Kye5lOB+euhTli9+HNxshOM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=enGWQQJij7Gn5KXQIvc6DgLGhW8TsmstPvfbBL0Frpv76daIROB5Wk6RyCml6X1M0
+         INr/wU0RVuAcWcOkPbgbi5U7MaR0NTk6+o3rhiyEe0vywSW27g/jS59FjbvlDzhRr3
+         ovNt3nB3npaxHStYKaqE8ptag4HrP8L17DKCvcbQ=
+Date:   Mon, 20 Dec 2021 17:41:02 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        David Laight <David.Laight@aculab.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Guo Ren <guoren@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
+        Mark Gross <markgross@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Russell King <linux@armlinux.org.uk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Will Deacon <will@kernel.org>,
+        bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 08/17] all: replace bitmap_weight with
+ bitmap_weight_{eq,gt,ge,lt,le} where appropriate
+Message-ID: <YcCyHvr1f+Z8M9M1@kroah.com>
+References: <20211218212014.1315894-1-yury.norov@gmail.com>
+ <20211218212014.1315894-9-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211218212014.1315894-9-yury.norov@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Similar to nVMX commit 502d2bf5f2fd ("KVM: nVMX: Implement Enlightened MSR
-Bitmap feature"), add support for the feature for nSVM (Hyper-V on KVM).
+On Sat, Dec 18, 2021 at 01:20:04PM -0800, Yury Norov wrote:
+> Kernel code calls bitmap_weight() to compare the weight of bitmap with
+> a given number. We can do it more efficiently with bitmap_weight_{eq, ...}
+> because conditional bitmap_weight may stop traversing the bitmap earlier,
+> as soon as condition is met.
+> 
+> This patch replaces bitmap_weight with conditional versions where possible,
+> except for small bitmaps which size is not configurable and  known at
+> constant time. In that case conditional version of bitmap_weight would not
+> benefit due to small_const_nbits() optimization; but readability may
+> suffer.
+> 
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> ---
+>  arch/x86/kernel/cpu/resctrl/rdtgroup.c                 |  2 +-
+>  drivers/iio/dummy/iio_simple_dummy_buffer.c            |  4 ++--
+>  drivers/iio/industrialio-trigger.c                     |  2 +-
+>  drivers/memstick/core/ms_block.c                       |  4 ++--
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c         |  2 +-
+>  .../net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c  |  2 +-
+>  .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c    |  4 ++--
+>  drivers/net/ethernet/mellanox/mlx4/cmd.c               | 10 +++-------
+>  drivers/net/ethernet/mellanox/mlx4/eq.c                |  4 ++--
+>  drivers/net/ethernet/mellanox/mlx4/fw.c                |  4 ++--
+>  drivers/net/ethernet/mellanox/mlx4/main.c              |  2 +-
+>  drivers/perf/thunderx2_pmu.c                           |  4 ++--
+>  drivers/staging/media/tegra-video/vi.c                 |  2 +-
+>  13 files changed, 21 insertions(+), 25 deletions(-)
 
-Notable differences from nVMX implementation:
-- As the feature uses SW reserved fields in VMCB control, KVM needs to
-make sure it's dealing with a Hyper-V guest (kvm_hv_hypercall_enabled()).
+"all" is not how to submit changes to the kernel.  Please break them up
+into subsystem-specific patches, and send them after your core changes
+are accepted.
 
-- 'msrpm_base_pa' needs to be always be overwritten in
-nested_svm_vmrun_msrpm(), even when the update is skipped. As an
-optimization, nested_vmcb02_prepare_control() copies it from VMCB01
-so when MSR-Bitmap feature for L2 is disabled nothing needs to be done.
+good luck!
 
-- 'struct vmcb_ctrl_area_cached' needs to be extended with clean
-fields/sw reserved data and __nested_copy_vmcb_control_to_cache() needs to
-copy it so nested_svm_vmrun_msrpm() can use it later.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c     |  7 +------
- arch/x86/kvm/svm/nested.c | 41 ++++++++++++++++++++++++++++++++-------
- arch/x86/kvm/svm/svm.h    |  2 ++
- 3 files changed, 37 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index c008522112f6..18af9e67be40 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2409,10 +2409,6 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 	if (kvm_x86_ops.nested_ops->get_evmcs_version)
- 		evmcs_ver = kvm_x86_ops.nested_ops->get_evmcs_version(vcpu);
- 
--	/* Skip NESTED_FEATURES if eVMCS is not supported */
--	if (!evmcs_ver)
--		--nent;
--
- 	if (cpuid->nent < nent)
- 		return -E2BIG;
- 
-@@ -2512,8 +2508,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 		case HYPERV_CPUID_NESTED_FEATURES:
- 			ent->eax = evmcs_ver;
--			if (evmcs_ver)
--				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
-+			ent->eax |= HV_X64_NESTED_MSR_BITMAP;
- 
- 			break;
- 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f27323728be2..c975570188e9 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -28,6 +28,7 @@
- #include "cpuid.h"
- #include "lapic.h"
- #include "svm.h"
-+#include "svm_onhyperv.h"
- 
- #define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
- 
-@@ -165,14 +166,30 @@ void recalc_intercepts(struct vcpu_svm *svm)
- 	vmcb_set_intercept(c, INTERCEPT_VMSAVE);
- }
- 
-+/*
-+ * Merge L0's (KVM) and L1's (Nested VMCB) MSR permission bitmaps. The function
-+ * is optimized in that it only merges the parts where KVM MSR permission bitmap
-+ * may contain zero bits.
-+ */
- static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- {
-+	struct hv_enlightenments *hve =
-+		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
-+	int i;
-+
- 	/*
--	 * This function merges the msr permission bitmaps of kvm and the
--	 * nested vmcb. It is optimized in that it only merges the parts where
--	 * the kvm msr permission bitmap may contain zero bits
-+	 * MSR bitmap update can be skipped when:
-+	 * - MSR bitmap for L1 hasn't changed.
-+	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-+	 *   before.
-+	 * - Nested hypervisor (L1) is using Hyper-V emulation interface and
-+	 * tells KVM (L0) there were no changes in MSR bitmap for L2.
- 	 */
--	int i;
-+	if (!svm->nested.force_msr_bitmap_recalc &&
-+	    kvm_hv_hypercall_enabled(&svm->vcpu) &&
-+	    hve->hv_enlightenments_control.msr_bitmap &&
-+	    (svm->nested.ctl.clean & VMCB_HV_NESTED_ENLIGHTENMENTS))
-+		goto set_msrpm_base_pa;
- 
- 	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return true;
-@@ -195,6 +212,7 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- 
- 	svm->nested.force_msr_bitmap_recalc = false;
- 
-+set_msrpm_base_pa:
- 	svm->vmcb->control.msrpm_base_pa = __sme_set(__pa(svm->nested.msrpm));
- 
- 	return true;
-@@ -300,7 +318,8 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
- }
- 
- static
--void __nested_copy_vmcb_control_to_cache(struct vmcb_ctrl_area_cached *to,
-+void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
-+					 struct vmcb_ctrl_area_cached *to,
- 					 struct vmcb_control_area *from)
- {
- 	unsigned int i;
-@@ -333,12 +352,19 @@ void __nested_copy_vmcb_control_to_cache(struct vmcb_ctrl_area_cached *to,
- 	to->asid           = from->asid;
- 	to->msrpm_base_pa &= ~0x0fffULL;
- 	to->iopm_base_pa  &= ~0x0fffULL;
-+
-+	/* Hyper-V extensions (Enlightened VMCB) */
-+	if (kvm_hv_hypercall_enabled(vcpu)) {
-+		to->clean = from->clean;
-+		memcpy(to->reserved_sw, from->reserved_sw,
-+		       sizeof(struct hv_enlightenments));
-+	}
- }
- 
- void nested_copy_vmcb_control_to_cache(struct vcpu_svm *svm,
- 				       struct vmcb_control_area *control)
- {
--	__nested_copy_vmcb_control_to_cache(&svm->nested.ctl, control);
-+	__nested_copy_vmcb_control_to_cache(&svm->vcpu, &svm->nested.ctl, control);
- }
- 
- static void __nested_copy_vmcb_save_to_cache(struct vmcb_save_area_cached *to,
-@@ -1305,6 +1331,7 @@ static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
- 	dst->virt_ext              = from->virt_ext;
- 	dst->pause_filter_count   = from->pause_filter_count;
- 	dst->pause_filter_thresh  = from->pause_filter_thresh;
-+	/* 'clean' and 'reserved_sw' are not changed by KVM */
- }
- 
- static int svm_get_nested_state(struct kvm_vcpu *vcpu,
-@@ -1437,7 +1464,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		goto out_free;
- 
- 	ret = -EINVAL;
--	__nested_copy_vmcb_control_to_cache(&ctl_cached, ctl);
-+	__nested_copy_vmcb_control_to_cache(vcpu, &ctl_cached, ctl);
- 	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached))
- 		goto out_free;
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index e5040daaa968..40b0b92d4e3e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -138,6 +138,8 @@ struct vmcb_ctrl_area_cached {
- 	u32 event_inj_err;
- 	u64 nested_cr3;
- 	u64 virt_ext;
-+	u32 clean;
-+	u8 reserved_sw[32];
- };
- 
- struct svm_nested_state {
--- 
-2.33.1
-
+greg k-h
