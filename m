@@ -2,196 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16F5A47C6DF
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 19:46:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F65347C6E4
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 19:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241501AbhLUSqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 13:46:14 -0500
-Received: from mail-bn7nam10on2042.outbound.protection.outlook.com ([40.107.92.42]:27905
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231534AbhLUSqN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 13:46:13 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OHzK7Qnx1eqtDdPWgGcX3Dn0dvQ3Q+PUFWOKQGPw+MuJ//L9XXbNSi9K/QKJk2cGhJ8/xfsZmRd2zW4VMbRr9mky9QAkTfmxbrdKQHeQDdZ8K+To6ncA/nkm/BTdNZVVAJh9brivLU9I7D4opScLfiCNtI9K+XNLcLAv1HXK+3fGhlNUvgUb58rtUAC2dxj1VuVH6S46GM268t+hqKpWo4zK3vmne3URoi8iyapftXhjjzCvJvdCqgv2x+WeoRDbkZmpsUJlRC+LvDr54ZHa1ZG2u45AId9jrNNYSWcfZK0VaX4R1Z3fowyWTJ998qUwbF3yaIJ1xYPLbqY5f2EiFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MzQEMiqfdSZJmpm/hrPfGgTjlDc95xpvzfrxToFyjJQ=;
- b=Jv6meejEzIrsRcLEbr8XSyOQbPJeyXWCumGiRJd4vd+tddLMvCmC4wdH6VwilFdkqZ1GSdIB97khIvIpHvlnXoj9iKbwqjSbbtVFKjDUO0fRf9f4bI7hpX5iLeix4niyQLEtWuniN6mE1QFXM+BBM5hT35RoiqfPheofNk56+EcUBGaSMCdyFyyYSu0LHunxhmRKc8QB47JwCYV3nTejv+rRUFCi+ee/DnEwzzR5aZnJZUfXvRTgPfP+rRwDriego4E5rHOPoYGxOdPPuGIPy+7o+VG0dbcJ8nIhtZQVcgsbxg0tV6/wxte7+Oysb/gqMrt1cMncVCfH2lGpN108Vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MzQEMiqfdSZJmpm/hrPfGgTjlDc95xpvzfrxToFyjJQ=;
- b=U5Vvojwm95Nqsp23Pu/IlTsu0DfLSYtU69SfQeW1McG9Bb3djZyhCCF7HZtKUV2Jg3Rn6YwVuWSekBuRvdFbXP8JWbLNjzxus29t1LyW2y5z1/epuNnXMs5JbjCDigG2bnZlDgp7lnIfv5dLSpGObFMKsCZsVD3OwQXZD5wn6/db1zWzrih2fzGam/0TG9GLuhKH2NaPWc/gxHJHGkWawCWsPsVBGgL+WBKN7DBmH8KpXeGJu0hyciSdY3X2pEG5VvLGaLv+tNC/Eh8E78pzmf5/iS5+vQ82lpTIljcchxrpuIICQX8+OV8nX1e223gRNyXt+epbM4Jx7SuKH7IZzA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5362.namprd12.prod.outlook.com (2603:10b6:208:31d::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Tue, 21 Dec
- 2021 18:46:11 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d8be:e4e4:ce53:6d11]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d8be:e4e4:ce53:6d11%7]) with mapi id 15.20.4823.017; Tue, 21 Dec 2021
- 18:46:11 +0000
-Date:   Tue, 21 Dec 2021 14:46:09 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 07/13] iommu: Add iommu_at[de]tach_device_shared() for
- multi-device groups
-Message-ID: <20211221184609.GF1432915@nvidia.com>
-References: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
- <20211217063708.1740334-8-baolu.lu@linux.intel.com>
- <dd797dcd-251a-1980-ca64-bb38e67a526f@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd797dcd-251a-1980-ca64-bb38e67a526f@arm.com>
-X-ClientProxiedBy: YT3PR01CA0124.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:83::33) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S234501AbhLUSrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 13:47:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37269 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237293AbhLUSrg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Dec 2021 13:47:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640112455;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fMJgqxOu6NETB3OMkfBKIVZjo/kuIriDF1hJexd9PzM=;
+        b=Bs/b0/UdvT0skdQ6nbN7pf3g2YlbuHehL4AV959ixHyZUUXaauEZQYilKdN9zhbMQmmccP
+        KS9EGMi6+i2kXWHSZK/bFThiy52Xfp2PZQRhAq4FfC2kB/KhA4GZ4Ya97uT1MuxsbL8rRD
+        4EaXCondleixE3HaHjkhLqB1QWmUSfk=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-459-mMcjbe00MXGI6BJ-tfJRzA-1; Tue, 21 Dec 2021 13:47:34 -0500
+X-MC-Unique: mMcjbe00MXGI6BJ-tfJRzA-1
+Received: by mail-oi1-f198.google.com with SMTP id t26-20020a056808159a00b002bce1f1c045so39070oiw.16
+        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 10:47:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fMJgqxOu6NETB3OMkfBKIVZjo/kuIriDF1hJexd9PzM=;
+        b=5Y9OiAAMFXyOxY2O1n4QXNZ5Apz5FV4wNU/9qMh+tevo28/SQp4blxvVkm2TMZ2BPe
+         +kQYAouzLZMcuAwfnOmRBjAgZnu7eOs705tq2CYANRb/DJ+4r/AiI4ik5yL1FwethzfI
+         LDnhWo6Ao2CGWFpg80FcVDOHpJv0v0XrneBV6zWHDINo/kT7N5i+GKtQr5lz5fOhUzv8
+         3bsLqTYBte0AfDS2IrSqoxO+elTAGPwN8MO6W9XR6MOuqqZfuV2VXeq0hAMmcZ7a0t3f
+         6p6perNtwWbkumNyMvu70Ti00pG70cCx5z90q1BY5a5B8oRWFbxySUrQtxjWF9LznphZ
+         lG9w==
+X-Gm-Message-State: AOAM531zE8LVV0ECT/3CsIO0yE1qWORn67N5j+IviF5Ic30UyxRBW24t
+        NknPnEdI/lhECcxTj7g++rUsxNA+5ToqPCY9EsuGA7MNUi3wjEm51rez23+xrgzF0Gu5Ki5ueVU
+        MJV/KJ7c5f0hD
+X-Received: by 2002:a4a:a44b:: with SMTP id w11mr2894069ool.66.1640112453918;
+        Tue, 21 Dec 2021 10:47:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwFK45DDoCU2XRxEstAIRZ1MmGBeMtD3eMoZ3u3pu7fxEDrFN8lOpeiB1zFxZ0v3QTOeosTvA==
+X-Received: by 2002:a4a:a44b:: with SMTP id w11mr2894046ool.66.1640112453637;
+        Tue, 21 Dec 2021 10:47:33 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id n26sm31334oij.5.2021.12.21.10.47.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Dec 2021 10:47:33 -0800 (PST)
+Date:   Tue, 21 Dec 2021 11:47:31 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 26/32] vfio-pci/zdev: wire up group notifier
+Message-ID: <20211221114731.21752d54.alex.williamson@redhat.com>
+In-Reply-To: <20211207205743.150299-27-mjrosato@linux.ibm.com>
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+        <20211207205743.150299-27-mjrosato@linux.ibm.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0f78fb51-f10b-44a3-2525-08d9c4b22843
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5362:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5362418157FE9BFE51E666ABC27C9@BL1PR12MB5362.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Oeki23Tsg6rSw3f/wdkC0I34GF2dh1C2Ob433mWHSoBjB+mt3zKLR26mNNbiPdT75RG0NFYvGT9Cro5yiS2l6/sxP6XCEdc8i045v9dIzh+fHL1kxfNa4cF29RW/jOfTrNFMFgTRphr5DAvPCWxXLpWTqTDFT74BD83dkbKpsam/FhQ8ptv0Xat8Q2V993xtr/qsBmwiMpzX71un68GSUhCDPMTW7TNQHGl7M5y3fGlEPX7UB0xiNf38T95/9y38gVKXZxmXOZA5StK9knZTrde7NwYGi8jwZ0nLYRnNaWRDPhsdBADlaijRV6VTwnlHw6f2mFogpWH21LrrhOrB/5bwf1v/FTr5LtaRFH+Qca/dPcWKjbe9wAsCzNp/kSJRk2IcCyfl36lqpKomcmHoc2S6qXLdgtBBEgSLWwtQX/boPxjqFROAKlP0fG7VEE0c5GFiPa/ePSCPfs69Rge1gOOnMUXrYZNMUmUGfNHqkgHHj5Pc/cke+Y82Whfea+PJcs8xgEAlMLmWbyqHz9jZOjRHwmW8Y2D7pECASDDnyXmcFCsPapQqkqMDD/dQRdoGYD/79VbXLCB9rlWPWxS4gyrCvEJT1e5BMzEyuUjwejP83DvnbEtGqIK4o6lcm6rQUfrlK61rbZZ4mWSCpjAntg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6512007)(54906003)(7416002)(508600001)(4326008)(66476007)(6916009)(8936002)(8676002)(2906002)(6486002)(66946007)(2616005)(66556008)(33656002)(1076003)(6506007)(83380400001)(86362001)(5660300002)(38100700002)(36756003)(26005)(186003)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XtmW5BN4sSlkcd+tOWRBM1mrNPkVAJwJCn3JDsrhpoubGNXS4AwLSmJfx5gY?=
- =?us-ascii?Q?fbxDU7OhlEjJOAYBVnzWA/VbFDRIg3G0TkwIJe0LUi1CAT03o75y45BFCEAK?=
- =?us-ascii?Q?IjN+qAh+bUWIND2SlOj/F5fVg6OGrXKMoaWCXGp/uPppvwrq+PyyRX6byEaz?=
- =?us-ascii?Q?vDP9MR/Y4vUudPetRJMtuuPwL3V/A3cQ+n6VEwc2b+HRXbEZkbHJe8gaLGMj?=
- =?us-ascii?Q?aRhm4Kw9Ypx/Ao9BC/B2YFfZePvNkEi0LvwX9FTQ2XpwcXp+dtmhfwtWlyEX?=
- =?us-ascii?Q?96y344kIEj6qkegltUvRmNWgCk+efeiClv0rcd2bicJzunVxKbjnOigy8eA/?=
- =?us-ascii?Q?byieo1l1OFtqLdEW6VsaEJrDvdZSMTrzwDR4Jpmrl51jnm4RJjNRtd4ym69s?=
- =?us-ascii?Q?ejkgAFvgJLaHxQdLaPwHPg0avsjyw6vFIWyya+K/XvcR/Lu35Ie5ui4VOgt8?=
- =?us-ascii?Q?zbHPt93zGLjzZKAKxJkzPgCU4lowzNyvLuSs2+EGm4PE3okZ9N+GVdPzSJxk?=
- =?us-ascii?Q?GQAxwa9fUXLs3i5ZVCf4GKW8lJKlRVY361dI8mGWjwI4EJblAQhgxH25QRD/?=
- =?us-ascii?Q?jt6EtRYKFzoU/WH5MbUI9exRzphU8GTw3ucXNue3kEZk1xXYL1MivEVf799O?=
- =?us-ascii?Q?SBQLYFRUGGwUnDAdruifyXzP4y5cB12rUVZlYe/0mkslJtuntSLd943ZT9Lf?=
- =?us-ascii?Q?dBcf6f300/wOQ7r/kcq1UjffiGvRRKOw8WOt+ODZ/wubxyTUPfuY/yOu5Ec0?=
- =?us-ascii?Q?S4/J5QwSN8iC2gl9OWzfnx/Y0rrGCWR5u8DNCYGSXa//VYyXTU+/kF7eDT7g?=
- =?us-ascii?Q?jIy2gAC9NYesNjecL//GdbV4Hd7G94nxneL2OInrhl3ncLTgG0bIVrM7qSiH?=
- =?us-ascii?Q?URQkEqOSlG+BAp1QYY0RYRvmGyMGlrwKe96BVMDZ54oZzBiQBp2FtYBfn8DN?=
- =?us-ascii?Q?XQNFw2k8BqExyf8dcZDjFTWZ7u/8SWZJTyQBgchjB3NY5evRxwjNyLb6lVc0?=
- =?us-ascii?Q?llupLQOBUdzvdLNKoUfHPZf+Jg5ao3LyWUGek3Qkefn4o9hfFiSaDLgerklw?=
- =?us-ascii?Q?O6WtPdEo93xj8wlyu60lrwHCS9wqrkwWITY+uTXCVtIsZbVmS9vwf6Mlwwp8?=
- =?us-ascii?Q?+FEUz+f/X85ryviN23j30WFPwHvXHYMxGcynBZfOJf531V62+Rl9SRM5guIy?=
- =?us-ascii?Q?kd4rX83JGlpwcfzXoRlJpgpRJ4ZZoFJhPfz+kqQJL97d0uxbXGBQDkEm6oB1?=
- =?us-ascii?Q?X4ofmK/IGwgAA0EHkr23HpolDBYfbGlRZ9Ux35OT3hQNy3718zexnWfWV1rC?=
- =?us-ascii?Q?aGNLpZHuuEtz5NPQp6G13hxYmDhmLZPAm+YnhPJRBH6L5lFOfipNcYLRe9cn?=
- =?us-ascii?Q?E/MH8NHbLw+8Oi851jojfakNEtKB2H5mz4qP6pi484p2eMxZ10qYfYwzIGVn?=
- =?us-ascii?Q?hTKveSo3gxrhPN3f0yqU9YQkOn1dBr1tQnlKVUMVjEKtRvOT8zaf4dleTBca?=
- =?us-ascii?Q?kL2tJRZJUsMjQpSZQMKFcMXr8SSi9B52ZxftV8EtB7D8CRpLwZxU0411S1mk?=
- =?us-ascii?Q?FKnAQvG1w8MzySu/5bE=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f78fb51-f10b-44a3-2525-08d9c4b22843
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2021 18:46:11.1940
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fpmm8iPBDm8Hj9rKamr0x7nLUlsHaxUvfY0p8zJiLso0vpIirvGY78ZAfm76nC5a
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5362
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 04:50:56PM +0000, Robin Murphy wrote:
+On Tue,  7 Dec 2021 15:57:37 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> this proposal is the worst of both worlds, in that drivers still have to be
-> just as aware of groups in order to know whether to call the _shared
-> interface or not, except it's now entirely implicit and non-obvious.
+> KVM zPCI passthrough device logic will need a reference to the associated
+> kvm guest that has access to the device.  Let's register a group notifier
+> for VFIO_GROUP_NOTIFY_SET_KVM to catch this information in order to create
+> an association between a kvm guest and the host zdev.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_pci.h  |  2 ++
+>  drivers/vfio/pci/vfio_pci_core.c |  2 ++
+>  drivers/vfio/pci/vfio_pci_zdev.c | 54 ++++++++++++++++++++++++++++++++
+>  include/linux/vfio_pci_core.h    | 12 +++++++
+>  4 files changed, 70 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+> index 97e3a369135d..6526908ac834 100644
+> --- a/arch/s390/include/asm/kvm_pci.h
+> +++ b/arch/s390/include/asm/kvm_pci.h
+> @@ -17,6 +17,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/pci.h>
+>  #include <linux/mutex.h>
+> +#include <linux/notifier.h>
+>  #include <asm/pci_insn.h>
+>  #include <asm/pci_dma.h>
+>  
+> @@ -33,6 +34,7 @@ struct kvm_zdev {
+>  	u64 rpcit_count;
+>  	struct kvm_zdev_ioat ioat;
+>  	struct zpci_fib fib;
+> +	struct notifier_block nb;
+>  };
+>  
+>  extern int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index f948e6cd2993..fc57d4d0abbe 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -452,6 +452,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+>  
+>  	vfio_pci_vf_token_user_add(vdev, -1);
+>  	vfio_spapr_pci_eeh_release(vdev->pdev);
+> +	vfio_pci_zdev_release(vdev);
+>  	vfio_pci_core_disable(vdev);
+>  
+>  	mutex_lock(&vdev->igate);
+> @@ -470,6 +471,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
+>  void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
+>  {
+>  	vfio_pci_probe_mmaps(vdev);
+> +	vfio_pci_zdev_open(vdev);
+>  	vfio_spapr_pci_eeh_open(vdev->pdev);
+>  	vfio_pci_vf_token_user_add(vdev, 1);
+>  }
+> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+> index ea4c0d2b0663..cfd7f44b06c1 100644
+> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/vfio_zdev.h>
+>  #include <asm/pci_clp.h>
+>  #include <asm/pci_io.h>
+> +#include <asm/kvm_pci.h>
+>  
+>  #include <linux/vfio_pci_core.h>
+>  
+> @@ -136,3 +137,56 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>  
+>  	return ret;
+>  }
+> +
+> +static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
+> +					unsigned long action, void *data)
+> +{
+> +	struct kvm_zdev *kzdev = container_of(nb, struct kvm_zdev, nb);
+> +
+> +	if (action == VFIO_GROUP_NOTIFY_SET_KVM) {
+> +		if (!data || !kzdev->zdev)
+> +			return NOTIFY_DONE;
+> +		if (kvm_s390_pci_attach_kvm(kzdev->zdev, data))
+> +			return NOTIFY_DONE;
+> +	}
+> +
+> +	return NOTIFY_OK;
+> +}
+> +
+> +int vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
+> +{
+> +	unsigned long events = VFIO_GROUP_NOTIFY_SET_KVM;
+> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
+> +	int ret;
+> +
+> +	if (!zdev)
+> +		return -ENODEV;
+> +
+> +	ret = kvm_s390_pci_dev_open(zdev);
+> +	if (ret)
+> +		return -ENODEV;
+> +
+> +	zdev->kzdev->nb.notifier_call = vfio_pci_zdev_group_notifier;
+> +
+> +	ret = vfio_register_notifier(vdev->vdev.dev, VFIO_GROUP_NOTIFY,
+> +				     &events, &zdev->kzdev->nb);
+> +	if (ret)
+> +		kvm_s390_pci_dev_release(zdev);
+> +
+> +	return ret;
 
-Drivers are not aware of groups, where did you see that?
+None of these error return paths are realized by the call site.  Thanks,
 
-Drivers have to indicate their intention, based entirely on their own
-internal design. If groups are present, or not is irrelevant to the
-driver.
+Alex
 
-If the driver uses a single struct device (which is most) then it uses
-iommu_attach_device().
+> +}
+> +
+> +int vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
+> +{
+> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
+> +
+> +	if (!zdev || !zdev->kzdev)
+> +		return -ENODEV;
+> +
+> +	vfio_unregister_notifier(vdev->vdev.dev, VFIO_GROUP_NOTIFY,
+> +				 &zdev->kzdev->nb);
+> +
+> +	kvm_s390_pci_dev_release(zdev);
+> +
+> +	return 0;
+> +}
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index 5e2bca3b89db..14079da409f1 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -198,12 +198,24 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+>  #ifdef CONFIG_VFIO_PCI_ZDEV
+>  extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>  				       struct vfio_info_cap *caps);
+> +int vfio_pci_zdev_open(struct vfio_pci_core_device *vdev);
+> +int vfio_pci_zdev_release(struct vfio_pci_core_device *vdev);
+>  #else
+>  static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>  					      struct vfio_info_cap *caps)
+>  {
+>  	return -ENODEV;
+>  }
+> +
+> +static inline int vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> +static inline int vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
+> +{
+> +	return -ENODEV;
+> +}
+>  #endif
+>  
+>  /* Will be exported for vfio pci drivers usage */
 
-If the driver uses multiple struct devices and intends to connect them
-all to the same domain then it uses the _shared variant. The only
-difference between the two is the _shared varient lacks some of the
-protections against driver abuse of the API.
-
-Nothing uses the group interface except for VFIO and stuff inside
-drivers/iommu. VFIO has a uAPI tied to the group interface and it
-is stuck with it.
-
-> Otherwise just add the housekeeping stuff to iommu_{attach,detach}_group() -
-> there's no way we want *three* attach/detach interfaces all with different
-> semantics.
-
-I'm not sure why you think 3 APIs is bad thing. Threes APIs, with
-clearly intended purposes is a lot better than one giant API with a
-bunch of parameters that tries to do everything.
-
-In this case, it is not simple to 'add the housekeeping' to
-iommu_attach_group() in a way that is useful to both tegra and
-VFIO. What tegra wants is what the _shared API implements, and that
-logic should not be open coded in drivers.
-
-VFIO does not want exactly that, it has its own logic to deal directly
-with groups tied to its uAPI. Due to the uAPI it doesn't even have a
-struct device, unfortunately.
-
-The reason there are three APIs is because there are three different
-use-cases. It is not bad thing to have APIs designed for the use cases
-they serve.
-
-> It's worth taking a step back and realising that overall, this is really
-> just a more generalised and finer-grained extension of what 426a273834ea
-> already did for non-group-aware code, so it makes little sense *not* to
-> integrate it into the existing interfaces.
-
-This is taking 426a to it's logical conclusion and *removing* the
-group API from the drivers entirely. This is desirable because drivers
-cannot do anything sane with the group.
-
-The drivers have struct devices, and so we provide APIs that work in
-terms of struct devices to cover both driver use cases today, and do
-so more safely than what is already implemented.
-
-Do not mix up VFIO with the driver interface, these are different
-things. It is better VFIO stay on its own and not complicate the
-driver world.
-
-Jason
