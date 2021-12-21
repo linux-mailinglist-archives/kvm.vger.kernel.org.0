@@ -2,451 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEAF347C15C
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 15:20:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E02F547C24E
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 16:12:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238414AbhLUOUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 09:20:17 -0500
-Received: from mga02.intel.com ([134.134.136.20]:4790 "EHLO mga02.intel.com"
+        id S238988AbhLUPMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 10:12:12 -0500
+Received: from mga18.intel.com ([134.134.136.126]:45583 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238405AbhLUOUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 09:20:16 -0500
+        id S238974AbhLUPML (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 10:12:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640096416; x=1671632416;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MvDajwAVdXNy5IycrrG6kgYhIlZzQhIeYa52mVikvN4=;
-  b=PkLSrNb+1nAwdi1DQoq8/y3VC20uBU83LciG3/bgWubOuXhwXvCaiODC
-   tNV1YUtbCjQCpInaCZMUk2xEzfNQJA3LjpNlJyNoC8hxzZxGrTaUuc9O5
-   09A3C/mY14KwYqxt0HW1zHr+Y4sdYiYASW0tLFS/INR3cNbSdUTPaQXjX
-   TuCqxJh2MKle6JtdubVMTXJIpBMGb6GMbuOIjmkKcy70QCK8/5uHDuear
-   iPY1QC9Nx55DhX45DEzn6yi9UqpMiN4KJB62h1mJMFpAHdirkr540ZG3H
-   r1NUpX3Y8CY7HukTsZPXK6B+80v/pwLFfok7ZMQCaYx3YHSH+5cSHan3O
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10204"; a="227693665"
+  t=1640099531; x=1671635531;
+  h=from:to:cc:subject:date:message-id;
+  bh=bhiBZIBPUvq8tNjFZYJrVCRkahxll9ZU4gU5+TYg0gQ=;
+  b=ZC5NfSsf31t7XUFVAFX+QIMUdFZH2+blNulPZ7um0g5ji4P4jq0UhjxF
+   bn5e9YfbY+fssBdtx8RM/3orIDI0Jfu5Qpiwh45hbZ7uckpgzOL0/AsYZ
+   CN+rZZpQc0+/oI+ZG4Or/nBP8N1o7ceNsY1atlpkUhHwZgdaaB8TlAoBy
+   NAzaGAUJcJscn7tlAoZ6cFZ3/cRQOsHxIKsYu5Eu8tdG+ZfD9ZGNWBg8F
+   v+nw/Qz0oDTyoyNe3Gen+BHcYsBxn9/+SPe4GIchK3Act9pKMgiTT9t4f
+   4WjmpzWu44uAnD6RzRRbZrleuK9phCMdBRl9gxv+Fd+wPPQlKIm9mLJ1d
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10204"; a="227259260"
 X-IronPort-AV: E=Sophos;i="5.88,223,1635231600"; 
-   d="scan'208";a="227693665"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2021 06:20:16 -0800
+   d="scan'208";a="227259260"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2021 07:12:11 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,223,1635231600"; 
-   d="scan'208";a="466312356"
-Received: from icx.bj.intel.com ([10.240.192.117])
-  by orsmga003.jf.intel.com with ESMTP; 21 Dec 2021 06:20:13 -0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, yang.zhong@intel.com
-Subject: [PATCH 3/3] selftest: Support amx selftest
-Date:   Tue, 21 Dec 2021 18:15:07 -0500
-Message-Id: <20211221231507.2910889-4-yang.zhong@intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211221231507.2910889-1-yang.zhong@intel.com>
-References: <20211221231507.2910889-1-yang.zhong@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+   d="scan'208";a="684688254"
+Received: from chaop.bj.intel.com ([10.240.192.101])
+  by orsmga005.jf.intel.com with ESMTP; 21 Dec 2021 07:12:03 -0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+Subject: [PATCH v3 00/15] KVM: mm: fd-based approach for supporting KVM guest private memory 
+Date:   Tue, 21 Dec 2021 23:11:10 +0800
+Message-Id: <20211221151125.19446-1-chao.p.peng@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This selftest do two test cases, one is to trigger #NM
-exception and check MSR XFD_ERR value. Another case is
-guest load tile data into tmm0 registers and trap to host
-side to check memory data after save/restore.
+This is the third version of this series which try to implement the
+fd-based KVM guest private memory.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- tools/testing/selftests/kvm/x86_64/amx_test.c | 370 ++++++++++++++++++
- 2 files changed, 371 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/amx_test.c
+In general this patch series introduce fd-based memslot which provide
+guest memory through a memfd file descriptor fd[offset,size] instead of
+hva/size. The fd then can be created from a supported memory filesystem
+like tmpfs/hugetlbfs etc which we refer as memory backend. KVM and the
+memory backend exchange some callbacks when such memslot gets created.
+At runtime KVM will call into callbacks provided by backend to get the
+pfn with the fd+offset. Memory backend will also call into KVM callbacks
+when userspace fallocate/punch hole on the fd to notify KVM to map/unmap
+secondary MMU page tables.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c4e34717826a..ecb1fe022111 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -75,6 +75,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_pi_mmio_test
- TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
-+TEST_GEN_PROGS_x86_64 += x86_64/amx_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-new file mode 100644
-index 000000000000..76ae44622923
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -0,0 +1,370 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * amx tests
-+ *
-+ * Copyright (C) 2021, Intel, Inc.
-+ *
-+ * Tests for amx #NM exception and save/restore.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <sys/syscall.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#ifndef __x86_64__
-+# error This test is 64-bit only
-+#endif
-+
-+#define VCPU_ID				0
-+#define X86_FEATURE_XSAVE		(1 << 26)
-+#define X86_FEATURE_OSXSAVE		(1 << 27)
-+
-+#define PAGE_SIZE			(1 << 12)
-+#define NUM_TILES			8
-+#define TILE_SIZE			1024
-+#define XSAVE_SIZE			((NUM_TILES * TILE_SIZE) + PAGE_SIZE)
-+
-+/* Tile configuration associated: */
-+#define MAX_TILES			16
-+#define RESERVED_BYTES			14
-+
-+#define XFEATURE_XTILECFG		17
-+#define XFEATURE_XTILEDATA		18
-+#define XFEATURE_MASK_XTILECFG		(1 << XFEATURE_XTILECFG)
-+#define XFEATURE_MASK_XTILEDATA		(1 << XFEATURE_XTILEDATA)
-+#define XFEATURE_MASK_XTILE		(XFEATURE_MASK_XTILECFG | XFEATURE_MASK_XTILEDATA)
-+
-+#define TILE_CPUID			0x1d
-+#define XSTATE_CPUID			0xd
-+#define TILE_PALETTE_CPUID_SUBLEAVE	0x1
-+#define XSTATE_USER_STATE_SUBLEAVE	0x0
-+
-+struct tile_config {
-+	u8  palette_id;
-+	u8  start_row;
-+	u8  reserved[RESERVED_BYTES];
-+	u16 colsb[MAX_TILES];
-+	u8  rows[MAX_TILES];
-+};
-+
-+struct tile_data {
-+	u8 data[NUM_TILES * TILE_SIZE];
-+};
-+
-+struct xtile_info {
-+	u16 bytes_per_tile;
-+	u16 bytes_per_row;
-+	u16 max_names;
-+	u16 max_rows;
-+	u32 xsave_offset;
-+	u32 xsave_size;
-+};
-+
-+static struct xtile_info xtile;
-+
-+static inline u64 __xgetbv(u32 index)
-+{
-+	u32 eax, edx;
-+
-+	asm volatile("xgetbv;"
-+		     : "=a" (eax), "=d" (edx)
-+		     : "c" (index));
-+	return eax + ((u64)edx << 32);
-+}
-+
-+static inline void __xsetbv(u32 index, u64 value)
-+{
-+	u32 eax = value;
-+	u32 edx = value >> 32;
-+
-+	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
-+}
-+
-+static inline void __ldtilecfg(void *cfg)
-+{
-+	asm volatile(".byte 0xc4,0xe2,0x78,0x49,0x00"
-+		     : : "a"(cfg));
-+}
-+
-+static inline void __tileloadd(void *tile)
-+{
-+	asm volatile(".byte 0xc4,0xe2,0x7b,0x4b,0x04,0x10"
-+		     : : "a"(tile), "d"(0));
-+}
-+
-+static inline void __tilerelease(void)
-+{
-+	asm volatile(".byte 0xc4, 0xe2, 0x78, 0x49, 0xc0" ::);
-+}
-+
-+static inline void check_cpuid_xsave(void)
-+{
-+	uint32_t eax, ebx, ecx, edx;
-+
-+	eax = 1;
-+	ecx = 0;
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	if (!(ecx & X86_FEATURE_XSAVE))
-+		GUEST_ASSERT(!"cpuid: no CPU xsave support!");
-+	if (!(ecx & X86_FEATURE_OSXSAVE))
-+		GUEST_ASSERT(!"cpuid: no OS xsave support!");
-+}
-+
-+static bool check_xsave_supports_xtile(void)
-+{
-+	return __xgetbv(0) & XFEATURE_MASK_XTILE;
-+}
-+
-+static bool enum_xtile_config(void)
-+{
-+	u32 eax, ebx, ecx, edx;
-+
-+	eax = TILE_CPUID;
-+	ecx = TILE_PALETTE_CPUID_SUBLEAVE;
-+
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	if (!eax || !ebx || !ecx)
-+		return false;
-+
-+	xtile.max_names = ebx >> 16;
-+	if (xtile.max_names < NUM_TILES)
-+		return false;
-+
-+	xtile.bytes_per_tile = eax >> 16;
-+	if (xtile.bytes_per_tile < TILE_SIZE)
-+		return false;
-+
-+	xtile.bytes_per_row = ebx;
-+	xtile.max_rows = ecx;
-+
-+	return true;
-+}
-+
-+static bool enum_xsave_tile(void)
-+{
-+	u32 eax, ebx, ecx, edx;
-+
-+	eax = XSTATE_CPUID;
-+	ecx = XFEATURE_XTILEDATA;
-+
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	if (!eax || !ebx)
-+		return false;
-+
-+	xtile.xsave_offset = ebx;
-+	xtile.xsave_size = eax;
-+
-+	return true;
-+}
-+
-+static bool check_xsave_size(void)
-+{
-+	u32 eax, ebx, ecx, edx;
-+	bool valid = false;
-+
-+	eax = XSTATE_CPUID;
-+	ecx = XSTATE_USER_STATE_SUBLEAVE;
-+
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	if (ebx && ebx <= XSAVE_SIZE)
-+		valid = true;
-+
-+	return valid;
-+}
-+
-+static bool check_xtile_info(void)
-+{
-+	bool ret = false;
-+
-+	if (!check_xsave_size())
-+		return ret;
-+
-+	if (!enum_xsave_tile())
-+		return ret;
-+
-+	if (!enum_xtile_config())
-+		return ret;
-+
-+	if (sizeof(struct tile_data) >= xtile.xsave_size)
-+		ret = true;
-+
-+	return ret;
-+}
-+
-+static void set_tilecfg(struct tile_config *cfg)
-+{
-+	int i;
-+
-+	/* Only palette id 1 */
-+	cfg->palette_id = 1;
-+	for (i = 0; i < xtile.max_names; i++) {
-+		cfg->colsb[i] = xtile.bytes_per_row;
-+		cfg->rows[i] = xtile.max_rows;
-+	}
-+}
-+
-+static void init_regs(void)
-+{
-+	uint64_t cr4, xcr0;
-+
-+	/* turn on CR4.OSXSAVE */
-+	cr4 = get_cr4();
-+	cr4 |= X86_CR4_OSXSAVE;
-+	set_cr4(cr4);
-+
-+	xcr0 = __xgetbv(0);
-+	xcr0 |= XFEATURE_MASK_XTILE;
-+	__xsetbv(0x0, xcr0);
-+}
-+
-+static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
-+						    struct tile_data *tiledata)
-+{
-+	init_regs();
-+	check_cpuid_xsave();
-+	GUEST_ASSERT(check_xsave_supports_xtile());
-+	GUEST_ASSERT(check_xtile_info());
-+
-+	/* check xtile configs */
-+	GUEST_ASSERT(xtile.xsave_offset == 2816);
-+	GUEST_ASSERT(xtile.xsave_size == 8192);
-+	GUEST_ASSERT(xtile.max_names == 8);
-+	GUEST_ASSERT(xtile.bytes_per_tile == 1024);
-+	GUEST_ASSERT(xtile.bytes_per_row == 64);
-+	GUEST_ASSERT(xtile.max_rows == 16);
-+
-+	/* xfd=0, enable amx */
-+	wrmsr(MSR_IA32_XFD, 0);
-+	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == 0);
-+	set_tilecfg(amx_cfg);
-+	__ldtilecfg(amx_cfg);
-+	/* Check save/restore when trap to userspace */
-+	__tileloadd(tiledata);
-+	GUEST_SYNC(1);
-+
-+	/* xfd=0x40000, disable amx tiledata */
-+	wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILEDATA);
-+	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == XFEATURE_MASK_XTILEDATA);
-+	set_tilecfg(amx_cfg);
-+	__ldtilecfg(amx_cfg);
-+	/* Trigger #NM exception */
-+	__tileloadd(tiledata);
-+
-+	GUEST_DONE();
-+}
-+
-+void guest_nm_handler(struct ex_regs *regs)
-+{
-+	/* Check if #NM is triggered by XFEATURE_MASK_XTILEDATA */
-+	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILEDATA);
-+	/* Clear xfd_err */
-+	wrmsr(MSR_IA32_XFD_ERR, 0);
-+	GUEST_SYNC(2);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_regs regs1;
-+	bool amx_supported = false;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct kvm_x86_state *state;
-+	int xsave_restore_size = 0;
-+	vm_vaddr_t amx_cfg, tiledata;
-+	struct ucall uc;
-+	u32 amx_offset;
-+	int stage, ret;
-+
-+	/* Create VM */
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	entry = kvm_get_supported_cpuid_entry(1);
-+	if (!(entry->ecx & X86_FEATURE_XSAVE)) {
-+		print_skip("XSAVE feature not supported");
-+		return 0;
-+	}
-+
-+	if (kvm_get_cpuid_max_basic() >= 0xd) {
-+		entry = kvm_get_supported_cpuid_index(0xd, 0);
-+		amx_supported = entry && !!(entry->eax & XFEATURE_MASK_XTILE);
-+		if (!amx_supported) {
-+			print_skip("AMX is not supported by the vCPU and eax=0x%x", entry->eax);
-+			return 0;
-+		}
-+		/* Get xsave/restore max size */
-+		xsave_restore_size = entry->ecx;
-+	}
-+
-+	run = vcpu_state(vm, VCPU_ID);
-+	vcpu_regs_get(vm, VCPU_ID, &regs1);
-+
-+	/* Register #NM handler */
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+	vm_install_exception_handler(vm, NM_VECTOR, guest_nm_handler);
-+
-+	/* amx cfg for guest_code */
-+	amx_cfg = vm_vaddr_alloc_page(vm);
-+	memset(addr_gva2hva(vm, amx_cfg), 0x0, getpagesize());
-+
-+	/* amx tiledatas for guest_code */
-+	tiledata = vm_vaddr_alloc_pages(vm, 2);
-+	memset(addr_gva2hva(vm, tiledata), rand() | 1, 2 * getpagesize());
-+	vcpu_args_set(vm, VCPU_ID, 2, amx_cfg, tiledata);
-+
-+	for (stage = 1; ; stage++) {
-+		_vcpu_run(vm, VCPU_ID);
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Stage %d: unexpected exit reason: %u (%s),\n",
-+			    stage, run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-+				  __FILE__, uc.args[1]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			switch (uc.args[1]) {
-+			case 1:
-+				fprintf(stderr,
-+					"Exit VM by GUEST_SYNC(1), check save/restore.\n");
-+
-+				/* Compacted mode, get amx offset by xsave area
-+				 * size subtract 8K amx size.
-+				 */
-+				amx_offset = xsave_restore_size - NUM_TILES*TILE_SIZE;
-+				state = vcpu_save_state(vm, VCPU_ID);
-+				void *amx_start = (void *)state->xsave + amx_offset;
-+				void *tiles_data = (void *)addr_gva2hva(vm, tiledata);
-+				/* Only check TMM0 register, 1 tile */
-+				ret = memcmp(amx_start, tiles_data, TILE_SIZE);
-+				TEST_ASSERT(ret == 0, "memcmp failed, ret=%d\n", ret);
-+				kvm_x86_state_cleanup(state);
-+				break;
-+			case 2:
-+				fprintf(stderr,
-+					"Exit VM by GUEST_SYNC(2), generate #NM exception.\n");
-+				goto done;
-+			}
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+done:
-+	kvm_vm_free(vm);
-+}
+Comparing to existing hva-based memslot, this new type of memslot allow
+guest memory unmapped from host userspace like QEMU and even the kernel
+itself, therefore reduce attack surface and prevent userspace bugs.
+
+Based on this fd-based memslot, we can build guest private memory that
+is going to be used in confidential computing environments such as Intel
+TDX and AMD SEV. When supported, the memory backend can provide more
+enforcement on the fd and KVM can use a single memslot to hold both the
+private and shared part of the guest memory. 
+
+Memfd/shmem extension
+---------------------
+Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file
+created with this flag cannot read(), write() or mmap() etc.
+
+In addition, two sets of callbacks are introduced as new MEMFD_OPS:
+  - memfd_falloc_notifier: memfd -> KVM notifier when memory gets
+    allocated/invalidated through fallocate().
+  - memfd_pfn_ops: kvm -> memfd to get a pfn with the fd+offset.
+
+Memslot extension
+-----------------
+Add the private fd and the offset into the fd to existing 'shared' memslot
+so that both private/shared guest memory can live in one single memslot.
+A page in the memslot is either private or shared. A page is private only
+when it's already allocated in the backend fd, all the other cases it's
+treated as shared, this includes those already mapped as shared as well as
+those having not been mapped. This means the memory backend is the place
+which tells the truth of which page is private.
+
+Private memory map/unmap and conversion
+---------------------------------------
+Userspace's map/unmap operations are done by fallocate() ioctl on the
+backend fd.
+  - map: default fallocate() with mode=0.
+  - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
+The map/unmap will trigger above memfd_falloc_notifier to let KVM
+map/unmap second MMU page tables.
+
+Test
+----
+This code has been tested with latest TDX code patches hosted at
+(https://github.com/intel/tdx/tree/kvm-upstream) with minimal TDX
+adaption and QEMU support.
+
+Example QEMU command line:
+-object tdx-guest,id=tdx \
+-object memory-backend-memfd-private,id=ram1,size=2G \
+-machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
+
+Changelog
+----------
+v3:
+  - Added locking protection when calling
+    invalidate_page_range/fallocate callbacks.
+  - Changed memslot structure to keep use useraddr for shared memory.
+  - Re-organized F_SEAL_INACCESSIBLE and MEMFD_OPS.
+  - Added MFD_INACCESSIBLE flag to force F_SEAL_INACCESSIBLE.
+  - Commit message improvement.
+  - Many small fixes for comments from the last version.
+
+Links of previous discussions
+-----------------------------
+[1]
+https://lkml.kernel.org/kvm/51a6f74f-6c05-74b9-3fd7-b7cd900fb8cc@redhat.com/
+[2]
+https://lkml.kernel.org/linux-fsdevel/20211111141352.26311-1-chao.p.peng@linux.intel.com/
+
+
+Chao Peng (13):
+  mm/memfd: Introduce MFD_INACCESSIBLE flag
+  KVM: Extend the memslot to support fd-based private memory
+  KVM: Implement fd-based memory using MEMFD_OPS interfaces
+  KVM: Refactor hva based memory invalidation code
+  KVM: Special handling for fd-based memory invalidation
+  KVM: Split out common memory invalidation code
+  KVM: Implement fd-based memory invalidation
+  KVM: Add kvm_map_gfn_range
+  KVM: Implement fd-based memory fallocation
+  KVM: Add KVM_EXIT_MEMORY_ERROR exit
+  KVM: Handle page fault for private memory
+  KVM: Use kvm_userspace_memory_region_ext
+  KVM: Register/unregister private memory slot to memfd
+
+Kirill A. Shutemov (2):
+  mm/shmem: Introduce F_SEAL_INACCESSIBLE
+  mm/memfd: Introduce MEMFD_OPS
+
+ arch/arm64/kvm/mmu.c               |  14 +-
+ arch/mips/kvm/mips.c               |  14 +-
+ arch/powerpc/include/asm/kvm_ppc.h |  28 ++--
+ arch/powerpc/kvm/book3s.c          |  14 +-
+ arch/powerpc/kvm/book3s_hv.c       |  14 +-
+ arch/powerpc/kvm/book3s_pr.c       |  14 +-
+ arch/powerpc/kvm/booke.c           |  14 +-
+ arch/powerpc/kvm/powerpc.c         |  14 +-
+ arch/riscv/kvm/mmu.c               |  14 +-
+ arch/s390/kvm/kvm-s390.c           |  14 +-
+ arch/x86/kvm/Kconfig               |   1 +
+ arch/x86/kvm/Makefile              |   3 +-
+ arch/x86/kvm/mmu/mmu.c             | 112 +++++++++++++-
+ arch/x86/kvm/mmu/paging_tmpl.h     |  11 +-
+ arch/x86/kvm/x86.c                 |  16 +-
+ include/linux/kvm_host.h           |  57 +++++--
+ include/linux/memfd.h              |  22 +++
+ include/linux/shmem_fs.h           |  16 ++
+ include/uapi/linux/fcntl.h         |   1 +
+ include/uapi/linux/kvm.h           |  27 ++++
+ include/uapi/linux/memfd.h         |   1 +
+ mm/Kconfig                         |   4 +
+ mm/memfd.c                         |  33 +++-
+ mm/shmem.c                         | 195 ++++++++++++++++++++++-
+ virt/kvm/kvm_main.c                | 239 +++++++++++++++++++++--------
+ virt/kvm/memfd.c                   | 100 ++++++++++++
+ 26 files changed, 822 insertions(+), 170 deletions(-)
+ create mode 100644 virt/kvm/memfd.c
+
+-- 
+2.17.1
+
