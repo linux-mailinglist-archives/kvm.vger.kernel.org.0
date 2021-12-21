@@ -2,169 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E89147C500
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 18:26:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA23447C519
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 18:36:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240380AbhLUR0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 12:26:23 -0500
-Received: from mail-bn7nam10on2074.outbound.protection.outlook.com ([40.107.92.74]:51425
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231187AbhLUR0W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 12:26:22 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mMALM00t1/mLMOnKgzGe00zmjcLq6FCOwZur4pN1Jgvax9nhiHA4zAe+AeqhYqALoflFo5TmDWzOlh2bXQNoRJYiFv35ut0Qd5fDhs51GfxPGrfVFH2boO+gFt1zjr2xK54o6XS4Vq94qlKRbROXj1/fm8gMjVA0hAnxhQfao2UFZ8jWlvCib4Bm4iYelcyXWm2pDC5olAkLKdu/mV32ptdd58I94hUVV1OGU6DHLpLQcOPW7B/+CYYiqqidSxkAJkuJ89MvJTRkngKma2Cdwwt4CvS5HzwItREHaqDVB3NLwlS1R0YwVAZoVVjFaJxyandOOjfolh8bM7KJRFX8Qw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=48BWeWiEYpRDwf67VAL3rzaBDDXCxf//2cZpnMFsXJ0=;
- b=UIaxf0hUAY3r6bSquJFcCcBXKUC8dNOxCa8geGhJwJslhtS5owjBOXhU8S+/in/4yAltokqx6mUSq+vRSZRRlN7GSnxDW4qKEsCg/maNE+dy0PzWipL1d1a/9oXMAUxipr8HOY5+ygV6e12AOWYBzHsuPKoMdC1ARamoPVQmgFEqk365faEyEdHuj/aXYc6vY0MDv9xp2TwCPssHyr3FdBXg57lypNxGLKKrjOAw4Qv+Nc+vuQ0TMZyFv0XGhEChzZkAATTiZGeHgBNzJwvvvM3+E4rwj8GxTZOYFZpKQT4e246SO09Nj91Z4wISyYL9LZQjd+p7vQR7igjHLTCESA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=48BWeWiEYpRDwf67VAL3rzaBDDXCxf//2cZpnMFsXJ0=;
- b=d6LeJUk5V8nnYRqlBBgwnAU6aXUOrGicvNRIiFJ4Ed9a0HMuR2VPL5Lu8PgWfN9VqCfEDmYVaUgRxE/llGNJoA02P/QYLFUEWWwHOetgBofaPZVGBVik2rlHasfq5SCDE5FRtoTn+I6NXsXnsvzjeh8mWPzpRD5uiquxCDDJ5vk=
-Received: from BN9PR03CA0737.namprd03.prod.outlook.com (2603:10b6:408:110::22)
- by DM5PR12MB2566.namprd12.prod.outlook.com (2603:10b6:4:b4::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.17; Tue, 21 Dec
- 2021 17:26:20 +0000
-Received: from BN8NAM11FT054.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:110:cafe::af) by BN9PR03CA0737.outlook.office365.com
- (2603:10b6:408:110::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.17 via Frontend
- Transport; Tue, 21 Dec 2021 17:26:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- BN8NAM11FT054.mail.protection.outlook.com (10.13.177.102) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4801.14 via Frontend Transport; Tue, 21 Dec 2021 17:26:19 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 21 Dec
- 2021 11:26:19 -0600
-Date:   Tue, 21 Dec 2021 11:26:04 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Mingwei Zhang <mizhang@google.com>
-CC:     <linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-        Nathan Tempelman <natet@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Brijesh Singh" <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Varad Gautam" <varad.gautam@suse.com>,
-        Shuah Khan <shuah@kernel.org>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Ricardo Koller" <ricarkol@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Peter Gonda <pgonda@google.com>
-Subject: Re: [PATCH v2 08/13] KVM: selftests: add SEV boot tests
-Message-ID: <20211221172604.7hg4digpwp2mnidv@amd.com>
-References: <20211216171358.61140-1-michael.roth@amd.com>
- <20211216171358.61140-9-michael.roth@amd.com>
- <Yb/hGzeiRi0AwfV6@google.com>
- <20211221154036.ivef7wuoblavlmsf@amd.com>
+        id S240438AbhLURgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 12:36:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45522 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234411AbhLURgj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Dec 2021 12:36:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640108198;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=38wgZasIJEmZs748b2lo89aA5pEBSbdco132gIBfpfQ=;
+        b=Vqxh0gXkstqEU6IKyEgjFth/8N2J9VJjxMhSP3CghygO700u+g0+etG3BAkBBkPLUfyi4Z
+        dksk84YWy7pXjzYqNrtkD1N/T5KNaILHBGFzj8dlrrAHSIb7HaiDSm26eOtbXL9T7eKs3B
+        xGtVkX9ZCHocXfOAXTw5+dwT1BCmyZQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-421-B-U54QozN_OnXyYur9y0kg-1; Tue, 21 Dec 2021 12:36:37 -0500
+X-MC-Unique: B-U54QozN_OnXyYur9y0kg-1
+Received: by mail-wm1-f71.google.com with SMTP id 205-20020a1c00d6000000b003335d1384f1so1575327wma.3
+        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 09:36:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=38wgZasIJEmZs748b2lo89aA5pEBSbdco132gIBfpfQ=;
+        b=HkzUObBAsKJfX63Z3CBvQs6NObAbd+qCNIAMW/h+pNo75pADpImbWnLpZ13yplVY/x
+         JyWw22CO1LZtEDYB5Qm3M8N77ZmzAIrTzYHe+AC/U67MkwzqZeTSkXd4r8rcjRZKP8ii
+         P+oSjUilnUsuJGhKKtRbjylJiNVMdmLYDBwDMq0pDCl3SFBie78Mb4s6S0GNtjNbMGTN
+         b6kWcktReZflWzdVQtucVQnetkUyavBPg6SSavnuRcxoPoybdsiMuq/LF/kqB07Yi9wJ
+         6Sj4X5H63R+sbZs3fxahKhCazNzDRqRgfYJrHM+QbZ63N2LGceYEoojh8lF7YEUW5OQY
+         SKbQ==
+X-Gm-Message-State: AOAM530l5aA/1P3egGWiyWG5TU43gUqtuGRsS0W4lEXKIub2XBJj3s8Z
+        ofZGaJ+iiMi5zNDcdI97UDibv/6qsYUv8zUHyg4FfSrblVGJP0HTY8HzcA0WRl9vOIJpT4bdbd0
+        aW1ECWmNPQfnM
+X-Received: by 2002:a1c:1906:: with SMTP id 6mr3644655wmz.19.1640108195312;
+        Tue, 21 Dec 2021 09:36:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw2MZkhDMyGTenlhqfVlnyPoISPCJianrWoU/KqNuAix/QZPHUHTggMalVz1oo8amaDSvBjdA==
+X-Received: by 2002:a1c:1906:: with SMTP id 6mr3644637wmz.19.1640108195019;
+        Tue, 21 Dec 2021 09:36:35 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id z17sm2900862wmi.22.2021.12.21.09.36.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Dec 2021 09:36:34 -0800 (PST)
+Message-ID: <65dd75c0-e0fd-28d2-f5b5-920772b6e791@redhat.com>
+Date:   Tue, 21 Dec 2021 18:36:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20211221154036.ivef7wuoblavlmsf@amd.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 38f8fb2f-1f2a-4e5d-31f5-08d9c4a7008e
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2566:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR12MB2566AB65D89FC7C4EE94F7C7957C9@DM5PR12MB2566.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mAPptLGk1+0+22Kgup5btx+pkld4WNJwLxOHjV1fokZFxqi1n/drvgGkZ0apAiNMlTeQBn93FTaQdPF8yIUJ6grbCgfLy7lUD3/t7FAype2gqTWFOlf55YqLiIdJXdVSKLdxxCWNZeZcBtnGnv10mCsaX9QGhlcFOdx9l5mcQeW8ugN/FBccgUh2X7geZ2SEz7C/d+J1gNLZ8tCdjYrC7/TSLWsG2s31sW1VgmlWQEOJ/wA6QK45OtvwKfIheSdfCFz+HEVz+rHfrfkDdYF0ty7wkn+LD7HBLtk3faZCW9QqFiz0Utqcef6J03Zxkmee4oQGLjfiuRsSSifSjoPAMMrwAe0QLlVCsS6nqe64pP8DpxkcEFTtEKhTy2tLAQf/uPUOHzvtKnrWdcbL3p+nQvXFc3kB17P3j4+wv5z/XZmIFYni+TDGXsFeX7KUvPtXjfukREk/33PR47GgGdgoZXM66Da7bgwDlEV6e1HDvgnjdF9cKBRVL6YzlGDdvtWBrvMNHl635qWxgSWoS7y5rviE6cKArelRZMdURLXSQyjbK/SNoJHDmtPRwPV+9IhaVheRuxV4kPwtHFeOb+eA72soO0LQnTEGa9wcgNTYcTcG5dvM8iN0BOAvIU2k10Fvv66Km/ebTSpXWwFy3egol4k8a9+GL+X17yhOTSfRJxVdXtQc7ZR87HiZWdPBXrCIwODU62gseI5FzZWklwUknSdf+AxKAEOaX9QDiW+C1B9wrTFekzgk0ShCFXJiMQ1olA/E5Dt8XIoN/eVZVVNSCPw6OeXy47TB1CrP8vwOO4c=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(40470700002)(36840700001)(46966006)(47076005)(81166007)(6916009)(8936002)(426003)(1076003)(83380400001)(82310400004)(316002)(26005)(6666004)(86362001)(16526019)(2906002)(40460700001)(186003)(70586007)(5660300002)(2616005)(44832011)(36756003)(54906003)(8676002)(336012)(508600001)(36860700001)(7416002)(4326008)(356005)(70206006)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2021 17:26:19.7068
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 38f8fb2f-1f2a-4e5d-31f5-08d9c4a7008e
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT054.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2566
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 3/3] selftest: Support amx selftest
+Content-Language: en-US
+To:     Yang Zhong <yang.zhong@intel.com>, kvm@vger.kernel.org
+Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com
+References: <20211221231507.2910889-1-yang.zhong@intel.com>
+ <20211221231507.2910889-4-yang.zhong@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211221231507.2910889-4-yang.zhong@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 09:40:36AM -0600, Michael Roth wrote:
-> On Mon, Dec 20, 2021 at 01:49:15AM +0000, Mingwei Zhang wrote:
-> > On Thu, Dec 16, 2021, Michael Roth wrote:
-> > > +}
-> > > +
-> > > +static void
-> > > +test_common(struct kvm_vm *vm, struct ucall *uc,
-> > > +		  uint8_t *shared_buf, uint8_t *private_buf)
-> > > +{
-> > > +	bool success;
-> > > +
-> > > +	/* Initial guest check-in. */
-> > > +	vcpu_run(vm, VCPU_ID);
-> > > +	CHECK_SHARED_SYNC(vm, VCPU_ID, uc, 100);
-> > > +
-> > > +	/* Ensure initial private pages are intact/encrypted. */
-> > > +	success = check_buf(private_buf, PRIVATE_PAGES, PAGE_STRIDE, 0x42);
-> > > +	TEST_ASSERT(!success, "Initial guest memory not encrypted!");
-> > > +
-> > > +	vcpu_run(vm, VCPU_ID);
-> > > +	CHECK_SHARED_SYNC(vm, VCPU_ID, uc, 101);
-> > > +
-> > > +	/* Ensure host userspace can't read newly-written encrypted data. */
-> > > +	success = check_buf(private_buf, PRIVATE_PAGES, PAGE_STRIDE, 0x43);
-> > 
-> > I am not sure if it is safe here. Since the cache coherency is not there
-> > for neither SEV or SEV-ES. Reading confidential memory from host side
-> > will generate cache lines that is not coherent with the guest. So might
-> > be better to add clfush here?
+On 12/22/21 00:15, Yang Zhong wrote:
+> This selftest do two test cases, one is to trigger #NM
+> exception and check MSR XFD_ERR value. Another case is
+> guest load tile data into tmm0 registers and trap to host
+> side to check memory data after save/restore.
 > 
-> On the guest side, the cachelines are tagged based on ASID, so in this case
-> the guest would populate it's own cachelines when it writes new data to
-> private buf.
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+
+This is a great start, mainly I'd add a lot more GUEST_SYNCs.
+
+Basically any instruction after the initial GUEST_ASSERTs are a 
+potential point for GUEST_SYNC, except right after the call to set_tilecfg:
+
+GUEST_SYNC(1)
+
+> +	/* xfd=0, enable amx */
+> +	wrmsr(MSR_IA32_XFD, 0);
+
+GUEST_SYNC(2)
+
+> +	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == 0);
+> +	set_tilecfg(amx_cfg);
+> +	__ldtilecfg(amx_cfg);
+
+GUEST_SYNC(3)
+
+> +	/* Check save/restore when trap to userspace */
+> +	__tileloadd(tiledata);
+> +	GUEST_SYNC(1);
+
+This would become 4; here add tilerelease+GUEST_SYNC(5)+XSAVEC, and 
+check that state 18 is not included in XCOMP_BV.
+
+> +	/* xfd=0x40000, disable amx tiledata */
+> +	wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILEDATA);
+
+GUEST_SYNC(6)
+
+> +	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == XFEATURE_MASK_XTILEDATA);
+> +	set_tilecfg(amx_cfg);
+> +	__ldtilecfg(amx_cfg);
+> +	/* Trigger #NM exception */
+> +	__tileloadd(tiledata);
+
+GUEST_SYNC(10); this final GUEST_SYNC should also check TMM0 in the host.
+
+> +	GUEST_DONE();
+> +}
+> +
+> +void guest_nm_handler(struct ex_regs *regs)
+> +{
+> +	/* Check if #NM is triggered by XFEATURE_MASK_XTILEDATA */
+
+GUEST_SYNC(7)
+
+> +	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILEDATA);
+> +	/* Clear xfd_err */
+
+Same here, I'd do a GUEST_SYNC(8) and re-read MSR_IA32_XFD_ERR.
+
+> +	wrmsr(MSR_IA32_XFD_ERR, 0);
+> +	GUEST_SYNC(2);
+
+This becomes GUEST_SYNC(9).
+
+> +}
+
+
+> +		case UCALL_SYNC:
+> +			switch (uc.args[1]) {
+> +			case 1:
+> +				fprintf(stderr,
+> +					"Exit VM by GUEST_SYNC(1), check save/restore.\n");
+> +
+> +				/* Compacted mode, get amx offset by xsave area
+> +				 * size subtract 8K amx size.
+> +				 */
+> +				amx_offset = xsave_restore_size - NUM_TILES*TILE_SIZE;
+> +				state = vcpu_save_state(vm, VCPU_ID);
+> +				void *amx_start = (void *)state->xsave + amx_offset;
+> +				void *tiles_data = (void *)addr_gva2hva(vm, tiledata);
+> +				/* Only check TMM0 register, 1 tile */
+> +				ret = memcmp(amx_start, tiles_data, TILE_SIZE);
+> +				TEST_ASSERT(ret == 0, "memcmp failed, ret=%d\n", ret);
+> +				kvm_x86_state_cleanup(state);
+> +				break;
+
+All GUEST_SYNCs should do save_state/load_state like state_test.c.  Then 
+of course you can *also* check TMM0 after __tileloadd, which would be 
+cases 4 and 10.
+
+Thanks,
+
+Paolo
+
+> +			case 2:
+> +				fprintf(stderr,
+> +					"Exit VM by GUEST_SYNC(2), generate #NM exception.\n");
+> +				goto done;
+> +			}
+> +			break;
+> +		case UCALL_DONE:
+> +			goto done;
+> +		default:
+> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> +		}
+> +	}
+> +done:
+> +	kvm_vm_free(vm);
+> +}
 > 
-> On a host without SME coherency bit, there is a possibility that whatever
-> data the host had previously written to private_buf with C=0/ASID=0, prior
-> to the guest writing to it, might still be present in the cache, but for
-> this test that's okay since the guest has purposely written new data to
-> confirm that the host does not see the new data. What data the host
-> *actually* sees, stale cache data vs. new reads of guest private memory
-> with C=0 (e.g. ciphertext) are both okay as far as the test is concerned.
-> clflush() would probably make sense here, but if failure to do so
-> somehow results in the above assumptions not holding, and the test ends
-> up seeing the newly-written data, we definitely want this test to fail
-> loudly, so leaving out the clflush() to cover that corner case seems
-> like a good idea.
 
-Actually it might be good to check both of those cases, e.g.:
-
-  //check private buf (possibly with stale cache for sme_coherency=0)
-  clflush()
-  //check private buf again (with fresh read of guest memory)
-
-I'll take a look at that.
-
--Mike
