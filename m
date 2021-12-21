@@ -2,111 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 270AF47BCE2
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 10:30:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8950947BDCC
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 10:58:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235347AbhLUJaz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 04:30:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:48558 "EHLO
+        id S231430AbhLUJ6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 04:58:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45388 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232759AbhLUJay (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Dec 2021 04:30:54 -0500
+        by vger.kernel.org with ESMTP id S231434AbhLUJ6X (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Dec 2021 04:58:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640079054;
+        s=mimecast20190719; t=1640080702;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MDP731re5DMtQOApW41TGX/daqIlWGEhnQrLBNbi7cU=;
-        b=UJ1G9+aC/wLQj6TtCQu/frP4WdqRKcc9qbxvhTdn1RDqW3N86TQro2KmbfLRqvAhcGTAt6
-        JRnlbQeRBcuCRWadJwTJsZUr4PCEh7r0/7x25YjXzzk9RJ+yej/SSLt52T3OUsAibrNkv/
-        Ac4CzuHCiXhE+FQBl/Qx9VKKvE65FAU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=sWineNtXqbTJ5Et1Uv2T/Fd4TrSY33+kUANsK8qrVRk=;
+        b=KQmXJNnWL6fuNsQrMXOj8CBt2NJM2UlclYwrbtL0WZJ3iHttmHxUcqLgPCoh+JCLdbFfsr
+        jYAlokVCcIplt2Asw/PV1cHzm8Gxuxq4iuZztzAbDYXw/k4w4oau5UsXMTTp9E5CvdpK7e
+        3TXl5Ok/vAVybm+ag5ubk0TZx68vZlI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-223-glSKZNjYMee1QQv1vVC3-w-1; Tue, 21 Dec 2021 04:30:52 -0500
-X-MC-Unique: glSKZNjYMee1QQv1vVC3-w-1
-Received: by mail-wr1-f70.google.com with SMTP id n22-20020adf8b16000000b001a22f61b29cso4449476wra.23
-        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 01:30:52 -0800 (PST)
+ us-mta-32-RnvHXf46NxqvCHBONGk6SQ-1; Tue, 21 Dec 2021 04:58:21 -0500
+X-MC-Unique: RnvHXf46NxqvCHBONGk6SQ-1
+Received: by mail-ed1-f70.google.com with SMTP id o20-20020a056402439400b003f83cf1e472so5848886edc.18
+        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 01:58:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=MDP731re5DMtQOApW41TGX/daqIlWGEhnQrLBNbi7cU=;
-        b=tZikiAzwN77mbdwcryvHwWdxA1LwJxsC6YZDwIif9VLr/4WNhl6CIaj0i687UZD2e3
-         wF5Tatk5FsrSMjjz2K6g8L/EtDyRwCEiE+vkINtrDBUWin1w76DagXcVWE7Vx/uWsapF
-         lKarUU1ytIAoLJTNttXwwiWnCPgfhOmeqbZNdl/hwGNFnDIoRfD2teMBetX/UgnWRH2S
-         6dgZIvt5cideQpuS7V1xI4KhVKt7xMhdjEro0O3/djTEkx+qIUMa2eKgkq8XTZ8vOM/u
-         pb8P6m+dMi4zp6Eq0RYqhKOisXdOZYJgC21s5V31pHfaL+v1dPkiMvduiTUm7OKAwEsS
-         TZgw==
-X-Gm-Message-State: AOAM530CSwtQIa7akCN7H7bNRoA2NJ1rOxlDw0zC914tfk5Ip5Yx0dhy
-        yuQzrmTwvETGxKzQEg5c2/itSreQPVTE7xGMmAq0egcWWOBGXmTQ7pB0POymPXKqe6Jt+0GrkPU
-        X7DA6m4LT5NFe
-X-Received: by 2002:a05:6000:1866:: with SMTP id d6mr1820863wri.704.1640079051271;
-        Tue, 21 Dec 2021 01:30:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy4OPUY2kgWsIwpXa/+dQUUQY5BJbjatdV1r5w+V9wm4oetQS+1VJTpTYIkBdnpO2hY/PhkRg==
-X-Received: by 2002:a05:6000:1866:: with SMTP id d6mr1820839wri.704.1640079051075;
-        Tue, 21 Dec 2021 01:30:51 -0800 (PST)
+        bh=sWineNtXqbTJ5Et1Uv2T/Fd4TrSY33+kUANsK8qrVRk=;
+        b=Qd1qPva83q5Wtx0eGn3FCBcBo5SVnaChEFU1xreDmFosyySEQCA5aRwdOLJ2Zc+Pph
+         nScDhcNVPwIckGp6TgDs+Ze1hLg2hCqj3umT4j/7Ph6Mb7IwMoD4LFgGDI0LiN90LO9c
+         mEJVVMEubr3CTJh0n3h0Q9T5UbcnLiJ1Drm37E/h+VhC50Oc+IESprwAgAcdS1mCgKj9
+         t0flFp4r50Rvxb8f4v/SqcXCYa3iir79MkS77nLSoHBGHE6cowAPRjQNDFxUAwfQn3HJ
+         EYnfIDrtNm+uq1xVUDzYYR43TNuMH5uN81tLOpo85GUpRzdzeRJMpusGFncJVs3RhKdI
+         772w==
+X-Gm-Message-State: AOAM531PWrDwQp85NKu67iZLLEo7PPL3y+vCoOIutdO4j+ddich7F3ln
+        RbHuU92zGcKdngTRBflTDl6n/M+l3oVf1wn335hs9+vtg3iqfFBVT37odewFa7oDl+7DkwHjsFe
+        29B/mPj4gCYlx
+X-Received: by 2002:a17:907:1703:: with SMTP id le3mr1948179ejc.344.1640080700077;
+        Tue, 21 Dec 2021 01:58:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy4f4Fi/3ajjfBqudjvoNO4LlCY2Zi0M/IbSQaY5n0ZYQtqx6OOihln9DSBs6B59SLHKiWUkA==
+X-Received: by 2002:a17:907:1703:: with SMTP id le3mr1948160ejc.344.1640080699808;
+        Tue, 21 Dec 2021 01:58:19 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id j17sm10390448wrp.68.2021.12.21.01.30.49
+        by smtp.googlemail.com with ESMTPSA id hc14sm3615121ejc.42.2021.12.21.01.58.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Dec 2021 01:30:50 -0800 (PST)
-Message-ID: <34ad15d6-d525-1fe0-8aa7-92a52a19861c@redhat.com>
-Date:   Tue, 21 Dec 2021 10:30:47 +0100
+        Tue, 21 Dec 2021 01:58:19 -0800 (PST)
+Message-ID: <ae15b86d-6e4d-78be-74da-845c3ef6b9ba@redhat.com>
+Date:   Tue, 21 Dec 2021 10:58:11 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH v2 18/23] kvm: x86: Get/set expanded xstate buffer
+Subject: Re: [kvm-unit-tests PATCH] scripts/arch-run: Mark migration tests as
+ SKIP if ncat is not available
 Content-Language: en-US
-To:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-Cc:     "seanjc@google.com" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
-        "Zeng, Guang" <guang.zeng@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-References: <20211217153003.1719189-1-jing2.liu@intel.com>
- <20211217153003.1719189-19-jing2.liu@intel.com>
- <3ffa47eb-3555-5925-1c55-f89a07ceb4bc@redhat.com>
- <e0fd378de64f44fd8becfe67b02cb635@intel.com>
- <219a751e-ac2d-9ce1-9db7-7d5b1edd6bdd@redhat.com>
- <c06fdc4f3b4d4346ae80801a6c3a6ff2@intel.com>
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org, Eric Auger <eric.auger@redhat.com>
+References: <20211221092130.444225-1-thuth@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <c06fdc4f3b4d4346ae80801a6c3a6ff2@intel.com>
+In-Reply-To: <20211221092130.444225-1-thuth@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/21/21 10:06, Wang, Wei W wrote:
->> (I'm not sure if the first sentence is true in the code, but if not it is a bug that
->> has to be fixed :)).
-> For the implementation, KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2) always return kvm->vcpus[0]->arch.guest_fpu.uabi_size.
-> Do you want to change it to below?
+On 12/21/21 10:21, Thomas Huth wrote:
+> Instead of failing the tests, we should rather skip them if ncat is
+> not available.
+> While we're at it, also mention ncat in the README.md file as a
+> requirement for the migration tests.
 > 
-> If (kvm->vcpus[0]->arch.guest_fpu.uabi_size < 4096)
-> 	return 0;
+> Resolves: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/issues/4
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-return 4096;
-
-since the minimum size of struct kvm_xsave2 (with no extra) is 4096.
+I would rather remove the migration tests.  There's really no reason for 
+them, the KVM selftests in the Linux tree are much better: they can find 
+migration bugs deterministically and they are really really easy to 
+debug.  The only disadvantage is that they are harder to write.
 
 Paolo
 
-> else
-> 	return kvm->vcpus[0]->arch.guest_fpu.uabi_size;
+> ---
+>   README.md             | 4 ++++
+>   scripts/arch-run.bash | 2 +-
+>   2 files changed, 5 insertions(+), 1 deletion(-)
 > 
-> If the size is less than 4096 (e.g. no dynamic xfeatures enabled),
-> userspace should use the old KVM_GET_XSAVE (instead of KVM_GET_XSAVE2)?
-> (KVM_GET_XSAVE2 supports to work with size less than 4096, so I think this isn't necessary)
+> diff --git a/README.md b/README.md
+> index 6e6a9d0..a82da56 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -54,6 +54,10 @@ ACCEL=name environment variable:
+>   
+>       ACCEL=kvm ./x86-run ./x86/msr.flat
+>   
+> +For running tests that involve migration from one QEMU instance to another
+> +you also need to have the "ncat" binary (from the nmap.org project) installed,
+> +otherwise the related tests will be skipped.
+> +
+>   # Tests configuration file
+>   
+>   The test case may need specific runtime configurations, for
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 43da998..cd92ed9 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -108,7 +108,7 @@ run_migration ()
+>   {
+>   	if ! command -v ncat >/dev/null 2>&1; then
+>   		echo "${FUNCNAME[0]} needs ncat (netcat)" >&2
+> -		return 2
+> +		return 77
+>   	fi
+>   
+>   	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
+> 
 
