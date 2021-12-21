@@ -2,524 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3075F47B99A
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 06:39:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26E2747B9D4
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 07:04:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232960AbhLUFjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 00:39:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37394 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232951AbhLUFjC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 00:39:02 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACAEBC061574
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 21:39:01 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id co15so11480985pjb.2
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 21:39:01 -0800 (PST)
+        id S229778AbhLUGEB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 01:04:01 -0500
+Received: from mail-dm6nam10on2126.outbound.protection.outlook.com ([40.107.93.126]:31137
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229698AbhLUGEA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 01:04:00 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Or1vPFUAAP+321Bqvsg/0f6wBTNy26Xxqf8NxUxt3oJJvX0iapn5ySSod2dZnQ47i1uR3XFvq6qvgi0l6iq8lIZ4Z1rXiw4at4RNH27+oNri2wBQ93PE70yQUdyojwXlXiqHHNBfrFrHV5Xsw2fyw/WFW/aEAaPpbO9TC89UoalnA0x7y+wJXIVZEdRDTOVDgxsSVNSTbPNc3BZ18F8ow0Qdh8wE88crL50NqY0Nqt/eFkLndbz98fIgOQ1ndOQiLII5sxF1a7FqCizGQAi03F7C0tYyVdm5tE74y0uXNl50rCCholsfJLXJvewNtqNVbLFnJ+/1Ks6Yj2QCGMKBgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+wC/PgYAXA4OesG27brlcqFG7c2R4NEwXwymaJ07Aqg=;
+ b=U7Jdf+S152fAusxBQ0qqGAIwVGZ6meps8R28LhEHYyjsV5t3DozhKxYH94sdQWg/kayp3t5N7WLzttDTAmcYOQ0waCSYQT6cKkIBxWqh/5fxjIasfC3w+DLWEyNnQT7t5ozXo4NSynfclP7jLH+YBIguEaIOukHn0fx70Ns88Noyh1hiHUcA8F1RidbUtTPwGIjBPKVhRBNAQUjaGDb8XiuYIx+/xts+BzBi2VfbBUMO0BccOqnHvKBhUUrXCdNSD3wRgDbimtzlPej2QG/xvBAPpSMLG7aoFHHEI71fgnei216ru91hevUGaVcbnG0mZOKC9P0gzBJp5TSLbXyOIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=//tQJT8oPwyYXKj/Jh3y32bl9GiOsptU80K/yLiDTJY=;
-        b=x7D+XTyLtqIRTUtO3VhupZdKQCI6srghSqBL/dhra1jRrdEOfym2GtG5MUkR+PiTS9
-         823adxTTvH+hSvHMtGEasfawIFt/YWSS0/f+SvLSv04lwdvRZu4J9hyLrNb50sgY1CKC
-         3qFGNDBycnj/xMkymiVhDQvNlCMxrlGnrsfpxt686xZUcmW7iq+4YmW73jRxjRXTJEYL
-         84f9YUJ/+aa7haHVw5qsHeIN+nynz0LC0rA1Yy2UG3y0xDRCN0R6MRJnFJdMfOqzjDoc
-         faByVuDPfr9ZhIz/vbkf9WcZ8eDHpMak2SN3YKgqBDClmd47SAXVp5pXSyV9LbnB77wX
-         pL0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=//tQJT8oPwyYXKj/Jh3y32bl9GiOsptU80K/yLiDTJY=;
-        b=H1aaFVVm/z6AykGYTlmRVF/3F6aOCtfMxmXk7pnLUk52SnRbP+MkFDicMdTInKDcNZ
-         xVRER7oidNbTe/ROse1P/6+a5GXrTxSoj7pESEi4T3ze4o/qPZ8I09wQCLFjonQyIwWr
-         3clMLiRqMqfNgngbzjYb1mA1ySriZY9AekRG+E97tSohtwJtFNIPIIhoLx3isEXV3U8A
-         3kHvq8TCSBIbqm3xd6SNz/5KJhrvkJEGwhH6FXlU681oC2G4dBHJ3X5lRk28/w5Qticz
-         ZCa/bE2ZaWUpti+2vV7CCJPxcRkN36g7j9STYIpTpYXSwz4tEDG/iC32uFoXzzp+ITte
-         fvuQ==
-X-Gm-Message-State: AOAM533yEiLeSi3B9BUiGqtBmi9sIyooGUqySUw0bX2Z5vmadxN/ebkw
-        t/VNfqYsmMyQs7j5UZ0n7ykM3w==
-X-Google-Smtp-Source: ABdhPJyMOemwZfKqq6yULi+gYTczFjoDwGjCptyIrTFMewyYGZB5ybC53ILgV0mBuMGez06PsM2NhA==
-X-Received: by 2002:a17:90b:350b:: with SMTP id ls11mr2013103pjb.134.1640065141036;
-        Mon, 20 Dec 2021 21:39:01 -0800 (PST)
-Received: from [192.168.10.24] (124-171-108-209.dyn.iinet.net.au. [124.171.108.209])
-        by smtp.gmail.com with ESMTPSA id lp6sm1231986pjb.55.2021.12.20.21.38.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Dec 2021 21:39:00 -0800 (PST)
-Message-ID: <b63e0570-934e-522f-8567-c9c4c438a55e@ozlabs.ru>
-Date:   Tue, 21 Dec 2021 16:38:54 +1100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101
- Thunderbird/96.0
-Subject: Re: [PATCH kernel v4] KVM: PPC: Merge powerpc's debugfs entry content
- into generic entry
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+wC/PgYAXA4OesG27brlcqFG7c2R4NEwXwymaJ07Aqg=;
+ b=I/cosRlmBXv0cDWbXSrDOwBwUitJfynEIkkqyYNa40qEW8RPMA2R2IY0FrXlDmCJR6rctZmamdTweoco3pGcNaQXS1fgI/2E1grI7oL1OYEYr37U0Dv0P/VjH3AvbMi3cRqq8vtLAl2Hf4fu8KqSqAKzqxjmIvPN5FsODvfYr/s=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ DM6PR01MB4665.prod.exchangelabs.com (2603:10b6:5:64::14) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4801.20; Tue, 21 Dec 2021 06:03:58 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::209e:941a:d9f9:354e]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::209e:941a:d9f9:354e%4]) with mapi id 15.20.4801.020; Tue, 21 Dec 2021
+ 06:03:57 +0000
+Message-ID: <ef667048-7fbe-55dc-9856-546fd9d3c690@os.amperecomputing.com>
+Date:   Tue, 21 Dec 2021 11:33:49 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v5 36/69] KVM: arm64: nv: Filter out unsupported features
+ from ID regs
 Content-Language: en-US
-To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        David Stevens <stevensd@chromium.org>, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-References: <20211220012351.2719879-1-aik@ozlabs.ru>
- <6111f49a-6ab9-2aba-92b1-ae02db3859b2@kaod.org>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <6111f49a-6ab9-2aba-92b1-ae02db3859b2@kaod.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-37-maz@kernel.org>
+ <e850857c-9cab-8e16-0568-acb513514ae8@os.amperecomputing.com>
+ <87h7b3wqe9.wl-maz@kernel.org>
+From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <87h7b3wqe9.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CY5PR10CA0003.namprd10.prod.outlook.com
+ (2603:10b6:930:1c::30) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a174ff5e-e96d-4091-253d-08d9c447ad1f
+X-MS-TrafficTypeDiagnostic: DM6PR01MB4665:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR01MB4665B290BBD7C28E19BF26969C7C9@DM6PR01MB4665.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UKfShkcphLznKVmB/lkgSBnliPPDq9LwlJk9wbB13phdBJLIUuyLunNvtcK/K07S5GvZaqDdVUNMI7eLLntzQbUJB1cq5NdZ/V57HHB4LWlAnTiBV5CGHeWmApLvtm7kY6Fu+xHLx4tJ5+ofNeaOjlCgJMrgL0GgyI8fiVQ3UurgGnzLeSC8LGayHisdn/6NJh27Ti0onG3//RRUm/Ne7j66+6ij/zOxOpoT4UP+/CHor6FpMmaMM9aDrTp90DZrWxYy2eWCI0U3V9myXtfyRRCVjZ3J8KAeDbUT5CKZkin4wnjC7QGKNZSxT0AlDE2s097F7+OJJnymwE94xwG5/vCCxDErn8Ysct3r8ZbO/irR6JC3DDe0iWRzvf07arz4Y2QcPmK3wJus+pd5i5vDBDVWL+NwnwTwDamkrvvSRebNvPYOrqVN5dornZUc4aBtyLSXFVkrn9Pr0ktUCPqGVJmcwnhNmv9JxC9l8bNthj/2NH8uDNawDtX3En+FgXWonl7ar68SADgGuLTVEplbfMn+iIAiXxvjF/3UYyLsakpeKitYR4cthgc/wAkVaf5ktzPGYKw2wXNOUSgu49+MboHNRRLCv2jTNTR5o8WX6REu9U7+XvAJZ1NGmbMD6wyiPapUG7sJvs+vEnJEGsC6JcWu1br04TeY96GIXicAaYTreVKmp1zKyUhjJpigP5ZGrcB9Jiz6I2eqI+ltOcM7lkSK7Ab5MU9nQO9mhTaGRTc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(86362001)(8936002)(2616005)(54906003)(6486002)(186003)(83380400001)(53546011)(31686004)(508600001)(5660300002)(2906002)(31696002)(6506007)(4326008)(38100700002)(7416002)(8676002)(52116002)(6512007)(38350700002)(6666004)(66556008)(66476007)(26005)(6916009)(55236004)(66946007)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dEc2SEtJdkFFOWdtdGI5ZUYvUkdFczJxZHQ2aGlpcWJWQ0E3U3BsV3NneENB?=
+ =?utf-8?B?VXlMdElscmtZU0hMaCtQOTlmTEFiMEtKNHZwYXFvMnc3SEN5WVZuVTMyNmdV?=
+ =?utf-8?B?Y0JVVVpKK3VrNXJDNnR5RHFNNUgzemxLMlFIdVVXQmhqSzJ1S2RXdWhQNEIr?=
+ =?utf-8?B?d043ZXJyMXFJZ3NXZHpYZTB6SmRFLy9jTkM4SFZ1disyY0o5a21IeFNMc1Uy?=
+ =?utf-8?B?YU56a3RiNE80VjFHaGhwdFhncWJMWmQ0cDZMY0Q3T3grVW54d2kwVTVpNnNS?=
+ =?utf-8?B?eHBpeEo4S1FmMVJBOE1KY0J4RXlod0xPZnorbWd2Z2ZuRHBmZGx6VHJGNGhL?=
+ =?utf-8?B?QllScGtJT09YVEtHTXRvb05RYk5kb1NVUmhlM3I5QUNyVEQzbTFXZitFd1Jk?=
+ =?utf-8?B?U1Njd1lKa1lzRE9SQUtqMnp2QUlqWk5hN1pLQ3d4UVBuNmV0R1RWOWU3NkVu?=
+ =?utf-8?B?S2lRWTNGZzM2RTgvSC9EWE5vUzY3b2ZoVVdPc3NVSFlCK1JxcktWcStwVlFN?=
+ =?utf-8?B?ellVaTkzelNRRkFTZmJWaFB2S21DWGpPMG5yakM0WVhHc0hVTlVKNHpscitp?=
+ =?utf-8?B?MFhzbElOeGk3RlpyMWJUYitHditFVjV2ZjkrU01WMHNhZ3VLSnV1UVhGT0Vq?=
+ =?utf-8?B?MXN1UVNRMkswQ0VjMGdTSHhkWnc2NSt2QzlOSGR4VzFRRXI5TGk4K1ozL0o4?=
+ =?utf-8?B?VlR5bjllMmZPUHFXTU1GbFVHamh3bDJrV1hKR1BQZE5hTmd3elIxd1JlSVNV?=
+ =?utf-8?B?a211bGFOMUJaV01Icm85T3Q1YnNLNnRtT2JQRmlNaFRnbDVSdERqZjRFNU5a?=
+ =?utf-8?B?YStuVDc2WDNleUUzQ3FjbnFoQm4rQUJFQU9VbkkwaWpoUndyZHdGbXRyUFdQ?=
+ =?utf-8?B?bEluMm1oTmhzcjl5YjBNY0tNdkI0eWJrY0VFU3NSQk15ekozaXVmTEFiUVBR?=
+ =?utf-8?B?NGtqTWRlUm5QK2RrRWNKOGNBd0Y1d093aDhUbm1ua2xXY0t5bmExeVRpOTE4?=
+ =?utf-8?B?cWZaS2tTSU1CZDJWT0RvSTRZZ1J0ak00SHJGaWYySWdLdlA2eGwyM0JiQkNK?=
+ =?utf-8?B?OG0rL3VOSW5NaXRVbURTM1BoVStlOWFRa29vdkRrTW4wWTlsb2MrdVp2WERH?=
+ =?utf-8?B?NXFYaFduYnBUMitVbk1xNVd4SFNSMmkvdGxTQzRTNHIxdFVydkszajRzb3Iv?=
+ =?utf-8?B?TS82RXlrTDFNQzAzOUNITGVBckVwelI5MlgwWlRSZWxnRmlVYldQQUcwMnFr?=
+ =?utf-8?B?bUtvcmplQVhzWE1MSEhxMDY2VHdQVzIzVzZ0U2JXSHdQY0IyemVvQ0Jaam4z?=
+ =?utf-8?B?QlR5emNjcXJUbjExbWtLY0NYRjBSYkpUUnIvQVFUUDYyam9PSytmWFRGNzEv?=
+ =?utf-8?B?VkJmbDRxK1UxNmRnUkpMc0JZa28vTjIybTY2MVdjcUxabW5sZkx1bVF1VGFw?=
+ =?utf-8?B?bjd1UWJuQXQzVEswTitGUDc1dGswWjBVQjJQYUs4U21YTVhaaFlvbm1PcW9t?=
+ =?utf-8?B?aHJhdDdRZjRucVUyVGhqUzFRYXBPMWlDeXR0Z0p3L3Jyd0I5VUdmL0JFTmY3?=
+ =?utf-8?B?blF3N0dtUzlCSVVZRnJYTHE4SmRYYWhxNW83R0U0VXI0dENMd29IdTVxa1ZT?=
+ =?utf-8?B?UmNkTWFFNXh3dTdQN3Y0NXVzRUdBOCtCLzZSZGtXL0tNU2tuN0hNQTZ5N0dN?=
+ =?utf-8?B?cVZta0NDMlowRmlaYlVCUVFlS0hwcE5SWmVkM05jZWZZWkRJOHNEcjhjTWRY?=
+ =?utf-8?B?ZW1hL2lsMHBmU0NRY2V4MUNLU1ZIM3B6Y1FTNTJpbHJxdlRTWFNCWFpjR05w?=
+ =?utf-8?B?WVBpczYyaWZwMXp0bkJRdjZrUUtlZ2xmTmtEUHlZaE5kaXZLU28rVHBTTTNC?=
+ =?utf-8?B?VVlsbHlleGIvUVFyRUh3YzRTZkY5NVlIMktzMExXUTQ1Y05tMkg5NnNXSk9Y?=
+ =?utf-8?B?SDE3QzZKd1BnUjhQYVp3RkhqL1pJMFE4T3MyempVZXpSTXFBMXJqQVpoM2hM?=
+ =?utf-8?B?K3NsVDhXVHEwQWRrc010SDRXTlJNWERyTy9vUGdMNlU2YklNOC9FcURhQ29U?=
+ =?utf-8?B?U2ZoL2JTZUlDWmpnanRzUTVISEdDNllPaUZKWEhtcnJvak14aDExSVdtSnlQ?=
+ =?utf-8?B?WGdnSytJYU1UVVNvYWU1Z0E1WFYya1dZRkdVV0FYbEVNMy82bkhUSnErNDl1?=
+ =?utf-8?B?RXVDQmZiSzExQW9HUERiMXNWU2hpbGVoQWNmdFFST3RaeVM2WjR3blZscWRa?=
+ =?utf-8?B?OWd5dWtVODlsOGhoY1ZqL1JFQ2U3bTlLRTMwbUxhdkJ0ek9kbk5NOFNOeFFX?=
+ =?utf-8?B?OWd0NjBJKzg5Q0dJaGpSYjEydkRTN0xXcXg2SWhMMGFFNlNaUlFDUT09?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a174ff5e-e96d-4091-253d-08d9c447ad1f
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2021 06:03:57.7732
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +WB4miYaA71pdyVGjkCdOoJT1X7t08AIX7pPpvKUVewSIJJ1rqzYKaDkXeYmLY0TZmhJpZINCko922nhI+r5p7MAhW5e1kdj+S1x2CObqF94Ye5ZkPNCNl7RPsP7O6Ki
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4665
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12/20/21 18:29, Cédric Le Goater wrote:
-> On 12/20/21 02:23, Alexey Kardashevskiy wrote:
->> At the moment KVM on PPC creates 4 types of entries under the kvm debugfs:
->> 1) "%pid-%fd" per a KVM instance (for all platforms);
->> 2) "vm%pid" (for PPC Book3s HV KVM);
->> 3) "vm%u_vcpu%u_timing" (for PPC Book3e KVM);
->> 4) "kvm-xive-%p" (for XIVE PPC Book3s KVM, the same for XICS);
+On 20-12-2021 03:26 pm, Marc Zyngier wrote:
+> On Mon, 20 Dec 2021 07:26:50 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 >>
->> The problem with this is that multiple VMs per process is not allowed for
->> 2) and 3) which makes it possible for userspace to trigger errors when
->> creating duplicated debugfs entries.
 >>
->> This merges all these into 1).
+>> Hi Marc,
 >>
->> This defines kvm_arch_create_kvm_debugfs() similar to
->> kvm_arch_create_vcpu_debugfs().
+>> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+>>> As there is a number of features that we either can't support,
+>>> or don't want to support right away with NV, let's add some
+>>> basic filtering so that we don't advertize silly things to the
+>>> EL2 guest.
+>>>
+>>> Whilst we are at it, avertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>    arch/arm64/include/asm/kvm_nested.h |   6 ++
+>>>    arch/arm64/kvm/nested.c             | 152 ++++++++++++++++++++++++++++
+>>>    arch/arm64/kvm/sys_regs.c           |   4 +-
+>>>    arch/arm64/kvm/sys_regs.h           |   2 +
+>>>    4 files changed, 163 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>>> index 07c15f51cf86..026ddaad972c 100644
+>>> --- a/arch/arm64/include/asm/kvm_nested.h
+>>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>>> @@ -67,4 +67,10 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+>>>    extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>>>    extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+>>>    +struct sys_reg_params;
+>>> +struct sys_reg_desc;
+>>> +
+>>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+>>> +			  const struct sys_reg_desc *r);
+>>> +
+>>>    #endif /* __ARM64_KVM_NESTED_H */
+>>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+>>> index 42a96c8d2adc..19b674983e13 100644
+>>> --- a/arch/arm64/kvm/nested.c
+>>> +++ b/arch/arm64/kvm/nested.c
+>>> @@ -20,6 +20,10 @@
+>>>    #include <linux/kvm_host.h>
+>>>      #include <asm/kvm_emulate.h>
+>>> +#include <asm/kvm_nested.h>
+>>> +#include <asm/sysreg.h>
+>>> +
+>>> +#include "sys_regs.h"
+>>>      /*
+>>>     * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+>>> @@ -38,3 +42,151 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+>>>      	return -EINVAL;
+>>>    }
+>>> +
+>>> +/*
+>>> + * Our emulated CPU doesn't support all the possible features. For the
+>>> + * sake of simplicity (and probably mental sanity), wipe out a number
+>>> + * of feature bits we don't intend to support for the time being.
+>>> + * This list should get updated as new features get added to the NV
+>>> + * support, and new extension to the architecture.
+>>> + */
+>>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+>>> +			  const struct sys_reg_desc *r)
+>>> +{
+>>> +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+>>> +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+>>> +	u64 val, tmp;
+>>> +
+>>> +	if (!nested_virt_in_use(v))
+>>> +		return;
+>>> +
+>>> +	val = p->regval;
+>>> +
+>>> +	switch (id) {
+>>> +	case SYS_ID_AA64ISAR0_EL1:
+>>> +		/* Support everything but O.S. and Range TLBIs */
+>>> +		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
+>>> +			 GENMASK_ULL(27, 24)		|
+>>> +			 GENMASK_ULL(3, 0));
+>>> +		break;
+>>> +
+>>> +	case SYS_ID_AA64ISAR1_EL1:
+>>> +		/* Support everything but PtrAuth and Spec Invalidation */
+>>> +		val &= ~(GENMASK_ULL(63, 56)		|
+>>> +			 FEATURE(ID_AA64ISAR1_SPECRES)	|
+>>> +			 FEATURE(ID_AA64ISAR1_GPI)	|
+>>> +			 FEATURE(ID_AA64ISAR1_GPA)	|
+>>> +			 FEATURE(ID_AA64ISAR1_API)	|
+>>> +			 FEATURE(ID_AA64ISAR1_APA));
+>>> +		break;
+>>> +
+>>> +	case SYS_ID_AA64PFR0_EL1:
+>>> +		/* No AMU, MPAM, S-EL2, RAS or SVE */
+>>> +		val &= ~(GENMASK_ULL(55, 52)		|
+>>> +			 FEATURE(ID_AA64PFR0_AMU)	|
+>>> +			 FEATURE(ID_AA64PFR0_MPAM)	|
+>>> +			 FEATURE(ID_AA64PFR0_SEL2)	|
+>>> +			 FEATURE(ID_AA64PFR0_RAS)	|
+>>> +			 FEATURE(ID_AA64PFR0_SVE)	|
+>>> +			 FEATURE(ID_AA64PFR0_EL3)	|
+>>> +			 FEATURE(ID_AA64PFR0_EL2));
+>>> +		/* 64bit EL2/EL3 only */
+>>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
+>>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), 0b0001);
+>>> +		break;
+>>> +
+>>> +	case SYS_ID_AA64PFR1_EL1:
+>>> +		/* Only support SSBS */
+>>> +		val &= FEATURE(ID_AA64PFR1_SSBS);
+>>> +		break;
+>>> +
+>>> +	case SYS_ID_AA64MMFR0_EL1:
+>>> +		/* Hide ECV, FGT, ExS, Secure Memory */
+>>> +		val &= ~(GENMASK_ULL(63, 43)			|
+>>> +			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
+>>> +			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
+>>> +			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
+>>> +			 FEATURE(ID_AA64MMFR0_SNSMEM));
+>>> +
+>>> +		/* Disallow unsupported S2 page sizes */
+>>> +		switch (PAGE_SIZE) {
+>>> +		case SZ_64K:
+>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
+>>> +			fallthrough;
+>>> +		case SZ_16K:
+>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
+>>> +			fallthrough;
+>>> +		case SZ_4K:
+>>> +			/* Support everything */
+>>> +			break;
+>>> +		}
 >>
->> This defines 2 hooks in kvmppc_ops that allow specific KVM implementations
->> add necessary entries, this adds the _e500 suffix to
->> kvmppc_create_vcpu_debugfs_e500() to make it clear what platform it is for.
->>
->> This makes use of already existing kvm_arch_create_vcpu_debugfs() on PPC.
->>
->> This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
->>
->> This stops removing vcpu entries as once created vcpus stay around
->> for the entire life of a VM and removed when the KVM instance is closed,
->> see commit d56f5136b010 ("KVM: let kvm_destroy_vm_debugfs clean up vCPU
->> debugfs directories").
->>
->> Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> It seems to me that Host hypervisor(L0) has to boot with 4KB page size
+>> to support all (4, 16 and 64KB) page sizes at L1, any specific reason
+>> for this restriction?
 > 
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> Well, yes.
 > 
-> One comment below.
+> If you have a L0 that has booted with (let's say) 64kB page size, how
+> do you provide S2 mappings with 4kB granularity so that you can
+> implement the permissions that a L1 guest hypervisor can impose on its
+> own guest, given that KVM currently mandates S1 and S2 to use the same
+> page sizes?
 > 
->> ---
->> Changes:
->> v4:
->> * added "kvm-xive-%p"
->>
->> v3:
->> * reworked commit log, especially, the bit about removing vcpus
->>
->> v2:
->> * handled powerpc-booke
->> * s/kvm/vm/ in arch hooks
->> ---
->>   arch/powerpc/include/asm/kvm_host.h    |  6 ++---
->>   arch/powerpc/include/asm/kvm_ppc.h     |  2 ++
->>   arch/powerpc/kvm/timing.h              |  9 ++++----
->>   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
->>   arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
->>   arch/powerpc/kvm/book3s_hv.c           | 31 ++++++++++----------------
->>   arch/powerpc/kvm/book3s_xics.c         | 13 ++---------
->>   arch/powerpc/kvm/book3s_xive.c         | 13 ++---------
->>   arch/powerpc/kvm/book3s_xive_native.c  | 13 ++---------
->>   arch/powerpc/kvm/e500.c                |  1 +
->>   arch/powerpc/kvm/e500mc.c              |  1 +
->>   arch/powerpc/kvm/powerpc.c             | 16 ++++++++++---
->>   arch/powerpc/kvm/timing.c              | 20 ++++-------------
->>   13 files changed, 47 insertions(+), 82 deletions(-)
->>
->> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
->> index 17263276189e..f5e14fa683f4 100644
->> --- a/arch/powerpc/include/asm/kvm_host.h
->> +++ b/arch/powerpc/include/asm/kvm_host.h
->> @@ -26,6 +26,8 @@
->>   #include <asm/hvcall.h>
->>   #include <asm/mce.h>
->>   
->> +#define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->> +
->>   #define KVM_MAX_VCPUS		NR_CPUS
->>   #define KVM_MAX_VCORES		NR_CPUS
->>   
->> @@ -295,7 +297,6 @@ struct kvm_arch {
->>   	bool dawr1_enabled;
->>   	pgd_t *pgtable;
->>   	u64 process_table;
->> -	struct dentry *debugfs_dir;
->>   	struct kvm_resize_hpt *resize_hpt; /* protected by kvm->lock */
->>   #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
->>   #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
->> @@ -673,7 +674,6 @@ struct kvm_vcpu_arch {
->>   	u64 timing_min_duration[__NUMBER_OF_KVM_EXIT_TYPES];
->>   	u64 timing_max_duration[__NUMBER_OF_KVM_EXIT_TYPES];
->>   	u64 timing_last_exit;
->> -	struct dentry *debugfs_exit_timing;
->>   #endif
->>   
->>   #ifdef CONFIG_PPC_BOOK3S
->> @@ -829,8 +829,6 @@ struct kvm_vcpu_arch {
->>   	struct kvmhv_tb_accumulator rm_exit;	/* real-mode exit code */
->>   	struct kvmhv_tb_accumulator guest_time;	/* guest execution */
->>   	struct kvmhv_tb_accumulator cede_time;	/* time napping inside guest */
->> -
->> -	struct dentry *debugfs_dir;
->>   #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
->>   };
->>   
->> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
->> index 33db83b82fbd..d2b192dea0d2 100644
->> --- a/arch/powerpc/include/asm/kvm_ppc.h
->> +++ b/arch/powerpc/include/asm/kvm_ppc.h
->> @@ -316,6 +316,8 @@ struct kvmppc_ops {
->>   	int (*svm_off)(struct kvm *kvm);
->>   	int (*enable_dawr1)(struct kvm *kvm);
->>   	bool (*hash_v3_possible)(void);
->> +	int (*create_vm_debugfs)(struct kvm *kvm);
->> +	int (*create_vcpu_debugfs)(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
->>   };
->>   
->>   extern struct kvmppc_ops *kvmppc_hv_ops;
->> diff --git a/arch/powerpc/kvm/timing.h b/arch/powerpc/kvm/timing.h
->> index feef7885ba82..493a7d510fd5 100644
->> --- a/arch/powerpc/kvm/timing.h
->> +++ b/arch/powerpc/kvm/timing.h
->> @@ -14,8 +14,8 @@
->>   #ifdef CONFIG_KVM_EXIT_TIMING
->>   void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu);
->>   void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu);
->> -void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id);
->> -void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu);
->> +void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
->> +				     struct dentry *debugfs_dentry);
->>   
->>   static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
->>   {
->> @@ -26,9 +26,8 @@ static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
->>   /* if exit timing is not configured there is no need to build the c file */
->>   static inline void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu) {}
->>   static inline void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu) {}
->> -static inline void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu,
->> -						unsigned int id) {}
->> -static inline void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
->> +static inline void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
->> +						   struct dentry *debugfs_dentry) {}
->>   static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type) {}
->>   #endif /* CONFIG_KVM_EXIT_TIMING */
->>   
->> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
->> index c63e263312a4..33dae253a0ac 100644
->> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
->> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
->> @@ -2112,7 +2112,7 @@ static const struct file_operations debugfs_htab_fops = {
->>   
->>   void kvmppc_mmu_debugfs_init(struct kvm *kvm)
->>   {
->> -	debugfs_create_file("htab", 0400, kvm->arch.debugfs_dir, kvm,
->> +	debugfs_create_file("htab", 0400, kvm->debugfs_dentry, kvm,
->>   			    &debugfs_htab_fops);
->>   }
->>   
->> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
->> index 8cebe5542256..e4ce2a35483f 100644
->> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
->> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
->> @@ -1454,7 +1454,7 @@ static const struct file_operations debugfs_radix_fops = {
->>   
->>   void kvmhv_radix_debugfs_init(struct kvm *kvm)
->>   {
->> -	debugfs_create_file("radix", 0400, kvm->arch.debugfs_dir, kvm,
->> +	debugfs_create_file("radix", 0400, kvm->debugfs_dentry, kvm,
->>   			    &debugfs_radix_fops);
->>   }
->>   
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index bf1eb1160ae2..4c52541b6f37 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -2768,20 +2768,17 @@ static const struct file_operations debugfs_timings_ops = {
->>   };
->>   
->>   /* Create a debugfs directory for the vcpu */
->> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
->> +static int kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
->>   {
->> -	char buf[16];
->> -	struct kvm *kvm = vcpu->kvm;
->> -
->> -	snprintf(buf, sizeof(buf), "vcpu%u", id);
->> -	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
->> -	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
->> +	debugfs_create_file("timings", 0444, debugfs_dentry, vcpu,
->>   			    &debugfs_timings_ops);
->> +	return 0;
->>   }
->>   
->>   #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
->> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
->> +static int kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
->>   {
->> +	return 0;
->>   }
->>   #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
->>   
->> @@ -2904,8 +2901,6 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
->>   	vcpu->arch.cpu_type = KVM_CPU_3S_64;
->>   	kvmppc_sanity_check(vcpu);
->>   
->> -	debugfs_vcpu_init(vcpu, id);
->> -
->>   	return 0;
->>   }
->>   
->> @@ -5226,7 +5221,6 @@ void kvmppc_free_host_rm_ops(void)
->>   static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->>   {
->>   	unsigned long lpcr, lpid;
->> -	char buf[32];
->>   	int ret;
->>   
->>   	mutex_init(&kvm->arch.uvmem_lock);
->> @@ -5359,15 +5353,14 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->>   		kvm->arch.smt_mode = 1;
->>   	kvm->arch.emul_smt_mode = 1;
->>   
->> -	/*
->> -	 * Create a debugfs directory for the VM
->> -	 */
->> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
->> -	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
->> +	return 0;
->> +}
->> +
->> +static int kvmppc_arch_create_vm_debugfs_hv(struct kvm *kvm)
->> +{
->>   	kvmppc_mmu_debugfs_init(kvm);
->>   	if (radix_enabled())
->>   		kvmhv_radix_debugfs_init(kvm);
->> -
->>   	return 0;
->>   }
->>   
->> @@ -5382,8 +5375,6 @@ static void kvmppc_free_vcores(struct kvm *kvm)
->>   
->>   static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
->>   {
->> -	debugfs_remove_recursive(kvm->arch.debugfs_dir);
->> -
->>   	if (!cpu_has_feature(CPU_FTR_ARCH_300))
->>   		kvm_hv_vm_deactivated();
->>   
->> @@ -6044,6 +6035,8 @@ static struct kvmppc_ops kvm_ops_hv = {
->>   	.svm_off = kvmhv_svm_off,
->>   	.enable_dawr1 = kvmhv_enable_dawr1,
->>   	.hash_v3_possible = kvmppc_hash_v3_possible,
->> +	.create_vcpu_debugfs = kvmppc_arch_create_vcpu_debugfs_hv,
->> +	.create_vm_debugfs = kvmppc_arch_create_vm_debugfs_hv,
->>   };
->>   
->>   static int kvm_init_subcore_bitmap(void)
->> diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
->> index ebd5d920de8c..3dfa9285e4a4 100644
->> --- a/arch/powerpc/kvm/book3s_xics.c
->> +++ b/arch/powerpc/kvm/book3s_xics.c
->> @@ -1016,19 +1016,10 @@ DEFINE_SHOW_ATTRIBUTE(xics_debug);
->>   
->>   static void xics_debugfs_init(struct kvmppc_xics *xics)
->>   {
->> -	char *name;
->> -
->> -	name = kasprintf(GFP_KERNEL, "kvm-xics-%p", xics);
->> -	if (!name) {
->> -		pr_err("%s: no memory for name\n", __func__);
->> -		return;
->> -	}
->> -
->> -	xics->dentry = debugfs_create_file(name, 0444, arch_debugfs_dir,
->> +	xics->dentry = debugfs_create_file("xics", 0444, xics->kvm->debugfs_dentry,
->>   					   xics, &xics_debug_fops);
->>   
->> -	pr_debug("%s: created %s\n", __func__, name);
->> -	kfree(name);
->> +	pr_debug("%s: created\n", __func__);
->>   }
->>   
->>   static struct kvmppc_ics *kvmppc_xics_create_ics(struct kvm *kvm,
->> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
->> index 225008882958..bb41afbb68fc 100644
->> --- a/arch/powerpc/kvm/book3s_xive.c
->> +++ b/arch/powerpc/kvm/book3s_xive.c
->> @@ -2351,19 +2351,10 @@ DEFINE_SHOW_ATTRIBUTE(xive_debug);
->>   
->>   static void xive_debugfs_init(struct kvmppc_xive *xive)
->>   {
->> -	char *name;
->> -
->> -	name = kasprintf(GFP_KERNEL, "kvm-xive-%p", xive);
->> -	if (!name) {
->> -		pr_err("%s: no memory for name\n", __func__);
->> -		return;
->> -	}
->> -
->> -	xive->dentry = debugfs_create_file(name, S_IRUGO, arch_debugfs_dir,
->> +	xive->dentry = debugfs_create_file("xive", S_IRUGO, xive->kvm->debugfs_dentry,
->>   					   xive, &xive_debug_fops);
+> You can't. That's why we tell the guest hypervisor how much we
+> support, and the guest hypervisor can decide to go ahead or not
+> depending on what it does.
 > 
-> The KVM XIVE device implements a "xics-on-xive" interface, the XICS hcalls
-> on top of the XIVE native PowerNV (OPAL) interface, and ...
-> 
->> -	pr_debug("%s: created %s\n", __func__, name);
->> -	kfree(name);
->> +	pr_debug("%s: created\n", __func__);
->>   }
->>   
->>   static void kvmppc_xive_init(struct kvm_device *dev)
->> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
->> index 99db9ac49901..e86f5b6c2ae1 100644
->> --- a/arch/powerpc/kvm/book3s_xive_native.c
->> +++ b/arch/powerpc/kvm/book3s_xive_native.c
->> @@ -1259,19 +1259,10 @@ DEFINE_SHOW_ATTRIBUTE(xive_native_debug);
->>   
->>   static void xive_native_debugfs_init(struct kvmppc_xive *xive)
->>   {
->> -	char *name;
->> -
->> -	name = kasprintf(GFP_KERNEL, "kvm-xive-%p", xive);
->> -	if (!name) {
->> -		pr_err("%s: no memory for name\n", __func__);
->> -		return;
->> -	}
->> -
->> -	xive->dentry = debugfs_create_file(name, 0444, arch_debugfs_dir,
->> +	xive->dentry = debugfs_create_file("xive", 0444, xive->kvm->debugfs_dentry,
->>   					   xive, &xive_native_debug_fops);
-> 
-> ... the KVM XIVE *native* device implements a "xive" interface", the one
-> using MMIOs for interrupt management.
-> 
-> May be it's worth making the difference in the user interface ?
+> If one day we can support S2 mappings that are smaller than the host
+> page sizes, then we'll be able to allow to advertise all page sizes.
+> But I wouldn't hold my breath for this to happen.
 
-
-The content of these xive files is quite different so I kept the same
-name as before, I can change if you think it is worth it, should I? You
-are probably the only person who looked at it recently (or ever?) :) Thanks,
-
-
+Thanks for the detailed explanation!.
+Can we put one line comment that explains why this manipulation?
+It would be helpful to see a comment like S2 PAGE_SIZE should be
+at-least the size of Host PAGE_SIZE?
 
 > 
-> Thanks,
-> 
-> C.
-> 
->>   
->> -	pr_debug("%s: created %s\n", __func__, name);
->> -	kfree(name);
->> +	pr_debug("%s: created\n", __func__);
->>   }
->>   
->>   static void kvmppc_xive_native_init(struct kvm_device *dev)
->> diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
->> index 7e8b69015d20..c8b2b4478545 100644
->> --- a/arch/powerpc/kvm/e500.c
->> +++ b/arch/powerpc/kvm/e500.c
->> @@ -495,6 +495,7 @@ static struct kvmppc_ops kvm_ops_e500 = {
->>   	.emulate_op = kvmppc_core_emulate_op_e500,
->>   	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
->>   	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
->> +	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
->>   };
->>   
->>   static int __init kvmppc_e500_init(void)
->> diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
->> index 1c189b5aadcc..fa0d8dbbe484 100644
->> --- a/arch/powerpc/kvm/e500mc.c
->> +++ b/arch/powerpc/kvm/e500mc.c
->> @@ -381,6 +381,7 @@ static struct kvmppc_ops kvm_ops_e500mc = {
->>   	.emulate_op = kvmppc_core_emulate_op_e500,
->>   	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
->>   	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
->> +	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
->>   };
->>   
->>   static int __init kvmppc_e500mc_init(void)
->> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
->> index a72920f4f221..2ea73dfcebb2 100644
->> --- a/arch/powerpc/kvm/powerpc.c
->> +++ b/arch/powerpc/kvm/powerpc.c
->> @@ -763,7 +763,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>   		goto out_vcpu_uninit;
->>   
->>   	vcpu->arch.waitp = &vcpu->wait;
->> -	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
->>   	return 0;
->>   
->>   out_vcpu_uninit:
->> @@ -780,8 +779,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->>   	/* Make sure we're not using the vcpu anymore */
->>   	hrtimer_cancel(&vcpu->arch.dec_timer);
->>   
->> -	kvmppc_remove_vcpu_debugfs(vcpu);
->> -
->>   	switch (vcpu->arch.irq_type) {
->>   	case KVMPPC_IRQ_MPIC:
->>   		kvmppc_mpic_disconnect_vcpu(vcpu->arch.mpic, vcpu);
->> @@ -2505,3 +2502,16 @@ int kvm_arch_init(void *opaque)
->>   }
->>   
->>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ppc_instr);
->> +
->> +void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
->> +{
->> +	if (vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs)
->> +		vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs(vcpu, debugfs_dentry);
->> +}
->> +
->> +int kvm_arch_create_vm_debugfs(struct kvm *kvm)
->> +{
->> +	if (kvm->arch.kvm_ops->create_vm_debugfs)
->> +		kvm->arch.kvm_ops->create_vm_debugfs(kvm);
->> +	return 0;
->> +}
->> diff --git a/arch/powerpc/kvm/timing.c b/arch/powerpc/kvm/timing.c
->> index ba56a5cbba97..f6d472874c85 100644
->> --- a/arch/powerpc/kvm/timing.c
->> +++ b/arch/powerpc/kvm/timing.c
->> @@ -204,21 +204,9 @@ static const struct file_operations kvmppc_exit_timing_fops = {
->>   	.release = single_release,
->>   };
->>   
->> -void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id)
->> +void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
->> +				     struct dentry *debugfs_dentry)
->>   {
->> -	static char dbg_fname[50];
->> -	struct dentry *debugfs_file;
->> -
->> -	snprintf(dbg_fname, sizeof(dbg_fname), "vm%u_vcpu%u_timing",
->> -		 current->pid, id);
->> -	debugfs_file = debugfs_create_file(dbg_fname, 0666, kvm_debugfs_dir,
->> -						vcpu, &kvmppc_exit_timing_fops);
->> -
->> -	vcpu->arch.debugfs_exit_timing = debugfs_file;
->> -}
->> -
->> -void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu)
->> -{
->> -	debugfs_remove(vcpu->arch.debugfs_exit_timing);
->> -	vcpu->arch.debugfs_exit_timing = NULL;
->> +	debugfs_create_file("timing", 0666, debugfs_dentry,
->> +			    vcpu, &kvmppc_exit_timing_fops);
->>   }
 >>
+>>> +		/* Advertize supported S2 page sizes */
+>>> +		switch (PAGE_SIZE) {
+>>> +		case SZ_4K:
+>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
+>>> +			fallthrough;
+>>> +		case SZ_16K:
+>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0010);
+>>> +			fallthrough;
+>>> +		case SZ_64K:
+>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64_2), 0b0010);
+>>> +			break;
+>>> +		}
+>>> +		/* Cap PARange to 40bits */
+>>
+>> Any specific reasons for the 40 bit cap?
+> 
+> The only platform this currently runs on is a model, and 1TB of
+> address space is what it supports. At some point, this will require
+> userspace involvement to set it up, but we're not quite ready for that
+> either. And given that there is no HW, the urge for changing this is
+> extremely limited.
+Makes sense, thanks.
+
+Please feel free to add.
+Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+
+> 
+> 	M.
 > 
 
--- 
-Alexey
+Thanks,
+Ganapat
