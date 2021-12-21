@@ -2,123 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74B8447BC77
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 10:06:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12D1D47BC98
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 10:10:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235060AbhLUJGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 04:06:30 -0500
-Received: from mga18.intel.com ([134.134.136.126]:59830 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234454AbhLUJG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 04:06:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640077589; x=1671613589;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=c8yHioLgX+giyIh16+OiSjIl4N67UmUFHNBIbnU3k6k=;
-  b=jGq/LFSAlSit5gvb3Tvgi9iT6lYqN8yuMxKBufUsG6kdIS7/0OhJiit9
-   Tm6xQO+Ghs25rLMFf/7cKn3JgkRUkenbjycUwPBjyrjwBQJeoS6anXH2P
-   /FQMQfqXQrgUTt8RVx22a/yggo7XV2QOusiWGB+rxsi4XVH8dIUlwmORl
-   sVyZueMoJJEys843XkC3SS0RhzDJekzQ6IgZggyrA/Y+ZcB696bpiFq0q
-   ug6sAt9p1nHGqiqmCtynXYPz4oD6hN6WuuPLB3fb7UeaOoTLiiTw3JFGQ
-   ZlMeSYcqPb++Ni7iDpILcqbtnga5O2zJCAwcespRZTzrgtF3e2IWNNrrj
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10204"; a="227208769"
-X-IronPort-AV: E=Sophos;i="5.88,223,1635231600"; 
-   d="scan'208";a="227208769"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2021 01:06:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,223,1635231600"; 
-   d="scan'208";a="684598517"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga005.jf.intel.com with ESMTP; 21 Dec 2021 01:06:29 -0800
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 01:06:28 -0800
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 17:06:26 +0800
-Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
- SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2308.020;
- Tue, 21 Dec 2021 17:06:26 +0800
-From:   "Wang, Wei W" <wei.w.wang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-CC:     "seanjc@google.com" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
-        "Zeng, Guang" <guang.zeng@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: RE: [PATCH v2 18/23] kvm: x86: Get/set expanded xstate buffer
-Thread-Topic: [PATCH v2 18/23] kvm: x86: Get/set expanded xstate buffer
-Thread-Index: AQHX81r8L73y8adYV0a4DFLIQjWYRqw6lEwAgAGYYhD///SwAIAAiGog
-Date:   Tue, 21 Dec 2021 09:06:26 +0000
-Message-ID: <c06fdc4f3b4d4346ae80801a6c3a6ff2@intel.com>
-References: <20211217153003.1719189-1-jing2.liu@intel.com>
- <20211217153003.1719189-19-jing2.liu@intel.com>
- <3ffa47eb-3555-5925-1c55-f89a07ceb4bc@redhat.com>
- <e0fd378de64f44fd8becfe67b02cb635@intel.com>
- <219a751e-ac2d-9ce1-9db7-7d5b1edd6bdd@redhat.com>
-In-Reply-To: <219a751e-ac2d-9ce1-9db7-7d5b1edd6bdd@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.6.200.16
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S236154AbhLUJKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 04:10:13 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:59008 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236156AbhLUJKM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 04:10:12 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FBEE6147A
+        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 09:10:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B46D1C36AE2;
+        Tue, 21 Dec 2021 09:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640077811;
+        bh=dqLnh6PlEXIFrCc8RxbmZ745zfW0n92neTWiPzt+10Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=N20IVw2zd5DxpYyhj/s7YCANrGpIzob5Wx470V91m8Gg/FhE/AqsNSwYsVF+96eHl
+         IlSScB4BeifCPnmg5HlUYWTuWpA53shjGkeSygZ9i6m+W/V2kC+FhycXRbQDVhFU24
+         DjdS73VraeWZgw/07/QQVvwrYyjlBkJtVvJzR9vQDLmpmCPPu8N2OdcUchTvtRPRoi
+         dLsZAKMUWbIKyW+HOT+FUjt5rfH7I4SIgj9gBoR7Y/bvADS6lih3T0BoJsveLTVR7I
+         U3wcsXdMciyqMvtMZqqpmHLb8iVHYhj++NUQ8gntZXACfqBXMUg45whzHXsYz2nNvM
+         MvU23c3N+K5Lg==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mzb9t-00DUHv-Hn; Tue, 21 Dec 2021 09:10:09 +0000
+Date:   Tue, 21 Dec 2021 09:10:09 +0000
+Message-ID: <87zgouuxvy.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 36/69] KVM: arm64: nv: Filter out unsupported features from ID regs
+In-Reply-To: <ef667048-7fbe-55dc-9856-546fd9d3c690@os.amperecomputing.com>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-37-maz@kernel.org>
+        <e850857c-9cab-8e16-0568-acb513514ae8@os.amperecomputing.com>
+        <87h7b3wqe9.wl-maz@kernel.org>
+        <ef667048-7fbe-55dc-9856-546fd9d3c690@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlc2RheSwgRGVjZW1iZXIgMjEsIDIwMjEgNDo0NSBQTSwgUGFvbG8gQm9uemluaSB3cm90
-ZToNCj4gT24gMTIvMjEvMjEgMDM6NDUsIFdhbmcsIFdlaSBXIHdyb3RlOg0KPiA+PiBLVk1fR0VU
-X1hTQVZFMiBhbmQgS1ZNX1NFVF9YU0FWRSByZXNwZWN0aXZlbHkgd3JpdGUgYW5kIHJlYWQgYXMN
-Cj4gbWFueQ0KPiA+PiBieXRlcyBhcyBhcmUgcmV0dXJuZWQgYnkgS1ZNX0NIRUNLX0VYVEVOU0lP
-TihLVk1fQ0FQX1hTQVZFMiksDQo+IHdoZW4NCj4gPj4gaW52b2tlZCBvbiB0aGUgdm0gZmlsZSBk
-ZXNjcmlwdG9yLiAgQ3VycmVudGx5LA0KPiA+PiBLVk1fQ0hFQ0tfRVhURU5TSU9OKEtWTV9DQVBf
-WFNBVkUyKSB3aWxsIG9ubHkgcmV0dXJuIGEgdmFsdWUgdGhhdCBpcw0KPiA+PiBncmVhdGVyIHRo
-YW4gNDA5NiBieXRlcyBpZiBhbnkgZHluYW1pYyBmZWF0dXJlcyBoYXZlIGJlZW4gZW5hYmxlZA0K
-PiA+PiB3aXRoIGBgYXJjaF9wcmN0bCgpYGA7IHRoaXMgaG93ZXZlciBtYXkgY2hhbmdlIGluIHRo
-ZSBmdXR1cmUuDQo+ID4gV291bGQgdGhpcyBtYWtlIHBlb3BsZSB0aGluayB0aGF0DQo+IEtWTV9D
-SEVDS19FWFRFTlNJT04oS1ZNX0NBUF9YU0FWRTIpDQo+ID4gZG9lc27igJl0IHJldHVybiB0aGUg
-dmFsdWUgKGkuZS4gcmV0dXJuIDApIGlmIGl0IGlzIHNtYWxsZXIgdGhhbiA0MDk2Pw0KPiA+IChp
-LmUuIEtWTV9HRVRfWFNBVkUyIGRvZXNuJ3Qgd29yayB3aXRoIHNpemUgPCA0MDk2LCB3aGljaCBp
-c27igJl0IHRydWUpDQo+ID4NCj4gPiBJIHBsYW4gdG8ganVzdCByZXdvcmQgYSBiaXQ6DQo+ID4g
-Q3VycmVudGx5LCBLVk1fQ0hFQ0tfRVhURU5TSU9OKEtWTV9DQVBfWFNBVkUyKSB3aWxsIG9ubHkg
-cmV0dXJuIGENCj4gc2l6ZQ0KPiA+IHZhbHVlLCBhbmQgdGhlIHZhbHVlIGlzIGdyZWF0ZXIgdGhh
-biA0MDk2IGJ5dGVzIGlmIGFueSBkeW5hbWljDQo+ID4gZmVhdHVyZXMgaGF2ZSBiZWVuIGVuYWJs
-ZWQgd2l0aCBgYGFyY2hfcHJjdGwoKWBgLiBNb3JlIHR5cGVzIG9mIHZhbHVlcyBjb3VsZA0KPiBi
-ZSByZXR1cm5lZCBpbiB0aGUgZnV0dXJlLg0KPiANCj4gTmV4dCByZWZpbmVtZW50Og0KPiANCj4g
-VGhlIHNpemUgdmFsdWUgcmV0dXJuZWQgYnkgS1ZNX0NIRUNLX0VYVEVOU0lPTihLVk1fQ0FQX1hT
-QVZFMikgd2lsbA0KPiBhbHdheXMgYmUgYXQgbGVhc3QgNDA5Ni4gIEN1cnJlbnRseSwgaXQgaXMg
-b25seSBncmVhdGVyIHRoYW4gNDA5NiBpZiBhIGR5bmFtaWMNCj4gZmVhdHVyZSBoYXMgYmVlbiBl
-bmFibGVkIHdpdGggYGBhcmNoX3ByY3RsKClgYCwgYnV0IHRoaXMgbWF5IGNoYW5nZSBpbiB0aGUN
-Cj4gZnV0dXJlLg0KDQo+IChJJ20gbm90IHN1cmUgaWYgdGhlIGZpcnN0IHNlbnRlbmNlIGlzIHRy
-dWUgaW4gdGhlIGNvZGUsIGJ1dCBpZiBub3QgaXQgaXMgYSBidWcgdGhhdA0KPiBoYXMgdG8gYmUg
-Zml4ZWQgOikpLg0KDQpGb3IgdGhlIGltcGxlbWVudGF0aW9uLCBLVk1fQ0hFQ0tfRVhURU5TSU9O
-KEtWTV9DQVBfWFNBVkUyKSBhbHdheXMgcmV0dXJuIGt2bS0+dmNwdXNbMF0tPmFyY2guZ3Vlc3Rf
-ZnB1LnVhYmlfc2l6ZS4NCkRvIHlvdSB3YW50IHRvIGNoYW5nZSBpdCB0byBiZWxvdz8NCg0KSWYg
-KGt2bS0+dmNwdXNbMF0tPmFyY2guZ3Vlc3RfZnB1LnVhYmlfc2l6ZSA8IDQwOTYpDQoJcmV0dXJu
-IDA7DQplbHNlDQoJcmV0dXJuIGt2bS0+dmNwdXNbMF0tPmFyY2guZ3Vlc3RfZnB1LnVhYmlfc2l6
-ZTsNCg0KSWYgdGhlIHNpemUgaXMgbGVzcyB0aGFuIDQwOTYgKGUuZy4gbm8gZHluYW1pYyB4ZmVh
-dHVyZXMgZW5hYmxlZCksDQp1c2Vyc3BhY2Ugc2hvdWxkIHVzZSB0aGUgb2xkIEtWTV9HRVRfWFNB
-VkUgKGluc3RlYWQgb2YgS1ZNX0dFVF9YU0FWRTIpPw0KKEtWTV9HRVRfWFNBVkUyIHN1cHBvcnRz
-IHRvIHdvcmsgd2l0aCBzaXplIGxlc3MgdGhhbiA0MDk2LCBzbyBJIHRoaW5rIHRoaXMgaXNuJ3Qg
-bmVjZXNzYXJ5KQ0KDQpUaGFua3MsDQpXZWkNCg==
+On Tue, 21 Dec 2021 06:03:49 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> 
+> On 20-12-2021 03:26 pm, Marc Zyngier wrote:
+> > On Mon, 20 Dec 2021 07:26:50 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> Hi Marc,
+> >> 
+> >> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> >>> As there is a number of features that we either can't support,
+> >>> or don't want to support right away with NV, let's add some
+> >>> basic filtering so that we don't advertize silly things to the
+> >>> EL2 guest.
+> >>> 
+> >>> Whilst we are at it, avertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+> >>> 
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> ---
+> >>>    arch/arm64/include/asm/kvm_nested.h |   6 ++
+> >>>    arch/arm64/kvm/nested.c             | 152 ++++++++++++++++++++++++++++
+> >>>    arch/arm64/kvm/sys_regs.c           |   4 +-
+> >>>    arch/arm64/kvm/sys_regs.h           |   2 +
+> >>>    4 files changed, 163 insertions(+), 1 deletion(-)
+> >>> 
+> >>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> >>> index 07c15f51cf86..026ddaad972c 100644
+> >>> --- a/arch/arm64/include/asm/kvm_nested.h
+> >>> +++ b/arch/arm64/include/asm/kvm_nested.h
+> >>> @@ -67,4 +67,10 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+> >>>    extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+> >>>    extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> >>>    +struct sys_reg_params;
+> >>> +struct sys_reg_desc;
+> >>> +
+> >>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >>> +			  const struct sys_reg_desc *r);
+> >>> +
+> >>>    #endif /* __ARM64_KVM_NESTED_H */
+> >>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> >>> index 42a96c8d2adc..19b674983e13 100644
+> >>> --- a/arch/arm64/kvm/nested.c
+> >>> +++ b/arch/arm64/kvm/nested.c
+> >>> @@ -20,6 +20,10 @@
+> >>>    #include <linux/kvm_host.h>
+> >>>      #include <asm/kvm_emulate.h>
+> >>> +#include <asm/kvm_nested.h>
+> >>> +#include <asm/sysreg.h>
+> >>> +
+> >>> +#include "sys_regs.h"
+> >>>      /*
+> >>>     * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+> >>> @@ -38,3 +42,151 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+> >>>      	return -EINVAL;
+> >>>    }
+> >>> +
+> >>> +/*
+> >>> + * Our emulated CPU doesn't support all the possible features. For the
+> >>> + * sake of simplicity (and probably mental sanity), wipe out a number
+> >>> + * of feature bits we don't intend to support for the time being.
+> >>> + * This list should get updated as new features get added to the NV
+> >>> + * support, and new extension to the architecture.
+> >>> + */
+> >>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >>> +			  const struct sys_reg_desc *r)
+> >>> +{
+> >>> +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+> >>> +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+> >>> +	u64 val, tmp;
+> >>> +
+> >>> +	if (!nested_virt_in_use(v))
+> >>> +		return;
+> >>> +
+> >>> +	val = p->regval;
+> >>> +
+> >>> +	switch (id) {
+> >>> +	case SYS_ID_AA64ISAR0_EL1:
+> >>> +		/* Support everything but O.S. and Range TLBIs */
+> >>> +		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
+> >>> +			 GENMASK_ULL(27, 24)		|
+> >>> +			 GENMASK_ULL(3, 0));
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64ISAR1_EL1:
+> >>> +		/* Support everything but PtrAuth and Spec Invalidation */
+> >>> +		val &= ~(GENMASK_ULL(63, 56)		|
+> >>> +			 FEATURE(ID_AA64ISAR1_SPECRES)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_GPI)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_GPA)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_API)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_APA));
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64PFR0_EL1:
+> >>> +		/* No AMU, MPAM, S-EL2, RAS or SVE */
+> >>> +		val &= ~(GENMASK_ULL(55, 52)		|
+> >>> +			 FEATURE(ID_AA64PFR0_AMU)	|
+> >>> +			 FEATURE(ID_AA64PFR0_MPAM)	|
+> >>> +			 FEATURE(ID_AA64PFR0_SEL2)	|
+> >>> +			 FEATURE(ID_AA64PFR0_RAS)	|
+> >>> +			 FEATURE(ID_AA64PFR0_SVE)	|
+> >>> +			 FEATURE(ID_AA64PFR0_EL3)	|
+> >>> +			 FEATURE(ID_AA64PFR0_EL2));
+> >>> +		/* 64bit EL2/EL3 only */
+> >>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
+> >>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), 0b0001);
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64PFR1_EL1:
+> >>> +		/* Only support SSBS */
+> >>> +		val &= FEATURE(ID_AA64PFR1_SSBS);
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64MMFR0_EL1:
+> >>> +		/* Hide ECV, FGT, ExS, Secure Memory */
+> >>> +		val &= ~(GENMASK_ULL(63, 43)			|
+> >>> +			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
+> >>> +			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
+> >>> +			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
+> >>> +			 FEATURE(ID_AA64MMFR0_SNSMEM));
+> >>> +
+> >>> +		/* Disallow unsupported S2 page sizes */
+> >>> +		switch (PAGE_SIZE) {
+> >>> +		case SZ_64K:
+> >>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
+> >>> +			fallthrough;
+> >>> +		case SZ_16K:
+> >>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
+> >>> +			fallthrough;
+> >>> +		case SZ_4K:
+> >>> +			/* Support everything */
+> >>> +			break;
+> >>> +		}
+> >> 
+> >> It seems to me that Host hypervisor(L0) has to boot with 4KB page size
+> >> to support all (4, 16 and 64KB) page sizes at L1, any specific reason
+> >> for this restriction?
+> > 
+> > Well, yes.
+> > 
+> > If you have a L0 that has booted with (let's say) 64kB page size, how
+> > do you provide S2 mappings with 4kB granularity so that you can
+> > implement the permissions that a L1 guest hypervisor can impose on its
+> > own guest, given that KVM currently mandates S1 and S2 to use the same
+> > page sizes?
+> > 
+> > You can't. That's why we tell the guest hypervisor how much we
+> > support, and the guest hypervisor can decide to go ahead or not
+> > depending on what it does.
+> > 
+> > If one day we can support S2 mappings that are smaller than the host
+> > page sizes, then we'll be able to allow to advertise all page sizes.
+> > But I wouldn't hold my breath for this to happen.
+> 
+> Thanks for the detailed explanation!.
+> Can we put one line comment that explains why this manipulation?
+> It would be helpful to see a comment like S2 PAGE_SIZE should be
+> at-least the size of Host PAGE_SIZE?
+
+Can do, but we need to get the terminology straight, because this is
+very quickly becoming confusing. Something like:
+
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 7c9dd1edf011..d35a947f5679 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -850,7 +850,12 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 			/* Support everything */
+ 			break;
+ 		}
+-		/* Advertize supported S2 page sizes */
++		/*
++		 * Since we can't support a guest S2 page size smaller than
++		 * the host's own page size (due to KVM only populating its
++		 * own S2 using the kernel's page size), advertise the
++		 * limitation using FEAT_GTG.
++		 */
+ 		switch (PAGE_SIZE) {
+ 		case SZ_4K:
+ 			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
+
+So not quite a one line comment! ;-)
+
+Ultimately, all there is to know is in the description of FEAT_GTG in
+the ARMv8 ARM.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
