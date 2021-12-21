@@ -2,140 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FDA247C347
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 16:44:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B36047C432
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 17:51:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235384AbhLUPo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 10:44:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35928 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239547AbhLUPoq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 10:44:46 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0C0C061574
-        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 07:44:46 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id c2so12102735pfc.1
-        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 07:44:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=k/JMvwK29hd8F/EfV5XzDRnc59RW8yzi0W84ODXNMgs=;
-        b=AbVrsJdBc5MN3KQC0A9AIyS9IRMdFjbEfvVJtUC3LZIrYXKcfifwgybiMrJ1dzyejd
-         q8YUFb1QM78QNIXTzVIec5gAsnLvo3X4AAG9zJHBWwIwUsGBs7Az4wPXZREawmQ76537
-         D4yK7omm6pLvt14gmta/yF+uKHmpG3uYwhvqYGCO1YbTfXustV5RYUKJ6USZinlk6B9J
-         dms6mrO1SjUxJjtuiu0tTWEq3XPddVfxNpbBEmbK2Nvq8909cqhkI5e1UBaZoLob+Zff
-         NFQDtXgY+753bzTe2lIKwytRe5IF/iysrdIxwl5Qq0gfzEU22ZxLymbf3FGvWJr/8MfY
-         IGdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=k/JMvwK29hd8F/EfV5XzDRnc59RW8yzi0W84ODXNMgs=;
-        b=FWy1Xc0vt+QqAb2fJoUZQjTtHaoOV7hoFVLBXgNKa/7KuEcYJzETpp8KGm4tDX57C1
-         J06SaI9hz6KXlKM9eriS3oQ3lygA2kIniYjdxVfnAmBuJYvHzuZofqQ6fFJtf14iZUFU
-         eZpHlzyoPZjTZyWnFLqMXUNdKNadgxyEyDNBmZQkx/66cvoJvCFQkXWmNcEP+GoETx6N
-         RbM/Cw9f39sCTx0Y2HYInlKFXwZjOEIkBwgt8+DAsFQZSuQKkE4cMTqYGiADVRGNrcoZ
-         cByG2bN0iIvd3SnJslpbK5i+S7l2naF2GFcAoQyXEnasPFscJEQX6MHCxGSJnYMNGF0s
-         ml4g==
-X-Gm-Message-State: AOAM530XV293qSRWmfKuNIaJ/XUIYBtqL8C+VxlGDSRqfLHbh6D2wCnm
-        ui0WEDmyYtNPH/GPzv76Fonu+3m7DdSKyg==
-X-Google-Smtp-Source: ABdhPJxrzNHBFbWmw0xZGAtZ2iGNWlJDv22rYelmdk8vCnJP2iZK3gUwsvnZ7g69hELWZvhhMRjJJA==
-X-Received: by 2002:a63:8249:: with SMTP id w70mr3516432pgd.274.1640101484781;
-        Tue, 21 Dec 2021 07:44:44 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s16sm22577607pfu.109.2021.12.21.07.44.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Dec 2021 07:44:44 -0800 (PST)
-Date:   Tue, 21 Dec 2021 15:44:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [PATCH v3 00/15] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YcH2aGNJn57pLihJ@google.com>
-References: <20211221151125.19446-1-chao.p.peng@linux.intel.com>
+        id S240017AbhLUQvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 11:51:09 -0500
+Received: from foss.arm.com ([217.140.110.172]:56020 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236530AbhLUQvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 11:51:08 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3ABFED1;
+        Tue, 21 Dec 2021 08:51:07 -0800 (PST)
+Received: from [10.57.34.58] (unknown [10.57.34.58])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 442DA3F718;
+        Tue, 21 Dec 2021 08:51:01 -0800 (PST)
+Message-ID: <dd797dcd-251a-1980-ca64-bb38e67a526f@arm.com>
+Date:   Tue, 21 Dec 2021 16:50:56 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211221151125.19446-1-chao.p.peng@linux.intel.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v4 07/13] iommu: Add iommu_at[de]tach_device_shared() for
+ multi-device groups
+Content-Language: en-GB
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
+ <20211217063708.1740334-8-baolu.lu@linux.intel.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20211217063708.1740334-8-baolu.lu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 21, 2021, Chao Peng wrote:
-> This is the third version of this series which try to implement the
-> fd-based KVM guest private memory.
-
-...
-
-> Test
-> ----
-> This code has been tested with latest TDX code patches hosted at
-> (https://github.com/intel/tdx/tree/kvm-upstream) with minimal TDX
-> adaption and QEMU support.
+On 2021-12-17 06:37, Lu Baolu wrote:
+> The iommu_attach/detach_device() interfaces were exposed for the device
+> drivers to attach/detach their own domains. The commit <426a273834eae>
+> ("iommu: Limit iommu_attach/detach_device to device with their own group")
+> restricted them to singleton groups to avoid different device in a group
+> attaching different domain.
 > 
-> Example QEMU command line:
-> -object tdx-guest,id=tdx \
-> -object memory-backend-memfd-private,id=ram1,size=2G \
-> -machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
+> As we've introduced device DMA ownership into the iommu core. We can now
+> introduce interfaces for muliple-device groups, and "all devices are in the
+> same address space" is still guaranteed.
 > 
-> Changelog
-> ----------
-> v3:
->   - Added locking protection when calling
->     invalidate_page_range/fallocate callbacks.
->   - Changed memslot structure to keep use useraddr for shared memory.
->   - Re-organized F_SEAL_INACCESSIBLE and MEMFD_OPS.
->   - Added MFD_INACCESSIBLE flag to force F_SEAL_INACCESSIBLE.
->   - Commit message improvement.
->   - Many small fixes for comments from the last version.
+> The iommu_attach/detach_device_shared() could be used when multiple drivers
+> sharing the group claim the DMA_OWNER_PRIVATE_DOMAIN ownership. The first
+> call of iommu_attach_device_shared() attaches the domain to the group.
+> Other drivers could join it later. The domain will be detached from the
+> group after all drivers unjoin it.
 
-Can you rebase on top of kvm/queue and send a new version?  There's a massive
-overhaul of KVM's memslots code that's queued for 5.17, and the KVM core changes
-in this series conflict mightily.
+I don't see the point of this at all - if you really want to hide the 
+concept of IOMMU groups away from drivers then just make 
+iommu_{attach,detach}_device() do the right thing. At least the 
+iommu_group_get_for_dev() plus iommu_{attach,detach}_group() API is 
+clear - this proposal is the worst of both worlds, in that drivers still 
+have to be just as aware of groups in order to know whether to call the 
+_shared interface or not, except it's now entirely implicit and non-obvious.
 
-It's ok if the private memslot support isn't tested exactly as-is, it's not like
-any of us reviewers can test it anyways, but I would like to be able to apply
-cleanly and verify that the series doesn't break existing functionality.
+Otherwise just add the housekeeping stuff to 
+iommu_{attach,detach}_group() - there's no way we want *three* 
+attach/detach interfaces all with different semantics.
 
-This version also appears to be based on an internal development branch, e.g. patch
-12/15 has some bits from the TDX series.
+It's worth taking a step back and realising that overall, this is really 
+just a more generalised and finer-grained extension of what 426a273834ea 
+already did for non-group-aware code, so it makes little sense *not* to 
+integrate it into the existing interfaces.
 
-@@ -336,6 +348,7 @@ struct kvm_tdx_exit {
- #define KVM_EXIT_X86_BUS_LOCK     33
- #define KVM_EXIT_XEN              34
- #define KVM_EXIT_RISCV_SBI        35
-+#define KVM_EXIT_MEMORY_ERROR     36
- #define KVM_EXIT_TDX              50   /* dump number to avoid conflict. */
+Robin.
 
- /* For KVM_EXIT_INTERNAL_ERROR */
-@@ -554,6 +567,8 @@ struct kvm_run {
-                        unsigned long args[6];
-                        unsigned long ret[2];
-                } riscv_sbi;
-+               /* KVM_EXIT_MEMORY_ERROR */
-+               struct kvm_memory_exit mem;
-                /* KVM_EXIT_TDX_VMCALL */
-                struct kvm_tdx_exit tdx;
-                /* Fix the size of the union. */
-
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Tested-by: Dmitry Osipenko <digetx@gmail.com>
+> ---
+>   include/linux/iommu.h | 13 +++++++
+>   drivers/iommu/iommu.c | 79 +++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 92 insertions(+)
+> 
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 5ad4cf13370d..1bc03118dfb3 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -703,6 +703,8 @@ int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner ow
+>   			      void *owner_cookie);
+>   void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner);
+>   bool iommu_group_dma_owner_unclaimed(struct iommu_group *group);
+> +int iommu_attach_device_shared(struct iommu_domain *domain, struct device *dev);
+> +void iommu_detach_device_shared(struct iommu_domain *domain, struct device *dev);
+>   
+>   #else /* CONFIG_IOMMU_API */
+>   
+> @@ -743,11 +745,22 @@ static inline int iommu_attach_device(struct iommu_domain *domain,
+>   	return -ENODEV;
+>   }
+>   
+> +static inline int iommu_attach_device_shared(struct iommu_domain *domain,
+> +					     struct device *dev)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>   static inline void iommu_detach_device(struct iommu_domain *domain,
+>   				       struct device *dev)
+>   {
+>   }
+>   
+> +static inline void iommu_detach_device_shared(struct iommu_domain *domain,
+> +					      struct device *dev)
+> +{
+> +}
+> +
+>   static inline struct iommu_domain *iommu_get_domain_for_dev(struct device *dev)
+>   {
+>   	return NULL;
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 8bec71b1cc18..3ad66cb9bedc 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -50,6 +50,7 @@ struct iommu_group {
+>   	struct list_head entry;
+>   	enum iommu_dma_owner dma_owner;
+>   	unsigned int owner_cnt;
+> +	unsigned int attach_cnt;
+>   	void *owner_cookie;
+>   };
+>   
+> @@ -3512,3 +3513,81 @@ void iommu_device_release_dma_owner(struct device *dev, enum iommu_dma_owner own
+>   	iommu_group_put(group);
+>   }
+>   EXPORT_SYMBOL_GPL(iommu_device_release_dma_owner);
+> +
+> +/**
+> + * iommu_attach_device_shared() - Attach shared domain to a device
+> + * @domain: The shared domain.
+> + * @dev: The device.
+> + *
+> + * Similar to iommu_attach_device(), but allowed for shared-group devices
+> + * and guarantees that all devices in an iommu group could only be attached
+> + * by a same iommu domain. The caller should explicitly set the dma ownership
+> + * of DMA_OWNER_PRIVATE_DOMAIN or DMA_OWNER_PRIVATE_DOMAIN_USER type before
+> + * calling it and use the paired helper iommu_detach_device_shared() for
+> + * cleanup.
+> + */
+> +int iommu_attach_device_shared(struct iommu_domain *domain, struct device *dev)
+> +{
+> +	struct iommu_group *group;
+> +	int ret = 0;
+> +
+> +	group = iommu_group_get(dev);
+> +	if (!group)
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&group->mutex);
+> +	if (group->dma_owner != DMA_OWNER_PRIVATE_DOMAIN &&
+> +	    group->dma_owner != DMA_OWNER_PRIVATE_DOMAIN_USER) {
+> +		ret = -EPERM;
+> +		goto unlock_out;
+> +	}
+> +
+> +	if (group->attach_cnt) {
+> +		if (group->domain != domain) {
+> +			ret = -EBUSY;
+> +			goto unlock_out;
+> +		}
+> +	} else {
+> +		ret = __iommu_attach_group(domain, group);
+> +		if (ret)
+> +			goto unlock_out;
+> +	}
+> +
+> +	group->attach_cnt++;
+> +unlock_out:
+> +	mutex_unlock(&group->mutex);
+> +	iommu_group_put(group);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_attach_device_shared);
+> +
+> +/**
+> + * iommu_detach_device_shared() - Detach a domain from device
+> + * @domain: The domain.
+> + * @dev: The device.
+> + *
+> + * The detach helper paired with iommu_attach_device_shared().
+> + */
+> +void iommu_detach_device_shared(struct iommu_domain *domain, struct device *dev)
+> +{
+> +	struct iommu_group *group;
+> +
+> +	group = iommu_group_get(dev);
+> +	if (!group)
+> +		return;
+> +
+> +	mutex_lock(&group->mutex);
+> +	if (WARN_ON(!group->attach_cnt || group->domain != domain ||
+> +		    (group->dma_owner != DMA_OWNER_PRIVATE_DOMAIN &&
+> +		     group->dma_owner != DMA_OWNER_PRIVATE_DOMAIN_USER)))
+> +		goto unlock_out;
+> +
+> +	if (--group->attach_cnt == 0)
+> +		__iommu_detach_group(domain, group);
+> +
+> +unlock_out:
+> +	mutex_unlock(&group->mutex);
+> +	iommu_group_put(group);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_detach_device_shared);
