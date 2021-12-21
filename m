@@ -2,173 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D68247B5F8
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 23:49:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0AA247B872
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 03:45:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230468AbhLTWtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 17:49:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41540 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230348AbhLTWtf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 17:49:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640040574;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Yxjdrsii06Uu6Yalmn32bZyWE+btTppxgBmmcjw46Bk=;
-        b=AzoBgQggQX+LPI+eq6iUUYepA2QkWJbdrZWImStc1lMHuBRa+HW/3DjTPtjmla6dFW56sV
-        O+vmAD1BiNxDX3h4iJBWs955npZFBA7fVTg5isQGi7y6OR5IpZ2JSdkX6vhaxRjBnx8ytY
-        GnenWb8C7uu5/YCTMbkuT7T1ZQadvts=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-161-Jhg0ir_cNBegDOuDvYuVsA-1; Mon, 20 Dec 2021 17:49:33 -0500
-X-MC-Unique: Jhg0ir_cNBegDOuDvYuVsA-1
-Received: by mail-ot1-f72.google.com with SMTP id m23-20020a05683023b700b0055c8a2dcca0so3798829ots.6
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 14:49:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Yxjdrsii06Uu6Yalmn32bZyWE+btTppxgBmmcjw46Bk=;
-        b=sBfUlsp/rzDo5BCMqQW3GvL75q/chHD/FQtQfml89FL3liyP3NtrbtvIoH1rmXkbw5
-         7iY6/URwb4SErqOFyCe7FeRnojMrO5W1UbZ4ct2Kc/qJy3vZskQaLWm0F2ICrlA1J85a
-         ti1lOBwj/aalHzXv+G75na0qOGw4nBamPiR6z4x+D9K08mD/wmYfUFb/X/H8MSHzK5IU
-         7uL6xXBmVBYgUHXzRI+NYCv9m2MPI/2dLLXFEi97nrqCSpmrr3Ry2mv00KpGp3s4SD2t
-         1qmXM2BL1WvWykkBQ/xWFuz66hQ6Z1vWcm+SMpUWBgdA+rrzKIKgzCXuHl+FqeKn1TgK
-         hOYA==
-X-Gm-Message-State: AOAM532VnaCpJrjGyNN3oGi7dk0lC118JbSoJFcR6WVGHMChPwGQR0S1
-        /azYQpgbvO6kOwA1X6f9MmcMBGH1J4D3DeH++e/iOrMb/sFUb8RuFrDaUR1HzZqoriK7VVnPnY9
-        fWJE1R+kEdrJQ
-X-Received: by 2002:a9d:5ccc:: with SMTP id r12mr238108oti.67.1640040572675;
-        Mon, 20 Dec 2021 14:49:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxpo8SkxsdjD66LatXQlf8w+5nAY9jvQykyRKZtRl290x2znLJAdMFUpWV4zU1FZDgNjhXqzA==
-X-Received: by 2002:a9d:5ccc:: with SMTP id r12mr238086oti.67.1640040572398;
-        Mon, 20 Dec 2021 14:49:32 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v12sm3406642ote.9.2021.12.20.14.49.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Dec 2021 14:49:32 -0800 (PST)
-Date:   Mon, 20 Dec 2021 15:49:30 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     jgg@nvidia.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, farman@linux.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com
-Subject: Re: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
-Message-ID: <20211220154930.071527e3.alex.williamson@redhat.com>
-In-Reply-To: <87v8zjp46l.fsf@redhat.com>
-References: <163909282574.728533.7460416142511440919.stgit@omen>
-        <87v8zjp46l.fsf@redhat.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S233588AbhLUCpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 21:45:51 -0500
+Received: from mga14.intel.com ([192.55.52.115]:8199 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231833AbhLUCpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Dec 2021 21:45:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640054750; x=1671590750;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=a9EAtYjMjgBhRqx9t80MptniHLo76DppyNXKRomGOUk=;
+  b=N4SUr9lUbRHoz9nt7J9U4T+LKGlh46oiD+41YBJZrAbatdmDpWgOk8co
+   G1k1O0Vy+31HbI6FjALZxpPGzbSGt+PGE9J1rcot6us+0Smjh2O7JNRhT
+   Ia5MIA0N/qc/87WUtidpqSzfharSNjSOLCZUX97dcvve6TOe0TQq6tFN5
+   oyq8pOLWShW7sirGdh6NXOVK+cdao6s742piLogKcJOJ7/9QKf6VpsuOe
+   cYRvU/tNyUKSH0nGnXbX4w8g3WVoUvddwC4ds32gHz4IanbxCHNklAPS4
+   BD5rd8I8D0lkpXNtb0vHVi3YTsvn6cAzf9qZN7gX++vfgfYYj5tbjzU64
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10204"; a="240533482"
+X-IronPort-AV: E=Sophos;i="5.88,222,1635231600"; 
+   d="scan'208";a="240533482"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2021 18:45:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,222,1635231600"; 
+   d="scan'208";a="616620471"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by orsmga004.jf.intel.com with ESMTP; 20 Dec 2021 18:45:48 -0800
+Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 20 Dec 2021 18:45:47 -0800
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 21 Dec 2021 10:45:45 +0800
+Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
+ SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2308.020;
+ Tue, 21 Dec 2021 10:45:45 +0800
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+CC:     "seanjc@google.com" <seanjc@google.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>
+Subject: RE: [PATCH v2 18/23] kvm: x86: Get/set expanded xstate buffer
+Thread-Topic: [PATCH v2 18/23] kvm: x86: Get/set expanded xstate buffer
+Thread-Index: AQHX81r8L73y8adYV0a4DFLIQjWYRqw6lEwAgAGYYhA=
+Date:   Tue, 21 Dec 2021 02:45:45 +0000
+Message-ID: <e0fd378de64f44fd8becfe67b02cb635@intel.com>
+References: <20211217153003.1719189-1-jing2.liu@intel.com>
+ <20211217153003.1719189-19-jing2.liu@intel.com>
+ <3ffa47eb-3555-5925-1c55-f89a07ceb4bc@redhat.com>
+In-Reply-To: <3ffa47eb-3555-5925-1c55-f89a07ceb4bc@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.200.16
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Dec 2021 18:38:26 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Thu, Dec 09 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > A new NDMA state is being proposed to support a quiescent state for
-> > contexts containing multiple devices with peer-to-peer DMA support.
-> > Formally define it.  
-> 
-> [I'm wondering if we would want to use NDMA in other cases as well. Just
-> thinking out loud below.]
-> 
-> >
-> > Clarify various aspects of the migration region data fields and
-> > protocol.  Remove QEMU related terminology and flows from the uAPI;
-> > these will be provided in Documentation/ so as not to confuse the
-> > device_state bitfield with a finite state machine with restricted
-> > state transitions.
-> >
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >  include/uapi/linux/vfio.h |  405 ++++++++++++++++++++++++---------------------
-> >  1 file changed, 214 insertions(+), 191 deletions(-)
-> >
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index ef33ea002b0b..1fdbc928f886 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h  
-> 
-> (...)
-> 
-> > + *   The device_state field defines the following bitfield use:
-> > + *
-> > + *     - Bit 0 (RUNNING) [REQUIRED]:
-> > + *        - Setting this bit indicates the device is fully operational, the
-> > + *          device may generate interrupts, DMA, respond to MMIO, all vfio
-> > + *          device regions are functional, and the device may advance its
-> > + *          internal state.  The default device_state must indicate the device
-> > + *          in exclusively the RUNNING state, with no other bits in this field
-> > + *          set.
-> > + *        - Clearing this bit (ie. !RUNNING) must stop the operation of the
-> > + *          device.  The device must not generate interrupts, DMA, or advance
-> > + *          its internal state.  The user should take steps to restrict access
-> > + *          to vfio device regions other than the migration region while the
-> > + *          device is !RUNNING or risk corruption of the device migration data
-> > + *          stream.  The device and kernel migration driver must accept and
-> > + *          respond to interaction to support external subsystems in the
-> > + *          !RUNNING state, for example PCI MSI-X and PCI config space.
-> > + *          Failure by the user to restrict device access while !RUNNING must
-> > + *          not result in error conditions outside the user context (ex.
-> > + *          host system faults).  
-> 
-> If I consider ccw, this would mean that user space would need to stop
-> writing to the regions that initiate start/halt/... when RUNNING is
-> cleared (makes sense) and that the subchannel must be idle or even
-> disabled (so that it does not become status pending). The question is,
-> does it make sense to stop new requests and wait for the subchannel to
-> become idle during the !RUNNING transition (or even forcefully kill
-> outstanding I/O), or...
-> 
-
-> > + *     - Bit 3 (NDMA) [OPTIONAL]:
-> > + *        The NDMA or "No DMA" state is intended to be a quiescent state for
-> > + *        the device for the purposes of managing multiple devices within a
-> > + *        user context where peer-to-peer DMA between devices may be active.
-> > + *        Support for the NDMA bit is indicated through the presence of the
-> > + *        VFIO_REGION_INFO_CAP_MIG_NDMA capability as reported by
-> > + *        VFIO_DEVICE_GET_REGION_INFO for the associated device migration
-> > + *        region.
-> > + *        - Setting this bit must prevent the device from initiating any
-> > + *          new DMA or interrupt transactions.  The migration driver must
-> > + *          complete any such outstanding operations prior to completing
-> > + *          the transition to the NDMA state.  The NDMA device_state
-> > + *          essentially represents a sub-set of the !RUNNING state for the
-> > + *          purpose of quiescing the device, therefore the NDMA device_state
-> > + *          bit is superfluous in combinations including !RUNNING.
-> > + *        - Clearing this bit (ie. !NDMA) negates the device operational
-> > + *          restrictions required by the NDMA state.  
-> 
-> ...should we use NDMA as the "stop new requests" state, but allow
-> running channel programs to conclude? I'm not entirely sure whether
-> that's in the spirit of NDMA (subchannels are independent of each
-> other), but it would be kind of "quiescing" already.
-> 
-> (We should probably clarify things like that in the Documentation/
-> file.)
-
-This bumps into the discussion in my other thread with Jason, we need
-to refine what NDMA means.  Based on my reply there and our previous
-discussion that QEMU could exclude p2p mappings to support VMs with
-multiple devices that don't support NDMA, I think that NDMA is only
-quiescing p2p traffic (if so, maybe should be NOP2P).  So this use of
-it seems out of scope to me.
-
-Userspace necessarily needs to stop vCPUs before stopping devices,
-which should mean that there are no new requests when a ccw device is
-transitioning to !RUNNING.  Therefore I'd expect that the transition to
-any !RUNNING state would wait from completion of running channel
-programs.  Thanks,
-
-Alex
-
+T24gTW9uZGF5LCBEZWNlbWJlciAyMCwgMjAyMSA1OjA0IFBNLCBQYW9sbyBCb256aW5pIHdyb3Rl
+Og0KPiBPbiAxMi8xNy8yMSAxNjoyOSwgSmluZyBMaXUgd3JvdGU6DQo+ID4gKy8qIGZvciBLVk1f
+Q0FQX1hTQVZFIGFuZCBLVk1fQ0FQX1hTQVZFMiAqLw0KPiA+ICAgc3RydWN0IGt2bV94c2F2ZSB7
+DQo+ID4gKwkvKg0KPiA+ICsJICogS1ZNX0dFVF9YU0FWRSBvbmx5IHVzZXMgdGhlIGZpcnN0IDQw
+OTYgYnl0ZXMuDQo+ID4gKwkgKg0KPiA+ICsJICogS1ZNX0dFVF9YU0FWRTIgbXVzdCBoYXZlIHRo
+ZSBzaXplIG1hdGNoIHdoYXQgaXMgcmV0dXJuZWQgYnkNCj4gPiArCSAqIEtWTV9DSEVDS19FWFRF
+TlNJT04oS1ZNX0NBUF9YU0FWRTIpLg0KPiA+ICsJICoNCj4gPiArCSAqIEtWTV9TRVRfWFNBVkUg
+dXNlcyB0aGUgZXh0cmEgZmllbGQgaWYgZ3Vlc3RfZnB1OjpmcHN0YXRlOjpzaXplDQo+ID4gKwkg
+KiBleGNlZWRzIDQwOTYgYnl0ZXMuDQo+IA0KPiBLVk1fR0VUX1hTQVZFMiBhbmQgS1ZNX1NFVF9Y
+U0FWRSByZXNwZWN0aXZlbHkgd3JpdGUgYW5kIHJlYWQgYXMgbWFueQ0KPiBieXRlcyBhcyBhcmUg
+cmV0dXJuZWQgYnkgS1ZNX0NIRUNLX0VYVEVOU0lPTihLVk1fQ0FQX1hTQVZFMiksIHdoZW4NCj4g
+aW52b2tlZCBvbiB0aGUgdm0gZmlsZSBkZXNjcmlwdG9yLiAgQ3VycmVudGx5LA0KPiBLVk1fQ0hF
+Q0tfRVhURU5TSU9OKEtWTV9DQVBfWFNBVkUyKSB3aWxsIG9ubHkgcmV0dXJuIGEgdmFsdWUgdGhh
+dCBpcw0KPiBncmVhdGVyIHRoYW4gNDA5NiBieXRlcyBpZiBhbnkgZHluYW1pYyBmZWF0dXJlcyBo
+YXZlIGJlZW4gZW5hYmxlZCB3aXRoDQo+IGBgYXJjaF9wcmN0bCgpYGA7IHRoaXMgaG93ZXZlciBt
+YXkgY2hhbmdlIGluIHRoZSBmdXR1cmUuDQoNCldvdWxkIHRoaXMgbWFrZSBwZW9wbGUgdGhpbmsg
+dGhhdCBLVk1fQ0hFQ0tfRVhURU5TSU9OKEtWTV9DQVBfWFNBVkUyKSBkb2VzbuKAmXQNCnJldHVy
+biB0aGUgdmFsdWUgKGkuZS4gcmV0dXJuIDApIGlmIGl0IGlzIHNtYWxsZXIgdGhhbiA0MDk2Pw0K
+KGkuZS4gS1ZNX0dFVF9YU0FWRTIgZG9lc24ndCB3b3JrIHdpdGggc2l6ZSA8IDQwOTYsIHdoaWNo
+IGlzbuKAmXQgdHJ1ZSkNCg0KSSBwbGFuIHRvIGp1c3QgcmV3b3JkIGEgYml0Og0KQ3VycmVudGx5
+LCBLVk1fQ0hFQ0tfRVhURU5TSU9OKEtWTV9DQVBfWFNBVkUyKSB3aWxsIG9ubHkgcmV0dXJuIGEg
+c2l6ZSB2YWx1ZSwNCmFuZCB0aGUgdmFsdWUgaXMgZ3JlYXRlciB0aGFuIDQwOTYgYnl0ZXMgaWYg
+YW55IGR5bmFtaWMgZmVhdHVyZXMgaGF2ZSBiZWVuIGVuYWJsZWQgd2l0aA0KYGBhcmNoX3ByY3Rs
+KClgYC4gTW9yZSB0eXBlcyBvZiB2YWx1ZXMgY291bGQgYmUgcmV0dXJuZWQgaW4gdGhlIGZ1dHVy
+ZS4NCg0KVGhhbmtzLA0KV2VpDQo=
