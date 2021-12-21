@@ -2,195 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF6047BC55
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 10:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42B1547BC6B
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 10:05:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235976AbhLUJBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 04:01:09 -0500
-Received: from mga18.intel.com ([134.134.136.126]:59382 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235977AbhLUJBI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 04:01:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640077268; x=1671613268;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=zn3VRsL0RsZD0/Q+Uto8PpdD6/o/nFqjELHlj/4RhFA=;
-  b=TBi7OyEymEIWDJk/R0PXZUmWQqDC2K5dOm3IPJs2kvZ6sRayfhLcUCX2
-   2WE5kXOJiqPUgV5sbQrGvETozN8XdFnbiDkMspYE1YY+QTkTARGRuZWo4
-   A6UxvyhWh5w6h+iYZNbDjw71pEABUoFTIU2nITst/VOcEsA7al5i+Fr5Y
-   1rl2cl9BI4xkYT6a6ftRGyzTWTPLs9s62ZdePhSJC4q2KpI4wEUIfyysV
-   /rdJSEQEUzl3ze9slNVpF637Pnwmgf/izAF9c8la2ue5EVcN42WaA0rKA
-   oQZRvUPhzKBkagLfczP6UH705Ehy7gmPsWFRVAU9CeLTC0ecHvTMIlRRb
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10204"; a="227207999"
-X-IronPort-AV: E=Sophos;i="5.88,222,1635231600"; 
-   d="scan'208";a="227207999"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2021 01:00:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,222,1635231600"; 
-   d="scan'208";a="613402745"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Dec 2021 01:00:45 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 01:00:45 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 01:00:44 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Tue, 21 Dec 2021 01:00:44 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Tue, 21 Dec 2021 01:00:44 -0800
+        id S236026AbhLUJFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 04:05:52 -0500
+Received: from mail-sn1anam02on2089.outbound.protection.outlook.com ([40.107.96.89]:58830
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229728AbhLUJFv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 04:05:51 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SSQtLXam/Fqqt3T0L7RhKaZ3nTagSaPGh2EVBpCg84HJE2lHMKcwiMnN0hAoMRJ02HBZ/16fi7u0nvOn1aALP7TtEONY+QSgbdOP6lXJgxmSiYuFZ+z5qFJzZnGkDYqaTSGLX9BwWVMXxOse/UMcVhQcP5yPVIzq/lUmlgdGjGw3C20uUDlclXNnKywcEA1OXugbmaHLYwR7r4fOV6uQpsxUh6GtTSik7h0vU2/bxWJdjivoxuyAgrb4QZ6poORkNQSSi0YNPZl7OK7VL5VIfehgCzmIEJtl8Ga6aUNXgnrNuq1vErQxx6WFgbDEvzOf8kpt435QsWC1wJA40og9GA==
+ b=kUxjtwrrnw0FbyWQtNMTIxs4N+6SLbAr4kHZ5YIv2cmdjHg/j0Hmw47e+3fsbGY90k8EZpqtyQ5L6DrukCwkDeUHv6xviqDD8KSp6VkmIepbFyoS1fNMx9hDzKuxGBGkLQmzHqYJc6BOyFAEfWQMO6OOzR89KH8/LO/mi3IQdsHte658TX/sQ2ryR6faEpwfAcH3GdJVfJ751t25Srz21gzcAhWfPLsEoMk4dtN1np4ssL05GooXEJaF0xgj4Tq2NnVll230KZZ0eZ5ABhQfanYfKMrdhiNo0q9vTHQafT3BXn8pBImxx2q346IKrD11iTgI4i1gaacBt28McTBUDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zn3VRsL0RsZD0/Q+Uto8PpdD6/o/nFqjELHlj/4RhFA=;
- b=M0pKbhtJ5XkOpaxK7dAxnN0Qn1bHRBKqjCg5+fIduayi0nR4YyYD8Y3PuXL+VKuJLg4grLnOGFgRtKCS/j05+SF4yKtjtoe4oXm4EpBuQCb+smadAxjK+66licQnWWLDPPnIptWM6SkCua+z1RQnquNgz87Rxss3NnpRwxS4ZBe2iZGbyWDEZ2MU2oZEbfs6UetQwSsx44OXmW9ooRlphc1XQmrigR+xjkCEbgemwFuNwHPH6Txd90HqeIvDI8vVTkZOauBr5tmGqZbXAaSJ6X8rhnaBLfOTFJUldk7P401iNcAsSO3I9hOX5QjwFtQXtSjLMZp8xmGIqa2OWEysgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MWHPR11MB1245.namprd11.prod.outlook.com (2603:10b6:300:28::11)
- by MW5PR11MB5810.namprd11.prod.outlook.com (2603:10b6:303:192::22) with
+ bh=caYdKyXX/58EqY2W9ytSuiyScnXCSqGf9dxryFyCxjA=;
+ b=TxyjXbhApmejV5Do8xATVLsr6sMdeSjgeSWfmu6h8OBHZMLI/3iyWgxzTt9tdHB7rj1OFCb76s1L6HB6HBJ6SWPhHQNUGFHbNigDOdAkd2/3p5Cx37/F2KH37M7JHGmnwpq4Htg8wKE59LYvZiNk8XY1o58uVBN/v+siBxiY/KNzt8ZbkiI/TW+Myii2l8arCd8R3WdnCQomgajzR1TwKM2iTJbuWx/b/KsiE0fmq78v2ySmWimGSHScin0fakFfsNgSwThChn8dZRsmPP/l6UGQxDy5tLov7pgQkM5Xn6nfvCAjVlUKL2R0VeaM+g5HcupVRD0Q3dm2Oh2GxX2Z0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=caYdKyXX/58EqY2W9ytSuiyScnXCSqGf9dxryFyCxjA=;
+ b=J8a4UAToFfEIFUUXBJlFYg+XtmMjRhB10DITS/Ls8ykbgvaJcynoE5i4gEVnQZT0NksFo0oML6Hyu9IYTJfrGNecBeQQz+uAi462A9WBtOU4QAcTFHjgmYu5jCB+poNpM/DfyhSYkAVWyNES2TtbbyuuHc3RSY9v7NXUTv6bR4LS+q/hS2kd8cABTIv9RSLWXH+IoISJ5H63LTiLQLfYKdoM96hlYhowx0DpSpzxw3aCeh6E+9Q8FCxH1F+04zWi/eE/R2vHd3bBI2kk1WncghnqwI1Rk0S4nIBYvKbebeyJixgrNtCL+5ctPx365hZAbM1Ri4KcpgMcLxJWam+RyQ==
+Received: from MW4PR03CA0256.namprd03.prod.outlook.com (2603:10b6:303:b4::21)
+ by CY4PR12MB1366.namprd12.prod.outlook.com (2603:10b6:903:40::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Tue, 21 Dec
- 2021 09:00:40 +0000
-Received: from MWHPR11MB1245.namprd11.prod.outlook.com
- ([fe80::c9f6:5be9:f253:6059]) by MWHPR11MB1245.namprd11.prod.outlook.com
- ([fe80::c9f6:5be9:f253:6059%12]) with mapi id 15.20.4801.020; Tue, 21 Dec
- 2021 09:00:40 +0000
-From:   "Liu, Jing2" <jing2.liu@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-CC:     "Christopherson,, Sean" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
-        "Zeng, Guang" <guang.zeng@intel.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: RE: [PATCH v2 23/23] kvm: x86: Disable RDMSR interception of
- IA32_XFD_ERR
-Thread-Topic: [PATCH v2 23/23] kvm: x86: Disable RDMSR interception of
- IA32_XFD_ERR
-Thread-Index: AQHX81sJtssEIr/APEmXmcVUJc1dj6w7G7CAgAFWU4CAADZVAIAAAlDQ
-Date:   Tue, 21 Dec 2021 09:00:40 +0000
-Message-ID: <MWHPR11MB1245CA82DBCE3D660CDE4756A97C9@MWHPR11MB1245.namprd11.prod.outlook.com>
-References: <20211217153003.1719189-1-jing2.liu@intel.com>
- <20211217153003.1719189-24-jing2.liu@intel.com>
- <e6fd3fc5-ea06-30a5-29ce-1ffd6b815b47@redhat.com>
- <MWHPR11MB12451924FE9189E4B69E78A4A97C9@MWHPR11MB1245.namprd11.prod.outlook.com>
- <f465ec18-4a0d-2e1c-239e-cc93aa43226f@redhat.com>
-In-Reply-To: <f465ec18-4a0d-2e1c-239e-cc93aa43226f@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.6.200.16
-dlp-product: dlpe-windows
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 34d06f7b-cfad-4d95-0cc3-08d9c4605cf0
-x-ms-traffictypediagnostic: MW5PR11MB5810:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <MW5PR11MB5810A674AA5B2A73E28DE430A97C9@MW5PR11MB5810.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qa3keuqrMP53coE5AxaypEH7BJvDtWXEL7PjHFrPczZkWk1y7iJ7jr+2VcI96U3mElhY849TtfCwegvFHHTIG5LywCOCyW50zvP0E6ePPRmRJfE6zAob2SP8TqQ+Jm+hAxdVrPNJYWmP98KVd0E7ODWVW+Nsgd7xtMy8sFMqlaS0cLmalR7T/KbVsfXlgDUdb9ztc14ahVAdvIFAs5Fuh9LkWSYJzNTQm1/ETqsumNb55mmJw7d2GIOHO4q8ynjjQ9LCLyp1Q+Qic/JETxPm+pkdf6fnrlQMq0bLGsvcV1lMBTZKhe6oa99XpTbwwFEQiVzd+7+eF3LLUsqE7XqsQSY5zXZaMRihrvF1TDbRRUAFjkJpWc91xboFVA1LQtatC2pUPw7a6SBO5xrs8XQW5Ph7FI7kIFXmUjbR+e8ReXssrUkpGVDor1/rpibnsYmZc80P0bixD3L1hpr0jm0Rr1nnrj3KswjpYigEIR/otbELPBaqtObAAcpkexvGSs/zlx1pEvvX5bZSSfXc0Q16lsnw6vzpu8rzVyNkGWQn9iNaK94+g45ZqxRUl0iLkIMyA1sXR7BFg1QW8n+3ueST2bIyS4bSYfxaQEz5BVU9his1sFXZ3vb4hnqB1XBU+g7mMMLrgZ3MpFSut6ZLZDVarY8QHfRY1BoaHKE3wDhKwxKlzE3O/l8QPpG7cZmIESXGcvwhsNVW0kFuGzsg2EVN7/HPWr3lBuatra0MXQgUbjA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1245.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(33656002)(186003)(55016003)(9686003)(86362001)(7696005)(6506007)(76116006)(38100700002)(316002)(5660300002)(110136005)(8676002)(26005)(71200400001)(508600001)(4326008)(54906003)(122000001)(38070700005)(53546011)(7416002)(52536014)(8936002)(2906002)(66476007)(64756008)(66556008)(66946007)(82960400001)(66446008)(13296009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UDFtbHM1dmtkVHJ2akIxdDRnb2hUdzFCQlZyQ2NqSEUycVVMcFlxZm83dm1M?=
- =?utf-8?B?U2Nlcnpkb2dLSDRiU05JbG9iSHBkNFhiOUlnU1p3T01TMzB5MHpsZE1TbTVp?=
- =?utf-8?B?WFNkS1FmQXNpd3ZVdTNkRCtkQXdqbVh6QUhPeTNCeG5NOThOVkZKZnd1SFo5?=
- =?utf-8?B?eFRBMzFsZmNGTU9XTS80VkJlUDlKeHVONjhlS0J2QUYrdUs2KzZsTjlnYzh3?=
- =?utf-8?B?N0JXSVp5QjFmNzhBcG45S3RzZjA1Y1EvSmN4MHZMUEd0SkREL1lrdUhJZHFH?=
- =?utf-8?B?SWIyUkVVUklTR3ViQVdWeDBOZ2ZOcEJrUS9qR2phaU4yZ0ZhNW9yZTZjVk5E?=
- =?utf-8?B?V3lOMEhmRkRzcndrMTBJV3JxM09yRmFmOFFEMG8rRzl3UlZtWVdkN2dTTGJh?=
- =?utf-8?B?aDJpUzJ3RDk2dVBwbmRrZVAyU1pJU0dvRGNiSnNZZHlqb0pHZEdpZVloS044?=
- =?utf-8?B?M0t3VU4xTXE1WTVKcVJWbFpiN2c5ckd0OW5NZTRuM1ZkQVpJVHdBLzF3eklj?=
- =?utf-8?B?dkpteVVXcHhHU0RXdmxSZ1lEZnNyazRvTVpYeFlDTkRTYU8wOXZEcXBGMm0y?=
- =?utf-8?B?a0VJUFh0VXNDL3hVL09GRlZmdTZYbnJTQ1F4c3c2MW1TSC9Pc3Z0cDRVZnkr?=
- =?utf-8?B?emd6cHlxaHF0TmxnNFhCNnhtVjdOOFBocEdjdDI2eXk5U0ZzSkdHRnFvTnpM?=
- =?utf-8?B?MHhWdkJzYWxqUEdnM01NYURPdlhEazNkMWtyV29hc0x6WmFJeC9UakJkQ0d6?=
- =?utf-8?B?VXNmSUI4T3VtaHJoYlJwOFlaNmdGUUJSYjFNYnFKMUhId2tQdVJQWkFQaW9X?=
- =?utf-8?B?QjgwWUFuL0VJWkJzSzFmU0RRS0pEZVpiK0FkYVNKRXh6enlBWkQrRjhMVjFU?=
- =?utf-8?B?d0VqY1FsS0VkcnNvZTBwSThycnplYWlORStGb09SYWNxM2pvclBvNTBNUjJx?=
- =?utf-8?B?bmRnMHJWcVRiS0dSYjhyek5PbmR6MjZ0S09SQnhzQ0haZU9WMEJvVlNzaFJV?=
- =?utf-8?B?Mjd1cFFTbjdoRTFVQTVXbnE1a1JLVVV1ckJaU0NXV3hQZWxuYUZ4VjBKMklS?=
- =?utf-8?B?U3ZvYTF3RVpPa0twQ0VOU2lGK1ErYkl0Vi9MTG5NMGxoVHJLWVlKR0hudEw5?=
- =?utf-8?B?ZGZ1a0c5dWhRSEJ3OGJQbDl2OU9QR1I4MUh1TUl3alhrV2xmNVVNVFF2VzFE?=
- =?utf-8?B?UEhnOU1lSFdKRWZkdEZvbVRCb0NkSEx0dUlnRktvdXlsd0I1dEt5R2hZYktP?=
- =?utf-8?B?T3Q2aDdEN0ZGVGdoVE1rRmxON1VTRmRhdXQ1Z0FoYVhGd3FtNUQ2eWlId1BV?=
- =?utf-8?B?NjdmVGMzWnNpdzNpNVVqdDhEMUx6dFhEK2tkRXlyWlZFUFJjZzJpMW1NTzFh?=
- =?utf-8?B?ZTdBYW9BMndKL0VzVW1zeHByWUkvRVhXZHo0cS9OTG5hQTJxTWl6a01SK3NB?=
- =?utf-8?B?ejloVkk5K1BYMWZBc1BubzF1eTFqZm50MVdvYzVvQ1htcGNObk9CZjdGc29U?=
- =?utf-8?B?NTYrU2JGZ0paQVFkR1VMUVJGMWhnVlM1ZCs2WnBBVWdVT1N5WEZ2dU1QTXJD?=
- =?utf-8?B?bXBOUDAvalNYUEFhbVc3WE5vYnlGSnc1WFNPOXdRWmxNTFFaRVFJZWRPWEJU?=
- =?utf-8?B?SnJrczd6OGl3R0E0OVNoZURNSC8zd25lZThaWGFHWTdETzdhRWxDRUVhZTkz?=
- =?utf-8?B?MWZJWndsVk5tV0k2UWViK0ZScFkyenVuZDJGbVlvTHZTTUJMeGs4V0YvdFZY?=
- =?utf-8?B?aXBPbUxVRW5VaDBLN0VpUjFZbGNkNkt4MmxjQzVSY0pqTHc4dG04dkZHWmhC?=
- =?utf-8?B?UVAxOW5TVm1TeGxrQThmcEYrTWF1cjFhMFN6ejEyYUJBRDBmTzlFZ2g1clRr?=
- =?utf-8?B?dUFjeEJzZ092MStPc0VyWUM0SjNpajRBUE1PYXhqWlkxWE9yUElLRm9PbmpJ?=
- =?utf-8?B?SEl0Z1FCMmxZT2NLZjdKRnM4elRNUCtqR2Rxb3RFcFNRU3ltT0diK0RmaEZq?=
- =?utf-8?B?ODdHNExTNlgyVXBJbWQ2RDlRVklUNEFNSmRPeWZXVDI4OWJZdDBxRndvMEVI?=
- =?utf-8?B?MS9SU0dJVG0reFozUFp4ZE9sUkJLaUMzR21OUlU5YnUyL1JPRzBPY2RKdW5Q?=
- =?utf-8?B?MHhqaW1qOGtnMVNWSndsVmNzWHhRb1Y5QXZwQnpMT01FUnFTWTRNQk1ZeXBy?=
- =?utf-8?Q?D4/GQAFm/M+zrJCi/b1ND5k=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 2021 09:05:48 +0000
+Received: from CO1NAM11FT046.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b4:cafe::ac) by MW4PR03CA0256.outlook.office365.com
+ (2603:10b6:303:b4::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14 via Frontend
+ Transport; Tue, 21 Dec 2021 09:05:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (12.22.5.235) by
+ CO1NAM11FT046.mail.protection.outlook.com (10.13.174.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4801.14 via Frontend Transport; Tue, 21 Dec 2021 09:05:48 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 21 Dec
+ 2021 09:05:47 +0000
+Received: from foundations-user-AS-2114GT-DNR-C1-NC24B.nvidia.com
+ (172.20.187.5) by rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.986.9; Tue, 21 Dec 2021 01:05:47 -0800
+From:   Kechen Lu <kechenl@nvidia.com>
+To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>
+CC:     <wanpengli@tencent.com>, <vkuznets@redhat.com>, <mst@redhat.com>,
+        <somduttar@nvidia.com>, <kechenl@nvidia.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH v2 0/3] KVM: x86: add per-vCPU exits disable capability
+Date:   Tue, 21 Dec 2021 01:04:46 -0800
+Message-ID: <20211221090449.15337-1-kechenl@nvidia.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1245.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34d06f7b-cfad-4d95-0cc3-08d9c4605cf0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Dec 2021 09:00:40.3213
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1e7d732c-77ab-406e-45a0-08d9c46114bc
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1366:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1366A614C82A4FD478B02ED4CA7C9@CY4PR12MB1366.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1AMUToHACduJ+LD30qYwioHnKHPUZVuuZYhV60Qz1lVH8/Jg61AIZ2xJkUTGCGJDY+gKU7FDi/qZpUeqyE83pan62qLZGgWdihhZ4LuDUoiyy5U8u2WL5CakrFmwJ7k45KO7D7+U3NQfp/PlQknePt8ZIXq/N6iECGldpgE0//G4oeCOLUvU8TDTF7krT8gDSvh7v89q92/0Ka1mWEpE50t+1+CvfzwvL5wbfVWYZzv8sktpdEA8c+E9GnkcUd5wQKVdVbLjoZGptW6SO/tUnd30TMccm2ERrSjDv7w32kledyKO6bGAMciancfhwcS3Vlkj8X0iBi1716CY20R4hHO8JHrs5ZVl5j5Xy1s5lElvA33PsN+7Qk7hk47VbHXfh5jXHexke0oUjO//vmyPS42J8+AHeAkHn4EZbCHElPay9JexM+YEK6uu16fiHgWw+ulboxkv2kw+N2TZrhK5moNrm5AuQGH6wh5Mg/8Nq5uypp61tWvSe30fBsDNz/4zn6k24rhrHixyaBk+VSLGoc9I3aKBft35J28mjXrLbbEtXjEgjieYbs82c8/Pqj4S7l7ADGVhh3MmAlYxoR5dRg6Ud1AoYvkFdxFIXV8b+GbJO4+SAeZ6RYTddFUOU11Gzl3K35ZHH1iMw+oh8P2eezFlgKaTI640/f3UXzJQDaET+MsWjlz28yd8W/OFW/mAwy/QC4265HTc/tig3UPhi6CcST+yc3ueu/tlS1k5sVt5yYl144j+0lyFlNNCf2fnNigWK6OW338hdyXE0ZrghLGPP3BsyO26mW1bBgaoXeU51Bh4Axh/b1CsvkTFVymHGaSwgqhr/rxskq+M1xZb5w==
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(40470700002)(36860700001)(16526019)(70586007)(186003)(26005)(316002)(336012)(70206006)(4326008)(8676002)(83380400001)(82310400004)(54906003)(356005)(110136005)(1076003)(8936002)(40460700001)(86362001)(7696005)(508600001)(81166007)(426003)(5660300002)(47076005)(34020700004)(2906002)(36756003)(2616005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2021 09:05:48.7296
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zulXjynbDrt7aQrZy+ZfJGmhnPDB0IccJfsESEUPHoJvGP5GzE2BZaRQrrQMwuL6HF+my3/qswMQmigkJXlYcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5810
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e7d732c-77ab-406e-45a0-08d9c46114bc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT046.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1366
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQpPbiAxMi8yMS8yMDIxIDQ6NDggUE0sIFBhb2xvIEJvbnppbmkgd3JvdGU6DQo+IA0KPiBPbiAx
-Mi8yMS8yMSAwNzoyOSwgTGl1LCBKaW5nMiB3cm90ZToNCj4gPj4NCj4gPiBUaGFua3MgZm9yIHJl
-dmlld2luZyB0aGUgcGF0Y2hlcy4NCj4gPg0KPiA+IElmIGRpc2FibGUgdW5jb25kaXRpb25hbGx5
-IGluIHZteF9jcmVhdGVfdmNwdSwgaXQgbWVhbnMgZXZlbiBndWVzdCBoYXMNCj4gPiBubyBjcHVp
-ZCwgdGhlIG1zciByZWFkIGlzIHBhc3N0aHJvdWdoIHRvIGd1ZXN0IGFuZCBpdCBjYW4gcmVhZCBh
-DQo+ID4gdmFsdWUsIHdoaWNoIHNlZW1zIHN0cmFuZ2UsIHRob3VnaCBzcGVjIGRvZXNuJ3QgbWVu
-dGlvbiB0aGUgcmVhZA0KPiBiZWhhdmlvdXIgdy9vIGNwdWlkLg0KPiA+DQo+ID4gSG93IGFib3V0
-IGRpc2FibGluZyByZWFkIGludGVyY2VwdGlvbiBhdCB2bXhfdmNwdV9hZnRlcl9zZXRfY3B1aWQ/
-DQo+ID4NCj4gPiBpZiAoYm9vdF9jcHVfaGFzKFg4Nl9GRUFUVVJFX1hGRCkgJiYgZ3Vlc3RfY3B1
-aWRfaGFzKHZjcHUsDQo+IFg4Nl9GRUFUVVJFX1hGRCkpDQo+ID4gICAgICAgICAgdm14X3NldF9p
-bnRlcmNlcHRfZm9yX21zcih2Y3B1LCBNU1JfSUEzMl9YRkRfRVJSLCBNU1JfVFlQRV9SLA0KPiA+
-IGZhbHNlKTsNCj4gDQo+IEV2ZW4gYmV0dGVyOg0KPiANCj4gCWlmIChib290X2NwdV9oYXMoWDg2
-X0ZFQVRVUkVfWEZEKSkNCj4gCQl2bXhfc2V0X2ludGVyY2VwdF9mb3JfbXNyKHZjcHUsIE1TUl9J
-QTMyX1hGRF9FUlIsDQo+IE1TUl9UWVBFX1IsDQo+IAkJCQkJICAhZ3Vlc3RfY3B1aWRfaGFzKHZj
-cHUsDQo+IFg4Nl9GRUFUVVJFX1hGRCkpOw0KDQpUaGFua3MgUGFvbG8uDQoNCkJUVyBkbyB3ZSB3
-YW50IHRvIHB1dCB0aGlzIHRvZ2V0aGVyIGludG8gcGF0Y2ggMTMgb3IgMTQsIEkgZ3Vlc3MgeW91
-IHdlcmUgc2F5aW5nIHBhdGNoIDE0IPCfmIoNCltQQVRDSCB2MiAxMy8yM10ga3ZtOiB4ODY6IElu
-dGVyY2VwdCAjTk0gZm9yIHNhdmluZyBJQTMyX1hGRF9FUlINCltQQVRDSCB2MiAxNC8yM10ga3Zt
-OiB4ODY6IEVtdWxhdGUgSUEzMl9YRkRfRVJSIGZvciBndWVzdA0KDQpUaGFua3MsDQpKaW5nDQoN
-Cj4gDQo+IFRoYW5rcywNCj4gDQo+IFBhb2xvDQoNCg==
+Summary
+===========
+Introduce support of vCPU-scoped ioctl with KVM_CAP_X86_DISABLE_EXITS
+cap for disabling exits to enable finer-grained VM exits disabling
+on per vCPU scales instead of whole guest. This patch series enabled
+the vCPU-scoped exits control on HLT VM-exits.
+
+Motivation
+============
+In use cases like Windows guest running heavy CPU-bound
+workloads, disabling HLT VM-exits could mitigate host sched ctx switch
+overhead. Simply HLT disabling on all vCPUs could bring
+performance benefits, but if no pCPUs reserved for host threads, could
+happened to the forced preemption as host does not know the time to do
+the schedule for other host threads want to run. With this patch, we
+could only disable part of vCPUs HLT exits for one guest, this still
+keeps performance benefits, and also shows resiliency to host stressing
+workload running at the same time.
+
+Performance and Testing
+=========================
+In the host stressing workload experiment with Windows guest heavy
+CPU-bound workloads, it shows good resiliency and having the ~3%
+performance improvement. E.g. Passmark running in a Windows guest
+with this patch disabling HLT exits on only half of vCPUs still
+showing 2.4% higher main score v/s baseline.
+
+Tested everything on AMD machines.
+
+
+v1->v2 (Sean Christopherson) :
+- Add explicit restriction for VM-scoped exits disabling to be called
+  before vCPUs creation (patch 1)
+- Use vCPU ioctl instead of 64bit vCPU bitmask (patch 3), and make exits
+  disable flags check purely for vCPU instead of VM (patch 2)
+
+
+Best Regards,
+Kechen
+
+Kechen Lu (3):
+  KVM: x86: only allow exits disable before vCPUs created
+  KVM: x86: move ()_in_guest checking to vCPU scope
+  KVM: x86: add vCPU ioctl for HLT exits disable capability
+
+ Documentation/virt/kvm/api.rst     |  4 +++-
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  7 +++++++
+ arch/x86/kvm/cpuid.c               |  2 +-
+ arch/x86/kvm/lapic.c               |  2 +-
+ arch/x86/kvm/svm/svm.c             | 20 +++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c             | 26 ++++++++++++++++++--------
+ arch/x86/kvm/x86.c                 | 24 +++++++++++++++++++++++-
+ arch/x86/kvm/x86.h                 | 16 ++++++++--------
+ 9 files changed, 77 insertions(+), 25 deletions(-)
+
+-- 
+2.30.2
+
