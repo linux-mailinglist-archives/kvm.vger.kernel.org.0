@@ -2,107 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7696247BBC2
-	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 09:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20CA047BBF8
+	for <lists+kvm@lfdr.de>; Tue, 21 Dec 2021 09:40:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235557AbhLUIW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 03:22:58 -0500
-Received: from 5.mo548.mail-out.ovh.net ([188.165.49.213]:53399 "EHLO
-        5.mo548.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235554AbhLUIW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 03:22:58 -0500
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.149])
-        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id D443920890;
-        Tue, 21 Dec 2021 08:22:55 +0000 (UTC)
-Received: from kaod.org (37.59.142.102) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 21 Dec
- 2021 09:22:54 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-102R0044d8bfc19-396c-481b-b929-127b9419749d,
-                    742E9276A26BC2B4C6C283707E5EBA255AB8FB31) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Message-ID: <cad67609-fa1f-f234-7205-2735dd438797@kaod.org>
-Date:   Tue, 21 Dec 2021 09:22:52 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH kernel v4] KVM: PPC: Merge powerpc's debugfs entry content
- into generic entry
-Content-Language: en-US
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-CC:     Nicholas Piggin <npiggin@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        David Stevens <stevensd@chromium.org>,
-        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>
-References: <20211220012351.2719879-1-aik@ozlabs.ru>
- <6111f49a-6ab9-2aba-92b1-ae02db3859b2@kaod.org>
- <b63e0570-934e-522f-8567-c9c4c438a55e@ozlabs.ru>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <b63e0570-934e-522f-8567-c9c4c438a55e@ozlabs.ru>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.102]
-X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 606a9c4e-6963-4284-9d4e-855090539a27
-X-Ovh-Tracer-Id: 10294947273805630313
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvuddruddtfedguddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfhfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpefhhfelgeeukedtteffvdffueeiuefgkeekleehleetfedtgfetffefheeugeelheenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehlihhnuhigphhptgdquggvvheslhhishhtshdrohiilhgrsghsrdhorhhg
+        id S235701AbhLUIkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 03:40:05 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:55226 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232357AbhLUIkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 03:40:04 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 85DBFB81202
+        for <kvm@vger.kernel.org>; Tue, 21 Dec 2021 08:40:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3960DC36AE7;
+        Tue, 21 Dec 2021 08:40:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640076002;
+        bh=6n2t4Pul4m76//01Vv7UUMgTMNHDNpFfmgUjueXm2HQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Yh73MDKYBgDSAFOHl8LPE0jo1hbbT+H+XTpyY9vfkkipEHCLMAwtET+I4AdXTX9MS
+         jLFKgkvjNqT9Q4z7WQngC7ERoMnWnHJN4IPWPboZSkj3b9/k1hKJAGDjzFVmkmsvWT
+         S1JqiH/ITg2Yb4c80HZXBV6xJtcIwR37Oj3G4Wd49lJ58qFIYiQ0c7D0hj0jkd6XAP
+         JGGfPouX7+DibmySqQvSUg1y9mrvsMv8WZeFAOY8vlHO47hJmIlgSJBX6hn+WrgYk2
+         JProUppnsYv5iy/1B/8n3tOYDUNCAeby4Kq59gpLb01lK6iY1KPkkLuq4V72HqeXLR
+         18q6U/4SP9EUw==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mzagh-00DTu5-EL; Tue, 21 Dec 2021 08:39:59 +0000
+Date:   Tue, 21 Dec 2021 08:39:58 +0000
+Message-ID: <871r26wdup.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in vcpu_read/write_sys_reg()
+In-Reply-To: <ccfc064b-55d1-470d-5815-94935e785279@os.amperecomputing.com>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-19-maz@kernel.org>
+        <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
+        <87lf0fwsj5.wl-maz@kernel.org>
+        <ccfc064b-55d1-470d-5815-94935e785279@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>> -	xive->dentry = debugfs_create_file(name, S_IRUGO, arch_debugfs_dir,
->>> +	xive->dentry = debugfs_create_file("xive", S_IRUGO, xive->kvm->debugfs_dentry,
->>>    					   xive, &xive_debug_fops);
->>
->> The KVM XIVE device implements a "xics-on-xive" interface, the XICS hcalls
->> on top of the XIVE native PowerNV (OPAL) interface, and ...
->>
->>> -	pr_debug("%s: created %s\n", __func__, name);
->>> -	kfree(name);
->>> +	pr_debug("%s: created\n", __func__);
->>>    }
->>>    
->>>    static void kvmppc_xive_init(struct kvm_device *dev)
->>> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
->>> index 99db9ac49901..e86f5b6c2ae1 100644
->>> --- a/arch/powerpc/kvm/book3s_xive_native.c
->>> +++ b/arch/powerpc/kvm/book3s_xive_native.c
->>> @@ -1259,19 +1259,10 @@ DEFINE_SHOW_ATTRIBUTE(xive_native_debug);
->>>    
->>>    static void xive_native_debugfs_init(struct kvmppc_xive *xive)
->>>    {
->>> -	char *name;
->>> -
->>> -	name = kasprintf(GFP_KERNEL, "kvm-xive-%p", xive);
->>> -	if (!name) {
->>> -		pr_err("%s: no memory for name\n", __func__);
->>> -		return;
->>> -	}
->>> -
->>> -	xive->dentry = debugfs_create_file(name, 0444, arch_debugfs_dir,
->>> +	xive->dentry = debugfs_create_file("xive", 0444, xive->kvm->debugfs_dentry,
->>>    					   xive, &xive_native_debug_fops);
->>
->> ... the KVM XIVE *native* device implements a "xive" interface", the one
->> using MMIOs for interrupt management.
->>
->> May be it's worth making the difference in the user interface ?
+On Tue, 21 Dec 2021 07:12:36 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
 > 
-> The content of these xive files is quite different so I kept the same
-> name as before, I can change if you think it is worth it, should I? 
+> 
+> On 20-12-2021 02:40 pm, Marc Zyngier wrote:
+> > On Mon, 20 Dec 2021 07:04:44 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> On 30-11-2021 01:30 am, Marc Zyngier wrote:
+> >>> KVM internally uses accessor functions when reading or writing the
+> >>> guest's system registers. This takes care of accessing either the stored
+> >>> copy or using the "live" EL1 system registers when the host uses VHE.
+> >>> 
+> >>> With the introduction of virtual EL2 we add a bunch of EL2 system
+> >>> registers, which now must also be taken care of:
+> >>> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+> >>>     revert to the stored version of that, and not use the CPU's copy.
+> >>> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+> >> 
+> >> Do we have vEL1? or is it a typo?
+> > 
+> > Not a typo, but only a convention (there is no such concept in the
+> > architecture). vELx denotes the exception level the guest thinks it is
+> > running at while running at EL1 (as it is the case for both vEL1 and
+> > vEL2).
+> > 
+> 
+> OK got it, this is to deal with Non-VHE case.
 
-It's not very important. The contents differ anyhow.
+No, you'd have the exact same thing with a VHE guest itself running an
+EL1 guest. You really cannot distinguish the two cases.
 
-> You
-> are probably the only person who looked at it recently (or ever?) :) Thanks,
+In general, you can't really think the NV support in terms of VHE or
+nVHE, or even in terms of guest level. You need to think in terms of a
+single machine with three exception levels, and follow the rules of
+the architecture to the letter.
 
-and you just did ! :)
+Thanks,
 
-Cheers,
+	M.
 
-C.
+-- 
+Without deviation from the norm, progress is not possible.
