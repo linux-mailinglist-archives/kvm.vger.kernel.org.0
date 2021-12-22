@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3745E47CC0E
-	for <lists+kvm@lfdr.de>; Wed, 22 Dec 2021 05:22:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2351F47CC15
+	for <lists+kvm@lfdr.de>; Wed, 22 Dec 2021 05:26:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242315AbhLVEWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Dec 2021 23:22:42 -0500
-Received: from mga11.intel.com ([192.55.52.93]:35737 "EHLO mga11.intel.com"
+        id S242364AbhLVEZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Dec 2021 23:25:59 -0500
+Received: from mga07.intel.com ([134.134.136.100]:25944 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232658AbhLVEWl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Dec 2021 23:22:41 -0500
+        id S232658AbhLVEZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Dec 2021 23:25:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640146961; x=1671682961;
+  t=1640147157; x=1671683157;
   h=cc:subject:to:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=Cyl3EnNuBUB+YdjCSptEMAFJt9rmebRqepgSebgdx4Q=;
-  b=LtVgxlrocd0EMvyq+oCmRBTDZTP9+aOyjHav4HhYp3VnPIs8MiKtGJWp
-   rLFxhAqqfnpuvnWFAYqn3Z3aR+UXC7mXeQpbS4iQWtVrbk/iEXqMWAmKS
-   DFm0diAF5oj9C0rXxpq1vMZnttTAj+jRQDcwSU90TAIfYuMI3qPwO9oI4
-   PMZfhGTlYIfCjSBGn1ZkgfgW+cv+EOa7V+BAUGVmayd1s4feRarkY5Ej2
-   JpEv8yO7g1g2625OT6uGUaAtCo3EZLfS4dCN0Uho5KYpXCY10PcKzm0JF
-   H46gsMNRgTBjTiHPIstzbzWn3dlLeNejKrW4L70zNa97X1e1VJqEV8uMW
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10205"; a="238078551"
+  bh=zybkO6myHTgJXbb9BKIuV/UbCxPTxJVK/qCq3t4VbHo=;
+  b=ZNjitHdGdHLYnQtBMefXBOXxV24oludn3zZXn6fyIU136ek/C3d77YUo
+   B+ACuou952ZqpO0VxIL1IxsoMArsiqkkKA3qu+2Qc0oaPtK1XAho1i63i
+   81tLfbwpmTp7MW2i4zXkcrern+8BZ0oqKfoyt5111k0BYFvVflBPeVAwq
+   LhDDm9xncKzTUWxhrg6GR//pt1e6vS4o0nDtrY+DDdKtUa0aWln/ZrXpC
+   OR3906AtSAnOajWE8/iRq4wRbt0cPzsvtbyW/9tRMFaY6lLEAopPNT5Es
+   c757j/lCg9wdRL0kNajXQT59Hr9we0wDwA6y05HzwjbjkCfzeKNrItbix
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10205"; a="303912678"
 X-IronPort-AV: E=Sophos;i="5.88,225,1635231600"; 
-   d="scan'208";a="238078551"
+   d="scan'208";a="303912678"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2021 20:22:41 -0800
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2021 20:25:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,225,1635231600"; 
-   d="scan'208";a="664154927"
+   d="scan'208";a="664155500"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by fmsmga001.fm.intel.com with ESMTP; 21 Dec 2021 20:22:34 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 21 Dec 2021 20:25:50 -0800
 Cc:     baolu.lu@linux.intel.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -67,13 +67,14 @@ References: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
  <20211217063708.1740334-8-baolu.lu@linux.intel.com>
  <dd797dcd-251a-1980-ca64-bb38e67a526f@arm.com>
  <20211221184609.GF1432915@nvidia.com>
+ <ced7f89a-8857-a8bb-be06-aaaabb4cdf09@linux.intel.com>
 From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <ced7f89a-8857-a8bb-be06-aaaabb4cdf09@linux.intel.com>
-Date:   Wed, 22 Dec 2021 12:22:11 +0800
+Message-ID: <c8b1e775-6821-59eb-6544-26983857f712@linux.intel.com>
+Date:   Wed, 22 Dec 2021 12:25:27 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20211221184609.GF1432915@nvidia.com>
+In-Reply-To: <ced7f89a-8857-a8bb-be06-aaaabb4cdf09@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,83 +82,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/22/21 2:46 AM, Jason Gunthorpe wrote:
->> It's worth taking a step back and realising that overall, this is really
->> just a more generalised and finer-grained extension of what 426a273834ea
->> already did for non-group-aware code, so it makes little sense*not*  to
->> integrate it into the existing interfaces.
-> This is taking 426a to it's logical conclusion and*removing*  the
-> group API from the drivers entirely. This is desirable because drivers
-> cannot do anything sane with the group.
-> 
-> The drivers have struct devices, and so we provide APIs that work in
-> terms of struct devices to cover both driver use cases today, and do
-> so more safely than what is already implemented.
-> 
-> Do not mix up VFIO with the driver interface, these are different
-> things. It is better VFIO stay on its own and not complicate the
-> driver world.
+On 12/22/21 12:22 PM, Lu Baolu wrote:
+> void iommu_detach_device_shared(struct iommu_domain *domain, struct 
+> device *dev)
 
-Per Joerg's previous comments:
-
-https://lore.kernel.org/linux-iommu/20211119150612.jhsvsbzisvux2lga@8bytes.org/
-
-The commit 426a273834ea came only in order to disallow attaching a
-single device within a group to a different iommu_domain. So it's
-reasonable to improve the existing iommu_attach/detach_device() to cover
-all cases. How about below code? Did I miss anything?
-
-int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
-{
-         struct iommu_group *group;
-         int ret = 0;
-
-         group = iommu_group_get(dev);
-         if (!group)
-                 return -ENODEV;
-
-         mutex_lock(&group->mutex);
-         if (group->attach_cnt) {
-                 if (group->domain != domain) {
-                         ret = -EBUSY;
-                         goto unlock_out;
-                 }
-         } else {
-                 ret = __iommu_attach_group(domain, group);
-                 if (ret)
-                         goto unlock_out;
-         }
-
-         group->attach_cnt++;
-unlock_out:
-         mutex_unlock(&group->mutex);
-         iommu_group_put(group);
-
-         return ret;
-}
-EXPORT_SYMBOL_GPL(iommu_attach_device);
-
-void iommu_detach_device_shared(struct iommu_domain *domain, struct 
-device *dev)
-{
-         struct iommu_group *group;
-
-         group = iommu_group_get(dev);
-         if (WARN_ON(!group))
-                 return;
-
-         mutex_lock(&group->mutex);
-         if (WARN_ON(!group->attach_cnt || group->domain != domain)
-                 goto unlock_out;
-
-         if (--group->attach_cnt == 0)
-                 __iommu_detach_group(domain, group);
-
-unlock_out:
-         mutex_unlock(&group->mutex);
-         iommu_group_put(group);
-}
-EXPORT_SYMBOL_GPL(iommu_detach_device);
+Sorry for typo. Please ignore the _shared postfix.
 
 Best regards,
 baolu
