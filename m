@@ -2,125 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60E6047D3F3
-	for <lists+kvm@lfdr.de>; Wed, 22 Dec 2021 15:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB5B347D3F7
+	for <lists+kvm@lfdr.de>; Wed, 22 Dec 2021 15:52:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237161AbhLVOwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Dec 2021 09:52:04 -0500
-Received: from mga02.intel.com ([134.134.136.20]:51223 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232073AbhLVOwE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Dec 2021 09:52:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640184724; x=1671720724;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=4xtn6EPbwVHkHyVB1KSElYHsfFLKGvF4/J0qCuOQMsk=;
-  b=VUxYS4ku8mQ94rXyF+ZuUegIUm6+KI11IzClom3FK8j/jocam69PpRgk
-   jtXpyM3e0k5/rOxROXL4qLlwr40FGBSqBVP71g9gmQqt5r8RiklcpbPfr
-   Jq6cav73MyWoowvwV5DqWRF8ZxmxL7U8nTExUn4wwvrYyN6Fqd/UA+9bJ
-   nTjRF//BmrOmXHs2CtcvpOyWbqZvzB3TM9KYzZ2rbXrz5vzXyKbGJ7Dyg
-   YwCBveHUE2SRfREwozZ8wej3h2LIP+HvNc4ADivWxduczGy2Zv/m4kjSt
-   LATsih0N2HKpjbC1RCTmZ/FeYdw9Sqyyl0jC9SS5UeUzrRcaEdGYcuPwQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10205"; a="227927819"
-X-IronPort-AV: E=Sophos;i="5.88,226,1635231600"; 
-   d="scan'208";a="227927819"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2021 06:52:03 -0800
-X-IronPort-AV: E=Sophos;i="5.88,226,1635231600"; 
-   d="scan'208";a="484776260"
-Received: from drakemat-mobl.amr.corp.intel.com (HELO [10.212.179.136]) ([10.212.179.136])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2021 06:52:03 -0800
-Subject: Re: State Component 18 and Palette 1 (Re: [PATCH 16/19] kvm: x86:
- Introduce KVM_{G|S}ET_XSAVE2 ioctl)
-To:     "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Zhong, Yang" <yang.zhong@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>
-References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-17-yang.zhong@intel.com>
- <d16aab21-0f81-f758-a61e-5919f223be78@redhat.com>
- <26ea7039-3186-c23f-daba-d039bb8d6f48@redhat.com>
- <24CFD156-5093-4833-8516-526A90FF350E@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <3afdb885-d2d9-c099-bc72-c813521b6b39@intel.com>
-Date:   Wed, 22 Dec 2021 06:52:01 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S241494AbhLVOw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Dec 2021 09:52:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232073AbhLVOwz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Dec 2021 09:52:55 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8D2C061574;
+        Wed, 22 Dec 2021 06:52:54 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id bg2-20020a05600c3c8200b0034565c2be15so4008670wmb.0;
+        Wed, 22 Dec 2021 06:52:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=UNASmdT0hvuhhs3uP9YzQnXIGyHzJSzVhAFNnDIR+qQ=;
+        b=oPmNrh2qnVZy7/rZvkrXfxHUtL7Dy90QCzv0h25xHCk0ESRgscsionZUbrLaMP8YiQ
+         9xS6DaUE7w8gcaUadFsu1zRr6YH9/NsCR3kvy0Nag56lp0TgE2DytfYJPYaTP6D5mll8
+         Z2iT2PJlaapBG71YAYrZwTovagn9QEOuw/aZcrOnS937Zfaijnwlab0Z/lzdUeSjwqBr
+         P9QCypcTgvHybTbmYtm/KMXMYorn6M2bVMUNlPui4flrm/gQnN+j/m9sxycRfzBARixw
+         htaqs1RqIIL7DYoZuPF2qCEKbUELafeegij/SRMxvrMjOOfGeu9hduV6E8gIuwwQL8Wx
+         gDag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=UNASmdT0hvuhhs3uP9YzQnXIGyHzJSzVhAFNnDIR+qQ=;
+        b=R5/qJ4GpHWlZpd1aZBJLJ2Ww0Fe+udpXpzoPI0R+bHR2hYq74cO0Yr3PfEycHI/KiU
+         b4Y28lYbeoMkO8IUOcsE+W/u4I2zQLGWk61aSqhvwfi/ulT2kPR5dzl9+Z1pZnbusk86
+         uYgeuzCdaDIxAsoCmyTLXK8ku4OIZvU3BHE+yUBg4f+1RyXquFy/iXI65mJE+1algsEi
+         0D5mB5Wqckm01FxnCh8+KmucInIgdgPTK37DMBibBuohclV/pF8Tj4zfCF5loLShwang
+         j/5PHy0Wpp7vXJqAqvG8ZsHtp/HgdXNPlK5LjGYseZEsZGcLQkc7oY8q2tGBzOJ7N1JK
+         se3w==
+X-Gm-Message-State: AOAM533u+7bpVkTh5Kq6UmaAXhifz/GJiOsvvLmZUeVjM3zxZJB5Pj6G
+        qf5k/Qx5HGousYmAPW2SXQE=
+X-Google-Smtp-Source: ABdhPJyXpgGNGKRcdlXMW7sez9UGp/XRanMx+cNdPZOSjYRNQanq5WOvyc59EI5cbOwxjj6Y9TPewA==
+X-Received: by 2002:a05:600c:1e01:: with SMTP id ay1mr1201748wmb.152.1640184773438;
+        Wed, 22 Dec 2021 06:52:53 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312::4fa? ([2001:b07:6468:f312::4fa])
+        by smtp.googlemail.com with ESMTPSA id m35sm12429107wms.1.2021.12.22.06.52.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Dec 2021 06:52:52 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <496b5209-6b1c-1205-ed0e-733af6386f8d@redhat.com>
+Date:   Wed, 22 Dec 2021 15:52:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <24CFD156-5093-4833-8516-526A90FF350E@intel.com>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v2 07/13] KVM: selftests: add library for
+ creating/interacting with SEV guests
 Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>,
+        Peter Gonda <pgonda@google.com>
+Cc:     linux-kselftest@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Nathan Tempelman <natet@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20211216171358.61140-1-michael.roth@amd.com>
+ <20211216171358.61140-8-michael.roth@amd.com>
+ <CAMkAt6pPpWzazBJAM0N1s115k9on7mC46BKzwk6oYHBOoGyohA@mail.gmail.com>
+ <20211217161758.pgpvzlgu4z6vhq7x@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211217161758.pgpvzlgu4z6vhq7x@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/20/21 9:54 AM, Nakajima, Jun wrote:
->> So, I hope that save state 18 will be frozen to 8k.  In that case,
->> and if palette 1 is frozen to the same values as today,
->> implementing migration will not be a problem; it will be
->> essentially the same as SSE->AVX (horizontal extension of existing
->> registers) and/or AVX->AVX512 (both horizontal and vertical
->> extension).
+On 12/17/21 17:17, Michael Roth wrote:
+>>> +void kvm_sev_ioctl(struct sev_vm *sev, int cmd, void *data)
+>>> +{
+>>> +       struct kvm_sev_cmd arg = {0};
+>>> +       int ret;
+>>> +
+>>> +       arg.id = cmd;
+>>> +       arg.sev_fd = sev->fd;
+>>> +       arg.data = (__u64)data;
+>>> +
+>>> +       ret = ioctl(vm_get_fd(sev->vm), KVM_MEMORY_ENCRYPT_OP, &arg);
+>> If the helper vm_get_fd() exists why not add another which takes a
+>> struct sev_vm. So you can do __vm_get_fd(sev) here?
+> I can add it as a local helper for now, maybe sev_get_kvm_fd(), to
+> distinguish from the SEV_PATH fd? I'm not sure it's worth exporting it
+> as part of the library though since vm_get_fd(sev_get_vm(sev)) would be
+> more familiar to callers that are already used to the kvm_util library.
 > 
-> I would like to confirm that the state component 18 will remain 8KB
-> and palette 1 will remain the same.
 
-Is that an architectural statement that will soon be making its way into
-the SDM?
+I also prefer the one that you suggest.
+
+>> Can you dedup this from  sev_ioctl() in sev_migrate_tests.c? That
+>> function already correctly asserts the fw_error.
+> 
+> This is a little bit awkward since sev_ioctl() in sev_migrate_tests opens
+> SEV_PATH on demand whereas this one pulls it out of struct sev_vm. I
+> could make kvm_sev_ioctl() expect the KVM fd as a parameter but that
+> means external callers need another call to pull it out of struct
+> sev_vm.
+
+Yeah, it's a bit weird because sev_migrate_tests do not use struct 
+sev_vm.  Unless you port them first, you could have both 
+kvm_vm_sev_ioctl that takes a struct kvm_vm, and sev_vm_ioctl that takes 
+a struct sev_vm.  Then you only need to change the argument of 
+verify_mirror_allowed_cmds to struct kvm_vm.
+
+Paolo
