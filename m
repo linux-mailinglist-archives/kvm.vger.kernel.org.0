@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5A2247E97B
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 23:27:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 108B147E987
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 23:28:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350526AbhLWW0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 17:26:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39200 "EHLO
+        id S1350574AbhLWW2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 17:28:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350514AbhLWWZt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1350517AbhLWWZt (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 23 Dec 2021 17:25:49 -0500
 Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94846C061D72
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:24 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id o9-20020a637309000000b0033fba59a89dso3877443pgc.17
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44C42C06175B
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:26 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id s22-20020a63d056000000b0033b09af4d13so3879044pgi.13
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=VKRhc2W30aJ+XXbCyNQ1ulY913smbN678/b9erLTCZg=;
-        b=TraPH2v75kx8IbE8VZzkiytfqpmKpo7bA6i3wHFNH8kWiJsWoKxjs5qifY9XeUUgX2
-         tq7skiqLI75wwsk+cjIoklE8kfO4Q026KdxSxhwOPCtGvLtOhmEwScoigtyX1CHem8so
-         zkagxCu8O7dAfUgZFPfJkFwQSPFdHLQ1V2UtzGQHphYQQNHGEZllckQfQUX7cmuix4h2
-         nfcB7Hrux6pUuz9oXT0nkK1872SuYu0vCiaN3hkcW7oo3lT3LOG6nAbpjSDrgIL5zhwj
-         LNRA0yctE8lTsttvPbZFQKIEkvpm5A9lSF7rYmq4mQ+6kupPT8W6/HfKU/DtISQgrr8F
-         G76Q==
+        bh=NTWd/eLJg+oZzoP/2OC3KeQ8hrwm8MCA9hvEYELSgZQ=;
+        b=BJbFbs6zx3b6NONCJh1BbEu1gCLTZ/pCoIckyh0v7CG8BpEflV8SaWjY3KyGRv6vty
+         JqDIHR8WvJMmsGtNl7EhrpbYh85gLPUKYkLFHjDXbXdh642hy4OrInO4jyTA4Y3BzHi4
+         MVGEO5q7YTqz6IuTrBJD89czl7SrvD8H6H2jX/8XDs5EGiIL2zFIKOPIsGzx2LLjPqmX
+         3HYr7IaDEPZw3zqpXNyA4hpSxFthe4nhZ2Bu5a8lzV8+colY89dLU7xYa5WnKL37rx5P
+         vTDKgXLwN88QSRBxEVcE6jOjRh8nWzO9DPKkKUodkDHNtv5f2/rSPOprahd21ZEqgtkE
+         A9yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=VKRhc2W30aJ+XXbCyNQ1ulY913smbN678/b9erLTCZg=;
-        b=xZmWJ2gpARyrNP27spEvnunPrlVMPjIs8sxkBN6rQ0muWk/Q+Ypcrp1c7sJOgbcxoR
-         xhW4FGy+u2+uUMGVaR89kM433ciuMrSrj7/0CUeiSQ7Eq64i62AI+ELvZ67AGX6PhGbs
-         rzm2bdMkftcdpR2oQhAymAY+GybvWdO6VjVkQJzmiQt3kh7ybt4OTOQEA8fHW2hPUoub
-         QG3/OJrGJbrK4BtEaK4gn6rdSpttEPen+FVEdawZvVVfpD6jiZ4sJKqe8BrFWaYAaoLU
-         65vdzzFRC1Yv/Ff3nNoFpPbTADRduhmt3/M7zvPk3cCisS/kca/RDIX44+mZ0Z5COu+7
-         vKgA==
-X-Gm-Message-State: AOAM5321uMskWvJuC09e2lWOQU+IcHP9xln7rGH+ftnhdesst8qdko6k
-        ShKGtPj/1FRN9hkV0uVpeti1HaaWRzg=
-X-Google-Smtp-Source: ABdhPJwddrNiJwRWA7gbWwHjC4Wsxlj0igcrrMuVa5jSNsVjb5YY/gIuu5OqR0d5fzyshMBMmcf917Kvr00=
+        bh=NTWd/eLJg+oZzoP/2OC3KeQ8hrwm8MCA9hvEYELSgZQ=;
+        b=8L0vK4L0ly/xwHbepeDy/d7KQULyD/fexW/C+PN3xtusArSDx6qQ0JJLpko/g/RO4M
+         YGMqpipiWF3+4tkAWtY9lq98AEe8Mzp9rHIlwvCQnLCVm31lqKcHlnV44yZQPgqaKmzm
+         nd/dEzNSJJFiqWd6fRYRSfLIl6bHC16OCb/abV/m9MTeMFGWJpdIiA+OC5dYdlgVCtU6
+         xX0APzoiyDU8NTJX8EIZ1rWgP4OR/AtL9DwHwXbbcWaOWH6oEDK2hpWvQ82uUCLahN51
+         0ujk1GkTJcNuJrEk3n5/oU8KAkYfmPvLM1z///qchl3y3eTKDENerT0qO2m0WxLdhcDg
+         K+xQ==
+X-Gm-Message-State: AOAM530AR3r4ihfgNGLXEvs6Q+n4rcT1e21kLRH8lrn4hoLX+4P9Fgzd
+        ROjfavUY0Cd2FqbpAwHAmX/m9taa7fI=
+X-Google-Smtp-Source: ABdhPJwsc10SoowlAMp1LP+rgARsIGn5+UkTI3VN7Tm8sl6hGezd+4vtPjQ03g92/ZC5uIwUkBnn8V3Mpxo=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:db0c:: with SMTP id
- g12mr5043010pjv.233.1640298264139; Thu, 23 Dec 2021 14:24:24 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:343:: with SMTP id
+ fh3mr4768409pjb.35.1640298265813; Thu, 23 Dec 2021 14:24:25 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 23 Dec 2021 22:23:14 +0000
+Date:   Thu, 23 Dec 2021 22:23:15 +0000
 In-Reply-To: <20211223222318.1039223-1-seanjc@google.com>
-Message-Id: <20211223222318.1039223-27-seanjc@google.com>
+Message-Id: <20211223222318.1039223-28-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211223222318.1039223-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.448.ga2b2bfdf31-goog
-Subject: [PATCH v2 26/30] KVM: x86/mmu: Zap defunct roots via asynchronous worker
+Subject: [PATCH v2 27/30] KVM: selftests: Move raw KVM_SET_USER_MEMORY_REGION
+ helper to utils
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,131 +68,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Zap defunct roots, a.k.a. roots that have been invalidated after their
-last reference was initially dropped, asynchronously via the system work
-queue instead of forcing the work upon the unfortunate task that happened
-to drop the last reference.
+Move set_memory_region_test's KVM_SET_USER_MEMORY_REGION helper to KVM's
+utils so that it can be used by other tests.  Provide a raw version as
+well as an assert-success version to reduce the amount of boilerplate
+code need for basic usage.
 
-If a vCPU task drops the last reference, the vCPU is effectively blocked
-by the host for the entire duration of the zap.  If the root being zapped
-happens be fully populated with 4kb leaf SPTEs, e.g. due to dirty logging
-being active, the zap can take several hundred seconds.  Unsurprisingly,
-most guests are unhappy if a vCPU disappears for hundreds of seconds.
-
-E.g. running a synthetic selftest that triggers a vCPU root zap with
-~64tb of guest memory and 4kb SPTEs blocks the vCPU for 900+ seconds.
-Offloading the zap to a worker drops the block time to <100ms.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu_internal.h |  2 +
- arch/x86/kvm/mmu/tdp_mmu.c      | 65 ++++++++++++++++++++++++++++-----
- 2 files changed, 58 insertions(+), 9 deletions(-)
+ .../testing/selftests/kvm/include/kvm_util.h  |  5 +++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 24 +++++++++++++
+ .../selftests/kvm/set_memory_region_test.c    | 35 +++++--------------
+ 3 files changed, 37 insertions(+), 27 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 8ce3d58fdf7f..ac365631e4fe 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -69,6 +69,8 @@ struct kvm_mmu_page {
- 		DECLARE_BITMAP(unsync_child_bitmap, 512);
- 		struct {
- 			bool tdp_mmu_defunct_root;
-+			struct work_struct tdp_mmu_async_work;
-+			void *tdp_mmu_async_data;
- 		};
- 	};
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 2d62edc49d67..fba971189390 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -128,6 +128,11 @@ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid,
  
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 2e28f5e4b761..a706328a5658 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -81,6 +81,38 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
- static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			     bool shared);
+ void vm_create_irqchip(struct kvm_vm *vm);
  
-+static void tdp_mmu_zap_root_async(struct work_struct *work)
-+{
-+	struct kvm_mmu_page *root = container_of(work, struct kvm_mmu_page,
-+						 tdp_mmu_async_work);
-+	struct kvm *kvm = root->tdp_mmu_async_data;
++void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
++			       uint64_t gpa, uint64_t size, void *hva);
++int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
++				uint64_t gpa, uint64_t size, void *hva);
 +
-+	read_lock(&kvm->mmu_lock);
-+
-+	/*
-+	 * A TLB flush is not necessary as KVM performs a local TLB flush when
-+	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
-+	 * to a different pCPU.  Note, the local TLB flush on reuse also
-+	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
-+	 * intermediate paging structures, that may be zapped, as such entries
-+	 * are associated with the ASID on both VMX and SVM.
-+	 */
-+	tdp_mmu_zap_root(kvm, root, true);
-+
-+	/*
-+	 * Drop the refcount using kvm_tdp_mmu_put_root() to test its logic for
-+	 * avoiding an infinite loop.  By design, the root is reachable while
-+	 * it's being asynchronously zapped, thus a different task can put its
-+	 * last reference, i.e. flowing through kvm_tdp_mmu_put_root() for an
-+	 * asynchronously zapped root is unavoidable.
-+	 */
-+	kvm_tdp_mmu_put_root(kvm, root, true);
-+
-+	read_unlock(&kvm->mmu_lock);
-+
-+	kvm_put_kvm(kvm);
-+}
-+
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			  bool shared)
- {
-@@ -143,15 +175,26 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	refcount_set(&root->tdp_mmu_root_count, 1);
- 
- 	/*
--	 * Zap the root, then put the refcount "acquired" above.   Recursively
--	 * call kvm_tdp_mmu_put_root() to test the above logic for avoiding an
--	 * infinite loop by freeing invalid roots.  By design, the root is
--	 * reachable while it's being zapped, thus a different task can put its
--	 * last reference, i.e. flowing through kvm_tdp_mmu_put_root() for a
--	 * defunct root is unavoidable.
-+	 * Attempt to acquire a reference to KVM itself.  If KVM is alive, then
-+	 * zap the root asynchronously in a worker, otherwise it must be zapped
-+	 * directly here.  Wait to do this check until after the refcount is
-+	 * reset so that tdp_mmu_zap_root() can safely yield.
-+	 *
-+	 * In both flows, zap the root, then put the refcount "acquired" above.
-+	 * When putting the reference, use kvm_tdp_mmu_put_root() to test the
-+	 * above logic for avoiding an infinite loop by freeing invalid roots.
-+	 * By design, the root is reachable while it's being zapped, thus a
-+	 * different task can put its last reference, i.e. flowing through
-+	 * kvm_tdp_mmu_put_root() for a defunct root is unavoidable.
- 	 */
--	tdp_mmu_zap_root(kvm, root, shared);
--	kvm_tdp_mmu_put_root(kvm, root, shared);
-+	if (kvm_get_kvm_safe(kvm)) {
-+		root->tdp_mmu_async_data = kvm;
-+		INIT_WORK(&root->tdp_mmu_async_work, tdp_mmu_zap_root_async);
-+		schedule_work(&root->tdp_mmu_async_work);
-+	} else {
-+		tdp_mmu_zap_root(kvm, root, shared);
-+		kvm_tdp_mmu_put_root(kvm, root, shared);
-+	}
+ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 	enum vm_mem_backing_src_type src_type,
+ 	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 53d2b5d04b82..45f39dd9b4da 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -779,6 +779,30 @@ static void vm_userspace_mem_region_hva_insert(struct rb_root *hva_tree,
+ 	rb_insert_color(&region->hva_node, hva_tree);
  }
  
- enum tdp_mmu_roots_iter_type {
-@@ -949,7 +992,11 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
++
++int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
++				uint64_t gpa, uint64_t size, void *hva)
++{
++	struct kvm_userspace_memory_region region = {
++		.slot = slot,
++		.flags = flags,
++		.guest_phys_addr = gpa,
++		.memory_size = size,
++		.userspace_addr = (uintptr_t)hva,
++	};
++
++	return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region);
++}
++
++void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
++			       uint64_t gpa, uint64_t size, void *hva)
++{
++	int ret = __vm_set_user_memory_region(vm, slot, flags, gpa, size, hva);
++
++	TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION failed, errno = %d (%s)",
++		    errno, strerror(errno));
++}
++
+ /*
+  * VM Userspace Memory Region Add
+  *
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 72a1c9b4882c..73bc297dabe6 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -329,22 +329,6 @@ static void test_zero_memory_regions(void)
+ }
+ #endif /* __x86_64__ */
  
- 	/*
- 	 * Zap all roots, including defunct roots, as all SPTEs must be dropped
--	 * before returning to the caller.
-+	 * before returning to the caller.  Zap directly even if the root is
-+	 * also being zapped by a worker.  Walking zapped top-level SPTEs isn't
-+	 * all that expensive and mmu_lock is already held, which means the
-+	 * worker has yielded, i.e. flushing the work instead of zapping here
-+	 * isn't guaranteed to be any faster.
- 	 *
- 	 * A TLB flush is unnecessary, KVM zaps everything if and only the VM
- 	 * is being destroyed or the userspace VMM has exited.  In both cases,
+-static int test_memory_region_add(struct kvm_vm *vm, void *mem, uint32_t slot,
+-				   uint32_t size, uint64_t guest_addr)
+-{
+-	struct kvm_userspace_memory_region region;
+-	int ret;
+-
+-	region.slot = slot;
+-	region.flags = 0;
+-	region.guest_phys_addr = guest_addr;
+-	region.memory_size = size;
+-	region.userspace_addr = (uintptr_t) mem;
+-	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &region);
+-
+-	return ret;
+-}
+-
+ /*
+  * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+  * tentative to add further slots should fail.
+@@ -382,23 +366,20 @@ static void test_add_max_memory_regions(void)
+ 	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
+ 	mem_aligned = (void *)(((size_t) mem + alignment - 1) & ~(alignment - 1));
+ 
+-	for (slot = 0; slot < max_mem_slots; slot++) {
+-		ret = test_memory_region_add(vm, mem_aligned +
+-					     ((uint64_t)slot * MEM_REGION_SIZE),
+-					     slot, MEM_REGION_SIZE,
+-					     (uint64_t)slot * MEM_REGION_SIZE);
+-		TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed,\n"
+-			    "  rc: %i errno: %i slot: %i\n",
+-			    ret, errno, slot);
+-	}
++	for (slot = 0; slot < max_mem_slots; slot++)
++		vm_set_user_memory_region(vm, slot, 0,
++					  ((uint64_t)slot * MEM_REGION_SIZE),
++					  MEM_REGION_SIZE,
++					  mem_aligned + (uint64_t)slot * MEM_REGION_SIZE);
+ 
+ 	/* Check it cannot be added memory slots beyond the limit */
+ 	mem_extra = mmap(NULL, MEM_REGION_SIZE, PROT_READ | PROT_WRITE,
+ 			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+ 	TEST_ASSERT(mem_extra != MAP_FAILED, "Failed to mmap() host");
+ 
+-	ret = test_memory_region_add(vm, mem_extra, max_mem_slots, MEM_REGION_SIZE,
+-				     (uint64_t)max_mem_slots * MEM_REGION_SIZE);
++	ret = __vm_set_user_memory_region(vm, max_mem_slots, 0,
++					  (uint64_t)max_mem_slots * MEM_REGION_SIZE,
++					  MEM_REGION_SIZE, mem_extra);
+ 	TEST_ASSERT(ret == -1 && errno == EINVAL,
+ 		    "Adding one more memory slot should fail with EINVAL");
+ 
 -- 
 2.34.1.448.ga2b2bfdf31-goog
 
