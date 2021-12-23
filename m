@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86F5E47E980
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 23:27:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2DB147E97E
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 23:27:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350715AbhLWW1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 17:27:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
+        id S1350939AbhLWW0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 17:26:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350680AbhLWWZt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 17:25:49 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845EDC061D7E
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:29 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id y7-20020a62ce07000000b004bb3ae114a1so4019014pfg.5
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:29 -0800 (PST)
+        with ESMTP id S1350693AbhLWWZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Dec 2021 17:25:50 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8F4C0698CB
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:31 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id n22-20020a6563d6000000b0029261ffde9bso3865819pgv.22
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=Yr+H8LBjl0djQfSMzX2wORKjmAdREQqaSzyX3BhenYw=;
-        b=XmQFD7vyhq5p8trN7cLD10q9mdheW4EOLvr7SHz8EpgoyH6oda/tiRX7ZBVlJwAHwm
-         pxx0c47eP51bpRUXyCWELedYY8s3KrRuvX/xhBiZqPIDn05GKwYbUTdvZxtQSRJNcxLN
-         kK77GUtf7L3Chh6OYUxSTJBxhHHfyiumxfeqDNePqdI5C0bFRb7f15c2McJzFQ0Fp95K
-         3JKbIWhgctO43HlTl2C0ZLUvmH5HJoTdyLkO9imR/gh6Mryu33xmQGLIzCenALuJ2lta
-         kskFun16QDJJZ4g8xCW7JLFuo7WuGx2WS5vm87C3T5Hf5RgmmCuvx702nSwCrdp5oCix
-         P32g==
+        bh=bh9JWouoX1FI0l45cZfZSX2igrao9BXu99qa2pMBV/0=;
+        b=U4Bm6CFaMoCHMmhEC8jA5D4g+EGS00FgylbV3W513R+SjiVionlfBd6Q+lrCMRuYk9
+         Lzgh4/4Qd5qi12xMNv53hKKyr3aBKDjoXDZvhQKIPWuSKLZYgEMrPYTo5/SV2ZcS/895
+         qBHrGZxTcFNR9k78O8XimfjsC0NDZO/ABfinUg+oWtFDNztTVyzYb24INryRqYbrQ1o5
+         qvdeCl/q0z6FPtgVXiw593TUydNdXodLy61YF2Majq4eBniLcWLShlmXtVonOnTLr/Il
+         8lZD8stxeWwPBhcCePTzl+yYaiQ82W5WhnMTvDWgcwHVXlZCXpDpEK3t9wevFDaK5EfN
+         25sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=Yr+H8LBjl0djQfSMzX2wORKjmAdREQqaSzyX3BhenYw=;
-        b=wtFKJ5PAQnsGhu0XKpeDL78qnzkNpkImv72ExLwP6HjBWfnnq7aK8fCFtLJ+bPeT0U
-         1VKvNOsHplUygYa9IHP37nU9QZIssLSDZmlbJ+rxAEeYhGSYvl0ZFjnuD+8a2w1JHqe6
-         tIVLAXvLf2unKnXZcnIMiu90DhOh0GYCumugrFc71AGd7S0VFoZIGMBgtSbgNMvsJNmp
-         rX/HeQ90HYNL3ZMlC5PnJ3kRUTxcHY7oAqMOXQDQAwxKiPgZEVnI/EWGVNq299nAisJw
-         SmTIU7FmUJKI4OQfkkvYh9olcoNAGnEsCAkSuRm/4F4TJU6Ux945jxwj4WrbxI9KrFPv
-         1wNw==
-X-Gm-Message-State: AOAM532xC62qr7cg/Z1hy0cnlWaX6DR4L0u94mPLwi96AgvsTV0y130Z
-        4fqtiBejAxcvxYkr8Mp5r7ILNg2RzWU=
-X-Google-Smtp-Source: ABdhPJwUiLkdbtaG9+zrvhGoVsZmSI+nH0Nx0az82/C5LbcyzQYJaBgH11x2pnQDooEF32SEPCtIuz686jQ=
+        bh=bh9JWouoX1FI0l45cZfZSX2igrao9BXu99qa2pMBV/0=;
+        b=iLFxiUF3AcW5rDW+kgd4GkmRs6SUsegTQyMJT/X4/bIXC1v2TGF1YlB2JRJCLhLZG0
+         JLlqxVc/OsKqqniNBFgzrzvhkJznRf7PCcKi7HvI/CbpbqmXdnrWjplV/Jw+jZ9nHeO9
+         2OZ7o21tOMrBLnVG+/yE1YuAG3Jzf/xzCtOMGiX/eo12gnagdk1iQ6iHcvBTpygivIW8
+         /vRG+VxhaO15trdf5VPxWLwa8sHwLVxMY1r0hhnjigKKKmgnHclHjFcEpC9mGs75JmLg
+         0PHv0BcR2F2fYkccqnsWndUcSYK6XK5urf0epQioLxtPYpT+mM4HYqKkS5aHClGJ4XcV
+         /gig==
+X-Gm-Message-State: AOAM5309tURBmt5FI+LWKyWywcSMfMql5mtwW7W0J97cF1icCZiA6R8p
+        N7Z1mCw9XxvKPU4wbWSslrvPl9u7Z8c=
+X-Google-Smtp-Source: ABdhPJwTBJy3DC88ncs30nk0eTkEcjJQSVUzWaAQff+PDs1j/Jecyi/RfKnWQeGIcgi7nAu2Ty7wrRbeLsE=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4a81:: with SMTP id
- lp1mr4969813pjb.19.1640298269028; Thu, 23 Dec 2021 14:24:29 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:e884:b0:148:b91b:d7e2 with SMTP id
+ w4-20020a170902e88400b00148b91bd7e2mr3980010plg.87.1640298270789; Thu, 23 Dec
+ 2021 14:24:30 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 23 Dec 2021 22:23:17 +0000
+Date:   Thu, 23 Dec 2021 22:23:18 +0000
 In-Reply-To: <20211223222318.1039223-1-seanjc@google.com>
-Message-Id: <20211223222318.1039223-30-seanjc@google.com>
+Message-Id: <20211223222318.1039223-31-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211223222318.1039223-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.448.ga2b2bfdf31-goog
-Subject: [PATCH v2 29/30] KVM: selftests: Define cpu_relax() helpers for s390
- and x86
+Subject: [PATCH v2 30/30] KVM: selftests: Add test to populate a VM with the
+ max possible guest mem
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,55 +69,389 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add cpu_relax() for s390 and x86 for use in arch-agnostic tests.  arm64
-already defines its own version.
+Add a selftest that enables populating a VM with the maximum amount of
+guest memory allowed by the underlying architecture.  Abuse KVM's
+memslots by mapping a single host memory region into multiple memslots so
+that the selftest doesn't require a system with terabytes of RAM.
+
+Default to 512gb of guest memory, which isn't all that interesting, but
+should work on all MMUs and doesn't take an exorbitant amount of memory
+or time.  E.g. testing with ~64tb of guest memory takes the better part
+of an hour, and requires 200gb of memory for KVM's page tables when using
+4kb pages.
+
+To inflicit maximum abuse on KVM' MMU, default to 4kb pages (or whatever
+the not-hugepage size is) in the backing store (memfd).  Use memfd for
+the host backing store to ensure that hugepages are guaranteed when
+requested, and to give the user explicit control of the size of hugepage
+being tested.
+
+By default, spin up as many vCPUs as there are available to the selftest,
+and distribute the work of dirtying each 4kb chunk of memory across all
+vCPUs.  Dirtying guest memory forces KVM to populate its page tables, and
+also forces KVM to write back accessed/dirty information to struct page
+when the guest memory is freed.
+
+On x86, perform two passes with a MMU context reset between each pass to
+coerce KVM into dropping all references to the MMU root, e.g. to emulate
+a vCPU dropping the last reference.  Perform both passes and all
+rendezvous on all architectures in the hope that arm64 and s390x can gain
+similar shenanigans in the future.
+
+Measure and report the duration of each operation, which is helpful not
+only to verify the test is working as intended, but also to easily
+evaluate the performance differences different page sizes.
+
+Provide command line options to limit the amount of guest memory, set the
+size of each slot (i.e. of the host memory region), set the number of
+vCPUs, and to enable usage of hugepages.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/s390x/processor.h  | 8 ++++++++
- tools/testing/selftests/kvm/include/x86_64/processor.h | 5 +++++
- 2 files changed, 13 insertions(+)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../selftests/kvm/max_guest_memory_test.c     | 292 ++++++++++++++++++
+ 3 files changed, 296 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/max_guest_memory_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/s390x/processor.h b/tools/testing/selftests/kvm/include/s390x/processor.h
-index e0e96a5f608c..255c9b990f4c 100644
---- a/tools/testing/selftests/kvm/include/s390x/processor.h
-+++ b/tools/testing/selftests/kvm/include/s390x/processor.h
-@@ -5,6 +5,8 @@
- #ifndef SELFTEST_KVM_PROCESSOR_H
- #define SELFTEST_KVM_PROCESSOR_H
- 
-+#include <linux/compiler.h>
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 3cb5ac5da087..ffb4da5b9d03 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -52,6 +52,7 @@
+ /hardware_disable_test
+ /kvm_create_max_vcpus
+ /kvm_page_table_test
++/max_guest_memory_test
+ /memslot_modification_stress_test
+ /memslot_perf_test
+ /rseq_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 17342b575e85..63640f59e96b 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -83,6 +83,7 @@ TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
+ TEST_GEN_PROGS_x86_64 += hardware_disable_test
+ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+ TEST_GEN_PROGS_x86_64 += kvm_page_table_test
++TEST_GEN_PROGS_x86_64 += max_guest_memory_test
+ TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
+ TEST_GEN_PROGS_x86_64 += memslot_perf_test
+ TEST_GEN_PROGS_x86_64 += rseq_test
+@@ -101,6 +102,7 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
+ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+ TEST_GEN_PROGS_aarch64 += kvm_page_table_test
++TEST_GEN_PROGS_aarch64 += max_guest_memory_test
+ TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
+ TEST_GEN_PROGS_aarch64 += memslot_perf_test
+ TEST_GEN_PROGS_aarch64 += rseq_test
+@@ -115,6 +117,7 @@ TEST_GEN_PROGS_s390x += demand_paging_test
+ TEST_GEN_PROGS_s390x += dirty_log_test
+ TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+ TEST_GEN_PROGS_s390x += kvm_page_table_test
++TEST_GEN_PROGS_s390x += max_guest_memory_test
+ TEST_GEN_PROGS_s390x += rseq_test
+ TEST_GEN_PROGS_s390x += set_memory_region_test
+ TEST_GEN_PROGS_s390x += kvm_binary_stats_test
+diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
+new file mode 100644
+index 000000000000..360c88288295
+--- /dev/null
++++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
+@@ -0,0 +1,292 @@
++// SPDX-License-Identifier: GPL-2.0
++#define _GNU_SOURCE
 +
- /* Bits in the region/segment table entry */
- #define REGION_ENTRY_ORIGIN	~0xfffUL /* region/segment table origin	   */
- #define REGION_ENTRY_PROTECT	0x200	 /* region protection bit	   */
-@@ -19,4 +21,10 @@
- #define PAGE_PROTECT	0x200		/* HW read-only bit  */
- #define PAGE_NOEXEC	0x100		/* HW no-execute bit */
- 
-+/* Is there a portable way to do this? */
-+static inline void cpu_relax(void)
++#include <stdio.h>
++#include <stdlib.h>
++#include <pthread.h>
++#include <semaphore.h>
++#include <sys/types.h>
++#include <signal.h>
++#include <errno.h>
++#include <linux/bitmap.h>
++#include <linux/bitops.h>
++#include <linux/atomic.h>
++
++#include "kvm_util.h"
++#include "test_util.h"
++#include "guest_modes.h"
++#include "processor.h"
++
++static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
 +{
-+	barrier();
++	uint64_t gpa;
++
++	for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
++		*((volatile uint64_t *)gpa) = gpa;
++
++	GUEST_DONE();
 +}
 +
- #endif
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 05e65ca1c30c..224574ee9967 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -346,6 +346,11 @@ static inline unsigned long get_xmm(int n)
- 	return 0;
- }
- 
-+static inline void cpu_relax(void)
++struct vcpu_info {
++	struct kvm_vm *vm;
++	uint32_t id;
++	uint64_t start_gpa;
++	uint64_t end_gpa;
++};
++
++static int nr_vcpus;
++static atomic_t rendezvous;
++
++static void rendezvous_with_boss(void)
 +{
-+	asm volatile("rep; nop" ::: "memory");
++	int orig = atomic_read(&rendezvous);
++
++	if (orig > 0) {
++		atomic_dec_and_test(&rendezvous);
++		while (atomic_read(&rendezvous) > 0)
++			cpu_relax();
++	} else {
++		atomic_inc(&rendezvous);
++		while (atomic_read(&rendezvous) < 0)
++			cpu_relax();
++	}
 +}
 +
- bool is_intel_cpu(void);
- 
- struct kvm_x86_state;
++static void run_vcpu(struct kvm_vm *vm, uint32_t vcpu_id)
++{
++	vcpu_run(vm, vcpu_id);
++	ASSERT_EQ(get_ucall(vm, vcpu_id, NULL), UCALL_DONE);
++}
++
++static void *vcpu_worker(void *data)
++{
++	struct vcpu_info *vcpu = data;
++	struct kvm_vm *vm = vcpu->vm;
++	struct kvm_sregs sregs;
++	struct kvm_regs regs;
++
++	vcpu_args_set(vm, vcpu->id, 3, vcpu->start_gpa, vcpu->end_gpa,
++		      vm_get_page_size(vm));
++
++	/* Snapshot regs before the first run. */
++	vcpu_regs_get(vm, vcpu->id, &regs);
++	rendezvous_with_boss();
++
++	run_vcpu(vm, vcpu->id);
++	rendezvous_with_boss();
++	vcpu_regs_set(vm, vcpu->id, &regs);
++	vcpu_sregs_get(vm, vcpu->id, &sregs);
++#ifdef __x86_64__
++	/* Toggle CR0.WP to trigger a MMU context reset. */
++	sregs.cr0 ^= X86_CR0_WP;
++#endif
++	vcpu_sregs_set(vm, vcpu->id, &sregs);
++	rendezvous_with_boss();
++
++	run_vcpu(vm, vcpu->id);
++	rendezvous_with_boss();
++
++	return NULL;
++}
++
++static pthread_t *spawn_workers(struct kvm_vm *vm, uint64_t start_gpa,
++				uint64_t end_gpa)
++{
++	struct vcpu_info *info;
++	uint64_t gpa, nr_bytes;
++	pthread_t *threads;
++	int i;
++
++	threads = malloc(nr_vcpus * sizeof(*threads));
++	TEST_ASSERT(threads, "Failed to allocate vCPU threads");
++
++	info = malloc(nr_vcpus * sizeof(*info));
++	TEST_ASSERT(info, "Failed to allocate vCPU gpa ranges");
++
++	nr_bytes = ((end_gpa - start_gpa) / nr_vcpus) &
++			~((uint64_t)vm_get_page_size(vm) - 1);
++	TEST_ASSERT(nr_bytes, "C'mon, no way you have %d CPUs", nr_vcpus);
++
++	for (i = 0, gpa = start_gpa; i < nr_vcpus; i++, gpa += nr_bytes) {
++		info[i].vm = vm;
++		info[i].id = i;
++		info[i].start_gpa = gpa;
++		info[i].end_gpa = gpa + nr_bytes;
++		pthread_create(&threads[i], NULL, vcpu_worker, &info[i]);
++	}
++	return threads;
++}
++
++static void rendezvous_with_vcpus(struct timespec *time, const char *name)
++{
++	int i, rendezvoused;
++
++	pr_info("Waiting for vCPUs to finish %s...\n", name);
++
++	rendezvoused = atomic_read(&rendezvous);
++	for (i = 0; abs(rendezvoused) != 1; i++) {
++		usleep(100);
++		if (!(i & 0x3f))
++			pr_info("\r%d vCPUs haven't rendezvoused...",
++				abs(rendezvoused) - 1);
++		rendezvoused = atomic_read(&rendezvous);
++	}
++
++	clock_gettime(CLOCK_MONOTONIC, time);
++
++	/* Release the vCPUs after getting the time of the previous action. */
++	pr_info("\rAll vCPUs finished %s, releasing...\n", name);
++	if (rendezvoused > 0)
++		atomic_set(&rendezvous, -nr_vcpus - 1);
++	else
++		atomic_set(&rendezvous, nr_vcpus + 1);
++}
++
++static void calc_default_nr_vcpus(void)
++{
++	cpu_set_t possible_mask;
++	int r;
++
++	r = sched_getaffinity(0, sizeof(possible_mask), &possible_mask);
++	TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)",
++		    errno, strerror(errno));
++
++	nr_vcpus = CPU_COUNT(&possible_mask);
++	TEST_ASSERT(nr_vcpus > 0, "Uh, no CPUs?");
++}
++
++int main(int argc, char *argv[])
++{
++	/*
++	 * Skip the first 4gb and slot0.  slot0 maps <1gb and is used to back
++	 * the guest's code, stack, and page tables.  Because selftests creates
++	 * an IRQCHIP, a.k.a. a local APIC, KVM creates an internal memslot
++	 * just below the 4gb boundary.  This test could create memory at
++	 * 1gb-3gb,but it's simpler to skip straight to 4gb.
++	 */
++	const uint64_t size_1gb = (1 << 30);
++	const uint64_t start_gpa = (4ull * size_1gb);
++	const int first_slot = 1;
++
++	struct timespec time_start, time_run1, time_reset, time_run2;
++	uint64_t max_gpa, gpa, slot_size, max_mem, i;
++	int max_slots, slot, opt, fd;
++	bool hugepages = false;
++	pthread_t *threads;
++	struct kvm_vm *vm;
++	void *mem;
++
++	/*
++	 * Default to 2gb so that maxing out systems with MAXPHADDR=46, which
++	 * are quite common for x86, requires changing only max_mem (KVM allows
++	 * 32k memslots, 32k * 2gb == ~64tb of guest memory).
++	 */
++	slot_size = 2 * size_1gb;
++
++	max_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
++	TEST_ASSERT(max_slots > first_slot, "KVM is broken");
++
++	/* All KVM MMUs should be able to survive a 512gb guest. */
++	max_mem = 512 * size_1gb;
++
++	calc_default_nr_vcpus();
++
++	while ((opt = getopt(argc, argv, "c:h:m:s:u")) != -1) {
++		switch (opt) {
++		case 'c':
++			nr_vcpus = atoi(optarg);
++			TEST_ASSERT(nr_vcpus, "#DE");
++			break;
++		case 'm':
++			max_mem = atoi(optarg) * size_1gb;
++			TEST_ASSERT(max_mem, "#DE");
++			break;
++		case 's':
++			slot_size = atoi(optarg) * size_1gb;
++			TEST_ASSERT(slot_size, "#DE");
++			break;
++		case 'u':
++			hugepages = true;
++			break;
++		case 'h':
++		default:
++			printf("usage: %s [-c nr_vcpus] [-m max_mem_in_gb] [-s slot_size_in_gb] [-u [huge_page_size]]\n", argv[0]);
++			exit(1);
++		}
++	}
++
++	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
++
++	max_gpa = vm_get_max_gfn(vm) << vm_get_page_shift(vm);
++	TEST_ASSERT(max_gpa > (4 * slot_size), "MAXPHYADDR <4gb ");
++
++	fd = kvm_memfd_alloc(slot_size, hugepages);
++	mem = mmap(NULL, slot_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem != MAP_FAILED, "mmap() failed");
++
++	TEST_ASSERT(!madvise(mem, slot_size, MADV_NOHUGEPAGE), "madvise() failed");
++
++	/* Pre-fault the memory to avoid taking mmap_sem on guest page faults. */
++	for (i = 0; i < slot_size; i += vm_get_page_size(vm))
++		((uint8_t *)mem)[i] = 0xaa;
++
++	gpa = 0;
++	for (slot = first_slot; slot < max_slots; slot++) {
++		gpa = start_gpa + ((slot - first_slot) * slot_size);
++		if (gpa + slot_size > max_gpa)
++			break;
++
++		if ((gpa - start_gpa) >= max_mem)
++			break;
++
++		vm_set_user_memory_region(vm, slot, 0, gpa, slot_size, mem);
++
++#ifdef __x86_64__
++		/* Identity map memory in the guest using 1gb pages. */
++		for (i = 0; i < slot_size; i += size_1gb)
++			__virt_pg_map(vm, gpa + i, gpa + i, X86_PAGE_SIZE_1G);
++#else
++		for (i = 0; i < slot_size; i += vm_get_page_size(vm))
++			virt_pg_map(vm, gpa + i, gpa + i);
++#endif
++	}
++
++	atomic_set(&rendezvous, nr_vcpus + 1);
++	threads = spawn_workers(vm, start_gpa, gpa);
++
++	pr_info("Running with %lugb of guest memory and %u vCPUs\n",
++		(gpa - start_gpa) / size_1gb, nr_vcpus);
++
++	rendezvous_with_vcpus(&time_start, "spawning");
++	rendezvous_with_vcpus(&time_run1, "run 1");
++	rendezvous_with_vcpus(&time_reset, "reset");
++	rendezvous_with_vcpus(&time_run2, "run 2");
++
++	time_run2  = timespec_sub(time_run2,   time_reset);
++	time_reset = timespec_sub(time_reset, time_run1);
++	time_run1  = timespec_sub(time_run1,   time_start);
++
++	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 =  %ld.%.9lds\n",
++		time_run1.tv_sec, time_run1.tv_nsec,
++		time_reset.tv_sec, time_reset.tv_nsec,
++		time_run2.tv_sec, time_run2.tv_nsec);
++
++	/*
++	 * Delete even numbered slots (arbitrary) and unmap the first half of
++	 * the backing (also arbitrary) to verify KVM correctly drops all
++	 * references to the removed regions.
++	 */
++	for (slot = (slot - 1) & ~1ull; slot >= first_slot; slot -= 2)
++		vm_set_user_memory_region(vm, slot, 0, 0, 0, NULL);
++
++	munmap(mem, slot_size / 2);
++
++	/* Sanity check that the vCPUs actually ran. */
++	for (i = 0; i < nr_vcpus; i++)
++		pthread_join(threads[i], NULL);
++
++	/*
++	 * Deliberately exit without deleting the remaining memslots or closing
++	 * kvm_fd to test cleanup via mmu_notifier.release.
++	 */
++}
 -- 
 2.34.1.448.ga2b2bfdf31-goog
 
