@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8220547E96C
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 23:27:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C055247E96F
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 23:27:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350712AbhLWWZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 17:25:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38762 "EHLO
+        id S1350747AbhLWWZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 17:25:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350742AbhLWWY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 17:24:27 -0500
+        with ESMTP id S1350772AbhLWWYc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Dec 2021 17:24:32 -0500
 Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0125C061401
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:12 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id u21-20020a17090a891500b001b14cf69a22so4232026pjn.2
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF22AC061374
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:14 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id r1-20020a17090a438100b001b1906bd90cso6400904pjg.2
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 14:24:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=j7zjELqiKcyIXQzSS76hhwYO0SvmRw+6i72sM7ruJEc=;
-        b=ZoC766AfGINLUGXjt38ST4kBuMMelcysWS4PXgZoAKD7GlcQtoqoLW8wlfUmGIxZg8
-         oRJwJzg0E+xIpxaWXFufdxBDNU/IfIHwyDQsNTWUTJacNadE7cLUTEXZqvlcnECUZJf7
-         NYl6NypBIB9uSh1e6QAW/ZAqOWkjvCM9Ilj2CAb4i3D2ak9I1PECGwstFf+PkaMf9mvv
-         ca61Sx8c2gaIR6tkuY3SSBwQHGqYrDPABAuIERrpD25oxvfwg+4uFLext+lBOQQtetyd
-         3qGb6zN3HE+z/n0IWvCJt5NGe831LVxKlfpWF0+BdfZ0pIH0KMnz3cOQvCOT2rq9bXnI
-         WtDQ==
+        bh=tDGnOGhCcvxTaWavsfwTLmgOIvYC3gf4ygJSFWS9QqU=;
+        b=kTOgrcc6BfePm0z+hvCdTFuh79DXEp5GuDndlgpAJVWC9FsuKerF77p60i8Amw364c
+         A0YRrVZzYsMnaM4DfzZuKv1bn6YWYQX3XY8gpy3FGp7+sJD9s9ZB6tHTF/1mMVkH0djH
+         gFphFTPgEquFo/vSlX88ZbEbCwx+ioHc4R3ur6f3p982PtAJSt7n5fr8/Bd6nv51l8M+
+         NUCmo0Eted2NZ54Y8RQMG9ni5K9eeXGrOrYwV0AakuEuQYuK8e/w8T0xKE4JBgRAT8Ee
+         P6XL9aI7G9VXbC1/v5QwlPUgp/prj07a2SnR3Yo0iDn9+cr9YaMvA8HiVyDiKR4sq+wj
+         +aaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=j7zjELqiKcyIXQzSS76hhwYO0SvmRw+6i72sM7ruJEc=;
-        b=TFC9LRqTE0NuEDSegzRFtt0PAMD5c+J1HwaLd0+/X8KvUFVMbYxiIjS/WHNy2sTMur
-         xYyZZRwQjItFBhIEWSRF7x+VulxZDBqU48NOhdFc6/VB6dTmsIvyG+Rh6V+o7xiiS7vp
-         30VAmDw3SWtW8ptKl1amQAvwIQkE0qHZcdtVLhQ0qOlAQO0OKP4sTs9X/RmL064fOn9I
-         y6ca58bmE7xKVuaSLXzR8gWjvFSsd7GXHzONIv2lcLR/5kqZTzYm3IjKJwpOrpU6rK5V
-         rO/y7k3n4rhSPmQmAjEihxisu1hytv+mGxePwXtOWdTrTONCacpbXK/qB+egy0CVPcSa
-         NrXg==
-X-Gm-Message-State: AOAM530TPUtg06BSY5jmJPkyHDnDMcn1oI//UOX9Zmn847WHeJdSxOgq
-        0/KKc/JeHeaDqsxU31DG9DvhZYGzJyo=
-X-Google-Smtp-Source: ABdhPJwpuVkvPCVR6sbOFqDkFoBIMP3ReGI+OXovB6sQfYb005odNoXif0w3zQ/6eO1W3gmhZSbp79VEUFU=
+        bh=tDGnOGhCcvxTaWavsfwTLmgOIvYC3gf4ygJSFWS9QqU=;
+        b=JrEmtMpitvyoLT+7rR0/TRvpqW62Vwk9jjOesbq9LI7PbJOMwnU5cR0d4Wy2NW+66f
+         +uN+Z1nRtbcK5GeZoliuC/sZBNdqFsCE/Gufj5qJEfDDO0K5lmiUH6dSLH1zNust1uX7
+         QfoG+DMc6IxxVaPXdOs+UDFwb64Nrvdr1GhwAjafiKfQCX/lsHEBiwyeh+jGe2EnRfTP
+         NQbQw6Q7e+ZI9MB1OB7EA+hglq+RtIY+SlC9RAaSEXqNIA2NYjfd7fJFlGlMuEb1LNpv
+         jDaqnZ33Y/u4Ijx0hGhXrlPwGebYsFB522BQANdL33F+CV5KWL2XzrQTo1+4OCvgn3Di
+         XgBw==
+X-Gm-Message-State: AOAM531X5hcbgxXltyfp7eIb5SCXqVyN3hzOR2Sxgw/s32IsbosVk9Tw
+        t9Vf9O2R4EQNqLOrqyyhRst5blO32zw=
+X-Google-Smtp-Source: ABdhPJynTFDTwq9OPWP3NGC2k4NnBfjNzEbTDYwrQOTcJqWU8FH5hTFzrUrGniBxYNwYQlCQwxy11xHnRYg=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:82c1:b0:149:5a6d:c59 with SMTP id
- u1-20020a17090282c100b001495a6d0c59mr1585675plz.83.1640298252210; Thu, 23 Dec
- 2021 14:24:12 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:3d42:: with SMTP id
+ o2mr738629pjf.1.1640298253827; Thu, 23 Dec 2021 14:24:13 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 23 Dec 2021 22:23:07 +0000
+Date:   Thu, 23 Dec 2021 22:23:08 +0000
 In-Reply-To: <20211223222318.1039223-1-seanjc@google.com>
-Message-Id: <20211223222318.1039223-20-seanjc@google.com>
+Message-Id: <20211223222318.1039223-21-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211223222318.1039223-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.448.ga2b2bfdf31-goog
-Subject: [PATCH v2 19/30] KVM: x86/mmu: Add dedicated helper to zap TDP MMU
- root shadow page
+Subject: [PATCH v2 20/30] KVM: x86/mmu: Require mmu_lock be held for write to
+ zap TDP MMU range
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,195 +68,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a dedicate helper for zapping a TDP MMU root, and use it in the three
-flows that do "zap_all" and intentionally do not do a TLB flush if SPTEs
-are zapped (zapping an entire root is safe if and only if it cannot be in
-use by any vCPU).  Because a TLB flush is never required, unconditionally
-pass "false" to tdp_mmu_iter_cond_resched() when potentially yielding.
-
-Opportunistically document why KVM must not yield when zapping roots that
-are being zapped by kvm_tdp_mmu_put_root(), i.e. roots whose refcount has
-reached zero, and further harden the flow to detect improper KVM behavior
-with respect to roots that are supposed to be unreachable.
-
-In addition to hardening zapping of roots, isolating zapping of roots
-will allow future simplification of zap_gfn_range() by having it zap only
-leaf SPTEs, and by removing its tricky "zap all" heuristic.  By having
-all paths that truly need to free _all_ SPs flow through the dedicated
-root zapper, the generic zapper can be freed of those concerns.
+Now that all callers of zap_gfn_range() hold mmu_lock for write, drop
+support for zapping with mmu_lock held for read.  That all callers hold
+mmu_lock for write isn't a random coincedence; now that the paths that
+need to zap _everything_ have their own path, the only callers left are
+those that need to zap for functional correctness.  And when zapping is
+required for functional correctness, mmu_lock must be held for write,
+otherwise the caller has no guarantees about the state of the TDP MMU
+page tables after it has run, e.g. the SPTE(s) it zapped can be
+immediately replaced by a vCPU faulting in a page.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 100 +++++++++++++++++++++++++++++++------
- 1 file changed, 84 insertions(+), 16 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 29 ++++++-----------------------
+ 1 file changed, 6 insertions(+), 23 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index e9232ef2194e..c4bfd6aac999 100644
+index c4bfd6aac999..c7529de776be 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -56,10 +56,6 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- 	rcu_barrier();
- }
- 
--static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+@@ -851,15 +851,9 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+  * function cannot yield, it will not release the MMU lock or reschedule and
+  * the caller must ensure it does not supply too large a GFN range, or the
+  * operation can cause a soft lockup.
+- *
+- * If shared is true, this thread holds the MMU lock in read mode and must
+- * account for the possibility that other threads are modifying the paging
+- * structures concurrently. If shared is false, this thread should hold the
+- * MMU lock in write mode.
+  */
+ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
 -			  gfn_t start, gfn_t end, bool can_yield, bool flush,
--			  bool shared);
--
- static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
+-			  bool shared)
++			  gfn_t start, gfn_t end, bool can_yield, bool flush)
  {
- 	free_page((unsigned long)sp->spt);
-@@ -82,6 +78,9 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
- 	tdp_mmu_free_sp(sp);
- }
- 
-+static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-+			     bool shared);
-+
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			  bool shared)
- {
-@@ -104,7 +103,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 * intermediate paging structures, that may be zapped, as such entries
- 	 * are associated with the ASID on both VMX and SVM.
- 	 */
--	(void)zap_gfn_range(kvm, root, 0, -1ull, false, false, shared);
-+	tdp_mmu_zap_root(kvm, root, shared);
- 
- 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
-@@ -749,6 +748,78 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
- 	return iter->yielded;
- }
- 
-+static inline gfn_t tdp_mmu_max_gfn_host(void)
-+{
-+	/*
-+	 * Bound TDP MMU walks at host.MAXPHYADDR, guest accesses beyond that
-+	 * will hit a #PF(RSVD) and never hit an EPT Violation/Misconfig / #NPF,
-+	 * and so KVM will never install a SPTE for such addresses.
-+	 */
-+	return 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-+}
-+
-+static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-+			     bool shared)
-+{
-+	bool root_is_unreachable = !refcount_read(&root->tdp_mmu_root_count);
-+	struct tdp_iter iter;
-+
-+	gfn_t end = tdp_mmu_max_gfn_host();
-+	gfn_t start = 0;
-+
-+	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-+
-+	rcu_read_lock();
-+
-+	/*
-+	 * No need to try to step down in the iterator when zapping an entire
-+	 * root, zapping an upper-level SPTE will recurse on its children.
-+	 */
-+	for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-+				   root->role.level, start, end) {
-+retry:
-+		/*
-+		 * Yielding isn't allowed when zapping an unreachable root as
-+		 * the root won't be processed by mmu_notifier callbacks.  When
-+		 * handling an unmap/release mmu_notifier command, KVM must
-+		 * drop all references to relevant pages prior to completing
-+		 * the callback.  Dropping mmu_lock can result in zapping SPTEs
-+		 * for an unreachable root after a relevant callback completes,
-+		 * which leads to use-after-free as zapping a SPTE triggers
-+		 * "writeback" of dirty/accessed bits to the SPTE's associated
-+		 * struct page.
-+		 */
-+		if (!root_is_unreachable &&
-+		    tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
-+			continue;
-+
-+		if (!is_shadow_present_pte(iter.old_spte))
-+			continue;
-+
-+		if (!shared) {
-+			tdp_mmu_set_spte(kvm, &iter, 0);
-+		} else if (!tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
-+			/*
-+			 * cmpxchg() shouldn't fail if the root is unreachable.
-+			 * to be unreachable.  Re-read the SPTE and retry so as
-+			 * not to leak the page and its children.
-+			 */
-+			WARN_ONCE(root_is_unreachable,
-+				  "Contended TDP MMU SPTE in unreachable root.");
-+			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
-+			goto retry;
-+		}
-+		/*
-+		 * WARN if the root is invalid and is unreachable, all SPTEs
-+		 * should've been zapped by kvm_tdp_mmu_zap_invalidated_roots(),
-+		 * and inserting new SPTEs under an invalid root is a KVM bug.
-+		 */
-+		WARN_ON_ONCE(root_is_unreachable && root->role.invalid);
-+	}
-+
-+	rcu_read_unlock();
-+}
-+
- bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
- 	u64 old_spte;
-@@ -790,8 +861,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 			  gfn_t start, gfn_t end, bool can_yield, bool flush,
- 			  bool shared)
- {
--	gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
--	bool zap_all = (start == 0 && end >= max_gfn_host);
-+	bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
+ 	bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
  	struct tdp_iter iter;
+@@ -872,15 +866,14 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
  
- 	/*
-@@ -800,12 +870,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 */
- 	int min_level = zap_all ? root->role.level : PG_LEVEL_4K;
+ 	end = min(end, tdp_mmu_max_gfn_host());
  
--	/*
--	 * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
--	 * hit a #PF(RSVD) and never get to an EPT Violation/Misconfig / #NPF,
--	 * and so KVM will never install a SPTE for such addresses.
--	 */
--	end = min(end, max_gfn_host);
-+	end = min(end, tdp_mmu_max_gfn_host());
+-	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
++	lockdep_assert_held_write(&kvm->mmu_lock);
  
- 	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+ 	rcu_read_lock();
  
-@@ -871,6 +936,7 @@ bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
+ 	for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
+ 				   min_level, start, end) {
+-retry:
+ 		if (can_yield &&
+-		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, shared)) {
++		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
+ 			flush = false;
+ 			continue;
+ 		}
+@@ -899,17 +892,8 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		    !is_last_spte(iter.old_spte, iter.level))
+ 			continue;
  
- void kvm_tdp_mmu_zap_all(struct kvm *kvm)
- {
-+	struct kvm_mmu_page *root;
- 	int i;
+-		if (!shared) {
+-			tdp_mmu_set_spte(kvm, &iter, 0);
+-			flush = true;
+-		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
+-			/*
+-			 * The iter must explicitly re-read the SPTE because
+-			 * the atomic cmpxchg failed.
+-			 */
+-			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
+-			goto retry;
+-		}
++		tdp_mmu_set_spte(kvm, &iter, 0);
++		flush = true;
+ 	}
  
- 	/*
-@@ -878,8 +944,10 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
- 	 * is being destroyed or the userspace VMM has exited.  In both cases,
- 	 * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
- 	 */
--	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
--		(void)kvm_tdp_mmu_zap_gfn_range(kvm, i, 0, -1ull, false);
-+	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-+		for_each_tdp_mmu_root_yield_safe(kvm, root, i, false)
-+			tdp_mmu_zap_root(kvm, root, false);
-+	}
+ 	rcu_read_unlock();
+@@ -928,8 +912,7 @@ bool __kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
+ 	struct kvm_mmu_page *root;
+ 
+ 	for_each_tdp_mmu_root_yield_safe(kvm, root, as_id, false)
+-		flush = zap_gfn_range(kvm, root, start, end, can_yield, flush,
+-				      false);
++		flush = zap_gfn_range(kvm, root, start, end, can_yield, flush);
+ 
+ 	return flush;
  }
- 
- /*
-@@ -905,7 +973,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
- 		 * will still flush on yield, but that's a minor performance
- 		 * blip and not a functional issue.
- 		 */
--		(void)zap_gfn_range(kvm, root, 0, -1ull, true, false, true);
-+		tdp_mmu_zap_root(kvm, root, true);
- 
- 		/*
- 		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
 -- 
 2.34.1.448.ga2b2bfdf31-goog
 
