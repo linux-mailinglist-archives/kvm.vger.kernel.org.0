@@ -2,187 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1A4D47E38B
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 13:36:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D95D247E442
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 14:58:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348496AbhLWMd5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 07:33:57 -0500
-Received: from mga17.intel.com ([192.55.52.151]:7858 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348474AbhLWMdw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 07:33:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640262832; x=1671798832;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=gr3qIQtqhPgZ2sWGOjcNk2j5JakW0dks3WgAyQ1CBMA=;
-  b=K71yiEJ/fCwQmNrv28asR3IyWbW8VKgc8yn1G/fvQ+NkHoreUFgshfY9
-   Iam2RisJwnuOngCOY7PZfvYs19LSV9Hr0EiEKUKrYlrzcHUpjAhBeuI5F
-   MdsJGe5AttFnOvR6Cy47OXO6m/PSMua60LgFRkYnDvHPIyMdjy8Now83m
-   Zll5R99S7pwW1xeYEaqAqKBu3yhM3Ha7x0vobk8JVVWi2m3kEcUKS28or
-   ImHHTDqCNk0CHT9UyqqmclYYnBffpWvGMj0mjUQpOJKYI3rcQod7VUNLr
-   bqmLLOh3988I41YWVoUVqRv+DtVFD43S2+wm04OgAtSnsQGc5DIpn9Ef2
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10206"; a="221493021"
-X-IronPort-AV: E=Sophos;i="5.88,229,1635231600"; 
-   d="scan'208";a="221493021"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2021 04:33:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,229,1635231600"; 
-   d="scan'208";a="522079184"
-Received: from chaop.bj.intel.com ([10.240.192.101])
-  by orsmga008.jf.intel.com with ESMTP; 23 Dec 2021 04:32:54 -0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: [PATCH v3 kvm/queue 16/16] KVM: Register/unregister private memory slot to memfd
-Date:   Thu, 23 Dec 2021 20:30:11 +0800
-Message-Id: <20211223123011.41044-17-chao.p.peng@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+        id S1348713AbhLWN6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 08:58:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31354 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236221AbhLWN6e (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Dec 2021 08:58:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640267913;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CpQJOwyNtlX1Mdolftn4RcdaD2Hy2yaictkseWrq6SQ=;
+        b=DwayA+U41dHyPsANWB3jp7pFg/1cxaSXyXdcf4hGCuRPVp8wPgANWcobSN9rvMlxP79Cei
+        93mEIV4eyUpw1+1ET3NeIjTOUTfKEfNXRX6Cte+XJMP5Q6oz6Rv01qC7LLxHP0oZkbzV2h
+        3jZkALMQ6cOh3NMDKY0Uxd5M99DjPpA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-131-F7trc4kZPqKeZNW4qLKL-Q-1; Thu, 23 Dec 2021 08:58:32 -0500
+X-MC-Unique: F7trc4kZPqKeZNW4qLKL-Q-1
+Received: by mail-wm1-f71.google.com with SMTP id r8-20020a05600c35c800b00345bfa31160so2034575wmq.0
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 05:58:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CpQJOwyNtlX1Mdolftn4RcdaD2Hy2yaictkseWrq6SQ=;
+        b=D9eTzPEPK8VpCtRiGwiMpwfzJwBKbcWC7AKBW2bHonx4IJbZO9g/ApGK9Wups0Fi/w
+         AIZuECp3d3n0AIOEijjGMZlccib84DfxuB6563zg5yl/ID58tuRYhL6zNi2+EgbK3MoB
+         onxws4R//XCwExx72pXeK/rKgJZmjscBCiPptmp4vCJXu1eukzoqvRw/gAFu0awsf1pk
+         9LA8C4hsm5rbjUNLVHGHKr+CCYjkidSUgIIUz1ZYrPcvDoWJQpCy7HEavecfRBG7uuI7
+         MdS0KCHSzXGdvZAxkjB3yo/feuy9i6WfIdcemyoAWr4j6AnoY13D9NadA/3LwAcQS/ak
+         vZ4g==
+X-Gm-Message-State: AOAM530GwIEY1QpUr7tTr8woO/nAf5tqxfOSm1OqQMERPop1GHK/eoBp
+        R7vJ65e0+G+Ee3MKgMHf6WegXStjqhgXtc9jT63l7wIkgjN7IgJr4OM7K6Zn6fELmkDbM+HqKng
+        8jyzlmyJKAmoV
+X-Received: by 2002:a05:600c:1f0f:: with SMTP id bd15mr1897613wmb.2.1640267911070;
+        Thu, 23 Dec 2021 05:58:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxdZ+swrtLCADcHVBsqJwj8tIlyAIce/Bk5kJZdXg7yhPIcNXyeP1RJ9MxfrD4FnxzIoU/LvQ==
+X-Received: by 2002:a05:600c:1f0f:: with SMTP id bd15mr1897604wmb.2.1640267910875;
+        Thu, 23 Dec 2021 05:58:30 -0800 (PST)
+Received: from redhat.com ([2.55.1.37])
+        by smtp.gmail.com with ESMTPSA id r8sm5096452wru.107.2021.12.23.05.58.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Dec 2021 05:58:30 -0800 (PST)
+Date:   Thu, 23 Dec 2021 08:58:26 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yi Wang <wang.yi59@zte.com.cn>
+Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        wang.liang82@zte.com.cn, Zhang Min <zhang.min9@zte.com.cn>
+Subject: Re: [PATCH] vdpa: regist vhost-vdpa dev class
+Message-ID: <20211223085634-mutt-send-email-mst@kernel.org>
+References: <20211223073145.35363-1-wang.yi59@zte.com.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211223073145.35363-1-wang.yi59@zte.com.cn>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expose KVM_MEM_PRIVATE flag and register/unregister private memory
-slot to memfd when userspace sets the flag.
+typo in subject
 
-KVM_MEM_PRIVATE is disallowed by default but architecture code can
-turn on it by implementing kvm_arch_private_memory_supported().
+On Thu, Dec 23, 2021 at 03:31:45PM +0800, Yi Wang wrote:
+> From: Zhang Min <zhang.min9@zte.com.cn>
+> 
+> Some applications like kata-containers need to acquire MAJOR/MINOR/DEVNAME
+> for devInfo [1], so regist vhost-vdpa dev class to expose uevent.
+> 
+> 1. https://github.com/kata-containers/kata-containers/blob/main/src/runtime/virtcontainers/device/config/config.go
+> 
+> Signed-off-by: Zhang Min <zhang.min9@zte.com.cn>
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> ---
+>  drivers/vhost/vdpa.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index fb41db3da611..90fbad93e7a2 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1012,6 +1012,7 @@ static void vhost_vdpa_release_dev(struct device *device)
+>  	kfree(v);
+>  }
+>  
+> +static struct class *vhost_vdpa_class;
+>  static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>  {
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+> @@ -1040,6 +1041,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>  	v->dev.release = vhost_vdpa_release_dev;
+>  	v->dev.parent = &vdpa->dev;
+>  	v->dev.devt = MKDEV(MAJOR(vhost_vdpa_major), minor);
+> +	v->dev.class = vhost_vdpa_class;
+>  	v->vqs = kmalloc_array(v->nvqs, sizeof(struct vhost_virtqueue),
+>  			       GFP_KERNEL);
+>  	if (!v->vqs) {
+> @@ -1097,6 +1099,14 @@ static int __init vhost_vdpa_init(void)
+>  {
+>  	int r;
+>  
+> +	vhost_vdpa_class = class_create(THIS_MODULE, "vhost-vdpa");
+> +	if (IS_ERR(vhost_vdpa_class)) {
+> +		r = PTR_ERR(vhost_vdpa_class);
+> +		pr_warn("vhost vdpa class create error %d,  maybe mod reinserted\n", r);
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
----
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 34 ++++++++++++++++++++++++++++++++--
- 2 files changed, 33 insertions(+), 2 deletions(-)
+what's mod reinserted? why warn not error?
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index fabab3b77d57..5173c52e70d4 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1229,6 +1229,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int kvm_arch_post_init_vm(struct kvm *kvm);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
- int kvm_arch_create_vm_debugfs(struct kvm *kvm);
-+bool kvm_arch_private_memory_supported(struct kvm *kvm);
- 
- #ifndef __KVM_HAVE_ARCH_VM_ALLOC
- /*
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf8dcb3b8c7f..1caebded52c4 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1514,10 +1514,19 @@ static void kvm_replace_memslot(struct kvm *kvm,
- 	}
- }
- 
--static int check_memory_region_flags(const struct kvm_userspace_memory_region_ext *mem)
-+bool __weak kvm_arch_private_memory_supported(struct kvm *kvm)
-+{
-+	return false;
-+}
-+
-+static int check_memory_region_flags(struct kvm *kvm,
-+			const struct kvm_userspace_memory_region_ext *mem)
- {
- 	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
- 
-+	if (kvm_arch_private_memory_supported(kvm))
-+		valid_flags |= KVM_MEM_PRIVATE;
-+
- #ifdef __KVM_HAVE_READONLY_MEM
- 	valid_flags |= KVM_MEM_READONLY;
- #endif
-@@ -1756,6 +1765,8 @@ static void kvm_delete_memslot(struct kvm *kvm,
- 			       struct kvm_memory_slot *old,
- 			       struct kvm_memory_slot *invalid_slot)
- {
-+	if (old->flags & KVM_MEM_PRIVATE)
-+		kvm_memfd_unregister(old);
- 	/*
- 	 * Remove the old memslot (in the inactive memslots) by passing NULL as
- 	 * the "new" slot, and for the invalid version in the active slots.
-@@ -1836,6 +1847,14 @@ static int kvm_set_memslot(struct kvm *kvm,
- 		kvm_invalidate_memslot(kvm, old, invalid_slot);
- 	}
- 
-+	if (new->flags & KVM_MEM_PRIVATE && change == KVM_MR_CREATE) {
-+		r = kvm_memfd_register(kvm, new);
-+		if (r) {
-+			mutex_unlock(&kvm->slots_arch_lock);
-+			return r;
-+		}
-+	}
-+
- 	r = kvm_prepare_memory_region(kvm, old, new, change);
- 	if (r) {
- 		/*
-@@ -1850,6 +1869,10 @@ static int kvm_set_memslot(struct kvm *kvm,
- 		} else {
- 			mutex_unlock(&kvm->slots_arch_lock);
- 		}
-+
-+		if (new->flags & KVM_MEM_PRIVATE && change == KVM_MR_CREATE)
-+			kvm_memfd_unregister(new);
-+
- 		return r;
- 	}
- 
-@@ -1917,7 +1940,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	int as_id, id;
- 	int r;
- 
--	r = check_memory_region_flags(mem);
-+	r = check_memory_region_flags(kvm, mem);
- 	if (r)
- 		return r;
- 
-@@ -1974,6 +1997,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
- 			return -EINVAL;
- 	} else { /* Modify an existing slot. */
-+		/* Private memslots are immutable, they can only be deleted. */
-+		if (mem->flags & KVM_MEM_PRIVATE)
-+			return -EINVAL;
-+
- 		if ((mem->userspace_addr != old->userspace_addr) ||
- 		    (npages != old->npages) ||
- 		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
-@@ -2002,6 +2029,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	new->npages = npages;
- 	new->flags = mem->flags;
- 	new->userspace_addr = mem->userspace_addr;
-+	new->fd = mem->fd;
-+	new->file = NULL;
-+	new->ofs = mem->ofs;
- 
- 	r = kvm_set_memslot(kvm, old, new, change);
- 	if (r)
--- 
-2.17.1
+> +		vhost_vdpa_class = NULL;
+> +		return r;
+> +	}
+> +
+>  	r = alloc_chrdev_region(&vhost_vdpa_major, 0, VHOST_VDPA_DEV_MAX,
+>  				"vhost-vdpa");
+>  	if (r)
+> @@ -1111,6 +1121,7 @@ static int __init vhost_vdpa_init(void)
+>  err_vdpa_register_driver:
+>  	unregister_chrdev_region(vhost_vdpa_major, VHOST_VDPA_DEV_MAX);
+>  err_alloc_chrdev:
+> +	class_destroy(vhost_vdpa_class);
+>  	return r;
+>  }
+>  module_init(vhost_vdpa_init);
+> @@ -1118,6 +1129,7 @@ module_init(vhost_vdpa_init);
+>  static void __exit vhost_vdpa_exit(void)
+>  {
+>  	vdpa_unregister_driver(&vhost_vdpa_driver);
+> +	class_destroy(vhost_vdpa_class);
+>  	unregister_chrdev_region(vhost_vdpa_major, VHOST_VDPA_DEV_MAX);
+>  }
+>  module_exit(vhost_vdpa_exit);
+> -- 
+> 2.27.0
 
