@@ -2,215 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81AE447E299
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 12:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 394B847E34D
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 13:31:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348031AbhLWLu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 06:50:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38486 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348025AbhLWLu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 06:50:27 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7FA9C061756;
-        Thu, 23 Dec 2021 03:50:26 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 09C2A1EC054E;
-        Thu, 23 Dec 2021 12:50:21 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1640260221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=cuJ+soGkmwGVdG30YPS/F1N7S/DbyJYTLWnol8x+5u4=;
-        b=Rsvnfq2qxXXOgXEVluwWck3R4Eyw+KHKRdwmXra1wDyjKVwD1FsCFugMErEl59E6zC09t+
-        7CnZ2kUaKkSUR4FmgVCit4Y+JvrquvY0CLpilS0y9xMwmq1YCHGFBnupRwRbzYYqxst3b+
-        O8/fud/q7zcxWW+af8iQXU/ftTyZoOs=
-Date:   Thu, 23 Dec 2021 12:50:22 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S1348277AbhLWMbI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 07:31:08 -0500
+Received: from mga14.intel.com ([192.55.52.115]:56928 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243475AbhLWMbH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Dec 2021 07:31:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640262667; x=1671798667;
+  h=from:to:cc:subject:date:message-id;
+  bh=B7UjJz2o8U/7WlNmnQCiNqRvJtB8Iir2uHf+buyKLjk=;
+  b=WSUqVBKma5rIip212g1Wp0x7R3QUjklO8CYBEZ9Cn/WOaRHcXTGl+PEy
+   ZO8g3yxOg09x71SNqAGzLx1LbyHmxFy+MF/lSKo38iLXQAd251oxDrZ3M
+   3vDXtrcs8dW9q7ypGHAxSwcpVvYjoAxVsE4tLAh0KN5asgfYwLJ2OPx88
+   YcWcuD79Nbhowmke8D+6xKS5xDMXkLvpe0Ff1vB2Mkr10m9r/5d1WlL0d
+   EIrGteQvGWfboUXn8sVjztipABtreIFO45L2cYRgXcH8NwkqisixmRAZv
+   6XAAdgH6BP0jqbU6e8w/L4A5cskOhZ/JkkGMcOnBUwfPVyaCWyQEeurtw
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10206"; a="241040325"
+X-IronPort-AV: E=Sophos;i="5.88,229,1635231600"; 
+   d="scan'208";a="241040325"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2021 04:30:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,229,1635231600"; 
+   d="scan'208";a="522078427"
+Received: from chaop.bj.intel.com ([10.240.192.101])
+  by orsmga008.jf.intel.com with ESMTP; 23 Dec 2021 04:30:48 -0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 12/40] x86/sev: Add helper for validating pages in
- early enc attribute changes
-Message-ID: <YcRifo82cGk+wP+a@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-13-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-13-brijesh.singh@amd.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+Subject: [PATCH v3 kvm/queue 00/16] KVM: mm: fd-based approach for supporting KVM guest private memory 
+Date:   Thu, 23 Dec 2021 20:29:55 +0800
+Message-Id: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 09:43:04AM -0600, Brijesh Singh wrote:
-> The early_set_memory_{encrypt,decrypt}() are used for changing the
-					^
-					ed()
+This is the third version of this series which try to implement the
+fd-based KVM guest private memory. Earlier this week I sent another v3 
+version at link:
 
+https://lore.kernel.org/linux-mm/20211222012223.GA22448@chaop.bj.intel.com/T/
 
-> page from decrypted (shared) to encrypted (private) and vice versa.
-> When SEV-SNP is active, the page state transition needs to go through
-> additional steps.
-> 
-> If the page is transitioned from shared to private, then perform the
-> following after the encryption attribute is set in the page table:
-> 
-> 1. Issue the page state change VMGEXIT to add the page as a private
->    in the RMP table.
-> 2. Validate the page after its successfully added in the RMP table.
-> 
-> To maintain the security guarantees, if the page is transitioned from
-> private to shared, then perform the following before clearing the
-> encryption attribute from the page table.
-> 
-> 1. Invalidate the page.
-> 2. Issue the page state change VMGEXIT to make the page shared in the
->    RMP table.
-> 
-> The early_set_memory_{encrypt,decrypt} can be called before the GHCB
+That version is based on the latest TDX codebase. In contrast the one you
+are reading is the same code rebased to latest kvm/queue branch at commit:
 
-ditto.
+  c34c87a69727  KVM: x86: Update vPMCs when retiring branch instructions
 
-> is setup, use the SNP page state MSR protocol VMGEXIT defined in the GHCB
-> specification to request the page state change in the RMP table.
-> 
-> While at it, add a helper snp_prep_memory() that can be used outside
-> the sev specific files to change the page state for a specified memory
+There are some changes made to fit into the kvm queue branch but
+generally the two versions are the same code in logic.
 
-"outside of the sev specific"? What is that trying to say?
+There is also difference in test. In the previous one I tested the new
+private memory feature with TDX but in this rebased version I can not
+test the new feature because lack TDX. I did run simple regression
+test on this new version.
 
-/me goes and looks at the whole patchset...
+Introduction
+------------
+In general this patch series introduce fd-based memslot which provide
+guest memory through a memfd file descriptor fd[offset,size] instead of
+hva/size. The fd then can be created from a supported memory filesystem
+like tmpfs/hugetlbfs etc which we refer as memory backend. KVM and the
+memory backend exchange some callbacks when such memslot gets created.
+At runtime KVM will call into callbacks provided by backend to get the
+pfn with the fd+offset. Memory backend will also call into KVM callbacks
+when userspace fallocate/punch hole on the fd to notify KVM to map/unmap
+secondary MMU page tables.
 
-Right, so that is used only in probe_roms(). So that should say:
+Comparing to existing hva-based memslot, this new type of memslot allow
+guest memory unmapped from host userspace like QEMU and even the kernel
+itself, therefore reduce attack surface and prevent userspace bugs.
 
-"Add a helper ... which will be used in probe_roms(), in a later patch."
+Based on this fd-based memslot, we can build guest private memory that
+is going to be used in confidential computing environments such as Intel
+TDX and AMD SEV. When supported, the memory backend can provide more
+enforcement on the fd and KVM can use a single memslot to hold both the
+private and shared part of the guest memory. 
 
-> range.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev.h |  10 ++++
->  arch/x86/kernel/sev.c      | 102 +++++++++++++++++++++++++++++++++++++
->  arch/x86/mm/mem_encrypt.c  |  51 +++++++++++++++++--
+Memfd/shmem extension
+---------------------
+Introduces new MFD_INACCESSIBLE flag for memfd_create(), the file
+created with this flag cannot read(), write() or mmap() etc.
 
-Right, for the next revision, that file is called mem_encrypt_amd.c now.
+In addition, two sets of callbacks are introduced as new MEMFD_OPS:
+  - memfd_falloc_notifier: memfd -> KVM notifier when memory gets
+    allocated/invalidated through fallocate().
+  - memfd_pfn_ops: kvm -> memfd to get a pfn with the fd+offset.
 
-...
+Memslot extension
+-----------------
+Add the private fd and the offset into the fd to existing 'shared' memslot
+so that both private/shared guest memory can live in one single memslot.
+A page in the memslot is either private or shared. A page is private only
+when it's already allocated in the backend fd, all the other cases it's
+treated as shared, this includes those already mapped as shared as well as
+those having not been mapped. This means the memory backend is the place
+which tells the truth of which page is private.
 
-> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-> index 3ba801ff6afc..5d19aad06670 100644
-> --- a/arch/x86/mm/mem_encrypt.c
-> +++ b/arch/x86/mm/mem_encrypt.c
-> @@ -31,6 +31,7 @@
->  #include <asm/processor-flags.h>
->  #include <asm/msr.h>
->  #include <asm/cmdline.h>
-> +#include <asm/sev.h>
->  
->  #include "mm_internal.h"
->  
-> @@ -49,6 +50,34 @@ EXPORT_SYMBOL_GPL(sev_enable_key);
->  /* Buffer used for early in-place encryption by BSP, no locking needed */
->  static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
->  
-> +/*
-> + * When SNP is active, change the page state from private to shared before
-> + * copying the data from the source to destination and restore after the copy.
-> + * This is required because the source address is mapped as decrypted by the
-> + * caller of the routine.
-> + */
-> +static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
-> +				     unsigned long paddr, bool decrypt)
-> +{
-> +	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-> +
-> +	if (!cc_platform_has(CC_ATTR_SEV_SNP) || !decrypt) {
+Private memory map/unmap and conversion
+---------------------------------------
+Userspace's map/unmap operations are done by fallocate() ioctl on the
+backend fd.
+  - map: default fallocate() with mode=0.
+  - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
+The map/unmap will trigger above memfd_falloc_notifier to let KVM
+map/unmap second MMU page tables.
 
-Yeah, looking at this again, I don't really like this multiplexing.
-Let's do this instead, diff ontop:
+Test
+----
+NOTE: below is the test for previous TDX based version. For this version
+I only tested regular vm booting.
 
----
-diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
-index c14fd8254198..e3f7a84449bb 100644
---- a/arch/x86/mm/mem_encrypt_amd.c
-+++ b/arch/x86/mm/mem_encrypt_amd.c
-@@ -49,24 +49,18 @@ EXPORT_SYMBOL(sme_me_mask);
- static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
- 
- /*
-- * When SNP is active, change the page state from private to shared before
-- * copying the data from the source to destination and restore after the copy.
-- * This is required because the source address is mapped as decrypted by the
-- * caller of the routine.
-+ * SNP-specific routine which needs to additionally change the page state from
-+ * private to shared before copying the data from the source to destination and
-+ * restore after the copy.
-  */
- static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
- 				     unsigned long paddr, bool decrypt)
- {
- 	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
- 
--	if (!cc_platform_has(CC_ATTR_SEV_SNP) || !decrypt) {
--		memcpy(dst, src, sz);
--		return;
--	}
--
- 	/*
--	 * With SNP, the paddr needs to be accessed decrypted, mark the page
--	 * shared in the RMP table before copying it.
-+	 * @paddr needs to be accessed decrypted, mark the page shared in the
-+	 * RMP table before copying it.
- 	 */
- 	early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
- 
-@@ -124,8 +118,13 @@ static void __init __sme_early_enc_dec(resource_size_t paddr,
- 		 * Use a temporary buffer, of cache-line multiple size, to
- 		 * avoid data corruption as documented in the APM.
- 		 */
--		snp_memcpy(sme_early_buffer, src, len, paddr, enc);
--		snp_memcpy(dst, sme_early_buffer, len, paddr, !enc);
-+		if (cc_platform_has(CC_ATTR_SEV_SNP)) {
-+			snp_memcpy(sme_early_buffer, src, len, paddr, enc);
-+			snp_memcpy(dst, sme_early_buffer, len, paddr, !enc);
-+		} else {
-+			memcpy(sme_early_buffer, src, len);
-+			memcpy(dst, sme_early_buffer, len);
-+		}
- 
- 		early_memunmap(dst, len);
- 		early_memunmap(src, len);
+This code has been tested with latest TDX code patches hosted at
+(https://github.com/intel/tdx/tree/kvm-upstream) with minimal TDX
+adaption and QEMU support.
+
+Example QEMU command line:
+-object tdx-guest,id=tdx \
+-object memory-backend-memfd-private,id=ram1,size=2G \
+-machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
+
+Changelog
+----------
+v3:
+  - Added locking protection when calling
+    invalidate_page_range/fallocate callbacks.
+  - Changed memslot structure to keep use useraddr for shared memory.
+  - Re-organized F_SEAL_INACCESSIBLE and MEMFD_OPS.
+  - Added MFD_INACCESSIBLE flag to force F_SEAL_INACCESSIBLE.
+  - Commit message improvement.
+  - Many small fixes for comments from the last version.
+
+Links of previous discussions
+-----------------------------
+[1] Original design proposal:
+https://lkml.kernel.org/kvm/20210824005248.200037-1-seanjc@google.com/
+[2] Updated proposal and RFC patch v1:
+https://lkml.kernel.org/linux-fsdevel/20211111141352.26311-1-chao.p.peng@linux.intel.com/
+[3] RFC patch v2:
+https://x-lore.kernel.org/qemu-devel/20211119134739.20218-1-chao.p.peng@linux.intel.com/
+
+Chao Peng (14):
+  mm/memfd: Introduce MFD_INACCESSIBLE flag
+  KVM: Extend the memslot to support fd-based private memory
+  KVM: Maintain ofs_tree for fast memslot lookup by file offset
+  KVM: Implement fd-based memory using MEMFD_OPS interfaces
+  KVM: Refactor hva based memory invalidation code
+  KVM: Special handling for fd-based memory invalidation
+  KVM: Split out common memory invalidation code
+  KVM: Implement fd-based memory invalidation
+  KVM: Add kvm_map_gfn_range
+  KVM: Implement fd-based memory fallocation
+  KVM: Add KVM_EXIT_MEMORY_ERROR exit
+  KVM: Handle page fault for private memory
+  KVM: Use kvm_userspace_memory_region_ext
+  KVM: Register/unregister private memory slot to memfd
+
+Kirill A. Shutemov (2):
+  mm/shmem: Introduce F_SEAL_INACCESSIBLE
+  mm/memfd: Introduce MEMFD_OPS
+
+ arch/x86/kvm/Kconfig           |   1 +
+ arch/x86/kvm/mmu/mmu.c         | 120 ++++++++++++++-
+ arch/x86/kvm/mmu/paging_tmpl.h |  11 +-
+ arch/x86/kvm/x86.c             |   2 +-
+ include/linux/kvm_host.h       |  43 +++++-
+ include/linux/memfd.h          |  22 +++
+ include/linux/shmem_fs.h       |  16 ++
+ include/uapi/linux/fcntl.h     |   1 +
+ include/uapi/linux/kvm.h       |  27 ++++
+ include/uapi/linux/memfd.h     |   1 +
+ mm/Kconfig                     |   4 +
+ mm/memfd.c                     |  33 ++++-
+ mm/shmem.c                     | 195 +++++++++++++++++++++++-
+ virt/kvm/Makefile.kvm          |   2 +-
+ virt/kvm/kvm_main.c            | 262 +++++++++++++++++++++++++--------
+ virt/kvm/memfd.c               |  95 ++++++++++++
+ 16 files changed, 753 insertions(+), 82 deletions(-)
+ create mode 100644 virt/kvm/memfd.c
 
 -- 
-Regards/Gruss,
-    Boris.
+2.17.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
