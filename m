@@ -2,104 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4004B47E74B
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 18:57:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0559D47E762
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 19:02:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244683AbhLWR5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 12:57:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23976 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233620AbhLWR5C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Dec 2021 12:57:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640282221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=tx1DaNTFUj+FTpRIoIC+27W+vuXIFSDacyLezNQVIis=;
-        b=h1gbwSOHMxjeeJ1scBxl5gErJmEbtfD9TU9QZKEAYhg9mIu4AmGPI3XFzVRmtfGUj9Wb3E
-        UBqZMIi8WdLjEGHi3ij9NGrwJH9SMSgW203HIZRBFz5wavtBkyIjh+CGg2bdpCbF664ft5
-        9dRdm2UoQfe8C/rrgmwzUQShh09TYVk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-665-LMhfcmh6P3OWZFyxviO3tA-1; Thu, 23 Dec 2021 12:57:00 -0500
-X-MC-Unique: LMhfcmh6P3OWZFyxviO3tA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA59A6973A
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 17:56:58 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9953A78C2B
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 17:56:58 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] vmx: separate VPID tests
-Date:   Thu, 23 Dec 2021 12:56:58 -0500
-Message-Id: <20211223175658.708793-1-pbonzini@redhat.com>
+        id S244655AbhLWSCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 13:02:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37550 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244522AbhLWSCi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Dec 2021 13:02:38 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6484AC061757
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 10:02:38 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id 196so5872760pfw.10
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 10:02:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=F3vp7cNpz2qk0OIvJVZgGpZrlLI8cGs8eddNh3pH4O0=;
+        b=V6LVAQd/8UIn8ldsx5JR1O9YpJZeToHbDLZbS7mg8/+loFV7/N7sZ+XhcLN4ER+wrt
+         a4OJl94CKbfUSCf2rds4kBh5Lrrm72ej4Vw2jCZdwyaTpvW1Rfri5/b6D0d+XdP6rcLq
+         EnCBOIjnXfg4hlKeBatFlHOFTTdwmCQQ6xeF/Ly1U82igCJHWiW1VL+d3kr+QmXcuLv8
+         0JyTkQyChwcIVqzmWpqo1NlewbWrHW4RFSMnsRxLAB2r1vNJbOQ7FxBRMK3jdWuCu2Zf
+         vQb1n9Yb12+2OopiSqPqPM/6Qm6od8AV54HqElWU29SUVdpkee1DGnFa+7+XiW0B251Y
+         fEzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=F3vp7cNpz2qk0OIvJVZgGpZrlLI8cGs8eddNh3pH4O0=;
+        b=lI+2mwjro9x3a6Q59KPyxAT/4FFqxOUWfU5agtsAG5WEaedUys1wc5ltTxQfHDEkne
+         VwuuYyiMelyRsUEELIPJZOT+e7jpIOXtkfrnYjtjee2A1H4sYE5s0R3jkA0ZgvolyJNd
+         YZX97fKnvCFPLJfewUv3S85rAKH88+d4YHjxO+EXoPqw/RKiamNRmxnu1fYykLTqbuIz
+         sd/rmEsmmzivxlb+mK1+TKAz7CfXdbw8zy7uvP56jLhvli5dNa939YjfXKjR3rrL05oA
+         s7LoeY230zAkw+debp5CC3ejYCqkghSLARBEUvlWQVPe/S96MI5CF4yLtNRrDarzXRWt
+         MtTA==
+X-Gm-Message-State: AOAM530uTajwTUMDuTRRALh23N6s4i+QE0h92xxI2R7L9pL9vXW2Kn5s
+        yk+/smxtp6A05g3IIHrFmTR9jg==
+X-Google-Smtp-Source: ABdhPJwrV3ydO2yyHoylZ6+Gjlc1pXLEXn2GLpfX+eRE21Of6xThdp2NrJD74NCN2Jt8w5I9duli3Q==
+X-Received: by 2002:a65:648b:: with SMTP id e11mr3022987pgv.138.1640282557705;
+        Thu, 23 Dec 2021 10:02:37 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id gg23sm9329532pjb.31.2021.12.23.10.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Dec 2021 10:02:36 -0800 (PST)
+Date:   Thu, 23 Dec 2021 18:02:33 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+Subject: Re: [PATCH v3 kvm/queue 05/16] KVM: Maintain ofs_tree for fast
+ memslot lookup by file offset
+Message-ID: <YcS5uStTallwRs0G@google.com>
+References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+ <20211223123011.41044-6-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211223123011.41044-6-chao.p.peng@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The VPID tests take quite a long time (about 12 minutes overall), so
-separate them from vmx_pf_exception_test and do not run vmx_pf_invvpid_test
-twice.
+On Thu, Dec 23, 2021, Chao Peng wrote:
+> Similar to hva_tree for hva range, maintain interval tree ofs_tree for
+> offset range of a fd-based memslot so the lookup by offset range can be
+> faster when memslot count is high.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/unittests.cfg | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+This won't work.  The hva_tree relies on there being exactly one virtual address
+space, whereas with private memory, userspace can map multiple files into the
+guest at different gfns, but with overlapping offsets.
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index f0727f1..5367013 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -293,7 +293,7 @@ arch = i386
- 
- [vmx]
- file = vmx.flat
--extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test -vmx_pf_exception_test -vmx_pf_no_vpid_test -vmx_pf_vpid_test"
-+extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test -vmx_pf_exception_test -vmx_pf_no_vpid_test -vmx_pf_invvpid_test -vmx_pf_vpid_test"
- arch = x86_64
- groups = vmx
- 
-@@ -362,10 +362,31 @@ groups = vmx
- 
- [vmx_pf_exception_test]
- file = vmx.flat
--extra_params = -cpu max,+vmx -append "vmx_pf_exception_test vmx_pf_no_vpid_test vmx_pf_vpid_test vmx_pf_invvpid_test"
-+extra_params = -cpu max,+vmx -append "vmx_pf_exception_test"
- arch = x86_64
- groups = vmx nested_exception
- 
-+[vmx_pf_vpid_test]
-+file = vmx.flat
-+extra_params = -cpu max,+vmx -append "vmx_pf_vpid_test"
-+arch = x86_64
-+groups = vmx nested_exception
-+timeout = 240
-+
-+[vmx_pf_invvpid_test]
-+file = vmx.flat
-+extra_params = -cpu max,+vmx -append "vmx_pf_invvpid_test"
-+arch = x86_64
-+groups = vmx nested_exception
-+timeout = 240
-+
-+[vmx_pf_no_vpid_test]
-+file = vmx.flat
-+extra_params = -cpu max,+vmx -append "vmx_pf_no_vpid_test"
-+arch = x86_64
-+groups = vmx nested_exception
-+timeout = 240
-+
- [vmx_pf_exception_test_reduced_maxphyaddr]
- file = vmx.flat
- extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off,+vmx -append "vmx_pf_exception_test vmx_pf_no_vpid_test vmx_pf_vpid_test vmx_pf_invvpid_test"
--- 
-2.31.1
+I also dislike hijacking __kvm_handle_hva_range() in patch 07.
 
+KVM also needs to disallow mapping the same file+offset into multiple gfns, which
+I don't see anywhere in this series.
+
+In other words, there needs to be a 1:1 gfn:file+offset mapping.  Since userspace
+likely wants to allocate a single file for guest private memory and map it into
+multiple discontiguous slots, e.g. to skip the PCI hole, the best idea off the top
+of my head would be to register the notifier on a per-slot basis, not a per-VM
+basis.  It would require a 'struct kvm *' in 'struct kvm_memory_slot', but that's
+not a huge deal.
+
+That way, KVM's notifier callback already knows the memslot and can compute overlap
+between the memslot and the range by reversing the math done by kvm_memfd_get_pfn().
+Then, armed with the gfn and slot, invalidation is just a matter of constructing
+a struct kvm_gfn_range and invoking kvm_unmap_gfn_range().
