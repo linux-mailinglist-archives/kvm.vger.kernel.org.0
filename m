@@ -2,110 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC5B747E60D
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 16:53:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32CB147E642
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 17:17:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244488AbhLWPxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 10:53:07 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:30100 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236546AbhLWPxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 10:53:05 -0500
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JKZQ82FFLz1DKG6;
-        Thu, 23 Dec 2021 23:49:52 +0800 (CST)
-Received: from dggpeml100015.china.huawei.com (7.185.36.168) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 23 Dec 2021 23:53:02 +0800
-Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
- dggpeml100015.china.huawei.com (7.185.36.168) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 23 Dec 2021 23:53:02 +0800
-Received: from dggpeml100016.china.huawei.com ([7.185.36.216]) by
- dggpeml100016.china.huawei.com ([7.185.36.216]) with mapi id 15.01.2308.020;
- Thu, 23 Dec 2021 23:53:02 +0800
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-To:     Yi Wang <wang.yi59@zte.com.cn>
-CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "xue.zhihong@zte.com.cn" <xue.zhihong@zte.com.cn>,
-        "wang.liang82@zte.com.cn" <wang.liang82@zte.com.cn>,
-        Zhang Min <zhang.min9@zte.com.cn>,
-        "mst@redhat.com" <mst@redhat.com>
-Subject: RE: [PATCH] vdpa: regist vhost-vdpa dev class
-Thread-Topic: [PATCH] vdpa: regist vhost-vdpa dev class
-Thread-Index: AQHX99HYrIlOz3l0l0u1qq17OsLXJqxAOkrA
-Date:   Thu, 23 Dec 2021 15:53:02 +0000
-Message-ID: <01217747379b4daab45862e572d4f8b1@huawei.com>
-References: <20211223073145.35363-1-wang.yi59@zte.com.cn>
-In-Reply-To: <20211223073145.35363-1-wang.yi59@zte.com.cn>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.148.223]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1349144AbhLWQRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 11:17:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33632 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244349AbhLWQRP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Dec 2021 11:17:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640276235;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LGHYzwJFpl5d7o2k8SxIMF3wKZE8+ynpp2p5jw8mxzU=;
+        b=O4b4dCmIMTNXiUxWoPDNjsuex629hvKC1flRrlCV5ctxhbZF5woxqTVknzdzW1iIiQ20Jm
+        kor22FltuxQ4iLrN4qxf6+rVUjANW12pWRLbV+seMA6FBuEp7taEhikskbEQktWumVHsYL
+        F1UrtCTGA8GrQbY4PvpfdFVCJTqNL5M=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-92-BtFYh_9ePJqBqFYjYDy0gg-1; Thu, 23 Dec 2021 11:17:14 -0500
+X-MC-Unique: BtFYh_9ePJqBqFYjYDy0gg-1
+Received: by mail-ed1-f72.google.com with SMTP id o20-20020a056402439400b003f83cf1e472so4834823edc.18
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 08:17:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LGHYzwJFpl5d7o2k8SxIMF3wKZE8+ynpp2p5jw8mxzU=;
+        b=YPsg9MvY/7evAk82LK/t1oZv8Y1Igtw4k7jCuPzlYUsuHSW6xdYurYAHHhBcOwXLAs
+         hka/KAOGO3ZZjhcJaj7BhGpY+5X7G+sAR/PZeUYVQOlKCnRzhxK9xCCvk1ACMyrY2iMX
+         FNUwmOi19MtGAu0huzflJIh5DskH6cOB0TuWfRbBNrZuynSmqXX6cM+r1FNYbQkpc0oE
+         aFWAfe4nUTrdiCGXkqDOsIgnnOZqXA2gx4unZWfK9ePFfeTlqB8i6ZFaYl6INENJN5NM
+         llzmJ3JUl8h0yaNlAcQHL9/zocDfed/g/1gpc6g1/go/U5JXM7/DWP/THTgGpfzb/IUN
+         o/lw==
+X-Gm-Message-State: AOAM531T83hldMgN/h4dYZMsteAASV32Mzl9xmXO7+9mwEbYKwWdWN6i
+        q1uvMi5UFu25G3zBaYNkJCjrCL3f9pgHwoM8rdh2G48Cvtd2PQbOkeNLBb28Q2MMwuoOMAkIoS2
+        /M9dgBmO/GExF
+X-Received: by 2002:aa7:dd56:: with SMTP id o22mr2624454edw.73.1640276232960;
+        Thu, 23 Dec 2021 08:17:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwUPkJLnb1EUhOx+myvWcZIfjsLXUKVU1wzS4aV5TfG8x7KaiLf7iSrMJIF8BKFGDQyt6lFAw==
+X-Received: by 2002:aa7:dd56:: with SMTP id o22mr2624436edw.73.1640276232745;
+        Thu, 23 Dec 2021 08:17:12 -0800 (PST)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id eg12sm2118704edb.25.2021.12.23.08.17.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Dec 2021 08:17:12 -0800 (PST)
+Date:   Thu, 23 Dec 2021 17:17:10 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: Re: [PATCH 3/5] KVM: selftests: arm64: Introduce a variable default
+ IPA size
+Message-ID: <20211223161710.ka3f2vjbmfuxp2op@gator.home>
+References: <20211216123135.754114-1-maz@kernel.org>
+ <20211216123135.754114-4-maz@kernel.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211216123135.754114-4-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogWWkgV2FuZyBbbWFpbHRv
-OndhbmcueWk1OUB6dGUuY29tLmNuXQ0KPiBTZW50OiBUaHVyc2RheSwgRGVjZW1iZXIgMjMsIDIw
-MjEgMzozMiBQTQ0KPiBUbzogbXN0QHJlZGhhdC5jb20NCj4gQ2M6IGphc293YW5nQHJlZGhhdC5j
-b207IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IHZpcnR1YWxpemF0aW9uQGxpc3RzLmxpbnV4LWZv
-dW5kYXRpb24ub3JnOyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1rZXJuZWxAdmdl
-ci5rZXJuZWwub3JnOyB4dWUuemhpaG9uZ0B6dGUuY29tLmNuOyB3YW5nLnlpNTlAenRlLmNvbS5j
-bjsNCj4gd2FuZy5saWFuZzgyQHp0ZS5jb20uY247IFpoYW5nIE1pbiA8emhhbmcubWluOUB6dGUu
-Y29tLmNuPg0KPiBTdWJqZWN0OiBbUEFUQ0hdIHZkcGE6IHJlZ2lzdCB2aG9zdC12ZHBhIGRldiBj
-bGFzcw0KPiANCj4gRnJvbTogWmhhbmcgTWluIDx6aGFuZy5taW45QHp0ZS5jb20uY24+DQo+IA0K
-PiBTb21lIGFwcGxpY2F0aW9ucyBsaWtlIGthdGEtY29udGFpbmVycyBuZWVkIHRvIGFjcXVpcmUg
-TUFKT1IvTUlOT1IvREVWTkFNRQ0KPiBmb3IgZGV2SW5mbyBbMV0sIHNvIHJlZ2lzdCB2aG9zdC12
-ZHBhIGRldiBjbGFzcyB0byBleHBvc2UgdWV2ZW50Lg0KPiANCj4gMS4NCj4gaHR0cHM6Ly9naXRo
-dWIuY29tL2thdGEtY29udGFpbmVycy9rYXRhLWNvbnRhaW5lcnMvYmxvYi9tYWluL3NyYy9ydW50
-aW1lL3ZpDQo+IHJ0Y29udGFpbmVycy9kZXZpY2UvY29uZmlnL2NvbmZpZy5nbw0KPiANCj4gU2ln
-bmVkLW9mZi1ieTogWmhhbmcgTWluIDx6aGFuZy5taW45QHp0ZS5jb20uY24+DQo+IFNpZ25lZC1v
-ZmYtYnk6IFlpIFdhbmcgPHdhbmcueWk1OUB6dGUuY29tLmNuPg0KPiAtLS0NCj4gIGRyaXZlcnMv
-dmhvc3QvdmRwYS5jIHwgMTIgKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgMTIgaW5z
-ZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmhvc3QvdmRwYS5jIGIvZHJp
-dmVycy92aG9zdC92ZHBhLmMNCj4gaW5kZXggZmI0MWRiM2RhNjExLi45MGZiYWQ5M2U3YTIgMTAw
-NjQ0DQo+IC0tLSBhL2RyaXZlcnMvdmhvc3QvdmRwYS5jDQo+ICsrKyBiL2RyaXZlcnMvdmhvc3Qv
-dmRwYS5jDQo+IEBAIC0xMDEyLDYgKzEwMTIsNyBAQCBzdGF0aWMgdm9pZCB2aG9zdF92ZHBhX3Jl
-bGVhc2VfZGV2KHN0cnVjdCBkZXZpY2UgKmRldmljZSkNCj4gIAlrZnJlZSh2KTsNCj4gIH0NCj4g
-DQo+ICtzdGF0aWMgc3RydWN0IGNsYXNzICp2aG9zdF92ZHBhX2NsYXNzOw0KPiAgc3RhdGljIGlu
-dCB2aG9zdF92ZHBhX3Byb2JlKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRwYSkNCj4gIHsNCj4gIAlj
-b25zdCBzdHJ1Y3QgdmRwYV9jb25maWdfb3BzICpvcHMgPSB2ZHBhLT5jb25maWc7DQo+IEBAIC0x
-MDQwLDYgKzEwNDEsNyBAQCBzdGF0aWMgaW50IHZob3N0X3ZkcGFfcHJvYmUoc3RydWN0IHZkcGFf
-ZGV2aWNlICp2ZHBhKQ0KPiAgCXYtPmRldi5yZWxlYXNlID0gdmhvc3RfdmRwYV9yZWxlYXNlX2Rl
-djsNCj4gIAl2LT5kZXYucGFyZW50ID0gJnZkcGEtPmRldjsNCj4gIAl2LT5kZXYuZGV2dCA9IE1L
-REVWKE1BSk9SKHZob3N0X3ZkcGFfbWFqb3IpLCBtaW5vcik7DQo+ICsJdi0+ZGV2LmNsYXNzID0g
-dmhvc3RfdmRwYV9jbGFzczsNCj4gIAl2LT52cXMgPSBrbWFsbG9jX2FycmF5KHYtPm52cXMsIHNp
-emVvZihzdHJ1Y3Qgdmhvc3RfdmlydHF1ZXVlKSwNCj4gIAkJCSAgICAgICBHRlBfS0VSTkVMKTsN
-Cj4gIAlpZiAoIXYtPnZxcykgew0KPiBAQCAtMTA5Nyw2ICsxMDk5LDE0IEBAIHN0YXRpYyBpbnQg
-X19pbml0IHZob3N0X3ZkcGFfaW5pdCh2b2lkKQ0KPiAgew0KPiAgCWludCByOw0KPiANCj4gKwl2
-aG9zdF92ZHBhX2NsYXNzID0gY2xhc3NfY3JlYXRlKFRISVNfTU9EVUxFLCAidmhvc3QtdmRwYSIp
-Ow0KPiArCWlmIChJU19FUlIodmhvc3RfdmRwYV9jbGFzcykpIHsNCj4gKwkJciA9IFBUUl9FUlIo
-dmhvc3RfdmRwYV9jbGFzcyk7DQo+ICsJCXByX3dhcm4oInZob3N0IHZkcGEgY2xhc3MgY3JlYXRl
-IGVycm9yICVkLCAgbWF5YmUgbW9kIHJlaW5zZXJ0ZWRcbiIsIHIpOw0KPiArCQl2aG9zdF92ZHBh
-X2NsYXNzID0gTlVMTDsNCg0KVW5uZWNlc3NhcnkgdG8gcmVzZXQ/DQoNCj4gKwkJcmV0dXJuIHI7
-DQo+ICsJfQ0KPiArDQo+ICAJciA9IGFsbG9jX2NocmRldl9yZWdpb24oJnZob3N0X3ZkcGFfbWFq
-b3IsIDAsIFZIT1NUX1ZEUEFfREVWX01BWCwNCj4gIAkJCQkidmhvc3QtdmRwYSIpOw0KPiAgCWlm
-IChyKQ0KPiBAQCAtMTExMSw2ICsxMTIxLDcgQEAgc3RhdGljIGludCBfX2luaXQgdmhvc3RfdmRw
-YV9pbml0KHZvaWQpDQo+ICBlcnJfdmRwYV9yZWdpc3Rlcl9kcml2ZXI6DQo+ICAJdW5yZWdpc3Rl
-cl9jaHJkZXZfcmVnaW9uKHZob3N0X3ZkcGFfbWFqb3IsIFZIT1NUX1ZEUEFfREVWX01BWCk7DQo+
-ICBlcnJfYWxsb2NfY2hyZGV2Og0KPiArCWNsYXNzX2Rlc3Ryb3kodmhvc3RfdmRwYV9jbGFzcyk7
-DQo+ICAJcmV0dXJuIHI7DQo+ICB9DQo+ICBtb2R1bGVfaW5pdCh2aG9zdF92ZHBhX2luaXQpOw0K
-PiBAQCAtMTExOCw2ICsxMTI5LDcgQEAgbW9kdWxlX2luaXQodmhvc3RfdmRwYV9pbml0KTsNCj4g
-IHN0YXRpYyB2b2lkIF9fZXhpdCB2aG9zdF92ZHBhX2V4aXQodm9pZCkNCj4gIHsNCj4gIAl2ZHBh
-X3VucmVnaXN0ZXJfZHJpdmVyKCZ2aG9zdF92ZHBhX2RyaXZlcik7DQo+ICsJY2xhc3NfZGVzdHJv
-eSh2aG9zdF92ZHBhX2NsYXNzKTsNCj4gIAl1bnJlZ2lzdGVyX2NocmRldl9yZWdpb24odmhvc3Rf
-dmRwYV9tYWpvciwgVkhPU1RfVkRQQV9ERVZfTUFYKTsNCj4gIH0NCj4gIG1vZHVsZV9leGl0KHZo
-b3N0X3ZkcGFfZXhpdCk7DQo+IC0tDQo+IDIuMjcuMA0K
+On Thu, Dec 16, 2021 at 12:31:33PM +0000, Marc Zyngier wrote:
+> Contrary to popular belief, there is no such thing as a default
+> IPA size on arm64. Anything goes, and implementations are the
+> usual Wild West.
+> 
+> The selftest infrastructure default to 40bit IPA, which obviously
+> doesn't work for some systems out there.
+> 
+> Turn VM_MODE_DEFAULT from a constant into a variable, and let
+> guest_modes_append_default() populate it, depending on what
+> the HW can do. In order to preserve the current behaviour, we
+> still pick 40bits IPA as the default if it is available, and
+> the largest supported IPA space otherwise.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  4 ++-
+>  tools/testing/selftests/kvm/lib/guest_modes.c | 28 +++++++++++++++++--
+>  2 files changed, 29 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index c74241ddf8b1..d2ba830a1faf 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -53,7 +53,9 @@ enum vm_guest_mode {
+>  
+>  #if defined(__aarch64__)
+>  
+> -#define VM_MODE_DEFAULT			VM_MODE_P40V48_4K
+> +extern enum vm_guest_mode vm_mode_default;
+> +
+> +#define VM_MODE_DEFAULT			vm_mode_default
+>  #define MIN_PAGE_SHIFT			12U
+>  #define ptes_per_page(page_size)	((page_size) / 8)
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+> index c330f414ef96..fadc99bac69c 100644
+> --- a/tools/testing/selftests/kvm/lib/guest_modes.c
+> +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+> @@ -4,22 +4,46 @@
+>   */
+>  #include "guest_modes.h"
+>  
+> +#ifdef __aarch64__
+> +enum vm_guest_mode vm_mode_default;
+> +#endif
+> +
+>  struct guest_mode guest_modes[NUM_VM_MODES];
+>  
+>  void guest_modes_append_default(void)
+>  {
+> +#ifndef __aarch64__
+>  	guest_mode_append(VM_MODE_DEFAULT, true, true);
+> -
+> +#endif
+>  #ifdef __aarch64__
+> -	guest_mode_append(VM_MODE_P40V48_64K, true, true);
+>  	{
+>  		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
+> +		int i;
+> +
+> +		vm_mode_default = NUM_VM_MODES;
+> +
+>  		if (limit >= 52)
+>  			guest_mode_append(VM_MODE_P52V48_64K, true, true);
+>  		if (limit >= 48) {
+>  			guest_mode_append(VM_MODE_P48V48_4K, true, true);
+>  			guest_mode_append(VM_MODE_P48V48_64K, true, true);
+>  		}
+> +		if (limit >= 40) {
+> +			guest_mode_append(VM_MODE_P40V48_4K, true, true);
+> +			guest_mode_append(VM_MODE_P40V48_64K, true, true);
+> +			vm_mode_default = VM_MODE_P40V48_4K;
+> +		}
+> +
+> +		/* Pick the largest supported IPA size */
+
+The guest_modes array isn't sorted from smallest to largest PA addresses,
+although it could be.
+
+> +		for (i = 0;
+> +		     vm_mode_default == NUM_VM_MODES && i < NUM_VM_MODES;
+> +		     i++) {
+
+Feel free to put this on one line.
+
+> +			if (guest_modes[i].supported)
+
+A bit safer would be to check both .supported and .enabled.
+
+> +				vm_mode_default = i;
+> +		}
+> +
+> +		TEST_ASSERT(vm_mode_default != NUM_VM_MODES,
+> +			    "No supported mode!");
+>  	}
+>  #endif
+>  #ifdef __s390x__
+> -- 
+> 2.30.2
+>
+
+Thanks,
+drew
+
