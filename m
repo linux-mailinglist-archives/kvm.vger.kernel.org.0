@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 930DC47E664
-	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 17:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA9FB47E697
+	for <lists+kvm@lfdr.de>; Thu, 23 Dec 2021 18:00:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349198AbhLWQdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 11:33:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:22294 "EHLO
+        id S1349373AbhLWRAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 12:00:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53243 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244178AbhLWQdA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Dec 2021 11:33:00 -0500
+        by vger.kernel.org with ESMTP id S1349358AbhLWRAQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Dec 2021 12:00:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640277179;
+        s=mimecast20190719; t=1640278815;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0L0+tsspM3Sr4bIkDveJ5wOCn0r+niWRUrhQ1sw4e1M=;
-        b=ddLsS/AqpzRNltj2Ld+2azrfZk99QVsaYU0LP+8YDReo6ffe/1GMV1xxLWV6neyfDqk7P9
-        XXdioVvh20fNRlQrSxtauVUq8ZQAmOS2UiF6UgnaqZUSJz6vUrWFAP4Sx3NQL7vmr8UVPW
-        eHlanHejAB9cvnzfRA5Kl7A1CfoqelE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QbDlCNO8BeLEzEuY1o/Yj/OOV9u7i5H7i/UVWO5+jqU=;
+        b=E+juW0NfEhQ/HUnFY9Y9n2q+mWzWYwtTQmz/+NFkQ8rBIKM/5nzfIFr76X2lYLaWIBdU+Q
+        T8HDxqoWQxLlp1efsdBklnr6Q+H2bcCk1U617gRJDK9EIUVOIHN5t5ldxfVo0hWIwd2Uhb
+        Q8PLKTeI1OSpi2UXCn2c0BK4xsJQUHA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-85-ogT73SOTN_a9nmQOdpEbiQ-1; Thu, 23 Dec 2021 11:32:58 -0500
-X-MC-Unique: ogT73SOTN_a9nmQOdpEbiQ-1
-Received: by mail-ed1-f70.google.com with SMTP id c19-20020a05640227d300b003f81c7154fbso4898723ede.7
-        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 08:32:58 -0800 (PST)
+ us-mta-601-VPPhFAj3ORmv0kfDLH-pDQ-1; Thu, 23 Dec 2021 12:00:13 -0500
+X-MC-Unique: VPPhFAj3ORmv0kfDLH-pDQ-1
+Received: by mail-ed1-f69.google.com with SMTP id x19-20020a05640226d300b003f8b80f5729so3763319edd.13
+        for <kvm@vger.kernel.org>; Thu, 23 Dec 2021 09:00:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=0L0+tsspM3Sr4bIkDveJ5wOCn0r+niWRUrhQ1sw4e1M=;
-        b=H0svp5OLMTLkwEMUB24X7XG9/YWfDIurW6ffKOznwS6Pe7IaovalwZ2IuGUQJnM1+9
-         C5Dp2EjzRFdOxSICC5qerZ3t40yYtSsewMuhBYJ+3c4mLltxE1i8GLYFkk+6cge5PR1L
-         cEc3zUyWQfA/xl/SI1CtLhxXZdz2/IQDJYuF8lPT2Gmcxxq4kFEqq/nlyqhxCwJc3Y4X
-         NQT/aX1aUYcQboVlVrq7EwxBnLvf568Jb+uQuUUQDo9bWIF5BsXVUmPkZ8v5nceinAGJ
-         R1dlXF5NuiY9Db194zYOlMEL8EXb6QCUL7fjydPEp4VQOOkunepX8ikVeHgSTAPZsmeu
-         FJew==
-X-Gm-Message-State: AOAM531ulOGCGRuDGY7/lpdQUIZExV6EkBxMCrtJbPj5uSiyZHz9vW/n
-        sdlQidNAfHezaivX3KmrCSSNYfOdbHR76dlTBUZEnBVtYn6vfAKBKhq5b1t8qCgKRlo4+bIH0m1
-        b+wnix4bk+mmt
-X-Received: by 2002:a17:906:794c:: with SMTP id l12mr2664829ejo.300.1640277177611;
-        Thu, 23 Dec 2021 08:32:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJykALJDGO3IeZ2oWghmdAmCC8/3tAVh7kAZddXvgesDgLY3AvQZPm7lC8xcpGxYNve1X+MJEA==
-X-Received: by 2002:a17:906:794c:: with SMTP id l12mr2664815ejo.300.1640277177399;
-        Thu, 23 Dec 2021 08:32:57 -0800 (PST)
+        bh=QbDlCNO8BeLEzEuY1o/Yj/OOV9u7i5H7i/UVWO5+jqU=;
+        b=RyAeYPl52yp2FY3evyIlxKkTDStQNQ26x58JootHBRoHx05utR5AN1Foc2yLDg7hQ5
+         +SgPxeZRT009V/3ZyoHiaZJOC1RX44BSFsdqaGykfPknDCxYr8fTvyd0KXiH3aOvVs0U
+         pPs5AcpDBhNKmi0qVkKsFmriWrCQscBfet70Is8Q1COqi07WfI5/l43F3niFMzFq9zMU
+         VLg6oyhV1Mr/gqAl+lruD8jxaOKfVQ7il3JfrPzYh54vptq9v7MqcTMvE5GA/IyKrt3C
+         3K9IUrUuvCqqkuzxCgL+u3nnKgfOq9cFdYIztKDsjWHnm7SMlz83t1sV5hM2hVy00oOb
+         ekmg==
+X-Gm-Message-State: AOAM533xUaRv9ddIXvUO8ABz3RFUUZTEpzcXVHSm4BZYUSTz9fFL2YFs
+        okWVSzno1RCuDEngbC9qq+jiY0K770RoRVShP4Ywt2RCfx0R4UUiaK6qavngkOMSLJA6dr2+aJW
+        QAnuZ5fonU9mP
+X-Received: by 2002:a17:906:478a:: with SMTP id cw10mr2509591ejc.693.1640278812810;
+        Thu, 23 Dec 2021 09:00:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzOXau0JYojDMrB4uhQtijnQf3uwLfJ8/1WFDQKJxoqhmtXGvyUBxdGs2J03ArKxDWe2arRKw==
+X-Received: by 2002:a17:906:478a:: with SMTP id cw10mr2509570ejc.693.1640278812612;
+        Thu, 23 Dec 2021 09:00:12 -0800 (PST)
 Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id u21sm2164756eds.8.2021.12.23.08.32.56
+        by smtp.gmail.com with ESMTPSA id t9sm2203094edd.94.2021.12.23.09.00.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Dec 2021 08:32:57 -0800 (PST)
-Date:   Thu, 23 Dec 2021 17:32:55 +0100
+        Thu, 23 Dec 2021 09:00:12 -0800 (PST)
+Date:   Thu, 23 Dec 2021 18:00:10 +0100
 From:   Andrew Jones <drjones@redhat.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,37 +59,70 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Subject: Re: [PATCH 5/5] KVM: selftests: arm64: Add support for
- VM_MODE_P36V48_{4K,64K}
-Message-ID: <20211223163255.vzjvlwkicsvgzfbx@gator.home>
+Subject: Re: [PATCH 2/5] KVM: selftests: Initialise default mode in each test
+Message-ID: <20211223170010.pekdezsyn75iuxqb@gator.home>
 References: <20211216123135.754114-1-maz@kernel.org>
- <20211216123135.754114-6-maz@kernel.org>
+ <20211216123135.754114-3-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211216123135.754114-6-maz@kernel.org>
+In-Reply-To: <20211216123135.754114-3-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 16, 2021 at 12:31:35PM +0000, Marc Zyngier wrote:
-> Some of the arm64 systems out there have an IPA space that is
-> positively tiny. Nonetheless, they make great KVM hosts.
-> 
-> Add support for 36bit IPA support with 4kB pages, which makes
-> some of the fruity machines happy. Whilst we're at it, add support
-> for 64kB pages as well, though these boxes have no support for it.
-> 
-> 16kB is left as a exercise for the eager reviewer.
+On Thu, Dec 16, 2021 at 12:31:32PM +0000, Marc Zyngier wrote:
+> As we are going to add support for a variable default mode on arm64,
+> let's make sure it is setup first by sprinkling a number of calls
+> to get_modes_append_default() when the test starts.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  tools/testing/selftests/kvm/include/kvm_util.h      | 2 ++
->  tools/testing/selftests/kvm/lib/aarch64/processor.c | 8 ++++++++
->  tools/testing/selftests/kvm/lib/guest_modes.c       | 4 ++++
->  tools/testing/selftests/kvm/lib/kvm_util.c          | 6 ++++++
->  4 files changed, 20 insertions(+)
->
+>  tools/testing/selftests/kvm/aarch64/arch_timer.c       | 3 +++
+>  tools/testing/selftests/kvm/aarch64/debug-exceptions.c | 3 +++
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c     | 3 +++
+>  tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c | 3 +++
+>  tools/testing/selftests/kvm/aarch64/vgic_init.c        | 3 +++
+>  tools/testing/selftests/kvm/kvm_binary_stats_test.c    | 3 +++
+>  tools/testing/selftests/kvm/kvm_create_max_vcpus.c     | 3 +++
+>  tools/testing/selftests/kvm/memslot_perf_test.c        | 4 ++++
+>  tools/testing/selftests/kvm/rseq_test.c                | 3 +++
+>  tools/testing/selftests/kvm/set_memory_region_test.c   | 4 ++++
+>  tools/testing/selftests/kvm/steal_time.c               | 3 +++
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+I wish there was a better way to set the defaults for each test
+without requiring a function call to be put at the beginning of
+each test. Maybe we should create a constructor function? I.e.
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index f307c9f61981..603e09be12ae 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -148,7 +148,7 @@ LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
+ # $(TEST_GEN_PROGS) starts with $(OUTPUT)/
+ include ../lib.mk
+ 
+-STATIC_LIBS := $(OUTPUT)/libkvm.a
++STATIC_LIBS := lib/init.o $(OUTPUT)/libkvm.a
+ LIBKVM_C := $(filter %.c,$(LIBKVM))
+ LIBKVM_S := $(filter %.S,$(LIBKVM))
+ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+diff --git a/tools/testing/selftests/kvm/lib/init.c b/tools/testing/selftests/kvm/lib/init.c
+new file mode 100644
+index 000000000000..6f92a85aa263
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/init.c
+@@ -0,0 +1,6 @@
++#include "guest_modes.h"
++
++void __attribute__((constructor)) main_init(void)
++{
++#ifdef __aarch64__
++       guest_modes_set_default();
++#endif
++}
+
+
+Thanks,
+drew
 
