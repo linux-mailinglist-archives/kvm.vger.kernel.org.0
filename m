@@ -2,101 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA3B147E9A0
-	for <lists+kvm@lfdr.de>; Fri, 24 Dec 2021 00:13:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E98447EA50
+	for <lists+kvm@lfdr.de>; Fri, 24 Dec 2021 02:30:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240720AbhLWXJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 18:09:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48848 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbhLWXJz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 18:09:55 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33609C061401;
-        Thu, 23 Dec 2021 15:09:55 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id e5so4186714wmq.1;
-        Thu, 23 Dec 2021 15:09:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dgbT8DN+Tw3GNuf5KJthTWpp6lDkFZBiYQzZimRcuRE=;
-        b=ehxbIBRAS2aXNbnGgB0k0x6R5UnwGvaUuLQwHieKejHDCyBTff1JOdaDIPIckgtJou
-         8hYkLoqNGiii4+iF8QW2us8YgNv9kljvbT4qGb/bQUff9DbRMmIrP0045w7Uw3CUCOK8
-         TTwrauAIdVxgec9tqmZeT0ABn4zy0J9Ld1K8K1eW8x56QfvdoJ4Dm/BexqyjR/YwzPZw
-         lDqlfT6bv88bZRj1nDoITdfdxhxwY3gc40PVSTqhV1FQbyf1IA5N0iLVeBCj3xHVVZgn
-         NV7mk5eCxTD4+SUpFaDQwPqH182VQ8mtL51XgD/+4dSE1ey1EoQe53Wn8U4cWrQUgaMC
-         9neA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dgbT8DN+Tw3GNuf5KJthTWpp6lDkFZBiYQzZimRcuRE=;
-        b=o4y2wHRFmnHEptWe2GP8e3dul2mqXrLlB31CwsgAlX4QnaS5Ch7MJdhHYpAkIoam5P
-         SGB37Fx5ZGN186NbY2INJurdUedBCX4rgL5SmUaXfOhIb+sXHJfKPGu5S5cSRVBsNbEM
-         296rGoCDgMLmpsU93hhW8ApHF9AQt6JItlo8q8vIeTPhNw6DiacNwlfUiz0jbVSmp/6n
-         K/pKg4wjn5EQ7lUJ852IgEnq0/3ZRjg3oJCW3fiX/otRF2x17VHk1i350qJsB1JwcqS6
-         beQ6GKkzM+lhYgsl2oH0dS71j8rd62DiuOvsuhaiVvGRrxpfrwCQ2LxkHiE3d2fm0ei5
-         Zf/A==
-X-Gm-Message-State: AOAM533nsrGrWtZpRG8X65WjrW1Am5/mdhgEGNx3lAxJQmt28ZCsdbAa
-        XOOyar0cQhMt7NWkdoVHPfea91WY7f8=
-X-Google-Smtp-Source: ABdhPJxl1U9OmTr5nW/WPKnQ66/Eyo9O1/bfTZjkkZoBY6qhl1LyNXjyknMXkm7SCe/TuBNlpdLL3A==
-X-Received: by 2002:a05:600c:c7:: with SMTP id u7mr3032584wmm.85.1640300993673;
-        Thu, 23 Dec 2021 15:09:53 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id c11sm10989913wmq.48.2021.12.23.15.09.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Dec 2021 15:09:53 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <e3fe04eb-1a01-bea4-f1ea-cb9ee98ee216@redhat.com>
-Date:   Fri, 24 Dec 2021 00:09:47 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v3 kvm/queue 06/16] KVM: Implement fd-based memory using
- MEMFD_OPS interfaces
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S1350829AbhLXBaw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 20:30:52 -0500
+Received: from mga06.intel.com ([134.134.136.31]:4950 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S245122AbhLXBav (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Dec 2021 20:30:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640309451; x=1671845451;
+  h=cc:subject:to:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=JjtBgOF28/vwd8lH1VxYSdGqqqEZptc6KfCcvvY2TOw=;
+  b=DatNdB+9cyIoUt+WPoqDxJLeyOd4mhonXbno6RkONRcX1/71sKCOHAe6
+   u2lyY4DtLj2FmqWh3YzWgBRCUPsTcXapn47b1MbwLL8Hqh6gKAQnB30AD
+   YrPNvabyyyndzBlpPD5/3uYJoHVq/RjPb4H4s2LrkRbVPXvttC6x+d5oV
+   oetLYr7AaR0flVNxm3SfLDmBqAFONB9Sm/pR8S8Nv+xHy460eeyW3IZqb
+   MD0WsYvR7Nun1lTIuZtaTthBEnLxAEV66JhJ+lmlPCLS6uBq/lDSQlqxa
+   hvwxK5RvqXcO3I6s8yPmjRGkJ1bIqtZYWMAj8u7XQST8GCnfpHdFsNylt
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10207"; a="301672017"
+X-IronPort-AV: E=Sophos;i="5.88,231,1635231600"; 
+   d="scan'208";a="301672017"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2021 17:30:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,231,1635231600"; 
+   d="scan'208";a="664737519"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by fmsmga001.fm.intel.com with ESMTP; 23 Dec 2021 17:30:43 -0800
+Cc:     baolu.lu@linux.intel.com, Robin Murphy <robin.murphy@arm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-7-chao.p.peng@linux.intel.com>
- <YcTBLpVlETdI8JHi@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YcTBLpVlETdI8JHi@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 07/13] iommu: Add iommu_at[de]tach_device_shared() for
+ multi-device groups
+To:     Jason Gunthorpe <jgg@nvidia.com>
+References: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
+ <20211217063708.1740334-8-baolu.lu@linux.intel.com>
+ <dd797dcd-251a-1980-ca64-bb38e67a526f@arm.com>
+ <20211221184609.GF1432915@nvidia.com>
+ <aebbd9c7-a239-0f89-972b-a9059e8b218b@arm.com>
+ <20211223005712.GA1779224@nvidia.com>
+ <fea0fc91-ac4c-dfe4-f491-5f906bea08bd@linux.intel.com>
+ <20211223140300.GC1779224@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <50b8bb0f-3873-b128-48e8-22f6142f7118@linux.intel.com>
+Date:   Fri, 24 Dec 2021 09:30:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <20211223140300.GC1779224@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/23/21 19:34, Sean Christopherson wrote:
->>   	select HAVE_KVM_PM_NOTIFIER if PM
->> +	select MEMFD_OPS
-> MEMFD_OPS is a weird Kconfig name given that it's not just memfd() that can
-> implement the ops.
+Hi Jason,
+
+On 12/23/21 10:03 PM, Jason Gunthorpe wrote:
+>>> I think it would be clear why iommu_group_set_dma_owner(), which
+>>> actually does detatch, is not the same thing as iommu_attach_device().
+>> iommu_device_set_dma_owner() will eventually call
+>> iommu_group_set_dma_owner(). I didn't get why
+>> iommu_group_set_dma_owner() is special and need to keep.
+> Not quite, they would not call each other, they have different
+> implementations:
 > 
+> int iommu_device_use_dma_api(struct device *device)
+> {
+> 	struct iommu_group *group = device->iommu_group;
+> 
+> 	if (!group)
+> 		return 0;
+> 
+> 	mutex_lock(&group->mutex);
+> 	if (group->owner_cnt != 0 ||
+> 	    group->domain != group->default_domain) {
+> 		mutex_unlock(&group->mutex);
+> 		return -EBUSY;
+> 	}
+> 	group->owner_cnt = 1;
+> 	group->owner = NULL;
+> 	mutex_unlock(&group->mutex);
+> 	return 0;
+> }
 
-Or, it's kvm that implements them to talk to memfd?
+It seems that this function doesn't work for multi-device groups. When
+the user unbinds all native drivers from devices in the group and start
+to bind them with vfio-pci and assign them to user, how could iommu know
+whether the group is viable for user?
 
-Paolo
+> 
+> int iommu_group_set_dma_owner(struct iommu_group *group, struct file *owner)
+> {
+> 	mutex_lock(&group->mutex);
+> 	if (group->owner_cnt != 0) {
+> 		if (group->owner != owner)
+> 			goto err_unlock;
+> 		group->owner_cnt++;
+> 		mutex_unlock(&group->mutex);
+> 		return 0;
+> 	}
+> 	if (group->domain && group->domain != group->default_domain)
+> 		goto err_unlock;
+> 
+> 	__iommu_detach_group(group->domain, group);
+> 	group->owner_cnt = 1;
+> 	group->owner = owner;
+> 	mutex_unlock(&group->mutex);
+> 	return 0;
+> 
+> err_unlock;
+> 	mutex_unlock(&group->mutex);
+> 	return -EBUSY;
+> }
+> 
+> It is the same as how we ended up putting the refcounting logic
+> directly into the iommu_attach_device().
+> 
+> See, we get rid of the enum as a multiplexor parameter, each API does
+> only wnat it needs, they don't call each other.
+
+I like the idea of removing enum parameter and make the API name
+specific. But I didn't get why they can't call each other even the
+data in group is the same.
+
+> 
+> We don't need _USER anymore because iommu_group_set_dma_owner() always
+> does detatch, and iommu_replace_group_domain() avoids ever reassigning
+> default_domain. The sepecial USER behavior falls out automatically.
+
+This means we will grow more group-centric interfaces. My understanding
+is the opposite that we should hide the concept of group in IOMMU
+subsystem, and the device drivers only faces device specific interfaces.
+
+The iommu groups are created by the iommu subsystem. The device drivers
+don't play any role in determining which device belongs to which group.
+So the iommu interfaces for device driver shouldn't rely on the group.
+
+Best regards,
+baolu
