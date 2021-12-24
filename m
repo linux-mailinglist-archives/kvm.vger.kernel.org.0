@@ -2,46 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3625F47EAA5
-	for <lists+kvm@lfdr.de>; Fri, 24 Dec 2021 03:50:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6BA247EACE
+	for <lists+kvm@lfdr.de>; Fri, 24 Dec 2021 04:20:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351000AbhLXCum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Dec 2021 21:50:42 -0500
-Received: from mail-bn1nam07on2078.outbound.protection.outlook.com ([40.107.212.78]:64834
-        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1350885AbhLXCul (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Dec 2021 21:50:41 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AUKrsO0+8K6dqR6MKJrTSiVdjQKs4FYd7zJmkHzz0H5QMcOQch2wU+SXEdfp7aMLhpAeTVGc1NXrMwqoLH9jlKJ9Qb2B9LcdH2QY1G32WdSblcJN+ULECCsMFibSc+gV9wQVZmTjC4aWZ0PM/m1jNtkcK/khvL4H6FnU5kSsMrhvocA2IlCMfKOA3uPih7v+nf9pUk1K6ZjH3WDIZO0SSnoHRqIESh96mbGjN/ieXdnXldqVuxElVyi7F02Ze9NfYwSxhj4OOMdAmusoXAmeCl3243hj9XgrdAswwE1/evasMFRyKWj1ZsxiO+jtgMKoXFBi56wjLjLU83TsOfzGQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WcgCT2Z8fo+N7Fhombpe1mL3S24LHC2LNxt2IsC0hUg=;
- b=cBWc9OClJPvIqaFjVUo5x8a4ss7y9Q6D/D+KPloZ118y/nPJ2o8no/L0xSNmzdKtb6Jfcb6MaqlT9dom8kQoCs2jF/i/LFXm4HBguG4oy6mmPsU6gzF/xDJ8irk2IFrkS8Kjnh2bXvLpdsrgC+L8BCh0fRzpqz4tQkZCHQ4Yc2yD/DU+v3saVtgGvCrF2ZxEWyZh5u4n9/fOlMcNC1B01XUp2I5zDSfSNJ1RLpuL3Gt14XMiScdwFGvzCCEhoZOR+H1XGjPPyM80p/V5FgGhX4SyweRVSwWUrsX4bkcbgo9G9bg9AiBkUW9nIhHhD2QzG5I8Tm4UVWpo+mrwWjPm6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WcgCT2Z8fo+N7Fhombpe1mL3S24LHC2LNxt2IsC0hUg=;
- b=Q5DDKtcDNLE8kIcde2+I7sebTLDZrL9+jM1axAMjHBW4+jYe1rVGrtCOOwK2gxuk7zyext2Opt+2pLmMhnZ5AIHr4M2dKB81d+d8BfFwp4kG9zeUSFLCRDMnRG6pjqWQuXbc93c1xeKXrHK5kEJ8K6jWFk27BJO4a/FnqIhlvBhGGSVpJFoiPoOeW9GkPQnmwRQTvJc0CvuFZ+32C7jspf0cV/MsxzsoYwUSdE1NBchUXoCKxwJTvjXyqvsoyKvdOoF/y/RTzW2A1Uhs/oQ1ZPgXEpvK3AK3qoebhZdg7bcfLCJxC7WHPKyH/EcDFsW5OcCKpI9fLNLpDismdCkDKw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5336.namprd12.prod.outlook.com (2603:10b6:208:314::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4823.19; Fri, 24 Dec
- 2021 02:50:38 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d8be:e4e4:ce53:6d11]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d8be:e4e4:ce53:6d11%7]) with mapi id 15.20.4823.019; Fri, 24 Dec 2021
- 02:50:38 +0000
-Date:   Thu, 23 Dec 2021 22:50:36 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
+        id S1351124AbhLXDUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Dec 2021 22:20:21 -0500
+Received: from mga05.intel.com ([192.55.52.43]:49820 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1351118AbhLXDUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Dec 2021 22:20:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640316017; x=1671852017;
+  h=cc:subject:to:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=wMsPZOHR5Bi7De06AcwKKVBkiYof5dOFy5ubdt3p48k=;
+  b=XBuGWIv3Mw8IupdKCDRmavyeiXSQgBl8DhWpCU/cI9ntJDqIm9WOtdks
+   uZwQAsMC/H67nj+DZa4HoeFoHHnF7Ti2hCsSduqg0SrNA887xOcyMEmgC
+   zplYola+7un4jSeYoQ3eCTudsZwcHUFVYBvZqeVivvNU4A4Hn6RDDD4G7
+   Hxy2lgmxiJk+v7nLS7s7MTdFzWdgC/2c+ytgHAUCuZq0rtZ1tpet+GMZy
+   YI+FQ/s5SbuAoQOtoXtxb1/lHASaWXlb74IBHefpPfsJ8ieA/BThgnmqP
+   oQpGmL3WR+HIJ40fuk0/Ux+ZHdS+FZfDuacWA8ZkTCBXqGC7LiVByUxVM
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10207"; a="327244566"
+X-IronPort-AV: E=Sophos;i="5.88,231,1635231600"; 
+   d="scan'208";a="327244566"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2021 19:20:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,231,1635231600"; 
+   d="scan'208";a="664757217"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by fmsmga001.fm.intel.com with ESMTP; 23 Dec 2021 19:20:09 -0800
+Cc:     baolu.lu@linux.intel.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -68,205 +61,277 @@ Cc:     Robin Murphy <robin.murphy@arm.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v4 07/13] iommu: Add iommu_at[de]tach_device_shared() for
  multi-device groups
-Message-ID: <20211224025036.GD1779224@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
 References: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
  <20211217063708.1740334-8-baolu.lu@linux.intel.com>
  <dd797dcd-251a-1980-ca64-bb38e67a526f@arm.com>
  <20211221184609.GF1432915@nvidia.com>
  <aebbd9c7-a239-0f89-972b-a9059e8b218b@arm.com>
- <20211223005712.GA1779224@nvidia.com>
- <fea0fc91-ac4c-dfe4-f491-5f906bea08bd@linux.intel.com>
- <20211223140300.GC1779224@nvidia.com>
- <50b8bb0f-3873-b128-48e8-22f6142f7118@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50b8bb0f-3873-b128-48e8-22f6142f7118@linux.intel.com>
-X-ClientProxiedBy: MN2PR16CA0004.namprd16.prod.outlook.com
- (2603:10b6:208:134::17) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <b4405a5e-c4cc-f44a-ab43-8cb62b888565@linux.intel.com>
+Date:   Fri, 24 Dec 2021 11:19:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7d3c78d8-9f96-45d5-69b0-08d9c6882a82
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5336:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB533696E6B7C42E178E322574C27F9@BL1PR12MB5336.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: whKNVD/pznbTd0ZXR0nZxS/ILsl9oL5gkhiEDw08CmJ8hM3hx55Vqj8wR3zpZXtfpWOFZr7+9rjKYiaJIFG3SK6N3+r3xDCBaOplvrrH9IjWSRPMJCtQVIpxi3B5s1iQTnVn2I+evOK3DMaZEafP1ombkyIFWbJr4VSbzMtvn2Di4H4hwgf4Fb3AQKTKPeUp7VE4NVrVMAFSi2LeB6v0GaW1lyxCXfFzgfiq6M+CCWi5cI3C4UasrIrQLSoFt3TFlbNT/F9rLfJKlzb2L2htXPHye/zIPMghlLGfySw8zgVF9BLcLe/8exXfty74WABooxPbV/Xkxy8Tyo4cfeks3yMPYAMbXVDua0EvnvVJbwC4zPVAkxa/ouN4PXcGJmFrNjZfIRM4xi4cY3wzTsqln12nWz//pDYiOhdryATfhMsU65usz/H2LMQNCGG7vwdNNLaIs9IhUczvfOatHptPOpr2lODvw3+R6zzaqx1637A0tmEXexbkXSixEjDfFRDAZ2ZUibpVGtq/USJkvRxwJ1XRtiKWa3ptzVCRfspGPPiFXDAmVD5rN50Nhe283OppgQ0rC3flzCAVrZAlDKhVXIg9JK5oJdc2vjWtTNYxppqTp10EpIfxfQKv4HL99PL0ikt06ueIZnPDPejJujWV1w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(36756003)(8676002)(186003)(2616005)(26005)(508600001)(5660300002)(6512007)(6486002)(33656002)(8936002)(53546011)(66476007)(38100700002)(7416002)(6916009)(66946007)(2906002)(6506007)(54906003)(316002)(83380400001)(4326008)(66556008)(1076003)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xN+JxGmzyMHn1Sgl56ROULEyf/cVDjbZYECfkhLDIchvkQNUtDlF4F1vTHCN?=
- =?us-ascii?Q?pCyvtVhpHUYFWE7CMVRZ6l6kgJjR0BGxvLKwS9Oz5FyZcYx1B7Syfwugw+Uk?=
- =?us-ascii?Q?idg30uGg8GQKmoitOL2fBliMtjzFon+khLZQLqtrHNEpjh9fRNGhkjtpigeH?=
- =?us-ascii?Q?na2Scy/cMlOFhrlWcmDiucWiwldkhfGdxvTYGqnx7na8KVaosmIGfuaEmalq?=
- =?us-ascii?Q?gN6oJcP8Oixm3glu/XEjolUp50lL36woQHg+LHOAq0ZnrCCXIQbEF25P+/TI?=
- =?us-ascii?Q?N+GtgxgT2iiypcZMl4riHvRoE3s5mXqU1SgkgQRHejxfSlYWsI+pdv3w33I8?=
- =?us-ascii?Q?wV3qzPUYf/6mIdxCabJkC6yjoJUCLYBgHtFG84DxJKfXw08KY/R86es+CW1z?=
- =?us-ascii?Q?qPXu2VEp4s7nPlfZbPbITXn2SZYDprzrNYfvaxrhBDczoFJOxJ3kuVnsEUoh?=
- =?us-ascii?Q?R37mjXgGa4g9vXcd+eQr/t2bGS+LR+QsRtYt+sOUC1ihv+SzfZHCQr10ynrG?=
- =?us-ascii?Q?J+fctkPqC7/H1I4CyOndHPso7biHkjK0z4VLdfQzgFeONt6M4XeTxDCh32lc?=
- =?us-ascii?Q?YOJTlrXrpzyWYOw3vABeYIjFNfSktXuFuLy4b+fDaeWqcpuY8tHMfY+lbMtX?=
- =?us-ascii?Q?JDH0YXWPfxJSmwsxR3mDzzk4uc/aslOGFzH3oHAK6ledHvbB6hPkDYa/WOMl?=
- =?us-ascii?Q?yZtuYgg/p43hTBQxnw3H7tMNH0vdambn4yttYzdmwVtv9juELBDMG1o1P/pE?=
- =?us-ascii?Q?8GFILQjk9w8IE41rNmm3thXO50TQtoMQttuBd9T0U/NAMbLI3sKNausoLj7Y?=
- =?us-ascii?Q?UgQKjWq0YpytCHGj2deoAhKG1I3LV1Z2JnwgL5T/Y4o/i7zIruYSHTYQHgrq?=
- =?us-ascii?Q?10/R9HYksC/bZExazP80wpYQTmf9qLDVImlWoJo7V4F6e7sCFlSYBKdUnMdd?=
- =?us-ascii?Q?AU1T1V6m+/1F7RMdplNIsNOkIhJk0XT2Ru1ie+zqCm6PTlH6Cijk44Tx6QmL?=
- =?us-ascii?Q?IzuaAXTwNoMVW508G1+V8+gNhi2oTam+zyA8Q/P3XjKtfUr6xGJMqafojSfT?=
- =?us-ascii?Q?G9ojaCLv/bY5EQBM5xeaTFnFs8F+dtO1XDuPsjGggmLmhtpvoukVtpANhFWK?=
- =?us-ascii?Q?tjppKpFDA5uR/uteFlcWOdSfHncHsw0GXWJ8tZRWAWUERZ00iA8y2zpflwEo?=
- =?us-ascii?Q?km0hcvCk9D76In3fgz/rHRluyLuI1ilTuCCowEWmrK53DD7GK22Bp8XH9a1R?=
- =?us-ascii?Q?HeA8wmpeJoGTd1G9/9MolUoGvQCao9GuHeByM7EiBU5NO4rUsAcIebqOBcao?=
- =?us-ascii?Q?jPpXqVeuQMizM5lUQXyscmx6ivV+TupjRWYOB+njfVUqLbY7n9G017xVHq8A?=
- =?us-ascii?Q?J0LhIly6koL/awSJ4GNOBDNvX1W5h8KKuvqq6G2IlZED86EvSvVxGwtBmf+2?=
- =?us-ascii?Q?NIKgwWRGTGq16DBUo6g8HVlT8joaFSIaiLccwBV8M6EgMDQdio6/MK7IswMB?=
- =?us-ascii?Q?hn6JZClE2LcIE858J8aWuzojch4nj7mjOZ44gFWf5ecgitL09PsawjrA5Z6v?=
- =?us-ascii?Q?AVEh+ZshDVuhYAo8Lnk=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d3c78d8-9f96-45d5-69b0-08d9c6882a82
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Dec 2021 02:50:38.3489
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zTz0yz5t/XzwnIL/LHm8GuyRdTG6/pRS6kbdnEcZtp3B44/N2VVLaCPyjfUcAbQp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5336
+In-Reply-To: <aebbd9c7-a239-0f89-972b-a9059e8b218b@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 24, 2021 at 09:30:17AM +0800, Lu Baolu wrote:
-> Hi Jason,
+On 12/23/21 4:26 AM, Robin Murphy wrote:
+> On 21/12/2021 6:46 pm, Jason Gunthorpe wrote:
+>> On Tue, Dec 21, 2021 at 04:50:56PM +0000, Robin Murphy wrote:
+>>
+>>> this proposal is the worst of both worlds, in that drivers still have 
+>>> to be
+>>> just as aware of groups in order to know whether to call the _shared
+>>> interface or not, except it's now entirely implicit and non-obvious.
+>>
+>> Drivers are not aware of groups, where did you see that?
 > 
-> On 12/23/21 10:03 PM, Jason Gunthorpe wrote:
-> > > > I think it would be clear why iommu_group_set_dma_owner(), which
-> > > > actually does detatch, is not the same thing as iommu_attach_device().
-> > > iommu_device_set_dma_owner() will eventually call
-> > > iommu_group_set_dma_owner(). I didn't get why
-> > > iommu_group_set_dma_owner() is special and need to keep.
-> > Not quite, they would not call each other, they have different
-> > implementations:
-> > 
-> > int iommu_device_use_dma_api(struct device *device)
-> > {
-> > 	struct iommu_group *group = device->iommu_group;
-> > 
-> > 	if (!group)
-> > 		return 0;
-> > 
-> > 	mutex_lock(&group->mutex);
-> > 	if (group->owner_cnt != 0 ||
-> > 	    group->domain != group->default_domain) {
-> > 		mutex_unlock(&group->mutex);
-> > 		return -EBUSY;
-> > 	}
-> > 	group->owner_cnt = 1;
-> > 	group->owner = NULL;
-> > 	mutex_unlock(&group->mutex);
-> > 	return 0;
-> > }
+> `git grep iommu_attach_group -- :^drivers/iommu :^include`
 > 
-> It seems that this function doesn't work for multi-device groups. When
-> the user unbinds all native drivers from devices in the group and start
-> to bind them with vfio-pci and assign them to user, how could iommu know
-> whether the group is viable for user?
-
-It is just a mistake, I made this very fast. It should work as your
-patch had it with a ++. More like this:
-
-int iommu_device_use_dma_api(struct device *device)
-{
-	struct iommu_group *group = device->iommu_group;
-
-	if (!group)
-		return 0;
-
-	mutex_lock(&group->mutex);
-	if (group->owner_cnt != 0) {
-		if (group->domain != group->default_domain ||
-		    group->owner != NULL) {
-			mutex_unlock(&group->mutex);
-			return -EBUSY;
-		}
-	}
-	group->owner_cnt++;
-	mutex_unlock(&group->mutex);
-	return 0;
-}
-
-> > See, we get rid of the enum as a multiplexor parameter, each API does
-> > only wnat it needs, they don't call each other.
+> Did I really have to explain that?
 > 
-> I like the idea of removing enum parameter and make the API name
-> specific. But I didn't get why they can't call each other even the
-> data in group is the same.
-
-Well, I think when you type them out you'll find they don't work the
-same. Ie the iommu_group_set_dma_owner() does __iommu_detach_group()
-which iommu_device_use_dma_api() definately doesn't want to
-do. iommu_device_use_dma_api() checks the domain while
-iommu_group_set_dma_owner() must not.
-
-This is basically the issue, all the places touching ownercount are
-superficially the same but each use different predicates. Given the
-predicate is more than half the code I wouldn't try to share the rest
-of it. But maybe when it is all typed in something will become
-obvious?
-
-> > We don't need _USER anymore because iommu_group_set_dma_owner() always
-> > does detatch, and iommu_replace_group_domain() avoids ever reassigning
-> > default_domain. The sepecial USER behavior falls out automatically.
+> The drivers other than vfio_iommu_type1, however, do have a complete 
+> failure to handle, or even consider, any group that does not fit the 
+> particular set of assumptions they are making, but at least they only 
+> work in a context where that should not occur.
 > 
-> This means we will grow more group-centric interfaces. My understanding
-> is the opposite that we should hide the concept of group in IOMMU
-> subsystem, and the device drivers only faces device specific interfaces.
+>> Drivers have to indicate their intention, based entirely on their own
+>> internal design. If groups are present, or not is irrelevant to the
+>> driver.
+>>
+>> If the driver uses a single struct device (which is most) then it uses
+>> iommu_attach_device().
+>>
+>> If the driver uses multiple struct devices and intends to connect them
+>> all to the same domain then it uses the _shared variant. The only
+>> difference between the two is the _shared varient lacks some of the
+>> protections against driver abuse of the API.
+> 
+> You've lost me again; how are those intentions any different? Attaching 
+> one device to a private domain is a literal subset of attaching more 
+> than one device to a private domain. There is no "abuse" of any API 
+> anywhere; the singleton group restriction exists as a protective measure 
+> because iommu_attach_device() was already in use before groups were 
+> really a thing, in contexts where groups happened to be singleton 
+> already, but anyone adding *new* uses in contexts where that assumption 
+> might *not* hold would be in trouble. Thus it enforces DMA ownership by 
+> the most trivial and heavy-handed means of simply preventing it ever 
+> becoming shared in the first place.
+> 
+> Yes, I'm using the term "DMA ownership" in a slightly different context 
+> to the one in which you originally proposed it. Please step out of the 
+> userspace-device-assignment-focused bubble for a moment and stay with me...
+> 
+> So then we have the iommu_attach_group() interface for new code (and 
+> still nobody has got round to updating the old code to it yet), for 
+> which the basic use-case is still fundamentally "I want to attach my 
+> thing to my domain", but at least now forcing explicit awareness that 
+> "my thing" could possibly be inextricably intertwined with more than 
+> just the one device they expect, so potential callers should have a good 
+> think about that. Unfortunately this leaves the matter of who "owns" the 
+> group entirely in the hands of those callers, which as we've now 
+> concluded is not great.
+> 
+> One of the main reasons for non-singleton groups to occur is due to ID 
+> aliasing or lack of isolation well beyond the scope and control of 
+> endpoint devices themselves, so it's not really fair to expect every 
+> IOMMU-aware driver to also be aware of that, have any idea of how to 
+> actually handle it, or especially try to negotiate with random other 
+> drivers as to whether it might be OK to take control of their DMA 
+> address space too. The whole point is that *every* domain attach really 
+> *has* to be considered "shared" because in general drivers can't know 
+> otherwise. Hence the easy, if crude, fix for the original API.
+> 
+>> Nothing uses the group interface except for VFIO and stuff inside
+>> drivers/iommu. VFIO has a uAPI tied to the group interface and it
+>> is stuck with it.
+> 
+> Self-contradiction is getting stronger, careful...
+>>> Otherwise just add the housekeeping stuff to 
+>>> iommu_{attach,detach}_group() -
+>>> there's no way we want *three* attach/detach interfaces all with 
+>>> different
+>>> semantics.
+>>
+>> I'm not sure why you think 3 APIs is bad thing. Threes APIs, with
+>> clearly intended purposes is a lot better than one giant API with a
+>> bunch of parameters that tries to do everything.
+> 
+> Because there's only one problem to solve! We have the original API 
+> which does happen to safely enforce ownership, but in an implicit way 
+> that doesn't scale; then we have the second API which got past the 
+> topology constraint but unfortunately turns out to just be unsafe in a 
+> slightly different way, and was supposed to replace the first one but 
+> hasn't, and is a bit clunky to boot; now you're proposing a third one 
+> which can correctly enforce safe ownership for any group topology, which 
+> is simply combining the good bits of the first two. It makes no sense to 
+> maintain two bad versions of a thing alongside one which works better.
+> 
+> I don't see why anything would be a giant API with a bunch of parameters 
+> - depending on how you look at it, this new proposal is basically either 
+> iommu_attach_device() with the ability to scale up to non-trivial groups 
+> properly, or iommu_attach_group() with a potentially better interface 
+> and actual safety. The former is still more prevalent (and the interface 
+> argument compelling), so if we put the new implementation behind that, 
+> with the one tweak of having it set DMA_OWNER_PRIVATE_DOMAIN 
+> automatically, kill off iommu_attach_group() by converting its couple of 
+> users, and not only have we solved the VFIO problem but we've also 
+> finally updated all the legacy code for free! Of course you can have a 
+> separate version for VFIO to attach with DMA_OWNER_PRIVATE_DOMAIN_USER 
+> if you like, although I still fail to understand the necessity of the 
+> distinction.
+> 
+>> In this case, it is not simple to 'add the housekeeping' to
+>> iommu_attach_group() in a way that is useful to both tegra and
+>> VFIO. What tegra wants is what the _shared API implements, and that
+>> logic should not be open coded in drivers.
+>>
+>> VFIO does not want exactly that, it has its own logic to deal directly
+>> with groups tied to its uAPI. Due to the uAPI it doesn't even have a
+>> struct device, unfortunately.
+> 
+> Nope. VFIO has its own logic to deal with groups because it's the only 
+> thing that's ever actually tried dealing with groups correctly 
+> (unsurprisingly, given that it's where they came from), and every other 
+> private IOMMU domain user is just crippled or broken to some degree. All 
+> that proves is that we really should be policing groups better in the 
+> IOMMU core, per this series, because actually fixing all the other users 
+> to properly validate their device's group would be a ridiculous mess.
+> 
+> What VFIO wants is (conceptually[1]) "attach this device to my domain, 
+> provided it and any other devices in its group are managed by a driver I 
+> approve of." Surprise surprise, that's what any other driver wants as 
+> well! For iommu_attach_device() it was originally implicit, and is now 
+> further enforced by the singleton group restriction. For Tegra/host1x 
+> it's implicit in the complete obliviousness to the possibility of that 
+> not being the case.
+> 
+> Of course VFIO has a struct device if it needs one; it's trivial to 
+> resolve the member(s) of a group (and even more so once we can assume 
+> that a group may only ever contain mutually-compatible devices in the 
+> first place). How do you think vfio_bus_type() works?
+> 
+> VFIO will also need a struct device anyway, because once I get back from 
+> my holiday in the new year I need to start working with Simon on 
+> evolving the rest of the API away from bus->iommu_ops to dev->iommu so 
+> we can finally support IOMMU drivers coexisting[2].
+> 
+>> The reason there are three APIs is because there are three different
+>> use-cases. It is not bad thing to have APIs designed for the use cases
+>> they serve.
+> 
+> Indeed I agree with that second point, I'm just increasingly baffled how 
+> it's not clear to you that there is only one fundamental use-case here. 
+> Perhaps I'm too familiar with the history to objectively see how unclear 
+> the current state of things might be :/
+> 
+>>> It's worth taking a step back and realising that overall, this is really
+>>> just a more generalised and finer-grained extension of what 426a273834ea
+>>> already did for non-group-aware code, so it makes little sense *not* to
+>>> integrate it into the existing interfaces.
+>>
+>> This is taking 426a to it's logical conclusion and *removing* the
+>> group API from the drivers entirely. This is desirable because drivers
+>> cannot do anything sane with the group.
+> 
+> I am in complete agreement with that (to the point of also not liking 
+> patch #6).
+> 
+>> The drivers have struct devices, and so we provide APIs that work in
+>> terms of struct devices to cover both driver use cases today, and do
+>> so more safely than what is already implemented.
+> 
+> I am in complete agreement with that (given "both" of the supposed 3 
+> use-cases all being the same).
+> 
+>> Do not mix up VFIO with the driver interface, these are different
+>> things. It is better VFIO stay on its own and not complicate the
+>> driver world.
+> 
+> Nope, vfio_iommu_type1 is just a driver, calling the IOMMU API just like 
+> any other driver. I like the little bit where it passes itself to 
+> vfio_register_iommu_driver(), which I feel gets this across far more 
+> poetically than I can manage.
+> 
+> Thanks,
+> Robin.
+> 
+> [1] Yes, due to the UAPI it actually starts with the whole group rather 
+> than any particular device within it. Don't nitpick.
+> [2] 
+> https://lore.kernel.org/linux-iommu/2021052710373173260118@rock-chips.com/
 
-Ideally group interfaces would be reduced, but in this case VFIO needs
-the group. It has sort of a fundamental problem with its uAPI that
-expects the container is fully setup with a domain at the moment the
-group is attached. So deferring domain setup to when the device is
-available becomes a user visible artifact - and if this is important
-or not is a whole research question that isn't really that important
-for this series.
+Let me summarize what I've got from above comments.
 
-We also can't just pull a device out of thin air, a device that hasn't
-been probed() hasn't even had dma_configure called! Let alone the
-lifetime and locking problems with that kind of idea.
+1. Essentially we only need below interfaces for device drivers to
+    manage the I/O address conflict in iommu layer:
 
-So.. leaving it as a group interface makes the most sense,
-particularly for this series which is really about fixing the sharing
-model in the iommu core and deleting the BUG_ONs. 
+int iommu_device_set/release/query_kernel_dma(struct device *dev)
 
-Also, I'm sitting here looking at Robin's idea that
-iommu_attach_device() and iommu_attach_device_shared() should be the
-same - and that does seem conceptually appealing, but not so simple.
+- Device driver lets the iommu layer know that driver DMAs go through
+   the kernel DMA APIs. The iommu layer should use the default domain
+   for DMA remapping. No other domains could be attached.
+- Device driver lets the iommu layer know that driver doesn't do DMA
+   anymore and other domains are allowed to be attached.
+- Device driver queries "can I only do DMA through the kernel DMA API?
+   In other words, can I attach my own domain?"
 
-The difference is that iommu_attach_device_shared() requires the
-device_driver to have set suppress_auto_claim_dma_owner while
-iommu_attach_device() does not (Lu, please do add a kdoc comment
-documenting this, and maybe a WARN_ON check to enforce it).
 
-Changing all 11 drivers using iommu_attach_device() to also set
-suppress_auto_claim_dma_owner is something to do in another series,
-merged properly through the driver trees, if it is done at all. So
-this series needs to keep both APIs.
+int iommu_device_set/release_private_dma(struct device *dev)
 
-However, what we should be doing is fixing iommu_attach_device() to
-rely on the owner_cnt, and not iommu_group_device_count().
+- Device driver lets the iommu layer know that it wants to use its own
+   iommu domain. The iommu layer should detach the default domain and
+   allow the driver to attach or detach its own domain through
+   iommu_attach/detach_device() interfaces.
+- Device driver lets the iommy layer know that it on longer needs a
+   private domain.
 
-Basically it's logic should instead check for the owner_cnt == 1 and
-then transform the group from a DMA_OWNER_DMA_API to a
-DMA_OWNER_PRIVATE_DOMAIN. If we get rid of the enum then this happens
-naturally by making group->domain != group->default_domain. All that
-is missing is the owner_cnt == 1 check and some commentary.  Again
-also with a WARN_ON and documentation that
-suppress_auto_claim_dma_owner is not set. (TBH, I thought this was
-discussed already, I haven't yet carefully checked v4..)
+2. iommu_attach_group() vs. iommu_attach_device()
 
-Then, we rely on iommu_device_use_dma_api() to block further users of
-the group and remove the iommu_group_device_count() hack.
+   [HISTORY]
+   The iommu_attach_device() added first by commit <fc2100eb4d096> ("add
+   frontend implementation for the IOMMU API") in 2008. At that time,
+   there was no concept of iommu group yet.
 
-Jason
+   The iommu group was added by commit <d72e31c937462> ("iommu: IOMMU
+   Groups") four years later in 2012. The iommu_attach_group() was added
+   at the same time.
+
+   Then, people realized that iommu_attach_device() allowed different
+   device in a same group to attach different domain. This was not in
+   line with the concept of iommu group. The commit <426a273834eae>
+   ("iommu: Limit iommu_attach/detach_device to device with their own
+   group") fixed this problem in 2015.
+
+   [REALITY]
+   We have two coexisting interfaces for device drivers to do the same
+   thing. But neither is perfect:
+
+   - iommu_attach_device() only works for singleton group.
+   - iommu_attach_group() asks the device drivers to handle iommu group
+     related staff which is beyond the role of a device driver.
+
+   [FUTURE]
+   Considering from the perspective of a device driver, its motivation is
+   very simple: "I want to manage my own I/O address space. The kernel
+   DMA API is not suitable for me because it hides the I/O address space
+   details in the lower layer which is transparent to me."
+
+   We consider heading in this direction:
+
+   Make the iommu_attach_device() the only and generic interface for the
+   device drivers to use their own private domain (I/O address space)
+   and replace all iommu_attach_group() uses with iommu_attach_device()
+   and deprecate the former.
+
+That's all. Did I miss or misunderstand anything?
+
+Best regards,
+baolu
