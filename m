@@ -2,263 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C0C947F2BB
-	for <lists+kvm@lfdr.de>; Sat, 25 Dec 2021 10:11:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5382F47F3EB
+	for <lists+kvm@lfdr.de>; Sat, 25 Dec 2021 17:56:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231241AbhLYJLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Dec 2021 04:11:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23360 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231231AbhLYJLt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 25 Dec 2021 04:11:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640423509;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zldxMj+mOa4xEISADiWr6dy8ahQABwEEuVquONVwlSU=;
-        b=JgQKMW410OGdMcJr6PY7zvp77t7OpgOX3tOQDqWuawPLF4ZmJX2QffLTquXENoKiFrLswP
-        3QAAdPwMJRMl95vH2YLnJ0aI/DhcBNui9oD/6sXSCFYL06eIYK6H5JVgR/7QyPlXkfwQV7
-        BGh6w4F1PiMnfrIqfPKWtYVMgRYXCWY=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-235-u9fIwpFWPQmQArZFmw63UA-1; Sat, 25 Dec 2021 04:11:47 -0500
-X-MC-Unique: u9fIwpFWPQmQArZFmw63UA-1
-Received: by mail-ed1-f72.google.com with SMTP id g11-20020a056402090b00b003f8fd1ac475so147795edz.1
-        for <kvm@vger.kernel.org>; Sat, 25 Dec 2021 01:11:47 -0800 (PST)
+        id S232364AbhLYQ4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Dec 2021 11:56:17 -0500
+Received: from mail-il1-f199.google.com ([209.85.166.199]:49945 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230158AbhLYQ4Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Dec 2021 11:56:16 -0500
+Received: by mail-il1-f199.google.com with SMTP id r12-20020a056e0219cc00b002b52dee3ee1so2922807ill.16
+        for <kvm@vger.kernel.org>; Sat, 25 Dec 2021 08:56:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zldxMj+mOa4xEISADiWr6dy8ahQABwEEuVquONVwlSU=;
-        b=poSEkEHnvmUwR5Y6hz8BxVUrOy1hWSqKdD6wyd/MXhKxIiZ426hUvfibGU4EjMBSaU
-         x2zoM2DW99JpR0hqC6DnljhhgJahm0Y4/w1IKKR6Gobpf4Z3wO1jAsHaKiF4g9VUOsM5
-         iPUkD+uC8l3HmhR2mFDT/mB2m2tVEcNgH8iApHtt+q3mT+w7PHVWEnVl6fmuU0VKiR3i
-         A70O7/HDtLtF0//E8Vg/hTvhEkUsOeVBEdOnmb5pce0XYdlu3S9nHLd9ZPst38GR7nFZ
-         98JMXIHdTQRIugJwZC1GWIKeM5L2rBH43E7KfgH3ZjZtjxjPVzQq5j/f9g/gKaaR8WQf
-         OsgQ==
-X-Gm-Message-State: AOAM53259yaz1rBGlvQXkFU9e+cbu9SlYL5zolGZoMQH/EQHJ7scgmWa
-        sePkJ/r5JxS7M63w6G3WTBB7t3tu977wJDmjaw+SSIQky5wyDmTPwAyP7YLG997uSLeo6Y8Qmhy
-        f3Ti7VtlQSS6a
-X-Received: by 2002:a17:907:9717:: with SMTP id jg23mr8342950ejc.593.1640423505855;
-        Sat, 25 Dec 2021 01:11:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxYG9NlF9xuaeOATknk+JawNqx6o5eHic3XVZf5gR+23IdJV86It317VASJSiDbLfIH+6i+wA==
-X-Received: by 2002:a17:907:9717:: with SMTP id jg23mr8342924ejc.593.1640423505581;
-        Sat, 25 Dec 2021 01:11:45 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id y17sm3923961edd.31.2021.12.25.01.11.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Dec 2021 01:11:44 -0800 (PST)
-Date:   Sat, 25 Dec 2021 10:11:42 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        Nathan Tempelman <natet@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH RFC 02/10] kvm: selftests: move ucall declarations into
- ucall_common.h
-Message-ID: <20211225091142.k6szpew4uatrvaus@gator.home>
-References: <20211210164620.11636-1-michael.roth@amd.com>
- <20211210164620.11636-3-michael.roth@amd.com>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=LZ85zs7UbC00u/OM5zrLGntNtou/HLcWoZgXMiysNFw=;
+        b=Uixjr5k3j9Nd+WN7rQhfO3f7+EkOTVE35T6WQAnygiIOgDxd9kRzq4HogrUvmWlusx
+         IsBYyXjTzj0KRMHHlIenKUiQzSfHbiRdIJxChfYxJ/+xLQ6fCCJYo0Y8J6m+gWvdSXM6
+         AxeMrjysiOn+8D9C9gsQE/bsysQwTxQ6MPOI++JRGObSxgHRGJiQW3Kya/qH+PMlHqxh
+         2u4kaBhOSg4yiINnMZOCwZyurcRETVWrVHBPU5jnFaN42Na0TCQEKWAGh5cB8Np0ihnG
+         sIpmYyhpgMxEVWId8F6xAKZavEGfLSrQG4ZxA2Kw9m5U7zXnhDwDuePvnB3gFVMsk2pQ
+         4v9g==
+X-Gm-Message-State: AOAM533TUf6Jkl3cVq2yiqEm7DlNIIjURH+9gmCnxhGf9o3X7zIy77e+
+        EMgjIQW/w5/oXhk7fDSmDKYDaDvbUmwsuaemweTfg51snNmb
+X-Google-Smtp-Source: ABdhPJwyhrqW5eugjWkaVTs5R1j1sJSma1SgbZxdpddKB5lcH9YqW/iijN5GYp0iJnaO6aDZfrR1CI6USF2l1c29bK37EKUgHRCc
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211210164620.11636-3-michael.roth@amd.com>
+X-Received: by 2002:a05:6638:8:: with SMTP id z8mr5075267jao.199.1640451376043;
+ Sat, 25 Dec 2021 08:56:16 -0800 (PST)
+Date:   Sat, 25 Dec 2021 08:56:16 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008a5baf05d3fb593e@google.com>
+Subject: [syzbot] WARNING in vmx_queue_exception
+From:   syzbot <syzbot+82112403ace4cbd780d8@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 10:46:12AM -0600, Michael Roth wrote:
-> Now that core kvm_util declarations have special home in
-> kvm_util_base.h, move ucall-related declarations out into a separate
-> header.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
->  .../selftests/kvm/include/kvm_util_base.h     | 49 ---------------
->  .../selftests/kvm/include/ucall_common.h      | 59 +++++++++++++++++++
->  3 files changed, 60 insertions(+), 49 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/ucall_common.h
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index c860ced3888d..c9286811a4cb 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -8,5 +8,6 @@
->  #define SELFTEST_KVM_UTIL_H
->  
->  #include "kvm_util_base.h"
-> +#include "ucall_common.h"
->  
->  #endif /* SELFTEST_KVM_UTIL_H */
+Hello,
 
-Now that kvm_util.h is looking like a "libkvm.h", then we can do some more
-header cleanups to make that official. After this series is merged I'll
-send a series that
+syzbot found the following issue on:
 
- - removes unnecessary includes from kvm_util_common.h and other headers
- - renames kvm_util.h to libkvm.h
- - also includes guest_modes.h and test_util.h from libkvm.h
- - simplify the includes of all unit tests since they'll be including
-   libkvm.h
- - probably move include/sparsebit.h to lib, since no unit test needs it
+HEAD commit:    6e0567b73052 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=128c1adbb00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6104739ac5f067ea
+dashboard link: https://syzkaller.appspot.com/bug?extid=82112403ace4cbd780d8
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Thanks,
-drew
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 8fb6aeff5469..4e2946ba3ff7 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -360,55 +360,6 @@ int vm_create_device(struct kvm_vm *vm, struct kvm_create_device *cd);
->  
->  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
->  
-> -/* Common ucalls */
-> -enum {
-> -	UCALL_NONE,
-> -	UCALL_SYNC,
-> -	UCALL_ABORT,
-> -	UCALL_DONE,
-> -	UCALL_UNHANDLED,
-> -};
-> -
-> -#define UCALL_MAX_ARGS 6
-> -
-> -struct ucall {
-> -	uint64_t cmd;
-> -	uint64_t args[UCALL_MAX_ARGS];
-> -};
-> -
-> -void ucall_init(struct kvm_vm *vm, void *arg);
-> -void ucall_uninit(struct kvm_vm *vm);
-> -void ucall(uint64_t cmd, int nargs, ...);
-> -uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
-> -
-> -#define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
-> -				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
-> -#define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
-> -#define GUEST_DONE()		ucall(UCALL_DONE, 0)
-> -#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
-> -	if (!(_condition))                                              \
-> -		ucall(UCALL_ABORT, 2 + _nargs,                          \
-> -			"Failed guest assert: "                         \
-> -			_condstr, __LINE__, _args);                     \
-> -} while (0)
-> -
-> -#define GUEST_ASSERT(_condition) \
-> -	__GUEST_ASSERT(_condition, #_condition, 0, 0)
-> -
-> -#define GUEST_ASSERT_1(_condition, arg1) \
-> -	__GUEST_ASSERT(_condition, #_condition, 1, (arg1))
-> -
-> -#define GUEST_ASSERT_2(_condition, arg1, arg2) \
-> -	__GUEST_ASSERT(_condition, #_condition, 2, (arg1), (arg2))
-> -
-> -#define GUEST_ASSERT_3(_condition, arg1, arg2, arg3) \
-> -	__GUEST_ASSERT(_condition, #_condition, 3, (arg1), (arg2), (arg3))
-> -
-> -#define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
-> -	__GUEST_ASSERT(_condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
-> -
-> -#define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
-> -
->  int vm_get_stats_fd(struct kvm_vm *vm);
->  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
->  
-> diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> new file mode 100644
-> index 000000000000..9eecc9d40b79
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> @@ -0,0 +1,59 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * tools/testing/selftests/kvm/include/kvm_util.h
-> + *
-> + * Copyright (C) 2018, Google LLC.
-> + */
-> +#ifndef SELFTEST_KVM_UCALL_COMMON_H
-> +#define SELFTEST_KVM_UCALL_COMMON_H
-> +
-> +/* Common ucalls */
-> +enum {
-> +	UCALL_NONE,
-> +	UCALL_SYNC,
-> +	UCALL_ABORT,
-> +	UCALL_DONE,
-> +	UCALL_UNHANDLED,
-> +};
-> +
-> +#define UCALL_MAX_ARGS 6
-> +
-> +struct ucall {
-> +	uint64_t cmd;
-> +	uint64_t args[UCALL_MAX_ARGS];
-> +};
-> +
-> +void ucall_init(struct kvm_vm *vm, void *arg);
-> +void ucall_uninit(struct kvm_vm *vm);
-> +void ucall(uint64_t cmd, int nargs, ...);
-> +uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
-> +
-> +#define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
-> +				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
-> +#define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
-> +#define GUEST_DONE()		ucall(UCALL_DONE, 0)
-> +#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
-> +	if (!(_condition))                                              \
-> +		ucall(UCALL_ABORT, 2 + _nargs,                          \
-> +			"Failed guest assert: "                         \
-> +			_condstr, __LINE__, _args);                     \
-> +} while (0)
-> +
-> +#define GUEST_ASSERT(_condition) \
-> +	__GUEST_ASSERT(_condition, #_condition, 0, 0)
-> +
-> +#define GUEST_ASSERT_1(_condition, arg1) \
-> +	__GUEST_ASSERT(_condition, #_condition, 1, (arg1))
-> +
-> +#define GUEST_ASSERT_2(_condition, arg1, arg2) \
-> +	__GUEST_ASSERT(_condition, #_condition, 2, (arg1), (arg2))
-> +
-> +#define GUEST_ASSERT_3(_condition, arg1, arg2, arg3) \
-> +	__GUEST_ASSERT(_condition, #_condition, 3, (arg1), (arg2), (arg3))
-> +
-> +#define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
-> +	__GUEST_ASSERT(_condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
-> +
-> +#define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
-> +
-> +#endif /* SELFTEST_KVM_UCALL_COMMON_H */
-> -- 
-> 2.25.1
-> 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+82112403ace4cbd780d8@syzkaller.appspotmail.com
 
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 28019 at arch/x86/kvm/vmx/vmx.c:1616 vmx_queue_exception+0x2f2/0x440 arch/x86/kvm/vmx/vmx.c:1616
+Modules linked in:
+CPU: 1 PID: 28019 Comm: syz-executor.5 Not tainted 5.16.0-rc6-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:vmx_queue_exception+0x2f2/0x440 arch/x86/kvm/vmx/vmx.c:1616
+Code: 41 5e 41 5f 5d e9 de b3 fd ff e8 79 22 60 00 eb 05 e8 72 22 60 00 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d c3 e8 5e 22 60 00 <0f> 0b e9 78 fe ff ff 89 f9 80 e1 07 38 c1 0f 8c 35 fd ff ff e8 15
+RSP: 0018:ffffc90010587450 EFLAGS: 00010287
+RAX: ffffffff812469b2 RBX: 0000000000000001 RCX: 0000000000040000
+RDX: ffffc900051ea000 RSI: 0000000000001923 RDI: 0000000000001924
+RBP: 0000000000000000 R08: ffffffff81246824 R09: ffffed100645904d
+R10: ffffed100645904d R11: 0000000000000000 R12: ffff8880322c8000
+R13: dffffc0000000000 R14: 0000000000000006 R15: 0000000080000006
+FS:  00007fe6788f8700(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4f4bcd8058 CR3: 0000000087d66000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ kvm_inject_exception arch/x86/kvm/x86.c:9071 [inline]
+ inject_pending_event arch/x86/kvm/x86.c:9145 [inline]
+ vcpu_enter_guest+0x19aa/0x9df0 arch/x86/kvm/x86.c:9801
+ vcpu_run+0x4d3/0xe50 arch/x86/kvm/x86.c:10055
+ kvm_arch_vcpu_ioctl_run+0x494/0xb20 arch/x86/kvm/x86.c:10250
+ kvm_vcpu_ioctl+0x894/0xe20 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3727
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fe679fa3e99
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe6788f8168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fe67a0b7030 RCX: 00007fe679fa3e99
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000f
+RBP: 00007fe679ffdff1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe39ef7acf R14: 00007fe6788f8300 R15: 0000000000022000
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
