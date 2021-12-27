@@ -2,104 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81F0F48036C
-	for <lists+kvm@lfdr.de>; Mon, 27 Dec 2021 19:33:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82F05480464
+	for <lists+kvm@lfdr.de>; Mon, 27 Dec 2021 20:29:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbhL0Sdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Dec 2021 13:33:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbhL0Sdu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Dec 2021 13:33:50 -0500
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38F7C06173E
-        for <kvm@vger.kernel.org>; Mon, 27 Dec 2021 10:33:50 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id g79-20020a9d12d5000000b0058f08f31338so21566441otg.2
-        for <kvm@vger.kernel.org>; Mon, 27 Dec 2021 10:33:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/ZPLneOgWxjVFWk6RqPAOGbtxrpi2B383af81OM9nLo=;
-        b=RYzqvVinREjuZKy26MOcu562md6FSDWkNifEyTHSlfRlOSW+YZQWp6ocrJkU+5L6UO
-         C3KKFrD6tNRm10043La7q1MPjC1Fh+6OD//554BZQxTuchlP+nztI03TvHhxl71qLXcl
-         vMGfTTGZ27q3vZipVQ2WNDcy9R8guMlHSXa7VzGu2HJNyjhgrI1RDBFYFlKhy8ALDwBM
-         i9SRI9GAisOAQ9kQMlZM9iK/cOKAhV0jvrPPZEtLo2RRT7N0bnx0xVQCSBpNXICaxZ6H
-         fl6MeZMiS51f6GNdwqG00e1NoibDtllKGLB+EXV0DovGY58keI/KuYeYTb+NRYvU15t4
-         L5NQ==
+        id S232395AbhL0T3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Dec 2021 14:29:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58546 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232349AbhL0T3l (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Dec 2021 14:29:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640633380;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GXeuw5/VQou208uQgpTgJva1XF/iFx6NuY0yYdLIPAM=;
+        b=VerxvA6yJeZAcC+JTFBFPdm2vmNeNAg3FgRCeU+YnB1Oar36Ar6m40fDhsTxQg0m9k4Ico
+        aCgoEv8rOKuS65riAHE7YMJEZE+W5W6sr7Y12NSixv6AA12FNZzgJM9PI41TmQlO45nCyu
+        zW4KVHnuhFYniWOCv1IzsLj1qa0Mz8M=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-641-rv3-Xs7BOHGQhVfqD5jZ2w-1; Mon, 27 Dec 2021 14:29:39 -0500
+X-MC-Unique: rv3-Xs7BOHGQhVfqD5jZ2w-1
+Received: by mail-ed1-f71.google.com with SMTP id z3-20020a05640240c300b003f9154816ffso2521816edb.9
+        for <kvm@vger.kernel.org>; Mon, 27 Dec 2021 11:29:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/ZPLneOgWxjVFWk6RqPAOGbtxrpi2B383af81OM9nLo=;
-        b=wBiJxp60UE/Sr3CMlbfmsxEXUW+srkjEzBKQYMNgseZeu9Zm22UCIuLuOO2jh2wQCq
-         FP4Z1q0CxeYTFjQ9twS0q845aKJ01mnsfLs8Yez2l705uAa9QDPLQ4rEil6KYbuhYdot
-         aO1GfBnbvWTNwscimcm7yhW9zkqXScU7xvSHHKPyNN5jldTkJsa8O+vDZmL98FMaMlhk
-         v0+lCJBtr4J1VIAFByxFftJsUqn3As6JUXGiKjwx6h6GqqzUD/o5vatB7w5geCv9u0c/
-         BxD+dV2uzahnvy7tQSJQQwqoCLfucPQ+A8b3wFdChAFhlUaDXHIXxN1JKXZ4/VFB78oS
-         Cecw==
-X-Gm-Message-State: AOAM5313D9cZc0TiFurrU0/D86C4rxYBExbtJ8U0GTzVs2BJsnVy7AhZ
-        smpM6RN1/SKrO3wm0eob6kdm76+9DsfWPZnXU1RLgA==
-X-Google-Smtp-Source: ABdhPJy/ONpip27iGSTlu2tXnpVqVrh2Czqg+M0eFyEx+CHyq8coylSbUJjwzVNmOf03K97F2ID1GXvpAYpp0Kxevq8=
-X-Received: by 2002:a05:6830:4a9:: with SMTP id l9mr10308821otd.75.1640630029610;
- Mon, 27 Dec 2021 10:33:49 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=GXeuw5/VQou208uQgpTgJva1XF/iFx6NuY0yYdLIPAM=;
+        b=VYpLmzm0fQSHrHu/ExRTFODMqL4ScvcsIq56pF+U42fwu3RUZCxS7du+uFzZb+Sq0a
+         OFX9lqEBNFG5AHXBlygBLULWS6wdzlojie2qRInbdZvuJrze6MpQtDDbw+evx6iy4lmn
+         TwhQvIiRXowkwmVo8bkxA36KPqxS2FOfctARctNCLVpShQ/LAO5V7mqyMKhATlYhBoS8
+         e1vPOFBqpF6aY4hqx5/MNP/VScBUqxzBLYsd9+b607cjXf7+2KdxajvWYcpVsdJuaffG
+         DcCaPYUR3nbZKGL9EJD6dSOcfQSNyRB77xfI0yNqNi/HvFcrRKj4rHjGjRX/stWxfyTz
+         tn5w==
+X-Gm-Message-State: AOAM533ZFE5OeIEqyf2S08Ys5nqCSuJ96Q+8XYhCRbs5J3F4MeI4u7Z8
+        V/Lp+s8njI1OBqlzTUtVPe5CkgUuSddRA6KeWM004LXzxxhcN9t4kOFbJOV01kdMGfbSlGT7uyA
+        4rGlBBmtLAIcN
+X-Received: by 2002:a17:906:58cf:: with SMTP id e15mr14661372ejs.343.1640633378223;
+        Mon, 27 Dec 2021 11:29:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxvH64YUKfWEKEQEA/Uc6NpU+N+4TFwpuSi74hwBNqKMn+Hyb+J7Dg7LDSADLd0E4kMs2bxmA==
+X-Received: by 2002:a17:906:58cf:: with SMTP id e15mr14661361ejs.343.1640633377972;
+        Mon, 27 Dec 2021 11:29:37 -0800 (PST)
+Received: from [192.168.8.101] (dynamic-046-114-172-006.46.114.pool.telefonica.de. [46.114.172.6])
+        by smtp.gmail.com with ESMTPSA id o22sm6556633edc.85.2021.12.27.11.29.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Dec 2021 11:29:37 -0800 (PST)
+Message-ID: <0eba82cd-e8aa-7aeb-f414-0909da19ef0d@redhat.com>
+Date:   Mon, 27 Dec 2021 20:29:34 +0100
 MIME-Version: 1.0
-References: <20211222133428.59977-1-likexu@tencent.com>
-In-Reply-To: <20211222133428.59977-1-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 27 Dec 2021 10:33:38 -0800
-Message-ID: <CALMp9eRNsKMB6onhc-nhW-aMb14gK1PCtQ_CxOoyZ5RvLHfvEQ@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: X86: Emulate APERF/MPERF to report actual vCPU frequency
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <likexu@tencent.com>,
-        Dongli Cao <caodongli@kingsoft.com>,
-        Li RongQing <lirongqing@baidu.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [kvm-unit-tests PATCH] scripts/arch-run: Mark migration tests as
+ SKIP if ncat is not available
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org, Eric Auger <eric.auger@redhat.com>
+References: <20211221092130.444225-1-thuth@redhat.com>
+ <ae15b86d-6e4d-78be-74da-845c3ef6b9ba@redhat.com>
+ <f8d97780-1d58-3dfb-10cc-eb1b8cd0c25a@redhat.com>
+ <a53a5e76-1bc7-075a-f644-2eded9963554@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <a53a5e76-1bc7-075a-f644-2eded9963554@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 22, 2021 at 5:34 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> The aperf/mperf are used to report current CPU frequency after 7d5905dc14a.
-> But guest kernel always reports a fixed vCPU frequency in the /proc/cpuinfo,
-> which may confuse users especially when turbo is enabled on the host or
-> when the vCPU has a noisy high power consumption neighbour task.
->
-> Most guests such as Linux will only read accesses to AMPERF msrs, where
-> we can passthrough registers to the vcpu as the fast-path (a performance win)
-> and once any write accesses are trapped, the emulation will be switched to
-> slow-path, which emulates guest APERF/MPERF values based on host values.
-> In emulation mode, the returned MPERF msr value will be scaled according
-> to the TSCRatio value.
->
-> As a minimum effort, KVM exposes the AMPERF feature when the host TSC
-> has CONSTANT and NONSTOP features, to avoid the need for more code
-> to cover various coner cases coming from host power throttling transitions.
->
-> The slow path code reveals an opportunity to refactor update_vcpu_amperf()
-> and get_host_amperf() to be more flexible and generic, to cover more
-> power-related msrs.
->
-> Requested-by: Dongli Cao <caodongli@kingsoft.com>
-> Requested-by: Li RongQing <lirongqing@baidu.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
+On 21/12/2021 18.25, Paolo Bonzini wrote:
+> On 12/21/21 11:12, Thomas Huth wrote:
+>> On 21/12/2021 10.58, Paolo Bonzini wrote:
+>>> On 12/21/21 10:21, Thomas Huth wrote:
+>>>> Instead of failing the tests, we should rather skip them if ncat is
+>>>> not available.
+>>>> While we're at it, also mention ncat in the README.md file as a
+>>>> requirement for the migration tests.
+>>>>
+>>>> Resolves: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/issues/4
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>
+>>> I would rather remove the migration tests.  There's really no reason for 
+>>> them, the KVM selftests in the Linux tree are much better: they can find 
+>>> migration bugs deterministically and they are really really easy to 
+>>> debug. The only disadvantage is that they are harder to write.
+>>
+>> I disagree: We're testing migration with QEMU here - the KVM selftests 
+>> don't include QEMU, so we'd lose some test coverage here.
+>> And at least the powerpc/sprs.c test helped to find some nasty bugs in the 
+>> past already.
+> 
+> I understand that this is testing QEMU, but I'm not sure that testing QEMU 
+> should be part of kvm-unit-tests.
 
-I am not sure that it is necessary for kvm to get involved in the
-virtualization of APERF and MPERF at all, and I am highly skeptical of
-the need for passing through the hardware MSRs to a guest. Due to
-concerns over potential side-channel exploits a la Platypus
-(https://platypusattack.com/), we are planning to provide only low
-fidelity APERF/MPERF virtualization from userspace, using the
-userspace MSR exiting mechanism. Of course, we should be able to do
-that whether or not this change goes in, but I was wondering if you
-could provide some more details regarding your use case(s).
+It's the combination of QEMU (migration handling) + KVM in the kernel 
+(register saving and restoring) that we are testing here. If you say that 
+QEMU should not be involved at all, we could also say that all 
+kvm-unit-tests should be converted to KVM selftests instead...
+
+>  Migrating an instance of QEMU that runs 
+> kvm-unit-tests would be done more easily in avocado-vt or avocado-qemu.
+
+But we don't have the environment for compiling small, Linux-independent 
+test kernels there, do we? So unless there is a way to write and compile 
+small test kernels in that framework, I think kvm-unit-tests is the better 
+fit for these kind of tests.
+
+  Thomas
+
