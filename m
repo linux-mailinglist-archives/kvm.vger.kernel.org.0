@@ -2,149 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8658E47FAED
-	for <lists+kvm@lfdr.de>; Mon, 27 Dec 2021 09:17:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85FD147FAEE
+	for <lists+kvm@lfdr.de>; Mon, 27 Dec 2021 09:17:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235560AbhL0IRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Dec 2021 03:17:13 -0500
-Received: from mga12.intel.com ([192.55.52.136]:31598 "EHLO mga12.intel.com"
+        id S235583AbhL0IRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Dec 2021 03:17:21 -0500
+Received: from mga09.intel.com ([134.134.136.24]:12161 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231358AbhL0IRM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Dec 2021 03:17:12 -0500
+        id S235566AbhL0IRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Dec 2021 03:17:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640593032; x=1672129032;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=tCJzGvAoR9V3Cf25Th6SaPQVLQdtAnnLPINob5E2Vys=;
-  b=CLSXoNF7DAYhlP6g9oHvqqHNlL25wbeXn08/h+oC8mbY1WOaOYL7uyKB
-   n5MjyUOfcA8xE5vcoyZP/95gcA5nmA/VdanDXxOORd85F8zQs0SCuYddK
-   g92KAAuC0ffcvQPc/PnJHVCYauF/MOROgSXkFtfYx9p+Lc/ZkUoSW/d8D
-   kZLJF8BWwZCIA3fCLaOk+Wj8HRSZnnvbFjIsRhTgHHDcGxf+CYbhoEGCI
-   Ld3X3cmk+1SxKfqhXhTfmC37k/wKgnSJ8Acplv1ht4005b7lYzPr2GZVT
-   yf523CC+7ZyKHfKjSekbj0y7qYaLgMVd7wcND9FEMTMmS6pUnahNXTHQj
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10209"; a="221182045"
-X-IronPort-AV: E=Sophos;i="5.88,239,1635231600"; 
-   d="scan'208";a="221182045"
+  t=1640593040; x=1672129040;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=gD95MZJuVqXHFQir/dDl6qfyNZH1jlwhc3VMpECHxWI=;
+  b=lqVxGsIa9tEiGAvJ0Jze1xLVUdkQREgazuZmz33RVf67cCj+cV6092yi
+   sJXDTXlXpJK8ecL5Xnq9DE5IdWOkhRCkOsWoM88RPSuMjJJ7/I5pw0oOO
+   NHYp18OYEJ1uj26b8T9RiK8KYviQrProBU40+6KUukajZRmK956eBjx3w
+   rEdWQ+2WzCA2g6ClmaN0ol8HeVMRT2DT5lmy+/dB9sKUUvJ/FG7V/ZTky
+   lYabIQaAQ9EMaj6LqGtqvf6kBfWRnglGrbmhihHEmIz7MN6JRSXCWTo9C
+   OKvqTdADr7EI21c9UDSSvVR2UsHdk93NxgouZva/ec/0yiqkZEL6qhtUg
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10209"; a="240985281"
+X-IronPort-AV: E=Sophos;i="5.88,237,1635231600"; 
+   d="scan'208";a="240985281"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2021 00:17:12 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2021 00:17:17 -0800
 X-IronPort-AV: E=Sophos;i="5.88,239,1635231600"; 
-   d="scan'208";a="523207964"
+   d="scan'208";a="523208000"
 Received: from unknown (HELO hyperv-sh4.sh.intel.com) ([10.239.48.22])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2021 00:16:56 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2021 00:17:12 -0800
 From:   Chao Gao <chao.gao@intel.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
         tglx@linutronix.de
-Cc:     Chao Gao <chao.gao@intel.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Guo Ren <guoren@linux.alibaba.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        John Garry <john.garry@huawei.com>,
-        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Ravi Bangoria <ravi.bangoria@linux.ibm.com>,
+Cc:     Chao Gao <chao.gao@intel.com>,
         Sean Christopherson <seanjc@google.com>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Sumanth Korikkar <sumanthk@linux.ibm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Richter <tmricht@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>, x86@kernel.org
-Subject: [PATCH 0/6] Improve KVM's interaction with CPU hotplug
-Date:   Mon, 27 Dec 2021 16:15:06 +0800
-Message-Id: <20211227081515.2088920-1-chao.gao@intel.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/6] KVM: x86: Move check_processor_compatibility from init ops to runtime ops
+Date:   Mon, 27 Dec 2021 16:15:07 +0800
+Message-Id: <20211227081515.2088920-2-chao.gao@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211227081515.2088920-1-chao.gao@intel.com>
+References: <20211227081515.2088920-1-chao.gao@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM registers its CPU hotplug callback to CPU starting section. And in the
-callback, KVM enables hardware virtualization on hotplugged CPUs if any VM
-is running on existing CPUs.
+so that KVM can do compatibility checks on hotplugged CPUs. Drop __init
+from check_processor_compatibility() and its callees.
 
-There are two problems in the process:
-1. KVM doesn't do compatibility checks before enabling hardware
-virtualization on hotplugged CPUs. This may cause #GP if VMX isn't
-supported or vmentry failure if some in-use VMX features are missing on
-hotplugged CPUs. Both break running VMs.
-2. Callbacks in CPU STARTING section cannot fail. So, even if KVM finds
-some incompatible CPUs, its callback cannot block CPU hotplug.
-
-This series improves KVM's interaction with CPU hotplug to avoid
-incompatible CPUs breaking running VMs. Following changes are made:
-
-1. move KVM's CPU hotplug callback to ONLINE section (suggested by Thomas)
-2. do compatibility checks on hotplugged CPUs.
-3. abort onlining incompatible CPUs if there is a running VM.
-
-This series is a follow-up to the discussion about KVM and CPU hotplug
-https://lore.kernel.org/lkml/3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com/T/
-
-Note: this series is tested only on Intel systems.
-
-Chao Gao (6):
-  KVM: x86: Move check_processor_compatibility from init ops to runtime
-    ops
-  KVM: x86: Use kvm_x86_ops in kvm_arch_check_processor_compat
-  KVM: Remove opaque from kvm_arch_check_processor_compat
-  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
-  KVM: x86: Remove WARN_ON in kvm_arch_check_processor_compat
-  KVM: Do compatibility checks on hotplugged CPUs
-
- arch/arm64/kvm/arm.c            |  2 +-
- arch/mips/kvm/mips.c            |  2 +-
- arch/powerpc/kvm/powerpc.c      |  2 +-
- arch/riscv/kvm/main.c           |  2 +-
- arch/s390/kvm/kvm-s390.c        |  2 +-
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+---
  arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/svm/svm.c          |  4 +-
+ arch/x86/kvm/svm/svm.c          |  4 ++--
  arch/x86/kvm/vmx/evmcs.c        |  2 +-
  arch/x86/kvm/vmx/evmcs.h        |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 12 +++---
- arch/x86/kvm/x86.c              |  7 +---
- include/linux/cpuhotplug.h      |  2 +-
- include/linux/kvm_host.h        |  2 +-
- virt/kvm/kvm_main.c             | 74 ++++++++++++++++++++++++---------
- 14 files changed, 74 insertions(+), 43 deletions(-)
+ arch/x86/kvm/vmx/vmx.c          | 12 ++++++------
+ arch/x86/kvm/x86.c              |  2 +-
+ 6 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5d97f4adc1cb..0d5dc148090c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1313,6 +1313,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
+ struct kvm_x86_ops {
+ 	const char *name;
+ 
++	int (*check_processor_compatibility)(void);
+ 	int (*hardware_enable)(void);
+ 	void (*hardware_disable)(void);
+ 	void (*hardware_unsetup)(void);
+@@ -1513,7 +1514,6 @@ struct kvm_x86_nested_ops {
+ struct kvm_x86_init_ops {
+ 	int (*cpu_has_kvm_support)(void);
+ 	int (*disabled_by_bios)(void);
+-	int (*check_processor_compatibility)(void);
+ 	int (*hardware_setup)(void);
+ 
+ 	struct kvm_x86_ops *runtime_ops;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 6cb38044a860..74c41a261633 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3825,7 +3825,7 @@ svm_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
+ 	hypercall[2] = 0xd9;
+ }
+ 
+-static int __init svm_check_processor_compat(void)
++static int svm_check_processor_compat(void)
+ {
+ 	return 0;
+ }
+@@ -4374,6 +4374,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.name = "kvm_amd",
+ 
+ 	.hardware_unsetup = svm_hardware_teardown,
++	.check_processor_compatibility = svm_check_processor_compat,
+ 	.hardware_enable = svm_hardware_enable,
+ 	.hardware_disable = svm_hardware_disable,
+ 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
+@@ -4743,7 +4744,6 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+ 	.cpu_has_kvm_support = has_svm,
+ 	.disabled_by_bios = is_disabled,
+ 	.hardware_setup = svm_hardware_setup,
+-	.check_processor_compatibility = svm_check_processor_compat,
+ 
+ 	.runtime_ops = &svm_x86_ops,
+ };
+diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+index ba6f99f584ac..50f923e9917e 100644
+--- a/arch/x86/kvm/vmx/evmcs.c
++++ b/arch/x86/kvm/vmx/evmcs.c
+@@ -296,7 +296,7 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+ };
+ const unsigned int nr_evmcs_1_fields = ARRAY_SIZE(vmcs_field_to_evmcs_1);
+ 
+-__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
++void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
+ {
+ 	vmcs_conf->pin_based_exec_ctrl &= ~EVMCS1_UNSUPPORTED_PINCTRL;
+ 	vmcs_conf->cpu_based_2nd_exec_ctrl &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
+diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+index 16731d2cf231..17a7c956396b 100644
+--- a/arch/x86/kvm/vmx/evmcs.h
++++ b/arch/x86/kvm/vmx/evmcs.h
+@@ -181,7 +181,7 @@ static inline void evmcs_load(u64 phys_addr)
+ 	vp_ap->enlighten_vmentry = 1;
+ }
+ 
+-__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
++void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
+ #else /* !IS_ENABLED(CONFIG_HYPERV) */
+ static __always_inline void evmcs_write64(unsigned long field, u64 value) {}
+ static inline void evmcs_write32(unsigned long field, u32 value) {}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index fe06b02994e6..de617a7bd966 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2373,8 +2373,8 @@ static bool cpu_has_sgx(void)
+ 	return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
+ }
+ 
+-static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+-				      u32 msr, u32 *result)
++static int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
++			       u32 msr, u32 *result)
+ {
+ 	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 ctl = ctl_min | ctl_opt;
+@@ -2392,8 +2392,8 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+ 	return 0;
+ }
+ 
+-static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+-				    struct vmx_capability *vmx_cap)
++static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
++			     struct vmx_capability *vmx_cap)
+ {
+ 	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 min, opt, min2, opt2;
+@@ -6990,7 +6990,7 @@ static int vmx_vm_init(struct kvm *kvm)
+ 	return 0;
+ }
+ 
+-static int __init vmx_check_processor_compat(void)
++static int vmx_check_processor_compat(void)
+ {
+ 	struct vmcs_config vmcs_conf;
+ 	struct vmx_capability vmx_cap;
+@@ -7578,6 +7578,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.hardware_unsetup = hardware_unsetup,
+ 
++	.check_processor_compatibility = vmx_check_processor_compat,
+ 	.hardware_enable = hardware_enable,
+ 	.hardware_disable = hardware_disable,
+ 	.cpu_has_accelerated_tpr = report_flexpriority,
+@@ -7911,7 +7912,6 @@ static __init int hardware_setup(void)
+ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
+ 	.cpu_has_kvm_support = cpu_has_kvm_support,
+ 	.disabled_by_bios = vmx_disabled_by_bios,
+-	.check_processor_compatibility = vmx_check_processor_compat,
+ 	.hardware_setup = hardware_setup,
+ 
+ 	.runtime_ops = &vmx_x86_ops,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c194a8cbd25f..6411417b6871 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11391,7 +11391,7 @@ int kvm_arch_check_processor_compat(void *opaque)
+ 	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+ 		return -EIO;
+ 
+-	return ops->check_processor_compatibility();
++	return ops->runtime_ops->check_processor_compatibility();
+ }
+ 
+ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
