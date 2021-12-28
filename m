@@ -2,91 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28EEB4807E8
-	for <lists+kvm@lfdr.de>; Tue, 28 Dec 2021 10:38:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95DC448086D
+	for <lists+kvm@lfdr.de>; Tue, 28 Dec 2021 11:29:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235986AbhL1JiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Dec 2021 04:38:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:24976 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235985AbhL1JiM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Dec 2021 04:38:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640684292;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GBj1Lmo862bZ5iBBD9Gif3sLiVjk0Wo9dVxJgXi9alI=;
-        b=RURLtzv6EQzVZPGLNqbUQpmJYjZCrdF6l8SGw2Fhp0Ksq77S8ZkOTsESwbvkfQUKxVA87l
-        Mxw0tmTTsW7pV0i8Ow/HfakQLrkNGv6E0Kwdjk9X0CBquehIY/XnQ0cY57lRTCx5anFU4m
-        mmszta0P+ZmUIyrDXSxOGvAgW5q0xM8=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-217-bIGBPSa2PvWtoJy-47_xzw-1; Tue, 28 Dec 2021 04:38:10 -0500
-X-MC-Unique: bIGBPSa2PvWtoJy-47_xzw-1
-Received: by mail-ed1-f72.google.com with SMTP id z10-20020a05640235ca00b003f8efab3342so5729350edc.2
-        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 01:38:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GBj1Lmo862bZ5iBBD9Gif3sLiVjk0Wo9dVxJgXi9alI=;
-        b=Fn/8HPKKKV2Yqek0G58nlgdtQmYUP3De2ysgcpXGeuerbvEymyUP0f0cW7Wvo4Exwt
-         XU55Ygvtg2Bl0CzbY8yMQUcxONfSOQTlVBn3qtXUDpy2OFJjMbv/nseEBsLa1XOKfr8o
-         kzpfyV6BP4uodMzll+DooMb6SDV7ascE0O3vWINnXeAY99Xe7sA4+VM619QEMCWEI/ls
-         Xwgr2X8seTlASPcSvJUXB6lK7QfAHXzDD+VdYz9xW7hRJ8vNoPLddY+E1NEppChXQ+1b
-         8IVwuu+RcBCUGzYCLrkB41WoL7HVYP6KwNryC8KpVpCR0GP2Xw3bnMKJ86dF3MHUVO7j
-         84gw==
-X-Gm-Message-State: AOAM530ShvR71pzY2Mk35DP0RzD5TPtJW27k8sZRxg9icXAJJ718mWFN
-        +H/GE40p8+5lr5CBXsiwGU+8H2AmCXFydsqmOaFnRrBGSiYQ7IFn9i8YCZK2l1rz6STY826rfxq
-        XW4GheSyKHIyn
-X-Received: by 2002:a17:906:4703:: with SMTP id y3mr16876611ejq.346.1640684289472;
-        Tue, 28 Dec 2021 01:38:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxSJyRS8TjbSLG0wyvRnwXos8K6OpwsqZkJ/RTwvEz16Ua9DcGNhPNRUQd8GoC6Nld1r5RMzw==
-X-Received: by 2002:a17:906:4703:: with SMTP id y3mr16876603ejq.346.1640684289289;
-        Tue, 28 Dec 2021 01:38:09 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id gs14sm5894820ejc.183.2021.12.28.01.38.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Dec 2021 01:38:09 -0800 (PST)
-Date:   Tue, 28 Dec 2021 10:38:07 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
+        id S236174AbhL1K3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Dec 2021 05:29:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59906 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230112AbhL1K3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Dec 2021 05:29:24 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A4DC061574
+        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 02:29:23 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F0C48611B6
+        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 10:29:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7D8C36AE7;
+        Tue, 28 Dec 2021 10:29:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640687362;
+        bh=jUyAI10oL4qbXf6iPtMaNEXBvDx/0AR7LVT2O/v4TWI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=cYpICZh/loys4dXwcO2vbPA9qMpPzWNJWm+fUksX2gTD0aPkW3R9ZUs1TUJQHWEON
+         FxecWJbmzXOu99MGmOdkEa/gGaryaiohlHN1t8Y9lYe2OYPyafshclZtVrQ5Ix3cb7
+         3Y+017I58oCK3x23nAD6aF2/8IL0qyGSGf0T+c48BNLFphIo9/6lifcVMQWGWkscq5
+         KVJ0de3MbETLH0yo6OESTwlT1m6cgQouNKGV6VN4tZiTChb75EMP9DN/m6u/CsHYji
+         ycgwLg/3V5MVwcXtDmlNkMguR0JbDNkUn1EN/UftP3vMFuj+O4r2e3onK+E8ONctas
+         rolHvY0oCtP0g==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n29jL-00Ehcz-VK; Tue, 28 Dec 2021 10:29:20 +0000
+Date:   Tue, 28 Dec 2021 10:29:35 +0000
+Message-ID: <87lf05yqcw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Subject: Re: [PATCH v2 6/6] KVM: selftests: arm64: Add support for various
- modes with 16kB page size
-Message-ID: <20211228093807.4s46hte4ilbjmxz7@gator.home>
+Subject: Re: [PATCH v2 2/6] KVM: selftests: arm64: Introduce a variable default IPA size
+In-Reply-To: <20211228092622.ffw7xu2j5ow4njxo@gator.home>
 References: <20211227124809.1335409-1-maz@kernel.org>
- <20211227124809.1335409-7-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211227124809.1335409-7-maz@kernel.org>
+        <20211227124809.1335409-3-maz@kernel.org>
+        <20211228092622.ffw7xu2j5ow4njxo@gator.home>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: drjones@redhat.com, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 27, 2021 at 12:48:09PM +0000, Marc Zyngier wrote:
-> The 16kB page size is not a popular choice, due to only a few CPUs
-> actually implementing support for it. However, it can lead to some
-> interesting performance improvements given the right uarch choices.
+On Tue, 28 Dec 2021 09:26:22 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
 > 
-> Add support for this page size for various PA/VA combinations.
+> On Mon, Dec 27, 2021 at 12:48:05PM +0000, Marc Zyngier wrote:
+> > Contrary to popular belief, there is no such thing as a default
+> > IPA size on arm64. Anything goes, and implementations are the
+> > usual Wild West.
+> > 
+> > The selftest infrastructure default to 40bit IPA, which obviously
+> > doesn't work for some systems out there.
+> > 
+> > Turn VM_MODE_DEFAULT from a constant into a variable, and let
+> > guest_modes_append_default() populate it, depending on what
+> > the HW can do. In order to preserve the current behaviour, we
+> > still pick 40bits IPA as the default if it is available, and
+> > the largest supported IPA space otherwise.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  .../testing/selftests/kvm/include/kvm_util.h  |  4 ++-
+> >  tools/testing/selftests/kvm/lib/guest_modes.c | 30 +++++++++++++++++--
+> >  2 files changed, 30 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index 2d62edc49d67..7fa0a93d7526 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -53,7 +53,9 @@ enum vm_guest_mode {
+> >  
+> >  #if defined(__aarch64__)
+> >  
+> > -#define VM_MODE_DEFAULT			VM_MODE_P40V48_4K
+> > +extern enum vm_guest_mode vm_mode_default;
+> > +
+> > +#define VM_MODE_DEFAULT			vm_mode_default
+> >  #define MIN_PAGE_SHIFT			12U
+> >  #define ptes_per_page(page_size)	((page_size) / 8)
+> >  
+> > diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+> > index c330f414ef96..5e3fdbd992fd 100644
+> > --- a/tools/testing/selftests/kvm/lib/guest_modes.c
+> > +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+> > @@ -4,22 +4,46 @@
+> >   */
+> >  #include "guest_modes.h"
+> >  
+> > +#ifdef __aarch64__
+> > +enum vm_guest_mode vm_mode_default;
+> > +#endif
+> > +
+> >  struct guest_mode guest_modes[NUM_VM_MODES];
+> >  
+> >  void guest_modes_append_default(void)
+> >  {
+> > +#ifndef __aarch64__
+> >  	guest_mode_append(VM_MODE_DEFAULT, true, true);
+> > -
+> > -#ifdef __aarch64__
+> > -	guest_mode_append(VM_MODE_P40V48_64K, true, true);
+> > +#else
+> >  	{
+> >  		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
+> > +		int i;
+> > +
+> > +		vm_mode_default = NUM_VM_MODES;
+> > +
+> >  		if (limit >= 52)
+> >  			guest_mode_append(VM_MODE_P52V48_64K, true, true);
+> >  		if (limit >= 48) {
+> >  			guest_mode_append(VM_MODE_P48V48_4K, true, true);
+> >  			guest_mode_append(VM_MODE_P48V48_64K, true, true);
+> >  		}
+> > +		if (limit >= 40) {
+> > +			guest_mode_append(VM_MODE_P40V48_4K, true, true);
+> > +			guest_mode_append(VM_MODE_P40V48_64K, true, true);
+> > +			vm_mode_default = VM_MODE_P40V48_4K;
+> > +		}
+> > +
+> > +		/*
+> > +		 * Pick the first supported IPA size if the default
+> > +		 * isn't available.
+> > +		 */
+> > +		for (i = 0; vm_mode_default == NUM_VM_MODES && i < NUM_VM_MODES; i++) {
+> > +			if (guest_modes[i].supported && guest_modes[i].enabled)
+> > +				vm_mode_default = i;
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h   |  4 ++++
->  .../selftests/kvm/lib/aarch64/processor.c        | 10 ++++++++++
->  tools/testing/selftests/kvm/lib/guest_modes.c    |  4 ++++
->  tools/testing/selftests/kvm/lib/kvm_util.c       | 16 ++++++++++++++++
->  4 files changed, 34 insertions(+)
->
+> Since we don't have a 'break' here, this picks the last supported size
+> (of the guest_modes list), not the first, as the comment implies it should
+> do.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This is checked in the for() loop condition, and the first matching
+mode will cause the loop to terminate. This is the same check that
+avoids scanning for a mode when VM_MODE_P40V48_4K is selected.
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
