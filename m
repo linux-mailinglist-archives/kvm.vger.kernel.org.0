@@ -2,80 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABAA8480DEE
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 00:38:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B9022480DF1
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 00:43:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237811AbhL1Xi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Dec 2021 18:38:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37274 "EHLO
+        id S237833AbhL1XnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Dec 2021 18:43:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237810AbhL1Xi5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Dec 2021 18:38:57 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662A6C06173E
-        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 15:38:57 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id l10-20020a17090a384a00b001b22190e075so17686745pjf.3
-        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 15:38:57 -0800 (PST)
+        with ESMTP id S237811AbhL1XnD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Dec 2021 18:43:03 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD479C061574
+        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 15:43:02 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id p2-20020a17090a2c4200b001b1866beecbso16558379pjm.5
+        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 15:43:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mLJEKnUeVA+ZJaDeVq7C58HVHq2F7qzWQ7vIWWcH/9I=;
-        b=Eiy8qoIw/+H+Jfx8mcv3/R1UdB2Av9PpBgReHTaaSLr7QNRpRxLq2Xr0kD7QHsDQLc
-         jMqa1zT3VYLLajjYXGcTlBJkLplBff49xgT6WYc+qinCxPYmRcHZqFl1331GvJWLiTPM
-         UMB3HWJWlGt64de9dAl0DBNGEudpy6kP1IT9QM35aydC9vFp3PaU8s3D433UtOgV09Wf
-         USNkA1zZQqpuG59EIU44pHjzNmo61hM+1bBpTMMLERNSDAI0UV/88SjncVcabfNKo1SW
-         OIYUccn9ZusVP6iipAYQiS29AeygpxEa6zqUL+91px6gBunwGQBepHO7GRI2Y+8/xJUM
-         wjBw==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=hxQmFeIwf3esrSd5J2l5mPzvcKGSO/++GjUWx0VZyWk=;
+        b=bbNSTV1jXwxK4ma61iX0n9HHBpfFt6kMZ2SWKCKvXd7URYZIAalBesyioxSh9BH/1F
+         iDchbU2d/fdnwe6Z58E2S85lGfdWkkrItR1U+oKBrSP7JjNsek5TpkiZX3xGBxr/ymkT
+         vMdclFxpH5uyUbjrt6BIu0SeN3WD8xBVC5I+ZIlbSnBaYL2IMTXiet1wfhJ9t0cx8eQb
+         IpExaQm5ZSTLvYYk/z1z9+tGmQuMTq78uPUfOqMlxQUX4QS3jNuDCtuIO0rRb0hDrus8
+         TkgUe2f/MxDd/BZ4VZkKHl0o4APJWVu9Dj0is+dnTIDN5gj/DPL1qQb8SV5iR8WdA3IS
+         yV6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mLJEKnUeVA+ZJaDeVq7C58HVHq2F7qzWQ7vIWWcH/9I=;
-        b=xKZxxnZ0Bs03dOCKQnIrNFgcJvXt7vtijvjDVGcx+8mM0lnd988RtjKHbEEnG1FgcT
-         HTAovhWKxCI6hUHucJbuF+nkuQYFVuAiunyZReYrZXeGLlyk/9FI88CX1bBINRpz5deG
-         Lbqt54ERv3HmzOB1/Os8Rlvx9tIZ76ovWKmh/iv3UvmBRM/8WZa2c6CdET7CDLigZW8t
-         6zHfCZrNRb9WvZTQ/Mmsggfv9ZDIdoQikAIlvhcLZmRWk4s+2ynv5cKiZM+r0q9c3OTY
-         j5Sgp3KH01AickbZy1z7myg05MUNRI9y09JpZQbCep4ebnUGoTOdxI+fhX/cA05tlnUZ
-         m0WQ==
-X-Gm-Message-State: AOAM531iablIxxo8chcHZgBYnSrgdCSh2qDo29SULhplTp2dWeztjH1y
-        FxtKCynlgIEJG4mc1rdiqXeshwZDaD5Euw==
-X-Google-Smtp-Source: ABdhPJyznVD+crKQ6G6u0OsCozPGqZlakrH/5IfbsFoLhMCKNUnUBjBp31t4ativuEsftnsU7jqacA==
-X-Received: by 2002:a17:902:c401:b0:149:353c:9705 with SMTP id k1-20020a170902c40100b00149353c9705mr23328628plk.23.1640734736553;
-        Tue, 28 Dec 2021 15:38:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f7sm19397673pfc.141.2021.12.28.15.38.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Dec 2021 15:38:56 -0800 (PST)
-Date:   Tue, 28 Dec 2021 23:38:52 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=hxQmFeIwf3esrSd5J2l5mPzvcKGSO/++GjUWx0VZyWk=;
+        b=vFgpBxPUi9OrD/X5mzjZiFroN8U85TtGp26bTMjkZBd2xYl/ia8xeqw+l3BsZHBMqA
+         TWq4AcdPZYddb8lazuuiu5CCTI1K4f9/4fekx32qJOCq7Q5xzDn5Lnr7OkYqhG35Czbc
+         eRv7ShaML81EzUtcf0xqAS8cEZekeFfkqaJoD9gk95cdDgxEP7JsxfooXPWeHgikoZUO
+         9K/hGCjyAOovqSr6yv6Y+zJL2RTe1x2XYsdU6V5Ecevg03bXTTpbERVau0NhyCYaeJco
+         PJHkYo8HBE95zX39OLSTjVT6CvauwiDUtp9Pr9WIhQz7iPUNFG2TAUhahLEv/ki0wVAx
+         kL3Q==
+X-Gm-Message-State: AOAM5329iaqYTBjfq4QmTfTVxg881XCGXtRRnB3F4vPGqgGx/ZlC6jtb
+        76DeTKjv02ZJ48iNU49uFWHttUUsytc=
+X-Google-Smtp-Source: ABdhPJwDpDnZN4cEd+lEACn3LAcXlkvF2YIkyrpOxWsam3E8ZTm3loa/pj0uPGr2k8xnfafdKHayGAtGOIw=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f0cc:: with SMTP id
+ fa12mr4771690pjb.134.1640734982346; Tue, 28 Dec 2021 15:43:02 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 28 Dec 2021 23:42:57 +0000
+Message-Id: <20211228234257.1926057-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.448.ga2b2bfdf31-goog
+Subject: [PATCH] hugetlbfs: Fix off-by-one error in hugetlb_vmdelete_list()
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jing Liu <jing2.liu@intel.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, pbonzini@redhat.com, corbet@lwn.net,
-        shuah@kernel.org, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, guang.zeng@intel.com,
-        wei.w.wang@intel.com, yang.zhong@intel.com
-Subject: Re: [PATCH v3 05/22] kvm: x86: Check permitted dynamic xfeatures at
- KVM_SET_CPUID2
-Message-ID: <YcugDN+9d8t4r9bV@google.com>
-References: <20211222124052.644626-1-jing2.liu@intel.com>
- <20211222124052.644626-6-jing2.liu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211222124052.644626-6-jing2.liu@intel.com>
+To:     Mike Kravetz <mike.kravetz@oracle.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        syzbot+4e697fe80a31aa7efe21@syzkaller.appspotmail.com,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 22, 2021, Jing Liu wrote:
-> Guest xstate permissions should be set by userspace VMM before vcpu
-> creation. Extend KVM_SET_CPUID2 to verify that every feature reported
-> in CPUID[0xD] has proper permission set.
+Pass "end - 1" instead of "end" when walking the interval tree in
+hugetlb_vmdelete_list() to fix an inclusive vs. exclusive bug.  The two
+callers that pass a non-zero "end" treat it as exclusive, whereas the
+interval tree iterator expects an inclusive "last".  E.g. punching a hole
+in a file that precisely matches the size of a single hugepage, with a
+vma starting right on the boundary, will result in unmap_hugepage_range()
+being called twice, with the second call having start==end.
 
-Why?  Nothing in the changelog, code, or comments explains why KVM _needs_ to prevent
-userspace from advertising bogus features to the guest.  E.g. the virtual address
-width check exists because _KVM_ will do the wrong thing given a width other than 48
-or 57, and explicity says as much in a comment.
+The off-by-one error doesn't cause functional problems as
+__unmap_hugepage_range() turns into a massive nop due to short-circuiting
+its for-loop on "address < end".  But, the mmu_notifier invocations to
+invalid_range_{start,end}() are passed a bogus zero-sized range, which
+may be unexpected behavior for secondary MMUs.
+
+The bug was exposed by commit ed922739c919 ("KVM: Use interval tree to do
+fast hva lookup in memslots"), currently queued in the KVM tree for 5.17,
+which added a WARN to detect ranges with start==end.
+
+Reported-by: syzbot+4e697fe80a31aa7efe21@syzkaller.appspotmail.com
+Fixes: 1bfad99ab425 ("hugetlbfs: hugetlb_vmtruncate_list() needs to take a range to delete")
+Cc: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+
+Not sure if this should go to stable@.  It's mostly harmless, and likely
+nothing more than a minor performance blip when it's not harmless.
+
+ fs/hugetlbfs/inode.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/fs/hugetlbfs/inode.c b/fs/hugetlbfs/inode.c
+index 49d2e686be74..a7c6c7498be0 100644
+--- a/fs/hugetlbfs/inode.c
++++ b/fs/hugetlbfs/inode.c
+@@ -409,10 +409,11 @@ hugetlb_vmdelete_list(struct rb_root_cached *root, pgoff_t start, pgoff_t end)
+ 	struct vm_area_struct *vma;
+ 
+ 	/*
+-	 * end == 0 indicates that the entire range after
+-	 * start should be unmapped.
++	 * end == 0 indicates that the entire range after start should be
++	 * unmapped.  Note, end is exclusive, whereas the interval tree takes
++	 * an inclusive "last".
+ 	 */
+-	vma_interval_tree_foreach(vma, root, start, end ? end : ULONG_MAX) {
++	vma_interval_tree_foreach(vma, root, start, end ? end - 1 : ULONG_MAX) {
+ 		unsigned long v_offset;
+ 		unsigned long v_end;
+ 
+-- 
+2.34.1.448.ga2b2bfdf31-goog
+
