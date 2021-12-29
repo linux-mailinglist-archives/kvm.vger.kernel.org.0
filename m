@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BDF94815C9
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 18:26:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04DD34815E1
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 18:37:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241106AbhL2R0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Dec 2021 12:26:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45800 "EHLO
+        id S229793AbhL2Rh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Dec 2021 12:37:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241096AbhL2R0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Dec 2021 12:26:20 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D70C06173E
-        for <kvm@vger.kernel.org>; Wed, 29 Dec 2021 09:26:20 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id 8so19250847pfo.4
-        for <kvm@vger.kernel.org>; Wed, 29 Dec 2021 09:26:20 -0800 (PST)
+        with ESMTP id S229904AbhL2Rh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Dec 2021 12:37:26 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E72E1C061401
+        for <kvm@vger.kernel.org>; Wed, 29 Dec 2021 09:37:25 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id g11-20020a17090a7d0b00b001b2c12c7273so283643pjl.0
+        for <kvm@vger.kernel.org>; Wed, 29 Dec 2021 09:37:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=60TyvX0zFQi6hqi8h/S/iZE8S9P3fjxrfT4ZN4fNmxU=;
-        b=DTg1moWe83+9+gQVZu431fIFhbqxKcy7UnLNH94wll+BM5aYgKUhfztbVhg5GqLKA3
-         qpMpnrHOrUTEN6+/i+4bASip+FVlynebgDkbm4Xa8sO4PWICQEKeW0tFgFpMuJm7MryJ
-         HhHb1oU2/P55kCKV6/Bt2EasK/U5Qt9alUsmWES/9Ky6ztMqQPH8kQJOk1VnRfv2kZC1
-         qgTJ1Z9/OEeIAGPsvAzAKC4+v4SHpVMLjf9z9mc+KQy+sUtLqaQC5e8u4rMlrw1guB9N
-         zUH954YHADl21w/A+bZ5IOlkfk0CMbU9Hiq52Eo/31vlNkLqnqisCdiiv4x1o57iAYF9
-         kt7w==
+         :content-disposition:in-reply-to;
+        bh=Efgx9IHONWruEAQzkI5SLmFWvrJKvgcTDP12usM5mkE=;
+        b=BZgeTpCI1Y3WML+gZXm9/II9O0JpFAF4B+9T6H+TLzK8QmSf/zzpKsHJ+FFns74ye1
+         cgKlOtHQk3hHVsrvoiMfLV5zh00UVUM4CEfPuuduOHgGXS1bZ2hn1H8MrGIDhXQT7CbU
+         6WFRCWcKSRNuNu3H+uacCCCFf2K7uHSKLC+s5+fTlMD8FyntdkyTvDuzxUJi1mNyCjaI
+         WrFulMxvICLLC0jwIlsN/gFsCowLU2fMifWII4pHdcpV43tDHGK7U2yjKeKdocuOHmg5
+         +6enQ2REonsBYJa3/N8XlAh2FkWDRcvZ5q2ZuvjtmJp1NA9cOaNGDYhSOFcTKUhs7QJI
+         JbHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=60TyvX0zFQi6hqi8h/S/iZE8S9P3fjxrfT4ZN4fNmxU=;
-        b=ctFghRxfsuywG9x9OMFtWLLGlyiuDK2xwkrhLLY+hETirukD+9XqIxFNHJKRgiywMd
-         ekxj4V/+gS00CH2i4HcdauCC0+l29QB4m/srCSpEzsMcKf6nXnAnAPcGt1FbtwHjjez2
-         4CG1Jxo0LfvtttUr9xM4tOdkaiP/yDLat229p4nLeZLkGhMK6HDrvcR20Dyf1CDPcuNG
-         3qIKEPoRFlTpaMZgBC2Ox6eshGND2kVnxtM0SvXFM+8kKKqODJDPLgbl8cp0J9wOEstn
-         a6KnssPxMytWeFz2GNYog7T7UhCltK/r6hAYQkuNGt1e3pdwiSvjUZP6AMfZFw44fjBn
-         ZJJw==
-X-Gm-Message-State: AOAM532U9ZYAfbZHTiDLws9szuagzwnYGmz7poZsjDH3IoHyRRyOqqSD
-        G/fbA3F6yfSsY+tJXDHp6PqOHw==
-X-Google-Smtp-Source: ABdhPJydgCyOJqC5EQayTuUUt7hYoDt65iGiIYwxMRxqQWK5hkAe4Q42+oM7dGMfJAFhbTSkK32OEg==
-X-Received: by 2002:a63:416:: with SMTP id 22mr24486207pge.133.1640798779544;
-        Wed, 29 Dec 2021 09:26:19 -0800 (PST)
+         :mime-version:content-disposition:in-reply-to;
+        bh=Efgx9IHONWruEAQzkI5SLmFWvrJKvgcTDP12usM5mkE=;
+        b=WSHMObSDkQSMuNlN+aKA3MjUaX7mv0kxlfZEmx+Ge4760uVlP7ygz+S1rd5Lsi8vQ/
+         kWZrytgyUu9dY7XODVli4sCAl/CL39gkfXEWJ8eiQ9b/4ReEO39HZwU5HM+JyjoTECm8
+         5USQjxLyv35PzjcS8WIhnPj5eaHdy9C76Nx84TDVPb/2TlT5ygaTGs4rFEjXHqKApH78
+         0BD9/2F13YYeyq/sqZ4OQcUDFc0WkKijOgE90PSNyGHwV1yspflMpYY7OexHeVm6H7dx
+         7xup1u8h4uxKyLhsd35WxIs97kg8uKnGnDFyk790guh+CM5fYRThRdt/7IEiPU0rKC7g
+         UhWw==
+X-Gm-Message-State: AOAM530w0v4Yp8ynU650hdacRys307DlDUrbgyvA4x/DSBojwggmw24H
+        RizfT5aoEdL4xLYayhExXG5gcQ==
+X-Google-Smtp-Source: ABdhPJzUwBcrBhft0hORYg6zqllwTZT3KaWotq1KPowSS1Lk8h3pPk5HtceknNKHwu7Rq/hQW12b8w==
+X-Received: by 2002:a17:902:bd91:b0:149:999c:35ad with SMTP id q17-20020a170902bd9100b00149999c35admr5503851pls.25.1640799445235;
+        Wed, 29 Dec 2021 09:37:25 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v16sm25142786pfu.131.2021.12.29.09.26.18
+        by smtp.gmail.com with ESMTPSA id u8sm25930236pfg.157.2021.12.29.09.37.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Dec 2021 09:26:18 -0800 (PST)
-Date:   Wed, 29 Dec 2021 17:26:15 +0000
+        Wed, 29 Dec 2021 09:37:24 -0800 (PST)
+Date:   Wed, 29 Dec 2021 17:37:21 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     "Tian, Kevin" <kevin.tian@intel.com>
 Cc:     "Liu, Jing2" <jing2.liu@intel.com>,
@@ -69,66 +68,49 @@ Cc:     "Liu, Jing2" <jing2.liu@intel.com>,
         "Zeng, Guang" <guang.zeng@intel.com>,
         "Wang, Wei W" <wei.w.wang@intel.com>,
         "Zhong, Yang" <yang.zhong@intel.com>
-Subject: Re: [PATCH v3 22/22] kvm: x86: Disable interception for IA32_XFD on
- demand
-Message-ID: <YcyaN7V4wwGI7wDV@google.com>
+Subject: Re: [PATCH v3 13/22] kvm: x86: Intercept #NM for saving IA32_XFD_ERR
+Message-ID: <Ycyc0YE8H8aL//iu@google.com>
 References: <20211222124052.644626-1-jing2.liu@intel.com>
- <20211222124052.644626-23-jing2.liu@intel.com>
- <Ycu0KVq9PfuygKKx@google.com>
- <BN9PR11MB5276CE5635898CE13BFC57FC8C449@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20211222124052.644626-14-jing2.liu@intel.com>
+ <YcunSb52LlGKT7dC@google.com>
+ <BN9PR11MB52760E4417F27BF9CA4F97B08C449@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BN9PR11MB5276CE5635898CE13BFC57FC8C449@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB52760E4417F27BF9CA4F97B08C449@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Dec 29, 2021, Tian, Kevin wrote:
-> > From: Tian, Kevin
-> > Sent: Wednesday, December 29, 2021 11:35 AM
-> > >
-> > > Speaking of nested, interception of #NM in
-> > vmx_update_exception_bitmap()
-> > > is wrong
-> > > with respect to nested guests.  Until XFD is supported for L2, which I didn't
-> > > see
-> > > in this series, #NM should not be intercepted while L2 is running.
+> > From: Sean Christopherson <seanjc@google.com>
+> > Sent: Wednesday, December 29, 2021 8:10 AM
 > > 
-> > Can you remind what additional thing is required to support XFD for L2?
+> > On Wed, Dec 22, 2021, Jing Liu wrote:
+> > > Guest IA32_XFD_ERR is generally modified in two places:
+> > >
+> > >   - Set by CPU when #NM is triggered;
+> > >   - Cleared by guest in its #NM handler;
+> > >
+> > > Intercept #NM for the first case, if guest writes XFD as nonzero for
+> > > the first time which indicates guest is possible to use XFD generating
+> > > the exception. #NM is rare if the guest doesn't use dynamic features.
+> > > Otherwise, there is at most one exception per guest task given a
+> > > dynamic feature.
+> > >
+> > > Save the current XFD_ERR value to the guest_fpu container in the #NM
+> > > VM-exit handler. This must be done with interrupt/preemption disabled,
+> > 
+> > Assuming my below understanding is correct, drop the "preemption" bit, it's
+> > misleading.
 > 
-> ok, at least we require additional work on when to disable write interception.
-> It can be done only when both L0 and L1 make the same decision, just like 
-> what we did for many other VMCS settings...
+> code-wise yes. In concept we just want to highlight that this operation 
+> must be completed when both interrupt and preemption are disabled.
 
-I'm not terribly concerned with exposing XFD to L2 right now, I'm much more
-concerned with not breaking nVMX when XFD is exposed to L1.
+No no no no no.  Yes, disabling IRQs also disables preemption, but that's not at
+all relevant, e.g. KVM could handle preemption via kvm_sched_{in,out}().  Handling
+this with IRQs disable is 100% mandatory because MSR_IA32_XFD_ERR can be indirectly
+consumed in (soft) IRQ context, end of story.
 
-> > If only about performance I prefer to the current conservative approach
-> > as the first step. As explained earlier, #NM should be rare if the guest
-> > doesn't run AMX applications at all. Adding nested into this picture doesn't
-> > make things a lot worser.
-> 
-> All your comments incorporated except this one. As said always trapping
-> #NM for L2 is not a big problem, as long as it's rare and don't break function.
-> Usually a relatively static scheme is safer than a dynamic one in case of
-> anything overlooked for the initial implementation. 😊
-
-I strongly disagree, it's not automagically safer.  Either way, we need to validate
-that KVM does the correct thing with respect to vmcs12.  E.g. does KVM correctly
-reflect the #NM back to L2 when it's not intercepted by L1?  Does it synthesize a
-nested VM-Exit when it is intercepted by L1?  The testing required doesn't magically
-go away.
-
-As posted, there is zero chance that the patches correctly handling #NM in L2
-because nested_vmx_l0_wants_exit() doesn't prevent an #NM from being forwarded
-to L1.  E.g. if L0 (KVM) and L1 both intercept #NM, handle_exception_nm() will
-queue a #NM for injection and then syntehsizea nested VM-Exit, i.e. the #NM from
-L2 will get injected into L1 after the nested exit.
-
-That also means handle_exception_nmi_irqoff() => handle_exception_nm() is fatally
-broken on non-XFD hardware, as it will attempt RDMSR(MSR_IA32_XFD_ERR) if L1
-intercepts #NM since handle_exception_nmi_irqoff() will run before
-__vmx_handle_exit() => nested_vmx_reflect_vmexit() checks whether L0 or L1 should
-handle the exit.
+> But we can also drop preemption if you prefer to, since preemption is
+> certainly disabled  when interrupt is disabled.
