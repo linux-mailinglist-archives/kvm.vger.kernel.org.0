@@ -2,133 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51B50480DFA
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 00:54:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1FD0480E07
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 01:05:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237803AbhL1XyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Dec 2021 18:54:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40690 "EHLO
+        id S232091AbhL2AF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Dec 2021 19:05:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231909AbhL1XyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Dec 2021 18:54:07 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBD5CC061747
-        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 15:54:06 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id z9-20020a17090a7b8900b001b13558eadaso22944275pjc.4
-        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 15:54:06 -0800 (PST)
+        with ESMTP id S231855AbhL2AF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Dec 2021 19:05:29 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9EC7C06173E
+        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 16:05:28 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id w7so11552347oiw.0
+        for <kvm@vger.kernel.org>; Tue, 28 Dec 2021 16:05:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qwG3+knHz/y15NSm8VuLqIc8tLJMm1hb1QKvFClBg7k=;
-        b=kBwxTBaN7QgTvA6QsbnhGLCzz4/df0tMalo70CsON6/KKAxoXaWDwHIW8w+7PbCmpa
-         0CQ040wdisE2/xw9XS7lsmPqHTe09yCI9QRWTFWtd9ZtIFY5tZL8CcLJkaq3Qwq/1pjZ
-         hz0F4SSjA9IU+1RP2EHxRxJdAp28aV2MXhoh38aMXdvGvWmZel9cDxEnwDWas1VH7YtM
-         9UUutKlR1wLkOz4Oto6SswemB1TqsfozUHmnwq5ED8PWzd1dygkkWmwB6AwbEw7STFxi
-         XalVTYjeqmejua1y0QCOTNNhp+K5fGI036/y7SbrjrR2isg3KeuHe/Sfo/te2Gktxh87
-         xU9g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=32Wtn2BBTzP1usnosTui06khYl1Qc21PEMfBrdcRzyk=;
+        b=dk+9D/MZ0F3L58c3D7sl5G0TDcKk2kyODgSQE6Qvd88/pdkSSMRIsWek7Mdm9nYF4A
+         ZXwPfOALKh5/RFYFij2MObePiya0oSEuaPos+VCe1y+EI8rw5DF9Njfmw8WROqSwXTnK
+         ehicUSFk2c8C+PGrRARTKfGTkPHt4DWVX+LB4HdbHxjUpya9sDW0PTT9q0WDrP+w6538
+         nctKAC2T7X1CWIsnJquobR+xJ+YMF/MA4hsm/nV8eHe8Ym7NOvpryp+Wey04+nb69CQr
+         U77OTK8git8kumIg04Rwa8sSt6bCnvB0n87wt4MIrK8uLScEL0LOYPLkXbgjuSJGxQzt
+         vLvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qwG3+knHz/y15NSm8VuLqIc8tLJMm1hb1QKvFClBg7k=;
-        b=485woi/7vZKxaSe8+P8Gb3YAMAEe+6gSt475/rlXxf5sfxjBiZHky6q/91WRMuhok/
-         5TMagODNEg/Ya8gXlELh6y3M9hXJXSG45WixwDaeSIhRqtP8IJnw6zb7Yt0IOMXxit2E
-         U7K/07XDayckOoBx7p9wVkGHz960nDsG6Z1WxMylXJ2V4qeZwKq9ZnypPgmQfyOuhn3b
-         W+0MpbzBVCYXaPg07IB4XCx3W6TLPfWyJ/UyaKYVdPFY4k5laVPcZDnN6fQRsaokaWO7
-         JpWx4zg7KoesfWJxkkwTfwhrK3uuEKin9vv9BWx+R6K3A60EnMmPoNmPAt/zf8k1Abyq
-         jpVw==
-X-Gm-Message-State: AOAM532MzNk21F3P2dXCSCBLO9liNFbfJ/TyJhA2f2LX5YZw9f1QOaeF
-        BM4ZVdY8WzjAMJNFt3lkVuO0AQ==
-X-Google-Smtp-Source: ABdhPJxxqVLu3MJ+H57Rawx3JssQCVKS5xD1nhF8/2MBGh8YET98U7ys6HIqDxoO06iJGKE/yEOs/g==
-X-Received: by 2002:a17:902:d50e:b0:148:b614:54a1 with SMTP id b14-20020a170902d50e00b00148b61454a1mr23740168plg.163.1640735646088;
-        Tue, 28 Dec 2021 15:54:06 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l6sm17236876pjt.54.2021.12.28.15.54.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Dec 2021 15:54:05 -0800 (PST)
-Date:   Tue, 28 Dec 2021 23:54:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jing Liu <jing2.liu@intel.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, pbonzini@redhat.com, corbet@lwn.net,
-        shuah@kernel.org, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, guang.zeng@intel.com,
-        wei.w.wang@intel.com, yang.zhong@intel.com
-Subject: Re: [PATCH v3 09/22] kvm: x86: Enable dynamic XSAVE features at
- KVM_SET_CPUID2
-Message-ID: <YcujmvvSEuoC2xRz@google.com>
-References: <20211222124052.644626-1-jing2.liu@intel.com>
- <20211222124052.644626-10-jing2.liu@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=32Wtn2BBTzP1usnosTui06khYl1Qc21PEMfBrdcRzyk=;
+        b=CAsQMAf9+dSVTTzPh0W3zMnw+ES/rL8yj2R9RltbKTAHouuFmfzFNcqYH+6Ch6QIkF
+         eij6vMi0Ub8hC53StTxo0COH7cuymQDZ7TXAcCPuP8b7JBcWto5Xak/DpSKykbAdcxbd
+         9wA0P94Q0ETuYePP3qXt5W5WkG5fa8sDwLN5qIPYbfPBh6ZaxSn9wXLIChrir1GNEDqY
+         Xoc1rJd5cupEKM1X9qW3Jb2cWZCYX8QXKcBKdQoTj8wrwVQd0vk82y9xOTnKsHTyaEL9
+         8nwB76hzSB1uyWCx2nQuLiQUcIMaa7ut+oiv5lnHKZv/lXIVzJM/LSKcE+eCBI7Jt2L2
+         B8ZA==
+X-Gm-Message-State: AOAM533WI0//tBKMll1SIr3yM3JDs0VHl5hm1sJEmcPbHTAEKhrzsvpq
+        Z/wZX9R6Z+PWKQdBrZh51BLqjzXusGrxm6BaXMp23HPVMCg=
+X-Google-Smtp-Source: ABdhPJzymNPJ55EvbPXBgesiSVDvllFDNyFrBK40MXAcllMHAML9lzUsz95whgyN4iy6OpD3Pca21Tj1hbra9rOI8+k=
+X-Received: by 2002:a54:4819:: with SMTP id j25mr18392614oij.66.1640736327959;
+ Tue, 28 Dec 2021 16:05:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211222124052.644626-10-jing2.liu@intel.com>
+References: <20211222133428.59977-1-likexu@tencent.com> <CALMp9eRNsKMB6onhc-nhW-aMb14gK1PCtQ_CxOoyZ5RvLHfvEQ@mail.gmail.com>
+ <d80f6161-e327-f374-4caf-016de1a77cc3@gmail.com>
+In-Reply-To: <d80f6161-e327-f374-4caf-016de1a77cc3@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 28 Dec 2021 16:05:17 -0800
+Message-ID: <CALMp9eTy-8CgoV1TJBQ=RON=k8bQ8SYR7xj00qipUEetR4Xofg@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: X86: Emulate APERF/MPERF to report actual vCPU frequency
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <likexu@tencent.com>,
+        Dongli Cao <caodongli@kingsoft.com>,
+        Li RongQing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 22, 2021, Jing Liu wrote:
-> Statically enable all xfeatures allowed by guest perm in
+On Mon, Dec 27, 2021 at 11:11 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> Hi Jim,
+>
+> On 28/12/2021 2:33 am, Jim Mattson wrote:
+> > On Wed, Dec 22, 2021 at 5:34 AM Like Xu <like.xu.linux@gmail.com> wrote:
+> >>
+> >> From: Like Xu <likexu@tencent.com>
+> >>
+> >> The aperf/mperf are used to report current CPU frequency after 7d5905dc14a.
+> >> But guest kernel always reports a fixed vCPU frequency in the /proc/cpuinfo,
+> >> which may confuse users especially when turbo is enabled on the host or
+> >> when the vCPU has a noisy high power consumption neighbour task.
+> >>
+> >> Most guests such as Linux will only read accesses to AMPERF msrs, where
+> >> we can passthrough registers to the vcpu as the fast-path (a performance win)
+> >> and once any write accesses are trapped, the emulation will be switched to
+> >> slow-path, which emulates guest APERF/MPERF values based on host values.
+> >> In emulation mode, the returned MPERF msr value will be scaled according
+> >> to the TSCRatio value.
+> >>
+> >> As a minimum effort, KVM exposes the AMPERF feature when the host TSC
+> >> has CONSTANT and NONSTOP features, to avoid the need for more code
+> >> to cover various coner cases coming from host power throttling transitions.
+> >>
+> >> The slow path code reveals an opportunity to refactor update_vcpu_amperf()
+> >> and get_host_amperf() to be more flexible and generic, to cover more
+> >> power-related msrs.
+> >>
+> >> Requested-by: Dongli Cao <caodongli@kingsoft.com>
+> >> Requested-by: Li RongQing <lirongqing@baidu.com>
+> >> Signed-off-by: Like Xu <likexu@tencent.com>
+> >
+> > I am not sure that it is necessary for kvm to get involved in the
+> > virtualization of APERF and MPERF at all, and I am highly skeptical of
+> > the need for passing through the hardware MSRs to a guest. Due to
+>
+> The AMPERF is pass-through for read-only guest use cases.
+>
+> > concerns over potential side-channel exploits a la Platypus
+>
+> I agree that the enabling of AMPERF features increases the attack surface,
+> like any other upstreamed features (SGX), and they're not design flaw, are they?
+>
+> As we know, KVM doesn't expose sufficient RAPL interface for Platypus. At least
+> the vendors has patched Platypus while the cat and mouse game will not end.
+>
+> User space needs to choose whether to enable features based on the
+> guest's level of trust, rather than trying to prevent it from enablement.
+>
+> > (https://platypusattack.com/), we are planning to provide only low
+> > fidelity APERF/MPERF virtualization from userspace, using the
+> > userspace MSR exiting mechanism. Of course, we should be able to do
+>
+> It works for other non time-sensitive MSRs.
+>
+> We have a long delay to walk the userspace MSR exiting mechanism
+> for both APERF msr and MPERF msr, which is almost intolerable for
+> frequent access guest reads. IMO, the low fidelity is not what the guest
+> user wants and it defeats the motivation for introducing amperf on host.
+>
+> > that whether or not this change goes in, but I was wondering if you
+> > could provide some more details regarding your use case(s).
+>
+> In addition to the advantages amperf brings in the kernel context
+> (e.g. smarter scheduler policies based on different power conditions),
+>
+> Guest workload analysts are often curious about anomalous benchmark
+> scores under predictive CPU isolation guaranteed by service providers,
+> and they ask to look at actual vCPU frequencies to determine if the source
+> of performance noise is coming from neighboring hardware threads
+> particularly AVX or future AMX or other high power consumption neighbors.
+>
+> This AMPERF data helps the customers to decide whether the back-end pCPU
+> is to be multiplexed or exclusive shared, or to upgrade to a faster HW model,
+> without being tricked by the guest CPUID.
+>
+> IMO, this feature will be of value to most performance users. Any other comments?
 
-Statically isn't the right word.  It's not dymanic with respect to running the
-vCPU, but it's certainly not static.  I think you can just omit "Statically"
-entirely.
+If it's worth doing, it's worth doing well.
 
-> KVM_SET_CPUID2, with fpstate buffer sized accordingly. This avoids
-> run-time expansion in the emulation and restore path of XCR0 and
-> XFD MSR [1].
-> 
-> Change kvm_vcpu_after_set_cpuid() to return error given fpstate
-> reallocation may fail.
-> 
-> [1] https://lore.kernel.org/all/20211214024948.048572883@linutronix.de/
-> 
-> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Jing Liu <jing2.liu@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c | 24 +++++++++++++++++-------
->  1 file changed, 17 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index a068373a7fbd..eb5a5070accb 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -204,10 +204,12 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
->  
-> -static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> +static int kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_lapic *apic = vcpu->arch.apic;
->  	struct kvm_cpuid_entry2 *best;
-> +	u64 xfeatures;
-> +	int r;
->  
->  	best = kvm_find_cpuid_entry(vcpu, 1, 0);
->  	if (best && apic) {
-> @@ -222,9 +224,17 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
->  	if (!best)
->  		vcpu->arch.guest_supported_xcr0 = 0;
-> -	else
-> -		vcpu->arch.guest_supported_xcr0 =
-> -			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
-> +	else {
-> +		xfeatures = best->eax | ((u64)best->edx << 32);
-> +
-> +		vcpu->arch.guest_supported_xcr0 = xfeatures & supported_xcr0;
-> +
-> +		if (xfeatures != vcpu->arch.guest_fpu.xfeatures) {
-> +			r = fpu_update_guest_perm_features(&vcpu->arch.guest_fpu);
-> +			if (r)
-> +				return r;
+Let me go back and look in detail at the code, now that the question
+of whether or not this is worth doing has been answered.
 
-IMO, this should be done and check before "committing" state, otherwise KVM will
-set the vCPU's CPUID info and update a variety of state, but then tell userspace
-that it failed.  The -EPERM case in particular falls squarely into the "check"
-category.
+> Thanks,
+> Like Xu
