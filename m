@@ -2,189 +2,600 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 888A5480F72
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 04:52:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CD2D480F7A
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 05:06:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238618AbhL2Dwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Dec 2021 22:52:49 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:55144 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238601AbhL2Dws (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Dec 2021 22:52:48 -0500
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BT2amKL015649;
-        Wed, 29 Dec 2021 03:52:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=v/JCw9msl+kMYd3BRIjvqPOm5JXRhlzPTr8WhQVEOkk=;
- b=U/bb6B17pDxdS39+y+mollYuPHrHkBh5/r0vKuzIFxMnsKPk2ENRVJTnGsUe/o0DZ3/q
- u20cQ0boLOoVynPsxhct47LD6R72R2Wx8Y3KUt17bldtzYRpUXRBmFCw8p+BJmF01eV8
- nTBvxIP7JwgUiU4lPXBd5UP3wWcgyzecqDlS+jJNpOT0CS+xKZCDgx+2j9yyZbk28Nt1
- 4DYCh0PwQpuQ1i2txsbb3kZYm0ZtvY7N+FmP9yMSkOeEwUjqfngX8ZmK13cey/Qiw1L4
- JXq63UQckTNzKcdQSJA4YEwjTraeapqgCI9DGeMPBC24skC+BMyUt4XL3qwKV0KXgRts Rg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3d7gt2t7mj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 Dec 2021 03:52:43 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BT3jSvB153874;
-        Wed, 29 Dec 2021 03:52:42 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2042.outbound.protection.outlook.com [104.47.57.42])
-        by userp3030.oracle.com with ESMTP id 3d5rdxabvx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 Dec 2021 03:52:42 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q2u88K0gx5VhQ+skFvyupvdSd/1ZzR9iOL3o50ZMFcYPXaUiK0+35TjjO6Ng+Crjvv2g9NO8IazxsEMgrOcGqlaazmMC1NNUz8/Jm41DSGHIfL/iirsJGv5iuYp7ZbmcjwSPefWQIGg32WNxeJFmeqhix1Z31GmtsLvHApgxkbHqftXheAl3v+Hv6iF7CHJSgLjIFMr62MvCmBdvB1uGTemRMcVjX8XwYZdBlLXE8SmSECnQ1HFYvTYE0W7PivRipczUR+ulkPaSgD7ujhVFXmkk46LZYWbieH3DbxvFbjOIObJ5pJKo9lpVd4pH6Eh9+WORo84nYIPQ5w/goYScIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v/JCw9msl+kMYd3BRIjvqPOm5JXRhlzPTr8WhQVEOkk=;
- b=VHNpoSkMyEmHL97vC5UDuOTsJmFzDt2/Gwc+X7/b2c0/QhIniMfFUAPYhKWjIls8DjcuwfBSeBqromAysakL7SS9K0wRAB7EBRjTFnkblYGnZuFQBtX/XehPQwLUq9LDHU+ze5A0aos5Ig1DxBJBuCTogU1UIRnfgXaUAJRvnpX4zb4kZ4qNLDhDlO4IuuvEZ2CIljoXgiJ573Th9oxBtejUOw/cEwkHlFZGneGT1OSZbCTHSEoEQ1Gy2LV10eWSJgF+JAs8qAebVMcc8/0bTBQEF7BubxRgsUXiG/XQLt5MaiBE0EAup5UUhWcZS4E1ZCLkA7t3q8s0mHNYKB+i/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        id S236543AbhL2EGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Dec 2021 23:06:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233830AbhL2EGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Dec 2021 23:06:39 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C08DC061574;
+        Tue, 28 Dec 2021 20:06:39 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id i6so8951246pla.0;
+        Tue, 28 Dec 2021 20:06:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v/JCw9msl+kMYd3BRIjvqPOm5JXRhlzPTr8WhQVEOkk=;
- b=n5akaMcdwAIF1mKHuwYyFsfloal6t6oxhvUhgWWZ7SYPnd2JU9CWr0BU6mh5a95Msy0VzK3RDvCBe0Dbji4IWYRHZEk/Gfn6G95EW3UHYwTeH9/t5dx3wRNRpZuhaIhfe+qmpnbECtYAgRWBkmGde1QqfLVhsMfTM7LSWfV5q9g=
-Received: from BY5PR10MB4196.namprd10.prod.outlook.com (2603:10b6:a03:20d::23)
- by BYAPR10MB3000.namprd10.prod.outlook.com (2603:10b6:a03:92::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4823.21; Wed, 29 Dec
- 2021 03:52:41 +0000
-Received: from BY5PR10MB4196.namprd10.prod.outlook.com
- ([fe80::5d0a:ae15:7255:722c]) by BY5PR10MB4196.namprd10.prod.outlook.com
- ([fe80::5d0a:ae15:7255:722c%9]) with mapi id 15.20.4823.023; Wed, 29 Dec 2021
- 03:52:40 +0000
-Message-ID: <7eb2849e-ad6d-11c5-a37d-806a1c62bb3e@oracle.com>
-Date:   Tue, 28 Dec 2021 19:52:37 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] hugetlbfs: Fix off-by-one error in
- hugetlb_vmdelete_list()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        syzbot+4e697fe80a31aa7efe21@syzkaller.appspotmail.com,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20211228234257.1926057-1-seanjc@google.com>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-In-Reply-To: <20211228234257.1926057-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CO2PR04CA0147.namprd04.prod.outlook.com (2603:10b6:104::25)
- To BY5PR10MB4196.namprd10.prod.outlook.com (2603:10b6:a03:20d::23)
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=ebtivvfuu/iVVYSM7ONpSA//vhmPAPcnb83p5lo/lJc=;
+        b=SWhjI98SHfltqdgiWyow7QI72KGG2wVuLjcEtepP+op74FYrFXb1EPC5/S/K+c0P95
+         KV4VpfTnYbOdtiW5jcOCBZJqYM9efaHbBQgkstliTiH1SiJVz6TSIa1pBhh+9ulFkiAL
+         kpid1wb7s3xL4w/YDmF9C/JSptbzvpGXPCc6ShSRO6vDgHDbJfFqu6EapzTreIsCP7AI
+         zJ0qQxQZEMp5X4W60aRmp4yKhX/KHuUuuVU60FreHbNwCkj36awOBQXHWx0g5cmYFYy5
+         f6Hhyli3brhYtVBUorvChS7hqkuPe0E0xbclbIKK+SyMDRKDMT7O9Sc8rzIyLdt/ETuF
+         dQiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=ebtivvfuu/iVVYSM7ONpSA//vhmPAPcnb83p5lo/lJc=;
+        b=GGrr00c5/Cn95Hdthw6g2n7wyWlvF45LsCRiFTDxXE6Tx1WuczNnxXmYa0e64l8qy7
+         ZoMxrNO1lhCLIqF8vjGgyUq+yjbvYoJqsFsGVViLsZW/QSOItyXevYPosi4et3Qlb72Y
+         8PrjcZe7ex6B7/3AJvQnDqJpvOSIsxpBM8pIClkrLf3cULaUBiAyLIYqwGFECXv0Wn63
+         sJ634McaA9VdCTX35DBHYu0mOUvpM+4/OE2ZPFHIpKwTyW2zyI9OpDsyv1gJvYfsXWt9
+         d3jIqhKSIfyQlvEMY349/9nSGNDbYrkmIijykrLElEdkWoCi9I+Z6wy51Y9Jud4LIH52
+         UpEQ==
+X-Gm-Message-State: AOAM532+MVILiCyhwALDXzxNlOqOKSIEYPdzU+b/p1u72ytuh+bc7zjy
+        fRCUXkkJfqkfCcGYxoAbDdQ=
+X-Google-Smtp-Source: ABdhPJxI+lHyiN4W4B4UkhP6Y1pp+RS1AlU1CURTT2WBjHLXu4TT45MCNJnNiIOc0/u/zonFvosJjA==
+X-Received: by 2002:a17:902:e804:b0:149:132e:a23e with SMTP id u4-20020a170902e80400b00149132ea23emr24030931plg.118.1640750798216;
+        Tue, 28 Dec 2021 20:06:38 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id c7sm23643104pjs.17.2021.12.28.20.06.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Dec 2021 20:06:37 -0800 (PST)
+Message-ID: <d3a9a73f-cdc2-bce0-55e6-e4c9f5c237de@gmail.com>
+Date:   Wed, 29 Dec 2021 12:06:26 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9d75a3aa-3c73-4bbf-950f-08d9ca7ea963
-X-MS-TrafficTypeDiagnostic: BYAPR10MB3000:EE_
-X-Microsoft-Antispam-PRVS: <BYAPR10MB30001726AF861C6540B84023E2449@BYAPR10MB3000.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fwPZCCslesBWixhk8EJt8Au8oCzDxLqayH/jKp6Ukyr5UN/+nh3u8HmpXZ/w1WOIkFbaOEXg5e9GaPBnRLdwbT1gcgZdICd75vr9yuVvBKujhF9Kl+nCjQTxfoxmmlFMbcmxMR+32pmEJNdvNxFeiuQl/6N3oTgz9qvF6Xxlq1UVULO9fBpYNlPO3ia/8RMeYh9zHbSYT16mcXHZ29NhBWyPhoRBqdrPlw6eHICNpVIPxNdzS/oSH2PTPjtkZ0jOfta+c3jIxOSiOvYACSxpKBQ4Zoj7qG5d0psmhl0PiSnXE4seNUXA48+MGDPbOrdYPaBISn0bdIq2V6pQUU7MP/C/khoWwWZ4c+qJsf8zUu4HG2uOQF/B1O9FQTMgpSgbIfQ1+WPixjJWs5nUnRhTq/AJxujn5Bpcg+nz08BKSh6l+VkbK0A4NXIJ1EbnC3KV9YFzhFOCKPXkdSIy5HGRUOH/75YmBjAVPeL87dlOPl2H65/Mf3zoS0c89WF3Kh/wqrgRMZeZdzsXqfGhYA+Qn0AbC+2IxwkgFjZoBBdhihyyLut91Os45dTYaGDnptpeBmV1chf8zeVCog6y2Ov5j1hAE35i9CvxDgD9PeATT6/x1LfkNhgvJuBO9Dez6QJ0Y+dx2n9TJq3u3wDC1EVdMdwDJgWt37OWyIuYxvR6U6VN6fTlSUHBr5lvvVJJERre8g6ghSWvsrvhIQHhEvkicC/FWcldc7oNMmaWZaHrMPOJH2javNlpEuuLNyA5jKnFjYjBlbesKCi6+Tu8R9KLgA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4196.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(36756003)(6916009)(54906003)(6666004)(8936002)(83380400001)(316002)(31696002)(31686004)(6486002)(53546011)(4326008)(38350700002)(6512007)(26005)(508600001)(186003)(38100700002)(5660300002)(44832011)(86362001)(6506007)(66946007)(8676002)(2906002)(2616005)(52116002)(66476007)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SFE3YkZQRTNlTVJHNk5FSVorT1lzeEs2T2Jqb2FUSktRMGtoNkI0WUlyR1VE?=
- =?utf-8?B?Q0JIT3gvd2d1L1ZmenNlOTh3blFBbmRPSkNhQUJBL0l4RmJUUFF4V3l4dGNm?=
- =?utf-8?B?TlVLK01oUStvcjcvRTZablJZMHArdHJYaURFdzRGRzIxeGhnTWdwWXdxQkhV?=
- =?utf-8?B?SlFiblFNMHpnV0JTM1dtMHMzVEMvZ2h6YnNUUDVXZ05TbkJZR1BIaGk3RmRl?=
- =?utf-8?B?QVQrZmxSM1pSRm54dlFBZ0xvYmFCc29HVFpzLzFKMkpGaUZRLzNQWFh2dS9r?=
- =?utf-8?B?dWFNa0VvUmt2cFN4ZXlMNTAvMFFnRnRtZWgydzA4aElwaWlYSFQ0V0UvZDl6?=
- =?utf-8?B?cktNRmpST2VSbjUwSUMyb21MS0VZbERFOHZLVXNDNG90bG12NVNjTDVFWW9u?=
- =?utf-8?B?bjQxaDVGaUhodEpwNzQzQVFUandxbmpRQkEwSytFTkVPRkdSa3BwWWU1cWth?=
- =?utf-8?B?TVJsRnhSbFFuVkVCYkU0cUpvUXdxeG9wT202eGt3L3RvNHBsR1dJOS90L3VZ?=
- =?utf-8?B?eG9tUUJrQ2hkTmlDaFZCM3I1S2E5azJNUlZncGJ0bjQ5dGVuZ296Q2t3MTg0?=
- =?utf-8?B?SGZpUWpyaGIwMkI5TVdOaDJoWHpKM1plVm5XcWh0dnRrSDJiWXI5RjdNZE9K?=
- =?utf-8?B?OUNtcFdVUGpOSktjZ1FSeFF3aVFrSFFXU3d2Y2p4Y2ovTTNobnZBUk50SFBQ?=
- =?utf-8?B?KzFLNnNZMEtCMnh5cnlzMktYSVRBUk1iMU5wMGxxM2NQVDBMd0VQN29ORUJB?=
- =?utf-8?B?emtRM2FBWmhDdFdWNjdnYkF5OTFwUlV5Rk4zK09aVUJlTkczbDJaNWR5RW1z?=
- =?utf-8?B?eDVTNEpYMHlrZkVvZjBCakY4a1l0aXAweUZiM1NQUUFlWjNPQlNKUEtQbi9U?=
- =?utf-8?B?U0syTSt2aEFjTmI0TlBjV2I1dlYra1pOWHJPU1FUamdnVFBwUmpKc2hvUGFU?=
- =?utf-8?B?V3dNWEVqeXpVY2x5SVVQR241MmwyaHJhV2NaY3dKZk9va3pnUzBLVXY0RDQv?=
- =?utf-8?B?M0hFNjhyWUlhSDdQSUlHRDZYRUZkQ0VlMUhFbGo2a0UxRStvQm52RjQycysy?=
- =?utf-8?B?YzhGS01OTkNsbldWcWs1OUw1ZVlzQ0xvREJlaU85Sm95SjZVR1kvRE1QMnQ0?=
- =?utf-8?B?bWpnc3NVZCtldTJtU2JRSHRnWDRtNnpTTXJLeWlQa21oWFBjNGZLMDczZmF3?=
- =?utf-8?B?ZW9FM3RNeXhOK00xN0ZaTDN1SXVWazVzVVRXRXZwQVVobnFXSWdZRERWTjds?=
- =?utf-8?B?M0lRc2ozZVhqOG9CU0FpamdtN1ZPNG9tSzY0ejZ2ZkxBdmtnUUJWcjFIV1Nr?=
- =?utf-8?B?cWdldmtWejQvTmlSU0llVkdRNm1tRVJqOXEyQVhqQU9FMUxaRGpGRXh3WDZy?=
- =?utf-8?B?VGw4OGU2Y0Y5VW9xTUZrVGNPaUVzYnpTZUcrU2tlVkZKUU5UR1gwNzNYaEVC?=
- =?utf-8?B?TElvSksyNE9neUFSekVLUnBFei90K3I2N05rd1VxY01iNU9ZcE9naVc5Wmp5?=
- =?utf-8?B?SHpFRU1zUTRYVmNGRlR3b2tmNFRYNHVqVi9aaW40MW5Oa3dnekNaYUoxZE5T?=
- =?utf-8?B?aGpoSnVsWjdWV1RSblhMckZzYWYyOTl5NW9tZk5XeXZGeTM2MU1pMks2dkh6?=
- =?utf-8?B?SUlJRlVFeFFhVUIrUWE4UXZ1UnBUTWpzbVFKR2NZcU5HRGYydVFkMmZuS1JR?=
- =?utf-8?B?TXFjaDV3bWg2NWF5WVBKd1c4T0lLWGo5bndJUU9UaVhZUmNDZmFvQUFFN3g5?=
- =?utf-8?B?WHo0a3lzc1RiaytDTER0bzhDOXFYYS8rNEJBYys5Z0FoT1B4M0pXeU5DazRK?=
- =?utf-8?B?TUdkaWVvYTdWRmt0TlZ1WlRwbDdycm54bmNlblpUK3lPRUY0UmJ0ckFDaG0v?=
- =?utf-8?B?UWJvYWdEOVhVSTNEcTlsOE96K0xQQ0RIK0VPSEgzZ0hpM0RYT1E0QkZXMG1v?=
- =?utf-8?B?eVZ1ZWRMUHV1cUxzbDFoN3hiVDIzdUtDSnhFU1NBZFY3RGwvOEhkQnQybUcx?=
- =?utf-8?B?M0VOR1dTWlVRNTJseElQV0Q1WTM5TjZOVXplZUVOK3MwU1UzT3dmMVIzR3I5?=
- =?utf-8?B?eG1BVG9mVnhEckZoU2I3eDVHVzJ0Y25PMVJpdW5rZ3Z2c0kxYTBsaTVNUGIx?=
- =?utf-8?B?ckZhYUpxM3pnb3lSOEwzVnJxejl3NVZFSFBuWHQrNS84Y1FMR1B2aThSUU9H?=
- =?utf-8?Q?iXY36LqXcABTjE0hoOn7iNw=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d75a3aa-3c73-4bbf-950f-08d9ca7ea963
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4196.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2021 03:52:40.8076
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: I+LbXnj5spuNGT8Yugd7xFquYgrWJZM/Zrkeu8jFDA38zIvzFQs3ND7Ctt/0PmNlqFw+/W3iokxQWJO05zH1Gg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB3000
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10211 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- malwarescore=0 mlxscore=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112290018
-X-Proofpoint-GUID: kBYEkd2QyCLtZfLWaevkET26Hv3iOu2T
-X-Proofpoint-ORIG-GUID: kBYEkd2QyCLtZfLWaevkET26Hv3iOu2T
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <likexu@tencent.com>,
+        Dongli Cao <caodongli@kingsoft.com>,
+        Li RongQing <lirongqing@baidu.com>
+References: <20211222133428.59977-1-likexu@tencent.com>
+ <CALMp9eTgO4XuNHwuxWahZc7jQqZ10DchW8xXvecBH2ovGPLU9g@mail.gmail.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH v2] KVM: X86: Emulate APERF/MPERF to report actual vCPU
+ frequency
+In-Reply-To: <CALMp9eTgO4XuNHwuxWahZc7jQqZ10DchW8xXvecBH2ovGPLU9g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Cc Andrew if he wants to take it though his tree.
+Hi Jim,
 
-On 12/28/21 15:42, Sean Christopherson wrote:
-> Pass "end - 1" instead of "end" when walking the interval tree in
-> hugetlb_vmdelete_list() to fix an inclusive vs. exclusive bug.  The two
-> callers that pass a non-zero "end" treat it as exclusive, whereas the
-> interval tree iterator expects an inclusive "last".  E.g. punching a hole
-> in a file that precisely matches the size of a single hugepage, with a
-> vma starting right on the boundary, will result in unmap_hugepage_range()
-> being called twice, with the second call having start==end.
+Thanks for your detailed comments.
+
+On 29/12/2021 9:11 am, Jim Mattson wrote:
+> On Wed, Dec 22, 2021 at 5:34 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>>
+>> From: Like Xu <likexu@tencent.com>
+>>
+>> The aperf/mperf are used to report current CPU frequency after 7d5905dc14a.
+>> But guest kernel always reports a fixed vCPU frequency in the /proc/cpuinfo,
+>> which may confuse users especially when turbo is enabled on the host or
+>> when the vCPU has a noisy high power consumption neighbour task.
+>>
+>> Most guests such as Linux will only read accesses to AMPERF msrs, where
+>> we can passthrough registers to the vcpu as the fast-path (a performance win)
+>> and once any write accesses are trapped, the emulation will be switched to
+>> slow-path, which emulates guest APERF/MPERF values based on host values.
+>> In emulation mode, the returned MPERF msr value will be scaled according
+>> to the TSCRatio value.
+>>
+>> As a minimum effort, KVM exposes the AMPERF feature when the host TSC
+>> has CONSTANT and NONSTOP features, to avoid the need for more code
+>> to cover various coner cases coming from host power throttling transitions.
+>>
+>> The slow path code reveals an opportunity to refactor update_vcpu_amperf()
+>> and get_host_amperf() to be more flexible and generic, to cover more
+>> power-related msrs.
+>>
+>> Requested-by: Dongli Cao <caodongli@kingsoft.com>
+>> Requested-by: Li RongQing <lirongqing@baidu.com>
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>> v1 -> v2 Changelog:
+>> - Use MSR_TYPE_R to passthrough as a fast path;
+>> - Use [svm|vmx]_set_msr for emulation as a slow path;
+>> - Interact MPERF with TSC scaling (Jim Mattson);
+>> - Drop bool hw_coord_fb_cap with cpuid check;
+>> - Add TSC CONSTANT and NONSTOP cpuid check;
+>> - Duplicate static_call(kvm_x86_run) to make the branch predictor happier;
+>>
+>> Previous:
+>> https://lore.kernel.org/kvm/20200623063530.81917-1-like.xu@linux.intel.com/
+>>
+>>   arch/x86/include/asm/kvm_host.h | 12 +++++
+>>   arch/x86/kvm/cpuid.c            |  3 ++
+>>   arch/x86/kvm/cpuid.h            | 22 +++++++++
+>>   arch/x86/kvm/svm/svm.c          | 15 ++++++
+>>   arch/x86/kvm/svm/svm.h          |  2 +-
+>>   arch/x86/kvm/vmx/vmx.c          | 18 ++++++-
+>>   arch/x86/kvm/x86.c              | 85 ++++++++++++++++++++++++++++++++-
+>>   7 files changed, 153 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index ce622b89c5d8..1cad3992439e 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -39,6 +39,8 @@
+>>
+>>   #define KVM_MAX_VCPUS 1024
+>>
+>> +#define KVM_MAX_NUM_HWP_MSR 2
+>> +
+>>   /*
+>>    * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
+>>    * might be larger than the actual number of VCPUs because the
+>> @@ -562,6 +564,14 @@ struct kvm_vcpu_hv_stimer {
+>>          bool msg_pending;
+>>   };
+>>
+>> +/* vCPU thermal and power context */
+>> +struct kvm_vcpu_hwp {
+>> +       bool fast_path;
+>> +       /* [0], APERF msr, increases with the current/actual frequency */
+>> +       /* [1], MPERF msr, increases with a fixed frequency */
 > 
-> The off-by-one error doesn't cause functional problems as
-> __unmap_hugepage_range() turns into a massive nop due to short-circuiting
-> its for-loop on "address < end".  But, the mmu_notifier invocations to
-> invalid_range_{start,end}() are passed a bogus zero-sized range, which
-> may be unexpected behavior for secondary MMUs.
+> According to the SDM, volume 3, section 18.7.2,
+> * The TSC, IA32_MPERF, and IA32_FIXED_CTR2 operate at close to the
+> maximum non-turbo frequency, which is equal to the product of scalable
+> bus frequency and maximum non-turbo ratio.
+
+For AMD, it will be the P0 frequency.
+
 > 
-> The bug was exposed by commit ed922739c919 ("KVM: Use interval tree to do
-> fast hva lookup in memslots"), currently queued in the KVM tree for 5.17,
-> which added a WARN to detect ranges with start==end.
+> It's important to note that IA32_MPERF operates at close to the same
+> frequency of the TSC. If that were not the case, your comment
+> regarding IA32_APERF would be incorrect.
+
+Yes, how does this look:
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f8f978bc9ec3..d422bf8669ca 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -568,7 +568,7 @@ struct kvm_vcpu_hv_stimer {
+  struct kvm_vcpu_hwp {
+  	bool fast_path;
+  	/* [0], APERF msr, increases with the current/actual frequency */
+-	/* [1], MPERF msr, increases with a fixed frequency */
++	/* [1], MPERF msr, increases at the same fixed frequency as the TSC */
+  	u64 msrs[KVM_MAX_NUM_HWP_MSR];
+  };
+
 > 
-> Reported-by: syzbot+4e697fe80a31aa7efe21@syzkaller.appspotmail.com
-> Fixes: 1bfad99ab425 ("hugetlbfs: hugetlb_vmtruncate_list() needs to take a range to delete")
-> Cc: kvm@vger.kernel.org
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Thanks Sean!
-
-Reviewed-by: Mike Kravetz <mike.kravetz@oracle.com>
-
-> ---
+> For example, suppose that the TSC frequency were 2.0 GHz, the
+> current/actual frequency were 2.2 GHz, and the IA32_MPERF frequency
+> were 133 MHz. In that case, the IA32_APERF MSR would increase at 146.3
+> MHz.
 > 
-> Not sure if this should go to stable@.  It's mostly harmless, and likely
-> nothing more than a minor performance blip when it's not harmless.
 
-I am also unsure about the need to send to stable.  It is possible automation
-will pick it up and make that decision for us.
--- 
-Mike Kravetz
+>> +       u64 msrs[KVM_MAX_NUM_HWP_MSR];
+>> +};
+>> +
+>>   /* Hyper-V synthetic interrupt controller (SynIC)*/
+>>   struct kvm_vcpu_hv_synic {
+>>          u64 version;
+>> @@ -887,6 +897,8 @@ struct kvm_vcpu_arch {
+>>          /* AMD MSRC001_0015 Hardware Configuration */
+>>          u64 msr_hwcr;
+>>
+>> +       struct kvm_vcpu_hwp hwp;
+>> +
+>>          /* pv related cpuid info */
+>>          struct {
+>>                  /*
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 0b920e12bb6d..e20e5e8c2b3a 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -739,6 +739,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>>                  entry->eax = 0x4; /* allow ARAT */
+>>                  entry->ebx = 0;
+>>                  entry->ecx = 0;
+>> +               /* allow aperf/mperf to report the true vCPU frequency. */
+>> +               if (kvm_cpu_cap_has_amperf())
+>> +                       entry->ecx |=  (1 << 0);
+>>                  entry->edx = 0;
+>>                  break;
+>>          /* function 7 has additional index. */
+>> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+>> index c99edfff7f82..741949b407b7 100644
+>> --- a/arch/x86/kvm/cpuid.h
+>> +++ b/arch/x86/kvm/cpuid.h
+>> @@ -154,6 +154,28 @@ static inline int guest_cpuid_stepping(struct kvm_vcpu *vcpu)
+>>          return x86_stepping(best->eax);
+>>   }
+>>
+>> +static inline bool kvm_cpu_cap_has_amperf(void)
+>> +{
+>> +       return boot_cpu_has(X86_FEATURE_APERFMPERF) &&
+>> +               boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
+>> +               boot_cpu_has(X86_FEATURE_NONSTOP_TSC);
+>> +}
+>> +
+>> +static inline bool guest_support_amperf(struct kvm_vcpu *vcpu)
+>> +{
+>> +       struct kvm_cpuid_entry2 *best;
+>> +
+>> +       if (!kvm_cpu_cap_has_amperf())
+>> +               return false;
+>> +
+>> +       best = kvm_find_cpuid_entry(vcpu, 0x6, 0);
+>> +       if (!best || !(best->ecx & 0x1))
+>> +               return false;
+>> +
+>> +       best = kvm_find_cpuid_entry(vcpu, 0x80000007, 0);
+>> +       return best && (best->edx & (1 << 8));
+> Nit: Use BIT().
+
+Applied.
+
+>> +}
+>> +
+>>   static inline bool guest_has_spec_ctrl_msr(struct kvm_vcpu *vcpu)
+>>   {
+>>          return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 5557867dcb69..2873c7f132bd 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -114,6 +114,8 @@ static const struct svm_direct_access_msrs {
+>>          { .index = MSR_EFER,                            .always = false },
+>>          { .index = MSR_IA32_CR_PAT,                     .always = false },
+>>          { .index = MSR_AMD64_SEV_ES_GHCB,               .always = true  },
+>> +       { .index = MSR_IA32_MPERF,                      .always = false },
+>> +       { .index = MSR_IA32_APERF,                      .always = false },
+>>          { .index = MSR_INVALID,                         .always = false },
+>>   };
+>>
+>> @@ -1218,6 +1220,12 @@ static inline void init_vmcb_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>                  /* No need to intercept these MSRs */
+>>                  set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_EIP, 1, 1);
+>>                  set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_ESP, 1, 1);
+>> +
+>> +               if (guest_support_amperf(vcpu)) {
+>> +                       set_msr_interception(vcpu, svm->msrpm, MSR_IA32_MPERF, 1, 0);
+>> +                       set_msr_interception(vcpu, svm->msrpm, MSR_IA32_APERF, 1, 0);
+>> +                       vcpu->arch.hwp.fast_path = true;
+>> +               }
+>>          }
+>>   }
+>>
+>> @@ -3078,6 +3086,13 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>>                  svm->msr_decfg = data;
+>>                  break;
+>>          }
+>> +       case MSR_IA32_APERF:
+>> +       case MSR_IA32_MPERF:
+>> +               if (vcpu->arch.hwp.fast_path) {
+>> +                       set_msr_interception(vcpu, svm->msrpm, MSR_IA32_MPERF, 0, 0);
+>> +                       set_msr_interception(vcpu, svm->msrpm, MSR_IA32_APERF, 0, 0);
+>> +               }
+>> +               return kvm_set_msr_common(vcpu, msr);
+>>          default:
+>>                  return kvm_set_msr_common(vcpu, msr);
+>>          }
+>> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>> index 9f153c59f2c8..ad4659811620 100644
+>> --- a/arch/x86/kvm/svm/svm.h
+>> +++ b/arch/x86/kvm/svm/svm.h
+>> @@ -27,7 +27,7 @@
+>>   #define        IOPM_SIZE PAGE_SIZE * 3
+>>   #define        MSRPM_SIZE PAGE_SIZE * 2
+>>
+>> -#define MAX_DIRECT_ACCESS_MSRS 20
+>> +#define MAX_DIRECT_ACCESS_MSRS 22
+>>   #define MSRPM_OFFSETS  16
+>>   extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+>>   extern bool npt_enabled;
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 1d53b8144f83..8998042107d2 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -576,6 +576,9 @@ static bool is_valid_passthrough_msr(u32 msr)
+>>          case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
+>>          case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
+>>                  /* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+>> +       case MSR_IA32_MPERF:
+>> +       case MSR_IA32_APERF:
+>> +               /* AMPERF MSRs. These are passthrough when all access is read-only. */
+> 
+> Even if all accesses are read-only, these MSRs cannot be pass-through
+> when the 'Use TSC scaling' VM-execution control is set and the TSC
+> multiplier is anything other than 1.
+
+If all accesses are read-only, rdmsr will not be trapped and in that case:
+
+The value read is scaled by the TSCRatio value (MSR C000_0104h) for
+guest reads, but the underlying counters are not affected. Reads in host
+mode or writes to MPERF are not affected. [AMD APM 17.3.2]
+
+> 
+> Suppose, for example, that the vCPU has a TSC frequency of 2.2 GHz,
+> but it is running on a host with a TSC frequency of 2.0 GHz. The
+> effective IA32_MPERF frequency should be the same as the vCPU TSC
+> frequency (scaled by the TSC multiplier), rather than the host
+> IA32_MPERF frequency.
+
+I guess that Intel's implementation will also imply the effect of
+the TSC multiplier for guest reads. Please let me know if I'm wrong.
+
+> 
+>>                  return true;
+>>          }
+>>
+>> @@ -2224,7 +2227,14 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>                  }
+>>                  ret = kvm_set_msr_common(vcpu, msr_info);
+>>                  break;
+>> -
+>> +       case MSR_IA32_APERF:
+>> +       case MSR_IA32_MPERF:
+>> +               if (vcpu->arch.hwp.fast_path) {
+>> +                       vmx_set_intercept_for_msr(vcpu, MSR_IA32_APERF, MSR_TYPE_RW, true);
+>> +                       vmx_set_intercept_for_msr(vcpu, MSR_IA32_MPERF, MSR_TYPE_RW, true);
+>> +               }
+>> +               ret = kvm_set_msr_common(vcpu, msr_info);
+>> +               break;
+>>          default:
+>>          find_uret_msr:
+>>                  msr = vmx_find_uret_msr(vmx, msr_index);
+>> @@ -6928,6 +6938,12 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+>>                  vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
+>>          }
+>>
+>> +       if (guest_support_amperf(vcpu)) {
+>> +               vmx_disable_intercept_for_msr(vcpu, MSR_IA32_MPERF, MSR_TYPE_R);
+>> +               vmx_disable_intercept_for_msr(vcpu, MSR_IA32_APERF, MSR_TYPE_R);
+>> +               vcpu->arch.hwp.fast_path = true;
+>> +       }
+>> +
+>>          vmx->loaded_vmcs = &vmx->vmcs01;
+>>
+>>          if (cpu_need_virtualize_apic_accesses(vcpu)) {
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 42bde45a1bc2..7a6355815493 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1376,6 +1376,8 @@ static const u32 msrs_to_save_all[] = {
+>>          MSR_F15H_PERF_CTL3, MSR_F15H_PERF_CTL4, MSR_F15H_PERF_CTL5,
+>>          MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1, MSR_F15H_PERF_CTR2,
+>>          MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4, MSR_F15H_PERF_CTR5,
+>> +
+>> +       MSR_IA32_APERF, MSR_IA32_MPERF,
+>>   };
+>>
+>>   static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+>> @@ -3685,6 +3687,16 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>                          return 1;
+>>                  vcpu->arch.msr_misc_features_enables = data;
+>>                  break;
+>> +       case MSR_IA32_APERF:
+>> +       case MSR_IA32_MPERF:
+>> +               /* Ignore meaningless value overrides from user space.*/
+>> +               if (msr_info->host_initiated)
+>> +                       return 0;
+> 
+> Without these meaningless overrides from userspace, how do we ensure
+> that the guest derives the correct IA32_APERF/IA32_MPERF ratio for a
+
+The guest cares about the ratio of the two deltas rather than APERF/MPERF ratio.
+
+Effective frequency = {(APERF − APERF_INIT) / (MPERF − MPERF_INIT)} * P0 frequency
+
+> set of measurements that span a live migration? For that matter, how
+> do we ensure that the deltas are even positive?
+
+Once we allow the user space to restore AMPERF msr values different from
+the host values, the slow path will be walked and we try to avoid this kind
+of case due to overhead, whatever for live migration or pCPU migration.
+
+> 
+> For example, suppose that the VM has migrated from a host with an
+> IA32_MPERF value of 0x0000123456789abc to a host with an IA32_MPERF
+> value of 0x000000123456789a. If the guest sampled IA32_MPERF before
+> and after live migration, it would see the counter go backwards, which
+
+Yes, it will happen since without more hints from KVM, the user space
+can't be sure if the save/restore time is in the sample period of AMPERF.
+And even worse, guest could manipulate reading order of the AMPERF.
+
+The proposal is to *let it happen* because it causes no harm, in the meantime,
+what the guest really cares about is the deltas ratio, not the accuracy of
+individual msr values, and if the result in this sample is ridiculous, the guest
+should go and pick the result from the next sample.
+
+Maybe we could add fault tolerance for AMPERF in the guest, something like
+a retry mechnism or just discarding extreme values to follow statistical methods.
+
+The good news is the robustness like Linux guest on this issue is appreciated.
+(9a6c2c3c7a73ce315c57c1b002caad6fcc858d0f and more stuff)
+
+Considering that the sampling period of amperf is relatively frequent compared
+with the workload runtime and it statistically reports the right vCPU frequency,
+do you think this meaningless proposal is acceptable or practicable ?
+
+> should not happen.
+> 
+>> +               if (!guest_support_amperf(vcpu))
+>> +                       return 1;
+>> +               vcpu->arch.hwp.msrs[MSR_IA32_APERF - msr] = data;
+>> +               vcpu->arch.hwp.fast_path = false;
+>> +               break;
+>>          default:
+>>                  if (kvm_pmu_is_valid_msr(vcpu, msr))
+>>                          return kvm_pmu_set_msr(vcpu, msr_info);
+>> @@ -4005,6 +4017,17 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>          case MSR_K7_HWCR:
+>>                  msr_info->data = vcpu->arch.msr_hwcr;
+>>                  break;
+>> +       case MSR_IA32_APERF:
+>> +       case MSR_IA32_MPERF: {
+> ]> +               u64 value;
+>> +
+>> +               if (!msr_info->host_initiated && !guest_support_amperf(vcpu))
+>> +                       return 1;
+>> +               value = vcpu->arch.hwp.msrs[MSR_IA32_APERF - msr_info->index];
+>> +               msr_info->data = (msr_info->index == MSR_IA32_APERF) ? value :
+>> +                       kvm_scale_tsc(vcpu, value, vcpu->arch.tsc_scaling_ratio);
+> 
+> I think it makes more sense to perform the scaling before storing the
+> IA32_MPERF value in vcpu->arch.hwp.msrs[].
+
+Emm, do you really need to add more instruction cycles in the each call
+of update_vcpu_amperf() in the critical path vcpu_enter_guest(), since the
+calls to kvm_get_msr_commom() are relatively sparse.
+
+Will we get a functional error if we defer the kvm_scale_tsc() operation ?
+
+> 
+>> +               break;
+>> +       }
+>>          default:
+>>                  if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+>>                          return kvm_pmu_get_msr(vcpu, msr_info);
+>> @@ -9688,6 +9711,53 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+>>   }
+>>   EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+>>
+>> +static inline void get_host_amperf(u64 msrs[])
+>> +{
+>> +       rdmsrl(MSR_IA32_APERF, msrs[0]);
+>> +       rdmsrl(MSR_IA32_MPERF, msrs[1]);
+>> +}
+>> +
+>> +static inline u64 get_amperf_delta(u64 enter, u64 exit)
+>> +{
+>> +       if (likely(exit >= enter))
+>> +               return exit - enter;
+>> +
+>> +       return ULONG_MAX - enter + exit;
+>> +}
+>> +
+>> +static inline void update_vcpu_amperf(struct kvm_vcpu *vcpu, u64 adelta, u64 mdelta)
+>> +{
+>> +       u64 aperf_left, mperf_left, delta, tmp;
+>> +
+>> +       aperf_left = ULONG_MAX - vcpu->arch.hwp.msrs[0];
+>> +       mperf_left = ULONG_MAX - vcpu->arch.hwp.msrs[1];
+>> +
+>> +       /* Fast path when neither MSR overflows */
+>> +       if (adelta <= aperf_left && mdelta <= mperf_left) {
+>> +               vcpu->arch.hwp.msrs[0] += adelta;
+>> +               vcpu->arch.hwp.msrs[1] += mdelta;
+>> +               return;
+>> +       }
+>> +
+>> +       /* When either MSR overflows, both MSRs are reset to zero and continue to increment. */
+>> +       delta = min(adelta, mdelta);
+>> +       if (delta > aperf_left || delta > mperf_left) {
+>> +               tmp = max(vcpu->arch.hwp.msrs[0], vcpu->arch.hwp.msrs[1]);
+>> +               tmp = delta - (ULONG_MAX - tmp) - 1;
+>> +               vcpu->arch.hwp.msrs[0] = tmp + adelta - delta;
+>> +               vcpu->arch.hwp.msrs[1] = tmp + mdelta - delta;
+>> +               return;
+>> +       }
+> 
+> I don't believe that the math above is correct in the general case. It
+> appears to assume that the counters are running at the same frequency.
+
+Are you saying that if the guest counter is not considered to be running
+at the same frequency as the host, we need to wrap mdelta with
+kvm_scale_tsc() to accumulate the mdelta difference for a vmentry/exit ?
+
+> The whole point of this exercise is that the counters do not always
+> run at the same frequency.
+> 
+>> +
+>> +       if (mdelta > adelta && mdelta > aperf_left) {
+>> +               vcpu->arch.hwp.msrs[0] = 0;
+>> +               vcpu->arch.hwp.msrs[1] = mdelta - mperf_left - 1;
+>> +       } else {
+>> +               vcpu->arch.hwp.msrs[0] = adelta - aperf_left - 1;
+>> +               vcpu->arch.hwp.msrs[1] = 0;
+>> +       }
+> 
+> I don't understand this code at all. It seems quite unlikely that you
+
+The value of two msr's will affect the other when one overflows:
+
+* When either MSR overflows, both MSRs are reset to zero and
+continue to increment. [Intel SDM, CHAPTER 14, 14.2]
+
+> are ever going to catch a wraparound at just the right point for one
+> of the MSRs to be 0. Moreover, since the two counters are not counting
+> the same thing, it doesn't seem likely that it would ever be correct
+> to derive the guest's IA32_APERF value from IA32_MPERF or vice versa.
+> 
+>> +}
+>> +
+>>   /*
+>>    * Returns 1 to let vcpu_run() continue the guest execution loop without
+>>    * exiting to the userspace.  Otherwise, the value will be returned to the
+>> @@ -9700,7 +9770,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>>                  dm_request_for_irq_injection(vcpu) &&
+>>                  kvm_cpu_accept_dm_intr(vcpu);
+>>          fastpath_t exit_fastpath;
+>> -
+>> +       u64 before[2], after[2];
+>>          bool req_immediate_exit = false;
+>>
+>>          /* Forbid vmenter if vcpu dirty ring is soft-full */
+>> @@ -9942,7 +10012,16 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>>                   */
+>>                  WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm) != kvm_vcpu_apicv_active(vcpu));
+>>
+>> -               exit_fastpath = static_call(kvm_x86_run)(vcpu);
+>> +               if (likely(vcpu->arch.hwp.fast_path)) {
+>> +                       exit_fastpath = static_call(kvm_x86_run)(vcpu);
+>> +               } else {
+>> +                       get_host_amperf(before);
+>> +                       exit_fastpath = static_call(kvm_x86_run)(vcpu);
+>> +                       get_host_amperf(after);
+>> +                       update_vcpu_amperf(vcpu, get_amperf_delta(before[0], after[0]),
+>> +                                          get_amperf_delta(before[1], after[1]));
+>> +               }
+>> +
+> The slow path is awfully expensive here. Shouldn't there also be an
+> option to do none of this, if the guest doesn't advertise CPUID.06H:
+> ECX[0]?
+
+Yes, it looks pretty good to me and let me figure it out.
+
+> 
+>>                  if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
+>>                          break;
+>>
+>> @@ -11138,6 +11217,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>                  vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+>>          }
+>>
+>> +       memset(vcpu->arch.hwp.msrs, 0, sizeof(vcpu->arch.hwp.msrs));
+>> +
+>>          /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+>>          memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
+>>          kvm_register_mark_dirty(vcpu, VCPU_REGS_RSP);
+>> --
+>> 2.33.1
+>>
+> 
