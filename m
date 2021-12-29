@@ -2,170 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B524F481047
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 07:23:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA043481071
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 07:37:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238920AbhL2GXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Dec 2021 01:23:16 -0500
-Received: from mail-bn8nam11on2089.outbound.protection.outlook.com ([40.107.236.89]:39393
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238916AbhL2GXO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Dec 2021 01:23:14 -0500
+        id S234643AbhL2GhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Dec 2021 01:37:01 -0500
+Received: from mga01.intel.com ([192.55.52.88]:19993 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230111AbhL2GhA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Dec 2021 01:37:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640759820; x=1672295820;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7zbY9bsvsLMHLya9iAZXXS/yPinVrFxUIFGqUUDbab4=;
+  b=W6HlJ/RUfK82h9oES5Xhx5P6wEc+5tB9f0nhTwgRbLipFhBWR4CGrxSx
+   X60gKYB+2P0kYt2NEnYEXjn6BXV0ciJCAxCuoi5BXk/ObBJEPiZOEt0gD
+   +/YVim3qZLeMHDiVG/OuOX9jfnhSpBmW7FnH36A7oqslJrzpDj2Q1clOX
+   2CkOjanDcSv0S9LzWrLK7OX+OyBRXH9K1ZIs2n/GFSCzx+DXrpZmhA0+d
+   YmWTRloOCYVJlGC0pITbZl4plNBngxnan10JEw9tb1q08egNASqsQZj40
+   TOOEyqLzZqM4r7hCkDbxFHwl7TTveXHnMzQc5bgqKinK0uFxvmrLRhbdB
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10211"; a="265708093"
+X-IronPort-AV: E=Sophos;i="5.88,244,1635231600"; 
+   d="scan'208";a="265708093"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2021 22:36:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,244,1635231600"; 
+   d="scan'208";a="666208910"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by fmsmga001.fm.intel.com with ESMTP; 28 Dec 2021 22:36:49 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 28 Dec 2021 22:36:49 -0800
+Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 28 Dec 2021 22:36:48 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20 via Frontend Transport; Tue, 28 Dec 2021 22:36:48 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.177)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.20; Tue, 28 Dec 2021 22:36:47 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QUT4Aboid9iNq3yGxaEduuCYjCax2mt/ANrG/K1UhLy5jVqc4PfgWPGt6eAr1JKdI3bpEtDx2u9RqsRTTdGBy42n1xjQtdK29HNdBs6UWY1CnItzekcvGqT+WPGX87/7mp2LekJ5e+QqU0S2V5jn3PVC+SNdvMD6cRlxfHKIB5oIPl5e/XTziU7IrvxoF+/eyZODS9Wdtu17KLwq2Hqzfb8eyF8Jg80Ww0dX9vGNwEH6CpvPZ7iGwCC4YO9WQpiLeofpfXR81c1JceE4i9IU14PZhXXSLap5q+n6QAFrRw2vsRmVKnLGXWD1d6mP44KMIdcz/xBuua210DZu0l2LOQ==
+ b=ofag2g8lmX0vZwFHIOijQ4bFWDfdUecDDW5ekCx6HdPHkkYze5e1rMT7tbxLkjj43ZhhLTAxJ46h3avdRQzAsCYaM8xLjoTF7CdEif/ZJGIQHMzRRdy82OONpZjydTGry+Z9FKJilnct7sMEK0u+01pSzZaWsJw/XTL8qVj3qTpmpqrEy4wZfoYZ40PQ13MhRe+1Eg8f3nsnYPUVXATPBAp8zPZbwyqgPIHCveZpXrGEiH9uVwVDdtl2Aq5XwhkpjxaqS9ICHvOODH+bARJH8CjsURlanGAhlKlA2cqPHOLX3Sr4RY4VguiBB9Li5OnhJuZSBwA4MWAkPD1TiFLtAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kmbRg1/gawEgFeJ5aLFeD0hpPmf0OwBIMxMx0n9gJ+g=;
- b=dd4qxPHivPk2n9jVy/87Bj2cMtX7QB8kQqsJ8o8Ugrh1XVe9/z8qrUyOZqxwXIUadB0nnuMPMDnMjv9DAaMUk/iMFRZpgyOS4LVvsEx0C8/7wGrjGE0siCfiNpgI2H7Q7n7OXFFJcNsHh1pRQCkWDOaisFUzjEDLqlncdUvkT1LJbwpFDkMColzJ2Jj+QXrWgmWkKUq8mGL3KULG9TkrmWZR2vxEBEI4oWUYB9m+AVL8oN7ErD9QwxPNXKbcgt/lDalDvohcyiwL2v2gvh5dgGh4tit6hp9AtpBebE+IudUykc8fgo48f5RWnHLd997rCwjCrOGYqhm8e0HFT31rVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kmbRg1/gawEgFeJ5aLFeD0hpPmf0OwBIMxMx0n9gJ+g=;
- b=AMMuE2K+vkgkP76FbkFMsBc55Cj9a9PNzbKh2BAxoiW4sfyliIJaISvMwpc6vVnWmC031hfmXayKdyoxLy/ovApmPwbjo2SHkntUkO/lq+ndIxwF3h4BhXrXtj8qJWUGiw7ucUQDOCIinofgrVAXgJyYBRPPQa7e2336lw/LSeM=
-Received: from DM5PR19CA0006.namprd19.prod.outlook.com (2603:10b6:3:151::16)
- by MN2PR12MB2911.namprd12.prod.outlook.com (2603:10b6:208:a9::21) with
+ bh=7zbY9bsvsLMHLya9iAZXXS/yPinVrFxUIFGqUUDbab4=;
+ b=QeFgZLWKQYJlgmVgZ2ywZct/5DrIQ0ZaqcNHyjsgyvC+57CG43O9/6ptqnB8KKDocFJbjjdihGpc8kbqvRROlnSduuOcb+rcGDYBMpRfADzhGdjOnQA/XF+hzVg4YZc6EQIiB8IZZ2FasjLcHgCgLWrCM8Btj8v6bs67juiu0YULqrpreFkxm9wgIAu/XaXliNN2bOwFKsSW05FfLyZf7GoKokwdWh+sQsqdjX8m8kGR9b+Qbh+wG3E/x/BSdLDdeZ6qgbKtJyMiW6zUuyLzyynOglkCtEw9x7wOuXrvluRG1Xkxbq+X0LMPkCcqj5MG/ySEbw+2Uk2VIcDdpWb1wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN6PR1101MB2196.namprd11.prod.outlook.com (2603:10b6:405:52::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4823.19; Wed, 29 Dec
- 2021 06:23:12 +0000
-Received: from DM6NAM11FT023.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:151:cafe::79) by DM5PR19CA0006.outlook.office365.com
- (2603:10b6:3:151::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.13 via Frontend
- Transport; Wed, 29 Dec 2021 06:23:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DM6NAM11FT023.mail.protection.outlook.com (10.13.173.96) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4844.14 via Frontend Transport; Wed, 29 Dec 2021 06:23:12 +0000
-Received: from bhadra.amd.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Wed, 29 Dec
- 2021 00:23:11 -0600
-From:   Manali Shukla <manali.shukla@amd.com>
-To:     <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests PATCH 3/3] x86: nSVM: Check #OF exception handling in L2
-Date:   Wed, 29 Dec 2021 06:22:01 +0000
-Message-ID: <20211229062201.26269-4-manali.shukla@amd.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211229062201.26269-1-manali.shukla@amd.com>
-References: <20211229062201.26269-1-manali.shukla@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4823.21; Wed, 29 Dec
+ 2021 06:36:44 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::5c8a:9266:d416:3e04]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::5c8a:9266:d416:3e04%2]) with mapi id 15.20.4844.014; Wed, 29 Dec 2021
+ 06:36:44 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>
+Subject: RE: [PATCH v3 19/22] kvm: x86: Get/set expanded xstate buffer
+Thread-Topic: [PATCH v3 19/22] kvm: x86: Get/set expanded xstate buffer
+Thread-Index: AQHX9zE4nQc2VVNaCkmSJ6dfEGDKnaxIqm0AgAAm9QCAADtnYA==
+Date:   Wed, 29 Dec 2021 06:36:43 +0000
+Message-ID: <BN9PR11MB5276411D19957E7EA51C53A98C449@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20211222124052.644626-1-jing2.liu@intel.com>
+ <20211222124052.644626-20-jing2.liu@intel.com> <YcuuCMCQryzUFoAZ@google.com>
+ <96d1266eeeb8434f9e23f9a051e252e6@intel.com>
+In-Reply-To: <96d1266eeeb8434f9e23f9a051e252e6@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a8b2234f-48ca-4c91-c74a-08d9ca9594a3
+x-ms-traffictypediagnostic: BN6PR1101MB2196:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <BN6PR1101MB219629AB87B2F67C5D2196488C449@BN6PR1101MB2196.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: zKW5s9QEkhG+Yu1JA0gvoSI1iI2jZLzU4d2+MNJM2Adq/KAqR17hGl/youf7A3qJaO1HOdF+ENM0m6BhEtNDLuil4fPif+9AW+MIqnaw4BLb+9vj89AgHRMSzBkK7ts5rW4hfeQG3fT2OgIEtTRQLtYETM05Amr6HLwzBjcUdiVE0TRx5zYAJF9txZaSUkqsU7sjHHMmXTWs5BQkfbp3rC/kbFEevcpoXjjTJ9YFLa/rTK87bdUUytA0fThhHD50e/BZD/wpwLOTjgCRKY9OoF5aeEdk0Gsz8pfAgbhU9/Q4fHbhruuativSfAmdT91hKF74FChvaNnLrD2uYV8Von6fjuQOFRUMNesmKPczfEtEc6QypH9AujCVHXzSoIiJYixJn2UzYYfH/rxqsooccIuODXjQBpvz5rOfcIPvK5rWUl1sBC56Ca1wNYIT1DwzVUiKq5sMw3o/P4DDN1gZRS1g3MdzAMicNVgGATTnEMjUOTLVzg3JSVqdpf84Ti7pyptOEUTMAdIY3FWcnY0kTy5+Kq/kUdGNzsXUFI92s29uLdiwgaLk0yes3nRMbSX/mfrSDNNa9w9dFPdgf2qJkD1ULUoC3Es4Q88DDhMeUPzjEpUj0lryM3VOcGIOLI5CFoEroJzQSx3wwJL0B0kYm+yHl9TQE/JDrNuBzIphSTdAl11maohPOVfELa2EXO6l7UmvWHb3+bmAiZmjHc7+bXJmiyAd29XHKw4Qyi7vN8aFC7Fto08/jVZQxeGsWomU9wMOY2kpiV7ObVCcGriiuWWtS0zb8v2Hcq4WDaKKLXU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(66946007)(66476007)(64756008)(8676002)(66446008)(110136005)(76116006)(6636002)(9686003)(2906002)(83380400001)(7696005)(66556008)(82960400001)(8936002)(316002)(4326008)(33656002)(966005)(38100700002)(55016003)(54906003)(5660300002)(186003)(38070700005)(508600001)(6506007)(7416002)(26005)(86362001)(52536014)(71200400001)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/nFYEiyYCdQwgz5weEP8dZZkdr5sC8NErwrzawobc9SpcQ+kBRgC2ctPZO/q?=
+ =?us-ascii?Q?grJopTo7gjEosLkfjcLdUsV2R8QqhX63d70j7I3SHpSFPxn6lhZJZ/21tAPT?=
+ =?us-ascii?Q?dGRqS+F94B3JVFSNuB9H8pbKFqjbvFqk4tyx4eD8mD1zCBeqrLeGXFpKY5fo?=
+ =?us-ascii?Q?JHD12e0V8XX8OuM/YgZaLTlugjMOeMXm1OJEg2HTozK0uCA3FG15e6NNFuo2?=
+ =?us-ascii?Q?KlvFfuF6azCBIr4jOyBoibh4pyGUWLJJH/GasK1PJygt3vrIKCb4se8Weaug?=
+ =?us-ascii?Q?x1fTRitByOBvIV0qZ+0/X9CxujB+LfVrcMr+YEGknQiobMizw5gDAZKgn1iS?=
+ =?us-ascii?Q?eL5Khk/pJVYkx8HVZ50L++wnKO1ev3B1DB1esinZ9LNcCMCtGJR+gNdVSNnl?=
+ =?us-ascii?Q?EYKHURJUFY9BXqiT1iKVPo2i64M/swFmRSEUOOBhVfd0O1C+iWQmB0J5OGjM?=
+ =?us-ascii?Q?m9PlYA2H0uFYlJHwoTO7w6ugnk85lZuFjNjBRMDT4zej0jSBDwkMaN/ejQlv?=
+ =?us-ascii?Q?8edonM4z5dYIs6Wo88KPbdoo+0p638gqU4W2ngq0Zkdx8V0ibc/PDPL1qXZZ?=
+ =?us-ascii?Q?GLmS91Uz+G+2x9T4HQvGpAfUptK0nb1iXCsL99Pf3XRNRwQ0yTjLv4iV8em+?=
+ =?us-ascii?Q?81PGMZFkNvmlE1SSK15iJBppqhz6PhFYRut9wMobWOTIHlKFWbkkPxfb78sp?=
+ =?us-ascii?Q?S8NiMI/SwI8zlqGvi3RCaAp296edp1iqLXzVD9Vx6RmWJfpBjYXhGGZzbjCD?=
+ =?us-ascii?Q?aj/2eM5MNdQ9D8xJ95oo7iWpKwb/MgmsCzjz6QJoWa42NFFH65jRFFBZ6qLG?=
+ =?us-ascii?Q?WVf11aYn7w8y5dpe2lCnvU/HlNOPwZQphY+7d+6c8DHbaVgMwX7qgmKfqEY8?=
+ =?us-ascii?Q?dKie+LmsUkgqWi9Lylgpa4xuldZYyo9Nw+RUS3Hs4YQGKYr6htE8iTyLl0V9?=
+ =?us-ascii?Q?Vk6Vc/gwjKAIlsvrz98xrN6eBXOWqyciOvE9iJNEW83Ao/wBxNn0n9mAUP5a?=
+ =?us-ascii?Q?yuVdcbuAwx8YRjNlrVuJvFfRd6JsmJpXTBhxk6fpH4CSIiv36hcswC1uqHPk?=
+ =?us-ascii?Q?N1QBrNU6EuM2N0C+FyVPdbodijW9wKnZqGyEA4zCKE7+XRf9HiY3zDw8ipP6?=
+ =?us-ascii?Q?ZcWvZ2sngOzTtqXgVbHOgOo++wtFxCLF+51E8dnLCAwBkNNqfFfJeyh0PxtW?=
+ =?us-ascii?Q?YqL63E2xR/n58IFHdN5AKQ0jcFUVj83pZQKJWq0wtiCS2TyHdvWw1M6EON82?=
+ =?us-ascii?Q?gHD24o89+JthpU6plHeyjE0aRvZA8Tgt+j7RFXT0T6Aw6CJMQ14Rd5NnuNbl?=
+ =?us-ascii?Q?HFrWL35HG/tUWfDk5Sww6BxcmsiroB/fKGX4K9eun+S1FyOFzM9L+7HCCxno?=
+ =?us-ascii?Q?xsDs5whkzpjVwtPYdavurjjFCnrP3SKQf4sOrgWh4iahen18e9ZpYgw7lzNB?=
+ =?us-ascii?Q?Vg2+p5ECl9WaWjpZjv2eKPB8Yg+jWBO68CUl9r5UlkwJohB27VIZp02HiPtM?=
+ =?us-ascii?Q?TksWJA8HQU6FBiU0LN9P5SfFsYxwOSpEaGklJOe0LPnb+heU1/SH4MqA8292?=
+ =?us-ascii?Q?1XGkqkXZfTriauiaUJ87Jk0dOLjgECAE8he14RAyfAdTRWBcTsmfbWf4YtKB?=
+ =?us-ascii?Q?7cx167gtDn18SPf42LGUjt8=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 05a0d543-8322-4ca3-2372-08d9ca93b0df
-X-MS-TrafficTypeDiagnostic: MN2PR12MB2911:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB29111F7DEC9C853632EBBE97FD449@MN2PR12MB2911.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1227;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lY/1Wk2vuxvV8LGys611fg8Kr5rv6bSuI/IqflO1gaO70qo9sD6nR/wL9a0XrROCArqiZp+gDdfaVSDUo5uAbzjeplRV3qPtKxoJh6dRSFlAddfICY4j6Gs9l30+cSouJMEKZl9mUq1CmBJlU/M0WBpNxAG7gMwkxHHMWhtkGafA2bxaUYotPOkflseu6smMHzvG5lqD9t1e9hsyKpmzMd48e/QYmxiNx/0Ou8/hH/mTMFa4TTNRrlGA2sxTg8eRxMrRpJIV1Vltl2WDoTsXC3XnVnRH79wj48ceeewR9kDsfNcGJ67BooCNLT1YkKpWoNHzAe5mpCCeuL2fJGR/o3MTTZ0GKhVvlBcSPLuB1Idtvp7hBTMUo4hHPv/H4Rmi3DAhH/dATzntfJ6BITvAoB86dyjuyb6DRk0mXzQiIL1UQDE2JHI262aKpzAvn/9m/vkisrNwFUz1HuJxMfAvSsCyVr7gkUwFPiTVHQAgSNNvcevpx0GDH44dFZFhIuNrrrjDwTN24SLmPBLoLqtIqfZnBxb6GiKz2/jf1e3e0IEMR5h2sgz8aDk5KXl15MU0ovZfTcysr7pt+3LBM3cSvittjtguVUT8iwPxSI9BbYVDjWelG7hmsVRbqH+A0dg9QmPiiDIpYHCuWv9Bt9gwcXyRvHqiuaXvBdZtJEnYIP7QJBnThF6prDMCupqp2M8GWcpFBCzd1j1Kf8rSSzO68qnVmHJyKIqdMxnJD1gn33OgAlreD/aOs+HAR0Yl8uUbGtgClMDGnQlKK7/MqLIGvgDT/AWxIZhg5NBp9NZABXU=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(40470700002)(336012)(2906002)(316002)(26005)(70206006)(1076003)(8936002)(86362001)(426003)(508600001)(16526019)(5660300002)(82310400004)(40460700001)(186003)(47076005)(8676002)(36756003)(6916009)(7696005)(36860700001)(70586007)(44832011)(81166007)(356005)(6666004)(2616005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2021 06:23:12.5115
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8b2234f-48ca-4c91-c74a-08d9ca9594a3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Dec 2021 06:36:44.0075
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05a0d543-8322-4ca3-2372-08d9ca93b0df
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT023.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB2911
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OpAZlBdWyLdwhp/xMBBxymYRXpXdzjXzVbLG6KqOen0/lHwdAaOhWO65fF7n1f1K6STBxRx+NicOptO/ZIbGLw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1101MB2196
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add coverage for OF exception handling in L2 when only L2 OF
-exception handler is registered.
+> From: Wang, Wei W <wei.w.wang@intel.com>
+> Sent: Wednesday, December 29, 2021 10:58 AM
+>=20
+> > > Reuse KVM_SET_XSAVE for both old/new formats by reimplementing it to
+> > > do properly-sized memdup_user() based on the guest fpu container.
+> >
+> > I'm confused, the first sentence says KVM_SET_XSAVE isn't suitable, the
+> > second says it can be reused with minimal effort.
+>=20
+> Probably "doesn't support" sounds better than "isn't suitable" above. But
+> plan to reword a bit:
+>=20
+> With KVM_CAP_XSAVE, userspace uses a hardcoded 4KB buffer to get/set
+> xstate data from/to
+> KVM. This doesn't work when dynamic features (e.g. AMX) are used by the
+> guest, as KVM uses
+> a full expanded xstate buffer for the guest fpu emulation, which is large=
+r
+> than 4KB.
+>=20
+> Add KVM_CAP_XSAVE2, and userspace gets the required xstate buffer size
+> from KVM via
+> KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2). KVM_SET_XSAVE is extended
+> with the support to
+> work with larger xstate data size passed from userspace. KVM_GET_XSAVE2
+> is preferred to
+> extending KVM_GET_XSAVE to work with large buffer size for backward-
+> compatible considerations.
+> (Link: https://lkml.org/lkml/2021/12/15/510)
+>=20
+> Also, update the api doc with the new KVM_GET_XSAVE2 ioctl.
+>=20
 
-OF exception generated using instrumented code and it is handled
-by L2 OF exception handler.
+Revised to:
 
-Signed-off-by: Manali Shukla <manali.shukla@amd.com>
----
- x86/svm_tests.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+--
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index ed67ae1..0707786 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2962,6 +2962,53 @@ static bool vgif_check(struct svm_test *test)
-     return get_test_stage(test) == 3;
- }
- 
-+static int of_test_counter;
-+
-+static void guest_test_of_handler(struct ex_regs *r)
-+{
-+    of_test_counter++;
-+}
-+
-+static void svm_of_test_guest(struct svm_test *test)
-+{
-+    struct far_pointer32 fp = {
-+        .offset = (uintptr_t)&&into,
-+        .selector = KERNEL_CS32,
-+    };
-+    uintptr_t rsp;
-+
-+    asm volatile ("mov %%rsp, %0" : "=r"(rsp));
-+
-+    if (fp.offset != (uintptr_t)&&into) {
-+        printf("Codee address too high.\n");
-+        return;
-+    }
-+
-+    if ((u32)rsp != rsp) {
-+        printf("Stack address too high.\n");
-+    }
-+
-+    asm goto("lcall *%0" : : "m" (fp) : "rax" : into);
-+    return;
-+into:
-+
-+    asm volatile (".code32;"
-+            "movl $0x7fffffff, %eax;"
-+            "addl %eax, %eax;"
-+            "into;"
-+            "lret;"
-+            ".code64");
-+    __builtin_unreachable();
-+}
-+
-+static void svm_into_test(void)
-+{
-+    handle_exception(OF_VECTOR, guest_test_of_handler);
-+    test_set_guest(svm_of_test_guest);
-+    report(svm_vmrun() == SVM_EXIT_VMMCALL && of_test_counter == 1,
-+        "#OF is generated in L2 exception handler0");
-+}
-+
- static int bp_test_counter;
- 
- static void guest_test_bp_handler(struct ex_regs *r)
-@@ -3148,5 +3195,6 @@ struct svm_test svm_tests[] = {
-     TEST(svm_test_singlestep),
-     TEST(svm_nm_test),
-     TEST(svm_int3_test),
-+    TEST(svm_into_test),
-     { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
- };
--- 
-2.30.2
+With KVM_CAP_XSAVE, userspace uses a hardcoded 4KB buffer to get/set
+xstate data from/to KVM. This doesn't work when dynamic xfeatures
+(e.g. AMX) are exposed to the guest as they require a larger buffer
+size.
 
+Introduce a new capability (KVM_CAP_XSAVE2). Userspace VMM gets the
+required xstate buffer size via KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2).
+KVM_SET_XSAVE is extended to work with both legacy and new capabilities
+by doing properly-sized memdup_user() based on the guest fpu container.
+KVM_GET_XSAVE is kept for backward-compatible reason. Instead,
+KVM_GET_XSAVE2 is introduced under KVM_CAP_XSAVE2 as the preferred
+interface for getting xstate buffer (4KB or larger size) from KVM.
+(Link: https://lkml.org/lkml/2021/12/15/510)
+
+Also, update the api doc with the new KVM_GET_XSAVE2 ioctl
+
+--
+
+Thanks
+Kevin
