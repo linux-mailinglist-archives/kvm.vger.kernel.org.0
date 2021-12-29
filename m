@@ -2,179 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B98948136B
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 14:15:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E50E4481371
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 14:18:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236703AbhL2NPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Dec 2021 08:15:50 -0500
-Received: from mga07.intel.com ([134.134.136.100]:28047 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236179AbhL2NPU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Dec 2021 08:15:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640783719; x=1672319719;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7O+Es7o+eCrwHN35mK6kNOWodcC1efhp1RiDWaOF2Dw=;
-  b=CWOJ8UKq7Q0SJWzLNlMzrhEeDIzIoR7/k/zFXZXFpPF4HQfxcog3W99n
-   IiOKKeNs+cZxXafAWUDESnyemj1G45XQf8YsPqDUZGKXXFvzYcroFDohO
-   uPr+mOK7iiOD5crkh/rbgHxrOvo+rjSdI4Q6AtGeSdPYc+H7eV3xpATV6
-   z3iGIN5qW65+V661/iam4axTN2V/ASmvHeZ24ghReSx7Y653z0b2WB+ID
-   dv6EIQhTFev5eecSGGyoKYQTncwe/vBdWRSXeuX9+Yu3ytI2Vpwws8HLA
-   GmhWSdD1AENBOIwV2iVGHpMC7kEx86IVUiJ1JirANMhiVGA5bMWjhK2po
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10211"; a="304876170"
-X-IronPort-AV: E=Sophos;i="5.88,245,1635231600"; 
-   d="scan'208";a="304876170"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2021 05:13:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,245,1635231600"; 
-   d="scan'208";a="666281231"
-Received: from 984fee00bf64.jf.intel.com ([10.165.54.77])
-  by fmsmga001.fm.intel.com with ESMTP; 29 Dec 2021 05:13:44 -0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, pbonzini@redhat.com, corbet@lwn.net,
-        shuah@kernel.org
-Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, jing2.liu@intel.com,
-        guang.zeng@intel.com, wei.w.wang@intel.com, yang.zhong@intel.com
-Subject: [PATCH v4 21/21] kvm: x86: Disable interception for IA32_XFD on demand
-Date:   Wed, 29 Dec 2021 05:13:28 -0800
-Message-Id: <20211229131328.12283-22-yang.zhong@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211229131328.12283-1-yang.zhong@intel.com>
-References: <20211229131328.12283-1-yang.zhong@intel.com>
+        id S233688AbhL2NSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Dec 2021 08:18:33 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:50435 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232575AbhL2NSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Dec 2021 08:18:32 -0500
+Received: from [192.168.0.2] (ip5f5aecf5.dynamic.kabel-deutschland.de [95.90.236.245])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id D5DFC61EA192E;
+        Wed, 29 Dec 2021 14:18:29 +0100 (CET)
+Message-ID: <ea433e41-0038-554d-3348-70aa98aff9e1@molgen.mpg.de>
+Date:   Wed, 29 Dec 2021 14:18:29 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com
+References: <20211215145633.5238-1-dwmw2@infradead.org>
+ <9a47b5ec-f2d1-94d9-3a48-9b326c88cfcb@molgen.mpg.de>
+ <ab28d2ce-4a9c-387d-9eda-558045a0c35b@molgen.mpg.de>
+ <3bfacf45d2d0f3dfa3789ff5a2dcb46744aacff7.camel@infradead.org>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <3bfacf45d2d0f3dfa3789ff5a2dcb46744aacff7.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Kevin Tian <kevin.tian@intel.com>
+Dear David,
 
-Always intercepting IA32_XFD causes non-negligible overhead when this
-register is updated frequently in the guest.
 
-Disable r/w emulation after intercepting the first WRMSR(IA32_XFD)
-with a non-zero value.
+Am 28.12.21 um 15:18 schrieb David Woodhouse:
+> On Tue, 2021-12-28 at 12:34 +0100, Paul Menzel wrote:
+>> Same on the ASUS F2A85-M PRO with AMD A6-6400K. Without serial console,
+>> the messages below are printed below to the monitor after nine seconds.
+>>
+>>        [    1.078879] smp: Bringing up secondary CPUs ...
+>>        [    1.080950] x86: Booting SMP configuration:
+>>
+>> Please find the serial log attached.
+> 
+> Thanks for testing. That looks like the same triple-fault on bringup
+> that we have been seeing, and that I reproduced without my patches
+> using kexec all the way back to a 5.0 kernel.
+> 
+> Out of interest, are you also able to reproduce it with kexec and
+> without the parallel bringup?
 
-Disable WRMSR emulation implies that IA32_XFD becomes out-of-sync
-with the software states in fpstate and the per-cpu xfd cache. Call
-fpu_sync_guest_vmexit_xfd_state() to bring them back in-sync, before
-preemption is enabled.
+No, I am not able to reproduce that with Debian’s 
+*linux-image-5.15.0-2-686*, and kexec. With this board, 
+`module_blacklist=radeon` is needed, as the driver *radeon* is not able 
+to deal with kexec – and amdgpu neither [1].
 
-Always trap #NM once write interception is disabled for IA32_XFD.
-The #NM exception is rare if the guest doesn't use dynamic features.
-Otherwise, there is at most one exception per guest task given a
-dynamic feature.
+```
+[    3.349911] [drm] Found VCE firmware/feedback version 50.0.1 / 17!
+[    3.365259] clocksource: Switched to clocksource tsc
+[    3.365284] [drm] GART: num cpu pages 262144, num gpu pages 262144
+[    3.405159] random: fast init done
+[    3.420492] [drm] PCIE GART of 1024M enabled (table at 
+0x00000000001D6000).
+[    3.427634] radeon 0000:00:01.0: WB enabled
+[    3.431828] radeon 0000:00:01.0: fence driver on ring 0 use gpu addr 
+0x0000000020000c00
+[    3.440100] radeon 0000:00:01.0: fence driver on ring 5 use gpu addr 
+0x0000000000075a18
+[    3.458182] radeon 0000:00:01.0: failed VCE resume (-22).
+[    3.463591] radeon 0000:00:01.0: fence driver on ring 1 use gpu addr 
+0x0000000020000c04
+[    3.471615] radeon 0000:00:01.0: fence driver on ring 2 use gpu addr 
+0x0000000020000c08
+[    3.479636] radeon 0000:00:01.0: fence driver on ring 3 use gpu addr 
+0x0000000020000c0c
+[    3.487650] radeon 0000:00:01.0: fence driver on ring 4 use gpu addr 
+0x0000000020000c10
+[    3.495990] radeon 0000:00:01.0: radeon: MSI limited to 32-bit
+[    3.502008] radeon 0000:00:01.0: radeon: using MSI.
+[    3.506906] ata7: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
+[    3.506918] [drm] radeon: irq initialized.
+[
+```
 
-p.s. We have confirmed that SDM is being revised to say that
-when setting IA32_XFD[18] the AMX register state is not guaranteed
-to be preserved. This clarification avoids adding mess for a creative
-guest which sets IA32_XFD[18]=1 before saving active AMX state to
-its own storage.
+> And with that patch I sent Tom in
+> https://lore.kernel.org/lkml/721484e0fa719e99f9b8f13e67de05033dd7cc86.camel@infradead.org/
+>   to expand the bitlock exclusion and stop the bringup being truly in
+> parallel at all?
 
-Signed-off-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Jing Liu <jing2.liu@intel.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/vmx.c          | 23 ++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.h          |  2 +-
- arch/x86/kvm/x86.c              |  3 +++
- 4 files changed, 23 insertions(+), 6 deletions(-)
+No, this does not help, and the Linux kernel resets at the same spot.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 555f4de47ef2..a372dfe6f407 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -640,6 +640,7 @@ struct kvm_vcpu_arch {
- 	u64 smi_count;
- 	bool tpr_access_reporting;
- 	bool xsaves_enabled;
-+	bool xfd_no_write_intercept;
- 	u64 ia32_xss;
- 	u64 microcode_version;
- 	u64 arch_capabilities;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 638665b3e241..21c4d7409433 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -162,6 +162,7 @@ static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
- 	MSR_FS_BASE,
- 	MSR_GS_BASE,
- 	MSR_KERNEL_GS_BASE,
-+	MSR_IA32_XFD,
- 	MSR_IA32_XFD_ERR,
- #endif
- 	MSR_IA32_SYSENTER_CS,
-@@ -766,10 +767,11 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/*
--	 * Trap #NM if guest xfd contains a non-zero value so guest XFD_ERR
--	 * can be saved timely.
-+	 * Disabling xfd interception indicates that dynamically-enabled
-+	 * features might be used in the guest. Always trap #NM in this case
-+	 * for proper virtualization of guest xfd_err.
- 	 */
--	if (vcpu->arch.guest_fpu.fpstate->xfd)
-+	if (vcpu->arch.xfd_no_write_intercept)
- 		eb |= (1u << NM_VECTOR);
- 
- 	vmcs_write32(EXCEPTION_BITMAP, eb);
-@@ -1971,9 +1973,20 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_XFD:
- 		ret = kvm_set_msr_common(vcpu, msr_info);
--		/* Update #NM interception according to guest xfd */
--		if (!ret)
-+		/*
-+		 * Always intercepting WRMSR could incur non-negligible
-+		 * overhead given xfd might be touched in guest context
-+		 * switch. Disable write interception upon the first write
-+		 * with a non-zero value (indicate potential guest usage
-+		 * on dynamic xfeatures). Also update exception bitmap
-+		 * to trap #NM for proper virtualization of guest xfd_err.
-+		 */
-+		if (!ret && data) {
-+			vmx_disable_intercept_for_msr(vcpu, MSR_IA32_XFD,
-+						      MSR_TYPE_RW);
-+			vcpu->arch.xfd_no_write_intercept = true;
- 			vmx_update_exception_bitmap(vcpu);
-+		}
- 		break;
- #endif
- 	case MSR_IA32_SYSENTER_CS:
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index bf9d3051cd6c..0a00242a91e7 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -340,7 +340,7 @@ struct vcpu_vmx {
- 	struct lbr_desc lbr_desc;
- 
- 	/* Save desired MSR intercept (read: pass-through) state */
--#define MAX_POSSIBLE_PASSTHROUGH_MSRS	14
-+#define MAX_POSSIBLE_PASSTHROUGH_MSRS	15
- 	struct {
- 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 76e1941db223..4990d6de5359 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10027,6 +10027,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.guest_fpu.xfd_err)
- 		wrmsrl(MSR_IA32_XFD_ERR, 0);
- 
-+	if (vcpu->arch.xfd_no_write_intercept)
-+		fpu_sync_guest_vmexit_xfd_state();
-+
- 	/*
- 	 * Consume any pending interrupts, including the possible source of
- 	 * VM-Exit on SVM and any ticks that occur between VM-Exit and now.
+```
+[    1.036036] smpboot: smpboot: After 
+x86_init.timers.setup_percpu_clockev()
+[    1.037031] smpboot: smp_get_logical_apicid()
+[    1.038031] smpboot: CPU0: AMD A6-6400K APU with Radeon(tm) HD 
+Graphics (family: 0x15, model: 0x13, stepping: 0x1)
+[    1.039366] Performance Events: Fam15h core perfctr, AMD PMU driver.
+[    1.040033] ... version:                0
+[    1.041031] ... bit width:              48
+[    1.042031] ... generic registers:      6
+[    1.043033] ... value mask:             0000ffffffffffff
+[    1.044031] ... max period:             00007fffffffffff
+[    1.045031] ... fixed-purpose events:   0
+[    1.046031] ... event mask:             000000000000003f
+[    1.048065] rcu: Hierarchical SRCU implementation.
+[    1.050642] NMI watchdog: Enabled. Permanently consumes one hw-PMU 
+counter.
+[    1.051133] smp: Bringing up secondary CPUs ...
+[    1.053202] x86: Booting SMP configuration:
+```
+
+> Or the one in
+> https://lore.kernel.org/lkml/d4cde50b4aab24612823714dfcbe69bc4bb63b60.camel@infradead.org
+> which makes it do nothing except prepare all the CPUs before bringing
+> them up one at a time?
+
+I applied it on top the other one, and it made no difference either.
+
+> My current theory (not that I've spent that much time thinking about it
+> in the last week) is that there's something about the existing CPU
+> bringup, possibly a CPU bug or something special about the AMD CPUs,
+> which is triggered by just making it a little bit *faster*, which is
+> why bringing them up from kexec (especially in qemu) can cause it too?
+
+Would having the serial console enabled make a difference?
+
+> Tom seemed to find that it was in load_TR_desc(), so if you could try
+> this hack on a machine that doesn't magically wink out of existence on
+> a triplefault before even flushing its serial output, that would be
+> much appreciated...
+> 
+> diff --git a/arch/x86/include/asm/desc.h b/arch/x86/include/asm/desc.h
+> index ab97b22ac04a..cc6590712ff4 100644
+> --- a/arch/x86/include/asm/desc.h
+> +++ b/arch/x86/include/asm/desc.h
+> @@ -8,7 +8,7 @@
+>   #include <asm/fixmap.h>
+>   #include <asm/irq_vectors.h>
+>   #include <asm/cpu_entry_area.h>
+> -
+> +#include <asm/io.h>
+>   #include <linux/debug_locks.h>
+>   #include <linux/smp.h>
+>   #include <linux/percpu.h>
+> @@ -265,11 +265,16 @@ static inline void native_load_tr_desc(void)
+>   	 * If the current GDT is the read-only fixmap, swap to the original
+>   	 * writeable version. Swap back at the end.
+>   	 */
+> +	outb('d', 0x3f8);
+>   	if (gdt.address == (unsigned long)fixmap_gdt) {
+> +	outb('e', 0x3f8);
+>   		load_direct_gdt(cpu);
+>   		restore = 1;
+> +	outb('f', 0x3f8);
+>   	}
+> +	outb('g', 0x3f8);
+>   	asm volatile("ltr %w0"::"q" (GDT_ENTRY_TSS*8));
+> +	outb('h', 0x3f8);
+>   	if (restore)
+>   		load_fixmap_gdt(cpu);
+>   }
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 0083464de5e3..5bc8f30c3283 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -1716,7 +1716,9 @@ void identify_secondary_cpu(struct cpuinfo_x86 *c)
+>   	enable_sep_cpu();
+>   #endif
+>   	mtrr_ap_init();
+> +outb('A', 0x3f8);
+>   	validate_apic_and_package_id(c);
+> +outb('B', 0x3f8);
+>   	x86_spec_ctrl_setup_ap();
+>   	update_srbds_msr();
+>   }
+> @@ -1957,6 +1959,7 @@ static inline void tss_setup_io_bitmap(struct tss_struct *tss)
+>   	tss->io_bitmap.mapall[IO_BITMAP_LONGS] = ~0UL;
+>   #endif
+>   }
+> +#include <asm/realmode.h>
+>   
+>   /*
+>    * Setup everything needed to handle exceptions from the IDT, including the IST
+> @@ -1969,16 +1972,24 @@ void cpu_init_exception_handling(void)
+>   
+>   	/* paranoid_entry() gets the CPU number from the GDT */
+>   	setup_getcpu(cpu);
+> -
+> +	outb('\n', 0x3f8);
+> +	outb('0' + cpu / 100, 0x3f8);
+> +	outb('0' + (cpu % 100) / 10, 0x3f8);
+> +	outb('0' + (cpu % 10), 0x3f8);
+> +	
+>   	/* IST vectors need TSS to be set up. */
+>   	tss_setup_ist(tss);
+> +	outb('a', 0x3f8);
+>   	tss_setup_io_bitmap(tss);
+>   	set_tss_desc(cpu, &get_cpu_entry_area(cpu)->tss.x86_tss);
+> -
+> +	outb('b', 0x3f8);
+>   	load_TR_desc();
+> +	outb('c', 0x3f8);
+>   
+>   	/* Finally load the IDT */
+>   	load_current_idt();
+> +	outb('z', 0x3f8);
+> +
+>   }
+>   
+>   /*
+
+Unfortunately, no more messages were printed on the serial console.
+
+
+Kind regards,
+
+Paul
+
+
+[1]: https://gitlab.freedesktop.org/drm/amd/-/issues/1597
