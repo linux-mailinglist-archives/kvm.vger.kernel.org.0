@@ -2,124 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0CAF481153
-	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 10:40:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4D434811DD
+	for <lists+kvm@lfdr.de>; Wed, 29 Dec 2021 12:09:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239566AbhL2JkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Dec 2021 04:40:03 -0500
-Received: from mga06.intel.com ([134.134.136.31]:55789 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235098AbhL2JkB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Dec 2021 04:40:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640770801; x=1672306801;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xg3yNLu1SDSyfnJWw0NUeSPKNgbPrxBdSvpwaZoN6g4=;
-  b=dk6Y0zGjUHxxZoc0RAwP4/5yA90M5bFR+oZ28h2a4vkpdAeAo77DYAGw
-   ns7BQdc6Tkay68phKVLiDiEDQWXWn/XGGz4r7ldzfnhKA89qqAVIiQnv3
-   0hQNuEVBJ92NwZvngNI1OW+cve/2lmEpZqDrpGj8ftCUS1n/oNdbV/Ame
-   XLfgw+quGclzOnHo62G7ki4QvkAZRqrZqdbp69xwiaTbbOPTb88lpQgQQ
-   c/q26aweiKfPl6toGLBbehQWxHMq70qKFDZS+IfrIMcwietX+k45gVJxl
-   2nBcRer1uxaWlNAJ0F8Pye5D+CC1xnnRzqozZtOuzThIYVH3e3uAY4Xl9
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10211"; a="302247434"
-X-IronPort-AV: E=Sophos;i="5.88,244,1635231600"; 
-   d="scan'208";a="302247434"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2021 01:40:00 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,244,1635231600"; 
-   d="scan'208";a="609555047"
-Received: from lkp-server01.sh.intel.com (HELO e357b3ef1427) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 29 Dec 2021 01:39:58 -0800
-Received: from kbuild by e357b3ef1427 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1n2VR7-0008nv-Jh; Wed, 29 Dec 2021 09:39:57 +0000
-Date:   Wed, 29 Dec 2021 17:39:31 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     kbuild-all@lists.01.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        David Stevens <stevensd@chromium.org>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH kernel v4] KVM: PPC: Merge powerpc's debugfs entry
- content into generic entry
-Message-ID: <202112291710.E7bImDlB-lkp@intel.com>
-References: <20211220012351.2719879-1-aik@ozlabs.ru>
+        id S239840AbhL2LJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Dec 2021 06:09:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235880AbhL2LJH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Dec 2021 06:09:07 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99066C061574;
+        Wed, 29 Dec 2021 03:09:06 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4B6031EC04D1;
+        Wed, 29 Dec 2021 12:09:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1640776140;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=6+tLU4T4Tpgo3yRqWbgVDQnqev5Uld1hOFCqOOuz+4Q=;
+        b=ntuwBAUmqxJEMGkpZ/GLOgUUCRiB0io5cHEImN3rxnntOCA5tGufgE1905XsnaIEMtVN6s
+        bhr8TeHKFfpAM4PrM2YhONFRRm/LhdN3O0RoIx/Ok90DZ2Kaj7y09bdntS5EJ+04YTmlQU
+        kFlmoW0WlpThsxR/EbolNUxzspLjLgY=
+Date:   Wed, 29 Dec 2021 12:09:01 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 15/40] x86/mm: Add support to validate memory when
+ changing C-bit
+Message-ID: <YcxBzXc4+b+hrXJE@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-16-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20211220012351.2719879-1-aik@ozlabs.ru>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20211210154332.11526-16-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexey,
+On Fri, Dec 10, 2021 at 09:43:07AM -0600, Brijesh Singh wrote:
+> The set_memory_{encrypt,decrypt}() are used for changing the pages
 
-Thank you for the patch! Yet something to improve:
+$ git grep -E "set_memory_decrypt\W"
+$
 
-[auto build test ERROR on powerpc/topic/ppc-kvm]
-[also build test ERROR on v5.16-rc7]
-[cannot apply to next-20211224]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Please check all your commit messages whether you're quoting the proper
+functions.
 
-url:    https://github.com/0day-ci/linux/commits/Alexey-Kardashevskiy/KVM-PPC-Merge-powerpc-s-debugfs-entry-content-into-generic-entry/20211220-092433
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
-config: powerpc64-randconfig-s031-20211228 (https://download.01.org/0day-ci/archive/20211229/202112291710.E7bImDlB-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 11.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/3d3a1a5e82517f5f1a5dd3d7131afb3aa4312d82
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Alexey-Kardashevskiy/KVM-PPC-Merge-powerpc-s-debugfs-entry-content-into-generic-entry/20211220-092433
-        git checkout 3d3a1a5e82517f5f1a5dd3d7131afb3aa4312d82
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=powerpc SHELL=/bin/bash arch/powerpc/kvm/
+> from decrypted (shared) to encrypted (private) and vice versa.
+> When SEV-SNP is active, the page state transition needs to go through
+> additional steps.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+		    ... "done by the guest."
 
-All errors (new ones prefixed by >>):
+I think it is important to state here who's supposed to do those
+additional steps.
 
->> arch/powerpc/kvm/e500mc.c:384:32: error: initialization of 'int (*)(struct kvm_vcpu *, struct dentry *)' from incompatible pointer type 'void (*)(struct kvm_vcpu *, struct dentry *)' [-Werror=incompatible-pointer-types]
-     384 |         .create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
-         |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/powerpc/kvm/e500mc.c:384:32: note: (near initialization for 'kvm_ops_e500mc.create_vcpu_debugfs')
-   cc1: all warnings being treated as errors
+...
 
+> @@ -659,6 +659,161 @@ void __init snp_prep_memory(unsigned long paddr, unsigned int sz, enum psc_op op
+>  		WARN(1, "invalid memory op %d\n", op);
+>  }
+>  
+> +static int vmgexit_psc(struct snp_psc_desc *desc)
+> +{
+> +	int cur_entry, end_entry, ret = 0;
+> +	struct snp_psc_desc *data;
+> +	struct ghcb_state state;
+> +	unsigned long flags;
+> +	struct ghcb *ghcb;
+> +
+> +	/* __sev_get_ghcb() need to run with IRQs disabled because it using per-cpu GHCB */
 
-vim +384 arch/powerpc/kvm/e500mc.c
+"... because it uses a per-CPU GHCB."
 
-   369	
-   370	static struct kvmppc_ops kvm_ops_e500mc = {
-   371		.get_sregs = kvmppc_core_get_sregs_e500mc,
-   372		.set_sregs = kvmppc_core_set_sregs_e500mc,
-   373		.get_one_reg = kvmppc_get_one_reg_e500mc,
-   374		.set_one_reg = kvmppc_set_one_reg_e500mc,
-   375		.vcpu_load   = kvmppc_core_vcpu_load_e500mc,
-   376		.vcpu_put    = kvmppc_core_vcpu_put_e500mc,
-   377		.vcpu_create = kvmppc_core_vcpu_create_e500mc,
-   378		.vcpu_free   = kvmppc_core_vcpu_free_e500mc,
-   379		.init_vm = kvmppc_core_init_vm_e500mc,
-   380		.destroy_vm = kvmppc_core_destroy_vm_e500mc,
-   381		.emulate_op = kvmppc_core_emulate_op_e500,
-   382		.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
-   383		.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
- > 384		.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
-   385	};
-   386	
+> +	local_irq_save(flags);
+> +
+> +	ghcb = __sev_get_ghcb(&state);
+> +	if (unlikely(!ghcb))
+> +		panic("SEV-SNP: Failed to get GHCB\n");
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+__sev_get_ghcb() will already panic if even the backup GHCB is active so
+you don't need to panic here too - just check the retval.
+
+> +	/* Copy the input desc into GHCB shared buffer */
+> +	data = (struct snp_psc_desc *)ghcb->shared_buffer;
+> +	memcpy(ghcb->shared_buffer, desc, min_t(int, GHCB_SHARED_BUF_SIZE, sizeof(*desc)));
+> +
+> +	/*
+> +	 * As per the GHCB specification, the hypervisor can resume the guest
+> +	 * before processing all the entries. Check whether all the entries
+> +	 * are processed. If not, then keep retrying.
+> +	 *
+> +	 * The stragtegy here is to wait for the hypervisor to change the page
+
++        * The stragtegy here is to wait for the hypervisor to change the page
+Unknown word [stragtegy] in comment, suggestions:
+        ['strategy', 'strategist']
+
+> +	 * state in the RMP table before guest accesses the memory pages. If the
+> +	 * page state change was not successful, then later memory access will result
+> +	 * in a crash.
+> +	 */
+> +	cur_entry = data->hdr.cur_entry;
+> +	end_entry = data->hdr.end_entry;
+> +
+> +	while (data->hdr.cur_entry <= data->hdr.end_entry) {
+> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
+> +
+
+Add a comment here:
+
+		/* This will advance the shared buffer data points to. */
+
+I had asked about it already but nada:
+
+"So then you *absoulutely* want to use data->hdr everywhere and then also
+write why in the comment above the check that data gets updated by the
+HV call."
+
+> +		ret = sev_es_ghcb_hv_call(ghcb, true, NULL, SVM_VMGEXIT_PSC, 0, 0);
+> +
+> +		/*
+> +		 * Page State Change VMGEXIT can pass error code through
+> +		 * exit_info_2.
+> +		 */
+> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
+> +			 "SEV-SNP: PSC failed ret=%d exit_info_2=%llx\n",
+> +			 ret, ghcb->save.sw_exit_info_2)) {
+> +			ret = 1;
+> +			goto out;
+> +		}
+> +
+> +		/* Verify that reserved bit is not set */
+> +		if (WARN(data->hdr.reserved, "Reserved bit is set in the PSC header\n")) {
+> +			ret = 1;
+> +			goto out;
+> +		}
+> +
+> +		/*
+> +		 * Sanity check that entry processing is not going backward.
+
+"... backwards."
+
+> +		 * This will happen only if hypervisor is tricking us.
+> +		 */
+> +		if (WARN(data->hdr.end_entry > end_entry || cur_entry > data->hdr.cur_entry,
+> +"SEV-SNP:  PSC processing going backward, end_entry %d (got %d) cur_entry %d (got %d)\n",
+> +			 end_entry, data->hdr.end_entry, cur_entry, data->hdr.cur_entry)) {
+> +			ret = 1;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +out:
+> +	__sev_put_ghcb(&state);
+> +	local_irq_restore(flags);
+> +
+> +	return ret;
+> +}
+> +
+> +static void __set_pages_state(struct snp_psc_desc *data, unsigned long vaddr,
+> +			      unsigned long vaddr_end, int op)
+> +{
+> +	struct psc_hdr *hdr;
+> +	struct psc_entry *e;
+> +	unsigned long pfn;
+> +	int i;
+> +
+> +	hdr = &data->hdr;
+> +	e = data->entries;
+> +
+> +	memset(data, 0, sizeof(*data));
+> +	i = 0;
+> +
+> +	while (vaddr < vaddr_end) {
+> +		if (is_vmalloc_addr((void *)vaddr))
+> +			pfn = vmalloc_to_pfn((void *)vaddr);
+> +		else
+> +			pfn = __pa(vaddr) >> PAGE_SHIFT;
+> +
+> +		e->gfn = pfn;
+> +		e->operation = op;
+> +		hdr->end_entry = i;
+
+		/*
+		 * Current SNP implementation doesn't keep track of the page size so use
+		 * 4K for simplicity.
+		 */
+
+> +		e->pagesize = RMP_PG_SIZE_4K;
+> +
+> +		vaddr = vaddr + PAGE_SIZE;
+> +		e++;
+> +		i++;
+> +	}
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
