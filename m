@@ -2,164 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 885A24818F7
-	for <lists+kvm@lfdr.de>; Thu, 30 Dec 2021 04:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A0434819D4
+	for <lists+kvm@lfdr.de>; Thu, 30 Dec 2021 06:35:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235196AbhL3Dde (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Dec 2021 22:33:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30374 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231751AbhL3Ddd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Dec 2021 22:33:33 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BU1gZjK032632;
-        Thu, 30 Dec 2021 03:33:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=OHLEHEuvQsUOBNtNyJQmOyXSioS+90Zvl0tvlsDoTU0=;
- b=RllvalWBpM0OEw9Lw53QcKM68/wy52D2UVTBHwewgtGPARokjxC0Nwha/kru19E40Cb6
- vk00AKqTu6RQxY+bD4iw+SXY+8jmdO4lkqfsXZVasVjPwNLXftLrE3osdrDe12BnSpR1
- pFWmV5+0ncOxZPWFHfJ7O/OlhGRhfTtO9eIiaw2wQtnY/QcsMbP7fn0TVqpf+9XPILjn
- XYlSSQ4/rT+7Ia66TM3DqWmR2DB8ZXwlmY1FotXxBxbZHbJ0KHsWO/NhDITFm422dEnC
- /xHd3mKiSbpq81c2F2YG2Pof4XZiAUZMIYd2PH4HxIaIm52qS4hHiJmnbdAEI1uTrbiN qA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d84jm7rnx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Dec 2021 03:33:31 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BU3TAZp028118;
-        Thu, 30 Dec 2021 03:33:31 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d84jm7rnm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Dec 2021 03:33:31 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BU3RmC2005025;
-        Thu, 30 Dec 2021 03:33:29 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3d5tx9f0c9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Dec 2021 03:33:29 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BU3XQuv45941026
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Dec 2021 03:33:26 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EF2AC4C05C;
-        Thu, 30 Dec 2021 03:33:25 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4AF724C040;
-        Thu, 30 Dec 2021 03:33:25 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.80.242])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 30 Dec 2021 03:33:25 +0000 (GMT)
-Date:   Thu, 30 Dec 2021 04:33:22 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v17 08/15] s390/vfio-ap: keep track of active guests
-Message-ID: <20211230043322.2ba19bbd.pasic@linux.ibm.com>
-In-Reply-To: <20211021152332.70455-9-akrowiak@linux.ibm.com>
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
-        <20211021152332.70455-9-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S236266AbhL3FfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Dec 2021 00:35:12 -0500
+Received: from mga02.intel.com ([134.134.136.20]:60427 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229478AbhL3FfL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Dec 2021 00:35:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640842511; x=1672378511;
+  h=cc:subject:to:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=JyIRfdKyDD8fBL5wItWhLvIY7ErrRHB7nNqaDZhNdD0=;
+  b=SR3WXpGcrQZrwp0PcH21sjGaItIhmLbpIw4RIYD9IC8yOL3SvN9C8/qm
+   5bu7ffZli5rgBMtSDEmx+lI6MjMUCZUKdJuF1k2seMTYZByQvRvjSgp9e
+   Z2rnPV8CE0KOKtsbV0QXjohepwiOmy8qSQxqmBF1kRjax4JHQ3Xcp+Q+w
+   NQQ479BQmP+VlCraaRosy00kgdVfW0JAIale7HCnkJcPE9ZRZVm6lBDHO
+   Ot6yhT5TpnfnsChBZmEF/z1Fuk72wgY0gHfOHvfryu4aph1vMG6HYm21k
+   H6PQP147PFqkkFF6M5IiZIqKGMdiwVJQLVvnmy+1SKu6wmmekdOYJ28md
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10212"; a="228929801"
+X-IronPort-AV: E=Sophos;i="5.88,247,1635231600"; 
+   d="scan'208";a="228929801"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2021 21:35:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,247,1635231600"; 
+   d="scan'208";a="524266151"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 29 Dec 2021 21:34:58 -0800
+Cc:     baolu.lu@linux.intel.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 03/13] PCI: pci_stub: Suppress kernel DMA ownership
+ auto-claiming
+To:     Bjorn Helgaas <helgaas@kernel.org>
+References: <20211229204202.GA1700874@bhelgaas>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <568b6d1d-69df-98ad-a864-dd031bedd081@linux.intel.com>
+Date:   Thu, 30 Dec 2021 13:34:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZqUoopOEfZB5AT4ANfgbYC8bGqj_COhY
-X-Proofpoint-ORIG-GUID: 64LDbmE7XijYeAVbRy85Qnc3eVZAZjlw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-30_01,2021-12-29_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- suspectscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0
- spamscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112300015
+In-Reply-To: <20211229204202.GA1700874@bhelgaas>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Oct 2021 11:23:25 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Hi Bjorn,
 
-> The vfio_ap device driver registers for notification when the pointer to
-> the KVM object for a guest is set. Let's store the KVM pointer as well as
-> the pointer to the mediated device when the KVM pointer is set.
-
-[..]
-
-
-> struct ap_matrix_dev {
->         ...
->         struct rw_semaphore guests_lock;
->         struct list_head guests;
->        ...
-> }
+On 12/30/21 4:42 AM, Bjorn Helgaas wrote:
+> On Fri, Dec 17, 2021 at 02:36:58PM +0800, Lu Baolu wrote:
+>> The pci_dma_configure() marks the iommu_group as containing only devices
+>> with kernel drivers that manage DMA.
 > 
-> The 'guests_lock' field is a r/w semaphore to control access to the
-> 'guests' field. The 'guests' field is a list of ap_guest
-> structures containing the KVM and matrix_mdev pointers for each active
-> guest. An ap_guest structure will be stored into the list whenever the
-> vfio_ap device driver is notified that the KVM pointer has been set and
-> removed when notified that the KVM pointer has been cleared.
+> I'm looking at pci_dma_configure(), and I don't see the connection to
+> iommu_groups.
+
+The 2nd patch "driver core: Set DMA ownership during driver bind/unbind"
+sets all drivers' DMA to be kernel-managed by default except a few ones
+which has a driver flag set. So by default, all iommu groups contains
+only devices with kernel drivers managing DMA.
+
 > 
+>> Avoid this default behavior for the
+>> pci_stub because it does not program any DMA itself.  This allows the
+>> pci_stub still able to be used by the admin to block driver binding after
+>> applying the DMA ownership to vfio.
+> 
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   drivers/pci/pci-stub.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/pci/pci-stub.c b/drivers/pci/pci-stub.c
+>> index e408099fea52..6324c68602b4 100644
+>> --- a/drivers/pci/pci-stub.c
+>> +++ b/drivers/pci/pci-stub.c
+>> @@ -36,6 +36,9 @@ static struct pci_driver stub_driver = {
+>>   	.name		= "pci-stub",
+>>   	.id_table	= NULL,	/* only dynamic id's */
+>>   	.probe		= pci_stub_probe,
+>> +	.driver		= {
+>> +		.suppress_auto_claim_dma_owner = true,
+> 
+> The new .suppress_auto_claim_dma_owner controls whether we call
+> iommu_device_set_dma_owner().  I guess you added
+> .suppress_auto_claim_dma_owner because iommu_device_set_dma_owner()
+> must be done *before* we call the driver's .probe() method?
 
-Is this about the field or about the list including all the nodes? This
-reads lie guests_lock only protects the head element, which makes no
-sense to me. Because of how these lists work.
+As explained above, all drivers are set to kernel-managed dma by
+default. For those vfio and vfio-approved drivers,
+suppress_auto_claim_dma_owner is used to tell the driver core that "this
+driver is attached to device for userspace assignment purpose, do not
+claim it for kernel-management dma".
 
-The narrowest scope that could make sense is all the list_head stuff
-in the entire list. I.e. one would only need the lock to traverse or
-manipulate the list, while the payload would still be subject to
-the matrix_dev->lock mutex.
+> 
+> Otherwise, we could call some new interface from .probe() instead of
+> adding the flag to struct device_driver.
 
-[..]
+Most device drivers are of the kernel-managed DMA type. Only a few vfio
+and vfio-approved drivers need to use this flag. That's the reason why
+we claim kernel-managed DMA by default.
 
-> +struct ap_guest {
-> +	struct kvm *kvm;
-> +	struct list_head node;
-> +};
-> +
->  /**
->   * struct ap_matrix_dev - Contains the data for the matrix device.
->   *
-> @@ -39,6 +44,9 @@
->   *		single ap_matrix_mdev device. It's quite coarse but we don't
->   *		expect much contention.
->   * @vfio_ap_drv: the vfio_ap device driver
-> + * @guests_lock: r/w semaphore for protecting access to @guests
-> + * @guests:	list of guests (struct ap_guest) using AP devices bound to the
-> + *		vfio_ap device driver.
+> 
+>> +	},
+>>   };
+>>   
+>>   static int __init pci_stub_init(void)
+>> -- 
+>> 2.25.1
+>>
 
-Please compare the above. Also if it is only about the access to the
-list, then you could drop the lock right after create, and not keep it
-till the very end of vfio_ap_mdev_set_kvm(). Right?
-
-In any case I'm skeptical about this whole struct ap_guest business. To
-me, it looks like something that just makes things more obscure and
-complicated without any real benefit.
-
-Regards,
-Halil
-
->   */
->  struct ap_matrix_dev {
->  	struct device device;
-> @@ -47,6 +55,8 @@ struct ap_matrix_dev {
->  	struct list_head mdev_list;
->  	struct mutex lock;
->  	struct ap_driver  *vfio_ap_drv;
-> +	struct rw_semaphore guests_lock;
-> +	struct list_head guests;
->  };
->  
->  extern struct ap_matrix_dev *matrix_dev;
-
+Best regards,
+baolu
