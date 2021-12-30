@@ -2,224 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46CE7481E9B
-	for <lists+kvm@lfdr.de>; Thu, 30 Dec 2021 18:26:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6414481EBE
+	for <lists+kvm@lfdr.de>; Thu, 30 Dec 2021 18:50:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241470AbhL3R0v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Dec 2021 12:26:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50358 "EHLO
+        id S233056AbhL3RuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Dec 2021 12:50:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233489AbhL3R0t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Dec 2021 12:26:49 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A218FC061574
-        for <kvm@vger.kernel.org>; Thu, 30 Dec 2021 09:26:49 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id b1-20020a17090a990100b001b14bd47532so23765438pjp.0
-        for <kvm@vger.kernel.org>; Thu, 30 Dec 2021 09:26:49 -0800 (PST)
+        with ESMTP id S229914AbhL3RuR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Dec 2021 12:50:17 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F42FC061574
+        for <kvm@vger.kernel.org>; Thu, 30 Dec 2021 09:50:17 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id f18-20020a17090aa79200b001ad9cb23022so23748534pjq.4
+        for <kvm@vger.kernel.org>; Thu, 30 Dec 2021 09:50:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=lBCsFftBWdAXzjaoaZyUCTgBOsRdtYNsGz6SR7hrmps=;
-        b=Oc/19XPrA7rVSvCOE1ol6CZ+7XIoX4GWD+2JXAi4ZGLQzGtSyCTazv7qZB4vBjB8JX
-         yh8/oYdLZC/XuQD20tWuG29Mppxcv7f/G1rRsmyUXLAy3Yex3Am7nWFSjb5QvWuPWbm3
-         UawMUSAN3dtzpimPwpWjfaaZTpEWeO7E9bKKIURFaHjKFoitADegn6SiLRJYOY1IUf8n
-         t0cK02CRvUNrt/ueb3k72xzSKDbap9WkwHZoSdJItU5c3UMVzOUaTwExMD7vfuhPE2q3
-         ptNIR69+eYl3GqtSIiqixzfTGrFNaMD3OC7S7vuyu/LMuBMkPaKOy+ArgUtognDwLQTe
-         UgMQ==
+        bh=Mpb0ULgk7PQRr0DmUxaMdI6xxfBGGaQkslgbSoCUNHA=;
+        b=NgJ+9BTsMf1m7mDgCmWxYUgNlMmFrCi6HHh15cqEOb77mqDWbjEX7pJe0kgelHHqFd
+         QvTqOJgFTxGy1iNkMqGH55Vzt9ChmchqkRCWlDKpBg3/5zUDLKI4HrGuXI8KXjvsxnnv
+         Aefi90AUzpiPgY5r9ZTGNfpvdj/80N7mzmkZYnpL0IEooEz/8wnO5cdHJ1wJItaGzo0C
+         pvL/F4a8YN8rDSQ053UsjfJKn6M8ijorEgo8h7fAioxjY5yhwIGckauasZF5HSwurfde
+         B0FMSv9+B7hYuoCeNzHfQkIjYXK8KeWDbyXQ2Yly5vzEuV016nzvGTjZhwJ3Dnfl5HtQ
+         EncQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=lBCsFftBWdAXzjaoaZyUCTgBOsRdtYNsGz6SR7hrmps=;
-        b=5gZI1RzbnRVHrMybEQ8ymGIoi7xF+xzR/lykI0nS1zrIIws9p+w4YPugqur1Hg/HpB
-         9cx1k43xNbZyRkrFO5lmR/OELRczI1v69UgSP4ti3iUHlu7hmG07qCHQqWoFL7WUDX0S
-         6E8HhQnKNqvp1tkF/XlQ+79uApb+Ehr7nK1o+cJVJXE404gh+pNOAC71jKDeWe5ZA14s
-         OH5Xb6pJidODl1hjj8mm76KuNr9b4ZfSJ1L1Uu5L6XOWRUSkmFwvgR2gV8NODj167ePj
-         52nLpF6bWAh+A8kpuFeN0tQjkziMcp6wOld18rXwYSov58w7Zr21wQYT4p/h7eTss7ng
-         LQdw==
-X-Gm-Message-State: AOAM533pIl/lV9R9TLxAkHG19KvlsDq49pBtpsN71lRCk9WTjqoAvdK/
-        imccjQKfDTXufkdjHMxV4zj/rQ==
-X-Google-Smtp-Source: ABdhPJzFz5vTIRvW6iqMN9QXKJe8F518FSAWxeQa3njfmQDjSNwChQBYHye8hWWk05YqFMYbv4cang==
-X-Received: by 2002:a17:90b:70f:: with SMTP id s15mr18641617pjz.35.1640885208886;
-        Thu, 30 Dec 2021 09:26:48 -0800 (PST)
+        bh=Mpb0ULgk7PQRr0DmUxaMdI6xxfBGGaQkslgbSoCUNHA=;
+        b=d+Usl/OuvSVnuBG8Ix0Ujuqj869kKuoIM2WXjyccg+8YEIrtV7O+tETr76xkJRYPsL
+         pLEYXo6StX5FNTt+4EieGDMAXEk04cIObqvFm+B2XBYt3VI6ihpc5tmIrHbNOTx01y7T
+         a8IUPOmMSLGAiOSwvlDWDQqSxiYvCg9Fwpc2pKlrnjb7y3Kx4udFF17SR/5Bhpg5nwwd
+         jsEbz/kX2sTTpdFHMybEbi9HdhHY/HA79vuLbg9E3yZc/hp9fn3Dw1H6beGeEjkDAhy2
+         PZy3yD7pDolxWlTxmVUCqZ8YDVTFpKWyzT1ftOKkJTGq2n2/3pwdCTSJ4V4OxElYbSRf
+         UoJA==
+X-Gm-Message-State: AOAM530VLyYhfJWpoQ2HeA5IeGk04CP+ZB7YK0A5w8TYMqwcJjPN/Xl6
+        gQL8ujcFCJBrv6VKQ9Ghq/Ti5A==
+X-Google-Smtp-Source: ABdhPJxjf0uOgc15nPhgO5QF+aaJccjckY17H0t6jNHspvF8t8z0Pq6j+/m0ZvyWqDOdC7O7JadHBA==
+X-Received: by 2002:a17:90a:c506:: with SMTP id k6mr39397591pjt.74.1640886616129;
+        Thu, 30 Dec 2021 09:50:16 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id cv14sm21464315pjb.24.2021.12.30.09.26.48
+        by smtp.gmail.com with ESMTPSA id k141sm27256560pfd.144.2021.12.30.09.50.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Dec 2021 09:26:48 -0800 (PST)
-Date:   Thu, 30 Dec 2021 17:26:45 +0000
+        Thu, 30 Dec 2021 09:50:15 -0800 (PST)
+Date:   Thu, 30 Dec 2021 17:50:12 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, mlevitsk@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        peterz@infradead.org, hpa@zytor.com, thomas.lendacky@amd.com,
-        jon.grimm@amd.com
-Subject: Re: [PATCH v3 1/3] KVM: SVM: Refactor AVIC hardware setup logic into
- helper function
-Message-ID: <Yc3r1U6WFVDtJCZn@google.com>
-References: <20211213113110.12143-1-suravee.suthikulpanit@amd.com>
- <20211213113110.12143-2-suravee.suthikulpanit@amd.com>
+To:     Zhenzhong Duan <zhenzhong.duan@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] x86: Assign a canonical address before
+ execute invpcid
+Message-ID: <Yc3xVIo8x+4DtQwx@google.com>
+References: <20211230101452.380581-1-zhenzhong.duan@intel.com>
+ <Yc3VryxgJbXXwyy3@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211213113110.12143-2-suravee.suthikulpanit@amd.com>
+In-Reply-To: <Yc3VryxgJbXXwyy3@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021, Suravee Suthikulpanit wrote:
-> To prepare for upcoming AVIC changes. There is no functional change.
+On Thu, Dec 30, 2021, Sean Christopherson wrote:
+> On Thu, Dec 30, 2021, Zhenzhong Duan wrote:
+> > Occasionally we see pcid test fail as INVPCID_DESC[127:64] is
+> > uninitialized before execute invpcid.
+> > 
+> > According to Intel spec: "#GP If INVPCID_TYPE is 0 and the linear
+> > address in INVPCID_DESC[127:64] is not canonical."
+> > 
+> > Assign desc's address which is guaranteed to be a real memory
+> > address and canonical.
+> > 
+> > Fixes: b44d84dae10c ("Add PCID/INVPCID test")
+> > Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+> > ---
+> >  x86/pcid.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/x86/pcid.c b/x86/pcid.c
+> > index 527a4a9..4828bbc 100644
+> > --- a/x86/pcid.c
+> > +++ b/x86/pcid.c
+> > @@ -75,6 +75,9 @@ static void test_invpcid_enabled(int pcid_enabled)
+> >      struct invpcid_desc desc;
+> >      desc.rsv = 0;
+> >  
+> > +    /* Initialize INVPCID_DESC[127:64] with a canonical address */
+> > +    desc.addr = (u64)&desc;
 > 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 10 ++++++++++
->  arch/x86/kvm/svm/svm.c  |  8 +-------
->  arch/x86/kvm/svm/svm.h  |  1 +
->  3 files changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 8052d92069e0..63c3801d1829 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -1011,3 +1011,13 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
->  		kvm_vcpu_update_apicv(vcpu);
->  	avic_set_running(vcpu, true);
->  }
-> +
-> +bool avic_hardware_setup(bool avic)
-> +{
-> +	if (!avic || !npt_enabled || !boot_cpu_has(X86_FEATURE_AVIC))
-> +		return false;
-> +
-> +	pr_info("AVIC enabled\n");
-> +	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
-> +	return true;
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 989685098b3e..e59f663ab8cb 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1031,13 +1031,7 @@ static __init int svm_hardware_setup(void)
->  			nrips = false;
->  	}
->  
-> -	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
-> -
-> -	if (enable_apicv) {
-> -		pr_info("AVIC enabled\n");
-> -
-> -		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
-> -	}
-> +	enable_apicv = avic = avic_hardware_setup(avic);
+> Casting to a u64 is arguably wrong since the address is an unsigned long.  It
+> doesn't cause problems because the test is 64-bit only, but it's a bit odd.
 
-Rather than pass in "avic", just do
+I take that back, "struct invpcid_desc" is the one that's "wrong".  Again, doesn't
+truly matter as attempting to build on 32-bit would fail due to the bitfield values
+exceeding the storage capacity of an unsigned long.  But to be pedantic, maybe this?
 
-	enable_apicv = avic == avic && avic_hardware_setup();
+diff --git a/x86/pcid.c b/x86/pcid.c
+index 527a4a9..fd218dd 100644
+--- a/x86/pcid.c
++++ b/x86/pcid.c
+@@ -5,9 +5,9 @@
+ #include "desc.h"
 
-This also conflicts with changes sitting in kvm/queue to nullify vcpu_(un)blocking
-when AVIC is disabled.  But moving AVIC setup to avic.c provides an opportunity for
-further cleanup, as it means vcpu_(un)blocking can be NULL by default and set to
-the AVIC helpers if and only if AVIC is enable.  That will allow making the helpers
-static in avic.c.  E.g.
+ struct invpcid_desc {
+-    unsigned long pcid : 12;
+-    unsigned long rsv  : 52;
+-    unsigned long addr : 64;
++    u64 pcid : 12;
++    u64 rsv  : 52;
++    u64 addr : 64;
+ };
 
----
- arch/x86/kvm/svm/avic.c | 17 +++++++++++++++--
- arch/x86/kvm/svm/svm.c  | 13 +------------
- arch/x86/kvm/svm/svm.h  |  3 +--
- 3 files changed, 17 insertions(+), 16 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 90364d02f22a..f5c6cab42d74 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -1027,7 +1027,7 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
- }
-
--void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
-+static void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
- {
- 	if (!kvm_vcpu_apicv_active(vcpu))
- 		return;
-@@ -1052,7 +1052,7 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
- 	preempt_enable();
- }
-
--void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
-+static void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
- {
- 	int cpu;
-
-@@ -1066,3 +1066,16 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
-
- 	put_cpu();
- }
+ static int write_cr0_checking(unsigned long val)
+@@ -73,7 +73,8 @@ static void test_invpcid_enabled(int pcid_enabled)
+     int passed = 0, i;
+     ulong cr4 = read_cr4();
+     struct invpcid_desc desc;
+-    desc.rsv = 0;
 +
-+bool avic_hardware_setup(struct kvm_x86_ops *x86_ops)
-+{
-+	if (!npt_enabled || !boot_cpu_has(X86_FEATURE_AVIC))
-+		return false;
-+
-+	x86_ops->vcpu_blocking = avic_vcpu_blocking,
-+	x86_ops->vcpu_unblocking = avic_vcpu_unblocking,
-+
-+	pr_info("AVIC enabled\n");
-+	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
-+	return true;
-+}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6cb38044a860..6cb0f58238cd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4390,8 +4390,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.prepare_guest_switch = svm_prepare_guest_switch,
- 	.vcpu_load = svm_vcpu_load,
- 	.vcpu_put = svm_vcpu_put,
--	.vcpu_blocking = avic_vcpu_blocking,
--	.vcpu_unblocking = avic_vcpu_unblocking,
++    memset(&desc, 0, sizeof(desc));
 
- 	.update_exception_bitmap = svm_update_exception_bitmap,
- 	.get_msr_feature = svm_get_msr_feature,
-@@ -4674,16 +4672,7 @@ static __init int svm_hardware_setup(void)
- 			nrips = false;
- 	}
-
--	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
--
--	if (enable_apicv) {
--		pr_info("AVIC enabled\n");
--
--		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
--	} else {
--		svm_x86_ops.vcpu_blocking = NULL;
--		svm_x86_ops.vcpu_unblocking = NULL;
--	}
-+	enable_apicv = avic = avic && avic_hardware_setup(&svm_x86_ops);
-
- 	if (vls) {
- 		if (!npt_enabled ||
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index daa8ca84afcc..59d91b969bd7 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -573,6 +573,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
-
- #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
-
-+bool avic_hardware_setup(struct kvm_x86_ops *ops);
- int avic_ga_log_notifier(u32 ga_tag);
- void avic_vm_destroy(struct kvm *kvm);
- int avic_vm_init(struct kvm *kvm);
-@@ -593,8 +594,6 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec);
- bool svm_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
- 		       uint32_t guest_irq, bool set);
--void avic_vcpu_blocking(struct kvm_vcpu *vcpu);
--void avic_vcpu_unblocking(struct kvm_vcpu *vcpu);
-
- /* sev.c */
-
---
-
-
+     /* try executing invpcid when CR4.PCIDE=0, desc.pcid=0 and type=0..3
+      * no exception expected
