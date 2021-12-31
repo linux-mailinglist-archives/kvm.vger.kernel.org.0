@@ -2,284 +2,392 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91E9648247F
-	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 15:59:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E64C5482499
+	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 16:36:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbhLaO7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Dec 2021 09:59:42 -0500
-Received: from mga09.intel.com ([134.134.136.24]:8181 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230370AbhLaO7h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Dec 2021 09:59:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640962777; x=1672498777;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=T9lZstSgT64E1WfAYsIVUx9bWf4gyoY3EbMk1/GBfFk=;
-  b=ekAgyMjXzX7Rxk6PX9awTN12In19UTTDLMTPaCFG/pI45wgKX7wURFuh
-   Qneafsgs+yknYT9fJinGg8WxIK0YPAIZRZHLthivOERkaohkZbhwtxl1n
-   UJ4TnmNy2+7hJqKakWRiSTm3H5zVm+5vu/YYvREHGXbYtX8a0iaSgHjJ+
-   Ok/AFvpINIas8cGLnXLBk8TKUCvaVRD9VltE+i+LApo7UbZK97mUUpT2x
-   UOSL+VZKa2qokkg7fJxs7JCy5XVLo6VfA9uvTpICwaJzXLuizGr+0Hxkr
-   5hCbbdyaQ+sMeNAFB2DZM7Bl6MN3RJ11rNQpeq/YZMg35V4vgCrXlO3sg
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10213"; a="241618910"
-X-IronPort-AV: E=Sophos;i="5.88,251,1635231600"; 
-   d="scan'208";a="241618910"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2021 06:59:37 -0800
-X-IronPort-AV: E=Sophos;i="5.88,251,1635231600"; 
-   d="scan'208";a="524758501"
-Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2021 06:59:31 -0800
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S231144AbhLaPga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Dec 2021 10:36:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57018 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229453AbhLaPga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Dec 2021 10:36:30 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1A6C061574;
+        Fri, 31 Dec 2021 07:36:30 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 238141EC018B;
+        Fri, 31 Dec 2021 16:36:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1640964983;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=e73K8Umx7rvCjEFSc9t/jc9In98gI9J2YopzbA2lLtU=;
+        b=bGMf3G697Am5T2hdwQXD8IbqbPLMoHyZmpRcs/O32MUOVhvUqO+tOieqtakP1xVwuo7QLB
+        qo/KxkT1sdlvncplcBsybyI5UmzJNrDAMGCZ2fgPtfDx3kn/XRl7BmscW7KX0Nq5AcTwLH
+        W3FzyP/86itFcuf73PUPJsXqh+u8FDE=
+Date:   Fri, 31 Dec 2021 16:36:26 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v5 8/8] KVM: VMX: Resize PID-ponter table on demand for IPI virtualization
-Date:   Fri, 31 Dec 2021 22:28:49 +0800
-Message-Id: <20211231142849.611-9-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20211231142849.611-1-guang.zeng@intel.com>
-References: <20211231142849.611-1-guang.zeng@intel.com>
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 20/40] x86/sev: Use SEV-SNP AP creation to start
+ secondary CPUs
+Message-ID: <Yc8jerEP5CrxfFi4@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-21-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211210154332.11526-21-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current kvm allocates 8 pages in advance for Posted Interrupt
-Descriptor pointer (PID-pointer) table to accommodate vCPUs
-with APIC ID up to KVM_MAX_VCPU_IDS - 1. This policy wastes
-some memory because most of VMs have less than 512 vCPUs and
-then just need one page.
+On Fri, Dec 10, 2021 at 09:43:12AM -0600, Brijesh Singh wrote:
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 123a96f7dff2..38c14601ae4a 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -104,6 +104,7 @@ enum psc_op {
+>  	(((u64)(v) & GENMASK_ULL(63, 12)) >> 12)
+>  
+>  #define GHCB_HV_FT_SNP			BIT_ULL(0)
+> +#define GHCB_HV_FT_SNP_AP_CREATION	(BIT_ULL(1) | GHCB_HV_FT_SNP)
 
-To reduce the memory consumption of most of VMs, KVM initially
-allocates one page for PID-pointer table for each VM and bumps
-up the table on demand according to the maximum APIC ID of all
-vCPUs of a VM. Bumping up PID-pointer table involves allocating
-a new table, requesting all vCPUs to update related VMCS fields
-and freeing the old table.
+Why is bit 0 ORed in? Because it "Requires SEV-SNP Feature."?
 
-In worst case that new memory allocation fails, KVM keep using
-the present PID-pointer table. Thus IPI virtualization won't
-take effect to those vCPUs not set in the table without impact
-on others.
+You can still enforce that requirement in the test though.
 
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
----
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  3 ++
- arch/x86/kvm/vmx/vmx.c             | 77 +++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.h             |  6 +++
- arch/x86/kvm/x86.c                 |  2 +
- 5 files changed, 78 insertions(+), 11 deletions(-)
+Or all those SEV features should not be bits but masks -
+GHCB_HV_FT_SNP_AP_CREATION_MASK for example, seeing how the others
+require the previous bits to be set too.
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index cefe1d81e2e8..847246f2537d 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -121,6 +121,7 @@ KVM_X86_OP_NULL(enable_direct_tlbflush)
- KVM_X86_OP_NULL(migrate_timers)
- KVM_X86_OP(msr_filter_changed)
- KVM_X86_OP_NULL(complete_emulated_msr)
-+KVM_X86_OP(update_ipiv_pid_table)
- 
- #undef KVM_X86_OP
- #undef KVM_X86_OP_NULL
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 753bf2a7cebc..24990d4e94c4 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -102,6 +102,8 @@
- #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
- #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
- 	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_PID_TABLE_UPDATE \
-+	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- 
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-@@ -1494,6 +1496,7 @@ struct kvm_x86_ops {
- 
- 	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
- 	void (*update_ipiv_pid_entry)(struct kvm_vcpu *vcpu, u8 old_id, u8 new_id);
-+	void (*update_ipiv_pid_table)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_nested_ops {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f21ce15c5eb8..fb8e2b52b5f7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -228,8 +228,9 @@ static const struct {
- 
- #define L1D_CACHE_ORDER 4
- 
--/* PID(Posted-Interrupt Descriptor)-pointer table entry is 64-bit long */
--#define MAX_PID_TABLE_ORDER get_order(KVM_MAX_VCPU_IDS * sizeof(u64))
-+/* Each entry in PID(Posted-Interrupt Descriptor)-pointer table is 8 bytes */
-+#define table_index_to_size(index) ((index) << 3)
-+#define table_size_to_index(size) ((size) >> 3)
- #define PID_TABLE_ENTRY_VALID 1
- 
- static void *vmx_l1d_flush_pages;
-@@ -4332,6 +4333,42 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
- 	return exec_control;
- }
- 
-+static int vmx_alloc_pid_table(struct kvm_vmx *kvm_vmx, int order)
-+{
-+	u64 *pid_table;
-+
-+	pid_table = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, order);
-+	if (!pid_table)
-+		return -ENOMEM;
-+
-+	kvm_vmx->pid_table = pid_table;
-+	kvm_vmx->pid_last_index = table_size_to_index(PAGE_SIZE << order) - 1;
-+	return 0;
-+}
-+
-+static int vmx_expand_pid_table(struct kvm_vmx *kvm_vmx, int entry_idx)
-+{
-+	u64 *last_pid_table;
-+	int last_table_size, new_order;
-+
-+	if (entry_idx <= kvm_vmx->pid_last_index)
-+		return 0;
-+
-+	last_pid_table = kvm_vmx->pid_table;
-+	last_table_size = table_index_to_size(kvm_vmx->pid_last_index + 1);
-+	new_order = get_order(table_index_to_size(entry_idx + 1));
-+
-+	if (vmx_alloc_pid_table(kvm_vmx, new_order))
-+		return -ENOMEM;
-+
-+	memcpy(kvm_vmx->pid_table, last_pid_table, last_table_size);
-+	kvm_make_all_cpus_request(&kvm_vmx->kvm, KVM_REQ_PID_TABLE_UPDATE);
-+
-+	/* Now old PID table can be freed safely as no vCPU is using it. */
-+	free_pages((unsigned long)last_pid_table, get_order(last_table_size));
-+	return 0;
-+}
-+
- #define VMX_XSS_EXIT_BITMAP 0
- 
- static void init_vmcs(struct vcpu_vmx *vmx)
-@@ -4370,10 +4407,19 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
- 
- 		if (enable_ipiv) {
--			WRITE_ONCE(kvm_vmx->pid_table[vcpu->vcpu_id],
--				__pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
-+			down_write(&kvm_vmx->pid_table_lock);
-+
-+			/*
-+			 * In case new memory allocation for PID table fails,
-+			 * skip setting Posted-Interrupt descriptor of current
-+			 * vCPU which index is beyond present table limit.
-+			 */
-+			if (!vmx_expand_pid_table(kvm_vmx, vcpu->vcpu_id))
-+				WRITE_ONCE(kvm_vmx->pid_table[vcpu->vcpu_id],
-+					__pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
- 			vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
- 			vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
-+			up_write(&kvm_vmx->pid_table_lock);
- 		}
- 	}
- 
-@@ -7001,14 +7047,11 @@ static int vmx_vm_init(struct kvm *kvm)
- 	}
- 
- 	if (enable_ipiv) {
--		struct page *pages;
-+		struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
- 
--		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, MAX_PID_TABLE_ORDER);
--		if (!pages)
-+		if (vmx_alloc_pid_table(kvm_vmx, 0))
- 			return -ENOMEM;
--
--		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
--		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_IDS - 1;
-+		init_rwsem(&kvm_vmx->pid_table_lock);
- 	}
- 
- 	return 0;
-@@ -7630,7 +7673,18 @@ static void vmx_vm_destroy(struct kvm *kvm)
- 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
- 
- 	if (kvm_vmx->pid_table)
--		free_pages((unsigned long)kvm_vmx->pid_table, MAX_PID_TABLE_ORDER);
-+		free_pages((unsigned long)kvm_vmx->pid_table,
-+			get_order(table_index_to_size(kvm_vmx->pid_last_index)));
-+}
-+
-+static void vmx_update_ipiv_pid_table(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
-+
-+	down_read(&kvm_vmx->pid_table_lock);
-+	vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
-+	vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
-+	up_read(&kvm_vmx->pid_table_lock);
- }
- 
- static void vmx_update_ipiv_pid_entry(struct kvm_vcpu *vcpu, u8 old_id, u8 new_id)
-@@ -7782,6 +7836,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
- 	.update_ipiv_pid_entry = vmx_update_ipiv_pid_entry,
-+	.update_ipiv_pid_table = vmx_update_ipiv_pid_table,
- };
- 
- static __init void vmx_setup_user_return_msrs(void)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index c8ae1458eb9e..8c437a7be08a 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -356,6 +356,12 @@ struct kvm_vmx {
- 	/* PID table for IPI virtualization */
- 	u64 *pid_table;
- 	u16 pid_last_index;
-+	/*
-+	 * Protects accesses to pid_table and pid_last_index.
-+	 * Request to reallocate and update PID table could
-+	 * happen on multiple vCPUs simultaneously.
-+	 */
-+	struct rw_semaphore pid_table_lock;
- };
- 
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9a2972fdae82..97ec2adb76bd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9783,6 +9783,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
- 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-+		if (kvm_check_request(KVM_REQ_PID_TABLE_UPDATE, vcpu))
-+			static_call(kvm_x86_update_ipiv_pid_table)(vcpu);
- 	}
- 
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
+...
+
+>  static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
+>  DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
+>  
+> +static DEFINE_PER_CPU(struct sev_es_save_area *, snp_vmsa);
+
+This is what I mean: the struct is called "sev_es... " but the variable
+"snp_...". I.e., it is all sev_<something>.
+
+> +
+>  static __always_inline bool on_vc_stack(struct pt_regs *regs)
+>  {
+>  	unsigned long sp = regs->sp;
+> @@ -814,6 +818,231 @@ void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
+>  	pvalidate_pages(vaddr, npages, 1);
+>  }
+>  
+> +static int snp_set_vmsa(void *va, bool vmsa)
+> +{
+> +	u64 attrs;
+> +
+> +	/*
+> +	 * The RMPADJUST instruction is used to set or clear the VMSA bit for
+> +	 * a page. A change to the VMSA bit is only performed when running
+> +	 * at VMPL0 and is ignored at other VMPL levels. If too low of a target
+
+What does "too low" mean here exactly?
+
+The kernel is not at VMPL0 but the specified level is lower? Weird...
+
+> +	 * VMPL level is specified, the instruction can succeed without changing
+> +	 * the VMSA bit should the kernel not be in VMPL0. Using a target VMPL
+> +	 * level of 1 will return a FAIL_PERMISSION error if the kernel is not
+> +	 * at VMPL0, thus ensuring that the VMSA bit has been properly set when
+> +	 * no error is returned.
+
+We do check whether we run at VMPL0 earlier when starting the guest -
+see enforce_vmpl0().
+
+I don't think you need any of that additional verification here - just
+assume you are at VMPL0.
+
+> +	 */
+> +	attrs = 1;
+> +	if (vmsa)
+> +		attrs |= RMPADJUST_VMSA_PAGE_BIT;
+> +
+> +	return rmpadjust((unsigned long)va, RMP_PG_SIZE_4K, attrs);
+> +}
+> +
+> +#define __ATTR_BASE		(SVM_SELECTOR_P_MASK | SVM_SELECTOR_S_MASK)
+> +#define INIT_CS_ATTRIBS		(__ATTR_BASE | SVM_SELECTOR_READ_MASK | SVM_SELECTOR_CODE_MASK)
+> +#define INIT_DS_ATTRIBS		(__ATTR_BASE | SVM_SELECTOR_WRITE_MASK)
+> +
+> +#define INIT_LDTR_ATTRIBS	(SVM_SELECTOR_P_MASK | 2)
+> +#define INIT_TR_ATTRIBS		(SVM_SELECTOR_P_MASK | 3)
+> +
+> +static void *snp_safe_alloc_page(void)
+
+safe?
+
+And you don't need to say "safe" - snp_alloc_vmsa_page() is perfectly fine.
+
+> +{
+> +	unsigned long pfn;
+> +	struct page *p;
+> +
+> +	/*
+> +	 * Allocate an SNP safe page to workaround the SNP erratum where
+> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
+> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMSA page.
+
+		2MB or 1GB
+
+Collides how? The 4K frame is inside the hugepage?
+
+> +	 * The recommeded workaround is to not use the large page.
+
+Unknown word [recommeded] in comment, suggestions:
+        ['recommended', 'recommend', 'recommitted', 'commended', 'commandeered']
+
+> +	 *
+> +	 * Allocate one extra page, use a page which is not 2mb aligned
+
+2MB-aligned
+
+> +	 * and free the other.
+> +	 */
+> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> +	if (!p)
+> +		return NULL;
+> +
+> +	split_page(p, 1);
+> +
+> +	pfn = page_to_pfn(p);
+> +	if (IS_ALIGNED(__pfn_to_phys(pfn), PMD_SIZE)) {
+> +		pfn++;
+> +		__free_page(p);
+> +	} else {
+> +		__free_page(pfn_to_page(pfn + 1));
+> +	}
+
+AFAICT, this is doing all this stuff so that you can make sure you get a
+non-2M-aligned page. I wonder if there's a way to simply ask mm to give
+you such page directly.
+
+vbabka?
+
+> +
+> +	return page_address(pfn_to_page(pfn));
+> +}
+> +
+> +static int wakeup_cpu_via_vmgexit(int apic_id, unsigned long start_ip)
+> +{
+> +	struct sev_es_save_area *cur_vmsa, *vmsa;
+> +	struct ghcb_state state;
+> +	unsigned long flags;
+> +	struct ghcb *ghcb;
+> +	int cpu, err, ret;
+> +	u8 sipi_vector;
+> +	u64 cr4;
+> +
+> +	if ((sev_hv_features & GHCB_HV_FT_SNP_AP_CREATION) != GHCB_HV_FT_SNP_AP_CREATION)
+> +		return -EOPNOTSUPP;
+> +
+> +	/*
+> +	 * Verify the desired start IP against the known trampoline start IP
+> +	 * to catch any future new trampolines that may be introduced that
+> +	 * would require a new protected guest entry point.
+> +	 */
+> +	if (WARN_ONCE(start_ip != real_mode_header->trampoline_start,
+> +		      "Unsupported SEV-SNP start_ip: %lx\n", start_ip))
+> +		return -EINVAL;
+> +
+> +	/* Override start_ip with known protected guest start IP */
+> +	start_ip = real_mode_header->sev_es_trampoline_start;
+> +
+> +	/* Find the logical CPU for the APIC ID */
+> +	for_each_present_cpu(cpu) {
+> +		if (arch_match_cpu_phys_id(cpu, apic_id))
+> +			break;
+> +	}
+> +	if (cpu >= nr_cpu_ids)
+> +		return -EINVAL;
+> +
+> +	cur_vmsa = per_cpu(snp_vmsa, cpu);
+> +
+> +	/*
+> +	 * A new VMSA is created each time because there is no guarantee that
+> +	 * the current VMSA is the kernels or that the vCPU is not running. If
+
+kernel's.
+
+And if it is not the kernel's, whose it is?
+
+> +	 * an attempt was done to use the current VMSA with a running vCPU, a
+> +	 * #VMEXIT of that vCPU would wipe out all of the settings being done
+> +	 * here.
+
+I don't understand - this is waking up a CPU, how can it ever be a
+running vCPU which is using the current VMSA?!
+
+There is per_cpu(snp_vmsa, cpu), who else can be using that one currently?
+
+> +	 */
+> +	vmsa = (struct sev_es_save_area *)snp_safe_alloc_page();
+> +	if (!vmsa)
+> +		return -ENOMEM;
+> +
+> +	/* CR4 should maintain the MCE value */
+> +	cr4 = native_read_cr4() & X86_CR4_MCE;
+> +
+> +	/* Set the CS value based on the start_ip converted to a SIPI vector */
+> +	sipi_vector		= (start_ip >> 12);
+> +	vmsa->cs.base		= sipi_vector << 12;
+> +	vmsa->cs.limit		= 0xffff;
+> +	vmsa->cs.attrib		= INIT_CS_ATTRIBS;
+> +	vmsa->cs.selector	= sipi_vector << 8;
+> +
+> +	/* Set the RIP value based on start_ip */
+> +	vmsa->rip		= start_ip & 0xfff;
+> +
+> +	/* Set VMSA entries to the INIT values as documented in the APM */
+> +	vmsa->ds.limit		= 0xffff;
+> +	vmsa->ds.attrib		= INIT_DS_ATTRIBS;
+> +	vmsa->es		= vmsa->ds;
+> +	vmsa->fs		= vmsa->ds;
+> +	vmsa->gs		= vmsa->ds;
+> +	vmsa->ss		= vmsa->ds;
+> +
+> +	vmsa->gdtr.limit	= 0xffff;
+> +	vmsa->ldtr.limit	= 0xffff;
+> +	vmsa->ldtr.attrib	= INIT_LDTR_ATTRIBS;
+> +	vmsa->idtr.limit	= 0xffff;
+> +	vmsa->tr.limit		= 0xffff;
+> +	vmsa->tr.attrib		= INIT_TR_ATTRIBS;
+> +
+> +	vmsa->efer		= 0x1000;	/* Must set SVME bit */
+
+verify_comment_style: Warning: No tail comments please:
+ arch/x86/kernel/sev.c:954 [+   vmsa->efer              = 0x1000;       /* Must set SVME bit */]
+
+> +	vmsa->cr4		= cr4;
+> +	vmsa->cr0		= 0x60000010;
+> +	vmsa->dr7		= 0x400;
+> +	vmsa->dr6		= 0xffff0ff0;
+> +	vmsa->rflags		= 0x2;
+> +	vmsa->g_pat		= 0x0007040600070406ULL;
+> +	vmsa->xcr0		= 0x1;
+> +	vmsa->mxcsr		= 0x1f80;
+> +	vmsa->x87_ftw		= 0x5555;
+> +	vmsa->x87_fcw		= 0x0040;
+
+Yah, those definitely need macros or at least comments ontop denoting
+what those naked values are.
+
+> +
+> +	/*
+> +	 * Set the SNP-specific fields for this VMSA:
+> +	 *   VMPL level
+> +	 *   SEV_FEATURES (matches the SEV STATUS MSR right shifted 2 bits)
+> +	 */
+
+Like this^^
+
+> +	vmsa->vmpl		= 0;
+> +	vmsa->sev_features	= sev_status >> 2;
+> +
+> +	/* Switch the page over to a VMSA page now that it is initialized */
+> +	ret = snp_set_vmsa(vmsa, true);
+> +	if (ret) {
+> +		pr_err("set VMSA page failed (%u)\n", ret);
+> +		free_page((unsigned long)vmsa);
+> +
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Issue VMGEXIT AP Creation NAE event */
+> +	local_irq_save(flags);
+> +
+> +	ghcb = __sev_get_ghcb(&state);
+> +
+> +	vc_ghcb_invalidate(ghcb);
+> +	ghcb_set_rax(ghcb, vmsa->sev_features);
+> +	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_AP_CREATION);
+> +	ghcb_set_sw_exit_info_1(ghcb, ((u64)apic_id << 32) | SVM_VMGEXIT_AP_CREATE);
+> +	ghcb_set_sw_exit_info_2(ghcb, __pa(vmsa));
+> +
+> +	sev_es_wr_ghcb_msr(__pa(ghcb));
+> +	VMGEXIT();
+> +
+> +	if (!ghcb_sw_exit_info_1_is_valid(ghcb) ||
+> +	    lower_32_bits(ghcb->save.sw_exit_info_1)) {
+> +		pr_alert("SNP AP Creation error\n");
+
+alert?
+
+> +		ret = -EINVAL;
+> +	}
+> +
+> +	__sev_put_ghcb(&state);
+> +
+> +	local_irq_restore(flags);
+> +
+> +	/* Perform cleanup if there was an error */
+> +	if (ret) {
+> +		err = snp_set_vmsa(vmsa, false);
+> +		if (err)
+> +			pr_err("clear VMSA page failed (%u), leaking page\n", err);
+> +		else
+> +			free_page((unsigned long)vmsa);
+
+That...
+
+> +
+> +		vmsa = NULL;
+> +	}
+> +
+> +	/* Free up any previous VMSA page */
+> +	if (cur_vmsa) {
+> +		err = snp_set_vmsa(cur_vmsa, false);
+> +		if (err)
+> +			pr_err("clear VMSA page failed (%u), leaking page\n", err);
+> +		else
+> +			free_page((unsigned long)cur_vmsa);
+
+.. and that wants to be in a common helper.
+
+> +	}
+> +
+> +	/* Record the current VMSA page */
+> +	per_cpu(snp_vmsa, cpu) = vmsa;
+> +
+> +	return ret;
+> +}
+
 -- 
-2.27.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
