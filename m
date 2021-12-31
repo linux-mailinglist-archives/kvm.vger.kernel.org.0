@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FB5F48247A
-	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 15:59:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71DC648247C
+	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 15:59:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbhLaO7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Dec 2021 09:59:21 -0500
-Received: from mga03.intel.com ([134.134.136.65]:47298 "EHLO mga03.intel.com"
+        id S231207AbhLaO7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Dec 2021 09:59:30 -0500
+Received: from mga06.intel.com ([134.134.136.31]:23761 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231154AbhLaO7P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Dec 2021 09:59:15 -0500
+        id S231166AbhLaO7V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Dec 2021 09:59:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640962755; x=1672498755;
+  t=1640962760; x=1672498760;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=VFfD9eTpxtjDaqvPE492xPzn5UqT5dKTnIj6sllM0iQ=;
-  b=gdoCzp9FTl60e+tmw9/S1WMIfkk0aw+KhxbYabIMhGW/8o96rTA1cU62
-   oaeH9YTQuBG0tnrCVbeoiQn6B+Oz7iHhQgwVfA9uf8J1reB6eg3sdrDrA
-   wzgg3Pe1RE0oR6YyARUEWQDfIfLOBAlDQll4aDNbwkkTzS7D50isozSF8
-   bCOY2pRlBsgXf3CYT4xI3KV+k1aNLcM1OXbN6zZoroG3hOEFIhCPK9CaZ
-   OL/TkDGYwHn19ywDydSWWNF0FIEPpHkVtWINGbCN8KVAdnUjPQkqBM+jg
-   hJxHGJXianEqNuUhojnEH+fcu8mQ83RZ/8LeCNEyg6zqQAoPUFOW0u6fy
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10213"; a="241773897"
+  bh=GYYW4VDo4aLjLd+zWJjAaLbWaXT9U1/xExbUlzLY79w=;
+  b=j8t/RnGFAgRfEh+USF9E6wnjVRmLRdJEZH72xn+kYjrm2g+nbW5nJh/R
+   pN9sGSJftzNDa8LXW4owLtnf1X0sbfmg7a+E+IqT2har0VSPzYdzIkRKD
+   BYFuYbmdRWRtGYfscfCN7xizD/f5zwo6hJ6joMuAgDx6ey6gRZMGiy7+A
+   xmiX2zfozbFLrGSAH0PcMEOuZ8vagPhBAtmlWonyapM2D1QEtGGH3ZW0o
+   T2kgHD8h5XZISWY2em7+rqT8OMg+1qMGbtRxYGra7IGDs8LjTTJ/X1q96
+   CIQhgeVUkXput6POvmR69e5sKfmVfDAx+ByhF/YAZT5PVHw5CddwQD7XP
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10213"; a="302569970"
 X-IronPort-AV: E=Sophos;i="5.88,251,1635231600"; 
-   d="scan'208";a="241773897"
+   d="scan'208";a="302569970"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2021 06:59:14 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2021 06:59:20 -0800
 X-IronPort-AV: E=Sophos;i="5.88,251,1635231600"; 
-   d="scan'208";a="524758450"
+   d="scan'208";a="524758458"
 Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.120])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2021 06:59:09 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2021 06:59:14 -0800
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -52,11 +52,10 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Kai Huang <kai.huang@intel.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: [PATCH v5 4/8] KVM: VMX: dump_vmcs() reports tertiary_exec_control field as well
-Date:   Fri, 31 Dec 2021 22:28:45 +0800
-Message-Id: <20211231142849.611-5-guang.zeng@intel.com>
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC mode with APIC-write VM exit
+Date:   Fri, 31 Dec 2021 22:28:46 +0800
+Message-Id: <20211231142849.611-6-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20211231142849.611-1-guang.zeng@intel.com>
 References: <20211231142849.611-1-guang.zeng@intel.com>
@@ -64,50 +63,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Robert Hoo <robert.hu@linux.intel.com>
+In VMX non-root operation, new behavior applies to
+virtualize WRMSR to vICR in x2APIC mode. Depending
+on settings of the VM-execution controls, CPU would
+produce APIC-write VM-exit following the 64-bit value
+written to offset 300H on the virtual-APIC page(vICR).
+KVM needs to retrieve the value written by CPU and
+emulate the vICR write to deliver an interrupt.
 
-Add tertiary_exec_control field report in dump_vmcs()
+Current KVM doesn't consider to handle the 64-bit setting
+on vICR in trap-like APIC-write VM-exit. Because using
+kvm_lapic_reg_write() to emulate writes to APIC_ICR requires
+the APIC_ICR2 is already programmed correctly. But in the
+above APIC-write VM-exit, CPU writes the whole 64 bits to
+APIC_ICR rather than program higher 32 bits and lower 32
+bits to APIC_ICR2 and APIC_ICR respectively. So, KVM needs
+to retrieve the whole 64-bit value and program higher 32 bits
+to APIC_ICR2 first.
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/x86/kvm/lapic.c | 12 +++++++++---
+ arch/x86/kvm/lapic.h |  5 +++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fb0f600368c6..5716db9704c0 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5729,6 +5729,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	u32 vmentry_ctl, vmexit_ctl;
- 	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
-+	u64 tertiary_exec_control = 0;
- 	unsigned long cr4;
- 	int efer_slot;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index f206fc35deff..3ce7142ba00e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2186,15 +2186,21 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
+ /* emulate APIC access in a trap manner */
+ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+ {
+-	u32 val = 0;
++	struct kvm_lapic *apic = vcpu->arch.apic;
++	u64 val = 0;
  
-@@ -5746,6 +5747,9 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	if (cpu_has_secondary_exec_ctrls())
- 		secondary_exec_control = vmcs_read32(SECONDARY_VM_EXEC_CONTROL);
+ 	/* hw has done the conditional check and inst decode */
+ 	offset &= 0xff0;
  
-+	if (cpu_has_tertiary_exec_ctrls())
-+		tertiary_exec_control = vmcs_read64(TERTIARY_VM_EXEC_CONTROL);
+-	kvm_lapic_reg_read(vcpu->arch.apic, offset, 4, &val);
++	/* exception dealing with 64bit data on vICR in x2apic mode */
++	if ((offset == APIC_ICR) && apic_x2apic_mode(apic)) {
++		val = kvm_lapic_get_reg64(apic, offset);
++		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(val>>32));
++	} else
++		kvm_lapic_reg_read(apic, offset, 4, &val);
+ 
+ 	/* TODO: optimize to just emulate side effect w/o one more write */
+-	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
++	kvm_lapic_reg_write(apic, offset, (u32)val);
+ }
+ EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
+ 
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 2b44e533fc8d..91864e401a64 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -158,6 +158,11 @@ static inline u32 kvm_lapic_get_reg(struct kvm_lapic *apic, int reg_off)
+ 	return *((u32 *) (apic->regs + reg_off));
+ }
+ 
++static inline u64 kvm_lapic_get_reg64(struct kvm_lapic *apic, int reg_off)
++{
++	return *((u64 *) (apic->regs + reg_off));
++}
 +
- 	pr_err("VMCS %p, last attempted VM-entry on CPU %d\n",
- 	       vmx->loaded_vmcs->vmcs, vcpu->arch.last_vmentry_cpu);
- 	pr_err("*** Guest State ***\n");
-@@ -5844,8 +5848,9 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 		vmx_dump_msrs("host autoload", &vmx->msr_autoload.host);
- 
- 	pr_err("*** Control State ***\n");
--	pr_err("PinBased=%08x CPUBased=%08x SecondaryExec=%08x\n",
--	       pin_based_exec_ctrl, cpu_based_exec_ctrl, secondary_exec_control);
-+	pr_err("PinBased=0x%08x CPUBased=0x%08x SecondaryExec=0x%08x TertiaryExec=0x%016llx\n",
-+	       pin_based_exec_ctrl, cpu_based_exec_ctrl, secondary_exec_control,
-+	       tertiary_exec_control);
- 	pr_err("EntryControls=%08x ExitControls=%08x\n", vmentry_ctl, vmexit_ctl);
- 	pr_err("ExceptionBitmap=%08x PFECmask=%08x PFECmatch=%08x\n",
- 	       vmcs_read32(EXCEPTION_BITMAP),
+ static inline void __kvm_lapic_set_reg(char *regs, int reg_off, u32 val)
+ {
+ 	*((u32 *) (regs + reg_off)) = val;
 -- 
 2.27.0
 
