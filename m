@@ -2,154 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 059104821A5
-	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 03:54:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62AB74821EC
+	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 05:00:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241141AbhLaCy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Dec 2021 21:54:29 -0500
-Received: from mga14.intel.com ([192.55.52.115]:39380 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241081AbhLaCy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Dec 2021 21:54:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640919268; x=1672455268;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=LPcVk7Dhs/psxqqcTf8fKAlDbNnm7Ve0rMtCoM0tbUc=;
-  b=gwYHV3/AilQsyS4mOLhcMIKE6Y21gtunjFMJheEH1KP88PqTQr/IjWzZ
-   MgNBP2Zec4RKxDL7eFeUVtqnxgwl0We2kKVm+6hyYKie+S4h/81fPvQuW
-   pzmqreLKQKA30YfCjQcryz1/purTc70yhvvPoKNU0qttj0Q4nuSheo3qw
-   D6gZBGRWx/+bB00qsHgOgelXIi1CNtLCiRvdlk4qjceBcleHSwyt/tgW5
-   QclsngPqyDDOGbnGEp4bOd6lfZxaplrRnw7QlARSJhwBXlL7C8c4BZTNN
-   DkN5DhQf5f5CF+RVkJbLwLCu1sRrxG2p120SOr/MlLrKy3rGzlGt9gAVJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10213"; a="241972471"
-X-IronPort-AV: E=Sophos;i="5.88,250,1635231600"; 
-   d="scan'208";a="241972471"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Dec 2021 18:54:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,250,1635231600"; 
-   d="scan'208";a="666710583"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga001.fm.intel.com with ESMTP; 30 Dec 2021 18:54:19 -0800
-Date:   Fri, 31 Dec 2021 10:53:44 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [PATCH v3 kvm/queue 04/16] KVM: Extend the memslot to support
- fd-based private memory
-Message-ID: <20211231025344.GC7255@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-5-chao.p.peng@linux.intel.com>
- <YcSzafzpjMy6m28B@google.com>
+        id S242658AbhLaEAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Dec 2021 23:00:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47778 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231222AbhLaEAu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Dec 2021 23:00:50 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFDE6C061574;
+        Thu, 30 Dec 2021 20:00:49 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id y16-20020a17090a6c9000b001b13ffaa625so29607221pjj.2;
+        Thu, 30 Dec 2021 20:00:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=77h7/M3O/tWcwB1TVuLaAEEhvGIK19Mi+7+lByjGYqs=;
+        b=A79vWq8Fny8BNDJsc0FsgLYMAgz9ju3fEYj8NesMp8i5eLDf/fProVh8bgNHIatR9l
+         iWPr/+vAsYkwb32T3UKotty+teCit/Kx92ts71fz+IO/iLwChdsPGdXIEOZ0cX9H14vm
+         ibdvPN/cEA/fH5w73LZo7moewehJa8glpOBVfw324ztdSvE5WXBusyKFDEL9wsuMR2/8
+         CK1ApoluR3obYAfNsJxcO7Y38NPKS9W4f+rRchq3vQc/Kj2qr/IRBAxVKZUXcgfmdWtU
+         x9MOTlqU+ueZLG9fjefYaD6a9Id3SNmGygxVC2iNTlQwB7WVib1BYVWfBnNdTX92Fvsm
+         i6VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=77h7/M3O/tWcwB1TVuLaAEEhvGIK19Mi+7+lByjGYqs=;
+        b=Ek9QEPOG8s7NMc6aZCuKPeGZZma376mLOvz2/vzAKOnSEC7sTwMCrF7U1lwIHGyM9u
+         S7d4dgPbNpGaqWrXYphktfgXK1VueUGzzDBBPrcsJGB4sxr5l4+AtZh5tVSSvWZ6XLfP
+         oCNwak9EPFk4fjs68zaYx/0/sKJWyiXqp0aco0+WFZWgTQ/D0Zi8r3LrEncAACyruPx2
+         ujgiEc9zM8pAaU9CSZ6wMsKaBIdGwJvY7AhKvCP97DvwPa7CM/JRr+jNJ5djE02Hv4Cq
+         bs5cbYNdUqhecQDz258WMenoLI63hWcT0dv433d/k3A/xN15OXZNFuDcHZtYc26R/N58
+         gmag==
+X-Gm-Message-State: AOAM531KEXkUmch6aGq3npaGz8tsRt1SvLtVUdcEuj5XKmv2Ygz2IIqw
+        NGp4cLZfHis8FF7GYrMphCg=
+X-Google-Smtp-Source: ABdhPJxYoPV/JlIx5DQlw2Qgr1EB8qbo1vsjNHcvSNHnSFn54fSTPSvnDzVDT6VKxtF3M6rjNqJZsQ==
+X-Received: by 2002:a17:90b:3c0c:: with SMTP id pb12mr40972455pjb.105.1640923248893;
+        Thu, 30 Dec 2021 20:00:48 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id u8sm30204230pfg.157.2021.12.30.20.00.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Dec 2021 20:00:48 -0800 (PST)
+Message-ID: <69ad949e-4788-0f93-46cb-6af6f79a9f24@gmail.com>
+Date:   Fri, 31 Dec 2021 12:00:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YcSzafzpjMy6m28B@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211210133525.46465-1-likexu@tencent.com>
+ <20211210133525.46465-2-likexu@tencent.com> <Yc321e9o16luwFK+@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH v11 01/17] perf/x86/intel: Add EPT-Friendly PEBS for Ice
+ Lake Server
+In-Reply-To: <Yc321e9o16luwFK+@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 05:35:37PM +0000, Sean Christopherson wrote:
-> On Thu, Dec 23, 2021, Chao Peng wrote:
+On 31/12/2021 2:13 am, Sean Christopherson wrote:
+> On Fri, Dec 10, 2021, Like Xu wrote:
+>> From: Like Xu <like.xu@linux.intel.com>
+>>
+>> From: Like Xu <like.xu@linux.intel.com>
 > 
-> > +	struct file *file;
-> 
-> Please use more descriptive names, shaving characters is not at all priority.
-> 
-> > +	u64 ofs;
-> 
-> I believe this should be loff_t.
-> 
-> 	struct file *private_file;
-> 	struct loff_t private_offset;
-> 
-> >  };
-> >  
-> > +static inline bool kvm_slot_is_private(const struct kvm_memory_slot *slot)
-> > +{
-> > +	if (slot && (slot->flags & KVM_MEM_PRIVATE))
-> > +		return true;
-> > +	return false;
-> 
-> 	return slot && (slot->flags & KVM_MEM_PRIVATE);
-> 
-> > +}
-> > +
-> >  static inline bool kvm_slot_dirty_track_enabled(const struct kvm_memory_slot *slot)
-> >  {
-> >  	return slot->flags & KVM_MEM_LOG_DIRTY_PAGES;
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 1daa45268de2..41434322fa23 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -103,6 +103,17 @@ struct kvm_userspace_memory_region {
-> >  	__u64 userspace_addr; /* start of the userspace allocated memory */
-> >  };
-> >  
-> > +struct kvm_userspace_memory_region_ext {
-> > +	__u32 slot;
-> > +	__u32 flags;
-> > +	__u64 guest_phys_addr;
-> > +	__u64 memory_size; /* bytes */
-> > +	__u64 userspace_addr; /* hva */
-> 
-> Would it make sense to embed "struct kvm_userspace_memory_region"?
-> 
-> > +	__u64 ofs; /* offset into fd */
-> > +	__u32 fd;
-> 
-> Again, use descriptive names, then comments like "offset into fd" are unnecessary.
-> 
-> 	__u64 private_offset;
-> 	__u32 private_fd;
+> Did one of these get handcoded?
 
-My original thought is the same fields might be used for shared memslot
-as well in future (e.g. there may be another KVM_MEM_* bit can reuse the
-same fields for shared slot) so non private-specific name may sound
-better. But definitely I have no objection and can use private_* names
-for next version unless there is other objection.
+Uh, now I have found the use of "--from=<ident>".
+
+> 
+>> The new hardware facility supporting guest PEBS is only available on
+>> Intel Ice Lake Server platforms for now. KVM will check this field
+>> through perf_get_x86_pmu_capability() instead of hard coding the cpu
+>> models in the KVM code. If it is supported, the guest PEBS capability
+>> will be exposed to the guest.
+> 
+> So what exactly is this new feature?  I've speed read the cover letter and a few
+> changelogs and didn't find anything that actually explained when this feature does.
+> 
+
+Please check Intel SDM Vol3 18.9.5 for this "EPT-Friendly PEBS" feature.
+
+I assume when an unfamiliar feature appears in the patch SUBJECT,
+the reviewer may search for the exact name in the specification.
+
+> Based on the shortlog, I assume the feature handles translating linear addresses
+> via EPT?  If that's correct, then x86_pmu.pebs_vmx should be named something like
+> x86_pmu.pebs_ept.
+
+"Translating linear addresses via EPT" is only part of the hardware implementation,
+and we may apply the new name if there are no other objections.
+
+> 
+> That also raises the question of what will happen if EPT is disabled.  Presumably
+> things will Just Work since no additional translation is needed, but if that's the
+> case then arguably vmx_pebs_supported() should be:
+> 
+> 	return boot_cpu_has(X86_FEATURE_PEBS) &&
+> 	       (!tdp_enabled || kvm_pmu_cap.pebs_vmx);
+
+Yes, a similar fix is already on my private tree, and thank you for pointing it out!
+
+> 
+> I'm guessing no one actually cares about supporting PEBS on older CPUs using shadow
+> paging, but the changelog should at least call out that PEBS is allowed if and only
+> if "pebs_vmx" is supported for simplicity, even though it would actually work if EPT
+> is disabled.  And if for some reason it _doesn't_ work when EPT is disabled, then
+> vmx_pebs_supported() and friends need to actually check tdp_enabled.
+
+Yes, the guest PEBS only works when EPT is enabled on the newer modern CPUs.
+
+> 
+> Regardless, this changelog really, really needs an explanation of the feature.
+
+Thank you for picking up, I will update the changelog for this commit.
+
+Please let me know if you have any more obstacles or niggles to review this 
+patch set.
 
 Thanks,
-Chao
-> 
-> > +	__u32 padding[5];
-> > +};
-> > +
-> >  /*
-> >   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
-> >   * other bits are reserved for kvm internal use which are defined in
-> > @@ -110,6 +121,7 @@ struct kvm_userspace_memory_region {
-> >   */
-> >  #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-> >  #define KVM_MEM_READONLY	(1UL << 1)
-> > +#define KVM_MEM_PRIVATE		(1UL << 2)
-> >  
-> >  /* for KVM_IRQ_LINE */
-> >  struct kvm_irq_level {
-> > -- 
-> > 2.17.1
-> > 
+Like Xu
