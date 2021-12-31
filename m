@@ -2,120 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4873848215B
-	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 02:58:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A388148217F
+	for <lists+kvm@lfdr.de>; Fri, 31 Dec 2021 03:27:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242535AbhLaB6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Dec 2021 20:58:53 -0500
-Received: from mga07.intel.com ([134.134.136.100]:20260 "EHLO mga07.intel.com"
+        id S241028AbhLaC1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Dec 2021 21:27:22 -0500
+Received: from mga01.intel.com ([192.55.52.88]:14779 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229890AbhLaB6w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Dec 2021 20:58:52 -0500
+        id S230097AbhLaC1V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Dec 2021 21:27:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640915932; x=1672451932;
-  h=cc:subject:to:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=5DUIS3fYDXtA8WzqPnxiZ6jJAXuU/rSnDLDZK5j56bA=;
-  b=mIuKVIkEPjHCGEh5mu16SS6FQJ85IAmbWulyiyHJhOscm+2JUtbH3lOx
-   D594wIiMjGz3atlBQOf9gDZhbX3JyifUYFWo0cI+Z9Eebki2kE/w8pEW5
-   Clw20mzVKcz3KpludUVxxUGn2hcsNLkyi1fYAurUBCi9FlIn4XTXqShr7
-   WAH7s85xUz/IvA7qHX1oBEcItqnTxcWSaNnpL3nCDoXIDKFHK8tQwai2Y
-   cgaH/TJLT+0fla2xHG3qHgZZk6Gn2FyLymWf+Ln9jbDulU6M73DKQA28u
-   o8EaiAYE1Fu+KO2IuWtELZDzalJM+1ab/NlcvVlo0WOdAb5fgTfpRjPV5
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10213"; a="305119217"
+  t=1640917641; x=1672453641;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=GWTpTesJcb+925QqthMUbTz8/8tLtbXxt+lqNt52Aec=;
+  b=AQ0+8iJghNMqDB+Y8FnQKy7cDdtA2gxWPiL+a0hND5hFQBzbwDoIixd2
+   cRJCrITIh5/Scm5FtUJjF1nzyuk8u+flATutN9NatsBM/VGbjGaNSxET1
+   KOWDJpt4ulYvXSoUQX2mRP6vvpNYlzZ5Ud4rw5g+j2hRljDuo+cE8YMk9
+   d1SwOgE1pWiny72NaVsPPfX/KrdufVTiVkVBncTZN5011JsNta+OfwrcS
+   R05uXzYaaNRHR2kLXgNmbDjbAnoxoJjMqWxyGBhlmI9yT6o3YUT/lXBF4
+   DyMEru9SlYgBqkgbFRiJT2oceZuamHCkV6Ene+cqDDpQcOOF3QAlch+LT
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10213"; a="266011070"
 X-IronPort-AV: E=Sophos;i="5.88,250,1635231600"; 
-   d="scan'208";a="305119217"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Dec 2021 17:58:52 -0800
+   d="scan'208";a="266011070"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Dec 2021 18:27:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,250,1635231600"; 
-   d="scan'208";a="524583164"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 30 Dec 2021 17:58:43 -0800
-Cc:     baolu.lu@linux.intel.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+   d="scan'208";a="666705441"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by fmsmga001.fm.intel.com with ESMTP; 30 Dec 2021 18:27:12 -0800
+Date:   Fri, 31 Dec 2021 10:26:36 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 03/13] PCI: pci_stub: Suppress kernel DMA ownership
- auto-claiming
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Bjorn Helgaas <helgaas@kernel.org>
-References: <568b6d1d-69df-98ad-a864-dd031bedd081@linux.intel.com>
- <20211230222414.GA1805873@bhelgaas> <20211231004019.GH1779224@nvidia.com>
- <5eb8650c-432f-bf06-c63d-6320199ef894@linux.intel.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <9daec0aa-b58f-93b3-c8bb-b67ec6d84596@linux.intel.com>
-Date:   Fri, 31 Dec 2021 09:58:11 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+Subject: Re: [PATCH v3 kvm/queue 05/16] KVM: Maintain ofs_tree for fast
+ memslot lookup by file offset
+Message-ID: <20211231022636.GA7025@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+ <20211223123011.41044-6-chao.p.peng@linux.intel.com>
+ <YcS5uStTallwRs0G@google.com>
+ <20211224035418.GA43608@chaop.bj.intel.com>
+ <YcuGGCo5pR31GkZE@google.com>
 MIME-Version: 1.0
-In-Reply-To: <5eb8650c-432f-bf06-c63d-6320199ef894@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YcuGGCo5pR31GkZE@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/31/21 9:10 AM, Lu Baolu wrote:
+On Tue, Dec 28, 2021 at 09:48:08PM +0000, Sean Christopherson wrote:
+> On Fri, Dec 24, 2021, Chao Peng wrote:
+> > On Thu, Dec 23, 2021 at 06:02:33PM +0000, Sean Christopherson wrote:
+> > > On Thu, Dec 23, 2021, Chao Peng wrote:
+> > > 
+> > > In other words, there needs to be a 1:1 gfn:file+offset mapping.  Since userspace
+> > > likely wants to allocate a single file for guest private memory and map it into
+> > > multiple discontiguous slots, e.g. to skip the PCI hole, the best idea off the top
+> > > of my head would be to register the notifier on a per-slot basis, not a per-VM
+> > > basis.  It would require a 'struct kvm *' in 'struct kvm_memory_slot', but that's
+> > > not a huge deal.
+> > > 
+> > > That way, KVM's notifier callback already knows the memslot and can compute overlap
+> > > between the memslot and the range by reversing the math done by kvm_memfd_get_pfn().
+> > > Then, armed with the gfn and slot, invalidation is just a matter of constructing
+> > > a struct kvm_gfn_range and invoking kvm_unmap_gfn_range().
+> > 
+> > KVM is easy but the kernel bits would be difficulty, it has to maintain
+> > fd+offset to memslot mapping because one fd can have multiple memslots,
+> > it need decide which memslot needs to be notified.
 > 
-> On 12/31/21 8:40 AM, Jason Gunthorpe wrote:
->> On Thu, Dec 30, 2021 at 04:24:14PM -0600, Bjorn Helgaas wrote:
->>
->>> I was speculating that maybe the DMA ownership claiming must be done
->>> *before* the driver's .probe() method?
->>
->> This is correct.
->>
->>> If DMA ownership could be claimed by the .probe() method, we
->>> wouldn't need the new flag in struct device_driver.
->>
->> The other requirement is that every existing driver must claim
->> ownership, so pushing this into the device driver's probe op would
->> require revising almost every driver in Linux...
->>
->> In effect the new flag indicates if the driver will do the DMA
->> ownership claim in it's probe, or should use the default claim the
->> core code does.
->>
->> In almost every case a driver should do a claim. A driver like
->> pci-stub, or a bridge, that doesn't actually operate MMIO on the
->> device would be the exception.
+> No, the kernel side maintains an opaque pointer like it does today,
+
+But the opaque pointer will now become memslot, isn't it? That said,
+kernel side should maintain a list of opaque pointer (memslot) instead
+of one for each fd (inode) since a fd to memslot mapping is 1:M now.
+
+>KVM handles
+> reverse engineering the memslot to get the offset and whatever else it needs.
+> notify_fallocate() and other callbacks are unchanged, though they probably can
+> drop the inode.
 > 
-> We still need to call iommu_device_use_dma_api() in bus dma_configure()
-> callback. But we can call iommu_device_unuse_dma_api() in the .probe()
-> of vfio (and vfio-approved) drivers, so that we don't need the new flag
-> anymore.
+> E.g. likely with bad math and handwaving on the overlap detection:
+> 
+> int kvm_private_fd_fallocate_range(void *owner, pgoff_t start, pgoff_t end)
+> {
+> 	struct kvm_memory_slot *slot = owner;
+> 	struct kvm_gfn_range gfn_range = {
+> 		.slot	   = slot,
+> 		.start	   = (start - slot->private_offset) >> PAGE_SHIFT,
+> 		.end	   = (end - slot->private_offset) >> PAGE_SHIFT,
+> 		.may_block = true,
+> 	};
+> 
+> 	if (!has_overlap(slot, start, end))
+> 		return 0;
+> 
+> 	gfn_range.end = min(gfn_range.end, slot->base_gfn + slot->npages);
+> 
+> 	kvm_unmap_gfn_range(slot->kvm, &gfn_range);
+> 	return 0;
+> }
 
-Oh, wait. I didn't think about the hot-plug case. If we call
-iommu_device_use_dma_api() in bus dma_configure() anyway, we can't bind
-any (no matter vfio or none-vfio) driver to a device if it's group has
-already been assigned to user space. It seems that we can't omit this
-flag.
+I understand this KVM side handling, but again one fd can have multiple
+memslots. How shmem decides to notify which memslot from a list of
+memslots when it invokes the notify_fallocate()? Or just notify all
+the possible memslots then let KVM to check? 
 
-Best regards,
-baolu
+Thanks,
+Chao
