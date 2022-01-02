@@ -2,94 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7961748276E
-	for <lists+kvm@lfdr.de>; Sat,  1 Jan 2022 13:05:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8290C482A98
+	for <lists+kvm@lfdr.de>; Sun,  2 Jan 2022 09:40:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232346AbiAAMFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Jan 2022 07:05:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
+        id S231341AbiABIWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Jan 2022 03:22:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232323AbiAAMFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Jan 2022 07:05:30 -0500
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C91EC061574
-        for <kvm@vger.kernel.org>; Sat,  1 Jan 2022 04:05:30 -0800 (PST)
-Received: by mail-pf1-x442.google.com with SMTP id s15so25532896pfk.6
-        for <kvm@vger.kernel.org>; Sat, 01 Jan 2022 04:05:30 -0800 (PST)
+        with ESMTP id S229505AbiABIWO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Jan 2022 03:22:14 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8F8C061574;
+        Sun,  2 Jan 2022 00:22:14 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id 7so15107891pgn.0;
+        Sun, 02 Jan 2022 00:22:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:from:mime-version:content-transfer-encoding
-         :content-description:subject:to:date:reply-to;
-        bh=dhFaFNGf9P/hgzfpigNOAcNefTeR7Csml9+Bh/hdy/w=;
-        b=L1S0udrr8b6jNYLwtQJIIHvNiA0ACl0IktiHoao2EnkLWRlPNkL26zQKGRI/MQ67bO
-         TVDyFaq3hDOphhj8+cYXM8aIOi7hsjym5rBbyQ4yDCBT4DHwVggs2Ll0s1Ga0WmzKMYN
-         j9v6HErddKRzK+oYaeCMSVQyGSSpFAyw8N8/bUeVBqojh2YL7KnYFH8pyDevIndjD4jC
-         4Okw6D5F5UaVoEYkQKIe+ltpbC9HCvOQgB2k6EczTLuvhnp1uWAg8wX4gMAnFxhlD6Ot
-         M95qJhEWTd0sYs1YYUQj7TWuZVXpWVV85fuuQKgfmLmIlvSE7DbhMruGmXFVKdoVtu4h
-         Hbiw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pFB6LeqgULhilOO4+NT/Y/zSijzYFfbA0zvCt4dGG50=;
+        b=G6H9Y+13OeUv6MdrtZRXr/B4eUmK4nDrY14bxz6brch8JxABFOyGymCkwgKIXcDfjx
+         5rarPL+ttKyyTeRtiM1vnhb3dhiSWGwtEEP+WegOF6F/nTKoOsqPUkgBCOnBaju6j7ZQ
+         9MPiqc3LgQPhFBysiqy7k4czW3NBZHcJtdQZxdjBVyZhmZ+E9ObYUPrrBqub5SO8R28r
+         f7xnK0kJ+kCr7CMv3GboSQyWwwjQcSzY9CTJjt+heV8pPqfqxL9rbzx61tWoAvPjaID9
+         91doRGhPAo16scin3bcle0myXVsy0JkprT9DZN1XcgLiM9cCkBBm27Q1UL0sTGXFg0E5
+         JZPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:from:mime-version
-         :content-transfer-encoding:content-description:subject:to:date
-         :reply-to;
-        bh=dhFaFNGf9P/hgzfpigNOAcNefTeR7Csml9+Bh/hdy/w=;
-        b=TGKrkpno+W0UZp0iIaaCXgOX9w563BETqDsz9PWItmLSL1LcgLL8BJxPJu+zVVBIOz
-         hjJdO2B4RL6reWiCHD0p3nfwGWjC5E33MPHKiaeYxotGOf7hnTG4DSE4Mru6cKHCQKZT
-         TRZdI+0mf7qFXvc/OjJKM8PNG8I4owu9VUgO9DK3JcMrata/3mQn/q/HqaIlY3RrQBy/
-         5yBbuFmufg3Co07SGHYyv4Q1H7S+do2LUXaKUjQ0foaLsu8ZuPru4u3TiVTMea4M/LAI
-         NzXZQMfMuyxPOhaWqCzM2GGyX/DeGsQ9aUzYIDNI7ZntUPRrMz/9gOWUaC28vqytnQDm
-         dG7A==
-X-Gm-Message-State: AOAM53371Qn9yz1/wIB2QHGd+AvPFJncc+YzTxNC5uwKTG0joZ8YXgqH
-        xfKYC/zFALb8Po1ALUe5VJM=
-X-Google-Smtp-Source: ABdhPJyvDop6sZlzrmK3eK/6zspQXipLCG1ZGYGlRJ7Sj8gMpoP9LBN4UOUCZvCToS8386BbbYxZtw==
-X-Received: by 2002:a63:d446:: with SMTP id i6mr34610701pgj.479.1641038729909;
-        Sat, 01 Jan 2022 04:05:29 -0800 (PST)
-Received: from [192.168.0.153] ([143.244.48.136])
-        by smtp.gmail.com with ESMTPSA id w13sm27606619pgm.5.2022.01.01.04.05.21
-        (version=TLS1 cipher=AES128-SHA bits=128/128);
-        Sat, 01 Jan 2022 04:05:28 -0800 (PST)
-Message-ID: <61d04388.1c69fb81.c547a.d7dc@mx.google.com>
-From:   yalaiibrahim818@gmail.com
-X-Google-Original-From: suport.prilend@gmail.com
-Content-Type: text/plain; charset="iso-8859-1"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pFB6LeqgULhilOO4+NT/Y/zSijzYFfbA0zvCt4dGG50=;
+        b=wW6qIZ38a7fyuMVvzODWQVTj6Jztw7J38ypo5lIeKyKTsDHThtN54s1rxaRYu8ImV+
+         gnAiicr4D5gttBEm0bDL9abMcfGvTZ1M2Rnz8fp+9WlQLlaNlUfuyl0hqmmUWhQrmtun
+         lSDUC2lgiYa1yc26O5qaL1V7zGE+XeYlhtvSeeMS8kXXfZTPuEX+QpmbyJpVtrKagGQo
+         NluMfW46W8/t0q3t9Rc9IZa/UundhXUhVQDNvFM/oaPe+g5eEbMi/E/EFpt7Qb94dQeX
+         qGC96HoOkDmlse0emHEURLFvscHjVLJNZWA0hkOoX5Twn38fOEM+fJuTGikP/n8MI/k8
+         4how==
+X-Gm-Message-State: AOAM530XKOvn/+6x3u7gjrY1PcKp/AtEtqdMWPNFIeJoSW6gHR2ndjAB
+        ruEWlo8KBvAJsya1jjs/neRQ322iug==
+X-Google-Smtp-Source: ABdhPJxQdOcZ2+fWvyG0pjWD8/qzpgUfPhnlP3Zj8lGFwaYNHBBglFPqzFKE211KBNgHf5OGHxVtaw==
+X-Received: by 2002:aa7:8d99:0:b0:4bb:8e5e:9ae4 with SMTP id i25-20020aa78d99000000b004bb8e5e9ae4mr39742848pfr.68.1641111733767;
+        Sun, 02 Jan 2022 00:22:13 -0800 (PST)
+Received: from localhost.localdomain ([66.90.115.98])
+        by smtp.gmail.com with ESMTPSA id g5sm37044757pfj.143.2022.01.02.00.22.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Jan 2022 00:22:13 -0800 (PST)
+From:   Jietao Xiao <shawtao1125@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jietao Xiao <shawtao1125@gmail.com>
+Subject: [PATCH] KVM:x86: Let kvm-pit thread inherit the cgroups of the calling process
+Date:   Sun,  2 Jan 2022 16:22:07 +0800
+Message-Id: <20220102082207.10485-1-shawtao1125@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: RE:
-To:     Recipients <suport.prilend@gmail.com>
-Date:   Sat, 01 Jan 2022 14:05:10 +0200
-Reply-To: andres.stemmet1@gmail.com
-X-Mailer: TurboMailer 2
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I want to confide in you to finalize this transaction of mutual benefits. I=
-t may seem strange to you, but it is real. This is a transaction that has n=
-o risk at all, due process shall be followed and it shall be carried out un=
-der the ambit of the financial laws. Being the Chief Financial Officer, BP =
-Plc. I want to trust and put in your care Eighteen Million British Pounds S=
-terling, The funds were acquired from an over-invoiced payment from a past =
-contract executed in one of my departments. I can't successfully achieve th=
-is transaction without presenting you as foreign contractor who will provid=
-e a bank account to receive the funds.
+Qemu-kvm will create several kernel threads for each VM including
+kvm-nx-lpage-re, vhost, and so on. Both of them properly inherit
+the cgroups of the calling process,so they are easy to attach to
+the VMM process's cgroups.
 
-Documentation for the claim of the funds will be legally processed and docu=
-mented, so I will need your full cooperation on this matter for our mutual =
-benefits. We will discuss details if you are interested to work with me to =
-secure this funds. I will appreciate your prompt response in every bit of o=
-ur communication. Stay Blessed and Stay Safe.
+Kubernetes has a feature Pod Overhead for accounting for the resources
+consumed by the Pod infrastructure(e.g overhead brought by qemu-kvm),
+and sandbox container runtime usually creates a sandbox or sandbox
+overhead cgroup for this feature. By just simply adding the runtime or
+the VMM process to the sandbox's cgroup, vhost and kvm-nx-lpage-re thread
+can successfully attach to the sanbox's cgroup but kvm-pit thread cannot.
+Besides, in some scenarios, kvm-pit thread can bring some CPU overhead.
+So it's better to let the kvm-pit inherit the cgroups of the calling
+userspace process.
 
-Best Regards
+By queuing the attach cgroup work as the first work after the creation
+of the kvm-pit worker thread, the worker thread can successfully attach
+to the callings process's cgroups.
 
+Signed-off-by: Jietao Xiao <shawtao1125@gmail.com>
+---
+ arch/x86/kvm/i8254.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-Tel: +44 7537 185910
-Andres  Stemmet
-Email: andres.stemmet1@gmail.com  =
-
-Chief financial officer
-BP Petroleum p.l.c.
-
-                                                                           =
-                        Copyright =A9 1996-2021
+diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+index 0b65a764ed3a..c8dcfd6a9ed4 100644
+--- a/arch/x86/kvm/i8254.c
++++ b/arch/x86/kvm/i8254.c
+@@ -34,6 +34,7 @@
+ 
+ #include <linux/kvm_host.h>
+ #include <linux/slab.h>
++#include <linux/cgroup.h>
+ 
+ #include "ioapic.h"
+ #include "irq.h"
+@@ -647,6 +648,32 @@ static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
+ 		kvm_pit_reset_reinject(pit);
+ }
+ 
++struct pit_attach_cgroups_struct {
++	struct kthread_work work;
++	struct task_struct *owner;
++	int ret;
++};
++
++static void pit_attach_cgroups_work(struct kthread_work *work)
++{
++	struct pit_attach_cgroups_struct *attach;
++
++	attach = container_of(work, struct pit_attach_cgroups_struct, work);
++	attach->ret = cgroup_attach_task_all(attach->owner, current);
++}
++
++
++static int pit_attach_cgroups(struct kvm_pit *pit)
++{
++	struct pit_attach_cgroups_struct attach;
++
++	attach.owner = current;
++	kthread_init_work(&attach.work, pit_attach_cgroups_work);
++	kthread_queue_work(pit->worker, &attach.work);
++	kthread_flush_work(&attach.work);
++	return attach.ret;
++}
++
+ static const struct kvm_io_device_ops pit_dev_ops = {
+ 	.read     = pit_ioport_read,
+ 	.write    = pit_ioport_write,
+@@ -683,6 +710,10 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+ 	if (IS_ERR(pit->worker))
+ 		goto fail_kthread;
+ 
++	ret = pit_attach_cgroups(pit);
++	if (ret < 0)
++		goto fail_attach_cgroups;
++
+ 	kthread_init_work(&pit->expired, pit_do_work);
+ 
+ 	pit->kvm = kvm;
+@@ -723,6 +754,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+ fail_register_pit:
+ 	mutex_unlock(&kvm->slots_lock);
+ 	kvm_pit_set_reinject(pit, false);
++fail_attach_cgroups:
+ 	kthread_destroy_worker(pit->worker);
+ fail_kthread:
+ 	kvm_free_irq_source_id(kvm, pit->irq_source_id);
+-- 
+2.20.1
 
