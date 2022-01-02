@@ -2,154 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8290C482A98
-	for <lists+kvm@lfdr.de>; Sun,  2 Jan 2022 09:40:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E50482C5D
+	for <lists+kvm@lfdr.de>; Sun,  2 Jan 2022 18:32:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231341AbiABIWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Jan 2022 03:22:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiABIWO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Jan 2022 03:22:14 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8F8C061574;
-        Sun,  2 Jan 2022 00:22:14 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id 7so15107891pgn.0;
-        Sun, 02 Jan 2022 00:22:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pFB6LeqgULhilOO4+NT/Y/zSijzYFfbA0zvCt4dGG50=;
-        b=G6H9Y+13OeUv6MdrtZRXr/B4eUmK4nDrY14bxz6brch8JxABFOyGymCkwgKIXcDfjx
-         5rarPL+ttKyyTeRtiM1vnhb3dhiSWGwtEEP+WegOF6F/nTKoOsqPUkgBCOnBaju6j7ZQ
-         9MPiqc3LgQPhFBysiqy7k4czW3NBZHcJtdQZxdjBVyZhmZ+E9ObYUPrrBqub5SO8R28r
-         f7xnK0kJ+kCr7CMv3GboSQyWwwjQcSzY9CTJjt+heV8pPqfqxL9rbzx61tWoAvPjaID9
-         91doRGhPAo16scin3bcle0myXVsy0JkprT9DZN1XcgLiM9cCkBBm27Q1UL0sTGXFg0E5
-         JZPA==
+        id S230083AbiABRb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Jan 2022 12:31:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:22981 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229529AbiABRb7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 2 Jan 2022 12:31:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641144718;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xx53ITjWAFhyNMijkvxtQDoUWUdkY09dXfOKBGXfymQ=;
+        b=Ko7VExloArW8w60lthNj0G3A1U1sENa6GrXOsafDYgofxBqbhKJ3WRDWYMzubg/ASo+tPr
+        M4IJjEKYcSoCdmopGl+o4UpnNo3MhZl3bTlt+2RBSmrsAA+X1glA0SxJMVbWNWViSvIaKr
+        xrDY1aOqt/sRVvRLj2Lbv0ofH4Z9dcg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-295-okt6zHqYNBWTXfAx4imjZw-1; Sun, 02 Jan 2022 12:31:57 -0500
+X-MC-Unique: okt6zHqYNBWTXfAx4imjZw-1
+Received: by mail-ed1-f70.google.com with SMTP id ay24-20020a056402203800b003f8491e499eso21487784edb.21
+        for <kvm@vger.kernel.org>; Sun, 02 Jan 2022 09:31:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=pFB6LeqgULhilOO4+NT/Y/zSijzYFfbA0zvCt4dGG50=;
-        b=wW6qIZ38a7fyuMVvzODWQVTj6Jztw7J38ypo5lIeKyKTsDHThtN54s1rxaRYu8ImV+
-         gnAiicr4D5gttBEm0bDL9abMcfGvTZ1M2Rnz8fp+9WlQLlaNlUfuyl0hqmmUWhQrmtun
-         lSDUC2lgiYa1yc26O5qaL1V7zGE+XeYlhtvSeeMS8kXXfZTPuEX+QpmbyJpVtrKagGQo
-         NluMfW46W8/t0q3t9Rc9IZa/UundhXUhVQDNvFM/oaPe+g5eEbMi/E/EFpt7Qb94dQeX
-         qGC96HoOkDmlse0emHEURLFvscHjVLJNZWA0hkOoX5Twn38fOEM+fJuTGikP/n8MI/k8
-         4how==
-X-Gm-Message-State: AOAM530XKOvn/+6x3u7gjrY1PcKp/AtEtqdMWPNFIeJoSW6gHR2ndjAB
-        ruEWlo8KBvAJsya1jjs/neRQ322iug==
-X-Google-Smtp-Source: ABdhPJxQdOcZ2+fWvyG0pjWD8/qzpgUfPhnlP3Zj8lGFwaYNHBBglFPqzFKE211KBNgHf5OGHxVtaw==
-X-Received: by 2002:aa7:8d99:0:b0:4bb:8e5e:9ae4 with SMTP id i25-20020aa78d99000000b004bb8e5e9ae4mr39742848pfr.68.1641111733767;
-        Sun, 02 Jan 2022 00:22:13 -0800 (PST)
-Received: from localhost.localdomain ([66.90.115.98])
-        by smtp.gmail.com with ESMTPSA id g5sm37044757pfj.143.2022.01.02.00.22.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jan 2022 00:22:13 -0800 (PST)
-From:   Jietao Xiao <shawtao1125@gmail.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jietao Xiao <shawtao1125@gmail.com>
-Subject: [PATCH] KVM:x86: Let kvm-pit thread inherit the cgroups of the calling process
-Date:   Sun,  2 Jan 2022 16:22:07 +0800
-Message-Id: <20220102082207.10485-1-shawtao1125@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        bh=Xx53ITjWAFhyNMijkvxtQDoUWUdkY09dXfOKBGXfymQ=;
+        b=cVVfpVCDwlOEFcw9UB+1TKy8VajJ7D7uBz5Y2SzSC6QJtAqVTLdFtq7YAU8/WcBsla
+         YbCTZFIIeplCo+e9QC2ZrrsG+XVsfT3LUOpPKUda0H0ZXupXX/QeBiR0WuKZJGPdop0x
+         tn5+tA7BUE/p6Jjv6xbkaWKacPXLo37IX8T0tsuw+/Kwvokebxay3DFT5ymvFz7cJ8qz
+         H6Te0pnZzhnrH+AvN3cjcC+ZN0q9raagn5UYrdtbfH3WGLa1wYXUd/Rl0VAwrUCfwY35
+         ko2DwbAJrW8j3p0UuTh0dPAK5V0+7zP7/m+2aW8B4vGfyz8Znpusubqmz4UeC6l1vm3L
+         4gvg==
+X-Gm-Message-State: AOAM532Fs6QLr5xKwOSW/ZZ5ypLnp1PHsMHfQHy3RV/0A4xItvaH4lkm
+        Vv30XlJ6Y2uMeU0P1MrGUWHhyJUhAkwzVOJQW6KcxAvOP1CElAmTqw61WebWICRiQ7EpJrMHdHB
+        +vVTMyR1GD37g
+X-Received: by 2002:a17:906:3e09:: with SMTP id k9mr35418896eji.104.1641144716131;
+        Sun, 02 Jan 2022 09:31:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzEQrTX0mLlJOs6HtUvWNyvJ5ZzPfG+dPZnuAx1kq+NyBboQlJA1+kSzghmTAFrtlhkLZLi8w==
+X-Received: by 2002:a17:906:3e09:: with SMTP id k9mr35418885eji.104.1641144715920;
+        Sun, 02 Jan 2022 09:31:55 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id o10sm5093507ejm.127.2022.01.02.09.31.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 02 Jan 2022 09:31:55 -0800 (PST)
+Message-ID: <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
+Date:   Sun, 2 Jan 2022 18:31:50 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Content-Language: en-US
+To:     Igor Mammedov <imammedo@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+ <20211122175818.608220-3-vkuznets@redhat.com>
+ <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+ <20211227183253.45a03ca2@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211227183253.45a03ca2@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Qemu-kvm will create several kernel threads for each VM including
-kvm-nx-lpage-re, vhost, and so on. Both of them properly inherit
-the cgroups of the calling process,so they are easy to attach to
-the VMM process's cgroups.
+On 12/27/21 18:32, Igor Mammedov wrote:
+>> Tweaked and queued nevertheless, thanks.
+> it seems this patch breaks VCPU hotplug, in scenario:
+> 
+>    1. hotunplug existing VCPU (QEMU stores VCPU file descriptor in parked cpus list)
+>    2. hotplug it again (unsuspecting QEMU reuses stored file descriptor when recreating VCPU)
+> 
+> RHBZ:https://bugzilla.redhat.com/show_bug.cgi?id=2028337#c11
+> 
 
-Kubernetes has a feature Pod Overhead for accounting for the resources
-consumed by the Pod infrastructure(e.g overhead brought by qemu-kvm),
-and sandbox container runtime usually creates a sandbox or sandbox
-overhead cgroup for this feature. By just simply adding the runtime or
-the VMM process to the sandbox's cgroup, vhost and kvm-nx-lpage-re thread
-can successfully attach to the sanbox's cgroup but kvm-pit thread cannot.
-Besides, in some scenarios, kvm-pit thread can bring some CPU overhead.
-So it's better to let the kvm-pit inherit the cgroups of the calling
-userspace process.
+The fix here would be (in QEMU) to not call KVM_SET_CPUID2 again. 
+However, we need to work around it in KVM, and allow KVM_SET_CPUID2 if 
+the data passed to the ioctl is the same that was set before.
 
-By queuing the attach cgroup work as the first work after the creation
-of the kvm-pit worker thread, the worker thread can successfully attach
-to the callings process's cgroups.
-
-Signed-off-by: Jietao Xiao <shawtao1125@gmail.com>
----
- arch/x86/kvm/i8254.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
-index 0b65a764ed3a..c8dcfd6a9ed4 100644
---- a/arch/x86/kvm/i8254.c
-+++ b/arch/x86/kvm/i8254.c
-@@ -34,6 +34,7 @@
- 
- #include <linux/kvm_host.h>
- #include <linux/slab.h>
-+#include <linux/cgroup.h>
- 
- #include "ioapic.h"
- #include "irq.h"
-@@ -647,6 +648,32 @@ static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
- 		kvm_pit_reset_reinject(pit);
- }
- 
-+struct pit_attach_cgroups_struct {
-+	struct kthread_work work;
-+	struct task_struct *owner;
-+	int ret;
-+};
-+
-+static void pit_attach_cgroups_work(struct kthread_work *work)
-+{
-+	struct pit_attach_cgroups_struct *attach;
-+
-+	attach = container_of(work, struct pit_attach_cgroups_struct, work);
-+	attach->ret = cgroup_attach_task_all(attach->owner, current);
-+}
-+
-+
-+static int pit_attach_cgroups(struct kvm_pit *pit)
-+{
-+	struct pit_attach_cgroups_struct attach;
-+
-+	attach.owner = current;
-+	kthread_init_work(&attach.work, pit_attach_cgroups_work);
-+	kthread_queue_work(pit->worker, &attach.work);
-+	kthread_flush_work(&attach.work);
-+	return attach.ret;
-+}
-+
- static const struct kvm_io_device_ops pit_dev_ops = {
- 	.read     = pit_ioport_read,
- 	.write    = pit_ioport_write,
-@@ -683,6 +710,10 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
- 	if (IS_ERR(pit->worker))
- 		goto fail_kthread;
- 
-+	ret = pit_attach_cgroups(pit);
-+	if (ret < 0)
-+		goto fail_attach_cgroups;
-+
- 	kthread_init_work(&pit->expired, pit_do_work);
- 
- 	pit->kvm = kvm;
-@@ -723,6 +754,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
- fail_register_pit:
- 	mutex_unlock(&kvm->slots_lock);
- 	kvm_pit_set_reinject(pit, false);
-+fail_attach_cgroups:
- 	kthread_destroy_worker(pit->worker);
- fail_kthread:
- 	kvm_free_irq_source_id(kvm, pit->irq_source_id);
--- 
-2.20.1
+Paolo
 
