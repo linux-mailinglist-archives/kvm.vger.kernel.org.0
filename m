@@ -2,119 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DFD74833DF
-	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 16:04:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCCE9483516
+	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 17:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232878AbiACPEK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jan 2022 10:04:10 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:34139 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbiACPEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jan 2022 10:04:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1641222249; x=1672758249;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=6DDI/5rt+hvVm8HYZLjfL2SPPunScVsJPs0AFGYZLjY=;
-  b=HMUMto6ITRNvyRccg0XapIQgQILY40gTBe0vxqMNyX5PZVxsvfM4oL9j
-   0MO6jGnT+z1+0GIghYK/Q5xogacrbJNX9n76UDHbBuNIox/NWf4zR+nBe
-   eCgslxd577n14GsoR4/d6R796LGCj6oosD5oeJhyXxoSpLaDP2BI30QdU
-   0=;
-X-IronPort-AV: E=Sophos;i="5.88,258,1635206400"; 
-   d="scan'208";a="165934371"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-98691110.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 03 Jan 2022 15:03:56 +0000
-Received: from EX13D16EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-98691110.us-east-1.amazon.com (Postfix) with ESMTPS id D578381342;
-        Mon,  3 Jan 2022 15:03:53 +0000 (UTC)
-Received: from [192.168.16.229] (10.43.160.87) by EX13D16EUB003.ant.amazon.com
- (10.43.166.99) with Microsoft SMTP Server (TLS) id 15.0.1497.26; Mon, 3 Jan
- 2022 15:03:47 +0000
-Message-ID: <0185a841-72df-1c8f-7e5f-d64dd18cee57@amazon.com>
-Date:   Mon, 3 Jan 2022 17:03:37 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.0
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCB2McKgXSBuaXRyb19lbmNsYXZlczogQWRkIG1tYXBf?=
- =?UTF-8?Q?read=5flock=28=29_for_the_get=5fuser=5fpages=28=29_call?=
-Content-Language: en-US
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-To:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>
-CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
-        Alexandru Vasile <lexnv@amazon.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Tim Gardner <tim.gardner@canonical.com>,
+        id S234796AbiACQtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jan 2022 11:49:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44094 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234996AbiACQtr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jan 2022 11:49:47 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A83BC061761;
+        Mon,  3 Jan 2022 08:49:46 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DBB481EC0380;
+        Mon,  3 Jan 2022 17:49:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1641228580;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=P798RWaZTr+okBNMCVL+1sl56MgtJUmphTduCouvUIE=;
+        b=ip+HPwItP/DquYMql6pC3Po65Wa5C8XWBZLq6hy+3IQt1D9EWyxbEfUBkQZGd+h8+zSPWi
+        X5/4SIi5AAR2dbjqWQjWlH/qDK5OuQxoQakMhvKtmHNJnB/4mtQS1N5aMHi698V0TubJ9X
+        yB2kwu78JKqbDVvlBS/bSARKlFBV54g=
+Date:   Mon, 3 Jan 2022 17:49:42 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        stable <stable@vger.kernel.org>
-References: <20211218103525.26739-1-andraprs@amazon.com>
- <fccc4545-2a8e-df40-f7ba-ae48651dda39@amazon.com>
-In-Reply-To: <fccc4545-2a8e-df40-f7ba-ae48651dda39@amazon.com>
-X-Originating-IP: [10.43.160.87]
-X-ClientProxiedBy: EX13D17UWB004.ant.amazon.com (10.43.161.132) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 21/40] x86/head: re-enable stack protection for
+ 32/64-bit builds
+Message-ID: <YdMpJg3YSdoYMKaZ@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-22-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211210154332.11526-22-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxOC4xMi4yMDIxIDEyOjQzLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+IAo+
-IAo+IE9uIDE4LjEyLjIwMjEgMTI6MzUsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPj4gQWZ0ZXIg
-Y29tbWl0IDViNzhlZDI0ZThlYyAobW0vcGFnZW1hcDogYWRkIG1tYXBfYXNzZXJ0X2xvY2tlZCgp
-Cj4+IGFubm90YXRpb25zIHRvIGZpbmRfdm1hKigpKSwgdGhlIGNhbGwgdG8gZ2V0X3VzZXJfcGFn
-ZXMoKSB3aWxsIHRyaWdnZXIKPj4gdGhlIG1tYXAgYXNzZXJ0Lgo+Pgo+PiBzdGF0aWMgaW5saW5l
-IHZvaWQgbW1hcF9hc3NlcnRfbG9ja2VkKHN0cnVjdCBtbV9zdHJ1Y3QgKm1tKQo+PiB7Cj4+IMKg
-wqDCoMKgbG9ja2RlcF9hc3NlcnRfaGVsZCgmbW0tPm1tYXBfbG9jayk7Cj4+IMKgwqDCoMKgVk1f
-QlVHX09OX01NKCFyd3NlbV9pc19sb2NrZWQoJm1tLT5tbWFwX2xvY2spLCBtbSk7Cj4+IH0KPj4K
-Pj4gW8KgwqAgNjIuNTIxNDEwXSBrZXJuZWwgQlVHIGF0IGluY2x1ZGUvbGludXgvbW1hcF9sb2Nr
-Lmg6MTU2IQo+PiAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLgo+PiBbwqDCoCA2Mi41Mzg5MzhdIFJJUDogMDAxMDpmaW5kX3ZtYSsweDMy
-LzB4ODAKPj4gLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4KPj4gW8KgwqAgNjIuNjA1ODg5XSBDYWxsIFRyYWNlOgo+PiBbwqDCoCA2Mi42
-MDg1MDJdwqAgPFRBU0s+Cj4+IFvCoMKgIDYyLjYxMDk1Nl3CoCA/IGxvY2tfdGltZXJfYmFzZSsw
-eDYxLzB4ODAKPj4gW8KgwqAgNjIuNjE0MTA2XcKgIGZpbmRfZXh0ZW5kX3ZtYSsweDE5LzB4ODAK
-Pj4gW8KgwqAgNjIuNjE3MTk1XcKgIF9fZ2V0X3VzZXJfcGFnZXMrMHg5Yi8weDZhMAo+PiBbwqDC
-oCA2Mi42MjAzNTZdwqAgX19ndXBfbG9uZ3Rlcm1fbG9ja2VkKzB4NDJkLzB4NDUwCj4+IFvCoMKg
-IDYyLjYyMzcyMV3CoCA/IGZpbmlzaF93YWl0KzB4NDEvMHg4MAo+PiBbwqDCoCA2Mi42MjY3NDhd
-wqAgPyBfX2ttYWxsb2MrMHgxNzgvMHgyZjAKPj4gW8KgwqAgNjIuNjI5NzY4XcKgIG5lX3NldF91
-c2VyX21lbW9yeV9yZWdpb25faW9jdGwuaXNyYS4wKzB4MjI1LzB4NmEwIAo+PiBbbml0cm9fZW5j
-bGF2ZXNdCj4+IFvCoMKgIDYyLjYzNTc3Nl3CoCBuZV9lbmNsYXZlX2lvY3RsKzB4MWNmLzB4NmQ3
-IFtuaXRyb19lbmNsYXZlc10KPj4gW8KgwqAgNjIuNjM5NTQxXcKgIF9feDY0X3N5c19pb2N0bCsw
-eDgyLzB4YjAKPj4gW8KgwqAgNjIuNjQyNjIwXcKgIGRvX3N5c2NhbGxfNjQrMHgzYi8weDkwCj4+
-IFvCoMKgIDYyLjY0NTY0Ml3CoCBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUrMHg0NC8w
-eGFlCj4+Cj4+IEFkZCBtbWFwX3JlYWRfbG9jaygpIGZvciB0aGUgZ2V0X3VzZXJfcGFnZXMoKSBj
-YWxsIHdoZW4gc2V0dGluZyB0aGUKPj4gZW5jbGF2ZSBtZW1vcnkgcmVnaW9ucy4KPj4KPj4gU2ln
-bmVkLW9mZi1ieTogQW5kcmEgUGFyYXNjaGl2IDxhbmRyYXByc0BhbWF6b24uY29tPgo+PiBDYzog
-c3RhYmxlQHZnZXIua2VybmVsLm9yZwo+PiAtLS0KPiAKPiBHcmVnLCBjYW4geW91IHBsZWFzZSBp
-bmNsdWRlIHRoaXMgZml4IGluIHRoZSBxdWV1ZSBmb3IgdjUuMTYgYW5kIHRoZW4gaW4gCj4gdGhl
-IG9uZSBmb3IgdGhlIHY1LjE1IHN0YWJsZSB0cmVlLiBMZXQgbWUga25vdyBpZiBhbnkgdXBkYXRl
-cyBhcmUgCj4gbmVjZXNzYXJ5IGZvciB0aGUgcGF0Y2guCj4gCgpUaGFuayB5b3UsIEdyZWcsIGZv
-ciBoZWxwaW5nIHdpdGggdGhlIG1lcmdlIG9mIHYyIGZvciB0aGlzIHBhdGNoLgoKQW5kcmEKCj4g
-Cj4+IMKgIGRyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9uZV9taXNjX2Rldi5jIHwgNSArKysr
-Kwo+PiDCoCAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1naXQg
-YS9kcml2ZXJzL3ZpcnQvbml0cm9fZW5jbGF2ZXMvbmVfbWlzY19kZXYuYyAKPj4gYi9kcml2ZXJz
-L3ZpcnQvbml0cm9fZW5jbGF2ZXMvbmVfbWlzY19kZXYuYwo+PiBpbmRleCA4OTM5NjEyZWUwZTAu
-LjZjNTFmZjAyNDAzNiAxMDA2NDQKPj4gLS0tIGEvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVz
-L25lX21pc2NfZGV2LmMKPj4gKysrIGIvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL25lX21p
-c2NfZGV2LmMKPj4gQEAgLTg4Niw4ICs4ODYsMTMgQEAgc3RhdGljIGludCBuZV9zZXRfdXNlcl9t
-ZW1vcnlfcmVnaW9uX2lvY3RsKHN0cnVjdCAKPj4gbmVfZW5jbGF2ZSAqbmVfZW5jbGF2ZSwKPj4g
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBwdXRfcGFnZXM7Cj4+IMKgwqDCoMKgwqDC
-oMKgwqDCoCB9Cj4+ICvCoMKgwqDCoMKgwqDCoCBtbWFwX3JlYWRfbG9jayhjdXJyZW50LT5tbSk7
-Cj4+ICsKPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGd1cF9yYyA9IGdldF91c2VyX3BhZ2VzKG1lbV9y
-ZWdpb24udXNlcnNwYWNlX2FkZHIgKyAKPj4gbWVtb3J5X3NpemUsIDEsIEZPTExfR0VULAo+PiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbmVfbWVtX3JlZ2lvbi0+
-cGFnZXMgKyBpLCBOVUxMKTsKPj4gKwo+PiArwqDCoMKgwqDCoMKgwqAgbW1hcF9yZWFkX3VubG9j
-ayhjdXJyZW50LT5tbSk7Cj4+ICsKPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChndXBfcmMgPCAw
-KSB7Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJjID0gZ3VwX3JjOwoKCgpBbWF6b24g
-RGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3
-QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAw
-MDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIg
-SjIyLzI2MjEvMjAwNS4K
+On Fri, Dec 10, 2021 at 09:43:13AM -0600, Brijesh Singh wrote:
 
+> Subject: Re: [PATCH v8 21/40] x86/head: re-enable stack protection for 32/64-bit builds
+
+The tip tree preferred format for patch subject prefixes is
+'subsys/component:', e.g. 'x86/apic:', 'x86/mm/fault:', 'sched/fair:',
+'genirq/core:'. Please do not use file names or complete file paths as
+prefix. 'git log path/to/file' should give you a reasonable hint in most
+cases.
+
+The condensed patch description in the subject line should start with a
+uppercase letter and should be written in imperative tone.
+
+In this case:
+
+x86/head/64: Re-enable stack protection
+
+There's no need for 32/64-bit builds - we don't have anything else :-)
+
+Please check all your subjects.
+
+> From: Michael Roth <michael.roth@amd.com>
+> 
+> As of commit 103a4908ad4d ("x86/head/64: Disable stack protection for
+> head$(BITS).o")
+
+verify_commit_quotation: Warning: The proper commit quotation format is:
+<newline>
+[  ]<sha1, 12 chars> ("commit name")
+<newline>
+
+> kernel/head64.c is compiled with -fno-stack-protector
+> to allow a call to set_bringup_idt_handler(), which would otherwise
+> have stack protection enabled with CONFIG_STACKPROTECTOR_STRONG. While
+> sufficient for that case, there may still be issues with calls to any
+> external functions that were compiled with stack protection enabled that
+> in-turn make stack-protected calls, or if the exception handlers set up
+> by set_bringup_idt_handler() make calls to stack-protected functions.
+> As part of 103a4908ad4d, stack protection was also disabled for
+> kernel/head32.c as a precaution.
+> 
+> Subsequent patches for SEV-SNP CPUID validation support will introduce
+> both such cases. Attempting to disable stack protection for everything
+> in scope to address that is prohibitive since much of the code, like
+> SEV-ES #VC handler, is shared code that remains in use after boot and
+> could benefit from having stack protection enabled. Attempting to inline
+> calls is brittle and can quickly balloon out to library/helper code
+> where that's not really an option.
+> 
+> Instead, re-enable stack protection for head32.c/head64.c and make the
+> appropriate changes to ensure the segment used for the stack canary is
+> initialized in advance of any stack-protected C calls.
+> 
+> for head64.c:
+> 
+> - The BSP will enter from startup_64 and call into C code
+
+Function names need to end with "()" so that it is clear they're
+functions.
+
+>   (startup_64_setup_env) shortly after setting up the stack, which may
+>   result in calls to stack-protected code. Set up %gs early to allow
+>   for this safely.
+> - APs will enter from secondary_startup_64*, and %gs will be set up
+>   soon after. There is one call to C code prior to this
+>   (__startup_secondary_64), but it is only to fetch sme_me_mask, and
+>   unlikely to be stack-protected, so leave things as they are, but add
+>   a note about this in case things change in the future.
+> 
+> for head32.c:
+> 
+> - BSPs/APs will set %fs to __BOOT_DS prior to any C calls. In recent
+>   kernels, the compiler is configured to access the stack canary at
+>   %fs:__stack_chk_guard,
+
+Add here somewhere:
+
+"See
+
+  3fb0fdb3bbe7 ("x86/stackprotector/32: Make the canary into a regular percpu variable")
+
+for details."
+
+> which overlaps with the initial per-cpu
+>   __stack_chk_guard variable in the initial/'master' .data..percpu
+>   area. This is sufficient to allow access to the canary for use
+>   during initial startup, so no changes are needed there.
+> 
+> Suggested-by: Joerg Roedel <jroedel@suse.de> #for 64-bit %gs set up
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kernel/Makefile  |  1 -
+>  arch/x86/kernel/head_64.S | 24 ++++++++++++++++++++++++
+>  2 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+> index 2ff3e600f426..4df8c8f7d2ac 100644
+> --- a/arch/x86/kernel/Makefile
+> +++ b/arch/x86/kernel/Makefile
+> @@ -48,7 +48,6 @@ endif
+>  # non-deterministic coverage.
+>  KCOV_INSTRUMENT		:= n
+>  
+> -CFLAGS_head$(BITS).o	+= -fno-stack-protector
+>  CFLAGS_cc_platform.o	+= -fno-stack-protector
+>  
+>  CFLAGS_irq.o := -I $(srctree)/$(src)/../include/asm/trace
+> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+> index 99de8fd461e8..9f8a7e48aca7 100644
+> --- a/arch/x86/kernel/head_64.S
+> +++ b/arch/x86/kernel/head_64.S
+> @@ -65,6 +65,22 @@ SYM_CODE_START_NOALIGN(startup_64)
+>  	leaq	(__end_init_task - FRAME_SIZE)(%rip), %rsp
+>  
+>  	leaq	_text(%rip), %rdi
+> +
+> +	/*
+> +	 * initial_gs points to initial fixed_per_cpu struct with storage for
+
+$ git grep fixed_per_cpu
+$
+
+??
+
+Do you mean this:
+
+SYM_DATA(initial_gs,    .quad INIT_PER_CPU_VAR(fixed_percpu_data))
+
+?
+
+> +	 * the stack protector canary. Global pointer fixups are needed at this
+> +	 * stage, so apply them as is done in fixup_pointer(), and initialize %gs
+> +	 * such that the canary can be accessed at %gs:40 for subsequent C calls.
+> +	 */
+> +	movl	$MSR_GS_BASE, %ecx
+> +	movq	initial_gs(%rip), %rax
+> +	movq	$_text, %rdx
+> +	subq	%rdx, %rax
+> +	addq	%rdi, %rax
+> +	movq	%rax, %rdx
+> +	shrq	$32,  %rdx
+> +	wrmsr
+> +
+>  	pushq	%rsi
+>  	call	startup_64_setup_env
+>  	popq	%rsi
+> @@ -146,6 +162,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_GLOBAL)
+>  	 * added to the initial pgdir entry that will be programmed into CR3.
+>  	 */
+>  	pushq	%rsi
+
+<---- newline here.
+
+> +	/*
+> +	 * NOTE: %gs at this point is a stale data segment left over from the
+> +	 * real-mode trampoline, so the default stack protector canary location
+> +	 * at %gs:40 does not yet coincide with the expected fixed_per_cpu struct
+> +	 * that contains storage for the stack canary. So take care not to add
+> +	 * anything to the C functions in this path that would result in stack
+> +	 * protected C code being generated.
+> +	 */
+>  	call	__startup_secondary_64
+>  	popq	%rsi
+
+Can't you simply do
+
+	movq    sme_me_mask, %rax
+
+here instead and avoid the issue altogether?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
