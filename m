@@ -2,319 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E75C48318A
-	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 14:46:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DFD74833DF
+	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 16:04:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233125AbiACNqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jan 2022 08:46:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39237 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229992AbiACNqH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 Jan 2022 08:46:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641217566;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m9tKNmguGwQHV4c8HM4LhwbPDmiYg4NQViyqROyOzb0=;
-        b=L3hOtSionFEfTPNxBmuoZzscNCdTBN6rypF/tPSLb0uIP39Ik3nlLU2CbyFcvQDi/atIIt
-        zVpLpMLRoFru/MIYImqyv0lgBkwexB7HRj+x0EgTY0VidxFwBVgATKIB0cKMuvI4yoQVaY
-        pTLixuM0q2vFjTaCteVa0oWGresFVtE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-587-SQcMYVkLOImeevvRSqNTiQ-1; Mon, 03 Jan 2022 08:46:05 -0500
-X-MC-Unique: SQcMYVkLOImeevvRSqNTiQ-1
-Received: by mail-ed1-f71.google.com with SMTP id q15-20020a056402518f00b003f87abf9c37so22829504edd.15
-        for <kvm@vger.kernel.org>; Mon, 03 Jan 2022 05:46:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=m9tKNmguGwQHV4c8HM4LhwbPDmiYg4NQViyqROyOzb0=;
-        b=AMVqhdnH/h21RsSYilTmoevOJgfRZ+n7wVZvfIOkY6SzqjgCptIdWzNAE7Vg+ine9X
-         CJcZZCsaZIS3wsO1D2gaPltF5K7/Ouud5mM0riL94kj3Dk3sP/UXJC26WW1QiHni9VYP
-         zdVrtPclIM1AJNylQ9CM0vGLcTcMyvaahDazpmcy17uE0rzoX4+D6Iudu7ar6RIpjAId
-         50O3E0/CAnSCn0KY8RaBz5iSuQMNmHHLLHX/4YxxR67hjw2PXBSzRMKVUOnWHzOE2VWU
-         LIA0A4vhr+8DY9KfhR2gmFqtYUMhQz5gbj1bDsMcPSj2yNqNMZA4faHXqOoUiBZIn6S7
-         pgAg==
-X-Gm-Message-State: AOAM532yiKDW212lwMX+GNJXrTRkyrVHiIlciyrJWlnyC3HOx+jeV24x
-        9QyWo/+eRJZp76kGEjlBmn5tXVJACIr5ugtZ2VTxPPxaGQGHruPdDmUZaWVDDkqGY4B7bWjxOcj
-        kPAgBEkXhm8kU
-X-Received: by 2002:a17:907:9808:: with SMTP id ji8mr36339801ejc.751.1641217563898;
-        Mon, 03 Jan 2022 05:46:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy8eeWuKUx9ItDdI27ssC7uVHwYjv+J0uZkjR9f5ux5q9swt42Ct+yubxq2zLvBYc7Ymbpb4Q==
-X-Received: by 2002:a17:907:9808:: with SMTP id ji8mr36339789ejc.751.1641217563636;
-        Mon, 03 Jan 2022 05:46:03 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id k12sm2610001ejk.188.2022.01.03.05.46.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jan 2022 05:46:03 -0800 (PST)
-Date:   Mon, 3 Jan 2022 14:46:01 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com,
-        Eric Auger <eric.auger@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] hw/arm/virt: KVM: Enable PAuth when supported by the host
-Message-ID: <20220103134601.7cumwbza32wja3ei@gator>
-References: <20211228182347.1025501-1-maz@kernel.org>
+        id S232878AbiACPEK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jan 2022 10:04:10 -0500
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:34139 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229978AbiACPEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jan 2022 10:04:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1641222249; x=1672758249;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=6DDI/5rt+hvVm8HYZLjfL2SPPunScVsJPs0AFGYZLjY=;
+  b=HMUMto6ITRNvyRccg0XapIQgQILY40gTBe0vxqMNyX5PZVxsvfM4oL9j
+   0MO6jGnT+z1+0GIghYK/Q5xogacrbJNX9n76UDHbBuNIox/NWf4zR+nBe
+   eCgslxd577n14GsoR4/d6R796LGCj6oosD5oeJhyXxoSpLaDP2BI30QdU
+   0=;
+X-IronPort-AV: E=Sophos;i="5.88,258,1635206400"; 
+   d="scan'208";a="165934371"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-98691110.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 03 Jan 2022 15:03:56 +0000
+Received: from EX13D16EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1e-98691110.us-east-1.amazon.com (Postfix) with ESMTPS id D578381342;
+        Mon,  3 Jan 2022 15:03:53 +0000 (UTC)
+Received: from [192.168.16.229] (10.43.160.87) by EX13D16EUB003.ant.amazon.com
+ (10.43.166.99) with Microsoft SMTP Server (TLS) id 15.0.1497.26; Mon, 3 Jan
+ 2022 15:03:47 +0000
+Message-ID: <0185a841-72df-1c8f-7e5f-d64dd18cee57@amazon.com>
+Date:   Mon, 3 Jan 2022 17:03:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211228182347.1025501-1-maz@kernel.org>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.0
+Subject: =?UTF-8?B?UmU6IFtQQVRDSCB2McKgXSBuaXRyb19lbmNsYXZlczogQWRkIG1tYXBf?=
+ =?UTF-8?Q?read=5flock=28=29_for_the_get=5fuser=5fpages=28=29_call?=
+Content-Language: en-US
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+To:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>
+CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
+        Alexandru Vasile <lexnv@amazon.com>,
+        Marcelo Cerri <marcelo.cerri@canonical.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Tim Gardner <tim.gardner@canonical.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>,
+        stable <stable@vger.kernel.org>
+References: <20211218103525.26739-1-andraprs@amazon.com>
+ <fccc4545-2a8e-df40-f7ba-ae48651dda39@amazon.com>
+In-Reply-To: <fccc4545-2a8e-df40-f7ba-ae48651dda39@amazon.com>
+X-Originating-IP: [10.43.160.87]
+X-ClientProxiedBy: EX13D17UWB004.ant.amazon.com (10.43.161.132) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Tue, Dec 28, 2021 at 06:23:47PM +0000, Marc Zyngier wrote:
-> Add basic support for Pointer Authentication when running a KVM
-> guest and that the host supports it, loosely based on the SVE
-> support.
-> 
-> Although the feature is enabled by default when the host advertises
-> it, it is possible to disable it by setting the 'pauth=off' CPU
-> property.
-> 
-> Tested on an Apple M1 running 5.16-rc6.
-> 
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Andrew Jones <drjones@redhat.com>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  docs/system/arm/cpu-features.rst |  5 +++++
->  target/arm/cpu.c                 |  1 +
->  target/arm/cpu.h                 |  1 +
->  target/arm/cpu64.c               | 36 ++++++++++++++++++++++++++++++++
->  target/arm/kvm.c                 | 13 ++++++++++++
->  target/arm/kvm64.c               | 10 +++++++++
->  target/arm/kvm_arm.h             |  7 +++++++
->  7 files changed, 73 insertions(+)
-> 
-> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-> index 584eb17097..c9e39546a5 100644
-> --- a/docs/system/arm/cpu-features.rst
-> +++ b/docs/system/arm/cpu-features.rst
-> @@ -211,6 +211,11 @@ the list of KVM VCPU features and their descriptions.
->                             influence the guest scheduler behavior and/or be
->                             exposed to the guest userspace.
->  
-> +  pauth                    Enable or disable ``FEAT_Pauth``, pointer
-> +                           authentication.  By default, the feature is enabled
-> +                           with ``-cpu host`` if supported by both the host
-> +                           kernel and the hardware.
-> +
-
-Thanks for considering a documentation update. In this case, though, I
-think we should delete the "TCG VCPU Features" pauth paragraph, rather
-than add a new "KVM VCPU Features" pauth paragraph. We don't need to
-document each CPU feature. We just document complex ones, like sve*,
-KVM specific ones (kvm-*), and TCG specific ones (now only pauth-impdef).
-
->  TCG VCPU Features
->  =================
->  
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index a211804fd3..68b09cbc6a 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -2091,6 +2091,7 @@ static void arm_host_initfn(Object *obj)
->      kvm_arm_set_cpu_features_from_host(cpu);
->      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
->          aarch64_add_sve_properties(obj);
-> +        aarch64_add_pauth_properties(obj);
->      }
->  #else
->      hvf_arm_set_cpu_features_from_host(cpu);
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index e33f37b70a..c6a4d50e82 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1076,6 +1076,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
->  void aarch64_sve_change_el(CPUARMState *env, int old_el,
->                             int new_el, bool el0_a64);
->  void aarch64_add_sve_properties(Object *obj);
-> +void aarch64_add_pauth_properties(Object *obj);
->  
->  /*
->   * SVE registers are encoded in KVM's memory in an endianness-invariant format.
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 15245a60a8..305c0e19fe 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -625,6 +625,42 @@ void aarch64_add_sve_properties(Object *obj)
->  #endif
->  }
->  
-> +static bool cpu_arm_get_pauth(Object *obj, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    return cpu_isar_feature(aa64_pauth, cpu);
-> +}
-> +
-> +static void cpu_arm_set_pauth(Object *obj, bool value, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    uint64_t t;
-> +
-> +    if (value) {
-> +        if (!kvm_arm_pauth_supported()) {
-> +            error_setg(errp, "'pauth' feature not supported by KVM on this host");
-> +        }
-> +
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * If the host supports PAuth, we only end-up here if the user has
-> +     * disabled the support, and value is false.
-> +     */
-> +    t = cpu->isar.id_aa64isar1;
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, APA, value);
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, GPA, value);
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, API, value);
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, GPI, value);
-> +    cpu->isar.id_aa64isar1 = t;
-> +}
-> +
-> +void aarch64_add_pauth_properties(Object *obj)
-> +{
-> +    object_property_add_bool(obj, "pauth", cpu_arm_get_pauth, cpu_arm_set_pauth);
-> +}
-
-I think we should try to merge as much as possible between the TCG and KVM
-pauth property handling. I think we just need to move the
-qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property) call into
-KVM/TCG common code and then modify arm_cpu_pauth_finalize() to
-handle checking KVM for support when KVM is enabled and also to not
-look at the impdef property.
-
-> +
->  void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp)
->  {
->      int arch_val = 0, impdef_val = 0;
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index bbf1ce7ba3..71e2f46ce8 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -84,6 +84,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->      if (vmfd < 0) {
->          goto err;
->      }
-> +
->      cpufd = ioctl(vmfd, KVM_CREATE_VCPU, 0);
->      if (cpufd < 0) {
->          goto err;
-> @@ -94,6 +95,18 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->          goto finish;
->      }
->  
-> +    /*
-> +     * Ask for Pointer Authentication if supported. We can't play the
-> +     * SVE trick of synthetising the ID reg as KVM won't tell us
-> +     * whether we have the architected or IMPDEF version of PAuth, so
-> +     * we have to use the actual ID regs.
-> +     */
-> +    if (ioctl(vmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_PTRAUTH_ADDRESS) > 0 &&
-> +        ioctl(vmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_PTRAUTH_GENERIC) > 0) {
-> +        init->features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-> +                              1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-> +    }
-> +
-
-I think kvm_init() is called prior to kvm_arm_get_host_cpu_features(),
-which means we can do this instead
-
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e790d6c9a573..d1512035ac5b 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -521,6 +521,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-      */
-     struct kvm_vcpu_init init = { .target = -1, };
- 
-+   /*
-+    * Ask for Pointer Authentication if supported. We can't play the
-+    * SVE trick of synthetising the ID reg as KVM won't tell us
-+    * whether we have the architected or IMPDEF version of PAuth, so
-+    * we have to use the actual ID regs.
-+    */
-+    if (kvm_arm_pauth_supported()) {
-+        init->features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-+                              1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-+    }
-+
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
-         return false;
-     }
-
-Assuming I'm right about the call order, then I think I'd like that more.
-
-
->      if (init->target == -1) {
->          struct kvm_vcpu_init preferred;
->  
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index e790d6c9a5..95b6902ca0 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -725,6 +725,12 @@ bool kvm_arm_sve_supported(void)
->      return kvm_check_extension(kvm_state, KVM_CAP_ARM_SVE);
->  }
->  
-> +bool kvm_arm_pauth_supported(void)
-> +{
-> +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
-> +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
-> +}
-> +
->  bool kvm_arm_steal_time_supported(void)
->  {
->      return kvm_check_extension(kvm_state, KVM_CAP_STEAL_TIME);
-> @@ -865,6 +871,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          assert(kvm_arm_sve_supported());
->          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
->      }
-> +    if (cpu_isar_feature(aa64_pauth, cpu)) {
-> +	    cpu->kvm_init_features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-> +					  1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-> +    }
->  
->      /* Do KVM_ARM_VCPU_INIT ioctl */
->      ret = kvm_arm_vcpu_init(cs);
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index b7f78b5215..c26acf7866 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -306,6 +306,13 @@ bool kvm_arm_pmu_supported(void);
->   */
->  bool kvm_arm_sve_supported(void);
->  
-> +/**
-> + * kvm_arm_pauth_supported:
-> + *
-> + * Returns true if KVM can enable Pointer Authentication and false otherwise.
-> + */
-> +bool kvm_arm_pauth_supported(void);
-> +
-
-If we merge more of the pauth property handling with the TCG code, then
-we'll also need a stub in the !CONFIG_KVM section for compiling without
-kvm support.
-
->  /**
->   * kvm_arm_get_max_vm_ipa_size:
->   * @ms: Machine state handle
-> -- 
-> 2.30.2
->
-
-Thanks,
-drew
+CgpPbiAxOC4xMi4yMDIxIDEyOjQzLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+IAo+
+IAo+IE9uIDE4LjEyLjIwMjEgMTI6MzUsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPj4gQWZ0ZXIg
+Y29tbWl0IDViNzhlZDI0ZThlYyAobW0vcGFnZW1hcDogYWRkIG1tYXBfYXNzZXJ0X2xvY2tlZCgp
+Cj4+IGFubm90YXRpb25zIHRvIGZpbmRfdm1hKigpKSwgdGhlIGNhbGwgdG8gZ2V0X3VzZXJfcGFn
+ZXMoKSB3aWxsIHRyaWdnZXIKPj4gdGhlIG1tYXAgYXNzZXJ0Lgo+Pgo+PiBzdGF0aWMgaW5saW5l
+IHZvaWQgbW1hcF9hc3NlcnRfbG9ja2VkKHN0cnVjdCBtbV9zdHJ1Y3QgKm1tKQo+PiB7Cj4+IMKg
+wqDCoMKgbG9ja2RlcF9hc3NlcnRfaGVsZCgmbW0tPm1tYXBfbG9jayk7Cj4+IMKgwqDCoMKgVk1f
+QlVHX09OX01NKCFyd3NlbV9pc19sb2NrZWQoJm1tLT5tbWFwX2xvY2spLCBtbSk7Cj4+IH0KPj4K
+Pj4gW8KgwqAgNjIuNTIxNDEwXSBrZXJuZWwgQlVHIGF0IGluY2x1ZGUvbGludXgvbW1hcF9sb2Nr
+Lmg6MTU2IQo+PiAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4uLi4uLi4uLgo+PiBbwqDCoCA2Mi41Mzg5MzhdIFJJUDogMDAxMDpmaW5kX3ZtYSsweDMy
+LzB4ODAKPj4gLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4uLi4uLi4KPj4gW8KgwqAgNjIuNjA1ODg5XSBDYWxsIFRyYWNlOgo+PiBbwqDCoCA2Mi42
+MDg1MDJdwqAgPFRBU0s+Cj4+IFvCoMKgIDYyLjYxMDk1Nl3CoCA/IGxvY2tfdGltZXJfYmFzZSsw
+eDYxLzB4ODAKPj4gW8KgwqAgNjIuNjE0MTA2XcKgIGZpbmRfZXh0ZW5kX3ZtYSsweDE5LzB4ODAK
+Pj4gW8KgwqAgNjIuNjE3MTk1XcKgIF9fZ2V0X3VzZXJfcGFnZXMrMHg5Yi8weDZhMAo+PiBbwqDC
+oCA2Mi42MjAzNTZdwqAgX19ndXBfbG9uZ3Rlcm1fbG9ja2VkKzB4NDJkLzB4NDUwCj4+IFvCoMKg
+IDYyLjYyMzcyMV3CoCA/IGZpbmlzaF93YWl0KzB4NDEvMHg4MAo+PiBbwqDCoCA2Mi42MjY3NDhd
+wqAgPyBfX2ttYWxsb2MrMHgxNzgvMHgyZjAKPj4gW8KgwqAgNjIuNjI5NzY4XcKgIG5lX3NldF91
+c2VyX21lbW9yeV9yZWdpb25faW9jdGwuaXNyYS4wKzB4MjI1LzB4NmEwIAo+PiBbbml0cm9fZW5j
+bGF2ZXNdCj4+IFvCoMKgIDYyLjYzNTc3Nl3CoCBuZV9lbmNsYXZlX2lvY3RsKzB4MWNmLzB4NmQ3
+IFtuaXRyb19lbmNsYXZlc10KPj4gW8KgwqAgNjIuNjM5NTQxXcKgIF9feDY0X3N5c19pb2N0bCsw
+eDgyLzB4YjAKPj4gW8KgwqAgNjIuNjQyNjIwXcKgIGRvX3N5c2NhbGxfNjQrMHgzYi8weDkwCj4+
+IFvCoMKgIDYyLjY0NTY0Ml3CoCBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUrMHg0NC8w
+eGFlCj4+Cj4+IEFkZCBtbWFwX3JlYWRfbG9jaygpIGZvciB0aGUgZ2V0X3VzZXJfcGFnZXMoKSBj
+YWxsIHdoZW4gc2V0dGluZyB0aGUKPj4gZW5jbGF2ZSBtZW1vcnkgcmVnaW9ucy4KPj4KPj4gU2ln
+bmVkLW9mZi1ieTogQW5kcmEgUGFyYXNjaGl2IDxhbmRyYXByc0BhbWF6b24uY29tPgo+PiBDYzog
+c3RhYmxlQHZnZXIua2VybmVsLm9yZwo+PiAtLS0KPiAKPiBHcmVnLCBjYW4geW91IHBsZWFzZSBp
+bmNsdWRlIHRoaXMgZml4IGluIHRoZSBxdWV1ZSBmb3IgdjUuMTYgYW5kIHRoZW4gaW4gCj4gdGhl
+IG9uZSBmb3IgdGhlIHY1LjE1IHN0YWJsZSB0cmVlLiBMZXQgbWUga25vdyBpZiBhbnkgdXBkYXRl
+cyBhcmUgCj4gbmVjZXNzYXJ5IGZvciB0aGUgcGF0Y2guCj4gCgpUaGFuayB5b3UsIEdyZWcsIGZv
+ciBoZWxwaW5nIHdpdGggdGhlIG1lcmdlIG9mIHYyIGZvciB0aGlzIHBhdGNoLgoKQW5kcmEKCj4g
+Cj4+IMKgIGRyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9uZV9taXNjX2Rldi5jIHwgNSArKysr
+Kwo+PiDCoCAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1naXQg
+YS9kcml2ZXJzL3ZpcnQvbml0cm9fZW5jbGF2ZXMvbmVfbWlzY19kZXYuYyAKPj4gYi9kcml2ZXJz
+L3ZpcnQvbml0cm9fZW5jbGF2ZXMvbmVfbWlzY19kZXYuYwo+PiBpbmRleCA4OTM5NjEyZWUwZTAu
+LjZjNTFmZjAyNDAzNiAxMDA2NDQKPj4gLS0tIGEvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVz
+L25lX21pc2NfZGV2LmMKPj4gKysrIGIvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL25lX21p
+c2NfZGV2LmMKPj4gQEAgLTg4Niw4ICs4ODYsMTMgQEAgc3RhdGljIGludCBuZV9zZXRfdXNlcl9t
+ZW1vcnlfcmVnaW9uX2lvY3RsKHN0cnVjdCAKPj4gbmVfZW5jbGF2ZSAqbmVfZW5jbGF2ZSwKPj4g
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBwdXRfcGFnZXM7Cj4+IMKgwqDCoMKgwqDC
+oMKgwqDCoCB9Cj4+ICvCoMKgwqDCoMKgwqDCoCBtbWFwX3JlYWRfbG9jayhjdXJyZW50LT5tbSk7
+Cj4+ICsKPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGd1cF9yYyA9IGdldF91c2VyX3BhZ2VzKG1lbV9y
+ZWdpb24udXNlcnNwYWNlX2FkZHIgKyAKPj4gbWVtb3J5X3NpemUsIDEsIEZPTExfR0VULAo+PiDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbmVfbWVtX3JlZ2lvbi0+
+cGFnZXMgKyBpLCBOVUxMKTsKPj4gKwo+PiArwqDCoMKgwqDCoMKgwqAgbW1hcF9yZWFkX3VubG9j
+ayhjdXJyZW50LT5tbSk7Cj4+ICsKPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChndXBfcmMgPCAw
+KSB7Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJjID0gZ3VwX3JjOwoKCgpBbWF6b24g
+RGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3
+QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAw
+MDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIg
+SjIyLzI2MjEvMjAwNS4K
 
