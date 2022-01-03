@@ -2,247 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCCE9483516
-	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 17:49:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6CC648368D
+	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 19:05:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234796AbiACQtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jan 2022 11:49:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44094 "EHLO
+        id S233921AbiACSFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jan 2022 13:05:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234996AbiACQtr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jan 2022 11:49:47 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A83BC061761;
-        Mon,  3 Jan 2022 08:49:46 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        with ESMTP id S231447AbiACSFV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jan 2022 13:05:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F80C061761
+        for <kvm@vger.kernel.org>; Mon,  3 Jan 2022 10:05:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DBB481EC0380;
-        Mon,  3 Jan 2022 17:49:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1641228580;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=P798RWaZTr+okBNMCVL+1sl56MgtJUmphTduCouvUIE=;
-        b=ip+HPwItP/DquYMql6pC3Po65Wa5C8XWBZLq6hy+3IQt1D9EWyxbEfUBkQZGd+h8+zSPWi
-        X5/4SIi5AAR2dbjqWQjWlH/qDK5OuQxoQakMhvKtmHNJnB/4mtQS1N5aMHi698V0TubJ9X
-        yB2kwu78JKqbDVvlBS/bSARKlFBV54g=
-Date:   Mon, 3 Jan 2022 17:49:42 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 21/40] x86/head: re-enable stack protection for
- 32/64-bit builds
-Message-ID: <YdMpJg3YSdoYMKaZ@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-22-brijesh.singh@amd.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id DA0B3B8106E
+        for <kvm@vger.kernel.org>; Mon,  3 Jan 2022 18:05:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C8FCC36AED;
+        Mon,  3 Jan 2022 18:05:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641233118;
+        bh=46LzaabE5JO+VdKf/ZcHCIviP0rFsFeqsrT763OHO+c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cTfBL0kiT+IgyMzFYIHYcnfl9MTrJFb4oj3cUL4RwTeUS4XaMA8HOHl5JLJikKHee
+         P2CcNKbUFFn/OjAkH+ZfpK+5IbR2+X/tz1FXBZ6RK03JADxwIYXVeFfK29pFKt6OWl
+         PCyr0ujtjjR/vb9NcOXZPOEuXKIZbmlzfwDSQisYOaQi33K46hCMlGcLxYjGcz5cSD
+         gI64RDDtebpgF9w7jdob316RRK/o/1SihFlDJevRuUJwIJ6/CP+UdC7ktRmPCYDN9T
+         bM3gOj/x9BbGsfyWtHNP1W0jIdxt1qt/eAbdUu6IdUB+SLDr5vo+qmHs71eOS1mxs5
+         VSGW+ogtC88Gg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n4Rhs-00Fl0p-D0; Mon, 03 Jan 2022 18:05:16 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     qemu-devel@nongnu.org
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com, Eric Auger <eric.auger@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the host
+Date:   Mon,  3 Jan 2022 18:05:07 +0000
+Message-Id: <20220103180507.2190429-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-22-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, eric.auger@redhat.com, drjones@redhat.com, richard.henderson@linaro.org, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 09:43:13AM -0600, Brijesh Singh wrote:
+Add basic support for Pointer Authentication when running a KVM
+guest and that the host supports it, loosely based on the SVE
+support.
 
-> Subject: Re: [PATCH v8 21/40] x86/head: re-enable stack protection for 32/64-bit builds
+Although the feature is enabled by default when the host advertises
+it, it is possible to disable it by setting the 'pauth=off' CPU
+property. The 'pauth' comment is removed from cpu-features.rst,
+as it is now common to both TCG and KVM.
 
-The tip tree preferred format for patch subject prefixes is
-'subsys/component:', e.g. 'x86/apic:', 'x86/mm/fault:', 'sched/fair:',
-'genirq/core:'. Please do not use file names or complete file paths as
-prefix. 'git log path/to/file' should give you a reasonable hint in most
-cases.
+Tested on an Apple M1 running 5.16-rc6.
 
-The condensed patch description in the subject line should start with a
-uppercase letter and should be written in imperative tone.
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+* From v1:
+  - Drop 'pauth' documentation
+  - Make the TCG path common to both TCG and KVM
+  - Some tidying up
 
-In this case:
+ docs/system/arm/cpu-features.rst |  4 ----
+ target/arm/cpu.c                 | 14 ++++----------
+ target/arm/cpu.h                 |  1 +
+ target/arm/cpu64.c               | 33 ++++++++++++++++++++++++++++----
+ target/arm/kvm64.c               | 21 ++++++++++++++++++++
+ 5 files changed, 55 insertions(+), 18 deletions(-)
 
-x86/head/64: Re-enable stack protection
-
-There's no need for 32/64-bit builds - we don't have anything else :-)
-
-Please check all your subjects.
-
-> From: Michael Roth <michael.roth@amd.com>
-> 
-> As of commit 103a4908ad4d ("x86/head/64: Disable stack protection for
-> head$(BITS).o")
-
-verify_commit_quotation: Warning: The proper commit quotation format is:
-<newline>
-[  ]<sha1, 12 chars> ("commit name")
-<newline>
-
-> kernel/head64.c is compiled with -fno-stack-protector
-> to allow a call to set_bringup_idt_handler(), which would otherwise
-> have stack protection enabled with CONFIG_STACKPROTECTOR_STRONG. While
-> sufficient for that case, there may still be issues with calls to any
-> external functions that were compiled with stack protection enabled that
-> in-turn make stack-protected calls, or if the exception handlers set up
-> by set_bringup_idt_handler() make calls to stack-protected functions.
-> As part of 103a4908ad4d, stack protection was also disabled for
-> kernel/head32.c as a precaution.
-> 
-> Subsequent patches for SEV-SNP CPUID validation support will introduce
-> both such cases. Attempting to disable stack protection for everything
-> in scope to address that is prohibitive since much of the code, like
-> SEV-ES #VC handler, is shared code that remains in use after boot and
-> could benefit from having stack protection enabled. Attempting to inline
-> calls is brittle and can quickly balloon out to library/helper code
-> where that's not really an option.
-> 
-> Instead, re-enable stack protection for head32.c/head64.c and make the
-> appropriate changes to ensure the segment used for the stack canary is
-> initialized in advance of any stack-protected C calls.
-> 
-> for head64.c:
-> 
-> - The BSP will enter from startup_64 and call into C code
-
-Function names need to end with "()" so that it is clear they're
-functions.
-
->   (startup_64_setup_env) shortly after setting up the stack, which may
->   result in calls to stack-protected code. Set up %gs early to allow
->   for this safely.
-> - APs will enter from secondary_startup_64*, and %gs will be set up
->   soon after. There is one call to C code prior to this
->   (__startup_secondary_64), but it is only to fetch sme_me_mask, and
->   unlikely to be stack-protected, so leave things as they are, but add
->   a note about this in case things change in the future.
-> 
-> for head32.c:
-> 
-> - BSPs/APs will set %fs to __BOOT_DS prior to any C calls. In recent
->   kernels, the compiler is configured to access the stack canary at
->   %fs:__stack_chk_guard,
-
-Add here somewhere:
-
-"See
-
-  3fb0fdb3bbe7 ("x86/stackprotector/32: Make the canary into a regular percpu variable")
-
-for details."
-
-> which overlaps with the initial per-cpu
->   __stack_chk_guard variable in the initial/'master' .data..percpu
->   area. This is sufficient to allow access to the canary for use
->   during initial startup, so no changes are needed there.
-> 
-> Suggested-by: Joerg Roedel <jroedel@suse.de> #for 64-bit %gs set up
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/Makefile  |  1 -
->  arch/x86/kernel/head_64.S | 24 ++++++++++++++++++++++++
->  2 files changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-> index 2ff3e600f426..4df8c8f7d2ac 100644
-> --- a/arch/x86/kernel/Makefile
-> +++ b/arch/x86/kernel/Makefile
-> @@ -48,7 +48,6 @@ endif
->  # non-deterministic coverage.
->  KCOV_INSTRUMENT		:= n
->  
-> -CFLAGS_head$(BITS).o	+= -fno-stack-protector
->  CFLAGS_cc_platform.o	+= -fno-stack-protector
->  
->  CFLAGS_irq.o := -I $(srctree)/$(src)/../include/asm/trace
-> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-> index 99de8fd461e8..9f8a7e48aca7 100644
-> --- a/arch/x86/kernel/head_64.S
-> +++ b/arch/x86/kernel/head_64.S
-> @@ -65,6 +65,22 @@ SYM_CODE_START_NOALIGN(startup_64)
->  	leaq	(__end_init_task - FRAME_SIZE)(%rip), %rsp
->  
->  	leaq	_text(%rip), %rdi
-> +
-> +	/*
-> +	 * initial_gs points to initial fixed_per_cpu struct with storage for
-
-$ git grep fixed_per_cpu
-$
-
-??
-
-Do you mean this:
-
-SYM_DATA(initial_gs,    .quad INIT_PER_CPU_VAR(fixed_percpu_data))
-
-?
-
-> +	 * the stack protector canary. Global pointer fixups are needed at this
-> +	 * stage, so apply them as is done in fixup_pointer(), and initialize %gs
-> +	 * such that the canary can be accessed at %gs:40 for subsequent C calls.
-> +	 */
-> +	movl	$MSR_GS_BASE, %ecx
-> +	movq	initial_gs(%rip), %rax
-> +	movq	$_text, %rdx
-> +	subq	%rdx, %rax
-> +	addq	%rdi, %rax
-> +	movq	%rax, %rdx
-> +	shrq	$32,  %rdx
-> +	wrmsr
-> +
->  	pushq	%rsi
->  	call	startup_64_setup_env
->  	popq	%rsi
-> @@ -146,6 +162,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_GLOBAL)
->  	 * added to the initial pgdir entry that will be programmed into CR3.
->  	 */
->  	pushq	%rsi
-
-<---- newline here.
-
-> +	/*
-> +	 * NOTE: %gs at this point is a stale data segment left over from the
-> +	 * real-mode trampoline, so the default stack protector canary location
-> +	 * at %gs:40 does not yet coincide with the expected fixed_per_cpu struct
-> +	 * that contains storage for the stack canary. So take care not to add
-> +	 * anything to the C functions in this path that would result in stack
-> +	 * protected C code being generated.
-> +	 */
->  	call	__startup_secondary_64
->  	popq	%rsi
-
-Can't you simply do
-
-	movq    sme_me_mask, %rax
-
-here instead and avoid the issue altogether?
-
+diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+index 584eb17097..3e626c4b68 100644
+--- a/docs/system/arm/cpu-features.rst
++++ b/docs/system/arm/cpu-features.rst
+@@ -217,10 +217,6 @@ TCG VCPU Features
+ TCG VCPU features are CPU features that are specific to TCG.
+ Below is the list of TCG VCPU features and their descriptions.
+ 
+-  pauth                    Enable or disable ``FEAT_Pauth``, pointer
+-                           authentication.  By default, the feature is
+-                           enabled with ``-cpu max``.
+-
+   pauth-impdef             When ``FEAT_Pauth`` is enabled, either the
+                            *impdef* (Implementation Defined) algorithm
+                            is enabled or the *architected* QARMA algorithm
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index a211804fd3..d96cc4ef18 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1380,18 +1380,11 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+             return;
+         }
+ 
+-        /*
+-         * KVM does not support modifications to this feature.
+-         * We have not registered the cpu properties when KVM
+-         * is in use, so the user will not be able to set them.
+-         */
+-        if (!kvm_enabled()) {
+-            arm_cpu_pauth_finalize(cpu, &local_err);
+-            if (local_err != NULL) {
++	arm_cpu_pauth_finalize(cpu, &local_err);
++	if (local_err != NULL) {
+                 error_propagate(errp, local_err);
+                 return;
+-            }
+-        }
++	}
+     }
+ 
+     if (kvm_enabled()) {
+@@ -2091,6 +2084,7 @@ static void arm_host_initfn(Object *obj)
+     kvm_arm_set_cpu_features_from_host(cpu);
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+         aarch64_add_sve_properties(obj);
++        aarch64_add_pauth_properties(obj);
+     }
+ #else
+     hvf_arm_set_cpu_features_from_host(cpu);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e33f37b70a..c6a4d50e82 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1076,6 +1076,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+ void aarch64_sve_change_el(CPUARMState *env, int old_el,
+                            int new_el, bool el0_a64);
+ void aarch64_add_sve_properties(Object *obj);
++void aarch64_add_pauth_properties(Object *obj);
+ 
+ /*
+  * SVE registers are encoded in KVM's memory in an endianness-invariant format.
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 15245a60a8..d5c0bce1c4 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -630,6 +630,17 @@ void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp)
+     int arch_val = 0, impdef_val = 0;
+     uint64_t t;
+ 
++    if (kvm_enabled()) {
++        if (cpu->prop_pauth) {
++            if (!cpu_isar_feature(aa64_pauth, cpu)) {
++                error_setg(errp, "'pauth' feature not supported by KVM on this host");
++            }
++
++            return;
++        }
++        /* Fall through to disable PAuth */
++    }
++
+     /* TODO: Handle HaveEnhancedPAC, HaveEnhancedPAC2, HaveFPAC. */
+     if (cpu->prop_pauth) {
+         if (cpu->prop_pauth_impdef) {
+@@ -655,6 +666,23 @@ static Property arm_cpu_pauth_property =
+ static Property arm_cpu_pauth_impdef_property =
+     DEFINE_PROP_BOOL("pauth-impdef", ARMCPU, prop_pauth_impdef, false);
+ 
++void aarch64_add_pauth_properties(Object *obj)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    /* Default to PAUTH on, with the architected algorithm on TCG. */
++    qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property);
++    if (kvm_enabled()) {
++        /*
++         * Mirror PAuth support from the probed sysregs back into the
++         * property for KVM. Is it just a bit backward? Yes it is!
++         */
++        cpu->prop_pauth = cpu_isar_feature(aa64_pauth, cpu);
++    } else {
++        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_impdef_property);
++    }
++}
++
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+  * otherwise, a CPU with as many features enabled as our emulation supports.
+  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+@@ -829,13 +857,10 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->dcz_blocksize = 7; /*  512 bytes */
+ #endif
+ 
+-        /* Default to PAUTH on, with the architected algorithm. */
+-        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property);
+-        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_impdef_property);
+-
+         bitmap_fill(cpu->sve_vq_supported, ARM_MAX_VQ);
+     }
+ 
++    aarch64_add_pauth_properties(obj);
+     aarch64_add_sve_properties(obj);
+     object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
+                         cpu_max_set_sve_max_vq, NULL, NULL);
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index e790d6c9a5..5c425bc074 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -491,6 +491,12 @@ static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
+     return ioctl(fd, KVM_GET_ONE_REG, &idreg);
+ }
+ 
++static bool kvm_arm_pauth_supported(void)
++{
++    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
++            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
++}
++
+ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+ {
+     /* Identify the feature bits corresponding to the host CPU, and
+@@ -521,6 +527,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      */
+     struct kvm_vcpu_init init = { .target = -1, };
+ 
++    /*
++     * Ask for Pointer Authentication if supported. We can't play the
++     * SVE trick of synthetising the ID reg as KVM won't tell us
++     * whether we have the architected or IMPDEF version of PAuth, so
++     * we have to use the actual ID regs.
++     */
++    if (kvm_arm_pauth_supported()) {
++        init.features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
++			     1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
++    }
++
+     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+         return false;
+     }
+@@ -865,6 +882,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         assert(kvm_arm_sve_supported());
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
+     }
++    if (cpu_isar_feature(aa64_pauth, cpu)) {
++	    cpu->kvm_init_features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
++					  1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
++    }
+ 
+     /* Do KVM_ARM_VCPU_INIT ioctl */
+     ret = kvm_arm_vcpu_init(cs);
 -- 
-Regards/Gruss,
-    Boris.
+2.30.2
 
-https://people.kernel.org/tglx/notes-about-netiquette
