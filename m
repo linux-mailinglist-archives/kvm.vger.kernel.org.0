@@ -2,258 +2,330 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6CC648368D
-	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 19:05:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67F8E483690
+	for <lists+kvm@lfdr.de>; Mon,  3 Jan 2022 19:05:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233921AbiACSFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jan 2022 13:05:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33214 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231447AbiACSFV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jan 2022 13:05:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F80C061761
-        for <kvm@vger.kernel.org>; Mon,  3 Jan 2022 10:05:21 -0800 (PST)
+        id S235190AbiACSFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jan 2022 13:05:49 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:47040 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231447AbiACSFt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jan 2022 13:05:49 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DA0B3B8106E
-        for <kvm@vger.kernel.org>; Mon,  3 Jan 2022 18:05:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C8FCC36AED;
-        Mon,  3 Jan 2022 18:05:18 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E3EB261154
+        for <kvm@vger.kernel.org>; Mon,  3 Jan 2022 18:05:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C912C36AED;
+        Mon,  3 Jan 2022 18:05:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641233118;
-        bh=46LzaabE5JO+VdKf/ZcHCIviP0rFsFeqsrT763OHO+c=;
-        h=From:To:Cc:Subject:Date:From;
-        b=cTfBL0kiT+IgyMzFYIHYcnfl9MTrJFb4oj3cUL4RwTeUS4XaMA8HOHl5JLJikKHee
-         P2CcNKbUFFn/OjAkH+ZfpK+5IbR2+X/tz1FXBZ6RK03JADxwIYXVeFfK29pFKt6OWl
-         PCyr0ujtjjR/vb9NcOXZPOEuXKIZbmlzfwDSQisYOaQi33K46hCMlGcLxYjGcz5cSD
-         gI64RDDtebpgF9w7jdob316RRK/o/1SihFlDJevRuUJwIJ6/CP+UdC7ktRmPCYDN9T
-         bM3gOj/x9BbGsfyWtHNP1W0jIdxt1qt/eAbdUu6IdUB+SLDr5vo+qmHs71eOS1mxs5
-         VSGW+ogtC88Gg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        s=k20201202; t=1641233148;
+        bh=RYVO31Qei7SxPtc0IFvMbacM3biwWqbje+VljU3wb48=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=OVtNe2puW0E5M9tUaS9BRnKh3vqG9zVKKmtUcm2z9ZKFsQxCT66qXA/bmc4Kn+OPE
+         13PiQ05+qo3LxqaOKj2qUdwStVxSjxbm+yzU7u+xtWZVD/Zl0WhdPr662GDfRuPYuJ
+         Ut9YXiQnmwd4H2vMyCf0U7GdHFCQH1Nv/y5AP6Y2X5eFPEnbJzVRbTJEY2iwwbYVef
+         lWS3YEK0Chergv5c/+u0Wbk7DS2aDe6Mo4ErK5v4SA7b00byn42/JnzHMVs+hr+GJX
+         UCG3j/qT5XgLO0gJgn0a1HbSPs3ZLHkKYsDxV56kWqCurpvJe2gR9B5+B37zSNZuVV
+         TFHFrpqpxcNDg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1n4Rhs-00Fl0p-D0; Mon, 03 Jan 2022 18:05:16 +0000
+        id 1n4RiM-00Fl1V-AY; Mon, 03 Jan 2022 18:05:46 +0000
+Date:   Mon, 03 Jan 2022 18:05:41 +0000
+Message-ID: <878rvwzocq.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     qemu-devel@nongnu.org
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        kernel-team@android.com, Eric Auger <eric.auger@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
+        Eric Auger <eric.auger@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the host
-Date:   Mon,  3 Jan 2022 18:05:07 +0000
-Message-Id: <20220103180507.2190429-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] hw/arm/virt: KVM: Enable PAuth when supported by the host
+In-Reply-To: <20220103134601.7cumwbza32wja3ei@gator>
+References: <20211228182347.1025501-1-maz@kernel.org>
+        <20220103134601.7cumwbza32wja3ei@gator>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, eric.auger@redhat.com, drjones@redhat.com, richard.henderson@linaro.org, peter.maydell@linaro.org
+X-SA-Exim-Rcpt-To: drjones@redhat.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, eric.auger@redhat.com, richard.henderson@linaro.org, peter.maydell@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add basic support for Pointer Authentication when running a KVM
-guest and that the host supports it, loosely based on the SVE
-support.
+Hi Andrew,
 
-Although the feature is enabled by default when the host advertises
-it, it is possible to disable it by setting the 'pauth=off' CPU
-property. The 'pauth' comment is removed from cpu-features.rst,
-as it is now common to both TCG and KVM.
+On Mon, 03 Jan 2022 13:46:01 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Tue, Dec 28, 2021 at 06:23:47PM +0000, Marc Zyngier wrote:
+> > Add basic support for Pointer Authentication when running a KVM
+> > guest and that the host supports it, loosely based on the SVE
+> > support.
+> > 
+> > Although the feature is enabled by default when the host advertises
+> > it, it is possible to disable it by setting the 'pauth=off' CPU
+> > property.
+> > 
+> > Tested on an Apple M1 running 5.16-rc6.
+> > 
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Andrew Jones <drjones@redhat.com>
+> > Cc: Richard Henderson <richard.henderson@linaro.org>
+> > Cc: Peter Maydell <peter.maydell@linaro.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  docs/system/arm/cpu-features.rst |  5 +++++
+> >  target/arm/cpu.c                 |  1 +
+> >  target/arm/cpu.h                 |  1 +
+> >  target/arm/cpu64.c               | 36 ++++++++++++++++++++++++++++++++
+> >  target/arm/kvm.c                 | 13 ++++++++++++
+> >  target/arm/kvm64.c               | 10 +++++++++
+> >  target/arm/kvm_arm.h             |  7 +++++++
+> >  7 files changed, 73 insertions(+)
+> > 
+> > diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> > index 584eb17097..c9e39546a5 100644
+> > --- a/docs/system/arm/cpu-features.rst
+> > +++ b/docs/system/arm/cpu-features.rst
+> > @@ -211,6 +211,11 @@ the list of KVM VCPU features and their descriptions.
+> >                             influence the guest scheduler behavior and/or be
+> >                             exposed to the guest userspace.
+> >  
+> > +  pauth                    Enable or disable ``FEAT_Pauth``, pointer
+> > +                           authentication.  By default, the feature is enabled
+> > +                           with ``-cpu host`` if supported by both the host
+> > +                           kernel and the hardware.
+> > +
+> 
+> Thanks for considering a documentation update. In this case, though, I
+> think we should delete the "TCG VCPU Features" pauth paragraph, rather
+> than add a new "KVM VCPU Features" pauth paragraph. We don't need to
+> document each CPU feature. We just document complex ones, like sve*,
+> KVM specific ones (kvm-*), and TCG specific ones (now only pauth-impdef).
 
-Tested on an Apple M1 running 5.16-rc6.
+Sure, works for me. Do we need to keep a trace of the available
+options? I'm not sure how a user is supposed to find out about those
+(I always end-up grepping through the code base, and something tells
+me I'm doing it wrong...). The QMP stuff flies way over my head.
 
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
-* From v1:
-  - Drop 'pauth' documentation
-  - Make the TCG path common to both TCG and KVM
-  - Some tidying up
+> >  TCG VCPU Features
+> >  =================
+> >  
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index a211804fd3..68b09cbc6a 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -2091,6 +2091,7 @@ static void arm_host_initfn(Object *obj)
+> >      kvm_arm_set_cpu_features_from_host(cpu);
+> >      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+> >          aarch64_add_sve_properties(obj);
+> > +        aarch64_add_pauth_properties(obj);
+> >      }
+> >  #else
+> >      hvf_arm_set_cpu_features_from_host(cpu);
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index e33f37b70a..c6a4d50e82 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -1076,6 +1076,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+> >  void aarch64_sve_change_el(CPUARMState *env, int old_el,
+> >                             int new_el, bool el0_a64);
+> >  void aarch64_add_sve_properties(Object *obj);
+> > +void aarch64_add_pauth_properties(Object *obj);
+> >  
+> >  /*
+> >   * SVE registers are encoded in KVM's memory in an endianness-invariant format.
+> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> > index 15245a60a8..305c0e19fe 100644
+> > --- a/target/arm/cpu64.c
+> > +++ b/target/arm/cpu64.c
+> > @@ -625,6 +625,42 @@ void aarch64_add_sve_properties(Object *obj)
+> >  #endif
+> >  }
+> >  
+> > +static bool cpu_arm_get_pauth(Object *obj, Error **errp)
+> > +{
+> > +    ARMCPU *cpu = ARM_CPU(obj);
+> > +    return cpu_isar_feature(aa64_pauth, cpu);
+> > +}
+> > +
+> > +static void cpu_arm_set_pauth(Object *obj, bool value, Error **errp)
+> > +{
+> > +    ARMCPU *cpu = ARM_CPU(obj);
+> > +    uint64_t t;
+> > +
+> > +    if (value) {
+> > +        if (!kvm_arm_pauth_supported()) {
+> > +            error_setg(errp, "'pauth' feature not supported by KVM on this host");
+> > +        }
+> > +
+> > +        return;
+> > +    }
+> > +
+> > +    /*
+> > +     * If the host supports PAuth, we only end-up here if the user has
+> > +     * disabled the support, and value is false.
+> > +     */
+> > +    t = cpu->isar.id_aa64isar1;
+> > +    t = FIELD_DP64(t, ID_AA64ISAR1, APA, value);
+> > +    t = FIELD_DP64(t, ID_AA64ISAR1, GPA, value);
+> > +    t = FIELD_DP64(t, ID_AA64ISAR1, API, value);
+> > +    t = FIELD_DP64(t, ID_AA64ISAR1, GPI, value);
+> > +    cpu->isar.id_aa64isar1 = t;
+> > +}
+> > +
+> > +void aarch64_add_pauth_properties(Object *obj)
+> > +{
+> > +    object_property_add_bool(obj, "pauth", cpu_arm_get_pauth, cpu_arm_set_pauth);
+> > +}
+> 
+> I think we should try to merge as much as possible between the TCG and KVM
+> pauth property handling. I think we just need to move the
+> qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property) call into
+> KVM/TCG common code and then modify arm_cpu_pauth_finalize() to
+> handle checking KVM for support when KVM is enabled and also to not
+> look at the impdef property.
 
- docs/system/arm/cpu-features.rst |  4 ----
- target/arm/cpu.c                 | 14 ++++----------
- target/arm/cpu.h                 |  1 +
- target/arm/cpu64.c               | 33 ++++++++++++++++++++++++++++----
- target/arm/kvm64.c               | 21 ++++++++++++++++++++
- 5 files changed, 55 insertions(+), 18 deletions(-)
+Happy to merge things more, though using qdev_property_add_static()
+feels a bit odd here (I have to forcefully replicate the probed state
+into the cpu->prop_pauth property in order to have a sensible default
+on KVM).
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 584eb17097..3e626c4b68 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -217,10 +217,6 @@ TCG VCPU Features
- TCG VCPU features are CPU features that are specific to TCG.
- Below is the list of TCG VCPU features and their descriptions.
- 
--  pauth                    Enable or disable ``FEAT_Pauth``, pointer
--                           authentication.  By default, the feature is
--                           enabled with ``-cpu max``.
--
-   pauth-impdef             When ``FEAT_Pauth`` is enabled, either the
-                            *impdef* (Implementation Defined) algorithm
-                            is enabled or the *architected* QARMA algorithm
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index a211804fd3..d96cc4ef18 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1380,18 +1380,11 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
-             return;
-         }
- 
--        /*
--         * KVM does not support modifications to this feature.
--         * We have not registered the cpu properties when KVM
--         * is in use, so the user will not be able to set them.
--         */
--        if (!kvm_enabled()) {
--            arm_cpu_pauth_finalize(cpu, &local_err);
--            if (local_err != NULL) {
-+	arm_cpu_pauth_finalize(cpu, &local_err);
-+	if (local_err != NULL) {
-                 error_propagate(errp, local_err);
-                 return;
--            }
--        }
-+	}
-     }
- 
-     if (kvm_enabled()) {
-@@ -2091,6 +2084,7 @@ static void arm_host_initfn(Object *obj)
-     kvm_arm_set_cpu_features_from_host(cpu);
-     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-         aarch64_add_sve_properties(obj);
-+        aarch64_add_pauth_properties(obj);
-     }
- #else
-     hvf_arm_set_cpu_features_from_host(cpu);
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e33f37b70a..c6a4d50e82 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1076,6 +1076,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
- void aarch64_sve_change_el(CPUARMState *env, int old_el,
-                            int new_el, bool el0_a64);
- void aarch64_add_sve_properties(Object *obj);
-+void aarch64_add_pauth_properties(Object *obj);
- 
- /*
-  * SVE registers are encoded in KVM's memory in an endianness-invariant format.
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 15245a60a8..d5c0bce1c4 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -630,6 +630,17 @@ void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp)
-     int arch_val = 0, impdef_val = 0;
-     uint64_t t;
- 
-+    if (kvm_enabled()) {
-+        if (cpu->prop_pauth) {
-+            if (!cpu_isar_feature(aa64_pauth, cpu)) {
-+                error_setg(errp, "'pauth' feature not supported by KVM on this host");
-+            }
-+
-+            return;
-+        }
-+        /* Fall through to disable PAuth */
-+    }
-+
-     /* TODO: Handle HaveEnhancedPAC, HaveEnhancedPAC2, HaveFPAC. */
-     if (cpu->prop_pauth) {
-         if (cpu->prop_pauth_impdef) {
-@@ -655,6 +666,23 @@ static Property arm_cpu_pauth_property =
- static Property arm_cpu_pauth_impdef_property =
-     DEFINE_PROP_BOOL("pauth-impdef", ARMCPU, prop_pauth_impdef, false);
- 
-+void aarch64_add_pauth_properties(Object *obj)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    /* Default to PAUTH on, with the architected algorithm on TCG. */
-+    qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property);
-+    if (kvm_enabled()) {
-+        /*
-+         * Mirror PAuth support from the probed sysregs back into the
-+         * property for KVM. Is it just a bit backward? Yes it is!
-+         */
-+        cpu->prop_pauth = cpu_isar_feature(aa64_pauth, cpu);
-+    } else {
-+        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_impdef_property);
-+    }
-+}
-+
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-  * otherwise, a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -829,13 +857,10 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->dcz_blocksize = 7; /*  512 bytes */
- #endif
- 
--        /* Default to PAUTH on, with the architected algorithm. */
--        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property);
--        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_impdef_property);
--
-         bitmap_fill(cpu->sve_vq_supported, ARM_MAX_VQ);
-     }
- 
-+    aarch64_add_pauth_properties(obj);
-     aarch64_add_sve_properties(obj);
-     object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
-                         cpu_max_set_sve_max_vq, NULL, NULL);
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e790d6c9a5..5c425bc074 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -491,6 +491,12 @@ static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
-     return ioctl(fd, KVM_GET_ONE_REG, &idreg);
- }
- 
-+static bool kvm_arm_pauth_supported(void)
-+{
-+    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
-+            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
-+}
-+
- bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
- {
-     /* Identify the feature bits corresponding to the host CPU, and
-@@ -521,6 +527,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-      */
-     struct kvm_vcpu_init init = { .target = -1, };
- 
-+    /*
-+     * Ask for Pointer Authentication if supported. We can't play the
-+     * SVE trick of synthetising the ID reg as KVM won't tell us
-+     * whether we have the architected or IMPDEF version of PAuth, so
-+     * we have to use the actual ID regs.
-+     */
-+    if (kvm_arm_pauth_supported()) {
-+        init.features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-+			     1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-+    }
-+
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
-         return false;
-     }
-@@ -865,6 +882,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         assert(kvm_arm_sve_supported());
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-     }
-+    if (cpu_isar_feature(aa64_pauth, cpu)) {
-+	    cpu->kvm_init_features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-+					  1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-+    }
- 
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret = kvm_arm_vcpu_init(cs);
+Anyway, I'll post something with this hack, and we add another coat of
+paint to the bike shed! ;-)
+
+> 
+> > +
+> >  void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp)
+> >  {
+> >      int arch_val = 0, impdef_val = 0;
+> > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> > index bbf1ce7ba3..71e2f46ce8 100644
+> > --- a/target/arm/kvm.c
+> > +++ b/target/arm/kvm.c
+> > @@ -84,6 +84,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+> >      if (vmfd < 0) {
+> >          goto err;
+> >      }
+> > +
+> >      cpufd = ioctl(vmfd, KVM_CREATE_VCPU, 0);
+> >      if (cpufd < 0) {
+> >          goto err;
+> > @@ -94,6 +95,18 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+> >          goto finish;
+> >      }
+> >  
+> > +    /*
+> > +     * Ask for Pointer Authentication if supported. We can't play the
+> > +     * SVE trick of synthetising the ID reg as KVM won't tell us
+> > +     * whether we have the architected or IMPDEF version of PAuth, so
+> > +     * we have to use the actual ID regs.
+> > +     */
+> > +    if (ioctl(vmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_PTRAUTH_ADDRESS) > 0 &&
+> > +        ioctl(vmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_PTRAUTH_GENERIC) > 0) {
+> > +        init->features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> > +                              1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> > +    }
+> > +
+> 
+> I think kvm_init() is called prior to kvm_arm_get_host_cpu_features(),
+> which means we can do this instead
+> 
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index e790d6c9a573..d1512035ac5b 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -521,6 +521,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>       */
+>      struct kvm_vcpu_init init = { .target = -1, };
+>  
+> +   /*
+> +    * Ask for Pointer Authentication if supported. We can't play the
+> +    * SVE trick of synthetising the ID reg as KVM won't tell us
+> +    * whether we have the architected or IMPDEF version of PAuth, so
+> +    * we have to use the actual ID regs.
+> +    */
+> +    if (kvm_arm_pauth_supported()) {
+> +        init->features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> +                              1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> +    }
+> +
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+>          return false;
+>      }
+> 
+> Assuming I'm right about the call order, then I think I'd like that more.
+
+Yup, works nicely, and allows for some further cleanups.
+
+>
+> 
+> >      if (init->target == -1) {
+> >          struct kvm_vcpu_init preferred;
+> >  
+> > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> > index e790d6c9a5..95b6902ca0 100644
+> > --- a/target/arm/kvm64.c
+> > +++ b/target/arm/kvm64.c
+> > @@ -725,6 +725,12 @@ bool kvm_arm_sve_supported(void)
+> >      return kvm_check_extension(kvm_state, KVM_CAP_ARM_SVE);
+> >  }
+> >  
+> > +bool kvm_arm_pauth_supported(void)
+> > +{
+> > +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
+> > +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
+> > +}
+> > +
+> >  bool kvm_arm_steal_time_supported(void)
+> >  {
+> >      return kvm_check_extension(kvm_state, KVM_CAP_STEAL_TIME);
+> > @@ -865,6 +871,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> >          assert(kvm_arm_sve_supported());
+> >          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
+> >      }
+> > +    if (cpu_isar_feature(aa64_pauth, cpu)) {
+> > +	    cpu->kvm_init_features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> > +					  1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> > +    }
+> >  
+> >      /* Do KVM_ARM_VCPU_INIT ioctl */
+> >      ret = kvm_arm_vcpu_init(cs);
+> > diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> > index b7f78b5215..c26acf7866 100644
+> > --- a/target/arm/kvm_arm.h
+> > +++ b/target/arm/kvm_arm.h
+> > @@ -306,6 +306,13 @@ bool kvm_arm_pmu_supported(void);
+> >   */
+> >  bool kvm_arm_sve_supported(void);
+> >  
+> > +/**
+> > + * kvm_arm_pauth_supported:
+> > + *
+> > + * Returns true if KVM can enable Pointer Authentication and false otherwise.
+> > + */
+> > +bool kvm_arm_pauth_supported(void);
+> > +
+> 
+> If we merge more of the pauth property handling with the TCG code, then
+> we'll also need a stub in the !CONFIG_KVM section for compiling without
+> kvm support.
+
+Actually, this can go altogether, as it can now be made static in
+kvm64.c and not be visible outside of the KVM code at all.
+
+Thanks a lot for the review and the guidance!
+
+	M.
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
