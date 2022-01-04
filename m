@@ -2,156 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A4148433D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 15:22:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84D15484475
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 16:23:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234125AbiADOWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 09:22:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22274 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229915AbiADOWM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 09:22:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641306132;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kd7NsJXI8gYpybe5mVP7ztpJR15QwvvZgvb8pedcJXM=;
-        b=axoRBK6p3Lp99Int9sYSISRZcVBIdf6hNqcTxmkQHN0A7etKV1aoblUsGk8fa4eZNJfamm
-        paP0xkktK/gtvMLmSnYunPARdTdSKwT29vMe7Ix9gB40WKECnKuvAvUC3szlgAvgfGNAkQ
-        u6jx0mmr3Pc02UjB2lFnq6xslgjVSAU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-fZceU7QpNGKknxgnCcuSOw-1; Tue, 04 Jan 2022 09:22:11 -0500
-X-MC-Unique: fZceU7QpNGKknxgnCcuSOw-1
-Received: by mail-wm1-f71.google.com with SMTP id z13-20020a05600c0a0d00b003457d6619f8so357347wmp.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 06:22:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=Kd7NsJXI8gYpybe5mVP7ztpJR15QwvvZgvb8pedcJXM=;
-        b=QHdZa/OyBtoVd5OwD8BMmbUSKiAuLBCbtLBI4fFLFersbVrHIXykgTIvG8YNIxoxJ5
-         oxVDMsedLialZAJnJpRDeWIbaSZGvIVIBOQAd/BIPXEzDbyuXoGi0YMSXwoWVRLW+xzD
-         jo8xv98hlIzGhlsX5v6f1gegwNnHt1hSCeeDVZ3i8rCJSefqI+SpJTYghcZRWEebnRKW
-         zdl14LYVa0L3hLlqLun/dhu6U8xqtkgKAoSP6xJQ2UclVR6jN9hFtvM/wwXy4hyukv2U
-         mT9a51ZWNzz+G9KluDYd+76CGGb3pS3rtPCNF+8/9V8zC/Kahs2tbSJ79qkNrpOdcB8J
-         O+LQ==
-X-Gm-Message-State: AOAM533xrRuIGRL1CAQMSGdJ4RfGzND9J+dpiKprSn3MjB0XNf9xQFwB
-        jjptkoIoiYvC9GS6vWS/NqYshmeFCWa3o5SfKCF+rA1Dmwmei213xpH7SHvw3Wh9zTGr8vMuc4q
-        DgMB8q790pRjN
-X-Received: by 2002:a05:600c:3589:: with SMTP id p9mr43117672wmq.109.1641306129987;
-        Tue, 04 Jan 2022 06:22:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw32qpFKWD69dT7hryNwrsfqQlIKMprgz5fqX/4Bi/8nva34KM25ikuyModAt0N7b2C0ORoeQ==
-X-Received: by 2002:a05:600c:3589:: with SMTP id p9mr43117653wmq.109.1641306129690;
-        Tue, 04 Jan 2022 06:22:09 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c62bd.dip0.t-ipconnect.de. [91.12.98.189])
-        by smtp.gmail.com with ESMTPSA id r11sm38357940wrw.5.2022.01.04.06.22.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jan 2022 06:22:09 -0800 (PST)
-Message-ID: <7eb40902-45dd-9193-37f1-efaca381529b@redhat.com>
-Date:   Tue, 4 Jan 2022 15:22:07 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v3 kvm/queue 01/16] mm/shmem: Introduce
- F_SEAL_INACCESSIBLE
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        id S234502AbiADPXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 10:23:34 -0500
+Received: from mail-dm6nam12on2073.outbound.protection.outlook.com ([40.107.243.73]:31328
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232085AbiADPXd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 10:23:33 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bjAc5mmPYfON5zbADnzDyN/+ZXCrLwfRURmMHEc3XxtSfRXffEDtox4WQlV6jr6u2skKhSQJYki/4yax9RW4MRYRXkFfUTDkDx/66bG2KyN+PWHQeGHmHwrQ+FW/Lj/gOVKPj4bYBsrtUIMfygyR3MD/UV+WdAu6rQYtjr5Ce1VB/bhlCXrqdk08hThN9Oo5LK2n+dKSBZ1gM0LYgujfM5PmoZw7+TbUIbxGgQkNYwbXgiAUx2RPjw3Po19KB7ZNSDt6lgg+M+DRIvsGI6l96iBLr7YAuOudVRWJhSghoQYyF1sl+V3HtDcci4Fk7174gOikhYRDQPQ9H0BTwakcJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ia5pg6yTeuKQHcgcRgyVMx7GdofYzi2hP+7yg8wHy+0=;
+ b=XPaEiK4vYpMYjx0liSzEV3sTrFgAPAMSr+/aKtLhXq0dFvgmjKYivCIW/1IRrTWDrFMVJts3tEkb08+93cVWBc2gZszhQbdHrjnTAp6EqBTPgWhaBlC+MgiBXzQf0g2qY5yxF818lFcCJaLgQaOW+BNtMxmrOQCt34foRa77udYOPik7yNPpML9VvuU68AsZNEqpenKHWAIsBQImPQ/4qVXJoHM2GH/gCZLom3GkSx6lzN7l0vZa5fTpFwEzLFG4/olzB84G0Bfd5Hw2LmtvVXr3yBqKTUasd30mbjqBOgYszqtagwLRRAh3albxaUooXiI37/YEvQc33+ZJndqysQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ia5pg6yTeuKQHcgcRgyVMx7GdofYzi2hP+7yg8wHy+0=;
+ b=CDPC/N9MQae4zBWt4q5JQJ5dJBtKyVxJSo8GZKFWExB/gn0ngC8iigh32+ZrCtPW4eiCjFso5y5+6tBEFsM/LgeYt5FhGea30yNKBPUP6kwnHb0IXQNMWekkBJUo+mYW4Z4xUcK6UbI+OiD4uIo/e9JEkLCcUxOVorQbHvFLf0I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2831.namprd12.prod.outlook.com (2603:10b6:805:ec::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.15; Tue, 4 Jan
+ 2022 15:23:31 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::35:281:b7f8:ed4c]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::35:281:b7f8:ed4c%6]) with mapi id 15.20.4844.016; Tue, 4 Jan 2022
+ 15:23:31 +0000
+Cc:     brijesh.singh@amd.com, Mikolaj Lisik <lisik@google.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-2-chao.p.peng@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211223123011.41044-2-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 08/40] x86/sev: Check the vmpl level
+To:     Borislav Petkov <bp@alien8.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-9-brijesh.singh@amd.com> <YbugbgXhApv9ECM2@dt>
+ <CADtC8PX_bEk3rQR1sonbp-rX7rAG4fdbM41r3YLhfj3qWvqJrw@mail.gmail.com>
+ <79c91197-a7d8-4b93-b6c3-edb7b2da4807@amd.com>
+ <d56c2f64-9e31-81d8-f250-e9772ba37d7e@amd.com> <YcDHF016tJLkempZ@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <5fb651e9-3e36-0b36-81d0-8cdd865eecdf@amd.com>
+Date:   Tue, 4 Jan 2022 09:23:25 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <YcDHF016tJLkempZ@zn.tnic>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR05CA0055.namprd05.prod.outlook.com
+ (2603:10b6:610:38::32) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9ed628de-65bf-43e1-3261-08d9cf9629f0
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2831:EE_
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2831508543748FBFBE8EB6D8E54A9@SN6PR12MB2831.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xS0WY2YUxOdUZfmFgZIeeNyh/tby35iWIf901XUReF5kEQFMJdtRGGr8TXe9tQz0VUVsYlSdG0GaZnHzUpn20j0Egll+DdAf8SRD4UF7RaW5HUEac+NycalauXz2uAfPI37IdfuayfRjpzjgIVPZruc+5mcsF1MNDpC30aHqOYuot+N/xD+exvvuNgRIcl6jIPL0WmOIDA5HzhZPKxywbTfm/xP39o8vhxxHpaxPRY/BAczygjULuA8zhLlCSFBhC5ehVa3TjQGpKKss9sGtg0/NErAiwFQMLNFVhrXPGIPXOTD85C36TjDb0cyJgfKphJZlyk4bkHqCkZ6nXz2l+H0gi7pxQB0LAXdZxI45WU02wU3G4+//FCZcstAwftykAP778yomZFI//HlHctKXKNXUSIu0YXqri/oSEeuhc5/ddWNa04A87fs3bLAv+PHBVBKBOv21d3498QOpny4Ru+QugMYq0im0X6uOgwP+ykDO2rs4Gk/MJ/8Ty84BI8OUFf0aCtFLiE9tTrF6dXzwlMvoy7HDVT8dqxBvQTCBJci+l2bQ1zFqe83i4fPO43YoLf4jrFJcQVPNDEIDHVMGPOb1FMV7eo8Ekz0TSsrLs2v1W6b9p4ZXK77HSf3bd5DmdC4ez8ZjJ8+fCqoEopePXO58IMJ80MnN3uOi70m0eGf9cwLlvSzpazqqRQexScsqTobvsMNqHOauISZcgNix+SrczW2S6Pg73K3bUBqz+f8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(316002)(86362001)(2616005)(36756003)(6486002)(186003)(26005)(53546011)(6512007)(508600001)(6506007)(66476007)(110136005)(8676002)(31686004)(8936002)(7416002)(31696002)(5660300002)(54906003)(2906002)(66556008)(6666004)(66946007)(44832011)(4326008)(7406005)(6636002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c2x0QzZuSVdjdVVzUWhGaW8zYUJ1L1hWcEpSQWR3YUxVRDlKMkdMdS84TFpi?=
+ =?utf-8?B?VnZncUJtR1JtSnBJSllCdldYaHVCMVlrRGNlQXZQUmw3VWdtSEh2dk5BeGps?=
+ =?utf-8?B?di9OYVljbEwrVVl6bThTV29mZWd5Y2lTZUVPNzZkMUtHTk5IVXBrY3ZhNUth?=
+ =?utf-8?B?WU1SbTY2NTE0SGx2clVwZkFTb2k4TjRLYUtucDVYMDJpbys0Zlg3WGNBS29r?=
+ =?utf-8?B?ME5GdHlweFIvbnd5UE1vekRocHd1QVYyWml0ZXdtM3Bacmc5c3R0RlMyTUpU?=
+ =?utf-8?B?VFpaWHVVbkFYTVdRcVRBbjJkZU9QeGV4c21rNHpPYzBlamJFSG1wL29ORUhv?=
+ =?utf-8?B?aE5jc1NuQUlRVFZvOWU4WWdLc2taT2xmY2J1UzF2dHd1bEZ3eHlHYlk1Qzgy?=
+ =?utf-8?B?RWpKZkJSQmE3RUVaZzFuWGN6K3JmTWs0RkNnS1UreDRyUmJCSGlSLyttdnFP?=
+ =?utf-8?B?U0JsWVRlTC80bmhlRWRadkF4emNrV3QzZ3VpTU05TVVOUU9IV3lLTnRCbktl?=
+ =?utf-8?B?WGh6VDZDclpYRE1CNDdtWVNqWFFDd0VSMWlBOG5pTjBZOTgxUUJ2TDRPT3RI?=
+ =?utf-8?B?YVhQNWRMZGxTeERTczB1M2t3VTI3cTVTWE5jeVcvcmpubWI3ektyaFdPVnV3?=
+ =?utf-8?B?ZFlmRDNmUzgwMlQwaDY5dlFKUFJvS3ZtS2kySFRQaVgvN3dlWm16UVNVcEdv?=
+ =?utf-8?B?WU5NUmh1YUVrekF2TmlyWkF3aCtya2owUnlUa3d5VlRvRDFlVjB0Ymh0S0lL?=
+ =?utf-8?B?K2lvMGcydU4rd2czUFluMTQ5eUlrL1cyOCthUW8vSFM2VXZCd0Z4Z0l1b1Mr?=
+ =?utf-8?B?OElMLzNGUm1tNWNYVjNGSDV6Y1RtcDQ5VVB6enpaWWpWdURsRi9kMjdoUWw0?=
+ =?utf-8?B?bmM0TXViK285emZFMEhkRFlmaU9xTndJNi9yZGo3cXcyN2xwQzV3cXBuQ1cv?=
+ =?utf-8?B?Z0QxUjdUMzN0TXl6ZUpDOU9DL21YMDVkaW9PUm0wVFZnT3VCT29paFUzQTg2?=
+ =?utf-8?B?MnZ2Wjgvbi9lOUNCRFBZd1ZvVElIajBCQjVBZjR1MzBuTnczU2VVR2FkeEZS?=
+ =?utf-8?B?LzhGV21mZmJLN1o0RnJHOE53ZDlGVmNuTlJsQWszMGhhcGNkWVRsSmlpSFVz?=
+ =?utf-8?B?MWcva2c3bTRuL2srVjJGZkkwZFZWaTl6dnJvOEZXdng5L1RCWDh1cm9UOWdu?=
+ =?utf-8?B?Y0J6cnljQ2RQV1JjK2xUTGQ2czRySmNkU0F3TTV6NjhmUG95QUJqa2NvZUcr?=
+ =?utf-8?B?ZFJFSmYyQy9PUURGTnZJVmFVc1JPdmFSZWxYWTFSZjYxQTA2bmt5ei8xUUJU?=
+ =?utf-8?B?VzBJdjQ0S0QzN3ordno2YXZjL1V4a2QrUmk5RkNzSFBkQzNKZHl5eFk3eC9V?=
+ =?utf-8?B?TUdrSzFGazRJKzdwT2J2Ri9OL2VPQ2ZiaEd0SlRCVnplZFNKU2djTmlidGtU?=
+ =?utf-8?B?NHZPazJhZktiT3ZYSkJrM1RKU0dJVnc3cy9uU0YxbTdqeUNXU1paK0d5WjRn?=
+ =?utf-8?B?aGxiS2RtZVllbXNpeGwxbWpreGcxRlhzQ2pZbHpPZGhJQTN5TjRKZUtzSHpO?=
+ =?utf-8?B?Uzg0UWpRaS9NVTgzditmR0g2aTJaVmJsRUhIQ1c3QWU3QStSczBDZXRVZ202?=
+ =?utf-8?B?bXlZQWtqcWJLOWNCc0JlQ2greE9TSzBjK1RVL1QrdmcxTEliK1I2SjJZdmpC?=
+ =?utf-8?B?cXBnbVRIc1NFZWpYTjN2MEhSK25FaHBmeGdINXovNEpZWktYdjZhbUU1NFRO?=
+ =?utf-8?B?OENyU2duc3dXaDY3bUFoN2Q0UUFjSEIrRldXNjVMaXp1MGJOZ0FycnZKM0Vy?=
+ =?utf-8?B?RFNucDNVaUlpY2tPTWlTZVNvcEQ5K3FlSDdacHgvMzFYY0lHL0ZrV05xNzFN?=
+ =?utf-8?B?MEpIWmJnTGtwK1p4cko4ZWpJNjhjNm10NWwvL3lHY2dJUUJRQUNsU2F4bGc1?=
+ =?utf-8?B?UmRoakFzRER3SDB6QlNzSHpXL0E2SnIzU2JTckpiN0VTMDA3Umpyb0lMY2hU?=
+ =?utf-8?B?bmlpRkNDazRsanF3QWcvcGtjZFFZeDlFRXFDcnRTUXMraFpxYnBpUHJQbHBW?=
+ =?utf-8?B?YzZ5a0xJcE1YeFJDVWUrZXFlWDRkMnBHSzJKZWh3RFdrdkRmbXc1ajdRVm9H?=
+ =?utf-8?B?QnVoZXkwbHJTZTJDVFR5UVlBb3VGUTRicnpIaHllS0FYMXZ3VUZibGNkY09s?=
+ =?utf-8?Q?Ad7GGssNoZSpEdJkl3x3W+4=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ed628de-65bf-43e1-3261-08d9cf9629f0
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 15:23:30.9394
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t4ZFSUVGS66AWqeYnc0UEHbwQ9GzCjfNrxDEK00f8tLVWXC7t0CED0b6Bs9smCewgQfzy5swMaS5AjZsMNsQtg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2831
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.12.21 13:29, Chao Peng wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+
+
+On 12/20/21 12:10 PM, Borislav Petkov wrote:
+> On Fri, Dec 17, 2021 at 04:33:02PM -0600, Tom Lendacky wrote:
+>>>>>> +      * There is no straightforward way to query the current VMPL level. The
+>>>>>> +      * simplest method is to use the RMPADJUST instruction to change a page
+>>>>>> +      * permission to a VMPL level-1, and if the guest kernel is launched at
+>>>>>> +      * a level <= 1, then RMPADJUST instruction will return an error.
+>>>>> Perhaps a nit. When you say "level <= 1", do you mean a level lower than or
+>>>>> equal to 1 semantically, or numerically?
+>>>
+>>> Its numerically, please see the AMD APM vol 3.
+>>
+>> Actually it is not numerically...  if it was numerically, then 0 <= 1 would
+>> return an error, but VMPL0 is the highest permission level.
 > 
-> Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
-> the file is inaccessible from userspace in any possible ways like
-> read(),write() or mmap() etc.
+> Just write in that comment exactly what this function does:
 > 
-> It provides semantics required for KVM guest private memory support
-> that a file descriptor with this seal set is going to be used as the
-> source of guest memory in confidential computing environments such
-> as Intel TDX/AMD SEV but may not be accessible from host userspace.
+> "RMPADJUST modifies RMP permissions of a lesser-privileged (numerically
+> higher) privilege level. Here, clear the VMPL1 permission mask of the
+> GHCB page. If the guest is not running at VMPL0, this will fail.
 > 
-> At this time only shmem implements this seal.
+> If the guest is running at VMP0, it will succeed. Even if that operation
+> modifies permission bits, it is still ok to do currently because Linux
+> SNP guests are supported only on VMPL0 so VMPL1 or higher permission
+> masks changing is a don't-care."
 > 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  include/uapi/linux/fcntl.h |  1 +
->  mm/shmem.c                 | 37 +++++++++++++++++++++++++++++++++++--
->  2 files changed, 36 insertions(+), 2 deletions(-)
+> and then everything is clear wrt numbering, privilege, etc.
 > 
-> diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-> index 2f86b2ad6d7e..e2bad051936f 100644
-> --- a/include/uapi/linux/fcntl.h
-> +++ b/include/uapi/linux/fcntl.h
-> @@ -43,6 +43,7 @@
->  #define F_SEAL_GROW	0x0004	/* prevent file from growing */
->  #define F_SEAL_WRITE	0x0008	/* prevent writes */
->  #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
-> +#define F_SEAL_INACCESSIBLE	0x0020  /* prevent file from accessing */
+> Ok?
+> 
 
-I think this needs more clarification: the file content can still be
-accessed using in-kernel mechanisms such as MEMFD_OPS for KVM. It
-effectively disallows traditional access to a file (read/write/mmap)
-that will result in ordinary MMU access to file content.
+Noted.
 
-Not sure how to best clarify that: maybe, prevent ordinary MMU access
-(e.g., read/write/mmap) to file content?
-
->  /* (1U << 31) is reserved for signed error codes */
->  
->  /*
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index 18f93c2d68f1..faa7e9b1b9bc 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -1098,6 +1098,10 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
->  		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
->  			return -EPERM;
->  
-> +		if ((info->seals & F_SEAL_INACCESSIBLE) &&
-> +		    (newsize & ~PAGE_MASK))
-> +			return -EINVAL;
-> +
-
-What happens when sealing and there are existing mmaps?
-
-
--- 
-Thanks,
-
-David / dhildenb
-
+thanks
