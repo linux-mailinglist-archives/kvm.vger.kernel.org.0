@@ -2,238 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B2E483EE2
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 10:10:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A74483F22
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 10:28:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230091AbiADJKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 04:10:51 -0500
-Received: from mga05.intel.com ([192.55.52.43]:15674 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229506AbiADJKu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 04:10:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641287450; x=1672823450;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=rl+9/vI+L0cuDx+k5y0HMB6G4IvN76ZZeARXiZbpGLQ=;
-  b=jOxb6+poBmx+z7WMjJx7WGv2VXLGQ4bgmPVjkdj7pcgngo1yWaWiXHX2
-   WBrgzKa7LITR/vw8YWAxAMBBLz3Zxd1VS5yHdS+vQzrqA4mnp4ocirZ/M
-   f7T7zKeiMsdFvqMy3gLua8LczM4UZkirwnC6BvxdnNo6eEtW823+JXT70
-   GB0QovsqUbNZ3oRiMhN1ylc9DVEdg2k11EAzvC9GohImfbJkgmvSXu+7L
-   v1Iy/d1/hZdlFy7xKPz6bvUJWOWsx7Qf/VSCKj6YaHNfDQ0SfWM7QWcCZ
-   p90ikti0KIoPqWHWnmdiE3xkP28KwiUfcD6jHVixbU2gJBuF3O7ijyPvY
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="328531374"
-X-IronPort-AV: E=Sophos;i="5.88,260,1635231600"; 
-   d="scan'208";a="328531374"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 01:10:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,260,1635231600"; 
-   d="scan'208";a="471992735"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga006.jf.intel.com with ESMTP; 04 Jan 2022 01:10:42 -0800
-Date:   Tue, 4 Jan 2022 17:10:08 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
+        id S229727AbiADJ2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 04:28:34 -0500
+Received: from mail-dm3nam07on2051.outbound.protection.outlook.com ([40.107.95.51]:46126
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229684AbiADJ2e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 04:28:34 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U/anuSCDTA4q83UpZnoW1tFYA8U1TEzr6Ur1le31A4u+uVkbr1AZIO+f8SpXU/uvTcy4TngRKvBksYrjk96GwLgf48dOHSHI4nCMqc8LLY+ilq9+pBSqcYXtOJBOI8hI4DfBBYXgoe7y8S/z9zxkdWvpfaN6LsdIhfwhv+7UcaS27FB+yo054w55BJliVDNFoIZ4Fu4DhALlnAjaQDSjX/3IQwR2sogiQ8ikxav1Srab5DSiYr/gQZjmwMDBXjPY4w6UCeFxtz+nLCj9QYSL2npDZ/puXIH99DvFi52W7YXPmd6hRnzlpBtTwZAfJP99ugiVkkQyPi2gG5UwrkplQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rWw0GjXqh6V5gh/kxU8vG4qrRVXTfzvxKEtZq1po51A=;
+ b=gisd5y7I7DUcsvX8/YJJAMVq/G5t0RU/dXJl10OyOZY3/ZjlYAOhAF14IqAwCAMDSgnjGBm7VGQ0C70xubE3qFAuSKHkD6aZMIw7IWbIAtYyjTlyanF363FJBYFySJv9b+dkOjRPVBjnICA1Ph41niIuoo1PgeM5oJOT31COCOXT3oOvkntPKPBhMUxzOlJ4tAOYCZuUrXKDR64fNkpJ1KBUqOSA2JnBeXnkIJDi7CcSR/wO1FHy1gVmKSv2mZi2GMdqnzlM/yjpwbfAUQoPh+z9WpG24MrNf4dsnLeWAbi9N7m0oXbUQri/yVoGhrcDeddcZZdwBqZEjJl1zsLMOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rWw0GjXqh6V5gh/kxU8vG4qrRVXTfzvxKEtZq1po51A=;
+ b=UB39tYGlEoBeF5LyqwstTSn8o+sKvorAxR/bgD3OflaB/ME4FSY98EH/d75bcMmgtGfyNA3QCUiYTBmwbGEMaCfXPBOa+vAP89RzW/RCIzjoQWlw7BbNqgukVZxzJvKajWHmwc19a53iLwZbJU4j82TTm7Eoz5h/d1ItzOEw8VU=
+Received: from DM5PR1101CA0015.namprd11.prod.outlook.com (2603:10b6:4:4c::25)
+ by BY5PR12MB3956.namprd12.prod.outlook.com (2603:10b6:a03:1ab::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.15; Tue, 4 Jan
+ 2022 09:28:30 +0000
+Received: from DM6NAM11FT032.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:4c:cafe::e6) by DM5PR1101CA0015.outlook.office365.com
+ (2603:10b6:4:4c::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.14 via Frontend
+ Transport; Tue, 4 Jan 2022 09:28:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DM6NAM11FT032.mail.protection.outlook.com (10.13.173.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4844.14 via Frontend Transport; Tue, 4 Jan 2022 09:28:30 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 4 Jan
+ 2022 03:28:27 -0600
+From:   Nikunj A Dadhania <nikunj@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [PATCH v3 kvm/queue 14/16] KVM: Handle page fault for private
- memory
-Message-ID: <20220104091008.GA21806@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-15-chao.p.peng@linux.intel.com>
- <20220104014629.GA2330@yzhao56-desk.sh.intel.com>
+        Peter Xu <peterx@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <nikunj@amd.com>,
+        <vasant.hegde@amd.com>, <brijesh.singh@amd.com>
+Subject: [PATCH] KVM: x86: Do not create mmu_rmaps_stat for TDP MMU
+Date:   Tue, 4 Jan 2022 14:58:14 +0530
+Message-ID: <20220104092814.11553-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220104014629.GA2330@yzhao56-desk.sh.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 74875b74-1c84-4788-832b-08d9cf649240
+X-MS-TrafficTypeDiagnostic: BY5PR12MB3956:EE_
+X-Microsoft-Antispam-PRVS: <BY5PR12MB3956B39E57E20400097AD9F5E24A9@BY5PR12MB3956.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:669;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 58BXgeaH2TKmvxmJKwT0maavoGefcS8KY0YGF4N6agamTKMORTgZoTDRst1/n7IAAGv5z9mAvJcIuOwXpQSCJoAw2Tjp+TAgQJQzmM9+ozRiHiF2AJItvgPAx3imu40XuOgce/M9dAkid2EGz+x1l4zs2dxLcmvcqOtBwDfBM8//8Y6lEZzYCDIi6qqW4EDLFjpfUeCIJtrI/YlabdUs0PDSoQQqwZ/c9rgzsGSv0abxHApHqkFiqdXGR55BHQZegzqmGRs2WnysktUQIsgAIERrRsS/o3dvr3YoGR7fj7AXlcmWeAmOVbRNSGCdRbv2lsyotqEwEpQYWpZtHIhwTgHLdFyfoYyqixdeSyBn0amqCNx5plX6Ej64ZRnhlaPdSYKtzWSfat9UpOmPxlvPf5Y4aB44a1yUjRdiQDHmKZyApgKkNARF4m5IrhsuMQu+rJlEdMbbnEnAH76cOhKzZ3jPI6Czv0JN3v2SnUrlWj/pa/GkRspr1WTDw3Ss00WsDbcjaY8CGCBoT6UsiI94ESAf6bk5yv9Lbr8bSg9ghThU7oaMcdEb3329vJZJxWbc+RWeqf/aZ8GNRyvcOA3cIlhj8+KfGojkjkKcqVNEtZSwcUgMWchESPo+Ft7YvFcFYlfYj4S3WImdGT5KeZucTT2sD0JGTHvdzM0Vyewd+D2UnC1YZv8nLjavjjspK3cQSkC9Wr4RK8Yp00AAYaJ6haaxwAEXy75pY0anDFzIFCneUouY/i/a7knjbc7iHMcSWIQrSQ7I6KEdVhBsfvXqyjAYelwRa2ciRmK2uV7ke5U=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(40470700002)(6666004)(426003)(508600001)(83380400001)(316002)(8936002)(70206006)(7696005)(186003)(356005)(16526019)(5660300002)(26005)(336012)(40460700001)(8676002)(82310400004)(81166007)(6916009)(54906003)(2616005)(36756003)(1076003)(2906002)(36860700001)(70586007)(47076005)(4326008)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 09:28:30.6235
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74875b74-1c84-4788-832b-08d9cf649240
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT032.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB3956
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 09:46:35AM +0800, Yan Zhao wrote:
-> On Thu, Dec 23, 2021 at 08:30:09PM +0800, Chao Peng wrote:
-> > When a page fault from the secondary page table while the guest is
-> > running happens in a memslot with KVM_MEM_PRIVATE, we need go
-> > different paths for private access and shared access.
-> > 
-> >   - For private access, KVM checks if the page is already allocated in
-> >     the memory backend, if yes KVM establishes the mapping, otherwise
-> >     exits to userspace to convert a shared page to private one.
-> >
-> will this conversion be atomical or not?
-> For example, after punching a hole in a private memory slot, will KVM
-> see two notifications: one for invalidation of the whole private memory
-> slot, and one for fallocate of the rest ranges besides the hole?
-> Or, KVM only sees one invalidation notification for the hole?
+With TDP MMU being the default now, access to mmu_rmaps_stat debugfs
+file causes following oops:
 
-Punching hole doesn't need to invalidate the whole memory slot. It only
-send one invalidation notification to KVM for the 'hole' part.
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+PGD 0 P4D 0
+Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 7 PID: 3185 Comm: cat Not tainted 5.16.0-rc4+ #204
+RIP: 0010:pte_list_count+0x6/0x40
+ Call Trace:
+  <TASK>
+  ? kvm_mmu_rmaps_stat_show+0x15e/0x320
+  seq_read_iter+0x126/0x4b0
+  ? aa_file_perm+0x124/0x490
+  seq_read+0xf5/0x140
+  full_proxy_read+0x5c/0x80
+  vfs_read+0x9f/0x1a0
+  ksys_read+0x67/0xe0
+  __x64_sys_read+0x19/0x20
+  do_syscall_64+0x3b/0xc0
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
+ RIP: 0033:0x7fca6fc13912
 
-Taking shared-to-private conversion as example it only invalidates the
-'hole' part (that usually only the portion of the whole memory) on the
-shared fd,, and then fallocate the private memory in the private fd at
-the 'hole'. The KVM invalidation notification happens when the shared
-hole gets invalidated. The establishment of the private mapping happens
-at subsequent KVM page fault handlers.
+Create mmu_rmaps_stat debugfs file only when rmaps are created.
 
-> Could you please show QEMU code about this conversion?
+Reported-by: Vasant Hegde <vasant.hegde@amd.com>
+Tested-by: Vasant Hegde <vasant.hegde@amd.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+---
+ arch/x86/kvm/debugfs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-See below for the QEMU side conversion code. The above described
-invalidation and fallocation will be two steps in this conversion. If
-error happens in the middle then this error will be propagated to
-kvm_run to do the proper action (e.g. may kill the guest?).
+diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
+index 543a8c04025c..78bb09a3a7b7 100644
+--- a/arch/x86/kvm/debugfs.c
++++ b/arch/x86/kvm/debugfs.c
+@@ -180,7 +180,8 @@ static const struct file_operations mmu_rmaps_stat_fops = {
+ 
+ int kvm_arch_create_vm_debugfs(struct kvm *kvm)
+ {
+-	debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
+-			    &mmu_rmaps_stat_fops);
++	if (kvm_memslots_have_rmaps(kvm))
++		debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
++				    &mmu_rmaps_stat_fops);
+ 	return 0;
+ }
+-- 
+2.32.0
 
-int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
-                            bool shared_to_private)
-{
-    int ret; 
-    int fd_from, fd_to;
-
-    if (!rb || rb->private_fd <= 0) { 
-        return -1;
-    }    
-
-    if (!QEMU_PTR_IS_ALIGNED(start, rb->page_size) ||
-        !QEMU_PTR_IS_ALIGNED(length, rb->page_size)) {
-        return -1;
-    }    
-
-    if (length > rb->max_length) {
-        return -1;
-    }    
-
-    if (shared_to_private) {
-        fd_from = rb->fd;
-        fd_to = rb->private_fd;
-    } else {
-        fd_from = rb->private_fd;
-        fd_to = rb->fd;
-    }    
-
-    ret = ram_block_discard_range_fd(rb, start, length, fd_from);
-    if (ret) {
-        return ret; 
-    }    
-
-    if (fd_to > 0) { 
-        return fallocate(fd_to, 0, start, length);
-    }    
-
-    return 0;
-}
-
-> 
-> 
-> >   - For shared access, KVM also checks if the page is already allocated
-> >     in the memory backend, if yes then exit to userspace to convert a
-> >     private page to shared one, otherwise it's treated as a traditional
-> >     hva-based shared memory, KVM lets existing code to obtain a pfn with
-> >     get_user_pages() and establish the mapping.
-> > 
-> > The above code assume private memory is persistent and pre-allocated in
-> > the memory backend so KVM can use this information as an indicator for
-> > a page is private or shared. The above check is then performed by
-> > calling kvm_memfd_get_pfn() which currently is implemented as a
-> > pagecache search but in theory that can be implemented differently
-> > (i.e. when the page is even not mapped into host pagecache there should
-> > be some different implementation).
-> > 
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c         | 73 ++++++++++++++++++++++++++++++++--
-> >  arch/x86/kvm/mmu/paging_tmpl.h | 11 +++--
-> >  2 files changed, 77 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 2856eb662a21..fbcdf62f8281 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2920,6 +2920,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> >  	if (max_level == PG_LEVEL_4K)
-> >  		return PG_LEVEL_4K;
-> >  
-> > +	if (kvm_slot_is_private(slot))
-> > +		return max_level;
-> > +
-> >  	host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
-> >  	return min(host_level, max_level);
-> >  }
-> > @@ -3950,7 +3953,59 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> >  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
-> >  }
-> >  
-> > -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
-> > +static bool kvm_vcpu_is_private_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> > +{
-> > +	/*
-> > +	 * At this time private gfn has not been supported yet. Other patch
-> > +	 * that enables it should change this.
-> > +	 */
-> > +	return false;
-> > +}
-> > +
-> > +static bool kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > +				    struct kvm_page_fault *fault,
-> > +				    bool *is_private_pfn, int *r)
-> > +{
-> > +	int order;
-> > +	int mem_convert_type;
-> > +	struct kvm_memory_slot *slot = fault->slot;
-> > +	long pfn = kvm_memfd_get_pfn(slot, fault->gfn, &order);
-> For private memory slots, it's possible to have pfns backed by
-> backends other than memfd, e.g. devicefd.
-
-Surely yes, although this patch only supports memfd, but it's designed
-to be extensible to support other memory backing stores than memfd. There
-is one assumption in this design however: one private memslot can be
-backed by only one type of such memory backing store, e.g. if the
-devicefd you mentioned can independently provide memory for a memslot
-then that's no issue.
-
->So is it possible to let those
-> private memslots keep private and use traditional hva-based way?
-
-Typically this fd-based private memory uses the 'offset' as the
-userspace address to get a pfn from the backing store fd. But I believe
-the current code does not prevent you from using the hva as the
-userspace address, as long as your memory backing store understand that
-address and can provide the pfn basing on it. But since you already have
-the hva, you probably already mmap-ed the fd to userspace, that seems
-not this private memory patch can protect you. Probably I didn't quite
-understand 'keep private' you mentioned here.
-
-Thanks,
-Chao
-> Reasons below:
-> 1. only memfd is supported in this patch set.
-> 2. qemu/host read/write to those private memslots backing up by devicefd may
-> not cause machine check.
-> 
-> Thanks
-> Yan
-> 
