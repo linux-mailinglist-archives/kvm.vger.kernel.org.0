@@ -2,97 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE0B8484965
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 21:43:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDBDD484967
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 21:45:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233112AbiADUn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 15:43:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30706 "EHLO
+        id S233252AbiADUpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 15:45:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:51956 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231175AbiADUn1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 15:43:27 -0500
+        by vger.kernel.org with ESMTP id S233112AbiADUpq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 15:45:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641329007;
+        s=mimecast20190719; t=1641329146;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sKCDKH8iAKV6R6bBKlfE9TSgq0EJgiwjwNLLPp/zRW0=;
-        b=B8Z1+zRQmGDsNi+ticuVltSi9r5Jw4vGw8V8hNwJBDGnbjhsQhWfZx1CqLQWuTGQ2YFqdo
-        gYhSmXH05QsC886gLc3GmthBuyri1/HlfIn84VBUGUfZ/heSwPkyHryBiL3mGxD8VMW4pv
-        4o8KDnSuXwmwTJa5fhztuAhwtx4/b9I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=PYrqbdtdF3TH5qv2dr8q46HQl1ZSosdbS+NCJ8IVZW0=;
+        b=Ivy6TqZ47rTjGWnte//yzL1FAzabVlyvWV9Y3A8DPI2GahU6KdTLGvSFWbW92q35xXymnI
+        EkX42PJehq2Iq0mNnuW3xasuYJOi9ZbnIpxM4E6dCxJWbJQ4MDLjI6kiwTLXggif3cCkro
+        ZYeH0BKd4U7oxb9WgsXk+Hb703halUg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-653-S7KjGhA3P2uduiHag6ZWnw-1; Tue, 04 Jan 2022 15:43:24 -0500
-X-MC-Unique: S7KjGhA3P2uduiHag6ZWnw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78B0310247AC;
-        Tue,  4 Jan 2022 20:43:21 +0000 (UTC)
-Received: from starship (unknown [10.40.192.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 74B8345D97;
-        Tue,  4 Jan 2022 20:43:15 +0000 (UTC)
-Message-ID: <a4fbf2ec33e7bbf81ea8c4750a5064ab67b94428.camel@redhat.com>
-Subject: Re: [RFC PATCH 2/6] KVM: X86: Walk shadow page starting with
- shadow_root_level
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Date:   Tue, 04 Jan 2022 22:43:14 +0200
-In-Reply-To: <c16e310f-8ae5-9c29-04c7-7355834ce803@redhat.com>
-References: <20211210092508.7185-1-jiangshanlai@gmail.com>
-         <20211210092508.7185-3-jiangshanlai@gmail.com>
-         <YdSvbsb5wt/WURtw@google.com>
-         <c16e310f-8ae5-9c29-04c7-7355834ce803@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-277-1EuAt6cXPZ-T2vMSbx_WFA-1; Tue, 04 Jan 2022 15:45:45 -0500
+X-MC-Unique: 1EuAt6cXPZ-T2vMSbx_WFA-1
+Received: by mail-ed1-f69.google.com with SMTP id b8-20020a056402350800b003f8f42a883dso18993954edd.16
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 12:45:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=PYrqbdtdF3TH5qv2dr8q46HQl1ZSosdbS+NCJ8IVZW0=;
+        b=DUHd5yR/lOX2VDZRsmwUX4F4AWFOVRhg41t94pvrUdBjvgnW6i8LU2vVyWccAFRwe0
+         hCu14uJYWQsl7ruHouMaW9u2C/tM8sq69PB90D3wWpWLQuSN9RidUK+Iu/FHB1uRptg+
+         Sq+iJpf/jowGzKmFNKGaVWmHMiBwRTCDvX9Zd932Uh1H1oSCHGHwXaUFntP90I/Xhopa
+         8OcVmcmljxreW01AVGrFpxZFTz/ir7qSyXK4QyzsIJGmJXiMKtCaGh3qVB4v9ZjQnQa+
+         Njn3IOFFGq1JpPZDVA6sIWNx7gzkMAURC3n7ffdwe0DM0hde9K0VjRJ1eOZ/PlqNKJYj
+         xK7A==
+X-Gm-Message-State: AOAM530WAlHZudSfdIOFHy/3C5pb39vOzXfg7vXAmY4P/keTqeSR8+f3
+        +I1BdJvohq4JbFkvzvXRBsiCktVrsI1GP8EUHcaz/jbdW6palHmEuuNBNEoQ5g/rm089DBYdPpM
+        pXZh/f8tRZ4j9
+X-Received: by 2002:a17:906:9746:: with SMTP id o6mr3103300ejy.112.1641329143963;
+        Tue, 04 Jan 2022 12:45:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwMBe92plviw0jlSVwnEa2kU3pf6epuXjoKR1YY7Y5SakD1MSKrYxN09nCveIinmPB1gzQR0w==
+X-Received: by 2002:a17:906:9746:: with SMTP id o6mr3103286ejy.112.1641329143795;
+        Tue, 04 Jan 2022 12:45:43 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id f5sm15075159edu.38.2022.01.04.12.45.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jan 2022 12:45:43 -0800 (PST)
+Message-ID: <c41a0458-1bfa-9dc6-71ce-f0433cd400e7@redhat.com>
+Date:   Tue, 4 Jan 2022 21:45:41 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v4 18/21] kvm: x86: Add support for getting/setting
+ expanded xstate buffer
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Yang Zhong <yang.zhong@intel.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, corbet@lwn.net, shuah@kernel.org,
+        jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, jing2.liu@intel.com,
+        guang.zeng@intel.com, wei.w.wang@intel.com
+References: <20211229131328.12283-1-yang.zhong@intel.com>
+ <20211229131328.12283-19-yang.zhong@intel.com> <YdSkDAruycpXhNUT@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YdSkDAruycpXhNUT@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-01-04 at 21:37 +0100, Paolo Bonzini wrote:
-> On 1/4/22 21:34, Sean Christopherson wrote:
-> > On Fri, Dec 10, 2021, Lai Jiangshan wrote:
-> > > From: Lai Jiangshan<laijs@linux.alibaba.com>
-> > > 
-> > > Walking from the root page of the shadow page table should start with
-> > > the level of the shadow page table: shadow_root_level.
-> > > 
-> > > Also change a small defect in audit_mappings(), it is believed
-> > > that the current walking level is more valuable to print.
-> > > 
-> > > Signed-off-by: Lai Jiangshan<laijs@linux.alibaba.com>
-> > > ---
-> > >   arch/x86/kvm/mmu/mmu_audit.c | 5 ++---
-> > 
-> > I vote we remove mmu_audit.c.  It has bitrotted horribly, and none of the
-> > current set of KVM developers even knows how to use it effectively.
+On 1/4/22 20:46, Sean Christopherson wrote:
+> On Wed, Dec 29, 2021, Yang Zhong wrote:
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index bdf89c28d2ce..76e1941db223 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4296,6 +4296,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>   		else
+>>   			r = 0;
+>>   		break;
+>> +	case KVM_CAP_XSAVE2:
+>> +		r = kvm->vcpus[0]->arch.guest_fpu.uabi_size;
 > 
-> No complaints.
-
-I played with it once, its not that bad IMHO.
-
-Best regards,
-	Maxim Levitsky
-
+> a) This does not compile against kvm/queue.
 > 
-> Paolo
+>     arch/x86/kvm/x86.c: In function ‘kvm_vm_ioctl_check_extension’:
+>     arch/x86/kvm/x86.c:4317:24: error: ‘struct kvm’ has no member named ‘vcpus’
+>      4317 |                 r = kvm->vcpus[0]->arch.guest_fpu.uabi_size;
 > 
+> b) vcpu0 is not guaranteed to be non-NULL at this point.
 
+Yang, you can post an incremental patch for this.  You can use the 
+highest bit of the guest-permitted xcr0 (i.e. the OR of KVM's supported 
+XCR0 an the guest-permitted dynamic features) and pass it to cpuid(0xD).
+
+Paolo
 
