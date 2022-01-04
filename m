@@ -2,109 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EF634845EF
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 17:22:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE7C14845FA
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 17:33:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235275AbiADQW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 11:22:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59940 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230389AbiADQW4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 11:22:56 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 204FMt1K001843;
-        Tue, 4 Jan 2022 16:22:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : reply-to : subject : to : cc : references : from :
- in-reply-to : content-type : content-transfer-encoding; s=pp1;
- bh=Ql8RA90aOTIqFTbRlZizKwaJjGs9gw0ddh+sGz09gEM=;
- b=jNqjHYUz74Zgio1A09PcACQwMkk5Cf6CNDbusML+yvLM9/feok0glGQ3CVkk3zrx32Qh
- nkkT3RPzW67mh3ICxOPa8rv5MyZGGqLRPKSYJ0+deW5d2nUquRPXokiUUGKAcLZjMVU8
- sdqE0x+FG8MUfIWY6MvWp6fIU+wdY/zdsLF64htP2WszoAborrZ0qdQXcPv7AqFOkBA8
- 0vNIL83yB5wuY0nrooC9Mn1rI6Jj46jBD2sR6NiIePb8Sta5efsjxtHlhWuGE4eKKfMn
- RcNpNfXJocdiFIFKeywGT/fu2jT2pQtsaic6+eTBFniof1ViKMJ6VJ1+xVB9d0OakRAk sA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dcpk9c2c1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Jan 2022 16:22:53 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 204Fbbln011883;
-        Tue, 4 Jan 2022 16:22:53 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dcpk9c2bs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Jan 2022 16:22:53 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 204GMpRk025469;
-        Tue, 4 Jan 2022 16:22:52 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma01wdc.us.ibm.com with ESMTP id 3daekae918-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Jan 2022 16:22:52 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 204GMpV519595684
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Jan 2022 16:22:51 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9274DB2065;
-        Tue,  4 Jan 2022 16:22:51 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AB06BB2068;
-        Tue,  4 Jan 2022 16:22:50 +0000 (GMT)
-Received: from [9.160.188.198] (unknown [9.160.188.198])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Jan 2022 16:22:50 +0000 (GMT)
-Message-ID: <47dc7326-b802-6023-6144-7bf4309756b4@linux.ibm.com>
-Date:   Tue, 4 Jan 2022 11:22:50 -0500
+        id S235306AbiADQdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 11:33:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46258 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229984AbiADQdC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 11:33:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641313981;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tzZrHzekcrvRX006y/Gm8rTUUV9sSFe7cbZaHfBSLqg=;
+        b=hVyVuwtUhR4QNtEueLFk+b8In4kdphwrqaTSDGsQNel79qDrspx6yc5gNKMhg++6Yre345
+        VT13L6wKKvIADweMBzE+KN2CsVLetgrcfY/UTzPvYXo1OoRF4G7ijleQ6RHZfwApU/e0Dg
+        5vxoa/qWSFXxzBv31ahdqsp2nSgkQzE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-214-pine5CoJON2i0yoYhBdGug-1; Tue, 04 Jan 2022 11:33:00 -0500
+X-MC-Unique: pine5CoJON2i0yoYhBdGug-1
+Received: by mail-wr1-f71.google.com with SMTP id j19-20020adfa553000000b001a375e473d8so3422133wrb.4
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 08:33:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=tzZrHzekcrvRX006y/Gm8rTUUV9sSFe7cbZaHfBSLqg=;
+        b=iGX9crvX+eSVRdXZyDTohws4YHZNuv9t/oK8zO4L4Ma+IuruqR9uQxzV+Tlau07sSU
+         xBYVl5ajlBNYT0Wn9zBywBZiiqwXUTLA3MBxfGfGHnGLp/tTG8Zgl5kEmxjMsaEV0R65
+         yZ9vSztL0gM4ILVVu+/nFo0ZvJkmxiSxvVshZB5dQhS9Qkwdyw49fo5ZmFQ0asRiTvxN
+         ohnC9xdlNIbqjWYV433B2i8xeHF/YMHeq+m4Yh6lPygf5oPhIQlf6Nt7/VoXhr1uySYO
+         cXUU743W4Py0wTMeB38eXMmANNDoVGyGJ3bQOgQNX9MsUz5hF8rhAfShXrWQNPnUgNL8
+         Vi1w==
+X-Gm-Message-State: AOAM531LXnQYyTrdueaRHaGaacrzvFK6pK3pDrE3xT7QtKcXstL4DKet
+        B94qywCp8PxBgCLv/Z3p78rgYhYSZbm33zhZAoRMbqHfuOIq74dqPpSbWl97nMROd7FnNVYDP1e
+        FWGYuapv6vEDzXP4pQ29Edt56jw6oP/MsmHUq++51y9aP4DrXRt4HT/6paoyakWiL
+X-Received: by 2002:adf:d0cb:: with SMTP id z11mr43499826wrh.470.1641313979126;
+        Tue, 04 Jan 2022 08:32:59 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJydR36rOEJz/kKdK6YEmU1gonpIfUL0n4Y/d/fq7dJDFrjtLzcP+ca6deofwJ0vw6WX7z6lWA==
+X-Received: by 2002:adf:d0cb:: with SMTP id z11mr43499811wrh.470.1641313978883;
+        Tue, 04 Jan 2022 08:32:58 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n1sm41002268wri.46.2022.01.04.08.32.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jan 2022 08:32:58 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     "Kaya, Metin" <metikaya@amazon.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86/hyperv: Use correct macro in
+ checking SynIC timer support
+In-Reply-To: <1641300662336.87966@amazon.com>
+References: <1641300662336.87966@amazon.com>
+Date:   Tue, 04 Jan 2022 17:32:57 +0100
+Message-ID: <87wnjfpikm.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH v17 01/15] s390/vfio-ap: Set pqap hook when vfio_ap module
- is loaded
-Content-Language: en-US
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
- <20211021152332.70455-2-akrowiak@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20211021152332.70455-2-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _ru8ZU_yxg5p2cCjNyADkuM8aPpUJfXD
-X-Proofpoint-ORIG-GUID: zuut13pR7E_ACVYIS7lYugj4En_nkP1F
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-04_07,2022-01-04_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
- spamscore=0 impostorscore=0 adultscore=0 mlxscore=0 clxscore=1011
- malwarescore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201040108
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/21/21 11:23, Tony Krowiak wrote:
+"Kaya, Metin" <metikaya@amazon.com> writes:
 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index a604d51acfc8..05569d077d7f 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -799,16 +799,17 @@ struct kvm_s390_cpu_model {
->   	unsigned short ibc;
->   };
->   
-> -typedef int (*crypto_hook)(struct kvm_vcpu *vcpu);
-> +struct kvm_s390_crypto_hook {
-> +	int (*fcn)(struct kvm_vcpu *vcpu);
-> +};
+> This commit fixes 69d4bf751641520f5b2d8e3f160c63c8966fcd8b. stimer_suppor=
+ted() should use HV_X64_MSR_SYNTIMER_AVAILABLE instead of HV_X64_MSR_SYNIC_=
+AVAILABLE.=E2=80=8B
+> From 3e31f7d2b7bfc92ff710e3061b32301f96862b8b Mon Sep 17 00:00:00 2001
+> From: Metin Kaya <metikaya@amazon.com>
+> Date: Wed, 22 Dec 2021 18:22:28 +0000
+> Subject: [kvm-unit-tests PATCH 1/2] x86/hyperv: Use correct macro in chec=
+king
+>  SynIC timer support
+>
+> This commit fixes 69d4bf751641520f5b2d8e3f160c63c8966fcd8b.
+> stimer_supported() should use HV_X64_MSR_SYNTIMER_AVAILABLE instead of
+> HV_X64_MSR_SYNIC_AVAILABLE.
+>
 
-Why are we storing a single function pointer inside a struct? Seems simpler to just use a 
-function pointer. What was the problem with the typedef that you are replacing?
+Fixes: 69d4bf7 ("x86: Hyper-V SynIC timers test")
+> Signed-off-by: Metin Kaya <metikaya@amazon.com>
+> ---
+>  x86/hyperv.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/hyperv.h b/x86/hyperv.h
+> index e135221..f2bb7b4 100644
+> --- a/x86/hyperv.h
+> +++ b/x86/hyperv.h
+> @@ -190,7 +190,7 @@ static inline bool synic_supported(void)
+>=20=20
+>  static inline bool stimer_supported(void)
+>  {
+> -    return cpuid(HYPERV_CPUID_FEATURES).a & HV_X64_MSR_SYNIC_AVAILABLE;
+> +    return cpuid(HYPERV_CPUID_FEATURES).a & HV_X64_MSR_SYNTIMER_AVAILABL=
+E;
+>  }
+
+Unrelated to the change but I'd suggest renaming stimer_supported() to
+hv_stimer_supported() and synic_supported() to hv_synic_supported().
+
+>=20=20
+>  static inline bool hv_time_ref_counter_supported(void)
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+--=20
+Vitaly
+
