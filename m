@@ -2,131 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6380484AB7
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:32:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83F00484AC1
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:32:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235524AbiADWb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 17:31:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53146 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234909AbiADWb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 17:31:58 -0500
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F57C061799
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 14:31:57 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id g26so84846961lfv.11
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 14:31:57 -0800 (PST)
+        id S235549AbiADWce (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 17:32:34 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:21470 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235500AbiADWcd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 17:32:33 -0500
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 204JSuYc013829;
+        Tue, 4 Jan 2022 22:31:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=yOAK0R0htQwv6WcGg0ar/DzDTpvBft/u3SzkotG9foE=;
+ b=rm3+Q/fO4cYE6vFb/1OD8oYZxV0y5pmfhxHdgK9F9DLP2ibWResM4hnsx+cXLODF7XhZ
+ ttdNUV86cudriGq0J52ufRCBexaZaYkFae6pRwRWNEvFz9oCCfhLft6gcJFNQ5jC3tkt
+ Fabdwe9lPBS4yxS5HUgrjdopy6y+baXsbj1Mp7MjSjBm7i1Nyb7ig2sDXNBBwWjEtJuq
+ /vebvBioSyqNurekReX2Ynzr8ebIfbsuCpoWB6++vDUwFtNqpxa0m9RS5jBQkZ5gKA6c
+ HAHquNIwwB0D9YCtmUrz65/TjLBbxhq80u9X0kmQtTm6P1x6a64nzdwaB3xwGpMFp0hA WQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3dc3st3gda-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 04 Jan 2022 22:31:56 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 204MVdBc059947;
+        Tue, 4 Jan 2022 22:31:55 GMT
+Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam08lp2049.outbound.protection.outlook.com [104.47.74.49])
+        by aserp3020.oracle.com with ESMTP id 3daes4aw5e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 04 Jan 2022 22:31:55 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NpcHF2YVDQ+AcXx77T0FM8/lkxcx7UCeNMtGXlscF0XYwrvJFNA7EXEhh2rzDSFPsaR4VJrqRtSu5MlA1jyCRsTrnQNHEQL+f0eWsMHua7O7G3K1yeUPJdxw38q48PdJWtA4rJgwjCQce/QBJGR91sdNHMHaTxozni906Q89r1kuSeknsAhy8dNNBbG7j0B/fSnxFsQtLS4TFUy1z7IBz4SsfdVYcO7nFy2A1wNw7Lt0uBVfgPbk8TPjbIpXjuLiwXLXyqhYYD8S5wHDpL72JyRBG0QQ2IHZUOFwqd8TqDJd+GGZ5NyJEA/5xQu0c48QFD+9vlm1eZGoc0l8GryYWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yOAK0R0htQwv6WcGg0ar/DzDTpvBft/u3SzkotG9foE=;
+ b=eTHW0Qj9KpfM/6xh/OU/EyYA1zPfnOE4qFKPULB/YtMUnzlCpwnfwzrE/6mSBwhkzg+x/yBcTSv912/tUpEdRFJ7Zduxci2WlxXDpX0TC1USgcX3ugM2yFajADwmQ7CHs8jIWNP6HGDkxVdCneqZjQPzTL1CVYryCa01h1oVOiO2wuTFtxwvr4FGotEJYR9sxwE/hUuXX5JpLf7rLafDmUwcVCRcpg1iFupbZr7GFyvedyz1mtOlVsfq3XkgOVA4kUphmGtAHiv1vBM45mLG06G+8+unbIafT4LfpXs1LP6OmSwEWLNUIfVJDgo3C/VjomjMsX60MS04JLh5ZgF8YQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=drummond.us; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WCROm2fnDVp3gJHoFF4FSh0CLwqqTwPGgd5WC3cykAE=;
-        b=SpNAIy18+a+BDF8ohbOhhPTgn+rzzWGPHdpXue1Z95/qQvcACFPfls+EhsBOb9bJ5I
-         J4obAOpt6rzp6Cc6ysV/HzbOKr1fr3e+TeLO6bRMnYdo3Gyh9nb1rzv1ICxH2cvlIvP1
-         O7zLwOaJVfjhHVFevNE78XtRHOJLnOt4OvZNOrtO4+Qth9yQuKO3Y0zMqJxHhe1sPN68
-         AsVbfWMCG2xnfSZ0gRMgCWFuQi9faGM0w08EmIWjCfBZLojXQfuuYl5i08TleIW/7b/n
-         nzMZzBq9PSmCXV2xi+HfGLAjucKoCMHpfD9Bcb6PeCRSN1t/e4GZt0e33JDtOpwXUI3r
-         +ijA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WCROm2fnDVp3gJHoFF4FSh0CLwqqTwPGgd5WC3cykAE=;
-        b=QZyVZTQz3ZGD6EGCE5nOMBvBP2QQiWBLxG5Pakh8dDzH+/057ykh1rfpzhch3WWvgM
-         F9My5VK3NRL4ujUgp8EJwmgtuV8LVCNgnAxNE4cJUsm34oTJBSHzgVb4LjL44WR47ore
-         p/i9iI7cGnbh88eIPvgQdjN8tFpBejPo+S0FrFBL2D7xNmk05cIDQASkOF9caMn8aXZr
-         EkWqLJ/hD+WjK2dHJMn7sRzfFjWaGhFn287iwTb+3TnTSj2Q7AsFaA9Y/apMD0KX7h+o
-         FnDqFenK7e3Nb7eYcr/0qunwOmGAn0fPsCfGGoGwVJCMcriR+WX8NSjg4kvWTeSDJLMm
-         N2Xg==
-X-Gm-Message-State: AOAM531Yx7MhVZdF361Ulr+2kWZzgybUbzvZMQ7AygeAXIAK09rDNCNL
-        XXYy6GmwKp+PEAEVatA4gVC/9IZEpEh+yC/2hVnPfQ==
-X-Google-Smtp-Source: ABdhPJx1kX6sFLTseOkg2YWGeBhi1W6ClRmDNwQ/+U2YIr6vghHpml3Y6bKghVPjgaFOMW5MDitHq9bLobHNxLYmId8=
-X-Received: by 2002:a05:6512:ba9:: with SMTP id b41mr43938123lfv.529.1641335515666;
- Tue, 04 Jan 2022 14:31:55 -0800 (PST)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yOAK0R0htQwv6WcGg0ar/DzDTpvBft/u3SzkotG9foE=;
+ b=WaPrE+LM4mec/H8XSQIgdu4NtjEP83HGTOUTwmRKJic1veFuEYopuslzb2OOU2KjtS7zEImH+aTforLK5uK/dAlCvImSfpZlfLfIWld5rVkWpN7ORb05z3bgsA5FVem4p1OHl9FXeehYAdeJzTd2X/OJ0xXfRbbnIt+L+kwayxY=
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
+ by SN6PR10MB2573.namprd10.prod.outlook.com (2603:10b6:805:48::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.15; Tue, 4 Jan
+ 2022 22:31:52 +0000
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4844.016; Tue, 4 Jan 2022
+ 22:31:52 +0000
+Date:   Tue, 4 Jan 2022 16:31:46 -0600
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 15/40] x86/mm: Add support to validate memory when
+ changing C-bit
+Message-ID: <YdTK0h2ZKu4UxrhQ@dt>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-16-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211210154332.11526-16-brijesh.singh@amd.com>
+X-ClientProxiedBy: SJ0PR05CA0200.namprd05.prod.outlook.com
+ (2603:10b6:a03:330::25) To SN6PR10MB2576.namprd10.prod.outlook.com
+ (2603:10b6:805:44::15)
 MIME-Version: 1.0
-References: <20220103181956.983342-1-walt@drummond.us> <87iluzidod.fsf@email.froward.int.ebiederm.org>
- <YdSzjPbVDVGKT4km@mit.edu> <87pmp79mxl.fsf@email.froward.int.ebiederm.org> <YdTI16ZxFFNco7rH@mit.edu>
-In-Reply-To: <YdTI16ZxFFNco7rH@mit.edu>
-From:   Walt Drummond <walt@drummond.us>
-Date:   Tue, 4 Jan 2022 14:31:44 -0800
-Message-ID: <CADCN6nzT-Dw-AabtwWrfVRDd5HzMS3EOy8WkeomicJF07nQyoA@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/8] signals: Support more than 64 signals
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     "Eric W. Biederman" <ebiederm@xmission.com>, aacraid@microsemi.com,
-        viro@zeniv.linux.org.uk, anna.schumaker@netapp.com, arnd@arndb.de,
-        bsegall@google.com, bp@alien8.de, chuck.lever@oracle.com,
-        bristot@redhat.com, dave.hansen@linux.intel.com,
-        dwmw2@infradead.org, dietmar.eggemann@arm.com, dinguyen@kernel.org,
-        geert@linux-m68k.org, gregkh@linuxfoundation.org, hpa@zytor.com,
-        idryomov@gmail.com, mingo@redhat.com, yzaikin@google.com,
-        ink@jurassic.park.msu.ru, jejb@linux.ibm.com, jmorris@namei.org,
-        bfields@fieldses.org, jlayton@kernel.org, jirislaby@kernel.org,
-        john.johansen@canonical.com, juri.lelli@redhat.com,
-        keescook@chromium.org, mcgrof@kernel.org,
-        martin.petersen@oracle.com, mattst88@gmail.com, mgorman@suse.de,
-        oleg@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
-        rth@twiddle.net, richard@nod.at, serge@hallyn.com,
-        rostedt@goodmis.org, tglx@linutronix.de,
-        trond.myklebust@hammerspace.com, vincent.guittot@linaro.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-m68k@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 88f8f182-298d-4f58-2f5f-08d9cfd2017b
+X-MS-TrafficTypeDiagnostic: SN6PR10MB2573:EE_
+X-Microsoft-Antispam-PRVS: <SN6PR10MB2573591A27E7A30107A81CC1E64A9@SN6PR10MB2573.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RPKpCRUlKoojC/LKoODUhQ9pKZC/HSrg6pkMuCGx1jZr/NVFCvAsGoSNpzwrJ6hj4XrkIgmIeQgHrwE3V1tHi5pfB3XgXgj/8mwkoEuhgZyk+X3mlaYMReQrvtYslKkBZYN2OkVEwzGAOC2QHGkLWbshU2ZlcHlOFFEx1YyGv11myxW7vXHK9M1E8aNZSUkoQuYoaTQq2JD+TCyeoPeI/9f/qpj4dfvR9c98o8wXAFA3ZWpPdpabEQ0rrVdNkCSjMKYOJMOMBRk6K5rua39lnKaU9sllGKjXtZtXPcdw3OyYIRVx3NB/u8a2svEQ4RzKJGPE9nJAKc1fTIvUAF5L9PnPeDLpLucI0pGnEMEn09OfGl/7HzsRXunoBCgpjlF0jNOoU4JGXDUHyTVtfARCkYmQhnTn8CwC/MXBDAMjH8BwFtNBEb/lMK7kGToqxG+c7bBZhsoX/a7tbf2c43TyWQZ57KOBthLAlgQ7Lpo+wQB9vrlzXAEGPSa0Mm/ftskhZ+9dLShHE18RZ/KVqCmEh54/VxI/kNiBFs4toz5f4CCz8ZuHHhjbFNOr+Jz1yG4ZHjx1N8QA/0Lz1iGOsFLPUknPLsO3dhpIWqYw3nwLwwEO0Y5QTYXuGvqiMYnwY8IpmB4nlzhPMoZa6lzkQ1WOGg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(26005)(86362001)(2906002)(186003)(66556008)(7406005)(7416002)(4326008)(38100700002)(6506007)(5660300002)(8936002)(6916009)(54906003)(9686003)(6666004)(4001150100001)(53546011)(44832011)(6486002)(15650500001)(6512007)(316002)(33716001)(83380400001)(66476007)(508600001)(8676002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4pp+4LQRYVjkRutYkaIE1QypYxFgPTFy+SSdf2nKQX3zznfv6ugJso8onnM8?=
+ =?us-ascii?Q?nZn5MH63X7RZ3rM02TgNdAdo2gVdyZqOOovLMkBG26ab/X2UY9aYI85x4rIE?=
+ =?us-ascii?Q?cYU7Ncxj4UuGRGyRkrgm2hABWMnDzccNSJwy5tDoe11HPP+zf5T19LGc5+ta?=
+ =?us-ascii?Q?V9B9QkEi8mkL5xthRr7Q7wRwZDYPqUIvEmEtM1sOi+L/dUlIkYTJG4k/B+J6?=
+ =?us-ascii?Q?CuKu78CywnDpTFxF5YpvxFoonGzeAz3TxYiTtLqoJ9TJoqaALoI3tc02H79k?=
+ =?us-ascii?Q?qBZzzH0Ggzg0tbQYDKXOw2GurSDW5zZIc2ybCw9lMn3v4eAwMZZaWTJavVDH?=
+ =?us-ascii?Q?GHybFehlKR7Q9NXaQoWBgZ+0RAWkSNCIFlAmqMk/siTTScGaJQ3fEuPG49tp?=
+ =?us-ascii?Q?jDYt3xBp6Au527HGGTEdstt9rUB2aG8Qh5l5plGQ335Qr1RkslDsw7JAxHjy?=
+ =?us-ascii?Q?sMyZ0IzxtlJQy39RbLcFUl2s6WZ9xOSIC86LMrvgW8ro9d0qunU6EgNmUa6/?=
+ =?us-ascii?Q?qeiFVW2R4KBTeDBS9KndXsTg6urCDJ6OqmB3XEvUBJ4qmRd+XSEVkcHyIX25?=
+ =?us-ascii?Q?Y6DyTEc6GbI0y9IY0G6vl9RxT/h00Utbt7CAYq/SbzqMgDHge7DwHXTe+qdI?=
+ =?us-ascii?Q?6GEMX8c0HzzjOuvJXGUIqz2EeUjBJlQ4HfOM97Tt1bjKLwu7Uia4Mr0k6To3?=
+ =?us-ascii?Q?LY0I23nTNp4YoNF3o9vI3UuyhlzN1HY62rnjLCJwHIeDK1sHg2rmBeeS+UpV?=
+ =?us-ascii?Q?E4Shacr1rcgIb5up6zgx6GVAKrkjO2GsFKbeT0sVfkmw6sHpoP0adqBsHvIK?=
+ =?us-ascii?Q?0XHpjyUKlShqKEs8KFCsz+xwpZDdP9FNHJvROyEns0ug6/J3VeWY2WKXGb+S?=
+ =?us-ascii?Q?VDPg3daeuJUO9lBIxCdZ672OxaIpMdmTNe/8PckKFO/Ln+naGEBg2V8QddQK?=
+ =?us-ascii?Q?cvq1OfZycXHBrR/Mis8yIk6HPnKmZzY803pKo3fNBRg/3qr1nr5wA9UcP9qV?=
+ =?us-ascii?Q?DXs6XOBaNYYlUQf93Jzwl2r81pXRvHHbuwJ3Rob/Bcx7nu5NXxuty4VCkTE3?=
+ =?us-ascii?Q?och02UXyInFXEK91eJLWBd3p/tnHbDVzcBqGnmP81gkx19WJSTFebW/eucsP?=
+ =?us-ascii?Q?T3z/j9wqWXkJEjZMSXmkG5fbLznoCYTuOPuBerrYnAompmWtI4Ptud6eMIPh?=
+ =?us-ascii?Q?hcxBCbi6caFCmFTWHZJTTGFgtg3Nft40KbzLNAOOJWYH4mojT6MWKlPuuC0b?=
+ =?us-ascii?Q?kleRmArOd5LZV+lapJk8gPcncfhDViTpLSInbX7yYYmg/6hOdPPY+dIUMtJL?=
+ =?us-ascii?Q?JhKkHTuYoFXSwIv2p1JaqMcbU7FPd9BtvSEpnU75Qv30cjyITGVcTALp4j3c?=
+ =?us-ascii?Q?9zvs8K4eSjJsWa6+4ezySBNCQ9IzpBorrqVMCRjBFmu4NDg7Gqhs5ZzmlJit?=
+ =?us-ascii?Q?JCTv2A6FKXVqKUu9ekKzNuO3Ii6UmnscmrDtcCzb46VZLTMmGwEQnDu5cSIz?=
+ =?us-ascii?Q?mENPrjsqREwIrVl7ogEg0wyy872z5dGtzpPbgTOoxFj2CNjdVb1LqDCGv6UB?=
+ =?us-ascii?Q?YZL7C4bvqX5axUd9AH0H5/BuAItwVwEVXy0Buq5BQmNfgPozdOcQkok8pMVC?=
+ =?us-ascii?Q?XMVj8btEohCxPDAaUlbzQF1eqiqNF6x8aSvukwSKrtEOnHIxlJDzknZBGlN+?=
+ =?us-ascii?Q?EwVmUg=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88f8f182-298d-4f58-2f5f-08d9cfd2017b
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 22:31:52.7156
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QD9dOxYEUcGHpPi+FcpE0MI2nRGc8Gji2OBxabDWm4fYR5VtDKVsXZBUPVG64Re8Lnqwdn9I6ugD28W3u5g4ELmpIxdw9BnO+u3DxUyK2TI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2573
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10217 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
+ spamscore=0 adultscore=0 phishscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201040143
+X-Proofpoint-GUID: 9KfRaklx_0qArIExAAxuL1ymaxdhtVTP
+X-Proofpoint-ORIG-GUID: 9KfRaklx_0qArIExAAxuL1ymaxdhtVTP
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The only standard tools that support SIGINFO are sleep, dd and ping,
-(and kill, for obvious reasons) so it's not like there's a vast hole
-in the tooling or something, nor is there a large legacy software base
-just waiting for SIGINFO to appear.   So while I very much enjoyed
-figuring out how to make SIGINFO work ...
+On 2021-12-10 09:43:07 -0600, Brijesh Singh wrote:
+> The set_memory_{encrypt,decrypt}() are used for changing the pages
 
-I'll have the VSTATUS patch out in a little bit.
+s/set_memory_{encrypt,decrypt}/snp_set_memory_{shared,private}/
 
-I also think there might be some merit in consolidating the 10
-'sigsetsize != sizeof(sigset_t)' checks in a macro and adding comments
-that wave people off on trying to do what I did.  If that would be
-useful, happy to provide the patch.
+> from decrypted (shared) to encrypted (private) and vice versa.
+> When SEV-SNP is active, the page state transition needs to go through
+> additional steps.
+> 
+> If the page is transitioned from shared to private, then perform the
+> following after the encryption attribute is set in the page table:
+> 
+> 1. Issue the page state change VMGEXIT to add the memory region in
+>    the RMP table.
+> 2. Validate the memory region after the RMP entry is added.
+> 
+> To maintain the security guarantees, if the page is transitioned from
+> private to shared, then perform the following before encryption attribute
+> is removed from the page table:
+> 
+> 1. Invalidate the page.
+> 2. Issue the page state change VMGEXIT to remove the page from RMP table.
+> 
+> To change the page state in the RMP table, use the Page State Change
+> VMGEXIT defined in the GHCB specification.
+> 
+> The GHCB specification provides the flexibility to use either 4K or 2MB
+> page size in during the page state change (PSC) request. For now use the
+> 4K page size for all the PSC until page size tracking is supported in the
+> kernel.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-On Tue, Jan 4, 2022 at 2:23 PM Theodore Ts'o <tytso@mit.edu> wrote:
->
-> On Tue, Jan 04, 2022 at 04:05:26PM -0600, Eric W. Biederman wrote:
-> >
-> > That is all as expected, and does not demonstrate a regression would
-> > happen if SIGPWR were to treat SIG_DFL as SIG_IGN, as SIGWINCH, SIGCONT,
-> > SIGCHLD, SIGURG do.  It does show there is the possibility of problems.
-> >
-> > The practical question is does anything send SIGPWR to anything besides
-> > init, and expect the process to handle SIGPWR or terminate?
->
-> So if I *cared* about SIGINFO, what I'd do is ask the systemd
-> developers and users list if there are any users of the sigpwr.target
-> feature that they know of.  And I'd also download all of the open
-> source UPS monitoring applications (and perhaps documentation of
-> closed-source UPS applications, such as for example APC's program) and
-> see if any of them are trying to send the SIGPWR signal.
->
-> I don't personally think it's worth the effort to do that research,
-> but maybe other people care enough to do the work.
->
-> > > I claim, though, that we could implement VSTATUS without implenting
-> > > the SIGINFO part of the feature.
-> >
-> > I agree that is the place to start.  And if we aren't going to use
-> > SIGINFO perhaps we could have an equally good notification method
-> > if anyone wants one.  Say call an ioctl and get an fd that can
-> > be read when a VSTATUS request comes in.
-> >
-> > SIGINFO vs SIGCONT vs a fd vs something else is something we can sort
-> > out when people get interested in modifying userspace.
->
->
-> Once VSTATUS support lands in the kernel, we can wait and see if there
-> is anyone who shows up wanting the SIGINFO functionality.  Certainly
-> we have no shortage of userspace notification interfaces in Linux.  :-)
->
->                                               - Ted
+[snip]
+
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 2971aa280ce6..35c772bf9f6c 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -574,7 +574,7 @@ static void pvalidate_pages(unsigned long vaddr, unsigned int npages, bool valid
+>  	}
+>  }
+>  
+> -static void __init early_set_page_state(unsigned long paddr, unsigned int npages, enum psc_op op)
+> +static void __init early_set_pages_state(unsigned long paddr, unsigned int npages, enum psc_op op)
+
+Is there a need to change the name? "npages" can take a value of 1 too.
+Hence, early_set_page_state() appears to be a better name!
+
+> +		/*
+> +		 * Page State Change VMGEXIT can pass error code through
+> +		 * exit_info_2.
+> +		 */
+
+Collapse into one line?
+
+> +void snp_set_memory_shared(unsigned long vaddr, unsigned int npages)
+> +{
+> +	if (!cc_platform_has(CC_ATTR_SEV_SNP))
+> +		return;
+> +
+> +	pvalidate_pages(vaddr, npages, 0);
+
+Replace '0' with "false"?
+
+> +
+> +	set_pages_state(vaddr, npages, SNP_PAGE_STATE_SHARED);
+> +}
+> +
+> +void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
+> +{
+> +	if (!cc_platform_has(CC_ATTR_SEV_SNP))
+> +		return;
+> +
+> +	set_pages_state(vaddr, npages, SNP_PAGE_STATE_PRIVATE);
+> +
+> +	pvalidate_pages(vaddr, npages, 1);
+
+Replace '1' with "true"?
+
+Venu
+
