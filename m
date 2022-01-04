@@ -2,313 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B08C648423B
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 14:19:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26D57484255
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 14:25:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233421AbiADNTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 08:19:52 -0500
-Received: from gloria.sntech.de ([185.11.138.130]:38740 "EHLO gloria.sntech.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231189AbiADNTw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 08:19:52 -0500
-Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <heiko@sntech.de>)
-        id 1n4jj4-0004br-8W; Tue, 04 Jan 2022 14:19:42 +0100
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Cc:     Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atishp@rivosinc.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heinrich Schuchardt <xypron.glpk@gmx.de>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Atish Patra <atishp@rivosinc.com>
-Subject: Re: [PATCH v5 1/5] RISC-V: KVM: Mark the existing SBI implementation as v01
-Date:   Tue, 04 Jan 2022 14:19:41 +0100
-Message-ID: <6615284.qex3tTltCR@diego>
-In-Reply-To: <20211118083912.981995-2-atishp@rivosinc.com>
-References: <20211118083912.981995-1-atishp@rivosinc.com> <20211118083912.981995-2-atishp@rivosinc.com>
+        id S232664AbiADNZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 08:25:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38986 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229884AbiADNZD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 08:25:03 -0500
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42FA9C061761;
+        Tue,  4 Jan 2022 05:25:03 -0800 (PST)
+Received: by mail-ot1-x336.google.com with SMTP id v22-20020a9d4e96000000b005799790cf0bso47208885otk.5;
+        Tue, 04 Jan 2022 05:25:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AZWJL+gXmk9nQBeyFLHDpAekZAv6FMjG6sXlfZgRTFM=;
+        b=QqwVDX4CcHzfd8gVVfUzvrjEPSM8kf3TC8a/0CLvsnk7bvRgnpdZ0P6rlhH4hYZX+o
+         wtn1TMk1arYpk+x+Ujrj5ry9JJzlPJyQuef3b+zOQE/OCP2YDOfqjs5tnafmDJbmLVQX
+         7PGXik4cyWM+uOm/FpQZcUoWzM6Tyn651d2tiMw+Uqhn7mEKvBufZUoc7cdz0yOADF0l
+         T49I/vgcWLgQnE9gfAdFuRx7OxEjmv6rk9HUkXOh+KYlnJbE2pqykJPPRsS+U1ADv+i1
+         YqEbmSiaUmNNKI0DhN42NbhUqWfNELekZverXOZuWkB3v6vkbj6USZT7JywubSjpjPpD
+         3wJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AZWJL+gXmk9nQBeyFLHDpAekZAv6FMjG6sXlfZgRTFM=;
+        b=6W+5oVgRzQR27XgoSr/ifjCuIYE3bJ+m+/ztAk7g2gQksFe3Xp8In3F4Fqk+XPCt36
+         SRsgxyeg6p9HgrnbOAcpbctR8R6KusM7+R8vgYFw9aItlbVH71Lm95fA7925CFoWvnJo
+         9aN87AySCcI0XAHkwukdLC65sF5xH1wJEzo4mOD5SMyfeY9XuwuEMK+5sC9vPQ/gzABO
+         4PwJiIqOV1nlSFE9lg6RZ2Ecz3lX8x4RLMz7waXx2XlCTlTff7Cpyug4KGHqxw1C79CF
+         XTY1SMGDzCf2B0N1y2ZmM1OvihxkjwdH5hfpXRuQAo+T1JnhZG7LxXdjTNtmVqr9+XWI
+         wMuw==
+X-Gm-Message-State: AOAM530+0smU5iawSdjVJn7xtqQ5gDIdPGYAsGbLVpxCiwdVZ1ihSXxz
+        trs7VciMfJdYmxDEufvOBNL5BODQSCueAN7DEko=
+X-Google-Smtp-Source: ABdhPJyG6Xy2yNlKmC/eifcIKXY8WzbwmhG0iqlYA6LUbahA6zSxu7E/QDfkgM6o0I9ljLdqr+W3sTMNafdrIVCeauI=
+X-Received: by 2002:a05:6830:4d1:: with SMTP id s17mr35692233otd.246.1641302702663;
+ Tue, 04 Jan 2022 05:25:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <CAFkrUsirdW1j_nhFK23x99itQ7=eXqAWFK5xYo7Mjmg+8zPmLw@mail.gmail.com>
+In-Reply-To: <CAFkrUsirdW1j_nhFK23x99itQ7=eXqAWFK5xYo7Mjmg+8zPmLw@mail.gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 4 Jan 2022 21:24:51 +0800
+Message-ID: <CANRm+CwHxxge61DGA=pmQfyY7F0iEdDMmTRWBOd5R_+m1XCFkA@mail.gmail.com>
+Subject: Re: possible deadlock in svm_vm_copy_asid_from
+To:     kvartet <xyru1999@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com, sunhao.th@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Atish,
+On Tue, 4 Jan 2022 at 19:01, kvartet <xyru1999@gmail.com> wrote:
+>
+> Hello,
+>
+> When using Syzkaller to fuzz the latest Linux kernel, the following
+> crash was triggered.
+>
+> HEAD commit: a7904a538933 Linux 5.16-rc6
+> git tree: upstream
+> console output: https://paste.ubuntu.com/p/GCRXrYQmMN/plain/
+> kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/plain/
+> C reproducer: https://paste.ubuntu.com/p/gD2D5wthDK/plain/
+> Syzlang reproducer: https://paste.ubuntu.com/p/hTnbvmsW8r/plain/
+>
+> ============================================
+> WARNING: possible recursive locking detected
+> 5.16.0-rc6 #9 Not tainted
+> --------------------------------------------
+> syz-executor.6/4919 is trying to acquire lock:
+> ffffc9000afbb250 (&kvm->lock){+.+.}-{3:3}, at: sev_lock_two_vms
+> arch/x86/kvm/svm/sev.c:1568 [inline]
+> ffffc9000afbb250 (&kvm->lock){+.+.}-{3:3}, at:
+> svm_vm_copy_asid_from+0x1bd/0x380 arch/x86/kvm/svm/sev.c:1988
+>
+> but task is already holding lock:
+> ffffc9000a703250 (&kvm->lock){+.+.}-{3:3}, at: sev_lock_two_vms
+> arch/x86/kvm/svm/sev.c:1566 [inline]
+> ffffc9000a703250 (&kvm->lock){+.+.}-{3:3}, at:
+> svm_vm_copy_asid_from+0x188/0x380 arch/x86/kvm/svm/sev.c:1988
+>
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+>
+>        CPU0
+>        ----
+>   lock(&kvm->lock);
+>   lock(&kvm->lock);
+>
+>  *** DEADLOCK ***
+>
+>  May be due to missing lock nesting notation
+>
+> 1 lock held by syz-executor.6/4919:
+>  #0: ffffc9000a703250 (&kvm->lock){+.+.}-{3:3}, at: sev_lock_two_vms
+> arch/x86/kvm/svm/sev.c:1566 [inline]
+>  #0: ffffc9000a703250 (&kvm->lock){+.+.}-{3:3}, at:
+> svm_vm_copy_asid_from+0x188/0x380 arch/x86/kvm/svm/sev.c:1988
+>
+> stack backtrace:
+> CPU: 1 PID: 4919 Comm: syz-executor.6 Not tainted 5.16.0-rc6 #9
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> 1.13.0-1ubuntu1.1 04/01/2014
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+>  print_deadlock_bug kernel/locking/lockdep.c:2956 [inline]
+>  check_deadlock kernel/locking/lockdep.c:2999 [inline]
+>  validate_chain kernel/locking/lockdep.c:3788 [inline]
+>  __lock_acquire.cold+0x168/0x3c3 kernel/locking/lockdep.c:5027
+>  lock_acquire kernel/locking/lockdep.c:5637 [inline]
+>  lock_acquire+0x1ab/0x520 kernel/locking/lockdep.c:5602
+>  __mutex_lock_common kernel/locking/mutex.c:607 [inline]
+>  __mutex_lock+0x151/0x1610 kernel/locking/mutex.c:740
+>  sev_lock_two_vms arch/x86/kvm/svm/sev.c:1568 [inline]
+>  svm_vm_copy_asid_from+0x1bd/0x380 arch/x86/kvm/svm/sev.c:1988
+>  kvm_vm_ioctl_enable_cap+0xf8/0xc40 arch/x86/kvm/x86.c:5829
+>  kvm_vm_ioctl_enable_cap_generic
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c:4241 [inline]
+>  kvm_vm_ioctl+0x3dd/0x23a0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4300
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:874 [inline]
+>  __se_sys_ioctl fs/ioctl.c:860 [inline]
+>  __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> RIP: 0033:0x7fc4241dc89d
+> Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+> 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fc422b4dc28 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 00007fc4242fbf60 RCX: 00007fc4241dc89d
+> RDX: 0000000020000080 RSI: 000000004068aea3 RDI: 0000000000000004
+> RBP: 00007fc42424900d R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007ffc9816f67f R14: 00007fc4242fbf60 R15: 00007fc422b4ddc0
+>  </TASK>
 
-Am Donnerstag, 18. November 2021, 09:39:08 CET schrieb Atish Patra:
-> From: Atish Patra <atish.patra@wdc.com>
-> 
-> The existing SBI specification impelementation follows v0.1
-> specification. The latest specification allows more
-> scalability and performance improvements.
-> 
-> Rename the existing implementation as v01 and provide a way to allow
-> future extensions.
-> 
-> Reviewed-by: Anup Patel <anup.patel@wdc.com>
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
+Maybe mutex_lock_killable_nested(), I will have a try.
 
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index eb3c045edf11..32376906ff20 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -1,5 +1,5 @@
->  // SPDX-License-Identifier: GPL-2.0
-> -/**
-> +/*
->   * Copyright (c) 2019 Western Digital Corporation or its affiliates.
->   *
->   * Authors:
-
-This got already fixed by [0]
-commit 0e2e64192100 ("riscv: kvm: fix non-kernel-doc comment block")
-so this patch doesn't apply cleanly anymore.
-
-This looks like it is a prerequisite for the sparse-hart-id series,
-so a respin might be in order.
-
-Heiko
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0e2e641921000ffc647b12918cdfcc504a9f6e3b
-
-> @@ -12,9 +12,25 @@
->  #include <asm/csr.h>
->  #include <asm/sbi.h>
->  #include <asm/kvm_vcpu_timer.h>
-> +#include <asm/kvm_vcpu_sbi.h>
->  
-> -#define SBI_VERSION_MAJOR			0
-> -#define SBI_VERSION_MINOR			1
-> +static int kvm_linux_err_map_sbi(int err)
-> +{
-> +	switch (err) {
-> +	case 0:
-> +		return SBI_SUCCESS;
-> +	case -EPERM:
-> +		return SBI_ERR_DENIED;
-> +	case -EINVAL:
-> +		return SBI_ERR_INVALID_PARAM;
-> +	case -EFAULT:
-> +		return SBI_ERR_INVALID_ADDRESS;
-> +	case -EOPNOTSUPP:
-> +		return SBI_ERR_NOT_SUPPORTED;
-> +	default:
-> +		return SBI_ERR_FAILURE;
-> +	};
-> +}
->  
->  static void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu,
->  				       struct kvm_run *run)
-> @@ -72,21 +88,19 @@ static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu,
->  	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->  }
->  
-> -int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +				      unsigned long *out_val,
-> +				      struct kvm_cpu_trap *utrap,
-> +				      bool *exit)
->  {
->  	ulong hmask;
-> -	int i, ret = 1;
-> +	int i, ret = 0;
->  	u64 next_cycle;
->  	struct kvm_vcpu *rvcpu;
-> -	bool next_sepc = true;
->  	struct cpumask cm, hm;
->  	struct kvm *kvm = vcpu->kvm;
-> -	struct kvm_cpu_trap utrap = { 0 };
->  	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
->  
-> -	if (!cp)
-> -		return -EINVAL;
-> -
->  	switch (cp->a7) {
->  	case SBI_EXT_0_1_CONSOLE_GETCHAR:
->  	case SBI_EXT_0_1_CONSOLE_PUTCHAR:
-> @@ -95,8 +109,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 * handled in kernel so we forward these to user-space
->  		 */
->  		kvm_riscv_vcpu_sbi_forward(vcpu, run);
-> -		next_sepc = false;
-> -		ret = 0;
-> +		*exit = true;
->  		break;
->  	case SBI_EXT_0_1_SET_TIMER:
->  #if __riscv_xlen == 32
-> @@ -104,47 +117,42 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  #else
->  		next_cycle = (u64)cp->a0;
->  #endif
-> -		kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
-> +		ret = kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
->  		break;
->  	case SBI_EXT_0_1_CLEAR_IPI:
-> -		kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
-> +		ret = kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
->  		break;
->  	case SBI_EXT_0_1_SEND_IPI:
->  		if (cp->a0)
->  			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
-> -							   &utrap);
-> +							   utrap);
->  		else
->  			hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
-> -		if (utrap.scause) {
-> -			utrap.sepc = cp->sepc;
-> -			kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> -			next_sepc = false;
-> +		if (utrap->scause)
->  			break;
-> -		}
-> +
->  		for_each_set_bit(i, &hmask, BITS_PER_LONG) {
->  			rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
-> -			kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
-> +			ret = kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
-> +			if (ret < 0)
-> +				break;
->  		}
->  		break;
->  	case SBI_EXT_0_1_SHUTDOWN:
->  		kvm_sbi_system_shutdown(vcpu, run, KVM_SYSTEM_EVENT_SHUTDOWN);
-> -		next_sepc = false;
-> -		ret = 0;
-> +		*exit = true;
->  		break;
->  	case SBI_EXT_0_1_REMOTE_FENCE_I:
->  	case SBI_EXT_0_1_REMOTE_SFENCE_VMA:
->  	case SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID:
->  		if (cp->a0)
->  			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
-> -							   &utrap);
-> +							   utrap);
->  		else
->  			hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
-> -		if (utrap.scause) {
-> -			utrap.sepc = cp->sepc;
-> -			kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> -			next_sepc = false;
-> +		if (utrap->scause)
->  			break;
-> -		}
-> +
->  		cpumask_clear(&cm);
->  		for_each_set_bit(i, &hmask, BITS_PER_LONG) {
->  			rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
-> @@ -154,22 +162,97 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		}
->  		riscv_cpuid_to_hartid_mask(&cm, &hm);
->  		if (cp->a7 == SBI_EXT_0_1_REMOTE_FENCE_I)
-> -			sbi_remote_fence_i(cpumask_bits(&hm));
-> +			ret = sbi_remote_fence_i(cpumask_bits(&hm));
->  		else if (cp->a7 == SBI_EXT_0_1_REMOTE_SFENCE_VMA)
-> -			sbi_remote_hfence_vvma(cpumask_bits(&hm),
-> +			ret = sbi_remote_hfence_vvma(cpumask_bits(&hm),
->  						cp->a1, cp->a2);
->  		else
-> -			sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
-> +			ret = sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
->  						cp->a1, cp->a2, cp->a3);
->  		break;
->  	default:
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_v01 = {
-> +	.extid_start = SBI_EXT_0_1_SET_TIMER,
-> +	.extid_end = SBI_EXT_0_1_SHUTDOWN,
-> +	.handler = kvm_sbi_ext_v01_handler,
-> +};
-> +
-> +static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
-> +	&vcpu_sbi_ext_v01,
-> +};
-> +
-> +const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid)
-> +{
-> +	int i = 0;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
-> +		if (sbi_ext[i]->extid_start <= extid &&
-> +		    sbi_ext[i]->extid_end >= extid)
-> +			return sbi_ext[i];
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	int ret = 1;
-> +	bool next_sepc = true;
-> +	bool userspace_exit = false;
-> +	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +	const struct kvm_vcpu_sbi_extension *sbi_ext;
-> +	struct kvm_cpu_trap utrap = { 0 };
-> +	unsigned long out_val = 0;
-> +	bool ext_is_v01 = false;
-> +
-> +	sbi_ext = kvm_vcpu_sbi_find_ext(cp->a7);
-> +	if (sbi_ext && sbi_ext->handler) {
-> +		if (cp->a7 >= SBI_EXT_0_1_SET_TIMER &&
-> +		    cp->a7 <= SBI_EXT_0_1_SHUTDOWN)
-> +			ext_is_v01 = true;
-> +		ret = sbi_ext->handler(vcpu, run, &out_val, &utrap, &userspace_exit);
-> +	} else {
->  		/* Return error for unsupported SBI calls */
->  		cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> -		break;
-> +		goto ecall_done;
-> +	}
-> +
-> +	/* Handle special error cases i.e trap, exit or userspace forward */
-> +	if (utrap.scause) {
-> +		/* No need to increment sepc or exit ioctl loop */
-> +		ret = 1;
-> +		utrap.sepc = cp->sepc;
-> +		kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> +		next_sepc = false;
-> +		goto ecall_done;
->  	}
->  
-> +	/* Exit ioctl loop or Propagate the error code the guest */
-> +	if (userspace_exit) {
-> +		next_sepc = false;
-> +		ret = 0;
-> +	} else {
-> +		/**
-> +		 * SBI extension handler always returns an Linux error code. Convert
-> +		 * it to the SBI specific error code that can be propagated the SBI
-> +		 * caller.
-> +		 */
-> +		ret = kvm_linux_err_map_sbi(ret);
-> +		cp->a0 = ret;
-> +		ret = 1;
-> +	}
-> +ecall_done:
->  	if (next_sepc)
->  		cp->sepc += 4;
-> +	if (!ext_is_v01)
-> +		cp->a1 = out_val;
->  
->  	return ret;
->  }
-> 
-
-
-
-
+    Wanpeng
