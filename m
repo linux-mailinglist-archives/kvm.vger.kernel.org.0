@@ -2,72 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 273ED483FA1
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 11:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DBDE483FA9
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 11:13:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbiADKI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 05:08:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50386 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiADKIy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 05:08:54 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A244CC061761;
-        Tue,  4 Jan 2022 02:08:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=He5mJNAVZLGt4B/chvWVA3LBDjigRGtLMa8gtm4wt1s=; b=kL9GzvPou7/2vKXI6TOUjGt7r2
-        yfHoQNz8RPyUWqoN9VuZzi+nGb3HWfbLRi/KqJ/sIHDW4e+EFZAnjpdq2ZfDS59ER5zFPhW5HWnfg
-        GlQXCKK3V19atr5Yph3p9ocCcAgr0zeiZz2apkrTQcIZdmZXSHU7kCLiOUyZ+7JBAeB8TZYvm456G
-        sykxbq6H3ZgrRJtLW2pznfce55bAeSWCgFFBGObwKngmIpI7n4V8RexngUhSsALnef7R4tqupZZs1
-        clVk3boIxQdRryu58jMBXFWOr/dQabXvQh6zpW5oRFlR55oUTwq+36CIGmdXxrGmrQXpRK+YjbeVx
-        STve0/HA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n4gk8-00B68W-6b; Tue, 04 Jan 2022 10:08:36 +0000
-Date:   Tue, 4 Jan 2022 02:08:36 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        id S229876AbiADKNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 05:13:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52825 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229486AbiADKNb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 05:13:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641291210;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=O0NO646f6vb+Q81VHaesj9qilMxmyVNYrelWxrsDwj4=;
+        b=CYYclUVDeViDEAks7dSMe/CFeAN87L6QhB7+27cB6be/oW6hWEe855QL744/tu+94e8XAJ
+        xflFdAtpbhmB5ws5MTk5E+IFIH+VDU6ZRD4tX9xfz/5IRvqVb+Q80nOA5F6Phq22kMgusD
+        zcRvYDImKULv6gGCiA9qOmhdbVyXMj0=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-49-V75PPaZAObuuMfCK63sbTQ-1; Tue, 04 Jan 2022 05:13:29 -0500
+X-MC-Unique: V75PPaZAObuuMfCK63sbTQ-1
+Received: by mail-pf1-f199.google.com with SMTP id j125-20020a62c583000000b004baed10680bso18254795pfg.2
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 02:13:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=O0NO646f6vb+Q81VHaesj9qilMxmyVNYrelWxrsDwj4=;
+        b=yrb/TTY/YKRlazZ0ig1MsU7c1d7lF8eNMEntwOhBnHMaj43Ld3GYVLQF9YiYs2bLSA
+         cFijCZs1aXqwW5E0qt7uJPVb+arQA3zRQ87jqeTxIfaHApTQPUTnjNzyuhPJqsAxYm5b
+         xeSZGSBOXToyIii6J4Z6nG63b23aJDPOw3gmQ30bjJhJBcyiv4ldYEyCZ3dU90T5g7GF
+         zOc3WB4vS87gSt6K6JlEcAKNx0AYWodTjHR6oUwSJ7qvwHnR2RtnbdvR3RdcP/mA1FUV
+         0EBaWziABHcbIQkgTIJBggIPgEo79lHllxmSA+2tNknVO41T7fbhED3BvQseFYhmvGHz
+         GoVA==
+X-Gm-Message-State: AOAM5318jiyaY4GDYZBbffotGqLv9jxJsiuk8bl31hVnmT48fChOe1Yw
+        wqxPIdvpcOwHhaBCZLr/w3jHI5qBW2XMWFa2nltDdh1wQzQY8JfcMl1xcXXXtv7l7QXbQkkd+YO
+        GxQFJ2on04PVz
+X-Received: by 2002:a17:90b:2249:: with SMTP id hk9mr58261253pjb.246.1641291208799;
+        Tue, 04 Jan 2022 02:13:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxPRZruWyUokSwVNJizpHTYEDSB1tgyajcT35vv7vqpnsOVcloxEjR7RY9oLHYNDzIshcDToQ==
+X-Received: by 2002:a17:90b:2249:: with SMTP id hk9mr58261225pjb.246.1641291208595;
+        Tue, 04 Jan 2022 02:13:28 -0800 (PST)
+Received: from xz-m1.local ([191.101.132.50])
+        by smtp.gmail.com with ESMTPSA id 204sm23016824pfy.207.2022.01.04.02.13.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jan 2022 02:13:28 -0800 (PST)
+Date:   Tue, 4 Jan 2022 18:13:19 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 02/14] driver core: Add dma_cleanup callback in
- bus_type
-Message-ID: <YdQcpHrV7NwUv+qc@infradead.org>
-References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
- <20220104015644.2294354-3-baolu.lu@linux.intel.com>
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>,
+        "Nikunj A . Dadhania" <nikunj@amd.com>
+Subject: Re: [PATCH v1 03/13] KVM: x86/mmu: Automatically update
+ iter->old_spte if cmpxchg fails
+Message-ID: <YdQdv5lAWsJA1/EA@xz-m1.local>
+References: <20211213225918.672507-1-dmatlack@google.com>
+ <20211213225918.672507-4-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220104015644.2294354-3-baolu.lu@linux.intel.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20211213225918.672507-4-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All these bus callouts still looks horrible and just create tons of
-boilerplate code.
+On Mon, Dec 13, 2021 at 10:59:08PM +0000, David Matlack wrote:
+> @@ -985,6 +992,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  			 * path below.
+>  			 */
+>  			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+> +
+
+Useless empty line?
+
+Other than that:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+-- 
+Peter Xu
+
