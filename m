@@ -2,143 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05A74483F22
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 10:28:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C6D6483F46
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 10:40:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbiADJ2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 04:28:34 -0500
-Received: from mail-dm3nam07on2051.outbound.protection.outlook.com ([40.107.95.51]:46126
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229684AbiADJ2e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 04:28:34 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U/anuSCDTA4q83UpZnoW1tFYA8U1TEzr6Ur1le31A4u+uVkbr1AZIO+f8SpXU/uvTcy4TngRKvBksYrjk96GwLgf48dOHSHI4nCMqc8LLY+ilq9+pBSqcYXtOJBOI8hI4DfBBYXgoe7y8S/z9zxkdWvpfaN6LsdIhfwhv+7UcaS27FB+yo054w55BJliVDNFoIZ4Fu4DhALlnAjaQDSjX/3IQwR2sogiQ8ikxav1Srab5DSiYr/gQZjmwMDBXjPY4w6UCeFxtz+nLCj9QYSL2npDZ/puXIH99DvFi52W7YXPmd6hRnzlpBtTwZAfJP99ugiVkkQyPi2gG5UwrkplQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rWw0GjXqh6V5gh/kxU8vG4qrRVXTfzvxKEtZq1po51A=;
- b=gisd5y7I7DUcsvX8/YJJAMVq/G5t0RU/dXJl10OyOZY3/ZjlYAOhAF14IqAwCAMDSgnjGBm7VGQ0C70xubE3qFAuSKHkD6aZMIw7IWbIAtYyjTlyanF363FJBYFySJv9b+dkOjRPVBjnICA1Ph41niIuoo1PgeM5oJOT31COCOXT3oOvkntPKPBhMUxzOlJ4tAOYCZuUrXKDR64fNkpJ1KBUqOSA2JnBeXnkIJDi7CcSR/wO1FHy1gVmKSv2mZi2GMdqnzlM/yjpwbfAUQoPh+z9WpG24MrNf4dsnLeWAbi9N7m0oXbUQri/yVoGhrcDeddcZZdwBqZEjJl1zsLMOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rWw0GjXqh6V5gh/kxU8vG4qrRVXTfzvxKEtZq1po51A=;
- b=UB39tYGlEoBeF5LyqwstTSn8o+sKvorAxR/bgD3OflaB/ME4FSY98EH/d75bcMmgtGfyNA3QCUiYTBmwbGEMaCfXPBOa+vAP89RzW/RCIzjoQWlw7BbNqgukVZxzJvKajWHmwc19a53iLwZbJU4j82TTm7Eoz5h/d1ItzOEw8VU=
-Received: from DM5PR1101CA0015.namprd11.prod.outlook.com (2603:10b6:4:4c::25)
- by BY5PR12MB3956.namprd12.prod.outlook.com (2603:10b6:a03:1ab::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.15; Tue, 4 Jan
- 2022 09:28:30 +0000
-Received: from DM6NAM11FT032.eop-nam11.prod.protection.outlook.com
- (2603:10b6:4:4c:cafe::e6) by DM5PR1101CA0015.outlook.office365.com
- (2603:10b6:4:4c::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.14 via Frontend
- Transport; Tue, 4 Jan 2022 09:28:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DM6NAM11FT032.mail.protection.outlook.com (10.13.173.93) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4844.14 via Frontend Transport; Tue, 4 Jan 2022 09:28:30 +0000
-Received: from gomati.amd.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 4 Jan
- 2022 03:28:27 -0600
-From:   Nikunj A Dadhania <nikunj@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <nikunj@amd.com>,
-        <vasant.hegde@amd.com>, <brijesh.singh@amd.com>
-Subject: [PATCH] KVM: x86: Do not create mmu_rmaps_stat for TDP MMU
-Date:   Tue, 4 Jan 2022 14:58:14 +0530
-Message-ID: <20220104092814.11553-1-nikunj@amd.com>
-X-Mailer: git-send-email 2.32.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 74875b74-1c84-4788-832b-08d9cf649240
-X-MS-TrafficTypeDiagnostic: BY5PR12MB3956:EE_
-X-Microsoft-Antispam-PRVS: <BY5PR12MB3956B39E57E20400097AD9F5E24A9@BY5PR12MB3956.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:669;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 58BXgeaH2TKmvxmJKwT0maavoGefcS8KY0YGF4N6agamTKMORTgZoTDRst1/n7IAAGv5z9mAvJcIuOwXpQSCJoAw2Tjp+TAgQJQzmM9+ozRiHiF2AJItvgPAx3imu40XuOgce/M9dAkid2EGz+x1l4zs2dxLcmvcqOtBwDfBM8//8Y6lEZzYCDIi6qqW4EDLFjpfUeCIJtrI/YlabdUs0PDSoQQqwZ/c9rgzsGSv0abxHApHqkFiqdXGR55BHQZegzqmGRs2WnysktUQIsgAIERrRsS/o3dvr3YoGR7fj7AXlcmWeAmOVbRNSGCdRbv2lsyotqEwEpQYWpZtHIhwTgHLdFyfoYyqixdeSyBn0amqCNx5plX6Ej64ZRnhlaPdSYKtzWSfat9UpOmPxlvPf5Y4aB44a1yUjRdiQDHmKZyApgKkNARF4m5IrhsuMQu+rJlEdMbbnEnAH76cOhKzZ3jPI6Czv0JN3v2SnUrlWj/pa/GkRspr1WTDw3Ss00WsDbcjaY8CGCBoT6UsiI94ESAf6bk5yv9Lbr8bSg9ghThU7oaMcdEb3329vJZJxWbc+RWeqf/aZ8GNRyvcOA3cIlhj8+KfGojkjkKcqVNEtZSwcUgMWchESPo+Ft7YvFcFYlfYj4S3WImdGT5KeZucTT2sD0JGTHvdzM0Vyewd+D2UnC1YZv8nLjavjjspK3cQSkC9Wr4RK8Yp00AAYaJ6haaxwAEXy75pY0anDFzIFCneUouY/i/a7knjbc7iHMcSWIQrSQ7I6KEdVhBsfvXqyjAYelwRa2ciRmK2uV7ke5U=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(40470700002)(6666004)(426003)(508600001)(83380400001)(316002)(8936002)(70206006)(7696005)(186003)(356005)(16526019)(5660300002)(26005)(336012)(40460700001)(8676002)(82310400004)(81166007)(6916009)(54906003)(2616005)(36756003)(1076003)(2906002)(36860700001)(70586007)(47076005)(4326008)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 09:28:30.6235
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74875b74-1c84-4788-832b-08d9cf649240
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT032.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB3956
+        id S230048AbiADJkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 04:40:05 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:43830 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229677AbiADJkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 04:40:04 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 927ABB8118A
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 09:40:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23A42C36AF3;
+        Tue,  4 Jan 2022 09:40:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641289202;
+        bh=2ikLkM64NuU+jo6o2U74nnzEnIhFw8r3SMpbAO9wtxs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Gze5ghq60O85ROITI9idjc1Mui0rvCmzO3xK1D2wm3XTJF+ADcoSJwzjGp3zsV4Br
+         QduvcIf21gvTNG5CLHHRkg3fI762PTwP3newC6o5uPMFjo0fBfuXmCABj/L8g6J+xd
+         0BuWF/BR7MxJZVBMns/s9AmucsLJ50ESjLsp17sQ5EKms6xqFbIGVvjCt83Ct6bUD/
+         VBVnSoUY9K7GaqKZ0x46uAkWi+i4Jp3W++oYR0vQXh10CjjUNQOLy70jqe4j020ufK
+         5J00x2d0efOqOgAmRFZ5mYeZdrYH6Ih/7kvIzCWHZgCAsJSHddFiNz45P4xT9AQuo8
+         S81I564VJt/2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n4gIS-00FsEg-4A; Tue, 04 Jan 2022 09:40:00 +0000
+Date:   Tue, 04 Jan 2022 09:39:59 +0000
+Message-ID: <87o84rvnyo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 34/69] KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
+In-Reply-To: <bbf31da5-ca1b-7499-e23c-9b5281ca7901@os.amperecomputing.com>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-35-maz@kernel.org>
+        <bbf31da5-ca1b-7499-e23c-9b5281ca7901@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With TDP MMU being the default now, access to mmu_rmaps_stat debugfs
-file causes following oops:
+On Tue, 04 Jan 2022 08:53:42 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> 
+> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > We enable nested virtualization by setting the HCR NV and NV1 bit.
+> > 
+> > When the virtual E2H bit is set, we can support EL2 register accesses
+> > via EL1 registers from the virtual EL2 by doing trap-and-emulate. A
+> > better alternative, however, is to allow the virtual EL2 to access EL2
+> > register states without trap. This can be easily achieved by not traping
+> > EL1 registers since those registers already have EL2 register states.
+> > 
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/kvm_arm.h |  1 +
+> >   arch/arm64/kvm/hyp/vhe/switch.c  | 38 +++++++++++++++++++++++++++++---
+> >   2 files changed, 36 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 68af5509e4b0..b8a0d410035b 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -87,6 +87,7 @@
+> >   			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+> >   			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+> >   			 HCR_FMO | HCR_IMO | HCR_PTW )
+> > +#define HCR_GUEST_NV_FILTER_FLAGS (HCR_ATA | HCR_API | HCR_APK | HCR_RW)
+> >   #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+> >   #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+> >   #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index 57f43e607819..da80c969e623 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -36,9 +36,41 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+> >   	u64 hcr = vcpu->arch.hcr_el2;
+> >   	u64 val;
+> >   -	/* Trap VM sysreg accesses if an EL2 guest is not using
+> > VHE. */
+> > -	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
+> > -		hcr |= HCR_TVM | HCR_TRVM;
+> > +	if (is_hyp_ctxt(vcpu)) {
+> > +		hcr |= HCR_NV;
+> > +
+> > +		if (!vcpu_el2_e2h_is_set(vcpu)) {
+> > +			/*
+> > +			 * For a guest hypervisor on v8.0, trap and emulate
+> > +			 * the EL1 virtual memory control register accesses.
+> > +			 */
+> > +			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
+> > +		} else {
+> > +			/*
+> > +			 * For a guest hypervisor on v8.1 (VHE), allow to
+> > +			 * access the EL1 virtual memory control registers
+> > +			 * natively. These accesses are to access EL2 register
+> > +			 * states.
+> > +			 * Note that we still need to respect the virtual
+> > +			 * HCR_EL2 state.
+> > +			 */
+> > +			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+> > +
+> > +			vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
+> 
+> Why HCR_RW is cleared here, May I know please?
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-PGD 0 P4D 0
-Oops: 0000 [#1] PREEMPT SMP NOPTI
-CPU: 7 PID: 3185 Comm: cat Not tainted 5.16.0-rc4+ #204
-RIP: 0010:pte_list_count+0x6/0x40
- Call Trace:
-  <TASK>
-  ? kvm_mmu_rmaps_stat_show+0x15e/0x320
-  seq_read_iter+0x126/0x4b0
-  ? aa_file_perm+0x124/0x490
-  seq_read+0xf5/0x140
-  full_proxy_read+0x5c/0x80
-  vfs_read+0x9f/0x1a0
-  ksys_read+0x67/0xe0
-  __x64_sys_read+0x19/0x20
-  do_syscall_64+0x3b/0xc0
-  entry_SYSCALL_64_after_hwframe+0x44/0xae
- RIP: 0033:0x7fca6fc13912
+Good question. That's clearly a leftover from an early rework. It
+really doesn't matter, as we are merging the guest's configuration
+into the host's, and the host already has HCR_EL2.RW set.
 
-Create mmu_rmaps_stat debugfs file only when rmaps are created.
+What HCR_GUEST_NV_FILTER_FLAGS should contain is only the bits we
+don't want to deal with at this stage of the NV support. I'll fix that
+for the next round.
 
-Reported-by: Vasant Hegde <vasant.hegde@amd.com>
-Tested-by: Vasant Hegde <vasant.hegde@amd.com>
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
----
- arch/x86/kvm/debugfs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index 543a8c04025c..78bb09a3a7b7 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -180,7 +180,8 @@ static const struct file_operations mmu_rmaps_stat_fops = {
- 
- int kvm_arch_create_vm_debugfs(struct kvm *kvm)
- {
--	debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
--			    &mmu_rmaps_stat_fops);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
-+				    &mmu_rmaps_stat_fops);
- 	return 0;
- }
+	M.
+
 -- 
-2.32.0
-
+Without deviation from the norm, progress is not possible.
