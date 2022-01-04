@@ -2,116 +2,313 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC1848421D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 14:08:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B08C648423B
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 14:19:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233284AbiADNIg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 08:08:36 -0500
-Received: from mga17.intel.com ([192.55.52.151]:11541 "EHLO mga17.intel.com"
+        id S233421AbiADNTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 08:19:52 -0500
+Received: from gloria.sntech.de ([185.11.138.130]:38740 "EHLO gloria.sntech.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229568AbiADNIf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 08:08:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641301715; x=1672837715;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eTosNZWN1zAzfnx/zcKL1qsuRrbXMmlQcyS8hm7dCaw=;
-  b=RvlZVEVvggBAkrGerE1xdzEa/3CJesia6USHTWQZ4urfmxTol2cU9Zdr
-   D8h7aYIDTcWFCAmnisTGFGVD6TJotoWLdFzg1SyOtNcuKVRRQsCqofbVG
-   j1Ph9GU28n/MhEMwBlAaqlHupP2arPGJJN42umVuuRVFSKWKk7vE3WHcB
-   QRTMl9zh48mG2qtI9ymi3B2OTD8eGfzRYNtNpjKnTXAUiOQf99dNsue1a
-   K1X68HQYMcjVv38MucSyPgDpOUXsnubZpS38bbgawpYTErM9MjDwCKrNd
-   P3sXhMMx8zZwavB0tGhmfFnZmpa4Bm5hClRLx8ax9EAWD/wmBryqdprrf
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="222892962"
-X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; 
-   d="scan'208";a="222892962"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 05:08:35 -0800
-X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; 
-   d="scan'208";a="472058377"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.30.18]) ([10.255.30.18])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 05:08:31 -0800
-Message-ID: <a97a75ad-9d1c-a09f-281b-d6b0a7652e78@intel.com>
-Date:   Tue, 4 Jan 2022 21:08:28 +0800
+        id S231189AbiADNTw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 08:19:52 -0500
+Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <heiko@sntech.de>)
+        id 1n4jj4-0004br-8W; Tue, 04 Jan 2022 14:19:42 +0100
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Cc:     Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
+        Atish Patra <atishp@rivosinc.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Atish Patra <atishp@rivosinc.com>
+Subject: Re: [PATCH v5 1/5] RISC-V: KVM: Mark the existing SBI implementation as v01
+Date:   Tue, 04 Jan 2022 14:19:41 +0100
+Message-ID: <6615284.qex3tTltCR@diego>
+In-Reply-To: <20211118083912.981995-2-atishp@rivosinc.com>
+References: <20211118083912.981995-1-atishp@rivosinc.com> <20211118083912.981995-2-atishp@rivosinc.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.4.1
-Subject: Re: [RFC PATCH v2 20/44] i386/tdx: Parse tdx metadata and store the
- result into TdxGuestState
-Content-Language: en-US
-To:     Gerd Hoffmann <kraxel@redhat.com>, isaku.yamahata@gmail.com,
-        Laszlo Ersek <lersek@redhat.com>
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
-        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
-        erdemaktas@google.com, kvm@vger.kernel.org,
-        isaku.yamahata@intel.com, "Min M . Xu" <min.m.xu@intel.com>
-References: <cover.1625704980.git.isaku.yamahata@intel.com>
- <acaf651389c3f407a9d6d0a2e943daf0a85bb5fc.1625704981.git.isaku.yamahata@intel.com>
- <20210826111838.fgbp6v6gd5wzbnho@sirius.home.kraxel.org>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20210826111838.fgbp6v6gd5wzbnho@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/26/2021 7:18 PM, Gerd Hoffmann wrote:
->> +int load_tdvf(const char *filename)
->> +{
+Hi Atish,
+
+Am Donnerstag, 18. November 2021, 09:39:08 CET schrieb Atish Patra:
+> From: Atish Patra <atish.patra@wdc.com>
 > 
->> +    for_each_fw_entry(fw, entry) {
->> +        if (entry->address < x86ms->below_4g_mem_size ||
->> +            entry->address > 4 * GiB) {
->> +            tdvf_init_ram_memory(ms, entry);
->> +        } else {
->> +            tdvf_init_bios_memory(fd, filename, entry);
->> +        }
->> +    }
+> The existing SBI specification impelementation follows v0.1
+> specification. The latest specification allows more
+> scalability and performance improvements.
 > 
-> Why there are two different ways to load the firmware?
-
-because there are two different parts in TDVF:
-  a) one is firmware volume (BFV and CFV, i.e., OVMF_CODE.fd and 
-OVMF_VAR.fd). Those are ROMs;
-
-  b) the other is some RAM regions, e.g., temp memory for BFV early 
-running and TD HOB to pass info to TDVF; Those are RAMs which is already 
-added to TDX VM;
-
-> Also: why is all this firmware volume parsing needed?  The normal ovmf
-> firmware can simply be mapped just below 4G, why can't tdvf work the
-> same way?
-
-Ideally, the firmware (part a above) can be mapped just below 4G like 
-what we do for OVMF.
-
-But it needs additional when map part a) to parse the metadata and get 
-location of part b) and initialize the RAM of part b). Yes, the 
-additional work can be added in existing OVMF laoding flow as pflash.
-
-
-+ Laszlo,
-
-Regarding laoding TDVF as pflash, I have some questions:
-
-- pflash requires KVM to support readonly mmeory. However, for TDX, it 
-doesn't support readonly memory. Is it a must? or we can make an 
-exception for TDX?
-
-- I saw from 
-https://lists.gnu.org/archive/html/qemu-discuss/2018-04/msg00045.html, 
-you said when load OVMF as pflash, it's MMIO. But for TDVF, it's treated 
-as private memory. I'm not sure whether it will cause some potential 
-problem if loading TDVF with pflash.
-
-Anyway I tried changing the existing pflash approach to load TDVF. It 
-can boot a TDX VM and no issue.
-
-> thanks,
->    Gerd
+> Rename the existing implementation as v01 and provide a way to allow
+> future extensions.
 > 
+> Reviewed-by: Anup Patel <anup.patel@wdc.com>
+> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> index eb3c045edf11..32376906ff20 100644
+> --- a/arch/riscv/kvm/vcpu_sbi.c
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -1,5 +1,5 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -/**
+> +/*
+>   * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+>   *
+>   * Authors:
+
+This got already fixed by [0]
+commit 0e2e64192100 ("riscv: kvm: fix non-kernel-doc comment block")
+so this patch doesn't apply cleanly anymore.
+
+This looks like it is a prerequisite for the sparse-hart-id series,
+so a respin might be in order.
+
+Heiko
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0e2e641921000ffc647b12918cdfcc504a9f6e3b
+
+> @@ -12,9 +12,25 @@
+>  #include <asm/csr.h>
+>  #include <asm/sbi.h>
+>  #include <asm/kvm_vcpu_timer.h>
+> +#include <asm/kvm_vcpu_sbi.h>
+>  
+> -#define SBI_VERSION_MAJOR			0
+> -#define SBI_VERSION_MINOR			1
+> +static int kvm_linux_err_map_sbi(int err)
+> +{
+> +	switch (err) {
+> +	case 0:
+> +		return SBI_SUCCESS;
+> +	case -EPERM:
+> +		return SBI_ERR_DENIED;
+> +	case -EINVAL:
+> +		return SBI_ERR_INVALID_PARAM;
+> +	case -EFAULT:
+> +		return SBI_ERR_INVALID_ADDRESS;
+> +	case -EOPNOTSUPP:
+> +		return SBI_ERR_NOT_SUPPORTED;
+> +	default:
+> +		return SBI_ERR_FAILURE;
+> +	};
+> +}
+>  
+>  static void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu,
+>  				       struct kvm_run *run)
+> @@ -72,21 +88,19 @@ static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu,
+>  	run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>  }
+>  
+> -int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> +				      unsigned long *out_val,
+> +				      struct kvm_cpu_trap *utrap,
+> +				      bool *exit)
+>  {
+>  	ulong hmask;
+> -	int i, ret = 1;
+> +	int i, ret = 0;
+>  	u64 next_cycle;
+>  	struct kvm_vcpu *rvcpu;
+> -	bool next_sepc = true;
+>  	struct cpumask cm, hm;
+>  	struct kvm *kvm = vcpu->kvm;
+> -	struct kvm_cpu_trap utrap = { 0 };
+>  	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+>  
+> -	if (!cp)
+> -		return -EINVAL;
+> -
+>  	switch (cp->a7) {
+>  	case SBI_EXT_0_1_CONSOLE_GETCHAR:
+>  	case SBI_EXT_0_1_CONSOLE_PUTCHAR:
+> @@ -95,8 +109,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		 * handled in kernel so we forward these to user-space
+>  		 */
+>  		kvm_riscv_vcpu_sbi_forward(vcpu, run);
+> -		next_sepc = false;
+> -		ret = 0;
+> +		*exit = true;
+>  		break;
+>  	case SBI_EXT_0_1_SET_TIMER:
+>  #if __riscv_xlen == 32
+> @@ -104,47 +117,42 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  #else
+>  		next_cycle = (u64)cp->a0;
+>  #endif
+> -		kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
+> +		ret = kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
+>  		break;
+>  	case SBI_EXT_0_1_CLEAR_IPI:
+> -		kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
+> +		ret = kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
+>  		break;
+>  	case SBI_EXT_0_1_SEND_IPI:
+>  		if (cp->a0)
+>  			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
+> -							   &utrap);
+> +							   utrap);
+>  		else
+>  			hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
+> -		if (utrap.scause) {
+> -			utrap.sepc = cp->sepc;
+> -			kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> -			next_sepc = false;
+> +		if (utrap->scause)
+>  			break;
+> -		}
+> +
+>  		for_each_set_bit(i, &hmask, BITS_PER_LONG) {
+>  			rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
+> -			kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
+> +			ret = kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
+> +			if (ret < 0)
+> +				break;
+>  		}
+>  		break;
+>  	case SBI_EXT_0_1_SHUTDOWN:
+>  		kvm_sbi_system_shutdown(vcpu, run, KVM_SYSTEM_EVENT_SHUTDOWN);
+> -		next_sepc = false;
+> -		ret = 0;
+> +		*exit = true;
+>  		break;
+>  	case SBI_EXT_0_1_REMOTE_FENCE_I:
+>  	case SBI_EXT_0_1_REMOTE_SFENCE_VMA:
+>  	case SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID:
+>  		if (cp->a0)
+>  			hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
+> -							   &utrap);
+> +							   utrap);
+>  		else
+>  			hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
+> -		if (utrap.scause) {
+> -			utrap.sepc = cp->sepc;
+> -			kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> -			next_sepc = false;
+> +		if (utrap->scause)
+>  			break;
+> -		}
+> +
+>  		cpumask_clear(&cm);
+>  		for_each_set_bit(i, &hmask, BITS_PER_LONG) {
+>  			rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
+> @@ -154,22 +162,97 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		}
+>  		riscv_cpuid_to_hartid_mask(&cm, &hm);
+>  		if (cp->a7 == SBI_EXT_0_1_REMOTE_FENCE_I)
+> -			sbi_remote_fence_i(cpumask_bits(&hm));
+> +			ret = sbi_remote_fence_i(cpumask_bits(&hm));
+>  		else if (cp->a7 == SBI_EXT_0_1_REMOTE_SFENCE_VMA)
+> -			sbi_remote_hfence_vvma(cpumask_bits(&hm),
+> +			ret = sbi_remote_hfence_vvma(cpumask_bits(&hm),
+>  						cp->a1, cp->a2);
+>  		else
+> -			sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
+> +			ret = sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
+>  						cp->a1, cp->a2, cp->a3);
+>  		break;
+>  	default:
+> +		ret = -EINVAL;
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_v01 = {
+> +	.extid_start = SBI_EXT_0_1_SET_TIMER,
+> +	.extid_end = SBI_EXT_0_1_SHUTDOWN,
+> +	.handler = kvm_sbi_ext_v01_handler,
+> +};
+> +
+> +static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
+> +	&vcpu_sbi_ext_v01,
+> +};
+> +
+> +const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid)
+> +{
+> +	int i = 0;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
+> +		if (sbi_ext[i]->extid_start <= extid &&
+> +		    sbi_ext[i]->extid_end >= extid)
+> +			return sbi_ext[i];
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +	int ret = 1;
+> +	bool next_sepc = true;
+> +	bool userspace_exit = false;
+> +	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+> +	const struct kvm_vcpu_sbi_extension *sbi_ext;
+> +	struct kvm_cpu_trap utrap = { 0 };
+> +	unsigned long out_val = 0;
+> +	bool ext_is_v01 = false;
+> +
+> +	sbi_ext = kvm_vcpu_sbi_find_ext(cp->a7);
+> +	if (sbi_ext && sbi_ext->handler) {
+> +		if (cp->a7 >= SBI_EXT_0_1_SET_TIMER &&
+> +		    cp->a7 <= SBI_EXT_0_1_SHUTDOWN)
+> +			ext_is_v01 = true;
+> +		ret = sbi_ext->handler(vcpu, run, &out_val, &utrap, &userspace_exit);
+> +	} else {
+>  		/* Return error for unsupported SBI calls */
+>  		cp->a0 = SBI_ERR_NOT_SUPPORTED;
+> -		break;
+> +		goto ecall_done;
+> +	}
+> +
+> +	/* Handle special error cases i.e trap, exit or userspace forward */
+> +	if (utrap.scause) {
+> +		/* No need to increment sepc or exit ioctl loop */
+> +		ret = 1;
+> +		utrap.sepc = cp->sepc;
+> +		kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> +		next_sepc = false;
+> +		goto ecall_done;
+>  	}
+>  
+> +	/* Exit ioctl loop or Propagate the error code the guest */
+> +	if (userspace_exit) {
+> +		next_sepc = false;
+> +		ret = 0;
+> +	} else {
+> +		/**
+> +		 * SBI extension handler always returns an Linux error code. Convert
+> +		 * it to the SBI specific error code that can be propagated the SBI
+> +		 * caller.
+> +		 */
+> +		ret = kvm_linux_err_map_sbi(ret);
+> +		cp->a0 = ret;
+> +		ret = 1;
+> +	}
+> +ecall_done:
+>  	if (next_sepc)
+>  		cp->sepc += 4;
+> +	if (!ext_is_v01)
+> +		cp->a1 = out_val;
+>  
+>  	return ret;
+>  }
+> 
+
+
+
 
