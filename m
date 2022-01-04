@@ -2,86 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1A05484990
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 21:57:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE3084849EE
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 22:33:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233688AbiADU5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 15:57:06 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:52312 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230316AbiADU5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 15:57:05 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9145B1EC0453;
-        Tue,  4 Jan 2022 21:56:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1641329819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=6KjE4zfdnoJa8VcbKr5tWykH8nZeyvMUacQiyUUGOVY=;
-        b=nLvokjXzEdmDvpUARTmnGiFS3Asc47jqMMaRZkBcWW7StoAsBmGlZGPfBmKwKTBjBJedXN
-        W9gYGacnwZlT0e4/Rcho1z9vPnvpi+VnOzEMUi0fPuPrbvIkGMQlvIGArhzm0CEeuYKcx4
-        n5wB63ndM0lQY7kc2BLP+2EVDi0KVWY=
-Date:   Tue, 4 Jan 2022 21:57:03 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 22/40] x86/sev: move MSR-based VMGEXITs for CPUID to
- helper
-Message-ID: <YdS0n3qLFS6r0ksN@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-23-brijesh.singh@amd.com>
- <Yc4ABL2EbBlwjma5@google.com>
+        id S234192AbiADVdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 16:33:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234142AbiADVda (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 16:33:30 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEB94C06179C
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 13:33:29 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id h7so40021978lfu.4
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 13:33:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=drummond.us; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TNEHR3Z7xVYize0mN8B03PgruOrGHLeNm9z/WBZRA5s=;
+        b=LSyr4sBMVZkpPhkZtPK2JisrQnhbBz7QjSfd4KNOcFM4AU0qKdk0UJpGZb+0jCOp3+
+         0be2y+YCjX3RXXSmjxSyg/dpUkwk8g9tR8tFlfpCoOl6gkjkt+fMq0PjjxyyJNTFYt8c
+         FZ11XeMeClhzKwY1EEXw6Drw6bXTNBrvYYXipPSLk1+G8bt34GEm94U8/3NBUpQmgo+I
+         6vFq6ItJdEYDUqsby/7d+eoSK1bjO+/oetaZ8Iew/taVDbU7iIgFSoXhe3hb0Ldw03MT
+         R+bmOKg8bmymIWyhHMZmRW+3LFsecnJ0FzU9ADVVLGkhSvwBro4JKi84WWqvGtFZApC4
+         FWMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TNEHR3Z7xVYize0mN8B03PgruOrGHLeNm9z/WBZRA5s=;
+        b=GdbiV3eHDpgHa/SUje217eOCz01rRHSol4GgDYJ/i1EfRdjIbGrW9fw1X2awlAY9Bp
+         M8qHRjxwHg0yUD3dAUCixO7qZJyNr8lwUc9I4u+k5iXeEuD3Yii8DRSmIWx3S5Y6xsy2
+         oxNBs+aXjjA73LkdD8J8l663STw6c1ps6A1itRDHAVU5CvdQBto+7Lvz05bSwVwohlC9
+         bxfAng6UUe/hQ8gVNQHgEDxxBNV7HoufPJA4gDX7vBX7emO/mtsFdR4s7RbNTJVND6jT
+         c9faz2Az1tp77A8ioWxQDqn55GK9W1PGFmhj0IUCi/LDVZ/z+L7KFvId7pEny1v5S68/
+         uvLQ==
+X-Gm-Message-State: AOAM533qwT/kMM7dXiK/0Glmc+8SJ6av8Uslx7G542UIR3QMet2+1q+Z
+        WXwKFnd4tGVm9FDXDzniUSYqNk7LiXrDI4PYk6/jiA==
+X-Google-Smtp-Source: ABdhPJyRA2K3TMJ6jSnxBuWi5MuQ4iKJxLMI138ugfOpXQ7kPFHXRpFMZUcCtjTEsQxbN1KSwsm/r+TWYRcUIccdplg=
+X-Received: by 2002:a05:6512:2083:: with SMTP id t3mr44658689lfr.595.1641332007792;
+ Tue, 04 Jan 2022 13:33:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yc4ABL2EbBlwjma5@google.com>
+References: <20220103181956.983342-1-walt@drummond.us> <87iluzidod.fsf@email.froward.int.ebiederm.org>
+ <YdSzjPbVDVGKT4km@mit.edu>
+In-Reply-To: <YdSzjPbVDVGKT4km@mit.edu>
+From:   Walt Drummond <walt@drummond.us>
+Date:   Tue, 4 Jan 2022 13:33:16 -0800
+Message-ID: <CADCN6nz0ih2k7-LB9D3qJjQ9Dv5QAkn7KC9Ci-qcbMHTG7_F+A@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/8] signals: Support more than 64 signals
+To:     "Theodore Ts'o" <tytso@mit.edu>
+Cc:     "Eric W. Biederman" <ebiederm@xmission.com>, aacraid@microsemi.com,
+        viro@zeniv.linux.org.uk, anna.schumaker@netapp.com, arnd@arndb.de,
+        bsegall@google.com, bp@alien8.de, chuck.lever@oracle.com,
+        bristot@redhat.com, dave.hansen@linux.intel.com,
+        dwmw2@infradead.org, dietmar.eggemann@arm.com, dinguyen@kernel.org,
+        geert@linux-m68k.org, gregkh@linuxfoundation.org, hpa@zytor.com,
+        idryomov@gmail.com, mingo@redhat.com, yzaikin@google.com,
+        ink@jurassic.park.msu.ru, jejb@linux.ibm.com, jmorris@namei.org,
+        bfields@fieldses.org, jlayton@kernel.org, jirislaby@kernel.org,
+        john.johansen@canonical.com, juri.lelli@redhat.com,
+        keescook@chromium.org, mcgrof@kernel.org,
+        martin.petersen@oracle.com, mattst88@gmail.com, mgorman@suse.de,
+        oleg@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
+        rth@twiddle.net, richard@nod.at, serge@hallyn.com,
+        rostedt@goodmis.org, tglx@linutronix.de,
+        trond.myklebust@hammerspace.com, vincent.guittot@linaro.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-m68k@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 30, 2021 at 06:52:52PM +0000, Sean Christopherson wrote:
-> Having @subfunc, a.k.a. index, in is weird/confusing/fragile because it's not consumed,
-> nor is it checked.  Peeking ahead, it looks like all future users pass '0'.  Taking the
-> index but dropping it on the floor is asking for future breakage.  Either drop it or
-> assert that it's zero.
+Fair enough.  I'll abandon the signals part of this and just send out
+the VSTATUS/Control-T part, after I address some comments from Greg.
 
-Yah, just drop it please. 
+Thanks.
 
-It can always be added later if needed.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+On Tue, Jan 4, 2022 at 12:52 PM Theodore Ts'o <tytso@mit.edu> wrote:
+>
+> On Tue, Jan 04, 2022 at 12:00:34PM -0600, Eric W. Biederman wrote:
+> > I dug through the previous conversations and there is a little debate
+> > about what makes sense for SIGPWR to do by default.  Alan Cox remembered
+> > SIGPWR was sent when the power was restored, so ignoring SIGPWR by
+> > default made sense.  Ted Tso pointed out a different scenario where it
+> > was reasonable for SIGPWR to be a terminating signal.
+> >
+> > So far no one has actually found any applications that will regress if
+> > SIGPWR becomes ignored by default.  Furthermore on linux SIGPWR is only
+> > defined to be sent to init, and init ignores all signals by default so
+> > in practice SIGPWR is ignored by the only process that receives it
+> > currently.
+>
+> As it turns out, systemd does *not* ignore SIGPWR.  Instead, it will
+> initiate the sigpwr target.  From the systemd.special man page:
+>
+>        sigpwr.target
+>            A special target that is started when systemd receives the
+>            SIGPWR process signal, which is normally sent by the kernel
+>            or UPS daemons when power fails.
+>
+> And child processes of systemd are not ignoring SIGPWR.  Instead, they
+> are getting terminated.
+>
+> <tytso@cwcc>
+> 41% /bin/sleep 50 &
+> [1] 180671
+> <tytso@cwcc>
+> 42% kill -PWR 180671
+> [1]+  Power failure           /bin/sleep 50
+>
+> > Where I saw the last conversation falter was in making a persuasive
+> > case of why SIGINFO was interesting to add.  Given a world of ssh
+> > connections I expect a persuasive case can be made.  Especially if there
+> > are a handful of utilities where it is already implemented that just
+> > need to be built with SIGINFO defined.
+>
+> One thing that's perhaps worth disentangling is the value of
+> supporting VSTATUS --- which is a control character much like VINTR
+> (^C) or VQUIT (control backslash) which is set via the c_cc[] array in
+> termios structure.  Quoting from the termios man page:
+>
+>        VSTATUS
+>               (not in POSIX; not supported under Linux; status
+>               request: 024, DC4, Ctrl-T).  Status character (STATUS).
+>               Display status information at terminal, including state
+>               of foreground process and amount of CPU time it has
+>               consumed.  Also sends a SIGINFO signal (not supported on
+>               Linux) to the foreground process group.
+>
+> The basic idea is that when you type C-t, you can find out information
+> about the currently running process.  This is a feature that
+> originally comes from TOPS-10's TENEX operating system, and it is
+> supported today on FreeBSD and Mac OS.  For example, it might display
+> something like this:
+>
+> load: 2.39  cmd: ping 5374 running 0.00u 0.00s
+>
+> The reason why SIGINFO is sent to the foreground process group is that
+> it gives the process an opportunity print application specific
+> information about currently running process.  For example, maybe the C
+> compiler could print something like "parsing 2042 of 5000 header
+> files", or some such.  :-)
+>
+> There are people who wish that Linux supported Control-T / VSTATUS,
+> for example, just last week, on TUHS, the Unix greybeards list, there
+> were two such heartfelt wishes for Control-T support from two such
+> greybeards:
+>
+>     "It's my biggest annoyance with Linux that it doesn't [support
+>     control-t]
+>     - https://minnie.tuhs.org/pipermail/tuhs/2021-December/024849.html
+>
+>     "I personally can't stand using Linux, even casually for a very
+>      short sys-admin task, because of this missing feature"
+>     - https://minnie.tuhs.org/pipermail/tuhs/2021-December/024898.html
+>
+> I claim, though, that we could implement VSTATUS without implenting
+> the SIGINFO part of the feature.  Previous few applications *ever*
+> implemented SIGINFO signal handlers so they could give status
+> information, it's the hard one, since we don't have any spare signals
+> left.  If we were to repurpose some lesser used signal, whether it be
+> SIGPWR, SIGLOST, or SIGSTKFLT, the danger is that there might be some
+> userspace program (such as a UPS monitoring program which wants to
+> trigger power fail handling, or a userspace NFSv4 process that wants
+> to signal that it was unable to recover a file's file lock after a
+> server reboot), and if we try to take over the signal assignment, it's
+> possible that we might get surprised.  Furthermore, all of the
+> possibly unused signals that we might try to reclaim terminate the
+> process by default, and SIGINFO *has* to have a default signal
+> handling action of Ignore, since otherwise typing Control-T will end
+> up killing the current foreground application.
+>
+> Personally, I don't care all that much about VSTATUS support --- I
+> used it when I was in university, but honestly, I've never missed it.
+> But if there is someone who wants to try to implement VSTATUS, and
+> make some Unix greybeards happy, and maybe even switch from FreeBSD to
+> Linux as a result, go wild.  I'm not convinced, though, that adding
+> the SIGINFO part of the support is worth the effort.
+>
+> Not only do almost no programs implement SIGINFO support, a lot of CPU
+> bound programs where this might be actually useful, end up running a
+> large number of processes in parallel.  Take the "parsing 2042 of 5000
+> header files" example I gave above.  Consider what would happen if gcc
+> implemented support for SIGINFO, but the user was running a "make -j
+> 16" and typed Control-T.   The result would be chaos!
+>
+> So if you really miss Control-T, and it's the only thing holding back
+> a few FreeBSD users from Linux, I don't see the problem with
+> implementing that part of the feature.  Why not just do the easy part
+> of the feature which is perhaps 5% of the work, and might provide 99%
+> of the benefit (at least for those people who care).
+>
+> > Without seeing the persuasive case for more signals I have to say that
+> > adding more signals to the kernel sounds like a bad idea.
+>
+> Concur, 100%.
+>
+>                                                 - Ted
