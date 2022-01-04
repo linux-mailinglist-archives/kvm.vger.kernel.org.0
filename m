@@ -2,115 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE7C14845FA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 17:33:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43435484618
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 17:41:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbiADQdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 11:33:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46258 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229984AbiADQdC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 11:33:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641313981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tzZrHzekcrvRX006y/Gm8rTUUV9sSFe7cbZaHfBSLqg=;
-        b=hVyVuwtUhR4QNtEueLFk+b8In4kdphwrqaTSDGsQNel79qDrspx6yc5gNKMhg++6Yre345
-        VT13L6wKKvIADweMBzE+KN2CsVLetgrcfY/UTzPvYXo1OoRF4G7ijleQ6RHZfwApU/e0Dg
-        5vxoa/qWSFXxzBv31ahdqsp2nSgkQzE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-214-pine5CoJON2i0yoYhBdGug-1; Tue, 04 Jan 2022 11:33:00 -0500
-X-MC-Unique: pine5CoJON2i0yoYhBdGug-1
-Received: by mail-wr1-f71.google.com with SMTP id j19-20020adfa553000000b001a375e473d8so3422133wrb.4
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 08:33:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=tzZrHzekcrvRX006y/Gm8rTUUV9sSFe7cbZaHfBSLqg=;
-        b=iGX9crvX+eSVRdXZyDTohws4YHZNuv9t/oK8zO4L4Ma+IuruqR9uQxzV+Tlau07sSU
-         xBYVl5ajlBNYT0Wn9zBywBZiiqwXUTLA3MBxfGfGHnGLp/tTG8Zgl5kEmxjMsaEV0R65
-         yZ9vSztL0gM4ILVVu+/nFo0ZvJkmxiSxvVshZB5dQhS9Qkwdyw49fo5ZmFQ0asRiTvxN
-         ohnC9xdlNIbqjWYV433B2i8xeHF/YMHeq+m4Yh6lPygf5oPhIQlf6Nt7/VoXhr1uySYO
-         cXUU743W4Py0wTMeB38eXMmANNDoVGyGJ3bQOgQNX9MsUz5hF8rhAfShXrWQNPnUgNL8
-         Vi1w==
-X-Gm-Message-State: AOAM531LXnQYyTrdueaRHaGaacrzvFK6pK3pDrE3xT7QtKcXstL4DKet
-        B94qywCp8PxBgCLv/Z3p78rgYhYSZbm33zhZAoRMbqHfuOIq74dqPpSbWl97nMROd7FnNVYDP1e
-        FWGYuapv6vEDzXP4pQ29Edt56jw6oP/MsmHUq++51y9aP4DrXRt4HT/6paoyakWiL
-X-Received: by 2002:adf:d0cb:: with SMTP id z11mr43499826wrh.470.1641313979126;
-        Tue, 04 Jan 2022 08:32:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJydR36rOEJz/kKdK6YEmU1gonpIfUL0n4Y/d/fq7dJDFrjtLzcP+ca6deofwJ0vw6WX7z6lWA==
-X-Received: by 2002:adf:d0cb:: with SMTP id z11mr43499811wrh.470.1641313978883;
-        Tue, 04 Jan 2022 08:32:58 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n1sm41002268wri.46.2022.01.04.08.32.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 08:32:58 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     "Kaya, Metin" <metikaya@amazon.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86/hyperv: Use correct macro in
- checking SynIC timer support
-In-Reply-To: <1641300662336.87966@amazon.com>
-References: <1641300662336.87966@amazon.com>
-Date:   Tue, 04 Jan 2022 17:32:57 +0100
-Message-ID: <87wnjfpikm.fsf@redhat.com>
+        id S235451AbiADQlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 11:41:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233941AbiADQlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 11:41:03 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E5E9C061761;
+        Tue,  4 Jan 2022 08:41:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BEBD661507;
+        Tue,  4 Jan 2022 16:41:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2E53C36AE9;
+        Tue,  4 Jan 2022 16:41:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641314462;
+        bh=7LIvck5HPV89YRWtE6kFpffx/kn63b1CJh/KGhZQUKs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=LRvO6MenpPinEO+T+hEV/YbUXSjLlkY8NoW3HQ9aE099V5K48u6VhHatEzBsKSBPT
+         cmffNDot4PE1jdfo57Arc+b1RjDJF4UindSch9QkjJJQOHEuyDv3Sb/V9CrAZ8qboX
+         FqEMlIC2YhID+deJpRGh+rGjD91a069/0BkOvhCvCmsJK1jZi8rBUdT+Y4L6D1LoWJ
+         +iF+m+fxZZCM303intD0VWXGgWalDOLkP/rubmrzKenN5dJymlBii0CMk5vgf2rQ4c
+         l4GnLXjX0UYge02uSn7jN4nWu8z/+1dWw6issq/EjMI7Z4BLY3xzgU97f0cFdn+/Kk
+         7cEOBvSJL88ew==
+Date:   Tue, 4 Jan 2022 10:41:00 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 01/14] iommu: Add dma ownership management interfaces
+Message-ID: <20220104164100.GA101735@bhelgaas>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YdQcgFhIMYvUwABV@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"Kaya, Metin" <metikaya@amazon.com> writes:
+On Tue, Jan 04, 2022 at 02:08:00AM -0800, Christoph Hellwig wrote:
+> On Tue, Jan 04, 2022 at 09:56:31AM +0800, Lu Baolu wrote:
+> > Multiple devices may be placed in the same IOMMU group because they
+> > cannot be isolated from each other. These devices must either be
+> > entirely under kernel control or userspace control, never a mixture.
 
-> This commit fixes 69d4bf751641520f5b2d8e3f160c63c8966fcd8b. stimer_suppor=
-ted() should use HV_X64_MSR_SYNTIMER_AVAILABLE instead of HV_X64_MSR_SYNIC_=
-AVAILABLE.=E2=80=8B
-> From 3e31f7d2b7bfc92ff710e3061b32301f96862b8b Mon Sep 17 00:00:00 2001
-> From: Metin Kaya <metikaya@amazon.com>
-> Date: Wed, 22 Dec 2021 18:22:28 +0000
-> Subject: [kvm-unit-tests PATCH 1/2] x86/hyperv: Use correct macro in chec=
-king
->  SynIC timer support
->
-> This commit fixes 69d4bf751641520f5b2d8e3f160c63c8966fcd8b.
-> stimer_supported() should use HV_X64_MSR_SYNTIMER_AVAILABLE instead of
-> HV_X64_MSR_SYNIC_AVAILABLE.
->
+I guess the reason is that if a group contained a mixture, userspace
+could attack the kernel by programming a device to DMA to a device
+owned by the kernel?
 
-Fixes: 69d4bf7 ("x86: Hyper-V SynIC timers test")
-> Signed-off-by: Metin Kaya <metikaya@amazon.com>
-> ---
->  x86/hyperv.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/hyperv.h b/x86/hyperv.h
-> index e135221..f2bb7b4 100644
-> --- a/x86/hyperv.h
-> +++ b/x86/hyperv.h
-> @@ -190,7 +190,7 @@ static inline bool synic_supported(void)
->=20=20
->  static inline bool stimer_supported(void)
->  {
-> -    return cpuid(HYPERV_CPUID_FEATURES).a & HV_X64_MSR_SYNIC_AVAILABLE;
-> +    return cpuid(HYPERV_CPUID_FEATURES).a & HV_X64_MSR_SYNTIMER_AVAILABL=
-E;
->  }
+> > This adds dma ownership management in iommu core and exposes several
+> > interfaces for the device drivers and the device userspace assignment
+> > framework (i.e. vfio), so that any conflict between user and kernel
+> > controlled DMA could be detected at the beginning.
 
-Unrelated to the change but I'd suggest renaming stimer_supported() to
-hv_stimer_supported() and synic_supported() to hv_synic_supported().
+Maybe I'm missing the point because I don't know what "conflict
+between user and kernel controlled DMA" is.  Are you talking about
+both userspace and the kernel programming the same device to do DMA?
 
->=20=20
->  static inline bool hv_time_ref_counter_supported(void)
+> > The device driver oriented interfaces are,
+> > 
+> > 	int iommu_device_use_dma_api(struct device *dev);
+> > 	void iommu_device_unuse_dma_api(struct device *dev);
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Nit, do we care whether it uses the actual DMA API?  Or is it just
+that iommu_device_use_dma_api() tells us the driver may program the
+device to do DMA?
 
---=20
-Vitaly
+> > Devices under kernel drivers control must call iommu_device_use_dma_api()
+> > before driver probes. The driver binding process must be aborted if it
+> > returns failure.
 
+"Devices" don't call functions.  Drivers do, or in this case, it looks
+like the bus DMA code (platform, amba, fsl, pci, etc).
+
+These functions are EXPORT_SYMBOL_GPL(), but it looks like all the
+callers are built-in, so maybe the export is unnecessary?
+
+You use "iommu"/"IOMMU" and "dma"/"DMA" interchangeably above.  Would
+be easier to read if you picked one.
+
+> > The vfio oriented interfaces are,
+> > 
+> > 	int iommu_group_set_dma_owner(struct iommu_group *group,
+> > 				      void *owner);
+> > 	void iommu_group_release_dma_owner(struct iommu_group *group);
+> > 	bool iommu_group_dma_owner_claimed(struct iommu_group *group);
+> > 
+> > The device userspace assignment must be disallowed if the set dma owner
+> > interface returns failure.
+
+Can you connect this back to the "never a mixture" from the beginning?
+If all you cared about was prevent an IOMMU group from containing
+devices with a mixture of kernel drivers and userspace drivers, I
+assume you could do that without iommu_device_use_dma_api().  So is
+this a way to *allow* a mixture under certain restricted conditions?
+
+Another nit below.
+
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+> > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> > ---
+> >  include/linux/iommu.h |  31 ++++++++
+> >  drivers/iommu/iommu.c | 161 +++++++++++++++++++++++++++++++++++++++++-
+> >  2 files changed, 189 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> > index de0c57a567c8..568f285468cf 100644
+> > --- a/include/linux/iommu.h
+> > +++ b/include/linux/iommu.h
+> > @@ -682,6 +682,13 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+> >  void iommu_sva_unbind_device(struct iommu_sva *handle);
+> >  u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+> >  
+> > +int iommu_device_use_dma_api(struct device *dev);
+> > +void iommu_device_unuse_dma_api(struct device *dev);
+> > +
+> > +int iommu_group_set_dma_owner(struct iommu_group *group, void *owner);
+> > +void iommu_group_release_dma_owner(struct iommu_group *group);
+> > +bool iommu_group_dma_owner_claimed(struct iommu_group *group);
+> > +
+> >  #else /* CONFIG_IOMMU_API */
+> >  
+> >  struct iommu_ops {};
+> > @@ -1082,6 +1089,30 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
+> >  {
+> >  	return NULL;
+> >  }
+> > +
+> > +static inline int iommu_device_use_dma_api(struct device *dev)
+> > +{
+> > +	return 0;
+> > +}
+> > +
+> > +static inline void iommu_device_unuse_dma_api(struct device *dev)
+> > +{
+> > +}
+> > +
+> > +static inline int
+> > +iommu_group_set_dma_owner(struct iommu_group *group, void *owner)
+> > +{
+> > +	return -ENODEV;
+> > +}
+> > +
+> > +static inline void iommu_group_release_dma_owner(struct iommu_group *group)
+> > +{
+> > +}
+> > +
+> > +static inline bool iommu_group_dma_owner_claimed(struct iommu_group *group)
+> > +{
+> > +	return false;
+> > +}
+> >  #endif /* CONFIG_IOMMU_API */
+> >  
+> >  /**
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > index 8b86406b7162..ff0c8c1ad5af 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -48,6 +48,8 @@ struct iommu_group {
+> >  	struct iommu_domain *default_domain;
+> >  	struct iommu_domain *domain;
+> >  	struct list_head entry;
+> > +	unsigned int owner_cnt;
+> > +	void *owner;
+> >  };
+> >  
+> >  struct group_device {
+> > @@ -289,7 +291,12 @@ int iommu_probe_device(struct device *dev)
+> >  	mutex_lock(&group->mutex);
+> >  	iommu_alloc_default_domain(group, dev);
+> >  
+> > -	if (group->default_domain) {
+> > +	/*
+> > +	 * If device joined an existing group which has been claimed
+> > +	 * for none kernel DMA purpose, avoid attaching the default
+> > +	 * domain.
+
+AOL: another "none kernel DMA purpose" that doesn't read well.  Is
+this supposed to be "non-kernel"?  What does "claimed for non-kernel
+DMA purpose" mean?  What interface does that?
+
+> > +	 */
+> > +	if (group->default_domain && !group->owner) {
+> >  		ret = __iommu_attach_device(group->default_domain, dev);
+> >  		if (ret) {
+> >  			mutex_unlock(&group->mutex);
+> > @@ -2320,7 +2327,7 @@ static int __iommu_attach_group(struct iommu_domain *domain,
+> >  {
+> >  	int ret;
+> >  
+> > -	if (group->default_domain && group->domain != group->default_domain)
+> > +	if (group->domain && group->domain != group->default_domain)
+> >  		return -EBUSY;
+> >  
+> >  	ret = __iommu_group_for_each_dev(group, domain,
+> > @@ -2357,7 +2364,11 @@ static void __iommu_detach_group(struct iommu_domain *domain,
+> >  {
+> >  	int ret;
+> >  
+> > -	if (!group->default_domain) {
+> > +	/*
+> > +	 * If group has been claimed for none kernel DMA purpose, avoid
+> > +	 * re-attaching the default domain.
+> > +	 */
+> 
+> none kernel reads odd.  But maybe drop that and just say 'claimed
+> already' ala:
+> 
+> 	/*
+> 	 * If the group has been claimed already, do not re-attach the default
+> 	 * domain.
+> 	 */
