@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 377DB483A46
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 02:59:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49D30483A49
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 02:59:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbiADB7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jan 2022 20:59:02 -0500
-Received: from mga12.intel.com ([192.55.52.136]:30228 "EHLO mga12.intel.com"
+        id S229700AbiADB7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jan 2022 20:59:13 -0500
+Received: from mga05.intel.com ([192.55.52.43]:37557 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231326AbiADB7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jan 2022 20:59:00 -0500
+        id S229757AbiADB7M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jan 2022 20:59:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641261540; x=1672797540;
+  t=1641261552; x=1672797552;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=eeKtbXgwDPL6SQfDc0qNWg3obZg3ERLKr5eUj6KHvZQ=;
-  b=BHkzDBnY8vUjsRGezoDMH9hSPemYPHgvnNnftB/BsI+oNLOg35EKpRBT
-   MrjAeLsXR9fectKSs4PThjcktr+fZgNOpgw4MiGW7iAw7y0JO+3bq8IQB
-   n5stwgTCkH1Oo3LVMymYhKoqj+zIEpxU2+BIYcryhD5eFmjxr0UeP7W17
-   D507gAPSFD2IBvhMCYeC1xH/VBu9GaWekUcCxRIH3J3OeBeyk0tHl0s6V
-   wUejM81KkdQQL4QYRgMORnnoZ++5t19X2MiyQ3adZ74YKFMw9PSys1DFY
-   wT4+ZrUIAumUvsGLwORUfktHRWh2Eb42iWzFy4dsPE1X9yHtOpeGbZAnT
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="222133891"
+  bh=QSJSuixQj2c2RVpXtE8IShxwGNkHMzp6PO0/hCqGO3I=;
+  b=jUj3T7vnm9j+nNohbkRaWcTJdkiqeoeI2ZWV06arPhlKCfXgxSrIp+Ph
+   58IReFiURxbs0KzLX2sYxg7U1jlz8M7XngJ0a54brJHuNTLAwd78IFUvE
+   fr/sGZfkqds52KhmLDKmVw68iif/Lg3JkPGD50wTZe4bEbmabbekq/IGI
+   rhx9u06pQiCjMpUQH6MAjCFOmkR/+HHkRVeld0o//4Y4y07wx7JTF9vVf
+   4hZY0OnF5ZHFI6GfIYewHLMQQwjpZcC9VHUeuMrUQL/3CcDtFB95pYOYO
+   I43DF7WfNbM/LzuGpfrycQwNOL/pBSQuS6Mb7AJtWQvfW2SaDowgs+2jO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="328482055"
 X-IronPort-AV: E=Sophos;i="5.88,258,1635231600"; 
-   d="scan'208";a="222133891"
+   d="scan'208";a="328482055"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2022 17:58:54 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2022 17:59:01 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,258,1635231600"; 
-   d="scan'208";a="667573379"
+   d="scan'208";a="667573411"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by fmsmga001.fm.intel.com with ESMTP; 03 Jan 2022 17:58:47 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 03 Jan 2022 17:58:54 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -61,10 +61,11 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         Dmitry Osipenko <digetx@gmail.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v5 13/14] vfio: Remove iommu group notifier
-Date:   Tue,  4 Jan 2022 09:56:43 +0800
-Message-Id: <20220104015644.2294354-14-baolu.lu@linux.intel.com>
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v5 14/14] iommu: Remove iommu group changes notifier
+Date:   Tue,  4 Jan 2022 09:56:44 +0800
+Message-Id: <20220104015644.2294354-15-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
 References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
@@ -74,231 +75,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The iommu core and driver core have been enhanced to avoid unsafe driver
-binding to a live group after iommu_group_set_dma_owner(PRIVATE_USER)
-has been called. There's no need to register iommu group notifier. This
-removes the iommu group notifer which contains BUG_ON() and WARN().
+The iommu group changes notifer is not referenced in the tree. Remove it
+to avoid dead code.
 
-The commit 5f096b14d421b ("vfio: Whitelist PCI bridges") allowed all
-pcieport drivers to be bound with devices while the group is assigned to
-user space. This is not always safe. For example, The shpchp_core driver
-relies on the PCI MMIO access for the controller functionality. With its
-downstream devices assigned to the userspace, the MMIO might be changed
-through user initiated P2P accesses without any notification. This might
-break the kernel driver integrity and lead to some unpredictable
-consequences. As the result, currently we only allow the portdrv driver.
-
-For any bridge driver, in order to avoiding default kernel DMA ownership
-claiming, we should consider:
-
- 1) Does the bridge driver use DMA? Calling pci_set_master() or
-    a dma_map_* API is a sure indicate the driver is doing DMA
-
- 2) If the bridge driver uses MMIO, is it tolerant to hostile
-    userspace also touching the same MMIO registers via P2P DMA
-    attacks?
-
-Conservatively if the driver maps an MMIO region at all, we can say that
-it fails the test.
-
+Suggested-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/vfio/vfio.c | 147 --------------------------------------------
- 1 file changed, 147 deletions(-)
+ include/linux/iommu.h | 23 -------------
+ drivers/iommu/iommu.c | 75 -------------------------------------------
+ 2 files changed, 98 deletions(-)
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 2877ec47e32a..dce42ede3190 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -71,7 +71,6 @@ struct vfio_group {
- 	struct vfio_container		*container;
- 	struct list_head		device_list;
- 	struct mutex			device_lock;
--	struct notifier_block		nb;
- 	struct list_head		vfio_next;
- 	struct list_head		container_next;
- 	atomic_t			opened;
-@@ -274,8 +273,6 @@ void vfio_unregister_iommu_driver(const struct vfio_iommu_driver_ops *ops)
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 568f285468cf..408a6d2b3034 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -403,13 +403,6 @@ static inline void iommu_iotlb_gather_init(struct iommu_iotlb_gather *gather)
+ 	};
  }
- EXPORT_SYMBOL_GPL(vfio_unregister_iommu_driver);
  
--static int vfio_iommu_group_notifier(struct notifier_block *nb,
--				     unsigned long action, void *data);
- static void vfio_group_get(struct vfio_group *group);
- 
- /*
-@@ -395,13 +392,6 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
- 		goto err_put;
- 	}
- 
--	group->nb.notifier_call = vfio_iommu_group_notifier;
--	err = iommu_group_register_notifier(iommu_group, &group->nb);
--	if (err) {
--		ret = ERR_PTR(err);
--		goto err_put;
--	}
+-#define IOMMU_GROUP_NOTIFY_ADD_DEVICE		1 /* Device added */
+-#define IOMMU_GROUP_NOTIFY_DEL_DEVICE		2 /* Pre Device removed */
+-#define IOMMU_GROUP_NOTIFY_BIND_DRIVER		3 /* Pre Driver bind */
+-#define IOMMU_GROUP_NOTIFY_BOUND_DRIVER		4 /* Post Driver bind */
+-#define IOMMU_GROUP_NOTIFY_UNBIND_DRIVER	5 /* Pre Driver unbind */
+-#define IOMMU_GROUP_NOTIFY_UNBOUND_DRIVER	6 /* Post Driver unbind */
 -
- 	mutex_lock(&vfio.group_lock);
- 
- 	/* Did we race creating this group? */
-@@ -422,7 +412,6 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
- 
- err_unlock:
- 	mutex_unlock(&vfio.group_lock);
--	iommu_group_unregister_notifier(group->iommu_group, &group->nb);
- err_put:
- 	put_device(&group->dev);
- 	return ret;
-@@ -447,7 +436,6 @@ static void vfio_group_put(struct vfio_group *group)
- 	cdev_device_del(&group->cdev, &group->dev);
- 	mutex_unlock(&vfio.group_lock);
- 
--	iommu_group_unregister_notifier(group->iommu_group, &group->nb);
- 	put_device(&group->dev);
+ extern int bus_set_iommu(struct bus_type *bus, const struct iommu_ops *ops);
+ extern int bus_iommu_probe(struct bus_type *bus);
+ extern bool iommu_present(struct bus_type *bus);
+@@ -482,10 +475,6 @@ extern int iommu_group_for_each_dev(struct iommu_group *group, void *data,
+ extern struct iommu_group *iommu_group_get(struct device *dev);
+ extern struct iommu_group *iommu_group_ref_get(struct iommu_group *group);
+ extern void iommu_group_put(struct iommu_group *group);
+-extern int iommu_group_register_notifier(struct iommu_group *group,
+-					 struct notifier_block *nb);
+-extern int iommu_group_unregister_notifier(struct iommu_group *group,
+-					   struct notifier_block *nb);
+ extern int iommu_register_device_fault_handler(struct device *dev,
+ 					iommu_dev_fault_handler_t handler,
+ 					void *data);
+@@ -885,18 +874,6 @@ static inline void iommu_group_put(struct iommu_group *group)
+ {
  }
  
-@@ -503,141 +491,6 @@ static struct vfio_device *vfio_group_get_device(struct vfio_group *group,
- 	return NULL;
- }
- 
--/*
-- * Some drivers, like pci-stub, are only used to prevent other drivers from
-- * claiming a device and are therefore perfectly legitimate for a user owned
-- * group.  The pci-stub driver has no dependencies on DMA or the IOVA mapping
-- * of the device, but it does prevent the user from having direct access to
-- * the device, which is useful in some circumstances.
-- *
-- * We also assume that we can include PCI interconnect devices, ie. bridges.
-- * IOMMU grouping on PCI necessitates that if we lack isolation on a bridge
-- * then all of the downstream devices will be part of the same IOMMU group as
-- * the bridge.  Thus, if placing the bridge into the user owned IOVA space
-- * breaks anything, it only does so for user owned devices downstream.  Note
-- * that error notification via MSI can be affected for platforms that handle
-- * MSI within the same IOVA space as DMA.
-- */
--static const char * const vfio_driver_allowed[] = { "pci-stub" };
--
--static bool vfio_dev_driver_allowed(struct device *dev,
--				    struct device_driver *drv)
+-static inline int iommu_group_register_notifier(struct iommu_group *group,
+-						struct notifier_block *nb)
 -{
--	if (dev_is_pci(dev)) {
--		struct pci_dev *pdev = to_pci_dev(dev);
--
--		if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
--			return true;
--	}
--
--	return match_string(vfio_driver_allowed,
--			    ARRAY_SIZE(vfio_driver_allowed),
--			    drv->name) >= 0;
+-	return -ENODEV;
 -}
 -
--/*
-- * A vfio group is viable for use by userspace if all devices are in
-- * one of the following states:
-- *  - driver-less
-- *  - bound to a vfio driver
-- *  - bound to an otherwise allowed driver
-- *  - a PCI interconnect device
-- *
-- * We use two methods to determine whether a device is bound to a vfio
-- * driver.  The first is to test whether the device exists in the vfio
-- * group.  The second is to test if the device exists on the group
-- * unbound_list, indicating it's in the middle of transitioning from
-- * a vfio driver to driver-less.
-- */
--static int vfio_dev_viable(struct device *dev, void *data)
+-static inline int iommu_group_unregister_notifier(struct iommu_group *group,
+-						  struct notifier_block *nb)
 -{
--	struct vfio_group *group = data;
--	struct vfio_device *device;
--	struct device_driver *drv = READ_ONCE(dev->driver);
--
--	if (!drv || vfio_dev_driver_allowed(dev, drv))
--		return 0;
--
--	device = vfio_group_get_device(group, dev);
--	if (device) {
--		vfio_device_put(device);
--		return 0;
--	}
--
--	return -EINVAL;
--}
--
--/*
-- * Async device support
-- */
--static int vfio_group_nb_add_dev(struct vfio_group *group, struct device *dev)
--{
--	struct vfio_device *device;
--
--	/* Do we already know about it?  We shouldn't */
--	device = vfio_group_get_device(group, dev);
--	if (WARN_ON_ONCE(device)) {
--		vfio_device_put(device);
--		return 0;
--	}
--
--	/* Nothing to do for idle groups */
--	if (!atomic_read(&group->container_users))
--		return 0;
--
--	/* TODO Prevent device auto probing */
--	dev_WARN(dev, "Device added to live group %d!\n",
--		 iommu_group_id(group->iommu_group));
--
 -	return 0;
 -}
 -
--static int vfio_group_nb_verify(struct vfio_group *group, struct device *dev)
+ static inline
+ int iommu_register_device_fault_handler(struct device *dev,
+ 					iommu_dev_fault_handler_t handler,
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index ff0c8c1ad5af..72a95dea688e 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -18,7 +18,6 @@
+ #include <linux/errno.h>
+ #include <linux/iommu.h>
+ #include <linux/idr.h>
+-#include <linux/notifier.h>
+ #include <linux/err.h>
+ #include <linux/pci.h>
+ #include <linux/bitops.h>
+@@ -40,7 +39,6 @@ struct iommu_group {
+ 	struct kobject *devices_kobj;
+ 	struct list_head devices;
+ 	struct mutex mutex;
+-	struct blocking_notifier_head notifier;
+ 	void *iommu_data;
+ 	void (*iommu_data_release)(void *iommu_data);
+ 	char *name;
+@@ -627,7 +625,6 @@ struct iommu_group *iommu_group_alloc(void)
+ 	mutex_init(&group->mutex);
+ 	INIT_LIST_HEAD(&group->devices);
+ 	INIT_LIST_HEAD(&group->entry);
+-	BLOCKING_INIT_NOTIFIER_HEAD(&group->notifier);
+ 
+ 	ret = ida_simple_get(&iommu_group_ida, 0, 0, GFP_KERNEL);
+ 	if (ret < 0) {
+@@ -902,10 +899,6 @@ int iommu_group_add_device(struct iommu_group *group, struct device *dev)
+ 	if (ret)
+ 		goto err_put_group;
+ 
+-	/* Notify any listeners about change to group. */
+-	blocking_notifier_call_chain(&group->notifier,
+-				     IOMMU_GROUP_NOTIFY_ADD_DEVICE, dev);
+-
+ 	trace_add_device_to_group(group->id, dev);
+ 
+ 	dev_info(dev, "Adding to iommu group %d\n", group->id);
+@@ -947,10 +940,6 @@ void iommu_group_remove_device(struct device *dev)
+ 
+ 	dev_info(dev, "Removing from iommu group %d\n", group->id);
+ 
+-	/* Pre-notify listeners that a device is being removed. */
+-	blocking_notifier_call_chain(&group->notifier,
+-				     IOMMU_GROUP_NOTIFY_DEL_DEVICE, dev);
+-
+ 	mutex_lock(&group->mutex);
+ 	list_for_each_entry(tmp_device, &group->devices, list) {
+ 		if (tmp_device->dev == dev) {
+@@ -1073,36 +1062,6 @@ void iommu_group_put(struct iommu_group *group)
+ }
+ EXPORT_SYMBOL_GPL(iommu_group_put);
+ 
+-/**
+- * iommu_group_register_notifier - Register a notifier for group changes
+- * @group: the group to watch
+- * @nb: notifier block to signal
+- *
+- * This function allows iommu group users to track changes in a group.
+- * See include/linux/iommu.h for actions sent via this notifier.  Caller
+- * should hold a reference to the group throughout notifier registration.
+- */
+-int iommu_group_register_notifier(struct iommu_group *group,
+-				  struct notifier_block *nb)
 -{
--	/* We don't care what happens when the group isn't in use */
--	if (!atomic_read(&group->container_users))
+-	return blocking_notifier_chain_register(&group->notifier, nb);
+-}
+-EXPORT_SYMBOL_GPL(iommu_group_register_notifier);
+-
+-/**
+- * iommu_group_unregister_notifier - Unregister a notifier
+- * @group: the group to watch
+- * @nb: notifier block to signal
+- *
+- * Unregister a previously registered group notifier block.
+- */
+-int iommu_group_unregister_notifier(struct iommu_group *group,
+-				    struct notifier_block *nb)
+-{
+-	return blocking_notifier_chain_unregister(&group->notifier, nb);
+-}
+-EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
+-
+ /**
+  * iommu_register_device_fault_handler() - Register a device fault handler
+  * @dev: the device
+@@ -1651,14 +1610,8 @@ static int remove_iommu_group(struct device *dev, void *data)
+ static int iommu_bus_notifier(struct notifier_block *nb,
+ 			      unsigned long action, void *data)
+ {
+-	unsigned long group_action = 0;
+ 	struct device *dev = data;
+-	struct iommu_group *group;
+ 
+-	/*
+-	 * ADD/DEL call into iommu driver ops if provided, which may
+-	 * result in ADD/DEL notifiers to group->notifier
+-	 */
+ 	if (action == BUS_NOTIFY_ADD_DEVICE) {
+ 		int ret;
+ 
+@@ -1669,34 +1622,6 @@ static int iommu_bus_notifier(struct notifier_block *nb,
+ 		return NOTIFY_OK;
+ 	}
+ 
+-	/*
+-	 * Remaining BUS_NOTIFYs get filtered and republished to the
+-	 * group, if anyone is listening
+-	 */
+-	group = iommu_group_get(dev);
+-	if (!group)
 -		return 0;
 -
--	return vfio_dev_viable(dev, group);
--}
--
--static int vfio_iommu_group_notifier(struct notifier_block *nb,
--				     unsigned long action, void *data)
--{
--	struct vfio_group *group = container_of(nb, struct vfio_group, nb);
--	struct device *dev = data;
--
 -	switch (action) {
--	case IOMMU_GROUP_NOTIFY_ADD_DEVICE:
--		vfio_group_nb_add_dev(group, dev);
+-	case BUS_NOTIFY_BIND_DRIVER:
+-		group_action = IOMMU_GROUP_NOTIFY_BIND_DRIVER;
 -		break;
--	case IOMMU_GROUP_NOTIFY_DEL_DEVICE:
--		/*
--		 * Nothing to do here.  If the device is in use, then the
--		 * vfio sub-driver should block the remove callback until
--		 * it is unused.  If the device is unused or attached to a
--		 * stub driver, then it should be released and we don't
--		 * care that it will be going away.
--		 */
+-	case BUS_NOTIFY_BOUND_DRIVER:
+-		group_action = IOMMU_GROUP_NOTIFY_BOUND_DRIVER;
 -		break;
--	case IOMMU_GROUP_NOTIFY_BIND_DRIVER:
--		dev_dbg(dev, "%s: group %d binding to driver\n", __func__,
--			iommu_group_id(group->iommu_group));
+-	case BUS_NOTIFY_UNBIND_DRIVER:
+-		group_action = IOMMU_GROUP_NOTIFY_UNBIND_DRIVER;
 -		break;
--	case IOMMU_GROUP_NOTIFY_BOUND_DRIVER:
--		dev_dbg(dev, "%s: group %d bound to driver %s\n", __func__,
--			iommu_group_id(group->iommu_group), dev->driver->name);
--		BUG_ON(vfio_group_nb_verify(group, dev));
--		break;
--	case IOMMU_GROUP_NOTIFY_UNBIND_DRIVER:
--		dev_dbg(dev, "%s: group %d unbinding from driver %s\n",
--			__func__, iommu_group_id(group->iommu_group),
--			dev->driver->name);
+-	case BUS_NOTIFY_UNBOUND_DRIVER:
+-		group_action = IOMMU_GROUP_NOTIFY_UNBOUND_DRIVER;
 -		break;
 -	}
--	return NOTIFY_OK;
--}
 -
- /*
-  * VFIO driver API
-  */
+-	if (group_action)
+-		blocking_notifier_call_chain(&group->notifier,
+-					     group_action, dev);
+-
+-	iommu_group_put(group);
+ 	return 0;
+ }
+ 
 -- 
 2.25.1
 
