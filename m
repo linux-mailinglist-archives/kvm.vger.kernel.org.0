@@ -2,103 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AE3F4846F1
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 18:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D5624846FD
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 18:29:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235236AbiADRZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 12:25:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39210 "EHLO
+        id S235646AbiADR3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 12:29:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234240AbiADRZm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 12:25:42 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344BBC061761
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 09:25:42 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id g2so33270202pgo.9
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 09:25:42 -0800 (PST)
+        with ESMTP id S234189AbiADR3o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 12:29:44 -0500
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100AFC061761
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 09:29:44 -0800 (PST)
+Received: by mail-il1-x131.google.com with SMTP id v10so28898668ilj.3
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 09:29:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Dt2cPCWEsFZ5AbysL4UkCn7JLhXrIdEBz/GoqAR1B90=;
-        b=NB45Tda4CCIIb04U+XDNPZB5azw6aHsshMgvWalK1tJ39OAsDe72/kEJOx2fW6bMeG
-         tdvxvimXmORNQJzTeQrOyhivszDBnLT8eQInnyfZfolZS7FmpwztJM3S9a9Qu4+VtC2M
-         XFGVtgFPc13suxJgngyMOg/NAezoiRxTuw4/UY7x4PKzEKqMPvcwvzWS3+Sl3S+Rxiu7
-         x/o3xwv5hYV55SYKUd/p7bh/PQkMYHKz4q4gbc4Lx5E4CtUdZ7SJt8TvcJyCLsrUsuGi
-         eBKr98sjqDjtwnHVKO4OGB2Tm3jkPAMw+iNPG/nrLuXah3b7/A2gYBxhdZrtoeZxuAxV
-         +j4A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m1GnrodwIx3U3MtKS6H0HNAvAZXFbA1aoo+jqiQdTH0=;
+        b=fctI+z0EraOx3SJTtbegT5MMc8azCbmtUzxlZd0i15u1nI3rQoC4i02eIwcrjwb8W5
+         bxx+t2TrLE7QJ0FB7lwIe4wj7t5+H6l3PtD7XkiURhd+gYsL2CnBrNlbXBc446QdyxZ8
+         yX5DGxnRdWZiorqW8vjbuYbJAGH9PhUn/cKxodJw/l6rojnJil5TI9xQ35jt8/0oBSvl
+         iJlhIHRXHUj0HLNJ8jj9Jz84ne4m2tzbmTWVtenqESnOV7RfaGTip3Dqw52QA/8sBJ68
+         7DbvaAisHCPniXqOoIEFVplZJvuKhTfbsjypZhD/U3mqwu25OKWpSz2p9nPLzZhWSSR+
+         B2sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Dt2cPCWEsFZ5AbysL4UkCn7JLhXrIdEBz/GoqAR1B90=;
-        b=RLi/6MlXQ6WrtHelGn/8R+VczBUHCbkU5kg/N6ZsFfzwjz9CUQY6jb+rYk/UX6854z
-         4qIthNBejHWBLT/Dw06VYIEq7sbMUNaSpLOkT00ZO/2YCkoO897Dhhl2Q9d1cVX0eLKM
-         TbvlPTld6w8OxUxgCyp/0I6gJac/l20D9loSmVTqJeslQWTJanE2uSqmVgoxgJgNgnZp
-         WxHO0WKkaWwrHZfMqwudF5+nmt6/2v5tXzgLHP5Rd6c6pTD8lTMTfbooZgj6fTcVdiAK
-         +tURVX5aQc5C3dzjTXyELtw4soEprfGhSwK9WlEdTugZ9Br0d8HpB38NUaJIGZXU9g5K
-         hCXQ==
-X-Gm-Message-State: AOAM532DJ3GGfk6yadq0jWNoHFFmpHHf601NswXmGzXqe32L1qlsATV6
-        9JuCeuy3S2lMehSeRNwFdokgaw==
-X-Google-Smtp-Source: ABdhPJwQvdabyHoNNTGEbHXwTynNfe/NdjpWJGah72K6zT+sA3YPBHP0aoiMjx0n1cqTIwmYvhLhXQ==
-X-Received: by 2002:a05:6a00:2304:b0:4ba:4cbb:8289 with SMTP id h4-20020a056a00230400b004ba4cbb8289mr51337276pfh.79.1641317141421;
-        Tue, 04 Jan 2022 09:25:41 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ip2sm36902413pjb.34.2022.01.04.09.25.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 09:25:40 -0800 (PST)
-Date:   Tue, 4 Jan 2022 17:25:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m1GnrodwIx3U3MtKS6H0HNAvAZXFbA1aoo+jqiQdTH0=;
+        b=w3iz1K0MKBs+YBlvwJJGduyeU8bzx2WJdG8UT8FL0en0+awHPMU9umlGT125DiAofc
+         OGYE9S6VLJm2BcwExhFrv4CSYXVIiluUCluu9X4wNwHEjJeEnVF30w0gdtslfZsL0GyR
+         i70y6z0x7anTLxc+3j+5toWBAeNhvZQN7TjQn82ilX9AmyUAmFBg8ZpSm74331cZRN62
+         sx1aUxV22L0y32lmG5o8aEBe5JxiU2MCIUIU6O81EZ9G8AHYWm11LMzv59XdhZWL7FfR
+         OAh8YDFpY9J0G1vPml95EetY35wKAluwGGXZztaRiqgjvbAZvNAxy0ToogOu74aKVNBO
+         Wckg==
+X-Gm-Message-State: AOAM533P9ZhfQgWvOWW0kL9JeE/JVRIPcO3vp59ZkyFaPO2etUXvIcnH
+        8FDvJtPmXbRJ0nr82/lzlrxgthTsVq/3rIwh7qfq2A==
+X-Google-Smtp-Source: ABdhPJx8kb43aDwoPlu1xtoqV8WdE0e1FhIjA/uac6cj4RYIhNDlu0kYtCt2+7WoQMZ+Cz9By5Gs/f0T1qazbh6Cm2s=
+X-Received: by 2002:a05:6e02:178c:: with SMTP id y12mr22287704ilu.298.1641317383370;
+ Tue, 04 Jan 2022 09:29:43 -0800 (PST)
+MIME-Version: 1.0
+References: <20211213225918.672507-1-dmatlack@google.com> <20211213225918.672507-4-dmatlack@google.com>
+ <YdQdv5lAWsJA1/EA@xz-m1.local>
+In-Reply-To: <YdQdv5lAWsJA1/EA@xz-m1.local>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 4 Jan 2022 09:29:32 -0800
+Message-ID: <CANgfPd9MmKC_E6J+isYX+6DmT+kCQBF=o7_w4xg-WqPEJ5WG8A@mail.gmail.com>
+Subject: Re: [PATCH v1 03/13] KVM: x86/mmu: Automatically update
+ iter->old_spte if cmpxchg fails
+To:     Peter Xu <peterx@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v11 01/17] perf/x86/intel: Add EPT-Friendly PEBS for Ice
- Lake Server
-Message-ID: <YdSDEUJQgJQfZjWD@google.com>
-References: <20211210133525.46465-1-likexu@tencent.com>
- <20211210133525.46465-2-likexu@tencent.com>
- <Yc321e9o16luwFK+@google.com>
- <69ad949e-4788-0f93-46cb-6af6f79a9f24@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69ad949e-4788-0f93-46cb-6af6f79a9f24@gmail.com>
+        Sean Christopherson <seanjc@google.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>,
+        "Nikunj A . Dadhania" <nikunj@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 31, 2021, Like Xu wrote:
-> On 31/12/2021 2:13 am, Sean Christopherson wrote:
-> > On Fri, Dec 10, 2021, Like Xu wrote:
-> > > The new hardware facility supporting guest PEBS is only available on
-> > > Intel Ice Lake Server platforms for now. KVM will check this field
-> > > through perf_get_x86_pmu_capability() instead of hard coding the cpu
-> > > models in the KVM code. If it is supported, the guest PEBS capability
-> > > will be exposed to the guest.
-> > 
-> > So what exactly is this new feature?  I've speed read the cover letter and a few
-> > changelogs and didn't find anything that actually explained when this feature does.
-> > 
-> 
-> Please check Intel SDM Vol3 18.9.5 for this "EPT-Friendly PEBS" feature.
-> 
-> I assume when an unfamiliar feature appears in the patch SUBJECT,
-> the reviewer may search for the exact name in the specification.
+On Tue, Jan 4, 2022 at 2:13 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Mon, Dec 13, 2021 at 10:59:08PM +0000, David Matlack wrote:
+> > @@ -985,6 +992,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >                        * path below.
+> >                        */
+> >                       iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+> > +
+>
+> Useless empty line?
+>
+> Other than that:
+>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+>
+> --
+> Peter Xu
+>
 
-C'mon, seriously?  How the blazes am I supposed to know that the feature name
-is EPT-Friendly PEBS?  Or that it's even in the SDM (it's not in the year-old
-version of the SDM I currently have open) versus one of the many ISE docs?
+Looks good to me too.
 
-This is not hard.  Please spend the 30 seconds it takes to write a small blurb
-so that reviewers don't have to spend 5+ minutes wondering WTF this does.
-
-  Add support for EPT-Friendly PEBS, a new CPU feature that enlightens PEBS to
-  translate guest linear address through EPT, and facilitates handling VM-Exits
-  that occur when accessing PEBS records.  More information can be found in the
-  <date> release of Intel's SDM, Volume 3, 18.9.5 "EPT-Friendly PEBS".
+Reviewed-by: Ben Gardon <bgardon@google.com>
