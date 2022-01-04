@@ -2,102 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E29644847D4
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 19:26:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C6F64847E7
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 19:32:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233271AbiADS0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 13:26:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53430 "EHLO
+        id S236340AbiADScy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 13:32:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232056AbiADS0o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 13:26:44 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E741C061761
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 10:26:44 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id o12so83663275lfk.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 10:26:44 -0800 (PST)
+        with ESMTP id S233271AbiADScw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 13:32:52 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDE9C061761;
+        Tue,  4 Jan 2022 10:32:51 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id bm14so151941344edb.5;
+        Tue, 04 Jan 2022 10:32:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O5Ysnesytl8XIzmcJR4kL4cqjEHZkL7UyI3OBV+nQBM=;
-        b=LfXc7yJhZdS43YbN6gmjjbp6kx/0470ztrwbR5aHbXEOmvymIM3KbYANQ1lKKOuZ9A
-         JvN2ethn/9uqURPSjCnoVAtNTmN47kPoP+pF8jdbGw++mRF7qSeTMfmoOKMahYwsY9Ji
-         vTgksCwMtKk5ljjn8jysJe6CqDl+7cFwyW1IKfl8NybJAOHzUXuHKqAOqJKr7IzKyWgY
-         NGVBz/cZLvKos2ev0z1OFKSp3v22Tl5s2QwhULmT/Lm+/kacqLUeIdiKdBbIGWxOIy7b
-         C5EujmsxmtDGHC1W2LxgO3IRj35Cb/scg/Nky3QX8x1LM529ie9D69mUD0D28GxwfGKJ
-         bcWQ==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=H++mvP7xNJ7DkJfGLUkbXM0jLfOJX76p9y1OOLe38IQ=;
+        b=dLv9eyr7RYbaApqHcWxnR9DQAJNKH4nos5iEGJ3nd6j3GTVjJCUhVYOm25z6oP90RG
+         b2yubaWsMfweUUKfS9xpTnAlTYD4H1XpBymwiT2OH23jydLTRZPSj9oY8UIS/p7U920F
+         OlnzMQ9yVz48DjOOVgSVyFHYqRxjzqIABZZRQ3gEkp3RXQ/xmSeOOHURA8hEI5NCRMgr
+         1GnQUIVVw+NW8hJFt5+8ilgKCCCQ7S213z3ze+/G8PFQuau+ni9+QWnZPetM/pAY7dT+
+         cmMJ6OMqqr4q83W4AH95Orz/BUJIQQ1NWgGjfnjPuiEMZ6UrP/6X/5AkUCXyjrhzriAh
+         Axmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O5Ysnesytl8XIzmcJR4kL4cqjEHZkL7UyI3OBV+nQBM=;
-        b=wTLkjR8xpOoqyNRkGTopDqhIigXMGieyMnXqTOk93fkLmY0KJiqgaXBKzQFxNM1oSC
-         1dqkyC7cl1DrjMMfGK1KMuzOu/7f/fsUEvH/wxuiO6fBseOHpSpN69ZjsBGLo21/CL5Z
-         mXV6yhoSBJNyYmMy6RGmfKk8b3KVJaDZXNyLhcgMj+LoomC7QI+0MU2ij8u1/A17/LQE
-         MUvKgZJYx7IrHMxh+JGTOOYXiRBwUeftZ94tzz/hjet0gSpe2fxcW6wHX2gOuBmCieA4
-         Z0VjrWODgh3ErYQuNEjAoxSkAnxbNUxZ17k2lzGWkVZiXXNfE+mhPAwxbmdyQ2vI5b0t
-         RtPw==
-X-Gm-Message-State: AOAM5328W0FmT7slcksPqf1nfvVGwcl34smH2eQfDS2wK8OkdFeGuE+P
-        vjx7dnevMKieom3RZzbDn7grQ1W4icvNTkfTAQYKaA==
-X-Google-Smtp-Source: ABdhPJxe1bzUjLR0pNgT5AJmnCg3tAC7MCGPoCYJi0693n9Nx8RN+8ZdqFs23AVbbNdzisWlKyg62S64HhOMVNqNfnE=
-X-Received: by 2002:a05:6512:2003:: with SMTP id a3mr45602725lfb.518.1641320801987;
- Tue, 04 Jan 2022 10:26:41 -0800 (PST)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=H++mvP7xNJ7DkJfGLUkbXM0jLfOJX76p9y1OOLe38IQ=;
+        b=5f+sQl3M/XeDZTPyKT1541pNSOi5UkAksKmoHmyNSj6q3+EGKr0f7OJ0pr6cowkjHY
+         Nlb7oCc7kbdz3g6de9KdSY3PGpx/NR6tOezwbv3IH+sWMcChx0PInVK4Rn4efbELZV7N
+         8/u6o/nA2PXm/lnF+BI+GDKKfeklV5rCtITwsWgnBkcO5vQvYlCvzPOxrAPVsN/Ph1aW
+         wbAkOA5810fIAn0HJiLJpCiTuANz2w1FWxqIz0eppdVC7kBM5zRsOMbbuoYGM4Cwv7Xa
+         Wyuh4PdNfGT5GP17ANvpvk+j4TsIC1cH88ar7yBhZMFiQ8a//WjPkrlMsOgHR1H9GbfT
+         vwPQ==
+X-Gm-Message-State: AOAM531fZKEzNjnUiYB5sL/P77LNgA9lo22LpCtfjkOfWS/IcinIeImb
+        tX3F+7/CyEoQQxijTsxLvd8=
+X-Google-Smtp-Source: ABdhPJz1wuD9CF9yh60mz6/O58ZsWK4Aqh+WsdA/rHGDuVs+hncGhVqnjRjWWBMzBt/wD2wJWq2Llg==
+X-Received: by 2002:aa7:c655:: with SMTP id z21mr43537910edr.352.1641321170423;
+        Tue, 04 Jan 2022 10:32:50 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id jg34sm11710859ejc.74.2022.01.04.10.32.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jan 2022 10:32:50 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <ff29b36a-ffe4-8ba9-2856-cf96fcf33c0d@redhat.com>
+Date:   Tue, 4 Jan 2022 19:32:47 +0100
 MIME-Version: 1.0
-References: <20211213225918.672507-1-dmatlack@google.com> <20211213225918.672507-5-dmatlack@google.com>
- <YdQiK2fbOfkQ77ku@xz-m1.local>
-In-Reply-To: <YdQiK2fbOfkQ77ku@xz-m1.local>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 4 Jan 2022 10:26:15 -0800
-Message-ID: <CALzav=dSHkEfA+G8EZO4tEdY7TXYB3DhxGb7Y=9ay_jC-S9Xpw@mail.gmail.com>
-Subject: Re: [PATCH v1 04/13] KVM: x86/mmu: Factor out logic to atomically
- install a new page table
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Shier <pshier@google.com>,
-        "Nikunj A . Dadhania" <nikunj@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v3 22/22] kvm: x86: Disable interception for IA32_XFD on
+ demand
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Jing Liu <jing2.liu@intel.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, corbet@lwn.net, shuah@kernel.org,
+        jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, guang.zeng@intel.com,
+        wei.w.wang@intel.com, yang.zhong@intel.com
+References: <20211222124052.644626-1-jing2.liu@intel.com>
+ <20211222124052.644626-23-jing2.liu@intel.com> <Ycu0KVq9PfuygKKx@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Ycu0KVq9PfuygKKx@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 4, 2022 at 2:32 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Mon, Dec 13, 2021 at 10:59:09PM +0000, David Matlack wrote:
-> > +/*
-> > + * tdp_mmu_install_sp_atomic - Atomically replace the given spte with an
-> > + * spte pointing to the provided page table.
-> > + *
-> > + * @kvm: kvm instance
-> > + * @iter: a tdp_iter instance currently on the SPTE that should be set
-> > + * @sp: The new TDP page table to install.
-> > + * @account_nx: True if this page table is being installed to split a
-> > + *              non-executable huge page.
-> > + *
-> > + * Returns: True if the new page table was installed. False if spte being
-> > + *          replaced changed, causing the atomic compare-exchange to fail.
-> > + *          If this function returns false the sp will be freed before
->
-> s/will/will not/?
+On 12/29/21 02:04, Sean Christopherson wrote:
+> 
+> Speaking of nested, interception of #NM in vmx_update_exception_bitmap() is wrong
+> with respect to nested guests.  Until XFD is supported for L2, which I didn't see
+> in this series, #NM should not be intercepted while L2 is running.
 
-Good catch. This comment is leftover from the RFC patch where it did
-free the sp.
+Why wouldn't L2 support XFD, since there are no new VMCS bits?  As long 
+as L0 knows what to do with XFD and XFD_ERR, it will do the right thing 
+no matter if L1 or L2 is running.
 
->
-> > + *          returning.
-> > + */
->
-> --
-> Peter Xu
->
+Paolo
