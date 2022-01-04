@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EDE1484877
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 20:24:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9002484881
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 20:26:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236518AbiADTX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 14:23:59 -0500
-Received: from mail-dm6nam10on2060.outbound.protection.outlook.com ([40.107.93.60]:29632
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S236528AbiADT0T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 14:26:19 -0500
+Received: from mail-dm3nam07on2075.outbound.protection.outlook.com ([40.107.95.75]:12731
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235922AbiADTXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 14:23:53 -0500
+        id S230166AbiADT0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 14:26:18 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cvCS9dKrTOffygMmncz4LO7qpXWNROyh0bOdRomuPqVmeQN3v/Vi9NYxj7/GYeQH6zneapqt99i6sWW735uDh31R9/zK0GD7oScNT3NcwAVJdgGVKrSyuZQSd5rDwIfkbZaHyyyVtZjpUOdcUt2C9gjlxKaAuZLiWyropy7fxT647Nq4JHoJU54ljY2xsQW8+utyydCZydybFmQBVL16IgtrexJCv99qmlixdR5pkILH7Zcs8eu/Cq4YlVDhYEuccGwKg0ou2NR7WwBidrHBL3blcVO0t2i7vtfhqrPGOp0VB24ekAbaHIa9C0goRDRH8qK399wFYx0BLfiBxyNXvw==
+ b=QCVvas4y2ENvwlC73CfE+DfbiDU/oPZdTV7xcEg/934/6qlHUednn9CHSV0oObz6SwMQFYUOCqtowm26fzKdVWuWTCgqpdxXj6CWcfRiQKAOWm1B7Jwg/rvQgazjw7/ZhQLBfcwCLta/IRrLU0HnAxb9SXpdVKwYGFzDOMXkqowquGSm3YwU8wIAwCAdPUXbxqLS9W3+34YtAl2mgbOOKjUEUPDC4iVEW9hU7dHurQ8WFn1GzRZAMFksQi7wwzfRy+9D7qIVl6EF3Cyyp3Gyb94InNYicEXjiGOyJKK8AZPw5Hy+bX7IiFdMBk0xroiXH/qM7v3mDScBzWf9eLw76A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HRHy8MQEuSpVEht0joaFD8S4eiI30QK65Srxkf0OgeM=;
- b=Tpi4xzfr5KFAtl8hwsfOb0g7LLMRw2Cgjd5PrYUYefiy0GTAza567BL3Lk7LoL1Yh9dxGL8T7n+SKvUkiaVi0vBL6oKw+A3XWTnrzMotj7PqPyYsZka88oRX/k5dBOWIvypxdgo53xp1/w7bh4v/wQl5eqRCCZXpVoTm3OIEusUFFs5xhl5Xxqpb3HomlJEWy/j2l0Gh4FJrwgJ1AMRShtCfdq4CJKThZZayuMtDXUer3YFOuB2qfPUCIX2oZbHBWCA8rtEwqUtqJl5dgtKtqwFF8ekYzmXO/3WhwhJkXs7OQXo5aIaIcLvGlr00EZPZ5t3wxoANAML45kfGqmeGZg==
+ bh=/JLYtMBMfl7ZZLijUBveo/GW7QLOIY3X36zPFaLkzO4=;
+ b=lMgrx8SmHUa0ZjoiRfVMiMlHSpsNKZNQBJCB//Gf+5BonwB9xAitKr6LEiyvbdmkByd7a1uVSihsj2qOi116JCF4LhT1Zm4YxhK7HF8nQCQ/WCmm2W1T8mSO2kicXxOBqP07mVUbh5WYz3+dgHYJpo+q3/5VUyhq3+sbQeCk6G2PFF+ZDhWaF0LsgWJxDJxwu8M3DZ0DipW07qb77wgmZQcor/JgZrvS9YHa+1wxfpWxwfayXcqZEArSN5PSuUj9KieipCMrZ75R5MyX5CPt+aI3nJ/m2foLWTxGOb2MKSWmh9CKwZ9ciXSYvcjUuEfQtFwXAmMH7rDOYX9W4l2bfg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HRHy8MQEuSpVEht0joaFD8S4eiI30QK65Srxkf0OgeM=;
- b=iGtEkPAtb4So2XgzL0SUFs8I7leOaKbrgeyBgzXU+13yW/4sydmgs9Z71P86DKEsNWTUxO6UtZNjm8nSJAwnjkfSzW3a93Ir63HPsp7xcCPAyC3/katF+MdGH2Ib/4QwTrlcocCA2QmR/cHiH1YVebUfO6EF1zAHPopPPsl31BTOFKVLLASI45oznBwfJXDAznZ6JcrxzxGPmpUqyG1ErFDqdIrid/gccmWEfTH4pX2ZDwh1KSJ0Lqy75/xpNArCJ6qfM6dFsOGyDg/ShXOM0B3T9caTmS9XLwn+zXhZiMQW4YiFXv6LM9Eca5HWM5QAR4aeB/qjye7fAQUfxHkFnA==
+ bh=/JLYtMBMfl7ZZLijUBveo/GW7QLOIY3X36zPFaLkzO4=;
+ b=sXqLcN2QZtIjsGJKMd675jhGZFQns6nbMJy0Jv+H3Uo/9nOaaX9+NdG5nrTREZq6TmqX4/IbEuId3homS5f9fqI5GINA3S3sz1KU5mCmB3yryyQHCmsjKl/jwwLGeE8sjFdFyFHE2zs9vTVyUIesTRCEVCUyImI3lPCEYz3pNlB1zoeBGI7z7F9OjJTbuRvSNKQNKK6OgG4L0l54Nq6DXuUQwknz3uM6V/bt6+1UKvOi7AnvJJgpGUS9polIvnOzCFpgDIqdGJvxX1JV544wcPDsIRfefNniCJQCKzSYJhiHhVTVIl7lnlp3D2GVKl4uvKLZ6wO+4GAzZ5EIkBB2QQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from DM6PR12MB5520.namprd12.prod.outlook.com (2603:10b6:5:208::9) by
- DM6PR12MB5518.namprd12.prod.outlook.com (2603:10b6:5:1b9::21) with Microsoft
+ DM4PR12MB5198.namprd12.prod.outlook.com (2603:10b6:5:395::17) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4844.13; Tue, 4 Jan 2022 19:23:51 +0000
+ 15.20.4823.19; Tue, 4 Jan 2022 19:26:17 +0000
 Received: from DM6PR12MB5520.namprd12.prod.outlook.com
  ([fe80::218e:ede8:15a4:f00d]) by DM6PR12MB5520.namprd12.prod.outlook.com
  ([fe80::218e:ede8:15a4:f00d%4]) with mapi id 15.20.4844.016; Tue, 4 Jan 2022
- 19:23:51 +0000
-Date:   Tue, 4 Jan 2022 15:23:48 -0400
+ 19:26:17 +0000
+Date:   Tue, 4 Jan 2022 15:26:14 -0400
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
         Bjorn Helgaas <bhelgaas@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Kevin Tian <kevin.tian@intel.com>,
         Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
         Robin Murphy <robin.murphy@arm.com>,
@@ -66,131 +66,87 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         Dmitry Osipenko <digetx@gmail.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/14] iommu: Add dma ownership management interfaces
-Message-ID: <20220104192348.GK2328285@nvidia.com>
-References: <YdQcgFhIMYvUwABV@infradead.org>
- <20220104164100.GA101735@bhelgaas>
+Subject: Re: [PATCH v5 09/14] PCI: portdrv: Suppress kernel DMA ownership
+ auto-claiming
+Message-ID: <20220104192614.GL2328285@nvidia.com>
+References: <20220104015644.2294354-10-baolu.lu@linux.intel.com>
+ <20220104170631.GA99771@bhelgaas>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220104164100.GA101735@bhelgaas>
-X-ClientProxiedBy: SJ0PR03CA0212.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::7) To DM6PR12MB5520.namprd12.prod.outlook.com
+In-Reply-To: <20220104170631.GA99771@bhelgaas>
+X-ClientProxiedBy: BY3PR03CA0002.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::7) To DM6PR12MB5520.namprd12.prod.outlook.com
  (2603:10b6:5:208::9)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d9613371-b2eb-4102-ee81-08d9cfb7bd05
-X-MS-TrafficTypeDiagnostic: DM6PR12MB5518:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB551815570A515B18599BC477C24A9@DM6PR12MB5518.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-MS-Office365-Filtering-Correlation-Id: c2caa469-a856-4979-eed0-08d9cfb813fc
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5198:EE_
+X-Microsoft-Antispam-PRVS: <DM4PR12MB5198D9E283FFA319834447B1C24A9@DM4PR12MB5198.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vdEuc4NWhwQwgxmOdupyxagQt3+el3ZTpGf38KNCT/mwvxg+1AR/4wgsGX63YrDZuzF4tlb9b6b3JULc6K3Ifg7mOV6o585C2w7OuUdKbirYo60pDPIELL1teEh91AUzO+y1gsP4ZkvvRxXF9uP4mbHsjtdWpfcNDZQjplPyMUaA4PA66pJRSSEU7wjrwqoeD3kE9v4/DeOSNjzhF/w+TVvx09iM0wC/PbzBZ3tLuODPnbgrVCKVDc1HAHOiMfL0K3YNirnfCXAestWherIsRLXT8z9ClPyLDVDT7Z6R2jsYz2yuL2fWPAvIquYS0Hm3HVp9tGu1szyqmANJEkhf5cRITAHps4nF13KDS2kKPy4jipKPso/9Y1m+wQowCxFhiyw6IDj1yZy4w9esCMJZ/VgdHxjwahfYj0rqfqyURTGM5pePZgPRyAzuTSA5SIIyWIVVzhnhzAXa6Y6+OZntpEZOzwE+AmJEnOwHdam8qkPUBn4JOGBve5Baau+h6D7CSvuoVgn2NpwAKxbReU/j769RmdwAmufuvqJUQEq8mThlQX8S43q/xitfnnH798vt9GCRrnKVCS8YL1R+/kvyg5ClJA04p0mVUD/J+iWWi+Y2t2Rak9bRDuK8rCi20FxiM2vRToBFG8Xptz0F8G0N1A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5520.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(36756003)(6666004)(2906002)(316002)(6916009)(186003)(6506007)(33656002)(54906003)(66476007)(38100700002)(6486002)(8676002)(86362001)(2616005)(4326008)(6512007)(5660300002)(66946007)(7416002)(8936002)(26005)(1076003)(83380400001)(508600001)(66556008);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: MxtX26jma09qMgTYVhIUzXKeLhbuMgvx9hNgLRJZ8N7kRx7v3cSSb97vMx8yHFOiUH0nlmWW1MSwQZjll2VclKlTqtGYbtzHZuF1th33ChT1M0oc4kqcr7wh4xU34uFfLXD526ZPm+KwBnghINda0CJHWzBVqp+5VJa/7drnuRSnr5AF7cbxZ7LcXYlssSi637R7irF0x/IND9XlFGjkhjvwXpVD3ZgHXcghiHZ4Vl4sMg+FpRlApgVCw2cqraUnO0CEVdrqkEuf79egII6on5HBEC/iHtTYM+aNBEiOL5MI7tXa1OUmg8D0XI9Y8J+T5GikKGIk/w0mGvBssmJqW3cNbqVi26DolZPZrMfT5td/+sEdVsfEljx+h4ZD/onzmLrWwB+AwYiwLDP3refChmQdpXDqHEBl6jnNG8c7dIuGImeSKlLJAPxJLymxobIW5hD2bl7+1G8R7mMhQzk89KWWtV/fUHRJZmFWKMvK4O0UGra7hubmsT7n1ExjPZPHeQUwWZciONyyhvt/79oEpAMgq7deXiMBfn4BbAVyHGY/uPwyJTm8tLU3I7G8J/TeROwLIxpdA36W2cdZG/1UTivpjIyI4Sdhg+f/UXT5YVD3mOKYREWlXp0ShYbeWh75inYtJIuYbAkzUxck4dIK3Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5520.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(4326008)(8676002)(6486002)(2616005)(6916009)(6506007)(86362001)(36756003)(33656002)(5660300002)(66476007)(4744005)(1076003)(54906003)(8936002)(26005)(66946007)(7416002)(6512007)(316002)(66556008)(2906002)(38100700002)(6666004)(186003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rlLGbHsTf8+NtJEaoIrnpKzzu01VN64f2b/FK1sR02TwTSEUKV0+//0MZXEC?=
- =?us-ascii?Q?+n1wUJnK2e/nKRyQDM8+2X32IQzMuebzgm4KjnhcjMIN4F9CQzFhSWju5X1W?=
- =?us-ascii?Q?kaC8cFYOTjgGpdsZt8U4EuczX9ACu0iAopiZALFq7dwTqjeeST0b0tQjHZxl?=
- =?us-ascii?Q?EzdZvbDLXd7hqAKPyo8+eAR/coW5O0Qv9UDJ59Y3ULo2Foun5SkmdvxTe27D?=
- =?us-ascii?Q?JhEOareJkyMzqIDIJNyW8vkqad3My7eu6D2Mf+6CTvpw3sB3ZypAVOcGMwsR?=
- =?us-ascii?Q?oin2P0lGgb1F0GbzYSBeHO3Z/8V34Mu1YaPoM8yy4/MfeQI4p/R088K1Jcqk?=
- =?us-ascii?Q?7k36Lh1SBhU7PFKFMlntjBkFdog/dGkcMFswGZyLULc1yysGxN0u+ri68+n9?=
- =?us-ascii?Q?zY8UNhDa72hl41RhLadRm65j+yVFt5AWc14kVdF6k8VNyIQOT6iztcYqHJO9?=
- =?us-ascii?Q?TXe3QmFLQfJT4lYpPK1KQo56sItb7E1rxNUwjKFIEfZxEaxGoKGCb0m7Mlzy?=
- =?us-ascii?Q?kBCbW4gsKExS2bBHuGjmLuMJ/6i+NjTldOyZtz2i1toUFzaRt2wbPXD9WXqJ?=
- =?us-ascii?Q?OXR7FWhcAUP3BO8javDls7FWdVyyEGm2cXGQWarkjltC2qJPlf+9nczqsxad?=
- =?us-ascii?Q?Ft4fx40A5vdKGx5AkrnkwT8YrESNTeGLxYtYc3VrupDFBMc5gwzu4q2YM+AX?=
- =?us-ascii?Q?P3hQi23oumQMGp0sSVk5DElULdRPHzGtW3fMLCHtpZZWnW+YpLMIVDDMoNcw?=
- =?us-ascii?Q?xJj/BPap3kFjSjuLCJqp/qLWFfdOfZmDvueMg0SHFV9sOi5LIAYXx+myK+/s?=
- =?us-ascii?Q?IkxGp0WzL/Fj6lnLXo17N2fsqnzdDHmK0FLbWi/IsZ8Q8slIlj5KsroshpCx?=
- =?us-ascii?Q?AZ1yA6qsXNASNAXI+fF9KdUeGoEmxeFvj8UDoGDCHeDPhQZbvIF9JylgDEHa?=
- =?us-ascii?Q?tEZ2KVGlBzB0CCQwX0E4fRSxgJjRQ0lnp1D+va2CwQ9dMYDq26Z4vBLtjZUw?=
- =?us-ascii?Q?aT47IJSdotBwn9vo9scCvJ3fC/jCE5cTAAwSd3ZWsfrUqjMWfzdCq8Q4dAnQ?=
- =?us-ascii?Q?KXR79cjXeVkhHuAqe/EjsFAI13U5lljlOqI6J6Ajzdz0RDs4YFgjjfsU/FZQ?=
- =?us-ascii?Q?Ue/ah1zjFSUpZzcrIedU8svnoz8yusfHAfL4Oum4qvw9huDjzv53zqDulWIm?=
- =?us-ascii?Q?Dde3wtQ32owwVBodeO83sjJewRTetZ3G6LygQe/iodsbEeZ8p0Nl6Bw8w6ua?=
- =?us-ascii?Q?0OndZ2G0xQz6zTURLq17/HDNsblcDqq+NE3kyeHD42Pf//Pbawt2xBxq8Ht9?=
- =?us-ascii?Q?s6gGOKD3dgYU3AXbJc4wtO+mkAoGmkopdpOAR8CvjqHM2gT1/xVPObxWDhE+?=
- =?us-ascii?Q?uhH3ZrIJvlgNnsm6s0nxYFc6t5u/rbW4Fh9la74eqKdNbzGB+8bxfwbh/KHj?=
- =?us-ascii?Q?kIbbme7LyKeareDjPQcUWr/CiBPhU4KSHDk/aDiYJK+Dx6tGWzAShN74o35K?=
- =?us-ascii?Q?DhzoSVUIPEsd4suUlk51DeCZIs4mNDednL0V8LeTaJHUcfsaO9rM9ifC44+d?=
- =?us-ascii?Q?m1DC2PtN3MgBxqRZEBc=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Rc0F8cFIxKhWm1RO+FvjTent0vGVOBeQtDSIxjM6+fbB64H9QWsSM67GUGQU?=
+ =?us-ascii?Q?5U38JVTNDl2WTo4xjlDLMHK4KAmB6kqXMsCEXJuTI5G6BaDydD/xA7Nms49I?=
+ =?us-ascii?Q?JZFE9BkVrEBh7NVTBe0Lmha7cIzT846a2yLVG5/8MOc0qq2xr92qkkO3x5v8?=
+ =?us-ascii?Q?ufcmjm1XGPLWuw3MEh/83apeIGlqK/K61sUgHTIRugd6JCL9v9UcuOzKS00K?=
+ =?us-ascii?Q?ce5PwkGVJHCUFwHzq7O76ATbXOfraiQRKRP6qU3RIhycxOeURMBxNq9jzrPh?=
+ =?us-ascii?Q?GuqdIukt/pbKCfnSeIqozQX5JKBUQrG5tQm7kxlT3k3qz73aoZsGHKoyz09q?=
+ =?us-ascii?Q?gg7Z1yewjM0RscVI6b23JchyLFuL4IJmsz9zc383Q4EaCfPmO1A9BuAY/dwj?=
+ =?us-ascii?Q?Gr2SQRkAHUj+nMqWAPsWiXUigUD583J2DIEe4tpe9uqaW2EB23g42011pFNQ?=
+ =?us-ascii?Q?5n7jIXwwwvDMsZIKLl5+IIqS5oaWhkrPLjIECqoUIhrCtb9FQcy6oYn8rTxG?=
+ =?us-ascii?Q?RRxF1nR+Fcl93tvnk+WXo7BWzNr7Mkm4MCBwfas5gosVZetxJdLjgLXwA3qu?=
+ =?us-ascii?Q?6kP1omTHSCHiJZNjI/4idCwMgYuTpwz769zA5KhWnTNnb+jeKoK1cAXEmk1P?=
+ =?us-ascii?Q?Stqz9cmeKgFeS3kf44GGPthym5V7TnaE7VQWYG/3I9YTdlPoELXrbDEfaeJ3?=
+ =?us-ascii?Q?bZDH2hFq1BQc/qiXrySp44qDfR/j/FLwxrwD76bIe6E68w4M0V5cRa9kSh5E?=
+ =?us-ascii?Q?djzl4Csj9nDaOqIpoCuQy2ElQREeCJ3Df1+DYjLImsvlqLcduQtqJD95gxu9?=
+ =?us-ascii?Q?nwdD99InpAdkSGZUuW+MHPZTJdhFQJBUlBk1wBN93tSqCLQnzzyNKNv92GOl?=
+ =?us-ascii?Q?e53aQ09yCkV+FW24mad10vnzYkYYLIK6Sczd9Is5mh02fpf4x/7pq2CJqtNd?=
+ =?us-ascii?Q?d5IpOxzgRp9IzoDuL6zo/nWiGMjymXfGHVmT/enY/AldG5gdDSC7HlTFqT7A?=
+ =?us-ascii?Q?xkdWi8disXZMFWfIRF3as2LaDzmL0G/atL98a1CV4dujaZXcAArqBdMf/Vti?=
+ =?us-ascii?Q?tbsk6+CKM1l/v4rneaPSRfC1hLtpdnpJA0e1ozaDYyXDQB+wn5u5YwruVecU?=
+ =?us-ascii?Q?MEDVf6rBJMsKpxg3glXOubKVU0QDwId8wvJxVShezNP5NZmyHMcLfdi1GKVY?=
+ =?us-ascii?Q?ocdE/hVN6mUiNkmD25F8i5Ie95V5xS0BK1bSdFMFeyuqa2TAa2Rk4NxHEe1T?=
+ =?us-ascii?Q?an6TFM0WjzHrh7BlrH+C/88U0nIHsMGtqZl7AyDTU00lpuqCyapXTvr3hCWV?=
+ =?us-ascii?Q?2RMUdHSnEiAtfHKuhX2ET+JfPmtLH1FwJdED/tiveO3gE8eOucbLx8BnGygE?=
+ =?us-ascii?Q?FUEkoGrzH2jqoAKSp5Iw8ynBLv1Kh8T543hhYuX1aSaGWSWW9Qb0F0+FgSP/?=
+ =?us-ascii?Q?MKeF0WzboyMePn/adsTWlKNYW+IJJCI91S39PH4vFD4qn7iSwLNkFa8QrBXJ?=
+ =?us-ascii?Q?L54QeSonjSfGF+Q0a81mgG2M/x36lKhoW2w2+7LOnlStxIK/vpMfQOqbehOP?=
+ =?us-ascii?Q?tr/pfm264qccuSnz8lo=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9613371-b2eb-4102-ee81-08d9cfb7bd05
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2caa469-a856-4979-eed0-08d9cfb813fc
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5520.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 19:23:51.1413
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 19:26:16.8864
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /al5j0bxvnqaeXXKoLiwn46kgPuRyNdO4yXfkfRF0m6IjxeosYaENy8f2Qoi8DTV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5518
+X-MS-Exchange-CrossTenant-UserPrincipalName: jEFVfD1sGF4gxaCZ1aNHZfoR90qYkN+kI316YtokeeE9jkGidUsbIVcVNBKf3jWx
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5198
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 10:41:00AM -0600, Bjorn Helgaas wrote:
-> On Tue, Jan 04, 2022 at 02:08:00AM -0800, Christoph Hellwig wrote:
-> > On Tue, Jan 04, 2022 at 09:56:31AM +0800, Lu Baolu wrote:
-> > > Multiple devices may be placed in the same IOMMU group because they
-> > > cannot be isolated from each other. These devices must either be
-> > > entirely under kernel control or userspace control, never a mixture.
+On Tue, Jan 04, 2022 at 11:06:31AM -0600, Bjorn Helgaas wrote:
+
+> > The existing vfio framework allows the portdrv driver to be bound
+> > to the bridge while its downstream devices are assigned to user space.
 > 
-> I guess the reason is that if a group contained a mixture, userspace
-> could attack the kernel by programming a device to DMA to a device
-> owned by the kernel?
+> I.e., the existing VFIO framework allows a switch to be in the same
+> IOMMU group as the devices below it, even though the switch has a
+> kernel driver and the other devices may have userspace drivers?
 
-There are several of reasons, including what you guess, but for the
-design of the series now we can just focus on the group's domain.
+Yes, this patch exists to maintain current VFIO behavior which has this
+same check.
 
-If the kernel is using a device then the kernel driver uses the DMA
-API and the group's domain must always point to the default domain so
-long as a DMA API user exists. Hopefully it is clear to understand
+I belive the basis for VFIO doing this is that the these devices
+cannot do DMA, so don't care about the DMA API or the group->domain,
+and do not expose MMIO memory so do not care about the P2P attack.
 
-> > > The device driver oriented interfaces are,
-> > > 
-> > > 	int iommu_device_use_dma_api(struct device *dev);
-> > > 	void iommu_device_unuse_dma_api(struct device *dev);
-> 
-> Nit, do we care whether it uses the actual DMA API?  Or is it just
-> that iommu_device_use_dma_api() tells us the driver may program the
-> device to do DMA?
-
-As the main purpose, yes this is all about the DMA API because it
-asserts the group domain is the DMA API's domain.
-
-There is a secondary purpose that has to do with the user/kernel
-attack you mentioned above. Maintaining the DMA API domain also
-prevents VFIO from allowing userspace to operate any device in the
-group which blocks P2P attacks to MMIO of other devices.
-
-This is why, even if the driver doesn't use DMA, it should still do a
-iommu_device_use_dma_api(), except in the special cases where we don't
-care about P2P attacks (eg pci-stub, bridges, etc).
-
-> > > The vfio oriented interfaces are,
-> > > 
-> > > 	int iommu_group_set_dma_owner(struct iommu_group *group,
-> > > 				      void *owner);
-> > > 	void iommu_group_release_dma_owner(struct iommu_group *group);
-> > > 	bool iommu_group_dma_owner_claimed(struct iommu_group *group);
-> > > 
-> > > The device userspace assignment must be disallowed if the set dma owner
-> > > interface returns failure.
-> 
-> Can you connect this back to the "never a mixture" from the beginning?
-> If all you cared about was prevent an IOMMU group from containing
-> devices with a mixture of kernel drivers and userspace drivers, I
-> assume you could do that without iommu_device_use_dma_api().  So is
-> this a way to *allow* a mixture under certain restricted conditions?
-
-It is not about user/kernel, it is about arbitrating the shared
-group->domain against multiple different requests to set it to
-something else.
-
-Lu, Given that the word 'user' was deleted from the API entirely it
-makes sense to reword these commit messages to focus less on user vs
-kernel and more on ownership of the domain pointer.
+A comment in the code to this effect would be good, IMHO.
 
 Jason
