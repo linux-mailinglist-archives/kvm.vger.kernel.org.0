@@ -2,117 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F41F4846A9
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 18:07:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AE3F4846F1
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 18:25:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234151AbiADRHE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 12:07:04 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:5065 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232983AbiADRGz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 12:06:55 -0500
+        id S235236AbiADRZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 12:25:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234240AbiADRZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 12:25:42 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344BBC061761
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 09:25:42 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id g2so33270202pgo.9
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 09:25:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1641316016; x=1672852016;
-  h=from:to:subject:date:message-id:mime-version;
-  bh=JLgasmB4JEll+piGyIAP2saA+DSCXtiAMUwg3bCgMoE=;
-  b=Ekt4vrA2CT/fmHWg1H2DiPVZtvWB8/HWArWzcgIpzZwhL2Dw8VPtiZ+F
-   cwfNqPXkc1kIn1GnA5ia5yAc41x2ZzATgh8IuFnJdN7Xksb4d976l1xlG
-   c1iLbZFZm1SkB4GdsLW6MiDVti58RSnZDWFKbKZh4Jl0bmRfwycaeuxr7
-   4=;
-X-Amazon-filename: 0001-x86-hyperv-improve-naming-of-stimer-functions.patch
-X-IronPort-AV: E=Sophos;i="5.88,261,1635206400"; 
-   d="scan'208,223";a="166254886"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-ccb3efe0.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 04 Jan 2022 17:06:44 +0000
-Received: from EX13D43EUB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-ccb3efe0.us-east-1.amazon.com (Postfix) with ESMTPS id D47E6C08D0
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 17:06:42 +0000 (UTC)
-Received: from EX13D43EUB002.ant.amazon.com (10.43.166.8) by
- EX13D43EUB002.ant.amazon.com (10.43.166.8) with Microsoft SMTP Server (TLS)
- id 15.0.1497.26; Tue, 4 Jan 2022 17:06:42 +0000
-Received: from EX13D43EUB002.ant.amazon.com ([10.43.166.8]) by
- EX13D43EUB002.ant.amazon.com ([10.43.166.8]) with mapi id 15.00.1497.026;
- Tue, 4 Jan 2022 17:06:42 +0000
-From:   "Kaya, Metin" <metikaya@amazon.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests PATCH 1/1] x86/hyperv: improve naming of stimer
- functions
-Thread-Topic: [kvm-unit-tests PATCH 1/1] x86/hyperv: improve naming of stimer
- functions
-Thread-Index: AQHYAY1fgFOstRVXaEyKySnKCZPCNQ==
-Date:   Tue, 4 Jan 2022 17:06:41 +0000
-Message-ID: <1641316001743.98051@amazon.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.162.203]
-Content-Type: multipart/mixed; boundary="_002_164131600174398051amazoncom_"
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Dt2cPCWEsFZ5AbysL4UkCn7JLhXrIdEBz/GoqAR1B90=;
+        b=NB45Tda4CCIIb04U+XDNPZB5azw6aHsshMgvWalK1tJ39OAsDe72/kEJOx2fW6bMeG
+         tdvxvimXmORNQJzTeQrOyhivszDBnLT8eQInnyfZfolZS7FmpwztJM3S9a9Qu4+VtC2M
+         XFGVtgFPc13suxJgngyMOg/NAezoiRxTuw4/UY7x4PKzEKqMPvcwvzWS3+Sl3S+Rxiu7
+         x/o3xwv5hYV55SYKUd/p7bh/PQkMYHKz4q4gbc4Lx5E4CtUdZ7SJt8TvcJyCLsrUsuGi
+         eBKr98sjqDjtwnHVKO4OGB2Tm3jkPAMw+iNPG/nrLuXah3b7/A2gYBxhdZrtoeZxuAxV
+         +j4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Dt2cPCWEsFZ5AbysL4UkCn7JLhXrIdEBz/GoqAR1B90=;
+        b=RLi/6MlXQ6WrtHelGn/8R+VczBUHCbkU5kg/N6ZsFfzwjz9CUQY6jb+rYk/UX6854z
+         4qIthNBejHWBLT/Dw06VYIEq7sbMUNaSpLOkT00ZO/2YCkoO897Dhhl2Q9d1cVX0eLKM
+         TbvlPTld6w8OxUxgCyp/0I6gJac/l20D9loSmVTqJeslQWTJanE2uSqmVgoxgJgNgnZp
+         WxHO0WKkaWwrHZfMqwudF5+nmt6/2v5tXzgLHP5Rd6c6pTD8lTMTfbooZgj6fTcVdiAK
+         +tURVX5aQc5C3dzjTXyELtw4soEprfGhSwK9WlEdTugZ9Br0d8HpB38NUaJIGZXU9g5K
+         hCXQ==
+X-Gm-Message-State: AOAM532DJ3GGfk6yadq0jWNoHFFmpHHf601NswXmGzXqe32L1qlsATV6
+        9JuCeuy3S2lMehSeRNwFdokgaw==
+X-Google-Smtp-Source: ABdhPJwQvdabyHoNNTGEbHXwTynNfe/NdjpWJGah72K6zT+sA3YPBHP0aoiMjx0n1cqTIwmYvhLhXQ==
+X-Received: by 2002:a05:6a00:2304:b0:4ba:4cbb:8289 with SMTP id h4-20020a056a00230400b004ba4cbb8289mr51337276pfh.79.1641317141421;
+        Tue, 04 Jan 2022 09:25:41 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ip2sm36902413pjb.34.2022.01.04.09.25.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jan 2022 09:25:40 -0800 (PST)
+Date:   Tue, 4 Jan 2022 17:25:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 01/17] perf/x86/intel: Add EPT-Friendly PEBS for Ice
+ Lake Server
+Message-ID: <YdSDEUJQgJQfZjWD@google.com>
+References: <20211210133525.46465-1-likexu@tencent.com>
+ <20211210133525.46465-2-likexu@tencent.com>
+ <Yc321e9o16luwFK+@google.com>
+ <69ad949e-4788-0f93-46cb-6af6f79a9f24@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <69ad949e-4788-0f93-46cb-6af6f79a9f24@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---_002_164131600174398051amazoncom_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Dec 31, 2021, Like Xu wrote:
+> On 31/12/2021 2:13 am, Sean Christopherson wrote:
+> > On Fri, Dec 10, 2021, Like Xu wrote:
+> > > The new hardware facility supporting guest PEBS is only available on
+> > > Intel Ice Lake Server platforms for now. KVM will check this field
+> > > through perf_get_x86_pmu_capability() instead of hard coding the cpu
+> > > models in the KVM code. If it is supported, the guest PEBS capability
+> > > will be exposed to the guest.
+> > 
+> > So what exactly is this new feature?  I've speed read the cover letter and a few
+> > changelogs and didn't find anything that actually explained when this feature does.
+> > 
+> 
+> Please check Intel SDM Vol3 18.9.5 for this "EPT-Friendly PEBS" feature.
+> 
+> I assume when an unfamiliar feature appears in the patch SUBJECT,
+> the reviewer may search for the exact name in the specification.
 
-- synic_supported() is renamed to hv_synic_supported().=0A=
-- stimer_supported() is renamed to hv_stimer_supported().=
+C'mon, seriously?  How the blazes am I supposed to know that the feature name
+is EPT-Friendly PEBS?  Or that it's even in the SDM (it's not in the year-old
+version of the SDM I currently have open) versus one of the many ISE docs?
 
---_002_164131600174398051amazoncom_
-Content-Type: text/x-patch;
-	name="0001-x86-hyperv-improve-naming-of-stimer-functions.patch"
-Content-Description: 0001-x86-hyperv-improve-naming-of-stimer-functions.patch
-Content-Disposition: attachment;
-	filename="0001-x86-hyperv-improve-naming-of-stimer-functions.patch";
-	size=2387; creation-date="Tue, 04 Jan 2022 17:05:30 GMT";
-	modification-date="Tue, 04 Jan 2022 17:05:30 GMT"
-Content-Transfer-Encoding: base64
+This is not hard.  Please spend the 30 seconds it takes to write a small blurb
+so that reviewers don't have to spend 5+ minutes wondering WTF this does.
 
-RnJvbSA5ZDVmZjI2M2YyNTQ0NGQyMDc5NzQxMzVkYWE2MDg0MzAwYmNmMjg2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29tPgpEYXRl
-OiBUdWUsIDQgSmFuIDIwMjIgMTc6MDI6MDQgKzAwMDAKU3ViamVjdDogW2t2bS11bml0LXRlc3Rz
-IFBBVENIIDMvM10geDg2L2h5cGVydjogaW1wcm92ZSBuYW1pbmcgb2Ygc3RpbWVyCiBmdW5jdGlv
-bnMKCi0gc3luaWNfc3VwcG9ydGVkKCkgaXMgcmVuYW1lZCB0byBodl9zeW5pY19zdXBwb3J0ZWQo
-KS4KLSBzdGltZXJfc3VwcG9ydGVkKCkgaXMgcmVuYW1lZCB0byBodl9zdGltZXJfc3VwcG9ydGVk
-KCkuCgpTaWduZWQtb2ZmLWJ5OiBNZXRpbiBLYXlhIDxtZXRpa2F5YUBhbWF6b24uY29tPgotLS0K
-IHg4Ni9oeXBlcnYuaCAgICAgICAgICAgICB8IDQgKystLQogeDg2L2h5cGVydl9jb25uZWN0aW9u
-cy5jIHwgMiArLQogeDg2L2h5cGVydl9zdGltZXIuYyAgICAgIHwgNCArKy0tCiB4ODYvaHlwZXJ2
-X3N5bmljLmMgICAgICAgfCAyICstCiA0IGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwg
-NiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS94ODYvaHlwZXJ2LmggYi94ODYvaHlwZXJ2LmgK
-aW5kZXggYmMxNjVjMy4uM2UxNzIzZSAxMDA2NDQKLS0tIGEveDg2L2h5cGVydi5oCisrKyBiL3g4
-Ni9oeXBlcnYuaApAQCAtMTgzLDEyICsxODMsMTIgQEAgc3RydWN0IGh2X2lucHV0X3Bvc3RfbWVz
-c2FnZSB7CiAJdTY0IHBheWxvYWRbSFZfTUVTU0FHRV9QQVlMT0FEX1FXT1JEX0NPVU5UXTsKIH07
-CiAKLXN0YXRpYyBpbmxpbmUgYm9vbCBzeW5pY19zdXBwb3J0ZWQodm9pZCkKK3N0YXRpYyBpbmxp
-bmUgYm9vbCBodl9zeW5pY19zdXBwb3J0ZWQodm9pZCkKIHsKICAgIHJldHVybiBjcHVpZChIWVBF
-UlZfQ1BVSURfRkVBVFVSRVMpLmEgJiBIVl9YNjRfTVNSX1NZTklDX0FWQUlMQUJMRTsKIH0KIAot
-c3RhdGljIGlubGluZSBib29sIHN0aW1lcl9zdXBwb3J0ZWQodm9pZCkKK3N0YXRpYyBpbmxpbmUg
-Ym9vbCBodl9zdGltZXJfc3VwcG9ydGVkKHZvaWQpCiB7CiAgICAgcmV0dXJuIGNwdWlkKEhZUEVS
-Vl9DUFVJRF9GRUFUVVJFUykuYSAmIEhWX1g2NF9NU1JfU1lOVElNRVJfQVZBSUxBQkxFOwogfQpk
-aWZmIC0tZ2l0IGEveDg2L2h5cGVydl9jb25uZWN0aW9ucy5jIGIveDg2L2h5cGVydl9jb25uZWN0
-aW9ucy5jCmluZGV4IDZlOGFjMzIuLjA0OWZkNzggMTAwNjQ0Ci0tLSBhL3g4Ni9oeXBlcnZfY29u
-bmVjdGlvbnMuYworKysgYi94ODYvaHlwZXJ2X2Nvbm5lY3Rpb25zLmMKQEAgLTI2Niw3ICsyNjYs
-NyBAQCBpbnQgbWFpbihpbnQgYWMsIGNoYXIgKiphdikKIHsKIAlpbnQgbmNwdXMsIG5jcHVzX29r
-LCBpOwogCi0JaWYgKCFzeW5pY19zdXBwb3J0ZWQoKSkgeworCWlmICghaHZfc3luaWNfc3VwcG9y
-dGVkKCkpIHsKIAkJcmVwb3J0X3NraXAoIkh5cGVyLVYgU3luSUMgaXMgbm90IHN1cHBvcnRlZCIp
-OwogCQlnb3RvIHN1bW1hcnk7CiAJfQpkaWZmIC0tZ2l0IGEveDg2L2h5cGVydl9zdGltZXIuYyBi
-L3g4Ni9oeXBlcnZfc3RpbWVyLmMKaW5kZXggN2I3Yzk4NS4uYmFhMzEzZiAxMDA2NDQKLS0tIGEv
-eDg2L2h5cGVydl9zdGltZXIuYworKysgYi94ODYvaHlwZXJ2X3N0aW1lci5jCkBAIC0zNTIsMTIg
-KzM1MiwxMiBAQCBzdGF0aWMgdm9pZCBzdGltZXJfdGVzdF9hbGwodm9pZCkKIGludCBtYWluKGlu
-dCBhYywgY2hhciAqKmF2KQogewogCi0gICAgaWYgKCFzeW5pY19zdXBwb3J0ZWQoKSkgeworICAg
-IGlmICghaHZfc3luaWNfc3VwcG9ydGVkKCkpIHsKICAgICAgICAgcmVwb3J0X3Bhc3MoIkh5cGVy
-LVYgU3luSUMgaXMgbm90IHN1cHBvcnRlZCIpOwogICAgICAgICBnb3RvIGRvbmU7CiAgICAgfQog
-Ci0gICAgaWYgKCFzdGltZXJfc3VwcG9ydGVkKCkpIHsKKyAgICBpZiAoIWh2X3N0aW1lcl9zdXBw
-b3J0ZWQoKSkgewogICAgICAgICByZXBvcnRfcGFzcygiSHlwZXItViBTeW5JQyB0aW1lcnMgYXJl
-IG5vdCBzdXBwb3J0ZWQiKTsKICAgICAgICAgZ290byBkb25lOwogICAgIH0KZGlmZiAtLWdpdCBh
-L3g4Ni9oeXBlcnZfc3luaWMuYyBiL3g4Ni9oeXBlcnZfc3luaWMuYwppbmRleCA1Y2E1OTNjLi5k
-YzE3OTc4IDEwMDY0NAotLS0gYS94ODYvaHlwZXJ2X3N5bmljLmMKKysrIGIveDg2L2h5cGVydl9z
-eW5pYy5jCkBAIC0xNDIsNyArMTQyLDcgQEAgc3RhdGljIHZvaWQgc3luaWNfdGVzdF9jbGVhbnVw
-KHZvaWQgKmN0eCkKIGludCBtYWluKGludCBhYywgY2hhciAqKmF2KQogewogCi0gICAgaWYgKHN5
-bmljX3N1cHBvcnRlZCgpKSB7CisgICAgaWYgKGh2X3N5bmljX3N1cHBvcnRlZCgpKSB7CiAgICAg
-ICAgIGludCBuY3B1cywgaTsKICAgICAgICAgYm9vbCBvazsKIAotLSAKMi4zMi4wCgo=
-
---_002_164131600174398051amazoncom_--
+  Add support for EPT-Friendly PEBS, a new CPU feature that enlightens PEBS to
+  translate guest linear address through EPT, and facilitates handling VM-Exits
+  that occur when accessing PEBS records.  More information can be found in the
+  <date> release of Intel's SDM, Volume 3, 18.9.5 "EPT-Friendly PEBS".
