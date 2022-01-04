@@ -2,245 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83F00484AC1
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:32:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F6F7484AEC
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:52:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235549AbiADWce (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 17:32:34 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:21470 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235500AbiADWcd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 17:32:33 -0500
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 204JSuYc013829;
-        Tue, 4 Jan 2022 22:31:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=yOAK0R0htQwv6WcGg0ar/DzDTpvBft/u3SzkotG9foE=;
- b=rm3+Q/fO4cYE6vFb/1OD8oYZxV0y5pmfhxHdgK9F9DLP2ibWResM4hnsx+cXLODF7XhZ
- ttdNUV86cudriGq0J52ufRCBexaZaYkFae6pRwRWNEvFz9oCCfhLft6gcJFNQ5jC3tkt
- Fabdwe9lPBS4yxS5HUgrjdopy6y+baXsbj1Mp7MjSjBm7i1Nyb7ig2sDXNBBwWjEtJuq
- /vebvBioSyqNurekReX2Ynzr8ebIfbsuCpoWB6++vDUwFtNqpxa0m9RS5jBQkZ5gKA6c
- HAHquNIwwB0D9YCtmUrz65/TjLBbxhq80u9X0kmQtTm6P1x6a64nzdwaB3xwGpMFp0hA WQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dc3st3gda-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Jan 2022 22:31:56 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 204MVdBc059947;
-        Tue, 4 Jan 2022 22:31:55 GMT
-Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam08lp2049.outbound.protection.outlook.com [104.47.74.49])
-        by aserp3020.oracle.com with ESMTP id 3daes4aw5e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Jan 2022 22:31:55 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NpcHF2YVDQ+AcXx77T0FM8/lkxcx7UCeNMtGXlscF0XYwrvJFNA7EXEhh2rzDSFPsaR4VJrqRtSu5MlA1jyCRsTrnQNHEQL+f0eWsMHua7O7G3K1yeUPJdxw38q48PdJWtA4rJgwjCQce/QBJGR91sdNHMHaTxozni906Q89r1kuSeknsAhy8dNNBbG7j0B/fSnxFsQtLS4TFUy1z7IBz4SsfdVYcO7nFy2A1wNw7Lt0uBVfgPbk8TPjbIpXjuLiwXLXyqhYYD8S5wHDpL72JyRBG0QQ2IHZUOFwqd8TqDJd+GGZ5NyJEA/5xQu0c48QFD+9vlm1eZGoc0l8GryYWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yOAK0R0htQwv6WcGg0ar/DzDTpvBft/u3SzkotG9foE=;
- b=eTHW0Qj9KpfM/6xh/OU/EyYA1zPfnOE4qFKPULB/YtMUnzlCpwnfwzrE/6mSBwhkzg+x/yBcTSv912/tUpEdRFJ7Zduxci2WlxXDpX0TC1USgcX3ugM2yFajADwmQ7CHs8jIWNP6HGDkxVdCneqZjQPzTL1CVYryCa01h1oVOiO2wuTFtxwvr4FGotEJYR9sxwE/hUuXX5JpLf7rLafDmUwcVCRcpg1iFupbZr7GFyvedyz1mtOlVsfq3XkgOVA4kUphmGtAHiv1vBM45mLG06G+8+unbIafT4LfpXs1LP6OmSwEWLNUIfVJDgo3C/VjomjMsX60MS04JLh5ZgF8YQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        id S235775AbiADWwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 17:52:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57850 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235678AbiADWwu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 17:52:50 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4C9C061784
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 14:52:50 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id u16so28021843plg.9
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 14:52:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yOAK0R0htQwv6WcGg0ar/DzDTpvBft/u3SzkotG9foE=;
- b=WaPrE+LM4mec/H8XSQIgdu4NtjEP83HGTOUTwmRKJic1veFuEYopuslzb2OOU2KjtS7zEImH+aTforLK5uK/dAlCvImSfpZlfLfIWld5rVkWpN7ORb05z3bgsA5FVem4p1OHl9FXeehYAdeJzTd2X/OJ0xXfRbbnIt+L+kwayxY=
-Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
- by SN6PR10MB2573.namprd10.prod.outlook.com (2603:10b6:805:48::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.15; Tue, 4 Jan
- 2022 22:31:52 +0000
-Received: from SN6PR10MB2576.namprd10.prod.outlook.com
- ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
- ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4844.016; Tue, 4 Jan 2022
- 22:31:52 +0000
-Date:   Tue, 4 Jan 2022 16:31:46 -0600
-From:   Venu Busireddy <venu.busireddy@oracle.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VxMSZX1HGa/pYxYXS45b2VNpzNPZiDZH28VAovlQ1Cs=;
+        b=iawsbHmTCIC5yjOILXtsURiIt1CUlPAzc2Yugmwaujue9UnekQWajk0upsHJviOqvX
+         /TEzGW2ZprP+fnDoc41KbMgaz6J0yO8k1zvbjsCBn54Y5nb3W3lqhJgIByhsIjLGHNEd
+         IJ/huOtBRSRrvN/dm1eC2BAm9kUT4TXBWw5is/0VoM0kp90Y3hyiRJrKcNFdQgPWyEPu
+         5uLTa1SmtVaxz1I2MQm4ihnCNUWuQc7spVhKQsriRSxI86OZZtey0CSqN+WBpu1OxkSV
+         WfLlQr8QCyM5oIode1Of9qUx3qsWesYJV5/juSKIkNKHggVae6e5yjeYoP197A/0IPoc
+         2HHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VxMSZX1HGa/pYxYXS45b2VNpzNPZiDZH28VAovlQ1Cs=;
+        b=Ou5oqGewlAZA175tmE5yWGvHvPf/BlXCSVyGs5WDmURrfmZ3UZDfIsBLzEQHD5vIk0
+         RXV8GiDijFIUh+BWZrWAOfBVEwdXwEhhfIe+2E9r/TnDa6yDUwN0JtG5lvdQqhoo7IHo
+         8MSspu5dAGv7APAreH88uutAKX8qkoUKkGoNvJ4s2/CyCIVqGmNPPRPbyP2dIJbkjx0f
+         YopYoy6PCzkt+3k0O5rX/LeswFeMHM6ZCwkCZdj/BL+0dnWUksjd+RI+FfbvULS4lfx8
+         IIs+39qJej3/ZB4XuAfLKIXqB361ueIn/LHzWTjFyn5sfoDwQlh6xyq5wVne/oHjBXCm
+         M+vg==
+X-Gm-Message-State: AOAM5331YSfKyc7aXPQu4AeF4HtO5RUDmptU3TmBJLchJlGfvv/PzhZw
+        PEXmAA3ZMDhKDNdHo/VoDvg/fQ==
+X-Google-Smtp-Source: ABdhPJzbLJqp98rD/4U7kVPEMER04Xrxb9fVUCnDdD98RdmEXnNhZJ/JJK+hWf6kFjkD4+t250lgHA==
+X-Received: by 2002:a17:902:e811:b0:149:22b4:d4a6 with SMTP id u17-20020a170902e81100b0014922b4d4a6mr51915667plg.58.1641336769248;
+        Tue, 04 Jan 2022 14:52:49 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id oa9sm337834pjb.31.2022.01.04.14.52.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jan 2022 14:52:48 -0800 (PST)
+Date:   Tue, 4 Jan 2022 22:52:45 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 15/40] x86/mm: Add support to validate memory when
- changing C-bit
-Message-ID: <YdTK0h2ZKu4UxrhQ@dt>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-16-brijesh.singh@amd.com>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH v2 3/5] KVM: SVM: fix race between interrupt delivery and
+ AVIC inhibition
+Message-ID: <YdTPvdY6ysjXMpAU@google.com>
+References: <20211213104634.199141-1-mlevitsk@redhat.com>
+ <20211213104634.199141-4-mlevitsk@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-16-brijesh.singh@amd.com>
-X-ClientProxiedBy: SJ0PR05CA0200.namprd05.prod.outlook.com
- (2603:10b6:a03:330::25) To SN6PR10MB2576.namprd10.prod.outlook.com
- (2603:10b6:805:44::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 88f8f182-298d-4f58-2f5f-08d9cfd2017b
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2573:EE_
-X-Microsoft-Antispam-PRVS: <SN6PR10MB2573591A27E7A30107A81CC1E64A9@SN6PR10MB2573.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RPKpCRUlKoojC/LKoODUhQ9pKZC/HSrg6pkMuCGx1jZr/NVFCvAsGoSNpzwrJ6hj4XrkIgmIeQgHrwE3V1tHi5pfB3XgXgj/8mwkoEuhgZyk+X3mlaYMReQrvtYslKkBZYN2OkVEwzGAOC2QHGkLWbshU2ZlcHlOFFEx1YyGv11myxW7vXHK9M1E8aNZSUkoQuYoaTQq2JD+TCyeoPeI/9f/qpj4dfvR9c98o8wXAFA3ZWpPdpabEQ0rrVdNkCSjMKYOJMOMBRk6K5rua39lnKaU9sllGKjXtZtXPcdw3OyYIRVx3NB/u8a2svEQ4RzKJGPE9nJAKc1fTIvUAF5L9PnPeDLpLucI0pGnEMEn09OfGl/7HzsRXunoBCgpjlF0jNOoU4JGXDUHyTVtfARCkYmQhnTn8CwC/MXBDAMjH8BwFtNBEb/lMK7kGToqxG+c7bBZhsoX/a7tbf2c43TyWQZ57KOBthLAlgQ7Lpo+wQB9vrlzXAEGPSa0Mm/ftskhZ+9dLShHE18RZ/KVqCmEh54/VxI/kNiBFs4toz5f4CCz8ZuHHhjbFNOr+Jz1yG4ZHjx1N8QA/0Lz1iGOsFLPUknPLsO3dhpIWqYw3nwLwwEO0Y5QTYXuGvqiMYnwY8IpmB4nlzhPMoZa6lzkQ1WOGg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(26005)(86362001)(2906002)(186003)(66556008)(7406005)(7416002)(4326008)(38100700002)(6506007)(5660300002)(8936002)(6916009)(54906003)(9686003)(6666004)(4001150100001)(53546011)(44832011)(6486002)(15650500001)(6512007)(316002)(33716001)(83380400001)(66476007)(508600001)(8676002)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4pp+4LQRYVjkRutYkaIE1QypYxFgPTFy+SSdf2nKQX3zznfv6ugJso8onnM8?=
- =?us-ascii?Q?nZn5MH63X7RZ3rM02TgNdAdo2gVdyZqOOovLMkBG26ab/X2UY9aYI85x4rIE?=
- =?us-ascii?Q?cYU7Ncxj4UuGRGyRkrgm2hABWMnDzccNSJwy5tDoe11HPP+zf5T19LGc5+ta?=
- =?us-ascii?Q?V9B9QkEi8mkL5xthRr7Q7wRwZDYPqUIvEmEtM1sOi+L/dUlIkYTJG4k/B+J6?=
- =?us-ascii?Q?CuKu78CywnDpTFxF5YpvxFoonGzeAz3TxYiTtLqoJ9TJoqaALoI3tc02H79k?=
- =?us-ascii?Q?qBZzzH0Ggzg0tbQYDKXOw2GurSDW5zZIc2ybCw9lMn3v4eAwMZZaWTJavVDH?=
- =?us-ascii?Q?GHybFehlKR7Q9NXaQoWBgZ+0RAWkSNCIFlAmqMk/siTTScGaJQ3fEuPG49tp?=
- =?us-ascii?Q?jDYt3xBp6Au527HGGTEdstt9rUB2aG8Qh5l5plGQ335Qr1RkslDsw7JAxHjy?=
- =?us-ascii?Q?sMyZ0IzxtlJQy39RbLcFUl2s6WZ9xOSIC86LMrvgW8ro9d0qunU6EgNmUa6/?=
- =?us-ascii?Q?qeiFVW2R4KBTeDBS9KndXsTg6urCDJ6OqmB3XEvUBJ4qmRd+XSEVkcHyIX25?=
- =?us-ascii?Q?Y6DyTEc6GbI0y9IY0G6vl9RxT/h00Utbt7CAYq/SbzqMgDHge7DwHXTe+qdI?=
- =?us-ascii?Q?6GEMX8c0HzzjOuvJXGUIqz2EeUjBJlQ4HfOM97Tt1bjKLwu7Uia4Mr0k6To3?=
- =?us-ascii?Q?LY0I23nTNp4YoNF3o9vI3UuyhlzN1HY62rnjLCJwHIeDK1sHg2rmBeeS+UpV?=
- =?us-ascii?Q?E4Shacr1rcgIb5up6zgx6GVAKrkjO2GsFKbeT0sVfkmw6sHpoP0adqBsHvIK?=
- =?us-ascii?Q?0XHpjyUKlShqKEs8KFCsz+xwpZDdP9FNHJvROyEns0ug6/J3VeWY2WKXGb+S?=
- =?us-ascii?Q?VDPg3daeuJUO9lBIxCdZ672OxaIpMdmTNe/8PckKFO/Ln+naGEBg2V8QddQK?=
- =?us-ascii?Q?cvq1OfZycXHBrR/Mis8yIk6HPnKmZzY803pKo3fNBRg/3qr1nr5wA9UcP9qV?=
- =?us-ascii?Q?DXs6XOBaNYYlUQf93Jzwl2r81pXRvHHbuwJ3Rob/Bcx7nu5NXxuty4VCkTE3?=
- =?us-ascii?Q?och02UXyInFXEK91eJLWBd3p/tnHbDVzcBqGnmP81gkx19WJSTFebW/eucsP?=
- =?us-ascii?Q?T3z/j9wqWXkJEjZMSXmkG5fbLznoCYTuOPuBerrYnAompmWtI4Ptud6eMIPh?=
- =?us-ascii?Q?hcxBCbi6caFCmFTWHZJTTGFgtg3Nft40KbzLNAOOJWYH4mojT6MWKlPuuC0b?=
- =?us-ascii?Q?kleRmArOd5LZV+lapJk8gPcncfhDViTpLSInbX7yYYmg/6hOdPPY+dIUMtJL?=
- =?us-ascii?Q?JhKkHTuYoFXSwIv2p1JaqMcbU7FPd9BtvSEpnU75Qv30cjyITGVcTALp4j3c?=
- =?us-ascii?Q?9zvs8K4eSjJsWa6+4ezySBNCQ9IzpBorrqVMCRjBFmu4NDg7Gqhs5ZzmlJit?=
- =?us-ascii?Q?JCTv2A6FKXVqKUu9ekKzNuO3Ii6UmnscmrDtcCzb46VZLTMmGwEQnDu5cSIz?=
- =?us-ascii?Q?mENPrjsqREwIrVl7ogEg0wyy872z5dGtzpPbgTOoxFj2CNjdVb1LqDCGv6UB?=
- =?us-ascii?Q?YZL7C4bvqX5axUd9AH0H5/BuAItwVwEVXy0Buq5BQmNfgPozdOcQkok8pMVC?=
- =?us-ascii?Q?XMVj8btEohCxPDAaUlbzQF1eqiqNF6x8aSvukwSKrtEOnHIxlJDzknZBGlN+?=
- =?us-ascii?Q?EwVmUg=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88f8f182-298d-4f58-2f5f-08d9cfd2017b
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 22:31:52.7156
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QD9dOxYEUcGHpPi+FcpE0MI2nRGc8Gji2OBxabDWm4fYR5VtDKVsXZBUPVG64Re8Lnqwdn9I6ugD28W3u5g4ELmpIxdw9BnO+u3DxUyK2TI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2573
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10217 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
- spamscore=0 adultscore=0 phishscore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201040143
-X-Proofpoint-GUID: 9KfRaklx_0qArIExAAxuL1ymaxdhtVTP
-X-Proofpoint-ORIG-GUID: 9KfRaklx_0qArIExAAxuL1ymaxdhtVTP
+In-Reply-To: <20211213104634.199141-4-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-12-10 09:43:07 -0600, Brijesh Singh wrote:
-> The set_memory_{encrypt,decrypt}() are used for changing the pages
+On Mon, Dec 13, 2021, Maxim Levitsky wrote:
+> If svm_deliver_avic_intr is called just after the target vcpu's AVIC got
+> inhibited, it might read a stale value of vcpu->arch.apicv_active
+> which can lead to the target vCPU not noticing the interrupt.
+> 
+> To fix this use load-acquire/store-release so that, if the target vCPU
+> is IN_GUEST_MODE, we're guaranteed to see a previous disabling of the
+> AVIC.  If AVIC has been disabled in the meanwhile, proceed with the
+> KVM_REQ_EVENT-based delivery.
+> 
+> All this complicated logic is actually exactly how we can handle an
+> incomplete IPI vmexit; the only difference lies in who sets IRR, whether
+> KVM or the processor.
+> 
+> Also incomplete IPI vmexit, has the same races as svm_deliver_avic_intr.
+> therefore just reuse the avic_kick_target_vcpu for it as well.
+> 
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-s/set_memory_{encrypt,decrypt}/snp_set_memory_{shared,private}/
+Heh, probably don't need a Reported-by for a patch you wrote :-)
 
-> from decrypted (shared) to encrypted (private) and vice versa.
-> When SEV-SNP is active, the page state transition needs to go through
-> additional steps.
-> 
-> If the page is transitioned from shared to private, then perform the
-> following after the encryption attribute is set in the page table:
-> 
-> 1. Issue the page state change VMGEXIT to add the memory region in
->    the RMP table.
-> 2. Validate the memory region after the RMP entry is added.
-> 
-> To maintain the security guarantees, if the page is transitioned from
-> private to shared, then perform the following before encryption attribute
-> is removed from the page table:
-> 
-> 1. Invalidate the page.
-> 2. Issue the page state change VMGEXIT to remove the page from RMP table.
-> 
-> To change the page state in the RMP table, use the Page State Change
-> VMGEXIT defined in the GHCB specification.
-> 
-> The GHCB specification provides the flexibility to use either 4K or 2MB
-> page size in during the page state change (PSC) request. For now use the
-> 4K page size for all the PSC until page size tracking is supported in the
-> kernel.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Co-developed-with: Paolo Bonzini <pbonzini@redhat.com>
 
-[snip]
+Co-developed-by: is preferred, and should be accompanied by Paolo's SoB.
 
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 2971aa280ce6..35c772bf9f6c 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -574,7 +574,7 @@ static void pvalidate_pages(unsigned long vaddr, unsigned int npages, bool valid
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 85 +++++++++++++++++++++++++----------------
+>  arch/x86/kvm/x86.c      |  4 +-
+>  2 files changed, 55 insertions(+), 34 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 90364d02f22aa..34f62da2fbadd 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -289,6 +289,47 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static void avic_kick_target_vcpu(struct kvm_vcpu *vcpu)
+> +{
+> +	bool in_guest_mode;
+> +
+> +	/*
+> +	 * vcpu->arch.apicv_active is read after vcpu->mode.  Pairs
+
+This should say "must be read", not "is read".  It's obvious from the code that
+apicv_active is read second, the comment is there to say that it _must_ be read
+after vcpu->mode.
+
+> +	 * with smp_store_release in vcpu_enter_guest.
+> +	 */
+> +	in_guest_mode = (smp_load_acquire(&vcpu->mode) == IN_GUEST_MODE);
+
+IMO, it's marginally clear to initialize the bool.
+
+	bool in_guest_mode = (smp_load_acquire(&vcpu->mode) == IN_GUEST_MODE);
+
+> +	if (READ_ONCE(vcpu->arch.apicv_active)) {
+> +		if (in_guest_mode) {
+> +			/*
+> +			 * Signal the doorbell to tell hardware to inject the IRQ if the vCPU
+> +			 * is in the guest.  If the vCPU is not in the guest, hardware will
+> +			 * automatically process AVIC interrupts at VMRUN.
+
+Might as well wrap these comments at 80 chars since they're being moved.  Or
+maybe even better....
+
+	/* blah blah blah */
+	if (!READ_ONCE(vcpu->arch.apicv_active)) {
+		kvm_make_request(KVM_REQ_EVENT, vcpu);
+		kvm_vcpu_kick(vcpu);
+		return;
+	}
+
+	if (in_guest_mode) {
+		...
+	} else {
+		....
+	}
+
+...so that the existing comments can be preserved as is.
+
+> +			 *
+> +			 * Note, the vCPU could get migrated to a different pCPU at any
+> +			 * point, which could result in signalling the wrong/previous
+> +			 * pCPU.  But if that happens the vCPU is guaranteed to do a
+> +			 * VMRUN (after being migrated) and thus will process pending
+> +			 * interrupts, i.e. a doorbell is not needed (and the spurious
+> +			 * one is harmless).
+> +			 */
+> +			int cpu = READ_ONCE(vcpu->cpu);
+> +			if (cpu != get_cpu())
+> +				wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
+> +			put_cpu();
+> +		} else {
+> +			/*
+> +			 * Wake the vCPU if it was blocking.  KVM will then detect the
+> +			 * pending IRQ when checking if the vCPU has a wake event.
+> +			 */
+> +			kvm_vcpu_wake_up(vcpu);
+> +		}
+> +	} else {
+> +		/* Compare this case with __apic_accept_irq.  */
+
+Honestly, this comment isn't very helpful.  It only takes a few lines to say:
+
+		/*
+		 * Manually signal the event, the __apic_accept_irq() fallback
+		 * path can't be used if AVIC is disabled after the vector is
+		 * already queued in the vIRR.
+		 */
+
+(incorporating more feedback below)
+
+> +		kvm_make_request(KVM_REQ_EVENT, vcpu);
+> +		kvm_vcpu_kick(vcpu);
+> +	}
+> +}
+> +
+>  static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
+>  				   u32 icrl, u32 icrh)
+>  {
+> @@ -304,8 +345,10 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
+>  					GET_APIC_DEST_FIELD(icrh),
+> -					icrl & APIC_DEST_MASK))
+> -			kvm_vcpu_wake_up(vcpu);
+> +					icrl & APIC_DEST_MASK)) {
+> +			vcpu->arch.apic->irr_pending = true;
+> +			avic_kick_target_vcpu(vcpu);
+> +		}
 >  	}
 >  }
 >  
-> -static void __init early_set_page_state(unsigned long paddr, unsigned int npages, enum psc_op op)
-> +static void __init early_set_pages_state(unsigned long paddr, unsigned int npages, enum psc_op op)
+> @@ -671,9 +714,12 @@ void svm_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+>  
+>  int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>  {
+> -	if (!vcpu->arch.apicv_active)
+> -		return -1;
+> -
+> +	/*
+> +	 * Below, we have to handle anyway the case of AVIC being disabled
+> +	 * in the middle of this function, and there is hardly any overhead
+> +	 * if AVIC is disabled.  So, we do not bother returning -1 and handle
+> +	 * the kick ourselves for disabled APICv.
 
-Is there a need to change the name? "npages" can take a value of 1 too.
-Hence, early_set_page_state() appears to be a better name!
+Hmm, my preference would be to keep the "return -1" even though apicv_active must
+be rechecked.  That would help highlight that returning "failure" after this point
+is not an option as it would result in kvm_lapic_set_irr() being called twice.
 
-> +		/*
-> +		 * Page State Change VMGEXIT can pass error code through
-> +		 * exit_info_2.
-> +		 */
-
-Collapse into one line?
-
-> +void snp_set_memory_shared(unsigned long vaddr, unsigned int npages)
-> +{
-> +	if (!cc_platform_has(CC_ATTR_SEV_SNP))
-> +		return;
+> +	 */
+>  	kvm_lapic_set_irr(vec, vcpu->arch.apic);
+>  
+>  	/*
+> @@ -684,34 +730,7 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>  	 * the doorbell if the vCPU is already running in the guest.
+>  	 */
+>  	smp_mb__after_atomic();
+> -
+> -	/*
+> -	 * Signal the doorbell to tell hardware to inject the IRQ if the vCPU
+> -	 * is in the guest.  If the vCPU is not in the guest, hardware will
+> -	 * automatically process AVIC interrupts at VMRUN.
+> -	 */
+> -	if (vcpu->mode == IN_GUEST_MODE) {
+> -		int cpu = READ_ONCE(vcpu->cpu);
+> -
+> -		/*
+> -		 * Note, the vCPU could get migrated to a different pCPU at any
+> -		 * point, which could result in signalling the wrong/previous
+> -		 * pCPU.  But if that happens the vCPU is guaranteed to do a
+> -		 * VMRUN (after being migrated) and thus will process pending
+> -		 * interrupts, i.e. a doorbell is not needed (and the spurious
+> -		 * one is harmless).
+> -		 */
+> -		if (cpu != get_cpu())
+> -			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
+> -		put_cpu();
+> -	} else {
+> -		/*
+> -		 * Wake the vCPU if it was blocking.  KVM will then detect the
+> -		 * pending IRQ when checking if the vCPU has a wake event.
+> -		 */
+> -		kvm_vcpu_wake_up(vcpu);
+> -	}
+> -
+> +	avic_kick_target_vcpu(vcpu);
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 85127b3e3690b..81a74d86ee5eb 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9869,7 +9869,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	 * result in virtual interrupt delivery.
+>  	 */
+>  	local_irq_disable();
+> -	vcpu->mode = IN_GUEST_MODE;
 > +
-> +	pvalidate_pages(vaddr, npages, 0);
-
-Replace '0' with "false"?
-
-> +
-> +	set_pages_state(vaddr, npages, SNP_PAGE_STATE_SHARED);
-> +}
-> +
-> +void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
-> +{
-> +	if (!cc_platform_has(CC_ATTR_SEV_SNP))
-> +		return;
-> +
-> +	set_pages_state(vaddr, npages, SNP_PAGE_STATE_PRIVATE);
-> +
-> +	pvalidate_pages(vaddr, npages, 1);
-
-Replace '1' with "true"?
-
-Venu
-
+> +	/* Store vcpu->apicv_active before vcpu->mode.  */
+> +	smp_store_release(&vcpu->mode, IN_GUEST_MODE);
+>  
+>  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+>  
+> -- 
+> 2.26.3
+> 
