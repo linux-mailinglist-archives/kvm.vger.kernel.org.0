@@ -2,95 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1CB3484AAA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:24:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49873484AAD
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235451AbiADWYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 17:24:53 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:36446 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S234157AbiADWYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 17:24:51 -0500
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 204MNJe9016479
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 4 Jan 2022 17:23:20 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 7EBF315C00E1; Tue,  4 Jan 2022 17:23:19 -0500 (EST)
-Date:   Tue, 4 Jan 2022 17:23:19 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     "Eric W. Biederman" <ebiederm@xmission.com>
-Cc:     Walt Drummond <walt@drummond.us>, aacraid@microsemi.com,
-        viro@zeniv.linux.org.uk, anna.schumaker@netapp.com, arnd@arndb.de,
-        bsegall@google.com, bp@alien8.de, chuck.lever@oracle.com,
-        bristot@redhat.com, dave.hansen@linux.intel.com,
-        dwmw2@infradead.org, dietmar.eggemann@arm.com, dinguyen@kernel.org,
-        geert@linux-m68k.org, gregkh@linuxfoundation.org, hpa@zytor.com,
-        idryomov@gmail.com, mingo@redhat.com, yzaikin@google.com,
-        ink@jurassic.park.msu.ru, jejb@linux.ibm.com, jmorris@namei.org,
-        bfields@fieldses.org, jlayton@kernel.org, jirislaby@kernel.org,
-        john.johansen@canonical.com, juri.lelli@redhat.com,
-        keescook@chromium.org, mcgrof@kernel.org,
-        martin.petersen@oracle.com, mattst88@gmail.com, mgorman@suse.de,
-        oleg@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
-        rth@twiddle.net, richard@nod.at, serge@hallyn.com,
-        rostedt@goodmis.org, tglx@linutronix.de,
-        trond.myklebust@hammerspace.com, vincent.guittot@linaro.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-m68k@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [RFC PATCH 0/8] signals: Support more than 64 signals
-Message-ID: <YdTI16ZxFFNco7rH@mit.edu>
-References: <20220103181956.983342-1-walt@drummond.us>
- <87iluzidod.fsf@email.froward.int.ebiederm.org>
- <YdSzjPbVDVGKT4km@mit.edu>
- <87pmp79mxl.fsf@email.froward.int.ebiederm.org>
+        id S235507AbiADWZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 17:25:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51594 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235476AbiADWZG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 17:25:06 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11CCEC061785
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 14:25:06 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id v13so33430789pfi.3
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 14:25:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+e0xqW2F0YeKJUlFeDl4DgUIfFWiqIClROiH7OcyebI=;
+        b=Yc9mMQL0dzf6v2hLBQUf+fjtdfCAeAy/cFw+Qem0qOL8fpxmfdYM7RkiXPZD3LmaV8
+         bZI+7s9bMC4kNdMnXrbPTmlLNa7JyQXk1rdP5OkskRjYuY75uzqE5A1myFHGs6Ok27wP
+         iHpvITzvtzCYNlzsSaWiZqFUOLlebh/eHIPY2YezMfO4xeDJ3eS+/wkiVW77famX46xe
+         K1nkRCXo1HgBAd56l46bvmUb0IlyVAuEqaVeRobelo0sECCchhTbdFrHh6jGETC8OC3b
+         lihUDPAlJe5aTlLiM6mB4sg7mNQTf+WakbO8lzXW1NvPMvGzVlCXtE8nGWvP5joZ2AKb
+         oUaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+e0xqW2F0YeKJUlFeDl4DgUIfFWiqIClROiH7OcyebI=;
+        b=hH4qtPRYt80KBjSNhQAuCYDHkSfmOS/MnSzVhSjqsXHIhjsowzuqhqb6KEWF+XkPlH
+         prBGicEnuK2qoygf7JtGDWDVa/O3Z3AxUnJAL4/WVOMdytUBqM1qqhFvPtBIpQ0o2eKu
+         5hgNW20jYRJs8XJE9hCkWPhU68HSqV59McTzPLObjj0FgTXxJMUefn/+YWA8BKnSlpFg
+         dVGjqmoNjMQvyds1luNA8sMW/c3QBavW17wLfVMz3K2yTBFIrM16Q/TbZRDlePzPtQnu
+         IFYWQQ6pX0Rto8GU62p98LyIQRSBNohByNEgOCn2TrlmrqXTPZsxNepEBEbnnfHQcbPB
+         nCeg==
+X-Gm-Message-State: AOAM5320//S3H5zM+cEv+KF/oMG4Xk3y542jo6kXJpaQJxf4laNllqsE
+        q1sqE1RZKJF6QqtuLlIl++x0yvB+qVOLMg==
+X-Google-Smtp-Source: ABdhPJxV+D4ZlMhjLhwvzZs5kvYN6VOQ+UUGxuU9oEfE9DyCMoNEg+ysNMrsfCX+zw7nADJ7I/JE4Q==
+X-Received: by 2002:a05:6a00:1502:b0:4ba:95a2:97a9 with SMTP id q2-20020a056a00150200b004ba95a297a9mr52543678pfu.48.1641335105382;
+        Tue, 04 Jan 2022 14:25:05 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k70sm35258535pgd.19.2022.01.04.14.25.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jan 2022 14:25:04 -0800 (PST)
+Date:   Tue, 4 Jan 2022 22:25:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH v2 2/5] KVM: SVM: allow to force AVIC to be enabled
+Message-ID: <YdTJPTSsM1feVwt/@google.com>
+References: <20211213104634.199141-1-mlevitsk@redhat.com>
+ <20211213104634.199141-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87pmp79mxl.fsf@email.froward.int.ebiederm.org>
+In-Reply-To: <20211213104634.199141-3-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 04:05:26PM -0600, Eric W. Biederman wrote:
+On Mon, Dec 13, 2021, Maxim Levitsky wrote:
+> Apparently on some systems AVIC is disabled in CPUID but still usable.
 > 
-> That is all as expected, and does not demonstrate a regression would
-> happen if SIGPWR were to treat SIG_DFL as SIG_IGN, as SIGWINCH, SIGCONT,
-> SIGCHLD, SIGURG do.  It does show there is the possibility of problems.
+> Allow the user to override the CPUID if the user is willing to
+> take the risk.
 > 
-> The practical question is does anything send SIGPWR to anything besides
-> init, and expect the process to handle SIGPWR or terminate?
-
-So if I *cared* about SIGINFO, what I'd do is ask the systemd
-developers and users list if there are any users of the sigpwr.target
-feature that they know of.  And I'd also download all of the open
-source UPS monitoring applications (and perhaps documentation of
-closed-source UPS applications, such as for example APC's program) and
-see if any of them are trying to send the SIGPWR signal.
-
-I don't personally think it's worth the effort to do that research,
-but maybe other people care enough to do the work.
-
-> > I claim, though, that we could implement VSTATUS without implenting
-> > the SIGINFO part of the feature.
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 > 
-> I agree that is the place to start.  And if we aren't going to use
-> SIGINFO perhaps we could have an equally good notification method
-> if anyone wants one.  Say call an ioctl and get an fd that can
-> be read when a VSTATUS request comes in.
-> 
-> SIGINFO vs SIGCONT vs a fd vs something else is something we can sort
-> out when people get interested in modifying userspace.
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index c9668a3b51011..468cc385c35f0 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -206,6 +206,9 @@ module_param(tsc_scaling, int, 0444);
+>  static bool avic;
+>  module_param(avic, bool, 0444);
+>  
+> +static bool force_avic;
+> +module_param_unsafe(force_avic, bool, 0444);
+> +
+>  bool __read_mostly dump_invalid_vmcb;
+>  module_param(dump_invalid_vmcb, bool, 0644);
+>  
+> @@ -4656,10 +4659,14 @@ static __init int svm_hardware_setup(void)
+>  			nrips = false;
+>  	}
+>  
+> -	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
+> +	enable_apicv = avic = avic && npt_enabled && (boot_cpu_has(X86_FEATURE_AVIC) || force_avic);
+>  
+>  	if (enable_apicv) {
+> -		pr_info("AVIC enabled\n");
+> +		if (!boot_cpu_has(X86_FEATURE_AVIC)) {
+> +			pr_warn("AVIC is not supported in CPUID but force enabled");
+> +			pr_warn("Your system might crash and burn");
+> +		} else
 
+Needs curly braces, though arguably the "AVIC enabled" part should be printed
+regardless of boot_cpu_has(X86_FEATURE_AVIC).
 
-Once VSTATUS support lands in the kernel, we can wait and see if there
-is anyone who shows up wanting the SIGINFO functionality.  Certainly
-we have no shortage of userspace notification interfaces in Linux.  :-)
+> +			pr_info("AVIC enabled\n");
 
-   	   	       		 	      - Ted
+This is all more than a bit terrifying, though I can see the usefuless for a
+developer.  At the very least, this should taint the kernel.  This should also
+probably be buried behind a Kconfig that is itself buried behind EXPERT.
