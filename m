@@ -2,226 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B93BD483F74
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 10:53:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00428483FCD
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 11:23:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbiADJxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 04:53:55 -0500
-Received: from mail-co1nam11on2132.outbound.protection.outlook.com ([40.107.220.132]:7265
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229702AbiADJxz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 04:53:55 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K8sxJxO6QHzYp+Zco2SOcMAaRqwmdeVSi17+INKQKUf0UH6ttKP4uE0NV53s3ve71MJekR9K5yxk5ydCI+atIczZlyC7zme2v1T7+b09AtVi50FUzQ8sQ0xULLhv5O1VZ3Rh9Xa/CaFgGputLRGh3uIMQuf4Frug2nuIHARingdfC+ta2wtINMDR6hU75x+0ZTuufyEVCjNHUeJG/Zbd4lffr99ydQJSqq+2a06RGwGuUhqVzcSTyESYarf+DyRpmI7evtvQKExDyMFbuAMp+m35Gw5QO8DGP8ZSSmFlivDUJ6Qw9XZJd7Q8vNMWLgncvsnSnaW45vnpgLj8QU1pcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ho8GiueFtcLpWEQhkfyRkQzW6+ShVTCMY6/eIbEbBQc=;
- b=ZtA6g/eCLWwEfs7tGV2vmpCz1FsHqYobmdDFjmCWsHbnkR87VWb5mldIH88D87cPB2139WX+f3dUppH2bK+4L0j02Gg+NoRiOyK2CxVCtGUDPqalBAWLsMssK++Tnq2YbmmjF+Noeb1GuGnljrwL3R4KLLfyH1sfiO6UCcgTlgCoGg81n3N7FokgNRxVLfIYmoOUMgMD8aESmn9j6VcHtKAjRul7goH4FmLUSB7L2bF4WDg31b2QpC7bQc1nR6jwJWJcey10nqY3zBsJzbxlbL7nYaxn7hVk+TiVG9ltBfRov7c5Z5qtd7bi0tdN0BQoUwB75LPHa0LoEbZYFTLCJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ho8GiueFtcLpWEQhkfyRkQzW6+ShVTCMY6/eIbEbBQc=;
- b=BB9Li+dStPGyeyHIYBoa4ORCrgdNZtlH8DlcElVFhq22H30/KN6OeG1s58uDOGqLU84SCTPSV3oHbzjQXQcVqCqhqk424YICSfwfIAj9DQQ7JFKQ8EIN0JP5HyV55pgBlj29Q3hH+cZzGN9nIvU1/N73zgVuXdclELqXGsJp158=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM6PR01MB5499.prod.exchangelabs.com (2603:10b6:5:17c::17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4844.15; Tue, 4 Jan 2022 09:53:50 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::209e:941a:d9f9:354e]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::209e:941a:d9f9:354e%4]) with mapi id 15.20.4867.007; Tue, 4 Jan 2022
- 09:53:50 +0000
-Message-ID: <2e8f9806-f11b-4aee-db44-8a5a0f30cc6d@os.amperecomputing.com>
-Date:   Tue, 4 Jan 2022 15:23:42 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v5 34/69] KVM: arm64: nv: Configure HCR_EL2 for nested
- virtualization
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-35-maz@kernel.org>
- <bbf31da5-ca1b-7499-e23c-9b5281ca7901@os.amperecomputing.com>
- <87o84rvnyo.wl-maz@kernel.org>
-From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <87o84rvnyo.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR20CA0018.namprd20.prod.outlook.com
- (2603:10b6:610:58::28) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+        id S231319AbiADKXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 05:23:52 -0500
+Received: from mga07.intel.com ([134.134.136.100]:50805 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229772AbiADKXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 05:23:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641291831; x=1672827831;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=cRmQp72roVP7l2p3EpKp9b++E4cZUwks/tvVGLmjE5Q=;
+  b=ahh7lMnNLUPBqEc7RAcWemkE4kC76CW9LE6dLuGNxTTwfjy8MBcgpqHd
+   KSkHvqcEt4eHxQshizk96+UYHtTEFUcRi3lBavCeK3OncXrQl515S2EqO
+   wYs0nux+e5TfeQUaUPP8wgLlF8PhhOnnH91RZBsb0ClqUsgCov4EpQGjg
+   UcPmpEfliNwDq2GZsnxmHFQ8WWllfwgIjVqRea8kGTFbj5CTKDZ7GdO2/
+   OM8BbyX4njwZKiW6e/W6Y6oMC0crKNbmYZ8pIbhcQIcGG3ecmJYim6/ZO
+   yB+rANcWrMpRf2avSzQCPtB73qjLsRty7NXKoZinqexW0fqLXZuU91x+D
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="305551924"
+X-IronPort-AV: E=Sophos;i="5.88,260,1635231600"; 
+   d="scan'208";a="305551924"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 02:23:50 -0800
+X-IronPort-AV: E=Sophos;i="5.88,260,1635231600"; 
+   d="scan'208";a="525991028"
+Received: from yzhao56-desk.sh.intel.com ([10.239.159.43])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 02:23:44 -0800
+Date:   Tue, 4 Jan 2022 18:06:12 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+Subject: Re: [PATCH v3 kvm/queue 14/16] KVM: Handle page fault for private
+ memory
+Message-ID: <20220104100612.GA19947@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+ <20211223123011.41044-15-chao.p.peng@linux.intel.com>
+ <20220104014629.GA2330@yzhao56-desk.sh.intel.com>
+ <20220104091008.GA21806@chaop.bj.intel.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f5c6080b-6035-42bc-4d41-08d9cf681be3
-X-MS-TrafficTypeDiagnostic: DM6PR01MB5499:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR01MB5499D57F10452E7C77A6CCBC9C4A9@DM6PR01MB5499.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8f7u24iOnWxBMqGJSjTE6Vu2lOloMSrez/lr5cmVe5I0pg7h/hFiM+Q1FH6XW5MizyEtx80FneFO3bSQvhLCJRaUXjPHlCtqfL3vHIiIBW3CVfFxwN/OuroyueCZ/uWXvHJo/h9ICBWHRLlUVmEMNW2YXmlig4byEeEFojt/nxG/jVLqlG2i6ZmRffzfiUyiABCGYPq6RRJbj5rv0OVkFt7BzRCmsx3Kg1Qmdrs6vm8kOK62/DjsqYqTLJ1SuMJm/34QtmA1lQ21O5LKqVJrf0iZUWUaIBsUd6KZwHlDfxGyIfHbLuTOZ4PiKUonfzPPSL+YlIQAPfZ+JXnCzpV6iAswIVC/hrTYUqUO0WMY4D/EyNlVtZwo3rMMMtUtGtuOVegVviW459hbMOAx7wJScSaP7f3H157Rv6gg0TT14ccaawDgFWxu24J1rywqf96M7W9DfdbjZR0OUsnTp5CLhxRZdIT6YI27qVD4FDC5Z9EItIWxsAvyuf3Q+W9qF9r0D8ziAqEno3HDamE1pfoK4h99D3+4wVSB7Id8WI8jllsEhED3MvAoopBI1kcrPsqPTyEMow/xjDrsHkzzD7HL/2No1z+0CK1iiElJkFsNLlp4jet+EoqVlOWBJx4mya8yBE1jCTKqt65DTtLXmtq9GG5BOHEeszgzgVN4atGdbojIW/ysxHD5jm+MOue5fAdvmsI7R6ryT3VvridpkX4artJledD/3xaqbXW+6GtqUJw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(83380400001)(38350700002)(66476007)(2616005)(54906003)(6916009)(5660300002)(2906002)(7416002)(8676002)(6512007)(38100700002)(186003)(508600001)(66556008)(4326008)(52116002)(31686004)(6486002)(6506007)(26005)(6666004)(8936002)(31696002)(66946007)(53546011)(86362001)(316002)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eFR5SXZlbjJTZlE0VHJTMXpzWUMyMmMzMnY2dU8wcHBjVldsUDdPR05kNFM3?=
- =?utf-8?B?aFVDajE1NGZONVNtRWNFSUFQZ2xrOUgybmhjVlc0alE0NnM5TUVVMjhvQ1FW?=
- =?utf-8?B?N0Z0a3pzL3ZJL2pDRzRXU1NWdGZnSE5HZWlacWlDZUVhVGN2OCtjMEgzU1JO?=
- =?utf-8?B?N3VCWjB1TjY2MWczZGxBQmswZXpBME9QMHNlVVhWNXd2c2xTbVlVL05LYlpt?=
- =?utf-8?B?UloyZzZsTS9zNndsWVIzTlVSM1lLMHRvRFFYM0thbml6RjRCMG5Zb28vUWND?=
- =?utf-8?B?T2x4eWVqVG53TEZXS0Y3RTMwY0dPSnl5R2g0amdyTVJZcGlyT0g4eVFFOWdV?=
- =?utf-8?B?Wnd0ekFmTWZsZ1gwOHN0ZjIwZytyL2g2T3ZqNEloM0w3bW91KzVCekRYSFpG?=
- =?utf-8?B?bDB1Vlh4ZVByMzhQQnYvRXYvUHJKYlFKczc2dlFsT00xdWg1cjYyK2dDR0Nx?=
- =?utf-8?B?MmZMMVFHM1I3Z3NPRTBLTHdjTFU1Mm05ZTZlT3RhdWJoZWZad1RvWitBQ1B6?=
- =?utf-8?B?S3ptdk8zdXEycnhONUpVTW1pWHMxUHdxWWZVRUVJQkJPVElqQlpLYjZEQ1Z1?=
- =?utf-8?B?UFoxajFkQTZ1aUpNUU0rNjc1eW9sMnJLYmtyWEwvSW1BVThzS0tsVHd6UUlR?=
- =?utf-8?B?UEMwSE5NdmViUWNzVWlETkUyZ1h1MHdxZUlsRmVYNWF1N1BuZVZVRVZlK3dI?=
- =?utf-8?B?YVpwc2g1VUV6aE12OXJKejBLNU9uQ1pUdURhdW04Sm5vb2lTVzFKSEhOd3JQ?=
- =?utf-8?B?VmZxR1RWbGxncXFRZlFuNVB0QkZQOU1VRWcxemZlclJNQUJvOVozRWZ5Sjhu?=
- =?utf-8?B?dW92UFF3UEFFZ3pLaTlUbURHQ2ljYmREMlNWcW83U3Zya3p2SCtVbS9YZUVn?=
- =?utf-8?B?TktscjllMEIvejRCVVNkbmZlZm9ZbFJBYWtFQmlZSjZ4L1ZUdEp2SXcvdlBR?=
- =?utf-8?B?S1ZHd29oZEIwTzl4Nll0OXpDbG93OE9FT1ZLaWtGcnNoVi9RWW9ldFM4dExG?=
- =?utf-8?B?enJpR3BlWDFRbjlBNWIxRVFvUldPQkpYbFFoRnl1cGF4MVVlS3pTb2JvQzZm?=
- =?utf-8?B?Z29PU0tsK0JhbjR3cXl4Zk94bmNjTis5WWlQMjc3c013bVlNVldCVy9ycFhC?=
- =?utf-8?B?Z0pHUnkzdWhRMlpoUHhFYnpnL21DY0d6R3RsL0htWlR6NnNtV1hzajExYkp0?=
- =?utf-8?B?c3FmcU5UK2p5T3VZWVJlbzNRVjJSRUZGYjM3c3lWUU1vY2ZxQjIyTDBCTm9O?=
- =?utf-8?B?MlBPV2FEZUVSR0lybmlmVVZyWXlyMjdLN3g0QzA2RjQrS0I1aXpWUXcyT2px?=
- =?utf-8?B?RG13aFA2czZtcGN3OGgwNkVqZmdXejlrbm9DdVNtSEhSalUwRXVOclhjdXVK?=
- =?utf-8?B?ajBRYzY4cW5tYk1qcWJtdWVaSDNYT1pSZVFMTVB3WGVZSDZZcGFEZVlFM0FT?=
- =?utf-8?B?WS9JbFIreTlIeEtHSmdpSE9tRDZwSnNJd1pyVmFqZHREUXFrVzRGOEVtcmxC?=
- =?utf-8?B?a3VZblRtYy9xVTVreHBTMU9MYlR5SnVIWkoyTXBleEFEVS9UOFRFd0N3WHlx?=
- =?utf-8?B?QjNMM1VlMGYvZTUwcmdpM2dyQzNqSTBnZWMveGNQb3VOSTJtNmlFQnFXZTlo?=
- =?utf-8?B?b1VHK2JlZER5T2drZEhKRG5TZHhBeXlCQTNjK2x5T0I0Qld4NDNmN2JLYWkx?=
- =?utf-8?B?bS9jdDBSY2ZlL1pLSkc5eTZvZzBFY2xLMmZiWjJXUVJGWkVRRFBJYzU0QkhJ?=
- =?utf-8?B?Wkp6K0JmVFJJNVZHVEtqazdtbXl6MlR4WjBMNkxLK1lKcTZ2bEJYL3djeXla?=
- =?utf-8?B?RUZnd2V1TVBObWR5dmFSM0pKRkNqSVJ5TXNhejJkVmlIMHNveWM5aU9DQ3ZK?=
- =?utf-8?B?cXdIcGozSW5IMjhhd1dzNWlCczBpU01SaGN3Y2ZlRVM4UlI4cHNoWHAyRUx1?=
- =?utf-8?B?ZHJyN3pjUDJ3QnpaeWhpQzAyN0RlYUpWd1YxR2RCeG01MWhSNGFwNmtMN0tp?=
- =?utf-8?B?WUE2eS81ODFiUEZTUGJWOGlGZTRJdE1wOEVQcFpkRlo4WHdBM2JSTnpDaTlU?=
- =?utf-8?B?d005UUFJWjFPaEJyb1YxWnM0RnpJZmg3U0JUSDJxeHlaYXdLeFNNSS8wVnFj?=
- =?utf-8?B?bllaOXNuUXFXaS8xRGF0RCsvRGI1K3MyQWJDcnlrVTBkZTNWNnZIWWE5MTZz?=
- =?utf-8?B?aXVQWGM0Lzd3cmQ0QVBqUDFPYjFnMjUxNlVubVJVZElDclh6S1JjTkxyRDFU?=
- =?utf-8?B?RXZHbzZRMmVqRzhBb0h0Z1Z1NkkrS0ZodzQwbFRsWXBzNm9PajI2TDNRSHQw?=
- =?utf-8?B?QlRzZ0lpeUpuTWhyUm5QWm1ZQlkwam0ycnduZk1tNk13NFYvZVJLdz09?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5c6080b-6035-42bc-4d41-08d9cf681be3
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 09:53:50.2783
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZNXTGhV4Chuw2a+IDdkoMtQV7Ek34F8+WaYXUvJ0248Cg/NkZn6ciLpne9iop/5Z/xoaMwwcgTCug7M09hrP2spEpVaNZXRSTQVm4sJFcn7UowqRTmXx62S9lxRP/SCq
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5499
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220104091008.GA21806@chaop.bj.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04-01-2022 03:09 pm, Marc Zyngier wrote:
-> On Tue, 04 Jan 2022 08:53:42 +0000,
-> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>
->>
->>
->> On 30-11-2021 01:31 am, Marc Zyngier wrote:
->>> From: Jintack Lim <jintack.lim@linaro.org>
->>>
->>> We enable nested virtualization by setting the HCR NV and NV1 bit.
->>>
->>> When the virtual E2H bit is set, we can support EL2 register accesses
->>> via EL1 registers from the virtual EL2 by doing trap-and-emulate. A
->>> better alternative, however, is to allow the virtual EL2 to access EL2
->>> register states without trap. This can be easily achieved by not traping
->>> EL1 registers since those registers already have EL2 register states.
->>>
->>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>    arch/arm64/include/asm/kvm_arm.h |  1 +
->>>    arch/arm64/kvm/hyp/vhe/switch.c  | 38 +++++++++++++++++++++++++++++---
->>>    2 files changed, 36 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
->>> index 68af5509e4b0..b8a0d410035b 100644
->>> --- a/arch/arm64/include/asm/kvm_arm.h
->>> +++ b/arch/arm64/include/asm/kvm_arm.h
->>> @@ -87,6 +87,7 @@
->>>    			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
->>>    			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
->>>    			 HCR_FMO | HCR_IMO | HCR_PTW )
->>> +#define HCR_GUEST_NV_FILTER_FLAGS (HCR_ATA | HCR_API | HCR_APK | HCR_RW)
->>>    #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
->>>    #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
->>>    #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
->>> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
->>> index 57f43e607819..da80c969e623 100644
->>> --- a/arch/arm64/kvm/hyp/vhe/switch.c
->>> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
->>> @@ -36,9 +36,41 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->>>    	u64 hcr = vcpu->arch.hcr_el2;
->>>    	u64 val;
->>>    -	/* Trap VM sysreg accesses if an EL2 guest is not using
->>> VHE. */
->>> -	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
->>> -		hcr |= HCR_TVM | HCR_TRVM;
->>> +	if (is_hyp_ctxt(vcpu)) {
->>> +		hcr |= HCR_NV;
->>> +
->>> +		if (!vcpu_el2_e2h_is_set(vcpu)) {
->>> +			/*
->>> +			 * For a guest hypervisor on v8.0, trap and emulate
->>> +			 * the EL1 virtual memory control register accesses.
->>> +			 */
->>> +			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
->>> +		} else {
->>> +			/*
->>> +			 * For a guest hypervisor on v8.1 (VHE), allow to
->>> +			 * access the EL1 virtual memory control registers
->>> +			 * natively. These accesses are to access EL2 register
->>> +			 * states.
->>> +			 * Note that we still need to respect the virtual
->>> +			 * HCR_EL2 state.
->>> +			 */
->>> +			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
->>> +
->>> +			vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
->>
->> Why HCR_RW is cleared here, May I know please?
+On Tue, Jan 04, 2022 at 05:10:08PM +0800, Chao Peng wrote:
+> On Tue, Jan 04, 2022 at 09:46:35AM +0800, Yan Zhao wrote:
+> > On Thu, Dec 23, 2021 at 08:30:09PM +0800, Chao Peng wrote:
+> > > When a page fault from the secondary page table while the guest is
+> > > running happens in a memslot with KVM_MEM_PRIVATE, we need go
+> > > different paths for private access and shared access.
+> > > 
+> > >   - For private access, KVM checks if the page is already allocated in
+> > >     the memory backend, if yes KVM establishes the mapping, otherwise
+> > >     exits to userspace to convert a shared page to private one.
+> > >
+> > will this conversion be atomical or not?
+> > For example, after punching a hole in a private memory slot, will KVM
+> > see two notifications: one for invalidation of the whole private memory
+> > slot, and one for fallocate of the rest ranges besides the hole?
+> > Or, KVM only sees one invalidation notification for the hole?
 > 
-> Good question. That's clearly a leftover from an early rework. It
-> really doesn't matter, as we are merging the guest's configuration
-> into the host's, and the host already has HCR_EL2.RW set.
+> Punching hole doesn't need to invalidate the whole memory slot. It only
+> send one invalidation notification to KVM for the 'hole' part.
+good :)
 
-Thanks, I too felt the same.
-
-x>
-> What HCR_GUEST_NV_FILTER_FLAGS should contain is only the bits we
-> don't want to deal with at this stage of the NV support. I'll fix that
-> for the next round.
 > 
-sure, thanks.
-
-> Thanks,
+> Taking shared-to-private conversion as example it only invalidates the
+> 'hole' part (that usually only the portion of the whole memory) on the
+> shared fd,, and then fallocate the private memory in the private fd at
+> the 'hole'. The KVM invalidation notification happens when the shared
+> hole gets invalidated. The establishment of the private mapping happens
+> at subsequent KVM page fault handlers.
 > 
-> 	M.
+> > Could you please show QEMU code about this conversion?
 > 
+> See below for the QEMU side conversion code. The above described
+> invalidation and fallocation will be two steps in this conversion. If
+> error happens in the middle then this error will be propagated to
+> kvm_run to do the proper action (e.g. may kill the guest?).
+> 
+> int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
+>                             bool shared_to_private)
+> {
+>     int ret; 
+>     int fd_from, fd_to;
+> 
+>     if (!rb || rb->private_fd <= 0) { 
+>         return -1;
+>     }    
+> 
+>     if (!QEMU_PTR_IS_ALIGNED(start, rb->page_size) ||
+>         !QEMU_PTR_IS_ALIGNED(length, rb->page_size)) {
+>         return -1;
+>     }    
+> 
+>     if (length > rb->max_length) {
+>         return -1;
+>     }    
+> 
+>     if (shared_to_private) {
+>         fd_from = rb->fd;
+>         fd_to = rb->private_fd;
+>     } else {
+>         fd_from = rb->private_fd;
+>         fd_to = rb->fd;
+>     }    
+> 
+>     ret = ram_block_discard_range_fd(rb, start, length, fd_from);
+>     if (ret) {
+>         return ret; 
+>     }    
+> 
+>     if (fd_to > 0) { 
+>         return fallocate(fd_to, 0, start, length);
+>     }    
+> 
+>     return 0;
+> }
+> 
+Thanks. So QEMU will re-generate memslots and set KVM_MEM_PRIVATE
+accordingly? Will it involve slot deletion and create?
 
-Thanks,
-Ganapat
+> > 
+> > 
+> > >   - For shared access, KVM also checks if the page is already allocated
+> > >     in the memory backend, if yes then exit to userspace to convert a
+> > >     private page to shared one, otherwise it's treated as a traditional
+> > >     hva-based shared memory, KVM lets existing code to obtain a pfn with
+> > >     get_user_pages() and establish the mapping.
+> > > 
+> > > The above code assume private memory is persistent and pre-allocated in
+> > > the memory backend so KVM can use this information as an indicator for
+> > > a page is private or shared. The above check is then performed by
+> > > calling kvm_memfd_get_pfn() which currently is implemented as a
+> > > pagecache search but in theory that can be implemented differently
+> > > (i.e. when the page is even not mapped into host pagecache there should
+> > > be some different implementation).
+> > > 
+> > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c         | 73 ++++++++++++++++++++++++++++++++--
+> > >  arch/x86/kvm/mmu/paging_tmpl.h | 11 +++--
+> > >  2 files changed, 77 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 2856eb662a21..fbcdf62f8281 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -2920,6 +2920,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> > >  	if (max_level == PG_LEVEL_4K)
+> > >  		return PG_LEVEL_4K;
+> > >  
+> > > +	if (kvm_slot_is_private(slot))
+> > > +		return max_level;
+> > > +
+> > >  	host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
+> > >  	return min(host_level, max_level);
+> > >  }
+> > > @@ -3950,7 +3953,59 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> > >  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
+> > >  }
+> > >  
+> > > -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
+> > > +static bool kvm_vcpu_is_private_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
+> > > +{
+> > > +	/*
+> > > +	 * At this time private gfn has not been supported yet. Other patch
+> > > +	 * that enables it should change this.
+> > > +	 */
+> > > +	return false;
+> > > +}
+> > > +
+> > > +static bool kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> > > +				    struct kvm_page_fault *fault,
+> > > +				    bool *is_private_pfn, int *r)
+> > > +{
+> > > +	int order;
+> > > +	int mem_convert_type;
+> > > +	struct kvm_memory_slot *slot = fault->slot;
+> > > +	long pfn = kvm_memfd_get_pfn(slot, fault->gfn, &order);
+> > For private memory slots, it's possible to have pfns backed by
+> > backends other than memfd, e.g. devicefd.
+> 
+> Surely yes, although this patch only supports memfd, but it's designed
+> to be extensible to support other memory backing stores than memfd. There
+> is one assumption in this design however: one private memslot can be
+> backed by only one type of such memory backing store, e.g. if the
+> devicefd you mentioned can independently provide memory for a memslot
+> then that's no issue.
+> 
+> >So is it possible to let those
+> > private memslots keep private and use traditional hva-based way?
+> 
+> Typically this fd-based private memory uses the 'offset' as the
+> userspace address to get a pfn from the backing store fd. But I believe
+> the current code does not prevent you from using the hva as the
+By hva-based way, I mean mmap is required for this fd.
+
+> userspace address, as long as your memory backing store understand that
+> address and can provide the pfn basing on it. But since you already have
+> the hva, you probably already mmap-ed the fd to userspace, that seems
+> not this private memory patch can protect you. Probably I didn't quite
+Yes, for this fd, though mapped in private memslot, there's no need to
+prevent QEMU/host from accessing it as it will not cause the severe machine
+check.
+
+> understand 'keep private' you mentioned here.
+'keep private' means allow this kind of private memslot which does not
+require protection from this private memory patch :)
+
+
+Thanks
+Yan
+> > Reasons below:
+> > 1. only memfd is supported in this patch set.
+> > 2. qemu/host read/write to those private memslots backing up by devicefd may
+> > not cause machine check.
+> > 
