@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5347C484707
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 18:35:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25C1D48470E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 18:38:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235740AbiADRe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 12:34:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
+        id S235820AbiADRio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 12:38:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233102AbiADRe4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 12:34:56 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D91FC061761
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 09:34:56 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id t123so32767359pfc.13
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 09:34:56 -0800 (PST)
+        with ESMTP id S234314AbiADRin (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 12:38:43 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13267C061785
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 09:38:43 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id w7so27035391plp.13
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 09:38:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=whSHyDkf0XZc1mjjjqOGE1/cp29qdWazioE+cyFAqO0=;
-        b=AKGtA6ul6yuij5z+AvEU6YGN7uC/zmR1Z3AA2eavQwv49exOo937KC2cThIO1M5x5R
-         ld8sDO2VSHM/RDAO9u2p+XO+70K8kcxVOrir1Y0yigapUXNM0Ylp9TZuzLp8opNiwQ7F
-         AnKU33bHmO0NaKXzOI53pZm3IA1/NzLaG7sHnIF4oNjbhA1aPFUnql4JxyGrCHn6JbAR
-         SUbiQLLvznmxlgAa1lOw1puG4OnmRONMmAC/E92187ZUZ0u1IfwKfyQOhRxiduWbOsmw
-         QfJOYMgQVQMBG6eYUimmH+OiBuy14zVxqAM71F46TwcrfoWBadi7V6J39TzjtU+srhbw
-         QcaQ==
+        bh=lyYzwxTZWc2pKk20hwF7g02tZU/8D7vFzmqot46zr3o=;
+        b=hF4kd1Mq//yjpl61nrYwvKMLJT6MIhV0E6IJ7zAD3JWlI+Lf9Kl7EjPWqG9SBDfEF8
+         bLQriumtvq/d4LPMxq+QOQ59vvcAi7NGeWaxhSlxlkxdhBfO29QiUCBdFlPXpq95IOxu
+         JnrHN+97F5CEcTUWcX51rjIW0pyoQQer1CQy1E5p5jQtDlIK/mVO/JhHG7vsEQcySXvf
+         BNaUi94Me+iu/Cekap3IlPAukuOJezwMa5QK5Oa7ly7GCgO/RioM5k2JBuseJG/0A/de
+         MBbrQnE1pKQwoHwCb9W1/cXrW4NS+qeUQ6HoMhdMIjuDjY1Jis5Xz1s308oEz41ERKbt
+         +qzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=whSHyDkf0XZc1mjjjqOGE1/cp29qdWazioE+cyFAqO0=;
-        b=L61diyuI5kARD6Hd15/EMYjTRKgTmJ7UVFlGk7vHXqH1b+U9rOwbB5RgCigOHUl+Wg
-         5gQUcH++osRCdlEcoq0ciR/vTKITSZqFhTONnlvPAhi1suBAhW68ONwuT523+a6cE1Zh
-         JEHpiGEWgyOofZCe6ljvJvh/GsxRQKvb/D15RD0iso5I3C26iNL644zA6VBRkPvw8v6l
-         yYus6cAX5S2SZ7kdsFUcKgZ1HZ5l+m7zz/Sr04cdY0GCyQWaLoY/qCq90E2MhBpIxY8F
-         i2sTCu1HxZBR/dn8HKJubbrILRjIsWsqjNdi+Yo6XPkEBuvJrj2VTc+fiWHkw1aRArWw
-         sfhQ==
-X-Gm-Message-State: AOAM533BPfO47/A/L179Tjbsk5mbTsG2FCwtOoKYBMDEwaqdUuev4Hh+
-        ab8bWCLUm/dPVYg+3v/YdnFHfw==
-X-Google-Smtp-Source: ABdhPJzZB3uUldS3H3PomxXInau17VQRCQJ4/BUX9qRXpwldcK2cYuphdyVvLg2cunzd1cVS/euxnw==
-X-Received: by 2002:a63:87c3:: with SMTP id i186mr45003143pge.507.1641317695407;
-        Tue, 04 Jan 2022 09:34:55 -0800 (PST)
+        bh=lyYzwxTZWc2pKk20hwF7g02tZU/8D7vFzmqot46zr3o=;
+        b=RxeLynVQnAEc0TLqmh2CXfNhU+4zvqf2Jtntdon4aGGpJkY5lXMfZ1Mq8Hz1+e5AIJ
+         50NdtHMKQ1HrQlT/+v4mWGXFOqBui9SX9O4bKS/A1UVZRGQ7N9/euUCnRaaC3rizavvA
+         5Der/wB2akMHZMBMQTZB2t0zd6g/sD77mVeUU0higDEJLgyyl0RPagwZBI1N300TokwE
+         me6s4+4d3/9W5owIhSBl2sSmbb4e/cp2yj8fe1my/ZNqVqkRFS7rUuJqMgFdzwEIBSJE
+         TNspDzNRrYCAB2N0lrJRV4HdQuPWWIkTpXV6ORCXnZxaZDx3jCDlskeP6F+OoU8ynPzt
+         9GMA==
+X-Gm-Message-State: AOAM531cNBNoe1+SbRxOd/Igwp+EPkzt4FoJkLMYMFdNRro0zpNxCHAt
+        Ski4uHgqhOJmqBvE7PJv3nfm1Q==
+X-Google-Smtp-Source: ABdhPJzjgo+EqH45rd3keKS/UyOltBLQmBVP2JYcV5J6T2Al78JIvydxac3UZxoz6wC2BU8T/FSzTQ==
+X-Received: by 2002:a17:90b:4d86:: with SMTP id oj6mr61729268pjb.185.1641317922423;
+        Tue, 04 Jan 2022 09:38:42 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k23sm401859pji.3.2022.01.04.09.34.54
+        by smtp.gmail.com with ESMTPSA id k23sm407842pji.3.2022.01.04.09.38.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 09:34:54 -0800 (PST)
-Date:   Tue, 4 Jan 2022 17:34:51 +0000
+        Tue, 04 Jan 2022 09:38:41 -0800 (PST)
+Date:   Tue, 4 Jan 2022 17:38:38 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Robert Hoo <robert.hu@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -70,53 +71,62 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
         jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
         david@redhat.com
-Subject: Re: [PATCH v3 kvm/queue 04/16] KVM: Extend the memslot to support
- fd-based private memory
-Message-ID: <YdSFO2fAHhdGsPLG@google.com>
+Subject: Re: [PATCH v3 kvm/queue 03/16] mm/memfd: Introduce MEMFD_OPS
+Message-ID: <YdSGHnMFV5Mu9vdF@google.com>
 References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-5-chao.p.peng@linux.intel.com>
- <YcSzafzpjMy6m28B@google.com>
- <20211231025344.GC7255@chaop.bj.intel.com>
+ <20211223123011.41044-4-chao.p.peng@linux.intel.com>
+ <95d13ac7da32aa1530d6883777ef3279e4ad825d.camel@linux.intel.com>
+ <20211231023853.GB7255@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211231025344.GC7255@chaop.bj.intel.com>
+In-Reply-To: <20211231023853.GB7255@chaop.bj.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Dec 31, 2021, Chao Peng wrote:
-> On Thu, Dec 23, 2021 at 05:35:37PM +0000, Sean Christopherson wrote:
-> > On Thu, Dec 23, 2021, Chao Peng wrote:
-> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > index 1daa45268de2..41434322fa23 100644
-> > > --- a/include/uapi/linux/kvm.h
-> > > +++ b/include/uapi/linux/kvm.h
-> > > @@ -103,6 +103,17 @@ struct kvm_userspace_memory_region {
-> > >  	__u64 userspace_addr; /* start of the userspace allocated memory */
-> > >  };
+> On Fri, Dec 24, 2021 at 11:53:15AM +0800, Robert Hoo wrote:
+> > On Thu, 2021-12-23 at 20:29 +0800, Chao Peng wrote:
+> > > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 > > >  
-> > > +struct kvm_userspace_memory_region_ext {
-> > > +	__u32 slot;
-> > > +	__u32 flags;
-> > > +	__u64 guest_phys_addr;
-> > > +	__u64 memory_size; /* bytes */
-> > > +	__u64 userspace_addr; /* hva */
+> > > +static void notify_fallocate(struct inode *inode, pgoff_t start,
+> > > pgoff_t end)
+> > > +{
+> > > +#ifdef CONFIG_MEMFD_OPS
+> > > +	struct shmem_inode_info *info = SHMEM_I(inode);
+> > > +	const struct memfd_falloc_notifier *notifier;
+> > > +	void *owner;
+> > > +	bool ret;
+> > > +
+> > > +	if (!info->falloc_notifier)
+> > > +		return;
+> > > +
+> > > +	spin_lock(&info->lock);
+> > > +	notifier = info->falloc_notifier;
+> > > +	if (!notifier) {
+> > > +		spin_unlock(&info->lock);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	owner = info->owner;
+> > > +	ret = notifier->get_owner(owner);
+> > > +	spin_unlock(&info->lock);
+> > > +	if (!ret)
+> > > +		return;
+> > > +
+> > > +	notifier->fallocate(inode, owner, start, end);
 > > 
-> > Would it make sense to embed "struct kvm_userspace_memory_region"?
-> > 
-> > > +	__u64 ofs; /* offset into fd */
-> > > +	__u32 fd;
-> > 
-> > Again, use descriptive names, then comments like "offset into fd" are unnecessary.
-> > 
-> > 	__u64 private_offset;
-> > 	__u32 private_fd;
+> > I see notifier->fallocate(), i.e. memfd_fallocate(), discards
+> > kvm_memfd_fallocate_range()'s return value. Should it be checked?
 > 
-> My original thought is the same fields might be used for shared memslot
-> as well in future (e.g. there may be another KVM_MEM_* bit can reuse the
-> same fields for shared slot) so non private-specific name may sound
-> better. But definitely I have no objection and can use private_* names
-> for next version unless there is other objection.
+> I think we can ignore it, just like how current mmu_notifier does,
+> the return value of __kvm_handle_hva_range is discarded in
+> kvm_mmu_notifier_invalidate_range_start(). Even when KVM side failed,
+> it's not fatal, it should not block the operation in the primary MMU.
 
-If that does happen, it's easy enough to wrap them in a union.
+If the return value is ignored, it'd be better to have no return value at all so
+that it's clear fallocate() will continue on regardless of whether or not the
+secondary MMU callback succeeds.  E.g. if KVM can't handle the fallocate() for
+whatever reason, then knowing that fallocate() will continue on means KVM should
+mark the VM as dead so that the broken setup cannot be abused by userspace.
