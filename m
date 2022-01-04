@@ -2,93 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06A18484911
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 21:01:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 138ED484948
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 21:24:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231449AbiADUBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 15:01:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47070 "EHLO
+        id S232850AbiADUYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 15:24:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231499AbiADUBb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 15:01:31 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CE03C061792
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 12:01:31 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id n16so27810431plc.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 12:01:31 -0800 (PST)
+        with ESMTP id S233708AbiADUYT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 15:24:19 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC318C06137C
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 12:24:18 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id z9-20020a17090a7b8900b001b13558eadaso783940pjc.4
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 12:24:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=P38x3udDv7VccpZiXoJefyN8u/f+VmXSebvIF1IMJ9Y=;
-        b=qw2oIUC6W97Gros4OgiOyM9i+7wnsvMfbBO23Bw18z3JsaKNq/k2XsNKJCHIs+uVhy
-         LmQ2DH+PIflhbQyURRzOlqUVA/dYVzQ12LkZXFq45gUQaxupOlYHXeyYVsxaSjASGl3S
-         I3smWKwTp3QwUj7mR7TBDxgbLSUUQaBE7x1YudiYEl9vOXxoPnFxMLlNGowaNoUtOsY7
-         oWzeA6Ag6CFEl7bhn8kaTJBmd9SsR0da/cCl2HOmLeD/c6hgdl1K8Vbn+irjyJggrDLD
-         G7gxVyMzrcBVJdVBE13VgLzQVG1NPt9Ca/2mS6l4lsOJ1jvBpH4jMbyliEsT9CTHaVRi
-         UB/g==
+        bh=sp4h6mNteJvQsGGemPAgFdl7QgNUEHOBWbhu7Dn9sPM=;
+        b=H1RFIZqleJZQlzRH7il0JNjNDZw/4hqE4Rmnzwzn9kr4i5ElDkNTaSwZC0FDVAogMx
+         RwEwpZ9qThHJllDcTv2mFQQqXZ3V8Rct9dg/TjVOkzakkdpFZfr53pNP3Q3O9ClCg5eY
+         TWbQh2rK+wTiUhYSYJqT9gqJbHOitzkDwvmGUZJDK6UvQWA7TFQ2yr+BvilnPwitTe3d
+         X99EjD6npYtyNRgqS/mIP4TOWqx+as71r6trCcFr+GglH5MWpPl8u50G8j+8b+q4T+wE
+         rhQyMqQ5Ji/2jU1vkzRgMLUV9oNmsrSiLfBVQsrG7A6RqCyntotJgpxx+F3km7WoVAKT
+         5gjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=P38x3udDv7VccpZiXoJefyN8u/f+VmXSebvIF1IMJ9Y=;
-        b=w8jmDBUoy+Ciw9TfHKYZlBqNgp0qJYpqzORXm123Y8xsbP/4zvZekNJ1l0PxRINJMY
-         3pjGBPZOZPmtNfdnmfqQsUVcaGEd4KefgMk6Vb+PjPH8AeVglV9MF80JvwSj84exksWx
-         s/4To7NI87eBRlWoeBBywxze8FxhgmVl+ZemKnMn6u1ZtFLJorW9JmofqhCXw14kXiaK
-         WazTYSbuCoykiisOZkG7D598sUITu2jmMQ+C+QJHoKZHU+AGI+Bz+3rpeJPUOV/6PYhx
-         WIElOu2ybtT0VBj9juZne7pVClvOtI/qQaDrqfE/d8bzTuWvB3DGQMiSNeaw1qyRGKa8
-         zycg==
-X-Gm-Message-State: AOAM530TRwqIvsZhz4kwMDiQi3VvX/EhJPcFI4PpZiT133PcRr2Yc7oS
-        pPSGJEUEOgVi6WNJKF4usUj+pA==
-X-Google-Smtp-Source: ABdhPJwBn8VJJJbQjgdjK3BL5ElqCtvbbHY3YHVoqOGEuLZPAF39gjygq4zF9vcYOMP1k5rlARtrIQ==
-X-Received: by 2002:a17:902:c94b:b0:149:22af:ed1c with SMTP id i11-20020a170902c94b00b0014922afed1cmr49705852pla.78.1641326490792;
-        Tue, 04 Jan 2022 12:01:30 -0800 (PST)
+        bh=sp4h6mNteJvQsGGemPAgFdl7QgNUEHOBWbhu7Dn9sPM=;
+        b=KqLIrAqUbKzfqrDqcPE4a00ZaY9BlX30pUlyejYVYrd3OAznwjY8d7XDpvk7oWvPtO
+         axsP5J1N9wk0ilUpcqXH77zcfhlhEW31QRmYWkm3cWck9tSDuaCGcOQvixWXd+A6TfSI
+         TUNz7FwkyVneurIWnyLPcLbismSPaYa5R9vXh+4hFimS86e4a99Wj0x7tA4BKMo4QBqu
+         2m5eUaSBiVniP/MYsEwPKiUjRH5NkiH2Gnvn440bV55saumLaPxJAhs5U1i8ViNJIwm/
+         XcJ19tdDH7dhcDo2QUy5A3T5JOPrg0xVECfcoud2RWG2f6gMK19TlpdjgReCyxC4zCdL
+         Q0nQ==
+X-Gm-Message-State: AOAM532ZPzH8V7IzZduGbbi2kzDIlqaTiVRIpDdkn1iDVebJdKNz5YMG
+        mfmYanK0yYN/a02QTSGrnnVY9w==
+X-Google-Smtp-Source: ABdhPJzJymv40G7eZ/5gTaFXTW+l58FMhoIFIlaAxGAd4DjGkNGFbyn1HaTIyqbkyyh0yf3aaTzfwA==
+X-Received: by 2002:a17:902:ea0a:b0:149:1f26:bce1 with SMTP id s10-20020a170902ea0a00b001491f26bce1mr51396836plg.92.1641327858272;
+        Tue, 04 Jan 2022 12:24:18 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id nu18sm160918pjb.15.2022.01.04.12.01.29
+        by smtp.gmail.com with ESMTPSA id e15sm43814047pfv.23.2022.01.04.12.24.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 12:01:30 -0800 (PST)
-Date:   Tue, 4 Jan 2022 20:01:26 +0000
+        Tue, 04 Jan 2022 12:24:17 -0800 (PST)
+Date:   Tue, 4 Jan 2022 20:24:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Zhong <yang.zhong@intel.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, pbonzini@redhat.com, corbet@lwn.net,
-        shuah@kernel.org, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, jing2.liu@intel.com,
-        guang.zeng@intel.com, wei.w.wang@intel.com
-Subject: Re: [PATCH v4 12/21] kvm: x86: Intercept #NM for saving IA32_XFD_ERR
-Message-ID: <YdSnlmO4dUnwRxxc@google.com>
-References: <20211229131328.12283-1-yang.zhong@intel.com>
- <20211229131328.12283-13-yang.zhong@intel.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [RFC PATCH 1/6] KVM: X86: Check root_level only in
+ fast_pgd_switch()
+Message-ID: <YdSs7ocQoy6txrMu@google.com>
+References: <20211210092508.7185-1-jiangshanlai@gmail.com>
+ <20211210092508.7185-2-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211229131328.12283-13-yang.zhong@intel.com>
+In-Reply-To: <20211210092508.7185-2-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 29, 2021, Yang Zhong wrote:
-> +static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
-> +{
-> +	rdmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
-> +	kvm_queue_exception(vcpu, NM_VECTOR);
+On Fri, Dec 10, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> If root_level >= 4, shadow_root_level must be >= 4 too.
 
-This is still wrong, even though no additional supported is needed to support
-nested XFD.  If L1 wants to intercept #NM, then KVM must not inject the #NM and
-must not read XFD_ERR.
+Please explain why so that it's explicitly clear why this ok, e.g.
 
-That this was posted multiple times is disturbing, because kvm-unit-tests has a
-test for exactly this, and running it against this series on a host without XFD
-yields:
+  Drop the shadow_root_level check when determining if a "fast" PGD switch
+  is allowed, as KVM never shadows 64-bit guest pages tables with PAE paging
+  (32-bit KVM doesn't support 64-bit guests).
 
-  unchecked MSR access error: RDMSR from 0x1c5 at rIP: 0xffffffffa02478ee (vmx_handle_exit_irqoff+0x1de/0x240 [kvm_intel])
-  Call Trace:
-   <TASK>
-   kvm_arch_vcpu_ioctl_run+0x11a0/0x1fb0 [kvm]
-   kvm_vcpu_ioctl+0x279/0x690 [kvm]
-   __x64_sys_ioctl+0x83/0xb0
-   do_syscall_64+0x3b/0xc0
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-   </TASK>
+with that:
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+> Checking only root_level can reduce a check.
+>
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 11b06d536cc9..846a2e426e0b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4136,8 +4136,7 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+>  	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
+>  	 * later if necessary.
+>  	 */
+> -	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
+> -	    mmu->root_level >= PT64_ROOT_4LEVEL)
+> +	if (mmu->root_level >= PT64_ROOT_4LEVEL)
+>  		return cached_root_available(vcpu, new_pgd, new_role);
+>  
+>  	return false;
+> -- 
+> 2.19.1.6.gb485710b
+> 
