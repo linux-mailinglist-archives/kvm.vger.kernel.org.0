@@ -2,122 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDE654842E7
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 15:00:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1A4148433D
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 15:22:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233950AbiADOAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 09:00:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47296 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233941AbiADOAM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 09:00:12 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7467C061784
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 06:00:11 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id b186-20020a1c1bc3000000b00345734afe78so1500163wmb.0
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 06:00:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LAi/zMLDUkXA55ptMHaAtcTiIFXbdm+3dHnXo6tH6To=;
-        b=mRc+fKjFCLxv1tB++H8YO7Ja92cyl7ysVXH0gvFwP8a/h7jN6F1I88slAfmXwpNrCE
-         9iqa6hA9cBdP4GzTfatDmB8bQHgwlnNtLpwc4yj8KIHX2QYw1Afru8Yrg787Thq6LbKi
-         X5Fm7mf2iN3ljpDxCg2+DAtmJ8gXl97NFnQBp5gUffZPu3zb2DgkLTqCeE8Jxgb8ciLM
-         OpltDN5JU+/0hqCPRbNJGm6ChzqvelKZsBTQqov3FQJ04GzM13eZi0Fy2Lfmy6rnYdf/
-         su5R5IuHUAsMfMaup67+GdOsH0/xMQPYn4ZMQ+mvu4l0ELyYmlV3Im5hs8fvsSJ5c2TF
-         WIYQ==
+        id S234125AbiADOWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 09:22:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22274 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229915AbiADOWM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 09:22:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641306132;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Kd7NsJXI8gYpybe5mVP7ztpJR15QwvvZgvb8pedcJXM=;
+        b=axoRBK6p3Lp99Int9sYSISRZcVBIdf6hNqcTxmkQHN0A7etKV1aoblUsGk8fa4eZNJfamm
+        paP0xkktK/gtvMLmSnYunPARdTdSKwT29vMe7Ix9gB40WKECnKuvAvUC3szlgAvgfGNAkQ
+        u6jx0mmr3Pc02UjB2lFnq6xslgjVSAU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-586-fZceU7QpNGKknxgnCcuSOw-1; Tue, 04 Jan 2022 09:22:11 -0500
+X-MC-Unique: fZceU7QpNGKknxgnCcuSOw-1
+Received: by mail-wm1-f71.google.com with SMTP id z13-20020a05600c0a0d00b003457d6619f8so357347wmp.1
+        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 06:22:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LAi/zMLDUkXA55ptMHaAtcTiIFXbdm+3dHnXo6tH6To=;
-        b=sfNIngb7WUpVN/Uiw7ZOjBgQCyY7uxAMNx7qc7t6V9MWD3y0PsKcEkKFHe7ClqZrxl
-         8mcffuJ4YuPpQAqXVEqEI7HiVGGxilr9YpUWQb/abaHJVf9M4rUNjxDQ07s8fG9Cxj1p
-         WQqizszKTU5QgWNpH3QwCWdaEVe178cAZ9cTDGQBhyz8AI/XWL4XQuDAe/UPruWoVpTm
-         G3vS0OAaFZ8VkDlPoAQg7DJPykQ2ppx46S7a0fyYM1c0Qfcvu0avjM9o9z3/uNpwOL++
-         KzWVwqZOrdm0roaNf2QTCNlqBpkuuX4CZuNxhSP3PmYjNtH+vjjzJm56mWXTFMFIM+Jk
-         g2qA==
-X-Gm-Message-State: AOAM5310WCy1JN7O1GYk3jKO/WzAohU3k0EGTfDzyN+7RUpmUobc30CB
-        bw8/x8sZRsDY7RGmTgvtnYUK8fBy5/5zlRixTrDJRw==
-X-Google-Smtp-Source: ABdhPJxshd4qMDQyCd0C74OyBKCvDdeUgBw0LwKdi1bze+9JK/GGFMAZ+nHe++OKjLTKJw7qt/730w8by/yH6EhdSsg=
-X-Received: by 2002:a7b:c243:: with SMTP id b3mr42380051wmj.61.1641304810085;
- Tue, 04 Jan 2022 06:00:10 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=Kd7NsJXI8gYpybe5mVP7ztpJR15QwvvZgvb8pedcJXM=;
+        b=QHdZa/OyBtoVd5OwD8BMmbUSKiAuLBCbtLBI4fFLFersbVrHIXykgTIvG8YNIxoxJ5
+         oxVDMsedLialZAJnJpRDeWIbaSZGvIVIBOQAd/BIPXEzDbyuXoGi0YMSXwoWVRLW+xzD
+         jo8xv98hlIzGhlsX5v6f1gegwNnHt1hSCeeDVZ3i8rCJSefqI+SpJTYghcZRWEebnRKW
+         zdl14LYVa0L3hLlqLun/dhu6U8xqtkgKAoSP6xJQ2UclVR6jN9hFtvM/wwXy4hyukv2U
+         mT9a51ZWNzz+G9KluDYd+76CGGb3pS3rtPCNF+8/9V8zC/Kahs2tbSJ79qkNrpOdcB8J
+         O+LQ==
+X-Gm-Message-State: AOAM533xrRuIGRL1CAQMSGdJ4RfGzND9J+dpiKprSn3MjB0XNf9xQFwB
+        jjptkoIoiYvC9GS6vWS/NqYshmeFCWa3o5SfKCF+rA1Dmwmei213xpH7SHvw3Wh9zTGr8vMuc4q
+        DgMB8q790pRjN
+X-Received: by 2002:a05:600c:3589:: with SMTP id p9mr43117672wmq.109.1641306129987;
+        Tue, 04 Jan 2022 06:22:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw32qpFKWD69dT7hryNwrsfqQlIKMprgz5fqX/4Bi/8nva34KM25ikuyModAt0N7b2C0ORoeQ==
+X-Received: by 2002:a05:600c:3589:: with SMTP id p9mr43117653wmq.109.1641306129690;
+        Tue, 04 Jan 2022 06:22:09 -0800 (PST)
+Received: from [192.168.3.132] (p5b0c62bd.dip0.t-ipconnect.de. [91.12.98.189])
+        by smtp.gmail.com with ESMTPSA id r11sm38357940wrw.5.2022.01.04.06.22.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jan 2022 06:22:09 -0800 (PST)
+Message-ID: <7eb40902-45dd-9193-37f1-efaca381529b@redhat.com>
+Date:   Tue, 4 Jan 2022 15:22:07 +0100
 MIME-Version: 1.0
-References: <20211118083912.981995-1-atishp@rivosinc.com> <20211118083912.981995-2-atishp@rivosinc.com>
- <6615284.qex3tTltCR@diego> <8323751.1mJVJdxAKN@diego>
-In-Reply-To: <8323751.1mJVJdxAKN@diego>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 4 Jan 2022 19:29:58 +0530
-Message-ID: <CAAhSdy0J7WVJO5vbz1JeHChitbJpagyuE1nF8XHfY-K=DnySGg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] RISC-V: KVM: Mark the existing SBI implementation
- as v01
-To:     =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>
-Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heinrich Schuchardt <xypron.glpk@gmx.de>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v3 kvm/queue 01/16] mm/shmem: Introduce
+ F_SEAL_INACCESSIBLE
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
+References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+ <20211223123011.41044-2-chao.p.peng@linux.intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20211223123011.41044-2-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 4, 2022 at 6:57 PM Heiko St=C3=BCbner <heiko@sntech.de> wrote:
->
-> Am Dienstag, 4. Januar 2022, 14:19:41 CET schrieb Heiko St=C3=BCbner:
-> > Hi Atish,
-> >
-> > Am Donnerstag, 18. November 2021, 09:39:08 CET schrieb Atish Patra:
-> > > From: Atish Patra <atish.patra@wdc.com>
-> > >
-> > > The existing SBI specification impelementation follows v0.1
-> > > specification. The latest specification allows more
-> > > scalability and performance improvements.
-> > >
-> > > Rename the existing implementation as v01 and provide a way to allow
-> > > future extensions.
-> > >
-> > > Reviewed-by: Anup Patel <anup.patel@wdc.com>
-> > > Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > > ---
-> >
-> > > diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> > > index eb3c045edf11..32376906ff20 100644
-> > > --- a/arch/riscv/kvm/vcpu_sbi.c
-> > > +++ b/arch/riscv/kvm/vcpu_sbi.c
-> > > @@ -1,5 +1,5 @@
-> > >  // SPDX-License-Identifier: GPL-2.0
-> > > -/**
-> > > +/*
-> > >   * Copyright (c) 2019 Western Digital Corporation or its affiliates.
-> > >   *
-> > >   * Authors:
-> >
-> > This got already fixed by [0]
-> > commit 0e2e64192100 ("riscv: kvm: fix non-kernel-doc comment block")
-> > so this patch doesn't apply cleanly anymore.
->
-> hmm, just found Anup's "I've queued this..." message after
-> writing my reply, so scratch the above ;-) .
->
-> @Anup: I've looked at git.kernel.org but didn't find a tree
-> there, can you tell me where this did go to?
+On 23.12.21 13:29, Chao Peng wrote:
+> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> 
+> Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
+> the file is inaccessible from userspace in any possible ways like
+> read(),write() or mmap() etc.
+> 
+> It provides semantics required for KVM guest private memory support
+> that a file descriptor with this seal set is going to be used as the
+> source of guest memory in confidential computing environments such
+> as Intel TDX/AMD SEV but may not be accessible from host userspace.
+> 
+> At this time only shmem implements this seal.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
+>  include/uapi/linux/fcntl.h |  1 +
+>  mm/shmem.c                 | 37 +++++++++++++++++++++++++++++++++++--
+>  2 files changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
+> index 2f86b2ad6d7e..e2bad051936f 100644
+> --- a/include/uapi/linux/fcntl.h
+> +++ b/include/uapi/linux/fcntl.h
+> @@ -43,6 +43,7 @@
+>  #define F_SEAL_GROW	0x0004	/* prevent file from growing */
+>  #define F_SEAL_WRITE	0x0008	/* prevent writes */
+>  #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
+> +#define F_SEAL_INACCESSIBLE	0x0020  /* prevent file from accessing */
 
-All queued patches are in riscv_kvm_queue branch of
-the KVM RISC-V tree at https://github.com/kvm-riscv/linux.git
+I think this needs more clarification: the file content can still be
+accessed using in-kernel mechanisms such as MEMFD_OPS for KVM. It
+effectively disallows traditional access to a file (read/write/mmap)
+that will result in ordinary MMU access to file content.
 
-Regards,
-Anup
+Not sure how to best clarify that: maybe, prevent ordinary MMU access
+(e.g., read/write/mmap) to file content?
 
->
-> Thanks
-> Heiko
->
->
+>  /* (1U << 31) is reserved for signed error codes */
+>  
+>  /*
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index 18f93c2d68f1..faa7e9b1b9bc 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -1098,6 +1098,10 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
+>  		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
+>  			return -EPERM;
+>  
+> +		if ((info->seals & F_SEAL_INACCESSIBLE) &&
+> +		    (newsize & ~PAGE_MASK))
+> +			return -EINVAL;
+> +
+
+What happens when sealing and there are existing mmaps?
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
