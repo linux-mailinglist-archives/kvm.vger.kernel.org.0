@@ -2,278 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E953A484A88
-	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:14:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0142484A8B
+	for <lists+kvm@lfdr.de>; Tue,  4 Jan 2022 23:15:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235326AbiADWOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 17:14:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
+        id S235339AbiADWPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 17:15:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235301AbiADWOX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 17:14:23 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5328CC061761
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 14:14:23 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id j13so28000366plx.4
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 14:14:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nX/9aypnm/DPNI7I3ieDjvwxS5DVT+/2AWFKFJDXyvg=;
-        b=qzmvPiw4WybP+A0bFqgfyK1T48D2PlDbz6qbCv3k8NuOiOzz4pHKnboxnadcD6x31D
-         V0p1EZFAPTQwTAF15gE82imQKnz6PktJ3aazLaswiPBffWbbH788iG4D7tmyZVLhIHJa
-         dTmKp2OfIJwKHXv1qwLVKJF5GvFxQYaimx0F/Xyyc1BOOAZw6dVfyVLhvepmEnA0N/Y4
-         7BDmDhkeYh0FOYrm8XczJPSO+VLmFmshM2rwWNQIW7hgPqnuxYA0EcZdPZrIJXWrW4ho
-         /dAmvm5CQHxljKU7ZlqHnOkfYLk+830yhWPJjlZOS9G1jqSVhOg7rGKnINx9cs5glZJE
-         73ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nX/9aypnm/DPNI7I3ieDjvwxS5DVT+/2AWFKFJDXyvg=;
-        b=FcIUCD3jWYpZyFWYM5TRz2AaltgQmxXUsIWPgNOw3msFfy3ey44rXSUe4mCBk8a8ts
-         HEVeQvbN6Vbfm7mso+srSRuYR311Y2CTrzUsj9Cv619iyK7oKkYxnD/muhNsB8HlTUKQ
-         PK+mI7u8E1Ixa/QwvKgxDK5muOpkwzj/VImS6JXcZ+koMQIVTrEjhanTowhibRqKOXSP
-         EJpAbLP1oIC6fUK1sUVt8XEpcTDYjSNdeybQ9Qro1QuaZ55x3PNFoe+Il6rufRUtpKsm
-         ApZS3/Qktk/wuyYrE4utacHIZ/aTFh5v49RekjJ7maR18gvB+y6mik+Axo0jLCUfAcq7
-         vJew==
-X-Gm-Message-State: AOAM53334Ua3TGXIplXytm6FKxB143GP87F+jpTPXdbhTQB2e2CrlH1s
-        dR/ezpNVPVRVWYShzkBZlKgZ2Q==
-X-Google-Smtp-Source: ABdhPJzSb0ZnvTHjy/esLNtLWTah2T1wcMfm2cxfeh9NR9hF4qRuP9j0jXUHwI5mwdiaqAVoCRqEkQ==
-X-Received: by 2002:a17:903:1211:b0:149:9809:77be with SMTP id l17-20020a170903121100b00149980977bemr29923032plh.133.1641334462598;
-        Tue, 04 Jan 2022 14:14:22 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a64sm35551485pge.72.2022.01.04.14.14.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 14:14:21 -0800 (PST)
-Date:   Tue, 4 Jan 2022 22:14:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [RFC PATCH 4/6] KVM: X86: Introduce role.level_promoted
-Message-ID: <YdTGuoh2vYPsRcu+@google.com>
-References: <20211210092508.7185-1-jiangshanlai@gmail.com>
- <20211210092508.7185-5-jiangshanlai@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211210092508.7185-5-jiangshanlai@gmail.com>
+        with ESMTP id S233989AbiADWPK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 17:15:10 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06277C061761
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 14:15:10 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BF6E7B817F9
+        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 22:15:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF27C36AE0;
+        Tue,  4 Jan 2022 22:15:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641334507;
+        bh=Kzxk3RkrfZPbqtVWNZWORHyjEKYI+rtH1xhVbWuMzOA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pwB/pe3aUdMravRuQYn0T8NZNVDW1z8daASldlC0mEeXgRK35sNzT5qwkYKVQed6w
+         dbRUdFbLZS62AXFWZHBB/GyNHVMO2cLDezb/l4A4KxMtGGolTmYWUX4sQVCRdOuLu6
+         TtSk3Tk3igYcUp+ECfTHnS0+CkdaXql7E5waQP3kkt7KOYTultkV0KejXUDOE/aGut
+         Oo2XxstZitkDhWkCNnrJr1nszmJ1eiygdKRVoblG0g+OUuCRowMpKe+p4eq6DOp+VK
+         ZYiAIAopeXCR2JQRnP/mbcOm2xDTSNccLyqgHiNPax7NeZ2ZJFrQYYgFWVbaGZlWjo
+         7vNHAptC/AcgA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n4s5B-00G18j-HJ; Tue, 04 Jan 2022 22:15:05 +0000
+Date:   Tue, 04 Jan 2022 22:15:04 +0000
+Message-ID: <877dbfywpj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on highmem_ecam
+In-Reply-To: <b9031d40-897e-b8c5-4240-fc2936dcbcb9@redhat.com>
+References: <20211003164605.3116450-1-maz@kernel.org>
+        <20211003164605.3116450-2-maz@kernel.org>
+        <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
+        <87pmpiyrfw.wl-maz@kernel.org>
+        <b9031d40-897e-b8c5-4240-fc2936dcbcb9@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org, drjones@redhat.com, peter.maydell@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
+Hi Eric,
+
+On Tue, 04 Jan 2022 15:31:33 +0000,
+Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> Level pormotion occurs when mmu->shadow_root_level > mmu->root_level.
-
-s/pormotion/promotion (in multiple places)
-
-That said, I strongly prefer "passthrough" or maybe "nop" over "level_promoted".
-Promoted in the context of page level usually refers to making a hugepage, which
-is not the case here.
-
+> Hi Marc,
 > 
-> There are several cases that can cuase level pormotion:
+> On 12/27/21 4:53 PM, Marc Zyngier wrote:
+> > Hi Eric,
+> >
+> > Picking this up again after a stupidly long time...
+> >
+> > On Mon, 04 Oct 2021 13:00:21 +0100,
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >> Hi Marc,
+> >>
+> >> On 10/3/21 6:46 PM, Marc Zyngier wrote:
+> >>> Currently, the highmem PCIe region is oddly keyed on the highmem
+> >>> attribute instead of highmem_ecam. Move the enablement of this PCIe
+> >>> region over to highmem_ecam.
+> >>>
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> ---
+> >>>  hw/arm/virt-acpi-build.c | 10 ++++------
+> >>>  hw/arm/virt.c            |  4 ++--
+> >>>  2 files changed, 6 insertions(+), 8 deletions(-)
+> >>>
+> >>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> >>> index 037cc1fd82..d7bef0e627 100644
+> >>> --- a/hw/arm/virt-acpi-build.c
+> >>> +++ b/hw/arm/virt-acpi-build.c
+> >>> @@ -157,10 +157,9 @@ static void acpi_dsdt_add_virtio(Aml *scope,
+> >>>  }
+> >>>  
+> >>>  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+> >>> -                              uint32_t irq, bool use_highmem, bool highmem_ecam,
+> >>> -                              VirtMachineState *vms)
+> >>> +                              uint32_t irq, VirtMachineState *vms)
+> >>>  {
+> >>> -    int ecam_id = VIRT_ECAM_ID(highmem_ecam);
+> >>> +    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
+> >>>      struct GPEXConfig cfg = {
+> >>>          .mmio32 = memmap[VIRT_PCIE_MMIO],
+> >>>          .pio    = memmap[VIRT_PCIE_PIO],
+> >>> @@ -169,7 +168,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+> >>>          .bus    = vms->bus,
+> >>>      };
+> >>>  
+> >>> -    if (use_highmem) {
+> >>> +    if (vms->highmem_ecam) {
+> >> highmem_ecam is more restrictive than use_highmem:
+> >> vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
+> >>
+> >> If I remember correctly there was a problem using highmem ECAM with 32b
+> >> AAVMF FW.
+> >>
+> >> However 5125f9cd2532 ("hw/arm/virt: Add high MMIO PCI region, 512G in
+> >> size") introduced high MMIO PCI region without this constraint.
+> > Then I really don't understand the point of this highmem_ecam. We only
+> > register the highmem version if highmem_ecam is set (see the use of
+> > VIRT_ECAM_ID() to pick the right ECAM window).
 > 
-> shadow mmu (shadow paging for 32 bit guest):
-> 	case1:	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0
+> but aren't we talking about different regions? On one hand the [high]
+> MMIO region (512GB wide) and the [high] ECAM region (256MB large).
+> To me you can enable either independently. High MMIO region is used by
+> some devices likes ivshmem/video cards while high ECAM was introduced to
+> extend the number of supported buses: 601d626d148a (hw/arm/virt: Add a
+> new 256MB ECAM region).
 > 
-> shadow nested NPT (for 32bit L1 hypervisor):
-> 	case2:	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0,hEFER_LMA=0
-> 	case3:	gCR0_PG=1,gEFER_LMA=0,hEFER_LMA=1
+> with the above change the high MMIO region won't be set with 32b
+> FW+kernel and LPAE whereas it is currently.
 > 
-> shadow nested NPT (for 64bit L1 hypervisor):
-> 	case4:	gEFER_LMA=1,gCR4_LA57=0,hEFER_LMA=1,hCR4_LA57=1
+> high ECAM was not supported by 32b FW, hence the highmem_ecam.
 > 
-> When level pormotion occurs (32bit guest, case1-3), special roots are
-> often used.  But case4 is not using special roots.  It uses shadow page
-> without fully aware of the specialty.  It might work accidentally:
-> 	1) The root_page (root_sp->spt) is allocated with level = 5,
-> 	   and root_sp->spt[0] is allocated with the same gfn and the
-> 	   same role except role.level = 4.  Luckly that they are
-> 	   different shadow pages.
-> 	2) FNAME(walk_addr_generic) sets walker->table_gfn[4] and
-> 	   walker->pt_access[4], which are normally unused when
-> 	   mmu->shadow_root_level == mmu->root_level == 4, so that
-> 	   FNAME(fetch) can use them to allocate shadow page for
-> 	   root_sp->spt[0] and link them when shadow_root_level == 5.
-> 
-> But it has problems.
-> If the guest switches from gCR4_LA57=0 to gCR4_LA57=1 (or vice verse)
-> and usees the same gfn as the root for the nNPT before and after
-> switching gCR4_LA57.  The host (hCR4_LA57=1) wold use the same root_sp
-> for guest even guest switches gCR4_LA57.  The guest will see unexpected
-> page mapped and L2 can hurts L1.  It is lucky the the problem can't
-> hurt L0.
-> 
-> The root_sp should be like role.direct=1 sometimes: its contents are
-> not backed by gptes, root_sp->gfns is meaningless.  For a normal high
-> level sp, sp->gfns is often unused and kept zero, but it could be
-> relevant and meaningful when sp->gfns is used because they are back
-> by concret gptes.  For level-promoted root_sp described before, root_sp
-> is just a portal to contribute root_sp->spt[0], and root_sp should not
-> have root_sp->gfns and root_sp->spt[0] should not be dropped if gpte[0]
-> of the root gfn is changed.
-> 
-> This patch adds role.level_promoted to address the two problems.
-> role.level_promoted is set when shadow paging and
-> role.level > gMMU.level.
-> 
-> An alternative way to fix the problem of case4 is that: also using the
-> special root pml5_root for it.  But it would required to change many
-> other places because it is assumption that special roots is only used
-> for 32bit guests.
-> 
-> This patch also paves the way to use level promoted shadow page for
-> case1-3, but that requires the special handling or PAE paging, so the
-> extensive usage of it is not included.
-> 
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  3 ++-
->  arch/x86/kvm/mmu/mmu.c          | 15 +++++++++++++--
->  arch/x86/kvm/mmu/paging_tmpl.h  |  1 +
->  3 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 88ecf53f0d2b..6465c83794fc 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -334,7 +334,8 @@ union kvm_mmu_page_role {
->  		unsigned smap_andnot_wp:1;
->  		unsigned ad_disabled:1;
->  		unsigned guest_mode:1;
-> -		unsigned :6;
-> +		unsigned level_promoted:1;
-> +		unsigned :5;
+> but maybe I miss your point?
 
-The massive comment above this union needs to be updated.
+There are two issues.
 
->  		/*
->  		 * This is left at the top of the word so that
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 54e7cbc15380..4769253e9024 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -767,6 +767,9 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
->  
->  static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
->  {
-> +	if (sp->role.level_promoted)
-> +		return sp->gfn;
-> +
->  	if (!sp->role.direct)
->  		return sp->gfns[index];
->  
-> @@ -776,6 +779,8 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
->  static void kvm_mmu_page_set_gfn(struct kvm_mmu_page *sp, int index, gfn_t gfn)
->  {
->  	if (!sp->role.direct) {
-> +		if (WARN_ON_ONCE(sp->role.level_promoted && gfn != sp->gfn))
-> +			return;
->  		sp->gfns[index] = gfn;
+First, I have been conflating the ECAM and MMIO ranges, and you only
+made me realise that they were supposed to be independent.  I still
+think the keying on highmem is wrong, but the main issue is that the
+highmem* flags don't quite describe the shape of the platform.
 
-This is wrong, sp->gfns is NULL when sp->role.level_promoted is true.  I believe
-you want something similar to the "get" flow, e.g.
+All these booleans indicate is whether the feature they describe (the
+high MMIO range, the high ECAM range, and in one of my patches the
+high RD range) are *allowed* to live above 4GB, but do not express
+whether then are actually usable (i.e. fit in the PA range).
 
-	if (sp->role.passthrough) {
-		WARN_ON_ONCE(gfn != sp->gfn);
-		return;
-	}
+Maybe we need to be more thorough in the way we describe the extended
+region in the VirtMachineState structure:
 
-	if (!sp->role.direct) {
-		...
-	}
+- highmem: overall control for anything that *can* live above 4GB
+- highmem_ecam: Has a PCIe ECAM region above 256GB
+- highmem_mmio: Has a PCIe MMIO region above 256GB
+- highmem_redist: Has 512 RDs above 256GB
 
-Alternatively, should we mark passthrough shadow pages as direct=1?  That would
-naturally handle this code, and for things like reexecute_instruction()'s usage
-of kvm_mmu_unprotect_page(), I don't think passthrough shadow pages should be
-considered indirect, e.g. zapping them won't help and the shadow page can't become
-unsync.
+Crucially, the last 3 items must fit in the PA range or be disabled.
 
->  		return;
->  	}
-> @@ -1702,7 +1707,7 @@ static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
->  	hlist_del(&sp->hash_link);
->  	list_del(&sp->link);
->  	free_page((unsigned long)sp->spt);
-> -	if (!sp->role.direct)
-> +	if (!sp->role.direct && !sp->role.level_promoted)
+We have highmem_ecam which is keyed on highmem, but not on the PA
+range.  highmem_mmio doesn't exist at all (we use highmem instead),
+and I'm only introducing highmem_redist.
 
-Hmm, at this point, it may be better to just omit the check entirely.  @sp is
-zero allocated and free_page() plays nice with NULL "pointers".  I believe TDX
-and maybe SNP support will need to do more work here, i.e. may add back a similar
-check, but if so then checking sp->gfns directly for !NULL is preferable.
+For these 3 ranges, we should have something like
 
->  		free_page((unsigned long)sp->gfns);
->  	kmem_cache_free(mmu_page_header_cache, sp);
->  }
-> @@ -1740,7 +1745,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, gfn_t gfn,
->  
->  	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
->  	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-> -	if (!role.direct)
-> +	if (!(role.direct || role.level_promoted))
+vms->highmem_xxx &= (vms->highmem &&
+		     (vms->memmap[XXX].base + vms->vms->memmap[XXX].size) < vms->highest_gpa);
 
-I personally prefer the style of the previous check, mainly because I'm horrible
-at reading !(x || y).
+and treat them as independent entities.  Unless someone shouts, I'm
+going to go ahead and implement this logic.
 
-	if (!role.direct && !role.passthrough)
+Thanks,
 
->  		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
->  	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
->  
-> @@ -2084,6 +2089,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->  		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
->  		role.quadrant = quadrant;
->  	}
-> +	if (role.level_promoted && (level <= vcpu->arch.mmu->root_level))
-> +		role.level_promoted = 0;
->  
->  	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
->  	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> @@ -4836,6 +4843,8 @@ kvm_calc_shadow_npt_root_page_role(struct kvm_vcpu *vcpu,
->  
->  	role.base.direct = false;
->  	role.base.level = kvm_mmu_get_tdp_level(vcpu);
-> +	if (role.base.level > role_regs_to_root_level(regs))
-> +		role.base.level_promoted = 1;
->  
->  	return role;
->  }
-> @@ -5228,6 +5237,8 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
->  	kvm_mmu_audit(vcpu, AUDIT_PRE_PTE_WRITE);
->  
->  	for_each_gfn_indirect_valid_sp(vcpu->kvm, sp, gfn) {
-> +		if (sp->role.level_promoted)
-> +			continue;
->  		if (detect_write_misaligned(sp, gpa, bytes) ||
->  		      detect_write_flooding(sp)) {
->  			kvm_mmu_prepare_zap_page(vcpu->kvm, sp, &invalid_list);
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 5c78300fc7d9..16ac276d342a 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -1043,6 +1043,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  		.level = 0xf,
->  		.access = 0x7,
->  		.quadrant = 0x3,
-> +		.level_promoted = 0x1,
->  	};
->  
->  	/*
-> -- 
-> 2.19.1.6.gb485710b
-> 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
