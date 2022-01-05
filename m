@@ -2,188 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C89744852B4
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 13:36:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4153E4852FB
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 13:45:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240193AbiAEMgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 07:36:42 -0500
-Received: from mga04.intel.com ([192.55.52.120]:6467 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240158AbiAEMgP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 07:36:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641386175; x=1672922175;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+VhmcyZLI52kxigvxsRrOyN1WGA41WgS5IooB8rfF4I=;
-  b=McaGpxguhubMcvau3s4M0vs0uQ8agd72/gxWHcehKwtYTkdvO3uwJM45
-   lhJhK7dXzwCg4nX5GTKGjG1r+jfNO0O2xg8bfUkJxwINO3K+xmEffkbFB
-   elpebTQ/jF+bWj28/4yw9SGY0r6iWOpiQEb11cyPUC285Ojp+H/XzTw0i
-   3LnlkGN+xc5KRLXblGtGLWKVxV3BJqQUqUJ+vYYWZrluc9VqFFsZdaB0p
-   F4fQAz5pBHP7fNprlA1h7AV2aYnPm4fKg2Ky7qHfr8vslOamDpbhVm3so
-   Obll0Bv58jpFsfnWVR2TrXggRZ6GasYAgg5Af3N2m08oE5rrEuO1dMJEz
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="241249395"
-X-IronPort-AV: E=Sophos;i="5.88,263,1635231600"; 
-   d="scan'208";a="241249395"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 04:35:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,263,1635231600"; 
-   d="scan'208";a="591004905"
-Received: from 984fee00bf64.jf.intel.com ([10.165.54.77])
-  by fmsmga004.fm.intel.com with ESMTP; 05 Jan 2022 04:35:43 -0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, pbonzini@redhat.com, corbet@lwn.net,
-        shuah@kernel.org, seanjc@google.com
-Cc:     jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, jing2.liu@intel.com,
-        guang.zeng@intel.com, wei.w.wang@intel.com, yang.zhong@intel.com
-Subject: [PATCH v5 21/21] kvm: x86: Disable interception for IA32_XFD on demand
-Date:   Wed,  5 Jan 2022 04:35:32 -0800
-Message-Id: <20220105123532.12586-22-yang.zhong@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220105123532.12586-1-yang.zhong@intel.com>
-References: <20220105123532.12586-1-yang.zhong@intel.com>
+        id S235357AbiAEMpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 07:45:39 -0500
+Received: from mail-bn8nam12on2053.outbound.protection.outlook.com ([40.107.237.53]:2784
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234151AbiAEMpi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 07:45:38 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KnFDLgdyUBoH4zzHhvrMYw4JLAg23G0wuFpDGm+tXe14WYxhi+eLbjzP5LjfCH2Wc9uk+v/8KSPvqLzcNS2i6wPqkXe7UQN9J/9DJfJ2P1cl+/Eu+P1oix/Oc+W/V8303llv2hZ3kHDCz/INAQzYIVJqQ4SuqSRWgQAyj2kuobDg91khS9bfq4dEY96qHdR5Ur9fkgWqx1wtxBa/Xwj71jJzBEv+hq2sBljNaqSIA3PctwJr+3aIk8mHOLUxh8PjdWp7kswNysDd7gKpS4NuL8khAL8Zej97M/tRgLQeuWMps27KTXl5GfEwh6mQ1B+mCA3ZYlurq6jeDPc6rJZhpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bPpAl4ejzHKITzzG0TaohHAc14M9Y8OGpA1NKrlyCK8=;
+ b=OjouxRYoAOQULEYuIOy3blcX1Y2RUD4cvnDt9bU7QE0XEVF4IibWUJuyiU74VDrla5wqOPwhte4cK76AqQiXE+jPE4oetkV65vO3G7wYn/r4/YXKJAmxmLnYRBUJnxws43DY7xrA6qj1lcmQGl+PFxMrnpdNok7DkTebkPwE15FQ6L/3arWPF84jumUOF3YK4ILPg2kzyKQx1gBWHLlYP/ugcjjkXL87jM638eoV2HtlsDKmKMQz8HHXWHFymp91M0HT2sy58M53+HV64Np52KXKSBdv5O+dDSefpw68vl+xan1ZtrHOh9d3BgCR4wrkQT0wrTWhsB8duT8K50bzMg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bPpAl4ejzHKITzzG0TaohHAc14M9Y8OGpA1NKrlyCK8=;
+ b=VvuYTebUDoHbr9HUBxekuuZXvrbpcnzKjox74MxNb5vw3HxzGq+HTQjnyCBkvI1/VD38sTNut8KHYpPN1vwMj+FgnPIZC7NEn9l2bmhiIeeoSISwQK6H/raWxD3V3jIk5SGWrQ6ByI6a2/7RMBFcuPyHRpRINtL8UoLW/iFMmLELL3y2YPIvakr1wQYq7caRsppA5CuZuDCwjOCeZ5EFG1i0DVlhba1xq06+R2pRyoZtRMExv/br7TXDFk6YRDjiu0HcljSsA7R1skMgvSxTyxsM5Ke+7aM5uTksPGRdcOoQDgmJ0mymxE7sHMAeKQc35V3jhtvJl+GDUsSOP59UoA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5256.namprd12.prod.outlook.com (2603:10b6:208:319::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Wed, 5 Jan
+ 2022 12:45:36 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::464:eb3d:1fde:e6af]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::464:eb3d:1fde:e6af%5]) with mapi id 15.20.4867.009; Wed, 5 Jan 2022
+ 12:45:36 +0000
+Date:   Wed, 5 Jan 2022 08:45:33 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "Lu, Baolu" <baolu.lu@intel.com>
+Subject: Re: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
+Message-ID: <20220105124533.GP2328285@nvidia.com>
+References: <163909282574.728533.7460416142511440919.stgit@omen>
+ <20211210012529.GC6385@nvidia.com>
+ <20211213134038.39bb0618.alex.williamson@redhat.com>
+ <20211214162654.GJ6385@nvidia.com>
+ <BN9PR11MB5276145C1D82FAFBDCF70AEF8C4A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220104160959.GJ2328285@nvidia.com>
+ <BN9PR11MB527662CA4820107EA7B6CC278C4B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527662CA4820107EA7B6CC278C4B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BYAPR02CA0068.namprd02.prod.outlook.com
+ (2603:10b6:a03:54::45) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4c228c76-cc63-4de8-37c3-08d9d0494538
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5256:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB525694531A272D642A375A58C24B9@BL1PR12MB5256.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EsaX384nIRNEHyLt8qXIPtq8EpDe9gm/6YxQ7ki6bHUkOMHCeLwR4jB1PPJ2e3+kRcnSzNKASm76mPRskUD4nJ6cRmJrGzhjInrfys0erBV+bGkYGPeBDtErGOlYgZy2kSG12Z+pITLgaZmJ1u7+dfbT+FXPyjnHcnl6t9iT5ZGDoMS8fnZ6fIaoIwA9B6hKTIUIcOv5wjNubpMd4KPxWDZZnv5wdXR9RhHs0N6y0qfYWBiZiZJ6JnT3iUW9E2leyYcyEA5mAkU/RJcYoWO8XeB/gXg5ENfJ6+Jz1MXEDrjOkRgC5LcDPfuExBXb32WWdPIcmXTrF7wXtCeJ1vDH/Qyi48sy1hVGiBJjVBbVRjxlPNVM12702T7LwZWpGm0i/WdrIJ5bdKDrWz4CwX3JSBMAGd0rzFblnxV36ZRB0zUSErImb3/cw8zQDUp623/QRz4u8vLg8jTdOQZ/R+BNftexlXLZIa283/Q0tvDhVGzRxmDX/eugX7m5smUSgofMj3LMJ7lwIR7PcOHs4Hkzd956E43TMMZzS1Kh9GdDw5SMudbexRv9fNPBYXbeJp0RC/GN+ZBnY/NcnVjBYZiL+G39hLf605Gz4IBwfBPVNgjpF2Z5uGvP+Z+cbdLOr/oT//+BrZJ6BLvMay1qiqjJWg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(83380400001)(6666004)(316002)(8676002)(6512007)(6916009)(6486002)(6506007)(186003)(508600001)(7416002)(86362001)(2616005)(5660300002)(36756003)(26005)(1076003)(66946007)(8936002)(66476007)(66556008)(4326008)(33656002)(54906003)(2906002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xvyEAJPc7V9JNEqAWv3hg8OtDTR950C+63dnX1XjQTYkK7p2BV773HiseB1j?=
+ =?us-ascii?Q?sbnZth5cuRhXHHE7b8Vu3vW7WQ71It40b9HUWZ5eVxAh8FcVWJGnxDsKPDaL?=
+ =?us-ascii?Q?jkOqQiWRjHNETU5MPb91vV7bn9/h5SuK90245gyMb3WisitIaoQonsy9XWl+?=
+ =?us-ascii?Q?9R+MzXoQw9lYMPtesmkmVevXPO9jN8H23bINhyWobSxEPz5Roi9fU5SNJYhQ?=
+ =?us-ascii?Q?RKdIa3QgEJQdIou5bvxEqXp70ot6A6ldfTHCSUG739lXsho/Gfeqd9dsch7V?=
+ =?us-ascii?Q?WHFcUf1+vqaytyJpG8ZE8ifU57TVm2IAW/NqGJMnV8xfk5IQzM8tGrCMTH89?=
+ =?us-ascii?Q?EK5mBk7s00JFyX7y+1+JuIz5HWb68H9S6Af5Yozh2d2H6EunPDeoDrV8ZvWs?=
+ =?us-ascii?Q?QkBgFA9k0GKWJodH7zRAvUKbn/wVVq8gAgnzeEjFdHu8CNgwRNpu7LuMqfR+?=
+ =?us-ascii?Q?chkTtIqPQO0J1or+iASCUMXHncrtTyjKrf2gFbaroML7DT7TzqonzyFNEZ6J?=
+ =?us-ascii?Q?bowr4uPu/si+uc4QKtF61knoAkMuc3qb9n9lJXpjnV+zkx0ajVTWyhirPUtA?=
+ =?us-ascii?Q?7/+xLlg6+VvoMVhXFKIgKoiyzjFUQwyk4mMZOaF0p7mXz1R5rfAp2wVTUP1j?=
+ =?us-ascii?Q?YE8TgeJSbobJ9H7MaxGMx2O2+X1HJ/F0dfSr49jHDy3+vYdZsd/RNSI+Guxs?=
+ =?us-ascii?Q?xj8Nevgj5avn2TEEBY+tqglaknIGaX2/qtA28PoSgJTmMrr1CPJOrd5hXkDx?=
+ =?us-ascii?Q?z6Lf1uN1Z2Jgvmfwvg0E4RbxVrl77s7wQDCB+XnL0cdn1VYtVorjffLmc5F7?=
+ =?us-ascii?Q?VXgrMJf75lzJ8KPMy7PxpCeBhvLDUw1xa3EHxWAMufVqJlH7Dr4GHSBFpljo?=
+ =?us-ascii?Q?DYnfcxbHa3WndTN2CqgRgUONtwR8vRd084ZKeQ0mtY31xDvxKosZeitl0Dfp?=
+ =?us-ascii?Q?o/muj3M553bjxL/DRWA+uwqXzH8G28AlufafhKQRuw3v2DTAXJJRlMvGIk+0?=
+ =?us-ascii?Q?5aJ5/k4myuHihYAeuYjwcEvAIv/TjPditkIwyxBosF6a7IneCzq2B9TL9HUk?=
+ =?us-ascii?Q?kRM5i6tfEuM7ZJMd5sGKCP3nV4tEcMYSGRsYDuouZ13tOWN+bbBT8Mjxlccj?=
+ =?us-ascii?Q?YW2zB6AA0IFJbusZouCoejjmpVRg7mc75YMqcefaziKtR3uSXntjH0Jy5QrN?=
+ =?us-ascii?Q?pEdgbum4iQGG5PWYUi1+cFUwI+qtmbVTpLS+8nvZPaXuLRe0NNB3qfK2XI2T?=
+ =?us-ascii?Q?CDdUVueCljzYMiBq+ZT2dVcfcHwQfrHTiP8ujYqmm8cxIs08FrKAOyv8NMnv?=
+ =?us-ascii?Q?0x93mtD+/UpOIAcAMB+XpSSOt1XkVws7OdqTAbYQXbT3oZA0GhmizHwJXscO?=
+ =?us-ascii?Q?AfWho3VcJixJwuFPGgU/wV110B9JGqB/2lBDfyu26IywxKYqsbgvVd4lPmFv?=
+ =?us-ascii?Q?8D7Pg2ZySeZKZSqIz6kFhQpBnIJqfeqN4dssd/EutKCdErxRBb2ed06mwyp9?=
+ =?us-ascii?Q?+1J80VmSwNuUU80AVdBSavzNAGz4OmK9pXzO3cNFLkEOlTDcWb/PDUNAcxEB?=
+ =?us-ascii?Q?JYgsmQSBfWoyB9pdfXA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c228c76-cc63-4de8-37c3-08d9d0494538
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2022 12:45:36.5574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q5u5Ga69zsuIIdxetEdrff10/F/03NUzT9AgCqJ6tHPuaBcjSAH+67n+Ekcizofi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Kevin Tian <kevin.tian@intel.com>
+On Wed, Jan 05, 2022 at 01:59:31AM +0000, Tian, Kevin wrote:
 
-Always intercepting IA32_XFD causes non-negligible overhead when this
-register is updated frequently in the guest.
+> > This will block the hypervisor from ever migrating the VM in a very
+> > poor way - it will just hang in the middle of a migration request.
+> 
+> it's poor but 'hang' won't happen. PCI spec defines completion timeout
+> for ATS translation request. If timeout the device will abort the in-fly
+> request and report error back to software. 
 
-Disable r/w emulation after intercepting the first WRMSR(IA32_XFD)
-with a non-zero value.
-
-Disable WRMSR emulation implies that IA32_XFD becomes out-of-sync
-with the software states in fpstate and the per-cpu xfd cache. This
-leads to two additional changes accordingly:
-
-  - Call fpu_sync_guest_vmexit_xfd_state() after vm-exit to bring
-    software states back in-sync with the MSR, before handle_exit_irqoff()
-    is called.
-
-  - Always trap #NM once write interception is disabled for IA32_XFD.
-    The #NM exception is rare if the guest doesn't use dynamic
-    features. Otherwise, there is at most one exception per guest
-    task given a dynamic feature.
-
-p.s. We have confirmed that SDM is being revised to say that
-when setting IA32_XFD[18] the AMX register state is not guaranteed
-to be preserved. This clarification avoids adding mess for a creative
-guest which sets IA32_XFD[18]=1 before saving active AMX state to
-its own storage.
-
-Signed-off-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Jing Liu <jing2.liu@intel.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/vmx.c          | 24 +++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.h          |  2 +-
- arch/x86/kvm/x86.c              |  8 ++++++++
- 4 files changed, 29 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5d97f4adc1cb..2e8ffe269c23 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -647,6 +647,7 @@ struct kvm_vcpu_arch {
- 	u64 smi_count;
- 	bool tpr_access_reporting;
- 	bool xsaves_enabled;
-+	bool xfd_no_write_intercept;
- 	u64 ia32_xss;
- 	u64 microcode_version;
- 	u64 arch_capabilities;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b601dc8a7f13..a3be4b02df2c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -162,6 +162,7 @@ static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
- 	MSR_FS_BASE,
- 	MSR_GS_BASE,
- 	MSR_KERNEL_GS_BASE,
-+	MSR_IA32_XFD,
- 	MSR_IA32_XFD_ERR,
- #endif
- 	MSR_IA32_SYSENTER_CS,
-@@ -764,10 +765,11 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
- 	}
+The PRI time outs have to be long enough to handle swap back from
+disk, so 'hang' will be a fair amount of time..
  
- 	/*
--	 * Trap #NM if guest xfd contains a non-zero value so guest XFD_ERR
--	 * can be saved timely.
-+	 * Disabling xfd interception indicates that dynamic xfeatures
-+	 * might be used in the guest. Always trap #NM in this case
-+	 * to save guest xfd_err timely.
- 	 */
--	if (vcpu->arch.guest_fpu.fpstate->xfd)
-+	if (vcpu->arch.xfd_no_write_intercept)
- 		eb |= (1u << NM_VECTOR);
- 
- 	vmcs_write32(EXCEPTION_BITMAP, eb);
-@@ -1978,9 +1980,21 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_XFD:
- 		ret = kvm_set_msr_common(vcpu, msr_info);
--		/* Update #NM interception according to guest xfd */
--		if (!ret)
-+		/*
-+		 * Always intercepting WRMSR could incur non-negligible
-+		 * overhead given xfd might be changed frequently in
-+		 * guest context switch. Disable write interception
-+		 * upon the first write with a non-zero value (indicating
-+		 * potential usage on dynamic xfeatures). Also update
-+		 * exception bitmap to trap #NM for proper virtualization
-+		 * of guest xfd_err.
-+		 */
-+		if (!ret && data) {
-+			vmx_disable_intercept_for_msr(vcpu, MSR_IA32_XFD,
-+						      MSR_TYPE_RW);
-+			vcpu->arch.xfd_no_write_intercept = true;
- 			vmx_update_exception_bitmap(vcpu);
-+		}
- 		break;
- #endif
- 	case MSR_IA32_SYSENTER_CS:
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index e0922c80c9d1..7f2c82e7f38f 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -352,7 +352,7 @@ struct vcpu_vmx {
- 	struct lbr_desc lbr_desc;
- 
- 	/* Save desired MSR intercept (read: pass-through) state */
--#define MAX_POSSIBLE_PASSTHROUGH_MSRS	14
-+#define MAX_POSSIBLE_PASSTHROUGH_MSRS	15
- 	struct {
- 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 92a1ea13ad51..df0150671b98 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10084,6 +10084,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	vcpu->mode = OUTSIDE_GUEST_MODE;
- 	smp_wmb();
- 
-+	/*
-+	 * Sync xfd before calling handle_exit_irqoff() which may
-+	 * rely on the fact that guest_fpu::xfd is up-to-date (e.g.
-+	 * in #NM irqoff handler).
-+	 */
-+	if (vcpu->arch.xfd_no_write_intercept)
-+		fpu_sync_guest_vmexit_xfd_state();
-+
- 	static_call(kvm_x86_handle_exit_irqoff)(vcpu);
- 
- 	if (vcpu->arch.guest_fpu.xfd_err)
+> > Regardless of the complaints of the IP designers, this is a very poor
+> > direction.
+> > 
+> > Progress in the hypervisor should never be contingent on a guest VM.
+> > 
+> 
+> Whether the said DOS is a real concern and how severe it is are usage 
+> specific things. Why would we want to hardcode such restriction on
+> an uAPI? Just give the choice to the admin (as long as this restriction is
+> clearly communicated to userspace clearly)...
+
+IMHO it is not just DOS, PRI can become dependent on IO which requires
+DMA to complete.
+
+You could quickly get yourself into a deadlock situation where the
+hypervisor has disabled DMA activities of other devices and the vPRI
+simply cannot be completed.
+
+I just don't see how this scheme is generally workable without a lot
+of limitations.
+
+While I do agree we should support the HW that exists, we should
+recognize this is not a long term workable design and treat it as
+such.
+
+Jason
