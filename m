@@ -2,140 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18AD4485A42
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 21:52:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C084F485A6D
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 22:09:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244223AbiAEUwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 15:52:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
+        id S244337AbiAEVJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 16:09:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244212AbiAEUwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 15:52:44 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D58C061201
-        for <kvm@vger.kernel.org>; Wed,  5 Jan 2022 12:52:44 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id b1-20020a17090a990100b001b14bd47532so299308pjp.0
-        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 12:52:44 -0800 (PST)
+        with ESMTP id S244334AbiAEVJS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 16:09:18 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F8EC061245
+        for <kvm@vger.kernel.org>; Wed,  5 Jan 2022 13:09:18 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id c14-20020a17090a674e00b001b31e16749cso4168729pjm.4
+        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 13:09:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=JbxoBomdcCqOqJFCBjDh/uGAgy3A+q4n81f2FmBqdOo=;
-        b=lcHlW5fa9jFHIO/4BxpYp/Tmy5m91nF1IHDBqc7vkJc8rcl2mWmRRDknMp0CMLyVxf
-         XG6AinG8ofa2FW/grJcmrznnxnQHMXttxllF9zF1ag/Jj8VLCCwLTO3HY4SCjlg2UOKE
-         a+kMrofibgpexqlucg3jyspkX/e8zA6WbfAoOCzZ+l5q9hnkZ4u1+hn00u80p+ugmte0
-         FA+8o29Vyy3Jr5vKE3NEi0QEsEVR0MmdN6Ji77oqhe7fzz96jVnlyjBGeGVvEoGdMfXC
-         VfzL8p3VVm36IH4JWgcFPStvAK81KBpBDqAZYWu4llyuPioega3WxWx8dVpGNUCvWcfd
-         19CA==
+        bh=0iyAXlgHwtdqwZs9XS4BcUOoOXGf2dlrNrwEOliwxsM=;
+        b=eB2Jlp+s/XG6hiEZlAj7p/pCThrVr7OZHBjuBseFXUeBi0o7Gd0w2lfVWkWTzg16Gd
+         kfffceXKmMTx4/pdkKJz7trBIwkww/9Ys+fzS6C/G4zkvNytiv2bEoRVQsKwZK19hddw
+         FTyz75KK2UcMr8zSx0+m9rmqwKZuNcU4X/UOrlBJ5zpfyls0gwMLXdlpkoOb/1myHyaT
+         VPuIRTuucXDUz5NdOrDjaHOf7NPSwE5XiBkOKDNRMgnSVnKDSm0xjbRopSGBfA0k5wBG
+         EA+ZXXbWFFc5EY6N7x68tTM3g3owU57mAvshN409LoXh4LN/SztpiY276aWfGntxTeY5
+         mGdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=JbxoBomdcCqOqJFCBjDh/uGAgy3A+q4n81f2FmBqdOo=;
-        b=sfrGCgMcCebsSCEdfnk6rQTq9xnM9I3AWaP1mpM1j5xLYFYuvAYJVVOYXkY4C91P6P
-         yBFeL/Bop+h5K6mTEyQcRgZ7SGjYTtuJc4GQCN7+BukXdDmK27/9wgMcybNBtZD7x2ok
-         hjhATh2wylHo1CxVFRsKIsFV8AHaC6xpgE5BzjnV5DlYschu+qBK0Vh8gpeU4I2dDka+
-         qpbSpjNkA72AWIhY9Aw0xUEn2ynAcTzeEq1JrD0np1eMp3enyH98rNoP645NaotJLXMr
-         DNWsyqIwupKWJQO7b4OpDcRITzziYCmTgoS6nVyGF3ybNSJqUNHjcYX1gepKqbYhPp1K
-         iAqw==
-X-Gm-Message-State: AOAM531MHKUD77KUdJzIZvckvS7IuB91W0eTohkM4SSig+/wDOw85TDM
-        0MTfizFF2CARoq7xpvyFyYvA2w==
-X-Google-Smtp-Source: ABdhPJyR0C1DrkXymrvkpk2S7sD/y26XNYIobEYJs+EPEbw+DMrYoag4fnJJYUy5LWVuQEwzegRnSA==
-X-Received: by 2002:a17:90a:ad07:: with SMTP id r7mr6153665pjq.67.1641415963380;
-        Wed, 05 Jan 2022 12:52:43 -0800 (PST)
+        bh=0iyAXlgHwtdqwZs9XS4BcUOoOXGf2dlrNrwEOliwxsM=;
+        b=AWb+fDKARh3JlJeoT3x3z1O+UwZZdbXZVkC4+ezTmLDJhLv6ABJQHe7v2AiifqIK4p
+         buCAaAVLvrG+cEanMbEBI2ZwkmgbWXRkJsjzvSY/BqVRsxlK5NYrHHrHIGCeMew83wJ7
+         J0MPKTWxSIQUZwuJNaShF+S4/F5uIdRuF8Tx9fJV5T0tREFc9+UaIPdLRAiFYXvPJDCN
+         Zssvo+0iC++FpOZR6ur6DmirrzRRsgLLRsNDQryAmLZ9lGvJh15arFMm6bBvUZi5rxh2
+         Nt1D21Ahbdo797guyU0oBLxbo7DNm6It2WdhBJYrd6624zJvS5aYdPsqpCoasEV0oh7D
+         tEYg==
+X-Gm-Message-State: AOAM531zAA8z5eR/wWqmcUlHUhecED5zK/eEQ0a7JHhVmoWdNTeN3U71
+        KBfKo92xejy5WwwgSxYTs5JUag==
+X-Google-Smtp-Source: ABdhPJzPLJD1Dm1hba3BUJSJPotIbPOs24yIMTb14I7Zmfr3EpfIos423kbLAbEeYFdmZmlN5TKBPw==
+X-Received: by 2002:a17:90b:1b0d:: with SMTP id nu13mr6167455pjb.231.1641416957384;
+        Wed, 05 Jan 2022 13:09:17 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h7sm28516pfv.35.2022.01.05.12.52.42
+        by smtp.gmail.com with ESMTPSA id k3sm37677056pgq.54.2022.01.05.13.09.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jan 2022 12:52:42 -0800 (PST)
-Date:   Wed, 5 Jan 2022 20:52:39 +0000
+        Wed, 05 Jan 2022 13:09:16 -0800 (PST)
+Date:   Wed, 5 Jan 2022 21:09:13 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [PATCH v3 kvm/queue 14/16] KVM: Handle page fault for private
- memory
-Message-ID: <YdYFFzlPTvgFdSXL@google.com>
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-15-chao.p.peng@linux.intel.com>
- <20220104014629.GA2330@yzhao56-desk.sh.intel.com>
- <20220104091008.GA21806@chaop.bj.intel.com>
- <20220104100612.GA19947@yzhao56-desk.sh.intel.com>
- <20220105062810.GB25283@chaop.bj.intel.com>
- <20220105075356.GB19947@yzhao56-desk.sh.intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND] KVM: x86/pmu: Make top-down.slots event
+ unavailable in supported leaf
+Message-ID: <YdYI+chaa6DsImb0@google.com>
+References: <20220105050711.67280-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220105075356.GB19947@yzhao56-desk.sh.intel.com>
+In-Reply-To: <20220105050711.67280-1-likexu@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 05, 2022, Yan Zhao wrote:
-> Sorry, maybe I didn't express it clearly.
+On Wed, Jan 05, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> As in the kvm_faultin_pfn_private(), 
-> static bool kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> 				    struct kvm_page_fault *fault,
-> 				    bool *is_private_pfn, int *r)
-> {
-> 	int order;
-> 	int mem_convert_type;
-> 	struct kvm_memory_slot *slot = fault->slot;
-> 	long pfn = kvm_memfd_get_pfn(slot, fault->gfn, &order);
-> 	...
-> }
-> Currently, kvm_memfd_get_pfn() is called unconditionally.
-> However, if the backend of a private memslot is not memfd, and is device
-> fd for example, a different xxx_get_pfn() is required here.
-
-Ya, I've complained about this in a different thread[*].  This should really be
-something like kvm_private_fd_get_pfn(), where the underlying ops struct can point
-at any compatible backing store.
-
-https://lore.kernel.org/all/YcuMUemyBXFYyxCC@google.com/
-
-> Further, though mapped to a private gfn, it might be ok for QEMU to
-> access the device fd in hva-based way (or call it MMU access way, e.g.
-> read/write/mmap), it's desired that it could use the traditional to get
-> pfn without convert the range to a shared one.
-
-No, this is expressly forbidden.  The backing store for a private gfn must not
-be accessible by userspace.  It's possible a backing store could support both, but
-not concurrently, and any conversion must be done without KVM being involved.
-In other words, resolving a private gfn must either succeed or fail (exit to
-userspace), KVM cannot initiate any conversions.
-
-> pfn = __gfn_to_pfn_memslot(slot, fault->gfn, ...)
-> 	|->addr = __gfn_to_hva_many (slot, gfn,...)
-> 	|  pfn = hva_to_pfn (addr,...)
+> When we choose to disable the fourth fixed counter TOPDOWN.SLOTS,
+> we need to also reduce the length of the 0AH.EBX bit vector, which
+> enumerates architecture performance monitoring events, and set
+> 0AH.EBX.[bit 7] to 1 if the new value of EAX[31:24] is still > 7.
 > 
+> Fixes: 2e8cd7a3b8287 ("kvm: x86: limit the maximum number of vPMU fixed counters to 3")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 > 
-> So, is it possible to recognize such kind of backends in KVM, and to get
-> the pfn in traditional way without converting them to shared?
-> e.g.
-> - specify KVM_MEM_PRIVATE_NONPROTECT to memory regions with such kind
-> of backends, or
-> - detect the fd type and check if get_pfn is provided. if no, go the
->   traditional way.
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 0b920e12bb6d..1f0131145296 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -782,6 +782,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		eax.split.mask_length = cap.events_mask_len;
+>  
+>  		edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
+> +
+> +		/*
+> +		 * The 8th Intel pre-defined architectural event (Topdown Slots) will be supported
+> +		 * if the 4th fixed counter exists && EAX[31:24] > 7 && EBX[7] = 0.
 
-No, because the whole point of this is to make guest private memory inaccessible
-to host userspace.  Or did I misinterpret your questions?
+Please wrap at ~80 chars.
+
+> +		 *
+> +		 * Currently, KVM needs to set EAX[31:24] < 8 or EBX[7] == 1
+> +		 * to make this event unavailable in a consistent way.
+> +		 */
+> +		if (edx.split.num_counters_fixed < 4) {
+> +			if (eax.split.mask_length > 7)
+> +				eax.split.mask_length--;
+
+This will break if there's a bit>7 enumerated in EBX (events_mask) that KVM wants
+to expose to the guest.  It doesn't cause problems today because bits 31:8 are all
+reserved, but that will not always be the case.
+
+We could do
+
+		if (edx.split.num_counters_fixed < 4) {
+			if (eax.split.mask_length == 7)
+				eax.split.mask_length--;
+			else
+				cap.events_mask |= BIT_ULL(7);
+		}
+
+but I don't see any reason to make this more complex than:
+
+		if (edx.split.num_counters_fixed < 4 &&
+		    eax.split.mask_length > 7)
+			cap.events_mask |= BIT_ULL(7);
+
+> +			if (eax.split.mask_length > 7)
+> +				cap.events_mask |= BIT_ULL(7);
+> +		}
+> +
+>  		edx.split.bit_width_fixed = cap.bit_width_fixed;
+>  		if (cap.version)
+>  			edx.split.anythread_deprecated = 1;
+> -- 
+> 2.33.1
+> 
