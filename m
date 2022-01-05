@@ -2,120 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF095485334
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 14:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECCEA485527
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 15:59:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236815AbiAENGy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 08:06:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28604 "EHLO
+        id S241169AbiAEO7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 09:59:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53266 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235575AbiAENGx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 08:06:53 -0500
+        by vger.kernel.org with ESMTP id S236073AbiAEO7B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 09:59:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641388012;
+        s=mimecast20190719; t=1641394740;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qPbUxj6ghyTrgwhNP+U3qhJU5iyb67zbb1namC5tcQQ=;
-        b=Nlnz7EQHx2PLHuoPXmt7IuQw77twpUosRrHwQbfOatzcDJzXxhgFME1deVQxKIYstfhMGJ
-        y2c+wE13Q6J2SqBynsvOXadijawRhWn414echOXt1MzEtRM13YTqjYyVpGDsIP1+BLxhDs
-        FnlL4P/giHUZzoUSiMa3KP0JuOyUmGA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xuDXDZaYk8pGsNJOMGUKMDNxo2JBtvsfuoGsrVtjpq0=;
+        b=Y6FwTjh5m43lNHsDUlpedDlXMsp7d3fu+DO/hGMymht0wvIzbZrjyEs5BB+Y9D5SF5Yab1
+        N9nYyTcnHE8Ajl54Tkq0yKmmeQ0GEOUV8xQIm+z71xKUnf4f9GT8oTCuCb8EHZYRTlCVRU
+        U8Y590jYDtlR1o5vrJAi+MrpDV05jbg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-493-pUGBYW7IMoi9XuwZ0eeZXw-1; Wed, 05 Jan 2022 08:06:51 -0500
-X-MC-Unique: pUGBYW7IMoi9XuwZ0eeZXw-1
-Received: by mail-ed1-f72.google.com with SMTP id s7-20020a056402520700b003f841380832so27878000edd.5
-        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 05:06:51 -0800 (PST)
+ us-mta-373-bmXrRT6jOMi8jpP9Q-ltsg-1; Wed, 05 Jan 2022 09:58:58 -0500
+X-MC-Unique: bmXrRT6jOMi8jpP9Q-ltsg-1
+Received: by mail-wm1-f71.google.com with SMTP id l20-20020a05600c1d1400b003458e02cea0so1907727wms.7
+        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 06:58:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=qPbUxj6ghyTrgwhNP+U3qhJU5iyb67zbb1namC5tcQQ=;
-        b=ogxHrkLMAvmGP6zu3caZQaltXrcprVg2SL/rIbguMb6O99x6Vdm0D9fM/r7g188kdD
-         f/5T7d/3cKRzQRVTrhSLt6IgmrP++o9udov5jYiVP/jnid8vTCV/Yql05V0toqP+kDIG
-         poqZJUhohhbXFbcaWUnulhQDbdEwgAv2z+1i9usStoGx7k2dVU91fPta2Wu11Hz3ubzT
-         hezO8zcGxAcecjOzLIDGZzk3a31X4VYPh3JHXEnUgjWcu/n3Z1RWZidHaXsOZxzTYneh
-         9lcdxbu8i4nCHeGeAxkvm4xnRoBcfU06RaUiJMauoAfWVjQ0Hq1qZTukogOCAWqoekuS
-         0fWQ==
-X-Gm-Message-State: AOAM530zhQ0z0JVhmv2NjJahR0uQ+QXLMeF2u7fMBA+jzb08cbxopDTS
-        O0P9l09YtTqBMOZxN+j2h2HgOjgPS4bHImWajAjoM2ImBQxhmOUCMYTxAiaNIeYz7r1KPYgEnrX
-        u3o6TJwu8Rb4b
-X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr40517137ejc.313.1641388010155;
-        Wed, 05 Jan 2022 05:06:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz2kvcaNQ8zr5/pOMq5wIiwszyeeQoUKvE+rInBlWiKyo00Mr1ysjR1/zCjvH1iUYUbX+TRaQ==
-X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr40517123ejc.313.1641388009929;
-        Wed, 05 Jan 2022 05:06:49 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id o12sm15956818edz.71.2022.01.05.05.06.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jan 2022 05:06:49 -0800 (PST)
-Message-ID: <c99d0b82-a44f-db8e-3f81-93d2394f9a02@redhat.com>
-Date:   Wed, 5 Jan 2022 14:06:40 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xuDXDZaYk8pGsNJOMGUKMDNxo2JBtvsfuoGsrVtjpq0=;
+        b=Khn7yDRe5BwrQEjMD9SvhDMT/CNwn/vH6wRlyamlqBBn3lfkAKY7tBgeqZuI0TUzrv
+         ulA/qX+ktFFpelJRVshe4SwDYWRXv6fZE9zm1RTT/4TjW+JAJHBh8M1LF3Xn3EEueOsw
+         uIKIj8jdE7/HXhOpXEvYzSIL6OUFPkCR8Rqv/DZd+/lJfzJp7BMy9X0GzdOuGko5QK8S
+         a6xFb45Ju11h/3JjofceHGtHcXx8xmZPSZ4baS2ZyGF0LpY45Zt0rg/lym0G3rXzSI0Z
+         NQfspeKOwuiJJoUqK570CjTxwe8AB2SzBPTVH943aT5XFb9EJHFHb8OfAtvd2HLKDcXO
+         qILQ==
+X-Gm-Message-State: AOAM530ZDbeg89IducYxjr9k8dandaiCMmcBVHs2L9dod6gYHHLUpj/R
+        SivsyfNWNGEAdcvQ1wjw5xuXWvEzGGWuSZLzyxF+OGFls9ixGKFC6Pf5SBPqL2aio07BBfLn5sg
+        USMI1c3YI+zKJ
+X-Received: by 2002:a5d:564f:: with SMTP id j15mr45520961wrw.366.1641394737665;
+        Wed, 05 Jan 2022 06:58:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzAIE48Rt6oCWt/TrKYOLRuPR/0b02qx5CUgTR/XXf3h6OjcPtM0vEG7RamhYrEag2pLW40KA==
+X-Received: by 2002:a5d:564f:: with SMTP id j15mr45520954wrw.366.1641394737546;
+        Wed, 05 Jan 2022 06:58:57 -0800 (PST)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+        by smtp.gmail.com with ESMTPSA id n9sm3237489wmq.37.2022.01.05.06.58.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jan 2022 06:58:57 -0800 (PST)
+Date:   Wed, 5 Jan 2022 15:58:55 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
+        Eric Auger <eric.auger@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the
+ host
+Message-ID: <20220105145855.ca7vxeu3ubytdkna@gator>
+References: <20220103180507.2190429-1-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v5 07/21] x86/fpu: Provide fpu_enable_guest_xfd_features()
- for KVM
-Content-Language: en-US
-To:     Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, corbet@lwn.net, shuah@kernel.org,
-        seanjc@google.com
-Cc:     jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, jing2.liu@intel.com,
-        guang.zeng@intel.com, wei.w.wang@intel.com
-References: <20220105123532.12586-1-yang.zhong@intel.com>
- <20220105123532.12586-8-yang.zhong@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220105123532.12586-8-yang.zhong@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220103180507.2190429-1-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/5/22 13:35, Yang Zhong wrote:
-> +int fpu_enable_guest_xfd_features(struct fpu_guest *guest_fpu, u64 xfeatures)
-> +{
-> +	lockdep_assert_preemption_enabled();
-> +
+On Mon, Jan 03, 2022 at 06:05:07PM +0000, Marc Zyngier wrote:
+> Add basic support for Pointer Authentication when running a KVM
+> guest and that the host supports it, loosely based on the SVE
+> support.
+> 
+> Although the feature is enabled by default when the host advertises
+> it, it is possible to disable it by setting the 'pauth=off' CPU
+> property. The 'pauth' comment is removed from cpu-features.rst,
+> as it is now common to both TCG and KVM.
+> 
+> Tested on an Apple M1 running 5.16-rc6.
+> 
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+> * From v1:
+>   - Drop 'pauth' documentation
+>   - Make the TCG path common to both TCG and KVM
+>   - Some tidying up
+> 
+>  docs/system/arm/cpu-features.rst |  4 ----
+>  target/arm/cpu.c                 | 14 ++++----------
+>  target/arm/cpu.h                 |  1 +
+>  target/arm/cpu64.c               | 33 ++++++++++++++++++++++++++++----
+>  target/arm/kvm64.c               | 21 ++++++++++++++++++++
+>  5 files changed, 55 insertions(+), 18 deletions(-)
+>
 
-The old fpu_update_guest_perm_features(guest_fpu) is equivalent to
-
-	fpu_enable_guest_xfd_features(guest_fpu, guest_fpu->perm);
-
-Missing doc comment:
-
-/*
-  * fpu_enable_guest_xfd_features - Enable xfeatures according to guest perm
-  * @guest_fpu:         Pointer to the guest FPU container
-  * @xfeatures:         Features requested by guest CPUID
-  *
-  * Enable all dynamic xfeatures according to guest perm and requested CPUID.
-  * Invoked if the caller wants to conservatively expand fpstate buffer instead
-  * of waiting until XCR0 or XFD MSR is written.
-  *
-  * Return: 0 on success, error code otherwise
-  */
-
-Also, the check for 32-bit is slightly imprecise:
-
-	/* Dynamic xfeatures are not supported with 32-bit kernels. */
-	if (!IS_ENABLED(CONFIG_X86_64))
--		return 0;
-+		return -EINVAL;
-
-since we only get here with xfeatures != 0 (if it compiles, just removing
-the IS_ENABLED check altogether would be even better).  With these changes,
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+ 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-
-Paolo
+drew
 
