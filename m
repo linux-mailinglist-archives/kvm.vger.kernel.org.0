@@ -2,477 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37B37484C14
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 02:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D7AA484C31
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 02:39:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236875AbiAEBZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 20:25:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35356 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234412AbiAEBZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 20:25:43 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51939C061784
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 17:25:43 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id h1so25008941pls.11
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 17:25:43 -0800 (PST)
+        id S236941AbiAEBjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 20:39:09 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:53340 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234393AbiAEBjI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jan 2022 20:39:08 -0500
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 204NiLSu008818;
+        Wed, 5 Jan 2022 01:38:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=SPFYHnnxrJiSZhrlCahIzCAnpoE13lJ/n5BS6Ai94Lg=;
+ b=VxF5U2fX0O8mv9YqtZaXJ8eufs0cEUrmo1Ur7pxbuRhd9r5AgGZnw2qhWeWrbTO0helh
+ IpkM6g6Flp9VuYOIO/A3puALnFYBvY6YeTRLyqZflzORQPbt2U4b9hmt2yo3u+N8aHiC
+ tg3L5GV+wt00MHm1iUtdKTK+Odv+gZaWiFNjowHddtjwJoxTwE61bRvyqjJ4bG92OuVq
+ m5DJTqxGy7tmbq1U3P7NhsJ+BsJL3jQ1AzXf/smvYvt5ikDl9QqXmbQYk+3PdQXkUIlP
+ +F+k4OyaUGV48Opt4Dll8jttcr+0YbV8z4a7AbXo3dQyUbQI5lew/AS+UG2rF8f6f1hz oA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3dc3v4kpry-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 05 Jan 2022 01:38:20 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2051ZkDr173356;
+        Wed, 5 Jan 2022 01:38:18 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2174.outbound.protection.outlook.com [104.47.58.174])
+        by userp3030.oracle.com with ESMTP id 3dac2xfuaa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 05 Jan 2022 01:38:18 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d1t0n/2NNAJUMW7oAyJWz52cIowieN9S3YNQNT5gCEvfkL3ElPS9zTLyit7JbSEB7DLXFmkSmlVduz/EUpByBZPgES8sJjj1sEzStM25ok/pqDqWQamajI0+A+t5jfugPEHo+DrCI3xDmldNHgJJJN3DrrgEs1z6BFSD4kqrSyexX+TqnNW0s+/QJW2rHVXrFWCCLzBnPLt5npYOi7/Q/hBuqHCQrYdXVTkP7Kt876FQ+NkvFay79wkdZm8q3vfBC41+DF4zTxIQ2QB04Yx/MfbCNOQmuNv13oyx+kig5eNT0F3JNMmDxNtlGH0oPMuGEcNHgcB7ROm0gOvB6JNZ8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SPFYHnnxrJiSZhrlCahIzCAnpoE13lJ/n5BS6Ai94Lg=;
+ b=kq14qL79C4jmVoyciR76cvbO9i+34XzCu1B3k0qVn1wyDImZUQ1W7kCP24+s1X2+QQS1mPpYS94R+tVh7bomQFaKuvTh9xOb8JhhLUMR5WUCeer5jTk6mdCJXC0jQ1zoXRyDnd+dcoX0Xe+1bmdZqPnRuEMvotJ1821/Ft0UOnBI/uqH9bQ8hLJDdiiA5JGz+81L7pyzGV5BetBBFVNBcP6FYUP62nwF7G/oXKyFv70c3YRaSfWclV2wV+eceO2V6CkiKuog8wASUn0DhA4UQ/dWQ5pP1MdpYiaHABsvw7O3ipEINWd/UqNIH/GlgvKVhaKCd0O8Alzcjy6YTQWteg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kmgBMIyB3eiB9Fir3SV9ST/W2vHsdQM2SdcywtLT3yI=;
-        b=hbH0t0c12XjqKrICJekOhVawbEMpge5w8OMOAhoQs7w8gsTSbqTqA6Y1VfdIjN2TTB
-         MI1Iho2CxJ8Lfv53hF8NDimK2HCMUvGY+VHkqP4opPaK22cuwhmHgdFzljEL7qvfBfUm
-         Nb+gOB+stfS5ZUVdBUT/l+UL9RB3scdad9+lhlYjam6mj+oSgs4c6m8R6JRCNKstvnY8
-         oLBcSONGfbFv0zcpKTWIuluGeSMas/nAKw0VPLM1WQOtsaVDkhmF7ZawF1WXlX9P/4Ll
-         bzppeOII2tMPmpcmUZwbRnmFBwoT/FF+zbOaeUgHUD7Vy1BSlT6ajJmw1t2mWdGpKfvN
-         Fe0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kmgBMIyB3eiB9Fir3SV9ST/W2vHsdQM2SdcywtLT3yI=;
-        b=vTbKR49kHcYIdyNm7WwhxqTauG7s49RdiXTWhlK4d3WZNXiy160g3sEGhjqU1MN7w1
-         KyC1dGHzyfuYI9ZaoAF5t/IdOwKi+hIbCivMunVBeKuD2MsmClxDOw6Qm6/n+3aVn87H
-         iRZDeKCt0//XsQxQGWmPsZ7aWraNyBciNwUH/+PlXuRlJfVMzUfILJ6gdeN17Rj24YCx
-         EqQxVsZkffLVhbqe4mL8TXRWcnBjaPnCLLpzSp0qRbHULvhhBuzk6KoCw8gY/YhfiLX8
-         qTtcT4kXJOjhYf6IoBmOjxBajXIUY48oG+bC0OcMGO6BRoRhJFd6+p3bgIExMhZ3HpaF
-         xNsw==
-X-Gm-Message-State: AOAM530+MHX/PjT1TzaM4jUetUBVUs8e6BpztKFMJH07/Q+/qEiHg6j0
-        KfzAc6ljlbDZtSfZq+w2Xt5KaQ==
-X-Google-Smtp-Source: ABdhPJy7q0t/2prhAmn+S5T36gwXkJwHk2sZ4JCgJzw7sxVlzYZV20XvYNbbBVFnxQO8kelpxfTB0w==
-X-Received: by 2002:a17:90b:388d:: with SMTP id mu13mr1343362pjb.86.1641345942311;
-        Tue, 04 Jan 2022 17:25:42 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id f5sm45066291pfc.102.2022.01.04.17.25.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 17:25:41 -0800 (PST)
-Date:   Wed, 5 Jan 2022 01:25:38 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SPFYHnnxrJiSZhrlCahIzCAnpoE13lJ/n5BS6Ai94Lg=;
+ b=L4G66K27CxL0CQ+vPgXIvcV4VbJSJBMRayKnfWW2aaqzeuC1geecfcrH9jK0/8FxVHGRsQD8msTwuZcsJzvArZpDYLL3z9lvZBcwozoVbBuObZdmXdorBdvVcl75zq56wu0DdO8OhV3jY27U8wtHg9V69ovKaso2mhGhH278wJ8=
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
+ by SA2PR10MB4684.namprd10.prod.outlook.com (2603:10b6:806:119::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.14; Wed, 5 Jan
+ 2022 01:38:16 +0000
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4844.016; Wed, 5 Jan 2022
+ 01:38:16 +0000
+Date:   Tue, 4 Jan 2022 19:38:10 -0600
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v2 24/30] KVM: x86/mmu: Allow yielding when zapping GFNs
- for defunct TDP MMU root
-Message-ID: <YdTzkjOi2w+MVA2V@google.com>
-References: <20211223222318.1039223-1-seanjc@google.com>
- <20211223222318.1039223-25-seanjc@google.com>
-MIME-Version: 1.0
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 17/40] KVM: SVM: Create a separate mapping for the
+ SEV-ES save area
+Message-ID: <YdT2gmB7peuEHPLx@dt>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-18-brijesh.singh@amd.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211223222318.1039223-25-seanjc@google.com>
+In-Reply-To: <20211210154332.11526-18-brijesh.singh@amd.com>
+X-ClientProxiedBy: SN7P220CA0016.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:806:123::21) To SN6PR10MB2576.namprd10.prod.outlook.com
+ (2603:10b6:805:44::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ea45a376-cfee-463c-8255-08d9cfec0b6b
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4684:EE_
+X-Microsoft-Antispam-PRVS: <SA2PR10MB46846C880440665233F5AA37E64B9@SA2PR10MB4684.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6j9HCgJ4THNFuvX6xRxxN9W209NV3fpFbOpOWLRjfwCOsUpQwfedk6qlSb5IQn5i/t4YEMoxs7sXh729/6yb7QdE2uxC7HOxWmgBur2benta9RIFmpsV25vzIyGN8E56QVw7KK7JnszoqHcj1nr6vPmhwdkAMPGcNFddTsoZm4udkJ7OCP687Bls2PDb0ar+91mB59ylV86itHBjp++90mO/12WZG2T0IgqQApPMhP1ifBSX81RtRKZ7KNg7zLMlrDnVC5SmF5Ufog7o380dc91QvtBxX39v7aETmcAlB9pyeWhWoRm0OCyiMXNWhQr4yicJKRYbrhV+PNdleQzALfHYC4ibDYsa7EiP/YbLgzDlzJzjRYEL/15HaxHtR4niVVH3SUFNCTG/6rQRoFxQuZOr2xPsIFYQtMKTlJ7MkoPtrmwpfHN7m/Kl6DIrKlkuhScsJBXXT3vwDn1xztB4Pb7ON77yxc8AOHfTjTb/Wn6R+t5hfBVpQBsAqrcVFW2sm7XE6Bi5iEZb2tpMCPVQgFS7+P422it6FBP/P9bUBGTsdEJnqD9wjoOOOhuMcxJhCh8jLZCaUR1xp+3/6Ghq8Z/zsYzc3Om0JnpQckzH6Zmt8dGab/9JrHuzY1PwxFZcVtQneW1N/idiTSgBWPG0cg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(2906002)(4001150100001)(508600001)(5660300002)(66946007)(316002)(66556008)(4744005)(6506007)(186003)(83380400001)(38100700002)(53546011)(66476007)(7416002)(54906003)(6486002)(7406005)(4326008)(6666004)(26005)(6512007)(33716001)(8676002)(9686003)(86362001)(6916009)(44832011)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6LFvkOQ/MC03ScUI12HJ8a5XNSnxBTKU130i2aNv+B6DfXleXnBKo/TqqqBo?=
+ =?us-ascii?Q?9imhCGAnQaCcRgAB0AeD0e7mM9d0IbZZu4o2A+U6FaiJHCLd8IzgugdCLtqE?=
+ =?us-ascii?Q?PTzT+JoMjq5fccOmzztayI5e0jNGJyz0wvjkUXmbGxv3wNKhUutNrgyOYPOq?=
+ =?us-ascii?Q?eM6vfRhfLfi4OhXQMBFKIiRxBf6UKutZ/ei3V6TnhoaywLeIsaMX2UQ8KvIq?=
+ =?us-ascii?Q?xHbcG43oEGTf27KdSOWwcEfAD7ATd7+SkZ30weq1u1fRa2ISwR2hED3cocZE?=
+ =?us-ascii?Q?Rr9hCVaW2cY1D0PnTqOXGsWhVYbVyXm4bxvrdErV9F4TWD57Ib/dhQxLRYWN?=
+ =?us-ascii?Q?JfyKSoGpteoMAwhd7Q0RM5FGPZ/czLP+yX5/yOFK1xpj+U5pJRoLyMQFVc6o?=
+ =?us-ascii?Q?LAVWOeYH/AtuEiCmDOSueaImXSgfm02PYKuCJqnvLtPlVRPZFEz29rmILrAC?=
+ =?us-ascii?Q?kpoiMnKSsdhOoq7kMEchq15SreeYs4YSdQgvvEgAaCXwSPmbVYjJldWpJKbI?=
+ =?us-ascii?Q?qRj7JBPSonP7l/SHsWZrLueKfK6KzkJiSM4gJLgvRos6hZkOBN+ACiSPWHWl?=
+ =?us-ascii?Q?Wi2OfLzn/NHuP/M7IrPd81/ZygKAWKnQ4hdREJNRx22evU8xCYnwe2Ran/HS?=
+ =?us-ascii?Q?R+Yv4qhosqVImRX4aSzGkdFT+155G5RZIKDtNnO0UgNHNSI//3pxswh8Er8C?=
+ =?us-ascii?Q?1czBActD3GUXhg8KRpDWPTMRNi7kSrdR0RVuLQXedmGYoaUo8nnpy+ZDNi9k?=
+ =?us-ascii?Q?BFGUUkC89PgWgWSotEmJAYmx4fpjFACCsOsXKUhtNv1LGPaj81WEdhhDFunw?=
+ =?us-ascii?Q?aG029vsastOlGtAOconTlislw+zJXkMnM/M/QoDTpl5eIWgNfi8tWs3g+gOj?=
+ =?us-ascii?Q?T8y3IoSS4+GXrJSK+Ut6EFD62vg4DIB0eog/bRb7UPfUK82J3aVZpSaTmdX2?=
+ =?us-ascii?Q?dR2Rdxy21jyxjvE0ylWXOy85xZUidBmUuogVINTQdv+wQj/0h7NJBV2iHv7j?=
+ =?us-ascii?Q?UYvO71s4Xr0fmh5XOjaa+73zIWwyeLulswDrRxQxpZODR1fEGI8KKnT2bXI3?=
+ =?us-ascii?Q?l3xhDhmiwv6v9lA/1qTBMYE4bfsGN1RHlicogn6CjGxnfeO9a6sOnLvxcOzN?=
+ =?us-ascii?Q?g/64N6Jw79Yejbo7/a1QPt/4BDMBFJWfPvBCugeDo3dBg18hsPjOwx+dV0cX?=
+ =?us-ascii?Q?mg0HmD5rN4AMU5eM4CICRqSqMKp0YT2IsKfvOnShSSmef1kV1abF+WR7/3T9?=
+ =?us-ascii?Q?CFqgoGyy2DExMXFPwKRAilHzWxPNWetdJPIDnPaRDbazdU8GwIh5LrYYUxUA?=
+ =?us-ascii?Q?Ki1IDYPAeL/fNMa/xLf4x8wYnSCH6zxmJ4eA1sSqaeW0FRoF0LIUCCFrVlo+?=
+ =?us-ascii?Q?J6Hx3/5fysyGcnzHfcnmNoz1fRQxYoF+p92SM+eThHWrHlp7RxGad7PQBZqh?=
+ =?us-ascii?Q?aSZKVYj+bdWUszuWMG9xfXALO1Kq6pjLgLN/mbtwrbVlilVqhyfQalVwT7PW?=
+ =?us-ascii?Q?8VPEzyv0+Ku0UkdSt4QjmIFr3oqdEDh5zxdnwI47Acdkl/whNNaDWAi0i/la?=
+ =?us-ascii?Q?Rrm94YFjfDjSegT0iQfgbssKQcY77JCOFQOa4ako0haptFoThkbj9GW6YgbJ?=
+ =?us-ascii?Q?Ptiy4UjkYLb4PWvR6jiiEGreKsvq4a0EaHgfrLBCxcxgk+tzn+DK8dTsi2u+?=
+ =?us-ascii?Q?49BJ3Q=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea45a376-cfee-463c-8255-08d9cfec0b6b
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2022 01:38:16.2841
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LkQJBXb/cuZDSuo2z18wW7lDDMQTJaixyZweb21La9EKZaI8V+ChkIowJgWehORq4mKqD1mF0GBBTRxRfY6NECbK8fv+NG5DRi7YOjgpiOQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4684
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10217 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ suspectscore=0 spamscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201050008
+X-Proofpoint-GUID: kVu7iPD3N_j4YzQRGOncqG2jZBsvpen5
+X-Proofpoint-ORIG-GUID: kVu7iPD3N_j4YzQRGOncqG2jZBsvpen5
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 10:23:12PM +0000, Sean Christopherson wrote:
-> Allow yielding when zapping SPTEs after the last reference to a valid
-> root is put.  Because KVM must drop all SPTEs in response to relevant
-> mmu_notifier events, mark defunct roots invalid and reset their refcount
-> prior to zapping the root.  Keeping the refcount elevated while the zap
-> is in-progress ensures the root is reachable via mmu_notifier until the
-> zap completes and the last reference to the invalid, defunct root is put.
+On 2021-12-10 09:43:09 -0600, Brijesh Singh wrote:
+> The save area for SEV-ES/SEV-SNP guests, as used by the hardware, is
+> different from the save area of a non SEV-ES/SEV-SNP guest.
 > 
-> Allowing kvm_tdp_mmu_put_root() to yield fixes soft lockup issues if the
-> root in being put has a massive paging structure, e.g. zapping a root
-> that is backed entirely by 4kb pages for a guest with 32tb of memory can
-> take hundreds of seconds to complete.
+> This is the first step in defining the multiple save areas to keep them
+> separate and ensuring proper operation amongst the different types of
+> guests. Create an SEV-ES/SEV-SNP save area and adjust usage to the new
+> save area definition where needed.
 > 
->   watchdog: BUG: soft lockup - CPU#49 stuck for 485s! [max_guest_memor:52368]
->   RIP: 0010:kvm_set_pfn_dirty+0x30/0x50 [kvm]
->    __handle_changed_spte+0x1b2/0x2f0 [kvm]
->    handle_removed_tdp_mmu_page+0x1a7/0x2b8 [kvm]
->    __handle_changed_spte+0x1f4/0x2f0 [kvm]
->    handle_removed_tdp_mmu_page+0x1a7/0x2b8 [kvm]
->    __handle_changed_spte+0x1f4/0x2f0 [kvm]
->    tdp_mmu_zap_root+0x307/0x4d0 [kvm]
->    kvm_tdp_mmu_put_root+0x7c/0xc0 [kvm]
->    kvm_mmu_free_roots+0x22d/0x350 [kvm]
->    kvm_mmu_reset_context+0x20/0x60 [kvm]
->    kvm_arch_vcpu_ioctl_set_sregs+0x5a/0xc0 [kvm]
->    kvm_vcpu_ioctl+0x5bd/0x710 [kvm]
->    __se_sys_ioctl+0x77/0xc0
->    __x64_sys_ioctl+0x1d/0x20
->    do_syscall_64+0x44/0xa0
->    entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-> KVM currently doesn't put a root from a non-preemptible context, so other
-> than the mmu_notifier wrinkle, yielding when putting a root is safe.
-> 
-> Yield-unfriendly iteration uses for_each_tdp_mmu_root(), which doesn't
-> take a reference to each root (it requires mmu_lock be held for the
-> entire duration of the walk).
-> 
-> tdp_mmu_next_root() is used only by the yield-friendly iterator.
-> 
-> kvm_tdp_mmu_zap_invalidated_roots() is explicitly yield friendly.
-> 
-> kvm_mmu_free_roots() => mmu_free_root_page() is a much bigger fan-out,
-> but is still yield-friendly in all call sites, as all callers can be
-> traced back to some combination of vcpu_run(), kvm_destroy_vm(), and/or
-> kvm_create_vm().
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+
 > ---
->  arch/x86/kvm/mmu/mmu_internal.h |   7 +-
->  arch/x86/kvm/mmu/tdp_mmu.c      | 145 +++++++++++++++++++++++---------
->  2 files changed, 109 insertions(+), 43 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index be063b6c91b7..8ce3d58fdf7f 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -65,7 +65,12 @@ struct kvm_mmu_page {
->  		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
->  		tdp_ptep_t ptep;
->  	};
-> -	DECLARE_BITMAP(unsync_child_bitmap, 512);
-> +	union {
-> +		DECLARE_BITMAP(unsync_child_bitmap, 512);
-> +		struct {
-> +			bool tdp_mmu_defunct_root;
-> +		};
-> +	};
->  
->  	struct list_head lpage_disallowed_link;
->  #ifdef CONFIG_X86_32
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 72bcec2cd23c..aec97e037a8d 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -91,21 +91,67 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  
->  	WARN_ON(!root->tdp_mmu_page);
->  
-> -	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> -	list_del_rcu(&root->link);
-> -	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> +	/*
-> +	 * Ensure root->role.invalid is read after the refcount reaches zero to
-> +	 * avoid zapping the root multiple times, e.g. if a different task
-> +	 * acquires a reference (after the root was marked invalid+defunct) and
-> +	 * puts the last reference, all while holding mmu_lock for read.  Pairs
-> +	 * with the smp_mb__before_atomic() below.
-> +	 */
-> +	smp_mb__after_atomic();
-> +
-> +	/*
-> +	 * Free the root if it's already invalid.  Invalid roots must be zapped
-> +	 * before their last reference is put, i.e. there's no work to be done,
-> +	 * and all roots must be invalidated (see below) before they're freed.
-> +	 * Re-zapping defunct roots, which are always invalid, would put KVM
-> +	 * into an infinite loop (again, see below).
-> +	 */
-> +	if (root->role.invalid) {
-> +		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> +		list_del_rcu(&root->link);
-> +		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> +
-> +		call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * Invalidate the root to prevent it from being reused by a vCPU, and
-> +	 * mark it defunct so that kvm_tdp_mmu_zap_invalidated_roots() doesn't
-> +	 * try to put a reference it didn't acquire.
-> +	 */
-> +	root->role.invalid = true;
-> +	root->tdp_mmu_defunct_root = true;
-
-Ah ok so tdp_mmu_defunct_root indicates the root became invalid due to
-losing all its references while it was valid. This is in contrast to
-kvm_tdp_mmu_invalidate_all_roots() which marks roots invalid while they
-still have valid references.
-
-But I wonder if tdp_mmu_defunct_root is necessary? It's only used to
-skip a put in zap_invalidated_roots. Could we instead unconditionally
-grab a reference in invalidate_all_roots and then unconditionally drop
-it?
-
-e.g. Apply this on top:
-
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 8ce3d58fdf7f..be063b6c91b7 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -65,12 +65,7 @@ struct kvm_mmu_page {
- 		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
- 		tdp_ptep_t ptep;
- 	};
--	union {
--		DECLARE_BITMAP(unsync_child_bitmap, 512);
--		struct {
--			bool tdp_mmu_defunct_root;
--		};
--	};
-+	DECLARE_BITMAP(unsync_child_bitmap, 512);
- 
- 	struct list_head lpage_disallowed_link;
- #ifdef CONFIG_X86_32
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index aec97e037a8d..6bc5556b4cb7 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -122,7 +122,6 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 * try to put a reference it didn't acquire.
- 	 */
- 	root->role.invalid = true;
--	root->tdp_mmu_defunct_root = true;
- 
- 	/*
- 	 * Ensure tdp_mmu_defunct_root is visible if a concurrent reader acquires
-@@ -140,7 +139,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 * faults, and the only flow that must not consume an invalid root is
- 	 * allocating a new root for a vCPU, which also takes mmu_lock for write.
- 	 */
--	refcount_set(&root->tdp_mmu_root_count, 1);
-+	refcount_add(1, &root->tdp_mmu_root_count);
- 
- 	/*
- 	 * Zap the root, then put the refcount "acquired" above.   Recursively
-@@ -984,16 +983,10 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
- 
- 		/*
- 		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots()
--		 * unless the root is defunct worker data, in which case no
--		 * reference was taken.  Roots become defunct only when a valid
--		 * root has its last reference put, thus holding a reference
--		 * means the root can't become defunct between invalidating the
--		 * root and re-checking the data here.
- 		 *
- 		 * Note, the iterator holds its own reference.
- 		 */
--		if (!root->tdp_mmu_defunct_root)
--			kvm_tdp_mmu_put_root(kvm, root, true);
-+		kvm_tdp_mmu_put_root(kvm, root, true);
- 	}
- }
- 
-@@ -1015,10 +1008,6 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
-  * dropped, so even though all invalid roots are zapped, a root may not go away
-  * for quite some time, e.g. if a vCPU blocks across multiple memslot updates.
-  *
-- * Don't take a reference if the root is defunct, vCPUs cannot hold references
-- * to defunct roots and so will never get stuck with zapping the root.  Note,
-- * defunct roots still need to be zapped by kvm_tdp_mmu_zap_invalidated_roots().
-- *
-  * Because mmu_lock is held for write, it should be impossible to observe a
-  * root with zero refcount, i.e. the list of roots cannot be stale.
-  *
-@@ -1032,9 +1021,8 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 
- 	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
--		if (!root->tdp_mmu_defunct_root &&
--		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
--			root->role.invalid = true;
-+		refcount_add(1, &root->tdp_mmu_root_count);
-+		root->role.invalid = true;
- 	}
- }
- 
-
-> +
-> +	/*
-> +	 * Ensure tdp_mmu_defunct_root is visible if a concurrent reader acquires
-> +	 * a reference after the root's refcount is reset.  Pairs with the
-> +	 * smp_mb__after_atomic() above and in kvm_tdp_mmu_zap_invalidated_roots().
-> +	 */
-> +	smp_mb__before_atomic();
-> +
-> +	/*
-> +	 * Note, if mmu_lock is held for read this can race with other readers,
-> +	 * e.g. they may acquire a reference without seeing the root as invalid,
-> +	 * and the refcount may be reset after the root is skipped.  Both races
-> +	 * are benign, as flows that must visit all roots, e.g. need to zap
-> +	 * SPTEs for correctness, must take mmu_lock for write to block page
-> +	 * faults, and the only flow that must not consume an invalid root is
-> +	 * allocating a new root for a vCPU, which also takes mmu_lock for write.
-> +	 */
-> +	refcount_set(&root->tdp_mmu_root_count, 1);
->  
->  	/*
-> -	 * A TLB flush is not necessary as KVM performs a local TLB flush when
-> -	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
-> -	 * to a different pCPU.  Note, the local TLB flush on reuse also
-> -	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
-> -	 * intermediate paging structures, that may be zapped, as such entries
-> -	 * are associated with the ASID on both VMX and SVM.
-> +	 * Zap the root, then put the refcount "acquired" above.   Recursively
-> +	 * call kvm_tdp_mmu_put_root() to test the above logic for avoiding an
-> +	 * infinite loop by freeing invalid roots.  By design, the root is
-> +	 * reachable while it's being zapped, thus a different task can put its
-> +	 * last reference, i.e. flowing through kvm_tdp_mmu_put_root() for a
-> +	 * defunct root is unavoidable.
->  	 */
->  	tdp_mmu_zap_root(kvm, root, shared);
-> -
-> -	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> +	kvm_tdp_mmu_put_root(kvm, root, shared);
->  }
->  
->  enum tdp_mmu_roots_iter_type {
-> @@ -758,12 +804,23 @@ static inline gfn_t tdp_mmu_max_gfn_host(void)
->  static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  			     bool shared)
->  {
-> -	bool root_is_unreachable = !refcount_read(&root->tdp_mmu_root_count);
->  	struct tdp_iter iter;
->  
->  	gfn_t end = tdp_mmu_max_gfn_host();
->  	gfn_t start = 0;
->  
-> +	/*
-> +	 * The root must have an elevated refcount so that it's reachable via
-> +	 * mmu_notifier callbacks, which allows this path to yield and drop
-> +	 * mmu_lock.  When handling an unmap/release mmu_notifier command, KVM
-> +	 * must drop all references to relevant pages prior to completing the
-> +	 * callback.  Dropping mmu_lock with an unreachable root would result
-> +	 * in zapping SPTEs after a relevant mmu_notifier callback completes
-> +	 * and lead to use-after-free as zapping a SPTE triggers "writeback" of
-> +	 * dirty accessed bits to the SPTE's associated struct page.
-> +	 */
-> +	WARN_ON_ONCE(!refcount_read(&root->tdp_mmu_root_count));
-> +
->  	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
->  
->  	rcu_read_lock();
-> @@ -775,19 +832,7 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  	for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
->  				   root->role.level, start, end) {
->  retry:
-> -		/*
-> -		 * Yielding isn't allowed when zapping an unreachable root as
-> -		 * the root won't be processed by mmu_notifier callbacks.  When
-> -		 * handling an unmap/release mmu_notifier command, KVM must
-> -		 * drop all references to relevant pages prior to completing
-> -		 * the callback.  Dropping mmu_lock can result in zapping SPTEs
-> -		 * for an unreachable root after a relevant callback completes,
-> -		 * which leads to use-after-free as zapping a SPTE triggers
-> -		 * "writeback" of dirty/accessed bits to the SPTE's associated
-> -		 * struct page.
-> -		 */
-> -		if (!root_is_unreachable &&
-> -		    tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
-> +		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
->  			continue;
->  
->  		if (!is_shadow_present_pte(iter.old_spte))
-> @@ -796,22 +841,9 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  		if (!shared) {
->  			tdp_mmu_set_spte(kvm, &iter, 0);
->  		} else if (!tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
-> -			/*
-> -			 * cmpxchg() shouldn't fail if the root is unreachable.
-> -			 * to be unreachable.  Re-read the SPTE and retry so as
-> -			 * not to leak the page and its children.
-> -			 */
-> -			WARN_ONCE(root_is_unreachable,
-> -				  "Contended TDP MMU SPTE in unreachable root.");
->  			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
->  			goto retry;
->  		}
-> -		/*
-> -		 * WARN if the root is invalid and is unreachable, all SPTEs
-> -		 * should've been zapped by kvm_tdp_mmu_zap_invalidated_roots(),
-> -		 * and inserting new SPTEs under an invalid root is a KVM bug.
-> -		 */
-> -		WARN_ON_ONCE(root_is_unreachable && root->role.invalid);
->  	}
->  
->  	rcu_read_unlock();
-> @@ -899,6 +931,9 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->  	int i;
->  
->  	/*
-> +	 * Zap all roots, including defunct roots, as all SPTEs must be dropped
-> +	 * before returning to the caller.
-> +	 *
->  	 * A TLB flush is unnecessary, KVM zaps everything if and only the VM
->  	 * is being destroyed or the userspace VMM has exited.  In both cases,
->  	 * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
-> @@ -924,6 +959,12 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->  
->  	for_each_invalid_tdp_mmu_root_yield_safe(kvm, root) {
->  		/*
-> +		 * Zap the root, even if it's defunct, as all SPTEs must be
-> +		 * dropped before returning to the caller, e.g. if the root was
-> +		 * invalidated by a memslot update, then SPTEs associated with
-> +		 * a deleted/moved memslot are unreachable via the mmu_notifier
-> +		 * once the memslot update completes.
-> +		 *
->  		 * A TLB flush is unnecessary, invalidated roots are guaranteed
->  		 * to be unreachable by the guest (see kvm_tdp_mmu_put_root()
->  		 * for more details), and unlike the legacy MMU, no vCPU kick
-> @@ -935,10 +976,24 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->  		tdp_mmu_zap_root(kvm, root, true);
->  
->  		/*
-> -		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
-> +		 * Leverages kvm_tdp_mmu_get_root() in the iterator, pairs with
-> +		 * the smp_mb__before_atomic() in kvm_tdp_mmu_put_root() to
-> +		 * ensure a defunct root is seen as such.
-> +		 */
-> +		smp_mb__after_atomic();
-> +
-> +		/*
-> +		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots()
-
-Correction: kvm_tdp_mmu_invalidate_all_roots
-
-(Looks like the typo comes from a previous patch though.)
-
-> +		 * unless the root is defunct worker data, in which case no
-> +		 * reference was taken.  Roots become defunct only when a valid
-> +		 * root has its last reference put, thus holding a reference
-> +		 * means the root can't become defunct between invalidating the
-> +		 * root and re-checking the data here.
-> +		 *
->  		 * Note, the iterator holds its own reference.
->  		 */
-> -		kvm_tdp_mmu_put_root(kvm, root, true);
-> +		if (!root->tdp_mmu_defunct_root)
-> +			kvm_tdp_mmu_put_root(kvm, root, true);
->  	}
->  }
->  
-> @@ -953,13 +1008,17 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
->   * a vCPU drops the last reference to a root prior to the root being zapped, it
->   * will get stuck with tearing down the entire paging structure.
->   *
-> - * Get a reference even if the root is already invalid,
-> + * Get a reference even if the root is already invalid, unless it's defunct, as
->   * kvm_tdp_mmu_zap_invalidated_roots() assumes it was gifted a reference to all
->   * invalid roots, e.g. there's no epoch to identify roots that were invalidated
->   * by a previous call.  Roots stay on the list until the last reference is
->   * dropped, so even though all invalid roots are zapped, a root may not go away
->   * for quite some time, e.g. if a vCPU blocks across multiple memslot updates.
->   *
-> + * Don't take a reference if the root is defunct, vCPUs cannot hold references
-> + * to defunct roots and so will never get stuck with zapping the root.  Note,
-> + * defunct roots still need to be zapped by kvm_tdp_mmu_zap_invalidated_roots().
-> + *
->   * Because mmu_lock is held for write, it should be impossible to observe a
->   * root with zero refcount, i.e. the list of roots cannot be stale.
->   *
-> @@ -971,8 +1030,10 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
->  	struct kvm_mmu_page *root;
->  
->  	lockdep_assert_held_write(&kvm->mmu_lock);
-> +
->  	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
-> -		if (!WARN_ON_ONCE(!kvm_tdp_mmu_get_root(kvm, root)))
-> +		if (!root->tdp_mmu_defunct_root &&
-> +		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
->  			root->role.invalid = true;
->  	}
->  }
-> -- 
-> 2.34.1.448.ga2b2bfdf31-goog
+>  arch/x86/include/asm/svm.h | 83 +++++++++++++++++++++++++++++---------
+>  arch/x86/kvm/svm/sev.c     | 24 +++++------
+>  arch/x86/kvm/svm/svm.h     |  2 +-
+>  3 files changed, 77 insertions(+), 32 deletions(-)
 > 
