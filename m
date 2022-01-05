@@ -2,148 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E957484FD3
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 10:12:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC989484FF3
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 10:22:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238782AbiAEJMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 04:12:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36000 "EHLO
+        id S238844AbiAEJWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 04:22:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58878 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233443AbiAEJMO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 04:12:14 -0500
+        by vger.kernel.org with ESMTP id S232036AbiAEJWo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 04:22:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641373933;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1641374563;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YuZR8Blv4ggkVN5CJn82939kNMxQ+jdkHDrF0kcyzK8=;
-        b=BHjl0smPRlAaHOSNX5rdHWmt9MF34ij6QHDYirL7p+lonPvgxWyk8H6msAeG9o3FMBZkyE
-        SAbsDf72kpOK3d9lZLjV4LSMLsgloebuiyC6jOaHXksL/cPSnw9eHyqc3KFxCiYCRAtCaO
-        urJYcTDmYdyyh/kiRYtWY8fg0XwP4WI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=nJYdodG85/ccnAQTfgZ3AUnRmcUufSnMa1xnUl79IAI=;
+        b=WOH/tIpdipa/9a1zK0+WHv6lBQylIuDl/irsaz1IX72tuDXiAEbpxYIjpCKUkI04msz4Wp
+        qCL3xTiPElTR3M9BP0Bewm1y7G9fSAlgrbJyC9598aFcJiumdWuNE6Z2kuJ3uxefWO4oBQ
+        rFruu0hl13CLs44nvKCGzocn4FwAyO0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-99-it6Qpg6SP9edyV52Jmztwg-1; Wed, 05 Jan 2022 04:12:13 -0500
-X-MC-Unique: it6Qpg6SP9edyV52Jmztwg-1
-Received: by mail-wm1-f70.google.com with SMTP id l20-20020a05600c1d1400b003458e02cea0so1359182wms.7
-        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 01:12:12 -0800 (PST)
+ us-mta-625-rNgImt6sOL2MNXrICQ_Pgw-1; Wed, 05 Jan 2022 04:22:42 -0500
+X-MC-Unique: rNgImt6sOL2MNXrICQ_Pgw-1
+Received: by mail-wr1-f72.google.com with SMTP id g6-20020adfbc86000000b001a2d62be244so11039686wrh.23
+        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 01:22:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=YuZR8Blv4ggkVN5CJn82939kNMxQ+jdkHDrF0kcyzK8=;
-        b=rjXDWINBquBV2diIZwqpfIfniyFLoUgwlMYfADrP5pC03DY+oMcR2NoY7NdSvnm+Go
-         iNIVPGBvFK/97ccRXQmPnsCaqRkVhZjJlqMFGyrgyN8iu3MN1MI4y8TUR57jl/g07Z8G
-         bI0O0j0nb4abmFKLnYVA0ueVLsSNZ+GMquBSFcvmTL136GSGK9YUB5z+D0ZaRM8ltFrw
-         CihIeOE0WMfSAWHhWAUduIMudXM5v3kJFN7JKR9as36uFh6IzZNnhspY//Q06eSKixcU
-         FvEmksPTKrWklESdsBJf+1xi3H/3OJmqOZrdHgHFlFyOqA5Pns7dKg50VrMKsUGPzKH1
-         9MSg==
-X-Gm-Message-State: AOAM530X/8d8vnK/ZmtkVmGley4Ww/dYD9S8so2maoogsuJC3CoXSzBZ
-        krWyvVK3wDqqvq6MQcHTyyEYjO8K5wJJJt7Z36HT7hSMnVYyQO7XbWsaTYqM7sPYxe/GWD53oYG
-        +t4S5akkiLlFj
-X-Received: by 2002:a05:600c:4f83:: with SMTP id n3mr1931436wmq.129.1641373931746;
-        Wed, 05 Jan 2022 01:12:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxJGEufGnlcPzjgNtiUf6Lw4kxejjQ0hkoClytwxQe81eCYbmD1eSwlLenyXSK3BfXqRxswbg==
-X-Received: by 2002:a05:600c:4f83:: with SMTP id n3mr1931404wmq.129.1641373931446;
-        Wed, 05 Jan 2022 01:12:11 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id e13sm1933746wmq.10.2022.01.05.01.12.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jan 2022 01:12:10 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Igor Mammedov <imammedo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
-In-Reply-To: <20220105091724.1a667275@redhat.com>
-References: <20211122175818.608220-1-vkuznets@redhat.com>
- <20211122175818.608220-3-vkuznets@redhat.com>
- <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
- <20211227183253.45a03ca2@redhat.com>
- <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
- <87mtkdqm7m.fsf@redhat.com> <20220103104057.4dcf7948@redhat.com>
- <875yr1q8oa.fsf@redhat.com> <20220105091724.1a667275@redhat.com>
-Date:   Wed, 05 Jan 2022 10:12:08 +0100
-Message-ID: <87tueipmvr.fsf@redhat.com>
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=nJYdodG85/ccnAQTfgZ3AUnRmcUufSnMa1xnUl79IAI=;
+        b=CNowPGi6XvfKTLdfPuaysLM3k6JfMYHZ7OxVwupOF1I4KPZ+TFr4be0BUbuxBGU7KH
+         TQOI/Z4vC5gBUsDlO2pZYo3symAq9vwPxdapMM19EwWjBl5ySpT2hbKJR/V0kCZkL9HF
+         Xuw4Bf4EkThZSMiNmG6Ib94UvvsTtMBcEz/SueL7TeDJg0SHSQImC762RqlbAT7pSuSe
+         0NVAtFxvJU4GZB6jmiJf1V56oBLqSiGNiYUNskM+wxUaTUqCsSKfsfifKFWV/6KAwZKW
+         Srm4y7ko4tvFp7asQ4ArCO1ZE8PvaZ4eSLIQ2FhTsr7SCARhMtr/dnFKP9Ci/BcK2Cpc
+         vMqg==
+X-Gm-Message-State: AOAM532VCsQygFIH4yj9ulqb4wLKBnCYtYFV8ySkN9kpdG3Df4pf10YM
+        NIci39O82Ngxehgr0FzxTBmTLoyVL8VyW2gzPlIabXOy9QzBH5ORBsx/rUeBbNL9XuZVUJUYaap
+        u1PvF/g6SO2CK
+X-Received: by 2002:a05:600c:3d0f:: with SMTP id bh15mr2037727wmb.27.1641374561381;
+        Wed, 05 Jan 2022 01:22:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz5u8kXW70952AOxAuw5ljL9wtKWvvP0ulgX5HpX3UhLV+slhtiBMxJ6UN+z0RstQQDzjW3tw==
+X-Received: by 2002:a05:600c:3d0f:: with SMTP id bh15mr2037711wmb.27.1641374561183;
+        Wed, 05 Jan 2022 01:22:41 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id c7sm45516656wri.21.2022.01.05.01.22.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jan 2022 01:22:40 -0800 (PST)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 3/5] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+To:     Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+References: <20211227211642.994461-1-maz@kernel.org>
+ <20211227211642.994461-4-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <ef8b3500-04ab-5434-6a04-0e8b1dcc65d1@redhat.com>
+Date:   Wed, 5 Jan 2022 10:22:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20211227211642.994461-4-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Igor Mammedov <imammedo@redhat.com> writes:
+Hi Marc,
 
-> On Mon, 03 Jan 2022 13:56:53 +0100
-> Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On 12/27/21 10:16 PM, Marc Zyngier wrote:
+> Even when the VM is configured with highmem=off, the highest_gpa
+> field includes devices that are above the 4GiB limit.
+> Similarily, nothing seem to check that the memory is within
+> the limit set by the highmem=off option.
 >
->> Igor Mammedov <imammedo@redhat.com> writes:
->> 
->> > On Mon, 03 Jan 2022 09:04:29 +0100
->> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->> >  
->> >> Paolo Bonzini <pbonzini@redhat.com> writes:
->> >>   
->> >> > On 12/27/21 18:32, Igor Mammedov wrote:    
->> >> >>> Tweaked and queued nevertheless, thanks.    
->> >> >> it seems this patch breaks VCPU hotplug, in scenario:
->> >> >> 
->> >> >>    1. hotunplug existing VCPU (QEMU stores VCPU file descriptor in parked cpus list)
->> >> >>    2. hotplug it again (unsuspecting QEMU reuses stored file descriptor when recreating VCPU)
->> >> >> 
->> >> >> RHBZ:https://bugzilla.redhat.com/show_bug.cgi?id=2028337#c11
->> >> >>     
->> >> >
->> >> > The fix here would be (in QEMU) to not call KVM_SET_CPUID2 again. 
->> >> > However, we need to work around it in KVM, and allow KVM_SET_CPUID2 if 
->> >> > the data passed to the ioctl is the same that was set before.    
->> >> 
->> >> Are we sure the data is going to be *exactly* the same? In particular,
->> >> when using vCPU fds from the parked list, do we keep the same
->> >> APIC/x2APIC id when hotplugging? Or can we actually hotplug with a
->> >> different id?  
->> >
->> > If I recall it right, it can be a different ID easily.
->> >  
->> 
->> It's broken then. I'd suggest we revert the patch from KVM and think
->> about the strategy how to proceed.
+> This leads to failures in virt_kvm_type() on systems that have
+> a crippled IPA range, as the reported IPA space is larger than
+> what it should be.
 >
-> Can you post a patch, then?
+> Instead, honor the user-specified limit to only use the devices
+> at the lowest end of the spectrum, and fail if we have memory
+> crossing the 4GiB limit.
 >
-
-Paolo,
-
-would you like to send a last minute revert to Linus to save 5.16 ...
-
->> Going forward, we really want to ban
->> KVM_SET_CPUID{,2} after KVM_RUN (see the comment which my patch moves).
->> E.g. we can have an 'allowlist' of things which can change (and put
->> *APICids there) and only fail KVM_SET_CPUID{,2} when we see something
->> else changing.
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  hw/arm/virt.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 >
-> It might work, at least on QEMU side we do not allow mixing up CPU models
-> within VM instance (so far). So aside of APICid (and related leafs
-> (extended APIC ID/possibly other topo related stuff)) nothing else should
-> change ever when a new vCPU is hotplugged.
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 8b600d82c1..84dd3b36fb 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1678,6 +1678,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          exit(EXIT_FAILURE);
+>      }
+>  
+> +    if (!vms->highmem &&
+> +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
+> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> +        exit(EXIT_FAILURE);
 
-or should we just focus on this (or similar) solution (for 5.17 and
-stable@5.16)?
+The memory is composed of initial memory and device memory.
+device memory is put after the initial memory but has a 1GB alignment
+On top of that you have 1G page alignment per device memory slot
 
->
->> In QEMU, we can search the parked CPUs list for an entry
->> with the right *APICid and reuse it only if we manage to find one.
-> In QEMU, 'parked cpus' fd list is a generic code shared by all supported
-> archs. And I'm reluctant to push something x86 specific there (it's not
-> impossible, but it's a crutch to workaround forbidden KVM_SET_CPUID{,2}).
->
+so potentially the highest mem address is larger than
+vms->memmap[VIRT_MEM].base + ms->maxram_size.
+I would rather do the check on device_memory_base + device_memory_size
+> +    }
+>      /*
+>       * We compute the base of the high IO region depending on the
+>       * amount of initial and device memory. The device memory start/size
+> @@ -1707,7 +1712,9 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          vms->memmap[i].size = size;
+>          base += size;
+>      }
+> -    vms->highest_gpa = base - 1;
+> +    vms->highest_gpa = (vms->highmem ?
+> +                        base :
+> +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
+As per the previous comment this looks wrong to me if !highmem.
 
-You can see it this was: vCPU fd corresponds to the particular CPU being
-hot plugged/unplugged, not to any CPU in the guest system. The change
-may be generic enough then (but it's not going to save existing QEMUs of
-course).
+If !highmem, if RAM requirements are low we still could get benefit from
+REDIST2 and HIGH ECAM which could fit within the 4GB limit. But maybe we
+simply don't care? If we don't, why don't we simply skip the
+extended_memmap overlay as suggested in v2? I did not get your reply sorry.
 
--- 
-Vitaly
+Thanks
+
+Eric
+>      if (device_memory_size > 0) {
+>          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>          ms->device_memory->base = device_memory_base;
 
