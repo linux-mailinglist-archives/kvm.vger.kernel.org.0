@@ -2,156 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1755484D45
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 06:15:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 998AD484DFE
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 07:07:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237417AbiAEFPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 00:15:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236195AbiAEFPV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 00:15:21 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5DEC061761;
-        Tue,  4 Jan 2022 21:15:21 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id l10-20020a17090a384a00b001b22190e075so2279584pjf.3;
-        Tue, 04 Jan 2022 21:15:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iEonvTksUS7dJnsZ76vpEbyoty/J53mQJ1swr25QLf4=;
-        b=Ez0magPReiSWrqVLENG9o6EaJrsyRnTE8l1Dwhn4clW2zn96JPbTId4FulldpxVpIB
-         66C6L9M/tAZFLHvzGtlEHPQozzyX3EFmmZGf6Q6PCMJt3zic8DgsDq0iCFPRg6eU0Shy
-         VSPKjo6pA3nIkmHh0HGiSQjEMuXeHdfpa8zeYp9+nBBClWKX6AMKyDGjWIagFlyVBgsl
-         AmgwcUZeqYUxaYcvdsE48KBItxslQ/dKHBDW1l4zKiJSz7DYbhaDnJZFrMKU4DUvDsf2
-         L0INxA4hNz5V5LjU3PeFYfUzQkNUO+vYaoA+hkAzmWSLOUN7ihrsCLYDSjarAZPim6XI
-         JwTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iEonvTksUS7dJnsZ76vpEbyoty/J53mQJ1swr25QLf4=;
-        b=qQZb5PcFawwN0dm1UWf+Y0gLkhJoDyBTHj111ife53JZN3C+x1iLl2cyN3CN8exldK
-         HOQCshGvMW1KgxXblQT80m2CNTwQcLBrhFcm/jM/8LtOIYsFGBEcs1LjguxjtZXPM5wi
-         UzA3wgsvXvCuSx2ShSRxuoG+BUD/TsTgL1awX4k2r7n1ZHYBDyJb5m/MkSAlpEwfEsLG
-         jtU0f2E3Y2MlT5CWaUQjiexPxTcCv6PrRrMrByfROAGkLyPNNr+KKRI5NM7uzrg1/768
-         FvAs4nVc73mLLxVJprVhSEBIGPzi3B+HMyy/NVDjtsTF5D7ryZErwNS7vxy7UTx51hly
-         OHYA==
-X-Gm-Message-State: AOAM532j5cLc3YhzNWtY0DyU1c5Uhb+KG0DZn8yuKalXv7814v/C6mx0
-        uNLBpsz2f2F1K1Am6/nYQ0s=
-X-Google-Smtp-Source: ABdhPJz64KkD1KekmVxaM4aXJb9USeUq8QofoE8WzsvQGaCT45zsPfYEk+NnPqCTkp8F3/ZlJoRGEQ==
-X-Received: by 2002:a17:90b:3848:: with SMTP id nl8mr2102093pjb.167.1641359721099;
-        Tue, 04 Jan 2022 21:15:21 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id e3sm2871664pgm.51.2022.01.04.21.15.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 21:15:20 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S234390AbiAEGH4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 01:07:56 -0500
+Received: from mga14.intel.com ([192.55.52.115]:32760 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229543AbiAEGHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 01:07:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641362875; x=1672898875;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=07p9MpW9zMg9Qp6lAa6OCqWxIJ+2lO0bV8d8+HqWdzA=;
+  b=HdLKlmaf2uM2e3YuP4t85s3KUnU0DYq7veFuc3Q5of94t7ucFHWlmAht
+   a3qbjsS8Hxv/tqz/BF9kjw0VQlvrD5IDfTEr46yunCiuY01wZN0cg1TtH
+   qjv5+N8jSm8aLivTOT3LYyy22eYeJhN/yX3RC5VGTMwzw8yhdL63UnbKU
+   CBbqwEWpeet01x7DxOho7Lsed7rRS6MAdfIyNAJrnAl8+5KAK4Qsfa2W1
+   IsdvHSiYuaHHvCTDhzJu7N7ek/jxOfUDY4Ltm16MOo61GRxVRu2NjU2s+
+   R6d8lu+XrwPpy+gQ7DUHrAzSqZgiEgkpMdhCocM4Vf/yA6mqUoD5SN1xv
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="242583901"
+X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
+   d="scan'208";a="242583901"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 22:07:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
+   d="scan'208";a="526379627"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga008.jf.intel.com with ESMTP; 04 Jan 2022 22:07:38 -0800
+Date:   Wed, 5 Jan 2022 14:07:04 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Robert Hoo <robert.hu@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event
-Date:   Wed,  5 Jan 2022 13:15:09 +0800
-Message-Id: <20220105051509.69437-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.33.1
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+Subject: Re: [PATCH v3 kvm/queue 03/16] mm/memfd: Introduce MEMFD_OPS
+Message-ID: <20220105060704.GA25009@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+ <20211223123011.41044-4-chao.p.peng@linux.intel.com>
+ <95d13ac7da32aa1530d6883777ef3279e4ad825d.camel@linux.intel.com>
+ <20211231023853.GB7255@chaop.bj.intel.com>
+ <YdSGHnMFV5Mu9vdF@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YdSGHnMFV5Mu9vdF@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Tue, Jan 04, 2022 at 05:38:38PM +0000, Sean Christopherson wrote:
+> On Fri, Dec 31, 2021, Chao Peng wrote:
+> > On Fri, Dec 24, 2021 at 11:53:15AM +0800, Robert Hoo wrote:
+> > > On Thu, 2021-12-23 at 20:29 +0800, Chao Peng wrote:
+> > > > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> > > >  
+> > > > +static void notify_fallocate(struct inode *inode, pgoff_t start,
+> > > > pgoff_t end)
+> > > > +{
+> > > > +#ifdef CONFIG_MEMFD_OPS
+> > > > +	struct shmem_inode_info *info = SHMEM_I(inode);
+> > > > +	const struct memfd_falloc_notifier *notifier;
+> > > > +	void *owner;
+> > > > +	bool ret;
+> > > > +
+> > > > +	if (!info->falloc_notifier)
+> > > > +		return;
+> > > > +
+> > > > +	spin_lock(&info->lock);
+> > > > +	notifier = info->falloc_notifier;
+> > > > +	if (!notifier) {
+> > > > +		spin_unlock(&info->lock);
+> > > > +		return;
+> > > > +	}
+> > > > +
+> > > > +	owner = info->owner;
+> > > > +	ret = notifier->get_owner(owner);
+> > > > +	spin_unlock(&info->lock);
+> > > > +	if (!ret)
+> > > > +		return;
+> > > > +
+> > > > +	notifier->fallocate(inode, owner, start, end);
+> > > 
+> > > I see notifier->fallocate(), i.e. memfd_fallocate(), discards
+> > > kvm_memfd_fallocate_range()'s return value. Should it be checked?
+> > 
+> > I think we can ignore it, just like how current mmu_notifier does,
+> > the return value of __kvm_handle_hva_range is discarded in
+> > kvm_mmu_notifier_invalidate_range_start(). Even when KVM side failed,
+> > it's not fatal, it should not block the operation in the primary MMU.
+> 
+> If the return value is ignored, it'd be better to have no return value at all so
+> that it's clear fallocate() will continue on regardless of whether or not the
+> secondary MMU callback succeeds.  E.g. if KVM can't handle the fallocate() for
+> whatever reason, then knowing that fallocate() will continue on means KVM should
+> mark the VM as dead so that the broken setup cannot be abused by userspace.
 
-According to CPUID 0x0A.EBX bit vector, the event [7] should be the
-unrealized event "Topdown Slots" instead of the *kernel* generalized
-common hardware event "REF_CPU_CYCLES", so we need to skip the cpuid
-unavaliblity check in the intel_pmc_perf_hw_id() for the last
-REF_CPU_CYCLES event and update the confusing comment.
+After a close look, kvm_unmap_gfn_range() actually does not return a
+error code, so it's safe to not return in kvm_memfd_handle_range().
 
-If the event is marked as unavailable in the Intel guest CPUID
-0AH.EBX leaf, we need to avoid any perf_event creation, whether
-it's a gp or fixed counter. To distinguish whether it is a rejected
-event or an event that needs to be programmed with PERF_TYPE_RAW type,
-a new special returned value of "PERF_COUNT_HW_MAX + 1" is introduced.
-
-Fixes: 62079d8a43128 ("KVM: PMU: add proper support for fixed counter 2")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-v1 -> v2 Changelog:
-- Refine comment based on commit c1d6f42f1a42;
-- Squash the idea "avoid event creation for rejected hw_config" into this commit;
-- Squash the idea "PERF_COUNT_HW_MAX + 1" into this commit;
-
-Previous:
-https://lore.kernel.org/kvm/20211112095139.21775-3-likexu@tencent.com/
-
- arch/x86/kvm/pmu.c           |  3 +++
- arch/x86/kvm/vmx/pmu_intel.c | 18 ++++++++++++------
- 2 files changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 8abdadb7e22a..e632693a2266 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -109,6 +109,9 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 		.config = config,
- 	};
- 
-+	if (type == PERF_TYPE_HARDWARE && config >= PERF_COUNT_HW_MAX)
-+		return;
-+
- 	attr.sample_period = get_sample_period(pmc, pmc->counter);
- 
- 	if (in_tx)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 5e0ac57d6d1b..ffccfd9823c0 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -21,7 +21,6 @@
- #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
- 
- static struct kvm_event_hw_type_mapping intel_arch_events[] = {
--	/* Index must match CPUID 0x0A.EBX bit vector */
- 	[0] = { 0x3c, 0x00, PERF_COUNT_HW_CPU_CYCLES },
- 	[1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
- 	[2] = { 0x3c, 0x01, PERF_COUNT_HW_BUS_CYCLES  },
-@@ -29,6 +28,7 @@ static struct kvm_event_hw_type_mapping intel_arch_events[] = {
- 	[4] = { 0x2e, 0x41, PERF_COUNT_HW_CACHE_MISSES },
- 	[5] = { 0xc4, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
- 	[6] = { 0xc5, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
-+	/* The above index must match CPUID 0x0A.EBX bit vector */
- 	[7] = { 0x00, 0x03, PERF_COUNT_HW_REF_CPU_CYCLES },
- };
- 
-@@ -75,11 +75,17 @@ static unsigned int intel_pmc_perf_hw_id(struct kvm_pmc *pmc)
- 	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(intel_arch_events); i++)
--		if (intel_arch_events[i].eventsel == event_select &&
--		    intel_arch_events[i].unit_mask == unit_mask &&
--		    (pmc_is_fixed(pmc) || pmu->available_event_types & (1 << i)))
--			break;
-+	for (i = 0; i < ARRAY_SIZE(intel_arch_events); i++) {
-+		if (intel_arch_events[i].eventsel != event_select ||
-+		    intel_arch_events[i].unit_mask != unit_mask)
-+			continue;
-+
-+		/* disable event that reported as not present by cpuid */
-+		if ((i < 7) && !(pmu->available_event_types & (1 << i)))
-+			return PERF_COUNT_HW_MAX + 1;
-+
-+		break;
-+	}
- 
- 	if (i == ARRAY_SIZE(intel_arch_events))
- 		return PERF_COUNT_HW_MAX;
--- 
-2.33.1
-
+Chao
