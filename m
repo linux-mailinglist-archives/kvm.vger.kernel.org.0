@@ -2,236 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 213F0484B9A
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 01:19:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C125484BA2
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 01:22:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236703AbiAEATQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jan 2022 19:19:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235658AbiAEATP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jan 2022 19:19:15 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30502C061761
-        for <kvm@vger.kernel.org>; Tue,  4 Jan 2022 16:19:14 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v16so32605832pjn.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jan 2022 16:19:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bCYC+miH07d2FRj/9RDaoq4iu2pPUYuQlZAVya3JhmE=;
-        b=Iwymnl1zJiosKX/c+o4bVhBug5326kUXLzuiPG4g/pyiPA186c5gZYi6Zv0/0oqZxU
-         JHu0jGEAry4CQgHagoJT4XC85+cx8RO50BxIRT80HM40g93V/mRCuWu8mHsmkX/seDlk
-         miV2pJuQ7HTRjRZpwmqyLPBnKVLoxALMN5ZUI3THCBLDMqpINLd2fddswGI0gKpXKzjK
-         SR7wO0Bq2/y11Ff5HHkhCy1aj9ybIPbjGpR6Ew1pBA7dPaqFNPtALfM1CWCLvevOampX
-         2SgC7NUgqnIsF2eneVQDpsOOKRIWzlu3xvTLh4FT98ftuj5AZJm/iSR9LZgB5g7PVaSG
-         JD/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bCYC+miH07d2FRj/9RDaoq4iu2pPUYuQlZAVya3JhmE=;
-        b=KvlNly9vnfYerrJykRQXSxSdh1LgrrnfFigTNLsA+M4N41NCoaTzv27ySZTpLHbeg0
-         gvsitooSFG36Ojp5XkstY6xU2ZO7yeL0C2C0hLiTfxDMmJ9gZBNMbg0I7EcKnlSvbLfu
-         aeUzurUrPIECR4WwvYXQORcZn0l7Bcmb7AhmbE6OOhi0h4oxX7oqAFwCPNVvlXR8ffot
-         ysGA5NdFP2k9Tby3Z4WlwHXO8uv5sgno1LOvGNspccV2SaKa5wqpuYR5Zdj7dlI87ZoQ
-         W5Bx+fsaE5nUqS837BRzMw+c791T4RyT4C9uZwXaxPvpMmt5wsyoet6E/Jo44i5jHsGZ
-         RdQg==
-X-Gm-Message-State: AOAM530rJ2m3t2RVXxjPBD2lt6m3wdWak8R+gIMHNYtmVdkyCCdczgAi
-        0q4zYtoKyUQA35ecXzKY4AR3vQ==
-X-Google-Smtp-Source: ABdhPJyyb9m0o1XsNVK984pIMcr3630Yvm/JhWz60G2MPpWJIps77gyQYyQEGx3IgVvYN0Sq7SR3vg==
-X-Received: by 2002:a17:903:32c6:b0:149:7e3d:e493 with SMTP id i6-20020a17090332c600b001497e3de493mr40310837plr.13.1641341953459;
-        Tue, 04 Jan 2022 16:19:13 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id 13sm43874012pfm.161.2022.01.04.16.19.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 16:19:12 -0800 (PST)
-Date:   Wed, 5 Jan 2022 00:19:09 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v2 25/30] KVM: x86/mmu: Zap roots in two passes to avoid
- inducing RCU stalls
-Message-ID: <YdTj/eHur+9Vqdw6@google.com>
-References: <20211223222318.1039223-1-seanjc@google.com>
- <20211223222318.1039223-26-seanjc@google.com>
+        id S236719AbiAEAWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jan 2022 19:22:35 -0500
+Received: from mga11.intel.com ([192.55.52.93]:34016 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235309AbiAEAWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jan 2022 19:22:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641342152; x=1672878152;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=fBeznG9cIKhC276vaaqEtqZudIjiHzEQFLwjvuaZIg4=;
+  b=dfqlwkotftObTGvcNZsuudGity00IgDSCdhrXdpHkGAqm6UMPMqgChc2
+   NqHB5A5qDsjuMb3v9cEI3Zgy3gJ6CHtz5AJC5M9iCzkwhFiJmkXSPhDSX
+   wn3V2mGDzd0EwEhWa95RToEPli2OXmE7Wf52X2hhk6JYk/KLDn38ZA/hS
+   ivBQaIPDDGbkWe0wzCUb1QcIuRWpp5gCMcqsQfcV17EDBgq2BpzUyNIwZ
+   HUtFa8Mrn0D89XLh8RAy7yWy9yqm4VSB/Qn3izNDqK89eshuUueTSmWJ8
+   KhiyWijU8MUtC522IgWCr+0UYBk5x6xPGxniYlLMopgDHKk80e+CoxnQ2
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="239876304"
+X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
+   d="scan'208";a="239876304"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 16:22:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
+   d="scan'208";a="526270095"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by orsmga008.jf.intel.com with ESMTP; 04 Jan 2022 16:22:31 -0800
+Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 4 Jan 2022 16:22:30 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 4 Jan 2022 16:22:30 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20 via Frontend Transport; Tue, 4 Jan 2022 16:22:30 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.20; Tue, 4 Jan 2022 16:22:30 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IichPKxXXBvQ8iEvM9Tl6oWfNrmjAJulU5/yPEdvA5uWmgq9RjQurVCMJ39DwtoF2JmIrmTN7vW96j46jNoZSUZkIB9GWmpzaOkgLZ1q/iywVdRT9iJ4CXux2E9hpveDxhGFgUUR9sKFdEmm8c0yyXImkcMJNDJFXQ7UZrCAx7ICTzesU4tk9WUwUr0kRG8iBr3/9+nN8ewK02MF3EsvlBj5epcDuhaF65W+/9QWBvQFTpEgIEBabp5pIhZvPMXlpQJbA1JcwRyjJLlTiyRC5D+cfF3kbQjYKs3BTsEyCK1P8/z+kYYIVM//Il3nbJX1NFal8b3kRDmPsk+SGQeusA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oIPKZCIsrdI2nt7w6/O8HwNkPflwltdhp2Q4BuegkTo=;
+ b=LLNo2BrnDEJTeqFi4Tpu4s8JvLykUE6KiWMEhCxkxRoHimT9G+4WCcvvBUos+Dy+0LSDPiGeJWKeNOXSo3DlFsTbq/Q9ehvBxNzQlxt88ZXg7Rd+PlQ5oyldscSj83954IYac7WVNprDn4A8UIC95WFCw0AbRmD8OCY1cZjCGwcRIAp29YPk8EcQg+09z5rCOX9aleYW9eruA8rhGSgBMcE8KcXRQKf7GIrDgl4ujeJ4a6+MwCpf7exb8vXUnEiFTq9QKTg1AbsMURAoIukgk+RyiUbxqM8k6qzw3zCSBAdKfKb4EnFby7d+LGjD6XXLrtxcunfFQgbHFKYpydvtLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN6PR11MB1396.namprd11.prod.outlook.com (2603:10b6:404:4a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.14; Wed, 5 Jan
+ 2022 00:22:25 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::5c8a:9266:d416:3e04]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::5c8a:9266:d416:3e04%2]) with mapi id 15.20.4844.016; Wed, 5 Jan 2022
+ 00:22:25 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>
+Subject: RE: [PATCH v4 10/21] kvm: x86: Add emulation for IA32_XFD
+Thread-Topic: [PATCH v4 10/21] kvm: x86: Add emulation for IA32_XFD
+Thread-Index: AQHX/LXrTMdgUmFiNUul2c+SerJZ36xTSjQAgABQqqA=
+Date:   Wed, 5 Jan 2022 00:22:25 +0000
+Message-ID: <BN9PR11MB52766D60A78E5C736E1BD4FB8C4B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20211229131328.12283-1-yang.zhong@intel.com>
+ <20211229131328.12283-11-yang.zhong@intel.com> <YdSgzsiBft/NgxdF@google.com>
+In-Reply-To: <YdSgzsiBft/NgxdF@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4a7e8e16-ddf8-416d-8ae8-08d9cfe17335
+x-ms-traffictypediagnostic: BN6PR11MB1396:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <BN6PR11MB13961EEC5FB0A4E046ACB2538C4B9@BN6PR11MB1396.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: e4kMgzlbELHOE4HW4vB3zo3EcATF4gbc2cwAMflVaW1IJz22WvvX+lHgn8ld6WhQam+FNB3AnFDisk1J0gTxiZkC2ALwWv5vAihCDZcJGGSIvaj3lzcfl1N67vZak1Y8BCM84vFemOoBzubuub/kLPZTuz1mynxFt0vwPm2Z6O7OiiJCRvzNUIdSZCmIUCNSnvahnNU36jEw2OqjcS/V0ariYJEf5UYLiudu3PlXZPXWdUmMJ/9bwfQChaaYzu+cYtfXDJV2qCDKm0SK4fSUEmWx3xtaBMlCZVSOQf+vwPkLmR6rPP/900vn5XwqWsOOkXbE+wdT+Ki7EPeBq+V+5Awnr0GefiOwiz9oPglCgdnozveh+Qbaj5HF72OetECF058KBg5V9TPYsvklIcXXAlcUd+TXnYldxW75a71UL3pGv3Dvwhd1I84lzw7nsuocYmKpFVwiSSEUh17GveHGQuTFM2Ss10A409KA0ZnOg+Dm74BnA0YIEoot80oVtGz0NX9AfYl6MDjMFNG/HYar4R/PdkIhWMII02SEJtSsriVlehlm75hyOoOLVePviDgRCZvUyaa3GF5fqPqJERIR/d+o7YoalyejPAD0eXnG4+S2MDSH1PmhMwzYINX+qbw74AuSzdcOD+u5NBXrRBePo9ljAzsT9DKRPAH3uPuGrwaoinXRS2biT1r7/FfanxhTf9G6esYXAtbGxHJGucg5Lw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(82960400001)(38100700002)(66556008)(7416002)(186003)(26005)(2906002)(76116006)(52536014)(316002)(7696005)(122000001)(508600001)(38070700005)(64756008)(66476007)(66446008)(110136005)(6506007)(33656002)(86362001)(66946007)(8676002)(83380400001)(8936002)(6636002)(54906003)(71200400001)(9686003)(55016003)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yqo+mLiRG+PyVadxLkJY/PltZ/rHALqFG7F/778KlLnC4rJX3SGMWoow1igt?=
+ =?us-ascii?Q?OGsQESHLklbONWPtsmU2IekwYSsWPM1ngAKFd9rZ2BddUlnZR49jWWQ/zplf?=
+ =?us-ascii?Q?ZcG12TIz/kDujxQtHy1RFVbgrJYT6LYiiJ6EZl6sAmL2z8DMVdBZNEbIDysk?=
+ =?us-ascii?Q?h7J+qivrdNblH1V/5HalqBxsIFPRZkMeLSpXmW0C3K+xQqm49L5DZUzDZ562?=
+ =?us-ascii?Q?1Yj/tbBaLASZw6uIrW9QRhMOyOnqQuN3hmTsfsByDGIISiIovZPbFscDLLtw?=
+ =?us-ascii?Q?QbAojDIiopy8YAtdEjjjw6whRy4eWsCOct9ZeBdp1oIRJpmEMDjNLaKT28c/?=
+ =?us-ascii?Q?uyOy6LdIRtQ1hsawHC1b7DOZ2BTMsTfNCX58wHrsHWTqZ1z7rXxo4SU9mxg8?=
+ =?us-ascii?Q?hOS67OJKaPnAsIGXs2GZ4if2RrDUmBizLSYOn7AF8mBEZNHLQzI6idrunX8l?=
+ =?us-ascii?Q?V6PClN9PJhftpmTjH2Y85zVQNfgDMpx+EQvqpPSE29mSfYkgqQUQ2D5gHNXs?=
+ =?us-ascii?Q?86GM9GFCa7YD76JTWpSQQ9GJAI2N3JC2eOeXOrzzBQ338MoJheU2mTlW0q6k?=
+ =?us-ascii?Q?+NNQufgmqh6vJunE2rt/OAa/cXqF1e+e7p/2XGRcuch7u+sAPpQA3Z0IdHG/?=
+ =?us-ascii?Q?D2Qx1DK+FtArP5aQ62ekjXEVJlAxFi4FA5z39sTuYhy6MyWI37kARwB58Mq9?=
+ =?us-ascii?Q?7afw/zb/pzrK1p1CfT0wXax6CXk1e8C0NlEBOVSg9qB+7PqZNcODr5utEifa?=
+ =?us-ascii?Q?1WZGUjTmbQVzM/dlJKOe9Yr6Oiar8LcOP2ANPZ88kBdhCzXKn8g6e6qFwqql?=
+ =?us-ascii?Q?jLEcqoJcjq1pwFOOUOwXyvpVEypNgW3yDNdghas+Goruv8vcaz35v5CFC5Ih?=
+ =?us-ascii?Q?cgMgZSKyqBhHLoYKsY08/m7hANlKjAjBNOz7artla4FRjoww2/ciUKc2WLpN?=
+ =?us-ascii?Q?qOdK1bE47PsbRDQZQaJXSRUh67WJzv+9hSGe2ojv5I/mn6T5bWbFSgLuOUtD?=
+ =?us-ascii?Q?OMcTyK4NX9aFbfJWzLEzKoq5EUWf4oxjoXJNYI6HTYQB6/z0TscC++u2uXym?=
+ =?us-ascii?Q?EsLmrM1dOgNeaQL9SQIG5nu2YbQDwkowgBXN5yVrpChFlrx8WGIp38cOgCf4?=
+ =?us-ascii?Q?Le58yEapRDIwi1ZXOZU6/I80j1SGyz2A6Nqoq6358HOjuNbvGV6mj6nWEVbv?=
+ =?us-ascii?Q?plmKehPPRIyiPnVPqSkAgRVM6NJby58TG+xAgZs0UbXK7rMYncAyJGolA4Wf?=
+ =?us-ascii?Q?R5I5MXwMhcttTUkLvMVr2WXb+3FMS/nDXoiSn1QovmDJAwfCLqcx21mQUPw6?=
+ =?us-ascii?Q?xe+TiKQT4fPbZaj130AHizocg064bNzHK6BDhRHsnTTsG8mck/O08TR8OPRk?=
+ =?us-ascii?Q?AUN2ZqMr9Z0nvpD3a4wAAB2GzhJgNJRkeM6mJ4Wtq5bxljaOkvIofGNUqMEN?=
+ =?us-ascii?Q?SVWqBFOCuuAnD74JpKrZDz1zSnBaXI9UmEOwILRnTWwWtKRwBeihAlv3baty?=
+ =?us-ascii?Q?ff//ZT9CItPgcljqkDG9RUdLr/1vJX/5oOi2k/Gep9f7k624DEdMTm8Sb/zW?=
+ =?us-ascii?Q?PAiw2Kn7oDQIXYyQZ6x393mSPN/BirglnFFBjyYE1+keAES5HJmrOpFNG3mg?=
+ =?us-ascii?Q?Yt1kdrEN03IlokXCr5AoFyM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211223222318.1039223-26-seanjc@google.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a7e8e16-ddf8-416d-8ae8-08d9cfe17335
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jan 2022 00:22:25.5731
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nHm3gYzrOhvHg29mg5wHX7HbKSDWv3up0/hIwOj9G/u1QM7PYqwCWjsrLokAL+WRSmCqmMM5Ry7OwSX8A+WGcw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB1396
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 10:23:13PM +0000, Sean Christopherson wrote:
-> When zapping a TDP MMU root, perform the zap in two passes to avoid
-> zapping an entire top-level SPTE while holding RCU, which can induce RCU
-> stalls.  In the first pass, zap SPTEs at PG_LEVEL_1G, and then
-> zap top-level entries in the second pass.
-> 
-> With 4-level paging, zapping a PGD that is fully populated with 4kb leaf
-> SPTEs take up to ~7 or so seconds (time varies based number of kernel
-> config, CPUs, vCPUs, etc...).  With 5-level paging, that time can balloon
-> well into hundreds of seconds.
-> 
-> Before remote TLB flushes were omitted, the problem was even worse as
-> waiting for all active vCPUs to respond to the IPI introduced significant
-> overhead for VMs with large numbers of vCPUs.
-> 
-> By zapping 1gb SPTEs (both shadow pages and hugepages) in the first pass,
-> the amount of work that is done without dropping RCU protection is
-> strictly bounded, with the worst case latency for a single operation
-> being less than 100ms.
-> 
-> Zapping at 1gb in the first pass is not arbitrary.  First and foremost,
-> KVM relies on being able to zap 1gb shadow pages in a single shot when
-> when repacing a shadow page with a hugepage.
+> From: Sean Christopherson <seanjc@google.com>
+> Sent: Wednesday, January 5, 2022 3:33 AM
+>=20
+> On Wed, Dec 29, 2021, Yang Zhong wrote:
+> > From: Jing Liu <jing2.liu@intel.com>
+> >
+> > Intel's eXtended Feature Disable (XFD) feature allows the software
+> > to dynamically adjust fpstate buffer size for XSAVE features which
+> > have large state.
+> >
+> > Because fpstate has been expanded for all possible dynamic xstates
+> > at KVM_SET_CPUID2, emulation of the IA32_XFD MSR is straightforward.
+> > For write just call fpu_update_guest_xfd() to update the guest fpu
+> > container once all the sanity checks are passed. For read then
+> > return the cached value in the container.
+> >
+> > Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > Signed-off-by: Jing Liu <jing2.liu@intel.com>
+> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 27 +++++++++++++++++++++++++++
+> >  1 file changed, 27 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index e50e97ac4408..36677b754ac9 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1359,6 +1359,7 @@ static const u32 msrs_to_save_all[] =3D {
+> >  	MSR_F15H_PERF_CTL3, MSR_F15H_PERF_CTL4,
+> MSR_F15H_PERF_CTL5,
+> >  	MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1,
+> MSR_F15H_PERF_CTR2,
+> >  	MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4,
+> MSR_F15H_PERF_CTR5,
+> > +	MSR_IA32_XFD,
+> >  };
+> >
+> >  static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+> > @@ -3669,6 +3670,19 @@ int kvm_set_msr_common(struct kvm_vcpu
+> *vcpu, struct msr_data *msr_info)
+> >  			return 1;
+> >  		vcpu->arch.msr_misc_features_enables =3D data;
+> >  		break;
+> > +#ifdef CONFIG_X86_64
+> > +	case MSR_IA32_XFD:
+> > +		if (!msr_info->host_initiated &&
+> > +		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
+> > +			return 1;
+> > +
+> > +		if (data & ~(XFEATURE_MASK_USER_DYNAMIC &
+> > +			     vcpu->arch.guest_supported_xcr0))
+> > +			return 1;
+> > +
+> > +		fpu_update_guest_xfd(&vcpu->arch.guest_fpu, data);
+> > +		break;
+> > +#endif
+> >  	default:
+> >  		if (kvm_pmu_is_valid_msr(vcpu, msr))
+> >  			return kvm_pmu_set_msr(vcpu, msr_info);
+> > @@ -3989,6 +4003,15 @@ int kvm_get_msr_common(struct kvm_vcpu
+> *vcpu, struct msr_data *msr_info)
+> >  	case MSR_K7_HWCR:
+> >  		msr_info->data =3D vcpu->arch.msr_hwcr;
+> >  		break;
+> > +#ifdef CONFIG_X86_64
+> > +	case MSR_IA32_XFD:
+> > +		if (!msr_info->host_initiated &&
+> > +		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
+> > +			return 1;
+> > +
+> > +		msr_info->data =3D vcpu->arch.guest_fpu.fpstate->xfd;
+> > +		break;
+> > +#endif
+> >  	default:
+> >  		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+> >  			return kvm_pmu_get_msr(vcpu, msr_info);
+> > @@ -6422,6 +6445,10 @@ static void kvm_init_msr_list(void)
+> >  			    min(INTEL_PMC_MAX_GENERIC,
+> x86_pmu.num_counters_gp))
+> >  				continue;
+> >  			break;
+> > +		case MSR_IA32_XFD:
+> > +			if (!kvm_cpu_cap_has(X86_FEATURE_XFD))
+> > +				continue;
+>=20
+> I suspect the 32-bit host support is wrong.  The kernel's handle_xfd_even=
+t()
+> checks for 64-bit support in addition to the CPU feature itself, which im=
+plies
+> that the feature can be reported in boot_cpu_data for 32-bit kernels.
+>=20
+>   static bool handle_xfd_event(struct pt_regs *regs)
+>   {
+> 	u64 xfd_err;
+> 	int err;
+>=20
+> 	if (!IS_ENABLED(CONFIG_X86_64)
+> || !cpu_feature_enabled(X86_FEATURE_XFD))
+> 		return false;
+>=20
+> 	...
+>   }
+>=20
+> In this specific case, that means KVM will tell userspace it needs to mgi=
+rate
+> MSR_IA32_XFD, and then reject attempts to read/write the MSR.
+>=20
+> If 32-bit host kernels do not explicitly suppress X86_FEATURE_XFD, then K=
+VM
 
-When dirty logging is disabled, zap_collapsible_spte_range() does the
-bulk of the work zapping leaf SPTEs and allows yielding. I guess that
-could race with a vCPU faulting in the huge page though and the vCPU
-could do the bulk of the work.
+I didn't find explicit suppress
 
-Are there any other scenarios where KVM relies on zapping 1GB worth of
-4KB SPTEs without yielding?
+> needs
+> to do:
+>=20
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 556555537a18..156ce332d55b 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -455,9 +455,11 @@ void kvm_set_cpu_caps(void)
+>  #ifdef CONFIG_X86_64
+>         unsigned int f_gbpages =3D F(GBPAGES);
+>         unsigned int f_lm =3D F(LM);
+> +       unsigned int f_xfd =3D F(XFD);
+>  #else
+>         unsigned int f_gbpages =3D 0;
+>         unsigned int f_lm =3D 0;
+> +       unsigned int f_xfd =3D 0;
+>  #endif
+>         memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
+>=20
+> @@ -545,7 +547,7 @@ void kvm_set_cpu_caps(void)
+>         );
+>=20
+>         kvm_cpu_cap_mask(CPUID_D_1_EAX,
+> -               F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) | F(XFD)
+> +               F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) | f_xfd
+>         );
+>=20
+>         kvm_cpu_cap_init_scattered(CPUID_12_EAX,
+>=20
 
-In any case, 100ms is a long time to hog the CPU. Why not just do the
-safe thing and zap each level? 4K, then 2M, then 1GB, ..., then root
-level. The only argument against it I can think of is performance (lots
-of redundant walks through the page table). But I don't think root
-zapping is especially latency critical.
+so this change makes sense. will incorporate it in next version.
 
-> Zapping a 1gb shadow page
-> that is fully populated with 4kb dirty SPTEs also triggers the worst case
-> latency due writing back the struct page accessed/dirty bits for each 4kb
-> page, i.e. the two-pass approach is guaranteed to work so long as KVM can
-> cleany zap a 1gb shadow page.
-> 
->   rcu: INFO: rcu_sched self-detected stall on CPU
->   rcu:     52-....: (20999 ticks this GP) idle=7be/1/0x4000000000000000
->                                           softirq=15759/15759 fqs=5058
->    (t=21016 jiffies g=66453 q=238577)
->   NMI backtrace for cpu 52
->   Call Trace:
->    ...
->    mark_page_accessed+0x266/0x2f0
->    kvm_set_pfn_accessed+0x31/0x40
->    handle_removed_tdp_mmu_page+0x259/0x2e0
->    __handle_changed_spte+0x223/0x2c0
->    handle_removed_tdp_mmu_page+0x1c1/0x2e0
->    __handle_changed_spte+0x223/0x2c0
->    handle_removed_tdp_mmu_page+0x1c1/0x2e0
->    __handle_changed_spte+0x223/0x2c0
->    zap_gfn_range+0x141/0x3b0
->    kvm_tdp_mmu_zap_invalidated_roots+0xc8/0x130
->    kvm_mmu_zap_all_fast+0x121/0x190
->    kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
->    kvm_page_track_flush_slot+0x5c/0x80
->    kvm_arch_flush_shadow_memslot+0xe/0x10
->    kvm_set_memslot+0x172/0x4e0
->    __kvm_set_memory_region+0x337/0x590
->    kvm_vm_ioctl+0x49c/0xf80
-> 
-> Reported-by: David Matlack <dmatlack@google.com>
-> Cc: Ben Gardon <bgardon@google.com>
-> Cc: Mingwei Zhang <mizhang@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 27 ++++++++++++++++++++++-----
->  1 file changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index aec97e037a8d..2e28f5e4b761 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -809,6 +809,18 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  	gfn_t end = tdp_mmu_max_gfn_host();
->  	gfn_t start = 0;
->  
-> +	/*
-> +	 * To avoid RCU stalls due to recursively removing huge swaths of SPs,
-> +	 * split the zap into two passes.  On the first pass, zap at the 1gb
-> +	 * level, and then zap top-level SPs on the second pass.  "1gb" is not
-> +	 * arbitrary, as KVM must be able to zap a 1gb shadow page without
-> +	 * inducing a stall to allow in-place replacement with a 1gb hugepage.
-> +	 *
-> +	 * Because zapping a SP recurses on its children, stepping down to
-> +	 * PG_LEVEL_4K in the iterator itself is unnecessary.
-> +	 */
-> +	int zap_level = PG_LEVEL_1G;
-> +
->  	/*
->  	 * The root must have an elevated refcount so that it's reachable via
->  	 * mmu_notifier callbacks, which allows this path to yield and drop
-> @@ -825,12 +837,9 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  
->  	rcu_read_lock();
->  
-> -	/*
-> -	 * No need to try to step down in the iterator when zapping an entire
-> -	 * root, zapping an upper-level SPTE will recurse on its children.
-> -	 */
-> +start:
->  	for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-> -				   root->role.level, start, end) {
-> +				   zap_level, start, end) {
->  retry:
->  		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
->  			continue;
-> @@ -838,6 +847,9 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  		if (!is_shadow_present_pte(iter.old_spte))
->  			continue;
->  
-> +		if (iter.level > zap_level)
-> +			continue;
-> +
->  		if (!shared) {
->  			tdp_mmu_set_spte(kvm, &iter, 0);
->  		} else if (!tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
-> @@ -846,6 +858,11 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  		}
->  	}
->  
-> +	if (zap_level < root->role.level) {
-> +		zap_level = root->role.level;
-> +		goto start;
-> +	}
-
-This is probably just person opinion but I find the 2 iteration goto
-loop harder to understand than just open-coding the 2 passes.
-
-e.g.
-
-  static void tdp_mmu_zap_root(...)
-  {
-          /*
-           * To avoid RCU stalls due to recursively removing huge swaths of SPs,
-           * split the zap into two passes.  On the first pass, zap at the 1gb
-           * level, and then zap top-level SPs on the second pass.  "1gb" is not
-           * arbitrary, as KVM must be able to zap a 1gb shadow page without
-           * inducing a stall to allow in-place replacement with a 1gb hugepage.
-           *
-           * Because zapping a SP recurses on its children, stepping down to
-           * PG_LEVEL_4K in the iterator itself is unnecessary.
-           */
-          tdp_mmu_zap_root_level(..., PG_LEVEL_1G);
-          tdp_mmu_zap_root_level(..., root->role.level);
-  }
-
-Or just go ahead and zap each level from 4K up to root->role.level as I
-mentioned above.
-
-> +
->  	rcu_read_unlock();
->  }
->  
-> -- 
-> 2.34.1.448.ga2b2bfdf31-goog
-> 
+Thanks
+Kevin
