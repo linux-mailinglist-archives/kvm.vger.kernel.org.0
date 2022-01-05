@@ -2,266 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60099484E5C
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 07:28:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7036F484E6C
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 07:42:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbiAEG2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 01:28:53 -0500
-Received: from mga05.intel.com ([192.55.52.43]:10151 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231226AbiAEG2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 01:28:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641364132; x=1672900132;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=R4LxQJYszF/u/f5BeYXO0e51VwhoyCxemYgl6dbn0rc=;
-  b=TZ4XdtBqZDK/An8gJcduI5irnpZDP/DsWFECqZibUh7CBWIIdBVfYsAn
-   hBwOYN094lBzyaaGxeK4QDIHiABAZaw6e630WsMs3z3VZUI9dh7inF8NR
-   d0YmNa3l56gru5tlibDSQWut++ofA7oS1qqkwsdnCDiKwzMxjZblxwJx2
-   d07mCJFGa7okywy7XJaRdTBt/Fy3KEPeKYAOSPB6MmqBG3650plnlqL+T
-   wsgPJxM+MAhwn7y9+Zme9SdAZs3u6y9DZ8AuGQ0tOqHR+MnCdSCs686BN
-   R8YYEfdyCyJo5QMThdTFjozGEF+L3VnCHpUXpFLA1NiYHWrfP/yHgAHQx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="328723686"
-X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
-   d="scan'208";a="328723686"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 22:28:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
-   d="scan'208";a="526385523"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga008.jf.intel.com with ESMTP; 04 Jan 2022 22:28:44 -0800
-Date:   Wed, 5 Jan 2022 14:28:10 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        id S233632AbiAEGmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 01:42:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231960AbiAEGl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 01:41:59 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3DFC061761;
+        Tue,  4 Jan 2022 22:41:59 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id c9-20020a17090a1d0900b001b2b54bd6c5so2538897pjd.1;
+        Tue, 04 Jan 2022 22:41:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=80WJqN+L9qqK1VevraDHrAQhOn8fFgJ49Yyqba/kVgE=;
+        b=mLoTP6tD2vbWZRzney5iVFMHPgQX971dvi8PX3x/1spC+nn65T4R/f0p0YtICJMAQF
+         cJXyzL0rsGQA8NHCY9cwA9gmnVQg90koakFiTA3k8FPrbJA0j7UM9hIYKcuhlJN726qN
+         w1+tMGN/lHW9kwkLJT16vJdLl6eiD68nt1vw2MuQgldBbOBd/E45fciYOnwQcNLcF/Md
+         +1Vl0Cog1XEFP2JO0iKY32BNRo7sj/f+FVYSmrwoDwxU2VgIv7a058MWsKjp13kQRCAC
+         NMiDWjUb0vIxavIvQ5MB1NsOhBC3NV1ERRWjkHwl9wGX0idZ5k/iG/Aiy4rrsC4YHmyl
+         LzCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=80WJqN+L9qqK1VevraDHrAQhOn8fFgJ49Yyqba/kVgE=;
+        b=LM/ZBXWT88aC5m+OCrc/i1WrbnspwSXXdnqKGE3wP6ygujLnaejhld0jPQoWKxHX7G
+         2mrRsth6YgMIY2yN3+8dqmFneroollQ5OhrbT54w3OqsB6L/AzQdBAFr1aOkXjLgYML3
+         ZSbGD0tNyyUHnxho1tEjjKaVoc/CIQ/HT+i/WduXrIb6q6BXA+pPEluXSqZwuNDnhgMs
+         pBEIu5m1raW2zAaNxnjGYZsG9V3y5ZjUWCswSPnrueKNlzV96BSkeGwdiadh/uY2hX9g
+         S3upt5xy41nPd4wDxvAXMBE6Aj+3kJwRY3Z0orhLRZuGk53K9bAFGcyc564kJwwvLTTT
+         Y1+A==
+X-Gm-Message-State: AOAM531SD45BwMf4O+cFgAfenULWPN1+6e/TbC0k7Z6o2GCOd0+MP/p1
+        i6ZpCz0vXtjRsLTv0TD1v1rAqT3zzHSgAg==
+X-Google-Smtp-Source: ABdhPJw9Bg52wHvEKY5b/P79AOJK5xD3jfuvEjIcDXNssNx1K91iEpKUCh/kkBKo2TnKciBgpceaTg==
+X-Received: by 2002:a17:903:2343:b0:149:3d87:c792 with SMTP id c3-20020a170903234300b001493d87c792mr52557130plh.72.1641364918776;
+        Tue, 04 Jan 2022 22:41:58 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.116])
+        by smtp.googlemail.com with ESMTPSA id gf4sm1259413pjb.56.2022.01.04.22.41.53
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 04 Jan 2022 22:41:58 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [PATCH v3 kvm/queue 14/16] KVM: Handle page fault for private
- memory
-Message-ID: <20220105062810.GB25283@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-15-chao.p.peng@linux.intel.com>
- <20220104014629.GA2330@yzhao56-desk.sh.intel.com>
- <20220104091008.GA21806@chaop.bj.intel.com>
- <20220104100612.GA19947@yzhao56-desk.sh.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220104100612.GA19947@yzhao56-desk.sh.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: SEV: Add lock subtyping in sev_lock_two_vms so lockdep doesn't report false dependencies
+Date:   Tue,  4 Jan 2022 22:41:03 -0800
+Message-Id: <1641364863-26331-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 06:06:12PM +0800, Yan Zhao wrote:
-> On Tue, Jan 04, 2022 at 05:10:08PM +0800, Chao Peng wrote:
-> > On Tue, Jan 04, 2022 at 09:46:35AM +0800, Yan Zhao wrote:
-> > > On Thu, Dec 23, 2021 at 08:30:09PM +0800, Chao Peng wrote:
-> > > > When a page fault from the secondary page table while the guest is
-> > > > running happens in a memslot with KVM_MEM_PRIVATE, we need go
-> > > > different paths for private access and shared access.
-> > > > 
-> > > >   - For private access, KVM checks if the page is already allocated in
-> > > >     the memory backend, if yes KVM establishes the mapping, otherwise
-> > > >     exits to userspace to convert a shared page to private one.
-> > > >
-> > > will this conversion be atomical or not?
-> > > For example, after punching a hole in a private memory slot, will KVM
-> > > see two notifications: one for invalidation of the whole private memory
-> > > slot, and one for fallocate of the rest ranges besides the hole?
-> > > Or, KVM only sees one invalidation notification for the hole?
-> > 
-> > Punching hole doesn't need to invalidate the whole memory slot. It only
-> > send one invalidation notification to KVM for the 'hole' part.
-> good :)
-> 
-> > 
-> > Taking shared-to-private conversion as example it only invalidates the
-> > 'hole' part (that usually only the portion of the whole memory) on the
-> > shared fd,, and then fallocate the private memory in the private fd at
-> > the 'hole'. The KVM invalidation notification happens when the shared
-> > hole gets invalidated. The establishment of the private mapping happens
-> > at subsequent KVM page fault handlers.
-> > 
-> > > Could you please show QEMU code about this conversion?
-> > 
-> > See below for the QEMU side conversion code. The above described
-> > invalidation and fallocation will be two steps in this conversion. If
-> > error happens in the middle then this error will be propagated to
-> > kvm_run to do the proper action (e.g. may kill the guest?).
-> > 
-> > int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t length,
-> >                             bool shared_to_private)
-> > {
-> >     int ret; 
-> >     int fd_from, fd_to;
-> > 
-> >     if (!rb || rb->private_fd <= 0) { 
-> >         return -1;
-> >     }    
-> > 
-> >     if (!QEMU_PTR_IS_ALIGNED(start, rb->page_size) ||
-> >         !QEMU_PTR_IS_ALIGNED(length, rb->page_size)) {
-> >         return -1;
-> >     }    
-> > 
-> >     if (length > rb->max_length) {
-> >         return -1;
-> >     }    
-> > 
-> >     if (shared_to_private) {
-> >         fd_from = rb->fd;
-> >         fd_to = rb->private_fd;
-> >     } else {
-> >         fd_from = rb->private_fd;
-> >         fd_to = rb->fd;
-> >     }    
-> > 
-> >     ret = ram_block_discard_range_fd(rb, start, length, fd_from);
-> >     if (ret) {
-> >         return ret; 
-> >     }    
-> > 
-> >     if (fd_to > 0) { 
-> >         return fallocate(fd_to, 0, start, length);
-> >     }    
-> > 
-> >     return 0;
-> > }
-> > 
-> Thanks. So QEMU will re-generate memslots and set KVM_MEM_PRIVATE
-> accordingly? Will it involve slot deletion and create?
+From: Wanpeng Li <wanpengli@tencent.com>
 
-KVM will not re-generate memslots when do the conversion, instead, it
-does unmap/map a range on the same memslot. For memslot with tag
-KVM_MEM_PRIVATE, it always have two mappings (private/shared) but at a
-time only one is effective. What conversion does is to turn off the
-existing mapping and turn on the other mapping for specified range in
-that slot.
+Both source and dest vms' kvm->locks are held in sev_lock_two_vms, 
+we should mark one with different subtype to avoid false positives 
+from lockdep.
 
-> 
-> > > 
-> > > 
-> > > >   - For shared access, KVM also checks if the page is already allocated
-> > > >     in the memory backend, if yes then exit to userspace to convert a
-> > > >     private page to shared one, otherwise it's treated as a traditional
-> > > >     hva-based shared memory, KVM lets existing code to obtain a pfn with
-> > > >     get_user_pages() and establish the mapping.
-> > > > 
-> > > > The above code assume private memory is persistent and pre-allocated in
-> > > > the memory backend so KVM can use this information as an indicator for
-> > > > a page is private or shared. The above check is then performed by
-> > > > calling kvm_memfd_get_pfn() which currently is implemented as a
-> > > > pagecache search but in theory that can be implemented differently
-> > > > (i.e. when the page is even not mapped into host pagecache there should
-> > > > be some different implementation).
-> > > > 
-> > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > > > ---
-> > > >  arch/x86/kvm/mmu/mmu.c         | 73 ++++++++++++++++++++++++++++++++--
-> > > >  arch/x86/kvm/mmu/paging_tmpl.h | 11 +++--
-> > > >  2 files changed, 77 insertions(+), 7 deletions(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > index 2856eb662a21..fbcdf62f8281 100644
-> > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > @@ -2920,6 +2920,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> > > >  	if (max_level == PG_LEVEL_4K)
-> > > >  		return PG_LEVEL_4K;
-> > > >  
-> > > > +	if (kvm_slot_is_private(slot))
-> > > > +		return max_level;
-> > > > +
-> > > >  	host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
-> > > >  	return min(host_level, max_level);
-> > > >  }
-> > > > @@ -3950,7 +3953,59 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > > >  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
-> > > >  }
-> > > >  
-> > > > -static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
-> > > > +static bool kvm_vcpu_is_private_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> > > > +{
-> > > > +	/*
-> > > > +	 * At this time private gfn has not been supported yet. Other patch
-> > > > +	 * that enables it should change this.
-> > > > +	 */
-> > > > +	return false;
-> > > > +}
-> > > > +
-> > > > +static bool kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > > > +				    struct kvm_page_fault *fault,
-> > > > +				    bool *is_private_pfn, int *r)
-> > > > +{
-> > > > +	int order;
-> > > > +	int mem_convert_type;
-> > > > +	struct kvm_memory_slot *slot = fault->slot;
-> > > > +	long pfn = kvm_memfd_get_pfn(slot, fault->gfn, &order);
-> > > For private memory slots, it's possible to have pfns backed by
-> > > backends other than memfd, e.g. devicefd.
-> > 
-> > Surely yes, although this patch only supports memfd, but it's designed
-> > to be extensible to support other memory backing stores than memfd. There
-> > is one assumption in this design however: one private memslot can be
-> > backed by only one type of such memory backing store, e.g. if the
-> > devicefd you mentioned can independently provide memory for a memslot
-> > then that's no issue.
-> > 
-> > >So is it possible to let those
-> > > private memslots keep private and use traditional hva-based way?
-> > 
-> > Typically this fd-based private memory uses the 'offset' as the
-> > userspace address to get a pfn from the backing store fd. But I believe
-> > the current code does not prevent you from using the hva as the
-> By hva-based way, I mean mmap is required for this fd.
-> 
-> > userspace address, as long as your memory backing store understand that
-> > address and can provide the pfn basing on it. But since you already have
-> > the hva, you probably already mmap-ed the fd to userspace, that seems
-> > not this private memory patch can protect you. Probably I didn't quite
-> Yes, for this fd, though mapped in private memslot, there's no need to
-> prevent QEMU/host from accessing it as it will not cause the severe machine
-> check.
-> 
-> > understand 'keep private' you mentioned here.
-> 'keep private' means allow this kind of private memslot which does not
-> require protection from this private memory patch :)
+Fixes: c9d61dcb0bc26 (KVM: SEV: accept signals in sev_lock_two_vms)
+Reported-by: Yiru Xu <xyru1999@gmail.com>
+Tested-by: Jinrong Liang <cloudliang@tencent.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/svm/sev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Then I think such memory can be the shared part of memory of the
-KVM_MEM_PRIVATE memslot. As said above, this is initially supported :)
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 7656a2c..be28831 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1565,7 +1565,7 @@ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+ 	r = -EINTR;
+ 	if (mutex_lock_killable(&dst_kvm->lock))
+ 		goto release_src;
+-	if (mutex_lock_killable(&src_kvm->lock))
++	if (mutex_lock_killable_nested(&src_kvm->lock, SINGLE_DEPTH_NESTING))
+ 		goto unlock_dst;
+ 	return 0;
+ 
+-- 
+2.7.4
 
-Chao
-> 
-> 
-> Thanks
-> Yan
-> > > Reasons below:
-> > > 1. only memfd is supported in this patch set.
-> > > 2. qemu/host read/write to those private memslots backing up by devicefd may
-> > > not cause machine check.
-> > > 
