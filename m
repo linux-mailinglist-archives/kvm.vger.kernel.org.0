@@ -2,158 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4153E4852FB
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 13:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF095485334
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 14:06:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235357AbiAEMpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 07:45:39 -0500
-Received: from mail-bn8nam12on2053.outbound.protection.outlook.com ([40.107.237.53]:2784
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234151AbiAEMpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 07:45:38 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KnFDLgdyUBoH4zzHhvrMYw4JLAg23G0wuFpDGm+tXe14WYxhi+eLbjzP5LjfCH2Wc9uk+v/8KSPvqLzcNS2i6wPqkXe7UQN9J/9DJfJ2P1cl+/Eu+P1oix/Oc+W/V8303llv2hZ3kHDCz/INAQzYIVJqQ4SuqSRWgQAyj2kuobDg91khS9bfq4dEY96qHdR5Ur9fkgWqx1wtxBa/Xwj71jJzBEv+hq2sBljNaqSIA3PctwJr+3aIk8mHOLUxh8PjdWp7kswNysDd7gKpS4NuL8khAL8Zej97M/tRgLQeuWMps27KTXl5GfEwh6mQ1B+mCA3ZYlurq6jeDPc6rJZhpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bPpAl4ejzHKITzzG0TaohHAc14M9Y8OGpA1NKrlyCK8=;
- b=OjouxRYoAOQULEYuIOy3blcX1Y2RUD4cvnDt9bU7QE0XEVF4IibWUJuyiU74VDrla5wqOPwhte4cK76AqQiXE+jPE4oetkV65vO3G7wYn/r4/YXKJAmxmLnYRBUJnxws43DY7xrA6qj1lcmQGl+PFxMrnpdNok7DkTebkPwE15FQ6L/3arWPF84jumUOF3YK4ILPg2kzyKQx1gBWHLlYP/ugcjjkXL87jM638eoV2HtlsDKmKMQz8HHXWHFymp91M0HT2sy58M53+HV64Np52KXKSBdv5O+dDSefpw68vl+xan1ZtrHOh9d3BgCR4wrkQT0wrTWhsB8duT8K50bzMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bPpAl4ejzHKITzzG0TaohHAc14M9Y8OGpA1NKrlyCK8=;
- b=VvuYTebUDoHbr9HUBxekuuZXvrbpcnzKjox74MxNb5vw3HxzGq+HTQjnyCBkvI1/VD38sTNut8KHYpPN1vwMj+FgnPIZC7NEn9l2bmhiIeeoSISwQK6H/raWxD3V3jIk5SGWrQ6ByI6a2/7RMBFcuPyHRpRINtL8UoLW/iFMmLELL3y2YPIvakr1wQYq7caRsppA5CuZuDCwjOCeZ5EFG1i0DVlhba1xq06+R2pRyoZtRMExv/br7TXDFk6YRDjiu0HcljSsA7R1skMgvSxTyxsM5Ke+7aM5uTksPGRdcOoQDgmJ0mymxE7sHMAeKQc35V3jhtvJl+GDUsSOP59UoA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5256.namprd12.prod.outlook.com (2603:10b6:208:319::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Wed, 5 Jan
- 2022 12:45:36 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af%5]) with mapi id 15.20.4867.009; Wed, 5 Jan 2022
- 12:45:36 +0000
-Date:   Wed, 5 Jan 2022 08:45:33 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "Lu, Baolu" <baolu.lu@intel.com>
-Subject: Re: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
-Message-ID: <20220105124533.GP2328285@nvidia.com>
-References: <163909282574.728533.7460416142511440919.stgit@omen>
- <20211210012529.GC6385@nvidia.com>
- <20211213134038.39bb0618.alex.williamson@redhat.com>
- <20211214162654.GJ6385@nvidia.com>
- <BN9PR11MB5276145C1D82FAFBDCF70AEF8C4A9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20220104160959.GJ2328285@nvidia.com>
- <BN9PR11MB527662CA4820107EA7B6CC278C4B9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527662CA4820107EA7B6CC278C4B9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BYAPR02CA0068.namprd02.prod.outlook.com
- (2603:10b6:a03:54::45) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S236815AbiAENGy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 08:06:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28604 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235575AbiAENGx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 08:06:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641388012;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qPbUxj6ghyTrgwhNP+U3qhJU5iyb67zbb1namC5tcQQ=;
+        b=Nlnz7EQHx2PLHuoPXmt7IuQw77twpUosRrHwQbfOatzcDJzXxhgFME1deVQxKIYstfhMGJ
+        y2c+wE13Q6J2SqBynsvOXadijawRhWn414echOXt1MzEtRM13YTqjYyVpGDsIP1+BLxhDs
+        FnlL4P/giHUZzoUSiMa3KP0JuOyUmGA=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-493-pUGBYW7IMoi9XuwZ0eeZXw-1; Wed, 05 Jan 2022 08:06:51 -0500
+X-MC-Unique: pUGBYW7IMoi9XuwZ0eeZXw-1
+Received: by mail-ed1-f72.google.com with SMTP id s7-20020a056402520700b003f841380832so27878000edd.5
+        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 05:06:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=qPbUxj6ghyTrgwhNP+U3qhJU5iyb67zbb1namC5tcQQ=;
+        b=ogxHrkLMAvmGP6zu3caZQaltXrcprVg2SL/rIbguMb6O99x6Vdm0D9fM/r7g188kdD
+         f/5T7d/3cKRzQRVTrhSLt6IgmrP++o9udov5jYiVP/jnid8vTCV/Yql05V0toqP+kDIG
+         poqZJUhohhbXFbcaWUnulhQDbdEwgAv2z+1i9usStoGx7k2dVU91fPta2Wu11Hz3ubzT
+         hezO8zcGxAcecjOzLIDGZzk3a31X4VYPh3JHXEnUgjWcu/n3Z1RWZidHaXsOZxzTYneh
+         9lcdxbu8i4nCHeGeAxkvm4xnRoBcfU06RaUiJMauoAfWVjQ0Hq1qZTukogOCAWqoekuS
+         0fWQ==
+X-Gm-Message-State: AOAM530zhQ0z0JVhmv2NjJahR0uQ+QXLMeF2u7fMBA+jzb08cbxopDTS
+        O0P9l09YtTqBMOZxN+j2h2HgOjgPS4bHImWajAjoM2ImBQxhmOUCMYTxAiaNIeYz7r1KPYgEnrX
+        u3o6TJwu8Rb4b
+X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr40517137ejc.313.1641388010155;
+        Wed, 05 Jan 2022 05:06:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz2kvcaNQ8zr5/pOMq5wIiwszyeeQoUKvE+rInBlWiKyo00Mr1ysjR1/zCjvH1iUYUbX+TRaQ==
+X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr40517123ejc.313.1641388009929;
+        Wed, 05 Jan 2022 05:06:49 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id o12sm15956818edz.71.2022.01.05.05.06.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jan 2022 05:06:49 -0800 (PST)
+Message-ID: <c99d0b82-a44f-db8e-3f81-93d2394f9a02@redhat.com>
+Date:   Wed, 5 Jan 2022 14:06:40 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4c228c76-cc63-4de8-37c3-08d9d0494538
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5256:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB525694531A272D642A375A58C24B9@BL1PR12MB5256.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EsaX384nIRNEHyLt8qXIPtq8EpDe9gm/6YxQ7ki6bHUkOMHCeLwR4jB1PPJ2e3+kRcnSzNKASm76mPRskUD4nJ6cRmJrGzhjInrfys0erBV+bGkYGPeBDtErGOlYgZy2kSG12Z+pITLgaZmJ1u7+dfbT+FXPyjnHcnl6t9iT5ZGDoMS8fnZ6fIaoIwA9B6hKTIUIcOv5wjNubpMd4KPxWDZZnv5wdXR9RhHs0N6y0qfYWBiZiZJ6JnT3iUW9E2leyYcyEA5mAkU/RJcYoWO8XeB/gXg5ENfJ6+Jz1MXEDrjOkRgC5LcDPfuExBXb32WWdPIcmXTrF7wXtCeJ1vDH/Qyi48sy1hVGiBJjVBbVRjxlPNVM12702T7LwZWpGm0i/WdrIJ5bdKDrWz4CwX3JSBMAGd0rzFblnxV36ZRB0zUSErImb3/cw8zQDUp623/QRz4u8vLg8jTdOQZ/R+BNftexlXLZIa283/Q0tvDhVGzRxmDX/eugX7m5smUSgofMj3LMJ7lwIR7PcOHs4Hkzd956E43TMMZzS1Kh9GdDw5SMudbexRv9fNPBYXbeJp0RC/GN+ZBnY/NcnVjBYZiL+G39hLf605Gz4IBwfBPVNgjpF2Z5uGvP+Z+cbdLOr/oT//+BrZJ6BLvMay1qiqjJWg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(83380400001)(6666004)(316002)(8676002)(6512007)(6916009)(6486002)(6506007)(186003)(508600001)(7416002)(86362001)(2616005)(5660300002)(36756003)(26005)(1076003)(66946007)(8936002)(66476007)(66556008)(4326008)(33656002)(54906003)(2906002)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xvyEAJPc7V9JNEqAWv3hg8OtDTR950C+63dnX1XjQTYkK7p2BV773HiseB1j?=
- =?us-ascii?Q?sbnZth5cuRhXHHE7b8Vu3vW7WQ71It40b9HUWZ5eVxAh8FcVWJGnxDsKPDaL?=
- =?us-ascii?Q?jkOqQiWRjHNETU5MPb91vV7bn9/h5SuK90245gyMb3WisitIaoQonsy9XWl+?=
- =?us-ascii?Q?9R+MzXoQw9lYMPtesmkmVevXPO9jN8H23bINhyWobSxEPz5Roi9fU5SNJYhQ?=
- =?us-ascii?Q?RKdIa3QgEJQdIou5bvxEqXp70ot6A6ldfTHCSUG739lXsho/Gfeqd9dsch7V?=
- =?us-ascii?Q?WHFcUf1+vqaytyJpG8ZE8ifU57TVm2IAW/NqGJMnV8xfk5IQzM8tGrCMTH89?=
- =?us-ascii?Q?EK5mBk7s00JFyX7y+1+JuIz5HWb68H9S6Af5Yozh2d2H6EunPDeoDrV8ZvWs?=
- =?us-ascii?Q?QkBgFA9k0GKWJodH7zRAvUKbn/wVVq8gAgnzeEjFdHu8CNgwRNpu7LuMqfR+?=
- =?us-ascii?Q?chkTtIqPQO0J1or+iASCUMXHncrtTyjKrf2gFbaroML7DT7TzqonzyFNEZ6J?=
- =?us-ascii?Q?bowr4uPu/si+uc4QKtF61knoAkMuc3qb9n9lJXpjnV+zkx0ajVTWyhirPUtA?=
- =?us-ascii?Q?7/+xLlg6+VvoMVhXFKIgKoiyzjFUQwyk4mMZOaF0p7mXz1R5rfAp2wVTUP1j?=
- =?us-ascii?Q?YE8TgeJSbobJ9H7MaxGMx2O2+X1HJ/F0dfSr49jHDy3+vYdZsd/RNSI+Guxs?=
- =?us-ascii?Q?xj8Nevgj5avn2TEEBY+tqglaknIGaX2/qtA28PoSgJTmMrr1CPJOrd5hXkDx?=
- =?us-ascii?Q?z6Lf1uN1Z2Jgvmfwvg0E4RbxVrl77s7wQDCB+XnL0cdn1VYtVorjffLmc5F7?=
- =?us-ascii?Q?VXgrMJf75lzJ8KPMy7PxpCeBhvLDUw1xa3EHxWAMufVqJlH7Dr4GHSBFpljo?=
- =?us-ascii?Q?DYnfcxbHa3WndTN2CqgRgUONtwR8vRd084ZKeQ0mtY31xDvxKosZeitl0Dfp?=
- =?us-ascii?Q?o/muj3M553bjxL/DRWA+uwqXzH8G28AlufafhKQRuw3v2DTAXJJRlMvGIk+0?=
- =?us-ascii?Q?5aJ5/k4myuHihYAeuYjwcEvAIv/TjPditkIwyxBosF6a7IneCzq2B9TL9HUk?=
- =?us-ascii?Q?kRM5i6tfEuM7ZJMd5sGKCP3nV4tEcMYSGRsYDuouZ13tOWN+bbBT8Mjxlccj?=
- =?us-ascii?Q?YW2zB6AA0IFJbusZouCoejjmpVRg7mc75YMqcefaziKtR3uSXntjH0Jy5QrN?=
- =?us-ascii?Q?pEdgbum4iQGG5PWYUi1+cFUwI+qtmbVTpLS+8nvZPaXuLRe0NNB3qfK2XI2T?=
- =?us-ascii?Q?CDdUVueCljzYMiBq+ZT2dVcfcHwQfrHTiP8ujYqmm8cxIs08FrKAOyv8NMnv?=
- =?us-ascii?Q?0x93mtD+/UpOIAcAMB+XpSSOt1XkVws7OdqTAbYQXbT3oZA0GhmizHwJXscO?=
- =?us-ascii?Q?AfWho3VcJixJwuFPGgU/wV110B9JGqB/2lBDfyu26IywxKYqsbgvVd4lPmFv?=
- =?us-ascii?Q?8D7Pg2ZySeZKZSqIz6kFhQpBnIJqfeqN4dssd/EutKCdErxRBb2ed06mwyp9?=
- =?us-ascii?Q?+1J80VmSwNuUU80AVdBSavzNAGz4OmK9pXzO3cNFLkEOlTDcWb/PDUNAcxEB?=
- =?us-ascii?Q?JYgsmQSBfWoyB9pdfXA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c228c76-cc63-4de8-37c3-08d9d0494538
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2022 12:45:36.5574
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q5u5Ga69zsuIIdxetEdrff10/F/03NUzT9AgCqJ6tHPuaBcjSAH+67n+Ekcizofi
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5256
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v5 07/21] x86/fpu: Provide fpu_enable_guest_xfd_features()
+ for KVM
+Content-Language: en-US
+To:     Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, corbet@lwn.net, shuah@kernel.org,
+        seanjc@google.com
+Cc:     jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, jing2.liu@intel.com,
+        guang.zeng@intel.com, wei.w.wang@intel.com
+References: <20220105123532.12586-1-yang.zhong@intel.com>
+ <20220105123532.12586-8-yang.zhong@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220105123532.12586-8-yang.zhong@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 05, 2022 at 01:59:31AM +0000, Tian, Kevin wrote:
+On 1/5/22 13:35, Yang Zhong wrote:
+> +int fpu_enable_guest_xfd_features(struct fpu_guest *guest_fpu, u64 xfeatures)
+> +{
+> +	lockdep_assert_preemption_enabled();
+> +
 
-> > This will block the hypervisor from ever migrating the VM in a very
-> > poor way - it will just hang in the middle of a migration request.
-> 
-> it's poor but 'hang' won't happen. PCI spec defines completion timeout
-> for ATS translation request. If timeout the device will abort the in-fly
-> request and report error back to software. 
+The old fpu_update_guest_perm_features(guest_fpu) is equivalent to
 
-The PRI time outs have to be long enough to handle swap back from
-disk, so 'hang' will be a fair amount of time..
- 
-> > Regardless of the complaints of the IP designers, this is a very poor
-> > direction.
-> > 
-> > Progress in the hypervisor should never be contingent on a guest VM.
-> > 
-> 
-> Whether the said DOS is a real concern and how severe it is are usage 
-> specific things. Why would we want to hardcode such restriction on
-> an uAPI? Just give the choice to the admin (as long as this restriction is
-> clearly communicated to userspace clearly)...
+	fpu_enable_guest_xfd_features(guest_fpu, guest_fpu->perm);
 
-IMHO it is not just DOS, PRI can become dependent on IO which requires
-DMA to complete.
+Missing doc comment:
 
-You could quickly get yourself into a deadlock situation where the
-hypervisor has disabled DMA activities of other devices and the vPRI
-simply cannot be completed.
+/*
+  * fpu_enable_guest_xfd_features - Enable xfeatures according to guest perm
+  * @guest_fpu:         Pointer to the guest FPU container
+  * @xfeatures:         Features requested by guest CPUID
+  *
+  * Enable all dynamic xfeatures according to guest perm and requested CPUID.
+  * Invoked if the caller wants to conservatively expand fpstate buffer instead
+  * of waiting until XCR0 or XFD MSR is written.
+  *
+  * Return: 0 on success, error code otherwise
+  */
 
-I just don't see how this scheme is generally workable without a lot
-of limitations.
+Also, the check for 32-bit is slightly imprecise:
 
-While I do agree we should support the HW that exists, we should
-recognize this is not a long term workable design and treat it as
-such.
+	/* Dynamic xfeatures are not supported with 32-bit kernels. */
+	if (!IS_ENABLED(CONFIG_X86_64))
+-		return 0;
++		return -EINVAL;
 
-Jason
+since we only get here with xfeatures != 0 (if it compiles, just removing
+the IS_ENABLED check altogether would be even better).  With these changes,
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks,
+
+Paolo
+
