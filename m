@@ -2,93 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7036F484E6C
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 07:42:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D13D6484E7B
+	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 07:52:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233632AbiAEGmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 01:42:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48884 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231960AbiAEGl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 01:41:59 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3DFC061761;
-        Tue,  4 Jan 2022 22:41:59 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id c9-20020a17090a1d0900b001b2b54bd6c5so2538897pjd.1;
-        Tue, 04 Jan 2022 22:41:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=80WJqN+L9qqK1VevraDHrAQhOn8fFgJ49Yyqba/kVgE=;
-        b=mLoTP6tD2vbWZRzney5iVFMHPgQX971dvi8PX3x/1spC+nn65T4R/f0p0YtICJMAQF
-         cJXyzL0rsGQA8NHCY9cwA9gmnVQg90koakFiTA3k8FPrbJA0j7UM9hIYKcuhlJN726qN
-         w1+tMGN/lHW9kwkLJT16vJdLl6eiD68nt1vw2MuQgldBbOBd/E45fciYOnwQcNLcF/Md
-         +1Vl0Cog1XEFP2JO0iKY32BNRo7sj/f+FVYSmrwoDwxU2VgIv7a058MWsKjp13kQRCAC
-         NMiDWjUb0vIxavIvQ5MB1NsOhBC3NV1ERRWjkHwl9wGX0idZ5k/iG/Aiy4rrsC4YHmyl
-         LzCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=80WJqN+L9qqK1VevraDHrAQhOn8fFgJ49Yyqba/kVgE=;
-        b=LM/ZBXWT88aC5m+OCrc/i1WrbnspwSXXdnqKGE3wP6ygujLnaejhld0jPQoWKxHX7G
-         2mrRsth6YgMIY2yN3+8dqmFneroollQ5OhrbT54w3OqsB6L/AzQdBAFr1aOkXjLgYML3
-         ZSbGD0tNyyUHnxho1tEjjKaVoc/CIQ/HT+i/WduXrIb6q6BXA+pPEluXSqZwuNDnhgMs
-         pBEIu5m1raW2zAaNxnjGYZsG9V3y5ZjUWCswSPnrueKNlzV96BSkeGwdiadh/uY2hX9g
-         S3upt5xy41nPd4wDxvAXMBE6Aj+3kJwRY3Z0orhLRZuGk53K9bAFGcyc564kJwwvLTTT
-         Y1+A==
-X-Gm-Message-State: AOAM531SD45BwMf4O+cFgAfenULWPN1+6e/TbC0k7Z6o2GCOd0+MP/p1
-        i6ZpCz0vXtjRsLTv0TD1v1rAqT3zzHSgAg==
-X-Google-Smtp-Source: ABdhPJw9Bg52wHvEKY5b/P79AOJK5xD3jfuvEjIcDXNssNx1K91iEpKUCh/kkBKo2TnKciBgpceaTg==
-X-Received: by 2002:a17:903:2343:b0:149:3d87:c792 with SMTP id c3-20020a170903234300b001493d87c792mr52557130plh.72.1641364918776;
-        Tue, 04 Jan 2022 22:41:58 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.116])
-        by smtp.googlemail.com with ESMTPSA id gf4sm1259413pjb.56.2022.01.04.22.41.53
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Jan 2022 22:41:58 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: SEV: Add lock subtyping in sev_lock_two_vms so lockdep doesn't report false dependencies
-Date:   Tue,  4 Jan 2022 22:41:03 -0800
-Message-Id: <1641364863-26331-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S237772AbiAEGw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 01:52:57 -0500
+Received: from mga06.intel.com ([134.134.136.31]:17379 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229759AbiAEGw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 01:52:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641365576; x=1672901576;
+  h=cc:subject:to:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=NfLc3B58P2xIUXLczC9zkU0pb72XnW/r7ysxWZe4Nnw=;
+  b=ShMpdl0jmPfZmtTtFE04uwMekIluZUELtKLmOHatMLNy/BfzxFmDMaue
+   D3OH4xBc3E7ygmU+Dh68R5tRq6qLVUtgyuEdsnYNSTu6w6WJYJ5jUpNUx
+   SsBJJ30ZvM71Untl57j/YQkreI6AvGr++DBOyG4N4zmlJtMVkcfxnC+Pv
+   8kO6sw6D0CoX9JvP9Iv3Jhub9Sy35VPAM1uMhhfXvcrXx6OZtmqq95whn
+   HRb0O6KTHLwP3C/mCfCMv894Ng+7CwH2HGY+rm8Womt06DBgTfoUjy5lA
+   gn9749xxdzZa9PUhI69399y6EUfJf9IL7SIioPwPyFeKT+3q/9UkqlqlQ
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="303134244"
+X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
+   d="scan'208";a="303134244"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 22:52:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,262,1635231600"; 
+   d="scan'208";a="526391598"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 04 Jan 2022 22:52:48 -0800
+Cc:     baolu.lu@linux.intel.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 00/14] Fix BUG_ON in vfio_iommu_group_notifier()
+To:     Jason Gunthorpe <jgg@nvidia.com>
+References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
+ <20220104124800.GF2328285@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <f42e5d09-6578-98a4-a0f3-097f69bb7c3a@linux.intel.com>
+Date:   Wed, 5 Jan 2022 14:52:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <20220104124800.GF2328285@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hi Jason,
 
-Both source and dest vms' kvm->locks are held in sev_lock_two_vms, 
-we should mark one with different subtype to avoid false positives 
-from lockdep.
+On 1/4/22 8:48 PM, Jason Gunthorpe wrote:
+> On Tue, Jan 04, 2022 at 09:56:30AM +0800, Lu Baolu wrote:
+> 
+>> v5:
+>>    - Move kernel dma ownership auto-claiming from driver core to bus
+>>      callback. (Greg)
+>>    - Refactor the iommu interfaces to make them more specific.
+>>      (Jason/Robin)
+>>    - Simplify the dma ownership implementation by removing the owner
+>>      type. (Jason)
+>>    - Commit message refactoring for PCI drivers. (Bjorn)
+>>    - Move iommu_attach/detach_device() improvement patches into another
+>>      series as there are a lot of code refactoring and cleanup staffs
+>>      in various device drivers.
+> 
+> Since you already have the code you should make this 'other series'
+> right now. It should delete iommu_group_attach() and fix
+> iommu_device_attach().
 
-Fixes: c9d61dcb0bc26 (KVM: SEV: accept signals in sev_lock_two_vms)
-Reported-by: Yiru Xu <xyru1999@gmail.com>
-Tested-by: Jinrong Liang <cloudliang@tencent.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/svm/sev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes. I am doing the functional and compile tests. I will post it once I
+complete the testing.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 7656a2c..be28831 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1565,7 +1565,7 @@ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
- 	r = -EINTR;
- 	if (mutex_lock_killable(&dst_kvm->lock))
- 		goto release_src;
--	if (mutex_lock_killable(&src_kvm->lock))
-+	if (mutex_lock_killable_nested(&src_kvm->lock, SINGLE_DEPTH_NESTING))
- 		goto unlock_dst;
- 	return 0;
- 
--- 
-2.7.4
+> 
+> You also didn't really do my suggestion, this messes up the normal
+> __iommu_attach_group()/__iommu_detach_group() instead of adding the
+> clear to purpose iommu_replace_group() for VFIO to use. This just
+> makes it more difficult to normalize the APIs.
 
+I didn't forget that. :-) It's part of the new series.
+
+> 
+> Otherwise it does seem to have turned out to be more understandable.
+> 
+> Jason
+> 
+
+Best regards,
+baolu
