@@ -2,99 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7029485BE6
-	for <lists+kvm@lfdr.de>; Wed,  5 Jan 2022 23:53:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 321CC485C71
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 00:50:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245332AbiAEWxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 17:53:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44700 "EHLO
+        id S245526AbiAEXuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 18:50:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245171AbiAEWv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 17:51:59 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18DCCC034001
-        for <kvm@vger.kernel.org>; Wed,  5 Jan 2022 14:51:57 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id 45-20020a9d0a30000000b0058f1a6df088so1078379otg.4
-        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 14:51:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FRh+AxN1SKs9JlRo4qZ0RFdMICo2/fomT2kNzxO2p68=;
-        b=AJ2Hph8NuF5lvpIdO8l9446b1i/7pjZoaXMicjA5dBbx836WEQhoZQgyo6VPfnASCE
-         UYtl7kgsDPaPZQZSQtWBBCe+2u96rE3xl/T8BbMJqVvZk84O0N/nw8FbV5hpY/MnDZrY
-         Wqlt4xX6KARDAwsMOZA0r/ydD2JuVaTTtb0qn8i49xfmgIQJY/J+rP6blqhFu6A+YawG
-         2rBFq+j0OossdgTcFcHtJaWeR99Rq9vAvukUQPSVzfPx9cgfUkOeWqxXqGwmsmXg/riT
-         rbrPKObUcs6PlnIWoDtSHPGSoKKv2h3gXNP9IRxX823yKTSj1r5aWL+6X4oB8EJ76MzN
-         btyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FRh+AxN1SKs9JlRo4qZ0RFdMICo2/fomT2kNzxO2p68=;
-        b=SJL5GkBgT+jPTfFOnC8SvyX+foAK/e5fhTvK6u0p+p50wSjfeDqk+M3+zPgh8tFPfE
-         hrzcpBBuaSt06URnqhinKVrhejzcIPh/TfADx6/nx5rGlb2hB3jat+CJw2jJpv/q/PuR
-         FsnhRjYPYmYraarAZXDVQPoRIJfV7s6SjJea0It5y7tw8jKBWPspkCCO2PQhOH3eA2QQ
-         TQKrNFEcO1hQ7ZaYLClYn/ik3S2DASvOF+mtRBbLm5Hjoo0HS0mTy4Uwipn4d+y7Dk3A
-         FkUJMohZAZ3wSyEIaAbioMQuWV0FkSvEuyg3j/zKkTAi7rQSvFr8O+jcgEGoHX9J8GDg
-         ZMTQ==
-X-Gm-Message-State: AOAM532mO3Nf0vwGj4i3OJcyO/URg64O/bhPtZ7Jd+gxPcKm9tYHiAP4
-        9kByKb+p6j7Rg0rDzx4geTlwp4elkKH1gFktWm6iBA==
-X-Google-Smtp-Source: ABdhPJxb9CzJIsfVy90wyaAPuF99n20endVT8kYcg2HVTpgbJ2dwEq9m3bKWp7pg3xrsTOD/xM78FhWyEBD1Wue8bpg=
-X-Received: by 2002:a9d:67c1:: with SMTP id c1mr42474949otn.299.1641423116181;
- Wed, 05 Jan 2022 14:51:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20211222133428.59977-1-likexu@tencent.com> <CALMp9eTgO4XuNHwuxWahZc7jQqZ10DchW8xXvecBH2ovGPLU9g@mail.gmail.com>
- <d3a9a73f-cdc2-bce0-55e6-e4c9f5c237de@gmail.com> <CALMp9eTm7R-69p3z9P37yXmD6QpzJhEJO564czqHQtDdCRK-SQ@mail.gmail.com>
- <CALMp9eTVjKztZC_11-DZo4MFhpxoVa31=p7Am2LYnEPuYBV8aw@mail.gmail.com>
- <22776732-0698-c61b-78d9-70db7f1b907d@gmail.com> <CALMp9eQQ7SvDNy3iKSrRTn9QUR9h1M-tSnuYO0Y4_-+bgV72sg@mail.gmail.com>
- <bf7fc07f-d49c-1c73-9a31-03585e99ff09@gmail.com>
-In-Reply-To: <bf7fc07f-d49c-1c73-9a31-03585e99ff09@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 5 Jan 2022 14:51:44 -0800
-Message-ID: <CALMp9eQmO1zS9urH_B8DeoLp30P7Yxxp9qMwavjmoyt_BSC23A@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: X86: Emulate APERF/MPERF to report actual vCPU frequency
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S245498AbiAEXuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 18:50:05 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3FEC061245;
+        Wed,  5 Jan 2022 15:50:04 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2EEA01EC0409;
+        Thu,  6 Jan 2022 00:49:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1641426598;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=yh2HPjhLeSr8ETcMJz1jKaFAeC0HLCRpCRK2exZKb7A=;
+        b=T7rQ8/pTGTLLpgmVHQ6OnV/xoabedB8nMW6rkq/qq5eTJfT6rOAatO5CT+7XW8oKV+aiN5
+        MesceBAIVCXWiBZej3U7pz/2BmZ9fzlNHvy39Wq1kUHJPe7P2kUrDDWt5kUcRs4ixg/veR
+        VFomTwZ/EVb0Sq17zd0PQZMC5h9yOWM=
+Date:   Thu, 6 Jan 2022 00:50:00 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <likexu@tencent.com>,
-        Dongli Cao <caodongli@kingsoft.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "Thomas Gleixner (kernel-recipes.org)" <tglx@linutronix.de>,
-        "Borislav Petkov (kernel-recipes.org)" <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 24/40] x86/compressed/acpi: move EFI system table
+ lookup to helper
+Message-ID: <YdYuqFcFkcK1d+XP@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-25-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211210154332.11526-25-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 30, 2021 at 11:48 PM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 31/12/2021 9:29 am, Jim Mattson wrote:
+On Fri, Dec 10, 2021 at 09:43:16AM -0600, Brijesh Singh wrote:
+> +int efi_get_system_table(struct boot_params *boot_params, unsigned long *sys_tbl_pa,
+> +			 bool *is_efi_64)
 
-> > At sched-in:
-> > 1. Save host APERF/MPERF values from the MSRs.
-> > 2. Load the "current" guest APERF/MPERF values into the MSRs (if the
-> > vCPU configuration allows for unintercepted reads).
-> >
-> > At sched-out:
-> > 1. Calculate the guest APERF/MPERF deltas for use in step 3.
-> > 2. Save the "current" guest APERF/MPERF values.
-> > 3. "Restore" the host APERF/MPERF values, but add in the deltas from step 1.
-> >
-> > Without any writes to IA32_MPERF, I would expect these MSRs to be
-> > synchronized across all logical processors, and the proposal above
-> > would break that synchronization.
+Nah, that's doing two things in one function.
 
-I am learning more about IA32_APERF and IA32_MPERF this year. :-)
+The signature should be a lot simpler:
 
-My worry above is unfounded. These MSRs only increment in C0, so they
-are not likely to be synchronized.
+unsigned long efi_get_system_table(struct boot_params *bp)
 
-This also raises another issue with your original fast-path
-implementation: the host MSRs will continue to count while the guest
-is halted. However, the guest MSRs should not count while the guest is
-halted.
+returns 0 on failure, non-null on success and then it returns the
+physical address of the system table.
+
+> +{
+> +	unsigned long sys_tbl;
+> +	struct efi_info *ei;
+> +	bool efi_64;
+> +	char *sig;
+> +
+> +	if (!sys_tbl_pa || !is_efi_64)
+> +		return -EINVAL;
+> +
+
+This...
+
+> +	ei = &boot_params->efi_info;
+> +	sig = (char *)&ei->efi_loader_signature;
+> +
+> +	if (!strncmp(sig, EFI64_LOADER_SIGNATURE, 4)) {
+> +		efi_64 = true;
+> +	} else if (!strncmp(sig, EFI32_LOADER_SIGNATURE, 4)) {
+> +		efi_64 = false;
+> +	} else {
+> +		debug_putstr("Wrong EFI loader signature.\n");
+> +		return -EOPNOTSUPP;
+> +	}
+
+... up to here needs to be another function:
+
+enum get_efi_type(sig)
+
+where enum is { EFI64, EFI32, INVALID } or so.
+
+And you call this function at the call sites:
+
+	if (efi_get_type(sig) == INVALID)
+		error...
+
+	sys_tbl_pa = efi_get_system_table(bp);
+	if (!sys_tbl_pa)
+		error...
+
+
+Completely pseudo but you get the idea.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
