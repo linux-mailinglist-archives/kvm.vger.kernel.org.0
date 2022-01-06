@@ -2,104 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5DE348644A
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:21:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B36148644D
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:23:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238780AbiAFMVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 07:21:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56230 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238475AbiAFMVD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 07:21:03 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB473C061245;
-        Thu,  6 Jan 2022 04:21:03 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id 200so2400336pgg.3;
-        Thu, 06 Jan 2022 04:21:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=As/WjEKqZAy9F1nGpQ4wmkL2ydVFs9ke/kDtTsLl3ko=;
-        b=fgfMaPlTT/8Blrv/OqQ/yZSJfsN0vxrYUY9J2/BGcF8fbAVz0doYCXy/sDKxBDhGSJ
-         b1kk/JmEv3pW6qya4XIJ0eHfJAzvuRCNsf24LLSb+pVFJ4KoIrYtx5eNaO39a/HmB2yQ
-         NRKAMMX390p00lskO6FFLUVKoqLXjK9jId7zdIp8XQV4rWtq3VX512L+jAGfrbkiE2H7
-         UQA96Ezq22gYI1c7whHu/v52WCRJt/jhSRT335oElYFsoPZO70PQCv/tUW+2XsteLi8z
-         iDL51bqZeN3y5JhGDYqC5TNzDbzlCfv8pNKZiRcADZiM7e1NqNtaxnIPZwxZlv9fkefc
-         DoZQ==
+        id S238754AbiAFMXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 07:23:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36860 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238475AbiAFMXc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jan 2022 07:23:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641471812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DIfBxULOavolfufOQdNG/vzCAo1esWK0a3vka0Ajyjs=;
+        b=H6z8alnBOHpoSHFfpjx1TC22Hk0ABy2O491yPXJvmSTLHM7tRCwx0u4dVsi34KnjVmhs56
+        RxM5DSffdej3+CCMcVNJbq5G+XggkxN5X6HzFyyoI10FjFyPi5autprQ3jSujJEDiPeQXt
+        XG0s98pfWErjdHEbGq4JV2SH4pPAqxQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-55-Im1mPoBFPySi6wz1PvX2Qg-1; Thu, 06 Jan 2022 07:23:31 -0500
+X-MC-Unique: Im1mPoBFPySi6wz1PvX2Qg-1
+Received: by mail-wr1-f69.google.com with SMTP id a11-20020adffb8b000000b001a0b0f4afe9so1185654wrr.13
+        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 04:23:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=As/WjEKqZAy9F1nGpQ4wmkL2ydVFs9ke/kDtTsLl3ko=;
-        b=qrqBkgdJgxWabNyvyoVgHtwvCnb0XeZ5ADVfTNQHx1Fe6MBkYv7uhBxw3NFkNhBejm
-         3+/wom4ZynZpRK1caAqvhywav2P2gsOn/AfWgBE9+U2uIP7P030emQjNOcHJCNKHySYB
-         t6SCPnOTKa0mOu1vUd4+IJWeOlL24Ensj2l3LO3YumM+6oYO+YYqIulem2zL29LSfHTr
-         DPslC52mewmh+MJCyKQ4D+cLfrwwnQs1iFeiw20Rsnyl9HYFgpsGPlBlTfxMnvmAJG5r
-         Ctoip13zc74zWnEEx6yV8onerWEMNgHtJBSJOgqlFhCnqvmgSYAGAZmSwB0xA5b2yhOz
-         K/Yw==
-X-Gm-Message-State: AOAM532JWYQdPQSqL3M0uAeU4lp7W8MNIrXcGoPgUCyUE/7QBz3/e2a9
-        YMF2dfFPWXPivd7E+dUPwTlMNGH4R3oKAA==
-X-Google-Smtp-Source: ABdhPJwVewV3z8nurVP0GLH6N1Gf3aznKRES4C3kmjNaG8WzE/y43HvRgUrHdLmwP/0sx4lECsG8MQ==
-X-Received: by 2002:a63:6687:: with SMTP id a129mr51265949pgc.477.1641471662936;
-        Thu, 06 Jan 2022 04:21:02 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.111])
-        by smtp.googlemail.com with ESMTPSA id my5sm2859974pjb.5.2022.01.06.04.21.00
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Jan 2022 04:21:02 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Aili Yao <yaoaili@kingsoft.com>
-Subject: [PATCH v2] KVM: LAPIC: Enable timer posted-interrupt when mwait/hlt is advertised
-Date:   Thu,  6 Jan 2022 04:20:12 -0800
-Message-Id: <1641471612-34483-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DIfBxULOavolfufOQdNG/vzCAo1esWK0a3vka0Ajyjs=;
+        b=46nYsdUKY5kSovpvOP1uXRUrJw+vPgUkABxuDEXpC9PZqb8RPxyNsXl9hU3Eu5byf1
+         1Im0QaEda8vx1TIIAlYziE4bITfJYFd+h3gk9e61EoqhFNVT8JCcaHWrnXMCXVMWure2
+         SUewcOXFS1tmixUzUuX2eQTdbfJ1GcZ4DzCdHnwcDNrIwE5k5ezF/T4VvTVDS6yqheQS
+         q2g2mnr7ielIP0NVseyZ8sac4ap7z7vMTBD1kMl34DKtjrVQ9jr8BUu18j9pWU3Z0sdX
+         03Mjgbom6wQfkiyhbXvoyANRmT+yTYGLPhU7kZXGX52s+WgPA/63QceVWl5RyfdHzfX9
+         DGww==
+X-Gm-Message-State: AOAM533X3IeTveQ4t7QcAPCIEHabRB4Nmo3zBdY8BjXrkA5pzrxv2r9Y
+        EWgIZ/qPH9RWiobgVmh+0jHazm4D/vW9jwDnFZX8NKwiU692AqNrJJVDkB7hcVN5hafclVfIRIi
+        JqpJuKaHpUyti
+X-Received: by 2002:a05:6000:3c8:: with SMTP id b8mr5369681wrg.152.1641471809678;
+        Thu, 06 Jan 2022 04:23:29 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxCKaZ3Vwd4RKCtyVMKKYHTk+aalh3XwUj1HV3KC0ncZK7QR6PvJ9NCHxybq+bIctJq+mNlbw==
+X-Received: by 2002:a05:6000:3c8:: with SMTP id b8mr5369670wrg.152.1641471809449;
+        Thu, 06 Jan 2022 04:23:29 -0800 (PST)
+Received: from redhat.com ([2a03:c5c0:207e:991b:6857:5652:b903:a63b])
+        by smtp.gmail.com with ESMTPSA id u15sm752186wmm.37.2022.01.06.04.23.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jan 2022 04:23:28 -0800 (PST)
+Date:   Thu, 6 Jan 2022 07:23:25 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Cai Huoqing <caihuoqing@baidu.com>
+Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH] vhost: add vhost_test to Kconfig & Makefile
+Message-ID: <20220106072056-mutt-send-email-mst@kernel.org>
+References: <20210616120734.1050-1-caihuoqing@baidu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210616120734.1050-1-caihuoqing@baidu.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, Jun 16, 2021 at 08:07:34PM +0800, Cai Huoqing wrote:
+> When running vhost test, make it easier to config
+> 
+> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
 
-As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via posted interrupt) 
-mentioned that the host admin should well tune the guest setup, so that vCPUs 
-are placed on isolated pCPUs, and with several pCPUs surplus for *busy* housekeeping.
-It is better to disable mwait/hlt/pause vmexits to keep the vCPUs in non-root 
-mode. However, we may isolate pCPUs for other purpose like DPDK or we can make 
-some guests isolated and others not, we may lose vmx preemption timer/timer fastpath 
-due to not well tuned setup, and the checking in kvm_can_post_timer_interrupt() 
-is not enough. Let's guarantee mwait/hlt is advertised before enabling posted-interrupt 
-interrupt. vmx preemption timer/timer fastpath can continue to work if both of them 
-are not advertised.
+I'd stick this under "Kernel Testing and Coverage"
+or something like this. The point is we don't want this module
+is release kernels.
 
-Reported-by: Aili Yao <yaoaili@kingsoft.com>
-Cc: Aili Yao <yaoaili@kingsoft.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v1 -> v2:
- * also check kvm_hlt_in_guest since sometime mwait is disabled on host
 
- arch/x86/kvm/lapic.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index f206fc3..fdb7c81 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -113,7 +113,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
- 
- static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
- {
--	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-+	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-+		(kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
- }
- 
- bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
--- 
-2.7.4
+> ---
+>  drivers/vhost/Kconfig  | 12 ++++++++++++
+>  drivers/vhost/Makefile |  3 +++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> index 587fbae06182..c93c12843a6f 100644
+> --- a/drivers/vhost/Kconfig
+> +++ b/drivers/vhost/Kconfig
+> @@ -61,6 +61,18 @@ config VHOST_VSOCK
+>         To compile this driver as a module, choose M here: the module will be called
+>         vhost_vsock.
+>  
+> +config VHOST_TEST
+> +       tristate "vhost virtio-test driver"
+> +       depends on EVENTFD
+> +       select VHOST
+> +       default n
+> +       help
+> +       This kernel module can be loaded in the host kernel to test vhost function
+> +       with tools/virtio-test.
+> +
+> +       To compile this driver as a module, choose M here: the module will be called
+> +       vhost_test.
+> +
+>  config VHOST_VDPA
+>         tristate "Vhost driver for vDPA-based backend"
+>         depends on EVENTFD
+> diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+> index f3e1897cce85..cf31c1f2652d 100644
+> --- a/drivers/vhost/Makefile
+> +++ b/drivers/vhost/Makefile
+> @@ -8,6 +8,9 @@ vhost_scsi-y := scsi.o
+>  obj-$(CONFIG_VHOST_VSOCK) += vhost_vsock.o
+>  vhost_vsock-y := vsock.o
+>  
+> +obj-$(CONFIG_VHOST_TEST) += vhost_test.o
+> +vhost_test-y := test.o
+> +
+>  obj-$(CONFIG_VHOST_RING) += vringh.o
+>  
+>  obj-$(CONFIG_VHOST_VDPA) += vhost_vdpa.o
+> -- 
+> 2.22.0
 
