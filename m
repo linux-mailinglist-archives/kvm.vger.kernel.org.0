@@ -2,159 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A741486397
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 12:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B544486427
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:13:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238368AbiAFLSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 06:18:32 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:59408 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbiAFLSb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 06:18:31 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B39ECB82059
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 11:18:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69A14C36AED
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 11:18:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641467909;
-        bh=TDdfz9KexiKP5nEqyXKhIuSwSP13R6TdN3pWD0qnMAg=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=bPx+H6mTebzhBil7x/dupSQeHU1VZbJqDiSMqo5Djom+9IzMo5TKj5vRgEb3TiVCE
-         7VtyKVq4iZWBcyRkkafyjW+GrdCJ9Jv+PA9A41NyvHzl8qVVqaENowsRuXq5FURtup
-         hUJ3uQQVE36lamXXzdLAiI4eOa9mAinUX5fRMx2ZuLUBwjkTkKcBC1nsg8PfveaFEP
-         ZKKCipdIjjoTrjS3+ElTUK95qYZK1goaJwzth+Dm2VYyQ6J1x9Kwzj/bBSA9jLjB79
-         nl4wQVePk3KALZZLwr7d8tTo7tfU+BCgKeJmgCG2XpNTMxhZwuZzTyEms3alTpzn0j
-         jkBxEHrhpJJLA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 4DA18CAC6E4; Thu,  6 Jan 2022 11:18:29 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 215459] VM freezes starting with kernel 5.15
-Date:   Thu, 06 Jan 2022 11:18:29 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: mlevitsk@redhat.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215459-28872-stH4AXhLL2@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215459-28872@https.bugzilla.kernel.org/>
-References: <bug-215459-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        id S238347AbiAFMNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 07:13:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232358AbiAFMNn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 07:13:43 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AE8C061245;
+        Thu,  6 Jan 2022 04:13:42 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id i30so2418320pgl.0;
+        Thu, 06 Jan 2022 04:13:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=n9CcsNCWBTa4xdrApzau9Q0lOnY7SOIkREDarH9emtg=;
+        b=oTLMa6RROOhPwA0ore16aFe09DXejIGtJ6t4rvBKx+1UdbxQ/kCyYi7G7YYp77GsAD
+         xC1g58gdgkyEk25f5JJs+bc0Q+a/PtSTZeDAsn54Ej5jBu/Hc2lHmgp9Ln2To0NG4LH/
+         2RVe50Mjujt4wKy7zdBh2TOjlybIjjz1UFiu0PB+OU1qsvvk9r8NeFQM0HZmL+ActfcF
+         gZpEf+ouYMLLxOKl/p8EV8urUKmWkWOUlGZOoDg+xZidc+5ASPyaOEYOTZihfrJuXs/v
+         Daz11b67MLZxquYfDKR/z1lfgN9lNarmkh+CHg5UoyxgaaDF4s5RJumaa0EmME+7HusJ
+         Gtog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=n9CcsNCWBTa4xdrApzau9Q0lOnY7SOIkREDarH9emtg=;
+        b=XkaP2bSII6qUpb+hsjPwwepIj6MaherIPm1HmeniPrxHb9TkD2MexUgSVDdyGjMMlI
+         JAglj4k7zICqorx06pfmB0DJRm1+jQYAa4nl9GfHpvPs0z8K/z3hjms7xNe6PBoZhSth
+         Jp6p1JBh24ofBXIQ36JZKAd8M8eNGXJgMTfcN6hvI9Pd/KDf/JOeUG5K7rXYmXI06wEA
+         jIFg9a46vWB7WcNxTUSNvDseVkeEwHuDTddh/JJZxBM0xpeuhvv8VbZXyc6Y1cfdBnU2
+         MJJO+jvAzZTfXX0MqmRfKwiiQsekcRl/nsth+wRXlAxBA8JTE+fM7CIEpDKTNfPI3lm2
+         k7GA==
+X-Gm-Message-State: AOAM531jUS1vXc4CKWbFimkUpwNi5KQaGixtaSZoM8xSrOCKZ87iKyGl
+        GuG/CwViOu54p5Jpwv2AzTyeCleme8mqsA==
+X-Google-Smtp-Source: ABdhPJxE6ewu2Qs+deoXVSNGSXzMb9lf4oRl9MEqGqEmzwBFMfHSxO+XB16ozHocCUNXGX4CAOxW2w==
+X-Received: by 2002:a05:6a00:2286:b0:4bb:3358:7ea0 with SMTP id f6-20020a056a00228600b004bb33587ea0mr59719126pfe.35.1641471222212;
+        Thu, 06 Jan 2022 04:13:42 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.112])
+        by smtp.googlemail.com with ESMTPSA id b19sm1952983pgk.44.2022.01.06.04.13.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jan 2022 04:13:41 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: VMX: Dont' deliver posted IRQ if vCPU == this vCPU and vCPU is IN_GUEST_MODE
+Date:   Thu,  6 Jan 2022 04:12:51 -0800
+Message-Id: <1641471171-34232-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215459
+From: Wanpeng Li <wanpengli@tencent.com>
 
---- Comment #1 from mlevitsk@redhat.com ---
-On Thu, 2022-01-06 at 11:03 +0000, bugzilla-daemon@bugzilla.kernel.org wrot=
-e:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D215459
->=20
->             Bug ID: 215459
->            Summary: VM freezes starting with kernel 5.15
->            Product: Virtualization
->            Version: unspecified
->     Kernel Version: 5.15.*
->           Hardware: Intel
->                 OS: Linux
->               Tree: Mainline
->             Status: NEW
->           Severity: normal
->           Priority: P1
->          Component: kvm
->           Assignee: virtualization_kvm@kernel-bugs.osdl.org
->           Reporter: th3voic3@mailbox.org
->         Regression: No
->=20
-> Created attachment 300234
->   --> https://bugzilla.kernel.org/attachment.cgi?id=3D300234&action=3Dedit
-> qemu.hook and libvirt xml
->=20
-> Hi,
->=20
-> starting with kernel 5.15 I'm experiencing freezes in my VFIO Windows 10 =
-VM.
-> Downgrading to 5.14.16 fixes the issue.
->=20
-> I can't find any error messages in dmesg when this happens and comparing =
-the
-> dmesg output between 5.14.16 and 5.15.7 didn't show any differences.
->=20
->=20
-> Additional info:
-> * 5.15.x
-> * I'm attaching my libvirt config and my /etc/libvirt/hooks/qemu
-> * My specs are:
-> ** i7-10700k
-> ** ASUS z490-A PRIME Motherboard
-> ** 64 GB RAM
-> ** Passthrough Card: NVIDIA 2070 Super
-> ** Host is using the integrated Graphics chip
->=20
-> Steps to reproduce:
-> Boot any 5.15 kernel and start the VM and after some time (no specific
-> trigger
-> as far as I can see) the VM freezes.
->=20
-> After some testing the solution seems to be:
->=20
-> I read about this:
-> 20210713142023.106183-9-mlevitsk@redhat.com/#24319635">
->
-> https://patchwork.kernel.org/project/kvm/patch/20210713142023.106183-9-ml=
-evitsk@redhat.com/#24319635
->=20
-> And so I checked
-> cat /sys/module/kvm_intel/parameters/enable_apicv
->=20
-> which returns Y to me by default.
->=20
-> So I added
-> options kvm_intel enable_apicv=3D0
-> to /etc/modprobe.d/kvm.conf
->=20
->=20
-> cat /sys/module/kvm_intel/parameters/enable_apicv
-> now returns N
->=20
-> So far I haven't encountered any freezes.
->=20
-> The confusing part is that APICv shouldn't be available with my CPU
+Commit fdba608f15e2 (KVM: VMX: Wake vCPU when delivering posted IRQ even 
+if vCPU == this vCPU) fixes wakeup event is missing when it is not from 
+synchronous kvm context by dropping vcpu == running_vcpu checking completely.
+However, it will break the original goal to optimise timer fastpath, let's 
+move the checking under vCPU is IN_GUEST_MODE to restore the performance.
 
-I guess you are lucky and your cpu has it?=20
-Does /sys/module/kvm_intel/parameters/enable_apicv show Y on 5.14.16 as wel=
-l?
+Suggested-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I know that there were few fixes in regard to posted interrupts on intel,
-which might explain the problem.
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index fe06b02..71e8afc 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3932,7 +3932,8 @@ static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+ 		 * which has no effect is safe here.
+ 		 */
+ 
+-		apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
++		if (vcpu != kvm_get_running_vcpu())
++			apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+ 		return;
+ 	}
+ #endif
+-- 
+2.7.4
 
-You might want to try 5.16 kernel when it released.
-
-Best regards,
-        Maxim Levitsky
-
->
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
