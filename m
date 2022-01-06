@@ -2,107 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7B50485E63
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:01:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2D16485E8B
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:21:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344560AbiAFCBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 21:01:44 -0500
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:45746 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344518AbiAFCBo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 21:01:44 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0V13mZFO_1641434499;
-Received: from 192.168.2.97(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0V13mZFO_1641434499)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 06 Jan 2022 10:01:40 +0800
-Message-ID: <dc8f2508-35ac-0dee-2465-4b5a8e3879ca@linux.alibaba.com>
-Date:   Thu, 6 Jan 2022 10:01:39 +0800
+        id S1344682AbiAFCVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 21:21:53 -0500
+Received: from mga18.intel.com ([134.134.136.126]:45635 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231945AbiAFCVu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 21:21:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641435710; x=1672971710;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=exYGrLYHGT8TzV5cnLFjwED9oszGYl1Sy9IWfWRq36I=;
+  b=cuwTyMkeJolBJHmcVUEKxaW0eLo+70SwxNCTRo71qdu6RO2Qi0BSy9O0
+   ugXDlsncJ1EyHpDcVR7nPg/dEE/aTBOmdT/VLTe120oF9U/b2AMsrkSG/
+   M/NFd/detzUax6hMhgj+3VCnnb/snulDToiBEL+CAHXaCds0fq/4aQzr5
+   ZIFKGtPZ9dY0mpLjvFnJXCea6dD3ljF9tiEkmBl23yJBn69EpSVxgevv6
+   FAADQ7ZOm+MlHTmqDSLgISxoPKzpLrCfud2JxTsmaHHipjLW0nvLZLs3v
+   D2JmHzvR8a15K6mC/Fn8DopYKukqnNZmiUAQKWExGxNCQBI0H56agJXf1
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229389157"
+X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
+   d="scan'208";a="229389157"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:21:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
+   d="scan'208";a="526794259"
+Received: from allen-box.sh.intel.com ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:21:42 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Will Deacon <will@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v1 0/8] Scrap iommu_attach/detach_group() interfaces
+Date:   Thu,  6 Jan 2022 10:20:45 +0800
+Message-Id: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.1
-Subject: Re: [RFC PATCH 5/6] KVM: X86: Alloc pae_root shadow page
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
-References: <20211210092508.7185-1-jiangshanlai@gmail.com>
- <20211210092508.7185-6-jiangshanlai@gmail.com> <YdTCKoTgI5IgOvln@google.com>
- <CAJhGHyAOyR6yGdyxsKydt_+HboGjxc-psbbSCqsrBo4WgUgQsQ@mail.gmail.com>
- <YdXLNEwCY8cqV7KS@google.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-In-Reply-To: <YdXLNEwCY8cqV7KS@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi folks,
 
+The iommu_attach_device() added first by commit <fc2100eb4d096> ("add
+frontend implementation for the IOMMU API") in 2008. At that time,
+there was no concept of iommu group yet.
 
-On 2022/1/6 00:45, Sean Christopherson wrote:
-> On Wed, Jan 05, 2022, Lai Jiangshan wrote:
->> On Wed, Jan 5, 2022 at 5:54 AM Sean Christopherson <seanjc@google.com> wrote:
->>
->>>>
->>>> default_pae_pdpte is needed because the cpu expect PAE pdptes are
->>>> present when VMenter.
->>>
->>> That's incorrect.  Neither Intel nor AMD require PDPTEs to be present.  Not present
->>> is perfectly ok, present with reserved bits is what's not allowed.
->>>
->>> Intel SDM:
->>>    A VM entry that checks the validity of the PDPTEs uses the same checks that are
->>>    used when CR3 is loaded with MOV to CR3 when PAE paging is in use[7].  If MOV to CR3
->>>    would cause a general-protection exception due to the PDPTEs that would be loaded
->>>    (e.g., because a reserved bit is set), the VM entry fails.
->>>
->>>    7. This implies that (1) bits 11:9 in each PDPTE are ignored; and (2) if bit 0
->>>       (present) is clear in one of the PDPTEs, bits 63:1 of that PDPTE are ignored.
->>
->> But in practice, the VM entry fails if the present bit is not set in the
->> PDPTE for the linear address being accessed (when EPT enabled at least).  The
->> host kvm complains and dumps the vmcs state.
-> 
-> That doesn't make any sense.  If EPT is enabled, KVM should never use a pae_root.
-> The vmcs.GUEST_PDPTRn fields are in play, but those shouldn't derive from KVM's
-> shadow page tables.
+The iommu group was added by commit <d72e31c937462> ("iommu: IOMMU
+Groups") four years later in 2012. The iommu_attach_group() was added
+at the same time.
 
-Oh, I wrote the negative what I want to say again when I try to emphasis
-something after I wrote a sentence and modified it several times.
+Then, people realized that iommu_attach_device() allowed different
+device in a same group to attach different domain. This was not in
+line with the concept of iommu group. The commit <426a273834eae>
+("iommu: Limit iommu_attach/detach_device to device with their own
+group") fixed this problem in 2015.
 
-I wanted to mean "EPT not enabled" when vmx.
+As the result, we have two coexisting interfaces for device drivers
+to do the same thing. But neither is perfect:
 
-The VM entry fails when the guest is in very early stage when booting which
-might be still in real mode.
+  - iommu_attach_device() only works for singleton group.
+  - iommu_attach_group() asks the device drivers to handle iommu group
+    related staff which is beyond the role of a device driver.
 
-VMEXIT: intr_info=00000000 errorcode=0000000 ilen=00000000
-reason=80000021 qualification=0000000000000002
+Considering from the perspective of a device driver, its motivation is
+very simple: "I want to manage my own I/O address space." Inspired by
+the discussion [1], we consider heading in this direction:
 
-IDTVectoring: info=00000000 errorcode=00000000
+Make the iommu_attach_device() the only and generic interface for the
+device drivers to use their own private domain (I/O address space)
+and replace all iommu_attach_group() uses with iommu_attach_device()
+and deprecate the former.
 
-> 
-> And I doubt there is a VMX ucode bug at play, as KVM currently uses '0' in its
-> shadow page tables for not-present PDPTEs.
-> 
-> If you can post/provide the patches that lead to VM-Fail, I'd be happy to help
-> debug.
+This is a follow-up series of this discussion: 
+[1] https://lore.kernel.org/linux-iommu/b4405a5e-c4cc-f44a-ab43-8cb62b888565@linux.intel.com/
 
-If you can try this patchset, you can just set the default_pae_pdpte to 0 to test
-it.
+It depends on the series of "Fix BUG_ON in vfio_iommu_group_notifier()".
+The latest version was posted here:
+https://lore.kernel.org/linux-iommu/20220104015644.2294354-1-baolu.lu@linux.intel.com/
 
-If you can't try this patchset, the mmu->pae_root can be possible to be modified
-to test it.
+and the whole patches are available on github:
+https://github.com/LuBaolu/intel-iommu/commits/iommu-domain-attach-refactor-v1
 
-I guess the vmx fails to translate %rip when VMentry in this case.
+Best regards,
+baolu
 
+Jason Gunthorpe (1):
+  drm/tegra: Use iommu_attach/detatch_device()
 
+Lu Baolu (7):
+  iommu: Add iommu_group_replace_domain()
+  vfio/type1: Use iommu_group_replace_domain()
+  iommu: Extend iommu_at[de]tach_device() for multi-device groups
+  iommu/amd: Use iommu_attach/detach_device()
+  gpu/host1x: Use iommu_attach/detach_device()
+  media: staging: media: tegra-vde: Use iommu_attach/detach_device()
+  iommu: Remove iommu_attach/detach_group()
+
+ include/linux/iommu.h                   |  25 ++---
+ drivers/gpu/drm/tegra/dc.c              |   1 +
+ drivers/gpu/drm/tegra/drm.c             |  47 +++-----
+ drivers/gpu/drm/tegra/gr2d.c            |   1 +
+ drivers/gpu/drm/tegra/gr3d.c            |   1 +
+ drivers/gpu/drm/tegra/vic.c             |   1 +
+ drivers/gpu/host1x/dev.c                |   4 +-
+ drivers/iommu/amd/iommu_v2.c            |   4 +-
+ drivers/iommu/iommu.c                   | 136 +++++++++++++++++-------
+ drivers/staging/media/tegra-vde/iommu.c |   6 +-
+ drivers/vfio/vfio_iommu_type1.c         |  22 ++--
+ 11 files changed, 146 insertions(+), 102 deletions(-)
+
+-- 
+2.25.1
 
