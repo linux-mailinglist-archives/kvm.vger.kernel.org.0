@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCDC8485D90
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 01:49:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BEAB485DA2
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 01:51:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344019AbiAFAtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 19:49:55 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:36832 "EHLO
+        id S1344000AbiAFAvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 19:51:23 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:53980 "EHLO
         mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344020AbiAFAsL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 19:48:11 -0500
+        by vger.kernel.org with ESMTP id S1344262AbiAFAtO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 19:49:14 -0500
 Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N4Pe3011251;
-        Thu, 6 Jan 2022 00:47:43 GMT
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N4Owh011234;
+        Thu, 6 Jan 2022 00:47:46 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2021-07-09; bh=cCbrdYZgZ6UluuxcuP5hy0i/kaxaqvMKbPFuo+vDN5k=;
- b=p7Ltb1O0oB6PPqBa5shhf4mxrHyj8Etgmh5mi18+mutwzaPOrG5/144ONY2MOSS1Yav0
- JIx5xrQeQ3nuVtaPLK8sZsdgFArtQkW17yjVj8HTFbfgpev9ilK+OPyMBGf/VatWbCBZ
- IU60K3qDBuOPj2q8y4xGHx4hkifzof6lZiy+FSob7bKYm6gEwIYXehikHgqgi9iEja/1
- JLRECHvf+Fw7Q6hJSvM32Jbb13UATuhVEam3h3Wb2r//gVOGf9tdjuF0MoAqysnE7y5B
- EaC3g01h1u/39eaIMDHMZQ4Y2L4PjbFSaiF5ig1dTbunF6aEZdZk7LD+MGhVIe97qVxo vQ== 
+ s=corp-2021-07-09; bh=ZRSeNxc7Bw6HLtNJdTm0NAGeJ5M3OC0ZzhTZqShHmU4=;
+ b=UTQacROCJf8Zrovm/SVTe6QWEAECNxcoaL5HGANRRoEIuZdrLFU0cbWhqiLfVFHcnKr9
+ IYHXF9HN2JjDmN/SGRhajex0lf3vDotYyZqaGeSfvssnIEtdJlqRvFmn6/XslP3b83Xu
+ zqJV92JJjgQESv+JwMDEBP52rzLwpBAaXD+sZo5UxdnvCn61/wgt+RubRtBbLIUJn/TE
+ 0yKUePT3Fnb2hOKtqugd+VRdRjQmFLviNmZQwfbu8PuCohO4obs5NnejqpBEEISytuPV
+ UrOXzgJIXQLx5vuX+z3xJoGvgGD1U6/hR6xL8Mqw+tJT4stOfOmgvFcca+B9J4E23jLF lQ== 
 Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpdg446-1
+        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpdg447-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:43 +0000
+        Thu, 06 Jan 2022 00:47:46 +0000
 Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060VfEo076239;
-        Thu, 6 Jan 2022 00:47:42 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2049.outbound.protection.outlook.com [104.47.57.49])
-        by aserp3020.oracle.com with ESMTP id 3ddmqa3deq-1
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060Vg5W076301;
+        Thu, 6 Jan 2022 00:47:45 GMT
+Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2046.outbound.protection.outlook.com [104.47.57.46])
+        by aserp3020.oracle.com with ESMTP id 3ddmqa3dg8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:42 +0000
+        Thu, 06 Jan 2022 00:47:45 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kzwLIhKo9U1psrS64MYjNuIMfLphsihky8sOkH73eeZNDV0ekSkJUtEryHsSsPB5/Oqt3a6uwR12m2GVM6420546la9EHnoJrl+OFnxlaZruEl98aTOs3CCTxH2grm7vLYmW2D/UuHobab22lT06679yp5CIjs83r8Qsv6jEiW7rOSzGOx5L2Wm5/pR688r67HiZeW4aZlwVNbLGO9SFE01Ru0mOvWRAcujo6WFFSTA+S8rRyhIZXwqdZ77sv/DIeoqMkQTKpdAdCOg6QOgnBFaBNIm4ysWckslxeu6cD7T0bS+dDO17Kc3InJzo5TseR4an5vJOJeBtQGXM94i5HQ==
+ b=Lel81XyYCcCv3s1nDYeyO04Je4S89dq1ut4jcPLk5uaQ1yIe8dbZfDR+VbxkiFq1NK9xOeSq+N3FnPVZ45uyora9GENXUGWYQFWUwtwEWNMHuDP/sV7pQuYJUnN6fGlHxRpPuB3oCv7P5Z3o0ybDoV4MJfxDX7HTRWtTEsu+StAARRDN1yteRSP2AECEDrINSWBvDcAVsPAa6rG6vO/3TyOlnFnAMyeO7qfxzNWgWYlmXc5Ov3nCkbCNYRhbSNqdEBqvVeJlmrZe3/o9K7yeftmFTceEl3QECGjQpJ8XZWxpAVJQ19T4rq78LKaeu2cnZShCkLc3lXAcHqgG7oxPew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cCbrdYZgZ6UluuxcuP5hy0i/kaxaqvMKbPFuo+vDN5k=;
- b=bor7OVN/TjyBd+gepoj3YafyU/7qT1Dshl58zS71L3P1Pz3U52H74kI2D8CTtVHqqOPdXDoSi536Yaj7XPjTSADjz2SuMsuhD67UOi9aZdleu6DDnVFSPKDt6HUyl3OrvY45w/2OzquTB7l5byqTESlhErBHhBKuz9D710hZ/GiYHWs1OGc7TwunMPpuOEDKf0RO3E4U22kak6KrKUdAIVAFmw5QFycfysAne9xYgfnZbdOrdobeVraOb3pAJIJrt7hNr850snS4CkY0bh41E/9+SIrrUSMED4HO89FJIgEXi3pD2Ot26Q6P4evuQ7ZiRQP9x5kG9M8Yrhii39RKgw==
+ bh=ZRSeNxc7Bw6HLtNJdTm0NAGeJ5M3OC0ZzhTZqShHmU4=;
+ b=bptjIJnsx3xs5pmUySeuQIKFws9SLz02e4evth0KG6F4yS8iRGd+yB9/4mUyVur4yHVvDP9m0uPGZbpN43IBVhc6T05DU0WrGrpNSrf0opGLj7zxA3LU8WQUCVrklknH80VVUgCfelT1qgZDl48yklf6t4Ridf6x89Z8izhikmlzZ5tJ/oszzhfa0ek/qOprhPZGzc7DaZy790Ddeo3RQStmJ4RiGYJuRLE4fPPoZppRuH8Z6S/PdV5ylA4Xx/fAPtQyJP9hUwg6WOoyb8286L0uROwzGfTnGqRRZ5SgyIlcCSNJFptZDbY3193djWWv2U3/Hl7DjufCa1FSlgaJfg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cCbrdYZgZ6UluuxcuP5hy0i/kaxaqvMKbPFuo+vDN5k=;
- b=RkEhl2uTPAokylOxomREwDP+QdAfnk/g29IEPKnaKKRMVIz/UOG0JKR7xJ1pDZPo7Vy0L2E5XP33dZhGSlICcwdTSp+OH9QAByTPrq77NKD1NDA2mxdxMe8OtOx6KRnBB1kS4uSc9L7iSwHB8i8dSwp+CuThi1Q49MHg5HmFyIs=
+ bh=ZRSeNxc7Bw6HLtNJdTm0NAGeJ5M3OC0ZzhTZqShHmU4=;
+ b=f8lqgBR/g/9xz1jOH9LdTWm1ZUVGIGFJMD4dCKQp+8TYfanTdYEWY67WL/+3hGUvDMi8HEka42XHFXBF+1wpGZaegPxchB0xOYC5fE8BsLKJAw3+C2MoSoaYMnmwBBwFufpRYYJSFBjzzPASiov7rQQef5Gwo3nkrGIsIowAlgs=
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com (2603:10b6:510:126::18)
  by PH0PR10MB4422.namprd10.prod.outlook.com (2603:10b6:510:38::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Thu, 6 Jan
- 2022 00:47:40 +0000
+ 2022 00:47:43 +0000
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3]) by PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3%9]) with mapi id 15.20.4867.009; Thu, 6 Jan 2022
- 00:47:40 +0000
+ 00:47:43 +0000
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Alexander Duyck <alexanderduyck@fb.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -83,9 +83,9 @@ To:     Alexander Duyck <alexanderduyck@fb.com>,
 Cc:     linux-mm@kvack.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [RFC 10/16] padata: Helpers should respect main thread's CPU affinity
-Date:   Wed,  5 Jan 2022 19:46:50 -0500
-Message-Id: <20220106004656.126790-11-daniel.m.jordan@oracle.com>
+Subject: [RFC 11/16] padata: Cap helpers started to online CPUs
+Date:   Wed,  5 Jan 2022 19:46:51 -0500
+Message-Id: <20220106004656.126790-12-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
@@ -96,104 +96,150 @@ X-ClientProxiedBy: MN2PR20CA0019.namprd20.prod.outlook.com
  (2603:10b6:510:126::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 832d7028-1e3d-4ef8-dd04-08d9d0ae247e
+X-MS-Office365-Filtering-Correlation-Id: ad652e27-55d4-4bc4-4d08-08d9d0ae261d
 X-MS-TrafficTypeDiagnostic: PH0PR10MB4422:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR10MB44229525E40698B4E7FAB7AFD94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1923;
+X-Microsoft-Antispam-PRVS: <PH0PR10MB4422C971C676DDA55CEF7A2AD94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: e+5k+nIwZLDyOARby2mW1NAU36kRWV/XSgMA1QiCbdpRSmQYzf7TrZDZ6qn1i/aptkxV/bnEAE59dYIROD967edl3wO2EwXymMnnz7dpcn3HFAtGJRXHDVr72vsbu2eldfwGBS72EPospv1K6CxI4O5lMyVQmzd+Y9mPWZk2zGugdHCDKXizEbGPY9A8rm+QGG1PvEnGJViHZ5c7K1wZE/NjNoc2mcRibfcZ6hCwrfS52TAzfSGjM+/lwnKCR3AQQpQYapbK7plWAmajHDEhO0qDIbyl41TdcdcvgMESEYdWuzbwAsVWwcb8gy/z+0MBMcgdp9xOWL1VMCEtO2XcWIhSiK2AVeG1vuCsFrh6B04c8mhVbWp8hWLvF/8iePcF536iypWaEUbWv70pBv2JI+cqwlK7ARF6On19WJ0zXC+O6pJKKJWbaDfXXM5MjfhBnHDVj3KRtcqduP4nZnRpVK4c0xjk75eo64x+/9dXls4hnPqUbXxS51PJ+fxNv2sGCYuFlH3w11RTFSUhpqtmsaEjQbSua562xVXMerzR7rhGEca47TKHehWT0FfoAhWiVKHhlP8b/4B6hDlGmFLOPinNlr2jRQb7iuu4jHETbIHIuqXROgezBOfgweNk8hy8LUrbI3ZYDBC8rsg+T5IqGbqMyVSj588s5ksTfk5Kr0bBHYtjcBazyggvmc7h2wUyulSCv3cZiRiqdlYJCi7IRswoXNobM1Lkcq/qU2G4MIE=
+X-Microsoft-Antispam-Message-Info: 33+TMqCEn0u4jovHvHlDynU6+A58o9pjgmRvBgn+i+pkdT9hCS8cHSBo9fpUggdKHfBg4/LkZK8lXwue8WTwM7ijkpOoYU1M53C+uWy28UFUPiCGQBnKWI5lRhxe9Yj2b2+60heN9v7Zv8p2qy1IL0Ot8HMH26igssiTBSq4Hl/1eX2XAgalitjpfMpxiAi0EbrT5dHNVAIzhxivzxuSeGbB/v2bWbOCKDlL+A2e/KHkFLnf3Pl2/EpmAs54zYW4389s/mMr5WaAxFaLiSaKoRCi4E52CxVcYO9XtQtdW9ffYBYontMd4jwtfnAFqgG47U8WTruAvaMnt0Ycgu8kwukt+c5LQqfrzYufrIAdBG8efQFDzpQUtWXcpPiIEbAB8xJHzYzu81ou43kzxXW40U+qVmNCU24O7rEjatClRhTgYjXko6SjuB8yo0J3bC3P1ZMVk3DqPt7dy6xgn4xpFMrrv/62JRVUVtPbZ68zEcYDLV6GSn7g7P+qaL/+NNrGaX3/iu4ds18TlYEw/7aNnYk+bnuSeQu/SRsvJJbu+f01/TGwaCwDqmbvNHAipdn34gJsZD2A/BunSvB54eGPj0HzNU1NR6gAwaVTmN6ckdX6I+mf1UGK6dnlAnm9Rw+eOo3FGRI3b6A0+Cwzwve7N1SujSNVex3XI2/TYTGEc+2DsPr1idHgfFpQSwF8m8ahGhKAyvT5ktEj/SORivff78kXyx9vXszRAI7looLgWVg=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(38100700002)(5660300002)(38350700002)(6666004)(83380400001)(508600001)(66946007)(66476007)(66556008)(26005)(52116002)(186003)(6506007)(7416002)(8676002)(110136005)(8936002)(921005)(1076003)(6486002)(2616005)(36756003)(86362001)(103116003)(107886003)(6512007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NRExe3wAwRz+UsnBYwurA8xtyw+EH+tQVmtmCsHkamACQi5oF10T2vwW3GhL?=
- =?us-ascii?Q?wP4EKLRcTR/vIZ1VBJIoMyhvhDi24tJtRikwuSEqYlQzwXTRe0yVQ96kkUnv?=
- =?us-ascii?Q?pLpLRFAwuc8RggV/WkOo0wiaz176Trvm/jPwmx8VHyFsKD39YXt0GWPqomMU?=
- =?us-ascii?Q?Ew9uiW5W9ZamBOXD+Pp06tAuXF5LSMaKrq/HcSrZV6SEqzdYhKyDOjMs0JYQ?=
- =?us-ascii?Q?ndaJ8jqUQxQgjOWECdxBsVO4pkm5WcR5nMVZLfu+FU7Novv75Kan/5ZRdOHS?=
- =?us-ascii?Q?z9NVHAlr7X7jRCygLrcDz91lYZNhl8i57/pkDSj/MUZtPiq3lIJ2mqXOmQp5?=
- =?us-ascii?Q?VbmYEsqB0yPYbaQNT6Ub2K8t+0cAFgnxmiKJ4FjzzJmuawbptKqnDC8rTrxV?=
- =?us-ascii?Q?ucRzcZ6krUAl31iLS2MhwNJRCQKWJVeBVQ5fdAFFCAqo7DMN/96v0fFRmNya?=
- =?us-ascii?Q?LMkchs4I7ZwPTTtb3CSJeskVKcXa5uTI9AFT7W8pEfaafLR5rDAJiRCG0B3s?=
- =?us-ascii?Q?UCTXL1ynRSJ4p0BdoCy6f0QysNzxf8vqKZOhk+Ag4+IFifCvVdsAlmOzKppy?=
- =?us-ascii?Q?LhaqnEzY9wRhUJkMd1A07UUiPHiys12A9uDE24aGqgqQnG9f3goS8tbQ9gdz?=
- =?us-ascii?Q?N5njbYrLVlbkIE22q9Skn9LBXN8AUM99UQNkwFVu7nOuWO14JH8LO7+yOkm3?=
- =?us-ascii?Q?CSgcEJGm6mViX/Om/otJ2phbI9ES318I0XsJNDjD6iSUwlvlaTuo+0rqt58+?=
- =?us-ascii?Q?1OADbtAxv3chsyN0lGLbDPTPNtoiWK1wK4xOhuZPNG0Gbl6ekEAOJBCrqnva?=
- =?us-ascii?Q?Kyg77X9Q317fMMNCrbfGf/EKaE+8OZBq+XQ5qVkDhNfLhRBWO1kaW6gyciOh?=
- =?us-ascii?Q?XXQiLOwlMf1r3UKJFHcu9xVSmQkeqlVZ/swCJ5B3DaCHwWYA6Aly/eWszYL3?=
- =?us-ascii?Q?9DQn3fggphk5dqD7sL1XpYgUvvccB7qz+7rOdbail0KjBQYFDjJjF6mnxRbL?=
- =?us-ascii?Q?cfp2XVKxBmUw0tQYdGaRUxU5wyRpcfYF4aatoiWovl86UKo6LLO9XZHbax8c?=
- =?us-ascii?Q?yOFEJI/Vrr9FAgFOleCsF720ybHs/awNIrlmLPeu2nq9LBflaHXoUuEDkwED?=
- =?us-ascii?Q?NnoYO2CKTTVYg9Ys4T/g9reNnLOrJonJu3lj2AgKKCbPRYmUA1keCAaIrt+g?=
- =?us-ascii?Q?j1a2FqjXAweUkLdxSbEK63/20OrKhHuF0/GPTw8VwLG04VjL0co7uPf9L53G?=
- =?us-ascii?Q?HobDAN2IbXFeny98UThGfN32KoEUi5TLUNfk1LULrXMuvdwmvDSXkhQP5Iql?=
- =?us-ascii?Q?UC+pEtX/WwAQeb/zH+ITLkGS59AxYuT/Ao7rtff0KpX+F45hR4/1IUXZkNMG?=
- =?us-ascii?Q?7R0vxfoHQLHJFsOqmsF8XMT88r5c6N6ueOOWjKl97nTEz1anDt+uqzlkL75+?=
- =?us-ascii?Q?3xmu7f+NF9V7hOqNuxArHJPDCOkDqpOkCrK0osz7sb2wNm5UB8u9Y5ep5vlO?=
- =?us-ascii?Q?jFLQYXXyeiUzUi9gjOME9M/yAJNpKk166t30ogOpyv50kKOOD1LVG7kJjxBJ?=
- =?us-ascii?Q?KUyQoV1Q1nFnK9d94P1oTXWlZtwh2AoG5/ukZHUldLcrXjPEh6gdwg8IBJKc?=
- =?us-ascii?Q?Rar95FTyXcqSH8Hi3MEz6EiMGKPgijlqakuRr24b9toS+B6mCnGPMeeX4Y/w?=
- =?us-ascii?Q?TTDrTT7pa0NLedr7nWqj67fpVHw=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2/aSos5vd5kxO6Io5KHbf6r+eqCnYvyH/bgb63WBnA3Nm8AZ9gLn57FaOsWy?=
+ =?us-ascii?Q?Dlmq/nfIRnNnmCT1/ccOJFpc94Jyv2ErknaEzOjsW/+RhsSmM8TTP3jaavw+?=
+ =?us-ascii?Q?q73BSbJq+MWIBeqC9L/7VJNYl4atg4C4cMjNamWBcFluUhc0GIsK/2wuLdW8?=
+ =?us-ascii?Q?Rylvwu69kiF2HKddTP5Y77xNAtEpQQUKLy3i+ghnavBhdza1U0uskjZWxp9W?=
+ =?us-ascii?Q?eNiBlRDZ4Fe140x5VUoxpi0duJ4r94T2x7muQzIW6ogjPXRtjFZ5sHL3oROb?=
+ =?us-ascii?Q?brYtu5yFvmYsU+Fx8PWAli2R4+uLcYDCxtPPsa9f72xTNn3WPWebhjx9YAaI?=
+ =?us-ascii?Q?0lFAuL2jgBdZRry6P3qnnZSbdB/gQEgWjcZ8rf9maEsQw/ZPVLc6t0n9BlBb?=
+ =?us-ascii?Q?dQf47KtfcZvukJsqOezWG+fRvkDHD33BJIfQhTAwzsA5D1aBjhqNh2R5HGou?=
+ =?us-ascii?Q?AseDAQr/hSqSg7yh4+NzxLKycobCPkiYGi39vB4K8nyzjmZnKx2TXYS5W67p?=
+ =?us-ascii?Q?14TrOeYrq2re0ND/ygZvfckFgOzn7TQvVjJj5O9dX7vEExPr+4Rme+mOp+v6?=
+ =?us-ascii?Q?73ch6I3L2KgfZagubYRNKg8o9/0gJHzmkxdlUs4XKrB2BqLGqfYj+qLsTpqa?=
+ =?us-ascii?Q?pJl/ywZJzdjZio0hVx6SwAWLZRC+KJG8w5dL9/+CgAnD57hBzBiPu6cpwYn2?=
+ =?us-ascii?Q?NB0vUNkdOluqcbMLWsDzl9WiHVINhP7LZFQjSTzW4F/QrGczZAjiqLb54AOp?=
+ =?us-ascii?Q?+WysKVOZUyjKcZWJgxN+sR/L+qaWJvEhrPIjBzCuT0Ozf/HCS9k6IM0rSURI?=
+ =?us-ascii?Q?ZQF/4qswGsyFll+rsdQRJxAK+VKM2gfI7F2reYzZHEY823C7TwxU3qx70qNS?=
+ =?us-ascii?Q?sO6aZSbf6TkF//aCARYRCdtycHzhREHl14Q8ZMwHqG7znJc0Sw9NLNJ2mIRx?=
+ =?us-ascii?Q?dK0JfXFUzqSdymKrVTiJL+u9PP+ZmQ38IgNL/wwSSH/5IbPUNHDQyiFonySH?=
+ =?us-ascii?Q?bkmDyooWqlPcrY9vXt2Jqf6TH90eVhFJ7qRhl+GKIU0fqGojMrhxgWwW6y78?=
+ =?us-ascii?Q?re9Wi5WET/iOKsUvH2AhfGYLW/PdNLEh08rDZpaz6YgfVsLaC34z2/5MFuU3?=
+ =?us-ascii?Q?rQ8TwbPvyTqbu3bzewmtiSwayosS5V8MNC3KMzG9km2F6xdyNOi8IFRkM0HL?=
+ =?us-ascii?Q?utbiExtEw0je3VXzfi8mEgmAc7yciisJxXo+os7sSudulL1uCFI9686sc98l?=
+ =?us-ascii?Q?akJaYlqvqqXIo3uQyN1aTrXJerGHxIj4imzkA05355CbyVO0DYnsZhtbQNVW?=
+ =?us-ascii?Q?YHo2StF4o7jSFwHvUINIfT5CecsfjlpjvOu8u1dOEpcGAeZklhmBZMJCAAyR?=
+ =?us-ascii?Q?mfpF0sVhV3xKehPorV30YuWfC2fRXE/nAL9vxuAVHIRzrCUtxxa6cXh3oxnb?=
+ =?us-ascii?Q?Tx2VmzP8DmYG+Beut1u2j14mkL6VVgMiFCgZ8LYxETMMao+YyBU1M/94Fbze?=
+ =?us-ascii?Q?mgBuZCK134gZsxKyMW1SLHU54uOojcFKX4zCtm4CwKI6t9tN/NZTNX0vGe69?=
+ =?us-ascii?Q?tF/pISmorXHd+M36BP5tcNLBsInHYfMHeNHukj7XR4RUvVdlIGpVzGSAVEYI?=
+ =?us-ascii?Q?GAfsgTU6QCrm77kNwuFCl21cTmWXv5ZQ0sTtOqItZAmRkPeeAVgrzluwsVmk?=
+ =?us-ascii?Q?GhevvTJ8Qlm9qcUcFyBt26r79c0=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 832d7028-1e3d-4ef8-dd04-08d9d0ae247e
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad652e27-55d4-4bc4-4d08-08d9d0ae261d
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR10MB5698.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:40.6409
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:43.3191
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BMhRk1xVuZ/wCjrLjOmGiCWAR6A6i2T+Rb112dGQxpelsFqHXwV55TSNoIuWj2fwZCfbUvRT5nPU1OoHOxulIZVcnlmxzxHwn35hy7KcpNM=
+X-MS-Exchange-CrossTenant-UserPrincipalName: V+jxUHgqaT7jdYwGx3mF7J+IQXMEvIiEqkjc5gMgBjFeDlfK3CfV5LXSZFckRhuRbc4zYWA0+EXm5iwCA/cUC1WGEPG8EZiS4S2a9C3Z2Uo=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4422
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10218 signatures=668683
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=999 phishscore=0 mlxscore=0 malwarescore=0
+ bulkscore=0 mlxlogscore=909 phishscore=0 mlxscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2112160000
  definitions=main-2201060001
-X-Proofpoint-ORIG-GUID: lzpHyArtG1QT8-PtdatUOz9Q0EwJn3Ma
-X-Proofpoint-GUID: lzpHyArtG1QT8-PtdatUOz9Q0EwJn3Ma
+X-Proofpoint-ORIG-GUID: 5n4C1OmqtK9TRM25e9I_Ma2_AhvvRb2A
+X-Proofpoint-GUID: 5n4C1OmqtK9TRM25e9I_Ma2_AhvvRb2A
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Helper threads should run only on the CPUs allowed by the main thread to
-honor its CPU affinity.  Similarly, cap the number of helpers started to
-the number of CPUs allowed by the main thread's cpumask to avoid
-flooding that subset of CPUs.
+padata can start num_possible_cpus() helpers, but this is too many
+considering that every job's main thread participates and there may
+be fewer online than possible CPUs.
+
+Limit overall concurrency, including main thread(s), to
+num_online_cpus() with the padata_works_inuse counter to prevent
+CPU-intensive threads flooding the system in case of concurrent jobs.
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 ---
- kernel/padata.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ kernel/padata.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 00509c83e356..0f4002ed1518 100644
+index 0f4002ed1518..e27988d3e9ed 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -571,6 +571,7 @@ int padata_do_multithreaded_job(struct padata_mt_job *job,
- 	/* Ensure at least one thread when size < min_chunk. */
- 	nworks = max(job->size / job->min_chunk, 1ul);
- 	nworks = min(nworks, job->max_threads);
-+	nworks = min(nworks, current->nr_cpus_allowed);
+@@ -50,6 +50,7 @@ struct padata_work {
  
- 	if (nworks == 1) {
- 		/* Single thread, no coordination needed, cut to the chase. */
-@@ -607,10 +608,12 @@ int padata_do_multithreaded_job(struct padata_mt_job *job,
+ static DEFINE_SPINLOCK(padata_works_lock);
+ static struct padata_work *padata_works;
++static unsigned int padata_works_inuse;
+ static LIST_HEAD(padata_free_works);
  
- 		pw->pw_data = &ps;
- 		task = kthread_create(padata_mt_helper, pw, "padata");
--		if (IS_ERR(task))
-+		if (IS_ERR(task)) {
- 			--ps.nworks;
--		else
-+		} else {
-+			kthread_bind_mask(task, current->cpus_ptr);
- 			wake_up_process(task);
-+		}
+ struct padata_mt_job_state {
+@@ -98,11 +99,16 @@ static struct padata_work *padata_work_alloc(void)
+ 
+ 	lockdep_assert_held(&padata_works_lock);
+ 
+-	if (list_empty(&padata_free_works))
+-		return NULL;	/* No more work items allowed to be queued. */
++	/* Are more work items allowed to be queued? */
++	if (padata_works_inuse >= num_online_cpus())
++		return NULL;
++
++	if (WARN_ON_ONCE(list_empty(&padata_free_works)))
++		return NULL;
+ 
+ 	pw = list_first_entry(&padata_free_works, struct padata_work, pw_list);
+ 	list_del(&pw->pw_list);
++	++padata_works_inuse;
+ 	return pw;
+ }
+ 
+@@ -111,7 +117,11 @@ static int padata_work_alloc_mt(int nworks, struct list_head *head)
+ 	int i;
+ 
+ 	spin_lock(&padata_works_lock);
+-	/* Start at 1 because the current task participates in the job. */
++	/*
++	 * Increment inuse and start iterating at 1 to account for the main
++	 * thread participating in the job with its stack-allocated work.
++	 */
++	++padata_works_inuse;
+ 	for (i = 1; i < nworks; ++i) {
+ 		struct padata_work *pw = padata_work_alloc();
+ 
+@@ -128,20 +138,22 @@ static void padata_work_free(struct padata_work *pw)
+ {
+ 	lockdep_assert_held(&padata_works_lock);
+ 	list_add(&pw->pw_list, &padata_free_works);
++	WARN_ON_ONCE(!padata_works_inuse);
++	--padata_works_inuse;
+ }
+ 
+ static void padata_works_free(struct list_head *works)
+ {
+ 	struct padata_work *cur, *next;
+ 
+-	if (list_empty(works))
+-		return;
+-
+ 	spin_lock(&padata_works_lock);
+ 	list_for_each_entry_safe(cur, next, works, pw_list) {
+ 		list_del(&cur->pw_list);
+ 		padata_work_free(cur);
  	}
++	/* To account for the main thread finishing its part of the job. */
++	WARN_ON_ONCE(!padata_works_inuse);
++	--padata_works_inuse;
+ 	spin_unlock(&padata_works_lock);
+ }
  
- 	/* Use the current task, which saves starting a kthread. */
 -- 
 2.34.1
 
