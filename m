@@ -2,107 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C07F44861B2
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 09:55:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35EBE4861F0
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 10:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237154AbiAFIzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 03:55:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237035AbiAFIzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 03:55:45 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADEBC061245;
-        Thu,  6 Jan 2022 00:55:44 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id l10-20020a17090a384a00b001b22190e075so7687638pjf.3;
-        Thu, 06 Jan 2022 00:55:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=l6AC26P5A6p2PYSNfsM3OeICvH034ha9iztPzeXC2KE=;
-        b=junyQPmsGv9qRZxRZ14fSV/UV4SkPFjzw7Fs9NYBI+iy840C6htKqDWzf2O3SbWfqS
-         qI7L4ptVuEqZgWWQ0dvgHVb58GV8PEZRp2CyMNF8CZLnebbiTsJ+UYrrCET8/tHAgBDs
-         aOvCInDbC/0lz7byrD2TviMaQjiN5RVdq8vl3miTncRc78KF+xZQ0pqtdXxpnkP+SX9T
-         vdxnwE1RujxY9215qw14Hw183AZdRJ6acsY3UVI9XNYwa4w3Y1LD6JizFhc/K8iBwnF+
-         naP8FiLLMHZz+WykYjVkzfLsYPcMtdQ9IvAs/v8Zkx24Cz5jlYdTHLhlnItga/HfPxct
-         uX7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=l6AC26P5A6p2PYSNfsM3OeICvH034ha9iztPzeXC2KE=;
-        b=qdGjTRI8z4ar57W0WZtCJhoDXHtkAk+nQUwBJQ+TjQ/7D0+J5auRQn0HO+1p43jYxp
-         KsP76gtqCg0NiY+jQz2cduMvgxNuvWLuW9gJGTcSJvU/0wSpLQkz8a1rOAszUmY/envH
-         t+1AB84j42RUD16gFKda5NeK7a6IYbttyCEoNmF5nZaddCpGJJOpmt0kvnUPCqt+cuDf
-         FxPXNJnKErBc8lgdWeI97RlTE0TRamKlNZp7pv46MTQv1Wg4+GiH/tidO+btNYBtsZvM
-         SOB0aBCmzNEx3YdMs/rT+qPpiw2dZ87eFfT8qf3aK0Cq5OU9VDQmQEoETbthbl8c6lBk
-         /ibw==
-X-Gm-Message-State: AOAM533WqcFUF+prg2HiFbT4mEQ7brqdOMFFcK2rdLNuW4dFslgI/dzs
-        wBTJESWeAHl3CBShKBA1Qn4=
-X-Google-Smtp-Source: ABdhPJwN4aeg1Mq4mkU4DhpPUKCXV/JpNiHzTkbXWDemFa2C0X1MHLfcbqbsYqlZWCjugX8dbXVSZw==
-X-Received: by 2002:a17:903:32c9:b0:149:7d71:c235 with SMTP id i9-20020a17090332c900b001497d71c235mr47235609plr.58.1641459344086;
-        Thu, 06 Jan 2022 00:55:44 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d14sm1594223pfl.132.2022.01.06.00.55.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jan 2022 00:55:43 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pt: Do not advertise Intel PT Event Trace capability
-Date:   Thu,  6 Jan 2022 16:55:33 +0800
-Message-Id: <20220106085533.84356-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.33.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S237247AbiAFJQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 04:16:18 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:46236 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237096AbiAFJQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 04:16:16 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D594861AE9
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 09:16:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468B4C36AE5;
+        Thu,  6 Jan 2022 09:16:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641460575;
+        bh=mdH8wLVZw9IC0axvrDBOf6u/F9++nH65H2Vt9jCeYSw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SQjF2ZDmhHDLNU8PSy++u2GW+aV5bYBZIvBxoyy64NK/p1qEKEZS/h+XSTUIQc+6f
+         o/NRsYCnzIAA5VFr6oPA4RVEI7Gfl1n2uoVb8ttjuFAyVRZFVm3kR9/v+Ryl4UPY77
+         nfRqyeUuULHcuDdR7uq2AcSfTIHhLoSQeKmaWw24CtOnMPBxd57odRQ6U78/P+oLFP
+         E3uDVxRESpx4SIBCr1z96gI8+upvhVGQeuQZw2+jWxdciYe2ilxWBfapj5quTT1qqS
+         cafpQWWJln0aRWs+G/qJgURciNlHE2w6owB7qYAG0LEy0IfOmGSZycO96G5Jym9Je0
+         K50GjjtSua87w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n5OsW-00GJrc-Rh; Thu, 06 Jan 2022 09:16:12 +0000
+Date:   Thu, 06 Jan 2022 09:16:08 +0000
+Message-ID: <87czl5usvb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Richard Henderson <richard.henderson@linaro.org>
+Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
+        Eric Auger <eric.auger@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the host
+In-Reply-To: <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
+References: <20220103180507.2190429-1-maz@kernel.org>
+        <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, eric.auger@redhat.com, drjones@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Hi Richard,
 
-The Inte PT Event Trace capability (Intel SDM Vol3, 32.2.4 Event Tracing)
-is a new CPU feature that "exposes details about the asynchronous events,
-when they are generated, and when their corresponding software event
-handler completes execution".
+On Wed, 05 Jan 2022 21:36:55 +0000,
+Richard Henderson <richard.henderson@linaro.org> wrote:
+> 
+> On 1/3/22 10:05 AM, Marc Zyngier wrote:
+> > -        /*
+> > -         * KVM does not support modifications to this feature.
+> > -         * We have not registered the cpu properties when KVM
+> > -         * is in use, so the user will not be able to set them.
+> > -         */
+> > -        if (!kvm_enabled()) {
+> > -            arm_cpu_pauth_finalize(cpu, &local_err);
+> > -            if (local_err != NULL) {
+> > +	arm_cpu_pauth_finalize(cpu, &local_err);
+> > +	if (local_err != NULL) {
+> >                   error_propagate(errp, local_err);
+> >                   return;
+> > -            }
+> > -        }
+> > +	}
+> 
+> Looks like the indentation is off?
 
-It is not possible for KVM to emulate all events including interrupts,
-VM exits, VM entries, INIT, SIPI events and etc. for guests and to
-emulate the simultaneous writing of Control Flow Events and Event Data
-packets generated by the KVM to the guest PT buffer.
+Most probably. I only just discovered how to use the QEMU style for
+Emacs, and was indenting things by hand before that (yes, pretty
+painful and likely to lead to issues (there is a TAB instead of a set
+of spaces there...).
 
-For KVM, it is best not to advertise the Event Trace feature and just
-let it be a system-wide-only tracing capability.
+> 
+> > +static bool kvm_arm_pauth_supported(void)
+> > +{
+> > +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
+> > +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
+> > +}
+> 
+> Do we really need to have them both set to play the game?  Given that
+> the only thing that happens is that we disable whatever host support
+> exists, can we have "pauth enabled" mean whatever subset the host has?
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-Off topic, other new PT features such as "PSB and PMI Preservation Supported"
-and "TNT disable" are under investigation or awaiting host support to move on.
+The host will always expose either both features or none, and that's
+part of the ABI. From the bit of kernel documentation located in
+Documentation/virt/kvm/api.rst:
 
- arch/x86/kvm/cpuid.c | 2 ++
- 1 file changed, 2 insertions(+)
+<quote>
+4.82 KVM_ARM_VCPU_INIT
+----------------------
+[...]
+        - KVM_ARM_VCPU_PTRAUTH_ADDRESS: Enables Address Pointer authentication
+          for arm64 only.
+          Depends on KVM_CAP_ARM_PTRAUTH_ADDRESS.
+          If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
+          both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
+          KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
+          requested.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0b920e12bb6d..1028c57377e9 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -901,6 +901,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			break;
- 		}
- 
-+		/* Not advertise Event Trace capability due to endless emulation */
-+		entry->ebx &= ~BIT(7);
- 		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
- 			if (!do_host_cpuid(array, function, i))
- 				goto out;
+        - KVM_ARM_VCPU_PTRAUTH_GENERIC: Enables Generic Pointer authentication
+          for arm64 only.
+          Depends on KVM_CAP_ARM_PTRAUTH_GENERIC.
+          If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
+          both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
+          KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
+          requested.
+</quote>
+
+KVM will reject the initialisation if only one of the features is
+requested, so checking and enabling both makes sense to me.
+
+> 
+> > @@ -521,6 +527,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+> >        */
+> >       struct kvm_vcpu_init init = { .target = -1, };
+> >   +    /*
+> > +     * Ask for Pointer Authentication if supported. We can't play the
+> > +     * SVE trick of synthetising the ID reg as KVM won't tell us
+> 
+> synthesizing
+
+Yup.
+
+> 
+> > +     * whether we have the architected or IMPDEF version of PAuth, so
+> > +     * we have to use the actual ID regs.
+> > +     */
+> > +    if (kvm_arm_pauth_supported()) {
+> > +        init.features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> > +			     1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> 
+> Align the two 1's.
+
+Gah, another of these... Will fix.
+
+> 
+> Otherwise, it looks good.
+
+Thanks,
+
+	M.
+
 -- 
-2.33.1
-
+Without deviation from the norm, progress is not possible.
