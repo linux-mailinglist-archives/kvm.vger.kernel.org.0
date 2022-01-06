@@ -2,91 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B36148644D
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:23:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78BE9486451
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:24:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238754AbiAFMXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 07:23:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36860 "EHLO
+        id S238780AbiAFMYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 07:24:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23991 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238475AbiAFMXc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jan 2022 07:23:32 -0500
+        by vger.kernel.org with ESMTP id S238598AbiAFMYy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jan 2022 07:24:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641471812;
+        s=mimecast20190719; t=1641471893;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=DIfBxULOavolfufOQdNG/vzCAo1esWK0a3vka0Ajyjs=;
-        b=H6z8alnBOHpoSHFfpjx1TC22Hk0ABy2O491yPXJvmSTLHM7tRCwx0u4dVsi34KnjVmhs56
-        RxM5DSffdej3+CCMcVNJbq5G+XggkxN5X6HzFyyoI10FjFyPi5autprQ3jSujJEDiPeQXt
-        XG0s98pfWErjdHEbGq4JV2SH4pPAqxQ=
+        bh=0uPOPPljcCRT5JnCSjBYTsAZ9QvLUTF6yXLYqezm/jk=;
+        b=TRiXqEUxE7KuA99lKmqzrqDNxkNScZCWtrXHJ5qdEN3IgQU2/Z+45eaRWHxwO0FRXamXEj
+        PJEDiNefTlhZ8x5WRkGSg6x0K8iZEBj287/POrc1Rp1+pnD8MO8YSiVLUgkGH2eNeoMF0F
+        dBeTdhs5r+ovRH6e3Pg47cESHf7UNKU=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-55-Im1mPoBFPySi6wz1PvX2Qg-1; Thu, 06 Jan 2022 07:23:31 -0500
-X-MC-Unique: Im1mPoBFPySi6wz1PvX2Qg-1
-Received: by mail-wr1-f69.google.com with SMTP id a11-20020adffb8b000000b001a0b0f4afe9so1185654wrr.13
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 04:23:30 -0800 (PST)
+ us-mta-185-CRIWEeGUNDSv45OOz7yK8Q-1; Thu, 06 Jan 2022 07:24:52 -0500
+X-MC-Unique: CRIWEeGUNDSv45OOz7yK8Q-1
+Received: by mail-wr1-f69.google.com with SMTP id w25-20020adf8bd9000000b001a255212b7cso1172894wra.18
+        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 04:24:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=DIfBxULOavolfufOQdNG/vzCAo1esWK0a3vka0Ajyjs=;
-        b=46nYsdUKY5kSovpvOP1uXRUrJw+vPgUkABxuDEXpC9PZqb8RPxyNsXl9hU3Eu5byf1
-         1Im0QaEda8vx1TIIAlYziE4bITfJYFd+h3gk9e61EoqhFNVT8JCcaHWrnXMCXVMWure2
-         SUewcOXFS1tmixUzUuX2eQTdbfJ1GcZ4DzCdHnwcDNrIwE5k5ezF/T4VvTVDS6yqheQS
-         q2g2mnr7ielIP0NVseyZ8sac4ap7z7vMTBD1kMl34DKtjrVQ9jr8BUu18j9pWU3Z0sdX
-         03Mjgbom6wQfkiyhbXvoyANRmT+yTYGLPhU7kZXGX52s+WgPA/63QceVWl5RyfdHzfX9
-         DGww==
-X-Gm-Message-State: AOAM533X3IeTveQ4t7QcAPCIEHabRB4Nmo3zBdY8BjXrkA5pzrxv2r9Y
-        EWgIZ/qPH9RWiobgVmh+0jHazm4D/vW9jwDnFZX8NKwiU692AqNrJJVDkB7hcVN5hafclVfIRIi
-        JqpJuKaHpUyti
-X-Received: by 2002:a05:6000:3c8:: with SMTP id b8mr5369681wrg.152.1641471809678;
-        Thu, 06 Jan 2022 04:23:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxCKaZ3Vwd4RKCtyVMKKYHTk+aalh3XwUj1HV3KC0ncZK7QR6PvJ9NCHxybq+bIctJq+mNlbw==
-X-Received: by 2002:a05:6000:3c8:: with SMTP id b8mr5369670wrg.152.1641471809449;
-        Thu, 06 Jan 2022 04:23:29 -0800 (PST)
+        bh=0uPOPPljcCRT5JnCSjBYTsAZ9QvLUTF6yXLYqezm/jk=;
+        b=sg1O/t9nDum8t74fCEB3kTbQK5rY6YmTsTqmmzohULmvpFRHK+VfvRIJlKfCQz1fZ8
+         YTg1I5JP8sbSBNM3i90cMqe1f1m4sz3PFhiEl+DDyaxO9tSDKnTdyjsV4HgZcF6AYDYh
+         qqx2qfLgUuulZELt1n5/mAVueXGLsxTMJaYWaIK7cVr8D4ZnU8TqFfA2/JUH51rsu8ID
+         3U3wAEElITpYJ+066kBhgPbVFqoZ/d+xrtBbxfHYJLGlBGLMZqknpIsSjK93bpVzzi9W
+         L8dxCjUyGSbLA1/JkbX7X2TRTNmLREBFS2kk5BkjMYujXyJWRtN/Ut6OII60w5+W9Pah
+         t2Xg==
+X-Gm-Message-State: AOAM533dnJsrCu8Vnp0hdEi+m96J5ztvNwbzx+Xb4mtD5I5A8MYPctYO
+        AQ49NT9FSxQynUcrbROSCz/JEWtgkIhslp+SXFgg+Cj6tHN7HJf+1B9kqLJBxkkxujC0JedcnUU
+        g7dtxmKPqsf8+
+X-Received: by 2002:adf:f904:: with SMTP id b4mr31756839wrr.457.1641471890971;
+        Thu, 06 Jan 2022 04:24:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxcnYl5f7mjbdHhw5BDaaDbej/KBrzommpeO6kEVNqKU1TlflODCHM/SPqrxpiLKr97ZxWBog==
+X-Received: by 2002:adf:f904:: with SMTP id b4mr31756826wrr.457.1641471890799;
+        Thu, 06 Jan 2022 04:24:50 -0800 (PST)
 Received: from redhat.com ([2a03:c5c0:207e:991b:6857:5652:b903:a63b])
-        by smtp.gmail.com with ESMTPSA id u15sm752186wmm.37.2022.01.06.04.23.27
+        by smtp.gmail.com with ESMTPSA id l8sm1945393wrv.25.2022.01.06.04.24.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jan 2022 04:23:28 -0800 (PST)
-Date:   Thu, 6 Jan 2022 07:23:25 -0500
+        Thu, 06 Jan 2022 04:24:49 -0800 (PST)
+Date:   Thu, 6 Jan 2022 07:24:47 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Cai Huoqing <caihuoqing@baidu.com>
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] vhost: add vhost_test to Kconfig & Makefile
-Message-ID: <20220106072056-mutt-send-email-mst@kernel.org>
-References: <20210616120734.1050-1-caihuoqing@baidu.com>
+Cc:     jasowang@redhat.com, leon@kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2] vhost: add vhost_test to Kconfig & Makefile
+Message-ID: <20220106072352-mutt-send-email-mst@kernel.org>
+References: <20210617033844.1107-1-caihuoqing@baidu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210616120734.1050-1-caihuoqing@baidu.com>
+In-Reply-To: <20210617033844.1107-1-caihuoqing@baidu.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 16, 2021 at 08:07:34PM +0800, Cai Huoqing wrote:
+On Thu, Jun 17, 2021 at 11:38:44AM +0800, Cai Huoqing wrote:
 > When running vhost test, make it easier to config
 > 
 > Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
 
-I'd stick this under "Kernel Testing and Coverage"
-or something like this. The point is we don't want this module
-is release kernels.
-
-
+I'd stick this under Kernel Testing and Coverage or something like this.
+The point being we don't want this in release kernels by mistake.
 
 > ---
->  drivers/vhost/Kconfig  | 12 ++++++++++++
+>  drivers/vhost/Kconfig  | 11 +++++++++++
 >  drivers/vhost/Makefile |  3 +++
->  2 files changed, 15 insertions(+)
+>  2 files changed, 14 insertions(+)
 > 
 > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index 587fbae06182..c93c12843a6f 100644
+> index 587fbae06182..ac2bffd6a501 100644
 > --- a/drivers/vhost/Kconfig
 > +++ b/drivers/vhost/Kconfig
-> @@ -61,6 +61,18 @@ config VHOST_VSOCK
+> @@ -61,6 +61,17 @@ config VHOST_VSOCK
 >         To compile this driver as a module, choose M here: the module will be called
 >         vhost_vsock.
 >  
@@ -94,7 +91,6 @@ is release kernels.
 > +       tristate "vhost virtio-test driver"
 > +       depends on EVENTFD
 > +       select VHOST
-> +       default n
 > +       help
 > +       This kernel module can be loaded in the host kernel to test vhost function
 > +       with tools/virtio-test.
