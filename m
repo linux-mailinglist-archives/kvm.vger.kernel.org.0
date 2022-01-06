@@ -2,129 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAE4A48646D
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:36:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C71948646F
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:36:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238893AbiAFMgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 07:36:13 -0500
-Received: from mga11.intel.com ([192.55.52.93]:65187 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238831AbiAFMgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 07:36:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641472572; x=1673008572;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=xyua25iDh4JWOKyPASiZgoHVEXaKTA4j0IhBTE9lILI=;
-  b=g+0JuRYd3cvHmhaptbjo7EJrh69Uvxx17AHslnGcPNRxmLPhV7E+dZky
-   Du6Q+wFJCouB+KxR5k4/2/Cl9mTU0FGk7mOdGxwjFz7nIUzLmHmWD9uvW
-   m1BeAebZns8LrXLovnJc/L2qfzZi1FubXzdxM9cIEBew27ug+t8s413Jl
-   eiiJ+o6eNa9ATgX+/4Elbw95lNTzTfKXN6EBgkdGLN2+qtP3EIJa1CRhd
-   lDOaVqQoKVPqSX8XH47WKbfR0eK8lYJz7OK7BLpeRPyIAPkhYGEkyM7QI
-   tPSrQdKq6CGAl+6Qak3WFQncqP3krlB/GSlWHzJDUfpntz077Wz0TMCh/
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="240196050"
-X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
-   d="scan'208";a="240196050"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 04:36:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
-   d="scan'208";a="472880803"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga006.jf.intel.com with ESMTP; 06 Jan 2022 04:35:59 -0800
-Date:   Thu, 6 Jan 2022 20:35:25 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [PATCH v3 kvm/queue 11/16] KVM: Add kvm_map_gfn_range
-Message-ID: <20220106123525.GA43371@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
- <20211223123011.41044-12-chao.p.peng@linux.intel.com>
- <YcS6m9CieYaIGA3F@google.com>
- <20211224041351.GB44042@chaop.bj.intel.com>
- <20211231023334.GA7255@chaop.bj.intel.com>
- <YdSEcknuErGe0gQa@google.com>
- <20220105061410.GA25283@chaop.bj.intel.com>
- <YdXPW+2hZDsgZD/a@google.com>
+        id S238909AbiAFMgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 07:36:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59794 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238831AbiAFMgp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 07:36:45 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2E1C061245;
+        Thu,  6 Jan 2022 04:36:45 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id gp5so2393240pjb.0;
+        Thu, 06 Jan 2022 04:36:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=NoGjPaQivsMsvPLvpJIAFIB5+lRj8RKV5+GIsw37iRc=;
+        b=RTnJPDeSUzJA4TjwTadXWyZtBQPrUHjSNnz0aRyI6m5NQvIjelMPdMw8yqvxMLnKN6
+         MQ99ExAMl9er0lOZ/1qTBqlILm0QL/Y+mU5fTeDflfPuCMbkrbmK01D1OQ+f4Bi94whI
+         RKkw+8QKOKJDAxts3ugakKuqXFuOeO2tENuEHSweXO8bNmTJGF3YPMdWBgmcZoXIVO8H
+         p+JqPvfiaapbr/0DZDaWAJCzKofX+wee04N+j4rlDlCi1M5EmDLryuyfs6vwqSaobH0a
+         S88KXQIePJZfBcTT0BqAM33p+4uM4aHDQexe187a8SThwd9tydx2GG/1QNydchxWJRa+
+         0oJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=NoGjPaQivsMsvPLvpJIAFIB5+lRj8RKV5+GIsw37iRc=;
+        b=CZpvC27rkjVCp4Q54rzSn3cJGpZiaFUk3DhhontiElds2JvTxFaJ5Tum18air9FB/7
+         b6VGUSjGfWFgZq644h6bQdrqo0xjbfAiWloxWPGhA0x/MFL5czhgspGA6A04VIBoEhzX
+         b/UrlRv9K3cUZmx8AloToCe8fCW2wickgOT+X9s6p0G0JdcGTZK1EjkD4Mm1uErzFQh1
+         pOm5MRijv0xbgy6E/2YeU1UJU2k6c7FH53bHE4QTvr2hUJQIfE1hXt/6UXArEoKg6Nf6
+         L2TF2wH52PyPbm/9G0qPlIfUsoOkIph1OM8H+rWSVEdD/KL18/sWXxlGFHjpFLmrCb8l
+         scDQ==
+X-Gm-Message-State: AOAM5308DmDmu4LVExpGUoDaMygyN80X5DIhm/bFi7n+uU0ne08i93MF
+        J4TloSrNgSQj6Vp2aWbgGF0=
+X-Google-Smtp-Source: ABdhPJyN0tM8perJ1u9smSoj//wHs3VS/4LED4KAS+D5h3tR1/0Y/LHJ6ZY3McvK2Ws9EhttI+uNkQ==
+X-Received: by 2002:a17:90b:1a92:: with SMTP id ng18mr9789966pjb.238.1641472604715;
+        Thu, 06 Jan 2022 04:36:44 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id m16sm2914161pfk.32.2022.01.06.04.36.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jan 2022 04:36:44 -0800 (PST)
+Message-ID: <9e01f081-f6c5-5597-6898-a043346063b6@gmail.com>
+Date:   Thu, 6 Jan 2022 20:36:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YdXPW+2hZDsgZD/a@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Content-Language: en-US
+To:     "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org)" 
+        <pbonzini@redhat.com>, Jietao Xiao <shawtao1125@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org
+References: <20220102082207.10485-1-shawtao1125@gmail.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH] KVM:x86: Let kvm-pit thread inherit the cgroups of the
+ calling process
+In-Reply-To: <20220102082207.10485-1-shawtao1125@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 05, 2022 at 05:03:23PM +0000, Sean Christopherson wrote:
-> On Wed, Jan 05, 2022, Chao Peng wrote:
-> > On Tue, Jan 04, 2022 at 05:31:30PM +0000, Sean Christopherson wrote:
-> > > On Fri, Dec 31, 2021, Chao Peng wrote:
-> > > > On Fri, Dec 24, 2021 at 12:13:51PM +0800, Chao Peng wrote:
-> > > > > On Thu, Dec 23, 2021 at 06:06:19PM +0000, Sean Christopherson wrote:
-> > > > > > On Thu, Dec 23, 2021, Chao Peng wrote:
-> > > > > > > This new function establishes the mapping in KVM page tables for a
-> > > > > > > given gfn range. It can be used in the memory fallocate callback for
-> > > > > > > memfd based memory to establish the mapping for KVM secondary MMU when
-> > > > > > > the pages are allocated in the memory backend.
-> > > > > > 
-> > > > > > NAK, under no circumstance should KVM install SPTEs in response to allocating
-> > > > > > memory in a file.   The correct thing to do is to invalidate the gfn range
-> > > > > > associated with the newly mapped range, i.e. wipe out any shared SPTEs associated
-> > > > > > with the memslot.
-> > > > > 
-> > > > > Right, thanks.
-> > > > 
-> > > > BTW, I think the current fallocate() callback is just useless as long as
-> > > > we don't want to install KVM SPTEs in response to allocating memory in a
-> > > > file. The invalidation of the shared SPTEs should be notified through 
-> > > > mmu_notifier of the shared memory backend, not memfd_notifier of the
-> > > > private memory backend.
-> > > 
-> > > No, because the private fd is the final source of truth as to whether or not a
-> > > GPA is private, e.g. userspace may choose to not unmap the shared backing.
-> > > KVM's rule per Paolo's/this proposoal is that a GPA is private if it has a private
-> > > memslot and is present in the private backing store.  And the other core rule is
-> > > that KVM must never map both the private and shared variants of a GPA into the
-> > > guest.
-> > 
-> > That's true, but I'm wondering if zapping the shared variant can be
-> > handled at the time when the private one gets mapped in the KVM page
-> > fault. No bothering the backing store to dedicate a callback to tell
-> > KVM.
+On 2/1/2022 4:22 pm, Jietao Xiao wrote:
+> Qemu-kvm will create several kernel threads for each VM including
+> kvm-nx-lpage-re, vhost, and so on. Both of them properly inherit
+> the cgroups of the calling process,so they are easy to attach to
+> the VMM process's cgroups.
 > 
-> Hmm, I don't think that would work for the TDP MMU due to page faults taking
-> mmu_lock for read.  E.g. if two vCPUs concurrently fault in both the shared and
-> private variants, a race could exist where the private page fault sees the gfn
-> as private and the shared page fault sees it as shared.  In that case, both faults
-> will install a SPTE and KVM would end up running with both variants mapped into the
-> guest.
+> Kubernetes has a feature Pod Overhead for accounting for the resources
+> consumed by the Pod infrastructure(e.g overhead brought by qemu-kvm),
+> and sandbox container runtime usually creates a sandbox or sandbox
+> overhead cgroup for this feature. By just simply adding the runtime or
+> the VMM process to the sandbox's cgroup, vhost and kvm-nx-lpage-re thread
+> can successfully attach to the sanbox's cgroup but kvm-pit thread cannot.
+
+Emm, it seems to be true for kvm-pit kthread.
+
+> Besides, in some scenarios, kvm-pit thread can bring some CPU overhead.
+> So it's better to let the kvm-pit inherit the cgroups of the calling
+> userspace process.
+
+As a side note, there is about ~3% overhead in the firecracker scenario.
+
 > 
-> There's also a performance penalty, as KVM would need to walk the shared EPT tree
-> on every private page fault.
+> By queuing the attach cgroup work as the first work after the creation
+> of the kvm-pit worker thread, the worker thread can successfully attach
+> to the callings process's cgroups.
+> 
+> Signed-off-by: Jietao Xiao <shawtao1125@gmail.com>
+> ---
+>   arch/x86/kvm/i8254.c | 32 ++++++++++++++++++++++++++++++++
+>   1 file changed, 32 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+> index 0b65a764ed3a..c8dcfd6a9ed4 100644
+> --- a/arch/x86/kvm/i8254.c
+> +++ b/arch/x86/kvm/i8254.c
+> @@ -34,6 +34,7 @@
+>   
+>   #include <linux/kvm_host.h>
+>   #include <linux/slab.h>
+> +#include <linux/cgroup.h>
+>   
+>   #include "ioapic.h"
+>   #include "irq.h"
+> @@ -647,6 +648,32 @@ static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
+>   		kvm_pit_reset_reinject(pit);
+>   }
+>   
+> +struct pit_attach_cgroups_struct {
+> +	struct kthread_work work;
+> +	struct task_struct *owner;
+> +	int ret;
+> +};
+> +
+> +static void pit_attach_cgroups_work(struct kthread_work *work)
+> +{
+> +	struct pit_attach_cgroups_struct *attach;
+> +
+> +	attach = container_of(work, struct pit_attach_cgroups_struct, work);
+> +	attach->ret = cgroup_attach_task_all(attach->owner, current);
 
-Make sense.
+This cgroup_v1 interface is also called by the vhost_attach_cgroups_work(),
+as well as the kvm_vm_worker_thread() in the KVM context.
 
-Thanks,
-Chao
+This part of the code may be a bit redundant as the number of kthreads increases.
+
+> +}
+> +
+> +
+> +static int pit_attach_cgroups(struct kvm_pit *pit)
+> +{
+> +	struct pit_attach_cgroups_struct attach;
+> +
+> +	attach.owner = current;
+> +	kthread_init_work(&attach.work, pit_attach_cgroups_work);
+> +	kthread_queue_work(pit->worker, &attach.work);
+> +	kthread_flush_work(&attach.work);
+> +	return attach.ret;
+> +}
+> +
+>   static const struct kvm_io_device_ops pit_dev_ops = {
+>   	.read     = pit_ioport_read,
+>   	.write    = pit_ioport_write,
+> @@ -683,6 +710,10 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+>   	if (IS_ERR(pit->worker))
+>   		goto fail_kthread;
+
+I wonder if we could unify the kthread_create method for both vhost and kvm-pit
+so that all kthreds from kvm_arch_vm agent could share the cgroup_attach_task_all()
+code base and more stuff like set_user_nice().
+
+>   
+> +	ret = pit_attach_cgroups(pit);
+> +	if (ret < 0)
+> +		goto fail_attach_cgroups;
+> +
+>   	kthread_init_work(&pit->expired, pit_do_work);
+>   
+>   	pit->kvm = kvm;
+> @@ -723,6 +754,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
+>   fail_register_pit:
+>   	mutex_unlock(&kvm->slots_lock);
+>   	kvm_pit_set_reinject(pit, false);
+> +fail_attach_cgroups:
+>   	kthread_destroy_worker(pit->worker);
+
+If it fails, could we keep it at least alive and functional ?
+
+>   fail_kthread:
+>   	kvm_free_irq_source_id(kvm, pit->irq_source_id);
