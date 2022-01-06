@@ -2,109 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF07C485EE2
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:42:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E3C0485F21
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 04:19:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344914AbiAFCmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 21:42:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40478 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231967AbiAFCmw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 21:42:52 -0500
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF9AAC061245
-        for <kvm@vger.kernel.org>; Wed,  5 Jan 2022 18:42:51 -0800 (PST)
-Received: by mail-yb1-xb2a.google.com with SMTP id k69so3479177ybf.1
-        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 18:42:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VUrh3Npgeap/8EiEtwRjncA+1oSJVR1QQxVGHBNvM04=;
-        b=f6EQYO79bUXprc7mhn+5kkGk7QaNhdm6TSnLti6itS7mqSCQT6sQjiGOBku7WoX188
-         vPdqu9VcHqayR/unWn8Q1ICELVnmKRotk6JQfhShEKTlwYXcQmP7i4wWQTx3chDRDI7A
-         4kBgcl+GK+bigbshUapujhp4+UlbLV1/GOkiY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VUrh3Npgeap/8EiEtwRjncA+1oSJVR1QQxVGHBNvM04=;
-        b=tHIiV86S0p1+tNvTqciwzk8l0LT0qgcP8CXUm8vGPj1Ly/+Vgo5lM/J7+bJmcO7ZEU
-         bjwLvIqmkb7bj2jBBWytzAk9ndOQuqGYrcjddsGo/yILedPplm3WOsEjsgRSK4lMSWT1
-         Xz2e1sdQ+Z5FVWulEfYA+gJ4VCN6HKu1ouH6H4dQLLfCVAo+ojz7Mt/2H8sVzRkwz622
-         XFm3PS9p89osXdC+EzWteA4a9NjK7QzQ5Oe2+0S2RKw07p32G5EJGPo5+LTTqaRcD6lD
-         tNErVXajEjzwF08naU+kG35p3bykeLvKfCEZrD+oMRk/JwrZKOZiIXvT2M0reMi8TyeZ
-         Ycyw==
-X-Gm-Message-State: AOAM530MCONdU3aATq+GE8888fkCLRVQkWe0xtWfIlnDAX+fzihPvRyI
-        OHEGcI5TcVFkdfNkYod9DJuB0qdkIcHdgw1lzD6Akw==
-X-Google-Smtp-Source: ABdhPJySN8UQBiLK5ZELedz9aMDOihftjIfvLaugncGmaT2wHj67/GId/mm7KBCgharYeRmCbxfpR9IivB+Tgad8EI0=
-X-Received: by 2002:a25:5ca:: with SMTP id 193mr64959101ybf.406.1641436971074;
- Wed, 05 Jan 2022 18:42:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20211129034317.2964790-1-stevensd@google.com> <20211129034317.2964790-5-stevensd@google.com>
- <Yc4G23rrSxS59br5@google.com> <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
- <YdXrURHO/R82puD4@google.com> <YdXvUaBUvaRPsv6m@google.com>
-In-Reply-To: <YdXvUaBUvaRPsv6m@google.com>
-From:   David Stevens <stevensd@chromium.org>
-Date:   Thu, 6 Jan 2022 11:42:39 +0900
-Message-ID: <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
-Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S229694AbiAFDTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 22:19:11 -0500
+Received: from mga11.intel.com ([192.55.52.93]:13445 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229543AbiAFDTK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 22:19:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641439150; x=1672975150;
+  h=cc:subject:to:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=jVs1PWNNKTf5pqsikfeVCGpxxqUkOICSdcJS6faPCaM=;
+  b=MvKbXQ4wF3qU6a/wkmKEKpY4wVAGI4VQxJd/Uq5Xd8/1lzq7Oj/AEV9Z
+   nV9SuiAg82yUL7ydIrGI5RTLaIoyZDmwbVn6NLlPbR2KotqP8bjtrVAmV
+   wOi/gMS2VthEJ5zkhZuGoHp/BpQDIpFuMGBarm0LmeaP/eptUdncXLGyJ
+   gt9q47sHXtaUBlCOl5qe8b7zannkUBooRZb1kzVzuPWNj9OKaTLAQYocp
+   UgLJKYms7ihvmcgARoT1IYVU9WJb6HalnKlj67qXqNYIR1kxeZThZNSPt
+   lEpZ3VscZudu+Dqwu+fnbwW0zc/cE7P3GIaE0HJGoqGCMbPJKzhGEHKVG
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="240127293"
+X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
+   d="scan'208";a="240127293"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 19:19:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
+   d="scan'208";a="526808939"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 19:19:03 -0800
+Cc:     baolu.lu@linux.intel.com, Christoph Hellwig <hch@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Chia-I Wu <olv@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 01/14] iommu: Add dma ownership management interfaces
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Bjorn Helgaas <helgaas@kernel.org>
+References: <YdQcgFhIMYvUwABV@infradead.org>
+ <20220104164100.GA101735@bhelgaas> <20220104192348.GK2328285@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <370335ad-0a2f-3668-9229-c65896f12828@linux.intel.com>
+Date:   Thu, 6 Jan 2022 11:18:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <20220104192348.GK2328285@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 6, 2022 at 4:19 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Jan 05, 2022, Sean Christopherson wrote:
-> > Ah, I got royally confused by ensure_pfn_ref()'s comment
-> >
-> >   * Certain IO or PFNMAP mappings can be backed with valid
-> >   * struct pages, but be allocated without refcounting e.g.,
-> >   * tail pages of non-compound higher order allocations, which
-> >   * would then underflow the refcount when the caller does the
-> >   * required put_page. Don't allow those pages here.
-> >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > that doesn't apply here because kvm_faultin_pfn() uses the low level
-> > __gfn_to_pfn_page_memslot().
->
-> On fifth thought, I think this is wrong and doomed to fail.  By mapping these pages
-> into the guest, KVM is effectively saying it supports these pages.  But if the guest
-> uses the corresponding gfns for an action that requires KVM to access the page,
-> e.g. via kvm_vcpu_map(), ensure_pfn_ref() will reject the access and all sorts of
-> bad things will happen to the guest.
->
-> So, why not fully reject these types of pages?  If someone is relying on KVM to
-> support these types of pages, then we'll fail fast and get a bug report letting us
-> know we need to properly support these types of pages.  And if not, then we reduce
-> KVM's complexity and I get to keep my precious WARN :-)
+On 1/5/22 3:23 AM, Jason Gunthorpe wrote:
+>>>> The vfio oriented interfaces are,
+>>>>
+>>>> 	int iommu_group_set_dma_owner(struct iommu_group *group,
+>>>> 				      void *owner);
+>>>> 	void iommu_group_release_dma_owner(struct iommu_group *group);
+>>>> 	bool iommu_group_dma_owner_claimed(struct iommu_group *group);
+>>>>
+>>>> The device userspace assignment must be disallowed if the set dma owner
+>>>> interface returns failure.
+>> Can you connect this back to the "never a mixture" from the beginning?
+>> If all you cared about was prevent an IOMMU group from containing
+>> devices with a mixture of kernel drivers and userspace drivers, I
+>> assume you could do that without iommu_device_use_dma_api().  So is
+>> this a way to*allow*  a mixture under certain restricted conditions?
+> It is not about user/kernel, it is about arbitrating the shared
+> group->domain against multiple different requests to set it to
+> something else.
+> 
+> Lu, Given that the word 'user' was deleted from the API entirely it
+> makes sense to reword these commit messages to focus less on user vs
+> kernel and more on ownership of the domain pointer.
 
-Our current use case here is virtio-gpu blob resources [1]. Blob
-resources are useful because they avoid a guest shadow buffer and the
-associated memcpys, and as I understand it they are also required for
-virtualized vulkan.
+Sure. Will do it.
 
-One type of blob resources requires mapping dma-bufs allocated by the
-host directly into the guest. This works on Intel platforms and the
-ARM platforms I've tested. However, the amdgpu driver sometimes
-allocates higher order, non-compound pages via ttm_pool_alloc_page.
-These are the type of pages which KVM is currently rejecting. Is this
-something that KVM can support?
-
-+olv, who has done some of the blob resource work.
-
-[1] https://patchwork.kernel.org/project/dri-devel/cover/20200814024000.2485-1-gurchetansingh@chromium.org/
-
--David
+Best regards,
+baolu
