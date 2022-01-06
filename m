@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26167485E90
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:22:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCACD485E94
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:22:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344693AbiAFCV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 21:21:58 -0500
-Received: from mga06.intel.com ([134.134.136.31]:40628 "EHLO mga06.intel.com"
+        id S1344703AbiAFCWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 21:22:06 -0500
+Received: from mga18.intel.com ([134.134.136.126]:45646 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231945AbiAFCV4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 21:21:56 -0500
+        id S231945AbiAFCWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 21:22:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641435716; x=1672971716;
+  t=1641435723; x=1672971723;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xKGR4J0OSP6uicbqMFdEjKsyZ291es72vzJYC31FqCM=;
-  b=UkzgLYhy0TijKNKyTDtiI2dE0qGRgt5YTi76pCMYmUqIzW+qDjzRpAUV
-   hCNCSs6aL/rBBQsP/saXwlPy5qunFDVGNGQ6apI3nlXifovcqBi2PqlGg
-   a2kuXWp7lMjo78gn9VeURfIFNIwHIlQnpb+vMaS5Z7VPPVE97LBp4XxRV
-   xEGNTZklolXVEnlzn7M0z4qZXTavfycOu0pI0rX/QgNSW6IXdhhDWEOjN
-   z8E4w7qAnJxYyzouByw8FXuNvMbWfwh4TqVNX8O8uLCBj+Hc7CsIkl+7i
-   37aIQtT7YeB99vG7ZRMnlmKRuhzTNFOvuHGt9xC6yISXLTHHytWhMwqpI
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="303325586"
+  bh=6YLQxZeVjKNGLWHBhbTA2BZXJ8CXUGVnJDAzUyu/JQ8=;
+  b=dOXqKwqh645TYN6QVRP1EvlzKn3p/ZxwzbGR1je8o52TWuj9c6JGh4Bp
+   LOJSaDkAsUfcmqJ/LvYwHqKKDmOzsvOeEe6b41tHBIgQpe1zaf7bm4ZbC
+   gVWIyt+cm/379z5QpOvJtDBnx9wZI00MRvo5F5N40gXAwL0diuhIfHtPH
+   u/CULbfEknDes6fH25QxGT3kr76zkRMTtyQ7Tch8AAVKVywsxI52wl1Wq
+   yHwg5JAKMiL+I5mPSWuNBPywD/+lA0ocEUPNQ9S2P5Sds8LtIszk66ts9
+   qkmfO1OWqrckuv7Er00IdoEr8aN5MFMN8swYX2Q52SCESbIjG+Yr8AEpx
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229389174"
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="303325586"
+   d="scan'208";a="229389174"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:21:56 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:03 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="526794284"
+   d="scan'208";a="526794313"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:21:49 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:21:56 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v1 1/8] iommu: Add iommu_group_replace_domain()
-Date:   Thu,  6 Jan 2022 10:20:46 +0800
-Message-Id: <20220106022053.2406748-2-baolu.lu@linux.intel.com>
+Subject: [PATCH v1 2/8] vfio/type1: Use iommu_group_replace_domain()
+Date:   Thu,  6 Jan 2022 10:20:47 +0800
+Message-Id: <20220106022053.2406748-3-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
 References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
@@ -75,88 +75,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expose an interface to replace the domain of an iommu group for frameworks
-like vfio which claims the ownership of the whole iommu group.
+After an IOMMU group is placed in a vfio container, the domain attachment
+may be deferred. During this process, other kernel modules can attach
+another domain simply in the following way:
 
+	group = iommu_group_get(dev);
+	iommu_attach_group(domain, group);
+
+Replace the iommu_attach/detach_group() with iommu_group_replace_domain()
+and prohibit use of iommu_attach/detach_group() in other kernel drivers
+can solve this problem.
+
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/iommu.h | 10 ++++++++++
- drivers/iommu/iommu.c | 37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 408a6d2b3034..66ebce3d1e11 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -677,6 +677,9 @@ void iommu_device_unuse_dma_api(struct device *dev);
- int iommu_group_set_dma_owner(struct iommu_group *group, void *owner);
- void iommu_group_release_dma_owner(struct iommu_group *group);
- bool iommu_group_dma_owner_claimed(struct iommu_group *group);
-+int iommu_group_replace_domain(struct iommu_group *group,
-+			       struct iommu_domain *old,
-+			       struct iommu_domain *new);
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index f17490ab238f..25276a5db737 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2213,7 +2213,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 			goto out_domain;
+ 	}
  
- #else /* CONFIG_IOMMU_API */
+-	ret = iommu_attach_group(domain->domain, group->iommu_group);
++	ret = iommu_group_replace_domain(group->iommu_group, NULL,
++					 domain->domain);
+ 	if (ret)
+ 		goto out_domain;
  
-@@ -1090,6 +1093,13 @@ static inline bool iommu_group_dma_owner_claimed(struct iommu_group *group)
- {
- 	return false;
- }
-+
-+static inline int
-+iommu_group_replace_domain(struct iommu_group *group, struct iommu_domain *old,
-+			   struct iommu_domain *new)
-+{
-+	return -ENODEV;
-+}
- #endif /* CONFIG_IOMMU_API */
+@@ -2280,19 +2281,14 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	list_for_each_entry(d, &iommu->domain_list, next) {
+ 		if (d->domain->ops == domain->domain->ops &&
+ 		    d->prot == domain->prot) {
+-			iommu_detach_group(domain->domain, group->iommu_group);
+-			if (!iommu_attach_group(d->domain,
+-						group->iommu_group)) {
++			if (!iommu_group_replace_domain(group->iommu_group,
++							domain->domain,
++							d->domain)) {
+ 				list_add(&group->next, &d->group_list);
+ 				iommu_domain_free(domain->domain);
+ 				kfree(domain);
+ 				goto done;
+ 			}
+-
+-			ret = iommu_attach_group(domain->domain,
+-						 group->iommu_group);
+-			if (ret)
+-				goto out_domain;
+ 		}
+ 	}
  
- /**
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 72a95dea688e..ab8ab95969f5 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -3431,3 +3431,40 @@ bool iommu_group_dma_owner_claimed(struct iommu_group *group)
- 	return user;
- }
- EXPORT_SYMBOL_GPL(iommu_group_dma_owner_claimed);
-+
-+/**
-+ * iommu_group_replace_domain() - Replace group's domain
-+ * @group: The group.
-+ * @old: The previous attached domain. NULL for none.
-+ * @new: The new domain about to be attached.
-+ *
-+ * This is to support backward compatibility for vfio which manages the dma
-+ * ownership in iommu_group level.
-+ */
-+int iommu_group_replace_domain(struct iommu_group *group,
-+			       struct iommu_domain *old,
-+			       struct iommu_domain *new)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&group->mutex);
-+	if (!group->owner || group->domain != old) {
-+		ret = -EPERM;
-+		goto unlock_out;
-+	}
-+
-+	if (old)
-+		__iommu_detach_group(old, group);
-+
-+	if (new) {
-+		ret = __iommu_attach_group(new, group);
-+		if (ret && old)
-+			__iommu_attach_group(old, group);
-+	}
-+
-+unlock_out:
-+	mutex_unlock(&group->mutex);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_replace_domain);
+@@ -2327,7 +2323,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	return 0;
+ 
+ out_detach:
+-	iommu_detach_group(domain->domain, group->iommu_group);
++	iommu_group_replace_domain(group->iommu_group, domain->domain, NULL);
+ out_domain:
+ 	iommu_domain_free(domain->domain);
+ 	vfio_iommu_iova_free(&iova_copy);
+@@ -2488,7 +2484,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 		if (!group)
+ 			continue;
+ 
+-		iommu_detach_group(domain->domain, group->iommu_group);
++		iommu_group_replace_domain(group->iommu_group,
++					   domain->domain, NULL);
+ 		update_dirty_scope = !group->pinned_page_dirty_scope;
+ 		list_del(&group->next);
+ 		kfree(group);
+@@ -2577,7 +2574,8 @@ static void vfio_release_domain(struct vfio_domain *domain)
+ 
+ 	list_for_each_entry_safe(group, group_tmp,
+ 				 &domain->group_list, next) {
+-		iommu_detach_group(domain->domain, group->iommu_group);
++		iommu_group_replace_domain(group->iommu_group,
++					   domain->domain, NULL);
+ 		list_del(&group->next);
+ 		kfree(group);
+ 	}
 -- 
 2.25.1
 
