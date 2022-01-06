@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD031485FCA
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 05:29:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 424D0485FCC
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 05:29:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233182AbiAFE3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 23:29:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35918 "EHLO
+        id S233478AbiAFE3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 23:29:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233390AbiAFE3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 23:29:00 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADEAC061245
-        for <kvm@vger.kernel.org>; Wed,  5 Jan 2022 20:29:00 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id h1-20020a170902f54100b001490a78b027so521326plf.14
-        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 20:29:00 -0800 (PST)
+        with ESMTP id S233548AbiAFE3C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 23:29:02 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03138C061245
+        for <kvm@vger.kernel.org>; Wed,  5 Jan 2022 20:29:02 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id o9-20020a637309000000b0033fba59a89dso866072pgc.17
+        for <kvm@vger.kernel.org>; Wed, 05 Jan 2022 20:29:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=qLJGLsrSxl8vz8UjF10/yIFUnzILoAmHFNlem5Xn0Rg=;
-        b=i2pAR+r1uF5crD94Cye8V3eeknRRtO5ClT5JcjxoCDoaNbz/OiiB8TjktEo0Eskfp3
-         SXHbDRxIQBeqo7TigD8nqnOKzN3/DRcrADtu8n/pb4avFwEdDuJeN4l97Ozud1ZXepI0
-         prcSedkcqtBI3/dZWpRTSrWnk2rPCQPlvqnvbZMxjYrtUyv0yPTqOZ6GwceiSRd5hJeI
-         UsbqeFxryWRUgTn3sIeD+PH7Ofz9yyPcS/4VirMBSfcm1K+DF17UFnt4Ws+XC3UOtQK0
-         7iq8lqsiOwLI8DhcKph7Tffm0WtkFnyBdF/SLC3yuZYdXTznsOwkX4JvLKRY6MrZ8dfn
-         l7CA==
+        bh=b7yr5TZKWgr1Gkk9tlld5S6pTxwmheE5Q1PU6HWi32U=;
+        b=F3Apz4IEwDK1YwS9SjwwGb7n870bheWeBdHqbZL+V970t7eiuWLXIwzE3dbQQ/USWn
+         25Z1yeytHNSLEFkFrfxXgf4hksZjEfmVgyXsWZBNIRZMOQ6KbpWnkSFbRu+jC22Bvhd4
+         w3HP8Iz0jziYoUpoeBfocZqDwkTsxXtddtnG1ZckQSCWx0uN9dAlOjTHFwpDmbdRKZEK
+         xNqs/cCFCvHQe3U+sus967N1MyyTivpKlV1N0kHd+QRii94GdPldP/mXhn3doT7Dgnv1
+         Obu+QUeJYInnMRmfXS9EN/7hIkQcTwFyk0eGK4UOGoWqaEd6m7V69tZu1ePNz+oeFTFD
+         UtTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=qLJGLsrSxl8vz8UjF10/yIFUnzILoAmHFNlem5Xn0Rg=;
-        b=ZBwQx/kXD1JnrqpNHKYhEy2z8QGHXkZ12CoeW9E9BSffErbSeio2vSoz+OnZ23Y8eA
-         yc8nKM+6ElsRe6Dm6BqvL83QK5WOTdO9bHG1pXCGtFs/xXBqNjBbVnpYZqfsHs5S7MkE
-         KXpi69xRQ9w0cjL6EukddVOeW27G2uKbVwx6E2865Ju2X/VE4wX+kCStbPbCC1hQ+VGn
-         BWBEezAzWpy/9Bjk8dGU578wAO1hK2n+dxMSRY14hRSjA4ehFpl1spN2bPAmJTnQft54
-         W3CqyY40sP86fDhJbl/9RKcEb5geCFbeMphyqEc2CS8IglgWGRHmRaNs5L2sgtVihB4z
-         X4UA==
-X-Gm-Message-State: AOAM531KHaliIEFWdGllaiRmG5/snXQ7AcDIoV7dtHZWb+25WJVHwzoC
-        +rx0lLky1hFkPv5AC2MyYmnyv5jWsz0=
-X-Google-Smtp-Source: ABdhPJye7IVcuJuXjnL+IknBc38aZjdnVQf/cyfydZZBaE3mIlTB6/eTjs70P0sFkJ75pQyDYNVJqb4tURw=
+        bh=b7yr5TZKWgr1Gkk9tlld5S6pTxwmheE5Q1PU6HWi32U=;
+        b=4oQ7sT6Kgb0alJXjpqSiZy4qwS6IxkDnbsFauFeBOaLHm5mXCu6jVsXSYmqXGt714A
+         AhHDh1qq1Aas6x/zdWgVNkKEEEn5nWhVEve81wLkIMg/cn0IqAiXC7gLZ8tjcyATTNlR
+         WJA9M5dVGsdKpx1p7wMJ1g0wwHxY/Jv/v7vxZ1Bso6zk22p31FDjryWYpM4gs8sYdPRS
+         KC2ueqO63OJ8IHZNa5gOO8FtL08lf1A3z23yVbCzT4BN83QRk9M1cL4OsWkU6i5s8ixe
+         Me2q5SAJqgMod/Igt4VoSU9SU1j118MAbhMwqPrSfb+dqRjbuiIAHFUg7nERIitxoshF
+         mQ5w==
+X-Gm-Message-State: AOAM533xkeuPqRwFSkZXxdCSP/H4zNKvBMKflzwfY1Q28ENgslGiJaPn
+        GellLfsUccSBZTpDyKApPaf0HVqoERw=
+X-Google-Smtp-Source: ABdhPJza7CsoLLbsr9YgDBA+GEOZJZ3TxzA3S2WFn+9UOWT0QXpaA8AlnFwKQEJB3WeGEVUg4wVYtWCt4qs=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:902:bc43:b0:148:9109:c60e with SMTP id
- t3-20020a170902bc4300b001489109c60emr58453515plz.9.1641443340051; Wed, 05 Jan
- 2022 20:29:00 -0800 (PST)
-Date:   Wed,  5 Jan 2022 20:27:01 -0800
+ (user=reijiw job=sendgmr) by 2002:a17:90b:388b:: with SMTP id
+ mu11mr7925849pjb.21.1641443341533; Wed, 05 Jan 2022 20:29:01 -0800 (PST)
+Date:   Wed,  5 Jan 2022 20:27:02 -0800
 In-Reply-To: <20220106042708.2869332-1-reijiw@google.com>
-Message-Id: <20220106042708.2869332-20-reijiw@google.com>
+Message-Id: <20220106042708.2869332-21-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220106042708.2869332-1-reijiw@google.com>
 X-Mailer: git-send-email 2.34.1.448.ga2b2bfdf31-goog
-Subject: [RFC PATCH v4 19/26] KVM: arm64: Introduce framework to trap disabled features
+Subject: [RFC PATCH v4 20/26] KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -73,217 +72,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a CPU feature that is supported on the host is not exposed to
-its guest, emulating a real CPU's behavior (by trapping or disabling
-guest's using the feature) is generally a desirable behavior (when
-it's possible without any or little side effect).
+Add feature_config_ctrl for RAS and AMU, which are indicated in
+ID_AA64PFR0_EL1, to program configuration registers to trap
+guest's using those features when they are not exposed to the guest.
 
-Introduce feature_config_ctrl structure, which manages feature
-information to program configuration register to trap or disable
-the feature when the feature is not exposed to the guest, and
-functions that uses the structure to activate the vcpu's trapping the
-feature.  Those codes don't update trap configuration registers
-themselves (HCR_EL2, etc) but values for the registers in
-kvm_vcpu_arch at the first KVM_RUN.
+Introduce trap_ras_regs() to change a behavior of guest's access to
+the registers, which is currently raz/wi, depending on the feature's
+availability for the guest (and inject undefined instruction
+exception when guest's RAS register access are trapped and RAS is
+not exposed to the guest).  In order to keep the current visibility
+of the RAS registers from userspace (always visible), a visibility
+function for RAS registers is not added.
 
-At present, no feature has feature_config_ctrl yet and the following
-patches will add the feature_config_ctrl for some features.
+No code is added for AMU's access/visibility handler because the
+current code already injects the exception for Guest's AMU register
+access unconditionally because AMU is never exposed to the guest.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   1 +
- arch/arm64/kvm/arm.c              |  13 ++--
- arch/arm64/kvm/sys_regs.c         | 105 +++++++++++++++++++++++++++++-
- 3 files changed, 113 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 90 +++++++++++++++++++++++++++++++++++----
+ 1 file changed, 82 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7b3f86bd6a6b..0274009cb05d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -751,6 +751,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
- void set_default_id_regs(struct kvm *kvm);
- int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
- int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu);
-+void kvm_vcpu_init_traps(struct kvm_vcpu *vcpu);
- 
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 33acbae7a7ed..e2f52eb84618 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -626,13 +626,16 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 
- 	ret = kvm_arm_pmu_v3_enable(vcpu);
- 
--	/*
--	 * Initialize traps for protected VMs.
--	 * NOTE: Move to run in EL2 directly, rather than via a hypercall, once
--	 * the code is in place for first run initialization at EL2.
--	 */
-+	/* Initialize traps for the guest. */
- 	if (kvm_vm_is_protected(kvm))
-+		/*
-+		 * NOTE: Move to run in EL2 directly, rather than via a
-+		 * hypercall, once the code is in place for first run
-+		 * initialization at EL2.
-+		 */
- 		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
-+	else
-+		kvm_vcpu_init_traps(vcpu);
- 
- 	return ret;
- }
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d5bd04c68cd4..33893a501475 100644
+index 33893a501475..015d67092d5e 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -283,8 +283,30 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 	(cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR1_GPI_SHIFT) >= \
- 	 ID_AA64ISAR1_GPI_IMP_DEF)
+@@ -304,6 +304,63 @@ struct feature_config_ctrl {
+ 	void	(*trap_activate)(struct kvm_vcpu *vcpu);
+ };
  
-+/*
-+ * Feature information to program configuration register to trap or disable
-+ * guest's using a feature when the feature is not exposed to the guest.
-+ */
-+struct feature_config_ctrl {
-+	/* ID register/field for the feature */
-+	u32	ftr_reg;	/* ID register */
-+	bool	ftr_signed;	/* Is the feature field signed ? */
-+	u8	ftr_shift;	/* Field of ID register for the feature */
-+	s8	ftr_min;	/* Min value that indicate the feature */
++enum vcpu_config_reg {
++	VCPU_HCR_EL2 = 1,
++	VCPU_MDCR_EL2,
++	VCPU_CPTR_EL2,
++};
 +
-+	/*
-+	 * Function to check trapping is needed. This is used when the above
-+	 * fields are not enough to determine if trapping is needed.
-+	 */
-+	bool	(*ftr_need_trap)(struct kvm_vcpu *vcpu);
++static void feature_trap_activate(struct kvm_vcpu *vcpu,
++				  enum vcpu_config_reg cfg_reg,
++				  u64 cfg_set, u64 cfg_clear)
++{
++	u64 *reg_ptr, reg_val;
 +
-+	/* Function to activate trapping the feature. */
-+	void	(*trap_activate)(struct kvm_vcpu *vcpu);
++	switch (cfg_reg) {
++	case VCPU_HCR_EL2:
++		reg_ptr = &vcpu->arch.hcr_el2;
++		break;
++	case VCPU_MDCR_EL2:
++		reg_ptr = &vcpu->arch.mdcr_el2;
++		break;
++	case VCPU_CPTR_EL2:
++		reg_ptr = &vcpu->arch.cptr_el2;
++		break;
++	}
++
++	/* Clear/Set fields that are indicated by cfg_clear/cfg_set. */
++	reg_val = (*reg_ptr & ~cfg_clear);
++	reg_val |= cfg_set;
++	*reg_ptr = reg_val;
++}
++
++static void feature_ras_trap_activate(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TERR | HCR_TEA, HCR_FIEN);
++}
++
++static void feature_amu_trap_activate(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TAM, 0);
++}
++
++/* For ID_AA64PFR0_EL1 */
++static struct feature_config_ctrl ftr_ctrl_ras = {
++	.ftr_reg = SYS_ID_AA64PFR0_EL1,
++	.ftr_shift = ID_AA64PFR0_RAS_SHIFT,
++	.ftr_min = ID_AA64PFR0_RAS_V1,
++	.ftr_signed = FTR_UNSIGNED,
++	.trap_activate = feature_ras_trap_activate,
++};
++
++static struct feature_config_ctrl ftr_ctrl_amu = {
++	.ftr_reg = SYS_ID_AA64PFR0_EL1,
++	.ftr_shift = ID_AA64PFR0_AMU_SHIFT,
++	.ftr_min = ID_AA64PFR0_AMU,
++	.ftr_signed = FTR_UNSIGNED,
++	.trap_activate = feature_amu_trap_activate,
 +};
 +
  struct id_reg_info {
  	u32	sys_reg;	/* Register ID */
-+	u64	sys_val;	/* Sanitized system value */
- 
- 	/*
- 	 * Limit value of the register for a vcpu. The value is the sanitized
-@@ -327,11 +349,15 @@ struct id_reg_info {
- 	 */
- 	u64 (*vcpu_mask)(const struct kvm_vcpu *vcpu,
- 			 const struct id_reg_info *id_reg);
-+
-+	/* Information to trap features that are disabled for the guest */
-+	const struct feature_config_ctrl *(*trap_features)[];
+ 	u64	sys_val;	/* Sanitized system value */
+@@ -778,6 +835,11 @@ static struct id_reg_info id_aa64pfr0_el1_info = {
+ 	.init = init_id_aa64pfr0_el1_info,
+ 	.validate = validate_id_aa64pfr0_el1,
+ 	.vcpu_mask = vcpu_mask_id_aa64pfr0_el1,
++	.trap_features = &(const struct feature_config_ctrl *[]) {
++		&ftr_ctrl_ras,
++		&ftr_ctrl_amu,
++		NULL,
++	},
  };
  
- static void id_reg_info_init(struct id_reg_info *id_reg)
- {
--	id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-+	id_reg->sys_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-+	id_reg->vcpu_limit_val = id_reg->sys_val;
- 	if (id_reg->init)
- 		id_reg->init(id_reg);
- }
-@@ -857,6 +883,24 @@ static int validate_id_reg(struct kvm_vcpu *vcpu, u32 id, u64 val)
- 	return err;
+ static struct id_reg_info id_aa64pfr1_el1_info = {
+@@ -901,6 +963,18 @@ static inline bool vcpu_feature_is_available(struct kvm_vcpu *vcpu,
+ 	return feature_avail(ctrl, val);
  }
  
-+static inline bool feature_avail(const struct feature_config_ctrl *ctrl,
-+				 u64 id_val)
++static bool trap_ras_regs(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
 +{
-+	int field_val = cpuid_feature_extract_field(id_val,
-+				ctrl->ftr_shift, ctrl->ftr_signed);
++	if (!vcpu_feature_is_available(vcpu, &ftr_ctrl_ras)) {
++		kvm_inject_undefined(vcpu);
++		return false;
++	}
 +
-+	return (field_val >= ctrl->ftr_min);
-+}
-+
-+static inline bool vcpu_feature_is_available(struct kvm_vcpu *vcpu,
-+					const struct feature_config_ctrl *ctrl)
-+{
-+	u64 val;
-+
-+	val = __read_id_reg(vcpu, ctrl->ftr_reg);
-+	return feature_avail(ctrl, val);
++	return trap_raz_wi(vcpu, p, r);
 +}
 +
  /*
   * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
   * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-@@ -1799,6 +1843,46 @@ static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
- static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
- static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+@@ -2265,14 +2339,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+ 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
  
-+static void id_reg_features_trap_activate(struct kvm_vcpu *vcpu,
-+					  const struct id_reg_info *id_reg)
-+{
-+	u64 val;
-+	int i = 0;
-+	const struct feature_config_ctrl **ctrlp_array, *ctrl;
-+
-+	if (!id_reg || !id_reg->trap_features)
-+		/* No information to trap a feature */
-+		return;
-+
-+	val = __read_id_reg(vcpu, id_reg->sys_reg);
-+	if (val == id_reg->sys_val)
-+		/* No feature needs to be trapped (no feature is disabled). */
-+		return;
-+
-+	ctrlp_array = *id_reg->trap_features;
-+	while ((ctrl = ctrlp_array[i++]) != NULL) {
-+		if (WARN_ON_ONCE(!ctrl->trap_activate))
-+			/* Shouldn't happen */
-+			continue;
-+
-+		if (ctrl->ftr_need_trap && ctrl->ftr_need_trap(vcpu)) {
-+			ctrl->trap_activate(vcpu);
-+			continue;
-+		}
-+
-+		if (!feature_avail(ctrl, id_reg->sys_val))
-+			/* The feature is not supported on the host. */
-+			continue;
-+
-+		if (feature_avail(ctrl, val))
-+			/* The feature is enabled for the guest. */
-+			continue;
-+
-+		/* The feature is supported but disabled. */
-+		ctrl->trap_activate(vcpu);
-+	}
-+}
-+
- /* Visibility overrides for SVE-specific control registers */
- static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
-@@ -3431,6 +3515,25 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 	return write_demux_regids(uindices);
- }
+-	{ SYS_DESC(SYS_ERRIDR_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERRSELR_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERXFR_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERXCTLR_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
+-	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
++	{ SYS_DESC(SYS_ERRIDR_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERRSELR_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERXFR_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERXCTLR_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERXADDR_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_ras_regs },
++	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_ras_regs },
  
-+/*
-+ * This function activates vcpu's trapping of features that are included in
-+ * trap_features[] of id_reg_info if the features are supported on the
-+ * host, but are hidden from the guest (i.e. values of ID registers for
-+ * the guest are modified to not show the features' availability).
-+ * This function just updates values for trap configuration registers (e.g.
-+ * HCR_EL2, etc) in kvm_vcpu_arch, which will be restored before switching
-+ * to the guest, but doesn't update the registers themselves.
-+ * This function should be called once at the first KVM_RUN (ID registers
-+ * are immutable after the first KVM_RUN).
-+ */
-+void kvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(id_reg_info_table); i++)
-+		id_reg_features_trap_activate(vcpu, id_reg_info_table[i]);
-+}
-+
- /* ID register's fractional field information with its feature field. */
- struct feature_frac {
- 	u32	id;
+ 	MTE_REG(TFSR_EL1),
+ 	MTE_REG(TFSRE0_EL1),
 -- 
 2.34.1.448.ga2b2bfdf31-goog
 
