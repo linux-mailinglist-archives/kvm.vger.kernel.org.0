@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D165B485D82
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 01:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC0E485D87
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 01:48:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343985AbiAFAsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 19:48:21 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:31546 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343957AbiAFAsA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 19:48:00 -0500
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N4jdC031970;
-        Thu, 6 Jan 2022 00:47:33 GMT
+        id S1343961AbiAFAsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 19:48:38 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:30232 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1343995AbiAFAsF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 19:48:05 -0500
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N4Y5e023582;
+        Thu, 6 Jan 2022 00:47:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2021-07-09; bh=Q/6bDBTgCx+bOXRkG/YRDrBG3uA87fmnjSGMlx+MiHQ=;
- b=Q7tnx4alkn/Z7w47+JnBJAWsQHv3jqDVXch4dygL1t0YgKsd/nXidYAoxbaaySXlN1/+
- Vxvp0kKGDRF5BzzhnBvRideW3SgU91JUz2uTqYJaETk8AcLmnpVZF7Lh+NuHlwcMgF3b
- 8l0gyHfhBHJgNDcLtz3ptgpgko3t3f2sbynN7kKSfxWl00xRGTUdN7tVoghsgUohAO5S
- GPosTxOAq3CGvz5QB3jZKwsHm99chvfJrSoz0BhYbd7Oj1avtDfAoPKCZhkvlECENjib
- JK3mC+NsB1iJUZFo38qwZ4t2BCPU7b5cMCT64i1oC/XTnEzfXRQYQoCE0HkKD0lNuTL5 dw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpjr3w8-1
+ s=corp-2021-07-09; bh=jgvLjAHm5Vf49VWwJ3j4Je5hXaayeoK3l5mdD4qALeU=;
+ b=UjaC5j9ljknDWL/TMLFPOfo3VNJhZ0j/JSINiyt67xZZpC8ljXeepCdxh8xxNRFlldJI
+ sVzuVqPEGMMVePKiWGvHXIPCfn6XXahXXCOF+0vuqR2aLVoROP1bmx3k1JSNsD8Q2j5u
+ 6RBNkL4z7BKmWsmS+roe9+ORasZ7xvzNXghYoje3rjVMru9WdXUD57SbFEehcYgvQ7R3
+ IYeGbI2g67+T3RDX2W4n/iUoh+YxymBG7xeDyZirlmUkT8DPJwo25G6e9kDsUlC2xCy6
+ rqk6PbfpKxK32gCb+wb+/otMAp3VpdKU7EWtzIx9DX6jI2kV0PGPSi3reKrlZuejxHqX ZQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpeg425-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060VgDL076303;
-        Thu, 6 Jan 2022 00:47:31 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam08lp2042.outbound.protection.outlook.com [104.47.73.42])
-        by aserp3020.oracle.com with ESMTP id 3ddmqa3d87-1
+        Thu, 06 Jan 2022 00:47:36 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060VnHj086820;
+        Thu, 6 Jan 2022 00:47:35 GMT
+Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2041.outbound.protection.outlook.com [104.47.57.41])
+        by userp3030.oracle.com with ESMTP id 3ddmqbvt0t-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:31 +0000
+        Thu, 06 Jan 2022 00:47:34 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PkNuM7MoNkUTOdn2ZmZGWfY5bpYf+qbyFo+ci1/qm1oCEDU4VkysLc68DzDj5T6qfTcLxDhH0EiDrhL8giie+cuzQBtVVFN7xjn9QFYJVsq7MVhpVXOxNqz/xDKUo+penV5EeqkCFd+uafoRy5HoBs2jVjBEPVc/4nVzTY/fdPdh5iCR4Iz3DC1rsaUfMBTZWXd4BKxyqv1a4pV7ZGYRwFCzXHCvIkt0VDm43eimXpxWx4Q7UOCvJq2OGjT0S+9XJc/5JHqzGxsumP68KrGR4XK5xlw3v9rLWfG9by5FqdwYQQ11entjmc9f3MwBBCPLV5EgTvVp2eFAq/yV2jB4bA==
+ b=OX4S1UUlqm4BWn4iYqkD4MjmaCGFkzmOM+8iSSbwP4Qi9YZHp2E5qWsjNcUpZfK4eeVj+woVeacgk8FjCNsfCVvxBcUbuYN66qG9nOX+ris5Env28XXeXjci7j90xQl6QlWuNkg4uKzpdSvXb7dAxT7AvRw1Y6xdyfuXxas0UjlsGwLBavjqkh1BvIq6NVKNz78UYR/LZwlLfUgT0YcJHujCskUYV90yZuIQqF6U10jhdtpZXpGZY4S33DE1EcZ+urzwJigXGKk+ft74Cdl4hFslRCW9yjEiJvCGBjIvQO3CRs3ylm1JhaJ0pf4eFPSRnRsWRM56oc12xGttOci07g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q/6bDBTgCx+bOXRkG/YRDrBG3uA87fmnjSGMlx+MiHQ=;
- b=kQWfoAKltKYJNQJev7HZ6ojlHVOw2rtxSDGMHtpZOGFm+Rtt2ToCUGIVimka0fDvN7VBKZdv+MgZ7yQKB9ZEy41ja+l4eC39Nl05bch9LUCrwC+qCg0TrTsWsfhZ7E3usMzr7bmr+slwDKfhyu8M6nFBxGUbTjVmyMYpIMDymmZYlNw2aJmnR17jaTWgevsfuqJXuBAK8TSPp13fKW10joCF2gg73GqH+Oxl2ebiDMLM/IW6QyBnvtHNZv3NxQkNP8xwbKChanuMbw0x+ruQJe09ciPT08lY0pmEh5uYKBjnmFENhePgUtSMCZjLbCZh2QWuCbD3MgiD1y/SHnUCuw==
+ bh=jgvLjAHm5Vf49VWwJ3j4Je5hXaayeoK3l5mdD4qALeU=;
+ b=jrMl/Ce4RZ6zmvMXFtvFjhNcY1qDu6v3Y5PVAc5wgDr5ZofgTqBxIxv51up7FGVZRUEZC44PPWnelHqYFW7HXrC7YXHxZhnAcmH0OwwjQjH5+y1yNzk6Gbsaik0utsCC9FwIMlnMmxvOiV5jrPmPg6Jp9txJn2Ha8LsVhwuTReOPNF7xqr/UvgXrvMeYqnPsACcSiYyhNPpU6AU5SR8dM7e1l04d9tlJSUvwMc7XKO/vNXOt5h0dELITcP5sfoGImZnl7RzOOUqFaPuRmyus40EewDs0UfG6C6icP56PbOT9F829DZMi/dQI+UU6I1yX9B3promdet0oFaHFH60iMQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q/6bDBTgCx+bOXRkG/YRDrBG3uA87fmnjSGMlx+MiHQ=;
- b=UFgHr0Xnw6obdyx9+omdx/qkgB0akl6+MLScnLnIsUCOGJXd3e5qHaUeG2MD8Fgx+DPtWrqkMlB0GxbzQkBL7YgeoZU4AksDdFYw7iJ3tVP2jR/rv9IMdMP88nJo9I9MV9yRcxjS1tSrv1i+JXNBPvYaWSmGH4fNnCxuKvNv7uA=
+ bh=jgvLjAHm5Vf49VWwJ3j4Je5hXaayeoK3l5mdD4qALeU=;
+ b=Ny2NzjosMYfFBVpdP0xR+SqIDFMpNLfbxJctbewM87Se3eHnyVJoZA0Q9ZeyXTWEbmrZFIMW9zz64kh0Pc0SvQQUEpuWEJ0kURI+Sn4anS6+iqTr8oDospxMqZdrQeF5EuxU/fUU95tbz7kWgXbQAb6BidIbF3l4Dr0y7c+NT1o=
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com (2603:10b6:510:126::18)
  by PH0PR10MB4422.namprd10.prod.outlook.com (2603:10b6:510:38::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Thu, 6 Jan
- 2022 00:47:29 +0000
+ 2022 00:47:32 +0000
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3]) by PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3%9]) with mapi id 15.20.4867.009; Thu, 6 Jan 2022
- 00:47:29 +0000
+ 00:47:32 +0000
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Alexander Duyck <alexanderduyck@fb.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -83,9 +83,9 @@ To:     Alexander Duyck <alexanderduyck@fb.com>,
 Cc:     linux-mm@kvack.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [RFC 06/16] vfio/type1: Refactor dma map removal
-Date:   Wed,  5 Jan 2022 19:46:46 -0500
-Message-Id: <20220106004656.126790-7-daniel.m.jordan@oracle.com>
+Subject: [RFC 07/16] vfio/type1: Parallelize vfio_pin_map_dma()
+Date:   Wed,  5 Jan 2022 19:46:47 -0500
+Message-Id: <20220106004656.126790-8-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
@@ -96,160 +96,240 @@ X-ClientProxiedBy: MN2PR20CA0019.namprd20.prod.outlook.com
  (2603:10b6:510:126::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 88432e5f-372b-4cfd-3064-08d9d0ae1e0b
+X-MS-Office365-Filtering-Correlation-Id: 96f4a87a-0f54-4be6-11b5-08d9d0ae1fa5
 X-MS-TrafficTypeDiagnostic: PH0PR10MB4422:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR10MB44225E314266FC820E01B213D94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-Microsoft-Antispam-PRVS: <PH0PR10MB4422B31F0B1D69221B9D8F3AD94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: V1tI8xlG/Uhy6zrHk3l4ZiBmX/jgyBNrMogOs2N9NsOrU0oUAeDzcargpACrAP2tR41gFYOnZ+jKTzVLjqFRApnkde9gWVhCb/LIAQ1Vp0ta+M8FWKnur1JFn484kXLdQR4cbWAGJKW/w/pjRjZJx6GAaJjupDDOiyJkeeMAM5pUEfH1TnYcWikvcMAPSAqy3cV3CfD2QCKqCmeWx3wGkVxmFVbgB7qWSmC2eytnNq9Gv7TIxZVy7q19KiBy6EWYIAFywu8Bi3hpvbPTwqWlJxAnJplXVxo57djTEp2mvri48Si3quVdl2HbSgnNZKtelHNp5Fple50JMp+y8FeMPFYtm7U91J2JEeLcmOox8GkPlu46f9ftxjcCL6nkz+EacUg+np0LzL9JaYW7xq+mz2j095/4oYPbvHd8llREXqzxKeS2viVgHVJMVQ2KSRXJoCoMMS+yEShmEW4tyEf2xf26BE4ukbqtOxFMEfha8u9mUyGkaH3SdTHmR0k+q5wtHUcSe/NR2W1j7V9GYMpt8Jfra/KjMcrwP3//dFK0ncE8untQqm42hbqJHokas8T+Ek0p8EJTTQVucsh11LWEicQOwzHjjwvXXDEUX/eslAbhk0ouyGJFgz9M6UpUxBTpes6c+F3NO42Omx06ZRsSIUGPT156bDNEhWqucOIL2F9/qjI04lNtfzzfBZUNipF01gBBB7U+V7yIPiHknz5ollrUJOPpjtb5ZtQUnX6LIDk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(38100700002)(5660300002)(38350700002)(6666004)(83380400001)(508600001)(66946007)(66476007)(66556008)(26005)(52116002)(186003)(6506007)(7416002)(8676002)(110136005)(8936002)(921005)(1076003)(6486002)(2616005)(36756003)(86362001)(103116003)(107886003)(6512007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: xyb22aRtPdtNbPj2ZMrZtWJJeLQYnoBEV9B4/HHuF5Grt4IEUUXJ7/+mY88a43SmyiOtwCf2LGETqPnkDJ17FL9XE1qXpR4HInHB5btNu/58BzMnsZI4EIrKB16DQk4G0js+XPuvKBKTamaKbAuIXGm3qC1RYXlhnr9MS9EbL8RuMsAKjNkaQR8+rmECGYnc8OweeV0CT1jjaMJL0FY2njqx9ojqacSoYknu3NSFzkd2/hPM25rLmDfVdxgI4GOTj7CavrX8cVx3nmbg9pXvQS+sX70uER/BV4v4PXvoKUo/1VxdB+jXEWOATFmoaJEwfKV01fUDN6+AGp2mP4Ct3AHI7Kd+x7RSoQ6oxAsOvFLLWvGIRnwROSx2i3hSO7hyZ8Z6ktrfySVF58QGSLukDeR3Muro20t9YRcQ0EPiE6KSdeCtA+NIIBMD/1gw7QDVbiZWOLh11+DOmvFki5S9bbZ9YReWWQvFBx6KEtbyMr0ghWc5vNyNb6/xlfXR61M/tRKuYFubxo3HqarHx2KYiNmQ34JeAbTazI6i3aifg3g1H0C2Z0sVu2T1u22KwwgTEoCw2K9rrcEZv/aXX69q10Ail/qtHQDxOISkHY88FeuFq8ry8yuoQXTAsY7Syxvh0a3Piuh0A7MuabyKAL9KhIMVSUrzklCmwL7MThIxTi10hvnuVBfRogjrPzRadfDSNKExrwY1dJXmRNoUJrccCCFeXTgA6oxtZaMCQZEurGAQ8HX7FSFSo+ysQcdeiLysfKC83OEj/CcdP+1LUIhsqHqIUYTb6HQqH8yZEpSyhPcnQOoVxWBB9pPQmK4VjJVK/TPtC7p12Wwu/w/hIX8uionKoOa5iNguEvB74LXGzGs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(38100700002)(5660300002)(38350700002)(6666004)(83380400001)(508600001)(66946007)(66476007)(66556008)(26005)(52116002)(186003)(6506007)(7416002)(8676002)(110136005)(8936002)(921005)(966005)(1076003)(6486002)(2616005)(36756003)(86362001)(103116003)(107886003)(6512007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EtRnG/KAmJmcrxE5G44vh3dkhKyqCAgggGyODj5vLBwzrm7oD1kIM7fRe9+P?=
- =?us-ascii?Q?095W2uasDKo7STE0MFeTlsaMMzlNMXyFwF6OGpIjuLEWU+62OKXzlnVYsKhh?=
- =?us-ascii?Q?kdmaLq2tdqBDUTiRr24HizXonuEwBoMT6neuTFwj4ByV+SwZnfWthZyAS4XV?=
- =?us-ascii?Q?RL6hf6hcot1v4ZESA2as8225xyXvbx7NwYf8pKJav/FwGTP8RZLo6Z+I1jVf?=
- =?us-ascii?Q?172HWNDfYzX8azE9PJbUD5iNxmXEJyywZDiM/UG3pSrsjEc6wepdNzfJpSpb?=
- =?us-ascii?Q?8bfH9js4zViAspLViWVIt4/4JFeRJHEexwqQEWQPuneTVRdGvgRM3XexbfJD?=
- =?us-ascii?Q?QAyE3BSMT2cYNcXnXkNtIdle7fkfhj/gmrrhrrsLw9tq3y80CUMfd23uoppI?=
- =?us-ascii?Q?HfsnhZZ5CFRsUAFGp851b77izxEh2wFJOakxr+biQ8ea4P4gTOjDadRMjeTV?=
- =?us-ascii?Q?2+NSQsDnS0uKYWHaINIy+Sfkrh/Gpwx5jPmnCwK0/Qn1HlK0lojZ3dGIQGVn?=
- =?us-ascii?Q?M1dLxS7hD0mpYa2+pvKFW8PnyVe8mTUr+7QUnCF+msn1vHyMkSw7Yqj9/rfj?=
- =?us-ascii?Q?kDCjmfo5pYWwcAhyp9JI0CwbHPWj+nEzqqpGJM9Uy0PaHQB8OnCbYRzqZpRK?=
- =?us-ascii?Q?VEOVr+Ts+/ZqQHEEutIL5Xb4U10RfmtlmWy7rZOP+fGDjbCaRL1cFQQnAURx?=
- =?us-ascii?Q?Zi+5qBHhO3gNdJihuCr+V6znNCm0Nv8Wkmlz7n7YFfA59sp4QwzN9KDwmt0N?=
- =?us-ascii?Q?bYg/0yajri4bltNCBihDbDWYPl72Nhjwmg6g8WF1k2EShNycsIBq1W2JzjnP?=
- =?us-ascii?Q?Fba/NHLGdCqB/7KLmFBTE2P/upGREgM8djinYGVBAFWN8BYo625wJiSZasfL?=
- =?us-ascii?Q?TrCQC/kGrkeV1SoieDfR0RmgIcKgUGqyMPAaCQTfxYaLr+ddfwwGrSecBeDM?=
- =?us-ascii?Q?Dk4BmPm9xpE+LtM/tfbtavwg3B4l4byhKvb8IcjmLQIwif1Ha61AUgyvpjvW?=
- =?us-ascii?Q?G60aVEvsFOZK3fy2lgv6E0Qn756yiCl7PA+/06TfRie3UFPmUHYCOF5bB+t8?=
- =?us-ascii?Q?lSy6Ga0SrVztLmTDcTg6Wi6orPC4JaV/OPleQUyZy0hLXDwQnTnGkgLDXlmc?=
- =?us-ascii?Q?qJh3fP+sJ1ziVCJh9Clg1XW5izlQn1GX/F6KY/1nPaZw/bkjMQr8k7C3xRr7?=
- =?us-ascii?Q?Jt0fGnac9i2M63nCUACEUIKRe8aY9BgC6DU7v/WkG57TOv7fAM8BLHeVGE3O?=
- =?us-ascii?Q?dWFw4HzdBu8mQxJrtOXjfahT4MRyl6lQUji+h6TaXkOo3OUBuqNu9McHhFaS?=
- =?us-ascii?Q?Ss6iZsV3Dwo/y5Fx1BZlH1vBl25DqPidM+Oihcy+y3i/hdFpyZnKjvL8f10q?=
- =?us-ascii?Q?gxG/RJCUH1szDjcHqDKgjI7tCdx2TD15aplp4CilmnPEbOMEP3cfwojVY1Yp?=
- =?us-ascii?Q?4sVbNVmG/X/+6FZ8z+NmMQ1qa45IE6Kh4B0BmoOCzstBEF84AaxlgNP0QsYA?=
- =?us-ascii?Q?SZsX5Ej28pJCUQeAZsZDOYVCyJoIF/DIuWVozpUVkEIXdA0U+IcvqHVxGDsK?=
- =?us-ascii?Q?3MTDaEHAG5vpyJPmwaCOIZYmp465Ty1A2B7UjTbb1GGzJqYY8N9qcaDVvgKj?=
- =?us-ascii?Q?/DX+WdAc1I//HboYxK3/vT4SakToiM71BVwtktgwtqiN+XL79A5OO8YIrGqs?=
- =?us-ascii?Q?X4Y/87kiLVOg1SX8Lc0TMufiACs=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?CKbaYQ7AfqK9amf10QGa34yhVeeJAJf06YoeVozsaVVhVgUnJJmF7vQ7UpwL?=
+ =?us-ascii?Q?ApoQIRgMIcVasqNv8YTIHlIZni0tvILQMCT947MC9W79IT5xwkDXSx7ycgj9?=
+ =?us-ascii?Q?fXrlohx9OZz3lPHeo0EVAzJ4uI2oycqqtEGbAj0Apr8JiiZ9QezVUjAhGl8S?=
+ =?us-ascii?Q?gfCmZy0WlGa0S9/rNlF3QhUKmhA+u4OBWEG2P1a/FqVdabrTXyRR1DHga4Kr?=
+ =?us-ascii?Q?jdHei2/Ersw3WSG0RSe2EcDTSbkIFBBvnhWmoeewRh6dC2/pZAQ1ErwgLc6X?=
+ =?us-ascii?Q?EbWQOX2faH3HUeIGV45yQSo9f30lC1pIj5uNEyfurWUqJojIJBU07w55rHRL?=
+ =?us-ascii?Q?86+BTSEr/xuZXuM0KAYgMCMN9FAg1Z8ip5fXkxExGhnAEsDjbsWexd0wzbuh?=
+ =?us-ascii?Q?8u3P578Z1KoHCLnDzpRXkomlrwmjRDs9kk75CS5NWbWAhxik6MJMF0sFayQc?=
+ =?us-ascii?Q?0tFrOkaDWV82Qb8QvalxyBat9znVtgtUlcca4pPhOzP8h0FslFvaku2ycStF?=
+ =?us-ascii?Q?f/DmoKqV7KRXnlEQDV5GYdohq4Sq5lLtuOmIt9IQUriw8n3q2EUHr1hrJWp1?=
+ =?us-ascii?Q?PBIX6RJFEtV/HT2052hbKe9dpG23f/gQc2DYbwXQuSXLtILIX3Za8z3k2fgc?=
+ =?us-ascii?Q?qNeMERtHhOGtAoLGc5xwEdwCcCyJlGqxkR+GcENQwe++DoaYhq5XQXUCNSG2?=
+ =?us-ascii?Q?HC3d3Z+VJ61pkm7EP/gmD1EKLYhFayoDyYJJe0+o35fcGLV+41orLp45twF5?=
+ =?us-ascii?Q?tjFo1rQJrbVVX8IbA8RFY7zNh1f1YJBq7Pi4lUZYUjEkQRYiH3WyxOnDtQAk?=
+ =?us-ascii?Q?7y5wwbRc5CtjbLiFHFVkdn2BR/hUcuxXUUcjKvN1R5RUIXbF7Ql2qbdNTtx6?=
+ =?us-ascii?Q?XdqvfBiybiDNp3/Ya2WdsaCa9X5KmOAxAesAsczGrqnSpvt2iJq9SY8u+u04?=
+ =?us-ascii?Q?Ewjb2ixT4dfVmA0TJXr96UHWzy5sA++kwMG6+fYq0ABUDWimA27AamBLh7kn?=
+ =?us-ascii?Q?tvz23sz1fZibxBFq0y60wor+L8vQLHl0SMbxQgCHsO+keLqrYW193VF2RGbb?=
+ =?us-ascii?Q?aiOdEaae4jjSX1Yhb3ln6YVRXv1cLFRvMb/AerzTbrCI2qXtWA1P1zuFOT3L?=
+ =?us-ascii?Q?O+XcoMFtj8CXMMfn7LI3Ihq0fTUh9yy2S+SHIwlQlIadLYQJihPRa0oDUY4N?=
+ =?us-ascii?Q?T7xcIA6Rs6oOifxAXSe/lc60hQSQb7+xyIhbUWPKr3SU/KsFR+DNkhUiu5/F?=
+ =?us-ascii?Q?9NzLOGljqubQup93pSW+zF7pWKkLYYtSrsoo57CRUV9j7lwABKVTuKoP/UI+?=
+ =?us-ascii?Q?j+eFuJdjza0ra+0J9o9v1Ydq63J9sK7FTn2ABI7U8iOCxnkubXH4ORVre1ug?=
+ =?us-ascii?Q?bx1ND4JSi3xGfrFUbWTLlXYXtwuV8NH2w+xLeYa1oIeS4P/xWITf87zwcWPo?=
+ =?us-ascii?Q?ma/pGXhK2W82zMJ34nQlp284e0NR5oSHt4z6YZ81RjTxsnpqJIggjUtt3UYO?=
+ =?us-ascii?Q?Cq/WAKk6UBJPlaVzYcWw1dA5K8R2NqRWyHeFhrMzlyiYjYQL/W18SYB9vPtd?=
+ =?us-ascii?Q?3KNo46bDXFvqEA9jDjy0rZzlvf4fzdyaJcn2utANuaEGU9kpDsra925ygYJ8?=
+ =?us-ascii?Q?fHXMkne18OyznfHHX96U5eXKrNNm6J6Mj4/WlpwhcWKtLkO4ZQMBQd6pJ9FC?=
+ =?us-ascii?Q?uCMHWtXd+YcUojpMVTLzE2jzCW4=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88432e5f-372b-4cfd-3064-08d9d0ae1e0b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96f4a87a-0f54-4be6-11b5-08d9d0ae1fa5
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR10MB5698.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:29.8125
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:32.5047
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xMguZG52AxPDZi/wEB3uMm9ScURkaKA7S8dsm0hRKpqpjsZ3IN6QLz9BMYqu05UO4T68XvpJyfE3A3s3UATsTCFDpbwO6gx3XnNOosGjTkI=
+X-MS-Exchange-CrossTenant-UserPrincipalName: QNUFs71oEf47YNhgi7HdQFenO8q0YZ9O50YHOxGmaUoBi6kHqHSIWsHDfdft8CqgNWBqlcznbj9JIYkval2Dln4DyUzVdYup3fVDTmvWIlc=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4422
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10218 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=957 phishscore=0 mlxscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=533 spamscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2112160000
  definitions=main-2201060001
-X-Proofpoint-ORIG-GUID: wbmakN5Gn_W7bdHHFuLBwxxd7FCG4684
-X-Proofpoint-GUID: wbmakN5Gn_W7bdHHFuLBwxxd7FCG4684
+X-Proofpoint-ORIG-GUID: 5OSWCM1iSYsusk1kUE07XgTMUM3C8LaZ
+X-Proofpoint-GUID: 5OSWCM1iSYsusk1kUE07XgTMUM3C8LaZ
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do these small refactors to prepare for multithreaded page pinning:
+The VFIO_IOMMU_MAP_DMA ioctl uses a single CPU to pin all pages in the
+given range to facilitate DMA to/from the passed-through device.  The
+pages may not have been faulted in and cleared, in which case the wall
+time for this can be truly horrendous, but even if this was already done
+(e.g. qemu prealloc), pinning pages for the largest guests still takes
+significant time, even with recent optimizations to hugetlb gup[1] and
+ioctl(VFIO_IOMMU_MAP_DMA) itself[2].
 
- * pass @iova and @end args to vfio_unmap_unpin()
- * set iommu_mapped outside of vfio_unmap_unpin()
- * split part of vfio_remove_dma() off into vfio_remove_dma_finish()
+Parallelize with padata for faster guest initialization times.  Numbers
+come later on.
 
-They all facilitate padata's undo callback, which needs to undo only the
-parts of the job that each helper completed successfully.
+[1] https://lore.kernel.org/linux-mm/20210128182632.24562-1-joao.m.martins@oracle.com
+[2] https://lore.kernel.org/lkml/20210219161305.36522-1-daniel.m.jordan@oracle.com/
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Suggested-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ drivers/vfio/Kconfig            |  1 +
+ drivers/vfio/vfio_iommu_type1.c | 95 +++++++++++++++++++++++++++------
+ 2 files changed, 80 insertions(+), 16 deletions(-)
 
+diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+index 67d0bf4efa16..39c7efb7b1b1 100644
+--- a/drivers/vfio/Kconfig
++++ b/drivers/vfio/Kconfig
+@@ -2,6 +2,7 @@
+ config VFIO_IOMMU_TYPE1
+ 	tristate
+ 	depends on VFIO
++	select PADATA
+ 	default n
+ 
+ config VFIO_IOMMU_SPAPR_TCE
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 26bb2d9b698b..8440e7e2c36d 100644
+index 8440e7e2c36d..faee849f1cce 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1078,16 +1078,16 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
+@@ -40,6 +40,7 @@
+ #include <linux/notifier.h>
+ #include <linux/dma-iommu.h>
+ #include <linux/irqdomain.h>
++#include <linux/padata.h>
+ 
+ #define DRIVER_VERSION  "0.2"
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+@@ -1488,24 +1489,44 @@ static int vfio_iommu_map(struct vfio_iommu *iommu, dma_addr_t iova,
+ 	return ret;
  }
  
- static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
-+			     dma_addr_t iova, dma_addr_t end,
- 			     bool do_accounting)
- {
--	dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
- 	struct vfio_domain *domain, *d;
- 	LIST_HEAD(unmapped_region_list);
- 	struct iommu_iotlb_gather iotlb_gather;
- 	int unmapped_region_cnt = 0;
- 	long unlocked = 0;
- 
--	if (!dma->size)
-+	if (iova == end)
- 		return 0;
- 
- 	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-@@ -1104,7 +1104,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 				      struct vfio_domain, next);
- 
- 	list_for_each_entry_continue(d, &iommu->domain_list, next) {
--		iommu_unmap(d->domain, dma->iova, dma->size);
-+		iommu_unmap(d->domain, iova, end - iova);
- 		cond_resched();
- 	}
- 
-@@ -1147,8 +1147,6 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		}
- 	}
- 
--	dma->iommu_mapped = false;
--
- 	if (unmapped_region_cnt) {
- 		unlocked += vfio_sync_unpin(dma, domain, &unmapped_region_list,
- 					    &iotlb_gather);
-@@ -1161,10 +1159,11 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	return unlocked;
- }
- 
--static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
-+static void vfio_remove_dma_finish(struct vfio_iommu *iommu,
-+				   struct vfio_dma *dma)
- {
- 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
--	vfio_unmap_unpin(iommu, dma, true);
-+	dma->iommu_mapped = false;
- 	vfio_unlink_dma(iommu, dma);
- 	put_task_struct(dma->task);
- 	vfio_dma_bitmap_free(dma);
-@@ -1176,6 +1175,12 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 	iommu->dma_avail++;
- }
- 
-+static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+-static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+-			    size_t map_size)
++struct vfio_pin_args {
++	struct vfio_iommu *iommu;
++	struct vfio_dma *dma;
++	unsigned long limit;
++	struct mm_struct *mm;
++};
++
++static void vfio_pin_map_dma_undo(unsigned long start_vaddr,
++				  unsigned long end_vaddr, void *arg)
 +{
-+	vfio_unmap_unpin(iommu, dma, dma->iova, dma->iova + dma->size, true);
-+	vfio_remove_dma_finish(iommu, dma);
++	struct vfio_pin_args *args = arg;
++	struct vfio_dma *dma = args->dma;
++	dma_addr_t iova = dma->iova + (start_vaddr - dma->vaddr);
++	dma_addr_t end  = dma->iova + (end_vaddr   - dma->vaddr);
++
++	vfio_unmap_unpin(args->iommu, args->dma, iova, end, true);
 +}
 +
- static void vfio_update_pgsize_bitmap(struct vfio_iommu *iommu)
++static int vfio_pin_map_dma_chunk(unsigned long start_vaddr,
++				  unsigned long end_vaddr, void *arg)
  {
- 	struct vfio_domain *domain;
-@@ -2466,7 +2471,9 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
- 		long locked = 0, unlocked = 0;
+-	dma_addr_t iova = dma->iova;
+-	unsigned long vaddr = dma->vaddr;
++	struct vfio_pin_args *args = arg;
++	struct vfio_dma *dma = args->dma;
++	dma_addr_t iova = dma->iova + (start_vaddr - dma->vaddr);
++	unsigned long unmapped_size = end_vaddr - start_vaddr;
++	unsigned long pfn, mapped_size = 0;
+ 	struct vfio_batch batch;
+-	size_t size = map_size;
+ 	long npage;
+-	unsigned long pfn, limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+ 	int ret = 0;
  
- 		dma = rb_entry(n, struct vfio_dma, node);
--		unlocked += vfio_unmap_unpin(iommu, dma, false);
-+		unlocked += vfio_unmap_unpin(iommu, dma, dma->iova,
-+					     dma->iova + dma->size, false);
-+		dma->iommu_mapped = false;
- 		p = rb_first(&dma->pfn_list);
- 		for (; p; p = rb_next(p)) {
- 			struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn,
+ 	vfio_batch_init(&batch);
+ 
+-	while (size) {
++	while (unmapped_size) {
+ 		/* Pin a contiguous chunk of memory */
+-		npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
+-					      size >> PAGE_SHIFT, &pfn, limit,
+-					      &batch, current->mm);
++		npage = vfio_pin_pages_remote(dma, start_vaddr + mapped_size,
++					      unmapped_size >> PAGE_SHIFT,
++					      &pfn, args->limit, &batch,
++					      args->mm);
+ 		if (npage <= 0) {
+ 			WARN_ON(!npage);
+ 			ret = (int)npage;
+@@ -1513,24 +1534,66 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 		}
+ 
+ 		/* Map it! */
+-		ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
+-				     dma->prot);
++		ret = vfio_iommu_map(args->iommu, iova + mapped_size, pfn,
++				     npage, dma->prot);
+ 		if (ret) {
+-			vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
++			vfio_unpin_pages_remote(dma, iova + mapped_size, pfn,
+ 						npage, true);
+ 			vfio_batch_unpin(&batch, dma);
+ 			break;
+ 		}
+ 
+-		size -= npage << PAGE_SHIFT;
+-		dma->size += npage << PAGE_SHIFT;
++		unmapped_size -= npage << PAGE_SHIFT;
++		mapped_size   += npage << PAGE_SHIFT;
+ 	}
+ 
+ 	vfio_batch_fini(&batch);
++
++	/*
++	 * Undo the successfully completed part of this chunk now.  padata will
++	 * undo previously completed chunks internally at the end of the job.
++	 */
++	if (ret) {
++		vfio_pin_map_dma_undo(start_vaddr, start_vaddr + mapped_size,
++				      args);
++		return ret;
++	}
++
++	return 0;
++}
++
++/* Small-memory guests benefited from this relatively small value in testing. */
++#define VFIO_MIN_CHUNK		(1ul << 27)
++
++/* The sweet spot between performance and efficiency on the test machines. */
++#define VFIO_MAX_THREADS	16
++
++static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
++			    size_t map_size)
++{
++	unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
++	int ret = 0;
++	struct vfio_pin_args args = { iommu, dma, limit, current->mm };
++	/* Stay on PMD boundary in case THP is being used. */
++	struct padata_mt_job job = {
++		.thread_fn   = vfio_pin_map_dma_chunk,
++		.fn_arg      = &args,
++		.start       = dma->vaddr,
++		.size        = map_size,
++		.align       = PMD_SIZE,
++		.min_chunk   = VFIO_MIN_CHUNK,
++		.undo_fn     = vfio_pin_map_dma_undo,
++		.max_threads = VFIO_MAX_THREADS,
++	};
++
++	ret = padata_do_multithreaded(&job);
++
+ 	dma->iommu_mapped = true;
+ 
+ 	if (ret)
+-		vfio_remove_dma(iommu, dma);
++		vfio_remove_dma_finish(iommu, dma);
++	else
++		dma->size += map_size;
+ 
+ 	return ret;
+ }
 -- 
 2.34.1
 
