@@ -2,84 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 646864868DE
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 18:41:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1F4D486953
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 19:01:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242174AbiAFRlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 12:41:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44250 "EHLO
+        id S242502AbiAFSBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 13:01:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242012AbiAFRlo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 12:41:44 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A339C061201
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 09:41:44 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id t187so3095492pfb.11
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 09:41:44 -0800 (PST)
+        with ESMTP id S242478AbiAFSBU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 13:01:20 -0500
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D06EC061201
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 10:01:20 -0800 (PST)
+Received: by mail-oo1-xc33.google.com with SMTP id t13-20020a4a760d000000b002dab4d502dfso845719ooc.6
+        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 10:01:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=6gPF6LIvuNsMGdMGQX3Xt0jGn5hRDQzTXJU/Apy4X9o=;
-        b=ZXCj1o4HApJ/G+dSeBxr7o9+V1a1WB/D6yDpeMM1dZjJKJIsE7AUy+AGCgAKPNS3kt
-         GSJ1bXgIehhEN49gNObI53pqK8MoVCeskaArovAEomnqYvaI88uGaPDfgYQ09Icf7QDU
-         ZRBXxfoD5GNPVEtDjJigsKlI/90jIv0i2IkTNzfOIICO6JPavH+h6X8MZho0x5c1y3b3
-         AtexljqK/mngSsltvRxemmDQ5nLfkhAT9cRnZlCMX/7uzUoWVuoT6NAaUwwxjdjOqJou
-         5dAWCXU17wFbVbFiMMLX0eN9n4oQwCvxNKneGv/juASqztGmcExb/MBYJmOoToW5s7uD
-         slKQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yd72dqLGjywYZ5iurvaOMSLfaNBW11uoIMA6hBdzT+w=;
+        b=Ix3i8LiyqKdcPsMVObpv10gDeddenlWw1CHrRBunNHwQS5LCbLhaXIl8WaWSMYlGUY
+         dC5EQeiJ/7xdSOF9JcQVBOYNnzBJuLAZWmZfWv5JGSzgXRniyow7HEWeRQu10Txkuanz
+         17spWXZt+ul01MTwowzgzrkQ6RRcpS5SXUYaUSWmDSj32G4GB8ZD/Zv6+sCnu5bXyPcC
+         vDmOgnHBW3YCC9egG/Str4FgSdAhWcQkPG0mDBPiCJvRDkvoFskfhbNqm+YkRxWqi6B9
+         pEUj9CcSQwFyufZuyld70+9awo1aSY+frJfP8NL+fV44qXsTcnQH6Dr0payE780n1Ds9
+         7TcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6gPF6LIvuNsMGdMGQX3Xt0jGn5hRDQzTXJU/Apy4X9o=;
-        b=zwrKO4iMpZbrdqIEI7JhPvJCidT65c+IB/UCb+Rguq2m7QX4ajcU/Gg52APBKI5tL4
-         wfUAiMnPEe0gt+Iz75HvqPWEzO9JZ2n6k98L30y7Cytt5+8sOpQ0slo3WDOGK5agDflP
-         KYUJSivoDiMO4sPrw2djOgwTvKJ+kFL5xnWghUWy5Ix+LoU6jSy1ULh71p/oC75GU97y
-         KBYMoR0sPPR+RgF5+q/cc6t9pwP1n7dUgXlMjvKaR54+PR27SPUud/1NLZFGPcqH7FDZ
-         1x23A+eq1Zke/0Oumtf5o9CNC5D4n2ziJqB87iQUQbAtmRCZoiWCdAqWSdz5mIAM06NR
-         TmpQ==
-X-Gm-Message-State: AOAM530qUjv93BELH6PbxI1Oh6B2zqsJ/K7RJEdfyK9ojE5tOnRDlS+6
-        mt5PHkqXGQneOgAMFq4zUsb//g==
-X-Google-Smtp-Source: ABdhPJxN8AU6A7B/z1GX0JgAJYOn+uaycfZURuK9IT+76YgEIPNdaUDq06/lOci9WrxYfwhbw+ByDA==
-X-Received: by 2002:aa7:97a1:0:b0:4bc:f921:5ae4 with SMTP id d1-20020aa797a1000000b004bcf9215ae4mr2323740pfq.78.1641490903635;
-        Thu, 06 Jan 2022 09:41:43 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k6sm3412416pff.106.2022.01.06.09.41.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jan 2022 09:41:43 -0800 (PST)
-Date:   Thu, 6 Jan 2022 17:41:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH v2 5/5] KVM: SVM: allow AVIC to co-exist with a nested
- guest running
-Message-ID: <Ydcp01dTJZKi0yuz@google.com>
-References: <20211213104634.199141-1-mlevitsk@redhat.com>
- <20211213104634.199141-6-mlevitsk@redhat.com>
- <YdYUD22otUIF3fqR@google.com>
- <21d662162bfa7a5ba9ba2833cc607828b36480ca.camel@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yd72dqLGjywYZ5iurvaOMSLfaNBW11uoIMA6hBdzT+w=;
+        b=bjC9WPHXHOuewVK+klBHwXIHhHKZYuzXS95ZguZ78YL6lMcMRNXhfOkmegLQ4ZA2nA
+         GzGLE+FfUT46W0byPbFfgFT0/FztD8/Zn7SeHMg7Y516BJLV5s0+Dd+YNYVf+EqK+lnD
+         Mih8ffu1y8pKG49tQTNgQQfMH1TaImOpPHT4Oq1X+uITca8idxuNwX3f/LORiGIQtKGM
+         bURneJ/9W2A2UTFqmABBnfTvUxkqP70+/He+DxeQRgrgvCDbGwjqC3Fzq0KBH68m2kF1
+         T4sLLxiAiNDW7BU7YOYlDlmEHNeAOtd6TYumXU+7CbI6wbilF3blHirxHj+qWsCo9ktx
+         tzpw==
+X-Gm-Message-State: AOAM530HjNp3sBdDHVjajDS0vjAl04YG/rIKnVCB5P7rgETZ2S2ADh+E
+        gj2sprAugCMP0L8ISBeaeJm+ZRdQMpZHxBz1iOFE+A==
+X-Google-Smtp-Source: ABdhPJyruBzm9/8La0+52GslZWVrbis9fZrQAm0L5We+2hwsH+ZB9RbSZIde7gM5agGitMuOTFOyk37AI17MI50O+vg=
+X-Received: by 2002:a4a:ac0a:: with SMTP id p10mr37659104oon.96.1641492078304;
+ Thu, 06 Jan 2022 10:01:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21d662162bfa7a5ba9ba2833cc607828b36480ca.camel@redhat.com>
+References: <20211222133428.59977-1-likexu@tencent.com> <CALMp9eTgO4XuNHwuxWahZc7jQqZ10DchW8xXvecBH2ovGPLU9g@mail.gmail.com>
+ <d3a9a73f-cdc2-bce0-55e6-e4c9f5c237de@gmail.com> <CALMp9eTm7R-69p3z9P37yXmD6QpzJhEJO564czqHQtDdCRK-SQ@mail.gmail.com>
+ <CALMp9eTVjKztZC_11-DZo4MFhpxoVa31=p7Am2LYnEPuYBV8aw@mail.gmail.com>
+ <22776732-0698-c61b-78d9-70db7f1b907d@gmail.com> <CALMp9eQQ7SvDNy3iKSrRTn9QUR9h1M-tSnuYO0Y4_-+bgV72sg@mail.gmail.com>
+ <bf7fc07f-d49c-1c73-9a31-03585e99ff09@gmail.com> <CALMp9eQmO1zS9urH_B8DeoLp30P7Yxxp9qMwavjmoyt_BSC23A@mail.gmail.com>
+ <212cea42-e445-d6f2-2730-88ccaa65b2cb@gmail.com>
+In-Reply-To: <212cea42-e445-d6f2-2730-88ccaa65b2cb@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 6 Jan 2022 10:01:07 -0800
+Message-ID: <CALMp9eQck0dPHU9qyY-kDE+mQWK4PUuhpkEFW7PH5BbCaptJ+g@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: X86: Emulate APERF/MPERF to report actual vCPU frequency
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <likexu@tencent.com>,
+        Dongli Cao <caodongli@kingsoft.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Thomas Gleixner (kernel-recipes.org)" <tglx@linutronix.de>,
+        "Borislav Petkov (kernel-recipes.org)" <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 06, 2022, Maxim Levitsky wrote:
-> Also I recently found that we have KVM_X86_OP and KVM_X86_OP_NULL which are the
-> same thing - another thing for refactoring, so I prefer to refactor this
-> in one patch series.
+On Wed, Jan 5, 2022 at 7:29 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> On 6/1/2022 6:51 am, Jim Mattson wrote:
+> > On Thu, Dec 30, 2021 at 11:48 PM Like Xu <like.xu.linux@gmail.com> wrote:
+> >>
+> >> On 31/12/2021 9:29 am, Jim Mattson wrote:
+> >
+> >>> At sched-in:
+> >>> 1. Save host APERF/MPERF values from the MSRs.
+> >>> 2. Load the "current" guest APERF/MPERF values into the MSRs (if the
+> >>> vCPU configuration allows for unintercepted reads).
+> >>>
+> >>> At sched-out:
+> >>> 1. Calculate the guest APERF/MPERF deltas for use in step 3.
+> >>> 2. Save the "current" guest APERF/MPERF values.
+> >>> 3. "Restore" the host APERF/MPERF values, but add in the deltas from step 1.
+> >>>
+> >>> Without any writes to IA32_MPERF, I would expect these MSRs to be
+> >>> synchronized across all logical processors, and the proposal above
+> >>> would break that synchronization.
+> >
+> > I am learning more about IA32_APERF and IA32_MPERF this year. :-)
+>
+> Uh, thanks for your attention.
+>
+> >
+> > My worry above is unfounded. These MSRs only increment in C0, so they
+> > are not likely to be synchronized.
+> >
+> > This also raises another issue with your original fast-path
+> > implementation: the host MSRs will continue to count while the guest
+> > is halted. However, the guest MSRs should not count while the guest is
+> > halted.
+> >
+>
+> The emulation based on guest TSC semantics w/ low precision may work it out.
+> TBH, I still haven't given up on the idea of a pass-through approach.
 
-I have a mostly-complete patch series that removes KVM_X86_OP_NULL, will get it
-finished and posted after I get through my review backlog.
+I believe that pass-through can work for IA32_APERF. It can also work
+for IA32_MPERF on AMD hosts or when the TSC multiplier is 1 on Intel
+hosts. However, I also believe that it requires KVM to load the
+hardware MSRs with the guest's values prior to VM-entry, and to update
+the hardware MSRs with newly calculated host values before any other
+consumers on the host may read them.
