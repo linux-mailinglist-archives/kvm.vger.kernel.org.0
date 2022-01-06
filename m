@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9586485F4F
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 04:44:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4771485F57
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 04:48:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231241AbiAFDoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 22:44:13 -0500
-Received: from mga11.intel.com ([192.55.52.93]:14946 "EHLO mga11.intel.com"
+        id S231344AbiAFDsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 22:48:36 -0500
+Received: from mga02.intel.com ([134.134.136.20]:7494 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230214AbiAFDoL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 22:44:11 -0500
+        id S230498AbiAFDsg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 22:48:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641440651; x=1672976651;
+  t=1641440916; x=1672976916;
   h=cc:subject:to:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=izTXx3R6T91KwPw+mhLreSSPy1JtAl4lGGpkT1QKBWE=;
-  b=EGzFvJZKZ53/2mUyn37cDQ3cAf5jbhD7cvZTygyjDPsXoRtiyfKFHZMT
-   TG8niEaEfIB8qoybR2u0ZaBfXFpLoXrcCGQrSmkPB9MKnjBa4HAuxuuPC
-   NiB9/1iqnHQCnk0A4EktWoT+wiE2N7z7Pg1QFPTOrApoQnHn1G56fbc/v
-   jJiCJ/s8nJFhTt2cTAoYvO61QW7c96L2zuKZRFElj5L1IKTsn1JDDr5iB
-   5dzIo4OxCJGtjItvvcotpksn69StbOeTarN2BHMDFSbQJHdM1MdlKiGGH
-   tjeUo/48AIbfx4lL79YPSIcz4HgqQocM6y/P1hdreLQadRGgNXbCRW4L4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="240129754"
+  bh=s88NpyScOH/XjHqT1y7xLL0UmtzfW9rw5bZNtIuacDQ=;
+  b=lOxOwoIQ15KuMbql7N6AA6wUn/8h0QE56SMTMYQN0iObfPbvzVXE3RsL
+   tdpk8YE82tlUQIlxqgpof0+P4yxfDo5zk0kOXtu0c7KzyMAMz9l4u2kiC
+   XW7hQ8104P1HPAekaxqFbuOIus56Fa7imOVWHWxYxurRZluM3Lh2onOi4
+   0DfsSEKuXCLKLMoQzN3saDKhAxaLOS1wKGCah2cnHSYtSklqf8NXk+SoN
+   ZVxq3z5dSByuNjmLFZx+0jOMNrwmvVzukrciWU0+lcTl16u0bEwcADI7K
+   xqCy4qYS//0pyFgvBNbPY2mDm3fE009kLCTvM0R3elDAFmXxfcNd5DJiA
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229907951"
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="240129754"
+   d="scan'208";a="229907951"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 19:44:10 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 19:48:35 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="526814111"
+   d="scan'208";a="526815184"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 19:44:03 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 19:48:29 -0800
 Cc:     baolu.lu@linux.intel.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -65,8 +65,8 @@ To:     Bjorn Helgaas <helgaas@kernel.org>,
         Christoph Hellwig <hch@infradead.org>
 References: <20220104164100.GA101735@bhelgaas>
 From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <5a2fdbe2-da57-eac4-f115-c5f434080b36@linux.intel.com>
-Date:   Thu, 6 Jan 2022 11:43:25 +0800
+Message-ID: <8e83da6c-7ae4-b855-ccf0-148d2babfcce@linux.intel.com>
+Date:   Thu, 6 Jan 2022 11:47:50 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
@@ -78,27 +78,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Bjorn,
-
 On 1/5/22 12:41 AM, Bjorn Helgaas wrote:
->>> This adds dma ownership management in iommu core and exposes several
->>> interfaces for the device drivers and the device userspace assignment
->>> framework (i.e. vfio), so that any conflict between user and kernel
->>> controlled DMA could be detected at the beginning.
-> Maybe I'm missing the point because I don't know what "conflict
-> between user and kernel controlled DMA" is.  Are you talking about
-> both userspace and the kernel programming the same device to do DMA?
+>>> Devices under kernel drivers control must call iommu_device_use_dma_api()
+>>> before driver probes. The driver binding process must be aborted if it
+>>> returns failure.
+> "Devices" don't call functions.  Drivers do, or in this case, it looks
+> like the bus DMA code (platform, amba, fsl, pci, etc).
+> 
+> These functions are EXPORT_SYMBOL_GPL(), but it looks like all the
+> callers are built-in, so maybe the export is unnecessary?
 
-It's about both userspace and kernel programming different devices
-belonging to a same iommu group to do DMA. For example, PCI device A and
-B sit in a some iommu group. Userspace programs device A for DMA and a
-kernel driver programs device B. Userspace may intentionally or
-unintentionally program device A to access and change device B's MMIO
-with P2P DMA transactions which cause the kernel driver for device B
-result in an inconsistent state.
+Yes. If all callers are built-in, we can remove this export.
 
-This may not be all, just an example.
+> 
+> You use "iommu"/"IOMMU" and "dma"/"DMA" interchangeably above.  Would
+> be easier to read if you picked one.
+> 
+
+I should cleanup all these. I also realized that I forgot to
+cleanup some typos you pointed out in v4:
+
+https://lore.kernel.org/linux-iommu/20211229211626.GA1701512@bhelgaas/
+
+Sorry about it. I will take care of all these in the next version.
 
 Best regards,
 baolu
-
