@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCACD485E94
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:22:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBE2A485E9C
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:22:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344703AbiAFCWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 21:22:06 -0500
-Received: from mga18.intel.com ([134.134.136.126]:45646 "EHLO mga18.intel.com"
+        id S1344739AbiAFCW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 21:22:28 -0500
+Received: from mga06.intel.com ([134.134.136.31]:40662 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231945AbiAFCWD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 21:22:03 -0500
+        id S231945AbiAFCWU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 21:22:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641435723; x=1672971723;
+  t=1641435740; x=1672971740;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=6YLQxZeVjKNGLWHBhbTA2BZXJ8CXUGVnJDAzUyu/JQ8=;
-  b=dOXqKwqh645TYN6QVRP1EvlzKn3p/ZxwzbGR1je8o52TWuj9c6JGh4Bp
-   LOJSaDkAsUfcmqJ/LvYwHqKKDmOzsvOeEe6b41tHBIgQpe1zaf7bm4ZbC
-   gVWIyt+cm/379z5QpOvJtDBnx9wZI00MRvo5F5N40gXAwL0diuhIfHtPH
-   u/CULbfEknDes6fH25QxGT3kr76zkRMTtyQ7Tch8AAVKVywsxI52wl1Wq
-   yHwg5JAKMiL+I5mPSWuNBPywD/+lA0ocEUPNQ9S2P5Sds8LtIszk66ts9
-   qkmfO1OWqrckuv7Er00IdoEr8aN5MFMN8swYX2Q52SCESbIjG+Yr8AEpx
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229389174"
+  bh=clG1gjGvOL9BSMyPbqgYNxozZZwO9e7BVS3UogrjHAs=;
+  b=Jl0YoOAKf3sWnyc7zprPr4I4kHkE3GmrJBwxEa/36P/JBFpSzXChAQb5
+   J5sS4WGGyfgbAkpVG+KXkBPD4UCqfkbjTw2ogvxOObPZi9jYLwwt9kncI
+   ieCYQH7V9ExNqlS6S8CP2jhz0oDZGEZcTtQmgUF+SqAn472NBa9iwVlF5
+   Em7JWOmiXhMfgDFM3HHN/e6VFywaDhJGMABLEAKu1/DVUOKMqLC37o4rh
+   UUF+oXVud4J2joYN95NKr2qPHHPWZYlAuD7wJ3DGLKZbyFjnqQdUSeh+v
+   GJ1iUhFpI6zWs8ekSsHDU7YXguV4JmyfPb1hsB5IDEsD9P/PWxeBGxH/F
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="303325620"
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="229389174"
+   d="scan'208";a="303325620"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:03 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:10 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="526794313"
+   d="scan'208";a="526794333"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:21:56 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:22:03 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v1 2/8] vfio/type1: Use iommu_group_replace_domain()
-Date:   Thu,  6 Jan 2022 10:20:47 +0800
-Message-Id: <20220106022053.2406748-3-baolu.lu@linux.intel.com>
+Subject: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for multi-device groups
+Date:   Thu,  6 Jan 2022 10:20:48 +0800
+Message-Id: <20220106022053.2406748-4-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
 References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
@@ -75,89 +75,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After an IOMMU group is placed in a vfio container, the domain attachment
-may be deferred. During this process, other kernel modules can attach
-another domain simply in the following way:
+The iommu_attach/detach_device() interfaces were exposed for the device
+drivers to attach/detach their own domains. The commit <426a273834eae>
+("iommu: Limit iommu_attach/detach_device to device with their own group")
+restricted them to singleton groups to avoid different device in a group
+attaching different domain.
 
-	group = iommu_group_get(dev);
-	iommu_attach_group(domain, group);
+As we've introduced device DMA ownership into the iommu core. We can now
+extend these interfaces for muliple-device groups, and "all devices are in
+the same address space" is still guaranteed.
 
-Replace the iommu_attach/detach_group() with iommu_group_replace_domain()
-and prohibit use of iommu_attach/detach_group() in other kernel drivers
-can solve this problem.
+For multiple devices belonging to a same group, iommu_device_use_dma_api()
+and iommu_attach_device() are exclusive. Therefore, when drivers decide to
+use iommu_attach_domain(), they cannot call iommu_device_use_dma_api() at
+the same time.
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ drivers/iommu/iommu.c | 79 +++++++++++++++++++++++++++++++++----------
+ 1 file changed, 62 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index f17490ab238f..25276a5db737 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2213,7 +2213,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 			goto out_domain;
- 	}
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index ab8ab95969f5..2c9efd85e447 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -47,6 +47,7 @@ struct iommu_group {
+ 	struct iommu_domain *domain;
+ 	struct list_head entry;
+ 	unsigned int owner_cnt;
++	unsigned int attach_cnt;
+ 	void *owner;
+ };
  
--	ret = iommu_attach_group(domain->domain, group->iommu_group);
-+	ret = iommu_group_replace_domain(group->iommu_group, NULL,
-+					 domain->domain);
- 	if (ret)
- 		goto out_domain;
+@@ -1921,27 +1922,59 @@ static int __iommu_attach_device(struct iommu_domain *domain,
+ 	return ret;
+ }
  
-@@ -2280,19 +2281,14 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	list_for_each_entry(d, &iommu->domain_list, next) {
- 		if (d->domain->ops == domain->domain->ops &&
- 		    d->prot == domain->prot) {
--			iommu_detach_group(domain->domain, group->iommu_group);
--			if (!iommu_attach_group(d->domain,
--						group->iommu_group)) {
-+			if (!iommu_group_replace_domain(group->iommu_group,
-+							domain->domain,
-+							d->domain)) {
- 				list_add(&group->next, &d->group_list);
- 				iommu_domain_free(domain->domain);
- 				kfree(domain);
- 				goto done;
- 			}
--
--			ret = iommu_attach_group(domain->domain,
--						 group->iommu_group);
--			if (ret)
--				goto out_domain;
- 		}
- 	}
++/**
++ * iommu_attach_device() - attach external or UNMANAGED domain to device
++ * @domain: the domain about to attach
++ * @dev: the device about to be attached
++ *
++ * For devices belonging to the same group, iommu_device_use_dma_api() and
++ * iommu_attach_device() are exclusive. Therefore, when drivers decide to
++ * use iommu_attach_domain(), they cannot call iommu_device_use_dma_api()
++ * at the same time.
++ */
+ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+ {
+ 	struct iommu_group *group;
+-	int ret;
++	int ret = 0;
++
++	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
++		return -EINVAL;
  
-@@ -2327,7 +2323,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	return 0;
+ 	group = iommu_group_get(dev);
+ 	if (!group)
+ 		return -ENODEV;
  
- out_detach:
--	iommu_detach_group(domain->domain, group->iommu_group);
-+	iommu_group_replace_domain(group->iommu_group, domain->domain, NULL);
- out_domain:
- 	iommu_domain_free(domain->domain);
- 	vfio_iommu_iova_free(&iova_copy);
-@@ -2488,7 +2484,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		if (!group)
- 			continue;
+-	/*
+-	 * Lock the group to make sure the device-count doesn't
+-	 * change while we are attaching
+-	 */
+ 	mutex_lock(&group->mutex);
+-	ret = -EINVAL;
+-	if (iommu_group_device_count(group) != 1)
+-		goto out_unlock;
++	if (group->owner_cnt) {
++		/*
++		 * Group has been used for kernel-api dma or claimed explicitly
++		 * for exclusive occupation. For backward compatibility, device
++		 * in a singleton group is allowed to ignore setting the
++		 * drv.no_kernel_api_dma field.
++		 */
++		if ((group->domain == group->default_domain &&
++		     iommu_group_device_count(group) != 1) ||
++		    group->owner) {
++			ret = -EBUSY;
++			goto unlock_out;
++		}
++	}
  
--		iommu_detach_group(domain->domain, group->iommu_group);
-+		iommu_group_replace_domain(group->iommu_group,
-+					   domain->domain, NULL);
- 		update_dirty_scope = !group->pinned_page_dirty_scope;
- 		list_del(&group->next);
- 		kfree(group);
-@@ -2577,7 +2574,8 @@ static void vfio_release_domain(struct vfio_domain *domain)
+-	ret = __iommu_attach_group(domain, group);
++	if (!group->attach_cnt) {
++		ret = __iommu_attach_group(domain, group);
++		if (ret)
++			goto unlock_out;
++	} else {
++		if (group->domain != domain) {
++			ret = -EPERM;
++			goto unlock_out;
++		}
++	}
  
- 	list_for_each_entry_safe(group, group_tmp,
- 				 &domain->group_list, next) {
--		iommu_detach_group(domain->domain, group->iommu_group);
-+		iommu_group_replace_domain(group->iommu_group,
-+					   domain->domain, NULL);
- 		list_del(&group->next);
- 		kfree(group);
- 	}
+-out_unlock:
++	group->owner_cnt++;
++	group->attach_cnt++;
++
++unlock_out:
+ 	mutex_unlock(&group->mutex);
+ 	iommu_group_put(group);
+ 
+@@ -2182,23 +2215,35 @@ static void __iommu_detach_device(struct iommu_domain *domain,
+ 	trace_detach_device_from_domain(dev);
+ }
+ 
++/**
++ * iommu_detach_device() - detach external or UNMANAGED domain from device
++ * @domain: the domain about to detach
++ * @dev: the device about to be detached
++ *
++ * Paired with iommu_attach_device(), it detaches the domain from the device.
++ */
+ void iommu_detach_device(struct iommu_domain *domain, struct device *dev)
+ {
+ 	struct iommu_group *group;
+ 
++	if (WARN_ON(domain->type != IOMMU_DOMAIN_UNMANAGED))
++		return;
++
+ 	group = iommu_group_get(dev);
+-	if (!group)
++	if (WARN_ON(!group))
+ 		return;
+ 
+ 	mutex_lock(&group->mutex);
+-	if (iommu_group_device_count(group) != 1) {
+-		WARN_ON(1);
+-		goto out_unlock;
+-	}
++	if (WARN_ON(!group->attach_cnt || !group->owner_cnt ||
++		    group->domain != domain))
++		goto unlock_out;
+ 
+-	__iommu_detach_group(domain, group);
++	group->attach_cnt--;
++	group->owner_cnt--;
++	if (!group->attach_cnt)
++		__iommu_detach_group(domain, group);
+ 
+-out_unlock:
++unlock_out:
+ 	mutex_unlock(&group->mutex);
+ 	iommu_group_put(group);
+ }
 -- 
 2.25.1
 
