@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 877DF485EA1
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:22:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E40B485EA8
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:23:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344770AbiAFCWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 21:22:38 -0500
-Received: from mga06.intel.com ([134.134.136.31]:40662 "EHLO mga06.intel.com"
+        id S1344843AbiAFCXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 21:23:03 -0500
+Received: from mga18.intel.com ([134.134.136.126]:45674 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344734AbiAFCW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 21:22:26 -0500
+        id S1344750AbiAFCWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 21:22:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641435746; x=1672971746;
+  t=1641435751; x=1672971751;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rk6a+5igN4LBX3L4wUsmQbl/BtWrVs0e5Y+7ihAeHL8=;
-  b=hVTBORazkuSD8onwYqW6Nk/Pkdvi2sKvgBb9QSPtil4MfBavvbbUQ/vl
-   x5PxpNpOGNc5MwQVVztcio5hLdZL6cmKysAnAE50LseYT8ZMT0leXfVe8
-   4bqqbL3A9gy9n8nHW8RjXdGJ8HegV0bmEQbXKBl6jTTGJ2JHKwZeeDPAd
-   kQj6uCJjqzWH9FozI29oOYHYtdejAuheT1eclwVIsS9Mv9/UzX+JIEouo
-   7IHzXJk42S3tBbXBtcYtqD1ELoin5ixoN5DPI/CRphGvLTyPWGXTmrvUz
-   OoB0/5OdWoDN6p5GKOGbQL+BhrszAWCUlxpT3xG//12+RxX4WSkqG3Lp2
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="303325635"
+  bh=GDCUJufXvlu7Z20AypZ4GsZd9L9C8y8eFXL56cSyTrE=;
+  b=A93kSzd8hs2KrJ8Tk8sCxIHEXc7epR5IYy2mOhdMLX9k69XP3KYD6lS1
+   NABwp+FaDCxcxJv8zF5wvqnEwLxi5NzGI3glW/idGSFxk17QCh8dHwPZC
+   QVqs9e/aewY4qOIbVak4ikSUTAcypB3OqugDd2U5xvhHj/xUYXJpfRz/e
+   12mvzQgzUFHUgBeQCDvuNhdhwx+Dzc1vpdM3rg0soNBtsTiMperI2HvLa
+   tOSuZxXOVaeD/0+k5F3bDiJl45Iglz7ARsoGq0iGpz91R5VRu8RVbbgN/
+   Pj5zTEI2RQM9kT4RZaIzUzw9Rj37QvbyATBUFCCXCy2e/pBQRZACU+3Df
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229389218"
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="303325635"
+   d="scan'208";a="229389218"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:24 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:31 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="526794416"
+   d="scan'208";a="526794466"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:22:17 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:22:24 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v1 5/8] iommu/amd: Use iommu_attach/detach_device()
-Date:   Thu,  6 Jan 2022 10:20:50 +0800
-Message-Id: <20220106022053.2406748-6-baolu.lu@linux.intel.com>
+Subject: [PATCH v1 6/8] gpu/host1x: Use iommu_attach/detach_device()
+Date:   Thu,  6 Jan 2022 10:20:51 +0800
+Message-Id: <20220106022053.2406748-7-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
 References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
@@ -75,36 +75,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The individual device driver should use iommu_attach/detach_device()
-for domain attachment/detachment.
+Ordinary drivers should use iommu_attach/detach_device() for domain
+attaching and detaching.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/iommu/amd/iommu_v2.c | 4 ++--
+ drivers/gpu/host1x/dev.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/iommu/amd/iommu_v2.c b/drivers/iommu/amd/iommu_v2.c
-index 58da08cc3d01..7d9d0fe89064 100644
---- a/drivers/iommu/amd/iommu_v2.c
-+++ b/drivers/iommu/amd/iommu_v2.c
-@@ -133,7 +133,7 @@ static void free_device_state(struct device_state *dev_state)
- 	if (WARN_ON(!group))
- 		return;
+diff --git a/drivers/gpu/host1x/dev.c b/drivers/gpu/host1x/dev.c
+index fbb6447b8659..6e08cb6202cc 100644
+--- a/drivers/gpu/host1x/dev.c
++++ b/drivers/gpu/host1x/dev.c
+@@ -265,7 +265,7 @@ static struct iommu_domain *host1x_iommu_attach(struct host1x *host)
+ 			goto put_cache;
+ 		}
  
--	iommu_detach_group(dev_state->domain, group);
-+	iommu_detach_device(dev_state->domain, &dev_state->pdev->dev);
+-		err = iommu_attach_group(host->domain, host->group);
++		err = iommu_attach_device(host->domain, host->dev);
+ 		if (err) {
+ 			if (err == -ENODEV)
+ 				err = 0;
+@@ -335,7 +335,7 @@ static void host1x_iommu_exit(struct host1x *host)
+ {
+ 	if (host->domain) {
+ 		put_iova_domain(&host->iova);
+-		iommu_detach_group(host->domain, host->group);
++		iommu_detach_device(host->domain, host->dev);
  
- 	iommu_group_put(group);
- 
-@@ -791,7 +791,7 @@ int amd_iommu_init_device(struct pci_dev *pdev, int pasids)
- 		goto out_free_domain;
- 	}
- 
--	ret = iommu_attach_group(dev_state->domain, group);
-+	ret = iommu_attach_device(dev_state->domain, &pdev->dev);
- 	if (ret != 0)
- 		goto out_drop_group;
- 
+ 		iommu_domain_free(host->domain);
+ 		host->domain = NULL;
 -- 
 2.25.1
 
