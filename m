@@ -2,134 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37AC5486B93
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 22:05:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAACA486BAE
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 22:12:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244095AbiAFVFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 16:05:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42338 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244080AbiAFVFc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jan 2022 16:05:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641503131;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bfNEPHx1xDfNOOR4ZfuMpjosG1jEJyn3a9yDJ8UdTKY=;
-        b=ZLKlFr4C/HWFUXDCwBLknBS18TzBJ+XskL5d1Hnof86EIpIEekJe3iETWUWYExBBJa/ij8
-        +GjsmuBJiEPKvOmpR3rBCWf9Ldd9bpFWSRP5b0T/uvz4M0itp66FBberIwK7o1ZBDQvAn5
-        qaaG5lSjzI8I4ns2NNmRjzuMa7XXSb4=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-632-Y57g5LjOPc-rKd2Fg26dbQ-1; Thu, 06 Jan 2022 16:05:30 -0500
-X-MC-Unique: Y57g5LjOPc-rKd2Fg26dbQ-1
-Received: by mail-oi1-f199.google.com with SMTP id n2-20020aca5902000000b002c6ee7caa53so2587523oib.20
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 13:05:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=bfNEPHx1xDfNOOR4ZfuMpjosG1jEJyn3a9yDJ8UdTKY=;
-        b=fGHU3oYghltEbwIEhwkVlv7kZHgrtY8LcGO45i+kYWHm5PXF6tWb1gtnUk1cmHnrCa
-         Xi8DPZiwNirOFEox+Jqj0DJcCOiiTYvLHiLu3LYb/lowmB/u5M7x/4oUBQ7P1SWL332J
-         zlPZ44aNQnnaWxvzGJ7uW0kQ3L0wsUOyVjORNOLG5W37ChCeof8DNnryh0ChGSxUrljY
-         OVWgcOx7CN3M2uOHPorwtUgGl3/gP9R8LI/jiVuKVGW1B/2Jjv6olfxNLu34oKkxSamV
-         wuqjAV+A5okaiqCm6VJmXIJdv6E3xmnDFhsCHUaa4KN0XseVaOXiBbEYreXmxHFxJ+Bg
-         bThg==
-X-Gm-Message-State: AOAM532Cq8De+IS5agtrau5h1WPJzPiP+WnHit69tqr2ZnMy0uzWkOek
-        zugfcsAbXPvUcfFp1Q0hEmdaRI2bEp73DMHN21BIqhCfA/RQnnWc47VxJa0noTizgUsZ86q5I7s
-        rOxKctskt1kn1
-X-Received: by 2002:a4a:dd08:: with SMTP id m8mr37690421oou.25.1641503129793;
-        Thu, 06 Jan 2022 13:05:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxJJHuHyvhX6fNO7GsfowW/AaCDltzBsOD9eqaeIHK+3O5wnNGjVkNDhjuWIf6dAb0cTtDPNA==
-X-Received: by 2002:a4a:dd08:: with SMTP id m8mr37690401oou.25.1641503129553;
-        Thu, 06 Jan 2022 13:05:29 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id r23sm615480oiw.20.2022.01.06.13.05.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jan 2022 13:05:29 -0800 (PST)
-Date:   Thu, 6 Jan 2022 14:05:27 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tejun Heo <tj@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 08/16] vfio/type1: Cache locked_vm to ease mmap_lock
- contention
-Message-ID: <20220106140527.5c292d34.alex.williamson@redhat.com>
-In-Reply-To: <20220106123456.GZ2328285@nvidia.com>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
-        <20220106004656.126790-9-daniel.m.jordan@oracle.com>
-        <20220106005339.GX2328285@nvidia.com>
-        <20220106011708.6ajbhzgreevu62gl@oracle.com>
-        <20220106123456.GZ2328285@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S244139AbiAFVMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 16:12:18 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:45470 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244039AbiAFVMS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 16:12:18 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 27A6761E17
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 21:12:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8632EC36AE3
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 21:12:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641503537;
+        bh=vRV1dTodqehloVbJAMvZoIJJwSmEUPwcsfX9XS1JefE=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=bVZGl7vzFzn3xbKzETvVkkxL1LKXQ4Gu3cpdiNsusjAu4nZ6jyiNbQt0YP7FXrYi6
+         Smqkr/SNCybosvKZBCeD0QF2hA5C6lvKiMONIhtNwrbFlqwtunTPSSp6Agi7vr3pbm
+         mwjRAUD4MipAYvBvY4T2nfYd+kUJvkEcdIojJt2p3tjdQEFzyZnmGIF+PFq9p2jn0i
+         K8YSB3S0PbtUW6AW6TwKmclku3d5kO8cUmeIiiuhGxof37oGPbJLUEO8skKAZ3As/5
+         EN0ZhkXe54xlVHGNllgRkJDwJI2Osg83It1tZCLJCOvEUQIwvxCtyjZhTrGuqJt67i
+         c8wDsGQjRm1KQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 71C65C05FEF; Thu,  6 Jan 2022 21:12:17 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 215459] VM freezes starting with kernel 5.15
+Date:   Thu, 06 Jan 2022 21:12:17 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: th3voic3@mailbox.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215459-28872-kAqeFxqe9P@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215459-28872@https.bugzilla.kernel.org/>
+References: <bug-215459-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 6 Jan 2022 08:34:56 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215459
 
-> On Wed, Jan 05, 2022 at 08:17:08PM -0500, Daniel Jordan wrote:
-> > On Wed, Jan 05, 2022 at 08:53:39PM -0400, Jason Gunthorpe wrote:  
-> > > On Wed, Jan 05, 2022 at 07:46:48PM -0500, Daniel Jordan wrote:  
-> > > > padata threads hold mmap_lock as reader for the majority of their
-> > > > runtime in order to call pin_user_pages_remote(), but they also
-> > > > periodically take mmap_lock as writer for short periods to adjust
-> > > > mm->locked_vm, hurting parallelism.
-> > > > 
-> > > > Alleviate the write-side contention with a per-thread cache of locked_vm
-> > > > which allows taking mmap_lock as writer far less frequently.
-> > > > 
-> > > > Failure to refill the cache due to insufficient locked_vm will not cause
-> > > > the entire pinning operation to error out.  This avoids spurious failure
-> > > > in case some pinned pages aren't accounted to locked_vm.
-> > > > 
-> > > > Cache size is limited to provide some protection in the unlikely event
-> > > > of a concurrent locked_vm accounting operation in the same address space
-> > > > needlessly failing in case the cache takes more locked_vm than it needs.  
-> > > 
-> > > Why not just do the pinned page accounting once at the start? Why does
-> > > it have to be done incrementally?  
-> > 
-> > Yeah, good question.  I tried doing it that way recently and it did
-> > improve performance a bit, but I thought it wasn't enough of a gain to
-> > justify how it overaccounted by the size of the entire pin.  
-> 
-> Why would it over account?
+--- Comment #6 from th3voic3@mailbox.org ---
+(In reply to Sean Christopherson from comment #4)
+> The fix Maxim is referring to is commit fdba608f15e2 ("KVM: VMX: Wake vCPU
+> when delivering posted IRQ even if vCPU =3D=3D this vCPU").  But the buggy
+> commit was introduced back in v5.8, so it's unlikely that's the issue, or=
+ at
+> least that it's the only issue.  And assuming the VM in question has
+> multiple vCPUs (which I'm pretty sure is true based on the config), that =
+bug
+> is unlikely to cause the entire VM to freeze; the expected symptom is tha=
+t a
+> vCPU isn't awakened when it should be, and while it's possible multiple
+> vCPUs could get unlucky, taking down the entire VM is highly improbable.=
+=20
+> That said, it's worth trying that fix, I'm just not very optimistic :-)
+>=20
+> Assuming this is something different, the biggest relevant changes in v5.=
+15
+> are that the TDP MMU is enabled by default, and that the APIC access page
+> memslot is not deleted when APICv is inhibited.
+>=20
+> Can you try disabling the TDP MMU with APICv still enabled?  KVM allows t=
+hat
+> to be toggled without unloading, e.g. "echo N | sudo tee
+> /sys/module/kvm/parameters/tdp_mmu", the VM just needs to be started after
+> the param is toggled.
 
-We'd be guessing that the entire virtual address mapping counts against
-locked memory limits, but it might include PFNMAP pages or pages that
-are already account via the page pinning interface that mdev devices
-use.  At that point we're risking that the user isn't concurrently
-doing something else that could fail as a result of pre-accounting and
-fixup later schemes like this.  Thanks,
+I enabled APICv again and toggled the setting and did a quick test. I teste=
+d a
+couple of things that often caused freezes. So far so good. Now I've added =
+the
+toggle to my qemu hooks prepare section and will do further testing.=20
 
-Alex
+Thanks for the input so far
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
