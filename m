@@ -2,131 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEA424869DD
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 19:27:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 834604869FA
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 19:32:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242917AbiAFS1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 13:27:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242948AbiAFS0y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 13:26:54 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC39C03327B
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 10:26:31 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id r16-20020a17090a0ad000b001b276aa3aabso9602729pje.0
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 10:26:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HlaWOyLJWUxC/fcMDwyvfjC8xT8OixmJxKEiGSjvP78=;
-        b=wnYu2Su9FUNALxqI5H57lVrouxwCAxjS9z9uEp0cHC5tBU9whcr8F+OGJwvsPlpB1c
-         k0tlBUjFz2sOB95QW9wG2x3zBrquvqrafRV4ZkIkrk7JYXTKrRFdpUU12s84soPbOmwj
-         wusCLLM5bU/UrpBMtNmJD1pknx6bc4ytVUxW//VVKqjZP3lZ840xYsfEEsmsE66OwnFl
-         IUKqtEDsGGC89wRoLwE972yS+Yt/8aYGHJDswJxBt+QU9oHR2O7tDplNFVyvtErZKpGc
-         mcGyO4buYHutNvSG9+Osf1VGUVgt0ywDZGZkJxfu7y2+lpd/ETIrYa6Qhj/lGlo00rDp
-         A8zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HlaWOyLJWUxC/fcMDwyvfjC8xT8OixmJxKEiGSjvP78=;
-        b=go1kmvm/bInx7OD5jgyUQSpiqdXxRg+aMOARFqifMfzV3YjEKvazF33xPA+4KptVMh
-         /w8s0pogKPTyi4ccyEJMfLsHgI6us+zrhcupGcIkdI049YPnA2M0zf1TO1SCRChSfxTs
-         AYDVe9rf3PFhqJSJ90vYTMUpgbe//FLMoH+Ta9fBVYW6HXqknNspA3oxoBMISq9rlFW6
-         fzF3wSl2kyknNwR2iwZ0Iq0XNlHdXnLdbJEgtwmUMSz7WpyOL86Xz2Qi1yc5KuAYAtCd
-         aRoH8Nx4VSR3/NVODn6nloPWw8nT/pQLWzHBQESrrdfHxENoudcTExAAm/bg5EhnYWrV
-         jfJA==
-X-Gm-Message-State: AOAM533JDTr7f3ZWXglaLvhWL0dn/JEsLHqHArnOr8e3ioTelxpGYtTQ
-        oI0Rc6aaALYdixAb+9oKVPrr+w==
-X-Google-Smtp-Source: ABdhPJxoQ3eVXISS6TugVeDxoCB53qQ/yNRF/WUAW9yzPhsSj1SmdwcZJEgtVSWbLiTQugXVAbFPpA==
-X-Received: by 2002:a17:90a:f316:: with SMTP id ca22mr11527272pjb.171.1641493590872;
-        Thu, 06 Jan 2022 10:26:30 -0800 (PST)
-Received: from [192.168.1.13] (174-21-75-75.tukw.qwest.net. [174.21.75.75])
-        by smtp.gmail.com with ESMTPSA id 72sm3129138pfu.70.2022.01.06.10.26.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jan 2022 10:26:30 -0800 (PST)
-Subject: Re: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the
- host
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com,
+        id S242898AbiAFSc3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 13:32:29 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:34342 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242799AbiAFSc2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 13:32:28 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2C008B8230F;
+        Thu,  6 Jan 2022 18:32:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93DE9C36AE3;
+        Thu,  6 Jan 2022 18:32:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641493946;
+        bh=5lY+HI8ihg/c9/B+VNUfvaxm/xosjyotG49pQ10u82w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=XirhBewNwMlp7K0TCeGeOUGw2hgP2JEu1cZv3AQV10PBvw4ZYBsmz1pS++baJq9Jo
+         Ww61H9RCyVHw3Jrl2sXCb1ZpBTdnroTskdtVAeNshmtbcDd7nlb/0XYkyhoR5QrKVJ
+         ZwBCnVA7Kpd/0ysferdN+9JZ9Q1XD6YGR43u+rzEXz6f+yzhZDs5aMEwxyE7Uobcf/
+         N/UZzPr5bseDS1LN3Kzfaebpd8kC2ZQ3iw5nipIQOwDwjWO1el3C8Y4IX+ur6mWwCM
+         s8UxZTMQAIYCBcEiAOVMEn7Hz32j1uXUqSo0YisNm9Ieomh0FRj7R7dgkX6s231e08
+         Y/edU4bUVxa2w==
+Date:   Thu, 6 Jan 2022 12:32:24 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Eric Auger <eric.auger@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-References: <20220103180507.2190429-1-maz@kernel.org>
- <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
- <87czl5usvb.wl-maz@kernel.org>
- <3db95713-2f05-3c70-82b1-7e12c579d3e2@linaro.org>
- <875yqwvkm1.wl-maz@kernel.org>
-From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <364fc879-4b13-cf37-53e0-628a843c7bfa@linaro.org>
-Date:   Thu, 6 Jan 2022 10:26:29 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 09/14] PCI: portdrv: Suppress kernel DMA ownership
+ auto-claiming
+Message-ID: <20220106183224.GA298861@bhelgaas>
 MIME-Version: 1.0
-In-Reply-To: <875yqwvkm1.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <039bbcf3-ccc6-f3b0-172e-9caa0866bb9e@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/22 9:29 AM, Marc Zyngier wrote:
-> On Thu, 06 Jan 2022 17:20:33 +0000,
-> Richard Henderson <richard.henderson@linaro.org> wrote:
->>
->> On 1/6/22 1:16 AM, Marc Zyngier wrote:
->>>>> +static bool kvm_arm_pauth_supported(void)
->>>>> +{
->>>>> +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
->>>>> +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
->>>>> +}
->>>>
->>>> Do we really need to have them both set to play the game?  Given that
->>>> the only thing that happens is that we disable whatever host support
->>>> exists, can we have "pauth enabled" mean whatever subset the host has?
->>>
->>> The host will always expose either both features or none, and that's
->>> part of the ABI. From the bit of kernel documentation located in
->>> Documentation/virt/kvm/api.rst:
->>>
->>> <quote>
->>> 4.82 KVM_ARM_VCPU_INIT
->>> ----------------------
->>> [...]
->>>           - KVM_ARM_VCPU_PTRAUTH_ADDRESS: Enables Address Pointer authentication
->>>             for arm64 only.
->>>             Depends on KVM_CAP_ARM_PTRAUTH_ADDRESS.
->>>             If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
->>>             both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
->>>             KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
->>>             requested.
->>>
->>>           - KVM_ARM_VCPU_PTRAUTH_GENERIC: Enables Generic Pointer authentication
->>>             for arm64 only.
->>>             Depends on KVM_CAP_ARM_PTRAUTH_GENERIC.
->>>             If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
->>>             both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
->>>             KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
->>>             requested.
->>> </quote>
->>>
->>> KVM will reject the initialisation if only one of the features is
->>> requested, so checking and enabling both makes sense to me.
->>
->> Well, no, that's not what that says.  It says that *if* both host
->> flags are set, then both guest flags must be set or both unset.
+On Thu, Jan 06, 2022 at 12:12:35PM +0800, Lu Baolu wrote:
+> On 1/5/22 1:06 AM, Bjorn Helgaas wrote:
+> > On Tue, Jan 04, 2022 at 09:56:39AM +0800, Lu Baolu wrote:
+> > > If a switch lacks ACS P2P Request Redirect, a device below the switch can
+> > > bypass the IOMMU and DMA directly to other devices below the switch, so
+> > > all the downstream devices must be in the same IOMMU group as the switch
+> > > itself.
+> > Help me think through what's going on here.  IIUC, we put devices in
+> > the same IOMMU group when they can interfere with each other in any
+> > way (DMA, config access, etc).
+> > 
+> > (We said "DMA" above, but I guess this would also apply to config
+> > requests, right?)
 > 
-> Indeed. But KVM never returns just one flag. It only exposes both or
-> none.
+> I am not sure whether devices could interfere each other through config
+> space access. The IOMMU hardware only protects and isolates DMA
+> accesses, so that userspace could control DMA directly. The config
+> accesses will always be intercepted by VFIO. Hence, I don't see a
+> problem.
 
-Mm.  It does beg the question of why KVM exposes multiple bits.  If they must be tied, 
-then it only serves to make the interface more complicated than necessary.  We would be 
-better served to have a single bit to control all of PAuth.
+I was wondering about config accesses generated by an endpoint, e.g.,
+an endpoint doing config writes to a peer or the upstream bridge.
 
+But I think that is prohibited by spec - PCIe r5.0, sec 7.3.3, says
+"Propagation of Configuration Requests from Downstream to Upstream as
+well as peer-to-peer are not supported" and "Configuration Requests
+are initiated only by the Host Bridge, including those passed through
+the SFI CAM mechanism."
 
-r~
+Bjorn
