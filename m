@@ -2,207 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1899E486AE8
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 21:12:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 934D2486AE9
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 21:12:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234253AbiAFUMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 15:12:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50772 "EHLO
+        id S243574AbiAFUMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 15:12:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230045AbiAFUMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 15:12:21 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31647C061245
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 12:12:21 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id p14so3267328plf.3
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 12:12:21 -0800 (PST)
+        with ESMTP id S243549AbiAFUMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 15:12:36 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318FEC061201
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 12:12:36 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id a129so4271948oif.6
+        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 12:12:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hjndkdtcJ3txIF09rbXJpkYUGVSXV8uGMtpeENuQrnY=;
-        b=gYbKCt2yNjXJXa3PUXLGwpKiXzDe/CBfWMfanWqoB5IBYW2bW82gWrOJpxnMbShCLY
-         Pfer5dbmXGSz0x5R4qJi49ThKIG1vQ42ILUcGXD7mJN6sakZd72ZAHdMwmOZGARTMlDh
-         pho18ZuJI81Eta3KXiwSSlS5sNTMxBsYCpB5NJWxQj16OWGrav0s5CZRHXT8zsJc/BYS
-         f7Pk6sLSrrwhCSyJxTYgrokEPTQFhf3vGlM2Jej1x6vOHDngyJkIMi4hz7igIgN1VvNV
-         fNAIi4DgC4fonzvK23a2JOMN/+fpERkD94sUBKML0ZqVueSMLt0xelK6tYSXUuhUQ0GP
-         JILA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vROeKx05r5S8zq2+fHHm+ECFUEqfMQWtVJfxmmZ8/Ww=;
+        b=IwOxf8ihHeWh8Vk/JhKknys2TRVe23Nw7HM/81myIZiIRt+jJvpoy0BA/upwdcBAl1
+         kEy65Evp0YMT8DcxieVwNBTYnb8LjpjnLrBmV6PL1WhT1sgXwWUiAGR8LpreT5W4U7/o
+         hgpNgWq1JWBZxKb/lJ1ECeuxGk0y13t6uUAN+h2XAa+QWHIz3DMFVhcITAFXv85j0VeS
+         408fSoxy2n+K4RjuRb43CvXO2Btl4Jf09YOZG+coa9ZhfJoKj+vO+7rjByazryTShDTh
+         kJ9msuEmKX52Cm8vClodZ0cuYc9gyWAg6UHYP1rgHYpUGOxCji7HKp/xvsbPl1QlMc6/
+         9+EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hjndkdtcJ3txIF09rbXJpkYUGVSXV8uGMtpeENuQrnY=;
-        b=h7l8vX4EmNY+GcCvAoYsNHstAgs2qRnDNAS7C+uYglaincIpx+mD6BEdEIjvjLsKZV
-         l+GRnm6n+Qma1BQac8iHoAALXE7v0eM9Jke0uPmqZu3EQoaKQsVobq46qxEW3YbMnpjW
-         In1m6KctG4pmQtcYBeWwofiBXMfja5gMALFivRf8ccmPlUQRmphVseuq9tBN6BH7paZG
-         awbI/idNSmcMXnUAru/fJTr3dtnj626apXGldaKcHd/6cn3m/tWNGH4vN4pEjvp4NNF3
-         +pRPthoMllsUvRffTrQcP8a014GLKdN0tQ6/9bR8kOghauoSdWOos73P5zIL/57CYbcI
-         ZwYw==
-X-Gm-Message-State: AOAM5309G1EzemBdP5hbNfCzn/GMS0Uq+8H+s1JiNTkpb6NrrFihmILF
-        aW8Ds0zouigsoZMGCigGaqMpSQ==
-X-Google-Smtp-Source: ABdhPJxQCZyvzereDL7vBhiA5ORf9vvMfUyE778crvkefHaY2qjPpn780Ug3wvjQdN1GSgWJeLbT8A==
-X-Received: by 2002:a17:90b:3810:: with SMTP id mq16mr11761814pjb.190.1641499940412;
-        Thu, 06 Jan 2022 12:12:20 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d4sm3288588pfu.50.2022.01.06.12.12.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jan 2022 12:12:19 -0800 (PST)
-Date:   Thu, 6 Jan 2022 20:12:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        "Nikunj A . Dadhania" <nikunj@amd.com>
-Subject: Re: [PATCH v1 04/13] KVM: x86/mmu: Factor out logic to atomically
- install a new page table
-Message-ID: <YddNIMWaARotqOSZ@google.com>
-References: <20211213225918.672507-1-dmatlack@google.com>
- <20211213225918.672507-5-dmatlack@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vROeKx05r5S8zq2+fHHm+ECFUEqfMQWtVJfxmmZ8/Ww=;
+        b=Ad7iJkZYvZEyM20oYOdECFJAwIrug2SYZeTjBkP+xdfNxRxKMyw76tem2EGVhRECCa
+         9XkL+/JyrprnHod5MltcBM2owG+tQZGxy/r6/MzrKbCq7v4ZR4GsAp3ixCEfHipUyqJG
+         j2wMROd4/7NpaFaN0mBC4ciRQgYpW5KxqhdXDeUO+kgEy+4QUaO+lIlGq5V++J1FyWpC
+         eB5noAUBONsqEdMurY1asElnH9+fwhGEGdaqBAf9oMnpompGJKBepCuJnW5UCWsN36qm
+         5VAlSA1pMaMn7GQnfLB1nrx0F+USpiIv5bQ6J0KEirg1tP+hDhnhD9hUAVjiZvRtBTJ+
+         Fkqg==
+X-Gm-Message-State: AOAM533YUFzK+MpEkGeNs0IREh0ArqGx84Uynku1/OSoR2T3pMTXVRsS
+        XfwHV3EtPMnN5D34Y/m6yLzgzRAbA18F8c3/IH9S5A==
+X-Google-Smtp-Source: ABdhPJxJ/MNcLpd6cu3C+bOIgnNNw2Mi1QOlfdVP1bmKYZXU3eundgFPCP8MKIkL04TZL9XRZB087Sxf1sixo2k3q8c=
+X-Received: by 2002:a05:6808:1b22:: with SMTP id bx34mr5205268oib.68.1641499955018;
+ Thu, 06 Jan 2022 12:12:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211213225918.672507-5-dmatlack@google.com>
+References: <20220106032118.34459-1-likexu@tencent.com> <YdcwXIANeB3fOWOI@google.com>
+In-Reply-To: <YdcwXIANeB3fOWOI@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 6 Jan 2022 12:12:23 -0800
+Message-ID: <CALMp9eSv7ZQmVsb49iPbw0gkJhYgKPGsFuw6UtEeNZ3FsBwRwA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86/pmu: Make top-down.slots event unavailable in
+ supported leaf
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021, David Matlack wrote:
-> Factor out the logic to atomically replace an SPTE with an SPTE that
-> points to a new page table. This will be used in a follow-up commit to
-> split a large page SPTE into one level lower.
-> 
-> Opportunistically drop the kvm_mmu_get_page tracepoint in
-> kvm_tdp_mmu_map() since it is redundant with the identical tracepoint in
-> alloc_tdp_mmu_page().
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 48 +++++++++++++++++++++++++++-----------
->  1 file changed, 34 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 656ebf5b20dc..dbd07c10d11a 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -950,6 +950,36 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
->  	return ret;
->  }
->  
-> +/*
-> + * tdp_mmu_install_sp_atomic - Atomically replace the given spte with an
-> + * spte pointing to the provided page table.
-> + *
-> + * @kvm: kvm instance
-> + * @iter: a tdp_iter instance currently on the SPTE that should be set
-> + * @sp: The new TDP page table to install.
-> + * @account_nx: True if this page table is being installed to split a
-> + *              non-executable huge page.
-> + *
-> + * Returns: True if the new page table was installed. False if spte being
-> + *          replaced changed, causing the atomic compare-exchange to fail.
+On Thu, Jan 6, 2022 at 10:09 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Jan 06, 2022, Like Xu wrote:
+> > From: Like Xu <likexu@tencent.com>
+> >
+> > When we choose to disable the fourth fixed counter TOPDOWN.SLOTS,
+> > we also need to comply with the specification and set 0AH.EBX.[bit 7]
+> > to 1 if the guest (e.g. on the ICX) has a value of 0AH.EAX[31:24] > 7.
+> >
+> > Fixes: 2e8cd7a3b8287 ("kvm: x86: limit the maximum number of vPMU fixed counters to 3")
+> > Signed-off-by: Like Xu <likexu@tencent.com>
+> > ---
+> > v1 -> v2 Changelog:
+> > - Make it simpler to keep forward compatibility; (Sean)
+> > - Wrap related comment at ~80 chars; (Sean)
+> >
+> > Previous:
+> > https://lore.kernel.org/kvm/20220105050711.67280-1-likexu@tencent.com/
+> >
+> >  arch/x86/kvm/cpuid.c | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 0b920e12bb6d..4fe17a537084 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -782,6 +782,18 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+> >               eax.split.mask_length = cap.events_mask_len;
+> >
+> >               edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
+> > +
+> > +             /*
+> > +              * The 8th Intel architectural event (Topdown Slots) will be supported
+>
+> Nit, the "8th" part is unnecessary information.
+>
+> > +              * if the 4th fixed counter exists && EAX[31:24] > 7 && EBX[7] = 0.
+> > +              *
+> > +              * Currently, KVM needs to set EAX[31:24] < 8 or EBX[7] == 1
+> > +              * to make this event unavailable in a consistent way.
+> > +              */
+>
+> This comment is now slightly stale.  It also doesn't say why the event is made
+> unavailable.
+>
+> > +             if (edx.split.num_counters_fixed < 4 &&
+>
+> Rereading the changelog and the changelog of the Fixed commit, I don't think KVM
+> should bother checking num_counters_fixed.  IIUC, cap.events_mask[7] should already
+> be '1' if there are less than 4 fixed counters in hardware, but at the same time
+> there's no harm in being a bit overzealous.  That would help simplifiy the comment
+> as there's no need to explain why num_counters_fixed is checked, e.g. the fact that
+> Topdown Slots uses the 4th fixed counter is irrelevant with respect to the legality
+> of setting EBX[7]=1 to hide an unsupported event.
 
-I'd prefer to return an int with 0/-EBUSY on success/fail.  Ditto for the existing
-tdp_mmu_set_spte_atomic().  Actually, if you add a prep patch to make that happen,
-then this can be:
+I was under the impression that the CPUID.0AH:EBX bits were
+independent of the fixed counters. That is, if CPUID.0AH:EAX[31:24] >
+7 and CPUID.0AH:EBX[7] is clear, then one should be able to program a
+general purpose counter with event selector A4H and umask 01H,
+regardless of whether or not fixed counter 4 exists.
 
-	u64 spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
-	int ret;
-
-	ret = tdp_mmu_set_spte_atomic(kvm, iter, spte);
-	if (ret)
-		return ret;
-
-	tdp_mmu_link_page(kvm, sp, account_nx);
-	return 0;
-
-
-
-> + *          If this function returns false the sp will be freed before
-> + *          returning.
-
-Uh, no it's not?  The call to tdp_mmu_free_sp() is still done by kvm_tdp_mmu_map().
-
-> + */
-> +static bool tdp_mmu_install_sp_atomic(struct kvm *kvm,
-
-Hmm, so this helper is the only user of tdp_mmu_link_page(), and _that_ helper
-is rather tiny.  And this would also be a good opportunity to clean up the
-"(un)link_page" verbiage, as the bare "page" doesn't communicate to the reader
-that it's for linking shadow pages, e.g. not struct page.
-
-So, what about folding in tdp_mmu_link_page(), naming this helper either
-tdp_mmu_link_sp_atomic() or tdp_mmu_link_shadow_page_atomic(), and then renaming
-tdp_mmu_unlink_page() accordingly?  And for bonus points, add a blurb in the
-function comment like:
-
-	* Note the lack of a non-atomic variant!  The TDP MMU always builds its
-	* page tables while holding mmu_lock for read.
-
-> +				      struct tdp_iter *iter,
-> +				      struct kvm_mmu_page *sp,
-> +				      bool account_nx)
-> +{
-> +	u64 spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
-> +
-> +	if (!tdp_mmu_set_spte_atomic(kvm, iter, spte))
-> +		return false;
-> +
-> +	tdp_mmu_link_page(kvm, sp, account_nx);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
->   * page tables and SPTEs to translate the faulting guest physical address.
-> @@ -959,8 +989,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  	struct kvm_mmu *mmu = vcpu->arch.mmu;
->  	struct tdp_iter iter;
->  	struct kvm_mmu_page *sp;
-> -	u64 *child_pt;
-> -	u64 new_spte;
->  	int ret;
->  
->  	kvm_mmu_hugepage_adjust(vcpu, fault);
-> @@ -996,6 +1024,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  		}
->  
->  		if (!is_shadow_present_pte(iter.old_spte)) {
-> +			bool account_nx = fault->huge_page_disallowed &&
-> +					  fault->req_level >= iter.level;
-> +
->  			/*
->  			 * If SPTE has been frozen by another thread, just
->  			 * give up and retry, avoiding unnecessary page table
-> @@ -1005,18 +1036,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  				break;
->  
->  			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
-> -			child_pt = sp->spt;
-> -
-> -			new_spte = make_nonleaf_spte(child_pt,
-> -						     !shadow_accessed_mask);
-> -
-> -			if (tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, new_spte)) {
-> -				tdp_mmu_link_page(vcpu->kvm, sp,
-> -						  fault->huge_page_disallowed &&
-> -						  fault->req_level >= iter.level);
-> -
-> -				trace_kvm_mmu_get_page(sp, true);
-> -			} else {
-> +			if (!tdp_mmu_install_sp_atomic(vcpu->kvm, &iter, sp, account_nx)) {
->  				tdp_mmu_free_sp(sp);
->  				break;
->  			}
-> -- 
-> 2.34.1.173.g76aa8bc2d0-goog
-> 
+>
+>                 /*
+>                  * Hide Intel's Topdown Slots architectural event, it's not yet
+>                  * supported by KVM.
+>                  */
+>                 if (eax.split.mask_length > 7)
+>                         cap.events_mask |= BIT_ULL(7);
+>
+> > +                 eax.split.mask_length > 7)
+> > +                     cap.events_mask |= BIT_ULL(7);
+> > +
+> >               edx.split.bit_width_fixed = cap.bit_width_fixed;
+> >               if (cap.version)
+> >                       edx.split.anythread_deprecated = 1;
+> > --
+> > 2.33.1
+> >
