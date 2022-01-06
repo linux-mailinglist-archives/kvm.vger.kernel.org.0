@@ -2,79 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 159EC486A74
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 20:25:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4B60486A8B
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 20:35:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243298AbiAFTZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 14:25:47 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:56524 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243233AbiAFTZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 14:25:43 -0500
+        id S243378AbiAFTfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 14:35:00 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:58322 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243375AbiAFTfA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 14:35:00 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3FB6461CDB
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 19:25:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA28C36AE3;
-        Thu,  6 Jan 2022 19:25:42 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EECA0B82354
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 19:34:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4893C36AEB;
+        Thu,  6 Jan 2022 19:34:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641497142;
-        bh=e+zVGMdRgQtMmKwfhtdxBIqK2ceC0hG3GaW4NSts81k=;
+        s=k20201202; t=1641497697;
+        bh=2aGQymYqTmaWkfPiI1bX2V0qCtNAHECJTgwZi07GMh4=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=N6lS+k87Foi9gULzBKkVaNpb1rKzSA6ZSqxu5sxJUliLChxFU7dtu7ziNZows8PaR
-         IeyjwiemV08HZKUMNxF16jhi8nywYmaKBy0hQmVtdr8sVg2QXoCBXsrGD82LezIiJ8
-         C0ec5YT9AnniTBJNhrqh3nBIfdDiuH1ljryFtKS4tRr2qg9U6Qp/ToYgKBY/jJmODo
-         VztzWl4wseoNyb/SJW407mZLj+uE/jjbRpxuX9QguRZJbjeP9CgUhZFRAtASXEtnZx
-         rcs4VQ2ZyoAyfz636VYoRXiTtGdrUAvEQdZrXVPiTt1ZKxzPgZJtZ4B4QZs31sXt95
-         /sxYgSoRpwHYA==
+        b=nNqWwlQz7WxKUjta1Ykq0eI8sEc++6Jqr+uYZoLWH/ihFTz5769u27qEayjrljlwg
+         iCceiLkfcJaKgAquR2xCCxnuAVoLUwlAPT+zHBVg6ager2MCsNX9QrWfyboVk6Q1xF
+         R3d5N8coVxtVq+K08l8caIbA2CthNSKgOgKnGpKwE6RbPg2afP1SGogRJEwxrgRZA9
+         SqzeVwH+cTGHcYtdP/VqF+4ZdQiZNGRQQwhU/5M/vjMcLjdk4PXs4NjMfoVnzxAbhY
+         7bEtGUhk06KyHFtumXa70vTUixrIMnNVaDyFBq0upOX8QiMLthnyhnkUtdGBQcSYHu
+         bn0dquxsEqIqA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1n5YOK-00GPzM-Lm; Thu, 06 Jan 2022 19:25:40 +0000
-Date:   Thu, 06 Jan 2022 19:25:42 +0000
-Message-ID: <874k6gzmx5.wl-maz@kernel.org>
+        id 1n5YXH-00GQ5m-TC; Thu, 06 Jan 2022 19:34:56 +0000
+Date:   Thu, 06 Jan 2022 19:34:57 +0000
+Message-ID: <8735m0zmhq.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Richard Henderson <richard.henderson@linaro.org>
-Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com,
-        Eric Auger <eric.auger@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the host
-In-Reply-To: <364fc879-4b13-cf37-53e0-628a843c7bfa@linaro.org>
-References: <20220103180507.2190429-1-maz@kernel.org>
-        <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
-        <87czl5usvb.wl-maz@kernel.org>
-        <3db95713-2f05-3c70-82b1-7e12c579d3e2@linaro.org>
-        <875yqwvkm1.wl-maz@kernel.org>
-        <364fc879-4b13-cf37-53e0-628a843c7bfa@linaro.org>
+To:     eric.auger@redhat.com
+Cc:     qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on highmem_ecam
+In-Reply-To: <cb9f6c39-40f8-eea7-73bf-13df1e5dae9d@redhat.com>
+References: <20211003164605.3116450-1-maz@kernel.org>
+        <20211003164605.3116450-2-maz@kernel.org>
+        <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
+        <87pmpiyrfw.wl-maz@kernel.org>
+        <b9031d40-897e-b8c5-4240-fc2936dcbcb9@redhat.com>
+        <877dbfywpj.wl-maz@kernel.org>
+        <cb9f6c39-40f8-eea7-73bf-13df1e5dae9d@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, eric.auger@redhat.com, drjones@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org, drjones@redhat.com, peter.maydell@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 06 Jan 2022 18:26:29 +0000,
-Richard Henderson <richard.henderson@linaro.org> wrote:
-> 
-> Mm.  It does beg the question of why KVM exposes multiple bits.  If
-> they must be tied, then it only serves to make the interface more
-> complicated than necessary.  We would be better served to have a
-> single bit to control all of PAuth.
+Hi Eric,
 
-In hindsight, there is a lot I would change in the KVM userspace ABI,
-and a lot I should have pushed back on. Unfortunately, there is little
-we can do now to fix it (userspace expecting this behaviour has been
-in the wild for almost 3 years already).
+On Wed, 05 Jan 2022 09:41:19 +0000,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> couldn't you simply introduce highmem_redist which is truly missing. You
+> could set it in virt_set_memmap() in case you skip extended_map overlay
+> and use it in virt_gicv3_redist_region_count() as you did?
+> In addition to the device memory top address check against the 4GB limit
+> if !highmem, we should be fine then?
+
+No, highmem really isn't nearly enough.
+
+Imagine you have (like I do) a system with 36 bits of IPA space.
+Create a VM with 8GB of RAM (which means the low-end of IPA space is
+already 9GB). Obviously, highmem=true here. With the current code, we
+will try to expose this PCI MMIO range, which falls way out of the IPA
+space (you need at least 40 bits of IPA to even cover it with the
+smallest configuration).
+
+highmem really is a control that says 'things may live above 4GB'. It
+doesn't say *how far* above 4GB it can be placed. Which is what I am
+trying to address.
+
+Thanks,
 
 	M.
 
