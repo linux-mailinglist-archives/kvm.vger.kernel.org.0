@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDD60485D98
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 01:50:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D84D485D95
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 01:50:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344387AbiAFAu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 19:50:27 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:46874 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344067AbiAFAsS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 19:48:18 -0500
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N58XL007590;
-        Thu, 6 Jan 2022 00:47:49 GMT
+        id S1343970AbiAFAuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 19:50:21 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:53792 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1344061AbiAFAsQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Jan 2022 19:48:16 -0500
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N5G8P009916;
+        Thu, 6 Jan 2022 00:47:52 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2021-07-09; bh=+E9ynw7v0+0jTPU3dvFVP9/tc0O0J6ZHfL4pFSIjx/0=;
- b=PQNUzK29uYLZUWgc3R5LLTWcgtom1lTyFMwYmK+nyAxTdc7+SqY9fi5DVhb08z90kxnk
- 7v7Kr1W/OlnfSfnlGdUf+6ZYCkimK1Vok0pO758STXtT4MV0XUX2sUC6rdnuWxtRLnjz
- PYp0WfUuSGfeFp5oVWLFdCgTqg0okqYnBM1Yt18/6RFzQTt7ov9xgcHyvtws0COmmhk8
- CpZ8ekukPsdIsOMV4CjQUjuvqsVnALy5QqGIiXE1SozDCMqY1RA6hBMaodoiVPBqf9Pb
- ZOL29hkdm7nnMdGFQEdxq486k+o8DTiZW4Kvsg/EgSK4Pf8ZwEahP1Ckf1O41vAEWxqQ WA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpm03xa-1
+ s=corp-2021-07-09; bh=UFTfPBqMhfxwUs14W4I/lXe+Vd3zvFZlPmGM7cmJszc=;
+ b=ODQ9lvkmW15AEmPpWyPoAY1xB8jOxd4To3AzW2b+MRtyQSBg4lvHEXB6PifP7YIoSn4W
+ 1xqy6jzBUKoeTsnzFPVT4CYB6Hdd3gnFU3xHw9954htH8Y+07SH5JqFK13bjZqJluRPQ
+ v53S6aUYcQWNwz7dwZ0EmsK8d3dSxVikVXvFMA9IOkdEvemthQZR/iILL28tpbxIO/9G
+ 7WLdhSYZYS6cIrgjxWj44Hr/Gntgg1J4DISDcz71TgaDyRIZVxZuchi4ZKtSy4ePf8A+
+ l6cqGfxDZYkff540KiMpUAqOPT6HISiZxcG3YHLOymRZP80IJSH4KaE+ikFaIWj1j0+Z Bw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpp83uf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:48 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060W8hn102586;
-        Thu, 6 Jan 2022 00:47:47 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2045.outbound.protection.outlook.com [104.47.57.45])
-        by aserp3030.oracle.com with ESMTP id 3ddmqgu5c6-1
+        Thu, 06 Jan 2022 00:47:51 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060VnfM086893;
+        Thu, 6 Jan 2022 00:47:50 GMT
+Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2040.outbound.protection.outlook.com [104.47.57.40])
+        by userp3030.oracle.com with ESMTP id 3ddmqbvtbs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:47 +0000
+        Thu, 06 Jan 2022 00:47:50 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ciI9MtVo9IITy8zxEo23PoawRRUs735BtF+OvTPw53OXewTAMIxDYKlK9NZhd+pz/pavLggA6FjwzDD3Jv6VYk1R4o66g4G+BiLgS4lRAQVOPXR5Rqt1Dii7AfUkHgZvpyb7K0mkhF+rDPAOZAOzpNiBsAeojtQJiehrX+xVDPhZcyq7zA38LHqEkHxVSmULApqPz2wbDyrWe32H43PjegfYu18NpwmI7DYrlkQ3DcDhBpvzxJf1BuIqyrBxa2Czwg6nto4ni6RY++Q1jifkCZ8sFpwcuW0MzijTKfm2w2s4gmT7bTESohIjNoJX5YUB/6bv1+mT2rlN2daHgHmiTQ==
+ b=eBZzLil5gcKiw8g87ZC9jKksJggwVPmrMRvFusFQDRb9T95neTDy9pjiFO3Q2EqBG4avIKTtBRykloUqdjvVXCyJXV7LO/YvNGA8CTPL7xnWqI7dNBKgWsvpOaQaJFppZ+1A/5viqJ+x8kxvSfkYXKvNsG/2ZrLoxPHv+VJwxuyvOnwfXY/q+GIseg1ioW+PDGHBqa5IkEFk/gYFuaSexrKF7EmLEV+ChuaRQm4IuarNcA2aKapoCdnZL6IZ9o6AFQuRuiGA++pCw4XKNi5UXEO8tdX/caHwBtvYbmLEM5HsoAP2T7NAGzntWViCdXHz7msssNUclPDDP5x46pO5eQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+E9ynw7v0+0jTPU3dvFVP9/tc0O0J6ZHfL4pFSIjx/0=;
- b=VMiqD2VVxcLRWZt0vQUTr7EyiX4mf4KJWAqJbsQx1XrV9wBAucPSTdsI9hjwyvB12IBJfgLL+eJ3UTp5zuhzqPpPXvva35MHJ2aQ/ADsCR4mElh3JSr1bRcpaIE8wuTfusDS7qeEyiKt+JEvSYfvtmbe0qNCS7eVb6uYM6YgZNz9IBNncbf851P5KhfbH3OFMTLd8+Fo4GLYrY2JYfSdAHevCw7u17O4YoF6NOkQF0JYuLWAI0RftWtfrrFJAYLUzX9sSGgTYQzjEWMbcbZVQToBfKQu3wQzlMUXQvseAX1Q/gom7zexXr2KJimYe13bqyKnBf3Bh7IMymbdlHf8uA==
+ bh=UFTfPBqMhfxwUs14W4I/lXe+Vd3zvFZlPmGM7cmJszc=;
+ b=DxBFyTyBb+ghE7YbHNpbMc0DnBJPFDKemM3n48As9ndZTV0a3Vtz7F3zCD7f+q23Dor88xizKkKcjlPX7M+Mqj16u+v3Oyt41MjniodZY+1N7Iy64IFgB/eB1z5NUEHIeiSh/kxf8P63jICtJtbAmsBhjd221KSfyjXKVuTzq197024rtNx6koX8rIdDjYAjDSF46vtiuAQB/eylc1WT7ni3BXMvwK+RBij+fiLdstaXmw4E9aOHcjjGuyhhSA5lBgsVx/x/by5F0nhf1gr7/rZwMUeaegDzmTNA88jSZfRW5IrJUnjz7lLPfSlFk92PbI5cVskQ86uYM1CdiuRYOQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+E9ynw7v0+0jTPU3dvFVP9/tc0O0J6ZHfL4pFSIjx/0=;
- b=yk8F1X7Ys3vpNq4X+joMKwRDMK3oFIHglDy81fPONEUxQn6yUrVlTt3SCNSUArbJACIqhhuDUKs/FdDdSzzQkAx+UKcDEAaSBfLy1DHAZ0AnI0sU6YS1rv8BoVrRVMiGtjQVrxrQgZH5Uuzg/pO/O2hvMOq5hWHYVZ2gorIKjhU=
+ bh=UFTfPBqMhfxwUs14W4I/lXe+Vd3zvFZlPmGM7cmJszc=;
+ b=HLkWB5XCrjqFEP585oKCGTsth7MLp1+q3VSZmPd5vJHNvRnnJ+hOd9g1592YBMTxmruPbB/BFtB1KPY0mvfT2BHY9nBdwifDuPoMoNkeVP13XZlYmlWoVSQjWR8SxjTdEM7uL7G4FIsxj+6YHaciqpzSA9In6cFDi9xvWa0DEJE=
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com (2603:10b6:510:126::18)
  by PH0PR10MB4422.namprd10.prod.outlook.com (2603:10b6:510:38::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Thu, 6 Jan
- 2022 00:47:46 +0000
+ 2022 00:47:48 +0000
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3]) by PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3%9]) with mapi id 15.20.4867.009; Thu, 6 Jan 2022
- 00:47:46 +0000
+ 00:47:48 +0000
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Alexander Duyck <alexanderduyck@fb.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -83,9 +83,9 @@ To:     Alexander Duyck <alexanderduyck@fb.com>,
 Cc:     linux-mm@kvack.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [RFC 12/16] sched, padata: Bound max threads with max_cfs_bandwidth_cpus()
-Date:   Wed,  5 Jan 2022 19:46:52 -0500
-Message-Id: <20220106004656.126790-13-daniel.m.jordan@oracle.com>
+Subject: [RFC 13/16] padata: Run helper threads at MAX_NICE
+Date:   Wed,  5 Jan 2022 19:46:53 -0500
+Message-Id: <20220106004656.126790-14-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
@@ -96,199 +96,150 @@ X-ClientProxiedBy: MN2PR20CA0019.namprd20.prod.outlook.com
  (2603:10b6:510:126::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c2f406f5-f8c7-4510-5849-08d9d0ae27b0
+X-MS-Office365-Filtering-Correlation-Id: adbda2d3-5b34-4bcb-db85-08d9d0ae2948
 X-MS-TrafficTypeDiagnostic: PH0PR10MB4422:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR10MB4422A3FE024927CAADD2EFF3D94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <PH0PR10MB442293137DC84D7F533DCC51D94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mUu7Xc1XTbfL2u4BzxXRn1OdTYRsjydK9LXTgWgsce0LbF9dlGwlrS7s5A4vtqY4WzWz9kVVjmeBUxwjzX2EsrBotGEkPX2WVFy0hAsrSjv4gQ5ipZUkGqmksfVZy2XoIL3nf0hDCWmQ9C4OmiqvDk/C9giaJLuIR7OHmkFwLEsdpN/zbgh5byJ+RRQ5xkhLa9NBAdvaTx4DznA9JUjY6sK9JtIHBOVULKDAG+4FV8CphABucRf+lcEWEZ7O1mMHSkljLuE4oqMQa6GdBKLr6tfPDKwS1dQLsPWo7fJTlbiOfDdmB8LD1w0ifyGwIe4LKd+iB3P2rPtY/uBc4GG5HanPusUKHaUIl38EGsa9MFnbCy3D0Pv2W/n2GugfEcwa3f7taJ00S9fEpVwibalg9plUHidrSXVhn4VbaEydv9FbcPjFi6mS742PL6sLdZkYVFRfLUiRbN4UWWu8WDeOcK8kCQz8QHdHc/H4vCQtymB4ePdd/phdfVmaS6V3NT9mgWeWPne/6j7nikFPUR7oJlDrLaR2dl5ny2qs2KG0JLA7lJB8fhZl3W0Rwq2GLk7wvfqwCBJpiyZXYlZjvo2kwtT/L36z2Z0FevPMpj9fxfzXDwlEaianaqsq/VvxWnMJvqRRZpt99u84eOoCYnSAh/pmiBJFlQQ3b5IHj1oix1wpvfR23SbgZh/yIczHKruGnQGPtmmHIM+KDmvpshE5O8DmznKGfpFlx61fMl6lKkU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(38100700002)(5660300002)(38350700002)(6666004)(83380400001)(508600001)(66946007)(66476007)(66556008)(26005)(52116002)(186003)(6506007)(7416002)(8676002)(110136005)(8936002)(921005)(1076003)(6486002)(2616005)(36756003)(86362001)(103116003)(107886003)(6512007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: t6NfPhMcNMzhsdUD4PdRCyIJ3XrFM7jnTQxK3JctqNCduenVq4Vplxa/omnBsVO3veEr3wq/vcS69v+4dLQUiro0XH/mhPnZibkaUUE0D/u28aV6pQBYSAwy7QQ65qtMagAEdEG5W6gFWOFIAu9nxlyZff8HUexsNhmjnZREb42YALkgjJLiPOldPsoJmJJWWhXy+9yFk/qFFCyKQejnpr5cUR1So/MvKL2dIXkDOY1KU9DiY6/+NBgRn8LFb0ACG9Y2onacbwsrJrQ7hahH3HnnV3rmjXdSx2Sz9nugB9HuiKCdgTCaLLQ7MyBEgR/6KMVmMOwG6oXMQdN/3AA/CjF3egfoPM+D/hMHTPueguBC84dvj5d9zt8iHyDXK5Gro57NZVlWwmFrVahFoaZMpr5ZfJMIzGsvnGuPvcQMBn9CMYCE76AAU33QiCDwwdf+1Ztu3COdLI39LQb/zoLtuOYd+0GBzvl+49K9UH1F8p8oU/4wE2Rppgf3buvwNjhn2qe1N648ZriYU/SkOIUuK9BLg+faUb2EFWerA3ZkUcQKr720bkmohMz/qHVI1+KtIoqhHmW32A+ldcoV0D4kFmdnWWewSCns+QY0X6smRKhfJWjEHNsguyEZUUQSmhXKrS3SU1q2EaYcEyXkRzD6eNtroxRlSO0Rfs4owqLu5fdW8lXXa12o7unvf+qh9zTQ7Haeb2+xUBRgwjwg87+2eVzmuTwRiNCEUZwwdYfjH7trxIfnHsyiB/NF454TAF1QbJhK7Khr/jYW90w2S2XGM+adxGvfkngJLC2zwxHv1gcYkII7QaPGMxS1V8Nqe2pJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(38100700002)(5660300002)(38350700002)(6666004)(508600001)(66946007)(66476007)(66556008)(26005)(52116002)(186003)(6506007)(7416002)(8676002)(110136005)(8936002)(921005)(1076003)(6486002)(2616005)(36756003)(86362001)(103116003)(107886003)(84970400001)(6512007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?y+IaWN+ymj3Z2D03i3QdHbch3azTOPgaxXLTSvMgHRYSEpWCvmCErh/6UZI/?=
- =?us-ascii?Q?2SDugfaoag0IM5TAa0HChLC7lFP5fBR0HNia2lKrnooLsN2NaJPDAACi/YiZ?=
- =?us-ascii?Q?WEiseYtGeCm2j5AQlCE8YpVRK2j9gOZDg4mneGNrtsU/jyEy8GP8wU+d5aYi?=
- =?us-ascii?Q?cr2rLw5YXkBQQnLMZ3lnkwkqmBOwlGag/XbAsPYn5l3hWqplfWe+yB8g8XXO?=
- =?us-ascii?Q?evvx7/gEGhF50JgYuJHFAp5sYdw0UkpqjqGsu/HMq/nLStY0tX7wnbDUFDa0?=
- =?us-ascii?Q?5O4YF3VVShxEQLHBniAB8n8gwds4vGefGH/ut9+xMC409aOvVvi/rEiCqJ4h?=
- =?us-ascii?Q?SvwYEqs0NAUMKj2rx1wU793x0hiYPyQocXyWDynW41e0jAkvo8ZmOwNgQjXU?=
- =?us-ascii?Q?+9qDWxZO0cwbRrY42L4NTPOIvS0MCbd15yUWy/PsvHBlBu2w7waX7XViaGWf?=
- =?us-ascii?Q?k/67bhyDFOA4hVOyZMpOvKraUAQ4EOrNHqoSjrj0siPD+CVlySYXv0MfV9z2?=
- =?us-ascii?Q?JBlWdGHoayufseqDBVUg6mi/ywFFFAoCQ+kQ2mySOQM6LtDsypxEgaQqpcdI?=
- =?us-ascii?Q?BVYe1YenWPVyxIuE8s0Wxc/rjZSG//ejX0Nolq58DluJ5DV2ZFP/jLSfZ/T7?=
- =?us-ascii?Q?fY4zqmCMmn9DX3zf6XfSlG1CE4JgtYyw1D0JsO3wa31bwhfE3RNivsttDAWz?=
- =?us-ascii?Q?4j3rkQJLPBLgrDg0sXoOB2JsLV7le1Rred9TzkEl7AzTvk8i8s0TBOt3u6Nh?=
- =?us-ascii?Q?69h655zOgI0tWAkC4HTr1BzF/DzEzLUgt8OAmy6TG9kerz4zn9yOvmnXWWAv?=
- =?us-ascii?Q?QjdY99U2xuv2twZkN0S54Iqboa01q/K5fPWIu2TEkcXWitiM8KgT68n9o733?=
- =?us-ascii?Q?MFMkWjxl2NayRzZ4M53e4rzQnEO5kDb15VDePr5SBPgKSsGxgaf9iO7ZfSOX?=
- =?us-ascii?Q?CJRjqZq8Ck0vppA2ZwigUqIW1NNsS9cuvZU8cGnka6VE95WwdcPcsCrT8LEm?=
- =?us-ascii?Q?xmAoqEzbi4GkErxFbs2QQogBju7YPNoBQPGzaCYi/61De3wfJVtQT6kOzHXV?=
- =?us-ascii?Q?VN00rQZk786Gf4maw1+AnZ5+VlShsXzUjuGHs8OEWXz7WKnAgB5XSXUG93c7?=
- =?us-ascii?Q?gKDjaBrwpQW4vhjVtfgbJ/Q6BemNkevOC65SomCNb7LXgxfG9bgAU+F6M/zS?=
- =?us-ascii?Q?pc8UgOy0ST87UHkVBdDM75dGOZlQaE26nl8WCvRPie4Y/TlIKFcl37L8BeBK?=
- =?us-ascii?Q?CfnwI9mRVy8La9QUs55hzIEgwen0UdlwA3dcFqPJJa0uspOwDKxOaMnjTzDB?=
- =?us-ascii?Q?ZOWUrmSaZi8SSWP0+GvN6DPLd4XJA6FndWdx4G28pogeUtTU5vcZl8p6CY9M?=
- =?us-ascii?Q?X0D/Bb6My9rRZR1jzxFMLkxrlIW10b088sDWDvFnvpbvfgWgXai4qCYA59M9?=
- =?us-ascii?Q?JdkBA2jPnrkQNTuf7cK8MEKQM5o1iPjUH9VX8pxMSZPF6rNOo5NhGJKS9m/C?=
- =?us-ascii?Q?PDp9BvNDya+4oabqNVvBtNraQPrlpnlPxLebKS9I7IoqdhgsCCfbxobCclQ4?=
- =?us-ascii?Q?8G2gpgwevbQ6EQMPqJBRMfq+bIlEbZJ+hDCLVcI098xfuWgyBhjNhQx6i4dA?=
- =?us-ascii?Q?C7FS934nSfn11l07o82Z6aJyHLAAbJFodivxd9RedH4zpYtsTwVkyJE1rGYN?=
- =?us-ascii?Q?pmY/g+GnLC/Xk7au8zzme6O500c=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZL7Ot7T98pxVEcnPQOSoI90FRFbeDedeRBmKR171NpGgxPZcxzhEyT2rWKth?=
+ =?us-ascii?Q?064v/Z2u52Nei1lvlIH18xIubI3U740b2PmMb12rRwvGY5Cbg+aH+moxnj+e?=
+ =?us-ascii?Q?NNdIOskU9Ki12SpWXOya16fUAG/T4+oa2WxUh9I3w7qDeKCIcPmKXU9vqFIi?=
+ =?us-ascii?Q?HJ+smNBklirz4+iTXByhiSkMAvt86Ak7fMhszFJvU5ra78GsCVjqYbWv2HGq?=
+ =?us-ascii?Q?xYQLupNvJB+w6pWUxUYFrJ+o6KH+mjdP8vIO/TlrYj7c4WNVFlo09yEnMohe?=
+ =?us-ascii?Q?i+S6Nh2NfKjK6jR6rlTOnMPSD/R8ks0GSkTWhtWZ1qbg7FOCpKkfaAtiuOtc?=
+ =?us-ascii?Q?YuFMOXiCFD0pSyAzbuSHGmVLTMOIRfvpUsEIElgCVuBQLTGs4lOfmpNLZuvG?=
+ =?us-ascii?Q?CwA/ApaVe9qLa6HzIc2VqdgG9T7yVA5DYrP1WHzF43VBvEacxhA7QhII5e2M?=
+ =?us-ascii?Q?ZjK2zXggHIJWJz/dl6wvXUGeBaYGoj0q+XB1zMAVOGvl4vDOyIsY1lY0jhKY?=
+ =?us-ascii?Q?4vK6cwTtTNTHxVc2yirYAflGkxqi8zW9kV1vu1CWe/eso9MgaBhQxS8uZAvB?=
+ =?us-ascii?Q?XlYQnNbvS+GiX9eAqkFMB8ud/w3RDSywQJK7TaSof3pDeJoA/Oz/ZBQPUMJu?=
+ =?us-ascii?Q?CODG39rSm6rTlWVK0OI7BW3Y+ScgV4qJpEjg95Q0ido7hqUAB6lQQYn72kWP?=
+ =?us-ascii?Q?1RxaEV84KlfOYy1CL/1EGvUkbAxet5zNkmM0ZT7q2pLCwCqSnmRFtctiWnNM?=
+ =?us-ascii?Q?nRZ5ZSfKlUySuHdcoEP7UJr3ghn3O2hmRvtFqPlwxIZpSWTDWujZ4xIoSa9W?=
+ =?us-ascii?Q?pOyl/6CV3m0O8hoFvzy+kvxcNA85sKzWG62A7Mdp9DG9CTiLUR3NEERKmyca?=
+ =?us-ascii?Q?kDAgFjX4bJ+Hr5YgrRu6voTXSXz8bDeJAchYCUfinsohIUeECaUFWtg1aNv1?=
+ =?us-ascii?Q?etONN76wt0atvqEu+xgjZfezpuFmqjGKCVbrAE9dIqrp1m2SoRx8kapeVjSs?=
+ =?us-ascii?Q?zKbwuL+WEcFsKA9F2X9p0U/Sj1d9d9aIh31+yNsUcx1bLNABy5NfUCVAJ4T0?=
+ =?us-ascii?Q?0B/Png0u/ydLHloN9QNDpIKTX2yYeMUbpBpPxBzlWSoU5DhGBJovPDNVOsx+?=
+ =?us-ascii?Q?Ts5qY9Wu+QbdxGP7EpFqGYFUkRS0UylUTYAqdhhVniROQvOvuHljc1u4qBe0?=
+ =?us-ascii?Q?mFLyt13nGbREONs0iwcAo5sRDCj6UKlEhtlTEra8uoKP4boiIwIAOkJ3qxkk?=
+ =?us-ascii?Q?6ema9/tpiOPhJC93KD6eHU0XUFO6pcvl9HQP5DkZy8yz/M0dfgy1AVlM1wUQ?=
+ =?us-ascii?Q?xwR40lHVWScIvTQAuMsuGUsYKrXVNrmeUvVmePqfC0RXLV0b2K5Hc9tCBb4/?=
+ =?us-ascii?Q?61CNyjJxDuXiNuIKzHTBWmWIuXhq5hCbmawUhLM9we7xrJMb09C3PPaSggDY?=
+ =?us-ascii?Q?u5QyMsLFeDqMQ4DF470tob0Vp3yC8jUM8Smwd0jvuA14+4qUk0SSYcULDfeY?=
+ =?us-ascii?Q?Phi511sn8/PXRHg0yBA2yAfBxaXLqJ2yLM4apsNxuVouBp43j3AyRsTl43/c?=
+ =?us-ascii?Q?hkibgeTNRhae4WFqiPuDoqWajMGbjCKbby9n9eA54lQh3iZeOnQyyU9ZV2b/?=
+ =?us-ascii?Q?pq4Km520g/DCpmAqKaHr735C8/M98GdFpfJNZvVdXXsQ/s/RgeI7j3z0fjHf?=
+ =?us-ascii?Q?S14us8yaN7AfLNLXD8JTK/FkQes=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2f406f5-f8c7-4510-5849-08d9d0ae27b0
+X-MS-Exchange-CrossTenant-Network-Message-Id: adbda2d3-5b34-4bcb-db85-08d9d0ae2948
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR10MB5698.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:45.9954
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:48.6527
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0IN89zn15klzP9BOFrLM/57KM093S9acMgui0GwOnytc4ZRZ5sEw+Une03S1h59JEzM8/HnQQ9qmJb0C45BCgk3hSI6CUT7jVphkUuRQD/c=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5RzNC/0AUb0MH/deITYpJ2w9eED4OndMwrWLK3WrU2oP0QC5BfEYvq21x0i2DsDE3e7UQ9yOawmZXKcf9b52Cpi+RNoVrFiNwIFyaazwvX4=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4422
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10218 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0 adultscore=0
- mlxlogscore=667 phishscore=0 malwarescore=0 mlxscore=0 bulkscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=823 spamscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2112160000
  definitions=main-2201060001
-X-Proofpoint-ORIG-GUID: h4_Y8PEYP4sYh1Z9hBLR5vldbozDzFp5
-X-Proofpoint-GUID: h4_Y8PEYP4sYh1Z9hBLR5vldbozDzFp5
+X-Proofpoint-ORIG-GUID: QwxVU9QEH6cp4HgJQNh4EYEY9FzWI5uT
+X-Proofpoint-GUID: QwxVU9QEH6cp4HgJQNh4EYEY9FzWI5uT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Helpers are currently not bound by the main thread's CFS bandwidth
-limits because they're kernel threads that run on the root runqueues, so
-a multithreaded job could cause a task group to consume more quota than
-it's configured for.
+Optimistic parallelization can go wrong if too many helpers are started
+on a busy system.  They can unfairly degrade the performance of other
+tasks, so they should be sensitive to current CPU utilization[1].
 
-As a starting point for helpers honoring these limits, restrict a job to
-only as many helpers as there are CPUs allowed by these limits.  Helpers
-are generally CPU-bound, so starting more helpers than this would likely
-exceed the group's entire quota.  Max CFS bandwidth CPUs are calculated
-conservatively with integer division (quota / period).
+Achieve this by running helpers at MAX_NICE so that their CPU time is
+proportional to idle CPU time.  The main thread, however, runs at its
+original priority so that it can make progress on a heavily loaded
+system, as it would if padata were not in the picture.
 
-This restriction ignores other tasks in the group that might also be
-consuming quota, so it doesn't strictly prevent a group from exceeding
-its limits.  However, this may be the right tradeoff between simplicity
-and absolutely correct resource control, given that VFIO page pinning
-typically happens during guest initialization when there's not much
-other CPU activity in the group.  There's also a prototype for an
-absolutely correct approach later in the series should that be
-preferred.
+Here are two test cases in which a padata and a non-padata workload
+compete for the same CPUs to show that normal priority (i.e. nice=0)
+padata helpers cause the non-padata workload to run more slowly, whereas
+MAX_NICE padata helpers don't.
+
+Notes:
+  - Each case was run using 8 CPUs on a large two-socket server, with a
+    cpumask allowing all test threads to run anywhere within the 8.
+  - The non-padata workload used 7 threads and the padata workload used 8
+    threads to evaluate how much padata helpers, rather than the main padata
+    thread, disturbed the non-padata workload.
+  - The non-padata workload was started after the padata workload and run
+    for less time to maximize the chances that the non-padata workload would
+    be disturbed.
+  - Runtimes in seconds.
+
+Case 1: Synthetic, worst-case CPU contention
+
+    padata_test - a tight loop doing integer multiplication to max out on CPU;
+                  used for testing only, does not appear in this series
+    stress-ng   - cpu stressor ("-c --cpu-method ackerman --cpu-ops 1200");
+
+                 stress-ng
+                     alone  (stdev)   max_nice  (stdev)   normal_prio  (stdev)
+                  ------------------------------------------------------------
+    padata_test                          96.87  ( 1.09)         90.81  ( 0.29)
+    stress-ng        43.04  ( 0.00)      43.58  ( 0.01)         75.86  ( 0.39)
+
+MAX_NICE helpers make a significant difference compared to normal
+priority helpers, with stress-ng taking 76% longer to finish when
+competing with normal priority padata threads than when run by itself,
+but only 1% longer when run with MAX_NICE helpers.  The 1% comes from
+the small amount of CPU time MAX_NICE threads are given despite their
+low priority.
+
+Case 2: Real-world CPU contention
+
+    padata_vfio - VFIO page pin a 175G kvm guest
+    usemem      - faults in 25G of anonymous THP per thread, PAGE_SIZE stride;
+                  used to mimic the page clearing that dominates in padata_vfio
+                  so that usemem competes for the same system resources
+
+                    usemem
+                     alone  (stdev)   max_nice  (stdev)   normal_prio  (stdev)
+                  ------------------------------------------------------------
+    padata_vfio                          14.74  ( 0.04)          9.93  ( 0.09)
+        usemem       10.45  ( 0.04)      10.75  ( 0.04)         14.14  ( 0.07)
+
+Here the effect is similar, just not as pronounced.  The usemem threads
+take 35% longer to finish with normal priority padata threads than when
+run alone, but only 3% longer when MAX_NICE is used.
+
+[1] lkml.kernel.org/r/20171206143509.GG7515@dhcp22.suse.cz
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 ---
- include/linux/sched/cgroup.h | 21 +++++++++++++++++++++
- kernel/padata.c              | 15 +++++++++++++++
- kernel/sched/core.c          | 19 +++++++++++++++++++
- 3 files changed, 55 insertions(+)
- create mode 100644 include/linux/sched/cgroup.h
+ kernel/padata.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/linux/sched/cgroup.h b/include/linux/sched/cgroup.h
-new file mode 100644
-index 000000000000..f89d92e9e015
---- /dev/null
-+++ b/include/linux/sched/cgroup.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_SCHED_CGROUP_H
-+#define _LINUX_SCHED_CGROUP_H
-+
-+#include <linux/cgroup-defs.h>
-+#include <linux/cpumask.h>
-+
-+#ifdef CONFIG_CFS_BANDWIDTH
-+
-+int max_cfs_bandwidth_cpus(struct cgroup_subsys_state *css);
-+
-+#else /* CONFIG_CFS_BANDWIDTH */
-+
-+static inline int max_cfs_bandwidth_cpus(struct cgroup_subsys_state *css)
-+{
-+	return nr_cpu_ids;
-+}
-+
-+#endif /* CONFIG_CFS_BANDWIDTH */
-+
-+#endif /* _LINUX_SCHED_CGROUP_H */
 diff --git a/kernel/padata.c b/kernel/padata.c
-index e27988d3e9ed..ef6589a6b665 100644
+index ef6589a6b665..83e86724b3e1 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -24,6 +24,7 @@
-  * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-  */
- 
-+#include <linux/cgroup.h>
- #include <linux/completion.h>
- #include <linux/export.h>
- #include <linux/cpumask.h>
-@@ -34,6 +35,7 @@
- #include <linux/padata.h>
- #include <linux/mutex.h>
- #include <linux/sched.h>
-+#include <linux/sched/cgroup.h>
- #include <linux/slab.h>
- #include <linux/sysfs.h>
- #include <linux/rcupdate.h>
-@@ -572,6 +574,7 @@ int padata_do_multithreaded_job(struct padata_mt_job *job,
- {
- 	/* In case threads finish at different times. */
- 	static const unsigned long load_balance_factor = 4;
-+	struct cgroup_subsys_state *cpu_css;
- 	struct padata_work my_work, *pw;
- 	struct padata_mt_job_state ps;
- 	LIST_HEAD(works);
-@@ -585,6 +588,18 @@ int padata_do_multithreaded_job(struct padata_mt_job *job,
- 	nworks = min(nworks, job->max_threads);
- 	nworks = min(nworks, current->nr_cpus_allowed);
- 
-+#ifdef CONFIG_CGROUP_SCHED
-+	/*
-+	 * Cap threads at the max number of CPUs current's CFS bandwidth
-+	 * settings allow.  Keep it simple, don't try to keep this value up to
-+	 * date.  The ifdef guards cpu_cgrp_id.
-+	 */
-+	rcu_read_lock();
-+	cpu_css = task_css(current, cpu_cgrp_id);
-+	nworks = min(nworks, max_cfs_bandwidth_cpus(cpu_css));
-+	rcu_read_unlock();
-+#endif
+@@ -638,7 +638,10 @@ int padata_do_multithreaded_job(struct padata_mt_job *job,
+ 		if (IS_ERR(task)) {
+ 			--ps.nworks;
+ 		} else {
++			/* Helper threads shouldn't disturb other workloads. */
++			set_user_nice(task, MAX_NICE);
+ 			kthread_bind_mask(task, current->cpus_ptr);
 +
- 	if (nworks == 1) {
- 		/* Single thread, no coordination needed, cut to the chase. */
- 		return job->thread_fn(job->start, job->start + job->size,
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index f3b27c6c5153..848c9fec8006 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -10021,6 +10021,25 @@ static long tg_get_cfs_burst(struct task_group *tg)
- 	return burst_us;
- }
- 
-+/* Returns the max whole number of CPUs that @css's bandwidth settings allow. */
-+int max_cfs_bandwidth_cpus(struct cgroup_subsys_state *css)
-+{
-+	struct task_group *tg = css_tg(css);
-+	u64 quota_us, period_us;
-+
-+	if (tg == &root_task_group)
-+		return nr_cpu_ids;
-+
-+	quota_us = tg_get_cfs_quota(tg);
-+
-+	if (quota_us == RUNTIME_INF)
-+		return nr_cpu_ids;
-+
-+	period_us = tg_get_cfs_period(tg);
-+
-+	return quota_us / period_us;
-+}
-+
- static s64 cpu_cfs_quota_read_s64(struct cgroup_subsys_state *css,
- 				  struct cftype *cft)
- {
+ 			wake_up_process(task);
+ 		}
+ 	}
 -- 
 2.34.1
 
