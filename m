@@ -2,44 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 345FD485F63
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 04:51:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8906B485F69
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 04:54:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231799AbiAFDvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 22:51:53 -0500
-Received: from mga12.intel.com ([192.55.52.136]:4821 "EHLO mga12.intel.com"
+        id S231845AbiAFDyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 22:54:53 -0500
+Received: from mga03.intel.com ([134.134.136.65]:44919 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229485AbiAFDvw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 22:51:52 -0500
+        id S231468AbiAFDyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 22:54:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641441112; x=1672977112;
+  t=1641441292; x=1672977292;
   h=cc:subject:to:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=duW+vQR4sMirxxEYotvqV0oLcyExanZmvqlVTiuxZFs=;
-  b=PFwmvSA1h1XkJNZBw4lhZRt9RWSn16C6hfAiYDvNtBk5zv5MWP8JQQ/M
-   ZiX2/eqMnD0hlfMfgAeRB4pLQr+djodWbUAdp9TiAJoOcl2rldGAIkisf
-   oI+qnfuPy48AbIidQcBEY5TVBu8bHep78YjF5GQor9D6LUjMD1otpL/lS
-   Jl1nowowk0R0Eb1FmwkJODeJuNCryil3ImvX0WCmQ0wz9V06s4tjonTbh
-   redNq8L+6JbOoyY0huIfCxatZ8aVK+bnu2d8c333POWJjpC/p3ca9EFhS
-   MpXF56/tNDy+2R+frer/nVsEM44Zeffk7TL7eJg52Yr/0T7lxtN9NQFWG
+  bh=Rqej3wXaYOK+xVJk5ty5fNj2P0uGjYEUdNVw2YgTyps=;
+  b=FLyzp0sMj0jFH0nc2xFJ/3Jgg34pLzCbW7Wob/IosAYq5xi5i9QIcw8o
+   pwOYx3YclGxF4bNImqc3w4xWtgtqPEIAKIQjnMNHGJbRVmriewIK5p6X9
+   YXndrZ1YRCQCppQ29DMevbS+lEWCdOQ7Ixt4Sm9WGPN+nY/8kfv4WgVNo
+   PEuDKxjD91kNQ4KxVoQhJ/y8BZLfgR6ofQ2bqoRtJU9iqqCro0R0B9fpR
+   Z7zI/DZ4DmsmVV8xFO6/PN80UKoTKkzoccebRm0CmEKlZ7IqL1ieTyJ/i
+   XVXYL239zRwXPsZAAXzO3ZycWicrhiP4Av1ppFea5Nu/tX3STtQUk9VgR
    g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="222580241"
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="242540472"
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="222580241"
+   d="scan'208";a="242540472"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 19:51:52 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 19:54:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="526815760"
+   d="scan'208";a="526816309"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 19:51:45 -0800
-Cc:     baolu.lu@linux.intel.com,
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 19:54:45 -0800
+Cc:     baolu.lu@linux.intel.com, Christoph Hellwig <hch@infradead.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
         Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
         Kevin Tian <kevin.tian@intel.com>,
         Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
         Robin Murphy <robin.murphy@arm.com>,
@@ -61,16 +60,17 @@ Cc:     baolu.lu@linux.intel.com,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v5 01/14] iommu: Add dma ownership management interfaces
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20220104164100.GA101735@bhelgaas>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Bjorn Helgaas <helgaas@kernel.org>
+References: <YdQcgFhIMYvUwABV@infradead.org>
+ <20220104164100.GA101735@bhelgaas> <20220104192348.GK2328285@nvidia.com>
 From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <bcb77054-f4ac-cd34-d79c-eba7cb54e042@linux.intel.com>
-Date:   Thu, 6 Jan 2022 11:51:07 +0800
+Message-ID: <9486face-0778-b8d0-6989-94c2e876446b@linux.intel.com>
+Date:   Thu, 6 Jan 2022 11:54:06 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20220104164100.GA101735@bhelgaas>
+In-Reply-To: <20220104192348.GK2328285@nvidia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,28 +78,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/5/22 12:41 AM, Bjorn Helgaas wrote:
->>>   struct group_device {
->>> @@ -289,7 +291,12 @@ int iommu_probe_device(struct device *dev)
->>>   	mutex_lock(&group->mutex);
->>>   	iommu_alloc_default_domain(group, dev);
->>>   
->>> -	if (group->default_domain) {
->>> +	/*
->>> +	 * If device joined an existing group which has been claimed
->>> +	 * for none kernel DMA purpose, avoid attaching the default
->>> +	 * domain.
-> AOL: another "none kernel DMA purpose" that doesn't read well.  Is
-> this supposed to be "non-kernel"?  What does "claimed for non-kernel
-> DMA purpose" mean?  What interface does that?
+On 1/5/22 3:23 AM, Jason Gunthorpe wrote:
+>>>> The device driver oriented interfaces are,
+>>>>
+>>>> 	int iommu_device_use_dma_api(struct device *dev);
+>>>> 	void iommu_device_unuse_dma_api(struct device *dev);
+>> Nit, do we care whether it uses the actual DMA API?  Or is it just
+>> that iommu_device_use_dma_api() tells us the driver may program the
+>> device to do DMA?
+> As the main purpose, yes this is all about the DMA API because it
+> asserts the group domain is the DMA API's domain.
+> 
+> There is a secondary purpose that has to do with the user/kernel
+> attack you mentioned above. Maintaining the DMA API domain also
+> prevents VFIO from allowing userspace to operate any device in the
+> group which blocks P2P attacks to MMIO of other devices.
+> 
+> This is why, even if the driver doesn't use DMA, it should still do a
+> iommu_device_use_dma_api(), except in the special cases where we don't
+> care about P2P attacks (eg pci-stub, bridges, etc).
 > 
 
-It's hard to read. I will rephrase it like this:
+By the way, use_dma_api seems hard to read. How about
 
-/*
-  * If device joined an existing group which has been claimed, don't
-  * attach the default domain.
-  */
+	iommu_device_use_default_dma()?
 
 Best regards,
 baolu
