@@ -2,182 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C71948646F
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 13:36:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A412C4864EB
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 14:07:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238909AbiAFMgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 07:36:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59794 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238831AbiAFMgp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 07:36:45 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2E1C061245;
-        Thu,  6 Jan 2022 04:36:45 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id gp5so2393240pjb.0;
-        Thu, 06 Jan 2022 04:36:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:organization:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=NoGjPaQivsMsvPLvpJIAFIB5+lRj8RKV5+GIsw37iRc=;
-        b=RTnJPDeSUzJA4TjwTadXWyZtBQPrUHjSNnz0aRyI6m5NQvIjelMPdMw8yqvxMLnKN6
-         MQ99ExAMl9er0lOZ/1qTBqlILm0QL/Y+mU5fTeDflfPuCMbkrbmK01D1OQ+f4Bi94whI
-         RKkw+8QKOKJDAxts3ugakKuqXFuOeO2tENuEHSweXO8bNmTJGF3YPMdWBgmcZoXIVO8H
-         p+JqPvfiaapbr/0DZDaWAJCzKofX+wee04N+j4rlDlCi1M5EmDLryuyfs6vwqSaobH0a
-         S88KXQIePJZfBcTT0BqAM33p+4uM4aHDQexe187a8SThwd9tydx2GG/1QNydchxWJRa+
-         0oJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=NoGjPaQivsMsvPLvpJIAFIB5+lRj8RKV5+GIsw37iRc=;
-        b=CZpvC27rkjVCp4Q54rzSn3cJGpZiaFUk3DhhontiElds2JvTxFaJ5Tum18air9FB/7
-         b6VGUSjGfWFgZq644h6bQdrqo0xjbfAiWloxWPGhA0x/MFL5czhgspGA6A04VIBoEhzX
-         b/UrlRv9K3cUZmx8AloToCe8fCW2wickgOT+X9s6p0G0JdcGTZK1EjkD4Mm1uErzFQh1
-         pOm5MRijv0xbgy6E/2YeU1UJU2k6c7FH53bHE4QTvr2hUJQIfE1hXt/6UXArEoKg6Nf6
-         L2TF2wH52PyPbm/9G0qPlIfUsoOkIph1OM8H+rWSVEdD/KL18/sWXxlGFHjpFLmrCb8l
-         scDQ==
-X-Gm-Message-State: AOAM5308DmDmu4LVExpGUoDaMygyN80X5DIhm/bFi7n+uU0ne08i93MF
-        J4TloSrNgSQj6Vp2aWbgGF0=
-X-Google-Smtp-Source: ABdhPJyN0tM8perJ1u9smSoj//wHs3VS/4LED4KAS+D5h3tR1/0Y/LHJ6ZY3McvK2Ws9EhttI+uNkQ==
-X-Received: by 2002:a17:90b:1a92:: with SMTP id ng18mr9789966pjb.238.1641472604715;
-        Thu, 06 Jan 2022 04:36:44 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id m16sm2914161pfk.32.2022.01.06.04.36.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jan 2022 04:36:44 -0800 (PST)
-Message-ID: <9e01f081-f6c5-5597-6898-a043346063b6@gmail.com>
-Date:   Thu, 6 Jan 2022 20:36:35 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.1
-Content-Language: en-US
-To:     "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org)" 
-        <pbonzini@redhat.com>, Jietao Xiao <shawtao1125@gmail.com>
+        id S239120AbiAFNH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 08:07:28 -0500
+Received: from mga02.intel.com ([134.134.136.20]:52817 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238990AbiAFNH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 08:07:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641474447; x=1673010447;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=znSuPJrdIfXZBPs+/0Wp7F8ajuSAzZTJWGMLAVEn470=;
+  b=J7UQ3iBlX/ns0+EBmP4pNHhPYCJLE93lhvX/1yFvND8RSL+b9V2gpA71
+   PX8Lup/pq8aQzdTO5EqmZOOAK90upvhyGPcgxCjJxg7icL6IVCBbT5qQY
+   rbF/DVURDTVaozqT6vhFfRAOgoBapRCWevuKTQZ2F4V5oxEiCz3qofm8d
+   9YYdam3B2TSW6LzYXQ45CJmE4ndsUdqV/pfiKtvw0BwYuY1EHhvhTlkqu
+   v9p2QB4G0SOqEaz0W9ugzvvILCvjozjopjBQfzLSZfBG751v+NAKBMsqF
+   XkdlHURoXqy1NPSZQWN/sLhkznkAmL0hRrRakDzcxxukhaMUAF14Al5cG
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229980549"
+X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
+   d="scan'208";a="229980549"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 05:07:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
+   d="scan'208";a="526972284"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga008.jf.intel.com with ESMTP; 06 Jan 2022 05:07:19 -0800
+Date:   Thu, 6 Jan 2022 21:06:38 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org
-References: <20220102082207.10485-1-shawtao1125@gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH] KVM:x86: Let kvm-pit thread inherit the cgroups of the
- calling process
-In-Reply-To: <20220102082207.10485-1-shawtao1125@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
+Subject: Re: [PATCH v3 kvm/queue 01/16] mm/shmem: Introduce
+ F_SEAL_INACCESSIBLE
+Message-ID: <20220106130638.GB43371@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20211223123011.41044-1-chao.p.peng@linux.intel.com>
+ <20211223123011.41044-2-chao.p.peng@linux.intel.com>
+ <7eb40902-45dd-9193-37f1-efaca381529b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7eb40902-45dd-9193-37f1-efaca381529b@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/2022 4:22 pm, Jietao Xiao wrote:
-> Qemu-kvm will create several kernel threads for each VM including
-> kvm-nx-lpage-re, vhost, and so on. Both of them properly inherit
-> the cgroups of the calling process,so they are easy to attach to
-> the VMM process's cgroups.
+On Tue, Jan 04, 2022 at 03:22:07PM +0100, David Hildenbrand wrote:
+> On 23.12.21 13:29, Chao Peng wrote:
+> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> > 
+> > Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
+> > the file is inaccessible from userspace in any possible ways like
+> > read(),write() or mmap() etc.
+> > 
+> > It provides semantics required for KVM guest private memory support
+> > that a file descriptor with this seal set is going to be used as the
+> > source of guest memory in confidential computing environments such
+> > as Intel TDX/AMD SEV but may not be accessible from host userspace.
+> > 
+> > At this time only shmem implements this seal.
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  include/uapi/linux/fcntl.h |  1 +
+> >  mm/shmem.c                 | 37 +++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 36 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
+> > index 2f86b2ad6d7e..e2bad051936f 100644
+> > --- a/include/uapi/linux/fcntl.h
+> > +++ b/include/uapi/linux/fcntl.h
+> > @@ -43,6 +43,7 @@
+> >  #define F_SEAL_GROW	0x0004	/* prevent file from growing */
+> >  #define F_SEAL_WRITE	0x0008	/* prevent writes */
+> >  #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
+> > +#define F_SEAL_INACCESSIBLE	0x0020  /* prevent file from accessing */
 > 
-> Kubernetes has a feature Pod Overhead for accounting for the resources
-> consumed by the Pod infrastructure(e.g overhead brought by qemu-kvm),
-> and sandbox container runtime usually creates a sandbox or sandbox
-> overhead cgroup for this feature. By just simply adding the runtime or
-> the VMM process to the sandbox's cgroup, vhost and kvm-nx-lpage-re thread
-> can successfully attach to the sanbox's cgroup but kvm-pit thread cannot.
-
-Emm, it seems to be true for kvm-pit kthread.
-
-> Besides, in some scenarios, kvm-pit thread can bring some CPU overhead.
-> So it's better to let the kvm-pit inherit the cgroups of the calling
-> userspace process.
-
-As a side note, there is about ~3% overhead in the firecracker scenario.
-
+> I think this needs more clarification: the file content can still be
+> accessed using in-kernel mechanisms such as MEMFD_OPS for KVM. It
+> effectively disallows traditional access to a file (read/write/mmap)
+> that will result in ordinary MMU access to file content.
 > 
-> By queuing the attach cgroup work as the first work after the creation
-> of the kvm-pit worker thread, the worker thread can successfully attach
-> to the callings process's cgroups.
+> Not sure how to best clarify that: maybe, prevent ordinary MMU access
+> (e.g., read/write/mmap) to file content?
+
+Or: prevent userspace access (e.g., read/write/mmap) to file content?
 > 
-> Signed-off-by: Jietao Xiao <shawtao1125@gmail.com>
-> ---
->   arch/x86/kvm/i8254.c | 32 ++++++++++++++++++++++++++++++++
->   1 file changed, 32 insertions(+)
+> >  /* (1U << 31) is reserved for signed error codes */
+> >  
+> >  /*
+> > diff --git a/mm/shmem.c b/mm/shmem.c
+> > index 18f93c2d68f1..faa7e9b1b9bc 100644
+> > --- a/mm/shmem.c
+> > +++ b/mm/shmem.c
+> > @@ -1098,6 +1098,10 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
+> >  		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
+> >  			return -EPERM;
+> >  
+> > +		if ((info->seals & F_SEAL_INACCESSIBLE) &&
+> > +		    (newsize & ~PAGE_MASK))
+> > +			return -EINVAL;
+> > +
 > 
-> diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
-> index 0b65a764ed3a..c8dcfd6a9ed4 100644
-> --- a/arch/x86/kvm/i8254.c
-> +++ b/arch/x86/kvm/i8254.c
-> @@ -34,6 +34,7 @@
->   
->   #include <linux/kvm_host.h>
->   #include <linux/slab.h>
-> +#include <linux/cgroup.h>
->   
->   #include "ioapic.h"
->   #include "irq.h"
-> @@ -647,6 +648,32 @@ static void pit_mask_notifer(struct kvm_irq_mask_notifier *kimn, bool mask)
->   		kvm_pit_reset_reinject(pit);
->   }
->   
-> +struct pit_attach_cgroups_struct {
-> +	struct kthread_work work;
-> +	struct task_struct *owner;
-> +	int ret;
-> +};
-> +
-> +static void pit_attach_cgroups_work(struct kthread_work *work)
-> +{
-> +	struct pit_attach_cgroups_struct *attach;
-> +
-> +	attach = container_of(work, struct pit_attach_cgroups_struct, work);
-> +	attach->ret = cgroup_attach_task_all(attach->owner, current);
+> What happens when sealing and there are existing mmaps?
 
-This cgroup_v1 interface is also called by the vhost_attach_cgroups_work(),
-as well as the kvm_vm_worker_thread() in the KVM context.
+I think this is similar to ftruncate, in either case we just allow that.
+The existing mmaps will be unmapped and KVM will be notified to
+invalidate the mapping in the secondary MMU as well. This assume we
+trust the userspace even though it can not access the file content.
 
-This part of the code may be a bit redundant as the number of kthreads increases.
-
-> +}
-> +
-> +
-> +static int pit_attach_cgroups(struct kvm_pit *pit)
-> +{
-> +	struct pit_attach_cgroups_struct attach;
-> +
-> +	attach.owner = current;
-> +	kthread_init_work(&attach.work, pit_attach_cgroups_work);
-> +	kthread_queue_work(pit->worker, &attach.work);
-> +	kthread_flush_work(&attach.work);
-> +	return attach.ret;
-> +}
-> +
->   static const struct kvm_io_device_ops pit_dev_ops = {
->   	.read     = pit_ioport_read,
->   	.write    = pit_ioport_write,
-> @@ -683,6 +710,10 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
->   	if (IS_ERR(pit->worker))
->   		goto fail_kthread;
-
-I wonder if we could unify the kthread_create method for both vhost and kvm-pit
-so that all kthreds from kvm_arch_vm agent could share the cgroup_attach_task_all()
-code base and more stuff like set_user_nice().
-
->   
-> +	ret = pit_attach_cgroups(pit);
-> +	if (ret < 0)
-> +		goto fail_attach_cgroups;
-> +
->   	kthread_init_work(&pit->expired, pit_do_work);
->   
->   	pit->kvm = kvm;
-> @@ -723,6 +754,7 @@ struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags)
->   fail_register_pit:
->   	mutex_unlock(&kvm->slots_lock);
->   	kvm_pit_set_reinject(pit, false);
-> +fail_attach_cgroups:
->   	kthread_destroy_worker(pit->worker);
-
-If it fails, could we keep it at least alive and functional ?
-
->   fail_kthread:
->   	kvm_free_irq_source_id(kvm, pit->irq_source_id);
+Thanks,
+Chao
+> 
+> 
+> -- 
+> Thanks,
+> 
+> David / dhildenb
