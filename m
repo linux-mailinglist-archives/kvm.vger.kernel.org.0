@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E40B485EA8
-	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:23:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82867485EAC
+	for <lists+kvm@lfdr.de>; Thu,  6 Jan 2022 03:24:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344843AbiAFCXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jan 2022 21:23:03 -0500
-Received: from mga18.intel.com ([134.134.136.126]:45674 "EHLO mga18.intel.com"
+        id S1344905AbiAFCX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jan 2022 21:23:59 -0500
+Received: from mga12.intel.com ([192.55.52.136]:3335 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344750AbiAFCWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jan 2022 21:22:32 -0500
+        id S1344796AbiAFCWu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jan 2022 21:22:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641435751; x=1672971751;
+  t=1641435770; x=1672971770;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GDCUJufXvlu7Z20AypZ4GsZd9L9C8y8eFXL56cSyTrE=;
-  b=A93kSzd8hs2KrJ8Tk8sCxIHEXc7epR5IYy2mOhdMLX9k69XP3KYD6lS1
-   NABwp+FaDCxcxJv8zF5wvqnEwLxi5NzGI3glW/idGSFxk17QCh8dHwPZC
-   QVqs9e/aewY4qOIbVak4ikSUTAcypB3OqugDd2U5xvhHj/xUYXJpfRz/e
-   12mvzQgzUFHUgBeQCDvuNhdhwx+Dzc1vpdM3rg0soNBtsTiMperI2HvLa
-   tOSuZxXOVaeD/0+k5F3bDiJl45Iglz7ARsoGq0iGpz91R5VRu8RVbbgN/
-   Pj5zTEI2RQM9kT4RZaIzUzw9Rj37QvbyATBUFCCXCy2e/pBQRZACU+3Df
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="229389218"
+  bh=rJCHc+7rEGzzzZ26n+LFYyMzqMy4eMF/FP0CIBhFlrQ=;
+  b=SGfXpxd5qSC07R+OUutcwmIaPCNy4ucqI2ie6pYbWnnzpW+HcXllrlpF
+   svEqf77IByGegIly9V3oYs0w5h6JZRa//VQq7Q0JE45qyNBCTf7Z0RU1I
+   8n4HMATaqIc8JB7RES+k8KYRjX7GknjbVnK8W6iOAERVdBcMD2LgdgGDS
+   nFCTwyRqBPslNHzJQqrJsi0f9ihX9nAKExJph0vCb7QrI6pITivT3/ozY
+   X93bjBpJF8aG7wjh9Gz/6HnCgNTQdFJsMRa0F8TTiasv6ZjoSEwmNqOZV
+   by3StD86ajQGv/jNXqlVwnadXhDYNP6wML/+aJb9cUYMHWAFygD18/oxD
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="222571003"
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="229389218"
+   d="scan'208";a="222571003"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:31 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 18:22:48 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,265,1635231600"; 
-   d="scan'208";a="526794466"
+   d="scan'208";a="526794519"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:22:24 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Jan 2022 18:22:31 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v1 6/8] gpu/host1x: Use iommu_attach/detach_device()
-Date:   Thu,  6 Jan 2022 10:20:51 +0800
-Message-Id: <20220106022053.2406748-7-baolu.lu@linux.intel.com>
+Subject: [PATCH v1 7/8] media: staging: media: tegra-vde: Use iommu_attach/detach_device()
+Date:   Thu,  6 Jan 2022 10:20:52 +0800
+Message-Id: <20220106022053.2406748-8-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
 References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
@@ -80,31 +80,40 @@ attaching and detaching.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/gpu/host1x/dev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/staging/media/tegra-vde/iommu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/gpu/host1x/dev.c b/drivers/gpu/host1x/dev.c
-index fbb6447b8659..6e08cb6202cc 100644
---- a/drivers/gpu/host1x/dev.c
-+++ b/drivers/gpu/host1x/dev.c
-@@ -265,7 +265,7 @@ static struct iommu_domain *host1x_iommu_attach(struct host1x *host)
- 			goto put_cache;
- 		}
+diff --git a/drivers/staging/media/tegra-vde/iommu.c b/drivers/staging/media/tegra-vde/iommu.c
+index adf8dc7ee25c..a6e6eb28f1e3 100644
+--- a/drivers/staging/media/tegra-vde/iommu.c
++++ b/drivers/staging/media/tegra-vde/iommu.c
+@@ -91,7 +91,7 @@ int tegra_vde_iommu_init(struct tegra_vde *vde)
+ 	order = __ffs(vde->domain->pgsize_bitmap);
+ 	init_iova_domain(&vde->iova, 1UL << order, 0);
  
--		err = iommu_attach_group(host->domain, host->group);
-+		err = iommu_attach_device(host->domain, host->dev);
- 		if (err) {
- 			if (err == -ENODEV)
- 				err = 0;
-@@ -335,7 +335,7 @@ static void host1x_iommu_exit(struct host1x *host)
- {
- 	if (host->domain) {
- 		put_iova_domain(&host->iova);
--		iommu_detach_group(host->domain, host->group);
-+		iommu_detach_device(host->domain, host->dev);
+-	err = iommu_attach_group(vde->domain, vde->group);
++	err = iommu_attach_device(vde->domain, dev);
+ 	if (err)
+ 		goto put_iova;
  
- 		iommu_domain_free(host->domain);
- 		host->domain = NULL;
+@@ -129,7 +129,7 @@ int tegra_vde_iommu_init(struct tegra_vde *vde)
+ unreserve_iova:
+ 	__free_iova(&vde->iova, vde->iova_resv_static_addresses);
+ detach_group:
+-	iommu_detach_group(vde->domain, vde->group);
++	iommu_detach_device(vde->domain, dev);
+ put_iova:
+ 	put_iova_domain(&vde->iova);
+ 	iova_cache_put();
+@@ -146,7 +146,7 @@ void tegra_vde_iommu_deinit(struct tegra_vde *vde)
+ 	if (vde->domain) {
+ 		__free_iova(&vde->iova, vde->iova_resv_last_page);
+ 		__free_iova(&vde->iova, vde->iova_resv_static_addresses);
+-		iommu_detach_group(vde->domain, vde->group);
++		iommu_detach_device(vde->domain, vde->miscdev.parent);
+ 		put_iova_domain(&vde->iova);
+ 		iova_cache_put();
+ 		iommu_domain_free(vde->domain);
 -- 
 2.25.1
 
