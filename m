@@ -2,175 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 188944879D8
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 16:43:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BCAF487A5F
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 17:31:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348130AbiAGPnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 10:43:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26579 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348126AbiAGPnl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 10:43:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641570220;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xLApLSkD2tnkzqx7aoXrE25bXex4a2vpZpy1QnhSBFE=;
-        b=EF+kXB0Onsorqh/VKS1RLZExJYW7xWv0DU6dnze2o/HJJp7s2QC01axazuPqeFtljecTkN
-        iq20g3xmbHb2KgV4Fue86r/9H3ekcNNfcO/6TWtmWQT6ayO8bpDfc0PHiK7uOi4P7nRq6Q
-        NGRCNeTJXMfVqlRY2qo4FKGoyETBZiY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-376-xwsyNjgcPB6jSSjIjDo51A-1; Fri, 07 Jan 2022 10:43:39 -0500
-X-MC-Unique: xwsyNjgcPB6jSSjIjDo51A-1
-Received: by mail-ed1-f71.google.com with SMTP id dz8-20020a0564021d4800b003f897935eb3so4992038edb.12
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 07:43:39 -0800 (PST)
+        id S240074AbiAGQbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 11:31:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239599AbiAGQbi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 11:31:38 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDD4C06173E
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 08:31:38 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id f8so5844864pgf.8
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 08:31:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8x5aau+9GId4X1fkS/Ix8Wi9zq+PLZoxIQ2oHrW+IM8=;
+        b=L9AJlkClDBCQp2d0qcZIwYZbbM0UJrWK7mAnAs7XoHi5p3eXECQk/DT7ZPdJL6dOLF
+         jIWwg4D0FCWGc+KY752pSLb0iqOUgyV4ueCX1tRs0iyIihUOfu+/nrN1UnQgQtHzU6Q9
+         E2bh0Vzff3Bi2MgEvD6x1btKH7Hj+ZDktF1TswaiGXH2itZ6sMNFH0eff2bzCSZIUzPx
+         Ljeu9mMpDh9SifesE99f/y4hFJusqSEbqQ+3QYY58RlPh7erzlf6CgVoHjBTmnzEr0gg
+         cXvZjK196zShjNX+a2OopX31KfOYlHQPnp5tpCH8PJpwA4n+VcXTb4X9AGr99mUZ2sKJ
+         dpBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xLApLSkD2tnkzqx7aoXrE25bXex4a2vpZpy1QnhSBFE=;
-        b=q6gFqMwUqokCF1vaeVJ27m3lmv1BJ8zp00l7yPmkiAXDQUD37tHqIVy+G5p62n963y
-         toYtZfAkYRibskFTlOfqDmMXu0MxRmCLP6+mtYY0ipYoB93yxemwhnIFI1j9w3RGJUx9
-         E7vm09XS74sluEHWLhHUg3bjwy1Pbf/3Ru7gVnkzHrt5uy5uH5wjA6YPVlxzsj36lBR8
-         Ysp7CeTPVZC5hXBFXUrPqsj6NG1u2CLTJGDYhh5KXG2k1cVQZMn0Sz8TnSnZM0E9/8gW
-         DehP0Drn3RkNuFkREEJaBT6XSfOJlmjRvoDn4+nB9oke/YU7hJDrlgcErG33XsMJSyda
-         cWcw==
-X-Gm-Message-State: AOAM530peuiqVfwMf5gXp4Idb3dqaaRzTAy4QUmJ+BkHL9/IMusbD9Oo
-        IRWwEH/vKW7DV8RKWROuYZvrS4ist9goFr3IbLU2qOc7sFe5GRMWUCr0VfTPSPCE19PwuAiVs9p
-        Sx8SD+lTi4KhW
-X-Received: by 2002:a17:907:961c:: with SMTP id gb28mr49410034ejc.385.1641570217885;
-        Fri, 07 Jan 2022 07:43:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwuHgNBYCw3FFcW3eQJ8shP/R+L2QCQpOod+A/9z88SLM/oJpVx1fVYsU+6h62mFlJQkskP8A==
-X-Received: by 2002:a17:907:961c:: with SMTP id gb28mr49410027ejc.385.1641570217668;
-        Fri, 07 Jan 2022 07:43:37 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id b10sm2219207edu.42.2022.01.07.07.43.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jan 2022 07:43:37 -0800 (PST)
-Message-ID: <806cc760-8e49-62a4-7bab-7149e9c95d33@redhat.com>
-Date:   Fri, 7 Jan 2022 16:43:36 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8x5aau+9GId4X1fkS/Ix8Wi9zq+PLZoxIQ2oHrW+IM8=;
+        b=eyoK8dz5459wOsWvIymyroBLQ+DDBovzRlKiA8GRQdef096ZGLi0Bqkd3JmiBNmSof
+         xegvlTk6QUwf8BrKmfHUVYm74CzhRcyLIObQocYo3ysnYXdIYxeBgpBVWLK0Q0jibhnS
+         LFoEeoDrj9r7A8VfkWFXqTnJ7M/p3nC2hKmX3jHJVFr82M8z6UgqIO1bOelZWHWbNssw
+         ZKiGe8r4kgYJYm3lUjYDBXfHmp1qNLMxjOkM1NsuuKima0K+9Q1+L5vlSzOiNR2UyHDA
+         OM/QUBf0ECD0w7S4Iugl7KjAjZVUxKgfxHPlKIzj5Q3f3JFHSYFBdEjeimRuCpwn8nWS
+         QQUQ==
+X-Gm-Message-State: AOAM532LaF9IPQ54HASObh7WxiCJOp8XQ/XQqSsrROJUVgxrvZJe/TE+
+        GJ7ku+GnHXuM2796wngqIVJgFA==
+X-Google-Smtp-Source: ABdhPJzgG47GKpuKWTf6oJSn9E2fBwBv84lP3oKIaE8NOaZd04A6CCABm5d7mq013onV7fWVKolFbQ==
+X-Received: by 2002:a63:3f88:: with SMTP id m130mr5233049pga.413.1641573097689;
+        Fri, 07 Jan 2022 08:31:37 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v128sm4290920pfc.36.2022.01.07.08.31.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jan 2022 08:31:37 -0800 (PST)
+Date:   Fri, 7 Jan 2022 16:31:33 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Chia-I Wu <olv@chromium.org>
+Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
+Message-ID: <Ydhq5aHW+JFo15UF@google.com>
+References: <20211129034317.2964790-1-stevensd@google.com>
+ <20211129034317.2964790-5-stevensd@google.com>
+ <Yc4G23rrSxS59br5@google.com>
+ <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
+ <YdXrURHO/R82puD4@google.com>
+ <YdXvUaBUvaRPsv6m@google.com>
+ <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
+ <YdcpIQgMZJrqswKU@google.com>
+ <CAD=HUj5v37wZ9NuNC4QBDvCGO2SyNG2KAiTc9Jxfg=R7neCuTw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [GIT PULL] KVM/riscv changes for 5.17, take #1
-Content-Language: en-US
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>
-References: <CAAhSdy2iRgCBt=6t2p5AE_Rq18s2QcRoM62ZAGiAcn5A6TfB4w@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAhSdy2iRgCBt=6t2p5AE_Rq18s2QcRoM62ZAGiAcn5A6TfB4w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=HUj5v37wZ9NuNC4QBDvCGO2SyNG2KAiTc9Jxfg=R7neCuTw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/22 14:21, Anup Patel wrote:
-> Hi Palao,
+On Fri, Jan 07, 2022, David Stevens wrote:
+> > > These are the type of pages which KVM is currently rejecting. Is this
+> > > something that KVM can support?
+> >
+> > I'm not opposed to it.  My complaint is that this series is incomplete in that it
+> > allows mapping the memory into the guest, but doesn't support accessing the memory
+> > from KVM itself.  That means for things to work properly, KVM is relying on the
+> > guest to use the memory in a limited capacity, e.g. isn't using the memory as
+> > general purpose RAM.  That's not problematic for your use case, because presumably
+> > the memory is used only by the vGPU, but as is KVM can't enforce that behavior in
+> > any way.
+> >
+> > The really gross part is that failures are not strictly punted to userspace;
+> > the resulting error varies significantly depending on how the guest "illegally"
+> > uses the memory.
+> >
+> > My first choice would be to get the amdgpu driver "fixed", but that's likely an
+> > unreasonable request since it sounds like the non-KVM behavior is working as intended.
+> >
+> > One thought would be to require userspace to opt-in to mapping this type of memory
+> > by introducing a new memslot flag that explicitly states that the memslot cannot
+> > be accessed directly by KVM, i.e. can only be mapped into the guest.  That way,
+> > KVM has an explicit ABI with respect to how it handles this type of memory, even
+> > though the semantics of exactly what will happen if userspace/guest violates the
+> > ABI are not well-defined.  And internally, KVM would also have a clear touchpoint
+> > where it deliberately allows mapping such memslots, as opposed to the more implicit
+> > behavior of bypassing ensure_pfn_ref().
 > 
-> This is the first set of changes for 5.17. We have two new
-> features for KVM RISC-V:
-> 1) SBI v0.2 support and
-> 2) Initial kvm selftest support.
-> 
-> Please pull.
+> Is it well defined when KVM needs to directly access a memslot?
 
-Pulled, thanks!
+Not really, there's certainly no established rule.
 
-Paolo
+> At least for x86, it looks like most of the use cases are related to nested
+> virtualization, except for the call in emulator_cmpxchg_emulated.
 
-> Regards,
-> Anup
-> 
-> The following changes since commit 5e4e84f1124aa02643833b7ea40abd5a8e964388:
-> 
->    Merge tag 'kvm-s390-next-5.17-1' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-> (2021-12-21 12:59:53 -0500)
-> 
-> are available in the Git repository at:
-> 
->    https://github.com/kvm-riscv/linux.git tags/kvm-riscv-5.17-1
-> 
-> for you to fetch changes up to 497685f2c743f552ec5626d60fc12e7c00faaf06:
-> 
->    MAINTAINERS: Update Anup's email address (2022-01-06 15:18:22 +0530)
-> 
-> ----------------------------------------------------------------
-> KVM/riscv changes for 5.17, take #1
-> 
-> - Use common KVM implementation of MMU memory caches
-> - SBI v0.2 support for Guest
-> - Initial KVM selftests support
-> - Fix to avoid spurious virtual interrupts after clearing hideleg CSR
-> - Update email address for Anup and Atish
-> 
-> ----------------------------------------------------------------
-> Anup Patel (5):
->        RISC-V: KVM: Forward SBI experimental and vendor extensions
->        RISC-V: KVM: Add VM capability to allow userspace get GPA bits
->        KVM: selftests: Add EXTRA_CFLAGS in top-level Makefile
->        KVM: selftests: Add initial support for RISC-V 64-bit
->        MAINTAINERS: Update Anup's email address
-> 
-> Atish Patra (6):
->        RISC-V: KVM: Mark the existing SBI implementation as v0.1
->        RISC-V: KVM: Reorganize SBI code by moving SBI v0.1 to its own file
->        RISC-V: KVM: Add SBI v0.2 base extension
->        RISC-V: KVM: Add v0.1 replacement SBI extensions defined in v0.2
->        RISC-V: KVM: Add SBI HSM extension in KVM
->        MAINTAINERS: Update Atish's email address
-> 
-> Jisheng Zhang (1):
->        RISC-V: KVM: make kvm_riscv_vcpu_fp_clean() static
-> 
-> Sean Christopherson (1):
->        KVM: RISC-V: Use common KVM implementation of MMU memory caches
-> 
-> Vincent Chen (1):
->        KVM: RISC-V: Avoid spurious virtual interrupts after clearing hideleg CSR
-> 
->   .mailmap                                           |   2 +
->   MAINTAINERS                                        |   4 +-
->   arch/riscv/include/asm/kvm_host.h                  |  11 +-
->   arch/riscv/include/asm/kvm_types.h                 |   2 +-
->   arch/riscv/include/asm/kvm_vcpu_sbi.h              |  33 ++
->   arch/riscv/include/asm/sbi.h                       |   9 +
->   arch/riscv/kvm/Makefile                            |   4 +
->   arch/riscv/kvm/main.c                              |   8 +
->   arch/riscv/kvm/mmu.c                               |  71 +---
->   arch/riscv/kvm/vcpu.c                              |  28 +-
->   arch/riscv/kvm/vcpu_fp.c                           |   2 +-
->   arch/riscv/kvm/vcpu_sbi.c                          | 213 ++++++------
->   arch/riscv/kvm/vcpu_sbi_base.c                     |  99 ++++++
->   arch/riscv/kvm/vcpu_sbi_hsm.c                      | 105 ++++++
->   arch/riscv/kvm/vcpu_sbi_replace.c                  | 135 ++++++++
->   arch/riscv/kvm/vcpu_sbi_v01.c                      | 126 +++++++
->   arch/riscv/kvm/vm.c                                |   3 +
->   include/uapi/linux/kvm.h                           |   1 +
->   tools/testing/selftests/kvm/Makefile               |  14 +-
->   tools/testing/selftests/kvm/include/kvm_util.h     |  10 +
->   .../selftests/kvm/include/riscv/processor.h        | 135 ++++++++
->   tools/testing/selftests/kvm/lib/guest_modes.c      |  10 +
->   tools/testing/selftests/kvm/lib/riscv/processor.c  | 362 +++++++++++++++++++++
->   tools/testing/selftests/kvm/lib/riscv/ucall.c      |  87 +++++
->   24 files changed, 1291 insertions(+), 183 deletions(-)
->   create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi.h
->   create mode 100644 arch/riscv/kvm/vcpu_sbi_base.c
->   create mode 100644 arch/riscv/kvm/vcpu_sbi_hsm.c
->   create mode 100644 arch/riscv/kvm/vcpu_sbi_replace.c
->   create mode 100644 arch/riscv/kvm/vcpu_sbi_v01.c
->   create mode 100644 tools/testing/selftests/kvm/include/riscv/processor.h
->   create mode 100644 tools/testing/selftests/kvm/lib/riscv/processor.c
->   create mode 100644 tools/testing/selftests/kvm/lib/riscv/ucall.c
-> 
+The emulator_cmpxchg_emulated() will hopefully go away in the nearish future[*].
+Paravirt features that communicate between guest and host via memory is the other
+case that often maps a pfn into KVM.
 
+> Without being able to specifically state what should be avoided, a flag like
+> that would be difficult for userspace to use.
+
+Yeah :-(  I was thinking KVM could state the flag would be safe to use if and only
+if userspace could guarantee that the guest would use the memory for some "special"
+use case, but hadn't actually thought about how to word things.
+
+The best thing to do is probably to wait for for kvm_vcpu_map() to be eliminated,
+as described in the changelogs for commits:
+
+  357a18ad230f ("KVM: Kill kvm_map_gfn() / kvm_unmap_gfn() and gfn_to_pfn_cache")
+  7e2175ebd695 ("KVM: x86: Fix recording of guest steal time / preempted status")
+
+Once that is done, everything in KVM will either access guest memory through the
+userspace hva, or via a mechanism that is tied into the mmu_notifier, at which
+point accessing non-refcounted struct pages is safe and just needs to worry about
+not corrupting _refcount.
