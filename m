@@ -2,129 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB05C4871D7
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 05:37:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BE4F4872EF
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 07:07:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346086AbiAGEhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 23:37:03 -0500
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:33518 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346075AbiAGEhA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jan 2022 23:37:00 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0V19C5WZ_1641530215;
-Received: from 30.22.113.103(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0V19C5WZ_1641530215)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 07 Jan 2022 12:36:56 +0800
-Message-ID: <142c192f-f8a5-cd52-fe85-6cbccd6c2a9b@linux.alibaba.com>
-Date:   Fri, 7 Jan 2022 12:36:55 +0800
+        id S231530AbiAGGHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 01:07:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44220 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230094AbiAGGHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 01:07:10 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDECC061245
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 22:07:10 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id ie13so4375459pjb.1
+        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 22:07:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2q58XOryfIlXBk+Ga94YK5KAiqVRv5tmtrlFtSkfC0E=;
+        b=ochKJUmv9jcYYqjl8Ri0yXzDhwacQ2/M9JFDOvS2FBy8XLGNBzhfSvKLa9ii/FgSHR
+         lKXPiHPPHOi42VPVoABzyceIiJ8F+Kbs3IS0k75hH2A5mdF2XigOH5lmdKWrpcwtxdbr
+         ezxvlB8NX6lqdXgr7vLxp+V4EZIGdh1LCkEFmJztS6KTyCd2fXWSEdqhhi3oBwVmS13w
+         /pYkJOH9knWKKZPd/LGxDD94eatNe6H5EBW+iGlQr71hEgAmZVB6ZiK24VPUj2ooMIaj
+         42ZKBZFHvnOHD474TolWmS+OmhGNji04Be9HsERGLppfG0rRjME6jGJDuXtYXGuWgZIu
+         K72Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2q58XOryfIlXBk+Ga94YK5KAiqVRv5tmtrlFtSkfC0E=;
+        b=8NDlb7b3He75R6Td61Dy1ylYH7ISjBiSgspclfYL//J5BnicfhzrdcSOpdjN01jkRc
+         5/Kqq9S3VVMKSyi5EhRSVZSiPvHE2ycgtAXRuynEjvxUihbrESfslnurwcNseBTgl9Fo
+         amM3Hp8KsY+z/nPgEDEqj2YJWAMNrfB8SG7DoahKwObWJEZnh62tUEdZIPTU3NdhM4WI
+         7ym9uRqJwnzvPtqD5mu9w090ihG/akj1EnSuqiQXIOxSf5uS79U8JOiq4qCIfVYgEmC3
+         ECI4xomX/HCx96RrIcs5wDatiWAXMxMv9LzU9OLYn5nhUYS64NZWUOEXNljaBgWZSb61
+         yBPw==
+X-Gm-Message-State: AOAM533CApPmsT9aPRJjP/N7Nf38+1FqjsSM6B9K+vtq77ogAOrO80mY
+        yl1StC2TrBfNEOEGAzZoiC/2Z+IBLRTx4ZzujBiuAg==
+X-Google-Smtp-Source: ABdhPJzi8RhMHj39b+4Rn0KshD189vXaFIX2vj8EwamLndmdEQUpG8o9KUsh8L5L/q0EpOVykikO8FcKUk+BveZguG8=
+X-Received: by 2002:a17:902:c652:b0:148:f1a5:b7bf with SMTP id
+ s18-20020a170902c65200b00148f1a5b7bfmr62134703pls.122.1641535629407; Thu, 06
+ Jan 2022 22:07:09 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.1
-Subject: Re: [RFC PATCH 5/6] KVM: X86: Alloc pae_root shadow page
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+In-Reply-To: <20220104194918.373612-2-rananta@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Thu, 6 Jan 2022 22:06:53 -0800
+Message-ID: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
-References: <20211210092508.7185-1-jiangshanlai@gmail.com>
- <20211210092508.7185-6-jiangshanlai@gmail.com> <YdTCKoTgI5IgOvln@google.com>
- <CAJhGHyAOyR6yGdyxsKydt_+HboGjxc-psbbSCqsrBo4WgUgQsQ@mail.gmail.com>
- <YdXLNEwCY8cqV7KS@google.com>
- <dc8f2508-35ac-0dee-2465-4b5a8e3879ca@linux.alibaba.com>
- <YddF+6eX7ycAsZLr@google.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-In-Reply-To: <YddF+6eX7ycAsZLr@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Raghu,
+
+On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Capture the start of the KVM VM, which is basically the
+> start of any vCPU run. This state of the VM is helpful
+> in the upcoming patches to prevent user-space from
+> configuring certain VM features after the VM has started
+> running.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  include/linux/kvm_host.h | 3 +++
+>  virt/kvm/kvm_main.c      | 9 +++++++++
+>  2 files changed, 12 insertions(+)
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c310648cc8f1..d0bd8f7a026c 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -623,6 +623,7 @@ struct kvm {
+>         struct notifier_block pm_notifier;
+>  #endif
+>         char stats_id[KVM_STATS_NAME_SIZE];
+> +       bool vm_started;
+
+Since KVM_RUN on any vCPUs doesn't necessarily mean that the VM
+started yet, the name might be a bit misleading IMHO.  I would
+think 'has_run_once' or 'ran_once' might be more clear (?).
 
 
-On 2022/1/7 03:41, Sean Christopherson wrote:
-> On Thu, Jan 06, 2022, Lai Jiangshan wrote:
->>
->>
->> On 2022/1/6 00:45, Sean Christopherson wrote:
->>> On Wed, Jan 05, 2022, Lai Jiangshan wrote:
->>>> On Wed, Jan 5, 2022 at 5:54 AM Sean Christopherson <seanjc@google.com> wrote:
->>>>
->>>>>>
->>>>>> default_pae_pdpte is needed because the cpu expect PAE pdptes are
->>>>>> present when VMenter.
->>>>>
->>>>> That's incorrect.  Neither Intel nor AMD require PDPTEs to be present.  Not present
->>>>> is perfectly ok, present with reserved bits is what's not allowed.
->>>>>
->>>>> Intel SDM:
->>>>>     A VM entry that checks the validity of the PDPTEs uses the same checks that are
->>>>>     used when CR3 is loaded with MOV to CR3 when PAE paging is in use[7].  If MOV to CR3
->>>>>     would cause a general-protection exception due to the PDPTEs that would be loaded
->>>>>     (e.g., because a reserved bit is set), the VM entry fails.
->>>>>
->>>>>     7. This implies that (1) bits 11:9 in each PDPTE are ignored; and (2) if bit 0
->>>>>        (present) is clear in one of the PDPTEs, bits 63:1 of that PDPTE are ignored.
->>>>
->>>> But in practice, the VM entry fails if the present bit is not set in the
->>>> PDPTE for the linear address being accessed (when EPT enabled at least).  The
->>>> host kvm complains and dumps the vmcs state.
->>>
->>> That doesn't make any sense.  If EPT is enabled, KVM should never use a pae_root.
->>> The vmcs.GUEST_PDPTRn fields are in play, but those shouldn't derive from KVM's
->>> shadow page tables.
->>
->> Oh, I wrote the negative what I want to say again when I try to emphasis
->> something after I wrote a sentence and modified it several times.
->>
->> I wanted to mean "EPT not enabled" when vmx.
-> 
-> Heh, that makes a lot more sense.
-> 
->> The VM entry fails when the guest is in very early stage when booting which
->> might be still in real mode.
->>
->> VMEXIT: intr_info=00000000 errorcode=0000000 ilen=00000000
->> reason=80000021 qualification=0000000000000002
-> 
-> Yep, that's the signature for an illegal PDPTE at VM-Enter.  But as noted above,
-> a not-present PDPTE is perfectly legal, VM-Enter should failed if and only if a
-> PDPTE is present and has reserved bits set.
-> 
->> IDTVectoring: info=00000000 errorcode=00000000
->>
->>>
->>> And I doubt there is a VMX ucode bug at play, as KVM currently uses '0' in its
->>> shadow page tables for not-present PDPTEs.
->>>
->>> If you can post/provide the patches that lead to VM-Fail, I'd be happy to help
->>> debug.
->>
->> If you can try this patchset, you can just set the default_pae_pdpte to 0 to test
->> it.
-> 
-> I can't reproduce the failure with this on top of your series + kvm/queue (commit
-> cc0e35f9c2d4 ("KVM: SVM: Nullify vcpu_(un)blocking() hooks if AVIC is disabled")).
-> 
+>  };
+>
+>  #define kvm_err(fmt, ...) \
+> @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+>         }
+>  }
+>
+> +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+> +
+>  extern bool kvm_rebooting;
+>
+>  extern unsigned int halt_poll_ns;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 72c4e6b39389..962b91ac2064 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>         int r;
+>         struct kvm_fpu *fpu = NULL;
+>         struct kvm_sregs *kvm_sregs = NULL;
+> +       struct kvm *kvm = vcpu->kvm;
+>
+>         if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+>                 return -EIO;
+> @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>                         if (oldpid)
+>                                 synchronize_rcu();
+>                         put_pid(oldpid);
+> +
+> +                       /*
+> +                        * Since we land here even on the first vCPU run,
+> +                        * we can mark that the VM has started running.
+> +                        */
+
+It might be nicer to add a comment why the code below gets kvm->lock.
+
+Anyway, the patch generally looks good to me, and thank you
+for making this change (it works for my purpose as well).
+
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+Thanks,
+Reiji
 
 
-I can't reproduce the failure with this code base either.  And I can't reproduce
-the failure when I switch to the code base when I developed it.
-
-After reviewing all the logs I saved that time, I think it was fixed after
-make_pae_pdpte().  I should have added make_pae_pdpte() first before added
-default_pae_pdpte.  (The code was still mess and the guest can't fully
-function even when make_pae_pdpte() was added that time)
-
-Removing default_pae_pdpte will simplify the code. Thank you.
-
-Thanks
-Lai.
+> +                       mutex_lock(&kvm->lock);
+> +                       kvm->vm_started = true;
+> +                       mutex_unlock(&kvm->lock);
+>                 }
+>                 r = kvm_arch_vcpu_ioctl_run(vcpu);
+>                 trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+> --
+> 2.34.1.448.ga2b2bfdf31-goog
+>
