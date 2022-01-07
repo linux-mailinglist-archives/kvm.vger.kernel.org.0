@@ -2,127 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1837F487F4B
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 00:18:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7FE5487F7F
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 00:42:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231440AbiAGXST (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 18:18:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
+        id S231669AbiAGXmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 18:42:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231395AbiAGXSS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 18:18:18 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0692FC061574
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 15:18:18 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id b1-20020a17090a990100b001b14bd47532so8096641pjp.0
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 15:18:18 -0800 (PST)
+        with ESMTP id S231519AbiAGXmG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 18:42:06 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9647DC06173E
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 15:42:05 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id y9so6971453pgr.11
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 15:42:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=yaoLqv5jRYvwceeR5DSPvo5ncAgq+xEgxFxHcI2Knk8=;
-        b=HWhgHw3ZS8xY+JgACdrlsFANWeCOv/rM1m6Nc5MLehoXVnpOlJlo2XtXyeMTcknEZG
-         ZNPFe+O47dfU4oxk9JDQdJkIHRV/iCPfuvX6Abkqwof2T9DYCpUoxCk4gC6FlEWcpOA9
-         MbXQ6ZurU18pgPUPKhHh6P1OczKpFUfvcQ3D3lVuF8EZ4i4Sv0twSgB6Kz5VBvIr9RNu
-         /9uQS4EtXUPqSrsdCK4kmOi96ejUcyw60Zn8RzPq8b3S41r3Gbz98OfcRRJKnKKLU5RR
-         YBwGhlcgWj2pOce8MUMs2jbhZM4frWKyNMVSCyvc/RtYZQHBcCGa7mylUhhqCDzpuqIq
-         RU0A==
+        bh=dl5NjrPyqtirGqh/44w+tOXwcC+wnrBXDnBxl8SYaOs=;
+        b=Y47yKd48acltCAFbzaPkvvplMuEGDM8zkr59CRe4GzPOZbM6Y6Gw5IyJttHP8FZrau
+         wQdnfzAzHqQhqWt65NFhLodOCyaeDDfG2pHlrFTo9Qoub8lR0RRbd15y5MNbWLnAcvqq
+         AkCzTZCqnqx3W0l/za6lj3lppZHDBWBSwbzJoh4P9awe/QLQTOr9YSd1dBg9bJsRryXv
+         UHhC4EY74xD+W9SQfZeT6EmrhzyJWDTOX8PF0PuxFG/Rk7QcSa1luANXQZupXdp015pI
+         LPcEH+3AwWTsafuO/os5SIF4LfuoaVOfwR+a2nxa+BoyqDy6pQMIPi3/vg7xwc82sHKz
+         xzig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=yaoLqv5jRYvwceeR5DSPvo5ncAgq+xEgxFxHcI2Knk8=;
-        b=f903VYMqdSQKBxX6hjJSYFK3uAIqwZu6jhBMKIZR7k7j4kKl+ooepZZRt5MP9i7VmX
-         e2vuXMcFdEwlSO7D9H9tctj1PY+hup8v0EhiSx/xhEf5Bhm2Eh6YmQ87SMyt4MUBBDFw
-         LlY4UCm+yDUDfOIC4yBwVBWJy+O753GduR7+xRGdkPLxwj9qfyt4ek0XJNhjLINAU1cy
-         LAEpgDL5jnnV+TG6Si4GYo5zUlLdMfpcJ9TLW+V7Qlw9PKVt2f+WZ9vJmnjmmTw1/CpW
-         AuIxD1CTZ/geZxcDQL/c/W30sWfPLGzmOwMsQIDz/9Vj0Kyas5wahT/rKA/4BpvIeUgl
-         L/7w==
-X-Gm-Message-State: AOAM531/gUrFTbXShe7dEyz3lFp7ph4EWwK1Y+evmuRjglXQJzyb7BRY
-        7ksCk+Ufk3cajNIa9Nmf8XSNdw==
-X-Google-Smtp-Source: ABdhPJxWzsZpPEniI/bjv14ONAp64VKU7JxHfh//mJ9FcB6M6YOdo0bUa6suDqExYlgub8MsNm5IWg==
-X-Received: by 2002:a17:902:bc88:b0:149:2032:6bcf with SMTP id bb8-20020a170902bc8800b0014920326bcfmr64767891plb.44.1641597497025;
-        Fri, 07 Jan 2022 15:18:17 -0800 (PST)
+        bh=dl5NjrPyqtirGqh/44w+tOXwcC+wnrBXDnBxl8SYaOs=;
+        b=xRjt2AKNfX23LHT0uwU9iHjgY+ncHhq22sYd32nhGiKXIinsQE6eoLe6G+UV00xOsE
+         HrPYBXFz2LEJgtBNkZD/eWJ+Q+hiJgdWjSFnWAiEGYl+yoNmCLffvPK0GPtV/krv8Iv8
+         gGTv9BehaY6ZKDXoUzyQY0RESetPfyT+keLMS3QRxtOILSerfQm8YX+ZRDYNIgqsTn4u
+         2GtggdugMtkLthLA4Z1wk4YoX1JZUeQKJ10vZwLT8UpWjOq+JaF1H6Uuzgk4ojAu4Twm
+         2IolZ0BHlg6iPcV4YxuZi4OZapUQWH5r7OIHbvPbr7Pvk3dSeCZNzISx8BWv6rP5nXYu
+         dRdg==
+X-Gm-Message-State: AOAM530QQSlAdXLqxkoHtxQ85saaigLInO4OOYEqDtoGwl2PWBnD1v9V
+        vSrBp2ns0gWv97S8fXdIv1OdrQ==
+X-Google-Smtp-Source: ABdhPJzPRIFNYJhGqnUuIdQe/e5MBW+Jo0uHATwazr1k7KOnw4yas1RlTdSzYpZPOo7fjsVlB/N9BA==
+X-Received: by 2002:a63:3c18:: with SMTP id j24mr2547358pga.204.1641598924961;
+        Fri, 07 Jan 2022 15:42:04 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g10sm3697pjs.1.2022.01.07.15.18.16
+        by smtp.gmail.com with ESMTPSA id na9sm92585pjb.0.2022.01.07.15.42.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 15:18:16 -0800 (PST)
-Date:   Fri, 7 Jan 2022 23:18:13 +0000
+        Fri, 07 Jan 2022 15:42:03 -0800 (PST)
+Date:   Fri, 7 Jan 2022 23:42:00 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] KVM: nVMX: Allow VMREAD when Enlightened VMCS is
- in use
-Message-ID: <YdjKNcTcd2rFaA27@google.com>
-References: <20220107102859.1471362-1-vkuznets@redhat.com>
- <20220107102859.1471362-6-vkuznets@redhat.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH v2 3/5] KVM: SVM: fix race between interrupt delivery and
+ AVIC inhibition
+Message-ID: <YdjPyCRwZDoV11ox@google.com>
+References: <20211213104634.199141-1-mlevitsk@redhat.com>
+ <20211213104634.199141-4-mlevitsk@redhat.com>
+ <YdTPvdY6ysjXMpAU@google.com>
+ <628ac6d9b16c6b3a2573f717df0d2417df7caddb.camel@redhat.com>
+ <6a11edec-c29a-95df-393e-363e1af46257@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220107102859.1471362-6-vkuznets@redhat.com>
+In-Reply-To: <6a11edec-c29a-95df-393e-363e1af46257@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 07, 2022, Vitaly Kuznetsov wrote:
-> Hyper-V TLFS explicitly forbids VMREAD and VMWRITE instructions when
-> Enlightened VMCS interface is in use:
+On Fri, Jan 07, 2022, Paolo Bonzini wrote:
+> On 1/5/22 12:03, Maxim Levitsky wrote:
+> > > > -	if (!vcpu->arch.apicv_active)
+> > > > -		return -1;
+> > > > -
+> > > > +	/*
+> > > > +	 * Below, we have to handle anyway the case of AVIC being disabled
+> > > > +	 * in the middle of this function, and there is hardly any overhead
+> > > > +	 * if AVIC is disabled.  So, we do not bother returning -1 and handle
+> > > > +	 * the kick ourselves for disabled APICv.
+> > > Hmm, my preference would be to keep the "return -1" even though apicv_active must
+> > > be rechecked.  That would help highlight that returning "failure" after this point
+> > > is not an option as it would result in kvm_lapic_set_irr() being called twice.
+> > I don't mind either - this will fix the tracepoint I recently added to report the
+> > number of interrupts that were delivered by AVIC/APICv - with this patch,
+> > all of them count as such.
 > 
-> "Any VMREAD or VMWRITE instructions while an enlightened VMCS is
-> active is unsupported and can result in unexpected behavior.""
+> The reasoning here is that, unlike VMX, we have to react anyway to
+> vcpu->arch.apicv_active becoming false halfway through the function.
 > 
-> Windows 11 + WSL2 seems to ignore this, attempts to VMREAD VMCS field
-> 0x4404 ("VM-exit interruption information") are observed. Failing
-> these attempts with nested_vmx_failInvalid() makes such guests
-> unbootable.
-> 
-> Microsoft confirms this is a Hyper-V bug and claims that it'll get fixed
-> eventually but for the time being we need a workaround. (Temporary) allow
-> VMREAD to get data from the currently loaded Enlightened VMCS.
-> 
-> Note: VMWRITE instructions remain forbidden, it is not clear how to
-> handle them properly and hopefully won't ever be needed.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
+> Removing the early return means that there's one less case of load
+> (mis)reordering that the reader has to check.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Yeah, I don't disagree, but the flip side is that without the early check, it's
+not all that obvious that SVM must not return -1.  And when AVIC isn't supported
+or is disabled at the module level, flowing into AVIC "specific" IRR logic is
+a bit weird.  And the LAPIC code effectively becomes Intel-only.
 
-> +		/*
-> +		 * Hyper-V TLFS (as of 6.0b) explicitly states, that while an
-> +		 * enlightened VMCS is active VMREAD/VMWRITE instructions are
-> +		 * unsupported. Unfortunately, certain versions of Windows 11
-> +		 * don't comply with this requirement which is not enforced in
-> +		 * genuine Hyper-V so KVM has implement a workaround allowing to
+To make everyone happy, and fix the tracepoint issue, what about moving delivery
+into vendor code?  E.g. the below (incomplete), with SVM functions renamed so that
+anything that isn't guaranteed to be AVIC specific uses svm_ instead of avic_.
 
-Nit, missing a "to".  But rather say what KVM "has" to do, maybe this?
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index baca9fa37a91..a9ac724c6305 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1096,14 +1096,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
+                                                       apic->regs + APIC_TMR);
+                }
 
-		 * genuine Hyper-V.  Allow VMREAD from an enlightened VMCS as a
-		 * workaround, as misbehaving guests will panic on VM-Fail.
+-               if (static_call(kvm_x86_deliver_posted_interrupt)(vcpu, vector)) {
+-                       kvm_lapic_set_irr(vector, apic);
+-                       kvm_make_request(KVM_REQ_EVENT, vcpu);
+-                       kvm_vcpu_kick(vcpu);
+-               } else {
+-                       trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
+-                                                  trig_mode, vector);
+-               }
++               static_call(kvm_x86_deliver_interrupt)(vcpu, vector);
+                break;
 
-> +		 * read from enlightened VMCS with VMREAD.
-> +		 * Note, enlightened VMCS is incompatible with shadow VMCS so
-> +		 * all VMREADs from L2 should go to L1.
-> +		 */
-> +		if (WARN_ON_ONCE(is_guest_mode(vcpu)))
-> +			return nested_vmx_failInvalid(vcpu);
->  
-> -	/* Read the field, zero-extended to a u64 value */
-> -	value = vmcs12_read_any(vmcs12, field, offset);
-> +		offset = evmcs_field_offset(field, NULL);
-> +		if (offset < 0)
-> +			return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-> +
-> +		/* Read the field, zero-extended to a u64 value */
-> +		value = evmcs_read_any(vmx->nested.hv_evmcs, field, offset);
-> +	}
->  
->  	/*
->  	 * Now copy part of this value to register or memory, as requested.
-> -- 
-> 2.33.1
-> 
+        case APIC_DM_REMRD:
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index fe06b02994e6..1fadd14ea884 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4012,6 +4012,18 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+        return 0;
+ }
+
++static void vmx_deliver_interrupt(struct kvm_vcpu *vcpu, int vector)
++{
++       if (vmx_deliver_posted_interrupt(vcpu, vector)) {
++               kvm_lapic_set_irr(vector, apic);
++               kvm_make_request(KVM_REQ_EVENT, vcpu);
++               kvm_vcpu_kick(vcpu);
++       } else {
++               trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
++                                          trig_mode, vector);
++       }
++}
++
+ /*
+  * Set up the vmcs's constant host-state fields, i.e., host-state fields that
+  * will not change in the lifetime of the guest.
+@@ -7651,7 +7663,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+        .hwapic_isr_update = vmx_hwapic_isr_update,
+        .guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
+        .sync_pir_to_irr = vmx_sync_pir_to_irr,
+-       .deliver_posted_interrupt = vmx_deliver_posted_interrupt,
++       .deliver_interrupt = vmx_deliver_interrupt,
+        .dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
+
+        .set_tss_addr = vmx_set_tss_addr,
+
