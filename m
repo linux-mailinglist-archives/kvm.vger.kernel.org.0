@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2CAF487C91
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 19:56:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4CC9487CA3
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 19:57:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232364AbiAGSzc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 13:55:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55909 "EHLO
+        id S234119AbiAGS5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 13:57:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59195 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231697AbiAGSz0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 13:55:26 -0500
+        by vger.kernel.org with ESMTP id S231373AbiAGSz2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 13:55:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641581725;
+        s=mimecast20190719; t=1641581727;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pLm3+v3CV9NsmlMw38Vs6LLjaRcIRw8vGpiUQp4f1Ec=;
-        b=GP2lnw+YvTWpE+f3zpxwpOJDbpPDQHlsWN2Sg9ucTDUx9NWY+VGNC7Ub1CSMwWAxl70E0v
-        P7bT8MFshR54rJkhE4jTapRdUvmhcZMcEWB1P3Q2j2CvW8a9+wxq4T8LHkuVpsvpHKxvj+
-        yCevcIJ25ukL0KKtMVXDtsLSrjp+YF0=
+        bh=uONjmy/t03IFtZZk5ERo0Inexunbz5jKfMIPTzX4NIk=;
+        b=Hlf/DYOfu2b3WrhOOjEBUxi2c6Fl9TDcXXPF9nY82HN3N1pisyGqR4c+pKhsseqcAtEO1k
+        F3f11e6sP3RnhHEd+xaD4qpkhgOQTEE77vHnJnw55ztucWd/Hpa+8Jf3Cy38mhd68ybqgp
+        aYkp95V06jRVdhN7tWL8qj5gNUw0lrs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-70-ZScsXPlePrW3BLC_5o65dg-1; Fri, 07 Jan 2022 13:55:21 -0500
-X-MC-Unique: ZScsXPlePrW3BLC_5o65dg-1
+ us-mta-444-xx3t5jXNMv-mEeFoeyJQfA-1; Fri, 07 Jan 2022 13:55:22 -0500
+X-MC-Unique: xx3t5jXNMv-mEeFoeyJQfA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2478764A7C;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E77AB81EE61;
         Fri,  7 Jan 2022 18:55:20 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E99C838FB;
-        Fri,  7 Jan 2022 18:55:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E21C838F0;
+        Fri,  7 Jan 2022 18:55:20 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     guang.zeng@intel.com, jing2.liu@intel.com, kevin.tian@intel.com,
         seanjc@google.com, tglx@linutronix.de, wei.w.wang@intel.com,
         yang.zhong@intel.com
-Subject: [PATCH v6 07/21] x86/fpu: Provide fpu_enable_guest_xfd_features() for KVM
-Date:   Fri,  7 Jan 2022 13:54:58 -0500
-Message-Id: <20220107185512.25321-8-pbonzini@redhat.com>
+Subject: [PATCH v6 08/21] kvm: x86: Enable dynamic xfeatures at KVM_SET_CPUID2
+Date:   Fri,  7 Jan 2022 13:54:59 -0500
+Message-Id: <20220107185512.25321-9-pbonzini@redhat.com>
 In-Reply-To: <20220107185512.25321-1-pbonzini@redhat.com>
 References: <20220107185512.25321-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -51,70 +51,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Jing Liu <jing2.liu@intel.com>
 
-Provide a wrapper for expanding the guest fpstate buffer according
-to requested xfeatures. KVM wants to call this wrapper to manage
-any dynamic xstate used by the guest.
+KVM can request fpstate expansion in two approaches:
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+  1) When intercepting guest updates to XCR0 and XFD MSR;
+
+  2) Before vcpu runs (e.g. at KVM_SET_CPUID2);
+
+The first option doesn't waste memory for legacy guest if it doesn't
+support XFD. However doing so introduces more complexity and also
+imposes an order requirement in the restoring path, i.e. XCR0/XFD
+must be restored before XSTATE.
+
+Given that the agreement is to do the static approach. This is
+considered a better tradeoff though it does waste 8K memory for
+legacy guest if its CPUID includes dynamically-enabled xfeatures.
+
+Successful fpstate expansion requires userspace VMM to acquire
+guest xstate permissions before calling KVM_SET_CPUID2.
+
+Also take the chance to adjust the indent in kvm_set_cpuid().
+
+Signed-off-by: Jing Liu <jing2.liu@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20220105123532.12586-8-yang.zhong@intel.com>
-[Remove unnecessary 32-bit check. - Paolo]
+Message-Id: <20220105123532.12586-9-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/fpu/api.h |  1 +
- arch/x86/kernel/fpu/core.c     | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ arch/x86/kvm/cpuid.c | 42 +++++++++++++++++++++++++++++-------------
+ 1 file changed, 29 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index d8c222290e68..1ed2a247a84e 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -138,6 +138,7 @@ extern inline u64 xstate_get_guest_group_perm(void);
- extern bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu);
- extern void fpu_free_guest_fpstate(struct fpu_guest *gfpu);
- extern int fpu_swap_kvm_fpstate(struct fpu_guest *gfpu, bool enter_guest);
-+extern int fpu_enable_guest_xfd_features(struct fpu_guest *guest_fpu, u64 xfeatures);
- 
- extern void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf, unsigned int size, u32 pkru);
- extern int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf, u64 xcr0, u32 *vpkru);
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index a78bc547fc03..64b2ee39bece 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -261,6 +261,28 @@ void fpu_free_guest_fpstate(struct fpu_guest *gfpu)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index eb52dde5deec..a0fedf1514ab 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -84,9 +84,12 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 	return NULL;
  }
- EXPORT_SYMBOL_GPL(fpu_free_guest_fpstate);
  
-+/*
-+  * fpu_enable_guest_xfd_features - Check xfeatures against guest perm and enable
-+  * @guest_fpu:         Pointer to the guest FPU container
-+  * @xfeatures:         Features requested by guest CPUID
-+  *
-+  * Enable all dynamic xfeatures according to guest perm and requested CPUID.
-+  *
-+  * Return: 0 on success, error code otherwise
-+  */
-+int fpu_enable_guest_xfd_features(struct fpu_guest *guest_fpu, u64 xfeatures)
-+{
-+	lockdep_assert_preemption_enabled();
+-static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
++static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
++			   struct kvm_cpuid_entry2 *entries,
++			   int nent)
+ {
+ 	struct kvm_cpuid_entry2 *best;
++	u64 xfeatures;
+ 
+ 	/*
+ 	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+@@ -100,7 +103,20 @@ static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
+ 			return -EINVAL;
+ 	}
+ 
+-	return 0;
++	/*
++	 * Exposing dynamic xfeatures to the guest requires additional
++	 * enabling in the FPU, e.g. to expand the guest XSAVE state size.
++	 */
++	best = cpuid_entry2_find(entries, nent, 0xd, 0);
++	if (!best)
++		return 0;
 +
-+	/* Nothing to do if all requested features are already enabled. */
-+	xfeatures &= ~guest_fpu->xfeatures;
++	xfeatures = best->eax | ((u64)best->edx << 32);
++	xfeatures &= XFEATURE_MASK_USER_DYNAMIC;
 +	if (!xfeatures)
 +		return 0;
 +
-+	return __xfd_enable_feature(xfeatures, guest_fpu);
-+}
-+EXPORT_SYMBOL_GPL(fpu_enable_guest_xfd_features);
-+
- int fpu_swap_kvm_fpstate(struct fpu_guest *guest_fpu, bool enter_guest)
++	return fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, xfeatures);
+ }
+ 
+ static void kvm_update_kvm_cpuid_base(struct kvm_vcpu *vcpu)
+@@ -280,21 +296,21 @@ u64 kvm_vcpu_reserved_gpa_bits_raw(struct kvm_vcpu *vcpu)
+ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+                         int nent)
  {
- 	struct fpstate *guest_fps = guest_fpu->fpstate;
+-    int r;
++	int r;
+ 
+-    r = kvm_check_cpuid(e2, nent);
+-    if (r)
+-        return r;
++	r = kvm_check_cpuid(vcpu, e2, nent);
++	if (r)
++		return r;
+ 
+-    kvfree(vcpu->arch.cpuid_entries);
+-    vcpu->arch.cpuid_entries = e2;
+-    vcpu->arch.cpuid_nent = nent;
++	kvfree(vcpu->arch.cpuid_entries);
++	vcpu->arch.cpuid_entries = e2;
++	vcpu->arch.cpuid_nent = nent;
+ 
+-    kvm_update_kvm_cpuid_base(vcpu);
+-    kvm_update_cpuid_runtime(vcpu);
+-    kvm_vcpu_after_set_cpuid(vcpu);
++	kvm_update_kvm_cpuid_base(vcpu);
++	kvm_update_cpuid_runtime(vcpu);
++	kvm_vcpu_after_set_cpuid(vcpu);
+ 
+-    return 0;
++	return 0;
+ }
+ 
+ /* when an old userspace process fills a new kernel module */
 -- 
 2.31.1
 
