@@ -2,120 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E71A487416
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 09:26:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6537A48741E
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 09:32:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232742AbiAGI0D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 03:26:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46644 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbiAGI0D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 03:26:03 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03660C061245
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 00:26:03 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id c14-20020a17090a674e00b001b31e16749cso9770512pjm.4
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 00:26:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jAWQmEyiwo1vMVzdgI77xHxKQLi1aYgS9jZkmo90ZHI=;
-        b=c+5gdx0wvxZTh+BJ2PRDcwTsWCl0XBKB5WFj+XJtT4jEoYIjv4DWiCTG7+bFgu7TME
-         j4/p8VLakUW2p5h6m3vQ/RKpkRJh6MkF3t9egJ4ugeVDEADGu5GtYSWiryUK8acTF6A0
-         ynibTFZ547GW3H9DChQRDtmeXBec8zlwvjmhU+0Snd59YM/9WCLVtXPyPx2Sb1hRaIMF
-         sQIZlVNpfRWRblQkvU4uk3RIrsE+k7ZcZT/Bxa6ZYeMW1EsP9dyV3xEKEeBbu+MaxUmV
-         DgOUJGHYNstWHctV49M9jeMdUaTdoR4Noo+DzIRsVrT44E3C4n5Emd+zXaZII0VDbUZW
-         mDfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jAWQmEyiwo1vMVzdgI77xHxKQLi1aYgS9jZkmo90ZHI=;
-        b=EVcQYWJn/zM9zWO0YOql8CDOmIrhu75xMRBCmco6ze0aaz/N/JmfM6cYD932NRLmHW
-         WNvC/91nhbqUoALhs1EW+xnZnXh9EpdjENhdnE9SUQW8PBQH+t0VgLNS3h3f/sNxGa7D
-         kq8fQDUKN47pddmTQqaeQWF9uWllK/SQ3NMlxvIDIjD8rhjwrAOpVfNoTjkUxylTWPNF
-         UTmccnEykbWjyqR818d8g9cxkSbgMTO9SriUnZgiunQ2BABTdHQLlcWD+VKdvi2pWumc
-         UpRfDMUiP+pEsmIN8SJkVwcxk0SuwRDOmj8DhddjuJyEC5+2WDYewkvSZYdZwPBKcCbV
-         kqfA==
-X-Gm-Message-State: AOAM532Gis18yNyAH6BMs+qRWnVd//3jRK2CxDYy3I41MuHyqO2WUOrM
-        6476zsGh+9iGG61l7YeV6qg=
-X-Google-Smtp-Source: ABdhPJzM4D7v0QbRiU9iqshjPjQCnUJzedEgwCyzzrEe74OeVkdsSXljmmh3AIr+tY9XPz25clEAow==
-X-Received: by 2002:a17:903:1ca:b0:149:2125:9a13 with SMTP id e10-20020a17090301ca00b0014921259a13mr63097243plh.73.1641543962532;
-        Fri, 07 Jan 2022 00:26:02 -0800 (PST)
-Received: from localhost.localdomain ([103.81.94.99])
-        by smtp.gmail.com with ESMTPSA id q9sm6792629pjg.1.2022.01.07.00.25.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 00:26:02 -0800 (PST)
-From:   Vihas Mak <makvihas@gmail.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, Vihas Mak <makvihas@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S1345847AbiAGIcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 03:32:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39204 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232742AbiAGIcS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 03:32:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641544337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oLJDHZnC+sET9jArPRQxdauwdVxkw06f0Vq94v7b63k=;
+        b=BM8yq99+5SD+aiQ/LyDto6X0DTIAYVh6csJYY/tBpVYMeDMovYNLNzDbU7oHo0ZqQdcwEN
+        ecqen2I/7jfm7AaIe5zGcGDFSqlt5SROWpsxmnHGOGmI6yQDJKm9AKdo4KNxuEpqOF/gR7
+        ZMz9feP+Dfd+n/AlX8aD5umB5N+wGpM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-656-29CgojVGMG-fPJ6tl4xNtA-1; Fri, 07 Jan 2022 03:32:14 -0500
+X-MC-Unique: 29CgojVGMG-fPJ6tl4xNtA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE5831898291;
+        Fri,  7 Jan 2022 08:32:10 +0000 (UTC)
+Received: from starship (unknown [10.40.192.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 761137317F;
+        Fri,  7 Jan 2022 08:32:00 +0000 (UTC)
+Message-ID: <d058f7464084cadc183bd9dbf02c7f525bb9f902.camel@redhat.com>
+Subject: Re: [PATCH v5 7/8] KVM: VMX: Update PID-pointer table entry when
+ APIC ID is changed
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: x86: move the can_unsync and prefetch checks outside of the loop
-Date:   Fri,  7 Jan 2022 13:55:54 +0530
-Message-Id: <20220107082554.32897-1-makvihas@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Date:   Fri, 07 Jan 2022 10:31:59 +0200
+In-Reply-To: <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+         <20211231142849.611-8-guang.zeng@intel.com>
+         <640e82f3-489d-60af-1d31-25096bef1a46@amd.com>
+         <4eee5de5-ab76-7094-17aa-adc552032ba0@intel.com>
+         <aa86022c-2816-4155-8d77-f4faf6018255@amd.com>
+         <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-mmu_try_to_unsync_pages() performs !can_unsync check before attempting
-to unsync any shadow pages.
-This check is peformed inside the loop right now. 
-It's redundant to perform it every iteration if can_unsync is true, as
-can_unsync parameter isn't getting updated inside the loop.
-Move the check outside of the loop.
+On Fri, 2022-01-07 at 16:05 +0800, Zeng Guang wrote:
+> On 1/6/2022 10:06 PM, Tom Lendacky wrote:
+> > On 1/5/22 7:44 PM, Zeng Guang wrote:
+> > > On 1/6/2022 3:13 AM, Tom Lendacky wrote:
+> > > > On 12/31/21 8:28 AM, Zeng Guang wrote:
+> > > > Won't this blow up on AMD since there is no corresponding SVM op?
+> > > > 
+> > > > Thanks,
+> > > > Tom
+> > > Right, need check ops validness to avoid ruining AMD system. Same
+> > > consideration on ops "update_ipiv_pid_table" in patch8.
+> > Not necessarily for patch8. That is "protected" by the
+> > kvm_check_request(KVM_REQ_PID_TABLE_UPDATE, vcpu) test, but it couldn't hurt.
+> 
+> OK, make sense. Thanks.
 
-Same is the case with prefetch.
+I haven't fully reviewed this patch series yet,
+and I will soon.
 
-Signed-off-by: Vihas Mak <makvihas@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
----
- arch/x86/kvm/mmu/mmu.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+I just want to point out few things:
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1d275e9d7..53f4b8b07 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2586,6 +2586,11 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 	if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
- 		return -EPERM;
- 
-+	if (!can_unsync)
-+		return -EPERM;
-+
-+	if (prefetch)
-+		return -EEXIST;
- 	/*
- 	 * The page is not write-tracked, mark existing shadow pages unsync
- 	 * unless KVM is synchronizing an unsync SP (can_unsync = false).  In
-@@ -2593,15 +2598,9 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 	 * allowing shadow pages to become unsync (writable by the guest).
- 	 */
- 	for_each_gfn_indirect_valid_sp(kvm, sp, gfn) {
--		if (!can_unsync)
--			return -EPERM;
--
- 		if (sp->unsync)
- 			continue;
- 
--		if (prefetch)
--			return -EEXIST;
--
- 		/*
- 		 * TDP MMU page faults require an additional spinlock as they
- 		 * run with mmu_lock held for read, not write, and the unsync
--- 
-2.30.2
+1. AMD's AVIC also has a PID table (its calle AVIC physical ID table). 
+It stores addressses of vCPUs apic backing pages,
+and thier real APIC IDs.
+
+avic_init_backing_page initializes the entry (assuming apic_id == vcpu_id) 
+(which is double confusing)
+
+2. For some reason KVM supports writable APIC IDs. Does anyone use these?
+Even Intel's PRM strongly discourages users from using them and in X2APIC mode,
+the APIC ID is read only.
+
+Because of this we have quite some bookkeeping in lapic.c, 
+(things like kvm_recalculate_apic_map and such)
+
+Also AVIC has its own handling for writes to APIC_ID,APIC_LDR,APIC_DFR
+which tries to update its physical and logical ID tables.
+
+(it used also to handle apic base and I removed this as apic base otherwise
+was always hardcoded to the default vaule)
+
+Note that avic_handle_apic_id_update is broken - it always copies the entry
+from the default (apicid == vcpu_id) location to new location and zeros
+the old location, which will fail in many cases, like even if the guest
+were to swap few apic ids.
+
+Also writable apic ID means that two vCPUs can have same apic ID. No way
+we handle this correclty, and no way APICv/AVIC does.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> > Thanks,
+> > Tom
+> > 
+> > > I will revise in next version. Thanks.
+> > > > > +        } else
+> > > > >                 ret = 1;
+> > > > >             break;
+> > > > > 
+
 
