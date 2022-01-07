@@ -2,99 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 645D5487025
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 03:06:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1A16487048
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 03:21:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344618AbiAGCGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 21:06:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54124 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344420AbiAGCGQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jan 2022 21:06:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641521176;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UG+D6uWjEAVn11kZk2peQMRnZXsetoAzRyhjRXwbIow=;
-        b=SLfoSjboKPZmsuNytA/WEjykOe4LY6Y+TnHXVpoYDRF3VMg7AfV4YIbPLNKUyHdzAHlbIz
-        NGLjIYNjmZv+1vn+whrEXSZdysTXjiChKwBJI3QYPmlfCCKG6+q+0WwjSSGl3ro3eu/2++
-        ehFanuWXgh6P2HlO4VAeOspF/fbeS00=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-197-2-nA9bP2PH-k3vKBFkRwEQ-1; Thu, 06 Jan 2022 21:06:15 -0500
-X-MC-Unique: 2-nA9bP2PH-k3vKBFkRwEQ-1
-Received: by mail-pl1-f197.google.com with SMTP id q14-20020a170902dace00b00148e2c4fe06so763008plx.15
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 18:06:14 -0800 (PST)
+        id S1345349AbiAGCV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 21:21:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50462 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344508AbiAGCV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 21:21:27 -0500
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DF32C061201
+        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 18:21:27 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id m6so2424711ybc.9
+        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 18:21:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=w70wbEdrZB71eZ7G5vu7np2TisVg/QSyUt9QnspenOc=;
+        b=PJzY3wgh+mwzx/EdpWDTNd9qDUJSucxLoxDlCP73jyOvxKm+qXxPYA1o+dMHW2MdVO
+         XI0G0g0Ml2Gv3hYdGaLawxZiY4/2rPyx4OdBV5vHL5nSb8/AGkvP6ZnU4ZX1nHR70mbl
+         z4QtjCr0pgIwTgGF1JP2jZ9quepjPmmKr2sWI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UG+D6uWjEAVn11kZk2peQMRnZXsetoAzRyhjRXwbIow=;
-        b=HPXTt/6YMmMVhy4NozIaXYuiSfO2IXF+SpZ/XfaOK9fh5YpcMLozr5njy7MNSnJU1B
-         3kLs5s4JIl4eGOqH9nB92/Axf0IVQ2pdMw5JNQPznzA+U0hG8XtqThj2u6juON5mY8I3
-         v2KY3bHjxcVSJEPWih/+wRMhPIPYnerKcfrCKuXFUF02R8NwV+YvMlFUX3JBR6bspy59
-         8j2x1geg7aJioA08AdMFadOMJARvQwiu3kbZ6rMU3cgG6tM6m8+9U0flDqoXHNFWjDtf
-         1iWmNVFggIqCZAC+acRxKIaQMfG5TIMeqAx3nUR7oaoYRQKRh6xB6hP1gpWT0G7AU0J5
-         ivRg==
-X-Gm-Message-State: AOAM530xsb4eQiQ7lyVMO8eXc19DlgcfgG8Demr1Bp8FE+0JZpmNfGbH
-        g18PaJfFaCL+YUqHUZBjhfUe0rHODQXF7ZHRK3zS2livljAIjAkRbdicmgUaIJrJgueZWHytiEw
-        u2tg22P/xvzt0
-X-Received: by 2002:a17:90b:1c07:: with SMTP id oc7mr13148598pjb.127.1641521173914;
-        Thu, 06 Jan 2022 18:06:13 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxLhtJYgw2ze+eHA/KXUj9kK5h8F14cR5QvKy0YCdz6PeWQNOOdpf5h5LGqrUt2qHXTEYAeTw==
-X-Received: by 2002:a17:90b:1c07:: with SMTP id oc7mr13148575pjb.127.1641521173673;
-        Thu, 06 Jan 2022 18:06:13 -0800 (PST)
-Received: from xz-m1.local ([191.101.132.79])
-        by smtp.gmail.com with ESMTPSA id b13sm3572506pfo.37.2022.01.06.18.06.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jan 2022 18:06:13 -0800 (PST)
-Date:   Fri, 7 Jan 2022 10:06:05 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Shier <pshier@google.com>,
-        "Nikunj A . Dadhania" <nikunj@amd.com>
-Subject: Re: [PATCH v1 09/13] KVM: x86/mmu: Split huge pages when dirty
- logging is enabled
-Message-ID: <YdegDZPkPyoSHw5A@xz-m1.local>
-References: <20211213225918.672507-1-dmatlack@google.com>
- <20211213225918.672507-10-dmatlack@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=w70wbEdrZB71eZ7G5vu7np2TisVg/QSyUt9QnspenOc=;
+        b=8K/syjGmAN1fG4faWOzIxBcNVhMxzGg8QyzXpHR3tIIH3ZHbwSiABQmq/Zl/Agaaaq
+         N7bsEKG47/v7WVSnwKkUYEoSuui0ua6GszGlNKAMC/2uvjp4mlzki5Pl8wtCrJMpXyJH
+         C/gUKYrkaiGOpuCsnXk3S+4m174pUfVYzh87j+eUfvM1D77C4hApzVTvvx43oNuE8leM
+         pk1X8fUmJyJOkv1j5mk3sOcIe7ly7oIM8HurrdCC7RpfaGgl+QZxNwy6a+trlDsOvua6
+         Hpw8QhO8ctctIoAF+CTrlnTls2RBhxUkjL9dUZR/SB4k+XMiCcwMgrIQgf4HxFMLlMeV
+         25yQ==
+X-Gm-Message-State: AOAM530yZaPneNCDwZ0GiR9+n9lH+ShGdA5H58HiYQUtS7GkUV4CkE+3
+        8GEmQszV/EWFZmEsejVyj2/pAvvkAFtPqxt1veGbPw==
+X-Google-Smtp-Source: ABdhPJyuGGdU1B4YPxYw/nS3nAD5s2wMNZ+axp3cZ+2j8IbHcyK/rE3IBGrNqTjmYE1Q7yj1rCOt5p2M1WYW4AGGLcg=
+X-Received: by 2002:a25:5ca:: with SMTP id 193mr70981373ybf.406.1641522086754;
+ Thu, 06 Jan 2022 18:21:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211213225918.672507-10-dmatlack@google.com>
+References: <20211129034317.2964790-1-stevensd@google.com> <20211129034317.2964790-5-stevensd@google.com>
+ <Yc4G23rrSxS59br5@google.com> <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
+ <YdXrURHO/R82puD4@google.com> <YdXvUaBUvaRPsv6m@google.com>
+ <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com> <YdcpIQgMZJrqswKU@google.com>
+In-Reply-To: <YdcpIQgMZJrqswKU@google.com>
+From:   David Stevens <stevensd@chromium.org>
+Date:   Fri, 7 Jan 2022 11:21:15 +0900
+Message-ID: <CAD=HUj5v37wZ9NuNC4QBDvCGO2SyNG2KAiTc9Jxfg=R7neCuTw@mail.gmail.com>
+Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Chia-I Wu <olv@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021 at 10:59:14PM +0000, David Matlack wrote:
-> When dirty logging is enabled without initially-all-set, attempt to
-> split all huge pages in the memslot down to 4KB pages so that vCPUs
-> do not have to take expensive write-protection faults to split huge
-> pages.
-> 
-> Huge page splitting is best-effort only. This commit only adds the
-> support for the TDP MMU, and even there splitting may fail due to out
-> of memory conditions. Failures to split a huge page is fine from a
-> correctness standpoint because we still always follow it up by write-
-> protecting any remaining huge pages.
+> > These are the type of pages which KVM is currently rejecting. Is this
+> > something that KVM can support?
+>
+> I'm not opposed to it.  My complaint is that this series is incomplete in that it
+> allows mapping the memory into the guest, but doesn't support accessing the memory
+> from KVM itself.  That means for things to work properly, KVM is relying on the
+> guest to use the memory in a limited capacity, e.g. isn't using the memory as
+> general purpose RAM.  That's not problematic for your use case, because presumably
+> the memory is used only by the vGPU, but as is KVM can't enforce that behavior in
+> any way.
+>
+> The really gross part is that failures are not strictly punted to userspace;
+> the resulting error varies significantly depending on how the guest "illegally"
+> uses the memory.
+>
+> My first choice would be to get the amdgpu driver "fixed", but that's likely an
+> unreasonable request since it sounds like the non-KVM behavior is working as intended.
+>
+> One thought would be to require userspace to opt-in to mapping this type of memory
+> by introducing a new memslot flag that explicitly states that the memslot cannot
+> be accessed directly by KVM, i.e. can only be mapped into the guest.  That way,
+> KVM has an explicit ABI with respect to how it handles this type of memory, even
+> though the semantics of exactly what will happen if userspace/guest violates the
+> ABI are not well-defined.  And internally, KVM would also have a clear touchpoint
+> where it deliberately allows mapping such memslots, as opposed to the more implicit
+> behavior of bypassing ensure_pfn_ref().
 
-One more thing: how about slightly document the tlb flush skipping behavior in
-commit message, or, in the function to do the split?  I don't see any problem
-with it but I'm just not sure whether it's super obvious to anyone.
+Is it well defined when KVM needs to directly access a memslot? At
+least for x86, it looks like most of the use cases are related to
+nested virtualization, except for the call in
+emulator_cmpxchg_emulated. Without being able to specifically state
+what should be avoided, a flag like that would be difficult for
+userspace to use.
 
--- 
-Peter Xu
-
+> If we're clever, we might even be able to share the flag with the "guest private
+> memory"[*] concept being pursued for confidential VMs.
+>
+> [*] https://lore.kernel.org/all/20211223123011.41044-1-chao.p.peng@linux.intel.com
