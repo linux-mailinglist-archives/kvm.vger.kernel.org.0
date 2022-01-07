@@ -2,163 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7FE5487F7F
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 00:42:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF44D487F85
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 00:43:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231669AbiAGXmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 18:42:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56290 "EHLO
+        id S231718AbiAGXnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 18:43:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231519AbiAGXmG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 18:42:06 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9647DC06173E
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 15:42:05 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id y9so6971453pgr.11
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 15:42:05 -0800 (PST)
+        with ESMTP id S231469AbiAGXnW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 18:43:22 -0500
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA67FC06173E
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 15:43:21 -0800 (PST)
+Received: by mail-yb1-xb29.google.com with SMTP id w184so21067460ybg.5
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 15:43:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dl5NjrPyqtirGqh/44w+tOXwcC+wnrBXDnBxl8SYaOs=;
-        b=Y47yKd48acltCAFbzaPkvvplMuEGDM8zkr59CRe4GzPOZbM6Y6Gw5IyJttHP8FZrau
-         wQdnfzAzHqQhqWt65NFhLodOCyaeDDfG2pHlrFTo9Qoub8lR0RRbd15y5MNbWLnAcvqq
-         AkCzTZCqnqx3W0l/za6lj3lppZHDBWBSwbzJoh4P9awe/QLQTOr9YSd1dBg9bJsRryXv
-         UHhC4EY74xD+W9SQfZeT6EmrhzyJWDTOX8PF0PuxFG/Rk7QcSa1luANXQZupXdp015pI
-         LPcEH+3AwWTsafuO/os5SIF4LfuoaVOfwR+a2nxa+BoyqDy6pQMIPi3/vg7xwc82sHKz
-         xzig==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NVQO0hqDncW10QtXjDHk2S0GMpXvaQ8aqURw+uPH5wg=;
+        b=h9pJpcJm/YMBAmJgf1a/hNcRkR8eituMdmkl0QZEo6aDIhoj9bNGkybBY9tLwABtu5
+         T47vLXRIGeeLHeBuPozHHi8Pl/RQ9FhfwS4CsX5VbJEm+o+wzusNHWWSGZ6TJZLlaacs
+         hFudIJXMhNvmwU+GrNuWtSqOe6shbDP1H4ZddJx+9I6jJuIazgHC+dfsYqqPX1/1YHJJ
+         V6XbJI3aB9kMiqAK2jOUT7R604WZYwEtYUsLXxGIeATyYFqTvRlv+xz5DCzxYDdROZ8d
+         GJ29YJCzQ0FTF/sStFeSpJgFrnNnSlnbqv7RAH1xaBsdO/kGKvx5sEJyEQJfFtB47w1k
+         IEeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dl5NjrPyqtirGqh/44w+tOXwcC+wnrBXDnBxl8SYaOs=;
-        b=xRjt2AKNfX23LHT0uwU9iHjgY+ncHhq22sYd32nhGiKXIinsQE6eoLe6G+UV00xOsE
-         HrPYBXFz2LEJgtBNkZD/eWJ+Q+hiJgdWjSFnWAiEGYl+yoNmCLffvPK0GPtV/krv8Iv8
-         gGTv9BehaY6ZKDXoUzyQY0RESetPfyT+keLMS3QRxtOILSerfQm8YX+ZRDYNIgqsTn4u
-         2GtggdugMtkLthLA4Z1wk4YoX1JZUeQKJ10vZwLT8UpWjOq+JaF1H6Uuzgk4ojAu4Twm
-         2IolZ0BHlg6iPcV4YxuZi4OZapUQWH5r7OIHbvPbr7Pvk3dSeCZNzISx8BWv6rP5nXYu
-         dRdg==
-X-Gm-Message-State: AOAM530QQSlAdXLqxkoHtxQ85saaigLInO4OOYEqDtoGwl2PWBnD1v9V
-        vSrBp2ns0gWv97S8fXdIv1OdrQ==
-X-Google-Smtp-Source: ABdhPJzPRIFNYJhGqnUuIdQe/e5MBW+Jo0uHATwazr1k7KOnw4yas1RlTdSzYpZPOo7fjsVlB/N9BA==
-X-Received: by 2002:a63:3c18:: with SMTP id j24mr2547358pga.204.1641598924961;
-        Fri, 07 Jan 2022 15:42:04 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id na9sm92585pjb.0.2022.01.07.15.42.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 15:42:03 -0800 (PST)
-Date:   Fri, 7 Jan 2022 23:42:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH v2 3/5] KVM: SVM: fix race between interrupt delivery and
- AVIC inhibition
-Message-ID: <YdjPyCRwZDoV11ox@google.com>
-References: <20211213104634.199141-1-mlevitsk@redhat.com>
- <20211213104634.199141-4-mlevitsk@redhat.com>
- <YdTPvdY6ysjXMpAU@google.com>
- <628ac6d9b16c6b3a2573f717df0d2417df7caddb.camel@redhat.com>
- <6a11edec-c29a-95df-393e-363e1af46257@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NVQO0hqDncW10QtXjDHk2S0GMpXvaQ8aqURw+uPH5wg=;
+        b=gjLg7KC34oCUkgghN5HZx20B1SonSTdIEYkB4IRVJIcbjQweTK068AHpB4PvEqf6wM
+         s+eTDJBjWXVu8/FLZEf7cDApd3np8zr+JgOHGQ2UZixsPk4vbwNmowFowIeOxtmzxLC1
+         XB2HDjlAkWlbYHT2J29XP0GIw+VXKU5hDcbStC4SjeZbHHe5I4YzTbg0L93NuWCGDXVV
+         /7bIxKHiJUWAxi+LGHz0rATKnLuPsHIciHru2ep7KVZ9qc2nm8tpk7KtUEUUdSwr9+3m
+         zabURQ3+ovLOP4A6I2OqlgG2gidoR0Fzwquo+PlqzGgYhNtyR7NOSwCWomXpcOi5ScX5
+         o+IA==
+X-Gm-Message-State: AOAM531ftEqHpO/iqhrhgDrXod8SyOMgXWZn6J5tDyPvt2CW4G1JGLbe
+        PxxreKQeaHYhfvQ2RPpm+KijiSQTVusMFdbNkNPJdg==
+X-Google-Smtp-Source: ABdhPJyZoQctE8XarHYHTzHFEcdEszvQRqEN4nBFLuAThhkJYA2F4ThxIao4CKuearoh3PucipTEnVqNvqht/yFdp+Q=
+X-Received: by 2002:a25:c841:: with SMTP id y62mr35443827ybf.196.1641599000772;
+ Fri, 07 Jan 2022 15:43:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6a11edec-c29a-95df-393e-363e1af46257@redhat.com>
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+In-Reply-To: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Fri, 7 Jan 2022 15:43:08 -0800
+Message-ID: <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 07, 2022, Paolo Bonzini wrote:
-> On 1/5/22 12:03, Maxim Levitsky wrote:
-> > > > -	if (!vcpu->arch.apicv_active)
-> > > > -		return -1;
-> > > > -
-> > > > +	/*
-> > > > +	 * Below, we have to handle anyway the case of AVIC being disabled
-> > > > +	 * in the middle of this function, and there is hardly any overhead
-> > > > +	 * if AVIC is disabled.  So, we do not bother returning -1 and handle
-> > > > +	 * the kick ourselves for disabled APICv.
-> > > Hmm, my preference would be to keep the "return -1" even though apicv_active must
-> > > be rechecked.  That would help highlight that returning "failure" after this point
-> > > is not an option as it would result in kvm_lapic_set_irr() being called twice.
-> > I don't mind either - this will fix the tracepoint I recently added to report the
-> > number of interrupts that were delivered by AVIC/APICv - with this patch,
-> > all of them count as such.
-> 
-> The reasoning here is that, unlike VMX, we have to react anyway to
-> vcpu->arch.apicv_active becoming false halfway through the function.
-> 
-> Removing the early return means that there's one less case of load
-> (mis)reordering that the reader has to check.
+Hi Reiji,
 
-Yeah, I don't disagree, but the flip side is that without the early check, it's
-not all that obvious that SVM must not return -1.  And when AVIC isn't supported
-or is disabled at the module level, flowing into AVIC "specific" IRR logic is
-a bit weird.  And the LAPIC code effectively becomes Intel-only.
+On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Raghu,
+>
+> On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
+> <rananta@google.com> wrote:
+> >
+> > Capture the start of the KVM VM, which is basically the
+> > start of any vCPU run. This state of the VM is helpful
+> > in the upcoming patches to prevent user-space from
+> > configuring certain VM features after the VM has started
+> > running.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  include/linux/kvm_host.h | 3 +++
+> >  virt/kvm/kvm_main.c      | 9 +++++++++
+> >  2 files changed, 12 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index c310648cc8f1..d0bd8f7a026c 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -623,6 +623,7 @@ struct kvm {
+> >         struct notifier_block pm_notifier;
+> >  #endif
+> >         char stats_id[KVM_STATS_NAME_SIZE];
+> > +       bool vm_started;
+>
+> Since KVM_RUN on any vCPUs doesn't necessarily mean that the VM
+> started yet, the name might be a bit misleading IMHO.  I would
+> think 'has_run_once' or 'ran_once' might be more clear (?).
+>
+I always struggle with the names; but if you feel that 'ran_once'
+makes more sense for a reader, I can change it.
+>
+> >  };
+> >
+> >  #define kvm_err(fmt, ...) \
+> > @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+> >         }
+> >  }
+> >
+> > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+> > +
+> >  extern bool kvm_rebooting;
+> >
+> >  extern unsigned int halt_poll_ns;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 72c4e6b39389..962b91ac2064 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >         int r;
+> >         struct kvm_fpu *fpu = NULL;
+> >         struct kvm_sregs *kvm_sregs = NULL;
+> > +       struct kvm *kvm = vcpu->kvm;
+> >
+> >         if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+> >                 return -EIO;
+> > @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >                         if (oldpid)
+> >                                 synchronize_rcu();
+> >                         put_pid(oldpid);
+> > +
+> > +                       /*
+> > +                        * Since we land here even on the first vCPU run,
+> > +                        * we can mark that the VM has started running.
+> > +                        */
+>
+> It might be nicer to add a comment why the code below gets kvm->lock.
+>
+I've been going back and forth on this one. Initially I considered
+simply going with atomic_t, but the patch 4/11 (KVM: arm64: Setup a
+framework for hypercall bitmap firmware registers)
+kvm_arm_set_fw_reg_bmap()'s implementation felt like we need a lock to
+have the whole 'is the register busy?' operation atomic. But, that's
+just one of the applications.
+> Anyway, the patch generally looks good to me, and thank you
+> for making this change (it works for my purpose as well).
+>
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+>
+Glad that it's helping you as well and thanks for the review.
 
-To make everyone happy, and fix the tracepoint issue, what about moving delivery
-into vendor code?  E.g. the below (incomplete), with SVM functions renamed so that
-anything that isn't guaranteed to be AVIC specific uses svm_ instead of avic_.
+Regards,
+Raghavendra
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index baca9fa37a91..a9ac724c6305 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1096,14 +1096,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
-                                                       apic->regs + APIC_TMR);
-                }
-
--               if (static_call(kvm_x86_deliver_posted_interrupt)(vcpu, vector)) {
--                       kvm_lapic_set_irr(vector, apic);
--                       kvm_make_request(KVM_REQ_EVENT, vcpu);
--                       kvm_vcpu_kick(vcpu);
--               } else {
--                       trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
--                                                  trig_mode, vector);
--               }
-+               static_call(kvm_x86_deliver_interrupt)(vcpu, vector);
-                break;
-
-        case APIC_DM_REMRD:
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fe06b02994e6..1fadd14ea884 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4012,6 +4012,18 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
-        return 0;
- }
-
-+static void vmx_deliver_interrupt(struct kvm_vcpu *vcpu, int vector)
-+{
-+       if (vmx_deliver_posted_interrupt(vcpu, vector)) {
-+               kvm_lapic_set_irr(vector, apic);
-+               kvm_make_request(KVM_REQ_EVENT, vcpu);
-+               kvm_vcpu_kick(vcpu);
-+       } else {
-+               trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
-+                                          trig_mode, vector);
-+       }
-+}
-+
- /*
-  * Set up the vmcs's constant host-state fields, i.e., host-state fields that
-  * will not change in the lifetime of the guest.
-@@ -7651,7 +7663,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
-        .hwapic_isr_update = vmx_hwapic_isr_update,
-        .guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
-        .sync_pir_to_irr = vmx_sync_pir_to_irr,
--       .deliver_posted_interrupt = vmx_deliver_posted_interrupt,
-+       .deliver_interrupt = vmx_deliver_interrupt,
-        .dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
-
-        .set_tss_addr = vmx_set_tss_addr,
-
+> Thanks,
+> Reiji
+>
+>
+> > +                       mutex_lock(&kvm->lock);
+> > +                       kvm->vm_started = true;
+> > +                       mutex_unlock(&kvm->lock);
+> >                 }
+> >                 r = kvm_arch_vcpu_ioctl_run(vcpu);
+> >                 trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+> > --
+> > 2.34.1.448.ga2b2bfdf31-goog
+> >
