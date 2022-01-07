@@ -2,163 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FB7A486F2D
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 01:55:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F44A486F86
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 02:15:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344018AbiAGAzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 19:55:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343957AbiAGAzC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 19:55:02 -0500
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E13C061245
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 16:55:02 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id g11so9881217lfu.2
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 16:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MFXd2GZzM97CntEW/TaFS7iaG4i3oCkzynH7EOS2mJ0=;
-        b=MTOEZbeI3pVU1RHKnnbrSOHU/9g2vQXdTTHNTtK03SVmTHTBCCootTX+eeNv/qCB1s
-         M4x2L9uBrVjRWSgaWDgwaJ8mX0CxNx6E7M1Y0oD33QglUXU1ggCkOaLH2VrDrpXPEXOg
-         KqGH6yA6oY8CVIuwqS1NqKjKl2CZHbkOL6xSp+GqR0eM5FI0Vjaj8kixpRkUjToWqeHI
-         jfN0GPsn7Tjk6CXUodqboCpZcA1YDlW/w383AsA58TkZDUAnSGrLGQBH3+1uJnTLeqrU
-         yKGjd4opFZDS8mHtpCvQR+JwBNjUQybdMrdeUmsN5RigwclUBII0yOBB0mbA+Xe0/G9+
-         97DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MFXd2GZzM97CntEW/TaFS7iaG4i3oCkzynH7EOS2mJ0=;
-        b=uB83J6DKXydNXkLxcz6BuhHuJGLLrIKd+C7Zfvvo1UlEyL1ou2m9CR3TMFKdyHG+Zn
-         nZ8mKW3CsNBo7tBcHuXzlIc/Cs7abhoXxKLGY3ygB7+3TrFjt0sRR5YzStdy7JXbnaap
-         weu6rdOjBbFmNpAUg0N10ylUC5kq0LJjqlXtG4yHcY3hH/ii2ZmM3b6QM5X6fwNZYZuL
-         x+5axv3qmYys3ZdMDLtibAuKyCG061DN/tpjkpm+EmN8hm7nkxQnf6YKVJBZWKnMgf61
-         mcErIuKZXYzvMpN8X/wCseFRNTueXkekpCJcE06LH/sRn3WpXNZjDwqrZdDH0QUg5bVx
-         tiVQ==
-X-Gm-Message-State: AOAM530oKfSGbHvnOWZ+sZqoqhikwwHq5/nL904zW0K2FjRXOXvyCrIi
-        nZKa5US7jGfcL0UzyAm6Lkblwn8ffbQVzlnEVJCRBg==
-X-Google-Smtp-Source: ABdhPJzOdgOJeHakcTWaLampQbPUu1JEHiDnS5zrRSWxn6PpoN/voVFBUcWQFwYZiim67CC1hsSZdzOmR8NGemGEgZk=
-X-Received: by 2002:ac2:4c83:: with SMTP id d3mr52187580lfl.102.1641516900443;
- Thu, 06 Jan 2022 16:55:00 -0800 (PST)
+        id S1344321AbiAGBP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 20:15:27 -0500
+Received: from mga09.intel.com ([134.134.136.24]:7791 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239981AbiAGBP0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 20:15:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641518126; x=1673054126;
+  h=cc:subject:to:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=nbnm/W/ou/jogJEbCGLPOkf+Msh2bjyG/ewZEC43WdY=;
+  b=QQuHNOYz6pe1n9AoEZgw61JM8/Po8hch+/Dq94c+VgdwouyzE6xK9s6f
+   UY7ttNiMcFan8vWmO/tnPZ9zv8Wa94CzYBgtLpuPWpn4KYZF6m5sJvkeJ
+   g9pD+Eyjgu3gjmRhSKhrG/fvT2Nsp4eSTvsr+FiyN9UUjf2FLEQdruP7t
+   IV+EEi+IXCd0ZXmaSmq8N06+yc/cjfpy/jhLLM4+4HFTvdgTLkGqvqXsh
+   HK6/p3VtIGmJqHx0176J7h7a1i0RVUVdDAYoCyUkpaX9UfHZ1g49EgySM
+   mRckYZuBUdVo74AW/YlisSZslEFoHv8A4GOK2PPvs2B5/Saf9hJpG9vee
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="242575074"
+X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
+   d="scan'208";a="242575074"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 17:15:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
+   d="scan'208";a="527199929"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 06 Jan 2022 17:15:18 -0800
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Will Deacon <will@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for
+ multi-device groups
+To:     Jason Gunthorpe <jgg@nvidia.com>
+References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
+ <20220106022053.2406748-4-baolu.lu@linux.intel.com>
+ <20220106172249.GJ2328285@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <ec61dd78-7e21-c9ca-b042-32d396577a22@linux.intel.com>
+Date:   Fri, 7 Jan 2022 09:14:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-References: <20211213225918.672507-1-dmatlack@google.com> <20211213225918.672507-13-dmatlack@google.com>
- <Ydd35kUoHp+7n272@google.com>
-In-Reply-To: <Ydd35kUoHp+7n272@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 6 Jan 2022 16:54:33 -0800
-Message-ID: <CALzav=eCrm5TLY_rEG3YnKbsuyhA=wZcapaVnPP-yw+mRD3H4w@mail.gmail.com>
-Subject: Re: [PATCH v1 12/13] KVM: x86/mmu: Add tracepoint for splitting huge pages
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        "Nikunj A . Dadhania" <nikunj@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20220106172249.GJ2328285@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 6, 2022 at 3:14 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Dec 13, 2021, David Matlack wrote:
-> > Add a tracepoint that records whenever KVM eagerly splits a huge page.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmutrace.h | 20 ++++++++++++++++++++
-> >  arch/x86/kvm/mmu/tdp_mmu.c  |  2 ++
-> >  2 files changed, 22 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-> > index de5e8e4e1aa7..4feabf773387 100644
-> > --- a/arch/x86/kvm/mmu/mmutrace.h
-> > +++ b/arch/x86/kvm/mmu/mmutrace.h
-> > @@ -416,6 +416,26 @@ TRACE_EVENT(
-> >       )
-> >  );
-> >
-> > +TRACE_EVENT(
-> > +     kvm_mmu_split_huge_page,
-> > +     TP_PROTO(u64 gfn, u64 spte, int level),
-> > +     TP_ARGS(gfn, spte, level),
-> > +
-> > +     TP_STRUCT__entry(
-> > +             __field(u64, gfn)
-> > +             __field(u64, spte)
-> > +             __field(int, level)
-> > +     ),
-> > +
-> > +     TP_fast_assign(
-> > +             __entry->gfn = gfn;
-> > +             __entry->spte = spte;
-> > +             __entry->level = level;
-> > +     ),
-> > +
-> > +     TP_printk("gfn %llx spte %llx level %d", __entry->gfn, __entry->spte, __entry->level)
-> > +);
-> > +
-> >  #endif /* _TRACE_KVMMMU_H */
-> >
-> >  #undef TRACE_INCLUDE_PATH
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index be5eb74ac053..e6910b9b5c12 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -1325,6 +1325,8 @@ tdp_mmu_split_huge_page_atomic(struct kvm *kvm, struct tdp_iter *iter, struct kv
-> >       u64 child_spte;
-> >       int i;
-> >
-> > +     trace_kvm_mmu_split_huge_page(iter->gfn, huge_spte, level);
->
-> This should either be called iff splitting is successful, or it should record
-> whether or not the split was successful.
+Hi Jason,
 
-Blegh. My intention was to do the former but it's obviously wrong if
-the cmpxchg fails.
+On 1/7/22 1:22 AM, Jason Gunthorpe wrote:
+> On Thu, Jan 06, 2022 at 10:20:48AM +0800, Lu Baolu wrote:
+>> The iommu_attach/detach_device() interfaces were exposed for the device
+>> drivers to attach/detach their own domains. The commit <426a273834eae>
+>> ("iommu: Limit iommu_attach/detach_device to device with their own group")
+>> restricted them to singleton groups to avoid different device in a group
+>> attaching different domain.
+>>
+>> As we've introduced device DMA ownership into the iommu core. We can now
+>> extend these interfaces for muliple-device groups, and "all devices are in
+>> the same address space" is still guaranteed.
+>>
+>> For multiple devices belonging to a same group, iommu_device_use_dma_api()
+>> and iommu_attach_device() are exclusive. Therefore, when drivers decide to
+>> use iommu_attach_domain(), they cannot call iommu_device_use_dma_api() at
+>> the same time.
+>>
+>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>>   drivers/iommu/iommu.c | 79 +++++++++++++++++++++++++++++++++----------
+>>   1 file changed, 62 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index ab8ab95969f5..2c9efd85e447 100644
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -47,6 +47,7 @@ struct iommu_group {
+>>   	struct iommu_domain *domain;
+>>   	struct list_head entry;
+>>   	unsigned int owner_cnt;
+>> +	unsigned int attach_cnt;
+> 
+> Why did we suddenly need another counter? None of the prior versions
+> needed this. I suppose this is being used a some flag to indicate if
+> owner_cnt == 1 or owner_cnt == 0 should restore the default domain?
 
-> The latter is probably useful info,
-> and easy to do, e.g. assuming this is changed to return an int like the lower
-> helpers:
->
->
->         ret = tdp_mmu_install_sp_atomic(kvm, iter, sp, false);
->
->         /*
->          * tdp_mmu_install_sp_atomic will handle subtracting the split huge
->          * page from stats, but we have to manually update the new present child
->          * pages on success.
->          */
->         if (!ret)
->                 kvm_update_page_stats(kvm, level - 1, PT64_ENT_PER_PAGE);
->
->         trace_kvm_mmu_split_huge_page(iter->gfn, huge_spte, level, ret);
->
->         return ret;
->
-> and then the tracpoint can do 'ret ? "failed" : "succeeded"' or something.
+Yes, exactly.
 
-If we do this we should capture all the reasons why splitting might
-fail. cmpxchg races are one, and the other is failing to allocate the
-sp memory. I'll take a look at doing this in the next version. It
-doesn't look too difficult.
+> Would rather a flag 'auto_no_kernel_dma_api_compat' or something
 
->
-> > +
-> >       init_child_tdp_mmu_page(sp, iter);
-> >
-> >       for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-> > --
-> > 2.34.1.173.g76aa8bc2d0-goog
-> >
+Adding a flag also works.
+
+> 
+> 
+>> +/**
+>> + * iommu_attach_device() - attach external or UNMANAGED domain to device
+>> + * @domain: the domain about to attach
+>> + * @dev: the device about to be attached
+>> + *
+>> + * For devices belonging to the same group, iommu_device_use_dma_api() and
+>> + * iommu_attach_device() are exclusive. Therefore, when drivers decide to
+>> + * use iommu_attach_domain(), they cannot call iommu_device_use_dma_api()
+>> + * at the same time.
+>> + */
+>>   int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+>>   {
+>>   	struct iommu_group *group;
+>> +	int ret = 0;
+>> +
+>> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
+>> +		return -EINVAL;
+>>   
+>>   	group = iommu_group_get(dev);
+>>   	if (!group)
+>>   		return -ENODEV;
+>>   
+>> +	if (group->owner_cnt) {
+>> +		/*
+>> +		 * Group has been used for kernel-api dma or claimed explicitly
+>> +		 * for exclusive occupation. For backward compatibility, device
+>> +		 * in a singleton group is allowed to ignore setting the
+>> +		 * drv.no_kernel_api_dma field.
+> 
+> BTW why is this call 'no kernel api dma' ? That reads backwards 'no
+> kernel dma api' right?
+
+Yes. Need to rephrase this wording.
+
+> 
+> Aother appeal of putting no_kernel_api_dma in the struct device_driver
+> is that this could could simply do 'dev->driver->no_kernel_api_dma' to
+> figure out how it is being called and avoid this messy implicitness.
+
+Yes.
+
+> 
+> Once we know our calling context we can always automatic switch from
+> DMA API mode to another domain without any trouble or special
+> counters:
+> 
+> if (!dev->driver->no_kernel_api_dma) {
+>      if (group->owner_cnt > 1 || group->owner)
+>          return -EBUSY;
+>      return __iommu_attach_group(domain, group);
+> }
+
+Is there any lock issue when referencing dev->driver here? I guess this
+requires iommu_attach_device() only being called during the driver life
+(a.k.a. between driver .probe and .release).
+
+> 
+> if (!group->owner_cnt) {
+>      ret = __iommu_attach_group(domain, group);
+>      if (ret)
+>          return ret;
+> } else if (group->owner || group->domain != domain)
+>      return -EBUSY;
+> group->owner_cnt++;
+> 
+> Right?
+
+Yes. It's more straightforward if there's no issue around dev->driver
+referencing.
+
+> 
+>> +	if (!group->attach_cnt) {
+>> +		ret = __iommu_attach_group(domain, group);
+> 
+> How come we don't have to detatch the default domain here? Doesn't
+> that mean that the iommu_replace_group could also just call attach
+> directly without going through detatch?
+
+__iommu_attach_group() allows replacing the default domain with a
+private domain. Corresponding __iommu_detach_group() automatically
+replaces private domain with the default domain.
+
+The auto-switch logic should not apply to iommu_group_replace_domain()
+which is designed for components with iommu_set_dma_owner() called.
+
+> 
+> Jason
+> 
+
+Best regards,
+baolu
