@@ -2,157 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BE4F4872EF
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 07:07:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0CB6487349
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 08:06:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231530AbiAGGHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 01:07:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44220 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiAGGHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 01:07:10 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDECC061245
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 22:07:10 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id ie13so4375459pjb.1
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 22:07:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2q58XOryfIlXBk+Ga94YK5KAiqVRv5tmtrlFtSkfC0E=;
-        b=ochKJUmv9jcYYqjl8Ri0yXzDhwacQ2/M9JFDOvS2FBy8XLGNBzhfSvKLa9ii/FgSHR
-         lKXPiHPPHOi42VPVoABzyceIiJ8F+Kbs3IS0k75hH2A5mdF2XigOH5lmdKWrpcwtxdbr
-         ezxvlB8NX6lqdXgr7vLxp+V4EZIGdh1LCkEFmJztS6KTyCd2fXWSEdqhhi3oBwVmS13w
-         /pYkJOH9knWKKZPd/LGxDD94eatNe6H5EBW+iGlQr71hEgAmZVB6ZiK24VPUj2ooMIaj
-         42ZKBZFHvnOHD474TolWmS+OmhGNji04Be9HsERGLppfG0rRjME6jGJDuXtYXGuWgZIu
-         K72Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2q58XOryfIlXBk+Ga94YK5KAiqVRv5tmtrlFtSkfC0E=;
-        b=8NDlb7b3He75R6Td61Dy1ylYH7ISjBiSgspclfYL//J5BnicfhzrdcSOpdjN01jkRc
-         5/Kqq9S3VVMKSyi5EhRSVZSiPvHE2ycgtAXRuynEjvxUihbrESfslnurwcNseBTgl9Fo
-         amM3Hp8KsY+z/nPgEDEqj2YJWAMNrfB8SG7DoahKwObWJEZnh62tUEdZIPTU3NdhM4WI
-         7ym9uRqJwnzvPtqD5mu9w090ihG/akj1EnSuqiQXIOxSf5uS79U8JOiq4qCIfVYgEmC3
-         ECI4xomX/HCx96RrIcs5wDatiWAXMxMv9LzU9OLYn5nhUYS64NZWUOEXNljaBgWZSb61
-         yBPw==
-X-Gm-Message-State: AOAM533CApPmsT9aPRJjP/N7Nf38+1FqjsSM6B9K+vtq77ogAOrO80mY
-        yl1StC2TrBfNEOEGAzZoiC/2Z+IBLRTx4ZzujBiuAg==
-X-Google-Smtp-Source: ABdhPJzi8RhMHj39b+4Rn0KshD189vXaFIX2vj8EwamLndmdEQUpG8o9KUsh8L5L/q0EpOVykikO8FcKUk+BveZguG8=
-X-Received: by 2002:a17:902:c652:b0:148:f1a5:b7bf with SMTP id
- s18-20020a170902c65200b00148f1a5b7bfmr62134703pls.122.1641535629407; Thu, 06
- Jan 2022 22:07:09 -0800 (PST)
+        id S233995AbiAGHGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 02:06:04 -0500
+Received: from mga04.intel.com ([192.55.52.120]:43503 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229560AbiAGHGE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 02:06:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641539164; x=1673075164;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Dcir3Ffal0vUADpdNEqrL/soZai/8Aq4FsqiXQdZrkw=;
+  b=Ib6Hy+lFiZ8TIwejMn1nNaExqPd9f2MZKB52W78rlx3O73GoxkKjV8WM
+   EixOfRYCPjuWpTJ28Yxv+fbADo7TYnlbGTL0uhp+IBzgCsNfr+j/MEyac
+   ZQLWaquwcVtUKCYYSQ6E7VY3OH7d/M6Tng5S2wv3WObF5TMbgMQ1TJCTg
+   aYLfq6oMzAu4Oa+IUs7N4ZsQjQGLJaW5nHf5V6/muJAElfYVdpR+prm5x
+   3AC4yMid2Cqx50ZDXP55yq7Shdbh7d4e+r3RJyK4N7N0yv4AJxNDGPQR+
+   CkFWz/HK2xSsOKP5Bkj11i9ANtfF15hzgwd1SdfbDnqJOHq0piZ7akGYR
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10219"; a="241636836"
+X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
+   d="scan'208";a="241636836"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 23:06:04 -0800
+X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
+   d="scan'208";a="621813370"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.145]) ([10.255.31.145])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 23:05:59 -0800
+Message-ID: <e74fcb88-3add-4bb7-4508-742db44fa3c8@intel.com>
+Date:   Fri, 7 Jan 2022 15:05:56 +0800
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
-In-Reply-To: <20220104194918.373612-2-rananta@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 6 Jan 2022 22:06:53 -0800
-Message-ID: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.4.1
+Subject: Re: [RFC PATCH v2 20/44] i386/tdx: Parse tdx metadata and store the
+ result into TdxGuestState
+Content-Language: en-US
+To:     Laszlo Ersek <lersek@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, isaku.yamahata@gmail.com
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
+        erdemaktas@google.com, kvm@vger.kernel.org,
+        isaku.yamahata@intel.com, "Min M . Xu" <min.m.xu@intel.com>
+References: <cover.1625704980.git.isaku.yamahata@intel.com>
+ <acaf651389c3f407a9d6d0a2e943daf0a85bb5fc.1625704981.git.isaku.yamahata@intel.com>
+ <20210826111838.fgbp6v6gd5wzbnho@sirius.home.kraxel.org>
+ <a97a75ad-9d1c-a09f-281b-d6b0a7652e78@intel.com>
+ <4eb6a628-0af6-409b-7e42-52787ee3e69d@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <4eb6a628-0af6-409b-7e42-52787ee3e69d@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghu,
+On 1/7/2022 12:06 AM, Laszlo Ersek wrote:
+> On 01/04/22 14:08, Xiaoyao Li wrote:
+> 
+>> + Laszlo,
+>>
+>> Regarding laoding TDVF as pflash, I have some questions:
+>>
+>> - pflash requires KVM to support readonly mmeory. However, for TDX, it
+>> doesn't support readonly memory. Is it a must? or we can make an
+>> exception for TDX?
+>>
+>> - I saw from
+>> https://lists.gnu.org/archive/html/qemu-discuss/2018-04/msg00045.html,
+>> you said when load OVMF as pflash, it's MMIO. But for TDVF, it's treated
+>> as private memory. I'm not sure whether it will cause some potential
+>> problem if loading TDVF with pflash.
+>>
+>> Anyway I tried changing the existing pflash approach to load TDVF. It
+>> can boot a TDX VM and no issue.
+> 
+> I have no comments on whether TDX should or should not use pflash.
+> 
+> If you go without pflash, then you likely will not have a
+> standards-conformant UEFI variable store. (Unless you reimplement the
+> variable arch protocols in edk2 on top of something else than the Fault
+> Tolerant Write and Firmware Volume Block protocols.) Whether a
+> conformant UEFI varstore matters to you (or to TDX in general) is
+> something I can't comment on.
 
-On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> Capture the start of the KVM VM, which is basically the
-> start of any vCPU run. This state of the VM is helpful
-> in the upcoming patches to prevent user-space from
-> configuring certain VM features after the VM has started
-> running.
->
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  include/linux/kvm_host.h | 3 +++
->  virt/kvm/kvm_main.c      | 9 +++++++++
->  2 files changed, 12 insertions(+)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index c310648cc8f1..d0bd8f7a026c 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -623,6 +623,7 @@ struct kvm {
->         struct notifier_block pm_notifier;
->  #endif
->         char stats_id[KVM_STATS_NAME_SIZE];
-> +       bool vm_started;
+Thanks for your reply! Laszlo
 
-Since KVM_RUN on any vCPUs doesn't necessarily mean that the VM
-started yet, the name might be a bit misleading IMHO.  I would
-think 'has_run_once' or 'ran_once' might be more clear (?).
+regarding "standards-conformant UEFI variable store", I guess you mean 
+the change to UEFI non-volatile variables needs to be synced back to the 
+OVMF_VARS.fd file. right?
 
+If so, I need to sync with internal folks who are upstreaming TDVF 
+support into OVMF.
 
->  };
->
->  #define kvm_err(fmt, ...) \
-> @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
->         }
->  }
->
-> +#define kvm_vm_has_started(kvm) (kvm->vm_started)
-> +
->  extern bool kvm_rebooting;
->
->  extern unsigned int halt_poll_ns;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 72c4e6b39389..962b91ac2064 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
->         int r;
->         struct kvm_fpu *fpu = NULL;
->         struct kvm_sregs *kvm_sregs = NULL;
-> +       struct kvm *kvm = vcpu->kvm;
->
->         if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
->                 return -EIO;
-> @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
->                         if (oldpid)
->                                 synchronize_rcu();
->                         put_pid(oldpid);
-> +
-> +                       /*
-> +                        * Since we land here even on the first vCPU run,
-> +                        * we can mark that the VM has started running.
-> +                        */
+> (I've generally stopped commenting on confidential computing topics, but
+> this message allows for comments on just pflash, and how it impacts OVMF.)
+> 
+> Regarding pflash itself, the read-only KVM memslot is required for it.
+> Otherwise pflash cannot work as a "ROMD device" (= you can't flip it
+> back and forth between ROM mode and programming (MMIO) mode).
 
-It might be nicer to add a comment why the code below gets kvm->lock.
+We don't need Read-only mode for TDVF so far. If for this purpose, is it 
+acceptable that allowing a pflash without KVM readonly memslot support 
+if read-only is not required for the specific pflash device?
 
-Anyway, the patch generally looks good to me, and thank you
-for making this change (it works for my purpose as well).
+We are trying to follow the existing usage of OVMF for TDX, since TDVF 
+support will be landed in OVMF instead of a new separate binary.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> Thanks
+> Laszlo
+> 
 
-Thanks,
-Reiji
-
-
-> +                       mutex_lock(&kvm->lock);
-> +                       kvm->vm_started = true;
-> +                       mutex_unlock(&kvm->lock);
->                 }
->                 r = kvm_arch_vcpu_ioctl_run(vcpu);
->                 trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
-> --
-> 2.34.1.448.ga2b2bfdf31-goog
->
