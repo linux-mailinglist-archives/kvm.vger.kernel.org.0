@@ -2,367 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6DAF487362
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 08:12:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CBD84873D8
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 09:04:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234825AbiAGHMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 02:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233716AbiAGHMr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 02:12:47 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4222CC061245
-        for <kvm@vger.kernel.org>; Thu,  6 Jan 2022 23:12:46 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id g11-20020a17090a7d0b00b001b2c12c7273so5979791pjl.0
-        for <kvm@vger.kernel.org>; Thu, 06 Jan 2022 23:12:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kbcPDOVFWP/YoljnZK4KEPygQkk4mWtbYx8io3Et7Vw=;
-        b=hFNJ/2vCxmPB/RyLp/aeRUeCE51MnM2jcfBxGMSoPxuIDBqa32Sg6r9wK0/psKQLBq
-         MWlyyH4od+uM79+M9jXCj2vbmpcORUdzEpEPzKFjjOH88vORYKcAEFu2Qk5G/2z8SlV1
-         bzl/vunozjdqCeU/Y1v5iSAuZuYp+sVMfMSTEy8+x3p6TG44ufPq//gPx3Ul4HQ3zZd7
-         RJbH+rDaW5T9cJ+bJW9ARC0geiawneZGfAm+fY31v1SWGu8yGBtmTxQMUP0Shlj6wlFF
-         wDArec0wtOxMpBZVCbw87X1Xz7QVbymLWm3vZ/i1MBzoDQ5JbOTqL42+e2Ital80uazp
-         IIBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kbcPDOVFWP/YoljnZK4KEPygQkk4mWtbYx8io3Et7Vw=;
-        b=kkZ3aAd/X5CWRI0858VYEKnR0X4g/QP6Xkko/ywFtup3SjmsN2RaN2Pi12OXTLO9pD
-         plvbpLInjwrJc7XlBP98bWJeXObgb3O18KyRiaFmX7TJYAxVTQFrcU3EGPK3tuTEgvtm
-         1DlGGP8bXqC9nQmecYLvp5YcR1vNzJKlUkoP2OnFrvoOIvhP/evrlkVviLER8Mp2qhWL
-         lFRMciKK0OCaI6cgR7Odeukr3c0/WVbJtIP0mlAZ9HwemwfU6xy43ulccdh2akun3c6H
-         V0sSiFSt62m9KQtQTp5suaNKwRk0w08iLm2pJbyJzAZlE1f7sc9vXD5j1zU61k8rJmgT
-         TV0Q==
-X-Gm-Message-State: AOAM530E8wdTanclxPEl5Bbf+MkHBZ1OYBObUw7TJsQG5H7v6G9yeqAP
-        UssFXRaEml5mBAX9AxZ0YVsLcerhIZ5Aoi8P1ZSWPQ==
-X-Google-Smtp-Source: ABdhPJwsb0Gv9vEPitDKlPfU9K/EV4+Ot0zzw1eukA8w2Pg2+Clqhc1BGKuyNR4H91D/xqtTAKv0lkEB9Mfong3YTkc=
-X-Received: by 2002:a17:90b:3b49:: with SMTP id ot9mr14404416pjb.110.1641539565579;
- Thu, 06 Jan 2022 23:12:45 -0800 (PST)
+        id S1345349AbiAGIEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 03:04:02 -0500
+Received: from mga09.intel.com ([134.134.136.24]:40757 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1345336AbiAGIEB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 03:04:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641542641; x=1673078641;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JANxAu3mIkVr2q7CwwRAkispUBoaz/bMbPms6dEq8gE=;
+  b=avqPs+r2S6ML7YYS+UkkEbYx4KXmNnm9OniX/RV9zrPnF39xMBGy3F1G
+   S2cvm8ciXjkWuWDhyQJI2RtD2CTV995iiVj0lKTxyrHbLDsASyxmGqN/p
+   jZoT3yod1U536lJOmfejSb58kmoqGlZFPg4DzJjt5pBBvpMVrGIfDsY+H
+   oG/vKxwlUJM9j9WHF2hJAGP3lSmbDlbPF2LtsL1fgcMTcoDbfJEAf/fkc
+   xRe2Ojs/WQoX+I2c3PWprvcKSmHihD8yCOYFOSWqDMvZcFzSrtfKl1z5x
+   b7LSvbofKIJHQaI7vcR8XOn5hEXMQ4GWBGATOj6+RPFQvu8xmqvJzAFtU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10219"; a="242622581"
+X-IronPort-AV: E=Sophos;i="5.88,269,1635231600"; 
+   d="scan'208";a="242622581"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2022 00:04:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,269,1635231600"; 
+   d="scan'208";a="489216580"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+  by orsmga002.jf.intel.com with ESMTP; 07 Jan 2022 00:03:59 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 7 Jan 2022 00:03:59 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20 via Frontend Transport; Fri, 7 Jan 2022 00:03:59 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.20; Fri, 7 Jan 2022 00:03:59 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W2JXCkKtNt/KWuyoOgGCsgy8mws7qUCILMxJGE5UG3xZWDRshD8ws8K1sq17Fjab0yP/8BlG8t/gNNm8bHqeCzwBPM2UpkNN9dYKU4ew3etcwyj/M3id1gWHp1nEmIY4DEfk9DxUlUiM+EK5L+v7iI4vpgsrY8GXCRHixjKQ6zeoHcPPvjBTumZKjRqRPheXEDkPDwsjLwjbZ/vC7dvpcW7jDzNNhKzKuf1KQVCjzJ9pV6MznaySqoPdD9V9QEZAfceJe+nf8GH1OkJWviWzm2JBqNwrU3AlQkAEUYoC6fX12NZDwx7SRiPCzQxkWhjyA9SGQgYb2LL8TgA4N4dxRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JANxAu3mIkVr2q7CwwRAkispUBoaz/bMbPms6dEq8gE=;
+ b=cuN0r+7Yrb6hMVmrYNeY5izRWoEGjCGWJ2tFeDzRNOPhkOtsjlFI4uLt2UjTIvK0AI2HkAbFwElhUB1IjbwRM3dpxrgCuPL28jdjYv4MDbF2E5hs2rrnJCTgN93v0qQO1Yyy6C8Wg8G7nu2dL+QuVdLUzhudgjK/G4IR/+m3RUFQH1oLvrrodbMh8QaTUj2cz1zDhpbpewBNx2h/KwZHp0qnckinqRIxGA1wsYps8+/8A/Ov4ebkRO0XvOS7CTrsHKPEnI6Tob/TkiHWU6b0beO5yigpLJ57sEV/dVfaaGc6ZDZ7nXOilwnjRMeRWqEsBzYB3HjBLQBluRkCqrw9RQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN6PR11MB1748.namprd11.prod.outlook.com (2603:10b6:404:101::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Fri, 7 Jan
+ 2022 08:03:57 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::5c8a:9266:d416:3e04]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::5c8a:9266:d416:3e04%2]) with mapi id 15.20.4867.010; Fri, 7 Jan 2022
+ 08:03:57 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>
+Subject: RE: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
+Thread-Topic: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
+Thread-Index: AQHX7VV0XQcySACwoUuiLSnTAAZEGKxXTBHg
+Date:   Fri, 7 Jan 2022 08:03:57 +0000
+Message-ID: <BN9PR11MB52769D49A29D1CD7A0C87C888C4D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <163909282574.728533.7460416142511440919.stgit@omen>
+In-Reply-To: <163909282574.728533.7460416142511440919.stgit@omen>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.200.16
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8c37f8b2-ccdf-4e21-6474-08d9d1b441e7
+x-ms-traffictypediagnostic: BN6PR11MB1748:EE_
+x-microsoft-antispam-prvs: <BN6PR11MB1748DD36D51144221BBE221E8C4D9@BN6PR11MB1748.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: hEAlGmGdyNRASYN1+qrPGePpaWgi40LTJA4OjhkKQUcFaEWqe7PC5T8/CFRYfehBckCUHgYIQMaUIm/MGASl9xlL7pABZtv5VKw0zkKlISpqKiV3e37E8LyO8rj2ggbVOv9tmQoU8SKd3qRvampCLQr9a+llaNw5HlxJmdCwrYFSCzU51CEG9NrnIQaRByKgVdqoLc12sjDYaAS+UDC3X1FHFuy/Ge8SaDdW9QYAvPz4yhPOu/C8IEl0CYvr0oBFcVx1EjqPLgqrXCWHJlQChe8xjUnXOBv0sU+ORgdX0jF2M+EkAgFmvxmco58gzQAjdaP8atGjVOy9A8P9FNI28o5JQj/7N1d6r7PbUPozTM5gL5himgKN0Q6E4ATLDLfDCcD1uSqOVhXc3drb7vVgR2aIpH10tfWKi2QU4XYBrGambilAxMSn1Jl1n++mOZ7VxQhzi8CXPqgoez5O+mtfdKYeSkPDK4K4bjkDbyncpqOxWDkmWKUwmlDMJVpsIpwM292KI9Q3ceayOw5ADCd5vxbmYme74N4dtukGxmvv5HGYiUmxQKQPsuXc1BBjPRjJNlhUAr9KaBpPCEVmG+DuowS4aQofxYWpeOCc80QR0n/uDlQ2jv2Q5jht149TgVkirPGwTVv2n4wWJXn2cq1g8XAXCoqkxaKzfFVO/iNiQcKUsnKDFH3rS9imUUSkt2NQP+xAcsz10WhBaaO7guluuw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(52536014)(6506007)(5660300002)(33656002)(6916009)(122000001)(9686003)(2906002)(82960400001)(71200400001)(83380400001)(508600001)(66556008)(66476007)(26005)(64756008)(66946007)(66446008)(8676002)(8936002)(4326008)(38100700002)(38070700005)(186003)(316002)(55016003)(7696005)(86362001)(76116006)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?azNVNmZIVGU0TjFGaXhIVjE5TnBXS0FvRFAzeHUrdzBCM0txYW1WOGxtdk93?=
+ =?utf-8?B?aUo1RXBwVFd3TXhKVU8xWmpuOG1PNERRRGNjS1NEdjM2YmhzOGllQ1hScFkx?=
+ =?utf-8?B?Yi9QL2VXUGVSSDhLS0Zjeit3K1RyQ2dySHlwK1pPSDRQYmhTVk9aYkJ4Y1pu?=
+ =?utf-8?B?TU1FTk9CUkRIcEFYSC9yamEzb3ZOZHMvZ0tiUnU0RHU4em5iS1BqSnBwbEda?=
+ =?utf-8?B?czBsT3Bwd0lodTRkeGdKaXVuUGpFZ3F1WE91VlR1WEVoeC95bk9iMHRZNklB?=
+ =?utf-8?B?RkdJbGhWYllMZjZSbGhRWndpSllNd2FUSkQ1NEw0TGFOME9WRndwaS83K3ZN?=
+ =?utf-8?B?bVpxZEZ1K2V2OEEzTVAxR00vaEtTczJmcFBHblVzb0pHaUluNmtVaEtiM3Mw?=
+ =?utf-8?B?VVZ6OVkrV1ZJUFFzNjMxM2VvSTRCOTQxNXhJUTFJZTQrKzlFNDNUek9ML29t?=
+ =?utf-8?B?QlVkRk1ubWprbHZoaTNaWFpYMklFSElkTXRJUmdwTEdpaXh4c3Q2S29oVGw3?=
+ =?utf-8?B?K2pMbUIxZWVZUlQyRytOM1BiRWtkWGF1MEEvTGxMN3NNYWJ6YWFTQkpPbUVB?=
+ =?utf-8?B?TVEyNVhpTFRYRVZSV1BNSkUxNUQ1NWJXNERveFkxd2xQOXd2MDRqTlY5OFF2?=
+ =?utf-8?B?NnJLV3pzOTRKUVdMS0kvSnlVUGUwYnpXNFN2ZFBFaXpvY1JuUm1WcU5ZZ29i?=
+ =?utf-8?B?V3lPcWFMb2xmanBSeHBNMk1BdkVpelVGQlNuR3g5bmcyU1R0ZzdtQUtPMHRL?=
+ =?utf-8?B?aS9IUjZVaGJOanM1RTJsb1lTLzljb0xoeVA2VW9nRzFpWnFNS0hjQWk5Q0JR?=
+ =?utf-8?B?QW5BWmVTMFNKdXRDcWo3NXdWS0RqbHJtMG41WHNxY0ZtV08rK3lBN3JneTF1?=
+ =?utf-8?B?WUdMVndyMWlFVVpUQ0lqa2FmVFRyTkN1QzNIaGlkQmJxaFVRam5DcVhreG5k?=
+ =?utf-8?B?OExUNGx6d0lxRkpUbm1IVit2OFNZZ285YUJsbHM1MzZqYng3WDhRWk03THUz?=
+ =?utf-8?B?V0xxTlNveUhsQXFNUVc3RUsrVlFHNXdDdVJqWU9qQURTN2VQOU54OTI1NmR2?=
+ =?utf-8?B?YXVJN3Q4bDc4eHc5SFpBUVhtcnZkdUYvL2xvQ0pWLzRlSUxzMXF3RFkyYmhI?=
+ =?utf-8?B?Q3ZMZzhoYUFoR0RFNkhCcmZSUEhrRXpVUVRRdEpNRTFXRHBvZ3F6RW9meTZr?=
+ =?utf-8?B?SjVBN1B3b3NjdE4yNWYzSDY5c3VYSmJpZnNjRktWNzJpUW9tUTkvNUpHdVZj?=
+ =?utf-8?B?U1JPQjFCalRXUjUrZGhmZ3BwdDRzZzRYNy9PdXdINThiOHVTWS9UYTRDS1hS?=
+ =?utf-8?B?Q0RxdUU3UHVBS2hJNHBENHdvU2JCR1dhTzU4bVUzMHRoSjBMVGIwcjFlQU0v?=
+ =?utf-8?B?aW4vZEhHSzJ0VWE4WDZNaEt0NmZodEsxV2dVUk5LUHU4S0lkY0pZQUtqNmpv?=
+ =?utf-8?B?bEVtSk5LbXFCK3NRZzdVM2xSR1VwTWJwUm45eWczUnpZVDFVYWVTb1R4NVlV?=
+ =?utf-8?B?Ump5eTA3blVaNjNEVXgwZnY2SlpSd3g4TXFoUWw0UkNoSllvMmFZYkxsZEQ5?=
+ =?utf-8?B?MWFpNmRZSUhPSDBjM3IyMFE3YjZUM1Fuek9kNlhzM3VnNXlNOVBqY3Y2QVUx?=
+ =?utf-8?B?RHF6UUJLRjJMN1dtdW4zOHM5MzAwYzZJUTZTZWVIL1ZmY1o3OFBsbVRUVnlR?=
+ =?utf-8?B?d3ZTakVCL29XekFTNW0xNDA5VjE0SjV1TW9VSDRwQ0VwMnI2MFBZYXlBS082?=
+ =?utf-8?B?OCt4OWJsR0xGcWRRaVEyZkM2S01CTWg4VVgvNkxaVEFEbWFmcjdRcGVuTkxX?=
+ =?utf-8?B?YXF3RFJsVDVuS1B2VEY3V0JjdjdkLyt6MXFFOVZkd3VGSy95aFFnSDN1aHkz?=
+ =?utf-8?B?bnhOVXVwd1hVUTczNVVvM2NsOHl0SjBweHVaVk16STI4a3ZjcWNpdk90b2ZJ?=
+ =?utf-8?B?cGVGbVM5MkJJdkRJV1FFYXRsQWd2UTROWVVkdHpqa3ZaRktmL2Q0ZGVzaEJU?=
+ =?utf-8?B?bEh1R1M1aE90UHVoUDgrVjgzUVNibFJ0RTRsbzVGZmdab1NSMFV3eVE4Q2dv?=
+ =?utf-8?B?TWFsWXhQMGJpTTFuNkFXeTdML2ozeG1OMkNONFJwZFBDeXdyZ3BDRVJ3R25w?=
+ =?utf-8?B?dDFmSDZYOUVuTzhWc2VDVXRCYmtWMC9haFRzMWxBdFY1UjVrVlhtMlhnK0M2?=
+ =?utf-8?Q?ipCZ3Ihhh7Vmg4kO9nr6SKo=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-2-reijiw@google.com>
-In-Reply-To: <20220106042708.2869332-2-reijiw@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 6 Jan 2022 23:12:28 -0800
-Message-ID: <CAAeT=FxEr4N4j7tJQKpUANM1dSrpZrgDLaYEOVLRhmXWPn52NA@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 01/26] KVM: arm64: Introduce a validation function
- for an ID register
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c37f8b2-ccdf-4e21-6474-08d9d1b441e7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jan 2022 08:03:57.8592
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FUBGW2bFuekCwjDgMfaV1vPLlbMwAMoy5uUEPILXzxZvQQivGhBowIEah9EhgpQGi8QJIcRreJ9k2FuIBHZzRQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB1748
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 5, 2022 at 8:28 PM Reiji Watanabe <reijiw@google.com> wrote:
->
-> Introduce arm64_check_features(), which does a basic validity checking
-> of an ID register value against the register's limit value, which is
-> generally the host's sanitized value.
->
-> This function will be used by the following patches to check if an ID
-> register value that userspace tries to set for a guest can be supported
-> on the host.
->
-> The validation is done using arm64_ftr_bits_kvm, which is created from
-> arm64_ftr_regs, with some entries overwritten by entries from
-> arm64_ftr_bits_kvm_override.
->
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h |   1 +
->  arch/arm64/kernel/cpufeature.c      | 228 ++++++++++++++++++++++++++++
->  2 files changed, 229 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index ef6be92b1921..eda7ddbed8cf 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -631,6 +631,7 @@ void check_local_cpu_capabilities(void);
->
->  u64 read_sanitised_ftr_reg(u32 id);
->  u64 __read_sysreg_by_encoding(u32 sys_id);
-> +int arm64_check_features(u32 sys_reg, u64 val, u64 limit);
->
->  static inline bool cpu_supports_mixed_endian_el0(void)
->  {
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 6f3e677d88f1..48dff8b101d9 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -3140,3 +3140,231 @@ ssize_t cpu_show_meltdown(struct device *dev, struct device_attribute *attr,
->                 return sprintf(buf, "Vulnerable\n");
->         }
->  }
-> +
-> +#ifdef CONFIG_KVM
-> +/*
-> + * arm64_ftr_bits_kvm[] is used for KVM to check if features that are
-> + * indicated in an ID register value for the guest are available on the host.
-> + * arm64_ftr_bits_kvm[] is created based on arm64_ftr_regs[].  But, for
-> + * registers for which arm64_ftr_bits_kvm_override[] has a corresponding
-> + * entry, replace arm64_ftr_bits entries in arm64_ftr_bits_kvm[] with the
-> + * ones in arm64_ftr_bits_kvm_override[].
-> + */
-> +static struct __ftr_reg_bits_entry *arm64_ftr_bits_kvm;
-> +static size_t arm64_ftr_bits_kvm_nentries;
-> +static DEFINE_MUTEX(arm64_ftr_bits_kvm_lock);
-> +
-> +/*
-> + * Number of arm64_ftr_bits entries for each register.
-> + * (Number of 4 bits fields in 64 bit register + 1 entry for ARM64_FTR_END)
-> + */
-> +#define        MAX_FTR_BITS_LEN        17
-> +
-> +/* Use FTR_LOWER_SAFE for AA64DFR0_EL1.PMUVER and AA64DFR0_EL1.DEBUGVER. */
-> +static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
-> +       S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
-> +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-> +       ARM64_FTR_END,
-> +};
-> +
-> +#define        ARM64_FTR_REG_BITS(id, table)   {       \
-> +       .sys_id = id,                           \
-> +       .ftr_bits = &((table)[0]),              \
-> +}
-> +
-> +struct __ftr_reg_bits_entry {
-> +       u32     sys_id;
-> +       struct arm64_ftr_bits   *ftr_bits;
-> +};
-> +
-> +/*
-> + * All entries in arm64_ftr_bits_kvm_override[] are used to override
-> + * the corresponding entries in arm64_ftr_bits_kvm[].
-> + */
-> +static struct __ftr_reg_bits_entry arm64_ftr_bits_kvm_override[] = {
-> +       ARM64_FTR_REG_BITS(SYS_ID_AA64DFR0_EL1, ftr_id_aa64dfr0_kvm),
-> +};
-> +
-> +/*
-> + * Override entries in @orig_ftrp with the ones in @new_ftrp when their shift
-> + * fields match.  The last entry of @orig_ftrp and @new_ftrp must be
-> + * ARM64_FTR_END (.width == 0).
-> + */
-> +static void arm64_ftr_reg_bits_overrite(struct arm64_ftr_bits *orig_ftrp,
-> +                                       struct arm64_ftr_bits *new_ftrp)
-> +{
-> +       struct arm64_ftr_bits *o_ftrp, *n_ftrp;
-> +
-> +       for (n_ftrp = new_ftrp; n_ftrp->width; n_ftrp++) {
-> +               for (o_ftrp = orig_ftrp; o_ftrp->width; o_ftrp++) {
-> +                       if (o_ftrp->shift == n_ftrp->shift) {
-> +                               *o_ftrp = *n_ftrp;
-> +                               break;
-> +                       }
-> +               }
-> +       }
-> +}
-> +
-> +/*
-> + * Copy arm64_ftr_bits entries from @src_ftrp to @dst_ftrp.  The last entries
-> + * of @dst_ftrp and @src_ftrp must be ARM64_FTR_END (.width == 0).
-> + */
-> +static void copy_arm64_ftr_bits(struct arm64_ftr_bits *dst_ftrp,
-> +                               const struct arm64_ftr_bits *src_ftrp)
-> +{
-> +       int i = 0;
-> +
-> +       for (; src_ftrp[i].width; i++) {
-> +               if (WARN_ON_ONCE(i >= (MAX_FTR_BITS_LEN - 1)))
-> +                       break;
-> +
-> +               dst_ftrp[i] = src_ftrp[i];
-> +       }
-> +
-> +       dst_ftrp[i].width = 0;
-> +}
-> +
-> +/*
-> + * Initialize arm64_ftr_bits_kvm.  Copy arm64_ftr_bits for each ID register
-> + * from arm64_ftr_regs to arm64_ftr_bits_kvm, and then override entries in
-> + * arm64_ftr_bits_kvm with ones in arm64_ftr_bits_kvm_override.
-> + */
-> +static int init_arm64_ftr_bits_kvm(void)
-> +{
-> +       struct arm64_ftr_bits ftr_temp[MAX_FTR_BITS_LEN];
-> +       static struct __ftr_reg_bits_entry *reg_bits_array, *bits, *o_bits;
-> +       int i, j, nent, ret;
-> +
-> +       mutex_lock(&arm64_ftr_bits_kvm_lock);
-> +       if (arm64_ftr_bits_kvm) {
-> +               /* Already initialized */
-> +               ret = 0;
-> +               goto unlock_exit;
-> +       }
-> +
-> +       nent = ARRAY_SIZE(arm64_ftr_regs);
-> +       reg_bits_array = kcalloc(nent, sizeof(struct __ftr_reg_bits_entry),
-> +                                GFP_KERNEL);
-> +       if (!reg_bits_array) {
-> +               ret = ENOMEM;
-> +               goto unlock_exit;
-> +       }
-> +
-> +       /* Copy entries from arm64_ftr_regs to reg_bits_array */
-> +       for (i = 0; i < nent; i++) {
-> +               bits = &reg_bits_array[i];
-> +               bits->sys_id = arm64_ftr_regs[i].sys_id;
-> +               bits->ftr_bits = (struct arm64_ftr_bits *)arm64_ftr_regs[i].reg->ftr_bits;
-> +       };
-> +
-> +       /*
-> +        * Override the entries in reg_bits_array with the ones in
-> +        * arm64_ftr_bits_kvm_override.
-> +        */
-> +       for (i = 0; i < ARRAY_SIZE(arm64_ftr_bits_kvm_override); i++) {
-> +               o_bits = &arm64_ftr_bits_kvm_override[i];
-> +               for (j = 0; j < nent; j++) {
-> +                       bits = &reg_bits_array[j];
-> +                       if (bits->sys_id != o_bits->sys_id)
-> +                               continue;
-> +
-> +                       memset(ftr_temp, 0, sizeof(ftr_temp));
-> +
-> +                       /*
-> +                        * Temporary save all entries in o_bits->ftr_bits
-> +                        * to ftr_temp.
-> +                        */
-> +                       copy_arm64_ftr_bits(ftr_temp, o_bits->ftr_bits);
-> +
-> +                       /*
-> +                        * Copy entries from bits->ftr_bits to o_bits->ftr_bits.
-> +                        */
-> +                       copy_arm64_ftr_bits(o_bits->ftr_bits, bits->ftr_bits);
-> +
-> +                       /*
-> +                        * Override entries in o_bits->ftr_bits with the
-> +                        * saved ones, and update bits->ftr_bits with
-> +                        * o_bits->ftr_bits.
-> +                        */
-> +                       arm64_ftr_reg_bits_overrite(o_bits->ftr_bits, ftr_temp);
-> +                       bits->ftr_bits = o_bits->ftr_bits;
-> +                       break;
-> +               }
-> +       }
-> +
-> +       arm64_ftr_bits_kvm_nentries = nent;
-> +       arm64_ftr_bits_kvm = reg_bits_array;
-
-I've just noticed that the patch has a problem in terms of memory ordering.
-I'm thinking of fixing the code above as follows in the v5 patch.
----
-        <...>
-        arm64_ftr_bits_kvm_nentries = nent;
-
-        /*
-         * Make sure any data written earlier in this function are visible
-         * from other CPUs before setting arm64_ftr_bits_kvm.
-         */
-        smp_wmb();
-
-        WRITE_ONCE(arm64_ftr_bits_kvm, reg_bits_array);
-        <...>
----
-
-Also, I will fix the reader side code of those data in
-get_arm64_ftr_bits_kvm().
-
-Thanks,
-Reiji
-
-
-> +       ret = 0;
-> +
-> +unlock_exit:
-> +       mutex_unlock(&arm64_ftr_bits_kvm_lock);
-> +       return ret;
-> +}
-> +
-> +static int search_cmp_ftr_reg_bits(const void *id, const void *regp)
-> +{
-> +       return ((int)(unsigned long)id -
-> +               (int)((const struct __ftr_reg_bits_entry *)regp)->sys_id);
-> +}
-> +
-> +static const struct arm64_ftr_bits *get_arm64_ftr_bits_kvm(u32 sys_id)
-> +{
-> +       const struct __ftr_reg_bits_entry *ret;
-> +       int err;
-> +
-> +       if (!arm64_ftr_bits_kvm) {
-> +               /* arm64_ftr_bits_kvm is not initialized yet. */
-> +               err = init_arm64_ftr_bits_kvm();
-> +               if (err)
-> +                       return NULL;
-> +       }
-> +
-> +       ret = bsearch((const void *)(unsigned long)sys_id,
-> +                     arm64_ftr_bits_kvm,
-> +                     arm64_ftr_bits_kvm_nentries,
-> +                     sizeof(arm64_ftr_bits_kvm[0]),
-> +                     search_cmp_ftr_reg_bits);
-> +       if (ret)
-> +               return ret->ftr_bits;
-> +
-> +       return NULL;
-> +}
-> +
-> +/*
-> + * Check if features (or levels of features) that are indicated in the ID
-> + * register value @val are also indicated in @limit.
-> + * This function is for KVM to check if features that are indicated in @val,
-> + * which will be used as the ID register value for its guest, are supported
-> + * on the host.
-> + * For AA64MMFR0_EL1.TGranX_2 fields, which don't follow the standard ID
-> + * scheme, the function checks if values of the fields in @val are the same
-> + * as the ones in @limit.
-> + */
-> +int arm64_check_features(u32 sys_reg, u64 val, u64 limit)
-> +{
-> +       const struct arm64_ftr_bits *ftrp = get_arm64_ftr_bits_kvm(sys_reg);
-> +       u64 exposed_mask = 0;
-> +
-> +       if (!ftrp)
-> +               return -ENOENT;
-> +
-> +       for (; ftrp->width; ftrp++) {
-> +               s64 ftr_val = arm64_ftr_value(ftrp, val);
-> +               s64 ftr_lim = arm64_ftr_value(ftrp, limit);
-> +
-> +               exposed_mask |= arm64_ftr_mask(ftrp);
-> +
-> +               if (ftr_val == ftr_lim)
-> +                       continue;
-> +
-> +               if (ftr_val != arm64_ftr_safe_value(ftrp, ftr_val, ftr_lim))
-> +                       return -E2BIG;
-> +       }
-> +
-> +       /* Make sure that no unrecognized fields are set in @val. */
-> +       if (val & ~exposed_mask)
-> +               return -E2BIG;
-> +
-> +       return 0;
-> +}
-> +#endif /* CONFIG_KVM */
-> --
-> 2.34.1.448.ga2b2bfdf31-goog
->
+SGksIEFsZXgsDQoNClRoYW5rcyBmb3IgY2xlYW5pbmcgdXAgdGhpcyBwYXJ0LCB3aGljaCBpcyB2
+ZXJ5IGhlbHBmdWwhIA0KDQo+IEZyb206IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29u
+QHJlZGhhdC5jb20+DQo+IFNlbnQ6IEZyaWRheSwgRGVjZW1iZXIgMTAsIDIwMjEgNzozNCBBTQ0K
+PiANCj4gKyAqDQo+ICsgKiAgIFRoZSBkZXZpY2Vfc3RhdGUgZmllbGQgZGVmaW5lcyB0aGUgZm9s
+bG93aW5nIGJpdGZpZWxkIHVzZToNCj4gKyAqDQo+ICsgKiAgICAgLSBCaXQgMCAoUlVOTklORykg
+W1JFUVVJUkVEXToNCj4gKyAqICAgICAgICAtIFNldHRpbmcgdGhpcyBiaXQgaW5kaWNhdGVzIHRo
+ZSBkZXZpY2UgaXMgZnVsbHkgb3BlcmF0aW9uYWwsIHRoZQ0KPiArICogICAgICAgICAgZGV2aWNl
+IG1heSBnZW5lcmF0ZSBpbnRlcnJ1cHRzLCBETUEsIHJlc3BvbmQgdG8gTU1JTywgYWxsIHZmaW8N
+Cj4gKyAqICAgICAgICAgIGRldmljZSByZWdpb25zIGFyZSBmdW5jdGlvbmFsLCBhbmQgdGhlIGRl
+dmljZSBtYXkgYWR2YW5jZSBpdHMNCj4gKyAqICAgICAgICAgIGludGVybmFsIHN0YXRlLiAgVGhl
+IGRlZmF1bHQgZGV2aWNlX3N0YXRlIG11c3QgaW5kaWNhdGUgdGhlIGRldmljZQ0KPiArICogICAg
+ICAgICAgaW4gZXhjbHVzaXZlbHkgdGhlIFJVTk5JTkcgc3RhdGUsIHdpdGggbm8gb3RoZXIgYml0
+cyBpbiB0aGlzIGZpZWxkDQo+ICsgKiAgICAgICAgICBzZXQuDQo+ICsgKiAgICAgICAgLSBDbGVh
+cmluZyB0aGlzIGJpdCAoaWUuICFSVU5OSU5HKSBtdXN0IHN0b3AgdGhlIG9wZXJhdGlvbiBvZiB0
+aGUNCj4gKyAqICAgICAgICAgIGRldmljZS4gIFRoZSBkZXZpY2UgbXVzdCBub3QgZ2VuZXJhdGUg
+aW50ZXJydXB0cywgRE1BLCBvciBhZHZhbmNlDQo+ICsgKiAgICAgICAgICBpdHMgaW50ZXJuYWwg
+c3RhdGUuIA0KDQpJJ20gY3VyaW91cyBhYm91dCB3aGF0IGl0IG1lYW5zIGZvciB0aGUgbWVkaWF0
+ZWQgZGV2aWNlLiBJIHN1cHBvc2UgdGhpcyANCidtdXN0IG5vdCcgY2xhdXNlIGlzIGZyb20gdXNl
+ciBwLm8udiBpLmUuIG5vIGV2ZW50IGRlbGl2ZXJlZCB0byB0aGUgdXNlciwgDQpubyBETUEgdG8g
+dXNlciBtZW1vcnkgYW5kIG5vIHVzZXIgdmlzaWJsZSBjaGFuZ2Ugb24gbWRldiBzdGF0ZS4gUGh5
+c2ljYWxseSANCnRoZSBkZXZpY2UgcmVzb3VyY2UgYmFja2luZyB0aGUgbWRldiBtYXkgc3RpbGwg
+Z2VuZXJhdGUgaW50ZXJydXB0L0RNQSANCnRvIHRoZSBob3N0IGFjY29yZGluZyB0byB0aGUgbWVk
+aWF0aW9uIHBvbGljeS4NCg0KSXMgdGhpcyB1bmRlcnN0YW5kaW5nIGNvcnJlY3Q/DQoNCj4gKyog
+ICAgICAgICAgIFRoZSB1c2VyIHNob3VsZCB0YWtlIHN0ZXBzIHRvIHJlc3RyaWN0IGFjY2Vzcw0K
+PiArICogICAgICAgICAgdG8gdmZpbyBkZXZpY2UgcmVnaW9ucyBvdGhlciB0aGFuIHRoZSBtaWdy
+YXRpb24gcmVnaW9uIHdoaWxlIHRoZQ0KPiArICogICAgICAgICAgZGV2aWNlIGlzICFSVU5OSU5H
+IG9yIHJpc2sgY29ycnVwdGlvbiBvZiB0aGUgZGV2aWNlIG1pZ3JhdGlvbiBkYXRhDQo+ICsgKiAg
+ICAgICAgICBzdHJlYW0uICBUaGUgZGV2aWNlIGFuZCBrZXJuZWwgbWlncmF0aW9uIGRyaXZlciBt
+dXN0IGFjY2VwdCBhbmQNCj4gKyAqICAgICAgICAgIHJlc3BvbmQgdG8gaW50ZXJhY3Rpb24gdG8g
+c3VwcG9ydCBleHRlcm5hbCBzdWJzeXN0ZW1zIGluIHRoZQ0KPiArICogICAgICAgICAgIVJVTk5J
+Tkcgc3RhdGUsIGZvciBleGFtcGxlIFBDSSBNU0ktWCBhbmQgUENJIGNvbmZpZyBzcGFjZS4NCg0K
+YW5kIGFsc28gcmVzcG9uZCB0byBtbWlvIGFjY2VzcyBpZiBzb21lIHN0YXRlIGlzIHNhdmVkIHZp
+YSByZWFkaW5nIG1taW8/DQoNCj4gKyAqICAgICAgICAgIEZhaWx1cmUgYnkgdGhlIHVzZXIgdG8g
+cmVzdHJpY3QgZGV2aWNlIGFjY2VzcyB3aGlsZSAhUlVOTklORyBtdXN0DQo+ICsgKiAgICAgICAg
+ICBub3QgcmVzdWx0IGluIGVycm9yIGNvbmRpdGlvbnMgb3V0c2lkZSB0aGUgdXNlciBjb250ZXh0
+IChleC4NCj4gKyAqICAgICAgICAgIGhvc3Qgc3lzdGVtIGZhdWx0cykuDQo+ICsgKiAgICAgLSBC
+aXQgMSAoU0FWSU5HKSBbUkVRVUlSRURdOg0KPiArICogICAgICAgIC0gU2V0dGluZyB0aGlzIGJp
+dCBlbmFibGVzIGFuZCBpbml0aWFsaXplcyB0aGUgbWlncmF0aW9uIHJlZ2lvbiBkYXRhDQo+ICsg
+KiAgICAgICAgICB3aW5kb3cgYW5kIGFzc29jaWF0ZWQgZmllbGRzIHdpdGhpbiB2ZmlvX2Rldmlj
+ZV9taWdyYXRpb25faW5mbyBmb3INCj4gKyAqICAgICAgICAgIGNhcHR1cmluZyB0aGUgbWlncmF0
+aW9uIGRhdGEgc3RyZWFtIGZvciB0aGUgZGV2aWNlLiAgVGhlIG1pZ3JhdGlvbg0KPiArICogICAg
+ICAgICAgZHJpdmVyIG1heSBwZXJmb3JtIGFjdGlvbnMgc3VjaCBhcyBlbmFibGluZyBkaXJ0eSBs
+b2dnaW5nIG9mIGRldmljZQ0KPiArICogICAgICAgICAgc3RhdGUgd2l0aCB0aGlzIGJpdC4gIFRo
+ZSBTQVZJTkcgYml0IGlzIG11dHVhbGx5IGV4Y2x1c2l2ZSB3aXRoIHRoZQ0KPiArICogICAgICAg
+ICAgUkVTVU1JTkcgYml0IGRlZmluZWQgYmVsb3cuDQo+ICsgKiAgICAgICAgLSBDbGVhcmluZyB0
+aGlzIGJpdCAoaWUuICFTQVZJTkcpIGRlLWluaXRpYWxpemVzIHRoZSBtaWdyYXRpb24gcmVnaW9u
+DQo+ICsgKiAgICAgICAgICBkYXRhIHdpbmRvdyBhbmQgaW5kaWNhdGVzIHRoZSBjb21wbGV0aW9u
+IG9yIHRlcm1pbmF0aW9uIG9mIHRoZQ0KPiArICogICAgICAgICAgbWlncmF0aW9uIGRhdGEgc3Ry
+ZWFtIGZvciB0aGUgZGV2aWNlLg0KPiArICogICAgIC0gQml0IDIgKFJFU1VNSU5HKSBbUkVRVUlS
+RURdOg0KPiArICogICAgICAgIC0gU2V0dGluZyB0aGlzIGJpdCBlbmFibGVzIGFuZCBpbml0aWFs
+aXplcyB0aGUgbWlncmF0aW9uIHJlZ2lvbiBkYXRhDQo+ICsgKiAgICAgICAgICB3aW5kb3cgYW5k
+IGFzc29jaWF0ZWQgZmllbGRzIHdpdGhpbiB2ZmlvX2RldmljZV9taWdyYXRpb25faW5mbyBmb3IN
+Cj4gKyAqICAgICAgICAgIHJlc3RvcmluZyB0aGUgZGV2aWNlIGZyb20gYSBtaWdyYXRpb24gZGF0
+YSBzdHJlYW0gY2FwdHVyZWQgZnJvbSBhDQo+ICsgKiAgICAgICAgICBTQVZJTkcgc2Vzc2lvbiB3
+aXRoIGEgY29tcGF0aWJsZSBkZXZpY2UuICBUaGUgbWlncmF0aW9uIGRyaXZlciBtYXkNCj4gKyAq
+ICAgICAgICAgIHBlcmZvcm0gaW50ZXJuYWwgZGV2aWNlIHJlc2V0cyBhcyBuZWNlc3NhcnkgdG8g
+cmVpbml0aWFsaXplIHRoZQ0KPiArICogICAgICAgICAgaW50ZXJuYWwgZGV2aWNlIHN0YXRlIGZv
+ciB0aGUgaW5jb21pbmcgbWlncmF0aW9uIGRhdGEuDQo+ICsgKiAgICAgICAgLSBDbGVhcmluZyB0
+aGlzIGJpdCAoaWUuICFSRVNVTUlORykgZGUtaW5pdGlhbGl6ZXMgdGhlIG1pZ3JhdGlvbg0KPiAr
+ICogICAgICAgICAgcmVnaW9uIGRhdGEgd2luZG93IGFuZCBpbmRpY2F0ZXMgdGhlIGVuZCBvZiBh
+IHJlc3VtaW5nIHNlc3Npb24gZm9yDQo+ICsgKiAgICAgICAgICB0aGUgZGV2aWNlLiAgVGhlIGtl
+cm5lbCBtaWdyYXRpb24gZHJpdmVyIHNob3VsZCBjb21wbGV0ZSB0aGUNCj4gKyAqICAgICAgICAg
+IGluY29ycG9yYXRpb24gb2YgZGF0YSB3cml0dGVuIHRvIHRoZSBtaWdyYXRpb24gZGF0YSB3aW5k
+b3cgaW50byB0aGUNCj4gKyAqICAgICAgICAgIGRldmljZSBpbnRlcm5hbCBzdGF0ZSBhbmQgcGVy
+Zm9ybSBmaW5hbCB2YWxpZGl0eSBhbmQgY29uc2lzdGVuY3kNCj4gKyAqICAgICAgICAgIGNoZWNr
+aW5nIG9mIHRoZSBuZXcgZGV2aWNlIHN0YXRlLiAgSWYgdGhlIHVzZXIgcHJvdmlkZWQgZGF0YSBp
+cw0KPiArICogICAgICAgICAgZm91bmQgdG8gYmUgaW5jb21wbGV0ZSwgaW5jb25zaXN0ZW50LCBv
+ciBvdGhlcndpc2UgaW52YWxpZCwgdGhlDQo+ICsgKiAgICAgICAgICBtaWdyYXRpb24gZHJpdmVy
+IG11c3QgaW5kaWNhdGUgYSB3cml0ZSgyKSBlcnJvciBhbmQgZm9sbG93IHRoZQ0KPiArICogICAg
+ICAgICAgcHJldmlvdXNseSBkZXNjcmliZWQgcHJvdG9jb2wgdG8gcmV0dXJuIGVpdGhlciB0aGUg
+cHJldmlvdXMgc3RhdGUNCj4gKyAqICAgICAgICAgIG9yIGFuIGVycm9yIHN0YXRlLg0KPiArICog
+ICAgIC0gQml0IDMgKE5ETUEpIFtPUFRJT05BTF06DQo+ICsgKiAgICAgICAgVGhlIE5ETUEgb3Ig
+Ik5vIERNQSIgc3RhdGUgaXMgaW50ZW5kZWQgdG8gYmUgYSBxdWllc2NlbnQgc3RhdGUgZm9yDQo+
+ICsgKiAgICAgICAgdGhlIGRldmljZSBmb3IgdGhlIHB1cnBvc2VzIG9mIG1hbmFnaW5nIG11bHRp
+cGxlIGRldmljZXMgd2l0aGluIGENCj4gKyAqICAgICAgICB1c2VyIGNvbnRleHQgd2hlcmUgcGVl
+ci10by1wZWVyIERNQSBiZXR3ZWVuIGRldmljZXMgbWF5IGJlIGFjdGl2ZS4NCg0KQXMgZGlzY3Vz
+c2VkIHdpdGggSmFzb24gaW4gYW5vdGhlciB0aHJlYWQsIHRoaXMgaXMgYWxzbyByZXF1aXJlZCBm
+b3IgdlBSSQ0Kd2hlbiBzdG9wcGluZyBETUEgaW52b2x2ZXMgY29tcGxldGluZyAoaW5zdGVhZCBv
+ZiBwcmVlbXB0aW5nKSBpbi1mbHkNCnJlcXVlc3RzIHRoZW4gYW55IHZQUkkgZm9yIHRob3NlIHJl
+cXVlc3RzIG11c3QgYmUgY29tcGxldGVkIHdoZW4gdmNwdSANCmlzIHJ1bm5pbmcuIFRoaXMgY2Fu
+bm90IGJlIGRvbmUgaW4gIVJVTk5JTkcgd2hpY2ggaXMgdHlwaWNhbGx5IHRyYW5zaXRpb25lZCAN
+CnRvIGFmdGVyIHN0b3BwaW5nIHZjcHUuDQoNCkl0IGlzIGFsc28gdXNlZnVsIHdoZW4gdGhlIHRp
+bWUgb2Ygc3RvcHBpbmcgZGV2aWNlIERNQSBpcyB1bmJvdW5kIChldmVuDQp3aXRob3V0IHZQUkkp
+LiBIYXZpbmcgYSBmYWlsdXJlIHBhdGggd2hlbiB2Y3B1IGlzIHJ1bm5pbmcgYXZvaWRzIGJyZWFr
+aW5nIA0KU0xBIChpZiBvbmx5IGNhcHR1cmluZyBpdCBhZnRlciBzdG9wcGluZyB2Y3B1KS4gVGhp
+cyBmdXJ0aGVyIHJlcXVpcmVzIGNlcnRhaW4NCmludGVyZmFjZSBmb3IgdGhlIHVzZXIgdG8gc3Bl
+Y2lmeSBhIHRpbWVvdXQgdmFsdWUgZm9yIGVudGVyaW5nIE5ETUEsIHRob3VnaA0KdW5jbGVhciB0
+byBtZSB3aGF0IGl0IHdpbGwgYmUgbm93Lg0KDQo+ICsgKiAgICAgICAgU3VwcG9ydCBmb3IgdGhl
+IE5ETUEgYml0IGlzIGluZGljYXRlZCB0aHJvdWdoIHRoZSBwcmVzZW5jZSBvZiB0aGUNCj4gKyAq
+ICAgICAgICBWRklPX1JFR0lPTl9JTkZPX0NBUF9NSUdfTkRNQSBjYXBhYmlsaXR5IGFzIHJlcG9y
+dGVkIGJ5DQo+ICsgKiAgICAgICAgVkZJT19ERVZJQ0VfR0VUX1JFR0lPTl9JTkZPIGZvciB0aGUg
+YXNzb2NpYXRlZCBkZXZpY2UgbWlncmF0aW9uDQo+ICsgKiAgICAgICAgcmVnaW9uLg0KPiArICog
+ICAgICAgIC0gU2V0dGluZyB0aGlzIGJpdCBtdXN0IHByZXZlbnQgdGhlIGRldmljZSBmcm9tIGlu
+aXRpYXRpbmcgYW55DQo+ICsgKiAgICAgICAgICBuZXcgRE1BIG9yIGludGVycnVwdCB0cmFuc2Fj
+dGlvbnMuICBUaGUgbWlncmF0aW9uIGRyaXZlciBtdXN0DQoNCldoeSBhbHNvIGRpc2FibGluZyBp
+bnRlcnJ1cHQ/IHZjcHUgaXMgc3RpbGwgcnVubmluZyBhdCB0aGlzIHBvaW50IHRodXMgaW50ZXJy
+dXB0DQpjb3VsZCBiZSB0cmlnZ2VyZWQgZm9yIG1hbnkgcmVhc29ucyBvdGhlciB0aGFuIERNQS4u
+Lg0KDQo+ICsgKiAgICAgICAgICBjb21wbGV0ZSBhbnkgc3VjaCBvdXRzdGFuZGluZyBvcGVyYXRp
+b25zIHByaW9yIHRvIGNvbXBsZXRpbmcNCj4gKyAqICAgICAgICAgIHRoZSB0cmFuc2l0aW9uIHRv
+IHRoZSBORE1BIHN0YXRlLiAgVGhlIE5ETUEgZGV2aWNlX3N0YXRlDQo+ICsgKiAgICAgICAgICBl
+c3NlbnRpYWxseSByZXByZXNlbnRzIGEgc3ViLXNldCBvZiB0aGUgIVJVTk5JTkcgc3RhdGUgZm9y
+IHRoZQ0KPiArICogICAgICAgICAgcHVycG9zZSBvZiBxdWllc2NpbmcgdGhlIGRldmljZSwgdGhl
+cmVmb3JlIHRoZSBORE1BIGRldmljZV9zdGF0ZQ0KPiArICogICAgICAgICAgYml0IGlzIHN1cGVy
+Zmx1b3VzIGluIGNvbWJpbmF0aW9ucyBpbmNsdWRpbmcgIVJVTk5JTkcuDQoNCidzdXBlcmZsdW91
+cycgbWVhbnMgZG9pbmcgc28gd2lsbCBnZXQgYSBmYWlsdXJlLCBvciBqdXN0IG5vdCByZWNvbW1l
+bmRlZD8NCg0KPiArICogICAgICAgIC0gQ2xlYXJpbmcgdGhpcyBiaXQgKGllLiAhTkRNQSkgbmVn
+YXRlcyB0aGUgZGV2aWNlIG9wZXJhdGlvbmFsDQo+ICsgKiAgICAgICAgICByZXN0cmljdGlvbnMg
+cmVxdWlyZWQgYnkgdGhlIE5ETUEgc3RhdGUuDQo+ICsgKiAgICAgLSBCaXRzIFszMTo0XToNCj4g
+KyAqICAgICAgICBSZXNlcnZlZCBmb3IgZnV0dXJlIHVzZSwgdXNlcnMgc2hvdWxkIHVzZSByZWFk
+LW1vZGlmeS13cml0ZQ0KPiArICogICAgICAgIG9wZXJhdGlvbnMgdG8gdGhlIGRldmljZV9zdGF0
+ZSBmaWVsZCBmb3IgbWFuaXB1bGF0aW9uIG9mIHRoZSBhYm92ZQ0KPiArICogICAgICAgIGRlZmlu
+ZWQgYml0cyBmb3Igb3B0aW1hbCBjb21wYXRpYmlsaXR5Lg0KPiArICoNCg0KVGhhbmtzDQpLZXZp
+bg0K
