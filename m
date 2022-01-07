@@ -2,99 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFA09487EA2
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 22:55:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F935487F38
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 00:11:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiAGVz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 16:55:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60808 "EHLO
+        id S231346AbiAGXJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 18:09:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbiAGVz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 16:55:27 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E1BC061574
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 13:55:27 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id oa15so5332463pjb.4
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 13:55:27 -0800 (PST)
+        with ESMTP id S230496AbiAGXJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 18:09:21 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79D6C06173E
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 15:09:21 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id s1so6870462pga.5
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 15:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ZIAHdwN6aVuhOtNHtulMsqMxfzts5FiRx/1oW6foGcg=;
-        b=aswxzkyYIemRGYNZbxtTJ+II2Ws+FGFNEglp6DjMh2vndMV6NotrX33V8p8HsjEb8M
-         RQYGxnkJNaeGR8YU6j503IWqHsja6wnCcuXVj6zlOiYpjbc3IYfgUTZTysdSNpJa4Qra
-         kuhohAKUJh6SxrmAKTlJzJP8sjBg5ofa0KT6Le2bpRimyB5uBn6/gIrYPSS9g99dX9TB
-         OCQAn29FymDJQG3JQKdZeYdVYZNfLNUzx0Nz0Pa2sGokzcyUwvzQHJxEHRLXfsSa/Mq7
-         zBfrIbDhTaetR6T3FtjeBdIdAqDFBGKKY8R+IdDkbD9k4ym43ust2SbTlRYidKQLCHiC
-         txQw==
+        bh=qHllN4kbwo4ufYEtJroZvaPo8Ljk02uIK7K+t+FgJRE=;
+        b=clxQZ9/ftSN9Vg09HHNPgNxsc3gPmDUeH96HuZnP9bVy/K3lNNKB0FSAY+y+NnH/ls
+         llJ8ym3M7uTyclFeuMpU2Me8bq8oK/6UHYeCvsYppqYFD+WARZ3FFYb8OAR79LenuP32
+         209ruO+EokmLNmPBtT3AxH/JhPL7IEGTYUpP8X5buH+NFTqRq3QIxDw4xhkxSzaxCzIY
+         /LjgTG+p2A5gYANiEX0T/7bslhjYorhRn27YidxdToHKUYDga8kOXYOPd0Euf6FUHFRW
+         pdnfbhgMpsMmOjzDHVWsj+0+FjyF0wILDRcHiKFFQQZTEA/w2mcxJue3EOEU0yogKkhM
+         zERQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ZIAHdwN6aVuhOtNHtulMsqMxfzts5FiRx/1oW6foGcg=;
-        b=Nv3fiul6KI8K74SOzAEFFxSs1oOU4MXK6ajUWR/+2R2bQajKy2xws5lbSATpgLHEXu
-         knttDGEXTSMwhNkHL9hZHAeKn/LveKtRoHEu2igALntv96YrLEegVQc9I6WFNoV2Wr4s
-         lMVCVgKbB3tZCq2mOnlwK5LZnaHAV8/dKgrqYafFmSYM7Z8kWXcIWaN5OatvCeVI0+jP
-         kJgF3KRPl62d4jwp7z8+IQXcQYdCGLVFlX4mvJ+bS5TTEfySP9gj7DCsDMefog5XwBgH
-         BFGtUku+r5dQ9klxg56oGrC+BPBsxnEzvZTk5xA/SVrGHUVyamRyxkyX83Yi4Tv6adqV
-         hp6Q==
-X-Gm-Message-State: AOAM531ZZFsh2W99phUwoEU3MKGNhDfrZMwBHBIwQ6FfYC81nFaQdsyP
-        bn21MOIcIAuqBRz7gnYznIOuaQ==
-X-Google-Smtp-Source: ABdhPJylOgzDMrNkOFKlWvyX1TMN5P422vGLLdTiI0AjjEP8pJEFnTB0KsqT/0zut59WAfg6EktFtA==
-X-Received: by 2002:a17:90b:3a92:: with SMTP id om18mr17534522pjb.159.1641592526237;
-        Fri, 07 Jan 2022 13:55:26 -0800 (PST)
+        bh=qHllN4kbwo4ufYEtJroZvaPo8Ljk02uIK7K+t+FgJRE=;
+        b=1Hs/GzMR8zu/n3q+Q6hlN45uC5sSuUtDv8IoHY0pR9M0lZpb51nbDoAkgAMQkQud4q
+         omITOBp3xey3NCxiJaF1moU335lF5GSC3ksNBzdvjCBhijcd0OuyRe33S+5ewB4Srney
+         8vc9oi5gi19r+wF313w9kW/QZn3hXf2QOrAdb0EsG4MK5ZdAqfWZecW51hIfHIVhoYs7
+         ZAjFq81oohaORUKbIut0ouPcw2C4/Ocbgyn+XlDxMxA6IKRAaK7Z8GIBzj7yYmq5kf1L
+         ftzSkT7JpJmTu4LfDn66F+Ey7RSgJrj0AbpLSioxmZH7+X2DDlCAE2nQUD044qBPQo6H
+         QJeA==
+X-Gm-Message-State: AOAM531VBdCXvfFc2hAbUrhgSzMjpyuGqqzci2tJbWyYQvY4EautcpDS
+        h6lgt2oQyObFuABnyh6sZEdFRw==
+X-Google-Smtp-Source: ABdhPJyt7KDmdYwRa0yzfNvIJHbHrYXII036Dt2obZiD43vzHxUYpQN2oxvsCMZIkl0YL3nuC8wDYQ==
+X-Received: by 2002:a63:af16:: with SMTP id w22mr57593728pge.560.1641596960987;
+        Fri, 07 Jan 2022 15:09:20 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id my5sm7564027pjb.5.2022.01.07.13.55.25
+        by smtp.gmail.com with ESMTPSA id p186sm8622pfp.128.2022.01.07.15.09.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 13:55:25 -0800 (PST)
-Date:   Fri, 7 Jan 2022 21:55:21 +0000
+        Fri, 07 Jan 2022 15:09:20 -0800 (PST)
+Date:   Fri, 7 Jan 2022 23:09:17 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vihas Mak <makvihas@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: x86: move the can_unsync and prefetch checks
- outside of the loop
-Message-ID: <Ydi2yTVpPGR9Qb+F@google.com>
-References: <20220107082554.32897-1-makvihas@gmail.com>
- <8886415d-f02d-7451-fa8d-4df340182dbc@redhat.com>
- <CAH1kMwSNhQMVLany4u+1tOZpa3KFr93OcwJGhnWN66gKWimaZA@mail.gmail.com>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/5] KVM: nVMX: Rename vmcs_to_field_offset{,_table}
+Message-ID: <YdjIHQXtRilU2Hm7@google.com>
+References: <20220107102859.1471362-1-vkuznets@redhat.com>
+ <20220107102859.1471362-4-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAH1kMwSNhQMVLany4u+1tOZpa3KFr93OcwJGhnWN66gKWimaZA@mail.gmail.com>
+In-Reply-To: <20220107102859.1471362-4-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 08, 2022, Vihas Mak wrote:
-> On Fri, Jan 07, 2022, Sean Christopherson wrote:
-> >> NAK, this change is functionally wrong.  The checks are inside the loop because
-> >> the flow fails if and only if there is at least one indirect, valid shadow pages
-> >> at the target gfn.  The @prefetch check is even more restrictive as it bails if
-> >> there is at least one indirect, valid, synchronized shadow page.
-> >> The can_unsync check could be "optimized" to
-> >>
-> >>       if (!can_unsync && kvm_gfn_has_indirect_valid_sp())
-> >>
-> >> but identifying whether or not there's a valid SP requires walking the list of
-> >> shadow pages for the gfn, so it's simpler to just handle the check in the loop.
-> >> And "optimized" in quotes because both checks will be well-predicted single-uop
-> >> macrofused TEST+Jcc on modern CPUs, whereas walking the list twice would be
-> >> relatively expensive if there are shadow pages for the gfn.
+On Fri, Jan 07, 2022, Vitaly Kuznetsov wrote:
+> vmcs_to_field_offset{,_table} may sound misleading as VMCS is an opaque
+> blob which is not supposed to be accessed directly. In fact,
+> vmcs_to_field_offset{,_table} are related to KVM defined VMCS12 structure.
 > 
+> Rename vmcs_field_to_offset() to get_vmcs12_field_offset() for clarity.
 > 
-> So this change isn't safe. I will look into the optimization suggested
-> by Sean. Sorry for this patch.
+> No functional change intended.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
-Heh, I wasn't actually suggesting we do the "optimization".  I was pointing out
-what the code would look like _if_ we wanted to move the checks out of the loop,
-but I do not actually think we should make any changes, quite the opposite.  The
-theoretical worst case if there no indirect valid SPs, but lots of direct and/or
-invalid SPs is far worse than burning a few uops per loop.
-
-The compiler is smart enough to handle the checks out of line, and I'm sure there
-are other optimizations being made as well.  In other words, odds are very good
-that trying to optimize the code will do more harm than good.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
