@@ -2,120 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AFF1487C1D
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 19:21:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C36D487C10
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 19:18:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241055AbiAGSVd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 13:21:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33730 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240915AbiAGSVX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 13:21:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641579681;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y6HZu8WA2ydj4C6Y+yks4Ifx8Vim2n8c4t7+gsJ4hSQ=;
-        b=MlLommlk4W2f6ZpdG/2V/bj62CMI1NgA14JWcScYYg6PWXhXcwnymLeTG1CAoQVBKIOpLq
-        oQzSy8Lc72fRI/FXnraxIO+uDw+fCNQGCnOwallnVAzPu4SOkDaLj0eg0ZpcprBcQZKwY4
-        VGBImDTLuR6dq6yACaAnvLGeVmnT/hY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-463-hbKk_O2iPwOh_jZv8yOcgg-1; Fri, 07 Jan 2022 13:18:10 -0500
-X-MC-Unique: hbKk_O2iPwOh_jZv8yOcgg-1
-Received: by mail-ed1-f69.google.com with SMTP id m8-20020a056402510800b003f9d22c4d48so5294878edd.21
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 10:18:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=y6HZu8WA2ydj4C6Y+yks4Ifx8Vim2n8c4t7+gsJ4hSQ=;
-        b=PCqZ2GaIDOC2s0LlH7+nsCePia73TQdaOIrhceQkrE0MHJki6m1OF8E8CgezwrTTl2
-         kt5TnntfOCIKFtmfEBvTS78o76+xixg+DH2AOIILjRdUehvivjEntilTgNO8MCjjwdBF
-         DvaIaadA4LBGLCDOK2kiploCZAyGX5FQp+PNGuTC/M3Db7UkH9jJh29q1XsW7hztuQBp
-         xtNWMvM/RElzjDkL/iMUSdxuj78V927eOA9TDJuGVjX88JPpiexVPw0aXzkqgYu0GdKF
-         xfKa1/+DMfBM5qBzanCrrpr5lMXvtEj+LUv5EgYN2TgtfdfYCUJW2anjZqvWyDrVVc6V
-         bYeg==
-X-Gm-Message-State: AOAM5328jBtHfwYKWpGSgquMlKGYJXVO/7zTW2ctXJviujDQc74t7FQ/
-        GP68NtmAKEV2dwvS1PjTDGJMvG3+xnzHlSZyRQJywT17aP0oPH3tu0iHQBua+r0QGJ8HeNar/YR
-        JmYHw5dfmMRW+
-X-Received: by 2002:a17:906:70b:: with SMTP id y11mr2268929ejb.364.1641579489096;
-        Fri, 07 Jan 2022 10:18:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyDYZ4ZBWSaGG8/mC9MAYNxHC55ystbMPGoIQqQuf/pU64IeQg+E8G2TfiSfXyqRSl3ZUx0ag==
-X-Received: by 2002:a17:906:70b:: with SMTP id y11mr2268920ejb.364.1641579488887;
-        Fri, 07 Jan 2022 10:18:08 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id e18sm2229374edq.77.2022.01.07.10.18.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jan 2022 10:18:08 -0800 (PST)
-Message-ID: <88aad2b3-8f60-fda4-15fb-81ea712c1dae@redhat.com>
-Date:   Fri, 7 Jan 2022 19:18:07 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86/pt: Do not advertise Intel PT Event Trace
- capability
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220106085533.84356-1-likexu@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220106085533.84356-1-likexu@tencent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S1348839AbiAGSSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 13:18:36 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:35450 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240559AbiAGSS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 13:18:28 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6029361F8C
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 18:18:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8318C36AE9;
+        Fri,  7 Jan 2022 18:18:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641579507;
+        bh=cAh/1ukCeNr4ljylsYNoFGLIbakq3LEf6JKqjDyyNVk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=N6GNW9TipkwfsVP0anEBua8YoApQratKn//cWadkH6KX41NT88vBgMoiNSJZelYE3
+         z7zxuaPWZJu8LTvbxPrTQKHw5JLYkJy4ujEHhxPFQGPw8H3V8H70tfp/mxnn+K+KKr
+         TcRdGwbrridGXBVR4BlJ5l4FFHzwE0tvGxSLNsFhkojbNfVcTNgDoSWe0Nd4yiZS2+
+         mzBaneUvhUR+H23i2BzuUmeN6TaLwcbs785Pb9BlPGFLw8oCTS+bkH0gFgOiwqaa14
+         L7fe3vTjvUusnNQVj5o2KABlrPZ+IVbG5recQhB6aJxevugYnbRFw9yWaFdcus+6OT
+         WWf8m4PMLA9xw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n5ton-00GcuU-LF; Fri, 07 Jan 2022 18:18:25 +0000
+Date:   Fri, 07 Jan 2022 18:18:25 +0000
+Message-ID: <87y23rtnny.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v3 3/5] hw/arm/virt: Honor highmem setting when computing the memory map
+In-Reply-To: <d330de15-b452-1f9c-14fa-906b88a8b4c4@redhat.com>
+References: <20211227211642.994461-1-maz@kernel.org>
+        <20211227211642.994461-4-maz@kernel.org>
+        <ef8b3500-04ab-5434-6a04-0e8b1dcc65d1@redhat.com>
+        <871r1kzhbp.wl-maz@kernel.org>
+        <d330de15-b452-1f9c-14fa-906b88a8b4c4@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org, drjones@redhat.com, peter.maydell@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/22 09:55, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> The Inte PT Event Trace capability (Intel SDM Vol3, 32.2.4 Event Tracing)
-> is a new CPU feature that "exposes details about the asynchronous events,
-> when they are generated, and when their corresponding software event
-> handler completes execution".
-> 
-> It is not possible for KVM to emulate all events including interrupts,
-> VM exits, VM entries, INIT, SIPI events and etc. for guests and to
-> emulate the simultaneous writing of Control Flow Events and Event Data
-> packets generated by the KVM to the guest PT buffer.
-> 
-> For KVM, it is best not to advertise the Event Trace feature and just
-> let it be a system-wide-only tracing capability.
-> 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
-> Off topic, other new PT features such as "PSB and PMI Preservation Supported"
-> and "TNT disable" are under investigation or awaiting host support to move on.
+Hi Eric,
 
-Yeah, I think it's better to be safe and ignore _all_ unknown capabilities.
-
-Paolo
-
->   arch/x86/kvm/cpuid.c | 2 ++
->   1 file changed, 2 insertions(+)
+On Fri, 07 Jan 2022 17:15:19 +0000,
+Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0b920e12bb6d..1028c57377e9 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -901,6 +901,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   			break;
->   		}
->   
-> +		/* Not advertise Event Trace capability due to endless emulation */
-> +		entry->ebx &= ~BIT(7);
->   		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
->   			if (!do_host_cpuid(array, function, i))
->   				goto out;
+> Hi Marc,
+> 
+> On 1/6/22 10:26 PM, Marc Zyngier wrote:
+> > On Wed, 05 Jan 2022 09:22:39 +0000,
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >> Hi Marc,
+> >>
+> >> On 12/27/21 10:16 PM, Marc Zyngier wrote:
+> >>> Even when the VM is configured with highmem=off, the highest_gpa
+> >>> field includes devices that are above the 4GiB limit.
+> >>> Similarily, nothing seem to check that the memory is within
+> >>> the limit set by the highmem=off option.
+> >>>
+> >>> This leads to failures in virt_kvm_type() on systems that have
+> >>> a crippled IPA range, as the reported IPA space is larger than
+> >>> what it should be.
+> >>>
+> >>> Instead, honor the user-specified limit to only use the devices
+> >>> at the lowest end of the spectrum, and fail if we have memory
+> >>> crossing the 4GiB limit.
+> >>>
+> >>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> ---
+> >>>  hw/arm/virt.c | 9 ++++++++-
+> >>>  1 file changed, 8 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >>> index 8b600d82c1..84dd3b36fb 100644
+> >>> --- a/hw/arm/virt.c
+> >>> +++ b/hw/arm/virt.c
+> >>> @@ -1678,6 +1678,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >>>          exit(EXIT_FAILURE);
+> >>>      }
+> >>>  
+> >>> +    if (!vms->highmem &&
+> >>> +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
+> >>> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> >>> +        exit(EXIT_FAILURE);
+> >> The memory is composed of initial memory and device memory.
+> >> device memory is put after the initial memory but has a 1GB alignment
+> >> On top of that you have 1G page alignment per device memory slot
+> >>
+> >> so potentially the highest mem address is larger than
+> >> vms->memmap[VIRT_MEM].base + ms->maxram_size.
+> >> I would rather do the check on device_memory_base + device_memory_size
+> > Yup, that's a good point.
+> >
+> > There is also a corner case in one of the later patches where I check
+> > this limit against the PA using the rounded-up device_memory_size.
+> > This could result in returning an error if the last memory slot would
+> > still fit in the PA space, but the rounded-up quantity wouldn't. I
+> > don't think it matters much, but I'll fix it anyway.
+> >
+> >>> +    }
+> >>>      /*
+> >>>       * We compute the base of the high IO region depending on the
+> >>>       * amount of initial and device memory. The device memory start/size
+> >>> @@ -1707,7 +1712,9 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >>>          vms->memmap[i].size = size;
+> >>>          base += size;
+> >>>      }
+> >>> -    vms->highest_gpa = base - 1;
+> >>> +    vms->highest_gpa = (vms->highmem ?
+> >>> +                        base :
+> >>> +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
+> >> As per the previous comment this looks wrong to me if !highmem.
+> > Agreed.
+> >
+> >> If !highmem, if RAM requirements are low we still could get benefit from
+> >> REDIST2 and HIGH ECAM which could fit within the 4GB limit. But maybe we
+> >> simply don't care?
+> > I don't see how. These devices live at a minimum of 256GB, which
+> > contradicts the very meaning of !highmem being a 4GB limit.
+> Yes I corrected the above statement afterwards, sorry for the noise.
+> >
+> >> If we don't, why don't we simply skip the extended_memmap overlay as
+> >> suggested in v2? I did not get your reply sorry.
+> > Because although this makes sense if you only care about a 32bit
+> > limit, we eventually want to check against an arbitrary PA limit and
+> > enable the individual devices that do fit in that space.
+> 
+> In my understanding that is what virt_kvm_type() was supposed to do by
+> testing the result of kvm_arm_get_max_vm_ipa_size and requested_pa_size
+> (which accounted the high regions) and exiting if they were
+> incompatible. But I must miss something.
 
+This is a chicken and egg problem: you need the IPA size to compute
+the memory map, and you need the memory map to compute the IPA
+size. Fun, isn't it?
+
+At the moment, virt_set_memmap() doesn't know about the IPA space,
+generates a highest_gpa that may not work, and we end-up failing
+because the resulting VM type is out of bound.
+
+My solution to that is to feed the *maximum* IPA size to
+virt_set_memmap(), compute the memory map there, and then use
+highest_gpa to compute the actual IPA size that is used to create the
+VM. By knowing the IPA limit in virt_set_memmap(), I'm able to keep it
+in check and avoid generating an unusable memory map.
+
+I've tried to make that clearer in my v4. Hopefully I succeeded.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
