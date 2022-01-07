@@ -2,120 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A7CD487D06
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 20:30:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42924487D38
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 20:43:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232391AbiAGTar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 14:30:47 -0500
-Received: from mx.cs.msu.ru ([188.44.42.42]:53104 "EHLO mail.cs.msu.ru"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232106AbiAGTar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 14:30:47 -0500
-X-Greylist: delayed 515 seconds by postgrey-1.27 at vger.kernel.org; Fri, 07 Jan 2022 14:30:44 EST
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cs.msu.ru;
-        s=dkim; h=Subject:In-Reply-To:Content-Type:MIME-Version:References:Message-ID
-        :Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=CAj6ZvCGsPU1I8LtRSp3RhetGGO18H0jd7c6GnJn/AI=; b=Tmtwzq882fuqOFkgczsh/hVTJV
-        vjYXVLuJSb3ebjGHUX/IMLewO/j7T7pru2BtNUWx1U0M9+uf4naJNbstc4a4hV627q9Fmvp2M8WVB
-        rrPobMbnO55k1E282B+ZDvv2xnqKt+6vi2dm/N58n2PoB9yvml12ZZi653qVVPbFvBrQ1N3Cb1Mlt
-        VpFJqmRvAKdp7QhJGXuWQmopkT9Zg4uypDmWsHhYSHIs2H59UUqr6Mb685+Z5ze6ULlPQQej9nGSV
-        Up77CfcM/pPZTa0PvLewaq5PkmdXAK939R648+o8vCCb1GgM/jYykm3sn1Pe3d2AL16FSeIumeX9/
-        Rgr2mlbw==;
-Received: from [37.204.119.143] (port=58124 helo=cello)
-        by mail.cs.msu.ru with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-        (Exim 4.94.2 (FreeBSD))
-        (envelope-from <ar@cs.msu.ru>)
-        id 1n5uvJ-00092m-Js; Fri, 07 Jan 2022 22:29:15 +0300
-Date:   Fri, 7 Jan 2022 22:29:12 +0300
-From:   Arseny Maslennikov <ar@cs.msu.ru>
-To:     Walt Drummond <walt@drummond.us>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        "Eric W. Biederman" <ebiederm@xmission.com>, aacraid@microsemi.com,
-        viro@zeniv.linux.org.uk, anna.schumaker@netapp.com, arnd@arndb.de,
-        bsegall@google.com, bp@alien8.de, chuck.lever@oracle.com,
-        bristot@redhat.com, dave.hansen@linux.intel.com,
-        dwmw2@infradead.org, dietmar.eggemann@arm.com, dinguyen@kernel.org,
-        geert@linux-m68k.org, gregkh@linuxfoundation.org, hpa@zytor.com,
-        idryomov@gmail.com, mingo@redhat.com, yzaikin@google.com,
-        ink@jurassic.park.msu.ru, jejb@linux.ibm.com, jmorris@namei.org,
-        bfields@fieldses.org, jlayton@kernel.org, jirislaby@kernel.org,
-        john.johansen@canonical.com, juri.lelli@redhat.com,
-        keescook@chromium.org, mcgrof@kernel.org,
-        martin.petersen@oracle.com, mattst88@gmail.com, mgorman@suse.de,
-        oleg@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
-        rth@twiddle.net, richard@nod.at, serge@hallyn.com,
-        rostedt@goodmis.org, tglx@linutronix.de,
-        trond.myklebust@hammerspace.com, vincent.guittot@linaro.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-m68k@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org
-Message-ID: <YdiUiHAhLyfgpvVY@cello>
-References: <20220103181956.983342-1-walt@drummond.us>
- <87iluzidod.fsf@email.froward.int.ebiederm.org>
- <YdSzjPbVDVGKT4km@mit.edu>
- <87pmp79mxl.fsf@email.froward.int.ebiederm.org>
- <YdTI16ZxFFNco7rH@mit.edu>
- <CADCN6nzT-Dw-AabtwWrfVRDd5HzMS3EOy8WkeomicJF07nQyoA@mail.gmail.com>
+        id S233219AbiAGTnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 14:43:40 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:44004 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230209AbiAGTnj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 14:43:39 -0500
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 538241EC0464;
+        Fri,  7 Jan 2022 20:43:33 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1641584613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=xT/Hp49EdTICk3VFgL8D3ISi+kG8cMrFjEZK0ltQXdI=;
+        b=b9mPYxy9efXiFExVz4Yp2WD82+Z3Dx8X3Kiye9rqZ4uUufJ4+4ZgTCaAuFBCYUHQGWrxCo
+        3l9QyG28YStnz5fmfNs8saMnE3vUp2TbWNf2oinDCWFED+7vnGViiKo7jf33L5W3yHHfo/
+        KzyOKpEV39+sf0dvpdoaKiSdIR9bivk=
+Date:   Fri, 7 Jan 2022 20:43:35 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        guang.zeng@intel.com, jing2.liu@intel.com, kevin.tian@intel.com,
+        seanjc@google.com, tglx@linutronix.de, wei.w.wang@intel.com,
+        yang.zhong@intel.com
+Subject: Re: [PATCH v6 05/21] x86/fpu: Make XFD initialization in
+ __fpstate_reset() a function argument
+Message-ID: <YdiX5y4KxQ7GY7xn@zn.tnic>
+References: <20220107185512.25321-1-pbonzini@redhat.com>
+ <20220107185512.25321-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="jM/2AY6iSqMbsk1G"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CADCN6nzT-Dw-AabtwWrfVRDd5HzMS3EOy8WkeomicJF07nQyoA@mail.gmail.com>
-OpenPGP: url=http://grep.cs.msu.ru/~ar/pgp-key.asc
-X-SA-Exim-Connect-IP: 37.204.119.143
-X-SA-Exim-Mail-From: ar@cs.msu.ru
-Subject: Re: [RFC PATCH 0/8] signals: Support more than 64 signals
-X-SA-Exim-Version: 4.2.1
-X-SA-Exim-Scanned: No (on mail.cs.msu.ru); Unknown failure
+In-Reply-To: <20220107185512.25321-6-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jan 07, 2022 at 01:54:56PM -0500, Paolo Bonzini wrote:
+> From: Jing Liu <jing2.liu@intel.com>
+> 
+> vCPU threads are different from native tasks regarding to the initial XFD
+> value. While all native tasks follow a fixed value (init_fpstate::xfd)
+> established by the FPU core at boot, vCPU threads need to obey the reset
+> value (i.e. ZERO) defined by the specification, to meet the expectation of
+> the guest.
+> 
+> Let the caller supply an argument and adjust the host and guest related
+> invocations accordingly.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 
---jM/2AY6iSqMbsk1G
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+If Jing is author, then tglx's SOB should come after Jing's to mean,
+tglx handled it further.
 
-On Tue, Jan 04, 2022 at 02:31:44PM -0800, Walt Drummond wrote:
-> The only standard tools that support SIGINFO are sleep, dd and ping,
-> (and kill, for obvious reasons) so it's not like there's a vast hole
-> in the tooling or something, nor is there a large legacy software base
-> just waiting for SIGINFO to appear.   So while I very much enjoyed
-> figuring out how to make SIGINFO work ...
+As it is now, it looks wrong.
 
-As far as I recall, GNU make on *BSD does support SIGINFO (Not a
-standard tool, but obviously an established one).
+Ditto for patches 10, 11, 12, 13.
 
-The developers of strace have expressed interest in SIGINFO support
-to print tracer status messages (unfortunately, not on a public list).
-Computational software can use this instead of stderr progress spam, if
-run in an interactive fashion on a terminal, as it frequently is. There
-is a user base, it's just not very vocal on kernel lists. :)
+Also, I wonder if all those Signed-off-by's do mean "handled" or
+Co-developed-by but I haven't tracked that particular pile so...
 
---jM/2AY6iSqMbsk1G
-Content-Type: application/pgp-signature; name="signature.asc"
+> Signed-off-by: Jing Liu <jing2.liu@intel.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Message-Id: <20220105123532.12586-6-yang.zhong@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
------BEGIN PGP SIGNATURE-----
+-- 
+Regards/Gruss,
+    Boris.
 
-iQIzBAEBCgAdFiEE56JD3UKTLEu/ddrm9dQjyAYL01AFAmHYlIMACgkQ9dQjyAYL
-01A2JA/+L9JwmjJHTVt97zLB/gp/798jHIH5xpSIqAGns8OfFkzQ95dxlpb2U9vw
-QnNRixTQzfe+GISVL0FKMOQnAodV/FiSCGQU3ebudcPQXtrGtYHUT8Ijz9WL8+pR
-LEbZvDDW4JT2N8sGVcsiAtSER9kHRUpdNBPCdIxURmQf0Fgjj16cYV/cr3j8NQpw
-uXKAulKoHIWjD84jc1douEnwo6Eij7QA7nZ1N4PLesZ6cdPxLpKYMR7bWbf9r5Fd
-B6C8jKZKl+eETWJx7ECQ/z2BBeUNw1bwUK8F0MgF+Kb01V29ouGaB2eUP4JhBH1b
-zBhEM+N1dYjc3gzDDTJHURS0lm9Pzcg1Dj4nRYVEYbddU3wNd/kYPQIk+BmWoUH8
-h6xtMYCT3k+hL6Y59LVXra23PpktJljTFtMI8DXYmuJS+yy+dV7g1rn4Ui9FmF7B
-UmI4khTwZV2TQ1C0LsSuzwkBm71S27ziqmKVTci0hmzEFalls/Mr2rAP7dSwK4FE
-3kjQxOPKuiSgwV2+Odw4M6JQKChplAVOy6dzr8QIq3ULzaMoZ4LxX4JhvqvaK/0w
-vqRxoJ/OmC/pbHdVM/h7OnsS0t67UnlO8zJwuOAn03S7mpo67HZ/xKHCsJctF4Ca
-cwRnCVEeiYv1kjA2YEbjg9uohTtnfysNsoVA+rE7TNEqeWb4r1c=
-=ueZJ
------END PGP SIGNATURE-----
-
---jM/2AY6iSqMbsk1G--
+https://people.kernel.org/tglx/notes-about-netiquette
