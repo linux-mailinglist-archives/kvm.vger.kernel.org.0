@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A33B6486FE5
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 02:50:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C867E486FF4
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 02:54:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344496AbiAGBuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 20:50:55 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45746 "EHLO mga06.intel.com"
+        id S1344554AbiAGBym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 20:54:42 -0500
+Received: from mga05.intel.com ([192.55.52.43]:36250 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344437AbiAGBux (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 20:50:53 -0500
+        id S1344533AbiAGBym (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 20:54:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641520253; x=1673056253;
+  t=1641520482; x=1673056482;
   h=cc:subject:to:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=Rk4TSsiNTO3YfMWheOgfWU447KggZGjywO0GgwnX7XY=;
-  b=SSFMxT9FgoQy3lYRGFjXF9Y9jb6UguAW2C3JmtooaUCFyoow14vokMg8
-   ugNHPPyZ+0VNWww82ZQ9nDFvKBZ9iXopx5S01hbkZRK1afBoMgDCT08pU
-   Gfdxa+YR44M+wzKCrBC7Stzn3U3ME/V0q1XmRd1qh4B5s0VPWGr/fGbQt
-   zjnFF8agYL0Z5qKrWXlfvXxQ2TvuSBE82nY6bXV78wnrIAYUP3xlnNm4E
-   AJL1dsrTtb8yjoPN+4Cwntf/BNyAWnR5u1CkgvHvg4ueCVfR+7fGQ5Mv9
-   NL1TSUp9vHjKKr9cPS+QHAECNZW58z5GTiZhp29RmDwUz7CUzToSli4UC
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10219"; a="303533983"
+  bh=Jt8G5RvicmESM2ejSPAMQP973KFNwwweQUosaDpYZ+Y=;
+  b=icHVwR+Bx3qfGy28JP7zxYLqxQK75AAZipFoinDX4WewSRCoHtWRV4W0
+   6i4it/3shDLcHYtn59uz/vWvgV2vOqCBuB4zbHSzSFAJOMjESQu3fr5W1
+   I7bg33PJjTmryfnmLgE+zcTp4QbIOmYvpM6wfHG/MPbpb2UopJN/Bvsm/
+   aaJh1zYKYmBXeRjvzoe6rarbLSAkeqo/tskdhv2Y8hIF79S81OphlEGWA
+   Fuq9CNwsgKuNkUNhEuMpNsknUvGRI7zbxyuUErqiz3mIU6d6a0150sJda
+   tSyIIpBbIH7tXlmeeBANak3Omt/6SX6ZtWE1GiuLC1uDhw3fgA8ad8EXj
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10219"; a="329131118"
 X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
-   d="scan'208";a="303533983"
+   d="scan'208";a="329131118"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 17:50:52 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 17:54:41 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
-   d="scan'208";a="527209322"
+   d="scan'208";a="527209969"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 06 Jan 2022 17:50:45 -0800
-Cc:     baolu.lu@linux.intel.com, Bjorn Helgaas <helgaas@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
+  by orsmga008.jf.intel.com with ESMTP; 06 Jan 2022 17:54:34 -0800
+Cc:     baolu.lu@linux.intel.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
         Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Kevin Tian <kevin.tian@intel.com>,
         Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
         Robin Murphy <robin.murphy@arm.com>,
@@ -60,19 +61,17 @@ Cc:     baolu.lu@linux.intel.com, Bjorn Helgaas <helgaas@kernel.org>,
         Dmitry Osipenko <digetx@gmail.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/14] iommu: Add dma ownership management interfaces
-To:     Jason Gunthorpe <jgg@nvidia.com>
-References: <YdQcgFhIMYvUwABV@infradead.org>
- <20220104164100.GA101735@bhelgaas> <20220104192348.GK2328285@nvidia.com>
- <9486face-0778-b8d0-6989-94c2e876446b@linux.intel.com>
- <20220106154635.GG2328285@nvidia.com>
+Subject: Re: [PATCH v5 09/14] PCI: portdrv: Suppress kernel DMA ownership
+ auto-claiming
+To:     Bjorn Helgaas <helgaas@kernel.org>
+References: <20220106183224.GA298861@bhelgaas>
 From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <b5fb659a-aa8b-587c-8bc1-20d7fd1ecd26@linux.intel.com>
-Date:   Fri, 7 Jan 2022 09:50:06 +0800
+Message-ID: <1545319f-130e-3750-ea00-082a12b73852@linux.intel.com>
+Date:   Fri, 7 Jan 2022 09:53:54 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20220106154635.GG2328285@nvidia.com>
+In-Reply-To: <20220106183224.GA298861@bhelgaas>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,49 +79,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/22 11:46 PM, Jason Gunthorpe wrote:
-> On Thu, Jan 06, 2022 at 11:54:06AM +0800, Lu Baolu wrote:
->> On 1/5/22 3:23 AM, Jason Gunthorpe wrote:
->>>>>> The device driver oriented interfaces are,
->>>>>>
->>>>>> 	int iommu_device_use_dma_api(struct device *dev);
->>>>>> 	void iommu_device_unuse_dma_api(struct device *dev);
->>>> Nit, do we care whether it uses the actual DMA API?  Or is it just
->>>> that iommu_device_use_dma_api() tells us the driver may program the
->>>> device to do DMA?
->>> As the main purpose, yes this is all about the DMA API because it
->>> asserts the group domain is the DMA API's domain.
+On 1/7/22 2:32 AM, Bjorn Helgaas wrote:
+> On Thu, Jan 06, 2022 at 12:12:35PM +0800, Lu Baolu wrote:
+>> On 1/5/22 1:06 AM, Bjorn Helgaas wrote:
+>>> On Tue, Jan 04, 2022 at 09:56:39AM +0800, Lu Baolu wrote:
+>>>> If a switch lacks ACS P2P Request Redirect, a device below the switch can
+>>>> bypass the IOMMU and DMA directly to other devices below the switch, so
+>>>> all the downstream devices must be in the same IOMMU group as the switch
+>>>> itself.
+>>> Help me think through what's going on here.  IIUC, we put devices in
+>>> the same IOMMU group when they can interfere with each other in any
+>>> way (DMA, config access, etc).
 >>>
->>> There is a secondary purpose that has to do with the user/kernel
->>> attack you mentioned above. Maintaining the DMA API domain also
->>> prevents VFIO from allowing userspace to operate any device in the
->>> group which blocks P2P attacks to MMIO of other devices.
->>>
->>> This is why, even if the driver doesn't use DMA, it should still do a
->>> iommu_device_use_dma_api(), except in the special cases where we don't
->>> care about P2P attacks (eg pci-stub, bridges, etc).
->>>
+>>> (We said "DMA" above, but I guess this would also apply to config
+>>> requests, right?)
 >>
->> By the way, use_dma_api seems hard to read. How about
->>
->> 	iommu_device_use_default_dma()?
+>> I am not sure whether devices could interfere each other through config
+>> space access. The IOMMU hardware only protects and isolates DMA
+>> accesses, so that userspace could control DMA directly. The config
+>> accesses will always be intercepted by VFIO. Hence, I don't see a
+>> problem.
 > 
-> You could just say "use default domain"
+> I was wondering about config accesses generated by an endpoint, e.g.,
+> an endpoint doing config writes to a peer or the upstream bridge.
 > 
-> IMHO the way the iommu subsystem has its own wonky language is a
-> little troublesome. In the rest of the kernel we call this the DMA
-> API, while the iommu subsystem calls the domain that the DMA API uses
-> the 'default domain' not the 'DMA API' domain.
-> 
-> Still, it is probably better to align to the iommu language - just be
-> sure to put in the function comment that this API 'allows the driver
-> to use the DMA API eg dma_map_sg()'
+> But I think that is prohibited by spec - PCIe r5.0, sec 7.3.3, says
+> "Propagation of Configuration Requests from Downstream to Upstream as
+> well as peer-to-peer are not supported" and "Configuration Requests
+> are initiated only by the Host Bridge, including those passed through
+> the SFI CAM mechanism."
 
-iommu_device_use_default_domain() reads better. And add some comments
-to link "default domain" with "DMA API". Thanks!
+That's clear. Thank you for the clarification.
 
 > 
-> Jason
+> Bjorn
 > 
 
 Best regards,
