@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6686A486EB6
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 01:23:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6300486EBF
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 01:27:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344093AbiAGAXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jan 2022 19:23:53 -0500
-Received: from mga06.intel.com ([134.134.136.31]:38685 "EHLO mga06.intel.com"
+        id S1344129AbiAGA1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jan 2022 19:27:38 -0500
+Received: from mga17.intel.com ([192.55.52.151]:2934 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343928AbiAGAXw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jan 2022 19:23:52 -0500
+        id S1343753AbiAGA1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jan 2022 19:27:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641515032; x=1673051032;
+  t=1641515257; x=1673051257;
   h=cc:subject:to:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=ZIszb2ptLlWN5jiqIqtYtNRvhlbcJxtJfClvbQTYBwI=;
-  b=dMYuhm+ct68A0mK/AURSdYZzwaoMXCHBssqJ0sBrPk0JE156EZJ6n2mv
-   Q8jnb2iPDsj6tJWZcwdg+0KIehA3WyzA91viaU1zX9qKa60909iFiJHFr
-   JWGJvIv0HndwQUW4K5kzd+5xgH7sbDgvcio9sx1Th/Z3XPbEVMaD5GKu6
-   98VgoUhnG0dK4uPqixS/2fWbOCdvJigpSzHc06TGL+sPGrONaQ0QEEwrk
-   vVmVC2zzfRBUZFZPn+3eADy422LnLb4EKarkGtUkaRmpQhvuvp2TINEJ1
-   nkzsw6NwpYqyWGSeJ6jNqLk7BBkxaYRIeEpAcU9SpJQYNxku2CFSeScub
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="303514982"
+  bh=DHF9LNBkwjjdXkY2HtbzusqrhjTjnQLSGj+vV2UJQkc=;
+  b=PJ0GyA693KFE5CU2BlIP22yksGPDRI/LiYl70Q/moZieMDe2ZOo1RYmP
+   M8pPmXE5shZ6Wi0hCfWzeE9AjNFgYGXnJ/Pi5/yVSy2WjtNMozfW46HKF
+   SHcTBB9b+tDCThMA4B7D5zdR5e9tYTCwOm83uM0l5FAC/vwNhhEUBbFPR
+   sktfMj2LUK/ovNzNKOmNHwpT19noqlG4V5WC3qOnkJ1UEUsUAcqeDaRlk
+   tBBBhWaGW4dfeUKBuY3YOx3sCWFuY5JLnyAvBn+xC1wgUrrspK4QJlzI8
+   DHbrN7wA8qJmqGTpx4iNYcDhlvDbzWKuk6c9qhGK7JPIReIexith5fP7d
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="223464221"
 X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
-   d="scan'208";a="303514982"
+   d="scan'208";a="223464221"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 16:23:52 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 16:27:37 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,268,1635231600"; 
-   d="scan'208";a="527179688"
+   d="scan'208";a="527180734"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 06 Jan 2022 16:23:45 -0800
+  by orsmga008.jf.intel.com with ESMTP; 06 Jan 2022 16:27:30 -0800
 Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
         Robin Murphy <robin.murphy@arm.com>,
@@ -60,18 +60,18 @@ Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
         Dmitry Osipenko <digetx@gmail.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 5/8] iommu/amd: Use iommu_attach/detach_device()
+Subject: Re: [PATCH v1 1/8] iommu: Add iommu_group_replace_domain()
 To:     Jason Gunthorpe <jgg@nvidia.com>
 References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
- <20220106022053.2406748-6-baolu.lu@linux.intel.com>
- <20220106143345.GC2328285@nvidia.com>
+ <20220106022053.2406748-2-baolu.lu@linux.intel.com>
+ <20220106170608.GI2328285@nvidia.com>
 From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <456972f1-0237-81db-69cf-363f9ac611e0@linux.intel.com>
-Date:   Fri, 7 Jan 2022 08:23:05 +0800
+Message-ID: <58e2d0d2-649a-a3f5-e8ae-9cbf2719015f@linux.intel.com>
+Date:   Fri, 7 Jan 2022 08:26:50 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20220106143345.GC2328285@nvidia.com>
+In-Reply-To: <20220106170608.GI2328285@nvidia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,58 +79,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
-
-On 1/6/22 10:33 PM, Jason Gunthorpe wrote:
-> On Thu, Jan 06, 2022 at 10:20:50AM +0800, Lu Baolu wrote:
->> The individual device driver should use iommu_attach/detach_device()
->> for domain attachment/detachment.
+On 1/7/22 1:06 AM, Jason Gunthorpe wrote:
+> On Thu, Jan 06, 2022 at 10:20:46AM +0800, Lu Baolu wrote:
+>> Expose an interface to replace the domain of an iommu group for frameworks
+>> like vfio which claims the ownership of the whole iommu group.
 >>
 >> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->>   drivers/iommu/amd/iommu_v2.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>   include/linux/iommu.h | 10 ++++++++++
+>>   drivers/iommu/iommu.c | 37 +++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 47 insertions(+)
 >>
->> diff --git a/drivers/iommu/amd/iommu_v2.c b/drivers/iommu/amd/iommu_v2.c
->> index 58da08cc3d01..7d9d0fe89064 100644
->> +++ b/drivers/iommu/amd/iommu_v2.c
->> @@ -133,7 +133,7 @@ static void free_device_state(struct device_state *dev_state)
->>   	if (WARN_ON(!group))
->>   		return;
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 408a6d2b3034..66ebce3d1e11 100644
+>> +++ b/include/linux/iommu.h
+>> @@ -677,6 +677,9 @@ void iommu_device_unuse_dma_api(struct device *dev);
+>>   int iommu_group_set_dma_owner(struct iommu_group *group, void *owner);
+>>   void iommu_group_release_dma_owner(struct iommu_group *group);
+>>   bool iommu_group_dma_owner_claimed(struct iommu_group *group);
+>> +int iommu_group_replace_domain(struct iommu_group *group,
+>> +			       struct iommu_domain *old,
+>> +			       struct iommu_domain *new);
 >>   
->> -	iommu_detach_group(dev_state->domain, group);
->> +	iommu_detach_device(dev_state->domain, &dev_state->pdev->dev);
+>>   #else /* CONFIG_IOMMU_API */
 >>   
->>   	iommu_group_put(group);
-> 
-> This is the only user of the group in the function all the
-> group_get/put should be deleted too.
-> 
-> Joerg said in commit 55c99a4dc50f ("iommu/amd: Use
-> iommu_attach_group()") that the device API doesn't work here because
-> there are multi-device groups?
-> 
-> But I'm not sure how this can work with multi-device groups - this
-> seems to assigns a domain setup for direct map, so perhaps this only
-> works if all devices are setup for direct map?
-
-It's also difficult for me to understand how this can work with multi-
-device group. The iommu_attach_group() returns -EBUSY if _init_device()
-is called for the second device in the group. That's the reason why I
-didn't set no_kernel_dma.
-
-> 
->> @@ -791,7 +791,7 @@ int amd_iommu_init_device(struct pci_dev *pdev, int pasids)
->>   		goto out_free_domain;
->>   	}
+>> @@ -1090,6 +1093,13 @@ static inline bool iommu_group_dma_owner_claimed(struct iommu_group *group)
+>>   {
+>>   	return false;
+>>   }
+>> +
+>> +static inline int
+>> +iommu_group_replace_domain(struct iommu_group *group, struct iommu_domain *old,
+>> +			   struct iommu_domain *new)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>>   #endif /* CONFIG_IOMMU_API */
 >>   
->> -	ret = iommu_attach_group(dev_state->domain, group);
->> +	ret = iommu_attach_device(dev_state->domain, &pdev->dev);
->>   	if (ret != 0)
->>   		goto out_drop_group;
+>>   /**
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 72a95dea688e..ab8ab95969f5 100644
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -3431,3 +3431,40 @@ bool iommu_group_dma_owner_claimed(struct iommu_group *group)
+>>   	return user;
+>>   }
+>>   EXPORT_SYMBOL_GPL(iommu_group_dma_owner_claimed);
+>> +
+>> +/**
+>> + * iommu_group_replace_domain() - Replace group's domain
+>> + * @group: The group.
+>> + * @old: The previous attached domain. NULL for none.
+>> + * @new: The new domain about to be attached.
+>> + *
+>> + * This is to support backward compatibility for vfio which manages the dma
+>> + * ownership in iommu_group level.
 > 
-> Same comment here
+> This should mention it can only be used with iommu_group_set_dma_owner()
 
-Yes.
+Sure.
+
+> 
+>> +	if (old)
+>> +		__iommu_detach_group(old, group);
+>> +
+>> +	if (new) {
+>> +		ret = __iommu_attach_group(new, group);
+>> +		if (ret && old)
+>> +			__iommu_attach_group(old, group);
+>> +	}
+> 
+> The sketchy error unwind here gives me some pause for sure. Maybe we
+> should define that on error this leaves the domain as NULL
+> 
+> Complicates vfio a tiny bit to cope with this failure but seems
+> cleaner than leaving it indeterminate.
+
+Fair enough.
 
 > 
 > Jason
