@@ -2,144 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A456B487BB2
-	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 19:01:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA443487C24
+	for <lists+kvm@lfdr.de>; Fri,  7 Jan 2022 19:26:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348666AbiAGSB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 13:01:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48759 "EHLO
+        id S241012AbiAGS0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 13:26:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47569 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240374AbiAGSB6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 13:01:58 -0500
+        by vger.kernel.org with ESMTP id S240882AbiAGS0L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jan 2022 13:26:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641578517;
+        s=mimecast20190719; t=1641579969;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=DDq5ZV3raVbWd7catgZXaSPZOFPUpBTYsBeXPjj09UE=;
-        b=T+4cbLMxx+TV4iSzXfTeDgSVANj9O6NB5b0F8Yr9qfsNi3MXgx7Dqep9T/WAssZbMTm+2r
-        0E1Q/aOjd0Wz8AsAKDFeIgWQj5zhUzviXhszF60j9F5NCF1/lt3yatr2W7QT2hSWqaoQ00
-        bugExIVrPHoKoGbqnxgfp9P1lSP95Pc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bXJcSEUZk6XoSn4xntB0L6+vAQub2RrKf5apdg2mID0=;
+        b=bq+vnejN+slDpVHYk/2fgFOfXL6f0JjDVhT7/mTUtdbZenvuPSzJMixXERKI91xYk/HdyZ
+        u52cc+HTzCDPIn97MlWJW9t91FEEt6Lymt5qH7rcZhvq5M1LJaRAujkWMx2e9wvE9MQhFg
+        uC708u0fNrV5IKv9Tg+Rr6XByy+R3YM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-270-ujv1KKFlOtOiYmbrP-_iEA-1; Fri, 07 Jan 2022 12:51:36 -0500
-X-MC-Unique: ujv1KKFlOtOiYmbrP-_iEA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BC7C101F000;
-        Fri,  7 Jan 2022 17:51:35 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A059F7A444;
-        Fri,  7 Jan 2022 17:51:34 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id D331F406EAF0; Fri,  7 Jan 2022 14:51:14 -0300 (-03)
-Date:   Fri, 7 Jan 2022 14:51:14 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH] KVM: VMX: switch wakeup_vcpus_on_cpu_lock to raw spinlock
-Message-ID: <20220107175114.GA261406@fuller.cnet>
+ us-mta-451-Ws7JXNGHPj27nt7bRZXBKA-1; Fri, 07 Jan 2022 13:15:48 -0500
+X-MC-Unique: Ws7JXNGHPj27nt7bRZXBKA-1
+Received: by mail-ed1-f71.google.com with SMTP id ec25-20020a0564020d5900b003fc074c5d21so983770edb.19
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 10:15:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=bXJcSEUZk6XoSn4xntB0L6+vAQub2RrKf5apdg2mID0=;
+        b=xfCKI2Ej9IOfY2/xusenC6lfHe2xFhy/xfvTfWSKcqK74LFwMzxw1bORVB+8TAJdar
+         sFseFlHAiAgV7uCoqoZ6LNd39yKXG6rinXHHrcRoeVSFkB48+Psbpq674LD9p0XZCyV6
+         4h6z5A8/9kexs6AcbU3EvJe6wFXRHc5HKP2zyCxRft9OhewfkZA0qUqy/cjoxu7R9Hk5
+         kQpmcDVkl+SNPSXXGnA8E62k4e3Pn0l6KT3JN8greUSufAtopayImfeNNeaTksZExHJj
+         twJuG8P6H24K8vwypIWyxOhyvn+oceCXz+YqodZA/IZRVzrdq1Yv4bA/yw6H0VMZ3p34
+         LTaA==
+X-Gm-Message-State: AOAM533RSImr5BRtD/3dmWG4cxFfFh120RJvaJ/VEZNQXgVNWpOsOOMq
+        r7vDuttHnfYQDdiEq+bemQNXcSJiArjUX1x85Gt1BKLG6ZOoQra7D/fL6yMUVSBei3fBzj++x5E
+        PafZv6gisFgiA
+X-Received: by 2002:a05:6402:5107:: with SMTP id m7mr64754798edd.266.1641579347040;
+        Fri, 07 Jan 2022 10:15:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxxw8K74GgJQBPwCf8t35W2906y+r7Hs2y8F63RdQYJAk2qOp0YdFRFajSxF5czTTL8r3YW2A==
+X-Received: by 2002:a05:6402:5107:: with SMTP id m7mr64754784edd.266.1641579346822;
+        Fri, 07 Jan 2022 10:15:46 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id r8sm2398775edd.39.2022.01.07.10.15.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jan 2022 10:15:46 -0800 (PST)
+Message-ID: <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
+Date:   Fri, 7 Jan 2022 19:15:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+ <20211122175818.608220-3-vkuznets@redhat.com>
+ <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+ <20211227183253.45a03ca2@redhat.com>
+ <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com> <87mtkdqm7m.fsf@redhat.com>
+ <20220103104057.4dcf7948@redhat.com> <875yr1q8oa.fsf@redhat.com>
+ <ceb63787-b057-13db-4624-b430c51625f1@redhat.com> <87o84qpk7d.fsf@redhat.com>
+ <877dbbq5om.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <877dbbq5om.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 1/7/22 10:02, Vitaly Kuznetsov wrote:
+> 
+> I'm again leaning towards an allowlist and currently I see only two
+> candidates:
+> 
+> CPUID.01H.EBX bits 31:24 (initial LAPIC id)
+> CPUID.0BH.EDX (x2APIC id)
+> 
+> Anything else I'm missing?
 
-wakeup_vcpus_on_cpu_lock is taken from hard interrupt context 
-(pi_wakeup_handler), therefore it cannot sleep.
+I would also ignore completely CPUID leaves 03H, 04H, 0BH, 80000005h, 
+80000006h, 8000001Dh, 8000001Eh (cache and processor topology), just to 
+err on the safe side.
 
-Switch it to a raw spinlock.
+We could change kvm_find_cpuid_entry to WARN if any of those leaves are 
+passed.
 
-Fixes:
-
-[41297.066254] BUG: scheduling while atomic: CPU 0/KVM/635218/0x00010001 
-[41297.066323] Preemption disabled at: 
-[41297.066324] [<ffffffff902ee47f>] irq_enter_rcu+0xf/0x60 
-[41297.066339] Call Trace: 
-[41297.066342]  <IRQ> 
-[41297.066346]  dump_stack_lvl+0x34/0x44 
-[41297.066353]  ? irq_enter_rcu+0xf/0x60 
-[41297.066356]  __schedule_bug.cold+0x7d/0x8b 
-[41297.066361]  __schedule+0x439/0x5b0 
-[41297.066365]  ? task_blocks_on_rt_mutex.constprop.0.isra.0+0x1b0/0x440 
-[41297.066369]  schedule_rtlock+0x1e/0x40 
-[41297.066371]  rtlock_slowlock_locked+0xf1/0x260 
-[41297.066374]  rt_spin_lock+0x3b/0x60 
-[41297.066378]  pi_wakeup_handler+0x31/0x90 [kvm_intel] 
-[41297.066388]  sysvec_kvm_posted_intr_wakeup_ipi+0x9d/0xd0 
-[41297.066392]  </IRQ> 
-[41297.066392]  asm_sysvec_kvm_posted_intr_wakeup_ipi+0x12/0x20 
-...
-
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index f4169c009400..aa1fe9085d77 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -27,7 +27,7 @@ static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
-  * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
-  * occur if a wakeup IRQ arrives and attempts to acquire the lock.
-  */
--static DEFINE_PER_CPU(spinlock_t, wakeup_vcpus_on_cpu_lock);
-+static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
- 
- static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
- {
-@@ -87,9 +87,9 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 * current pCPU if the task was migrated.
- 	 */
- 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
--		spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 		list_del(&vmx->pi_wakeup_list);
--		spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 	}
- 
- 	dest = cpu_physical_id(cpu);
-@@ -149,10 +149,10 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 
- 	local_irq_save(flags);
- 
--	spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 	list_add_tail(&vmx->pi_wakeup_list,
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
--	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 
- 	WARN(pi_desc->sn, "PI descriptor SN field set before blocking");
- 
-@@ -204,20 +204,20 @@ void pi_wakeup_handler(void)
- 	int cpu = smp_processor_id();
- 	struct vcpu_vmx *vmx;
- 
--	spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-+	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
- 	list_for_each_entry(vmx, &per_cpu(wakeup_vcpus_on_cpu, cpu),
- 			    pi_wakeup_list) {
- 
- 		if (pi_test_on(&vmx->pi_desc))
- 			kvm_vcpu_wake_up(&vmx->vcpu);
- 	}
--	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-+	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
- }
- 
- void __init pi_init_cpu(int cpu)
- {
- 	INIT_LIST_HEAD(&per_cpu(wakeup_vcpus_on_cpu, cpu));
--	spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-+	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
- }
- 
- bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
+Paolo
 
