@@ -2,80 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30793488220
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 08:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 323B94882A9
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 10:01:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233689AbiAHHY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Jan 2022 02:24:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233484AbiAHHY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 Jan 2022 02:24:56 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C58C061574;
-        Fri,  7 Jan 2022 23:24:55 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S233908AbiAHJBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 8 Jan 2022 04:01:19 -0500
+Received: from mxhk.zte.com.cn ([63.216.63.35]:47458 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231402AbiAHJBT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 Jan 2022 04:01:19 -0500
+Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JWBS5215fz4xZ1;
-        Sat,  8 Jan 2022 18:24:53 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1641626693;
-        bh=4Oi6SAO0gtr5q+eZOeJdXgsENrla7hccxRm0YSld2UE=;
-        h=Date:From:To:Cc:Subject:From;
-        b=RDdXyReoAVbqXAQAqdrmpYWtn6428cRy+2aKdWJxGiPKVGBb4VQg0EZ91delI8M8u
-         0lBr+yLCGGeDBevQA9ErpD+PC3wPv/yiLyJKmzBNrd6aKKXrfvc37On86shNsuk+Nw
-         86O7dHPZ/zRkiW4xBxhjQSJlBV2gvRmYdCFUVFU01RZyvd5vkHdiTRv1XpMw3toY01
-         HsEwip3Fk76D32+RUIpG7gYOwC8HoS93BKAqKznPyLvX257XR3ZBlo4IovCJQpoOgI
-         2+Ygd8HtRN5MZMM0WpnZZiSPhNLGNkNKKQlYTYXx7hstRE0TsQLFayXS/ykKBCar6o
-         CIE2CIkWVQdag==
-Date:   Sat, 8 Jan 2022 18:24:52 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the kvm tree
-Message-ID: <20220108182452.6224558b@canb.auug.org.au>
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4JWDbK2847z8131k;
+        Sat,  8 Jan 2022 17:01:17 +0800 (CST)
+Received: from szxlzmapp01.zte.com.cn ([10.5.231.85])
+        by mse-fl1.zte.com.cn with SMTP id 20890qAW079364;
+        Sat, 8 Jan 2022 17:00:52 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-cloudhost8.localdomain (unknown [10.234.72.110])
+        by smtp (Zmail) with SMTP;
+        Mon, 8 Jan 2022 17:00:52 +0800
+X-Zmail-TransId: 3e8161d952c3001-c1ba5
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xue.zhihong@zte.com.cn, wang.yi59@zte.com.cn,
+        wang.liang82@zte.com.cn, ZhaoQiang <zhao.qiang11@zte.com.cn>
+Subject: [PATCH] KVM: Fix OOM vulnerability caused by continuously creating devices
+Date:   Sun,  9 Jan 2022 00:49:48 +0800
+Message-Id: <20220108164948.42112-1-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 2.33.0.rc0.dirty
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/=crcFEtHqMUP+QU.FZRkf/R";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl1.zte.com.cn 20890qAW079364
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 61D952DD.000 by FangMail milter!
+X-FangMail-Envelope: 1641632477/4JWDbK2847z8131k/61D952DD.000/10.30.14.238/[10.30.14.238]/mse-fl1.zte.com.cn/<wang.yi59@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 61D952DD.000/4JWDbK2847z8131k
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/=crcFEtHqMUP+QU.FZRkf/R
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: ZhaoQiang <zhao.qiang11@zte.com.cn>
 
-Hi all,
+When processing the ioctl request for creating a device in the
+kvm_vm_ioctl()function,the branch did not reclaim the successfully
+created device,which caused memory leak.
 
-Commit
+Signed-off-by: ZhaoQiang <zhao.qiang11@zte.com.cn>
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+---
+ virt/kvm/kvm_main.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
-  907d139318b5 ("KVM: VMX: Provide vmread version using asm-goto-with-outpu=
-ts")
-
-is missing a Signed-off-by from its author.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/=crcFEtHqMUP+QU.FZRkf/R
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHZPEQACgkQAVBC80lX
-0GyZ0wf+MVOGKFIz+SeNQXOC9gtIufu46FHTTcCGpGGRyubr607pQJjgWBeS197z
-3ylsxG7i8Rs0v1INPfVwPF4Y6t6iHnzAzvfTa7+hbvpVB2MK6qM54rLkAdpKLEac
-RJ/zAqpqGEX19COEhi3rZsP7OqmySH0S+0jQkUJLmnWxuo1wkbLtK2ITiNCRibBR
-CE7VGDI+MfJMbES2cFSDsR0al23YNuLsRxh33BPfCRiCQQMzJuu5B8fff7frKv6t
-6B6YlAULUM9n5wQqUpOGx77dwME8DRv8a9oJHb10V14YKj8I/cRyfAjCa/ZV/aEz
-eeukdVq2RG/CNnImt7rD7rY3LEtDGw==
-=/8mp
------END PGP SIGNATURE-----
-
---Sig_/=crcFEtHqMUP+QU.FZRkf/R--
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 72c4e6b39389..f4fbc935faea 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -52,6 +52,7 @@
+ #include <linux/lockdep.h>
+ #include <linux/kthread.h>
+ #include <linux/suspend.h>
++#include <linux/syscalls.h>
+ 
+ #include <asm/processor.h>
+ #include <asm/ioctl.h>
+@@ -4092,6 +4093,40 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
+ 	return 0;
+ }
+ 
++static int kvm_ioctl_destroy_device(struct kvm *kvm,
++				    struct kvm_create_device *cd)
++{
++	struct kvm_device_ops *ops = NULL;
++	struct kvm_device *dev;
++	struct file *file;
++	int type;
++
++	if (cd->type >= ARRAY_SIZE(kvm_device_ops_table))
++		return -ENODEV;
++
++	type = array_index_nospec(cd->type, ARRAY_SIZE(kvm_device_ops_table));
++	ops = kvm_device_ops_table[type];
++	if (ops == NULL)
++		return -ENODEV;
++
++	file = fget(cd->fd);
++	if (!file)
++		return -ENODEV;
++
++	dev = file->private_data;
++	if (!dev)
++		return -ENODEV;
++
++	kvm_put_kvm(kvm);
++	mutex_lock(&kvm->lock);
++	list_del(&device->vm_node);
++	mutex_unlock(&kvm->lock);
++	ops->destroy(dev);
++	ksys_close(cd->fd);
++
++	return 0;
++}
++
+ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ {
+ 	switch (arg) {
+@@ -4448,8 +4483,10 @@ static long kvm_vm_ioctl(struct file *filp,
+ 			goto out;
+ 
+ 		r = -EFAULT;
+-		if (copy_to_user(argp, &cd, sizeof(cd)))
++		if (copy_to_user(argp, &cd, sizeof(cd))) {
++			kvm_ioctl_destroy_device(kvm, &cd);
+ 			goto out;
++		}
+ 
+ 		r = 0;
+ 		break;
+-- 
+2.27.0
