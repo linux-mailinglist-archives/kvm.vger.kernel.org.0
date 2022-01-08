@@ -2,127 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 323B94882A9
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 10:01:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3971E4883CC
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 14:42:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233908AbiAHJBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Jan 2022 04:01:19 -0500
-Received: from mxhk.zte.com.cn ([63.216.63.35]:47458 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231402AbiAHJBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 Jan 2022 04:01:19 -0500
-Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+        id S234328AbiAHNmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 8 Jan 2022 08:42:40 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:42074 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229542AbiAHNmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 Jan 2022 08:42:40 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4JWDbK2847z8131k;
-        Sat,  8 Jan 2022 17:01:17 +0800 (CST)
-Received: from szxlzmapp01.zte.com.cn ([10.5.231.85])
-        by mse-fl1.zte.com.cn with SMTP id 20890qAW079364;
-        Sat, 8 Jan 2022 17:00:52 +0800 (GMT-8)
-        (envelope-from wang.yi59@zte.com.cn)
-Received: from fox-cloudhost8.localdomain (unknown [10.234.72.110])
-        by smtp (Zmail) with SMTP;
-        Mon, 8 Jan 2022 17:00:52 +0800
-X-Zmail-TransId: 3e8161d952c3001-c1ba5
-From:   Yi Wang <wang.yi59@zte.com.cn>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xue.zhihong@zte.com.cn, wang.yi59@zte.com.cn,
-        wang.liang82@zte.com.cn, ZhaoQiang <zhao.qiang11@zte.com.cn>
-Subject: [PATCH] KVM: Fix OOM vulnerability caused by continuously creating devices
-Date:   Sun,  9 Jan 2022 00:49:48 +0800
-Message-Id: <20220108164948.42112-1-wang.yi59@zte.com.cn>
-X-Mailer: git-send-email 2.33.0.rc0.dirty
+        by sin.source.kernel.org (Postfix) with ESMTPS id A3431CE0986
+        for <kvm@vger.kernel.org>; Sat,  8 Jan 2022 13:42:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF3A8C36AE5;
+        Sat,  8 Jan 2022 13:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641649356;
+        bh=hQLJg/reC9b+EvXMNlt1up4GO6wGeIenlkDQEvW4m3g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=oTaJDqri17ndldlKbvClJSSXBCdq5mYI5nozNYP8x+SFn21vj/kI+cqg5Sui3KKPX
+         O+PuK+6mdgOqA17X6cVNbaM+5SwbekFYlCv0m4IQLlj2HpOAxZ1j2zqsAYuHg37+oC
+         b8EK/eg+PYopiLoQe/3cha1x7sQNuKUhRLRY9OS2g3zu1t2uoBfWRFOAZLZuAP3/s1
+         uOHuxbEdXOyX/BDZcRy8yKLicG6CB6GlAtaVtKBjsUqoNwHXg1+cJmn6ATj1LWuL1E
+         kcvGvMyeq+9qxBCPxb9Ue6PNqZROwCVOjJoSZkNG7m7JxkoUQtqh30E6PRtGZhkqD0
+         MeIM6GEITMgQA==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n6BzO-00GlKS-MH; Sat, 08 Jan 2022 13:42:34 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl1.zte.com.cn 20890qAW079364
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 61D952DD.000 by FangMail milter!
-X-FangMail-Envelope: 1641632477/4JWDbK2847z8131k/61D952DD.000/10.30.14.238/[10.30.14.238]/mse-fl1.zte.com.cn/<wang.yi59@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 61D952DD.000/4JWDbK2847z8131k
+Date:   Sat, 08 Jan 2022 13:42:34 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Richard Henderson <richard.henderson@linaro.org>
+Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
+        Eric Auger <eric.auger@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3] hw/arm/virt: KVM: Enable PAuth when supported by the
+ host
+In-Reply-To: <a3d32f18-dbbb-e462-82ce-722f424707f9@linaro.org>
+References: <20220107150154.2490308-1-maz@kernel.org>
+ <a3d32f18-dbbb-e462-82ce-722f424707f9@linaro.org>
+User-Agent: Roundcube Webmail/1.4.12
+Message-ID: <c9a3552aa067ba691055841b5e3fb7b7@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, eric.auger@redhat.com, peter.maydell@linaro.org, drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: ZhaoQiang <zhao.qiang11@zte.com.cn>
+On 2022-01-07 20:23, Richard Henderson wrote:
+> On 1/7/22 7:01 AM, Marc Zyngier wrote:
+>> @@ -1380,17 +1380,10 @@ void arm_cpu_finalize_features(ARMCPU *cpu, 
+>> Error **errp)
+>>               return;
+>>           }
+>>   -        /*
+>> -         * KVM does not support modifications to this feature.
+>> -         * We have not registered the cpu properties when KVM
+>> -         * is in use, so the user will not be able to set them.
+>> -         */
+>> -        if (!kvm_enabled()) {
+>> -            arm_cpu_pauth_finalize(cpu, &local_err);
+>> -            if (local_err != NULL) {
+>> +        arm_cpu_pauth_finalize(cpu, &local_err);
+>> +        if (local_err != NULL) {
+>>                   error_propagate(errp, local_err);
+>>                   return;
+>> -            }
+>>           }
+> 
+> Indentation is still off -- error + return should be out-dented one 
+> level.
+> 
 
-When processing the ioctl request for creating a device in the
-kvm_vm_ioctl()function,the branch did not reclaim the successfully
-created device,which caused memory leak.
+Duh. Clearly, my brain can't spot these. Apologies for the extra noise.
 
-Signed-off-by: ZhaoQiang <zhao.qiang11@zte.com.cn>
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
----
- virt/kvm/kvm_main.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+> Otherwise,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 72c4e6b39389..f4fbc935faea 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -52,6 +52,7 @@
- #include <linux/lockdep.h>
- #include <linux/kthread.h>
- #include <linux/suspend.h>
-+#include <linux/syscalls.h>
- 
- #include <asm/processor.h>
- #include <asm/ioctl.h>
-@@ -4092,6 +4093,40 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
- 	return 0;
- }
- 
-+static int kvm_ioctl_destroy_device(struct kvm *kvm,
-+				    struct kvm_create_device *cd)
-+{
-+	struct kvm_device_ops *ops = NULL;
-+	struct kvm_device *dev;
-+	struct file *file;
-+	int type;
-+
-+	if (cd->type >= ARRAY_SIZE(kvm_device_ops_table))
-+		return -ENODEV;
-+
-+	type = array_index_nospec(cd->type, ARRAY_SIZE(kvm_device_ops_table));
-+	ops = kvm_device_ops_table[type];
-+	if (ops == NULL)
-+		return -ENODEV;
-+
-+	file = fget(cd->fd);
-+	if (!file)
-+		return -ENODEV;
-+
-+	dev = file->private_data;
-+	if (!dev)
-+		return -ENODEV;
-+
-+	kvm_put_kvm(kvm);
-+	mutex_lock(&kvm->lock);
-+	list_del(&device->vm_node);
-+	mutex_unlock(&kvm->lock);
-+	ops->destroy(dev);
-+	ksys_close(cd->fd);
-+
-+	return 0;
-+}
-+
- static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- {
- 	switch (arg) {
-@@ -4448,8 +4483,10 @@ static long kvm_vm_ioctl(struct file *filp,
- 			goto out;
- 
- 		r = -EFAULT;
--		if (copy_to_user(argp, &cd, sizeof(cd)))
-+		if (copy_to_user(argp, &cd, sizeof(cd))) {
-+			kvm_ioctl_destroy_device(kvm, &cd);
- 			goto out;
-+		}
- 
- 		r = 0;
- 		break;
+Thanks. I'll repost a version shortly, unless someone shouts.
+
+         M.
 -- 
-2.27.0
+Jazz is not dead. It just smells funny...
