@@ -2,152 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 448DF4884FE
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 18:42:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96B7A4885E4
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 21:28:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234508AbiAHRmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Jan 2022 12:42:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40826 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234256AbiAHRmH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 8 Jan 2022 12:42:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641663724;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eZVUjQiwMvhimCji0d8/xJbQ9eOHnZHI4ZJAgbXoD1Y=;
-        b=ip7JZJlIo42oRzKzJlbA+79AOUkoq0+T41nVtpzXlcUQz5Otql7uvVdfMeo0MekIAcpsDK
-        qIGoy6d77GewgS7kNy30WnGrIHlWO7714z/V9Y2WwURxOBhCMdBr23S0njTfFXc3a3B+TE
-        7JQDCY1LBgt/rGV41krEFIkeTbbMBKk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-347-_X2e9sFhNViCO1epxvZ84w-1; Sat, 08 Jan 2022 12:42:03 -0500
-X-MC-Unique: _X2e9sFhNViCO1epxvZ84w-1
-Received: by mail-wm1-f71.google.com with SMTP id m9-20020a05600c4f4900b0034644da3525so3445353wmq.3
-        for <kvm@vger.kernel.org>; Sat, 08 Jan 2022 09:42:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eZVUjQiwMvhimCji0d8/xJbQ9eOHnZHI4ZJAgbXoD1Y=;
-        b=z/IB5mf0zD12L81dJEsvSqkRcR252vGpF+JRhUBzr7dbNs53h5th7s0QUAbBg1xHj9
-         aP7Q1yoZ4/KOC/2vndXnAK/fmgecQ9XuYwNSJIljgYHRQMYm2DB4e1ptJLZc8Pxq5ddV
-         Pfg1gc4dR+TGqkQ7g2hYRz/uQNH4OSj3S4Oo+btg2bZ4gP8ldIL6Tn5v5L9M7JBuemEP
-         3WUi26z+K3jOgD++bSo8VTNvg6Xwnm2BFux69+LaZZGsRQBCFBKcAWebX+OXy9l4s1/N
-         3CFvy1uV+3nujJHUtjOsNkotlWFDUSV076cqGirDVlhFVqZe4RATo2/abNYUQ//Zm/6u
-         yyAQ==
-X-Gm-Message-State: AOAM5304cxUpEkgxf5+G9p8s3spdjQgZfzqkpNzwSqhi0edZlyzBsRbG
-        GnvGiiwTKYnWp7ImNlzNEC2OMQqejY+UF8NCWBeQM3ZMzVTb4g8leJelznT8AbAfW7jtDZT44Ft
-        n9yhoHPVhtTJL
-X-Received: by 2002:a5d:428e:: with SMTP id k14mr2220367wrq.524.1641663722051;
-        Sat, 08 Jan 2022 09:42:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwYKBDXf6+Z/pzYSngoalfQglop4wcw0Ierbv2oLgA5+pKSxRs/CvyEYCqC5ZnaNpSy6KPkkw==
-X-Received: by 2002:a5d:428e:: with SMTP id k14mr2220359wrq.524.1641663721855;
-        Sat, 08 Jan 2022 09:42:01 -0800 (PST)
-Received: from redhat.com ([2a10:800d:b77b:0:4c0a:9a47:da3d:38fd])
-        by smtp.gmail.com with ESMTPSA id m5sm1939693wml.48.2022.01.08.09.41.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Jan 2022 09:42:00 -0800 (PST)
-Date:   Sat, 8 Jan 2022 12:41:57 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Eli Cohen <elic@nvidia.com>, kbuild-all@lists.01.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-Subject: Re: [mst-vhost:vhost 30/44]
- drivers/vdpa/mlx5/net/mlx5_vnet.c:1247:23: sparse: sparse: cast to
- restricted __le16
-Message-ID: <20220108123934-mutt-send-email-mst@kernel.org>
-References: <202201082258.aKRHnaJX-lkp@intel.com>
+        id S232799AbiAHU2W convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 8 Jan 2022 15:28:22 -0500
+Received: from mail.galeria.spb.ru ([46.252.244.27]:21851 "EHLO
+        mail.galeria.spb.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229822AbiAHU2W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 Jan 2022 15:28:22 -0500
+X-Greylist: delayed 903 seconds by postgrey-1.27 at vger.kernel.org; Sat, 08 Jan 2022 15:28:21 EST
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202201082258.aKRHnaJX-lkp@intel.com>
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Ciao
+To:     Recipients <robot@galeria.spb.ru>
+From:   Huang Jinping <robot@galeria.spb.ru>
+Date:   Sun, 9 Jan 2022 04:13:03 +0800
+Reply-To: <receiver@winghang.info>
+Message-ID: <3cf8b76d-024b-4cfa-aa3a-b966237242f4@MAIL-01.galeria.spb.ru>
+X-ClientProxiedBy: MAIL-01.galeria.spb.ru (192.168.0.33) To
+ mail-01.galeria.spb.ru (192.168.0.33)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 08, 2022 at 10:48:34PM +0800, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-> head:   008842b2060c14544ff452483ffd2241d145c7b2
-> commit: 7620d51af29aa1c5d32150db2ac4b6187ef8af3a [30/44] vdpa/mlx5: Support configuring max data virtqueue
-> config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20220108/202201082258.aKRHnaJX-lkp@intel.com/config)
-> compiler: powerpc-linux-gcc (GCC) 11.2.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # apt-get install sparse
->         # sparse version: v0.6.4-dirty
->         # https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=7620d51af29aa1c5d32150db2ac4b6187ef8af3a
->         git remote add mst-vhost https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
->         git fetch --no-tags mst-vhost vhost
->         git checkout 7620d51af29aa1c5d32150db2ac4b6187ef8af3a
->         # save the config file to linux build tree
->         mkdir build_dir
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=powerpc SHELL=/bin/bash drivers/vdpa/mlx5/
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> 
-> sparse warnings: (new ones prefixed by >>)
-> >> drivers/vdpa/mlx5/net/mlx5_vnet.c:1247:23: sparse: sparse: cast to restricted __le16
-> >> drivers/vdpa/mlx5/net/mlx5_vnet.c:1247:23: sparse: sparse: cast from restricted __virtio16
-> 
-> vim +1247 drivers/vdpa/mlx5/net/mlx5_vnet.c
-> 
->   1232	
->   1233	static int create_rqt(struct mlx5_vdpa_net *ndev)
->   1234	{
->   1235		__be32 *list;
->   1236		int max_rqt;
->   1237		void *rqtc;
->   1238		int inlen;
->   1239		void *in;
->   1240		int i, j;
->   1241		int err;
->   1242		int num;
->   1243	
->   1244		if (!(ndev->mvdev.actual_features & BIT_ULL(VIRTIO_NET_F_MQ)))
->   1245			num = 1;
->   1246		else
-> > 1247			num = le16_to_cpu(ndev->config.max_virtqueue_pairs);
-
-What is the correct thing to do here?  mlx5vdpa16_to_cpu?
-
->   1248	
->   1249		max_rqt = min_t(int, roundup_pow_of_two(num),
->   1250				1 << MLX5_CAP_GEN(ndev->mvdev.mdev, log_max_rqt_size));
->   1251		if (max_rqt < 1)
->   1252			return -EOPNOTSUPP;
->   1253	
->   1254		inlen = MLX5_ST_SZ_BYTES(create_rqt_in) + max_rqt * MLX5_ST_SZ_BYTES(rq_num);
->   1255		in = kzalloc(inlen, GFP_KERNEL);
->   1256		if (!in)
->   1257			return -ENOMEM;
->   1258	
->   1259		MLX5_SET(create_rqt_in, in, uid, ndev->mvdev.res.uid);
->   1260		rqtc = MLX5_ADDR_OF(create_rqt_in, in, rqt_context);
->   1261	
->   1262		MLX5_SET(rqtc, rqtc, list_q_type, MLX5_RQTC_LIST_Q_TYPE_VIRTIO_NET_Q);
->   1263		MLX5_SET(rqtc, rqtc, rqt_max_size, max_rqt);
->   1264		list = MLX5_ADDR_OF(rqtc, rqtc, rq_num[0]);
->   1265		for (i = 0, j = 0; i < max_rqt; i++, j += 2)
->   1266			list[i] = cpu_to_be32(ndev->vqs[j % (2 * num)].virtq_id);
->   1267	
->   1268		MLX5_SET(rqtc, rqtc, rqt_actual_size, max_rqt);
->   1269		err = mlx5_vdpa_create_rqt(&ndev->mvdev, in, inlen, &ndev->res.rqtn);
->   1270		kfree(in);
->   1271		if (err)
->   1272			return err;
->   1273	
->   1274		return 0;
->   1275	}
->   1276	
-> 
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
-
+Mi dispiace inviarti questa email, che è arrivata nella tua cartella spam come email non richiesta. Mi chiamo Huang Jinping. Ho una proposta commerciale per te. So che saresti interessato a questa proposta commerciale. Contattatemi per maggiori informazioni
