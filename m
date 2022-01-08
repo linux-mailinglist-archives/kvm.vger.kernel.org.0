@@ -2,92 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92A0F487FD1
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 01:05:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0C45487FD3
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 01:06:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbiAHAFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 19:05:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33424 "EHLO
+        id S229783AbiAHAGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 19:06:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229700AbiAHAFB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 19:05:01 -0500
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C5AC061574
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 16:05:01 -0800 (PST)
-Received: by mail-ot1-x32d.google.com with SMTP id o3-20020a9d4043000000b0058f31f4312fso8359305oti.1
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 16:05:01 -0800 (PST)
+        with ESMTP id S229703AbiAHAGz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 19:06:55 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB021C061574
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 16:06:54 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id v124so3227203oie.0
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 16:06:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xIQIMAF9RLT+C4D5YuRDhHVaZflXIUIUiQfqwkcoWZc=;
-        b=ikRLN/s+6VutL3/OAv9/D8Jt2GzaaDDFBTBjvFaNhLcP59xDsK76CcNlzc4oMBOwvc
-         UodXoB8hp54v4YFwcJxBfHQoyZOxoD1KzRVhLjlrtXjMZ0kC/iGoTZH/bl4fz0ea+ER3
-         Dd6O6lLHatYVKexOUaY4+UdpkbMut0ZQWhp+xoET0+ViFkHdL9PAOTCEnOnGuUhRVAYq
-         5xd7e0TjW+HC1AYlN3jhHqlHe+wD8UU3lli7sEi6wuM8YwejdHniz5x1YpypSMC+KP4N
-         bza8pbAUy1ess2KEkKTP8RDE1JvFMBkG3bWqEnfOBv4UnBRMOkZdssMMEE+iUi6lxhsD
-         FCiQ==
+         :cc:content-transfer-encoding;
+        bh=6y1oCb9FsJGNnOttI3nUfsYQ56k78qI2vypZBmXq17c=;
+        b=eDRyeHcRSGIv4aSUKEFJmIZn7h23sMWjk2plSanToc9Jc1+olB6FKC/DFxaC3H4YLp
+         GgZMfDPT8flkdtkb/WWJr+STHKhDY2o7CizMpFNXulEegOR9Bkx1A3LESJdkGbriEVg8
+         swTnd1rYnjrnPr/y+aJfg6HM6C3eLE1RvrRZ5stqLPlcHmpChh3dO/65y5Yn00OEvpzC
+         pJ8ndUUJSj1KIrbak8yGzZPInUhxjkQ5qFEX+kmAdjJV4vEW+2UowKbODW3P/p2iqr/R
+         G7rempbLXHjLYs2D3DM7V/s7Ek68ACtZQkRE+v4JdlApjekzS3OneFYEnFS5COG+EMJa
+         nvmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xIQIMAF9RLT+C4D5YuRDhHVaZflXIUIUiQfqwkcoWZc=;
-        b=CXwaIv9NtX5T1yHIeOnPaQ/RNqQ9hnPESd1YAGXPASxf/w/Dhr6KIk/UjOERxFzNVG
-         wwQegkwwYOJViBFqjKi9kwGB9ruPNzK63uSKsnuXjAjQ173kU9fVzEPyodLRMpyijB/1
-         wV0tfQQGGKZsrvykMYNO7iUC7RJu/15kOqpgZZ5WDI2mB68p5tp2spjdFJ0uiYjVY9Zi
-         iP5nnbO+uDp3qo30n+CKPEJsmMhqy63XuvuKPGc2bqjqDwvJmRpSKKD9yoxS15r02hLO
-         35okEmqRl8RGNU42sV73cH/fkOPYl0+FzyhZdgQc4gwBRgrpHZSxaB00Bza5So1Bdy8G
-         kQXQ==
-X-Gm-Message-State: AOAM531R6AONoNx98XQ368ucBtrKxmhvSz7DQ4dvtHvtsvafahO+/u64
-        WRlMG/3LjosfLGMRyncqIhR34N52Bl/WjjBh55g1Yw==
-X-Google-Smtp-Source: ABdhPJyvaiFT2G34coGt3czDQ/iLkIq+EgyiHgmZSbvDmR6/D06mxLvwlCBW5kXpWCbVDzlXbPJqPLrmwno45hzKJ4M=
-X-Received: by 2002:a05:6830:4a9:: with SMTP id l9mr44223760otd.75.1641600300700;
- Fri, 07 Jan 2022 16:05:00 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=6y1oCb9FsJGNnOttI3nUfsYQ56k78qI2vypZBmXq17c=;
+        b=Iu0SWbfKrt+yQw+L9pMNWf+8l6YLJcWUTilwUgjA6dls9s0hdL4YQD1jstGK/RGtx2
+         5FlTMr/q2OA2mKcBzFcfpo90ldkoovGfCaXxyqWiGizZJk33Y76SuJg/qasf1YIEdGSX
+         Kdqy2rP76jNjBqbhIyP4qQzNaTA6jPeDMNsGqxiiuxhLd7g/J0eodE+yb8WIu7KWS8QA
+         Em4vicMNKY9z39tFmuJ+d/Ce9UhYxJzUL5WZwUvAgFD/JfXbDstRt6FBA1R9iB7WOaYk
+         HWH8wXEwpK36oAYnSf2ZWVVEMYoLjmmVsUgLyyqLq929sryJ77R+IUnCwBXfnXXfAy1L
+         QDwA==
+X-Gm-Message-State: AOAM532Egqldympe9g+fjLqanJzxchKclLYSCf+GC/OMfk13wCzmaCxG
+        3YlJ3aKuoiiIX7Dx7w0seISZd9yQgIpHIQBvyZzGEw==
+X-Google-Smtp-Source: ABdhPJwvDI3eReziG8/afRs5uk2kJ6CeH2dboGoUraFuxbDEp1m0yHxQwSx4iuQiQbCR6WW0Rt3gaIZ1OXuLW727hkM=
+X-Received: by 2002:a05:6808:1b22:: with SMTP id bx34mr9315775oib.68.1641600414089;
+ Fri, 07 Jan 2022 16:06:54 -0800 (PST)
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
- <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com> <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
-In-Reply-To: <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+References: <20200529074347.124619-1-like.xu@linux.intel.com>
+ <20200529074347.124619-4-like.xu@linux.intel.com> <CALMp9eQNZsk-odGHNkLkkakk+Y01qqY5Mzm3x8n0A3YizfUJ7Q@mail.gmail.com>
+ <7c44617d-39f5-4e82-ee45-f0d142ba0dbc@linux.intel.com>
+In-Reply-To: <7c44617d-39f5-4e82-ee45-f0d142ba0dbc@linux.intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 7 Jan 2022 16:04:49 -0800
-Message-ID: <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
+Date:   Fri, 7 Jan 2022 16:06:43 -0800
+Message-ID: <CALMp9eTYPqZ-NMuBKkoNX+ZvomzSsCgz1=C2n+Ajaq-ttMys1Q@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: pmu: Test full-width counter writes support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
         Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 7, 2022 at 3:43 PM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
+On Tue, May 11, 2021 at 11:33 PM Like Xu <like.xu@linux.intel.com> wrote:
 >
-> Hi Reiji,
+> On 2021/5/12 5:27, Jim Mattson wrote:
+> > On Fri, May 29, 2020 at 12:44 AM Like Xu <like.xu@linux.intel.com> wrot=
+e:
+> >>
+> >> When the full-width writes capability is set, use the alternative MSR
+> >> range to write larger sign counter values (up to GP counter width).
+> >>
+> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> >> ---
+> >
+> >> +       /*
+> >> +        * MSR_IA32_PMCn supports writing values =C3=A2=E2=82=AC=E2=80=
+=B9=C3=A2=E2=82=AC=E2=80=B9up to GP counter width,
+> >> +        * and only the lowest bits of GP counter width are valid.
+> >> +        */
+> >
+> > Could you rewrite this comment in ASCII, please? I would do it, but
+> > I'm not sure what the correct translation is.
+> >
 >
-> On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Raghu,
-> >
-> > On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
-> > <rananta@google.com> wrote:
-> > >
-> > > Capture the start of the KVM VM, which is basically the
-> > > start of any vCPU run. This state of the VM is helpful
-> > > in the upcoming patches to prevent user-space from
-> > > configuring certain VM features after the VM has started
-> > > running.
+> My first submitted patch says that
+> they are just Unicode "ZERO WIDTH SPACE".
+>
+> https://lore.kernel.org/kvm/20200508083218.120559-2-like.xu@linux.intel.c=
+om/
+>
+> Here you go:
+>
+> ---
+>
+>  From 1b058846aabcd7a85b5c5f41cb2b63b6a348bdc4 Mon Sep 17 00:00:00 2001
+> From: Like Xu <like.xu@linux.intel.com>
+> Date: Wed, 12 May 2021 14:26:40 +0800
+> Subject: [PATCH] x86: pmu: Fix a comment about full-width counter writes
+>   support
+>
+> Remove two Unicode characters 'ZERO WIDTH SPACE' (U+200B).
+>
+> Fixes: 22f2901a0e ("x86: pmu: Test full-width counter writes support")
+> Reported-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>   x86/pmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 5a3d55b..6cb3506 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -510,7 +510,7 @@ static void  check_gp_counters_write_width(void)
+>          }
+>
+>          /*
+> -        * MSR_IA32_PMCn supports writing values =C3=83=C2=A2=C3=A2=E2=80=
+=9A=C2=AC=C3=A2=E2=82=AC=C2=B9=C3=83=C2=A2=C3=A2=E2=80=9A=C2=AC=C3=A2=E2=82=
+=AC=C2=B9up to GP
+> counter width,
+> +        * MSR_IA32_PMCn supports writing values up to GP counter width,
+>           * and only the lowest bits of GP counter width are valid.
+>           */
+>          for (i =3D 0; i < num_counters; i++) {
+> --
+> 2.31.1
 
-What about live migration, where the VM has already technically been
-started before the first call to KVM_RUN?
+Paolo:
+
+Did this patch get overlooked? I'm still seeing the unicode characters
+in this comment.
