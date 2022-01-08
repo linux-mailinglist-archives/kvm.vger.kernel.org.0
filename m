@@ -2,133 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0C45487FD3
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 01:06:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CD22487FDE
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 01:17:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiAHAGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 19:06:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33848 "EHLO
+        id S229963AbiAHARJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 19:17:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiAHAGz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 19:06:55 -0500
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB021C061574
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 16:06:54 -0800 (PST)
-Received: by mail-oi1-x236.google.com with SMTP id v124so3227203oie.0
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 16:06:54 -0800 (PST)
+        with ESMTP id S229582AbiAHARI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 19:17:08 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3563EC061574
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 16:17:08 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id c3so6258153pls.5
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 16:17:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6y1oCb9FsJGNnOttI3nUfsYQ56k78qI2vypZBmXq17c=;
-        b=eDRyeHcRSGIv4aSUKEFJmIZn7h23sMWjk2plSanToc9Jc1+olB6FKC/DFxaC3H4YLp
-         GgZMfDPT8flkdtkb/WWJr+STHKhDY2o7CizMpFNXulEegOR9Bkx1A3LESJdkGbriEVg8
-         swTnd1rYnjrnPr/y+aJfg6HM6C3eLE1RvrRZ5stqLPlcHmpChh3dO/65y5Yn00OEvpzC
-         pJ8ndUUJSj1KIrbak8yGzZPInUhxjkQ5qFEX+kmAdjJV4vEW+2UowKbODW3P/p2iqr/R
-         G7rempbLXHjLYs2D3DM7V/s7Ek68ACtZQkRE+v4JdlApjekzS3OneFYEnFS5COG+EMJa
-         nvmA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8YdYvsY4lCeVA+Gp/EBIybdpKH1XTBffjFU4qvK9NaU=;
+        b=hETj+4UOwIYMFBq+UQHCYYs/Nwi0fOTAixvBX5OmEdAOBbEHg62l/nyfyFZTRjQTR1
+         z0ppodeZFqjezDneI02xzbF7o9DpleGRIwDVbgx/ejQlXi3HuhJQlg7inJNBPUta0Qfw
+         8yQsspz6bbkVwRz4UpplInWAPui5BFWP8vsMWfwDVIt8CS2ijI7brkc3ZoVBqXDeZFGo
+         kBgjytFnz4xXyN5c4frI5raBmXNU6scmCHyc59W0Zt20/415b14KDyp/H2CtVhiLAjbQ
+         VxKg7DtGAlg6GQqIeRDaQXq85quk7MvJU/EsymnPRFUffBQzopco+yR0Tghm+7HyuEh7
+         nB2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6y1oCb9FsJGNnOttI3nUfsYQ56k78qI2vypZBmXq17c=;
-        b=Iu0SWbfKrt+yQw+L9pMNWf+8l6YLJcWUTilwUgjA6dls9s0hdL4YQD1jstGK/RGtx2
-         5FlTMr/q2OA2mKcBzFcfpo90ldkoovGfCaXxyqWiGizZJk33Y76SuJg/qasf1YIEdGSX
-         Kdqy2rP76jNjBqbhIyP4qQzNaTA6jPeDMNsGqxiiuxhLd7g/J0eodE+yb8WIu7KWS8QA
-         Em4vicMNKY9z39tFmuJ+d/Ce9UhYxJzUL5WZwUvAgFD/JfXbDstRt6FBA1R9iB7WOaYk
-         HWH8wXEwpK36oAYnSf2ZWVVEMYoLjmmVsUgLyyqLq929sryJ77R+IUnCwBXfnXXfAy1L
-         QDwA==
-X-Gm-Message-State: AOAM532Egqldympe9g+fjLqanJzxchKclLYSCf+GC/OMfk13wCzmaCxG
-        3YlJ3aKuoiiIX7Dx7w0seISZd9yQgIpHIQBvyZzGEw==
-X-Google-Smtp-Source: ABdhPJwvDI3eReziG8/afRs5uk2kJ6CeH2dboGoUraFuxbDEp1m0yHxQwSx4iuQiQbCR6WW0Rt3gaIZ1OXuLW727hkM=
-X-Received: by 2002:a05:6808:1b22:: with SMTP id bx34mr9315775oib.68.1641600414089;
- Fri, 07 Jan 2022 16:06:54 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8YdYvsY4lCeVA+Gp/EBIybdpKH1XTBffjFU4qvK9NaU=;
+        b=2Ohg2/0dp1r5HwYjxGD6k0ENckCoIbhT2LSS8AMFkgk5vkpw1GPEmiRC5nVlBbGRxR
+         9rhq73MMQOuT9Fkv4s/gFKkZDYSxZXmUI/v6wldYGh+P+SPpg3D+IyS5DJH8Qx5u9NIA
+         WgGRzDesmM2xE8P0VMatWBWOZuJZAsSp9OpR3YUZ5men8QCpun2KYKwJVPFQcuLC0coL
+         mVTUxI9wlCqQS2O1JZStpyjNuxH6febh/JU45cL7+LpllTsHsXJqaVGuiI5hPygWl6JD
+         sbEuSsqBycUaOvmCnL2h+X5zzNrimfsEfGWWxMveCQjgzGg82c3Xv/2YALSmie7x17ER
+         CFTw==
+X-Gm-Message-State: AOAM532giULnf5SInxJldbdQSFaOLmZYSrjRAfy2bPhOvg5UeImCrjGA
+        3DY1KOe3UhYBmzwI8DR5NavgOQ==
+X-Google-Smtp-Source: ABdhPJw16/37KDT9FJvcQkWKT0mpM8WtDHh1qlOLrRksMZ5DUpZ8pFfcaf1tETTxaeKfVko7T6iEsw==
+X-Received: by 2002:a17:90b:4ad0:: with SMTP id mh16mr18421890pjb.114.1641601027376;
+        Fri, 07 Jan 2022 16:17:07 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k6sm81642pfu.96.2022.01.07.16.17.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jan 2022 16:17:06 -0800 (PST)
+Date:   Sat, 8 Jan 2022 00:17:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: VMX: Dont' deliver posted IRQ if vCPU == this vCPU
+ and vCPU is IN_GUEST_MODE
+Message-ID: <YdjX//gxZtP/ZMME@google.com>
+References: <1641471171-34232-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-References: <20200529074347.124619-1-like.xu@linux.intel.com>
- <20200529074347.124619-4-like.xu@linux.intel.com> <CALMp9eQNZsk-odGHNkLkkakk+Y01qqY5Mzm3x8n0A3YizfUJ7Q@mail.gmail.com>
- <7c44617d-39f5-4e82-ee45-f0d142ba0dbc@linux.intel.com>
-In-Reply-To: <7c44617d-39f5-4e82-ee45-f0d142ba0dbc@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 7 Jan 2022 16:06:43 -0800
-Message-ID: <CALMp9eTYPqZ-NMuBKkoNX+ZvomzSsCgz1=C2n+Ajaq-ttMys1Q@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: pmu: Test full-width counter writes support
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1641471171-34232-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 11, 2021 at 11:33 PM Like Xu <like.xu@linux.intel.com> wrote:
->
-> On 2021/5/12 5:27, Jim Mattson wrote:
-> > On Fri, May 29, 2020 at 12:44 AM Like Xu <like.xu@linux.intel.com> wrot=
-e:
-> >>
-> >> When the full-width writes capability is set, use the alternative MSR
-> >> range to write larger sign counter values (up to GP counter width).
-> >>
-> >> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> >> ---
-> >
-> >> +       /*
-> >> +        * MSR_IA32_PMCn supports writing values =C3=A2=E2=82=AC=E2=80=
-=B9=C3=A2=E2=82=AC=E2=80=B9up to GP counter width,
-> >> +        * and only the lowest bits of GP counter width are valid.
-> >> +        */
-> >
-> > Could you rewrite this comment in ASCII, please? I would do it, but
-> > I'm not sure what the correct translation is.
-> >
->
-> My first submitted patch says that
-> they are just Unicode "ZERO WIDTH SPACE".
->
-> https://lore.kernel.org/kvm/20200508083218.120559-2-like.xu@linux.intel.c=
-om/
->
-> Here you go:
->
-> ---
->
->  From 1b058846aabcd7a85b5c5f41cb2b63b6a348bdc4 Mon Sep 17 00:00:00 2001
-> From: Like Xu <like.xu@linux.intel.com>
-> Date: Wed, 12 May 2021 14:26:40 +0800
-> Subject: [PATCH] x86: pmu: Fix a comment about full-width counter writes
->   support
->
-> Remove two Unicode characters 'ZERO WIDTH SPACE' (U+200B).
->
-> Fixes: 22f2901a0e ("x86: pmu: Test full-width counter writes support")
-> Reported-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->   x86/pmu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 5a3d55b..6cb3506 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -510,7 +510,7 @@ static void  check_gp_counters_write_width(void)
->          }
->
->          /*
-> -        * MSR_IA32_PMCn supports writing values =C3=83=C2=A2=C3=A2=E2=80=
-=9A=C2=AC=C3=A2=E2=82=AC=C2=B9=C3=83=C2=A2=C3=A2=E2=80=9A=C2=AC=C3=A2=E2=82=
-=AC=C2=B9up to GP
-> counter width,
-> +        * MSR_IA32_PMCn supports writing values up to GP counter width,
->           * and only the lowest bits of GP counter width are valid.
->           */
->          for (i =3D 0; i < num_counters; i++) {
-> --
-> 2.31.1
+Nit, s/deliver/send, "deliver" reads as though KVM is ignoring an event that was
+sent by something else.
 
-Paolo:
+On Thu, Jan 06, 2022, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Commit fdba608f15e2 (KVM: VMX: Wake vCPU when delivering posted IRQ even 
+> if vCPU == this vCPU) fixes wakeup event is missing when it is not from 
+> synchronous kvm context by dropping vcpu == running_vcpu checking completely.
+> However, it will break the original goal to optimise timer fastpath, let's 
+> move the checking under vCPU is IN_GUEST_MODE to restore the performance.
 
-Did this patch get overlooked? I'm still seeing the unicode characters
-in this comment.
+Please (a) explain why this is safe and (b) provide context for exactly what
+fastpath this helpers.  Lack of context is partly what led to the optimization
+being reverted instead of being fixed as below, and forcing readers to jump through
+multiple changelogs to understand what's going on is unnecessarily mean.
+
+E.g.
+
+  When delivering a virtual interrupt, don't actually send a posted interrupt
+  if the target vCPU is also the currently running vCPU and is IN_GUEST_MODE,
+  in which case the interrupt is being sent from a VM-Exit fastpath and the
+  core run loop in vcpu_enter_guest() will manually move the interrupt from
+  the PIR to vmcs.GUEST_RVI.  IRQs are disabled while IN_GUEST_MODE, thus
+  there's no possibility of the virtual interrupt being sent from anything
+  other than KVM, i.e. KVM won't suppress a wake event from an IRQ handler
+  (see commit fdba608f15e2, "KVM: VMX: Wake vCPU when delivering posted IRQ
+  even if vCPU == this vCPU").
+
+  Eliding the posted interrupt restores the performance provided by the
+  combination of commits 379a3c8ee444 ("KVM: VMX: Optimize posted-interrupt
+  delivery for timer fastpath") and 26efe2fd92e5 ("KVM: VMX: Handle
+  preemption timer fastpath").
+
+The comment above send_IPI_mask() also needs to be updated.  There are a few
+existing grammar and style nits that can be opportunistically cleaned up, too.
+
+Paolo, if Wanpeng doesn't object, can you use the above changelog and the below
+comment?
+
+With that,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+---
+ arch/x86/kvm/vmx/vmx.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index fe06b02994e6..730df0e183d6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3908,31 +3908,32 @@ static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+ #ifdef CONFIG_SMP
+ 	if (vcpu->mode == IN_GUEST_MODE) {
+ 		/*
+-		 * The vector of interrupt to be delivered to vcpu had
+-		 * been set in PIR before this function.
++		 * The vector of the virtual has already been set in the PIR.
++		 * Send a notification event to deliver the virtual interrupt
++		 * unless the vCPU is the currently running vCPU, i.e. the
++		 * event is being sent from a fastpath VM-Exit handler, in
++		 * which case the PIR will be synced to the vIRR before
++		 * re-entering the guest.
+ 		 *
+-		 * Following cases will be reached in this block, and
+-		 * we always send a notification event in all cases as
+-		 * explained below.
++		 * When the target is not the running vCPU, the following
++		 * possibilities emerge:
+ 		 *
+-		 * Case 1: vcpu keeps in non-root mode. Sending a
+-		 * notification event posts the interrupt to vcpu.
++		 * Case 1: vCPU stays in non-root mode. Sending a notification
++		 * event posts the interrupt to the vCPU.
+ 		 *
+-		 * Case 2: vcpu exits to root mode and is still
+-		 * runnable. PIR will be synced to vIRR before the
+-		 * next vcpu entry. Sending a notification event in
+-		 * this case has no effect, as vcpu is not in root
+-		 * mode.
++		 * Case 2: vCPU exits to root mode and is still runnable. The
++		 * PIR will be synced to the vIRR before re-entering the guest.
++		 * Sending a notification event is ok as the host IRQ handler
++		 * will ignore the spurious event.
+ 		 *
+-		 * Case 3: vcpu exits to root mode and is blocked.
+-		 * vcpu_block() has already synced PIR to vIRR and
+-		 * never blocks vcpu if vIRR is not cleared. Therefore,
+-		 * a blocked vcpu here does not wait for any requested
+-		 * interrupts in PIR, and sending a notification event
+-		 * which has no effect is safe here.
++		 * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
++		 * has already synced PIR to vIRR and never blocks the vCPU if
++		 * the vIRR is not empty. Therefore, a blocked vCPU here does
++		 * not wait for any requested interrupts in PIR, and sending a
++		 * notification event also results in a benign, spurious event.
+ 		 */
+-
+-		apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
++		if (vcpu != kvm_get_running_vcpu())
++			apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+ 		return;
+ 	}
+ #endif
+
