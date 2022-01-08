@@ -2,172 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E18E488046
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 02:06:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A04194880D3
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 03:09:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229988AbiAHBGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 20:06:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47042 "EHLO
+        id S233273AbiAHCJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 21:09:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbiAHBGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 20:06:08 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10542C061574
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 17:06:08 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id z30so3641162pge.4
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 17:06:07 -0800 (PST)
+        with ESMTP id S229912AbiAHCJK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 21:09:10 -0500
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6680BC061574;
+        Fri,  7 Jan 2022 18:09:10 -0800 (PST)
+Received: by mail-yb1-xb2b.google.com with SMTP id j83so21831364ybg.2;
+        Fri, 07 Jan 2022 18:09:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=P/JdDvFQ/rU7zLe6irNqXlDeNuS6rYc6yuVZLjuKGyc=;
-        b=Gg5eWfiQzwLIDi3YoPnouPv9dHbr42UFFA0692cmMc7iSKB3cfJ5APAG23uGy/zbsp
-         oya7+4PV908NfHJWxCkXmdBerdH+HzKm70zC7wBiD7lEiagilEozr/p5HxVIv0JMB9vt
-         xfp8BL/sZlkI5ZvY1XM8Jj4+ooVgNxixfzOcEOuiWvDD1VZTA79hUIEOzDnjgqtGr6hZ
-         hFxCBC2uNj4kC8Q3E5BaaaOPYm0J39TVtvw/a4HH6csoTDS1yZK43b7wD9i7v81Y1H47
-         sYePq+D7zHxdjOge2j+M+0YN2yDtjEwxUZGKuxBuCJB1Gir0mUYamaCWzpw3NzO3l2yx
-         d6aw==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7h91m8QgRh+qiSrsUgRoesNuNjxf0DUMijvzYemGZOw=;
+        b=mN82rEM2nXPEcJn05mmRCgetWyZvLxhs7lRPRbN6vihJtz21ZbB0cJ49cvAVu9i9r2
+         lViB28+iSjOME/OrGno/dO3jsIm7e79roVg5jbFkHodiEXxmU4zGoQmutCklHXTpBs4L
+         aDLmOyYzlOJGTkqQ5VloAKE4cHSY+9K4D7t5V6SGac74R6eUsJna+OSQkL4wQJ7Yfxnc
+         CQb0YJ+r2xRXuF4egCnYqf+O+ipHNlAvOT9MS72J0v1QYRBGpzL4TCfWiefO8MMRamBM
+         odtaBpiOd0+JqEhNst9NCBn3STqTU9gOYsEy54zXmhkudcSkZw3xgwXEfDIMh3TQ+h/R
+         XoqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=P/JdDvFQ/rU7zLe6irNqXlDeNuS6rYc6yuVZLjuKGyc=;
-        b=Wx8QRJHMYH7u4IwCV/JN03PFIs57H0h4uEcHA6Ewy/F2JrHb4xCqrrG0DCvXqckmga
-         xuVpwcR+avrISfGxVZ7de58I8cNz1rT4sXByMLsYGPIsN6q92helS88mvxsrOaHmglNQ
-         2BM8mr16O1z/ZcVK1BQeW1wJHo63205U5blPS1DC2F4JpiXDva0ebdx1LcNQMzmxhHg8
-         mWoMJwndzSZXvI8EnfFgcOESyLVYZtEcsj0xGd24llQJ3Gm1xVZknGODr6i2cif49XiZ
-         E6zKHB4AaHhMqFlzhL2Z8+1bHHXqly7SCzLUq1QrbrtGg6UcIDd2K/NpbnPLUbnd33Gq
-         bIQQ==
-X-Gm-Message-State: AOAM530tsLpGSk1fJ4Ma/Kxld13kWrX1rJ7Nl3cIZjMrGZBpJlcIchr3
-        PWUEOpfsOMlBCyiRxG+uLRW+Lg==
-X-Google-Smtp-Source: ABdhPJxZQQtD46lRS+IB/vTcxBt5snfvk4QQYFbDeXg0NYPG6jAhHnl2lRG1C3Wa5MqAPv4pOwoSvQ==
-X-Received: by 2002:a63:44a:: with SMTP id 71mr57292354pge.453.1641603967292;
-        Fri, 07 Jan 2022 17:06:07 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c124sm121598pfb.139.2022.01.07.17.06.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 17:06:06 -0800 (PST)
-Date:   Sat, 8 Jan 2022 01:06:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-Message-ID: <Ydjje8qBOP3zDOZi@google.com>
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7h91m8QgRh+qiSrsUgRoesNuNjxf0DUMijvzYemGZOw=;
+        b=6sR2CDyQ50LOVfE9K6hWG1RqPZdR6ZteW9MB1EECnXAJvVKgoTalGwpQkU045tnXoc
+         zDZjkQomwfweCbSr6gqAPldJKiKhbrVfrfwXD5OBGCZtHz4AezrZeJ/nH3S8ZZsJrzTD
+         O2OOm+J0QyBL0rKft5Bkq0tLqUxCFoH3keiZr6KBbK5ptOu6mJsqF/UNO/zp0soFsgPl
+         NY2pqxfEMwMCXs0uVGryJ5tNFjdMplDnG6jDcN/fCgtdo+RFDzlfg7q1MCb1ClAem0jv
+         cqKTJwA+x5bzsZiN+I8tSDH5ozEv09QWzkwQG4eNZRaZQQd8RogM/lWFAw/ToChIekg6
+         HTYg==
+X-Gm-Message-State: AOAM530kxZzi5IfNiM+mSZFWD4esBzzaq6QV0zI4U7i1vVtnFPFbwupd
+        KSAJMTomw4S+hwewSkVMn1swMpLFapIIDNbsctU=
+X-Google-Smtp-Source: ABdhPJz7MkCjTEyiz+NK7oEvCsuYoUVLt4MhDKFMJnhT7dLj1HchoBu5mJT+/G85d3wBLha0ezafgUn+3rf1rFlXuYY=
+X-Received: by 2002:a25:abcf:: with SMTP id v73mr66297958ybi.459.1641607749650;
+ Fri, 07 Jan 2022 18:09:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220104194918.373612-2-rananta@google.com>
+References: <1641471171-34232-1-git-send-email-wanpengli@tencent.com> <YdjX//gxZtP/ZMME@google.com>
+In-Reply-To: <YdjX//gxZtP/ZMME@google.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sat, 8 Jan 2022 10:08:59 +0800
+Message-ID: <CANRm+Cz6NE_72V-_sCQxEvHQxuHEtBVsmYX1tE02+Y6EPRFzkA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Dont' deliver posted IRQ if vCPU == this vCPU
+ and vCPU is IN_GUEST_MODE
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
-> Capture the start of the KVM VM, which is basically the
+On Sat, 8 Jan 2022 at 08:17, Sean Christopherson <seanjc@google.com> wrote:
+>
+> Nit, s/deliver/send, "deliver" reads as though KVM is ignoring an event that was
+> sent by something else.
+>
+> On Thu, Jan 06, 2022, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Commit fdba608f15e2 (KVM: VMX: Wake vCPU when delivering posted IRQ even
+> > if vCPU == this vCPU) fixes wakeup event is missing when it is not from
+> > synchronous kvm context by dropping vcpu == running_vcpu checking completely.
+> > However, it will break the original goal to optimise timer fastpath, let's
+> > move the checking under vCPU is IN_GUEST_MODE to restore the performance.
+>
+> Please (a) explain why this is safe and (b) provide context for exactly what
+> fastpath this helpers.  Lack of context is partly what led to the optimization
+> being reverted instead of being fixed as below, and forcing readers to jump through
+> multiple changelogs to understand what's going on is unnecessarily mean.
+>
+> E.g.
+>
+>   When delivering a virtual interrupt, don't actually send a posted interrupt
+>   if the target vCPU is also the currently running vCPU and is IN_GUEST_MODE,
+>   in which case the interrupt is being sent from a VM-Exit fastpath and the
+>   core run loop in vcpu_enter_guest() will manually move the interrupt from
+>   the PIR to vmcs.GUEST_RVI.  IRQs are disabled while IN_GUEST_MODE, thus
+>   there's no possibility of the virtual interrupt being sent from anything
+>   other than KVM, i.e. KVM won't suppress a wake event from an IRQ handler
+>   (see commit fdba608f15e2, "KVM: VMX: Wake vCPU when delivering posted IRQ
+>   even if vCPU == this vCPU").
+>
+>   Eliding the posted interrupt restores the performance provided by the
+>   combination of commits 379a3c8ee444 ("KVM: VMX: Optimize posted-interrupt
+>   delivery for timer fastpath") and 26efe2fd92e5 ("KVM: VMX: Handle
+>   preemption timer fastpath").
+>
+> The comment above send_IPI_mask() also needs to be updated.  There are a few
+> existing grammar and style nits that can be opportunistically cleaned up, too.
+>
+> Paolo, if Wanpeng doesn't object, can you use the above changelog and the below
+> comment?
 
-Please wrap at ~75 chars.
+Thanks for these updates, Sean.
 
-> start of any vCPU run. This state of the VM is helpful
-> in the upcoming patches to prevent user-space from
-> configuring certain VM features after the VM has started
-> running.
+    Wanpeng
 
-Please provide context of how the flag will be used.  I glanced at the future
-patches, and knowing very little about arm, I was unable to glean useful info
-about exactly who is being prevented from doing what.
-
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+>
+> With that,
+>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+>
 > ---
->  include/linux/kvm_host.h | 3 +++
->  virt/kvm/kvm_main.c      | 9 +++++++++
->  2 files changed, 12 insertions(+)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index c310648cc8f1..d0bd8f7a026c 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -623,6 +623,7 @@ struct kvm {
->  	struct notifier_block pm_notifier;
+>  arch/x86/kvm/vmx/vmx.c | 41 +++++++++++++++++++++--------------------
+>  1 file changed, 21 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index fe06b02994e6..730df0e183d6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -3908,31 +3908,32 @@ static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+>  #ifdef CONFIG_SMP
+>         if (vcpu->mode == IN_GUEST_MODE) {
+>                 /*
+> -                * The vector of interrupt to be delivered to vcpu had
+> -                * been set in PIR before this function.
+> +                * The vector of the virtual has already been set in the PIR.
+> +                * Send a notification event to deliver the virtual interrupt
+> +                * unless the vCPU is the currently running vCPU, i.e. the
+> +                * event is being sent from a fastpath VM-Exit handler, in
+> +                * which case the PIR will be synced to the vIRR before
+> +                * re-entering the guest.
+>                  *
+> -                * Following cases will be reached in this block, and
+> -                * we always send a notification event in all cases as
+> -                * explained below.
+> +                * When the target is not the running vCPU, the following
+> +                * possibilities emerge:
+>                  *
+> -                * Case 1: vcpu keeps in non-root mode. Sending a
+> -                * notification event posts the interrupt to vcpu.
+> +                * Case 1: vCPU stays in non-root mode. Sending a notification
+> +                * event posts the interrupt to the vCPU.
+>                  *
+> -                * Case 2: vcpu exits to root mode and is still
+> -                * runnable. PIR will be synced to vIRR before the
+> -                * next vcpu entry. Sending a notification event in
+> -                * this case has no effect, as vcpu is not in root
+> -                * mode.
+> +                * Case 2: vCPU exits to root mode and is still runnable. The
+> +                * PIR will be synced to the vIRR before re-entering the guest.
+> +                * Sending a notification event is ok as the host IRQ handler
+> +                * will ignore the spurious event.
+>                  *
+> -                * Case 3: vcpu exits to root mode and is blocked.
+> -                * vcpu_block() has already synced PIR to vIRR and
+> -                * never blocks vcpu if vIRR is not cleared. Therefore,
+> -                * a blocked vcpu here does not wait for any requested
+> -                * interrupts in PIR, and sending a notification event
+> -                * which has no effect is safe here.
+> +                * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
+> +                * has already synced PIR to vIRR and never blocks the vCPU if
+> +                * the vIRR is not empty. Therefore, a blocked vCPU here does
+> +                * not wait for any requested interrupts in PIR, and sending a
+> +                * notification event also results in a benign, spurious event.
+>                  */
+> -
+> -               apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+> +               if (vcpu != kvm_get_running_vcpu())
+> +                       apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+>                 return;
+>         }
 >  #endif
->  	char stats_id[KVM_STATS_NAME_SIZE];
-> +	bool vm_started;
->  };
->  
->  #define kvm_err(fmt, ...) \
-> @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +#define kvm_vm_has_started(kvm) (kvm->vm_started)
-
-Needs parantheses around (kvm), but why bother with a macro?  This is the same
-header that defines struct kvm.
-
-> +
->  extern bool kvm_rebooting;
->  
->  extern unsigned int halt_poll_ns;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 72c4e6b39389..962b91ac2064 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
->  	int r;
->  	struct kvm_fpu *fpu = NULL;
->  	struct kvm_sregs *kvm_sregs = NULL;
-> +	struct kvm *kvm = vcpu->kvm;
-
-If you're going to bother grabbing kvm, replace the instances below that also do
-vcpu->kvm.
-
->  
->  	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
->  		return -EIO;
-> @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
->  			if (oldpid)
->  				synchronize_rcu();
->  			put_pid(oldpid);
-> +
-> +			/*
-> +			 * Since we land here even on the first vCPU run,
-> +			 * we can mark that the VM has started running.
-
-Please avoid "we", "us", etc..
-
-"vm_started" is also ambiguous.  If we end up with a flag, then I would prefer a
-much more literal name, a la created_vcpus, e.g. ran_vcpus or something.
-
-> +			 */
-> +			mutex_lock(&kvm->lock);
-
-This adds unnecessary lock contention when running vCPUs.  The naive solution
-would be:
-			if (!kvm->vm_started) {
-				...
-			}
-
-> +			kvm->vm_started = true;
-> +			mutex_unlock(&kvm->lock);
-
-Lastly, why is this in generic KVM?
-
->  		}
->  		r = kvm_arch_vcpu_ioctl_run(vcpu);
->  		trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
-> -- 
-> 2.34.1.448.ga2b2bfdf31-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>
