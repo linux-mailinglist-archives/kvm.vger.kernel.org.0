@@ -2,111 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 982AC487FEB
-	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 01:26:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E18E488046
+	for <lists+kvm@lfdr.de>; Sat,  8 Jan 2022 02:06:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbiAHA0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jan 2022 19:26:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38186 "EHLO
+        id S229988AbiAHBGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jan 2022 20:06:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiAHA0h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jan 2022 19:26:37 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E260CC061574
-        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 16:26:36 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id lr15-20020a17090b4b8f00b001b19671cbebso8334295pjb.1
-        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 16:26:36 -0800 (PST)
+        with ESMTP id S229530AbiAHBGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jan 2022 20:06:08 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10542C061574
+        for <kvm@vger.kernel.org>; Fri,  7 Jan 2022 17:06:08 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id z30so3641162pge.4
+        for <kvm@vger.kernel.org>; Fri, 07 Jan 2022 17:06:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=oN9IoclmlzNbuDTb2TmdBSrHPAIluEwiJU3uJynIdUA=;
-        b=VkFIh9vkyXAFHBiwc5bl269FHHlk/+KAWjO5ffZB5R22Jf73oh7q4SNdh0gXmmScwK
-         f/NI4Thh6P8ROPhBeu0TuYJ/EFcHQNhp9lGZwcMWInogW3GFtLAjJCcakfiIDk478/Q/
-         UMNJ4Fybq45SgIK25vPI1YJbn6XmpacoFe5zTBB1/x6ef/Ml8CrLywBvpIjhp26H5n3/
-         7QkLbwUENWqJgZNkXzy22f0x1Ja3k5qmKfZEYaIc3cU2oJ87BrCJF+2Lxv2FwmigCy1s
-         f41E8mXn200YKOa/7vPF5547ZqKkOhu4lU6MkekNmx6skcAFEXseCp0RbP2fJtnev008
-         DBKQ==
+        bh=P/JdDvFQ/rU7zLe6irNqXlDeNuS6rYc6yuVZLjuKGyc=;
+        b=Gg5eWfiQzwLIDi3YoPnouPv9dHbr42UFFA0692cmMc7iSKB3cfJ5APAG23uGy/zbsp
+         oya7+4PV908NfHJWxCkXmdBerdH+HzKm70zC7wBiD7lEiagilEozr/p5HxVIv0JMB9vt
+         xfp8BL/sZlkI5ZvY1XM8Jj4+ooVgNxixfzOcEOuiWvDD1VZTA79hUIEOzDnjgqtGr6hZ
+         hFxCBC2uNj4kC8Q3E5BaaaOPYm0J39TVtvw/a4HH6csoTDS1yZK43b7wD9i7v81Y1H47
+         sYePq+D7zHxdjOge2j+M+0YN2yDtjEwxUZGKuxBuCJB1Gir0mUYamaCWzpw3NzO3l2yx
+         d6aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=oN9IoclmlzNbuDTb2TmdBSrHPAIluEwiJU3uJynIdUA=;
-        b=WBGluRaInp4ZMHdgpXkgDGpdRLK1loZ7UAa0jlpZO7r5kcIFeXgrrewBFUS35y+eWq
-         +ZZD17odC960Et8lvd0jFsIjKSbqdma8v4p1GVaQwjhQMRmG88zFV3SkUz6iU/5rzdOx
-         NAr+2IoRFUuncxY7C5YU6FRiVd91OKJ4hSM5GyDZayLTYLLF7t45NgXKQ6dMXu3f5bL7
-         65oYHKpR9IfoTVXg80oHox/HH5v6RfiiDqVCgHKANh3C2PJL0MtUShpWsPlbzZGs5nkw
-         wKP2w9nJd8ie5a4KiIT5YdlLJFtAJVD4BtsvjY11hzbu7f0Z9vKCwb/8OwSj0BAY0wDH
-         qg3w==
-X-Gm-Message-State: AOAM530bHtp26HOqsCidTdiI7vkkLrOES9pOXFqgOyInHHKvfZk1kYhc
-        QYs2nRQ/A+5o2/SjqSuAauKojw==
-X-Google-Smtp-Source: ABdhPJyVQBOwsnjvsD88a0yJhZPvtEQpLbuYLYiJFidhNM8306m5l/cKlCecpMu57fL/DFol/tQBeA==
-X-Received: by 2002:a17:902:bc88:b0:149:2032:6bcf with SMTP id bb8-20020a170902bc8800b0014920326bcfmr64950128plb.44.1641601596310;
-        Fri, 07 Jan 2022 16:26:36 -0800 (PST)
+        bh=P/JdDvFQ/rU7zLe6irNqXlDeNuS6rYc6yuVZLjuKGyc=;
+        b=Wx8QRJHMYH7u4IwCV/JN03PFIs57H0h4uEcHA6Ewy/F2JrHb4xCqrrG0DCvXqckmga
+         xuVpwcR+avrISfGxVZ7de58I8cNz1rT4sXByMLsYGPIsN6q92helS88mvxsrOaHmglNQ
+         2BM8mr16O1z/ZcVK1BQeW1wJHo63205U5blPS1DC2F4JpiXDva0ebdx1LcNQMzmxhHg8
+         mWoMJwndzSZXvI8EnfFgcOESyLVYZtEcsj0xGd24llQJ3Gm1xVZknGODr6i2cif49XiZ
+         E6zKHB4AaHhMqFlzhL2Z8+1bHHXqly7SCzLUq1QrbrtGg6UcIDd2K/NpbnPLUbnd33Gq
+         bIQQ==
+X-Gm-Message-State: AOAM530tsLpGSk1fJ4Ma/Kxld13kWrX1rJ7Nl3cIZjMrGZBpJlcIchr3
+        PWUEOpfsOMlBCyiRxG+uLRW+Lg==
+X-Google-Smtp-Source: ABdhPJxZQQtD46lRS+IB/vTcxBt5snfvk4QQYFbDeXg0NYPG6jAhHnl2lRG1C3Wa5MqAPv4pOwoSvQ==
+X-Received: by 2002:a63:44a:: with SMTP id 71mr57292354pge.453.1641603967292;
+        Fri, 07 Jan 2022 17:06:07 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o13sm45091pjq.23.2022.01.07.16.26.35
+        by smtp.gmail.com with ESMTPSA id c124sm121598pfb.139.2022.01.07.17.06.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 16:26:35 -0800 (PST)
-Date:   Sat, 8 Jan 2022 00:26:32 +0000
+        Fri, 07 Jan 2022 17:06:06 -0800 (PST)
+Date:   Sat, 8 Jan 2022 01:06:03 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        butt3rflyh4ck <butterflyhuangxx@gmail.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v6 0/6] x86/xen: Add in-kernel Xen event channel delivery
-Message-ID: <YdjaOIymuiRhXUeT@google.com>
-References: <20211210163625.2886-1-dwmw2@infradead.org>
- <33f3a978-ae3b-21de-b184-e3e4cd1dd4e3@redhat.com>
- <a727e8ae9f1e35330b3e2cad49782d0b352bee1c.camel@infradead.org>
- <e2ed79e6-612a-44a3-d77b-297135849656@redhat.com>
- <YcTpJ369cRBN4W93@google.com>
- <daeba2e20c50bbede7fbe32c4f3c0aed7091382e.camel@infradead.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+Message-ID: <Ydjje8qBOP3zDOZi@google.com>
+References: <20220104194918.373612-1-rananta@google.com>
+ <20220104194918.373612-2-rananta@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <daeba2e20c50bbede7fbe32c4f3c0aed7091382e.camel@infradead.org>
+In-Reply-To: <20220104194918.373612-2-rananta@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Peter
+On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
+> Capture the start of the KVM VM, which is basically the
 
-On Wed, Jan 05, 2022, David Woodhouse wrote:
-> On Thu, 2021-12-23 at 21:24 +0000, Sean Christopherson wrote:
-> > Commit e880c6ea55b9 ("KVM: x86: hyper-v: Prevent using not-yet-updated TSC page
-> > by secondary CPUs") is squarely to blame as it was added after dirty ring, though
-> > in Vitaly's defense, David put it best: "That's a fairly awful bear trap".
+Please wrap at ~75 chars.
+
+> start of any vCPU run. This state of the VM is helpful
+> in the upcoming patches to prevent user-space from
+> configuring certain VM features after the VM has started
+> running.
+
+Please provide context of how the flag will be used.  I glanced at the future
+patches, and knowing very little about arm, I was unable to glean useful info
+about exactly who is being prevented from doing what.
+
 > 
-> Even with the WARN to keep us honest, this is still awful.
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  include/linux/kvm_host.h | 3 +++
+>  virt/kvm/kvm_main.c      | 9 +++++++++
+>  2 files changed, 12 insertions(+)
 > 
-> We have kvm_vcpu_write_guest()... but the vcpu we pass it is ignored
-> and only vcpu->kvm is used. But you have to be running on a physical
-> CPU which currently owns *a* vCPU of that KVM, or you might crash.
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c310648cc8f1..d0bd8f7a026c 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -623,6 +623,7 @@ struct kvm {
+>  	struct notifier_block pm_notifier;
+>  #endif
+>  	char stats_id[KVM_STATS_NAME_SIZE];
+> +	bool vm_started;
+>  };
+>  
+>  #define kvm_err(fmt, ...) \
+> @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+
+Needs parantheses around (kvm), but why bother with a macro?  This is the same
+header that defines struct kvm.
+
+> +
+>  extern bool kvm_rebooting;
+>  
+>  extern unsigned int halt_poll_ns;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 72c4e6b39389..962b91ac2064 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  	int r;
+>  	struct kvm_fpu *fpu = NULL;
+>  	struct kvm_sregs *kvm_sregs = NULL;
+> +	struct kvm *kvm = vcpu->kvm;
+
+If you're going to bother grabbing kvm, replace the instances below that also do
+vcpu->kvm.
+
+>  
+>  	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+>  		return -EIO;
+> @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  			if (oldpid)
+>  				synchronize_rcu();
+>  			put_pid(oldpid);
+> +
+> +			/*
+> +			 * Since we land here even on the first vCPU run,
+> +			 * we can mark that the VM has started running.
+
+Please avoid "we", "us", etc..
+
+"vm_started" is also ambiguous.  If we end up with a flag, then I would prefer a
+much more literal name, a la created_vcpus, e.g. ran_vcpus or something.
+
+> +			 */
+> +			mutex_lock(&kvm->lock);
+
+This adds unnecessary lock contention when running vCPUs.  The naive solution
+would be:
+			if (!kvm->vm_started) {
+				...
+			}
+
+> +			kvm->vm_started = true;
+> +			mutex_unlock(&kvm->lock);
+
+Lastly, why is this in generic KVM?
+
+>  		}
+>  		r = kvm_arch_vcpu_ioctl_run(vcpu);
+>  		trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+> -- 
+> 2.34.1.448.ga2b2bfdf31-goog
 > 
-> There is also kvm_write_guest() which doesn't take a vCPU as an
-> argument, and looks for all the world like it was designed for you not
-> to need one... but which still needs there to be a vCPU or it might
-> crash.
-> 
-> I think I want to kill the latter, make the former use the vCPU it's
-> given, add a spinlock to the dirty ring which will be uncontended
-> anyway in the common case so it shouldn't hurt (?),
-
-IIRC, Peter did a fair amount of performance testing and analysis that led to
-the current behavior.
-
-> and then let people use kvm->vcpu[0] when they really need to, with a
-> documented caveat that when there are *no* vCPUs in a KVM, dirty tracking
-> might not work.  Which is fine, as migration of a KVM that hasn't been fully
-> set up yet is silly.
-
-"when they really need to" can be a slippery slope, using vcpu[0] is also quite
-gross.  Though I 100% agree that always using kvm_get_running_vcpu() is awful.
-
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
