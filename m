@@ -2,122 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 042DE4889C1
-	for <lists+kvm@lfdr.de>; Sun,  9 Jan 2022 15:05:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E350A488A57
+	for <lists+kvm@lfdr.de>; Sun,  9 Jan 2022 16:56:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235765AbiAIOFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Jan 2022 09:05:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbiAIOFi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Jan 2022 09:05:38 -0500
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D96C1C06173F;
-        Sun,  9 Jan 2022 06:05:37 -0800 (PST)
-Received: by mail-ed1-x542.google.com with SMTP id b13so42932598edd.8;
-        Sun, 09 Jan 2022 06:05:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=1T/jOp2YlfQdXwI5Lba833/98dqJmXanJ/UjQY3X2JY=;
-        b=OM+jlDrL74+JWv85i8qlUlrOvkcy7gVikjVc7ybfxLifJwRKJP3XIj8T+YAik9PAv/
-         mACjkRlvZOe3p2MKUIerDw5pcHlmJvTEpKs/+ChoT6SMGxC/ZVrRCWAlk0/smE8Sa9P5
-         vDNvxvQrJzmC69sEZCMLEmQw173WXprL32hv/jeFhkb/poDiphw6YxWLQpw1bkUolfE5
-         Cwa0T10KiiwGzDOlUxqwXGLaAyUky7wUgQ1dPBhofyvDev+w3cn0hGp5SYl2z+vRJqv9
-         nvPWEzJWjJ86bdrNFgXESvJzipDMn2f0a1KcsUYI/HDGJtG/F8GZg8byFqlYPArkT59Z
-         4F9A==
+        id S235948AbiAIP4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Jan 2022 10:56:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41660 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232658AbiAIP4H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 9 Jan 2022 10:56:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641743765;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=J7V1ZXHLUPXbLKGQxjrSNZfe50jHyedl6dKQf1BF2XY=;
+        b=EGktbMueKP0SVx1fWmMEbA42yVQtr7zCltyhkObZM2wNgMVVLezyxUmKuIWaE+b5e7KpBX
+        veMTIB5qqKPKFZJmZABODsRHXnPjlySNn4mjaKhcoUnrS6S4KEwCexCZsFhATBpx8tpTcx
+        Msn13Mgb9eDhfqyvV+hnez2ESFOUBqM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-675-qEP93i4POGy1Xrx2dnqIYw-1; Sun, 09 Jan 2022 10:56:04 -0500
+X-MC-Unique: qEP93i4POGy1Xrx2dnqIYw-1
+Received: by mail-wm1-f72.google.com with SMTP id r2-20020a05600c35c200b00345c3b82b22so7310422wmq.0
+        for <kvm@vger.kernel.org>; Sun, 09 Jan 2022 07:56:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=1T/jOp2YlfQdXwI5Lba833/98dqJmXanJ/UjQY3X2JY=;
-        b=nLzNjALf9wTfoMe2HM+Bum+Do8qavveTG0Vf+R96eJTjDC7u0yesteO5denKdLSg96
-         yXT0dJrYjHcLtAevqP/f1m/5f7GWK/6hbk8w2FU7ifImQ+RvNaoFsXLSf15cHklPr3GI
-         03KbYqcUVqn97geTRYYSbGlPW3s+rco1d0LJWSk/A6WTphFrW4Dz3QNCM0BsAHrwC7t9
-         nStj4d9oyXPIlXJThJJH+UOOKhNHxCxj6rR9P6NbTP+Wboa8kqBysKHBxjzI09wHAt8P
-         sOpQwgifLUnZKYDALvXc4f3/jp+eQYJQB0w2zWnUPuBwOMdOdXSb54wtXP00upFWu+MV
-         ctFQ==
-X-Gm-Message-State: AOAM531n4yPhYYJTgfKTkD6pUWdlBRAdcAgDL6JlFR8owdcmOXsFyJIZ
-        8O6/kyei1Ouiu7mAOcZW+Vv1XcbQucclr1wB7/4=
-X-Google-Smtp-Source: ABdhPJwiVfWz1fgtQciEOSQSLf/tNpKgIyuXTJDat67dbZujfGxLXKQ+NvmRDuO0wh7z4gjvACjlPZWzJRmv6ytR/wg=
-X-Received: by 2002:a50:ec81:: with SMTP id e1mr9684850edr.37.1641737136387;
- Sun, 09 Jan 2022 06:05:36 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=J7V1ZXHLUPXbLKGQxjrSNZfe50jHyedl6dKQf1BF2XY=;
+        b=6TwnCTdzn/NlmMvMCwL1KoQtpnj09bZXNHNoL0DF4KVEeHwDvKvmUxkEvRAI5ucPz6
+         x08y6MFXXPZsSN8e39LiRJ0h1AvQTSHBYT2x7YBxnBQu/uV8JghyMKftZCO1Ps3xewne
+         vNZSY89P6qWRfx8NoW1w9NPCFaJnzJA4J/LIfBWN0f6zquMrh4p7443NfIA7PSCmsOet
+         /QgXtJaKhXDVVP09KPxPOjRZoqPzrcE5MCLWBzpaljIfWYIYJfbFsxbBMExtaOqK3D9M
+         o3o4IP6mOH9O3A+bsgqMgNqVBiROZVRtldTJXkoEaJD4padF75+H7gupEdVAru8nHBRU
+         SaVw==
+X-Gm-Message-State: AOAM531CnncZ0ns6Y99es2551Vdzf1wFKj1DdkqjbrhHFIszX6IOTFlb
+        Ijg4VN150vxMPL6hL80I2cJGXoFlXHQDdFVN4B+QcujvFekd1csZDJiftQwqE7t+WYjT15JyTUU
+        XsFheuqsBWE3U
+X-Received: by 2002:a7b:c7da:: with SMTP id z26mr12392522wmk.52.1641743763212;
+        Sun, 09 Jan 2022 07:56:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwNEi79CRxQjFDs1Tr8AJ4vn/QoN3V9wwHj33+A6h0wLfeFHwE/3phbm0G7DptlIOkNkq64eA==
+X-Received: by 2002:a7b:c7da:: with SMTP id z26mr12392505wmk.52.1641743762966;
+        Sun, 09 Jan 2022 07:56:02 -0800 (PST)
+Received: from redhat.com ([2a03:c5c0:107e:c07a:cd29:1c16:894b:6b07])
+        by smtp.gmail.com with ESMTPSA id c8sm4697313wmq.34.2022.01.09.07.56.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jan 2022 07:56:02 -0800 (PST)
+Date:   Sun, 9 Jan 2022 10:55:59 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Eli Cohen <elic@nvidia.com>, kbuild-all@lists.01.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+Subject: Re: [mst-vhost:vhost 30/44]
+ drivers/vdpa/mlx5/net/mlx5_vnet.c:1247:23: sparse: sparse: cast to
+ restricted __le16
+Message-ID: <20220109105546-mutt-send-email-mst@kernel.org>
+References: <202201082258.aKRHnaJX-lkp@intel.com>
 MIME-Version: 1.0
-From:   "Sabri N. Ferreiro" <snferreiro1@gmail.com>
-Date:   Sun, 9 Jan 2022 22:05:24 +0800
-Message-ID: <CAKG+3NTTHD3iXgK67B4R3e+ScZ+vW5H4FdwLYy9CR5oBF44DOA@mail.gmail.com>
-Subject: WARNING in kvm_mmu_uninit_tdp_mmu
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     sunhao.th@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202201082258.aKRHnaJX-lkp@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Sat, Jan 08, 2022 at 10:48:34PM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+> head:   008842b2060c14544ff452483ffd2241d145c7b2
+> commit: 7620d51af29aa1c5d32150db2ac4b6187ef8af3a [30/44] vdpa/mlx5: Support configuring max data virtqueue
+> config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20220108/202201082258.aKRHnaJX-lkp@intel.com/config)
+> compiler: powerpc-linux-gcc (GCC) 11.2.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # apt-get install sparse
+>         # sparse version: v0.6.4-dirty
+>         # https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=7620d51af29aa1c5d32150db2ac4b6187ef8af3a
+>         git remote add mst-vhost https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+>         git fetch --no-tags mst-vhost vhost
+>         git checkout 7620d51af29aa1c5d32150db2ac4b6187ef8af3a
+>         # save the config file to linux build tree
+>         mkdir build_dir
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=powerpc SHELL=/bin/bash drivers/vdpa/mlx5/
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> 
+> sparse warnings: (new ones prefixed by >>)
+> >> drivers/vdpa/mlx5/net/mlx5_vnet.c:1247:23: sparse: sparse: cast to restricted __le16
+> >> drivers/vdpa/mlx5/net/mlx5_vnet.c:1247:23: sparse: sparse: cast from restricted __virtio16
+> 
+> vim +1247 drivers/vdpa/mlx5/net/mlx5_vnet.c
 
-When using Syzkaller to fuzz the Linux kernel, it triggers the following crash.
+Eli? I sent a patch for this - ack?
 
-HEAD commit: a7904a538933 Linux 5.16-rc6
-git tree: upstream
-console output: https://pastebin.com/raw/keWCUeJ2
-kernel config: https://docs.google.com/document/d/1w94kqQ4ZSIE6BW-5WIhqp4_Zh7XTPH57L5OF2Xb6O6o/view
-C reproducer: https://pastebin.com/raw/kSxa6Yit
-Syzlang reproducer: https://pastebin.com/raw/2RMu8p6E
+>   1232	
+>   1233	static int create_rqt(struct mlx5_vdpa_net *ndev)
+>   1234	{
+>   1235		__be32 *list;
+>   1236		int max_rqt;
+>   1237		void *rqtc;
+>   1238		int inlen;
+>   1239		void *in;
+>   1240		int i, j;
+>   1241		int err;
+>   1242		int num;
+>   1243	
+>   1244		if (!(ndev->mvdev.actual_features & BIT_ULL(VIRTIO_NET_F_MQ)))
+>   1245			num = 1;
+>   1246		else
+> > 1247			num = le16_to_cpu(ndev->config.max_virtqueue_pairs);
+>   1248	
+>   1249		max_rqt = min_t(int, roundup_pow_of_two(num),
+>   1250				1 << MLX5_CAP_GEN(ndev->mvdev.mdev, log_max_rqt_size));
+>   1251		if (max_rqt < 1)
+>   1252			return -EOPNOTSUPP;
+>   1253	
+>   1254		inlen = MLX5_ST_SZ_BYTES(create_rqt_in) + max_rqt * MLX5_ST_SZ_BYTES(rq_num);
+>   1255		in = kzalloc(inlen, GFP_KERNEL);
+>   1256		if (!in)
+>   1257			return -ENOMEM;
+>   1258	
+>   1259		MLX5_SET(create_rqt_in, in, uid, ndev->mvdev.res.uid);
+>   1260		rqtc = MLX5_ADDR_OF(create_rqt_in, in, rqt_context);
+>   1261	
+>   1262		MLX5_SET(rqtc, rqtc, list_q_type, MLX5_RQTC_LIST_Q_TYPE_VIRTIO_NET_Q);
+>   1263		MLX5_SET(rqtc, rqtc, rqt_max_size, max_rqt);
+>   1264		list = MLX5_ADDR_OF(rqtc, rqtc, rq_num[0]);
+>   1265		for (i = 0, j = 0; i < max_rqt; i++, j += 2)
+>   1266			list[i] = cpu_to_be32(ndev->vqs[j % (2 * num)].virtq_id);
+>   1267	
+>   1268		MLX5_SET(rqtc, rqtc, rqt_actual_size, max_rqt);
+>   1269		err = mlx5_vdpa_create_rqt(&ndev->mvdev, in, inlen, &ndev->res.rqtn);
+>   1270		kfree(in);
+>   1271		if (err)
+>   1272			return err;
+>   1273	
+>   1274		return 0;
+>   1275	}
+>   1276	
+> 
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
-If you fix this issue, please add the following tag to the commit:
-Reported-by: Yuheng Shen mosesfonscqf75@gmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 5 PID: 29657 at arch/x86/kvm/mmu/tdp_mmu.c:46
-kvm_mmu_uninit_tdp_mmu+0xb9/0xf0
-Modules linked in:
-CPU: 5 PID: 29657 Comm: syz-executor.5 Not tainted 5.16.0-rc8+ #10
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.13.0-1ubuntu1.1 04/01/2014
-RIP: 0010:kvm_mmu_uninit_tdp_mmu+0xb9/0xf0
-Code: ea 03 80 3c 02 00 75 39 48 8b 83 e8 ae 00 00 48 39 c5 75 1a e8
-48 86 5a 00 e8 e3 bf 46 00 5b 5d e9 3c 86 5a 00 e8 37 86 5a 00 <0f> 0b
-eb b7 e8 2e 86 5a 00 0f 0b eb dd e8 a5 38 a1 00 e9 60 ff ff
-RSP: 0018:ffffc90016057b30 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffc90015f89000 RCX: ffff888130d18000
-RDX: 0000000000000000 RSI: ffff888130d18000 RDI: 0000000000000002
-RBP: ffffc90015f93ef8 R08: ffffffff811cc8f9 R09: 0000000000000000
-R10: 0000000000000001 R11: fffffbfff20e793a R12: ffffc90015f8b1c8
-R13: 0000000000000003 R14: ffffc90015f8b1e8 R15: dffffc0000000000
-FS:  00007f7f240cb700(0000) GS:ffff888135d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055f76caf3498 CR3: 0000000123d22000 CR4: 0000000000350ee0
-Call Trace:
- <TASK>
- kvm_arch_destroy_vm+0x42b/0x5b0
- kvm_put_kvm+0x4e9/0xbd0
- kvm_vcpu_release+0x4d/0x70
- __fput+0x286/0x9f0
- task_work_run+0xe0/0x1a0
- get_signal+0x1fb5/0x25e0
- arch_do_signal_or_restart+0x2ed/0x1c40
- exit_to_user_mode_prepare+0x192/0x2a0
- syscall_exit_to_user_mode+0x19/0x60
- do_syscall_64+0x42/0xb0
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f7f257dd89d
-Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f7f240cac28 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: 0000000000000000 RBX: 00007f7f258fd2a0 RCX: 00007f7f257dd89d
-RDX: 0000000000000000 RSI: 000000000000ae9a RDI: 0000000000000005
-RBP: 00007f7f2584a00d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffdf486b75f R14: 00007f7f258fd2a0 R15: 00007f7f240cadc0
- </TASK>
