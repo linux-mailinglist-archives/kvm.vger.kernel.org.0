@@ -2,192 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E3AC489C20
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:25:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF557489C3A
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:31:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236150AbiAJPZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 10:25:07 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:38124 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236140AbiAJPZG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 10:25:06 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2EED21EC057F;
-        Mon, 10 Jan 2022 16:25:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1641828301;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=JcKyfT03HQRyetzAup8js7asR0ilVLmbmT8dYb/zGME=;
-        b=eluuWklBiN7zb5uOfQCpiOUZz3jAv6b7bFEnh2xAWS8X1zgiapVDV7GDqhgW9dCFRQbVWq
-        9tTVPIwFdo4STvQw4MJj0LBgMluj+im7bh9SaqZHDo6Zf5kzR3MchzvGuer2YbFrxE3mql
-        jG8PX3bgfQxuHWOPF4DTHU5wF7YA8FM=
-Date:   Mon, 10 Jan 2022 16:25:04 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Zeng, Guang" <guang.zeng@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: Re: [PATCH v6 05/21] x86/fpu: Make XFD initialization in
- __fpstate_reset() a function argument
-Message-ID: <YdxP0FVWEJa/vrPk@zn.tnic>
-References: <20220107185512.25321-1-pbonzini@redhat.com>
- <20220107185512.25321-6-pbonzini@redhat.com>
- <YdiX5y4KxQ7GY7xn@zn.tnic>
- <BN9PR11MB527688406C0BDCF093C718858C509@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Ydvz0g+Bdys5JyS9@zn.tnic>
- <761a554a-d13f-f1fb-4faf-ca7ed28d4d3a@redhat.com>
+        id S236210AbiAJPbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 10:31:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:35982 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236214AbiAJPbE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 10:31:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641828663;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hAsOCNUk4gJy3xfkTWxDnJ/ocn/Hng6/ay6Zh+ITS5o=;
+        b=T2mc/62GSKP3ieXzS7WSKU9qed2WVgtysOHeLH2QntQeEe3cIm8DX1Cz8BMsmIyi+B6Pqd
+        Uli2ZyTieTL/o/DJ7IReZkHIDbB3fVEpmM2/sTTZKEbcg3C6pakDYWthUiYvvPj2YeirE1
+        szHxWDHaCu4bRY6Yp5hubNCKyUuY/FA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-153-AlWCsdvfPi6HEHizxiKd9g-1; Mon, 10 Jan 2022 10:31:02 -0500
+X-MC-Unique: AlWCsdvfPi6HEHizxiKd9g-1
+Received: by mail-wm1-f69.google.com with SMTP id v23-20020a05600c215700b0034566adb612so2255180wml.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:31:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=hAsOCNUk4gJy3xfkTWxDnJ/ocn/Hng6/ay6Zh+ITS5o=;
+        b=cH3jbqU0ykc58MCsU2apl2YQyLLmQpsFpV/QhD3/kMApvvBBHAlMRweEt8ABacxX1b
+         Q+OZy6T1iDiIfLuAKTbNCxEUc1eA3RCIsVLdPRfACq/oK0M5Fh1VEbyn2Hc9azhJwDcl
+         Kq5ulGZbr0VYl+RDV5YGIqk63PdnPvj0oG0pp3oW4KDefJ4z1V6zZLsLMdNGOi9t6Tl3
+         jofdApM8oluY8AUM2tKKUznFBxIwATKAlyrRvskwU77QondF/f5MPgD9Wm7/U1zjGOLn
+         WpUO5322QJOw3MEpPcm7IrurrVyPjQfAoItUsFS9OTnD9Y849Bnt8uZ5b1NZTWjYFL5C
+         WgpA==
+X-Gm-Message-State: AOAM530aWsKn/P6LP3CzKSDJxKuJvon74NVLbe4KJQqJy5W8w28WKe75
+        JNykzbgGPr1Zy8ZoTidoQGYT+cuioojro7fDdfqqiSPNfqblXaEZrgm3KRiB3Fs0qH3X0WnqIKX
+        JRY/rQiH9KIFV
+X-Received: by 2002:a05:600c:34c4:: with SMTP id d4mr22837826wmq.53.1641828660521;
+        Mon, 10 Jan 2022 07:31:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwZ5PbKWG2o82UtfdwF8YlHmCQ3IAN9akDTuLFh8hqRxJQpStKQ1peYtx8PsS1Wl2ACmE2rXQ==
+X-Received: by 2002:a05:600c:34c4:: with SMTP id d4mr22837815wmq.53.1641828660301;
+        Mon, 10 Jan 2022 07:31:00 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id g5sm7517121wrd.100.2022.01.10.07.30.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jan 2022 07:30:59 -0800 (PST)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v4 3/6] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+To:     Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com, Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+References: <20220107163324.2491209-1-maz@kernel.org>
+ <20220107163324.2491209-4-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <a72846d6-d559-9f12-154f-20c04821747e@redhat.com>
+Date:   Mon, 10 Jan 2022 16:30:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <20220107163324.2491209-4-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <761a554a-d13f-f1fb-4faf-ca7ed28d4d3a@redhat.com>
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 03:18:26PM +0100, Paolo Bonzini wrote:
-> Say a patch went A->B->C->A->D and all of {A,B,C} were involved in the
-> development at different times.  The above text says "any further SoBs are
-> from people not involved in its development", in other words it doesn't
-> cover the case of multiple people handling different versions of a patch
-> submission.
+Hi Marc,
 
-Well, if I'm reading Kevin's mail correctly, it sounds like Thomas
-updated it (and I'm pretty sure he doesn't care about Co-developed-by)
-and the rest of the folks simply handled it.
+On 1/7/22 5:33 PM, Marc Zyngier wrote:
+> Even when the VM is configured with highmem=off, the highest_gpa
+> field includes devices that are above the 4GiB limit.
+> Similarily, nothing seem to check that the memory is within
+> the limit set by the highmem=off option.
+>
+> This leads to failures in virt_kvm_type() on systems that have
+> a crippled IPA range, as the reported IPA space is larger than
+> what it should be.
+>
+> Instead, honor the user-specified limit to only use the devices
+> at the lowest end of the spectrum, and fail if we have memory
+> crossing the 4GiB limit.
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-In the interest of remaining practical, I'd say one doesn't have to add
-Co-developed-by when one is doing contextual changes or addressing minor
-review feedback, or, of course, simply handling the patch as part of a
-series.
+Eric
+> ---
+>  hw/arm/virt.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 4d1d629432..57c55e8a37 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1663,7 +1663,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>  static void virt_set_memmap(VirtMachineState *vms)
+>  {
+>      MachineState *ms = MACHINE(vms);
+> -    hwaddr base, device_memory_base, device_memory_size;
+> +    hwaddr base, device_memory_base, device_memory_size, memtop;
+>      int i;
+>  
+>      vms->memmap = extended_memmap;
+> @@ -1690,7 +1690,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+>      device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
+>  
+>      /* Base address of the high IO region */
+> -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    if (!vms->highmem && memtop > 4 * GiB) {
+> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> +        exit(EXIT_FAILURE);
+> +    }
+>      if (base < device_memory_base) {
+>          error_report("maxmem/slots too huge");
+>          exit(EXIT_FAILURE);
+> @@ -1707,7 +1711,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          vms->memmap[i].size = size;
+>          base += size;
+>      }
+> -    vms->highest_gpa = base - 1;
+> +    vms->highest_gpa = (vms->highmem ? base : memtop) - 1;
+>      if (device_memory_size > 0) {
+>          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>          ms->device_memory->base = device_memory_base;
 
-> The only clear thing from the text would be "do not remove/move the
-> author's Signed-off-by", but apart from that it's wild wild west and
-> there are contradictions everywhere.
-
-The main point in that paragraph is that the SOB chain needs to denote
-how that patch went upstream and who handled it on the way. So you can't
-simply shorten or reorder the SOBs.
-
-What is more, even if you cherry-pick a patch which doesn't have your
-SOB at the end - for example, tglx applies a patch and I cherry-pick it
-into a different branch - I must add my SOB because, well, I handled it.
-
-> For example:
-> 
-> 1) checkpatch.pl wants "Co-developed-by" to be immediately followed by
-> "Signed-off-by".  Should we imply that all SoB entries preceded by
-> Co-developed-by do not exactly reflect the route that the patch took (since
-> there could be multiple back and forth)?
-
-Co-developed-by is to express multiple-people's authorship. And that
-rule checkpatch enforces is already in submitting-patches:
-
-"Since Co-developed-by: denotes authorship, every Co-developed-by:
-must be immediately followed by a Signed-off-by: of the associated
-co-author."
-
-> 
-> 2) if the author sends the patches but has co-developers, should they be
-> first (because they're the author) or last (because they're the one actually
-> sending the patch out)?
-
-That is also explained there:
-
-"Standard sign-off procedure applies, i.e. the ordering of
-Signed-off-by: tags should reflect the chronological history of
-the patch insofar as possible, regardless of whether the author
-is attributed via From: or Co-developed-by:. Notably, the last
-Signed-off-by: must always be that of the developer submitting the
-patch."
-
-> Any consistent rules that I could come up with are too baroque to be
-> practical:
-> 
-> 1) a sequence consisting of {SoB,Co-developed-by,SoB} does not necessarily
-> reflect a chain from the first signoff to the second signoff
-
-Right, if you want to attribute co-authorship too - at least I think
-this is what you mean - then you can do that according to the last
-snippet I pasted. IOW, you'd need to do:
-
-Co-developed-by: A
-SOB: A
-Co-developed-by: B
-SOB: B
-SOB: C
-
-etc.
-
-Or remain practical and do only an SOB chain. But it all depends
-on who has co-authored what and what kind of attribution the
-co-authors/handlers prefer.
-
-> 2) if you are a maintainer committing a patch so that it will go to Linus,
-> just add your SoB line.
-
-Ack.
-
-> 3) if you pick up someone else's branch or posted series, and you are not in
-> the existing SoB chain, you must add a Co-developed-by and SoB line for
-> yourself.
-
-Just SOB, as stated above. Because you handled the patch.
-
-> The maintainers must already have a bad case of Stockholm syndrome for not
-> having automated this kind of routine check, but it would be even worse if
-> we were to inflict this on the developers.
-
-Well, usually, the SOB chain is pretty simple and straight-forward.
-
-In this particular case, I'd simply add my SOB when I've handled the
-patch. If I've done big changes and I think I'd like to be listed as an
-author, I'd do Co-developed but other than that, just the SOB.
-
-> In the end, IMHO the real rules
-> that matter are:
-> 
-> - there should be a SoB line for the author
-
-Yap.
-
-> - the submitter must always have the last SoB line
-
-Yap.
-
-> - SoB lines shall never be removed
-
-And their order should be kept too as the path upstream is important,
-obviously.
-
-> - maintainers should prefer merge commits when moving commits from one tree
-> to the other
-
-It depends.
-
-> - merge commits should have a SoB line too
-
-Yap, we do that in the tip tree and document the reason for the merge
-commit.
-
-> Everything else, including the existence of Co-developed-by lines, is an
-> unnecessary complication.
-
-See above.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
