@@ -2,164 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D478B489AD7
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 14:54:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7D79489B23
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 15:18:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233329AbiAJNyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 08:54:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233013AbiAJNyU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 08:54:20 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E91AC06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 05:54:20 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id c71so42314835edf.6
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 05:54:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=djPW+e1c8spfYeyL5AbJ32h9GSIUYbKoLv2DLHaOq+0=;
-        b=bl9J2QtWDuUmQlp5N7WmOsJhVeMPiTX+NiVRwh9l87FNYClRzAhBufVdMy0MCqtNFV
-         dq4421mAxg0ILI2S2MCCP1ns1H4QhlZT4aWwoBhR0cZUmunXHRx+d+HuOX/d5PKXrzPG
-         TK+4Hu5xgpHlwxKj6pUbOw6pX2/G4EJ8DfXnXNMUesmDYorizgDzkPnVKpRJhctC8sUZ
-         B2ri5NpHRwtPw2fRocdZhxoBuaBCKzAjfaykJZay8LbVDX930o0CDQ/LHWyda4xFV+Hc
-         WugS89G4jBlr4VL2uypPxdIO8AzpqLxqh+es+3YLGWyAingktkoxMNPCyXb/hyfzuCo6
-         mj1g==
+        id S235410AbiAJOSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 09:18:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53713 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233643AbiAJOSb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 09:18:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641824310;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MyDFUtiAGsgsScU+rj6Lzzf5+dTQR7JO2CzhcJOaowg=;
+        b=N7xsINfifI0Alr6zEIAwj71AOGEiwKFmz25TUQmiy0UygZB6zaFUztaHSvyOtYHkk36wtN
+        nhy+2JNzg0I0SHlGno/gtSw/2CbHXEeDcc35V5Yb7zToyVVdVkPBlKHC+fG94RUrgnBmTM
+        +VqYsxL1gMSIr+nNeC8zsb77M88s4QM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-487-snPDuVI0OIeVVAQEY2mU6Q-1; Mon, 10 Jan 2022 09:18:29 -0500
+X-MC-Unique: snPDuVI0OIeVVAQEY2mU6Q-1
+Received: by mail-ed1-f72.google.com with SMTP id y18-20020a056402271200b003fa16a5debcso10220212edd.14
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 06:18:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=djPW+e1c8spfYeyL5AbJ32h9GSIUYbKoLv2DLHaOq+0=;
-        b=drBkLlp6YzSm7mum+pN9RZDHPmiwC+Gtj9/udSAma/a9maMtyWwIN3Fhkxk/lS9phU
-         XPbGuAY8Z4iFEn48a4AXPyZy0osRDlZkJSvEKUavPEwiT4DgA4DLs/a+Y+F0Dolg8opX
-         qfSiCBBkOOQejTJfk2PjKN+L7Vy4VxEC4IdEaNz5fL9wQOlAzG+2TOPjZfqH1s2JRvbV
-         HmPUV5r2IgBsnYgnJgngJ3s+2JwX0my7Y3h7qsBfUpK3I7LVKquCD7s0plXEWw00Gxpi
-         hAKUNvVrpgZdMGJNd9NTOdb5JjA+XrgM1Un/SiWb9sqoNkOILXtMi5ybr4Eiz8/pj53W
-         4TCw==
-X-Gm-Message-State: AOAM531nExRKxLEMsvOV3fSskM7i2zcmcgaQ0XTVUfdeMJrJDGxdVhy8
-        RWsdCNJ2AJVCaka5z6aYLDkbDTW7vCPvZLm1mLl8
-X-Google-Smtp-Source: ABdhPJyFGnfUMGEnoNxRXvUJpCvABNYtlKdS/8DhFo1CC6qDSFOT+cL5Hg32zlVk43P8LVymiEdjB1533Wdjtj+EyFw=
-X-Received: by 2002:a05:6402:cbb:: with SMTP id cn27mr5089054edb.246.1641822858820;
- Mon, 10 Jan 2022 05:54:18 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=MyDFUtiAGsgsScU+rj6Lzzf5+dTQR7JO2CzhcJOaowg=;
+        b=Oml9z/n9cxvk514bTM1DjCswWCIWR6XyM+fVR/MG3R8R7IVRbmpPmamhbUrGYlCTfV
+         bEt85PeWSzPBg2xpRISSeAkyn3+dVahdRpBHHYNVF/9mEtPeldhN2ZMgdjrBAi4L1y7f
+         xidN5WtSV3TiURtr+U6rq/Oj3d1kj9t5IBFq8X4XR/3GOzzScrTA1qXMnclnMG7crQgS
+         +YEG/Qbzf20Drq1+JvD/y8lGZCN7MxE/dfVn2fhcu3patYWUlfc2w4PliS3dwnmqEMEw
+         cDQvfdcaw0AyNImXBzr4VGGd7liM9hR9xWwUOG3NppCtvIjENhPueQwIRAQhqvJku9JV
+         0Tkg==
+X-Gm-Message-State: AOAM531hRe3EheXaQm1XSdzM1F3t+7GFZfMaS2WJ2epFRt8c2UcXgQ2E
+        EjoDCa0mIQBjj4ns6o/Xae0TRqLpbpXwUqXVDwD1Ke/resnuirNPckKOLq4EpQrw2Cm69ijgBhd
+        ZEMsMxNrfI2DM
+X-Received: by 2002:a17:906:8490:: with SMTP id m16mr10796311ejx.504.1641824308102;
+        Mon, 10 Jan 2022 06:18:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxrJfxt8rkBnco5dvB92y/phpCALDwxjDXLd9vNGVpjjfWL50MFHy+ZOPOOCekX0ogxMmOWnQ==
+X-Received: by 2002:a17:906:8490:: with SMTP id m16mr10796287ejx.504.1641824307860;
+        Mon, 10 Jan 2022 06:18:27 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id o1sm2477166ejm.210.2022.01.10.06.18.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jan 2022 06:18:27 -0800 (PST)
+Message-ID: <761a554a-d13f-f1fb-4faf-ca7ed28d4d3a@redhat.com>
+Date:   Mon, 10 Jan 2022 15:18:26 +0100
 MIME-Version: 1.0
-References: <20210830141737.181-1-xieyongji@bytedance.com> <20220110075546-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220110075546-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 10 Jan 2022 21:54:08 +0800
-Message-ID: <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
-Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>,
-        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v6 05/21] x86/fpu: Make XFD initialization in
+ __fpstate_reset() a function argument
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>
+References: <20220107185512.25321-1-pbonzini@redhat.com>
+ <20220107185512.25321-6-pbonzini@redhat.com> <YdiX5y4KxQ7GY7xn@zn.tnic>
+ <BN9PR11MB527688406C0BDCF093C718858C509@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Ydvz0g+Bdys5JyS9@zn.tnic>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Ydvz0g+Bdys5JyS9@zn.tnic>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
-> > This series introduces a framework that makes it possible to implement
-> > software-emulated vDPA devices in userspace. And to make the device
-> > emulation more secure, the emulated vDPA device's control path is handled
-> > in the kernel and only the data path is implemented in the userspace.
-> >
-> > Since the emuldated vDPA device's control path is handled in the kernel,
-> > a message mechnism is introduced to make userspace be aware of the data
-> > path related changes. Userspace can use read()/write() to receive/reply
-> > the control messages.
-> >
-> > In the data path, the core is mapping dma buffer into VDUSE daemon's
-> > address space, which can be implemented in different ways depending on
-> > the vdpa bus to which the vDPA device is attached.
-> >
-> > In virtio-vdpa case, we implements a MMU-based software IOTLB with
-> > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-> > buffer is reside in a userspace memory region which can be shared to the
-> > VDUSE userspace processs via transferring the shmfd.
-> >
-> > The details and our user case is shown below:
-> >
-> > ------------------------    -------------------------   ----------------------------------------------
-> > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-> > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-> > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-> > ------------+-----------     -----------+------------   -------------+----------------------+---------
-> >             |                           |                            |                      |
-> >             |                           |                            |                      |
-> > ------------+---------------------------+----------------------------+----------------------+---------
-> > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-> > |    -------+--------           --------+--------            -------+--------          -----+----    |
-> > |           |                           |                           |                       |        |
-> > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-> > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > |           |      virtio bus           |                           |                       |        |
-> > |   --------+----+-----------           |                           |                       |        |
-> > |                |                      |                           |                       |        |
-> > |      ----------+----------            |                           |                       |        |
-> > |      | virtio-blk device |            |                           |                       |        |
-> > |      ----------+----------            |                           |                       |        |
-> > |                |                      |                           |                       |        |
-> > |     -----------+-----------           |                           |                       |        |
-> > |     |  virtio-vdpa driver |           |                           |                       |        |
-> > |     -----------+-----------           |                           |                       |        |
-> > |                |                      |                           |    vdpa bus           |        |
-> > |     -----------+----------------------+---------------------------+------------           |        |
-> > |                                                                                        ---+---     |
-> > -----------------------------------------------------------------------------------------| NIC |------
-> >                                                                                          ---+---
-> >                                                                                             |
-> >                                                                                    ---------+---------
-> >                                                                                    | Remote Storages |
-> >                                                                                    -------------------
-> >
-> > We make use of it to implement a block device connecting to
-> > our distributed storage, which can be used both in containers and
-> > VMs. Thus, we can have an unified technology stack in this two cases.
-> >
-> > To test it with null-blk:
-> >
-> >   $ qemu-storage-daemon \
-> >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-> >       --monitor chardev=charmonitor \
-> >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
-> >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> >
-> > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
->
-> It's been half a year - any plans to upstream this?
+On 1/10/22 09:52, Borislav Petkov wrote:
+> On Mon, Jan 10, 2022 at 05:15:44AM +0000, Tian, Kevin wrote:
+>> Thanks for pointing it out! Actually this is one area which we didn't get
+>> a clear answer from 'submitting-patches.rst'
+> 
+> Are you sure? I see
+> 
+> "Any further SoBs (Signed-off-by:'s) following the author's SoB are from
+> people handling and transporting the patch, but were not involved in its
+> development. SoB chains should reflect the **real** route a patch took
+> as it was propagated to the maintainers and ultimately to Linus, with
+> the first SoB entry signalling primary authorship of a single author."
 
-Yeah, this is on my to-do list this month.
+Say a patch went A->B->C->A->D and all of {A,B,C} were involved in the 
+development at different times.  The above text says "any further SoBs 
+are from people not involved in its development", in other words it 
+doesn't cover the case of multiple people handling different versions of 
+a patch submission.
 
-Sorry for taking so long... I've been working on another project
-enabling userspace RDMA with VDUSE for the past few months. So I
-didn't have much time for this. Anyway, I will submit the first
-version as soon as possible.
+The only clear thing from the text would be "do not remove/move the 
+author's Signed-off-by", but apart from that it's wild wild west and 
+there are contradictions everywhere.
 
-Thanks,
-Yongji
+For example:
+
+1) checkpatch.pl wants "Co-developed-by" to be immediately followed by 
+"Signed-off-by".  Should we imply that all SoB entries preceded by 
+Co-developed-by do not exactly reflect the route that the patch took 
+(since there could be multiple back and forth)?
+
+2) if the author sends the patches but has co-developers, should they be 
+first (because they're the author) or last (because they're the one 
+actually sending the patch out)?
+
+
+Any consistent rules that I could come up with are too baroque to be 
+practical:
+
+1) a sequence consisting of {SoB,Co-developed-by,SoB} does not 
+necessarily reflect a chain from the first signoff to the second signoff
+
+2) if you are a maintainer committing a patch so that it will go to 
+Linus, just add your SoB line.
+
+3) if you pick up someone else's branch or posted series, and you are 
+not in the existing SoB chain, you must add a Co-developed-by and SoB 
+line for yourself.  Do not use the document the changes in brackets: 
+that is only done by the maintainers when they make changes and do not 
+repost for review.
+
+The maintainers must already have a bad case of Stockholm syndrome for 
+not having automated this kind of routine check, but it would be even 
+worse if we were to inflict this on the developers.  In the end, IMHO 
+the real rules that matter are:
+
+- there should be a SoB line for the author
+
+- the submitter must always have the last SoB line
+
+- SoB lines shall never be removed
+
+- maintainers should prefer merge commits when moving commits from one 
+tree to the other
+
+- merge commits should have a SoB line too
+
+Everything else, including the existence of Co-developed-by lines, is an 
+unnecessary complication.
+
+Paolo
+
