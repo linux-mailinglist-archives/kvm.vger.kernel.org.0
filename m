@@ -2,102 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1030548A365
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 00:07:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC74148A366
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 00:07:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345621AbiAJXHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 18:07:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
+        id S1345622AbiAJXH0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 18:07:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242456AbiAJXHN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 18:07:13 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F38C2C06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:07:12 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id u8so19927903iol.5
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:07:12 -0800 (PST)
+        with ESMTP id S1345625AbiAJXHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 18:07:25 -0500
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C78DC061748
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:07:25 -0800 (PST)
+Received: by mail-yb1-xb35.google.com with SMTP id g80so42547327ybf.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:07:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=9yk6Bcu1fitpNUpPqU1IkNlHV7SkcpGxAs+8b8ya+Jw=;
-        b=kp5nhNlVfP5cUSmergeH2yUe2An8sATSkHa4jRRtTrVAMYvQZP/FZNWmKHZ3qOcRIc
-         L6U/5IGi6b/ysGAvkNSykzQHtPz7peRkZwVymngeuQnIKWEdZKgMSwoAvZYAZ9tA/xh4
-         LZwpz7vNXH0sXSmoBV0I5ELJCvN7753ZKRBHnRMCdHO6XxfciAKiFRbd6Xc9vnhZ+Ufv
-         1PvBGG1LfDONWRH23TWZfGj2LKvhxAjydIw4UzIvxRpvJFQt9OAAEoCW3AFDyj2BMClX
-         iv6pQGmRzhCB6wpQjOOc6vAPugTvrfLiYoN/1vQy3qHds667CJ4CspDZxJvLiKGpgma2
-         n3qQ==
+        bh=WXezCkJjRPkDROjmNSEXw8KrMNSVatQHflVa4NcIBZ4=;
+        b=lT7ThlTt++QvhmmkculwEqKL3uXY7KHRlY1gZM6+NQiGlRD9ipXMMx4+mWy7E0i6H2
+         YFeTMNWGyf/XiOMdm8cZbbHWziX6fKd2IX5qBjQCbpvC07ja4ugEzBJKzn05hpgC1SRR
+         AekdfWmGnZEjHKsImuXfvSQZ+rOmhk9vwUrAEUMpqVXfV6b9OOJ/ps8P9VpNpvoHUrbT
+         BzHh3EIH2sdChxnhiwiBSPlCNDGMnSqOv2qNVaeHVb7nIwPjGi/tvwQnkAh8FxtL726/
+         Y35AUh+AK0fQZVMkhY7LAhlUFPIqR4ls8dFOHnDz2cos6MHdV42xAgbIurK7je8UGI33
+         1ONA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9yk6Bcu1fitpNUpPqU1IkNlHV7SkcpGxAs+8b8ya+Jw=;
-        b=5IzBof+f4zWjv9tx06+QFP+0n+qIuP7Gw+Q3noy28vxNB21PgFuxqW037bzI5xj0qi
-         y0ls8HBSOpq2FEFxBP191p98wotVkGMB2u+7ErarIRptXQyLENOPM8rcdGe5R097RrK6
-         o12zWV98j4aJwSu8WrNeU50ubq3jbYeTdLIT8bgrkczEE8tHUjmzUjz8nsvKED4mnGBP
-         xKRWNFf2fMQRhlgfbdxiOFP4IpWgWEy0pidJcyyju7wSh5CuQoFmE3HY16bYm5mqZxZo
-         Qm1pyFpQUuvzt1mNEmj8vq2duyNktfe5XXnaEuWCVq1E6oHA5wpoZzNY+AVmAa/NcMMd
-         sscg==
-X-Gm-Message-State: AOAM533WIO+RH4SSaRc+oV7JqwoZdoIrF+0465hJKDsKNcYas+1nFRZz
-        qRsUr0m4nVUU9+cIOdaeONmh2vNxt5MNo1bBLttyyQdBharGjkiV
-X-Google-Smtp-Source: ABdhPJzwjiMQFRGUsTNJWfxyanbFpK/E3qPuRVxLdqjeusRLwOMQDlDT2t/VSj7mrqld5jzDVwQcC+4z1iWgVrrDbFs=
-X-Received: by 2002:a05:6602:140c:: with SMTP id t12mr922733iov.187.1641856032412;
- Mon, 10 Jan 2022 15:07:12 -0800 (PST)
+        bh=WXezCkJjRPkDROjmNSEXw8KrMNSVatQHflVa4NcIBZ4=;
+        b=InTmV26Z+QWbQSaKiCivsZBocTk4omila9Lh2isX2Jd5UctjrmhUjgZTPUcjeXWzll
+         ROvIXKZl13R7uR0GDp90D93OuKL4Ri6v2qw/hxC7D99HmGXlAmIaWSOecbVD1P6rJpdh
+         jdYfaH82les5jBncD40o5JCJxnsSZudOhw5YUP4w21/hipz6sIzgQghhMdyTUJW8ERSp
+         GhfA2QzSbJFn2P6Da0e9yzKqg6gehrBAuS0ZsEoToLMphSPffWQHlIIkX5lB4wWjtbMh
+         MHgjFaBF6opnLP+aSVghvbsFMLWma7B8FInqNBV357KkUrheBKGm+r8MlR+yM32mqUD5
+         5NXA==
+X-Gm-Message-State: AOAM530R/o/z3gxHroBRuYE2a2Bu8TCPo7WghVskZqUMpx0tPNsvphUm
+        YONnwojH7UDdhl+3P87N3iUrVPcJMOEokLUcuASFHA==
+X-Google-Smtp-Source: ABdhPJzBJzORsUZLGXrxCBMovCLT/oathXNs3w20UB7mc6qHjBQPdClWy2y/DJ7ReGsZVPvGVSjnvALfMbExKTvbbuk=
+X-Received: by 2002:a25:b9d2:: with SMTP id y18mr1128156ybj.615.1641856044191;
+ Mon, 10 Jan 2022 15:07:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20220110013831.1594-1-jiangyifei@huawei.com> <20220110013831.1594-6-jiangyifei@huawei.com>
-In-Reply-To: <20220110013831.1594-6-jiangyifei@huawei.com>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Tue, 11 Jan 2022 09:06:46 +1000
-Message-ID: <CAKmqyKPsSidxir_1fncugsmLK33aSbHk63MP0JnS3OJLvy65EA@mail.gmail.com>
-Subject: Re: [PATCH v4 05/12] target/riscv: Implement kvm_arch_put_registers
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        kvm-riscv@lists.infradead.org,
-        "open list:Overall" <kvm@vger.kernel.org>, libvir-list@redhat.com,
-        Anup Patel <anup@brainfault.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>, fanliang@huawei.com,
-        "Wubin (H)" <wu.wubin@huawei.com>, wanghaibin.wang@huawei.com,
-        wanbo13@huawei.com, Mingwang Li <limingwang@huawei.com>,
-        Anup Patel <anup.patel@wdc.com>
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com> <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+In-Reply-To: <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 10 Jan 2022 15:07:13 -0800
+Message-ID: <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 11:57 AM Yifei Jiang via <qemu-devel@nongnu.org> wrote:
+On Fri, Jan 7, 2022 at 4:05 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> Put GPR CSR and FP registers to kvm by KVM_SET_ONE_REG ioctl
+> On Fri, Jan 7, 2022 at 3:43 PM Raghavendra Rao Ananta
+> <rananta@google.com> wrote:
+> >
+> > Hi Reiji,
+> >
+> > On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > Hi Raghu,
+> > >
+> > > On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
+> > > <rananta@google.com> wrote:
+> > > >
+> > > > Capture the start of the KVM VM, which is basically the
+> > > > start of any vCPU run. This state of the VM is helpful
+> > > > in the upcoming patches to prevent user-space from
+> > > > configuring certain VM features after the VM has started
+> > > > running.
 >
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Mingwang Li <limingwang@huawei.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Anup Patel <anup.patel@wdc.com>
-> ---
->  target/riscv/kvm.c | 104 ++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 103 insertions(+), 1 deletion(-)
->
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 6d4df0ef6d..e695b91dc7 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -73,6 +73,14 @@ static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type, uint64_t idx
->          } \
->      } while(0)
->
-> +#define KVM_RISCV_SET_CSR(cs, env, csr, reg) \
-> +    do { \
-> +        int ret = kvm_set_one_reg(cs, RISCV_CSR_REG(env, csr), &reg); \
-> +        if (ret) { \
-> +            return ret; \
-> +        } \
-> +    } while(0)
+> What about live migration, where the VM has already technically been
+> started before the first call to KVM_RUN?
 
-This fails checkpatch. I know there is lots of QEMU code like this,
-but it probably should be `while (0)` to keep checkpatch happy.
+My understanding is that a new 'struct kvm' is created on the target
+machine and this flag should be reset, which would allow the VMM to
+restore the firmware registers. However, we would be running KVM_RUN
+for the first time on the target machine, thus setting the flag.
+So, you are right; It's more of a resume operation from the guest's
+point of view. I guess the name of the variable is what's confusing
+here.
 
-Please run checkpatch on all the patches.
-
-Alistair
+Thanks,
+Raghavendra
