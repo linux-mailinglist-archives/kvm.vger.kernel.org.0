@@ -2,98 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DD35489C7B
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:45:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C3E7489C87
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:48:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236417AbiAJPpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 10:45:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51644 "EHLO
+        id S236432AbiAJPsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 10:48:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236430AbiAJPpN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 10:45:13 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EB4BC06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:45:13 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 03352B81661
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:45:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB8F0C36AE3;
-        Mon, 10 Jan 2022 15:45:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641829510;
-        bh=/cJ14iZsrwrHt6rKN+QfSmHGBYGz0Ywl+1X61/fcY3c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NMmLAQX/uAQNZKjyR63+dLPDi/nwcYUF1woCj26HUIj4MbR+Th3VMsoRVWt7QDXfi
-         xK+Op9jucoBBso7t1QNpBM0dAaG4/eUfs5VK6R3hqQ8Wh7+7tpBCQwMz0v4xvUlW4S
-         1ffCO2KtSyuVa7c1DUv+i4pSm7uokZyBvTKCPeXTWmu+o9gZNdUuLKUP8Bx0zMOfF+
-         VUOprNKUu44az6KwM0tjQth++HW3ACq1ztrACmprHb7zJG7rFqXGqNTX3MXTb9KK9K
-         9ooGBUyhwKMX6bcVuHvAZ9sMaZwsU0DYyur58x8ZL6NFW76/6m4rGFYlEtoc6YUocS
-         uO2cpkmfqs/kA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1n6wr6-00HASj-Pu; Mon, 10 Jan 2022 15:45:08 +0000
-Date:   Mon, 10 Jan 2022 15:45:08 +0000
-Message-ID: <87k0f7tx17.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     eric.auger@redhat.com
-Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
+        with ESMTP id S231592AbiAJPr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 10:47:59 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95043C06173F
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:47:59 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id v6so27509017wra.8
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:47:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=peGK9jkA1ECjFCE1GKLjh+6ydkjA9f/37HFPcNjIPDU=;
+        b=Fh/b5I5anwBkTrgBAtBNtIQHIvXWf0V/SmPFlgo1Ve2rCHEb+dOLc48FjRg6MyDu8W
+         3JIjkFNcPvMJwb2d5XweNmVLbAzYZwc+R9yieoV/nO5cUlW7gdt/gjRxm7Vfv+yGhC7C
+         UAh3QVRrkzr9VOreaFCPBJ8kfnHPm/lixEr/I8CQqyLR4tP6tUPdbihWPy+afpSTt+zC
+         V+4MajeqxYj48c6D7WcxyLT/o8EgbFOASSbmqUAL1danKNNFEAzVqfpB6Ixc/xq75eSx
+         69Zu8RVKme11rtIYESDsR1qD0pyXNUWrTeT4ncZtgB5S/IBqFbUZF+NHFw67ovlnh/PD
+         6nbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=peGK9jkA1ECjFCE1GKLjh+6ydkjA9f/37HFPcNjIPDU=;
+        b=0DJAIuLJZ5dOZa/hlVhZ11Nz1mMHgY8EeQoq8+du7Z6qhPEAogIMbEBu/GWSccED4C
+         LRdmEZmJpxRBYTYrEp3xeckrTs6D8RAatm0FEL0lnO89ihgumz9ueS/m/kVX3yrXrMar
+         6mCn4Zj39UDyolZ0U4YWRF1k2OXEwvLEHvc+BSHDquTYOmlHJMIlARDZ2ypCImyVn1C1
+         Y8ma2aFrDl7Oefns80mO2Wb9g2LgXNbWRA/2Ot+FWcQEm6SHjK7dlovGsYrkjQ1Nx7V2
+         d17sirTHx3JxSmtetCOjxDhN91XcX0uxkESjJ3KpDcHvB09UEZz2aE3MprZ30JqQvE1w
+         3O9Q==
+X-Gm-Message-State: AOAM532c3RlLG37XKjz6MnGs4NlKtkjzNyotJ8XEcmQl6vJftIe6grwv
+        UtmCeg5QklJp1njKb6UuXYp0akpXgsKhhhO+ZkKO7CD/ud+QLA==
+X-Google-Smtp-Source: ABdhPJxG4gV0GKraTJ6tgmVj/WLmoPT/UKnsUKRM4S2k9+WOReU1GZyRcyeYg2VWZg8Hu9Q+7DLNpKQQR9PpEA7yc1U=
+X-Received: by 2002:a5d:52c4:: with SMTP id r4mr183666wrv.521.1641829678212;
+ Mon, 10 Jan 2022 07:47:58 -0800 (PST)
+MIME-Version: 1.0
+References: <20220107163324.2491209-1-maz@kernel.org> <20220107163324.2491209-3-maz@kernel.org>
+ <448274ac-2650-7c09-742d-584109fb5c56@redhat.com> <87k0f7tx17.wl-maz@kernel.org>
+In-Reply-To: <87k0f7tx17.wl-maz@kernel.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 10 Jan 2022 15:47:47 +0000
+Message-ID: <CAFEAcA-OF29ptHr0X9ojyLEcDw9v7Smc5PC3O+v5Uv3bjiSmRA@mail.gmail.com>
 Subject: Re: [PATCH v4 2/6] hw/arm/virt: Add a control for the the highmem redistributors
-In-Reply-To: <448274ac-2650-7c09-742d-584109fb5c56@redhat.com>
-References: <20220107163324.2491209-1-maz@kernel.org>
-        <20220107163324.2491209-3-maz@kernel.org>
-        <448274ac-2650-7c09-742d-584109fb5c56@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, drjones@redhat.com, peter.maydell@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     eric.auger@redhat.com, qemu-devel@nongnu.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com, Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On Mon, 10 Jan 2022 at 15:45, Marc Zyngier <maz@kernel.org> wrote:
+> $ /home/maz/vminstall/qemu-hack -m 1G -smp 256 -cpu host -machine virt,accel=kvm,gic-version=3,highmem=on -nographic -drive if=pflash,format=raw,readonly=on,file=/usr/share/AAVMF/AAVMF_CODE.fd
+> qemu-hack: warning: Number of SMP cpus requested (256) exceeds the recommended cpus supported by KVM (8)
+> qemu-hack: warning: Number of hotpluggable cpus requested (256) exceeds the recommended cpus supported by KVM (8)
+> qemu-hack: Capacity of the redist regions(123) is less than number of vcpus(256)
 
-On Mon, 10 Jan 2022 15:35:44 +0000,
-Eric Auger <eric.auger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 1/7/22 5:33 PM, Marc Zyngier wrote:
+Side question: why is KVM_CAP_NR_VCPUS returning 8 for
+"recommended cpus supported by KVM" ? Is something still
+assuming GICv2 CPU limits?
 
-[...]
-
-> > @@ -190,7 +191,8 @@ static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
-> >  
-> >      assert(vms->gic_version == VIRT_GIC_VERSION_3);
-> >  
-> > -    return MACHINE(vms)->smp.cpus > redist0_capacity ? 2 : 1;
-> > +    return (MACHINE(vms)->smp.cpus > redist0_capacity &&
-> > +            vms->highmem_redists) ? 2 : 1;
-> If we fail to use the high redist region, is there any check that the
-> number of vcpus does not exceed the first redist region capacity.
-> Did you check that config, does it nicely fail?
-
-I did, and it does (example on M1 with KVM):
-
-$ /home/maz/vminstall/qemu-hack -m 1G -smp 256 -cpu host -machine virt,accel=kvm,gic-version=3,highmem=on -nographic -drive if=pflash,format=raw,readonly=on,file=/usr/share/AAVMF/AAVMF_CODE.fd
-qemu-hack: warning: Number of SMP cpus requested (256) exceeds the recommended cpus supported by KVM (8)
-qemu-hack: warning: Number of hotpluggable cpus requested (256) exceeds the recommended cpus supported by KVM (8)
-qemu-hack: Capacity of the redist regions(123) is less than number of vcpus(256)
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+-- PMM
