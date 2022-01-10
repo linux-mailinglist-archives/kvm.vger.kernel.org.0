@@ -2,72 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC60489B25
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 15:18:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D478B489AD7
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 14:54:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235421AbiAJOSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 09:18:37 -0500
-Received: from ssh.movementarian.org ([139.162.205.133]:53964 "EHLO
-        movementarian.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S235417AbiAJOSg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 09:18:36 -0500
-X-Greylist: delayed 1631 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Jan 2022 09:18:35 EST
-Received: from movement by movementarian.org with local (Exim 4.94)
-        (envelope-from <movement@movementarian.org>)
-        id 1n6v50-00A6ze-VH; Mon, 10 Jan 2022 13:51:22 +0000
-Date:   Mon, 10 Jan 2022 13:51:22 +0000
-From:   John Levon <levon@movementarian.org>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: X86_FEATURE_AMD_IBRS getting set for Intel guests
-Message-ID: <Ydw52mvd3SQH/5CY@movementarian.org>
+        id S233329AbiAJNyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 08:54:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233013AbiAJNyU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 08:54:20 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E91AC06173F
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 05:54:20 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id c71so42314835edf.6
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 05:54:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=djPW+e1c8spfYeyL5AbJ32h9GSIUYbKoLv2DLHaOq+0=;
+        b=bl9J2QtWDuUmQlp5N7WmOsJhVeMPiTX+NiVRwh9l87FNYClRzAhBufVdMy0MCqtNFV
+         dq4421mAxg0ILI2S2MCCP1ns1H4QhlZT4aWwoBhR0cZUmunXHRx+d+HuOX/d5PKXrzPG
+         TK+4Hu5xgpHlwxKj6pUbOw6pX2/G4EJ8DfXnXNMUesmDYorizgDzkPnVKpRJhctC8sUZ
+         B2ri5NpHRwtPw2fRocdZhxoBuaBCKzAjfaykJZay8LbVDX930o0CDQ/LHWyda4xFV+Hc
+         WugS89G4jBlr4VL2uypPxdIO8AzpqLxqh+es+3YLGWyAingktkoxMNPCyXb/hyfzuCo6
+         mj1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=djPW+e1c8spfYeyL5AbJ32h9GSIUYbKoLv2DLHaOq+0=;
+        b=drBkLlp6YzSm7mum+pN9RZDHPmiwC+Gtj9/udSAma/a9maMtyWwIN3Fhkxk/lS9phU
+         XPbGuAY8Z4iFEn48a4AXPyZy0osRDlZkJSvEKUavPEwiT4DgA4DLs/a+Y+F0Dolg8opX
+         qfSiCBBkOOQejTJfk2PjKN+L7Vy4VxEC4IdEaNz5fL9wQOlAzG+2TOPjZfqH1s2JRvbV
+         HmPUV5r2IgBsnYgnJgngJ3s+2JwX0my7Y3h7qsBfUpK3I7LVKquCD7s0plXEWw00Gxpi
+         hAKUNvVrpgZdMGJNd9NTOdb5JjA+XrgM1Un/SiWb9sqoNkOILXtMi5ybr4Eiz8/pj53W
+         4TCw==
+X-Gm-Message-State: AOAM531nExRKxLEMsvOV3fSskM7i2zcmcgaQ0XTVUfdeMJrJDGxdVhy8
+        RWsdCNJ2AJVCaka5z6aYLDkbDTW7vCPvZLm1mLl8
+X-Google-Smtp-Source: ABdhPJyFGnfUMGEnoNxRXvUJpCvABNYtlKdS/8DhFo1CC6qDSFOT+cL5Hg32zlVk43P8LVymiEdjB1533Wdjtj+EyFw=
+X-Received: by 2002:a05:6402:cbb:: with SMTP id cn27mr5089054edb.246.1641822858820;
+ Mon, 10 Jan 2022 05:54:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Url:  http://www.movementarian.org/
+References: <20210830141737.181-1-xieyongji@bytedance.com> <20220110075546-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220110075546-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 10 Jan 2022 21:54:08 +0800
+Message-ID: <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
+Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
+> > This series introduces a framework that makes it possible to implement
+> > software-emulated vDPA devices in userspace. And to make the device
+> > emulation more secure, the emulated vDPA device's control path is handled
+> > in the kernel and only the data path is implemented in the userspace.
+> >
+> > Since the emuldated vDPA device's control path is handled in the kernel,
+> > a message mechnism is introduced to make userspace be aware of the data
+> > path related changes. Userspace can use read()/write() to receive/reply
+> > the control messages.
+> >
+> > In the data path, the core is mapping dma buffer into VDUSE daemon's
+> > address space, which can be implemented in different ways depending on
+> > the vdpa bus to which the vDPA device is attached.
+> >
+> > In virtio-vdpa case, we implements a MMU-based software IOTLB with
+> > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+> > buffer is reside in a userspace memory region which can be shared to the
+> > VDUSE userspace processs via transferring the shmfd.
+> >
+> > The details and our user case is shown below:
+> >
+> > ------------------------    -------------------------   ----------------------------------------------
+> > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+> > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+> > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+> > ------------+-----------     -----------+------------   -------------+----------------------+---------
+> >             |                           |                            |                      |
+> >             |                           |                            |                      |
+> > ------------+---------------------------+----------------------------+----------------------+---------
+> > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+> > |    -------+--------           --------+--------            -------+--------          -----+----    |
+> > |           |                           |                           |                       |        |
+> > | ----------+----------       ----------+-----------         -------+-------                |        |
+> > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+> > | ----------+----------       ----------+-----------         -------+-------                |        |
+> > |           |      virtio bus           |                           |                       |        |
+> > |   --------+----+-----------           |                           |                       |        |
+> > |                |                      |                           |                       |        |
+> > |      ----------+----------            |                           |                       |        |
+> > |      | virtio-blk device |            |                           |                       |        |
+> > |      ----------+----------            |                           |                       |        |
+> > |                |                      |                           |                       |        |
+> > |     -----------+-----------           |                           |                       |        |
+> > |     |  virtio-vdpa driver |           |                           |                       |        |
+> > |     -----------+-----------           |                           |                       |        |
+> > |                |                      |                           |    vdpa bus           |        |
+> > |     -----------+----------------------+---------------------------+------------           |        |
+> > |                                                                                        ---+---     |
+> > -----------------------------------------------------------------------------------------| NIC |------
+> >                                                                                          ---+---
+> >                                                                                             |
+> >                                                                                    ---------+---------
+> >                                                                                    | Remote Storages |
+> >                                                                                    -------------------
+> >
+> > We make use of it to implement a block device connecting to
+> > our distributed storage, which can be used both in containers and
+> > VMs. Thus, we can have an unified technology stack in this two cases.
+> >
+> > To test it with null-blk:
+> >
+> >   $ qemu-storage-daemon \
+> >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+> >       --monitor chardev=charmonitor \
+> >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+> >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
+> >
+> > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+>
+> It's been half a year - any plans to upstream this?
 
-```
-arch/x86/kernel/cpu/common.c:
+Yeah, this is on my to-do list this month.
 
- 863         /*                                                                       
- 864          * The Intel SPEC_CTRL CPUID bit implies IBRS and IBPB support,          
- 865          * and they also have a different bit for STIBP support. Also,           
- 866          * a hypervisor might have set the individual AMD bits even on           
- 867          * Intel CPUs, for finer-grained selection of what's available.          
- 868          */                                                                      
- 869         if (cpu_has(c, X86_FEATURE_SPEC_CTRL)) {                                 
- 870                 set_cpu_cap(c, X86_FEATURE_IBRS);                                
- 871                 set_cpu_cap(c, X86_FEATURE_IBPB);                                
- 872                 set_cpu_cap(c, X86_FEATURE_MSR_SPEC_CTRL);                       
- 873         }                                                                        
+Sorry for taking so long... I've been working on another project
+enabling userspace RDMA with VDUSE for the past few months. So I
+didn't have much time for this. Anyway, I will submit the first
+version as soon as possible.
 
-arch/x86/kvm/cpuid.c:
-
- 550         /*                                                                       
- 551          * AMD has separate bits for each SPEC_CTRL bit.                         
- 552          * arch/x86/kernel/cpu/bugs.c is kind enough to                          
- 553          * record that in cpufeatures so use them.                               
- 554          */                                                                      
- 555         if (boot_cpu_has(X86_FEATURE_IBPB))                                      
- 556                 kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);                           
- 557         if (boot_cpu_has(X86_FEATURE_IBRS))                                      
- 558                 kvm_cpu_cap_set(X86_FEATURE_AMD_IBRS);                           
-```
-
-As a result, we're setting AMD-specific bits in the relevant CPUID leaf. They're
-reserved, but it appears, somewhat unfortunately, that libvirt happily reports
-them regardless of vendor - with the knock-on effect that anything using `virsh
-capabilities` to decide which flags to pass to qemu inside the guest VM
-breaks[1].
-
-Curious if other people have hit this, and if there's specific reason why we're
-setting AMD-specific flags on Intel like this.
-
-thanks
-john
-
-[1] yes, it should be using `virsh domcapabilities`, but that didn't use to
-exist AFAIK
+Thanks,
+Yongji
