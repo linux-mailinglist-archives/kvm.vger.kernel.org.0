@@ -2,170 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D650A489CF1
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:58:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AFA6489D00
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 17:02:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236841AbiAJP6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 10:58:39 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:36070 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236654AbiAJP6i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 10:58:38 -0500
+        id S236875AbiAJQCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 11:02:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236654AbiAJQCK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 11:02:10 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AE9C06173F
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 08:02:09 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 307B6B811EC
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:58:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEA0DC36AE5;
-        Mon, 10 Jan 2022 15:58:35 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3A3CCB811EC
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 16:02:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0242C36AE3;
+        Mon, 10 Jan 2022 16:02:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641830315;
-        bh=yy2g18ZmN6V9ofHPGdck09RwOJDBvsPANaHpXOcQECQ=;
+        s=k20201202; t=1641830526;
+        bh=fuz9oNXrm2Hf4a0RANGkIs6aiYecMqw64RGc7bXvONI=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=W/cQTf1/z21ABUgAszAEP2BgFPvE9YEgWKljQMwmJ6gJbLqQOSnwQXOV/Q4zNr6yB
-         xHYeV9IlJfEdy4gL8XJtjTYBa2xhAV0k0CWshEwx/bHQkbMu7A3k8UPvBl7hyDUJXz
-         Na6pPAr9QtAHptoMmPRtycpNq8vOnMonKvc8uqUDufPv7uuEz7Lbc9tbXEq1jKswje
-         cjYa9mXir1C+W9JlBKmg2Ee8uSSbQgs+FPFjnjlpSXCEUEgwRegKZTnXT4bF/1tLJ9
-         sJNGM2S0p0im5T2v/C+RQ95xwa+RooWkSM6EXDRmlmw3hQCtvpooYgY0FdB4aQt5BF
-         MGG8saYejYsKw==
+        b=BNQ0DoNDVNdrSom+IIrIk4Bg6r7+4jYAMpYsNI1zKIUEBoikgoBEdBSRPQYj1M4E/
+         3dZYRiKGrcy6pHcO6c3e68yw1Ke4ZIjXfj3GE8WDwlj2k6TjULEnDQYUiw3DU62cZO
+         jtI4Smf0z/smYwPI6l4MqPsCwOxK0dNXEwWtsBA/Xg2T2QRfLKndwjMPYF6DipUJGU
+         BX8//LBkz6EF6LiSK4FQyBVz5/DbLq5EFFGoGiwFSK/S5a2h+QkeGiEkccoP8rpRX3
+         yYzf2HLLbxABY4QgYglgBH0lOW0uShMOvJk6+w9KHcTl0tAshbCL5v55Iv27vIkD8F
+         YgaHoOyvlYjRA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1n6x45-00HAi9-T9; Mon, 10 Jan 2022 15:58:34 +0000
-Date:   Mon, 10 Jan 2022 15:58:33 +0000
-Message-ID: <87ilurtweu.wl-maz@kernel.org>
+        id 1n6x7U-00HAlH-VM; Mon, 10 Jan 2022 16:02:05 +0000
+Date:   Mon, 10 Jan 2022 16:02:04 +0000
+Message-ID: <87h7abtw8z.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     eric.auger@redhat.com
-Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v4 4/6] hw/arm/virt: Use the PA range to compute the memory map
-In-Reply-To: <d7f793ab-bf78-32fb-e793-54a034ffd5d8@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     eric.auger@redhat.com, qemu-devel@nongnu.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com, Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v4 2/6] hw/arm/virt: Add a control for the the highmem redistributors
+In-Reply-To: <CAFEAcA-OF29ptHr0X9ojyLEcDw9v7Smc5PC3O+v5Uv3bjiSmRA@mail.gmail.com>
 References: <20220107163324.2491209-1-maz@kernel.org>
-        <20220107163324.2491209-5-maz@kernel.org>
-        <d7f793ab-bf78-32fb-e793-54a034ffd5d8@redhat.com>
+        <20220107163324.2491209-3-maz@kernel.org>
+        <448274ac-2650-7c09-742d-584109fb5c56@redhat.com>
+        <87k0f7tx17.wl-maz@kernel.org>
+        <CAFEAcA-OF29ptHr0X9ojyLEcDw9v7Smc5PC3O+v5Uv3bjiSmRA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, drjones@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, eric.auger@redhat.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, drjones@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 Jan 2022 15:38:56 +0000,
-Eric Auger <eric.auger@redhat.com> wrote:
->=20
-> Hi Marc,
->=20
-> On 1/7/22 5:33 PM, Marc Zyngier wrote:
-> > The highmem attribute is nothing but another way to express the
-> > PA range of a VM. To support HW that has a smaller PA range then
-> > what QEMU assumes, pass this PA range to the virt_set_memmap()
-> > function, allowing it to correctly exclude highmem devices
-> > if they are outside of the PA range.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  hw/arm/virt.c | 53 ++++++++++++++++++++++++++++++++++++++++++++-------
-> >  1 file changed, 46 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 57c55e8a37..db4b0636e1 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1660,7 +1660,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineS=
-tate *vms, int idx)
-> >      return arm_cpu_mp_affinity(idx, clustersz);
-> >  }
-> > =20
-> > -static void virt_set_memmap(VirtMachineState *vms)
-> > +static void virt_set_memmap(VirtMachineState *vms, int pa_bits)
-> >  {
-> >      MachineState *ms =3D MACHINE(vms);
-> >      hwaddr base, device_memory_base, device_memory_size, memtop;
-> > @@ -1678,6 +1678,13 @@ static void virt_set_memmap(VirtMachineState *vm=
-s)
-> >          exit(EXIT_FAILURE);
-> >      }
-> > =20
-> > +    /*
-> > +     * !highmem is exactly the same as limiting the PA space to 32bit,
-> > +     * irrespective of the underlying capabilities of the HW.
-> > +     */
-> > +    if (!vms->highmem)
-> > +	    pa_bits =3D 32;
-> you need {} according to the QEMU coding style. Welcome to a new shiny
-> world :-)
+On Mon, 10 Jan 2022 15:47:47 +0000,
+Peter Maydell <peter.maydell@linaro.org> wrote:
+> 
+> On Mon, 10 Jan 2022 at 15:45, Marc Zyngier <maz@kernel.org> wrote:
+> > $ /home/maz/vminstall/qemu-hack -m 1G -smp 256 -cpu host -machine virt,accel=kvm,gic-version=3,highmem=on -nographic -drive if=pflash,format=raw,readonly=on,file=/usr/share/AAVMF/AAVMF_CODE.fd
+> > qemu-hack: warning: Number of SMP cpus requested (256) exceeds the recommended cpus supported by KVM (8)
+> > qemu-hack: warning: Number of hotpluggable cpus requested (256) exceeds the recommended cpus supported by KVM (8)
+> > qemu-hack: Capacity of the redist regions(123) is less than number of vcpus(256)
+> 
+> Side question: why is KVM_CAP_NR_VCPUS returning 8 for
+> "recommended cpus supported by KVM" ? Is something still
+> assuming GICv2 CPU limits?
 
-Yeah. Between the reduced indentation and the avalanche of braces, my
-brain fails to pattern-match blocks of code. Amusing how inflexible
-you become after a couple of decades...
-
-> > +
-> >      /*
-> >       * We compute the base of the high IO region depending on the
-> >       * amount of initial and device memory. The device memory start/si=
-ze
-> > @@ -1691,8 +1698,9 @@ static void virt_set_memmap(VirtMachineState *vms)
-> > =20
-> >      /* Base address of the high IO region */
-> >      memtop =3D base =3D device_memory_base + ROUND_UP(device_memory_si=
-ze, GiB);
-> > -    if (!vms->highmem && memtop > 4 * GiB) {
-> > -        error_report("highmem=3Doff, but memory crosses the 4GiB limit=
-\n");
-> > +    if (memtop > BIT_ULL(pa_bits)) {
-> > +	    error_report("Addressing limited to %d bits, but memory exceeds i=
-t by %llu bytes\n",
-> > +			 pa_bits, memtop - BIT_ULL(pa_bits));
-> >          exit(EXIT_FAILURE);
-> >      }
-> >      if (base < device_memory_base) {
-> > @@ -1711,7 +1719,13 @@ static void virt_set_memmap(VirtMachineState *vm=
-s)
-> >          vms->memmap[i].size =3D size;
-> >          base +=3D size;
-> >      }
-> > -    vms->highest_gpa =3D (vms->highmem ? base : memtop) - 1;
-> > +
-> > +    /*
-> > +     * If base fits within pa_bits, all good. If it doesn't, limit it
-> > +     * to the end of RAM, which is guaranteed to fit within pa_bits.
-> > +     */
-> > +    vms->highest_gpa =3D (base <=3D BIT_ULL(pa_bits) ? base : memtop) =
-- 1;
-> > +
-> >      if (device_memory_size > 0) {
-> >          ms->device_memory =3D g_malloc0(sizeof(*ms->device_memory));
-> >          ms->device_memory->base =3D device_memory_base;
-> > @@ -1902,12 +1916,38 @@ static void machvirt_init(MachineState *machine)
-> >      unsigned int smp_cpus =3D machine->smp.cpus;
-> >      unsigned int max_cpus =3D machine->smp.max_cpus;
-> Move the cpu_type check before?
->=20
-> =C2=A0=C2=A0=C2=A0 if (!cpu_type_valid(machine->cpu_type)) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("mach-virt: CPU t=
-ype %s not supported",
-> machine->cpu_type);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
-> =C2=A0=C2=A0=C2=A0 }
-> >
-
-Yes, very good point. I wonder why this was tucked away past
-computing the memory map and the GIC configuration... Anyway, I'll
-move it up.
-
-Thanks,
+No, it is only that KVM_CAP_NR_VCPUS is defined as returning the
+number of physical CPUs (and this test machine has only 8 of them).
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
