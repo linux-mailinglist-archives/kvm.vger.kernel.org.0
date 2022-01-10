@@ -2,80 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 187EA48945C
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 09:55:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDF96489496
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 10:00:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241709AbiAJIz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 03:55:28 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:37638 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242607AbiAJIwi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 03:52:38 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S241887AbiAJJAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 04:00:35 -0500
+Received: from gandalf.ozlabs.org ([150.107.74.76]:52571 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242036AbiAJI6s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 03:58:48 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 200551EC057F;
-        Mon, 10 Jan 2022 09:52:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1641804751;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=KbNkHqNnB4sF1Vlw447CuxYzeQqnfPld8QZoUvnjLdk=;
-        b=YpjGSjRV6yq177K7f/bMLhGrp0dLiM632/jLMNEjSED7wSUK2ZDRjCrzpPt/Xt59FPZaUp
-        2elDnpryvzt2aIZ+YQ4QTR/mtEqLC+C97nHhShvqald7nmAjqFH3spxgml96GN8Nc9lV9h
-        vy2lXYqBquIZmWHaTVhNoNhMQADu9Eg=
-Date:   Mon, 10 Jan 2022 09:52:34 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Zeng, Guang" <guang.zeng@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: Re: [PATCH v6 05/21] x86/fpu: Make XFD initialization in
- __fpstate_reset() a function argument
-Message-ID: <Ydvz0g+Bdys5JyS9@zn.tnic>
-References: <20220107185512.25321-1-pbonzini@redhat.com>
- <20220107185512.25321-6-pbonzini@redhat.com>
- <YdiX5y4KxQ7GY7xn@zn.tnic>
- <BN9PR11MB527688406C0BDCF093C718858C509@BN9PR11MB5276.namprd11.prod.outlook.com>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JXSRT2PDtz4y4Z;
+        Mon, 10 Jan 2022 19:58:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1641805125;
+        bh=R24FBnuWNPJfvfg1NosQCQTFGwsK5/KBKgGWM0Ld1f8=;
+        h=Date:From:To:Cc:Subject:From;
+        b=jtML7XlxaRko5BrjYiatxljUcMHIAgahYBtgnQibGGyDNew5nCSuWVyPVzt+ztYzm
+         zcxSTtKuR+f1Tt1peHKhTZAxFe7NTvRia+CHn2YpqMT7p6mkkoQe+/ocWNe9U+iSqo
+         03ohRgH7mP393dgzKdwKdE/GyHE5AIJPb3oK68f12Kn0Jd9tlZWY8uutUWbggoruvi
+         5vtJ7spsm97QolMA2/lh1DVUR9PYKZ6eXFaKu4ptovYjGffcgViXG28UoJYssHD4Is
+         aGiSGpK/ehaPADxSRZZfbHMJU2bL2wGPSjrxk473wqEgHToJbgZ8p9E3113jpv8cV0
+         CTVlCeWD1eMGg==
+Date:   Mon, 10 Jan 2022 19:58:44 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Guang Zeng <guang.zeng@intel.com>, Jing Liu <jing2.liu@intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the kvm tree
+Message-ID: <20220110195844.7de09681@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527688406C0BDCF093C718858C509@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: multipart/signed; boundary="Sig_/4C4BxWxtIge57R94iiy5EJL";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 05:15:44AM +0000, Tian, Kevin wrote:
-> Thanks for pointing it out! Actually this is one area which we didn't get
-> a clear answer from 'submitting-patches.rst'
+--Sig_/4C4BxWxtIge57R94iiy5EJL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Are you sure?
+Hi all,
 
-I see
+After merging the kvm tree, today's linux-next build (htmldocs) produced
+this warning:
 
-"Any further SoBs (Signed-off-by:'s) following the author's SoB are from
-people handling and transporting the patch, but were not involved in its
-development. SoB chains should reflect the **real** route a patch took
-as it was propagated to the maintainers and ultimately to Linus, with
-the first SoB entry signalling primary authorship of a single author."
+Documentation/virt/kvm/api.rst:5549: WARNING: Title underline too short.
 
-Now, when you read that paragraph, what do you think is the answer to
-your question and why?
+4.42 KVM_GET_XSAVE2
+------------------
 
-And if that paragraph doesn't make it clear, we would have to improve
-it...
+Introduced by commit
 
-Thx.
+  16786d406fe8 ("kvm: x86: Add support for getting/setting expanded xstate =
+buffer")
 
--- 
-Regards/Gruss,
-    Boris.
+--=20
+Cheers,
+Stephen Rothwell
 
-https://people.kernel.org/tglx/notes-about-netiquette
+--Sig_/4C4BxWxtIge57R94iiy5EJL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHb9UQACgkQAVBC80lX
+0Gy0Bwf/ccjEHDcjRMn5LJuKO9LbYxlvmOgdwL7/pN6XodM3qa6+Eu3LIsPEMHWs
+I5VM3RqEQzXHRHdC1V39KBdU1UZ9J8YUVMuISwdVfr3LycJsiDyS4qrP0bCR77H0
+fyOU9erOhvycWBf/oKYVipG6pV0gXBguWS8T54ay+w4/y6QsvUcKnxF30++nTvNA
+UOPBhCC0sa9Q8lBtVR5cSyO54xN3MVkTdiiEdPbUljGPNM8VLx2xnZpYTeVRXPjo
+c9Wg9O+oFmSzIgv99wtHWLt5bY/VlP9fTSFGjTrTA3La8H01QqxtH68ho128I6x/
+ZWt52XprkJdtCo/1gfp7rAJlEO6Arg==
+=V5n6
+-----END PGP SIGNATURE-----
+
+--Sig_/4C4BxWxtIge57R94iiy5EJL--
