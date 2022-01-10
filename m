@@ -2,112 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAD524896B2
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 11:48:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC3794896E4
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 12:01:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244201AbiAJKsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 05:48:41 -0500
-Received: from foss.arm.com ([217.140.110.172]:59850 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244189AbiAJKsf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 05:48:35 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44BDEED1;
-        Mon, 10 Jan 2022 02:48:35 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 75DFC3F5A1;
-        Mon, 10 Jan 2022 02:48:32 -0800 (PST)
-Date:   Mon, 10 Jan 2022 10:48:41 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
- uninitialized vCPUs
-Message-ID: <YdwPCcZWD8Uc1eej@monolith.localdoman>
-References: <20220110054042.1079932-1-reijiw@google.com>
+        id S244344AbiAJLBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 06:01:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:25878 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244382AbiAJLB3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 06:01:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641812488;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+PA8Vg//oTzHEGQwEE7hFyLmXJdElvmOjQHkElYPEaI=;
+        b=QeRbGIDMhn+rUGFpDOdHOPidtTxCn/3ZdHvl/+GQS/46Z5xf23mQu7q1hseZ3kB9t6M707
+        8sUZvmREV+VUY3MonjX61pFMlO0q1tQiRN2yS3Y5uueAg5rNvnpJiiXk9KLdzONHYYFJ2Y
+        W/lTpQ20A/zMebdBxMWSeqv5ePyJfm0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-613-sjwusAxaPwCaUnHnsW-kDA-1; Mon, 10 Jan 2022 06:01:24 -0500
+X-MC-Unique: sjwusAxaPwCaUnHnsW-kDA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF98E69737;
+        Mon, 10 Jan 2022 11:01:22 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.193.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FEE0752AA;
+        Mon, 10 Jan 2022 11:01:22 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id A76E818003A0; Mon, 10 Jan 2022 12:01:20 +0100 (CET)
+Date:   Mon, 10 Jan 2022 12:01:20 +0100
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>, isaku.yamahata@gmail.com,
+        qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
+        erdemaktas@google.com, kvm@vger.kernel.org,
+        isaku.yamahata@intel.com, "Min M . Xu" <min.m.xu@intel.com>
+Subject: Re: [RFC PATCH v2 20/44] i386/tdx: Parse tdx metadata and store the
+ result into TdxGuestState
+Message-ID: <20220110110120.ldjekirdzgmgex4z@sirius.home.kraxel.org>
+References: <cover.1625704980.git.isaku.yamahata@intel.com>
+ <acaf651389c3f407a9d6d0a2e943daf0a85bb5fc.1625704981.git.isaku.yamahata@intel.com>
+ <20210826111838.fgbp6v6gd5wzbnho@sirius.home.kraxel.org>
+ <a97a75ad-9d1c-a09f-281b-d6b0a7652e78@intel.com>
+ <4eb6a628-0af6-409b-7e42-52787ee3e69d@redhat.com>
+ <e74fcb88-3add-4bb7-4508-742db44fa3c8@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220110054042.1079932-1-reijiw@google.com>
+In-Reply-To: <e74fcb88-3add-4bb7-4508-742db44fa3c8@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-
-On Sun, Jan 09, 2022 at 09:40:41PM -0800, Reiji Watanabe wrote:
-> vcpu_allowed_register_width() checks if all the VCPUs are either
-> all 32bit or all 64bit.  Since the checking is done even for vCPUs
-> that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
-> the non-initialized vCPUs are erroneously treated as 64bit vCPU,
-> which causes the function to incorrectly detect a mixed-width VM.
+> > If you go without pflash, then you likely will not have a
+> > standards-conformant UEFI variable store. (Unless you reimplement the
+> > variable arch protocols in edk2 on top of something else than the Fault
+> > Tolerant Write and Firmware Volume Block protocols.) Whether a
+> > conformant UEFI varstore matters to you (or to TDX in general) is
+> > something I can't comment on.
 > 
-> Fix vcpu_allowed_register_width() to skip the check for vCPUs that
-> are not initialized yet.
+> Thanks for your reply! Laszlo
 > 
-> Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/kvm/reset.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+> regarding "standards-conformant UEFI variable store", I guess you mean the
+> change to UEFI non-volatile variables needs to be synced back to the
+> OVMF_VARS.fd file. right?
+
+Yes.  UEFI variables are expected to be persistent, and syncing to
+OVMF_VARS.fd handles that.
+
+Not fully sure whenever that expectation holds up in the CC world.  At
+least the AmdSev variant has just OVMF.fd, i.e. no CODE/VARS split.
+
+> > Regarding pflash itself, the read-only KVM memslot is required for it.
+> > Otherwise pflash cannot work as a "ROMD device" (= you can't flip it
+> > back and forth between ROM mode and programming (MMIO) mode).
 > 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 426bd7fbc3fd..ef78bbc7566a 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
->  	if (kvm_has_mte(vcpu->kvm) && is32bit)
->  		return false;
->  
-> +	/*
-> +	 * Make sure vcpu->arch.target setting is visible from others so
-> +	 * that the width consistency checking between two vCPUs is done
-> +	 * by at least one of them at KVM_ARM_VCPU_INIT.
-> +	 */
-> +	smp_mb();
+> We don't need Read-only mode for TDVF so far. If for this purpose, is it
+> acceptable that allowing a pflash without KVM readonly memslot support if
+> read-only is not required for the specific pflash device?
 
-From ARM DDI 0487G.a, page B2-146 ("Data Memory Barrier (DMB)"):
+In case you don't want/need persistent VARS (which strictly speaking is
+a UEFI spec violation) you should be able to go for a simple "-bios
+OVMF.fd".
 
-"The DMB instruction is a memory barrier instruction that ensures the relative
-order of memory accesses before the barrier with memory accesses after the
-barrier."
+take care,
+  Gerd
 
-I'm going to assume from the comment that you are referring to completion of
-memory accesses ("Make sure [..] is visible from others"). Please correct me if
-I am wrong. In this case, DMB ensures ordering of memory accesses with regards
-to writes and reads, not *completion*.  Have a look at
-tools/memory-model/litmus-tests/MP+fencewmbonceonce+fencermbonceonce.litmus for
-the classic message passing example as an example of memory ordering.
-Message passing and other patterns are also explained in ARM DDI 0487G.a, page
-K11-8363.
-
-I'm not saying that your approach is incorrect, but the commit message should
-explain what memory accesses are being ordered relative to each other and why.
-
-Thanks,
-Alex
-
-> +
->  	/* Check that the vcpus are either all 32bit or all 64bit */
->  	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> +		/* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
-> +		if (tmp->arch.target == -1)
-> +			continue;
-> +
->  		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
->  			return false;
->  	}
-> 
-> base-commit: df0cc57e057f18e44dac8e6c18aba47ab53202f9
-> -- 
-> 2.34.1.575.g55b058a8bb-goog
-> 
