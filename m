@@ -2,184 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A63AC48A38B
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 00:24:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E11F48A39C
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 00:27:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245317AbiAJXX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 18:23:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46036 "EHLO
+        id S1345700AbiAJX1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 18:27:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233112AbiAJXX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 18:23:59 -0500
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C99C06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:23:58 -0800 (PST)
-Received: by mail-yb1-xb2f.google.com with SMTP id d7so9520842ybo.5
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:23:58 -0800 (PST)
+        with ESMTP id S242263AbiAJX1O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 18:27:14 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2D8C06173F
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:27:14 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id oa15so14720807pjb.4
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:27:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2g1hbad4Ezo/DEI6dD8aLA+EdL+7wxXqyuFafbp6z7Q=;
-        b=oM55QpMEWMcvOqaoBxInuJtySCBl6PW7f7mAJVErZF/Edaw25Fs3NnxBEJGutKpThM
-         NaMCG+wYGHuROiIcWOSChJyZdCvgXhoIPl01LYbl3tcfPCyVLadaFRSVb3VoxGMW80D/
-         ZITS7pnXfImw/rEfW1PwvZMzxk43Vw9o6paseMqNBSYkkV0CrHC9eOmg8mdCrZ1ulUQm
-         hDge8Dig10AO1msI2UMUwgnnmnRU1I83ydBHfrFYy7asvInQuDd+xUhLhqYQg4u0W4Vm
-         rScD8sdocOnCM923CAOopu0+gVHJ2fr9/sFxjd/vmInLMWavXstJvLkA7DsctY0vjSxz
-         hKIQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4h1d480IZ4YCqogfOcApNhj3xjpkSaqcARPjT3soJXI=;
+        b=OedMk2FdzQlt9NdHJDBJpAjrExnz+iTJlbH+kURG3kXwBfI1xKuad2LAUFdvqgOBDf
+         NWPtBpYsT6cVofRFba2m0JRvXcIB6ftj7pI/Vv9hlVPaG2jLF0TLj6hHVymXCwcF7p5r
+         0qLyjFJ/OpoVADVEhLUJt2dPOaXqq8cVaHk1MOwk/4qP8VYtJ1Hku+sQFBicOiYMxyyJ
+         on+51RZIgxk/fqMovmfwTdYO7k97KSS0wq5+ktkhwq4k6BuuR+LL7XptF4fi9e6gnovm
+         nZWCgeUZ/+mOl2WFpznwFx+BUILrcNMma/uoKPnZasV3ocO5qeBWa3coPRvDQRIgHQUD
+         cz1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2g1hbad4Ezo/DEI6dD8aLA+EdL+7wxXqyuFafbp6z7Q=;
-        b=MBqAGlsWW9Jzl2IOOSp72W8sXdjhzUAKCVQ1aOFUNg7lf85n0TUVY7BmznMpivKpvo
-         UtzhCYNd8mCyiuz+NU0HI5rMD0VqtdaVEXMHWJ9nF9u2AO2160xG7HazonAKssGIYzGe
-         pbinGqlSg/Mp5OkhbfNdPmXoofZte48IRDqH0XQPFy4EYLCVWtNpYhXJr+zBJ5fxUDOT
-         OTWInBYKcO0vjDLEpe7+h8GsLMD6SsZmDOFCwZUxVmvp4CSQsWfC7Y79uBtgwei5XLxV
-         2X/CcivCeV/DO9inAw4N5QCTAhMerrqpybMA9iTk7nEweyQeF9nZAbs1yNiMnwyeATN/
-         mgqQ==
-X-Gm-Message-State: AOAM530VNNdCrMDR/M9Mg0DdqCx+nVEtN6reOsTJSBqraBBn+3qiBACq
-        spwfRxn3nzK1xArNhQ/4udVqMMwPE9jKZh9NPucKJQ==
-X-Google-Smtp-Source: ABdhPJz5so6Chi1+nIiR5l3idPgrT/QBMsfnjZlAPbMETIEUAr95xu0h9jTnoe2QCZEdnEG9W/LLTv4gt3Ndz+8iVXU=
-X-Received: by 2002:a25:7e83:: with SMTP id z125mr2770391ybc.446.1641857037793;
- Mon, 10 Jan 2022 15:23:57 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4h1d480IZ4YCqogfOcApNhj3xjpkSaqcARPjT3soJXI=;
+        b=WXY/yq/NpmoEskSZ7TFdHz31NJfcpc3ujmk1/CvHb2MZWb1uOAUsPIT9iQifrJlDZv
+         j+h9te62RAVY+OHn409dpY5ngcmsbXUvVqzGwiHrocD8GK6YLwVBgsLrMf0gtvITmJAa
+         m4M1T6ATQs745P7+TwxOBeGspI4YGaVKrswyUjZq/iCjFRzIvn96n6ydix99C2TTe7h5
+         RdSU20bIz2HkYxI3eGrNwI3EJMwXYxJ3viXITFODfSbYfsfnmaD5CYlHneK2U3kPWcJN
+         CTDLW8B5B64qbd74vOaZqggS111o56tOpHHRmnxyPwL+Lyh5VSmuozgwLkX8dmgUs5tw
+         JBEQ==
+X-Gm-Message-State: AOAM531uMvuPYU0kHNTdc9KDKFtdWde8fYgRSTa9/T16rJmJVnpwtb6Y
+        li2zcJKRiyIeN1CaCJLWVKnZWg==
+X-Google-Smtp-Source: ABdhPJxRCN95KRkMaW0D7kUbDkBVMWZrYRgIXRf34blGPkn8FGjpH7FZKnKEFThlL9eICh8AA6973g==
+X-Received: by 2002:a17:902:aa07:b0:14a:27da:9503 with SMTP id be7-20020a170902aa0700b0014a27da9503mr1970347plb.60.1641857233303;
+        Mon, 10 Jan 2022 15:27:13 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d21sm8260583pfv.45.2022.01.10.15.27.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 15:27:12 -0800 (PST)
+Date:   Mon, 10 Jan 2022 23:27:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
+        tglx@linutronix.de, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/6] KVM: x86: Move check_processor_compatibility from
+ init ops to runtime ops
+Message-ID: <YdzAzT5AqO0aCsHk@google.com>
+References: <20211227081515.2088920-1-chao.gao@intel.com>
+ <20211227081515.2088920-2-chao.gao@intel.com>
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
- <Ydjje8qBOP3zDOZi@google.com>
-In-Reply-To: <Ydjje8qBOP3zDOZi@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 10 Jan 2022 15:23:46 -0800
-Message-ID: <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211227081515.2088920-2-chao.gao@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 7, 2022 at 5:06 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
-> > Capture the start of the KVM VM, which is basically the
->
-> Please wrap at ~75 chars.
->
-> > start of any vCPU run. This state of the VM is helpful
-> > in the upcoming patches to prevent user-space from
-> > configuring certain VM features after the VM has started
-> > running.
->
-> Please provide context of how the flag will be used.  I glanced at the future
-> patches, and knowing very little about arm, I was unable to glean useful info
-> about exactly who is being prevented from doing what.
->
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  include/linux/kvm_host.h | 3 +++
-> >  virt/kvm/kvm_main.c      | 9 +++++++++
-> >  2 files changed, 12 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index c310648cc8f1..d0bd8f7a026c 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -623,6 +623,7 @@ struct kvm {
-> >       struct notifier_block pm_notifier;
-> >  #endif
-> >       char stats_id[KVM_STATS_NAME_SIZE];
-> > +     bool vm_started;
-> >  };
-> >
-> >  #define kvm_err(fmt, ...) \
-> > @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
-> >       }
-> >  }
-> >
-> > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
->
-> Needs parantheses around (kvm), but why bother with a macro?  This is the same
-> header that defines struct kvm.
->
-No specific reason for creating a macro as such. I can remove it if it
-feels noisy.
-> > +
-> >  extern bool kvm_rebooting;
-> >
-> >  extern unsigned int halt_poll_ns;
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 72c4e6b39389..962b91ac2064 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >       int r;
-> >       struct kvm_fpu *fpu = NULL;
-> >       struct kvm_sregs *kvm_sregs = NULL;
-> > +     struct kvm *kvm = vcpu->kvm;
->
-> If you're going to bother grabbing kvm, replace the instances below that also do
-> vcpu->kvm.
->
-> >
-> >       if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
-> >               return -EIO;
-> > @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >                       if (oldpid)
-> >                               synchronize_rcu();
-> >                       put_pid(oldpid);
-> > +
-> > +                     /*
-> > +                      * Since we land here even on the first vCPU run,
-> > +                      * we can mark that the VM has started running.
->
-> Please avoid "we", "us", etc..
->
-> "vm_started" is also ambiguous.  If we end up with a flag, then I would prefer a
-> much more literal name, a la created_vcpus, e.g. ran_vcpus or something.
->
-> > +                      */
-> > +                     mutex_lock(&kvm->lock);
->
-> This adds unnecessary lock contention when running vCPUs.  The naive solution
-> would be:
->                         if (!kvm->vm_started) {
->                                 ...
->                         }
->
-Not sure if I understood the solution..
+On Mon, Dec 27, 2021, Chao Gao wrote:
+> so that KVM can do compatibility checks on hotplugged CPUs. Drop __init
+> from check_processor_compatibility() and its callees.
 
-> > +                     kvm->vm_started = true;
-> > +                     mutex_unlock(&kvm->lock);
->
-> Lastly, why is this in generic KVM?
->
-The v1 of the series originally had it in the arm specific code.
-However, I was suggested to move it to the generic code since the book
-keeping is not arch specific and could be helpful to others too [1].
+Losing the __init annotation on all these helpers makes me a bit sad, more from a
+documentation perspective than a "but we could shave a few bytes" perspective.
+More than once I've wondered why some bit of code isn't __init, only to realize
+its used for hotplug.
 
-Thanks for the review. I'll add your other comments as well.
+What if we added an __init_or_hotplug annotation that is a nop if HOTPLUG_CPU=y?
+At a glance, KVM could use that if the guts of kvm_online_cpu() were #idef'd out
+on !CONFIG_HOTPLUG_CPU.  That also give us a bit of test coverage for bots that
+build with SMP=n.
 
-Regards,
-Raghavendra
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a80e3b0c11a8..30bbcb4f4057 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11380,7 +11380,7 @@ void kvm_arch_hardware_unsetup(void)
+        static_call(kvm_x86_hardware_unsetup)();
+ }
 
-[1]: https://lore.kernel.org/kvmarm/YYMKphExkqttn2w0@google.com/
+-int kvm_arch_check_processor_compat(void)
++int __init_or_hotplug kvm_arch_check_processor_compat(void)
+ {
+        struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
 
-> >               }
-> >               r = kvm_arch_vcpu_ioctl_run(vcpu);
-> >               trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
-> > --
-> > 2.34.1.448.ga2b2bfdf31-goog
-> >
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+diff --git a/include/linux/init.h b/include/linux/init.h
+index d82b4b2e1d25..33788b3c180a 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -53,6 +53,12 @@
+ #define __exitdata     __section(".exit.data")
+ #define __exit_call    __used __section(".exitcall.exit")
+
++#ifdef CONFIG_HOTPLUG_CPU
++#define __init_or_hotplug
++#else
++#define __init_or_hotplug __init
++#endif /* CONFIG_HOTPLUG_CPU
++
+ /*
+  * modpost check for section mismatches during the kernel build.
+  * A section mismatch happens when there are references from a
+
