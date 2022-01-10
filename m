@@ -2,215 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E1F0489C61
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:39:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C80FE489C70
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:44:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233743AbiAJPjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 10:39:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34870 "EHLO
+        id S236401AbiAJPoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 10:44:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46632 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236339AbiAJPjC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 10:39:02 -0500
+        by vger.kernel.org with ESMTP id S236361AbiAJPoX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 10:44:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641829141;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1641829462;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Vn/4MITr303eLI/9sy4vZE7T+80p2T43/HHj8bjumUI=;
-        b=EqGkm6LolTRYNRUUKoBJba5S/+i6bDTVHKDUjkqPtJwboI8zoZmcDHOlTgo5GQaeh+l4rM
-        DyOo3/t9DFr4FewRBfigZUBQGPhNmJyPJ5XrBkVsDKxsSzSmnMgGlh/MMu+9Told5Annlv
-        zvPiqVs2KRLTSRTVOJr/fRzVvS0YC6s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=1GwsjTdK6v2LnBFhWI+JJOy9OQSY+yI1I9CwqbFn3SQ=;
+        b=BBe4NaoKQSbWyzM93tQDsHo2EmSH51X5nnoZWp5KwDypX/ekOsoHDd7XDz+dTiWJ6R4jDO
+        ZjbTtht5MYmc7FRRkiiVF79G+poA9M1GyIjY9wC+93DDqcgFLE91hz+czZQhxoMpaDB6pn
+        AGkgOu6dPrY5MLVMPX8CGLZgv99WFes=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-360-PCWB1t_YP8SVSDojUlL_lg-1; Mon, 10 Jan 2022 10:39:00 -0500
-X-MC-Unique: PCWB1t_YP8SVSDojUlL_lg-1
-Received: by mail-wm1-f72.google.com with SMTP id n3-20020a05600c3b8300b00345c3fc40b0so9085494wms.3
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:39:00 -0800 (PST)
+ us-mta-652-tv6vxxLkNEynoM9BibVYhw-1; Mon, 10 Jan 2022 10:44:21 -0500
+X-MC-Unique: tv6vxxLkNEynoM9BibVYhw-1
+Received: by mail-wm1-f71.google.com with SMTP id i81-20020a1c3b54000000b003467c58cbddso8727673wma.5
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:44:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=Vn/4MITr303eLI/9sy4vZE7T+80p2T43/HHj8bjumUI=;
-        b=iQ3O4821BD2xz+kUCdhw7VLx3JWDIMqmdKXjjcICbn1kf6juOw4DoTavkHa6GtvBB9
-         5GUUqS0KGMq4VVACI0UAGxDFSDc6UZqL/44iNp7c26X3jRBPfa2GEVfb1TNoJw9CXQj/
-         7sFD7wEQ8ehUsPV3gQOEaoH/6tmNgsqGF/7KDrax2WMu7zdBVQhC9r5dQI4jL/qLzdVe
-         dAsTWt/Xu4SaDhD1lf0YhuVLGtT1W5UMWckAp7GDsveHCXKj3VVfnJl6I8lP+Du6RLmj
-         MkJN2Q7rZed8ki/UwruUKFajnp+TP/l+YAbVkokfn+daCdi374JJNOKeGrAMTARi2D7c
-         izcg==
-X-Gm-Message-State: AOAM533VR0BwnCPNk89gApUozxEfTpxLbjyo21Yf0fBF0V0t9JCG6Iiv
-        UOJHGJ0YqaNzDD4Jv4mXs7rXrXJ86tGIIXtG+BO7Uj0j6JfrQvsnysL8Fx0P/I062e1hCBni3h6
-        XE4UtOA6WclQB
-X-Received: by 2002:a5d:4609:: with SMTP id t9mr153681wrq.551.1641829138993;
-        Mon, 10 Jan 2022 07:38:58 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwZifhrLZp+3rpsOY24CeNlWG+k7+BKtRIYq4bZWPG5Q97FLrRELUVOFGLaCLaT/fCtp/nCcw==
-X-Received: by 2002:a5d:4609:: with SMTP id t9mr153665wrq.551.1641829138790;
-        Mon, 10 Jan 2022 07:38:58 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id n12sm7169407wmq.30.2022.01.10.07.38.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jan 2022 07:38:57 -0800 (PST)
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v4 4/6] hw/arm/virt: Use the PA range to compute the
- memory map
-To:     Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        kernel-team@android.com, Andrew Jones <drjones@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-References: <20220107163324.2491209-1-maz@kernel.org>
- <20220107163324.2491209-5-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <d7f793ab-bf78-32fb-e793-54a034ffd5d8@redhat.com>
-Date:   Mon, 10 Jan 2022 16:38:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=1GwsjTdK6v2LnBFhWI+JJOy9OQSY+yI1I9CwqbFn3SQ=;
+        b=UUxtMEIbOP/ujO49Luj2BX0a0QYOgEE9kkc6ejC+ImqPYU7wP49zXP36khv7a4m6IV
+         GcCwNaHn14UMDNTLwZK7lC75wjPvJO2bJdUvj63Mn/YFUONA6E/jeo5iwm6SKz0Dcizv
+         wRYOT6pqw1h7DXArSj6Z+dlvz17yfNtuI7ORyfGhI1Iau6zwZSl/TzBkHudDxaon1lDz
+         14mtMKAleiOK7HBRVY7copx/ZNTIfXI1oHjpvRjMEUX6eQy+eAdcRHr2K3Av+5tJ3anF
+         RqYBIRI/SBOPW3jp9YTdMnXwjIyLfMHzPNRk+jL7fivmvPmk+eU8agmxBQ1+TW3Pb90T
+         /m2g==
+X-Gm-Message-State: AOAM533gaQKZUvX9eDppNNAX8+PWtZETmFd5P1g/quVGWAQAXtj99rpX
+        5rvNI9CIP5Wxk/4axr2HWK+RqPpKnjNHkgDbxJjQOdrVCJfYWuRjg+lVVW0kCEmpI2C3fcciC4g
+        1xn1FMM49qqG2
+X-Received: by 2002:adf:f807:: with SMTP id s7mr184307wrp.638.1641829460437;
+        Mon, 10 Jan 2022 07:44:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwGlziNjGEYg/AKCCVR6dHJcBIW6ndhJ3HU0fYXJaw1aGDnRw1EG3ab/feKEGmla/24mvGOMw==
+X-Received: by 2002:adf:f807:: with SMTP id s7mr184278wrp.638.1641829460157;
+        Mon, 10 Jan 2022 07:44:20 -0800 (PST)
+Received: from redhat.com ([2.55.148.228])
+        by smtp.gmail.com with ESMTPSA id s1sm6891060wmh.35.2022.01.10.07.44.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 07:44:19 -0800 (PST)
+Date:   Mon, 10 Jan 2022 10:44:14 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
+Message-ID: <20220110103938-mutt-send-email-mst@kernel.org>
+References: <20210830141737.181-1-xieyongji@bytedance.com>
+ <20220110075546-mutt-send-email-mst@kernel.org>
+ <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
+ <20220110100911-mutt-send-email-mst@kernel.org>
+ <CACycT3v6jo3-8ATWUzf659vV94a2oRrm-zQtGNDZd6OQr-MENA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20220107163324.2491209-5-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <CACycT3v6jo3-8ATWUzf659vV94a2oRrm-zQtGNDZd6OQr-MENA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Jan 10, 2022 at 11:24:40PM +0800, Yongji Xie wrote:
+> On Mon, Jan 10, 2022 at 11:10 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Jan 10, 2022 at 09:54:08PM +0800, Yongji Xie wrote:
+> > > On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
+> > > > > This series introduces a framework that makes it possible to implement
+> > > > > software-emulated vDPA devices in userspace. And to make the device
+> > > > > emulation more secure, the emulated vDPA device's control path is handled
+> > > > > in the kernel and only the data path is implemented in the userspace.
+> > > > >
+> > > > > Since the emuldated vDPA device's control path is handled in the kernel,
+> > > > > a message mechnism is introduced to make userspace be aware of the data
+> > > > > path related changes. Userspace can use read()/write() to receive/reply
+> > > > > the control messages.
+> > > > >
+> > > > > In the data path, the core is mapping dma buffer into VDUSE daemon's
+> > > > > address space, which can be implemented in different ways depending on
+> > > > > the vdpa bus to which the vDPA device is attached.
+> > > > >
+> > > > > In virtio-vdpa case, we implements a MMU-based software IOTLB with
+> > > > > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+> > > > > buffer is reside in a userspace memory region which can be shared to the
+> > > > > VDUSE userspace processs via transferring the shmfd.
+> > > > >
+> > > > > The details and our user case is shown below:
+> > > > >
+> > > > > ------------------------    -------------------------   ----------------------------------------------
+> > > > > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+> > > > > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+> > > > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+> > > > > ------------+-----------     -----------+------------   -------------+----------------------+---------
+> > > > >             |                           |                            |                      |
+> > > > >             |                           |                            |                      |
+> > > > > ------------+---------------------------+----------------------------+----------------------+---------
+> > > > > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+> > > > > |    -------+--------           --------+--------            -------+--------          -----+----    |
+> > > > > |           |                           |                           |                       |        |
+> > > > > | ----------+----------       ----------+-----------         -------+-------                |        |
+> > > > > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+> > > > > | ----------+----------       ----------+-----------         -------+-------                |        |
+> > > > > |           |      virtio bus           |                           |                       |        |
+> > > > > |   --------+----+-----------           |                           |                       |        |
+> > > > > |                |                      |                           |                       |        |
+> > > > > |      ----------+----------            |                           |                       |        |
+> > > > > |      | virtio-blk device |            |                           |                       |        |
+> > > > > |      ----------+----------            |                           |                       |        |
+> > > > > |                |                      |                           |                       |        |
+> > > > > |     -----------+-----------           |                           |                       |        |
+> > > > > |     |  virtio-vdpa driver |           |                           |                       |        |
+> > > > > |     -----------+-----------           |                           |                       |        |
+> > > > > |                |                      |                           |    vdpa bus           |        |
+> > > > > |     -----------+----------------------+---------------------------+------------           |        |
+> > > > > |                                                                                        ---+---     |
+> > > > > -----------------------------------------------------------------------------------------| NIC |------
+> > > > >                                                                                          ---+---
+> > > > >                                                                                             |
+> > > > >                                                                                    ---------+---------
+> > > > >                                                                                    | Remote Storages |
+> > > > >                                                                                    -------------------
+> > > > >
+> > > > > We make use of it to implement a block device connecting to
+> > > > > our distributed storage, which can be used both in containers and
+> > > > > VMs. Thus, we can have an unified technology stack in this two cases.
+> > > > >
+> > > > > To test it with null-blk:
+> > > > >
+> > > > >   $ qemu-storage-daemon \
+> > > > >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+> > > > >       --monitor chardev=charmonitor \
+> > > > >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+> > > > >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
+> > > > >
+> > > > > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+> > > >
+> > > > It's been half a year - any plans to upstream this?
+> > >
+> > > Yeah, this is on my to-do list this month.
+> > >
+> > > Sorry for taking so long... I've been working on another project
+> > > enabling userspace RDMA with VDUSE for the past few months. So I
+> > > didn't have much time for this. Anyway, I will submit the first
+> > > version as soon as possible.
+> > >
+> > > Thanks,
+> > > Yongji
+> >
+> > Oh fun. You mean like virtio-rdma? Or RDMA as a backend for regular
+> > virtio?
+> >
+> 
+> Yes, like virtio-rdma. Then we can develop something like userspace
+> rxe、siw or custom protocol with VDUSE.
+> 
+> Thanks,
+> Yongji
 
-On 1/7/22 5:33 PM, Marc Zyngier wrote:
-> The highmem attribute is nothing but another way to express the
-> PA range of a VM. To support HW that has a smaller PA range then
-> what QEMU assumes, pass this PA range to the virt_set_memmap()
-> function, allowing it to correctly exclude highmem devices
-> if they are outside of the PA range.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  hw/arm/virt.c | 53 ++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 46 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 57c55e8a37..db4b0636e1 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1660,7 +1660,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
->      return arm_cpu_mp_affinity(idx, clustersz);
->  }
->  
-> -static void virt_set_memmap(VirtMachineState *vms)
-> +static void virt_set_memmap(VirtMachineState *vms, int pa_bits)
->  {
->      MachineState *ms = MACHINE(vms);
->      hwaddr base, device_memory_base, device_memory_size, memtop;
-> @@ -1678,6 +1678,13 @@ static void virt_set_memmap(VirtMachineState *vms)
->          exit(EXIT_FAILURE);
->      }
->  
-> +    /*
-> +     * !highmem is exactly the same as limiting the PA space to 32bit,
-> +     * irrespective of the underlying capabilities of the HW.
-> +     */
-> +    if (!vms->highmem)
-> +	    pa_bits = 32;
-you need {} according to the QEMU coding style. Welcome to a new shiny
-world :-)
-> +
->      /*
->       * We compute the base of the high IO region depending on the
->       * amount of initial and device memory. The device memory start/size
-> @@ -1691,8 +1698,9 @@ static void virt_set_memmap(VirtMachineState *vms)
->  
->      /* Base address of the high IO region */
->      memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
-> -    if (!vms->highmem && memtop > 4 * GiB) {
-> -        error_report("highmem=off, but memory crosses the 4GiB limit\n");
-> +    if (memtop > BIT_ULL(pa_bits)) {
-> +	    error_report("Addressing limited to %d bits, but memory exceeds it by %llu bytes\n",
-> +			 pa_bits, memtop - BIT_ULL(pa_bits));
->          exit(EXIT_FAILURE);
->      }
->      if (base < device_memory_base) {
-> @@ -1711,7 +1719,13 @@ static void virt_set_memmap(VirtMachineState *vms)
->          vms->memmap[i].size = size;
->          base += size;
->      }
-> -    vms->highest_gpa = (vms->highmem ? base : memtop) - 1;
-> +
-> +    /*
-> +     * If base fits within pa_bits, all good. If it doesn't, limit it
-> +     * to the end of RAM, which is guaranteed to fit within pa_bits.
-> +     */
-> +    vms->highest_gpa = (base <= BIT_ULL(pa_bits) ? base : memtop) - 1;
-> +
->      if (device_memory_size > 0) {
->          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
->          ms->device_memory->base = device_memory_base;
-> @@ -1902,12 +1916,38 @@ static void machvirt_init(MachineState *machine)
->      unsigned int smp_cpus = machine->smp.cpus;
->      unsigned int max_cpus = machine->smp.max_cpus;
-Move the cpu_type check before?
+Would be interesting to see the spec for that.
+The issues with RDMA revolved around the fact that current
+apps tend to either use non-standard propocols for connection
+establishment or use UD where there's IIRC no standard
+at all. So QP numbers are hard to virtualize.
+Similarly many use LIDs directly with the same effect.
+GUIDs might be virtualizeable but no one went to the effort.
 
-    if (!cpu_type_valid(machine->cpu_type)) {
-        error_report("mach-virt: CPU type %s not supported",
-machine->cpu_type);
-        exit(1);
-    }
->  
-> +    possible_cpus = mc->possible_cpu_arch_ids(machine);
-> +
->      /*
->       * In accelerated mode, the memory map is computed earlier in kvm_type()
->       * to create a VM with the right number of IPA bits.
->       */
->      if (!vms->memmap) {
-> -        virt_set_memmap(vms);
-> +        Object *cpuobj;
-> +        ARMCPU *armcpu;
-> +        int pa_bits;
-> +
-> +        /*
-> +         * Instanciate a temporary CPU object to find out about what
-> +         * we are about to deal with. Once this is done, get rid of
-> +         * the object.
-> +         */
-> +        cpuobj = object_new(possible_cpus->cpus[0].type);
-> +        armcpu = ARM_CPU(cpuobj);
-> +
-> +        if (object_property_get_bool(cpuobj, "aarch64", NULL)) {
-> +            pa_bits = arm_pamax(armcpu);
-> +        } else if (arm_feature(&armcpu->env, ARM_FEATURE_LPAE)) {
-> +            /* v7 with LPAE */
-> +            pa_bits = 40;
-> +        } else {
-> +            /* Anything else */
-> +            pa_bits = 32;
-> +        }
-> +
-> +        object_unref(cpuobj);
-> +
-> +        virt_set_memmap(vms, pa_bits);
->      }
->  
->      /* We can probe only here because during property set
-> @@ -1989,7 +2029,6 @@ static void machvirt_init(MachineState *machine)
->  
->      create_fdt(vms);
->  
-> -    possible_cpus = mc->possible_cpu_arch_ids(machine);
->      assert(possible_cpus->len == max_cpus);
->      for (n = 0; n < possible_cpus->len; n++) {
->          Object *cpuobj;
-> @@ -2646,7 +2685,7 @@ static int virt_kvm_type(MachineState *ms, const char *type_str)
->      max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms, &fixed_ipa);
->  
->      /* we freeze the memory map to compute the highest gpa */
-> -    virt_set_memmap(vms);
-> +    virt_set_memmap(vms, max_vm_pa_size);
->  
->      requested_pa_size = 64 - clz64(vms->highest_gpa);
->  
-Thanks
+To say nothing about the interaction with memory overcommit.
 
-Eric
+-- 
+MST
 
