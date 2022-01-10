@@ -2,182 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16A1B489BDA
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:09:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E0FE489BE1
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:10:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235915AbiAJPJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 10:09:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32076 "EHLO
+        id S235967AbiAJPKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 10:10:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24804 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235916AbiAJPJr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 10:09:47 -0500
+        by vger.kernel.org with ESMTP id S235938AbiAJPKl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 10:10:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641827387;
+        s=mimecast20190719; t=1641827441;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pqCR8DvhBxiCC4TzGlm/t/7v2g7znFq4gFV1cmWoEXc=;
-        b=FCKL11GeK8lPcrJxi1b6tEdLWm46ya5nKM7YFb8Z9sWP3uxjCqZ/mNgbCnPlkDJgcTKVWb
-        Nuto2Wr73jlMPi8sZjr0u5SIjjpAomCwya82EPufuvKsRJVXeeNI7cK44TPp6ZY7zPUFZ2
-        +oW1ZO1Vr+a9A68346t8gyfFPjz5yUw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=SLM8O5I4XsqQfDouqPjuMZjGtdO2q2woR6k0IW1Zlz0=;
+        b=JWjBDonM0TRGQK/do2Y8QMBF6jktYxECPGBxrK79IpaDEqPhJ6CFY+27fl8oYPAZDMDF6z
+        AXIbup85MwOghAeKDVecoliObLoqcuIKmMUrrg+kSE6DIHbLdT7MzY3k2i2iAoq1fWLRPn
+        +pRzVeATm9+mR09sp2lfIvoX9bchvvg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-369-Zt8BqPMTPQ-6NqPUw6LlpQ-1; Mon, 10 Jan 2022 10:09:45 -0500
-X-MC-Unique: Zt8BqPMTPQ-6NqPUw6LlpQ-1
-Received: by mail-wr1-f71.google.com with SMTP id i23-20020adfaad7000000b001a6320b66b9so2398575wrc.15
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:09:45 -0800 (PST)
+ us-mta-270-vK33Hy8gPX-hRwXZocfnvg-1; Mon, 10 Jan 2022 10:10:40 -0500
+X-MC-Unique: vK33Hy8gPX-hRwXZocfnvg-1
+Received: by mail-ed1-f72.google.com with SMTP id y10-20020a056402358a00b003f88b132849so10418465edc.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:10:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pqCR8DvhBxiCC4TzGlm/t/7v2g7znFq4gFV1cmWoEXc=;
-        b=r0TB4gkSgFtr6mhB19wYAqkp8fXkZDV5BPhCMdsskG5SG8IFatZ10asfyGm6KEd4NJ
-         kBXVZfIaWvYOUchC5tdEQoCDX88K6NJJ6WXG5D90N6x2i5aRzYccMaQLulD3mm13eO3Y
-         5RAHDMdgbCvizQJgw8CS/7WynOznEne1FaF7xQEhE8Hj8PNZHD+B0W63XB5096vSbIr5
-         piIeJ/kyw7iGYS3K1SDXmfchPTdHApUsCJyY1G5+WRMEAlQcjRFzheguSibBvlwCosit
-         dtB3l8y90810bAnqsmb6oN0GGygrqjzt+j2xt2mGvFr576ixnCXs+ZglgZyBOkQ48L02
-         6Epw==
-X-Gm-Message-State: AOAM531FtyK8QEvNTiJ9Ih84527cUGwiC+1fJAzIjIqtc+CsMb/57xc5
-        zIjCgp68eOXvBcXLfXEgwl0hiZNAEavYIvL4IHb6iHcLc/41U8fKwWLzKOqChdo58CQfHkAmc6e
-        l0D+p3fD0aFVh
-X-Received: by 2002:a05:6000:1687:: with SMTP id y7mr92692wrd.234.1641827384680;
-        Mon, 10 Jan 2022 07:09:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx+Wi7ut3xNdrf+rI6tR7FUH1Wzlso2Na/Gkg81RELF3PPjhams/SaDbGDnPVE94lb71Siqrw==
-X-Received: by 2002:a05:6000:1687:: with SMTP id y7mr92655wrd.234.1641827384391;
-        Mon, 10 Jan 2022 07:09:44 -0800 (PST)
-Received: from redhat.com ([2.55.148.228])
-        by smtp.gmail.com with ESMTPSA id m6sm7888102wrx.36.2022.01.10.07.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 07:09:43 -0800 (PST)
-Date:   Mon, 10 Jan 2022 10:09:38 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>,
-        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
-Message-ID: <20220110100911-mutt-send-email-mst@kernel.org>
-References: <20210830141737.181-1-xieyongji@bytedance.com>
- <20220110075546-mutt-send-email-mst@kernel.org>
- <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:references:content-language:in-reply-to
+         :content-transfer-encoding;
+        bh=SLM8O5I4XsqQfDouqPjuMZjGtdO2q2woR6k0IW1Zlz0=;
+        b=Jy6nGBc5fUD+cqMylgg/dRoBxlrDfZwZQEJfMiQ5/tYwt9Nj1LtSSNSCXPNB017cR5
+         ywIKQvX4AFJtnM4UeG0igALzmxTVGoPGdgLfL/HCvR+wk17rQVnTRG65ar7SAAetSlI0
+         EFCLKS4At9K3iuF35FT1gq+SzBC4q5psbgoLNhvuRK/Gbpzv9JeWhYJ/WbFWVSnhXiyW
+         1FtvnWXlN9667xeATkx28XWrB2KJTm96JCzS1PE2rS2JO86Js52qGDm+BziZGVfgCu9/
+         H7ZzbEms+KPEwk+NbtCBqWlNeS6Lcn12Xpyawe5/N3WrjahJP/7M7EDbKpIZHK7ANHEj
+         wXlA==
+X-Gm-Message-State: AOAM531N76CbYnK7WfI/GyMEsul1QxKWilocWgv6FLxeal99mZafBbr8
+        TGiqm0UPmeJ55K0SOuaWcOrch2K9i0uhsBiMmz6imP4ZfvSmX8hi6Rx3FUZ9rGRGdGHh4+dRAJ7
+        IW3eXYOWkQrMK
+X-Received: by 2002:a05:6402:4405:: with SMTP id y5mr77639eda.179.1641827438904;
+        Mon, 10 Jan 2022 07:10:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxLT9e9aX5TGQJz8YqtpWsu2Vw3N+FjhJS/2z70PRmbztYPVe7+65DOq7V5OVNzyG+IRRJnsw==
+X-Received: by 2002:a05:6402:4405:: with SMTP id y5mr77607eda.179.1641827438687;
+        Mon, 10 Jan 2022 07:10:38 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id g3sm2561967ejo.147.2022.01.10.07.10.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jan 2022 07:10:38 -0800 (PST)
+Message-ID: <c17fb7b3-d7cc-e2e6-dce8-c27d19f5fe00@redhat.com>
+Date:   Mon, 10 Jan 2022 16:10:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 3/5] KVM: SVM: fix race between interrupt delivery and
+ AVIC inhibition
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>
+References: <20211213104634.199141-1-mlevitsk@redhat.com>
+ <20211213104634.199141-4-mlevitsk@redhat.com> <YdTPvdY6ysjXMpAU@google.com>
+ <628ac6d9b16c6b3a2573f717df0d2417df7caddb.camel@redhat.com>
+ <6a11edec-c29a-95df-393e-363e1af46257@redhat.com>
+ <YdjPyCRwZDoV11ox@google.com>
+Content-Language: en-US
+In-Reply-To: <YdjPyCRwZDoV11ox@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 09:54:08PM +0800, Yongji Xie wrote:
-> On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
-> > > This series introduces a framework that makes it possible to implement
-> > > software-emulated vDPA devices in userspace. And to make the device
-> > > emulation more secure, the emulated vDPA device's control path is handled
-> > > in the kernel and only the data path is implemented in the userspace.
-> > >
-> > > Since the emuldated vDPA device's control path is handled in the kernel,
-> > > a message mechnism is introduced to make userspace be aware of the data
-> > > path related changes. Userspace can use read()/write() to receive/reply
-> > > the control messages.
-> > >
-> > > In the data path, the core is mapping dma buffer into VDUSE daemon's
-> > > address space, which can be implemented in different ways depending on
-> > > the vdpa bus to which the vDPA device is attached.
-> > >
-> > > In virtio-vdpa case, we implements a MMU-based software IOTLB with
-> > > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-> > > buffer is reside in a userspace memory region which can be shared to the
-> > > VDUSE userspace processs via transferring the shmfd.
-> > >
-> > > The details and our user case is shown below:
-> > >
-> > > ------------------------    -------------------------   ----------------------------------------------
-> > > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-> > > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-> > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-> > > ------------+-----------     -----------+------------   -------------+----------------------+---------
-> > >             |                           |                            |                      |
-> > >             |                           |                            |                      |
-> > > ------------+---------------------------+----------------------------+----------------------+---------
-> > > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-> > > |    -------+--------           --------+--------            -------+--------          -----+----    |
-> > > |           |                           |                           |                       |        |
-> > > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-> > > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > > |           |      virtio bus           |                           |                       |        |
-> > > |   --------+----+-----------           |                           |                       |        |
-> > > |                |                      |                           |                       |        |
-> > > |      ----------+----------            |                           |                       |        |
-> > > |      | virtio-blk device |            |                           |                       |        |
-> > > |      ----------+----------            |                           |                       |        |
-> > > |                |                      |                           |                       |        |
-> > > |     -----------+-----------           |                           |                       |        |
-> > > |     |  virtio-vdpa driver |           |                           |                       |        |
-> > > |     -----------+-----------           |                           |                       |        |
-> > > |                |                      |                           |    vdpa bus           |        |
-> > > |     -----------+----------------------+---------------------------+------------           |        |
-> > > |                                                                                        ---+---     |
-> > > -----------------------------------------------------------------------------------------| NIC |------
-> > >                                                                                          ---+---
-> > >                                                                                             |
-> > >                                                                                    ---------+---------
-> > >                                                                                    | Remote Storages |
-> > >                                                                                    -------------------
-> > >
-> > > We make use of it to implement a block device connecting to
-> > > our distributed storage, which can be used both in containers and
-> > > VMs. Thus, we can have an unified technology stack in this two cases.
-> > >
-> > > To test it with null-blk:
-> > >
-> > >   $ qemu-storage-daemon \
-> > >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-> > >       --monitor chardev=charmonitor \
-> > >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
-> > >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> > >
-> > > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
-> >
-> > It's been half a year - any plans to upstream this?
-> 
-> Yeah, this is on my to-do list this month.
-> 
-> Sorry for taking so long... I've been working on another project
-> enabling userspace RDMA with VDUSE for the past few months. So I
-> didn't have much time for this. Anyway, I will submit the first
-> version as soon as possible.
-> 
-> Thanks,
-> Yongji
+On 1/8/22 00:42, Sean Christopherson wrote:
+> Yeah, I don't disagree, but the flip side is that without the early check, it's
+> not all that obvious that SVM must not return -1.
 
-Oh fun. You mean like virtio-rdma? Or RDMA as a backend for regular
-virtio?
+But that's what the comment is about.
 
--- 
-MST
+> And when AVIC isn't supported
+> or is disabled at the module level, flowing into AVIC "specific" IRR logic is
+> a bit weird.  And the LAPIC code effectively becomes Intel-only.
+
+Yeah, I agree that this particular aspect is a bit weird at first.  But 
+it is also natural if you consider how IRR is implemented for AVIC vs. 
+APICv, especially with respect to incomplete IPIs.  And the LAPIC code 
+becomes a blueprint for AVIC's, i.e. you can see that the AVIC code 
+effectively becomes the one in lapic.c when you have either 
+!vcpu->arch.apicv_active or an incomplete IPI.
+
+I don't hate the code below, it does lose a bit of expressiveness of the 
+LAPIC code but I guess it's a good middle ground.
+
+Paolo
+
+> To make everyone happy, and fix the tracepoint issue, what about moving delivery
+> into vendor code?  E.g. the below (incomplete), with SVM functions renamed so that
+> anything that isn't guaranteed to be AVIC specific uses svm_ instead of avic_.
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index baca9fa37a91..a9ac724c6305 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1096,14 +1096,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
+>                                                         apic->regs + APIC_TMR);
+>                  }
+> 
+> -               if (static_call(kvm_x86_deliver_posted_interrupt)(vcpu, vector)) {
+> -                       kvm_lapic_set_irr(vector, apic);
+> -                       kvm_make_request(KVM_REQ_EVENT, vcpu);
+> -                       kvm_vcpu_kick(vcpu);
+> -               } else {
+> -                       trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
+> -                                                  trig_mode, vector);
+> -               }
+> +               static_call(kvm_x86_deliver_interrupt)(vcpu, vector);
+>                  break;
+> 
+>          case APIC_DM_REMRD:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index fe06b02994e6..1fadd14ea884 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4012,6 +4012,18 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+>          return 0;
+>   }
+> 
+> +static void vmx_deliver_interrupt(struct kvm_vcpu *vcpu, int vector)
+> +{
+> +       if (vmx_deliver_posted_interrupt(vcpu, vector)) {
+> +               kvm_lapic_set_irr(vector, apic);
+> +               kvm_make_request(KVM_REQ_EVENT, vcpu);
+> +               kvm_vcpu_kick(vcpu);
+> +       } else {
+> +               trace_kvm_apicv_accept_irq(vcpu->vcpu_id, delivery_mode,
+> +                                          trig_mode, vector);
+> +       }
+> +}
+> +
+>   /*
+>    * Set up the vmcs's constant host-state fields, i.e., host-state fields that
+>    * will not change in the lifetime of the guest.
+> @@ -7651,7 +7663,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>          .hwapic_isr_update = vmx_hwapic_isr_update,
+>          .guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
+>          .sync_pir_to_irr = vmx_sync_pir_to_irr,
+> -       .deliver_posted_interrupt = vmx_deliver_posted_interrupt,
+> +       .deliver_interrupt = vmx_deliver_interrupt,
+>          .dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
+> 
+>          .set_tss_addr = vmx_set_tss_addr,
+> 
 
