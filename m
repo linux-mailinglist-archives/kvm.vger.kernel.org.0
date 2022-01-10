@@ -2,113 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9209D489CD7
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:55:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D650A489CF1
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 16:58:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236781AbiAJPzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 10:55:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37697 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236654AbiAJPzK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 10:55:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641830105;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XpYeQhiPDirU0G/PVNqCRwCNkTCrk6kfnonmEcbmwc0=;
-        b=E/yBzizbMv7rbMQZGRgL0VvkVvQzrvafPxs6f+N5xUvzlHgz3XqToId7Gh118y3bCmYsqa
-        Q/LotjiJESAzjb16kxaiPyn8p2WG88CM57exGTtVsqFX5r6As0WIdmkMc16lHpFwSyqQQV
-        kDDZVe/mtc+cillgpCzd3pZXk2/K3gM=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-157-ra9AAtcPP2i0Op292OpxYA-1; Mon, 10 Jan 2022 10:55:04 -0500
-X-MC-Unique: ra9AAtcPP2i0Op292OpxYA-1
-Received: by mail-ed1-f69.google.com with SMTP id s7-20020a056402520700b003f841380832so10518307edd.5
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 07:55:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=XpYeQhiPDirU0G/PVNqCRwCNkTCrk6kfnonmEcbmwc0=;
-        b=wYfQb9/5nyIXRZzqZsyBSAd/9I9PRZwxmuwcvb1uliowHyPJazlkJHnPnVU6T5cWPZ
-         qJReOy/OcgaBdFozKDDxZkMWjAmY4EruiIlpRfQrow+TxNpK/1tLhcIi5xBfJ9JFCpnS
-         45wPp8Ok9917HT9eDotogNL6G6BuzHXY7BP+J3arX9n1L7flLemK9GsX580kvNJtFh+0
-         Sn9BMfIB8I6rjZ43DDxoUCNGoivfcZEffl6at1Lt5DnIgTuuDgrdjDbENHdHr82Wogn+
-         TUZFRf8d/0yLJeQaYuMRohrBF7Fa/m1YY9Nb229hFx46iHHl/oou1InM/LGNqa2Ll9KG
-         z05g==
-X-Gm-Message-State: AOAM530bM9BztvlBTyelWL8mihkKAXjReQE3jXk82OTfItz1cxgmsO0t
-        /FpAV5iKFg0d/r1n8D5Qx8F3A+nXnhV4ppOfMzCoNNEjDcDpHNZH5hTcSChN8UYwEBfgx5NEXx4
-        GTraJOLyDLtiB
-X-Received: by 2002:a17:906:2559:: with SMTP id j25mr309157ejb.416.1641830103368;
-        Mon, 10 Jan 2022 07:55:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw7T5q1x9hsc3bVzo1lfPD24rVEwbE8/18ZOdEUfUvWPhR6gTWcqSFxJrCNFXChTF5aB6OI2A==
-X-Received: by 2002:a17:906:2559:: with SMTP id j25mr309144ejb.416.1641830103124;
-        Mon, 10 Jan 2022 07:55:03 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id he35sm2582404ejc.135.2022.01.10.07.55.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jan 2022 07:55:02 -0800 (PST)
-Message-ID: <7994877a-0c46-07a5-eab0-0a8dd6244e9a@redhat.com>
-Date:   Mon, 10 Jan 2022 16:55:01 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v6 05/21] x86/fpu: Make XFD initialization in
- __fpstate_reset() a function argument
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Zeng, Guang" <guang.zeng@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-References: <20220107185512.25321-1-pbonzini@redhat.com>
- <20220107185512.25321-6-pbonzini@redhat.com> <YdiX5y4KxQ7GY7xn@zn.tnic>
- <BN9PR11MB527688406C0BDCF093C718858C509@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Ydvz0g+Bdys5JyS9@zn.tnic> <761a554a-d13f-f1fb-4faf-ca7ed28d4d3a@redhat.com>
- <YdxP0FVWEJa/vrPk@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YdxP0FVWEJa/vrPk@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S236841AbiAJP6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 10:58:39 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:36070 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236654AbiAJP6i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 10:58:38 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 307B6B811EC
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 15:58:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEA0DC36AE5;
+        Mon, 10 Jan 2022 15:58:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641830315;
+        bh=yy2g18ZmN6V9ofHPGdck09RwOJDBvsPANaHpXOcQECQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=W/cQTf1/z21ABUgAszAEP2BgFPvE9YEgWKljQMwmJ6gJbLqQOSnwQXOV/Q4zNr6yB
+         xHYeV9IlJfEdy4gL8XJtjTYBa2xhAV0k0CWshEwx/bHQkbMu7A3k8UPvBl7hyDUJXz
+         Na6pPAr9QtAHptoMmPRtycpNq8vOnMonKvc8uqUDufPv7uuEz7Lbc9tbXEq1jKswje
+         cjYa9mXir1C+W9JlBKmg2Ee8uSSbQgs+FPFjnjlpSXCEUEgwRegKZTnXT4bF/1tLJ9
+         sJNGM2S0p0im5T2v/C+RQ95xwa+RooWkSM6EXDRmlmw3hQCtvpooYgY0FdB4aQt5BF
+         MGG8saYejYsKw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n6x45-00HAi9-T9; Mon, 10 Jan 2022 15:58:34 +0000
+Date:   Mon, 10 Jan 2022 15:58:33 +0000
+Message-ID: <87ilurtweu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v4 4/6] hw/arm/virt: Use the PA range to compute the memory map
+In-Reply-To: <d7f793ab-bf78-32fb-e793-54a034ffd5d8@redhat.com>
+References: <20220107163324.2491209-1-maz@kernel.org>
+        <20220107163324.2491209-5-maz@kernel.org>
+        <d7f793ab-bf78-32fb-e793-54a034ffd5d8@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, drjones@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/22 16:25, Borislav Petkov wrote:
-> "Standard sign-off procedure applies, i.e. the ordering of
-> Signed-off-by: tags should reflect the chronological history of
-> the patch insofar as possible, regardless of whether the author
-> is attributed via From: or Co-developed-by:. Notably, the last
-> Signed-off-by: must always be that of the developer submitting the
-> patch."
+On Mon, 10 Jan 2022 15:38:56 +0000,
+Eric Auger <eric.auger@redhat.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On 1/7/22 5:33 PM, Marc Zyngier wrote:
+> > The highmem attribute is nothing but another way to express the
+> > PA range of a VM. To support HW that has a smaller PA range then
+> > what QEMU assumes, pass this PA range to the virt_set_memmap()
+> > function, allowing it to correctly exclude highmem devices
+> > if they are outside of the PA range.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  hw/arm/virt.c | 53 ++++++++++++++++++++++++++++++++++++++++++++-------
+> >  1 file changed, 46 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 57c55e8a37..db4b0636e1 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1660,7 +1660,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineS=
+tate *vms, int idx)
+> >      return arm_cpu_mp_affinity(idx, clustersz);
+> >  }
+> > =20
+> > -static void virt_set_memmap(VirtMachineState *vms)
+> > +static void virt_set_memmap(VirtMachineState *vms, int pa_bits)
+> >  {
+> >      MachineState *ms =3D MACHINE(vms);
+> >      hwaddr base, device_memory_base, device_memory_size, memtop;
+> > @@ -1678,6 +1678,13 @@ static void virt_set_memmap(VirtMachineState *vm=
+s)
+> >          exit(EXIT_FAILURE);
+> >      }
+> > =20
+> > +    /*
+> > +     * !highmem is exactly the same as limiting the PA space to 32bit,
+> > +     * irrespective of the underlying capabilities of the HW.
+> > +     */
+> > +    if (!vms->highmem)
+> > +	    pa_bits =3D 32;
+> you need {} according to the QEMU coding style. Welcome to a new shiny
+> world :-)
 
-So this means that "the author must be the first SoB" is not an absolute 
-rule.  In the case of this patch we had:
+Yeah. Between the reduced indentation and the avalanche of braces, my
+brain fails to pattern-match blocks of code. Amusing how inflexible
+you become after a couple of decades...
 
-From: Jing Liu <jing2.liu@intel.com>
-...
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Jing Liu <jing2.liu@intel.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > +
+> >      /*
+> >       * We compute the base of the high IO region depending on the
+> >       * amount of initial and device memory. The device memory start/si=
+ze
+> > @@ -1691,8 +1698,9 @@ static void virt_set_memmap(VirtMachineState *vms)
+> > =20
+> >      /* Base address of the high IO region */
+> >      memtop =3D base =3D device_memory_base + ROUND_UP(device_memory_si=
+ze, GiB);
+> > -    if (!vms->highmem && memtop > 4 * GiB) {
+> > -        error_report("highmem=3Doff, but memory crosses the 4GiB limit=
+\n");
+> > +    if (memtop > BIT_ULL(pa_bits)) {
+> > +	    error_report("Addressing limited to %d bits, but memory exceeds i=
+t by %llu bytes\n",
+> > +			 pa_bits, memtop - BIT_ULL(pa_bits));
+> >          exit(EXIT_FAILURE);
+> >      }
+> >      if (base < device_memory_base) {
+> > @@ -1711,7 +1719,13 @@ static void virt_set_memmap(VirtMachineState *vm=
+s)
+> >          vms->memmap[i].size =3D size;
+> >          base +=3D size;
+> >      }
+> > -    vms->highest_gpa =3D (vms->highmem ? base : memtop) - 1;
+> > +
+> > +    /*
+> > +     * If base fits within pa_bits, all good. If it doesn't, limit it
+> > +     * to the end of RAM, which is guaranteed to fit within pa_bits.
+> > +     */
+> > +    vms->highest_gpa =3D (base <=3D BIT_ULL(pa_bits) ? base : memtop) =
+- 1;
+> > +
+> >      if (device_memory_size > 0) {
+> >          ms->device_memory =3D g_malloc0(sizeof(*ms->device_memory));
+> >          ms->device_memory->base =3D device_memory_base;
+> > @@ -1902,12 +1916,38 @@ static void machvirt_init(MachineState *machine)
+> >      unsigned int smp_cpus =3D machine->smp.cpus;
+> >      unsigned int max_cpus =3D machine->smp.max_cpus;
+> Move the cpu_type check before?
+>=20
+> =C2=A0=C2=A0=C2=A0 if (!cpu_type_valid(machine->cpu_type)) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("mach-virt: CPU t=
+ype %s not supported",
+> machine->cpu_type);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
+> =C2=A0=C2=A0=C2=A0 }
+> >
 
+Yes, very good point. I wonder why this was tucked away past
+computing the memory map and the GIC configuration... Anyway, I'll
+move it up.
 
-and the possibilities could be:
+Thanks,
 
-1) have two SoB lines for Jing (before and after Thomas)
+	M.
 
-2) add a Co-developed-by for Thomas as the first line
-
-3) do exactly what the gang did ("remain practical and do only an SOB 
-chain")
-
-Paolo
-
+--=20
+Without deviation from the norm, progress is not possible.
