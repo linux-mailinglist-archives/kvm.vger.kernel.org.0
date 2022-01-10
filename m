@@ -2,199 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2347148A2B1
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 23:24:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A451C48A2B9
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 23:28:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345386AbiAJWYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 17:24:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:33021 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241368AbiAJWYd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 17:24:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641853472;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OVMJVto/h3bHuFIQM4/MuFTwUhyIKi5r+o6uRQ0M4D4=;
-        b=JOLfxy3LlPFrRx0kwuzGZbO0Ak0uNG2nmtN+pBSsrQAWrBS5160SViG5YuJb2nJb1hRn2z
-        RJD5kdIjtS+95CNeFwn6cFjGjbB3FowwU4OnTkeSuaUfajdB8MHxgdB2/yyjPpOP9NDkQJ
-        PYbaTV+pxgaXYd/4Lh0Ftz3gPrn4REQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-227-QlOkv7AVPGSKBOUJ_syiaQ-1; Mon, 10 Jan 2022 17:24:29 -0500
-X-MC-Unique: QlOkv7AVPGSKBOUJ_syiaQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F6BB84BA40;
-        Mon, 10 Jan 2022 22:24:26 +0000 (UTC)
-Received: from starship (unknown [10.40.192.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CEB7A78DD2;
-        Mon, 10 Jan 2022 22:24:10 +0000 (UTC)
-Message-ID: <1ff69ed503faa4c5df3ad1b5abe8979d570ef2b8.camel@redhat.com>
-Subject: Re: [PATCH v5 7/8] KVM: VMX: Update PID-pointer table entry when
- APIC ID is changed
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1345408AbiAJW22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 17:28:28 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:35124 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345394AbiAJW21 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 17:28:27 -0500
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20AJlhbQ011416;
+        Mon, 10 Jan 2022 22:27:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=1Aq7V2S90CCkiUtYjNrVeW7xB7JHgsccxssyxcxk7VE=;
+ b=Uj1nZP/UA+Lg96bwp1QRMqhnsqAklPyiP0+qPh6LaCm8klJL3yfAePQHAtXN2m7/uDEs
+ 30xv1nYqCle9nT8V3hSVr3A0PYPpDUsQ11cUfFyAlfY3puUqQ7WkLAFLR16b5wY8ifnR
+ Rj3M4+BqE9gwMsmlTwajYgR/sF4mMh/+fE8GKgV5WuA1jRy5whIzSosT6jPel3z+Ie9G
+ ljwMhkDRsISoLdY0a00E+iPKPz3trN15E0fwgUII3GVmJNq5JPdMx50YkpOYIFOzg6vm
+ Ul75lJxer3ZLbGo8vnxmJvnsCogbf4mrayYWes6vgRXmx84WW/PsNa1fMFKnQL7G8O4A 6g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3dgjdbsv9y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jan 2022 22:27:35 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20AMFvXF012826;
+        Mon, 10 Jan 2022 22:27:34 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2172.outbound.protection.outlook.com [104.47.56.172])
+        by aserp3020.oracle.com with ESMTP id 3df2e3wkx1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jan 2022 22:27:33 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Dz4sFvxlDCtqI87IvAj4pAH5YNr2KQhPmlZrYwW6tt2OpZk6dRDDR90JGyyYY/XAks4hOGDSrtr501KJ554e0/h4H5Mx8f2l6I5uE622eVDfc+RWPrJg6Soe+/7QUCpyXfxSN76FJassY9X6AxLVsBzCkbHRrnpNaixrN09EuM4K5MehZwCWS4tm8MxQxNHtRsWgoQHvs4t1KwoL5WCLz6NSDW8EuMZKfBZl6NkXQAdx2YgR94uxmkNGZHhLxq6dD9x7PekL1+OFfukxC9lRFxjNQzrw1oYDICOkJHr4aUUDJmtl6tCu9xDynTkbIdP0I9CYY53H2mNkH+bz4OY5Fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1Aq7V2S90CCkiUtYjNrVeW7xB7JHgsccxssyxcxk7VE=;
+ b=DH8F+T+QvBl+eSAeC8+npckR+g93xJU/aaKfXWFcuvG5ZPtGrZzL3Oa+gX9bDK9dwASOTFz8oDPyA2yLju0+HBL9l/jQ4n2gE8DSNrTsUh3q/574ya9HMC59PoLlnHWk0EdS+C8yvIMEPr1br/kWKtWQbi9nyv2jbWc5QI0DwMEF44xDzHE+t3IXbWiOq9hzwXJ4CwvfG0u9DDdy5JVyMDf6dCPQYArIEGowN+H47dwpZ1aglSjA+M6pxpg10osoVRV3K50hLNYSbaAKlI9qSgSdxOmCuSoaF0V5WVqzIkkLWM462A7cL3PBWtWbkRUCO/2xprTdLTVF4Kfx3qQ0Nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1Aq7V2S90CCkiUtYjNrVeW7xB7JHgsccxssyxcxk7VE=;
+ b=iofO7UGMs74sCLu5tAxNi/yd7BTjINnByDVCklKUIPvOMO65OFWmyHFtzGwPQDeBYIBHvQsAusnb+o0a5Id9xgq2ZfbhxPcufBOPlMQjIjO8Jy1DCW+SVol9NvGsgODhn72FN1JwO8e2+veB/RS2dHqIK1rUb4FgQvPUpuG4d/I=
+Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
+ by SN6PR10MB2510.namprd10.prod.outlook.com (2603:10b6:805:3f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.11; Mon, 10 Jan
+ 2022 22:27:31 +0000
+Received: from SA1PR10MB5711.namprd10.prod.outlook.com
+ ([fe80::9d38:21ba:a523:b34e]) by SA1PR10MB5711.namprd10.prod.outlook.com
+ ([fe80::9d38:21ba:a523:b34e%8]) with mapi id 15.20.4867.012; Mon, 10 Jan 2022
+ 22:27:30 +0000
+Date:   Mon, 10 Jan 2022 17:27:25 -0500
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alexander Duyck <alexanderduyck@fb.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ben Segall <bsegall@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Date:   Tue, 11 Jan 2022 00:24:09 +0200
-In-Reply-To: <20220110074523.GA18434@gao-cwp>
-References: <20211231142849.611-1-guang.zeng@intel.com>
-         <20211231142849.611-8-guang.zeng@intel.com>
-         <640e82f3-489d-60af-1d31-25096bef1a46@amd.com>
-         <4eee5de5-ab76-7094-17aa-adc552032ba0@intel.com>
-         <aa86022c-2816-4155-8d77-f4faf6018255@amd.com>
-         <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
-         <d058f7464084cadc183bd9dbf02c7f525bb9f902.camel@redhat.com>
-         <20220110074523.GA18434@gao-cwp>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ingo Molnar <mingo@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
+        Pasha Tatashin <pasha.tatashin@soleen.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        Tejun Heo <tj@kernel.org>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-mm@kvack.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [RFC 00/16] padata, vfio, sched: Multithreaded VFIO page pinning
+Message-ID: <20220110222725.paug7n5oznicceck@oracle.com>
+References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
+ <20220106011306.GY2328285@nvidia.com>
+ <20220107030330.2kcpekbtxn7xmsth@oracle.com>
+ <20220107171248.GU2328285@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220107171248.GU2328285@nvidia.com>
+X-ClientProxiedBy: MN2PR05CA0051.namprd05.prod.outlook.com
+ (2603:10b6:208:236::20) To SA1PR10MB5711.namprd10.prod.outlook.com
+ (2603:10b6:806:23e::20)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c77b6065-a497-4eca-7372-08d9d48863cd
+X-MS-TrafficTypeDiagnostic: SN6PR10MB2510:EE_
+X-Microsoft-Antispam-PRVS: <SN6PR10MB25105E2D88056986DD60A35CD9509@SN6PR10MB2510.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0e4WuPE3DvTfCt85FzK1QfH/ThiDv0s3rrwL5Y4XxlwgqK50AD6TSZpivGrZsVgl/Is9erLhq+l8pMJDhDLdTK/eBB17QTxjhHntVW10Qn9E/f6trNi6l0CklSFtwn30kgI4hQ8urZPCts0syIh7VZR6ZZarJZ9Bvx0TShsuPUC7QCq/w4R54Kqnbd5scb0nTSyV1XIrd32wdDNqPMhoTzMNSFVVHitq2rUTKYi00/MFyUrA90fLIl0rxScx//tD+QiEVSM2xBJkTCesP9cG+cWqQ11xhW09Ymv79cOqGlsodLNHg+UzGTI3pIS3qEf9FIU8zSi56eoYefygUUcPuRkzCounc01+zM638ybVuSpEE+LGCtDgvd7015JNdJBh+kQ+KmgdJHmdXKYQP2wVymgOTvHZuvotQlKEsIqh0t5hwZ3Wn2B1e1oPhzYhaMDNkfp9xYF3tYSXP4/zD/3ZgvMsZep4o+4LkgqH9Y0Yp8VqiXQSClm1Cn8uhtuiuaaWhNArKdmtO0tmyig/XXh0jA1FD9krGh55yfNthM+6HnzngNz6XU76adFFCdJ4xPYhk+VvergkKzwy2My4SyeKbtFPlfQXrnP6ilD3uRfgFHvilCtTWb4PU2QYAKT1oEpvaozRTo8qXhX6x6LXTq1tZXD4V0K9qr85NH93KwF7LM7k7MIu2QKbTPtkROxDk1tARUhReMw4XxtIR01uL8yUSA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(7416002)(508600001)(54906003)(38350700002)(38100700002)(83380400001)(6506007)(316002)(36756003)(6916009)(2906002)(52116002)(2616005)(6666004)(66556008)(1076003)(66946007)(5660300002)(86362001)(6512007)(8676002)(66476007)(6486002)(4326008)(186003)(8936002)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bhXKWfx/ue3loX72yMGWf5yw4xmvHx/hzoTOgd4iH0vdfThfIhCrujFEQqvg?=
+ =?us-ascii?Q?hLDFpthbwyT7X8X3y8P5lEBkfWTWgtOuJ5Bak1S62riI7gXJNadZPXkClWMw?=
+ =?us-ascii?Q?3O/bZlcZZqA1jVctkSLuZ5FEQA6VPwwzsWbagh9fUyRPXVC5snCiTbKfMb7E?=
+ =?us-ascii?Q?kvP58ZL3ZmzLhRhrgrfEAWAD9mVqCRddtE0h7WJWEHwHVnaiem1iukSJeOPy?=
+ =?us-ascii?Q?hYBvRyQMdtsQJXkUwDG2HFwVuNIbRWjnYiKqEr3Qt5ZqlNdkSKUdZozRWnSK?=
+ =?us-ascii?Q?eFrhEeUT6DAETLKTfF0DLvV50JGjHOmi6QdSipafsR+lIGtInE03QyIEql6X?=
+ =?us-ascii?Q?tMs41BZwwPThAUZMdKHRJ0USQjrQ+dkEQrmG5NYX3VDrJIHEdrIMYbSu3l7H?=
+ =?us-ascii?Q?puhS9NdFpGctnJT+rnmezmwp41tkvtxHf++YOfdTYu6NeEv186uhLo5X2UJu?=
+ =?us-ascii?Q?l2k/V2mNZnf55J4/CweO2CXy92+IeHKj++N8D2BQda/gL7bh6Yjx1JzAkFGW?=
+ =?us-ascii?Q?7tr/rNGcWkiNyvTsn/15maQE136QZj+m4DsxIDG0k2iY474tPUkS9Ykkjvxk?=
+ =?us-ascii?Q?V4thCaHe3FFkcGm32r2/eJHOIaC4tCw7uYQr4tEnx5eJDcjaKLzOnLF5PeTt?=
+ =?us-ascii?Q?os6/RiKRyUL0gBRiGkp7S7wnC3ImOKeMjt47DrGy13rYOeTKEZjQKvnnlCyr?=
+ =?us-ascii?Q?j/wOMZRBjiQM++J/9Hwp2hIev2utfUO7Xsc+TEZwkdRw7NaCcWHwzFiiK3EI?=
+ =?us-ascii?Q?8iqEFNM3gZOiVHqoDJtL1duleIIQLj33PPkcV5X3Zhl/LTHuqW6anmTnlG9E?=
+ =?us-ascii?Q?U4fIhy5OmxAJkeeOqg4NsbPrvB0m4Eo0ar0JEZ/YbjhvLVQV7lY6M484Phiy?=
+ =?us-ascii?Q?hateiJG9OKK04Yu+K/Sc34Fgh+rCI4FIDbJ7XXgO3ahJb3+XjI1eNt+c3p+g?=
+ =?us-ascii?Q?mdXErlbjhdc6+c3nHrBrfzMIY+tkR59H0uHvwLll+JDwcl7JTuMbuXq6KAS0?=
+ =?us-ascii?Q?Eu4JZYRdyxzfT2nFQmbiIj1l3Cxv1lxY/rK2qaU5Z+dkTz5C+aUhlDoXtyDU?=
+ =?us-ascii?Q?68pf/0yelCarp3/1qfP1E4avp/++3APXmI0yMwnEfTip8KnQiS7JoCYVLcMT?=
+ =?us-ascii?Q?KS8Zgj9gag17uufIbdc+ctfXBFBYme9XPCKDtyAx4/uZgjVn3yVUGfmxTRZ3?=
+ =?us-ascii?Q?MoBadj/MuAyE/n6+RR7krDqNEqcdk0faDJ19/fPasK9ON2G5jZmkcaObgpGR?=
+ =?us-ascii?Q?FFnG/eaJBNk/dI6ojiEMkfGEFzLnZbzez/KQYskEupO1H17UUXPedrVf1cPC?=
+ =?us-ascii?Q?76TiNkQRg9gBDQM218WiTVVsLJgQSfLs2vbxrmWtT2OIiwj+VMzJ2Hzcgc0u?=
+ =?us-ascii?Q?Hpj40T2a7TjbUQdx8flhXJYBNWSV3PvGyZlc83ZbB20jZAQGiMtGNXAmXNYv?=
+ =?us-ascii?Q?sLjRVQI7GI/M6vSpMhGOSj43CVDM9S85N/8cIvev28KCFvnP5CWzZDbetgBs?=
+ =?us-ascii?Q?A8BKItBinPuyIq+tsmmyL5oa6hQhvzvKi+UGlr4OziCVkYwenYP3xOdAOFwe?=
+ =?us-ascii?Q?7ebTKR8QkV+Cs410l3TyWi7stG25N8vBK+a7GLgBPMgW9K4UcAtmJ9Chwsh4?=
+ =?us-ascii?Q?opfe5zYeBRkNL44GP5e9XJbsBCuclMCDHl6oJz6DAO1TcMlzxY7ZY5DlAbLF?=
+ =?us-ascii?Q?GomU7w=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c77b6065-a497-4eca-7372-08d9d48863cd
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2022 22:27:30.8903
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Br3MiFv4/Xa41SmhZmQ0HO/PDsfNo0CpH0HqIc3dDCuu+NvB7VMXZmSV4JQvufKYpAczr4i86O34WDPOP2N29mO4Ik+W/6IcG6oTWdZe/z4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2510
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201100145
+X-Proofpoint-GUID: ZqhLWtfzeQI8DBuX-uyjY66UNSvH1Zbu
+X-Proofpoint-ORIG-GUID: ZqhLWtfzeQI8DBuX-uyjY66UNSvH1Zbu
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-01-10 at 15:45 +0800, Chao Gao wrote:
-> On Fri, Jan 07, 2022 at 10:31:59AM +0200, Maxim Levitsky wrote:
-> > On Fri, 2022-01-07 at 16:05 +0800, Zeng Guang wrote:
-> > > On 1/6/2022 10:06 PM, Tom Lendacky wrote:
-> > > > On 1/5/22 7:44 PM, Zeng Guang wrote:
-> > > > > On 1/6/2022 3:13 AM, Tom Lendacky wrote:
-> > > > > > On 12/31/21 8:28 AM, Zeng Guang wrote:
-> > > > > > Won't this blow up on AMD since there is no corresponding SVM op?
-> > > > > > 
-> > > > > > Thanks,
-> > > > > > Tom
-> > > > > Right, need check ops validness to avoid ruining AMD system. Same
-> > > > > consideration on ops "update_ipiv_pid_table" in patch8.
-> > > > Not necessarily for patch8. That is "protected" by the
-> > > > kvm_check_request(KVM_REQ_PID_TABLE_UPDATE, vcpu) test, but it couldn't hurt.
-> > > 
-> > > OK, make sense. Thanks.
-> > 
-> > I haven't fully reviewed this patch series yet,
-> > and I will soon.
-> > 
-> > I just want to point out few things:
+On Fri, Jan 07, 2022 at 01:12:48PM -0400, Jason Gunthorpe wrote:
+> > The cuts aren't arbitrary, padata controls where they happen.  
 > 
-> Thanks for pointing them out.
+> Well, they are, you picked a PMD alignment if I recall.
 > 
-> > 1. AMD's AVIC also has a PID table (its calle AVIC physical ID table). 
-> > It stores addressses of vCPUs apic backing pages,
-> > and thier real APIC IDs.
-> > 
-> > avic_init_backing_page initializes the entry (assuming apic_id == vcpu_id) 
-> > (which is double confusing)
-> > 
-> > 2. For some reason KVM supports writable APIC IDs. Does anyone use these?
-> > Even Intel's PRM strongly discourages users from using them and in X2APIC mode,
-> > the APIC ID is read only.
-> > 
-> > Because of this we have quite some bookkeeping in lapic.c, 
-> > (things like kvm_recalculate_apic_map and such)
-> > 
-> > Also AVIC has its own handling for writes to APIC_ID,APIC_LDR,APIC_DFR
-> > which tries to update its physical and logical ID tables.
+> If hugetlbfs is using PUD pages then this is the wrong alignment,
+> right?
 > 
-> Intel's IPI virtualization doesn't handle logical-addressing IPIs. They cause
-> APIC-write vm-exit as usual. So, this series doesn't handle APIC_LDR/DFR.
-> 
-> > (it used also to handle apic base and I removed this as apic base otherwise
-> > was always hardcoded to the default vaule)
-> > 
-> > Note that avic_handle_apic_id_update is broken - it always copies the entry
-> > from the default (apicid == vcpu_id) location to new location and zeros
-> > the old location, which will fail in many cases, like even if the guest
-> > were to swap few apic ids.
-> 
-> This series differs from avic_handle_apic_id_update slightly:
-> 
-> If a vCPU's APIC ID is changed, this series zeros the old entry in PID-pointer
-> table and programs the vCPU's PID to the new entry (rather than copy from the
-> old entry).
+> I suppose it could compute the cuts differently to try to maximize
+> alignment at the cutpoints.. 
 
-Yes. The AVIC code is pretty much totaly busted in this regard which I noticed recently. 
-It will fail the 2nd time it is called because it zeroes the entry it copies, 
-and even if the guest changes the APIC ID once, this code will still fail because, 
-it is called after each AVIC inhibition.
+Yes, this is what I was suggesting, increase the alignment.
 
+> > size.  If cuts in per-thread ranges are an issue, I *think* userspace
+> > has the same problem?
 > 
-> But this series is also problematic if guest swaps two vCPU's APIC ID without
-> using another free APIC ID; it would end up one of them having no valid entry.
+> Userspace should know what it has done, if it is using hugetlbfs it
+> knows how big the pages are.
 
-Yes, exactly. I wanted to fix the AVIC's code and also noticed that.
-Plus, the guest can assign the same APIC ID to two vCPUs in theory and keep it this
-way which complicates things further, from the point of view of what malicious guests can do.
- 
+Right, what I mean is both user and kernel threads can end up splitting
+a physically contiguous range of pages, however large the page size.
 
+> > Pinning itself, the only thing being optimized, improves 8.5x in that
+> > experiment, bringing the time from 1.8 seconds to .2 seconds.  That's a
+> > significant savings IMHO
 > 
-> One solution in my mind is:
+> And here is where I suspect we'd get similar results from folio's
+> based on the unpin performance uplift we already saw.
 > 
-> when a vCPU's APIC ID is changed, KVM traverses all vCPUs to count vCPUs using
-> the old APIC ID and the new APIC ID, programs corrsponding entries following
-> below rules:
-> 1. populate an entry with a vCPU's PID if the corrsponding APIC ID is
-> exclusively used by that vCPU.
-> 2. zero an entry for other cases.
+> As long as PUP doesn't have to COW its work is largely proportional to
+> the number of struct pages it processes, so we should be expecting an
+> upper limit of 512x gains on the PUP alone with foliation.
+>
+> This is in line with what we saw with the prior unpin work.
 
-Yes, that what I was thinking as well - but zeroing *both* entries when they are duplicate,
-is not what I was thinkging and it is a very good idea IMHO.
+"in line with what we saw"  Not following.  The unpin work had two
+optimizations, I think, 4.5x and 3.5x which together give 16x.  Why is
+that in line with the potential gains from pup?
 
+Overall I see what you're saying, just curious what you meant here.
 
+> The other optimization that would help a lot here is to use
+> pin_user_pages_fast(), something like:
 > 
-> Proper locking is needed in this process to prevent changes to vCPUs' APIC IDs.
+>   if (current->mm != remote_mm)
+>      mmap_lock()
+>      pin_user_pages_remote(..)
+>      mmap_unlock()
+>   else
+>      pin_user_pages_fast(..)
+> 
+> But you can't get that gain with kernel-size parallization, right?
+> 
+> (I haven't dug into if gup_fast relies on current due to IPIs or not,
+> maybe pin_user_pages_remote_fast can exist?)
+
+Yeah, not sure.  I'll have a look.
+
+> > But, I'm skeptical that singlethreaded optimization alone will remove
+> > the bottleneck with the enormous memory sizes we use.  
+> 
+> I think you can get the 1.2x at least.
+> 
+> > scaling up the times from the unpin results with both optimizations (the
+> > IB specific one too, which would need to be done for vfio), 
+> 
+> Oh, I did the IB one already in iommufd...
+
+Ahead of the curve!
+
+> > a 1T guest would still take almost 2 seconds to pin/unpin.
+> 
+> Single threaded?
+
 Yes.
 
+> Isn't that excellent
+
+Depends on who you ask, I guess.
+
+> and completely dwarfed by the populate overhead?
+
+Well yes, but here we all are optimizing gup anyway :-)
+
+> > If people feel strongly that we should try optimizing other ways first,
+> > ok, but I think these are complementary approaches.  I'm coming at this
+> > problem this way because this is fundamentally a memory-intensive
+> > operation where more bandwidth can help, and there are other kernel
+> > paths we and others want this infrastructure for.
 > 
-> Or if it doesn't worth it, we can disable IPI virtualization for a guest on its
-> first attempt to change xAPIC ID.
-
-Yes, and this brings the main question. Are there any OSes that actually change the APIC ID?
- 
-I tested winxp, and win10 32 bit, and they seem to work just fine when I don't allow them to change apic id.
-Older/more obscure oses like win98/95/dos and such don't use APIC at all.
-That leaves only modern OSes like *BSD and such, I'll try to check a few of them soon.
- 
-I just don't see any reason whatsoever to change APIC ID. It seems that it was initially writable,
-just because Intel' forgot to make it read-only, and then they even made it read-only with x2apic.
- 
-Both Intel and AMD's PRM also state that changing APIC ID is implementation dependent.
- 
-I vote to forbid changing apic id, at least in the case any APIC acceleration is used, be that APICv or AVIC.
- 
- 
-
-Best regards,
-	Maxim Levitsky
-
+> At least here I would like to see an apples to apples at least before
+> we have this complexity. Full user threading vs kernel auto threading.
 > 
-> Let us know which option is preferred.
-> 
+> Saying multithreaded kernel gets 8x over single threaded userspace is
+> nice, but sort of irrelevant because we can have multithreaded
+> userspace, right?
 
+One of my assumptions was that doing this in the kernel would benefit
+all vfio users, avoiding duplicating the same sort of multithreading
+logic across applications, including ones that didn't prefault.  Calling
+it irrelevant seems a bit strong.  Parallelizing in either layer has its
+upsides and downsides.
 
+My assumption going into this series was that multithreading VFIO page
+pinning in the kernel was a viable way forward given the positive
+feedback I got from the VFIO maintainer last time I posted this, which
+was admittedly a while ago, and I've since been focused on the other
+parts of this series rather than what's been happening in the mm lately.
+Anyway, your arguments are reasonable, so I'll go take a look at some of
+these optimizations and see where I get.
+
+Daniel
