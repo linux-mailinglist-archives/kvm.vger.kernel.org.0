@@ -2,185 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4631C488E16
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 02:33:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2BD8488E1E
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 02:38:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237708AbiAJBd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Jan 2022 20:33:26 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:31151 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237702AbiAJBdW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Jan 2022 20:33:22 -0500
-Received: from dggpeml500022.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JXGVS5bxvz8v1q;
-        Mon, 10 Jan 2022 09:30:40 +0800 (CST)
+        id S237897AbiAJBil (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Jan 2022 20:38:41 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:30264 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237873AbiAJBik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Jan 2022 20:38:40 -0500
+Received: from kwepemi500009.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JXGfw2YhyzbjdJ;
+        Mon, 10 Jan 2022 09:38:00 +0800 (CST)
 Received: from kwepemm600017.china.huawei.com (7.193.23.234) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ kwepemi500009.china.huawei.com (7.221.188.199) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 10 Jan 2022 09:33:20 +0800
-Received: from kwepemm600017.china.huawei.com ([7.193.23.234]) by
- kwepemm600017.china.huawei.com ([7.193.23.234]) with mapi id 15.01.2308.020;
- Mon, 10 Jan 2022 09:33:20 +0800
-From:   Jiangyifei <jiangyifei@huawei.com>
-To:     Alistair Francis <alistair23@gmail.com>
-CC:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        "open list:Overall" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        "Fanliang (EulerOS)" <fanliang@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>,
-        "wanbo (G)" <wanbo13@huawei.com>,
-        "limingwang (A)" <limingwang@huawei.com>,
-        Anup Patel <anup@brainfault.org>
-Subject: RE: [PATCH v3 08/12] target/riscv: Handle KVM_EXIT_RISCV_SBI exit
-Thread-Topic: [PATCH v3 08/12] target/riscv: Handle KVM_EXIT_RISCV_SBI exit
-Thread-Index: AQHX9aLZ7VVFUhFBzUapnod3pVMriqxUjsUAgAcI4oA=
-Date:   Mon, 10 Jan 2022 01:33:20 +0000
-Message-ID: <0a655978156646baa83d41446a0898ac@huawei.com>
-References: <20211220130919.413-1-jiangyifei@huawei.com>
- <20211220130919.413-9-jiangyifei@huawei.com>
- <CAKmqyKOtOFmy1_9W785DZiFCc=Us6O_pVpLsBOyXOk32zansnA@mail.gmail.com>
-In-Reply-To: <CAKmqyKOtOFmy1_9W785DZiFCc=Us6O_pVpLsBOyXOk32zansnA@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.186.236]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.1.2308.20; Mon, 10 Jan 2022 09:38:38 +0800
+Received: from huawei.com (10.174.186.236) by kwepemm600017.china.huawei.com
+ (7.193.23.234) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 10 Jan
+ 2022 09:38:36 +0800
+From:   Yifei Jiang <jiangyifei@huawei.com>
+To:     <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+CC:     <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <libvir-list@redhat.com>, <anup@brainfault.org>,
+        <palmer@dabbelt.com>, <Alistair.Francis@wdc.com>,
+        <bin.meng@windriver.com>, <fanliang@huawei.com>,
+        <wu.wubin@huawei.com>, <wanghaibin.wang@huawei.com>,
+        <wanbo13@huawei.com>, Yifei Jiang <jiangyifei@huawei.com>
+Subject: [PATCH v4 00/12] Add riscv kvm accel support
+Date:   Mon, 10 Jan 2022 09:38:19 +0800
+Message-ID: <20220110013831.1594-1-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.236]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600017.china.huawei.com (7.193.23.234)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFsaXN0YWlyIEZyYW5jaXMg
-W21haWx0bzphbGlzdGFpcjIzQGdtYWlsLmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEphbnVhcnkg
-NiwgMjAyMiA2OjA0IEFNDQo+IFRvOiBKaWFuZ3lpZmVpIDxqaWFuZ3lpZmVpQGh1YXdlaS5jb20+
-DQo+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmcgRGV2ZWxvcGVycyA8cWVtdS1kZXZlbEBub25n
-bnUub3JnPjsgb3Blbg0KPiBsaXN0OlJJU0MtViA8cWVtdS1yaXNjdkBub25nbnUub3JnPjsga3Zt
-LXJpc2N2QGxpc3RzLmluZnJhZGVhZC5vcmc7IG9wZW4NCj4gbGlzdDpPdmVyYWxsIDxrdm1Admdl
-ci5rZXJuZWwub3JnPjsgbGlidmlyLWxpc3RAcmVkaGF0LmNvbTsgQW51cCBQYXRlbA0KPiA8YW51
-cC5wYXRlbEB3ZGMuY29tPjsgUGFsbWVyIERhYmJlbHQgPHBhbG1lckBkYWJiZWx0LmNvbT47IEFs
-aXN0YWlyDQo+IEZyYW5jaXMgPEFsaXN0YWlyLkZyYW5jaXNAd2RjLmNvbT47IEJpbiBNZW5nIDxi
-aW4ubWVuZ0B3aW5kcml2ZXIuY29tPjsNCj4gRmFubGlhbmcgKEV1bGVyT1MpIDxmYW5saWFuZ0Bo
-dWF3ZWkuY29tPjsgV3ViaW4gKEgpDQo+IDx3dS53dWJpbkBodWF3ZWkuY29tPjsgV2FuZ2hhaWJp
-biAoRCkgPHdhbmdoYWliaW4ud2FuZ0BodWF3ZWkuY29tPjsNCj4gd2FuYm8gKEcpIDx3YW5ibzEz
-QGh1YXdlaS5jb20+OyBsaW1pbmd3YW5nIChBKQ0KPiA8bGltaW5nd2FuZ0BodWF3ZWkuY29tPg0K
-PiBTdWJqZWN0OiBSZTogW1BBVENIIHYzIDA4LzEyXSB0YXJnZXQvcmlzY3Y6IEhhbmRsZSBLVk1f
-RVhJVF9SSVNDVl9TQkkgZXhpdA0KPiANCj4gT24gVHVlLCBEZWMgMjEsIDIwMjEgYXQgMzo0MSBB
-TSBZaWZlaSBKaWFuZyB2aWEgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gd3JvdGU6DQo+ID4N
-Cj4gPiBVc2UgY2hhci1mZSB0byBoYW5kbGUgY29uc29sZSBzYmkgY2FsbCwgd2hpY2ggaW1wbGVt
-ZW50IGVhcmx5IGNvbnNvbGUNCj4gPiBpbyB3aGlsZSBhcHBseSAnZWFybHljb249c2JpJyBpbnRv
-IGtlcm5lbCBwYXJhbWV0ZXJzLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWlmZWkgSmlhbmcg
-PGppYW5neWlmZWlAaHVhd2VpLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBNaW5nd2FuZyBMaSA8
-bGltaW5nd2FuZ0BodWF3ZWkuY29tPg0KPiA+IFJldmlld2VkLWJ5OiBBbnVwIFBhdGVsIDxhbnVw
-LnBhdGVsQHdkYy5jb20+DQo+ID4gLS0tDQo+ID4gIHRhcmdldC9yaXNjdi9rdm0uYyAgICAgICAg
-ICAgICAgICAgfCA0MyArKysrKysrKysrKysrKysrKy0NCj4gPiAgdGFyZ2V0L3Jpc2N2L3NiaV9l
-Y2FsbF9pbnRlcmZhY2UuaCB8IDcyDQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-DQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgMTE0IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkg
-IGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+IHRhcmdldC9yaXNjdi9zYmlfZWNhbGxfaW50ZXJmYWNl
-LmgNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvcmlzY3Yva3ZtLmMgYi90YXJnZXQvcmlz
-Y3Yva3ZtLmMgaW5kZXgNCj4gPiAwMDI3ZjExZjQ1Li40ZDA4NjY5YzgxIDEwMDY0NA0KPiA+IC0t
-LSBhL3RhcmdldC9yaXNjdi9rdm0uYw0KPiA+ICsrKyBiL3RhcmdldC9yaXNjdi9rdm0uYw0KPiA+
-IEBAIC0zOCw2ICszOCw5IEBADQo+ID4gICNpbmNsdWRlICJxZW11L2xvZy5oIg0KPiA+ICAjaW5j
-bHVkZSAiaHcvbG9hZGVyLmgiDQo+ID4gICNpbmNsdWRlICJrdm1fcmlzY3YuaCINCj4gPiArI2lu
-Y2x1ZGUgInNiaV9lY2FsbF9pbnRlcmZhY2UuaCINCj4gPiArI2luY2x1ZGUgImNoYXJkZXYvY2hh
-ci1mZS5oIg0KPiA+ICsjaW5jbHVkZSAic2VtaWhvc3RpbmcvY29uc29sZS5oIg0KPiA+DQo+ID4g
-IHN0YXRpYyB1aW50NjRfdCBrdm1fcmlzY3ZfcmVnX2lkKENQVVJJU0NWU3RhdGUgKmVudiwgdWlu
-dDY0X3QgdHlwZSwNCj4gPiB1aW50NjRfdCBpZHgpICB7IEBAIC0zNjUsOSArMzY4LDQ3IEBAIGJv
-b2wNCj4gPiBrdm1fYXJjaF9zdG9wX29uX2VtdWxhdGlvbl9lcnJvcihDUFVTdGF0ZSAqY3MpDQo+
-ID4gICAgICByZXR1cm4gdHJ1ZTsNCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQga3ZtX3Jp
-c2N2X2hhbmRsZV9zYmkoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX3J1biAqcnVuKSB7DQo+ID4g
-KyAgICBpbnQgcmV0ID0gMDsNCj4gPiArICAgIHVuc2lnbmVkIGNoYXIgY2g7DQo+ID4gKyAgICBz
-d2l0Y2ggKHJ1bi0+cmlzY3Zfc2JpLmV4dGVuc2lvbl9pZCkgew0KPiA+ICsgICAgY2FzZSBTQklf
-RVhUXzBfMV9DT05TT0xFX1BVVENIQVI6DQo+ID4gKyAgICAgICAgY2ggPSBydW4tPnJpc2N2X3Ni
-aS5hcmdzWzBdOw0KPiA+ICsgICAgICAgIHFlbXVfc2VtaWhvc3RpbmdfbG9nX291dCgoY29uc3Qg
-Y2hhciAqKSZjaCwgc2l6ZW9mKGNoKSk7DQo+IA0KPiBIbW1tLi4uIFdlIHByaW50IHRvIHRoZSBz
-ZW1paG9zdGluZw0KPiANCj4gPiArICAgICAgICBicmVhazsNCj4gPiArICAgIGNhc2UgU0JJX0VY
-VF8wXzFfQ09OU09MRV9HRVRDSEFSOg0KPiA+ICsgICAgICAgIHJldCA9IHFlbXVfY2hyX2ZlX3Jl
-YWRfYWxsKHNlcmlhbF9oZCgwKS0+YmUsICZjaCwNCj4gPiArIHNpemVvZihjaCkpOw0KPiANCj4g
-YnV0IHRoZW4gcmVhZCBmcm9tIHRoZSBmaXJzdCBzZXJpYWwgZGV2aWNlLg0KPiANCj4gVGhhdCBz
-ZWVtcyBhIGxpdHRsZSBzdHJhbmdlLiBXb3VsZCBpdCBiZSBiZXR0ZXIgdG8ganVzdCBwcmludCB0
-byBzZXJpYWwgYXMgd2VsbD8NCj4gDQo+IEFsaXN0YWlyDQo+IA0KDQpIbS4uLkkgYWxzbyB0aGlu
-ayBzby4gSXQgd2lsbCBiZSBtb2RpZmllZCBpbiB0aGUgbmV4dCBzZXJpZXMuDQoNCllpZmVpDQoN
-Cj4gPiArICAgICAgICBpZiAocmV0ID09IHNpemVvZihjaCkpIHsNCj4gPiArICAgICAgICAgICAg
-cnVuLT5yaXNjdl9zYmkuYXJnc1swXSA9IGNoOw0KPiA+ICsgICAgICAgIH0gZWxzZSB7DQo+ID4g
-KyAgICAgICAgICAgIHJ1bi0+cmlzY3Zfc2JpLmFyZ3NbMF0gPSAtMTsNCj4gPiArICAgICAgICB9
-DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gKyAgICBkZWZhdWx0Og0KPiA+ICsgICAgICAgIHFl
-bXVfbG9nX21hc2soTE9HX1VOSU1QLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIiVzOiB1
-bi1oYW5kbGVkIFNCSSBFWElULCBzcGVjaWZpYyByZWFzb25zDQo+IGlzICVsdVxuIiwNCj4gPiAr
-ICAgICAgICAgICAgICAgICAgICAgIF9fZnVuY19fLCBydW4tPnJpc2N2X3NiaS5leHRlbnNpb25f
-aWQpOw0KPiA+ICsgICAgICAgIHJldCA9IC0xOw0KPiA+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsg
-ICAgfQ0KPiA+ICsgICAgcmV0dXJuIHJldDsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgaW50IGt2bV9h
-cmNoX2hhbmRsZV9leGl0KENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9ydW4gKnJ1bikgIHsNCj4g
-PiAtICAgIHJldHVybiAwOw0KPiA+ICsgICAgaW50IHJldCA9IDA7DQo+ID4gKyAgICBzd2l0Y2gg
-KHJ1bi0+ZXhpdF9yZWFzb24pIHsNCj4gPiArICAgIGNhc2UgS1ZNX0VYSVRfUklTQ1ZfU0JJOg0K
-PiA+ICsgICAgICAgIHJldCA9IGt2bV9yaXNjdl9oYW5kbGVfc2JpKGNzLCBydW4pOw0KPiA+ICsg
-ICAgICAgIGJyZWFrOw0KPiA+ICsgICAgZGVmYXVsdDoNCj4gPiArICAgICAgICBxZW11X2xvZ19t
-YXNrKExPR19VTklNUCwgIiVzOiB1bi1oYW5kbGVkIGV4aXQgcmVhc29uICVkXG4iLA0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgX19mdW5jX18sIHJ1bi0+ZXhpdF9yZWFzb24pOw0KPiA+ICsg
-ICAgICAgIHJldCA9IC0xOw0KPiA+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsgICAgfQ0KPiA+ICsg
-ICAgcmV0dXJuIHJldDsNCj4gPiAgfQ0KPiA+DQo+ID4gIHZvaWQga3ZtX3Jpc2N2X3Jlc2V0X3Zj
-cHUoUklTQ1ZDUFUgKmNwdSkgZGlmZiAtLWdpdA0KPiA+IGEvdGFyZ2V0L3Jpc2N2L3NiaV9lY2Fs
-bF9pbnRlcmZhY2UuaA0KPiA+IGIvdGFyZ2V0L3Jpc2N2L3NiaV9lY2FsbF9pbnRlcmZhY2UuaA0K
-PiA+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+ID4gaW5kZXggMDAwMDAwMDAwMC4uZmIxYTNmYThm
-Mg0KPiA+IC0tLSAvZGV2L251bGwNCj4gPiArKysgYi90YXJnZXQvcmlzY3Yvc2JpX2VjYWxsX2lu
-dGVyZmFjZS5oDQo+ID4gQEAgLTAsMCArMSw3MiBAQA0KPiA+ICsvKg0KPiA+ICsgKiBTUERYLUxp
-Y2Vuc2UtSWRlbnRpZmllcjogQlNELTItQ2xhdXNlDQo+ID4gKyAqDQo+ID4gKyAqIENvcHlyaWdo
-dCAoYykgMjAxOSBXZXN0ZXJuIERpZ2l0YWwgQ29ycG9yYXRpb24gb3IgaXRzIGFmZmlsaWF0ZXMu
-DQo+ID4gKyAqDQo+ID4gKyAqIEF1dGhvcnM6DQo+ID4gKyAqICAgQW51cCBQYXRlbCA8YW51cC5w
-YXRlbEB3ZGMuY29tPg0KPiA+ICsgKi8NCj4gPiArDQo+ID4gKyNpZm5kZWYgX19TQklfRUNBTExf
-SU5URVJGQUNFX0hfXw0KPiA+ICsjZGVmaW5lIF9fU0JJX0VDQUxMX0lOVEVSRkFDRV9IX18NCj4g
-PiArDQo+ID4gKy8qIGNsYW5nLWZvcm1hdCBvZmYgKi8NCj4gPiArDQo+ID4gKy8qIFNCSSBFeHRl
-bnNpb24gSURzICovDQo+ID4gKyNkZWZpbmUgU0JJX0VYVF8wXzFfU0VUX1RJTUVSICAgICAgICAg
-ICAweDANCj4gPiArI2RlZmluZSBTQklfRVhUXzBfMV9DT05TT0xFX1BVVENIQVIgICAgIDB4MQ0K
-PiA+ICsjZGVmaW5lIFNCSV9FWFRfMF8xX0NPTlNPTEVfR0VUQ0hBUiAgICAgMHgyDQo+ID4gKyNk
-ZWZpbmUgU0JJX0VYVF8wXzFfQ0xFQVJfSVBJICAgICAgICAgICAweDMNCj4gPiArI2RlZmluZSBT
-QklfRVhUXzBfMV9TRU5EX0lQSSAgICAgICAgICAgIDB4NA0KPiA+ICsjZGVmaW5lIFNCSV9FWFRf
-MF8xX1JFTU9URV9GRU5DRV9JICAgICAgMHg1DQo+ID4gKyNkZWZpbmUgU0JJX0VYVF8wXzFfUkVN
-T1RFX1NGRU5DRV9WTUEgICAweDYNCj4gPiArI2RlZmluZSBTQklfRVhUXzBfMV9SRU1PVEVfU0ZF
-TkNFX1ZNQV9BU0lEIDB4Nw0KPiA+ICsjZGVmaW5lIFNCSV9FWFRfMF8xX1NIVVRET1dOICAgICAg
-ICAgICAgMHg4DQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9CQVNFICAgICAgICAgICAgICAgICAgICAw
-eDEwDQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9USU1FICAgICAgICAgICAgICAgICAgICAweDU0NDk0
-RDQ1DQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9JUEkgICAgICAgICAgICAgICAgICAgICAweDczNTA0
-OQ0KPiA+ICsjZGVmaW5lIFNCSV9FWFRfUkZFTkNFICAgICAgICAgICAgICAgICAgMHg1MjQ2NEU0
-Mw0KPiA+ICsjZGVmaW5lIFNCSV9FWFRfSFNNICAgICAgICAgICAgICAgICAgICAgMHg0ODUzNEQN
-Cj4gPiArDQo+ID4gKy8qIFNCSSBmdW5jdGlvbiBJRHMgZm9yIEJBU0UgZXh0ZW5zaW9uKi8NCj4g
-PiArI2RlZmluZSBTQklfRVhUX0JBU0VfR0VUX1NQRUNfVkVSU0lPTiAgIDB4MA0KPiA+ICsjZGVm
-aW5lIFNCSV9FWFRfQkFTRV9HRVRfSU1QX0lEICAgICAgICAgMHgxDQo+ID4gKyNkZWZpbmUgU0JJ
-X0VYVF9CQVNFX0dFVF9JTVBfVkVSU0lPTiAgICAweDINCj4gPiArI2RlZmluZSBTQklfRVhUX0JB
-U0VfUFJPQkVfRVhUICAgICAgICAgIDB4Mw0KPiA+ICsjZGVmaW5lIFNCSV9FWFRfQkFTRV9HRVRf
-TVZFTkRPUklEICAgICAgMHg0DQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9CQVNFX0dFVF9NQVJDSElE
-ICAgICAgICAweDUNCj4gPiArI2RlZmluZSBTQklfRVhUX0JBU0VfR0VUX01JTVBJRCAgICAgICAg
-IDB4Ng0KPiA+ICsNCj4gPiArLyogU0JJIGZ1bmN0aW9uIElEcyBmb3IgVElNRSBleHRlbnNpb24q
-Lw0KPiA+ICsjZGVmaW5lIFNCSV9FWFRfVElNRV9TRVRfVElNRVIgICAgICAgICAgMHgwDQo+ID4g
-Kw0KPiA+ICsvKiBTQkkgZnVuY3Rpb24gSURzIGZvciBJUEkgZXh0ZW5zaW9uKi8NCj4gPiArI2Rl
-ZmluZSBTQklfRVhUX0lQSV9TRU5EX0lQSSAgICAgICAgICAgIDB4MA0KPiA+ICsNCj4gPiArLyog
-U0JJIGZ1bmN0aW9uIElEcyBmb3IgUkZFTkNFIGV4dGVuc2lvbiovDQo+ID4gKyNkZWZpbmUgU0JJ
-X0VYVF9SRkVOQ0VfUkVNT1RFX0ZFTkNFX0kgICAgICAgMHgwDQo+ID4gKyNkZWZpbmUgU0JJX0VY
-VF9SRkVOQ0VfUkVNT1RFX1NGRU5DRV9WTUEgICAgMHgxDQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9S
-RkVOQ0VfUkVNT1RFX1NGRU5DRV9WTUFfQVNJRCAgMHgyDQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9S
-RkVOQ0VfUkVNT1RFX0hGRU5DRV9HVk1BICAgMHgzDQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9SRkVO
-Q0VfUkVNT1RFX0hGRU5DRV9HVk1BX1ZNSUQgMHg0DQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9SRkVO
-Q0VfUkVNT1RFX0hGRU5DRV9WVk1BICAgMHg1DQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9SRkVOQ0Vf
-UkVNT1RFX0hGRU5DRV9WVk1BX0FTSUQgMHg2DQo+ID4gKw0KPiA+ICsvKiBTQkkgZnVuY3Rpb24g
-SURzIGZvciBIU00gZXh0ZW5zaW9uICovDQo+ID4gKyNkZWZpbmUgU0JJX0VYVF9IU01fSEFSVF9T
-VEFSVCAgICAgICAgICAweDANCj4gPiArI2RlZmluZSBTQklfRVhUX0hTTV9IQVJUX1NUT1AgICAg
-ICAgICAgIDB4MQ0KPiA+ICsjZGVmaW5lIFNCSV9FWFRfSFNNX0hBUlRfR0VUX1NUQVRVUyAgICAg
-MHgyDQo+ID4gKw0KPiA+ICsjZGVmaW5lIFNCSV9IU01fSEFSVF9TVEFUVVNfU1RBUlRFRCAgICAg
-MHgwDQo+ID4gKyNkZWZpbmUgU0JJX0hTTV9IQVJUX1NUQVRVU19TVE9QUEVEICAgICAweDENCj4g
-PiArI2RlZmluZSBTQklfSFNNX0hBUlRfU1RBVFVTX1NUQVJUX1BFTkRJTkcgICAweDINCj4gPiAr
-I2RlZmluZSBTQklfSFNNX0hBUlRfU1RBVFVTX1NUT1BfUEVORElORyAgICAweDMNCj4gPiArDQo+
-ID4gKyNkZWZpbmUgU0JJX1NQRUNfVkVSU0lPTl9NQUpPUl9PRkZTRVQgICAyNA0KPiA+ICsjZGVm
-aW5lIFNCSV9TUEVDX1ZFUlNJT05fTUFKT1JfTUFTSyAgICAgMHg3Zg0KPiA+ICsjZGVmaW5lIFNC
-SV9TUEVDX1ZFUlNJT05fTUlOT1JfTUFTSyAgICAgMHhmZmZmZmYNCj4gPiArI2RlZmluZSBTQklf
-RVhUX1ZFTkRPUl9TVEFSVCAgICAgICAgICAgIDB4MDkwMDAwMDANCj4gPiArI2RlZmluZSBTQklf
-RVhUX1ZFTkRPUl9FTkQgICAgICAgICAgICAgIDB4MDlGRkZGRkYNCj4gPiArLyogY2xhbmctZm9y
-bWF0IG9uICovDQo+ID4gKw0KPiA+ICsjZW5kaWYNCj4gPiAtLQ0KPiA+IDIuMTkuMQ0KPiA+DQo+
-ID4NCg==
+This series adds both riscv32 and riscv64 kvm support, and implements
+migration based on riscv.
+
+Because of RISC-V KVM has been merged into the Linux master, so this
+series are changed from RFC to patch.
+
+Several steps to use this:
+1. Build emulation
+$ ./configure --target-list=riscv64-softmmu
+$ make -j$(nproc)
+
+2. Build kernel
+
+3. Build QEMU VM
+Cross built in riscv toolchain.
+$ PKG_CONFIG_LIBDIR=<toolchain pkgconfig path>
+$ export PKG_CONFIG_SYSROOT_DIR=<toolchain sysroot path>
+$ ./configure --target-list=riscv64-softmmu --enable-kvm \
+--cross-prefix=riscv64-linux-gnu- --disable-libiscsi --disable-glusterfs \
+--disable-libusb --disable-usb-redir --audio-drv-list= --disable-opengl \
+--disable-libxml2
+$ make -j$(nproc)
+
+4. Start emulation
+$ ./qemu-system-riscv64 -M virt -m 4096M -cpu rv64,x-h=true -nographic \
+        -name guest=riscv-hyp,debug-threads=on \
+        -smp 4 \
+        -bios ./fw_jump.bin \
+        -kernel ./Image \
+        -drive file=./hyp.img,format=raw,id=hd0 \
+        -device virtio-blk-device,drive=hd0 \
+        -append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
+
+5. Start kvm-acceled QEMU VM in emulation
+$ ./qemu-system-riscv64 -M virt,accel=kvm -m 1024M -cpu host -nographic \
+        -name guest=riscv-guset \
+        -smp 2 \
+        -bios none \
+        -kernel ./Image \
+        -drive file=./guest.img,format=raw,id=hd0 \
+        -device virtio-blk-device,drive=hd0 \
+        -append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
+
+Changes since patch v3
+- Re-write the for-loop in sifive_plic_create().
+- Drop unnecessary change in hw/riscv/virt.c.
+- Use serial to handle console sbi call.
+
+Changes since patch v2
+- Create a macro for get and put timer csr.
+- Remove M-mode PLIC contexts when kvm is enabled.
+- Add get timer frequency.
+- Move cpu_host_load to vmstate_kvmtimer.
+
+Changes since patch v1
+- Rebase on recent commit a216e7cf119c91ffdf5931834a1a030ebea40d70
+- Sync-up headers with Linux-5.16-rc4.
+- Fixbug in kvm_arch_init_vcpu.
+- Create a macro for get and put regs csr.
+- Start kernel directly when kvm_enabled.
+- Use riscv_cpu_set_irq to inject KVM interrupts.
+- Use the Semihosting Console API for RISC-V kvm handle sbi.
+- Update vmstate_riscv_cpu version id.
+  Placing kvm_timer into a subsection.
+
+Changes since RFC v6
+- Rebase on recent commit 8627edfb3f1fca24a96a0954148885c3241c10f8
+- Sync-up headers with Linux-5.16-rc1
+
+Changes since RFC v5
+- Rebase on QEMU v6.1.0-rc1 and kvm-riscv linux v19.
+- Move kvm interrupt setting to riscv_cpu_update_mip().
+- Replace __u64 with uint64_t.
+
+Changes since RFC v4
+- Rebase on QEMU v6.0.0-rc2 and kvm-riscv linux v17.
+- Remove time scaling support as software solution is incomplete.
+  Because it will cause unacceptable performance degradation. and
+  We will post a better solution.
+- Revise according to Alistair's review comments.
+  - Remove compile time XLEN checks in kvm_riscv_reg_id
+  - Surround TYPE_RISCV_CPU_HOST definition by CONFIG_KVM and share
+    it between RV32 and RV64.
+  - Add kvm-stub.c for reduce unnecessary compilation checks.
+  - Add riscv_setup_direct_kernel() to direct boot kernel for KVM.
+
+Changes since RFC v3
+- Rebase on QEMU v5.2.0-rc2 and kvm-riscv linux v15.
+- Add time scaling support(New patches 13, 14 and 15).
+- Fix the bug that guest vm can't reboot.
+
+Changes since RFC v2
+- Fix checkpatch error at target/riscv/sbi_ecall_interface.h.
+- Add riscv migration support.
+
+Changes since RFC v1
+- Add separate SBI ecall interface header.
+- Add riscv32 kvm accel support.
+
+Yifei Jiang (12):
+  update-linux-headers: Add asm-riscv/kvm.h
+  target/riscv: Add target/riscv/kvm.c to place the public kvm interface
+  target/riscv: Implement function kvm_arch_init_vcpu
+  target/riscv: Implement kvm_arch_get_registers
+  target/riscv: Implement kvm_arch_put_registers
+  target/riscv: Support start kernel directly by KVM
+  target/riscv: Support setting external interrupt by KVM
+  target/riscv: Handle KVM_EXIT_RISCV_SBI exit
+  target/riscv: Add host cpu type
+  target/riscv: Add kvm_riscv_get/put_regs_timer
+  target/riscv: Implement virtual time adjusting with vm state changing
+  target/riscv: Support virtual time context synchronization
+
+ hw/intc/sifive_plic.c              |  21 +-
+ hw/riscv/boot.c                    |  16 +-
+ hw/riscv/virt.c                    |  83 +++--
+ include/hw/riscv/boot.h            |   1 +
+ linux-headers/asm-riscv/kvm.h      | 128 +++++++
+ meson.build                        |   2 +
+ target/riscv/cpu.c                 |  29 +-
+ target/riscv/cpu.h                 |  11 +
+ target/riscv/kvm-stub.c            |  30 ++
+ target/riscv/kvm.c                 | 532 +++++++++++++++++++++++++++++
+ target/riscv/kvm_riscv.h           |  25 ++
+ target/riscv/machine.c             |  30 ++
+ target/riscv/meson.build           |   1 +
+ target/riscv/sbi_ecall_interface.h |  72 ++++
+ 14 files changed, 948 insertions(+), 33 deletions(-)
+ create mode 100644 linux-headers/asm-riscv/kvm.h
+ create mode 100644 target/riscv/kvm-stub.c
+ create mode 100644 target/riscv/kvm.c
+ create mode 100644 target/riscv/kvm_riscv.h
+ create mode 100644 target/riscv/sbi_ecall_interface.h
+
+-- 
+2.19.1
+
