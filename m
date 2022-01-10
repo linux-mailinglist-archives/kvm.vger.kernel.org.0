@@ -2,108 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39D1848A164
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 22:05:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A47D48A170
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 22:08:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343767AbiAJVFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 16:05:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41936 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239741AbiAJVFG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 16:05:06 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7A8C06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:05:06 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id b11-20020a17090a6e0b00b001b34cd8941bso11180453pjk.1
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:05:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=vBy+mErr/Ri6TNTRhXUfpamv23OXSo9DbZDSg0SsleA=;
-        b=j4wxxxti3g07KeR5JHvFJjSWeBtiIqEnlJZMlLN+QAnslR8j6tBWxo5GU+hia2wTGw
-         W4jmM4Uh7jDA0RFkEjTe29a6Xs+Im3R7Oeir+9fg4a5+fcwiPsflg7OKLwo/qOOfKE2g
-         skORzCFyO2ZQiMpz5MIDa1Cvo7YG4v/3cVutqX1mm6lkfEQZTD0NSXrpDN145MyFPWhj
-         MAf0jDXO36ivf9Dm/Hhz8vXmZ4A7ai5SiRUy52hLcycYaMgnorvd/x90eWjdPGjL4UlU
-         Q1vCcaJMoMfzLf/JS/Co/U0KZcX4Dnt+zug3KcIOu++dR9VgtyZWhGIJqgFyhQznpNUx
-         C2Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=vBy+mErr/Ri6TNTRhXUfpamv23OXSo9DbZDSg0SsleA=;
-        b=ED7gCDzAn03GwGLpx3djYmWcR8uEPw1039L5Ziffj+NH9d0fytB74t9vUQBoH0veXz
-         91hZYBHVXq0rl2Klef+xC6srlsb3nQbt2QV5UFUU7ypVkPOO3z3uLpZTSAJEo3MQTXCs
-         uunscngLJnJ2aiDY5NKO6UJSNqFtyqmc+f7M1iyom5nxGRNLKFOPH0nL0rDf0P6q2iKi
-         3GF4ONAjfhyLObZQeLEGmswbVaTxkJnUHhCj+7dmWMjeILW8oLSsmBVySpkpYnh1J+da
-         SIVa3jG+3BYRw2hB0gsu2SZ59vbqtYWBDPMEcZ12D7OKGkZUfM0arMchkFjW7O+bGNep
-         FbNg==
-X-Gm-Message-State: AOAM532xWc3NnwTbhioMTJly5Y9ubdUGnfRimO3J/uCFgE7VFYdz23YB
-        x82QD02GYMv3LdnohHjq14Gp73iWyv1tAo0S6BZerREpMApOC6UQ9ezDkjQOTv98mU5iGn9MypO
-        s2xKW6jOyUIuYFPHPntlMQ2ZRO+94MQqeQd0UONvxEdGDZdhN1/m3ZGA17VzQ3Uo+nYLSJ88=
-X-Google-Smtp-Source: ABdhPJyA6eTvWUsrJk2S/OyaiGDE/FsFt0ITd8LARBlVorREgJZxAx6nOm6HJvMjiBTPntB3YG6byKs1bXRAzVy7wA==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6a00:1819:b0:4ba:eaa6:d1b8 with
- SMTP id y25-20020a056a00181900b004baeaa6d1b8mr1349363pfa.78.1641848705619;
- Mon, 10 Jan 2022 13:05:05 -0800 (PST)
-Date:   Mon, 10 Jan 2022 21:04:41 +0000
-In-Reply-To: <20220110210441.2074798-1-jingzhangos@google.com>
-Message-Id: <20220110210441.2074798-4-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20220110210441.2074798-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [RFC PATCH 3/3] KVM: selftests: Add vgic initialization for dirty log
- perf test for ARM
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1343798AbiAJVIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 16:08:40 -0500
+Received: from mga04.intel.com ([192.55.52.120]:30171 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1343788AbiAJVIj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 16:08:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641848919; x=1673384919;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=noXDmlMb/EBRvid+M0xTN4DJrqhApqmO9Jn6H9SNPpk=;
+  b=lrwTqACLWTe81ZxqCH/BWfzQGN91+hs8RtoBMi1k7VTBjiNpTA/5x7ha
+   d/8INGCxUD5A6e2YXt+QSceu40k/hxSwWoyqxyhEo04PQ2NAQ+vP1KjXl
+   2mNCg0Dsxu1XXtCMM4yTZEAtIrdIb8BaTD/uz2kPL7NO536uZDmpeY289
+   E3go6tZFo3D6y0blg0CWhbTxGjFUSM+qjQ1lr8c6pH6UwtgQFiB3tjd0L
+   X1EVaDHXV3/vdfuYootLB1E1utULamPpyTKWfQ2uO1Rz5Ycj6kQNhDgKY
+   UhIcZ6luhoLIm//3CNhMBAMS3P2O6qjM8mg8J8sZY789435IYjb5FUZwl
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="242135056"
+X-IronPort-AV: E=Sophos;i="5.88,278,1635231600"; 
+   d="scan'208";a="242135056"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 13:08:38 -0800
+X-IronPort-AV: E=Sophos;i="5.88,278,1635231600"; 
+   d="scan'208";a="490132599"
+Received: from smile.fi.intel.com ([10.237.72.61])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 13:08:20 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1n71sd-00915P-Sm;
+        Mon, 10 Jan 2022 23:07:03 +0200
+Date:   Mon, 10 Jan 2022 23:07:03 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
+        Sebastian Reichel <sre@kernel.org>,
+        linux-phy@lists.infradead.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
+        linux-gpio@vger.kernel.org,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Guenter Roeck <groeck@chromium.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        openipmi-developer@lists.sourceforge.net,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        kvm@vger.kernel.org, Kamal Dasu <kdasu.kdev@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Robert Richter <rric@kernel.org>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Benson Leung <bleung@chromium.org>,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        Tony Luck <tony.luck@intel.com>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Eric Auger <eric.auger@redhat.com>, netdev@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        linux-spi@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Niklas =?iso-8859-1?Q?S=F6derlund?= 
+        <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+Message-ID: <Ydyf93VD8FrV7GH+@smile.fi.intel.com>
+References: <20220110195449.12448-1-s.shtylyov@omp.ru>
+ <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For ARM64, if no vgic is setup before the dirty log perf test, the
-userspace irqchip would be used, which would affect the dirty log perf
-test result.
+On Mon, Jan 10, 2022 at 09:10:14PM +0100, Uwe Kleine-König wrote:
+> On Mon, Jan 10, 2022 at 10:54:48PM +0300, Sergey Shtylyov wrote:
+> > This patch is based on the former Andy Shevchenko's patch:
+> > 
+> > https://lore.kernel.org/lkml/20210331144526.19439-1-andriy.shevchenko@linux.intel.com/
+> > 
+> > Currently platform_get_irq_optional() returns an error code even if IRQ
+> > resource simply has not been found. It prevents the callers from being
+> > error code agnostic in their error handling:
+> > 
+> > 	ret = platform_get_irq_optional(...);
+> > 	if (ret < 0 && ret != -ENXIO)
+> > 		return ret; // respect deferred probe
+> > 	if (ret > 0)
+> > 		...we get an IRQ...
+> > 
+> > All other *_optional() APIs seem to return 0 or NULL in case an optional
+> > resource is not available. Let's follow this good example, so that the
+> > callers would look like:
+> > 
+> > 	ret = platform_get_irq_optional(...);
+> > 	if (ret < 0)
+> > 		return ret;
+> > 	if (ret > 0)
+> > 		...we get an IRQ...
+> 
+> The difference to gpiod_get_optional (and most other *_optional) is that
+> you can use the NULL value as if it were a valid GPIO.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+The problem is not only there, but also in the platform_get_irq() and that
+problem is called vIRQ0. Or as Linus put it "_cookie_" for IRQ, which never
+ever should be 0.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 1954b964d1cf..b501338d9430 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -18,6 +18,12 @@
- #include "test_util.h"
- #include "perf_test_util.h"
- #include "guest_modes.h"
-+#ifdef __aarch64__
-+#include "aarch64/vgic.h"
-+
-+#define GICD_BASE_GPA			0x8000000ULL
-+#define GICR_BASE_GPA			0x80A0000ULL
-+#endif
- 
- /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
- #define TEST_HOST_LOOP_N		2UL
-@@ -200,6 +206,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		vm_enable_cap(vm, &cap);
- 	}
- 
-+#ifdef __aarch64__
-+	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+#endif
-+
- 	/* Start the iterations */
- 	iteration = 0;
- 	host_quit = false;
+> As this isn't given with for irqs, I don't think changing the return
+> value has much sense. In my eyes the problem with platform_get_irq() and
+> platform_get_irq_optional() is that someone considered it was a good
+> idea that a global function emits an error message. The problem is,
+> that's only true most of the time. (Sometimes the caller can handle an
+> error (here: the absence of an irq) just fine, sometimes the generic
+> error message just isn't as good as a message by the caller could be.
+> (here: The caller could emit "TX irq not found" which is a much nicer
+> message than "IRQ index 5 not found".)
+> 
+> My suggestion would be to keep the return value of
+> platform_get_irq_optional() as is, but rename it to
+> platform_get_irq_silent() to get rid of the expectation invoked by the
+> naming similarity that motivated you to change
+> platform_get_irq_optional().
+
+This won't fix the issue with vIRQ0.
+
 -- 
-2.34.1.575.g55b058a8bb-goog
+With Best Regards,
+Andy Shevchenko
+
 
