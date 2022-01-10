@@ -2,110 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66BAB488F03
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 04:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4CD9488F54
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 05:29:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238396AbiAJDr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Jan 2022 22:47:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56816 "EHLO
+        id S233088AbiAJE3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Jan 2022 23:29:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235727AbiAJDr5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Jan 2022 22:47:57 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57F3C06173F;
-        Sun,  9 Jan 2022 19:47:57 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id 78so1527384pfu.10;
-        Sun, 09 Jan 2022 19:47:57 -0800 (PST)
+        with ESMTP id S230515AbiAJE2s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Jan 2022 23:28:48 -0500
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B92FC061759
+        for <kvm@vger.kernel.org>; Sun,  9 Jan 2022 20:28:48 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id h2so39869034lfv.9
+        for <kvm@vger.kernel.org>; Sun, 09 Jan 2022 20:28:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pbRI1T2l3Qets8v52jJPGd5CiuQtZXN6jFwWiPsneXQ=;
-        b=ZQrHf3jO6LZaTeDXee6HHvFaG63VScf3A579kXtpX+vWMW89xqhJtHSavilLKTZl51
-         NzGWoTpFw5kZpbBh53spzudlfCV5cxMfKWnNNRQlvfFc4Kj6/OKQw5ugyo1Afdkzy5Xs
-         RDIlmpoyadyfpqnzFuOuzsaaB2sopn2/+UGWQikvhGiNQfdS5NqcOWVfQ4n79biFp1wo
-         18ibrr7YMTqPIiqHPoaTatCKvDUod8BXRae4PZfEm6hC2sgGmy6+fawymfsfSd1ks4ko
-         bXwRUeGq3aBWmTh5591jivivDCbvOY0de1atWIYOPRQQg7C7vJRb4qztSrR5R+XPsQjj
-         CTqg==
+        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
+        bh=dKFXRxFFjh9xw1vPCYWrhibJscdy5DYIaUyqlpaPFVc=;
+        b=c3ye8SdpenRYjqyWpCapwy+XTR/99UTaYs/7nPbC4MMdi04VTY83hajLiElloDai/6
+         xmSs8e/uvK3Irxhb834l/lhHQFP0Luqcgw5f0qs5isX3/SXKITinUEZdygn2B5Bn/s8N
+         /Myyzoy0ApEcqfm4sqlrQ8yv9U8Nm8DfkwxAVtfTs9J1PNRgAkajw+y0EKPFCjDhDS1f
+         ZUBA5b7DYeA71I+YOhqi8zXiHYqnuok8oGf7dEVF5ffJqPkA673HbGEFKWkpOLM2tYjN
+         GjQoDZg/p7lmcqJLbSBhn/ji9oFN+933w3gJK7AqYzYb6qHc5ueU3KO0eqV7LtFNZkWf
+         W1nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pbRI1T2l3Qets8v52jJPGd5CiuQtZXN6jFwWiPsneXQ=;
-        b=TJolqRozm+vEyWc8rP4X8n+yEJZPPdatMLYzZOEMJVBDhD89vMzIPzrqL65WReA6Sh
-         hddae0TYh9ec6xCZLt54W9hIwTDnOHgvkYYJFAegxKmGsoM5fX82KdrV4nkSkkp6NzBp
-         QmkIUgZUdha7q2jNs3QO1XJSPisrLhn3gMf/ZSgxZWkPjrKs6i1hJLoBowPgnKElQPvF
-         GrJ+knzj1xTjdBi3NiAAn+B53tgGbyuIdvWLptZmr2H4GkW8H3Oi3pojv36+fYy1snR6
-         xGovqF+kQ8bdtpeLsfAK76GRqbeUIJF8DcsSswd6wsd4/0ZRzRdR33Av1jCvSz3HJsDt
-         886w==
-X-Gm-Message-State: AOAM531wJquWcRURme4da9Bnub8EZtmQiweJSdoQE55srHFIA2Or7TQQ
-        Y2jy+oyD/9NtBhACf2f7B8E=
-X-Google-Smtp-Source: ABdhPJzl1NMgZcIY8d5zzP0k4fAzrUgdzf8ewwbTJFYPcTSl9+pX/TDHiD3BnvEAZyn4BqAB+i0FbQ==
-X-Received: by 2002:a63:2056:: with SMTP id r22mr63042594pgm.460.1641786477305;
-        Sun, 09 Jan 2022 19:47:57 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id s5sm4607660pfe.117.2022.01.09.19.47.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jan 2022 19:47:56 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86/pt: Ignore all unknown Intel PT capabilities
-Date:   Mon, 10 Jan 2022 11:47:47 +0800
-Message-Id: <20220110034747.30498-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.33.1
+        h=x-gm-message-state:mime-version:reply-to:sender:from:date
+         :message-id:subject:to;
+        bh=dKFXRxFFjh9xw1vPCYWrhibJscdy5DYIaUyqlpaPFVc=;
+        b=LwUYTGoyj0CnTjnNMZ/w6qMrY6iR8AAeDyNddfTknId/E/krzeNCr41E7fSlGluqS/
+         mbyhrbGof6LzSyWoT8h38ugHthIAp3E8ELRrVi96KjMsbHbakT9FK8B1bJxS5dW1motv
+         LXooWgeKEtJAbMPzOYuVfkSQs9RMZQR5qWoqD/X4nXiYXD12d9EVD1UWsAB82hOtBA9/
+         Ubo26AmmfsTnsk2L1FHWKpuQcV2PwyhGmuErj1UfHuMUhbHNPlFU9SjlSV8hZU8qYHPz
+         BC6Zy2NUrsluy43NDnRnlmZ05MlW5iOgGi0SOWgeGtpZ04Tk8ci8HnqsvDCWfz7ryvpY
+         vhBQ==
+X-Gm-Message-State: AOAM532slxTbaH21eMpXNjw+/ynuXbM5YUCKD0SLpp279QxYzmI3pH7E
+        gLJbdf0bno5fAwQBihZeALT1oaiRf4XxYYnM/RI=
+X-Google-Smtp-Source: ABdhPJzfxSkmXd4h8Tzh57xTGZr0MEuejw4wDNzyU+kSZvNHJiSyJFS8zdLVjwio4/11eggyqN7qlfxWafQSk4gYU2M=
+X-Received: by 2002:a05:6512:3b13:: with SMTP id f19mr63260936lfv.305.1641788926104;
+ Sun, 09 Jan 2022 20:28:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Reply-To: godwinppter@gmail.com
+Sender: mrpkabore1@gmail.com
+Received: by 2002:a05:6504:502f:0:0:0:0 with HTTP; Sun, 9 Jan 2022 20:28:45
+ -0800 (PST)
+From:   Godwin Pete <godwinnpeter@gmail.com>
+Date:   Mon, 10 Jan 2022 05:28:45 +0100
+X-Google-Sender-Auth: PRsYlhEb7StfrxJVKjLovCNkuS4
+Message-ID: <CAEspYAo=_mW46aMGJSu_fc8AgmuRC8ucrr0qsWCeva804b9oBg@mail.gmail.com>
+Subject: This is for you
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Hi,
 
-Some of the new Intel PT capabilities (e.g. SDM Vol3, 32.2.4 Event
-Tracing, it exposes details about the asynchronous events, when they are
-generated, and when their corresponding software event handler completes
-execution) cannot be safely and fully emulated by the KVM, especially
-emulating the simultaneous writing of guest PT packets generated by
-the KVM to the guest PT buffer.
+How are you doing? I am very happy to inform you about my success. I'm
+currently out of the country for an investment with part of my share,
+after completing the transfer with an Indian business man. But i will
+visit your country, next year, after the completion of my project.
+Please, contact my secretary to send you the (ATM) card which I've
+already credited with the sum of ($300,000.00). Just contact her to
+help you in receiving the (ATM) card. I've explained everything to her
+before my trip. This is what I can do for you because, you couldn't
+help in the transfer, but for the fact that you're the person whom
+I've contacted initially, for the transfer. I decided to give this
+($300,000.00) as a compensation for being contacted initially for the
+transfer. I always try to make the difference, in dealing with people
+any time I come in contact with them. I'm also trying to show that I'm
+quite a different person from others whose may have a different
+purpose within them. I believe that you will render some help to me
+when I, will visit your country, for another investment there. So
+contact my secretary for the card, Her contact are as follows,
 
-For KVM, it's better to advertise currently supported features based on
-the "static struct pt_cap_desc" implemented in the host PT driver and
-ignore _all_ unknown features before they have been investigated one by
-one and supported in a safe manner, leaving the rest as system-wide-only
-tracing capabilities.
+Full name: Mrs, Victoria Nyemuya,
+Country: Burkina Faso
+Email: victorynyemuya@gmail.com
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-v1 -> v2 Changelog:
-- Be safe and ignore _all_ unknown capabilities. (Paolo)
+Thanks, and hope for a good corporation with you in future.
 
-Previous:
-https://lore.kernel.org/kvm/20220106085533.84356-1-likexu@tencent.com/
-
- arch/x86/kvm/cpuid.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0b920e12bb6d..439b93359848 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -901,6 +901,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			break;
- 		}
- 
-+		/* It's better to be safe and ignore _all_ unknown capabilities. */
-+		entry->ebx &= GENMASK(5, 0);
- 		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
- 			if (!do_host_cpuid(array, function, i))
- 				goto out;
--- 
-2.33.1
-
+Godwin Peter,
