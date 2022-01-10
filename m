@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B2F748A162
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 22:05:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39D1848A164
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 22:05:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343766AbiAJVFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 16:05:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41924 "EHLO
+        id S1343767AbiAJVFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 16:05:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239741AbiAJVFE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 16:05:04 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E90C06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:05:04 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id ik6-20020a170902ab0600b0014a1e5aab34so1994102plb.21
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:05:04 -0800 (PST)
+        with ESMTP id S239741AbiAJVFG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 16:05:06 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7A8C06173F
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:05:06 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id b11-20020a17090a6e0b00b001b34cd8941bso11180453pjk.1
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:05:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=SblhaXcWijIzk0Mapv3cGqzGg1Y0/XESvuNWuvJevdk=;
-        b=tJhw8ZATrv3Sjy9QhepZUWpfX9dTE8Ja4a0R/EZCvyfUQj/+OWsQL94ONBjWVMpaez
-         b2bNJQTqp6okRMwCqrN5Tt4UOCN2V+ptEfZEk3C3g/c8Y//NHMFgSJRgtIdayXr0LemP
-         UYcHoRiyjMfoQJC5LpxjbMcsa+oSbLKuBbaungcF3668+S7YF9EKmn4bGkYxiQEmQlke
-         wBmpEIHWalDlZEJLoE+Zgt3IZ9NyHxeGMLCwYNIdPApvX/MtGJGslz6BjO464WpeSKwZ
-         VEuOU2T24qaEojHNtI8BfU84V+5HoQzHehfcEfTff+Wvb5WL8jlpl/iyJK9Y6IbsYFvY
-         w+mw==
+        bh=vBy+mErr/Ri6TNTRhXUfpamv23OXSo9DbZDSg0SsleA=;
+        b=j4wxxxti3g07KeR5JHvFJjSWeBtiIqEnlJZMlLN+QAnslR8j6tBWxo5GU+hia2wTGw
+         W4jmM4Uh7jDA0RFkEjTe29a6Xs+Im3R7Oeir+9fg4a5+fcwiPsflg7OKLwo/qOOfKE2g
+         skORzCFyO2ZQiMpz5MIDa1Cvo7YG4v/3cVutqX1mm6lkfEQZTD0NSXrpDN145MyFPWhj
+         MAf0jDXO36ivf9Dm/Hhz8vXmZ4A7ai5SiRUy52hLcycYaMgnorvd/x90eWjdPGjL4UlU
+         Q1vCcaJMoMfzLf/JS/Co/U0KZcX4Dnt+zug3KcIOu++dR9VgtyZWhGIJqgFyhQznpNUx
+         C2Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=SblhaXcWijIzk0Mapv3cGqzGg1Y0/XESvuNWuvJevdk=;
-        b=Q5sauPqisO1ZEgaMg8wwEzUFJPevDLD0Ak3JuWDvh47HFI08abGBygweua3gQM2O42
-         dvyFa2d8OY9o96kK35PpT6+FB1SzCcnTrJBQnCzsCtk2BCxTnx+BGjEl4vX9zgc+3sur
-         2rA2xe1ZcjEYQUvztP1i39WkaxxN73XfQ4gmb4fAFqdPK0EpjNniUPGe3ifE9HVFd3GE
-         H1EWLV999UpRVXISqyY8HCaiNc09NyRC6AGD6CjBNDdl2DAag6gqZcuC2ILXA8NEVMM3
-         Ag10ZPmFavcKYv4R96k7YrOsng4RDtT4tpiTAR3rfw7tkoqBtCKo8dM4TAekzwtJvN9Y
-         hKHw==
-X-Gm-Message-State: AOAM532foVdupRXBl3JUfk8Gwtw7dqFTqGa5s2vW0qDw+rfWy5SHvqE3
-        +OwkMLONMnuD2NpvYfz3JzD1aAIxMKeChtc49Yw/PJI6qi3CSiZmyH07gMbexNXgp09Z46OVRkj
-        49DaF6216bHrHkMWTx8s9MRGEiQhzIrkcKh27coJ6mLzstQAKYi2NlXhjjOdnYtJBztURs20=
-X-Google-Smtp-Source: ABdhPJyZXewBlKNnGyc7EiD71gjJFzijvf+twsuG6PIplDMkIgqq41GFwCDp+OOvS5LS/4e8YnTET8+Nw0N7jOmrdQ==
+        bh=vBy+mErr/Ri6TNTRhXUfpamv23OXSo9DbZDSg0SsleA=;
+        b=ED7gCDzAn03GwGLpx3djYmWcR8uEPw1039L5Ziffj+NH9d0fytB74t9vUQBoH0veXz
+         91hZYBHVXq0rl2Klef+xC6srlsb3nQbt2QV5UFUU7ypVkPOO3z3uLpZTSAJEo3MQTXCs
+         uunscngLJnJ2aiDY5NKO6UJSNqFtyqmc+f7M1iyom5nxGRNLKFOPH0nL0rDf0P6q2iKi
+         3GF4ONAjfhyLObZQeLEGmswbVaTxkJnUHhCj+7dmWMjeILW8oLSsmBVySpkpYnh1J+da
+         SIVa3jG+3BYRw2hB0gsu2SZ59vbqtYWBDPMEcZ12D7OKGkZUfM0arMchkFjW7O+bGNep
+         FbNg==
+X-Gm-Message-State: AOAM532xWc3NnwTbhioMTJly5Y9ubdUGnfRimO3J/uCFgE7VFYdz23YB
+        x82QD02GYMv3LdnohHjq14Gp73iWyv1tAo0S6BZerREpMApOC6UQ9ezDkjQOTv98mU5iGn9MypO
+        s2xKW6jOyUIuYFPHPntlMQ2ZRO+94MQqeQd0UONvxEdGDZdhN1/m3ZGA17VzQ3Uo+nYLSJ88=
+X-Google-Smtp-Source: ABdhPJyA6eTvWUsrJk2S/OyaiGDE/FsFt0ITd8LARBlVorREgJZxAx6nOm6HJvMjiBTPntB3YG6byKs1bXRAzVy7wA==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:902:c407:b0:149:2ef4:b6b2 with
- SMTP id k7-20020a170902c40700b001492ef4b6b2mr1490383plk.112.1641848703948;
- Mon, 10 Jan 2022 13:05:03 -0800 (PST)
-Date:   Mon, 10 Jan 2022 21:04:40 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a05:6a00:1819:b0:4ba:eaa6:d1b8 with
+ SMTP id y25-20020a056a00181900b004baeaa6d1b8mr1349363pfa.78.1641848705619;
+ Mon, 10 Jan 2022 13:05:05 -0800 (PST)
+Date:   Mon, 10 Jan 2022 21:04:41 +0000
 In-Reply-To: <20220110210441.2074798-1-jingzhangos@google.com>
-Message-Id: <20220110210441.2074798-3-jingzhangos@google.com>
+Message-Id: <20220110210441.2074798-4-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20220110210441.2074798-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [RFC PATCH 2/3] KVM: arm64: Add fast path to handle permission
- relaxation during dirty logging
+Subject: [RFC PATCH 3/3] KVM: selftests: Add vgic initialization for dirty log
+ perf test for ARM
 From:   Jing Zhang <jingzhangos@google.com>
 To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
@@ -67,82 +67,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To reduce MMU lock contention during dirty logging, all permission
-relaxation operations would be performed under read lock.
+For ARM64, if no vgic is setup before the dirty log perf test, the
+userspace irqchip would be used, which would affect the dirty log perf
+test result.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/mmu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index cafd5813c949..dd1f43fba4b0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1063,6 +1063,54 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 	return 0;
- }
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index 1954b964d1cf..b501338d9430 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -18,6 +18,12 @@
+ #include "test_util.h"
+ #include "perf_test_util.h"
+ #include "guest_modes.h"
++#ifdef __aarch64__
++#include "aarch64/vgic.h"
++
++#define GICD_BASE_GPA			0x8000000ULL
++#define GICR_BASE_GPA			0x80A0000ULL
++#endif
  
-+static bool fast_mark_writable(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-+		struct kvm_memory_slot *memslot, unsigned long fault_status)
-+{
-+	int ret;
-+	bool writable;
-+	bool write_fault = kvm_is_write_fault(vcpu);
-+	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
-+	kvm_pfn_t pfn;
-+	struct kvm *kvm = vcpu->kvm;
-+	bool logging_active = memslot_is_logging(memslot);
-+	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
-+	unsigned long fault_granule;
-+
-+	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
-+
-+	/* Make sure the fault can be handled in the fast path.
-+	 * Only handle write permission fault on non-hugepage during dirty
-+	 * logging period.
-+	 */
-+	if (fault_status != FSC_PERM || fault_granule != PAGE_SIZE
-+			|| !logging_active || !write_fault)
-+		return false;
-+
-+
-+	/* Pin the pfn to make sure it couldn't be freed and be resued for
-+	 * another gfn.
-+	 */
-+	pfn = __gfn_to_pfn_memslot(memslot, gfn, true, NULL,
-+				   write_fault, &writable, NULL);
-+	if (is_error_pfn(pfn) || !writable)
-+		return false;
-+
-+	read_lock(&kvm->mmu_lock);
-+	ret = kvm_pgtable_stage2_relax_perms(
-+			vcpu->arch.hw_mmu->pgt, fault_ipa, PAGE_HYP);
-+
-+	if (!ret) {
-+		kvm_set_pfn_dirty(pfn);
-+		mark_page_dirty_in_slot(kvm, memslot, gfn);
-+	}
-+	read_unlock(&kvm->mmu_lock);
-+
-+	kvm_set_pfn_accessed(pfn);
-+	kvm_release_pfn_clean(pfn);
-+
-+	return true;
-+}
-+
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  struct kvm_memory_slot *memslot, unsigned long hva,
- 			  unsigned long fault_status)
-@@ -1085,6 +1133,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt;
+ /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
+ #define TEST_HOST_LOOP_N		2UL
+@@ -200,6 +206,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		vm_enable_cap(vm, &cap);
+ 	}
  
-+	if (fast_mark_writable(vcpu, fault_ipa, memslot, fault_status))
-+		return 0;
- 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
- 	write_fault = kvm_is_write_fault(vcpu);
- 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
++#ifdef __aarch64__
++	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++#endif
++
+ 	/* Start the iterations */
+ 	iteration = 0;
+ 	host_quit = false;
 -- 
 2.34.1.575.g55b058a8bb-goog
 
