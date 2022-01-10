@@ -2,208 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4F0748A217
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 22:46:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2347148A2B1
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 23:24:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241278AbiAJVq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 16:46:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51990 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241341AbiAJVq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 16:46:27 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444E4C061748
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 13:46:27 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n72TM-0001u6-SR; Mon, 10 Jan 2022 22:45:00 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n72TB-009atw-Vd; Mon, 10 Jan 2022 22:44:49 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n72TA-0003wz-UN; Mon, 10 Jan 2022 22:44:48 +0100
-Date:   Mon, 10 Jan 2022 22:44:48 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>, kvm@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, Lee Jones <lee.jones@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>, linux-gpio@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        openipmi-developer@lists.sourceforge.net,
-        Jaroslav Kysela <perex@perex.cz>,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Richard Weinberger <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
-Message-ID: <20220110214448.rp4pcjlaqbjlggvj@pengutronix.de>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
- <Ydyf93VD8FrV7GH+@smile.fi.intel.com>
+        id S1345386AbiAJWYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 17:24:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:33021 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241368AbiAJWYd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 17:24:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641853472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OVMJVto/h3bHuFIQM4/MuFTwUhyIKi5r+o6uRQ0M4D4=;
+        b=JOLfxy3LlPFrRx0kwuzGZbO0Ak0uNG2nmtN+pBSsrQAWrBS5160SViG5YuJb2nJb1hRn2z
+        RJD5kdIjtS+95CNeFwn6cFjGjbB3FowwU4OnTkeSuaUfajdB8MHxgdB2/yyjPpOP9NDkQJ
+        PYbaTV+pxgaXYd/4Lh0Ftz3gPrn4REQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-227-QlOkv7AVPGSKBOUJ_syiaQ-1; Mon, 10 Jan 2022 17:24:29 -0500
+X-MC-Unique: QlOkv7AVPGSKBOUJ_syiaQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F6BB84BA40;
+        Mon, 10 Jan 2022 22:24:26 +0000 (UTC)
+Received: from starship (unknown [10.40.192.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CEB7A78DD2;
+        Mon, 10 Jan 2022 22:24:10 +0000 (UTC)
+Message-ID: <1ff69ed503faa4c5df3ad1b5abe8979d570ef2b8.camel@redhat.com>
+Subject: Re: [PATCH v5 7/8] KVM: VMX: Update PID-pointer table entry when
+ APIC ID is changed
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>
+Date:   Tue, 11 Jan 2022 00:24:09 +0200
+In-Reply-To: <20220110074523.GA18434@gao-cwp>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+         <20211231142849.611-8-guang.zeng@intel.com>
+         <640e82f3-489d-60af-1d31-25096bef1a46@amd.com>
+         <4eee5de5-ab76-7094-17aa-adc552032ba0@intel.com>
+         <aa86022c-2816-4155-8d77-f4faf6018255@amd.com>
+         <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
+         <d058f7464084cadc183bd9dbf02c7f525bb9f902.camel@redhat.com>
+         <20220110074523.GA18434@gao-cwp>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="e2is76odjewy3gr2"
-Content-Disposition: inline
-In-Reply-To: <Ydyf93VD8FrV7GH+@smile.fi.intel.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 2022-01-10 at 15:45 +0800, Chao Gao wrote:
+> On Fri, Jan 07, 2022 at 10:31:59AM +0200, Maxim Levitsky wrote:
+> > On Fri, 2022-01-07 at 16:05 +0800, Zeng Guang wrote:
+> > > On 1/6/2022 10:06 PM, Tom Lendacky wrote:
+> > > > On 1/5/22 7:44 PM, Zeng Guang wrote:
+> > > > > On 1/6/2022 3:13 AM, Tom Lendacky wrote:
+> > > > > > On 12/31/21 8:28 AM, Zeng Guang wrote:
+> > > > > > Won't this blow up on AMD since there is no corresponding SVM op?
+> > > > > > 
+> > > > > > Thanks,
+> > > > > > Tom
+> > > > > Right, need check ops validness to avoid ruining AMD system. Same
+> > > > > consideration on ops "update_ipiv_pid_table" in patch8.
+> > > > Not necessarily for patch8. That is "protected" by the
+> > > > kvm_check_request(KVM_REQ_PID_TABLE_UPDATE, vcpu) test, but it couldn't hurt.
+> > > 
+> > > OK, make sense. Thanks.
+> > 
+> > I haven't fully reviewed this patch series yet,
+> > and I will soon.
+> > 
+> > I just want to point out few things:
+> 
+> Thanks for pointing them out.
+> 
+> > 1. AMD's AVIC also has a PID table (its calle AVIC physical ID table). 
+> > It stores addressses of vCPUs apic backing pages,
+> > and thier real APIC IDs.
+> > 
+> > avic_init_backing_page initializes the entry (assuming apic_id == vcpu_id) 
+> > (which is double confusing)
+> > 
+> > 2. For some reason KVM supports writable APIC IDs. Does anyone use these?
+> > Even Intel's PRM strongly discourages users from using them and in X2APIC mode,
+> > the APIC ID is read only.
+> > 
+> > Because of this we have quite some bookkeeping in lapic.c, 
+> > (things like kvm_recalculate_apic_map and such)
+> > 
+> > Also AVIC has its own handling for writes to APIC_ID,APIC_LDR,APIC_DFR
+> > which tries to update its physical and logical ID tables.
+> 
+> Intel's IPI virtualization doesn't handle logical-addressing IPIs. They cause
+> APIC-write vm-exit as usual. So, this series doesn't handle APIC_LDR/DFR.
+> 
+> > (it used also to handle apic base and I removed this as apic base otherwise
+> > was always hardcoded to the default vaule)
+> > 
+> > Note that avic_handle_apic_id_update is broken - it always copies the entry
+> > from the default (apicid == vcpu_id) location to new location and zeros
+> > the old location, which will fail in many cases, like even if the guest
+> > were to swap few apic ids.
+> 
+> This series differs from avic_handle_apic_id_update slightly:
+> 
+> If a vCPU's APIC ID is changed, this series zeros the old entry in PID-pointer
+> table and programs the vCPU's PID to the new entry (rather than copy from the
+> old entry).
 
---e2is76odjewy3gr2
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes. The AVIC code is pretty much totaly busted in this regard which I noticed recently. 
+It will fail the 2nd time it is called because it zeroes the entry it copies, 
+and even if the guest changes the APIC ID once, this code will still fail because, 
+it is called after each AVIC inhibition.
 
-On Mon, Jan 10, 2022 at 11:07:03PM +0200, Andy Shevchenko wrote:
-> On Mon, Jan 10, 2022 at 09:10:14PM +0100, Uwe Kleine-K=F6nig wrote:
-> > On Mon, Jan 10, 2022 at 10:54:48PM +0300, Sergey Shtylyov wrote:
-> > > This patch is based on the former Andy Shevchenko's patch:
-> > >=20
-> > > https://lore.kernel.org/lkml/20210331144526.19439-1-andriy.shevchenko=
-@linux.intel.com/
-> > >=20
-> > > Currently platform_get_irq_optional() returns an error code even if I=
-RQ
-> > > resource simply has not been found. It prevents the callers from being
-> > > error code agnostic in their error handling:
-> > >=20
-> > > 	ret =3D platform_get_irq_optional(...);
-> > > 	if (ret < 0 && ret !=3D -ENXIO)
-> > > 		return ret; // respect deferred probe
-> > > 	if (ret > 0)
-> > > 		...we get an IRQ...
-> > >=20
-> > > All other *_optional() APIs seem to return 0 or NULL in case an optio=
-nal
-> > > resource is not available. Let's follow this good example, so that the
-> > > callers would look like:
-> > >=20
-> > > 	ret =3D platform_get_irq_optional(...);
-> > > 	if (ret < 0)
-> > > 		return ret;
-> > > 	if (ret > 0)
-> > > 		...we get an IRQ...
-> >=20
-> > The difference to gpiod_get_optional (and most other *_optional) is that
-> > you can use the NULL value as if it were a valid GPIO.
->=20
-> The problem is not only there, but also in the platform_get_irq() and that
-> problem is called vIRQ0. Or as Linus put it "_cookie_" for IRQ, which nev=
-er
-> ever should be 0.
+> 
+> But this series is also problematic if guest swaps two vCPU's APIC ID without
+> using another free APIC ID; it would end up one of them having no valid entry.
 
-IMHO it's best to avoid yielding zero for a value that should be
-interpreted as an (virtual) irq. Then callers don't even have to
-consider if it's a valid value or not.
+Yes, exactly. I wanted to fix the AVIC's code and also noticed that.
+Plus, the guest can assign the same APIC ID to two vCPUs in theory and keep it this
+way which complicates things further, from the point of view of what malicious guests can do.
+ 
 
-> > As this isn't given with for irqs, I don't think changing the return
-> > value has much sense. In my eyes the problem with platform_get_irq() and
-> > platform_get_irq_optional() is that someone considered it was a good
-> > idea that a global function emits an error message. The problem is,
-> > that's only true most of the time. (Sometimes the caller can handle an
-> > error (here: the absence of an irq) just fine, sometimes the generic
-> > error message just isn't as good as a message by the caller could be.
-> > (here: The caller could emit "TX irq not found" which is a much nicer
-> > message than "IRQ index 5 not found".)
-> >=20
-> > My suggestion would be to keep the return value of
-> > platform_get_irq_optional() as is, but rename it to
-> > platform_get_irq_silent() to get rid of the expectation invoked by the
-> > naming similarity that motivated you to change
-> > platform_get_irq_optional().
->=20
-> This won't fix the issue with vIRQ0.
+> 
+> One solution in my mind is:
+> 
+> when a vCPU's APIC ID is changed, KVM traverses all vCPUs to count vCPUs using
+> the old APIC ID and the new APIC ID, programs corrsponding entries following
+> below rules:
+> 1. populate an entry with a vCPU's PID if the corrsponding APIC ID is
+> exclusively used by that vCPU.
+> 2. zero an entry for other cases.
 
-Is the patch about vIRQ0, or did you only start to consider it when I
-said that for gpio NULL is a dummy value? If the former, the commit log
-should better mention that.
+Yes, that what I was thinking as well - but zeroing *both* entries when they are duplicate,
+is not what I was thinkging and it is a very good idea IMHO.
 
-Anyhow, I still think renaming platform_get_irq_optional() to
-platform_get_irq_silent() is a good idea and the patches in this thread
-are not.
 
-Best regards
-Uwe
+> 
+> Proper locking is needed in this process to prevent changes to vCPUs' APIC IDs.
+Yes.
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+> 
+> Or if it doesn't worth it, we can disable IPI virtualization for a guest on its
+> first attempt to change xAPIC ID.
 
---e2is76odjewy3gr2
-Content-Type: application/pgp-signature; name="signature.asc"
+Yes, and this brings the main question. Are there any OSes that actually change the APIC ID?
+ 
+I tested winxp, and win10 32 bit, and they seem to work just fine when I don't allow them to change apic id.
+Older/more obscure oses like win98/95/dos and such don't use APIC at all.
+That leaves only modern OSes like *BSD and such, I'll try to check a few of them soon.
+ 
+I just don't see any reason whatsoever to change APIC ID. It seems that it was initially writable,
+just because Intel' forgot to make it read-only, and then they even made it read-only with x2apic.
+ 
+Both Intel and AMD's PRM also state that changing APIC ID is implementation dependent.
+ 
+I vote to forbid changing apic id, at least in the case any APIC acceleration is used, be that APICv or AVIC.
+ 
+ 
 
------BEGIN PGP SIGNATURE-----
+Best regards,
+	Maxim Levitsky
 
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHcqM0ACgkQwfwUeK3K
-7Amxygf+NmX8BzaqLoc9m8fsv49CkQqQKbXt9a0l2gES1hAm8NL2nbgjydEJDcPs
-QJ5X1TL08pb9wPoYcUF7uSwjJx2Vp0f+FEiMtDk2kj5xI38T+86tnyuQw1tNg4Ss
-52foCYQJVIIgIAeMyIvWk14oUMsy4JV/SuT+GZImMq+aM/5+wIF02NZoGzXofThL
-mUNzp+vgTNNhZpF7c0D4orD7SDOCOn2fA/uu2UGk1Nh6m+lgW5qIw5Z0KFPTalKH
-kU/JuEOBD6kdEr84D9EM6SB2l+dOBVJ20F5DL1JItM4qkAK9thM+3ecLPF610K1e
-+N5e1XZXSLS6gpWGBjS9bxMbdZ6Qpg==
-=FQR4
------END PGP SIGNATURE-----
+> 
+> Let us know which option is preferred.
+> 
 
---e2is76odjewy3gr2--
+
