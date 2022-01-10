@@ -2,313 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3D7B4898FA
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 13:58:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2AF5489A0E
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 14:36:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231701AbiAJM6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 07:58:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45285 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231724AbiAJM5A (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 07:57:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641819418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AVvp/Hc7qPRUEz7YJl4ozj14nYLlyYVQtjr0ms9L8NQ=;
-        b=GoMtm1QG1S+jJ9oFHDvnKJAq2fFQyfWRt8qn1vcRIBrHgitYR+6uihJ2Igvzf/hYVAe6zd
-        8o6o2DtUQYPur+D9zg2VH6Bbmbf5A5C8Wyc+3gW26v4zQe5WD9mSxhVlb4exp9XV/5qUfI
-        9yVJkqcIAWwBnyhT7ar8LaG0jdy7RGU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-462-8D4xG5mCMgqsOuCAxmFPKA-1; Mon, 10 Jan 2022 07:56:57 -0500
-X-MC-Unique: 8D4xG5mCMgqsOuCAxmFPKA-1
-Received: by mail-wr1-f69.google.com with SMTP id k4-20020adfc704000000b001a32d86a772so4156524wrg.5
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 04:56:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AVvp/Hc7qPRUEz7YJl4ozj14nYLlyYVQtjr0ms9L8NQ=;
-        b=HNYk6M+3BZuQKJ9dWX+RdM06WcadtKafj8edo0bs+Tm3xGloXPSFJQv+LBFWT8tvlM
-         QoGR53dkPl58cZR7lCljCSL2cceEi4nFd+pz4tEiFhb0w766/fF28h3RuXa8rJN3kkyL
-         uGOitFtiAeoIraN4fnpvNwBiZPijboGNtahcM7e12nmC/HTrbG82iPikzSP3LfC535gY
-         UKotglOk3lUyAuoKK8RXs/Iiy5v44N8C5+bdsvZ42IqujglkbNnLEb1chTq6vr1OF4aB
-         y69xM3gItiA9KuUkn2jn+jDDZZjtahyBncrWEqdfhVcA5gv/S0IN4xJ5y7ZWPVVVEw70
-         u2Kg==
-X-Gm-Message-State: AOAM5326TranZ3ccqC19ydaIbtePBvDBPS/1e5hw4UMe4KjeTIGa+3Dp
-        hpTZMBpHpkB9gzquFQGchUcCY77CJEY4esA0niuHZH0+aSvuriDBKQVYTPwye/Bh8myrZ2XIhdG
-        aMynuGgHgqIgA
-X-Received: by 2002:a5d:6811:: with SMTP id w17mr1492937wru.443.1641819415868;
-        Mon, 10 Jan 2022 04:56:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwdbhYXvkJBaz3bkMPO/rSfqHXfqP57/N68w5WuSlZAf8/gWErxx+H35vqh9TdefF+KiFBoKA==
-X-Received: by 2002:a5d:6811:: with SMTP id w17mr1492925wru.443.1641819415636;
-        Mon, 10 Jan 2022 04:56:55 -0800 (PST)
-Received: from redhat.com ([2.55.13.160])
-        by smtp.gmail.com with ESMTPSA id g6sm6862655wri.67.2022.01.10.04.56.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 04:56:55 -0800 (PST)
-Date:   Mon, 10 Jan 2022 07:56:49 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
-        parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, zhe.he@windriver.com,
-        xiaodong.liu@intel.com, joe@perches.com, robin.murphy@arm.com,
-        will@kernel.org, john.garry@huawei.com, songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
-Message-ID: <20220110075546-mutt-send-email-mst@kernel.org>
-References: <20210830141737.181-1-xieyongji@bytedance.com>
+        id S232694AbiAJNg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 08:36:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55320 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232627AbiAJNg2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 08:36:28 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20AChdYw018734;
+        Mon, 10 Jan 2022 13:36:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=BH1QB72H62lbVTUPX+CV1u7MpSiiBwN6o/40gDPnTDs=;
+ b=iGYzWdtD9TeIxpHdXd/SigmyHpVd6qK4YZWDJPw0Shccj2MH1iz3gys3MmQkqbE/MbdU
+ uQ/d6b1RBnGWZ+Z6vKiS84UgUZj7HOzu7x24XF0IrcCQOtWHANX574xvnM4XKiShjJEK
+ rZ7UU6z+zdL3TuFU+9v7oh48XI+tBOYhPqkG71Q5DvQqUrM4GeokxGBV6yqrxQmykpS4
+ 4/A41XUIqbKpXkSHa0Gu7Fdmto5QjzYe62Fxy8eJZoH4/Ly5MYxJA+Dh4Jc0Yu66dbi2
+ 46rTX3RpIMGYAeXFWOpVjR5qmRbPySYcBXI6Dxfcac8xfHSSOuv0fx2TSpYRgdBp0b0m 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dgn261eft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jan 2022 13:36:27 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20AD7H8r010159;
+        Mon, 10 Jan 2022 13:36:27 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dgn261eer-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jan 2022 13:36:27 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ADW5eS022579;
+        Mon, 10 Jan 2022 13:36:24 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 3df2894jhh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jan 2022 13:36:24 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ADRMgU35127558
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jan 2022 13:27:22 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C8D3420A2;
+        Mon, 10 Jan 2022 13:36:21 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C97D3420FC;
+        Mon, 10 Jan 2022 13:36:20 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.85.190])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Jan 2022 13:36:20 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/4] S390x: CPU Topology Information
+Date:   Mon, 10 Jan 2022 14:37:51 +0100
+Message-Id: <20220110133755.22238-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.27.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: f6YRmsTVorcPCQJstANVQSBhHpxXf1cz
+X-Proofpoint-ORIG-GUID: BYxP7UJnykFsJ-thkodgBJf-uGQp-6fW
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210830141737.181-1-xieyongji@bytedance.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-10_05,2022-01-10_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ phishscore=0 mlxscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
+ malwarescore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201100095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
-> This series introduces a framework that makes it possible to implement
-> software-emulated vDPA devices in userspace. And to make the device
-> emulation more secure, the emulated vDPA device's control path is handled
-> in the kernel and only the data path is implemented in the userspace.
-> 
-> Since the emuldated vDPA device's control path is handled in the kernel,
-> a message mechnism is introduced to make userspace be aware of the data
-> path related changes. Userspace can use read()/write() to receive/reply
-> the control messages.
-> 
-> In the data path, the core is mapping dma buffer into VDUSE daemon's
-> address space, which can be implemented in different ways depending on
-> the vdpa bus to which the vDPA device is attached.
-> 
-> In virtio-vdpa case, we implements a MMU-based software IOTLB with
-> bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-> buffer is reside in a userspace memory region which can be shared to the
-> VDUSE userspace processs via transferring the shmfd.
-> 
-> The details and our user case is shown below:
-> 
-> ------------------------    -------------------------   ----------------------------------------------
-> |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-> |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-> |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-> ------------+-----------     -----------+------------   -------------+----------------------+---------
->             |                           |                            |                      |
->             |                           |                            |                      |
-> ------------+---------------------------+----------------------------+----------------------+---------
-> |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-> |    -------+--------           --------+--------            -------+--------          -----+----    |
-> |           |                           |                           |                       |        |
-> | ----------+----------       ----------+-----------         -------+-------                |        |
-> | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-> | ----------+----------       ----------+-----------         -------+-------                |        |
-> |           |      virtio bus           |                           |                       |        |
-> |   --------+----+-----------           |                           |                       |        |
-> |                |                      |                           |                       |        |
-> |      ----------+----------            |                           |                       |        |
-> |      | virtio-blk device |            |                           |                       |        |
-> |      ----------+----------            |                           |                       |        |
-> |                |                      |                           |                       |        |
-> |     -----------+-----------           |                           |                       |        |
-> |     |  virtio-vdpa driver |           |                           |                       |        |
-> |     -----------+-----------           |                           |                       |        |
-> |                |                      |                           |    vdpa bus           |        |
-> |     -----------+----------------------+---------------------------+------------           |        |
-> |                                                                                        ---+---     |
-> -----------------------------------------------------------------------------------------| NIC |------
->                                                                                          ---+---
->                                                                                             |
->                                                                                    ---------+---------
->                                                                                    | Remote Storages |
->                                                                                    -------------------
-> 
-> We make use of it to implement a block device connecting to
-> our distributed storage, which can be used both in containers and
-> VMs. Thus, we can have an unified technology stack in this two cases.
-> 
-> To test it with null-blk:
-> 
->   $ qemu-storage-daemon \
->       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
->       --monitor chardev=charmonitor \
->       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
->       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> 
-> The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+Hi,
 
-It's been half a year - any plans to upstream this?
-I'm beginning to worry I made a mistake merging this
-with the module being unused by major userspace ...
+new version of the series with corrections.
 
-> To make the userspace VDUSE processes such as qemu-storage-daemon able
-> to be run by an unprivileged user. We limit the supported device type
-> to virtio block device currently. The support for other device types
-> can be added after the security issue of corresponding device driver
-> is clarified or fixed in the future.
-> 
-> Future work:
->   - Improve performance
->   - Userspace library (find a way to reuse device emulation code in qemu/rust-vmm)
->   - Support more device types
-> 
-> V11 to V12:
-> - Rebased to vhost.git
-> - Add reset support for all vdpa drivers
-> - Remove the dependency on other patches
-> - Export eventfd_wake_count
-> - Use workqueue for virtqueue kicking in some cases
-> 
-> V10 to V11:
-> - Rebased to newest kernel tree
-> - Add a device attribute for message timeout
-> - Add check for the reserved field of some structures
-> - Add a reset callback in vdpa_config_ops and handle it in VDUSE case
-> - Remove the patches that handle virtio-vdpa reset failure
-> - Document the structures in include/uapi/linux/vduse.h using kernel doc
-> - Add the reserved field for struct vduse_vq_config
-> 
-> V9 to V10:
-> - Forbid some userspace operations after a timeout
-> - Rename VDUSE_DEV_INJECT_IRQ to VDUSE_DEV_INJECT_CONFIG_IRQ
-> - Use fixed bounce buffer size
-> - Fix more code indentation issues in include/linux/vdpa.h
-> - Remove the section describing bounce-buffer mechanism in documentation
-> - Fix some commit logs and documentation
-> 
-> V8 to V9:
-> - Add VDUSE_SET_STATUS message to replace VDUSE_START/STOP_DATAPLANE messages
-> - Support packed virtqueue state
-> - Handle the reset failure in both virtio-vdpa and vhost-vdpa cases
-> - Add more details in documentation
-> - Remove VDUSE_REQ_FLAGS_NO_REPLY flag
-> - Add VDUSE_VQ_SETUP ioctl to support per-vq configuration
-> - Separate config interrupt injecting out of config update
-> - Flush kworker for interrupt inject during resetting
-> - Validate the config_size in .get_config()
-> 
-> V7 to V8:
-> - Rebased to newest kernel tree
-> - Rework VDUSE driver to handle the device's control path in kernel
-> - Limit the supported device type to virtio block device
-> - Export free_iova_fast()
-> - Remove the virtio-blk and virtio-scsi patches (will send them alone)
-> - Remove all module parameters
-> - Use the same MAJOR for both control device and VDUSE devices
-> - Avoid eventfd cleanup in vduse_dev_release()
-> 
-> V6 to V7:
-> - Export alloc_iova_fast()
-> - Add get_config_size() callback
-> - Add some patches to avoid trusting virtio devices
-> - Add limited device emulation
-> - Add some documents
-> - Use workqueue to inject config irq
-> - Add parameter on vq irq injecting
-> - Rename vduse_domain_get_mapping_page() to vduse_domain_get_coherent_page()
-> - Add WARN_ON() to catch message failure
-> - Add some padding/reserved fields to uAPI structure
-> - Fix some bugs
-> - Rebase to vhost.git
-> 
-> V5 to V6:
-> - Export receive_fd() instead of __receive_fd()
-> - Factor out the unmapping logic of pa and va separatedly
-> - Remove the logic of bounce page allocation in page fault handler
-> - Use PAGE_SIZE as IOVA allocation granule
-> - Add EPOLLOUT support
-> - Enable setting API version in userspace
-> - Fix some bugs
-> 
-> V4 to V5:
-> - Remove the patch for irq binding
-> - Use a single IOTLB for all types of mapping
-> - Factor out vhost_vdpa_pa_map()
-> - Add some sample codes in document
-> - Use receice_fd_user() to pass file descriptor
-> - Fix some bugs
-> 
-> V3 to V4:
-> - Rebase to vhost.git
-> - Split some patches
-> - Add some documents
-> - Use ioctl to inject interrupt rather than eventfd
-> - Enable config interrupt support
-> - Support binding irq to the specified cpu
-> - Add two module parameter to limit bounce/iova size
-> - Create char device rather than anon inode per vduse
-> - Reuse vhost IOTLB for iova domain
-> - Rework the message mechnism in control path
-> 
-> V2 to V3:
-> - Rework the MMU-based IOMMU driver
-> - Use the iova domain as iova allocator instead of genpool
-> - Support transferring vma->vm_file in vhost-vdpa
-> - Add SVA support in vhost-vdpa
-> - Remove the patches on bounce pages reclaim
-> 
-> V1 to V2:
-> - Add vhost-vdpa support
-> - Add some documents
-> - Based on the vdpa management tool
-> - Introduce a workqueue for irq injection
-> - Replace interval tree with array map to store the iova_map
-> 
-> Xie Yongji (13):
->   iova: Export alloc_iova_fast() and free_iova_fast()
->   eventfd: Export eventfd_wake_count to modules
->   file: Export receive_fd() to modules
->   vdpa: Fix some coding style issues
->   vdpa: Add reset callback in vdpa_config_ops
->   vhost-vdpa: Handle the failure of vdpa_reset()
->   vhost-iotlb: Add an opaque pointer for vhost IOTLB
->   vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
->   vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
->   vdpa: Support transferring virtual addressing during DMA mapping
->   vduse: Implement an MMU-based software IOTLB
->   vduse: Introduce VDUSE - vDPA Device in Userspace
->   Documentation: Add documentation for VDUSE
-> 
->  Documentation/userspace-api/index.rst              |    1 +
->  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
->  Documentation/userspace-api/vduse.rst              |  233 +++
->  drivers/iommu/iova.c                               |    2 +
->  drivers/vdpa/Kconfig                               |   10 +
->  drivers/vdpa/Makefile                              |    1 +
->  drivers/vdpa/ifcvf/ifcvf_main.c                    |   37 +-
->  drivers/vdpa/mlx5/net/mlx5_vnet.c                  |   42 +-
->  drivers/vdpa/vdpa.c                                |    9 +-
->  drivers/vdpa/vdpa_sim/vdpa_sim.c                   |   26 +-
->  drivers/vdpa/vdpa_user/Makefile                    |    5 +
->  drivers/vdpa/vdpa_user/iova_domain.c               |  545 +++++++
->  drivers/vdpa/vdpa_user/iova_domain.h               |   73 +
->  drivers/vdpa/vdpa_user/vduse_dev.c                 | 1641 ++++++++++++++++++++
->  drivers/vdpa/virtio_pci/vp_vdpa.c                  |   17 +-
->  drivers/vhost/iotlb.c                              |   20 +-
->  drivers/vhost/vdpa.c                               |  168 +-
->  fs/eventfd.c                                       |    1 +
->  fs/file.c                                          |    6 +
->  include/linux/file.h                               |    7 +-
->  include/linux/vdpa.h                               |   62 +-
->  include/linux/vhost_iotlb.h                        |    3 +
->  include/uapi/linux/vduse.h                         |  306 ++++
->  23 files changed, 3112 insertions(+), 104 deletions(-)
->  create mode 100644 Documentation/userspace-api/vduse.rst
->  create mode 100644 drivers/vdpa/vdpa_user/Makefile
->  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
->  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
->  create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
->  create mode 100644 include/uapi/linux/vduse.h
-> 
-> -- 
-> 2.11.0
+When facility 11 is available inside the S390x architecture, 2 new
+instructions are available: PTF and STSI with function code 15.
+
+Let's check their availability in QEMU/KVM and their coherence
+with the CPU topology provided to the QEMU -smp parameter and as
+argument for the test.
+
+To run these tests successfully you will need both the Linux and the
+QEMU patches, at least the following or newer patches:
+
+    https://lkml.org/lkml/2021/8/3/201
+
+    https://lists.nongnu.org/archive/html/qemu-s390x/2021-07/msg00165.html
+
+Then if you have the text you can run directly the unit test or directly
+start QEMU with:
+
+# ./s390x-run s390x/topology.elf \
+	-smp 5,drawers=2,books=3,sockets=4,cores=4,maxcpus=96 \
+	-append "-d 2 -b 3 -s 4 -c 4 -m 96"
+
+If you do not have the patches you can still use the test but only with
+the first two topology levels like in:
+
+# ./s390x-run s390x/topology.elf \
+	-smp 5,sockets=24,cores=4,maxcpus=96 \
+	-append "-s 24 -c 4 -m 96"
+
+Of course the declaration of the number of socket and core must be
+coherent.
+
+Regards,
+Pierre
+
+Pierre Morel (4):
+  s390x: lib: Add SCLP toplogy nested level
+  s390x: stsi: Define vm_is_kvm to be used in different tests
+  s390x: topology: Check the Perform Topology Function
+  s390x: topology: Checking Configuration Topology Information
+
+ lib/s390x/sclp.c    |   6 +
+ lib/s390x/sclp.h    |   4 +-
+ lib/s390x/stsi.h    |  76 ++++++++++
+ lib/s390x/vm.c      |  39 +++++
+ lib/s390x/vm.h      |   1 +
+ s390x/Makefile      |   1 +
+ s390x/stsi.c        |  23 +--
+ s390x/topology.c    | 346 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   4 +
+ 9 files changed, 478 insertions(+), 22 deletions(-)
+ create mode 100644 lib/s390x/stsi.h
+ create mode 100644 s390x/topology.c
+
+-- 
+2.27.0
+
+Changelog:
+
+From V2:
+
+- Check if the test in running in KVM
+  (Janosch)
+
+- patch on "Simplify stsi_get_fc and move it to library"
+  pushed separatly
+
+- replace named level with abstracted topology levels
+  to get rid of a possible naming controversy
+  (Pierre)
+
+- Better checks and new checks for STSI(15,1,x)
+  (Pierre)
+
+From V1:
+
+- Simplify the stsi_get_fc function when pushing it into lib
+  (Janosch)
+
+- Simplify PTF inline assembly as PTF instruction does not use RRE
+  second argument
+  (Claudio)
+
+- Rename Test global name
+  (Claudio, Janosch)
+
+- readibility, naming for PTF_REQ_* and removed unused globals
+  (Janosch)
+
+- skipping tests which could fail when run on LPAR
+  (Janosh)
+
+- Missing prefix_pop
+  (Janosch)
 
