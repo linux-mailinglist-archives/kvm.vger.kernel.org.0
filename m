@@ -2,175 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47C39488FB9
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 06:25:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3101D488FD7
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 06:41:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238689AbiAJFZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 00:25:20 -0500
-Received: from mga11.intel.com ([192.55.52.93]:63271 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230407AbiAJFZS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 00:25:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641792318; x=1673328318;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Dg52vI7Zzph7SANnogz1zjWx6H95Svdva7PP5uUm/3I=;
-  b=m+hk50sb8GxeJ44J1iEkrK3aQt1voF+ZMQ6R+qEtnXZ7xpc3Wj5eM2Bg
-   9jrq21X6RQQewuDonCo+PAfc6V7ZpG64xNC8zmvvl6K9FqlNboE5EcqGN
-   cX8UTQvORWkdc0PSsEkBcW6N3ItLPL5F6WqvyoYAYnyvrwV47GpRX1Ei6
-   wLGncEAbxmvA0DqjEi8Nrp54URAcMWjk8RnxRiPYrQd2KeMY4EV+ob+cA
-   nXY2p85AaIge0RATQ9VyBVdPRs415mWDe6v4kcI2YjqbYJJqFJn/oaGkG
-   /6InMQhkbqPjBpMuedFvphGttOPthEqTFxejXAC2nCW8UERsgRSQBXCRL
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10222"; a="240705645"
-X-IronPort-AV: E=Sophos;i="5.88,276,1635231600"; 
-   d="scan'208";a="240705645"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2022 21:25:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,276,1635231600"; 
-   d="scan'208";a="557874842"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
-  by orsmga001.jf.intel.com with ESMTP; 09 Jan 2022 21:25:17 -0800
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sun, 9 Jan 2022 21:25:17 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Sun, 9 Jan 2022 21:25:17 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Sun, 9 Jan 2022 21:25:17 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U6zv3rsRDmlRLho7TN4UvxHXU8SrZ/khQi9taDQiOd/fL5WE6tAUJRvOnoAGShR6Of3Q1Dp2bi9WtmB+gr3zcuYpkgQfdvYyVogEwFAHN0kOJ50YnHhfBfFLl42r7oityj4bYh1jFbTk+ZhlFUmswfTA4hH6AsE07hINscZ6iN5izp/dT7Ot3PtjHwKCbIiKFI/iH3HcK1/PA4HCh/kmagdUC8FXf7JX6AhSiUvTZTMLLOPi58GqSZRFNlL/0fib0M6Uc3T9NwnJlZ8f+Ci6FjS/xyQdtgjjFrFiUq3NEB02wNnvlj6DOQfp7lhF6vgYqUc/E06B1FNpONGLd5pslg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XHgmG7vf6e8yT2idli02GCnA5fjtGU4DpbYXHk8Sllo=;
- b=g0s0/mRYliEvLfUOfD7KuH0KIsVCcHcyRrgYcSdiLr+SGwGMgriEO2Ihlbu4l3QZtkDE+uCK1b2w5REWq7PFljhQhlP/L5Lbym3PhlDc6GYShBdDkKMfUluTFmP7AwVia3hfs5RkFjuHbgj4KJAiUJTBV0slD8gCCnLkjGM56G9nOv5BUex5MzYEJMiDySyoBBCsZuv6+ra1kZSRfCetqT4cUFxPJol287p0yzkf/1B2M0B2lxzBAM/sB6cSLBrbLvf8YQ81bV/SoilXCKEzrEMuz6Zoh54pnt9bWIrkm5YL2+Mu4Rrmt5IFQztbDyUYE18vTMd3VzxDnJvPgM8EaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BN9PR11MB5451.namprd11.prod.outlook.com (2603:10b6:408:100::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Mon, 10 Jan
- 2022 05:25:14 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::5c8a:9266:d416:3e04]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::5c8a:9266:d416:3e04%2]) with mapi id 15.20.4867.011; Mon, 10 Jan 2022
- 05:25:14 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "Zeng, Guang" <guang.zeng@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: RE: [PATCH v6 07/21] x86/fpu: Provide fpu_enable_guest_xfd_features()
- for KVM
-Thread-Topic: [PATCH v6 07/21] x86/fpu: Provide
- fpu_enable_guest_xfd_features() for KVM
-Thread-Index: AQHYA/gqbksPM+WOB0GCv7Jt5r6c6Kxbu3ZA
-Date:   Mon, 10 Jan 2022 05:25:14 +0000
-Message-ID: <BN9PR11MB527688C6B00A14C61B97ABE08C509@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220107185512.25321-1-pbonzini@redhat.com>
- <20220107185512.25321-8-pbonzini@redhat.com>
-In-Reply-To: <20220107185512.25321-8-pbonzini@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.6.200.16
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fbf94ab1-bc82-41aa-6d13-08d9d3f994ab
-x-ms-traffictypediagnostic: BN9PR11MB5451:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <BN9PR11MB5451757B74FCF13AB89B089D8C509@BN9PR11MB5451.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2803;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +VZi5OxPIVGA4FkmlublYI55cZX9NCA/gLRUKopMo536Wl1UOvF3/SksuFHv/jPQhLToQp1Dj17JEdzdTQSHZGVoTaWExnZMtWajB21TIkKDwPRzys66WK+LStJ2MnpDQOgZB5ELyJuoZVK5w2XdCFdnx7ScmHOkbBYvd1bPtdC6cO6buYYv6/DX3qJTuUbnPpVJbTuB+Nx+StgJveQWO44p/qs8T4iTcwjBChzJoYqHUkoVxOq5IHQ1Pvb+/+RAqhbV3ya7M78bcRGzW/wdE9q2W2A69HPjAi4ZRBhJ1c2HTsq00N9LDpLEgaO+Ss9EwvJbcsClAdcilWzcY1+EBg+Fb2zI0zA5YgzDOc3wnmXjbvV2xtNjX92/5K8x9ezBJa2UzJDTq71kqRikVLyRAOewGDh6ojzHep4wgiR3BQij6ZG6DNLTSQIK8BTl/bbTnYsywqe/Qrhri4KAKamrwj4xXyaYeiY2zpNJODKcv4eBDwjMqqekqnJCNNzfUrweHKEPK7YpKHRtDeGf3VvpZ5HNCVWs9PESRgSaycEL0nahvF8M/IKHHhSUNQwfB9QMc/6jASgq9a3OHYnGx2EQsRsOhoPY50HOsHVGiF3TDnSzsWbc5ug/V+9+Wnq5IXph6oFo4fnstDUu/u7lho/CN70v/zpaJLb7kN+WEgILTUKcjzd/HXj6Zn2aaDpeV48TlE259cL9p2/U8Kayx9Cdew==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(5660300002)(38100700002)(38070700005)(33656002)(4326008)(7696005)(83380400001)(71200400001)(6506007)(316002)(110136005)(107886003)(82960400001)(54906003)(4744005)(2906002)(508600001)(76116006)(52536014)(26005)(9686003)(64756008)(66556008)(55016003)(66446008)(8676002)(86362001)(8936002)(66476007)(186003)(66946007)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6kR6dFaonRvktbueKxZ5JdXyvhY1IJmZmna38Qb+jskb5dQ0mwyLTlH/zpuU?=
- =?us-ascii?Q?8jMqvoLFkEL7uD2hRY5M703U5/ofWod9Jy/tGrX+otpUadQWUi+xMImHo6lb?=
- =?us-ascii?Q?b5yDPXUx+A4pFu687TnOvOXVAzo2xSXD1P3oYFzKzqC9D1hOV14D9PuyMIPB?=
- =?us-ascii?Q?4AeSUhsWHvydFLGARrzopxs1E6oqCpeNzx1u4pe1GPeTIQCP1nU8RcV6qRXe?=
- =?us-ascii?Q?dl3jltpk/eoCYK6QrBJt5keAX/WsoCl19OqHRmg014+bPBDP8QB0ESidhdX6?=
- =?us-ascii?Q?sFN+HCjhv9DflwHXCwDqCMLvpBwN4BfgEstrWk17cKLBnimLSe0ITk6geSEJ?=
- =?us-ascii?Q?yZodGnyXvyjV7DRTm2NBHbyOzJAhKPDRwbhbyJ8/N7ATYkoT/5K75Had3V91?=
- =?us-ascii?Q?6o6eDqABYniChrL/EWGR8/XYszTEwDp/Uhdst7hngzsC2kBkw1M25IIfHQY/?=
- =?us-ascii?Q?oGScTLT5CK9YeMY7bYRJ6qNoO1f1jw7f5SkANrfAsO7O5Pz4FBZPtEoQzjx7?=
- =?us-ascii?Q?b9gu3B9afzQTdUMfLWAi6ls/cbhKCeUmqir7Br6lf0xarLh5zjIS2Z4G8jWo?=
- =?us-ascii?Q?qeO2gBVd+F+Un0a7w7fgSTG6aZaDaglYx1gcdTr8h/cOBeGncm2+czkg/nJo?=
- =?us-ascii?Q?1dWr1qvR6HjTMODTY3KBQPHeF2VXwn0or86Ax2P5ivACDmXMI+mIlk0HCE70?=
- =?us-ascii?Q?BxqJbfH5QEAX5KAyf9KbOBD24R1BSP449o9SZtjkSu0VxGvedldvVrat3CxJ?=
- =?us-ascii?Q?1ozDQf1h0fkOFtfPHL+Gm0CIKV3aZ01kT0Fm9OkbJX2HX1hKEhehQ3k7pnvx?=
- =?us-ascii?Q?GlMB7kehkBpQlh3NmDoOOYTNj/vGxotHRt65d6/BVpoL6cnJeyY8EYLdZhXj?=
- =?us-ascii?Q?QzKdk2q5ZxhItVRLLSn/Aq3c1Z26LkTV9Qf9EnEIPpzwX/Es0LPBnKsmMTpd?=
- =?us-ascii?Q?DV+cE5Wlty8GM/d3ZziBZhd76ZlcfbLnVTG7rBXhiBvLTuyaVwDpS4omqSI5?=
- =?us-ascii?Q?nYnm9oEkTmeZBewvR5fEyi2egxRX6i6LHU8gUszwd0up39KJC3ta5ENLg1b7?=
- =?us-ascii?Q?T7E2ZDiSSEaZ98kUwKym1doBC56UMI42zuaHNb2dJqJLXlrrYbJS3XaCTwQR?=
- =?us-ascii?Q?Zpr2BuM/ihYxm5JcPtyrL8Ypk5aUwuajgyrAcNTbCUWaBIiMmLaYAlGP4sa2?=
- =?us-ascii?Q?cSc/wjW/tsrlhk5GvSBpup3jploIMuexAFxuOtdJ26FKNLUPtBfrcT51JVt/?=
- =?us-ascii?Q?73V93yjlyMFtVebtEYXtKcWnrCv91b+LnCa97/ZRtvB+06/nDaYr9q5xMmQ7?=
- =?us-ascii?Q?HiaQNaoYiP+0fHJGywdKEYMW7yh7Q+x/GOXZEwz+aWD88g0eWj+IhSxVxtVI?=
- =?us-ascii?Q?rTCnaC1yVB1mYWtmyNwqEJS/15r6xGBPeVOxmUUw9HDs8MTuli/mB1XOVURD?=
- =?us-ascii?Q?CWMicwl24YBCjyZHKiEso46UB9ZGvELMMPrTzNUtBZlLPkUHSWZiCgsM59w9?=
- =?us-ascii?Q?7IMmcz5c9vF9HBxQZpgv4ZzYGP7ttgihnSIx+tz76E3vYd9WqHUMb6OFA84F?=
- =?us-ascii?Q?6zC/7oWoA2tyi3rlAziMdevavVX0V8BVhvpenw5bMx/3q84uy0mpzaTstOyx?=
- =?us-ascii?Q?N4QTrLnJt369ckmgJ6AwFgk=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fbf94ab1-bc82-41aa-6d13-08d9d3f994ab
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2022 05:25:14.2184
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: p1Qwdf2wfimDwZlJ9L1Mi4qxqmoUUdn0w5waCbhfpx4ITBEgDywnKhPWNPpPfWk/dTYey/r9NS7i24GVuvRESg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5451
-X-OriginatorOrg: intel.com
+        id S238805AbiAJFlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 00:41:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238757AbiAJFlM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 00:41:12 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAABC06173F
+        for <kvm@vger.kernel.org>; Sun,  9 Jan 2022 21:41:12 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id y15-20020a17090a600f00b001b3501d9e7eso9541951pji.8
+        for <kvm@vger.kernel.org>; Sun, 09 Jan 2022 21:41:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=P1aAJUJH4MNJA7hqf+LRqj2aY6nDmgn4ybYnyTkArAE=;
+        b=DKYr9uQS09X33zIc7+1zVb3NQ0xRf8HBTMLLm3p4pinup+CxLE+HbHLqhHvzqvqAb3
+         olhmXPyqbPsUCCdHiJUGtosE19JLvR49S1qjZI4NX924Y68uziCJNmqT7LElQs3CUgru
+         ExwQbM7Qg6Bp7LwtNaXcprLPD7B9xYFoOVH2UWJDlxBXG+XmnTWYmM1BLt8KxaIs0Ln/
+         W4dqLxfV+V9VxkGMAIITblVgrtK4ZoaKN54r589zJ60edJKeaDB8mrTHaHEhBl8zRdZ5
+         R3D+YC4m8EYrXYfBL75jWzbnqUsG/7N57JvFqLytLroLG8h0FO7JdV6M7gHFF0CP0/Lb
+         9J2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=P1aAJUJH4MNJA7hqf+LRqj2aY6nDmgn4ybYnyTkArAE=;
+        b=byipa7fZXC81zhQfgzrf+QO60813s1OmoAYw8G2CydFAtMYLaEJn4Iw4v32yLyCaU3
+         X3U0C407cvlBRKunePVLQSmq6W3u9RcnqjiUoXF57CU5mekFgDn6wfFrCvVXmQxWInsl
+         99i1/Qy7f1RaJHU3q++TRWDwemziUejiqci73Y1dRj2hGH3mcjOQdyTfkjpX5YZqwKt3
+         uzeAWh26XuizxTfbHVV+t47RyT5GQNaglzbMBmyAgd1rXwPvywwiEqCWxLu7tQ5kpbK5
+         hcqpP5cpAevaQLUvlQPeNTFBkixf5qby2apw7O5n3yr8ylO71vvxN2m6h6jlgoWH8v2v
+         3aNw==
+X-Gm-Message-State: AOAM5321GpujtkA0LYmSdmS/tFL1HG5towjAKuHjNk4xCM8o8gly736v
+        BUEnF4V48f2N96oowNMSC50MZFzryDc=
+X-Google-Smtp-Source: ABdhPJy2ff3+Ra0eAAdVIR8qPPRFVBp537t4vFeJtOPbXf4dGRZKqRvR8mgwpxO5W3cOouanq7W4upyND6M=
+X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:d64:b0:4ba:cb6f:87e0 with SMTP id
+ n36-20020a056a000d6400b004bacb6f87e0mr74125375pfv.72.1641793271719; Sun, 09
+ Jan 2022 21:41:11 -0800 (PST)
+Date:   Sun,  9 Jan 2022 21:40:41 -0800
+Message-Id: <20220110054042.1079932-1-reijiw@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
+Subject: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
+ uninitialized vCPUs
+From:   Reiji Watanabe <reijiw@google.com>
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Paolo,
+vcpu_allowed_register_width() checks if all the VCPUs are either
+all 32bit or all 64bit.  Since the checking is done even for vCPUs
+that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
+the non-initialized vCPUs are erroneously treated as 64bit vCPU,
+which causes the function to incorrectly detect a mixed-width VM.
 
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Sent: Saturday, January 8, 2022 2:55 AM
->=20
-> +/*
-> +  * fpu_enable_guest_xfd_features - Check xfeatures against guest perm
-> and enable
-> +  * @guest_fpu:         Pointer to the guest FPU container
-> +  * @xfeatures:         Features requested by guest CPUID
-> +  *
-> +  * Enable all dynamic xfeatures according to guest perm and requested
-> CPUID.
-> +  *
-> +  * Return: 0 on success, error code otherwise
-> +  */
+Fix vcpu_allowed_register_width() to skip the check for vCPUs that
+are not initialized yet.
 
-Just a NIT. This function itself has nothing to do with guest CPUID
-which is a caller-side policy. It simply enable xfeatures per request.
+Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ arch/arm64/kvm/reset.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Thanks
-Kevin
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 426bd7fbc3fd..ef78bbc7566a 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+ 	if (kvm_has_mte(vcpu->kvm) && is32bit)
+ 		return false;
+ 
++	/*
++	 * Make sure vcpu->arch.target setting is visible from others so
++	 * that the width consistency checking between two vCPUs is done
++	 * by at least one of them at KVM_ARM_VCPU_INIT.
++	 */
++	smp_mb();
++
+ 	/* Check that the vcpus are either all 32bit or all 64bit */
+ 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
++		/* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
++		if (tmp->arch.target == -1)
++			continue;
++
+ 		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
+ 			return false;
+ 	}
+
+base-commit: df0cc57e057f18e44dac8e6c18aba47ab53202f9
+-- 
+2.34.1.575.g55b058a8bb-goog
+
