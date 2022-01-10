@@ -2,191 +2,350 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD4A648A118
-	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 21:46:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CFEC48A13D
+	for <lists+kvm@lfdr.de>; Mon, 10 Jan 2022 21:56:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244042AbiAJUqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 15:46:37 -0500
-Received: from mail-bn8nam12on2053.outbound.protection.outlook.com ([40.107.237.53]:37569
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S242206AbiAJUqg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 15:46:36 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cpiVwW5E862HJHrVYJ/Iz/7TK19VkQria/qW8yT0HjzN9eBeBaKDhEPppv04BXiAmZS9EtAdDyy2jmeuiH+UvPBSuKRwKyicwgZWZWNbMxtFCBU1SrpGhbYaf6VAl89KlvMCXclpWJc322CdXs+j9hvQhWKgkfx/VkW/uTi2ZKgvqb92F6xEB7d2wxihtm3LM5IMbLG/1TOWtxyeR8qFMmq4L4IPZIMmVSmUdRXRhNU6lW9z7MGNfqIUSkZWupvS/3nu0rYNZt88wnJ5glNProy67GrCh+GCSTipQWsygSCSwfNSUozOOz7YjYAZQWxM84jn5L3zihxdCA63Yw4EWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v3wSmiZy6UrSJdUTRIpQJhZlBT0LMLY2TXMV7P7SYdM=;
- b=Vnm6sKlPT+Wei8eO80VGEGI35p+cpWLHmD3gWIDK6/0DeZp/hVxj8mH8NWToiWigkP5Wko41m8q36ycrOestmyx4HjB7764sCPnOMjDVqVYoC1IJvoz1JsVsyOMRmvYyFPtFxAo1LnjSeKcbmHLGmtdk/33KSkcZvi3f8gIAm+WeoEEj5RbSuA79+jGZrrQz0SMvKXHHP90t15dzBQjkxGEk/QOI/5w5/4gD0Ed2daz2Txx3nr0Bh05oyj63Et63aU3qLCUk2pTnE6UVdA9KMNH7y0dZgANagkSnCwANFegqYbCFx+gpFhbOrpOFxhvOx+/YzmbhCdTmvmQX67ZCqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v3wSmiZy6UrSJdUTRIpQJhZlBT0LMLY2TXMV7P7SYdM=;
- b=RSjXRpuwsr8tDlyygVqLIERMt56sPiY6c+Yb3r8a9tc+HE/Fdl90HU5lz9zV+5rU7ZyOkrc5siHl7DWBUYgDqTvCdk728C+3Lyy10p7L/88KTu8ILwxM7yvQI/SEGHM4xRPR1061skj4u1NuLVMui4cbnoe1qCCWJbc60fyo7l0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2510.namprd12.prod.outlook.com (2603:10b6:802:28::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.11; Mon, 10 Jan
- 2022 20:46:33 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c%6]) with mapi id 15.20.4867.012; Mon, 10 Jan 2022
- 20:46:33 +0000
-Cc:     brijesh.singh@amd.com, Borislav Petkov <bp@alien8.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME features
- earlier in boot
-To:     Venu Busireddy <venu.busireddy@oracle.com>,
-        Michael Roth <michael.roth@amd.com>
-References: <YbjYZtXlbRdUznUO@dt> <YbjsGHSUUwomjbpc@zn.tnic>
- <YbkzaiC31/DzO5Da@dt> <b18655e3-3922-2b5d-0c35-1dcfef568e4d@amd.com>
- <20211215174934.tgn3c7c4s3toelbq@amd.com> <YboxSPFGF0Cqo5Fh@dt>
- <Ybo1C6kpcPJBzMGq@zn.tnic> <20211215201734.glq5gsle6crj25sf@amd.com>
- <YbpSX4/WGsXpX6n0@zn.tnic> <20211215212257.r4xisg2tyiwdeleh@amd.com>
- <YdNKIOg+9LAaDDF6@dt> <5913c603-2505-7865-4f8e-2cbceba8bd12@amd.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <1148bed5-29dc-04b2-591b-c7ef2d2664c7@amd.com>
-Date:   Mon, 10 Jan 2022 14:46:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-In-Reply-To: <5913c603-2505-7865-4f8e-2cbceba8bd12@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1PR13CA0380.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::25) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S1343725AbiAJU4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 15:56:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39882 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343704AbiAJU4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 15:56:17 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEBC2C06173F
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 12:56:16 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id 59-20020a17090a09c100b001b34a13745eso728742pjo.5
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 12:56:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DSBL73diG3nJJJKmUuDFKV7a62ax2dpKOBHt0+DgKYE=;
+        b=AWioNWY29OtZcO9pgL+kJ+0OmQe6ZNGKCrr/AjpmTFYknhk0HOJ4HQSzpJFtRI5GXD
+         GRdMaZEsoSOHxF7Q9Gi4dEW05UHcEPcuDN/va3cMiFZVGgOdnqjcpvzrDfYXxDJrbtL+
+         8WytxWG+JMFUcibQWTyCxOyJHJ6J1P4vyoyQAI2mJ5bihjmzSZY5GXy1FrkruHm4WHPr
+         A+qzEA8UrIfqqJcpQFl/yKnFOO6aQFIo1P5TfYKADi40I8287RXaA6iwFnBt9DtDk4am
+         JDJRyqVEbCxjOCKYJRpZRZfOV+TUiqCILJkHNWMxbVB2NrzOPsmcFKv5jsvcfcMBRG4n
+         b8hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DSBL73diG3nJJJKmUuDFKV7a62ax2dpKOBHt0+DgKYE=;
+        b=6rC5kuR1gOUpPMQNwghlycKHdo8sR7wzgSIna9tbDXVabRTB6eR2/+VwL4/PIKBbjw
+         ccxFHoUSM3lCQe/vFieyWzwBNL9iwDV5ymSnJTKoGIjPldS4bv6yzEHg/p7DgOZ9AVTI
+         9tgyBirHx6LV5hgQMYkPlQTOX3XazJk0JhWKC5GX1U3B3fnaku3GYOuQcZMr2ac7bqcT
+         PizdqjKXnjGQdlAcm1qJtlnIrZxvgPGk4LnVYDBsrjzpew2crhf90h/u5PL4kIMNCPch
+         5b/kRSJTwI2+l9J+RvUrUoZ5BUQpAWbCREzmtq/tZ/DUwvUP/1TM4VmHIq5PSNKlJe5k
+         XoOA==
+X-Gm-Message-State: AOAM531wPe+3nZoBL4YciIScfpkR0YcIWTICT5GiwbSM88TfOF/N7UUR
+        tayRTGXUZXBToKnAfT/L1rvuJg==
+X-Google-Smtp-Source: ABdhPJzT/QEahrJPqR0Htk2lrdLL2kxZYmDM33pdZKOfmYxDZ45r9JljZNMcdO7sBn2klbr5TX6tuA==
+X-Received: by 2002:a17:90a:688d:: with SMTP id a13mr1038849pjd.164.1641848176266;
+        Mon, 10 Jan 2022 12:56:16 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k8sm8097188pfc.177.2022.01.10.12.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 12:56:15 -0800 (PST)
+Date:   Mon, 10 Jan 2022 20:56:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kechen Lu <kechenl@nvidia.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, wanpengli@tencent.com,
+        vkuznets@redhat.com, mst@redhat.com, somduttar@nvidia.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 3/3] KVM: x86: add vCPU ioctl for HLT exits
+ disable capability
+Message-ID: <Ydyda6K8FrFveZX7@google.com>
+References: <20211221090449.15337-1-kechenl@nvidia.com>
+ <20211221090449.15337-4-kechenl@nvidia.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 59b7a56d-6e20-4fa4-830a-08d9d47a4985
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2510:EE_
-X-Microsoft-Antispam-PRVS: <SN1PR12MB25109DBAA503DD0EDE68CC5FE5509@SN1PR12MB2510.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OtyWPiWZhyQyhhvFSyOsgAstFPynDQi+rJ5qoWgm43kTMvF9EJUmEVBZYBbjhHqAIIoaQCoTScy54QcqSiW7uU8dqp+b3nqbSlF8HxlpjdHkXJ0xDmbi3o5yr/mspAPHsKF5mOpbhdItMAIY2JcG9yH4oE3DlOcNuGPI5I7TThKkYzbuht9wsTaouCKBjtVrOKQLcTi3iCTKQAQ9PI+2ZgjuclYSct4NAIiQWKQmGhLQH08y9iw9W5A4ESElaAp31rGBcSu92FQ4T3GGcGffNsRKyuTWDbPDlA4WAcXcQwyY7anB6MRN6BE5G/34+uZqENzK0VoH1zNoYBDqvEvPz8x2wMUi0hOxD4Bim2RnEyOSPPzvlIw+HAOSXAL/5q/TtEhw0a5zn6kcOnx7pYu23qbv38ElnqEROFQOd53NNwIWRzRGoTkIbQTAeBVpldqRdPjTgRljlc70aKyjulgV+1VJhomkxEfbGOsxU6P51xXgiHrWsqAIm5vZrRENI3UooJHLKjt3goqbOAwhvPqUNfvlJn097xFQ2GxIpYAaXNtqB19kxH6nc+3ii1QhiNm4jl+mIi0hpNGBl+G6MRUEvvVSDYKIkzxCxZJk/TzZCvtIkPZm5BcH4yzzHP8Mwe7xpRzzOpu9+jR2SUvGc8+cm/3woQza9ABegx4OEExCZ6QgG+FX0EJRjVVdst07NQ2M19MHmg3IFpXc1bsai7umSs17VCl+jNW+WXxOQRCdixQR9LsLQZ+JJd63ApnKOdXz
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(36756003)(2906002)(7406005)(66556008)(66946007)(66476007)(31686004)(6636002)(6666004)(6506007)(4001150100001)(7416002)(5660300002)(186003)(53546011)(38100700002)(54906003)(110136005)(316002)(6512007)(26005)(4326008)(86362001)(508600001)(44832011)(8936002)(31696002)(83380400001)(2616005)(8676002)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QlpvZkZacVdaMkdyZGV5VlBmTlhCVVFqMTJwbUJETVF6WlNMZWRIcG1sbDNQ?=
- =?utf-8?B?ZGpybU1Tai80Tk1TNEJDWmJXTW5ORStZMkxodmZFZGdaNktQUUhLOHlOMGJE?=
- =?utf-8?B?RHp0NHk5bXVXbVNQNXNQbjhqV3BjYTVGMzVmZ0dNNFBHZXZqTzdYdFVzaTdz?=
- =?utf-8?B?S3BHSHRzWkxaNEpHbHprTUxLdWs2UDJIWkNsN2pBRGE3b1lVZE1LRzFUY2tF?=
- =?utf-8?B?REY3cGxuTWRpSDNxOGZWcHhlNkJ4T05zQ0pQUVF5SFhUdlZWQkkxZnZlZm5T?=
- =?utf-8?B?UmUzbkhnbEJGZmwyc3B0ZDJ4UlYwUGlYeVdpMVdJUVBIT3MzWkJSQldXbjFn?=
- =?utf-8?B?RWdUd2NzK2ROUWlaUHRtc0JTNWdabUlCcndhQUlZbGREWHdJZTR3K2JEZVRM?=
- =?utf-8?B?NmdTaG5tU1pzM1lYa1ZsMWNSbjU4WFVQbEtKSzRiTjlzV0c0SnhBd0k0ZGxZ?=
- =?utf-8?B?bk9RbG9qUlBXR3VSSzltc0VDdzlDaVpxRjNaVnkrNkhHZkFydVgrN3dFZmEw?=
- =?utf-8?B?ejRYVVlWSGc1bmt3NEhWTU9kZ1dKYTZNWUo5bm1QeW9rci93cG02aisvL0Rl?=
- =?utf-8?B?WDM1MmJwMXM0L25BWStlOVRrRVp0bVFuMGREN21YVVg2UUV2eXRkZ0FMemYx?=
- =?utf-8?B?V2dWVzU4ZG5LaUNjQ0FmT3FUR1hyL2ZxS0lNOEl1TnEvZEk5ZFpQL3lFSFpO?=
- =?utf-8?B?T0VwV1RZdU96elc4aUxhN2Y3OCtjRmN6TGhxMHRxWEtxSUx2VHRCSXJOWHRz?=
- =?utf-8?B?cVRWaWdZSEc2NXJ6VjVnVThqYnhmQ3R3RzZ3SWFsbzA0cW80ZklYd1ZzQ1NH?=
- =?utf-8?B?dXRCekFWcGZJcU4rZmtBWFpoS09nMUxPOE41VXJYd3luQTZoTFE5U3E0QUU1?=
- =?utf-8?B?Kyt5djhzYStmS1FMZUJyVGRPUFBNckRRRmgyV01NaEZRSEtrWnVpTSs3bUFv?=
- =?utf-8?B?V0JnSVlpMElzRWpKclcvK0lhcDZsWUVoTUhGenNURngwQnl4T3NocVc4cUNy?=
- =?utf-8?B?UlkzdU9lNFl3V1QydFArdXZVK1RKUFlHemZnbTBuMTR5dHZsemtrR2JzYmRa?=
- =?utf-8?B?OGkwLzRudzB2VSt1RVlVOFJqUWdRS1I0TFZZM08vQm5kTUp4cVRsSVJjUzkv?=
- =?utf-8?B?T3VVdHBGVHpEdnBQN2NLYm15TGFGUVExcU1sUHVHaFU2QTJCbHhBS2E1SGMy?=
- =?utf-8?B?N1p6TEwxbWRLelMwdHlJVDZ1eXNMcythRHkzMXlOUEF2T0F2Rm5Vb3UyWi9E?=
- =?utf-8?B?Y2E0WDlXdHhOVG1rWmFiazdCcWRCYnVPZkdlaVhoMTZUVXhjSEljcDAvbDZk?=
- =?utf-8?B?SjMrNld1bEcwbWVncUwzZkVWMmhqOVY3blVtcGxtSjNQSDJzWitldkNIc3Qz?=
- =?utf-8?B?SmxXOXBNaXI0TFJmN2lJVjk4TnJWWTh4WENtTmM1UlMvaUdsTTNRaGxLNjIz?=
- =?utf-8?B?cVVnbXR4aThwdnVwV0lBeUg1ZGR6ZGpEbUZkZDFuV0xHNy91WkVjRGd4dW5H?=
- =?utf-8?B?bTE2UGY4NlV4czQySWZjNnNrVVdsZS9ROWhmWVVYSk1Fc01XZG12QTc3VGV0?=
- =?utf-8?B?OGl2b2dkOHp6WmVBUGJpWEpmenhUQUNQQUtSdm53eURrS0RTYzhHQ3hWN3Z2?=
- =?utf-8?B?cVJzOXNkWXZySFNoYjZZWW15Umt1dGxzSC8zU1VZMnlDdWtDVDVEdzUwSlZD?=
- =?utf-8?B?Z29wTkRxemhvOE5sNmg5N0Q1eFo5cDJUSlpSTlFpdTh0Sm9pdHRJeFZMYXVQ?=
- =?utf-8?B?Q3RWZUNKTjYyUzF1QlBUS2FJc0V5dWs3dWxiT0sreFo1cFM4aFA0QXhCa0Nz?=
- =?utf-8?B?Z1ExT21BVWFTR0UvbG9JaHZQcGxEdTNyWk5FeHpSUFJOTG0zT0I3OFBOUlVl?=
- =?utf-8?B?M0p4VGkrcHdBbzF6ZjlYVlNFanZ1LzQvd0FXYWtrMkZZWXZQbzdmSU9DcFFN?=
- =?utf-8?B?SGR5dnZRWUhZNFdnS1RPL285eUxPMU1OMHllNXdlM1lEeXFzOGtnbUExanJD?=
- =?utf-8?B?anFkeEhuaFFSNXlWbFFMRDZKVVJUL0ZkWUtzRktIdWIvZ2UyK2lGMXlTYXQ1?=
- =?utf-8?B?MStmTnkvbGpES3RVd2RtVFFEb3hCanp6SjBiaGdhaEpyanMwVXJ5RFhzL2dD?=
- =?utf-8?B?a1F1RFdFVWdUOFMrcVpKZ3AvcVI2RGpoVFBiZUN4aENzb3M5cHp6K3hpT3k3?=
- =?utf-8?Q?b022HXUKdNzzPfd1pucPToQ=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59b7a56d-6e20-4fa4-830a-08d9d47a4985
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2022 20:46:33.7809
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QkaCiTq6NgxLgB+YUDiCwtf9FPPMl3R0X3ksIlsmGIJh7AOc5sbc/2+YzocoWOnRkxVJ4l8e72oemOZpzIX0hQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2510
+Content-Type: multipart/mixed; boundary="tQ3jC/mhVwyhSXsr"
+Content-Disposition: inline
+In-Reply-To: <20211221090449.15337-4-kechenl@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Venu,
 
-On 1/5/22 1:34 PM, Brijesh Singh wrote:
-> 
-> 
-> On 1/3/22 1:10 PM, Venu Busireddy wrote:
->> On 2021-12-15 15:22:57 -0600, Michael Roth wrote:
->>> On Wed, Dec 15, 2021 at 09:38:55PM +0100, Borislav Petkov wrote:
->>>>
->>>> But it is hard to discuss anything without patches so we can continue
->>>> the topic with concrete patches. But this unification is not
->>>> super-pressing so it can go ontop of the SNP pile.
->>>
->>> Yah, it's all theoretical at this point. Didn't mean to derail things
->>> though. I mainly brought it up to suggest that Venu's original 
->>> approach of
->>> returning the encryption bit via a pointer argument might make it 
->>> easier to
->>> expand it for other purposes in the future, and that naming it for that
->>> future purpose might encourage future developers to focus their efforts
->>> there instead of potentially re-introducing duplicate code.
->>>
->>> But either way it's simple enough to rework things when we actually
->>> cross that bridge. So totally fine with saving all of this as a future
->>> follow-up, or picking up either of Venu's patches for now if you'd still
->>> prefer.
->>
->> So, what is the consensus? Do you want me to submit a patch after the
->> SNP changes go upstream? Or, do you want to roll in one of the patches
->> that I posted earlier?
->>
-> 
-> Will incorporate your changes in v9. And will see what others say about it.
-> 
+--tQ3jC/mhVwyhSXsr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Now that I am incorporating the feedback in my wip branch, at this time 
-I am dropping your cleanup mainly because some of recommendation may 
-require more rework down the line; you can submit your recommendation as 
-cleanup after the patches are in. I hope this is okay with you.
+On Tue, Dec 21, 2021, Kechen Lu wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d5d0d99b584e..d7b4a3e360bb 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5072,6 +5072,18 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  			kvm_update_pv_runtime(vcpu);
+>  
+>  		return 0;
+> +
+> +	case KVM_CAP_X86_DISABLE_EXITS:
+> +		if (cap->args[0] && (cap->args[0] &
+> +				~KVM_X86_DISABLE_VALID_EXITS))
 
-thanks
+Bad alignment, but there's no need for the !0 in the first place, i.e.
+
+		if (cap->args[0] & ~KVM_X86_DISABLE_VALID_EXITS)
+
+but that's also incomplete as this path only supports toggling HLT, yet allows
+all flavors of KVM_X86_DISABLE_VALID_EXITS.  Unless there's a good reason to not
+allow maniuplating the other exits, the proper fix is to just support everything.
+
+> +			return -EINVAL;
+> +
+> +		vcpu->arch.hlt_in_guest = (cap->args[0] &
+> +			KVM_X86_DISABLE_EXITS_HLT) ? true : false;
+
+Hmm, this behavior diverges from the per-VM ioctl, which doesn't allow re-enabling
+a disabled exit.  We can't change the per-VM behavior without breaking backwards
+compatibility, e.g. if userspace does:
+
+	if (allow_mwait)
+		kvm_vm_disable_exit(KVM_X86_DISABLE_EXITS_MWAIT)
+	if (allow_hlt)
+		kvm_vm_disable_exit(KVM_X86_DISABLE_EXITS_HLT)
+
+then changing KVM behavior would result in MWAIT behavior intercepted when previously
+it would have been allowed.  We have a userspace VMM that operates like this...
+
+Does your use case require toggling intercepts?  Or is the configuration static?
+If it's static, then the easiest thing would be to follow the per-VM behavior so
+that there are no suprises.  If toggling is required, then I think the best thing
+would be to add a prep patch to add an override flag to the per-VM ioctl, and then
+share code between the per-VM and per-vCPU paths for modifying the flags (attached
+as patch 0003).
+
+Somewhat related, there's another bug of sorts that I think we can safely fix.
+KVM doesn't reject disabling of MWAIT exits when MWAIT isn't allowed in the guest,
+and instead ignores the bad input.  Not a big deal, but fixing that means KVM
+doesn't need to check kvm_can_mwait_in_guest() when processing the args to update
+flags.  If that breaks someone's userspace, the alternative would be to tweak the
+attached patch 0003 to introduce the OVERRIDE, e.g.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f611a49ceba4..3bac756bab79 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5053,6 +5053,8 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+
+ #define kvm_ioctl_disable_exits(a, mask)                                    \
+ ({                                                                          \
++       if (!kvm_can_mwait_in_guest())                                       \
++               (mask) &= KVM_X86_DISABLE_EXITS_MWAIT;                       \
+        if ((mask) & KVM_X86_DISABLE_EXITS_OVERRIDE) {                       \
+                (a).mwait_in_guest = (mask) & KVM_X86_DISABLE_EXITS_MWAIT;   \
+                (a).hlt_in_guest = (mask) & KVM_X86_DISABLE_EXITS_HLT;       \
+
+
+If toggling is not required, then I still think it makes sense to add a macro to
+handle propagating the capability args to the arch flags.
+
+--tQ3jC/mhVwyhSXsr
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-Reject-disabling-of-MWAIT-interception-when-.patch"
+
+From 10798eb3fc1fe7f7240acd0f2667a6519ae445c5 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 10 Jan 2022 12:29:28 -0800
+Subject: [PATCH] KVM: x86: Reject disabling of MWAIT interception when not
+ allowed
+
+Reject KVM_CAP_X86_DISABLE_EXITS if userspace attempts to disable MWAIT
+exits and KVM previously reported (via KVM_CHECK_EXTENSION) that MWAIT is
+not allowed in guest, e.g. because it's not supported or the CPU doesn't
+have an aways-running APIC timer.
+
+Fixes: 4d5422cea3b6 ("KVM: X86: Provide a capability to disable MWAIT intercepts")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c194a8cbd25f..9de22dceb49b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4087,6 +4087,17 @@ static inline bool kvm_can_mwait_in_guest(void)
+ 		boot_cpu_has(X86_FEATURE_ARAT);
+ }
+ 
++static u64 kvm_get_allowed_disable_exits(void)
++{
++	u64 r = KVM_X86_DISABLE_EXITS_HLT | KVM_X86_DISABLE_EXITS_PAUSE |
++		KVM_X86_DISABLE_EXITS_CSTATE;
++
++	if(kvm_can_mwait_in_guest())
++		r |= KVM_X86_DISABLE_EXITS_MWAIT;
++
++	return r;
++}
++
+ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+ 					    struct kvm_cpuid2 __user *cpuid_arg)
+ {
+@@ -4202,10 +4213,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = KVM_CLOCK_VALID_FLAGS;
+ 		break;
+ 	case KVM_CAP_X86_DISABLE_EXITS:
+-		r |=  KVM_X86_DISABLE_EXITS_HLT | KVM_X86_DISABLE_EXITS_PAUSE |
+-		      KVM_X86_DISABLE_EXITS_CSTATE;
+-		if(kvm_can_mwait_in_guest())
+-			r |= KVM_X86_DISABLE_EXITS_MWAIT;
++		r |= kvm_get_allowed_disable_exits();
+ 		break;
+ 	case KVM_CAP_X86_SMM:
+ 		/* SMBASE is usually relocated above 1M on modern chipsets,
+@@ -5779,11 +5787,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		break;
+ 	case KVM_CAP_X86_DISABLE_EXITS:
+ 		r = -EINVAL;
+-		if (cap->args[0] & ~KVM_X86_DISABLE_VALID_EXITS)
++		if (cap->args[0] & ~kvm_get_allowed_disable_exits())
+ 			break;
+ 
+-		if ((cap->args[0] & KVM_X86_DISABLE_EXITS_MWAIT) &&
+-			kvm_can_mwait_in_guest())
++		if (cap->args[0] & KVM_X86_DISABLE_EXITS_MWAIT)
+ 			kvm->arch.mwait_in_guest = true;
+ 		if (cap->args[0] & KVM_X86_DISABLE_EXITS_HLT)
+ 			kvm->arch.hlt_in_guest = true;
+-- 
+2.34.1.575.g55b058a8bb-goog
+
+
+--tQ3jC/mhVwyhSXsr
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0003-KVM-x86-Let-userspace-re-enable-previously-disabled-.patch"
+
+From a8e75742293c1c400dd5aa1d111825046cf26ab2 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 10 Jan 2022 12:40:31 -0800
+Subject: [PATCH] KVM: x86: Let userspace re-enable previously disabled exits
+
+Add an OVERRIDE flag to KVM_CAP_X86_DISABLE_EXITS allow userspace to
+re-enable exits and/or override previous settings.  There's no real use
+case for the the per-VM ioctl, but a future per-vCPU variant wants to let
+userspace toggle interception while the vCPU is running; add the OVERRIDE
+functionality now to provide consistent between between the per-VM and
+per-vCPU variants.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ Documentation/virt/kvm/api.rst |  5 +++++
+ arch/x86/kvm/x86.c             | 37 +++++++++++++++++++++++-----------
+ include/uapi/linux/kvm.h       |  4 +++-
+ 3 files changed, 33 insertions(+), 13 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 9460941d38d7..c42e653891a2 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6617,6 +6617,7 @@ Valid bits in args[0] are::
+   #define KVM_X86_DISABLE_EXITS_HLT              (1 << 1)
+   #define KVM_X86_DISABLE_EXITS_PAUSE            (1 << 2)
+   #define KVM_X86_DISABLE_EXITS_CSTATE           (1 << 3)
++  #define KVM_X86_DISABLE_EXITS_OVERRIDE         (1ull << 63)
+ 
+ Enabling this capability on a VM provides userspace with a way to no
+ longer intercept some instructions for improved latency in some
+@@ -6625,6 +6626,10 @@ physical CPUs.  More bits can be added in the future; userspace can
+ just pass the KVM_CHECK_EXTENSION result to KVM_ENABLE_CAP to disable
+ all such vmexits.
+ 
++By default, this capability only disables exits.  To re-enable an exit, or to
++override previous settings, userspace can set KVM_X86_DISABLE_EXITS_OVERRIDE,
++in which case KVM will enable/disable according to the mask (a '1' == disable).
++
+ Do not enable KVM_FEATURE_PV_UNHALT if you disable HLT exits.
+ 
+ 7.14 KVM_CAP_S390_HPAGE_1M
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7741a5980334..f611a49ceba4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4089,11 +4089,10 @@ static inline bool kvm_can_mwait_in_guest(void)
+ 
+ static u64 kvm_get_allowed_disable_exits(void)
+ {
+-	u64 r = KVM_X86_DISABLE_EXITS_HLT | KVM_X86_DISABLE_EXITS_PAUSE |
+-		KVM_X86_DISABLE_EXITS_CSTATE;
++	u64 r = KVM_X86_DISABLE_VALID_EXITS;
+ 
+-	if(kvm_can_mwait_in_guest())
+-		r |= KVM_X86_DISABLE_EXITS_MWAIT;
++	if (!kvm_can_mwait_in_guest())
++		r &= ~KVM_X86_DISABLE_EXITS_MWAIT;
+ 
+ 	return r;
+ }
+@@ -5051,6 +5050,26 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+ 	return r;
+ }
+ 
++
++#define kvm_ioctl_disable_exits(a, mask)				     \
++({									     \
++	if ((mask) & KVM_X86_DISABLE_EXITS_OVERRIDE) {			     \
++		(a).mwait_in_guest = (mask) & KVM_X86_DISABLE_EXITS_MWAIT;   \
++		(a).hlt_in_guest = (mask) & KVM_X86_DISABLE_EXITS_HLT;	     \
++		(a).pause_in_guest = (mask) & KVM_X86_DISABLE_EXITS_PAUSE;   \
++		(a).cstate_in_guest = (mask) & KVM_X86_DISABLE_EXITS_CSTATE; \
++	} else {							     \
++		if ((mask) & KVM_X86_DISABLE_EXITS_MWAIT)		     \
++			(a).mwait_in_guest = true;			     \
++		if ((mask) & KVM_X86_DISABLE_EXITS_HLT)			     \
++			(a).hlt_in_guest = true;			     \
++		if ((mask) & KVM_X86_DISABLE_EXITS_PAUSE)		     \
++			(a).pause_in_guest = true;			     \
++		if ((mask) & KVM_X86_DISABLE_EXITS_CSTATE)		     \
++			(a).cstate_in_guest = true;			     \
++	}								     \
++})
++
+ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 				     struct kvm_enable_cap *cap)
+ {
+@@ -5794,14 +5813,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		if (kvm->created_vcpus)
+ 			goto disable_exits_unlock;
+ 
+-		if (cap->args[0] & KVM_X86_DISABLE_EXITS_MWAIT)
+-			kvm->arch.mwait_in_guest = true;
+-		if (cap->args[0] & KVM_X86_DISABLE_EXITS_HLT)
+-			kvm->arch.hlt_in_guest = true;
+-		if (cap->args[0] & KVM_X86_DISABLE_EXITS_PAUSE)
+-			kvm->arch.pause_in_guest = true;
+-		if (cap->args[0] & KVM_X86_DISABLE_EXITS_CSTATE)
+-			kvm->arch.cstate_in_guest = true;
++		kvm_ioctl_disable_exits(kvm->arch, cap->args[0]);
++
+ 		r = 0;
+ disable_exits_unlock:
+ 		mutex_unlock(&kvm->lock);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index fbfd70d965c6..5e0ffc87a578 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -798,10 +798,12 @@ struct kvm_ioeventfd {
+ #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+ #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+ #define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
++#define KVM_X86_DISABLE_EXITS_OVERRIDE	     (1ull << 63)
+ #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
+                                               KVM_X86_DISABLE_EXITS_HLT | \
+                                               KVM_X86_DISABLE_EXITS_PAUSE | \
+-                                              KVM_X86_DISABLE_EXITS_CSTATE)
++                                              KVM_X86_DISABLE_EXITS_CSTATE | \
++					      KVM_X86_DISABLE_EXITS_OVERRIDE)
+ 
+ /* for KVM_ENABLE_CAP */
+ struct kvm_enable_cap {
+-- 
+2.34.1.575.g55b058a8bb-goog
+
+
+--tQ3jC/mhVwyhSXsr--
