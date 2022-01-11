@@ -2,202 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7489E48A771
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 06:51:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BD0448A7A6
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 07:18:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347284AbiAKFvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 00:51:33 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:38962 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231574AbiAKFvc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 00:51:32 -0500
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20B3TLlu018725;
-        Tue, 11 Jan 2022 05:51:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
- bh=YO3j0dEoF7LicnQxvUSHOlvUYubFDiNgPCUKMYWKnvM=;
- b=Nqo8kWvnB/yQSM4UEf8lOYZZWBQuRnkZVWi8d+wDSMSg6dRB2p+OQ8teh/F7InlaBlsa
- KE56R1mIAh5xvfu2ZikpMrp6jP9X4KjWD6bDqsFoGrq2CfR5kBjNiHFILjmyN2NHPOxm
- yQBU0TdgA8q+nU27UDamzC7Xo5hzxAE4E9u4rASEcdVfQQTYjBi2GEhQ6jO9D3ptMUHz
- SrIpqX7tMQUKlSuz7gNdroGkC62fLTYtThfgARz+cqOz8xeEZkEiPhVRmhOVraYXgtCQ
- SwNs6QrzKArvzjOEF7WgHruEmejVy8YkWNj6eEH6j+7XZgso6Vl8g+AXfraPcpGsTiiW Ig== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dgp7nhxnw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 05:51:31 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20B5oQMe182760;
-        Tue, 11 Jan 2022 05:51:30 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2170.outbound.protection.outlook.com [104.47.55.170])
-        by aserp3030.oracle.com with ESMTP id 3df0ndk2j1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 05:51:30 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HcryjVTlFFUe8lRfmtaHrXpsBdolFG0LEhU1gypK6aj/axXykNghFf4JqUiNAr1pcn6EY7ILSulgIvAMhg+qG7xS1ENkBkyvgyHcB3l6kmXd3iv21IKXh8zylEwjB/8ROjuRr5KMNUURnHXlYX+T8ohIc3pAdQ1qDRI9OROgdWXM3AvvVuSAMgdDUvUiDFmZS5UoCgzvfbQef9W2djwWYrT+Oqj4zpPmqGXaJeX00ec9igvrTDx69sdxh/OT+WngSbYYtokvHWT2NQHnPUHNrxdITB6d+ChxWqTN9Cu3UrPsEttNfPfXB8pQ5KC65ugKBBH+5aD0IulZBJXK0GRWPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YO3j0dEoF7LicnQxvUSHOlvUYubFDiNgPCUKMYWKnvM=;
- b=YpXQFkQ47gasHLCIh2gkparmkFNBC5rsNqEBepDU1KJzC3nHkeKXValDPFSdXP4hDiMExPka3cLqIvZNiA/nsJSD2YnwGERfHg+mlWgMlpx3b0T0pIgMfHqN73nBcXnaC+w7jurChsrApeKNC3uQyqrqYsFD6QOMq3zCtUPDMGJOD1cH3maxwYxJLidSapp04joPXodS+l9wXiLpjgTecTI/8hFKOdB/pGUViQ2ektDwmrGi1Kt46nLfYBcUlflh0+GrW1YobKQuImGiBwQCSrle5HOzSzdUbYIB9BTcbpolXdji3nqpRsei9LM8AJ11NmC0FTPgkw/RlBadZ/j1qQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        id S1348085AbiAKGSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 01:18:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57156 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232725AbiAKGST (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 01:18:19 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 377E1C06173F;
+        Mon, 10 Jan 2022 22:18:19 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id m13so16708981pji.3;
+        Mon, 10 Jan 2022 22:18:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YO3j0dEoF7LicnQxvUSHOlvUYubFDiNgPCUKMYWKnvM=;
- b=u/ZEXVKtuzCZiWd1rRwUKAFFDv5lYs5BhUFFlnzXy4Y5SWpeJGzGXEj1+qYty8wioDz1reoOmWDYZk4TStjFUpEpcxPuSpId88cpNbU/taenz1tjJLafudJTQIBB2UcHVLWDQCQfi0imhGlBhi+CXp2K0JpfTiqsDKKU73d+oD0=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by MW5PR10MB5668.namprd10.prod.outlook.com
- (2603:10b6:303:1a3::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.11; Tue, 11 Jan
- 2022 05:51:28 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::b889:5c86:23c0:82b8]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::b889:5c86:23c0:82b8%4]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
- 05:51:28 +0000
-Date:   Tue, 11 Jan 2022 08:51:17 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     guang.zeng@intel.com
-Cc:     kvm@vger.kernel.org
-Subject: [bug report] kvm: x86: Add support for getting/setting expanded
- xstate buffer
-Message-ID: <20220111055117.GA3117@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-ClientProxiedBy: ZRAP278CA0015.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:10::25) To MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28)
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=X18v40N5uNeF4+CxOKsSVdbKFEsMdXIdNxMHtmaLwOg=;
+        b=dT/e3xwnwJjpE4movXCCfNcZovcHkl71fXQxB35sT1aaBs9gqi3tdY355frbZ240ZR
+         TYf7DKppKmZ8gGEULR34UkpVXjEuBQSSjfS1DcuVTg2U1x9iVAYXq37EGXytxrgOmz6Z
+         G31myFDh/pEl1bf27dB4UsDZPNRUCONfnAWeYnELzJJ/myo6AfVPVY4JG0XDqobPruD3
+         /C4qGUIIvz5kHDzYHoqNYRnqQAzw1bfm/wlcMiszPMSg2GF9LYN8n6tp8CH9ADRExd9a
+         m8geOKe5G/M4F4Fm74KlnNF4I3HFfZbe7Y+DPtPd3gRccBycVwgcOQr4e+PqQfoHE1jb
+         omvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=X18v40N5uNeF4+CxOKsSVdbKFEsMdXIdNxMHtmaLwOg=;
+        b=2iq043gc1h1L4FS8O5w9DJ/do2QJKG6YuH7ofDxusmpCr5PJ6ydfFgRSvfX+/SI5H6
+         mI0a5CiWlIirwmCy0Lt6gNaOFQGpsO6JyrfHKo/gEU6qRsu9V5bhnI4wrLKU8IR42Qrz
+         DQVFmBmqr46gaNE/tlJFqMYwggkC6okGCEg3XM8+DYJE43ntJJiDhTJeRnMSP7fJ1dG0
+         itHEHxjZuuENWAG+M5RbUeSAMGMdSFupuBCuP+3WPwan1lccoA4wp4UPPR3O/yxVjkJA
+         E48FnZtUs6KJ+OU+wZVGBl/eaYx/Nep5IzvE/kNw4JylAbl5BA7Bte+V1IhVh6GF17tF
+         oyrw==
+X-Gm-Message-State: AOAM531PedvpRw51wzyv+qJhcSV/0chrTgabWH8LJmj61HKXf8j4o9in
+        lSOAcaQ5bHfeYye7Jm52Kis=
+X-Google-Smtp-Source: ABdhPJwfAIdWa+7sJg6SLLD5LRkeD2p5JRQemA4o10kwgRdmOEWj/vIG5DuP5vdZXy9Zk17vC7pVVA==
+X-Received: by 2002:a17:90a:294f:: with SMTP id x15mr1573022pjf.136.1641881898544;
+        Mon, 10 Jan 2022 22:18:18 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id s6sm900240pjp.19.2022.01.10.22.18.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jan 2022 22:18:18 -0800 (PST)
+Message-ID: <7fa1a2d8-040c-1485-41ae-ad51f1182bdb@gmail.com>
+Date:   Tue, 11 Jan 2022 14:18:09 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4f45124c-cede-4341-fdae-08d9d4c668e3
-X-MS-TrafficTypeDiagnostic: MW5PR10MB5668:EE_
-X-Microsoft-Antispam-PRVS: <MW5PR10MB56684B152FA9CE0D57B25A378E519@MW5PR10MB5668.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jJoDzn1bJHUkKBd+bdODTe5/A7hUdXrwGUoPfBb+WevxekGgxkBT2cw656HaoqTCZhsJM1zNSjaiM3MklGCZzCtyN1tVP8hBIDFnxeAigdH5tg9MAnAXwO6nGg6teZkbGwznhtRZrTLk3N9/GmkbLA+iITu+LCn0AIKDZ1dvDmcMOJhvQ60+hjJ0A2W8EZZSwuqPgClUsA1WzLkSANlwf2hV6GjQrQcewWRdJLTHFoNlpvu8sxN9IXW2EMPzPL+1s8qV4t/krcdhVU+958aGZPePpTTYdZGFMjwArUMXKAn7dE65b5xLwfJrkf6z1deJOi5sbAjwe+GyuNEqkOU3DWpNFOGs1NQ/ifHKu+gTnKL0zNJRFWbKi8e6y1ncH8wgCiUqEpy6XuTg1GuA6CqB8aL67GNpJde16daRulbc0DGaJX66lNtKcT69WM554SfiGMwk2e7j02uzzOlDP+WaE6c89Y+xui/XrJ7b5LH6cHRbrvJe1mgBHUQSp7twvY6JC3KPNPdK/6eDp6UGAeClk2YzWBNpsesZK/1fzwUO7mbxE0J+5gOtwTfb3SsKhVJQEJBlWrIsoEdb2QU4UEFqyZSyAOOTlRgkERgQkKZrZ2AP3uZVnp1XK/Lq48YUgmmvp0QyJENBuaMeW2irMaFyod1+WOE2NMWkmSuMsSacAu/awmFPNi3BHEj0DWc81GWeo9zwh+uYgLE+B5jT4c+vmw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(9686003)(38100700002)(6512007)(86362001)(33716001)(52116002)(66556008)(66946007)(6916009)(83380400001)(5660300002)(4326008)(6486002)(6506007)(1076003)(38350700002)(8936002)(66476007)(44832011)(186003)(316002)(6666004)(508600001)(33656002)(2906002)(8676002)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GMvoxS8gImmrvzEb5bAutHC93glDal279rdhQIBNNkGHgrJPe9qg1fLksqvl?=
- =?us-ascii?Q?AVNLv22vS/OP4FfJBOzDvHib3nq1Cy/elzk8d6RQ1i9h4+rTUdfcrG1LI89I?=
- =?us-ascii?Q?Cypf4Z1lC0z/fsSVBFd4c2KFDux/dToAzsCAse91VajkKEFgQCRqvOWUrE13?=
- =?us-ascii?Q?q/DJKdjJ0WWz3HUr+IFxCn8QPlUIz2vCwcCjW22s5PbF/qsKU9/2xg6bZDS+?=
- =?us-ascii?Q?qEDTGjLpUcwijfTPL7iOqbsWw8v4WB0HyW0lORBq23BQCH7vNIAVQJwZKchL?=
- =?us-ascii?Q?+JgQc9YX2NkmpKbZPVrT0aDDeg2a1gehh99ZA265pAekMMZlzRBWJ/y1rP7j?=
- =?us-ascii?Q?qWAgz0Q5iCb6De49F4G6fRt4deSh10l9+Vt5unchpMtASDItwfxy0nm/VicG?=
- =?us-ascii?Q?KoJoQRzJ6oi3SjBF7x/6La5IlTW5CVpbZzolWdJINd5oLQYUMqQGvUyZQY5Y?=
- =?us-ascii?Q?imt4pduowDvI019eKzFTKfG0uONWXkszOu/UcIeYBbvrCdN/RqRg5/Wlsoyj?=
- =?us-ascii?Q?l9lJsyL9J6rMx0sb8hYMxuLzst94ZPm39EFjLaxLO7TphLs3EQw3krDcUQcs?=
- =?us-ascii?Q?7HLLcPjCWbko2McdHUbngGZBnIYP3DJFeA7gfd3zNcjjD+PvPZfIOB5bXhEH?=
- =?us-ascii?Q?RvLOg3jdBaiIFXx7KLxALT4Fo3LlFtBMuu0oFmY9N6jWD99Q+etjtB5vdeSt?=
- =?us-ascii?Q?d7/strjvhcqrUvwsOlsWqhAD0v+nRGPoRVPC0XgMyGv2XEhEkfoFjSkOiUA8?=
- =?us-ascii?Q?w9MajfJ3JRvLCDhhw2NI7NqQF4vGTP91VuYhwlxI4vCRIrSUV/NAAepiXuqJ?=
- =?us-ascii?Q?+pBMdEZuRkL4hrtclRY8szZWqH5QfMJdsvfWN4htTSjnZvAcx4nTnqIf131j?=
- =?us-ascii?Q?ilWKHEbKRs7enNd3LoXPpLwdFgQPtOZCOimZtPAURMFfFXsHFbRh3HnWcMJP?=
- =?us-ascii?Q?j0TUJVLrv6O2DYadcsBUZnLwPsrc3oAWXI/nP+JzHHYMwqxX72xzxvknl5nt?=
- =?us-ascii?Q?gjLySfBVB2V9g3bNFPJoXLUmu1gkfhwj0jXdXjMfWo0us3ix3RxOtAuxfdC5?=
- =?us-ascii?Q?2umVvPyfCZHwpA8xkCXdpOs3LXZdIBTBexUE9b9vpyiDykUjOIlj17g2nKtz?=
- =?us-ascii?Q?MTGoJWErEGdkM3DlEjf5iPR6WvnpQ4ry2pda8s4e7UOWZ4XF6mGOOY2JO1dk?=
- =?us-ascii?Q?vlCrScmA/6Bqj5NT2D8CTtLc8XdOVat6T2MCg+6CqVlD859+HCDMTul5olTc?=
- =?us-ascii?Q?gQ2c3yVz2653FRmjhetJqVP2dR5eo72vCmhEGDal1umRYv2Q/Iny/PqCjTPx?=
- =?us-ascii?Q?b2d8F1noQzuIXAM8MNr/qysfIwUhwO0OvxPaSw4VunW4T5J/5aKLvZYguSoc?=
- =?us-ascii?Q?fU9/Rb6IWQKlQd45VIU0c0BPef6pXBTRpm3sgmIRdBKqC+Bkbh1WxxR+qIm7?=
- =?us-ascii?Q?OkFO5pLWtNEEvUsBxqR8FEqInGvsr61x4D6dmdyPmPbIRlhzhf3UPDg7GY7Y?=
- =?us-ascii?Q?XrLKh05FFoKOLy1ONgpemVzYMz3eR9QAOK0FeJik+0ybhVp8/U0ZHg/ih7p2?=
- =?us-ascii?Q?6xJC34+J68rEcsDZg9WMRwlPzUOgrjg8Lpmzc7Y3tc75EAs+4RbGXZ6xkLjg?=
- =?us-ascii?Q?T6G/fNGkxdQe1PlS2UgDOnvlxKc8dTYRkdUA1Tzi/VKY6mZw3EM0QUdYBU1P?=
- =?us-ascii?Q?faCPgqqGFT0mwEIYM5lGDK4WLMg=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f45124c-cede-4341-fdae-08d9d4c668e3
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 05:51:28.1145
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5PK8tzXt2FfVR6qDQmsdr3+3WJDIKiW5DOLnjCjqbejAnUk9buNHj8s+kdw6P+7itugJ7EmxP0E3j/bjuhZfyckJlxK36GjNEvCC5cp0rLU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR10MB5668
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=846 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201110028
-X-Proofpoint-GUID: YsTmt06vL_3r4iUB4g7enY7uuq_Nrxe4
-X-Proofpoint-ORIG-GUID: YsTmt06vL_3r4iUB4g7enY7uuq_Nrxe4
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Dunn <daviddunn@google.com>
+References: <20211117080304.38989-1-likexu@tencent.com>
+ <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
+ <CALMp9eRA8hw9zVEwnZEX56Gao-MibX5A+XXYS-n-+X0BkhrSvQ@mail.gmail.com>
+ <438d42de-78e1-0ce9-6a06-38194de4abd4@redhat.com>
+ <CALMp9eSLU1kfffC3Du58L8iPY6LmKyVO0yU7c3wEnJAD9JZw4w@mail.gmail.com>
+ <CALMp9eR3PEgXhe_z8ArHK0bPeW4=htta_f3LHTm9jqL2rtcT7A@mail.gmail.com>
+ <a2b6fb82-292b-f714-cfd7-31a5310c28ed@gmail.com>
+ <CALMp9eQbiqjf_MMJP9Cc9=Ubm7qKv88BXtu3=7z8ax9W_1AY4Q@mail.gmail.com>
+ <1f293656-49f5-ce02-1c59-a0f215306033@gmail.com>
+ <CALMp9eTqMMia0Vx=kfGpQVHVYvSCDtuBN1eDr12cop0EAzCSaw@mail.gmail.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH] KVM: x86/svm: Add module param to control PMU
+ virtualization
+In-Reply-To: <CALMp9eTqMMia0Vx=kfGpQVHVYvSCDtuBN1eDr12cop0EAzCSaw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Guang Zeng,
+On 11/1/2022 11:24 am, Jim Mattson wrote:
+> On Mon, Jan 10, 2022 at 6:11 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>>
+>> On 11/1/2022 2:13 am, Jim Mattson wrote:
+>>> On Sun, Jan 9, 2022 at 10:23 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>>>>
+>>>> On 9/1/2022 9:23 am, Jim Mattson wrote:
+>>>>> On Fri, Dec 10, 2021 at 7:48 PM Jim Mattson <jmattson@google.com> wrote:
+>>>>>>
+>>>>>> On Fri, Dec 10, 2021 at 6:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>>>>>
+>>>>>>> On 12/10/21 20:25, Jim Mattson wrote:
+>>>>>>>> In the long run, I'd like to be able to override this system-wide
+>>>>>>>> setting on a per-VM basis, for VMs that I trust. (Of course, this
+>>>>>>>> implies that I trust the userspace process as well.)
+>>>>>>>>
+>>>>>>>> How would you feel if we were to add a kvm ioctl to override this
+>>>>>>>> setting, for a particular VM, guarded by an appropriate permissions
+>>>>>>>> check, like capable(CAP_SYS_ADMIN) or capable(CAP_SYS_MODULE)?
+>>>>>>>
+>>>>>>> What's the rationale for guarding this with a capability check?  IIRC
+>>>>>>> you don't have such checks for perf_event_open (apart for getting kernel
+>>>>>>> addresses, which is not a problem for virtualization).
+>>>>>>
+>>>>>> My reasoning was simply that for userspace to override a mode 0444
+>>>>>> kernel module parameter, it should have the rights to reload the
+>>>>>> module with the parameter override. I wasn't thinking specifically
+>>>>>> about PMU capabilities.
+>>>>
+>>>> Do we have a precedent on any module parameter rewriting for privileger ?
+>>>>
+>>>> A further requirement is whether we can dynamically change this part of
+>>>> the behaviour when the guest is already booted up.
+>>>>
+>>>>>
+>>>>> Assuming that we trust userspace to decide whether or not to expose a
+>>>>> virtual PMU to a guest (as we do on the Intel side), perhaps we could
+>>>>> make use of the existing PMU_EVENT_FILTER to give us per-VM control,
+>>>>> rather than adding a new module parameter for per-host control. If
+>>>>
+>>>> Various granularities of control are required to support vPMU production
+>>>> scenarios, including per-host, per-VM, and dynamic-guest-alive control.
+>>>>
+>>>>> userspace calls KVM_SET_PMU_EVENT_FILTER with an action of
+>>>>> KVM_PMU_EVENT_ALLOW and an empty list of allowed events, KVM could
+>>>>> just disable the virtual PMU for that VM.
+>>>>
+>>>> AMD will also have "CPUID Fn8000_0022_EBX[NumCorePmc, 3:0]".
+>>>
+>>> Where do you see this? Revision 3.33 (November 2021) of the AMD APM,
+>>> volume 3, only goes as high as CPUID Fn8000_0021.
+>>
+>> Try APM Revision: 4.04 (November 2021),  page 1849/3273,
+>> "CPUID Fn8000_0022_EBX Extended Performance Monitoring and Debug".
+> 
+> Is this a public document?
 
-The patch 16786d406fe8: "kvm: x86: Add support for getting/setting
-expanded xstate buffer" from Jan 5, 2022, leads to the following
-Smatch static checker warning:
+The latest version of APM (40332) is revision v4.04, released on 12/1/2021.
 
-	arch/x86/kvm/x86.c:5411 kvm_arch_vcpu_ioctl()
-	warn: is memdup() '0-s32max' large enough for 'struct kvm_xsave'
+> 
+>> Given the current ambiguity in this revision, the AMD folks will reveal more
+>> details bout this field in the next revision.
+>>
+>>>
+>>>>>
+>>>>> Today, the semantics of an empty allow list are quite different from
+>>>>> the proposed pmuv module parameter being false. However, it should be
+>>>>> an easy conversion. Would anyone be concerned about changing the
+>>>>> current semantics of an empty allow list? Is there a need for
+>>>>> disabling PMU virtualization for legacy userspace implementations that
+>>>>> can't be modified to ask for an empty allow list?
+>>>>>
+>>>>
+>>>> AFAI, at least one user-space agent has integrated with it plus additional
+>>>> "action"s.
+>>>>
+>>>> Once the API that the kernel presents to user space has been defined,
+>>>> it's best not to change it and instead fall into remorse.
+>>>
+>>> Okay.
+>>>
+>>> I propose the following:
+>>> 1) The new module parameter should apply to Intel as well as AMD, for
+>>> situations where userspace is not trusted.
+>>> 2) If the module parameter allows PMU virtualization, there should be
+>>> a new KVM_CAP whereby userspace can enable/disable PMU virtualization.
+>>> (Since you require a dynamic toggle, and there is a move afoot to
+>>> refuse guest CPUID changes once a guest is running, this new KVM_CAP
+>>> is needed on Intel as well as AMD).
+>>
+>> Both hands in favour. Do you need me as a labourer, or you have a ready-made one ?
+> 
+> We could split the work. Since (1) is a modification of the change you
+> proposed in this thread, perhaps you could apply it to both AMD and
 
-arch/x86/kvm/x86.c
-    5390         case KVM_GET_XSAVE: {
-    5391                 r = -EINVAL;
-    5392                 if (vcpu->arch.guest_fpu.uabi_size > sizeof(struct kvm_xsave))
-    5393                         break;
-    5394 
-    5395                 u.xsave = kzalloc(sizeof(struct kvm_xsave), GFP_KERNEL_ACCOUNT);
-    5396                 r = -ENOMEM;
-    5397                 if (!u.xsave)
-    5398                         break;
-    5399 
-    5400                 kvm_vcpu_ioctl_x86_get_xsave(vcpu, u.xsave);
-    5401 
-    5402                 r = -EFAULT;
-    5403                 if (copy_to_user(argp, u.xsave, sizeof(struct kvm_xsave)))
-    5404                         break;
-    5405                 r = 0;
-    5406                 break;
-    5407         }
-    5408         case KVM_SET_XSAVE: {
-    5409                 int size = vcpu->arch.guest_fpu.uabi_size;
-    5410 
+We obviously need extra code to make the module parameters suitable for Intel 
+since it
+affects other features (such as LBR and PEBS), we may not rush to draw this line 
+clearly.
 
-There is no check whether size >= sizeof(struct kvm_xsave).
+> Intel in v2? We can find someone for (2).
 
---> 5411                 u.xsave = memdup_user(argp, size);
-    5412                 if (IS_ERR(u.xsave)) {
-    5413                         r = PTR_ERR(u.xsave);
-    5414                         goto out_nofree;
-    5415                 }
-    5416 
-    5417                 r = kvm_vcpu_ioctl_x86_set_xsave(vcpu, u.xsave);
+The ioctl_set_pmu_event_filter() interface is already practical for dynamic toggle,
+as not being able to program any events is the same as having none vPMU,
+w/o considering performance impact of traversing the list.
 
-So this can read out of bounds.
+I am not sure if the maintainer will buy in another KVM_CAP for only per-VM, 
+considering
+"CPUID Fn8000_0022_EBX[NumCorePmc, 3:0]" is a feature that will be available soon.
 
-    5418                 break;
-    5419         }
-    5420 
-    5421         case KVM_GET_XSAVE2: {
-    5422                 int size = vcpu->arch.guest_fpu.uabi_size;
-    5423 
-    5424                 u.xsave = kzalloc(size, GFP_KERNEL_ACCOUNT);
-    5425                 r = -ENOMEM;
-    5426                 if (!u.xsave)
-    5427                         break;
-    5428 
-    5429                 kvm_vcpu_ioctl_x86_get_xsave2(vcpu, u.buffer, size);
-    5430 
-    5431                 r = -EFAULT;
-    5432                 if (copy_to_user(argp, u.xsave, size))
-    5433                         break;
-    5434 
-    5435                 r = 0;
-    5436                 break;
-    5437         }
-    5438 
+> 
+>>> 3) If the module parameter does not allow PMU virtualization, there
+>>> should be no userspace override, since we have no precedent for
+>>> authorizing that kind of override.
+>>
+>> Uh, I thought you (Google) had a lot of these (interesting) use cases internally.
+> 
+> We have modified some module parameters so that they can be changed at
+> runtime, but we don't have any concept of a privileged userspace
+> overriding a module parameter restriction.
 
-regards,
-dan carpenter
+Considering that the semantics of the different module parameters are different,
+allowing one of them to be overridden does not mean that such a generic framework
+is promising, but it makes sense for the community to see another case for it.
+
+> 
+>>>
+>>>> "But I am not a decision maker. " :D
+>>>>
+>>>> Thanks,
+>>>> Like Xu
+>>>>
+> 
