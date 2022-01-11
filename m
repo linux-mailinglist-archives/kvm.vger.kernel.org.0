@@ -2,39 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FBA548AB47
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 11:22:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E07A248AB49
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 11:23:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237717AbiAKKWx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 05:22:53 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:45160 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233911AbiAKKWw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 05:22:52 -0500
+        id S237686AbiAKKXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 05:23:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233911AbiAKKXw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 05:23:52 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E4EC06173F
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 02:23:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 68DC06156D
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:22:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F22C36AF2;
-        Tue, 11 Jan 2022 10:22:51 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 587DBB819D0
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:23:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6E5C36AE9;
+        Tue, 11 Jan 2022 10:23:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641896571;
-        bh=HbZF3sztPtTkN6ALrGsuTJUFcv/QYl5hN7mRZyThhxk=;
+        s=k20201202; t=1641896629;
+        bh=rLjD10oD9rqTVqIwpiJZNWSMQasAD9/0XTaE7F0fPJM=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=QsK4N6ZVg4xpfSCf+0LJtl3nX/2jJeeT1v36KyJ3jGmigu3P82wPjLAAm7CgvsmOB
-         T1d/UxQbiJIN/nMCUusyQgva4iJURF3H5StcA5uLoabCMSU7LOZSTMjHmVcEbTwaKM
-         H+jupVYLajPAhzCCfPynhwrP9ioUeEX8N0eXfCMXqUQ89GUzQrgV1RHrkVOUWeiXLD
-         OJrCMdxWuvVyQY/AgpkE2RXDt/geRGaebeIzT2AwEoIpkG+pI9AZ3PVUUtXJ7AxHXr
-         5m7VLFto/oqk+W+UH6MBNTZTIwykOE77LuabiZNcm3S/9uiOE04dUWs4C2oCoDpzTi
-         S76XymIe/ERGg==
+        b=TCU5mDKO7IVKoA6t1LM1XXUwtnRWErJZiM8V0rm9W6W0dOtlo41/6ao7AGeXG6DWo
+         a3CxPbUcMDKNUwEY98ghskIzMQPGU7aODjowexlxLse7uqek8kjj9w1eVbJMObl7ji
+         LoFBKsAtgbNkMqkZa3s6WlU4x0cuTdHeuSFSipv1kCrt9Un4m5uAyE75Rao/HMaypl
+         1gkfZz2BzJRRtkUwMKw4ZCHSn0dnLIDFvx5UObh7bUWcBzYA3e1wMP4/kKZeY6wuVz
+         hCIenB7SZQHvNn7XAZ6T9+r+cPcFA+bnHnurRrlsYdfgYWHb7NOWIlY6Ubun7FPivZ
+         SZHKTUH9gOKFw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1n7EIj-00HM2A-83; Tue, 11 Jan 2022 10:22:49 +0000
-Date:   Tue, 11 Jan 2022 10:22:48 +0000
-Message-ID: <87czkytvuv.wl-maz@kernel.org>
+        id 1n7EJf-00HM32-2U; Tue, 11 Jan 2022 10:23:47 +0000
+Date:   Tue, 11 Jan 2022 10:23:46 +0000
+Message-ID: <87bl0itvt9.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
@@ -43,10 +46,10 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH 2/3] KVM: arm64: Add fast path to handle permission relaxation during dirty logging
-In-Reply-To: <20220110210441.2074798-3-jingzhangos@google.com>
+Subject: Re: [RFC PATCH 1/3] KVM: arm64: Use read/write spin lock for MMU protection
+In-Reply-To: <20220110210441.2074798-2-jingzhangos@google.com>
 References: <20220110210441.2074798-1-jingzhangos@google.com>
-        <20220110210441.2074798-3-jingzhangos@google.com>
+        <20220110210441.2074798-2-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,105 +63,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 Jan 2022 21:04:40 +0000,
+On Mon, 10 Jan 2022 21:04:39 +0000,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> To reduce MMU lock contention during dirty logging, all permission
-> relaxation operations would be performed under read lock.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/mmu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index cafd5813c949..dd1f43fba4b0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1063,6 +1063,54 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
->  	return 0;
->  }
->  
-> +static bool fast_mark_writable(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> +		struct kvm_memory_slot *memslot, unsigned long fault_status)
-> +{
-> +	int ret;
-> +	bool writable;
-> +	bool write_fault = kvm_is_write_fault(vcpu);
-> +	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
-> +	kvm_pfn_t pfn;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	bool logging_active = memslot_is_logging(memslot);
-> +	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
-> +	unsigned long fault_granule;
-> +
-> +	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
-> +
-> +	/* Make sure the fault can be handled in the fast path.
-> +	 * Only handle write permission fault on non-hugepage during dirty
-> +	 * logging period.
-> +	 */
+> To reduce the contentions caused by MMU lock, some MMU operations can
+> be performed under read lock.
+> One improvement is to add a fast path for permission relaxation during
+> dirty logging under the read lock.
 
-Not the correct comment format.
-
-> +	if (fault_status != FSC_PERM || fault_granule != PAGE_SIZE
-> +			|| !logging_active || !write_fault)
-> +		return false;
-
-This is all reinventing the logic that already exists in
-user_mem_abort(). I'm sympathetic to the effort not to bloat it even
-more, but code duplication doesn't help either.
-
-> +
-> +
-> +	/* Pin the pfn to make sure it couldn't be freed and be resued for
-> +	 * another gfn.
-> +	 */
-> +	pfn = __gfn_to_pfn_memslot(memslot, gfn, true, NULL,
-> +				   write_fault, &writable, NULL);
-> +	if (is_error_pfn(pfn) || !writable)
-> +		return false;
-
-What happens if we hit a non-writable mapping? Don't we leak a page
-reference?
-
-> +
-> +	read_lock(&kvm->mmu_lock);
-> +	ret = kvm_pgtable_stage2_relax_perms(
-> +			vcpu->arch.hw_mmu->pgt, fault_ipa, PAGE_HYP);
-
-PAGE_HYP? Err... no. KVM_PGTABLE_PROT_RW, more likely. Yes, they
-expand to the same thing, but you are not dealing with nVHE EL2 S1
-page tables here.
-
-> +
-> +	if (!ret) {
-> +		kvm_set_pfn_dirty(pfn);
-> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> +	}
-> +	read_unlock(&kvm->mmu_lock);
-> +
-> +	kvm_set_pfn_accessed(pfn);
-> +	kvm_release_pfn_clean(pfn);
-> +
-> +	return true;
-> +}
-> +
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_memory_slot *memslot, unsigned long hva,
->  			  unsigned long fault_status)
-> @@ -1085,6 +1133,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->  	struct kvm_pgtable *pgt;
->  
-> +	if (fast_mark_writable(vcpu, fault_ipa, memslot, fault_status))
-> +		return 0;
->  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
->  	write_fault = kvm_is_write_fault(vcpu);
->  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
-
-You are bypassing all sort of checks that I want to keep. Please
-integrate this in user_mem_abort instead of this side hack.
+This commit message really doesn't say what this patch does
+(converting our MMU spinlock to a rwlock, and replacing all instances
+of the lock being acquired with a write lock acquisition). Crucially,
+it only mention the read lock which appears *nowhere* in this patch.
 
 Thanks,
 
