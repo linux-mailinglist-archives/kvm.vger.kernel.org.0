@@ -2,288 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BDF748B10F
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 16:41:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11DF748B1AE
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 17:11:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240010AbiAKPk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 10:40:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239773AbiAKPk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 10:40:58 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54B9C061748
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 07:40:58 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id i129-20020a255487000000b006107b38b495so25426715ybb.16
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 07:40:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=T42iHV28VeOQOSr6+/jPZLYHOPmxU90EiajYoOWkuKs=;
-        b=CXKrmFoMgA/idPVTdcgeKlKj97I4kSjTasFYbuJfvU0rRxnErMfkEWCGxaaLForzZ0
-         XD0jnj24uOAzP/cU4djQ4KSiZk0n7TN79KMPRxCB6FaRbX4BEk/Rklaggh0kzyPJ/1nS
-         VJOqmreHtxrx+85ZpjMO1csw4IhJvLpBDMFY1VSBkuQgDeNUS7Ru6n6aGxktaGbnithE
-         waFKcVc89ifkaMdq6kAu2mrI4chpPfpRS8XGw1nZsE+zQtjLzjhUZ6tOWsi+ljMQkWCs
-         807atYnm9TPYV3fEAOfABR1MpdLTWXNK/cTT2DjhiRXLdDXfrH5jDWVtUupDE3gsaZX9
-         HbJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=T42iHV28VeOQOSr6+/jPZLYHOPmxU90EiajYoOWkuKs=;
-        b=erHFSM9rlKzgttlmJTy9FgQV9/dm5Kivbx4hCCCEmo/uVjccccCo6ViEb72VEZuRSG
-         BKjzzga0+751X4nU8QnOj+cE7KmVrISv8DFHRmjsC88nznDrpE1xRB7ZfixNG5isJVWx
-         C6iMHDq9oYs3wRQ1tG2pQnrBOrrOWwtpcjSaIOh5kX/U6TXA59MF2yRfIrFs+v6hTUjn
-         o/ofh5l1fEQJwpj2oiNYRYGaY8LGBBnujdrHgbMhlqmVsNNnrbr/HINVTqLb+DqznFYn
-         WTOfOiwqtJWxuNE/5cM1mZ8yOgG6jdnuDOiQGOfQ6N312KMyTWqwyBKIY86EZXVEHxni
-         1NQQ==
-X-Gm-Message-State: AOAM5326pCBlWY8ENpch664PTF84bN+f7HOMBL/ex8Q+P9Iqlh8soeKe
-        0cZTteTep68MyBQa2Dcz7zAqL7Zz1iNve3VWSRrefUhtQGtN/pqmlsuO6MJhCEYdd79QQKRyQ12
-        xXIwIh/jB5nlI7NQL/IeS6qsToD5afLD+pBMCklxuUfuZKsEOuQTRyM5JtQ==
-X-Google-Smtp-Source: ABdhPJyxFwn9MvYTDU9n4J/DClDNTiWQjW15TZxBxG09HzMX1+Shm2icLskC2lCjrznUlV5XCw2DiSv9AT8=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:4f78:6ed1:42d2:b0a7])
- (user=pgonda job=sendgmr) by 2002:a25:680e:: with SMTP id d14mr2781511ybc.522.1641915657861;
- Tue, 11 Jan 2022 07:40:57 -0800 (PST)
-Date:   Tue, 11 Jan 2022 07:40:48 -0800
-Message-Id: <20220111154048.2108264-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [PATCH] KVM: SEV: Allow SEV intra-host migration of VM with mirrors
-From:   Peter Gonda <pgonda@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S1349852AbiAKQLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 11:11:21 -0500
+Received: from foss.arm.com ([217.140.110.172]:48866 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1349848AbiAKQLT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 11:11:19 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 342FB6D;
+        Tue, 11 Jan 2022 08:11:18 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B16B3F774;
+        Tue, 11 Jan 2022 08:11:15 -0800 (PST)
+Date:   Tue, 11 Jan 2022 16:11:25 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Reiji Watanabe <reijiw@google.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Orr <marcorr@google.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
+ uninitialized vCPUs
+Message-ID: <Yd2sLbiw/XPCZe7q@monolith.localdoman>
+References: <20220110054042.1079932-1-reijiw@google.com>
+ <YdwPCcZWD8Uc1eej@monolith.localdoman>
+ <CAAeT=Fz1KPbpmcSbukBuGWMJH=V_oXAJoaDHAen_Gy9Qswo_1Q@mail.gmail.com>
+ <875yqqtn5q.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875yqqtn5q.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For SEV-ES VMs with mirrors to be intra-host migrated they need to be
-able to migrate with the mirror. This is due to that fact that all VMSAs
-need to be added into the VM with LAUNCH_UPDATE_VMSA before
-lAUNCH_FINISH. Allowing migration with mirrors allows users of SEV-ES to
-keep the mirror VMs VMSAs during migration.
+Hi Marc,
 
-Adds a list of mirror VMs for the original VM iterate through during its
-migration. During the iteration the owner pointers can be updated from
-the source to the destination. This fixes the ASID leaking issue which
-caused the blocking of migration of VMs with mirrors.
+On Tue, Jan 11, 2022 at 01:30:41PM +0000, Marc Zyngier wrote:
+> On Tue, 11 Jan 2022 07:37:57 +0000,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> > 
+> > Hi Alex,
+> > 
+> > On Mon, Jan 10, 2022 at 2:48 AM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Hi Reiji,
+> > >
+> > > On Sun, Jan 09, 2022 at 09:40:41PM -0800, Reiji Watanabe wrote:
+> > > > vcpu_allowed_register_width() checks if all the VCPUs are either
+> > > > all 32bit or all 64bit.  Since the checking is done even for vCPUs
+> > > > that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
+> > > > the non-initialized vCPUs are erroneously treated as 64bit vCPU,
+> > > > which causes the function to incorrectly detect a mixed-width VM.
+> > > >
+> > > > Fix vcpu_allowed_register_width() to skip the check for vCPUs that
+> > > > are not initialized yet.
+> > > >
+> > > > Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > > ---
+> > > >  arch/arm64/kvm/reset.c | 11 +++++++++++
+> > > >  1 file changed, 11 insertions(+)
+> > > >
+> > > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > > > index 426bd7fbc3fd..ef78bbc7566a 100644
+> > > > --- a/arch/arm64/kvm/reset.c
+> > > > +++ b/arch/arm64/kvm/reset.c
+> > > > @@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> > > >       if (kvm_has_mte(vcpu->kvm) && is32bit)
+> > > >               return false;
+> > > >
+> > > > +     /*
+> > > > +      * Make sure vcpu->arch.target setting is visible from others so
+> > > > +      * that the width consistency checking between two vCPUs is done
+> > > > +      * by at least one of them at KVM_ARM_VCPU_INIT.
+> > > > +      */
+> > > > +     smp_mb();
+> > >
+> > > From ARM DDI 0487G.a, page B2-146 ("Data Memory Barrier (DMB)"):
+> > >
+> > > "The DMB instruction is a memory barrier instruction that ensures the relative
+> > > order of memory accesses before the barrier with memory accesses after the
+> > > barrier."
+> > >
+> > > I'm going to assume from the comment that you are referring to completion of
+> > > memory accesses ("Make sure [..] is visible from others"). Please correct me if
+> > > I am wrong. In this case, DMB ensures ordering of memory accesses with regards
+> > > to writes and reads, not *completion*.  Have a look at
+> > > tools/memory-model/litmus-tests/MP+fencewmbonceonce+fencermbonceonce.litmus for
+> > > the classic message passing example as an example of memory ordering.
+> > > Message passing and other patterns are also explained in ARM DDI 0487G.a, page
+> > > K11-8363.
+> > >
+> > > I'm not saying that your approach is incorrect, but the commit message should
+> > > explain what memory accesses are being ordered relative to each other and why.
+> > 
+> > Thank you so much for the review.
+> > What I meant with the comment was:
+> > ---
+> >   DMB is used to make sure that writing @vcpu->arch.target, which is done
+> >   by kvm_vcpu_set_target() before getting here, is visible to other PEs
+> >   before the following kvm_for_each_vcpu iteration reads the other vCPUs'
+> >   target field.
+> > ---
+> > Did the comment become more clear ?? (Or do I use DMB incorrectly ?)
+> > 
+> > > > +
+> > > >       /* Check that the vcpus are either all 32bit or all 64bit */
+> > > >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> > > > +             /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
+> > > > +             if (tmp->arch.target == -1)
+> > > > +                     continue;
+> > 
+> > I just noticed DMB(ishld) is needed here to assure ordering between
+> > reading tmp->arch.target and reading vcpu->arch.features for this fix.
+> > Similarly, kvm_vcpu_set_target() needs DMB(ishst) to assure ordering
+> > between writing vcpu->arch.features and writing vcpu->arch.target...
+> > I am going to fix them in the v2 series.
+> 
+> Yes, you'd need at least this, and preferably in their smp_rmb/wmb
+> variants.
+> 
+> However, this looks like a pretty fragile construct, as there are
+> multiple paths where we can change target (including some error
+> paths from the run loop).
+> 
+> I'd rather all changes to target and the feature bits happen under the
+> kvm->lock, and take that lock when checking for consistency in
+> vcpu_allowed_register_width(), as this isn't a fast path. I wrote the
+> following, which is obviously incomplete and as usual untested.
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- arch/x86/kvm/svm/sev.c                        | 45 ++++++++++++-----
- arch/x86/kvm/svm/svm.h                        |  4 ++
- .../selftests/kvm/x86_64/sev_migrate_tests.c  | 48 +++++++++++++------
- 3 files changed, 70 insertions(+), 27 deletions(-)
+I think this is the better approach, because we also want to make sure that
+a PE observes changes to target and features as soon as they have been
+made, to avoid situations where one PE sets the target and the 32bit
+feature, and another PE reads the old values and skips the check, in which
+case memory ordering is not enough.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 322553322202..e396ae04f891 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -258,6 +258,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		goto e_free;
- 
- 	INIT_LIST_HEAD(&sev->regions_list);
-+	INIT_LIST_HEAD(&sev->mirror_vms);
- 
- 	return 0;
- 
-@@ -1623,22 +1624,41 @@ static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
- 	}
- }
- 
--static void sev_migrate_from(struct kvm_sev_info *dst,
--			      struct kvm_sev_info *src)
-+static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
- {
-+	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
-+	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
-+	struct kvm_sev_info *mirror, *tmp;
-+
- 	dst->active = true;
- 	dst->asid = src->asid;
- 	dst->handle = src->handle;
- 	dst->pages_locked = src->pages_locked;
- 	dst->enc_context_owner = src->enc_context_owner;
-+	dst->num_mirrored_vms = src->num_mirrored_vms;
- 
- 	src->asid = 0;
- 	src->active = false;
- 	src->handle = 0;
- 	src->pages_locked = 0;
- 	src->enc_context_owner = NULL;
-+	src->num_mirrored_vms = 0;
- 
- 	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
-+	list_cut_before(&dst->mirror_vms, &src->mirror_vms, &src->mirror_vms);
-+
-+	/*
-+	 * If this VM has mirrors we need to update the KVM refcounts from the
-+	 * source to the destination.
-+	 */
-+	if (dst->num_mirrored_vms > 0) {
-+		list_for_each_entry_safe(mirror, tmp, &dst->mirror_vms,
-+					  mirror_entry) {
-+			kvm_get_kvm(dst_kvm);
-+			kvm_put_kvm(src_kvm);
-+			mirror->enc_context_owner = dst_kvm;
-+		}
-+	}
- }
- 
- static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
-@@ -1708,15 +1728,6 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- 
- 	src_sev = &to_kvm_svm(source_kvm)->sev_info;
- 
--	/*
--	 * VMs mirroring src's encryption context rely on it to keep the
--	 * ASID allocated, but below we are clearing src_sev->asid.
--	 */
--	if (src_sev->num_mirrored_vms) {
--		ret = -EBUSY;
--		goto out_unlock;
--	}
--
- 	dst_sev->misc_cg = get_current_misc_cg();
- 	cg_cleanup_sev = dst_sev;
- 	if (dst_sev->misc_cg != src_sev->misc_cg) {
-@@ -1738,7 +1749,7 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- 		if (ret)
- 			goto out_source_vcpu;
- 	}
--	sev_migrate_from(dst_sev, src_sev);
-+	sev_migrate_from(kvm, source_kvm);
- 	kvm_vm_dead(source_kvm);
- 	cg_cleanup_sev = src_sev;
- 	ret = 0;
-@@ -2009,9 +2020,10 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
- 	source_sev = &to_kvm_svm(source_kvm)->sev_info;
- 	kvm_get_kvm(source_kvm);
- 	source_sev->num_mirrored_vms++;
-+	mirror_sev = &to_kvm_svm(kvm)->sev_info;
-+	list_add_tail(&mirror_sev->mirror_entry, &source_sev->mirror_vms);
- 
- 	/* Set enc_context_owner and copy its encryption context over */
--	mirror_sev = &to_kvm_svm(kvm)->sev_info;
- 	mirror_sev->enc_context_owner = source_kvm;
- 	mirror_sev->active = true;
- 	mirror_sev->asid = source_sev->asid;
-@@ -2050,10 +2062,17 @@ void sev_vm_destroy(struct kvm *kvm)
- 	if (is_mirroring_enc_context(kvm)) {
- 		struct kvm *owner_kvm = sev->enc_context_owner;
- 		struct kvm_sev_info *owner_sev = &to_kvm_svm(owner_kvm)->sev_info;
-+		struct kvm_sev_info *mirror, *tmp;
- 
- 		mutex_lock(&owner_kvm->lock);
- 		if (!WARN_ON(!owner_sev->num_mirrored_vms))
- 			owner_sev->num_mirrored_vms--;
-+
-+		list_for_each_entry_safe(mirror, tmp, &owner_sev->mirror_vms,
-+					  mirror_entry)
-+			if (mirror == sev)
-+				list_del(&mirror->mirror_entry);
-+
- 		mutex_unlock(&owner_kvm->lock);
- 		kvm_put_kvm(owner_kvm);
- 		return;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index daa8ca84afcc..b9f5e33d5232 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -81,6 +81,10 @@ struct kvm_sev_info {
- 	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
- 	struct kvm *enc_context_owner; /* Owner of copied encryption context */
- 	unsigned long num_mirrored_vms; /* Number of VMs sharing this ASID */
-+	union {
-+		struct list_head mirror_vms; /* List of VMs mirroring */
-+		struct list_head mirror_entry; /* Use as a list entry of mirrors */
-+	};
- 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
- 	atomic_t migration_in_progress;
- };
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-index 80056bbbb003..cb1962c89945 100644
---- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-+++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-@@ -341,37 +341,57 @@ static void test_sev_mirror_parameters(void)
- 
- static void test_sev_move_copy(void)
- {
--	struct kvm_vm *dst_vm, *sev_vm, *mirror_vm, *dst_mirror_vm;
--	int ret;
-+	struct kvm_vm *dst_vm, *dst2_vm, *dst3_vm, *sev_vm, *mirror_vm,
-+		      *dst_mirror_vm, *dst2_mirror_vm, *dst3_mirror_vm;
- 
- 	sev_vm = sev_vm_create(/* es= */ false);
- 	dst_vm = aux_vm_create(true);
-+	dst2_vm = aux_vm_create(true);
-+	dst3_vm = aux_vm_create(true);
- 	mirror_vm = aux_vm_create(false);
- 	dst_mirror_vm = aux_vm_create(false);
-+	dst2_mirror_vm = aux_vm_create(false);
-+	dst3_mirror_vm = aux_vm_create(false);
- 
- 	sev_mirror_create(mirror_vm->fd, sev_vm->fd);
--	ret = __sev_migrate_from(dst_vm->fd, sev_vm->fd);
--	TEST_ASSERT(ret == -1 && errno == EBUSY,
--		    "Cannot migrate VM that has mirrors. ret %d, errno: %d\n", ret,
--		    errno);
- 
--	/* The mirror itself can be migrated.  */
- 	sev_migrate_from(dst_mirror_vm->fd, mirror_vm->fd);
--	ret = __sev_migrate_from(dst_vm->fd, sev_vm->fd);
--	TEST_ASSERT(ret == -1 && errno == EBUSY,
--		    "Cannot migrate VM that has mirrors. ret %d, errno: %d\n", ret,
--		    errno);
-+	sev_migrate_from(dst_vm->fd, sev_vm->fd);
-+
-+	sev_migrate_from(dst2_vm->fd, dst_vm->fd);
-+	sev_migrate_from(dst2_mirror_vm->fd, dst_mirror_vm->fd);
-+
-+	sev_migrate_from(dst3_mirror_vm->fd, dst2_mirror_vm->fd);
-+	sev_migrate_from(dst3_vm->fd, dst2_vm->fd);
-+
-+	kvm_vm_free(dst_vm);
-+	kvm_vm_free(sev_vm);
-+	kvm_vm_free(dst2_vm);
-+	kvm_vm_free(dst3_vm);
-+	kvm_vm_free(mirror_vm);
-+	kvm_vm_free(dst_mirror_vm);
-+	kvm_vm_free(dst2_mirror_vm);
-+	kvm_vm_free(dst3_mirror_vm);
- 
- 	/*
--	 * mirror_vm is not a mirror anymore, dst_mirror_vm is.  Thus,
--	 * the owner can be copied as soon as dst_mirror_vm is gone.
-+	 * Run similar test be destroy mirrors before mirrored VMs to ensure
-+	 * destruction is done safely.
- 	 */
--	kvm_vm_free(dst_mirror_vm);
-+	sev_vm = sev_vm_create(/* es= */ false);
-+	dst_vm = aux_vm_create(true);
-+	mirror_vm = aux_vm_create(false);
-+	dst_mirror_vm = aux_vm_create(false);
-+
-+	sev_mirror_create(mirror_vm->fd, sev_vm->fd);
-+
-+	sev_migrate_from(dst_mirror_vm->fd, mirror_vm->fd);
- 	sev_migrate_from(dst_vm->fd, sev_vm->fd);
- 
- 	kvm_vm_free(mirror_vm);
-+	kvm_vm_free(dst_mirror_vm);
- 	kvm_vm_free(dst_vm);
- 	kvm_vm_free(sev_vm);
-+
- }
- 
- int main(int argc, char *argv[])
--- 
-2.34.1.575.g55b058a8bb-goog
+Thanks,
+Alex
 
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e4727dc771bf..42f2ab80646c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1061,7 +1061,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  			       const struct kvm_vcpu_init *init)
+>  {
+> -	unsigned int i, ret;
+> +	unsigned int i;
+> +	int ret = 0;
+>  	u32 phys_target = kvm_target_cpu();
+>  
+>  	if (init->target != phys_target)
+> @@ -1074,32 +1075,46 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  	if (vcpu->arch.target != -1 && vcpu->arch.target != init->target)
+>  		return -EINVAL;
+>  
+> +	/* Hazard against a concurent check of the target in kvm_reset_vcpu() */
+> +	mutex_lock(&vcpu->kvm->lock);
+> +
+>  	/* -ENOENT for unknown features, -EINVAL for invalid combinations. */
+>  	for (i = 0; i < sizeof(init->features) * 8; i++) {
+>  		bool set = (init->features[i / 32] & (1 << (i % 32)));
+>  
+> -		if (set && i >= KVM_VCPU_MAX_FEATURES)
+> -			return -ENOENT;
+> +		if (set && i >= KVM_VCPU_MAX_FEATURES) {
+> +			ret = -ENOENT;
+> +			break;
+> +		}
+>  
+>  		/*
+>  		 * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
+>  		 * use the same feature set.
+>  		 */
+>  		if (vcpu->arch.target != -1 && i < KVM_VCPU_MAX_FEATURES &&
+> -		    test_bit(i, vcpu->arch.features) != set)
+> -			return -EINVAL;
+> +		    test_bit(i, vcpu->arch.features) != set) {
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+>  
+>  		if (set)
+>  			set_bit(i, vcpu->arch.features);
+>  	}
+>  
+> -	vcpu->arch.target = phys_target;
+> +	if (!ret)
+> +		vcpu->arch.target = phys_target;
+> +
+> +	mutex_unlock(&vcpu->kvm->lock);
+> +	if (ret)
+> +		return ret;
+>  
+>  	/* Now we know what it is, we can reset it. */
+>  	ret = kvm_reset_vcpu(vcpu);
+>  	if (ret) {
+> +		mutex_lock(&vcpu->kvm->lock);
+>  		vcpu->arch.target = -1;
+>  		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> +		mutex_unlock(&vcpu->kvm->lock);
+>  	}
+>  
+>  	return ret;
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index ef78bbc7566a..fae88a703140 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -180,13 +180,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+>  	if (kvm_has_mte(vcpu->kvm) && is32bit)
+>  		return false;
+>  
+> -	/*
+> -	 * Make sure vcpu->arch.target setting is visible from others so
+> -	 * that the width consistency checking between two vCPUs is done
+> -	 * by at least one of them at KVM_ARM_VCPU_INIT.
+> -	 */
+> -	smp_mb();
+> -
+>  	/* Check that the vcpus are either all 32bit or all 64bit */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+>  		/* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
+> @@ -222,14 +215,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_reset_state reset_state;
+> -	int ret;
+> +	int ret = -EINVAL;
+>  	bool loaded;
+>  	u32 pstate;
+>  
+>  	mutex_lock(&vcpu->kvm->lock);
+> -	reset_state = vcpu->arch.reset_state;
+> -	WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> +	if (vcpu_allowed_register_width(vcpu)) {
+> +		reset_state = vcpu->arch.reset_state;
+> +		WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> +		ret = 0;
+> +	}
+>  	mutex_unlock(&vcpu->kvm->lock);
+> +	if (ret)
+> +		goto out;
+>  
+>  	/* Reset PMU outside of the non-preemptible section */
+>  	kvm_pmu_vcpu_reset(vcpu);
+> @@ -257,11 +255,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> -	if (!vcpu_allowed_register_width(vcpu)) {
+> -		ret = -EINVAL;
+> -		goto out;
+> -	}
+> -
+>  	switch (vcpu->arch.target) {
+>  	default:
+>  		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
