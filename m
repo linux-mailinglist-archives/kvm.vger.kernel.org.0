@@ -2,338 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CBA248B267
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 17:39:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DDFE48B2BE
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 17:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350133AbiAKQjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 11:39:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31442 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1350090AbiAKQjN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 11:39:13 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BGJ0xk007863;
-        Tue, 11 Jan 2022 16:39:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=vtJjfVRVFvxUruJifBuxeLoaxVKKjLKnBJxu0ng9/54=;
- b=a87oBUu3mcGenO2gBTXPPRWz6riORTOCMkiIRF5Rj7inVdplGz2yRYkJCOUzUwuSBMBX
- em7mE/bTxLNVcjH8t3uWxvceAq4xWP6YhwBNF7Kj7vpT3Ve7UL6b8Hf7dWcCRvATvT5N
- vvhR7rZIe9tkISVj5rc7aBBIj/P4p8NYv4F24SmujQHTS5Bwz++empolEDEl5uW2bJnB
- onsxck1PJJfsZFXPLVt7fTlVbdyzr/NjHYpnhz369Ckf7hQXJmgKb37V+OQBOUBJgWfG
- JTX/WwurYKKJLVxDdEiOqYYF5wDgkOLVrs+9++2fZ4TLtWX21VGxruIW9KzpXQ9IDKib EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dfm05ke0p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 16:39:11 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20BGa120029941;
-        Tue, 11 Jan 2022 16:39:11 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dfm05ke08-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 16:39:11 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20BGXjr6026934;
-        Tue, 11 Jan 2022 16:39:10 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3dfwhj33bw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 16:39:10 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20BGd4U243057506
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 16:39:04 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 322CF5207C;
-        Tue, 11 Jan 2022 16:39:04 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 008365206B;
-        Tue, 11 Jan 2022 16:39:03 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v4 2/2] s390x: Test specification exceptions during transaction
-Date:   Tue, 11 Jan 2022 17:39:01 +0100
-Message-Id: <20220111163901.1263736-3-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220111163901.1263736-1-scgl@linux.ibm.com>
-References: <20220111163901.1263736-1-scgl@linux.ibm.com>
+        id S242695AbiAKQ7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 11:59:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35168 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241302AbiAKQ7q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 11:59:46 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3247C06173F
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 08:59:45 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id h1so18127862pls.11
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 08:59:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NM1YKEzIM8tGqBc0n3TyDW24QIkGu+HKbCPjDATsj68=;
+        b=nnvQD7e28G0p7YCABuNTGDFNTAzi9hm+ogCN+DcP1bdzgEni3JcQrHerCUnr5IjY5G
+         /rfYeI3B/cTaAMGPKwl4XW/+VYyfFJXRfuunvjJ763BTaT2Rx1GtWWHvO0knTf9TEyNh
+         S0XXW6zRYUAa08BUhMwoKwd/RTHvCXHkcy8fwr7N0gu3DSgXcxto2HgM5dxPW36jzAyD
+         pzJznxgWqmrytXmg5G/PwNZocAxs/Ts647iOH979Yg7ZxypJvNW2fMeJm4d2SMEZ+tw2
+         bEwwse2axNEnDJzS29CDGXgiRu+4OYxRCKeXWCta+gXzjxbGeTT2clREuOsBifHYlNUV
+         l2cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NM1YKEzIM8tGqBc0n3TyDW24QIkGu+HKbCPjDATsj68=;
+        b=7lSUB3qQ47b6YilkPDY0tY/ePE9sCfajDQCkpDHALSLb8D2IpFS+FxdmwETvwYgjNa
+         wEPlTsTaax0dPXpitM0dvpaCEPGyo3Fyc1eyG9UVIM+jRD22WRlE3H6FMfkSZc00Bn6D
+         LMHpnver1saTZ08aWm4c1ooDtZeojqbvaEb8O2BsxWGReiQZ3+pkJtzvLzrqvrWcq4Iy
+         QMGStcqB00+53ZTnTJe5Ua7KpThBkYbH8VPA1n2dnMhCGgc7aYXLiraIBPWVzP4AtbKc
+         5q4IRz2LccS0r2rKLRTARrF0tl1bcPOxx3FXcNCLKOoAFnODVLc2tG/VWAJLD/VNxwI/
+         GcFw==
+X-Gm-Message-State: AOAM530L74aeGsgOxMI3k3ipXc+c0hPTZS2xYnD7PIbV9ki7eM0u3HKT
+        +PcBZq9iMDSnpvrxpD8IwvuMFQ==
+X-Google-Smtp-Source: ABdhPJwGQcXrHgxq/Nl+gjh7pFbmxIaN4mzkUhCWXHFpgegLuLJeMvkrL2XLYJjc+ZhGKtWnCsjjBQ==
+X-Received: by 2002:a17:90b:350b:: with SMTP id ls11mr4120442pjb.134.1641920385147;
+        Tue, 11 Jan 2022 08:59:45 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id mw8sm3228018pjb.42.2022.01.11.08.59.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jan 2022 08:59:44 -0800 (PST)
+Date:   Tue, 11 Jan 2022 16:59:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, agraf@csgraf.de,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v2 1/1] KVM: Implement dirty quota-based throttling of
+ vcpus
+Message-ID: <Yd23fDV8ckkfCUiD@google.com>
+References: <20211220055722.204341-1-shivam.kumar1@nutanix.com>
+ <20211220055722.204341-2-shivam.kumar1@nutanix.com>
+ <Ydx2EW6U3fpJoJF0@google.com>
+ <eca3faed-5f2c-6217-fb2c-298855510265@nutanix.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CxwZB2sUPwNcjP0b6ja0TT3PXQYHFVdM
-X-Proofpoint-ORIG-GUID: lDdOfMGVNT7kPNNmbo5tn7QFqn7ZYgWo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-11_04,2022-01-11_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0 adultscore=0
- malwarescore=0 clxscore=1011 bulkscore=0 priorityscore=1501 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201110093
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eca3faed-5f2c-6217-fb2c-298855510265@nutanix.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Program interruptions during transactional execution cause other
-interruption codes.
-Check that we see the expected code for (some) specification exceptions.
+On Tue, Jan 11, 2022, Shivam Kumar wrote:
+> On 10/01/22 11:38 pm, Sean Christopherson wrote:
+> > > +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_QUOTA_FULL;
+> > "FULL" is a bit of a misnomer, there's nothing being filled.  REACHED is a better,
+> > though not perfect because the quota can be exceeded if multiple pages are dirtied
+> > in a single run.  Maybe just KVM_EXIT_DIRTY_QUOTA?
+> 
+> Absolutely. Does KVM_EXIT_DIRTY_QUOTA_EXHAUSTED look good? Or should I keep it just
+> KVM_EXIT_DIRTY_QUOTA?
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
----
-I don't think we can use constraint transactions to guarantee successful
-execution of the transaction unless we implement it completely in asm,
-otherwise we cannot ensure that the constraints of the transaction are met.
+EXHAUSTED is good.
 
- lib/s390x/asm/arch_def.h |   1 +
- s390x/spec_ex.c          | 177 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 174 insertions(+), 4 deletions(-)
+> > This stat should count regardless of whether dirty logging is enabled.  First and
+> > foremost, counting only while dirty logging is enabled creates funky semantics for
+> > KVM_EXIT_DIRTY_QUOTA, e.g. a vCPU can take exits even though no memslots have dirty
+> > logging enabled (due to past counts), and a vCPU can dirty enormous amounts of
+> > memory without exiting due to the relevant memslot not being dirty logged.
+> > 
+> > Second, the stat could be useful for determining initial quotas or just for debugging.
+> > There's the huge caveat that the counts may be misleading if there's nothing clearing
+> > the dirty bits, but I suspect the info would still be helpful.
+> > 
+> > Speaking of caveats, this needs documentation in Documentation/virt/kvm/api.rst.
+> > One thing that absolutely needs to be covered is that this quota is not a hard limit,
+> > and that it is enforced opportunistically, e.g. with VMX's PML enabled, a vCPU can go
+> > up to 511 (or 510? I hate math) counts over its quota.
+> 
+> I think section 5 (kvm run structure) will be the right place to document this. Please
+> confirm once.
 
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 40626d7..f7fb467 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -55,6 +55,7 @@ struct psw {
- #define PSW_MASK_BA			0x0000000080000000UL
- #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
- 
-+#define CTL0_TRANSACT_EX_CTL		(63 -  8)
- #define CTL0_LOW_ADDR_PROT		(63 - 35)
- #define CTL0_EDAT			(63 - 40)
- #define CTL0_IEP			(63 - 43)
-diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-index a9f9f31..e599994 100644
---- a/s390x/spec_ex.c
-+++ b/s390x/spec_ex.c
-@@ -4,12 +4,18 @@
-  *
-  * Specification exception test.
-  * Tests that specification exceptions occur when expected.
-+ * This includes specification exceptions occurring during transactional execution
-+ * as these result in another interruption code (the transactional-execution-aborted
-+ * bit is set).
-  *
-  * Can be extended by adding triggers to spec_ex_triggers, see comments below.
-  */
- #include <stdlib.h>
-+#include <htmintrin.h>
- #include <libcflat.h>
-+#include <asm/barrier.h>
- #include <asm/interrupt.h>
-+#include <asm/facility.h>
- 
- static struct lowcore *lc = (struct lowcore *) 0;
- 
-@@ -106,19 +112,21 @@ static int not_even(void)
- /*
-  * Harness for specification exception testing.
-  * func only triggers exception, reporting is taken care of automatically.
-+ * If a trigger is transactable it will also  be executed during a transaction.
-  */
- struct spec_ex_trigger {
- 	const char *name;
- 	int (*func)(void);
-+	bool transactable;
- 	void (*fixup)(void);
- };
- 
- /* List of all tests to execute */
- static const struct spec_ex_trigger spec_ex_triggers[] = {
--	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw },
--	{ "bad_alignment", &bad_alignment, NULL },
--	{ "not_even", &not_even, NULL },
--	{ NULL, NULL, NULL },
-+	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
-+	{ "bad_alignment", &bad_alignment, true, NULL },
-+	{ "not_even", &not_even, true, NULL },
-+	{ NULL, NULL, false, NULL },
- };
- 
- static void test_spec_ex(const struct spec_ex_trigger *trigger)
-@@ -138,10 +146,161 @@ static void test_spec_ex(const struct spec_ex_trigger *trigger)
- 	       expected_pgm, pgm);
- }
- 
-+#define TRANSACTION_COMPLETED 4
-+#define TRANSACTION_MAX_RETRIES 5
-+
-+/* NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
-+ * being NULL to keep things simple
-+ */
-+static int __attribute__((nonnull))
-+with_transaction(int (*trigger)(void), struct __htm_tdb *diagnose)
-+{
-+	int cc;
-+
-+	cc = __builtin_tbegin(diagnose);
-+	if (cc == _HTM_TBEGIN_STARTED) {
-+		/* return code is meaningless: transaction needs to complete
-+		 * in order to return and completion indicates a test failure
-+		 */
-+		trigger();
-+		__builtin_tend();
-+		return TRANSACTION_COMPLETED;
-+	} else {
-+		return cc;
-+	}
-+}
-+
-+static int retry_transaction(const struct spec_ex_trigger *trigger, unsigned int max_retries,
-+			     struct __htm_tdb *tdb, uint16_t expected_pgm)
-+{
-+	int trans_result, i;
-+	uint16_t pgm;
-+
-+	for (i = 0; i < max_retries; i++) {
-+		expect_pgm_int();
-+		trans_result = with_transaction(trigger->func, tdb);
-+		if (trans_result == _HTM_TBEGIN_TRANSIENT) {
-+			mb();
-+			pgm = lc->pgm_int_code;
-+			if (pgm == 0)
-+				continue;
-+			else if (pgm == expected_pgm)
-+				return 0;
-+		}
-+		return trans_result;
-+	}
-+	return TRANSACTION_MAX_RETRIES;
-+}
-+
-+struct args {
-+	uint64_t max_retries;
-+	bool diagnose;
-+};
-+
-+static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
-+{
-+	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
-+				      | PGM_INT_CODE_TX_ABORTED_EVENT;
-+	union {
-+		struct __htm_tdb tdb;
-+		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
-+	} diag;
-+	unsigned int i;
-+	int trans_result;
-+
-+	if (!test_facility(73)) {
-+		report_skip("transactional-execution facility not installed");
-+		return;
-+	}
-+	ctl_set_bit(0, CTL0_TRANSACT_EX_CTL); /* enable transactional-exec */
-+
-+	register_pgm_cleanup_func(trigger->fixup);
-+	trans_result = retry_transaction(trigger, args->max_retries, &diag.tdb, expected_pgm);
-+	register_pgm_cleanup_func(NULL);
-+	switch (trans_result) {
-+	case 0:
-+		report_pass("Program interrupt: expected(%d) == received(%d)",
-+			    expected_pgm, expected_pgm);
-+		break;
-+	case _HTM_TBEGIN_INDETERMINATE:
-+	case _HTM_TBEGIN_PERSISTENT:
-+		report_info("transaction failed with cc %d", trans_result);
-+		report_info("transaction abort code: %llu", diag.tdb.abort_code);
-+		if (args->diagnose)
-+			for (i = 0; i < 32; i++)
-+				report_info("diag+%03d: %016lx", i * 8, diag.dwords[i]);
-+		break;
-+	case _HTM_TBEGIN_TRANSIENT:
-+		report_fail("Program interrupt: expected(%d) == received(%d)",
-+			    expected_pgm, clear_pgm_int());
-+		break;
-+	case TRANSACTION_COMPLETED:
-+		report_fail("Transaction completed without exception");
-+		break;
-+	case TRANSACTION_MAX_RETRIES:
-+		report_info("Retried transaction %lu times without exception",
-+			    args->max_retries);
-+		break;
-+	default:
-+		report_fail("Invalid return transaction result");
-+		break;
-+	}
-+
-+	ctl_clear_bit(0, CTL0_TRANSACT_EX_CTL);
-+}
-+
-+static struct args parse_args(int argc, char **argv)
-+{
-+	struct args args = {
-+		.max_retries = 20,
-+		.diagnose = false
-+	};
-+	unsigned int i;
-+	long arg;
-+	bool no_arg;
-+	char *end;
-+	const char *flag;
-+	uint64_t *argp;
-+
-+	for (i = 1; i < argc; i++) {
-+		no_arg = true;
-+		if (i < argc - 1) {
-+			no_arg = *argv[i + 1] == '\0';
-+			arg = strtol(argv[i + 1], &end, 10);
-+			no_arg |= *end != '\0';
-+			no_arg |= arg < 0;
-+		}
-+
-+		flag = "--max-retries";
-+		argp = &args.max_retries;
-+		if (!strcmp(flag, argv[i])) {
-+			if (no_arg)
-+				report_abort("%s needs a positive parameter", flag);
-+			*argp = arg;
-+			++i;
-+			continue;
-+		}
-+		if (!strcmp("--diagnose", argv[i])) {
-+			args.diagnose = true;
-+			continue;
-+		}
-+		if (!strcmp("--no-diagnose", argv[i])) {
-+			args.diagnose = false;
-+			continue;
-+		}
-+		report_abort("Unsupported parameter '%s'",
-+			     argv[i]);
-+	}
-+
-+	return args;
-+}
-+
- int main(int argc, char **argv)
- {
- 	unsigned int i;
- 
-+	struct args args = parse_args(argc, argv);
-+
- 	report_prefix_push("specification exception");
- 	for (i = 0; spec_ex_triggers[i].name; i++) {
- 		report_prefix_push(spec_ex_triggers[i].name);
-@@ -150,5 +309,15 @@ int main(int argc, char **argv)
- 	}
- 	report_prefix_pop();
- 
-+	report_prefix_push("specification exception during transaction");
-+	for (i = 0; spec_ex_triggers[i].name; i++) {
-+		if (spec_ex_triggers[i].transactable) {
-+			report_prefix_push(spec_ex_triggers[i].name);
-+			test_spec_ex_trans(&args, &spec_ex_triggers[i]);
-+			report_prefix_pop();
-+		}
-+	}
-+	report_prefix_pop();
-+
- 	return report_summary();
- }
--- 
-2.33.1
+Yep.
 
+> > The "(if dirty quota throttling is enabled)" is stale, this is the enable.
+> 
+> dirty_quota will be reset to zero at the end of live migration. I added this
+> to capture this scenario.
+
+That's irrelevant with respect to KVM's responsibilities.  More below.
+
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index f079820f52b5..7449b9748ddf 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -424,6 +424,20 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+> >   	return cmpxchg(&vcpu->mode, IN_GUEST_MODE, EXITING_GUEST_MODE);
+> >   }
+> > 
+> > +static inline int kvm_vcpu_check_dirty_quota(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 dirty_quota = READ_ONCE(vcpu->run->dirty_quota);
+> 
+> I think we can store vcpu->stat.generic.pages_dirtied too in some variable here, and
+> use that in the next statements.
+
+Yep.
+
+> > @@ -508,6 +514,12 @@ struct kvm_run {
+> >   		struct kvm_sync_regs regs;
+> >   		char padding[SYNC_REGS_SIZE_BYTES];
+> >   	} s;
+> > +	/*
+> > +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> > +	 * liftime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA if the quota is
+> > +	 * reached/exceeded.
+> > +	 */
+> > +	__u64 dirty_quota;
+> >   };
+> 
+> As mentioned above, this doesn't capture resetting of dirty_quota. Please let
+> me know if that can be ignored here and captured in the documentation.
+
+Capture it in the documentation.  Similar to the "reset to zero at the end of
+live migration" comment, that's the behavior of _one_ userspace VMM, and isn't
+fully representative of KVM's responsibilities.  From a KVM perspective, we can't
+make any assumptions about how exactly userspace will utilize a feature, what
+matters is what is/isn't supported by KVM's ABI.  E.g. for this particular comment,
+KVM needs to play nice with userspace setting dirty_quota to any arbitrary value,
+and functionally at any time as well since the quota is checked inside the run
+loop, hence suggestion to use READ_ONCE().
+
+It's certainly helpful to document how a feature can be used, especially for users
+and VMM developers, but that belongs in the "official" documentation, not internal
+code comments.
+
+Speaking of VMM behavior, this also needs a selftest.  I'm guessing it'll be easier
+and cleaner to add a new test instead of enhancing something like dirty_log_test,
+but whatever works.
+
+> >   /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 168d0ab93c88..aa526b5b5518 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3163,7 +3163,12 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+> >   	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+> >   		return;
+> > 
+> > -	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+> > +	if (!memslot)
+> > +		return;
+> > +
+> > +	vcpu->stat.generic.pages_dirtied++;
+> > +
+> > +	if (kvm_slot_dirty_track_enabled(memslot)) {
+> >   		unsigned long rel_gfn = gfn - memslot->base_gfn;
+> >   		u32 slot = (memslot->as_id << 16) | memslot->id;
+> > 
+> > --
+> > 
+> This looks superb. I am very thankful to you for your reviews. As a beginner in linux
+> kernel development, I have learnt a lot from your suggestions.
+> 
+> I'll be sending this with the documentation bit shortly. Please let me know if I can
+> add you in the "Reviewed-by" list in the next patch.
+
+No :-)  A Reviewed-by can be speculatively/conditionally provided, but generally
+speaking that's only done if the expected delta is minimal and/or unlikely to have
+any impact on the functionally.  That's also a good guideline for carrying reviews
+across revisions of a patch: it's usually ok to retain a R-b if you rebase a patch,
+tweak a comment/changelog, make minor revisions such as renaming a variable, etc...,
+but you should drop a R-b (or explicitly ask as you've done here) if you make
+non-trivial changes to a patch and/or modify the functionality in some way.
