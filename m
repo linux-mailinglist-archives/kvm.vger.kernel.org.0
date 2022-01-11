@@ -2,455 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E009148AE73
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 14:30:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E86A248AE71
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 14:30:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240538AbiAKNaw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 08:30:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30264 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240497AbiAKNav (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 08:30:51 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BDErdL023344;
-        Tue, 11 Jan 2022 13:30:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=DFhafjxSGA6qB7sGFq7dfNi6WXT4SPXn3pNOq0DoEB8=;
- b=p7MNbcZLS24TpW8HuqDE2J3EOkfRHiuff59CoqTxpVZ5Xuu9TTFitD6+1f0S19sAQMGH
- RDOsM4AMKyZsIFc/Q2QMpkgOKUU53nD30GKU+0BLE2y6sE4N7Zgkudw4GhxpGKAmeggh
- VIz+L6P7siZO/s1szgVpx9E94E2Qmr9p5vPxFKMY0mGIVpCJJ9JPgcX/cfTgqSr4FOn7
- wZmArzxkkeJQnGZkmQulAX0Rr9ozdTO8J77Aue8jP5CoAQubGscWXVlBdq4vOQYd3Nqf
- ZODpFnBn88nInVzOA5tdekncqTM/0Qbfxsrid2W6B47T+ol5UVCKdGnGySawJn3RgF06 Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dh6u15jm1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 13:30:51 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20BDCUgt026474;
-        Tue, 11 Jan 2022 13:30:51 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dh6u15jjk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 13:30:50 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20BDRjLI007817;
-        Tue, 11 Jan 2022 13:30:46 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3dfwhj195x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 13:30:45 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20BDUg7e47579494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 13:30:42 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 782C811C052;
-        Tue, 11 Jan 2022 13:30:42 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1268111C05B;
-        Tue, 11 Jan 2022 13:30:42 +0000 (GMT)
-Received: from [9.145.189.100] (unknown [9.145.189.100])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jan 2022 13:30:42 +0000 (GMT)
-Message-ID: <45dea0fb-5605-5f98-74c7-d68f7841f1b6@linux.ibm.com>
-Date:   Tue, 11 Jan 2022 14:30:41 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-References: <20220110133755.22238-1-pmorel@linux.ibm.com>
- <20220110133755.22238-5-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 4/4] s390x: topology: Checking
- Configuration Topology Information
-In-Reply-To: <20220110133755.22238-5-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Ho2r89Hc_hssX2kreRYAaxOBMB2y00ES
-X-Proofpoint-ORIG-GUID: ksZ4-G2W3d4odVluSwM3_ecyQguEXuxV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-11_04,2022-01-11_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015 spamscore=0
- bulkscore=0 impostorscore=0 adultscore=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201110082
+        id S240524AbiAKNau (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 08:30:50 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:34878 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240497AbiAKNat (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 08:30:49 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 554D0CE199B
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 13:30:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 587CFC36AEB;
+        Tue, 11 Jan 2022 13:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641907844;
+        bh=8OD1t5cI6qYCWJTAbC1YF4ZMsG67IjB7llqWmOKLa5s=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SKf/Mx6T2AJtn1Nzi1DHBbwQ5f0R9h5iem9QDlonGJctzWFLWb3Ppjy523nE2w7SC
+         Tvss1JnXnFMpueRVWyLnuD38pqPaxjVYYHBS5F5nmW3jP+2nhefdoGCRFkPgaXlVmp
+         IWsXPVaPyGIHm43TvtGsWMqaRIi/B8uwc4PZZfV8U4XAotqvzbVfGzvqJWMR9vkK5p
+         bdq5mBVueFHmhgwP6equZyQg6FXZPIooVqpdOm4PXomh+Twy3Ga3iAxWkjivYcbCFS
+         pEtAP8aLnyM/1kH21dGJzAl5CTmwQUh9/0W6qh+6qkc524nhb+TGmZ8WYLZnmZxG8R
+         CTeU44Vaxo2MQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n7HEY-00HOHM-5d; Tue, 11 Jan 2022 13:30:42 +0000
+Date:   Tue, 11 Jan 2022 13:30:41 +0000
+Message-ID: <875yqqtn5q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+In-Reply-To: <CAAeT=Fz1KPbpmcSbukBuGWMJH=V_oXAJoaDHAen_Gy9Qswo_1Q@mail.gmail.com>
+References: <20220110054042.1079932-1-reijiw@google.com>
+        <YdwPCcZWD8Uc1eej@monolith.localdoman>
+        <CAAeT=Fz1KPbpmcSbukBuGWMJH=V_oXAJoaDHAen_Gy9Qswo_1Q@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/22 14:37, Pierre Morel wrote:
-> STSI with function code 15 is used to store the CPU configuration
-> topology.
+On Tue, 11 Jan 2022 07:37:57 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> We check :
-> - if the topology stored is coherent between the QEMU -smp
->    parameters and kernel parameters.
-> - the number of CPUs
-> - the maximum number of CPUs
-> - the number of containers of each levels for every STSI(15.1.x)
->    instruction allowed by the machine.
-
-The full review of this will take some time.
-
+> Hi Alex,
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> On Mon, Jan 10, 2022 at 2:48 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi Reiji,
+> >
+> > On Sun, Jan 09, 2022 at 09:40:41PM -0800, Reiji Watanabe wrote:
+> > > vcpu_allowed_register_width() checks if all the VCPUs are either
+> > > all 32bit or all 64bit.  Since the checking is done even for vCPUs
+> > > that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
+> > > the non-initialized vCPUs are erroneously treated as 64bit vCPU,
+> > > which causes the function to incorrectly detect a mixed-width VM.
+> > >
+> > > Fix vcpu_allowed_register_width() to skip the check for vCPUs that
+> > > are not initialized yet.
+> > >
+> > > Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/kvm/reset.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > > index 426bd7fbc3fd..ef78bbc7566a 100644
+> > > --- a/arch/arm64/kvm/reset.c
+> > > +++ b/arch/arm64/kvm/reset.c
+> > > @@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> > >       if (kvm_has_mte(vcpu->kvm) && is32bit)
+> > >               return false;
+> > >
+> > > +     /*
+> > > +      * Make sure vcpu->arch.target setting is visible from others so
+> > > +      * that the width consistency checking between two vCPUs is done
+> > > +      * by at least one of them at KVM_ARM_VCPU_INIT.
+> > > +      */
+> > > +     smp_mb();
+> >
+> > From ARM DDI 0487G.a, page B2-146 ("Data Memory Barrier (DMB)"):
+> >
+> > "The DMB instruction is a memory barrier instruction that ensures the relative
+> > order of memory accesses before the barrier with memory accesses after the
+> > barrier."
+> >
+> > I'm going to assume from the comment that you are referring to completion of
+> > memory accesses ("Make sure [..] is visible from others"). Please correct me if
+> > I am wrong. In this case, DMB ensures ordering of memory accesses with regards
+> > to writes and reads, not *completion*.  Have a look at
+> > tools/memory-model/litmus-tests/MP+fencewmbonceonce+fencermbonceonce.litmus for
+> > the classic message passing example as an example of memory ordering.
+> > Message passing and other patterns are also explained in ARM DDI 0487G.a, page
+> > K11-8363.
+> >
+> > I'm not saying that your approach is incorrect, but the commit message should
+> > explain what memory accesses are being ordered relative to each other and why.
+> 
+> Thank you so much for the review.
+> What I meant with the comment was:
 > ---
->   lib/s390x/stsi.h    |  44 +++++++++
->   s390x/topology.c    | 231 ++++++++++++++++++++++++++++++++++++++++++++
->   s390x/unittests.cfg |   1 +
->   3 files changed, 276 insertions(+)
+>   DMB is used to make sure that writing @vcpu->arch.target, which is done
+>   by kvm_vcpu_set_target() before getting here, is visible to other PEs
+>   before the following kvm_for_each_vcpu iteration reads the other vCPUs'
+>   target field.
+> ---
+> Did the comment become more clear ?? (Or do I use DMB incorrectly ?)
 > 
-> diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
-> index 02cc94a6..e3fc7ac0 100644
-> --- a/lib/s390x/stsi.h
-> +++ b/lib/s390x/stsi.h
-> @@ -29,4 +29,48 @@ struct sysinfo_3_2_2 {
->   	uint8_t ext_names[8][256];
->   };
->   
-> +struct topology_core {
-> +	uint8_t nl;
-> +	uint8_t reserved1[3];
-> +	uint8_t reserved4:5;
-> +	uint8_t d:1;
-> +	uint8_t pp:2;
-> +	uint8_t type;
-> +	uint16_t origin;
-> +	uint64_t mask;
-> +};
-> +
-> +struct topology_container {
-> +	uint8_t nl;
-> +	uint8_t reserved[6];
-> +	uint8_t id;
-> +};
-> +
-> +union topology_entry {
-> +	uint8_t nl;
-> +	struct topology_core cpu;
-> +	struct topology_container container;
-> +};
-> +
-> +#define CPU_TOPOLOGY_MAX_LEVEL 6
-> +struct sysinfo_15_1_x {
-> +	uint8_t reserved0[2];
-> +	uint16_t length;
-> +	uint8_t mag[CPU_TOPOLOGY_MAX_LEVEL];
-> +	uint8_t reserved10;
-
-reserved0a?
-
-> +	uint8_t mnest;
-> +	uint8_t reserved12[4];
-
-reserved0c?
-
-> +	union topology_entry tle[0];
-> +};
-> +
-> +static inline int cpus_in_tle_mask(uint64_t val)
-> +{
-> +	int i, n;
-> +
-> +	for (i = 0, n = 0; i < 64; i++, val >>= 1)
-> +		if (val & 0x01)
-> +			n++;
-> +	return n;
-> +}
-> +
->   #endif  /* _S390X_STSI_H_ */
-> diff --git a/s390x/topology.c b/s390x/topology.c
-> index a227555e..d06e7c4d 100644
-> --- a/s390x/topology.c
-> +++ b/s390x/topology.c
-> @@ -16,6 +16,15 @@
->   #include <smp.h>
->   #include <sclp.h>
->   #include <s390x/vm.h>
-> +#include <s390x/stsi.h>
-> +
-> +static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-> +
-> +static int max_nested_lvl;
-> +static int number_of_cpus;
-> +static int max_cpus = 1;
-> +static int arch_topo_lvl[CPU_TOPOLOGY_MAX_LEVEL];	/* Topology level defined by architecture */
-> +static int stsi_nested_lvl[CPU_TOPOLOGY_MAX_LEVEL];	/* Topology nested level reported in STSI */
->   
->   #define PTF_REQ_HORIZONTAL	0
->   #define PTF_REQ_VERTICAL	1
-> @@ -83,11 +92,230 @@ end:
->   	report_prefix_pop();
->   }
->   
-> +/*
-> + * stsi_check_maxcpus
-> + * @info: Pointer to the stsi information
-> + *
-> + * The product of the numbers of containers per level
-> + * is the maximum number of CPU allowed by the machine.
-> + */
-> +static void stsi_check_maxcpus(struct sysinfo_15_1_x *info)
-> +{
-> +	int n, i;
-> +
-> +	report_prefix_push("maximum cpus");
-> +
-> +	for (i = 0, n = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-> +		report_info("Mag%d: %d", CPU_TOPOLOGY_MAX_LEVEL - i, info->mag[i]);
-> +		n *= info->mag[i] ? info->mag[i] : 1;
-> +	}
-> +	report(n == max_cpus, "Maximum CPUs %d expected %d", n, max_cpus);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * stsi_check_tle_coherency
-> + * @info: Pointer to the stsi information
-> + * @sel2: Topology level to check.
-> + *
-> + * We verify that we get the expected number of Topology List Entry
-> + * containers for a specific level.
-> + */
-> +static void stsi_check_tle_coherency(struct sysinfo_15_1_x *info, int sel2)
-> +{
-> +	struct topology_container *tc, *end;
-> +	struct topology_core *cpus;
-> +	int n = 0;
-> +	int i;
-> +
-> +	report_prefix_push("TLE coherency");
-> +
-> +	tc = (void *)&info->tle[0];
-
-tc = &info->tle[0].container ?
-
-> +	end = (struct topology_container *)((unsigned long)info + info->length);
-> +
-> +	for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++)
-> +		stsi_nested_lvl[i] = 0;
-> +
-> +	while (tc < end) {
-> +		if (tc->nl > 5) {
-> +			report_abort("Unexpected TL Entry: tle->nl: %d", tc->nl);
-> +			return;
-> +		}
-> +		if (tc->nl == 0) {
-> +			cpus = (struct topology_core *)tc;
-> +			n += cpus_in_tle_mask(cpus->mask);
-> +			report_info("cpu type %02x  d: %d pp: %d", cpus->type, cpus->d, cpus->pp);
-> +			report_info("origin : %04x mask %016lx", cpus->origin, cpus->mask);
-> +		}
-> +
-> +		stsi_nested_lvl[tc->nl]++;
-> +		report_info("level %d: lvl: %d id: %d cnt: %d",
-> +			    tc->nl, tc->nl, tc->id, stsi_nested_lvl[tc->nl]);
-> +
-> +		/* trick: CPU TLEs are twice the size of containers TLE */
-> +		if (tc->nl == 0)
-> +			tc++;
-> +		tc++;
-> +	}
-> +	report(n == number_of_cpus, "Number of CPUs  : %d expect %d", n, number_of_cpus);
-> +	/*
-> +	 * For KVM we accept
-> +	 * - only 1 type of CPU
-> +	 * - only horizontal topology
-> +	 * - only dedicated CPUs
-> +	 * This leads to expect the number of entries of level 0 CPU
-> +	 * Topology Level Entry (TLE) to be:
-> +	 * 1 + (number_of_cpus - 1)  / arch_topo_lvl[0]
-> +	 *
-> +	 * For z/VM or LPAR this number can only be greater if different
-> +	 * polarity, CPU types because there may be a nested level 0 CPU TLE
-> +	 * for each of the CPU/polarity/sharing types in a level 1 container TLE.
-> +	 */
-> +	n =  (number_of_cpus - 1)  / arch_topo_lvl[0];
-> +	report(stsi_nested_lvl[0] >=  n + 1,
-> +	       "CPU Type TLE    : %d expect %d", stsi_nested_lvl[0], n + 1);
-> +
-> +	/* For each level found in STSI */
-> +	for (i = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-> +		/*
-> +		 * For non QEMU/KVM hypervizor the concatanation of the levels
-
-hypervisor
-
-concatenation
-
-> +		 * above level 1 are architecture dependent.
-> +		 * Skip these checks.
-> +		 */
-> +		if (!vm_is_kvm() && sel2 != 2)
-> +			continue;
-> +
-> +		/* For QEMU/KVM we expect a simple calculation */
-> +		if (sel2 > i) {
-> +			report(stsi_nested_lvl[i] ==  n + 1,
-> +			       "Container TLE  %d: %d expect %d", i, stsi_nested_lvl[i], n + 1);
-> +			n /= arch_topo_lvl[i];
-> +		}
-> +	}
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * check_sysinfo_15_1_x
-> + * @info: pointer to the STSI info structure
-> + * @sel2: the selector giving the topology level to check
-> + *
-> + * Check if the validity of the STSI instruction and then
-> + * calls specific checks on the information buffer.
-> + */
-> +static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info, int sel2)
-> +{
-> +	int ret;
-> +
-> +	report_prefix_pushf("15_1_%d", sel2);
-> +
-> +	ret = stsi(pagebuf, 15, 1, sel2);
-> +	if (max_nested_lvl >= sel2)
-> +		report(!ret, "Valid stsi instruction");
-> +	else
-> +		report(ret, "Invalid stsi instruction");
-> +	if (ret)
-> +		goto end;
-> +
-> +	stsi_check_maxcpus(info);
-> +	stsi_check_tle_coherency(info, sel2);
-> +
-> +end:
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * test_stsi
-> + *
-> + * Retrieves the maximum nested topology level supported by the architecture
-> + * and the number of CPUs.
-> + * Calls the checking for the STSI instruction in sel2 reverse level order
-> + * from 6 (CPU_TOPOLOGY_MAX_LEVEL) to 2 to have the most interesting level,
-> + * the one triggering a topology-change-report-pending condition, level 2,
-> + * at the end of the report.
-> + *
-> + */
-> +static void test_stsi(void)
-> +{
-> +	int sel2;
-> +
-> +	max_nested_lvl = sclp_get_stsi_parm();
-> +	/* If the STSI parm is 0, the Maximum Nesting for STSI is 2 */
-> +	if (!max_nested_lvl)
-> +		max_nested_lvl = 2;
-> +	report_info("SCLP maximum nested level : %d", max_nested_lvl);
-> +
-> +	number_of_cpus = sclp_get_cpu_num();
-> +	report_info("SCLP number of CPU: %d", number_of_cpus);
-> +
-> +	/* STSI selector 2 can takes values between 2 and 6 */
-> +	for (sel2 = 6; sel2 >= 2; sel2--)
-> +		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf, sel2);
-> +}
-> +
-> +/*
-> + * parse_topology_args
-> + * @argc: number of arguments
-> + * @argv: argument array
-> + *
-> + * This function initialize the architecture topology levels
-> + * which should be the same as the one provided by the hypervisor.
-> + *
-> + * We use the current names found in IBM/Z literature, Linux and QEMU:
-> + * cores, sockets/packages, books, drawers and nodes to facilitate the
-> + * human machine interface but store the result in a machine abstract
-> + * array of architecture topology levels.
-> + * Note that when QEMU uses socket as a name for the topology level 1
-> + * Linux uses package or physical_package.
-> + */
-> +static void parse_topology_args(int argc, char **argv)
-> +{
-> +	int i;
-> +
-> +	for (i = 1; i < argc; i++) {
-> +		if (!strcmp("-c", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-c (cores) needs a parameter");
-> +			arch_topo_lvl[0] = atol(argv[i]);
-> +		} else if (!strcmp("-s", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-s (sockets) needs a parameter");
-> +			arch_topo_lvl[1] = atol(argv[i]);
-> +		} else if (!strcmp("-b", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-b (books) needs a parameter");
-> +			arch_topo_lvl[2] = atol(argv[i]);
-> +		} else if (!strcmp("-d", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-d (drawers) needs a parameter");
-> +			arch_topo_lvl[3] = atol(argv[i]);
-> +		} else if (!strcmp("-n", argv[i])) {
-> +			i++;
-> +			if (i >= argc)
-> +				report_abort("-n (nodes) needs a parameter");
-> +			arch_topo_lvl[4] = atol(argv[i]);
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-> +		if (!arch_topo_lvl[i])
-> +			arch_topo_lvl[i] = 1;
-> +		max_cpus *= arch_topo_lvl[i];
-> +	}
-> +}
-> +
->   static struct {
->   	const char *name;
->   	void (*func)(void);
->   } tests[] = {
->   	{ "PTF", test_ptf},
-> +	{ "STSI", test_stsi},
->   	{ NULL, NULL }
->   };
->   
-> @@ -97,6 +325,8 @@ int main(int argc, char *argv[])
->   
->   	report_prefix_push("CPU Topology");
->   
-> +	parse_topology_args(argc, argv);
-> +
->   	if (!test_facility(11)) {
->   		report_skip("Topology facility not present");
->   		goto end;
-> @@ -109,6 +339,7 @@ int main(int argc, char *argv[])
->   		tests[i].func();
->   		report_prefix_pop();
->   	}
-> +
->   end:
->   	report_prefix_pop();
->   	return report_summary();
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index e2d3e6a5..bc19b5b6 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -125,3 +125,4 @@ extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -devi
->   
->   [topology]
->   file = topology.elf
-> +extra_params=-smp 5,drawers=2,books=3,sockets=4,cores=4,maxcpus=16 -append "-d 2 -b 3 -s 4 -c 4"
+> > > +
+> > >       /* Check that the vcpus are either all 32bit or all 64bit */
+> > >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> > > +             /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
+> > > +             if (tmp->arch.target == -1)
+> > > +                     continue;
 > 
+> I just noticed DMB(ishld) is needed here to assure ordering between
+> reading tmp->arch.target and reading vcpu->arch.features for this fix.
+> Similarly, kvm_vcpu_set_target() needs DMB(ishst) to assure ordering
+> between writing vcpu->arch.features and writing vcpu->arch.target...
+> I am going to fix them in the v2 series.
 
+Yes, you'd need at least this, and preferably in their smp_rmb/wmb
+variants.
+
+However, this looks like a pretty fragile construct, as there are
+multiple paths where we can change target (including some error
+paths from the run loop).
+
+I'd rather all changes to target and the feature bits happen under the
+kvm->lock, and take that lock when checking for consistency in
+vcpu_allowed_register_width(), as this isn't a fast path. I wrote the
+following, which is obviously incomplete and as usual untested.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e4727dc771bf..42f2ab80646c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1061,7 +1061,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+ 			       const struct kvm_vcpu_init *init)
+ {
+-	unsigned int i, ret;
++	unsigned int i;
++	int ret = 0;
+ 	u32 phys_target = kvm_target_cpu();
+ 
+ 	if (init->target != phys_target)
+@@ -1074,32 +1075,46 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+ 	if (vcpu->arch.target != -1 && vcpu->arch.target != init->target)
+ 		return -EINVAL;
+ 
++	/* Hazard against a concurent check of the target in kvm_reset_vcpu() */
++	mutex_lock(&vcpu->kvm->lock);
++
+ 	/* -ENOENT for unknown features, -EINVAL for invalid combinations. */
+ 	for (i = 0; i < sizeof(init->features) * 8; i++) {
+ 		bool set = (init->features[i / 32] & (1 << (i % 32)));
+ 
+-		if (set && i >= KVM_VCPU_MAX_FEATURES)
+-			return -ENOENT;
++		if (set && i >= KVM_VCPU_MAX_FEATURES) {
++			ret = -ENOENT;
++			break;
++		}
+ 
+ 		/*
+ 		 * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
+ 		 * use the same feature set.
+ 		 */
+ 		if (vcpu->arch.target != -1 && i < KVM_VCPU_MAX_FEATURES &&
+-		    test_bit(i, vcpu->arch.features) != set)
+-			return -EINVAL;
++		    test_bit(i, vcpu->arch.features) != set) {
++			ret = -EINVAL;
++			break;
++		}
+ 
+ 		if (set)
+ 			set_bit(i, vcpu->arch.features);
+ 	}
+ 
+-	vcpu->arch.target = phys_target;
++	if (!ret)
++		vcpu->arch.target = phys_target;
++
++	mutex_unlock(&vcpu->kvm->lock);
++	if (ret)
++		return ret;
+ 
+ 	/* Now we know what it is, we can reset it. */
+ 	ret = kvm_reset_vcpu(vcpu);
+ 	if (ret) {
++		mutex_lock(&vcpu->kvm->lock);
+ 		vcpu->arch.target = -1;
+ 		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
++		mutex_unlock(&vcpu->kvm->lock);
+ 	}
+ 
+ 	return ret;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index ef78bbc7566a..fae88a703140 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -180,13 +180,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+ 	if (kvm_has_mte(vcpu->kvm) && is32bit)
+ 		return false;
+ 
+-	/*
+-	 * Make sure vcpu->arch.target setting is visible from others so
+-	 * that the width consistency checking between two vCPUs is done
+-	 * by at least one of them at KVM_ARM_VCPU_INIT.
+-	 */
+-	smp_mb();
+-
+ 	/* Check that the vcpus are either all 32bit or all 64bit */
+ 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+ 		/* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
+@@ -222,14 +215,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_reset_state reset_state;
+-	int ret;
++	int ret = -EINVAL;
+ 	bool loaded;
+ 	u32 pstate;
+ 
+ 	mutex_lock(&vcpu->kvm->lock);
+-	reset_state = vcpu->arch.reset_state;
+-	WRITE_ONCE(vcpu->arch.reset_state.reset, false);
++	if (vcpu_allowed_register_width(vcpu)) {
++		reset_state = vcpu->arch.reset_state;
++		WRITE_ONCE(vcpu->arch.reset_state.reset, false);
++		ret = 0;
++	}
+ 	mutex_unlock(&vcpu->kvm->lock);
++	if (ret)
++		goto out;
+ 
+ 	/* Reset PMU outside of the non-preemptible section */
+ 	kvm_pmu_vcpu_reset(vcpu);
+@@ -257,11 +255,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
+-	if (!vcpu_allowed_register_width(vcpu)) {
+-		ret = -EINVAL;
+-		goto out;
+-	}
+-
+ 	switch (vcpu->arch.target) {
+ 	default:
+ 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+
+-- 
+Without deviation from the norm, progress is not possible.
