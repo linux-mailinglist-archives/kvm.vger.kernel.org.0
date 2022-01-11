@@ -2,94 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF75348B76C
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 20:37:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A0E548B791
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 20:44:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236632AbiAKTh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 14:37:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45202 "EHLO
+        id S238819AbiAKToj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 14:44:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236357AbiAKThz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 14:37:55 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CB58C061748
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:37:55 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id hv15so671220pjb.5
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:37:55 -0800 (PST)
+        with ESMTP id S238702AbiAKTnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 14:43:00 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90208C061759
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:42:59 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id hv15so698923pjb.5
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:42:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=zGHwR3NiHUMCCbtobgvdiBSkcpXAF9setwIu+L+2NTg=;
-        b=TAGb+YJCDXlRtjUQUm2H3TX+eCODYtkadlIc0LARHDTdwUNOaWlnYbVItKV6ZFEPr1
-         cuhzonW3+Xc7Lf7v+78erPe+pjaUtCwGPGGBf2S/Ag+bsztSgmMctA1FRKkWbQNWn747
-         /D+C2lPI1EFydZQN/VawKEj+VK2qkoVFMN/HYpgf6RHy9snvnbMN4w8lZsR+BcvVVbqB
-         FcjVWcUwz/5eaIfUo/mQZjQ5bb3IauEUxfNZriFqV3CCuS5sRmU4qA2sUpY87UBRe1vb
-         taAuwPX6zJ7hkBg2eryl243n1O5zePA+QqV3lsOKtjyDKIJADikzb8vHLdYV4Laae6He
-         m4oQ==
+        bh=/FgK5IAnk6FTMgJ52e8i7lV+7gxkfwjZm7Vn+Nisr9w=;
+        b=cyRc7pebHjcqfec09Gg909vXcbxF1ItyjKOkz4RPd7uTitdC93xRVMXxRaWVXPW1F/
+         6+OynK/dadT9Zax5twqvJQGuHy6WfhiYET1qpIPZFHwkBaAoDRPWPyuwxgCU9C0yNGTC
+         uX+wSWZHEuAIO5uT1RYqxdJaFnWbjJBYk7yJ5oH9WMnpW2vkBrXhZtk5RkS3N2FenERI
+         +MrPTpfmORE3846hdHowtS/7RNHWsZWbod3Dd+60iCXf4XlW3FL5DRxnaFPanygmO0U/
+         d97tE0NvDBnWT+ZGoDV4nd0Le9apc6wyAXt1WGWNJqHk00pHWioCOvfKnxxsax/EqhZ0
+         eLOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zGHwR3NiHUMCCbtobgvdiBSkcpXAF9setwIu+L+2NTg=;
-        b=TPJMyf6MPD4zSrkLHPrFTexJl9TMJRc2dX4WMRLsYn64yPqtteSi8uAWULdDs8DEwC
-         5MbepZ28Fuk6IbA5sKIZdCc+EFzHR4vPKLF/I/91eMOce2JFX2ZSGVyDJwIIv9yOje1Z
-         HM5IcQW1dp2v2t6LfU9G10xAT94L49vQrfHxqEfml+kx7SbWyol6zTeONtHyL04fCEyH
-         MnCXzgl+2p8Pi4y7nE09wFj85Yc3NQzwS224WkDAHr/96iMq4cOKmBZelKvGwu7U7Kht
-         Hp4MV1fffb3Njq9SufKru5AwgtFLuOSyZ8kU47r5GHsFEkS6dpGJCWeYTO/TgUSRhvVZ
-         yNEg==
-X-Gm-Message-State: AOAM531ypZ7cifLZA0PLCk5zfwlFDW1UzbEhpLgdr7JTua0SrQw5yQJg
-        nbJ0rQBya1VG+DmguJ7M+zW0JQ==
-X-Google-Smtp-Source: ABdhPJyAO1F86LpATpX13rxQnWzV7BjRnUO+onBahR+oWSETlxXBbl1cZjhcoNjBfMW72JaI3Dhm8Q==
-X-Received: by 2002:a17:902:c410:b0:149:577c:2b08 with SMTP id k16-20020a170902c41000b00149577c2b08mr5957188plk.108.1641929874631;
-        Tue, 11 Jan 2022 11:37:54 -0800 (PST)
+        bh=/FgK5IAnk6FTMgJ52e8i7lV+7gxkfwjZm7Vn+Nisr9w=;
+        b=YytvA6k2hYdAHP5w0FZ7xuA5RPl3Pd6gTF/AyS9rbcPbOPZFw+dREOOBf/zv6i3Nj4
+         dI62XXBUUO6ExcMppUJweu6w6D1AxYMdAv1BZ67GxMyHHb+5orirmg7Fs9NRQAi3lQLO
+         h15wIbhgoq4CILtM2/N9N4aYYn0qH4kpYqHDoJNvlK02WEBIvID0h9sLNMAtWeKqmbQG
+         B+m6W7r+usYhIalVo9irvld40K8OrBYYwHYGsthkoAcjJ0qnTvIypCFpoNGZs+Ulmhxo
+         Myj01apuWljEkYGy6IKqxL6XpU7ZkkHJJE/ZtCnx+zOzCyPgdSdUmsi5DrE7N1knN/v4
+         JIQg==
+X-Gm-Message-State: AOAM531sy5eJ5qV6e4WX7byjIomCveTluzK3CYQ1s56ZFkHl/3IF1qba
+        /xbIJYIfFwFicqUDXZiYZl+vgRTBCS4h9g==
+X-Google-Smtp-Source: ABdhPJzaDuTd4GVMQuDQLn3fOUD2ETpVmwUGMlFIET+66unTNa39QrLyGOYIClARpmqJlRGFyDu8zA==
+X-Received: by 2002:a17:902:a70b:b0:149:75ae:4d63 with SMTP id w11-20020a170902a70b00b0014975ae4d63mr6305902plq.50.1641930178932;
+        Tue, 11 Jan 2022 11:42:58 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id rm2sm2010382pjb.13.2022.01.11.11.37.53
+        by smtp.gmail.com with ESMTPSA id o11sm145586pgk.36.2022.01.11.11.42.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 11:37:53 -0800 (PST)
-Date:   Tue, 11 Jan 2022 19:37:50 +0000
+        Tue, 11 Jan 2022 11:42:58 -0800 (PST)
+Date:   Tue, 11 Jan 2022 19:42:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Sabri N. Ferreiro" <snferreiro1@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sunhao.th@gmail.com
-Subject: Re: WARNING in kvm_mmu_uninit_tdp_mmu
-Message-ID: <Yd3cjllVD4vS17kG@google.com>
-References: <CAKG+3NTTHD3iXgK67B4R3e+ScZ+vW5H4FdwLYy9CR5oBF44DOA@mail.gmail.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org
+Subject: Re: [kvm-unit-tests PATCH] arm64: debug: mark test_[bp, wp, ss] as
+ noinline
+Message-ID: <Yd3dvorNkP7eercw@google.com>
+References: <20220111041103.2199594-1-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKG+3NTTHD3iXgK67B4R3e+ScZ+vW5H4FdwLYy9CR5oBF44DOA@mail.gmail.com>
+In-Reply-To: <20220111041103.2199594-1-ricarkol@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jan 09, 2022, Sabri N. Ferreiro wrote:
-> Hi,
+On Mon, Jan 10, 2022, Ricardo Koller wrote:
+> Clang inlines some functions (like test_ss) which define global labels
+> in inline assembly (e.g., ss_start). This results in:
 > 
-> When using Syzkaller to fuzz the Linux kernel, it triggers the following crash.
+>     arm/debug.c:382:15: error: invalid symbol redefinition
+>             asm volatile("ss_start:\n"
+>                          ^
+>     <inline asm>:1:2: note: instantiated into assembly here
+>             ss_start:
+>             ^
+>     1 error generated.
 > 
-> HEAD commit: a7904a538933 Linux 5.16-rc6
-> git tree: upstream
-> console output: https://pastebin.com/raw/keWCUeJ2
-> kernel config: https://docs.google.com/document/d/1w94kqQ4ZSIE6BW-5WIhqp4_Zh7XTPH57L5OF2Xb6O6o/view
-> C reproducer: https://pastebin.com/raw/kSxa6Yit
-> Syzlang reproducer: https://pastebin.com/raw/2RMu8p6E
+> Fix these functions by marking them as "noinline".
 > 
-> If you fix this issue, please add the following tag to the commit:
-> Reported-by: Yuheng Shen mosesfonscqf75@gmail.com
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+> This applies on top of: "[kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for debug state"
+> which is in https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue.
 > 
-> ------------[ cut here ]------------
-> WARNING: CPU: 5 PID: 29657 at arch/x86/kvm/mmu/tdp_mmu.c:46
-> kvm_mmu_uninit_tdp_mmu+0xb9/0xf0
+>  arm/debug.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arm/debug.c b/arm/debug.c
+> index 54f059d..6c5b683 100644
+> --- a/arm/debug.c
+> +++ b/arm/debug.c
+> @@ -264,7 +264,7 @@ static void do_migrate(void)
+>  	report_info("Migration complete");
+>  }
+>  
+> -static void test_hw_bp(bool migrate)
+> +static __attribute__((noinline)) void test_hw_bp(bool migrate)
 
-I wasn't able to reproduce to confirm, but this is more than likely fixed by
-commit 3a0f64de479c ("KVM: x86/mmu: Don't advance iterator after restart due to yielding"),
-which didn't land until 5.16-rc7.
+Use "noinline", which was added by commit 16431a7 ("lib: define the "noinline" macro").
