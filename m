@@ -2,255 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6300648AE31
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 14:11:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6EBF48AE1E
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 14:04:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240328AbiAKNLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 08:11:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41046 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S239945AbiAKNLb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 08:11:31 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BAwF2n022698;
-        Tue, 11 Jan 2022 13:11:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=f4clDWAT1VSI/K9jIEfWPV92G+ixpChzi+pyeFaJE/A=;
- b=W5AFqqw8i1J1WSdTXhewE4zFkI1XbXqdtaqmjmO2UojwRMM/nEPl5pDvyI75Xb7hYXcc
- VsbCnXE11Xb447Bzre3c7ljD5gEkue0EaFy7mmEOqOT4ASv2F/fOEHDiy8c63Kq/TU04
- 4E1UdJdsqaCjIMt2qLd9PoXHsjXNSXYib19mWNo5FnVkvhrKFpxOsyG3SehAGHj9s8Fc
- +wCQyq2URGfS1xmvwq6h/DejNb3XzO43J8I5q6f7Rm6NVVVfQ1oaCbBx33xicIjMpogV
- mehQ4gvtlLGcpeLNAM5re8v/aMl57UOe00GjqULeWniIG7on1RCO5icIMELEurAiQZSQ 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dh8m12q7u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 13:11:30 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20BCrUDU014110;
-        Tue, 11 Jan 2022 13:11:30 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dh8m12q7b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 13:11:30 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20BD7tNu007392;
-        Tue, 11 Jan 2022 13:11:28 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3dfwhj13nd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 13:11:28 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20BDBDO447383022
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 13:11:13 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C29D011C06E;
-        Tue, 11 Jan 2022 13:11:13 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6149E11C075;
-        Tue, 11 Jan 2022 13:11:13 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.10.78])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jan 2022 13:11:13 +0000 (GMT)
-Date:   Tue, 11 Jan 2022 12:25:26 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] s390x: topology: Check the
- Perform Topology Function
-Message-ID: <20220111122526.60e31b38@p-imbrenda>
-In-Reply-To: <20220110133755.22238-4-pmorel@linux.ibm.com>
-References: <20220110133755.22238-1-pmorel@linux.ibm.com>
-        <20220110133755.22238-4-pmorel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S240285AbiAKNE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 08:04:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49094 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240268AbiAKNEW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 08:04:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641906261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CnoXRZzxHpYZJCWWJWjQzv34cSxRuBzuUNROP7tocqU=;
+        b=J7ie4awMUKp0X52WIJ4CV5Qxr2LakL28ytYOoKgQITNXvU9CNe3qs3IDReFf5unlz9AKQB
+        Tu1X/N+gH1psYAw3N6kdPipV0FuOAX21+FkZgvnO/OLQN6NpKwpiJDY2n6IejNhWeLpMro
+        oLdkfXa7LzoZEmEeIM8JQc6SBxRBv/A=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-453-xfFFUqWkMJuak4mVKCxRAQ-1; Tue, 11 Jan 2022 08:04:20 -0500
+X-MC-Unique: xfFFUqWkMJuak4mVKCxRAQ-1
+Received: by mail-ed1-f71.google.com with SMTP id b8-20020a056402350800b003f8f42a883dso13226794edd.16
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 05:04:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=CnoXRZzxHpYZJCWWJWjQzv34cSxRuBzuUNROP7tocqU=;
+        b=csjjObinXzDhlA131n3LJiCBmbCrPyoavT95EF1VDTIS2dZeoTaqG8NszvzivyXUZO
+         8R56t9sSwt8Ub6gEYwIVxf9vZoEZYJGhIiKOJNXVp2iOJPM67vCr0ekQFf45Fec8wTlX
+         QF++nzChp5G0dpy6TGcazz9T+9oWWqAzFyiXonUyiDqnli5RLApiImOOMv/tfo+n9aFQ
+         aTNP83763BTujqUrExJw7p7ZAjmGJUe6tEztOVVMt+4jS0DpCL9yCU/XvJhJ1Foxk43f
+         LvUrJem5HKRXoZr8f41iTQOOpWdkt6yr9ZQI+VgJo1sz8rOxGgvFxkDALDARfI+kvk6V
+         UW+w==
+X-Gm-Message-State: AOAM530C/nkG3dK//QQKTuYU4f6ChcOKTQSfsBfpj6CYW1WH+iZSYpy1
+        dFhV7IHwVJg8ZHMyiJskHECIcAJJwp5dpZFtSNk7sVG7T5sy8vU48WLnOZlO2Ri5dSUn/KKUzfp
+        6JZ2ME0x1T5CD
+X-Received: by 2002:a17:906:3707:: with SMTP id d7mr3673130ejc.688.1641906259336;
+        Tue, 11 Jan 2022 05:04:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyufWlr/Lw1gvdqS0EUpwg1gh0cWIzsXPiLkrC7aOl+Vt8tOWZrM6glrUNIyzIuktDWyNcriw==
+X-Received: by 2002:a17:906:3707:: with SMTP id d7mr3673099ejc.688.1641906259017;
+        Tue, 11 Jan 2022 05:04:19 -0800 (PST)
+Received: from redhat.com ([2.55.5.100])
+        by smtp.gmail.com with ESMTPSA id j5sm3591214ejo.171.2022.01.11.05.04.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jan 2022 05:04:18 -0800 (PST)
+Date:   Tue, 11 Jan 2022 08:04:10 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
+Message-ID: <20220111080359-mutt-send-email-mst@kernel.org>
+References: <20210830141737.181-1-xieyongji@bytedance.com>
+ <20220110075546-mutt-send-email-mst@kernel.org>
+ <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
+ <20220110100911-mutt-send-email-mst@kernel.org>
+ <CACycT3v6jo3-8ATWUzf659vV94a2oRrm-zQtGNDZd6OQr-MENA@mail.gmail.com>
+ <20220110103938-mutt-send-email-mst@kernel.org>
+ <CACycT3sbJC1Jn7NeWk_ccQ_2_YgKybjugfxmKpfgCP3Ayoju4w@mail.gmail.com>
+ <20220111065301-mutt-send-email-mst@kernel.org>
+ <CACycT3sdfAbdByKJwg8N-Jb2qVDdgfSqprp_aOp5fpYz4LxmgA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: x9OJfX1dCRwRF6P66XAQo-tmPHtH1gRE
-X-Proofpoint-ORIG-GUID: _hgYtXjAn5fj3T0c_KUMwrMWpLhCfFV6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-11_04,2022-01-11_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- clxscore=1015 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 spamscore=0 adultscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201110079
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACycT3sdfAbdByKJwg8N-Jb2qVDdgfSqprp_aOp5fpYz4LxmgA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 Jan 2022 14:37:54 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Tue, Jan 11, 2022 at 08:57:49PM +0800, Yongji Xie wrote:
+> On Tue, Jan 11, 2022 at 7:54 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jan 11, 2022 at 11:31:37AM +0800, Yongji Xie wrote:
+> > > On Mon, Jan 10, 2022 at 11:44 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Jan 10, 2022 at 11:24:40PM +0800, Yongji Xie wrote:
+> > > > > On Mon, Jan 10, 2022 at 11:10 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Mon, Jan 10, 2022 at 09:54:08PM +0800, Yongji Xie wrote:
+> > > > > > > On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
+> > > > > > > > > This series introduces a framework that makes it possible to implement
+> > > > > > > > > software-emulated vDPA devices in userspace. And to make the device
+> > > > > > > > > emulation more secure, the emulated vDPA device's control path is handled
+> > > > > > > > > in the kernel and only the data path is implemented in the userspace.
+> > > > > > > > >
+> > > > > > > > > Since the emuldated vDPA device's control path is handled in the kernel,
+> > > > > > > > > a message mechnism is introduced to make userspace be aware of the data
+> > > > > > > > > path related changes. Userspace can use read()/write() to receive/reply
+> > > > > > > > > the control messages.
+> > > > > > > > >
+> > > > > > > > > In the data path, the core is mapping dma buffer into VDUSE daemon's
+> > > > > > > > > address space, which can be implemented in different ways depending on
+> > > > > > > > > the vdpa bus to which the vDPA device is attached.
+> > > > > > > > >
+> > > > > > > > > In virtio-vdpa case, we implements a MMU-based software IOTLB with
+> > > > > > > > > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+> > > > > > > > > buffer is reside in a userspace memory region which can be shared to the
+> > > > > > > > > VDUSE userspace processs via transferring the shmfd.
+> > > > > > > > >
+> > > > > > > > > The details and our user case is shown below:
+> > > > > > > > >
+> > > > > > > > > ------------------------    -------------------------   ----------------------------------------------
+> > > > > > > > > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+> > > > > > > > > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+> > > > > > > > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+> > > > > > > > > ------------+-----------     -----------+------------   -------------+----------------------+---------
+> > > > > > > > >             |                           |                            |                      |
+> > > > > > > > >             |                           |                            |                      |
+> > > > > > > > > ------------+---------------------------+----------------------------+----------------------+---------
+> > > > > > > > > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+> > > > > > > > > |    -------+--------           --------+--------            -------+--------          -----+----    |
+> > > > > > > > > |           |                           |                           |                       |        |
+> > > > > > > > > | ----------+----------       ----------+-----------         -------+-------                |        |
+> > > > > > > > > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+> > > > > > > > > | ----------+----------       ----------+-----------         -------+-------                |        |
+> > > > > > > > > |           |      virtio bus           |                           |                       |        |
+> > > > > > > > > |   --------+----+-----------           |                           |                       |        |
+> > > > > > > > > |                |                      |                           |                       |        |
+> > > > > > > > > |      ----------+----------            |                           |                       |        |
+> > > > > > > > > |      | virtio-blk device |            |                           |                       |        |
+> > > > > > > > > |      ----------+----------            |                           |                       |        |
+> > > > > > > > > |                |                      |                           |                       |        |
+> > > > > > > > > |     -----------+-----------           |                           |                       |        |
+> > > > > > > > > |     |  virtio-vdpa driver |           |                           |                       |        |
+> > > > > > > > > |     -----------+-----------           |                           |                       |        |
+> > > > > > > > > |                |                      |                           |    vdpa bus           |        |
+> > > > > > > > > |     -----------+----------------------+---------------------------+------------           |        |
+> > > > > > > > > |                                                                                        ---+---     |
+> > > > > > > > > -----------------------------------------------------------------------------------------| NIC |------
+> > > > > > > > >                                                                                          ---+---
+> > > > > > > > >                                                                                             |
+> > > > > > > > >                                                                                    ---------+---------
+> > > > > > > > >                                                                                    | Remote Storages |
+> > > > > > > > >                                                                                    -------------------
+> > > > > > > > >
+> > > > > > > > > We make use of it to implement a block device connecting to
+> > > > > > > > > our distributed storage, which can be used both in containers and
+> > > > > > > > > VMs. Thus, we can have an unified technology stack in this two cases.
+> > > > > > > > >
+> > > > > > > > > To test it with null-blk:
+> > > > > > > > >
+> > > > > > > > >   $ qemu-storage-daemon \
+> > > > > > > > >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+> > > > > > > > >       --monitor chardev=charmonitor \
+> > > > > > > > >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+> > > > > > > > >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
+> > > > > > > > >
+> > > > > > > > > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+> > > > > > > >
+> > > > > > > > It's been half a year - any plans to upstream this?
+> > > > > > >
+> > > > > > > Yeah, this is on my to-do list this month.
+> > > > > > >
+> > > > > > > Sorry for taking so long... I've been working on another project
+> > > > > > > enabling userspace RDMA with VDUSE for the past few months. So I
+> > > > > > > didn't have much time for this. Anyway, I will submit the first
+> > > > > > > version as soon as possible.
+> > > > > > >
+> > > > > > > Thanks,
+> > > > > > > Yongji
+> > > > > >
+> > > > > > Oh fun. You mean like virtio-rdma? Or RDMA as a backend for regular
+> > > > > > virtio?
+> > > > > >
+> > > > >
+> > > > > Yes, like virtio-rdma. Then we can develop something like userspace
+> > > > > rxe、siw or custom protocol with VDUSE.
+> > > > >
+> > > > > Thanks,
+> > > > > Yongji
+> > > >
+> > > > Would be interesting to see the spec for that.
+> > >
+> > > Will send it ASAP.
+> > >
+> > > > The issues with RDMA revolved around the fact that current
+> > > > apps tend to either use non-standard propocols for connection
+> > > > establishment or use UD where there's IIRC no standard
+> > > > at all. So QP numbers are hard to virtualize.
+> > > > Similarly many use LIDs directly with the same effect.
+> > > > GUIDs might be virtualizeable but no one went to the effort.
+> > > >
+> > >
+> > > Actually we aimed at emulating a soft RDMA with normal NIC (not use
+> > > RDMA capability) rather than virtualizing a physical RDMA NIC into
+> > > several vRDMA devices. If so, I think we won't have those issues,
+> > > right?
+> >
+> > Right, maybe you won't.
+> >
+> > > > To say nothing about the interaction with memory overcommit.
+> > > >
+> > >
+> > > I don't get you here. Could you give me more details?
+> > >
+> > > Thanks,
+> > > Yongji
+> >
+> > RDMA devices tend to want to pin the memory under DMA.
+> >
+> 
+> I see. Maybe something like dm or odp could be helpful.
+> 
+> Thanks,
+> Yongji
 
-> We check the PTF instruction.
-> 
-> - We do not expect to support vertical polarization.
-> 
-> - We do not expect the Modified Topology Change Report to be
-> pending or not at the moment the first PTF instruction with
-> PTF_CHECK function code is done as some code already did run
-> a polarization change may have occur.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  s390x/Makefile      |   1 +
->  s390x/topology.c    | 115 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   3 ++
->  3 files changed, 119 insertions(+)
->  create mode 100644 s390x/topology.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 1e567c11..fa21a882 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -26,6 +26,7 @@ tests += $(TEST_DIR)/edat.elf
->  tests += $(TEST_DIR)/mvpg-sie.elf
->  tests += $(TEST_DIR)/spec_ex-sie.elf
->  tests += $(TEST_DIR)/firq.elf
-> +tests += $(TEST_DIR)/topology.elf
->  
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  ifneq ($(HOST_KEY_DOCUMENT),)
-> diff --git a/s390x/topology.c b/s390x/topology.c
-> new file mode 100644
-> index 00000000..a227555e
-> --- /dev/null
-> +++ b/s390x/topology.c
-> @@ -0,0 +1,115 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright (c) 2021 IBM Corp
+Yes sure.
 
-Copyright IBM Corp. 2021
-
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/page.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/facility.h>
-> +#include <smp.h>
-> +#include <sclp.h>
-> +#include <s390x/vm.h>
-> +
-> +#define PTF_REQ_HORIZONTAL	0
-> +#define PTF_REQ_VERTICAL	1
-> +#define PTF_REQ_CHECK		2
-> +
-> +#define PTF_ERR_NO_REASON	0
-> +#define PTF_ERR_ALRDY_POLARIZED	1
-> +#define PTF_ERR_IN_PROGRESS	2
-> +
-> +static int ptf(unsigned long fc, unsigned long *rc)
-> +{
-> +	int cc;
-> +
-> +	asm volatile(
-> +		"       .insn   rre,0xb9a20000,%1,0\n"
-> +		"       ipm     %0\n"
-> +		"       srl     %0,28\n"
-> +		: "=d" (cc), "+d" (fc)
-> +		: "d" (fc)
-> +		: "cc");
-> +
-> +	*rc = fc >> 8;
-> +	return cc;
-> +}
-> +
-> +static void test_ptf(void)
-> +{
-> +	unsigned long rc;
-> +	int cc;
-> +
-> +	report_prefix_push("Topology Report pending");
-> +	/*
-> +	 * At this moment the topology may already have changed
-> +	 * since the VM has been started.
-> +	 * However, we can test if a second PTF instruction
-> +	 * reports that the topology did not change since the
-> +	 * preceding PFT instruction.
-> +	 */
-> +	ptf(PTF_REQ_CHECK, &rc);
-> +	cc = ptf(PTF_REQ_CHECK, &rc);
-> +	report(cc == 0, "PTF check should clear topology report");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("Topology polarisation check");
-> +	/*
-> +	 * We can not assume the state of the polarization for
-> +	 * any Virtual Machine but KVM.
-> +	 * Let's skip the polarisation tests for other VMs.
-> +	 */
-> +	if (!vm_is_kvm()) {
-> +		report_skip("Topology polarisation check is done for KVM only");
-> +		goto end;
-> +	}
-> +
-> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
-> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
-> +	       "KVM always provides horizontal polarization");
-> +
-> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
-> +	report(cc == 2 && rc == PTF_ERR_NO_REASON,
-> +	       "KVM doesn't support vertical polarization.");
-> +
-> +end:
-> +	report_prefix_pop();
-> +}
-> +
-> +static struct {
-> +	const char *name;
-> +	void (*func)(void);
-> +} tests[] = {
-> +	{ "PTF", test_ptf},
-> +	{ NULL, NULL }
-> +};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	int i;
-> +
-> +	report_prefix_push("CPU Topology");
-> +
-> +	if (!test_facility(11)) {
-> +		report_skip("Topology facility not present");
-> +		goto end;
-> +	}
-> +
-> +	report_info("Machine level %ld", stsi_get_fc());
-> +
-> +	for (i = 0; tests[i].name; i++) {
-> +		report_prefix_push(tests[i].name);
-> +		tests[i].func();
-> +		report_prefix_pop();
-> +	}
-> +end:
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 054560c2..e2d3e6a5 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -122,3 +122,6 @@ extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=1 -devi
->  file = firq.elf
->  timeout = 20
->  extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -device qemu-s390x-cpu,core-id=1
-> +
-> +[topology]
-> +file = topology.elf
+-- 
+MST
 
