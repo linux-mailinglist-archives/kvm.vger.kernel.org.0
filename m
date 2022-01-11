@@ -2,133 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C70C448B673
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 20:04:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D32C48B72F
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 20:18:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345855AbiAKTEt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 14:04:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
+        id S1350612AbiAKTS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 14:18:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238845AbiAKTEs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 14:04:48 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75014C061748
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:04:48 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id h1so175144pls.11
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:04:48 -0800 (PST)
+        with ESMTP id S1350618AbiAKTRg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 14:17:36 -0500
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1637EC06118A
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:16:59 -0800 (PST)
+Received: by mail-ot1-x32d.google.com with SMTP id a12-20020a0568301dcc00b005919e149b4cso1684469otj.8
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:16:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=K0voZAURqPJsMSPgWRWSbzQgUhtAjQkdnnmPm2jJT2w=;
-        b=OBsot1EYclSvooVusPEFiHcqQS0tLiqutA1hLvc4Q8dJ1Ly3d4NacG3jUTcwT8b5B0
-         yAzAAMtSPazCmF1twB9t7p7OjthaBlEEVkPWyFLjoGrBIC4wlTb5/+rRXf0vM/6rqMCU
-         Ragb7afH7stdPZ3KqbuRhWmkPsSooAAmEnsXlw63cnann8b5t+woTMjdUi9ErVLDZadL
-         SBMqnGpNjCY4JuVHxg3BCfGS2f1fwERk57a6Mqygc7EBur2rRRWKrn5R3WR0uUengxin
-         T+1Z9+vSV6mbJNk442DU5o4tAuCOGgn5t6ttzvE2XufqHuwrPcbXryB0l8VXzxOzfmXG
-         EbOw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RmmeEOXgL4aczt2lYfVEJ81JJyR5GHuXnUEqtqtBYAw=;
+        b=cOATJM7qKaMwa1rfMreaSBRrwDDzMO7PjOtbZd5NEoxEnpoVYSyEoZ9YYXqeYIXSvr
+         YE9v8N/iag490QDHMRj+L/DdGLjpFJHDqQCT7vnsL3SeJdwkX63Af178WulVTiUohxbi
+         2Z/g/UTUnmDWrvpF1A4BuycMUQiQMZtfEfDMEJMhly8ysY21Lwy1FYkVyAAHc2Y+CloD
+         QUqxx8+pjJdctbF3pQ+CoqO2LSEEj2OAsTt02lMfMbyq/L2h4o6KshlrJhMnTMxz7HRI
+         kj1j8PJ6vmHhfhTs5wV82Z3hYb9FrcuJ2q8JzsdRPEiJYoahPTsWOV6v37b2pmdg3f9Q
+         Qtpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=K0voZAURqPJsMSPgWRWSbzQgUhtAjQkdnnmPm2jJT2w=;
-        b=egVAgXbtIof3B0hkK3NZ2mQkIRX+6RNiG3EFNnhdZ9rJa550dzhaWFhQNzbzaRE+VX
-         1CgiZE+i9w+vKQzYUNzoIa8kOgDH4FqPxSy+ow8OBQSKpmaqWFLuUwfGvO+TGwcnIj57
-         cFmD/+i1ELutFt/5DpsTaTG3pMSyec0/bXztJysA3XP88H4PXJnbLv4NQRsHqLbq3JLc
-         K2aKcQra+9naQMHpwgKRJdoNLPUfDeMTN+d5+RpZNYWgJWdohUou+CIknA6qg1+3sCtF
-         N9B7hUHwIqCnXt0A2X1gaY3elx0RB8oQH//xeFRImP8z9s/s7VYsvwbPL+9Lnq0csvWd
-         mxrA==
-X-Gm-Message-State: AOAM530HsoPwWKaqA29V3uaCGhJJfjVrgtJ5rYIuYsM7wjKxioAYag1M
-        gsTLjHd1djNM+Td8XeMFck3B1Q==
-X-Google-Smtp-Source: ABdhPJxSyV27y218zwiIgly8FGJNiKN5fGPK6Fudoin6YBhcWN0ZlQZF3CdSOjibQ9Gqz01uCEpKuA==
-X-Received: by 2002:a63:7c5e:: with SMTP id l30mr5246852pgn.297.1641927887737;
-        Tue, 11 Jan 2022 11:04:47 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l22sm11246197pfc.167.2022.01.11.11.04.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 11:04:47 -0800 (PST)
-Date:   Tue, 11 Jan 2022 19:04:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RmmeEOXgL4aczt2lYfVEJ81JJyR5GHuXnUEqtqtBYAw=;
+        b=E3hwxML0Q7gp4CSLkRmpncoKtpwe3XmB/dPjNoRauJQkLdAcYxYZHtzBmv2ACH/FOz
+         pM0hGnzDhnzO/lIqOO1c8CL2vQtUvmatAdn8vPdGBOjJMoPL14gj5aZsiBnVj+xq9TYN
+         bCU2SoHrV3qHL22SUCs517OGihJWLPPlMYLmpu0N8xVi2SzlAQR7gf7Hr732sIpzBWFY
+         fbysKt0d4q3SoB796RAcJyBQjtrkrblmKhXRx9hRGCOFu7NV/MgB2QPkhcf9yO0kNO/q
+         t2BLiPPmuCGujcJDTnqPiCu4qhyw/vqDPNBSLnx1AHLkzoncU0X8nl13t/h4YGUmWvIg
+         1xBA==
+X-Gm-Message-State: AOAM530aG9fB7Pbgw/QzWqZ51RP//H0kOlis0xCyNlv2RnAYMGb1W1mx
+        g2vInIZ81SgBd2Ja7OTQvBD20kx46AQbdjuFsM0M8w==
+X-Google-Smtp-Source: ABdhPJyFhnhDMW2ISK4zn+lMszvCQjj7MkaLiyC7O4OUsyaW0HdldRqbQFmZ06I5CZ/gdojGHnnTpqjIXgdkiahuGYk=
+X-Received: by 2002:a05:6830:441f:: with SMTP id q31mr4578699otv.14.1641928618059;
+ Tue, 11 Jan 2022 11:16:58 -0800 (PST)
+MIME-Version: 1.0
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+ <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+ <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+ <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com> <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+In-Reply-To: <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 11 Jan 2022 11:16:46 -0800
+Message-ID: <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
 To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+Cc:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-Message-ID: <Yd3UymPg++JW98/2@google.com>
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
- <Ydjje8qBOP3zDOZi@google.com>
- <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
- <Yd3AGRtkBgWSmGf2@google.com>
- <CAJHc60w7vfHkg+9XkPw+38nZBWLLhETJj310ekM1HpQQTL_O0Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJHc60w7vfHkg+9XkPw+38nZBWLLhETJj310ekM1HpQQTL_O0Q@mail.gmail.com>
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022, Raghavendra Rao Ananta wrote:
-> On Tue, Jan 11, 2022 at 9:36 AM Sean Christopherson <seanjc@google.com> wrote:
-> > In your proposed patch, KVM_RUN will take kvm->lock _every_ time.  That introduces
-> > unnecessary contention as it will serialize this bit of code if multiple vCPUs
-> > are attempting KVM_RUN.  By checking !vm_started, only the "first" KVM_RUN for a
-> > VM will acquire kvm->lock and thus avoid contention once the VM is up and running.
-> > There's still a possibility that multiple vCPUs will contend for kvm->lock on their
-> > first KVM_RUN, hence the quotes.  I called it "naive" because it's possible there's
-> > a more elegant solution depending on the use case, e.g. a lockless approach might
-> > work (or it might not).
+On Tue, Jan 11, 2022 at 10:52 AM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> On Mon, Jan 10, 2022 at 3:57 PM Jim Mattson <jmattson@google.com> wrote:
 > >
-> But is it safe to read kvm->vm_started without grabbing the lock in
-> the first place?
-
-Don't know, but that's my point.  Without a consumer in generic KVM and due to
-my lack of arm64 knowledge, without a high-level description of how the flag will
-be used by arm64, it's really difficult to determine what's safe and what's not.
-For other architectures, it's an impossible question to answer because we don't
-know how the flag might be used.
-
-> use atomic_t maybe for this?
-
-No.  An atomic_t is generally useful only if there are multiple writers that can
-possibly write different values.  It's highly unlikely that simply switching to an
-atomic address the needs of arm64.
-
-> > > > > +                     kvm->vm_started = true;
-> > > > > +                     mutex_unlock(&kvm->lock);
+> > On Mon, Jan 10, 2022 at 3:07 PM Raghavendra Rao Ananta
+> > <rananta@google.com> wrote:
+> > >
+> > > On Fri, Jan 7, 2022 at 4:05 PM Jim Mattson <jmattson@google.com> wrote:
 > > > >
-> > > > Lastly, why is this in generic KVM?
+> > > > On Fri, Jan 7, 2022 at 3:43 PM Raghavendra Rao Ananta
+> > > > <rananta@google.com> wrote:
+> > > > >
+> > > > > Hi Reiji,
+> > > > >
+> > > > > On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
+> > > > > >
+> > > > > > Hi Raghu,
+> > > > > >
+> > > > > > On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
+> > > > > > <rananta@google.com> wrote:
+> > > > > > >
+> > > > > > > Capture the start of the KVM VM, which is basically the
+> > > > > > > start of any vCPU run. This state of the VM is helpful
+> > > > > > > in the upcoming patches to prevent user-space from
+> > > > > > > configuring certain VM features after the VM has started
+> > > > > > > running.
 > > > >
-> > > The v1 of the series originally had it in the arm specific code.
-> > > However, I was suggested to move it to the generic code since the book
-> > > keeping is not arch specific and could be helpful to others too [1].
+> > > > What about live migration, where the VM has already technically been
+> > > > started before the first call to KVM_RUN?
+> > >
+> > > My understanding is that a new 'struct kvm' is created on the target
+> > > machine and this flag should be reset, which would allow the VMM to
+> > > restore the firmware registers. However, we would be running KVM_RUN
+> > > for the first time on the target machine, thus setting the flag.
+> > > So, you are right; It's more of a resume operation from the guest's
+> > > point of view. I guess the name of the variable is what's confusing
+> > > here.
 > >
-> > I'm definitely in favor of moving/adding thing to generic KVM when it makes sense,
-> > but I'm skeptical in this particular case.  The code _is_ arch specific in that
-> > arm64 apparently needs to acquire kvm->lock when checking if a vCPU has run, e.g.
-> > versus a hypothetical x86 use case that might be completely ok with a lockless
-> > implementation.  And it's not obvious that there's a plausible, safe use case
-> > outside of arm64, e.g. on x86, there is very, very little that is truly shared
-> > across the entire VM/system, most things are per-thread/core/package in some way,
-> > shape, or form.  In other words, I'm a wary of providing something like this for
-> > x86 because odds are good that any use will be functionally incorrect.
-> I've been going back and forth on this. I've seen a couple of
-> variables declared in the generic struct and used only in the arch
-> code. vcpu->valid_wakeup for instance, which is used only by s390
-> arch. Maybe I'm looking at it the wrong way as to what can and can't
-> go in the generic kvm code.
+> > I was actually thinking that live migration gives userspace an easy
+> > way to circumvent your restriction. You said, "This state of the VM is
+> > helpful in the upcoming patches to prevent user-space from configuring
+> > certain VM features after the VM has started running." However, if you
+> > don't ensure that these VM features are configured the same way on the
+> > target machine as they were on the source machine, you have not
+> > actually accomplished your stated goal.
+> >
+> Isn't that up to the VMM to save/restore and validate the registers
+> across migrations?
 
-Ya, valid_wakeup is an oddball, I don't know why it's in kvm_vcpu instead of
-arch code that's wrapped with e.g. kvm_arch_vcpu_valid_wakeup().
+Yes, just as it is up to userspace not to make bad configuration
+changes after the first VMRUN.
 
-That said, valid_wakeup is consumed by generic KVM, i.e. has well defined semantics
-for how it is used, so it's purely a "this code is rather odd" issue.  vm_started
-on the other hand is only produced by generic KVM, and so its required semantics are
-unclear.
+> Perhaps I have to re-word my intentions for the patch- userspace
+> should be able to configure the registers before issuing the first
+> KVM_RUN.
+
+Perhaps it would help if you explained *why* you are doing this. It
+sounds like you are either trying to protect against a malicious
+userspace, or you are trying to keep userspace from doing something
+stupid. In general, kvm only enforces constraints that are necessary
+to protect the host. If that's what you're doing, I don't understand
+why live migration doesn't provide an end-run around your protections.
