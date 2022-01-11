@@ -2,185 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EA4D48A6D3
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 05:34:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A435348A71D
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 06:21:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347876AbiAKEeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 23:34:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34242 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234033AbiAKEeG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 23:34:06 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C537C061748
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 20:34:05 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id l15so15287085pls.7
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 20:34:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uMyFE4hG9HNVlJfPf9YKH//FQ4xNSq0cqHXKoYVzLtY=;
-        b=IoUVuvrgWKhoC6sytqSfwIJI7gkn4fO0B8ADTV3aEgX+knQcJsv0VAQaj1kuLBeNoI
-         O6xnzUblcUsaWiU/Z4wBCsMYs8FnGy+kKltX5jlY/Z5bpv7VT+iDEIl4N5HphnVSPoKc
-         yCPnpKrZyKuNI9FN/+bAZAeyLqf69A96/TysbBvFonI3FqDvEBEBbYX9wpHhrFv1ZrqM
-         dqOYgpXY9ky0C/oAQHLMOCPUXteUxxndCpdzANKI3hQUQxZVPAGAUyi4rSwXbtDp2ABn
-         L+DKYW4o2UtYL9YEHda31pyHov40Rr1EwQ8mQ9Prkrr6+CDQjQO0rFzakHfnfcSZSS1V
-         UWaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uMyFE4hG9HNVlJfPf9YKH//FQ4xNSq0cqHXKoYVzLtY=;
-        b=hGc34dvjGlM4hCUfutLqfBeXSjysiAUAwg0TGa+JE0MpnNZyDLAxYsWZJLJL7PxpBF
-         GL6OccNlYCWN0YFVIArnIL/MVCJ5hqEZDcbMQ2FCLAM+0XziXd5wsB0i/vGCDtoSFrnr
-         jjPZPxvZkRVNjJ08NujHPFq6tpwP9jcCV0x5fBDsn76+Nqbs9cZJF32075krSFfGjGd7
-         BrrEqzF2tEfohhMCWiBDyIkeqhoyoDwn8stToyFUIIQkL1YH5Kog1AucBcVwsbElWmJP
-         ovKEQohSdU9fCGzmcHZUJF1bA8IYZqFG9yupN8Y7lLhRIsxVe0kAb3xBopsCDBDwJ/dk
-         V6Qg==
-X-Gm-Message-State: AOAM531WVRmf+yNMHtJoPToPvFOBoCAxm+MSEm1StZrDTD+jQypO8BsZ
-        gzei4sNdjn6lGUKLpqMCM+AD5C9oYcslkF/H6URBZg==
-X-Google-Smtp-Source: ABdhPJxDACYVZNSOXRWjP5GTJ3EFQevPl911BeBWcnIlhN78MJFunWDZRUfpIPX1foVzWaUHnTgRqvlXUGm4SWZ6HUg=
-X-Received: by 2002:a63:6c85:: with SMTP id h127mr2530846pgc.491.1641875644641;
- Mon, 10 Jan 2022 20:34:04 -0800 (PST)
+        id S233798AbiAKFVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 00:21:19 -0500
+Received: from mga09.intel.com ([134.134.136.24]:10946 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241556AbiAKFVP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 00:21:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641878475; x=1673414475;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SeBpGHW2Awj9fCFruQbs0jysOX1WgLyM8SQ0XPcSawQ=;
+  b=iJxKJ5mvbHeW1mtzxeNeMR46qSAbhK+VpSzkI1QBBw78v5k3tr7o8Ii/
+   TP7drDAdsGNcPLb3am1XiOCYQ9LP98xuu/f2ZHr8Bl/3s3SS6wiEwrV9N
+   8g5OSy/cFr3ZNtNk+E7XRMQYdz+AW8pMgp4UL7vPfKX/wZ5kfnOlAu0Cr
+   eFXhlhVaxHNjgaGN/jOEErNWTYW6QuqvXomtQDOlgwF8tCpwcEmk+dnPw
+   J2luymyB2MOE4zXyiml3ZHFjrZMAYpu68qaP7gKxuhKjI6JKrN1ql5VAJ
+   tHIMWohrMp2cMxaOkAUsVldwhYMLB3VbNQDhljZQtWlICN6s5mAEmqHeM
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="243201507"
+X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
+   d="scan'208";a="243201507"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 21:21:14 -0800
+X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
+   d="scan'208";a="690859624"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 21:21:12 -0800
+Date:   Tue, 11 Jan 2022 13:32:06 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
+        tglx@linutronix.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] KVM: Do compatibility checks on hotplugged CPUs
+Message-ID: <20220111053205.GD2175@gao-cwp>
+References: <20211227081515.2088920-1-chao.gao@intel.com>
+ <20211227081515.2088920-7-chao.gao@intel.com>
+ <YdzTfIEZ727L4g2R@google.com>
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-4-rananta@google.com>
- <CAAeT=FxCCD+H1z8+gfyBZNeibfAUqUenZZe56Vj_3fCghJjy=Q@mail.gmail.com> <CAJHc60yY9qH5_r09Tz2fhWr+tT+i7RnKhchBuEePCKnos52kwA@mail.gmail.com>
-In-Reply-To: <CAJHc60yY9qH5_r09Tz2fhWr+tT+i7RnKhchBuEePCKnos52kwA@mail.gmail.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 10 Jan 2022 20:33:48 -0800
-Message-ID: <CAAeT=FyJcUKP4ZGuMQh-AFExj9X=cXKUf0RueqqqhRwUHL2+sw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 03/11] KVM: Introduce KVM_CAP_ARM_HVC_FW_REG_BMAP
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YdzTfIEZ727L4g2R@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 3:40 PM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
+On Tue, Jan 11, 2022 at 12:46:52AM +0000, Sean Christopherson wrote:
+>On Mon, Dec 27, 2021, Chao Gao wrote:
+>> At init time, KVM does compatibility checks to ensure that all online
+>> CPUs support hardware virtualization and a common set of features. But
+>> KVM uses hotplugged CPUs without such compatibility checks. On Intel
+>> CPUs, this leads to #GP if the hotplugged CPU doesn't support VMX or
+>> vmentry failure if the hotplugged CPU doesn't meet minimal feature
+>> requirements.
+>> 
+>> Do compatibility checks when onlining a CPU. If any VM is running,
+>> KVM hotplug callback returns an error to abort onlining incompatible
+>> CPUs.
+>> 
+>> But if no VM is running, onlining incompatible CPUs is allowed. Instead,
+>> KVM is prohibited from creating VMs similar to the policy for init-time
+>> compatibility checks.
 >
-> On Fri, Jan 7, 2022 at 9:40 PM Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Raghu,
-> >
-> > On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
-> > <rananta@google.com> wrote:
-> > >
-> > > Introduce the KVM ARM64 capability, KVM_CAP_ARM_HVC_FW_REG_BMAP,
-> > > to indicate the support for psuedo-firmware bitmap extension.
-> > > Each of these registers holds a feature-set exposed to the guest
-> > > in the form of a bitmap. If supported, a simple 'read' of the
-> > > capability should return the number of psuedo-firmware registers
-> > > supported. User-space can utilize this to discover the registers.
-> > > It can further explore or modify the features using the classical
-> > > GET/SET_ONE_REG interface.
-> > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  Documentation/virt/kvm/api.rst | 21 +++++++++++++++++++++
-> > >  include/uapi/linux/kvm.h       |  1 +
-> > >  2 files changed, 22 insertions(+)
-> > >
-> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > index aeeb071c7688..646176537f2c 100644
-> > > --- a/Documentation/virt/kvm/api.rst
-> > > +++ b/Documentation/virt/kvm/api.rst
-> > > @@ -6925,6 +6925,27 @@ indicated by the fd to the VM this is called on.
-> > >  This is intended to support intra-host migration of VMs between userspace VMMs,
-> > >  upgrading the VMM process without interrupting the guest.
-> > >
-> > > +7.30 KVM_CAP_ARM_HVC_FW_REG_BMAP
-> >
-> > IMHO, instead of including its format of the register in the name,
-> > including its purpose/function in the name might be better.
-> > e.g. KVM_CAP_ARM_HVC_FEATURE_REG ?
-> > (Feature fields don't necessarily have to be in a bitmap format
-> >  if they don't fit well although I'm not sure if we have such fields.)
-> >
-> Well we do have registers, KVM_REG_ARM_PSCI_VERSION for instance,
-> that's not covered by this CAP. But sure, I can explicitly add
-> 'FEATURES' to the name. I also wanted to explicitly convey that we are
-> covering the *bitmapped* firmware registers here. But not sure if
-> appending 'BMAP' might give an impression that the CAP itself is
-> bitmapped.
-> Do you think KVM_CAP_ARM_HVC_BMAP_FEAT_REG is better?
-
-Thank you for the explanation! That sounds better to me.
-
-Regards,
-Reiji
-
-
-> > > +
-> > > +:Architectures: arm64
-> > > +:Parameters: None
-> > > +:Returns: Number of psuedo-firmware registers supported
-> >
-> > Looking at patch-4, the return value of this would be the number of
-> > pseudo-firmware *bitmap* registers supported.
-> > BTW, "4.68 KVM_SET_ONE_REG" in the doc uses the word "arm64 firmware
-> > pseudo-registers".  It would be nicer to use the same term.
-> >
-> Nice catch. I'll fix it here in apr.rst.
-> > > +
-> > > +This capability indicates that KVM for arm64 supports the psuedo-firmware
-> > > +register bitmap extension. Each of these registers represent the features
-> > > +supported by a particular type in the form of a bitmap. By default, these
-> > > +registers are set with the upper limit of the features that are supported.
-> > > +
-> > > +The registers can be accessed via the standard SET_ONE_REG and KVM_GET_ONE_REG
-> > > +interfaces. The user-space is expected to read the number of these registers
-> > > +available by reading KVM_CAP_ARM_HVC_FW_REG_BMAP, read the current bitmap
-> > > +configuration via GET_ONE_REG for each register, and then write back the
-> > > +desired bitmap of features that it wishes the guest to see via SET_ONE_REG.
-> > > +
-> > > +Note that KVM doesn't allow the user-space to modify these registers after
-> > > +the VM (any of the vCPUs) has started running.
-> >
-> > Since even if KVM_RUN fails, and the VM hasn't started yet,
-> > it will get immutable. So, "after any of the vCPUs run KVM_RUN."
-> > might be more clear ?
-> >
-> Sure, that's probably more clear. I'll fix it.
+>...
 >
-> Regards,
-> Raghavendra
+>> ---
+>>  virt/kvm/kvm_main.c | 36 ++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 34 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index c1054604d1e8..0ff80076d48d 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -106,6 +106,8 @@ LIST_HEAD(vm_list);
+>>  static cpumask_var_t cpus_hardware_enabled;
+>>  static int kvm_usage_count;
+>>  static atomic_t hardware_enable_failed;
+>> +/* Set if hardware becomes incompatible after CPU hotplug */
+>> +static bool hardware_incompatible;
+>>  
+>>  static struct kmem_cache *kvm_vcpu_cache;
+>>  
+>> @@ -4855,20 +4857,32 @@ static void hardware_enable_nolock(void *junk)
+>>  
+>>  static int kvm_online_cpu(unsigned int cpu)
+>>  {
+>> -	int ret = 0;
+>> +	int ret;
+>>  
+>> +	ret = kvm_arch_check_processor_compat();
+>>  	raw_spin_lock(&kvm_count_lock);
+>>  	/*
+>>  	 * Abort the CPU online process if hardware virtualization cannot
+>>  	 * be enabled. Otherwise running VMs would encounter unrecoverable
+>>  	 * errors when scheduled to this CPU.
+>>  	 */
+>> -	if (kvm_usage_count) {
+>> +	if (!ret && kvm_usage_count) {
+>>  		hardware_enable_nolock(NULL);
+>>  		if (atomic_read(&hardware_enable_failed)) {
+>>  			ret = -EIO;
+>>  			pr_info("kvm: abort onlining CPU%d", cpu);
+>>  		}
+>> +	} else if (ret && !kvm_usage_count) {
+>> +		/*
+>> +		 * Continue onlining an incompatible CPU if no VM is
+>> +		 * running. KVM should reject creating any VM after this
+>> +		 * point. Then this CPU can be still used to run non-VM
+>> +		 * workload.
+>> +		 */
+>> +		ret = 0;
+>> +		hardware_incompatible = true;
 >
-> > Thanks,
-> > Reiji
-> >
-> >
-> >
-> > > +
-> > >  8. Other capabilities.
-> > >  ======================
-> > >
-> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > index 1daa45268de2..209b43dbbc3c 100644
-> > > --- a/include/uapi/linux/kvm.h
-> > > +++ b/include/uapi/linux/kvm.h
-> > > @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
-> > >  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
-> > >  #define KVM_CAP_ARM_MTE 205
-> > >  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> > > +#define KVM_CAP_ARM_HVC_FW_REG_BMAP 207
-> > >
-> > >  #ifdef KVM_CAP_IRQ_ROUTING
-> > >
-> > > --
-> > > 2.34.1.448.ga2b2bfdf31-goog
-> > >
+>This has a fairly big flaw in that it prevents KVM from creating VMs even if the
+>offending CPU is offlined.  That seems like a very reasonable thing to do, e.g.
+>admin sees that hotplugging a CPU broke KVM and removes the CPU to remedy the
+>problem.  And if KVM is built-in, reloading KVM to wipe hardware_incompatible
+>after offlining the CPU isn't an option.
+
+Ideally, yes, creation VMs should be allowed after offending CPUs are offlined.
+But the problem is kind of foundamental: 
+
+After kernel tries to online a CPU without VMX, boot_cpu_has(X86_FEATURE_VMX)
+returns false. So, the current behavior is reloading KVM would fail if
+kernel *tried* to bring up a CPU without VMX. So, it looks to me that
+boot_cpu_has() doesn't do feature re-evalution either. Given that, I doubt
+the value of making KVM able to create VM in this case.
+
+>
+>To make this approach work, I think kvm_offline_cpu() would have to reevaluate
+>hardware_incompatible if the flag is set.
+>
+>And should there be a KVM module param to let the admin opt in/out of this
+>behavior?  E.g. if the primary use case for a system is to run VMs, disabling
+>KVM just to online a CPU isn't very helpful.
+>
+>That said, I'm not convinced that continuing with the hotplug in this scenario
+>is ever the right thing to do.  Either the CPU being hotplugged really is a different
+>CPU, or it's literally broken.  In both cases, odds are very, very good that running
+>on the dodgy CPU will hose the kernel sooner or later, i.e. KVM's compatibility checks
+>are just the canary in the coal mine.
+
+Ok. Then here are two options:
+1. KVM always prevents incompatible CPUs from being brought up regardless of running VMs
+2. make "disabling KVM on incompatible CPUs" an opt-in feature.
+
+Which one do you think is better?
+
+And as said above, even with option 1, KVM reloading would fail due to
+boot_cpu_has(X86_FEATURE_VMX). I suppose it isn't necessary to be fixed in this series.
+
+>
+>TDX is a different beast as (a) that's purely a security restriction and (b) anyone
+>trying to run TDX guests darn well better know that TDX doesn't allow hotplug.
+>In other words, if TDX gets disabled due to hotplug, either someone majorly screwed
+>up and is going to be unhappy no matter what, or there's no intention of using TDX
+>and it's a complete don't care.
+>
+>> +		pr_info("kvm: prohibit VM creation due to incompatible CPU%d",
+>
+>pr_info() is a bit weak, this should be at least pr_warn() and maybe even pr_err().
+>
+>> +			cpu);
+>
+>Eh, I'd omit the newline and let that poke out.
+
+Will do.
+
+>
+>>  	}
+>>  	raw_spin_unlock(&kvm_count_lock);
+>>  	return ret;
+>> @@ -4913,8 +4927,24 @@ static int hardware_enable_all(void)
+>>  {
+>>  	int r = 0;
+>>  
+>> +	/*
+>> +	 * During onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
+>> +	 * is called. on_each_cpu() between them includes the CPU. As a result,
+>> +	 * hardware_enable_nolock() may get invoked before kvm_online_cpu().
+>> +	 * This would enable hardware virtualization on that cpu without
+>> +	 * compatibility checks, which can potentially crash system or break
+>> +	 * running VMs.
+>> +	 *
+>> +	 * Disable CPU hotplug to prevent this case from happening.
+>> +	 */
+>> +	cpus_read_lock();
+>>  	raw_spin_lock(&kvm_count_lock);
+>>  
+>> +	if (hardware_incompatible) {
+>
+>Another error message would likely be helpful here.  Even better would be if KVM
+>could provide some way for userspace to query which CPU(s) is bad.
+
+If option 1 is chosen, this check will be removed.
+
+For option 2, will add an error message. And how about a debugfs tunable to provide
+the list of bad CPUs?
