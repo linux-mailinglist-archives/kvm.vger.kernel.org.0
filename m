@@ -2,127 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7A548A499
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 01:57:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 364A548A4B0
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 02:05:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346038AbiAKA5M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 19:57:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229701AbiAKA5I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 19:57:08 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997B5C061748
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 16:57:08 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id h1so14701358pls.11
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 16:57:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=U+Wx73GN18nvNIxW83NvEPo0/N8UDKXuIJQiQCJDnlQ=;
-        b=W3uF1D/1TcPvfyCWEuQlCC/ZfqmxcCgVeUkXDF2tP0gUnoSZjf5vsm4z4RnSaC+VzG
-         9mCRsKcXyQ9qqbaEeyon8nAdKJkcbgXfLWa/My5hClQZV9DSLea+6U+mBDwA7aHFto01
-         kM/r6zJGX6DuGWYWcWGAUzJpBlpMSvRLSkwB/+o5VoxYqjFEZjq0fCuFFENKnlM2P3Or
-         oYZuf+4C5kuyIchn2HnbVjzxEgKkcXvlBYS6mzR9pohNotyLnPk/UKOvtqOyQOrmwbkB
-         JK7Jqul1MzLKItoxcEV28I22HO0VzyQ8iioEmV718/b+11ZrLMslwNCchDjygZeUZGp1
-         FS1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=U+Wx73GN18nvNIxW83NvEPo0/N8UDKXuIJQiQCJDnlQ=;
-        b=e6zEX5HD1atYeDCpzkoxJkJ5N1u9bI8F+trrQWulg1dl1RZE92VeRBkwskDgm16v0W
-         OkkSgXKkuHkMnMjzWpL+etGT0PhW2fnEvLkN+WAiPtXoz9+rkyswGdjnC07Y9wpS8UPX
-         eU7ZgnIeS2+M+HpD8OdH6xCvUuSvDbIM9Jqfq5FnRBkRGH38GJ2Kqgg7U9LRteZUcElI
-         5p5QJnmGbPG0hOa+rtbTYCZ5TaxEHpN+lF+F1wIrFoTlaTdRmYPzAdfxgGL+wkY6G3wq
-         ScJY2C997aDkv+BNXXE65XZzarndcREZdtVQh34G7KCueVpZfU7C1MKqrPDgENGzvYVR
-         7Hqw==
-X-Gm-Message-State: AOAM53090U9XB3YZXkSbw6b+z1iaRPxt95K0Rg8iJwjVFiiLRgLd7ofY
-        PIdsqKq8w6Bho/OsEGlDyfak0g==
-X-Google-Smtp-Source: ABdhPJyaxEHTTqdck5k/nSmI+nCln5IHFkOM+cvXjeodmuDO+C5RFav2V+9vgqFil9ytGRtHWnCdlg==
-X-Received: by 2002:a63:68c6:: with SMTP id d189mr2056686pgc.32.1641862627949;
-        Mon, 10 Jan 2022 16:57:07 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id mq12sm218893pjb.48.2022.01.10.16.57.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 16:57:07 -0800 (PST)
-Date:   Tue, 11 Jan 2022 00:57:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: x86/pt: Ignore all unknown Intel PT capabilities
-Message-ID: <YdzV33X5w6+tCamI@google.com>
-References: <20220110034747.30498-1-likexu@tencent.com>
+        id S1346066AbiAKBE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 20:04:59 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:59584 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243225AbiAKBE7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Jan 2022 20:04:59 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R951e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0V1WtPEy_1641863096;
+Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0V1WtPEy_1641863096)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 11 Jan 2022 09:04:57 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     anup@brainfault.org
+Cc:     atishp@atishpatra.org, paul.walmsley@sifive.com,
+        palmer@dabbelt.com, aou@eecs.berkeley.edu, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>,
+        Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH -next] RISC-V: KVM: remove unneeded semicolon
+Date:   Tue, 11 Jan 2022 09:04:54 +0800
+Message-Id: <20220111010454.126241-1-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220110034747.30498-1-likexu@tencent.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> Some of the new Intel PT capabilities (e.g. SDM Vol3, 32.2.4 Event
-> Tracing, it exposes details about the asynchronous events, when they are
-> generated, and when their corresponding software event handler completes
-> execution) cannot be safely and fully emulated by the KVM, especially
-> emulating the simultaneous writing of guest PT packets generated by
-> the KVM to the guest PT buffer.
-> 
-> For KVM, it's better to advertise currently supported features based on
-> the "static struct pt_cap_desc" implemented in the host PT driver and
-> ignore _all_ unknown features before they have been investigated one by
-> one and supported in a safe manner, leaving the rest as system-wide-only
-> tracing capabilities.
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
-> v1 -> v2 Changelog:
-> - Be safe and ignore _all_ unknown capabilities. (Paolo)
-> 
-> Previous:
-> https://lore.kernel.org/kvm/20220106085533.84356-1-likexu@tencent.com/
-> 
->  arch/x86/kvm/cpuid.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0b920e12bb6d..439b93359848 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -901,6 +901,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  			break;
->  		}
->  
-> +		/* It's better to be safe and ignore _all_ unknown capabilities. */
+Eliminate the following coccicheck warning:
+./arch/riscv/kvm/vcpu_sbi_v01.c:117:2-3: Unneeded semicolon
 
-No need to justify why unknown capabilities are hidden as that's very much (supposed
-to be) standard KVM behavior.
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ arch/riscv/kvm/vcpu_sbi_v01.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +		entry->ebx &= GENMASK(5, 0);
+diff --git a/arch/riscv/kvm/vcpu_sbi_v01.c b/arch/riscv/kvm/vcpu_sbi_v01.c
+index 4c7e13ec9ccc..9acc8fa21d1f 100644
+--- a/arch/riscv/kvm/vcpu_sbi_v01.c
++++ b/arch/riscv/kvm/vcpu_sbi_v01.c
+@@ -114,7 +114,7 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+-	};
++	}
+ 
+ 	return ret;
+ }
+-- 
+2.20.1.7.g153144c
 
-Please add a #define somewhere so that this is self-documenting, e.g. see
-KVM_SUPPORTED_XCR0.
-
-And why just EBX?  ECX appears to enumerate features too, and EDX is presumably
-reserved to enumerate yet more features when EBX/ECX run out of bits.
-
-And is there any possibility of a malicious user/guest using features to cause
-problems in the host?  I.e. does KVM need to enforce that the guest can't enable
-any unsupported features?
-
->  		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
->  			if (!do_host_cpuid(array, function, i))
->  				goto out;
-> -- 
-> 2.33.1
-> 
