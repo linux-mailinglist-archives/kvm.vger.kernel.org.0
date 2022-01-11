@@ -2,207 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFF2948BA58
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 22:59:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5457448BA8F
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 23:12:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343770AbiAKV6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 16:58:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16428 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229719AbiAKV6T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 16:58:19 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BLAvVG001974;
-        Tue, 11 Jan 2022 21:58:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9EeTXtdvEVZJPE8clELVEPcRNb4nDpYJAOUAGnpD18E=;
- b=AHJ47HcbsWqVPq3rjy43Ss5e4x3KrLCHIGCL2F0X1Q303cN75OEQk4FZ/z8LdKV2BlAE
- rNzGguTWzpwBfHA/vqVNsCgDCxhVyaxyZ/AMm4UvLb/On9X/Pqcq4cix+YnTkSfTk6iO
- pjWKPMfTbnciyPFd6XfhHPmA2QYRKswpwqGoaycPm/l7vB+o+OBEpz8kbMwAmckXymSB
- B3x8ThguvfLo/3CuTjf0j+yTR07xrQimWAoV9E0ZGYSwqAvGABFJpgY9QfPF95dRtRoB
- aXC/65nwL21N7X1bpGuCnIhVNXu213vZEo3006p+57nOjCLmYnKAhONigbOdRLe6ELgh 6w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dhgxy1hyc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 21:58:17 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20BLwGC9026617;
-        Tue, 11 Jan 2022 21:58:16 GMT
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dhgxy1hy5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 21:58:16 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20BLqMe9012370;
-        Tue, 11 Jan 2022 21:58:16 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04wdc.us.ibm.com with ESMTP id 3df28apbag-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jan 2022 21:58:15 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20BLwFtO10093018
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 21:58:15 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D4FAA28067;
-        Tue, 11 Jan 2022 21:58:14 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C48E028060;
-        Tue, 11 Jan 2022 21:58:13 +0000 (GMT)
-Received: from [9.65.85.237] (unknown [9.65.85.237])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jan 2022 21:58:13 +0000 (GMT)
-Message-ID: <fcce7cc6-6ac7-b22a-a957-80e59a0f4e83@linux.ibm.com>
-Date:   Tue, 11 Jan 2022 16:58:13 -0500
+        id S1346003AbiAKWMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 17:12:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345951AbiAKWMq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 17:12:46 -0500
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D28CC06173F
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 14:12:46 -0800 (PST)
+Received: by mail-ua1-x92e.google.com with SMTP id c36so1215866uae.13
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 14:12:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=r07AHSrwP7IiWaEc7XuaOpzxQqznHXlAJOTUVnC9Vs4=;
+        b=SoKy7zFxyiZIdEqDDvOy55G3RyQeDHBYuXYA0ds5AFE1ghNy88MWPRSTJJu1I27m//
+         Tn0zXSHitKGrBp82XAL0fqoQEQftUzzmRiRs3cYeqCqKNWnVrqdNdiGuAKiExQbrJ/pn
+         PeeU8VO/ymOqvy1DR08Ddip5epHa/U+1AvWGOU5mFS00J6+PQf+GxHG7fgugyVD9q/E0
+         ddcKS/8jlMs6CeE1VnGo/jSicIwx7r2YbZemenSGs2pQqqMbSFcIfSeWISIqG2Q2ZyGC
+         ViHS32HwVD+VIzeEMdbcAwmlRNq7I+FmHmKrUdjmOgMg54ZCHnb/lmlKpIq4kpt3lFY1
+         K3kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=r07AHSrwP7IiWaEc7XuaOpzxQqznHXlAJOTUVnC9Vs4=;
+        b=bH+DmHh4nUSTnZSZ29AW5/WHHdzlP3HgQzProiGOwInJdnEgI3BXhVS5NIdivMvXJc
+         t03WCwqxKZR8zs5D8lv72w/wk6V/ia3sgZvcDMBqVURnS+O/YOFINXpL0pGSdlifi040
+         UN6UbPxxhAIHR5q7pCP56P7O2WWza9I0tjm2yfyNP9EKztjhJqrgTDyjeGyV3lt5p0hI
+         4JRsrAuP0ELIwQlrjiFd0hRXX8fs1lHGk+B41HeUrvgAIhcRLWq4cmOAIB4nzX9hyHmv
+         pA9EI8cXfsXORNsoy9UkuAprKIrNCF6k1ty4GTzq/+Zpt0uAaWh0Dv0tJuSOA2yv/rmu
+         gLDA==
+X-Gm-Message-State: AOAM530X1EsSqW9n2IGPrX92c2PVtAUO155qMe5aQnaYgPYOwiWr8Wsu
+        UsMESXG0HP5mUGbHX+Nlofv1LoxkSe99qu3PA3JNNQ==
+X-Google-Smtp-Source: ABdhPJykyDLPhTd+VxJJF2l6DucJ4yNqzfCKkidJatnlOChHRQstJQQgi8avKM3niDpObkvUxYiEkxdrWnFBgVBxboQ=
+X-Received: by 2002:a05:6102:c46:: with SMTP id y6mr3403896vss.82.1641939165542;
+ Tue, 11 Jan 2022 14:12:45 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v17 08/15] s390/vfio-ap: keep track of active guests
-Content-Language: en-US
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
- <20211021152332.70455-9-akrowiak@linux.ibm.com>
- <20211230043322.2ba19bbd.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20211230043322.2ba19bbd.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uiPt7voRNxJjkjHMej9jUbf_89r3wWlF
-X-Proofpoint-ORIG-GUID: TrUUSbQ4qftWyQU6y_m6rm0QqOdw6Mhx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-11_04,2022-01-11_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- mlxlogscore=999 spamscore=0 clxscore=1015 mlxscore=0 phishscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201110111
+References: <20220110210441.2074798-1-jingzhangos@google.com> <877db6trlc.wl-maz@kernel.org>
+In-Reply-To: <877db6trlc.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Tue, 11 Jan 2022 14:12:33 -0800
+Message-ID: <CAAdAUtiZ4GXkDfjeknCmN5TZAiw5roH2h8pdeUGLMva50CL6rg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] ARM64: Guest performance improvement during dirty
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 12/29/21 22:33, Halil Pasic wrote:
-> On Thu, 21 Oct 2021 11:23:25 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Tue, Jan 11, 2022 at 3:55 AM Marc Zyngier <maz@kernel.org> wrote:
 >
->> The vfio_ap device driver registers for notification when the pointer to
->> the KVM object for a guest is set. Let's store the KVM pointer as well as
->> the pointer to the mediated device when the KVM pointer is set.
-> [..]
+> On Mon, 10 Jan 2022 21:04:38 +0000,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > This patch is to reduce the performance degradation of guest workload during
+> > dirty logging on ARM64. A fast path is added to handle permission relaxation
+> > during dirty logging. The MMU lock is replaced with rwlock, by which all
+> > permision relaxations on leaf pte can be performed under the read lock. This
+> > greatly reduces the MMU lock contention during dirty logging. With this
+> > solution, the source guest workload performance degradation can be improved
+> > by more than 60%.
+> >
+> > Problem:
+> >   * A Google internal live migration test shows that the source guest workload
+> >   performance has >99% degradation for about 105 seconds, >50% degradation
+> >   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+> >   This shows that most of the time, the guest workload degradtion is above
+> >   99%, which obviously needs some improvement compared to the test result
+> >   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+> >   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB
+> >   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB
 >
+> What are the host and guest page sizes?
+Both are 4K and guest mem is 2M hugepage backed. Will add the info for
+future posts.
 >
->> struct ap_matrix_dev {
->>          ...
->>          struct rw_semaphore guests_lock;
->>          struct list_head guests;
->>         ...
->> }
->>
->> The 'guests_lock' field is a r/w semaphore to control access to the
->> 'guests' field. The 'guests' field is a list of ap_guest
->> structures containing the KVM and matrix_mdev pointers for each active
->> guest. An ap_guest structure will be stored into the list whenever the
->> vfio_ap device driver is notified that the KVM pointer has been set and
->> removed when notified that the KVM pointer has been cleared.
->>
-> Is this about the field or about the list including all the nodes? This
-> reads lie guests_lock only protects the head element, which makes no
-> sense to me. Because of how these lists work.
-
-It locks the list, I can rewrite the description.
-
+> >
+> > Analysis:
+> >   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+> >     the number of contentions of MMU lock and the "dirty memory time" on
+> >     various VM spec.
+> >     By using test command
+> >     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
 >
-> The narrowest scope that could make sense is all the list_head stuff
-> in the entire list. I.e. one would only need the lock to traverse or
-> manipulate the list, while the payload would still be subject to
-> the matrix_dev->lock mutex.
-
-The matrix_dev->guests lock is needed whenever the kvm->lock
-is needed because the struct ap_guest object is created and the
-struct kvm assigned to it when the kvm pointer is set
-(vfio_ap_mdev_set_kvm function). So, in order to access the
-ap_guest object and retrieve the kvm pointer, we have to ensure
-the ap_guest_object is still available. The fact we can get the
-kvm pointer from the ap_matrix_mdev object just makes things
-more efficient - i.e., we won't have to traverse the list.
-
-Whenever the kvm->lock and matrix_dev->lock mutexes must
-be held, the order is:
-
-     matrix_dev->guests_lock
-     matrix_dev->guests->kvm->lock
-     matrix_dev->lock
-
-There are times where all three locks are not required; for example,
-the handle_pqap and vfio_ap_mdev_probe/remove functions only
-require the matrix_dev->lock because it does not need to lock kvm.
-
+> How is this test representative of the internal live migration test
+> you mention above? '-m 2' indicates a mode that varies depending on
+> the HW and revision of the test (I just added a bunch of supported
+> modes). Which one is it?
+The "dirty memory time" is the time vCPU threads spent in KVM after
+fault. Higher "dirty memory time" means higher degradation to guest
+workload.
+'-m 2' indicates mode "PA-bits:48,  VA-bits:48,  4K pages". Will add
+this for future posts.
 >
-> [..]
+> >     Below are the results:
+> >     +-------+------------------------+-----------------------+
+> >     | #vCPU | dirty memory time (ms) | number of contentions |
+> >     +-------+------------------------+-----------------------+
+> >     | 1     | 926                    | 0                     |
+> >     +-------+------------------------+-----------------------+
+> >     | 2     | 1189                   | 4732558               |
+> >     +-------+------------------------+-----------------------+
+> >     | 4     | 2503                   | 11527185              |
+> >     +-------+------------------------+-----------------------+
+> >     | 8     | 5069                   | 24881677              |
+> >     +-------+------------------------+-----------------------+
+> >     | 16    | 10340                  | 50347956              |
+> >     +-------+------------------------+-----------------------+
+> >     | 32    | 20351                  | 100605720             |
+> >     +-------+------------------------+-----------------------+
+> >     | 64    | 40994                  | 201442478             |
+> >     +-------+------------------------+-----------------------+
+> >
+> >   * From the test results above, the "dirty memory time" and the number of
+> >     MMU lock contention scale with the number of vCPUs. That means all the
+> >     dirty memory operations from all vCPU threads have been serialized by
+> >     the MMU lock. Further analysis also shows that the permission relaxation
+> >     during dirty logging is where vCPU threads get serialized.
+> >
+> > Solution:
+> >   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+> >     the dirty-bit solution for dirty logging is much complicated compared to
+> >     the write-protection solution. The straight way to reduce the guest
+> >     performance degradation is to enhance the concurrency for the permission
+> >     fault path during dirty logging.
+> >   * In this patch, we only put leaf PTE permission relaxation for dirty
+> >     logging under read lock, all others would go under write lock.
+> >     Below are the results based on the solution:
+> >     +-------+------------------------+
+> >     | #vCPU | dirty memory time (ms) |
+> >     +-------+------------------------+
+> >     | 1     | 803                    |
+> >     +-------+------------------------+
+> >     | 2     | 843                    |
+> >     +-------+------------------------+
+> >     | 4     | 942                    |
+> >     +-------+------------------------+
+> >     | 8     | 1458                   |
+> >     +-------+------------------------+
+> >     | 16    | 2853                   |
+> >     +-------+------------------------+
+> >     | 32    | 5886                   |
+> >     +-------+------------------------+
+> >     | 64    | 12190                  |
+> >     +-------+------------------------+
+> >     All "dirty memory time" have been reduced by more than 60% when the
+> >     number of vCPU grows.
 >
->> +struct ap_guest {
->> +	struct kvm *kvm;
->> +	struct list_head node;
->> +};
->> +
->>   /**
->>    * struct ap_matrix_dev - Contains the data for the matrix device.
->>    *
->> @@ -39,6 +44,9 @@
->>    *		single ap_matrix_mdev device. It's quite coarse but we don't
->>    *		expect much contention.
->>    * @vfio_ap_drv: the vfio_ap device driver
->> + * @guests_lock: r/w semaphore for protecting access to @guests
->> + * @guests:	list of guests (struct ap_guest) using AP devices bound to the
->> + *		vfio_ap device driver.
-> Please compare the above. Also if it is only about the access to the
-> list, then you could drop the lock right after create, and not keep it
-> till the very end of vfio_ap_mdev_set_kvm(). Right?
-
-That would be true if it only controlled access to the list, but as I
-explained above, that is not its sole purpose.
-
+> How does that translate to the original problem statement with your
+> live migration test?
+Based on the solution, the test results from the Google internal live
+migration test also shows more than 60% improvement with >99% for 30s,
+>50% for 58s and >10% for 76s.
+Will add this info in to future posts.
 >
-> In any case I'm skeptical about this whole struct ap_guest business. To
-> me, it looks like something that just makes things more obscure and
-> complicated without any real benefit.
-
-I'm open to other ideas, but you'll have to come up with a way
-to take the kvm->lock before the matrix_mdev->lock in the
-vfio_ap_mdev_probe_queue and vfio_ap_mdev_remove_queue
-functions where we don't have access to the ap_matrix_mdev
-object to which the APQN is assigned and has the pointer to the
-kvm object.
-
-In order to retrieve the matrix_mdev, we need the matrix_dev->lock.
-In order to hot plug/unplug the queue, we need the kvm->lock.
-There's your catch-22 that needs to be solved. This design is my
-attempt to solve that.
-
+> Thanks,
 >
-> Regards,
-> Halil
+>         M.
 >
->>    */
->>   struct ap_matrix_dev {
->>   	struct device device;
->> @@ -47,6 +55,8 @@ struct ap_matrix_dev {
->>   	struct list_head mdev_list;
->>   	struct mutex lock;
->>   	struct ap_driver  *vfio_ap_drv;
->> +	struct rw_semaphore guests_lock;
->> +	struct list_head guests;
->>   };
->>   
->>   extern struct ap_matrix_dev *matrix_dev;
+> --
+> Without deviation from the norm, progress is not possible.
 
+Thanks,
+Jing
