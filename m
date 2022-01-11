@@ -2,116 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3599948A6B5
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 05:11:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DCA848A6BE
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 05:21:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347466AbiAKELM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 23:11:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56996 "EHLO
+        id S1347721AbiAKEUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 23:20:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234203AbiAKELL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 23:11:11 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A546FC06173F
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 20:11:11 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id k93-20020a17090a3ee600b001b32ec86e10so13562043pjc.3
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 20:11:11 -0800 (PST)
+        with ESMTP id S229952AbiAKEUj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 23:20:39 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E25C06173F;
+        Mon, 10 Jan 2022 20:20:39 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id x15so15272700plg.1;
+        Mon, 10 Jan 2022 20:20:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=vuys1FOVQgJkQm3U23Wnkdvvz8kMB7ON0dRulHlLdEE=;
-        b=DMOs9ZfuIX/E8E0XOSnK/jEt42wVxalj2BjYlkjVxBiiLVtCW8IfoafUUEyv6afof2
-         kU+X4V61/uPmHSqdWMLxLTsPH8SRE7MD8xTmo+4mnsrn73gHo0lUmU8fsx0RGRimmHxh
-         BbeIVLhYBzcEuwxNd+EvfQNxk15SOD3U5wEAato04jXIRYvbtrcmiaWXa2aCYAzvBJeh
-         2wSJoZDojPBHmjNWMZ66K3vYJmPkxt6OyaUuVqx15Z7u5Ns71Ak7sN8UgkqNJs9mogx+
-         l5118bYPCDAPg8AKCVTviTiAiY7J241SVVTMBM/xXlq0FcsYSPcF8XuAd01hQhMxGr2n
-         z2/A==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=Tto62C+VWnwHMjIZEt/IkjdeF/hUNskHa7hE32WUZWo=;
+        b=nGTZvLPVZhT+r0RT2Y/D+I8RG8YKSzE/wpDhxsSXL6ToEwD5+XL24LyirAjpM9Udi8
+         M0+Td9ZDbJ1+oHivltWchrBBw2jO++RQz2s52zf4kUd5YJHWJxUKAu/o5J9xjIAuyryW
+         +0hb2hMmoG3/uUR6T8yAwSptn6mFucCIGrQaqg2VJXlruJLi/e/FT+PTPouezh2VM7C+
+         sDNMmHgwIqW35Cgda6qPlN7ntOKaCY+XkpkQB44SIfjIo+KjNjcd2c7bIOhhyR4GVS+u
+         uQynCn/bUcfM9q5nIkrNqkOUcj2yafqb2PC3TkFs53nNAJQR+86jy6S7njJPOlk3+HcR
+         aSQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=vuys1FOVQgJkQm3U23Wnkdvvz8kMB7ON0dRulHlLdEE=;
-        b=DSNK/LYx5crbyfKeMfCSERIw/9/o0/qgpcOOp2KGwHPUDJHIxH/YFKbX5jWyUk19es
-         wN4hwKfOJeDatv0EtgsNfuc9SKie91880rP7pSS6AAhWflO/+8Iw9/y7W3l5l9hPXGOJ
-         bkeA7L5jJerK5IjlDssOWmaG8D05pVxJEUBbI98uRXMlI2OaNIWEk/WTZ/UIE6mFjvhC
-         Gsq/70l+kZFzbYzHiOBAeuLJDtu+Yv9VVFMotbg+5va5l8XODNFYtkWwNV5bgC2IyLKq
-         9HmJZXrnqSQJgRgfY2YJvpBtJ86Vj/ZOUAOs5rt/O97NY+at6OULuQhElz0KF1j+1ily
-         Varw==
-X-Gm-Message-State: AOAM532qWRy/drPexu73osNvHzIgTI8SC1R9+7Fb5BC+9hlx2MyUClqy
-        TVFAr4y+7tiaU1vLl9NH12LcvqXgmesFxNllarDa470h17xlKdiiWyZysg9r3yU60mzzqgH6iIW
-        rZWCht+Y/6BKFlIP5OHuAKubsOljVqjDzhXQsh8ZY4U6yBXxGreyFpApZcEAFihM=
-X-Google-Smtp-Source: ABdhPJxVtWdGmFRZAURDuDsj5vwVOqytm2YwefpIzsPSUT1dplrnA1BH+TP83+kWDfXruoOlCGzM4mllxvS5TA==
-X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:7793:b0:149:c4ad:ecc3 with SMTP
- id o19-20020a170902779300b00149c4adecc3mr2585026pll.171.1641874271051; Mon,
- 10 Jan 2022 20:11:11 -0800 (PST)
-Date:   Mon, 10 Jan 2022 20:11:03 -0800
-Message-Id: <20220111041103.2199594-1-ricarkol@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [kvm-unit-tests PATCH] arm64: debug: mark test_[bp,wp,ss] as noinline
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     drjones@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
-        maz@kernel.org, oupton@google.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=Tto62C+VWnwHMjIZEt/IkjdeF/hUNskHa7hE32WUZWo=;
+        b=JYOlp+PYfZNqw/P2P7SthPyOFzvoFV5ka7wKy44oIPsL8RmmbbbQKEqezCiNit7rP4
+         7sZVGtVHzbJlamueyBoBO+vd7Ir0jHc8+YFtzYfzlvWY2/MSLW/UJLyGmEQU6mGjUOif
+         Q6Ybgw+v2PHxzg65mKOE4CtSX64rfCpauWe8ysaj0ux9+mQzXANvrBU9RnHolvqbG43J
+         jp4fSqXxVAZJS+jfuTGlWGqehDgGmaN8n5WuLEnwS32n+1lAK1+rD+Wu2FsVTIRd8AkB
+         498ONCBbAUA6xpwwKscajZOfwKkuc41OB4QiaydGybiUOHouIywdnkx8J3RYkLh9nkWN
+         AjQQ==
+X-Gm-Message-State: AOAM5333N4bQlnKWfc1/+mq+DTLvOtG2r14uSj3qfisx19Af/isTAmZu
+        Bg/dDo3Ca80kU858YQptm9w=
+X-Google-Smtp-Source: ABdhPJyCeAzKwRCAJCdxXI9tSlZrQtzB5EZyg4yJJ/9hoSTjTGV3tnt7nvk8rmjjXPCEDgSuyAt0qw==
+X-Received: by 2002:a17:90a:5893:: with SMTP id j19mr1198018pji.30.1641874838514;
+        Mon, 10 Jan 2022 20:20:38 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id w5sm8460312pfu.214.2022.01.10.20.20.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jan 2022 20:20:38 -0800 (PST)
+Message-ID: <80b40829-0d25-eb84-7bd7-f21685daeb20@gmail.com>
+Date:   Tue, 11 Jan 2022 12:20:29 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220110034747.30498-1-likexu@tencent.com>
+ <YdzV33X5w6+tCamI@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH v2] KVM: x86/pt: Ignore all unknown Intel PT capabilities
+In-Reply-To: <YdzV33X5w6+tCamI@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clang inlines some functions (like test_ss) which define global labels
-in inline assembly (e.g., ss_start). This results in:
+On 11/1/2022 8:57 am, Sean Christopherson wrote:
+> On Mon, Jan 10, 2022, Like Xu wrote:
+>> From: Like Xu <likexu@tencent.com>
+>>
+>> Some of the new Intel PT capabilities (e.g. SDM Vol3, 32.2.4 Event
+>> Tracing, it exposes details about the asynchronous events, when they are
+>> generated, and when their corresponding software event handler completes
+>> execution) cannot be safely and fully emulated by the KVM, especially
+>> emulating the simultaneous writing of guest PT packets generated by
+>> the KVM to the guest PT buffer.
+>>
+>> For KVM, it's better to advertise currently supported features based on
+>> the "static struct pt_cap_desc" implemented in the host PT driver and
+>> ignore _all_ unknown features before they have been investigated one by
+>> one and supported in a safe manner, leaving the rest as system-wide-only
+>> tracing capabilities.
+>>
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>> v1 -> v2 Changelog:
+>> - Be safe and ignore _all_ unknown capabilities. (Paolo)
+>>
+>> Previous:
+>> https://lore.kernel.org/kvm/20220106085533.84356-1-likexu@tencent.com/
+>>
+>>   arch/x86/kvm/cpuid.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 0b920e12bb6d..439b93359848 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -901,6 +901,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>>   			break;
+>>   		}
+>>   
+>> +		/* It's better to be safe and ignore _all_ unknown capabilities. */
+> 
+> No need to justify why unknown capabilities are hidden as that's very much (supposed
+> to be) standard KVM behavior.
+> 
+>> +		entry->ebx &= GENMASK(5, 0);
+> 
+> Please add a #define somewhere so that this is self-documenting, e.g. see
+> KVM_SUPPORTED_XCR0.
 
-    arm/debug.c:382:15: error: invalid symbol redefinition
-            asm volatile("ss_start:\n"
-                         ^
-    <inline asm>:1:2: note: instantiated into assembly here
-            ss_start:
-            ^
-    1 error generated.
+How about we define this macro in the <asm/intel_pt.h> so that the next PT 
+capability
+enabler can update the mask with minimal effort, considering that many pure kernel
+developers don't care about KVM code ?
 
-Fix these functions by marking them as "noinline".
+> 
+> And why just EBX?  ECX appears to enumerate features too, and EDX is presumably
+> reserved to enumerate yet more features when EBX/ECX run out of bits.
 
-Cc: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
-This applies on top of: "[kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for debug state"
-which is in https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue.
+Yes, how about this version:
 
- arm/debug.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+diff --git a/arch/x86/include/asm/intel_pt.h b/arch/x86/include/asm/intel_pt.h
+index ebe8d2ea44fe..da94d0eeb9df 100644
+--- a/arch/x86/include/asm/intel_pt.h
++++ b/arch/x86/include/asm/intel_pt.h
+@@ -24,6 +24,12 @@ enum pt_capabilities {
+  	PT_CAP_psb_periods,
+  };
 
-diff --git a/arm/debug.c b/arm/debug.c
-index 54f059d..6c5b683 100644
---- a/arm/debug.c
-+++ b/arm/debug.c
-@@ -264,7 +264,7 @@ static void do_migrate(void)
- 	report_info("Migration complete");
- }
- 
--static void test_hw_bp(bool migrate)
-+static __attribute__((noinline)) void test_hw_bp(bool migrate)
- {
- 	extern unsigned char hw_bp0;
- 	uint32_t bcr;
-@@ -310,7 +310,7 @@ static void test_hw_bp(bool migrate)
- 
- static volatile char write_data[16];
- 
--static void test_wp(bool migrate)
-+static __attribute__((noinline)) void test_wp(bool migrate)
- {
- 	uint32_t wcr;
- 	uint32_t mdscr;
-@@ -353,7 +353,7 @@ static void test_wp(bool migrate)
- 	}
- }
- 
--static void test_ss(bool migrate)
-+static __attribute__((noinline)) void test_ss(bool migrate)
- {
- 	extern unsigned char ss_start;
- 	uint32_t mdscr;
--- 
-2.34.1.575.g55b058a8bb-goog
++#define GUEST_SUPPORTED_CPUID_14_EBX	\
++	(BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5))
++
++#define GUEST_SUPPORTED_CPUID_14_ECX	\
++	(BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(31))
++
+  #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+  void cpu_emergency_stop_pt(void);
+  extern u32 intel_pt_validate_hw_cap(enum pt_capabilities cap);
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 0b920e12bb6d..be8c9170f98e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -19,6 +19,7 @@
+  #include <asm/user.h>
+  #include <asm/fpu/xstate.h>
+  #include <asm/sgx.h>
++#include <asm/intel_pt.h>
+  #include "cpuid.h"
+  #include "lapic.h"
+  #include "mmu.h"
+@@ -900,7 +901,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array 
+*array, u32 function)
+  			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+  			break;
+  		}
+-
++		entry->eax = min(entry->eax, 1u);
++		entry->ebx &= GUEST_SUPPORTED_CPUID_14_EBX;
++		entry->ecx &= GUEST_SUPPORTED_CPUID_14_ECX;
++		entry->edx = 0;
+  		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
+  			if (!do_host_cpuid(array, function, i))
+  				goto out;
 
+> 
+> And is there any possibility of a malicious user/guest using features to cause
+> problems in the host?  I.e. does KVM need to enforce that the guest can't enable
+> any unsupported features?
+
+If a user space is set up with features not supported by KVM, it owns the risk 
+itself.
+
+AFAI, the guest Intel PT introduces a great attack interface for the host and
+we only use the guest supported PT features in a highly trusted environment.
+
+I agree that more uncertainty and fixes can be triggered in the security motive,
+not expecting too much from this patch. :D
+
+> 
+>>   		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
+>>   			if (!do_host_cpuid(array, function, i))
+>>   				goto out;
+>> -- 
+>> 2.33.1
+>>
