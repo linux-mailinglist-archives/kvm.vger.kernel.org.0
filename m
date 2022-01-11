@@ -2,156 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8741248B60B
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 19:46:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D13CE48B612
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 19:47:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346263AbiAKSqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 13:46:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33130 "EHLO
+        id S1350133AbiAKSrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 13:47:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345791AbiAKSqv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 13:46:51 -0500
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A01D6C06173F
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:46:51 -0800 (PST)
-Received: by mail-yb1-xb2e.google.com with SMTP id g81so22759016ybg.10
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:46:51 -0800 (PST)
+        with ESMTP id S243059AbiAKSrk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 13:47:40 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8BFC06173F
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:47:39 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id b1-20020a17090a990100b001b14bd47532so551849pjp.0
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:47:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aFmLILnvpHUVz7ssSaFntznd0hUHj6gSC616E6Fkf3U=;
-        b=ePhCIqosOE3NORpI3w54xHfcf6puCuQ+ahHlVC9G+tLO1IGP+Wgo03UffIkLCD29C6
-         k0CRMWuU19THro9DlEhGP69zZBJFVhAePULjiWgpPP2+R248Tcm165947vP0aZi3s+z3
-         KJBzevL0NfgzA5F+Uc4oKmj+jYR+wZ55HEE+ti6ILLFigEbDJwP/lrOgXm0M24EPXvYm
-         4dtTAQF9+cItgcqoCCoSXLydPtnIrMJF1vzL8JO2vTdoooQUT9gSNNHz/Q2miLU8T7Ag
-         MZlAK/xMpFZL9y3rVVJXsoY8rl5Y5BvRXzGKK3g1FVPPKtyr0P1MbZ2vI5P2ZX9v2Gz3
-         y+SQ==
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yFm/72khGOzDGuFloPTXkx3ofKp3oHgAX0/2+vtRUTk=;
+        b=sn0bbmgBLIT8J2GNU/KU/vX4gMqD6KD09hpw9IfuryBzjMFsACaoyGKgcKxk7bNqCG
+         v9smN74s601Lc/u3FY91Ksm+/SmsZ6sToA+saQ9/vETOSDwF6oOKJi7+FpTDeQDWZ5RS
+         A8aFeaM5tjpqRaQpaLuD33zOJ9hNTwGcF2Tp/s1ss6dBGNSfUkIQpkjoFgNWXU38Lw6c
+         Vyq6Pe6GuwdzDM2F3LfabeZLQGBcbz35FWNdhDkkvi9PGCvtelJWPWOQ64HtHuc0cJgI
+         OrPiw/RSK3I/Mwoq64ZWGMKYdFmZ9jZ5A1AAJFsgHFUfIAhxrQbDQQfw6cBi03htD6Ww
+         ssRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aFmLILnvpHUVz7ssSaFntznd0hUHj6gSC616E6Fkf3U=;
-        b=qLVFnSVCS9H9s7XLSuMovlfXXAcwe5AB5foyOgw96x1mJtc53BoF2BLs2ADASncYIA
-         atEPGF6825O6R9RFcerEDT9L0vIKQTMteELs22b8WIYrVOqSFLL/FKr6RKJ2dt766JrJ
-         dTtxrnlFn71exYckkmfnJIyuQR4MQKox+chcR5q2VjLa+WEvIENS/KSJZiWPkDw8Vb9c
-         wP9qfQ2xehkgAE0MptCIgExS6QIHV9+v3xN3YIsVEj8f0DsEH40SpP83/LnDgNICHped
-         mlPwc0pHrn11CYZkA2Xu05pLskycj8sE4WsxoTHtIjw9Rv00OZ8aHmjuCvZmULt20/t+
-         xlWA==
-X-Gm-Message-State: AOAM531zi/jQLUq8Kwi9IyK4AvUuR+HDqzPPdH8i8G5IPw6VwH/PXQhV
-        7UCjUbvy8kmHjy09ThLngx+62EoOmrkB77I8T8jN4w==
-X-Google-Smtp-Source: ABdhPJy2gg0pwgufffOlXPR//NYKBRRE7YQswq8GMY6HGu/DSmziIAnClGDP4sEu6YMRCb2AJB3uhS4DQuFcC/jbDPk=
-X-Received: by 2002:a25:d750:: with SMTP id o77mr7614846ybg.543.1641926810619;
- Tue, 11 Jan 2022 10:46:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
- <Ydjje8qBOP3zDOZi@google.com> <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
- <Yd3AGRtkBgWSmGf2@google.com>
-In-Reply-To: <Yd3AGRtkBgWSmGf2@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 11 Jan 2022 10:46:40 -0800
-Message-ID: <CAJHc60w7vfHkg+9XkPw+38nZBWLLhETJj310ekM1HpQQTL_O0Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+         :mime-version:content-transfer-encoding;
+        bh=yFm/72khGOzDGuFloPTXkx3ofKp3oHgAX0/2+vtRUTk=;
+        b=u12W4R07ExG6lv3jGFxk6DgO90q46Eik7QGSic981eLTG4Mqwru3Bwwxivhl76MlvR
+         WM7pffON8CmQDC25POGCnev5LRL18JZWHfETrvG7zaRGj5BW92Hdm3GEpdDSMWTS6hte
+         zgWl/eZusBB6bBt+e2WZ/t6M6A5j/Pq6aWw1huEYHUf9hEPiua1z+wYuoVhwhsl4etkW
+         4Gm8jqEWN63f3g1YI15pGz9cRbKjAouM8f5h1MtopmuHU4iHfWvVTnZeRHCWo19Z5Y31
+         cLUeEqK7xHiAyZiL9o+bUNsJ4XbgVSLMtQl8kZAYwjNiSqHnTJwrqCNHv+njr7eeZUhX
+         qoYA==
+X-Gm-Message-State: AOAM533jgBVbwElAOGqi/mbD0A+rzUvPfW3jPQRYtFIPdjhmvE0wdxt/
+        O8TG1jNevHlgJ+jM4gk9+DB7cQ==
+X-Google-Smtp-Source: ABdhPJz7UuyllrZ02SpHg/7DvQ1A/J0L4kgnQ0XK5dFo0rLp5b7Q1yCW4dVjmvp/v/qtDn88L83//A==
+X-Received: by 2002:a05:6a00:2313:b0:4bb:8b68:3677 with SMTP id h19-20020a056a00231300b004bb8b683677mr6049563pfh.2.1641926859302;
+        Tue, 11 Jan 2022 10:47:39 -0800 (PST)
+Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net. [76.210.143.223])
+        by smtp.gmail.com with ESMTPSA id u64sm6233199pfb.208.2022.01.11.10.47.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jan 2022 10:47:38 -0800 (PST)
+Date:   Tue, 11 Jan 2022 10:47:38 -0800 (PST)
+X-Google-Original-Date: Tue, 11 Jan 2022 10:47:12 PST (-0800)
+Subject:     Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
+In-Reply-To: <20220111153539.2532246-1-mark.rutland@arm.com>
+CC:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
+        alexandru.elisei@arm.com, anup@brainfault.org,
+        aou@eecs.berkeley.edu, Atish Patra <atishp@rivosinc.com>,
+        benh@kernel.crashing.org, borntraeger@linux.ibm.com, bp@alien8.de,
+        catalin.marinas@arm.com, chenhuacai@kernel.org,
+        dave.hansen@linux.intel.com, david@redhat.com,
+        frankja@linux.ibm.com, frederic@kernel.org, gor@linux.ibm.com,
+        hca@linux.ibm.com, imbrenda@linux.ibm.com, james.morse@arm.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        mark.rutland@arm.com, Marc Zyngier <maz@kernel.org>,
+        mingo@redhat.com, mpe@ellerman.id.au, nsaenzju@redhat.com,
+        paulmck@kernel.org, paulus@samba.org,
+        Paul Walmsley <paul.walmsley@sifive.com>, pbonzini@redhat.com,
+        seanjc@google.com, suzuki.poulose@arm.com, tglx@linutronix.de,
+        tsbogend@alpha.franken.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, Will Deacon <will@kernel.org>
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     mark.rutland@arm.com
+Message-ID: <mhng-d83df857-7865-4514-a339-68439336974a@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 9:36 AM Sean Christopherson <seanjc@google.com> wrote:
+On Tue, 11 Jan 2022 07:35:34 PST (-0800), mark.rutland@arm.com wrote:
+> Several architectures have latent bugs around guest entry/exit, most
+> notably:
 >
-> On Mon, Jan 10, 2022, Raghavendra Rao Ananta wrote:
-> > On Fri, Jan 7, 2022 at 5:06 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
-> > > > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
-> > >
-> > > Needs parantheses around (kvm), but why bother with a macro?  This is the same
-> > > header that defines struct kvm.
-> > >
-> > No specific reason for creating a macro as such. I can remove it if it
-> > feels noisy.
+> 1) Several architectures enable interrupts between guest_enter() and
+>    guest_exit(). As this period is an RCU extended quiescent state (EQS) this
+>    is unsound unless the irq entry code explicitly wakes RCU, which most
+>    architectures only do for entry from usersapce or idle.
 >
-> Please do.  In the future, don't use a macro unless there's a good reason to do
-> so.  Don't get me wrong, I love abusing macros, but for things like this they are
-> completely inferior to
+>    I believe this affects: arm64, riscv, s390
 >
->   static inline bool kvm_vm_has_started(struct kvm *kvm)
->   {
->         return kvm->vm_started;
->   }
+>    I am not sure about powerpc.
 >
-> because a helper function gives us type safety, doesn't suffer from concatenation
-> of tokens potentially doing weird things, is easier to extend to a multi-line
-> implementation, etc...
+> 2) Several architectures permit instrumentation of code between
+>    guest_enter() and guest_exit(), e.g. KASAN, KCOV, KCSAN, etc. As
+>    instrumentation may directly o indirectly use RCU, this has the same
+>    problems as with interrupts.
 >
-> An example of when it's ok to use a macro is x86's
->
->   #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
->
-> which uses a macro instead of a proper function to avoid a circular dependency
-> due to arch/x86/include/asm/kvm_host.h being included by include/linux/kvm_host.h
-> and thus x86's implementation of kvm_arch_vcpu_memslots_id() coming before the
-> definition of struct kvm_vcpu.  But that's very much an exception and done only
-> because the alternatives suck more.
->
-Understood. Thanks for the explanation! Will switch to an inline function.
+>    I believe this affects: arm64, mips, powerpc, riscv, s390
 
-> > > > +                      */
-> > > > +                     mutex_lock(&kvm->lock);
-> > >
-> > > This adds unnecessary lock contention when running vCPUs.  The naive solution
-> > > would be:
-> > >                         if (!kvm->vm_started) {
-> > >                                 ...
-> > >                         }
-> > >
-> > Not sure if I understood the solution..
->
-> In your proposed patch, KVM_RUN will take kvm->lock _every_ time.  That introduces
-> unnecessary contention as it will serialize this bit of code if multiple vCPUs
-> are attempting KVM_RUN.  By checking !vm_started, only the "first" KVM_RUN for a
-> VM will acquire kvm->lock and thus avoid contention once the VM is up and running.
-> There's still a possibility that multiple vCPUs will contend for kvm->lock on their
-> first KVM_RUN, hence the quotes.  I called it "naive" because it's possible there's
-> a more elegant solution depending on the use case, e.g. a lockless approach might
-> work (or it might not).
->
-But is it safe to read kvm->vm_started without grabbing the lock in
-the first place? use atomic_t maybe for this?
+Moving to Atish and Anup's new email addresses, looks like MAINTAINERS 
+hasn't been updated yet.  I thought I remembering seeing patches getting 
+picked up for these, but LMK if you guys were expecting me to send them 
+along -- sorry if I misunderstood!
 
-> > > > +                     kvm->vm_started = true;
-> > > > +                     mutex_unlock(&kvm->lock);
-> > >
-> > > Lastly, why is this in generic KVM?
-> > >
-> > The v1 of the series originally had it in the arm specific code.
-> > However, I was suggested to move it to the generic code since the book
-> > keeping is not arch specific and could be helpful to others too [1].
 >
-> I'm definitely in favor of moving/adding thing to generic KVM when it makes sense,
-> but I'm skeptical in this particular case.  The code _is_ arch specific in that
-> arm64 apparently needs to acquire kvm->lock when checking if a vCPU has run, e.g.
-> versus a hypothetical x86 use case that might be completely ok with a lockless
-> implementation.  And it's not obvious that there's a plausible, safe use case
-> outside of arm64, e.g. on x86, there is very, very little that is truly shared
-> across the entire VM/system, most things are per-thread/core/package in some way,
-> shape, or form.  In other words, I'm a wary of providing something like this for
-> x86 because odds are good that any use will be functionally incorrect.
-I've been going back and forth on this. I've seen a couple of
-variables declared in the generic struct and used only in the arch
-code. vcpu->valid_wakeup for instance, which is used only by s390
-arch. Maybe I'm looking at it the wrong way as to what can and can't
-go in the generic kvm code.
-
-Thanks,
-Raghavendra
+> 3) Several architectures do not inform lockdep and tracing that
+>    interrupts are enabled during the execution of the guest, or do so in
+>    an incorrect order. Generally
+>    this means that logs will report IRQs being masked for much longer
+>    than is actually the case, which is not ideal for debugging. I don't
+>    know whether this affects the correctness of lockdep.
+>
+>    I believe this affects: arm64, mips, powerpc, riscv, s390
+>
+> This was previously fixed for x86 specifically in a series of commits:
+>
+>   87fa7f3e98a1310e ("x86/kvm: Move context tracking where it belongs")
+>   0642391e2139a2c1 ("x86/kvm/vmx: Add hardirq tracing to guest enter/exit")
+>   9fc975e9efd03e57 ("x86/kvm/svm: Add hardirq tracing on guest enter/exit")
+>   3ebccdf373c21d86 ("x86/kvm/vmx: Move guest enter/exit into .noinstr.text")
+>   135961e0a7d555fc ("x86/kvm/svm: Move guest enter/exit into .noinstr.text")
+>   160457140187c5fb ("KVM: x86: Defer vtime accounting 'til after IRQ handling")
+>   bc908e091b326467 ("KVM: x86: Consolidate guest enter/exit logic to common helpers")
+>
+> But other architectures were left broken, and the infrastructure for
+> handling this correctly is x86-specific.
+>
+> This series introduces generic helper functions which can be used to
+> handle the problems above, and migrates architectures over to these,
+> fixing the latent issues.
+>
+> I wasn't able to figure my way around powerpc and s390, so I have not
+> altered these. I'd appreciate if anyone could take a look at those
+> cases, and either have a go at patches or provide some feedback as to
+> any alternative approaches which work work better there.
+>
+> I have build-tested the arm64, mips, riscv, and x86 cases, but I don't
+> have a suitable HW setup to test these, so any review and/or testing
+> would be much appreciated.
+>
+> I've pushed the series (based on v5.16) to my kvm/entry-rework branch:
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git/log/?h=kvm/entry-rework
+>   git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git kvm/entry-rework
+>
+> ... also tagged as kvm-entry-rework-20210111
+>
+> Thanks,
+> Mark.
+>
+> Mark Rutland (5):
+>   kvm: add exit_to_guest_mode() and enter_from_guest_mode()
+>   kvm/arm64: rework guest entry logic
+>   kvm/mips: rework guest entry logic
+>   kvm/riscv: rework guest entry logic
+>   kvm/x86: rework guest entry logic
+>
+>  arch/arm64/kvm/arm.c     |  51 +++++++++++-------
+>  arch/mips/kvm/mips.c     |  37 ++++++++++++--
+>  arch/riscv/kvm/vcpu.c    |  44 ++++++++++------
+>  arch/x86/kvm/svm/svm.c   |   4 +-
+>  arch/x86/kvm/vmx/vmx.c   |   4 +-
+>  arch/x86/kvm/x86.c       |   4 +-
+>  arch/x86/kvm/x86.h       |  45 ----------------
+>  include/linux/kvm_host.h | 108 +++++++++++++++++++++++++++++++++++++--
+>  8 files changed, 206 insertions(+), 91 deletions(-)
