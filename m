@@ -2,125 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7BE548AAE4
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 10:55:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FBA548AB47
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 11:22:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237258AbiAKJzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 04:55:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25239 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237188AbiAKJzO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 04:55:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641894913;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uMRIJvycuUhx7h41E38Clut9x9CtptwubWi+vWGBfAc=;
-        b=L3pKAUIaTea4T3/JZGoEpjVJtg8B2w/F3/8v8oKZ0VcZ+FQXn0f5eWwAJyhRedLnIzv0k+
-        J281avZ5HJvpPlmcNrHta0v3i0WZGbZMghss0gbjKbLRMNhCFtDJJK5fbbT87I+h9CkWFJ
-        BwPGe3+ghnKxIQ1xdC0H9fdYRoEWCm8=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-638-283eJoMbPNSpy_X1fI6r2A-1; Tue, 11 Jan 2022 04:55:10 -0500
-X-MC-Unique: 283eJoMbPNSpy_X1fI6r2A-1
-Received: by mail-qt1-f197.google.com with SMTP id a26-20020ac8001a000000b002b6596897dcso12886124qtg.19
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 01:55:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uMRIJvycuUhx7h41E38Clut9x9CtptwubWi+vWGBfAc=;
-        b=v0YCYDD3XneIHgZXJ/gxhVMVvXwVQ++xsD/M388VcFpAyEcQdDZMYxnOjpbtKvH+H+
-         vCLj3N7VD9QM0ZRKYb+TPvZKyYCzRconIquADp7DAMMUykkzvWEdbkH4s+AkBH3KK0si
-         /Za583bYFKVtwmEm/dJwSdf9aowi061acOpurzVlPylcqYru16kx4DVf/OteXMSc4k+z
-         rZqMhtbH48YNOQjZ6uE3euO8agIYx83zVjxGCSJLOXsTTHNDXPLvEQ6txqqEbwOmxsiG
-         9o8vtsY4EAkjownQmktymiFVrp+zRvuiYgFzlWQfL5yOAYWaisZrwhiIX2YsiJ0MCKZ9
-         85kw==
-X-Gm-Message-State: AOAM5333YkIqA6ARyUve+RSyH9W4K8YS7Ld2JhIDL32SfMtV2jhl7Xlq
-        9qNtwoKfZMUuWTzSbTkIhfcOhRUNypy7bbfJfZUX3smE3P9DXrpgRKfdgEKNZYE/doO0eX2K/eS
-        jtlMicF3RT7W8
-X-Received: by 2002:ac8:5cd4:: with SMTP id s20mr1931903qta.426.1641894909877;
-        Tue, 11 Jan 2022 01:55:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyt2oY5Iv7+h0zYh5JClHXf+9izVN3nAg8r3JTSwK2sGJu05xeSvkHkTZb5Ua/EfbiSyufcIg==
-X-Received: by 2002:ac8:5cd4:: with SMTP id s20mr1931896qta.426.1641894909674;
-        Tue, 11 Jan 2022 01:55:09 -0800 (PST)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id s19sm6646780qtk.40.2022.01.11.01.55.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 01:55:09 -0800 (PST)
-Date:   Tue, 11 Jan 2022 10:55:05 +0100
-From:   Andrew Jones <drjones@redhat.com>
+        id S237717AbiAKKWx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 05:22:53 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:45160 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233911AbiAKKWw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 05:22:52 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 68DC06156D
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:22:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F22C36AF2;
+        Tue, 11 Jan 2022 10:22:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641896571;
+        bh=HbZF3sztPtTkN6ALrGsuTJUFcv/QYl5hN7mRZyThhxk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QsK4N6ZVg4xpfSCf+0LJtl3nX/2jJeeT1v36KyJ3jGmigu3P82wPjLAAm7CgvsmOB
+         T1d/UxQbiJIN/nMCUusyQgva4iJURF3H5StcA5uLoabCMSU7LOZSTMjHmVcEbTwaKM
+         H+jupVYLajPAhzCCfPynhwrP9ioUeEX8N0eXfCMXqUQ89GUzQrgV1RHrkVOUWeiXLD
+         OJrCMdxWuvVyQY/AgpkE2RXDt/geRGaebeIzT2AwEoIpkG+pI9AZ3PVUUtXJ7AxHXr
+         5m7VLFto/oqk+W+UH6MBNTZTIwykOE77LuabiZNcm3S/9uiOE04dUWs4C2oCoDpzTi
+         S76XymIe/ERGg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n7EIj-00HM2A-83; Tue, 11 Jan 2022 10:22:49 +0000
+Date:   Tue, 11 Jan 2022 10:22:48 +0000
+Message-ID: <87czkytvuv.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH 3/3] KVM: selftests: Add vgic initialization for
- dirty log perf test for ARM
-Message-ID: <20220111095505.spwflhcdfxwveh3u@gator>
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Add fast path to handle permission relaxation during dirty logging
+In-Reply-To: <20220110210441.2074798-3-jingzhangos@google.com>
 References: <20220110210441.2074798-1-jingzhangos@google.com>
- <20220110210441.2074798-4-jingzhangos@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220110210441.2074798-4-jingzhangos@google.com>
+        <20220110210441.2074798-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, pbonzini@redhat.com, dmatlack@google.com, oupton@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 09:04:41PM +0000, Jing Zhang wrote:
-> For ARM64, if no vgic is setup before the dirty log perf test, the
-> userspace irqchip would be used, which would affect the dirty log perf
-> test result.
+On Mon, 10 Jan 2022 21:04:40 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> To reduce MMU lock contention during dirty logging, all permission
+> relaxation operations would be performed under read lock.
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  arch/arm64/kvm/mmu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 1954b964d1cf..b501338d9430 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -18,6 +18,12 @@
->  #include "test_util.h"
->  #include "perf_test_util.h"
->  #include "guest_modes.h"
-> +#ifdef __aarch64__
-> +#include "aarch64/vgic.h"
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index cafd5813c949..dd1f43fba4b0 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1063,6 +1063,54 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+>  	return 0;
+>  }
+>  
+> +static bool fast_mark_writable(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> +		struct kvm_memory_slot *memslot, unsigned long fault_status)
+> +{
+> +	int ret;
+> +	bool writable;
+> +	bool write_fault = kvm_is_write_fault(vcpu);
+> +	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+> +	kvm_pfn_t pfn;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	bool logging_active = memslot_is_logging(memslot);
+> +	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+> +	unsigned long fault_granule;
 > +
-> +#define GICD_BASE_GPA			0x8000000ULL
-> +#define GICR_BASE_GPA			0x80A0000ULL
-> +#endif
+> +	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+> +
+> +	/* Make sure the fault can be handled in the fast path.
+> +	 * Only handle write permission fault on non-hugepage during dirty
+> +	 * logging period.
+> +	 */
+
+Not the correct comment format.
+
+> +	if (fault_status != FSC_PERM || fault_granule != PAGE_SIZE
+> +			|| !logging_active || !write_fault)
+> +		return false;
+
+This is all reinventing the logic that already exists in
+user_mem_abort(). I'm sympathetic to the effort not to bloat it even
+more, but code duplication doesn't help either.
+
+> +
+> +
+> +	/* Pin the pfn to make sure it couldn't be freed and be resued for
+> +	 * another gfn.
+> +	 */
+> +	pfn = __gfn_to_pfn_memslot(memslot, gfn, true, NULL,
+> +				   write_fault, &writable, NULL);
+> +	if (is_error_pfn(pfn) || !writable)
+> +		return false;
+
+What happens if we hit a non-writable mapping? Don't we leak a page
+reference?
+
+> +
+> +	read_lock(&kvm->mmu_lock);
+> +	ret = kvm_pgtable_stage2_relax_perms(
+> +			vcpu->arch.hw_mmu->pgt, fault_ipa, PAGE_HYP);
+
+PAGE_HYP? Err... no. KVM_PGTABLE_PROT_RW, more likely. Yes, they
+expand to the same thing, but you are not dealing with nVHE EL2 S1
+page tables here.
+
+> +
+> +	if (!ret) {
+> +		kvm_set_pfn_dirty(pfn);
+> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
+> +	}
+> +	read_unlock(&kvm->mmu_lock);
+> +
+> +	kvm_set_pfn_accessed(pfn);
+> +	kvm_release_pfn_clean(pfn);
+> +
+> +	return true;
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+>  			  unsigned long fault_status)
+> @@ -1085,6 +1133,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>  	struct kvm_pgtable *pgt;
 >  
->  /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
->  #define TEST_HOST_LOOP_N		2UL
-> @@ -200,6 +206,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  		vm_enable_cap(vm, &cap);
->  	}
->  
-> +#ifdef __aarch64__
-> +	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-                                    ^^ extra parameter
+> +	if (fast_mark_writable(vcpu, fault_ipa, memslot, fault_status))
+> +		return 0;
+>  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+>  	write_fault = kvm_is_write_fault(vcpu);
+>  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+
+You are bypassing all sort of checks that I want to keep. Please
+integrate this in user_mem_abort instead of this side hack.
 
 Thanks,
-drew
 
-> +#endif
-> +
->  	/* Start the iterations */
->  	iteration = 0;
->  	host_quit = false;
-> -- 
-> 2.34.1.575.g55b058a8bb-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
