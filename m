@@ -2,260 +2,728 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9E0248B23A
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 17:30:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F4E48B266
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 17:39:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350019AbiAKQai (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 11:30:38 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:9080 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350015AbiAKQai (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 11:30:38 -0500
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BFEBXi015389;
-        Tue, 11 Jan 2022 16:30:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=b1fOsSfgdCSFjxRHLquKTszZclnk0q50qLe2nj0Z9/A=;
- b=Ssk4XEo5K8OYee6QgYEkOIj9GIXEUiJfSiS6quNjsHOdAylM1YdcOePqYSMrMRwRPi9D
- vjBqjNXNPBENXCLQV8MS11YW+LAwNetB668pk1+uFA8p/FRz87i4oQIJukrPyyA4mdOI
- /bqtY0cbCiSWROnGG48gH+BWspSNhw21bkFUcSCtNPh47akhIRyNAIififFKmSnhGg6q
- 6rp3AHBUMeBGY0yyp4/foY8oShi07aDGDJ/XgQLACieH44GpVvY2npLhetw9x/nQ9Nch
- JoIK5z/6l+OTy8lZRMLevbzG0JMJYz55tcfjwucwk3EIb0ciSP+d8+c+dVVhIqsOElSA 3A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dgmk9bkee-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 16:30:01 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20BGTxqN019784;
-        Tue, 11 Jan 2022 16:30:01 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2172.outbound.protection.outlook.com [104.47.55.172])
-        by aserp3020.oracle.com with ESMTP id 3df2e50c5q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 16:30:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HRpiD1u9yNP6kSt2ElG1P8CU2lC/KO3d/1/RVTkqgRS+qHG48hefNFQTENm8QRnKSu3GKZR+ruiUVq6M6gydiyduKJ20fu5ZgyabJXb/Q4riJwrt4DqFMLUVi027h4APuizSl+tEjevwQAy2rQsHFlrHRxMRB1jjXUw+QJYmxrvg7djO4IWe9XXeN5INqssAmyxl1UBQDoiJFeyIB7S3dIGf4nJPradCdgtQIaKdsNmJERvu3HMzCOpKfDhdshIO09pAh7LNrRGEHPKys8EUAoJM9XXL4Od4iLH90qlS+U+vP+WkiMSuQgBDPSEOwmp33Ldf6MZwJ0JlP+Z+RmwA4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b1fOsSfgdCSFjxRHLquKTszZclnk0q50qLe2nj0Z9/A=;
- b=NSRoR4CAcxPPC6ZJylknc2DbD0DoaNRmAGAp7wtopu2T5NMbB492svM59BtBU67i+tzyWYG7cHcKPnNORUCAPrLVeHoWLmYgQqbr0R9p82qRd5b/Hdlcs0DmNj+3kB0SKpq/X6j30mQzoron+zvk0pWnOao/JkfqfVRkKAtSN7GIk4+zZmy93iRXrng6+XYySTifn3Wr/aTkQ/rTQhhonAmWR7Tk4K8lmsS2DQiNfMRGzhQKTB5kCyT7hafauJgaRzXHb+vn/tRO08LrhFLdQkh/YURB75qac2ar2zRo3HlCv38im9G+WyXXSNhMungrCsncWiay7ojdo1xpJDhM+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b1fOsSfgdCSFjxRHLquKTszZclnk0q50qLe2nj0Z9/A=;
- b=x+LG+xJkYEpyEwpbQ9ZP2abqtXQJ0G0jpU21gVKV2c5BgVvecvknGf4PBQpJ562EpH+qS8S/UvZHRXeq63PWk5zM0RqWsUzmW5mla/yvlnr8rGMWCV0uUR2giOzZarARpmJJY1bg2l/O0tmiAdYqGwtX3bTDNlSiCnSDzAVr5Oo=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by SA2PR10MB4732.namprd10.prod.outlook.com (2603:10b6:806:fa::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Tue, 11 Jan
- 2022 16:29:55 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::9d38:21ba:a523:b34e]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::9d38:21ba:a523:b34e%8]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
- 16:29:55 +0000
-Date:   Tue, 11 Jan 2022 11:29:50 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Alexander Duyck <alexanderduyck@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tejun Heo <tj@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
- bandwidth
-Message-ID: <20220111162950.jk3edkm3nh5apviq@oracle.com>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106004656.126790-16-daniel.m.jordan@oracle.com>
- <Yd1w/TxTcGk5Ht53@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yd1w/TxTcGk5Ht53@hirez.programming.kicks-ass.net>
-X-ClientProxiedBy: MN2PR16CA0064.namprd16.prod.outlook.com
- (2603:10b6:208:234::33) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
+        id S1343677AbiAKQjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 11:39:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27304 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1349958AbiAKQjM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 11:39:12 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BFsMmE001774;
+        Tue, 11 Jan 2022 16:39:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=lMSGQca29FcT27b3JSNSTo/jl2ulc58VGH0oQFzap9k=;
+ b=sO1ORye6tiDJrTmrxHQ5slaq8TIcSuXbfI588r0/kwpyqMgXBkfr3g4w0kL62IfDMQvb
+ r9fJi9jyPQ2Fnd7Xi/omA5fomV8guL4HVygO57jnq0ak/kCqQuRPskiVnasl5kxT0jJ3
+ bnGIMemEZByerhkJNioMAGnFlUGkmH8FIPMhutF+oYimrtSVCVXdikHrFi5Cv9RFN8pI
+ DWzcgaJ98nYRNdkpsdz/+kVAO7JDeuRd/r0pLZNMzosXipW1+dyNXoOx4NIDQJbk/Q2/
+ 4KTWtOSRTek8L+3FC8ln2RiJCoejGrZI1msV9lOj88JKbVXpXSRJ+3cZnL/u54MdLFR5 8Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dhb7um4pf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Jan 2022 16:39:11 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20BGaCGu025698;
+        Tue, 11 Jan 2022 16:39:11 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dhb7um4nx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Jan 2022 16:39:11 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20BGXjr4026934;
+        Tue, 11 Jan 2022 16:39:09 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 3dfwhj33bt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Jan 2022 16:39:09 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20BGd3rm38863284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jan 2022 16:39:03 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F4B852054;
+        Tue, 11 Jan 2022 16:39:03 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5D62C5205F;
+        Tue, 11 Jan 2022 16:39:03 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v4 0/2] Add specification exception tests
+Date:   Tue, 11 Jan 2022 17:38:59 +0100
+Message-Id: <20220111163901.1263736-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a87a95a8-92c0-49b0-7797-08d9d51f998a
-X-MS-TrafficTypeDiagnostic: SA2PR10MB4732:EE_
-X-Microsoft-Antispam-PRVS: <SA2PR10MB473263BA09B8CCD0365CD900D9519@SA2PR10MB4732.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Y6s1OEULsaweYKA7dgQw/C5ZCc1S1051xLNeCsiXMKMP8+PET7NEiym6AAPD5ylx+62U23OI0EyQOEUnP8CtWOkacbpkUEZmdaRk9JLa/kdPaeTy89lI+tv+4MP2UNRz7mtpm+aseTOMEEIzBAgoSmH+LZgpxRblOfjhxtQb1fOHzcLcEg3n9OT1tvbEfmUYvhwey3qpX8mMbHp5vChq9JBb4ykp4VF6rErfXDpibqLLv77TRQsbobxZGgcCFvruzaMb4U2UnQ7osO05wcgq+t4sQH/cmtL3Jhz3+xp9lHIi2ui6h/0tu/MHp1DeRU2kB5FdYO06MYJFHeTXUsfxRbMFOVmvecvS6Hbi6YpCeKzihc8btAAK/HEF8hHKhxH+b+l2L7BnIoAhAFT6h+QzdNC52f1gZi77bLklfkgzTwzc5fj4r6p86g87wndKBcSJWbSatU11WVbeUpafLwFO2PMo46QrwiT7bJGfkRDxTegM/e/1rDvDTjxW9RRlQskck76yBaCw/nlkCJfSacNZQNYYLXcnY81jyeJqKLSGJc5NH5lt0yNQqWvT/PsDn0aG830syI4Tluo6Q2k0+zSRDbwBTTpGLlRxmlV1+ieTodnNDsSgE/Lw2WnlAikSG2pEcA3mr8aXUG7zwnaC/K3ROzwccwuMja+1ICvtR8xJbXZG3i+63chNQhidgxfHf9PtAnAqbYH08BSHrXQUFmf1FQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(508600001)(8676002)(8936002)(6916009)(15650500001)(52116002)(316002)(86362001)(6512007)(26005)(186003)(54906003)(4326008)(2616005)(6486002)(7416002)(38100700002)(83380400001)(1076003)(6666004)(6506007)(5660300002)(2906002)(36756003)(66476007)(66556008)(38350700002)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PgFv0If2uoDEVTPZjccrXRGvVnSYDZJGwoL/gxOn0ZbjhA+qJZjMLnSVXulp?=
- =?us-ascii?Q?B654dbs9JiA3rg2n/9Ep76cFk/uM2+D86QGfh7lYZPNbciRO73eN3jCDpDfY?=
- =?us-ascii?Q?BArXFNuM0JaJogW8ORMDjLHAyUaf0LzAx21rUM+zOLXZd8C5D5MJJnv7ppkC?=
- =?us-ascii?Q?c5z74kTD1htHIP/LLplXfoi8PQSC3cXtj2WaSDRpsdpaCRDXQd9r2MAmyiR4?=
- =?us-ascii?Q?MRo0++t/HOWLoPs+i5OofBr9BlTzZCmaDi/09h2+jDhsguioyNPH/6Dx3QRx?=
- =?us-ascii?Q?zM9d1AH73qi4Js3HHNnOUjvX0pTpmw9ezG+Oy0CKKSSh3IyzOzBU7bxSqiYL?=
- =?us-ascii?Q?/nyYUmkH7jlG6wPrc+qmAkFS+GcTAIAY7drjzjJ/ddCIjiEL81Lzrbz0UgFu?=
- =?us-ascii?Q?jssfx94/Ixavh7hx8LwJSkLyCyqCS4eOyquhIg+VowI+SuKH0A5zcjl7I25C?=
- =?us-ascii?Q?YMh85Of7Mar6IMi4ttoqK9kkjflBlfAXkEuaAjqbLIWMslhENFV6pql8//Q3?=
- =?us-ascii?Q?VVFkWi9sO0zM9TO8ANiJ02VtA1KYh6Irz7XJ9zyW+0k/pKY57HBbSRpPcr0k?=
- =?us-ascii?Q?t1zOy575UAK2bemHxbblSHT3jxHdgfw+6H0R3NxKSTx/LOS4+3gGEBwV6vXF?=
- =?us-ascii?Q?XdsBVLlI+LXYCud4N6bdAJgRREodoNRd8vyG9vZ0Wx2TG4FXHORVYcywgpFp?=
- =?us-ascii?Q?+rRDFXb2suWITe8KeRhCApmnFygrc/k7+zzMsGu93uiv2+JcRw7pn61l+PpP?=
- =?us-ascii?Q?7GwZ/XXeo5Ha4r2DiSCOBIYFL29VB+9czP5fRYwspMpK8TdBHWY8DEYRN8Rn?=
- =?us-ascii?Q?xRZ5TjBVphFA7+Oel2ynmf6BWnZuhTSmldhPUZqcvbuFCJ/p+p3TlakEkvpy?=
- =?us-ascii?Q?TZEGMClKYnVY0wRdiszfnqaGfhVovUi2FZps3jvswZQjIojVCO9/dLDM8X0S?=
- =?us-ascii?Q?WAkmdlVQsZfGKqRFyZ4JLLWNgbbhoHPMhiJWZxRKxCfaB5+s4oEymiX9E2Up?=
- =?us-ascii?Q?Cobre7c5dTEJK6SUzgkE3e7vdg6UESwmo5+qF728WYFU8Gmjq18tQvtFSEYq?=
- =?us-ascii?Q?Dlxx/jCn3WtAe03cEyIqPxPw449sI2adtzWh4jGG84VzpWAFuBYNisJEjU2h?=
- =?us-ascii?Q?7cMmX4kzsYY7GVIaK7/24IiGO/xuTbM4hR0/qsjOgEto1bfJY+wNRPpyN4Ts?=
- =?us-ascii?Q?dtrzdd69eGTC5eXmg66lOUchH8LAtmJyQKud5DWvbK/6Zz75jRpwV4Bqm383?=
- =?us-ascii?Q?oWPkaP0CzB2dCw1iyFpQuQrSi7ayE0khYTBFMf9Cy7ssthVdEsHjlzH9DGHp?=
- =?us-ascii?Q?ozuFdSR0IPn9xEAULRXsf6cUrSHWfbfZ0MawZrxoA4tMs0KPXPUcfTmmdY1q?=
- =?us-ascii?Q?Ul8OG3g9IEtRwhqdAdAF6UFqFOyGXUfRjGb5mTQftCk6+TPkA7YR1SHyRhsv?=
- =?us-ascii?Q?aAFXMZhgh30zN/7hv62rwJMy+eRMtKCPHaAdPOFKEsBzbpkqlJ24NkbUrqIZ?=
- =?us-ascii?Q?t3PffysL0uXDiFoaO1o4Ojzd4w7G0PXCSDRCq2AaHy8PbLmxy2pzFQpQ+r/N?=
- =?us-ascii?Q?AZZ9cQUYNAlmvLdKQfx1tpQZoz/Tdik55Lu/3LeH5NWey+5CMV4tJ0n/2nzj?=
- =?us-ascii?Q?eco5piPDI38HPfivHL6ZJfa32AsOSP2Fkh0rwju0bkAnnUVQeLcBF7zcdz1b?=
- =?us-ascii?Q?bOddpA=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a87a95a8-92c0-49b0-7797-08d9d51f998a
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 16:29:55.1169
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yyBeTP3s6O0jiJR7hZml76Y3IEhk+yS9UKQ94jzjfjQCJfSMO60Wpm3BHgaYGaxGFrBDkoRt3wVof6oyesINM6wD4y5w7kVWshOd+PD7Z3Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4732
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201110093
-X-Proofpoint-GUID: M-3nsWlxTIWDDhRUE-hRN2BYyfXX-TqA
-X-Proofpoint-ORIG-GUID: M-3nsWlxTIWDDhRUE-hRN2BYyfXX-TqA
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: BLSCkAFjWaK0EN3CE-cJpf0TmTATUDZJ
+X-Proofpoint-GUID: hbI_5aBdrKiy8nWRlkENMxzkya9HXCpv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-11_04,2022-01-11_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 adultscore=0 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1015 mlxscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201110093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 12:58:53PM +0100, Peter Zijlstra wrote:
-> On Wed, Jan 05, 2022 at 07:46:55PM -0500, Daniel Jordan wrote:
-> > As before, helpers in multithreaded jobs don't honor the main thread's
-> > CFS bandwidth limits, which could lead to the group exceeding its quota.
-> > 
-> > Fix it by having helpers remote charge their CPU time to the main
-> > thread's task group.  A helper calls a pair of new interfaces
-> > cpu_cgroup_remote_begin() and cpu_cgroup_remote_charge() (see function
-> > header comments) to achieve this.
-> > 
-> > This is just supposed to start a discussion, so it's pretty simple.
-> > Once a kthread has finished a remote charging period with
-> > cpu_cgroup_remote_charge(), its runtime is subtracted from the target
-> > task group's runtime (cfs_bandwidth::runtime) and any remainder is saved
-> > as debt (cfs_bandwidth::debt) to pay off in later periods.
-> > 
-> > Remote charging tasks aren't throttled when the group reaches its quota,
-> > and a task group doesn't run at all until its debt is completely paid,
-> > but these shortcomings can be addressed if the approach ends up being
-> > taken.
-> > 
-> 
-> *groan*... and not a single word on why it wouldn't be much better to
-> simply move the task into the relevant cgroup..
+Test that specification exceptions cause the correct interruption code
+during both normal and transactional execution.
 
-Yes, the cover letter talks about that, I'll quote the relevant part
-here.
+v3 -> v4
+	remove iterations argument in order to simplify the code
+		for manual performance testing adding a for loop is easy
+	move report out of fixup_invalid_psw
+	simplify/improve readability of triggers
+	use positive error values
 
----
+v2 -> v3
+	remove non-ascii symbol
+	clean up load_psw
+	fix nits
 
-    15  sched/fair: Account kthread runtime debt for CFS bandwidth
-    16  sched/fair: Consider kthread debt in cputime
+v1 -> v2
+	Add license and test description
+	Split test patch into normal test and transactional execution test
+	Add comments to
+		invalid PSW fixup function
+		with_transaction
+	Rename some variables/functions
+	Pass mask as single parameter to asm
+	Get rid of report_info_if macro
+	Introduce report_pass/fail and use them
 
-A prototype for remote charging in CFS bandwidth and cpu.stat, described more
-in the next section.  It's debatable whether these last two are required for
-this series.  Patch 12 caps the number of helper threads started according to
-the max effective CPUs allowed by the quota and period of the main thread's
-task group.  In practice, I think this hits the sweet spot between complexity
-and respecting CFS bandwidth limits so that patch 15 might just be dropped.
-For instance, when running qemu with a vfio device, the restriction from patch
-12 was enough to avoid the helpers breaching CFS bandwidth limits.  That leaves
-patch 16, which on its own seems overkill for all the hunks it would require
-from patch 15, so it could be dropped too.
+Janis Schoetterl-Glausch (2):
+  s390x: Add specification exception test
+  s390x: Test specification exceptions during transaction
 
-Patch 12 isn't airtight, though, since other tasks running in the task group
-alongside the main thread and helpers could still result in overage.  So,
-patches 15-16 give an idea of what absolutely correct accounting in the CPU
-controller might look like in case there are real situations that want it.
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |   1 +
+ s390x/spec_ex.c          | 323 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 4 files changed, 328 insertions(+)
+ create mode 100644 s390x/spec_ex.c
 
+Range-diff against v3:
+1:  75d0bf1 ! 1:  a242e84 s390x: Add specification exception test
+    @@ Commit message
+         s390x: Add specification exception test
+     
+         Generate specification exceptions and check that they occur.
+    -    With the iterations argument one can check if specification
+    -    exception interpretation occurs, e.g. by using a high value and
+    -    checking that the debugfs counters are substantially lower.
+    -    The argument is also useful for estimating the performance benefit
+    -    of interpretation.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+     
+      ## s390x/Makefile ##
+    -@@ s390x/Makefile: tests += $(TEST_DIR)/mvpg.elf
+    - tests += $(TEST_DIR)/uv-host.elf
+    +@@ s390x/Makefile: tests += $(TEST_DIR)/uv-host.elf
+      tests += $(TEST_DIR)/edat.elf
+      tests += $(TEST_DIR)/mvpg-sie.elf
+    + tests += $(TEST_DIR)/spec_ex-sie.elf
+     +tests += $(TEST_DIR)/spec_ex.elf
+    + tests += $(TEST_DIR)/firq.elf
+      
+      tests_binary = $(patsubst %.elf,%.bin,$(tests))
+    - ifneq ($(HOST_KEY_DOCUMENT),)
+     
+      ## s390x/spec_ex.c (new) ##
+     @@
+    @@ s390x/spec_ex.c (new)
+     + *
+     + * Specification exception test.
+     + * Tests that specification exceptions occur when expected.
+    ++ *
+    ++ * Can be extended by adding triggers to spec_ex_triggers, see comments below.
+     + */
+     +#include <stdlib.h>
+     +#include <libcflat.h>
+     +#include <asm/interrupt.h>
+    -+#include <asm/facility.h>
+     +
+     +static struct lowcore *lc = (struct lowcore *) 0;
+     +
+    -+static bool expect_invalid_psw;
+    ++static bool invalid_psw_expected;
+     +static struct psw expected_psw;
+    ++static struct psw invalid_psw;
+     +static struct psw fixup_psw;
+     +
+     +/* The standard program exception handler cannot deal with invalid old PSWs,
+    @@ s390x/spec_ex.c (new)
+     + */
+     +static void fixup_invalid_psw(void)
+     +{
+    -+	if (expect_invalid_psw) {
+    -+		report(expected_psw.mask == lc->pgm_old_psw.mask
+    -+		       && expected_psw.addr == lc->pgm_old_psw.addr,
+    -+		       "Invalid program new PSW as expected");
+    -+		expect_invalid_psw = false;
+    -+	}
+    ++	// signal occurrence of invalid psw fixup
+    ++	invalid_psw_expected = false;
+    ++	invalid_psw = lc->pgm_old_psw;
+     +	lc->pgm_old_psw = fixup_psw;
+     +}
+     +
+     +/* Load possibly invalid psw, but setup fixup_psw before,
+     + * so that *fixup_invalid_psw() can bring us back onto the right track.
+    ++ * Also acts as compiler barrier, -> none required in expect/check_invalid_psw
+     + */
+     +static void load_psw(struct psw psw)
+     +{
+     +	uint64_t scratch;
+     +
+     +	fixup_psw.mask = extract_psw_mask();
+    -+	asm volatile (
+    -+		"	larl	%[scratch],nop%=\n"
+    ++	asm volatile ( "larl	%[scratch],nop%=\n"
+     +		"	stg	%[scratch],%[addr]\n"
+     +		"	lpswe	%[psw]\n"
+     +		"nop%=:	nop\n"
+    @@ s390x/spec_ex.c (new)
+     +	);
+     +}
+     +
+    -+static void psw_bit_12_is_1(void)
+    ++static void expect_invalid_psw(struct psw psw)
+     +{
+    -+	expected_psw.mask = 0x0008000000000000;
+    -+	expected_psw.addr = 0x00000000deadbeee;
+    -+	expect_invalid_psw = true;
+    ++	expected_psw = psw;
+    ++	invalid_psw_expected = true;
+    ++}
+    ++
+    ++static int check_invalid_psw(void)
+    ++{
+    ++	// toggled to signal occurrence of invalid psw fixup
+    ++	if (!invalid_psw_expected) {
+    ++		if (expected_psw.mask == invalid_psw.mask &&
+    ++		    expected_psw.addr == invalid_psw.addr)
+    ++			return 0;
+    ++		report_fail("Wrong invalid PSW");
+    ++	} else {
+    ++		report_fail("Expected exception due to invalid PSW");
+    ++	}
+    ++	return 1;
+    ++}
+    ++
+    ++static int psw_bit_12_is_1(void)
+    ++{
+    ++	struct psw invalid = { .mask = 0x0008000000000000, .addr = 0x00000000deadbeee};
+    ++
+    ++	expect_invalid_psw(invalid);
+     +	load_psw(expected_psw);
+    ++	return check_invalid_psw();
+     +}
+     +
+    -+static void bad_alignment(void)
+    ++static int bad_alignment(void)
+     +{
+    -+	uint32_t words[5] = {0, 0, 0};
+    -+	uint32_t (*bad_aligned)[4];
+    -+
+    -+	register uint64_t r1 asm("6");
+    -+	register uint64_t r2 asm("7");
+    -+	if (((uintptr_t)&words[0]) & 0xf)
+    -+		bad_aligned = (uint32_t (*)[4])&words[0];
+    -+	else
+    -+		bad_aligned = (uint32_t (*)[4])&words[1];
+    -+	asm volatile ("lpq %0,%2"
+    -+		      : "=r"(r1), "=r"(r2)
+    -+		      : "T"(*bad_aligned)
+    ++	uint32_t words[5] __attribute__((aligned(16)));
+    ++	uint32_t (*bad_aligned)[4] = (uint32_t (*)[4])&words[1];
+    ++
+    ++	asm volatile ("lpq %%r6,%[bad]"
+    ++		      : : [bad] "T"(*bad_aligned)
+    ++		      : "%r6", "%r7"
+     +	);
+    ++	return 0;
+     +}
+     +
+    -+static void not_even(void)
+    ++static int not_even(void)
+     +{
+    -+	uint64_t quad[2];
+    ++	uint64_t quad[2] __attribute__((aligned(16))) = {0};
+     +
+    -+	register uint64_t r1 asm("7");
+    -+	register uint64_t r2 asm("8");
+    -+	asm volatile (".insn	rxy,0xe3000000008f,%0,%2" //lpq %0,%2
+    -+		      : "=r"(r1), "=r"(r2)
+    -+		      : "T"(quad)
+    ++	asm volatile (".insn	rxy,0xe3000000008f,%%r7,%[quad]" //lpq %%r7,%[quad]
+    ++		      : : [quad] "T"(quad)
+    ++		      : "%r7", "%r8"
+     +	);
+    ++	return 0;
+     +}
+     +
+    ++/*
+    ++ * Harness for specification exception testing.
+    ++ * func only triggers exception, reporting is taken care of automatically.
+    ++ */
+     +struct spec_ex_trigger {
+     +	const char *name;
+    -+	void (*func)(void);
+    ++	int (*func)(void);
+     +	void (*fixup)(void);
+     +};
+     +
+    ++/* List of all tests to execute */
+     +static const struct spec_ex_trigger spec_ex_triggers[] = {
+    -+	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw},
+    -+	{ "bad_alignment", &bad_alignment, NULL},
+    -+	{ "not_even", &not_even, NULL},
+    -+	{ NULL, NULL, NULL},
+    ++	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw },
+    ++	{ "bad_alignment", &bad_alignment, NULL },
+    ++	{ "not_even", &not_even, NULL },
+    ++	{ NULL, NULL, NULL },
+     +};
+     +
+    -+struct args {
+    -+	uint64_t iterations;
+    -+};
+    -+
+    -+static void test_spec_ex(struct args *args,
+    -+			 const struct spec_ex_trigger *trigger)
+    ++static void test_spec_ex(const struct spec_ex_trigger *trigger)
+     +{
+     +	uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION;
+     +	uint16_t pgm;
+    -+	unsigned int i;
+    -+
+    -+	for (i = 0; i < args->iterations; i++) {
+    -+		expect_pgm_int();
+    -+		register_pgm_cleanup_func(trigger->fixup);
+    -+		trigger->func();
+    -+		register_pgm_cleanup_func(NULL);
+    -+		pgm = clear_pgm_int();
+    -+		if (pgm != expected_pgm) {
+    -+			report_fail("Program interrupt: expected(%d) == received(%d)",
+    -+				    expected_pgm,
+    -+				    pgm);
+    -+			return;
+    -+		}
+    -+	}
+    -+	report_pass("Program interrupt: always expected(%d) == received(%d)",
+    -+		    expected_pgm,
+    -+		    expected_pgm);
+    -+}
+    -+
+    -+static struct args parse_args(int argc, char **argv)
+    -+{
+    -+	struct args args = {
+    -+		.iterations = 1,
+    -+	};
+    -+	unsigned int i;
+    -+	long arg;
+    -+	bool no_arg;
+    -+	char *end;
+    -+
+    -+	for (i = 1; i < argc; i++) {
+    -+		no_arg = true;
+    -+		if (i < argc - 1) {
+    -+			no_arg = *argv[i + 1] == '\0';
+    -+			arg = strtol(argv[i + 1], &end, 10);
+    -+			no_arg |= *end != '\0';
+    -+			no_arg |= arg < 0;
+    -+		}
+    -+
+    -+		if (!strcmp("--iterations", argv[i])) {
+    -+			if (no_arg)
+    -+				report_abort("--iterations needs a positive parameter");
+    -+			args.iterations = arg;
+    -+			++i;
+    -+		} else {
+    -+			report_abort("Unsupported parameter '%s'",
+    -+				     argv[i]);
+    -+		}
+    -+	}
+    -+	return args;
+    ++	int rc;
+    ++
+    ++	expect_pgm_int();
+    ++	register_pgm_cleanup_func(trigger->fixup);
+    ++	rc = trigger->func();
+    ++	register_pgm_cleanup_func(NULL);
+    ++	if (rc)
+    ++		return;
+    ++	pgm = clear_pgm_int();
+    ++	report(pgm == expected_pgm, "Program interrupt: expected(%d) == received(%d)",
+    ++	       expected_pgm, pgm);
+     +}
+     +
+     +int main(int argc, char **argv)
+     +{
+     +	unsigned int i;
+     +
+    -+	struct args args = parse_args(argc, argv);
+    -+
+     +	report_prefix_push("specification exception");
+     +	for (i = 0; spec_ex_triggers[i].name; i++) {
+     +		report_prefix_push(spec_ex_triggers[i].name);
+    -+		test_spec_ex(&args, &spec_ex_triggers[i]);
+    ++		test_spec_ex(&spec_ex_triggers[i]);
+     +		report_prefix_pop();
+     +	}
+     +	report_prefix_pop();
+    @@ s390x/spec_ex.c (new)
+     +}
+     
+      ## s390x/unittests.cfg ##
+    -@@ s390x/unittests.cfg: file = edat.elf
+    +@@ s390x/unittests.cfg: file = mvpg-sie.elf
+    + [spec_ex-sie]
+    + file = spec_ex-sie.elf
+      
+    - [mvpg-sie]
+    - file = mvpg-sie.elf
+    -+
+     +[spec_ex]
+     +file = spec_ex.elf
+    ++
+    + [firq-linear-cpu-ids]
+    + file = firq.elf
+    + timeout = 20
+2:  0593951 ! 2:  16ce8bb s390x: Test specification exceptions during transaction
+    @@ s390x/spec_ex.c
+     + * This includes specification exceptions occurring during transactional execution
+     + * as these result in another interruption code (the transactional-execution-aborted
+     + * bit is set).
+    +  *
+    +  * Can be extended by adding triggers to spec_ex_triggers, see comments below.
+       */
+      #include <stdlib.h>
+     +#include <htmintrin.h>
+      #include <libcflat.h>
+     +#include <asm/barrier.h>
+      #include <asm/interrupt.h>
+    - #include <asm/facility.h>
+    ++#include <asm/facility.h>
+    + 
+    + static struct lowcore *lc = (struct lowcore *) 0;
+      
+    -@@ s390x/spec_ex.c: static void not_even(void)
+    +@@ s390x/spec_ex.c: static int not_even(void)
+    + /*
+    +  * Harness for specification exception testing.
+    +  * func only triggers exception, reporting is taken care of automatically.
+    ++ * If a trigger is transactable it will also  be executed during a transaction.
+    +  */
+      struct spec_ex_trigger {
+      	const char *name;
+    - 	void (*func)(void);
+    + 	int (*func)(void);
+     +	bool transactable;
+      	void (*fixup)(void);
+      };
+      
+    + /* List of all tests to execute */
+      static const struct spec_ex_trigger spec_ex_triggers[] = {
+    --	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw},
+    --	{ "bad_alignment", &bad_alignment, NULL},
+    --	{ "not_even", &not_even, NULL},
+    --	{ NULL, NULL, NULL},
+    -+	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw},
+    -+	{ "bad_alignment", &bad_alignment, true, NULL},
+    -+	{ "not_even", &not_even, true, NULL},
+    -+	{ NULL, NULL, true, NULL},
+    - };
+    - 
+    - struct args {
+    - 	uint64_t iterations;
+    -+	uint64_t max_retries;
+    -+	uint64_t suppress_info;
+    -+	uint64_t max_failures;
+    -+	bool diagnose;
+    +-	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw },
+    +-	{ "bad_alignment", &bad_alignment, NULL },
+    +-	{ "not_even", &not_even, NULL },
+    +-	{ NULL, NULL, NULL },
+    ++	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw },
+    ++	{ "bad_alignment", &bad_alignment, true, NULL },
+    ++	{ "not_even", &not_even, true, NULL },
+    ++	{ NULL, NULL, false, NULL },
+      };
+      
+    - static void test_spec_ex(struct args *args,
+    -@@ s390x/spec_ex.c: static void test_spec_ex(struct args *args,
+    - 		    expected_pgm);
+    + static void test_spec_ex(const struct spec_ex_trigger *trigger)
+    +@@ s390x/spec_ex.c: static void test_spec_ex(const struct spec_ex_trigger *trigger)
+    + 	       expected_pgm, pgm);
+      }
+      
+     +#define TRANSACTION_COMPLETED 4
+    @@ s390x/spec_ex.c: static void test_spec_ex(struct args *args,
+     + * being NULL to keep things simple
+     + */
+     +static int __attribute__((nonnull))
+    -+with_transaction(void (*trigger)(void), struct __htm_tdb *diagnose)
+    ++with_transaction(int (*trigger)(void), struct __htm_tdb *diagnose)
+     +{
+     +	int cc;
+     +
+     +	cc = __builtin_tbegin(diagnose);
+     +	if (cc == _HTM_TBEGIN_STARTED) {
+    ++		/* return code is meaningless: transaction needs to complete
+    ++		 * in order to return and completion indicates a test failure
+    ++		 */
+     +		trigger();
+     +		__builtin_tend();
+    -+		return -TRANSACTION_COMPLETED;
+    ++		return TRANSACTION_COMPLETED;
+     +	} else {
+    -+		return -cc;
+    ++		return cc;
+     +	}
+     +}
+     +
+    @@ s390x/spec_ex.c: static void test_spec_ex(struct args *args,
+     +	for (i = 0; i < max_retries; i++) {
+     +		expect_pgm_int();
+     +		trans_result = with_transaction(trigger->func, tdb);
+    -+		if (trans_result == -_HTM_TBEGIN_TRANSIENT) {
+    ++		if (trans_result == _HTM_TBEGIN_TRANSIENT) {
+     +			mb();
+     +			pgm = lc->pgm_int_code;
+     +			if (pgm == 0)
+    @@ s390x/spec_ex.c: static void test_spec_ex(struct args *args,
+     +		}
+     +		return trans_result;
+     +	}
+    -+	return -TRANSACTION_MAX_RETRIES;
+    ++	return TRANSACTION_MAX_RETRIES;
+     +}
+     +
+    ++struct args {
+    ++	uint64_t max_retries;
+    ++	bool diagnose;
+    ++};
+    ++
+     +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
+     +{
+     +	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
+    -+			      | PGM_INT_CODE_TX_ABORTED_EVENT;
+    ++				      | PGM_INT_CODE_TX_ABORTED_EVENT;
+     +	union {
+     +		struct __htm_tdb tdb;
+     +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
+     +	} diag;
+    -+	unsigned int i, failures = 0;
+    ++	unsigned int i;
+     +	int trans_result;
+     +
+     +	if (!test_facility(73)) {
+    @@ s390x/spec_ex.c: static void test_spec_ex(struct args *args,
+     +	}
+     +	ctl_set_bit(0, CTL0_TRANSACT_EX_CTL); /* enable transactional-exec */
+     +
+    -+	for (i = 0; i < args->iterations && failures <= args->max_failures; i++) {
+    -+		register_pgm_cleanup_func(trigger->fixup);
+    -+		trans_result = retry_transaction(trigger, args->max_retries, &diag.tdb, expected_pgm);
+    -+		register_pgm_cleanup_func(NULL);
+    -+		switch (trans_result) {
+    -+		case 0:
+    -+			continue;
+    -+		case -_HTM_TBEGIN_INDETERMINATE:
+    -+		case -_HTM_TBEGIN_PERSISTENT:
+    -+			if (failures < args->suppress_info)
+    -+				report_info("transaction failed with cc %d",
+    -+					    -trans_result);
+    -+			break;
+    -+		case -_HTM_TBEGIN_TRANSIENT:
+    -+			report_fail("Program interrupt: expected(%d) == received(%d)",
+    -+				    expected_pgm,
+    -+				    clear_pgm_int());
+    -+			goto out;
+    -+		case -TRANSACTION_COMPLETED:
+    -+			report_fail("Transaction completed without exception");
+    -+			goto out;
+    -+		case -TRANSACTION_MAX_RETRIES:
+    -+			if (failures < args->suppress_info)
+    -+				report_info("Retried transaction %lu times without exception",
+    -+					    args->max_retries);
+    -+			break;
+    -+		default:
+    -+			report_fail("Invalid return transaction result");
+    -+			goto out;
+    -+		}
+    -+
+    -+		if (failures < args->suppress_info)
+    -+			report_info("transaction abort code: %llu", diag.tdb.abort_code);
+    -+		if (args->diagnose && failures < args->suppress_info) {
+    ++	register_pgm_cleanup_func(trigger->fixup);
+    ++	trans_result = retry_transaction(trigger, args->max_retries, &diag.tdb, expected_pgm);
+    ++	register_pgm_cleanup_func(NULL);
+    ++	switch (trans_result) {
+    ++	case 0:
+    ++		report_pass("Program interrupt: expected(%d) == received(%d)",
+    ++			    expected_pgm, expected_pgm);
+    ++		break;
+    ++	case _HTM_TBEGIN_INDETERMINATE:
+    ++	case _HTM_TBEGIN_PERSISTENT:
+    ++		report_info("transaction failed with cc %d", trans_result);
+    ++		report_info("transaction abort code: %llu", diag.tdb.abort_code);
+    ++		if (args->diagnose)
+     +			for (i = 0; i < 32; i++)
+    -+				report_info("diag+%03d: %016lx", i*8, diag.dwords[i]);
+    -+		}
+    -+		++failures;
+    -+	}
+    -+	if (failures <= args->max_failures) {
+    -+		report_pass(
+    -+			"Program interrupt: always expected(%d) == received(%d), transaction failures: %u",
+    -+			expected_pgm,
+    -+			expected_pgm,
+    -+			failures);
+    -+	} else {
+    -+		report_fail("Too many transaction failures: %u", failures);
+    ++				report_info("diag+%03d: %016lx", i * 8, diag.dwords[i]);
+    ++		break;
+    ++	case _HTM_TBEGIN_TRANSIENT:
+    ++		report_fail("Program interrupt: expected(%d) == received(%d)",
+    ++			    expected_pgm, clear_pgm_int());
+    ++		break;
+    ++	case TRANSACTION_COMPLETED:
+    ++		report_fail("Transaction completed without exception");
+    ++		break;
+    ++	case TRANSACTION_MAX_RETRIES:
+    ++		report_info("Retried transaction %lu times without exception",
+    ++			    args->max_retries);
+    ++		break;
+    ++	default:
+    ++		report_fail("Invalid return transaction result");
+    ++		break;
+     +	}
+    -+	if (failures > args->suppress_info)
+    -+		report_info("Suppressed some transaction failure information messages");
+     +
+    -+out:
+     +	ctl_clear_bit(0, CTL0_TRANSACT_EX_CTL);
+     +}
+     +
+    - static struct args parse_args(int argc, char **argv)
+    - {
+    - 	struct args args = {
+    - 		.iterations = 1,
+    ++static struct args parse_args(int argc, char **argv)
+    ++{
+    ++	struct args args = {
+     +		.max_retries = 20,
+    -+		.suppress_info = 20,
+     +		.diagnose = false
+    - 	};
+    - 	unsigned int i;
+    - 	long arg;
+    --	bool no_arg;
+    -+	bool no_arg, max_failures = false;
+    - 	char *end;
+    - 
+    - 	for (i = 1; i < argc; i++) {
+    -@@ s390x/spec_ex.c: static struct args parse_args(int argc, char **argv)
+    - 				report_abort("--iterations needs a positive parameter");
+    - 			args.iterations = arg;
+    - 			++i;
+    -+		} else if (!strcmp("--max-retries", argv[i])) {
+    -+			if (no_arg)
+    -+				report_abort("--max-retries needs a positive parameter");
+    -+			args.max_retries = arg;
+    -+			++i;
+    -+		} else if (!strcmp("--suppress-info", argv[i])) {
+    -+			if (no_arg)
+    -+				report_abort("--suppress-info needs a positive parameter");
+    -+			args.suppress_info = arg;
+    -+			++i;
+    -+		} else if (!strcmp("--max-failures", argv[i])) {
+    ++	};
+    ++	unsigned int i;
+    ++	long arg;
+    ++	bool no_arg;
+    ++	char *end;
+    ++	const char *flag;
+    ++	uint64_t *argp;
+    ++
+    ++	for (i = 1; i < argc; i++) {
+    ++		no_arg = true;
+    ++		if (i < argc - 1) {
+    ++			no_arg = *argv[i + 1] == '\0';
+    ++			arg = strtol(argv[i + 1], &end, 10);
+    ++			no_arg |= *end != '\0';
+    ++			no_arg |= arg < 0;
+    ++		}
+    ++
+    ++		flag = "--max-retries";
+    ++		argp = &args.max_retries;
+    ++		if (!strcmp(flag, argv[i])) {
+     +			if (no_arg)
+    -+				report_abort("--max-failures needs a positive parameter");
+    -+			args.max_failures = arg;
+    -+			max_failures = true;
+    ++				report_abort("%s needs a positive parameter", flag);
+    ++			*argp = arg;
+     +			++i;
+    -+		} else if (!strcmp("--diagnose", argv[i])) {
+    ++			continue;
+    ++		}
+    ++		if (!strcmp("--diagnose", argv[i])) {
+     +			args.diagnose = true;
+    -+		} else if (!strcmp("--no-diagnose", argv[i])) {
+    ++			continue;
+    ++		}
+    ++		if (!strcmp("--no-diagnose", argv[i])) {
+     +			args.diagnose = false;
+    - 		} else {
+    - 			report_abort("Unsupported parameter '%s'",
+    - 				     argv[i]);
+    - 		}
+    - 	}
+    ++			continue;
+    ++		}
+    ++		report_abort("Unsupported parameter '%s'",
+    ++			     argv[i]);
+    ++	}
+     +
+    -+	if (!max_failures)
+    -+		args.max_failures = args.iterations / 1000;
+    ++	return args;
+    ++}
+     +
+    - 	return args;
+    - }
+    + int main(int argc, char **argv)
+    + {
+    + 	unsigned int i;
+      
+    ++	struct args args = parse_args(argc, argv);
+    ++
+    + 	report_prefix_push("specification exception");
+    + 	for (i = 0; spec_ex_triggers[i].name; i++) {
+    + 		report_prefix_push(spec_ex_triggers[i].name);
+     @@ s390x/spec_ex.c: int main(int argc, char **argv)
+      	}
+      	report_prefix_pop();
 
-Remote Charging in the CPU Controller
--------------------------------------
-
-CPU-intensive kthreads aren't generally accounted in the CPU controller, so
-they escape settings such as weight and bandwidth when they do work on behalf
-of a task group.
-
-This problem arises with multithreaded jobs, but is also an issue in other
-places.  CPU activity from async memory reclaim (kswapd, cswapd?[5]) should be
-accounted to the cgroup that the memory belongs to, and similarly CPU activity
-from net rx should be accounted to the task groups that correspond to the
-packets being received.  There are also vague complaints from Android[6].
-
-Each use case has its own requirements[7].  In padata and reclaim, the task
-group to account to is known ahead of time, but net rx has to spend cycles
-processing a packet before its destination task group is known, so any solution
-should be able to work without knowing the task group in advance.  Furthermore,
-the CPU controller shouldn't throttle reclaim or net rx in real time since both
-are doing high priority work.  These make approaches that run kthreads directly
-in a task group, like cgroup-aware workqueues[8] or a kernel path for
-CLONE_INTO_CGROUP, infeasible.  Running kthreads directly in cgroups also has a
-downside for padata because helpers' MAX_NICE priority is "shadowed" by the
-priority of the group entities they're running under.
-
-The proposed solution of remote charging can accrue debt to a task group to be
-paid off or forgiven later, addressing all these issues.  A kthread calls the
-interface
-
-    void cpu_cgroup_remote_begin(struct task_struct *p,
-                                 struct cgroup_subsys_state *css);
-
-to begin remote charging to @css, causing @p's current sum_exec_runtime to be
-updated and saved.  The @css arg isn't required and can be removed later to
-facilitate the unknown cgroup case mentioned above.  Then the kthread calls
-another interface
-
-    void cpu_cgroup_remote_charge(struct task_struct *p,
-                                  struct cgroup_subsys_state *css);
-
-to account the sum_exec_runtime that @p has used since the first call.
-Internally, a new field cfs_bandwidth::debt is added to keep track of unpaid
-debt that's only used when the debt exceeds the quota in the current period.
-
-Weight-based control isn't implemented for now since padata helpers run at
-MAX_NICE and so always yield to anything higher priority, meaning they would
-rarely compete with other task groups.
-
-[ We have another use case to use remote charging for implementing
-  CFS bandwidth control across multiple machines.  This is an entirely
-  different topic that deserves its own thread. ]
+base-commit: ca785dae0dd343b1de4b3f5d6c1223d41fbc39e7
+-- 
+2.33.1
 
