@@ -2,173 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5844148A905
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 08:59:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BFA748A909
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 09:00:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348774AbiAKH7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 02:59:48 -0500
-Received: from mga07.intel.com ([134.134.136.100]:18837 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235827AbiAKH7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 02:59:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641887988; x=1673423988;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Afn//rSP4R9SsyZ6VJF11Y3rnLWXeO8abK+Y2aty1FU=;
-  b=T/J3mCJmP5TI7yIJ//cVCynxQnRdfPiu7HaeftkXfMD5z3b5ePyUUUB7
-   u2tm0AfyiNAngUFOKu32oJIsDKfWlzt56HD+5HxXh+U6P1YBMw9Hkcm2O
-   KoHr7UCVwY/zartTxpL7sE+NiOBIcTMcwUMAIG/6Y6lK5vdbpl+1y/u3e
-   tYVNc6RfJZUXyVaFIiMUxz7mYhsmTTpTiyvCiJ7Vc5bO9EqgP0uqhr3wE
-   01otaPfWQBY5DQEXGZLuA+BttJ35JECln9zZuPzVsq36VmAggOLBJSlrT
-   v0CGvMsXz4B3+5l987ds5P6c0lKWQy/8rGJ5/z2AeCJla+O5IBghxHCXj
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="306779923"
-X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
-   d="scan'208";a="306779923"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 23:59:48 -0800
-X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
-   d="scan'208";a="622983509"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.30.76]) ([10.255.30.76])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 23:59:45 -0800
-Message-ID: <8a6e5b96-1191-7693-314a-1714cb7c9c9c@intel.com>
-Date:   Tue, 11 Jan 2022 15:59:43 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.4.1
-Subject: Re: [PATCH v2] KVM: x86/pt: Ignore all unknown Intel PT capabilities
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S1348758AbiAKIAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 03:00:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27747 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1348786AbiAKIA2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 03:00:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641888027;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mUwFgZRxEbBys4hhtVi3XC+OOhBQXkgUrXq0SWKqfV4=;
+        b=A7EDEux1wAt4xrnZxTI3qw8aeuk52RFcSi7QlBbesBVUpmSS3YRY7HuGFMEmJ1tS/8/jd0
+        5xltgLp8NrHWdzrAnJKfiYbAacYHNGI7djhw7g+9osQTqcvFmDGfrsMXRnX92SGc3jCzd3
+        uTjE+VjpIbTfuQOQG+nNCDzAn/To6cM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-609-Ma2NvKZuPqqM6PDgQ90Urg-1; Tue, 11 Jan 2022 03:00:26 -0500
+X-MC-Unique: Ma2NvKZuPqqM6PDgQ90Urg-1
+Received: by mail-ed1-f71.google.com with SMTP id i9-20020a05640242c900b003fe97faab62so2712484edc.9
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 00:00:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=mUwFgZRxEbBys4hhtVi3XC+OOhBQXkgUrXq0SWKqfV4=;
+        b=To3H8FU+bwszx4wxIGeCgddSPVNKFf0rBNnuEWywMOl7RSGfUZ8YgUGm2HWNKTHd6l
+         AZ+OSh7/ZqWnAmIZvqBCIATaI9PSzCR3EMJUVzlYVQfLmKtyYz60o2dNbsvCKnpYx5TA
+         CDR3ktRdJ71KNW4au2pLlkQRRc1yYaAHM4hZPfsd5ZvS94ZpXbAYct97FTcXJmD5Wkrp
+         /PaDwEC7s81Dtwn+2F+Zzw9zPzwlHBkN2DpZa38XfC3nP4A1rdUoivpjN2UuwZkD7Lc0
+         pYVRxOLqBsV0BwZniOHyIvhSfYtI+g49wdF6Oqt9/6/ulp3V/JdziHzL/a9G58y5cHLm
+         N9aw==
+X-Gm-Message-State: AOAM531aYclf69YjpQ8ERflPaZXykdqRqAMb5irWiaT7p9bj9dzwS0GJ
+        2wHxTpx/MSic+H8ILS+N+3pNLW8xRE7tnAFWnIj/WVHJwhZW7gBm64C13A7aWGEistrVbJ+Wb4N
+        FvglJxVkYam3W
+X-Received: by 2002:a05:6402:27cf:: with SMTP id c15mr3238872ede.390.1641888024726;
+        Tue, 11 Jan 2022 00:00:24 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzqKWre77joDOe06fjv7Z8fAS1cCPD1ZbZaT/jVCVMGeddVETAE80TP8U4qVc80gmByfCibvA==
+X-Received: by 2002:a05:6402:27cf:: with SMTP id c15mr3238860ede.390.1641888024586;
+        Tue, 11 Jan 2022 00:00:24 -0800 (PST)
+Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id g17sm3304399eja.165.2022.01.11.00.00.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jan 2022 00:00:23 -0800 (PST)
+Date:   Tue, 11 Jan 2022 09:00:22 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220110034747.30498-1-likexu@tencent.com>
- <YdzV33X5w6+tCamI@google.com>
- <80b40829-0d25-eb84-7bd7-f21685daeb20@gmail.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <80b40829-0d25-eb84-7bd7-f21685daeb20@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Message-ID: <20220111090022.1125ffb5@redhat.com>
+In-Reply-To: <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+        <20211122175818.608220-3-vkuznets@redhat.com>
+        <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+        <20211227183253.45a03ca2@redhat.com>
+        <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
+        <87mtkdqm7m.fsf@redhat.com>
+        <20220103104057.4dcf7948@redhat.com>
+        <875yr1q8oa.fsf@redhat.com>
+        <ceb63787-b057-13db-4624-b430c51625f1@redhat.com>
+        <87o84qpk7d.fsf@redhat.com>
+        <877dbbq5om.fsf@redhat.com>
+        <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/11/2022 12:20 PM, Like Xu wrote:
-> On 11/1/2022 8:57 am, Sean Christopherson wrote:
->> On Mon, Jan 10, 2022, Like Xu wrote:
->>> From: Like Xu <likexu@tencent.com>
->>>
->>> Some of the new Intel PT capabilities (e.g. SDM Vol3, 32.2.4 Event
->>> Tracing, it exposes details about the asynchronous events, when they are
->>> generated, and when their corresponding software event handler completes
->>> execution) cannot be safely and fully emulated by the KVM, especially
->>> emulating the simultaneous writing of guest PT packets generated by
->>> the KVM to the guest PT buffer.
->>>
->>> For KVM, it's better to advertise currently supported features based on
->>> the "static struct pt_cap_desc" implemented in the host PT driver and
->>> ignore _all_ unknown features before they have been investigated one by
->>> one and supported in a safe manner, leaving the rest as system-wide-only
->>> tracing capabilities.
->>>
->>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->>> Signed-off-by: Like Xu <likexu@tencent.com>
->>> ---
->>> v1 -> v2 Changelog:
->>> - Be safe and ignore _all_ unknown capabilities. (Paolo)
->>>
->>> Previous:
->>> https://lore.kernel.org/kvm/20220106085533.84356-1-likexu@tencent.com/
->>>
->>>   arch/x86/kvm/cpuid.c | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>> index 0b920e12bb6d..439b93359848 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -901,6 +901,8 @@ static inline int __do_cpuid_func(struct 
->>> kvm_cpuid_array *array, u32 function)
->>>               break;
->>>           }
->>> +        /* It's better to be safe and ignore _all_ unknown 
->>> capabilities. */
->>
->> No need to justify why unknown capabilities are hidden as that's very 
->> much (supposed
->> to be) standard KVM behavior.
->>
->>> +        entry->ebx &= GENMASK(5, 0);
->>
->> Please add a #define somewhere so that this is self-documenting, e.g. see
->> KVM_SUPPORTED_XCR0.
-> 
-> How about we define this macro in the <asm/intel_pt.h> so that the next 
-> PT capability
-> enabler can update the mask with minimal effort, considering that many 
-> pure kernel
-> developers don't care about KVM code ?
-> 
->>
->> And why just EBX?  ECX appears to enumerate features too, and EDX is 
->> presumably
->> reserved to enumerate yet more features when EBX/ECX run out of bits.
-> 
-> Yes, how about this version:
-> 
-> diff --git a/arch/x86/include/asm/intel_pt.h 
-> b/arch/x86/include/asm/intel_pt.h
-> index ebe8d2ea44fe..da94d0eeb9df 100644
-> --- a/arch/x86/include/asm/intel_pt.h
-> +++ b/arch/x86/include/asm/intel_pt.h
-> @@ -24,6 +24,12 @@ enum pt_capabilities {
->       PT_CAP_psb_periods,
->   };
-> 
-> +#define GUEST_SUPPORTED_CPUID_14_EBX    \
-> +    (BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5))
-> +
-> +#define GUEST_SUPPORTED_CPUID_14_ECX    \
-> +    (BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(31))
-> +
+On Fri, 7 Jan 2022 19:15:43 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-I doubt BIT(3) of CPUID_14_ECX can be exposed to guest directly.
+> On 1/7/22 10:02, Vitaly Kuznetsov wrote:
+> > 
+> > I'm again leaning towards an allowlist and currently I see only two
+> > candidates:
+> > 
+> > CPUID.01H.EBX bits 31:24 (initial LAPIC id)
+> > CPUID.0BH.EDX (x2APIC id)
+> > 
+> > Anything else I'm missing?  
+> 
+> I would also ignore completely CPUID leaves 03H, 04H, 0BH, 80000005h, 
+> 80000006h, 8000001Dh, 8000001Eh (cache and processor topology), just to 
+> err on the safe side.
 
-It means "output to Trace Transport Subsystem Supported". If I 
-understand correctly, it at least needs passthrough of the said 
-Transport Subsystem or emulation of it.
+on top of that,
 
->   #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
->   void cpu_emergency_stop_pt(void);
->   extern u32 intel_pt_validate_hw_cap(enum pt_capabilities cap);
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0b920e12bb6d..be8c9170f98e 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -19,6 +19,7 @@
->   #include <asm/user.h>
->   #include <asm/fpu/xstate.h>
->   #include <asm/sgx.h>
-> +#include <asm/intel_pt.h>
->   #include "cpuid.h"
->   #include "lapic.h"
->   #include "mmu.h"
-> @@ -900,7 +901,10 @@ static inline int __do_cpuid_func(struct 
-> kvm_cpuid_array *array, u32 function)
->               entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
->               break;
->           }
-> -
-> +        entry->eax = min(entry->eax, 1u);
-> +        entry->ebx &= GUEST_SUPPORTED_CPUID_14_EBX;
-> +        entry->ecx &= GUEST_SUPPORTED_CPUID_14_ECX;
-> +        entry->edx = 0;
->           for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
->               if (!do_host_cpuid(array, function, i))
->                   goto out;
+1Fh
+
+> We could change kvm_find_cpuid_entry to WARN if any of those leaves are 
+> passed.
+> 
+> Paolo
+> 
+
