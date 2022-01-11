@@ -2,139 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D32C48B72F
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 20:18:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF75348B76C
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 20:37:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350612AbiAKTS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 14:18:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40368 "EHLO
+        id S236632AbiAKTh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 14:37:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350618AbiAKTRg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 14:17:36 -0500
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1637EC06118A
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:16:59 -0800 (PST)
-Received: by mail-ot1-x32d.google.com with SMTP id a12-20020a0568301dcc00b005919e149b4cso1684469otj.8
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:16:59 -0800 (PST)
+        with ESMTP id S236357AbiAKThz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 14:37:55 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CB58C061748
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:37:55 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id hv15so671220pjb.5
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:37:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RmmeEOXgL4aczt2lYfVEJ81JJyR5GHuXnUEqtqtBYAw=;
-        b=cOATJM7qKaMwa1rfMreaSBRrwDDzMO7PjOtbZd5NEoxEnpoVYSyEoZ9YYXqeYIXSvr
-         YE9v8N/iag490QDHMRj+L/DdGLjpFJHDqQCT7vnsL3SeJdwkX63Af178WulVTiUohxbi
-         2Z/g/UTUnmDWrvpF1A4BuycMUQiQMZtfEfDMEJMhly8ysY21Lwy1FYkVyAAHc2Y+CloD
-         QUqxx8+pjJdctbF3pQ+CoqO2LSEEj2OAsTt02lMfMbyq/L2h4o6KshlrJhMnTMxz7HRI
-         kj1j8PJ6vmHhfhTs5wV82Z3hYb9FrcuJ2q8JzsdRPEiJYoahPTsWOV6v37b2pmdg3f9Q
-         Qtpg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zGHwR3NiHUMCCbtobgvdiBSkcpXAF9setwIu+L+2NTg=;
+        b=TAGb+YJCDXlRtjUQUm2H3TX+eCODYtkadlIc0LARHDTdwUNOaWlnYbVItKV6ZFEPr1
+         cuhzonW3+Xc7Lf7v+78erPe+pjaUtCwGPGGBf2S/Ag+bsztSgmMctA1FRKkWbQNWn747
+         /D+C2lPI1EFydZQN/VawKEj+VK2qkoVFMN/HYpgf6RHy9snvnbMN4w8lZsR+BcvVVbqB
+         FcjVWcUwz/5eaIfUo/mQZjQ5bb3IauEUxfNZriFqV3CCuS5sRmU4qA2sUpY87UBRe1vb
+         taAuwPX6zJ7hkBg2eryl243n1O5zePA+QqV3lsOKtjyDKIJADikzb8vHLdYV4Laae6He
+         m4oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RmmeEOXgL4aczt2lYfVEJ81JJyR5GHuXnUEqtqtBYAw=;
-        b=E3hwxML0Q7gp4CSLkRmpncoKtpwe3XmB/dPjNoRauJQkLdAcYxYZHtzBmv2ACH/FOz
-         pM0hGnzDhnzO/lIqOO1c8CL2vQtUvmatAdn8vPdGBOjJMoPL14gj5aZsiBnVj+xq9TYN
-         bCU2SoHrV3qHL22SUCs517OGihJWLPPlMYLmpu0N8xVi2SzlAQR7gf7Hr732sIpzBWFY
-         fbysKt0d4q3SoB796RAcJyBQjtrkrblmKhXRx9hRGCOFu7NV/MgB2QPkhcf9yO0kNO/q
-         t2BLiPPmuCGujcJDTnqPiCu4qhyw/vqDPNBSLnx1AHLkzoncU0X8nl13t/h4YGUmWvIg
-         1xBA==
-X-Gm-Message-State: AOAM530aG9fB7Pbgw/QzWqZ51RP//H0kOlis0xCyNlv2RnAYMGb1W1mx
-        g2vInIZ81SgBd2Ja7OTQvBD20kx46AQbdjuFsM0M8w==
-X-Google-Smtp-Source: ABdhPJyFhnhDMW2ISK4zn+lMszvCQjj7MkaLiyC7O4OUsyaW0HdldRqbQFmZ06I5CZ/gdojGHnnTpqjIXgdkiahuGYk=
-X-Received: by 2002:a05:6830:441f:: with SMTP id q31mr4578699otv.14.1641928618059;
- Tue, 11 Jan 2022 11:16:58 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zGHwR3NiHUMCCbtobgvdiBSkcpXAF9setwIu+L+2NTg=;
+        b=TPJMyf6MPD4zSrkLHPrFTexJl9TMJRc2dX4WMRLsYn64yPqtteSi8uAWULdDs8DEwC
+         5MbepZ28Fuk6IbA5sKIZdCc+EFzHR4vPKLF/I/91eMOce2JFX2ZSGVyDJwIIv9yOje1Z
+         HM5IcQW1dp2v2t6LfU9G10xAT94L49vQrfHxqEfml+kx7SbWyol6zTeONtHyL04fCEyH
+         MnCXzgl+2p8Pi4y7nE09wFj85Yc3NQzwS224WkDAHr/96iMq4cOKmBZelKvGwu7U7Kht
+         Hp4MV1fffb3Njq9SufKru5AwgtFLuOSyZ8kU47r5GHsFEkS6dpGJCWeYTO/TgUSRhvVZ
+         yNEg==
+X-Gm-Message-State: AOAM531ypZ7cifLZA0PLCk5zfwlFDW1UzbEhpLgdr7JTua0SrQw5yQJg
+        nbJ0rQBya1VG+DmguJ7M+zW0JQ==
+X-Google-Smtp-Source: ABdhPJyAO1F86LpATpX13rxQnWzV7BjRnUO+onBahR+oWSETlxXBbl1cZjhcoNjBfMW72JaI3Dhm8Q==
+X-Received: by 2002:a17:902:c410:b0:149:577c:2b08 with SMTP id k16-20020a170902c41000b00149577c2b08mr5957188plk.108.1641929874631;
+        Tue, 11 Jan 2022 11:37:54 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id rm2sm2010382pjb.13.2022.01.11.11.37.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jan 2022 11:37:53 -0800 (PST)
+Date:   Tue, 11 Jan 2022 19:37:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Sabri N. Ferreiro" <snferreiro1@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sunhao.th@gmail.com
+Subject: Re: WARNING in kvm_mmu_uninit_tdp_mmu
+Message-ID: <Yd3cjllVD4vS17kG@google.com>
+References: <CAKG+3NTTHD3iXgK67B4R3e+ScZ+vW5H4FdwLYy9CR5oBF44DOA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
- <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
- <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
- <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com> <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
-In-Reply-To: <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 11 Jan 2022 11:16:46 -0800
-Message-ID: <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKG+3NTTHD3iXgK67B4R3e+ScZ+vW5H4FdwLYy9CR5oBF44DOA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 10:52 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> On Mon, Jan 10, 2022 at 3:57 PM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > On Mon, Jan 10, 2022 at 3:07 PM Raghavendra Rao Ananta
-> > <rananta@google.com> wrote:
-> > >
-> > > On Fri, Jan 7, 2022 at 4:05 PM Jim Mattson <jmattson@google.com> wrote:
-> > > >
-> > > > On Fri, Jan 7, 2022 at 3:43 PM Raghavendra Rao Ananta
-> > > > <rananta@google.com> wrote:
-> > > > >
-> > > > > Hi Reiji,
-> > > > >
-> > > > > On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
-> > > > > >
-> > > > > > Hi Raghu,
-> > > > > >
-> > > > > > On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
-> > > > > > <rananta@google.com> wrote:
-> > > > > > >
-> > > > > > > Capture the start of the KVM VM, which is basically the
-> > > > > > > start of any vCPU run. This state of the VM is helpful
-> > > > > > > in the upcoming patches to prevent user-space from
-> > > > > > > configuring certain VM features after the VM has started
-> > > > > > > running.
-> > > >
-> > > > What about live migration, where the VM has already technically been
-> > > > started before the first call to KVM_RUN?
-> > >
-> > > My understanding is that a new 'struct kvm' is created on the target
-> > > machine and this flag should be reset, which would allow the VMM to
-> > > restore the firmware registers. However, we would be running KVM_RUN
-> > > for the first time on the target machine, thus setting the flag.
-> > > So, you are right; It's more of a resume operation from the guest's
-> > > point of view. I guess the name of the variable is what's confusing
-> > > here.
-> >
-> > I was actually thinking that live migration gives userspace an easy
-> > way to circumvent your restriction. You said, "This state of the VM is
-> > helpful in the upcoming patches to prevent user-space from configuring
-> > certain VM features after the VM has started running." However, if you
-> > don't ensure that these VM features are configured the same way on the
-> > target machine as they were on the source machine, you have not
-> > actually accomplished your stated goal.
-> >
-> Isn't that up to the VMM to save/restore and validate the registers
-> across migrations?
+On Sun, Jan 09, 2022, Sabri N. Ferreiro wrote:
+> Hi,
+> 
+> When using Syzkaller to fuzz the Linux kernel, it triggers the following crash.
+> 
+> HEAD commit: a7904a538933 Linux 5.16-rc6
+> git tree: upstream
+> console output: https://pastebin.com/raw/keWCUeJ2
+> kernel config: https://docs.google.com/document/d/1w94kqQ4ZSIE6BW-5WIhqp4_Zh7XTPH57L5OF2Xb6O6o/view
+> C reproducer: https://pastebin.com/raw/kSxa6Yit
+> Syzlang reproducer: https://pastebin.com/raw/2RMu8p6E
+> 
+> If you fix this issue, please add the following tag to the commit:
+> Reported-by: Yuheng Shen mosesfonscqf75@gmail.com
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 5 PID: 29657 at arch/x86/kvm/mmu/tdp_mmu.c:46
+> kvm_mmu_uninit_tdp_mmu+0xb9/0xf0
 
-Yes, just as it is up to userspace not to make bad configuration
-changes after the first VMRUN.
-
-> Perhaps I have to re-word my intentions for the patch- userspace
-> should be able to configure the registers before issuing the first
-> KVM_RUN.
-
-Perhaps it would help if you explained *why* you are doing this. It
-sounds like you are either trying to protect against a malicious
-userspace, or you are trying to keep userspace from doing something
-stupid. In general, kvm only enforces constraints that are necessary
-to protect the host. If that's what you're doing, I don't understand
-why live migration doesn't provide an end-run around your protections.
+I wasn't able to reproduce to confirm, but this is more than likely fixed by
+commit 3a0f64de479c ("KVM: x86/mmu: Don't advance iterator after restart due to yielding"),
+which didn't land until 5.16-rc7.
