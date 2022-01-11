@@ -2,192 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D05F48B599
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 19:19:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8741248B60B
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 19:46:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344628AbiAKSTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 13:19:46 -0500
-Received: from mail-bn8nam11on2080.outbound.protection.outlook.com ([40.107.236.80]:4889
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1344961AbiAKSTl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 13:19:41 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JmUQbWzUDUbBtCJmEENu99yV5HOFM58pHlovO1+1oGHwqq49wRumrJCyExfkZgOwcl0y3r6M0yIxKLdKgfT7CDib2DnvIwvyqnUIsHcQLkKWdb3CNTWDqmgTv3wsn3B/iOd87P2jyXk2mHZ1XKNxy9+L9YRZiVBaGoUGhCzIqFBiZlQYwbATsheThaOCVOM6GK5Fq3bpT+S85C8nu8fiCHn3MFbkZqds3VQeyWWnLhil0wwI03HT+P8vF/qJ0GiI4bA1hm+GVo49hhgODR1v0B4aykTsMdWOjjTSzO3TZXS+whswyYrMxIOu5f4LQ77APXYXqnK70kclCYIAxqJ/5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wnAutoPfVH/7sWf6utItOM6PKF2bZ14C9r4KXbPNPIQ=;
- b=cNGlCBhsoOnIfK6T9+Da1u3dgh8C8KPHO/PAqfxrsUmXdjV3rbQx9qx+d/fJrf956a6vTkYHRA+oztuyq2YcgkjTQXu3WOjgLRAfc0HUifsjvjcia6jvuvWgUNXB1039/GhS2RiOph0hB/xTUyTC8KcTBbv/Qxjc00pjo1aYkiEnFQLu4Nw9PH9yQHU7TxIH4IjUqQJMlfaMQMQdTzvZcLLQvyAsJCn2LOZUyKtFom21rMXLdH9oZizSKOVtU31VPW4xIyk+LfcpD7UgtunWnJOBsgk6S147E3IaCR/lZB1ooOR0tZLQArrFamqSTWpO/sw3SicXXtOVWamCZeiM3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wnAutoPfVH/7sWf6utItOM6PKF2bZ14C9r4KXbPNPIQ=;
- b=q8q2dVCoF26K1/o142/0R3EKZxtiLDzqoV7zpGMl+OIcKnCebS9DSuuLwdcxIFA9tp9lS3MtbvLZP4p4eLn9ShcZxLvv/3mltrEvrptaFpXLd0Q4xMnTApVkqrtBrio7hfXT22EHRS1onROZ7A8H2wSmB525lwx+g95gB0cg+wxhVl+vCHSbFoYqErrCp2VWjxWHg2uwA44UXppOv11gBvMwDJD4KctkQw1dPGgHZqM8evdiepF2C0/b/39k6GEZn8v34RMsHrMiRoFUS/0cKh75Ydsi+349hYAT6z09osfNXnyLnZzOJoWSi1SyOITTB+VRgGtDvXuyoNPwEDmfag==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB5556.namprd12.prod.outlook.com (2603:10b6:208:1cf::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Tue, 11 Jan
- 2022 18:19:39 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af%5]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
- 18:19:39 +0000
-Date:   Tue, 11 Jan 2022 14:19:38 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>
-Subject: Re: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
-Message-ID: <20220111181938.GN2328285@nvidia.com>
-References: <20211210012529.GC6385@nvidia.com>
- <20211213134038.39bb0618.alex.williamson@redhat.com>
- <20211214162654.GJ6385@nvidia.com>
- <20211220152623.50d753ec.alex.williamson@redhat.com>
- <20220104202834.GM2328285@nvidia.com>
- <20220106111718.0e5f5ed6.alex.williamson@redhat.com>
- <20220106212057.GM2328285@nvidia.com>
- <BN9PR11MB52767CB9E4C30143065549C98C509@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20220110181140.GH2328285@nvidia.com>
- <BN9PR11MB5276CD4004B789D004C8A1488C519@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276CD4004B789D004C8A1488C519@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR08CA0005.namprd08.prod.outlook.com
- (2603:10b6:208:239::10) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S1346263AbiAKSqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 13:46:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345791AbiAKSqv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 13:46:51 -0500
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A01D6C06173F
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:46:51 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id g81so22759016ybg.10
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 10:46:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aFmLILnvpHUVz7ssSaFntznd0hUHj6gSC616E6Fkf3U=;
+        b=ePhCIqosOE3NORpI3w54xHfcf6puCuQ+ahHlVC9G+tLO1IGP+Wgo03UffIkLCD29C6
+         k0CRMWuU19THro9DlEhGP69zZBJFVhAePULjiWgpPP2+R248Tcm165947vP0aZi3s+z3
+         KJBzevL0NfgzA5F+Uc4oKmj+jYR+wZ55HEE+ti6ILLFigEbDJwP/lrOgXm0M24EPXvYm
+         4dtTAQF9+cItgcqoCCoSXLydPtnIrMJF1vzL8JO2vTdoooQUT9gSNNHz/Q2miLU8T7Ag
+         MZlAK/xMpFZL9y3rVVJXsoY8rl5Y5BvRXzGKK3g1FVPPKtyr0P1MbZ2vI5P2ZX9v2Gz3
+         y+SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aFmLILnvpHUVz7ssSaFntznd0hUHj6gSC616E6Fkf3U=;
+        b=qLVFnSVCS9H9s7XLSuMovlfXXAcwe5AB5foyOgw96x1mJtc53BoF2BLs2ADASncYIA
+         atEPGF6825O6R9RFcerEDT9L0vIKQTMteELs22b8WIYrVOqSFLL/FKr6RKJ2dt766JrJ
+         dTtxrnlFn71exYckkmfnJIyuQR4MQKox+chcR5q2VjLa+WEvIENS/KSJZiWPkDw8Vb9c
+         wP9qfQ2xehkgAE0MptCIgExS6QIHV9+v3xN3YIsVEj8f0DsEH40SpP83/LnDgNICHped
+         mlPwc0pHrn11CYZkA2Xu05pLskycj8sE4WsxoTHtIjw9Rv00OZ8aHmjuCvZmULt20/t+
+         xlWA==
+X-Gm-Message-State: AOAM531zi/jQLUq8Kwi9IyK4AvUuR+HDqzPPdH8i8G5IPw6VwH/PXQhV
+        7UCjUbvy8kmHjy09ThLngx+62EoOmrkB77I8T8jN4w==
+X-Google-Smtp-Source: ABdhPJy2gg0pwgufffOlXPR//NYKBRRE7YQswq8GMY6HGu/DSmziIAnClGDP4sEu6YMRCb2AJB3uhS4DQuFcC/jbDPk=
+X-Received: by 2002:a25:d750:: with SMTP id o77mr7614846ybg.543.1641926810619;
+ Tue, 11 Jan 2022 10:46:50 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 31f57129-417c-4f43-5472-08d9d52eee69
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5556:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB55564218B4B9BF1A8F587F3BC2519@BL0PR12MB5556.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 11cxq85q6vByYTqYX1Da6WJ3meMh649K4uvnjD5/iCeNjfxNDHL2a5717lVXcCRw0imVY+C4zflhJuvPjbP4clsavP4m9urPWhk5Pzbqu+GLgcl8y3ZQXVBLWfUn79vgWmUiqt7cjiSycaWtMGYkVWz7mtWV/PMKaDpiHHNkLftvUFy+NnbFdLoxm/jx4B/9cvEwIPvfNAZJWHiEYftzJVbKheW6X3Q+VplILriekfMXvAHLs3azHYDAdsbfQ8VikDlErrxqGkHbGgV+2HfbtddICqgADHngGEDPHMCnhzFOXSEccp6xLtKVVkngE23gpbzoB7iteazgif1cHEqAiE82EcVgRslvEptXImfsVPu6iRiC60xotz1b3mA19xraqvNpS830efxrPyRCf3QVWritihVBNWqGIZFaPz6vDd7WZMRx68tYbp+Cwr2AG2uD40SGsV+6zTsKhKZLjtLWEvUjSTDSix6od490YrrJJBsYkotLtEsxndbmYLEGvunXr1mrsTG31M6+ZemNVw4cUdInd/pL1OrASoP1Ex/836x35TaF3J4gx8JZI5JrtW9E4pR5cGnop8TD7ELscNz8/VRtRL17Mne5O/90YeSwE0wXOMbXQyh573N34TVRVYUmRtGurrg9/aN4+MjaKNBZ8g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(1076003)(6486002)(6506007)(6916009)(33656002)(8936002)(6512007)(508600001)(38100700002)(2906002)(66946007)(66476007)(66556008)(8676002)(36756003)(54906003)(186003)(4326008)(86362001)(5660300002)(26005)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PeJ/wTuyVC1G+/bDNoPuAvLh8axOj/wzdQRIWBXLt31afNUSeuja/IiMI31b?=
- =?us-ascii?Q?GNAOpF4ayS28fjFGLRXPnl9MeeaZ4ZOfZ+X8vEEmWIzBJU31//cT6+X7sO2b?=
- =?us-ascii?Q?r8dmI0CJSNAyPShRqOw3wK5+mgj2UG9cOuXxliZemxa+3y6gXPOKkzQK3Nk5?=
- =?us-ascii?Q?bpZmitQRSmpuU5vBqmsRrzi9P9df3wNZkEO60x0AyOs2snXJHRK+QvtaeeLp?=
- =?us-ascii?Q?NtC6O4SVUHyu/pmOUo39NnI4peXCiho0JNcncAK5T9YkkukXrh0MRk+fnamc?=
- =?us-ascii?Q?3sdwwBHjptVWvft0gNFVJYq+L3GpAo2F3ldjvIN29eRJV6rWUYgFfVglc6C6?=
- =?us-ascii?Q?kmzbE0LbAh5sklcfX+cgeckQxT2YUEgYToVYeyIbBA5lLYVKXfAKrGj7/QOS?=
- =?us-ascii?Q?hDXnFr5CfHt0MOO+gxOJ241ioHTOdeoqT0hqDamSi4bkz/Izmteaixgx92UG?=
- =?us-ascii?Q?2txjIbmFYfel8OhbatnyB4gEALqAXYdBV21jo1rkGYS+BeBS1nN4mTP81uXK?=
- =?us-ascii?Q?ysfBEe90+a7Fi6NAOCc/wwYpKtycbtGgVFFWJTidyMjPusAjVP4u7RjlGaBw?=
- =?us-ascii?Q?PqP8GaG3YD5W1+B8dcHEEgfkUNyUDQwwfWR2WCBn++ptGHzkBBgLQ1GpiHps?=
- =?us-ascii?Q?FrRw4u82IJo7IpvAmsqvhukCKZfUlhCBGwrFDBfj4h34060lptw2ESojnU8x?=
- =?us-ascii?Q?Xj6OMr80dEAF6h+14guIBNhZTYJ103cr8P0OeL5I3ZHM9nzj1qkIN+33F+QG?=
- =?us-ascii?Q?ESp4p56nH07dbrqkYJaCYaPgr9y1BpFmtrvaYuuF/Tvlx7ZojcfpMeeZnl4b?=
- =?us-ascii?Q?dTNqr/vv/FczJbcfe+ZTL6BT6jLVnIRxjyFwegaSb28fC+uchrpH8FezfhBs?=
- =?us-ascii?Q?IFiguGJqyFnkkh9En0NsDYqjIM9oZJr3Qmz6U0C+u9tQ8swA+wvq+U6E/a5h?=
- =?us-ascii?Q?eDJekooKfljpFgctCNKYrAgC+tRkrlpF6+hLFF+OPCeMf4enlaivWC+CfU/8?=
- =?us-ascii?Q?hRpo9XM04BFCV+MvdPYrDnh2/7EQawHuq46U1/WXrRetp9Jo90efnEMCVr/q?=
- =?us-ascii?Q?+wRmD/KWXyc2jUH0oPPfo0naiiDUA7/x8Yi3/3Fjckgk+ZCM9nN2g8oyY+UD?=
- =?us-ascii?Q?D4pSyKVtVq2m2RnXbqZnj7YEqF1RyKXsaAKXp8H1VNmavrjgb3V4n5r5O2BO?=
- =?us-ascii?Q?g+QQPYzWSNtXgXhiHfrqn0suiBm9AXGr/vDrKpzea3j0V5UmfSewHkShMoIK?=
- =?us-ascii?Q?TRgYRtp1w+BYFmqFRMPLcuhhoO3/BMyY7AJXDMdgF1rJt71z7PCgvahOIjY7?=
- =?us-ascii?Q?m2tE+ekcW619VnYeQKDI5CUuIKcEVSxN9bRjN9P/6dvK42ZshUuMKNNGUfUW?=
- =?us-ascii?Q?+eiVF1ryEOYDkK24qVITznvZQFfvI3zQ0+4F/I7/b3RmJvxJEHI5azi57mwh?=
- =?us-ascii?Q?3cy21byS6wmH/l53NG+QYSNobNkeM9b+cF6wHEBhTqbUU1KbAD84mazOCc5Z?=
- =?us-ascii?Q?dTP167q/Ic0mSKBw4NYAJSOcNe0Lwk6wKjWCoAi9Vb7KeV4vwapYoDRI6TOu?=
- =?us-ascii?Q?m2tH37S0UmHj82+EGXE=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31f57129-417c-4f43-5472-08d9d52eee69
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 18:19:39.7083
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FCHBrJQ5art/rpwm+rq9zNV6NcnwXvL5WipR6QwYY2nxGTI4X+RXID+4SkPmsVow
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5556
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+ <Ydjje8qBOP3zDOZi@google.com> <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
+ <Yd3AGRtkBgWSmGf2@google.com>
+In-Reply-To: <Yd3AGRtkBgWSmGf2@google.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 11 Jan 2022 10:46:40 -0800
+Message-ID: <CAJHc60w7vfHkg+9XkPw+38nZBWLLhETJj310ekM1HpQQTL_O0Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 03:14:04AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, January 11, 2022 2:12 AM
-> > 
-> > On Mon, Jan 10, 2022 at 07:55:16AM +0000, Tian, Kevin wrote:
-> > 
-> > > > > {SAVING} -> {RESUMING}
-> > > > > 	If not supported, user can achieve this via:
-> > > > > 		{SAVING}->{RUNNING}->{RESUMING}
-> > > > > 		{SAVING}-RESET->{RUNNING}->{RESUMING}
-> > > >
-> > > > This can be:
-> > > >
-> > > > SAVING -> STOP -> RESUMING
+On Tue, Jan 11, 2022 at 9:36 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Jan 10, 2022, Raghavendra Rao Ananta wrote:
+> > On Fri, Jan 7, 2022 at 5:06 PM Sean Christopherson <seanjc@google.com> wrote:
 > > >
-> > > From Alex's original description the default device state is RUNNING.
-> > > This supposed to be the initial state on the dest machine for the
-> > > device assigned to Qemu before Qemu resumes the device state.
-> > > Then how do we eliminate the RUNNING state in above flow? Who
-> > > makes STOP as the initial state on the dest node?
-> > 
-> > All of this notation should be read with the idea that the
-> > device_state is already somehow moved away from RESET. Ie the above
-> > notation is about what is possible once qemu has already moved the
-> > device to SAVING.
-> 
-> Qemu moves the device to SAVING on the src node.
-> 
-> On the dest the device is in RUNNING (after reset) which can be directly
-> transitioned to RESUMING. I didn't see the point of adding a STOP here.
+> > > On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
+> > > > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+> > >
+> > > Needs parantheses around (kvm), but why bother with a macro?  This is the same
+> > > header that defines struct kvm.
+> > >
+> > No specific reason for creating a macro as such. I can remove it if it
+> > feels noisy.
+>
+> Please do.  In the future, don't use a macro unless there's a good reason to do
+> so.  Don't get me wrong, I love abusing macros, but for things like this they are
+> completely inferior to
+>
+>   static inline bool kvm_vm_has_started(struct kvm *kvm)
+>   {
+>         return kvm->vm_started;
+>   }
+>
+> because a helper function gives us type safety, doesn't suffer from concatenation
+> of tokens potentially doing weird things, is easier to extend to a multi-line
+> implementation, etc...
+>
+> An example of when it's ok to use a macro is x86's
+>
+>   #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+>
+> which uses a macro instead of a proper function to avoid a circular dependency
+> due to arch/x86/include/asm/kvm_host.h being included by include/linux/kvm_host.h
+> and thus x86's implementation of kvm_arch_vcpu_memslots_id() coming before the
+> definition of struct kvm_vcpu.  But that's very much an exception and done only
+> because the alternatives suck more.
+>
+Understood. Thanks for the explanation! Will switch to an inline function.
 
-Alex is talking about the same node case where qemu has put the device
-into SAVING and then, for whatever reason, decides it now wants the
-device to be in RESUMING.
+> > > > +                      */
+> > > > +                     mutex_lock(&kvm->lock);
+> > >
+> > > This adds unnecessary lock contention when running vCPUs.  The naive solution
+> > > would be:
+> > >                         if (!kvm->vm_started) {
+> > >                                 ...
+> > >                         }
+> > >
+> > Not sure if I understood the solution..
+>
+> In your proposed patch, KVM_RUN will take kvm->lock _every_ time.  That introduces
+> unnecessary contention as it will serialize this bit of code if multiple vCPUs
+> are attempting KVM_RUN.  By checking !vm_started, only the "first" KVM_RUN for a
+> VM will acquire kvm->lock and thus avoid contention once the VM is up and running.
+> There's still a possibility that multiple vCPUs will contend for kvm->lock on their
+> first KVM_RUN, hence the quotes.  I called it "naive" because it's possible there's
+> a more elegant solution depending on the use case, e.g. a lockless approach might
+> work (or it might not).
+>
+But is it safe to read kvm->vm_started without grabbing the lock in
+the first place? use atomic_t maybe for this?
 
-We are talking about the state space of commands the driver has to
-process here. If we can break down things like SAVING -> RESUMING into
-two commands:
+> > > > +                     kvm->vm_started = true;
+> > > > +                     mutex_unlock(&kvm->lock);
+> > >
+> > > Lastly, why is this in generic KVM?
+> > >
+> > The v1 of the series originally had it in the arm specific code.
+> > However, I was suggested to move it to the generic code since the book
+> > keeping is not arch specific and could be helpful to others too [1].
+>
+> I'm definitely in favor of moving/adding thing to generic KVM when it makes sense,
+> but I'm skeptical in this particular case.  The code _is_ arch specific in that
+> arm64 apparently needs to acquire kvm->lock when checking if a vCPU has run, e.g.
+> versus a hypothetical x86 use case that might be completely ok with a lockless
+> implementation.  And it's not obvious that there's a plausible, safe use case
+> outside of arm64, e.g. on x86, there is very, very little that is truly shared
+> across the entire VM/system, most things are per-thread/core/package in some way,
+> shape, or form.  In other words, I'm a wary of providing something like this for
+> x86 because odds are good that any use will be functionally incorrect.
+I've been going back and forth on this. I've seen a couple of
+variables declared in the generic struct and used only in the arch
+code. vcpu->valid_wakeup for instance, which is used only by s390
+arch. Maybe I'm looking at it the wrong way as to what can and can't
+go in the generic kvm code.
 
- SAVING -> STOP
- STOP -> RESUMING
-
-Then the driver has to implement fewer arcs, and the arcs it does
-implement are much simpler.
-
-It also resolves the precedence question nicely as we have a core FSM
-that is built on the arcs the drivers implement and that in turn gives
-a natural answer to the question of how do you transit between any two
-states.
-
-Eg using the state names I gave earlier we can look at going from
-RESUMING -> PRE_COPY_NDMA and decomposing it into these four steps:
-
-  RESUMING -> STOP -> RUNNING -> PRE_COPY -> PRE_COPY_P2P
-
-In the end the driver needs to implement only about half of the total
-arcs and the ones it does need to implement are simpler and have a
-more obvious implementation.
-
-> Later when supporting hw mdev (with pasid granular isolation in
-> iommu), this restriction can be uplifted as it doesn't use dma api
-> and is pretty much like a pdev regarding to ioas management.
-
-When I say 'mdev' I really mean things that use the vfio pinning
-interface - which we don't quite have a proper name for yet (though
-emulated iommu perhaps is sticking)
-
-Things that use iommu_domain would not be a problem
-
-Jason
+Thanks,
+Raghavendra
