@@ -2,205 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A435348A71D
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 06:21:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7489E48A771
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 06:51:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233798AbiAKFVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 00:21:19 -0500
-Received: from mga09.intel.com ([134.134.136.24]:10946 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241556AbiAKFVP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jan 2022 00:21:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641878475; x=1673414475;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SeBpGHW2Awj9fCFruQbs0jysOX1WgLyM8SQ0XPcSawQ=;
-  b=iJxKJ5mvbHeW1mtzxeNeMR46qSAbhK+VpSzkI1QBBw78v5k3tr7o8Ii/
-   TP7drDAdsGNcPLb3am1XiOCYQ9LP98xuu/f2ZHr8Bl/3s3SS6wiEwrV9N
-   8g5OSy/cFr3ZNtNk+E7XRMQYdz+AW8pMgp4UL7vPfKX/wZ5kfnOlAu0Cr
-   eFXhlhVaxHNjgaGN/jOEErNWTYW6QuqvXomtQDOlgwF8tCpwcEmk+dnPw
-   J2luymyB2MOE4zXyiml3ZHFjrZMAYpu68qaP7gKxuhKjI6JKrN1ql5VAJ
-   tHIMWohrMp2cMxaOkAUsVldwhYMLB3VbNQDhljZQtWlICN6s5mAEmqHeM
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="243201507"
-X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
-   d="scan'208";a="243201507"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 21:21:14 -0800
-X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
-   d="scan'208";a="690859624"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 21:21:12 -0800
-Date:   Tue, 11 Jan 2022 13:32:06 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
-        tglx@linutronix.de, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/6] KVM: Do compatibility checks on hotplugged CPUs
-Message-ID: <20220111053205.GD2175@gao-cwp>
-References: <20211227081515.2088920-1-chao.gao@intel.com>
- <20211227081515.2088920-7-chao.gao@intel.com>
- <YdzTfIEZ727L4g2R@google.com>
-MIME-Version: 1.0
+        id S1347284AbiAKFvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 00:51:33 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:38962 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231574AbiAKFvc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 00:51:32 -0500
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20B3TLlu018725;
+        Tue, 11 Jan 2022 05:51:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
+ bh=YO3j0dEoF7LicnQxvUSHOlvUYubFDiNgPCUKMYWKnvM=;
+ b=Nqo8kWvnB/yQSM4UEf8lOYZZWBQuRnkZVWi8d+wDSMSg6dRB2p+OQ8teh/F7InlaBlsa
+ KE56R1mIAh5xvfu2ZikpMrp6jP9X4KjWD6bDqsFoGrq2CfR5kBjNiHFILjmyN2NHPOxm
+ yQBU0TdgA8q+nU27UDamzC7Xo5hzxAE4E9u4rASEcdVfQQTYjBi2GEhQ6jO9D3ptMUHz
+ SrIpqX7tMQUKlSuz7gNdroGkC62fLTYtThfgARz+cqOz8xeEZkEiPhVRmhOVraYXgtCQ
+ SwNs6QrzKArvzjOEF7WgHruEmejVy8YkWNj6eEH6j+7XZgso6Vl8g+AXfraPcpGsTiiW Ig== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3dgp7nhxnw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jan 2022 05:51:31 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20B5oQMe182760;
+        Tue, 11 Jan 2022 05:51:30 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2170.outbound.protection.outlook.com [104.47.55.170])
+        by aserp3030.oracle.com with ESMTP id 3df0ndk2j1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jan 2022 05:51:30 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HcryjVTlFFUe8lRfmtaHrXpsBdolFG0LEhU1gypK6aj/axXykNghFf4JqUiNAr1pcn6EY7ILSulgIvAMhg+qG7xS1ENkBkyvgyHcB3l6kmXd3iv21IKXh8zylEwjB/8ROjuRr5KMNUURnHXlYX+T8ohIc3pAdQ1qDRI9OROgdWXM3AvvVuSAMgdDUvUiDFmZS5UoCgzvfbQef9W2djwWYrT+Oqj4zpPmqGXaJeX00ec9igvrTDx69sdxh/OT+WngSbYYtokvHWT2NQHnPUHNrxdITB6d+ChxWqTN9Cu3UrPsEttNfPfXB8pQ5KC65ugKBBH+5aD0IulZBJXK0GRWPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YO3j0dEoF7LicnQxvUSHOlvUYubFDiNgPCUKMYWKnvM=;
+ b=YpXQFkQ47gasHLCIh2gkparmkFNBC5rsNqEBepDU1KJzC3nHkeKXValDPFSdXP4hDiMExPka3cLqIvZNiA/nsJSD2YnwGERfHg+mlWgMlpx3b0T0pIgMfHqN73nBcXnaC+w7jurChsrApeKNC3uQyqrqYsFD6QOMq3zCtUPDMGJOD1cH3maxwYxJLidSapp04joPXodS+l9wXiLpjgTecTI/8hFKOdB/pGUViQ2ektDwmrGi1Kt46nLfYBcUlflh0+GrW1YobKQuImGiBwQCSrle5HOzSzdUbYIB9BTcbpolXdji3nqpRsei9LM8AJ11NmC0FTPgkw/RlBadZ/j1qQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YO3j0dEoF7LicnQxvUSHOlvUYubFDiNgPCUKMYWKnvM=;
+ b=u/ZEXVKtuzCZiWd1rRwUKAFFDv5lYs5BhUFFlnzXy4Y5SWpeJGzGXEj1+qYty8wioDz1reoOmWDYZk4TStjFUpEpcxPuSpId88cpNbU/taenz1tjJLafudJTQIBB2UcHVLWDQCQfi0imhGlBhi+CXp2K0JpfTiqsDKKU73d+oD0=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by MW5PR10MB5668.namprd10.prod.outlook.com
+ (2603:10b6:303:1a3::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.11; Tue, 11 Jan
+ 2022 05:51:28 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::b889:5c86:23c0:82b8]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::b889:5c86:23c0:82b8%4]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
+ 05:51:28 +0000
+Date:   Tue, 11 Jan 2022 08:51:17 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     guang.zeng@intel.com
+Cc:     kvm@vger.kernel.org
+Subject: [bug report] kvm: x86: Add support for getting/setting expanded
+ xstate buffer
+Message-ID: <20220111055117.GA3117@kili>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YdzTfIEZ727L4g2R@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: ZRAP278CA0015.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::25) To MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4f45124c-cede-4341-fdae-08d9d4c668e3
+X-MS-TrafficTypeDiagnostic: MW5PR10MB5668:EE_
+X-Microsoft-Antispam-PRVS: <MW5PR10MB56684B152FA9CE0D57B25A378E519@MW5PR10MB5668.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jJoDzn1bJHUkKBd+bdODTe5/A7hUdXrwGUoPfBb+WevxekGgxkBT2cw656HaoqTCZhsJM1zNSjaiM3MklGCZzCtyN1tVP8hBIDFnxeAigdH5tg9MAnAXwO6nGg6teZkbGwznhtRZrTLk3N9/GmkbLA+iITu+LCn0AIKDZ1dvDmcMOJhvQ60+hjJ0A2W8EZZSwuqPgClUsA1WzLkSANlwf2hV6GjQrQcewWRdJLTHFoNlpvu8sxN9IXW2EMPzPL+1s8qV4t/krcdhVU+958aGZPePpTTYdZGFMjwArUMXKAn7dE65b5xLwfJrkf6z1deJOi5sbAjwe+GyuNEqkOU3DWpNFOGs1NQ/ifHKu+gTnKL0zNJRFWbKi8e6y1ncH8wgCiUqEpy6XuTg1GuA6CqB8aL67GNpJde16daRulbc0DGaJX66lNtKcT69WM554SfiGMwk2e7j02uzzOlDP+WaE6c89Y+xui/XrJ7b5LH6cHRbrvJe1mgBHUQSp7twvY6JC3KPNPdK/6eDp6UGAeClk2YzWBNpsesZK/1fzwUO7mbxE0J+5gOtwTfb3SsKhVJQEJBlWrIsoEdb2QU4UEFqyZSyAOOTlRgkERgQkKZrZ2AP3uZVnp1XK/Lq48YUgmmvp0QyJENBuaMeW2irMaFyod1+WOE2NMWkmSuMsSacAu/awmFPNi3BHEj0DWc81GWeo9zwh+uYgLE+B5jT4c+vmw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(9686003)(38100700002)(6512007)(86362001)(33716001)(52116002)(66556008)(66946007)(6916009)(83380400001)(5660300002)(4326008)(6486002)(6506007)(1076003)(38350700002)(8936002)(66476007)(44832011)(186003)(316002)(6666004)(508600001)(33656002)(2906002)(8676002)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GMvoxS8gImmrvzEb5bAutHC93glDal279rdhQIBNNkGHgrJPe9qg1fLksqvl?=
+ =?us-ascii?Q?AVNLv22vS/OP4FfJBOzDvHib3nq1Cy/elzk8d6RQ1i9h4+rTUdfcrG1LI89I?=
+ =?us-ascii?Q?Cypf4Z1lC0z/fsSVBFd4c2KFDux/dToAzsCAse91VajkKEFgQCRqvOWUrE13?=
+ =?us-ascii?Q?q/DJKdjJ0WWz3HUr+IFxCn8QPlUIz2vCwcCjW22s5PbF/qsKU9/2xg6bZDS+?=
+ =?us-ascii?Q?qEDTGjLpUcwijfTPL7iOqbsWw8v4WB0HyW0lORBq23BQCH7vNIAVQJwZKchL?=
+ =?us-ascii?Q?+JgQc9YX2NkmpKbZPVrT0aDDeg2a1gehh99ZA265pAekMMZlzRBWJ/y1rP7j?=
+ =?us-ascii?Q?qWAgz0Q5iCb6De49F4G6fRt4deSh10l9+Vt5unchpMtASDItwfxy0nm/VicG?=
+ =?us-ascii?Q?KoJoQRzJ6oi3SjBF7x/6La5IlTW5CVpbZzolWdJINd5oLQYUMqQGvUyZQY5Y?=
+ =?us-ascii?Q?imt4pduowDvI019eKzFTKfG0uONWXkszOu/UcIeYBbvrCdN/RqRg5/Wlsoyj?=
+ =?us-ascii?Q?l9lJsyL9J6rMx0sb8hYMxuLzst94ZPm39EFjLaxLO7TphLs3EQw3krDcUQcs?=
+ =?us-ascii?Q?7HLLcPjCWbko2McdHUbngGZBnIYP3DJFeA7gfd3zNcjjD+PvPZfIOB5bXhEH?=
+ =?us-ascii?Q?RvLOg3jdBaiIFXx7KLxALT4Fo3LlFtBMuu0oFmY9N6jWD99Q+etjtB5vdeSt?=
+ =?us-ascii?Q?d7/strjvhcqrUvwsOlsWqhAD0v+nRGPoRVPC0XgMyGv2XEhEkfoFjSkOiUA8?=
+ =?us-ascii?Q?w9MajfJ3JRvLCDhhw2NI7NqQF4vGTP91VuYhwlxI4vCRIrSUV/NAAepiXuqJ?=
+ =?us-ascii?Q?+pBMdEZuRkL4hrtclRY8szZWqH5QfMJdsvfWN4htTSjnZvAcx4nTnqIf131j?=
+ =?us-ascii?Q?ilWKHEbKRs7enNd3LoXPpLwdFgQPtOZCOimZtPAURMFfFXsHFbRh3HnWcMJP?=
+ =?us-ascii?Q?j0TUJVLrv6O2DYadcsBUZnLwPsrc3oAWXI/nP+JzHHYMwqxX72xzxvknl5nt?=
+ =?us-ascii?Q?gjLySfBVB2V9g3bNFPJoXLUmu1gkfhwj0jXdXjMfWo0us3ix3RxOtAuxfdC5?=
+ =?us-ascii?Q?2umVvPyfCZHwpA8xkCXdpOs3LXZdIBTBexUE9b9vpyiDykUjOIlj17g2nKtz?=
+ =?us-ascii?Q?MTGoJWErEGdkM3DlEjf5iPR6WvnpQ4ry2pda8s4e7UOWZ4XF6mGOOY2JO1dk?=
+ =?us-ascii?Q?vlCrScmA/6Bqj5NT2D8CTtLc8XdOVat6T2MCg+6CqVlD859+HCDMTul5olTc?=
+ =?us-ascii?Q?gQ2c3yVz2653FRmjhetJqVP2dR5eo72vCmhEGDal1umRYv2Q/Iny/PqCjTPx?=
+ =?us-ascii?Q?b2d8F1noQzuIXAM8MNr/qysfIwUhwO0OvxPaSw4VunW4T5J/5aKLvZYguSoc?=
+ =?us-ascii?Q?fU9/Rb6IWQKlQd45VIU0c0BPef6pXBTRpm3sgmIRdBKqC+Bkbh1WxxR+qIm7?=
+ =?us-ascii?Q?OkFO5pLWtNEEvUsBxqR8FEqInGvsr61x4D6dmdyPmPbIRlhzhf3UPDg7GY7Y?=
+ =?us-ascii?Q?XrLKh05FFoKOLy1ONgpemVzYMz3eR9QAOK0FeJik+0ybhVp8/U0ZHg/ih7p2?=
+ =?us-ascii?Q?6xJC34+J68rEcsDZg9WMRwlPzUOgrjg8Lpmzc7Y3tc75EAs+4RbGXZ6xkLjg?=
+ =?us-ascii?Q?T6G/fNGkxdQe1PlS2UgDOnvlxKc8dTYRkdUA1Tzi/VKY6mZw3EM0QUdYBU1P?=
+ =?us-ascii?Q?faCPgqqGFT0mwEIYM5lGDK4WLMg=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f45124c-cede-4341-fdae-08d9d4c668e3
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 05:51:28.1145
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5PK8tzXt2FfVR6qDQmsdr3+3WJDIKiW5DOLnjCjqbejAnUk9buNHj8s+kdw6P+7itugJ7EmxP0E3j/bjuhZfyckJlxK36GjNEvCC5cp0rLU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR10MB5668
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=846 bulkscore=0 spamscore=0
+ phishscore=0 adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201110028
+X-Proofpoint-GUID: YsTmt06vL_3r4iUB4g7enY7uuq_Nrxe4
+X-Proofpoint-ORIG-GUID: YsTmt06vL_3r4iUB4g7enY7uuq_Nrxe4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 12:46:52AM +0000, Sean Christopherson wrote:
->On Mon, Dec 27, 2021, Chao Gao wrote:
->> At init time, KVM does compatibility checks to ensure that all online
->> CPUs support hardware virtualization and a common set of features. But
->> KVM uses hotplugged CPUs without such compatibility checks. On Intel
->> CPUs, this leads to #GP if the hotplugged CPU doesn't support VMX or
->> vmentry failure if the hotplugged CPU doesn't meet minimal feature
->> requirements.
->> 
->> Do compatibility checks when onlining a CPU. If any VM is running,
->> KVM hotplug callback returns an error to abort onlining incompatible
->> CPUs.
->> 
->> But if no VM is running, onlining incompatible CPUs is allowed. Instead,
->> KVM is prohibited from creating VMs similar to the policy for init-time
->> compatibility checks.
->
->...
->
->> ---
->>  virt/kvm/kvm_main.c | 36 ++++++++++++++++++++++++++++++++++--
->>  1 file changed, 34 insertions(+), 2 deletions(-)
->> 
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index c1054604d1e8..0ff80076d48d 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -106,6 +106,8 @@ LIST_HEAD(vm_list);
->>  static cpumask_var_t cpus_hardware_enabled;
->>  static int kvm_usage_count;
->>  static atomic_t hardware_enable_failed;
->> +/* Set if hardware becomes incompatible after CPU hotplug */
->> +static bool hardware_incompatible;
->>  
->>  static struct kmem_cache *kvm_vcpu_cache;
->>  
->> @@ -4855,20 +4857,32 @@ static void hardware_enable_nolock(void *junk)
->>  
->>  static int kvm_online_cpu(unsigned int cpu)
->>  {
->> -	int ret = 0;
->> +	int ret;
->>  
->> +	ret = kvm_arch_check_processor_compat();
->>  	raw_spin_lock(&kvm_count_lock);
->>  	/*
->>  	 * Abort the CPU online process if hardware virtualization cannot
->>  	 * be enabled. Otherwise running VMs would encounter unrecoverable
->>  	 * errors when scheduled to this CPU.
->>  	 */
->> -	if (kvm_usage_count) {
->> +	if (!ret && kvm_usage_count) {
->>  		hardware_enable_nolock(NULL);
->>  		if (atomic_read(&hardware_enable_failed)) {
->>  			ret = -EIO;
->>  			pr_info("kvm: abort onlining CPU%d", cpu);
->>  		}
->> +	} else if (ret && !kvm_usage_count) {
->> +		/*
->> +		 * Continue onlining an incompatible CPU if no VM is
->> +		 * running. KVM should reject creating any VM after this
->> +		 * point. Then this CPU can be still used to run non-VM
->> +		 * workload.
->> +		 */
->> +		ret = 0;
->> +		hardware_incompatible = true;
->
->This has a fairly big flaw in that it prevents KVM from creating VMs even if the
->offending CPU is offlined.  That seems like a very reasonable thing to do, e.g.
->admin sees that hotplugging a CPU broke KVM and removes the CPU to remedy the
->problem.  And if KVM is built-in, reloading KVM to wipe hardware_incompatible
->after offlining the CPU isn't an option.
+Hello Guang Zeng,
 
-Ideally, yes, creation VMs should be allowed after offending CPUs are offlined.
-But the problem is kind of foundamental: 
+The patch 16786d406fe8: "kvm: x86: Add support for getting/setting
+expanded xstate buffer" from Jan 5, 2022, leads to the following
+Smatch static checker warning:
 
-After kernel tries to online a CPU without VMX, boot_cpu_has(X86_FEATURE_VMX)
-returns false. So, the current behavior is reloading KVM would fail if
-kernel *tried* to bring up a CPU without VMX. So, it looks to me that
-boot_cpu_has() doesn't do feature re-evalution either. Given that, I doubt
-the value of making KVM able to create VM in this case.
+	arch/x86/kvm/x86.c:5411 kvm_arch_vcpu_ioctl()
+	warn: is memdup() '0-s32max' large enough for 'struct kvm_xsave'
 
->
->To make this approach work, I think kvm_offline_cpu() would have to reevaluate
->hardware_incompatible if the flag is set.
->
->And should there be a KVM module param to let the admin opt in/out of this
->behavior?  E.g. if the primary use case for a system is to run VMs, disabling
->KVM just to online a CPU isn't very helpful.
->
->That said, I'm not convinced that continuing with the hotplug in this scenario
->is ever the right thing to do.  Either the CPU being hotplugged really is a different
->CPU, or it's literally broken.  In both cases, odds are very, very good that running
->on the dodgy CPU will hose the kernel sooner or later, i.e. KVM's compatibility checks
->are just the canary in the coal mine.
+arch/x86/kvm/x86.c
+    5390         case KVM_GET_XSAVE: {
+    5391                 r = -EINVAL;
+    5392                 if (vcpu->arch.guest_fpu.uabi_size > sizeof(struct kvm_xsave))
+    5393                         break;
+    5394 
+    5395                 u.xsave = kzalloc(sizeof(struct kvm_xsave), GFP_KERNEL_ACCOUNT);
+    5396                 r = -ENOMEM;
+    5397                 if (!u.xsave)
+    5398                         break;
+    5399 
+    5400                 kvm_vcpu_ioctl_x86_get_xsave(vcpu, u.xsave);
+    5401 
+    5402                 r = -EFAULT;
+    5403                 if (copy_to_user(argp, u.xsave, sizeof(struct kvm_xsave)))
+    5404                         break;
+    5405                 r = 0;
+    5406                 break;
+    5407         }
+    5408         case KVM_SET_XSAVE: {
+    5409                 int size = vcpu->arch.guest_fpu.uabi_size;
+    5410 
 
-Ok. Then here are two options:
-1. KVM always prevents incompatible CPUs from being brought up regardless of running VMs
-2. make "disabling KVM on incompatible CPUs" an opt-in feature.
+There is no check whether size >= sizeof(struct kvm_xsave).
 
-Which one do you think is better?
+--> 5411                 u.xsave = memdup_user(argp, size);
+    5412                 if (IS_ERR(u.xsave)) {
+    5413                         r = PTR_ERR(u.xsave);
+    5414                         goto out_nofree;
+    5415                 }
+    5416 
+    5417                 r = kvm_vcpu_ioctl_x86_set_xsave(vcpu, u.xsave);
 
-And as said above, even with option 1, KVM reloading would fail due to
-boot_cpu_has(X86_FEATURE_VMX). I suppose it isn't necessary to be fixed in this series.
+So this can read out of bounds.
 
->
->TDX is a different beast as (a) that's purely a security restriction and (b) anyone
->trying to run TDX guests darn well better know that TDX doesn't allow hotplug.
->In other words, if TDX gets disabled due to hotplug, either someone majorly screwed
->up and is going to be unhappy no matter what, or there's no intention of using TDX
->and it's a complete don't care.
->
->> +		pr_info("kvm: prohibit VM creation due to incompatible CPU%d",
->
->pr_info() is a bit weak, this should be at least pr_warn() and maybe even pr_err().
->
->> +			cpu);
->
->Eh, I'd omit the newline and let that poke out.
+    5418                 break;
+    5419         }
+    5420 
+    5421         case KVM_GET_XSAVE2: {
+    5422                 int size = vcpu->arch.guest_fpu.uabi_size;
+    5423 
+    5424                 u.xsave = kzalloc(size, GFP_KERNEL_ACCOUNT);
+    5425                 r = -ENOMEM;
+    5426                 if (!u.xsave)
+    5427                         break;
+    5428 
+    5429                 kvm_vcpu_ioctl_x86_get_xsave2(vcpu, u.buffer, size);
+    5430 
+    5431                 r = -EFAULT;
+    5432                 if (copy_to_user(argp, u.xsave, size))
+    5433                         break;
+    5434 
+    5435                 r = 0;
+    5436                 break;
+    5437         }
+    5438 
 
-Will do.
-
->
->>  	}
->>  	raw_spin_unlock(&kvm_count_lock);
->>  	return ret;
->> @@ -4913,8 +4927,24 @@ static int hardware_enable_all(void)
->>  {
->>  	int r = 0;
->>  
->> +	/*
->> +	 * During onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
->> +	 * is called. on_each_cpu() between them includes the CPU. As a result,
->> +	 * hardware_enable_nolock() may get invoked before kvm_online_cpu().
->> +	 * This would enable hardware virtualization on that cpu without
->> +	 * compatibility checks, which can potentially crash system or break
->> +	 * running VMs.
->> +	 *
->> +	 * Disable CPU hotplug to prevent this case from happening.
->> +	 */
->> +	cpus_read_lock();
->>  	raw_spin_lock(&kvm_count_lock);
->>  
->> +	if (hardware_incompatible) {
->
->Another error message would likely be helpful here.  Even better would be if KVM
->could provide some way for userspace to query which CPU(s) is bad.
-
-If option 1 is chosen, this check will be removed.
-
-For option 2, will add an error message. And how about a debugfs tunable to provide
-the list of bad CPUs?
+regards,
+dan carpenter
