@@ -2,177 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 523D548A63D
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 04:25:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33A6948A655
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 04:31:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbiAKDZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jan 2022 22:25:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
+        id S1346971AbiAKDbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jan 2022 22:31:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346717AbiAKDY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jan 2022 22:24:56 -0500
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF51C061748
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 19:24:55 -0800 (PST)
-Received: by mail-ot1-x32e.google.com with SMTP id s8-20020a0568301e0800b00590a1c8cc08so11343056otr.9
-        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 19:24:55 -0800 (PST)
+        with ESMTP id S1346951AbiAKDbu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jan 2022 22:31:50 -0500
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BEEC061751
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 19:31:49 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id o20so6831895ill.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jan 2022 19:31:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vt6eTIkW2rjgsDlp2Z3piPi66iajGtL8d5EhM3+JwDc=;
-        b=PDZZMBR3ILiRIPUN7aXI728zpXb1y8zLSKQ+ENdryuEu01RNFHW3NFifiIvPv5NTkt
-         gQvucQoKuoyoiBdHwegVWLXrARPhRgbk37t3X/nUIkLw+ZvCwRXcGIVo5C5GRM0ay+r5
-         sKCIFheAYgxBzU5ddo8oHeh80RHyypLkVEBnN+pX5Z0w63O/+NwuyCH63nu0gRwEqq1W
-         hickR/I8duDLsKa5m4fmwUMzVG6somKefc2CbIi+Nvw+ulu3T4VEl9uY24SAmZjrUUPV
-         8UhgRYdeJDh/pPhC9Ycg1dqKbFzgIbilUSUCq8pkXSd6nbiXDUI6gvK881OlAT+XnwoB
-         AxIg==
+         :cc:content-transfer-encoding;
+        bh=WjJwUUWZ/BCy26tG6i0H8TGwk6V985nqQvOicOWTZ4M=;
+        b=Kt/SXme2spmF1Q4vRsvS4pG+rCHvAFzpHY6/g+ah9uXn8dEf8B+SiQy74uNTNlfzu+
+         fI86pnBPd36ytsLrsYVt+JYuMg4mD2Cbjr+zRIvUoEFk42um/CGgPgZzAJVesTcyceDW
+         1k2nbgWOrjiVu2NGqqueDgsqMN4JvUiPUeB/ILX3mxmPSGxrFW0bZhC7osF093nslXUD
+         dQcVO1MjKr7QrGgG6xYLmU9DOzNGYxeQhnk4tBkDGumVMH/auGCVkA/4RWUFHbCLqwcy
+         LfvGZ2RjfROO0lVZu8VzzhE+dY1i+pIfTo3kWazj3HlFXLJjk0xUNbsrRXnZytjoJ/tY
+         C1gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vt6eTIkW2rjgsDlp2Z3piPi66iajGtL8d5EhM3+JwDc=;
-        b=Fpbz55krO6hS6EkG18z1Po1CsGEpdfibbp/CpLegdfEkNBe7l6nnP9C0nLoWrGTi1j
-         sOPsTua3HNi9RdIfhDh2gZK8QXueL75qb3CDjNNh/aUZJIgtvFDYSz/bJVrQuKeZaBha
-         wnos8EXi5VjYTFGDO/0ScELCbn+LWSQS5GzUs+E5Z3nyF6gEv4c9Dcg9dNINz25wPOqx
-         n4kVzdGYwgCIuUxTQ1IpBRloRSYVXet5chD+UM2GBpU4EYG0g0gy2/Cjrzzl4ty+C63B
-         Sd/P/CUwvJVx/IkAJHiqcdRaFOt1fCFuBgJJmRTcQRnyinWypvKOE9inWDLnhnJVjqlG
-         V0PA==
-X-Gm-Message-State: AOAM532VZvXJX56z1wgWe9BJJ0n0je781ZakWlq4E1YiMeysNKLcQetC
-        +aPRp/xqfaDwlyOR/OQlQ7jpNeoKNOeoBsYZCVL7FA==
-X-Google-Smtp-Source: ABdhPJxN1qdnCnvDwG4vqV5IYMMsFcmQo3pz7JTnaUYQacPcCthQJujAOML/NRV8FYO5TPRfc2jv+EkJnWYW5eq2qqA=
-X-Received: by 2002:a05:6830:441f:: with SMTP id q31mr2162701otv.14.1641871494663;
- Mon, 10 Jan 2022 19:24:54 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WjJwUUWZ/BCy26tG6i0H8TGwk6V985nqQvOicOWTZ4M=;
+        b=yMh+LFtZf8Mn9YijewyAD2aMAJc63C8fgRmIotxa1Kt9i89cqCZUMw3Yg0Tmg8pU9N
+         0fR07tytgI1VTl7g25JK0D01OMHX7Lppb6Cf3gOlDLRUgqoXDIOK6Vyzsa4syRfrpvkO
+         IR/OgO2GW1b6wZkvUFJU/oBde3aAFQWUUTUzYzmSr4IbyzlgkeNzRgL9O4tDNLOYmOGC
+         K9IWYJV+2kHYEQ2ZXEdWr+AjbJuTpetIyjk1DwCco6wHQVgX2JlO8XlayPP0hRNH/8hQ
+         DNnGyAS8OoSEIxfyvcGh9ptT4ZlQCmc969y0ZZ5rq8wZifSiTOAMnkYKHHk9gCIFPjsZ
+         yF2g==
+X-Gm-Message-State: AOAM533rdvkGyJMxMuH3lA24grIevq4duIKVh1c9NNE6vGBWfdVxrFkQ
+        FSQUx3lf222lY/vBgLxojCZs5Hv+k0sKRaD9UJpp
+X-Google-Smtp-Source: ABdhPJzAm1xFKAL/SDZlyq0Folm6Knaez8RQjNeQ6v1fXaBZB6Z4O8nf2/JHKKIjXLTJDZb9MJQc9tdaDTRaMZwQSZ4=
+X-Received: by 2002:a05:6e02:1e08:: with SMTP id g8mr1423993ila.270.1641871909341;
+ Mon, 10 Jan 2022 19:31:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20211117080304.38989-1-likexu@tencent.com> <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
- <CALMp9eRA8hw9zVEwnZEX56Gao-MibX5A+XXYS-n-+X0BkhrSvQ@mail.gmail.com>
- <438d42de-78e1-0ce9-6a06-38194de4abd4@redhat.com> <CALMp9eSLU1kfffC3Du58L8iPY6LmKyVO0yU7c3wEnJAD9JZw4w@mail.gmail.com>
- <CALMp9eR3PEgXhe_z8ArHK0bPeW4=htta_f3LHTm9jqL2rtcT7A@mail.gmail.com>
- <a2b6fb82-292b-f714-cfd7-31a5310c28ed@gmail.com> <CALMp9eQbiqjf_MMJP9Cc9=Ubm7qKv88BXtu3=7z8ax9W_1AY4Q@mail.gmail.com>
- <1f293656-49f5-ce02-1c59-a0f215306033@gmail.com>
-In-Reply-To: <1f293656-49f5-ce02-1c59-a0f215306033@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 10 Jan 2022 19:24:43 -0800
-Message-ID: <CALMp9eTqMMia0Vx=kfGpQVHVYvSCDtuBN1eDr12cop0EAzCSaw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/svm: Add module param to control PMU virtualization
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Dunn <daviddunn@google.com>
+References: <20210830141737.181-1-xieyongji@bytedance.com> <20220110075546-mutt-send-email-mst@kernel.org>
+ <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
+ <20220110100911-mutt-send-email-mst@kernel.org> <CACycT3v6jo3-8ATWUzf659vV94a2oRrm-zQtGNDZd6OQr-MENA@mail.gmail.com>
+ <20220110103938-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20220110103938-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 11 Jan 2022 11:31:37 +0800
+Message-ID: <CACycT3sbJC1Jn7NeWk_ccQ_2_YgKybjugfxmKpfgCP3Ayoju4w@mail.gmail.com>
+Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 6:11 PM Like Xu <like.xu.linux@gmail.com> wrote:
+On Mon, Jan 10, 2022 at 11:44 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> On 11/1/2022 2:13 am, Jim Mattson wrote:
-> > On Sun, Jan 9, 2022 at 10:23 PM Like Xu <like.xu.linux@gmail.com> wrote:
-> >>
-> >> On 9/1/2022 9:23 am, Jim Mattson wrote:
-> >>> On Fri, Dec 10, 2021 at 7:48 PM Jim Mattson <jmattson@google.com> wrote:
-> >>>>
-> >>>> On Fri, Dec 10, 2021 at 6:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>>>>
-> >>>>> On 12/10/21 20:25, Jim Mattson wrote:
-> >>>>>> In the long run, I'd like to be able to override this system-wide
-> >>>>>> setting on a per-VM basis, for VMs that I trust. (Of course, this
-> >>>>>> implies that I trust the userspace process as well.)
-> >>>>>>
-> >>>>>> How would you feel if we were to add a kvm ioctl to override this
-> >>>>>> setting, for a particular VM, guarded by an appropriate permissions
-> >>>>>> check, like capable(CAP_SYS_ADMIN) or capable(CAP_SYS_MODULE)?
-> >>>>>
-> >>>>> What's the rationale for guarding this with a capability check?  IIRC
-> >>>>> you don't have such checks for perf_event_open (apart for getting kernel
-> >>>>> addresses, which is not a problem for virtualization).
-> >>>>
-> >>>> My reasoning was simply that for userspace to override a mode 0444
-> >>>> kernel module parameter, it should have the rights to reload the
-> >>>> module with the parameter override. I wasn't thinking specifically
-> >>>> about PMU capabilities.
-> >>
-> >> Do we have a precedent on any module parameter rewriting for privileger ?
-> >>
-> >> A further requirement is whether we can dynamically change this part of
-> >> the behaviour when the guest is already booted up.
-> >>
-> >>>
-> >>> Assuming that we trust userspace to decide whether or not to expose a
-> >>> virtual PMU to a guest (as we do on the Intel side), perhaps we could
-> >>> make use of the existing PMU_EVENT_FILTER to give us per-VM control,
-> >>> rather than adding a new module parameter for per-host control. If
-> >>
-> >> Various granularities of control are required to support vPMU production
-> >> scenarios, including per-host, per-VM, and dynamic-guest-alive control.
-> >>
-> >>> userspace calls KVM_SET_PMU_EVENT_FILTER with an action of
-> >>> KVM_PMU_EVENT_ALLOW and an empty list of allowed events, KVM could
-> >>> just disable the virtual PMU for that VM.
-> >>
-> >> AMD will also have "CPUID Fn8000_0022_EBX[NumCorePmc, 3:0]".
+> On Mon, Jan 10, 2022 at 11:24:40PM +0800, Yongji Xie wrote:
+> > On Mon, Jan 10, 2022 at 11:10 PM Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+> > >
+> > > On Mon, Jan 10, 2022 at 09:54:08PM +0800, Yongji Xie wrote:
+> > > > On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+> > > > >
+> > > > > On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
+> > > > > > This series introduces a framework that makes it possible to im=
+plement
+> > > > > > software-emulated vDPA devices in userspace. And to make the de=
+vice
+> > > > > > emulation more secure, the emulated vDPA device's control path =
+is handled
+> > > > > > in the kernel and only the data path is implemented in the user=
+space.
+> > > > > >
+> > > > > > Since the emuldated vDPA device's control path is handled in th=
+e kernel,
+> > > > > > a message mechnism is introduced to make userspace be aware of =
+the data
+> > > > > > path related changes. Userspace can use read()/write() to recei=
+ve/reply
+> > > > > > the control messages.
+> > > > > >
+> > > > > > In the data path, the core is mapping dma buffer into VDUSE dae=
+mon's
+> > > > > > address space, which can be implemented in different ways depen=
+ding on
+> > > > > > the vdpa bus to which the vDPA device is attached.
+> > > > > >
+> > > > > > In virtio-vdpa case, we implements a MMU-based software IOTLB w=
+ith
+> > > > > > bounce-buffering mechanism to achieve that. And in vhost-vdpa c=
+ase, the dma
+> > > > > > buffer is reside in a userspace memory region which can be shar=
+ed to the
+> > > > > > VDUSE userspace processs via transferring the shmfd.
+> > > > > >
+> > > > > > The details and our user case is shown below:
+> > > > > >
+> > > > > > ------------------------    -------------------------   -------=
+---------------------------------------
+> > > > > > |            Container |    |              QEMU(VM) |   |      =
+                         VDUSE daemon |
+> > > > > > |       ---------      |    |  -------------------  |   | -----=
+-------------------- ---------------- |
+> > > > > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDP=
+A device emulation | | block driver | |
+> > > > > > ------------+-----------     -----------+------------   -------=
+------+----------------------+---------
+> > > > > >             |                           |                      =
+      |                      |
+> > > > > >             |                           |                      =
+      |                      |
+> > > > > > ------------+---------------------------+----------------------=
+------+----------------------+---------
+> > > > > > |    | block device |           |  vhost device |            | =
+vduse driver |          | TCP/IP |    |
+> > > > > > |    -------+--------           --------+--------            --=
+-----+--------          -----+----    |
+> > > > > > |           |                           |                      =
+     |                       |        |
+> > > > > > | ----------+----------       ----------+-----------         --=
+-----+-------                |        |
+> > > > > > | | virtio-blk driver |       |  vhost-vdpa driver |         | =
+vdpa device |                |        |
+> > > > > > | ----------+----------       ----------+-----------         --=
+-----+-------                |        |
+> > > > > > |           |      virtio bus           |                      =
+     |                       |        |
+> > > > > > |   --------+----+-----------           |                      =
+     |                       |        |
+> > > > > > |                |                      |                      =
+     |                       |        |
+> > > > > > |      ----------+----------            |                      =
+     |                       |        |
+> > > > > > |      | virtio-blk device |            |                      =
+     |                       |        |
+> > > > > > |      ----------+----------            |                      =
+     |                       |        |
+> > > > > > |                |                      |                      =
+     |                       |        |
+> > > > > > |     -----------+-----------           |                      =
+     |                       |        |
+> > > > > > |     |  virtio-vdpa driver |           |                      =
+     |                       |        |
+> > > > > > |     -----------+-----------           |                      =
+     |                       |        |
+> > > > > > |                |                      |                      =
+     |    vdpa bus           |        |
+> > > > > > |     -----------+----------------------+----------------------=
+-----+------------           |        |
+> > > > > > |                                                              =
+                          ---+---     |
+> > > > > > ---------------------------------------------------------------=
+--------------------------| NIC |------
+> > > > > >                                                                =
+                          ---+---
+> > > > > >                                                                =
+                             |
+> > > > > >                                                                =
+                    ---------+---------
+> > > > > >                                                                =
+                    | Remote Storages |
+> > > > > >                                                                =
+                    -------------------
+> > > > > >
+> > > > > > We make use of it to implement a block device connecting to
+> > > > > > our distributed storage, which can be used both in containers a=
+nd
+> > > > > > VMs. Thus, we can have an unified technology stack in this two =
+cases.
+> > > > > >
+> > > > > > To test it with null-blk:
+> > > > > >
+> > > > > >   $ qemu-storage-daemon \
+> > > > > >       --chardev socket,id=3Dcharmonitor,path=3D/tmp/qmp.sock,se=
+rver,nowait \
+> > > > > >       --monitor chardev=3Dcharmonitor \
+> > > > > >       --blockdev driver=3Dhost_device,cache.direct=3Don,aio=3Dn=
+ative,filename=3D/dev/nullb0,node-name=3Ddisk0 \
+> > > > > >       --export type=3Dvduse-blk,id=3Dtest,node-name=3Ddisk0,wri=
+table=3Don,name=3Dvduse-null,num-queues=3D16,queue-size=3D128
+> > > > > >
+> > > > > > The qemu-storage-daemon can be found at https://github.com/byte=
+dance/qemu/tree/vduse
+> > > > >
+> > > > > It's been half a year - any plans to upstream this?
+> > > >
+> > > > Yeah, this is on my to-do list this month.
+> > > >
+> > > > Sorry for taking so long... I've been working on another project
+> > > > enabling userspace RDMA with VDUSE for the past few months. So I
+> > > > didn't have much time for this. Anyway, I will submit the first
+> > > > version as soon as possible.
+> > > >
+> > > > Thanks,
+> > > > Yongji
+> > >
+> > > Oh fun. You mean like virtio-rdma? Or RDMA as a backend for regular
+> > > virtio?
+> > >
 > >
-> > Where do you see this? Revision 3.33 (November 2021) of the AMD APM,
-> > volume 3, only goes as high as CPUID Fn8000_0021.
+> > Yes, like virtio-rdma. Then we can develop something like userspace
+> > rxe=E3=80=81siw or custom protocol with VDUSE.
+> >
+> > Thanks,
+> > Yongji
 >
-> Try APM Revision: 4.04 (November 2021),  page 1849/3273,
-> "CPUID Fn8000_0022_EBX Extended Performance Monitoring and Debug".
+> Would be interesting to see the spec for that.
 
-Is this a public document?
+Will send it ASAP.
 
-> Given the current ambiguity in this revision, the AMD folks will reveal more
-> details bout this field in the next revision.
+> The issues with RDMA revolved around the fact that current
+> apps tend to either use non-standard propocols for connection
+> establishment or use UD where there's IIRC no standard
+> at all. So QP numbers are hard to virtualize.
+> Similarly many use LIDs directly with the same effect.
+> GUIDs might be virtualizeable but no one went to the effort.
 >
-> >
-> >>>
-> >>> Today, the semantics of an empty allow list are quite different from
-> >>> the proposed pmuv module parameter being false. However, it should be
-> >>> an easy conversion. Would anyone be concerned about changing the
-> >>> current semantics of an empty allow list? Is there a need for
-> >>> disabling PMU virtualization for legacy userspace implementations that
-> >>> can't be modified to ask for an empty allow list?
-> >>>
-> >>
-> >> AFAI, at least one user-space agent has integrated with it plus additional
-> >> "action"s.
-> >>
-> >> Once the API that the kernel presents to user space has been defined,
-> >> it's best not to change it and instead fall into remorse.
-> >
-> > Okay.
-> >
-> > I propose the following:
-> > 1) The new module parameter should apply to Intel as well as AMD, for
-> > situations where userspace is not trusted.
-> > 2) If the module parameter allows PMU virtualization, there should be
-> > a new KVM_CAP whereby userspace can enable/disable PMU virtualization.
-> > (Since you require a dynamic toggle, and there is a move afoot to
-> > refuse guest CPUID changes once a guest is running, this new KVM_CAP
-> > is needed on Intel as well as AMD).
+
+Actually we aimed at emulating a soft RDMA with normal NIC (not use
+RDMA capability) rather than virtualizing a physical RDMA NIC into
+several vRDMA devices. If so, I think we won't have those issues,
+right?
+
+> To say nothing about the interaction with memory overcommit.
 >
-> Both hands in favour. Do you need me as a labourer, or you have a ready-made one ?
 
-We could split the work. Since (1) is a modification of the change you
-proposed in this thread, perhaps you could apply it to both AMD and
-Intel in v2? We can find someone for (2).
+I don't get you here. Could you give me more details?
 
-> > 3) If the module parameter does not allow PMU virtualization, there
-> > should be no userspace override, since we have no precedent for
-> > authorizing that kind of override.
->
-> Uh, I thought you (Google) had a lot of these (interesting) use cases internally.
-
-We have modified some module parameters so that they can be changed at
-runtime, but we don't have any concept of a privileged userspace
-overriding a module parameter restriction.
-
-> >
-> >> "But I am not a decision maker. " :D
-> >>
-> >> Thanks,
-> >> Like Xu
-> >>
+Thanks,
+Yongji
