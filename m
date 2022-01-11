@@ -2,231 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42F0E48AD12
-	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 12:55:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6830648AD15
+	for <lists+kvm@lfdr.de>; Tue, 11 Jan 2022 12:55:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239311AbiAKLy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jan 2022 06:54:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40161 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239258AbiAKLy5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jan 2022 06:54:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641902097;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L8tUAuU3sx4wnqm2mHqp+w//Djo25ItZNH0jpA9WCOg=;
-        b=fqSQLKMmsDReoL19xKfx3Z0fgdD+i0T9pAf5w+PSn4ZggUCSjTJsgxu6+AcTYWB2F3JJCv
-        17bOrlDey9RVXgA/xZGljfVF0NmtjCLxAt+SOZhgGwb+lo9W+5r+uu2E664yLkK6KaX3BL
-        cySAw/Eexd1NjpV84RLU81wbcXc03B0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-674-7C_-2EBVNZua3l80exyveQ-1; Tue, 11 Jan 2022 06:54:55 -0500
-X-MC-Unique: 7C_-2EBVNZua3l80exyveQ-1
-Received: by mail-wm1-f71.google.com with SMTP id az9-20020a05600c600900b0034692565ca8so1400383wmb.9
-        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 03:54:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=L8tUAuU3sx4wnqm2mHqp+w//Djo25ItZNH0jpA9WCOg=;
-        b=XPApOQVkBEiOWDscR/Oxsfscf15QAyDJQsmPbevp3Bzbxc5tIc8Sm7DIJY7Est0JMi
-         4exMi5YSiXnxtFTie7EAtufEuf/dnvDN8gTfvfclQwaxVTnqfu88Ag/f8eNCe3T9OUFl
-         CazY6rAaEbBUg4542Wg+D2Xdt9IMTj67SMyjJ18gc7h/2fRCg704r3vPqI3XEN9OJRT5
-         L9NmxkSzm/jwiD8j8b9+YRYfzO1pT8M2Mm0DEL0ij9VXEIjao/BjcRhUjnLzqp/PT8qt
-         l36ZGBvCGLOfjupbsop1xp+VBQXBylyzuC/UXGXvuXUbQhdkkpd9G1l7XiOCDi6RvZuZ
-         2e6A==
-X-Gm-Message-State: AOAM532f4eEIeZ0dJimdynZD4BFgOgQDs8XXGOgelbjeHuNHLf6kGkNx
-        aafKGZnKocGdLx0ot74dpjqZmdfDveqIrNqSOeSuhJJtip3bSA9i9p51bPR53QgdicJo1xxAlKh
-        vIo9g56sdxb1X
-X-Received: by 2002:a05:6000:184f:: with SMTP id c15mr3548871wri.73.1641902094695;
-        Tue, 11 Jan 2022 03:54:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxMB9cKDt3oBelm1sFftDwQwVLNcfaNRNRFFSf7NuXogZYA8px0qiu/L2gStlBR5LFyvB4wcw==
-X-Received: by 2002:a05:6000:184f:: with SMTP id c15mr3548846wri.73.1641902094469;
-        Tue, 11 Jan 2022 03:54:54 -0800 (PST)
-Received: from redhat.com ([2.55.5.100])
-        by smtp.gmail.com with ESMTPSA id f10sm1710595wmg.43.2022.01.11.03.54.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 03:54:53 -0800 (PST)
-Date:   Tue, 11 Jan 2022 06:54:48 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
+        id S239003AbiAKLzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jan 2022 06:55:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49300 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239321AbiAKLzA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jan 2022 06:55:00 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 643B6C06173F
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 03:55:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 283F3B81A34
+        for <kvm@vger.kernel.org>; Tue, 11 Jan 2022 11:54:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E87C36AE3;
+        Tue, 11 Jan 2022 11:54:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641902097;
+        bh=PcHSbQAv9iYlueJlYk3EkQpIZ8HAtZkZAvEG5bViVv4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RxIjA9t3YoLSPpqsFYAbepOLn/2lbzJ8lCHEjrlT3Mt/2mXV6WW2zAfHpZfSz4nWF
+         jjoZmDZucc9kIwHu727Tc/JgUlcY3WV1lG5OkJfiyndEc0VJiu++8NcLX3JUDHJuNK
+         D4/+c71hWixYMFKh6NqY9Ml2/GgZmd6QFA5tbPFgLyC+A3fWTIX7bkn7P0O8RwYOD1
+         Vb3AO/4Y5suCIj+YnZbjus6E9J7H1btz8R/YYcHf5qeErzyH9AoSrNXPX+xCdEN+rQ
+         AlF46uHADZoY6VntDlW717VUXooZgQl+85EMjXZt/lh9i7kZa1nWFN1T23qo/ak9ns
+         N4EdDfD6gwFSg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n7Fjr-00HNFO-RG; Tue, 11 Jan 2022 11:54:55 +0000
+Date:   Tue, 11 Jan 2022 11:54:55 +0000
+Message-ID: <877db6trlc.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         Will Deacon <will@kernel.org>,
-        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
-Message-ID: <20220111065301-mutt-send-email-mst@kernel.org>
-References: <20210830141737.181-1-xieyongji@bytedance.com>
- <20220110075546-mutt-send-email-mst@kernel.org>
- <CACycT3v1aEViw7vV4x5qeGVPrSrO-BTDvQshEX35rx_X0Au2vw@mail.gmail.com>
- <20220110100911-mutt-send-email-mst@kernel.org>
- <CACycT3v6jo3-8ATWUzf659vV94a2oRrm-zQtGNDZd6OQr-MENA@mail.gmail.com>
- <20220110103938-mutt-send-email-mst@kernel.org>
- <CACycT3sbJC1Jn7NeWk_ccQ_2_YgKybjugfxmKpfgCP3Ayoju4w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACycT3sbJC1Jn7NeWk_ccQ_2_YgKybjugfxmKpfgCP3Ayoju4w@mail.gmail.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [RFC PATCH 0/3] ARM64: Guest performance improvement during dirty
+In-Reply-To: <20220110210441.2074798-1-jingzhangos@google.com>
+References: <20220110210441.2074798-1-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, pbonzini@redhat.com, dmatlack@google.com, oupton@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 11:31:37AM +0800, Yongji Xie wrote:
-> On Mon, Jan 10, 2022 at 11:44 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Jan 10, 2022 at 11:24:40PM +0800, Yongji Xie wrote:
-> > > On Mon, Jan 10, 2022 at 11:10 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Mon, Jan 10, 2022 at 09:54:08PM +0800, Yongji Xie wrote:
-> > > > > On Mon, Jan 10, 2022 at 8:57 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > >
-> > > > > > On Mon, Aug 30, 2021 at 10:17:24PM +0800, Xie Yongji wrote:
-> > > > > > > This series introduces a framework that makes it possible to implement
-> > > > > > > software-emulated vDPA devices in userspace. And to make the device
-> > > > > > > emulation more secure, the emulated vDPA device's control path is handled
-> > > > > > > in the kernel and only the data path is implemented in the userspace.
-> > > > > > >
-> > > > > > > Since the emuldated vDPA device's control path is handled in the kernel,
-> > > > > > > a message mechnism is introduced to make userspace be aware of the data
-> > > > > > > path related changes. Userspace can use read()/write() to receive/reply
-> > > > > > > the control messages.
-> > > > > > >
-> > > > > > > In the data path, the core is mapping dma buffer into VDUSE daemon's
-> > > > > > > address space, which can be implemented in different ways depending on
-> > > > > > > the vdpa bus to which the vDPA device is attached.
-> > > > > > >
-> > > > > > > In virtio-vdpa case, we implements a MMU-based software IOTLB with
-> > > > > > > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-> > > > > > > buffer is reside in a userspace memory region which can be shared to the
-> > > > > > > VDUSE userspace processs via transferring the shmfd.
-> > > > > > >
-> > > > > > > The details and our user case is shown below:
-> > > > > > >
-> > > > > > > ------------------------    -------------------------   ----------------------------------------------
-> > > > > > > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-> > > > > > > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-> > > > > > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-> > > > > > > ------------+-----------     -----------+------------   -------------+----------------------+---------
-> > > > > > >             |                           |                            |                      |
-> > > > > > >             |                           |                            |                      |
-> > > > > > > ------------+---------------------------+----------------------------+----------------------+---------
-> > > > > > > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-> > > > > > > |    -------+--------           --------+--------            -------+--------          -----+----    |
-> > > > > > > |           |                           |                           |                       |        |
-> > > > > > > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > > > > > > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-> > > > > > > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > > > > > > |           |      virtio bus           |                           |                       |        |
-> > > > > > > |   --------+----+-----------           |                           |                       |        |
-> > > > > > > |                |                      |                           |                       |        |
-> > > > > > > |      ----------+----------            |                           |                       |        |
-> > > > > > > |      | virtio-blk device |            |                           |                       |        |
-> > > > > > > |      ----------+----------            |                           |                       |        |
-> > > > > > > |                |                      |                           |                       |        |
-> > > > > > > |     -----------+-----------           |                           |                       |        |
-> > > > > > > |     |  virtio-vdpa driver |           |                           |                       |        |
-> > > > > > > |     -----------+-----------           |                           |                       |        |
-> > > > > > > |                |                      |                           |    vdpa bus           |        |
-> > > > > > > |     -----------+----------------------+---------------------------+------------           |        |
-> > > > > > > |                                                                                        ---+---     |
-> > > > > > > -----------------------------------------------------------------------------------------| NIC |------
-> > > > > > >                                                                                          ---+---
-> > > > > > >                                                                                             |
-> > > > > > >                                                                                    ---------+---------
-> > > > > > >                                                                                    | Remote Storages |
-> > > > > > >                                                                                    -------------------
-> > > > > > >
-> > > > > > > We make use of it to implement a block device connecting to
-> > > > > > > our distributed storage, which can be used both in containers and
-> > > > > > > VMs. Thus, we can have an unified technology stack in this two cases.
-> > > > > > >
-> > > > > > > To test it with null-blk:
-> > > > > > >
-> > > > > > >   $ qemu-storage-daemon \
-> > > > > > >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-> > > > > > >       --monitor chardev=charmonitor \
-> > > > > > >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
-> > > > > > >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> > > > > > >
-> > > > > > > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
-> > > > > >
-> > > > > > It's been half a year - any plans to upstream this?
-> > > > >
-> > > > > Yeah, this is on my to-do list this month.
-> > > > >
-> > > > > Sorry for taking so long... I've been working on another project
-> > > > > enabling userspace RDMA with VDUSE for the past few months. So I
-> > > > > didn't have much time for this. Anyway, I will submit the first
-> > > > > version as soon as possible.
-> > > > >
-> > > > > Thanks,
-> > > > > Yongji
-> > > >
-> > > > Oh fun. You mean like virtio-rdma? Or RDMA as a backend for regular
-> > > > virtio?
-> > > >
-> > >
-> > > Yes, like virtio-rdma. Then we can develop something like userspace
-> > > rxe、siw or custom protocol with VDUSE.
-> > >
-> > > Thanks,
-> > > Yongji
-> >
-> > Would be interesting to see the spec for that.
+On Mon, 10 Jan 2022 21:04:38 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> Will send it ASAP.
+> This patch is to reduce the performance degradation of guest workload during
+> dirty logging on ARM64. A fast path is added to handle permission relaxation
+> during dirty logging. The MMU lock is replaced with rwlock, by which all
+> permision relaxations on leaf pte can be performed under the read lock. This
+> greatly reduces the MMU lock contention during dirty logging. With this
+> solution, the source guest workload performance degradation can be improved
+> by more than 60%.
 > 
-> > The issues with RDMA revolved around the fact that current
-> > apps tend to either use non-standard propocols for connection
-> > establishment or use UD where there's IIRC no standard
-> > at all. So QP numbers are hard to virtualize.
-> > Similarly many use LIDs directly with the same effect.
-> > GUIDs might be virtualizeable but no one went to the effort.
-> >
-> 
-> Actually we aimed at emulating a soft RDMA with normal NIC (not use
-> RDMA capability) rather than virtualizing a physical RDMA NIC into
-> several vRDMA devices. If so, I think we won't have those issues,
-> right?
+> Problem:
+>   * A Google internal live migration test shows that the source guest workload
+>   performance has >99% degradation for about 105 seconds, >50% degradation
+>   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+>   This shows that most of the time, the guest workload degradtion is above
+>   99%, which obviously needs some improvement compared to the test result
+>   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+>   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB
+>   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB
 
-Right, maybe you won't.
+What are the host and guest page sizes?
 
-> > To say nothing about the interaction with memory overcommit.
-> >
 > 
-> I don't get you here. Could you give me more details?
-> 
-> Thanks,
-> Yongji
+> Analysis:
+>   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+>     the number of contentions of MMU lock and the "dirty memory time" on
+>     various VM spec.
+>     By using test command
+>     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
 
-RDMA devices tend to want to pin the memory under DMA.
+How is this test representative of the internal live migration test
+you mention above? '-m 2' indicates a mode that varies depending on
+the HW and revision of the test (I just added a bunch of supported
+modes). Which one is it?
+
+>     Below are the results:
+>     +-------+------------------------+-----------------------+
+>     | #vCPU | dirty memory time (ms) | number of contentions |
+>     +-------+------------------------+-----------------------+
+>     | 1     | 926                    | 0                     |
+>     +-------+------------------------+-----------------------+
+>     | 2     | 1189                   | 4732558               |
+>     +-------+------------------------+-----------------------+
+>     | 4     | 2503                   | 11527185              |
+>     +-------+------------------------+-----------------------+
+>     | 8     | 5069                   | 24881677              |
+>     +-------+------------------------+-----------------------+
+>     | 16    | 10340                  | 50347956              |
+>     +-------+------------------------+-----------------------+
+>     | 32    | 20351                  | 100605720             |
+>     +-------+------------------------+-----------------------+
+>     | 64    | 40994                  | 201442478             |
+>     +-------+------------------------+-----------------------+
+> 
+>   * From the test results above, the "dirty memory time" and the number of
+>     MMU lock contention scale with the number of vCPUs. That means all the
+>     dirty memory operations from all vCPU threads have been serialized by
+>     the MMU lock. Further analysis also shows that the permission relaxation
+>     during dirty logging is where vCPU threads get serialized.
+> 
+> Solution:
+>   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+>     the dirty-bit solution for dirty logging is much complicated compared to
+>     the write-protection solution. The straight way to reduce the guest
+>     performance degradation is to enhance the concurrency for the permission
+>     fault path during dirty logging.
+>   * In this patch, we only put leaf PTE permission relaxation for dirty
+>     logging under read lock, all others would go under write lock.
+>     Below are the results based on the solution:
+>     +-------+------------------------+
+>     | #vCPU | dirty memory time (ms) |
+>     +-------+------------------------+
+>     | 1     | 803                    |
+>     +-------+------------------------+
+>     | 2     | 843                    |
+>     +-------+------------------------+
+>     | 4     | 942                    |
+>     +-------+------------------------+
+>     | 8     | 1458                   |
+>     +-------+------------------------+
+>     | 16    | 2853                   |
+>     +-------+------------------------+
+>     | 32    | 5886                   |
+>     +-------+------------------------+
+>     | 64    | 12190                  |
+>     +-------+------------------------+
+>     All "dirty memory time" have been reduced by more than 60% when the
+>     number of vCPU grows.
+
+How does that translate to the original problem statement with your
+live migration test?
+
+Thanks,
+
+	M.
 
 -- 
-MST
-
+Without deviation from the norm, progress is not possible.
