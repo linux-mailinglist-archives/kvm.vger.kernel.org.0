@@ -2,179 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66CD548CD68
-	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 22:05:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3A7648CDCC
+	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 22:30:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbiALVFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 16:05:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55068 "EHLO
+        id S232683AbiALVaA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 16:30:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230416AbiALVFH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 16:05:07 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D158AC06173F
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 13:05:06 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id i8-20020a17090a138800b001b3936fb375so14805394pja.1
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 13:05:06 -0800 (PST)
+        with ESMTP id S233235AbiALV3y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jan 2022 16:29:54 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667C7C06173F
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 13:29:54 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id c3so6252284pls.5
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 13:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=nYpE8qObJY8smRJsa3z2gCeio5ib7kZSmRctEM2XPHQ=;
-        b=rkjRW1kY9KNBW9DnAWpTxjgdrVnPLw8wAGoiZADlB18nUm1wBzfboJPdKkwyRCx+hP
-         CHmYVo7t1u6RV3udpGlW6iQwS3MnQ0eDYfr2UEoCgfmVZGY+yhFe9dyCo9kYnT/yv2D2
-         iPhRTu1vun6WEN9p9bT/DEN/eTNtdTCbqDVt1yqmAZWWPNJ8EcmyTohAxbVesdnFbnhf
-         fGjGm0G9qJsK6RY//yIUOuo3x+GKq2EmrP9zPIZ0xQCXc00uJ1m9cdx+hOWXoHsFDNXl
-         MZmKJRed+ziINZWB36nAiZsz7d4Gkio2o4bWtpUglwdcCVTlRrfcfoJyr1q5Cz3atbDv
-         pxPA==
+        bh=9/6LdT7clWbhj3g0oaPqru8a+FxuDPhGBh6SwjfBjFY=;
+        b=KbhzU48CpLCcDiSSS1g7JHa1srdx449cyfHI9ksB5svS5hIhDU6hAnR1DklatqfcR0
+         nFSJPG9mSGMOzL243yCAnKlOEl8YICpst9lCa8xR9eG/o0YBa2vEvO/g7YmyqNV0CJvW
+         eg0XkKD0fjFILc99WvR2L6vONQOa0mgsLuWRYT3HHjhcFVyNdgtAmdsyqol20pbnZpQ3
+         Tu/ZOCj0tilGXxa8LIRO2p7YwFSk7EXdw1VyEe3YRNKrr7AYZngrNrIHrsvPcJ+IjHEZ
+         BIQsZDeU99AjFlSB0qGhECmAB6odYnSdektnD0XGKSiVOJiUST8kyCvI8cvEFQ+KI9u+
+         dU0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=nYpE8qObJY8smRJsa3z2gCeio5ib7kZSmRctEM2XPHQ=;
-        b=7yhRFBCSG1xkUXk0ScN42GlcLs4umv2qxgj2v0kx+m0d8HHAS0+NvbnnhGS7+fexrv
-         rJx98Z01iWgqYDfE14YyyuTkcFSBYLfpRuNzG30lLu18vb6MVaeUxAYXzeDcxTmB+4hR
-         JzmAEiPRNwRuqRE1axP8E/jcwSDFgyUieHUSLdO4bH7rwlc4ew1/sqYjamb4SXMmk9Wb
-         8ULVsY9BM2QwfnQW8oJ4Yd7c3qt91PhwD1VFmphHcbzzO0o5YSAVa+QqnxvghE0PVmkf
-         JpFjxG4BTw5vB/79M4IXL0lMnc412t1ZVjmCvu16Qaom4rLgFx0kvkaQZKrajeLg98rf
-         4CxQ==
-X-Gm-Message-State: AOAM530sw+CSmsQTJ+/NvA/WwlATeWMl1pGNnfxT0ZAH7amSTN9BrU5X
-        k9+xn4uGV8yj4/XAxWo45AbW5Q==
-X-Google-Smtp-Source: ABdhPJzDNiAzjEeO1ewhKEFf2+ZnwvCwxaQqzOoYwzaabhtEL3iHda92pPrWRQiHy0IlSnoEeEtdSQ==
-X-Received: by 2002:a63:88c7:: with SMTP id l190mr624434pgd.150.1642021506085;
-        Wed, 12 Jan 2022 13:05:06 -0800 (PST)
+        bh=9/6LdT7clWbhj3g0oaPqru8a+FxuDPhGBh6SwjfBjFY=;
+        b=jRJsjPTTYNytQkxWwEzAOVowIehipyPv4g37fVqP2Qwq9JW1ZdtORh3Wms93u/XNJX
+         sZbRBfe7+pGhWQJP/SEhEj9QZj0TO+3wlp8WJpQ9HCjf9LFpI8K6j+dyC23cljgZBHdX
+         1ssBDbRiEyp5Tmho2/Ga+1mx3cNW9FXSNLeYeX9Wue0j2ZpLZNs+El0UvCZOErjBomuH
+         zvRgT04GJ4kAhU3zDulWl1vQ7jjZmURDPCuwWSBS6wt2G/m4dJZ58ibI+4N51IVX/mdp
+         v69rrdiZHoAg4iryr9dBFNlR4yDt7RJ0HBuhEC5MMc82RFOHxzr/iTdzLftzdXH4uXbV
+         A0Dg==
+X-Gm-Message-State: AOAM533hc/7uJcUEQfb5BM/1LI9Bpc1T1FqbWrYvsF4RLY0kkIrk6ygF
+        4XluM5JY8lBldfNV8BNYE4ULh8XiZDJcfA==
+X-Google-Smtp-Source: ABdhPJwvEgRRix7ZqSyLneWQn8eQVOtdrPfgWjDmNltbLQSQNLrD8JHWJjgN6lKVLqMJU+AkfOSmZw==
+X-Received: by 2002:a62:2f86:0:b0:4bc:fe4d:4831 with SMTP id v128-20020a622f86000000b004bcfe4d4831mr1226243pfv.23.1642022993756;
+        Wed, 12 Jan 2022 13:29:53 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b4sm6558684pjh.44.2022.01.12.13.05.05
+        by smtp.gmail.com with ESMTPSA id r11sm524977pff.81.2022.01.12.13.29.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 13:05:05 -0800 (PST)
-Date:   Wed, 12 Jan 2022 21:05:02 +0000
+        Wed, 12 Jan 2022 13:29:53 -0800 (PST)
+Date:   Wed, 12 Jan 2022 21:29:49 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Zhong <yang.zhong@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jun.nakajima@intel.com,
-        kevin.tian@intel.com, jing2.liu@linux.intel.com
-Subject: Re: [WARNING: UNSCANNABLE EXTRACTION FAILED][PATCH v2 1/3] selftest:
- kvm: Reorder vcpu_load_state steps for AMX
-Message-ID: <Yd9CfnNhcQNGsUqA@google.com>
-References: <20211222214731.2912361-1-yang.zhong@intel.com>
- <20211222214731.2912361-2-yang.zhong@intel.com>
+To:     Manali Shukla <manali.shukla@amd.com>
+Cc:     kvm@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 0/3] Add L2 exception handling KVM unit
+ tests for nSVM
+Message-ID: <Yd9ITZv48+ehuMsx@google.com>
+References: <20211229062201.26269-1-manali.shukla@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211222214731.2912361-2-yang.zhong@intel.com>
+In-Reply-To: <20211229062201.26269-1-manali.shukla@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 22, 2021, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
++Aaron, and +Paolo who may or may not subsribe to kvm@ :-)
+
+On Wed, Dec 29, 2021, Manali Shukla wrote:
+> This series adds 3 KVM Unit tests for nested SVM
+> 1) Check #NM is handled in L2 when L2 #NM handler is registered
+>    "fnop" instruction is called in L2 to generate the exception
 > 
-> For AMX support it is recommended to load XCR0 after XFD, so
-> that KVM does not see XFD=0, XCR=1 for a save state that will
-> eventually be disabled (which would lead to premature allocation
-> of the space required for that save state).
-
-It would be very helpful to clarify that XFD is loaded via KVM_SET_MSRS.  It took
-me longer than it should have to understand what was going on.  The large amount of
-whitespace noise in this patch certainly didn't help.  E.g. just a simple tweak:
-
-  For AMX support it is recommended to load XCR0 after XFD, i.e. after MSRs, so
-
-> It is also required to load XSAVE data after XCR0 and XFD, so
-> that KVM can trigger allocation of the extra space required to
-> store AMX state.
+> 2) Check #BP is handled in L2 when L2 #BP handler is registered
+>    "int3" instruction is called in L2 to generate the exception
 > 
-> Adjust vcpu_load_state to obey these new requirements.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  .../selftests/kvm/lib/x86_64/processor.c      | 29 ++++++++++---------
->  1 file changed, 15 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 00324d73c687..9b5abf488211 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -1192,9 +1192,14 @@ void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *s
->  	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
->  	int r;
->  
-> -	r = ioctl(vcpu->fd, KVM_SET_XSAVE, &state->xsave);
-> -        TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XSAVE, r: %i",
-> -                r);
-> +	r = ioctl(vcpu->fd, KVM_SET_SREGS, &state->sregs);
-> +	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_SREGS, r: %i",
-> +		r);
+> 3) Check #OF is handled in L2 when L2 #OF handler is registered
+>    "into" instruction with instrumented code is used in L2 to
+>    generate the exception
 
-If we're going to bother replacing spaces with tabs, might as well get rid of all
-the gratuituous newlines as well.
+This is all basically identical in terms of desired functionality to existing or
+in-flight nVMX tests, e.g. vmx_nm_test() and Aaron's vmx_exception_test() work[*].
+And much of the feedback I provided to Aaron's earlier revisions applies to this
+series as well, e.g. create a framework to test intercpetion of arbitrary exceptions
+instead of writing the same boilerplate for each and every test.
 
-> +
-> +	r = ioctl(vcpu->fd, KVM_SET_MSRS, &state->msrs);
-> +	TEST_ASSERT(r == state->msrs.nmsrs,
-> +		"Unexpected result from KVM_SET_MSRS,r: %i (failed at %x)",
-> +		r, r == state->msrs.nmsrs ? -1 : state->msrs.entries[r].index);
+It doesn't seem like it'd be _that_ difficult to turn vmx_exception_test into a
+generic-ish l2_exception_test.  To avoid too much scope creep, what if we first get
+Aaron's code merged, and than attempt to extract the core functionality into a
+shared library to reuse it for nSVM?  If it turns out to be more trouble then its
+worth, we can always fall back to something like this series.
 
-Most people not named "Paolo" prefer to align this with the opening "(" :-)
-
-E.g.
-
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 97f8c2f2df36..971f41afa689 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1158,44 +1158,36 @@ void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *s
-        int r;
-
-        r = ioctl(vcpu->fd, KVM_SET_SREGS, &state->sregs);
--       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_SREGS, r: %i",
--               r);
-+       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_SREGS, r: %i", r);
-
-        r = ioctl(vcpu->fd, KVM_SET_MSRS, &state->msrs);
-        TEST_ASSERT(r == state->msrs.nmsrs,
--               "Unexpected result from KVM_SET_MSRS,r: %i (failed at %x)",
--               r, r == state->msrs.nmsrs ? -1 : state->msrs.entries[r].index);
-+                   "Unexpected result from KVM_SET_MSRS,r: %i (failed at %x)",
-+                   r, r == state->msrs.nmsrs ? -1 : state->msrs.entries[r].index);
-
-        if (kvm_check_cap(KVM_CAP_XCRS)) {
-                r = ioctl(vcpu->fd, KVM_SET_XCRS, &state->xcrs);
--               TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XCRS, r: %i",
--                           r);
-+               TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XCRS, r: %i", r);
-        }
-
-        r = ioctl(vcpu->fd, KVM_SET_XSAVE, &state->xsave);
--       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XSAVE, r: %i",
--               r);
-+       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XSAVE, r: %i", r);
-
-        r = ioctl(vcpu->fd, KVM_SET_VCPU_EVENTS, &state->events);
--       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_VCPU_EVENTS, r: %i",
--               r);
-+       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_VCPU_EVENTS, r: %i", r);
-
-        r = ioctl(vcpu->fd, KVM_SET_MP_STATE, &state->mp_state);
--        TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_MP_STATE, r: %i",
--                r);
-+        TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_MP_STATE, r: %i", r);
-
-        r = ioctl(vcpu->fd, KVM_SET_DEBUGREGS, &state->debugregs);
--        TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_DEBUGREGS, r: %i",
--                r);
-+        TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_DEBUGREGS, r: %i", r);
-
-        r = ioctl(vcpu->fd, KVM_SET_REGS, &state->regs);
--       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_REGS, r: %i",
--               r);
-+       TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_REGS, r: %i", r);
-
-        if (state->nested.size) {
-                r = ioctl(vcpu->fd, KVM_SET_NESTED_STATE, &state->nested);
--               TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_NESTED_STATE, r: %i",
--                       r);
-+               TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_NESTED_STATE, r: %i", r);
-        }
- }
-
+[*] https://lore.kernel.org/all/20211214011823.3277011-1-aaronlewis@google.com
