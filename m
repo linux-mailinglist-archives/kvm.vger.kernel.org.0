@@ -2,89 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE65948CB83
-	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 20:07:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCC1448CC20
+	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 20:40:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356522AbiALTHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 14:07:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
+        id S1356437AbiALTjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 14:39:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241137AbiALTHP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 14:07:15 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363CDC06173F
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 11:07:15 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id i6so5543984pla.0
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 11:07:15 -0800 (PST)
+        with ESMTP id S1357210AbiALTjC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jan 2022 14:39:02 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73689C028C3A
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 11:38:45 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id oa15so7170531pjb.4
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 11:38:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=/E6LcRT46+1wvC1FNtzkLHlaM7J38R0FPn8cliv4VpA=;
-        b=qsUNooEQNDBCnxbG0FLaC1OM64KjCFr+xvpND3ycqSBodr6CIhQgxjLl6UeXbNGbCd
-         wDkkwBgUUM+GJ3czVIiot3ZKXLXjKsD/PVzKsUz3CPIZ5oRLbb395wZa3eB7QBvSyGE0
-         M6ujxerWXtzQBwWwyDfycfLqv2gCJEJhhbuIOT86+NTjPBjK+JBxa38hBtAA2pIaX4mR
-         60PdkxuNUKGzISBowjUEbrheQMhMjcZlCHMPFM6dNTxrxxte1bDedCXrsZAWG6uXUgC0
-         bPO7vc34eGEM8LMw13GgsmMK04CpgUF1jJsKzeMKWfCSQvgk73y1pAWl56OgbO4/iHYR
-         teOQ==
+        bh=qzu0W7luXmF5PYf8DA5sImzBEUVSK6W0gLuKzPwx89s=;
+        b=hH6ZJY2CsrPwl3tONEith676vxb02h20i3jmc8hx0sTaH+bHym4htb9alJoEJJCl7c
+         Dlcj/hfBD0kzusT+RxNuEBtWg6iVoRCnDFCJGlQ3v895jIQGGiVufz+oO4kEYC0x/9nA
+         D+SkcO7mKyJKTd3j2GwRt9vmo0tt5MX/CMvjZvrMAGefyH4M1Wwchr6JT1NoUX73z4Wv
+         YrT++r4gVE8jXQXGN5PvU/aImNF9K3DdaNd+ZrZKPubOy2mVda4R5Nck9rJGn/HluyOU
+         io0am+EY4E64PuPLwNJ3syCZ64gzizoMG6xQ7pIwBMajUXnB8qevDlOZ0jG5XIfbFsvp
+         XYyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=/E6LcRT46+1wvC1FNtzkLHlaM7J38R0FPn8cliv4VpA=;
-        b=cBkSEtHDoFeXhN0AxhUFFZJ1dwWuUI73OJjUVZ7e/IcWdHSVv89ax+AWDpTzHYLDon
-         2cI191BS97wIMtd4d2VcArCX6Sk4i/eq4X8Vbwi/rMk+nmxo9AFJ6povmgnvMd3tsXp7
-         +QAkj4qHu71kxOl0ywX+umQqUvBeEHqR+YVo1sXzZDIMcQuWhVo2K+vRMwap4Bq1iGBF
-         ivIbNmINvuRKzXdrAkZE5Zx5Puryd38GuC1xPMBK+QrneufunsFvU0wXM6HNxdNILTc8
-         a+dqhvxJScKYq0Yg4xJGasrMTHnv+0ELKBBdOTEBY343dagcPkH5ea9MCqm1KKOdNCwP
-         RcaQ==
-X-Gm-Message-State: AOAM530uQuxqM6vEAsobhwr60aV/2vkCK3FOYJZtbHLmq9T83Y0BIK/t
-        b9UaS8r7oI9PwocFNTAwMh8fEQ==
-X-Google-Smtp-Source: ABdhPJxMEkpSjEwGJFbpw1qoMan0wZMPMYOiaOQxTgFWzGT4vjTc3UPc+1oPzOCirQw6S1Poz3Rsjg==
-X-Received: by 2002:a63:338c:: with SMTP id z134mr880544pgz.459.1642014434409;
-        Wed, 12 Jan 2022 11:07:14 -0800 (PST)
+        bh=qzu0W7luXmF5PYf8DA5sImzBEUVSK6W0gLuKzPwx89s=;
+        b=KFmI/rkEB0ZlUS7jqHSdqZgGtQfsm9quP+TGbkIbPf5OcbOHug6M2ePa3O5MJ7pQeD
+         BhDWPZ2l3Ge56oYvyyXu4+vp8IHVXMNU+tlWJUax12JZpmfeAxFaaVuJbMo3u6maDKBb
+         xE+BMna6oFqhe58oBK1s5hNIgxuWOU83Z3/q31X0+Y+eGE6GYmflA4tA0VZ13MKeD0TR
+         OFIjzS3hV2s0o/alHsKHjiYy6zgGe57q9rx06jTS4FRAaTb4TZ2bchO90807GSk0Vxkv
+         PxRf+fFzB3sHWT7C3/ObeSq0l1ykb64DC9zyPJk3UzQTSLD1HoeNS1ag4cTgqA40NTE0
+         aJwA==
+X-Gm-Message-State: AOAM5324T34OXcnQtVV3J7ic7A0lOG0SveQ3xVdo508Q2suFQAmRdRw+
+        kr98JougYcTR0iBmOCbd3IRZgmvHhOZZVg==
+X-Google-Smtp-Source: ABdhPJyjIQbcDdCBKu7Z+ED+nYeWFReiIU904VhCd/11XMrcPXjIegV+a/Xgy5xbOEC8uBA90zUKDQ==
+X-Received: by 2002:a17:902:e808:b0:14a:5ab3:ae6 with SMTP id u8-20020a170902e80800b0014a5ab30ae6mr986799plg.32.1642016324788;
+        Wed, 12 Jan 2022 11:38:44 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x15sm364293pfh.157.2022.01.12.11.07.13
+        by smtp.gmail.com with ESMTPSA id a23sm398721pjo.57.2022.01.12.11.38.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 11:07:13 -0800 (PST)
-Date:   Wed, 12 Jan 2022 19:07:09 +0000
+        Wed, 12 Jan 2022 11:38:44 -0800 (PST)
+Date:   Wed, 12 Jan 2022 19:38:40 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Li RongQing <lirongqing@baidu.com>, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
-        bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org, joro@8bytes.org
-Subject: Re: [PATCH] KVM: X86: set vcpu preempted only if it is preempted
-Message-ID: <Yd8m3SA/77LRKOJH@google.com>
-References: <1641988921-3507-1-git-send-email-lirongqing@baidu.com>
- <Yd7S5rEYZg8v93NX@hirez.programming.kicks-ass.net>
- <Yd8QR2KHDfsekvNg@google.com>
- <7d96787e-d2e8-b4cd-c030-bcda3fe23e55@redhat.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [kvm-unit-tests PATCH v2 2/4] x86: Align L2's stacks
+Message-ID: <Yd8uQLYAhSppgW74@google.com>
+References: <20211214011823.3277011-1-aaronlewis@google.com>
+ <20211214011823.3277011-3-aaronlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7d96787e-d2e8-b4cd-c030-bcda3fe23e55@redhat.com>
+In-Reply-To: <20211214011823.3277011-3-aaronlewis@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 12, 2022, Paolo Bonzini wrote:
-> On 1/12/22 18:30, Sean Christopherson wrote:
-> > > Uhhmm, why not? Who says the vcpu will run the moment it becomes
-> > > runnable again? Another task could be woken up meanwhile occupying the
-> > > real cpu.
-> > Hrm, but when emulating HLT, e.g. for an idling vCPU, KVM will voluntarily schedule
-> > out the vCPU and mark it as preempted from the guest's perspective.  The vast majority,
-> > probably all, usage of steal_time.preempted expects it to truly mean "preempted" as
-> > opposed to "not running".
+On Tue, Dec 14, 2021, Aaron Lewis wrote:
+> Setting the stack to PAGE_SIZE - 1 sets the stack to being 1-byte
+> aligned, which fails in usermode with alignment checks enabled (ie: with
+> flags cr0.am set and eflags.ac set).  This was causing an #AC in
+> usermode.c when preparing to call the callback in run_in_user().
+> Aligning the stack fixes the issue.
 > 
-> I'm not sure about that.  In particular, PV TLB shootdown benefits from
-> treating a halted vCPU as preempted, because it avoids wakeups of the halted
-> vCPUs.
+> For the purposes of fixing the #AC in usermode.c the stack has to be
+> aligned to at least an 8-byte boundary.  Setting it to a page aligned
+> boundary ensures any stack alignment requirements are met as x86_64
+> stacks generally want to be 16-byte aligned.
+> 
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
 
-Ah, right.  But that really should be decoupled from steal_time.preempted.  KVM
-can technically handle the PV TLB flush any time the vCPU exits, it's just a
-question of whether the cost of writing guest memory outweighs the benefits of
-potentially avoiding an IPI.  E.g. modifying KVM's fastpath exit loop to toggle
-a flag and potentially handle PV TLB flushes is probably a bad idea, but setting
-a flag immediately before static_call(kvm_x86_handle_exit)() may be a net win.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
