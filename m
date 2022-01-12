@@ -2,459 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 533DB48C554
-	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 14:59:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A6B648C5EE
+	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 15:26:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241565AbiALN61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 08:58:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58252 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241197AbiALN60 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 Jan 2022 08:58:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641995905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=u92yA883SjiA8RmcsqvmgxkfZYspTwlEn6ow9YD5DEM=;
-        b=Wt2a4mqNBokJuVhpVwChdixFBtclZD1bNT5/kmxyvSeWYrNfk7Jp32+t5Nej/+toNtxVBE
-        kX7i+1MhDMtpc1sUuSxt/8hzZ7PxQRg/9LF0JPRCYhy77Qb8XTz1xDsUa1LxAPDl4/WpLE
-        obt1zhN0G8qOS6JyvVo1R3QDw4NrP1g=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-321-InQKPk0fNmean9YMHlg1nw-1; Wed, 12 Jan 2022 08:58:23 -0500
-X-MC-Unique: InQKPk0fNmean9YMHlg1nw-1
-Received: by mail-ed1-f70.google.com with SMTP id j10-20020a05640211ca00b003ff0e234fdfso2379707edw.0
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 05:58:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=u92yA883SjiA8RmcsqvmgxkfZYspTwlEn6ow9YD5DEM=;
-        b=e75fV/XdGrEqXpaCPHar6VRNaEjH1KL+79Tod3H7LidtPjHz1hElkrADcNQ7ns3/E9
-         k5r8lR5Yu8bnRYcrVEe15//ObcW9bFo/ZvYtieGhwiXIDkivGWOw8HmB0S4MziiwGNFF
-         r6Fj01xf4PJFPSqDivRxfthjLncieM9a+Td1rLavIKMkPiq7DqXCxivWCUW4WU4cDPr+
-         kOTElN/vqFltAkK8sT9+LBxA+IzbRQpsHlA4TnAb/CXqLWaoSjuR/J/SvH0HoWQidOp4
-         qU4h+q8hH95mWL86Tim1ME5OQGGMmFCc4HiIMUTWso/XTu7mPOy0fUnWpR0U0g1k3EdB
-         W35w==
-X-Gm-Message-State: AOAM533hx5AzFqqAotQ2N57OsFFfif9m/n9jDmbzRWgcX1BSs2ry9B90
-        j/YU56JdVh56rBr3Wf4pySLJt+fnOCMSqCPYh1AuacUDbafDwI9EJoW15ZJLDgWXm4yvo3Stoap
-        aSsBPZQ0tvA+4
-X-Received: by 2002:a17:906:478a:: with SMTP id cw10mr7547993ejc.39.1641995902102;
-        Wed, 12 Jan 2022 05:58:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxQWCCq3M0i6JXw8e8/d6zE68bpCKlO/E128Sxu1xmkY7DvL2COwCFZkw0bskJ47bnhDkzIrQ==
-X-Received: by 2002:a17:906:478a:: with SMTP id cw10mr7547984ejc.39.1641995901935;
-        Wed, 12 Jan 2022 05:58:21 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id kw14sm4525869ejc.68.2022.01.12.05.58.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 05:58:20 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
-In-Reply-To: <20220111090022.1125ffb5@redhat.com>
-References: <20211122175818.608220-1-vkuznets@redhat.com>
- <20211122175818.608220-3-vkuznets@redhat.com>
- <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
- <20211227183253.45a03ca2@redhat.com>
- <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
- <87mtkdqm7m.fsf@redhat.com> <20220103104057.4dcf7948@redhat.com>
- <875yr1q8oa.fsf@redhat.com>
- <ceb63787-b057-13db-4624-b430c51625f1@redhat.com>
- <87o84qpk7d.fsf@redhat.com> <877dbbq5om.fsf@redhat.com>
- <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
- <20220111090022.1125ffb5@redhat.com>
-Date:   Wed, 12 Jan 2022 14:58:19 +0100
-Message-ID: <87fsptnjic.fsf@redhat.com>
+        id S1354080AbiALOZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 09:25:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62702 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239105AbiALOZt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 Jan 2022 09:25:49 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20CDr28F015803;
+        Wed, 12 Jan 2022 14:25:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2IXUEKfzeDElomINqFEw47xnwGcyhKdwCrRJWlaSCwE=;
+ b=Jk89jKfRRXFvXkgzSKyaf4+tifLnHZlPD70gwd73Jnyg2CtXRcxypVmL64OXE8vP8xGM
+ mcjBdZw7tnaEOf1mCBmODpM3jSW4zFR0JwB7B8N4y1SkCr5GFVp36inTLZz5bigNk7ud
+ Zi1lPKWWbT6XvMm2bNqYX80JDcAs4tgoZaFTGHaHA0LUgjydl0/5nNYBXxQd1kNyMYd0
+ 1mibGytQPUURZAIRWAe25+xLK+G7vNJz0/sEVlKp7WIX0EaWuNUfKmLKXZytkMFtbBV7
+ 6yK8xZhspy996XDJdAFSzQThPe1lXaC5/fdAr62Rpk4ZVYquMr7oh3yQeXkR5wva/b0d rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dhycgt0tk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Jan 2022 14:25:46 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20CDvQle005371;
+        Wed, 12 Jan 2022 14:25:46 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dhycgt0ss-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Jan 2022 14:25:46 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20CECSPe004794;
+        Wed, 12 Jan 2022 14:25:44 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma05fra.de.ibm.com with ESMTP id 3df289k07r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Jan 2022 14:25:44 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20CEPf6C35717422
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 12 Jan 2022 14:25:41 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C01B5204F;
+        Wed, 12 Jan 2022 14:25:41 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.56.243])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id 8DE5452057;
+        Wed, 12 Jan 2022 14:25:40 +0000 (GMT)
+Date:   Wed, 12 Jan 2022 15:25:20 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v17 08/15] s390/vfio-ap: keep track of active guests
+Message-ID: <20220112152520.4cd37e7c.pasic@linux.ibm.com>
+In-Reply-To: <fcce7cc6-6ac7-b22a-a957-80e59a0f4e83@linux.ibm.com>
+References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
+ <20211021152332.70455-9-akrowiak@linux.ibm.com>
+ <20211230043322.2ba19bbd.pasic@linux.ibm.com>
+ <fcce7cc6-6ac7-b22a-a957-80e59a0f4e83@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IdeELkvS6Iz10UxJKbgCPL9dYIy5D7zv
+X-Proofpoint-ORIG-GUID: xkovmHWvlbf8TpuqnDpJFFAIk1HKzFEY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-12_04,2022-01-11_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0
+ priorityscore=1501 clxscore=1015 phishscore=0 malwarescore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201120093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+On Tue, 11 Jan 2022 16:58:13 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Igor Mammedov <imammedo@redhat.com> writes:
+> On 12/29/21 22:33, Halil Pasic wrote:
+> > On Thu, 21 Oct 2021 11:23:25 -0400
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >  
+> >> The vfio_ap device driver registers for notification when the pointer to
+> >> the KVM object for a guest is set. Let's store the KVM pointer as well as
+> >> the pointer to the mediated device when the KVM pointer is set.  
+> > [..]
+> >
+> >  
+> >> struct ap_matrix_dev {
+> >>          ...
+> >>          struct rw_semaphore guests_lock;
+> >>          struct list_head guests;
+> >>         ...
+> >> }
+> >>
+> >> The 'guests_lock' field is a r/w semaphore to control access to the
+> >> 'guests' field. The 'guests' field is a list of ap_guest
+> >> structures containing the KVM and matrix_mdev pointers for each active
+> >> guest. An ap_guest structure will be stored into the list whenever the
+> >> vfio_ap device driver is notified that the KVM pointer has been set and
+> >> removed when notified that the KVM pointer has been cleared.
+> >>  
+> > Is this about the field or about the list including all the nodes? This
+> > reads lie guests_lock only protects the head element, which makes no
+> > sense to me. Because of how these lists work.  
+> 
+> It locks the list, I can rewrite the description.
+> 
+> >
+> > The narrowest scope that could make sense is all the list_head stuff
+> > in the entire list. I.e. one would only need the lock to traverse or
+> > manipulate the list, while the payload would still be subject to
+> > the matrix_dev->lock mutex.  
+> 
+> The matrix_dev->guests lock is needed whenever the kvm->lock
+> is needed because the struct ap_guest object is created and the
+> struct kvm assigned to it when the kvm pointer is set
+> (vfio_ap_mdev_set_kvm function). 
 
-> On Fri, 7 Jan 2022 19:15:43 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->> On 1/7/22 10:02, Vitaly Kuznetsov wrote:
->> > 
->> > I'm again leaning towards an allowlist and currently I see only two
->> > candidates:
->> > 
->> > CPUID.01H.EBX bits 31:24 (initial LAPIC id)
->> > CPUID.0BH.EDX (x2APIC id)
->> > 
->> > Anything else I'm missing?  
->> 
->> I would also ignore completely CPUID leaves 03H, 04H, 0BH, 80000005h, 
->> 80000006h, 8000001Dh, 8000001Eh (cache and processor topology), just to 
->> err on the safe side.
->
-> on top of that,
->
-> 1Fh
->
+Yes reading the code, my impression was, that this is more about the
+ap_guest.kvm that about the list.
 
-The implementation turned out to be a bit more complex as kvm also
-mangles CPUIDs so we need to account for that. Could you give the
-attached series a spin to see if it works?
+My understanding is that struct ap_gurest is basically about the
+marriage between a matrix_mdev and a kvm. Basically a link between the
+two.
 
--- 
-Vitaly
+But then, it probably does not make a sense for this link to outlive
+either kvm or matrix_mdev.
 
+Thus I don't quite understand why do we need the extra allocation? If
+we want a list, why don't we just the pointers to matrix_mdev?
 
---=-=-=
-Content-Type: text/x-patch
-Content-Disposition: inline;
- filename=0001-KVM-x86-Fix-indentation-in-kvm_set_cpuid.patch
+We could still protect that stuff with a separate lock.
 
-From 9b7d89c0a86f52e404278a5dfd86521bff278d17 Mon Sep 17 00:00:00 2001
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Wed, 12 Jan 2022 14:41:24 +0100
-Subject: [PATCH RFC 1/3] KVM: x86: Fix indentation in kvm_set_cpuid()
+> So, in order to access the
+> ap_guest object and retrieve the kvm pointer, we have to ensure
+> the ap_guest_object is still available. The fact we can get the
+> kvm pointer from the ap_matrix_mdev object just makes things
+> more efficient - i.e., we won't have to traverse the list.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/cpuid.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+Well if the guests_lock is only protecting the list, then that should not
+be true. In that case, you can be only sure about the nodes that you
+reached by traversing the list with he lock held. Right.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 07e9215e911d..89af3c7390d3 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -276,21 +276,21 @@ u64 kvm_vcpu_reserved_gpa_bits_raw(struct kvm_vcpu *vcpu)
- static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
-                         int nent)
- {
--    int r;
-+	int r;
- 
--    r = kvm_check_cpuid(e2, nent);
--    if (r)
--        return r;
-+	r = kvm_check_cpuid(e2, nent);
-+	if (r)
-+		return r;
- 
--    kvfree(vcpu->arch.cpuid_entries);
--    vcpu->arch.cpuid_entries = e2;
--    vcpu->arch.cpuid_nent = nent;
-+	kvfree(vcpu->arch.cpuid_entries);
-+	vcpu->arch.cpuid_entries = e2;
-+	vcpu->arch.cpuid_nent = nent;
- 
--    kvm_update_kvm_cpuid_base(vcpu);
--    kvm_update_cpuid_runtime(vcpu);
--    kvm_vcpu_after_set_cpuid(vcpu);
-+	kvm_update_kvm_cpuid_base(vcpu);
-+	kvm_update_cpuid_runtime(vcpu);
-+	kvm_vcpu_after_set_cpuid(vcpu);
- 
--    return 0;
-+	return 0;
- }
- 
- /* when an old userspace process fills a new kernel module */
--- 
-2.34.1
+If only the list is protected, then one could do
+
+down_write(guests_lock)
+list_del(element)
+up_write(guests_lock)
+fancy_free(element)
 
 
---=-=-=
-Content-Type: text/x-patch
-Content-Disposition: inline;
- filename=0002-KVM-x86-Do-runtime-CPUID-update-before-updating-vcpu.patch
+> 
+> Whenever the kvm->lock and matrix_dev->lock mutexes must
+> be held, the order is:
+> 
+>      matrix_dev->guests_lock
+>      matrix_dev->guests->kvm->lock
+>      matrix_dev->lock
+> 
+> There are times where all three locks are not required; for example,
+> the handle_pqap and vfio_ap_mdev_probe/remove functions only
+> require the matrix_dev->lock because it does not need to lock kvm.
+> 
 
-From c735aa9b4375d37dbd61c7c655d6b007d7d1962c Mon Sep 17 00:00:00 2001
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Wed, 12 Jan 2022 14:27:54 +0100
-Subject: [PATCH RFC 2/3] KVM: x86: Do runtime CPUID update before updating
- vcpu->arch.cpuid_entries
+Yeah, that is what gets rid of the circular lock dependency. If we had
+to take guests_lock there we would have guests_lock in the same role
+as matrix_dev->lock before.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/cpuid.c | 35 +++++++++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 10 deletions(-)
+But the thing is you do 
+kvm = q->matrix_mdev->guest->kvm;
+in the pqap_handler (more precisely in a function called by it).
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 89af3c7390d3..16f4083edeeb 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -125,14 +125,21 @@ static void kvm_update_kvm_cpuid_base(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu)
-+static struct kvm_cpuid_entry2 *__kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu,
-+					      struct kvm_cpuid_entry2 *entries, int nent)
- {
- 	u32 base = vcpu->arch.kvm_cpuid_base;
- 
- 	if (!base)
- 		return NULL;
- 
--	return kvm_find_cpuid_entry(vcpu, base | KVM_CPUID_FEATURES, 0);
-+	return cpuid_entry2_find(entries, nent, base | KVM_CPUID_FEATURES, 0);
-+}
-+
-+static struct kvm_cpuid_entry2 *kvm_find_kvm_cpuid_features(struct kvm_vcpu *vcpu)
-+{
-+	return __kvm_find_kvm_cpuid_features(vcpu, vcpu->arch.cpuid_entries,
-+					     vcpu->arch.cpuid_nent);
- }
- 
- void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
-@@ -147,11 +154,12 @@ void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
- 		vcpu->arch.pv_cpuid.features = best->eax;
- }
- 
--void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-+static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
-+				       int nent)
- {
- 	struct kvm_cpuid_entry2 *best;
- 
--	best = kvm_find_cpuid_entry(vcpu, 1, 0);
-+	best = cpuid_entry2_find(entries, nent, 1, 0);
- 	if (best) {
- 		/* Update OSXSAVE bit */
- 		if (boot_cpu_has(X86_FEATURE_XSAVE))
-@@ -162,33 +170,39 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
- 			   vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE);
- 	}
- 
--	best = kvm_find_cpuid_entry(vcpu, 7, 0);
-+	best = cpuid_entry2_find(entries, nent, 7, 0);
- 	if (best && boot_cpu_has(X86_FEATURE_PKU) && best->function == 0x7)
- 		cpuid_entry_change(best, X86_FEATURE_OSPKE,
- 				   kvm_read_cr4_bits(vcpu, X86_CR4_PKE));
- 
--	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
-+	best = cpuid_entry2_find(entries, nent, 0xD, 0);
- 	if (best)
- 		best->ebx = xstate_required_size(vcpu->arch.xcr0, false);
- 
--	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
-+	best = cpuid_entry2_find(entries, nent, 0xD, 1);
- 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
- 		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
- 		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
- 
--	best = kvm_find_kvm_cpuid_features(vcpu);
-+	best = __kvm_find_kvm_cpuid_features(vcpu, vcpu->arch.cpuid_entries,
-+					     vcpu->arch.cpuid_nent);
- 	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
- 		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
- 		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
- 
- 	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
--		best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-+		best = cpuid_entry2_find(entries, nent, 0x1, 0);
- 		if (best)
- 			cpuid_entry_change(best, X86_FEATURE_MWAIT,
- 					   vcpu->arch.ia32_misc_enable_msr &
- 					   MSR_IA32_MISC_ENABLE_MWAIT);
- 	}
- }
-+
-+void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-+{
-+	__kvm_update_cpuid_runtime(vcpu, vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
-+}
- EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
- 
- static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-@@ -278,6 +292,8 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- {
- 	int r;
- 
-+	__kvm_update_cpuid_runtime(vcpu, e2, nent);
-+
- 	r = kvm_check_cpuid(e2, nent);
- 	if (r)
- 		return r;
-@@ -287,7 +303,6 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	vcpu->arch.cpuid_nent = nent;
- 
- 	kvm_update_kvm_cpuid_base(vcpu);
--	kvm_update_cpuid_runtime(vcpu);
- 	kvm_vcpu_after_set_cpuid(vcpu);
- 
- 	return 0;
--- 
-2.34.1
+So you do access the struct ap_guest object and its kvm member
+without the guests_lock being held. That is where things become very
+muddy to me.
 
+It looks to me that the kvm pointer is changed with both the
+guests_lock and the matrix_dev->lock held in write mode. And accessing
+such stuff read only is safe with either of the two locks held.
 
---=-=-=
-Content-Type: text/x-patch
-Content-Disposition: inline;
- filename=0003-KVM-x86-Partially-allow-KVM_SET_CPUID-2-after-KVM_RU.patch
+Thus I do believe that the general idea is viable. I've pointed that out
+in a later email.
 
-From f29f2c4e48540f3e1214a6ecdd49510465d2d234 Mon Sep 17 00:00:00 2001
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Wed, 12 Jan 2022 12:51:01 +0100
-Subject: [PATCH RFC 3/3] KVM: x86: Partially allow KVM_SET_CPUID{,2} after
- KVM_RUN for CPU hotplug
+But the information you give the unsuspecting reader to aid him in
+understanding our new locking scheme is severely lacking.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/cpuid.c | 69 +++++++++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/x86.c   | 19 ------------
- 2 files changed, 65 insertions(+), 23 deletions(-)
+> >
+> > [..]
+> >  
+> >> +struct ap_guest {
+> >> +	struct kvm *kvm;
+> >> +	struct list_head node;
+> >> +};
+> >> +
+> >>   /**
+> >>    * struct ap_matrix_dev - Contains the data for the matrix device.
+> >>    *
+> >> @@ -39,6 +44,9 @@
+> >>    *		single ap_matrix_mdev device. It's quite coarse but we don't
+> >>    *		expect much contention.
+> >>    * @vfio_ap_drv: the vfio_ap device driver
+> >> + * @guests_lock: r/w semaphore for protecting access to @guests
+> >> + * @guests:	list of guests (struct ap_guest) using AP devices bound to the
+> >> + *		vfio_ap device driver.  
+> > Please compare the above. Also if it is only about the access to the
+> > list, then you could drop the lock right after create, and not keep it
+> > till the very end of vfio_ap_mdev_set_kvm(). Right?  
+> 
+> That would be true if it only controlled access to the list, but as I
+> explained above, that is not its sole purpose.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 16f4083edeeb..0f130d686323 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -80,9 +80,11 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
- 	return NULL;
- }
- 
--static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
-+static int kvm_check_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *entries,
-+			   int nent, bool is_update)
- {
--	struct kvm_cpuid_entry2 *best;
-+	struct kvm_cpuid_entry2 *best, *e;
-+	int i;
- 
- 	/*
- 	 * The existing code assumes virtual address is 48-bit or 57-bit in the
-@@ -96,6 +98,58 @@ static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
- 			return -EINVAL;
- 	}
- 
-+	if (!is_update)
-+		return 0;
-+
-+	/*
-+	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
-+	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
-+	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
-+	 * faults due to reusing SPs/SPTEs. In practice no sane VMM mucks with
-+	 * the core vCPU model on the fly. It would've been better to forbid any
-+	 * KVM_SET_CPUID{,2} calls after KVM_RUN altogether but unfortunately
-+	 * some VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and they
-+	 * need to set CPUID to e.g. change [x2]APIC id. Implement an allowlist
-+	 * of CPUIDs which are allowed to change.
-+	 */
-+	for (i = 0; i < nent; i++) {
-+		e = &entries[i];
-+
-+		best = kvm_find_cpuid_entry(vcpu, e->function, e->index);
-+		if (!best)
-+			return -EINVAL;
-+
-+		switch (e->function) {
-+		case 0x1:
-+			/* Only initial LAPIC id is allowed to change */
-+			if (e->eax ^ best->eax || ((e->ebx ^ best->ebx) >> 24) ||
-+			    e->ecx ^ best->ecx || e->edx ^ best->edx)
-+				return -EINVAL;
-+			break;
-+		case 0x3:
-+			/* processor serial number */
-+		case 0x4:
-+			/* cache parameters */
-+		case 0xb:
-+		case 0x1f:
-+			/* x2APIC id and CPU topology */
-+		case 0x80000005:
-+			/* AMD l1 cache information */
-+		case 0x80000006:
-+			/* l2 cache information */
-+		case 0x8000001d:
-+			/* AMD cache topology */
-+		case 0x8000001e:
-+			/* AMD processor topology */
-+			break;
-+		default:
-+			if (e->eax ^ best->eax || e->ebx ^ best->ebx ||
-+			    e->ecx ^ best->ecx || e->edx ^ best->edx)
-+				return -EINVAL;
-+			break;
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -291,10 +345,11 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
-                         int nent)
- {
- 	int r;
-+	bool is_update = vcpu->arch.last_vmentry_cpu != -1;
- 
- 	__kvm_update_cpuid_runtime(vcpu, e2, nent);
- 
--	r = kvm_check_cpuid(e2, nent);
-+	r = kvm_check_cpuid(vcpu, e2, nent, is_update);
- 	if (r)
- 		return r;
- 
-@@ -303,7 +358,13 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	vcpu->arch.cpuid_nent = nent;
- 
- 	kvm_update_kvm_cpuid_base(vcpu);
--	kvm_vcpu_after_set_cpuid(vcpu);
-+
-+	/*
-+	 * KVM_SET_CPUID{,2} after KVM_RUN is not allowed to change vCPU features, see
-+	 * kvm_check_cpuid().
-+	 */
-+	if (!is_update)
-+		kvm_vcpu_after_set_cpuid(vcpu);
- 
- 	return 0;
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e50e97ac4408..285d563af856 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5148,17 +5148,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		struct kvm_cpuid __user *cpuid_arg = argp;
- 		struct kvm_cpuid cpuid;
- 
--		/*
--		 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
--		 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
--		 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
--		 * faults due to reusing SPs/SPTEs.  In practice no sane VMM mucks with
--		 * the core vCPU model on the fly, so fail.
--		 */
--		r = -EINVAL;
--		if (vcpu->arch.last_vmentry_cpu != -1)
--			goto out;
--
- 		r = -EFAULT;
- 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
- 			goto out;
-@@ -5169,14 +5158,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		struct kvm_cpuid2 __user *cpuid_arg = argp;
- 		struct kvm_cpuid2 cpuid;
- 
--		/*
--		 * KVM_SET_CPUID{,2} after KVM_RUN is forbidded, see the comment in
--		 * KVM_SET_CPUID case above.
--		 */
--		r = -EINVAL;
--		if (vcpu->arch.last_vmentry_cpu != -1)
--			goto out;
--
- 		r = -EFAULT;
- 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
- 			goto out;
--- 
-2.34.1
+Well, but guests is a member of struct ap_matrix_dev and not the whole
+list including all the nodes.
 
+> 
+> >
+> > In any case I'm skeptical about this whole struct ap_guest business. To
+> > me, it looks like something that just makes things more obscure and
+> > complicated without any real benefit.  
+> 
+> I'm open to other ideas, but you'll have to come up with a way
+> to take the kvm->lock before the matrix_mdev->lock in the
+> vfio_ap_mdev_probe_queue and vfio_ap_mdev_remove_queue
+> functions where we don't have access to the ap_matrix_mdev
+> object to which the APQN is assigned and has the pointer to the
+> kvm object.
+> 
+> In order to retrieve the matrix_mdev, we need the matrix_dev->lock.
+> In order to hot plug/unplug the queue, we need the kvm->lock.
+> There's your catch-22 that needs to be solved. This design is my
+> attempt to solve that.
+> 
 
---=-=-=--
+I agree that having a lock that we take before kvm->lock is taken,
+and another one that we take with the kvm->lock taken is a good idea.
 
+I was referring to having ap_guest objects which are separately
+allocated, and have a decoupled lifecycle. Please see above!
+
+Regards,
+Halil
+[..]
