@@ -2,122 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C758F48C280
-	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 11:49:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C269448C31A
+	for <lists+kvm@lfdr.de>; Wed, 12 Jan 2022 12:29:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352611AbiALKtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 05:49:13 -0500
-Received: from mga03.intel.com ([134.134.136.65]:11364 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239535AbiALKtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 05:49:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641984552; x=1673520552;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=/Ap0QBU3t/R1DSPsppRpZ66Vza8HREIl/QzjQ9in2CA=;
-  b=F852mrDD6MaVoebHZtss0jgBH+EoROfTSFlO1IsSKy09nuqnFGbydNQr
-   S4qspQGp9/rFSEmuDWlDvM/V1URMVDJFSu23mKLiKTsVf7XPKIAOviE18
-   07vhGIlI1VVHKvrpDx5ZUW8Gc+H9vpXHeI39gtluIl2dy12+ousH3M+rL
-   KX6rmxb+Xo87zk8NYBRAfX1dpxF/c1/qUKgGa9aZT6Qpr5IrIYZjAQqXk
-   6meyVTKyBU7Cyf7PErAXzp32ewbkHWi4Q6GxTYlQZVGMdl4wyOZRqlHfA
-   7NGNDFssOwulknnUowlqAR41e7cdN1Ay4tZeg/vaKjWO4AIKq0cHIJk6w
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10224"; a="243663661"
-X-IronPort-AV: E=Sophos;i="5.88,282,1635231600"; 
-   d="scan'208";a="243663661"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 02:49:11 -0800
-X-IronPort-AV: E=Sophos;i="5.88,282,1635231600"; 
-   d="scan'208";a="515442067"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 02:49:07 -0800
-Date:   Wed, 12 Jan 2022 19:00:01 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/6] KVM: x86: Remove WARN_ON in
- kvm_arch_check_processor_compat
-Message-ID: <20220112110000.GA10249@gao-cwp>
-References: <20211227081515.2088920-1-chao.gao@intel.com>
- <20211227081515.2088920-6-chao.gao@intel.com>
- <Ydy6aIyI3jFQvF0O@google.com>
- <BN9PR11MB5276DEA925C72AF585E7472C8C519@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Yd3fFxg3IjWPUIqH@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yd3fFxg3IjWPUIqH@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        id S1352859AbiALL3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 06:29:36 -0500
+Received: from mx411.baidu.com ([124.64.200.154]:52191 "EHLO mx421.baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S237766AbiALL3f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jan 2022 06:29:35 -0500
+X-Greylist: delayed 591 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Jan 2022 06:29:35 EST
+Received: from bjhw-sys-rpm015653cc5.bjhw.baidu.com (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
+        by mx421.baidu.com (Postfix) with ESMTP id EA0762F0053F;
+        Wed, 12 Jan 2022 19:19:40 +0800 (CST)
+Received: from localhost (localhost [127.0.0.1])
+        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id DFD79D9932;
+        Wed, 12 Jan 2022 19:19:40 +0800 (CST)
+From:   Li RongQing <lirongqing@baidu.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        rkrcmar@redhat.com, kvm@vger.kernel.org, joro@8bytes.org
+Subject: [PATCH] KVM: x86: fix kvm_vcpu_is_preempted
+Date:   Wed, 12 Jan 2022 19:19:40 +0800
+Message-Id: <1641986380-10199-1-git-send-email-lirongqing@baidu.com>
+X-Mailer: git-send-email 1.7.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 07:48:39PM +0000, Sean Christopherson wrote:
->On Tue, Jan 11, 2022, Tian, Kevin wrote:
->> > From: Sean Christopherson <seanjc@google.com>
->> > Sent: Tuesday, January 11, 2022 7:00 AM
->> > 
->> > On Mon, Dec 27, 2021, Chao Gao wrote:
->> > > kvm_arch_check_processor_compat() needn't be called with interrupt
->> > > disabled, as it only reads some CRs/MSRs which won't be clobbered
->> > > by interrupt handlers or softirq.
->> > >
->> > > What really needed is disabling preemption. No additional check is
->> > > added because if CONFIG_DEBUG_PREEMPT is enabled, smp_processor_id()
->> > > (right above the WARN_ON()) can help to detect any violation.
->> > 
->> > Hrm, IIRC, the assertion that IRQs are disabled was more about detecting
->> > improper usage with respect to KVM doing hardware enabling than it was
->> > about ensuring the current task isn't migrated.  E.g. as exhibited by patch
->> > 06, extra protections (disabling of hotplug in that case) are needed if
->> > this helper is called outside of the core KVM hardware enabling flow since
->> > hardware_enable_all() does its thing via SMP function call.
->> 
->> Looks the WARN_ON() was added by you. 😊
->
->Yeah, past me owes current me a beer.
->
->> commit f1cdecf5807b1a91829a2dc4f254bfe6bafd4776
->> Author: Sean Christopherson <sean.j.christopherson@intel.com>
->> Date:   Tue Dec 10 14:44:14 2019 -0800
->> 
->>     KVM: x86: Ensure all logical CPUs have consistent reserved cr4 bits
->> 
->>     Check the current CPU's reserved cr4 bits against the mask calculated
->>     for the boot CPU to ensure consistent behavior across all CPUs.
->> 
->>     Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> 
->> But it's unclear to me how this WARN_ON() is related to what the commit
->> msg tries to explain.
->
->Ya, the changelog and lack of a comment is awful.
->
->> When I read this code it's more like a sanity check on the assumption that it
->> is currently called in SMP function call which runs the said function with
->> interrupt disabled.
->
->Yes, and as above, that assertion was more about the helper not really being safe
->for general usage as opposed to wanting to detect use from preemptible context.
->If we end up keeping the WARN_ON, I'll happily write a comment explaining the
->point of the assertion.
+After support paravirtualized TLB shootdowns, steal_time.preempted
+includes not only KVM_VCPU_PREEMPTED, but also KVM_VCPU_FLUSH_TLB
 
-OK. I will do following changes to keep the WARN_ON():
-1. drop this patch
-2. disable interrupt before the call site in patch 6.
+and kvm_vcpu_is_preempted should test only with KVM_VCPU_PREEMPTED
+
+Fixes: 858a43aae2367 ("KVM: X86: use paravirtualized TLB Shootdown")
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+ arch/x86/kernel/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 59abbda..a9202d9 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -1025,8 +1025,8 @@ asm(
+ ".type __raw_callee_save___kvm_vcpu_is_preempted, @function;"
+ "__raw_callee_save___kvm_vcpu_is_preempted:"
+ "movq	__per_cpu_offset(,%rdi,8), %rax;"
+-"cmpb	$0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
+-"setne	%al;"
++"movb	" __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax), %al;"
++"andb	$" __stringify(KVM_VCPU_PREEMPTED) ", %al;"
+ "ret;"
+ ".size __raw_callee_save___kvm_vcpu_is_preempted, .-__raw_callee_save___kvm_vcpu_is_preempted;"
+ ".popsection");
+-- 
+2.9.4
+
