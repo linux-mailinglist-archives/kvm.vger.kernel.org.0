@@ -2,191 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A824948DF96
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 22:29:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D009248DFC7
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 22:43:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235460AbiAMV3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 16:29:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46748 "EHLO
+        id S235394AbiAMVnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 16:43:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232029AbiAMV3P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 16:29:15 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448ADC061574
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 13:29:15 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id c3so11517695pls.5
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 13:29:15 -0800 (PST)
+        with ESMTP id S235254AbiAMVnE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 16:43:04 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F8CC06161C;
+        Thu, 13 Jan 2022 13:43:03 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id o3so11765216pjs.1;
+        Thu, 13 Jan 2022 13:43:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=v66kQJPQ7cVIvaUPj32GpP29/XbkcAvgruVgXIm7Hck=;
-        b=dmT1uQrp7+MVBjrnFisZDuP9hfD/dPkKX+Wj8ki+Wm5H/AqrM6/C7DY0ZGI7k7a78J
-         lfBmQe9gqgqiSHYLjUNK2CMKJ+R+PFqUjSGVdbRChRTESTGGRmPJTukQFVQ8zQyV0/X+
-         gUGeI2fJe1I9oERuruuXLN6AXBTRCkVQq+VTXAjt03lFpS15qEIeg+MqHjnzYSua9tqf
-         AZn8ag2VVa1/g0C2yjc+dg5Sz+XMxhMINgeGVH8YDkw5QZc0W5R46hthT4EsHJ/oG39W
-         B9c4Hqp8nmukDxkzoRy0nlH5vErubnIBD0pS0lHFf0eNZToQeyiogUM+zCSu02G02Y7F
-         UkBQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=chMleOaZP5LLYybKEvqzaEnOntGIKeyxzv8RxEMS/pU=;
+        b=oOc3d8quuL+d364W7KNWQtMdgtUPWTOWcsp8cMWNvHDxrhgRW2/iqLsZTnFsASrpLY
+         68f6X/M1x+sO4IK/5z8GRukqDLM7CHf4rk2qB/zOlWi9G1eAn8tq+zp6RKqI0IPYCVAa
+         hUGAgdHmZB/tYYdmRvOmZ4JNl+7KaTpFtgGI83AIVn9odjlTyVtSNxGjna9I3MmeJxnP
+         LOezyDSKBJbwulklkuNOKWH9DWBVEMZVRl505lf6yiD2x6vDvZWbGecOdmYT0deqt9nE
+         7oj6Lo5rPX0mYmnixNE6GUUU70z4K2CwYIE2HI3Z8c69J6dTeJP+r1nvFkXQlYsjlWb9
+         Puog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=v66kQJPQ7cVIvaUPj32GpP29/XbkcAvgruVgXIm7Hck=;
-        b=fTBAY/sl3F1JfdejxPZc0kBONzdrMM4ZTQBYVW9PktJz3bV0rNRsICYQ2vSeubOYeE
-         HRnIxSdQi0xcHLiXFM3Sm8btWvvyE1jKJuDThCFoPWWX0GlSUfk+C55GPPWtfleF6F+j
-         E/S72D9Yneogh2vG8yUprHI8q7STyhDBr2xwtDYrOE0uY1WWd0OCNpdtxPs89qxysXE1
-         0+/jazzZuVxqkzLCqv51K3zbJ8NYCMM2cAWMuRDJYSBmOiMQ9fqyerglOpBDW/JDLgwf
-         mkKZAoyMM3yDhRoFVb9SmG8KeHxRKNBlyMvwmUsDCH0bLsRMJGB0i5nxmZQJI8lUr+Uu
-         2uVQ==
-X-Gm-Message-State: AOAM531Wau3FRVYE8AgnU/hW21gl1bXhEHAFVT1xZWR4mjZJs4hGP6Qq
-        is0v/tmdXRQO8E852M8ezYGAFQ==
-X-Google-Smtp-Source: ABdhPJy6OboZEza1UKblpwHYxX0CmsSLLxRzvzXs8rjBa0gryLiZRloWdOvGfOtaZ6fL8gfN7c8n/A==
-X-Received: by 2002:a17:902:6a89:b0:149:732e:d335 with SMTP id n9-20020a1709026a8900b00149732ed335mr6690282plk.136.1642109354299;
-        Thu, 13 Jan 2022 13:29:14 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id t21sm9288425pjq.9.2022.01.13.13.29.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jan 2022 13:29:13 -0800 (PST)
-Date:   Thu, 13 Jan 2022 21:29:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>
-Subject: Re: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC
- mode with APIC-write VM exit
-Message-ID: <YeCZpo+qCkvx5l5m@google.com>
-References: <20211231142849.611-1-guang.zeng@intel.com>
- <20211231142849.611-6-guang.zeng@intel.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=chMleOaZP5LLYybKEvqzaEnOntGIKeyxzv8RxEMS/pU=;
+        b=QHOYRG/nrfl4koWEJiDfqsnGR7cx6gwQoWB3GZrWGV5Jm+mGhgU2oJBOVGs1d91qFs
+         YKEalHAq/WhDO3wKhvAAiS8zdXatfsHpJGeNM11Yknr/paokwUvDUHQMS1EqVMpXSTpQ
+         8JCyWBHqGUEw0SsWI1aDjNvTNarBcn8bW0URJoDmK3TttnoZYva4YHb5nvGBAhftrWiV
+         oN8MSxY/igu+98YFqlmUpz+jxUppzDTy73SFLux8bq9KheaibR+lrzuir7LrZGEGQvmf
+         +gxLyfQcrmZV2rSPj7BhsihZT4GMwq0Il/WkiIqdgS8bHoO+pCI2mOqy3naSVNeCkFCm
+         Yo/A==
+X-Gm-Message-State: AOAM531lftljLgVSLheaLb+KOHwuzjHS5UQVSYczmzkfm72T5DlB4KDo
+        pPFmwv0thZJf359F6AMOKl0=
+X-Google-Smtp-Source: ABdhPJza7nTyxaYu7zMa+CS3ya6yZ7jUqwYQkOFFet8Qv/maBjKZ7v19D4TMGEeuYYibqr5z1N9W+A==
+X-Received: by 2002:a17:902:e790:b0:149:7a3f:826a with SMTP id cp16-20020a170902e79000b001497a3f826amr6595655plb.76.1642110183142;
+        Thu, 13 Jan 2022 13:43:03 -0800 (PST)
+Received: from ?IPV6:2600:8802:b00:4a48:c1d3:c1c0:b78e:9e36? ([2600:8802:b00:4a48:c1d3:c1c0:b78e:9e36])
+        by smtp.gmail.com with ESMTPSA id r26sm2983811pgu.65.2022.01.13.13.42.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jan 2022 13:43:02 -0800 (PST)
+Message-ID: <745c601f-c782-0904-f786-c9bfced8f11c@gmail.com>
+Date:   Thu, 13 Jan 2022 13:42:57 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211231142849.611-6-guang.zeng@intel.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH] driver core: platform: Rename platform_get_irq_optional()
+ to platform_get_irq_silent()
+Content-Language: en-US
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Mark Brown <broonie@kernel.org>
+Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
+        openipmi-developer@lists.sourceforge.net,
+        "David S. Miller" <davem@davemloft.net>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Sebastian Reichel <sre@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        Benson Leung <bleung@chromium.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        netdev@vger.kernel.org
+References: <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220110201014.mtajyrfcfznfhyqm@pengutronix.de> <YdyilpjC6rtz6toJ@lunn.ch>
+ <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
+ <20220112085009.dbasceh3obfok5dc@pengutronix.de>
+ <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+ <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
+ <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
+ <YeA7CjOyJFkpuhz/@sirena.org.uk>
+ <20220113194358.xnnbhsoyetihterb@pengutronix.de>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20220113194358.xnnbhsoyetihterb@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 31, 2021, Zeng Guang wrote:
-> In VMX non-root operation, new behavior applies to
 
-"new behavior" is ambiguous, it's not clear if it refers to new hardware behavior,
-new KVM behavior, etc...
 
-> virtualize WRMSR to vICR in x2APIC mode. Depending
-
-Please wrap at ~75 chars, this is too narrow.
-
-> on settings of the VM-execution controls, CPU would
-> produce APIC-write VM-exit following the 64-bit value
-> written to offset 300H on the virtual-APIC page(vICR).
-> KVM needs to retrieve the value written by CPU and
-> emulate the vICR write to deliver an interrupt.
+On 1/13/2022 11:43 AM, Uwe Kleine-König wrote:
+> The subsystems regulator, clk and gpio have the concept of a dummy
+> resource. For regulator, clk and gpio there is a semantic difference
+> between the regular _get() function and the _get_optional() variant.
+> (One might return the dummy resource, the other won't. Unfortunately
+> which one implements which isn't the same for these three.) The
+> difference between platform_get_irq() and platform_get_irq_optional() is
+> only that the former might emit an error message and the later won't.
 > 
-> Current KVM doesn't consider to handle the 64-bit setting
-> on vICR in trap-like APIC-write VM-exit. Because using
-> kvm_lapic_reg_write() to emulate writes to APIC_ICR requires
-> the APIC_ICR2 is already programmed correctly. But in the
-> above APIC-write VM-exit, CPU writes the whole 64 bits to
-> APIC_ICR rather than program higher 32 bits and lower 32
-> bits to APIC_ICR2 and APIC_ICR respectively. So, KVM needs
-> to retrieve the whole 64-bit value and program higher 32 bits
-> to APIC_ICR2 first.
-
-I think this is simply saying:
-
-  Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
-  i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
-  the WRMSR.  Add support for handling "nodecode" x2APIC writes, which were
-  previously impossible.
-
-  Note, x2APIC MSR writes are 64 bits wide.
-
-and then the shortlog can be:
-
-  KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode
-
-The "interrupt dispatch" part is quite confusing because it's not really germane
-to the change; yes, the vICR write does (eventually) dispatch an IRQ, but that
-has nothing to do with the code being modified.
-
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> To prevent people's expectations that there is a semantic difference
+> between these too, rename platform_get_irq_optional() to
+> platform_get_irq_silent() to make the actual difference more obvious.
+> 
+> The #define for the old name can and should be removed once all patches
+> currently in flux still relying on platform_get_irq_optional() are
+> fixed.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 > ---
->  arch/x86/kvm/lapic.c | 12 +++++++++---
->  arch/x86/kvm/lapic.h |  5 +++++
->  2 files changed, 14 insertions(+), 3 deletions(-)
+> Hello,
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index f206fc35deff..3ce7142ba00e 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2186,15 +2186,21 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
->  /* emulate APIC access in a trap manner */
->  void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
->  {
-> -	u32 val = 0;
-> +	struct kvm_lapic *apic = vcpu->arch.apic;
-> +	u64 val = 0;
->  
->  	/* hw has done the conditional check and inst decode */
->  	offset &= 0xff0;
->  
-> -	kvm_lapic_reg_read(vcpu->arch.apic, offset, 4, &val);
-> +	/* exception dealing with 64bit data on vICR in x2apic mode */
-> +	if ((offset == APIC_ICR) && apic_x2apic_mode(apic)) {
+> On Thu, Jan 13, 2022 at 02:45:30PM +0000, Mark Brown wrote:
+>> On Thu, Jan 13, 2022 at 12:08:31PM +0100, Uwe Kleine-König wrote:
+>>
+>>> This is all very unfortunate. In my eyes b) is the most sensible
+>>> sense, but the past showed that we don't agree here. (The most annoying
+>>> part of regulator_get is the warning that is emitted that regularily
+>>> makes customers ask what happens here and if this is fixable.)
+>>
+>> Fortunately it can be fixed, and it's safer to clearly specify things.
+>> The prints are there because when the description is wrong enough to
+>> cause things to blow up we can fail to boot or run messily and
+>> forgetting to describe some supplies (or typoing so they haven't done
+>> that) and people were having a hard time figuring out what might've
+>> happened.
+> 
+> Yes, that's right. I sent a patch for such a warning in 2019 and pinged
+> occationally. Still waiting for it to be merged :-\
+> (https://lore.kernel.org/r/20190625100412.11815-1-u.kleine-koenig@pengutronix.de)
+> 
+>>> I think at least c) is easy to resolve because
+>>> platform_get_irq_optional() isn't that old yet and mechanically
+>>> replacing it by platform_get_irq_silent() should be easy and safe.
+>>> And this is orthogonal to the discussion if -ENOXIO is a sensible return
+>>> value and if it's as easy as it could be to work with errors on irq
+>>> lookups.
+>>
+>> It'd certainly be good to name anything that doesn't correspond to one
+>> of the existing semantics for the API (!) something different rather
+>> than adding yet another potentially overloaded meaning.
+> 
+> It seems we're (at least) three who agree about this. Here is a patch
+> fixing the name.
 
-Sorry, I failed to reply to your response in the previous version.  I suggested
-a WARN_ON(offset != APIC_ICR), but you were concerned that apic_x2apic_mode()
-would be expensive to check before @offset.  I don't think that's a valid concern
-as apic_x2apic_mode() is simply:
+ From an API naming perspective this does not make much sense anymore 
+with the name chosen, it is understood that whent he function is called 
+platform_get_irq_optional(), optional applies to the IRQ. An optional 
+IRQ is something people can reason about because it makes sense.
 
-	apic->vcpu->arch.apic_base & X2APIC_ENABLE
+What is a a "silent" IRQ however? It does not apply to the object it is 
+trying to fetch to anymore, but to the message that may not be printed 
+in case the resource failed to be obtained, because said resource is 
+optional. Woah, that's quite a stretch.
 
-And is likely well-predicted by the CPU, especially in single tenant or pinned
-scenarios where the pCPU is running a single VM/vCPU, i.e. will amost never see
-X2APIC_ENABLE toggling.
+Following the discussion and original 2 patches set from Sergey, it is 
+not entirely clear to me anymore what is it that we are trying to fix.
 
-So I stand behind my previous feedback[*] that we should split on x2APIC.
-
-> +		val = kvm_lapic_get_reg64(apic, offset);
-> +		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(val>>32));
-> +	} else
-> +		kvm_lapic_reg_read(apic, offset, 4, &val);
-
-Needs curly braces.  But again, I stand behind my previous feedback that this
-would be better written as:
-
-        if (apic_x2apic_mode(apic)) {
-                if (WARN_ON_ONCE(offset != APIC_ICR))
-                        return 1;
-
-                kvm_lapic_reg_read(apic, offset, 8, &val);
-                kvm_lapic_reg_write64(apic, offset, val);
-        } else {
-                kvm_lapic_reg_read(apic, offset, 4, &val);
-                kvm_lapic_reg_write(apic, offset, val);
-        }
-
-after a patch (provided in earlier feedback) to introduce kvm_lapic_reg_write64().
-
-[*] https://lore.kernel.org/all/YTvcJZSd1KQvNmaz@google.com
-
->  	/* TODO: optimize to just emulate side effect w/o one more write */
-> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
-> +	kvm_lapic_reg_write(apic, offset, (u32)val);
->  }
->  EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
->  
+I nearly forgot, I would paint it blue, sky blue, not navy blue, not 
+light blue ;)
+-- 
+Florian
