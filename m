@@ -2,120 +2,320 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A62A48D1C6
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 06:08:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B12D648D204
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 06:33:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229517AbiAMFIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 00:08:53 -0500
-Received: from mx24.baidu.com ([111.206.215.185]:35832 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229456AbiAMFIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 00:08:52 -0500
-Received: from BJHW-Mail-Ex12.internal.baidu.com (unknown [10.127.64.35])
-        by Forcepoint Email with ESMTPS id D0CF2F038D8C2C6EE0B5;
-        Thu, 13 Jan 2022 12:52:40 +0800 (CST)
-Received: from bjkjy-mail-ex25.internal.baidu.com (172.31.50.41) by
- BJHW-Mail-Ex12.internal.baidu.com (10.127.64.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Thu, 13 Jan 2022 12:52:40 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- bjkjy-mail-ex25.internal.baidu.com (172.31.50.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2375.17; Thu, 13 Jan 2022 12:52:40 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.020; Thu, 13 Jan 2022 12:52:40 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Wang,Guangju" <wangguangju@baidu.com>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IFg4Njogc2V0IHZjcHUgcHJlZW1wdGVkIG9u?=
- =?gb2312?Q?ly_if_it_is_preempted?=
-Thread-Topic: [PATCH] KVM: X86: set vcpu preempted only if it is preempted
-Thread-Index: AQHYB7WMg7j2vnvXFkKy6dq5PabOWqxfHr2AgABDQICAAPSkQA==
-Date:   Thu, 13 Jan 2022 04:52:40 +0000
-Message-ID: <bb92391dc5de46ac87ff238faf875c7b@baidu.com>
-References: <1641988921-3507-1-git-send-email-lirongqing@baidu.com>
- <Yd7S5rEYZg8v93NX@hirez.programming.kicks-ass.net>
- <Yd8QR2KHDfsekvNg@google.com>
- <20220112213129.GO16608@worktop.programming.kicks-ass.net>
-In-Reply-To: <20220112213129.GO16608@worktop.programming.kicks-ass.net>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.206.28]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        id S229770AbiAMFdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 00:33:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229744AbiAMFdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 00:33:38 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3CBC06173F
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 21:33:38 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id m13so9183967pji.3
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 21:33:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=p+r0LPZOfGniF2N+vDyRSD/lUF/vLa2MZKw07kH77DU=;
+        b=SZXola/5bZftUkpaDVEqwhjFOzmbQ4qvJgirlkjTGO+p7XRCkKS0mIL+QCB+oBRQ0d
+         tbpDHOZVuU+eOTTIPdwJc2/lc5azw/P37zrp8XxHq9/WglqfsBkzfUMSWfAlKtJkHK5H
+         pF73lnEKuqYmguEZrk0ot0kx2MRFI6VND9TzMsF88+QD6IJ6a4bV/N/xf/OmhJmBzuDu
+         yP1A4kLVy0QHAfUA/X0Z5vZBXLcYShP5s7QPcXnbqvKieYhDJTJuvnTeBYmLwnV+XtFx
+         98Ve/5Hun9tjeK9nSBP7fhHmbelxDkYC/6CGldF0iB4JCYiiKc8S3dPWLuQt3VOBtT9u
+         C8pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=p+r0LPZOfGniF2N+vDyRSD/lUF/vLa2MZKw07kH77DU=;
+        b=wB+XYkBTETZoCdy1VcKwnktlUkkvA8Ka0qUzPrS61/wBt5/Z03T/NU3mlhTWplNFaU
+         F/c+QeVv8aQrHDG7VIiygijxNykjrGn5WomAJarkj4JmgAuYfHl2sJPEAp5zvshQ0XEQ
+         wat+5Sp5AP1pzGimZBKT98Fi9GlmVWkbtNffTPDPJiE8m5i5JTWLJDggDQm7qtQ9lQbY
+         hHZAIXXKcuxrVuSp3M9BYCC1u2zE2iB8Z5/t7ZgkUfQyyejhIbgNdsrMu9LgX3nSMJPj
+         TW8VnQ/LyWSYLoSfsy6Oi1XaqR6SSAN04N8A0hJ6ASEpK+O9ep7KSpJQCXV1o1Hxf4xB
+         RW1A==
+X-Gm-Message-State: AOAM53389iJFxZfnUliUOUjkeinVvYT6f0gh6nNfMIgyB+YvE2atQgx7
+        +yrkntcYUWTpU5WhRP6rnAlR9BstMWjgjY2cwxT+tA==
+X-Google-Smtp-Source: ABdhPJxRejhJ4rImaa5T0dvK3sqkItOKQW3Nq/2+rpgfD4lSO6ngdk1tncp/0Wak0SXUznMf9+X8ef+BRb0JTXBOn+Q=
+X-Received: by 2002:a05:6a00:ccf:b0:4ba:ea96:dff with SMTP id
+ b15-20020a056a000ccf00b004baea960dffmr2767397pfv.82.1642052017693; Wed, 12
+ Jan 2022 21:33:37 -0800 (PST)
 MIME-Version: 1.0
-X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex12_2022-01-13 12:52:40:847
+References: <20220110054042.1079932-1-reijiw@google.com> <YdwPCcZWD8Uc1eej@monolith.localdoman>
+ <CAAeT=Fz1KPbpmcSbukBuGWMJH=V_oXAJoaDHAen_Gy9Qswo_1Q@mail.gmail.com>
+ <875yqqtn5q.wl-maz@kernel.org> <Yd2sLbiw/XPCZe7q@monolith.localdoman>
+In-Reply-To: <Yd2sLbiw/XPCZe7q@monolith.localdoman>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 12 Jan 2022 21:33:21 -0800
+Message-ID: <CAAeT=Fx62SZJvQYfFWj2sA-pcvrghuh8dSGuAaAtYWnJ5T5HCA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
+ uninitialized vCPUs
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogUGV0ZXIgWmlqbHN0cmEgPHBldGVy
-ekBpbmZyYWRlYWQub3JnPg0KPiC3osvNyrG85DogMjAyMsTqMdTCMTPI1SA1OjMxDQo+IMrVvP7I
-yzogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+ILOty806IExpLFJv
-bmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT47IHBib256aW5pQHJlZGhhdC5jb207DQo+IHZr
-dXpuZXRzQHJlZGhhdC5jb207IHdhbnBlbmdsaUB0ZW5jZW50LmNvbTsgam1hdHRzb25AZ29vZ2xl
-LmNvbTsNCj4gdGdseEBsaW51dHJvbml4LmRlOyBicEBhbGllbjguZGU7IHg4NkBrZXJuZWwub3Jn
-OyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiBqb3JvQDhieXRlcy5vcmcNCj4g1vfM4jogUmU6IFtQ
-QVRDSF0gS1ZNOiBYODY6IHNldCB2Y3B1IHByZWVtcHRlZCBvbmx5IGlmIGl0IGlzIHByZWVtcHRl
-ZA0KPiANCj4gT24gV2VkLCBKYW4gMTIsIDIwMjIgYXQgMDU6MzA6NDdQTSArMDAwMCwgU2VhbiBD
-aHJpc3RvcGhlcnNvbiB3cm90ZToNCj4gPiBPbiBXZWQsIEphbiAxMiwgMjAyMiwgUGV0ZXIgWmlq
-bHN0cmEgd3JvdGU6DQo+ID4gPiBPbiBXZWQsIEphbiAxMiwgMjAyMiBhdCAwODowMjowMVBNICsw
-ODAwLCBMaSBSb25nUWluZyB3cm90ZToNCj4gPiA+ID4gdmNwdSBjYW4gc2NoZWR1bGUgb3V0IHdo
-ZW4gcnVuIGhhbHQgaW5zdHJ1Y3Rpb24sIGFuZCBzZXQgaXRzZWxmIHRvDQo+ID4gPiA+IElOVEVS
-UlVQVElCTEUgYW5kIHN3aXRjaCB0byBpZGxlIHRocmVhZCwgdmNwdSBzaG91bGQgbm90IGJlIHNl
-dA0KPiA+ID4gPiBwcmVlbXB0ZWQgZm9yIHRoaXMgY29uZGl0aW9uDQo+ID4gPg0KPiA+ID4gVWho
-bW0sIHdoeSBub3Q/IFdobyBzYXlzIHRoZSB2Y3B1IHdpbGwgcnVuIHRoZSBtb21lbnQgaXQgYmVj
-b21lcw0KPiA+ID4gcnVubmFibGUgYWdhaW4/IEFub3RoZXIgdGFzayBjb3VsZCBiZSB3b2tlbiB1
-cCBtZWFud2hpbGUgb2NjdXB5aW5nDQo+ID4gPiB0aGUgcmVhbCBjcHUuDQo+ID4NCj4gPiBIcm0s
-IGJ1dCB3aGVuIGVtdWxhdGluZyBITFQsIGUuZy4gZm9yIGFuIGlkbGluZyB2Q1BVLCBLVk0gd2ls
-bA0KPiA+IHZvbHVudGFyaWx5IHNjaGVkdWxlIG91dCB0aGUgdkNQVSBhbmQgbWFyayBpdCBhcyBw
-cmVlbXB0ZWQgZnJvbSB0aGUNCj4gPiBndWVzdCdzIHBlcnNwZWN0aXZlLiAgVGhlIHZhc3QgbWFq
-b3JpdHksIHByb2JhYmx5IGFsbCwgdXNhZ2Ugb2YNCj4gPiBzdGVhbF90aW1lLnByZWVtcHRlZCBl
-eHBlY3RzIGl0IHRvIHRydWx5IG1lYW4gInByZWVtcHRlZCIgYXMgb3Bwb3NlZCB0bw0KPiAibm90
-IHJ1bm5pbmciLg0KPiANCj4gTm8sIHRoZSBvcmlnaW5hbCB1c2UtY2FzZSB3YXMgbG9ja2luZyBh
-bmQgdGhhdCByZWFsbHkgY2FyZXMgYWJvdXQgcnVubmluZy4NCj4gDQo+IElmIHRoZSB2Q1BVIGlz
-bid0IHJ1bm5pbmcsIHdlIG11c3Qgbm90IGJ1c3ktd2FpdCBmb3IgaXQgZXRjLi4NCj4gDQo+IFNp
-bWlsYXIgdG8gdGhlIHNjaGVkdWxlciB1c2Ugb2YgaXQsIGlmIHRoZSB2Q1BVIGlzbid0IHJ1bm5p
-bmcsIHdlIHNob3VsZCBub3QNCj4gY29uc2lkZXIgaXQgc28uIEdldHRpbmcgdGhlIHZDUFUgdGFz
-ayBzY2hlZHVsZWQgYmFjayBvbiB0aGUgQ1BVIGNhbiB0YWtlIGEgJ2xvbmcnDQo+IHRpbWUuDQo+
-IA0KPiBJZiB5b3UgaGF2ZSBwaW5uZWQgdkNQVSB0aHJlYWRzIGFuZCBubyBvdmVyY29tbWl0LCB3
-ZSBoYXZlIG90aGVyIGtub2JzIHRvDQo+IGluZGljYXRlIHRoaXMgSSB0aGluay4NCg0KDQpJcyBp
-dCBwb3NzaWJsZSBpZiBndWVzdCBoYXMgS1ZNX0hJTlRTX1JFQUxUSU1FIGZlYXR1cmUsIGJ1dCBp
-dHMgSExUIGluc3RydWN0aW9uIGlzIGVtdWxhdGVkIGJ5IEtWTT8NCklmIGl0IGlzIHBvc3NpYmxl
-LCB0aGlzIGNvbmRpdGlvbiBoYXMgYmVlbiBwZXJmb3JtYW5jZSBkZWdyYWRhdGlvbiwgc2luY2Ug
-dmNwdV9pc19wcmVlbXB0ZWQgaXMgbm90IF9fa3ZtX3ZjcHVfaXNfcHJlZW1wdGVkLCB3aWxsIHJl
-dHVybiBmYWxzZS4NCg0KU2ltaWxhciwgZ3Vlc3QgaGFzIG5vcHZzcGluLCBidXQgSExUIGluc3Ry
-dWN0aW9uIGlzIGVtdWxhdGVkOyAgDQoNClNob3VsZCB3ZSBhZGp1c3QgdGhlIHNldHRpbmcgb2Yg
-cHZfb3BzLmxvY2sudmNwdV9pc19wcmVlbXB0ZWQgYXMgYmVsb3cNCkFuZCBJIHNlZSB0aGUgcGVy
-Zm9ybWFuY2UgYm9vc3Qgd2hlbiBndWVzdCBoYXMgbm9wdnNwaW4sIGJ1dCBITFQgaW5zdHJ1Y3Rp
-b24gaXMgZW11bGF0ZWQgd2l0aCBiZWxvdyBjaGFuZ2UNCg0KZGlmZiAtLWdpdCBhL2FyY2gveDg2
-L2tlcm5lbC9rdm0uYyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KaW5kZXggNTlhYmJkYS4uYjA2
-MWQxNyAxMDA2NDQNCi0tLSBhL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KKysrIGIvYXJjaC94ODYv
-a2VybmVsL2t2bS5jDQpAQCAtMTA0OCw2ICsxMDQ4LDExIEBAIHZvaWQgX19pbml0IGt2bV9zcGlu
-bG9ja19pbml0KHZvaWQpDQogICAgICAgICAgICAgICAgcmV0dXJuOw0KICAgICAgICB9DQoNCisg
-ICAgICAgaWYgKGt2bV9wYXJhX2hhc19mZWF0dXJlKEtWTV9GRUFUVVJFX1NURUFMX1RJTUUpKSB7
-DQorICAgICAgICAgICAgICAgcHZfb3BzLmxvY2sudmNwdV9pc19wcmVlbXB0ZWQgPQ0KKyAgICAg
-ICAgICAgICAgICAgICAgICAgUFZfQ0FMTEVFX1NBVkUoX19rdm1fdmNwdV9pc19wcmVlbXB0ZWQp
-Ow0KKyAgICAgICB9DQorDQogICAgICAgIC8qDQogICAgICAgICAqIERpc2FibGUgUFYgc3Bpbmxv
-Y2tzIGFuZCB1c2UgbmF0aXZlIHFzcGlubG9jayB3aGVuIGRlZGljYXRlZCBwQ1BVcw0KICAgICAg
-ICAgKiBhcmUgYXZhaWxhYmxlLg0KQEAgLTEwNzYsMTAgKzEwODEsNiBAQCB2b2lkIF9faW5pdCBr
-dm1fc3BpbmxvY2tfaW5pdCh2b2lkKQ0KICAgICAgICBwdl9vcHMubG9jay53YWl0ID0ga3ZtX3dh
-aXQ7DQogICAgICAgIHB2X29wcy5sb2NrLmtpY2sgPSBrdm1fa2lja19jcHU7DQoNCi0gICAgICAg
-aWYgKGt2bV9wYXJhX2hhc19mZWF0dXJlKEtWTV9GRUFUVVJFX1NURUFMX1RJTUUpKSB7DQotICAg
-ICAgICAgICAgICAgcHZfb3BzLmxvY2sudmNwdV9pc19wcmVlbXB0ZWQgPQ0KLSAgICAgICAgICAg
-ICAgICAgICAgICAgUFZfQ0FMTEVFX1NBVkUoX19rdm1fdmNwdV9pc19wcmVlbXB0ZWQpOw0KLSAg
-ICAgICB9DQogICAgICAgIC8qDQogICAgICAgICAqIFdoZW4gUFYgc3BpbmxvY2sgaXMgZW5hYmxl
-ZCB3aGljaCBpcyBwcmVmZXJyZWQgb3Zlcg0KICAgICAgICAgKiB2aXJ0X3NwaW5fbG9jaygpLCB2
-aXJ0X3NwaW5fbG9ja19rZXkncyB2YWx1ZSBpcyBtZWFuaW5nbGVzcy4NCg0KDQotTGkNCg==
+Hi Marc and Alex,
+
+On Tue, Jan 11, 2022 at 8:11 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi Marc,
+>
+> On Tue, Jan 11, 2022 at 01:30:41PM +0000, Marc Zyngier wrote:
+> > On Tue, 11 Jan 2022 07:37:57 +0000,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > Hi Alex,
+> > >
+> > > On Mon, Jan 10, 2022 at 2:48 AM Alexandru Elisei
+> > > <alexandru.elisei@arm.com> wrote:
+> > > >
+> > > > Hi Reiji,
+> > > >
+> > > > On Sun, Jan 09, 2022 at 09:40:41PM -0800, Reiji Watanabe wrote:
+> > > > > vcpu_allowed_register_width() checks if all the VCPUs are either
+> > > > > all 32bit or all 64bit.  Since the checking is done even for vCPUs
+> > > > > that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
+> > > > > the non-initialized vCPUs are erroneously treated as 64bit vCPU,
+> > > > > which causes the function to incorrectly detect a mixed-width VM.
+> > > > >
+> > > > > Fix vcpu_allowed_register_width() to skip the check for vCPUs that
+> > > > > are not initialized yet.
+> > > > >
+> > > > > Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+> > > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > > > ---
+> > > > >  arch/arm64/kvm/reset.c | 11 +++++++++++
+> > > > >  1 file changed, 11 insertions(+)
+> > > > >
+> > > > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > > > > index 426bd7fbc3fd..ef78bbc7566a 100644
+> > > > > --- a/arch/arm64/kvm/reset.c
+> > > > > +++ b/arch/arm64/kvm/reset.c
+> > > > > @@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> > > > >       if (kvm_has_mte(vcpu->kvm) && is32bit)
+> > > > >               return false;
+> > > > >
+> > > > > +     /*
+> > > > > +      * Make sure vcpu->arch.target setting is visible from others so
+> > > > > +      * that the width consistency checking between two vCPUs is done
+> > > > > +      * by at least one of them at KVM_ARM_VCPU_INIT.
+> > > > > +      */
+> > > > > +     smp_mb();
+> > > >
+> > > > From ARM DDI 0487G.a, page B2-146 ("Data Memory Barrier (DMB)"):
+> > > >
+> > > > "The DMB instruction is a memory barrier instruction that ensures the relative
+> > > > order of memory accesses before the barrier with memory accesses after the
+> > > > barrier."
+> > > >
+> > > > I'm going to assume from the comment that you are referring to completion of
+> > > > memory accesses ("Make sure [..] is visible from others"). Please correct me if
+> > > > I am wrong. In this case, DMB ensures ordering of memory accesses with regards
+> > > > to writes and reads, not *completion*.  Have a look at
+> > > > tools/memory-model/litmus-tests/MP+fencewmbonceonce+fencermbonceonce.litmus for
+> > > > the classic message passing example as an example of memory ordering.
+> > > > Message passing and other patterns are also explained in ARM DDI 0487G.a, page
+> > > > K11-8363.
+> > > >
+> > > > I'm not saying that your approach is incorrect, but the commit message should
+> > > > explain what memory accesses are being ordered relative to each other and why.
+> > >
+> > > Thank you so much for the review.
+> > > What I meant with the comment was:
+> > > ---
+> > >   DMB is used to make sure that writing @vcpu->arch.target, which is done
+> > >   by kvm_vcpu_set_target() before getting here, is visible to other PEs
+> > >   before the following kvm_for_each_vcpu iteration reads the other vCPUs'
+> > >   target field.
+> > > ---
+> > > Did the comment become more clear ?? (Or do I use DMB incorrectly ?)
+> > >
+> > > > > +
+> > > > >       /* Check that the vcpus are either all 32bit or all 64bit */
+> > > > >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> > > > > +             /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
+> > > > > +             if (tmp->arch.target == -1)
+> > > > > +                     continue;
+> > >
+> > > I just noticed DMB(ishld) is needed here to assure ordering between
+> > > reading tmp->arch.target and reading vcpu->arch.features for this fix.
+> > > Similarly, kvm_vcpu_set_target() needs DMB(ishst) to assure ordering
+> > > between writing vcpu->arch.features and writing vcpu->arch.target...
+> > > I am going to fix them in the v2 series.
+> >
+> > Yes, you'd need at least this, and preferably in their smp_rmb/wmb
+> > variants.
+> >
+> > However, this looks like a pretty fragile construct, as there are
+> > multiple paths where we can change target (including some error
+> > paths from the run loop).
+> >
+> > I'd rather all changes to target and the feature bits happen under the
+> > kvm->lock, and take that lock when checking for consistency in
+> > vcpu_allowed_register_width(), as this isn't a fast path. I wrote the
+> > following, which is obviously incomplete and as usual untested.
+>
+> I think this is the better approach, because we also want to make sure that
+> a PE observes changes to target and features as soon as they have been
+> made, to avoid situations where one PE sets the target and the 32bit
+> feature, and another PE reads the old values and skips the check, in which
+> case memory ordering is not enough.
+
+Thank you for the comments and the suggestion.
+I will look into fixing this based on the suggestion.
+
+Thanks,
+Reiji
+
+
+
+
+>
+> Thanks,
+> Alex
+>
+> >
+> > Thanks,
+> >
+> >       M.
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e4727dc771bf..42f2ab80646c 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1061,7 +1061,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+> >  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+> >                              const struct kvm_vcpu_init *init)
+> >  {
+> > -     unsigned int i, ret;
+> > +     unsigned int i;
+> > +     int ret = 0;
+> >       u32 phys_target = kvm_target_cpu();
+> >
+> >       if (init->target != phys_target)
+> > @@ -1074,32 +1075,46 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+> >       if (vcpu->arch.target != -1 && vcpu->arch.target != init->target)
+> >               return -EINVAL;
+> >
+> > +     /* Hazard against a concurent check of the target in kvm_reset_vcpu() */
+> > +     mutex_lock(&vcpu->kvm->lock);
+> > +
+> >       /* -ENOENT for unknown features, -EINVAL for invalid combinations. */
+> >       for (i = 0; i < sizeof(init->features) * 8; i++) {
+> >               bool set = (init->features[i / 32] & (1 << (i % 32)));
+> >
+> > -             if (set && i >= KVM_VCPU_MAX_FEATURES)
+> > -                     return -ENOENT;
+> > +             if (set && i >= KVM_VCPU_MAX_FEATURES) {
+> > +                     ret = -ENOENT;
+> > +                     break;
+> > +             }
+> >
+> >               /*
+> >                * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
+> >                * use the same feature set.
+> >                */
+> >               if (vcpu->arch.target != -1 && i < KVM_VCPU_MAX_FEATURES &&
+> > -                 test_bit(i, vcpu->arch.features) != set)
+> > -                     return -EINVAL;
+> > +                 test_bit(i, vcpu->arch.features) != set) {
+> > +                     ret = -EINVAL;
+> > +                     break;
+> > +             }
+> >
+> >               if (set)
+> >                       set_bit(i, vcpu->arch.features);
+> >       }
+> >
+> > -     vcpu->arch.target = phys_target;
+> > +     if (!ret)
+> > +             vcpu->arch.target = phys_target;
+> > +
+> > +     mutex_unlock(&vcpu->kvm->lock);
+> > +     if (ret)
+> > +             return ret;
+> >
+> >       /* Now we know what it is, we can reset it. */
+> >       ret = kvm_reset_vcpu(vcpu);
+> >       if (ret) {
+> > +             mutex_lock(&vcpu->kvm->lock);
+> >               vcpu->arch.target = -1;
+> >               bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> > +             mutex_unlock(&vcpu->kvm->lock);
+> >       }
+> >
+> >       return ret;
+> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > index ef78bbc7566a..fae88a703140 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -180,13 +180,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> >       if (kvm_has_mte(vcpu->kvm) && is32bit)
+> >               return false;
+> >
+> > -     /*
+> > -      * Make sure vcpu->arch.target setting is visible from others so
+> > -      * that the width consistency checking between two vCPUs is done
+> > -      * by at least one of them at KVM_ARM_VCPU_INIT.
+> > -      */
+> > -     smp_mb();
+> > -
+> >       /* Check that the vcpus are either all 32bit or all 64bit */
+> >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> >               /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
+> > @@ -222,14 +215,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >  {
+> >       struct vcpu_reset_state reset_state;
+> > -     int ret;
+> > +     int ret = -EINVAL;
+> >       bool loaded;
+> >       u32 pstate;
+> >
+> >       mutex_lock(&vcpu->kvm->lock);
+> > -     reset_state = vcpu->arch.reset_state;
+> > -     WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> > +     if (vcpu_allowed_register_width(vcpu)) {
+> > +             reset_state = vcpu->arch.reset_state;
+> > +             WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> > +             ret = 0;
+> > +     }
+> >       mutex_unlock(&vcpu->kvm->lock);
+> > +     if (ret)
+> > +             goto out;
+> >
+> >       /* Reset PMU outside of the non-preemptible section */
+> >       kvm_pmu_vcpu_reset(vcpu);
+> > @@ -257,11 +255,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >               }
+> >       }
+> >
+> > -     if (!vcpu_allowed_register_width(vcpu)) {
+> > -             ret = -EINVAL;
+> > -             goto out;
+> > -     }
+> > -
+> >       switch (vcpu->arch.target) {
+> >       default:
+> >               if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
