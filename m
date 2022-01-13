@@ -2,58 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2582348DDAD
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 19:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D14C48DE1E
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 20:29:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237471AbiAMS3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 13:29:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34676 "EHLO
+        id S230046AbiAMT3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 14:29:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237537AbiAMS3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 13:29:06 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 377A7C06173F
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 10:29:06 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id o12so5938410lfu.12
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 10:29:06 -0800 (PST)
+        with ESMTP id S231237AbiAMT3M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 14:29:12 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6E6C06161C
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 11:29:12 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id m21so768444pfd.3
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 11:29:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9PJ/86w6fMelDu16gGywyp00uJUFkTSIXc+6iRnYOrI=;
-        b=GbY5aJ9ARP4aJJ2clpUzOJ5t3iHurYtyL9uEyZ5VrF9mCyAJMXJinMrQL/+3ueWJgr
-         2maMWcVlyLgbRMp09PWrYXOkDWZB4lwQx54iq77V0JtmM+4F5HPXGExBBynpThuci7IR
-         qnWc/6oJV9SPIvDhfeTSefcuXbu8qkot8vuWI0A9aAeGL/S8r82b++E4ZLEcHcyWDKHW
-         z0JsomuJjljkhWS5QAsWDhM1ZQfZY6VuspWANwmgdFL4qq1qe9JalJ+OVPHGx0le2SmP
-         6hdKaU180R3CM4qnyBNmvJOF1+Sbb8nwH/YSJyleQ8MRRPAFZ2UKusROQKWWZQTTQZLQ
-         zfRw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ROVS5rBm3Cz2W7S8I9dH4k+dRH+0gu+Fwbo6sb8zAv4=;
+        b=qYxLeriBR4hEl0PAMbDC6uHko0lBwc7MNT6+tSu1ZVoUxbUJ8n44ouopnHLy/mz092
+         mz0sOLWk0wVlutM9QlUvbj+FYEzJBPkcGFOZlp7JELxPfbibtXdFoO9q4WKKi2Ykm0nl
+         +UgRytc99ed0b0jF0XFc2IF64mGrk+yito7s3BSv6GYy+6cyEdMUqKSil1L1ILha7YoP
+         raE0ZCCb443bMAIknGUdU1r3qHxZ7NGBRurlMZeql9L4KZp0UsH0FBohCimq36x5aBxN
+         i976s9+72rkrxev9bctJrT/2V3fi315+S40dE9xd9ib9eywhvjGcCzLMpC7u8f0o4aRO
+         F+qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9PJ/86w6fMelDu16gGywyp00uJUFkTSIXc+6iRnYOrI=;
-        b=WGzr7xJZ9E7R1sCgEua9eFOv6aQ63zAFA7gA2pIGs7/pEU60U0Bm+ZX4yRRxTilwlf
-         STFCfmQqJq4HIXgtmDtrNI/fdNsRLU7Q491dkeiuRWGsSh9TFvQrSB8IJObWHCju8NAu
-         2J6Pm2LelKgIbjJScgplRuK9b1hXPSVhLSuO518RKKKvm6AFWsqpjbPIWdhnGZtGs5Bu
-         Z1T/qL/xpYZIR8D1XO0S3scAssxruSzhSeQUFNrkp40/bH6DlfW+s73kXAFkx6WJl6/L
-         +0g3YQJaiC5IIurv2asyt6344pzutyvrbMTDR7cxYtaxCgdmP/y0kIKcz0IgE2r71JjR
-         IgzQ==
-X-Gm-Message-State: AOAM533zOhD/kYAUeSJJ6XBNhEm0HAeUok0BybbmkALR/jFvL9IGnZAK
-        hiXPjnquq4Guh8PbtjPtPSK41YOWreQVb1CT+Q7/KA==
-X-Google-Smtp-Source: ABdhPJyiohFQi0oaoBakOdVoCHuH4wamOKZAtPPGn1ZUiDorOwpG02nDDfQHxBsPotxlRgZZoK9MCJdozE/R0q2j62c=
-X-Received: by 2002:a19:c505:: with SMTP id w5mr4381505lfe.518.1642098544304;
- Thu, 13 Jan 2022 10:29:04 -0800 (PST)
-MIME-Version: 1.0
-References: <20220112215801.3502286-1-dmatlack@google.com> <20220112215801.3502286-2-dmatlack@google.com>
- <Yd9g1KIoNwUPtFrt@google.com> <CALzav=djDTBxvXEz3O4QQu-2VkOcMESkpxmWYJYKikiGQLwyUA@mail.gmail.com>
- <Yd9ySjsQFeHKnIDv@google.com> <CALzav=eWMOuuXog5Rk9FwSjQDfM8==qdEGjSp=u9xB3VhBm6qw@mail.gmail.com>
-In-Reply-To: <CALzav=eWMOuuXog5Rk9FwSjQDfM8==qdEGjSp=u9xB3VhBm6qw@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 13 Jan 2022 10:28:37 -0800
-Message-ID: <CALzav=e0tARVjFijerR7f9RgM6gaUzQa+GcAhrK8+9A45FfWZg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: x86/mmu: Fix write-protection of PTs mapped by
- the TDP MMU
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ROVS5rBm3Cz2W7S8I9dH4k+dRH+0gu+Fwbo6sb8zAv4=;
+        b=AdHqQvGsBir7yY+qzuJTziTmTpE5ele24YSgW1TyoqDRRjd6XPU5nQkmjJcTR2fO6H
+         7PKQGztYAToB6qGiOrAnlTdm9IvOxEiocnYbccB6Afg7eNZGATvUENOCnTVW1j8wi6x9
+         7Yjatsm/6MPXJ8EGCMBf+KF7UBHqm4S/Hkzgu2rPPGbKHWORlRc/1jAogLox7pCo1eZw
+         mcwflULH15YXp3IYC4BmJQCIT59zKX+4jvjSbDRN4Ll/2VTTGS2Z6eNLNu6jg9iKbr0n
+         6rQNmgGhyAfF1J+GpLPymP3OgCwaTLc9kHYQ8PHwmVkJVAf+omxsmgEXeT6rl/RWh9Hq
+         6TdA==
+X-Gm-Message-State: AOAM530kJcXA2oWFcUL3CnfwccfgklSGG7ONAa469iIq6IzZ4s63zLPs
+        nU8OG3GwhzmWuzdeyUEVzF/tzQ==
+X-Google-Smtp-Source: ABdhPJzp+3opgjvBAgLmiA+ZDVQGYD2H3ErTGoj7k05eePcJiZvAUhJhuN+yqFX0jKDuereypjnrHg==
+X-Received: by 2002:a63:7845:: with SMTP id t66mr5203707pgc.103.1642102151862;
+        Thu, 13 Jan 2022 11:29:11 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n26sm2818946pgb.91.2022.01.13.11.29.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 11:29:11 -0800 (PST)
+Date:   Thu, 13 Jan 2022 19:29:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -61,118 +57,65 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Ben Gardon <bgardon@google.com>,
         kvm list <kvm@vger.kernel.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Fix write-protection of PTs mapped by
+ the TDP MMU
+Message-ID: <YeB9gxIsjQNhE/21@google.com>
+References: <20220112215801.3502286-1-dmatlack@google.com>
+ <20220112215801.3502286-2-dmatlack@google.com>
+ <Yd9g1KIoNwUPtFrt@google.com>
+ <CALzav=djDTBxvXEz3O4QQu-2VkOcMESkpxmWYJYKikiGQLwyUA@mail.gmail.com>
+ <Yd9ySjsQFeHKnIDv@google.com>
+ <CALzav=eWMOuuXog5Rk9FwSjQDfM8==qdEGjSp=u9xB3VhBm6qw@mail.gmail.com>
+ <CALzav=e0tARVjFijerR7f9RgM6gaUzQa+GcAhrK8+9A45FfWZg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=e0tARVjFijerR7f9RgM6gaUzQa+GcAhrK8+9A45FfWZg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 9:04 AM David Matlack <dmatlack@google.com> wrote:
->
-> On Wed, Jan 12, 2022 at 4:29 PM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Jan 13, 2022, David Matlack wrote:
+> On Thu, Jan 13, 2022 at 9:04 AM David Matlack <dmatlack@google.com> wrote:
 > >
-> > On Wed, Jan 12, 2022, David Matlack wrote:
-> > > On Wed, Jan 12, 2022 at 3:14 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Wed, Jan 12, 2022, David Matlack wrote:
-> > > > > When the TDP MMU is write-protection GFNs for page table protection (as
-> > > > > opposed to for dirty logging, or due to the HVA not being writable), it
-> > > > > checks if the SPTE is already write-protected and if so skips modifying
-> > > > > the SPTE and the TLB flush.
-> > > > >
-> > > > > This behavior is incorrect because the SPTE may be write-protected for
-> > > > > dirty logging. This implies that the SPTE could be locklessly be made
-> > > > > writable on the next write access, and that vCPUs could still be running
-> > > > > with writable SPTEs cached in their TLB.
-> > > > >
-> > > > > Fix this by unconditionally setting the SPTE and only skipping the TLB
-> > > > > flush if the SPTE was already marked !MMU-writable or !Host-writable,
-> > > > > which guarantees the SPTE cannot be locklessly be made writable and no
-> > > > > vCPUs are running the writable SPTEs cached in their TLBs.
-> > > > >
-> > > > > Technically it would be safe to skip setting the SPTE as well since:
-> > > > >
-> > > > >   (a) If MMU-writable is set then Host-writable must be cleared
-> > > > >       and the only way to set Host-writable is to fault the SPTE
-> > > > >       back in entirely (at which point any unsynced shadow pages
-> > > > >       reachable by the new SPTE will be synced and MMU-writable can
-> > > > >       be safetly be set again).
-> > > > >
-> > > > >   and
-> > > > >
-> > > > >   (b) MMU-writable is never consulted on its own.
-> > > > >
-> > > > > And in fact this is what the shadow MMU does when write-protecting guest
-> > > > > page tables. However setting the SPTE unconditionally is much easier to
-> > > > > reason about and does not require a huge comment explaining why it is safe.
-> > > >
-> > > > I disagree.  I looked at the code+comment before reading the full changelog and
-> > > > typed up a response saying the code should be:
-> > > >
-> > > >                 if (!is_writable_pte(iter.old_spte) &&
-> > > >                     !spte_can_locklessly_be_made_writable(spte))
-> > > >                         break;
-> > > >
-> > > > Then I went read the changelog and here we are :-)
-> > > >
-> > > > I find that much more easier to grok, e.g. in plain English: "if the SPTE isn't
-> > > > writable and can't be made writable, there's nothing to do".
+> > On Wed, Jan 12, 2022 at 4:29 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > Oh interesting. I actually find that confusing because it can easily
+> > > > lead to the MMU-writable bit staying set. Here we are protecting GFNs
+> > > > and we're opting to leave the MMU-writable bit set. It takes a lot of
+> > > > digging to figure out that this is safe because if MMU-writable is set
+> > > > and the SPTE cannot be locklessly be made writable then it implies
+> > > > Host-writable is clear, and Host-writable can't be reset without
+> > > > syncing the all shadow pages reachable by the MMU. Oh and the
+> > > > MMU-writable bit is never consulted on its own (e.g. We never iterate
+> > > > through all SPTEs to find the ones that are !MMU-writable).
 > > >
-> > > Oh interesting. I actually find that confusing because it can easily
-> > > lead to the MMU-writable bit staying set. Here we are protecting GFNs
-> > > and we're opting to leave the MMU-writable bit set. It takes a lot of
-> > > digging to figure out that this is safe because if MMU-writable is set
-> > > and the SPTE cannot be locklessly be made writable then it implies
-> > > Host-writable is clear, and Host-writable can't be reset without
-> > > syncing the all shadow pages reachable by the MMU. Oh and the
-> > > MMU-writable bit is never consulted on its own (e.g. We never iterate
-> > > through all SPTEs to find the ones that are !MMU-writable).
-> >
-> > Ah, you've missed the other wrinkle: MMU-writable can bet set iff Host-writable
-> > is set.  In other words, the MMU-writable bit is never left set because it can't
-> > be set if spte_can_locklessly_be_made_writable() returns false.
+> > > Ah, you've missed the other wrinkle: MMU-writable can bet set iff Host-writable
+> > > is set.  In other words, the MMU-writable bit is never left set because it can't
+> > > be set if spte_can_locklessly_be_made_writable() returns false.
+> 
+> The changed_pte notifier looks like it clears Host-writable without
+> clearing MMU-writable. Specifically the call chain:
+> 
+> kvm_mmu_notifier_change_pte()
+>   kvm_set_spte_gfn()
+>     kvm_tdp_mmu_set_spte_gfn()
+>       set_spte_gfn()
+>         kvm_mmu_changed_pte_notifier_make_spte()
+> 
+> Is there some guarantee that old_spte is !MMU-writable at this point?
 
-The changed_pte notifier looks like it clears Host-writable without
-clearing MMU-writable. Specifically the call chain:
+Ugh, I misread that code, multiple times.  There's no guarantee, it was likely
+just missed when MMU-writable was introduced.
 
-kvm_mmu_notifier_change_pte()
-  kvm_set_spte_gfn()
-    kvm_tdp_mmu_set_spte_gfn()
-      set_spte_gfn()
-        kvm_mmu_changed_pte_notifier_make_spte()
+Note, you literally cannot hit that code path in current kernels.  See commit
+c13fda237f08 ("KVM: Assert that notifier count is elevated in .change_pte()").
+So whatever you do is effectively untestable.
 
-Is there some guarantee that old_spte is !MMU-writable at this point?
-If not I could easily change kvm_mmu_changed_pte_notifier_make_spte()
-to also clear MMU-writable and preserve the invariant.
+I really want to rip out .change_pte(), but I also don't want to do any performance
+testing to justify removing the code instead of fixing it proper, so it's hung
+around as a zombie...
 
+> If not I could easily change kvm_mmu_changed_pte_notifier_make_spte()
+> to also clear MMU-writable and preserve the invariant.
 
->
-> Ohhh I did miss that and yes that explains it. I'll send another
-> version of this patch that skips setting the SPTE unnecessarily.
->
-> >
-> > To reduce confusion, we can and probably should do:
-> >
-> > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> > index a4af2a42695c..bc691ff72cab 100644
-> > --- a/arch/x86/kvm/mmu/spte.h
-> > +++ b/arch/x86/kvm/mmu/spte.h
-> > @@ -316,8 +316,7 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
-> >
-> >  static inline bool spte_can_locklessly_be_made_writable(u64 spte)
-> >  {
-> > -       return (spte & shadow_host_writable_mask) &&
-> > -              (spte & shadow_mmu_writable_mask);
-> > +       return (spte & shadow_mmu_writable_mask);
-> >  }
-> >
-> >  static inline u64 get_mmio_spte_generation(u64 spte)
-> >
-> > Though it'd be nice to have a WARN somewhere to enforce that MMU-Writable isn't
-> > set without Host-writable.
-> >
-> > We could also rename the helper to is_mmu_writable_spte(), though I'm not sure
-> > that's actually better.
-> >
-> > Yet another option would be to invert the flag and make it shadow_mmu_pt_protected_mask
-> > or something, i.e. make it more explicitly a flag that says "this thing is write-protected
-> > for shadowing a page table".
+Yes, please.
