@@ -2,418 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B13C48D00B
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 02:15:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 354BF48D087
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 03:50:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbiAMBPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 20:15:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54524 "EHLO
+        id S231808AbiAMCuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 21:50:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231230AbiAMBPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 20:15:09 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0F01C06173F
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 17:15:08 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id ik6-20020a170902ab0600b0014a1e5aab34so4296735plb.21
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 17:15:08 -0800 (PST)
+        with ESMTP id S231804AbiAMCuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jan 2022 21:50:05 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0F2C06173F
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 18:50:04 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id ie23-20020a17090b401700b001b38a5318easo8804042pjb.2
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 18:50:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=60alse+Xj9Oru3Lgzl7M06omRFjVAPtZkCCTmXOK1gs=;
-        b=pZti8aIoqweXKEfg/pqrEs3+JqQYnGZBHsyI+dT7ElFEnQAWvDQOdfvvPRSQqQoGnw
-         71Ggct88kOVRYeLPCxLaOzHCU8GnjlREHkgGrGCjGGRlO7AN8Trhw0v7jssR4cIIxXPp
-         3tBSsOl6te2EwHS5TolaZnsscCfGCBfNaLL939tUzQ2zkT0EduTStXxYj1zbgjSYlmpk
-         xK8OGWFdy5VeP7WKkoNrIL3GuYFi106dKfkrvZVPrM1LAERc6B8W0mD2MUqQ0zY7GRz+
-         1R5QZl0ZLBu8q5i5qtrgFgaZvPgJXXq+arC2NmLYJnej5LC1lk1OE8FT9ebalCvGuScz
-         f99w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ImhU/fmG/HToy1dr2YDqNHAIq2uq2Uny1Xfg58LVMDU=;
+        b=Gigq102AAzuRtLukWWkUBX0D17ljeF9+2fsUkpCmhbJgmQkUkSKzzvCSbUiCBcHKeb
+         y7TNSBhEeZ+YZ/ncbylr2ahjiafDpXtM+9VTFqpAsdirorLmP3+taH2Rkd/2sJ4bBlZM
+         5NF65ElgZmuZrLnANwZouDTaEPq5WXtUxlwfj8nzgB6/12khDixcXKBmHVAK0lrNgb8v
+         OI4XKGyy9TitatLLBjPfSxWwVozS2RX5bZsg+kkrVTOjmG2Qvd/u0UpZxgp879l6KxUs
+         /wA1jJkCfBvCNla1Dfby1G+cFQsSS+qTCCrgb6VWeio4d31tEvOyeWV3vI/VJNV9z26R
+         W+EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=60alse+Xj9Oru3Lgzl7M06omRFjVAPtZkCCTmXOK1gs=;
-        b=XqSUBwLwowT2AFP+aaXkVGWChodoACmm9vt2Lgehq0ePuXgfivZ00hgiQXPTvSMPab
-         iR5IETLDsuJ0gxEMAHhrztVGxvI5shMmP2SmLgusO7nL9SJBJrGgRLfnGJ117v9TDypB
-         gKTBp3N1C6L5aH+/428y23ya7i2z+cHokFjUSLmoXEvnCjZXaXtUo/6clVn++2yCGvHf
-         Zw/E72xu9qbh0EGkHM8G84j/NpzhhkHjZUt5hs84CMRfm5rGkIGX590UrtZYAIKBBycu
-         oDpGlvYiYQhVmpyW7Zc9CLweVxONHx7D2L70Z5u1+xv/NTM5VX3dVpZGgX0+XxAn8c5Z
-         N9zQ==
-X-Gm-Message-State: AOAM532AdgmH2vA2+75cyMB4/Npd5s4RFfOyt2jSSrAiopSD9w7iwimb
-        wUMF7k6ye/3FLW3h7Qa69DBvfzGfK6D8E7doYNHnSNKoXkvwWxxBP3JnWGMSgSxKIaYcByXQJyD
-        FV5/7Z8ty3GOpfvhg8ykvdgxNjKLHL9vX/kAAr9lpovAr7nDwtch7y2c8i4VPXWk=
-X-Google-Smtp-Source: ABdhPJyzi6NObxTOXmM+1xnmLw73jPz4pqwVmcoOfvF5InCGVdD5wY7XZJZauIBp/hemLTayNkfGei7Lhni78w==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a17:90a:410a:: with SMTP id
- u10mr228971pjf.1.1642036507886; Wed, 12 Jan 2022 17:15:07 -0800 (PST)
-Date:   Wed, 12 Jan 2022 17:14:53 -0800
-In-Reply-To: <20220113011453.3892612-1-jmattson@google.com>
-Message-Id: <20220113011453.3892612-7-jmattson@google.com>
-Mime-Version: 1.0
-References: <20220113011453.3892612-1-jmattson@google.com>
-X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [PATCH 6/6] selftests: kvm/x86: Add test for KVM_SET_PMU_EVENT_FILTER
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ImhU/fmG/HToy1dr2YDqNHAIq2uq2Uny1Xfg58LVMDU=;
+        b=lGdx8BqbQxm9Zz7n91XUN8+AGx+qbme7fdl3hI695r7gRFp/85kndDPS8H1H9/7guH
+         Y1jz2XB1cOoWdOSLVJ70HIlcvW3P5ker008d4/f+iJHlaCoPmKy+oXUE4VGfUL8Lf2t1
+         VuRKfpsUTer0+LYAFbX0Y7nxlaXbbML+kYTUNAluERqh+tC7fjoKnZxhHvvTihnk4qpe
+         6gmyyHc2bTnoWWQxt6DdBy9/AR3w4tAvAkRgGJMahl4hRymAxIvxXvqQ+i9WRS15kFkq
+         xEkd18KWP24ayt94LbcdPIlvozePsJCWrEopmuHFt1BI/x5ecudHrX+o1aqBGLvIQGEF
+         iTgg==
+X-Gm-Message-State: AOAM533xgl9xIk4DhTirpdPcRqXg4T8p+cUEPDFgDZyFxjpCahzzCrrb
+        mk1HGN3HqByF2HqD2S/S4hgw1A==
+X-Google-Smtp-Source: ABdhPJwOm8yJobDTRYmQRBuNHnS2U4QbUjj11RF+wet+br6fkzc7s74WO9DpP5GSP2MDEwKJtbONgQ==
+X-Received: by 2002:a17:90b:4381:: with SMTP id in1mr2933797pjb.40.1642042204018;
+        Wed, 12 Jan 2022 18:50:04 -0800 (PST)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id f125sm892919pfa.28.2022.01.12.18.50.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jan 2022 18:50:03 -0800 (PST)
+Date:   Wed, 12 Jan 2022 18:49:59 -0800
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [RFC PATCH 0/3] ARM64: Guest performance improvement during dirty
+Message-ID: <Yd+TV4Bkhzpnpx8N@google.com>
+References: <20220110210441.2074798-1-jingzhangos@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220110210441.2074798-1-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that the PMU event filter works as expected.
+Hi Jing,
 
-Note that the virtual PMU doesn't work as expected on AMD Zen CPUs (an
-intercepted rdmsr is counted as a retired branch instruction), but the
-PMU event filter does work.
+On Mon, Jan 10, 2022 at 09:04:38PM +0000, Jing Zhang wrote:
+> This patch is to reduce the performance degradation of guest workload during
+> dirty logging on ARM64. A fast path is added to handle permission relaxation
+> during dirty logging. The MMU lock is replaced with rwlock, by which all
+> permision relaxations on leaf pte can be performed under the read lock. This
+> greatly reduces the MMU lock contention during dirty logging. With this
+> solution, the source guest workload performance degradation can be improved
+> by more than 60%.
+> 
+> Problem:
+>   * A Google internal live migration test shows that the source guest workload
+>   performance has >99% degradation for about 105 seconds, >50% degradation
+>   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+>   This shows that most of the time, the guest workload degradtion is above
+>   99%, which obviously needs some improvement compared to the test result
+>   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+>   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB
+>   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB
+> 
+> Analysis:
+>   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+>     the number of contentions of MMU lock and the "dirty memory time" on
+>     various VM spec.
+>     By using test command
+>     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
+>     Below are the results:
+>     +-------+------------------------+-----------------------+
+>     | #vCPU | dirty memory time (ms) | number of contentions |
+>     +-------+------------------------+-----------------------+
+>     | 1     | 926                    | 0                     |
+>     +-------+------------------------+-----------------------+
+>     | 2     | 1189                   | 4732558               |
+>     +-------+------------------------+-----------------------+
+>     | 4     | 2503                   | 11527185              |
+>     +-------+------------------------+-----------------------+
+>     | 8     | 5069                   | 24881677              |
+>     +-------+------------------------+-----------------------+
+>     | 16    | 10340                  | 50347956              |
+>     +-------+------------------------+-----------------------+
+>     | 32    | 20351                  | 100605720             |
+>     +-------+------------------------+-----------------------+
+>     | 64    | 40994                  | 201442478             |
+>     +-------+------------------------+-----------------------+
+> 
+>   * From the test results above, the "dirty memory time" and the number of
+>     MMU lock contention scale with the number of vCPUs. That means all the
+>     dirty memory operations from all vCPU threads have been serialized by
+>     the MMU lock. Further analysis also shows that the permission relaxation
+>     during dirty logging is where vCPU threads get serialized.
+> 
+> Solution:
+>   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+>     the dirty-bit solution for dirty logging is much complicated compared to
+>     the write-protection solution. The straight way to reduce the guest
+>     performance degradation is to enhance the concurrency for the permission
+>     fault path during dirty logging.
+>   * In this patch, we only put leaf PTE permission relaxation for dirty
+>     logging under read lock, all others would go under write lock.
+>     Below are the results based on the solution:
+>     +-------+------------------------+
+>     | #vCPU | dirty memory time (ms) |
+>     +-------+------------------------+
+>     | 1     | 803                    |
+>     +-------+------------------------+
+>     | 2     | 843                    |
+>     +-------+------------------------+
+>     | 4     | 942                    |
+>     +-------+------------------------+
+>     | 8     | 1458                   |
+>     +-------+------------------------+
+>     | 16    | 2853                   |
+>     +-------+------------------------+
+>     | 32    | 5886                   |
+>     +-------+------------------------+
+>     | 64    | 12190                  |
+>     +-------+------------------------+
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/pmu_event_filter_test.c        | 310 ++++++++++++++++++
- 3 files changed, 312 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+Just curious, do yo know why is time still doubling (roughly) with the
+number of cpus? maybe you performed another experiment or have some
+guess(es).
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 8c129961accf..7834e03ab159 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -22,6 +22,7 @@
- /x86_64/mmio_warning_test
- /x86_64/mmu_role_test
- /x86_64/platform_info_test
-+/x86_64/pmu_event_filter_test
- /x86_64/set_boot_cpu_id
- /x86_64/set_sregs_test
- /x86_64/sev_migrate_tests
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c407ebbec2c1..899413a6588f 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -56,6 +56,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
- TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
- TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
-+TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-new file mode 100644
-index 000000000000..d879a4b92fae
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -0,0 +1,310 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Test for x86 KVM_SET_PMU_EVENT_FILTER.
-+ *
-+ * Copyright (C) 2022, Google LLC.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ *
-+ * Verifies the expected behavior of allow lists and deny lists for
-+ * virtual PMU events.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+/*
-+ * In lieue of copying perf_event.h into tools...
-+ */
-+#define ARCH_PERFMON_EVENTSEL_ENABLE	BIT(22)
-+#define ARCH_PERFMON_EVENTSEL_OS	BIT(17)
-+
-+#define VCPU_ID 0
-+#define NUM_BRANCHES 42
-+
-+/*
-+ * This is how the event selector and unit mask are stored in an AMD
-+ * core performance event-select register. Intel's format is similar,
-+ * but the event selector is only 8 bits.
-+ */
-+#define EVENT(select, umask) ((select & 0xf00UL) << 24 | (select & 0xff) | \
-+			      (umask & 0xff) << 8)
-+
-+/*
-+ * "Branch instructions retired", from the Intel SDM, volume 3,
-+ * "Pre-defined Architectural Performance Events."
-+ */
-+
-+#define INTEL_BR_RETIRED EVENT(0xc4, 0)
-+
-+/*
-+ * "Retired branch instructions", from Processor Programming Reference
-+ * (PPR) for AMD Family 17h Model 01h, Revision B1 Processors,
-+ * Preliminary Processor Programming Reference (PPR) for AMD Family
-+ * 17h Model 31h, Revision B0 Processors, and Preliminary Processor
-+ * Programming Reference (PPR) for AMD Family 19h Model 01h, Revision
-+ * B1 Processors Volume 1 of 2
-+ */
-+
-+#define AMD_ZEN_BR_RETIRED EVENT(0xc2, 0)
-+
-+/*
-+ * This event list comprises Intel's eight architectural events plus
-+ * AMD's "branch instructions retired" for Zen[123].
-+ */
-+static const uint64_t event_list[] = {
-+	EVENT(0x3c, 0),
-+	EVENT(0xc0, 0),
-+	EVENT(0x3c, 1),
-+	EVENT(0x2e, 0x4f),
-+	EVENT(0x2e, 0x41),
-+	EVENT(0xc4, 0),
-+	EVENT(0xc5, 0),
-+	EVENT(0xa4, 1),
-+	AMD_ZEN_BR_RETIRED,
-+};
-+
-+static void intel_guest_code(void)
-+{
-+	uint64_t br0, br1;
-+
-+	for (;;) {
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+		wrmsr(MSR_P6_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | INTEL_BR_RETIRED);
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 1);
-+		br0 = rdmsr(MSR_IA32_PMC0);
-+		__asm__ __volatile__("loop ."
-+				     : "=c"((int){0})
-+				     : "0"(NUM_BRANCHES));
-+		br1 = rdmsr(MSR_IA32_PMC0);
-+		GUEST_SYNC(br1 - br0);
-+	}
-+}
-+
-+/*
-+ * To avoid needing a check for CPUID.80000001:ECX.PerfCtrExtCore[bit
-+ * 23], this code uses the always-available, legacy K7 PMU MSRs, which
-+ * alias to the first four of the six extended core PMU MSRs.
-+ */
-+static void amd_guest_code(void)
-+{
-+	uint64_t br0, br1;
-+
-+	for (;;) {
-+		wrmsr(MSR_K7_EVNTSEL0, 0);
-+		wrmsr(MSR_K7_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | AMD_ZEN_BR_RETIRED);
-+		br0 = rdmsr(MSR_K7_PERFCTR0);
-+		__asm__ __volatile__("loop ."
-+				     : "=c"((int){0})
-+				     : "0"(NUM_BRANCHES));
-+		br1 = rdmsr(MSR_K7_PERFCTR0);
-+		GUEST_SYNC(br1 - br0);
-+	}
-+}
-+
-+static uint64_t test_branches_retired(struct kvm_vm *vm)
-+{
-+	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+	struct ucall uc;
-+
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+	get_ucall(vm, VCPU_ID, &uc);
-+	TEST_ASSERT(uc.cmd == UCALL_SYNC,
-+		    "Received ucall other than UCALL_SYNC: %lu", uc.cmd);
-+	return uc.args[1];
-+}
-+
-+static struct kvm_pmu_event_filter *make_pmu_event_filter(uint32_t nevents)
-+{
-+	struct kvm_pmu_event_filter *f;
-+	int size = sizeof(*f) + nevents * sizeof(f->events[0]);
-+
-+	f = malloc(size);
-+	TEST_ASSERT(f, "Out of memory");
-+	memset(f, 0, size);
-+	f->nevents = nevents;
-+	return f;
-+}
-+
-+static struct kvm_pmu_event_filter *event_filter(uint32_t action)
-+{
-+	struct kvm_pmu_event_filter *f;
-+	int i;
-+
-+	f = make_pmu_event_filter(ARRAY_SIZE(event_list));
-+	f->action = action;
-+	for (i = 0; i < ARRAY_SIZE(event_list); i++)
-+		f->events[i] = event_list[i];
-+
-+	return f;
-+}
-+
-+static struct kvm_pmu_event_filter *remove_event(struct kvm_pmu_event_filter *f,
-+						 uint64_t event)
-+{
-+	bool found = false;
-+	int i;
-+
-+	for (i = 0; i < f->nevents; i++) {
-+		if (found)
-+			f->events[i - 1] = f->events[i];
-+		else
-+			found = f->events[i] == event;
-+	}
-+	if (found)
-+		f->nevents--;
-+	return f;
-+}
-+
-+static void test_no_filter(struct kvm_vm *vm)
-+{
-+	uint64_t count = test_branches_retired(vm);
-+
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
-+static uint64_t test_with_filter(struct kvm_vm *vm,
-+				 struct kvm_pmu_event_filter *f)
-+{
-+	vm_ioctl(vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
-+	return test_branches_retired(vm);
-+}
-+
-+static void test_member_deny_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-+	uint64_t count = test_with_filter(vm, f);
-+
-+	free(f);
-+	if (count)
-+		pr_info("%s: Branch instructions retired = %lu (expected 0)\n",
-+			__func__, count);
-+	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
-+}
-+
-+static void test_member_allow_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
-+	uint64_t count = test_with_filter(vm, f);
-+
-+	free(f);
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
-+static void test_not_member_deny_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-+	uint64_t count;
-+
-+	remove_event(f, INTEL_BR_RETIRED);
-+	remove_event(f, AMD_ZEN_BR_RETIRED);
-+	count = test_with_filter(vm, f);
-+	free(f);
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
-+static void test_not_member_allow_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
-+	uint64_t count;
-+
-+	remove_event(f, INTEL_BR_RETIRED);
-+	remove_event(f, AMD_ZEN_BR_RETIRED);
-+	count = test_with_filter(vm, f);
-+	free(f);
-+	if (count)
-+		pr_info("%s: Branch instructions retired = %lu (expected 0)\n",
-+			__func__, count);
-+	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
-+}
-+
-+/*
-+ * Note that CPUID leaf 0xa is Intel-specific. This leaf should be
-+ * clear on AMD hardware.
-+ */
-+static bool vcpu_supports_intel_br_retired(void)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_cpuid2 *cpuid;
-+
-+	cpuid = kvm_get_supported_cpuid();
-+	entry = kvm_get_supported_cpuid_index(0xa, 0);
-+	return entry &&
-+		(entry->eax & 0xff) &&
-+		(entry->eax >> 24) > 5 &&
-+		!(entry->ebx & BIT(5));
-+}
-+
-+/*
-+ * Determining AMD support for a PMU event requires consulting the AMD
-+ * PPR for the CPU or reference material derived therefrom.
-+ */
-+static bool vcpu_supports_amd_zen_br_retired(void)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_cpuid2 *cpuid;
-+
-+	cpuid = kvm_get_supported_cpuid();
-+	entry = kvm_get_supported_cpuid_index(1, 0);
-+	return entry &&
-+		((x86_family(entry->eax) == 0x17 &&
-+		  (x86_model(entry->eax) == 1 ||
-+		   x86_model(entry->eax) == 0x31)) ||
-+		 (x86_family(entry->eax) == 0x19 &&
-+		  x86_model(entry->eax) == 1));
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	void (*guest_code)(void) = NULL;
-+	struct kvm_vm *vm;
-+	int r;
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	r = kvm_check_cap(KVM_CAP_PMU_EVENT_FILTER);
-+	if (!r) {
-+		print_skip("KVM_CAP_PMU_EVENT_FILTER not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	if (vcpu_supports_intel_br_retired())
-+		guest_code = intel_guest_code;
-+	else if (vcpu_supports_amd_zen_br_retired())
-+		guest_code = amd_guest_code;
-+
-+	if (!guest_code) {
-+		print_skip("Branch instructions retired not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	test_no_filter(vm);
-+	test_member_deny_list(vm);
-+	test_member_allow_list(vm);
-+	test_not_member_deny_list(vm);
-+	test_not_member_allow_list(vm);
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
--- 
-2.34.1.575.g55b058a8bb-goog
+Thanks,
+Ricardo
 
+>     All "dirty memory time" have been reduced by more than 60% when the
+>     number of vCPU grows.
+>     
+> ---
+> 
+> Jing Zhang (3):
+>   KVM: arm64: Use read/write spin lock for MMU protection
+>   KVM: arm64: Add fast path to handle permission relaxation during dirty
+>     logging
+>   KVM: selftests: Add vgic initialization for dirty log perf test for
+>     ARM
+> 
+>  arch/arm64/include/asm/kvm_host.h             |  2 +
+>  arch/arm64/kvm/mmu.c                          | 86 +++++++++++++++----
+>  .../selftests/kvm/dirty_log_perf_test.c       | 10 +++
+>  3 files changed, 80 insertions(+), 18 deletions(-)
+> 
+> 
+> base-commit: fea31d1690945e6dd6c3e89ec5591490857bc3d4
+> -- 
+> 2.34.1.575.g55b058a8bb-goog
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
