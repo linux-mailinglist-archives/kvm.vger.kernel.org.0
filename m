@@ -2,93 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E133648DBCB
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 17:30:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7286C48DBDE
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 17:34:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236708AbiAMQa5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 11:30:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21292 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236686AbiAMQa5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 11:30:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642091455;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4H2G/AcFCWNIo4a7X3Hpex/LEo4UsnyCD4gzRSNQTAQ=;
-        b=iS7qhr2ZU2Jf7Q/u02AJ/TnxnjtKJPDFFN4B6uGiWsvrdpSdxbtNZAOHgWTbP0uuxFfdo8
-        jYMedgFWvEUzQ3uoVJRTvR/D6EYLm+q3qehToo0vjKG/JD/PkzFv/lMaBmWiamFiQglO73
-        /jL/3ta2iN/v7MVaW8iSzU1lNpLYlgQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-498-Ax1e_eeJPauRyoBTaav1KA-1; Thu, 13 Jan 2022 11:30:54 -0500
-X-MC-Unique: Ax1e_eeJPauRyoBTaav1KA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D54810AF8C2;
-        Thu, 13 Jan 2022 16:30:53 +0000 (UTC)
-Received: from starship (unknown [10.40.192.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 95131858A0;
-        Thu, 13 Jan 2022 16:30:50 +0000 (UTC)
-Message-ID: <d3cc3cd1a90d7ee9a31e40fbe2db9f3f338d5004.camel@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Thu, 13 Jan 2022 18:30:49 +0200
-In-Reply-To: <YeBSrcNawgzvTzQ6@google.com>
-References: <877dbbq5om.fsf@redhat.com>
-         <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
-         <20220111090022.1125ffb5@redhat.com> <87fsptnjic.fsf@redhat.com>
-         <50136685-706e-fc6a-0a77-97e584e74f93@redhat.com>
-         <87bl0gnfy5.fsf@redhat.com>
-         <7e7c7e22f8b1b1695d26d9e19a767b87c679df93.camel@redhat.com>
-         <87zgnzn1nr.fsf@redhat.com>
-         <6ae7e64c53727f9f00537d787e9612c292c4e244.camel@redhat.com>
-         <87wnj3n0k0.fsf@redhat.com> <YeBSrcNawgzvTzQ6@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S236726AbiAMQe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 11:34:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229474AbiAMQe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 11:34:27 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31994C061574
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 08:34:27 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id j27so324750pgj.3
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 08:34:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=mkqNPwNyWzH/IWi5x/274HOlT+CfBnkf/fh5Mx48N7U=;
+        b=ZJIJPSDPPwbxebtfbczZRnKKBZAYzlymkaeATSEkqwn8Asb2zWUlNIb2LwZBPeWcIf
+         PLcDlMQGxAfViHTSvk8aSY4g+c47rtyup7vPVAJKNoquUC61XSiK1bH+VlQLn5VzdkWU
+         dWAvcNWVwfF/H03VzX1AlgnSh9DcStzd50+LEXeK5lktV6S1uIun9rmkzX4muhlVdpuv
+         0zZURfvq2jYk6VoYeaNXrt8eid1hXNn7AayALghAlTYRNFdBr1/8vlanbL/1xTLHU1+b
+         ZB3AOot6jaC/QFzmcmWMhFmJn/98a8isZRmNvFI68QONGfnYjcCxiPTL+SbqUG3PMvQ+
+         3mNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mkqNPwNyWzH/IWi5x/274HOlT+CfBnkf/fh5Mx48N7U=;
+        b=0sk1Z1+pehnSeVJ90jkDq4soD0A7GHm6W+VtgLzsR4oJp80IpGmlokJQF5YBq/2G/6
+         NoCue2EWqWMQummxazczATlZqwn9yrdUJRISuGFgYX/HlCH5h7C58ThfkBet3OkTpXR9
+         znvtMVkCMz6weCSoquL5c7CIDIfNYuxEMpLu7Gd0j2pbuout9fSGxEFPxjdreu6DbWTv
+         0I16BvcBwRLv9DHiYyX3MAW/LFb+mymHxBWO8gv/nwR6XZqz04Sl5OJvYCHTclaTFCuE
+         naBOj+kjJaunSpB3iHmT8WDTg5EOPqyHEVR/zerwJlLd9fH+cWzFmJqIMwJ4jgM4/xbZ
+         8pfA==
+X-Gm-Message-State: AOAM531VjipQx5vBw/cVQP3gvkLiCC3OWsYAI/FhYrfwiOF4qsLTu9AI
+        NdD0LtA7GakRyEI0DUG5dkKPrA==
+X-Google-Smtp-Source: ABdhPJy16fWqMfRtddgMqmja4pygVtnjB2tUDY2FPN15TAZ6Mbc2iMRfm3/LmhDWGOARWvgUghdVIg==
+X-Received: by 2002:a05:6a00:1783:b0:4c0:775b:e1c1 with SMTP id s3-20020a056a00178300b004c0775be1c1mr4931904pfg.36.1642091666534;
+        Thu, 13 Jan 2022 08:34:26 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x23sm2945205pjd.40.2022.01.13.08.34.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 08:34:25 -0800 (PST)
+Date:   Thu, 13 Jan 2022 16:34:22 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Li RongQing <lirongqing@baidu.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        tglx@linutronix.de, bp@alien8.de, x86@kernel.org,
+        kvm@vger.kernel.org, joro@8bytes.org
+Subject: Re: [PATCH] KVM: X86: set vcpu preempted only if it is preempted
+Message-ID: <YeBUjibZ1/nZ1p0X@google.com>
+References: <1641988921-3507-1-git-send-email-lirongqing@baidu.com>
+ <Yd7S5rEYZg8v93NX@hirez.programming.kicks-ass.net>
+ <Yd8QR2KHDfsekvNg@google.com>
+ <20220112213129.GO16608@worktop.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220112213129.GO16608@worktop.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-01-13 at 16:26 +0000, Sean Christopherson wrote:
-> On Thu, Jan 13, 2022, Vitaly Kuznetsov wrote:
-> > Maxim Levitsky <mlevitsk@redhat.com> writes:
-> > > For my nested AVIC work I would really want the APIC ID of a VCPU to be read-only
-> > > and be equal to vcpu_id.
+On Wed, Jan 12, 2022, Peter Zijlstra wrote:
+> On Wed, Jan 12, 2022 at 05:30:47PM +0000, Sean Christopherson wrote:
+> > On Wed, Jan 12, 2022, Peter Zijlstra wrote:
+> > > On Wed, Jan 12, 2022 at 08:02:01PM +0800, Li RongQing wrote:
+> > > > vcpu can schedule out when run halt instruction, and set itself
+> > > > to INTERRUPTIBLE and switch to idle thread, vcpu should not be
+> > > > set preempted for this condition
 > > > 
+> > > Uhhmm, why not? Who says the vcpu will run the moment it becomes
+> > > runnable again? Another task could be woken up meanwhile occupying the
+> > > real cpu.
 > > 
-> > Doesn't APIC ID have topology encoded in it?
+> > Hrm, but when emulating HLT, e.g. for an idling vCPU, KVM will voluntarily schedule
+> > out the vCPU and mark it as preempted from the guest's perspective.  The vast majority,
+> > probably all, usage of steal_time.preempted expects it to truly mean "preempted" as
+> > opposed to "not running".
 > 
-> Yeah, APIC IDs are derived from the topology.  From the SDM (this doesn't
-> talk about core/SMT info, but that's included as well):
+> No, the original use-case was locking and that really cares about
+> running.
 > 
->   The hardware assigned APIC ID is based on system topology and includes encoding
->   for socket position and cluster information.
+> If the vCPU isn't running, we must not busy-wait for it etc..
 > 
-> The SDM also says:
-> 
->   Some processors permit software to modify the APIC ID. However, the ability of
->   software to modify the APIC ID is processor model specific.
-> 
-> So I _think_ we could define KVM behavior to ignore writes from the _guest_, but
-> the APIC_ID == vcpu_id requirement won't fly as userspace expects to be able to
-> stuff virtual toplogy info into the APIC ID.
-> 
-That is a very good piece of information! Thanks!
+> Similar to the scheduler use of it, if the vCPU isn't running, we should
+> not consider it so. Getting the vCPU task scheduled back on the CPU can
+> take a 'long' time.
 
-Best regards,
-	Maxim Levitsky
-
+Ah, thanks.  Should have blamed more, commit 247f2f6f3c70 ("sched/core: Don't
+schedule threads on pre-empted vCPUs") is quite clear on this front.
