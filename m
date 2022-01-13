@@ -2,156 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D9C048D348
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 09:01:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6979848D359
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 09:07:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232535AbiAMIAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 03:00:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53310 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231223AbiAMIAw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 03:00:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642060852;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Yrpcw7YUTOUtHCgNDfajqgyLxv5jTMntW/pzZ7ls5fc=;
-        b=GRw32gOrb9EIM94PCpClHHhWRczDt1sXp6E2T9gH93lOXsytRTYnVloj57yIrNq5eRAuo7
-        CsKerfKGYacl0ewlec0f6gx9/35GjLtdOzoSM9JYMXUVBsW1TjC4HuXHRQHSzJWJxmFCwM
-        UeGQfL8uv0ajzWB2QsSXwMI+I+lepXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-511-ythulDzxPZaGrVntYfIi7g-1; Thu, 13 Jan 2022 03:00:48 -0500
-X-MC-Unique: ythulDzxPZaGrVntYfIi7g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAE5F100C611;
-        Thu, 13 Jan 2022 08:00:46 +0000 (UTC)
-Received: from [10.72.13.202] (ovpn-13-202.pek2.redhat.com [10.72.13.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 018266E1EF;
-        Thu, 13 Jan 2022 08:00:38 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 06/15] KVM: arm64: Add paravirtualization header files
-To:     Eric Auger <eauger@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
-        shan.gavin@gmail.com, Jonathan.Cameron@huawei.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, will@kernel.org
-References: <20210815005947.83699-1-gshan@redhat.com>
- <20210815005947.83699-7-gshan@redhat.com>
- <82506a31-7b32-f8e2-c0cb-0f39d204ef3a@redhat.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <0335878f-2dc0-edc3-97ec-3f4d6ed01b48@redhat.com>
-Date:   Thu, 13 Jan 2022 16:00:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S231493AbiAMIGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 03:06:22 -0500
+Received: from mx22.baidu.com ([220.181.50.185]:34292 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231436AbiAMIGU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 03:06:20 -0500
+X-Greylist: delayed 11608 seconds by postgrey-1.27 at vger.kernel.org; Thu, 13 Jan 2022 03:06:20 EST
+Received: from BJHW-Mail-Ex13.internal.baidu.com (unknown [10.127.64.36])
+        by Forcepoint Email with ESMTPS id CA052E3ECA070997018B;
+        Thu, 13 Jan 2022 16:06:12 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.20; Thu, 13 Jan 2022 16:06:12 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.020; Thu, 13 Jan 2022 16:06:12 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IHg4NjogZml4IGt2bV92Y3B1X2lzX3ByZWVt?=
+ =?gb2312?Q?pted?=
+Thread-Topic: [PATCH] KVM: x86: fix kvm_vcpu_is_preempted
+Thread-Index: AQHYB9OMV2TCiAy6TkSx5H613fhU46xgkMew
+Date:   Thu, 13 Jan 2022 08:06:12 +0000
+Message-ID: <f0be007a87494a9bb645fedc433e9310@baidu.com>
+References: <1641986380-10199-1-git-send-email-lirongqing@baidu.com>
+ <Yd8FO8O9AQa79sFc@google.com>
+In-Reply-To: <Yd8FO8O9AQa79sFc@google.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.28]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <82506a31-7b32-f8e2-c0cb-0f39d204ef3a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 11/11/21 2:06 AM, Eric Auger wrote:
-> On 8/15/21 2:59 AM, Gavin Shan wrote:
->> We need put more stuff in the paravirtualization header files when
->> the asynchronous page fault is supported. The generic header files
->> can't meet the goal.
-> you need to explain why
->   This duplicate the generic header files to be
-> s/This duplicate/Duplicate
-
-Ok.
-
->> our platform specific header files. It's the preparatory work to
->> support the asynchronous page fault in the subsequent patches:
-> why duplication and not move. Shouldn't it be squashed with another
-> subsequent patch?
-> 
-
-It's also fine to squash this one to PATCH[v4 07/15]. My intent was
-to keep them separate to make PATCH[v4 07/17] a bit easier to be
-reviewed. So lets keep it as separate patch :)
-
->>
->>     include/uapi/asm-generic/kvm_para.h
->>     include/asm-generic/kvm_para.h
->>
->>     arch/arm64/include/uapi/asm/kvm_para.h
->>     arch/arm64/include/asm/kvm_para.h
->>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->>   arch/arm64/include/asm/kvm_para.h      | 27 ++++++++++++++++++++++++++
->>   arch/arm64/include/uapi/asm/Kbuild     |  2 --
->>   arch/arm64/include/uapi/asm/kvm_para.h |  5 +++++
->>   3 files changed, 32 insertions(+), 2 deletions(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_para.h
->>   create mode 100644 arch/arm64/include/uapi/asm/kvm_para.h
->>
->> diff --git a/arch/arm64/include/asm/kvm_para.h b/arch/arm64/include/asm/kvm_para.h
->> new file mode 100644
->> index 000000000000..0ea481dd1c7a
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/kvm_para.h
->> @@ -0,0 +1,27 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +#ifndef _ASM_ARM_KVM_PARA_H
->> +#define _ASM_ARM_KVM_PARA_H
->> +
->> +#include <uapi/asm/kvm_para.h>
->> +
->> +static inline bool kvm_check_and_clear_guest_paused(void)
->> +{
->> +	return false;
->> +}
->> +
->> +static inline unsigned int kvm_arch_para_features(void)
->> +{
->> +	return 0;
->> +}
->> +
->> +static inline unsigned int kvm_arch_para_hints(void)
->> +{
->> +	return 0;
->> +}
->> +
->> +static inline bool kvm_para_available(void)
->> +{
->> +	return false;
->> +}
->> +
->> +#endif /* _ASM_ARM_KVM_PARA_H */
->> diff --git a/arch/arm64/include/uapi/asm/Kbuild b/arch/arm64/include/uapi/asm/Kbuild
->> index 602d137932dc..f66554cd5c45 100644
->> --- a/arch/arm64/include/uapi/asm/Kbuild
->> +++ b/arch/arm64/include/uapi/asm/Kbuild
->> @@ -1,3 +1 @@
->>   # SPDX-License-Identifier: GPL-2.0
->> -
->> -generic-y += kvm_para.h
->> diff --git a/arch/arm64/include/uapi/asm/kvm_para.h b/arch/arm64/include/uapi/asm/kvm_para.h
->> new file mode 100644
->> index 000000000000..cd212282b90c
->> --- /dev/null
->> +++ b/arch/arm64/include/uapi/asm/kvm_para.h
->> @@ -0,0 +1,5 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +#ifndef _UAPI_ASM_ARM_KVM_PARA_H
->> +#define _UAPI_ASM_ARM_KVM_PARA_H
->> +
->> +#endif /* _UAPI_ASM_ARM_KVM_PARA_H */
->>
-
-Thanks,
-Gavin
-
+DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogU2VhbiBDaHJpc3RvcGhlcnNvbiA8
+c2VhbmpjQGdvb2dsZS5jb20+DQo+ILeiy83KsbzkOiAyMDIyxOox1MIxM8jVIDA6NDQNCj4gytW8
+/sjLOiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ILOty806IHBib256aW5p
+QHJlZGhhdC5jb207IHZrdXpuZXRzQHJlZGhhdC5jb207IHdhbnBlbmdsaUB0ZW5jZW50LmNvbTsN
+Cj4gam1hdHRzb25AZ29vZ2xlLmNvbTsgdGdseEBsaW51dHJvbml4LmRlOyBtaW5nb0ByZWRoYXQu
+Y29tOyBicEBhbGllbjguZGU7DQo+IHg4NkBrZXJuZWwub3JnOyBocGFAenl0b3IuY29tOyBya3Jj
+bWFyQHJlZGhhdC5jb207IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IGpvcm9AOGJ5dGVzLm9yZw0K
+PiDW98ziOiBSZTogW1BBVENIXSBLVk06IHg4NjogZml4IGt2bV92Y3B1X2lzX3ByZWVtcHRlZA0K
+PiANCj4gT24gV2VkLCBKYW4gMTIsIDIwMjIsIExpIFJvbmdRaW5nIHdyb3RlOg0KPiA+IEFmdGVy
+IHN1cHBvcnQgcGFyYXZpcnR1YWxpemVkIFRMQiBzaG9vdGRvd25zLCBzdGVhbF90aW1lLnByZWVt
+cHRlZA0KPiA+IGluY2x1ZGVzIG5vdCBvbmx5IEtWTV9WQ1BVX1BSRUVNUFRFRCwgYnV0IGFsc28g
+S1ZNX1ZDUFVfRkxVU0hfVExCDQo+ID4NCj4gPiBhbmQga3ZtX3ZjcHVfaXNfcHJlZW1wdGVkIHNo
+b3VsZCB0ZXN0IG9ubHkgd2l0aCBLVk1fVkNQVV9QUkVFTVBURUQNCj4gPg0KPiA+IEZpeGVzOiA4
+NThhNDNhYWUyMzY3ICgiS1ZNOiBYODY6IHVzZSBwYXJhdmlydHVhbGl6ZWQgVExCIFNob290ZG93
+biIpDQo+ID4gU2lnbmVkLW9mZi1ieTogTGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29t
+Pg0KPiA+IC0tLQ0KPiA+ICBhcmNoL3g4Ni9rZXJuZWwva3ZtLmMgfCA0ICsrLS0NCj4gPiAgMSBm
+aWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRp
+ZmYgLS1naXQgYS9hcmNoL3g4Ni9rZXJuZWwva3ZtLmMgYi9hcmNoL3g4Ni9rZXJuZWwva3ZtLmMg
+aW5kZXgNCj4gPiA1OWFiYmRhLi5hOTIwMmQ5IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gveDg2L2tl
+cm5lbC9rdm0uYw0KPiA+ICsrKyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KPiA+IEBAIC0xMDI1
+LDggKzEwMjUsOCBAQCBhc20oDQo+ID4gICIudHlwZSBfX3Jhd19jYWxsZWVfc2F2ZV9fX2t2bV92
+Y3B1X2lzX3ByZWVtcHRlZCwgQGZ1bmN0aW9uOyINCj4gPiAgIl9fcmF3X2NhbGxlZV9zYXZlX19f
+a3ZtX3ZjcHVfaXNfcHJlZW1wdGVkOiINCj4gPiAgIm1vdnEJX19wZXJfY3B1X29mZnNldCgsJXJk
+aSw4KSwgJXJheDsiDQo+ID4gLSJjbXBiCSQwLCAiIF9fc3RyaW5naWZ5KEtWTV9TVEVBTF9USU1F
+X3ByZWVtcHRlZCkgIitzdGVhbF90aW1lKCVyYXgpOyINCj4gPiAtInNldG5lCSVhbDsiDQo+ID4g
+KyJtb3ZiCSIgX19zdHJpbmdpZnkoS1ZNX1NURUFMX1RJTUVfcHJlZW1wdGVkKQ0KPiAiK3N0ZWFs
+X3RpbWUoJXJheCksICVhbDsiDQo+ID4gKyJhbmRiCSQiIF9fc3RyaW5naWZ5KEtWTV9WQ1BVX1BS
+RUVNUFRFRCkgIiwgJWFsOyINCj4gDQo+IEV3dywgdGhlIGV4aXN0aW5nIGNvZGUgaXMgc2tldGNo
+eS4gIEl0IHJlbGllcyBvbiB0aGUgY29tcGlsZXIgdG8gc3RvcmUgX0Jvb2wvYm9vbA0KPiBpbiBh
+IHNpbmdsZSBieXRlIHNpbmNlICVyYXggbWF5IGJlIG5vbi16ZXJvIGZyb20gdGhlIF9fcGVyX2Nw
+dV9vZmZzZXQoKSwgYW5kDQo+IG1vZGlmeWluZyAlYWwgZG9lc24ndCB6ZXJvICVyYXhbNjM6OF0u
+ICBJIGRvdWJ0IGdjYyBvciBjbGFuZyB1c2UgYW55dGhpbmcgYnV0IGENCj4gc2luZ2xlIGJ5dGUg
+b24geDg2LTY0LCBidXQgImFuZGwiIGlzIGp1c3QgYXMgY2hlYXAgc28gSSBkb24ndCBzZWUgYW55
+IGhhcm0gaW4gYmVpbmcNCj4gcGFyYW5vaWQuDQo+IA0KQnVpbGQgd2l0aCBnY2MgKEdDQykgNy4z
+LjAsICBkaXNhc3NlbWJsZWQgYXMgYmxvdw0KDQpiZWZvcmU6DQpmZmZmZmZmZjgxMDViZGMwIDxf
+X3Jhd19jYWxsZWVfc2F2ZV9fX2t2bV92Y3B1X2lzX3ByZWVtcHRlZD46DQpmZmZmZmZmZjgxMDVi
+ZGMwOiAgICAgICA0OCA4YiAwNCBmZCBjMCAxNiAxZCAgICBtb3YgICAgLTB4N2RlMmU5NDAoLCVy
+ZGksOCksJXJheA0KZmZmZmZmZmY4MTA1YmRjNzogICAgICAgODINCmZmZmZmZmZmODEwNWJkYzg6
+ICAgICAgIDgwIGI4IDkwIGMwIDAyIDAwIDAwICAgIGNtcGIgICAkMHgwLDB4MmMwOTAoJXJheCkN
+CmZmZmZmZmZmODEwNWJkY2Y6ICAgICAgIDBmIDk1IGMwICAgICAgICAgICAgICAgIHNldG5lICAl
+YWwNCmZmZmZmZmZmODEwNWJkZDI6ICAgICAgIGMzICAgICAgICAgICAgICAgICAgICAgIHJldHEN
+CmZmZmZmZmZmODEwNWJkZDM6ICAgICAgIDBmIDFmIDAwICAgICAgICAgICAgICAgIG5vcGwgICAo
+JXJheCkNCmZmZmZmZmZmODEwNWJkZDY6ICAgICAgIDY2IDJlIDBmIDFmIDg0IDAwIDAwICAgIG5v
+cHcgICAlY3M6MHgwKCVyYXgsJXJheCwxKQ0KZmZmZmZmZmY4MTA1YmRkZDogICAgICAgMDAgMDAg
+MDANCg0KDQphZnRlcjoNCmZmZmZmZmZmODEwNWJkYzAgPF9fcmF3X2NhbGxlZV9zYXZlX19fa3Zt
+X3ZjcHVfaXNfcHJlZW1wdGVkPjoNCmZmZmZmZmZmODEwNWJkYzA6ICAgICAgIDQ4IDhiIDA0IGZk
+IGMwIDE2IDFkICAgIG1vdiAgICAtMHg3ZGUyZTk0MCgsJXJkaSw4KSwlcmF4DQpmZmZmZmZmZjgx
+MDViZGM3OiAgICAgICA4Mg0KZmZmZmZmZmY4MTA1YmRjODogICAgICAgOGEgODAgOTAgYzAgMDIg
+MDAgICAgICAgbW92ICAgIDB4MmMwOTAoJXJheCksJWFsDQpmZmZmZmZmZjgxMDViZGNlOiAgICAg
+ICAyNCAwMSAgICAgICAgICAgICAgICAgICBhbmQgICAgJDB4MSwlYWwNCmZmZmZmZmZmODEwNWJk
+ZDA6ICAgICAgIGMzICAgICAgICAgICAgICAgICAgICAgIHJldHENCmZmZmZmZmZmODEwNWJkZDE6
+ICAgICAgIDBmIDFmIDQ0IDAwIDAwICAgICAgICAgIG5vcGwgICAweDAoJXJheCwlcmF4LDEpDQpm
+ZmZmZmZmZjgxMDViZGQ2OiAgICAgICA2NiAyZSAwZiAxZiA4NCAwMCAwMCAgICBub3B3ICAgJWNz
+OjB4MCglcmF4LCVyYXgsMSkNCmZmZmZmZmZmODEwNWJkZGQ6ICAgICAgIDAwIDAwIDAwDQoNClRo
+YW5rcw0KDQotTGkNCg==
