@@ -2,82 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAAF548E05D
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 23:36:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0D1E48E077
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 23:40:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235281AbiAMWgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 17:36:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33740 "EHLO
+        id S238035AbiAMWk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 17:40:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238006AbiAMWgR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 17:36:17 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A776C06173F
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 14:36:17 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id h1so11619312pls.11
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 14:36:17 -0800 (PST)
+        with ESMTP id S233645AbiAMWk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 17:40:58 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49459C061574
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 14:40:58 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id t32so1166460pgm.7
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 14:40:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=YbEI3Q/NEjCtDTVCV1jkA7nYNYBH/Wfa2wk3IkVyJko=;
-        b=WpVMz+4gpUntGpyaWEJVBfbKAzjD16yH5Gm0LRNFlu5oAyFKOymMeuFP1trroFQtVK
-         eFyex5Yaw809PnJHpJAwAfZT8MJ21x4fAdgQAF7z4qQiEmY7/ckTK6eNm0hBnHhnOY2B
-         FKcmFIfe+srCgWhYbEpHsRg2Eu4omG6t1/KUG/tF/wsEcHr9X8HV+tzJQCG4zSuI9yfm
-         5x1IWmBrTwpJV5mT8w1DhRnhh42yEtQZmuzlWWD10YBQjxn3AMOR8ery8sESq3nLFz2I
-         UCQ+XbTpj3XQ8UTcFNWtVkV16ZEev7kGTePX5Bqsx9eZ6vbaYe5zlAVAUbq+1OoRf+QD
-         jXmQ==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=UIBiUOD4DHxlB4Cj1VhTqRpz44USNMdFSO01fjoq5FI=;
+        b=hhvywSawdWtzXtNOd8th/sNW0pSKLEKPS1bgmmbAacqW7ZPwKofRns/b6LNdx1u4k7
+         Clt885hY2v2buaUsa8uA9hqodC09+jsJp1QE5FzkGudB/giZHsCUpiEWQp2+/Fhp0y/+
+         pSAsvMzdDSB7Uwo+lxaBJM5YvzjrqoRtK0wEymBT4d0bdvFSVRCGDnVA8oNR+4sVe45n
+         9DejGVDnvWOoJouKzvwFw49HnYnrtYqgY1ioM71iHnA44OYZr5tcbPq7C3sVTC4VGW4I
+         6PyL/BcvhVffY3K33PJCIuEbbBHN8HrzphKGBd2JbXOUxkJeY8u8vMx/MogToiKcG8SD
+         QkkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=YbEI3Q/NEjCtDTVCV1jkA7nYNYBH/Wfa2wk3IkVyJko=;
-        b=MQyojXb7gIE99+OMmfa3ygZR52DRh1QXgScn0zJy/KYiuV7DdSYjbt9RG2HAyevH29
-         AqK7UvrRY3CE/TBZmveg5LUKLYenXncPJ+6445n4ZQkXH5c0cYBMNJxisPfhhIT7H4Xi
-         7D/79l3GTrOnx/CGD3FgonoXtvkg4jHFihkWkp8oTqxwonx/6mTIl52zwC7jK97yTKfu
-         t0QJulnJrnbvI5DTQS9i0tjstAHV9dRN2RklUve3mXYWugsLM9eKFMUXd4dUjECZJZnM
-         TH3E+vLsl85P22xtU9BHdhu88Y9Vjr3uMVjZfNfXPqT7wN8YM/sf4Pwj5AP7M0uCSD7T
-         6wXw==
-X-Gm-Message-State: AOAM533atepUHqhdDn8TLtqg8UDFv8nLw5ivnrly76Fwl9wk3zIYRD4I
-        /4tYhrpNZuIktH5EHHdIXuXrgwiBcQqlyqgtdSw=
-X-Google-Smtp-Source: ABdhPJzaJhfMR+h/tQtNRoX2zC4tRzbz5MEIPSw1qrTgwjU+ECndQZear3zvqEok9F+uo6qFiMnIl4XH+uZsGkdlwAc=
-X-Received: by 2002:a17:90a:cc0d:: with SMTP id b13mr16791500pju.236.1642113376647;
- Thu, 13 Jan 2022 14:36:16 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UIBiUOD4DHxlB4Cj1VhTqRpz44USNMdFSO01fjoq5FI=;
+        b=4NCn2p5hgEPGn7T9vj94Jzlawdj64D4O0uknRfTkn+z4eGuKwzszhGr2J3ELzFlMBv
+         G1orYkokn84hdiI4p3eCrHrMIxqFMv0TuhJx/uwy8J7NzsYuQLjIwowv7E/PNY1AmI28
+         fxes0Z90wuif7qR/xDTsTG2LyqVh5ZrIFZAj7tO2K9Wt/sQZ8KkehswRyNveZ0nsPAmQ
+         bXrKkeTE83JaKLF2ZlgjWZFZs+TBGDny2PSPMZK/Oe6LkDD/Nn430STt2FbyHKlGRCY5
+         cFoSYPbMUY9E59j0q4sY5Xx0dlKDFUbG0me66D0c9/xOfw3g3chmIeXd+gPUvdvkDIL1
+         dzxg==
+X-Gm-Message-State: AOAM530UFglBS4VtRerWpH+LhzNY3BdOPmYTUQZafH6hsUV+wOIfC/sz
+        46SQFZ/5l1RTGCEdWlX/o3Ifig==
+X-Google-Smtp-Source: ABdhPJwQaTU9PuMVsmXCOaBlT7jxLXNw9JMVp+npjhVVU8JDE9yam4Mt8zLMkIrZPdPRgOYc+lME4A==
+X-Received: by 2002:a63:7118:: with SMTP id m24mr5641168pgc.603.1642113657649;
+        Thu, 13 Jan 2022 14:40:57 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s35sm3561396pfw.193.2022.01.13.14.40.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 14:40:57 -0800 (PST)
+Date:   Thu, 13 Jan 2022 22:40:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Improve comment about TLB flush
+ semantics for write-protection
+Message-ID: <YeCqdds2r/q+0Zog@google.com>
+References: <20220112215801.3502286-1-dmatlack@google.com>
+ <20220112215801.3502286-3-dmatlack@google.com>
+ <Yd92T8RoZZi6usxH@google.com>
+ <CALzav=dhd3rLh6tDJV0BR7aH0FV=Xv9xVm5XdbVitQYfSAqfYg@mail.gmail.com>
 MIME-Version: 1.0
-Received: by 2002:a05:6a10:f38c:0:0:0:0 with HTTP; Thu, 13 Jan 2022 14:36:16
- -0800 (PST)
-Reply-To: mchristophdaniel@gmail.com
-From:   Marcus Galois <marcus.galois@gmail.com>
-Date:   Thu, 13 Jan 2022 23:36:16 +0100
-Message-ID: <CANqBaXXCcMpqFZVxPZZJWaz5kmT0bbZzXjB_FkEbmFBi-HPpBQ@mail.gmail.com>
-Subject: Good News Finally.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=dhd3rLh6tDJV0BR7aH0FV=Xv9xVm5XdbVitQYfSAqfYg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello friend.
+On Thu, Jan 13, 2022, David Matlack wrote:
+> On Wed, Jan 12, 2022 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
+> > So something like this?  Plus more commentry in spte.h.
+> >
+> >         /*
+> >          * It's safe to flush TLBs after dropping mmu_lock as making a writable
+> >          * SPTE read-only for dirty logging only needs to ensure KVM starts
+> >          * logging writes to the memslot before the memslot update completes,
+> >          * i.e. before the enabling of dirty logging is visible to userspace.
+> >          *
+> >          * Note, KVM also write-protects SPTEs when shadowing guest page tables,
+> >          * in which case a TLB flush is needed before dropping mmu_lock().  To
+> >          * ensure a future TLB flush isn't missed, KVM uses a software-available
+> >          * bit to track if a SPTE is MMU-Writable, i.e. is considered writable
+> >          * for shadow paging purposes.  When write-protecting for shadow paging,
+> >          * KVM clears both WRITABLE and MMU-Writable, and performs a TLB flush
+> >          * while holding mmu_lock if either bit is cleared.
+> >          *
+> >          * See DEFAULT_SPTE_{HOST,MMU}_WRITEABLE for more details.
+> >          */
+> 
+> Makes sense. I'll rework the comment per your feedback and also
+> document the {host,mmu}-writable bits. Although I think it'd make more
+> sense to put those comments on shadow_{host,mmu}_writable_mask as
+> those are the symbols used throughout the code and EPT uses different
+> bits than DEFAULT_..._WRITABLE.
 
-You might find it so difficult to remember me, though it is indeed a
-very long time, I am much delighted to contact you again after a long
-period of time, I remember you despite circumstances that made things
-not worked out as we projected then. I want to inform you that the
-transaction we're doing together then finally worked out and I decided
-to contact you and to let you know because of your tremendous effort
-to make things work out then.
-
-Meanwhile I must inform you that I'm presently in Caribbean Island for
-numerous business negotiation with some partners. with my sincere
-heart i have decided to compensate you with USD$900,000 for your
-dedication then on our transaction, you tried so much that period and
-I appreciated your effort. I wrote a cheque/check on your name, as
-soon as you receive it, you let me know.
-
-Contact my secretary now on his email: mchristophdaniel@gmail.com
-Name: Mr. Christoph Daniel
-
-You are to forward to him your Name........ Address.......,Phone
-number......for shipment/dispatch of the cheque/Check to you
-
-Regards,
-Mr. Marcus Galois
+I don't necessarily disagree, but all of the existing comments for SPTE bits are
+in spte.h, even though the dynamic masks that are actually used in code are defined
+elsewhere.  I'd prefer to keep all the "documentation" somewhat centralized, and it
+shouldn't be too onerous to get from shadow_*_mask to DEFAULT_*_WRITABLE.
