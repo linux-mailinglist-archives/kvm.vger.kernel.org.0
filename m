@@ -2,203 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 675D048D652
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 12:09:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC28E48D691
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 12:18:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbiAMLJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 06:09:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbiAMLJt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 06:09:49 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E2EC06173F
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 03:09:49 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n7xyF-0006Q7-HJ; Thu, 13 Jan 2022 12:08:43 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n7xy5-00A3Hi-BT; Thu, 13 Jan 2022 12:08:32 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n7xy3-0005lb-Nu; Thu, 13 Jan 2022 12:08:31 +0100
-Date:   Thu, 13 Jan 2022 12:08:31 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Mark Brown <broonie@kernel.org>
-Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        platform-driver-x86@vger.kernel.org,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Borislav Petkov <bp@alien8.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        openipmi-developer@lists.sourceforge.net,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
-Message-ID: <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
- <YdyilpjC6rtz6toJ@lunn.ch>
- <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
- <20220112085009.dbasceh3obfok5dc@pengutronix.de>
- <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
- <Yd9L9SZ+g13iyKab@sirena.org.uk>
+        id S234127AbiAMLSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 06:18:05 -0500
+Received: from foss.arm.com ([217.140.110.172]:43116 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229670AbiAMLSE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 06:18:04 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2469A6D;
+        Thu, 13 Jan 2022 03:18:04 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.5.145])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 43C123F774;
+        Thu, 13 Jan 2022 03:17:58 -0800 (PST)
+Date:   Thu, 13 Jan 2022 11:17:53 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
+        alexandru.elisei@arm.com, anup.patel@wdc.com,
+        aou@eecs.berkeley.edu, atish.patra@wdc.com,
+        benh@kernel.crashing.org, borntraeger@linux.ibm.com, bp@alien8.de,
+        catalin.marinas@arm.com, chenhuacai@kernel.org,
+        dave.hansen@linux.intel.com, david@redhat.com,
+        frankja@linux.ibm.com, frederic@kernel.org, gor@linux.ibm.com,
+        hca@linux.ibm.com, imbrenda@linux.ibm.com, james.morse@arm.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        mingo@redhat.com, mpe@ellerman.id.au, nsaenzju@redhat.com,
+        palmer@dabbelt.com, paulmck@kernel.org, paulus@samba.org,
+        paul.walmsley@sifive.com, pbonzini@redhat.com, seanjc@google.com,
+        suzuki.poulose@arm.com, tglx@linutronix.de,
+        tsbogend@alpha.franken.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, will@kernel.org
+Subject: Re: [PATCH 2/5] kvm/arm64: rework guest entry logic
+Message-ID: <YeAKYUQcHc0+LJ/P@FVFF77S0Q05N>
+References: <20220111153539.2532246-1-mark.rutland@arm.com>
+ <20220111153539.2532246-3-mark.rutland@arm.com>
+ <87tuearwc7.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="zcdy7nemyxfoojub"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yd9L9SZ+g13iyKab@sirena.org.uk>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+In-Reply-To: <87tuearwc7.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jan 11, 2022 at 05:55:20PM +0000, Marc Zyngier wrote:
+> On Tue, 11 Jan 2022 15:35:36 +0000,
+> Mark Rutland <mark.rutland@arm.com> wrote:
+> > 
+> > In kvm_arch_vcpu_ioctl_run() we enter an RCU extended quiescent state
+> > (EQS) by calling guest_enter_irqoff(), and unmasked IRQs prior to
+> > exiting the EQS by calling guest_exit(). As the IRQ entry code will not
+> > wake RCU in this case, we may run the core IRQ code and IRQ handler
+> > without RCU watching, leading to various potential problems.
+> > 
+> > Additionally, we do not inform lockdep or tracing that interrupts will
+> > be enabled during guest execution, which caan lead to misleading traces
+> > and warnings that interrupts have been enabled for overly-long periods.
+> > 
+> > This patch fixes these issues by using the new timing and context
+> > entry/exit helpers to ensure that interrupts are handled during guest
+> > vtime but with RCU watching, with a sequence:
+> > 
+> > 	guest_timing_enter_irqoff();
+> > 
+> > 	exit_to_guest_mode();
+> > 	< run the vcpu >
+> > 	enter_from_guest_mode();
+> > 
+> > 	< take any pending IRQs >
+> > 
+> > 	guest_timing_exit_irqoff();
+> > 
+> > Since instrumentation may make use of RCU, we must also ensure that no
+> > instrumented code is run during the EQS. I've split out the critical
+> > section into a new kvm_arm_enter_exit_vcpu() helper which is marked
+> > noinstr.
+> > 
+> > Fixes: 1b3d546daf85ed2b ("arm/arm64: KVM: Properly account for guest CPU time")
+> > Reported-by: Nicolas Saenz Julienne <nsaenzju@redhat.com>
+> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> > Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Frederic Weisbecker <frederic@kernel.org>
+> > Cc: James Morse <james.morse@arm.com>
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Paul E. McKenney <paulmck@kernel.org>
+> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arm.c | 51 ++++++++++++++++++++++++++++----------------
+> >  1 file changed, 33 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e4727dc771bf..1721df2522c8 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -764,6 +764,24 @@ static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu, int *ret)
+> >  			xfer_to_guest_mode_work_pending();
+> >  }
+> >  
+> > +/*
+> > + * Actually run the vCPU, entering an RCU extended quiescent state (EQS) while
+> > + * the vCPU is running.
+> > + *
+> > + * This must be noinstr as instrumentation may make use of RCU, and this is not
+> > + * safe during the EQS.
+> > + */
+> > +static int noinstr kvm_arm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+> > +{
+> > +	int ret;
+> > +
+> > +	exit_to_guest_mode();
+> > +	ret = kvm_call_hyp_ret(__kvm_vcpu_run, vcpu);
+> > +	enter_from_guest_mode();
+> > +
+> > +	return ret;
+> > +}
+> > +
+> >  /**
+> >   * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
+> >   * @vcpu:	The VCPU pointer
+> > @@ -854,9 +872,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >  		 * Enter the guest
+> >  		 */
+> >  		trace_kvm_entry(*vcpu_pc(vcpu));
+> > -		guest_enter_irqoff();
+> > +		guest_timing_enter_irqoff();
+> >  
+> > -		ret = kvm_call_hyp_ret(__kvm_vcpu_run, vcpu);
+> > +		ret = kvm_arm_vcpu_enter_exit(vcpu);
+> >  
+> >  		vcpu->mode = OUTSIDE_GUEST_MODE;
+> >  		vcpu->stat.exits++;
+> > @@ -891,26 +909,23 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >  		kvm_arch_vcpu_ctxsync_fp(vcpu);
+> >  
+> >  		/*
+> > -		 * We may have taken a host interrupt in HYP mode (ie
+> > -		 * while executing the guest). This interrupt is still
+> > -		 * pending, as we haven't serviced it yet!
+> > +		 * We must ensure that any pending interrupts are taken before
+> > +		 * we exit guest timing so that timer ticks are accounted as
+> > +		 * guest time. Transiently unmask interrupts so that any
+> > +		 * pending interrupts are taken.
+> >  		 *
+> > -		 * We're now back in SVC mode, with interrupts
+> > -		 * disabled.  Enabling the interrupts now will have
+> > -		 * the effect of taking the interrupt again, in SVC
+> > -		 * mode this time.
+> > +		 * Per ARM DDI 0487G.b section D1.13.4, an ISB (or other
+> > +		 * context synchronization event) is necessary to ensure that
+> > +		 * pending interrupts are taken.
+> >  		 */
+> >  		local_irq_enable();
+> > +		isb();
+> > +		local_irq_disable();
+> 
+> Small nit: we may be able to elide this enable/isb/disable dance if a
+> read of ISR_EL1 returns 0.
 
---zcdy7nemyxfoojub
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Wouldn't that be broken when using GIC priority masking, since that can prevent
+IRQS being signalled ot the PE?
 
-On Wed, Jan 12, 2022 at 09:45:25PM +0000, Mark Brown wrote:
-> On Wed, Jan 12, 2022 at 10:31:21PM +0100, Uwe Kleine-K=F6nig wrote:
-> > On Wed, Jan 12, 2022 at 11:27:02AM +0100, Geert Uytterhoeven wrote:
->=20
-> (Do we really need *all* the CCs here?)
+I'm happy to rework this, but I'll need to think a bit harder about it. Would
+you be happy if we did that as a follow-up?
 
-It's probably counteractive to finding an agreement because there are
-too many opinions on that matter. But I didn't dare to strip it down,
-too :-)
+I suspect we'll want to split that out into a helper, e.g.
 
-> > That convinces me, that platform_get_irq_optional() is a bad name. The
-> > only difference to platform_get_irq is that it's silent. And returning
-> > a dummy irq value (which would make it aligned with the other _optional
-> > functions) isn't possible.
->=20
-> There is regulator_get_optional() which is I believe the earliest of
-> these APIs, it doesn't return a dummy either (and is silent too) - this
-> is because regulator_get() does return a dummy since it's the vastly
-> common case that regulators must be physically present and them not
-> being found is due to there being an error in the system description.
-> It's unfortunate that we've ended up with these two different senses for
-> _optional(), people frequently get tripped up by it.
+static __always_inline handle_pending_host_irqs(void)
+{
+	/*
+	 * TODO: explain PMR masking / signalling here
+	 */
+	if (!system_uses_irq_prio_masking() &&
+	    !read_sysreg(isr_el1))
+		return;
+	
+	local_irq_enable();
+	isb();
+	local_irq_disable();
+}
 
-Yeah, I tripped over that one already, too. And according to my counting
-this results in three different senses now :-\ :
+> 
+> > +
+> > +		guest_timing_exit_irqoff();
+> > +
+> > +		local_irq_enable();
+> >  
+> > -		/*
+> > -		 * We do local_irq_enable() before calling guest_exit() so
+> > -		 * that if a timer interrupt hits while running the guest we
+> > -		 * account that tick as being spent in the guest.  We enable
+> > -		 * preemption after calling guest_exit() so that if we get
+> > -		 * preempted we make sure ticks after that is not counted as
+> > -		 * guest time.
+> > -		 */
+> > -		guest_exit();
+> >  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> >  
+> >  		/* Exit types that need handling before we can be preempted */
+> 
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
 
- a) regulator
-    regulator_get returns a dummy, regulator_get_optional returns ERR_PTR(-=
-ENODEV)
- b) clk + gpiod
-    ..._get returns ERR_PTR(-ENODEV), ..._get_optional returns a dummy
- c) platform_get_irq()
-    platform_get_irq_optional() is just a silent variant of
-    platform_get_irq(); the return values are identical.
-   =20
-This is all very unfortunate. In my eyes b) is the most sensible
-sense, but the past showed that we don't agree here. (The most annoying
-part of regulator_get is the warning that is emitted that regularily
-makes customers ask what happens here and if this is fixable.)
+Thanks!
 
-I think at least c) is easy to resolve because
-platform_get_irq_optional() isn't that old yet and mechanically
-replacing it by platform_get_irq_silent() should be easy and safe.
-And this is orthogonal to the discussion if -ENOXIO is a sensible return
-value and if it's as easy as it could be to work with errors on irq
-lookups.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---zcdy7nemyxfoojub
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHgCCsACgkQwfwUeK3K
-7AktbAf/UzNin6+fnXTmkdrTvXWaXCV8TB76EIUtIdNWwJEjmXxWes5jyBpp/jXj
-7gSmYT3gi4oK0wjB6dKmqF6jba5/RPL4cdS6/8iQDp32Xey0hzWymBPENLc/Nxt5
-Ge81cdot6EFxqSkuW1Zbe55wzmNUmEsez7+e+8gJAviPB6zQndDE/zAkwxczzb04
-GfD6Uixgm4a29NwXNIignwNm8pACez/px2A8cVhILZ8135X0rdwYM17BiQtfM5Uq
-s2hZsLfxWm9ZvdyxA7gGvsfefPmiPfS3k/HWagHMDB8nQq4vqnMmPTu01YJs34dM
-+ycJZkglW3eJnCZ9Fr5sjnuP6uLExw==
-=5Hn7
------END PGP SIGNATURE-----
-
---zcdy7nemyxfoojub--
+Mark.
