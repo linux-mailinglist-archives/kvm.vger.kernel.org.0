@@ -2,104 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 992FC48D1B8
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 05:43:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A62A48D1C6
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 06:08:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232730AbiAMEl5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 23:41:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43860 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232608AbiAMElz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 23:41:55 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62E2BC06173F
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 20:41:55 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id n19-20020a7bc5d3000000b003466ef16375so4695816wmk.1
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 20:41:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rRgjIPZAMfyNauGGHIKOX091JCYAgZevyPfFhtUJQts=;
-        b=Rn4+emlflINHAHBiSJ3Gzd6GT/de+VWv1au7GWk8b6OrMoecsjCkN7c2+18t9vc79g
-         7/bhYYKnUbclewXy8OEZ2KoO7zxZurf+4JJrLx9x4uaDDYYrUAM1m56vbxB/gB+PxRQE
-         HZkeZyGPq+n/OKrDrWG/sUMFsEJzVyYJBdn7TY9KsBwwrfn4BuXazF9bR9Ktitc2dbij
-         E0YYlNoJBPpEsqvZvlsHm4bYM3TFrgtrE2RT4OE0MDnUnRSinq+7ohA5qBgkYzX5ycVx
-         9icDwH5VvCF/25c11L298V7PN4DF/vIQXmRLI29BDg8DTAXerFFqkrDzA86+HG/4eOMg
-         Vd0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rRgjIPZAMfyNauGGHIKOX091JCYAgZevyPfFhtUJQts=;
-        b=RUwXNDjBBCT9Lp1jSh8SY/BqTCcza3L9dE0gtDWW4EXGa+wo6sNjB+J+ueVDBWzy7S
-         AlioTcVy5GSLnvLDyRxdn8HFH+COo6XY1+JJMUh7gpHvXMOABViTklLrpYJ9uDPMHhY7
-         fMZH6WWa5/qfjgKAH0YZTGMblO37liV5/WEaVT61hpKmn5oliglMG8PDJ3REH3OmK8+A
-         Z6chSVdVhFPcgtB8H7Em+iTZUvwMC7rZih7YYcbeRAB63vtjfmGQKneqbd1eZZz4OzS9
-         xcBhl8EDHuL0J8d3Ijm56XUdNAN5e7lNXkQCCK+Y7ShA88BSPpXTMiU2e/K6EzJh+7i5
-         5ENg==
-X-Gm-Message-State: AOAM531Ih35QrZHPSTvatdTFCMaNlzklpIngr19O74TrTrTsq2c50cq7
-        Rx+MsfT6AEMR5MDFjzNpKNveOrxlq1AUig7yDd4Qwg==
-X-Google-Smtp-Source: ABdhPJwq/inlKzSq75AY+T0EiU9ZxyChPaiKkzBbfN+RsyzMC//uRd8wWeOw7uPjcUk1dOIBM5ntx6MYREPqrrRjUC4=
-X-Received: by 2002:a7b:c0c1:: with SMTP id s1mr9159071wmh.176.1642048913903;
- Wed, 12 Jan 2022 20:41:53 -0800 (PST)
+        id S229517AbiAMFIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 00:08:53 -0500
+Received: from mx24.baidu.com ([111.206.215.185]:35832 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229456AbiAMFIw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 00:08:52 -0500
+Received: from BJHW-Mail-Ex12.internal.baidu.com (unknown [10.127.64.35])
+        by Forcepoint Email with ESMTPS id D0CF2F038D8C2C6EE0B5;
+        Thu, 13 Jan 2022 12:52:40 +0800 (CST)
+Received: from bjkjy-mail-ex25.internal.baidu.com (172.31.50.41) by
+ BJHW-Mail-Ex12.internal.baidu.com (10.127.64.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.20; Thu, 13 Jan 2022 12:52:40 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ bjkjy-mail-ex25.internal.baidu.com (172.31.50.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2375.17; Thu, 13 Jan 2022 12:52:40 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.020; Thu, 13 Jan 2022 12:52:40 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Wang,Guangju" <wangguangju@baidu.com>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IFg4Njogc2V0IHZjcHUgcHJlZW1wdGVkIG9u?=
+ =?gb2312?Q?ly_if_it_is_preempted?=
+Thread-Topic: [PATCH] KVM: X86: set vcpu preempted only if it is preempted
+Thread-Index: AQHYB7WMg7j2vnvXFkKy6dq5PabOWqxfHr2AgABDQICAAPSkQA==
+Date:   Thu, 13 Jan 2022 04:52:40 +0000
+Message-ID: <bb92391dc5de46ac87ff238faf875c7b@baidu.com>
+References: <1641988921-3507-1-git-send-email-lirongqing@baidu.com>
+ <Yd7S5rEYZg8v93NX@hirez.programming.kicks-ass.net>
+ <Yd8QR2KHDfsekvNg@google.com>
+ <20220112213129.GO16608@worktop.programming.kicks-ass.net>
+In-Reply-To: <20220112213129.GO16608@worktop.programming.kicks-ass.net>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.28]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20220112081329.1835-1-jiangyifei@huawei.com> <20220112081329.1835-14-jiangyifei@huawei.com>
-In-Reply-To: <20220112081329.1835-14-jiangyifei@huawei.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 13 Jan 2022 10:11:41 +0530
-Message-ID: <CAAhSdy2oOiiJ=ogzP4+StyvJpqaa-zjPGqKA2hy2T3JcCO7jCA@mail.gmail.com>
-Subject: Re: [PATCH v5 13/13] target/riscv: enable riscv kvm accel
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        libvir-list@redhat.com, Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>, fanliang@huawei.com,
-        "Wubin (H)" <wu.wubin@huawei.com>, wanghaibin.wang@huawei.com,
-        wanbo13@huawei.com, Mingwang Li <limingwang@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex12_2022-01-13 12:52:40:847
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 1:44 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
->
-> Add riscv kvm support in meson.build file.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Mingwang Li <limingwang@huawei.com>
-
-Looks good to me.
-
-Reviewed-by: Anup Patel <anup@brainfault.org>
-
-Regards,
-Anup
-
-> ---
->  meson.build | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/meson.build b/meson.build
-> index c1b1db1e28..06a5476254 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -90,6 +90,8 @@ elif cpu in ['ppc', 'ppc64']
->    kvm_targets = ['ppc-softmmu', 'ppc64-softmmu']
->  elif cpu in ['mips', 'mips64']
->    kvm_targets = ['mips-softmmu', 'mipsel-softmmu', 'mips64-softmmu', 'mips64el-softmmu']
-> +elif cpu in ['riscv']
-> +  kvm_targets = ['riscv32-softmmu', 'riscv64-softmmu']
->  else
->    kvm_targets = []
->  endif
-> --
-> 2.19.1
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogUGV0ZXIgWmlqbHN0cmEgPHBldGVy
+ekBpbmZyYWRlYWQub3JnPg0KPiC3osvNyrG85DogMjAyMsTqMdTCMTPI1SA1OjMxDQo+IMrVvP7I
+yzogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+ILOty806IExpLFJv
+bmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT47IHBib256aW5pQHJlZGhhdC5jb207DQo+IHZr
+dXpuZXRzQHJlZGhhdC5jb207IHdhbnBlbmdsaUB0ZW5jZW50LmNvbTsgam1hdHRzb25AZ29vZ2xl
+LmNvbTsNCj4gdGdseEBsaW51dHJvbml4LmRlOyBicEBhbGllbjguZGU7IHg4NkBrZXJuZWwub3Jn
+OyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiBqb3JvQDhieXRlcy5vcmcNCj4g1vfM4jogUmU6IFtQ
+QVRDSF0gS1ZNOiBYODY6IHNldCB2Y3B1IHByZWVtcHRlZCBvbmx5IGlmIGl0IGlzIHByZWVtcHRl
+ZA0KPiANCj4gT24gV2VkLCBKYW4gMTIsIDIwMjIgYXQgMDU6MzA6NDdQTSArMDAwMCwgU2VhbiBD
+aHJpc3RvcGhlcnNvbiB3cm90ZToNCj4gPiBPbiBXZWQsIEphbiAxMiwgMjAyMiwgUGV0ZXIgWmlq
+bHN0cmEgd3JvdGU6DQo+ID4gPiBPbiBXZWQsIEphbiAxMiwgMjAyMiBhdCAwODowMjowMVBNICsw
+ODAwLCBMaSBSb25nUWluZyB3cm90ZToNCj4gPiA+ID4gdmNwdSBjYW4gc2NoZWR1bGUgb3V0IHdo
+ZW4gcnVuIGhhbHQgaW5zdHJ1Y3Rpb24sIGFuZCBzZXQgaXRzZWxmIHRvDQo+ID4gPiA+IElOVEVS
+UlVQVElCTEUgYW5kIHN3aXRjaCB0byBpZGxlIHRocmVhZCwgdmNwdSBzaG91bGQgbm90IGJlIHNl
+dA0KPiA+ID4gPiBwcmVlbXB0ZWQgZm9yIHRoaXMgY29uZGl0aW9uDQo+ID4gPg0KPiA+ID4gVWho
+bW0sIHdoeSBub3Q/IFdobyBzYXlzIHRoZSB2Y3B1IHdpbGwgcnVuIHRoZSBtb21lbnQgaXQgYmVj
+b21lcw0KPiA+ID4gcnVubmFibGUgYWdhaW4/IEFub3RoZXIgdGFzayBjb3VsZCBiZSB3b2tlbiB1
+cCBtZWFud2hpbGUgb2NjdXB5aW5nDQo+ID4gPiB0aGUgcmVhbCBjcHUuDQo+ID4NCj4gPiBIcm0s
+IGJ1dCB3aGVuIGVtdWxhdGluZyBITFQsIGUuZy4gZm9yIGFuIGlkbGluZyB2Q1BVLCBLVk0gd2ls
+bA0KPiA+IHZvbHVudGFyaWx5IHNjaGVkdWxlIG91dCB0aGUgdkNQVSBhbmQgbWFyayBpdCBhcyBw
+cmVlbXB0ZWQgZnJvbSB0aGUNCj4gPiBndWVzdCdzIHBlcnNwZWN0aXZlLiAgVGhlIHZhc3QgbWFq
+b3JpdHksIHByb2JhYmx5IGFsbCwgdXNhZ2Ugb2YNCj4gPiBzdGVhbF90aW1lLnByZWVtcHRlZCBl
+eHBlY3RzIGl0IHRvIHRydWx5IG1lYW4gInByZWVtcHRlZCIgYXMgb3Bwb3NlZCB0bw0KPiAibm90
+IHJ1bm5pbmciLg0KPiANCj4gTm8sIHRoZSBvcmlnaW5hbCB1c2UtY2FzZSB3YXMgbG9ja2luZyBh
+bmQgdGhhdCByZWFsbHkgY2FyZXMgYWJvdXQgcnVubmluZy4NCj4gDQo+IElmIHRoZSB2Q1BVIGlz
+bid0IHJ1bm5pbmcsIHdlIG11c3Qgbm90IGJ1c3ktd2FpdCBmb3IgaXQgZXRjLi4NCj4gDQo+IFNp
+bWlsYXIgdG8gdGhlIHNjaGVkdWxlciB1c2Ugb2YgaXQsIGlmIHRoZSB2Q1BVIGlzbid0IHJ1bm5p
+bmcsIHdlIHNob3VsZCBub3QNCj4gY29uc2lkZXIgaXQgc28uIEdldHRpbmcgdGhlIHZDUFUgdGFz
+ayBzY2hlZHVsZWQgYmFjayBvbiB0aGUgQ1BVIGNhbiB0YWtlIGEgJ2xvbmcnDQo+IHRpbWUuDQo+
+IA0KPiBJZiB5b3UgaGF2ZSBwaW5uZWQgdkNQVSB0aHJlYWRzIGFuZCBubyBvdmVyY29tbWl0LCB3
+ZSBoYXZlIG90aGVyIGtub2JzIHRvDQo+IGluZGljYXRlIHRoaXMgSSB0aGluay4NCg0KDQpJcyBp
+dCBwb3NzaWJsZSBpZiBndWVzdCBoYXMgS1ZNX0hJTlRTX1JFQUxUSU1FIGZlYXR1cmUsIGJ1dCBp
+dHMgSExUIGluc3RydWN0aW9uIGlzIGVtdWxhdGVkIGJ5IEtWTT8NCklmIGl0IGlzIHBvc3NpYmxl
+LCB0aGlzIGNvbmRpdGlvbiBoYXMgYmVlbiBwZXJmb3JtYW5jZSBkZWdyYWRhdGlvbiwgc2luY2Ug
+dmNwdV9pc19wcmVlbXB0ZWQgaXMgbm90IF9fa3ZtX3ZjcHVfaXNfcHJlZW1wdGVkLCB3aWxsIHJl
+dHVybiBmYWxzZS4NCg0KU2ltaWxhciwgZ3Vlc3QgaGFzIG5vcHZzcGluLCBidXQgSExUIGluc3Ry
+dWN0aW9uIGlzIGVtdWxhdGVkOyAgDQoNClNob3VsZCB3ZSBhZGp1c3QgdGhlIHNldHRpbmcgb2Yg
+cHZfb3BzLmxvY2sudmNwdV9pc19wcmVlbXB0ZWQgYXMgYmVsb3cNCkFuZCBJIHNlZSB0aGUgcGVy
+Zm9ybWFuY2UgYm9vc3Qgd2hlbiBndWVzdCBoYXMgbm9wdnNwaW4sIGJ1dCBITFQgaW5zdHJ1Y3Rp
+b24gaXMgZW11bGF0ZWQgd2l0aCBiZWxvdyBjaGFuZ2UNCg0KZGlmZiAtLWdpdCBhL2FyY2gveDg2
+L2tlcm5lbC9rdm0uYyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KaW5kZXggNTlhYmJkYS4uYjA2
+MWQxNyAxMDA2NDQNCi0tLSBhL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KKysrIGIvYXJjaC94ODYv
+a2VybmVsL2t2bS5jDQpAQCAtMTA0OCw2ICsxMDQ4LDExIEBAIHZvaWQgX19pbml0IGt2bV9zcGlu
+bG9ja19pbml0KHZvaWQpDQogICAgICAgICAgICAgICAgcmV0dXJuOw0KICAgICAgICB9DQoNCisg
+ICAgICAgaWYgKGt2bV9wYXJhX2hhc19mZWF0dXJlKEtWTV9GRUFUVVJFX1NURUFMX1RJTUUpKSB7
+DQorICAgICAgICAgICAgICAgcHZfb3BzLmxvY2sudmNwdV9pc19wcmVlbXB0ZWQgPQ0KKyAgICAg
+ICAgICAgICAgICAgICAgICAgUFZfQ0FMTEVFX1NBVkUoX19rdm1fdmNwdV9pc19wcmVlbXB0ZWQp
+Ow0KKyAgICAgICB9DQorDQogICAgICAgIC8qDQogICAgICAgICAqIERpc2FibGUgUFYgc3Bpbmxv
+Y2tzIGFuZCB1c2UgbmF0aXZlIHFzcGlubG9jayB3aGVuIGRlZGljYXRlZCBwQ1BVcw0KICAgICAg
+ICAgKiBhcmUgYXZhaWxhYmxlLg0KQEAgLTEwNzYsMTAgKzEwODEsNiBAQCB2b2lkIF9faW5pdCBr
+dm1fc3BpbmxvY2tfaW5pdCh2b2lkKQ0KICAgICAgICBwdl9vcHMubG9jay53YWl0ID0ga3ZtX3dh
+aXQ7DQogICAgICAgIHB2X29wcy5sb2NrLmtpY2sgPSBrdm1fa2lja19jcHU7DQoNCi0gICAgICAg
+aWYgKGt2bV9wYXJhX2hhc19mZWF0dXJlKEtWTV9GRUFUVVJFX1NURUFMX1RJTUUpKSB7DQotICAg
+ICAgICAgICAgICAgcHZfb3BzLmxvY2sudmNwdV9pc19wcmVlbXB0ZWQgPQ0KLSAgICAgICAgICAg
+ICAgICAgICAgICAgUFZfQ0FMTEVFX1NBVkUoX19rdm1fdmNwdV9pc19wcmVlbXB0ZWQpOw0KLSAg
+ICAgICB9DQogICAgICAgIC8qDQogICAgICAgICAqIFdoZW4gUFYgc3BpbmxvY2sgaXMgZW5hYmxl
+ZCB3aGljaCBpcyBwcmVmZXJyZWQgb3Zlcg0KICAgICAgICAgKiB2aXJ0X3NwaW5fbG9jaygpLCB2
+aXJ0X3NwaW5fbG9ja19rZXkncyB2YWx1ZSBpcyBtZWFuaW5nbGVzcy4NCg0KDQotTGkNCg==
