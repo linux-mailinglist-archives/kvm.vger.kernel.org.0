@@ -2,130 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46EBB48D4FA
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 10:50:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B86248D50F
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 10:50:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232729AbiAMJ1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 04:27:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60202 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230094AbiAMJ1f (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 04:27:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642066054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9u4mM8xpzGhQTXqNOSpCIuqLOs+p1DjaP1wP5fvTV0U=;
-        b=IGTl/4ydkniQ6wNVIR+8qXrh4DokGBwHBSjS/Z8O7IWEezsanFv/U42DXxbHDHdfqLJSbS
-        6jsH7jv+KV0POTu5D/aBgStNfZDfa4hqeZ28nG0nB6Yncu+C/PKrNcGKjl4KlEe9IreKn3
-        FspqY313LyvosI2DmIZx0LAfrPQ3pjk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-260-sCUn2xi-Msm3V8E4KL-4xw-1; Thu, 13 Jan 2022 04:27:33 -0500
-X-MC-Unique: sCUn2xi-Msm3V8E4KL-4xw-1
-Received: by mail-ed1-f72.google.com with SMTP id c8-20020a05640227c800b003fdc1684cdeso4826417ede.12
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 01:27:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=9u4mM8xpzGhQTXqNOSpCIuqLOs+p1DjaP1wP5fvTV0U=;
-        b=G122pEgQOzbI0leehErVsflJTOwSXwL6tOxVXVC5tMloSEcm2PtjXPEm0sAEKhtqsB
-         BaaKZbyAmBMIHQn4XLbq2pQBxjhMYoCqH88c52gk24Zh3qoCqXtpUbSk3FyRjv3mebkz
-         nqT7qxX215rguI5OTgK7jzRCUM7l/XJffUTj6VoONcY0SfUhfcXGu/1blbK4KMS4J8tz
-         5LYV609lft/kLdhL3NlI31kL3LBaVCJpWDxKNSpqgEw6fX5StgynOWOaUq3i48TfWAER
-         yHVLuvG5rLaaqYEg99na49SstI+9kQhlcT7pQI97xraBaDYM15p63iany+iWQ92+RX2V
-         Lp+Q==
-X-Gm-Message-State: AOAM5335Vrxnf8UGG+IYB0/DvRVCsZ4W3QRGtD0K3Hh4DQNo+VNvDWlM
-        ief2868AWxhi1y/53vSZ36vOaE3AvkGh7366o0uG/HHUUCr8jaFqVwAGeSuD9+6VvPvnJSh6/Op
-        wY0K1FRM/m+fK
-X-Received: by 2002:a50:d74e:: with SMTP id i14mr3257719edj.243.1642066052534;
-        Thu, 13 Jan 2022 01:27:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyxknbT0PRuA/sllWl1GxiPU1rPaJrzQ/P32/YPeYZnMkI87/uDO/WsTaCwyYZr8gCuLccFgA==
-X-Received: by 2002:a50:d74e:: with SMTP id i14mr3257708edj.243.1642066052360;
-        Thu, 13 Jan 2022 01:27:32 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id oz31sm671867ejc.35.2022.01.13.01.27.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jan 2022 01:27:31 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
-In-Reply-To: <50136685-706e-fc6a-0a77-97e584e74f93@redhat.com>
-References: <20211122175818.608220-1-vkuznets@redhat.com>
- <20211122175818.608220-3-vkuznets@redhat.com>
- <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
- <20211227183253.45a03ca2@redhat.com>
- <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
- <87mtkdqm7m.fsf@redhat.com> <20220103104057.4dcf7948@redhat.com>
- <875yr1q8oa.fsf@redhat.com>
- <ceb63787-b057-13db-4624-b430c51625f1@redhat.com>
- <87o84qpk7d.fsf@redhat.com> <877dbbq5om.fsf@redhat.com>
- <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
- <20220111090022.1125ffb5@redhat.com> <87fsptnjic.fsf@redhat.com>
- <50136685-706e-fc6a-0a77-97e584e74f93@redhat.com>
-Date:   Thu, 13 Jan 2022 10:27:30 +0100
-Message-ID: <87bl0gnfy5.fsf@redhat.com>
+        id S233206AbiAMJeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 04:34:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52660 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231216AbiAMJeE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 04:34:04 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FEBCC06173F
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 01:34:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=DHr1sVrl7IeDvej9SCgr84nfd+F52WmWfEs1KtZgQWw=; b=oYZLyJosFgXgCrOK0kLOcSbfUz
+        1Dt68evhq9DHR+9Ny2C2UDj2b7WjMLOAUN6NNzQ9BoaPsnoYC/prqVp+a2Y3mrTDzNg51vZHGL4vo
+        pO1Uq8EQkXPw438JqKhHTPxMiAG/7R6q86zqdloEVDoZNWsRT8ix9eP4i8P7r1wAVKNMk5oZoUPpe
+        F6MOC9C4EMOzTEB8/eDXrkZFJAyXqhvlLtUG3gLUiot8l/f6g7ybvgPMbvHTBHsC8XPEYEXDnx1+v
+        KHhGM0vlAYgccQ/CabdTPnDrAe1VxwU+cC/tmhSn59IOZi4HG3GeBJGx7vsoym69Se2qZd9jE6aRo
+        F9ufPaZw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n7wUA-004omR-Bv; Thu, 13 Jan 2022 09:33:34 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9F8593001E1;
+        Thu, 13 Jan 2022 10:33:33 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 7B83B264EE43F; Thu, 13 Jan 2022 10:33:33 +0100 (CET)
+Date:   Thu, 13 Jan 2022 10:33:33 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Li,Rongqing" <lirongqing@baidu.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Wang,Guangju" <wangguangju@baidu.com>
+Subject: Re: =?utf-8?B?562U5aSNOiBbUEFUQ0g=?= =?utf-8?Q?=5D?= KVM: X86: set
+ vcpu preempted only if it is preempted
+Message-ID: <Yd/x7SfI7rNG1erQ@hirez.programming.kicks-ass.net>
+References: <1641988921-3507-1-git-send-email-lirongqing@baidu.com>
+ <Yd7S5rEYZg8v93NX@hirez.programming.kicks-ass.net>
+ <Yd8QR2KHDfsekvNg@google.com>
+ <20220112213129.GO16608@worktop.programming.kicks-ass.net>
+ <bb92391dc5de46ac87ff238faf875c7b@baidu.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb92391dc5de46ac87ff238faf875c7b@baidu.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Thu, Jan 13, 2022 at 04:52:40AM +0000, Li,Rongqing wrote:
 
-> On 1/12/22 14:58, Vitaly Kuznetsov wrote:
->> -	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
->> +	best = cpuid_entry2_find(entries, nent, 0xD, 1);
->>   	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
->>   		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
->>   		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
->>   
->> -	best = kvm_find_kvm_cpuid_features(vcpu);
->> +	best = __kvm_find_kvm_cpuid_features(vcpu, vcpu->arch.cpuid_entries,
->> +					     vcpu->arch.cpuid_nent);
->>   	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
->
-> I think this should be __kvm_find_kvm_cpuid_features(vcpu, entries, nent).
->
+> > > > On Wed, Jan 12, 2022 at 08:02:01PM +0800, Li RongQing wrote:
+> > > > > vcpu can schedule out when run halt instruction, and set itself to
+> > > > > INTERRUPTIBLE and switch to idle thread, vcpu should not be set
+> > > > > preempted for this condition
 
-Of course.
+> Is it possible if guest has KVM_HINTS_REALTIME feature, but its HLT instruction is emulated by KVM?
+> If it is possible, this condition has been performance degradation, since vcpu_is_preempted is not __kvm_vcpu_is_preempted, will return false.
+> 
+> Similar, guest has nopvspin, but HLT instruction is emulated;  
+> 
+> Should we adjust the setting of pv_ops.lock.vcpu_is_preempted as below
+> And I see the performance boost when guest has nopvspin, but HLT instruction is emulated with below change
 
->> 
->> +		case 0x1:
->> +			/* Only initial LAPIC id is allowed to change */
->> +			if (e->eax ^ best->eax || ((e->ebx ^ best->ebx) >> 24) ||
->> +			    e->ecx ^ best->ecx || e->edx ^ best->edx)
->> +				return -EINVAL;
->> +			break;
->
-> This XOR is a bit weird.  In addition the EBX test is checking the wrong 
-> bits (it checks whether 31:24 change and ignores changes to 23:0).
+I'm a little confused; the initial patch explicitly avoided setting
+preempted on HLT, while the below causes it to be set more.
 
-Indeed, however, I've tested CPU hotplug with QEMU trying different
-CPUs in random order and surprisingly othing blew up, feels like QEMU
-was smart enough to re-use the right fd)
+That said; I don't object to this, but I'm not convinced it's right
+either. If you have HINTS_REALTIME (horrible naming aside) this means
+you have pinned vCPU and no overcommit, in which case setting preempted
+makes no sense.
 
->
-> You can write just "(e->ebx & ~0xff000000u) != (best->ebx ~0xff000000u)".
->
->> 
->> +		default:
->> +			if (e->eax ^ best->eax || e->ebx ^ best->ebx ||
->> +			    e->ecx ^ best->ecx || e->edx ^ best->edx)
->> +				return -EINVAL;
->
-> This one even more so.
+*confused*
 
-Thanks for the early review, I'm going to prepare a selftest and send
-this out.
-
--- 
-Vitaly
-
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 59abbda..b061d17 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -1048,6 +1048,11 @@ void __init kvm_spinlock_init(void)
+>                 return;
+>         }
+> 
+> +       if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+> +               pv_ops.lock.vcpu_is_preempted =
+> +                       PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
+> +       }
+> +
+>         /*
+>          * Disable PV spinlocks and use native qspinlock when dedicated pCPUs
+>          * are available.
+> @@ -1076,10 +1081,6 @@ void __init kvm_spinlock_init(void)
+>         pv_ops.lock.wait = kvm_wait;
+>         pv_ops.lock.kick = kvm_kick_cpu;
+> 
+> -       if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+> -               pv_ops.lock.vcpu_is_preempted =
+> -                       PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
+> -       }
+>         /*
+>          * When PV spinlock is enabled which is preferred over
+>          * virt_spin_lock(), virt_spin_lock_key's value is meaningless.
+> 
+> 
+> -Li
