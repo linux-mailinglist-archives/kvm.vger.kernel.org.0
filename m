@@ -2,427 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FD3848D89B
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 14:16:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE69848D8AC
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 14:18:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235020AbiAMNQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 08:16:08 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:44530 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234992AbiAMNQH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 08:16:07 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8598C1EC05B0;
-        Thu, 13 Jan 2022 14:16:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1642079761;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=9WGoBrjivrLqJxCpV/zv4l0xkczjCFTpEWzWAmYUpRk=;
-        b=hO6rTC026rzboOcdbL00rf9aiGWfSdX9/Vc0Eq8wGTmBDnQ8FWJQY9t1MLiIEyC93J3qgF
-        JYmy4wtIHM8flS3KD2tcibLc/R9L/Y7pl+P3fHZhL6T95hBmIAHHB3PERAlDj1eUm2u5Ek
-        sC0W69m/3cW2/e8xUmmlidRowZ+fbI4=
-Date:   Thu, 13 Jan 2022 14:16:05 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 29/40] x86/compressed/64: add support for SEV-SNP
- CPUID table in #VC handlers
-Message-ID: <YeAmFePcPjvMoWCP@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-30-brijesh.singh@amd.com>
+        id S235036AbiAMNSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 08:18:00 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42918 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232469AbiAMNR7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 08:17:59 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20DCs8Gw009933;
+        Thu, 13 Jan 2022 13:17:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=V7cyHYs7coITesRIuAb6fJcr+jEOk1HTxd6P1IxMZiA=;
+ b=D+KlgDXJPLl5Hjg59Il3RIS4e2MXZEaCNzJqT3jSUuIyYnaPXlhvSuZ1hjVd6dVMJzXg
+ te/B2NbJKgjlayU4Alu6v+bU9lP6YuDHVBFWPpXj9X5XDW44H68+bFhU/kp/j3/pezpD
+ m0fZZVbOxzhN0ZAJ7RTGdmz/NbPAZ1f02IG3uV2uw0VwF/zHaRg4BhoABEFk3KLBtKJs
+ rcO373PyD54rYQsFFNKhdWwPKekLro1+NAQ422PMEergMf/u6ZULACCNyh1BA9u0eUuE
+ bHpQBRLPjj6/XHaOS/ZL7mB0e6nYMY0eXoLMKY4q2+njVpaOzh48mFbTaJzGV1paIL4O /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3djknxhk08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jan 2022 13:17:58 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20DDE83E007871;
+        Thu, 13 Jan 2022 13:17:58 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3djknxhjyj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jan 2022 13:17:58 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20DDBwai014688;
+        Thu, 13 Jan 2022 13:17:56 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3dfwhjnt41-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jan 2022 13:17:56 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20DDHrog42860868
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jan 2022 13:17:53 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4A4E3A4060;
+        Thu, 13 Jan 2022 13:17:53 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CF486A4064;
+        Thu, 13 Jan 2022 13:17:52 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.156])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Jan 2022 13:17:52 +0000 (GMT)
+Date:   Thu, 13 Jan 2022 14:17:50 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, seiden@linux.ibm.com, mhartmay@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 7/8] s390x: snippets: Add PV support
+Message-ID: <20220113141750.78478ef3@p-imbrenda>
+In-Reply-To: <62524574-a3c9-9024-7655-2a59725e557f@linux.ibm.com>
+References: <20211123103956.2170-1-frankja@linux.ibm.com>
+        <20211123103956.2170-8-frankja@linux.ibm.com>
+        <20211123122219.3c18cf98@p-imbrenda>
+        <08052bad-b494-c99b-27b3-bcfef0aa94fd@linux.ibm.com>
+        <e0708a4f-8747-d1c5-229e-d06c8d67dcda@linux.ibm.com>
+        <62524574-a3c9-9024-7655-2a59725e557f@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-30-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jTPTh1jFXJ5RB3X7gNdmS9c2bQ9ipXrI
+X-Proofpoint-ORIG-GUID: dsYE4Pt9FpztM4yTQXtVRLzO_b8SO-ep
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-13_04,2022-01-13_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 bulkscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 adultscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201130079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 09:43:21AM -0600, Brijesh Singh wrote:
-> +/*
-> + * Individual entries of the SEV-SNP CPUID table, as defined by the SEV-SNP
-> + * Firmware ABI, Revision 0.9, Section 7.1, Table 14. Note that the XCR0_IN
-> + * and XSS_IN are denoted here as __unused/__unused2, since they are not
-> + * needed for the current guest implementation,
+On Thu, 13 Jan 2022 14:10:01 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-That's fine and great but you need to check in the function where you
-iterate over those leafs below whether those unused variables are 0
-and fail if not. Not that BIOS or whoever creates that table, starts
-becoming creative...
+> On 12/3/21 10:29, Janosch Frank wrote:
+> > On 11/26/21 14:28, Janosch Frank wrote:  
+> >> On 11/23/21 12:22, Claudio Imbrenda wrote:  
+> >>> On Tue, 23 Nov 2021 10:39:55 +0000
+> >>> Janosch Frank <frankja@linux.ibm.com> wrote:
+> >>>  
+> [...]
+> >>> are they supposed to have different addresses?
+> >>> the C files start at 0x4000, while the asm ones at 0  
+> >>
+> >> That's a mistake I'll need to fix.  
+> > 
+> > On second thought this is correct since it's the starting address of the
+> > component and not the PSW entry. The psw entry is the next argument.
+> > The C snippets currently have data in the first 4 pages so we can
+> > encrypt from offset 0.
+> > 
+> > The question that remains is: do we need the data at 0x0 - 0x4000?
+> > The reset and restart PSWs are not really necessary since we don't start
+> > the snippets as a lpar or in simulation where we use these PSWs.
+> > The stackptr is just that, a ptr AFAIK so there shouldn't be data on
+> > 0x3000 (but I'll look that up anyway).  
+> 
+> Colleagues have used the C PV snippets over the last few weeks and 
+> haven't reported any issues. It's time that we bring this into master 
+> since a lot of upcoming tests are currently based on this series.
+> 
+> @Claudio: Any further comments?
 
-> where the size of the buffers
-> + * needed to store enabled XSAVE-saved features are calculated rather than
-> + * encoded in the CPUID table for each possible combination of XCR0_IN/XSS_IN
-> + * to save space.
-> + */
-> +struct snp_cpuid_fn {
-> +	u32 eax_in;
-> +	u32 ecx_in;
-> +	u64 __unused;
-> +	u64 __unused2;
-> +	u32 eax;
-> +	u32 ebx;
-> +	u32 ecx;
-> +	u32 edx;
-> +	u64 __reserved;
+no, let's bring this into master
 
-Ditto.
-
-> +} __packed;
-> +
-> +/*
-> + * SEV-SNP CPUID table header, as defined by the SEV-SNP Firmware ABI,
-> + * Revision 0.9, Section 8.14.2.6. Also noted there is the SEV-SNP
-> + * firmware-enforced limit of 64 entries per CPUID table.
-> + */
-> +#define SNP_CPUID_COUNT_MAX 64
-> +
-> +struct snp_cpuid_info {
-> +	u32 count;
-> +	u32 __reserved1;
-> +	u64 __reserved2;
-> +	struct snp_cpuid_fn fn[SNP_CPUID_COUNT_MAX];
-> +} __packed;
-> +
->  /*
->   * Since feature negotiation related variables are set early in the boot
->   * process they must reside in the .data section so as not to be zeroed
-> @@ -23,6 +58,20 @@
->   */
->  static u16 ghcb_version __ro_after_init;
->  
-> +/* Copy of the SNP firmware's CPUID page. */
-> +static struct snp_cpuid_info cpuid_info_copy __ro_after_init;
-> +static bool snp_cpuid_initialized __ro_after_init;
-> +
-> +/*
-> + * These will be initialized based on CPUID table so that non-present
-> + * all-zero leaves (for sparse tables) can be differentiated from
-> + * invalid/out-of-range leaves. This is needed since all-zero leaves
-> + * still need to be post-processed.
-> + */
-> +u32 cpuid_std_range_max __ro_after_init;
-> +u32 cpuid_hyp_range_max __ro_after_init;
-> +u32 cpuid_ext_range_max __ro_after_init;
-
-All of them: static.
-
->  static bool __init sev_es_check_cpu_features(void)
->  {
->  	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-> @@ -246,6 +295,244 @@ static int sev_cpuid_hv(u32 func, u32 subfunc, u32 *eax, u32 *ebx,
->  	return 0;
->  }
->  
-> +static const struct snp_cpuid_info *
-
-No need for that linebreak here.
-
-> +snp_cpuid_info_get_ptr(void)
-> +{
-> +	void *ptr;
-> +
-> +	/*
-> +	 * This may be called early while still running on the initial identity
-> +	 * mapping. Use RIP-relative addressing to obtain the correct address
-> +	 * in both for identity mapping and after switch-over to kernel virtual
-> +	 * addresses.
-> +	 */
-
-Put that comment over the function name.
-
-And yah, that probably works but eww.
-
-> +	asm ("lea cpuid_info_copy(%%rip), %0"
-> +	     : "=r" (ptr)
-
-Why not "=g" and let the compiler decide?
-
-> +	     : "p" (&cpuid_info_copy));
-> +
-> +	return ptr;
-> +}
-> +
-> +static inline bool snp_cpuid_active(void)
-> +{
-> +	return snp_cpuid_initialized;
-> +}
-
-That looks useless. That variable snp_cpuid_initialized either gets set
-or the guest terminates, so practically, if the guest is still running,
-you can assume SNP CPUID is properly initialized.
-
-> +static int snp_cpuid_calc_xsave_size(u64 xfeatures_en, u32 base_size,
-> +				     u32 *xsave_size, bool compacted)
-> +{
-> +	const struct snp_cpuid_info *cpuid_info = snp_cpuid_info_get_ptr();
-> +	u32 xsave_size_total = base_size;
-> +	u64 xfeatures_found = 0;
-> +	int i;
-> +
-> +	for (i = 0; i < cpuid_info->count; i++) {
-> +		const struct snp_cpuid_fn *fn = &cpuid_info->fn[i];
-> +
-> +		if (!(fn->eax_in == 0xD && fn->ecx_in > 1 && fn->ecx_in < 64))
-> +			continue;
-
-I guess that test can be as simple as
-
-		if (fn->eax_in != 0xd)
-			continue;
-
-or why do you wanna check ECX too? Funky values coming from the CPUID
-page?
-
-> +		if (!(xfeatures_en & (BIT_ULL(fn->ecx_in))))
-> +			continue;
-> +		if (xfeatures_found & (BIT_ULL(fn->ecx_in)))
-> +			continue;
-
-What is that test for? Don't tell me the CPUID page allows duplicate
-entries...
-
-> +		xfeatures_found |= (BIT_ULL(fn->ecx_in));
-> +
-> +		if (compacted)
-> +			xsave_size_total += fn->eax;
-> +		else
-> +			xsave_size_total = max(xsave_size_total,
-> +					       fn->eax + fn->ebx);
-> +	}
-> +
-> +	/*
-> +	 * Either the guest set unsupported XCR0/XSS bits, or the corresponding
-> +	 * entries in the CPUID table were not present. This is not a valid
-> +	 * state to be in.
-> +	 */
-> +	if (xfeatures_found != (xfeatures_en & GENMASK_ULL(63, 2)))
-> +		return -EINVAL;
-> +
-> +	*xsave_size = xsave_size_total;
-> +
-> +	return 0;
-
-This function can return xsave_size in the success case and negative in
-the error case so you don't need the IO param *xsave_size.
-
-> +}
-> +
-> +static void snp_cpuid_hv(u32 func, u32 subfunc, u32 *eax, u32 *ebx, u32 *ecx,
-> +			 u32 *edx)
-> +{
-> +	/*
-> +	 * MSR protocol does not support fetching indexed subfunction, but is
-> +	 * sufficient to handle current fallback cases. Should that change,
-> +	 * make sure to terminate rather than ignoring the index and grabbing
-> +	 * random values. If this issue arises in the future, handling can be
-> +	 * added here to use GHCB-page protocol for cases that occur late
-> +	 * enough in boot that GHCB page is available.
-> +	 */
-> +	if (cpuid_function_is_indexed(func) && subfunc)
-> +		sev_es_terminate(1, GHCB_TERM_CPUID_HV);
-> +
-> +	if (sev_cpuid_hv(func, 0, eax, ebx, ecx, edx))
-> +		sev_es_terminate(1, GHCB_TERM_CPUID_HV);
-> +}
-> +
-> +static bool
-> +snp_cpuid_find_validated_func(u32 func, u32 subfunc, u32 *eax, u32 *ebx,
-
-snp_cpuid_get_validated_func()
-
-> +			      u32 *ecx, u32 *edx)
-> +{
-> +	const struct snp_cpuid_info *cpuid_info = snp_cpuid_info_get_ptr();
-> +	int i;
-> +
-> +	for (i = 0; i < cpuid_info->count; i++) {
-> +		const struct snp_cpuid_fn *fn = &cpuid_info->fn[i];
-> +
-> +		if (fn->eax_in != func)
-> +			continue;
-> +
-> +		if (cpuid_function_is_indexed(func) && fn->ecx_in != subfunc)
-> +			continue;
-> +
-> +		*eax = fn->eax;
-> +		*ebx = fn->ebx;
-> +		*ecx = fn->ecx;
-> +		*edx = fn->edx;
-> +
-> +		return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static bool snp_cpuid_check_range(u32 func)
-> +{
-> +	if (func <= cpuid_std_range_max ||
-> +	    (func >= 0x40000000 && func <= cpuid_hyp_range_max) ||
-> +	    (func >= 0x80000000 && func <= cpuid_ext_range_max))
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static int snp_cpuid_postprocess(u32 func, u32 subfunc, u32 *eax, u32 *ebx,
-> +				 u32 *ecx, u32 *edx)
-
-I'm wondering if you could make everything a lot easier by doing
-
-static int snp_cpuid_postprocess(struct cpuid_leaf *leaf)
-
-and marshall around that struct cpuid_leaf which contains func, subfunc,
-e[abcd]x instead of dealing with 6 parameters.
-
-Callers of snp_cpuid() can simply allocate it on their stack and hand it
-in and it is all in sev-shared.c so nicely self-contained...
-
-...
-
-> +/*
-> + * Returns -EOPNOTSUPP if feature not enabled. Any other return value should be
-> + * treated as fatal by caller.
-> + */
-> +static int snp_cpuid(u32 func, u32 subfunc, u32 *eax, u32 *ebx, u32 *ecx,
-> +		     u32 *edx)
-> +{
-> +	if (!snp_cpuid_active())
-> +		return -EOPNOTSUPP;
-
-And this becomes superfluous.
-
-> +
-> +	if (!snp_cpuid_find_validated_func(func, subfunc, eax, ebx, ecx, edx)) {
-> +		/*
-> +		 * Some hypervisors will avoid keeping track of CPUID entries
-> +		 * where all values are zero, since they can be handled the
-> +		 * same as out-of-range values (all-zero). This is useful here
-> +		 * as well as it allows virtually all guest configurations to
-> +		 * work using a single SEV-SNP CPUID table.
-> +		 *
-> +		 * To allow for this, there is a need to distinguish between
-> +		 * out-of-range entries and in-range zero entries, since the
-> +		 * CPUID table entries are only a template that may need to be
-> +		 * augmented with additional values for things like
-> +		 * CPU-specific information during post-processing. So if it's
-> +		 * not in the table, but is still in the valid range, proceed
-> +		 * with the post-processing. Otherwise, just return zeros.
-> +		 */
-> +		*eax = *ebx = *ecx = *edx = 0;
-> +		if (!snp_cpuid_check_range(func))
-> +			return 0;
-
-Do the check first and then assign.
-
-> +	}
-> +
-> +	return snp_cpuid_postprocess(func, subfunc, eax, ebx, ecx, edx);
-> +}
-> +
->  /*
->   * Boot VC Handler - This is the first VC handler during boot, there is no GHCB
->   * page yet, so it only supports the MSR based communication with the
-> @@ -253,16 +540,26 @@ static int sev_cpuid_hv(u32 func, u32 subfunc, u32 *eax, u32 *ebx,
->   */
->  void __init do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code)
->  {
-> +	unsigned int subfn = lower_bits(regs->cx, 32);
->  	unsigned int fn = lower_bits(regs->ax, 32);
->  	u32 eax, ebx, ecx, edx;
-> +	int ret;
->  
->  	/* Only CPUID is supported via MSR protocol */
->  	if (exit_code != SVM_EXIT_CPUID)
->  		goto fail;
->  
-> +	ret = snp_cpuid(fn, subfn, &eax, &ebx, &ecx, &edx);
-> +	if (ret == 0)
-
-	if (!ret)
-
-> +		goto cpuid_done;
-> +
-> +	if (ret != -EOPNOTSUPP)
-> +		goto fail;
-> +
->  	if (sev_cpuid_hv(fn, 0, &eax, &ebx, &ecx, &edx))
->  		goto fail;
->  
-> +cpuid_done:
->  	regs->ax = eax;
->  	regs->bx = ebx;
->  	regs->cx = ecx;
-> @@ -557,12 +854,35 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
->  	return ret;
->  }
->  
-> +static int vc_handle_cpuid_snp(struct pt_regs *regs)
-> +{
-> +	u32 eax, ebx, ecx, edx;
-> +	int ret;
-> +
-> +	ret = snp_cpuid(regs->ax, regs->cx, &eax, &ebx, &ecx, &edx);
-> +	if (ret == 0) {
-
-	if (!ret)
-
-> +		regs->ax = eax;
-> +		regs->bx = ebx;
-> +		regs->cx = ecx;
-> +		regs->dx = edx;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
->  				      struct es_em_ctxt *ctxt)
->  {
->  	struct pt_regs *regs = ctxt->regs;
->  	u32 cr4 = native_read_cr4();
->  	enum es_result ret;
-> +	int snp_cpuid_ret;
-> +
-> +	snp_cpuid_ret = vc_handle_cpuid_snp(regs);
-> +	if (snp_cpuid_ret == 0)
-
-	if (! ... - you get the idea.
-
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
