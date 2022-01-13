@@ -2,110 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1E1148D646
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 12:04:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 675D048D652
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 12:09:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232198AbiAMLDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 06:03:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47440 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231831AbiAMLDz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 06:03:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642071834;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MpZ4Du/iM3hkKHHuN33A6bZXhYi9Fwj36mcGGjKskBw=;
-        b=XxNeE0LJM+w3K774fdgW43OfUSgoTUjxMEWwmh+D7Z+/UnLwgmrP2wmJCEUYSY4bqAAczi
-        tY7WX4YUu8yJoy6diyOALgIsbCz/c8ASwLuBjncTULrxtAzxueLePzZqOZVD3dq9xKxVqe
-        XMfMdtnUz6Jx2Lu3MyaGXpI6K7V6GkE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-fMbRlD3NOFelcU312XOFiA-1; Thu, 13 Jan 2022 06:03:53 -0500
-X-MC-Unique: fMbRlD3NOFelcU312XOFiA-1
-Received: by mail-ed1-f70.google.com with SMTP id m8-20020a056402510800b003f9d22c4d48so4991401edd.21
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 03:03:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=MpZ4Du/iM3hkKHHuN33A6bZXhYi9Fwj36mcGGjKskBw=;
-        b=T/VpVDufjqOXK+uCM942wFLsYou3I/EI/BRNC6NZCS3T11jFNjABJEWVRlpfrPoiB7
-         EFWbHnVshrnSvqlvu3+atykUh/XB90QUww/ajWp2cErI4EXMCj4zQ9oXEVAHx+K+Fx6Q
-         fpb26AGh039puxW567Nu4oLRSbf7ZPK81sJfofcOyeEdrgxZN/QX+EQ9Ko5ya4KrFYNY
-         XdokoCDqTJ1FT/1Ovps4pyI8Cy0w7VXRkGAFrTZbFeTo/HqWkHN182rxBYztRauK5PLX
-         0dqbcQZP6Hy6shZ5y9pw+s+vs06GlF7KRkiwpWwur4HUVF0D/d226p/ztDefmVg+uEhs
-         ZZRA==
-X-Gm-Message-State: AOAM533Lkl+M8zb4zAGIAclVJ+VrH19dngPoc7IF75ukjERFIOSGPNqM
-        4hhj7IntXcXrVsTRNuX/0GVunztVifNM9umHlACUNwJGCdoN1DUYXV4h1WiIp71Nx/mun4YI4Kj
-        8h6LliMJxIrCp
-X-Received: by 2002:a17:907:72c3:: with SMTP id du3mr3034509ejc.114.1642071831851;
-        Thu, 13 Jan 2022 03:03:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz5nCl7RoTG6c5m83v9OIRnTyFQ7PANN2z1weIZQ3bscYBH59y9e3ohr1LZGiWRx0W1za5VfQ==
-X-Received: by 2002:a17:907:72c3:: with SMTP id du3mr3034494ejc.114.1642071831644;
-        Thu, 13 Jan 2022 03:03:51 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id qb2sm760403ejc.219.2022.01.13.03.03.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jan 2022 03:03:50 -0800 (PST)
-Message-ID: <57e8ee6e-e332-990c-2f4f-1767374b637b@redhat.com>
-Date:   Thu, 13 Jan 2022 12:03:48 +0100
+        id S230151AbiAMLJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 06:09:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46524 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229571AbiAMLJt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 06:09:49 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E2EC06173F
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 03:09:49 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n7xyF-0006Q7-HJ; Thu, 13 Jan 2022 12:08:43 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n7xy5-00A3Hi-BT; Thu, 13 Jan 2022 12:08:32 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n7xy3-0005lb-Nu; Thu, 13 Jan 2022 12:08:31 +0100
+Date:   Thu, 13 Jan 2022 12:08:31 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Zhang Rui <rui.zhang@intel.com>,
+        platform-driver-x86@vger.kernel.org,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Borislav Petkov <bp@alien8.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        openipmi-developer@lists.sourceforge.net,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Benson Leung <bleung@chromium.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        netdev@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+Message-ID: <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
+References: <20220110195449.12448-1-s.shtylyov@omp.ru>
+ <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
+ <YdyilpjC6rtz6toJ@lunn.ch>
+ <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
+ <20220112085009.dbasceh3obfok5dc@pengutronix.de>
+ <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+ <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86: fix kvm_vcpu_is_preempted
-Content-Language: en-US
-To:     Li RongQing <lirongqing@baidu.com>, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, rkrcmar@redhat.com, kvm@vger.kernel.org,
-        joro@8bytes.org
-References: <1641986380-10199-1-git-send-email-lirongqing@baidu.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1641986380-10199-1-git-send-email-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="zcdy7nemyxfoojub"
+Content-Disposition: inline
+In-Reply-To: <Yd9L9SZ+g13iyKab@sirena.org.uk>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/12/22 12:19, Li RongQing wrote:
-> After support paravirtualized TLB shootdowns, steal_time.preempted
-> includes not only KVM_VCPU_PREEMPTED, but also KVM_VCPU_FLUSH_TLB
-> 
-> and kvm_vcpu_is_preempted should test only with KVM_VCPU_PREEMPTED
 
-The combination of PREEMPTED=0,FLUSH_TLB=1 is invalid and can only 
-happens if the guest malfunctions (which it doesn't, it uses cmpxchg to 
-set KVM_VCPU_PREEMPTED); the host only does an xchg with 0 as the new 
-value.  Since this is guest code, this patch does not change an actual 
-error in the code, does it?
+--zcdy7nemyxfoojub
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Wed, Jan 12, 2022 at 09:45:25PM +0000, Mark Brown wrote:
+> On Wed, Jan 12, 2022 at 10:31:21PM +0100, Uwe Kleine-K=F6nig wrote:
+> > On Wed, Jan 12, 2022 at 11:27:02AM +0100, Geert Uytterhoeven wrote:
+>=20
+> (Do we really need *all* the CCs here?)
 
-> Fixes: 858a43aae2367 ("KVM: X86: use paravirtualized TLB Shootdown")
-> Signed-off-by: Li RongQing<lirongqing@baidu.com>
-> ---
->   arch/x86/kernel/kvm.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 59abbda..a9202d9 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -1025,8 +1025,8 @@ asm(
->   ".type __raw_callee_save___kvm_vcpu_is_preempted, @function;"
->   "__raw_callee_save___kvm_vcpu_is_preempted:"
->   "movq	__per_cpu_offset(,%rdi,8), %rax;"
-> -"cmpb	$0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
-> -"setne	%al;"
-> +"movb	" __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax), %al;"
-> +"andb	$" __stringify(KVM_VCPU_PREEMPTED) ", %al;"
->   "ret;"
->   ".size __raw_callee_save___kvm_vcpu_is_preempted, .-__raw_callee_save___kvm_vcpu_is_preempted;"
->   ".popsection");
+It's probably counteractive to finding an agreement because there are
+too many opinions on that matter. But I didn't dare to strip it down,
+too :-)
 
+> > That convinces me, that platform_get_irq_optional() is a bad name. The
+> > only difference to platform_get_irq is that it's silent. And returning
+> > a dummy irq value (which would make it aligned with the other _optional
+> > functions) isn't possible.
+>=20
+> There is regulator_get_optional() which is I believe the earliest of
+> these APIs, it doesn't return a dummy either (and is silent too) - this
+> is because regulator_get() does return a dummy since it's the vastly
+> common case that regulators must be physically present and them not
+> being found is due to there being an error in the system description.
+> It's unfortunate that we've ended up with these two different senses for
+> _optional(), people frequently get tripped up by it.
+
+Yeah, I tripped over that one already, too. And according to my counting
+this results in three different senses now :-\ :
+
+ a) regulator
+    regulator_get returns a dummy, regulator_get_optional returns ERR_PTR(-=
+ENODEV)
+ b) clk + gpiod
+    ..._get returns ERR_PTR(-ENODEV), ..._get_optional returns a dummy
+ c) platform_get_irq()
+    platform_get_irq_optional() is just a silent variant of
+    platform_get_irq(); the return values are identical.
+   =20
+This is all very unfortunate. In my eyes b) is the most sensible
+sense, but the past showed that we don't agree here. (The most annoying
+part of regulator_get is the warning that is emitted that regularily
+makes customers ask what happens here and if this is fixable.)
+
+I think at least c) is easy to resolve because
+platform_get_irq_optional() isn't that old yet and mechanically
+replacing it by platform_get_irq_silent() should be easy and safe.
+And this is orthogonal to the discussion if -ENOXIO is a sensible return
+value and if it's as easy as it could be to work with errors on irq
+lookups.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--zcdy7nemyxfoojub
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHgCCsACgkQwfwUeK3K
+7AktbAf/UzNin6+fnXTmkdrTvXWaXCV8TB76EIUtIdNWwJEjmXxWes5jyBpp/jXj
+7gSmYT3gi4oK0wjB6dKmqF6jba5/RPL4cdS6/8iQDp32Xey0hzWymBPENLc/Nxt5
+Ge81cdot6EFxqSkuW1Zbe55wzmNUmEsez7+e+8gJAviPB6zQndDE/zAkwxczzb04
+GfD6Uixgm4a29NwXNIignwNm8pACez/px2A8cVhILZ8135X0rdwYM17BiQtfM5Uq
+s2hZsLfxWm9ZvdyxA7gGvsfefPmiPfS3k/HWagHMDB8nQq4vqnMmPTu01YJs34dM
++ycJZkglW3eJnCZ9Fr5sjnuP6uLExw==
+=5Hn7
+-----END PGP SIGNATURE-----
+
+--zcdy7nemyxfoojub--
