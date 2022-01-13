@@ -2,134 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B42F648DF31
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 21:50:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47F8E48DF44
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 21:57:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234711AbiAMUuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 15:50:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38054 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232900AbiAMUuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 15:50:06 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D703DC06161C
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 12:50:05 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id t18so11375772plg.9
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 12:50:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tPApFU58dR1gZgJEEILu+tDGM+PxSeVinprQhzYCrE0=;
-        b=U5Eh4w8ILAYJhQL+8Y6Z9iDTqQsglioZ0VFEHhm4/BwRgFS4oNhLFLsxsFiqlA1zAo
-         itCSCSrzIrhpEMme3G0z47NlGBGRbIr3+D6R8O9kJYKVUl+9+hrsaIrhEl6DjOdbMJWS
-         AR6WaLHIXm35aP+AH3hszxZzhlxt84R4zE/VauBiZSf/Z6Yf9MExY1Qvyoax8K/hUwzD
-         dPyMhx9SSUuu5dJ2HOILw6gEdj4UEyNjES+8O/F4y9lTCglxf6WMFliRv5OYa44NoyQ2
-         DSgceVnFXObalfg6opXRXYJGjc2XUbF6hGNavkF5+6GwIlrMhmtCeTLQ0nkAvmDBvSsB
-         nsCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tPApFU58dR1gZgJEEILu+tDGM+PxSeVinprQhzYCrE0=;
-        b=Fy9sUZkw+rCSGQbrWsORCykf2ZdF0VqvbIN1zeBZE2cquMPu2vzBeOhG3R2+SuFJ9Q
-         lJMy25sIsngcEOOBd8jcqcx6Geg64Chh31jPJD1boRNylSjZSmgegEzsQ+gjHufreme2
-         9poG8A1hvQJyAnoJqv9sKAcv5d4TytfSEpIT106sRQbSw7EKvPFKilum8CIrT6xieLqT
-         1ZhtTm/9I+J1I3LBYvnaP4qpbccJpQjZh963lOzyaQzoXu278dKV9HNrI7bbjldHcioX
-         hWPnFQcQ1vJ1FYIgzCNI3cVTLYgiBi/97eQwzgtdsK0ctS6t+emExE09YRA8bkh/uKra
-         qCdA==
-X-Gm-Message-State: AOAM5302etQMyC447VcQ+wZ2BuTvlvf0s3rapmT4W3waNQjAUO8atpMF
-        JN5tXVyzwUwY+/s09I1M+7yg2A==
-X-Google-Smtp-Source: ABdhPJwJYCD5/Syd/w/87DQlTR6TI+0Jvof2BT19Yr+6weO4P+lZR1M9vsvHVuZlgMkc5peAaklPcw==
-X-Received: by 2002:a17:90b:1651:: with SMTP id il17mr15571035pjb.151.1642107004976;
-        Thu, 13 Jan 2022 12:50:04 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y69sm3549018pfg.171.2022.01.13.12.50.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jan 2022 12:50:04 -0800 (PST)
-Date:   Thu, 13 Jan 2022 20:50:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, borntraeger@linux.ibm.com, bp@alien8.de,
-        catalin.marinas@arm.com, chenhuacai@kernel.org,
-        dave.hansen@linux.intel.com, david@redhat.com,
-        frankja@linux.ibm.com, frederic@kernel.org, gor@linux.ibm.com,
-        hca@linux.ibm.com, imbrenda@linux.ibm.com, james.morse@arm.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        maz@kernel.org, mingo@redhat.com, mpe@ellerman.id.au,
-        nsaenzju@redhat.com, palmer@dabbelt.com, paulmck@kernel.org,
-        paulus@samba.org, paul.walmsley@sifive.com, pbonzini@redhat.com,
-        suzuki.poulose@arm.com, tglx@linutronix.de,
-        tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-Subject: Re: [PATCH 5/5] kvm/x86: rework guest entry logic
-Message-ID: <YeCQeHbswboaosoV@google.com>
-References: <20220111153539.2532246-1-mark.rutland@arm.com>
- <20220111153539.2532246-6-mark.rutland@arm.com>
+        id S234717AbiAMU5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 15:57:55 -0500
+Received: from mxout04.lancloud.ru ([45.84.86.114]:43128 "EHLO
+        mxout04.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230369AbiAMU5y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 15:57:54 -0500
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 29AAB20A6FFC
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Subject: Re: [PATCH] driver core: platform: Rename platform_get_irq_optional()
+ to platform_get_irq_silent()
+To:     Mark Brown <broonie@kernel.org>,
+        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
+CC:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        <linux-iio@vger.kernel.org>,
+        "Linus Walleij" <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        "ALSA Development Mailing List" <alsa-devel@alsa-project.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        <linux-phy@lists.infradead.org>, Jiri Slaby <jirislaby@kernel.org>,
+        <openipmi-developer@lists.sourceforge.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        "Bartosz Golaszewski" <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        "Borislav Petkov" <bp@alien8.de>,
+        Sebastian Reichel <sre@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        <platform-driver-x86@vger.kernel.org>,
+        Benson Leung <bleung@chromium.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        <linux-edac@vger.kernel.org>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        "Eric Auger" <eric.auger@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Linux MMC List" <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
+        <linux-mediatek@lists.infradead.org>,
+        "Brian Norris" <computersforpeace@gmail.com>,
+        <netdev@vger.kernel.org>
+References: <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
+ <YdyilpjC6rtz6toJ@lunn.ch>
+ <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
+ <20220112085009.dbasceh3obfok5dc@pengutronix.de>
+ <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+ <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
+ <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
+ <YeA7CjOyJFkpuhz/@sirena.org.uk>
+ <20220113194358.xnnbhsoyetihterb@pengutronix.de>
+ <YeCI47ltlWzjzjYy@sirena.org.uk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <1df04d74-8aa2-11f1-54e9-34d0e8f4e58b@omp.ru>
+Date:   Thu, 13 Jan 2022 23:57:43 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220111153539.2532246-6-mark.rutland@arm.com>
+In-Reply-To: <YeCI47ltlWzjzjYy@sirena.org.uk>
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
+ LFEX1907.lancloud.ru (fd00:f066::207)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 11, 2022, Mark Rutland wrote:
-> For consistency and clarity, migrate x86 over to the generic helpers for
-> guest timing and lockdep/RCU/tracing management, and remove the
-> x86-specific helpers.
-> 
-> Prior to this patch, the guest timing was entered in
-> kvm_guest_enter_irqoff() (called by svm_vcpu_enter_exit() and
-> svm_vcpu_enter_exit()), and was exited by the call to
-> vtime_account_guest_exit() within vcpu_enter_guest().
-> 
-> To minimize duplication and to more clearly balance entry and exit, both
-> entry and exit of guest timing are placed in vcpu_enter_guest(), using
-> the new guest_timing_{enter,exit}_irqoff() helpers. This may result in a
-> small amount of additional time being acounted towards guests.
+On 1/13/22 11:17 PM, Mark Brown wrote:
 
-This can be further qualified to state that it only affects time accounting when
-using context tracking; tick-based accounting is unaffected because IRQs are
-disabled the entire time.
+>> The subsystems regulator, clk and gpio have the concept of a dummy
+>> resource. For regulator, clk and gpio there is a semantic difference
+>> between the regular _get() function and the _get_optional() variant.
+>> (One might return the dummy resource, the other won't. Unfortunately
+>> which one implements which isn't the same for these three.) The
+>> difference between platform_get_irq() and platform_get_irq_optional() is
+>> only that the former might emit an error message and the later won't.
 
-And this might actually be a (benign?) bug fix for context tracking accounting in
-the EXIT_FASTPATH_REENTER_GUEST case (commits ae95f566b3d2 "KVM: X86: TSCDEADLINE
-MSR emulation fastpath" and 26efe2fd92e5, "KVM: VMX: Handle preemption timer
-fastpath").  In those cases, KVM will enter the guest multiple times without
-bouncing through vtime_account_guest_exit().  That means vtime_guest_enter() will
-be called when the CPU is already "in guest", and call vtime_account_system()
-when it really should call vtime_account_guest().  account_system_time() does
-check PF_VCPU and redirect to account_guest_time(), so it appears to be benign,
-but it's at least odd.
+   This is only a current difference but I'm still going to return 0 ISO
+-ENXIO from latform_get_irq_optional(), no way I'd leave that -ENXIO there
+alone... :-)
 
-> Other than this, there should be no functional change as a result of
-> this patch.
+> Reviewed-by: Mark Brown <broonie@kernel.org>
 
-...
+   Hm... I'm seeing a tag bit not seeing the patch itself...
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e50e97ac4408..bd3873b90889 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9876,6 +9876,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		set_debugreg(0, 7);
->  	}
->  
-> +	guest_timing_enter_irqoff();
-> +
->  	for (;;) {
->  		/*
->  		 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
-> @@ -9949,7 +9951,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  	 * of accounting via context tracking, but the loss of accuracy is
->  	 * acceptable for all known use cases.
->  	 */
-> -	vtime_account_guest_exit();
-> +	guest_timing_exit_irqoff();
->  
->  	if (lapic_in_kernel(vcpu)) {
->  		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
+MBR, Sergey
