@@ -2,245 +2,438 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5960248D124
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 04:55:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AEFB48D134
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 05:07:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232391AbiAMDxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 22:53:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33162 "EHLO
+        id S232416AbiAMEHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 23:07:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232386AbiAMDxf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 22:53:35 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD4EC061748;
-        Wed, 12 Jan 2022 19:53:35 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id c3so7654856pls.5;
-        Wed, 12 Jan 2022 19:53:35 -0800 (PST)
+        with ESMTP id S232410AbiAMEHI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jan 2022 23:07:08 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0C2C06173F
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 20:07:08 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id a1-20020a17090a688100b001b3fd52338eso8006435pjd.1
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 20:07:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=message-id:date:mime-version:user-agent:content-language:to
+         :references:cc:from:organization:subject:in-reply-to
          :content-transfer-encoding;
-        bh=TAgI2TJU7veYy/9IG8eVZWWNyX9wqETK8RiqzSJm0IY=;
-        b=X2wBkSxnrzOdE7uTE3O3YWW8AkKnt7wtS3LaqkwsgKc4W/er6LBQG2m7SSEhENUB9b
-         B/ZeYOauL/vOZvD7eLsGylDzthX43II7t+zEIVTL4rP9Zuh3qwQ5MdfvdNoXwbm40u7S
-         5ZRZJfHa3J1OxbdppCMea/qffcefjtYpPdFMKIiC8auS4dkRUYRnykXyVsuTn2Jt0YZo
-         1tnytyqHljP2D7Rdy8tmybHkQh5EvKICqs/4ju627E7HpyJfEjv0mxgxtSyu7Uc77mLo
-         xErjNmW1HBqFNel8mz82+6xBrMazxG+6JsS5XimxTC6R/qAT0pXNP4Tgxlgblu04KlaJ
-         POEw==
+        bh=EWcXLNh8AYt+/tVU3hJ8862UgzEDENLO7tNuZoOCGYc=;
+        b=LGlnyy+jFi2gL6fW2R9t7h+c3XclZfVP9/PofjGr11MROKk5gUL6/kBXttlktowZCE
+         l1KCPxUvRCTFMEknrSDhPTYGVwqmfIur5e7pj0AU0UbW6b464PyppiEftHnDEAQl8PD6
+         IaJdXfvv588HyGvdPcg7wYZQdcccA9pgs6TRB5TogN+nhz/kmw7Qpb8To6oUHs4Sp4Tf
+         AZ7qEdJ7LZSJMc8JzMZ5IUt4xfpNcd1WInEeBEgft+trvhoq24DlEwxb37pSCxO5HgOP
+         3JKm2pGtakKjZtCUeOpvKYPR2rF02KmEJkWKEpce0LVEp7G/DysgyyjWRE7qavO2p6Bg
+         oYZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TAgI2TJU7veYy/9IG8eVZWWNyX9wqETK8RiqzSJm0IY=;
-        b=BdgC7rMAnu6kMpUxPnNp9W0irJgYiVyRb/ab85vlM5ayNgL0XDAeqBUxDMl6YDWQNG
-         MB5DsahQjLkLLREW1umufjlJaTJQJfLnB33Kwj43Nv+smE+vAqv5kkZVnMQB3K9KPOcM
-         Ymh/4/YC+Flq4B2FcfpMqwwYvIhRdZtHXLfbAS4pUA84JkQTAE7P/k/DkuzqcO4McHZY
-         +ClCziGRFFoZ40Pb58vhaTPEgS8OIMNwJwmf0lw1X8XuWCNXtOKDs28JQ4ISqFCWoN04
-         2mCaPz+MTecDinNJ9tj25lzSMy87/1XResgisDAZ1v6CYNA3eQGLRM4MS3beb6StanVt
-         UFmA==
-X-Gm-Message-State: AOAM5317Y1p1gEvZU8FkYRJvjT3xlWJC9sN4kSRpKXV+AUxJUcYyG86S
-        dliExgSQRg/M7gP/DWNx8KEY1mLgeoIk2hi1WoE3Ig==
-X-Google-Smtp-Source: ABdhPJwRblKo/oNfvblTbqD45RoQA7n6JrbDO/3RI0w0eBl/hKZM4zRL/w1KYXm4NVhp7tgbJ4G2+g==
-X-Received: by 2002:a17:902:ea85:b0:14a:3c49:f140 with SMTP id x5-20020a170902ea8500b0014a3c49f140mr2516213plb.31.1642046014882;
-        Wed, 12 Jan 2022 19:53:34 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id o11sm912745pgk.36.2022.01.12.19.53.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 19:53:34 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] KVM: x86: Make the module parameter of vPMU more common
-Date:   Thu, 13 Jan 2022 11:53:24 +0800
-Message-Id: <20220113035324.59572-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.33.1
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:references:cc:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=EWcXLNh8AYt+/tVU3hJ8862UgzEDENLO7tNuZoOCGYc=;
+        b=KCgf8Fo20LbXRZRIgXrgFf8JX6WOTTTahBY8OsUeEc0Y+W++LNKsHVhg3vxkRbm8NS
+         5dkejbEgRmgtqv0huDII2snOODB9gtZH9OFtioYBQO/quVogOdRoz3FRSzOxsthucM78
+         6NoI99+/Lps4T44mX6cHPCDCVc/3c1QWokhUfGaZsrAbAjIfzO97B1R/NJ+sv2RjmTtj
+         oeZ1nfVE73BA8OG3zxbzEWrMbyCBH6DZVzL0m+5zFcZz37qFhuFiAUmf/UCV5UPame9l
+         tPak0liFVGEi/tkE5Ct9nzPAGHWqCarcjnBo4d5eLt1d4M9WFK722Xb707zOSMn8Ehvr
+         Q0sw==
+X-Gm-Message-State: AOAM530E5uggv5rINqNzjBMl6g/9NgpW+nB8D0aLWP0loP/RhWQdQuw2
+        S0GCxLH9G7vLWCBZhV+V2+9r+l3eQhrnLloIHT6hGw==
+X-Google-Smtp-Source: ABdhPJxhu6JiQBgUdA+xROYE1aNj88Zy5GUZMFaNsOiN7F80qgYN42Cmk+ZmsuCUoRmmKpGI4Oo+5w==
+X-Received: by 2002:a62:7997:0:b0:4bf:508a:2f78 with SMTP id u145-20020a627997000000b004bf508a2f78mr2577671pfc.16.1642046828242;
+        Wed, 12 Jan 2022 20:07:08 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id m5sm114302pfh.123.2022.01.12.20.07.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Jan 2022 20:07:07 -0800 (PST)
+Message-ID: <a1053e1c-a16a-b1ec-a836-56974b4d4a65@gmail.com>
+Date:   Thu, 13 Jan 2022 12:06:59 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.0
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>,
+        =?UTF-8?B?Y2xvdWRsaWFuZyjmooHph5HojaMp?= <cloudliang@tencent.com>
+References: <20220113011453.3892612-1-jmattson@google.com>
+ <20220113011453.3892612-7-jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org)" 
+        <pbonzini@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH 6/6] selftests: kvm/x86: Add test for
+ KVM_SET_PMU_EVENT_FILTER
+In-Reply-To: <20220113011453.3892612-7-jmattson@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+cc Liang,
 
-The new module parameter to control PMU virtualization should apply
-to Intel as well as AMD, for situations where userspace is not trusted.
-If the module parameter allows PMU virtualization, there could be a
-new KVM_CAP or guest CPUID bits whereby userspace can enable/disable
-PMU virtualization on a per-VM basis.
+On 13/1/2022 9:14 am, Jim Mattson wrote:
+> Verify that the PMU event filter works as expected.
+> 
+> Note that the virtual PMU doesn't work as expected on AMD Zen CPUs (an
+> intercepted rdmsr is counted as a retired branch instruction), but the
+> PMU event filter does work.
 
-If the module parameter does not allow PMU virtualization, there
-should be no userspace override, since we have no precedent for
-authorizing that kind of override. If it's false, other counter-based
-profiling features (such as LBR including the associated CPUID bits
-if any) will not be exposed.
+Thanks for this patch. It saves us from upstreaming our equivalent patch.
+We do have a plan to cover vPMU features (and more) in selftests/kvm/x86.
 
-The module_param_named() is used so that KVM can use "enable_pmu"
-for all its checks, but the user only needs to type "pmu=?" when
-manipulating the module param.
+Liang would help me on these selftests patches and,
+please share more issues or insights (if any) you have found.
 
-Fixes: b1d66dad65dc ("KVM: x86/svm: Add module param to control PMU virtualization")
-Suggested-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-v2 -> v3 Changelog:
-- Use module_param_named() for the use of both enable_pmu and pmu; (Sean)
-
-Previous:
-https://lore.kernel.org/kvm/20220112040116.23937-1-likexu@tencent.com/
-
- arch/x86/kvm/cpuid.c            | 6 +++---
- arch/x86/kvm/pmu.c              | 5 +++++
- arch/x86/kvm/pmu.h              | 1 +
- arch/x86/kvm/svm/pmu.c          | 2 +-
- arch/x86/kvm/svm/svm.c          | 8 ++------
- arch/x86/kvm/svm/svm.h          | 1 -
- arch/x86/kvm/vmx/capabilities.h | 4 ++++
- arch/x86/kvm/vmx/pmu_intel.c    | 2 +-
- 8 files changed, 17 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0b920e12bb6d..4ac7172478a0 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -770,10 +770,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		perf_get_x86_pmu_capability(&cap);
- 
- 		/*
--		 * Only support guest architectural pmu on a host
--		 * with architectural pmu.
-+		 * The guest architecture pmu is only supported if the architecture
-+		 * pmu exists on the host and the module parameters allow it.
- 		 */
--		if (!cap.version)
-+		if (!enable_pmu || !cap.version)
- 			memset(&cap, 0, sizeof(cap));
- 
- 		eax.split.version_id = min(cap.version, 2);
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index e632693a2266..03e6a24dd8cb 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -19,6 +19,11 @@
- #include "lapic.h"
- #include "pmu.h"
- 
-+/* Enable/disable PMU virtualization */
-+bool __read_mostly enable_pmu = true;
-+EXPORT_SYMBOL_GPL(enable_pmu);
-+module_param_named(pmu, enable_pmu, bool, 0444);
-+
- /* This is enough to filter the vast majority of currently defined events. */
- #define KVM_PMU_EVENT_FILTER_MAX_EVENTS 300
- 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 7a7b8d5b775e..46df3d58784b 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -163,4 +163,5 @@ bool is_vmware_backdoor_pmc(u32 pmc_idx);
- 
- extern struct kvm_pmu_ops intel_pmu_ops;
- extern struct kvm_pmu_ops amd_pmu_ops;
-+extern bool enable_pmu;
- #endif /* __KVM_X86_PMU_H */
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 12d8b301065a..5aa45f13b16d 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -101,7 +101,7 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- {
- 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
- 
--	if (!pmu)
-+	if (!enable_pmu)
- 		return NULL;
- 
- 	switch (msr) {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6cb38044a860..549f73ce5ebc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -192,10 +192,6 @@ module_param(vgif, int, 0444);
- static int lbrv = true;
- module_param(lbrv, int, 0444);
- 
--/* enable/disable PMU virtualization */
--bool pmu = true;
--module_param(pmu, bool, 0444);
--
- static int tsc_scaling = true;
- module_param(tsc_scaling, int, 0444);
- 
-@@ -4573,7 +4569,7 @@ static __init void svm_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
- 
- 	/* AMD PMU PERFCTR_CORE CPUID */
--	if (pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
-+	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
- 		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
- 
- 	/* CPUID 0x8000001F (SME/SEV features) */
-@@ -4712,7 +4708,7 @@ static __init int svm_hardware_setup(void)
- 			pr_info("LBR virtualization supported\n");
- 	}
- 
--	if (!pmu)
-+	if (!enable_pmu)
- 		pr_info("PMU virtualization is disabled\n");
- 
- 	svm_set_cpu_caps();
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index daa8ca84afcc..47ef8f4a9358 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -32,7 +32,6 @@
- extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
- extern bool intercept_smi;
--extern bool pmu;
- 
- /*
-  * Clean bits in VMCB.
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index c8029b7845b6..401c48000a48 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -5,6 +5,7 @@
- #include <asm/vmx.h>
- 
- #include "lapic.h"
-+#include "pmu.h"
- 
- extern bool __read_mostly enable_vpid;
- extern bool __read_mostly flexpriority_enabled;
-@@ -389,6 +390,9 @@ static inline u64 vmx_get_perf_capabilities(void)
- {
- 	u64 perf_cap = 0;
- 
-+	if (!enable_pmu)
-+		return perf_cap;
-+
- 	if (boot_cpu_has(X86_FEATURE_PDCM))
- 		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
- 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index ffccfd9823c0..f3656b95cd2f 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -487,7 +487,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->reserved_bits = 0xffffffff00200000ull;
- 
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
--	if (!entry)
-+	if (!enable_pmu || !entry)
- 		return;
- 	eax.full = entry->eax;
- 	edx.full = entry->edx;
--- 
-2.33.1
-
+> 
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   1 +
+>   .../kvm/x86_64/pmu_event_filter_test.c        | 310 ++++++++++++++++++
+>   3 files changed, 312 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 8c129961accf..7834e03ab159 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -22,6 +22,7 @@
+>   /x86_64/mmio_warning_test
+>   /x86_64/mmu_role_test
+>   /x86_64/platform_info_test
+> +/x86_64/pmu_event_filter_test
+>   /x86_64/set_boot_cpu_id
+>   /x86_64/set_sregs_test
+>   /x86_64/sev_migrate_tests
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c407ebbec2c1..899413a6588f 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -56,6 +56,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+>   TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+>   TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> new file mode 100644
+> index 000000000000..d879a4b92fae
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> @@ -0,0 +1,310 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Test for x86 KVM_SET_PMU_EVENT_FILTER.
+> + *
+> + * Copyright (C) 2022, Google LLC.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + *
+> + * Verifies the expected behavior of allow lists and deny lists for
+> + * virtual PMU events.
+> + */
+> +
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +
+> +/*
+> + * In lieue of copying perf_event.h into tools...
+> + */
+> +#define ARCH_PERFMON_EVENTSEL_ENABLE	BIT(22)
+> +#define ARCH_PERFMON_EVENTSEL_OS	BIT(17)
+> +
+> +#define VCPU_ID 0
+> +#define NUM_BRANCHES 42
+> +
+> +/*
+> + * This is how the event selector and unit mask are stored in an AMD
+> + * core performance event-select register. Intel's format is similar,
+> + * but the event selector is only 8 bits.
+> + */
+> +#define EVENT(select, umask) ((select & 0xf00UL) << 24 | (select & 0xff) | \
+> +			      (umask & 0xff) << 8)
+> +
+> +/*
+> + * "Branch instructions retired", from the Intel SDM, volume 3,
+> + * "Pre-defined Architectural Performance Events."
+> + */
+> +
+> +#define INTEL_BR_RETIRED EVENT(0xc4, 0)
+> +
+> +/*
+> + * "Retired branch instructions", from Processor Programming Reference
+> + * (PPR) for AMD Family 17h Model 01h, Revision B1 Processors,
+> + * Preliminary Processor Programming Reference (PPR) for AMD Family
+> + * 17h Model 31h, Revision B0 Processors, and Preliminary Processor
+> + * Programming Reference (PPR) for AMD Family 19h Model 01h, Revision
+> + * B1 Processors Volume 1 of 2
+> + */
+> +
+> +#define AMD_ZEN_BR_RETIRED EVENT(0xc2, 0)
+> +
+> +/*
+> + * This event list comprises Intel's eight architectural events plus
+> + * AMD's "branch instructions retired" for Zen[123].
+> + */
+> +static const uint64_t event_list[] = {
+> +	EVENT(0x3c, 0),
+> +	EVENT(0xc0, 0),
+> +	EVENT(0x3c, 1),
+> +	EVENT(0x2e, 0x4f),
+> +	EVENT(0x2e, 0x41),
+> +	EVENT(0xc4, 0),
+> +	EVENT(0xc5, 0),
+> +	EVENT(0xa4, 1),
+> +	AMD_ZEN_BR_RETIRED,
+> +};
+> +
+> +static void intel_guest_code(void)
+> +{
+> +	uint64_t br0, br1;
+> +
+> +	for (;;) {
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +		wrmsr(MSR_P6_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
+> +		      ARCH_PERFMON_EVENTSEL_OS | INTEL_BR_RETIRED);
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 1);
+> +		br0 = rdmsr(MSR_IA32_PMC0);
+> +		__asm__ __volatile__("loop ."
+> +				     : "=c"((int){0})
+> +				     : "0"(NUM_BRANCHES));
+> +		br1 = rdmsr(MSR_IA32_PMC0);
+> +		GUEST_SYNC(br1 - br0);
+> +	}
+> +}
+> +
+> +/*
+> + * To avoid needing a check for CPUID.80000001:ECX.PerfCtrExtCore[bit
+> + * 23], this code uses the always-available, legacy K7 PMU MSRs, which
+> + * alias to the first four of the six extended core PMU MSRs.
+> + */
+> +static void amd_guest_code(void)
+> +{
+> +	uint64_t br0, br1;
+> +
+> +	for (;;) {
+> +		wrmsr(MSR_K7_EVNTSEL0, 0);
+> +		wrmsr(MSR_K7_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
+> +		      ARCH_PERFMON_EVENTSEL_OS | AMD_ZEN_BR_RETIRED);
+> +		br0 = rdmsr(MSR_K7_PERFCTR0);
+> +		__asm__ __volatile__("loop ."
+> +				     : "=c"((int){0})
+> +				     : "0"(NUM_BRANCHES));
+> +		br1 = rdmsr(MSR_K7_PERFCTR0);
+> +		GUEST_SYNC(br1 - br0);
+> +	}
+> +}
+> +
+> +static uint64_t test_branches_retired(struct kvm_vm *vm)
+> +{
+> +	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
+> +	struct ucall uc;
+> +
+> +	vcpu_run(vm, VCPU_ID);
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+> +		    "Exit_reason other than KVM_EXIT_IO: %u (%s)\n",
+> +		    run->exit_reason,
+> +		    exit_reason_str(run->exit_reason));
+> +	get_ucall(vm, VCPU_ID, &uc);
+> +	TEST_ASSERT(uc.cmd == UCALL_SYNC,
+> +		    "Received ucall other than UCALL_SYNC: %lu", uc.cmd);
+> +	return uc.args[1];
+> +}
+> +
+> +static struct kvm_pmu_event_filter *make_pmu_event_filter(uint32_t nevents)
+> +{
+> +	struct kvm_pmu_event_filter *f;
+> +	int size = sizeof(*f) + nevents * sizeof(f->events[0]);
+> +
+> +	f = malloc(size);
+> +	TEST_ASSERT(f, "Out of memory");
+> +	memset(f, 0, size);
+> +	f->nevents = nevents;
+> +	return f;
+> +}
+> +
+> +static struct kvm_pmu_event_filter *event_filter(uint32_t action)
+> +{
+> +	struct kvm_pmu_event_filter *f;
+> +	int i;
+> +
+> +	f = make_pmu_event_filter(ARRAY_SIZE(event_list));
+> +	f->action = action;
+> +	for (i = 0; i < ARRAY_SIZE(event_list); i++)
+> +		f->events[i] = event_list[i];
+> +
+> +	return f;
+> +}
+> +
+> +static struct kvm_pmu_event_filter *remove_event(struct kvm_pmu_event_filter *f,
+> +						 uint64_t event)
+> +{
+> +	bool found = false;
+> +	int i;
+> +
+> +	for (i = 0; i < f->nevents; i++) {
+> +		if (found)
+> +			f->events[i - 1] = f->events[i];
+> +		else
+> +			found = f->events[i] == event;
+> +	}
+> +	if (found)
+> +		f->nevents--;
+> +	return f;
+> +}
+> +
+> +static void test_no_filter(struct kvm_vm *vm)
+> +{
+> +	uint64_t count = test_branches_retired(vm);
+> +
+> +	if (count != NUM_BRANCHES)
+> +		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
+> +			__func__, count, NUM_BRANCHES);
+> +	TEST_ASSERT(count, "Allowed PMU event is not counting");
+> +}
+> +
+> +static uint64_t test_with_filter(struct kvm_vm *vm,
+> +				 struct kvm_pmu_event_filter *f)
+> +{
+> +	vm_ioctl(vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
+> +	return test_branches_retired(vm);
+> +}
+> +
+> +static void test_member_deny_list(struct kvm_vm *vm)
+> +{
+> +	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
+> +	uint64_t count = test_with_filter(vm, f);
+> +
+> +	free(f);
+> +	if (count)
+> +		pr_info("%s: Branch instructions retired = %lu (expected 0)\n",
+> +			__func__, count);
+> +	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
+> +}
+> +
+> +static void test_member_allow_list(struct kvm_vm *vm)
+> +{
+> +	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
+> +	uint64_t count = test_with_filter(vm, f);
+> +
+> +	free(f);
+> +	if (count != NUM_BRANCHES)
+> +		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
+> +			__func__, count, NUM_BRANCHES);
+> +	TEST_ASSERT(count, "Allowed PMU event is not counting");
+> +}
+> +
+> +static void test_not_member_deny_list(struct kvm_vm *vm)
+> +{
+> +	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
+> +	uint64_t count;
+> +
+> +	remove_event(f, INTEL_BR_RETIRED);
+> +	remove_event(f, AMD_ZEN_BR_RETIRED);
+> +	count = test_with_filter(vm, f);
+> +	free(f);
+> +	if (count != NUM_BRANCHES)
+> +		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
+> +			__func__, count, NUM_BRANCHES);
+> +	TEST_ASSERT(count, "Allowed PMU event is not counting");
+> +}
+> +
+> +static void test_not_member_allow_list(struct kvm_vm *vm)
+> +{
+> +	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
+> +	uint64_t count;
+> +
+> +	remove_event(f, INTEL_BR_RETIRED);
+> +	remove_event(f, AMD_ZEN_BR_RETIRED);
+> +	count = test_with_filter(vm, f);
+> +	free(f);
+> +	if (count)
+> +		pr_info("%s: Branch instructions retired = %lu (expected 0)\n",
+> +			__func__, count);
+> +	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
+> +}
+> +
+> +/*
+> + * Note that CPUID leaf 0xa is Intel-specific. This leaf should be
+> + * clear on AMD hardware.
+> + */
+> +static bool vcpu_supports_intel_br_retired(void)
+> +{
+> +	struct kvm_cpuid_entry2 *entry;
+> +	struct kvm_cpuid2 *cpuid;
+> +
+> +	cpuid = kvm_get_supported_cpuid();
+> +	entry = kvm_get_supported_cpuid_index(0xa, 0);
+> +	return entry &&
+> +		(entry->eax & 0xff) &&
+> +		(entry->eax >> 24) > 5 &&
+> +		!(entry->ebx & BIT(5));
+> +}
+> +
+> +/*
+> + * Determining AMD support for a PMU event requires consulting the AMD
+> + * PPR for the CPU or reference material derived therefrom.
+> + */
+> +static bool vcpu_supports_amd_zen_br_retired(void)
+> +{
+> +	struct kvm_cpuid_entry2 *entry;
+> +	struct kvm_cpuid2 *cpuid;
+> +
+> +	cpuid = kvm_get_supported_cpuid();
+> +	entry = kvm_get_supported_cpuid_index(1, 0);
+> +	return entry &&
+> +		((x86_family(entry->eax) == 0x17 &&
+> +		  (x86_model(entry->eax) == 1 ||
+> +		   x86_model(entry->eax) == 0x31)) ||
+> +		 (x86_family(entry->eax) == 0x19 &&
+> +		  x86_model(entry->eax) == 1));
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	void (*guest_code)(void) = NULL;
+> +	struct kvm_vm *vm;
+> +	int r;
+> +
+> +	/* Tell stdout not to buffer its content */
+> +	setbuf(stdout, NULL);
+> +
+> +	r = kvm_check_cap(KVM_CAP_PMU_EVENT_FILTER);
+> +	if (!r) {
+> +		print_skip("KVM_CAP_PMU_EVENT_FILTER not supported");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	if (vcpu_supports_intel_br_retired())
+> +		guest_code = intel_guest_code;
+> +	else if (vcpu_supports_amd_zen_br_retired())
+> +		guest_code = amd_guest_code;
+> +
+> +	if (!guest_code) {
+> +		print_skip("Branch instructions retired not supported");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +
+> +	test_no_filter(vm);
+> +	test_member_deny_list(vm);
+> +	test_member_allow_list(vm);
+> +	test_not_member_deny_list(vm);
+> +	test_not_member_allow_list(vm);
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
