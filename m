@@ -2,222 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D009248DFC7
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 22:43:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6805848DFDD
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 22:48:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235394AbiAMVnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 16:43:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49974 "EHLO
+        id S236050AbiAMVr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 16:47:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235254AbiAMVnE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 16:43:04 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F8CC06161C;
-        Thu, 13 Jan 2022 13:43:03 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id o3so11765216pjs.1;
-        Thu, 13 Jan 2022 13:43:03 -0800 (PST)
+        with ESMTP id S234972AbiAMVr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 16:47:58 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E428EC06161C
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 13:47:57 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id m13so11734265pji.3
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 13:47:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=chMleOaZP5LLYybKEvqzaEnOntGIKeyxzv8RxEMS/pU=;
-        b=oOc3d8quuL+d364W7KNWQtMdgtUPWTOWcsp8cMWNvHDxrhgRW2/iqLsZTnFsASrpLY
-         68f6X/M1x+sO4IK/5z8GRukqDLM7CHf4rk2qB/zOlWi9G1eAn8tq+zp6RKqI0IPYCVAa
-         hUGAgdHmZB/tYYdmRvOmZ4JNl+7KaTpFtgGI83AIVn9odjlTyVtSNxGjna9I3MmeJxnP
-         LOezyDSKBJbwulklkuNOKWH9DWBVEMZVRl505lf6yiD2x6vDvZWbGecOdmYT0deqt9nE
-         7oj6Lo5rPX0mYmnixNE6GUUU70z4K2CwYIE2HI3Z8c69J6dTeJP+r1nvFkXQlYsjlWb9
-         Puog==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Qlw9zu20908sVRjvcOO7VK1fi4Ol62KCGhcxbKZ2mWM=;
+        b=Jsup4IFpxl6vRB3iS3yCHWdZGVZpZYRsv5CJ8Y1zklXVBGfGAFJ0CUrueIqLkRWYZj
+         oTYlGnNdqYlMa5U6sq9TldWgHXXStdeBWJlNF6YCGHqvh+HbKUd2K6K6RG+jkbP/PKTa
+         rEyryXYeBHwUIhW+LS0Pk+TI1h4yZkocVgR2e8gL7TkgU90eNnuHQNRec10lwWyXfnSJ
+         6aC4x5f50z3yLJO7B3OBxg69Xry41ZtqsEMZgsHwdyPcWJDI8CmAiqdyIseNg5ZjPTl6
+         Zl+PqNrBVsB3jhjisfP2Gg4+cU5r1SUgSiFDXXIQnzKu1lV+VF+S8m/uq5pkgfN3csPe
+         Fn7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=chMleOaZP5LLYybKEvqzaEnOntGIKeyxzv8RxEMS/pU=;
-        b=QHOYRG/nrfl4koWEJiDfqsnGR7cx6gwQoWB3GZrWGV5Jm+mGhgU2oJBOVGs1d91qFs
-         YKEalHAq/WhDO3wKhvAAiS8zdXatfsHpJGeNM11Yknr/paokwUvDUHQMS1EqVMpXSTpQ
-         8JCyWBHqGUEw0SsWI1aDjNvTNarBcn8bW0URJoDmK3TttnoZYva4YHb5nvGBAhftrWiV
-         oN8MSxY/igu+98YFqlmUpz+jxUppzDTy73SFLux8bq9KheaibR+lrzuir7LrZGEGQvmf
-         +gxLyfQcrmZV2rSPj7BhsihZT4GMwq0Il/WkiIqdgS8bHoO+pCI2mOqy3naSVNeCkFCm
-         Yo/A==
-X-Gm-Message-State: AOAM531lftljLgVSLheaLb+KOHwuzjHS5UQVSYczmzkfm72T5DlB4KDo
-        pPFmwv0thZJf359F6AMOKl0=
-X-Google-Smtp-Source: ABdhPJza7nTyxaYu7zMa+CS3ya6yZ7jUqwYQkOFFet8Qv/maBjKZ7v19D4TMGEeuYYibqr5z1N9W+A==
-X-Received: by 2002:a17:902:e790:b0:149:7a3f:826a with SMTP id cp16-20020a170902e79000b001497a3f826amr6595655plb.76.1642110183142;
-        Thu, 13 Jan 2022 13:43:03 -0800 (PST)
-Received: from ?IPV6:2600:8802:b00:4a48:c1d3:c1c0:b78e:9e36? ([2600:8802:b00:4a48:c1d3:c1c0:b78e:9e36])
-        by smtp.gmail.com with ESMTPSA id r26sm2983811pgu.65.2022.01.13.13.42.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jan 2022 13:43:02 -0800 (PST)
-Message-ID: <745c601f-c782-0904-f786-c9bfced8f11c@gmail.com>
-Date:   Thu, 13 Jan 2022 13:42:57 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH] driver core: platform: Rename platform_get_irq_optional()
- to platform_get_irq_silent()
-Content-Language: en-US
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Mark Brown <broonie@kernel.org>
-Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
-        openipmi-developer@lists.sourceforge.net,
-        "David S. Miller" <davem@davemloft.net>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Qlw9zu20908sVRjvcOO7VK1fi4Ol62KCGhcxbKZ2mWM=;
+        b=Qol0M7ScB8UzMUjkmOf2a1E1LRI0zVYY3VFuh2DwNQMaaqrL5MLNYgpkaNHO1O4MIP
+         L3y7DnvhY3W0I+IZesBSpjQ0PS+ob3aFdDwIJnRezwn1RSqK3CL1V1HrZpxQRUL1m4Sn
+         qXdBoCwtpw6/gNMyRaFLrOC0D4ob4fn+R9jPnKcZaLFhc9z+0WwTFQDIQ5MlMadRw/Dm
+         veQc0zHTzFELT+LquIDtgAHDwZB+xxL8ZCPQMgOyzxewU2WW57ZwnbAWyK7c1n+3+hWW
+         0syhc47gFMVpTNXtdZzV2v1bhoJceu6UOCj8bJpdUounOdlCjArtUfocxf0QSQP3NApV
+         VzQg==
+X-Gm-Message-State: AOAM533h3itDrwAdqshRvQYsG3jCoyR2Bn8Ny/9JHy0Js2lvvXY1DU3O
+        eW+MtRkKV6AhNeRwEAG94GHkKg==
+X-Google-Smtp-Source: ABdhPJyet0qeO9RRG9lay5WRarnCed1yWvPCbp+wzDShDhFsopl8GfEjvMhYbtbHt7gZbrOuQhOf3g==
+X-Received: by 2002:a17:903:2344:b0:14a:37c4:721c with SMTP id c4-20020a170903234400b0014a37c4721cmr6563386plh.158.1642110477132;
+        Thu, 13 Jan 2022 13:47:57 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u13sm841893pfl.220.2022.01.13.13.47.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 13:47:56 -0800 (PST)
+Date:   Thu, 13 Jan 2022 21:47:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         Tony Luck <tony.luck@intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Sebastian Reichel <sre@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        platform-driver-x86@vger.kernel.org,
-        Benson Leung <bleung@chromium.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        netdev@vger.kernel.org
-References: <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220110201014.mtajyrfcfznfhyqm@pengutronix.de> <YdyilpjC6rtz6toJ@lunn.ch>
- <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
- <20220112085009.dbasceh3obfok5dc@pengutronix.de>
- <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
- <Yd9L9SZ+g13iyKab@sirena.org.uk>
- <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
- <YeA7CjOyJFkpuhz/@sirena.org.uk>
- <20220113194358.xnnbhsoyetihterb@pengutronix.de>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20220113194358.xnnbhsoyetihterb@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>
+Subject: Re: [PATCH v5 6/8] KVM: VMX: enable IPI virtualization
+Message-ID: <YeCeCYY2UTL/T1Tv@google.com>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+ <20211231142849.611-7-guang.zeng@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211231142849.611-7-guang.zeng@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Dec 31, 2021, Zeng Guang wrote:
+> +/* Tertiary Processor-Based VM-Execution Controls, word 3 */
+> +#define VMX_FEATURE_IPI_VIRT		(3*32 +  4) /* "" Enable IPI virtualization */
+>  #endif /* _ASM_X86_VMXFEATURES_H */
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index 38d414f64e61..78b0525dd991 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -12,6 +12,7 @@ extern bool __read_mostly enable_ept;
+>  extern bool __read_mostly enable_unrestricted_guest;
+>  extern bool __read_mostly enable_ept_ad_bits;
+>  extern bool __read_mostly enable_pml;
+> +extern bool __read_mostly enable_ipiv;
+>  extern int __read_mostly pt_mode;
+>  
+>  #define PT_MODE_SYSTEM		0
+> @@ -283,6 +284,12 @@ static inline bool cpu_has_vmx_apicv(void)
+>  		cpu_has_vmx_posted_intr();
+>  }
+>  
+> +static inline bool cpu_has_vmx_ipiv(void)
+> +{
+> +	return vmcs_config.cpu_based_3rd_exec_ctrl &
+> +		TERTIARY_EXEC_IPI_VIRT;
+
+Unnecessary newline, that fits on a single line.
+
+> +}
+> +
+>  static inline bool cpu_has_vmx_flexpriority(void)
+>  {
+>  	return cpu_has_vmx_tpr_shadow() &&
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index 1c94783b5a54..bd9c9a89726a 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -85,11 +85,16 @@ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
+>  		irq_remapping_cap(IRQ_POSTING_CAP);
+>  }
+>  
+> +static bool vmx_can_use_ipiv_pi(struct kvm *kvm)
+> +{
+> +	return irqchip_in_kernel(kvm) && enable_apicv && enable_ipiv;
+
+enable_ipiv should be cleared if !enable_apicv, i.e. the enable_apicv check
+here should be unnecessary.
+
+> +}
+> +
+>  void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
+>  {
+>  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+>  
+> -	if (!vmx_can_use_vtd_pi(vcpu->kvm))
+> +	if (!(vmx_can_use_ipiv_pi(vcpu->kvm) || vmx_can_use_vtd_pi(vcpu->kvm)))
+
+Purely because I am beyond terrible at reading !(A || B) and !(A && B), can we
+write this as:
+
+	if (!vmx_can_use_ipiv_pi(vcpu->kvm) && !vmx_can_use_vtd_pi(vcpu->kvm))
+		return;
+
+Or better, add a helper.  We could even drop vmx_can_use_ipiv_pi() altogether, e.g.
+
+static bool vmx_can_use_posted_interrupts(struct kvm *kvm)
+{
+	return irqchip_in_kernel(kvm) &&
+	       (enable_ipiv || vmx_can_use_vtd_pi(kvm));
+}
+
+Or with both helpers:
+
+static bool vmx_can_use_posted_interrupts(struct kvm *kvm)
+{
+	return vmx_can_use_ipiv_pi(kvm) || vmx_can_use_vtd_pi(kvm);
+}
+
+I don't think I have a strong preference over whether or not to drop 
+vmx_can_use_ipiv_pi().  I think it's marginally easier to read with the extra
+helper?
+
+>  		return;
+>  
+>  	/* Set SN when the vCPU is preempted */
+> @@ -147,7 +152,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
+>  	struct pi_desc old, new;
+>  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+>  
+> -	if (!vmx_can_use_vtd_pi(vcpu->kvm))
+> +	if (!(vmx_can_use_ipiv_pi(vcpu->kvm) || vmx_can_use_vtd_pi(vcpu->kvm)))
+>  		return 0;
+>  
+>  	WARN_ON(irqs_disabled());
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 5716db9704c0..2e65464d6dee 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -104,6 +104,9 @@ module_param(fasteoi, bool, S_IRUGO);
+>  
+>  module_param(enable_apicv, bool, S_IRUGO);
+>  
+> +bool __read_mostly enable_ipiv = true;
+> +module_param(enable_ipiv, bool, 0444);
+> +
+>  /*
+>   * If nested=1, nested virtualization is supported, i.e., guests may use
+>   * VMX and be a hypervisor for its own guests. If nested=0, guests may not
+> @@ -224,6 +227,11 @@ static const struct {
+>  };
+>  
+>  #define L1D_CACHE_ORDER 4
+> +
+> +/* PID(Posted-Interrupt Descriptor)-pointer table entry is 64-bit long */
+> +#define MAX_PID_TABLE_ORDER get_order(KVM_MAX_VCPU_IDS * sizeof(u64))
+> +#define PID_TABLE_ENTRY_VALID 1
+> +
+>  static void *vmx_l1d_flush_pages;
+>  
+>  static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+> @@ -2504,7 +2512,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>  	}
+>  
+>  	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+> -		u64 opt3 = 0;
+> +		u64 opt3 = TERTIARY_EXEC_IPI_VIRT;
+>  		u64 min3 = 0;
+>  
+>  		if (adjust_vmx_controls_64(min3, opt3,
+> @@ -3841,6 +3849,8 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu)
+>  		vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
+>  		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
+>  		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
+> +		vmx_set_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),
+> +				MSR_TYPE_RW, !enable_ipiv);
+
+Please align this, e.g.
+
+		vmx_set_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),
+					  MSR_TYPE_RW, !enable_ipiv);
+
+though I think I'd actually prefer we do:
 
 
-On 1/13/2022 11:43 AM, Uwe Kleine-König wrote:
-> The subsystems regulator, clk and gpio have the concept of a dummy
-> resource. For regulator, clk and gpio there is a semantic difference
-> between the regular _get() function and the _get_optional() variant.
-> (One might return the dummy resource, the other won't. Unfortunately
-> which one implements which isn't the same for these three.) The
-> difference between platform_get_irq() and platform_get_irq_optional() is
-> only that the former might emit an error message and the later won't.
-> 
-> To prevent people's expectations that there is a semantic difference
-> between these too, rename platform_get_irq_optional() to
-> platform_get_irq_silent() to make the actual difference more obvious.
-> 
-> The #define for the old name can and should be removed once all patches
-> currently in flux still relying on platform_get_irq_optional() are
-> fixed.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
-> Hello,
-> 
-> On Thu, Jan 13, 2022 at 02:45:30PM +0000, Mark Brown wrote:
->> On Thu, Jan 13, 2022 at 12:08:31PM +0100, Uwe Kleine-König wrote:
->>
->>> This is all very unfortunate. In my eyes b) is the most sensible
->>> sense, but the past showed that we don't agree here. (The most annoying
->>> part of regulator_get is the warning that is emitted that regularily
->>> makes customers ask what happens here and if this is fixable.)
->>
->> Fortunately it can be fixed, and it's safer to clearly specify things.
->> The prints are there because when the description is wrong enough to
->> cause things to blow up we can fail to boot or run messily and
->> forgetting to describe some supplies (or typoing so they haven't done
->> that) and people were having a hard time figuring out what might've
->> happened.
-> 
-> Yes, that's right. I sent a patch for such a warning in 2019 and pinged
-> occationally. Still waiting for it to be merged :-\
-> (https://lore.kernel.org/r/20190625100412.11815-1-u.kleine-koenig@pengutronix.de)
-> 
->>> I think at least c) is easy to resolve because
->>> platform_get_irq_optional() isn't that old yet and mechanically
->>> replacing it by platform_get_irq_silent() should be easy and safe.
->>> And this is orthogonal to the discussion if -ENOXIO is a sensible return
->>> value and if it's as easy as it could be to work with errors on irq
->>> lookups.
->>
->> It'd certainly be good to name anything that doesn't correspond to one
->> of the existing semantics for the API (!) something different rather
->> than adding yet another potentially overloaded meaning.
-> 
-> It seems we're (at least) three who agree about this. Here is a patch
-> fixing the name.
+		if (enable_ipiv)
+			vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR), MSR_TYPE_RW);
 
- From an API naming perspective this does not make much sense anymore 
-with the name chosen, it is understood that whent he function is called 
-platform_get_irq_optional(), optional applies to the IRQ. An optional 
-IRQ is something people can reason about because it makes sense.
+and just let it poke out.  That makes it much more obvious that interception is
+disabled when IPI virtualization is enabled.  Using vmx_set_intercept_for_msr()
+implies that it could go either way, but that's not true as vmx_reset_x2apic_msrs()
+sets the bitmap to intercept all x2APIC MSRs.
 
-What is a a "silent" IRQ however? It does not apply to the object it is 
-trying to fetch to anymore, but to the message that may not be printed 
-in case the resource failed to be obtained, because said resource is 
-optional. Woah, that's quite a stretch.
-
-Following the discussion and original 2 patches set from Sergey, it is 
-not entirely clear to me anymore what is it that we are trying to fix.
-
-I nearly forgot, I would paint it blue, sky blue, not navy blue, not 
-light blue ;)
--- 
-Florian
+>  	}
+>  }
+>  
