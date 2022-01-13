@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 410DD48D006
+	by mail.lfdr.de (Postfix) with ESMTP id 8E6E548D007
 	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 02:15:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231200AbiAMBPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jan 2022 20:15:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54480 "EHLO
+        id S231204AbiAMBPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jan 2022 20:15:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231181AbiAMBPA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jan 2022 20:15:00 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F85DC061748
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 17:15:00 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id v8-20020a17090a778800b001b2e6d08cd1so4987864pjk.8
-        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 17:15:00 -0800 (PST)
+        with ESMTP id S231187AbiAMBPB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jan 2022 20:15:01 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDEAC06173F
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 17:15:01 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id m13-20020a170902db0d00b0014a54b3db7aso4323948plx.14
+        for <kvm@vger.kernel.org>; Wed, 12 Jan 2022 17:15:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=q9VW1SY3M4Wp4rDuFqdCRQzOdTgyhpZocVWqSUFUUpg=;
-        b=UvzGJYhFh31ca7osy4R/W/PVnuB5JPSErZBFTnG8XxdXjNnOPSSrhRdVu8caSEQOAx
-         RiBNg9l4BDr+AqHy0hWXVOeZ/fLrE7jpj1eTsbEozm5NoB0DYfmJY/K5DH/cVN0/e/UZ
-         o4C9leN7RaYsFDW8yQpV9MT4DhlbF3udgi2I9tTWhWBpd4B2FgCV5Ik/KZTllLgCnekX
-         GfxpeVipxeliZgOKp0Iie6ihGhgrIjEBCFPP3A+hGkVtF+T+qlPrw28OWPy2yXXP80e3
-         x4WIljnF08B1pUtz/3HZ4UOp4QzlF8cE0a8CU3F50wVDWq4ccQZxE20uFHyuDOX0+MMe
-         1rdQ==
+        bh=RygOBcbUT3WnO07lGCfOFuANEGLykoz7c71q7Uhky+Q=;
+        b=le9nNfyKUMhTDpytN6QdQZw/+dzS69cJF6LrYvEMfNxBtZFNu+ulwzOG60RCXbz8gw
+         JJRfPi5d1qJ4QMRVT7Zk3imu2HS24iXwgWfcz1QNXQY8+dJbV6XSItCyqIoFEd0+Tsas
+         2rY1KncW59nUucFqKMnZKlERBNT1rDxBeOKxdjB/vOBTjbnsWwf+XRgM3NhIRDP+HUpq
+         8mLA9NzRKyLNganv6tZ5cN6hAolDnAGaq6TRq/nD+OtsoYQmGLlVF1iEA8Rl4/fBRRof
+         Mvan0PDZqYPxO9rP8bmgfShfuh4l3SWOQ7960/Opv1xGlntg3JEpiZ2N1v40GateEjS2
+         5d+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=q9VW1SY3M4Wp4rDuFqdCRQzOdTgyhpZocVWqSUFUUpg=;
-        b=kJRZLU+3C1Xva5zoy9ccHs32/W1XhNqysiv77Lvto/yw+xsGMUCDZPaiq2prx/7YVL
-         6fUN48kBqeqZCbPET03/iUA2j/9AcHW0/v00bZlvaa+vp/d6sFcyO02+033vL0M7M6ro
-         cT1jMhBYapyJDNvI697n0wEa63/vTRrasW8XoRGehhQvQ+b4m1DmbnAZuURRDBuJvw+1
-         iWhvP/A7o0Sb2ZV/xm3UmPezJROY7/QtGoY/GDYzY7QOs+BvJvdI6/H/ky+5qve20ZAu
-         fIgl9mQa4k2liScAnHuvKc8lW2i6bCjPM1OgkjYdL9/CFjlNOU4pp2CwcDSHio00kA2X
-         F1VQ==
-X-Gm-Message-State: AOAM530EY+YlCOwg8+OgbSStyw9XNGQRvDyHqTqDrOS2aLSAoepazT+9
-        XStXjVCNf9eE1NOuvuIIeKY8DffclkTeY28xJgJCJoO7hmITAAoRcEXK/chY5IU8XT+QrayDNlg
-        65tHIdhwqCY7yGZcea2aqwQPdytEYk+5IHgogXhQ3s3mZa5ClS6HO14EF8mrIVek=
-X-Google-Smtp-Source: ABdhPJzhCOaSt9PmMGSgJyzAf0pcZCHJLLFKf2aQwWJPDe09wcEjysV42tFcFWwF8h1dHpgSnmP76reK2LLk1g==
+        bh=RygOBcbUT3WnO07lGCfOFuANEGLykoz7c71q7Uhky+Q=;
+        b=KmYsW7cCFc7ia/qDNZ9ggZ7Gt8KT4GfYU4ukQeqcDa8m7MafPiWLaQnIXWWUhXt1mg
+         raiVV7h+EAyvfOwTqi/Hub2xZ3GaubmYnt4ULOivF7n2l+fOmPA6TK2Upe4+j2VWVPFW
+         /5xpZ8ZOOELqdHLm7yfJnMFCDV69C/w7+/8cEu5IgGHmS+NwzO0+m86Nv8/Fc2+iPS9j
+         rrtZmadvlIBDoDE0nCZjC3kXkLJCyVLe6t2tj/zNE72Wo7+UBcbjhXY6V1fMifwquyCs
+         AOeHNcUHlnewrgcmcxzziA+f4twyZfBb7AB96WdFQ0rbDdO6eUU9Ww5toK1G3AKZ9TiV
+         CRxg==
+X-Gm-Message-State: AOAM532TBq0YxXSGLoKw/OxstUOYpVaObvYqOF8Iy6PsIvdEAw5/s25s
+        tEW5loLNw50Co+Xu0fJ0LWLCKJGUJjPaeX+WDuB/4Gjyo/6ht2InRO6tmJ7AMQ4Qy3T8jYOCwAL
+        j73UksiNe+yNhg6sw5aqVEpgKgLcgrsCaoBgeCXfJ2t5Ql0ePmsO8+/lT6KuSyd0=
+X-Google-Smtp-Source: ABdhPJzJVrgykjDjT7Xea2wvNVQW4nBLCjcNSSPE27Yro0M7s7g4PQqv2WDOAoQgYiWWq8qgN7/N4VJXz/K7hg==
 X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a17:90a:2a4e:: with SMTP id
- d14mr229262pjg.0.1642036499183; Wed, 12 Jan 2022 17:14:59 -0800 (PST)
-Date:   Wed, 12 Jan 2022 17:14:48 -0800
+ (user=jmattson job=sendgmr) by 2002:a62:1c12:0:b0:4bc:6d81:b402 with SMTP id
+ c18-20020a621c12000000b004bc6d81b402mr1976633pfc.40.1642036501088; Wed, 12
+ Jan 2022 17:15:01 -0800 (PST)
+Date:   Wed, 12 Jan 2022 17:14:49 -0800
 In-Reply-To: <20220113011453.3892612-1-jmattson@google.com>
-Message-Id: <20220113011453.3892612-2-jmattson@google.com>
+Message-Id: <20220113011453.3892612-3-jmattson@google.com>
 Mime-Version: 1.0
 References: <20220113011453.3892612-1-jmattson@google.com>
 X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [PATCH 1/6] KVM: x86/pmu: Use binary search to check filtered events
+Subject: [PATCH 2/6] selftests: kvm/x86: Parameterize the CPUID vendor string check
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com
 Cc:     Jim Mattson <jmattson@google.com>
@@ -60,81 +61,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The PMU event filter may contain up to 300 events. Replace the linear
-search in reprogram_gp_counter() with a binary search.
+Refactor is_intel_cpu() to make it easier to reuse the bulk of the
+code for other vendors in the future.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/pmu.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+ tools/testing/selftests/kvm/lib/x86_64/processor.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index e632693a2266..2c98f3ee8df4 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -13,6 +13,8 @@
- #include <linux/types.h>
- #include <linux/kvm_host.h>
- #include <linux/perf_event.h>
-+#include <linux/bsearch.h>
-+#include <linux/sort.h>
- #include <asm/perf_event.h>
- #include "x86.h"
- #include "cpuid.h"
-@@ -172,12 +174,16 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
- 	return true;
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index eef7b34756d5..355a3f6f1970 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1198,10 +1198,10 @@ void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *s
+ 	}
  }
  
-+static int cmp_u64(const void *a, const void *b)
+-bool is_intel_cpu(void)
++static bool cpu_vendor_string_is(const char *vendor)
+ {
++	const uint32_t *chunk = (const uint32_t *)vendor;
+ 	int eax, ebx, ecx, edx;
+-	const uint32_t *chunk;
+ 	const int leaf = 0;
+ 
+ 	__asm__ __volatile__(
+@@ -1210,10 +1210,14 @@ bool is_intel_cpu(void)
+ 		  "=c"(ecx), "=d"(edx)
+ 		: /* input */ "0"(leaf), "2"(0));
+ 
+-	chunk = (const uint32_t *)("GenuineIntel");
+ 	return (ebx == chunk[0] && edx == chunk[1] && ecx == chunk[2]);
+ }
+ 
++bool is_intel_cpu(void)
 +{
-+	return *(__u64 *)a - *(__u64 *)b;
++	return cpu_vendor_string_is("GenuineIntel");
 +}
 +
- void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
+ uint32_t kvm_get_cpuid_max_basic(void)
  {
- 	unsigned config, type = PERF_TYPE_RAW;
- 	struct kvm *kvm = pmc->vcpu->kvm;
- 	struct kvm_pmu_event_filter *filter;
--	int i;
- 	bool allow_event = true;
- 
- 	if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
-@@ -192,16 +198,13 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
- 
- 	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
- 	if (filter) {
--		for (i = 0; i < filter->nevents; i++)
--			if (filter->events[i] ==
--			    (eventsel & AMD64_RAW_EVENT_MASK_NB))
--				break;
--		if (filter->action == KVM_PMU_EVENT_ALLOW &&
--		    i == filter->nevents)
--			allow_event = false;
--		if (filter->action == KVM_PMU_EVENT_DENY &&
--		    i < filter->nevents)
--			allow_event = false;
-+		__u64 key = eventsel & AMD64_RAW_EVENT_MASK_NB;
-+
-+		if (bsearch(&key, filter->events, filter->nevents,
-+			    sizeof(__u64), cmp_u64))
-+			allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
-+		else
-+			allow_event = filter->action == KVM_PMU_EVENT_DENY;
- 	}
- 	if (!allow_event)
- 		return;
-@@ -576,6 +579,11 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
- 	/* Ensure nevents can't be changed between the user copies. */
- 	*filter = tmp;
- 
-+	/*
-+	 * Sort the in-kernel list so that we can search it with bsearch.
-+	 */
-+	sort(&filter->events, filter->nevents, sizeof(__u64), cmp_u64, NULL);
-+
- 	mutex_lock(&kvm->lock);
- 	filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter,
- 				     mutex_is_locked(&kvm->lock));
+ 	return kvm_get_supported_cpuid_entry(0)->eax;
 -- 
 2.34.1.575.g55b058a8bb-goog
 
