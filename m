@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B467148D7F5
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05FDA48D7F9
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:31:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233161AbiAMMa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 07:30:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36844 "EHLO
+        id S233270AbiAMMbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 07:31:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233071AbiAMMa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 07:30:26 -0500
+        with ESMTP id S231237AbiAMMbi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 07:31:38 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FDF4C06173F;
-        Thu, 13 Jan 2022 04:30:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64CA1C061748;
+        Thu, 13 Jan 2022 04:31:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=EneBo83sq8azB3R3KL1ipMu1kmeyhB+xyiGKMG2LoSI=; b=C6mHKi3Ipka9Y1lCxE4NYlknr9
-        SkVZImpHa+R8UrgePxUjpcHCg/UZsuopBm154JDIrcTDx8JMzcD0kM/GC46AO2tcn+t71hKbHy+r+
-        gTn58pCNa30dGlENZDeYE47H4f+0Rb+2APfc5+18cFX6fYv9k2UwkWumjltwIUwqWwnC6IEfoYlbJ
-        9egDeJV4v7PUyLxDAf3ceiCMPWCHtA3qwAdX/V127dmna2Jm20vKGIeB1ZNXwSxxfRQqTTdBjkHUE
-        gZbv8P+OMNH1djvrdWyKKFD9kMSxbdZ6DDAjnTOXsUclRHc7v76KWW35qGnl+3rVhLdZOj1oWHl2G
-        /IScmFUA==;
+        bh=O5U2AgH0G1kVu5MM4GuHWevFtiWkqtv8f/2+gNyvH7g=; b=hK373tEwlMl8kUaVVQWmHQAFaL
+        Rws0QqjNP4WtId14hycos4InPbWKyYQbzuSxgxa+BYIX0RkeEsbpPiKE9Zg6umUKOIv1JXoERONKt
+        UKGroDl1GaEs+7UqIFHtn13JHypESzH19+18KZEAbTYQW+BUt2+LDpl9e9pB/0HMvp77RCle2bF4H
+        ocEb8wbtUjoCn6Ue7/jXDFvFIIAIfpECie2qagbIKrY5VS8riZ2O9YxBjgmQDVvo8VCJiQui15oGt
+        kUI+ycQajCKwNlAEPti+yzrUK9kG/Lv99OpCq0NKTXE0X8JhAOOImSykwY2KIMva0KHFK/IihehuC
+        iiiMLT0Q==;
 Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n7zFG-005pIU-7x; Thu, 13 Jan 2022 12:30:22 +0000
-Message-ID: <b6d9785d769f98da0b057fac643b0f088e346a94.camel@infradead.org>
-Subject: Re: KVM: Warn if mark_page_dirty() is called without an active vCPU
+        id 1n7zGQ-005pid-T9; Thu, 13 Jan 2022 12:31:35 +0000
+Message-ID: <c11eeeba5a1633a59fea601772d55ab2b7f4db98.camel@infradead.org>
+Subject: Re: [PATCH] KVM: avoid warning on s390 in mark_page_dirty
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        pbonzini@redhat.com
 Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, seanjc@google.com,
         Cornelia Huck <cohuck@redhat.com>,
@@ -40,13 +40,12 @@ Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
         linux-s390 <linux-s390@vger.kernel.org>,
         Thomas Huth <thuth@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>
-Date:   Thu, 13 Jan 2022 12:30:19 +0000
-In-Reply-To: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
-References: <e8f40b8765f2feefb653d8a67e487818f66581aa.camel@infradead.org>
-         <20220113120609.736701-1-borntraeger@linux.ibm.com>
-         <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
+Date:   Thu, 13 Jan 2022 12:31:31 +0000
+In-Reply-To: <20220113122924.740496-1-borntraeger@linux.ibm.com>
+References: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
+         <20220113122924.740496-1-borntraeger@linux.ibm.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-bewMyUF+enQusL8Y8cjs"
+        boundary="=-1zpgKsU+ZHMndk060dAW"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -55,49 +54,40 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-bewMyUF+enQusL8Y8cjs
+--=-1zpgKsU+ZHMndk060dAW
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2022-01-13 at 13:14 +0100, Paolo Bonzini wrote:
-> On 1/13/22 13:06, Christian Borntraeger wrote:
-> > From: Christian Borntraeger<
-> > borntraeger@de.ibm.com
-> > >
-> >=20
-> > Quick heads-up.
-> > The new warnon triggers on s390. Here we write to the guest from an
-> > irqfd worker. Since we do not use dirty_ring yet this might be an
-> > over-indication.
-> > Still have to look into that.
+On Thu, 2022-01-13 at 13:29 +0100, Christian Borntraeger wrote:
+> Avoid warnings on s390 like
+> [ 1801.980931] CPU: 12 PID: 117600 Comm: kworker/12:0 Tainted: G         =
+   E     5.17.0-20220113.rc0.git0.32ce2abb03cf.300.fc35.s390x+next #1
+> [ 1801.980938] Workqueue: events irqfd_inject [kvm]
+> [...]
+> [ 1801.981057] Call Trace:
+> [ 1801.981060]  [<000003ff805f0f5c>] mark_page_dirty_in_slot+0xa4/0xb0 [k=
+vm]
+> [ 1801.981083]  [<000003ff8060e9fe>] adapter_indicators_set+0xde/0x268 [k=
+vm]
+> [ 1801.981104]  [<000003ff80613c24>] set_adapter_int+0x64/0xd8 [kvm]
+> [ 1801.981124]  [<000003ff805fb9aa>] kvm_set_irq+0xc2/0x130 [kvm]
+> [ 1801.981144]  [<000003ff805f8d86>] irqfd_inject+0x76/0xa0 [kvm]
+> [ 1801.981164]  [<0000000175e56906>] process_one_work+0x1fe/0x470
+> [ 1801.981173]  [<0000000175e570a4>] worker_thread+0x64/0x498
+> [ 1801.981176]  [<0000000175e5ef2c>] kthread+0x10c/0x110
+> [ 1801.981180]  [<0000000175de73c8>] __ret_from_fork+0x40/0x58
+> [ 1801.981185]  [<000000017698440a>] ret_from_fork+0xa/0x40
 >=20
-> Yes, it's okay to add an #ifdef around the warning.
+> when writing to a guest from an irqfd worker as long as we do not have
+> the dirty ring.
+>=20
+> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-That would be #ifndef CONFIG_HAVE_KVM_DIRTY_RING, yes?=20
+Reluctantly-acked-by: David Woodhouse <dwmw@amazon.co.uk>
 
-I already found it hard to write down the rules around how
-kvm_vcpu_write_guest() doesn't use the vCPU it's passed, and how both
-it and kvm_write_guest() need to be invoked on a pCPU which currently
-owns *a* vCPU belonging to the same KVM... if we add "unless you're on
-an architecture that doesn't support dirty ring logging", you may have
-to pass me a bucket.
+... with a bucket nearby just in case.
 
-Are you proposing that as an officially documented part of the already
-horrid API, or a temporary measure :)
-
-Btw, that get_map_page() in arch/s390/kvm/interrupt.c looks like it has
-the same use-after-free problem that kvm_map_gfn() used to have. It
-probably wants converting to the new gfn_to_pfn_cache.=20
-
-Take a look at how I resolve the same issue for delivering Xen event
-channel interrupts.
-
-Although I gave myself a free pass on the dirty marking in that case,
-by declaring that the shinfo page doesn't get marked dirty; it should
-be considered *always* dirty. You might have less fun declaring that
-retrospectively in your case.
-
---=-bewMyUF+enQusL8Y8cjs
+--=-1zpgKsU+ZHMndk060dAW
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -189,25 +179,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMTEzMTIzMDE5WjAvBgkqhkiG9w0BCQQxIgQgodd9Lnu5
-406GtXiJLhLr78EFUIKkYbovwcJfBODAf0gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMTEzMTIzMTMxWjAvBgkqhkiG9w0BCQQxIgQgT7+Lfxmw
+xMkJGIhgHHKMqeIN6aATgLl5pwzdqsvplOwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAQRZgNZYM9YZ6C/AHqyvbGOJgv8+wplf6t
-o55ojcEhiLymo/VdFcN8GZvMDMQThJTfXaR5uJEQCDGhC/7xHuBtxao2XOmsnRNHWFOwhBj3DCaS
-YVgYsTVZlNcpQ8evB4q60IFnPljO0FVGae7xz94awHmr3OyTvWmC8I2UBQaEC/wtajINERYwJUfm
-0dOzpJfbbLQ/ZO0Q7M7kdqRD9OBjlroceiZYOLRrHmy5afLlwJrpec9n1OTdrLE5v1lUpfPXTTlq
-m5yoUyg4TGT5/JAt3xJrIaYRyJUMkZGnQgzW4jYul6o7lKhRenWONwIYyqrLBFi4b7evNpAfNPiH
-20d1I0yvXgpax4pjMpes2gtpmHNm7E+UrH9E5j75lF1ro2Axk2/6pCRvtsAcGK5EcJxVDNMRkt8i
-hGQPl9shq5qVKD0ePdFFfiKkohIPG2W3Afwhs3bEvljbUd/qdevsL4ZlQ2ojogw1sDcxyzo9LvCZ
-Fs8iOOfw7dEkUUDUluovk1OptYMirUUwbVJMJyJ/MOYAG8I4faYuxAdIq+SB8o6+71cfrce4oy+M
-oVplfyxEZ73rW3LrcNfJltk2qCEobqoYiJBR7VAk83mM0vsNhLIZRTaClAppgW/xZ4N+gAcQT+KD
-tq3gXLWscyqWCJo6YEGAtDFh144mBVmB0TPFz5M+3gAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCyFaz+aRQWON3O7FaP/ikkY9Guo0fHfz+i
+1XjdWmKVMsVty5KqCPV1OaJdDT6J1mGLqAfT46cO7IhpQTDf5rCOg54WVuqY4xBZQq6fnWx8JJoK
+vO7tPzRr1qrUlZaz6J86KBKZsWKD2IiWli6MLQ6FabRo5xklcfjYtOgBjLkBJAyA2o/Zi9hDAL2z
+T+dD1hCThGEpU6rQrSLx5QpFdQF4KOrIi/J2a8QmUgD8XS6/l1Ek2nMfmr41sOyyvg2Z0o7btUiL
+wdkNy1eq3xf59FKAtNixLBn6oOUfQp2H/Na+Li+43R6jcT5EhRS7RykwqziLU9+KhdZ3o1BOSkZS
+RsUbSmo5/g7BxYAmGVQTmMv9jokaNBTVaK2RFqyziE/QBUrG4qbPlLSmeGMON8ahzPWIytOUi9iy
+h8aW1939wpUzMllZLdX3WGBgdsyA0sA9WGtghjcH4C5l36fgQ/+apSq9ZJxgezGsI29kX0tujRE1
+nEdTYIUngAZsmyV62EZJ+NjsUmRlbFSzlJM3LeR9EHqeyTyXbK/5bvHX5+Mvu1jTSHcYW+QMHSTM
+DnVHkIpkcl6MAcAKXl54D3lyeG429+CxHnqiFVkaDNmtB8tdpsX9MyqEcW6P2JrAbRA2BpXNovbK
+7OeC3wn9J70i8M9DQsmAwoUBdHkL9OZMoDsNsUsQNQAAAAAAAA==
 
 
---=-bewMyUF+enQusL8Y8cjs--
+--=-1zpgKsU+ZHMndk060dAW--
 
