@@ -2,188 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A33B048DCAF
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 18:10:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1EC948DCD9
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 18:21:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbiAMRKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 12:10:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45236 "EHLO
+        id S232856AbiAMRVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 12:21:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbiAMRKg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 12:10:36 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD75C061574
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 09:10:35 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id s30so21863933lfo.7
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 09:10:35 -0800 (PST)
+        with ESMTP id S230124AbiAMRVY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 12:21:24 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A64CC061574
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 09:21:24 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id x20so437854pgk.1
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 09:21:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JOz96PjrzNYDSxp90dJH/qz3cIJ31aow/lemfL+/Kl4=;
-        b=PBSSAutGD+wJm6XXGTzbQLAOVwWxTK025E3bGM/NA4V31Nv9kR1gS8ObPM9oSILKTd
-         oEedbJKGD8OU24Layp8tMU1qRi3a+d4Yuj3YMNmDipQLZtvs6Uh8UaoMV6r2MJTjsN6B
-         jVJd3jm+hkQGrjuLNTTSa7oUUH9pynd29Bw/bvNPXkDZqOy9N7LmWscmoiDBY5BRTsCJ
-         yFAKnFxvc5rRagkdi2BsMcLHhhDKnXAOMT0t2dBZ6sea4BuT+jW9EkXmtawWWE2ph2fU
-         1tdPb6ru+lxkPpFr5bUn95dHhnfzBLJNUylDEI+yNooYPX7fRbWmf+03puEMWLIi66+q
-         7HzQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fbtEGzJF4Pri1PYcfPX7asBEf22RcTqncsyblqc+OvY=;
+        b=Sl9FnTulo3H/YWpf/aLfhSezCJjNzfPIcyIfQnWaI/T+ls4BqPWyqk0HJpiNM9kBV3
+         yGWtR900nHAhsuqatRtea8l3DKjGXWlo8s5kuMoFNZ7F9GpaNNS4XkSbvkXTqsrf2Zt2
+         APxjvu6wgUo4v3/0Ed+fzz74FUPs60sq9kEb5Q6U4T6Wfw2sHFVn2yOiqSEIvjuhjNo4
+         kuPwFSKBgU+46N6R3bu0BV7BPQos4gfZusOXH4QF94O+R0NhEUt2Q27T1c7bwrI8vByj
+         u1niyPmODAf23UyQipBFWfpwwWDFqW/fDcCcLJAKR6WcuHkeCsBMoMFkcTlmmC0+SUbj
+         kR/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JOz96PjrzNYDSxp90dJH/qz3cIJ31aow/lemfL+/Kl4=;
-        b=lOvIvVjgU6sFWkajKEiLjtEyi+qepV2IgWYj07TJ//A5ERixrU6/R/oWkn0OSzgoB/
-         uV0Gk5EnTSi7wBVFzh2vIugpqeRIatM26oO00aG8zoCRa0V7xlVgjyF/VQJTv5EFtroC
-         I5ncupG73hr1vCJHoag5kfKhwyTWsZ3OAKzCy1LQw1heu+cSUOagkuS6DLsryFjFVxsA
-         owvM38cWmuhB68+8exa+8UX1jhoFgUa5l0rCt0bayFviTKtbzwUOOYfRgc+pw3G3mSfT
-         gBlJwU4D7jomK/Osr7TSROitYi4GyHp4bDinXbhMNb7CdY78H81R4oGs0SV4HkuTEnUR
-         DUog==
-X-Gm-Message-State: AOAM530IRJMLK5NpEjKdUnH6iL4REjkb41WfzyO1SwPb2Pl0WLccwYyt
-        LKjS5h69ykAZ14mrDUS7BpsX31C40dPPetgJRvH/tzjLAs29Bw==
-X-Google-Smtp-Source: ABdhPJx/M1DXkjiGhYzRVZaOUfcpMoE675R5O1kc3y8tEFJ6Zl0gqYhG6SFciytRPc5YVp4MEdcb7tDZgBcmQ6sufg0=
-X-Received: by 2002:a05:6512:b93:: with SMTP id b19mr3689196lfv.190.1642093833735;
- Thu, 13 Jan 2022 09:10:33 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fbtEGzJF4Pri1PYcfPX7asBEf22RcTqncsyblqc+OvY=;
+        b=d8kHvNhz2rcotJ52CriYdTSxvcd0MiNazHNJUm7NqwNSLtnamk0+/hOiaur+zjCGpN
+         mzNS1YlJ4jORZHtc61cQBlY+YdL5WUg+c3Urc1FUqpUeZ7erCD4eWS/aDN+wnYBr/rIY
+         qU32B8fiXll4d2XsoH2dr123IDHv8dFE07x/1qoGXVFzib6JiiPEdxDJ//M+OzljQZBW
+         jh8hEUSFBLBYvilRsGDXYxFH1KJroYYWZGn3eKRLgiClVrRSL2LO+g7k+bi4MFwFWxC9
+         kbmIjByxAsmaUCzO3bDj2R48UYGKbxHfCNo9MXgLMPoH6+DbDs6+SACBrZbAsMly2dtV
+         rEDQ==
+X-Gm-Message-State: AOAM533PFt9TjgCy2I+cZkgJIpB8X1iAcTy3TG5rmdfwvPS8th+5IftY
+        N8lbQcqVeHyo7qgeNyj0KqYHsQ==
+X-Google-Smtp-Source: ABdhPJwscB6iGP0ZkbE0k3eKaRnQ7Ca7BDedLEYyrWxbsoa7id33e6ZYFRtTIaHRtcelXaAQ3lqEHA==
+X-Received: by 2002:a62:178a:0:b0:4c0:25a5:d389 with SMTP id 132-20020a62178a000000b004c025a5d389mr5156670pfx.1.1642094483546;
+        Thu, 13 Jan 2022 09:21:23 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id pi15sm3309892pjb.43.2022.01.13.09.21.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 09:21:22 -0800 (PST)
+Date:   Thu, 13 Jan 2022 17:21:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+Message-ID: <YeBfj89mIf8SezfD@google.com>
+References: <20220104194918.373612-1-rananta@google.com>
+ <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+ <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+ <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+ <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
+ <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+ <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+ <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220112215801.3502286-1-dmatlack@google.com> <20220112215801.3502286-3-dmatlack@google.com>
- <Yd92T8RoZZi6usxH@google.com>
-In-Reply-To: <Yd92T8RoZZi6usxH@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 13 Jan 2022 09:10:07 -0800
-Message-ID: <CALzav=dhd3rLh6tDJV0BR7aH0FV=Xv9xVm5XdbVitQYfSAqfYg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Improve comment about TLB flush
- semantics for write-protection
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Jan 12, 2022, David Matlack wrote:
-> > Rewrite the comment in kvm_mmu_slot_remove_write_access() that explains
-> > why it is safe to flush TLBs outside of the MMU lock after
-> > write-protecting SPTEs for dirty logging. The current comment is a long
-> > run-on sentance that was difficult to undertsand. In addition it was
-> > specific to the shadow MMU (mentioning mmu_spte_update()) when the TDP
-> > MMU has to handle this as well.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 29 ++++++++++++++++++++---------
-> >  1 file changed, 20 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 1d275e9d76b5..33f550b3be8f 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5825,15 +5825,26 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
-> >       }
-> >
-> >       /*
-> > -      * We can flush all the TLBs out of the mmu lock without TLB
-> > -      * corruption since we just change the spte from writable to
-> > -      * readonly so that we only need to care the case of changing
-> > -      * spte from present to present (changing the spte from present
-> > -      * to nonpresent will flush all the TLBs immediately), in other
-> > -      * words, the only case we care is mmu_spte_update() where we
-> > -      * have checked Host-writable | MMU-writable instead of
-> > -      * PT_WRITABLE_MASK, that means it does not depend on PT_WRITABLE_MASK
-> > -      * anymore.
-> > +      * It is safe to flush TLBs outside of the MMU lock since SPTEs are only
-> > +      * being changed from writable to read-only (i.e. the mapping to host
-> > +      * PFNs is not changing).
->
-> Hmm, you mostly address things in the next sentence/paragraph, but it's more than
-> the SPTE being downgraded from writable => read-only, e.g. if the SPTE were being
-> made read-only due to userspace removing permissions, then KVM would need to flush
-> before dropping mmu_lock.  The qualifier about the PFN not changing actually does
-> more harm than good because it further suggests that writable => read-only is
-> somehow inherently safe.
->
-> > +      * All we care about is that CPUs start using the
-> > +      * read-only mappings from this point forward to ensure the dirty bitmap
-> > +      * gets updated, but that does not need to run under the MMU lock.
->
-> "this point forward" isn't technically true, the requirement is that the flush
-> occurs before the memslot update completes.  Definitely splitting hairs, I mean,
-> this basically is the end of the memslot update, but it's an opportunity to
-> clarify _why_ the flush needs to happen at this point.
->
-> > +      *
-> > +      * Note that there are other reasons why SPTEs can be write-protected
-> > +      * besides dirty logging: (1) to intercept guest page table
-> > +      * modifications when doing shadow paging and (2) to protecting guest
-> > +      * memory that is not host-writable.
->
-> So, technically, #2 is not possible.  KVM doesn't allow a memslot to be converted
-> from writable => read-only, userspace must first delete the entire memslot.  That
-> means the relevant SPTEs never transition directly from writable to !writable,
-> they are instead zapped entirely and "new" SPTEs are created that are read-only
-> from their genesis.
->
-> Making a VMA read-only also results in SPTEs being zapped and recreated, though
-> this is an area for improvement.  We could cover future changes in this area by
-> being a bit fuzzy in the wording, but I think it would be better to talk only
-> about the shadow paging case and thus only about MMU-writable, because Host-writable
-> is (currently) immutable and making it mutable (in the mmu_notifier path) will
-> have additional "rule" changes.
->
-> > +      * Both of these usecases require
-> > +      * flushing the TLB under the MMU lock to ensure CPUs are not running
-> > +      * with writable SPTEs in their TLB. The tricky part is knowing when it
-> > +      * is safe to skip a TLB flush if an SPTE is already write-protected,
-> > +      * since it could have been write-protected for dirty-logging which does
-> > +      * not flush under the lock.
->
-> It's a bit unclear that the last "skip a TLB flush" snippet is referring to a
-> future TLB flush, not this TLB flush.
->
-> > +      *
-> > +      * To handle this each SPTE has an MMU-writable bit and a Host-writable
-> > +      * bit (KVM-specific bits that are not used by hardware). These bits
-> > +      * allow KVM to deduce *why* a given SPTE is currently write-protected,
-> > +      * so that it knows when it needs to flush TLBs under the MMU lock.
->
-> I much rather we add this type of comment over the definitions for
-> DEFAULT_SPTE_{HOST,MMU}_WRITEABLE and then provide a reference to those definitions
-> after a very brief "KVM uses the MMU-writable bit".
->
-> So something like this?  Plus more commentry in spte.h.
->
->         /*
->          * It's safe to flush TLBs after dropping mmu_lock as making a writable
->          * SPTE read-only for dirty logging only needs to ensure KVM starts
->          * logging writes to the memslot before the memslot update completes,
->          * i.e. before the enabling of dirty logging is visible to userspace.
->          *
->          * Note, KVM also write-protects SPTEs when shadowing guest page tables,
->          * in which case a TLB flush is needed before dropping mmu_lock().  To
->          * ensure a future TLB flush isn't missed, KVM uses a software-available
->          * bit to track if a SPTE is MMU-Writable, i.e. is considered writable
->          * for shadow paging purposes.  When write-protecting for shadow paging,
->          * KVM clears both WRITABLE and MMU-Writable, and performs a TLB flush
->          * while holding mmu_lock if either bit is cleared.
->          *
->          * See DEFAULT_SPTE_{HOST,MMU}_WRITEABLE for more details.
->          */
+On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
+> On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
+> > Perhaps it would help if you explained *why* you are doing this. It
+> > sounds like you are either trying to protect against a malicious
+> > userspace, or you are trying to keep userspace from doing something
+> > stupid. In general, kvm only enforces constraints that are necessary
+> > to protect the host. If that's what you're doing, I don't understand
+> > why live migration doesn't provide an end-run around your protections.
+> It's mainly to safeguard the guests. With respect to migration, KVM
+> and the userspace are collectively playing a role here. It's up to the
+> userspace to ensure that the registers are configured the same across
+> migrations and KVM ensures that the userspace doesn't modify the
+> registers after KVM_RUN so that they don't see features turned OFF/ON
+> during execution. I'm not sure if it falls into the definition of
+> protecting the host. Do you see a value in adding this extra
+> protection from KVM?
 
-Makes sense. I'll rework the comment per your feedback and also
-document the {host,mmu}-writable bits. Although I think it'd make more
-sense to put those comments on shadow_{host,mmu}_writable_mask as
-those are the symbols used throughout the code and EPT uses different
-bits than DEFAULT_..._WRITABLE.
+Short answer: probably not?
 
->
-> >        */
-> >       if (flush)
-> >               kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
-> > --
-> > 2.34.1.703.g22d0c6ccf7-goog
-> >
+There is precedent for disallowing userspace from doing stupid things, but that's
+either for KVM's protection (as Jim pointed out), or because KVM can't honor the
+change, e.g. x86 is currently in the process of disallowing most CPUID changes
+after KVM_RUN because KVM itself consumes the CPUID information and KVM doesn't
+support updating some of it's own internal state (because removing features like
+GB hugepage support is nonsensical and would require a large pile of complicated,
+messy code).
+
+Restricing CPUID changes does offer some "protection" to the guest, but that's
+not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
+case, and trying to do so is a fool's errand.
+
+If restricting updates in the arm64 is necessary to ensure KVM provides sane
+behavior, then it could be justified.  But if it's purely a sanity check on
+behalf of the guest, then it's not justified.
