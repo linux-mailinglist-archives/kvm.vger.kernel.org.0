@@ -2,149 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E0FD48DA77
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 16:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8723748DA96
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 16:19:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235994AbiAMPJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 10:09:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47842 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235988AbiAMPJZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 10:09:25 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20DDq9u4010321;
-        Thu, 13 Jan 2022 15:09:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7LX5KeAirnDHIYJQqXMWNufA/g4qmD+wx5smisw5wbM=;
- b=s9vailyQj2majgh9Yq5+b1P/kGn7M72S3/zBzWeqy08cYOz9UHhOXltISWwM2SgF/S2E
- WadkGwgSC7Epd4vZhEN+o8iJIoiYZVxTkR/fPnKX/RIIQ+SZr0wisYrEP+u2qmc0GZDK
- rrWTlxr89tlHeksHGAJvNZBULESeVGAqNYo2uhh6pTho8DfxP4TdVxqkKffc13wfWH79
- FZ8is1cEq3vI7ChzFai9MUEvJqAk8bZFa6YgGpCupbqERZD7Ld45Ia/76MsiS/U4qlqV
- d2w+Byv6Ih3k9nyUHRawGTxoUS0ul0put6w3j2z9fHyJ027WOxAC0ma2MdDMdoLm0iv2 nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3djnbe1nmb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 15:09:22 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20DF5VZv009362;
-        Thu, 13 Jan 2022 15:09:21 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3djnbe1nk9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 15:09:21 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20DF7ORa025162;
-        Thu, 13 Jan 2022 15:09:19 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3df289upsa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 15:09:19 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20DF9FC442729918
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jan 2022 15:09:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E186BA407C;
-        Thu, 13 Jan 2022 15:09:14 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5B6F9A405F;
-        Thu, 13 Jan 2022 15:09:14 +0000 (GMT)
-Received: from [9.171.57.64] (unknown [9.171.57.64])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Jan 2022 15:09:14 +0000 (GMT)
-Message-ID: <4a54cba5-6fce-7810-2966-b990d0dbb7c3@linux.ibm.com>
-Date:   Thu, 13 Jan 2022 16:09:14 +0100
+        id S236064AbiAMPTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 10:19:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:51153 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236053AbiAMPTy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 10:19:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642087193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NnVmdo4eA3jgB9H6nwQxP3p+2r7UOf/6AXY2LS6emsY=;
+        b=Ad3xZTmx5jZGtH4TTfEF52EHvcKw5GTQOtatkHmn8EtifvQa6HscYajx8FMzKNV+aJf8fx
+        dzBcacccSq/qxzl6lQI+KHS1nbmTnVRWso9xzGZmKBZuuL1rQ+1yXCMMh7nQ95VxFvh8Zp
+        Sw4ugVnc67Z7v1JC8DbmeTAgRyn5+Fg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-385-wqjUgLKsOj-tiDFTNGSa2w-1; Thu, 13 Jan 2022 10:19:51 -0500
+X-MC-Unique: wqjUgLKsOj-tiDFTNGSa2w-1
+Received: by mail-ed1-f70.google.com with SMTP id m16-20020a056402431000b003fb60bbe0e2so5639041edc.3
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 07:19:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NnVmdo4eA3jgB9H6nwQxP3p+2r7UOf/6AXY2LS6emsY=;
+        b=g+tVoKvQrwL2p+vi99BxKZfs9W8jwlyC+cc4VJH5XxA6+15+rtMjV1Sy5tBP9qWl/t
+         ZJkyEc7mOnC7eVBKCjDpO7iagl8al7GiJATujGvADa2W6eGF/WiHOYOu6FnSo/kMZz2Z
+         0T2U7/D52P8kTu/hzum26H75j4K3+BDtAtxaIbJ4GZZMTMQrk0EklLcMlqG6K3bcvzZH
+         9xlYGQ1IE4MUNweY1mOYr4r4K78/YLBz0LI/VWTsi2LPu+qlWC/wlVjSdbBZPhmrS+F+
+         QCj3VTyBnfZuyghV1iu8aoEOTZzTBW2HgoVG389Pb/2gpoac11LjtkCOCfDKmjG4vaDA
+         4crA==
+X-Gm-Message-State: AOAM530nurecJVVu5oqKVedyDrPujqqtZyLy8icVRAEA2lQx0/yHBYgw
+        3U5eDFcv4XpMv0ihb1WqQWTaRCOPPgvdnw9kCjfCKCesesU22NonutF5t6iCstXBebNbb6Ex16P
+        hfD7T1XMj/SG8
+X-Received: by 2002:a17:906:7942:: with SMTP id l2mr4109128ejo.730.1642087190542;
+        Thu, 13 Jan 2022 07:19:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzY9l0dMwz3EJs33yEWQDUQD/vM85TTnjGbfUdGlr/uzrnbvqMxaz/IW8imPgv8gALNSSrBgA==
+X-Received: by 2002:a17:906:7942:: with SMTP id l2mr4109114ejo.730.1642087190356;
+        Thu, 13 Jan 2022 07:19:50 -0800 (PST)
+Received: from redhat.com ([2.55.154.210])
+        by smtp.gmail.com with ESMTPSA id m12sm1309096edd.86.2022.01.13.07.19.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 07:19:49 -0800 (PST)
+Date:   Thu, 13 Jan 2022 10:19:46 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stefanha@redhat.com, Jason Wang <jasowang@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <20220113101922-mutt-send-email-mst@kernel.org>
+References: <20220113145642.205388-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: KVM: Warn if mark_page_dirty() is called without an active vCPU
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <e8f40b8765f2feefb653d8a67e487818f66581aa.camel@infradead.org>
- <20220113120609.736701-1-borntraeger@linux.ibm.com>
- <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
- <b6d9785d769f98da0b057fac643b0f088e346a94.camel@infradead.org>
- <c685a543-a524-9c95-4b85-f53a0ff744a9@linux.ibm.com>
- <bfc53985a178f43a3a21796f33449570cf9e4649.camel@infradead.org>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <bfc53985a178f43a3a21796f33449570cf9e4649.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zhB1xhAe4LBWJhH9SRJkn9MP5dxb3LLA
-X-Proofpoint-GUID: morpnHT-q60JuDUQdTVAIhkTneeom_hM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-13_07,2022-01-13_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 lowpriorityscore=0 clxscore=1015
- adultscore=0 spamscore=0 impostorscore=0 malwarescore=0 phishscore=0
- bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201130093
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220113145642.205388-1-sgarzare@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 13.01.22 um 14:22 schrieb David Woodhouse:
-> On Thu, 2022-01-13 at 13:51 +0100, Christian Borntraeger wrote:
->>> Btw, that get_map_page() in arch/s390/kvm/interrupt.c looks like it has
->>> the same use-after-free problem that kvm_map_gfn() used to have. It
->>> probably wants converting to the new gfn_to_pfn_cache.
->>>
->>> Take a look at how I resolve the same issue for delivering Xen event
->>> channel interrupts.
->>
->> Do you have a commit ID for your Xen event channel fix?
+On Thu, Jan 13, 2022 at 03:56:42PM +0100, Stefano Garzarella wrote:
+> In vhost_enable_notify() we enable the notifications and we read
+> the avail index to check if new buffers have become available in
+> the meantime. In this case, the device would go to re-read avail
+> index to access the descriptor.
 > 
-> 14243b387137 ("KVM: x86/xen: Add KVM_IRQ_ROUTING_XEN_EVTCHN and event
-> channel delivery") and the commits reworking the gfn_to_pfn_cache which
-> lead up to it.
+> As we already do in other place, we can cache the value in `avail_idx`
+> and compare it with `last_avail_idx` to check if there are new
+> buffers available.
 > 
-> Questions: In your kvm_set_routing_entry() where it calls
-> gmap_translate() to turn the summary_addr and ind_addr from guest
-> addresses to userspace virtual addresses, what protects those
-> translations? If the gmap changes before kvm_set_routing_entry() even
-> returns, what ensures that the IRQ gets retranslated?
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-In the end the gmap translated between guest physical and host virtual, just
-like the kvm memslots. This is done in kvm_arch_commit_memory_region. The gmap
-is a method where we share the last level page table between the guest mapping
-and the user mapping. That is why our memslots have to be on 1 MB boundary (our
-page tables have 256 4k entries). So instead of gmap we could have used the
-memslots as well for translation.
+I guess we can ... but what's the point?
 
-I have trouble seeing a kernel integrity issue: worst case is that we point to
-a different address in the userspace mapping if qemu would change the memslots
-maybe even to an invalid one. But then the access should fail (for invalid) or
-you get a self-inflicted bit flips on your own address space if you play such
-games.
-
-Well, one thing:  if QEMU changes memslots, it might need to redo the irqfd
-registration as well as we do not follow these changes. Maybe this is something
-that we could improve as future QEMUs could do more changes regarding memslots.
-
+> ---
+>  drivers/vhost/vhost.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> And later in adapter_indicators_set() where you take that userspace
-> virtual address and pass it to your get_map_page() function, the same
-> question: what if userspace does a concurrent mmap() and changes the
-> physical page that the userspace address points to?
-> 
-> In the latter case, at least it does look like you don't support
-> external memory accessed only by a PFN without having a corresponding
-> struct page. So at least you don't end up accessing a page that can now
-> belong to *another* guest, because the original underlying page is
-> locked. You're probably OK in that case, so it's just the gmap changing
-> that we need to focus on?
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 59edb5a1ffe2..07363dff559e 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+>  		       &vq->avail->idx, r);
+>  		return false;
+>  	}
+> +	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
+>  
+> -	return vhost16_to_cpu(vq, avail_idx) != vq->avail_idx;
+> +	return vq->avail_idx != vq->last_avail_idx;
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_enable_notify);
+>  
+> -- 
+> 2.31.1
+
