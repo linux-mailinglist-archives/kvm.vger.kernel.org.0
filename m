@@ -2,168 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AA2748DC47
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 17:57:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E24BC48DC8B
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 18:04:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236930AbiAMQ5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 11:57:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42050 "EHLO
+        id S232285AbiAMRE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 12:04:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231269AbiAMQ5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 11:57:34 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770BAC061574
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 08:57:34 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id b3so1608492plc.7
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 08:57:34 -0800 (PST)
+        with ESMTP id S230090AbiAMRE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 12:04:58 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76993C061574
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 09:04:57 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id s30so21802581lfo.7
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 09:04:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=IDu36Q/8jeKxXBMvNlI5EGcL6+rCrj1OafVPDxD7U30=;
-        b=efdPusnCFU6tDV4fN2YgrIBvga/8ORb5yRUAyUp/OEAwb2yn5Z2+kk4bRET+uNuHos
-         FgepAAuSCK1m0IDrzZu38jjoQtHP9et6qYT63Ir+P7WGz0RJMD7kJ53eWjKYYA68UpV/
-         7AzSmqTCE37zc2i0SVPyiI0mtjSgVRErpylA7VDVOk1lBihQWBe7EUhjHACIs/kABpMJ
-         y701lfjOIRVmnJjjWKlzV1BuFkMjjpMGf3uRoNq/jF9H3JemlYWbBBy5oHpdAbYi1HLT
-         Wc/mO8/EXHHVmvgUWwWfBjcQOqx5vkOwbHLvJMamxieqKqqobCK55q+W+dDLDRNz0t1j
-         7UmQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wiirCHI6lYv/CvxqqTOCCFzFHxDjKSiNSEL6CkjYGGw=;
+        b=EUPKJhUtspuecuPUtrqoPbXGji9V+3FgBt0DaEawld3fO07b7AO93zwSDYtw55cLUj
+         Szj5Zgn+nUaxMY5I5Dx5VVH5q0Cz7X3FNmiZKaus/OvwmrTbYeIO/Ioh6f6SeDkH7/wn
+         s4xo5HlDvoYa1V0OKN507EahpWGzkJpk32vpr16b7Ai1yo4Z1BoTaS7a0gVBIHg/7iux
+         XbjGWv5moUDxTrH0smsYj8AST4GRih3l5k/KTbKvgZsMPdFhMHLezEVjPQ1h0CCMBilG
+         5G34IHjGjlau/l/7CcUmDOnX6o4ZDa16uLZN+j/5+P6c2gieRx6egtewNNZuPX5fi/6e
+         kJDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=IDu36Q/8jeKxXBMvNlI5EGcL6+rCrj1OafVPDxD7U30=;
-        b=8ANaVc7IIC28lIRZmDwXnes98s6w3DJQrPTOLQJAFQXrqUuScANLKB76SxJuTxdu7Y
-         COL2F6E3be3+yVbOgufyk84FDENR1/B9LaUM809En/TrY5qoMKJ8CLQQwavNe6mt4P56
-         ci2EP2nAH8y6BI5w9zq3nfT7jySR6GsQhT/6VP4RSz3hVhh5zUaTgX+/hVAxEx7LBPtz
-         b9pILT7S/lexCJEXc6fxXyCQQgZ3DY8/KHdf0gb06QbItyZqxrpaNsM3UfuNdGpAEpVj
-         0AzUW6Ej8x54h6St1sdlqqTpsk2kildo1mb8AAfDflSardW45vkn7SxUQGf3Ud4rang2
-         C5pA==
-X-Gm-Message-State: AOAM530Vu0eb95/MrJTTtI+7LeH8wVseKvX4CBKOqn/fJO/Yb94tFXdE
-        uWZ60SnQqXlpRzF8M+SqEzyA6g==
-X-Google-Smtp-Source: ABdhPJyrGMFHe2XQz3Ed+0GGOjmVEm82BGzMlKYQ/j6vUtuNKzafRsIf1wOM7y5lt4eVVhHz6AGv4w==
-X-Received: by 2002:a17:902:d64f:b0:149:4d01:fb42 with SMTP id y15-20020a170902d64f00b001494d01fb42mr5343651plh.13.1642093053759;
-        Thu, 13 Jan 2022 08:57:33 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k10sm3138017pfi.52.2022.01.13.08.57.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jan 2022 08:57:33 -0800 (PST)
-Date:   Thu, 13 Jan 2022 16:57:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Liam Merwick <liam.merwick@oracle.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: Query about calling kvm_vcpu_gfn_to_memslot() with a GVA (Re:
- [PATCH 1/2] KVM: SVM: avoid infinite loop on NPF from bad address
-Message-ID: <YeBZ+QcXUIQ7/fD2@google.com>
-References: <20200417163843.71624-2-pbonzini@redhat.com>
- <74de09d4-6c3a-77e1-5051-c122de712f9b@oracle.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wiirCHI6lYv/CvxqqTOCCFzFHxDjKSiNSEL6CkjYGGw=;
+        b=ft1V07JTTQwO9U3aKK2a/vS/p8Gm2U/wJfioPd6vCSbPL+pvnGohg8OzLXxoR3WIju
+         n21jL0zdvSNwmD5hqg5ebqJLJluFCnrOu0HdPqeHuxJwNjkv3His3wruM9lZtQsj2e1p
+         mJDyfjGZio1EjeqL4K12a71ZjnIqh78kfgzuIpCbQavZcrxnJhg6ShyaS29EkLda5pjj
+         Xea873mnhXqUSbWabs9TB986wVPXs+M/GHx+O1Y9VLkcT5NOM59gZiZph9Ax6gq27Gdr
+         n/Uw1h3AkAiMeUqGz2IGSLdtDdUgAJ3kgi8EDSiTH5FWjw2DxcnMbmiHrZiPZvIPzjve
+         svtQ==
+X-Gm-Message-State: AOAM533Cbiss6wbZLx9MgHKHHs/L8nwvZSuFYWB4LHD1yv/U7KCIk3UB
+        Xm+s9wzSC5KwtBuuHGlvVWuycGIYs32PFy0aTSveRQ==
+X-Google-Smtp-Source: ABdhPJz02utokoeajYaSeqYK/taCM+DKTuVZz2XxQwBmd1oWGB6TtTAmPd1qoMbLHtOVdtmQ92QC3rbqZV3NsKRYKJ4=
+X-Received: by 2002:a2e:9ac3:: with SMTP id p3mr3696662ljj.49.1642093495576;
+ Thu, 13 Jan 2022 09:04:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <74de09d4-6c3a-77e1-5051-c122de712f9b@oracle.com>
+References: <20220112215801.3502286-1-dmatlack@google.com> <20220112215801.3502286-2-dmatlack@google.com>
+ <Yd9g1KIoNwUPtFrt@google.com> <CALzav=djDTBxvXEz3O4QQu-2VkOcMESkpxmWYJYKikiGQLwyUA@mail.gmail.com>
+ <Yd9ySjsQFeHKnIDv@google.com>
+In-Reply-To: <Yd9ySjsQFeHKnIDv@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 13 Jan 2022 09:04:28 -0800
+Message-ID: <CALzav=eWMOuuXog5Rk9FwSjQDfM8==qdEGjSp=u9xB3VhBm6qw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Fix write-protection of PTs mapped by
+ the TDP MMU
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Gardon <bgardon@google.com>,
+        kvm list <kvm@vger.kernel.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022, Liam Merwick wrote:
-> On Fri, Apr 17, 2020 at 12:38:42PM -0400, Paolo Bonzini wrote:
-> > When a nested page fault is taken from an address that does not have
-> > a memslot associated to it, kvm_mmu_do_page_fault returns RET_PF_EMULATE
-> > (via mmu_set_spte) and kvm_mmu_page_fault then invokes
-> svm_need_emulation_on_page_fault.
+On Wed, Jan 12, 2022 at 4:29 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Jan 12, 2022, David Matlack wrote:
+> > On Wed, Jan 12, 2022 at 3:14 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Wed, Jan 12, 2022, David Matlack wrote:
+> > > > When the TDP MMU is write-protection GFNs for page table protection (as
+> > > > opposed to for dirty logging, or due to the HVA not being writable), it
+> > > > checks if the SPTE is already write-protected and if so skips modifying
+> > > > the SPTE and the TLB flush.
+> > > >
+> > > > This behavior is incorrect because the SPTE may be write-protected for
+> > > > dirty logging. This implies that the SPTE could be locklessly be made
+> > > > writable on the next write access, and that vCPUs could still be running
+> > > > with writable SPTEs cached in their TLB.
+> > > >
+> > > > Fix this by unconditionally setting the SPTE and only skipping the TLB
+> > > > flush if the SPTE was already marked !MMU-writable or !Host-writable,
+> > > > which guarantees the SPTE cannot be locklessly be made writable and no
+> > > > vCPUs are running the writable SPTEs cached in their TLBs.
+> > > >
+> > > > Technically it would be safe to skip setting the SPTE as well since:
+> > > >
+> > > >   (a) If MMU-writable is set then Host-writable must be cleared
+> > > >       and the only way to set Host-writable is to fault the SPTE
+> > > >       back in entirely (at which point any unsynced shadow pages
+> > > >       reachable by the new SPTE will be synced and MMU-writable can
+> > > >       be safetly be set again).
+> > > >
+> > > >   and
+> > > >
+> > > >   (b) MMU-writable is never consulted on its own.
+> > > >
+> > > > And in fact this is what the shadow MMU does when write-protecting guest
+> > > > page tables. However setting the SPTE unconditionally is much easier to
+> > > > reason about and does not require a huge comment explaining why it is safe.
+> > >
+> > > I disagree.  I looked at the code+comment before reading the full changelog and
+> > > typed up a response saying the code should be:
+> > >
+> > >                 if (!is_writable_pte(iter.old_spte) &&
+> > >                     !spte_can_locklessly_be_made_writable(spte))
+> > >                         break;
+> > >
+> > > Then I went read the changelog and here we are :-)
+> > >
+> > > I find that much more easier to grok, e.g. in plain English: "if the SPTE isn't
+> > > writable and can't be made writable, there's nothing to do".
 > >
-> > The default answer there is to return false, but in this case this just
-> > causes the page fault to be retried ad libitum.  Since this is not a
-> > fast path, and the only other case where it is taken is an erratum,
-> > just stick a kvm_vcpu_gfn_to_memslot check in there to detect the
-> > common case where the erratum is not happening.
-> >
-> > This fixes an infinite loop in the new set_memory_region_test.
-> >
-> > Fixes: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len maybe
-> zero on SMAP violation)")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  arch/x86/kvm/svm/svm.c | 7 +++++++
-> >  virt/kvm/kvm_main.c    | 1 +
-> >  2 files changed, 8 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index a91e397d6750..c86f7278509b 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -3837,6 +3837,13 @@ static bool svm_need_emulation_on_page_fault(struct
-> kvm_vcpu *vcpu)
-> >  	bool smap = cr4 & X86_CR4_SMAP;
-> >  	bool is_user = svm_get_cpl(vcpu) == 3;
-> >
-> > +	/*
-> > +	 * If RIP is invalid, go ahead with emulation which will cause an
-> > +	 * internal error exit.
-> > +	 */
-> > +	if (!kvm_vcpu_gfn_to_memslot(vcpu, kvm_rip_read(vcpu) >> PAGE_SHIFT))
-> 
-> When looking into an SEV issue it was noted that the second arg to
-> kvm_vcpu_gfn_to_memslot() is a gfn_t but kvm_rip_read() will return guest
-> RIP which is a guest virtual address and memslots hold guest physical
-> addresses. How is KVM supposed to translate it to a memslot
-> and indicate if the guest RIP is valid?
+> > Oh interesting. I actually find that confusing because it can easily
+> > lead to the MMU-writable bit staying set. Here we are protecting GFNs
+> > and we're opting to leave the MMU-writable bit set. It takes a lot of
+> > digging to figure out that this is safe because if MMU-writable is set
+> > and the SPTE cannot be locklessly be made writable then it implies
+> > Host-writable is clear, and Host-writable can't be reset without
+> > syncing the all shadow pages reachable by the MMU. Oh and the
+> > MMU-writable bit is never consulted on its own (e.g. We never iterate
+> > through all SPTEs to find the ones that are !MMU-writable).
+>
+> Ah, you've missed the other wrinkle: MMU-writable can bet set iff Host-writable
+> is set.  In other words, the MMU-writable bit is never left set because it can't
+> be set if spte_can_locklessly_be_made_writable() returns false.
 
-Ugh, magic?  That code is complete garbage.  It worked to fix the selftest issue
-because the selftest identity maps the relevant guest code.
+Ohhh I did miss that and yes that explains it. I'll send another
+version of this patch that skips setting the SPTE unnecessarily.
 
-The entire idea is a hack.  If KVM gets into an infinite loop because the guest
-is attempting to fetch from MMIO, then the #NPF/#PF should have the FETCH bit set
-in the error code.  I.e. I believe the below change should fix the original issue,
-at which point we can revert the above.  I'll test today and hopefully get a patch
-sent out.
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c3d9006478a4..e1d2a46e06bf 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1995,6 +1995,17 @@ static void svm_set_dr7(struct kvm_vcpu *vcpu, unsigned long value)
-        vmcb_mark_dirty(svm->vmcb, VMCB_DR);
- }
-
-+static char *svm_get_pf_insn_bytes(struct vcpu_svm *svm)
-+{
-+       if (!static_cpu_has(X86_FEATURE_DECODEASSISTS))
-+               return NULL;
-+
-+       if (svm->vmcb->control.exit_info_1 & PFERR_FETCH_MASK)
-+               return NULL;
-+
-+       return svm->vmcb->control.insn_bytes;
-+}
-+
- static int pf_interception(struct kvm_vcpu *vcpu)
- {
-        struct vcpu_svm *svm = to_svm(vcpu);
-@@ -2003,9 +2014,8 @@ static int pf_interception(struct kvm_vcpu *vcpu)
-        u64 error_code = svm->vmcb->control.exit_info_1;
-
-        return kvm_handle_page_fault(vcpu, error_code, fault_address,
--                       static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
--                       svm->vmcb->control.insn_bytes : NULL,
--                       svm->vmcb->control.insn_len);
-+                                    svm_get_pf_insn_bytes(svm),
-+                                    svm->vmcb->control.insn_len);
- }
-
- static int npf_interception(struct kvm_vcpu *vcpu)
-@@ -2017,9 +2027,8 @@ static int npf_interception(struct kvm_vcpu *vcpu)
-
-        trace_kvm_page_fault(fault_address, error_code);
-        return kvm_mmu_page_fault(vcpu, fault_address, error_code,
--                       static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
--                       svm->vmcb->control.insn_bytes : NULL,
--                       svm->vmcb->control.insn_len);
-+                                 svm_get_pf_insn_bytes(svm),
-+                                 svm->vmcb->control.insn_len);
- }
-
- static int db_interception(struct kvm_vcpu *vcpu)
+>
+> To reduce confusion, we can and probably should do:
+>
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index a4af2a42695c..bc691ff72cab 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -316,8 +316,7 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
+>
+>  static inline bool spte_can_locklessly_be_made_writable(u64 spte)
+>  {
+> -       return (spte & shadow_host_writable_mask) &&
+> -              (spte & shadow_mmu_writable_mask);
+> +       return (spte & shadow_mmu_writable_mask);
+>  }
+>
+>  static inline u64 get_mmio_spte_generation(u64 spte)
+>
+> Though it'd be nice to have a WARN somewhere to enforce that MMU-Writable isn't
+> set without Host-writable.
+>
+> We could also rename the helper to is_mmu_writable_spte(), though I'm not sure
+> that's actually better.
+>
+> Yet another option would be to invert the flag and make it shadow_mmu_pt_protected_mask
+> or something, i.e. make it more explicitly a flag that says "this thing is write-protected
+> for shadowing a page table".
