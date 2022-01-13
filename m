@@ -2,84 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F24F848D732
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:09:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56C7348D73A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:12:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234383AbiAMMJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 07:09:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60012 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230310AbiAMMJM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 07:09:12 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AF1C06173F
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 04:09:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3B007B8226C
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 12:09:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 09927C36AF3
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 12:09:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642075749;
-        bh=dBeA/a7eCEuvyfjHc9lXPjmy2xphLybZtH61xccsnP0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qNYnJxyfmXvjD7kozU7FW9MT4NgGs1dnIHbzS92bLXixJzhhU7NGCo7ytbefzvIOQ
-         tyj4HMbDCEPjMjgLS+kau4ExnlqR1rvrPOGGexCpMyx3zvtjbY2fi3tuUUD/MaiYeb
-         hDd64P+AG0DFne8wxWLcn1h5HoNZp/wToqmya+GXqsWylqxEenjj2fDx504DjVdQE1
-         JOMJ6R4QzK2qroWnA7bKVHbWjYU2VBOfJRURG3qQChPc6y/zyOEU03UG2f1NWBCQPi
-         cWLef6mt0PFPzOaPbNlGmXTiAUK1VxlUvEddrm6PURamzO/0WE0LpRvlhfc4iHqwMc
-         1z8lqv6Kze7sA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id E8252CC13AF; Thu, 13 Jan 2022 12:09:08 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
-Date:   Thu, 13 Jan 2022 12:09:08 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: devzero@web.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-199727-28872-WlxdwVp4EK@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
-References: <bug-199727-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S232480AbiAMMMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 07:12:00 -0500
+Received: from foss.arm.com ([217.140.110.172]:43762 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230310AbiAMMMA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 07:12:00 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C6CDED1;
+        Thu, 13 Jan 2022 04:11:59 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BB763F774;
+        Thu, 13 Jan 2022 04:11:57 -0800 (PST)
+Date:   Thu, 13 Jan 2022 12:12:04 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 05/69] KVM: arm64: Allow preservation of the S2 SW bits
+Message-ID: <YeAXFOR1wf3LekrQ@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-6-maz@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211129200150.351436-6-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
+Hi Marc,
 
---- Comment #6 from Roland Kletzing (devzero@web.de) ---
-what i have also seen is VM freezes when backup runs in our gitlab vm serve=
-r,
-which is apparently related to fsync/fdatasync sync writes.=20=20
+On Mon, Nov 29, 2021 at 08:00:46PM +0000, Marc Zyngier wrote:
+> The S2 page table code has a limited use the SW bits, but we are about
+> to need them to encode some guest Stage-2 information (its mapping size
+> in the form of the TTL encoding).
+> 
+> Propagate the SW bits specified by the caller, and store them into
+> the corresponding entry.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 8cdbc43fa651..d69e400b2de6 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1064,9 +1064,6 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	u32 level;
+>  	kvm_pte_t set = 0, clr = 0;
+>  
+> -	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+> -		return -EINVAL;
+> -
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+>  
+> @@ -1076,6 +1073,10 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	if (prot & KVM_PGTABLE_PROT_X)
+>  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+>  
+> +	/* Always propagate the SW bits */
+> +	clr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_SW, 0xf);
 
-at least for zfs there exists some write starvation issue , as large sync
-writes may starve small ones, as there apparently is no fair scheduling for=
- it,
-see=20
+Nitpick: isn't that the same as:
 
-https://github.com/openzfs/zfs/issues/10110
+	clr |= KVM_PTE_LEAF_ATTR_HI_SW;
 
---=20
-You may reply to this email to add a comment.
+which looks more readable to me.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> +	set |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+
+Checked stage2_attr_walker() callbak, first it clears the bits in clr, then
+sets the bits in set, so this looks correct to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
+
+> +
+>  	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level);
+>  	if (!ret)
+>  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
+> -- 
+> 2.30.2
+> 
