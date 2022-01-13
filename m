@@ -2,102 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D34448DABC
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 16:36:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6911048DAE7
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 16:45:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236144AbiAMPgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 10:36:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51330 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236147AbiAMPga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 10:36:30 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95981C06174E
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 07:36:29 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id u21so24522269edd.5
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 07:36:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=XHQEo9fqyrDZ/5pi9gXVVtH309S9YPpH8gy7JyNdDZw=;
-        b=n9FfjuP2bLhZ4H2O1TCdlrOQM2oQfDk+FqT32mA/qVE2T6zFXeDYiBh3gFi0NKqumU
-         lRgZ35xiOyX2qN1EQCJQUrokfDCN/q1oRI6jayDyoSRm0oRGDCsJz6FwjG/JiShj7xU4
-         YZbzA02kF8lDvETrvzBtl0AYUkdbqYJ34aBgBH34kIzkiq+gL6+hAx5Pf9DfxxzqRMkM
-         DhCPxauQmPv4K8+EoJTug03CWyN2vb7sW5ZU10Eikl1kIKvOikiashtEYmkLM8Ch5//t
-         CpjK2cI4kMvNAcvWz7qIWXcOetuetZWI8YXR5buD9akTba6eHqb8jA5JwMVb2AoKNgA/
-         Y+Kw==
+        id S232268AbiAMPph (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 10:45:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:51582 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232043AbiAMPpX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 10:45:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642088722;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XOQmkcxnHsUnotvr77pJAq4wKyjZXJltLlB+w8uHbjI=;
+        b=KK/gyAfe2hkZR59jS8uWZ5KkJGDPMQpTPZ1ak5G/oKNVFpWR2QsddcwSUKbJKfaqK13PcL
+        40NexyEudGDxx+iKzHwUa4YDu8MwRWQbHDpSG2oOX7rz7xmuaGn+90bWCCa13ZNPifkqtW
+        Q8m/uw+UQui4tcQMcageyvJaFiAzupM=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-147-NbcWK8dmOOCsYCdhnzwHSQ-1; Thu, 13 Jan 2022 10:45:21 -0500
+X-MC-Unique: NbcWK8dmOOCsYCdhnzwHSQ-1
+Received: by mail-pl1-f200.google.com with SMTP id u14-20020a170902714e00b00148ee2b06efso6320967plm.5
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 07:45:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=XHQEo9fqyrDZ/5pi9gXVVtH309S9YPpH8gy7JyNdDZw=;
-        b=g2CAMEPeuBV5Ec0d08g9TuLBgqp3eFZ5AhxVj8S7V33dDSPpv2Do+aj7FuMONz5Fd4
-         uiXXRYLZGW+9S0peZG+iaSr1VJqFJ0L7qgVBHgW/C/veG6DN3rpmxWkh3n2CZN60p1Dr
-         SQY67jBDVIl3ijn8Ax4BTnj4ZqPdhnTBvZ5GF9hH5JB0iMpCmkCi2f7WTbvpZhx+mgn+
-         4K/vPgIN98JCxFiPch/1DichpFpe/IzYS/gu4x2HXI3uMk8/YBhpybH7+4wzVS7e/exC
-         02+kF/weUKAXUyGFVlT7aN23vwFBqAbeFTl8sWv+yqsQAYqbWZ36lN4IrMajTIOmAVSc
-         J0yw==
-X-Gm-Message-State: AOAM533zyLtynqb3AjQYZF8Ejldd8Cp38TgNpl4C4DujJesutAhZAYN1
-        HMWajwdLMCK5rrCbblpn5KoZ8yft/N0MkM5HJ10=
-X-Google-Smtp-Source: ABdhPJz6uz7scSCbFh7ox39AaVp8nDxjEESf2m4mb8GDT8yiOikEVP4Gy+aRLDxS9NFPTD5E/vKUcUMih4PeJeVtlH8=
-X-Received: by 2002:a05:6402:42c4:: with SMTP id i4mr4823241edc.408.1642088187635;
- Thu, 13 Jan 2022 07:36:27 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XOQmkcxnHsUnotvr77pJAq4wKyjZXJltLlB+w8uHbjI=;
+        b=Fgedr2r+P80ubkHxQHSWbdIn01U5DfT97ixbA8rzzy7bhIKEpYCyz91uHD6b6j6jHP
+         3rj7GXi/sVsQopsY5BfsYNGXw39g3TQFkEl1AvGU/Wgi/PV05ub0OUGh5QW7xIrqayig
+         cDRgtXI8Eh9MatDRPwPFqVadbg4n6nSQNql37GPtqbGGjVbVzsfDxKuLM5msVnN1EOFa
+         sj1kf4aZqW1u8Wquf44AQarSHnNA9rIVEnDSBk0RUHJsZOCcdqoCz3g7Gxj7sQPxFxdd
+         FO6NivcRhREE2Q6a2ZMxtn08ejpMwWHKl8rcFKfs/VWTVulYFtNDJpQMLpPWvzwX7BNM
+         lMiQ==
+X-Gm-Message-State: AOAM533vBS2St8qHdov7WWZ9VhJ2BrHd1OtvFAJFnhA6LThtwH7mGF7L
+        mcONH3cepnUGlqHtDwGIO+ZuhNQlYZyGy/bMXFpjjoI7FKCJyE3MUZrvN9POLi+GjJaQSimXmez
+        ipSbIIID3GjKh
+X-Received: by 2002:a63:4186:: with SMTP id o128mr4373789pga.450.1642088719908;
+        Thu, 13 Jan 2022 07:45:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwoTVzJmaQMaCWyrTgeBzpvTXnZncov7SOddrWkGnSqiIzv5eZXOkdcIXRKCxNIrGEynwLc4Q==
+X-Received: by 2002:a63:4186:: with SMTP id o128mr4373770pga.450.1642088719635;
+        Thu, 13 Jan 2022 07:45:19 -0800 (PST)
+Received: from steredhat (host-79-51-11-180.retail.telecomitalia.it. [79.51.11.180])
+        by smtp.gmail.com with ESMTPSA id n28sm2603973pgl.7.2022.01.13.07.45.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 07:45:19 -0800 (PST)
+Date:   Thu, 13 Jan 2022 16:44:47 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stefanha@redhat.com, Jason Wang <jasowang@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <20220113154301.qd3ayuhrcjnsaim7@steredhat>
+References: <20220113145642.205388-1-sgarzare@redhat.com>
+ <20220113101922-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a17:907:9691:0:0:0:0 with HTTP; Thu, 13 Jan 2022 07:36:27
- -0800 (PST)
-Reply-To: rco.ben189@outlook.fr
-From:   "Mrs. Susan Dansuki" <peteronyekachi077@gmail.com>
-Date:   Thu, 13 Jan 2022 07:36:27 -0800
-Message-ID: <CAB6=xyYh_Th1nx0Kce8yCW1RD-VOGJB5UWk-gXL+yQNXE40pFg@mail.gmail.com>
-Subject: Re: COVID-19 RELIEF FUND WORTH $1,500,000.00 USD
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220113101922-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=20
-Attention: Beneficiary,
+On Thu, Jan 13, 2022 at 10:19:46AM -0500, Michael S. Tsirkin wrote:
+>On Thu, Jan 13, 2022 at 03:56:42PM +0100, Stefano Garzarella wrote:
+>> In vhost_enable_notify() we enable the notifications and we read
+>> the avail index to check if new buffers have become available in
+>> the meantime. In this case, the device would go to re-read avail
+>> index to access the descriptor.
+>>
+>> As we already do in other place, we can cache the value in `avail_idx`
+>> and compare it with `last_avail_idx` to check if there are new
+>> buffers available.
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>
+>I guess we can ... but what's the point?
+>
 
-I am  Mrs. Susan Dansuki, the current Director of the Centers for
-Disease Control and Prevention. In the wake of the global COVID-19
-Pandemic, I wish to bring you the good news of hope. Be officially
-inform that the United Nations organization department for disaster
-management in conjunction with IMF, World Bank, is giving out Covid-19
-stimulus package worth $1,500, 000.00 USD, and your e-mail address
-were selected among other's to receive this stimulus package.
+That without this patch if avail index is new, then device when will 
+call vhost_get_vq_desc() will find old value in cache and will read it 
+again.
 
-The United Nations COVID-19 Response and Recovery Fund is a UN
-inter-agency fund mechanism established by the UN Secretary-General to
-help support low- and middle-income people(s) to respond to the
-pandemic and its impacts, including an unprecedented socio-economic
-shock. The Fund=E2=80=99s assistance targets those most vulnerable to econo=
-mic
-hardship and social disruption around the world.
+With this patch we also do the same path and update the cache every time 
+we read avail index.
 
-We are delighted to inform you that due to mixed up of names and
-numbers, your email attached to approved number UN6MM020/COVID-19,
-which consequently fall on our Chapter, therefore, you are advised to
-contact the United Nations Covid-19 Relief Fund Coordinator ( Mr.
-Robert TAIWO ), to claim your $1,500, 000.00 USD.
+I marked it RFC because I don't know if it's worth it :-)
 
-Name: Mr.  Robert Taiwo
-Email:   mr.roberttaiwo73@qq.com
-Telephone:  +229 965 483 88
+Stefano
 
-Confirm the following information as soon as possible.
-
-1. Full Name :
-2. Address :
-3. Nationality :
-4. Direct Telephone #:
-
-NOTE: that the amount to be paid to you is ( $1,500, 000.00 USD ), we
-are expecting your urgent response to this email to enable us monitor
-the transaction effectively.
-
-Best Regards
-Mrs. Susan Dansuki
-Director of the Centers for Disease Control and Prevention.
