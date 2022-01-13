@@ -2,131 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E320A48D9AC
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 15:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 552F048D9B4
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 15:29:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235651AbiAMOYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 09:24:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34970 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235649AbiAMOYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 09:24:51 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E41C06173F
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 06:24:50 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S235653AbiAMO3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 09:29:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41855 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233195AbiAMO3H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 09:29:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642084146;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KD9x1FnPOWiMxqn8PJ52imgGWmsMrgv0XjSE1mjBD5E=;
+        b=hHPi/4dD52evyAxlt/0dQTLVkN4zCbCW5Vl/ZiYSnPaIpwgMojfq47xlpcn5I4i5xWzZ6f
+        ErOwpC0l9vmriNSKGAFe3be8KpWo3qXpy/zkkMy66PDbo2S4yc2VghCz3GMwrGkhKDKfQE
+        BNEZMFl9lV3XcIITCEg32m0wq88gbvI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-104-teqkYBZ0P3mt-ceJzowZSw-1; Thu, 13 Jan 2022 09:29:03 -0500
+X-MC-Unique: teqkYBZ0P3mt-ceJzowZSw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6155561CCC
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 14:24:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1BBC36AE9;
-        Thu, 13 Jan 2022 14:24:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642083889;
-        bh=svbuPhCXep/f7L7EOte2zVLFwttWAAhq8yFpX/SSd3w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=GtfqDh2n3X2nUJRLn8kjbYNFkij+XoDuBYTNSyOp//OGEro6wYg7Y+jqCnjG02BQU
-         BwhZB46if2yV5RsC16ZBlsT3BLHPe6N+s/x21QhEwhCdcaQEYr2S6NZoj8njavQb51
-         Q8bN5lWrl0tFJhGJX/Ssfrnj1th7njhBkxqp4cbIUq8+REpTa6G9jkGYN4p6CLN0wg
-         zxm7WNJ+2sGiT+RrylXIxsxXYdCDNAL2YiESbcNhLjnosxH7O1MnfiFlK+MrqqcGYB
-         aFBTfOzTqftWZxzwHx3MyRpY3BjZhREpqDNgCB3jjNdF/NzFz9W7whc3U233KRRI/6
-         aU6HjznepybOA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1n811z-000Ibp-Nj; Thu, 13 Jan 2022 14:24:47 +0000
-Date:   Thu, 13 Jan 2022 14:24:47 +0000
-Message-ID: <87mtjz90i8.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v5 07/69] KVM: arm64: nv: Introduce nested virtualization VCPU feature
-In-Reply-To: <YeAy371xsAUiSzj+@monolith.localdoman>
-References: <20211129200150.351436-1-maz@kernel.org>
-        <20211129200150.351436-8-maz@kernel.org>
-        <YeAy371xsAUiSzj+@monolith.localdoman>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A4EB8024C7;
+        Thu, 13 Jan 2022 14:29:02 +0000 (UTC)
+Received: from starship (unknown [10.40.192.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 028AD108C0;
+        Thu, 13 Jan 2022 14:28:51 +0000 (UTC)
+Message-ID: <7e7c7e22f8b1b1695d26d9e19a767b87c679df93.camel@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Date:   Thu, 13 Jan 2022 16:28:49 +0200
+In-Reply-To: <87bl0gnfy5.fsf@redhat.com>
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+         <20211122175818.608220-3-vkuznets@redhat.com>
+         <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+         <20211227183253.45a03ca2@redhat.com>
+         <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
+         <87mtkdqm7m.fsf@redhat.com> <20220103104057.4dcf7948@redhat.com>
+         <875yr1q8oa.fsf@redhat.com>
+         <ceb63787-b057-13db-4624-b430c51625f1@redhat.com>
+         <87o84qpk7d.fsf@redhat.com> <877dbbq5om.fsf@redhat.com>
+         <5505d731-cf87-9662-33f3-08844d92877c@redhat.com>
+         <20220111090022.1125ffb5@redhat.com> <87fsptnjic.fsf@redhat.com>
+         <50136685-706e-fc6a-0a77-97e584e74f93@redhat.com>
+         <87bl0gnfy5.fsf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Jan 2022 14:10:39 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, 2022-01-13 at 10:27 +0100, Vitaly Kuznetsov wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 > 
-> Hi Marc,
+> > On 1/12/22 14:58, Vitaly Kuznetsov wrote:
+> > > -	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+> > > +	best = cpuid_entry2_find(entries, nent, 0xD, 1);
+> > >   	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+> > >   		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
+> > >   		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+> > >   
+> > > -	best = kvm_find_kvm_cpuid_features(vcpu);
+> > > +	best = __kvm_find_kvm_cpuid_features(vcpu, vcpu->arch.cpuid_entries,
+> > > +					     vcpu->arch.cpuid_nent);
+> > >   	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
+> > 
+> > I think this should be __kvm_find_kvm_cpuid_features(vcpu, entries, nent).
+> > 
 > 
-> On Mon, Nov 29, 2021 at 08:00:48PM +0000, Marc Zyngier wrote:
-> > From: Christoffer Dall <christoffer.dall@arm.com>
-> > 
-> > Introduce the feature bit and a primitive that checks if the feature is
-> > set behind a static key check based on the cpus_have_const_cap check.
-> > 
-> > Checking nested_virt_in_use() on systems without nested virt enabled
-> > should have neglgible overhead.
-> > 
-> > We don't yet allow userspace to actually set this feature.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_nested.h | 14 ++++++++++++++
-> >  arch/arm64/include/uapi/asm/kvm.h   |  1 +
-> >  2 files changed, 15 insertions(+)
-> >  create mode 100644 arch/arm64/include/asm/kvm_nested.h
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > new file mode 100644
-> > index 000000000000..1028ac65a897
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -0,0 +1,14 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +#ifndef __ARM64_KVM_NESTED_H
-> > +#define __ARM64_KVM_NESTED_H
-> > +
-> > +#include <linux/kvm_host.h>
-> > +
-> > +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
-> > +{
-> > +	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-> > +		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-> > +		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> Of course.
 > 
-> kvm_vcpu_init_nested() checks the ARM64_HAS_NESTED_VIRT cap before setting
-> the features bit, so I guess you can drop this check here if you're
-> interested in correctness.
+> > > +		case 0x1:
+> > > +			/* Only initial LAPIC id is allowed to change */
+> > > +			if (e->eax ^ best->eax || ((e->ebx ^ best->ebx) >> 24) ||
+> > > +			    e->ecx ^ best->ecx || e->edx ^ best->edx)
+> > > +				return -EINVAL;
+> > > +			break;
+> > 
+> > This XOR is a bit weird.  In addition the EBX test is checking the wrong 
+> > bits (it checks whether 31:24 change and ignores changes to 23:0).
 > 
-> But the reason the cap check done is performance, right? Same with the NVHE
-> define.
+> Indeed, however, I've tested CPU hotplug with QEMU trying different
+> CPUs in random order and surprisingly othing blew up, feels like QEMU
+> was smart enough to re-use the right fd)
+> 
+> > You can write just "(e->ebx & ~0xff000000u) != (best->ebx ~0xff000000u)".
+> > 
+> > > +		default:
+> > > +			if (e->eax ^ best->eax || e->ebx ^ best->ebx ||
+> > > +			    e->ecx ^ best->ecx || e->edx ^ best->edx)
+> > > +				return -EINVAL;
+> > 
+> > This one even more so.
+> 
+> Thanks for the early review, I'm going to prepare a selftest and send
+> this out.
+> 
+I also looked at this recently (due to other reasons) and I found out that
+qemu picks a parked vcpu by its vcpu_id which is its initial apic id,
+thus apic id related features should not change.
 
-Exactly. The capability check allows us to use a static key to bypass
-the test_bit() when NV isn't enable, which is 100% of our use cases.
-Given that this checked fairly often on some of the fast paths, it is
-worth doing it.
+Take a look at 'kvm_get_vcpu' in qemu source.
+Maybe old qemu versions didn't do this?
 
-The NVHE check goes even further by allowing some dead code removal in
-the nVHE-specific code, which cannot use NV by construction.
-
+Best regards,
 Thanks,
+	Maxim Levitsky
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
