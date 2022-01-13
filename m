@@ -2,37 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C23E48D917
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 14:37:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C6C048D91A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 14:37:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235292AbiAMNhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 08:37:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32830 "EHLO
+        id S235352AbiAMNhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 08:37:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:22894 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235284AbiAMNhY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 08:37:24 -0500
+        by vger.kernel.org with ESMTP id S235301AbiAMNh1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 08:37:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642081044;
+        s=mimecast20190719; t=1642081047;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=dwJK1y+tLTc2sbN3KuFxFocd1+lOlCoMGQ0ACbyDWGs=;
-        b=SebRbctnxERRrg+BYbLqMLSzfJgzLUzUzVc3QZ+QU3z/Ub6KYbi9gnz/E7EedOkEwmjJRb
-        eiFW8ApxNjAaEko6EN+Dv+qawBNuABQuttRCeUow4cML6rDMW7tDxhIvKhUAWKi/7l8aj8
-        JbTUWEBOBqe9Hcwc89UHov3e8fgHo1w=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+QucDtCZpV9LURrbrH5odoHPTbhOV6WITMzbopk+iXQ=;
+        b=C/+E4t4FP/Fm6Hz6Fl665Fuu3GGDPGy9k21aLhodW9Rc7Dh2kEbNfrRvuDmsTkfoutF61u
+        zEW8ObR7c58onVgOYxJn2Un6Q9IQDaK1AGA8yjQXpCZsR26dM4QQmb5e7ayC4cMBHczw7j
+        nMlsd7GkXNyjmOqpVjjzfHG08+L69dk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-6mgDpTk4P9y3G56OBcxa0w-1; Thu, 13 Jan 2022 08:37:20 -0500
-X-MC-Unique: 6mgDpTk4P9y3G56OBcxa0w-1
+ us-mta-597-gAr9Ao32OfOTlEvlACGpVg-1; Thu, 13 Jan 2022 08:37:24 -0500
+X-MC-Unique: gAr9Ao32OfOTlEvlACGpVg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 744D41083F64;
-        Thu, 13 Jan 2022 13:37:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C902C1083F60;
+        Thu, 13 Jan 2022 13:37:21 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.194.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D5CE84A26;
-        Thu, 13 Jan 2022 13:37:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A872B84A1C;
+        Thu, 13 Jan 2022 13:37:19 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,9 +41,11 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Igor Mammedov <imammedo@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 0/5] KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN for CPU hotplug
-Date:   Thu, 13 Jan 2022 14:36:58 +0100
-Message-Id: <20220113133703.1976665-1-vkuznets@redhat.com>
+Subject: [PATCH 1/5] KVM: x86: Fix indentation in kvm_set_cpuid()
+Date:   Thu, 13 Jan 2022 14:36:59 +0100
+Message-Id: <20220113133703.1976665-2-vkuznets@redhat.com>
+In-Reply-To: <20220113133703.1976665-1-vkuznets@redhat.com>
+References: <20220113133703.1976665-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
@@ -50,36 +53,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Recently, KVM made it illegal to change CPUID after KVM_RUN but
-unfortunately this change is not fully compatible with existing VMMs.
-In particular, QEMU reuses vCPU fds for CPU hotplug after unplug and it
-calls KVM_SET_CPUID2. Relax the requirement by implementing an allowlist
-of entries which are allowed to change.
+Indent kvm_set_cpuid() properly.
 
-Going forward, VMMs are supposed to change the behavior. There is no real
-need to change CPUID information. For hotplug purposes (and if reusing vCPU
-fds is still considered being worthy), VMMs can be a bit smarter and always
-pick the fd with the required LAPIC/x2APIC id to eliminate the need to
-change this info later.
+No functional change intended.
 
-Vitaly Kuznetsov (5):
-  KVM: x86: Fix indentation in kvm_set_cpuid()
-  KVM: x86: Do runtime CPUID update before updating
-    vcpu->arch.cpuid_entries
-  KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN
-  KVM: selftests: Rename 'get_cpuid_test' to 'cpuid_test'
-  KVM: selftests: Test KVM_SET_CPUID2 after KVM_RUN
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/cpuid.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
- arch/x86/kvm/cpuid.c                          | 120 ++++++++++++++----
- arch/x86/kvm/x86.c                            |  19 ---
- tools/testing/selftests/kvm/.gitignore        |   2 +-
- tools/testing/selftests/kvm/Makefile          |   5 +-
- .../selftests/kvm/include/x86_64/processor.h  |   7 +
- .../selftests/kvm/lib/x86_64/processor.c      |  33 ++++-
- .../x86_64/{get_cpuid_test.c => cpuid_test.c} |  78 ++++++++++++
- 7 files changed, 216 insertions(+), 48 deletions(-)
- rename tools/testing/selftests/kvm/x86_64/{get_cpuid_test.c => cpuid_test.c} (66%)
-
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 07e9215e911d..89af3c7390d3 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -276,21 +276,21 @@ u64 kvm_vcpu_reserved_gpa_bits_raw(struct kvm_vcpu *vcpu)
+ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+                         int nent)
+ {
+-    int r;
++	int r;
+ 
+-    r = kvm_check_cpuid(e2, nent);
+-    if (r)
+-        return r;
++	r = kvm_check_cpuid(e2, nent);
++	if (r)
++		return r;
+ 
+-    kvfree(vcpu->arch.cpuid_entries);
+-    vcpu->arch.cpuid_entries = e2;
+-    vcpu->arch.cpuid_nent = nent;
++	kvfree(vcpu->arch.cpuid_entries);
++	vcpu->arch.cpuid_entries = e2;
++	vcpu->arch.cpuid_nent = nent;
+ 
+-    kvm_update_kvm_cpuid_base(vcpu);
+-    kvm_update_cpuid_runtime(vcpu);
+-    kvm_vcpu_after_set_cpuid(vcpu);
++	kvm_update_kvm_cpuid_base(vcpu);
++	kvm_update_cpuid_runtime(vcpu);
++	kvm_vcpu_after_set_cpuid(vcpu);
+ 
+-    return 0;
++	return 0;
+ }
+ 
+ /* when an old userspace process fills a new kernel module */
 -- 
 2.34.1
 
