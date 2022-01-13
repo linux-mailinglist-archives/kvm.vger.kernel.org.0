@@ -2,133 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E1AA48D7EF
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:29:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B467148D7F5
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:30:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232141AbiAMM3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 07:29:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44010 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234618AbiAMM3h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 07:29:37 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20DCT98R006942;
-        Thu, 13 Jan 2022 12:29:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=GPE0+NPk+GB/qIL5sDb+b3pXMDEKGb/c2amWoZ/lzq4=;
- b=ciypoH3AX1pN/Q5qsogTlvwY6gGw70ckMZ3S5rPIWeyKiHGog1SG5xiuGDYiCvM+JX3m
- jNOsvC1UlzOBleMstHPZD+qM11f56WrW7rQCpHWBN9OMt9zBBrg6s7PzBpE7Th/VyQEm
- 2VF6s4HrIly7ozhIZlFwH/3ae0DJbaIOO7QAUESFXPZSEjqKtDm88rLvCczrAEqBBm1+
- HAHw8ypF27PeK6tmSmJCbqyd1AhH4EsqhO+m53v8cNso2vnaeAiCt6fISqRQ379q2Wnu
- WCzm3gGBJUz6oCY+WoaGkdhnIvpmIPPvIzlOLTCysdrUGxwMFqjB4JWIUWbUT65WHDgO AQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3djkpdrk7r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 12:29:32 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20DCTPZ0007632;
-        Thu, 13 Jan 2022 12:29:31 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3djkpdrk73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 12:29:31 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20DCSJcM013918;
-        Thu, 13 Jan 2022 12:29:29 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3df1vjmdky-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 12:29:29 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20DCTQZV39256548
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jan 2022 12:29:26 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3893E42052;
-        Thu, 13 Jan 2022 12:29:26 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21EC042042;
-        Thu, 13 Jan 2022 12:29:26 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 13 Jan 2022 12:29:26 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id AAB7BE03A3; Thu, 13 Jan 2022 13:29:25 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-To:     dwmw2@infradead.org, pbonzini@redhat.com
+        id S233161AbiAMMa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 07:30:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36844 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233071AbiAMMa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 07:30:26 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FDF4C06173F;
+        Thu, 13 Jan 2022 04:30:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=EneBo83sq8azB3R3KL1ipMu1kmeyhB+xyiGKMG2LoSI=; b=C6mHKi3Ipka9Y1lCxE4NYlknr9
+        SkVZImpHa+R8UrgePxUjpcHCg/UZsuopBm154JDIrcTDx8JMzcD0kM/GC46AO2tcn+t71hKbHy+r+
+        gTn58pCNa30dGlENZDeYE47H4f+0Rb+2APfc5+18cFX6fYv9k2UwkWumjltwIUwqWwnC6IEfoYlbJ
+        9egDeJV4v7PUyLxDAf3ceiCMPWCHtA3qwAdX/V127dmna2Jm20vKGIeB1ZNXwSxxfRQqTTdBjkHUE
+        gZbv8P+OMNH1djvrdWyKKFD9kMSxbdZ6DDAjnTOXsUclRHc7v76KWW35qGnl+3rVhLdZOj1oWHl2G
+        /IScmFUA==;
+Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n7zFG-005pIU-7x; Thu, 13 Jan 2022 12:30:22 +0000
+Message-ID: <b6d9785d769f98da0b057fac643b0f088e346a94.camel@infradead.org>
+Subject: Re: KVM: Warn if mark_page_dirty() is called without an active vCPU
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
 Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, seanjc@google.com,
         Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Thomas Huth <thuth@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: [PATCH] KVM: avoid warning on s390 in mark_page_dirty
-Date:   Thu, 13 Jan 2022 13:29:24 +0100
-Message-Id: <20220113122924.740496-1-borntraeger@linux.ibm.com>
-X-Mailer: git-send-email 2.33.1
+Date:   Thu, 13 Jan 2022 12:30:19 +0000
 In-Reply-To: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
-References: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
+References: <e8f40b8765f2feefb653d8a67e487818f66581aa.camel@infradead.org>
+         <20220113120609.736701-1-borntraeger@linux.ibm.com>
+         <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-bewMyUF+enQusL8Y8cjs"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MAP5mWyygcCwYNeatHCNi8WojDYS3er7
-X-Proofpoint-GUID: VMAYwqNOkptejPYOdpa7xFi2pIryeSei
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-13_04,2022-01-13_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 suspectscore=0 mlxlogscore=999 lowpriorityscore=0
- clxscore=1015 adultscore=0 mlxscore=0 phishscore=0 spamscore=0
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2110150000 definitions=main-2201130073
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Avoid warnings on s390 like
-[ 1801.980931] CPU: 12 PID: 117600 Comm: kworker/12:0 Tainted: G            E     5.17.0-20220113.rc0.git0.32ce2abb03cf.300.fc35.s390x+next #1
-[ 1801.980938] Workqueue: events irqfd_inject [kvm]
-[...]
-[ 1801.981057] Call Trace:
-[ 1801.981060]  [<000003ff805f0f5c>] mark_page_dirty_in_slot+0xa4/0xb0 [kvm]
-[ 1801.981083]  [<000003ff8060e9fe>] adapter_indicators_set+0xde/0x268 [kvm]
-[ 1801.981104]  [<000003ff80613c24>] set_adapter_int+0x64/0xd8 [kvm]
-[ 1801.981124]  [<000003ff805fb9aa>] kvm_set_irq+0xc2/0x130 [kvm]
-[ 1801.981144]  [<000003ff805f8d86>] irqfd_inject+0x76/0xa0 [kvm]
-[ 1801.981164]  [<0000000175e56906>] process_one_work+0x1fe/0x470
-[ 1801.981173]  [<0000000175e570a4>] worker_thread+0x64/0x498
-[ 1801.981176]  [<0000000175e5ef2c>] kthread+0x10c/0x110
-[ 1801.981180]  [<0000000175de73c8>] __ret_from_fork+0x40/0x58
-[ 1801.981185]  [<000000017698440a>] ret_from_fork+0xa/0x40
 
-when writing to a guest from an irqfd worker as long as we do not have
-the dirty ring.
+--=-bewMyUF+enQusL8Y8cjs
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
----
- virt/kvm/kvm_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, 2022-01-13 at 13:14 +0100, Paolo Bonzini wrote:
+> On 1/13/22 13:06, Christian Borntraeger wrote:
+> > From: Christian Borntraeger<
+> > borntraeger@de.ibm.com
+> > >
+> >=20
+> > Quick heads-up.
+> > The new warnon triggers on s390. Here we write to the guest from an
+> > irqfd worker. Since we do not use dirty_ring yet this might be an
+> > over-indication.
+> > Still have to look into that.
+>=20
+> Yes, it's okay to add an #ifdef around the warning.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 504158f0e131..1a682d3e106d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3163,8 +3163,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
- {
- 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 
-+#ifdef CONFIG_HAVE_KVM_DIRTY_RING
- 	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
- 		return;
-+#endif
- 
- 	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
- 		unsigned long rel_gfn = gfn - memslot->base_gfn;
--- 
-2.33.1
+That would be #ifndef CONFIG_HAVE_KVM_DIRTY_RING, yes?=20
+
+I already found it hard to write down the rules around how
+kvm_vcpu_write_guest() doesn't use the vCPU it's passed, and how both
+it and kvm_write_guest() need to be invoked on a pCPU which currently
+owns *a* vCPU belonging to the same KVM... if we add "unless you're on
+an architecture that doesn't support dirty ring logging", you may have
+to pass me a bucket.
+
+Are you proposing that as an officially documented part of the already
+horrid API, or a temporary measure :)
+
+Btw, that get_map_page() in arch/s390/kvm/interrupt.c looks like it has
+the same use-after-free problem that kvm_map_gfn() used to have. It
+probably wants converting to the new gfn_to_pfn_cache.=20
+
+Take a look at how I resolve the same issue for delivering Xen event
+channel interrupts.
+
+Although I gave myself a free pass on the dirty marking in that case,
+by declaring that the shinfo page doesn't get marked dirty; it should
+be considered *always* dirty. You might have less fun declaring that
+retrospectively in your case.
+
+--=-bewMyUF+enQusL8Y8cjs
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMTEzMTIzMDE5WjAvBgkqhkiG9w0BCQQxIgQgodd9Lnu5
+406GtXiJLhLr78EFUIKkYbovwcJfBODAf0gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAQRZgNZYM9YZ6C/AHqyvbGOJgv8+wplf6t
+o55ojcEhiLymo/VdFcN8GZvMDMQThJTfXaR5uJEQCDGhC/7xHuBtxao2XOmsnRNHWFOwhBj3DCaS
+YVgYsTVZlNcpQ8evB4q60IFnPljO0FVGae7xz94awHmr3OyTvWmC8I2UBQaEC/wtajINERYwJUfm
+0dOzpJfbbLQ/ZO0Q7M7kdqRD9OBjlroceiZYOLRrHmy5afLlwJrpec9n1OTdrLE5v1lUpfPXTTlq
+m5yoUyg4TGT5/JAt3xJrIaYRyJUMkZGnQgzW4jYul6o7lKhRenWONwIYyqrLBFi4b7evNpAfNPiH
+20d1I0yvXgpax4pjMpes2gtpmHNm7E+UrH9E5j75lF1ro2Axk2/6pCRvtsAcGK5EcJxVDNMRkt8i
+hGQPl9shq5qVKD0ePdFFfiKkohIPG2W3Afwhs3bEvljbUd/qdevsL4ZlQ2ojogw1sDcxyzo9LvCZ
+Fs8iOOfw7dEkUUDUluovk1OptYMirUUwbVJMJyJ/MOYAG8I4faYuxAdIq+SB8o6+71cfrce4oy+M
+oVplfyxEZ73rW3LrcNfJltk2qCEobqoYiJBR7VAk83mM0vsNhLIZRTaClAppgW/xZ4N+gAcQT+KD
+tq3gXLWscyqWCJo6YEGAtDFh144mBVmB0TPFz5M+3gAAAAAAAA==
+
+
+--=-bewMyUF+enQusL8Y8cjs--
 
