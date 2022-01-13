@@ -2,85 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B94948D988
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 15:11:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E320A48D9AC
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 15:24:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235602AbiAMOL6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 09:11:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:46987 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235590AbiAMOL6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 09:11:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642083117;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=xCYpNTbO554QGVwnOrW/uIVMk9yK3DSR4H4rxcM8uH8=;
-        b=JoIAj2eEpUDvlCpJXrUA40MeQEj60vTHcbGC1UlHvjWUKhC2NDk0OrIkc+RbISMEZMpl9Y
-        +NIJazr8J4HdER1Kshg90fjGJd6qksb4etfDeoCnzRuvg33LAulonU1ANXBz1DS0eGAprE
-        h4duDwY2Tqm9y2qTP+kwmDChK56aR88=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-fm-pjm88NTydB7XZ6ad7Jw-1; Thu, 13 Jan 2022 09:11:56 -0500
-X-MC-Unique: fm-pjm88NTydB7XZ6ad7Jw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S235651AbiAMOYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 09:24:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235649AbiAMOYv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 09:24:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E41C06173F
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 06:24:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 504A581EE64;
-        Thu, 13 Jan 2022 14:11:55 +0000 (UTC)
-Received: from steredhat.redhat.com (unknown [10.64.242.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DA7F92B5A5;
-        Thu, 13 Jan 2022 14:11:37 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        netdev@vger.kernel.org
-Subject: [PATCH] vhost: remove avail_event arg from vhost_update_avail_event()
-Date:   Thu, 13 Jan 2022 15:11:34 +0100
-Message-Id: <20220113141134.186773-1-sgarzare@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6155561CCC
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 14:24:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1BBC36AE9;
+        Thu, 13 Jan 2022 14:24:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642083889;
+        bh=svbuPhCXep/f7L7EOte2zVLFwttWAAhq8yFpX/SSd3w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=GtfqDh2n3X2nUJRLn8kjbYNFkij+XoDuBYTNSyOp//OGEro6wYg7Y+jqCnjG02BQU
+         BwhZB46if2yV5RsC16ZBlsT3BLHPe6N+s/x21QhEwhCdcaQEYr2S6NZoj8njavQb51
+         Q8bN5lWrl0tFJhGJX/Ssfrnj1th7njhBkxqp4cbIUq8+REpTa6G9jkGYN4p6CLN0wg
+         zxm7WNJ+2sGiT+RrylXIxsxXYdCDNAL2YiESbcNhLjnosxH7O1MnfiFlK+MrqqcGYB
+         aFBTfOzTqftWZxzwHx3MyRpY3BjZhREpqDNgCB3jjNdF/NzFz9W7whc3U233KRRI/6
+         aU6HjznepybOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n811z-000Ibp-Nj; Thu, 13 Jan 2022 14:24:47 +0000
+Date:   Thu, 13 Jan 2022 14:24:47 +0000
+Message-ID: <87mtjz90i8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 07/69] KVM: arm64: nv: Introduce nested virtualization VCPU feature
+In-Reply-To: <YeAy371xsAUiSzj+@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-8-maz@kernel.org>
+        <YeAy371xsAUiSzj+@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vhost_update_avail_event() we never used the `avail_event` argument,
-since its introduction in commit 2723feaa8ec6 ("vhost: set log when
-updating used flags or avail event").
+On Thu, 13 Jan 2022 14:10:39 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Nov 29, 2021 at 08:00:48PM +0000, Marc Zyngier wrote:
+> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > 
+> > Introduce the feature bit and a primitive that checks if the feature is
+> > set behind a static key check based on the cpus_have_const_cap check.
+> > 
+> > Checking nested_virt_in_use() on systems without nested virt enabled
+> > should have neglgible overhead.
+> > 
+> > We don't yet allow userspace to actually set this feature.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h | 14 ++++++++++++++
+> >  arch/arm64/include/uapi/asm/kvm.h   |  1 +
+> >  2 files changed, 15 insertions(+)
+> >  create mode 100644 arch/arm64/include/asm/kvm_nested.h
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > new file mode 100644
+> > index 000000000000..1028ac65a897
+> > --- /dev/null
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -0,0 +1,14 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef __ARM64_KVM_NESTED_H
+> > +#define __ARM64_KVM_NESTED_H
+> > +
+> > +#include <linux/kvm_host.h>
+> > +
+> > +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> > +{
+> > +	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
+> > +		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
+> > +		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> 
+> kvm_vcpu_init_nested() checks the ARM64_HAS_NESTED_VIRT cap before setting
+> the features bit, so I guess you can drop this check here if you're
+> interested in correctness.
+> 
+> But the reason the cap check done is performance, right? Same with the NVHE
+> define.
 
-Let's remove it to clean up the code.
+Exactly. The capability check allows us to use a static key to bypass
+the test_bit() when NV isn't enable, which is 100% of our use cases.
+Given that this checked fairly often on some of the fast paths, it is
+worth doing it.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- drivers/vhost/vhost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The NVHE check goes even further by allowing some dead code removal in
+the nVHE-specific code, which cannot use NV by construction.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 59edb5a1ffe2..ee171e663a18 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1981,7 +1981,7 @@ static int vhost_update_used_flags(struct vhost_virtqueue *vq)
- 	return 0;
- }
- 
--static int vhost_update_avail_event(struct vhost_virtqueue *vq, u16 avail_event)
-+static int vhost_update_avail_event(struct vhost_virtqueue *vq)
- {
- 	if (vhost_put_avail_event(vq))
- 		return -EFAULT;
-@@ -2527,7 +2527,7 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- 			return false;
- 		}
- 	} else {
--		r = vhost_update_avail_event(vq, vq->avail_idx);
-+		r = vhost_update_avail_event(vq);
- 		if (r) {
- 			vq_err(vq, "Failed to update avail event index at %p: %d\n",
- 			       vhost_avail_event(vq), r);
+Thanks,
+
+	M.
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
