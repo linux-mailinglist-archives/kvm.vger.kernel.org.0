@@ -2,101 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56C7348D73A
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:12:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D1C048D74B
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 13:14:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232480AbiAMMMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 07:12:00 -0500
-Received: from foss.arm.com ([217.140.110.172]:43762 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230310AbiAMMMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 07:12:00 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C6CDED1;
-        Thu, 13 Jan 2022 04:11:59 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BB763F774;
-        Thu, 13 Jan 2022 04:11:57 -0800 (PST)
-Date:   Thu, 13 Jan 2022 12:12:04 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v5 05/69] KVM: arm64: Allow preservation of the S2 SW bits
-Message-ID: <YeAXFOR1wf3LekrQ@monolith.localdoman>
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-6-maz@kernel.org>
+        id S234413AbiAMMO2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 07:14:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32445 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232841AbiAMMO1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 07:14:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642076066;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+0lIRoOhUZRcmverl2fS/N58QWJmAbrDo4GjOCnd6uY=;
+        b=FnLpWe6YqOj0xlt1BTO7bzrlAKJySL7kJt7Cji8CaTp8exbknJYriigq+88/ArNLFsc2jm
+        b4iNRJxfCDgtAV9B/biddxi3koT3goP80HiFQo1HCcpl//9RyFbVehMlKXwUGdX2ralXki
+        oMoxGTI91WShClfreSZo52eNcJHLRvU=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-523-3e4eYGVPMTmRnsqsXPCiUA-1; Thu, 13 Jan 2022 07:14:24 -0500
+X-MC-Unique: 3e4eYGVPMTmRnsqsXPCiUA-1
+Received: by mail-ed1-f71.google.com with SMTP id l14-20020aa7cace000000b003f7f8e1cbbdso5130356edt.20
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 04:14:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=+0lIRoOhUZRcmverl2fS/N58QWJmAbrDo4GjOCnd6uY=;
+        b=Kf0wFPWvux6w1E3t1UswlkcFWGqB/0WogDS/+OeS8a6h17U4ELcJZighLJdnDgVrir
+         F6/5ddkBv0C/6xSf3DNzc9DRwSvENXvedkdABpqpcacPsa8G2mMmw0IxfSKX3AJVeE7X
+         D5/g+Bj/HEhQ3+HfdCeSM6LqdqkCDdtVQf8WMlecmILRky0BE89tToc8rmFy1hCr375Q
+         BSdkb2K0eXkJmzUXHdm85rxunBdM3Ls34ho0ingDQP/sNbOB9hcWXdAEfzwFqr+lGpDH
+         McGBFCjQsmL+Be3Q9paQ3yO4VITNRS/CxxxWoQWGvQgQvhOioAMaCVOJbah46xKy/jtR
+         rolg==
+X-Gm-Message-State: AOAM530JzJ2SFVb8FZIa5gOEeY2n7SPO9xgzXyJdyBB0eXbGy+dgCkl4
+        Wr1fu/jRUfP+IFxF1y+RMJh2bZFu4PQp5Py2gp1y+pFESD26/edX86xjMOiJHcM2mk3LYfeKRtB
+        +yW3tDIrqj8Yi
+X-Received: by 2002:a17:906:dc94:: with SMTP id cs20mr3224679ejc.316.1642076063779;
+        Thu, 13 Jan 2022 04:14:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxPQMF6TGaiElXpWlkkYzbwGgnKNg/CxUKtTPr6TZd994YwTxRDTgzO+5g21JW/xapJL8Xr3w==
+X-Received: by 2002:a17:906:dc94:: with SMTP id cs20mr3224656ejc.316.1642076063508;
+        Thu, 13 Jan 2022 04:14:23 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id c9sm839546ejf.10.2022.01.13.04.14.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jan 2022 04:14:22 -0800 (PST)
+Message-ID: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
+Date:   Thu, 13 Jan 2022 13:14:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-6-maz@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: KVM: Warn if mark_page_dirty() is called without an active vCPU
+Content-Language: en-US
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        dwmw2@infradead.org
+Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <e8f40b8765f2feefb653d8a67e487818f66581aa.camel@infradead.org>
+ <20220113120609.736701-1-borntraeger@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220113120609.736701-1-borntraeger@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Mon, Nov 29, 2021 at 08:00:46PM +0000, Marc Zyngier wrote:
-> The S2 page table code has a limited use the SW bits, but we are about
-> to need them to encode some guest Stage-2 information (its mapping size
-> in the form of the TTL encoding).
+On 1/13/22 13:06, Christian Borntraeger wrote:
+> From: Christian Borntraeger<borntraeger@de.ibm.com>
 > 
-> Propagate the SW bits specified by the caller, and store them into
-> the corresponding entry.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 8cdbc43fa651..d69e400b2de6 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1064,9 +1064,6 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  	u32 level;
->  	kvm_pte_t set = 0, clr = 0;
->  
-> -	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
-> -		return -EINVAL;
-> -
->  	if (prot & KVM_PGTABLE_PROT_R)
->  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
->  
-> @@ -1076,6 +1073,10 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  	if (prot & KVM_PGTABLE_PROT_X)
->  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
->  
-> +	/* Always propagate the SW bits */
-> +	clr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_SW, 0xf);
+> Quick heads-up.
+> The new warnon triggers on s390. Here we write to the guest from an
+> irqfd worker. Since we do not use dirty_ring yet this might be an over-indication.
+> Still have to look into that.
 
-Nitpick: isn't that the same as:
+Yes, it's okay to add an #ifdef around the warning.
 
-	clr |= KVM_PTE_LEAF_ATTR_HI_SW;
+Paolo
 
-which looks more readable to me.
-
-> +	set |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
-
-Checked stage2_attr_walker() callbak, first it clears the bits in clr, then
-sets the bits in set, so this looks correct to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
-> +
->  	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level);
->  	if (!ret)
->  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-> -- 
-> 2.30.2
-> 
