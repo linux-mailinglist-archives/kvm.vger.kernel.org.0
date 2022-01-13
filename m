@@ -2,186 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E502848DF6B
-	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 22:12:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A824948DF96
+	for <lists+kvm@lfdr.de>; Thu, 13 Jan 2022 22:29:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234926AbiAMVMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 16:12:06 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:46652 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229931AbiAMVMF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jan 2022 16:12:05 -0500
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20DK4Jqk002522;
-        Thu, 13 Jan 2022 21:11:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=J0lMxgO0tk/sNNh7/Ec3xRf8SBy94LwZiY6zG5s7oqA=;
- b=sHyq5kw/txcT/GmxqiE+tBPKS5STdxx76abJSkWQZuQBSkbhy1IelB2u+rOKnt17nmgp
- m6Gyt28F7bgWBwGcBbIvPLJdbTyIF1hVef9kOszuhJ+UrIWkBeKMYiVi5hBOQb28SdC5
- AsR+TiitwXsj09v5h3oy3CwGC8Y7DguGCjp3TxBq4EHUKUmRa948zJLlXYT2j/yxaEcq
- 9SKLT3L7Raz8UvBkjuyJ8ZBRsLLv/kuhoT1dU9r06Y7GwHQeHAJ7b89KE/vfXRMTQ3hh
- O4yinsW9jSZ4qcT1iKjlaiidioJxLuBjUj1zb0nTroJ0071jwcIVa4eukN9IvslsfQrn oA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3djkdnsw1h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jan 2022 21:11:31 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20DLAaOW017951;
-        Thu, 13 Jan 2022 21:11:31 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
-        by aserp3030.oracle.com with ESMTP id 3df0nhmp4m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jan 2022 21:11:30 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VQRJDr3iKHOqEgWNMi8OTtGY5dbAzjp8ilSIbIf9qFxg4tKLarYNtS0Xid75Ub/rXPxa5FOOSXT6a453UwhxGXSBD2neXmDPulWDxhNxU4Pmj6VOUeCHBLDXphFiqezF44AqENO1ScKFu86sUvYczpPqeqF7NHG8Cg5I2yjjdqddYqljDeZNVBkdMoOgFzg01HKDYgSfeI9Ao3pgLNzgI2qQ7E5BmpJeMG9e7Z/SldEFmpVpCa9APCtDm7m5CJD5Pg95rGU+vRTqYV8vTkMmN+PVRqDPf2FowxhZYa/hZb+Hf+xlhb2YsHwcUbulQ4R/tV/90H30wg2ZT+q9TYMcYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J0lMxgO0tk/sNNh7/Ec3xRf8SBy94LwZiY6zG5s7oqA=;
- b=JzSMZa6EvT7FaYBVrK00tmZ0M9uva1MX1Db2yFvQYdrPc80dom/aOpDn8WdrLJ+zI3rDny4NQxjLdxX/G4Dzm7Xll1DO7SADpCyuOBGydN0FJYrFrxybS7EQlSb2prbkYM2PXGgjX6rBL37ujKFttetJ4HKL1nPKqlqyNlM2NhD8MCflyr/0SmPfDikbEXegAfcOq21mocwOQPwPcCGGMWrPhOSkiovWAS6sv7c14MwlzaJhV3RMk3qguW/u8ydZFl2Ge93PKM63VQqRrBe1LkOuHH4UFuv46chxyvPnEsi3z5ZgE1qwuL4Apalg8UHQ64PngFaFA2v8b9g9xwF7ig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        id S235460AbiAMV3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 16:29:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46748 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232029AbiAMV3P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 16:29:15 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448ADC061574
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 13:29:15 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id c3so11517695pls.5
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 13:29:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J0lMxgO0tk/sNNh7/Ec3xRf8SBy94LwZiY6zG5s7oqA=;
- b=FDo5Nf/90YCxfHrcNdKar2SfPKQKvLQ+AQcwkL17xqXgPuSLWhTVojSwhlnueNmW6leKr6YsSZKZXaURriCfEZX/X9MWQDjV7Q+Kei9jzUaQa3jqmgeb6Qiv93B6graqYbxlOm5Gvkwy9YNE8hxdsuISV1r8V5ArLF6Jwy1vURQ=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by PH0PR10MB5612.namprd10.prod.outlook.com (2603:10b6:510:fa::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.10; Thu, 13 Jan
- 2022 21:11:28 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::9d38:21ba:a523:b34e]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::9d38:21ba:a523:b34e%9]) with mapi id 15.20.4888.011; Thu, 13 Jan 2022
- 21:11:28 +0000
-Date:   Thu, 13 Jan 2022 16:11:23 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=v66kQJPQ7cVIvaUPj32GpP29/XbkcAvgruVgXIm7Hck=;
+        b=dmT1uQrp7+MVBjrnFisZDuP9hfD/dPkKX+Wj8ki+Wm5H/AqrM6/C7DY0ZGI7k7a78J
+         lfBmQe9gqgqiSHYLjUNK2CMKJ+R+PFqUjSGVdbRChRTESTGGRmPJTukQFVQ8zQyV0/X+
+         gUGeI2fJe1I9oERuruuXLN6AXBTRCkVQq+VTXAjt03lFpS15qEIeg+MqHjnzYSua9tqf
+         AZn8ag2VVa1/g0C2yjc+dg5Sz+XMxhMINgeGVH8YDkw5QZc0W5R46hthT4EsHJ/oG39W
+         B9c4Hqp8nmukDxkzoRy0nlH5vErubnIBD0pS0lHFf0eNZToQeyiogUM+zCSu02G02Y7F
+         UkBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=v66kQJPQ7cVIvaUPj32GpP29/XbkcAvgruVgXIm7Hck=;
+        b=fTBAY/sl3F1JfdejxPZc0kBONzdrMM4ZTQBYVW9PktJz3bV0rNRsICYQ2vSeubOYeE
+         HRnIxSdQi0xcHLiXFM3Sm8btWvvyE1jKJuDThCFoPWWX0GlSUfk+C55GPPWtfleF6F+j
+         E/S72D9Yneogh2vG8yUprHI8q7STyhDBr2xwtDYrOE0uY1WWd0OCNpdtxPs89qxysXE1
+         0+/jazzZuVxqkzLCqv51K3zbJ8NYCMM2cAWMuRDJYSBmOiMQ9fqyerglOpBDW/JDLgwf
+         mkKZAoyMM3yDhRoFVb9SmG8KeHxRKNBlyMvwmUsDCH0bLsRMJGB0i5nxmZQJI8lUr+Uu
+         2uVQ==
+X-Gm-Message-State: AOAM531Wau3FRVYE8AgnU/hW21gl1bXhEHAFVT1xZWR4mjZJs4hGP6Qq
+        is0v/tmdXRQO8E852M8ezYGAFQ==
+X-Google-Smtp-Source: ABdhPJy6OboZEza1UKblpwHYxX0CmsSLLxRzvzXs8rjBa0gryLiZRloWdOvGfOtaZ6fL8gfN7c8n/A==
+X-Received: by 2002:a17:902:6a89:b0:149:732e:d335 with SMTP id n9-20020a1709026a8900b00149732ed335mr6690282plk.136.1642109354299;
+        Thu, 13 Jan 2022 13:29:14 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t21sm9288425pjq.9.2022.01.13.13.29.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 13:29:13 -0800 (PST)
+Date:   Thu, 13 Jan 2022 21:29:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
- bandwidth
-Message-ID: <20220113211123.c4csxg5srmkisqwr@oracle.com>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106004656.126790-16-daniel.m.jordan@oracle.com>
- <Yd1w/TxTcGk5Ht53@hirez.programming.kicks-ass.net>
- <20220111162950.jk3edkm3nh5apviq@oracle.com>
- <Yd83iDzoUOWPB6yH@slm.duckdns.org>
- <20220113210857.d3xkupgmpdeqknhn@oracle.com>
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>
+Subject: Re: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC
+ mode with APIC-write VM exit
+Message-ID: <YeCZpo+qCkvx5l5m@google.com>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+ <20211231142849.611-6-guang.zeng@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220113210857.d3xkupgmpdeqknhn@oracle.com>
-X-ClientProxiedBy: BLAP220CA0014.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:32c::19) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 53c66d97-60cb-40a2-4b6a-08d9d6d9437b
-X-MS-TrafficTypeDiagnostic: PH0PR10MB5612:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR10MB56126996AF0A8A6EE4A071E2D9539@PH0PR10MB5612.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: F0ySfv4axtGANqmYMooO9etmUy9iNFyLcelXyZOjnsfi3ywtNxITXdrUICJFL/4rsIXs29INbXOwbpq0Eeh+GJsmGRVrU4w5hLL6ZuGRcThHEELmzJb1gfl2032maWruyman3qJomizZaPDYyPkDhnA5nbQyhZ1/XDdCWUb4w1utiW3p0mN96t97PNLHqH8NGmCitOEf0B8M1h5TA79fmN4BklAe6WsDG8KKcf6pMcA4aitWT+hA75jly+FZH8xMaNelAuGxujn1S7L6Gfg3qQq+rxvN8qCTGIwbSOJnvYPJVHu5WLvXm4vsH67PqO5ZD3uk35rOOPfDRkzq30fGEOofbNZ4wRMseTU1ux/BvkHfhr7JuiCJClOYEnu5gAIP0kcRehFv12eikbZGV6tBUFRtbDLaJ9jpmf3g+AH6sNA/PBhyB1VhvBL5Y2fx8cJInU1s53is4pwYE5+7RiOOygC7SjiPFwHHjnr9ys5K645mO4f+uQadTa8iipnVrwov6epgaaXKZhz+4BUQ7ZU834DiCUnBa0lzrgR7TqjQj1DEPZohOxkUYdrpao2VCf0UuaXysDUhwnE9RnXeBDlJdjZsojdUG7KR8bUqYWHLG9lnbQlZn1grDmRT5shck5hRZ2SA4aQRtiu9hdIwTP/FU5CGPD4dIZ8HVndree9fOwPfPODdWAqf6sDaAnY/75SRs62NbgmUOjdPx2JYVAtJEQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(66556008)(26005)(6512007)(4744005)(4326008)(6486002)(508600001)(186003)(8936002)(38350700002)(8676002)(66946007)(38100700002)(66476007)(5660300002)(6506007)(6666004)(52116002)(1076003)(83380400001)(316002)(54906003)(7416002)(2906002)(2616005)(86362001)(6916009)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8z5m/dobTHNWyPQ8dkVS2GP/u40aTOfFj9n1oAWKBV/XLJf3E1S0fCJTmae2?=
- =?us-ascii?Q?FhdDPb2P5bob3VD8S+LVH/1Si0AUykg57OjWzNaS2oNBFyltXY0hv1LH3JRN?=
- =?us-ascii?Q?2pd/GRLPNX86wf9MYKxRAdqspPLinC6z7h5aDiLytXuwYbgx8fgtUSE03l/s?=
- =?us-ascii?Q?HE76aVeeEGCIskVPS8Ftvw9PSdFVQ+1qUbdVeyNfv+ocyDsumTBn1vcFyPCw?=
- =?us-ascii?Q?tg119jaqp8ulFSrYWmh4iB5yJwj5848+HdLvD36BQQ/rjWILu/Eos9ljTNbN?=
- =?us-ascii?Q?SmzpPA64NdQYvHi96r8i9uLutrBAczS78el2JRF1GRpbSQkwLrgVMY3RM7GP?=
- =?us-ascii?Q?3ScU/gG8za4WEigEy3tWzo1jXm7sSidYkequDHvLbuCo5+TL3in1o3LOgkSi?=
- =?us-ascii?Q?gX3Q6Y/Ag59/0WjM/jCIRbPqnyjCiNtCKeoQCD/zckf6+O52ovAwxsqCysDJ?=
- =?us-ascii?Q?TvZP9ut3n6dWBKl9DL27//E4d2bl3HWec2cYWFgK2SkI1UJgHpKJQGHwvNPK?=
- =?us-ascii?Q?Jn9eObJiK3D5eah6mblqgSZ613BkixAQTpfF+jsH32wN6M8CBPoP6S5ZsGsB?=
- =?us-ascii?Q?6dtrOSlBQerZd6F8s87syKfV5Ur5UmYWd3tf+EkDza1o08iNSaWtrdiiDzAQ?=
- =?us-ascii?Q?yAVM427zcvAE+DwNk0D/2xik4NFrjZoJSJAmkzbMywo+Mmwsns+XJA0Twcp6?=
- =?us-ascii?Q?sUVzDQcngZhtKxGlzFNa9j0eMH09V9aHdiV7mR58DVipQU9tQZI+WFX7hrDG?=
- =?us-ascii?Q?P14Sr+iQHLM/wwlFP8j/iMYb9lOoSEhyNIYhN2FMlYgj5+v664178giCbtCS?=
- =?us-ascii?Q?ftxjPXFzdSFr+Jisp/jKlfQCtZN0/r6JVMrlWV5TSsaRCiaWtLF5myCPXEMY?=
- =?us-ascii?Q?iWPj6WRTG2csl1BKmBRUU+ycCzXs5BjMfIEsVIK1kAVq7ovIek5lbnev3EkS?=
- =?us-ascii?Q?idOKtw6gtkganBES6bRVJfu6npRPtm00zr8Ps1VtcoTjbBpuEKr4/uqwqDtV?=
- =?us-ascii?Q?S20vxzn3vdBN+AzXXXiwQVkGGo2BTd5atsCSstlW8v0wCC2ZnWTC9B9CuHGa?=
- =?us-ascii?Q?M/IhPDIOU+kok+HLRWIdU07NrBCPh7IaGx8RJR+YTb0zNr/SrZdamZvKRWde?=
- =?us-ascii?Q?MNIcuqY2YckncK5SmBdodn2bajFl+YdXW6cMB5dyNXvB6QY85VyisC1Bh675?=
- =?us-ascii?Q?TeZxMZvOK8O5lIzYsipI8bdUlQedFhk1eKS78Xl7vNf4I7R5O0K6X0E1K74t?=
- =?us-ascii?Q?Dm2UM5Ol9xqjpVLYCpz2qgAjTOjxUC3XIAc3BJBquu4FuifnPEH9DiRQ/gg6?=
- =?us-ascii?Q?IyueBQcdNhgVb7sp62FGhuoCk5tduL8p9KR441LPkTQjz3kBMcQf4FGbb8je?=
- =?us-ascii?Q?olwDkyUtLY885TN4jxdFHpmbdhLK9HwFQ/Kw//4AuCBp0MWC7JtrcM+nqYUX?=
- =?us-ascii?Q?3qeduVYWKiUIuFakmwTWiy/i2pPY16kK8rpXe+EWUyaARW4mTsMnuSp0gSRw?=
- =?us-ascii?Q?y6ma3bat1sSU48ujgtMA+S9LJLHwkLioyIbMpKJUwtJZPv5FMRvlmWUq0ed8?=
- =?us-ascii?Q?34Ih0lb8fI6oc0MCu+ZMmly9Mo5u+auvf4WdP78+0qF9YzZs1fRxRy7JhIQt?=
- =?us-ascii?Q?G2RB2buP3NzYqd/dFPrX5sE1sa3FijKXKKXBPJLpl4KDretQzeZHxq6ea1wa?=
- =?us-ascii?Q?i4pUZuZg0lr4RiGMR1/PggwzaH8=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53c66d97-60cb-40a2-4b6a-08d9d6d9437b
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2022 21:11:27.9599
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0oRVe9g1VnVZ16sKWVFIQscPBb+/6/ztnUo923BeRwsDbGCwY44IhipEVDftJdvcojzgtB5CQui9GcOYxoEnoX/UOR+tMXpLO3UStS66FK8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5612
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10226 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201130130
-X-Proofpoint-GUID: H5PW4-w-ZZaaSpH600va4HadxVy6ZcEc
-X-Proofpoint-ORIG-GUID: H5PW4-w-ZZaaSpH600va4HadxVy6ZcEc
+In-Reply-To: <20211231142849.611-6-guang.zeng@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 04:08:57PM -0500, Daniel Jordan wrote:
-> On Wed, Jan 12, 2022 at 10:18:16AM -1000, Tejun Heo wrote:
-> > If we're gonna do this, let's please do it right and make weight based
-> > control work too. Otherwise, its usefulness is pretty limited.
-> 
-> Ok, understood.
-> 
-> Doing it as presented is an incremental step and all that's required for
-> this.  I figured weight could be added later with the first user that
-> actually needs it.
-> 
-> I did prototype weight too, though, just to see if it was all gonna work
-> together, so given how the discussion elsewhere in the thread is going,
-> I might respin the scheduler part of this with another use case and
-> weight-based control included.
-> 
-> I got this far, do the interface and CFS skeleton seem sane?  Both are
+On Fri, Dec 31, 2021, Zeng Guang wrote:
+> In VMX non-root operation, new behavior applies to
 
-s/CFS/CFS bandwidth/
+"new behavior" is ambiguous, it's not clear if it refers to new hardware behavior,
+new KVM behavior, etc...
 
-> basically unchanged with weight-based control included, the weight parts
-> are just more code on top.
+> virtualize WRMSR to vICR in x2APIC mode. Depending
+
+Please wrap at ~75 chars, this is too narrow.
+
+> on settings of the VM-execution controls, CPU would
+> produce APIC-write VM-exit following the 64-bit value
+> written to offset 300H on the virtual-APIC page(vICR).
+> KVM needs to retrieve the value written by CPU and
+> emulate the vICR write to deliver an interrupt.
 > 
-> Thanks for looking.
+> Current KVM doesn't consider to handle the 64-bit setting
+> on vICR in trap-like APIC-write VM-exit. Because using
+> kvm_lapic_reg_write() to emulate writes to APIC_ICR requires
+> the APIC_ICR2 is already programmed correctly. But in the
+> above APIC-write VM-exit, CPU writes the whole 64 bits to
+> APIC_ICR rather than program higher 32 bits and lower 32
+> bits to APIC_ICR2 and APIC_ICR respectively. So, KVM needs
+> to retrieve the whole 64-bit value and program higher 32 bits
+> to APIC_ICR2 first.
+
+I think this is simply saying:
+
+  Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
+  i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
+  the WRMSR.  Add support for handling "nodecode" x2APIC writes, which were
+  previously impossible.
+
+  Note, x2APIC MSR writes are 64 bits wide.
+
+and then the shortlog can be:
+
+  KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode
+
+The "interrupt dispatch" part is quite confusing because it's not really germane
+to the change; yes, the vICR write does (eventually) dispatch an IRQ, but that
+has nothing to do with the code being modified.
+
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+>  arch/x86/kvm/lapic.c | 12 +++++++++---
+>  arch/x86/kvm/lapic.h |  5 +++++
+>  2 files changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index f206fc35deff..3ce7142ba00e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2186,15 +2186,21 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
+>  /* emulate APIC access in a trap manner */
+>  void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+>  {
+> -	u32 val = 0;
+> +	struct kvm_lapic *apic = vcpu->arch.apic;
+> +	u64 val = 0;
+>  
+>  	/* hw has done the conditional check and inst decode */
+>  	offset &= 0xff0;
+>  
+> -	kvm_lapic_reg_read(vcpu->arch.apic, offset, 4, &val);
+> +	/* exception dealing with 64bit data on vICR in x2apic mode */
+> +	if ((offset == APIC_ICR) && apic_x2apic_mode(apic)) {
+
+Sorry, I failed to reply to your response in the previous version.  I suggested
+a WARN_ON(offset != APIC_ICR), but you were concerned that apic_x2apic_mode()
+would be expensive to check before @offset.  I don't think that's a valid concern
+as apic_x2apic_mode() is simply:
+
+	apic->vcpu->arch.apic_base & X2APIC_ENABLE
+
+And is likely well-predicted by the CPU, especially in single tenant or pinned
+scenarios where the pCPU is running a single VM/vCPU, i.e. will amost never see
+X2APIC_ENABLE toggling.
+
+So I stand behind my previous feedback[*] that we should split on x2APIC.
+
+> +		val = kvm_lapic_get_reg64(apic, offset);
+> +		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(val>>32));
+> +	} else
+> +		kvm_lapic_reg_read(apic, offset, 4, &val);
+
+Needs curly braces.  But again, I stand behind my previous feedback that this
+would be better written as:
+
+        if (apic_x2apic_mode(apic)) {
+                if (WARN_ON_ONCE(offset != APIC_ICR))
+                        return 1;
+
+                kvm_lapic_reg_read(apic, offset, 8, &val);
+                kvm_lapic_reg_write64(apic, offset, val);
+        } else {
+                kvm_lapic_reg_read(apic, offset, 4, &val);
+                kvm_lapic_reg_write(apic, offset, val);
+        }
+
+after a patch (provided in earlier feedback) to introduce kvm_lapic_reg_write64().
+
+[*] https://lore.kernel.org/all/YTvcJZSd1KQvNmaz@google.com
+
+>  	/* TODO: optimize to just emulate side effect w/o one more write */
+> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
+> +	kvm_lapic_reg_write(apic, offset, (u32)val);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
+>  
