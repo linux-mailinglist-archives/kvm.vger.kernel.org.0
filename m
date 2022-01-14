@@ -2,188 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5373848E7EE
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 10:59:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4518048E809
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 11:05:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240140AbiANJ7H convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 14 Jan 2022 04:59:07 -0500
-Received: from mail-ua1-f54.google.com ([209.85.222.54]:35506 "EHLO
-        mail-ua1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240090AbiANJ7F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 04:59:05 -0500
-Received: by mail-ua1-f54.google.com with SMTP id m90so16094884uam.2;
-        Fri, 14 Jan 2022 01:59:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LMpobQFf1iaA0D70o2w2ggZn7pjngkhXQg858+CLGTw=;
-        b=iNuRv7X+axQkS087/SEyVRfO807oDY8shZhs/RwbIOXrSJwDV4ivcCA8aQXWl04XYX
-         0xvRFdm45/m3AH4F6sxbOGY18vGQ2l6/oslhdN25IV2CEKO714zW5bsExRdX3RfwolLx
-         JOZ8Q2zCT/ZbmuUmFJtoLtKwr5MtpKkiuujFgB9cwtyyMz7kjl4E+gjXU6RAH9G6s8g1
-         LtcYRGzW3Y5fNoXLxX4i3HiicVj9EHd2ZOyNcOZfA87BCQYltk85FuYKaCBSzHDZ4OeQ
-         e9xAelfLcLlrvyDQHKJNjblWo5Nf89OJdMHR4liKWiRYvo+IGKjZbjYzvvyoO5COMZ6w
-         Q9wg==
-X-Gm-Message-State: AOAM532sLVmq0HXIdflqmaOJLCYgtWMac8I4GsATtNywZZTwzimhwn5A
-        /VD3wdy52bHeuAx5iNkeZdGttDvg1uOEqEhH
-X-Google-Smtp-Source: ABdhPJxHh8EdXSh3VBEjuVDDfqaR9RmxXk44chjxPH7GeQ/Gjo5pr5JcrJn3S8edkLsVjYbwAobZ+w==
-X-Received: by 2002:a67:e905:: with SMTP id c5mr3767905vso.68.1642154343755;
-        Fri, 14 Jan 2022 01:59:03 -0800 (PST)
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com. [209.85.222.48])
-        by smtp.gmail.com with ESMTPSA id u33sm2226584uau.7.2022.01.14.01.59.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jan 2022 01:59:03 -0800 (PST)
-Received: by mail-ua1-f48.google.com with SMTP id p1so16004267uap.9;
-        Fri, 14 Jan 2022 01:59:02 -0800 (PST)
-X-Received: by 2002:a67:e905:: with SMTP id c5mr3767888vso.68.1642154342466;
- Fri, 14 Jan 2022 01:59:02 -0800 (PST)
+        id S240227AbiANKEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 05:04:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49500 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237537AbiANKEC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 05:04:02 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20E9rU3N017405;
+        Fri, 14 Jan 2022 10:04:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=sg3TXSVfqjrM14IdX7dmR/Od6hvrPhGZKRO5di3LJws=;
+ b=iQQlFCvxT4ZvWpDcTUaA3VXP22E7IhOmBCAwGvtB1u5pvBujTqWtYiF1p2pSVaY1+uAn
+ Qv9BF3fePyffAXxwHPoyqytAjWWbHzV932EfNET4MWTiQ7CYgJ5ZizO0pFKy8qtS/KJ0
+ g8HD/uWr1Exfl4ULfmBTOm0Ot51b6I3NQd1ztz1+5zErkw/Bjr2Ny/7v+9sdVTrtz4/x
+ n9s5jU124wOX1ivYVHbUprd+xCzLeO8yrgz0n/dnPwcDIAm6TejnP2yZHQN5LC5vVI+A
+ zmTSnqbksdlbUd+ujwhNXGtSJdsvmtIlYX9KkY51D2LnwKPPH3P/w0OU9LWXZrtLstqA qA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk6xmg66x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 10:04:01 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EA0Wlu005765;
+        Fri, 14 Jan 2022 10:04:01 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk6xmg66f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 10:04:00 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20E9vTdM017686;
+        Fri, 14 Jan 2022 10:03:58 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3df28a282w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 10:03:58 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20E9slEc49873386
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Jan 2022 09:54:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5543A11C054;
+        Fri, 14 Jan 2022 10:03:55 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F21B11C05B;
+        Fri, 14 Jan 2022 10:03:54 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Jan 2022 10:03:54 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 0/5] s390x: Allocation and hosting environment detection fixes
+Date:   Fri, 14 Jan 2022 10:02:40 +0000
+Message-Id: <20220114100245.8643-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
- <20220112085009.dbasceh3obfok5dc@pengutronix.de> <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de> <Yd9L9SZ+g13iyKab@sirena.org.uk>
- <20220113110831.wvwbm75hbfysbn2d@pengutronix.de> <YeA7CjOyJFkpuhz/@sirena.org.uk>
- <20220113194358.xnnbhsoyetihterb@pengutronix.de> <YeCI47ltlWzjzjYy@sirena.org.uk>
- <1df04d74-8aa2-11f1-54e9-34d0e8f4e58b@omp.ru> <20220113224319.akljsjtu7ps75vun@pengutronix.de>
-In-Reply-To: <20220113224319.akljsjtu7ps75vun@pengutronix.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 14 Jan 2022 10:58:51 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWjo36UGde3g5ysdXpLJn=mrPp31SDODuQNPUqoc-ARrQ@mail.gmail.com>
-Message-ID: <CAMuHMdWjo36UGde3g5ysdXpLJn=mrPp31SDODuQNPUqoc-ARrQ@mail.gmail.com>
-Subject: Re: [PATCH] driver core: platform: Rename platform_get_irq_optional()
- to platform_get_irq_silent()
-To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Mark Brown <broonie@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        platform-driver-x86@vger.kernel.org,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        openipmi-developer@lists.sourceforge.net,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0RdCb2IGUlHeUbRmwEyk1XN2w71R5Xzb
+X-Proofpoint-ORIG-GUID: CvyhemeqNUcyzoU1ZzSVQJx6kdLwp7Kh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-14_03,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ adultscore=0 mlxlogscore=999 suspectscore=0 spamscore=0 malwarescore=0
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201140063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Uwe,
+I took some time before Christmas to write a test runner for lpar
+which automatically runs all tests and sends me the logs. It's based
+on the zhmc library to control starting and stopping of the lpar and
+works by having a menu entry for each kvm unit test.
 
-On Thu, Jan 13, 2022 at 11:43 PM Uwe Kleine-König
-<u.kleine-koenig@pengutronix.de> wrote:
-> On Thu, Jan 13, 2022 at 11:57:43PM +0300, Sergey Shtylyov wrote:
-> > On 1/13/22 11:17 PM, Mark Brown wrote:
-> > >> The subsystems regulator, clk and gpio have the concept of a dummy
-> > >> resource. For regulator, clk and gpio there is a semantic difference
-> > >> between the regular _get() function and the _get_optional() variant.
-> > >> (One might return the dummy resource, the other won't. Unfortunately
-> > >> which one implements which isn't the same for these three.) The
-> > >> difference between platform_get_irq() and platform_get_irq_optional() is
-> > >> only that the former might emit an error message and the later won't.
-> >
-> >    This is only a current difference but I'm still going to return 0 ISO
-> > -ENXIO from latform_get_irq_optional(), no way I'd leave that -ENXIO there
-> > alone... :-)
->
-> This would address a bit of the critic in my commit log. But as 0 isn't
-> a dummy value like the dummy values that exist for clk, gpiod and
-> regulator I still think that the naming is a bad idea because it's not
-> in the spirit of the other *_get_optional functions.
->
-> Seeing you say that -ENXIO is a bad return value for
-> platform_get_irq_optional() and 0 should be used instead, I wonder why
-> not changing platform_get_irq() to return 0 instead of -ENXIO, too.
-> This question is for now only about a sensible semantic. That actually
-> changing platform_get_irq() is probably harder than changing
-> platform_get_irq_optional() is a different story.
->
-> If only platform_get_irq_optional() is changed and given that the
-> callers have to do something like:
->
->         if (this_irq_exists()):
->                 ... (e.g. request_irq)
->         else:
->                 ... (e.g. setup polling)
->
-> I really think it's a bad idea that this_irq_exists() has to be
-> different for platform_get_irq() vs. platform_get_irq_optional().
+This revealed a number of test fails when the tests are run under lpar
+as there are a few differences:
+   * lpars most often have a very high memory amount (upwards of 8GB)
+     compared to our qemu env (256MB)
+   * lpar supports diag308 subcode 2
+   * lpar does not provide virtio devices
 
-For platform_get_irq(), the IRQ being absent is an error condition,
-hence it should return an error code.
-For platform_get_irq_optional(), the IRQ being absent is not an error
-condition, hence it should not return an error code, and 0 is OK.
+The higher memory amount leads to allocations crossing the 2GB or 4GB
+border which made sclp and sigp calls fail that expect 31/32 bit
+addresses.
 
-Gr{oetje,eeting}s,
+Janosch Frank (5):
+  lib: s390x: vm: Add kvm and lpar vm queries
+  s390x: css: Skip if we're not run by qemu
+  s390x: diag308: Only test subcode 2 under QEMU
+  s390x: smp: Allocate memory in DMA31 space
+  s390x: firq: Fix sclp buffer allocation
 
-                        Geert
+ lib/s390x/vm.c  | 39 +++++++++++++++++++++++++++++++++++++++
+ lib/s390x/vm.h  | 23 +++++++++++++++++++++++
+ s390x/css.c     | 10 +++++++++-
+ s390x/diag308.c | 15 ++++++++++++++-
+ s390x/firq.c    |  2 +-
+ s390x/smp.c     |  4 ++--
+ s390x/stsi.c    | 21 +--------------------
+ 7 files changed, 89 insertions(+), 25 deletions(-)
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+-- 
+2.32.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
