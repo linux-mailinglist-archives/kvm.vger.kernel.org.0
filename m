@@ -2,116 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE3E448F1D2
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 22:06:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18BF048F220
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 22:51:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbiANVEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 16:04:46 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18476 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229515AbiANVEq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 16:04:46 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20EIwBaV030132;
-        Fri, 14 Jan 2022 21:04:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=U8xPbafIJzKPaySmj+q6pQGQvOEnly+FaVHpoL4VWrg=;
- b=cxy8aPeW5h8s82+SOaER5GGUMeeXXxhA2DlukqIGpn8WvWl+u4vI8NnaExq2l9JyazqG
- JofUU/iunIuydRwNM2/ipqa4yxVkT+WR0Iy5MGLpkiEaowY+mkbh2ltJ8h+ivpjr+FGl
- Gi0yLty9bp8Pf8EI0lXXOPe1GFoO7Ey+W+dPXjrXtWg7JPYMz/KiKo+Buyy1rvfcB3AX
- VRA2I/1mGrzYV6ZvgwIyWnPcSqDJCi2mv/UjKKNb+0IdwO/4murt7rA2sKL4WGh2Ka6V
- ubauz7GuzENfRTsrpkrX3yarWPOhoqxxiMLY6rQrmLt98C9jMdYsLFzeegJyQrBac0qm Zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkewyj990-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 21:04:40 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EL1Glj031973;
-        Fri, 14 Jan 2022 21:04:40 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkewyj98j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 21:04:40 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EKrZsc003535;
-        Fri, 14 Jan 2022 21:04:38 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma01wdc.us.ibm.com with ESMTP id 3df28cfqe0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 21:04:38 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EL4bOq36569420
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 21:04:37 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66FBB136067;
-        Fri, 14 Jan 2022 21:04:37 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2011C136053;
-        Fri, 14 Jan 2022 21:04:35 +0000 (GMT)
-Received: from [9.211.65.142] (unknown [9.211.65.142])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Jan 2022 21:04:35 +0000 (GMT)
-Message-ID: <4ff00131-911b-644b-0de4-ccecb7820f7d@linux.ibm.com>
-Date:   Fri, 14 Jan 2022 16:04:35 -0500
+        id S229957AbiANVvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 16:51:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229833AbiANVvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 16:51:24 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B01C061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 13:51:24 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id ie23-20020a17090b401700b001b38a5318easo15392697pjb.2
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 13:51:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CDsGS2jq8SAFd9OvPx49AGjFg/2s2ed5RyEVXzRWnAo=;
+        b=cfjpva8bdcPLTTQoIPCixVnAFaxsDELlb/9JwStbXYQvRDZGYhfWD3/1KeCmYuq1Yy
+         IupWGk+fR/uoJLiecnN6JvPjTin7H2Hska91lSfi0kRro7XHjZ6Rzw5/PBWb3KmK74HI
+         6pCTKoDjaCjUtQcw4EmIb5Vfnyj3Gkuo0vj2jqbXi6WAKriAHyY1Sgq+jO+4eA5weoen
+         ZrIWRe1oHnOOA/6QybWEb2IdUiv7mV9Bj9zx4zNCcwBb//Iynkc59wxBPmD0p9oUP07a
+         L+eJCdTyRQg1pRPFhhLwPjoPg8fhQ884XaKcHU6+jI7Zd1mjfSkV4huFnNNCOGyPSI2t
+         Jc6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CDsGS2jq8SAFd9OvPx49AGjFg/2s2ed5RyEVXzRWnAo=;
+        b=ahK3tLPIyJq0W5RhoR46NtzeRuVzRRndaf34qfHkbhT7pGA9TAGQPh/VVKu3ie2ikt
+         HvjCufacd3UW/0le8n1+4kzEd6PAWVu4NlEDNmQpWnLCy8wfAgGV0e/xa6BfL/3rSwcA
+         18DZiU3bVrkw/KfD21BFaM0fqBG1YkSrJ9wswFK9dUkkeinHzv9pWm4jAdjUduYxfV6D
+         AzLBbuBjkrz/GiIj8V269XL8S11dmMbNg0TdOD7exYBj5tM6ZVtfifVEP6P+Hx8nh3tb
+         zBONWaciX+KL+5yH3XKHuSdVOOedlqrmWrOC/vIpPapp1tVP/wrPpXAX396eOSZA8Oqs
+         Kq9Q==
+X-Gm-Message-State: AOAM531/4qgs+AlNHjwHAl99aemVI7H7ZB/sPYzwbn2dgjKlAPWlqpZ2
+        Ca0CzBD3J9Ph59tSBQi+4/hW3AXcqDR4D18112tmsg==
+X-Google-Smtp-Source: ABdhPJxoOISTy68Z7laSCPjCr0YLWiNLl+ousUKcH2g0/tuXUHAGX63U2SWCQe4kEq9CrnNG7uifRtzx5bVqMY3fqWc=
+X-Received: by 2002:a17:902:ea10:b0:14a:6c29:a6a5 with SMTP id
+ s16-20020a170902ea1000b0014a6c29a6a5mr11540567plg.172.1642197084066; Fri, 14
+ Jan 2022 13:51:24 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v2 3/9] fixup: force interp off for QEMU machine 6.2 and
- older
-Content-Language: en-US
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, richard.henderson@linaro.org,
-        david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
-        mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-References: <20220114203849.243657-1-mjrosato@linux.ibm.com>
- <20220114203849.243657-4-mjrosato@linux.ibm.com>
-In-Reply-To: <20220114203849.243657-4-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5DMODYIJWxJ0B8OrOnwuec0zp2l5wiHS
-X-Proofpoint-GUID: v4irdAulTB2JxQzU569NhlhmCBV0GRlw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_06,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 clxscore=1015
- suspectscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 adultscore=0
- impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140121
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+ <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+ <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+ <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
+ <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+ <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+ <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com> <YeBfj89mIf8SezfD@google.com>
+In-Reply-To: <YeBfj89mIf8SezfD@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Fri, 14 Jan 2022 13:51:07 -0800
+Message-ID: <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        linux-kernel@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/14/22 3:38 PM, Matthew Rosato wrote:
-> Double-check I'm doing this right + test.
-> 
+On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
+> > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
+> > > Perhaps it would help if you explained *why* you are doing this. It
+> > > sounds like you are either trying to protect against a malicious
+> > > userspace, or you are trying to keep userspace from doing something
+> > > stupid. In general, kvm only enforces constraints that are necessary
+> > > to protect the host. If that's what you're doing, I don't understand
+> > > why live migration doesn't provide an end-run around your protections.
+> > It's mainly to safeguard the guests. With respect to migration, KVM
+> > and the userspace are collectively playing a role here. It's up to the
+> > userspace to ensure that the registers are configured the same across
+> > migrations and KVM ensures that the userspace doesn't modify the
+> > registers after KVM_RUN so that they don't see features turned OFF/ON
+> > during execution. I'm not sure if it falls into the definition of
+> > protecting the host. Do you see a value in adding this extra
+> > protection from KVM?
+>
+> Short answer: probably not?
+>
+> There is precedent for disallowing userspace from doing stupid things, but that's
+> either for KVM's protection (as Jim pointed out), or because KVM can't honor the
+> change, e.g. x86 is currently in the process of disallowing most CPUID changes
+> after KVM_RUN because KVM itself consumes the CPUID information and KVM doesn't
+> support updating some of it's own internal state (because removing features like
+> GB hugepage support is nonsensical and would require a large pile of complicated,
+> messy code).
+>
+> Restricing CPUID changes does offer some "protection" to the guest, but that's
+> not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
+> case, and trying to do so is a fool's errand.
+>
+> If restricting updates in the arm64 is necessary to ensure KVM provides sane
+> behavior, then it could be justified.  But if it's purely a sanity check on
+> behalf of the guest, then it's not justified.
 
-Argh...  This should have been squashed into the preceding patch 
-'target/s390x: add zpci-interp to cpu models'
+The pseudo firmware hvc registers, which this series are adding, are
+used by KVM to identify available hvc features for the guest, and not
+directly exposed to the guest as registers.
+The ways the KVM code in the series consumes the registers' values are
+very limited, and no KVM data/state is created based on their values.
+But, as the code that consumes the registers grows in the future,
+I wouldn't be surprised if KVM consumes them differently than it does
+now (e.g. create another data structure based on the register values).
+I'm not sure though :)
 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   hw/s390x/s390-virtio-ccw.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 84e3e63c43..e02fe11b07 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -803,6 +803,7 @@ DEFINE_CCW_MACHINE(7_0, "7.0", true);
->   static void ccw_machine_6_2_instance_options(MachineState *machine)
->   {
->       ccw_machine_7_0_instance_options(machine);
-> +    s390_cpudef_featoff_greater(14, 1, S390_FEAT_ZPCI_INTERP);
->   }
->   
->   static void ccw_machine_6_2_class_options(MachineClass *mc)
+The restriction, with which KVM doesn't need to worry about the changes
+in the registers after KVM_RUN, could potentially protect or be useful
+to protect KVM and simplify future changes/maintenance of the KVM codes
+that consumes the values.
+I thought this was one of the reasons for having the restriction.
 
+Thanks,
+Reiji
