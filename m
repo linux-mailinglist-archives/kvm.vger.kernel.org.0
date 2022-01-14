@@ -2,104 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB7BB48E205
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 02:10:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F312948E214
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 02:21:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235783AbiANBKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jan 2022 20:10:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39760 "EHLO
+        id S235998AbiANBVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jan 2022 20:21:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbiANBKI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jan 2022 20:10:08 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304B4C06161C
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 17:10:08 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id r16-20020a17090a0ad000b001b276aa3aabso20611481pje.0
-        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 17:10:08 -0800 (PST)
+        with ESMTP id S230237AbiANBVS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jan 2022 20:21:18 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B072BC061574
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 17:21:18 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id b7-20020a639307000000b003428e51f24dso923013pge.15
+        for <kvm@vger.kernel.org>; Thu, 13 Jan 2022 17:21:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dfHTMu5yyfREc50x2Kq3TV4XK0N3u2/ilz/wJ1H6bEc=;
-        b=Qp0L93h2Bp9PLGVaYi0WSJZdkp402RO5l/aQCpgeknH84r7jXsj7pSuEYA955i7rn1
-         W/p3e5Om59luBvf1WCuy9aMCOrdXM0d9zK5q9FPAIBUu+YPOluPJPYYDgGJHTgZdtQpc
-         nUerIZBF1IuHj8vPAaqSwkIRpzapyybW2OQchtN+j/XvAyejjbCFcFTsNN3peB96A/cW
-         U3rxmnuP7tXIc4sW/2zfK+HG8geZbnDbbhy93s2AOQI02kxI7/1FPXmzht3IuvE5V4jZ
-         2AaVVp/32HkacH3MCRJUeaGvlUbX2c5ey2lnicXWxn/xg22G9auoTekB9x32FSWgUC01
-         MK/Q==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=VNWleEEnwlAJHJK1Adhn4cP+JarFtGqoFJu3rQaTca4=;
+        b=BjZka5iTsl4CakMqTbsvMr+MFCc63oLAJcgcPhRfGOlxu5lG24RP9RhwujxC3zgQ1C
+         17ScRE/qHUF/Z9rg2N0wEpOxiJQ3f8Xhzz5NwegEQW5ixywRHVEGAPFHt7SzAJJjeptC
+         NgP0HldJJVqoURgG8Rd6K5XmPUcGJRFBRqbILIxRfayDojwsAJUSWXf6y1Ae9MfivTA4
+         VjsmrHXu/RbsrsEKu0W8LWQ+y1Sb43TC4VOnK++IZ6ECSYNq3rpnfm3Lg4kQlwzMqCcu
+         lZuY9sN8G1lxgMYcQUXyQerU6eHkUG6W5GCarCSnEOX5lB7NGFT4Dak6Qcg5Dk2XV2dc
+         Gkgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dfHTMu5yyfREc50x2Kq3TV4XK0N3u2/ilz/wJ1H6bEc=;
-        b=qyhZJCtEdb4VzXHpu7Ng/sVCUJLFs6YWEeF7ZYDnMQP5u4fS+NoYBU7cJJfv4LoOsi
-         R7BGugEMiHeAYbih+DuBns1G3PIwf8cwWTBcYoWYzaKEi1f4sfAbhrE/dXFoqy0oRXH+
-         GAgxuyrFpru7rQxLneDH23vAqJTcTB+Z2lW5rcIg+tXnXE1NWrbiIU6FCf/Y41V4f+hk
-         LgizQErh4VTJHV0ZxlrhvJ/PPVjcXKvngIa4DUnAOXRvG1XVmXOsGmhKLS/64zFNlofZ
-         VcMGyq/TCLqQJ7lbRc4odWiAyDekKiUxkMj/myGPI+cRyImfij7t3PXi4rKNV/4behCo
-         P6Yw==
-X-Gm-Message-State: AOAM532/qOXAJ9GHKdI2zlZO7heXkKziR4iB4MKLpMrgJG49I6DZDnJP
-        PBGIOaB53TkCUy3bwQ2E7q04aLPtTg0/Yg==
-X-Google-Smtp-Source: ABdhPJwJPF9HsoPu5KG5130tnrH/ZAmOSjZe/Jj2K4WwUe35vcCRE5fNeuBHwGHXHuwdjfoMvZZibA==
-X-Received: by 2002:a17:902:76c2:b0:149:7fa3:2ace with SMTP id j2-20020a17090276c200b001497fa32acemr7109949plt.64.1642122607394;
-        Thu, 13 Jan 2022 17:10:07 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y64sm3134915pgy.12.2022.01.13.17.10.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jan 2022 17:10:06 -0800 (PST)
-Date:   Fri, 14 Jan 2022 01:10:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-Message-ID: <YeDNa+/rF0YEVJAi@google.com>
-References: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
- <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
- <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
- <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
- <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
- <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
- <YeBfj89mIf8SezfD@google.com>
- <CAJHc60wRrgnvwqPWdXdvoqT0V9isXW5xH=btgdjPWQkqVW31Pw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJHc60wRrgnvwqPWdXdvoqT0V9isXW5xH=btgdjPWQkqVW31Pw@mail.gmail.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=VNWleEEnwlAJHJK1Adhn4cP+JarFtGqoFJu3rQaTca4=;
+        b=Rc9h5EQMTJO3q7uPDNZh2qLMtyMkkU8VjKqoNVtPS4Dy8F2kSy7jehhjzMHXRJfC7D
+         kzjGg32IKNGsTfxqPTTazah1JHUBA2ro3Fj8zST53OeeLFTL1wUUjbe626LUcaP4brHV
+         z6kbnO1y9lT5pMJZ/CILBDHlSJngkwUoLgWFtzRVw7VH5S00ZAw4yOe6zQspnf694Ue6
+         tmbaZ2iXngHXpymRH4Gezsqir+m+CGknNUwzM6QWTtW2GHGKqySs5iKIBZbOT+0so4xS
+         MSx0u9uC4ycX/V1Pto6zz9BZnDtfTEj3vN2B9BGISVRJTwFLmKp+NiqDUlIuhyvs7Gp2
+         fElA==
+X-Gm-Message-State: AOAM53027NMl9Q5vX/+8U0RDEOChwKHDCZB4Jk+5c8HDfsOZNw+g4UOs
+        MtvQWAFADkKBSIQALW6cqNHX0gk8R0/3030OVrGo+raJ2V6mj+6xajMw5rtaykDxnprEjTm6VXb
+        HBnwGAmTewUutosg95SKm5b0xWW9mWuKYio9ZNcOKwprnwT8vcHkbTe88oQ8to6k=
+X-Google-Smtp-Source: ABdhPJwkHzSbZjWddJYpev5zc9yNoQpovXjB61zNwCHBnSDTs3+5yg/EqhczoEbJln88dwVzGfvA7nSLDQ8+rw==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:90a:458d:: with SMTP id
+ v13mr17015593pjg.202.1642123277905; Thu, 13 Jan 2022 17:21:17 -0800 (PST)
+Date:   Thu, 13 Jan 2022 17:21:03 -0800
+Message-Id: <20220114012109.153448-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
+Subject: [PATCH v2 0/6] KVM: x86/pmu: Use binary search to check filtered events
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
+        daviddunn@google.com, cloudliang@tencent.com
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022, Raghavendra Rao Ananta wrote:
-> On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
-> > If restricting updates in the arm64 is necessary to ensure KVM provides sane
-> > behavior, then it could be justified.  But if it's purely a sanity check on
-> > behalf of the guest, then it's not justified.
-> Agreed that KVM doesn't really safeguard the guests, but just curious,
-> is there really a downside in adding this thin layer of safety check?
+This started out as a simple change to sort the (up to 300 element)
+PMU filtered event list and to use binary search rather than linear
+search to see if an event is in the list.
 
-It's more stuff that KVM has to maintain, creates an ABI that KVM must adhere to,
-potentially creates inconsistencies in KVM, and prevents using KVM to intentionally
-do stupid things to test scenarios that are "impossible".  And we also try to avoid
-defining arbitrary CPU behavior in KVM (that may not be the case here).
+I thought it would be nice to add a directed test for the PMU event
+filter, and that's when things got complicated. The Intel side was
+fine, but the AMD side was a bit ugly, until I did a few
+refactorings. Imagine my dismay when I discovered that the PMU event
+filter works fine on the AMD side, but that fundamental PMU
+virtualization is broken. And I don't just mean erratum 1292, though
+that throws even more brokenness into the mix.
 
-> On the bright side, the guests would be safe, and it could save the
-> developers some time in hunting down the bugs in this path, no?
+v1 -> v2
+* Drop the check for "AMDisbetter!" in is_amd_cpu() [David Dunn]
+* Drop the call to cpuid(0, 0) that fed the original check for
+  CPU vendor string "AuthenticAMD" in vm_compute_max_gfn().
+* Simplify the inline asm in the selftest by using the compound literal
+  for both input & output.
+  
+Jim Mattson (6):
+  KVM: x86/pmu: Use binary search to check filtered events
+  selftests: kvm/x86: Parameterize the CPUID vendor string check
+  selftests: kvm/x86: Introduce is_amd_cpu()
+  selftests: kvm/x86: Export x86_family() for use outside of processor.c
+  selftests: kvm/x86: Introduce x86_model()
+  selftests: kvm/x86: Add test for KVM_SET_PMU_EVENT_FILTER
 
-Yes, but that can be said for lots and lots of things.  This is both a slippery
-slope argument and the inconsistency argument above, e.g. if KVM actively prevents
-userspace from doing X, why doesn't KVM prevent userspace from doing Y?  Having a
-decently defined rule for these types of things, e.g. protect KVM/kernel and adhere
-to the architecture but otherwise let userspace do whatever, avoids spending too
-much time arguing over what KVM should/shouldn't allow, or wondering why on earth
-KVM does XYZ, at least in theory :-)
+ arch/x86/kvm/pmu.c                            |  30 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |  18 ++
+ .../selftests/kvm/lib/x86_64/processor.c      |  40 +--
+ .../kvm/x86_64/pmu_event_filter_test.c        | 306 ++++++++++++++++++
+ 6 files changed, 361 insertions(+), 35 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
 
-There are certainly times where KVM could have saved userspace some pain, but
-overall I do think KVM is better off staying out of the way when possible.
+-- 
+2.34.1.703.g22d0c6ccf7-goog
+
