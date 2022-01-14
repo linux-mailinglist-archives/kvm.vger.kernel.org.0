@@ -2,201 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1143048E50C
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 08:52:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A8948E529
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 09:02:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233955AbiANHwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 02:52:49 -0500
-Received: from mga07.intel.com ([134.134.136.100]:6282 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230143AbiANHwt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 02:52:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642146769; x=1673682769;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=sZsuATNg4UqU09w85XSeP9EMzdFomxr5c2hmtcLk0uo=;
-  b=h9qPf8E1+aSJopqTRquuyg8Y5hn4ac83HkLFN/uhHwJedE5GdrdVqmTr
-   fWE02H3XVY1BtDiePcFFFN59AsCdPSytvHldB3fbRC1FiNYLkNlaSw22i
-   ZAmM6JMV7FaRFuGGsTaxO4Xp36Tlr2mm3g6DNWV7K6+EgKnJCqg92cigd
-   0teP7DFta9Uu1bGcVo5dsTtd2AHXMEZMU4Ab8RPf1qVp1rmJTL9mLJsLj
-   PVwgPHaFhGsmZPYRttGWhpL2cZ4aYbk6BGuGgnzFJ5L4V393Jx8unJ9/y
-   sqOex1O6Gu1Ow1YydkJ7FY5/yHBPCPWYN8HKyoj2UXEnzhNw9pLAz+29Y
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10226"; a="307545209"
-X-IronPort-AV: E=Sophos;i="5.88,287,1635231600"; 
-   d="scan'208";a="307545209"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 23:52:48 -0800
-X-IronPort-AV: E=Sophos;i="5.88,287,1635231600"; 
-   d="scan'208";a="530117601"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.254.212.142]) ([10.254.212.142])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 23:52:43 -0800
-Message-ID: <ec578526-989d-0913-e40e-9e463fb85a8f@intel.com>
-Date:   Fri, 14 Jan 2022 15:52:35 +0800
+        id S235076AbiANICQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 03:02:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47569 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229812AbiANICO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 03:02:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642147333;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=klb0nnUjuvobPotelSx3DfHypMSRSFWqMkVcwCb1ESI=;
+        b=R0craPwLOL0qwiy9/QUK0Ld+j7BTZ6k4foPYEUygyamKXnnOk7NyS7enPkw4mq2OunLzXC
+        iIn4PPj1YyEiZ5zAkT/aR4JkmY4hc2xunDEEVsvfOUJWad29a8dSzyA2MGC/jx1I+nBakY
+        LOS2SV53T9FTAOkjpU1PtUWmKlpSfUQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-147-F3Fc-pQmMrq9YvkqhER9Cg-1; Fri, 14 Jan 2022 03:02:10 -0500
+X-MC-Unique: F3Fc-pQmMrq9YvkqhER9Cg-1
+Received: by mail-wr1-f71.google.com with SMTP id o28-20020adfa11c000000b001a60fd79c21so1545082wro.19
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 00:02:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=klb0nnUjuvobPotelSx3DfHypMSRSFWqMkVcwCb1ESI=;
+        b=YkUmtiu9A7Wj6MTfzbm6kdMGVpv8/fGcNNTbqqDChJw8RZ7Y5Y1y2eoQ6apWD9zKdF
+         EybK/4aGAttx4WeZPL5RBlN7vFLzMRXmCzDpY3pmVz46O0e1khgR1CYtOmqpQeI5dMTe
+         RT+4A1k4jdiYRmx38SOMsgqLh+0lFvZUZ3sf06I/lD00lrBuc/955UAOdFveszSWTorQ
+         7Wk1Rz0+7stcS5EFLZbPVQnw1b8QNWujxxuF4iZNzEq5+4HDK702DAUF60sAGQMreUPX
+         j2EA7MXqTgxpOq7Ul80R5oGJxqTDwKDOsyJqXdr3M9iMhpt40bvkZb9uHiQgKL8bK5d1
+         PJeQ==
+X-Gm-Message-State: AOAM531d0fX9hBImPkFb4Q/WZFd3mhPgw8xYmjgnXtr8TiXUPBWIUZar
+        lB9J3sYJnCWqG1uzRwGhLw7szQqZu0J0HR4Rpyr2fmkzR0p2NhZHulXVYjfViFVcyuq5/xbemRY
+        G95ztzP+mRprd
+X-Received: by 2002:a05:6000:188d:: with SMTP id a13mr7447583wri.297.1642147329115;
+        Fri, 14 Jan 2022 00:02:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyjqJT5sGU0ZJyw8nvYxiwmgy2EIiuoaOLJLNLYx14PQLad/rO2oCWq7DkWPydBZBlnn2TR1Q==
+X-Received: by 2002:a05:6000:188d:: with SMTP id a13mr7447566wri.297.1642147328909;
+        Fri, 14 Jan 2022 00:02:08 -0800 (PST)
+Received: from steredhat (host-95-238-125-214.retail.telecomitalia.it. [95.238.125.214])
+        by smtp.gmail.com with ESMTPSA id o12sm5576911wrc.69.2022.01.14.00.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 00:02:08 -0800 (PST)
+Date:   Fri, 14 Jan 2022 09:02:05 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [RFC PATCH] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <20220114080205.ls4txgj7qbqmc3q5@steredhat>
+References: <20220113145642.205388-1-sgarzare@redhat.com>
+ <CACGkMEsqY5RHL=9=iny6xRVs_=EdACUCfX-Rmpq+itpdoT_rrg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.4.1
-Subject: Re: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC
- mode with APIC-write VM exit
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20211231142849.611-1-guang.zeng@intel.com>
- <20211231142849.611-6-guang.zeng@intel.com> <YeCZpo+qCkvx5l5m@google.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <YeCZpo+qCkvx5l5m@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CACGkMEsqY5RHL=9=iny6xRVs_=EdACUCfX-Rmpq+itpdoT_rrg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/14/2022 5:29 AM, Sean Christopherson wrote:
-> On Fri, Dec 31, 2021, Zeng Guang wrote:
->> In VMX non-root operation, new behavior applies to
-> "new behavior" is ambiguous, it's not clear if it refers to new hardware behavior,
-> new KVM behavior, etc...
->
->> virtualize WRMSR to vICR in x2APIC mode. Depending
-> Please wrap at ~75 chars, this is too narrow.
->
->> on settings of the VM-execution controls, CPU would
->> produce APIC-write VM-exit following the 64-bit value
->> written to offset 300H on the virtual-APIC page(vICR).
->> KVM needs to retrieve the value written by CPU and
->> emulate the vICR write to deliver an interrupt.
+On Fri, Jan 14, 2022 at 02:18:01PM +0800, Jason Wang wrote:
+>On Thu, Jan 13, 2022 at 10:57 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
 >>
->> Current KVM doesn't consider to handle the 64-bit setting
->> on vICR in trap-like APIC-write VM-exit. Because using
->> kvm_lapic_reg_write() to emulate writes to APIC_ICR requires
->> the APIC_ICR2 is already programmed correctly. But in the
->> above APIC-write VM-exit, CPU writes the whole 64 bits to
->> APIC_ICR rather than program higher 32 bits and lower 32
->> bits to APIC_ICR2 and APIC_ICR respectively. So, KVM needs
->> to retrieve the whole 64-bit value and program higher 32 bits
->> to APIC_ICR2 first.
-> I think this is simply saying:
->
->    Upcoming Intel CPUs will support virtual x2APIC MSR writes to the vICR,
->    i.e. will trap and generate an APIC-write VM-Exit instead of intercepting
->    the WRMSR.  Add support for handling "nodecode" x2APIC writes, which were
->    previously impossible.
->
->    Note, x2APIC MSR writes are 64 bits wide.
->
-> and then the shortlog can be:
->
->    KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode
->
-> The "interrupt dispatch" part is quite confusing because it's not really germane
-> to the change; yes, the vICR write does (eventually) dispatch an IRQ, but that
-> has nothing to do with the code being modified.
-
-I would take commit message as you suggested. Thanks.
-
->> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->> ---
->>   arch/x86/kvm/lapic.c | 12 +++++++++---
->>   arch/x86/kvm/lapic.h |  5 +++++
->>   2 files changed, 14 insertions(+), 3 deletions(-)
+>> In vhost_enable_notify() we enable the notifications and we read
+>> the avail index to check if new buffers have become available in
+>> the meantime. In this case, the device would go to re-read avail
+>> index to access the descriptor.
 >>
->> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->> index f206fc35deff..3ce7142ba00e 100644
->> --- a/arch/x86/kvm/lapic.c
->> +++ b/arch/x86/kvm/lapic.c
->> @@ -2186,15 +2186,21 @@ EXPORT_SYMBOL_GPL(kvm_lapic_set_eoi);
->>   /* emulate APIC access in a trap manner */
->>   void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
->>   {
->> -	u32 val = 0;
->> +	struct kvm_lapic *apic = vcpu->arch.apic;
->> +	u64 val = 0;
->>   
->>   	/* hw has done the conditional check and inst decode */
->>   	offset &= 0xff0;
->>   
->> -	kvm_lapic_reg_read(vcpu->arch.apic, offset, 4, &val);
->> +	/* exception dealing with 64bit data on vICR in x2apic mode */
->> +	if ((offset == APIC_ICR) && apic_x2apic_mode(apic)) {
-> Sorry, I failed to reply to your response in the previous version.  I suggested
-> a WARN_ON(offset != APIC_ICR), but you were concerned that apic_x2apic_mode()
-> would be expensive to check before @offset.  I don't think that's a valid concern
-> as apic_x2apic_mode() is simply:
+>> As we already do in other place, we can cache the value in `avail_idx`
+>> and compare it with `last_avail_idx` to check if there are new
+>> buffers available.
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 >
-> 	apic->vcpu->arch.apic_base & X2APIC_ENABLE
->
-> And is likely well-predicted by the CPU, especially in single tenant or pinned
-> scenarios where the pCPU is running a single VM/vCPU, i.e. will amost never see
-> X2APIC_ENABLE toggling.
->
-> So I stand behind my previous feedback[*] that we should split on x2APIC.
->
->> +		val = kvm_lapic_get_reg64(apic, offset);
->> +		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(val>>32));
->> +	} else
->> +		kvm_lapic_reg_read(apic, offset, 4, &val);
-> Needs curly braces.  But again, I stand behind my previous feedback that this
-> would be better written as:
->
->          if (apic_x2apic_mode(apic)) {
->                  if (WARN_ON_ONCE(offset != APIC_ICR))
->                          return 1;
->
->                  kvm_lapic_reg_read(apic, offset, 8, &val);
->                  kvm_lapic_reg_write64(apic, offset, val);
->          } else {
->                  kvm_lapic_reg_read(apic, offset, 4, &val);
->                  kvm_lapic_reg_write(apic, offset, val);
->          }
->
-> after a patch (provided in earlier feedback) to introduce kvm_lapic_reg_write64().
->
-> [*] https://lore.kernel.org/all/YTvcJZSd1KQvNmaz@google.com
+>Patch looks fine but I guess we won't get performance improvement
+>since it doesn't save any userspace/VM memory access?
 
-kvm_lapic_reg_read() is limited to read up to 4 bytes. It needs extension to support 64bit
-read. And another concern is here getting reg value only specific from vICR(no other regs
-need take care), going through whole path on kvm_lapic_reg_read() could be time-consuming
-unnecessarily. Is it proper that calling kvm_lapic_get_reg64() to retrieve vICR value directly?
+It should save the memory access when vhost_enable_notify() find 
+something new in the VQ, so in this path:
 
-The change could be like follows:
+     vhost_enable_notify() <- VM memory access for avail index
+       == true
 
-         if (apic_x2apic_mode(apic)) {
-                 if (WARN_ON_ONCE(offset != APIC_ICR))
-                         return 1;
+     vhost_disable_notify()
+     ...
 
-                 val = kvm_lapic_get_reg64(apic, offset);
-                 kvm_lapic_reg_write64(apic, offset, val);
-         } else {
-                 kvm_lapic_reg_read(apic, offset, 4, &val);
-                 kvm_lapic_reg_write(apic, offset, val);
-         }
+     vhost_get_vq_desc()   <- VM memory access for avail index
+                              with the patch applied, this access is 
+                              avoided since avail index is cached
 
-  
+In any case, I don't expect this to be a very common path, indeed we
+usually use unlikely() for this path:
 
->>   	/* TODO: optimize to just emulate side effect w/o one more write */
->> -	kvm_lapic_reg_write(vcpu->arch.apic, offset, val);
->> +	kvm_lapic_reg_write(apic, offset, (u32)val);
->>   }
->>   EXPORT_SYMBOL_GPL(kvm_apic_write_nodecode);
->>   
+     if (unlikely(vhost_enable_notify(dev, vq))) {
+         vhost_disable_notify(dev, vq);
+         continue;
+     }
+
+So I don't expect a significant performance increase.
+
+v1 coming with a better commit description.
+
+Thanks,
+Stefano
+
