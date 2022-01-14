@@ -2,104 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 679C548E71B
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 10:08:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EBBB48E775
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 10:27:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236423AbiANJIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 04:08:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36720 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231254AbiANJIy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 04:08:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642151333;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k/tbnGn76vQBdBcG0duWBnDfwWlVcLC0sTsv0law7hM=;
-        b=HZX/jDh8jma0VMEfTcFWGRSVYtUq4kGPcbgdjwQEIfBS2aLOlQ23poo2IkUtTq3Q/I7e9L
-        3DHwbAQcQZMAArVL5mO95OnyWAiEWhmi4ULhT3Ye+3irgW6nofcY1CMFBhzBnaNY84HH4A
-        b59CPEwAA973RovCvyAJuYQLjhS/0e4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-209-tcgIPBTCNrGD2pUMwto8PQ-1; Fri, 14 Jan 2022 04:08:52 -0500
-X-MC-Unique: tcgIPBTCNrGD2pUMwto8PQ-1
-Received: by mail-wm1-f71.google.com with SMTP id m19-20020a05600c4f5300b00345cb6e8dd4so2066039wmq.3
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 01:08:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=k/tbnGn76vQBdBcG0duWBnDfwWlVcLC0sTsv0law7hM=;
-        b=LFyiJBSxKBha2lmOcSV2phnzHEdEWSwIzfTyyBudcTknrKT5rbeLylo1iunCINKJHw
-         R5hRK/ehYlGhyqJt+NWjO9OQQk9qEBD2dhdqDnl8UUe7JInypXAa5RgQJ198Ams0GW2Z
-         ZbO2qDwaDP4D9HxU3Re8bmenhGCv1E2BT6uYRxLFp5vEzpi7BLp8cw1nsZku4+ZRYLF3
-         dklMsVFf50eYFWEQW0Ttki9NN9D/Gp1xUJrwPxPjnyJZPiVo1nOn0rF6v1XYkFVnLuY1
-         7vKhvpBXqZE76qWMq1GpJXg5fnhn/yhF8pJ2ITyeiPsT1Pr1/pOy3Bxt1Co1gJ1tMFCK
-         nPpA==
-X-Gm-Message-State: AOAM530J/t72u8+4wI7XIDGPQ5UyCqjtXCUM1fxY80otu/zf1l/z6ImV
-        XIEvovgLYKDPv6IPaIAhSixhI5V/a1WOuuZBFiEhZJjnk9MLjDbJUMRMcCQXguHFxf7tUub1Z9a
-        2aE5ORPDuurC2
-X-Received: by 2002:a05:600c:1987:: with SMTP id t7mr7419117wmq.154.1642151331123;
-        Fri, 14 Jan 2022 01:08:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyhfoN2OOQTjZHsQIIXa/cBFJoRQxv2LUVrveuV4ufsBMcmahcNTF92eV8tlV7pZYOpXGshBA==
-X-Received: by 2002:a05:600c:1987:: with SMTP id t7mr7419089wmq.154.1642151330842;
-        Fri, 14 Jan 2022 01:08:50 -0800 (PST)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id b15sm1339696wrr.50.2022.01.14.01.08.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 01:08:50 -0800 (PST)
-Date:   Fri, 14 Jan 2022 10:08:49 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] KVM: x86: Partially allow KVM_SET_CPUID{,2} after
- KVM_RUN for CPU hotplug
-Message-ID: <20220114100849.277c04ee@redhat.com>
-In-Reply-To: <YeCEyNz/xqcJBcU/@google.com>
-References: <20220113133703.1976665-1-vkuznets@redhat.com>
-        <YeCEyNz/xqcJBcU/@google.com>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
+        id S239913AbiANJ0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 04:26:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239694AbiANJ0w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 04:26:52 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D99C06161C
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 01:26:51 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n8IqX-0007Po-Mn; Fri, 14 Jan 2022 10:26:09 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n8IqP-00AEBU-7g; Fri, 14 Jan 2022 10:26:00 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n8IqN-0000tG-Uq; Fri, 14 Jan 2022 10:25:59 +0100
+Date:   Fri, 14 Jan 2022 10:25:57 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Sergey Shtylyov <s.shtylyov@omp.ru>
+Cc:     Mark Brown <broonie@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Zhang Rui <rui.zhang@intel.com>,
+        platform-driver-x86@vger.kernel.org,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        openipmi-developer@lists.sourceforge.net,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Benson Leung <bleung@chromium.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        netdev@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+Message-ID: <20220114092557.jrkfx7ihg26ekzci@pengutronix.de>
+References: <20220110195449.12448-1-s.shtylyov@omp.ru>
+ <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
+ <YdyilpjC6rtz6toJ@lunn.ch>
+ <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
+ <20220112085009.dbasceh3obfok5dc@pengutronix.de>
+ <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+ <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
+ <29f0c65d-77f2-e5b2-f6cc-422add8a707d@omp.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="pqpclpjbrmroys3t"
+Content-Disposition: inline
+In-Reply-To: <29f0c65d-77f2-e5b2-f6cc-422add8a707d@omp.ru>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Jan 2022 20:00:08 +0000
-Sean Christopherson <seanjc@google.com> wrote:
 
-> On Thu, Jan 13, 2022, Vitaly Kuznetsov wrote:
-> > Recently, KVM made it illegal to change CPUID after KVM_RUN but
-> > unfortunately this change is not fully compatible with existing VMMs.
-> > In particular, QEMU reuses vCPU fds for CPU hotplug after unplug and it
-> > calls KVM_SET_CPUID2. Relax the requirement by implementing an allowlist
-> > of entries which are allowed to change.  
-> 
-> Honestly, I'd prefer we give up and just revert feb627e8d6f6 ("KVM: x86: Forbid
-> KVM_SET_CPUID{,2} after KVM_RUN").  Attempting to retroactively restrict the
-> existing ioctls is becoming a mess, and I'm more than a bit concerned that this
-> will be a maintenance nightmare in the future, without all that much benefit to
-> anyone.
+--pqpclpjbrmroys3t
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-in 63f5a1909f9 ("KVM: x86: Alert userspace that KVM_SET_CPUID{,2} after KVM_RUN is broken")
-you mention heterogeneous configuration, and that implies that
-a userspace (not upstream qemu today) might attempt to change CPUID
-and that would be wrong. Do we still care about that?
+Hello Sergey,
 
+On Thu, Jan 13, 2022 at 11:35:34PM +0300, Sergey Shtylyov wrote:
+> On 1/13/22 12:45 AM, Mark Brown wrote:
+> >>> To me it sounds much more logical for the driver to check if an
+> >>> optional irq is non-zero (available) or zero (not available), than to
+> >>> sprinkle around checks for -ENXIO. In addition, you have to remember
+> >>> that this one returns -ENXIO, while other APIs use -ENOENT or -ENOSYS
+> >>> (or some other error code) to indicate absence. I thought not having
+> >>> to care about the actual error code was the main reason behind the
+> >>> introduction of the *_optional() APIs.
+> >=20
+> >> No, the main benefit of gpiod_get_optional() (and clk_get_optional()) =
+is
+> >> that you can handle an absent GPIO (or clk) as if it were available.
+>=20
+>    Hm, I've just looked at these and must note that they match 1:1 with
+> platform_get_irq_optional(). Unfortunately, we can't however behave the
+> same way in request_irq() -- because it has to support IRQ0 for the sake
+> of i8253 drivers in arch/...
 
-> I also don't love that the set of volatile entries is nothing more than "this is
-> what QEMU needs today".  There's no architectural justification, and the few cases
-> that do architecturally allow CPUID bits to change are disallowed.  E.g. OSXSAVE,
-> MONITOR/MWAIT, CPUID.0x12.EAX.SGX1 are all _architecturally_ defined scenarios
-> where CPUID can change, yet none of those appear in this list.  Some of those are
-> explicitly handled by KVM (runtime CPUID updates), but why should it be illegal
-> for userspace to intercept writes to MISC_ENABLE and do its own CPUID emulation?
-> 
+Let me reformulate your statement to the IMHO equivalent:
 
+	If you set aside the differences between
+	platform_get_irq_optional() and gpiod_get_optional(),
+	platform_get_irq_optional() is like gpiod_get_optional().
+
+The introduction of gpiod_get_optional() made it possible to simplify
+the following code:
+
+	reset_gpio =3D gpiod_get(...)
+	if IS_ERR(reset_gpio):
+		error =3D PTR_ERR(reset_gpio)
+		if error !=3D -ENDEV:
+			return error
+	else:
+		gpiod_set_direction(reset_gpiod, INACTIVE)
+
+to
+
+	reset_gpio =3D gpiod_get_optional(....)
+	if IS_ERR(reset_gpio):
+		return reset_gpio
+	gpiod_set_direction(reset_gpiod, INACTIVE)
+
+and I never need to actually know if the reset_gpio actually exists.
+Either the line is put into its inactive state, or it doesn't exist and
+then gpiod_set_direction is a noop. For a regulator or a clk this works
+in a similar way.
+
+However for an interupt this cannot work. You will always have to check
+if the irq is actually there or not because if it's not you cannot just
+ignore that. So there is no benefit of an optional irq.
+
+Leaving error message reporting aside, the introduction of
+platform_get_irq_optional() allows to change
+
+	irq =3D platform_get_irq(...);
+	if (irq < 0 && irq !=3D -ENXIO) {
+		return irq;
+	} else if (irq >=3D 0) {
+		... setup irq operation ...
+	} else { /* irq =3D=3D -ENXIO */
+		... setup polling ...
+	}
+
+to
+=09
+	irq =3D platform_get_irq_optional(...);
+	if (irq < 0 && irq !=3D -ENXIO) {
+		return irq;
+	} else if (irq >=3D 0) {
+		... setup irq operation ...
+	} else { /* irq =3D=3D -ENXIO */
+		... setup polling ...
+	}
+
+which isn't a win. When changing the return value as you suggest, it can
+be changed instead to:
+
+	irq =3D platform_get_irq_optional(...);
+	if (irq < 0) {
+		return irq;
+	} else if (irq > 0) {
+		... setup irq operation ...
+	} else { /* irq =3D=3D 0 */
+		... setup polling ...
+	}
+
+which is a tad nicer. If that is your goal however I ask you to also
+change the semantic of platform_get_irq() to return 0 on "not found".
+Note the win is considerably less compared to gpiod_get_optional vs
+gpiod_get however. And then it still lacks the semantic of a dummy irq
+which IMHO forfeits the right to call it ..._optional().
+
+Now I'm unwilling to continue the discussion unless there pops up a
+suggestion that results in a considerable part (say > 10%) of the
+drivers using platform_get_irq_optional not having to check if the
+return value corresponds to "not found".
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--pqpclpjbrmroys3t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHhQaIACgkQwfwUeK3K
+7AmkQAf/d5PfPw0IAOs7Wqvc6r/p6+1tkvEg9YM43cQ03LWApgcX+mJuGNq/lpcb
+MvZUP4vJwOgXf4HlzKhY5cmrtlcjY+gTojfSCWGvV2oO7t1vx/19Mqh9zY3W297j
+f5fYMWJx8DicM/I+7Clo5cNGZiBiwEcH3eptaX6YahEQXjSg45gPcXIpGNotj8AO
+O/Xl9hviFVW48prFLlFLY+qfKNsJPVNtu/Gnl8qdD/USm6Wa7361ko6G32lHIHUf
+7NnENwu96Qw92tZN7jHMMmHbiW1xwp5Yu3yd4xf2/h/RBc3iRsgbEoSgjoUYbMgS
+v/GqERP7XEBCpDmg1fzMNr/LcXeBxQ==
+=hCsr
+-----END PGP SIGNATURE-----
+
+--pqpclpjbrmroys3t--
