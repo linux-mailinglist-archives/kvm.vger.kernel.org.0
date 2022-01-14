@@ -2,110 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E675748EAF5
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:40:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 038FB48EAFC
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:44:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241410AbiANNkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 08:40:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29430 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241400AbiANNkq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:40:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642167646;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kIY3gZLZkDvyIuN4E1WV5yUkfGDdChIOt3WJ/TVBqGs=;
-        b=heg5OB+ZbBjWCp08GI2ZhIIDUn3hq997AtiW0HA/EnJUSqYK1KFDHJRfwjyzo4xzdXZ5N4
-        Hz/zECTfP4gjt5ZvWVub9+uSi4khY24LNuKO7DTVsYyjxmiQettATSJKIRaE6JcxyoACxC
-        sZd1sLI4LbwBCxV3o3ynAhb37d/kYpI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-513-6IgnNnuwM4ihU7zt-OQt7A-1; Fri, 14 Jan 2022 08:40:45 -0500
-X-MC-Unique: 6IgnNnuwM4ihU7zt-OQt7A-1
-Received: by mail-ed1-f69.google.com with SMTP id y18-20020a056402271200b003fa16a5debcso8373966edd.14
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 05:40:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kIY3gZLZkDvyIuN4E1WV5yUkfGDdChIOt3WJ/TVBqGs=;
-        b=TdK/eYpHcHotmPUdqwrxWjCj1X61E8vrw2KB+KfNrcDSU6uzLuGrh3B2RQptbauMGs
-         RExFqjOvsWHH+YVjjDGIM7iDzazar9pzdsbJEd2+TLDoTeITbd0qncHlY6ik79pfeo5M
-         rpFtm8zWU++ob4iMLTWsA5HHWuDKnMaJfMjsU1/lTd2MTDl4BBZPUAQjnxNS8zE4bVz6
-         WLtY70NTL9WYkdo2zJHTz2yoeH5yHk0QBhwAsIGVR4mKYpE0BpcQbJjp/wha6lQAzcxN
-         TFcDGSbPgWWflK0lEk4nFCwS7ftj2igLLetU59BLUt6KzFBMakbjdprB7WmhJZm/nopE
-         0jFA==
-X-Gm-Message-State: AOAM531Zck8Aw/RGrFL1pdJx/Ikm5c4INJSx9rN8PDEZvk5HHdRc5vF2
-        yQ2COd8Gmr/Mk2nZ6clUdssGoquTsEOmAbjeEVmxWeY4Sf/Eg6/erMYvc54nkNDNFq7O6GLx+H+
-        n6whoCbBKSyyA
-X-Received: by 2002:a50:e79a:: with SMTP id b26mr9036452edn.341.1642167644025;
-        Fri, 14 Jan 2022 05:40:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy2fVFvhVy+pmPWHeYWUSOIG58hk1uWTDrKAAI8J1+CadDXmJiQxrYFzLWCmLzTDxfKAupkRA==
-X-Received: by 2002:a50:e79a:: with SMTP id b26mr9036435edn.341.1642167643845;
-        Fri, 14 Jan 2022 05:40:43 -0800 (PST)
-Received: from redhat.com ([2.55.154.210])
-        by smtp.gmail.com with ESMTPSA id qa35sm1854925ejc.67.2022.01.14.05.40.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 05:40:43 -0800 (PST)
-Date:   Fri, 14 Jan 2022 08:40:39 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, stefanha@redhat.com,
-        kvm@vger.kernel.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v1] vhost: cache avail index in vhost_enable_notify()
-Message-ID: <20220114084016-mutt-send-email-mst@kernel.org>
-References: <20220114090508.36416-1-sgarzare@redhat.com>
- <20220114074454-mutt-send-email-mst@kernel.org>
- <20220114133816.7niyaqygvdveddmi@steredhat>
+        id S241372AbiANNn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 08:43:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57538 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230472AbiANNn6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:43:58 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ECqcXs028697;
+        Fri, 14 Jan 2022 13:43:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=KMUztCrCWFgxtFLl9NgyGpfuhUslj7aMVbrW3LIdC7k=;
+ b=cwSO8LrHhYQzRWzjKTtdHCfQpDXIOMhDNW5Om25HV+LHyO1yM97FVo/zTwXU98ADXgjq
+ gLuF4HemDgnJJoaA/7R6192HQS3dHo37zMu7YAqSn9SVy3UBw9ozIIUIzogibHItYK/v
+ 8/gWQ0qBs8VTmqWGgTELHrL71QxxvjQQxGn4Dqirg3pdXWKZsehw9672R289QhsodEcC
+ SWhuQ/JXM575tEjIXvdLr2r00faf8hHS3Zhj8NvIw2gfY64U1eO3kLSzXyCbKKrQMz48
+ O/op+na+oF8rxJrgYweMKImmafUR+UY40SCXnStHAceOxvDkJvXDv6/HpEvlyzx2ZWmn +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk9jm0yy2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 13:43:57 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ECs49e032639;
+        Fri, 14 Jan 2022 13:43:57 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk9jm0yxh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 13:43:57 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EDbSEI022394;
+        Fri, 14 Jan 2022 13:43:54 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3df28a3ses-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 13:43:54 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EDhpSc45547994
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Jan 2022 13:43:51 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 64484AE055;
+        Fri, 14 Jan 2022 13:43:51 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 09824AE045;
+        Fri, 14 Jan 2022 13:43:51 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.38.143])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Jan 2022 13:43:50 +0000 (GMT)
+Message-ID: <5582205fd65db8fcfd9ba94e2976007e7ac4869d.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/5] lib: s390x: vm: Add kvm and lpar vm
+ queries
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+Date:   Fri, 14 Jan 2022 14:43:50 +0100
+In-Reply-To: <d09a7170-6538-fc52-15f1-42d7fc4e7c9b@linux.ibm.com>
+References: <20220114100245.8643-1-frankja@linux.ibm.com>
+         <20220114100245.8643-2-frankja@linux.ibm.com>
+         <b468354deac3f9902f42aa2c46e762ddf208efdd.camel@linux.ibm.com>
+         <d09a7170-6538-fc52-15f1-42d7fc4e7c9b@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.2 (3.42.2-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220114133816.7niyaqygvdveddmi@steredhat>
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Ynb9lVlfBB_gSATIsxHtSiFAeBX-tyUD
+X-Proofpoint-ORIG-GUID: a_G_FRUj6QdPy_RQ2GvU6dfWCsYNhkAM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-14_05,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=969 mlxscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ spamscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
+ adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201140090
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 02:38:16PM +0100, Stefano Garzarella wrote:
-> On Fri, Jan 14, 2022 at 07:45:35AM -0500, Michael S. Tsirkin wrote:
-> > On Fri, Jan 14, 2022 at 10:05:08AM +0100, Stefano Garzarella wrote:
-> > > In vhost_enable_notify() we enable the notifications and we read
-> > > the avail index to check if new buffers have become available in
-> > > the meantime.
-> > > 
-> > > We are not caching the avail index, so when the device will call
-> > > vhost_get_vq_desc(), it will find the old value in the cache and
-> > > it will read the avail index again.
-> > > 
-> > > It would be better to refresh the cache every time we read avail
-> > > index, so let's change vhost_enable_notify() caching the value in
-> > > `avail_idx` and compare it with `last_avail_idx` to check if there
-> > > are new buffers available.
-> > > 
-> > > Anyway, we don't expect a significant performance boost because
-> > > the above path is not very common, indeed vhost_enable_notify()
-> > > is often called with unlikely(), expecting that avail index has
-> > > not been updated.
-> > > 
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > 
-> > ... and can in theory even hurt due to an extra memory write.
-> > So ... performance test restults pls?
-> 
-> Right, could be.
-> 
-> I'll run some perf test with vsock, about net, do you have a test suite or
-> common step to follow to test it?
-> 
-> Thanks,
-> Stefano
+On Fri, 2022-01-14 at 14:35 +0100, Janosch Frank wrote:
+> Have a look at Pierre's patch which I will be relying on when it's
+> done. 
+> As I said in the commit message, this is only a placeholder for his
+> patch.
 
-You can use the vhost test as a unit test as well.
-
--- 
-MST
-
+There it is just as I suggested. Thanks.
