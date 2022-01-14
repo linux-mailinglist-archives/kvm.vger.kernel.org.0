@@ -2,129 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18BF048F220
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 22:51:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E24A548F272
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 23:30:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229957AbiANVvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 16:51:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39120 "EHLO
+        id S230474AbiANW33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 17:29:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbiANVvY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 16:51:24 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B01C061574
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 13:51:24 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id ie23-20020a17090b401700b001b38a5318easo15392697pjb.2
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 13:51:24 -0800 (PST)
+        with ESMTP id S230465AbiANW32 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 17:29:28 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A5AC061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 14:29:28 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id y16-20020a17090a6c9000b001b13ffaa625so23591938pjj.2
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 14:29:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CDsGS2jq8SAFd9OvPx49AGjFg/2s2ed5RyEVXzRWnAo=;
-        b=cfjpva8bdcPLTTQoIPCixVnAFaxsDELlb/9JwStbXYQvRDZGYhfWD3/1KeCmYuq1Yy
-         IupWGk+fR/uoJLiecnN6JvPjTin7H2Hska91lSfi0kRro7XHjZ6Rzw5/PBWb3KmK74HI
-         6pCTKoDjaCjUtQcw4EmIb5Vfnyj3Gkuo0vj2jqbXi6WAKriAHyY1Sgq+jO+4eA5weoen
-         ZrIWRe1oHnOOA/6QybWEb2IdUiv7mV9Bj9zx4zNCcwBb//Iynkc59wxBPmD0p9oUP07a
-         L+eJCdTyRQg1pRPFhhLwPjoPg8fhQ884XaKcHU6+jI7Zd1mjfSkV4huFnNNCOGyPSI2t
-         Jc6w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=bPFEuJghAq85KSQIR4gB3+T+iHCDYNMGhh4VVUyK1yk=;
+        b=iUPTHGiMqWfnxByHl2huCDUaGb0wNP2o2euAlNSouVPbCBZl4XMIh1AmkuMnqjN5eU
+         Mt4oDa3xZfyZT4WzXA8Po0PMgvtrv94XnyRXYg19oMQFJJYUQLDN5jrCUPAA5a+W2MsX
+         rzClEEKQ6HfrTVUsUbxMjQS9vpJjpMFklAQBTX6n/e+ClCE9jW9J0Wz0KIx1gqUUk6ao
+         KvNhZCr9IHKKUNyQvvwtWb0ryNFznfs5+PtZPT4cvhGTPQ0MIzUhZm1qECz9urv7zf4F
+         TS22RpHP9YVJ2p2vX+Jq0S/asF+xf02iRSQtsSowdiers4zz65zUMVhPSgwvFhYOtPWC
+         mKng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CDsGS2jq8SAFd9OvPx49AGjFg/2s2ed5RyEVXzRWnAo=;
-        b=ahK3tLPIyJq0W5RhoR46NtzeRuVzRRndaf34qfHkbhT7pGA9TAGQPh/VVKu3ie2ikt
-         HvjCufacd3UW/0le8n1+4kzEd6PAWVu4NlEDNmQpWnLCy8wfAgGV0e/xa6BfL/3rSwcA
-         18DZiU3bVrkw/KfD21BFaM0fqBG1YkSrJ9wswFK9dUkkeinHzv9pWm4jAdjUduYxfV6D
-         AzLBbuBjkrz/GiIj8V269XL8S11dmMbNg0TdOD7exYBj5tM6ZVtfifVEP6P+Hx8nh3tb
-         zBONWaciX+KL+5yH3XKHuSdVOOedlqrmWrOC/vIpPapp1tVP/wrPpXAX396eOSZA8Oqs
-         Kq9Q==
-X-Gm-Message-State: AOAM531/4qgs+AlNHjwHAl99aemVI7H7ZB/sPYzwbn2dgjKlAPWlqpZ2
-        Ca0CzBD3J9Ph59tSBQi+4/hW3AXcqDR4D18112tmsg==
-X-Google-Smtp-Source: ABdhPJxoOISTy68Z7laSCPjCr0YLWiNLl+ousUKcH2g0/tuXUHAGX63U2SWCQe4kEq9CrnNG7uifRtzx5bVqMY3fqWc=
-X-Received: by 2002:a17:902:ea10:b0:14a:6c29:a6a5 with SMTP id
- s16-20020a170902ea1000b0014a6c29a6a5mr11540567plg.172.1642197084066; Fri, 14
- Jan 2022 13:51:24 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bPFEuJghAq85KSQIR4gB3+T+iHCDYNMGhh4VVUyK1yk=;
+        b=vRfyujfDHXIQd4OSLlEqQBCaNDBmgnb4pgSZCIY9Ta89ZWrHXoP+8C0nZJypm4msmN
+         L4vzub2da+KftSyVpCbOr9DKWfhTZdsDN8I2N2yedRVLokz7d8qZhvyiT7PNGjP0p+yY
+         1O849DGw+N4GsKMGXNNo8hbxVE32Zh1mFugMezWqWcFZJIGch6DBUMbVJZoYTRzXMYec
+         gcN7lSFSV6ZSq2zcrQThrdXqsiq1L4MvrfZMQYzz8nHTH4p/VS5xPJMunwHrZhyoQy31
+         UCSbrVDJNP0M6JnipaeXxxJaAphu7A94RXeINBUgwfBtQUxnpPoV35IMIficUhkyCG7z
+         sWqw==
+X-Gm-Message-State: AOAM533fIvHFH634mMXClf9Z8cgyBG0qo2s8cp8RkKndDC/cRd1YwNf4
+        crQOde5mANQHDFgeI0rwEk18kIuMuQaMrA==
+X-Google-Smtp-Source: ABdhPJx4zcKCPgpeoUwThTveqg+DDRKoEdKndJ5KKNdgJe8TaTFK2C1SxCYDaBBezeMcKSiSeGWMCQ==
+X-Received: by 2002:a17:903:11d1:b0:149:57d1:acc6 with SMTP id q17-20020a17090311d100b0014957d1acc6mr11679606plh.134.1642199367284;
+        Fri, 14 Jan 2022 14:29:27 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ls7sm647509pjb.54.2022.01.14.14.29.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 14:29:26 -0800 (PST)
+Date:   Fri, 14 Jan 2022 22:29:22 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] KVM: x86/mmu: Document and enforce MMU-writable
+ and Host-writable invariants
+Message-ID: <YeH5QlwgGcpStZyp@google.com>
+References: <20220113233020.3986005-1-dmatlack@google.com>
+ <20220113233020.3986005-4-dmatlack@google.com>
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
- <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
- <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
- <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
- <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
- <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
- <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com> <YeBfj89mIf8SezfD@google.com>
-In-Reply-To: <YeBfj89mIf8SezfD@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Fri, 14 Jan 2022 13:51:07 -0800
-Message-ID: <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        linux-kernel@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220113233020.3986005-4-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
-> > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
-> > > Perhaps it would help if you explained *why* you are doing this. It
-> > > sounds like you are either trying to protect against a malicious
-> > > userspace, or you are trying to keep userspace from doing something
-> > > stupid. In general, kvm only enforces constraints that are necessary
-> > > to protect the host. If that's what you're doing, I don't understand
-> > > why live migration doesn't provide an end-run around your protections.
-> > It's mainly to safeguard the guests. With respect to migration, KVM
-> > and the userspace are collectively playing a role here. It's up to the
-> > userspace to ensure that the registers are configured the same across
-> > migrations and KVM ensures that the userspace doesn't modify the
-> > registers after KVM_RUN so that they don't see features turned OFF/ON
-> > during execution. I'm not sure if it falls into the definition of
-> > protecting the host. Do you see a value in adding this extra
-> > protection from KVM?
->
-> Short answer: probably not?
->
-> There is precedent for disallowing userspace from doing stupid things, but that's
-> either for KVM's protection (as Jim pointed out), or because KVM can't honor the
-> change, e.g. x86 is currently in the process of disallowing most CPUID changes
-> after KVM_RUN because KVM itself consumes the CPUID information and KVM doesn't
-> support updating some of it's own internal state (because removing features like
-> GB hugepage support is nonsensical and would require a large pile of complicated,
-> messy code).
->
-> Restricing CPUID changes does offer some "protection" to the guest, but that's
-> not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
-> case, and trying to do so is a fool's errand.
->
-> If restricting updates in the arm64 is necessary to ensure KVM provides sane
-> behavior, then it could be justified.  But if it's purely a sanity check on
-> behalf of the guest, then it's not justified.
+On Thu, Jan 13, 2022, David Matlack wrote:
+> +/*
+> + * *_SPTE_HOST_WRITEABLE (aka Host-writable) indicates whether the host permits
+> + * writes to the guest page mapped by the SPTE. This bit is cleared on SPTEs
+> + * that map guest pages in read-only memslots and read-only VMAs.
+> + *
+> + * Invariants:
+> + *  - If Host-writable is clear, PT_WRITABLE_MASK must be clear.
+> + *
+> + *
+> + * *_SPTE_MMU_WRITEABLE (aka MMU-writable) indicates whether the shadow MMU
+> + * allows writes to the guest page mapped by the SPTE. This bit is cleared when
+> + * the guest page mapped by the SPTE contains a page table that is being
+> + * monitored for shadow paging. In this case the SPTE can only be made writable
+> + * by unsyncing the shadow page under the mmu_lock.
+> + *
+> + * Invariants:
+> + *  - If MMU-writable is clear, PT_WRITABLE_MASK must be clear.
+> + *  - If MMU-writable is set, Host-writable must be set.
+> + *
+> + * If MMU-writable is set, PT_WRITABLE_MASK is normally set but can be cleared
+> + * to track writes for dirty logging. For such SPTEs, KVM will locklessly set
+> + * PT_WRITABLE_MASK upon the next write from the guest and record the write in
+> + * the dirty log (see fast_page_fault()).
+> + */
+> +
+> +/* Bits 9 and 10 are ignored by all non-EPT PTEs. */
+> +#define DEFAULT_SPTE_HOST_WRITEABLE	BIT_ULL(9)
+> +#define DEFAULT_SPTE_MMU_WRITEABLE	BIT_ULL(10)
 
-The pseudo firmware hvc registers, which this series are adding, are
-used by KVM to identify available hvc features for the guest, and not
-directly exposed to the guest as registers.
-The ways the KVM code in the series consumes the registers' values are
-very limited, and no KVM data/state is created based on their values.
-But, as the code that consumes the registers grows in the future,
-I wouldn't be surprised if KVM consumes them differently than it does
-now (e.g. create another data structure based on the register values).
-I'm not sure though :)
+Ha, so there's a massive comment above is_writable_pte() that covers a lot of
+the same material.  More below.
 
-The restriction, with which KVM doesn't need to worry about the changes
-in the registers after KVM_RUN, could potentially protect or be useful
-to protect KVM and simplify future changes/maintenance of the KVM codes
-that consumes the values.
-I thought this was one of the reasons for having the restriction.
+> +
+>  /*
+>   * Low ignored bits are at a premium for EPT, use high ignored bits, taking care
+>   * to not overlap the A/D type mask or the saved access bits of access-tracked
+> @@ -316,8 +341,13 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
+>  
+>  static inline bool spte_can_locklessly_be_made_writable(u64 spte)
+>  {
+> -	return (spte & shadow_host_writable_mask) &&
+> -	       (spte & shadow_mmu_writable_mask);
+> +	if (spte & shadow_mmu_writable_mask) {
+> +		WARN_ON_ONCE(!(spte & shadow_host_writable_mask));
+> +		return true;
+> +	}
+> +
+> +	WARN_ON_ONCE(spte & PT_WRITABLE_MASK);
 
-Thanks,
-Reiji
+I don't like having the WARNs here.  This is a moderately hot path, there are a
+decent number of call sites, and the WARNs won't actually help detect the offender,
+i.e. whoever wrote the bad SPTE long since got away.
+
+And for whatever reason, I had a hell of a time (correctly) reading the second WARN :-)
+
+Lastly, there's also an "overlapping" WARN in mark_spte_for_access_track().
+
+> +	return false;
+
+To kill a few birds with fewer stones, what if we:
+
+  a. Move is_writable_pte() into spte.h, somewhat close to the HOST/MMU_WRITABLE
+     definitions.
+
+  b. Add a new helper, spte_check_writable_invariants(), to enforce that a SPTE
+     is WRITABLE iff it's MMU-Writable, and that a SPTE is MMU-Writable iff it's
+     HOST-Writable.
+
+  c. Drop the WARN in mark_spte_for_access_track().
+
+  d. Call spte_check_writable_invariants() when setting SPTEs.
+
+  e. Document everything in a comment above spte_check_writable_invariants().
