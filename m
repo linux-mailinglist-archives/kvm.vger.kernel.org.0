@@ -2,133 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A23E48E9C7
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:23:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49C2D48E9C8
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:25:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240922AbiANMXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 07:23:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22144 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234801AbiANMXn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 07:23:43 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20EBRkNT007862;
-        Fri, 14 Jan 2022 12:23:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=kPO0ZZLv9ivsTnj//vR7qj5rPah80ZaXvKtVs6X9YVY=;
- b=si9wrkCfYul/q1rQUwKXOwmF3Rw7v3Up6BXKcM+r5zImtUf5KrKocrCozhy+Y/RwtWBE
- jAcJfiInv9kKlVWNbU9u+li26larNQ1PU2nHafKgNmwr2IY1BaOaWmQx4DFEZ15hHVGe
- kJN2P76ucPL53tqSwfBT877Fn4mxCRhWHbJnNirq4jRK53mEPSA/KheCNsQrINDz2A2L
- 7PUVGwxlHWFXMOikCgm3a4hNEy2lhnLpFcAieLfiHbpwRAyHyFZcu3khVYSc6Fx4iMI5
- FydlSEBUWrbOQAr5AsT37JO4DrtQKlc630igFFiDMYNIIAzacx1dgB9/XlUaio+j/oVV QQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk8at0x7m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:23:43 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ECJffR031171;
-        Fri, 14 Jan 2022 12:23:42 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk8at0x70-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:23:42 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ECCqk5009534;
-        Fri, 14 Jan 2022 12:23:40 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3df1vjx80m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:23:40 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ECETjQ36176330
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 12:14:29 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3AB2252063;
-        Fri, 14 Jan 2022 12:23:37 +0000 (GMT)
-Received: from [9.145.160.142] (unknown [9.145.160.142])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DA2A35204E;
-        Fri, 14 Jan 2022 12:23:36 +0000 (GMT)
-Message-ID: <f7c76f9a-c138-5dc1-2189-f0177fb19709@linux.ibm.com>
-Date:   Fri, 14 Jan 2022 13:23:36 +0100
+        id S241014AbiANMZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 07:25:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53553 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234801AbiANMZP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 07:25:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642163114;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hBh0G3PaFCWJV1sufbCQzEoGiZiKhsRfTLAPWCryd98=;
+        b=Q8cMp8kl5QMmluEv2feQMUw6WnN5NrLo6YLPZo8ZaqdyASVrjERuSzwE+spOOLc52i2s8h
+        feXAKzcBFOAKb3vHiCWWzVa98C8JeUA3yI2JnuSXW71p7t0v0sMdQqOphzkO0wy5+2xWgm
+        2TGV4lKxeRi8VL1VWIgPagVnQyfTzyw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-205-EaA7L9DiNqiKA6n6gOFEUg-1; Fri, 14 Jan 2022 07:25:13 -0500
+X-MC-Unique: EaA7L9DiNqiKA6n6gOFEUg-1
+Received: by mail-wr1-f70.google.com with SMTP id a11-20020adffb8b000000b001a0b0f4afe9so1716190wrr.13
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 04:25:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=hBh0G3PaFCWJV1sufbCQzEoGiZiKhsRfTLAPWCryd98=;
+        b=L2XSUy4h6zyHNWI5wYpHUMk8Qzg1C9p2dsi1QEvo22wW1/NVtjkLWckVy7pMCzZGRR
+         ilO+VQXUWjYUk3zEl61sYxNlDNCZdEbp/dmmHlR0NOM8Y9zSlusHQuuahyeW/6ddUmZb
+         MzjqnoPvpE+av1nWoBjDtmpJAT5/XROK0GJ0G2yt7J8wZVZhHXO+ylngSrsVmDQxBT8k
+         HP6m4rXvR8WTqfW+0F9jz+UIMavX+H+CJiqU4wUWgG+6f1FfoYm51obgQDeVVMacijgH
+         TMOHZ+VY9fQngCD1cyCVHhrazy4YcLtP47aLfKODDthsOYWjlTNImFc2QOu53bnYRmoU
+         nqtQ==
+X-Gm-Message-State: AOAM530tpdkB5sTkHSvoKoI/ujZMbNBOvTNmDjJaeI6wPhFdqYWXHJ9g
+        cagXhI0DljdkY+MAts9/iUZ6a4v2EqV0fgU76XssvDYxe+PcFQPbfHq4C1TsH/NAbe2LwRfvNI9
+        1J8z0HJdMd2Bg
+X-Received: by 2002:adf:dfcb:: with SMTP id q11mr8088552wrn.181.1642163112407;
+        Fri, 14 Jan 2022 04:25:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJytUF1b2SbzKOsKta4a5pVQxU/2110KFAo5J35XHdXJ85Ys1js7Hdv0X5E6eJ5VN6A5fa2AWw==
+X-Received: by 2002:adf:dfcb:: with SMTP id q11mr8088537wrn.181.1642163112185;
+        Fri, 14 Jan 2022 04:25:12 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id g2sm5042986wro.41.2022.01.14.04.25.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 04:25:11 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Igor Mammedov <imammedo@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+In-Reply-To: <20220114122237.54fa8c91@redhat.com>
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+ <20211122175818.608220-3-vkuznets@redhat.com>
+ <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+ <20211227183253.45a03ca2@redhat.com>
+ <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
+ <87mtkdqm7m.fsf@redhat.com> <20220103104057.4dcf7948@redhat.com>
+ <YeCowpPBEHC6GJ59@google.com> <20220114095535.0f498707@redhat.com>
+ <87ilummznd.fsf@redhat.com> <20220114122237.54fa8c91@redhat.com>
+Date:   Fri, 14 Jan 2022 13:25:10 +0100
+Message-ID: <87ee5amrmh.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH 0/5] s390x: Allocation and hosting
- environment detection fixes
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com, nrb@linux.ibm.com
-References: <20220114100245.8643-1-frankja@linux.ibm.com>
- <20220114121948.566e77a6@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220114121948.566e77a6@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5NigK6fB7aWfNmyun-KBW_CUbs-dz22g
-X-Proofpoint-ORIG-GUID: 1S0zIlyJopSyLOMd0vG_K3gBWBzL9esX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_04,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 mlxscore=0 adultscore=0 malwarescore=0 clxscore=1015
- bulkscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140081
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/14/22 12:19, Claudio Imbrenda wrote:
-> On Fri, 14 Jan 2022 10:02:40 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> I took some time before Christmas to write a test runner for lpar
->> which automatically runs all tests and sends me the logs. It's based
->> on the zhmc library to control starting and stopping of the lpar and
->> works by having a menu entry for each kvm unit test.
->>
->> This revealed a number of test fails when the tests are run under lpar
->> as there are a few differences:
->>     * lpars most often have a very high memory amount (upwards of 8GB)
->>       compared to our qemu env (256MB)
->>     * lpar supports diag308 subcode 2
->>     * lpar does not provide virtio devices
->>
->> The higher memory amount leads to allocations crossing the 2GB or 4GB
->> border which made sclp and sigp calls fail that expect 31/32 bit
->> addresses.
->>
-> 
-> the series looks good to me; if you send me a fixed patch 3, I'll queue
-> this together with the other ones
+Igor Mammedov <imammedo@redhat.com> writes:
 
-Well, since Pierre originally came up with a large part of the code for 
-patch 1 I'll wait with a new version until we picked his fixed patch so 
-I can rebase on it.
+> On Fri, 14 Jan 2022 10:31:50 +0100
+> Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+>> Igor Mammedov <imammedo@redhat.com> writes:
+>> 
+>> 
+>> > However, a problem of failing KVM_SET_CPUID2 during VCPU re-plug
+>> > is still there and re-plug will fail if KVM rejects repeated KVM_SET_CPUID2
+>> > even if ioctl called with exactly the same CPUID leafs as the 1st call.
+>> >  
+>> 
+>> Assuming APIC id change doesn not need to be supported, I can send v2
+>> here with an empty allowlist.
+> As you mentioned in another thread black list would be better
+> to address Sean's concerns or just revert problematic commit.
+>
 
-But you can already pick the allocation patches if you want.
+Personally, I'm leaning towards the blocklist approach even if just for
+'documenting' the fact that KVM doesn't correctly handle the
+change. Compared to a comment in the code, such approach could help
+someone save tons of debugging time (if anyone ever decides do something
+weird, like changing MAXPHYADDR on the fly).
 
-> 
->> Janosch Frank (5):
->>    lib: s390x: vm: Add kvm and lpar vm queries
->>    s390x: css: Skip if we're not run by qemu
->>    s390x: diag308: Only test subcode 2 under QEMU
->>    s390x: smp: Allocate memory in DMA31 space
->>    s390x: firq: Fix sclp buffer allocation
->>
->>   lib/s390x/vm.c  | 39 +++++++++++++++++++++++++++++++++++++++
->>   lib/s390x/vm.h  | 23 +++++++++++++++++++++++
->>   s390x/css.c     | 10 +++++++++-
->>   s390x/diag308.c | 15 ++++++++++++++-
->>   s390x/firq.c    |  2 +-
->>   s390x/smp.c     |  4 ++--
->>   s390x/stsi.c    | 21 +--------------------
->>   7 files changed, 89 insertions(+), 25 deletions(-)
->>
-> 
+-- 
+Vitaly
 
