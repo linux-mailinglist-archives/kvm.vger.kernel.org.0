@@ -2,109 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A81148EACA
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:35:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C68A48EAE4
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:38:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241322AbiANNf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 08:35:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24318 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S236727AbiANNf2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:35:28 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ECrTaG030363;
-        Fri, 14 Jan 2022 13:35:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=QrAsnfqckw0ljnJBypVeB5tjWh4pgBd/ZN9KVR51zsk=;
- b=foxYfdu3Uzh2ssTcn/fYkxiK9d1XTpcRAW5QmkxvJNl4LZP4UpgpovK1EFPnIenKl6Tj
- BTqZPMx07rmodmmkP/LvPJ7844vDBd42GYLhHiZnOrQCNqINXLJdCK7MI4nJmHIcgK7V
- dSUQAotF1IEYH4zi96Cy3133eLuXtK0ea+XMfxYXv06OrDqVQhINGkqVuC4RlJ22xH69
- /0/fEo06BB+7s3mryERzgstjdGNWMKqo0FNrMX5LeVXCgZZsHzsoKoMxGA9J8JC8yJ38
- rd5L8NbennRlOmPVmhHnGkaeXJjMGJUcpQl9dsUQyOcc5tesLc1viwl7MiG6/x+tktl3 Fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dk9k1gs00-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:35:27 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EDVJuC023412;
-        Fri, 14 Jan 2022 13:35:27 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dk9k1grya-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:35:27 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EDWxEf018350;
-        Fri, 14 Jan 2022 13:35:25 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3df28aek7k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:35:25 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EDZLLD44761470
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 13:35:21 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D849252052;
-        Fri, 14 Jan 2022 13:35:21 +0000 (GMT)
-Received: from [9.145.160.142] (unknown [9.145.160.142])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8769B5204F;
-        Fri, 14 Jan 2022 13:35:21 +0000 (GMT)
-Message-ID: <d09a7170-6538-fc52-15f1-42d7fc4e7c9b@linux.ibm.com>
-Date:   Fri, 14 Jan 2022 14:35:21 +0100
+        id S241372AbiANNid (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 08:38:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:42758 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241309AbiANNic (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:38:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642167512;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YhO8ftDsk4+jW9Ti1jjOdqgLJ1dfN2h8UN/qErYWEn4=;
+        b=Ry8hiHlKKBix2amcS81F1JR6UVcJbFT28/t5lOMo665F3WJvsoPA0VhY09fWG5nwC6lcX7
+        q5TQqeJRauNWdDaHozt8Eq2mHIDTFy6xQoyhKQS1tXjGhCwYbQSFcHiyXY8bg1ACvJfdzY
+        iVoYy9yoD99C13n4bm/rq47Ygepmw18=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-577-7xthMk4pNUmEF-Laa_Sp8A-1; Fri, 14 Jan 2022 08:38:30 -0500
+X-MC-Unique: 7xthMk4pNUmEF-Laa_Sp8A-1
+Received: by mail-pj1-f71.google.com with SMTP id a22-20020a17090abe1600b001b39929b5fdso9107531pjs.0
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 05:38:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YhO8ftDsk4+jW9Ti1jjOdqgLJ1dfN2h8UN/qErYWEn4=;
+        b=Or+/9XmezZqkbkzVtP7PKft9Vo5Pl0mgN7G1s2nnEmxPsVYOgA3Yo1Y44I7IODP4vy
+         Khs99hNz6DstW9bWGXwt4eJ1JXDfXKmWimWFbK1eVZ/7QvfnKWejO0d208RR+FNrX497
+         9+D03VnT4JmsbFXZ5HpFTwiyJRpVytJx9efqFrmLYDFc/jcQmx9iTlBBnyhDoxsHnHmw
+         C6TwlxwFz+t1ABTFGyV3twYeZCruAE1G53WjFJFA3X9dvR78fCZFxfqT0F9573pXUrvf
+         S/zpu+L3cVnxkxRS9yx3SWhMPCywM/VRuW0vEk3MrjtDxWJL1NyQaaOHJaMvQOQz1vDW
+         YMNA==
+X-Gm-Message-State: AOAM531TeKb0KgzTYksykLWFZK1rhuE4k3L0r08nEhDK28pR/wFjVwVK
+        JWoe0/ymDx5jZhZ/gaS4FxEVtpCk+nQznouhwZsJhPoCiILZIvIJmcYSeb8z6S/wRRwHpotVM5U
+        Vogkn+BIO8tT9
+X-Received: by 2002:a17:902:a502:b0:149:c5a5:5329 with SMTP id s2-20020a170902a50200b00149c5a55329mr9559619plq.164.1642167509352;
+        Fri, 14 Jan 2022 05:38:29 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxILsnBPX9TsvIa9qO8Uq+U+Jo4SOThql41KRmDC+m0uXyl0MuvIPYYRITKGIUaFyG3qpSUrA==
+X-Received: by 2002:a17:902:a502:b0:149:c5a5:5329 with SMTP id s2-20020a170902a50200b00149c5a55329mr9559603plq.164.1642167509120;
+        Fri, 14 Jan 2022 05:38:29 -0800 (PST)
+Received: from steredhat (host-95-238-125-214.retail.telecomitalia.it. [95.238.125.214])
+        by smtp.gmail.com with ESMTPSA id g7sm5820333pfu.61.2022.01.14.05.38.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 05:38:28 -0800 (PST)
+Date:   Fri, 14 Jan 2022 14:38:16 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, stefanha@redhat.com,
+        kvm@vger.kernel.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v1] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <20220114133816.7niyaqygvdveddmi@steredhat>
+References: <20220114090508.36416-1-sgarzare@redhat.com>
+ <20220114074454-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH 1/5] lib: s390x: vm: Add kvm and lpar vm
- queries
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-References: <20220114100245.8643-1-frankja@linux.ibm.com>
- <20220114100245.8643-2-frankja@linux.ibm.com>
- <b468354deac3f9902f42aa2c46e762ddf208efdd.camel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <b468354deac3f9902f42aa2c46e762ddf208efdd.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: s39YsTJYrk5AFCNLv2guzJg7R3GY_uUj
-X-Proofpoint-GUID: az-V2U9i7XVmuCPkbaJxzv8rJ8NY_Xod
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_05,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 phishscore=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 priorityscore=1501 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140088
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220114074454-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMS8xNC8yMiAxNDoyNywgTmljbyBCb2VociB3cm90ZToNCj4gT24gRnJpLCAyMDIyLTAx
-LTE0IGF0IDEwOjAyICswMDAwLCBKYW5vc2NoIEZyYW5rIHdyb3RlOg0KPj4gVGhpcyBwYXRj
-aCB3aWxsIGxpa2VseSAoaW4gcGFydHMpIGJlIHJlcGxhY2VkIGJ5IFBpZXJyZSdzIHBhdGNo
-IGZyb20NCj4+IGhpcyB0b3BvbG9neSB0ZXN0IHNlcmllcy4NCj4+DQo+PiBTaWduZWQtb2Zm
-LWJ5OiBKYW5vc2NoIEZyYW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+DQo+PiAtLS0NCj4+
-ICDCoGxpYi9zMzkweC92bS5jIHwgMzkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrDQo+PiAgwqBsaWIvczM5MHgvdm0uaCB8IDIzICsrKysrKysrKysrKysrKysr
-KysrKysrDQo+PiAgwqBzMzkweC9zdHNpLmPCoMKgIHwgMjEgKy0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQo+PiAgwqAzIGZpbGVzIGNoYW5nZWQsIDYzIGluc2VydGlvbnMoKyksIDIwIGRlbGV0
-aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9saWIvczM5MHgvdm0uYyBiL2xpYi9zMzkw
-eC92bS5jDQo+PiBpbmRleCBhNWI5Mjg2My4uMjY2YTgxYzEgMTAwNjQ0DQo+PiAtLS0gYS9s
-aWIvczM5MHgvdm0uYw0KPj4gKysrIGIvbGliL3MzOTB4L3ZtLmMNCj4+IEBAIC0yNiw2ICsy
-NiwxMSBAQCBib29sIHZtX2lzX3RjZyh2b2lkKQ0KPj4gIMKgwqDCoMKgwqDCoMKgwqBpZiAo
-aW5pdGlhbGl6ZWQpDQo+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1
-cm4gaXNfdGNnOw0KPj4gICANCj4+ICvCoMKgwqDCoMKgwqDCoGlmIChzdHNpX2dldF9mYygp
-IDwgMykgew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGluaXRpYWxpemVk
-ID0gdHJ1ZTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gZmFs
-c2U7DQo+IA0KPiBNaW5vciBuaXQ6IEJ5IHNldHRpbmcgaW5pdGlhbGl6ZWQgdG8gdHJ1ZSwg
-eW91IHJlbHkgb24gdGhlIHByZXZpb3VzDQo+IGluaXRpYWxpemF0aW9uIG9mIGlzX3RjZyB0
-byBmYWxzZSBmb3Igc3Vic2VxdWVudCBjYWxscy4NCj4gDQo+IFlvdSBjb3VsZCBtYWtlIHRo
-aXMgbW9yZSBvYnZpb3VzIGJ5IHNheWluZzoNCj4gDQo+IHJldHVybiBpc190Y2c7DQo+IA0K
-DQpIYXZlIGEgbG9vayBhdCBQaWVycmUncyBwYXRjaCB3aGljaCBJIHdpbGwgYmUgcmVseWlu
-ZyBvbiB3aGVuIGl0J3MgZG9uZS4gDQpBcyBJIHNhaWQgaW4gdGhlIGNvbW1pdCBtZXNzYWdl
-LCB0aGlzIGlzIG9ubHkgYSBwbGFjZWhvbGRlciBmb3IgaGlzIHBhdGNoLg0K
+On Fri, Jan 14, 2022 at 07:45:35AM -0500, Michael S. Tsirkin wrote:
+>On Fri, Jan 14, 2022 at 10:05:08AM +0100, Stefano Garzarella wrote:
+>> In vhost_enable_notify() we enable the notifications and we read
+>> the avail index to check if new buffers have become available in
+>> the meantime.
+>>
+>> We are not caching the avail index, so when the device will call
+>> vhost_get_vq_desc(), it will find the old value in the cache and
+>> it will read the avail index again.
+>>
+>> It would be better to refresh the cache every time we read avail
+>> index, so let's change vhost_enable_notify() caching the value in
+>> `avail_idx` and compare it with `last_avail_idx` to check if there
+>> are new buffers available.
+>>
+>> Anyway, we don't expect a significant performance boost because
+>> the above path is not very common, indeed vhost_enable_notify()
+>> is often called with unlikely(), expecting that avail index has
+>> not been updated.
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>
+>... and can in theory even hurt due to an extra memory write.
+>So ... performance test restults pls?
+
+Right, could be.
+
+I'll run some perf test with vsock, about net, do you have a test suite 
+or common step to follow to test it?
+
+Thanks,
+Stefano
+
