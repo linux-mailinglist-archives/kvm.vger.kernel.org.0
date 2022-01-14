@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0082F48E96A
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 12:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D28B48E99C
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:05:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240882AbiANLsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 06:48:18 -0500
-Received: from foss.arm.com ([217.140.110.172]:60442 "EHLO foss.arm.com"
+        id S240933AbiANMFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 07:05:46 -0500
+Received: from foss.arm.com ([217.140.110.172]:60646 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234679AbiANLsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 06:48:17 -0500
+        id S234308AbiANMFo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 07:05:44 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A95BDED1;
-        Fri, 14 Jan 2022 03:48:16 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 297D3ED1;
+        Fri, 14 Jan 2022 04:05:44 -0800 (PST)
 Received: from FVFF77S0Q05N (unknown [10.57.2.91])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BFF7F3F5A1;
-        Fri, 14 Jan 2022 03:48:10 -0800 (PST)
-Date:   Fri, 14 Jan 2022 11:48:04 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 921713F774;
+        Fri, 14 Jan 2022 04:05:38 -0800 (PST)
+Date:   Fri, 14 Jan 2022 12:05:35 +0000
 From:   Mark Rutland <mark.rutland@arm.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
@@ -35,67 +35,103 @@ Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
         suzuki.poulose@arm.com, tglx@linutronix.de,
         tsbogend@alpha.franken.de, vkuznets@redhat.com,
         wanpengli@tencent.com, will@kernel.org
-Subject: Re: [PATCH 1/5] kvm: add exit_to_guest_mode() and
- enter_from_guest_mode()
-Message-ID: <YeFi9FTPSyLbQytu@FVFF77S0Q05N>
+Subject: Re: [PATCH 5/5] kvm/x86: rework guest entry logic
+Message-ID: <YeFnD8l/OoMtPYvh@FVFF77S0Q05N>
 References: <20220111153539.2532246-1-mark.rutland@arm.com>
- <20220111153539.2532246-2-mark.rutland@arm.com>
- <YeCMVGqiVfTKESzy@google.com>
+ <20220111153539.2532246-6-mark.rutland@arm.com>
+ <YeCQeHbswboaosoV@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YeCMVGqiVfTKESzy@google.com>
+In-Reply-To: <YeCQeHbswboaosoV@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 08:32:20PM +0000, Sean Christopherson wrote:
+On Thu, Jan 13, 2022 at 08:50:00PM +0000, Sean Christopherson wrote:
 > On Tue, Jan 11, 2022, Mark Rutland wrote:
-> > Atop this, new exit_to_guest_mode() and enter_from_guest_mode() helpers
-> > are added to handle the ordering of lockdep, tracing, and RCU manageent.
-> > These are named to align with exit_to_user_mode() and
-> > enter_from_user_mode().
+> > For consistency and clarity, migrate x86 over to the generic helpers for
+> > guest timing and lockdep/RCU/tracing management, and remove the
+> > x86-specific helpers.
 > > 
-> > Subsequent patches will migrate architectures over to the new helpers,
-> > following a sequence:
+> > Prior to this patch, the guest timing was entered in
+> > kvm_guest_enter_irqoff() (called by svm_vcpu_enter_exit() and
+> > svm_vcpu_enter_exit()), and was exited by the call to
+> > vtime_account_guest_exit() within vcpu_enter_guest().
 > > 
-> > 	guest_timing_enter_irqoff();
-> > 
-> > 	exit_to_guest_mode();
+> > To minimize duplication and to more clearly balance entry and exit, both
+> > entry and exit of guest timing are placed in vcpu_enter_guest(), using
+> > the new guest_timing_{enter,exit}_irqoff() helpers. This may result in a
+> > small amount of additional time being acounted towards guests.
 > 
-> I'm not a fan of this nomenclature.  First and foremost, virtualization refers to
-> transfers to guest mode as VM-Enter, and transfers from guest mode as VM-Exit.
-> It's really, really confusing to read this code from a virtualization perspective.
-> The functions themselves are contradictory as the "enter" helper calls functions
-> with "exit" in their name, and vice versa.
+> This can be further qualified to state that it only affects time accounting when
+> using context tracking; tick-based accounting is unaffected because IRQs are
+> disabled the entire time.
 
-Sure; FWIW I wasn't happy with the naming either, but I couldn't find anything
-that was entirely clear, because it depends on whether you consider this an
-entry..exit of guest context or an exit..entry of regular kernel context. I
-went with exit_to_guest_mode() and enter_from_guest_mode() because that clearly
-corresponded to exit_to_user_mode() and enter_from_user_mode(), and the
-convention in the common entry code is to talk in terms of the regular kernel
-context.
+Ok. I'll replace that last sentence with:
 
-While I was working on this, I had guest_context_enter_irqoff() for
-kernel->guest and guest_context_exit_irqoff() for guest->kernel, which also
-matched the style of guest_timing_{enter,exit}_irqoff().
+  When context tracking is used a small amount of additional time will be
+  accounted towards guests; tick-based accounting is unnaffected as IRQs are
+  disabled at this point and not enabled until after the return from the guest.
 
-I'm happy to change to that, if that works for you?
-
-> We settled on xfer_to_guest_mode_work() for a similar conundrum in the past, though
-> I don't love using xfer_to/from_guest_mode() as that makes it sound like those
-> helpers handle the actual transition into guest mode, i.e. runs the vCPU.
 > 
-> To avoid too much bikeshedding, what about reusing the names we all compromised
-> on when we did this for x86 and call them kvm_guest_enter/exit_irqoff()?  If x86
-> is converted in the first patch then we could even avoid temporary #ifdefs.
+> And this might actually be a (benign?) bug fix for context tracking accounting in
+> the EXIT_FASTPATH_REENTER_GUEST case (commits ae95f566b3d2 "KVM: X86: TSCDEADLINE
+> MSR emulation fastpath" and 26efe2fd92e5, "KVM: VMX: Handle preemption timer
+> fastpath").  In those cases, KVM will enter the guest multiple times without
+> bouncing through vtime_account_guest_exit().  That means vtime_guest_enter() will
+> be called when the CPU is already "in guest", and call vtime_account_system()
+> when it really should call vtime_account_guest().  account_system_time() does
+> check PF_VCPU and redirect to account_guest_time(), so it appears to be benign,
+> but it's at least odd.
+> 
+> > Other than this, there should be no functional change as a result of
+> > this patch.
 
-I'd like to keep this somewhat orthogonal to the x86 changes (e.g. as other
-architectures will need backports to stable at least for the RCU bug fix), so
-I'd rather use a name that isn't immediately coupled with x86 changes.
+I've added wording:
 
-Does the guest_context_{enter,exit}_irqoff() naming above work for you?
+  This also corrects (benign) mis-balanced context tracking accounting
+  introduced in commits:
+  
+    ae95f566b3d22ade ("KVM: X86: TSCDEADLINE MSR emulation fastpath")
+    26efe2fd92e50822 ("KVM: VMX: Handle preemption timer fastpath")
+  
+  Where KVM can enter a guest multiple times, calling vtime_guest_enter()
+  without a corresponding call to vtime_account_guest_exit(), and with
+  vtime_account_system() called when vtime_account_guest() should be used.
+  As account_system_time() checks PF_VCPU and calls account_guest_time(),
+  this doesn't result in any functional problem, but is unnecessarily
+  confusing.
+
+... and deleted the "no functional change" line for now.
+
+I assume that other than the naming of the entry/exit functions you're happy
+with this patch?
 
 Thanks,
 Mark.
+
+> ...
+> 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index e50e97ac4408..bd3873b90889 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -9876,6 +9876,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >  		set_debugreg(0, 7);
+> >  	}
+> >  
+> > +	guest_timing_enter_irqoff();
+> > +
+> >  	for (;;) {
+> >  		/*
+> >  		 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
+> > @@ -9949,7 +9951,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >  	 * of accounting via context tracking, but the loss of accuracy is
+> >  	 * acceptable for all known use cases.
+> >  	 */
+> > -	vtime_account_guest_exit();
+> > +	guest_timing_exit_irqoff();
+> >  
+> >  	if (lapic_in_kernel(vcpu)) {
+> >  		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
