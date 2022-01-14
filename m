@@ -2,125 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 565DB48E910
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 12:20:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0670A48E91B
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 12:22:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231167AbiANLUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 06:20:06 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6770 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240590AbiANLUG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 06:20:06 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20EApt5l028949;
-        Fri, 14 Jan 2022 11:20:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=sSPh1bH7U02kwfSfRZv21G0YvuyyltfH7kZbukUFzxM=;
- b=otB9E3ussorDVIMknyJ5PhB0oFDz+MKfL7A1bjKS719RCAyXH8si+cFeKwQ4cEsJXmFY
- 3C6ksBd/M91K8SFjiqC8riZlkUAEDiNCxFxby+hgzyqgsgJcovEhYSW8W6lvprosC3QM
- 4shL1fc1DPhmxXRlD+OsHLvBpg9oqw5qUcp7q+Uq/mhcRbnm+JDXGDmGHKfNKm3MUkME
- EYcL3JsWIrdGygDn4+/W7XwQxbaOYoVcyADLp8hKvffAIZse0MDWpP3GPcf/yd5ahlIX
- 0aaV8Snr/39RlJ2KSbfdMcOwu+QPU5SPurURGcqM6O78eYvqXHdvg81H0r2h0CLNN94t Gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk7sy8e8k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 11:20:05 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EBK5GK025861;
-        Fri, 14 Jan 2022 11:20:05 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk7sy8e7k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 11:20:05 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EBD6UL010759;
-        Fri, 14 Jan 2022 11:20:02 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma02fra.de.ibm.com with ESMTP id 3df28atnst-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 11:20:02 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EBJxOc44106030
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 11:19:59 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 576EA4C062;
-        Fri, 14 Jan 2022 11:19:59 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE24F4C050;
-        Fri, 14 Jan 2022 11:19:58 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.8.156])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Jan 2022 11:19:58 +0000 (GMT)
-Date:   Fri, 14 Jan 2022 12:19:48 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 0/5] s390x: Allocation and hosting
- environment detection fixes
-Message-ID: <20220114121948.566e77a6@p-imbrenda>
-In-Reply-To: <20220114100245.8643-1-frankja@linux.ibm.com>
-References: <20220114100245.8643-1-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S233008AbiANLWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 06:22:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49450 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231705AbiANLWm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 06:22:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642159361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iLTg4wwf72c5vthIOvKqfSt1SY2KDa4Mpvj4k6lWWOY=;
+        b=Ro7/qVjrqkChgn4uK96sl/45qXLTH3IkCXnGPooKtjh46JACZKkqHGv9gAwYz3F8ktJoAH
+        y2nRi0Mb0xiWYTJa1O8cmzf0vXvPeY3IZ9SHU4moBPEht6L4G7ySoTKZ9hNtxEHiKtdBw5
+        P3sVt6IAkWVQ+Tvuql3VQC2tQD+4b0A=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-563-V6Od8ojPMRuCmlLGSj4f2A-1; Fri, 14 Jan 2022 06:22:40 -0500
+X-MC-Unique: V6Od8ojPMRuCmlLGSj4f2A-1
+Received: by mail-ed1-f71.google.com with SMTP id h1-20020aa7cdc1000000b0040042dd2fe4so6826697edw.17
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 03:22:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=iLTg4wwf72c5vthIOvKqfSt1SY2KDa4Mpvj4k6lWWOY=;
+        b=yomFeyGAJcmGjwxBc1c3owit6Mz5B4z0JsiQ6mL/1DAVTJbzQxNXx/fvWkdZ53MVVE
+         oStlyoeXI/vebh14kl7RGav0phPjFrURztnxGCh+bTCL3TnTTFD+WGMFvt7ONDybO1CO
+         VkK1B/gFIiwbl1nmYVQwYEhKt+Vlj5MyLRwW4YMEskbnZJ3ShfIG1h73mS6AXPmfR3Pk
+         QpwtRIukBAfWrSEWZjgGwHJNiHZ+BVmS/kZwjlEn7520VAtsa2/OAcBIY4IyBN1ElwW8
+         HSOARd3w5tTOVZg9pmYdov+PoW7J/7KFQCixPgbupuaKLq7+xJJp+Sgzak0+GfKImhNR
+         /stA==
+X-Gm-Message-State: AOAM531Z1/4h0vfwTgoNACDXvA3cEMyJ2AB/1q1o8/J+0mPPIq2TpjAZ
+        iD/L6uDsT3t/xr/cHUNORTx7gDVz6kh9RzT/S7HA4lf20nhLuuFrzKp7y6hrYxYsfNDYxLR9A5S
+        Amb44jJNv8jOl
+X-Received: by 2002:a17:906:1f51:: with SMTP id d17mr6899085ejk.759.1642159358840;
+        Fri, 14 Jan 2022 03:22:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxsMqgdRzO68qhSabKf+XHaTzty5JGMJ6wQ+em+6w7fAZnYL54Sg4c0WDYyOb2SwQQYgsuOww==
+X-Received: by 2002:a17:906:1f51:: with SMTP id d17mr6899069ejk.759.1642159358643;
+        Fri, 14 Jan 2022 03:22:38 -0800 (PST)
+Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id 4sm1723923ejc.168.2022.01.14.03.22.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 03:22:38 -0800 (PST)
+Date:   Fri, 14 Jan 2022 12:22:37 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Message-ID: <20220114122237.54fa8c91@redhat.com>
+In-Reply-To: <87ilummznd.fsf@redhat.com>
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+        <20211122175818.608220-3-vkuznets@redhat.com>
+        <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+        <20211227183253.45a03ca2@redhat.com>
+        <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
+        <87mtkdqm7m.fsf@redhat.com>
+        <20220103104057.4dcf7948@redhat.com>
+        <YeCowpPBEHC6GJ59@google.com>
+        <20220114095535.0f498707@redhat.com>
+        <87ilummznd.fsf@redhat.com>
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SehHybn4ciOFmbB_SY7PBLrZcloKa9mQ
-X-Proofpoint-ORIG-GUID: JicfF3B1Hw5KkB59_1iOmraiYl21AhWR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_04,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- mlxscore=0 priorityscore=1501 phishscore=0 suspectscore=0 malwarescore=0
- clxscore=1015 adultscore=0 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140074
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 14 Jan 2022 10:02:40 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, 14 Jan 2022 10:31:50 +0100
+Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 
-> I took some time before Christmas to write a test runner for lpar
-> which automatically runs all tests and sends me the logs. It's based
-> on the zhmc library to control starting and stopping of the lpar and
-> works by having a menu entry for each kvm unit test.
+> Igor Mammedov <imammedo@redhat.com> writes:
 > 
-> This revealed a number of test fails when the tests are run under lpar
-> as there are a few differences:
->    * lpars most often have a very high memory amount (upwards of 8GB)
->      compared to our qemu env (256MB)
->    * lpar supports diag308 subcode 2
->    * lpar does not provide virtio devices
+> > On Thu, 13 Jan 2022 22:33:38 +0000
+> > Sean Christopherson <seanjc@google.com> wrote:
+> >  
+> >> On Mon, Jan 03, 2022, Igor Mammedov wrote:  
+> >> > On Mon, 03 Jan 2022 09:04:29 +0100
+> >> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >> >     
+> >> > > Paolo Bonzini <pbonzini@redhat.com> writes:
+> >> > >     
+> >> > > > On 12/27/21 18:32, Igor Mammedov wrote:      
+> >> > > >>> Tweaked and queued nevertheless, thanks.      
+> >> > > >> it seems this patch breaks VCPU hotplug, in scenario:
+> >> > > >> 
+> >> > > >>    1. hotunplug existing VCPU (QEMU stores VCPU file descriptor in parked cpus list)
+> >> > > >>    2. hotplug it again (unsuspecting QEMU reuses stored file descriptor when recreating VCPU)
+> >> > > >> 
+> >> > > >> RHBZ:https://bugzilla.redhat.com/show_bug.cgi?id=2028337#c11
+> >> > > >>       
+> >> > > >
+> >> > > > The fix here would be (in QEMU) to not call KVM_SET_CPUID2 again. 
+> >> > > > However, we need to work around it in KVM, and allow KVM_SET_CPUID2 if 
+> >> > > > the data passed to the ioctl is the same that was set before.      
+> >> > > 
+> >> > > Are we sure the data is going to be *exactly* the same? In particular,
+> >> > > when using vCPU fds from the parked list, do we keep the same
+> >> > > APIC/x2APIC id when hotplugging? Or can we actually hotplug with a
+> >> > > different id?    
+> >> > 
+> >> > If I recall it right, it can be a different ID easily.    
+> >> 
+> >> No, it cannot.  KVM doesn't provide a way for userspace to change the APIC ID of
+> >> a vCPU after the vCPU is created.  x2APIC flat out disallows changing the APIC ID,
+> >> and unless there's magic I'm missing, apic_mmio_write() => kvm_lapic_reg_write()
+> >> is not reachable from userspace.
+> >> 
+> >> The only way for userspace to set the APIC ID is to change vcpu->vcpu_id, and that
+> >> can only be done at KVM_VCPU_CREATE.
+> >> 
+> >> So, reusing a parked vCPU for hotplug must reuse the same APIC ID.  QEMU handles
+> >> this by stashing the vcpu_id, a.k.a. APIC ID, when parking a vCPU, and reuses a
+> >> parked vCPU if and only if it has the same APIC ID.  And because QEMU derives the
+> >> APIC ID from topology, that means all the topology CPUID leafs must remain the
+> >> same, otherwise the guest is hosed because it will send IPIs to the wrong vCPUs.  
+> >
+> > Indeed, I was wrong.
+> > I just checked all cpu unplug history in qemu. It was introduced in qemu-2.7
+> > and from the very beginning it did stash vcpu_id,
+> > so there is no old QEMU that would re-plug VCPU with different apic_id.
+> > Though tells us nothing about what other userspace implementations might do.
+> >  
 > 
-> The higher memory amount leads to allocations crossing the 2GB or 4GB
-> border which made sclp and sigp calls fail that expect 31/32 bit
-> addresses.
+> The genie is out of the bottle already, 5.16 is released with the change
+> (which was promissed for some time, KVM was complaining with
+> pr_warn_ratelimited()). I'd be brave and say that if QEMU doesn't need
+> it then nobody else does (out of curiosity, are there KVM VMMs besides
+> QEMU which support CPU hotplug out there?).
 > 
-
-the series looks good to me; if you send me a fixed patch 3, I'll queue
-this together with the other ones
-
-> Janosch Frank (5):
->   lib: s390x: vm: Add kvm and lpar vm queries
->   s390x: css: Skip if we're not run by qemu
->   s390x: diag308: Only test subcode 2 under QEMU
->   s390x: smp: Allocate memory in DMA31 space
->   s390x: firq: Fix sclp buffer allocation
+> > However, a problem of failing KVM_SET_CPUID2 during VCPU re-plug
+> > is still there and re-plug will fail if KVM rejects repeated KVM_SET_CPUID2
+> > even if ioctl called with exactly the same CPUID leafs as the 1st call.
+> >  
 > 
->  lib/s390x/vm.c  | 39 +++++++++++++++++++++++++++++++++++++++
->  lib/s390x/vm.h  | 23 +++++++++++++++++++++++
->  s390x/css.c     | 10 +++++++++-
->  s390x/diag308.c | 15 ++++++++++++++-
->  s390x/firq.c    |  2 +-
->  s390x/smp.c     |  4 ++--
->  s390x/stsi.c    | 21 +--------------------
->  7 files changed, 89 insertions(+), 25 deletions(-)
-> 
+> Assuming APIC id change doesn not need to be supported, I can send v2
+> here with an empty allowlist.
+As you mentioned in another thread black list would be better
+to address Sean's concerns or just revert problematic commit.
 
