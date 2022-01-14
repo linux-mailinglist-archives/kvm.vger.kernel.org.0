@@ -2,174 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9358248E9C1
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A23E48E9C7
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:23:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235042AbiANMTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 07:19:41 -0500
-Received: from foss.arm.com ([217.140.110.172]:60816 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231846AbiANMTk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 07:19:40 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FD4DED1;
-        Fri, 14 Jan 2022 04:19:40 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.2.91])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 177C43F774;
-        Fri, 14 Jan 2022 04:19:33 -0800 (PST)
-Date:   Fri, 14 Jan 2022 12:19:30 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
-        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
-        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
-        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
-        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
-        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
-        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
-        pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com,
-        tglx@linutronix.de, tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
-Message-ID: <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
-References: <20220111153539.2532246-1-mark.rutland@arm.com>
- <127a6117-85fb-7477-983c-daf09e91349d@linux.ibm.com>
+        id S240922AbiANMXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 07:23:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22144 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234801AbiANMXn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 07:23:43 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20EBRkNT007862;
+        Fri, 14 Jan 2022 12:23:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kPO0ZZLv9ivsTnj//vR7qj5rPah80ZaXvKtVs6X9YVY=;
+ b=si9wrkCfYul/q1rQUwKXOwmF3Rw7v3Up6BXKcM+r5zImtUf5KrKocrCozhy+Y/RwtWBE
+ jAcJfiInv9kKlVWNbU9u+li26larNQ1PU2nHafKgNmwr2IY1BaOaWmQx4DFEZ15hHVGe
+ kJN2P76ucPL53tqSwfBT877Fn4mxCRhWHbJnNirq4jRK53mEPSA/KheCNsQrINDz2A2L
+ 7PUVGwxlHWFXMOikCgm3a4hNEy2lhnLpFcAieLfiHbpwRAyHyFZcu3khVYSc6Fx4iMI5
+ FydlSEBUWrbOQAr5AsT37JO4DrtQKlc630igFFiDMYNIIAzacx1dgB9/XlUaio+j/oVV QQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk8at0x7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 12:23:43 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ECJffR031171;
+        Fri, 14 Jan 2022 12:23:42 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk8at0x70-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 12:23:42 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ECCqk5009534;
+        Fri, 14 Jan 2022 12:23:40 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3df1vjx80m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 12:23:40 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ECETjQ36176330
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Jan 2022 12:14:29 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3AB2252063;
+        Fri, 14 Jan 2022 12:23:37 +0000 (GMT)
+Received: from [9.145.160.142] (unknown [9.145.160.142])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DA2A35204E;
+        Fri, 14 Jan 2022 12:23:36 +0000 (GMT)
+Message-ID: <f7c76f9a-c138-5dc1-2189-f0177fb19709@linux.ibm.com>
+Date:   Fri, 14 Jan 2022 13:23:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <127a6117-85fb-7477-983c-daf09e91349d@linux.ibm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH 0/5] s390x: Allocation and hosting
+ environment detection fixes
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, cohuck@redhat.com, nrb@linux.ibm.com
+References: <20220114100245.8643-1-frankja@linux.ibm.com>
+ <20220114121948.566e77a6@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220114121948.566e77a6@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5NigK6fB7aWfNmyun-KBW_CUbs-dz22g
+X-Proofpoint-ORIG-GUID: 1S0zIlyJopSyLOMd0vG_K3gBWBzL9esX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-14_04,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 mlxscore=0 adultscore=0 malwarescore=0 clxscore=1015
+ bulkscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201140081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 04:20:07PM +0100, Christian Borntraeger wrote:
+On 1/14/22 12:19, Claudio Imbrenda wrote:
+> On Fri, 14 Jan 2022 10:02:40 +0000
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
+>> I took some time before Christmas to write a test runner for lpar
+>> which automatically runs all tests and sends me the logs. It's based
+>> on the zhmc library to control starting and stopping of the lpar and
+>> works by having a menu entry for each kvm unit test.
+>>
+>> This revealed a number of test fails when the tests are run under lpar
+>> as there are a few differences:
+>>     * lpars most often have a very high memory amount (upwards of 8GB)
+>>       compared to our qemu env (256MB)
+>>     * lpar supports diag308 subcode 2
+>>     * lpar does not provide virtio devices
+>>
+>> The higher memory amount leads to allocations crossing the 2GB or 4GB
+>> border which made sclp and sigp calls fail that expect 31/32 bit
+>> addresses.
+>>
 > 
-> Am 11.01.22 um 16:35 schrieb Mark Rutland:
-> > Several architectures have latent bugs around guest entry/exit, most
-> > notably:
-> > 
-> > 1) Several architectures enable interrupts between guest_enter() and
-> >     guest_exit(). As this period is an RCU extended quiescent state (EQS) this
-> >     is unsound unless the irq entry code explicitly wakes RCU, which most
-> >     architectures only do for entry from usersapce or idle.
-> > 
-> >     I believe this affects: arm64, riscv, s390
-> > 
-> >     I am not sure about powerpc.
-> > 
-> > 2) Several architectures permit instrumentation of code between
-> >     guest_enter() and guest_exit(), e.g. KASAN, KCOV, KCSAN, etc. As
-> >     instrumentation may directly o indirectly use RCU, this has the same
-> >     problems as with interrupts.
-> > 
-> >     I believe this affects: arm64, mips, powerpc, riscv, s390
-> > 
-> > 3) Several architectures do not inform lockdep and tracing that
-> >     interrupts are enabled during the execution of the guest, or do so in
-> >     an incorrect order. Generally
-> >     this means that logs will report IRQs being masked for much longer
-> >     than is actually the case, which is not ideal for debugging. I don't
-> >     know whether this affects the correctness of lockdep.
-> > 
-> >     I believe this affects: arm64, mips, powerpc, riscv, s390
-> > 
-> > This was previously fixed for x86 specifically in a series of commits:
-> > 
-> >    87fa7f3e98a1310e ("x86/kvm: Move context tracking where it belongs")
-> >    0642391e2139a2c1 ("x86/kvm/vmx: Add hardirq tracing to guest enter/exit")
-> >    9fc975e9efd03e57 ("x86/kvm/svm: Add hardirq tracing on guest enter/exit")
-> >    3ebccdf373c21d86 ("x86/kvm/vmx: Move guest enter/exit into .noinstr.text")
-> >    135961e0a7d555fc ("x86/kvm/svm: Move guest enter/exit into .noinstr.text")
-> >    160457140187c5fb ("KVM: x86: Defer vtime accounting 'til after IRQ handling")
-> >    bc908e091b326467 ("KVM: x86: Consolidate guest enter/exit logic to common helpers")
-> > 
-> > But other architectures were left broken, and the infrastructure for
-> > handling this correctly is x86-specific.
-> > 
-> > This series introduces generic helper functions which can be used to
-> > handle the problems above, and migrates architectures over to these,
-> > fixing the latent issues.
-> > 
-> > I wasn't able to figure my way around powerpc and s390, so I have not
+> the series looks good to me; if you send me a fixed patch 3, I'll queue
+> this together with the other ones
+
+Well, since Pierre originally came up with a large part of the code for 
+patch 1 I'll wait with a new version until we picked his fixed patch so 
+I can rebase on it.
+
+But you can already pick the allocation patches if you want.
+
 > 
-> I think 2 later patches have moved the guest_enter/exit a bit out.
-> Does this make the s390 code clearer?
+>> Janosch Frank (5):
+>>    lib: s390x: vm: Add kvm and lpar vm queries
+>>    s390x: css: Skip if we're not run by qemu
+>>    s390x: diag308: Only test subcode 2 under QEMU
+>>    s390x: smp: Allocate memory in DMA31 space
+>>    s390x: firq: Fix sclp buffer allocation
+>>
+>>   lib/s390x/vm.c  | 39 +++++++++++++++++++++++++++++++++++++++
+>>   lib/s390x/vm.h  | 23 +++++++++++++++++++++++
+>>   s390x/css.c     | 10 +++++++++-
+>>   s390x/diag308.c | 15 ++++++++++++++-
+>>   s390x/firq.c    |  2 +-
+>>   s390x/smp.c     |  4 ++--
+>>   s390x/stsi.c    | 21 +--------------------
+>>   7 files changed, 89 insertions(+), 25 deletions(-)
+>>
+> 
 
-Yes; that's much simpler to follow!
-
-One major thing I wasn't sure about for s390 is the sequence:
-
-	guest_enter_irqoff();	// Enters an RCU EQS
-	...
-	local_irq_enable();
-	...
-	sie64a(...);
-	...
-	local_irq_disable();
-	...
-	guest_exit_irqoff();	// Exits an RCU EQS
-
-... since if an IRQ is taken between local_irq_{enable,disable}(), RCU won't be
-watching, and I couldn't spot whether your regular IRQ entry logic would wake
-RCU in this case, or whether there was something else I'm missing that saves
-you here.
-
-For other architectures, including x86 and arm64, we enter the guest with IRQs
-masked and return from the guest with IRQs masked, and don't actually take IRQs
-until we unmask them in the host, after the guest_exit_*() logic has woken RCU
-and so on.
-
-I wasn't able to find documentation on the semantics of SIE, so I couldn't spot
-whether the local_irq_{enable,disable}() calls were necessary, or could be
-removed.
-
-Thanks,
-Mark.
-
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 577f1ead6a51..5859207c2cc0 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4145,10 +4145,6 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->                  * As PF_VCPU will be used in fault handler, between
->                  * guest_enter and guest_exit should be no uaccess.
->                  */
-> -               local_irq_disable();
-> -               guest_enter_irqoff();
-> -               __disable_cpu_timer_accounting(vcpu);
-> -               local_irq_enable();
->                 if (kvm_s390_pv_cpu_is_protected(vcpu)) {
->                         memcpy(sie_page->pv_grregs,
->                                vcpu->run->s.regs.gprs,
-> @@ -4156,8 +4152,16 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->                 }
->                 if (test_cpu_flag(CIF_FPU))
->                         load_fpu_regs();
-> +               local_irq_disable();
-> +               __disable_cpu_timer_accounting(vcpu);
-> +               guest_enter_irqoff();
-> +               local_irq_enable();
->                 exit_reason = sie64a(vcpu->arch.sie_block,
->                                      vcpu->run->s.regs.gprs);
-> +               local_irq_disable();
-> +               guest_exit_irqoff();
-> +               __enable_cpu_timer_accounting(vcpu);
-> +               local_irq_enable();
->                 if (kvm_s390_pv_cpu_is_protected(vcpu)) {
->                         memcpy(vcpu->run->s.regs.gprs,
->                                sie_page->pv_grregs,
-> @@ -4173,10 +4177,6 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->                                 vcpu->arch.sie_block->gpsw.mask &= ~PSW_INT_MASK;
->                         }
->                 }
-> -               local_irq_disable();
-> -               __enable_cpu_timer_accounting(vcpu);
-> -               guest_exit_irqoff();
-> -               local_irq_enable();
->                 vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
->                 rc = vcpu_post_run(vcpu, exit_reason);
