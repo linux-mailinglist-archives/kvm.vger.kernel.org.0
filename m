@@ -2,153 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0670A48E91B
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 12:22:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D043B48E93B
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 12:34:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbiANLWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 06:22:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49450 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231705AbiANLWm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 06:22:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642159361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iLTg4wwf72c5vthIOvKqfSt1SY2KDa4Mpvj4k6lWWOY=;
-        b=Ro7/qVjrqkChgn4uK96sl/45qXLTH3IkCXnGPooKtjh46JACZKkqHGv9gAwYz3F8ktJoAH
-        y2nRi0Mb0xiWYTJa1O8cmzf0vXvPeY3IZ9SHU4moBPEht6L4G7ySoTKZ9hNtxEHiKtdBw5
-        P3sVt6IAkWVQ+Tvuql3VQC2tQD+4b0A=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-V6Od8ojPMRuCmlLGSj4f2A-1; Fri, 14 Jan 2022 06:22:40 -0500
-X-MC-Unique: V6Od8ojPMRuCmlLGSj4f2A-1
-Received: by mail-ed1-f71.google.com with SMTP id h1-20020aa7cdc1000000b0040042dd2fe4so6826697edw.17
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 03:22:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=iLTg4wwf72c5vthIOvKqfSt1SY2KDa4Mpvj4k6lWWOY=;
-        b=yomFeyGAJcmGjwxBc1c3owit6Mz5B4z0JsiQ6mL/1DAVTJbzQxNXx/fvWkdZ53MVVE
-         oStlyoeXI/vebh14kl7RGav0phPjFrURztnxGCh+bTCL3TnTTFD+WGMFvt7ONDybO1CO
-         VkK1B/gFIiwbl1nmYVQwYEhKt+Vlj5MyLRwW4YMEskbnZJ3ShfIG1h73mS6AXPmfR3Pk
-         QpwtRIukBAfWrSEWZjgGwHJNiHZ+BVmS/kZwjlEn7520VAtsa2/OAcBIY4IyBN1ElwW8
-         HSOARd3w5tTOVZg9pmYdov+PoW7J/7KFQCixPgbupuaKLq7+xJJp+Sgzak0+GfKImhNR
-         /stA==
-X-Gm-Message-State: AOAM531Z1/4h0vfwTgoNACDXvA3cEMyJ2AB/1q1o8/J+0mPPIq2TpjAZ
-        iD/L6uDsT3t/xr/cHUNORTx7gDVz6kh9RzT/S7HA4lf20nhLuuFrzKp7y6hrYxYsfNDYxLR9A5S
-        Amb44jJNv8jOl
-X-Received: by 2002:a17:906:1f51:: with SMTP id d17mr6899085ejk.759.1642159358840;
-        Fri, 14 Jan 2022 03:22:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxsMqgdRzO68qhSabKf+XHaTzty5JGMJ6wQ+em+6w7fAZnYL54Sg4c0WDYyOb2SwQQYgsuOww==
-X-Received: by 2002:a17:906:1f51:: with SMTP id d17mr6899069ejk.759.1642159358643;
-        Fri, 14 Jan 2022 03:22:38 -0800 (PST)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id 4sm1723923ejc.168.2022.01.14.03.22.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 03:22:38 -0800 (PST)
-Date:   Fri, 14 Jan 2022 12:22:37 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
-Message-ID: <20220114122237.54fa8c91@redhat.com>
-In-Reply-To: <87ilummznd.fsf@redhat.com>
-References: <20211122175818.608220-1-vkuznets@redhat.com>
-        <20211122175818.608220-3-vkuznets@redhat.com>
-        <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
-        <20211227183253.45a03ca2@redhat.com>
-        <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
-        <87mtkdqm7m.fsf@redhat.com>
-        <20220103104057.4dcf7948@redhat.com>
-        <YeCowpPBEHC6GJ59@google.com>
-        <20220114095535.0f498707@redhat.com>
-        <87ilummznd.fsf@redhat.com>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
+        id S240847AbiANLe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 06:34:28 -0500
+Received: from mxout01.lancloud.ru ([45.84.86.81]:56428 "EHLO
+        mxout01.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236513AbiANLe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 06:34:26 -0500
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout01.lancloud.ru 0230320DD201
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Subject: Re: [PATCH] driver core: platform: Rename platform_get_irq_optional()
+ to platform_get_irq_silent()
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+To:     Mark Brown <broonie@kernel.org>,
+        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
+CC:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        <linux-iio@vger.kernel.org>,
+        "Linus Walleij" <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        "ALSA Development Mailing List" <alsa-devel@alsa-project.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        <linux-phy@lists.infradead.org>, Jiri Slaby <jirislaby@kernel.org>,
+        <openipmi-developer@lists.sourceforge.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        "Bartosz Golaszewski" <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        "Borislav Petkov" <bp@alien8.de>,
+        Sebastian Reichel <sre@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        <platform-driver-x86@vger.kernel.org>,
+        Benson Leung <bleung@chromium.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        <linux-edac@vger.kernel.org>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        "Eric Auger" <eric.auger@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Linux MMC List" <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
+        <linux-mediatek@lists.infradead.org>,
+        "Brian Norris" <computersforpeace@gmail.com>,
+        <netdev@vger.kernel.org>
+References: <20220110201014.mtajyrfcfznfhyqm@pengutronix.de>
+ <YdyilpjC6rtz6toJ@lunn.ch>
+ <CAMuHMdWK3RKVXRzMASN4HaYfLckdS7rBvSopafq+iPADtGEUzA@mail.gmail.com>
+ <20220112085009.dbasceh3obfok5dc@pengutronix.de>
+ <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+ <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
+ <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
+ <YeA7CjOyJFkpuhz/@sirena.org.uk>
+ <20220113194358.xnnbhsoyetihterb@pengutronix.de>
+ <YeCI47ltlWzjzjYy@sirena.org.uk>
+ <1df04d74-8aa2-11f1-54e9-34d0e8f4e58b@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <fba81d0d-c7e3-394d-5929-1706ac9ef5b7@omp.ru>
+Date:   Fri, 14 Jan 2022 14:34:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1df04d74-8aa2-11f1-54e9-34d0e8f4e58b@omp.ru>
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
+ LFEX1907.lancloud.ru (fd00:f066::207)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 14 Jan 2022 10:31:50 +0100
-Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On 1/13/22 11:57 PM, Sergey Shtylyov wrote:
 
-> Igor Mammedov <imammedo@redhat.com> writes:
+>>> The subsystems regulator, clk and gpio have the concept of a dummy
+>>> resource. For regulator, clk and gpio there is a semantic difference
+>>> between the regular _get() function and the _get_optional() variant.
+>>> (One might return the dummy resource, the other won't. Unfortunately
+>>> which one implements which isn't the same for these three.) The
+>>> difference between platform_get_irq() and platform_get_irq_optional() is
+>>> only that the former might emit an error message and the later won't.
 > 
-> > On Thu, 13 Jan 2022 22:33:38 +0000
-> > Sean Christopherson <seanjc@google.com> wrote:
-> >  
-> >> On Mon, Jan 03, 2022, Igor Mammedov wrote:  
-> >> > On Mon, 03 Jan 2022 09:04:29 +0100
-> >> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >> >     
-> >> > > Paolo Bonzini <pbonzini@redhat.com> writes:
-> >> > >     
-> >> > > > On 12/27/21 18:32, Igor Mammedov wrote:      
-> >> > > >>> Tweaked and queued nevertheless, thanks.      
-> >> > > >> it seems this patch breaks VCPU hotplug, in scenario:
-> >> > > >> 
-> >> > > >>    1. hotunplug existing VCPU (QEMU stores VCPU file descriptor in parked cpus list)
-> >> > > >>    2. hotplug it again (unsuspecting QEMU reuses stored file descriptor when recreating VCPU)
-> >> > > >> 
-> >> > > >> RHBZ:https://bugzilla.redhat.com/show_bug.cgi?id=2028337#c11
-> >> > > >>       
-> >> > > >
-> >> > > > The fix here would be (in QEMU) to not call KVM_SET_CPUID2 again. 
-> >> > > > However, we need to work around it in KVM, and allow KVM_SET_CPUID2 if 
-> >> > > > the data passed to the ioctl is the same that was set before.      
-> >> > > 
-> >> > > Are we sure the data is going to be *exactly* the same? In particular,
-> >> > > when using vCPU fds from the parked list, do we keep the same
-> >> > > APIC/x2APIC id when hotplugging? Or can we actually hotplug with a
-> >> > > different id?    
-> >> > 
-> >> > If I recall it right, it can be a different ID easily.    
-> >> 
-> >> No, it cannot.  KVM doesn't provide a way for userspace to change the APIC ID of
-> >> a vCPU after the vCPU is created.  x2APIC flat out disallows changing the APIC ID,
-> >> and unless there's magic I'm missing, apic_mmio_write() => kvm_lapic_reg_write()
-> >> is not reachable from userspace.
-> >> 
-> >> The only way for userspace to set the APIC ID is to change vcpu->vcpu_id, and that
-> >> can only be done at KVM_VCPU_CREATE.
-> >> 
-> >> So, reusing a parked vCPU for hotplug must reuse the same APIC ID.  QEMU handles
-> >> this by stashing the vcpu_id, a.k.a. APIC ID, when parking a vCPU, and reuses a
-> >> parked vCPU if and only if it has the same APIC ID.  And because QEMU derives the
-> >> APIC ID from topology, that means all the topology CPUID leafs must remain the
-> >> same, otherwise the guest is hosed because it will send IPIs to the wrong vCPUs.  
-> >
-> > Indeed, I was wrong.
-> > I just checked all cpu unplug history in qemu. It was introduced in qemu-2.7
-> > and from the very beginning it did stash vcpu_id,
-> > so there is no old QEMU that would re-plug VCPU with different apic_id.
-> > Though tells us nothing about what other userspace implementations might do.
-> >  
-> 
-> The genie is out of the bottle already, 5.16 is released with the change
-> (which was promissed for some time, KVM was complaining with
-> pr_warn_ratelimited()). I'd be brave and say that if QEMU doesn't need
-> it then nobody else does (out of curiosity, are there KVM VMMs besides
-> QEMU which support CPU hotplug out there?).
-> 
-> > However, a problem of failing KVM_SET_CPUID2 during VCPU re-plug
-> > is still there and re-plug will fail if KVM rejects repeated KVM_SET_CPUID2
-> > even if ioctl called with exactly the same CPUID leafs as the 1st call.
-> >  
-> 
-> Assuming APIC id change doesn not need to be supported, I can send v2
-> here with an empty allowlist.
-As you mentioned in another thread black list would be better
-to address Sean's concerns or just revert problematic commit.
+>    This is only a current difference but I'm still going to return 0 ISO
+> -ENXIO from latform_get_irq_optional(), no way I'd leave that -ENXIO there
 
+   platform.
+
+> alone... :-)
+> 
+>> Reviewed-by: Mark Brown <broonie@kernel.org>
+> 
+>    Hm... I'm seeing a tag bit not seeing the patch itself...
+
+   Grr, my mail server tossed it into the spam folder... :-(
+
+MBR, Sergey
