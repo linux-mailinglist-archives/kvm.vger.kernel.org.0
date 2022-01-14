@@ -2,213 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2596348EB19
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:53:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF1CC48EB2E
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 15:04:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236806AbiANNxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 08:53:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8792 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230472AbiANNxN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:53:13 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20EBveur020151;
-        Fri, 14 Jan 2022 13:51:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vP1aoBsPQt/yrozo2sUvU5CVIot6dV2VEGneghSkLFA=;
- b=a2gFV4734kGqUgIHKXadnrCFSKuBjJRY30aUQdGCFiYF8jRsHV+z2mI4wFE/Vmth6kUs
- 8QUMtKN08iYUGQdeGav2yl4jGVMOnN+FjLbFBpgJ6dEmNOs7wsMT4y+PEc1wueG6Atxc
- OXnSBTyBBQbA8HCalgy5VAexQD8ps0se//ZDpVvQbn1K2qLNcATAExxwxxPYpHjsKd1u
- IS1l1Q16lhrtUXAVpb64mZZhXTVa4ROac7uK7SIt27/2EeBnhIyQDnzALcLTG4mxbb6L
- eHN77+UCRvY8NAuo6a9ZGGf68003niLfHTxMzqmoVo9J4NtX4+8u69ZsERMOzAndRSg7 ZA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk8rvj1er-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:51:46 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EDEb57026077;
-        Fri, 14 Jan 2022 13:51:45 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk8rvj1e0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:51:45 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EDkqGP005393;
-        Fri, 14 Jan 2022 13:51:43 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3df1vjxub1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:51:43 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EDpeCG37093796
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 13:51:40 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2808052051;
-        Fri, 14 Jan 2022 13:51:40 +0000 (GMT)
-Received: from [9.171.88.24] (unknown [9.171.88.24])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A47C752050;
-        Fri, 14 Jan 2022 13:51:38 +0000 (GMT)
-Message-ID: <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
-Date:   Fri, 14 Jan 2022 14:51:38 +0100
+        id S241245AbiANOES convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 14 Jan 2022 09:04:18 -0500
+Received: from mail.savoirfairelinux.com ([208.88.110.44]:38390 "EHLO
+        mail.savoirfairelinux.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230472AbiANOES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 09:04:18 -0500
+X-Greylist: delayed 413 seconds by postgrey-1.27 at vger.kernel.org; Fri, 14 Jan 2022 09:04:18 EST
+Received: from localhost (localhost [127.0.0.1])
+        by mail.savoirfairelinux.com (Postfix) with ESMTP id 7A9329C02A6
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 08:57:23 -0500 (EST)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+        by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id JW-rC3P_-Yay; Fri, 14 Jan 2022 08:57:23 -0500 (EST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.savoirfairelinux.com (Postfix) with ESMTP id E98199C02A5;
+        Fri, 14 Jan 2022 08:57:22 -0500 (EST)
+X-Virus-Scanned: amavisd-new at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+        by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id BbXN5zqYlOcF; Fri, 14 Jan 2022 08:57:22 -0500 (EST)
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [192.168.48.237])
+        by mail.savoirfairelinux.com (Postfix) with ESMTP id CBF6A9C023E;
+        Fri, 14 Jan 2022 08:57:22 -0500 (EST)
+Date:   Fri, 14 Jan 2022 08:57:22 -0500 (EST)
+From:   Mathieu =?utf-8?Q?Dupr=C3=A9?= 
+        <mathieu.dupre@savoirfairelinux.com>
+To:     kvm@vger.kernel.org
+Cc:     Eloi Bail <eloi.bail@savoirfairelinux.com>
+Message-ID: <2145240823.143808.1642168642764.JavaMail.zimbra@savoirfairelinux.com>
+Subject: KVM-RT high max latency after upgrade host from 4.19 to 5.15
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
-Content-Language: en-US
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
-        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
-        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
-        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
-        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
-        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
-        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
-        pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com,
-        tglx@linutronix.de, tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-References: <20220111153539.2532246-1-mark.rutland@arm.com>
- <127a6117-85fb-7477-983c-daf09e91349d@linux.ibm.com>
- <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
- <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
- <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: V601sx0TRChMmHg9UgBYp6CkK53iWuCv
-X-Proofpoint-ORIG-GUID: EIy8ZE84WROG9oqjCpjBq0scXVJmJ2Sk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_05,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=584
- priorityscore=1501 clxscore=1015 phishscore=0 spamscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140090
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Mailer: Zimbra 8.8.15_GA_4180 (ZimbraWebClient - FF95 (Linux)/8.8.15_GA_4177)
+Thread-Index: oRJ4hgB0SScxc5sxDJfwhu0LJaK/uA==
+Thread-Topic: KVM-RT high max latency after upgrade host from 4.19 to 5.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello all,
 
+I have a high latency in KVM with Linux 5.15 that I did not have in 4.19.
 
-Am 14.01.22 um 14:32 schrieb Mark Rutland:
-> On Fri, Jan 14, 2022 at 01:29:46PM +0100, Christian Borntraeger wrote:
->>
->>
->> Am 14.01.22 um 13:19 schrieb Mark Rutland:
->>> On Thu, Jan 13, 2022 at 04:20:07PM +0100, Christian Borntraeger wrote:
->>>> Am 11.01.22 um 16:35 schrieb Mark Rutland:
->>>>> Several architectures have latent bugs around guest entry/exit, most
->>>>> notably:
->>>>>
->>>>> 1) Several architectures enable interrupts between guest_enter() and
->>>>>       guest_exit(). As this period is an RCU extended quiescent state (EQS) this
->>>>>       is unsound unless the irq entry code explicitly wakes RCU, which most
->>>>>       architectures only do for entry from usersapce or idle.
->>>>>
->>>>>       I believe this affects: arm64, riscv, s390
->>>>>
->>>>>       I am not sure about powerpc.
->>>>>
->>>>> 2) Several architectures permit instrumentation of code between
->>>>>       guest_enter() and guest_exit(), e.g. KASAN, KCOV, KCSAN, etc. As
->>>>>       instrumentation may directly o indirectly use RCU, this has the same
->>>>>       problems as with interrupts.
->>>>>
->>>>>       I believe this affects: arm64, mips, powerpc, riscv, s390
->>>>>
->>>>> 3) Several architectures do not inform lockdep and tracing that
->>>>>       interrupts are enabled during the execution of the guest, or do so in
->>>>>       an incorrect order. Generally
->>>>>       this means that logs will report IRQs being masked for much longer
->>>>>       than is actually the case, which is not ideal for debugging. I don't
->>>>>       know whether this affects the correctness of lockdep.
->>>>>
->>>>>       I believe this affects: arm64, mips, powerpc, riscv, s390
->>>>>
->>>>> This was previously fixed for x86 specifically in a series of commits:
->>>>>
->>>>>      87fa7f3e98a1310e ("x86/kvm: Move context tracking where it belongs")
->>>>>      0642391e2139a2c1 ("x86/kvm/vmx: Add hardirq tracing to guest enter/exit")
->>>>>      9fc975e9efd03e57 ("x86/kvm/svm: Add hardirq tracing on guest enter/exit")
->>>>>      3ebccdf373c21d86 ("x86/kvm/vmx: Move guest enter/exit into .noinstr.text")
->>>>>      135961e0a7d555fc ("x86/kvm/svm: Move guest enter/exit into .noinstr.text")
->>>>>      160457140187c5fb ("KVM: x86: Defer vtime accounting 'til after IRQ handling")
->>>>>      bc908e091b326467 ("KVM: x86: Consolidate guest enter/exit logic to common helpers")
->>>>>
->>>>> But other architectures were left broken, and the infrastructure for
->>>>> handling this correctly is x86-specific.
->>>>>
->>>>> This series introduces generic helper functions which can be used to
->>>>> handle the problems above, and migrates architectures over to these,
->>>>> fixing the latent issues.
->>>>>
->>>>> I wasn't able to figure my way around powerpc and s390, so I have not
->>>>
->>>> I think 2 later patches have moved the guest_enter/exit a bit out.
->>>> Does this make the s390 code clearer?
->>>
->>> Yes; that's much simpler to follow!
->>>
->>> One major thing I wasn't sure about for s390 is the sequence:
->>>
->>> 	guest_enter_irqoff();	// Enters an RCU EQS
->>> 	...
->>> 	local_irq_enable();
->>> 	...
->>> 	sie64a(...);
->>> 	...
->>> 	local_irq_disable();
->>> 	...
->>> 	guest_exit_irqoff();	// Exits an RCU EQS
->>>
->>> ... since if an IRQ is taken between local_irq_{enable,disable}(), RCU won't be
->>> watching, and I couldn't spot whether your regular IRQ entry logic would wake
->>> RCU in this case, or whether there was something else I'm missing that saves
->>> you here.
->>>
->>> For other architectures, including x86 and arm64, we enter the guest with IRQs
->>> masked and return from the guest with IRQs masked, and don't actually take IRQs
->>> until we unmask them in the host, after the guest_exit_*() logic has woken RCU
->>> and so on.
->>>
->>> I wasn't able to find documentation on the semantics of SIE, so I couldn't spot
->>> whether the local_irq_{enable,disable}() calls were necessary, or could be
->>> removed.
->>
->> We run the SIE instruction with interrupts enabled. SIE is interruptible.
->> The disable/enable pairs are just because  guest_enter/exit_irqoff() require them.
-> 
-> What I was trying to figure out was when an interrupt is taken between
-> guest_enter_irqoff() and guest_exit_irqoff(), where is RCU woken? I couldn't
-> spot that in the s390 entry code (probably simply because I'm not familiar with
-> it), and so AFAICT that means IRQ code could run without RCU watching, which
-> would cause things to explode.
-> 
-> On other architectures that problem is avoided because IRQs asserted during the
-> guest cause a specific guest exit rather than a regular IRQ exception, and the
-> HW enables/disables IRQs when entering/exiting the guest, so the host can leave
-> IRQs masked across guest_enter_irqoff()..guest_exit_irqoff().
-> 
-> Am I right in understanding that SIE itself won't enable (host) interrupts
-> while running the guest, and so it *needs* to be run with interrupts already
-> enabled?
+Previously I was on version 4.19.188-rt77 (with the PREEMPT_RT and CONFIG_PREEMPT_FULL patch), I was running KVM on an isolated CPU and I had a max latency with cyclictest of ~60 µs.
 
-yes
+I have bumped the kernel version to 5.15.13-rt26 (on both host and guest) and I have now a huge maximal latency of 40 ms.
 
-> 
->> One thing to be aware of: in our entry.S - after an interrupt - we leave SIE by
->> setting the return address of the interrupt after the sie instruction so that we
->> get back into this __vcpu_run loop to check for signals and so.
-> 
-> Just to check, that's after the IRQ handler runs, right?
+I try to tweak halt_poll_ns, and I managed to reduce the latency to 4 ms.
 
-and yes.
+The host max latency outside KVM is the same.
+
+When I used LTTng to know what’s happen, I see that periodically the CPU core running KVM enter in idle mode.
+
+I have tried with 3 different Intel CPU (Intel Core i3-4130, Intel Xeon E5-2680 and Intel Xeon X5660) and I have always the same result.
+
+Here is my setup :
+Intel CPU
+KVM runing on a dedecated CPU with real-time priority
+Kernel parameters : isolcpus=2-3 nohz_full=2-3 rcu_nocbs=2-3 irqaffinity=0-1
+CONFIG_CPU_IDLE not set
+qemu-x86_64 version 4.2.0
+cyclictest command : cyclictest -l1000000 -m -Sp90 -i200 -h200
+
+Qemu parameters
+/usr/bin/qemu-system-x86_64
+-name guest=guest0,debug-threads=on
+-S
+-object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-2-guest0/master-key.aes
+-blockdev {"driver":"file","filename":"/usr/share/qemu/edk2-x86_64-code.fd","node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard":"unmap"}
+-blockdev {"node-name":"libvirt-pflash0-format","read-only":true,"driver":"raw","file":"libvirt-pflash0-storage"}
+-blockdev {"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/guest0_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"discard":"unmap"}
+-blockdev {"node-name":"libvirt-pflash1-format","read-only":false,"driver":"raw","file":"libvirt-pflash1-storage"}
+-machine pc-i440fx-4.1,accel=kvm,usb=off,dump-guest-core=off,pflash0=libvirt-pflash0-format,pflash1=libvirt-pflash1-format
+-cpu host,tsc-deadline=on,pmu=off
+-m 256
+-overcommit mem-lock=off
+-smp 1,sockets=1,dies=1,cores=1,threads=1
+-uuid 06ed47d1-6dc8-437b-a655-c578768dd0c2
+-no-user-config
+-nodefaults
+-device sga
+-chardev socket,id=charmonitor,fd=35,server,nowait
+-mon chardev=charmonitor,id=monitor,mode=control
+-rtc base=utc,driftfix=slew
+-global kvm-pit.lost_tick_policy=delay
+-no-hpet
+-no-shutdown
+-global PIIX4_PM.disable_s3=1
+-global PIIX4_PM.disable_s4=1
+-boot menu=off,reboot-timeout=0,strict=on
+-device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2
+-blockdev {"driver":"file","filename":"/var/lib/libvirt/images/seapath-guest-efi-test-image-votp-vm.wic.qcow2","node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}
+-blockdev {"node-name":"libvirt-1-format","read-only":false,"driver":"qcow2","file":"libvirt-1-storage","backing":null}
+-device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x3,drive=libvirt-1-format,id=virtio-disk0,bootindex=1
+-netdev tap,fd=37,id=hostnet0,vhost=on,vhostfd=38
+-device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:34:56:4d,bus=pci.0,addr=0x5
+-chardev pty,id=charserial0
+-device isa-serial,chardev=charserial0,id=serial0
+-vnc 127.0.0.1:0
+-device VGA,id=video0,vgamem_mb=16,bus=pci.0,addr=0x4
+-device ib700,id=watchdog0
+-watchdog-action poweroff
+-device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x2
+-msg timestamp=on
+
+Results :
+Kernel host : 4.19.188-rt77
+Kernel guest : 4.19.188-rt77
+halt_poll_ns : default value
+Max latency : ~60 µs
+
+Kernel host : 5.15.13-rt26
+Kernel guest :  5.15.13-rt26
+halt_poll_ns : default value
+Max latency : > 40 ms
+
+Kernel host : 5.15.13-rt26
+Kernel guest :  4.19.188-rt77
+halt_poll_ns : default value
+Max latency : > 40 ms
+
+Kernel host : 5.15.13-rt26
+Kernel guest :  5.15.13-rt26
+halt_poll_ns : 50000
+Max latency : > 4 ms
+
+I would like to know what is introducing this latency. Is it related to the fact that the CPU running KVM periodically enters IDLE mode? Why do we have this behavior in 5.15 and not in 4.19?
+
+Thanks
