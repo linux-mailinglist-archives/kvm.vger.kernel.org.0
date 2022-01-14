@@ -2,130 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7E048EA2F
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:56:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AA7A48EA3B
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 13:59:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241139AbiANMzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 07:55:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55280 "EHLO
+        id S241158AbiANM5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 07:57:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13424 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235721AbiANMzk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 07:55:40 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ECRVsu026589;
-        Fri, 14 Jan 2022 12:55:40 GMT
+        by vger.kernel.org with ESMTP id S235107AbiANM5V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 07:57:21 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ECLWDf031586;
+        Fri, 14 Jan 2022 12:57:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=s4D6B1FENGTeYDjbSfhWU4NJGrujzP5e+fx0FJoNjLQ=;
- b=VpWruDU4D/yD0rikbmNODrOLejU9VBO6XHaxlLeuG0Pddmwr65T6cOrj4KVXIzqlAD22
- HAtMnsPKmuP0OfEN2UZNnEOMijYRqMzwibbm5RbaKDc6gSqQ+8Jd+4MN7JIGxqTcO4d3
- Sz3aTK+/mP+65cSjP/Ssr9gu6e0/Y7uEcZoQ6MgZqcZK+Vb1/SKEj4GBqfDKjgpNN6CM
- BrBH8H48sWbKCtgbWAciKkFMC9/gGtQK3TrOVWlgZazMEIfEGqk9z+CxI73mMYp7OE7p
- zxywmOTJmPPhtaS5dTN7oyozjCeKtn7FXVR6AhLWhARb/fe7d6+WD3KXPTiwn5w/VVVD 4g== 
+ bh=/w2AsGJU3pvaEaSADVB3+oeiCSnJECaY0YEloaUwah4=;
+ b=ACxGkztAiX5bok1rSCh0E1Pqmehe0rW/vv3G+cTibt16x4BVIE8H2MLGdjZPZW6RP91s
+ 4TybyytP19OJYsTp0kccHo61QSJzFTHN6uv48KSpVi/sM0VvbyJmJVWutY3DJ6RzUEyb
+ VUXlYE4WUax3/KjDOsNKdoFmFlD4wFHF7ACpOEo/MyF50BM0xzQi+k8Lcc6/cZLHge2A
+ UBlsBTZiFLoj+ROX0DVbVFE2Ca3awCAkxBPXrFQgrZ7b5BauFIzwhd12ttT8Uwbkyy/O
+ tkQ3Kw/rGNQ4BDX+zjw9iwvz8/2e9hdEH0m/GA6U64mpLIvyGc+w2UWoX6vGE1Tcdl8f 1g== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk96ugfdd-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk9420jtk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:55:39 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EComVs029209;
-        Fri, 14 Jan 2022 12:55:39 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk96ugfcf-1
+        Fri, 14 Jan 2022 12:57:21 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ECiaf6003993;
+        Fri, 14 Jan 2022 12:57:21 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk9420jt1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:55:39 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ECqtKO001635;
-        Fri, 14 Jan 2022 12:55:37 GMT
+        Fri, 14 Jan 2022 12:57:20 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ECux2m000622;
+        Fri, 14 Jan 2022 12:57:18 GMT
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 3dfwhjxkrm-1
+        by ppma06ams.nl.ibm.com with ESMTP id 3df1vjxeqv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:55:37 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ECtX7v38666540
+        Fri, 14 Jan 2022 12:57:18 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ECvEGp45089136
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 12:55:33 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7292B5204F;
-        Fri, 14 Jan 2022 12:55:33 +0000 (GMT)
+        Fri, 14 Jan 2022 12:57:14 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9DCA011C066;
+        Fri, 14 Jan 2022 12:57:14 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33F4A11C052;
+        Fri, 14 Jan 2022 12:57:14 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.145.8.156])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 096AE52050;
-        Fri, 14 Jan 2022 12:55:32 +0000 (GMT)
-Date:   Fri, 14 Jan 2022 13:55:30 +0100
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Jan 2022 12:57:14 +0000 (GMT)
+Date:   Fri, 14 Jan 2022 13:57:12 +0100
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 1/5] lib: s390x: vm: Add kvm and lpar vm
- queries
-Message-ID: <20220114135530.749a7c6c@p-imbrenda>
-In-Reply-To: <380e04e5-b487-36cf-a6f2-143b01c070ff@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 4/5] s390x: smp: Allocate memory in DMA31
+ space
+Message-ID: <20220114135712.6473723a@p-imbrenda>
+In-Reply-To: <f840f66aa615ce167187754842268662cd466b92.camel@linux.ibm.com>
 References: <20220114100245.8643-1-frankja@linux.ibm.com>
-        <20220114100245.8643-2-frankja@linux.ibm.com>
-        <20220114121830.0f6c4908@p-imbrenda>
-        <380e04e5-b487-36cf-a6f2-143b01c070ff@linux.ibm.com>
+        <20220114100245.8643-5-frankja@linux.ibm.com>
+        <f840f66aa615ce167187754842268662cd466b92.camel@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4CKU0_DeXZ0Jd_xa2IVKwCSUP-G5AO5S
-X-Proofpoint-ORIG-GUID: MqzqAguZpweCafVSjWSZ5Ewify8w-PfS
+X-Proofpoint-GUID: 0uqzGAInqQqW02dU5TongbZv2nnYrRz7
+X-Proofpoint-ORIG-GUID: uRz5bCgI7WlmViKnaKoA8UB3PeM3_7-x
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-01-14_04,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 adultscore=0 clxscore=1015
- bulkscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
+ suspectscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201140083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 14 Jan 2022 13:28:19 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, 14 Jan 2022 13:50:52 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> On 1/14/22 12:18, Claudio Imbrenda wrote:
-> > On Fri, 14 Jan 2022 10:02:41 +0000
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >   
-> >> This patch will likely (in parts) be replaced by Pierre's patch from
-> >> his topology test series.
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>  
-> > 
-> > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > 
-> > although I think there is some room for improvement, but nothing too
-> > serious, I'll probably fix it myself later  
-> 
-> I think I should add this to clean up the checks in the following patches:
-> 
-> bool vm_is_qemu(void)
-> {
-> 	return vm_is_kvm() || vm_is_tcg();
-> }
-> 
-> That of course also isn't a 100% correct, we could have KVM + non-QEMU 
-> but I'll cross that bridge when I get there.
-> 
-> And as I already mentioned in Pierre's patch, the STSI values are a bit 
-> of a mystery to me since AFAIK we store KVM/Linux even if we run under TCG.
+> On Fri, 2022-01-14 at 10:02 +0000, Janosch Frank wrote:
+> > The store status at address order works with 31 bit addresses so
+> > let's
+> > use them.
+> >=20
+> > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> > ---
+> > =C2=A0s390x/smp.c | 4 ++--
+> > =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/s390x/smp.c b/s390x/smp.c
+> > index 32f128b3..c91f170b 100644
+> > --- a/s390x/smp.c
+> > +++ b/s390x/smp.c =20
+>=20
+> [...]
+>=20
+> > @@ -244,7 +244,7 @@ static void test_func_initial(void)
+> > =C2=A0
+> > =C2=A0static void test_reset_initial(void)
+> > =C2=A0{
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct cpu_status *status =
+=3D alloc_pages(0);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct cpu_status *status =
+=3D alloc_pages_flags(1, AREA_DMA31); =20
+>=20
+> Why do we need two pages now?
 
-I was actually thinking of a generic detection function that will call
-STSI only once and set all the necessary flags. 
+oh, good catch
 
-then the various vm_is_* functions can become something like this:
+the next patch has the same issue
 
-bool vm_is_${TYPE}()
-{
-	if (vm_type == VM_TYPE_NOT_INITIALIZED)
-		do_vm_detection();
-	return vm_type == VM_${TYPE};
-}
-
-and then have all the magic hidden in the one do_vm_detection, which
-will call STSI once and try to find out what we are running on.
-
+I can fix them up when I queue them
