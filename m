@@ -2,159 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EAF548EABB
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:32:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A81148EACA
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:35:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236727AbiANNc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 08:32:56 -0500
-Received: from foss.arm.com ([217.140.110.172]:33390 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231860AbiANNcz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 08:32:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF0E6ED1;
-        Fri, 14 Jan 2022 05:32:54 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.2.91])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C58E3F774;
-        Fri, 14 Jan 2022 05:32:49 -0800 (PST)
-Date:   Fri, 14 Jan 2022 13:32:10 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
-        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
-        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
-        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
-        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
-        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
-        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
-        pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com,
-        tglx@linutronix.de, tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
-Message-ID: <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
-References: <20220111153539.2532246-1-mark.rutland@arm.com>
- <127a6117-85fb-7477-983c-daf09e91349d@linux.ibm.com>
- <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
- <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
+        id S241322AbiANNf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 08:35:29 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24318 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236727AbiANNf2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:35:28 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ECrTaG030363;
+        Fri, 14 Jan 2022 13:35:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=QrAsnfqckw0ljnJBypVeB5tjWh4pgBd/ZN9KVR51zsk=;
+ b=foxYfdu3Uzh2ssTcn/fYkxiK9d1XTpcRAW5QmkxvJNl4LZP4UpgpovK1EFPnIenKl6Tj
+ BTqZPMx07rmodmmkP/LvPJ7844vDBd42GYLhHiZnOrQCNqINXLJdCK7MI4nJmHIcgK7V
+ dSUQAotF1IEYH4zi96Cy3133eLuXtK0ea+XMfxYXv06OrDqVQhINGkqVuC4RlJ22xH69
+ /0/fEo06BB+7s3mryERzgstjdGNWMKqo0FNrMX5LeVXCgZZsHzsoKoMxGA9J8JC8yJ38
+ rd5L8NbennRlOmPVmhHnGkaeXJjMGJUcpQl9dsUQyOcc5tesLc1viwl7MiG6/x+tktl3 Fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dk9k1gs00-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 13:35:27 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20EDVJuC023412;
+        Fri, 14 Jan 2022 13:35:27 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dk9k1grya-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 13:35:27 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EDWxEf018350;
+        Fri, 14 Jan 2022 13:35:25 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3df28aek7k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Jan 2022 13:35:25 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EDZLLD44761470
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Jan 2022 13:35:21 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D849252052;
+        Fri, 14 Jan 2022 13:35:21 +0000 (GMT)
+Received: from [9.145.160.142] (unknown [9.145.160.142])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8769B5204F;
+        Fri, 14 Jan 2022 13:35:21 +0000 (GMT)
+Message-ID: <d09a7170-6538-fc52-15f1-42d7fc4e7c9b@linux.ibm.com>
+Date:   Fri, 14 Jan 2022 14:35:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH 1/5] lib: s390x: vm: Add kvm and lpar vm
+ queries
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+References: <20220114100245.8643-1-frankja@linux.ibm.com>
+ <20220114100245.8643-2-frankja@linux.ibm.com>
+ <b468354deac3f9902f42aa2c46e762ddf208efdd.camel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <b468354deac3f9902f42aa2c46e762ddf208efdd.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: s39YsTJYrk5AFCNLv2guzJg7R3GY_uUj
+X-Proofpoint-GUID: az-V2U9i7XVmuCPkbaJxzv8rJ8NY_Xod
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-14_05,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 impostorscore=0 mlxscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=999 malwarescore=0 bulkscore=0 priorityscore=1501 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201140088
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 01:29:46PM +0100, Christian Borntraeger wrote:
-> 
-> 
-> Am 14.01.22 um 13:19 schrieb Mark Rutland:
-> > On Thu, Jan 13, 2022 at 04:20:07PM +0100, Christian Borntraeger wrote:
-> > > Am 11.01.22 um 16:35 schrieb Mark Rutland:
-> > > > Several architectures have latent bugs around guest entry/exit, most
-> > > > notably:
-> > > > 
-> > > > 1) Several architectures enable interrupts between guest_enter() and
-> > > >      guest_exit(). As this period is an RCU extended quiescent state (EQS) this
-> > > >      is unsound unless the irq entry code explicitly wakes RCU, which most
-> > > >      architectures only do for entry from usersapce or idle.
-> > > > 
-> > > >      I believe this affects: arm64, riscv, s390
-> > > > 
-> > > >      I am not sure about powerpc.
-> > > > 
-> > > > 2) Several architectures permit instrumentation of code between
-> > > >      guest_enter() and guest_exit(), e.g. KASAN, KCOV, KCSAN, etc. As
-> > > >      instrumentation may directly o indirectly use RCU, this has the same
-> > > >      problems as with interrupts.
-> > > > 
-> > > >      I believe this affects: arm64, mips, powerpc, riscv, s390
-> > > > 
-> > > > 3) Several architectures do not inform lockdep and tracing that
-> > > >      interrupts are enabled during the execution of the guest, or do so in
-> > > >      an incorrect order. Generally
-> > > >      this means that logs will report IRQs being masked for much longer
-> > > >      than is actually the case, which is not ideal for debugging. I don't
-> > > >      know whether this affects the correctness of lockdep.
-> > > > 
-> > > >      I believe this affects: arm64, mips, powerpc, riscv, s390
-> > > > 
-> > > > This was previously fixed for x86 specifically in a series of commits:
-> > > > 
-> > > >     87fa7f3e98a1310e ("x86/kvm: Move context tracking where it belongs")
-> > > >     0642391e2139a2c1 ("x86/kvm/vmx: Add hardirq tracing to guest enter/exit")
-> > > >     9fc975e9efd03e57 ("x86/kvm/svm: Add hardirq tracing on guest enter/exit")
-> > > >     3ebccdf373c21d86 ("x86/kvm/vmx: Move guest enter/exit into .noinstr.text")
-> > > >     135961e0a7d555fc ("x86/kvm/svm: Move guest enter/exit into .noinstr.text")
-> > > >     160457140187c5fb ("KVM: x86: Defer vtime accounting 'til after IRQ handling")
-> > > >     bc908e091b326467 ("KVM: x86: Consolidate guest enter/exit logic to common helpers")
-> > > > 
-> > > > But other architectures were left broken, and the infrastructure for
-> > > > handling this correctly is x86-specific.
-> > > > 
-> > > > This series introduces generic helper functions which can be used to
-> > > > handle the problems above, and migrates architectures over to these,
-> > > > fixing the latent issues.
-> > > > 
-> > > > I wasn't able to figure my way around powerpc and s390, so I have not
-> > > 
-> > > I think 2 later patches have moved the guest_enter/exit a bit out.
-> > > Does this make the s390 code clearer?
-> > 
-> > Yes; that's much simpler to follow!
-> > 
-> > One major thing I wasn't sure about for s390 is the sequence:
-> > 
-> > 	guest_enter_irqoff();	// Enters an RCU EQS
-> > 	...
-> > 	local_irq_enable();
-> > 	...
-> > 	sie64a(...);
-> > 	...
-> > 	local_irq_disable();
-> > 	...
-> > 	guest_exit_irqoff();	// Exits an RCU EQS
-> > 
-> > ... since if an IRQ is taken between local_irq_{enable,disable}(), RCU won't be
-> > watching, and I couldn't spot whether your regular IRQ entry logic would wake
-> > RCU in this case, or whether there was something else I'm missing that saves
-> > you here.
-> > 
-> > For other architectures, including x86 and arm64, we enter the guest with IRQs
-> > masked and return from the guest with IRQs masked, and don't actually take IRQs
-> > until we unmask them in the host, after the guest_exit_*() logic has woken RCU
-> > and so on.
-> > 
-> > I wasn't able to find documentation on the semantics of SIE, so I couldn't spot
-> > whether the local_irq_{enable,disable}() calls were necessary, or could be
-> > removed.
-> 
-> We run the SIE instruction with interrupts enabled. SIE is interruptible.
-> The disable/enable pairs are just because  guest_enter/exit_irqoff() require them.
-
-What I was trying to figure out was when an interrupt is taken between
-guest_enter_irqoff() and guest_exit_irqoff(), where is RCU woken? I couldn't
-spot that in the s390 entry code (probably simply because I'm not familiar with
-it), and so AFAICT that means IRQ code could run without RCU watching, which
-would cause things to explode.
-
-On other architectures that problem is avoided because IRQs asserted during the
-guest cause a specific guest exit rather than a regular IRQ exception, and the
-HW enables/disables IRQs when entering/exiting the guest, so the host can leave
-IRQs masked across guest_enter_irqoff()..guest_exit_irqoff().
-
-Am I right in understanding that SIE itself won't enable (host) interrupts
-while running the guest, and so it *needs* to be run with interrupts already
-enabled?
-
-> One thing to be aware of: in our entry.S - after an interrupt - we leave SIE by
-> setting the return address of the interrupt after the sie instruction so that we
-> get back into this __vcpu_run loop to check for signals and so.
-
-Just to check, that's after the IRQ handler runs, right?
-
-Thanks,
-Mark.
+T24gMS8xNC8yMiAxNDoyNywgTmljbyBCb2VociB3cm90ZToNCj4gT24gRnJpLCAyMDIyLTAx
+LTE0IGF0IDEwOjAyICswMDAwLCBKYW5vc2NoIEZyYW5rIHdyb3RlOg0KPj4gVGhpcyBwYXRj
+aCB3aWxsIGxpa2VseSAoaW4gcGFydHMpIGJlIHJlcGxhY2VkIGJ5IFBpZXJyZSdzIHBhdGNo
+IGZyb20NCj4+IGhpcyB0b3BvbG9neSB0ZXN0IHNlcmllcy4NCj4+DQo+PiBTaWduZWQtb2Zm
+LWJ5OiBKYW5vc2NoIEZyYW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+DQo+PiAtLS0NCj4+
+ICDCoGxpYi9zMzkweC92bS5jIHwgMzkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrDQo+PiAgwqBsaWIvczM5MHgvdm0uaCB8IDIzICsrKysrKysrKysrKysrKysr
+KysrKysrDQo+PiAgwqBzMzkweC9zdHNpLmPCoMKgIHwgMjEgKy0tLS0tLS0tLS0tLS0tLS0t
+LS0tDQo+PiAgwqAzIGZpbGVzIGNoYW5nZWQsIDYzIGluc2VydGlvbnMoKyksIDIwIGRlbGV0
+aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9saWIvczM5MHgvdm0uYyBiL2xpYi9zMzkw
+eC92bS5jDQo+PiBpbmRleCBhNWI5Mjg2My4uMjY2YTgxYzEgMTAwNjQ0DQo+PiAtLS0gYS9s
+aWIvczM5MHgvdm0uYw0KPj4gKysrIGIvbGliL3MzOTB4L3ZtLmMNCj4+IEBAIC0yNiw2ICsy
+NiwxMSBAQCBib29sIHZtX2lzX3RjZyh2b2lkKQ0KPj4gIMKgwqDCoMKgwqDCoMKgwqBpZiAo
+aW5pdGlhbGl6ZWQpDQo+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1
+cm4gaXNfdGNnOw0KPj4gICANCj4+ICvCoMKgwqDCoMKgwqDCoGlmIChzdHNpX2dldF9mYygp
+IDwgMykgew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGluaXRpYWxpemVk
+ID0gdHJ1ZTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gZmFs
+c2U7DQo+IA0KPiBNaW5vciBuaXQ6IEJ5IHNldHRpbmcgaW5pdGlhbGl6ZWQgdG8gdHJ1ZSwg
+eW91IHJlbHkgb24gdGhlIHByZXZpb3VzDQo+IGluaXRpYWxpemF0aW9uIG9mIGlzX3RjZyB0
+byBmYWxzZSBmb3Igc3Vic2VxdWVudCBjYWxscy4NCj4gDQo+IFlvdSBjb3VsZCBtYWtlIHRo
+aXMgbW9yZSBvYnZpb3VzIGJ5IHNheWluZzoNCj4gDQo+IHJldHVybiBpc190Y2c7DQo+IA0K
+DQpIYXZlIGEgbG9vayBhdCBQaWVycmUncyBwYXRjaCB3aGljaCBJIHdpbGwgYmUgcmVseWlu
+ZyBvbiB3aGVuIGl0J3MgZG9uZS4gDQpBcyBJIHNhaWQgaW4gdGhlIGNvbW1pdCBtZXNzYWdl
+LCB0aGlzIGlzIG9ubHkgYSBwbGFjZWhvbGRlciBmb3IgaGlzIHBhdGNoLg0K
