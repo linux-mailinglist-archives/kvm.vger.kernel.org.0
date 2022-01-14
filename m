@@ -2,94 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 038FB48EAFC
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:44:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E16548EB16
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 14:50:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241372AbiANNn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 08:43:58 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57538 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230472AbiANNn6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 08:43:58 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ECqcXs028697;
-        Fri, 14 Jan 2022 13:43:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=KMUztCrCWFgxtFLl9NgyGpfuhUslj7aMVbrW3LIdC7k=;
- b=cwSO8LrHhYQzRWzjKTtdHCfQpDXIOMhDNW5Om25HV+LHyO1yM97FVo/zTwXU98ADXgjq
- gLuF4HemDgnJJoaA/7R6192HQS3dHo37zMu7YAqSn9SVy3UBw9ozIIUIzogibHItYK/v
- 8/gWQ0qBs8VTmqWGgTELHrL71QxxvjQQxGn4Dqirg3pdXWKZsehw9672R289QhsodEcC
- SWhuQ/JXM575tEjIXvdLr2r00faf8hHS3Zhj8NvIw2gfY64U1eO3kLSzXyCbKKrQMz48
- O/op+na+oF8rxJrgYweMKImmafUR+UY40SCXnStHAceOxvDkJvXDv6/HpEvlyzx2ZWmn +w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk9jm0yy2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:43:57 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ECs49e032639;
-        Fri, 14 Jan 2022 13:43:57 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dk9jm0yxh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:43:57 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20EDbSEI022394;
-        Fri, 14 Jan 2022 13:43:54 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3df28a3ses-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 13:43:54 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20EDhpSc45547994
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jan 2022 13:43:51 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64484AE055;
-        Fri, 14 Jan 2022 13:43:51 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 09824AE045;
-        Fri, 14 Jan 2022 13:43:51 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.38.143])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Jan 2022 13:43:50 +0000 (GMT)
-Message-ID: <5582205fd65db8fcfd9ba94e2976007e7ac4869d.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 1/5] lib: s390x: vm: Add kvm and lpar vm
- queries
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Date:   Fri, 14 Jan 2022 14:43:50 +0100
-In-Reply-To: <d09a7170-6538-fc52-15f1-42d7fc4e7c9b@linux.ibm.com>
-References: <20220114100245.8643-1-frankja@linux.ibm.com>
-         <20220114100245.8643-2-frankja@linux.ibm.com>
-         <b468354deac3f9902f42aa2c46e762ddf208efdd.camel@linux.ibm.com>
-         <d09a7170-6538-fc52-15f1-42d7fc4e7c9b@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.2 (3.42.2-1.fc35) 
+        id S241438AbiANNtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 08:49:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241319AbiANNtS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 08:49:18 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A74C061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 05:49:17 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id h10so15741359wrb.1
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 05:49:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=SplDRCa6NNrw+jmw+XcUlhx9ZxjilxrjFesGl7lzU8g=;
+        b=a8+JP378o1HAvFjmRAXUOS92EqYOCCF88AwdX0/glSzNwYInZgQODDEMtel8YNg43L
+         yYJWvN218zskoZeANgcb1mJ8YkIikwhMIQ/j/c2EwwWlx1AyTftWuWJLK/q4DO2x9KhF
+         SX2Q17/rj7UDxp1MxMU5n5EyscAbo+Y6gBeBFRUUqZnOhohMNv3u0xHpRXG88P5rCodV
+         J6ZzYoj2CCEzrG1fanC9jK06RN3WeAj2R91MreRQDcoTPbOu0SdKk3oOkZyPWai0cSxg
+         Run8+wVv5fEmM8o7zcChBaWTpUjMXF7lpEXzUR8WOjnviB7ezlfmvN16E2LaKXWslsnM
+         g8PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SplDRCa6NNrw+jmw+XcUlhx9ZxjilxrjFesGl7lzU8g=;
+        b=p2kNRRFyDCrt8LJ945oNRTlREFK3Pkuh5Ur87fPvIntw5gJ80BEzF1dZDT77ot+Hjd
+         +8eKFDAiYyDLpIybjKuNnJ887t91kZ6YL+YkJLWBZ1R6wRh3KrTEMHnIOvlQSKs0/Icv
+         wEwEESc2iCcPTveYOf1sm46Wqk/ZXFM7msxc0lNwsoGPHZ847gf/5uJ8D8d8ZorSEhVT
+         6UG/aGkMJdA6UM6oFKnddxC7uaKMczhWysnDdVCoRcbf0cr25aTFDYP0kk93i+Flz8MH
+         1p0VSofBu+9URVwFMw2JAYFG97ztfY5MIR9594K5ro/uhs1xBhoTFJ2CDCrN91ydtFZd
+         fR0w==
+X-Gm-Message-State: AOAM532aBIuUYRhZcDwFW50AE6LnfJNh0fwNHxhrs+H1jl7BJeyX2dE2
+        XNujPvI4huSZxoIrmpvUWZtPlyUU0R9EpA==
+X-Google-Smtp-Source: ABdhPJwoUoCO5g9qpmclfYXylg3VPdHOz196vgmYaxgcYpAG6lUSt03T/h3hujcZM8T0T16gsvO79w==
+X-Received: by 2002:a05:6000:18a5:: with SMTP id b5mr8486696wri.24.1642168156403;
+        Fri, 14 Jan 2022 05:49:16 -0800 (PST)
+Received: from google.com ([2a00:79e0:d:210:d47e:30f8:4fad:745b])
+        by smtp.gmail.com with ESMTPSA id f15sm1858029wmq.38.2022.01.14.05.49.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 05:49:15 -0800 (PST)
+Date:   Fri, 14 Jan 2022 13:49:12 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] KVM: arm64: pkvm: Use the mm_ops indirection for cache
+ maintenance
+Message-ID: <YeF/WMXe4HL/n8qw@google.com>
+References: <20220114125038.1336965-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Ynb9lVlfBB_gSATIsxHtSiFAeBX-tyUD
-X-Proofpoint-ORIG-GUID: a_G_FRUj6QdPy_RQ2GvU6dfWCsYNhkAM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_05,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=969 mlxscore=0 bulkscore=0 phishscore=0 impostorscore=0
- spamscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
- adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2110150000 definitions=main-2201140090
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220114125038.1336965-1-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-01-14 at 14:35 +0100, Janosch Frank wrote:
-> Have a look at Pierre's patch which I will be relying on when it's
-> done. 
-> As I said in the commit message, this is only a placeholder for his
-> patch.
+On Friday 14 Jan 2022 at 12:50:38 (+0000), Marc Zyngier wrote:
+> CMOs issued from EL2 cannot directly use the kernel helpers,
+> as EL2 doesn't have a mapping of the guest pages. Oops.
+> 
+> Instead, use the mm_ops indirection to use helpers that will
+> perform a mapping at EL2 and allow the CMO to be effective.
 
-There it is just as I suggested. Thanks.
+Right, we were clearly lucky not to use those paths at EL2 _yet_, but
+that's going to change soon and this is better for consistency, so:
+
+Reviewed-by: Quentin Perret <qperret@google.com>
+
+> Fixes: 25aa28691bb9 ("KVM: arm64: Move guest CMOs to the fault handlers")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 18 ++++++------------
+>  1 file changed, 6 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 844a6f003fd5..2cb3867eb7c2 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -983,13 +983,9 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	 */
+>  	stage2_put_pte(ptep, mmu, addr, level, mm_ops);
+>  
+> -	if (need_flush) {
+> -		kvm_pte_t *pte_follow = kvm_pte_follow(pte, mm_ops);
+> -
+> -		dcache_clean_inval_poc((unsigned long)pte_follow,
+> -				    (unsigned long)pte_follow +
+> -					    kvm_granule_size(level));
+> -	}
+> +	if (need_flush && mm_ops->dcache_clean_inval_poc)
+> +		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
+> +					       kvm_granule_size(level));
+>  
+>  	if (childp)
+>  		mm_ops->put_page(childp);
+> @@ -1151,15 +1147,13 @@ static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	struct kvm_pgtable *pgt = arg;
+>  	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+>  	kvm_pte_t pte = *ptep;
+> -	kvm_pte_t *pte_follow;
+>  
+>  	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pgt, pte))
+>  		return 0;
+>  
+> -	pte_follow = kvm_pte_follow(pte, mm_ops);
+> -	dcache_clean_inval_poc((unsigned long)pte_follow,
+> -			    (unsigned long)pte_follow +
+> -				    kvm_granule_size(level));
+> +	if (mm_ops->dcache_clean_inval_poc)
+> +		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
+> +					       kvm_granule_size(level));
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.30.2
+> 
