@@ -2,113 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 904F048EEDE
-	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 18:00:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5800848EF1F
+	for <lists+kvm@lfdr.de>; Fri, 14 Jan 2022 18:13:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243631AbiANRAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 12:00:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
+        id S243803AbiANRNJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 12:13:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242588AbiANRAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 12:00:32 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7876BC061574
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 09:00:31 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id h23so3225380pgk.11
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 09:00:31 -0800 (PST)
+        with ESMTP id S235457AbiANRNJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 12:13:09 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15947C061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 09:13:09 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id x83so3253561pgx.4
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 09:13:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=xjoS4K/y8gkwtFetlOk0sMfpyN0++LCc7AkNoF1EEeA=;
-        b=IKLEf9fy+XV5ibto796ufUUVkuOXmiAe1Ec1lM7Z3daI4YOtmL6CWQG9prdrfb7oup
-         I98bnXfMazE1cMqeBEAsn6oKT/rUhI80S2prPVp/AhX8ICntJmz5AJWQ/XRV2CCwXO3M
-         TVYw4crJyR8WLi8lOK9POPQQ6JjM+g19AP1dddsS1z3Dq7g36cWQNpAdPIaHuC3/p4n6
-         WzaubIq1mLt+jn9fLoMcSt6Ovf8zUad/zHf7O3mpUigEyTF3WmnRmYCyOQ51QP/ld1Sp
-         qZa5acJbXlHJgNm9yxDginU0uGaj1DZXxV5NEd3qnX1n9t0K3lWv2OjUXnZ073W+WtPY
-         LfhA==
+        bh=O8JciH1zrT2lq0/xMXikypIOOXFn78remSO3U7N452w=;
+        b=Otj6jRHrpMqjXccoLZLn90tUuXxqMk9otAEy6+vO7h99H6yXFhY8l4VXGLgp0LC/P0
+         cbSpQeEvrNLgHDwMCUbLZrsOf4BLTLl0+jF5Bbn3uWQHBYRyy/4NfSunRXubV6O7F92F
+         CUHyWWLxmXxT8GOE7Cg1gvtwfXjCzV+wEg9pyG9qbCMYjUpbdcmoZHxzhr1qpEdeoMuq
+         nTMqs0RB/7D6YNNAxMSyxEZT5dxmi8rwTN9iSqxalqtq3cQDL6VY/TLRqBDL1wO7Ggfq
+         Jr1HX/VtZDBxki2C3vcqVDxqXD1pfoIOG7EL6bpnEfVIjBn/PVbNQMXFwFhYxtofPrx9
+         hmGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=xjoS4K/y8gkwtFetlOk0sMfpyN0++LCc7AkNoF1EEeA=;
-        b=7qNQrEiPnWLtbU4gAX30ZmUiZfShRn7LM0W3Ma7LvW2QYk+3+/e2YDTut0p9k0LZGq
-         kuhTt1fGTFQEheaDGbR+SSs1wtrVfKdCGb8WpYHLrXS+bBzh81trDmvVmhtzvG73TRSP
-         8Uz9uufzfmfe3LoY0oMG9ab5S02IS13f64Mm4g8/rj8EtrLF6ymruw/ScKVPmA1NHIK3
-         iMKGtVHt8Y48kxwZRmX2i97b1JvCeChcObS0n3y3ML/EZTtslq3Re7yCSMjBhWeEvhe7
-         YYY+A3fHFO1zBiDzDQ8Q5+PLqEoPVgaOqxn9vf2FPQkAV8dWsmUqhvNQh3Gb8AO+aeBw
-         8+GA==
-X-Gm-Message-State: AOAM531fzxaFa57X4vHuP1YLcEDy1BoZI8Pp5+CaabIS303jXPr3jp/0
-        sPbWH/Ikxw9umy23bv+r0rZnbw==
-X-Google-Smtp-Source: ABdhPJyK4NO0IRQqUFtpgmMoDjmV9qYii4Ns5cvsdau/cVTvulWI3OU+4pc/o5/DiidW5EAys9uOLQ==
-X-Received: by 2002:a63:6c01:: with SMTP id h1mr8913390pgc.233.1642179630783;
-        Fri, 14 Jan 2022 09:00:30 -0800 (PST)
+        bh=O8JciH1zrT2lq0/xMXikypIOOXFn78remSO3U7N452w=;
+        b=qr3INhddHBGA2AZW2KaLWuWvZ1MOiIjIhl9AKio0VyeA8ZrPAingyjtj88XIdsvZNl
+         ZGTdgSxpd8g3LgF9F3KqkDKN5IsbXwkBX5qLJxCZ6nrx+wFuX0O6dDUZUN8QrmX7odJB
+         Ix80P/wI8QCXQkBJ/Qmmv+OYQWkc1mkNOXgknprbK20BZl5s0GlvJHfU3wqyFtvv9CEP
+         b6fnJ7CLXuw6J8fTm83RV5qa/6GXRFquOT88f1wi+tInJK7ZaEmmVEMKI14FdjxP0+qS
+         Zhk7YxWv8zwZmTNv27C8lPF8D9Eox4EIjrP2mZ08VNAINziBYUtLS+xb83MgYR1i9Pgn
+         06AQ==
+X-Gm-Message-State: AOAM530reE28Qy4ePQW63VIMTtedal4G+zp8BjeAm8ebeOYeSiNjnoj5
+        bsGOxUGOblXhnzma8tSUW+C8vw==
+X-Google-Smtp-Source: ABdhPJyWP2M3ZfcdB/0Vb0MXVcvqfNWydhvBYiRfK91I6MDU6Yz2KEZMtL04VZQHkW0q6IMi0EJeCg==
+X-Received: by 2002:a63:8942:: with SMTP id v63mr5155737pgd.471.1642180388417;
+        Fri, 14 Jan 2022 09:13:08 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m13sm4985630pga.38.2022.01.14.09.00.29
+        by smtp.gmail.com with ESMTPSA id nl16sm13817660pjb.22.2022.01.14.09.13.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 09:00:29 -0800 (PST)
-Date:   Fri, 14 Jan 2022 17:00:26 +0000
+        Fri, 14 Jan 2022 09:13:07 -0800 (PST)
+Date:   Fri, 14 Jan 2022 17:13:04 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Igor Mammedov <imammedo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
-Message-ID: <YeGsKslt7hbhQZPk@google.com>
-References: <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
- <20211227183253.45a03ca2@redhat.com>
- <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
- <87mtkdqm7m.fsf@redhat.com>
- <20220103104057.4dcf7948@redhat.com>
- <YeCowpPBEHC6GJ59@google.com>
- <20220114095535.0f498707@redhat.com>
- <87ilummznd.fsf@redhat.com>
- <20220114122237.54fa8c91@redhat.com>
- <87ee5amrmh.fsf@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Li RongQing <lirongqing@baidu.com>, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
+        bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org, joro@8bytes.org,
+        peterz@infradead.org
+Subject: Re: 
+Message-ID: <YeGvILDCvt70CrlU@google.com>
+References: <1642157664-18105-1-git-send-email-lirongqing@baidu.com>
+ <ee11b876-3042-f7c4-791e-2740130b93d4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87ee5amrmh.fsf@redhat.com>
+In-Reply-To: <ee11b876-3042-f7c4-791e-2740130b93d4@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022, Vitaly Kuznetsov wrote:
-> Igor Mammedov <imammedo@redhat.com> writes:
+On Fri, Jan 14, 2022, Paolo Bonzini wrote:
+> On 1/14/22 11:54, Li RongQing wrote:
+> > After support paravirtualized TLB shootdowns, steal_time.preempted
+> > includes not only KVM_VCPU_PREEMPTED, but also KVM_VCPU_FLUSH_TLB
+> > 
+> > and kvm_vcpu_is_preempted should test only with KVM_VCPU_PREEMPTED
+> > 
+> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> > ---
+> > diff with v1:
+> > clear the rest of rax, suggested by Sean and peter
+> > remove Fixes tag, since no issue in practice
+> > 
+> >   arch/x86/kernel/kvm.c | 4 ++--
+> >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > index b061d17..45c9ce8d 100644
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -1025,8 +1025,8 @@ asm(
+> >   ".type __raw_callee_save___kvm_vcpu_is_preempted, @function;"
+> >   "__raw_callee_save___kvm_vcpu_is_preempted:"
+> >   "movq	__per_cpu_offset(,%rdi,8), %rax;"
+> > -"cmpb	$0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
+> > -"setne	%al;"
+> > +"movb	" __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax), %al;"
+> > +"and	$" __stringify(KVM_VCPU_PREEMPTED) ", %rax;"
 > 
-> > On Fri, 14 Jan 2022 10:31:50 +0100
-> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >
-> >> Igor Mammedov <imammedo@redhat.com> writes:
-> >> 
-> >> 
-> >> > However, a problem of failing KVM_SET_CPUID2 during VCPU re-plug
-> >> > is still there and re-plug will fail if KVM rejects repeated KVM_SET_CPUID2
-> >> > even if ioctl called with exactly the same CPUID leafs as the 1st call.
-> >> >  
-> >> 
-> >> Assuming APIC id change doesn not need to be supported, I can send v2
-> >> here with an empty allowlist.
-> > As you mentioned in another thread black list would be better
-> > to address Sean's concerns or just revert problematic commit.
-> >
-> 
-> Personally, I'm leaning towards the blocklist approach even if just for
-> 'documenting' the fact that KVM doesn't correctly handle the
-> change. Compared to a comment in the code, such approach could help
-> someone save tons of debugging time (if anyone ever decides do something
-> weird, like changing MAXPHYADDR on the fly).
+> This assumes that KVM_VCPU_PREEMPTED is 1.
 
-I assume the blocklist approach is let userspace opt into rejecting KVM_SET_CPUID{,2},
-but allow all CPUID leafs and sub-leafs to be modified at will by default?  I don't
-dislike the idea, but I wonder if it's unnecessarily fancy.
+Ah, right, because technically the compiler is only required to be able to store
+'1' and '0' in the boolean.  That said, KVM_VCPU_PREEMPTED is ABI and isn't going
+to change, so this could be "solved" with a comment.
 
-What if we instead provide an ioctl/capability to let userspace toggle disabling
-of KVM_SET_CPUID{,2}, a la STAC/CLAC to override SMAP?  E.g. QEMU could enable
-protections after initially creating the vCPU, then temporarily disable protections
-only for the hotplug path?
+> It could also be %eax (slightly cheaper).
 
-That'd provide solid protections for minimal effort, and if userspace can restrict
-the danger zone to one specific path, then userspace can easily do its own auditing
-for that one path.
+Ya.
+
+> Overall, I prefer to leave the code as is using setne.
+
+But that also makes dangerous assumptions: (a) that the return type is bool,
+and (b) that the compiler uses a single byte for bools.
+
+If the assumptiong about KVM_VCPU_PREEMPTED being '1' is a sticking point, what
+about combining the two to make everyone happy?
+
+	andl	$" __stringify(KVM_VCPU_PREEMPTED) ", %eax
+	setnz	%al
