@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30D9D48FA7B
-	for <lists+kvm@lfdr.de>; Sun, 16 Jan 2022 04:36:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 716C748FA9A
+	for <lists+kvm@lfdr.de>; Sun, 16 Jan 2022 04:58:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234171AbiAPDgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Jan 2022 22:36:02 -0500
-Received: from [36.155.112.122] ([36.155.112.122]:59662 "EHLO
-        ecs-42a4.novalocal" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S232790AbiAPDgB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Jan 2022 22:36:01 -0500
-Received: from User (localhost [127.0.0.1])
-        by ecs-42a4.novalocal (Postfix) with SMTP id 859244E5257;
-        Tue, 11 Jan 2022 10:20:29 +0800 (CST)
-Reply-To: <andbaill228@mail2world.com>
-From:   "Vlieghe" <andbaill228@mail2world.com>
-Subject: URGENT NOTICE
-Date:   Tue, 11 Jan 2022 04:19:06 +0200
+        id S234187AbiAPD64 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 15 Jan 2022 22:58:56 -0500
+Received: from ec2-13-115-114-132.ap-northeast-1.compute.amazonaws.com ([13.115.114.132]:43910
+        "EHLO mail.gunma-suigai-risk.jp" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231501AbiAPD64 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 15 Jan 2022 22:58:56 -0500
+Received: from Unknown (unknown [103.124.137.27])
+        by mail.gunma-suigai-risk.jp (Postfix) with ESMTPA id 4AC6125628A3;
+        Sat, 15 Jan 2022 23:05:10 +0000 (UTC)
+Message-ID: <484DFBA8A377599A46430AB6B2746A6E@wcqhgd>
+Reply-To: "Fredrik Elvebakk" <fcresswell9@gmail.com>
+From:   "Fredrik Elvebakk" <investment@dnb.no>
+Subject: Re:
+Date:   Sat, 15 Jan 2022 15:05:07 -0800
 MIME-Version: 1.0
 Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
+        format=flowed;
+        charset="windows-1251";
+        reply-type=original
+Content-Transfer-Encoding: 8BIT
 X-Priority: 3
 X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-Message-Id: <20220111022029.859244E5257@ecs-42a4.novalocal>
-To:     undisclosed-recipients:;
+X-Mailer: Microsoft Windows Live Mail 15.4.3538.513
+X-MimeOLE: Produced By Microsoft MimeOLE V15.4.3538.513
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sir/Madam,
+Hello
 
-Good day to you.
+Kindly get back to me for an important 
+discussion
 
-I am Dr.Gertjan Vlieghe personal Secretary to Andrew Bailey who double as the Governor, Bank of England (https://en.wikipedia.org/wiki/Andrew_Bailey_%28banker%29). We have an inheritance of a deceased client, who bear the same name  with your surname. kindly contact Andrew Bailey through his personal email ( andbaill228@mail2world.com ) with your details for more information.
-
-Thank you.
-
-Dr.Gertjan Vlieghe
+Best regards
+Fredrik Elvebakk
