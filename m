@@ -2,180 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 624DF48F422
-	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 02:27:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC3C48F44B
+	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 03:08:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231982AbiAOB0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 20:26:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbiAOB0b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 20:26:31 -0500
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E4DC061574
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 17:26:31 -0800 (PST)
-Received: by mail-oo1-xc29.google.com with SMTP id v10-20020a4a244a000000b002ddfb22ab49so2768970oov.0
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 17:26:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iGxhzdY+o8fZ08CLZJyGxW7d23UVHciFJHOknE38cZw=;
-        b=iY7KJRBkntVU/rVadUv0PJdb2KFcPKF6PPUUe1IH2Di0GhGZ+a66TCmxaI27Sy6K+O
-         xUleFpkSeSW8rDXQtCd/ZcIsHwxjTi2wj2abfIPaYDB0Gh1AdHQfRGa8ODwTfFypjeN3
-         h+iS6UO4wJDhB41ypCxmNXU1ZILBnL8je6tDO+mAMWOcI4iz+mBvbNDCxL1PqEQexXgr
-         p8ojIWbPPFqewMueT3lthQW2KLwMTqbaScL87wYoUadMGXTaUX4i7SDAfUTUQ0+I7Iv4
-         c8bjM7BhMb7FrVn+cHVwma4ZPp1qBk1MbqcIlAiylmeRZelK0ikhu8JhhOd+ywqRpDEf
-         Tf+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iGxhzdY+o8fZ08CLZJyGxW7d23UVHciFJHOknE38cZw=;
-        b=dLueQR2tXYGxVkLEI78eV8dg2YMnLfMSHGcdveFUlL80aKVxSlD4IcNp0eJFQIQkoS
-         erHMUt7PTGlcJA6H+eoLIifMpyqRy75gziLSrUfqvA7nEg1vlIUN9FrFV0BIgqKzi1bU
-         DFsVCU37aIJiwkJYL4es9aNqbJ1rUadrCNaEguTOQuUzHmI2AFa6l0TBsePnJCOBf/tb
-         HFh4dmWHOLJbWMUB/Tw7nQHe8Y922H6zOPHiZ7ah56oiUyDVaOxbjE2WURI3nVlJLA0F
-         PL1Y6l9+Rd+bc1LLCMiP1hBQONjK5MQLWg0sI5RbTAlQbB7Ceb/i+2u4PxfP3izFR6AV
-         73Jw==
-X-Gm-Message-State: AOAM531tvMjDne5k6ypx5lsDgGzlyi9i3twmrIp+49nxnMjcvMk4/vZ5
-        Pm8H1QmIo9JZCr4lvR3GHNw7BbGp3Lu08IhjHGUwLHUbEJ0DbA==
-X-Google-Smtp-Source: ABdhPJwnBXn26R+PGLexcGDygO0NDDlzWoHG9/A0kn5cgChrw7gacpCWI4kqdbckb+NpQsQn+2ru/m5TniKKnsyTS9U=
-X-Received: by 2002:a4a:dc16:: with SMTP id p22mr8238076oov.85.1642209990389;
- Fri, 14 Jan 2022 17:26:30 -0800 (PST)
+        id S232130AbiAOCIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 21:08:25 -0500
+Received: from mga05.intel.com ([192.55.52.43]:50569 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231258AbiAOCIY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 21:08:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642212504; x=1673748504;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=56svY1AMQsubSQkVshEHRawYB4F98372l1HmddsGc+c=;
+  b=Maz0Fwrp6SJ8SnRQf3GGmfMluTvx4G3rZR3DpkGkZ1QodE/7UmiTNUjr
+   2h1g99Y2dEkbBy5psBkw48ft0VhLKhjU5xnMgL+xYS6TsdW/TUs7BW2n3
+   Wbw/QLwmQd8Aa8LnjOgzgX+8ufCXy6p9tc/SifeeFyW5O+8FVda8OHP6/
+   wqpvioV61LW4yTW4jfiwhRi0849zdN9i3C3Co8jZDEQTPnW/BRF0rDAb+
+   iiHaEZ7g1qK8aMUkXODOEOOIQStHEWr5JE3+GCB+w9bC7xxN8bpwf7N1q
+   pqOVvi/9ZBwcBzsvDvILwcWv4ugoMt/FBZYl+8treTPZclmBWRmWRQ81A
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10227"; a="330715278"
+X-IronPort-AV: E=Sophos;i="5.88,290,1635231600"; 
+   d="scan'208";a="330715278"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2022 18:08:24 -0800
+X-IronPort-AV: E=Sophos;i="5.88,290,1635231600"; 
+   d="scan'208";a="516615072"
+Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.254.213.217]) ([10.254.213.217])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2022 18:08:19 -0800
+Message-ID: <8ab5f976-1f3e-e2a5-87f6-e6cf376ead2f@intel.com>
+Date:   Sat, 15 Jan 2022 10:08:10 +0800
 MIME-Version: 1.0
-References: <20211117080304.38989-1-likexu@tencent.com> <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
-In-Reply-To: <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 14 Jan 2022 17:26:19 -0800
-Message-ID: <CALMp9eQCEFsQTbm7F9CqotirbP18OF_cQUySb7Q=dqiuiK1FMg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/svm: Add module param to control PMU virtualization
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.4.1
+Subject: Re: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC
+ mode with APIC-write VM exit
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+ <20211231142849.611-6-guang.zeng@intel.com> <YeCZpo+qCkvx5l5m@google.com>
+ <ec578526-989d-0913-e40e-9e463fb85a8f@intel.com>
+ <YeG0Fdn/2++phMWs@google.com>
+From:   Zeng Guang <guang.zeng@intel.com>
+In-Reply-To: <YeG0Fdn/2++phMWs@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 5:25 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 1/15/2022 1:34 AM, Sean Christopherson wrote:
+> On Fri, Jan 14, 2022, Zeng Guang wrote:
+>> kvm_lapic_reg_read() is limited to read up to 4 bytes. It needs extension to
+>> support 64bit read.
+> Ah, right.
 >
-> On 11/17/21 09:03, Like Xu wrote:
-> > From: Like Xu <likexu@tencent.com>
-> >
-> > For Intel, the guest PMU can be disabled via clearing the PMU CPUID.
-> > For AMD, all hw implementations support the base set of four
-> > performance counters, with current mainstream hardware indicating
-> > the presence of two additional counters via X86_FEATURE_PERFCTR_CORE.
-> >
-> > In the virtualized world, the AMD guest driver may detect
-> > the presence of at least one counter MSR. Most hypervisor
-> > vendors would introduce a module param (like lbrv for svm)
-> > to disable PMU for all guests.
-> >
-> > Another control proposal per-VM is to pass PMU disable information
-> > via MSR_IA32_PERF_CAPABILITIES or one bit in CPUID Fn4000_00[FF:00].
-> > Both of methods require some guest-side changes, so a module
-> > parameter may not be sufficiently granular, but practical enough.
-> >
-> > Signed-off-by: Like Xu <likexu@tencent.com>
-> > ---
-> >   arch/x86/kvm/cpuid.c   |  2 +-
-> >   arch/x86/kvm/svm/pmu.c |  4 ++++
-> >   arch/x86/kvm/svm/svm.c | 11 +++++++++++
-> >   arch/x86/kvm/svm/svm.h |  1 +
-> >   4 files changed, 17 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 2d70edb0f323..647af2a184ad 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -487,7 +487,7 @@ void kvm_set_cpu_caps(void)
-> >               F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
-> >               F(3DNOWPREFETCH) | F(OSVW) | 0 /* IBS */ | F(XOP) |
-> >               0 /* SKINIT, WDT, LWP */ | F(FMA4) | F(TBM) |
-> > -             F(TOPOEXT) | F(PERFCTR_CORE)
-> > +             F(TOPOEXT) | 0 /* PERFCTR_CORE */
-> >       );
-> >
-> >       kvm_cpu_cap_mask(CPUID_8000_0001_EDX,
-> > diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> > index fdf587f19c5f..a0bcf0144664 100644
-> > --- a/arch/x86/kvm/svm/pmu.c
-> > +++ b/arch/x86/kvm/svm/pmu.c
-> > @@ -16,6 +16,7 @@
-> >   #include "cpuid.h"
-> >   #include "lapic.h"
-> >   #include "pmu.h"
-> > +#include "svm.h"
-> >
-> >   enum pmu_type {
-> >       PMU_TYPE_COUNTER = 0,
-> > @@ -100,6 +101,9 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
-> >   {
-> >       struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-> >
-> > +     if (!pmuv)
-> > +             return NULL;
-> > +
-> >       switch (msr) {
-> >       case MSR_F15H_PERF_CTL0:
-> >       case MSR_F15H_PERF_CTL1:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 21bb81710e0f..062e48c191ee 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -190,6 +190,10 @@ module_param(vgif, int, 0444);
-> >   static int lbrv = true;
-> >   module_param(lbrv, int, 0444);
-> >
-> > +/* enable/disable PMU virtualization */
-> > +bool pmuv = true;
-> > +module_param(pmuv, bool, 0444);
-> > +
-> >   static int tsc_scaling = true;
-> >   module_param(tsc_scaling, int, 0444);
-> >
-> > @@ -952,6 +956,10 @@ static __init void svm_set_cpu_caps(void)
-> >           boot_cpu_has(X86_FEATURE_AMD_SSBD))
-> >               kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
-> >
-> > +     /* AMD PMU PERFCTR_CORE CPUID */
-> > +     if (pmuv && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
-> > +             kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
-> > +
-> >       /* CPUID 0x8000001F (SME/SEV features) */
-> >       sev_set_cpu_caps();
-> >   }
-> > @@ -1085,6 +1093,9 @@ static __init int svm_hardware_setup(void)
-> >                       pr_info("LBR virtualization supported\n");
-> >       }
-> >
-> > +     if (!pmuv)
-> > +             pr_info("PMU virtualization is disabled\n");
-> > +
-> >       svm_set_cpu_caps();
-> >
-> >       /*
-> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > index 0d7bbe548ac3..08e1c19ffbdf 100644
-> > --- a/arch/x86/kvm/svm/svm.h
-> > +++ b/arch/x86/kvm/svm/svm.h
-> > @@ -32,6 +32,7 @@
-> >   extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
-> >   extern bool npt_enabled;
-> >   extern bool intercept_smi;
-> > +extern bool pmuv;
-> >
-> >   /*
-> >    * Clean bits in VMCB.
-> >
+>> And another concern is here getting reg value only specific from vICR(no
+>> other regs need take care), going through whole path on kvm_lapic_reg_read()
+>> could be time-consuming unnecessarily. Is it proper that calling
+>> kvm_lapic_get_reg64() to retrieve vICR value directly?
+> Hmm, no, I don't think that's proper.  Retrieving a 64-bit value really is unique
+> to vICR.  Yes, the code does WARN on that, but if future architectural extensions
+> even generate APIC-write exits on other registers, then using kvm_lapic_get_reg64()
+> would be wrong and this code would need to be updated again.
+Split on x2apic and WARN on (offset != APIC_ICR) already limit register 
+read to vICR only. Actually
+we just need consider to deal with 64bit data specific to vICR in 
+APIC-write exits. From this point of
+view, previous design can be compatible on handling other registers even 
+if future architectural
+extensions changes. :)
 >
-> Queued, thanks - just changed the parameter name to "pmu".
+> What about tweaking my prep patch from before to the below?  That would yield:
+>
+> 	if (apic_x2apic_mode(apic)) {
+> 		if (WARN_ON_ONCE(offset != APIC_ICR))
+> 			return 1;
+>
+> 		kvm_lapic_msr_read(apic, offset, &val);
 
-Whoops! The global 'pmu' is hidden by a local 'pmu' in get_gp_pmc_amd().
+I think it's problematic to use kvm_lapic_msr_read() in this case. It 
+premises the high 32bit value
+already valid at APIC_ICR2, while in handling "nodecode" x2APIC writes 
+we need get continuous 64bit
+data from offset 300H first and prepare emulation of APIC_ICR2 write. At 
+this time, APIC_ICR2 is not
+ready yet.
+
+> 		kvm_lapic_msr_write(apic, offset, val);
+> 	} else {
+> 		kvm_lapic_reg_read(apic, offset, 4, &val);
+> 		kvm_lapic_reg_write(apic, offset, val);
+> 	}
+>
+> I like that the above has "msr" in the low level x2apic helpers, and it maximizes
+> code reuse.  Compile tested only...
+>
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Fri, 14 Jan 2022 09:29:34 -0800
+> Subject: [PATCH] KVM: x86: Add helpers to handle 64-bit APIC MSR read/writes
+>
+> Add helpers to handle 64-bit APIC read/writes via MSRs to deduplicate the
+> x2APIC and Hyper-V code needed to service reads/writes to ICR.  Future
+> support for IPI virtualization will add yet another path where KVM must
+> handle 64-bit APIC MSR reads/write (to ICR).
+>
+> Opportunistically fix the comment in the write path; ICR2 holds the
+> destination (if there's no shorthand), not the vector.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/lapic.c | 59 ++++++++++++++++++++++----------------------
+>   1 file changed, 29 insertions(+), 30 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index f206fc35deff..cc4531eb448f 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2787,6 +2787,30 @@ int kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr)
+>   	return 0;
+>   }
+>
+> +static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data)
+> +{
+> +	u32 low, high = 0;
+> +
+> +	if (kvm_lapic_reg_read(apic, reg, 4, &low))
+> +		return 1;
+> +
+> +	if (reg == APIC_ICR &&
+> +	    WARN_ON_ONCE(kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high)))
+> +		return 1;
+> +
+> +	*data = (((u64)high) << 32) | low;
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_lapic_msr_write(struct kvm_lapic *apic, u32 reg, u64 data)
+> +{
+> +	/* For 64-bit ICR writes, set ICR2 (dest) before ICR (command). */
+> +	if (reg == APIC_ICR)
+> +		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
+> +	return kvm_lapic_reg_write(apic, reg, (u32)data);
+> +}
+> +
+>   int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+>   {
+>   	struct kvm_lapic *apic = vcpu->arch.apic;
+> @@ -2798,16 +2822,13 @@ int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+>   	if (reg == APIC_ICR2)
+>   		return 1;
+>
+> -	/* if this is ICR write vector before command */
+> -	if (reg == APIC_ICR)
+> -		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
+> -	return kvm_lapic_reg_write(apic, reg, (u32)data);
+> +	return kvm_lapic_msr_write(apic, reg, data);
+>   }
+>
+>   int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
+>   {
+>   	struct kvm_lapic *apic = vcpu->arch.apic;
+> -	u32 reg = (msr - APIC_BASE_MSR) << 4, low, high = 0;
+> +	u32 reg = (msr - APIC_BASE_MSR) << 4;
+>
+>   	if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(apic))
+>   		return 1;
+> @@ -2815,45 +2836,23 @@ int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
+>   	if (reg == APIC_DFR || reg == APIC_ICR2)
+>   		return 1;
+>
+> -	if (kvm_lapic_reg_read(apic, reg, 4, &low))
+> -		return 1;
+> -	if (reg == APIC_ICR)
+> -		kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high);
+> -
+> -	*data = (((u64)high) << 32) | low;
+> -
+> -	return 0;
+> +	return kvm_lapic_msr_read(apic, reg, data);
+>   }
+>
+>   int kvm_hv_vapic_msr_write(struct kvm_vcpu *vcpu, u32 reg, u64 data)
+>   {
+> -	struct kvm_lapic *apic = vcpu->arch.apic;
+> -
+>   	if (!lapic_in_kernel(vcpu))
+>   		return 1;
+>
+> -	/* if this is ICR write vector before command */
+> -	if (reg == APIC_ICR)
+> -		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
+> -	return kvm_lapic_reg_write(apic, reg, (u32)data);
+> +	return kvm_lapic_msr_write(vcpu->arch.apic, reg, data);
+>   }
+>
+>   int kvm_hv_vapic_msr_read(struct kvm_vcpu *vcpu, u32 reg, u64 *data)
+>   {
+> -	struct kvm_lapic *apic = vcpu->arch.apic;
+> -	u32 low, high = 0;
+> -
+>   	if (!lapic_in_kernel(vcpu))
+>   		return 1;
+>
+> -	if (kvm_lapic_reg_read(apic, reg, 4, &low))
+> -		return 1;
+> -	if (reg == APIC_ICR)
+> -		kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high);
+> -
+> -	*data = (((u64)high) << 32) | low;
+> -
+> -	return 0;
+> +	return kvm_lapic_msr_read(vcpu->arch.apic, reg, data);
+>   }
+>
+>   int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
+> --
