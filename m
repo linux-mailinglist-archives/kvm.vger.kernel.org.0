@@ -2,64 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38B0448F380
-	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 01:29:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60BA148F383
+	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 01:31:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbiAOA3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 19:29:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3272 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231573AbiAOA3h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 19:29:37 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ENv0O0017452;
-        Sat, 15 Jan 2022 00:29:35 GMT
+        id S231572AbiAOAbc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 19:31:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26862 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230473AbiAOAbb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 19:31:31 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20F0RKQ4027399;
+        Sat, 15 Jan 2022 00:31:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=HbpaYULzQpBqw1+v8dqIzark2ZUc6zI9uCREJk4RULU=;
- b=jIHC8O9eXo1e2N+EpDIMaLEhEyGeb6EFxc89ajMVt1SMtS1x1gpbfuwYw03FL2oH0HG7
- RoMPJ9ol2eB1YPdiv/JhsoQIoBcCDQCOWo32ty0WnJlE4m48pcK3HKkMu75a5dAQ61u/
- vUiBBaQC5OZs9bbjOImDI16h3ok+1viaA+UyGCLDmO1uNINeKFRO1EarhUhnmcfxoXqw
- xDj9f8iR2tcKuJVhqNEoCdIEZhdyWDpFjghA6e3KmGI0xbNU+AsbWwembtr0ndCIRI5J
- Z1cyIpIMsoAApYz7GxpzzPs4Dq6dhPskkw66kr1mLwOg1CJbscTVjjHKCEftcbybcmvo GQ== 
+ bh=V7n77PggV3wohoM0Q9M5PGVIEWZcBEpdK6OGfj0DKPE=;
+ b=n4NRilMSntpLm6+ED3wHZJX7n1PdPA9UvdnX85+vMTFFKZJ99AQArRf0ODONfyf++cM0
+ iOz4rN+Jwyk2RiBtOlOe1BVGlGqDLmmPu8KfYmteJcvEvUdIWYvs3OF7ii5YDCugZps0
+ W3y2403ZHL+Tb6zHVAlZ8z4cURaN/R7ya7tgOEWegqOzTZx6oQJp+A2FyCe5q9XfsXLc
+ FkowkeBOXFZndqyGDImVoE0N42fA12Ckie+HSt722MB82qvfke201qUVGj6zE1vTY+/Q
+ SwNNMw4TRwgDaOuUGnx7HoO2+Go8x2BddswPVMXuLO6xBfiOuVJQYLgf8dN8i6y3lB8K tw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkka1gdym-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkkr9g1fb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 15 Jan 2022 00:29:35 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20F0OK6m012755;
-        Sat, 15 Jan 2022 00:29:34 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkka1gdyh-1
+        Sat, 15 Jan 2022 00:31:28 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20F0UFhr004054;
+        Sat, 15 Jan 2022 00:31:27 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkkr9g1f6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 15 Jan 2022 00:29:34 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20F0CgBv006822;
-        Sat, 15 Jan 2022 00:29:34 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma02dal.us.ibm.com with ESMTP id 3df28dj071-1
+        Sat, 15 Jan 2022 00:31:27 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20F0CKeP019623;
+        Sat, 15 Jan 2022 00:31:26 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma04dal.us.ibm.com with ESMTP id 3df28da0nv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 15 Jan 2022 00:29:34 +0000
+        Sat, 15 Jan 2022 00:31:26 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20F0TWMk20250968
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20F0VP9B31523266
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 15 Jan 2022 00:29:32 GMT
+        Sat, 15 Jan 2022 00:31:25 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 02653B2067;
-        Sat, 15 Jan 2022 00:29:32 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E7EB8B206B;
+        Sat, 15 Jan 2022 00:31:24 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D39F3B206E;
-        Sat, 15 Jan 2022 00:29:30 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 56362B206A;
+        Sat, 15 Jan 2022 00:31:23 +0000 (GMT)
 Received: from [9.160.163.221] (unknown [9.160.163.221])
         by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Sat, 15 Jan 2022 00:29:30 +0000 (GMT)
-Message-ID: <0afc896d-9bb8-737a-029a-38bdcf586f85@linux.ibm.com>
-Date:   Fri, 14 Jan 2022 19:29:30 -0500
+        Sat, 15 Jan 2022 00:31:23 +0000 (GMT)
+Message-ID: <1cbbe637-b04b-dcea-8773-39c56cf0664d@linux.ibm.com>
+Date:   Fri, 14 Jan 2022 19:31:22 -0500
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.3.0
-Subject: Re: [PATCH v17 08/15] s390/vfio-ap: keep track of active guests
+Subject: Re: [PATCH v17 06/15] s390/vfio-ap: refresh guest's APCB by filtering
+ APQNs assigned to mdev
 Content-Language: en-US
 To:     Halil Pasic <pasic@linux.ibm.com>
 Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -68,200 +69,72 @@ Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         alex.williamson@redhat.com, kwankhede@nvidia.com,
         fiuczy@linux.ibm.com
 References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
- <20211021152332.70455-9-akrowiak@linux.ibm.com>
- <20211230043322.2ba19bbd.pasic@linux.ibm.com>
- <fcce7cc6-6ac7-b22a-a957-80e59a0f4e83@linux.ibm.com>
- <20220112152520.4cd37e7c.pasic@linux.ibm.com>
+ <20211021152332.70455-7-akrowiak@linux.ibm.com>
+ <20211227095301.34a91ca4.pasic@linux.ibm.com>
+ <831f8897-b7cd-8240-c607-be3a106bad5c@linux.ibm.com>
+ <20220112125217.108e0fba.pasic@linux.ibm.com>
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20220112152520.4cd37e7c.pasic@linux.ibm.com>
+In-Reply-To: <20220112125217.108e0fba.pasic@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ndFYZsbomjh0ygcOYCzjcbhpnWHrSNUr
-X-Proofpoint-ORIG-GUID: u8oZqHQGn4jxJq8fVq3FuJf_HIHSDYkZ
+X-Proofpoint-ORIG-GUID: 88fXMtEUQe22qiLnx7pYhqwmuCbWelLD
+X-Proofpoint-GUID: f15oPun15kPacUHO2ueiQKDDJMkcfUBj
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-01-14_07,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 priorityscore=1501
- phishscore=0 mlxscore=0 mlxlogscore=897 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201140132
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 spamscore=0 impostorscore=0 priorityscore=1501
+ mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201150001
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 1/12/22 09:25, Halil Pasic wrote:
-> On Tue, 11 Jan 2022 16:58:13 -0500
+On 1/12/22 06:52, Halil Pasic wrote:
+> On Tue, 11 Jan 2022 16:19:06 -0500
 > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 >
->> On 12/29/21 22:33, Halil Pasic wrote:
->>> On Thu, 21 Oct 2021 11:23:25 -0400
->>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>>   
->>>> The vfio_ap device driver registers for notification when the pointer to
->>>> the KVM object for a guest is set. Let's store the KVM pointer as well as
->>>> the pointer to the mediated device when the KVM pointer is set.
->>> [..]
->>>
->>>   
->>>> struct ap_matrix_dev {
->>>>           ...
->>>>           struct rw_semaphore guests_lock;
->>>>           struct list_head guests;
->>>>          ...
->>>> }
->>>>
->>>> The 'guests_lock' field is a r/w semaphore to control access to the
->>>> 'guests' field. The 'guests' field is a list of ap_guest
->>>> structures containing the KVM and matrix_mdev pointers for each active
->>>> guest. An ap_guest structure will be stored into the list whenever the
->>>> vfio_ap device driver is notified that the KVM pointer has been set and
->>>> removed when notified that the KVM pointer has been cleared.
->>>>   
->>> Is this about the field or about the list including all the nodes? This
->>> reads lie guests_lock only protects the head element, which makes no
->>> sense to me. Because of how these lists work.
->> It locks the list, I can rewrite the description.
->>
->>> The narrowest scope that could make sense is all the list_head stuff
->>> in the entire list. I.e. one would only need the lock to traverse or
->>> manipulate the list, while the payload would still be subject to
->>> the matrix_dev->lock mutex.
->> The matrix_dev->guests lock is needed whenever the kvm->lock
->> is needed because the struct ap_guest object is created and the
->> struct kvm assigned to it when the kvm pointer is set
->> (vfio_ap_mdev_set_kvm function).
-> Yes reading the code, my impression was, that this is more about the
-> ap_guest.kvm that about the list.
+>>> Also we could probably do the filtering incrementally. In a sense that
+>>> at a time only so much changes, and we know that the invariant was
+>>> preserved without that change. But that would probably end up trading
+>>> complexity for cycles. I will trust your judgment and your tests on this
+>>> matter.
+>> I am not entirely clear on what you are suggesting. I think you are
+>> suggesting that there may not be a need to look at every APQN
+>> assigned to the mdev when an adapter or domain is assigned or
+>> unassigned or a queue is probed or removed. Maybe you can clarify
+>> what you are suggesting here.
+> Exactly. For example if we have the following assigned
+> adapters:
+> 1, 2, 3
+> domains:
+> 1, 2, 3
+> and the operation we are trying to perform is assign domain 4, then it
+> is sufficient to have a look at the queues with the APQNs (1,4), (2,4)
+> and (3, 4). We don't have to examine all the 14 queues.
 >
-> My understanding is that struct ap_gurest is basically about the
-> marriage between a matrix_mdev and a kvm. Basically a link between the
-> two.
+> When an unassign dapter is performed, there is no need to do the
+> re-filtering, because there is nothing that can pop-back or go away. And
+> on unassign domain is performed, then all we care about are the queues
+> of that domain on the filtered adapters.
 >
-> But then, it probably does not make a sense for this link to outlive
-> either kvm or matrix_mdev.
+> Similarly if after that successful assign the queue (3,4) gets removed
+> (from vfio_ap) and then added back again and probed, we only have to
+> look at the queues (3, 1), (3, 2), (3, 3).
 >
-> Thus I don't quite understand why do we need the extra allocation? If
-> we want a list, why don't we just the pointers to matrix_mdev?
->
-> We could still protect that stuff with a separate lock.
-
-I think this may be a good idea. We already have a list of matrix_mdev
-stored in matrix_dev. I'll explore this further.
-
->
->> So, in order to access the
->> ap_guest object and retrieve the kvm pointer, we have to ensure
->> the ap_guest_object is still available. The fact we can get the
->> kvm pointer from the ap_matrix_mdev object just makes things
->> more efficient - i.e., we won't have to traverse the list.
-> Well if the guests_lock is only protecting the list, then that should not
-> be true. In that case, you can be only sure about the nodes that you
-> reached by traversing the list with he lock held. Right.
->
-> If only the list is protected, then one could do
->
-> down_write(guests_lock)
-> list_del(element)
-> up_write(guests_lock)
-> fancy_free(element)
->
->
->> Whenever the kvm->lock and matrix_dev->lock mutexes must
->> be held, the order is:
->>
->>       matrix_dev->guests_lock
->>       matrix_dev->guests->kvm->lock
->>       matrix_dev->lock
->>
->> There are times where all three locks are not required; for example,
->> the handle_pqap and vfio_ap_mdev_probe/remove functions only
->> require the matrix_dev->lock because it does not need to lock kvm.
->>
-> Yeah, that is what gets rid of the circular lock dependency. If we had
-> to take guests_lock there we would have guests_lock in the same role
-> as matrix_dev->lock before.
->
-> But the thing is you do
-> kvm = q->matrix_mdev->guest->kvm;
-> in the pqap_handler (more precisely in a function called by it).
->
-> So you do access the struct ap_guest object and its kvm member
-> without the guests_lock being held. That is where things become very
-> muddy to me.
-
-I was thinking about this the other day, that the kvm pointer is
-needed when the IRQ is disabled to clean up the gisa stuff and
-the pinned memory. I'm going to revisit this.
-
->
-> It looks to me that the kvm pointer is changed with both the
-> guests_lock and the matrix_dev->lock held in write mode. And accessing
-> such stuff read only is safe with either of the two locks held.
->
-> Thus I do believe that the general idea is viable. I've pointed that out
-> in a later email.
->
-> But the information you give the unsuspecting reader to aid him in
-> understanding our new locking scheme is severely lacking.
-
-I'll try to clear up the patch description.
-
->
->>> [..]
->>>   
->>>> +struct ap_guest {
->>>> +	struct kvm *kvm;
->>>> +	struct list_head node;
->>>> +};
->>>> +
->>>>    /**
->>>>     * struct ap_matrix_dev - Contains the data for the matrix device.
->>>>     *
->>>> @@ -39,6 +44,9 @@
->>>>     *		single ap_matrix_mdev device. It's quite coarse but we don't
->>>>     *		expect much contention.
->>>>     * @vfio_ap_drv: the vfio_ap device driver
->>>> + * @guests_lock: r/w semaphore for protecting access to @guests
->>>> + * @guests:	list of guests (struct ap_guest) using AP devices bound to the
->>>> + *		vfio_ap device driver.
->>> Please compare the above. Also if it is only about the access to the
->>> list, then you could drop the lock right after create, and not keep it
->>> till the very end of vfio_ap_mdev_set_kvm(). Right?
->> That would be true if it only controlled access to the list, but as I
->> explained above, that is not its sole purpose.
-> Well, but guests is a member of struct ap_matrix_dev and not the whole
-> list including all the nodes.
->
->>> In any case I'm skeptical about this whole struct ap_guest business. To
->>> me, it looks like something that just makes things more obscure and
->>> complicated without any real benefit.
->> I'm open to other ideas, but you'll have to come up with a way
->> to take the kvm->lock before the matrix_mdev->lock in the
->> vfio_ap_mdev_probe_queue and vfio_ap_mdev_remove_queue
->> functions where we don't have access to the ap_matrix_mdev
->> object to which the APQN is assigned and has the pointer to the
->> kvm object.
->>
->> In order to retrieve the matrix_mdev, we need the matrix_dev->lock.
->> In order to hot plug/unplug the queue, we need the kvm->lock.
->> There's your catch-22 that needs to be solved. This design is my
->> attempt to solve that.
->>
-> I agree that having a lock that we take before kvm->lock is taken,
-> and another one that we take with the kvm->lock taken is a good idea.
->
-> I was referring to having ap_guest objects which are separately
-> allocated, and have a decoupled lifecycle. Please see above!
-
-I'm thinking about looking into getting rid of the struct ap_guest and
-the guests list as I said above. I think I can rework this.
-
+> But I'm OK with the current design of this. It is certainly conceptually
+> simpler to say we have a master-copy and we filter that master-copy based
+> on the very same rules every time something changes. I'm really fine
+> either way as log as it works well. :D
 >
 > Regards,
 > Halil
-> [..]
+
+I spent a day messing with this and was able to make it work, so
+the next implementation will incorporate your idea here.
+
 
