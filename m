@@ -2,548 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E71048F4F1
-	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 06:25:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C60B48F6B2
+	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 13:19:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231418AbiAOFY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Jan 2022 00:24:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54342 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231289AbiAOFYw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Jan 2022 00:24:52 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB37C06173F
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 21:24:52 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id b136-20020a621b8e000000b004bfc3cd755cso3096735pfb.4
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 21:24:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=lFCb57Kor/0rkIz1Naz+xs2cTGrazzFbtHuHaeXBim4=;
-        b=iJOkVS+DkXBLh17A8Z2UvmIS2m+b9yW9GsMjlDzxzBdW1MCO8ieICfacEHzBoWdCRL
-         Qb8W9NsmgAWsn1s8PWdzP1yA/pPRoitxP7MmwhroUiaw6rV0zenz33K4NwIeHH2We4Sc
-         mMyYk1JNy/4365ov3Fpfpxjm/LsAWUPo1sUZDdTS19CobwwXGzdD7+Ge/UcVR12lon1w
-         AgTJzDL5PA5/+Rb8n1+q4bzfvV4m5VOnhoUvD5v2nhPHlOZeyrICC/lmwuCJbdxChepo
-         gXytmjbVB+D54dWcLpN5g6f+Ixe4oBbGQtElDOFx1s+wr50U15nYHPxmLXrpyGvcqIQ4
-         07Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=lFCb57Kor/0rkIz1Naz+xs2cTGrazzFbtHuHaeXBim4=;
-        b=rzqCnYHA7KqIHXPQVGPIcaZZr0qw7LHkYh8YKBlNjWFon7VLtDnsKTEb3wG70iKsOX
-         enyAcPG/vnFhzVISGDY2e+9VW046U3S7Bn8aObVsvgTCcZ2UsrR3HCI0++7m7vgxzBVW
-         +MiX8FjFgQkWeeHq9qFrzUDQvW0lc+DqS2wJZC7Fbyx1xTidallljVQMseG6lynI8b1X
-         OI0zBW8RP/o/afqd/qUszpj5Psiy9k39PaI1ALt8FaiPHk0bY2doaTp8FgRMFlOaxrtf
-         McYy4scVmU869DOr4k1BL7JWkzOUE46X9j+Rb4lWB4a7+kp+3kYqs6RSGHCbJ0HI3b0D
-         +LpQ==
-X-Gm-Message-State: AOAM530rpsXtckToSEXuDtA7C5LIVUBh0Hb0sZIAG7SwwVNXuGC2Auv8
-        wmViqm5XwJLW3EYuAda+uy6iyN1aSwSeakZGjWCvIp045E6MbJvbag/RfpxHbmgppJh0Bm9gC6g
-        UZjT/erBMalxlrZOTalRJeGIIdGIyO6bO95hfOgSO27kV5Bw1X7OjApCUq+f0N8M=
-X-Google-Smtp-Source: ABdhPJy4Z2keSbgAOniEwjllq/NBqiNtg0R/JMxLCGLfQf58NTP72sNBlRDZAzY0mu13UQZP0BaFLuj3YZDzDA==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a05:6a00:ac4:b0:4bd:6555:1746 with SMTP
- id c4-20020a056a000ac400b004bd65551746mr11983387pfl.39.1642224291826; Fri, 14
- Jan 2022 21:24:51 -0800 (PST)
-Date:   Fri, 14 Jan 2022 21:24:31 -0800
-In-Reply-To: <20220115052431.447232-1-jmattson@google.com>
-Message-Id: <20220115052431.447232-7-jmattson@google.com>
-Mime-Version: 1.0
-References: <20220115052431.447232-1-jmattson@google.com>
-X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
-Subject: [PATCH v3 6/6] selftests: kvm/x86: Add test for KVM_SET_PMU_EVENT_FILTER
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
-        daviddunn@google.com, cloudliang@tencent.com
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S230093AbiAOMTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Jan 2022 07:19:21 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:41614 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229452AbiAOMTV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Jan 2022 07:19:21 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EA4C1B80176
+        for <kvm@vger.kernel.org>; Sat, 15 Jan 2022 12:19:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A778C36AE7;
+        Sat, 15 Jan 2022 12:19:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642249158;
+        bh=6+qoAG36azZixXorCyoPCDPI6DnRVUfl3m7bOnDj5KU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KLl9nh3MIKbcNLt6+VXOV7hxY5sBJWY9sjxvHuXJZWMQTNruEPm2oE2K8IaFkf4Ec
+         H/gZYOZrMNriQf2QhctuVZmxnXPhzS30+wAFgdI2AIBkeI1LG2V7DfQ9LAUZjfw5bY
+         xDDgxulwAykNCiuenXZWxKNPbEL3wS4RHX5xHvGFEUnv+XGOUHC6HC9l8CZYqXF1Ha
+         2o57Cek2Faz7BpmDYbLTD9LCE6jNnOXQh/qdfZkrTzne+mnHJhq9fSVH8NnGD5r6p7
+         QnnHRAs+xJlL8giP4ooqfGeq+CibXwYKsapO307pkqPU73JUIUqUpRGcbTKfH492ho
+         nUJ+HXoy2k8bg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1n8i1c-000eTm-Hp; Sat, 15 Jan 2022 12:19:16 +0000
+Date:   Sat, 15 Jan 2022 12:19:16 +0000
+Message-ID: <87lezh8a4b.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 11/69] KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+In-Reply-To: <YeG17OWrvFPQjgjS@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-12-maz@kernel.org>
+        <YeG17OWrvFPQjgjS@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that the PMU event filter works as expected.
+On Fri, 14 Jan 2022 17:42:04 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> Bunch of bikeshedding regarding names below, which can be safely ignored.
+> 
+> On Mon, Nov 29, 2021 at 08:00:52PM +0000, Marc Zyngier wrote:
+> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > 
+> > When running a nested hypervisor we commonly have to figure out if
+> > the VCPU mode is running in the context of a guest hypervisor or guest
+> > guest, or just a normal guest.
+> > 
+> > Add convenient primitives for this.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h | 55 ++++++++++++++++++++++++++++
+> >  1 file changed, 55 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index f4871e47b2d0..f4b079945d0f 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -176,6 +176,61 @@ static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+> >  		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+> >  }
+> >  
+> > +static inline bool vcpu_mode_el2_ctxt(const struct kvm_cpu_context *ctxt)
+> 
+> "The Armv8-A architecture defines a set of Exception levels, EL0 to EL3" (ARM
+> DDI 0487G.a, page G1-5941).
+> 
+> "AArch64 state does not support modes. Modes are a concept that is specific to
+> AArch32 state." (ARM DDI 0487G.a, page G1-5944).
+> 
+> Wouldn't it be better to use the same terminology as the architecture?
 
-Note that the virtual PMU doesn't work as expected on AMD Zen CPUs (an
-intercepted rdmsr is counted as a retired branch instruction), but the
-PMU event filter does work.
+Probably. I'll see how invasive it is to repaint this. It still
+remains that the 'mode' term is used all over the shop (for example,
+PSR_MODE_*).
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/pmu_event_filter_test.c        | 438 ++++++++++++++++++
- 3 files changed, 440 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > +{
+> > +	unsigned long cpsr = ctxt->regs.pstate;
+> 
+> CPSR is an AArch32 register. Why not name the variable pstate?
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 8c129961accf..7834e03ab159 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -22,6 +22,7 @@
- /x86_64/mmio_warning_test
- /x86_64/mmu_role_test
- /x86_64/platform_info_test
-+/x86_64/pmu_event_filter_test
- /x86_64/set_boot_cpu_id
- /x86_64/set_sregs_test
- /x86_64/sev_migrate_tests
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c407ebbec2c1..899413a6588f 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -56,6 +56,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
- TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
- TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
-+TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-new file mode 100644
-index 000000000000..1cf697fca7aa
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -0,0 +1,438 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Test for x86 KVM_SET_PMU_EVENT_FILTER.
-+ *
-+ * Copyright (C) 2022, Google LLC.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ *
-+ * Verifies the expected behavior of allow lists and deny lists for
-+ * virtual PMU events.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+/*
-+ * In lieu of copying perf_event.h into tools...
-+ */
-+#define ARCH_PERFMON_EVENTSEL_OS			(1ULL << 17)
-+#define ARCH_PERFMON_EVENTSEL_ENABLE			(1ULL << 22)
-+
-+union cpuid10_eax {
-+	struct {
-+		unsigned int version_id:8;
-+		unsigned int num_counters:8;
-+		unsigned int bit_width:8;
-+		unsigned int mask_length:8;
-+	} split;
-+	unsigned int full;
-+};
-+
-+union cpuid10_ebx {
-+	struct {
-+		unsigned int no_unhalted_core_cycles:1;
-+		unsigned int no_instructions_retired:1;
-+		unsigned int no_unhalted_reference_cycles:1;
-+		unsigned int no_llc_reference:1;
-+		unsigned int no_llc_misses:1;
-+		unsigned int no_branch_instruction_retired:1;
-+		unsigned int no_branch_misses_retired:1;
-+	} split;
-+	unsigned int full;
-+};
-+
-+/* End of stuff taken from perf_event.h. */
-+
-+/* Oddly, this isn't in perf_event.h. */
-+#define ARCH_PERFMON_BRANCHES_RETIRED		5
-+
-+#define VCPU_ID 0
-+#define NUM_BRANCHES 42
-+
-+/*
-+ * This is how the event selector and unit mask are stored in an AMD
-+ * core performance event-select register. Intel's format is similar,
-+ * but the event selector is only 8 bits.
-+ */
-+#define EVENT(select, umask) ((select & 0xf00UL) << 24 | (select & 0xff) | \
-+			      (umask & 0xff) << 8)
-+
-+/*
-+ * "Branch instructions retired", from the Intel SDM, volume 3,
-+ * "Pre-defined Architectural Performance Events."
-+ */
-+
-+#define INTEL_BR_RETIRED EVENT(0xc4, 0)
-+
-+/*
-+ * "Retired branch instructions", from Processor Programming Reference
-+ * (PPR) for AMD Family 17h Model 01h, Revision B1 Processors,
-+ * Preliminary Processor Programming Reference (PPR) for AMD Family
-+ * 17h Model 31h, Revision B0 Processors, and Preliminary Processor
-+ * Programming Reference (PPR) for AMD Family 19h Model 01h, Revision
-+ * B1 Processors Volume 1 of 2.
-+ */
-+
-+#define AMD_ZEN_BR_RETIRED EVENT(0xc2, 0)
-+
-+/*
-+ * This event list comprises Intel's eight architectural events plus
-+ * AMD's "retired branch instructions" for Zen[123] (and possibly
-+ * other AMD CPUs).
-+ */
-+static const uint64_t event_list[] = {
-+	EVENT(0x3c, 0),
-+	EVENT(0xc0, 0),
-+	EVENT(0x3c, 1),
-+	EVENT(0x2e, 0x4f),
-+	EVENT(0x2e, 0x41),
-+	EVENT(0xc4, 0),
-+	EVENT(0xc5, 0),
-+	EVENT(0xa4, 1),
-+	AMD_ZEN_BR_RETIRED,
-+};
-+
-+/*
-+ * If we encounter a #GP during the guest PMU sanity check, then the guest
-+ * PMU is not functional. Inform the hypervisor via GUEST_SYNC(0).
-+ */
-+static void guest_gp_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(0);
-+}
-+
-+/*
-+ * Check that we can write a new value to the given MSR and read it back.
-+ * The caller should provide a non-empty set of bits that are safe to flip.
-+ *
-+ * Return on success. GUEST_SYNC(0) on error.
-+ */
-+static void check_msr(uint32_t msr, uint64_t bits_to_flip)
-+{
-+	uint64_t v = rdmsr(msr) ^ bits_to_flip;
-+
-+	wrmsr(msr, v);
-+	if (rdmsr(msr) != v)
-+		GUEST_SYNC(0);
-+
-+	v ^= bits_to_flip;
-+	wrmsr(msr, v);
-+	if (rdmsr(msr) != v)
-+		GUEST_SYNC(0);
-+}
-+
-+static void intel_guest_code(void)
-+{
-+	check_msr(MSR_CORE_PERF_GLOBAL_CTRL, 1);
-+	check_msr(MSR_P6_EVNTSEL0, 0xffff);
-+	check_msr(MSR_IA32_PMC0, 0xffff);
-+	GUEST_SYNC(1);
-+
-+	for (;;) {
-+		uint64_t br0, br1;
-+
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+		wrmsr(MSR_P6_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | INTEL_BR_RETIRED);
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 1);
-+		br0 = rdmsr(MSR_IA32_PMC0);
-+		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+		br1 = rdmsr(MSR_IA32_PMC0);
-+		GUEST_SYNC(br1 - br0);
-+	}
-+}
-+
-+/*
-+ * To avoid needing a check for CPUID.80000001:ECX.PerfCtrExtCore[bit 23],
-+ * this code uses the always-available, legacy K7 PMU MSRs, which alias to
-+ * the first four of the six extended core PMU MSRs.
-+ */
-+static void amd_guest_code(void)
-+{
-+	check_msr(MSR_K7_EVNTSEL0, 0xffff);
-+	check_msr(MSR_K7_PERFCTR0, 0xffff);
-+	GUEST_SYNC(1);
-+
-+	for (;;) {
-+		uint64_t br0, br1;
-+
-+		wrmsr(MSR_K7_EVNTSEL0, 0);
-+		wrmsr(MSR_K7_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | AMD_ZEN_BR_RETIRED);
-+		br0 = rdmsr(MSR_K7_PERFCTR0);
-+		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+		br1 = rdmsr(MSR_K7_PERFCTR0);
-+		GUEST_SYNC(br1 - br0);
-+	}
-+}
-+
-+/*
-+ * Run the VM to the next GUEST_SYNC(value), and return the value passed
-+ * to the sync. Any other exit from the guest is fatal.
-+ */
-+static uint64_t run_vm_to_sync(struct kvm_vm *vm)
-+{
-+	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+	struct ucall uc;
-+
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+	get_ucall(vm, VCPU_ID, &uc);
-+	TEST_ASSERT(uc.cmd == UCALL_SYNC,
-+		    "Received ucall other than UCALL_SYNC: %lu", uc.cmd);
-+	return uc.args[1];
-+}
-+
-+/*
-+ * In a nested environment or if the vPMU is disabled, the guest PMU
-+ * might not work as architected (accessing the PMU MSRs may raise
-+ * #GP, or writes could simply be discarded). In those situations,
-+ * there is no point in running these tests. The guest code will perform
-+ * a sanity check and then GUEST_SYNC(success). In the case of failure,
-+ * the behavior of the guest on resumption is undefined.
-+ */
-+static bool sanity_check_pmu(struct kvm_vm *vm)
-+{
-+	bool success;
-+
-+	vm_install_exception_handler(vm, GP_VECTOR, guest_gp_handler);
-+	success = run_vm_to_sync(vm);
-+	vm_install_exception_handler(vm, GP_VECTOR, NULL);
-+
-+	return success;
-+}
-+
-+static struct kvm_pmu_event_filter *make_pmu_event_filter(uint32_t nevents)
-+{
-+	struct kvm_pmu_event_filter *f;
-+	int size = sizeof(*f) + nevents * sizeof(f->events[0]);
-+
-+	f = malloc(size);
-+	TEST_ASSERT(f, "Out of memory");
-+	memset(f, 0, size);
-+	f->nevents = nevents;
-+	return f;
-+}
-+
-+static struct kvm_pmu_event_filter *event_filter(uint32_t action)
-+{
-+	struct kvm_pmu_event_filter *f;
-+	int i;
-+
-+	f = make_pmu_event_filter(ARRAY_SIZE(event_list));
-+	f->action = action;
-+	for (i = 0; i < ARRAY_SIZE(event_list); i++)
-+		f->events[i] = event_list[i];
-+
-+	return f;
-+}
-+
-+/*
-+ * Remove the first occurrence of 'event' (if any) from the filter's
-+ * event list.
-+ */
-+static struct kvm_pmu_event_filter *remove_event(struct kvm_pmu_event_filter *f,
-+						 uint64_t event)
-+{
-+	bool found = false;
-+	int i;
-+
-+	for (i = 0; i < f->nevents; i++) {
-+		if (found)
-+			f->events[i - 1] = f->events[i];
-+		else
-+			found = f->events[i] == event;
-+	}
-+	if (found)
-+		f->nevents--;
-+	return f;
-+}
-+
-+static void test_without_filter(struct kvm_vm *vm)
-+{
-+	uint64_t count = run_vm_to_sync(vm);
-+
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
-+static uint64_t test_with_filter(struct kvm_vm *vm,
-+				 struct kvm_pmu_event_filter *f)
-+{
-+	vm_ioctl(vm, KVM_SET_PMU_EVENT_FILTER, (void *)f);
-+	return run_vm_to_sync(vm);
-+}
-+
-+static void test_member_deny_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-+	uint64_t count = test_with_filter(vm, f);
-+
-+	free(f);
-+	if (count)
-+		pr_info("%s: Branch instructions retired = %lu (expected 0)\n",
-+			__func__, count);
-+	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
-+}
-+
-+static void test_member_allow_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
-+	uint64_t count = test_with_filter(vm, f);
-+
-+	free(f);
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
-+static void test_not_member_deny_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-+	uint64_t count;
-+
-+	remove_event(f, INTEL_BR_RETIRED);
-+	remove_event(f, AMD_ZEN_BR_RETIRED);
-+	count = test_with_filter(vm, f);
-+	free(f);
-+	if (count != NUM_BRANCHES)
-+		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",
-+			__func__, count, NUM_BRANCHES);
-+	TEST_ASSERT(count, "Allowed PMU event is not counting");
-+}
-+
-+static void test_not_member_allow_list(struct kvm_vm *vm)
-+{
-+	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
-+	uint64_t count;
-+
-+	remove_event(f, INTEL_BR_RETIRED);
-+	remove_event(f, AMD_ZEN_BR_RETIRED);
-+	count = test_with_filter(vm, f);
-+	free(f);
-+	if (count)
-+		pr_info("%s: Branch instructions retired = %lu (expected 0)\n",
-+			__func__, count);
-+	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
-+}
-+
-+/*
-+ * Check for a non-zero PMU version, at least one general-purpose
-+ * counter per logical processor, an EBX bit vector of length greater
-+ * than 5, and EBX[5] clear.
-+ */
-+static bool check_intel_pmu_leaf(struct kvm_cpuid_entry2 *entry)
-+{
-+	union cpuid10_eax eax = { .full = entry->eax };
-+	union cpuid10_ebx ebx = { .full = entry->ebx };
-+
-+	return eax.split.version_id && eax.split.num_counters > 0 &&
-+		eax.split.mask_length > ARCH_PERFMON_BRANCHES_RETIRED &&
-+		!ebx.split.no_branch_instruction_retired;
-+}
-+
-+/*
-+ * Note that CPUID leaf 0xa is Intel-specific. This leaf should be
-+ * clear on AMD hardware.
-+ */
-+static bool use_intel_pmu(void)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_cpuid2 *cpuid;
-+
-+	cpuid = kvm_get_supported_cpuid();
-+	entry = kvm_get_supported_cpuid_index(0xa, 0);
-+	return is_intel_cpu() && entry && check_intel_pmu_leaf(entry);
-+}
-+
-+static bool is_zen1(uint32_t eax)
-+{
-+	return x86_family(eax) == 0x17 && x86_model(eax) <= 0x0f;
-+}
-+
-+static bool is_zen2(uint32_t eax)
-+{
-+	return x86_family(eax) == 0x17 &&
-+		x86_model(eax) >= 0x30 && x86_model(eax) <= 0x3f;
-+}
-+
-+static bool is_zen3(uint32_t eax)
-+{
-+	return x86_family(eax) == 0x19 && x86_model(eax) <= 0x0f;
-+}
-+
-+/*
-+ * Determining AMD support for a PMU event requires consulting the AMD
-+ * PPR for the CPU or reference material derived therefrom. The AMD
-+ * test code herein has been verified to work on Zen1, Zen2, and Zen3.
-+ *
-+ * Feel free to add more AMD CPUs that are documented to support event
-+ * select 0xc2 umask 0 as "retired branch instructions."
-+ */
-+static bool use_amd_pmu(void)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_cpuid2 *cpuid;
-+
-+	cpuid = kvm_get_supported_cpuid();
-+	entry = kvm_get_supported_cpuid_index(1, 0);
-+	return is_amd_cpu() && entry &&
-+		(is_zen1(entry->eax) ||
-+		 is_zen2(entry->eax) ||
-+		 is_zen3(entry->eax));
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	void (*guest_code)(void) = NULL;
-+	struct kvm_vm *vm;
-+	int r;
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	r = kvm_check_cap(KVM_CAP_PMU_EVENT_FILTER);
-+	if (!r) {
-+		print_skip("KVM_CAP_PMU_EVENT_FILTER not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	if (use_intel_pmu())
-+		guest_code = intel_guest_code;
-+	else if (use_amd_pmu())
-+		guest_code = amd_guest_code;
-+
-+	if (!guest_code) {
-+		print_skip("Don't know how to test this guest PMU");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+
-+	if (!sanity_check_pmu(vm)) {
-+		print_skip("Guest PMU is not functional");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	test_without_filter(vm);
-+	test_member_deny_list(vm);
-+	test_member_allow_list(vm);
-+	test_not_member_deny_list(vm);
-+	test_not_member_allow_list(vm);
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
+Because we have *a ton* of existing CPSR references all over the shop
+(more than references to pstate, actually), owing to the AArch32
+heritage of KVM/arm64. Yes, I can change this locally without any
+damage. But repainting the whole of KVM would be fairly pointless
+(same with hsr/esr, hfar/far_el2...).
+
+> 
+> > +
+> > +	switch (cpsr & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
+> > +	case PSR_MODE_EL2h:
+> > +	case PSR_MODE_EL2t:
+> > +		return true;
+> > +	default:
+> > +		return false;
+> > +	}
+> > +}
+> > +
+> > +static inline bool vcpu_mode_el2(const struct kvm_vcpu *vcpu)
+> > +{
+> > +	return vcpu_mode_el2_ctxt(&vcpu->arch.ctxt);
+> > +}
+> > +
+> > +static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
+> > +{
+> > +	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
+> > +}
+> > +
+> > +static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
+> > +{
+> > +	return __vcpu_el2_e2h_is_set(&vcpu->arch.ctxt);
+> > +}
+> > +
+> > +static inline bool __vcpu_el2_tge_is_set(const struct kvm_cpu_context *ctxt)
+> > +{
+> > +	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_TGE;
+> > +}
+> > +
+> > +static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
+> 
+> This is confusing. What does the exception level have to do with the
+> HCR_EL2.TGE bit being set? Wouldn't vcpu_hcr_tge_is_set() be better?
+
+Sure, why not. Again, I'll see how invasive such a repainting is
+across 70 patches.
+
+> 
+> > +{
+> > +	return __vcpu_el2_tge_is_set(&vcpu->arch.ctxt);
+> > +}
+> > +
+> > +static inline bool __is_hyp_ctxt(const struct kvm_cpu_context *ctxt)
+> > +{
+> > +	/*
+> > +	 * We are in a hypervisor context if the vcpu mode is EL2 or
+> > +	 * E2H and TGE bits are set. The latter means we are in the user space
+> > +	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
+> 
+> So why not call the function vcpu_is_inhost() or something along
+> those lines to match the architecture?
+
+Because this is not the architectural 'InHost' primitive, which
+returns 'false' if HCR_EL2.E2H==0. The second term of the expression
+could be written in terms of an InHost primitive, but that's about it.
+
+> 
+> Thanks,
+> Alex
+> 
+> > +	 */
+> > +	return vcpu_mode_el2_ctxt(ctxt) ||
+> > +		(__vcpu_el2_e2h_is_set(ctxt) && __vcpu_el2_tge_is_set(ctxt)) ||
+> > +		WARN_ON(__vcpu_el2_tge_is_set(ctxt));
+> > +}
+> > +
+> > +static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+> > +{
+> > +	return __is_hyp_ctxt(&vcpu->arch.ctxt);
+> > +}
+> > +
+> >  /*
+> >   * The layout of SPSR for an AArch32 state is different when observed from an
+> >   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1.703.g22d0c6ccf7-goog
-
+Without deviation from the norm, progress is not possible.
