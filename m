@@ -2,119 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 143F148F4D9
-	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 06:02:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DA7A48F4EC
+	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 06:24:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiAOFCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Jan 2022 00:02:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49480 "EHLO
+        id S230080AbiAOFYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Jan 2022 00:24:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiAOFCH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Jan 2022 00:02:07 -0500
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A2DC061574
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 21:02:07 -0800 (PST)
-Received: by mail-oi1-x235.google.com with SMTP id s22so15147509oie.10
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 21:02:06 -0800 (PST)
+        with ESMTP id S229458AbiAOFYn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Jan 2022 00:24:43 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80293C061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 21:24:43 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id w195-20020a6282cc000000b004bdce57da98so3093725pfd.5
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 21:24:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FQzHCH5FlNz+U7bWBTAZyle45WIZg9psEvWsAgYcLfg=;
-        b=XsYeRC5z/SD0yApPR18F+winVTYuaJQFhvy2FZDWgSlNjK69/lSizDgqqAHegy0hkj
-         BvLr0gPCZYVnMlpYHDa9si/dJEjy4EYBX+X78hWUzBxs3XkAV0trxT/aw6zvi02p470D
-         oN8ZQ1bueuykpTrhY5gp7Mae/UIjQ9oiH2630gpal53lPVoGnzCK2hhsSe+71U1Zq/6N
-         W91qFm/T/+ss2VP5tiUaFQEwujwfxntp1ZoS4teVWfnUYL168IqrT5kvX5JAEJIo0ywB
-         7RNVCPIOZyG33gzhWCq9QpuTk47lZ9mf4glEOfgu0QLwXeAYod/ctxWZ/He28JY7f5e1
-         8Adg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=1OOJjIJzsfYox4VRrNoUCp4CbcUM8/AlP6XykWkhfHU=;
+        b=pY8+mpP8JLc3i6qsWvP/l5pbSHqAlqIGD4uBcV4b9tRBExy8l1AuGKgnfDGa6llWOg
+         afhF+01Fyt67a3nEMynIcd3ZL7JS1QTQR1NU/UphfJCnUR92QnuxQUJAs+Mx0ljZSgyz
+         uNbRI2mWmqeh+jQfxxOHN2aMqq9Y0utrZGhaJUxGKsDKME9mgSAnqK/8+RQwPbV26gUo
+         7Wt/uvuJ9nQfTmVLp6aD3aCmfnnOLITEsMx0FUwpEGDl43aBzZ+oJc0l7XSsTXu1VOpx
+         opMb4NIRt2GjhK7OgSxyVTtT1uBchaeKNOSF3mqS3EG3rQZwNJVBZEueOTUr3/8lNRbT
+         78dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FQzHCH5FlNz+U7bWBTAZyle45WIZg9psEvWsAgYcLfg=;
-        b=lm1PBDi9W8l+2zxZZTf1lNGegOhWg6lxUr5XvAF7Js08PWvgHnLrF4PKNdivEXv8Fa
-         5cUwIRLaFp/kZusFTMxDQro9sXgCOAMMj9fi1XU6JxRlWKBZ6R65EdLKcDoetll0CHk4
-         S806r9Sq14ZZN+pEufCZrumpLwyMSnRzD5CG1QA/k2LhBjesFHyBhwl/uVFulGkJap+o
-         jsSvv2WS5lIZoZAXFZPhvVWIH+Sd3qCNPk+FIIgUTKLsJxvRd9mwyRvKYz2cnO5n7X/o
-         YE/oPbDZTiBtvUwyYsUPD8aeixQqFnLoL4MM+VyCgZy2I8Js+vjmht/duHCNS7BPS/pK
-         BH1A==
-X-Gm-Message-State: AOAM533/fn+2Kw3CpuKANaZ0jR1x/T8o9AzoA1Vew4ZV6xnebszYnRZS
-        Qwo4OADUN6jwkzc9cq4KM0dvXDPX+7/8lNo5FhJtlg==
-X-Google-Smtp-Source: ABdhPJwcAip/K8CaTPAsCGOnQhlrdjH1/8ecfJ8WFfimVc+XEKvqSBS78uBKLzO3xk4ryebq7emeiShV4MRHCSNkrfY=
-X-Received: by 2002:a05:6808:14cd:: with SMTP id f13mr10526810oiw.76.1642222926120;
- Fri, 14 Jan 2022 21:02:06 -0800 (PST)
-MIME-Version: 1.0
-References: <20220114012109.153448-1-jmattson@google.com> <20220114012109.153448-7-jmattson@google.com>
- <CABOYuvb=LgmGSZ33Ht6eGYO8P-88Y7i=F=AEjVDxPfkQg46x0g@mail.gmail.com>
-In-Reply-To: <CABOYuvb=LgmGSZ33Ht6eGYO8P-88Y7i=F=AEjVDxPfkQg46x0g@mail.gmail.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=1OOJjIJzsfYox4VRrNoUCp4CbcUM8/AlP6XykWkhfHU=;
+        b=mPbot0OFGQF1OejX+mmWxM/V8pyXD5T4Xh3OYuiCDIUe/Lbd4m47dzk2luKW/Oiijy
+         42UObvOi5oZVe0O5vOk8gdec2PLXmUxHUdIFjUw2W8iYdlOAdrInWBJCByI8t0PIVBqx
+         nssa6E0YETiNe21UdIJHE9XAuT5iBBSFkUdGGFzai4iuR4MmMbxcjD7c4/uF319NFe8X
+         eEwx8Aao2xgvlINqMvQU03nTCroO+D0fTr7kftNNSxGP2uUnsslHhKwD5fvD94Z2KFFo
+         25nCauvolGkiibCxGtyYrvysjvobjhN4Ga68Qfe2ZIy4piclsxBr5iEJPhw80G4IKf3q
+         /SLA==
+X-Gm-Message-State: AOAM532xiMs+7/k0wnKm8TRV5uSXKyJ7S4J+E3qjuYL/e3fAzDwqibKO
+        8akL/XwYcSKFBqBydVdVkTUtBeGWF/nqHmn+yyZkZJsdFqzIeP/QinrucE/UnvSJtfHI9/8vtCT
+        EkGRqCe66ZIWVoopfXkk4LbdDVFm6HaA2bkm16RGD5/x2hApmErnKdnmV2razDFE=
+X-Google-Smtp-Source: ABdhPJwPuT/hCH3VMMGTySAsD1w+nCvgVYi+AqZJjmoxPvBPDgsyp2qsa1s3xWiGsZC+5CPWbOJVT3pe1shy7w==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:90a:2a4e:: with SMTP id
+ d14mr716493pjg.0.1642224281831; Fri, 14 Jan 2022 21:24:41 -0800 (PST)
+Date:   Fri, 14 Jan 2022 21:24:25 -0800
+Message-Id: <20220115052431.447232-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
+Subject: [PATCH v3 0/6] KVM: x86/pmu: Use binary search to check filtered events
 From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 14 Jan 2022 21:01:55 -0800
-Message-ID: <CALMp9eRWWgY1UT6KvnpHoopA86W9=kXojjYpvjLasJ9oBtNGSA@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] selftests: kvm/x86: Add test for KVM_SET_PMU_EVENT_FILTER
-To:     David Dunn <daviddunn@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
-        cloudliang@tencent.com
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
+        daviddunn@google.com, cloudliang@tencent.com
+Cc:     Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 11:15 AM David Dunn <daviddunn@google.com> wrote:
->
-> Jim,
->
-> The patch set looks good to me.  A couple comments and questions
-> related just to this test are inline.
->
-> On Thu, Jan 13, 2022 at 5:21 PM Jim Mattson <jmattson@google.com> wrote:
->
-> > + * Determining AMD support for a PMU event requires consulting the AMD
-> > + * PPR for the CPU or reference material derived therefrom.
-> > + */
-> > +static bool vcpu_supports_amd_zen_br_retired(void)
-> > +{
-> > +       struct kvm_cpuid_entry2 *entry;
-> > +       struct kvm_cpuid2 *cpuid;
-> > +
-> > +       cpuid = kvm_get_supported_cpuid();
-> > +       entry = kvm_get_supported_cpuid_index(1, 0);
-> > +       return entry &&
-> > +               ((x86_family(entry->eax) == 0x17 &&
-> > +                 (x86_model(entry->eax) == 1 ||
-> > +                  x86_model(entry->eax) == 0x31)) ||
-> > +                (x86_family(entry->eax) == 0x19 &&
-> > +                 x86_model(entry->eax) == 1));
-> > +}
->
-> The above function does not verify that the AMD host you are running
-> on supports PMU.  In particular, you might be running the KVM test
-> suite within a guest.  Is there a way to do that check here without
-> direct access to MSRs?  If not, maybe we need a KVM capability to
-> query this information.
+This started out as a simple change to sort the (up to 300 element)
+PMU filtered event list and to use binary search rather than linear
+search to see if an event is in the list.
 
-On Intel, if the parent hypervisor has constructed the CPUID:0AH leaf
-correctly, the test will skip because it can't find what it wants in
-CPUID:0AH, and the CPU family isn't what it is looking for on the AMD
-side.
+I thought it would be nice to add a directed test for the PMU event
+filter, and that's when things got complicated. The Intel side was
+fine, but the AMD side was a bit ugly, until I did a few
+refactorings. Imagine my dismay when I discovered that the PMU event
+filter works fine on the AMD side, but that fundamental PMU
+virtualization is broken.
 
-On AMD, the test assumes that the PMU is there (as the specification
-requires). For the Zen line, a VM with vPMU enabled should report
-CPUID:80000001H:ECX.PerfCtrExtCore[bit 23] set, and a VM with vPMU
-disabled should report that bit clear.
+I'm not referring to erratum 1292, though that throws even more
+brokenness into the mix. Apparently, a #VMEXIT counts as a "retired
+branch instruction." The Zen family PPRs do say, "This includes all
+types of architectural control flow changes, including exceptions and
+interrupts," so apparently everything is working as intended. However,
+this means that if the hypervisor doesn't adjust the counts, the
+results are not only different from bare metal, but they are
+non-deterministic as well (because a physical interrupt can occur at
+any time and bump the count up).
 
-In v3, I'm adding a PMU sanity check based on Linux's check_hw_exists().
+v1 -> v2
+* Drop the check for "AMDisbetter!" in is_amd_cpu() [David Dunn]
+* Drop the call to cpuid(0, 0) that fed the original check for
+  CPU vendor string "AuthenticAMD" in vm_compute_max_gfn().
+* Simplify the inline asm in the selftest by using the compound literal
+  for both input & output.
 
-> > +       r = kvm_check_cap(KVM_CAP_PMU_EVENT_FILTER);
-> > +       if (!r) {
-> > +               print_skip("KVM_CAP_PMU_EVENT_FILTER not supported");
-> > +               exit(KSFT_SKIP);
-> > +       }
->
-> This capability is still supported even when PMU has been disabled by
-> Like Xu's new module parameter.  Should all the PMU related
-> capabilities be gated behind that module parameter?
+v2 -> v3 [only the selftest is modified]
+* Literally copy ARCH_PERFMON_EVENTSEL_{OS,ENABLE} from perf_event.h,
+  rather than defining semantic equivalents.
+* Copy cpuid10_e[ab]x from perf_event.h for improved readability of the
+  code that checks CPUID.0AH.
+* Preface the guest code with a PMU sanity check, so that the test will
+  skip rather than fail if the PMU is non-functional (disabled by module
+  parameter, unimplemented or disabled by parent hypervisor, &c).
+  [David Dunn]
+* Refactor and rename the Intel and AMD PMU checks.
+* Use the is_amd_cpu() code from an earlier commit in the series (as well
+  as the is_intel_cpu() code).
+* Add a check for at least one general-purpose counter on the Intel side.
+* Change each of the Zen family/model checks to include the sixteen model
+  number range specified in AMD's "Revision Guide" for each generation of CPU,
+  rather than the single model number specified in the associated PPRs.
 
-Perhaps. That's something for Like Xu to consider with the current
-rewrite of the module parameter.
+Jim Mattson (6):
+  KVM: x86/pmu: Use binary search to check filtered events
+  selftests: kvm/x86: Parameterize the CPUID vendor string check
+  selftests: kvm/x86: Introduce is_amd_cpu()
+  selftests: kvm/x86: Export x86_family() for use outside of processor.c
+  selftests: kvm/x86: Introduce x86_model()
+  selftests: kvm/x86: Add test for KVM_SET_PMU_EVENT_FILTER
 
-> Dave Dunn
+ arch/x86/kvm/pmu.c                            |  30 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |  18 +
+ .../selftests/kvm/lib/x86_64/processor.c      |  40 +-
+ .../kvm/x86_64/pmu_event_filter_test.c        | 437 ++++++++++++++++++
+ 6 files changed, 492 insertions(+), 35 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+
+-- 
+2.34.1.703.g22d0c6ccf7-goog
+
