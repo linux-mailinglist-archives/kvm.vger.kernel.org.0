@@ -2,101 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F2A348F389
-	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 01:46:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 624DF48F422
+	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 02:27:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231594AbiAOAqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 19:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49990 "EHLO
+        id S231982AbiAOB0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 20:26:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230465AbiAOAqL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jan 2022 19:46:11 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F18C061574
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 16:46:10 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id a7so11735479plh.1
-        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 16:46:10 -0800 (PST)
+        with ESMTP id S229580AbiAOB0b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 20:26:31 -0500
+Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E4DC061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 17:26:31 -0800 (PST)
+Received: by mail-oo1-xc29.google.com with SMTP id v10-20020a4a244a000000b002ddfb22ab49so2768970oov.0
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 17:26:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bkM1TIVQ6Ac38f4nYsJNosa7HutS0fQKr+FWU8XPdnk=;
-        b=Yc/kl/Jbg9szpRv3k/IzparKqDb+3nAG79byiWJRAr6vcPID2qlK8Ll7ZhhGCQxKM8
-         qpnrDHGWORdYlTddFCIZc3MwCkKJ+fDE8F+hQJxxhm6k96biUQ7dMGQW/z3MvNn5zSzy
-         PmScnf2Ogg3ual4pUmmzq0EY4RbSN0/fWiSwf1cEac5e7yiSwjXuOqje1y8O9c/zgSew
-         aiQXMfsTxHHUXkMmh9zVcyjNklwiC2R/OcvtXjeHssebaHJfchlO0gd2PjZCHQwS36eg
-         KG15qUqzse9nkL3f8QZK/jx+X7zzcJfoyFCvcuIZh/bCI9p1Ut74ePaZy9y6y00xUXbc
-         Vbwg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iGxhzdY+o8fZ08CLZJyGxW7d23UVHciFJHOknE38cZw=;
+        b=iY7KJRBkntVU/rVadUv0PJdb2KFcPKF6PPUUe1IH2Di0GhGZ+a66TCmxaI27Sy6K+O
+         xUleFpkSeSW8rDXQtCd/ZcIsHwxjTi2wj2abfIPaYDB0Gh1AdHQfRGa8ODwTfFypjeN3
+         h+iS6UO4wJDhB41ypCxmNXU1ZILBnL8je6tDO+mAMWOcI4iz+mBvbNDCxL1PqEQexXgr
+         p8ojIWbPPFqewMueT3lthQW2KLwMTqbaScL87wYoUadMGXTaUX4i7SDAfUTUQ0+I7Iv4
+         c8bjM7BhMb7FrVn+cHVwma4ZPp1qBk1MbqcIlAiylmeRZelK0ikhu8JhhOd+ywqRpDEf
+         Tf+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bkM1TIVQ6Ac38f4nYsJNosa7HutS0fQKr+FWU8XPdnk=;
-        b=hxDkFnmT8X5zDNEbMOz0sqroMEHyU2PF5EGqfKfuNWg5akNkQgXIBR5DXGh5gR8RK/
-         l3gjkbEk23GKYD0BWuRsQl1urK4idRll5oNuO+kKtHBVGngEOASr45Xdno7WICPXl3Uq
-         tdrxzw5j5DQN1rd1h5tH1lhsisPwbOFvemHiWOd5HY4dK1/XH03zFdHRFB9w+FJQhKwe
-         BxVO6EtzIs+31X9oYeWQNBDzdK2JZ3D7x27bC0N5/KQFoGyt6F561romW8QK89QT76hc
-         VEK2V0rErO3zFNH8uRQiSPf7RjQABDnjW3gfvOcvw+MjCSQ0LNFtLC7zK2ZXRic14Hvb
-         JO5Q==
-X-Gm-Message-State: AOAM530V5Cj9ZTfCygZKWo4C9hgqsfdDl9lKBw+79bk5DroqMVwyecSx
-        5ARkdocYlVR4h4Jvx2KMyjx/Pg==
-X-Google-Smtp-Source: ABdhPJyjoEesRbQZZc0Tgpt+hvNhPOuvvNTkD9qfCCr7Q29ROSTPcf1hYZdlomlI4VxXqYxmdiidyQ==
-X-Received: by 2002:a17:902:e5c9:b0:14a:2da3:e60f with SMTP id u9-20020a170902e5c900b0014a2da3e60fmr11538953plf.100.1642207570237;
-        Fri, 14 Jan 2022 16:46:10 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id t25sm5504034pgv.9.2022.01.14.16.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 16:46:09 -0800 (PST)
-Date:   Sat, 15 Jan 2022 00:46:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wang Guangju <wangguangju@baidu.com>
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: enhance the readability of function
- pic_intack()
-Message-ID: <YeIZTkYCfkTE0Lob@google.com>
-References: <20220112085153.4506-1-wangguangju@baidu.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iGxhzdY+o8fZ08CLZJyGxW7d23UVHciFJHOknE38cZw=;
+        b=dLueQR2tXYGxVkLEI78eV8dg2YMnLfMSHGcdveFUlL80aKVxSlD4IcNp0eJFQIQkoS
+         erHMUt7PTGlcJA6H+eoLIifMpyqRy75gziLSrUfqvA7nEg1vlIUN9FrFV0BIgqKzi1bU
+         DFsVCU37aIJiwkJYL4es9aNqbJ1rUadrCNaEguTOQuUzHmI2AFa6l0TBsePnJCOBf/tb
+         HFh4dmWHOLJbWMUB/Tw7nQHe8Y922H6zOPHiZ7ah56oiUyDVaOxbjE2WURI3nVlJLA0F
+         PL1Y6l9+Rd+bc1LLCMiP1hBQONjK5MQLWg0sI5RbTAlQbB7Ceb/i+2u4PxfP3izFR6AV
+         73Jw==
+X-Gm-Message-State: AOAM531tvMjDne5k6ypx5lsDgGzlyi9i3twmrIp+49nxnMjcvMk4/vZ5
+        Pm8H1QmIo9JZCr4lvR3GHNw7BbGp3Lu08IhjHGUwLHUbEJ0DbA==
+X-Google-Smtp-Source: ABdhPJwnBXn26R+PGLexcGDygO0NDDlzWoHG9/A0kn5cgChrw7gacpCWI4kqdbckb+NpQsQn+2ru/m5TniKKnsyTS9U=
+X-Received: by 2002:a4a:dc16:: with SMTP id p22mr8238076oov.85.1642209990389;
+ Fri, 14 Jan 2022 17:26:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220112085153.4506-1-wangguangju@baidu.com>
+References: <20211117080304.38989-1-likexu@tencent.com> <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
+In-Reply-To: <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 14 Jan 2022 17:26:19 -0800
+Message-ID: <CALMp9eQCEFsQTbm7F9CqotirbP18OF_cQUySb7Q=dqiuiK1FMg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/svm: Add module param to control PMU virtualization
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 12, 2022, Wang Guangju wrote:
-> From: wangguangju <wangguangju@baidu.com>
-> 
-> In function pic_intack(), use a varibale of "mask" to
-> record expression of "1 << irq", so we can enhance the
-> readability of this function.
+On Thu, Nov 18, 2021 at 5:25 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 11/17/21 09:03, Like Xu wrote:
+> > From: Like Xu <likexu@tencent.com>
+> >
+> > For Intel, the guest PMU can be disabled via clearing the PMU CPUID.
+> > For AMD, all hw implementations support the base set of four
+> > performance counters, with current mainstream hardware indicating
+> > the presence of two additional counters via X86_FEATURE_PERFCTR_CORE.
+> >
+> > In the virtualized world, the AMD guest driver may detect
+> > the presence of at least one counter MSR. Most hypervisor
+> > vendors would introduce a module param (like lbrv for svm)
+> > to disable PMU for all guests.
+> >
+> > Another control proposal per-VM is to pass PMU disable information
+> > via MSR_IA32_PERF_CAPABILITIES or one bit in CPUID Fn4000_00[FF:00].
+> > Both of methods require some guest-side changes, so a module
+> > parameter may not be sufficiently granular, but practical enough.
+> >
+> > Signed-off-by: Like Xu <likexu@tencent.com>
+> > ---
+> >   arch/x86/kvm/cpuid.c   |  2 +-
+> >   arch/x86/kvm/svm/pmu.c |  4 ++++
+> >   arch/x86/kvm/svm/svm.c | 11 +++++++++++
+> >   arch/x86/kvm/svm/svm.h |  1 +
+> >   4 files changed, 17 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 2d70edb0f323..647af2a184ad 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -487,7 +487,7 @@ void kvm_set_cpu_caps(void)
+> >               F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
+> >               F(3DNOWPREFETCH) | F(OSVW) | 0 /* IBS */ | F(XOP) |
+> >               0 /* SKINIT, WDT, LWP */ | F(FMA4) | F(TBM) |
+> > -             F(TOPOEXT) | F(PERFCTR_CORE)
+> > +             F(TOPOEXT) | 0 /* PERFCTR_CORE */
+> >       );
+> >
+> >       kvm_cpu_cap_mask(CPUID_8000_0001_EDX,
+> > diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> > index fdf587f19c5f..a0bcf0144664 100644
+> > --- a/arch/x86/kvm/svm/pmu.c
+> > +++ b/arch/x86/kvm/svm/pmu.c
+> > @@ -16,6 +16,7 @@
+> >   #include "cpuid.h"
+> >   #include "lapic.h"
+> >   #include "pmu.h"
+> > +#include "svm.h"
+> >
+> >   enum pmu_type {
+> >       PMU_TYPE_COUNTER = 0,
+> > @@ -100,6 +101,9 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
+> >   {
+> >       struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+> >
+> > +     if (!pmuv)
+> > +             return NULL;
+> > +
+> >       switch (msr) {
+> >       case MSR_F15H_PERF_CTL0:
+> >       case MSR_F15H_PERF_CTL1:
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 21bb81710e0f..062e48c191ee 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -190,6 +190,10 @@ module_param(vgif, int, 0444);
+> >   static int lbrv = true;
+> >   module_param(lbrv, int, 0444);
+> >
+> > +/* enable/disable PMU virtualization */
+> > +bool pmuv = true;
+> > +module_param(pmuv, bool, 0444);
+> > +
+> >   static int tsc_scaling = true;
+> >   module_param(tsc_scaling, int, 0444);
+> >
+> > @@ -952,6 +956,10 @@ static __init void svm_set_cpu_caps(void)
+> >           boot_cpu_has(X86_FEATURE_AMD_SSBD))
+> >               kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+> >
+> > +     /* AMD PMU PERFCTR_CORE CPUID */
+> > +     if (pmuv && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+> > +             kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
+> > +
+> >       /* CPUID 0x8000001F (SME/SEV features) */
+> >       sev_set_cpu_caps();
+> >   }
+> > @@ -1085,6 +1093,9 @@ static __init int svm_hardware_setup(void)
+> >                       pr_info("LBR virtualization supported\n");
+> >       }
+> >
+> > +     if (!pmuv)
+> > +             pr_info("PMU virtualization is disabled\n");
+> > +
+> >       svm_set_cpu_caps();
+> >
+> >       /*
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index 0d7bbe548ac3..08e1c19ffbdf 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -32,6 +32,7 @@
+> >   extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+> >   extern bool npt_enabled;
+> >   extern bool intercept_smi;
+> > +extern bool pmuv;
+> >
+> >   /*
+> >    * Clean bits in VMCB.
+> >
+>
+> Queued, thanks - just changed the parameter name to "pmu".
 
-Please wrap at ~75 chars.
-
-> Signed-off-by: wangguangju <wangguangju@baidu.com>
-> ---
->  arch/x86/kvm/i8259.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-> index 814064d06016..ad6b64b11adc 100644
-> --- a/arch/x86/kvm/i8259.c
-> +++ b/arch/x86/kvm/i8259.c
-> @@ -216,12 +216,14 @@ void kvm_pic_clear_all(struct kvm_pic *s, int irq_source_id)
->   */
->  static inline void pic_intack(struct kvm_kpic_state *s, int irq)
->  {
-> -	s->isr |= 1 << irq;
-> +	int mask;
-
-Needs a newline, and could also be:
-
-	int mask = 1 << irq;
-
-or even
-
-	int mask = BIT(irq);
-
-That said, I oddly find the existing code more readable.  Maybe "irq_mask" instead
-of "mask"?  Dunno.  I guess I don't have a strong opinion :-)
+Whoops! The global 'pmu' is hidden by a local 'pmu' in get_gp_pmc_amd().
