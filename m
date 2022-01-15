@@ -2,139 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60BA148F383
-	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 01:31:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F2A348F389
+	for <lists+kvm@lfdr.de>; Sat, 15 Jan 2022 01:46:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231572AbiAOAbc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jan 2022 19:31:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26862 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230473AbiAOAbb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jan 2022 19:31:31 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20F0RKQ4027399;
-        Sat, 15 Jan 2022 00:31:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=V7n77PggV3wohoM0Q9M5PGVIEWZcBEpdK6OGfj0DKPE=;
- b=n4NRilMSntpLm6+ED3wHZJX7n1PdPA9UvdnX85+vMTFFKZJ99AQArRf0ODONfyf++cM0
- iOz4rN+Jwyk2RiBtOlOe1BVGlGqDLmmPu8KfYmteJcvEvUdIWYvs3OF7ii5YDCugZps0
- W3y2403ZHL+Tb6zHVAlZ8z4cURaN/R7ya7tgOEWegqOzTZx6oQJp+A2FyCe5q9XfsXLc
- FkowkeBOXFZndqyGDImVoE0N42fA12Ckie+HSt722MB82qvfke201qUVGj6zE1vTY+/Q
- SwNNMw4TRwgDaOuUGnx7HoO2+Go8x2BddswPVMXuLO6xBfiOuVJQYLgf8dN8i6y3lB8K tw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkkr9g1fb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 15 Jan 2022 00:31:28 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20F0UFhr004054;
-        Sat, 15 Jan 2022 00:31:27 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dkkr9g1f6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 15 Jan 2022 00:31:27 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20F0CKeP019623;
-        Sat, 15 Jan 2022 00:31:26 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma04dal.us.ibm.com with ESMTP id 3df28da0nv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 15 Jan 2022 00:31:26 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20F0VP9B31523266
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 15 Jan 2022 00:31:25 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E7EB8B206B;
-        Sat, 15 Jan 2022 00:31:24 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 56362B206A;
-        Sat, 15 Jan 2022 00:31:23 +0000 (GMT)
-Received: from [9.160.163.221] (unknown [9.160.163.221])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Sat, 15 Jan 2022 00:31:23 +0000 (GMT)
-Message-ID: <1cbbe637-b04b-dcea-8773-39c56cf0664d@linux.ibm.com>
-Date:   Fri, 14 Jan 2022 19:31:22 -0500
+        id S231594AbiAOAqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jan 2022 19:46:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49990 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230465AbiAOAqL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jan 2022 19:46:11 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F18C061574
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 16:46:10 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id a7so11735479plh.1
+        for <kvm@vger.kernel.org>; Fri, 14 Jan 2022 16:46:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=bkM1TIVQ6Ac38f4nYsJNosa7HutS0fQKr+FWU8XPdnk=;
+        b=Yc/kl/Jbg9szpRv3k/IzparKqDb+3nAG79byiWJRAr6vcPID2qlK8Ll7ZhhGCQxKM8
+         qpnrDHGWORdYlTddFCIZc3MwCkKJ+fDE8F+hQJxxhm6k96biUQ7dMGQW/z3MvNn5zSzy
+         PmScnf2Ogg3ual4pUmmzq0EY4RbSN0/fWiSwf1cEac5e7yiSwjXuOqje1y8O9c/zgSew
+         aiQXMfsTxHHUXkMmh9zVcyjNklwiC2R/OcvtXjeHssebaHJfchlO0gd2PjZCHQwS36eg
+         KG15qUqzse9nkL3f8QZK/jx+X7zzcJfoyFCvcuIZh/bCI9p1Ut74ePaZy9y6y00xUXbc
+         Vbwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bkM1TIVQ6Ac38f4nYsJNosa7HutS0fQKr+FWU8XPdnk=;
+        b=hxDkFnmT8X5zDNEbMOz0sqroMEHyU2PF5EGqfKfuNWg5akNkQgXIBR5DXGh5gR8RK/
+         l3gjkbEk23GKYD0BWuRsQl1urK4idRll5oNuO+kKtHBVGngEOASr45Xdno7WICPXl3Uq
+         tdrxzw5j5DQN1rd1h5tH1lhsisPwbOFvemHiWOd5HY4dK1/XH03zFdHRFB9w+FJQhKwe
+         BxVO6EtzIs+31X9oYeWQNBDzdK2JZ3D7x27bC0N5/KQFoGyt6F561romW8QK89QT76hc
+         VEK2V0rErO3zFNH8uRQiSPf7RjQABDnjW3gfvOcvw+MjCSQ0LNFtLC7zK2ZXRic14Hvb
+         JO5Q==
+X-Gm-Message-State: AOAM530V5Cj9ZTfCygZKWo4C9hgqsfdDl9lKBw+79bk5DroqMVwyecSx
+        5ARkdocYlVR4h4Jvx2KMyjx/Pg==
+X-Google-Smtp-Source: ABdhPJyjoEesRbQZZc0Tgpt+hvNhPOuvvNTkD9qfCCr7Q29ROSTPcf1hYZdlomlI4VxXqYxmdiidyQ==
+X-Received: by 2002:a17:902:e5c9:b0:14a:2da3:e60f with SMTP id u9-20020a170902e5c900b0014a2da3e60fmr11538953plf.100.1642207570237;
+        Fri, 14 Jan 2022 16:46:10 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t25sm5504034pgv.9.2022.01.14.16.46.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jan 2022 16:46:09 -0800 (PST)
+Date:   Sat, 15 Jan 2022 00:46:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wang Guangju <wangguangju@baidu.com>
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: enhance the readability of function
+ pic_intack()
+Message-ID: <YeIZTkYCfkTE0Lob@google.com>
+References: <20220112085153.4506-1-wangguangju@baidu.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v17 06/15] s390/vfio-ap: refresh guest's APCB by filtering
- APQNs assigned to mdev
-Content-Language: en-US
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
- <20211021152332.70455-7-akrowiak@linux.ibm.com>
- <20211227095301.34a91ca4.pasic@linux.ibm.com>
- <831f8897-b7cd-8240-c607-be3a106bad5c@linux.ibm.com>
- <20220112125217.108e0fba.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20220112125217.108e0fba.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 88fXMtEUQe22qiLnx7pYhqwmuCbWelLD
-X-Proofpoint-GUID: f15oPun15kPacUHO2ueiQKDDJMkcfUBj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_07,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 mlxscore=0 adultscore=0
- malwarescore=0 spamscore=0 impostorscore=0 priorityscore=1501
- mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2110150000 definitions=main-2201150001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220112085153.4506-1-wangguangju@baidu.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jan 12, 2022, Wang Guangju wrote:
+> From: wangguangju <wangguangju@baidu.com>
+> 
+> In function pic_intack(), use a varibale of "mask" to
+> record expression of "1 << irq", so we can enhance the
+> readability of this function.
 
+Please wrap at ~75 chars.
 
-On 1/12/22 06:52, Halil Pasic wrote:
-> On Tue, 11 Jan 2022 16:19:06 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->>> Also we could probably do the filtering incrementally. In a sense that
->>> at a time only so much changes, and we know that the invariant was
->>> preserved without that change. But that would probably end up trading
->>> complexity for cycles. I will trust your judgment and your tests on this
->>> matter.
->> I am not entirely clear on what you are suggesting. I think you are
->> suggesting that there may not be a need to look at every APQN
->> assigned to the mdev when an adapter or domain is assigned or
->> unassigned or a queue is probed or removed. Maybe you can clarify
->> what you are suggesting here.
-> Exactly. For example if we have the following assigned
-> adapters:
-> 1, 2, 3
-> domains:
-> 1, 2, 3
-> and the operation we are trying to perform is assign domain 4, then it
-> is sufficient to have a look at the queues with the APQNs (1,4), (2,4)
-> and (3, 4). We don't have to examine all the 14 queues.
->
-> When an unassign dapter is performed, there is no need to do the
-> re-filtering, because there is nothing that can pop-back or go away. And
-> on unassign domain is performed, then all we care about are the queues
-> of that domain on the filtered adapters.
->
-> Similarly if after that successful assign the queue (3,4) gets removed
-> (from vfio_ap) and then added back again and probed, we only have to
-> look at the queues (3, 1), (3, 2), (3, 3).
->
-> But I'm OK with the current design of this. It is certainly conceptually
-> simpler to say we have a master-copy and we filter that master-copy based
-> on the very same rules every time something changes. I'm really fine
-> either way as log as it works well. :D
->
-> Regards,
-> Halil
+> Signed-off-by: wangguangju <wangguangju@baidu.com>
+> ---
+>  arch/x86/kvm/i8259.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+> index 814064d06016..ad6b64b11adc 100644
+> --- a/arch/x86/kvm/i8259.c
+> +++ b/arch/x86/kvm/i8259.c
+> @@ -216,12 +216,14 @@ void kvm_pic_clear_all(struct kvm_pic *s, int irq_source_id)
+>   */
+>  static inline void pic_intack(struct kvm_kpic_state *s, int irq)
+>  {
+> -	s->isr |= 1 << irq;
+> +	int mask;
 
-I spent a day messing with this and was able to make it work, so
-the next implementation will incorporate your idea here.
+Needs a newline, and could also be:
 
+	int mask = 1 << irq;
 
+or even
+
+	int mask = BIT(irq);
+
+That said, I oddly find the existing code more readable.  Maybe "irq_mask" instead
+of "mask"?  Dunno.  I guess I don't have a strong opinion :-)
