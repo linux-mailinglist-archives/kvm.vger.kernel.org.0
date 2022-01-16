@@ -2,125 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26A6D48FD62
-	for <lists+kvm@lfdr.de>; Sun, 16 Jan 2022 15:19:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B01ED48FDD2
+	for <lists+kvm@lfdr.de>; Sun, 16 Jan 2022 17:22:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235413AbiAPOTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jan 2022 09:19:13 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:50044 "EHLO
+        id S235869AbiAPQWX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jan 2022 11:22:23 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:49144 "EHLO
         dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbiAPOTM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jan 2022 09:19:12 -0500
+        with ESMTP id S235863AbiAPQWX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jan 2022 11:22:23 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 31DF260F2E;
-        Sun, 16 Jan 2022 14:19:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D360C36AE7;
-        Sun, 16 Jan 2022 14:19:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1642342750;
-        bh=KujYZ44NbqHewC3hStYnBx16eqgxm1SsBiD7vgCzy1A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sKsNPdg/t/aehm0kbBx0+iaMt7Vs15thP7mY+lgsvv2wpHp7hhFp/CL3s/+VFunx8
-         VMGsJpG9T+206AG5qxqWiAVL+YwMP+lMdgO6G29sYG5yQOnXi5Wp9YcaTPGre6QZaH
-         1Q5W85dO5PtMcGij5VwJ57avVdKo6t7UZumaWiEk=
-Date:   Sun, 16 Jan 2022 15:19:06 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        linux-phy@lists.infradead.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
-        linux-gpio@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        openipmi-developer@lists.sourceforge.net,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        kvm@vger.kernel.org, Kamal Dasu <kdasu.kdev@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Robert Richter <rric@kernel.org>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Benson Leung <bleung@chromium.org>,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        Tony Luck <tony.luck@intel.com>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>, netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        linux-spi@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Niklas =?iso-8859-1?Q?S=F6derlund?= 
-        <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
- (summary)
-Message-ID: <YeQpWu2sUVOSaT9I@kroah.com>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B937860F57;
+        Sun, 16 Jan 2022 16:22:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 288B4C36AF2;
+        Sun, 16 Jan 2022 16:22:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642350142;
+        bh=/cVJUxqVWnjlYUt4WXjbLuM0FITLRLEwxn+8tcPu1JM=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=I38mDq+IyB+w2PRcSUyRPxW1y5qxW4fBp1RdXmnfJayvMulgm7DMZWwIOtqJ78vJa
+         KClOjlIRn6PXpsJZQaRGJWjc2b2wmSMwlwVPTnx3WV1EwIubcai5QdJmxMzOC1ZKG3
+         RekyrZRauWu83uEbGdqUir7lMq+QOmETEynckX1PKFMAJsWptX9elatZXsW4baVmbn
+         VvMzDVsDGXcZi/ouDlztve9xTG1baV0HdG8r1NtS4favSUziNmjTjEQhQaOFYG/Uyo
+         0JWaKlh97zjaJmGU3p5jl3ilZQQP6P13BzzslU3c9w5UE7XDGueQgUcJQcJXeW2t+x
+         XbbYMzleXvKgg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 16A10F60796;
+        Sun, 16 Jan 2022 16:22:22 +0000 (UTC)
+Subject: Re: [GIT PULL] First batch of KVM changes for Linux 5.17
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20220114191402.808664-1-pbonzini@redhat.com>
+References: <20220114191402.808664-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20220114191402.808664-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: c862dcd199759d4a45e65dab47b03e3e8a144e3a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 79e06c4c4950be2abd8ca5d2428a8c915aa62c24
+Message-Id: <164235014208.4755.2133021697223237200.pr-tracker-bot@kernel.org>
+Date:   Sun, 16 Jan 2022 16:22:22 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 15, 2022 at 07:36:43PM +0100, Uwe Kleine-König wrote:
-> A possible compromise: We can have both. We rename
-> platform_get_irq_optional() to platform_get_irq_silent() (or
-> platform_get_irq_silently() if this is preferred) and once all users are
-> are changed (which can be done mechanically), we reintroduce a
-> platform_get_irq_optional() with Sergey's suggested semantic (i.e.
-> return 0 on not-found, no error message printking).
+The pull request you sent on Fri, 14 Jan 2022 14:14:02 -0500:
 
-Please do not do that as anyone trying to forward-port an old driver
-will miss the abi change of functionality and get confused.  Make
-build-breaking changes, if the way a function currently works is
-changed in order to give people a chance.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-thanks,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/79e06c4c4950be2abd8ca5d2428a8c915aa62c24
 
-greg k-h
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
