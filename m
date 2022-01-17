@@ -2,258 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 290BB4907FB
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 12:57:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F8F04908B2
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 13:29:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233880AbiAQL5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 06:57:42 -0500
-Received: from mxout01.lancloud.ru ([45.84.86.81]:47210 "EHLO
-        mxout01.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231510AbiAQL5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 06:57:41 -0500
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout01.lancloud.ru 2ADB220E0F3B
-Received: from LanCloud
-Received: from LanCloud
-Received: from LanCloud
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Corey Minyard <minyard@acm.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        "James Morse" <james.morse@arm.com>,
-        Robert Richter <rric@kernel.org>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Bartosz Golaszewski" <brgl@bgdev.pl>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Lee Jones <lee.jones@linaro.org>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        <bcm-kernel-feedback-list@broadcom.com>,
-        "Peter Korsgaard" <peter@korsgaard.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        "Miquel Raynal" <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Benson Leung <bleung@chromium.org>,
-        "Guenter Roeck" <groeck@chromium.org>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Mark Brown <broonie@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Liam Girdwood" <lgirdwood@gmail.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        "Takashi Iwai" <tiwai@suse.com>,
-        <openipmi-developer@lists.sourceforge.net>,
-        <linux-iio@vger.kernel.org>, <linux-edac@vger.kernel.org>,
-        <linux-gpio@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mmc@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>,
-        <platform-driver-x86@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <770fb569-03c8-78f9-c174-94b31e866017@omp.ru>
-Date:   Mon, 17 Jan 2022 14:57:32 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S239872AbiAQM3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 07:29:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55668 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231537AbiAQM3c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 07:29:32 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20H9vg0c026569;
+        Mon, 17 Jan 2022 12:29:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Jhw74Q0ZA1B5FRWJ7Ovl7UMYmHpd6o0tDAaLcyQwQ5g=;
+ b=dwQpauLv4gH0NEVj99WfaryH+BQgdY1McCGKH3PW/I+Z5LMpiA1xQqMKl1A+D5xyZ1Q/
+ ggra1JoRK4en/4eeyVUpJvQpVWFbOCCiN0T3R+iRMyyjcuj84yH6y8hp4WLATBcqCi0d
+ qlclEeuRcMK6dPTAGMOv3DgOKVxrlsF64gimxUQ8GIxnxIJfFV8gvtr3sBBjZ9fiUNpj
+ OYDgLY2oTcDVvqaOS7GW4s7WhC7MT5p4zRl7/xGbd27TfKBIlx7FBgseWY699nfzQQRM
+ irIoEwMD4rBtpwMJUiuqFswsFRvtZY5qpqcq5IaTfPSKEA9UvvU07E06AT9M+igG8a/t sA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dn69mkbqb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 12:29:31 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20HBlZR3027470;
+        Mon, 17 Jan 2022 12:29:31 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dn69mkbpw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 12:29:31 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20HCD9bc016683;
+        Mon, 17 Jan 2022 12:29:29 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3dknw8uumc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 12:29:29 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20HCTNnq41484556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jan 2022 12:29:23 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C2CEA404D;
+        Mon, 17 Jan 2022 12:29:23 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 54547A405D;
+        Mon, 17 Jan 2022 12:29:22 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.3.16])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Jan 2022 12:29:22 +0000 (GMT)
+Date:   Mon, 17 Jan 2022 13:29:20 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 06/30] s390/airq: allow for airq structure that uses
+ an input vector
+Message-ID: <20220117132920.213bf0bd@p-imbrenda>
+In-Reply-To: <20220114203145.242984-7-mjrosato@linux.ibm.com>
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+        <20220114203145.242984-7-mjrosato@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20220110195449.12448-2-s.shtylyov@omp.ru>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [192.168.11.198]
-X-ClientProxiedBy: LFEXT02.lancloud.ru (fd00:f066::142) To
- LFEX1907.lancloud.ru (fd00:f066::207)
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mi00v2XWW5_9dqNyHAnjWZeh11y65dSm
+X-Proofpoint-GUID: BVN8kD0eghT5z4ARzxEUqbHF8mrbHwpG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-17_05,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0
+ clxscore=1015 lowpriorityscore=0 spamscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201170077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/22 10:54 PM, Sergey Shtylyov wrote:
+On Fri, 14 Jan 2022 15:31:21 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> This patch is based on the former Andy Shevchenko's patch:
-> 
-> https://lore.kernel.org/lkml/20210331144526.19439-1-andriy.shevchenko@linux.intel.com/
-> 
-> Currently platform_get_irq_optional() returns an error code even if IRQ
-> resource simply has not been found. It prevents the callers from being
-> error code agnostic in their error handling:
-> 
-> 	ret = platform_get_irq_optional(...);
-> 	if (ret < 0 && ret != -ENXIO)
-> 		return ret; // respect deferred probe
-> 	if (ret > 0)
-> 		...we get an IRQ...
-> 
-> All other *_optional() APIs seem to return 0 or NULL in case an optional
-> resource is not available. Let's follow this good example, so that the
-> callers would look like:
-> 
-> 	ret = platform_get_irq_optional(...);
-> 	if (ret < 0)
-> 		return ret;
-> 	if (ret > 0)
-> 		...we get an IRQ...
-> 
-> Reported-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-[...]
+> When doing device passthrough where interrupts are being forwarded
+> from host to guest, we wish to use a pinned section of guest memory
+> as the vector (the same memory used by the guest as the vector).
 
-   Please don't merge this as yet, I'm going thru this patch once again
-and have already found some sloppy code. :-/
+maybe expand the description of the patch to explain what exactly is
+being done in this patch. Namely: you add a parameter to a function
+(and some logic in the function to use the new parameter), but the
+function is not being used yet. And pinning is also done somewhere else.
 
-> diff --git a/drivers/char/ipmi/bt-bmc.c b/drivers/char/ipmi/bt-bmc.c
-> index 7450904e330a..fdc63bfa5be4 100644
-> --- a/drivers/char/ipmi/bt-bmc.c
-> +++ b/drivers/char/ipmi/bt-bmc.c
-> @@ -382,12 +382,14 @@ static int bt_bmc_config_irq(struct bt_bmc *bt_bmc,
->  	bt_bmc->irq = platform_get_irq_optional(pdev, 0);
->  	if (bt_bmc->irq < 0)
->  		return bt_bmc->irq;
-> +	if (!bt_bmc->irq)
-> +		return 0;
+maybe you can add something like
 
-   Hm, this is sloppy. Will recast and rebase to the -next branch.
+	This patch adds a new parameter for airq_iv_create to pass the
+	existing vector pinned in guest memory and to use it when
+	needed instead of allocating a new one.
 
+Apart from that, the patch looks good.
+
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/airq.h     |  4 +++-
+>  arch/s390/pci/pci_irq.c          |  8 ++++----
+>  drivers/s390/cio/airq.c          | 10 +++++++---
+>  drivers/s390/virtio/virtio_ccw.c |  2 +-
+>  4 files changed, 15 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
+> index 7918a7d09028..e82e5626e139 100644
+> --- a/arch/s390/include/asm/airq.h
+> +++ b/arch/s390/include/asm/airq.h
+> @@ -47,8 +47,10 @@ struct airq_iv {
+>  #define AIRQ_IV_PTR		4	/* Allocate the ptr array */
+>  #define AIRQ_IV_DATA		8	/* Allocate the data array */
+>  #define AIRQ_IV_CACHELINE	16	/* Cacheline alignment for the vector */
+> +#define AIRQ_IV_GUESTVEC	32	/* Vector is a pinned guest page */
 >  
->  	rc = devm_request_irq(dev, bt_bmc->irq, bt_bmc_irq, IRQF_SHARED,
->  			      DEVICE_NAME, bt_bmc);
->  	if (rc < 0) {
->  		dev_warn(dev, "Unable to request IRQ %d\n", bt_bmc->irq);
-> -		bt_bmc->irq = rc;
-> +		bt_bmc->irq = 0;
-
-   This change isn't needed...
-
->  		return rc;
+> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags);
+> +struct airq_iv *airq_iv_create(unsigned long bits, unsigned long
+> flags,
+> +			       unsigned long *vec);
+>  void airq_iv_release(struct airq_iv *iv);
+>  unsigned long airq_iv_alloc(struct airq_iv *iv, unsigned long num);
+>  void airq_iv_free(struct airq_iv *iv, unsigned long bit, unsigned
+> long num); diff --git a/arch/s390/pci/pci_irq.c
+> b/arch/s390/pci/pci_irq.c index cc4c8d7c8f5c..0d0a02a9fbbf 100644
+> --- a/arch/s390/pci/pci_irq.c
+> +++ b/arch/s390/pci/pci_irq.c
+> @@ -296,7 +296,7 @@ int arch_setup_msi_irqs(struct pci_dev *pdev, int
+> nvec, int type) zdev->aisb = bit;
+>  
+>  		/* Create adapter interrupt vector */
+> -		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA |
+> AIRQ_IV_BITLOCK);
+> +		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA |
+> AIRQ_IV_BITLOCK, NULL); if (!zdev->aibv)
+>  			return -ENOMEM;
+>  
+> @@ -419,7 +419,7 @@ static int __init zpci_directed_irq_init(void)
+>  	union zpci_sic_iib iib = {{0}};
+>  	unsigned int cpu;
+>  
+> -	zpci_sbv = airq_iv_create(num_possible_cpus(), 0);
+> +	zpci_sbv = airq_iv_create(num_possible_cpus(), 0, NULL);
+>  	if (!zpci_sbv)
+>  		return -ENOMEM;
+>  
+> @@ -441,7 +441,7 @@ static int __init zpci_directed_irq_init(void)
+>  		zpci_ibv[cpu] = airq_iv_create(cache_line_size() *
+> BITS_PER_BYTE, AIRQ_IV_DATA |
+>  					       AIRQ_IV_CACHELINE |
+> -					       (!cpu ? AIRQ_IV_ALLOC
+> : 0));
+> +					       (!cpu ? AIRQ_IV_ALLOC
+> : 0), NULL); if (!zpci_ibv[cpu])
+>  			return -ENOMEM;
 >  	}
+> @@ -458,7 +458,7 @@ static int __init zpci_floating_irq_init(void)
+>  	if (!zpci_ibv)
+>  		return -ENOMEM;
 >  
-[...]
-> diff --git a/drivers/edac/xgene_edac.c b/drivers/edac/xgene_edac.c
-> index 2ccd1db5e98f..0d1bdd27cd78 100644
-> --- a/drivers/edac/xgene_edac.c
-> +++ b/drivers/edac/xgene_edac.c
-> @@ -1917,7 +1917,7 @@ static int xgene_edac_probe(struct platform_device *pdev)
+> -	zpci_sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC);
+> +	zpci_sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC,
+> NULL); if (!zpci_sbv)
+>  		goto out_free;
 >  
->  		for (i = 0; i < 3; i++) {
->  			irq = platform_get_irq_optional(pdev, i);
-
-   Is *_optinal() even correct here?
-
-> -			if (irq < 0) {
-> +			if (irq <= 0) {
->  				dev_err(&pdev->dev, "No IRQ resource\n");
->  				rc = -EINVAL;
->  				goto out_err;
-[...]
-> diff --git a/drivers/mtd/nand/raw/brcmnand/brcmnand.c b/drivers/mtd/nand/raw/brcmnand/brcmnand.c
-> index f75929783b94..ac222985efde 100644
-> --- a/drivers/mtd/nand/raw/brcmnand/brcmnand.c
-> +++ b/drivers/mtd/nand/raw/brcmnand/brcmnand.c
-> @@ -1521,7 +1521,7 @@ static irqreturn_t brcmnand_ctlrdy_irq(int irq, void *data)
->  
->  	/* check if you need to piggy back on the ctrlrdy irq */
->  	if (ctrl->edu_pending) {
-> -		if (irq == ctrl->irq && ((int)ctrl->edu_irq >= 0))
-> +		if (irq == ctrl->irq && ((int)ctrl->edu_irq > 0))
-
-   Note to self: the cast to *int* isn't needed, the edu_irq field is *int* already...
-
-[...]
-> diff --git a/drivers/power/supply/mp2629_charger.c b/drivers/power/supply/mp2629_charger.c
-> index bdf924b73e47..51289700a7ac 100644
-> --- a/drivers/power/supply/mp2629_charger.c
-> +++ b/drivers/power/supply/mp2629_charger.c
-> @@ -581,9 +581,9 @@ static int mp2629_charger_probe(struct platform_device *pdev)
->  	platform_set_drvdata(pdev, charger);
->  
->  	irq = platform_get_irq_optional(to_platform_device(dev->parent), 0);
-
-   Again, is *_optional() even correct here?
-
-> -	if (irq < 0) {
-> +	if (irq <= 0) {
->  		dev_err(dev, "get irq fail: %d\n", irq);
-> -		return irq;
-> +		return irq < 0 ? irq : -ENXIO;
->  	}
->  
->  	for (i = 0; i < MP2629_MAX_FIELD; i++) {
-[...]
-> diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
-> index 43eb25b167bc..776cfed4339c 100644
-> --- a/drivers/thermal/rcar_gen3_thermal.c
-> +++ b/drivers/thermal/rcar_gen3_thermal.c
-> @@ -430,7 +430,7 @@ static int rcar_gen3_thermal_request_irqs(struct rcar_gen3_thermal_priv *priv,
->  
->  	for (i = 0; i < 2; i++) {
->  		irq = platform_get_irq_optional(pdev, i);
-> -		if (irq < 0)
-> +		if (irq <= 0)
->  			return irq;
-
-   Sloppy code again? We shouldn't return 0...
-
-[...]
-> diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
-> index 68a1c87066d7..cd7494933563 100644
-> --- a/drivers/vfio/platform/vfio_platform.c
-> +++ b/drivers/vfio/platform/vfio_platform.c
-> @@ -32,8 +32,12 @@ static struct resource *get_platform_resource(struct vfio_platform_device *vdev,
->  static int get_platform_irq(struct vfio_platform_device *vdev, int i)
+> diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
+> index 2f2226786319..375a58b1c838 100644
+> --- a/drivers/s390/cio/airq.c
+> +++ b/drivers/s390/cio/airq.c
+> @@ -122,10 +122,12 @@ static inline unsigned long iv_size(unsigned
+> long bits)
+>   * airq_iv_create - create an interrupt vector
+>   * @bits: number of bits in the interrupt vector
+>   * @flags: allocation flags
+> + * @vec: pointer to pinned guest memory if AIRQ_IV_GUESTVEC
+>   *
+>   * Returns a pointer to an interrupt vector structure
+>   */
+> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long
+> flags) +struct airq_iv *airq_iv_create(unsigned long bits, unsigned
+> long flags,
+> +			       unsigned long *vec)
 >  {
->  	struct platform_device *pdev = (struct platform_device *) vdev->opaque;
-> +	int ret;
->  
-> -	return platform_get_irq_optional(pdev, i);
-> +	ret = platform_get_irq_optional(pdev, i);
-> +	if (ret < 0)
-> +		return ret;
-> +	return ret > 0 ? ret : -ENXIO;
+>  	struct airq_iv *iv;
+>  	unsigned long size;
+> @@ -146,6 +148,8 @@ struct airq_iv *airq_iv_create(unsigned long
+> bits, unsigned long flags) &iv->vector_dma);
+>  		if (!iv->vector)
+>  			goto out_free;
+> +	} else if (flags & AIRQ_IV_GUESTVEC) {
+> +		iv->vector = vec;
+>  	} else {
+>  		iv->vector = cio_dma_zalloc(size);
+>  		if (!iv->vector)
+> @@ -185,7 +189,7 @@ struct airq_iv *airq_iv_create(unsigned long
+> bits, unsigned long flags) kfree(iv->avail);
+>  	if (iv->flags & AIRQ_IV_CACHELINE && iv->vector)
+>  		dma_pool_free(airq_iv_cache, iv->vector,
+> iv->vector_dma);
+> -	else
+> +	else if (!(iv->flags & AIRQ_IV_GUESTVEC))
+>  		cio_dma_free(iv->vector, size);
+>  	kfree(iv);
+>  out:
+> @@ -204,7 +208,7 @@ void airq_iv_release(struct airq_iv *iv)
+>  	kfree(iv->bitlock);
+>  	if (iv->flags & AIRQ_IV_CACHELINE)
+>  		dma_pool_free(airq_iv_cache, iv->vector,
+> iv->vector_dma);
+> -	else
+> +	else if (!(iv->flags & AIRQ_IV_GUESTVEC))
+>  		cio_dma_free(iv->vector, iv_size(iv->bits));
+>  	kfree(iv->avail);
+>  	kfree(iv);
+> diff --git a/drivers/s390/virtio/virtio_ccw.c
+> b/drivers/s390/virtio/virtio_ccw.c index 52c376d15978..410498d693f8
+> 100644 --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -241,7 +241,7 @@ static struct airq_info *new_airq_info(int index)
+>  		return NULL;
+>  	rwlock_init(&info->lock);
+>  	info->aiv = airq_iv_create(VIRTIO_IV_BITS, AIRQ_IV_ALLOC |
+> AIRQ_IV_PTR
+> -				   | AIRQ_IV_CACHELINE);
+> +				   | AIRQ_IV_CACHELINE, NULL);
+>  	if (!info->aiv) {
+>  		kfree(info);
+>  		return NULL;
 
-   Could be expressed more concisely:
-
-	return ret ? : -ENXIO;
-
-just like vfio_amba.c does it...
-
-[...]
-
-MBR, Sergey
