@@ -2,356 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4EF3490729
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 12:31:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AEE2490756
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 12:50:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239104AbiAQLbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 06:31:33 -0500
-Received: from foss.arm.com ([217.140.110.172]:56984 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233787AbiAQLbc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 06:31:32 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37B8F6D;
-        Mon, 17 Jan 2022 03:31:32 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EC403F73D;
-        Mon, 17 Jan 2022 03:31:29 -0800 (PST)
-Date:   Mon, 17 Jan 2022 11:31:41 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        id S239230AbiAQLu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 06:50:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58208 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236426AbiAQLu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 06:50:26 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EF1BC061574
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 03:50:26 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9QVx-0000fx-Mn; Mon, 17 Jan 2022 12:49:33 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9QVo-00AoYK-L6; Mon, 17 Jan 2022 12:49:23 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9QVn-0001x3-Fg; Mon, 17 Jan 2022 12:49:23 +0100
+Date:   Mon, 17 Jan 2022 12:49:23 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
+        openipmi-developer@lists.sourceforge.net,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Sebastian Reichel <sre@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        Benson Leung <bleung@chromium.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
         James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v5 12/69] KVM: arm64: nv: Handle HCR_EL2.NV system
- register traps
-Message-ID: <YeVTnZcW82G36cda@monolith.localdoman>
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-13-maz@kernel.org>
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+Message-ID: <20220117114923.d5vajgitxneec7j7@pengutronix.de>
+References: <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
+ <29f0c65d-77f2-e5b2-f6cc-422add8a707d@omp.ru>
+ <20220114092557.jrkfx7ihg26ekzci@pengutronix.de>
+ <61b80939-357d-14f5-df99-b8d102a4e1a1@omp.ru>
+ <20220114202226.ugzklxv4wzr6egwj@pengutronix.de>
+ <c9026f17-2b3f-ee94-0ea3-5630f981fbc1@omp.ru>
+ <CAMuHMdXVbRudGs69f9ZzaP1PXhteDNZiXA658eMFAwP4nr9r3w@mail.gmail.com>
+ <20220117092444.opoedfcf5k5u6otq@pengutronix.de>
+ <CAMuHMdUgZUeraHadRAi2Z=DV+NuNBrKPkmAKsvFvir2MuquVoA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="p6yh245p57zhiyck"
 Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-13-maz@kernel.org>
+In-Reply-To: <CAMuHMdUgZUeraHadRAi2Z=DV+NuNBrKPkmAKsvFvir2MuquVoA@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-Nitpick, but HCR_EL2.NV also traps accesses to *_EL02 and *_EL12 registers,
-according to ARM DDI 0487G.a, page D5-2770. The subject could be changed to
-"Handle HCR_EL2.NV *_EL2 system register traps" to better match the
-content, but doesn't make much a difference overall.
+--p6yh245p57zhiyck
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 29, 2021 at 08:00:53PM +0000, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
-> 
-> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
-> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
-> addition, executing the following instructions in EL1 will trap to EL2:
-> tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
-> instructions that trap to EL2 with the NV bit were undef at EL1 prior to
-> ARM v8.3. The only instruction that was not undef is eret.
-> 
-> This patch sets up a handler for EL2 registers and SP_EL1 register
-> accesses at EL1. The host hypervisor keeps those register values in
-> memory, and will emulate their behavior.
-> 
-> This patch doesn't set the NV bit yet. It will be set in a later patch
-> once nested virtualization support is completed.
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> [maz: added SCTLR_EL2 RES0/RES1 handling]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/sysreg.h |  41 +++++++++++-
->  arch/arm64/kvm/sys_regs.c       | 109 ++++++++++++++++++++++++++++++--
->  2 files changed, 144 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 615dd6278f8b..c77fe5401826 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -531,10 +531,26 @@
->  
->  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
->  
-> +#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
-> +#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
-> +
->  #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
-> +#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
-> +#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
-> +#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
-> +#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
-> +#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
->  #define SYS_HFGRTR_EL2			sys_reg(3, 4, 1, 1, 4)
->  #define SYS_HFGWTR_EL2			sys_reg(3, 4, 1, 1, 5)
->  #define SYS_HFGITR_EL2			sys_reg(3, 4, 1, 1, 6)
-> +#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
-> +
-> +#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
-> +#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
-> +#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
-> +#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-> +#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-> +
->  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
->  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
-> @@ -543,14 +559,26 @@
->  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
->  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
->  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-> +#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
->  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-> +#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
-> +#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
->  #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
->  #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
->  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
->  #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
->  #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
->  
-> -#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
-> +#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
-> +#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
-> +
-> +#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
-> +#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
-> +
-> +#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
-> +#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
-> +#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
-> +#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
->  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
->  #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
->  #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
-> @@ -592,15 +620,24 @@
->  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
->  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
->  
-> +#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
-> +#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
-> +
-> +#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
-> +#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
-> +
->  /* VHE encodings for architectural EL0/1 system registers */
->  #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
->  #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
->  #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
-> +
->  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
->  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
->  #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
-> +
->  #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
->  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
-> +
->  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
->  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
->  #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
-> @@ -618,6 +655,8 @@
->  #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
->  #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
->  
-> +#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+On Mon, Jan 17, 2022 at 11:35:52AM +0100, Geert Uytterhoeven wrote:
+> Hi Uwe,
+>=20
+> On Mon, Jan 17, 2022 at 10:24 AM Uwe Kleine-K=F6nig
+> <u.kleine-koenig@pengutronix.de> wrote:
+> > On Mon, Jan 17, 2022 at 09:41:42AM +0100, Geert Uytterhoeven wrote:
+> > > On Sat, Jan 15, 2022 at 9:22 PM Sergey Shtylyov <s.shtylyov@omp.ru> w=
+rote:
+> > > > On 1/14/22 11:22 PM, Uwe Kleine-K=F6nig wrote:
+> > > > > You have to understand that for clk (and regulator and gpiod) NUL=
+L is a
+> > > > > valid descriptor that can actually be used, it just has no effect=
+=2E So
+> > > > > this is a convenience value for the case "If the clk/regulator/gp=
+iod in
+> > > > > question isn't available, there is nothing to do". This is what m=
+akes
+> > > > > clk_get_optional() and the others really useful and justifies the=
+ir
+> > > > > existence. This doesn't apply to platform_get_irq_optional().
+> > > >
+> > > >    I do understand that. However, IRQs are a different beast with t=
+heir
+> > > > own justifications...
+> > >
+> > > > > clk_get_optional() is sane and sensible for cases where the clk m=
+ight be
+> > > > > absent and it helps you because you don't have to differentiate b=
+etween
+> > > > > "not found" and "there is an actual resource".
+> > > > >
+> > > > > The reason for platform_get_irq_optional()'s existence is just th=
+at
+> > > > > platform_get_irq() emits an error message which is wrong or subop=
+timal
+> > > >
+> > > >    I think you are very wrong here. The real reason is to simplify =
+the
+> > > > callers.
+> > >
+> > > Indeed.
+> >
+> > The commit that introduced platform_get_irq_optional() said:
+> >
+> >         Introduce a new platform_get_irq_optional() that works much like
+> >         platform_get_irq() but does not output an error on failure to
+> >         find the interrupt.
+> >
+> > So the author of 8973ea47901c81a1912bd05f1577bed9b5b52506 failed to
+> > mention the real reason? Or look at
+> > 31a8d8fa84c51d3ab00bf059158d5de6178cf890:
+> >
+> >         [...] use platform_get_irq_optional() to get second/third IRQ
+> >         which are optional to avoid below error message during probe:
+> >         [...]
+> >
+> > Look through the output of
+> >
+> >         git log -Splatform_get_irq_optional
+> >
+> > to find several more of these.
+>=20
+> Commit 8973ea47901c81a1 ("driver core: platform: Introduce
+> platform_get_irq_optional()") and the various fixups fixed the ugly
+> printing of error messages that were not applicable.
+> In hindsight, probably commit 7723f4c5ecdb8d83 ("driver core:
+> platform: Add an error message to platform_get_irq*()") should have
+> been reverted instead, until a platform_get_irq_optional() with proper
+> semantics was introduced.
 
-Checked the encoding for the newly added registers, they match.
+ack.
 
-> +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_DSSBS	(BIT(44))
->  #define SCTLR_ELx_ATA	(BIT(43))
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e3ec1a44f94d..a23701f29858 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -105,6 +105,46 @@ static u32 get_ccsidr(u32 csselr)
->  	return ccsidr;
->  }
->  
-> +static bool access_rw(struct kvm_vcpu *vcpu,
-> +		      struct sys_reg_params *p,
-> +		      const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-> +	else
-> +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
-> +			     struct sys_reg_params *p,
-> +			     const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write) {
-> +		u64 val = p->regval;
-> +
-> +		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
-> +			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
-> +				 BIT_ULL(17) | BIT_ULL(9));
-> +			val |=  SCTLR_EL1_RES1;
-> +		} else {
-> +			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
-> +				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
-> +				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
-> +				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
-> +				 GENMASK(10, 7));
-> +			val |=  SCTLR_EL2_RES1;
-> +		}
+> But as we were all in a hurry to kill the non-applicable error
+> message, we went for the quick and dirty fix.
+>=20
+> > Also I fail to see how a caller of (today's) platform_get_irq_optional()
+> > is simpler than a caller of platform_get_irq() given that there is no
+> > semantic difference between the two. Please show me a single
+> > conversion from platform_get_irq to platform_get_irq_optional that
+> > yielded a simplification.
+>=20
+> That's exactly why we want to change the latter to return 0 ;-)
 
-Some bits in SCTLR_EL2 are functional bits when {E2H, TGE} = {1, 1}, otherwise
-they are RES0. This is how ARM DDI 0487G.a describes the behaviour of bits which
-are RES0 only in some contexts (page Glossary-8529, emphasis added by me):
+OK. So you agree to my statement "The reason for
+platform_get_irq_optional()'s existence is just that platform_get_irq()
+emits an error message [...]". Actually you don't want to oppose but
+say: It's unfortunate that the silent variant of platform_get_irq() took
+the obvious name of a function that could have an improved return code
+semantic.
 
-"For a bit in a read/write register, when the bit is described as RES0:
+So my suggestion to rename todays platform_get_irq_optional() to
+platform_get_irq_silently() and then introducing
+platform_get_irq_optional() with your suggested semantic seems
+intriguing and straigt forward to me.
 
-- An indirect write to the register sets the bit to 0.
+Another thought: platform_get_irq emits an error message for all
+problems. Wouldn't it be consistent to let platform_get_irq_optional()
+emit an error message for all problems but "not found"?
+Alternatively remove the error printk from platform_get_irq().
 
-- ** A read of the bit must return the value last successfully written to the bit,
-  by either a direct or an indirect write, regardless of the use of the register
-  when the bit was written **
+> > So you need some more effort to convince me of your POV.
+> >
+> > > Even for clocks, you cannot assume that you can always blindly use
+> > > the returned dummy (actually a NULL pointer) to call into the clk
+> > > API.  While this works fine for simple use cases, where you just
+> > > want to enable/disable an optional clock (clk_prepare_enable() and
+> > > clk_disable_unprepare()), it does not work for more complex use cases.
+> >
+> > Agreed. But for clks and gpiods and regulators the simple case is quite
+> > usual. For irqs it isn't.
+>=20
+> It is for devices that can have either separate interrupts, or a single
+> multiplexed interrupt.
+>=20
+> The logic in e.g. drivers/tty/serial/sh-sci.c and
+> drivers/spi/spi-rspi.c could be simplified and improved (currently
+> it doesn't handle deferred probe) if platform_get_irq_optional()
+> would return 0 instead of -ENXIO.
 
-If the bit has not been successfully written since reset, then the read of the bit returns the reset
-value if there is one, or otherwise returns an UNKNOWN value.
+Looking at sh-sci.c the irq handling logic could be improved even
+without a changed platform_get_irq_optional():
 
-- A direct write to the bit must update a storage location associated with the bit.
+diff --git a/drivers/tty/serial/sh-sci.c b/drivers/tty/serial/sh-sci.c
+index 968967d722d4..c7dc9fb84844 100644
+--- a/drivers/tty/serial/sh-sci.c
++++ b/drivers/tty/serial/sh-sci.c
+@@ -2873,11 +2873,13 @@ static int sci_init_single(struct platform_device *=
+dev,
+ 	 * interrupt ID numbers, or muxed together with another interrupt.
+ 	 */
+ 	if (sci_port->irqs[0] < 0)
+-		return -ENXIO;
++		return sci_port->irqs[0];
+=20
+-	if (sci_port->irqs[1] < 0)
++	if (sci_port->irqs[1] =3D=3D -ENXIO)
+ 		for (i =3D 1; i < ARRAY_SIZE(sci_port->irqs); i++)
+ 			sci_port->irqs[i] =3D sci_port->irqs[0];
++	else if (sci_port->irqs[1] < 0)
++		return sci_port->irqs[1];
+=20
+ 	sci_port->params =3D sci_probe_regmap(p);
+ 	if (unlikely(sci_port->params =3D=3D NULL))
 
-- While the use of the register is such that the bit is described as RES0, the
-  value of the bit must have no effect on the operation of the PE, other than
-  determining the value read back from that bit, unless this Manual
-  explicitly defines additional properties for the bit."
+And then the code flow is actively irritating. sci_init_single() copies
+irqs[0] to all other irqs[i] and then sci_request_irq() loops over the
+already requested irqs and checks for duplicates. A single place that
+identifies the exact set of required irqs would already help a lot.
 
-Let's take bit 24, E0E, as an example. When E2H,TGE != {1,1} (which means the
-bit is now RES0), KVM clears the bit on a write, when according to the above
-definition, it should save the value.
+Also for spi-rspi.c I don't see how platform_get_irq_byname_optional()
+returning 0 instead of -ENXIO would help. Please talk in patches.
 
-Thanks,
-Alex
+Preferably first simplify in-driver logic to make the conversion to the
+new platform_get_irq_optional() actually reviewable.
 
-> +
-> +		vcpu_write_sys_reg(vcpu, val, r->reg);
-> +	} else {
-> +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
->   */
-> @@ -263,6 +303,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
->  		return read_zero(vcpu, p);
->  }
->  
-> +static bool trap_undef(struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_params *p,
-> +		       const struct sys_reg_desc *r)
-> +{
-> +	kvm_inject_undefined(vcpu);
-> +	return false;
-> +}
-> +
->  /*
->   * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
->   * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-> @@ -342,12 +390,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
->  			    struct sys_reg_params *p,
->  			    const struct sys_reg_desc *r)
->  {
-> -	if (p->is_write) {
-> -		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-> +	access_rw(vcpu, p, r);
-> +	if (p->is_write)
->  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
-> -	} else {
-> -		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-> -	}
->  
->  	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
->  
-> @@ -1411,6 +1456,18 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->  	.set_user = set_raz_id_reg,		\
->  }
->  
-> +static bool access_sp_el1(struct kvm_vcpu *vcpu,
-> +			  struct sys_reg_params *p,
-> +			  const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		__vcpu_sys_reg(vcpu, SP_EL1) = p->regval;
-> +	else
-> +		p->regval = __vcpu_sys_reg(vcpu, SP_EL1);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -1825,9 +1882,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
->  	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
->  
-> +	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
-> +	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
-> +	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
-> +	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
-> +	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
-> +	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, CPTR_EL2_DEFAULT },
-> +	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
-> +	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
-> +	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
-> +	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, TCR_EL2_RES1 },
-> +	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
-> +	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
-> +
->  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-> +	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-> +	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
-> +	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
-> +
->  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-> +	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
-> +	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
-> +	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
->  	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
-> +
-> +	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
-> +	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
-> +	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
-> +	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
-> +	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
-> +
-> +	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
-> +	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
-> +	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
->  };
->  
->  static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
-> -- 
-> 2.30.2
-> 
+> > And if you cannot blindly use the dummy, then you're not the targetted
+> > caller of *_get_optional() and should better use *_get() and handle
+> > -ENODEV explicitly.
+>=20
+> No, because the janitors tend to consolidate error message handling,
+> by moving the printing up, inside the *_get() methods.  That's exactly
+> what happened here.
+
+This is in my eyes the root cause of the issues at hand. Moving the
+error message handling into a get function is only right for most of the
+callers. So the more conservative approach would be to introduce a noisy
+variant of the get function and convert all users that benefit
+separately while the unreviewed callers and those that don't want an
+error message can happily continue to use the silent variant.
+
+> So there are three reasons: because the absence of an optional IRQ
+> is not an error, and thus that should not cause (a) an error code
+> to be returned, and (b) an error message to be printed, and (c)
+> because it can simplify the logic in device drivers.
+
+I don't agree to (a). If the value signaling not-found is -ENXIO or 0
+(or -ENODEV) doesn't matter much. I wouldn't deviate from the return
+code semantics of platform_get_irq() just for having to check against 0
+instead of -ENXIO. Zero is then just another magic value.
+(c) still has to be proven, see above.
+
+> Commit 8973ea47901c81a1 ("driver core: platform: Introduce
+> platform_get_irq_optional()") fixed (b), but didn't address (a) and
+> (c).
+
+Yes, it fixed (b) and picked a bad name for that.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--p6yh245p57zhiyck
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHlV8AACgkQwfwUeK3K
+7Am0GQf8CoKYtZsyB2Veq4tA4dVxwehDrqSNzD0/oee9gQ2W8Ug3o/BHJYBwahzq
+EvMyo3JUywFfBFS6fqP6q+5CXaw3qhcVdLIQIYR1NbdbDku9fPpYgUlMeO8FLj0S
+AjA1gReJzZffpqQa+j6sWHbwoCmV4ZWTYuhi2tnY6gxes4QcBTcXhrlPtPvEcvRj
+xiaHDNvm4yBJjau7t98dhCCfb9ioYwkuGybaTVJenP6u4ZB5QxTAKBsVZsaYscE9
+K/bTKX+pt+MFJrjy6AN6Qq4JYNuQK8v7MawD5u/q9qZHAELmMQaNyWTpBBDKqjGv
+Z8p6bAtXmJy2dTalO786GdRxwAWrMQ==
+=gT+3
+-----END PGP SIGNATURE-----
+
+--p6yh245p57zhiyck--
