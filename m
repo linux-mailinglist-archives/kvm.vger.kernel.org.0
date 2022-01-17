@@ -2,82 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F9BA491129
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 21:58:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B3694911A2
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 23:12:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243119AbiAQU6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 15:58:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42396 "EHLO
+        id S243582AbiAQWMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 17:12:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243041AbiAQU6F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 15:58:05 -0500
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22623C061574
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 12:58:05 -0800 (PST)
-Received: by mail-ot1-x332.google.com with SMTP id t4-20020a05683022e400b00591aaf48277so21458818otc.13
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 12:58:05 -0800 (PST)
+        with ESMTP id S234020AbiAQWMV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 17:12:21 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA783C061574
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 14:12:20 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id e3so60209856lfc.9
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 14:12:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KF7UfJyg273nq+7UPuXBXJZx5tYDxZRdcCSC95qVL0Y=;
-        b=Me/jkXhjfEinzPrTuJrRemZtW2y0GidUhmBwl+k2nHW5gnM/5jrM1FHmFW0IwdnqXg
-         ubCgP2ClHaIOv8ddkn3IiSwE2qDCnvkmfZnC66RchZJGdQKNi1g8QsJ4r/3hsewt3R3X
-         kUjnsAzkZ4fcKBCVnhNh3qBT8UjtbVjgx7EEAXAuK95zkddyYDyOYobPBLAj+dLJnP26
-         P+BssiTu0IN/l2CXypSLZpfo0KiynS+13JXRCDioJ5HPDyrDtkZAgYFooaVatkJnUxyr
-         uaNwAYegUujiMgyYpFaS1oB34SUsbDvVMmPbfkhEGJwQVjiBGp5LaRq69ug2bSRlqbm/
-         n50A==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vWLVs+l7+STOOWtF13ZAtvkyq3IkQp2HTgX1z6kBB5E=;
+        b=di5kK9L/kexo7RbJDKjstQjuat1cRFPimC4HpYOEHSFG2+4NfckedOSDrXj2Ha4cCy
+         HZsf3Hmb2vNoRcWCp0UOLKmlqu/vEJQuF9ia5I1A3QIMc8UI1vl14KKc0KjL4cElc13q
+         KAGwaf8CsikW+F//0ckS7mXdkx3s4vd/v7eAfCiS+ZlNxfiAOOYrHfM29axm9pZu11TB
+         1obBIlIi/F7BX9lVmncjm+amwvBc77qvHV36q9F/32X23s7w3u+joxbCeJ5q8Tl/8G8i
+         jijVbH+o6OxSC+YN/hbR0XpMQdluuwY9AhteWOgyz3W9NzuCYqzFjT54bQJ4Dm2rl5cX
+         jy0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KF7UfJyg273nq+7UPuXBXJZx5tYDxZRdcCSC95qVL0Y=;
-        b=YZoNEUoSLO85UuzyKQRdFjGrWoxAF8MW7V3dxETwtF/H0Vq8owNkfXIUDtr7p+78b9
-         etbgo3xhwvfYUeTtrHxobmy2NXfbtDcsLVw3yN2ukbz6/SaIYeZ6j59s67eUf2i0Bhds
-         Q85PANtNX+8Y13xtslkZgmIskV9tPt6KZKCsn10wBPyDDRD1PxCH97UVKzYLhEKmKqsH
-         5gQCxSPBauL5Fwv6oJilkaxSW33jH1FPXZxnTGQj3gfhKCsOnNyewO3CCHVZ7+eIbodg
-         N1rn18LWLWHz2so2wJ/pItLv/TbybJsXxcQOFWrH1NunUfINdglCY47QRDOCJQEbslES
-         brjQ==
-X-Gm-Message-State: AOAM530vGPFuuV+7mcGzFZfaSzCSDwAyH5HGBxj7GdPEwAUCtFkgEdpM
-        c8fWvh5SerxePkxdDgJ9B7wrrQDwnaZ3m2v9F6lNmQ==
-X-Google-Smtp-Source: ABdhPJx7KSIOGMBto4HP5L7hv2jxsoQwkdcb8n4cTd2YDgj3wvrnJ1wx3y7Eg7f5Xky9jvLaf2R/CK7hRa3swTQ83G0=
-X-Received: by 2002:a05:6830:441f:: with SMTP id q31mr18449252otv.14.1642453084021;
- Mon, 17 Jan 2022 12:58:04 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vWLVs+l7+STOOWtF13ZAtvkyq3IkQp2HTgX1z6kBB5E=;
+        b=jhjI71B8rh0wKPccLATC5va0ojgJPOqI9YJTL6fjrWMTbRLYyRURq72VASCvcjtfa9
+         aA73vJKstkVCaplqy6tvUjbQBq1orkrKVHHWY5rOIyncLwwzbYWo8jacRiC94D3IUWxZ
+         cxZba+0wAi538GqgZH5ZGrR4YG6P9OpKPMnACgRv0XVy16QudWFlb+nqFDQL93ZoP9zA
+         F7o7Moe9IHroZ7iUDGph/fgI5q7z1e0TZ9kRd6NUqYkI2i/pwN40qB+hUptwzeKcWAWE
+         +Ai2+atZ/VcJMY05XRfV59eaQzaoEs1FkdKxaSbNmdLSgE9S7BqqpVBE0z/yLh8GlQcm
+         eKOw==
+X-Gm-Message-State: AOAM530W+yM5NTAuoYjGgELeKdyX7mbvdLSJPAJpvgsxEaWD7wpKhtQt
+        tcS2oGRQiKymjlBp/N1TmzaaFTHRtUz5Og==
+X-Google-Smtp-Source: ABdhPJyf9OYzYOrbZQA2NBj7TKRJGo1BOyC51WraCMrJcKo0HWWwT1PUwNI2v80G2+4x1TOPWIdS0g==
+X-Received: by 2002:a2e:9018:: with SMTP id h24mr16992262ljg.468.1642457538922;
+        Mon, 17 Jan 2022 14:12:18 -0800 (PST)
+Received: from localhost.localdomain (88-115-234-133.elisa-laajakaista.fi. [88.115.234.133])
+        by smtp.gmail.com with ESMTPSA id c32sm1458094ljr.107.2022.01.17.14.12.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jan 2022 14:12:18 -0800 (PST)
+From:   Martin Radev <martin.b.radev@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        Martin Radev <martin.b.radev@gmail.com>
+Subject: [PATCH kvmtool 0/5] kvmtool: Fix few found bugs
+Date:   Tue, 18 Jan 2022 00:11:58 +0200
+Message-Id: <cover.1642457047.git.martin.b.radev@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <CALMp9eQZa_y3ZN0_xHuB6nW0YU8oO6=5zPEov=DUQYPbzLeQVA@mail.gmail.com>
- <453a2a09-5f29-491e-c386-6b23d4244cc2@gmail.com>
-In-Reply-To: <453a2a09-5f29-491e-c386-6b23d4244cc2@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 17 Jan 2022 12:57:53 -0800
-Message-ID: <CALMp9eSkYEXKkqDYLYYWpJ0oX10VWECJTwtk_pBWY5G-vN5H0A@mail.gmail.com>
-Subject: Re: PMU virtualization and AMD erratum 1292
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stephane Eranian <eranian@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jan 16, 2022 at 8:26 PM Like Xu <like.xu.linux@gmail.com> wrote:
-...
-> It's easy for KVM to clear the reserved bit PERF_CTL2[43]
-> for only (AMD Family 19h Models 00h-0Fh) guests.
+In December, we hosted a CTF where one of the challenges was exploiting
+any "0day" bug in kvmtool [1]. Eight teams managed to find a bug and
+exploit it in less than 36 hours. Write-ups for exploits are available
+by HXP [2] and kalmarunionen [3]. 
 
-KVM is currently *way* too aggressive about synthesizing #GP for
-"reserved" bits on AMD hardware. Note that "reserved" generally has a
-much weaker definition in AMD documentation than in Intel
-documentation. When Intel says that an MSR bit is "reserved," it means
-that an attempt to set the bit will raise #GP. When AMD says that an
-MSR bit is "reserved," it does not necessarily mean the same thing.
-(Usually, AMD will write MBZ to indicate that the bit must be zero.)
+Now, I'm aware that kvmtool is mostly used for KVM testing and KVM bring-up
+in simulation environments. But since it does get mentioned in some security-
+related projects [4, 5] and has a sandboxing feature, maybe it makes sense
+to fix these bugs.
 
-On my Zen3 CPU, I can write 0xffffffffffffffff to MSR 0xc0010204,
-without getting a #GP. Hence, KVM should not synthesize a #GP for any
-writes to this MSR.
+Could you please check if these patches make sense?
+I have not verified that these patches do not break something for these virtio
+drivers.
 
-Note that the value I get back from rdmsr is 0x30fffdfffff, so there
-appears to be no storage behind bit 43. If KVM allows this bit to be
-set, it should ensure that reads of this bit always return 0, as they
-do on hardware.
+Kind regards,
+Martin
+
+[1]: https://2021.ctf.link/internal/challenge/dd0e8826-c970-4fde-8eeb-41a9d8a86b67/
+[2]: https://hxp.io/blog/87/hxp-CTF-2021-indie_vmm-writeup/
+[3]: https://www.kalmarunionen.dk/writeups/2021/hxp-2021/lkvm/
+[4]: https://blog.quarkslab.com/no-tears-no-fears.html
+[5]: https://fly.io/blog/sandboxing-and-workload-isolation/
+
+Martin Radev (5):
+  virtio: Sanitize config accesses
+  virtio: Check for overflows in QUEUE_NOTIFY and QUEUE_SEL
+  virtio/net: Warn if virtio_net is implicitly enabled
+  Makefile: Mark stack as not executable
+  mmio: Sanitize addr and len
+
+ Makefile                |  7 +++++--
+ include/kvm/virtio-9p.h |  1 +
+ include/kvm/virtio.h    |  3 ++-
+ mmio.c                  |  4 ++++
+ virtio/9p.c             | 21 ++++++++++++++++----
+ virtio/balloon.c        |  8 +++++++-
+ virtio/blk.c            |  8 +++++++-
+ virtio/console.c        |  8 +++++++-
+ virtio/mmio.c           | 44 ++++++++++++++++++++++++++++++++++-------
+ virtio/net.c            | 11 ++++++++++-
+ virtio/pci.c            | 40 +++++++++++++++++++++++++++++++++----
+ virtio/rng.c            |  8 +++++++-
+ virtio/scsi.c           |  8 +++++++-
+ virtio/vsock.c          |  8 +++++++-
+ 14 files changed, 154 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
