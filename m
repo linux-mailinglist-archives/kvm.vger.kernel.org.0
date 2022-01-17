@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2292B4901C6
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 06:58:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00E4349023F
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 08:00:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234455AbiAQF5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 00:57:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
+        id S233130AbiAQHAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 02:00:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232040AbiAQF5N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 00:57:13 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D72C061574;
-        Sun, 16 Jan 2022 21:57:13 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id l21-20020a17090b079500b001b49df5c4dfso2632028pjz.2;
-        Sun, 16 Jan 2022 21:57:13 -0800 (PST)
+        with ESMTP id S232184AbiAQHAI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 02:00:08 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5F1C061574;
+        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id l21-20020a17090b079500b001b49df5c4dfso2749853pjz.2;
+        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=e4gdSmCj7yWsd2DI5GqBWLTuv6FfWDIo04+u9VO8cm4=;
-        b=PcgDDloMAp6QKvrj36ECnpXVIibceDFsT7PNQ2qvcbiGtlW79G7BTQXhbR0Aa9a4il
-         /21lr8MtQKlTRDv+l4Aw9pAVW8uigPfBvQK8rsL5BIe8MpsNKBPaWHi12b7zclZoXk2a
-         4LBuzaiZzq0lf/maokSz6k2nGsdQdpubarEKNkY8yGp+JmQeEro2hm9SQgX8oXc9Tc/i
-         9zDpVsgFBE/UtMhhUaICWLT2aMgvSgtKonw1pMHhHg7tNY8q3WhbdwttG08y/KrZ1ltn
-         6hwAVFEcx218pzJavGW06NTE0eNFv51kVK5Es/Ulfu3gTknMc3CIPXgjQAqw050L8AX9
-         S+hw==
+        bh=IJGYiOOL+6CUqrzL1DWyP6i538pdaiTRGXfMxIypbx4=;
+        b=SQOmKzE5qLd9atEF7c6ICsVd/f5pZySXamSt5bexMkFZxDX8MPWRQ8iyBNR3y4r8YJ
+         T28OGncW226NldDD+N3pS6Sfp1ROGEcVKoeumFtoVRbxHaaeCpgNpLn7K6z0wsB/h2m8
+         bOSZIW+WnM7/erCzYmkbF2CcBuJKmCJ5a5jiz+TaYqU0GybF3ne52Df8RbF91EnZldIu
+         zg2Tum8yvOL9K5RvbuKAafOyl8rXxoRY+BKiPNzwq8deqivzL11NWe39DnGQKbwp7eDq
+         XcsOQqFXQL6cDjhI8GUlhTXwsolsy1KVWYzUmfYLWaA5sdUpT2nfQM+tJdwlghNsm5SV
+         5RTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=e4gdSmCj7yWsd2DI5GqBWLTuv6FfWDIo04+u9VO8cm4=;
-        b=0Ae0N1a9QTu2jlXjmBy2egu3mp86Z0YHXtH3HeLjU9tQyXzd4S83HxxjnV8m26nmW2
-         kULo/YyDaXQ1hN0AE3/SkTyslIQaSwKnte7zY1YTRNRYIOvs9xFV5Ij69ztPGY+595Fn
-         qFdNaY9w14kRch5AtchBHjHzKFCnOGJhnAUe7wXcyMoB/O6opDKycrTPQuhnev5mnN1G
-         hTo72cGi18xnC54joOlrbhHvY3kJd2cIvkf8Sbv1mf5IZtHxdHwMOmD+LYF8SRoZWrKl
-         nRB7PzLru9t1w6RuO8jXg5x4mXnDY6DGIXxiLowGfbKEBxRSAb2Mq1ETCcSa7ve2wf4j
-         8raw==
-X-Gm-Message-State: AOAM5326Z0lCLxkxEfzFNq49PoRPw+Pssth4YOaosRbPWJjfZIS+cxIG
-        aJI4snRgM6rnz7FlaL4WaK4=
-X-Google-Smtp-Source: ABdhPJwhbs0rnWj5qoUD0bcXPUTHc0ski6pPar3m8WCgklO4hGcqIg+G1ZJcIkr8UVmRhZ1LlWZcqw==
-X-Received: by 2002:a17:902:b784:b0:14a:2fec:dda2 with SMTP id e4-20020a170902b78400b0014a2fecdda2mr21111673pls.118.1642399033104;
-        Sun, 16 Jan 2022 21:57:13 -0800 (PST)
+        bh=IJGYiOOL+6CUqrzL1DWyP6i538pdaiTRGXfMxIypbx4=;
+        b=GThgX0tV/y/PQXXheVsSQh9Hlr0ZRi7wCLFO7W8RNyCgpN0Zw+ZpPIxy1JLKp/oHzU
+         72+sVPHGCTSNI5LUoCHIKNfKbr56eP6ngfnTS7eaKNWaY85h7h96BHlHBahhGV1n2Sp1
+         9Uw/8K3upUpzACzqo7Kx46yd9VDz/ibtLGDFLqkriV1Lycbf+DTIQGgIkkVtJAiKoqGe
+         xxCCDUOZItpicAvlHldQMAry0X4T3PaMRJiJ6JN+/1IosH757sbmHc70QZWeKbYzG5Gi
+         8WZA8eqquYOOdxfahZLQCxRqaK/93QUexMN3l14ugiiZ5eMrF/XBOPmMLsfe2hs1NkM9
+         IFaw==
+X-Gm-Message-State: AOAM530NTBzhmHeTTcxBVImAVQGjeWiOJZnr4KhHR6ygYjaPt8n6Xg8M
+        IUsSh5JaWhcQ4uNl0UxfUss=
+X-Google-Smtp-Source: ABdhPJyr1guEKgMePOqMXuJjqjUjwbfxwr+ht7XFTzzRRD5eavXA8v2bvVaiMaXLsySekzmV+ZQpIA==
+X-Received: by 2002:a17:90a:156:: with SMTP id z22mr32537539pje.191.1642402807498;
+        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id b12sm13144744pfl.121.2022.01.16.21.57.10
+        by smtp.gmail.com with ESMTPSA id t25sm10752959pgv.9.2022.01.16.23.00.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jan 2022 21:57:12 -0800 (PST)
+        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Ananth Narayan <ananth.narayan@amd.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jing Liu <jing2.liu@intel.com>,
         Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Clear reserved bit PERF_CTL2[43] for AMD erratum 1292
-Date:   Mon, 17 Jan 2022 13:57:03 +0800
-Message-Id: <20220117055703.52020-1-likexu@tencent.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/cpuid: Stop exposing unknown AMX Tile Palettes and accelerator units
+Date:   Mon, 17 Jan 2022 14:59:57 +0800
+Message-Id: <20220117065957.65335-1-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -69,70 +69,63 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The AMD Family 19h Models 00h-0Fh Processors may experience sampling
-inaccuracies that cause the following performance counters to overcount
-retire-based events. To count the non-FP affected PMC events correctly,
-a patched guest with a target vCPU model would:
+Guest enablement of Intel AMX requires a good co-work from both host and
+KVM, which means that KVM should take a more safer approach to avoid
+the accidental inclusion of new unknown AMX features, even though it's
+designed to be an extensible architecture.
 
-    - Use Core::X86::Msr::PERF_CTL2 to count the events, and
-    - Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
-    - Program Core::X86::Msr::PERF_CTL2[20] to 0b.
+Per current spec, Intel CPUID Leaf 1EH sub-leaf 1 and above are reserved,
+other bits in leaves 0x1d and 0x1e marked as "Reserved=0" shall be strictly
+limited by definition for reporeted KVM_GET_SUPPORTED_CPUID.
 
-To support this use of AMD guests, KVM should not reserve bit 43
-only for counter #2. Treatment of other cases remains unchanged.
-
-Note, the host's perf subsystem will decide which hardware counter
-will be used for the guest counter, based on its own physical CPU
-model and its own workaround(s) in the host perf context.
-
-Reported-by: Jim Mattson <jmattson@google.com>
+Fixes: 690a757d610e ("kvm: x86: Add CPUID support for Intel AMX")
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/svm/pmu.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ arch/x86/kvm/cpuid.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 12d8b301065a..1111b12adcca 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -18,6 +18,17 @@
- #include "pmu.h"
- #include "svm.h"
- 
-+/*
-+ * As a workaround of "Retire Based Events May Overcount" for erratum 1292,
-+ * some patched guests may set PERF_CTL2[43] to 1b and PERF_CTL2[20] to 0b
-+ * to count the non-FP affected PMC events correctly.
-+ */
-+static inline bool vcpu_overcount_retire_events(struct kvm_vcpu *vcpu)
-+{
-+	return guest_cpuid_family(vcpu) == 0x19 &&
-+		guest_cpuid_model(vcpu) < 0x10;
-+}
-+
- enum pmu_type {
- 	PMU_TYPE_COUNTER = 0,
- 	PMU_TYPE_EVNTSEL,
-@@ -252,6 +263,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	struct kvm_pmc *pmc;
- 	u32 msr = msr_info->index;
- 	u64 data = msr_info->data;
-+	u64 reserved_bits;
- 
- 	/* MSR_PERFCTRn */
- 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
-@@ -264,7 +276,10 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	if (pmc) {
- 		if (data == pmc->eventsel)
- 			return 0;
--		if (!(data & pmu->reserved_bits)) {
-+		reserved_bits = pmu->reserved_bits;
-+		if (pmc->idx == 2 && vcpu_overcount_retire_events(vcpu))
-+			reserved_bits &= ~BIT_ULL(43);
-+		if (!(data & reserved_bits)) {
- 			reprogram_gp_counter(pmc, data);
- 			return 0;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index c55e57b30e81..3fde6610d314 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -661,7 +661,6 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
+ 	case 0x17:
+ 	case 0x18:
+ 	case 0x1d:
+-	case 0x1e:
+ 	case 0x1f:
+ 	case 0x8000001d:
+ 		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+@@ -936,21 +935,26 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		break;
+ 	/* Intel AMX TILE */
+ 	case 0x1d:
++		entry->ebx = entry->ecx = entry->edx = 0;
+ 		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+-			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
++			entry->eax = 0;
+ 			break;
  		}
+ 
++		entry->eax = min(entry->eax, 1u);
+ 		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
+ 			if (!do_host_cpuid(array, function, i))
+ 				goto out;
+ 		}
+ 		break;
+-	case 0x1e: /* TMUL information */
++	/* TMUL Information */
++	case 0x1e:
++		entry->eax = entry->ecx = entry->edx = 0;
+ 		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+-			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
++			entry->ebx = 0;
+ 			break;
+ 		}
++		entry->ebx &= 0xffffffu;
+ 		break;
+ 	case KVM_CPUID_SIGNATURE: {
+ 		const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
 -- 
 2.33.1
 
