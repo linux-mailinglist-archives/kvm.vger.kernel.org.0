@@ -2,123 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26B0749007A
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 04:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F3A5490085
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 04:23:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236909AbiAQDHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jan 2022 22:07:05 -0500
-Received: from mga12.intel.com ([192.55.52.136]:46396 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234099AbiAQDHD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jan 2022 22:07:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642388823; x=1673924823;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=R8Sn8SZmhuMPafCTfdZnGovaHJidPy4VsCKLE6frY5I=;
-  b=bdS4wD6AHE+mJ2tHmHW171YjF8JhXjxLB36Hsbsc27Kq4S5wvNKufoAr
-   yT+4jZV3XJGfKRljngwCMX5I2k13+OqzwGFDhT4HlFHsWQtPIiTD/LZ7/
-   p82Gd6n9yAVqe9yJHHzEn9y/9fCTCixYlzio/9m3tGMa8wxE+2uPqTsW9
-   EGrgNYTBQNVVubuasV+C/UgdrMxNZWG0znms8zKGtXftAA7wk+BCps7OQ
-   ZfHpesFyWY6fMVdeO98TACgPLT/4pNP6rTaIbInRB6gQzsWOeg3dWbN78
-   pjtsxJy9vfp7S+TFz8wN9XgetYEw+ucqNBVpkK1WaCR0/DYByMXQMiBB2
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10229"; a="224521886"
-X-IronPort-AV: E=Sophos;i="5.88,294,1635231600"; 
-   d="scan'208";a="224521886"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2022 19:07:03 -0800
-X-IronPort-AV: E=Sophos;i="5.88,294,1635231600"; 
-   d="scan'208";a="476489507"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.105])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2022 19:06:58 -0800
-Date:   Mon, 17 Jan 2022 11:17:52 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Zeng Guang <guang.zeng@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>
-Subject: Re: [PATCH v5 7/8] KVM: VMX: Update PID-pointer table entry when
- APIC ID is changed
-Message-ID: <20220117031750.GA5339@gao-cwp>
-References: <640e82f3-489d-60af-1d31-25096bef1a46@amd.com>
- <4eee5de5-ab76-7094-17aa-adc552032ba0@intel.com>
- <aa86022c-2816-4155-8d77-f4faf6018255@amd.com>
- <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
- <d058f7464084cadc183bd9dbf02c7f525bb9f902.camel@redhat.com>
- <20220110074523.GA18434@gao-cwp>
- <1ff69ed503faa4c5df3ad1b5abe8979d570ef2b8.camel@redhat.com>
- <YeClaZWM1cM+WLjH@google.com>
- <20220114025825.GA3010@gao-cwp>
- <4b9fb845bf698f7efa6b46d525b37e329dd693ea.camel@redhat.com>
+        id S236928AbiAQDXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jan 2022 22:23:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230324AbiAQDXS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jan 2022 22:23:18 -0500
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C223C061574
+        for <kvm@vger.kernel.org>; Sun, 16 Jan 2022 19:23:18 -0800 (PST)
+Received: by mail-ua1-x92c.google.com with SMTP id y4so28113149uad.1
+        for <kvm@vger.kernel.org>; Sun, 16 Jan 2022 19:23:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Q9SVo+f6dgUavA4xqDj7rCCdQm9sgpR68lZeR6ag/AU=;
+        b=pXkhEfOkBnZ3rkG5MXGsvE+ucMi1XFgWS0j/7yscTiipWC1KV67ZB6H1btatJEunK5
+         /UCgP4QrxImjBP/bITqYYDlc1jqBPHu8MKmhJxeSi58qzo59RkbxaRVWtYVpQWMpbgu5
+         /0VIA12vQuB/0vUa7Aj1TshTTbRdImv+/JMZdxCN4rvmkJB0X8Q3eqIMb6NYMljGu50A
+         J9WizShGjki9IazWgGxcpzktSWOP5NWcQqZIkG1uo4NpsWUlJqLTNrjYU8WaSYb6O/s7
+         UfByT0uGic8xEMwBuGPMF3XqusLp8xlK1NpifUlAj6moJmthC2luQJXDPEMBELTZMNzH
+         VF/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Q9SVo+f6dgUavA4xqDj7rCCdQm9sgpR68lZeR6ag/AU=;
+        b=H3rCJPg/gfuHFmujwaPUe+9/jVH3IZeVbhN6uJp7QmZ4jaOnxaAlw1rgDFc4OrQsZT
+         ndojzj0+ZFYnLEp7eryL4aiinlEJXQdQdWknvNzaMx8WzqFe6oLF55dQEZz8f24/7l89
+         EqGOLl/Tyk856JpNy52pcU95s7fS9uqosTDEk9Yl7Fuwm3tNOlVcgZQwHiAdGQlRT5y2
+         QcoAfum4vElxj9/Gra7331gbq+zybRe+ya5b6gXkiPd4ZD2B+wKYgWO5sZA+sKgrlQRr
+         YuphoGg75v+kD9h4z/c0X7lBofKiELeKiDzACIRrP8s9InGOoQaZLTUxbp4vAI87TQ9B
+         4yKg==
+X-Gm-Message-State: AOAM531p9GvUJ/KHzhgGl+qTt5+AaidxphzCL2AVijs02cEqiAIwZ3Tw
+        vEmHJvEDKciRv5sqfTxVmsWQPthZhkAWzX5qiZo4wg==
+X-Google-Smtp-Source: ABdhPJz0Ml23OeNs4PVzflMjLgqC1PMFnYM+QUtn472KrkIuc5/oFdgNhdINP3mf04H7ahtbQE3GgNyiAsBVfuAYURg=
+X-Received: by 2002:ab0:1609:: with SMTP id k9mr3323464uae.137.1642389797118;
+ Sun, 16 Jan 2022 19:23:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b9fb845bf698f7efa6b46d525b37e329dd693ea.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20220113221829.2785604-1-jingzhangos@google.com>
+ <20220113221829.2785604-3-jingzhangos@google.com> <87wnj0x789.wl-maz@kernel.org>
+In-Reply-To: <87wnj0x789.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Sun, 16 Jan 2022 19:23:06 -0800
+Message-ID: <CAAdAUti0Ydsw4uHyT29H93+LUmY5fRSYF02k+qBJvrpv0VnD_w@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] KVM: arm64: Add fast path to handle permission
+ relaxation during dirty logging
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 10:17:34AM +0200, Maxim Levitsky wrote:
->On Fri, 2022-01-14 at 10:58 +0800, Chao Gao wrote:
->> On Thu, Jan 13, 2022 at 10:19:21PM +0000, Sean Christopherson wrote:
->> > On Tue, Jan 11, 2022, Maxim Levitsky wrote:
->> > > Both Intel and AMD's PRM also state that changing APIC ID is implementation
->> > > dependent.
->> > >  
->> > > I vote to forbid changing apic id, at least in the case any APIC acceleration
->> > > is used, be that APICv or AVIC.
->> > 
->> > That has my vote as well.  For IPIv in particular there's not much concern with
->> > backwards compability, i.e. we can tie the behavior to enable_ipiv.
->Great!
->> 
->> Hi Sean and Levitsky,
->> 
->> Let's align on the implementation.
->> 
->> To disable changes for xAPIC ID when IPIv/AVIC is enabled:
->> 
->> 1. introduce a variable (forbid_apicid_change) for this behavior in kvm.ko
->> and export it so that kvm-intel, kvm-amd can set it when IPIv/AVIC is
->> enabled. To reduce complexity, this variable is a module level setting.
->> 
->> 2. when guest attempts to change xAPIC ID but it is forbidden, KVM prints
->> a warning on host and injects a #GP to guest.
->> 
->> 3. remove AVIC code that deals with changes to xAPIC ID.
->> 
+On Sun, Jan 16, 2022 at 3:14 AM Marc Zyngier <maz@kernel.org> wrote:
 >
->I have a patch for both, I attached them.
-
-Looks good to me. We will drop this patch and rely on the first attached patch
-to forbid guest from changing xAPIC ID.
-
->I haven't tested either of these patches that much other than a smoke test,
->but I did test all of the guests I  have and none broke in regard to boot.
+> On Thu, 13 Jan 2022 22:18:28 +0000,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > To reduce MMU lock contention during dirty logging, all permission
+> > relaxation operations would be performed under read lock.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 20 ++++++++++++++++++--
+> >  1 file changed, 18 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index cafd5813c949..15393cb61a3f 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1084,6 +1084,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >       unsigned long vma_pagesize, fault_granule;
+> >       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> >       struct kvm_pgtable *pgt;
+> > +     bool use_mmu_readlock = false;
 >
->I will send those patches as part of larger patch series that implements
->nesting for AVIC. I hope to do this next week.
+> Group this with the rest of the flags. It would also be better if it
+> described the condition this represent rather than what we use it for.
+> For example, 'perm_fault_while_logging', or something along those
+> lines.
+>
+Sure, will group with logging_active and rename it as "logging_perm_fault".
+> >
+> >       fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+> >       write_fault = kvm_is_write_fault(vcpu);
+> > @@ -1212,7 +1213,19 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >       if (exec_fault && device)
+> >               return -ENOEXEC;
+> >
+> > -     write_lock(&kvm->mmu_lock);
+> > +     if (fault_status == FSC_PERM && fault_granule == PAGE_SIZE
+> > +                                  && logging_active && write_fault)
+> > +             use_mmu_readlock = true;
+>
+> This looks a bit clumsy, and would be better if this was kept together
+> with the rest of the logging_active==true code. Something like:
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index bc2aba953299..59b1d5f46b06 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1114,6 +1114,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>         if (logging_active) {
+>                 force_pte = true;
+>                 vma_shift = PAGE_SHIFT;
+> +               use_readlock = (fault_status == FSC_PERM && write_fault);
+>         } else {
+>                 vma_shift = get_vma_page_shift(vma, hva);
+>         }
+>
+> I don't think we have to check for fault_granule here, as I don't see
+> how you could get a permission fault for something other than a page
+> size mapping.
+>
+You are right. Will do as you suggested.
 
-Thanks.
+> > +     /*
+> > +      * To reduce MMU contentions and enhance concurrency during dirty
+> > +      * logging dirty logging, only acquire read lock for permission
+> > +      * relaxation. This fast path would greatly reduce the performance
+> > +      * degradation of guest workloads.
+> > +      */
+>
+> This comment makes more sense with the previous hunk. Drop the last
+> sentence though, as it doesn't bring much information.
+>
+Will do.
+> > +     if (use_mmu_readlock)
+> > +             read_lock(&kvm->mmu_lock);
+> > +     else
+> > +             write_lock(&kvm->mmu_lock);
+> >       pgt = vcpu->arch.hw_mmu->pgt;
+> >       if (mmu_notifier_retry(kvm, mmu_seq))
+> >               goto out_unlock;
+> > @@ -1271,7 +1284,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >       }
+> >
+> >  out_unlock:
+> > -     write_unlock(&kvm->mmu_lock);
+> > +     if (use_mmu_readlock)
+> > +             read_unlock(&kvm->mmu_lock);
+> > +     else
+> > +             write_unlock(&kvm->mmu_lock);
+> >       kvm_set_pfn_accessed(pfn);
+> >       kvm_release_pfn_clean(pfn);
+> >       return ret != -EAGAIN ? ret : 0;
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+Thanks,
+Jing
