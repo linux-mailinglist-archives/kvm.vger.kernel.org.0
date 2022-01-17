@@ -2,208 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 908DE490B3B
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:13:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A7FB490B52
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:23:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240378AbiAQPNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 10:13:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2974 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230202AbiAQPNO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 10:13:14 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20HDviSI018352;
-        Mon, 17 Jan 2022 15:13:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=16UotllAKznZT4KieQy+6b3nwme+qZWB4csvLOcC9NE=;
- b=UZUvAQSCDwJGxVu4THgGUMvSdQK+o0g0ArxzU7cTJ68o7TuSp9gDuT4XQpTI6loLsrLW
- gNLr67doDB5RwecFzKVukPniisK7hyn8rdABXsmiJaclwDIwytrNdVH27xRReyXIhirR
- tbaBlxi94Og6LP/ZVGPlDUFh8bu8ASypG0tg0DJpd3iYCUM6xoutCiSl1q7Bh/D1zFZI
- QiWqQb3JFYsM3YcIp7mgdwg0jcTfeccQlt9Re1vNVx3JJRtYSejCikQwWhxHgZgCvRdi
- c1iDOgn+cf5uAm1Q8CBvYl5PRcmb0FfUs028UKmO4FU7Pw0ay5t/0+uMttLBtm1HHs3O 1Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dn9t3hex2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jan 2022 15:13:13 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20HECiCN018878;
-        Mon, 17 Jan 2022 15:13:12 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dn9t3hewj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jan 2022 15:13:12 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20HF972G015147;
-        Mon, 17 Jan 2022 15:13:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dknhj5byc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jan 2022 15:13:10 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20HFD7uV35127798
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Jan 2022 15:13:07 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B58894C05A;
-        Mon, 17 Jan 2022 15:13:07 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 511764C05C;
-        Mon, 17 Jan 2022 15:13:07 +0000 (GMT)
-Received: from [9.171.80.201] (unknown [9.171.80.201])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 17 Jan 2022 15:13:07 +0000 (GMT)
-Message-ID: <9aa09fba-27ef-ddd5-462a-165b38f6d58a@linux.ibm.com>
-Date:   Mon, 17 Jan 2022 16:14:50 +0100
+        id S240363AbiAQPXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 10:23:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38384 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231831AbiAQPXb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 10:23:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642433011;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eptcp3tAvcq5hmKWsJUSp8SYz6a+GwEZa29b9sA+JtM=;
+        b=PQnlE/h67PWtX2nDFcQrCFIBi323IS5O6nwNuycmKgXu1w4i8X9UU38aBXjUplj7VxODBO
+        HBnRCXe4dfVtjeuAyZ1wyVE2lFjE2HWNF9nyqB9KN41jVz7NdaL/SPivuVodEIkqiXJMbj
+        N0LdWvi9nl3i9BOEXvb5/8D8PpUtzYA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-629-wEQA4DYJNoS9FyiZ-z5pKg-1; Mon, 17 Jan 2022 10:23:10 -0500
+X-MC-Unique: wEQA4DYJNoS9FyiZ-z5pKg-1
+Received: by mail-wm1-f72.google.com with SMTP id 24-20020a05600c229800b0034bfa8a1531so87372wmf.1
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 07:23:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=eptcp3tAvcq5hmKWsJUSp8SYz6a+GwEZa29b9sA+JtM=;
+        b=LMwlC2eAcwPuX91WqR9WyPyTDLZW0QmKBahzywZ6YwUemDV0G0DDOI6aNJzG6oKlC/
+         KDRvp6WpAu4N5Bn7ZRIO0C0dgw+yW+JTaHcxAhEjycaVjd4/54MhPleXlCyi96odKC/G
+         p3OcXkBer6diCInXIT5wWh6mxAWaS2N18uZ6Agsl8Up3oeq9wAZls/nTlPJJ7PfVuouu
+         jisyP0A0v5OZ6QYKWUkF7dk1tRUnNndIVXOHmlS7RqmYMGlYbopdRXjXVoSbsSWeYeHk
+         WmSgI1BX9CyiB4vl6fkVYry6LpGlX0K3nFHcF9ltpeX7TDrVpAMsRoJ2xv5bwaz+VMMO
+         Z+Kw==
+X-Gm-Message-State: AOAM530J0t7CeobzOMpE/tb+7e7lnasY0KzAaXwZXibuaDaWIDfBJgCW
+        ye5yDM+qniCE6oKXlTBnavid/ywkHokUzfgFcIcqaneX6daHj5CZ7cvWo/o++K6IEYMMm96Hb3a
+        O04Crh5F6oUQm
+X-Received: by 2002:a5d:591a:: with SMTP id v26mr17775943wrd.557.1642432988509;
+        Mon, 17 Jan 2022 07:23:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyan0rksifvJHIoHblxOJ60zZ1eEn4rTVauXh+dyyVNUHHQkMTF1U9LOQ8Be+iumOxosZj7UQ==
+X-Received: by 2002:a5d:591a:: with SMTP id v26mr17775934wrd.557.1642432988357;
+        Mon, 17 Jan 2022 07:23:08 -0800 (PST)
+Received: from [192.168.8.100] (tmo-098-68.customers.d1-online.com. [80.187.98.68])
+        by smtp.gmail.com with ESMTPSA id t125sm5251214wma.15.2022.01.17.07.23.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jan 2022 07:23:07 -0800 (PST)
+Message-ID: <32c83624-eb3b-05ea-6fb6-737bd9876db3@redhat.com>
+Date:   Mon, 17 Jan 2022 16:23:05 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH v3 4/4] s390x: topology: Checking
- Configuration Topology Information
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v2 0/9] s390x/pci: zPCI interpretation support
 Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-References: <20220110133755.22238-1-pmorel@linux.ibm.com>
- <20220110133755.22238-5-pmorel@linux.ibm.com>
- <45dea0fb-5605-5f98-74c7-d68f7841f1b6@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <45dea0fb-5605-5f98-74c7-d68f7841f1b6@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220114203849.243657-1-mjrosato@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220114203849.243657-1-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Iupiuaj9BqB0Kbv7uk_egi32mX57YD52
-X-Proofpoint-GUID: u5hFrp191SF59Zb57pJ28-ysR8qa4QIM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-17_07,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 clxscore=1015 malwarescore=0 adultscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 bulkscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201170093
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/11/22 14:30, Janosch Frank wrote:
-> On 1/10/22 14:37, Pierre Morel wrote:
->> STSI with function code 15 is used to store the CPU configuration
->> topology.
->>
->> We check :
->> - if the topology stored is coherent between the QEMU -smp
->>    parameters and kernel parameters.
->> - the number of CPUs
->> - the maximum number of CPUs
->> - the number of containers of each levels for every STSI(15.1.x)
->>    instruction allowed by the machine.
+On 14/01/2022 21.38, Matthew Rosato wrote:
+> For QEMU, the majority of the work in enabling instruction interpretation
+> is handled via new VFIO ioctls to SET the appropriate interpretation and
+> interrupt forwarding modes, and to GET the function handle to use for
+> interpretive execution.
 > 
-> The full review of this will take some time.
-> 
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/stsi.h    |  44 +++++++++
->>   s390x/topology.c    | 231 ++++++++++++++++++++++++++++++++++++++++++++
->>   s390x/unittests.cfg |   1 +
->>   3 files changed, 276 insertions(+)
->>
->> diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
->> index 02cc94a6..e3fc7ac0 100644
->> --- a/lib/s390x/stsi.h
->> +++ b/lib/s390x/stsi.h
->> @@ -29,4 +29,48 @@ struct sysinfo_3_2_2 {
->>       uint8_t ext_names[8][256];
->>   };
->> +struct topology_core {
->> +    uint8_t nl;
->> +    uint8_t reserved1[3];
->> +    uint8_t reserved4:5;
->> +    uint8_t d:1;
->> +    uint8_t pp:2;
->> +    uint8_t type;
->> +    uint16_t origin;
->> +    uint64_t mask;
->> +};
->> +
->> +struct topology_container {
->> +    uint8_t nl;
->> +    uint8_t reserved[6];
->> +    uint8_t id;
->> +};
->> +
->> +union topology_entry {
->> +    uint8_t nl;
->> +    struct topology_core cpu;
->> +    struct topology_container container;
->> +};
->> +
->> +#define CPU_TOPOLOGY_MAX_LEVEL 6
->> +struct sysinfo_15_1_x {
->> +    uint8_t reserved0[2];
->> +    uint16_t length;
->> +    uint8_t mag[CPU_TOPOLOGY_MAX_LEVEL];
->> +    uint8_t reserved10;
-> 
-> reserved0a?
+> This series implements these new ioctls, as well as adding a new, optional
+> 'intercept' parameter to zpci to request interpretation support not be used
+> as well as an 'intassist' parameter to determine whether or not the
+> firmware assist will be used for interrupt delivery or whether the host
+> will be responsible for delivering all interrupts.
 
-OK
+  Hi Matthew,
 
-> 
->> +    uint8_t mnest;
->> +    uint8_t reserved12[4];
-> 
-> reserved0c?
+would it make sense to create a docs/system/s390x/zpci.rst doc file, too, 
+where you could describe such new parameters like 'intassist' and 
+'intercept' (or is it 'interp') ? ... otherwise hardly anybody except you 
+will know how to use these parameters later...
 
-OK
+  Thomas
 
-> 
->> +    union topology_entry tle[0];
-
-...snip...
-
->> +static void stsi_check_tle_coherency(struct sysinfo_15_1_x *info, int 
->> sel2)
->> +{
->> +    struct topology_container *tc, *end;
->> +    struct topology_core *cpus;
->> +    int n = 0;
->> +    int i;
->> +
->> +    report_prefix_push("TLE coherency");
->> +
->> +    tc = (void *)&info->tle[0];
-> 
-> tc = &info->tle[0].container ?
-
-Yes, clearly better than a cast.
-
-> 
->> +    end = (struct topology_container *)((unsigned long)info + 
-...snip...
->> +    /* For each level found in STSI */
->> +    for (i = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
->> +        /*
->> +         * For non QEMU/KVM hypervizor the concatanation of the levels
-> 
-> hypervisor
-> 
-> concatenation
-
-Yes, thanks.
-
-> 
->> +         * above level 1 are architecture dependent.
-
-...snip...
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
