@@ -2,366 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A372490490
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 10:04:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98F004904BD
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 10:25:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233632AbiAQJD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 04:03:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48512 "EHLO
+        id S235629AbiAQJZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 04:25:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232907AbiAQJDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 04:03:55 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52360C061574;
-        Mon, 17 Jan 2022 01:03:55 -0800 (PST)
-Received: from ip4d173d02.dynamic.kabel-deutschland.de ([77.23.61.2] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1n9Nvc-0005vo-I4; Mon, 17 Jan 2022 10:03:52 +0100
-Message-ID: <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
-Date:   Mon, 17 Jan 2022 10:03:52 +0100
+        with ESMTP id S235621AbiAQJZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 04:25:43 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51FEC061574
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 01:25:42 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9OFv-0006KR-Ei; Mon, 17 Jan 2022 10:24:51 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9OFp-00AnDX-Gd; Mon, 17 Jan 2022 10:24:44 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9OFo-0002fs-6r; Mon, 17 Jan 2022 10:24:44 +0100
+Date:   Mon, 17 Jan 2022 10:24:44 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>, Andrew Lunn <andrew@lunn.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        platform-driver-x86@vger.kernel.org,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, Takashi Iwai <tiwai@suse.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        openipmi-developer@lists.sourceforge.net,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Benson Leung <bleung@chromium.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+Message-ID: <20220117092444.opoedfcf5k5u6otq@pengutronix.de>
+References: <20220112085009.dbasceh3obfok5dc@pengutronix.de>
+ <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+ <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+ <Yd9L9SZ+g13iyKab@sirena.org.uk>
+ <29f0c65d-77f2-e5b2-f6cc-422add8a707d@omp.ru>
+ <20220114092557.jrkfx7ihg26ekzci@pengutronix.de>
+ <61b80939-357d-14f5-df99-b8d102a4e1a1@omp.ru>
+ <20220114202226.ugzklxv4wzr6egwj@pengutronix.de>
+ <c9026f17-2b3f-ee94-0ea3-5630f981fbc1@omp.ru>
+ <CAMuHMdXVbRudGs69f9ZzaP1PXhteDNZiXA658eMFAwP4nr9r3w@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-BS
-To:     "James D. Turner" <linuxkernel.foss@dmarc-none.turner.link>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, regressions@lists.linux.dev,
-        linux-kernel@vger.kernel.org
-References: <87ee57c8fu.fsf@turner.link>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
- PCI-passed-through to Windows VM
-In-Reply-To: <87ee57c8fu.fsf@turner.link>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1642410235;881c5ab1;
-X-HE-SMSGID: 1n9Nvc-0005vo-I4
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="ycu5k3o6g2lyq6o4"
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdXVbRudGs69f9ZzaP1PXhteDNZiXA658eMFAwP4nr9r3w@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[TLDR: I'm adding this regression to regzbot, the Linux kernel
-regression tracking bot; most text you find below is compiled from a few
-templates paragraphs some of you might have seen already.]
 
-Hi, this is your Linux kernel regression tracker speaking.
+--ycu5k3o6g2lyq6o4
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Hello Geert,
 
-On 17.01.22 03:12, James D. Turner wrote:
-> 
-> With newer kernels, starting with the v5.14 series, when using a MS
-> Windows 10 guest VM with PCI passthrough of an AMD Radeon Pro WX 3200
-> discrete GPU, the passed-through GPU will not run above 501 MHz, even
-> when it is under 100% load and well below the temperature limit. As a
-> result, GPU-intensive software (such as video games) runs unusably
-> slowly in the VM.
+On Mon, Jan 17, 2022 at 09:41:42AM +0100, Geert Uytterhoeven wrote:
+> On Sat, Jan 15, 2022 at 9:22 PM Sergey Shtylyov <s.shtylyov@omp.ru> wrote:
+> > On 1/14/22 11:22 PM, Uwe Kleine-K=F6nig wrote:
+> > > You have to understand that for clk (and regulator and gpiod) NULL is=
+ a
+> > > valid descriptor that can actually be used, it just has no effect. So
+> > > this is a convenience value for the case "If the clk/regulator/gpiod =
+in
+> > > question isn't available, there is nothing to do". This is what makes
+> > > clk_get_optional() and the others really useful and justifies their
+> > > existence. This doesn't apply to platform_get_irq_optional().
+> >
+> >    I do understand that. However, IRQs are a different beast with their
+> > own justifications...
+>=20
+> > > clk_get_optional() is sane and sensible for cases where the clk might=
+ be
+> > > absent and it helps you because you don't have to differentiate betwe=
+en
+> > > "not found" and "there is an actual resource".
+> > >
+> > > The reason for platform_get_irq_optional()'s existence is just that
+> > > platform_get_irq() emits an error message which is wrong or suboptimal
+> >
+> >    I think you are very wrong here. The real reason is to simplify the
+> > callers.
+>=20
+> Indeed.
 
-Thanks for the report. Greg already asked for a bisection, which would
-help a lot here.
+The commit that introduced platform_get_irq_optional() said:
 
-To be sure this issue doesn't fall through the cracks unnoticed, I'm
-adding it to regzbot, my Linux kernel regression tracking bot:
+	Introduce a new platform_get_irq_optional() that works much like
+	platform_get_irq() but does not output an error on failure to
+	find the interrupt.
 
-#regzbot ^introduced v5.13..v5.14-rc1
-#regzbot ignore-activity
+So the author of 8973ea47901c81a1912bd05f1577bed9b5b52506 failed to
+mention the real reason? Or look at
+31a8d8fa84c51d3ab00bf059158d5de6178cf890:
 
-Reminder: when fixing the issue, please add a 'Link:' tag with the URL
-to the report (the parent of this mail) using the kernel.org redirector,
-as explained in 'Documentation/process/submitting-patches.rst'. Regzbot
-then will automatically mark the regression as resolved once the fix
-lands in the appropriate tree. For more details about regzbot see footer.
+	[...] use platform_get_irq_optional() to get second/third IRQ
+	which are optional to avoid below error message during probe:
+	[...]
 
-Sending this to everyone that got the initial report, to make all aware
-of the tracking. I also hope that messages like this motivate people to
-directly get at least the regression mailing list and ideally even
-regzbot involved when dealing with regressions, as messages like this
-wouldn't be needed then.
+Look through the output of
 
-Don't worry, I'll send further messages wrt to this regression just to
-the lists (with a tag in the subject so people can filter them away), as
-long as they are intended just for regzbot. With a bit of luck no such
-messages will be needed anyway.
+	git log -Splatform_get_irq_optional
 
-Ciao, Thorsten (wearing his 'Linux kernel regression tracker' hat)
+to find several more of these.
 
-P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
-on my table. I can only look briefly into most of them. Unfortunately
-therefore I sometimes will get things wrong or miss something important.
-I hope that's not the case here; if you think it is, don't hesitate to
-tell me about it in a public reply, that's in everyone's interest.
+Also I fail to see how a caller of (today's) platform_get_irq_optional()
+is simpler than a caller of platform_get_irq() given that there is no
+semantic difference between the two. Please show me a single
+conversion from platform_get_irq to platform_get_irq_optional that
+yielded a simplification.
 
-BTW, I have no personal interest in this issue, which is tracked using
-regzbot, my Linux kernel regression tracking bot
-(https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
-this mail to get things rolling again and hence don't need to be CC on
-all further activities wrt to this regression.
+So you need some more effort to convince me of your POV.
 
-> In contrast, with older kernels, the passed-through GPU runs at up to
-> 1295 MHz (the correct hardware limit), so GPU-intensive software runs at
-> a reasonable speed in the VM.
-> 
-> I've confirmed that the issue exists with the following kernel versions:
-> 
-> - v5.16
-> - v5.14
-> - v5.14-rc1
-> 
-> The issue does not exist with the following kernels:
-> 
-> - v5.13
-> - various packaged (non-vanilla) 5.10.* Arch Linux `linux-lts` kernels
-> 
-> So, the issue was introduced between v5.13 and v5.14-rc1. I'm willing to
-> bisect the commit history to narrow it down further, if that would be
-> helpful.
-> 
-> The configuration details and test results are provided below. In
-> summary, for the kernels with this issue, the GPU core stays at a
-> constant 0.8 V, the GPU core clock ranges from 214 MHz to 501 MHz, and
-> the GPU memory stays at a constant 625 MHz, in the VM. For the correctly
-> working kernels, the GPU core ranges from 0.85 V to 1.0 V, the GPU core
-> clock ranges from 214 MHz to 1295 MHz, and the GPU memory stays at 1500
-> MHz, in the VM.
-> 
-> Please let me know if additional information would be helpful.
-> 
-> Regards,
-> James Turner
-> 
-> # Configuration Details
-> 
-> Hardware:
-> 
-> - Dell Precision 7540 laptop
-> - CPU: Intel Core i7-9750H (x86-64)
-> - Discrete GPU: AMD Radeon Pro WX 3200
-> - The internal display is connected to the integrated GPU, and external
->   displays are connected to the discrete GPU.
-> 
-> Software:
-> 
-> - KVM host: Arch Linux
->   - self-built vanilla kernel (built using Arch Linux `PKGBUILD`
->     modified to use vanilla kernel sources from git.kernel.org)
->   - libvirt 1:7.10.0-2
->   - qemu 6.2.0-2
-> 
-> - KVM guest: Windows 10
->   - GPU driver: Radeon Pro Software Version 21.Q3 (Note that I also
->     experienced this issue with the 20.Q4 driver, using packaged
->     (non-vanilla) Arch Linux kernels on the host, before updating to the
->     21.Q3 driver.)
-> 
-> Kernel config:
-> 
-> - For v5.13, v5.14-rc1, and v5.14, I used
->   https://github.com/archlinux/svntogit-packages/blob/89c24952adbfa645d9e1a6f12c572929f7e4e3c7/trunk/config
->   (The build script ran `make olddefconfig` on that config file.)
-> 
-> - For v5.16, I used
->   https://github.com/archlinux/svntogit-packages/blob/94f84e1ad8a530e54aa34cadbaa76e8dcc439d10/trunk/config
->   (The build script ran `make olddefconfig` on that config file.)
-> 
-> I set up the VM with PCI passthrough according to the instructions at
-> https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF
-> 
-> I'm passing through the following PCI devices to the VM, as listed by
-> `lspci -D -nn`:
-> 
->   0000:01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
->   0000:01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
-> 
-> The host kernel command line includes the following relevant options:
-> 
->   intel_iommu=on vfio-pci.ids=1002:6981,1002:aae0
-> 
-> to enable IOMMU and bind the `vfio-pci` driver to the PCI devices.
-> 
-> My `/etc/mkinitcpio.conf` includes the following line:
-> 
->   MODULES=(vfio_pci vfio vfio_iommu_type1 vfio_virqfd i915 amdgpu)
-> 
-> to load `vfio-pci` before the graphics drivers. (Note that removing
-> `i915 amdgpu` has no effect on this issue.)
-> 
-> I'm using libvirt to manage the VM. The relevant portions of the XML
-> file are:
-> 
->   <hostdev mode="subsystem" type="pci" managed="yes">
->     <source>
->       <address domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
->     </source>
->     <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
->   </hostdev>
->   <hostdev mode="subsystem" type="pci" managed="yes">
->     <source>
->       <address domain="0x0000" bus="0x01" slot="0x00" function="0x1"/>
->     </source>
->     <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
->   </hostdev>
-> 
-> # Test Results
-> 
-> For testing, I used the following procedure:
-> 
-> 1. Boot the host machine and log in.
-> 
-> 2. Run the following commands to gather information. For all the tests,
->    the output was identical.
-> 
->    - `cat /proc/sys/kernel/tainted` printed:
-> 
->      0
-> 
->    - `hostnamectl | grep "Operating System"` printed:
-> 
->      Operating System: Arch Linux
-> 
->    - `lspci -nnk -d 1002:6981` printed
-> 
->      01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
->      	Subsystem: Dell Device [1028:0926]
->      	Kernel driver in use: vfio-pci
->      	Kernel modules: amdgpu
-> 
->    - `lspci -nnk -d 1002:aae0` printed
-> 
->      01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
->      	Subsystem: Dell Device [1028:0926]
->      	Kernel driver in use: vfio-pci
->      	Kernel modules: snd_hda_intel
-> 
->    - `sudo dmesg | grep -i vfio` printed the kernel command line and the
->      following messages:
-> 
->      VFIO - User Level meta-driver version: 0.3
->      vfio-pci 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
->      vfio_pci: add [1002:6981[ffffffff:ffffffff]] class 0x000000/00000000
->      vfio_pci: add [1002:aae0[ffffffff:ffffffff]] class 0x000000/00000000
->      vfio-pci 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
-> 
-> 3. Start the Windows VM using libvirt and log in. Record sensor
->    information.
-> 
-> 4. Run a graphically-intensive video game to put the GPU under load.
->    Record sensor information.
-> 
-> 5. Stop the game. Record sensor information.
-> 
-> 6. Shut down the VM. Save the output of `sudo dmesg`.
-> 
-> I compared the `sudo dmesg` output for v5.13 and v5.14-rc1 and didn't
-> see any relevant differences.
-> 
-> Note that the issue occurs only within the guest VM. When I'm not using
-> a VM (after removing `vfio-pci.ids=1002:6981,1002:aae0` from the kernel
-> command line so that the PCI devices are bound to their normal `amdgpu`
-> and `snd_hda_intel` drivers instead of the `vfio-pci` driver), the GPU
-> operates correctly on the host.
-> 
-> ## Linux v5.16 (issue present)
-> 
-> $ cat /proc/version
-> Linux version 5.16.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 01:51:08 +0000
-> 
-> Before running the game:
-> 
-> - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 53.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> While running the game:
-> 
-> - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> After stopping the game:
-> 
-> - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 51.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> ## Linux v5.14 (issue present)
-> 
-> $ cat /proc/version
-> Linux version 5.14.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 03:19:35 +0000
-> 
-> Before running the game:
-> 
-> - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 50.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> While running the game:
-> 
-> - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> After stopping the game:
-> 
-> - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 49.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> ## Linux v5.14-rc1 (issue present)
-> 
-> $ cat /proc/version
-> Linux version 5.14.0-rc1-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 18:31:35 +0000
-> 
-> Before running the game:
-> 
-> - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 50.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> While running the game:
-> 
-> - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> After stopping the game:
-> 
-> - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 49.0 degC
-> - GPU memory: 625.0 MHz
-> 
-> ## Linux v5.13 (works correctly, issue not present)
-> 
-> $ cat /proc/version
-> Linux version 5.13.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 02:39:18 +0000
-> 
-> Before running the game:
-> 
-> - GPU core: 214.0 MHz, 0.850 V, 0.0% load, 55.0 degC
-> - GPU memory: 1500.0 MHz
-> 
-> While running the game:
-> 
-> - GPU core: 1295.0 MHz, 1.000 V, 100.0% load, 67.0 degC
-> - GPU memory: 1500.0 MHz
-> 
-> After stopping the game:
-> 
-> - GPU core: 214.0 MHz, 0.850 V, 0.0% load, 52.0 degC
-> - GPU memory: 1500.0 MHz
-> 
-> 
----
-Additional information about regzbot:
+> Even for clocks, you cannot assume that you can always blindly use
+> the returned dummy (actually a NULL pointer) to call into the clk
+> API.  While this works fine for simple use cases, where you just
+> want to enable/disable an optional clock (clk_prepare_enable() and
+> clk_disable_unprepare()), it does not work for more complex use cases.
 
-If you want to know more about regzbot, check out its web-interface, the
-getting start guide, and/or the references documentation:
+Agreed. But for clks and gpiods and regulators the simple case is quite
+usual. For irqs it isn't.
 
-https://linux-regtracking.leemhuis.info/regzbot/
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
+And if you cannot blindly use the dummy, then you're not the targetted
+caller of *_get_optional() and should better use *_get() and handle
+-ENODEV explicitly.
 
-The last two documents will explain how you can interact with regzbot
-yourself if your want to.
+Best regards
+Uwe
 
-Hint for reporters: when reporting a regression it's in your interest to
-tell #regzbot about it in the report, as that will ensure the regression
-gets on the radar of regzbot and the regression tracker. That's in your
-interest, as they will make sure the report won't fall through the
-cracks unnoticed.
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
-Hint for developers: you normally don't need to care about regzbot once
-it's involved. Fix the issue as you normally would, just remember to
-include a 'Link:' tag to the report in the commit message, as explained
-in Documentation/process/submitting-patches.rst
-That aspect was recently was made more explicit in commit 1f57bd42b77c:
-https://git.kernel.org/linus/1f57bd42b77c
+--ycu5k3o6g2lyq6o4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHlNdMACgkQwfwUeK3K
+7AkbyQf/dzwfw39nzRfi8yss0CiqoAU/yS+7MsnZvnWGKQxcIojgK1OX/xdxiMKI
+C4HnYtImt4dRHJdZDTL5+BWmwrkKo3ytJl8YRHBffgzQdKfAXOit1Pce623dbYvd
+wKJedLR6H9VXuTa1ULEvTnC0cXupHaoxjvQbKkUhlz/PahrhX91+dNJcoWTB6eB2
+YSb6MMcqwMFJ6y2P4pDKDoCf0RNjt8EzTKMWUdx1zcCrqT+wDzA0Ub0UvM7EpUXn
+ziLd4JEC+3SxJZvr2Y8jPQUGb4RMr+Z20vfEOG154m+zZ5lZe7Pcp1ggo6wb+fZ9
+qM6JVYjExAvA43UcTTna2uSeE/+nfA==
+=gHVT
+-----END PGP SIGNATURE-----
+
+--ycu5k3o6g2lyq6o4--
