@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2516C490B95
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:41:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8EA5490BAB
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:43:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240563AbiAQPkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 10:40:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54556 "EHLO
+        id S240612AbiAQPnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 10:43:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240572AbiAQPkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 10:40:24 -0500
+        with ESMTP id S237299AbiAQPnp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 10:43:45 -0500
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958E2C061574
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 07:40:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DF2C061574
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 07:43:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=lzdw6Nwn/vFRWz9WPmMH5XAh3P+TxRDaZo1uvpfE2q0=; b=Lqxv7+kxwBdy26Iyw1jNLC3CKA
-        2GHch2IuPp9L0uGBKnf5CnKD1T9t4qLvUHxB0iFZrOQjzOEOki5POQ7jakgBvFphqfGgvW4/R2Swk
-        jUrp+WsL48NSDb6Xu/48XBqITKBCqhThTcwF4eEb3bMwDgQBD1G9bR6Stad2eJbGhGyacMqBPohiK
-        2MMWj9Fq1gh8J4ZTU5PRJfeaX/NhwpC+09ZnrgHJcaUg+vN+KVbffD7ixUuopggIl/o/Y+SL2cIaf
-        aB1EqpZCUwwECnAB/wnIGz0T+4LDsUUxIvaXq/J72f/4n6kT7p3LraIc2fgMy5fguhi2bFohZh3P3
-        G0im24LA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56728)
+        bh=ht/XA4o6M7ptrMuQobE80T6P+r3p1d2fY/4emv7Mr6k=; b=gd+XESqH9MGjUcSRFv5QXODHDT
+        9/s7SutHqkcuxPN5qijjYFs8D9zkKUxBVYGT9H7PbFND/lmSC9+YgPlp4/wyhZATtgD3Wp2y2c8vI
+        lHbIBE9fVA1vQDM7uTPXPWSxo5cO2m+Qd5i/NDziUFyyEmRVmkrJ2VeF6PYMpvQB9iMmTGjLYAZO5
+        IMh14SDuLbvQhaC4V79iTt2YaJZxmwtASION1qMdin2GEuAbsqzFuz8/ivF4iLwcWVeQAzD1zlxCn
+        yfNisfnN08qjnztVYWYpSOgtEZspfzgWb8QJA51Phk3EBIXviWOz5Alg7y8qXzSfAiGQfUv2fXxn9
+        PxJzDqsA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56730)
         by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <linux@armlinux.org.uk>)
-        id 1n9U7H-0002nI-KW; Mon, 17 Jan 2022 15:40:19 +0000
+        id 1n9UAW-0002nl-NM; Mon, 17 Jan 2022 15:43:40 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
         (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1n9U7E-0003RF-Qr; Mon, 17 Jan 2022 15:40:16 +0000
-Date:   Mon, 17 Jan 2022 15:40:16 +0000
+        id 1n9UAQ-0003RO-UA; Mon, 17 Jan 2022 15:43:34 +0000
+Date:   Mon, 17 Jan 2022 15:43:34 +0000
 From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -47,31 +47,35 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH v5 03/69] KVM: arm64: Add minimal handling for the
- ARMv8.7 PMU
-Message-ID: <YeWN4JoAB5UqN2/0@shell.armlinux.org.uk>
+Subject: Re: [PATCH v5 04/69] KVM: arm64: Rework kvm_pgtable initialisation
+Message-ID: <YeWOpnGxlRC4mCip@shell.armlinux.org.uk>
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-4-maz@kernel.org>
+ <20211129200150.351436-5-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-4-maz@kernel.org>
+In-Reply-To: <20211129200150.351436-5-maz@kernel.org>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 08:00:44PM +0000, Marc Zyngier wrote:
-> When running a KVM guest hosted on an ARMv8.7 machine, the host
-> kernel complains that it doesn't know about the architected number
-> of events.
+On Mon, Nov 29, 2021 at 08:00:45PM +0000, Marc Zyngier wrote:
+> Ganapatrao reported that the kvm_pgtable->mmu pointer is more or
+> less hardcoded to the main S2 mmu structure, while the nested
+> code needs it to point to other instances (as we have one instance
+> per nested context).
 > 
-> Fix it by adding the PMUver code corresponding to PMUv3 for ARMv8.7.
+> Rework the initialisation of the kvm_pgtable structure so that
+> this assumtion doesn't hold true anymore. This requires some
+> minor changes to the order in which things are initialised
+> (the mmu->arch pointer being the critical one).
 > 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Reported-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20211126115533.217903-1-maz@kernel.org
+
+Looks fairly simple.
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
