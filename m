@@ -2,81 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C24490CB0
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 17:57:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8AAE490D0D
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 18:00:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237826AbiAQQ5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 11:57:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44134 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235345AbiAQQ5f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 11:57:35 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F93C061574
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 08:57:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=yHWRLlRI9bn6GVVwZA6rSW6DL/TTFRIYe9kwoc6Tfq8=; b=BZcYL9devfiMA5mpw714+i66I+
-        /uYs84bal7O5nwUXGFomOWM6xGy00o9Eo5Vs/gQcHjdDUCWKP8y6TkJg6hmGGZRZPYjmGg/F/A7nw
-        apF66Fj2hkgWpIuoMpNC0kMXwo0X3i4qL8qo5PxgyQkdZLIjQkhuOteePuw/lfH5MQNBzJEUWUhs5
-        JK8gxKKscyg+zgsHAMR0kwxZzgUBCzFKqLNZ9W0tbcZDM7DeO4okPw9/F8E8rY79gqxMRFNZAnzME
-        b+cW2A2OtfsSGpeVzSl7fzBTWOzKdkJwlAyoTN1bHEawgs1ijgzmJ48YiSFJvMiZCSuil8Az1/EYX
-        PKWXMyYQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56734)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1n9VJu-0002rW-CX; Mon, 17 Jan 2022 16:57:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1n9VJn-0003UD-Mo; Mon, 17 Jan 2022 16:57:19 +0000
-Date:   Mon, 17 Jan 2022 16:57:19 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v5 07/69] KVM: arm64: nv: Introduce nested virtualization
- VCPU feature
-Message-ID: <YeWf70AwuTETyvu9@shell.armlinux.org.uk>
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-8-maz@kernel.org>
+        id S241217AbiAQRAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 12:00:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25862 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241419AbiAQQ77 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 11:59:59 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20HFTNCc030239
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 16:59:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=Zyoh96kS4O/cQJyvkQkZc2YlVVX7aJZ5CLRbZWgKf+I=;
+ b=aOxAHh1woyTwckHvDHm4zCGPA0YmPrjvJYJy57KMYSMa4BetPxLLjsXaXuzuNVyY2UVG
+ AbuZWzztwSVc1s7TCqefdn5raBYNgdQta+jDVDjO4iHIG7Sf3vrm6t+H/XgRtk577QRS
+ pob7mAoeIJmo0Lw+HLnZaJ+99HRUJidESWHEUork0mHdCpsZbHozqCRNRrk2qX0EcgiM
+ ZsXf2OMm7pGRTNUvEVUs+dwgXjwFdjueOW/NbXmuNVph+bOZHetv4+rTZl+llmpzeVPv
+ 2FdPiuvmigkyP6loy8vpVHCfXCtO21W20DK7Ec86tEJa0GJ+0dZNMtRunpAqQAxDVvQD Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnb4t2emx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 16:59:58 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20HGmJZc015009
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 16:59:58 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnb4t2em9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 16:59:58 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20HGl8Mx019671;
+        Mon, 17 Jan 2022 16:59:56 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9e2tq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 16:59:56 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20HGxo9646924272
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jan 2022 16:59:50 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A78EA405C;
+        Mon, 17 Jan 2022 16:59:50 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F576A4054;
+        Mon, 17 Jan 2022 16:59:50 +0000 (GMT)
+Received: from p-imbrenda.ibmuc.com (unknown [9.145.3.16])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Jan 2022 16:59:50 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests GIT PULL 00/13] s390x update 2022-01-17
+Date:   Mon, 17 Jan 2022 17:59:36 +0100
+Message-Id: <20220117165949.75964-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: pdsyace2-KvCV3jbAx11A1IDhe7vWFXW
+X-Proofpoint-ORIG-GUID: Wu7iiarHJTEIHysork3aiUEbDGMPbh0F
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-8-maz@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-17_07,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 bulkscore=0 clxscore=1015 suspectscore=0 adultscore=0
+ phishscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201170104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 08:00:48PM +0000, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
-> 
-> Introduce the feature bit and a primitive that checks if the feature is
-> set behind a static key check based on the cpus_have_const_cap check.
-> 
-> Checking nested_virt_in_use() on systems without nested virt enabled
-> should have neglgible overhead.
-> 
-> We don't yet allow userspace to actually set this feature.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Hi Paolo,
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+please merge the following changes:
+* snippet support for PV (Janosch)
+* DMA31 allocation fixes (Janosch)
+
+MERGE:
+https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/22
+
+PIPELINE:
+https://gitlab.com/imbrenda/kvm-unit-tests/-/pipelines/449739146
+
+PULL:
+https://gitlab.com/imbrenda/kvm-unit-tests.git s390x-next-20220117
+
+Janosch Frank (13):
+  s390x: snippets: mvpg-snippet: Remove unneeded includes
+  lib: s390x: sie: Add sca allocation and freeing
+  s390x: sie: Add PV fields to SIE control block
+  s390x: sie: Add UV information into VM struct
+  s390x: uv: Add more UV call functions
+  s390x: lib: Extend UV library with PV guest management
+  lib: s390: sie: Add PV guest register handling
+  s390x: snippets: Add PV support
+  lib: s390x: Introduce snippet helpers
+  s390x: mvpg-sie: Use snippet helpers
+  s390x: sie: Add PV diag test
+  s390x: smp: Allocate memory in DMA31 space
+  s390x: firq: Fix sclp buffer allocation
+
+ configure                                  |   8 +
+ s390x/Makefile                             |  73 ++++++--
+ lib/s390x/asm/uv.h                         |  99 +++++++++++
+ lib/s390x/sie.h                            |  54 +++++-
+ lib/s390x/snippet.h                        | 110 ++++++++++++
+ lib/s390x/uv.h                             |  28 +++
+ lib/s390x/sie.c                            |  20 +++
+ lib/s390x/uv.c                             | 128 ++++++++++++++
+ s390x/snippets/asm/snippet-pv-diag-288.S   |  25 +++
+ s390x/snippets/asm/snippet-pv-diag-500.S   |  39 +++++
+ s390x/snippets/asm/snippet-pv-diag-yield.S |   7 +
+ s390x/firq.c                               |   2 +-
+ s390x/mvpg-sie.c                           |  24 +--
+ s390x/pv-diags.c                           | 187 +++++++++++++++++++++
+ s390x/smp.c                                |   4 +-
+ s390x/snippets/c/mvpg-snippet.c            |   1 -
+ .gitignore                                 |   2 +
+ 17 files changed, 773 insertions(+), 38 deletions(-)
+ create mode 100644 s390x/snippets/asm/snippet-pv-diag-288.S
+ create mode 100644 s390x/snippets/asm/snippet-pv-diag-500.S
+ create mode 100644 s390x/snippets/asm/snippet-pv-diag-yield.S
+ create mode 100644 s390x/pv-diags.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+2.31.1
+
