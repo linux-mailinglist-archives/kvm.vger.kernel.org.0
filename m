@@ -2,108 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4D8490FF1
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 18:52:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A208490FF9
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 18:57:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241368AbiAQRwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 12:52:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41719 "EHLO
+        id S241982AbiAQR5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 12:57:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28559 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233445AbiAQRwQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 12:52:16 -0500
+        by vger.kernel.org with ESMTP id S235420AbiAQR5R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 12:57:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642441935;
+        s=mimecast20190719; t=1642442237;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X/xq6a824NvWlkbfgxqJlSfnHzBPgwMyo8yjUKXz4sg=;
-        b=ZhKI8ZL6RYUdfU6teD5UKLfb7pqZrM6bFdnj+MqInrF+ppdjvArVWnu1mS6z0Sj4TTH9bK
-        MGXy9LF6AYOajRoW54UwokoaOS1G6BDMtwJs/KUtZmWbRNO+N9WVbqA35JL7FLrF9X4uBk
-        bvS9YD6qQeVmtxa2gA9mr4I9KQhyv08=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=K9kCXO7ufS1sgHwDNkwg1B3hoEyZ/1T3PNCqsxyfB6M=;
+        b=DdSxClg1zHdki5CjuFC9/JdwteDOI4Ca2eUBki0hIb+pyaGyyCW6uBbmJ9IYCZhxRSHUGy
+        Xf241aN1Vlwbolbz3YTGbEhCilMbp8XhdfrG+nHNUP3mfsAv6xtkpcdjJ3xoE/DCDZwbTg
+        YwaY4Drupl9bWDBoKvCvxAQSYSfBcwY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-138-Asl5fsPrNUCJj2hTDZePqQ-1; Mon, 17 Jan 2022 12:52:12 -0500
-X-MC-Unique: Asl5fsPrNUCJj2hTDZePqQ-1
-Received: by mail-wm1-f71.google.com with SMTP id bg16-20020a05600c3c9000b0034bea12c043so5082829wmb.7
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 09:52:12 -0800 (PST)
+ us-mta-659-LNepjOPrPnyBU66LGQrVfA-1; Mon, 17 Jan 2022 12:57:16 -0500
+X-MC-Unique: LNepjOPrPnyBU66LGQrVfA-1
+Received: by mail-wm1-f72.google.com with SMTP id x10-20020a7bc20a000000b0034c3d77f277so326804wmi.3
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 09:57:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=X/xq6a824NvWlkbfgxqJlSfnHzBPgwMyo8yjUKXz4sg=;
-        b=19DldGFJlRomirwVsqRRauz6WRgxuvVrWgfM9xNlTqGdjYs9PgLhS7aYnhNBCKvvi0
-         nt1cC3VX7s2LoVcYN0Xtlcx3aYQcOkigz0ki/GeMg4Fo45xuq98ASDzgJZXK8GIdV28g
-         o5phMJbo6RXKemsvhK0TrXLW5HlSyLJfCCnZWsdrmbI/ANFAseWg6f8qa0kvN+UmDrvy
-         ejQObnR8vaF3h1DGxSgvYtvERkWpjYIyvnPi/panOHGhG4uXFBF1KHgB9vQO/HsAP3mE
-         T4A+7czQerxk+kF6xCHjNlS2XGLOVSKQVt5AGI6GUthOORUq3OrF4VHpg524CQc0gRmW
-         /vcA==
-X-Gm-Message-State: AOAM530viwc1pMFX5z02tpFRRCejVS3lH17NFejUecDN/ym7JjpQNMa+
-        /4IyVoqI365h6d0V1TZobbNuYFVhYH5t8u3yDsCJUjRmPkpT1rgYES8uJRyQ4aJn9WEosW5uxqN
-        DBDtyZk4+Ln3a
-X-Received: by 2002:a1c:7209:: with SMTP id n9mr10003593wmc.83.1642441931216;
-        Mon, 17 Jan 2022 09:52:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzKisSU4G5w2S0Henxr1S3D9REmimsfL39nrIQwKsuRAaokQww5Gemo1Mb19ll9iKDhR0DWEw==
-X-Received: by 2002:a1c:7209:: with SMTP id n9mr10003577wmc.83.1642441930957;
-        Mon, 17 Jan 2022 09:52:10 -0800 (PST)
+        bh=K9kCXO7ufS1sgHwDNkwg1B3hoEyZ/1T3PNCqsxyfB6M=;
+        b=UMtew47oyUYlVApiKSZ21CcKgxzTQ2aKcS7NuIp0GxPjpy++8J0h+Mq9P1meV0LyKS
+         y2zNo3pK9ptHF3joyWJi9E6iCJ2Zf8+KJnnV5JT3R5a9Uxhpzjyb7klL6mz1XvcKdfer
+         RTyKoQF8P8ZRl0PKgqGU+F3a+x+Hng+pVVGyBFVP544NcdqyPDJRM13cCRiAIYEdVNSy
+         +439awFSegE4dTuKNw59MYCQGwPrgCFPGu5/Qae6wLQ6jlEFqCtsGguEXeJ/tcPxeq3b
+         NfWZ5rZnCWH2bP0xlpG0z+0z7w1T+gfuGVSrbczcYQPu3t1v9LISvf3+w4KZzU/OR50i
+         w6cw==
+X-Gm-Message-State: AOAM531Z1weZwgi2Tc39MTmrNd/dypmVAUfa79+jz5TcDAgdcIYRJeyT
+        AmerbPixsQYWDxbc4DpmGgHedDaMczGFqXo/rfxLhyPPdycvmuGxgcbucpufa9RsgNEKCirMUCF
+        jAz1lc/Op8Qhm
+X-Received: by 2002:a05:600c:154b:: with SMTP id f11mr11952591wmg.62.1642442234965;
+        Mon, 17 Jan 2022 09:57:14 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy9poqi18K22C4DLmX3arn0dWMU5OIx+f4+yE7QU/e7Wxcc8+4kRtHO8FGVVmVxA4ig9BVqyQ==
+X-Received: by 2002:a05:600c:154b:: with SMTP id f11mr11952576wmg.62.1642442234751;
+        Mon, 17 Jan 2022 09:57:14 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id c11sm22371208wmq.48.2022.01.17.09.52.10
+        by smtp.googlemail.com with ESMTPSA id h2sm72101wmq.2.2022.01.17.09.57.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jan 2022 09:52:10 -0800 (PST)
-Message-ID: <5acea70f-5e53-f1df-7355-8fa194b59380@redhat.com>
-Date:   Mon, 17 Jan 2022 18:52:09 +0100
+        Mon, 17 Jan 2022 09:57:14 -0800 (PST)
+Message-ID: <42dd21d1-8300-3101-4870-bf772783588b@redhat.com>
+Date:   Mon, 17 Jan 2022 18:57:13 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [kvm-unit-tests PATCH] ACPI: fix ACPI RSDP located before 0xF0000
- is not found
+Subject: Re: [PATCH] KVM: x86: Making the module parameter of vPMU more common
 Content-Language: en-US
-To:     "Barzen, Benjamin" <bbarzen@amazon.de>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Benjamin Barzen <b.barzen@barzen.io>
-References: <6DFC2BF8-5CAC-410C-9A36-36E92FFC7817@amazon.de>
+To:     Like Xu <like.xu.linux@gmail.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220111073823.21885-1-likexu@tencent.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <6DFC2BF8-5CAC-410C-9A36-36E92FFC7817@amazon.de>
+In-Reply-To: <20220111073823.21885-1-likexu@tencent.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/22 13:53, Barzen, Benjamin wrote:
->  From e107317d029b5298c88701b4bcc93bc64e28384b Mon Sep 17 00:00:00 2001
-> From: bbarzen <bbarzen@amazon.com>
-> Date: Wed, 29 Dec 2021 12:50:14 +0100
-> Subject: [PATCH] ACPI: fix ACPI RSDP located before 0xF0000 is not found
+On 1/11/22 08:38, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> The function find_acpi_table_addr locates the ACPI RSDP by searching the
-> BIOS read only memory space. The official ACPI specification states that
-> this space goes from 0xE0000 to 0xFFFFF. The function currently starts
-> searching at 0xF0000. Any RSDP located before that address can
-> subsequently not be found.
+> The new module parameter to control PMU virtualization should apply
+> to Intel as well as AMD, for situations where userspace is not trusted.
+> If the module parameter allows PMU virtualization, there could be a
+> new KVM_CAP or guest CPUID bits whereby userspace can enable/disable
+> PMU virtualization on a per-VM basis.
 > 
-> Change the start address of the search to 0xE0000.
+> If the module parameter does not allow PMU virtualization, there
+> should be no userspace override, since we have no precedent for
+> authorizing that kind of override. If it's false, other counter-based
+> profiling features (such as LBR including the associated CPUID bits
+> if any) will not be exposed.
 > 
-> Singed-off-by: Benjamin Barzen <bbarzen@amazon.de>
+> Change its name from "pmu" to "enable_pmu" as we have temporary
+> variables with the same name in our code like "struct kvm_pmu *pmu".
+> 
+> Fixes: b1d66dad65dc ("KVM: x86/svm: Add module param to control PMU virtualization")
+> Suggested-by : Jim Mattson <jmattson@google.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
 > ---
->   lib/x86/acpi.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/x86/kvm/cpuid.c            | 6 +++---
+>   arch/x86/kvm/svm/pmu.c          | 2 +-
+>   arch/x86/kvm/svm/svm.c          | 8 ++------
+>   arch/x86/kvm/svm/svm.h          | 1 -
+>   arch/x86/kvm/vmx/capabilities.h | 4 ++++
+>   arch/x86/kvm/vmx/pmu_intel.c    | 2 +-
+>   arch/x86/kvm/x86.c              | 5 +++++
+>   arch/x86/kvm/x86.h              | 1 +
+>   8 files changed, 17 insertions(+), 12 deletions(-)
 > 
-> diff --git a/lib/x86/acpi.c b/lib/x86/acpi.c
-> index 4373106..bd7f022 100644
-> --- a/lib/x86/acpi.c
-> +++ b/lib/x86/acpi.c
-> @@ -19,7 +19,7 @@ void* find_acpi_table_addr(u32 sig)
->           return (void*)(ulong)fadt->firmware_ctrl;
->       }
-> 
-> -    for(addr = 0xf0000; addr < 0x100000; addr += 16) {
-> +    for(addr = 0xe0000; addr < 0x100000; addr += 16) {
->          rsdp = (void*)addr;
->          if (rsdp->signature == 0x2052545020445352LL)
->             break;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 0b920e12bb6d..b2ff8bfd8220 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -770,10 +770,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   		perf_get_x86_pmu_capability(&cap);
+>   
+>   		/*
+> -		 * Only support guest architectural pmu on a host
+> -		 * with architectural pmu.
+> +		 * The guest architecture pmu is only supported if the architecture
+> +		 * pmu exists on the host and the module parameters allow it.
+>   		 */
+> -		if (!cap.version)
+> +		if (!cap.version || !enable_pmu)
+>   			memset(&cap, 0, sizeof(cap));
+>   
+>   		eax.split.version_id = min(cap.version, 2);
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index 12d8b301065a..5aa45f13b16d 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -101,7 +101,7 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
+>   {
+>   	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+>   
+> -	if (!pmu)
+> +	if (!enable_pmu)
+>   		return NULL;
+>   
+>   	switch (msr) {
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 6cb38044a860..549f73ce5ebc 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -192,10 +192,6 @@ module_param(vgif, int, 0444);
+>   static int lbrv = true;
+>   module_param(lbrv, int, 0444);
+>   
+> -/* enable/disable PMU virtualization */
+> -bool pmu = true;
+> -module_param(pmu, bool, 0444);
+> -
+>   static int tsc_scaling = true;
+>   module_param(tsc_scaling, int, 0444);
+>   
+> @@ -4573,7 +4569,7 @@ static __init void svm_set_cpu_caps(void)
+>   		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+>   
+>   	/* AMD PMU PERFCTR_CORE CPUID */
+> -	if (pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+> +	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+>   		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
+>   
+>   	/* CPUID 0x8000001F (SME/SEV features) */
+> @@ -4712,7 +4708,7 @@ static __init int svm_hardware_setup(void)
+>   			pr_info("LBR virtualization supported\n");
+>   	}
+>   
+> -	if (!pmu)
+> +	if (!enable_pmu)
+>   		pr_info("PMU virtualization is disabled\n");
+>   
+>   	svm_set_cpu_caps();
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index daa8ca84afcc..47ef8f4a9358 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -32,7 +32,6 @@
+>   extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+>   extern bool npt_enabled;
+>   extern bool intercept_smi;
+> -extern bool pmu;
+>   
+>   /*
+>    * Clean bits in VMCB.
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index c8029b7845b6..959b59d13b5a 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -5,6 +5,7 @@
+>   #include <asm/vmx.h>
+>   
+>   #include "lapic.h"
+> +#include "x86.h"
+>   
+>   extern bool __read_mostly enable_vpid;
+>   extern bool __read_mostly flexpriority_enabled;
+> @@ -389,6 +390,9 @@ static inline u64 vmx_get_perf_capabilities(void)
+>   {
+>   	u64 perf_cap = 0;
+>   
+> +	if (!enable_pmu)
+> +		return perf_cap;
+> +
+>   	if (boot_cpu_has(X86_FEATURE_PDCM))
+>   		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+>   
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index ffccfd9823c0..466d18fc0c5d 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -487,7 +487,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>   	pmu->reserved_bits = 0xffffffff00200000ull;
+>   
+>   	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
+> -	if (!entry)
+> +	if (!entry || !enable_pmu)
+>   		return;
+>   	eax.full = entry->eax;
+>   	edx.full = entry->edx;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c194a8cbd25f..bff2ff8cb35f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -187,6 +187,11 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
+>   int __read_mostly pi_inject_timer = -1;
+>   module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
+>   
+> +/* Enable/disable PMU virtualization */
+> +bool __read_mostly enable_pmu = true;
+> +EXPORT_SYMBOL_GPL(enable_pmu);
+> +module_param(enable_pmu, bool, 0444);
+> +
+>   /*
+>    * Restoring the host value for MSRs that are only consumed when running in
+>    * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index da7031e80f23..1ebd5a7594da 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -336,6 +336,7 @@ extern u64 host_xcr0;
+>   extern u64 supported_xcr0;
+>   extern u64 host_xss;
+>   extern u64 supported_xss;
+> +extern bool enable_pmu;
+>   
+>   static inline bool kvm_mpx_supported(void)
+>   {
 
 Queued, thanks.
 
