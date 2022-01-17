@@ -2,244 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F8F04908B2
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 13:29:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8761B490920
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 14:02:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239872AbiAQM3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 07:29:33 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55668 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231537AbiAQM3c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 07:29:32 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20H9vg0c026569;
-        Mon, 17 Jan 2022 12:29:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Jhw74Q0ZA1B5FRWJ7Ovl7UMYmHpd6o0tDAaLcyQwQ5g=;
- b=dwQpauLv4gH0NEVj99WfaryH+BQgdY1McCGKH3PW/I+Z5LMpiA1xQqMKl1A+D5xyZ1Q/
- ggra1JoRK4en/4eeyVUpJvQpVWFbOCCiN0T3R+iRMyyjcuj84yH6y8hp4WLATBcqCi0d
- qlclEeuRcMK6dPTAGMOv3DgOKVxrlsF64gimxUQ8GIxnxIJfFV8gvtr3sBBjZ9fiUNpj
- OYDgLY2oTcDVvqaOS7GW4s7WhC7MT5p4zRl7/xGbd27TfKBIlx7FBgseWY699nfzQQRM
- irIoEwMD4rBtpwMJUiuqFswsFRvtZY5qpqcq5IaTfPSKEA9UvvU07E06AT9M+igG8a/t sA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dn69mkbqb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jan 2022 12:29:31 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20HBlZR3027470;
-        Mon, 17 Jan 2022 12:29:31 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dn69mkbpw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jan 2022 12:29:31 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20HCD9bc016683;
-        Mon, 17 Jan 2022 12:29:29 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3dknw8uumc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jan 2022 12:29:29 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20HCTNnq41484556
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Jan 2022 12:29:23 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C2CEA404D;
-        Mon, 17 Jan 2022 12:29:23 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 54547A405D;
-        Mon, 17 Jan 2022 12:29:22 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.16])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 17 Jan 2022 12:29:22 +0000 (GMT)
-Date:   Mon, 17 Jan 2022 13:29:20 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 06/30] s390/airq: allow for airq structure that uses
- an input vector
-Message-ID: <20220117132920.213bf0bd@p-imbrenda>
-In-Reply-To: <20220114203145.242984-7-mjrosato@linux.ibm.com>
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
-        <20220114203145.242984-7-mjrosato@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S240084AbiAQNCh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 08:02:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:42117 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229563AbiAQNCf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 08:02:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642424554;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AmxLgMKtM2xp64rnq5p7GdtgJriOCMkjmIrcQ5U3IJY=;
+        b=XPNJvkIl9PsohOH9aUUxHI0QJCDWaqTiv0hlNp4376duwoV7qWI3/wWlOHR6ou5Ox3/adE
+        1Qtj06Ghi1eINq7BiUKkJ3IpXv4EKVKH7W0mwDfpbE5VJRAu60NuGZy2GoHhxFkCRvqLC8
+        UzfOoFLZWMP5qF/zbhx2NOSCkd55IEw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-369-hBRaWyO1M3SWxDv66jrOuQ-1; Mon, 17 Jan 2022 08:02:33 -0500
+X-MC-Unique: hBRaWyO1M3SWxDv66jrOuQ-1
+Received: by mail-wm1-f71.google.com with SMTP id a3-20020a05600c348300b0034a0dfc86aaso11260734wmq.6
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 05:02:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=AmxLgMKtM2xp64rnq5p7GdtgJriOCMkjmIrcQ5U3IJY=;
+        b=1azJz0sPsmCAeerA1fHUGl0oDha5gn7iLXw+HuRkHZnpDxZosC3vEVRYpiLLjYTBnK
+         x8T5yitQPnk8tX9p34C8DDMlTwPp0+iszPoawTfVAAzP7SvDACryfAvj9Qr5w2k5zLK8
+         R4FyFEGTU1bIoZ2QKZ0tnMcGqbEpdFcComzu0SaoFMISVbGEqp4mVp0eFu7uhpAo7ZVS
+         fR+DBBwDEjeguRUeI+SGFoeO/+r3qBdZa6xU03yeQ3OtKgCTfi5EdWfEuEKH8UMuev3S
+         in28lEQeVguBoeuhTs9XvFoSVRh9Cd8LUgsYWDAj5Tp0K2TC7WvBwfnrLnFbY60AKxGJ
+         b8iA==
+X-Gm-Message-State: AOAM533OZ8vL8LqzakUFdrN2QXc3mjg/V7hpAdpeVK4IuETOE6ZwlADo
+        da49+fM1+ob9XeJoMqjeP2+3GDcAwodSfoepngwA3E2s7zLZak6rAAndXZ4GDkUCMIkc5XLMmac
+        pQDhVcz9SGR8o
+X-Received: by 2002:a5d:5147:: with SMTP id u7mr13730985wrt.687.1642424552696;
+        Mon, 17 Jan 2022 05:02:32 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw5gUyIT+6hmx9at0BIXTQZgqi8LBV9qiFylH3MqPMb8FTU5HuKtAntofElkn6GwInqCUKmTw==
+X-Received: by 2002:a5d:5147:: with SMTP id u7mr13730964wrt.687.1642424552481;
+        Mon, 17 Jan 2022 05:02:32 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id az29sm9867067wmb.31.2022.01.17.05.02.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jan 2022 05:02:31 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+In-Reply-To: <517e8b95-e336-8796-6657-c0f8d554143a@redhat.com>
+References: <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+ <20211227183253.45a03ca2@redhat.com>
+ <61325b2b-dc93-5db2-2d0a-dd0900d947f2@redhat.com>
+ <87mtkdqm7m.fsf@redhat.com> <20220103104057.4dcf7948@redhat.com>
+ <YeCowpPBEHC6GJ59@google.com> <20220114095535.0f498707@redhat.com>
+ <87ilummznd.fsf@redhat.com> <20220114122237.54fa8c91@redhat.com>
+ <87ee5amrmh.fsf@redhat.com> <YeGsKslt7hbhQZPk@google.com>
+ <8735lmn0t1.fsf@redhat.com>
+ <517e8b95-e336-8796-6657-c0f8d554143a@redhat.com>
+Date:   Mon, 17 Jan 2022 14:02:31 +0100
+Message-ID: <87zgnuldlk.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mi00v2XWW5_9dqNyHAnjWZeh11y65dSm
-X-Proofpoint-GUID: BVN8kD0eghT5z4ARzxEUqbHF8mrbHwpG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-17_05,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
- suspectscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0
- clxscore=1015 lowpriorityscore=0 spamscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201170077
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 14 Jan 2022 15:31:21 -0500
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> When doing device passthrough where interrupts are being forwarded
-> from host to guest, we wish to use a pinned section of guest memory
-> as the vector (the same memory used by the guest as the vector).
+> On 1/17/22 10:55, Vitaly Kuznetsov wrote:
+>> No, honestly I was thinking about something much simpler: instead of
+>> forbidding KVM_SET_CPUID{,2} after KVM_RUN completely (what we have now
+>> in 5.16), we only forbid to change certain data which we know breaks
+>> some assumptions in MMU, from the comment:
+>> "
+>>           * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+>>           * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+>>           * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
+>>           * faults due to reusing SPs/SPTEs.
+>> "
+>> It seems that CPU hotplug path doesn't need to change these so we don't
+>> need an opt-in/opt-out, we can just forbid changing certain things for
+>> the time being. Alternatively, we can silently ignore such changes but I
+>> don't quite like it because it would mask bugs in VMMs.
+>
+> I think the version that only allows exactly the same CPUID is the best, 
+> as it leaves less room for future bugs.
+>
 
-maybe expand the description of the patch to explain what exactly is
-being done in this patch. Namely: you add a parameter to a function
-(and some logic in the function to use the new parameter), but the
-function is not being used yet. And pinning is also done somewhere else.
+Ok, I hear your vote) Will prepare v2.
 
-maybe you can add something like
-
-	This patch adds a new parameter for airq_iv_create to pass the
-	existing vector pinned in guest memory and to use it when
-	needed instead of allocating a new one.
-
-Apart from that, the patch looks good.
-
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  arch/s390/include/asm/airq.h     |  4 +++-
->  arch/s390/pci/pci_irq.c          |  8 ++++----
->  drivers/s390/cio/airq.c          | 10 +++++++---
->  drivers/s390/virtio/virtio_ccw.c |  2 +-
->  4 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
-> index 7918a7d09028..e82e5626e139 100644
-> --- a/arch/s390/include/asm/airq.h
-> +++ b/arch/s390/include/asm/airq.h
-> @@ -47,8 +47,10 @@ struct airq_iv {
->  #define AIRQ_IV_PTR		4	/* Allocate the ptr array */
->  #define AIRQ_IV_DATA		8	/* Allocate the data array */
->  #define AIRQ_IV_CACHELINE	16	/* Cacheline alignment for the vector */
-> +#define AIRQ_IV_GUESTVEC	32	/* Vector is a pinned guest page */
->  
-> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags);
-> +struct airq_iv *airq_iv_create(unsigned long bits, unsigned long
-> flags,
-> +			       unsigned long *vec);
->  void airq_iv_release(struct airq_iv *iv);
->  unsigned long airq_iv_alloc(struct airq_iv *iv, unsigned long num);
->  void airq_iv_free(struct airq_iv *iv, unsigned long bit, unsigned
-> long num); diff --git a/arch/s390/pci/pci_irq.c
-> b/arch/s390/pci/pci_irq.c index cc4c8d7c8f5c..0d0a02a9fbbf 100644
-> --- a/arch/s390/pci/pci_irq.c
-> +++ b/arch/s390/pci/pci_irq.c
-> @@ -296,7 +296,7 @@ int arch_setup_msi_irqs(struct pci_dev *pdev, int
-> nvec, int type) zdev->aisb = bit;
->  
->  		/* Create adapter interrupt vector */
-> -		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA |
-> AIRQ_IV_BITLOCK);
-> +		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA |
-> AIRQ_IV_BITLOCK, NULL); if (!zdev->aibv)
->  			return -ENOMEM;
->  
-> @@ -419,7 +419,7 @@ static int __init zpci_directed_irq_init(void)
->  	union zpci_sic_iib iib = {{0}};
->  	unsigned int cpu;
->  
-> -	zpci_sbv = airq_iv_create(num_possible_cpus(), 0);
-> +	zpci_sbv = airq_iv_create(num_possible_cpus(), 0, NULL);
->  	if (!zpci_sbv)
->  		return -ENOMEM;
->  
-> @@ -441,7 +441,7 @@ static int __init zpci_directed_irq_init(void)
->  		zpci_ibv[cpu] = airq_iv_create(cache_line_size() *
-> BITS_PER_BYTE, AIRQ_IV_DATA |
->  					       AIRQ_IV_CACHELINE |
-> -					       (!cpu ? AIRQ_IV_ALLOC
-> : 0));
-> +					       (!cpu ? AIRQ_IV_ALLOC
-> : 0), NULL); if (!zpci_ibv[cpu])
->  			return -ENOMEM;
->  	}
-> @@ -458,7 +458,7 @@ static int __init zpci_floating_irq_init(void)
->  	if (!zpci_ibv)
->  		return -ENOMEM;
->  
-> -	zpci_sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC);
-> +	zpci_sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC,
-> NULL); if (!zpci_sbv)
->  		goto out_free;
->  
-> diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
-> index 2f2226786319..375a58b1c838 100644
-> --- a/drivers/s390/cio/airq.c
-> +++ b/drivers/s390/cio/airq.c
-> @@ -122,10 +122,12 @@ static inline unsigned long iv_size(unsigned
-> long bits)
->   * airq_iv_create - create an interrupt vector
->   * @bits: number of bits in the interrupt vector
->   * @flags: allocation flags
-> + * @vec: pointer to pinned guest memory if AIRQ_IV_GUESTVEC
->   *
->   * Returns a pointer to an interrupt vector structure
->   */
-> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long
-> flags) +struct airq_iv *airq_iv_create(unsigned long bits, unsigned
-> long flags,
-> +			       unsigned long *vec)
->  {
->  	struct airq_iv *iv;
->  	unsigned long size;
-> @@ -146,6 +148,8 @@ struct airq_iv *airq_iv_create(unsigned long
-> bits, unsigned long flags) &iv->vector_dma);
->  		if (!iv->vector)
->  			goto out_free;
-> +	} else if (flags & AIRQ_IV_GUESTVEC) {
-> +		iv->vector = vec;
->  	} else {
->  		iv->vector = cio_dma_zalloc(size);
->  		if (!iv->vector)
-> @@ -185,7 +189,7 @@ struct airq_iv *airq_iv_create(unsigned long
-> bits, unsigned long flags) kfree(iv->avail);
->  	if (iv->flags & AIRQ_IV_CACHELINE && iv->vector)
->  		dma_pool_free(airq_iv_cache, iv->vector,
-> iv->vector_dma);
-> -	else
-> +	else if (!(iv->flags & AIRQ_IV_GUESTVEC))
->  		cio_dma_free(iv->vector, size);
->  	kfree(iv);
->  out:
-> @@ -204,7 +208,7 @@ void airq_iv_release(struct airq_iv *iv)
->  	kfree(iv->bitlock);
->  	if (iv->flags & AIRQ_IV_CACHELINE)
->  		dma_pool_free(airq_iv_cache, iv->vector,
-> iv->vector_dma);
-> -	else
-> +	else if (!(iv->flags & AIRQ_IV_GUESTVEC))
->  		cio_dma_free(iv->vector, iv_size(iv->bits));
->  	kfree(iv->avail);
->  	kfree(iv);
-> diff --git a/drivers/s390/virtio/virtio_ccw.c
-> b/drivers/s390/virtio/virtio_ccw.c index 52c376d15978..410498d693f8
-> 100644 --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -241,7 +241,7 @@ static struct airq_info *new_airq_info(int index)
->  		return NULL;
->  	rwlock_init(&info->lock);
->  	info->aiv = airq_iv_create(VIRTIO_IV_BITS, AIRQ_IV_ALLOC |
-> AIRQ_IV_PTR
-> -				   | AIRQ_IV_CACHELINE);
-> +				   | AIRQ_IV_CACHELINE, NULL);
->  	if (!info->aiv) {
->  		kfree(info);
->  		return NULL;
+-- 
+Vitaly
 
