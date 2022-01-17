@@ -2,130 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E4349023F
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 08:00:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6982490246
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 08:02:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233130AbiAQHAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 02:00:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47666 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232184AbiAQHAI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 02:00:08 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5F1C061574;
-        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id l21-20020a17090b079500b001b49df5c4dfso2749853pjz.2;
-        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IJGYiOOL+6CUqrzL1DWyP6i538pdaiTRGXfMxIypbx4=;
-        b=SQOmKzE5qLd9atEF7c6ICsVd/f5pZySXamSt5bexMkFZxDX8MPWRQ8iyBNR3y4r8YJ
-         T28OGncW226NldDD+N3pS6Sfp1ROGEcVKoeumFtoVRbxHaaeCpgNpLn7K6z0wsB/h2m8
-         bOSZIW+WnM7/erCzYmkbF2CcBuJKmCJ5a5jiz+TaYqU0GybF3ne52Df8RbF91EnZldIu
-         zg2Tum8yvOL9K5RvbuKAafOyl8rXxoRY+BKiPNzwq8deqivzL11NWe39DnGQKbwp7eDq
-         XcsOQqFXQL6cDjhI8GUlhTXwsolsy1KVWYzUmfYLWaA5sdUpT2nfQM+tJdwlghNsm5SV
-         5RTg==
+        id S235062AbiAQHB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 02:01:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57170 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235059AbiAQHBz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 02:01:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642402915;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZInfsJu7ErgNvQcctk0yVymFu8hQlMDYYqOyuF8tNVM=;
+        b=iTWDqHBz+TZjnRD8G2rpKjC18LOafvDVyN2gDO+j9SdtyBJtDuM2dj5ALdIGRT+K73+uOD
+        Q18zGdIPzBn5KKFIKBOnbAe52cv+EmhjLmz3IFItjuNzmzF36wP/C6PlZGgx/Z+lpvepzw
+        LlYoOXnSmnjp8B5Qg2kMgRr+EfT7wlg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-39-4q5iSFI-NdGkzXVGNLEzDw-1; Mon, 17 Jan 2022 02:01:43 -0500
+X-MC-Unique: 4q5iSFI-NdGkzXVGNLEzDw-1
+Received: by mail-wm1-f69.google.com with SMTP id x10-20020a7bc20a000000b0034c3d77f277so2580011wmi.3
+        for <kvm@vger.kernel.org>; Sun, 16 Jan 2022 23:01:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=IJGYiOOL+6CUqrzL1DWyP6i538pdaiTRGXfMxIypbx4=;
-        b=GThgX0tV/y/PQXXheVsSQh9Hlr0ZRi7wCLFO7W8RNyCgpN0Zw+ZpPIxy1JLKp/oHzU
-         72+sVPHGCTSNI5LUoCHIKNfKbr56eP6ngfnTS7eaKNWaY85h7h96BHlHBahhGV1n2Sp1
-         9Uw/8K3upUpzACzqo7Kx46yd9VDz/ibtLGDFLqkriV1Lycbf+DTIQGgIkkVtJAiKoqGe
-         xxCCDUOZItpicAvlHldQMAry0X4T3PaMRJiJ6JN+/1IosH757sbmHc70QZWeKbYzG5Gi
-         8WZA8eqquYOOdxfahZLQCxRqaK/93QUexMN3l14ugiiZ5eMrF/XBOPmMLsfe2hs1NkM9
-         IFaw==
-X-Gm-Message-State: AOAM530NTBzhmHeTTcxBVImAVQGjeWiOJZnr4KhHR6ygYjaPt8n6Xg8M
-        IUsSh5JaWhcQ4uNl0UxfUss=
-X-Google-Smtp-Source: ABdhPJyr1guEKgMePOqMXuJjqjUjwbfxwr+ht7XFTzzRRD5eavXA8v2bvVaiMaXLsySekzmV+ZQpIA==
-X-Received: by 2002:a17:90a:156:: with SMTP id z22mr32537539pje.191.1642402807498;
-        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t25sm10752959pgv.9.2022.01.16.23.00.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jan 2022 23:00:07 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jing Liu <jing2.liu@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/cpuid: Stop exposing unknown AMX Tile Palettes and accelerator units
-Date:   Mon, 17 Jan 2022 14:59:57 +0800
-Message-Id: <20220117065957.65335-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.33.1
+        bh=ZInfsJu7ErgNvQcctk0yVymFu8hQlMDYYqOyuF8tNVM=;
+        b=0DUGzj+6AgGHJw2Z5OJvLZfBcgyv8OLLYUTZfd5dLPWJG7VQdt6TUUwumJKLkWkH1z
+         NGCPz91q/7Sxbm5rQLWpYa/GscoQyMPFeaKQ5yuI2e1GJWshxGuWCnvS+ctgw2lkCgpK
+         zPJnpBunYupe7igK8wsN5UCrXxVd9CVWaLg1NshjUYxPyo8QGT99BrqRR/WkFKjoG7kY
+         MkxaGUZmz2D9w24lA6jWjvZKIbsUz50DedefCiPVxbUiXg5asN4Rgv5uYF5sldPKgeDY
+         c7yPqLoypfPlNzt+TWeeIGpew4A7sBBt3wfs9o9GVu9CvzijKMEMC2uUCfbmHYCGEdEg
+         RJIA==
+X-Gm-Message-State: AOAM530K9UHJdxsvENYV0g7qaORonKPkVUAoerPY27wpfM9cNsHR2pS0
+        RhNzypq0n2L+7z6/1WVaBl8kCrlWyKBSCYAG//HlpGEbt8Z7M5Ibfa0Q7KAB/FVsBzcQLluFk6b
+        CfpmGCRIuMOSu
+X-Received: by 2002:a05:6000:2c2:: with SMTP id o2mr9989373wry.660.1642402902407;
+        Sun, 16 Jan 2022 23:01:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw7sVxoy5PbUdoRvkQMmy3TI09E04uzw+Rzmzzc7mhJn+tLE06QBaym/a4ilbrhWaYgX0C1Rw==
+X-Received: by 2002:a05:6000:2c2:: with SMTP id o2mr9989359wry.660.1642402902220;
+        Sun, 16 Jan 2022 23:01:42 -0800 (PST)
+Received: from [192.168.8.100] (tmo-098-68.customers.d1-online.com. [80.187.98.68])
+        by smtp.gmail.com with ESMTPSA id v8sm12897381wrt.116.2022.01.16.23.01.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Jan 2022 23:01:41 -0800 (PST)
+Message-ID: <80006dc9-039c-d729-f84c-af964314442f@redhat.com>
+Date:   Mon, 17 Jan 2022 08:01:39 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [kvm-unit-tests PATCH 2/5] s390x: css: Skip if we're not run by
+ qemu
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, nrb@linux.ibm.com
+References: <20220114100245.8643-1-frankja@linux.ibm.com>
+ <20220114100245.8643-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220114100245.8643-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 14/01/2022 11.02, Janosch Frank wrote:
+> There's no guarantee that we even find a device at the address we're
+> testing for if we're not running under QEMU.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   s390x/css.c | 10 +++++++++-
+>   1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/s390x/css.c b/s390x/css.c
+> index 881206ba..c24119b4 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -15,6 +15,7 @@
+>   #include <interrupt.h>
+>   #include <asm/arch_def.h>
+>   #include <alloc_page.h>
+> +#include <vm.h>
+>   
+>   #include <malloc_io.h>
+>   #include <css.h>
+> @@ -350,6 +351,12 @@ int main(int argc, char *argv[])
+>   {
+>   	int i;
+>   
+> +	/* There's no guarantee where our devices are without qemu */
+> +	if (!vm_is_kvm() && !vm_is_tcg()) {
+> +		report_skip("Not running under QEMU");
+> +		goto done;
+> +	}
 
-Guest enablement of Intel AMX requires a good co-work from both host and
-KVM, which means that KVM should take a more safer approach to avoid
-the accidental inclusion of new unknown AMX features, even though it's
-designed to be an extensible architecture.
+You've added the check before the report_prefix_push() ...
 
-Per current spec, Intel CPUID Leaf 1EH sub-leaf 1 and above are reserved,
-other bits in leaves 0x1d and 0x1e marked as "Reserved=0" shall be strictly
-limited by definition for reporeted KVM_GET_SUPPORTED_CPUID.
+>   	report_prefix_push("Channel Subsystem");
+>   	enable_io_isc(0x80 >> IO_SCH_ISC);
+>   	for (i = 0; tests[i].name; i++) {
+> @@ -357,7 +364,8 @@ int main(int argc, char *argv[])
+>   		tests[i].func();
+>   		report_prefix_pop();
+>   	}
+> -	report_prefix_pop();
+>   
+> +done:
+> +	report_prefix_pop();
 
-Fixes: 690a757d610e ("kvm: x86: Add CPUID support for Intel AMX")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/cpuid.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+... but in case of the goto you now do the pop without the push. I think you 
+have to drop the second hunk.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index c55e57b30e81..3fde6610d314 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -661,7 +661,6 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
- 	case 0x17:
- 	case 0x18:
- 	case 0x1d:
--	case 0x1e:
- 	case 0x1f:
- 	case 0x8000001d:
- 		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-@@ -936,21 +935,26 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		break;
- 	/* Intel AMX TILE */
- 	case 0x1d:
-+		entry->ebx = entry->ecx = entry->edx = 0;
- 		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
--			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-+			entry->eax = 0;
- 			break;
- 		}
- 
-+		entry->eax = min(entry->eax, 1u);
- 		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
- 			if (!do_host_cpuid(array, function, i))
- 				goto out;
- 		}
- 		break;
--	case 0x1e: /* TMUL information */
-+	/* TMUL Information */
-+	case 0x1e:
-+		entry->eax = entry->ecx = entry->edx = 0;
- 		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
--			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-+			entry->ebx = 0;
- 			break;
- 		}
-+		entry->ebx &= 0xffffffu;
- 		break;
- 	case KVM_CPUID_SIGNATURE: {
- 		const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
--- 
-2.33.1
+  Thomas
+
+
+>   	return report_summary();
+>   }
 
