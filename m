@@ -2,199 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A4B5490B25
-	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:07:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4B66490B24
+	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:07:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240440AbiAQPGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S240430AbiAQPGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 17 Jan 2022 10:06:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58059 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240410AbiAQPGE (ORCPT
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4032 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240401AbiAQPGE (ORCPT
         <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 10:06:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642431964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bLFvUw5OiL0PwWN1RfLYJMbRWgda2rw0vcjqVwdGBw4=;
-        b=QGtnUBJFkKpIt3/4YZ90fzwsg7++mcHSWCGWvtWiTxZEVfEUZ3bR7t8NGrGRs7ZpMrKZHn
-        Jhg6lyqwdkbKOqyiP+8uRA1dJFiHF526WMw+kMDrr+e6FJl32ZxVqOpp+CwvPi5+GKmMhb
-        srI262JwKrBS4trpbw8+UErAEkSaImw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-32-O1HyghfuMAqfNzHzVDjykw-1; Mon, 17 Jan 2022 10:06:01 -0500
-X-MC-Unique: O1HyghfuMAqfNzHzVDjykw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D65241083F64;
-        Mon, 17 Jan 2022 15:05:59 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.195.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C7D6A2B59F;
-        Mon, 17 Jan 2022 15:05:57 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] KVM: selftests: Test KVM_SET_CPUID2 after KVM_RUN
-Date:   Mon, 17 Jan 2022 16:05:42 +0100
-Message-Id: <20220117150542.2176196-5-vkuznets@redhat.com>
-In-Reply-To: <20220117150542.2176196-1-vkuznets@redhat.com>
-References: <20220117150542.2176196-1-vkuznets@redhat.com>
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20HDw1Fi028630;
+        Mon, 17 Jan 2022 15:06:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/M3GOBw3RpA4RhYZMHohcKKbS0ryG2KKvwytJ6MHYIA=;
+ b=PoOHwnPm3XeZK416fqNUFjOHFBdgZKazoA8Z3c+v2hQWSNiWrNTQpwfdDh49dqvRxaQp
+ IkBoxDpqA/vgA1wq5sldTeJq0QXNvhee7wNFLQ0F02MhzpGIrP59eu+d+OI3H+cfM7NL
+ 8puXR00G3i7fKyClpeHUuaKxPEGXa/Q0IujfsI+62YTMiDGMXlgwlQsBotTMa7byHjpg
+ 5ImiZ2ccFai0bIGJFqn+7HMtjnw9osK45MOvJIfHpeQWwGsKc/pMEGB4BtrEVA4PeXAw
+ mJsoEsmTOFx3Et5sRKr5ulFd5vbv0xYoGBMwIgPpWfcxmplJ6xpsAdB5rzz77mwiBojJ WQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dn9t41bjg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 15:06:02 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20HEtmYY025711;
+        Mon, 17 Jan 2022 15:06:01 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dn9t41bhe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 15:06:01 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20HF3k58017917;
+        Mon, 17 Jan 2022 15:05:59 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3dknw94cfr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 15:05:59 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20HF5vu030867922
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jan 2022 15:05:57 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE92A4C050;
+        Mon, 17 Jan 2022 15:05:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AFA54C044;
+        Mon, 17 Jan 2022 15:05:56 +0000 (GMT)
+Received: from [9.171.80.201] (unknown [9.171.80.201])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Jan 2022 15:05:56 +0000 (GMT)
+Message-ID: <32ac01d4-a662-57bd-42ce-5feba4e03ede@linux.ibm.com>
+Date:   Mon, 17 Jan 2022 16:07:40 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] s390x: topology: Check the Perform
+ Topology Function
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
+        david@redhat.com
+References: <20220110133755.22238-1-pmorel@linux.ibm.com>
+ <20220110133755.22238-4-pmorel@linux.ibm.com>
+ <20220111122526.60e31b38@p-imbrenda>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220111122526.60e31b38@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wc-MBZZlcl_q-EP-BgGLnr7pwRg7lzkh
+X-Proofpoint-ORIG-GUID: y0MpG6dQvC0tzp9A8uSmFe2opSAIEAaL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-17_07,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ adultscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201170093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM forbids KVM_SET_CPUID2 after KVM_RUN was performed on a vCPU unless
-the supplied CPUID data is equal to what was previously set. Test this.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../selftests/kvm/include/x86_64/processor.h  |  7 ++++
- .../selftests/kvm/lib/x86_64/processor.c      | 33 ++++++++++++++++---
- .../testing/selftests/kvm/x86_64/cpuid_test.c | 30 +++++++++++++++++
- 3 files changed, 66 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index e94ba0fc67d8..bb013d101c14 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -375,6 +375,8 @@ uint64_t kvm_get_feature_msr(uint64_t msr_index);
- struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
- 
- struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
-+int __vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
-+		     struct kvm_cpuid2 *cpuid);
- void vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
- 		    struct kvm_cpuid2 *cpuid);
- 
-@@ -418,6 +420,11 @@ uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr);
- void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr,
- 			     uint64_t pte);
- 
-+/*
-+ * get_cpuid() - find matching CPUID entry and return pointer to it.
-+ */
-+struct kvm_cpuid_entry2 *get_cpuid(struct kvm_cpuid2 *cpuid, uint32_t function,
-+				   uint32_t index);
- /*
-  * set_cpuid() - overwrites a matching cpuid entry with the provided value.
-  *		 matches based on ent->function && ent->index. returns true
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index babb0f28575c..d61e2326dc85 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -886,6 +886,17 @@ kvm_get_supported_cpuid_index(uint32_t function, uint32_t index)
- 	return entry;
- }
- 
-+
-+int __vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
-+		     struct kvm_cpuid2 *cpuid)
-+{
-+	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+
-+	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-+
-+	return ioctl(vcpu->fd, KVM_SET_CPUID2, cpuid);
-+}
-+
- /*
-  * VM VCPU CPUID Set
-  *
-@@ -903,12 +914,9 @@ kvm_get_supported_cpuid_index(uint32_t function, uint32_t index)
- void vcpu_set_cpuid(struct kvm_vm *vm,
- 		uint32_t vcpuid, struct kvm_cpuid2 *cpuid)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
- 	int rc;
- 
--	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
--
--	rc = ioctl(vcpu->fd, KVM_SET_CPUID2, cpuid);
-+	rc = __vcpu_set_cpuid(vm, vcpuid, cpuid);
- 	TEST_ASSERT(rc == 0, "KVM_SET_CPUID2 failed, rc: %i errno: %i",
- 		    rc, errno);
- 
-@@ -1384,6 +1392,23 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
- 	}
- }
- 
-+struct kvm_cpuid_entry2 *get_cpuid(struct kvm_cpuid2 *cpuid, uint32_t function,
-+				   uint32_t index)
-+{
-+	int i;
-+
-+	for (i = 0; i < cpuid->nent; i++) {
-+		struct kvm_cpuid_entry2 *cur = &cpuid->entries[i];
-+
-+		if (cur->function == function && cur->index == index)
-+			return cur;
-+	}
-+
-+	TEST_FAIL("CPUID function 0x%x index 0x%x not found ", function, index);
-+
-+	return NULL;
-+}
-+
- bool set_cpuid(struct kvm_cpuid2 *cpuid,
- 	       struct kvm_cpuid_entry2 *ent)
- {
-diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-index a711f83749ea..16d2465c5634 100644
---- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-@@ -154,6 +154,34 @@ struct kvm_cpuid2 *vcpu_alloc_cpuid(struct kvm_vm *vm, vm_vaddr_t *p_gva, struct
- 	return guest_cpuids;
- }
- 
-+static void set_cpuid_after_run(struct kvm_vm *vm, struct kvm_cpuid2 *cpuid)
-+{
-+	struct kvm_cpuid_entry2 *ent;
-+	int rc;
-+	u32 eax, ebx, x;
-+
-+	/* Setting unmodified CPUID is allowed */
-+	rc = __vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	TEST_ASSERT(!rc, "Setting unmodified CPUID after KVM_RUN failed: %d", rc);
-+
-+	/* Changing CPU features is forbidden */
-+	ent = get_cpuid(cpuid, 0x7, 0);
-+	ebx = ent->ebx;
-+	ent->ebx--;
-+	rc = __vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	TEST_ASSERT(rc, "Changing CPU features should fail");
-+	ent->ebx = ebx;
-+
-+	/* Changing MAXPHYADDR is forbidden */
-+	ent = get_cpuid(cpuid, 0x80000008, 0);
-+	eax = ent->eax;
-+	x = eax & 0xff;
-+	ent->eax = (eax & ~0xffu) | (x - 1);
-+	rc = __vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	TEST_ASSERT(rc, "Changing MAXPHYADDR should fail");
-+	ent->eax = eax;
-+}
-+
- int main(void)
- {
- 	struct kvm_cpuid2 *supp_cpuid, *cpuid2;
-@@ -175,5 +203,7 @@ int main(void)
- 	for (stage = 0; stage < 3; stage++)
- 		run_vcpu(vm, VCPU_ID, stage);
- 
-+	set_cpuid_after_run(vm, cpuid2);
-+
- 	kvm_vm_free(vm);
- }
+On 1/11/22 12:25, Claudio Imbrenda wrote:
+> On Mon, 10 Jan 2022 14:37:54 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> We check the PTF instruction.
+>>
+>> - We do not expect to support vertical polarization.
+>>
+>> - We do not expect the Modified Topology Change Report to be
+>> pending or not at the moment the first PTF instruction with
+>> PTF_CHECK function code is done as some code already did run
+>> a polarization change may have occur.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   s390x/Makefile      |   1 +
+>>   s390x/topology.c    | 115 ++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/unittests.cfg |   3 ++
+>>   3 files changed, 119 insertions(+)
+>>   create mode 100644 s390x/topology.c
+>>
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 1e567c11..fa21a882 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -26,6 +26,7 @@ tests += $(TEST_DIR)/edat.elf
+>>   tests += $(TEST_DIR)/mvpg-sie.elf
+>>   tests += $(TEST_DIR)/spec_ex-sie.elf
+>>   tests += $(TEST_DIR)/firq.elf
+>> +tests += $(TEST_DIR)/topology.elf
+>>   
+>>   tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>   ifneq ($(HOST_KEY_DOCUMENT),)
+>> diff --git a/s390x/topology.c b/s390x/topology.c
+>> new file mode 100644
+>> index 00000000..a227555e
+>> --- /dev/null
+>> +++ b/s390x/topology.c
+>> @@ -0,0 +1,115 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * CPU Topology
+>> + *
+>> + * Copyright (c) 2021 IBM Corp
+> 
+> Copyright IBM Corp. 2021
+
+Yes thanks
+Pierre
+
 -- 
-2.34.1
-
+Pierre Morel
+IBM Lab Boeblingen
