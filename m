@@ -2,147 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53EDE490B14
+	by mail.lfdr.de (Postfix) with ESMTP id 0ADDD490B13
 	for <lists+kvm@lfdr.de>; Mon, 17 Jan 2022 16:04:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240312AbiAQPEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 10:04:33 -0500
-Received: from mga09.intel.com ([134.134.136.24]:59607 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233003AbiAQPEc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 10:04:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642431872; x=1673967872;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8hAcDQdsGYS2a64rx034wwDmCqbWr8Zo5bXT7BLZY1w=;
-  b=W7qtXRfvFNxSbJ8xjCqDQrUyFp0rH7XA7/NUyGB0pOLFp3x1lSTQAwrr
-   Ot9IXUyRDBe7wQhaS7bxirW50EoC9OSF/TUzxGxDhLdnNaCqxrsVm++gu
-   g90vqwbpF4g/vjAw8CK6ZqVM631QWAaMpAoItJFqZYoJ1XLA+ESdYz+rI
-   V7pI0vZwhNnlq3+9/KmmEXCHW15ATL2OMsiW+BYUPYvbDnhhS/ZQjyJvH
-   f3sLmDpWXIzgWYNcWsjmnU9yP64gI9wLNnXBA57V3FXHQP2DtNJlRZJTn
-   sA+xQJmFXELfeKxxAGjg/tNYSwlUH920uNPYr5IOETuMjX2sHiZYjoWAx
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10229"; a="244438026"
-X-IronPort-AV: E=Sophos;i="5.88,295,1635231600"; 
-   d="scan'208";a="244438026"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2022 07:04:32 -0800
-X-IronPort-AV: E=Sophos;i="5.88,295,1635231600"; 
-   d="scan'208";a="476679426"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.254.209.10]) ([10.254.209.10])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2022 07:04:27 -0800
-Message-ID: <67262b95-d577-0620-79bf-20fc37906869@intel.com>
-Date:   Mon, 17 Jan 2022 23:04:18 +0800
+        id S240329AbiAQPD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 10:03:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50018 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240304AbiAQPD4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jan 2022 10:03:56 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20HEK3Co010380;
+        Mon, 17 Jan 2022 15:03:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/E3Goe4+VaKpv1ylPScDepE8ToBPeMKqZspQF6YeMjc=;
+ b=JvBrdhnyrxcwzRiVxzZHOPDX+fxA1GSEoNV2wU044H22POzkyE6K2jTTHarz10qGcCnD
+ bUKTeJfiG9347qSs4w4tpUVmhWzGDndHeDk/malc25i3Q33bhcVEpoc4N2A4pKe/K0N8
+ 9c8V8n+ulNfT7Ja5IL0VdLEYWeiIR56iceQUjQD6zaHgBRt766BdBleXIUNcjXlbAIKK
+ VxYq97GivP+Z9oF9aUZyMPOxAVWX9DoEFU+s43bIgKHieyVxV1y4wGirYExCIg8dhcH/
+ krQ0AN3pAI+voS9Vm8HZQYgOqnvHCgKEdWHUZTCVq4YR5drQm5YICvt/HkUosJJMIs3d Uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dn7krv5sh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 15:03:53 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20HEbn0g030404;
+        Mon, 17 Jan 2022 15:03:53 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dn7krv5rm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 15:03:53 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20HF2rVR007232;
+        Mon, 17 Jan 2022 15:03:51 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma01fra.de.ibm.com with ESMTP id 3dknw94d7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jan 2022 15:03:51 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20HF3iwm40960420
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jan 2022 15:03:44 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8D6244C04A;
+        Mon, 17 Jan 2022 15:03:44 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 166D74C040;
+        Mon, 17 Jan 2022 15:03:44 +0000 (GMT)
+Received: from [9.171.80.201] (unknown [9.171.80.201])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Jan 2022 15:03:43 +0000 (GMT)
+Message-ID: <cc221aec-838c-c710-fe41-c523cc2fd787@linux.ibm.com>
+Date:   Mon, 17 Jan 2022 16:05:27 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.4.1
-Subject: Re: [PATCH v5 8/8] KVM: VMX: Resize PID-ponter table on demand for
- IPI virtualization
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v3 2/4] s390x: stsi: Define vm_is_kvm to be
+ used in different tests
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-References: <20211231142849.611-1-guang.zeng@intel.com>
- <20211231142849.611-9-guang.zeng@intel.com> <YeCjHbdAikyIFQc9@google.com>
- <43200b86-aa40-f7a3-d571-dc5fc3ebd421@intel.com>
- <YeGiVCn0wNH9eqxX@google.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <YeGiVCn0wNH9eqxX@google.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
+        david@redhat.com
+References: <20220110133755.22238-1-pmorel@linux.ibm.com>
+ <20220110133755.22238-3-pmorel@linux.ibm.com>
+ <20220111140811.2a7f49c2@p-imbrenda>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220111140811.2a7f49c2@p-imbrenda>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uU5GboWXR-BVwC8rI-EW_l5k1hYzorf2
+X-Proofpoint-GUID: NIhH5VKaF1fs684XYLKT1xlz6AvmgLxF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-17_07,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 spamscore=0 impostorscore=0 bulkscore=0 mlxscore=0
+ clxscore=1015 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
+ phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201170093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/15/2022 12:18 AM, Sean Christopherson wrote:
-> On Fri, Jan 14, 2022, Zeng Guang wrote:
->> On 1/14/2022 6:09 AM, Sean Christopherson wrote:
->>> On Fri, Dec 31, 2021, Zeng Guang wrote:
->>>> +static int vmx_expand_pid_table(struct kvm_vmx *kvm_vmx, int entry_idx)
->>>> +{
->>>> +	u64 *last_pid_table;
->>>> +	int last_table_size, new_order;
->>>> +
->>>> +	if (entry_idx <= kvm_vmx->pid_last_index)
->>>> +		return 0;
->>>> +
->>>> +	last_pid_table = kvm_vmx->pid_table;
->>>> +	last_table_size = table_index_to_size(kvm_vmx->pid_last_index + 1);
->>>> +	new_order = get_order(table_index_to_size(entry_idx + 1));
->>>> +
->>>> +	if (vmx_alloc_pid_table(kvm_vmx, new_order))
->>>> +		return -ENOMEM;
->>>> +
->>>> +	memcpy(kvm_vmx->pid_table, last_pid_table, last_table_size);
->>>> +	kvm_make_all_cpus_request(&kvm_vmx->kvm, KVM_REQ_PID_TABLE_UPDATE);
->>>> +
->>>> +	/* Now old PID table can be freed safely as no vCPU is using it. */
->>>> +	free_pages((unsigned long)last_pid_table, get_order(last_table_size));
->>> This is terrifying.  I think it's safe?  But it's still terrifying.
->> Free old PID table here is safe as kvm making request KVM_REQ_PI_TABLE_UPDATE
->> with KVM_REQUEST_WAIT flag force all vcpus trigger vm-exit to update vmcs
->> field to new allocated PID table. At this time, it makes sure old PID table
->> not referenced by any vcpu.
->> Do you mean it still has potential problem?
-> No, I do think it's safe, but it is still terrifying :-)
->
->>> Rather than dynamically react as vCPUs are created, what about we make max_vcpus
->>> common[*], extend KVM_CAP_MAX_VCPUS to allow userspace to override max_vcpus,
->>> and then have the IPIv support allocate the PID table on first vCPU creation
->>> instead of in vmx_vm_init()?
->>>
->>> That will give userspace an opportunity to lower max_vcpus to reduce memory
->>> consumption without needing to dynamically muck with the table in KVM.  Then
->>> this entire patch goes away.
->> IIUC, it's risky if relying on userspace .
-> That's why we have cgroups, rlimits, etc...
->
->> In this way userspace also have chance to assign large max_vcpus but not use
->> them at all. This cannot approach the goal to save memory as much as possible
->> just similar as using KVM_MAX_VCPU_IDS to allocate PID table.
-> Userspace can simply do KVM_CREATE_VCPU until it hits KVM_MAX_VCPU_IDS...
-IIUC, what you proposed is to use max_vcpus in kvm for x86 arch 
-(currently not present yet) and
-provide new api for userspace to notify kvm how many vcpus in current vm 
-session prior to vCPU creation.
-Thus IPIv can setup PID-table with this information in one shot.
-I'm thinking this may have several things uncertain:
-1. cannot identify the exact max APIC ID corresponding to max vcpus
-APIC ID definition is platform dependent. A large APIC ID could be 
-assigned to one vCPU in theory even running with
-small max_vcpus. We cannot figure out max APIC ID supported mapping to 
-max_vcpus.
 
-2. cannot optimize the memory consumption on PID table to the least at 
-run-time
-  In case "-smp=small_n,maxcpus=large_N", kvm has to allocate memory to 
-accommodate large_N vcpus at the
-beginning no matter whether all maxcpus will run.
 
-3. Potential backward-compatible problem
-If running with old QEMU version,  kvm cannot get expected information 
-so as to make a fallback to use
-KVM_MAX_VCPU_IDS by default. It's feasible but not benefit on memory 
-optimization for PID table.
+On 1/11/22 14:08, Claudio Imbrenda wrote:
+> On Mon, 10 Jan 2022 14:37:53 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> We need in several tests to check if the VM we are running in
+>> is KVM.
+>> Let's add the test.
+>>
+>> To check the VM type we use the STSI 3.2.2 instruction, let's
+>> define it's response structure in a central header.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/stsi.h | 32 ++++++++++++++++++++++++++++++++
+>>   lib/s390x/vm.c   | 39 +++++++++++++++++++++++++++++++++++++++
+>>   lib/s390x/vm.h   |  1 +
+>>   s390x/stsi.c     | 23 ++---------------------
+>>   4 files changed, 74 insertions(+), 21 deletions(-)
+>>   create mode 100644 lib/s390x/stsi.h
+>>
+>> diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
+>> new file mode 100644
+>> index 00000000..02cc94a6
+>> --- /dev/null
+>> +++ b/lib/s390x/stsi.h
+>> @@ -0,0 +1,32 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>> +/*
+>> + * Structures used to Store System Information
+>> + *
+>> + * Copyright (c) 2021 IBM Inc
+> 
+> Copyright IBM Corp. 2021
 
-What's your opinion ? Thanks.
+OK
+
+> 
+>> + */
+>> +
+>> +#ifndef _S390X_STSI_H_
+>> +#define _S390X_STSI_H_
+> 
+> [...]
+> 
+>> +
+>> +/**
+>> + * Detect whether we are running with KVM
+>> + */
+>> +
+>> +bool vm_is_kvm(void)
+>> +{
+>> +	/* EBCDIC for "KVM/" */
+>> +	const uint8_t kvm_ebcdic[] = { 0xd2, 0xe5, 0xd4, 0x61 };
+>> +	static bool initialized;
+>> +	static bool is_kvm;
+>> +	struct sysinfo_3_2_2 *stsi_322;
+>> +
+>> +	if (initialized)
+>> +		return is_kvm;
+>> +
+>> +	if (stsi_get_fc() < 3) {
+>> +		initialized = true;
+>> +		return is_kvm;
+>> +	}
+>> +
+>> +	stsi_322 = alloc_page();
+>> +	if (!stsi_322)
+>> +		return false;
+> 
+> I don't like returning false if the allocation fails.
+> The allocation should not fail: assert(stsi_322);
+
+OK, right.
+
+> 
+>> +
+>> +	if (stsi(stsi_322, 3, 2, 2))
+>> +		goto out;
+>> +
+
+Thanks for the review,
+
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
