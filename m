@@ -2,149 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A85D0492B4E
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 17:34:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1065E492B54
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 17:35:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243676AbiARQeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 11:34:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35033 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232580AbiARQeQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 11:34:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642523655;
+        id S244123AbiARQey (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 11:34:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57820 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243692AbiARQex (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 11:34:53 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54DE4C061574;
+        Tue, 18 Jan 2022 08:34:53 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D29021EC056A;
+        Tue, 18 Jan 2022 17:34:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1642523687;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NDRBcK1YMu+yeTrzNGtn5hFI5coY1/6IuTgKRbLDusA=;
-        b=RB5Ou/RGPAFl9LLky2IArTvCobg/eTHWLbPZ5soC2wVq8x6VclhcMLk2MUo67YzG1+munT
-        RExO0R/6SMt23PpIFsqvXwCEcV+B1h4a8kwVfiuhJCCp+Y5hZdn3VULvWY5eLHebipDuyA
-        a1yvYNqi4VEXqPMVXRAKXH8ZG1FsJbg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-624-LV5yYxRqMmOq7pN4ibDbWw-1; Tue, 18 Jan 2022 11:34:13 -0500
-X-MC-Unique: LV5yYxRqMmOq7pN4ibDbWw-1
-Received: by mail-wm1-f71.google.com with SMTP id bg16-20020a05600c3c9000b0034bea12c043so2205047wmb.7
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 08:34:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=NDRBcK1YMu+yeTrzNGtn5hFI5coY1/6IuTgKRbLDusA=;
-        b=PbXwEQBfcDVfwi1QGh2BF35FL+84CxAe2uAVUZC3/GzPljzMlNWGNP5Gwv0l8JAXyM
-         k//Yw0zMYlE5VdGENwJSDXeQhbuDa3CtelRyBD7+GBIHnheS/0TDGqyNMPnhbukZQbIB
-         MxPERewqV0UzzSkOvxQCE7f56oPh4xkBOF9+2nQ9jxcxFRLyKCxhidxrPTakgn+zbhYI
-         h2f3P6zA/IE9tT9g475UKe1MO94r93whU5ykRqNEBFGzw1KV9Nkj+eBQd9ICIKcHpIdZ
-         NXEmtQJLc4walb9zjUOau4QzHRKfMBZcsXkXa5WSW4DAr5E+rNZRqym7pIOlA+CdJPSc
-         VTXA==
-X-Gm-Message-State: AOAM531zKD9g2EiCxasMm+d0LKZEqiVFkyhyiiStUlPICvoHeRJEouOX
-        zhe8QBKfIS5t0H+2aA6+YO+vzO3AwTEwBWtbjBdoa8/acnr4ehdIjrGMgf2zgXyoS0v/zvQwYlW
-        rOMsFF8Jaakh+
-X-Received: by 2002:adf:fc90:: with SMTP id g16mr25634956wrr.699.1642523651225;
-        Tue, 18 Jan 2022 08:34:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxakAAHpFv9j8JH43Ek867/dZJS9LmnS10c9F0qAH99L9AYcFIRgVmADvv/nkkqfUuJfrraNg==
-X-Received: by 2002:adf:fc90:: with SMTP id g16mr25634925wrr.699.1642523650947;
-        Tue, 18 Jan 2022 08:34:10 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o5sm2743792wmc.39.2022.01.18.08.34.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jan 2022 08:34:10 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=xK1Ruqt0Z3LpMS/GeIOUADQcueEO2vAcwQe8tnfengs=;
+        b=bIZs6T3eRL29/2uilP6w7Rm92gPfcnQp2vi0QmpTHCgNpF01xtADYy6ZJfaiUEkVQxQ7rz
+        tTfqeCf214MnTZxLlL7syAvWgctc20H4w+1cxhqAXyOfZEU72KaDQPbBJ7erwJXEqkWN4y
+        xfQn8rJrSZmZg3PGrtGbOaU4fct01Es=
+Date:   Tue, 18 Jan 2022 17:34:49 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] KVM: x86: Partially allow KVM_SET_CPUID{,2}
- after KVM_RUN for CPU hotplug
-In-Reply-To: <20220118153531.11e73048@redhat.com>
-References: <20220117150542.2176196-1-vkuznets@redhat.com>
- <20220118153531.11e73048@redhat.com>
-Date:   Tue, 18 Jan 2022 17:34:09 +0100
-Message-ID: <87ee55knpa.fsf@redhat.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 29/40] x86/compressed/64: add support for SEV-SNP
+ CPUID table in #VC handlers
+Message-ID: <YebsKcpnYzvjaEjs@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-30-brijesh.singh@amd.com>
+ <YeAmFePcPjvMoWCP@zn.tnic>
+ <20220113163913.phpu4klrmrnedgic@amd.com>
+ <YeGhKll2fTcTr2wS@zn.tnic>
+ <20220118043521.exgma53qrzrbalpd@amd.com>
+ <YebIiN6Ftq2aPtyF@zn.tnic>
+ <20220118142345.65wuub2p3alavhpb@amd.com>
+ <20220118143238.lu22npcktxuvadwk@amd.com>
+ <20220118143730.wenhm2bbityq7wwy@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220118143730.wenhm2bbityq7wwy@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Igor Mammedov <imammedo@redhat.com> writes:
+On Tue, Jan 18, 2022 at 08:37:30AM -0600, Michael Roth wrote:
+> Actually, no, because doing that would provide hypervisor a means to
+> effectively disable CPUID page for an SNP guest by provided a table with
+> count == 0, which needs to be guarded against.
 
-> On Mon, 17 Jan 2022 16:05:38 +0100
-> Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
->> Changes since v1:
->> - Drop the allowlist of items which were allowed to change and just allow
->> the exact same CPUID data [Sean, Paolo]. Adjust selftest accordingly.
->> - Drop PATCH1 as the exact same change got merged upstream.
->> 
->> Recently, KVM made it illegal to change CPUID after KVM_RUN but
->> unfortunately this change is not fully compatible with existing VMMs.
->> In particular, QEMU reuses vCPU fds for CPU hotplug after unplug and it
->> calls KVM_SET_CPUID2. Relax the requirement by implementing an allowing
->> KVM_SET_CPUID{,2} with the exact same data.
->
->
-> Can you check following scenario:
->  * on host that has IA32_TSX_CTRL and TSX enabled (RTM/HLE cpuid bits present)
->  * boot 2 vcpus VM with TSX enabled on VMM side but with tsx=off on kernel CLI
->
->      that should cause kernel to set MSR_IA32_TSX_CTRL to 3H from initial 0H
->      and clear RTM+HLE bits in CPUID, check that RTM/HLE cpuid it
->      cleared
+Err, I'm confused.
 
-Forgive me my ignorance around (not only) TSX :-) I took a "Intel(R)
-Xeon(R) CPU E3-1270 v5 @ 3.60GHz" host which seems to have rtm/hle and
-booted a guest with 'cpu=host' and with (and without) 'tsx=off' on the
-kernel command line. I decided to check what's is MSR_IA32_TSX_CTRL but
-I see the following:
+Isn't that "SEV-SNP guests will be provided the location of special
+'secrets' 'CPUID' pages via the Confidential Computing blob..." and the
+HV has no say in there?
 
-# rdmsr 0x122
-rdmsr: CPU 0 cannot read MSR 0x00000122
+Why does the HV provide the CPUID page?
 
-I tried adding 'tsx_ctrl' to my QEMU command line but it complains with
-qemu-system-x86_64: warning: host doesn't support requested feature: MSR(10AH).tsx-ctrl [bit 7]
+And when I read "secrets page" I think, encrypted/signed and given
+directly to the guest, past the HV which cannot even touch it.
 
-so I think my host is not good enough :-(
-
-Also, I've looked at tsx_clear_cpuid() but it actually writes to
-MSR_TSX_FORCE_ABORT MSR (0x10F), not MSR_IA32_TSX_CTRL so I'm confused.
-
->
->  * hotunplug a VCPU and then replug it again
->     if IA32_TSX_CTRL is reset to initial state, that should re-enable
->     RTM/HLE cpuid bits and KVM_SET_CPUID2 might fail due to difference
-
-Could you please teach me this kung-fu, I mean hot to unplug a
-cold-plugged CPU with QMP? Previoulsy, I only did un-plugging for what
-I've hotplugged, something like:
-
-(QEMU) device_add driver=host-x86_64-cpu socket-id=0 core-id=2 thread-id=0 id=cpu2
-{"return": {}}
-(QEMU) device_del id=cpu2
-{"return": {}}
-
-What's the ids of the cold-plugged CPUs?
-
->
-> and as Sean pointed out there might be other non constant leafs,
-> where exact match check could leave userspace broken.
-
-Indeed, while testing your suggestion I've stumbled upon
-CPUID.(EAX=0x12, ECX=1) (SGX) where we mangle ECX from
-kvm_vcpu_after_set_cpuid():
-
-        best = kvm_find_cpuid_entry(vcpu, 0x12, 0x1);
-	if (best) {
-                best->ecx &= vcpu->arch.guest_supported_xcr0 & 0xffffffff;
-		best->edx &= vcpu->arch.guest_supported_xcr0 >> 32;
-                best->ecx |= XFEATURE_MASK_FPSSE;
-        }
-
-In theory, we should just move this to __kvm_update_cpuid_runtime()...
-I'll take a look tomorrow.
+Hmmm.
 
 -- 
-Vitaly
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
