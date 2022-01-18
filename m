@@ -2,131 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A0584925E2
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 13:44:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83E2A492609
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 13:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237581AbiARMoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 07:44:18 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10334 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237441AbiARMoR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 07:44:17 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ICYsYb035744;
-        Tue, 18 Jan 2022 12:42:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=m12V+yXH4hlsiZwa8i+pDOp/j8Cs7qgKrlgEwxXj7L4=;
- b=RnlpiRvsUmkTWbjkruFslYg1tMFQEJuByDNn/0YTdV7DSI138NX40q5meitQdeZeW1Yu
- k5EjYZWjx9qzdO56Aja0MBuq7X6zydGGr2b/7ryqUtGTk+0pWv0/UvAgzDo9tFZTnhCq
- 1k2P5DRAR2BQ79VW7//cIBf0CxghnC0wU7poxz2X0XDJ+Vk3dmGawcG8O7VEddXlyFql
- fQXA8mYfg7MLeFtLfrvIuBe06ReGD+eoc2oj85gI0N8OiMxaxJZBX8t0doppb8oWBua3
- dpD1zfzbh0R9xrycvwLTF86PosVpuQlw0XDwCxxcVroA7CfX9Kdvjs34WHLCN5M0NDdM Yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnv93anyn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 12:42:35 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ICgYjv023877;
-        Tue, 18 Jan 2022 12:42:35 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnv93anxp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 12:42:34 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ICbc3T000483;
-        Tue, 18 Jan 2022 12:42:32 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9m9cc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 12:42:32 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ICgT1r44761424
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 12:42:29 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B548AE134;
-        Tue, 18 Jan 2022 12:42:29 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 85CDBAE143;
-        Tue, 18 Jan 2022 12:42:26 +0000 (GMT)
-Received: from [9.171.19.84] (unknown [9.171.19.84])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 12:42:26 +0000 (GMT)
-Message-ID: <6b6b8a2b-202c-8966-b3f7-5ce35cf40a7e@linux.ibm.com>
-Date:   Tue, 18 Jan 2022 13:42:26 +0100
+        id S239552AbiARMte convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 18 Jan 2022 07:49:34 -0500
+Received: from mail-ua1-f49.google.com ([209.85.222.49]:35487 "EHLO
+        mail-ua1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235104AbiARMtb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 07:49:31 -0500
+Received: by mail-ua1-f49.google.com with SMTP id m90so36320088uam.2;
+        Tue, 18 Jan 2022 04:49:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=iDNGF1VjVomGlE1aVlmhPbvwByegTECQGcsrxubfQG0=;
+        b=W/7+KwcQIFe8k9do6GnoupOVJaOKBdiP+MrAUzGwizq4jkG1DvOd/PQS8vg7vJJvPe
+         8C5XbpuNcDb8ZlT+gBIZGaYfLBDaASe9KEv2NsKpjpF2tRaZ+Zuud8NIJms2l4qkzLAx
+         XMv9JWaVH9cGPKjKWYMq/5DePXPe+QcRDbfM7E/Ty5DHg2hX3jTvc+WkxeBZAwkUGvve
+         QRei+gV7soYC+7p6+3G6d1wC+bgK5TkBu1QySj3AJkSRF2gvILWYsUQfNeBdCNFetwxb
+         1YNiYjF+yFkbraOPVF38W15G82u/rOkTNnSpQ0FS+TlAQ0nrg9CvT8YPJTzh++cG9Tv2
+         lZ5A==
+X-Gm-Message-State: AOAM531I+1ECNNQTj+97N5eGsVOavtQ4zTarjbORuoCQFkwudfNUGeEL
+        ykKgZwG8KROlSfpcRJvFjxNtHdQQD6iLJ4YM
+X-Google-Smtp-Source: ABdhPJwKQbCOkjDtdikM1lfRv1KCWaWVwhaMtYkyK+iOxRUckVe3GwFbVQNSVQ9kAuVjm+afJgCLKg==
+X-Received: by 2002:a05:6102:ecf:: with SMTP id m15mr8610496vst.68.1642510169047;
+        Tue, 18 Jan 2022 04:49:29 -0800 (PST)
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com. [209.85.222.46])
+        by smtp.gmail.com with ESMTPSA id p14sm3586095uad.20.2022.01.18.04.49.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jan 2022 04:49:27 -0800 (PST)
+Received: by mail-ua1-f46.google.com with SMTP id c36so36154877uae.13;
+        Tue, 18 Jan 2022 04:49:27 -0800 (PST)
+X-Received: by 2002:a05:6102:3581:: with SMTP id h1mr9266907vsu.5.1642510166831;
+ Tue, 18 Jan 2022 04:49:26 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
-Content-Language: en-US
-To:     Mark Rutland <mark.rutland@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
-        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
-        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
-        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
-        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
-        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
-        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
-        seanjc@google.com, suzuki.poulose@arm.com, tglx@linutronix.de,
-        tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-References: <20220111153539.2532246-1-mark.rutland@arm.com>
- <127a6117-85fb-7477-983c-daf09e91349d@linux.ibm.com>
- <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
- <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
- <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
- <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
- <YeGUnwhbSvwJz5pD@FVFF77S0Q05N>
- <8aa0cada-7f00-47b3-41e4-8a9e7beaae47@redhat.com>
- <20220118120154.GA17938@C02TD0UTHF1T.local>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220118120154.GA17938@C02TD0UTHF1T.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kBuNuBs-U6Vi15T0uagzyQoDh0iT-1MZ
-X-Proofpoint-GUID: ryNn6W6_ACAD_AcE88cXBjk0KElOYo9l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-18_03,2022-01-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 malwarescore=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 adultscore=0 phishscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201180077
+References: <c9026f17-2b3f-ee94-0ea3-5630f981fbc1@omp.ru> <CAMuHMdXVbRudGs69f9ZzaP1PXhteDNZiXA658eMFAwP4nr9r3w@mail.gmail.com>
+ <20220117092444.opoedfcf5k5u6otq@pengutronix.de> <CAMuHMdUgZUeraHadRAi2Z=DV+NuNBrKPkmAKsvFvir2MuquVoA@mail.gmail.com>
+ <20220117114923.d5vajgitxneec7j7@pengutronix.de> <CAMuHMdWCKERO20R2iVHq8P=BaoauoBAtiampWzfMRYihi3Sb0g@mail.gmail.com>
+ <20220117170609.yxaamvqdkivs56ju@pengutronix.de> <CAMuHMdXbuZqEpYivyS6hkaRN+CwTOGaHq_OROwVAWvDD6OXODQ@mail.gmail.com>
+ <20220118090913.pjumkq4zf4iqtlha@pengutronix.de> <CAMuHMdUW8+Y_=uszD+JOZO3Lpa9oDayk+GO+cg276i2f2T285w@mail.gmail.com>
+ <20220118120806.pbjsat4ulg3vnhsh@pengutronix.de>
+In-Reply-To: <20220118120806.pbjsat4ulg3vnhsh@pengutronix.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 18 Jan 2022 13:49:15 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWkwV9XE_R5FZ=jPtDwLpDbEngG6+X2JmiDJCZJZvUjYA@mail.gmail.com>
+Message-ID: <CAMuHMdWkwV9XE_R5FZ=jPtDwLpDbEngG6+X2JmiDJCZJZvUjYA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        platform-driver-x86@vger.kernel.org,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, Takashi Iwai <tiwai@suse.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        openipmi-developer@lists.sourceforge.net,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Benson Leung <bleung@chromium.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Uwe,
 
+On Tue, Jan 18, 2022 at 1:08 PM Uwe Kleine-König
+<u.kleine-koenig@pengutronix.de> wrote:
+> On Tue, Jan 18, 2022 at 10:37:25AM +0100, Geert Uytterhoeven wrote:
+> > On Tue, Jan 18, 2022 at 10:09 AM Uwe Kleine-König
+> > <u.kleine-koenig@pengutronix.de> wrote:
+> > > For the (clk|gpiod|regulator)_get_optional() you don't have to check
+> > > against the magic not-found value (so no implementation detail magic
+> > > leaks into the caller code) and just pass it to the next API function.
+> > > (And my expectation would be that if you chose to represent not-found by
+> > > (void *)66 instead of NULL, you won't have to adapt any user, just the
+> > > framework internal checks. This is a good thing!)
+> >
+> > Ah, there is the wrong assumption: drivers sometimes do need to know
+> > if the resource was found, and thus do need to know about (void *)66,
+> > -ENODEV, or -ENXIO.  I already gave examples for IRQ and clk before.
+> > I can imagine these exist for gpiod and regulator, too, as soon as
+> > you go beyond the trivial "enable" and "disable" use-cases.
+>
+> My premise is that every user who has to check for "not found"
+> explicitly should not use (clk|gpiod)_get_optional() but
+> (clk|gpiod)_get() and do proper (and explicit) error handling for
+> -ENODEV. (clk|gpiod)_get_optional() is only for these trivial use-cases.
+>
+> > And 0/NULL vs. > 0 is the natural check here: missing, but not
+> > an error.
+>
+> For me it it 100% irrelevant if "not found" is an error for the query
+> function or not. I just have to be able to check for "not found" and
+> react accordingly.
+>
+> And adding a function
+>
+>         def platform_get_irq_opional():
+>                 ret = platform_get_irq()
+>                 if ret == -ENXIO:
+>                         return 0
+>                 return ret
+>
+> it's not a useful addition to the API if I cannot use 0 as a dummy
+> because it doesn't simplify the caller enough to justify the additional
+> function.
+>
+> The only thing I need to be able is to distinguish the cases "there is
+> an irq", "there is no irq" and anything else is "there is a problem I
+> cannot handle and so forward it to my caller". The semantic of
+> platform_get_irq() is able to satisfy this requirement[1], so why introduce
+> platform_get_irq_opional() for the small advantage that I can check for
+> not-found using
+>
+>         if (!irq)
+>
+> instead of
+>
+>         if (irq != -ENXIO)
+>
+> ? The semantic of platform_get_irq() is easier ("Either a usable
+> non-negative irq number or a negative error number") compared to
+> platform_get_irq_optional() ("Either a usable positive irq number or a
+> negative error number or 0 meaning not found"). Usage of
+> platform_get_irq() isn't harder or more expensive (neither for a human
+> reader nor for a maching running the resulting compiled code).
+> For a human reader
+>
+>         if (irq != -ENXIO)
+>
+> is even easier to understand because for
+>
+>         if (!irq)
+>
+> they have to check where the value comes from, see it's
+> platform_get_irq_optional() and understand that 0 means not-found.
 
-Am 18.01.22 um 13:02 schrieb Mark Rutland:
-> On Mon, Jan 17, 2022 at 06:45:36PM +0100, Paolo Bonzini wrote:
->> On 1/14/22 16:19, Mark Rutland wrote:
->>> I also think there is another issue here. When an IRQ is taken from SIE, will
->>> user_mode(regs) always be false, or could it be true if the guest userspace is
->>> running? If it can be true I think tha context tracking checks can complain,
->>> and it*might*  be possible to trigger a panic().
->>
->> I think that it would be false, because the guest PSW is in the SIE block
->> and switched on SIE entry and exit, but I might be incorrect.
-> 
-> Ah; that's the crux of my confusion: I had thought the guest PSW would
-> be placed in the regular lowcore *_old_psw slots. From looking at the
-> entry asm it looks like the host PSW (around the invocation of SIE) is
-> stored there, since that's what the OUTSIDE + SIEEXIT handling is
-> checking for.
-> 
-> Assuming that's correct, I agree this problem doesn't exist, and there's
-> only the common RCU/tracing/lockdep management to fix.
+"vIRQ zero does not exist."
 
-Will you provide an s390 patch in your next iteration or shall we then do
-one as soon as there is a v2? We also need to look into vsie.c where we
-also call sie64a
+> This function just adds overhead because as a irq framework user I have
+> to understand another function. For me the added benefit is too small to
+> justify the additional function. And you break out-of-tree drivers.
+> These are all no major counter arguments, but as the advantage isn't
+> major either, they still matter.
+>
+> Best regards
+> Uwe
+>
+> [1] the only annoying thing is the error message.
+
+So there's still a need for two functions.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
