@@ -2,390 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 210D54930AE
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 23:27:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34EEB49310F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 23:54:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349938AbiARW1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 17:27:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54302 "EHLO
+        id S1350112AbiARWy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 17:54:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349010AbiARW1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 17:27:04 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D80C061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 14:27:03 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n9wvk-0000Vm-NM; Tue, 18 Jan 2022 23:26:20 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n9wvY-00B4m8-19; Tue, 18 Jan 2022 23:26:07 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n9wvX-0003U8-0E; Tue, 18 Jan 2022 23:26:07 +0100
-Date:   Tue, 18 Jan 2022 23:26:06 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
-        openipmi-developer@lists.sourceforge.net,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Sebastian Reichel <sre@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        platform-driver-x86@vger.kernel.org,
-        Benson Leung <bleung@chromium.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Hans de Goede <hdegoede@redhat.com>, netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
-Message-ID: <20220118222606.3iwuzbenl7g6oeiq@pengutronix.de>
-References: <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
- <Yd9L9SZ+g13iyKab@sirena.org.uk>
- <29f0c65d-77f2-e5b2-f6cc-422add8a707d@omp.ru>
- <20220114092557.jrkfx7ihg26ekzci@pengutronix.de>
- <61b80939-357d-14f5-df99-b8d102a4e1a1@omp.ru>
- <20220114202226.ugzklxv4wzr6egwj@pengutronix.de>
- <57af1851-9341-985e-7b28-d2ba86770ecb@omp.ru>
- <20220117084732.cdy2sash5hxp4lwo@pengutronix.de>
- <68d3bb7a-7572-7495-d295-e1d512ef509e@omp.ru>
+        with ESMTP id S1344503AbiARWyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 17:54:25 -0500
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6455EC061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 14:54:25 -0800 (PST)
+Received: by mail-yb1-xb31.google.com with SMTP id p5so1438154ybd.13
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 14:54:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2A0o9RStrnIxmL11KBIrT0fGYmNaZT0XLIaxHQF5rjs=;
+        b=dag6jxRDJUEiQYlvYUtjYS/OfkScCbS15kuV1kOlQvrem03MJYgdAwaEHsk7xkMGTO
+         kFHIj3pxg2l26Gamk9bynAV2Zfontn1hV5i3Z18gq3jN3xjnwhxB20CVOjA4+vlA0R02
+         ceyCS6rF1ci0H0IzntFxCa97kN3hwPwH9Z5sBLk8kMfM4ZECEp0lNsPAGgF1rYgVCvUR
+         PGkIyNBVj8eZ5YoiH4PXKb+AZcWt0b511F2zYUm4g2+HsrQfl/5+64z1s3gsYWingZHi
+         WN++EpOE6AguKoOdixg8BZ9R5wasNuqelZQvKvhUyQa3VDRdqhnIkSRieTj99s3sWzle
+         ku3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2A0o9RStrnIxmL11KBIrT0fGYmNaZT0XLIaxHQF5rjs=;
+        b=DvCwARraaQMGAAAfrr03pbz1cVzfPCBUrCSPT8DnLKKYOn26VW01FpM5WIjWAUVYQi
+         +QfIgLn56qEJeMcsGLIckjlD4/7QXfbJ0NRN9BQkGkBH5UAvq66eXfJiseaMEgIiz/7v
+         N/toCmLRZCfTDQqPJuZg2hhTlsSPd+QskkxakCZgOKihW319aTZOuPaioyAmlsnLazfr
+         kXbNPDDuf2i2ibVszHCaEwS1/DyhBm6HX0MRfltZwxJVh7u6Wss0aRBfGC2EWcoKYwlf
+         /0csHZukvGcxhPrKcE6HCK3B+dhW1KHTd3RiNXNKJ3b2Ge2DG+p1tR0JKBt5CFxjZa+G
+         mH5A==
+X-Gm-Message-State: AOAM533lDlPccAG/Yl+GDgL3DnGQJ5+zk7ZIjYcbRUN/MTSw3DloYJA7
+        ZHWWjXKjw/XUENntiv+seFJRofpvs2fvDpTZA4sdLQ==
+X-Google-Smtp-Source: ABdhPJwKhpxDqzsHYaDrecYU3+cgHLkJME7T1oocecMclqJnaqy7jDJK7leekDDAezlwQk6RPUBfNaub4qT6EIgRDRI=
+X-Received: by 2002:a25:d055:: with SMTP id h82mr6237602ybg.543.1642546464435;
+ Tue, 18 Jan 2022 14:54:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="a7pus3gvz76yet7d"
-Content-Disposition: inline
-In-Reply-To: <68d3bb7a-7572-7495-d295-e1d512ef509e@omp.ru>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+References: <20220104194918.373612-1-rananta@google.com> <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+ <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+ <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+ <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
+ <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+ <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+ <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
+ <YeBfj89mIf8SezfD@google.com> <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+In-Reply-To: <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 18 Jan 2022 14:54:13 -0800
+Message-ID: <CAJHc60zcwNskA7JCg9nQc4YhmLdziHVauf1gQQ48GHYtby_aYg@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        linux-kernel@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jan 14, 2022 at 1:51 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
+> > > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
+> > > > Perhaps it would help if you explained *why* you are doing this. It
+> > > > sounds like you are either trying to protect against a malicious
+> > > > userspace, or you are trying to keep userspace from doing something
+> > > > stupid. In general, kvm only enforces constraints that are necessary
+> > > > to protect the host. If that's what you're doing, I don't understand
+> > > > why live migration doesn't provide an end-run around your protections.
+> > > It's mainly to safeguard the guests. With respect to migration, KVM
+> > > and the userspace are collectively playing a role here. It's up to the
+> > > userspace to ensure that the registers are configured the same across
+> > > migrations and KVM ensures that the userspace doesn't modify the
+> > > registers after KVM_RUN so that they don't see features turned OFF/ON
+> > > during execution. I'm not sure if it falls into the definition of
+> > > protecting the host. Do you see a value in adding this extra
+> > > protection from KVM?
+> >
+> > Short answer: probably not?
+> >
+> > There is precedent for disallowing userspace from doing stupid things, but that's
+> > either for KVM's protection (as Jim pointed out), or because KVM can't honor the
+> > change, e.g. x86 is currently in the process of disallowing most CPUID changes
+> > after KVM_RUN because KVM itself consumes the CPUID information and KVM doesn't
+> > support updating some of it's own internal state (because removing features like
+> > GB hugepage support is nonsensical and would require a large pile of complicated,
+> > messy code).
+> >
+> > Restricing CPUID changes does offer some "protection" to the guest, but that's
+> > not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
+> > case, and trying to do so is a fool's errand.
+> >
+> > If restricting updates in the arm64 is necessary to ensure KVM provides sane
+> > behavior, then it could be justified.  But if it's purely a sanity check on
+> > behalf of the guest, then it's not justified.
+>
+> The pseudo firmware hvc registers, which this series are adding, are
+> used by KVM to identify available hvc features for the guest, and not
+> directly exposed to the guest as registers.
+> The ways the KVM code in the series consumes the registers' values are
+> very limited, and no KVM data/state is created based on their values.
+> But, as the code that consumes the registers grows in the future,
+> I wouldn't be surprised if KVM consumes them differently than it does
+> now (e.g. create another data structure based on the register values).
+> I'm not sure though :)
+>
+> The restriction, with which KVM doesn't need to worry about the changes
+> in the registers after KVM_RUN, could potentially protect or be useful
+> to protect KVM and simplify future changes/maintenance of the KVM codes
+> that consumes the values.
+> I thought this was one of the reasons for having the restriction.
+>
+Well, that wasn't the original intention of the patch, but just to
+protect the guests from the userspace's dynamic updates. Having said
+that, and based on what Sean mentioned in his last reply, it could be
+inconsistent from what KVM has been doing so far and would be
+difficult to cover all the scenarios that userspace can mess things up
+for guests.
+I'll plan to drop this patch in the next version, and bring it back
+back to arm64 if we really need it.
 
---a7pus3gvz76yet7d
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks Sean, Jim, and Reiji for the comments and discussion.
 
-On Tue, Jan 18, 2022 at 11:21:45PM +0300, Sergey Shtylyov wrote:
-> Hello!
->=20
-> On 1/17/22 11:47 AM, Uwe Kleine-K=F6nig wrote:
->=20
-> [...]
-> >>>>>>>>> To me it sounds much more logical for the driver to check if an
-> >>>>>>>>> optional irq is non-zero (available) or zero (not available), t=
-han to
-> >>>>>>>>> sprinkle around checks for -ENXIO. In addition, you have to rem=
-ember
-> >>>>>>>>> that this one returns -ENXIO, while other APIs use -ENOENT or -=
-ENOSYS
-> >>>>>>>>> (or some other error code) to indicate absence. I thought not h=
-aving
-> >>>>>>>>> to care about the actual error code was the main reason behind =
-the
-> >>>>>>>>> introduction of the *_optional() APIs.
-> >>>>>>>
-> >>>>>>>> No, the main benefit of gpiod_get_optional() (and clk_get_option=
-al()) is
-> >>>>>>>> that you can handle an absent GPIO (or clk) as if it were availa=
-ble.
-> >>>>>>
-> >>>>>>    Hm, I've just looked at these and must note that they match 1:1=
- with
-> >>>>>> platform_get_irq_optional(). Unfortunately, we can't however behav=
-e the
-> >>>>>> same way in request_irq() -- because it has to support IRQ0 for th=
-e sake
-> >>>>>> of i8253 drivers in arch/...
-> >>>>>
-> >>>>> Let me reformulate your statement to the IMHO equivalent:
-> >>>>>
-> >>>>> 	If you set aside the differences between
-> >>>>> 	platform_get_irq_optional() and gpiod_get_optional(),
-> >>>>
-> >>>>    Sorry, I should make it clear this is actually the diff between a=
- would-be
-> >>>> platform_get_irq_optional() after my patch, not the current code...
-> >>>
-> >>> The similarity is that with your patch both gpiod_get_optional() and
-> >>> platform_get_irq_optional() return NULL and 0 on not-found. The relev=
-ant
-> >>> difference however is that for a gpiod NULL is a dummy value, while f=
-or
-> >>> irqs it's not. So the similarity is only syntactically, but not
-> >>> semantically.
-> >>
-> >>    I have noting to say here, rather than optional IRQ could well have=
- a different
-> >> meaning than for clk/gpio/etc.
-> >>
-> >> [...]
-> >>>>> However for an interupt this cannot work. You will always have to c=
-heck
-> >>>>> if the irq is actually there or not because if it's not you cannot =
-just
-> >>>>> ignore that. So there is no benefit of an optional irq.
-> >>>>>
-> >>>>> Leaving error message reporting aside, the introduction of
-> >>>>> platform_get_irq_optional() allows to change
-> >>>>>
-> >>>>> 	irq =3D platform_get_irq(...);
-> >>>>> 	if (irq < 0 && irq !=3D -ENXIO) {
-> >>>>> 		return irq;
-> >>>>> 	} else if (irq >=3D 0) {
-> >>>>
-> >>>>    Rather (irq > 0) actually, IRQ0 is considered invalid (but still =
-returned).
-> >>>
-> >>> This is a topic I don't feel strong for, so I'm sloppy here. If chang=
-ing
-> >>> this is all that is needed to convince you of my point ...
-> >>
-> >>    Note that we should absolutely (and first of all) stop returning 0 =
-=66rom platform_get_irq()
-> >> on a "real" IRQ0. Handling that "still good" zero absolutely doesn't s=
-cale e.g. for the subsystems
-> >> (like libata) which take 0 as an indication that the polling mode shou=
-ld be used... We can't afford
-> >> to be sloppy here. ;-)
-> >=20
-> > Then maybe do that really first?
->=20
->    I'm doing it first already:
->=20
-> https://lore.kernel.org/all/5e001ec1-d3f1-bcb8-7f30-a6301fd9930c@omp.ru/
->=20
->    This series is atop of the above patch...
-
-Ah, I missed that (probably because I didn't get the cover letter).
-
-> > I didn't recheck, but is this what the
-> > driver changes in your patch is about?
->=20
->    Partly, yes. We can afford to play with the meaning of 0 after the abo=
-ve patch.
-
-But the changes that are in patch 1 are all needed?
-=20
-> > After some more thoughts I wonder if your focus isn't to align
-> > platform_get_irq_optional to (clk|gpiod|regulator)_get_optional, but to
-> > simplify return code checking. Because with your change we have:
-> >=20
-> >  - < 0 -> error
-> >  - =3D=3D 0 -> no irq
-> >  - > 0 -> irq
->=20
->    Mainly, yes. That's why the code examples were given in the descriptio=
-n.
->=20
-> > For my part I'd say this doesn't justify the change, but at least I
-> > could better life with the reasoning. If you start at:
-> >=20
-> > 	irq =3D platform_get_irq_optional(...)
-> > 	if (irq < 0 && irq !=3D -ENXIO)
-> > 		return irq
-> > 	else if (irq > 0)
-> > 		setup_irq(irq);
-> > 	else
-> > 		setup_polling()
-> >=20
-> > I'd change that to
-> >=20
-> > 	irq =3D platform_get_irq_optional(...)
-> > 	if (irq > 0) /* or >=3D 0 ? */
->=20
->    Not >=3D 0, no...
->=20
-> > 		setup_irq(irq)
-> > 	else if (irq =3D=3D -ENXIO)
-> > 		setup_polling()
-> > 	else
-> > 		return irq
-> >=20
-> > This still has to mention -ENXIO, but this is ok and checking for 0 just
-> > hardcodes a different return value.
->=20
->    I think comparing with 0 is simpler (and shorter) than with -ENXIO, if=
- you
-> consider the RISC CPUs, like e.g. MIPS...
-
-Hmm, I don't know MIPS good enough to judge. So I created a small C
-file:
-
-	$ cat test.c
-	#include <errno.h>
-
-	int platform_get_irq_optional(void);
-	void a(void);
-
-	int func_0()
-	{
-		int irq =3D platform_get_irq_optional();
-
-		if (irq =3D=3D 0)
-			a();
-	}
-
-	int func_enxio()
-	{
-		int irq =3D platform_get_irq_optional();
-
-		if (irq =3D=3D -ENXIO)
-			a();
-	}
-
-With some cross compilers as provided by Debian doing
-
-	$CC -c -O3 test.c
-	nm --size-sort test.o
-
-I get:
-
-  compiler			|  size of func_0  | size of func_enxio
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D|=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-aarch64-linux-gnu-gcc		| 0000000000000024 | 0000000000000028
-arm-linux-gnueabi-gcc		|         00000018 |         00000018
-arm-linux-gnueabihf-gcc		|         00000010 |         00000012
-i686-linux-gnu-gcc		|         0000002a |         0000002a
-mips64el-linux-gnuabi64-gcc	| 0000000000000054 | 000000000000005c
-powerpc-linux-gnu-gcc		|         00000058 |         00000058
-s390x-linux-gnu-gcc		| 000000000000002e | 0000000000000030
-x86_64-linux-gnu-gcc		| 0000000000000022 | 0000000000000022
-
-So you save some bytes indeed.
-
-> > Anyhow, I think if you still want to change platform_get_irq_optional
-> > you should add a few patches converting some drivers which demonstrates
-> > the improvement for the callers.
->=20
->    Mhm, I did include all the drivers where the IRQ checks have to be mod=
-ified,
-> not sure what else you want me to touch...
-
-I somehow expected that the changes that are now necessary (or possible)
-to callers makes them prettier somehow. Looking at your patch again:
-
- - drivers/counter/interrupt-cnt.c
-   This one is strange in my eyes because it tests the return value of
-   gpiod_get_optional against NULL :-(
-
- - drivers/edac/xgene_edac.c
-   This one just wants a silent irq lookup and then throws away the
-   error code returned by platform_get_irq_optional() to return -EINVAL.
-   Not so nice, is it?
-
- - drivers/gpio/gpio-altera.c
-   This one just wants a silent irq lookup. And maybe it should only
-   goto skip_irq if the irq was not found, but on an other error code
-   abort the probe?!
-
- - drivers/gpio/gpio-mvebu.c
-   Similar to gpio-altera.c: Wants a silent irq and improved error
-   handling.
-
- - drivers/i2c/busses/i2c-brcmstb.c
-   A bit ugly that we now have dev->irq =3D=3D 0 if the irq isn't available,
-   but if requesting the irq failed irq =3D -1 is used?
-
- - drivers/mmc/host/sh_mmcif.c
-   Broken error handling. This one wants to abort on irq[1] < 0 (with
-   your changed semantic).
-
-I stopped here.
-
-It seems quite common that drivers assume a value < 0 returned by
-platform_get_irq means not-found and don't care for -EPROBE_DEFER (what
-else can happen?) Changing a relevant function in that mess seems
-unfortunate here :-\
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---a7pus3gvz76yet7d
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHnPnoACgkQwfwUeK3K
-7Akqngf/deJcg5Z6920bXlYUCFdp2KylFxWHucfT0qIrwGnPq8zaZFS9gHqJ0sdG
-7jQQJZSuB0RvjbvoR65zpQdPHzf+L5Mt7RcHB97mz9RBI0icUJxXPyCM5R+JJztU
-FwvRMasJJTaWprdySpKQ2NBP//sovxwwmoujXrWnzumTfyLR1rw66bTkDxHqwQO0
-aWnbojhdu/efNMVD8vDGDRvmyeWv2jVpsINrc/BxPET+KGaMZQUKGtk2vnJSgprv
-w/qDSARMcG/2W0EAD65b/kO9COe957sWbn7Pj9ylMp1Eb4kziV8OLLT8WYWtLiHw
-zStNC4/q9uZn5kXN2bo45YckhIG/gg==
-=ZjV7
------END PGP SIGNATURE-----
-
---a7pus3gvz76yet7d--
+Regards,
+Raghavendra
+> Thanks,
+> Reiji
