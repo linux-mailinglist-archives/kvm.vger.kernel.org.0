@@ -2,153 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A144492D32
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 19:23:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD00E492D4F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 19:30:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244576AbiARSWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 13:22:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54824 "EHLO
+        id S1348039AbiARSaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 13:30:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244533AbiARSWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 13:22:47 -0500
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DB6C06173E
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:22:47 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id a10-20020a9d260a000000b005991bd6ae3eso11825405otb.11
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:22:47 -0800 (PST)
+        with ESMTP id S1347989AbiARSaI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 13:30:08 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7458DC06173E
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:30:08 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id m21so124840pfd.3
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:30:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1q/ydx49keEZGWsAWRg7W9al0WAO2oLskLJ8Qk4a3uA=;
-        b=Ti3pXq5PWkDKY2e94msFAZE9zQGy9QZOFNgzR4fLpdLlmvXEobm2Br9/aw0TkwMMML
-         gL/ivfTK5tpd25PDCCTleoLGVSPM58hXUlD3qR7jHRb/MaihBFQF1uUjdopF/kfCZY/v
-         iUZTzB/AO2Jcutw9XZUhUPnnQsp7nMOQCyNI0LpYgMOYp6kKr8Pg2ZWwZFW5AfflaBHs
-         gHPjfX3D2uYXhme4R3KAoEXdlzlZH+6Xp6J5OfxKVg953/vW31RYyUKV+bS00InLVJih
-         7IS/AGDVBI+Gf692c73nxgFdSHBzQITpz8Q/8KWF9urpq5z7kEHPvsoAKt+VdB3s3a8i
-         KsPw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=SWbb1UZG/b7k7Lx9na6HLCxa4UWNr2RlfPnFhxjraRg=;
+        b=f4H5WNnaCHNp+d7K0qMWtzUU7JrzZgs2CLPbFeWIrzTmQ6AMxAts/LARYEPMhhz9Zc
+         traIcym/lekeL97Ouynm24SqNqQCno5Ywn91tcLRTQmH8+1t+uCSNFmdk0XG7ggGQf0b
+         E3BqfQ76zWGS0fP6df+/+yOJ9YceO2F55ZO9NSuIymy19+50eBaEjhFkSNAhrIP5ViBG
+         +LNc3Ahf3r8lf05WZVzaP/BwscV13WDc13OmQ/Z2865qx+CZnpyJKGVOzmMiSiDuJ5sn
+         k0CSsQZqjJd75q9+/AMS0k5w8p+r4KN95wvOGN3cGIv15/i0MhwvnMckr5NDjSiAxwmO
+         YYmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1q/ydx49keEZGWsAWRg7W9al0WAO2oLskLJ8Qk4a3uA=;
-        b=qVIfbTBD2ex/BzjTmp2S095HJux1hE9D4zcThhB5vTXV1DLAUmfKgci/Sc0U9BBlKc
-         DR4SWdxngca2SIuXEjTSz6kjhNfhs4WtCFeO5hp8QG2G4p4iCiSSVQYXgaTl33/0nMzY
-         HjZeIqS/fEKHtbBv/WaAB0+VItKjRZCZLLTPf4SkM04plupRvvmxwsRqhnEn/qc+WAnE
-         2SRaqgpMogWG3A0yLMDv17yrxzSQYA7CoKrP2yWRhbBMqIRG2e47/JMfq0z2wkaZikPm
-         8c8YbQblgc5jY6OIKIn6txWIb0J3waD53pzEyuxT1E7emLvhFN/Etk6Oax5xfC0CMHoV
-         n+Yw==
-X-Gm-Message-State: AOAM533y2n8BpLSEicpW2GV/jmgOZ0gD8evLLm04a+I0dJEUNrSTgcTX
-        FWonK686HwpnEHxIsdCkW3y8W/ZJzRvq2/fgGgUA1g==
-X-Google-Smtp-Source: ABdhPJwOULlAveoN8jDLIzZCo5aBoG3v2UUBO58ENvhePozWMYoNZ6zqfzh9m0ZNRe07m/E2+L+g2Ea953jmmvaSv0Y=
-X-Received: by 2002:a9d:12f7:: with SMTP id g110mr21978798otg.299.1642530166827;
- Tue, 18 Jan 2022 10:22:46 -0800 (PST)
-MIME-Version: 1.0
-References: <CALMp9eQZa_y3ZN0_xHuB6nW0YU8oO6=5zPEov=DUQYPbzLeQVA@mail.gmail.com>
- <453a2a09-5f29-491e-c386-6b23d4244cc2@gmail.com> <CALMp9eSkYEXKkqDYLYYWpJ0oX10VWECJTwtk_pBWY5G-vN5H0A@mail.gmail.com>
- <CALMp9eQAMpnJOSk_Rw+pp2amwi8Fk4Np1rviKYxJtoicas=6BQ@mail.gmail.com> <b3cffb4b-8425-06bb-d40e-89e7f01d5c05@gmail.com>
-In-Reply-To: <b3cffb4b-8425-06bb-d40e-89e7f01d5c05@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 18 Jan 2022 10:22:35 -0800
-Message-ID: <CALMp9eRhdLKq0Y372e+ZGnUCtDNQYv7pUiYL0bqJsYCDfqTpcQ@mail.gmail.com>
-Subject: Re: PMU virtualization and AMD erratum 1292
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SWbb1UZG/b7k7Lx9na6HLCxa4UWNr2RlfPnFhxjraRg=;
+        b=npwAsS4pw1eMTB5s4XjcEqDrk7x6UwDjN2VFxvnaOeIrubVJSxPlboTOxbx0B3JO00
+         1XAnsniVofCli3kHAMOBsIVn4xZnY7sHnPeuU9xQpvobowyxQ5uSdob5zTZqc/g6GNOC
+         lOEFqotMRrjDVOv6ElXzKyqAdvHlWmmwr4BVjcmdMYC1/nyabD21ETQCPUkgzqN52RPX
+         EVfXrpZp/GQRxe4DMCwRIJxLRamnInhPZNn4HtWUb5wtomeBwCxj/i+b7qDnm08Tb4pA
+         6/n0KkLSRRS+6+k+4XhPeRh24dlnQ/LL2lMwmOym9DVvNrK+quo9s1s4Pg/3aFlGzJ2L
+         8Npg==
+X-Gm-Message-State: AOAM532mKMLW2wJJ6/3Si/uXkzaiTlvMP1W9yAkBqS/ro1n4bsQfRZAj
+        88UQCbg4Ayvaeb0VQXdmqJO36Q==
+X-Google-Smtp-Source: ABdhPJzB5DUKJcstTUBwBMK55nhluUUChAkq6wKa4PRFr915fyjn1nQYdkdR4oLzUnWTydBXCZaixA==
+X-Received: by 2002:a63:84c8:: with SMTP id k191mr16893333pgd.562.1642530607662;
+        Tue, 18 Jan 2022 10:30:07 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t5sm12971739pfl.6.2022.01.18.10.30.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jan 2022 10:30:07 -0800 (PST)
+Date:   Tue, 18 Jan 2022 18:30:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stephane Eranian <eranian@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Ananth Narayan <ananth.narayan@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Update the states size cpuid even if
+ XCR0/IA32_XSS is reset
+Message-ID: <YecHK2DmooVlMr2U@google.com>
+References: <20220117082631.86143-1-likexu@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220117082631.86143-1-likexu@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 17, 2022 at 10:25 PM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 18/1/2022 12:08 pm, Jim Mattson wrote:
-> > On Mon, Jan 17, 2022 at 12:57 PM Jim Mattson <jmattson@google.com> wrote:
-> >>
-> >> On Sun, Jan 16, 2022 at 8:26 PM Like Xu <like.xu.linux@gmail.com> wrote:
-> >> ...
-> >>> It's easy for KVM to clear the reserved bit PERF_CTL2[43]
-> >>> for only (AMD Family 19h Models 00h-0Fh) guests.
-> >>
-> >> KVM is currently *way* too aggressive about synthesizing #GP for
-> >> "reserved" bits on AMD hardware. Note that "reserved" generally has a
-> >> much weaker definition in AMD documentation than in Intel
-> >> documentation. When Intel says that an MSR bit is "reserved," it means
-> >> that an attempt to set the bit will raise #GP. When AMD says that an
-> >> MSR bit is "reserved," it does not necessarily mean the same thing.
->
-> I agree. And I'm curious as to why there are hardly any guest user complaints.
->
-> The term "reserved" is described in the AMD "Conventions and Definitions":
->
->         Fields marked as reserved may be used at some future time.
->         To preserve compatibility with future processors, reserved fields require
-> special handling when
->         read or written by software. Software must not depend on the state of a
-> reserved field (unless
->         qualified as RAZ), nor upon the ability of such fields to return a previously
-> written state.
->
->         If a field is marked reserved *without qualification*, software must not change
-> the state of
->         that field; it must reload that field with the same value returned from a prior
-> read.
->
->         Reserved fields may be qualified as IGN, MBZ, RAZ, or SBZ.
->
-> For AMD, #GP comes from "Writing 1 to any bit that must be zero (MBZ) in the MSR."
->
-> >> (Usually, AMD will write MBZ to indicate that the bit must be zero.)
-> >>
-> >> On my Zen3 CPU, I can write 0xffffffffffffffff to MSR 0xc0010204,
-> >> without getting a #GP. Hence, KVM should not synthesize a #GP for any
-> >> writes to this MSR.
-> >>
->
-> ; storage behind bit 43 test
-> ; CPU family:          25
-> ; Model:               1
->
-> wrmsr -p 0 0xc0010204 0x80000000000
-> rdmsr -p 0 0xc0010204 # return 0x80000000000
+On Mon, Jan 17, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> XCR0 is reset to 1 by RESET but not INIT and IA32_XSS is zeroed by
+> both RESET and INIT. In both cases, the size in bytes of the XSAVE
+> area containing all states enabled by XCR0 or (XCRO | IA32_XSS)
+> needs to be updated.
+> 
+> Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/x86.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 76b4803dd3bd..5748a57e1cb7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11134,6 +11134,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	struct kvm_cpuid_entry2 *cpuid_0x1;
+>  	unsigned long old_cr0 = kvm_read_cr0(vcpu);
+>  	unsigned long new_cr0;
+> +	bool need_update_cpuid = false;
+>  
+>  	/*
+>  	 * Several of the "set" flows, e.g. ->set_cr0(), read other registers
+> @@ -11199,6 +11200,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  
+>  		vcpu->arch.msr_misc_features_enables = 0;
+>  
+> +		if (vcpu->arch.xcr0 != XFEATURE_MASK_FP)
+> +			need_update_cpuid = true;
+>  		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+>  	}
+>  
+> @@ -11216,6 +11219,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
+>  	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
+>  
+> +	if (vcpu->arch.ia32_xss)
+> +		need_update_cpuid = true;
 
-Oops. You're right. The host that I thought was a Zen3 was actually a
-Zen2. Switching to an actual Zen3, I find that there is storage behind
-bits 42 and 43, both of which are indicated as reserved.
+This means that kvm_set_msr_common()'s handling of MSR_IA32_XSS also needs to
+update kvm_update_cpuid_runtime().  And then for bnoth XCR0 and XSS, I would very
+strongly prefer that use the helpers to write the values and let the helpers call
+kvm_update_cpuid_runtime().  Yes, that will mean kvm_update_cpuid_runtime() may be
+called multiple times during INIT, but that's already true (CR4), and this isn't
+exactly a fast path.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 55518b7d3b96..22d4b1d15e94 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11256,7 +11256,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+
+                vcpu->arch.msr_misc_features_enables = 0;
+
+-               vcpu->arch.xcr0 = XFEATURE_MASK_FP;
++               __kvm_set_xcr(vcpu, 0, XFEATURE_MASK_FP);
+        }
+
+        /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+@@ -11273,7 +11273,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
+        kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
+
+-       vcpu->arch.ia32_xss = 0;
++       __kvm_set_msr(vcpu, MSR_IA32_XSS, 0, true);
+
+        static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
 
 
-> >> Note that the value I get back from rdmsr is 0x30fffdfffff, so there
-> >> appears to be no storage behind bit 43. If KVM allows this bit to be
-> >> set, it should ensure that reads of this bit always return 0, as they
-> >> do on hardware.
->
-> The PERF_CTL2[43] is marked reserved without qualification in the in Figure 13-7.
->
-> I'm not sure we really need a cleanup storm of #GP for all SVM's non-MBZ
-> reserved bits.
-
-OTOH, we wouldn't need to have this discussion if these MSRs had been
-implemented correctly to begin with.
-
-> >
-> > Bit 19 (Intel's old Pin Control bit) seems to have storage behind it.
-> > It is interesting that in Figure 13-7 "Core Performance Event-Select
-> > Register (PerfEvtSeln)" of the APM volume 2, this "reserved" bit is
-> > not marked in grey. The remaining "reserved" bits (which are marked in
-> > grey), should probably be annotated with "RAZ."
-> >
->
-> In any diagram, we at least have three types of "reservation":
->
-> - Reserved + grey
-> - Reserved, MBZ + grey
-> - Reserved + no grey
->
-> So it is better not to think of "Reserved + grey" as "Reserved, MBZ + grey".
-
-Right. None of these bits MBZ. I was observing that the grey fields
-RAZ. However, that observation was on Zen2. Zen3 is different. Now,
-it's not clear to me what the grey highlights mean. Perhaps nothing at
-all.
