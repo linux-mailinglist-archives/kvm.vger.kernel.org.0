@@ -2,121 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D93934925D8
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 13:41:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A0584925E2
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 13:44:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236801AbiARMlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 07:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234111AbiARMlr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 07:41:47 -0500
-X-Greylist: delayed 343 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 18 Jan 2022 04:41:47 PST
-Received: from smtp-42aa.mail.infomaniak.ch (smtp-42aa.mail.infomaniak.ch [IPv6:2001:1600:4:17::42aa])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF96C061574;
-        Tue, 18 Jan 2022 04:41:47 -0800 (PST)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4JdStT1zBDzMq01B;
-        Tue, 18 Jan 2022 13:36:01 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4JdStQ5z5tzlhMBj;
-        Tue, 18 Jan 2022 13:35:58 +0100 (CET)
-Message-ID: <8ea3bd61-8251-a5b6-c0b4-6d15bac4d2c5@digikod.net>
-Date:   Tue, 18 Jan 2022 13:35:46 +0100
+        id S237581AbiARMoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 07:44:18 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10334 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237441AbiARMoR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 07:44:17 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20ICYsYb035744;
+        Tue, 18 Jan 2022 12:42:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=m12V+yXH4hlsiZwa8i+pDOp/j8Cs7qgKrlgEwxXj7L4=;
+ b=RnlpiRvsUmkTWbjkruFslYg1tMFQEJuByDNn/0YTdV7DSI138NX40q5meitQdeZeW1Yu
+ k5EjYZWjx9qzdO56Aja0MBuq7X6zydGGr2b/7ryqUtGTk+0pWv0/UvAgzDo9tFZTnhCq
+ 1k2P5DRAR2BQ79VW7//cIBf0CxghnC0wU7poxz2X0XDJ+Vk3dmGawcG8O7VEddXlyFql
+ fQXA8mYfg7MLeFtLfrvIuBe06ReGD+eoc2oj85gI0N8OiMxaxJZBX8t0doppb8oWBua3
+ dpD1zfzbh0R9xrycvwLTF86PosVpuQlw0XDwCxxcVroA7CfX9Kdvjs34WHLCN5M0NDdM Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnv93anyn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 12:42:35 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20ICgYjv023877;
+        Tue, 18 Jan 2022 12:42:35 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnv93anxp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 12:42:34 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20ICbc3T000483;
+        Tue, 18 Jan 2022 12:42:32 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9m9cc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 12:42:32 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20ICgT1r44761424
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jan 2022 12:42:29 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B548AE134;
+        Tue, 18 Jan 2022 12:42:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 85CDBAE143;
+        Tue, 18 Jan 2022 12:42:26 +0000 (GMT)
+Received: from [9.171.19.84] (unknown [9.171.19.84])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Jan 2022 12:42:26 +0000 (GMT)
+Message-ID: <6b6b8a2b-202c-8966-b3f7-5ce35cf40a7e@linux.ibm.com>
+Date:   Tue, 18 Jan 2022 13:42:26 +0100
 MIME-Version: 1.0
-User-Agent: 
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
 Content-Language: en-US
-To:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        chiminghao <chi.minghao@zte.com.cn>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:LANDLOCK SECURITY MODULE" 
-        <linux-security-module@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        "open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-Cc:     kernel@collabora.com
-References: <20220118112909.1885705-1-usama.anjum@collabora.com>
- <20220118112909.1885705-7-usama.anjum@collabora.com>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Subject: Re: [PATCH 06/10] selftests: landlock: Add the uapi headers include
- variable
-In-Reply-To: <20220118112909.1885705-7-usama.anjum@collabora.com>
+To:     Mark Rutland <mark.rutland@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
+        alexandru.elisei@arm.com, anup.patel@wdc.com,
+        aou@eecs.berkeley.edu, atish.patra@wdc.com,
+        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
+        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
+        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
+        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
+        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
+        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
+        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
+        seanjc@google.com, suzuki.poulose@arm.com, tglx@linutronix.de,
+        tsbogend@alpha.franken.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, will@kernel.org
+References: <20220111153539.2532246-1-mark.rutland@arm.com>
+ <127a6117-85fb-7477-983c-daf09e91349d@linux.ibm.com>
+ <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
+ <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
+ <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
+ <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
+ <YeGUnwhbSvwJz5pD@FVFF77S0Q05N>
+ <8aa0cada-7f00-47b3-41e4-8a9e7beaae47@redhat.com>
+ <20220118120154.GA17938@C02TD0UTHF1T.local>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220118120154.GA17938@C02TD0UTHF1T.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kBuNuBs-U6Vi15T0uagzyQoDh0iT-1MZ
+X-Proofpoint-GUID: ryNn6W6_ACAD_AcE88cXBjk0KElOYo9l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-18_03,2022-01-18_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ suspectscore=0 malwarescore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 impostorscore=0 adultscore=0 phishscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201180077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 18/01/2022 12:29, Muhammad Usama Anjum wrote:
-> Out of tree build of this test fails if relative path of the output
-> directory is specified. Remove the un-needed include paths and use
-> KHDR_INCLUDES to correctly reach the headers.
+
+Am 18.01.22 um 13:02 schrieb Mark Rutland:
+> On Mon, Jan 17, 2022 at 06:45:36PM +0100, Paolo Bonzini wrote:
+>> On 1/14/22 16:19, Mark Rutland wrote:
+>>> I also think there is another issue here. When an IRQ is taken from SIE, will
+>>> user_mode(regs) always be false, or could it be true if the guest userspace is
+>>> running? If it can be true I think tha context tracking checks can complain,
+>>> and it*might*  be possible to trigger a panic().
+>>
+>> I think that it would be false, because the guest PSW is in the SIE block
+>> and switched on SIE entry and exit, but I might be incorrect.
 > 
-> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> ---
->   tools/testing/selftests/landlock/Makefile | 11 +++--------
->   1 file changed, 3 insertions(+), 8 deletions(-)
+> Ah; that's the crux of my confusion: I had thought the guest PSW would
+> be placed in the regular lowcore *_old_psw slots. From looking at the
+> entry asm it looks like the host PSW (around the invocation of SIE) is
+> stored there, since that's what the OUTSIDE + SIEEXIT handling is
+> checking for.
 > 
-> diff --git a/tools/testing/selftests/landlock/Makefile b/tools/testing/selftests/landlock/Makefile
-> index a99596ca9882..44c724b38a37 100644
-> --- a/tools/testing/selftests/landlock/Makefile
-> +++ b/tools/testing/selftests/landlock/Makefile
-> @@ -1,6 +1,6 @@
->   # SPDX-License-Identifier: GPL-2.0
->   
-> -CFLAGS += -Wall -O2
-> +CFLAGS += -Wall -O2 $(KHDR_INCLUDES)
->   
->   src_test := $(wildcard *_test.c)
->   
-> @@ -12,13 +12,8 @@ KSFT_KHDR_INSTALL := 1
->   OVERRIDE_TARGETS := 1
->   include ../lib.mk
->   
-> -khdr_dir = $(top_srcdir)/usr/include
+> Assuming that's correct, I agree this problem doesn't exist, and there's
+> only the common RCU/tracing/lockdep management to fix.
 
-This should be updated to:
-khdr_dir = ${abs_srctree}/usr/include
-
-Using a global KHDR_DIR instead of khdr_dir could be useful for others too.
-
-> -
-> -$(khdr_dir)/linux/landlock.h: khdr
-> -	@:
-
-This should be kept as is, otherwise we loose this check to rebuild the 
-headers if linux/landlock.h is updated, which is handy for development.
-KVM lost a similar behavior with this patch series.
-
-> -
->   $(OUTPUT)/true: true.c
->   	$(LINK.c) $< $(LDLIBS) -o $@ -static
->   
-> -$(OUTPUT)/%_test: %_test.c $(khdr_dir)/linux/landlock.h ../kselftest_harness.h common.h
-
-This should not be changed.
-
-> -	$(LINK.c) $< $(LDLIBS) -o $@ -lcap -I$(khdr_dir)
-> +$(OUTPUT)/%_test: %_test.c ../kselftest_harness.h common.h
-> +	$(LINK.c) $< $(LDLIBS) -o $@ -lcap
-
-This doesn't work when building in the local directory because 
-$abs_srctree and $KHDR_INCLUDES are empty:
-cd tools/testing/selftests/landlock && make
+Will you provide an s390 patch in your next iteration or shall we then do
+one as soon as there is a v2? We also need to look into vsie.c where we
+also call sie64a
