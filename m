@@ -2,131 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B87B492165
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 09:41:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1962049217C
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 09:42:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235312AbiARIk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 03:40:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50576 "EHLO
+        id S1344806AbiARIm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 03:42:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20895 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235134AbiARIk6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 03:40:58 -0500
+        by vger.kernel.org with ESMTP id S1344780AbiARImv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 03:42:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642495257;
+        s=mimecast20190719; t=1642495371;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=P6JED6ZXK16zXcKezrzoJEKz/qwjTeZGQeCzB0BgpnU=;
-        b=RiEWDAV3OcuiE45sjY523IQKEiL50lKdzcdimznNdEiAZwwtX40m3DNOrvuIZuD73NltPx
-        cjqsdZyJsz3BSwFpxZvx37j7+BNn9FKPJI84KvexMbIh3Q8Vdfndrn8DZgF6qsrZL1tjbU
-        tJd5mKkoIF5i/4ctf9mIR7dmsevljkQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=TarkNDGLeLClM9Er8y1qKxBwUxhfzivs6AuUpW/f/WM=;
+        b=QjhwlwQtcHhqAaCgqnoqD/DNILcT9Uug8JEdrVijHrXkUDrXcpViaEChgX+Mo10iFIIXaz
+        qk8/jGjPl4B1/8yWvuplNlF5meh3AMkKnCV14Yj8+fTPb3x4aVcUUhv1T4S/5/VI/i0ynn
+        EmFfDSiVre06uzsvivmWAyy5r5OBuPc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-4S6kkVyJN8WZvAxDI4B5oQ-1; Tue, 18 Jan 2022 03:40:56 -0500
-X-MC-Unique: 4S6kkVyJN8WZvAxDI4B5oQ-1
-Received: by mail-ed1-f72.google.com with SMTP id z6-20020a50eb46000000b00403a7687b5bso510389edp.3
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 00:40:56 -0800 (PST)
+ us-mta-22-oJ_eDlqCPTWz831Oe60G0w-1; Tue, 18 Jan 2022 03:42:46 -0500
+X-MC-Unique: oJ_eDlqCPTWz831Oe60G0w-1
+Received: by mail-wm1-f71.google.com with SMTP id bg16-20020a05600c3c9000b0034bea12c043so1273619wmb.7
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 00:42:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=P6JED6ZXK16zXcKezrzoJEKz/qwjTeZGQeCzB0BgpnU=;
-        b=5NBBWqiZ1f4sEm2pbVJYoPnAuoffOu4oBKppagiH77Xlp6JFZiVgzNbUL6FxoyqWTm
-         BOnBkQKBgkoVFwSgsj7slnSKwkfX7O/5bTq2Ub7rEgZCgDxHoWgr23I7LdF4mbWRgbm2
-         wjDccKEddOQGXfxZgMfuZjIK6VAt5lW6XhrnS/CXED5U3f+BA1QhFuClnN4IaVroiQ+T
-         Rq7ixk+GTvzSYfqoMbAAC8gXW+L2HGdlUFe8m8/sgB1tt68IRlCOjeJ23niw7n0G0lPr
-         5Ex+CERHAd81EHPRvviSHN3sk+ivBTLRk/TA7Gk00ldMvGgSTE8aQuKx9GDj4y/CZmy4
-         rC+g==
-X-Gm-Message-State: AOAM53239CzYbXFvObsVopBgj9RkKuScPnOuqM7s3n7uvxwRnal7WqLY
-        0vR0hy8Y6wMgMr+bKTvznyNiz1ljZWD3EX5gegSLRQnFiD1/nog0BRp0UIEvM1q2QYA9YRNs/as
-        6CUiauDxuPbRW
-X-Received: by 2002:a17:906:6a1d:: with SMTP id qw29mr6640040ejc.750.1642495255457;
-        Tue, 18 Jan 2022 00:40:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxy/67Tkiwq/Hb0lr+RVqCK8TWjyci7RUPTkTmpxhBNTEK2o14/AlNKQFp4PQJusHdo+BDSrA==
-X-Received: by 2002:a17:906:6a1d:: with SMTP id qw29mr6640026ejc.750.1642495255261;
-        Tue, 18 Jan 2022 00:40:55 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o22sm2994507eju.193.2022.01.18.00.40.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jan 2022 00:40:54 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/4] KVM: x86: Partially allow KVM_SET_CPUID{,2}
- after KVM_RUN
-In-Reply-To: <c427371c-474e-1233-4e57-66210bfc5687@redhat.com>
-References: <20220117150542.2176196-1-vkuznets@redhat.com>
- <20220117150542.2176196-3-vkuznets@redhat.com>
- <c427371c-474e-1233-4e57-66210bfc5687@redhat.com>
-Date:   Tue, 18 Jan 2022 09:40:53 +0100
-Message-ID: <87pmopl9m2.fsf@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=TarkNDGLeLClM9Er8y1qKxBwUxhfzivs6AuUpW/f/WM=;
+        b=Oh92xQZBXIhsHhzHAFMGTl7UZK9IDCEuBE3RNdKSj6alzllWtGAVTq/Z4xr4k+qCfJ
+         UIt6oyLbKNS4hYyG3tkRQoaVprsCjEgqzcxrmb2lGOdXcrJAsgRXz3tIjZcmTG5Vyicl
+         27wJrhxHGsr9mz/1guT+J3LPx5N7h+dhOuNKS/j8pn0G/+1wqpsfwO3BVp91gbOsVEm7
+         pUs/0FjuEqJ8oQZmPrJYf6HK83m0fQrYeqJR0j8MDN1qR04smikVBkc40TH8zA3ISJSz
+         gPVj8WmcW4WO+B53+b57Nfgry5Hn+xee0+fa/uEryld2EnhN1FG/iNsvLg1OyQD1H7Hu
+         9WQA==
+X-Gm-Message-State: AOAM532dtPFv7iOw1+pLkTq/pmPmvr+yiNiXPUYA496Tonxet/rg4YEw
+        SRKpFQvhK0LTUprYA0zd5IIjYkiU2t4Vpmsccl3d6MbaBNV+j85lv8HhpDeVzvKITbDHHYt5LoL
+        h+rbpDmBDzohT
+X-Received: by 2002:a05:6000:1543:: with SMTP id 3mr18770619wry.98.1642495364922;
+        Tue, 18 Jan 2022 00:42:44 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwAyGvXU5HDKLWFwFpIrTCSK9QY6AaJIsN90njgmJzG/VSlbLny/iJ4sPFZNRRBlJuknO62zg==
+X-Received: by 2002:a05:6000:1543:: with SMTP id 3mr18770585wry.98.1642495364639;
+        Tue, 18 Jan 2022 00:42:44 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id i8sm7620259wry.33.2022.01.18.00.42.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jan 2022 00:42:44 -0800 (PST)
+Message-ID: <98424056-829b-ed80-73f3-ead0bef1e7ab@redhat.com>
+Date:   Tue, 18 Jan 2022 09:42:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] KVM: x86/cpuid: Clear XFD for component i if the base
+ feature is missing
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Jing Liu <jing2.liu@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220117074531.76925-1-likexu@tencent.com>
+ <301d4800-5eab-6e21-e8c1-2f87789fc4b9@redhat.com>
+ <5ca97b8f-facd-b1dc-f671-51569ad17284@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <5ca97b8f-facd-b1dc-f671-51569ad17284@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 1/18/22 07:43, Like Xu wrote:
+> On 18/1/2022 1:31 am, Paolo Bonzini wrote:
+>> On 1/17/22 08:45, Like Xu wrote:
+>>> From: Like Xu <likexu@tencent.com>
+>>>
+>>> According to Intel extended feature disable (XFD) spec, the 
+>>> sub-function i
+>>> (i > 1) of CPUID function 0DH enumerates "details for state component i.
+>>> ECX[2] enumerates support for XFD support for this state component."
+>>>
+>>> If KVM does not report F(XFD) feature (e.g. due to CONFIG_X86_64),
+>>> then the corresponding XFD support for any state component i
+>>> should also be removed. Translate this dependency into KVM terms.
+>>>
+>>> Fixes: 690a757d610e ("kvm: x86: Add CPUID support for Intel AMX")
+>>> Signed-off-by: Like Xu <likexu@tencent.com>
+>>> ---
+>>>   arch/x86/kvm/cpuid.c | 3 +++
+>>>   1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>> index c55e57b30e81..e96efef4f048 100644
+>>> --- a/arch/x86/kvm/cpuid.c
+>>> +++ b/arch/x86/kvm/cpuid.c
+>>> @@ -886,6 +886,9 @@ static inline int __do_cpuid_func(struct 
+>>> kvm_cpuid_array *array, u32 function)
+>>>                   --array->nent;
+>>>                   continue;
+>>>               }
+>>> +
+>>> +            if (!kvm_cpu_cap_has(X86_FEATURE_XFD))
+>>> +                entry->ecx &= ~BIT_ULL(2);
+>>>               entry->edx = 0;
+>>>           }
+>>>           break;
+>>
+>> Generally this is something that is left to userspace.  Apart from the 
+>> usecase of "call KVM_GET_SUPPORTED_CPUID and pass it to 
+>> KVM_SET_CPUID2", userspace should know what any changed bits mean.
+>>
+>> Paolo
+>>
+> 
+> I totally agree that setting the appropriate CPUID bits for a feature is 
+> a user space thing.
+> 
+> But this patch is more focused on fixing a different type of problem, 
+> which is
+> that the capabilities exposed by KVM should not *contradict each other* :
+> 
+>      a user space may be confused with the current code base :
+>      - why KVM does not have F(XFD) feature (MSR_IA32_XFD and XFD_ERR 
+> non-exit),
+>      - but KVM reports XFD support for state component i individually;
 
-> On 1/17/22 16:05, Vitaly Kuznetsov wrote:
->>   
->> +/* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
->> +static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
->> +				 int nent)
->> +{
->> +	struct kvm_cpuid_entry2 *best;
->> +	int i;
->> +
->> +	for (i = 0; i < nent; i++) {
->> +		best = kvm_find_cpuid_entry(vcpu, e2[i].function, e2[i].index);
->> +		if (!best)
->> +			return -EINVAL;
->> +
->> +		if (e2[i].eax != best->eax || e2[i].ebx != best->ebx ||
->> +		    e2[i].ecx != best->ecx || e2[i].edx != best->edx)
->> +			return -EINVAL;
->> +	}
->> +
->> +	return 0;
->> +}
->
-> What about this alternative implementation:
->
-> /* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
-> static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
->                                   int nent)
-> {
->          struct kvm_cpuid_entry2 *orig;
->          int i;
->
->          if (nent != vcpu->arch.cpuid_nent)
->                  return -EINVAL;
->
->          for (i = 0; i < nent; i++) {
->                  orig = &vcpu->arch.cpuid_entries[i];
->                  if (e2[i].function != orig->function ||
->                      e2[i].index != orig->index ||
->                      e2[i].eax != orig->eax || e2[i].ebx != orig->ebx ||
->                      e2[i].ecx != orig->ecx || e2[i].edx != orig->edx)
->                          return -EINVAL;
->          }
->
->          return 0;
-> }
->
-> avoiding the repeated calls to kvm_find_cpuid_entry?
->
+Got it.  Yeah, the patch makes sense for the sake of CONFIG_X86_64.
 
-My version is a bit more permissive as it allows supplying CPUID entries
-in any order, not necessarily matching the original. I *guess* this
-doesn't matter much for the QEMU problem we're trying to workaround,
-I'll have to check.
+Paolo
 
--- 
-Vitaly
+> This is like KVM reporting PEBS when no PMU capacity is reported (due to 
+> module param).
+
 
