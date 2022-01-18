@@ -2,199 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB0AE492831
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 15:18:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA718492841
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 15:22:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244535AbiAROSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 09:18:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:26764 "EHLO
+        id S245165AbiAROW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 09:22:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28924 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244862AbiAROSU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 09:18:20 -0500
+        by vger.kernel.org with ESMTP id S244543AbiAROW1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 09:22:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642515498;
+        s=mimecast20190719; t=1642515746;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bLFvUw5OiL0PwWN1RfLYJMbRWgda2rw0vcjqVwdGBw4=;
-        b=UvIph5ZR0vfCK9hpXLUp4lm6moYci4XD6oaYT+uNtY3Zaygph6+utUlRQQUubm7D7tJitF
-        rUu+ZcL/3eXigVQTdeCbok//3C+KjHf2MJw5YpHfY0Nmo/VAaLi3wq5yUpG/WlCukq97C9
-        utVq3Y14Hdx4BzGw/OKOrCBwNH5Ffko=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=y4YzeEHCT5Qsp1fTF2Ff1Fo1X3wdgn1gp47dQ5F5Huc=;
+        b=Gcj7TMGEHboZaCr6rlwiPf7SSMLa3Pw/RL/BnC5t06ONDehofRcZ+waOV/7V6FQh+9EA7e
+        P1O3T/XRj23f+m7ZmnYpWrJvHhNUODi1ivHFO0pNkIr/DBQnFE5Tf1MSkAL9u2q5950zva
+        l2bUiynzSFsOvizov5mzylY/DtNyYNM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-477--rDvR8haOZW_qEsTZ3am1g-1; Tue, 18 Jan 2022 09:18:15 -0500
-X-MC-Unique: -rDvR8haOZW_qEsTZ3am1g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A10C86A061;
-        Tue, 18 Jan 2022 14:18:14 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 27C467E126;
-        Tue, 18 Jan 2022 14:18:11 +0000 (UTC)
+ us-mta-638-k6mEmK25NHCosLUsBQDnBg-1; Tue, 18 Jan 2022 09:22:25 -0500
+X-MC-Unique: k6mEmK25NHCosLUsBQDnBg-1
+Received: by mail-ed1-f71.google.com with SMTP id ee53-20020a056402293500b004022f34edcbso6450703edb.11
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 06:22:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=y4YzeEHCT5Qsp1fTF2Ff1Fo1X3wdgn1gp47dQ5F5Huc=;
+        b=TOQoOribVR00BqnVxKJwStGxNeIN7ru0MlDzxg9Kx9SHbdVTCFev8WbNt/qZVPsyIz
+         OS079Vy9Xfl53gA7FtGUz5aHpu2AtExwMLlpnOWZZjLDokfMoHcE3cLwJ4LMCqxcxMIa
+         yB3T7RvhJZrSKlUe+zDJtpSmh27vyOdCO9RrSNXmsXBDKR22hRAJj/2eEuVtBora44Ke
+         AfVsDnM5g10rbWnc68+RAKt7M+PDEVMvJGxUrTnvyypN0suxRuKSLSCnD0PmM8omncBU
+         81bU6pHd9B1MtikUmQUOzcRXMcjz2h7ijq+M0rcxelduWo+GzjoX+hkugc3w5/JJprIn
+         zfqg==
+X-Gm-Message-State: AOAM533ykcFhKDtjk/QOkJzRPzD1HQcFiEP4W5gunEUzJ4sQza0xlbMS
+        hF3PJYb64Hn6Q3IiODMW3fOYQP8OTqj5RMpcLUH0VQB+aWmMmsoAMSCC2r1v/1kbRv4c98+ux0B
+        LJVHy1ZtJ7D+w/0ZGHp4LDRSZbJKOkYFzwZytH2uC8pZbVAAOWhZrbQIG+kWC7vL+
+X-Received: by 2002:a17:907:a088:: with SMTP id hu8mr8326075ejc.371.1642515744078;
+        Tue, 18 Jan 2022 06:22:24 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwzJQAqutfAisYqiCh+L8bg9o17eCN/WQ/E0+eI30kykTX1fCzEW1NnfAmieqKaAxTUw7qCtA==
+X-Received: by 2002:a17:907:a088:: with SMTP id hu8mr8326054ejc.371.1642515743776;
+        Tue, 18 Jan 2022 06:22:23 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id l25sm4381770edc.20.2022.01.18.06.22.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jan 2022 06:22:23 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/4] KVM: selftests: Test KVM_SET_CPUID2 after KVM_RUN
-Date:   Tue, 18 Jan 2022 15:18:01 +0100
-Message-Id: <20220118141801.2219924-5-vkuznets@redhat.com>
-In-Reply-To: <20220118141801.2219924-1-vkuznets@redhat.com>
-References: <20220118141801.2219924-1-vkuznets@redhat.com>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/5] KVM: nVMX: Fix Windows 11 + WSL2 + Enlightened VMCS
+In-Reply-To: <20220112170134.1904308-1-vkuznets@redhat.com>
+References: <20220112170134.1904308-1-vkuznets@redhat.com>
+Date:   Tue, 18 Jan 2022 15:22:22 +0100
+Message-ID: <87k0exktsx.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM forbids KVM_SET_CPUID2 after KVM_RUN was performed on a vCPU unless
-the supplied CPUID data is equal to what was previously set. Test this.
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../selftests/kvm/include/x86_64/processor.h  |  7 ++++
- .../selftests/kvm/lib/x86_64/processor.c      | 33 ++++++++++++++++---
- .../testing/selftests/kvm/x86_64/cpuid_test.c | 30 +++++++++++++++++
- 3 files changed, 66 insertions(+), 4 deletions(-)
+> Changes since v2 [Sean]:
+> - Tweak a comment in PATCH5.
+> - Add Reviewed-by: tags to PATCHes 3 and 5.
+>
+> Original description:
+>
+> Windows 11 with enabled Hyper-V role doesn't boot on KVM when Enlightened
+> VMCS interface is provided to it. The observed behavior doesn't conform to
+> Hyper-V TLFS. In particular, I'm observing 'VMREAD' instructions trying to
+> access field 0x4404 ("VM-exit interruption information"). TLFS, however, is
+> very clear this should not be happening:
+>
+> "Any VMREAD or VMWRITE instructions while an enlightened VMCS is active is
+> unsupported and can result in unexpected behavior."
+>
+> Microsoft confirms this is a bug in Hyper-V which is supposed to get fixed
+> eventually. For the time being, implement a workaround in KVM allowing 
+> VMREAD instructions to read from the currently loaded Enlightened VMCS.
+>
+> Patches 1-2 are unrelated fixes to VMX feature MSR filtering when eVMCS is
+> enabled. Patches 3 and 4 are preparatory changes, patch 5 implements the
+> workaround.
+>
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index e94ba0fc67d8..bb013d101c14 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -375,6 +375,8 @@ uint64_t kvm_get_feature_msr(uint64_t msr_index);
- struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
- 
- struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
-+int __vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
-+		     struct kvm_cpuid2 *cpuid);
- void vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
- 		    struct kvm_cpuid2 *cpuid);
- 
-@@ -418,6 +420,11 @@ uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr);
- void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr,
- 			     uint64_t pte);
- 
-+/*
-+ * get_cpuid() - find matching CPUID entry and return pointer to it.
-+ */
-+struct kvm_cpuid_entry2 *get_cpuid(struct kvm_cpuid2 *cpuid, uint32_t function,
-+				   uint32_t index);
- /*
-  * set_cpuid() - overwrites a matching cpuid entry with the provided value.
-  *		 matches based on ent->function && ent->index. returns true
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index babb0f28575c..d61e2326dc85 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -886,6 +886,17 @@ kvm_get_supported_cpuid_index(uint32_t function, uint32_t index)
- 	return entry;
- }
- 
-+
-+int __vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
-+		     struct kvm_cpuid2 *cpuid)
-+{
-+	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+
-+	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-+
-+	return ioctl(vcpu->fd, KVM_SET_CPUID2, cpuid);
-+}
-+
- /*
-  * VM VCPU CPUID Set
-  *
-@@ -903,12 +914,9 @@ kvm_get_supported_cpuid_index(uint32_t function, uint32_t index)
- void vcpu_set_cpuid(struct kvm_vm *vm,
- 		uint32_t vcpuid, struct kvm_cpuid2 *cpuid)
- {
--	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
- 	int rc;
- 
--	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
--
--	rc = ioctl(vcpu->fd, KVM_SET_CPUID2, cpuid);
-+	rc = __vcpu_set_cpuid(vm, vcpuid, cpuid);
- 	TEST_ASSERT(rc == 0, "KVM_SET_CPUID2 failed, rc: %i errno: %i",
- 		    rc, errno);
- 
-@@ -1384,6 +1392,23 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
- 	}
- }
- 
-+struct kvm_cpuid_entry2 *get_cpuid(struct kvm_cpuid2 *cpuid, uint32_t function,
-+				   uint32_t index)
-+{
-+	int i;
-+
-+	for (i = 0; i < cpuid->nent; i++) {
-+		struct kvm_cpuid_entry2 *cur = &cpuid->entries[i];
-+
-+		if (cur->function == function && cur->index == index)
-+			return cur;
-+	}
-+
-+	TEST_FAIL("CPUID function 0x%x index 0x%x not found ", function, index);
-+
-+	return NULL;
-+}
-+
- bool set_cpuid(struct kvm_cpuid2 *cpuid,
- 	       struct kvm_cpuid_entry2 *ent)
- {
-diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-index a711f83749ea..16d2465c5634 100644
---- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-@@ -154,6 +154,34 @@ struct kvm_cpuid2 *vcpu_alloc_cpuid(struct kvm_vm *vm, vm_vaddr_t *p_gva, struct
- 	return guest_cpuids;
- }
- 
-+static void set_cpuid_after_run(struct kvm_vm *vm, struct kvm_cpuid2 *cpuid)
-+{
-+	struct kvm_cpuid_entry2 *ent;
-+	int rc;
-+	u32 eax, ebx, x;
-+
-+	/* Setting unmodified CPUID is allowed */
-+	rc = __vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	TEST_ASSERT(!rc, "Setting unmodified CPUID after KVM_RUN failed: %d", rc);
-+
-+	/* Changing CPU features is forbidden */
-+	ent = get_cpuid(cpuid, 0x7, 0);
-+	ebx = ent->ebx;
-+	ent->ebx--;
-+	rc = __vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	TEST_ASSERT(rc, "Changing CPU features should fail");
-+	ent->ebx = ebx;
-+
-+	/* Changing MAXPHYADDR is forbidden */
-+	ent = get_cpuid(cpuid, 0x80000008, 0);
-+	eax = ent->eax;
-+	x = eax & 0xff;
-+	ent->eax = (eax & ~0xffu) | (x - 1);
-+	rc = __vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	TEST_ASSERT(rc, "Changing MAXPHYADDR should fail");
-+	ent->eax = eax;
-+}
-+
- int main(void)
- {
- 	struct kvm_cpuid2 *supp_cpuid, *cpuid2;
-@@ -175,5 +203,7 @@ int main(void)
- 	for (stage = 0; stage < 3; stage++)
- 		run_vcpu(vm, VCPU_ID, stage);
- 
-+	set_cpuid_after_run(vm, cpuid2);
-+
- 	kvm_vm_free(vm);
- }
+Paolo,
+
+would it be possible to pick this up for 5.17? Technically, this is a
+"fix", even if the bug itself is not in KVM)
+
 -- 
-2.34.1
+Vitaly
 
