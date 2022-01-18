@@ -2,156 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69242492273
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:19:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CBCC492281
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:19:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345551AbiARJS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 04:18:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41388 "EHLO
+        id S1345590AbiARJTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 04:19:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345541AbiARJSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 04:18:55 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F30C061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 01:18:55 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n9kdD-0006Nd-T3; Tue, 18 Jan 2022 10:18:23 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n9kdA-00Ayd5-Tc; Tue, 18 Jan 2022 10:18:20 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1n9kd9-0003a7-SE; Tue, 18 Jan 2022 10:18:19 +0100
-Date:   Tue, 18 Jan 2022 10:18:19 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>, kvm@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, Lee Jones <lee.jones@linaro.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>, linux-gpio@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        openipmi-developer@lists.sourceforge.net,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Richard Weinberger <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Hans de Goede <hdegoede@redhat.com>, netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
- (summary)
-Message-ID: <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de>
- <YeQpWu2sUVOSaT9I@kroah.com>
+        with ESMTP id S240567AbiARJTr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 04:19:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E562FC061574;
+        Tue, 18 Jan 2022 01:19:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9F9FAB81247;
+        Tue, 18 Jan 2022 09:19:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A077BC340E4;
+        Tue, 18 Jan 2022 09:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1642497584;
+        bh=/Rdu/D+fiOf/x38JO5sE42aJ+q6RYz1CwV95zFg8HXY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Uo3DnIwN47etRtaC+bcn9hIw8UTdKtcUC7pPoSr1AYPgOE24HWstDbZrjzH+8ILZA
+         W4N/cT120Vt4dChmnKKj2ockfrwn+tCW9CvFK3LgE/AbYXAOtdOETJ7+CJ5udZPxe4
+         YBZUW8zi8wQUNZRExVsYl37iHhYkVr4T+C7VR32Q=
+Date:   Tue, 18 Jan 2022 10:19:40 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Wei Wang <wei.w.wang@intel.com>, stable@vger.kernel.org
+Subject: Re: [PATCH stable] KVM: x86: remove PMU FIXED_CTR3 from
+ msrs_to_save_all
+Message-ID: <YeaGLM2U74OEPq7Z@kroah.com>
+References: <20220118091107.1007603-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="4nmi7jsy4ulpuolr"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YeQpWu2sUVOSaT9I@kroah.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+In-Reply-To: <20220118091107.1007603-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jan 18, 2022 at 04:11:07AM -0500, Paolo Bonzini wrote:
+> From: Wei Wang <wei.w.wang@intel.com>
+> 
+> [ upstream commit 9fb12fe5b93b94b9e607509ba461e17f4cc6a264 ]
+> 
+> The fixed counter 3 is used for the Topdown metrics, which hasn't been
+> enabled for KVM guests. Userspace accessing to it will fail as it's not
+> included in get_fixed_pmc(). This breaks KVM selftests on ICX+ machines,
+> which have this counter.
+> 
+> To reproduce it on ICX+ machines, ./state_test reports:
+> ==== Test Assertion Failure ====
+> lib/x86_64/processor.c:1078: r == nmsrs
+> pid=4564 tid=4564 - Argument list too long
+> 1  0x000000000040b1b9: vcpu_save_state at processor.c:1077
+> 2  0x0000000000402478: main at state_test.c:209 (discriminator 6)
+> 3  0x00007fbe21ed5f92: ?? ??:0
+> 4  0x000000000040264d: _start at ??:?
+>  Unexpected result from KVM_GET_MSRS, r: 17 (failed MSR was 0x30c)
+> 
+> With this patch, it works well.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> Message-Id: <20211217124934.32893-1-wei.w.wang@intel.com>
+> Fixes: e2ada66ec418 ("kvm: x86: Add Intel PMU MSRs to msrs_to_save[]")
+> Cc: stable@vger.kernel.org # 5.4.x
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9a2972fdae82..d490b83d640c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1331,7 +1331,7 @@ static const u32 msrs_to_save_all[] = {
+>  	MSR_IA32_UMWAIT_CONTROL,
+>  
+>  	MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
+> -	MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
+> +	MSR_ARCH_PERFMON_FIXED_CTR0 + 2,
+>  	MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
+>  	MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+>  	MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
+> -- 
+> 2.31.1
+> 
 
---4nmi7jsy4ulpuolr
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Now queued up, thanks.
 
-On Sun, Jan 16, 2022 at 03:19:06PM +0100, Greg Kroah-Hartman wrote:
-> On Sat, Jan 15, 2022 at 07:36:43PM +0100, Uwe Kleine-K=F6nig wrote:
-> > A possible compromise: We can have both. We rename
-> > platform_get_irq_optional() to platform_get_irq_silent() (or
-> > platform_get_irq_silently() if this is preferred) and once all users are
-> > are changed (which can be done mechanically), we reintroduce a
-> > platform_get_irq_optional() with Sergey's suggested semantic (i.e.
-> > return 0 on not-found, no error message printking).
->=20
-> Please do not do that as anyone trying to forward-port an old driver
-> will miss the abi change of functionality and get confused.  Make
-> build-breaking changes, if the way a function currently works is
-> changed in order to give people a chance.
-
-Fine for me. I assume this is a Nack for Sergey's patch?
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---4nmi7jsy4ulpuolr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHmhdgACgkQwfwUeK3K
-7AlOfwf/RajwcOGZOaXu4/Hu0uIDDH01Izth3e7+cbt0DvzofBxZhrwLi6+7R8Ii
-FDvio63jvvz41IZoKpB3Sp3cJe6N5nHxfoeVbVFx1oDC5ZSb3xpzIKBpz6usYWSK
-mpEzG1FLl/zHhNcFBvzOrkoJNhHOKKqTkCMQ9+SMFB2QpzY2GlhGyeloYsR5wRlS
-36dfdheA3MnzMe+YgqcykvdU78oW4Ajcnq+31xfkY4u4FtLXz44Pz4j32buAaqtw
-/Ryrr0NnSSAdwMkNMebBf3XX8emOhXd3w/ActLJA50YN3K1ePF1ViBaNwB6wIGGA
-DmnwP6lCav2JoRm3yOWVlcLDeltVJA==
-=IrhS
------END PGP SIGNATURE-----
-
---4nmi7jsy4ulpuolr--
+greg k-h
