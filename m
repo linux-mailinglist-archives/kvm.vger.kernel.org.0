@@ -2,108 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BA0C492C5D
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:30:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67EB2492C5F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:30:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244071AbiARR3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 12:29:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347377AbiARR3k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 12:29:40 -0500
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2A6C061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 09:29:39 -0800 (PST)
-Received: by mail-ot1-x32e.google.com with SMTP id m8-20020a9d4c88000000b00592bae7944bso22026760otf.1
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 09:29:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EmjNg9lNxh54HZ72qxgQELVSPnW1LTx7hlMB9FXaGSU=;
-        b=T1DHldf9aXpA2NB/vIe/tUGYfP8s7lMazNYGYEgvlJJZ1lGAyEltryFVs4wPKrv9DD
-         Z2uUMcfImr1rw9UQPCLoo52JvXV1Sz4Ee6e/kq8FWgGgA2mKSR9bTXPpp7tsmOOFAz0n
-         ud9OesyF86Rtpvq1MhvvDhezMMpgprbsg2ltFq2EGpCZ2czatyb2aYvFGMWqI/DWeSMj
-         l0MePvRq0+jmXAbxQDcXtJbbame/e1528txoydl4dJr9KW2LJpGnG9x9H4O7pLqxYkSn
-         pzTzTWCCmwh6x+rlsNIpLb6gEacDlz72+mC5D4egBGyMzES9RZDnzsyM8jvnZmI6GqrB
-         S0wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EmjNg9lNxh54HZ72qxgQELVSPnW1LTx7hlMB9FXaGSU=;
-        b=fwo0cU8KiEdqXNIrw1vsL4zJnEnSZij5vjYy09c1YJnFwtzhHTyQcUDXfbbitpY0ra
-         Shd45uWa6kk7oTGP9gEaeNUJd8M7PFCYYqbaTCOaR8gGMNOvueUSykiBm7J3SNxQCGAY
-         R5te07t0vbqYydnk7uMvXGTTT6jDKS4xUpbDR86kiVZdPxtHVg90mnbjL9mIkvaJ7UfO
-         6WgYHvD8H/cBj5kDImvtpzr4YasBFsVH8M7XHau3lf9D18wJ5a7CL25ym6l5JOFtliOs
-         slqeBh/4sigGhHxEftuln1VfPXeJ7b5T5O4U2ANYT7eqMS9BHDBJMMhW9FqDZxVH96fI
-         Q+gw==
-X-Gm-Message-State: AOAM533OxCLeoWC0dkwhuW+ax7o6+PpeX9HblOZIAkGwrWdzoU8tvjHj
-        IxFfr9gkHV8Fb9OoEnQQH6GN0pKl3/x5ngiP4IfLSA==
-X-Google-Smtp-Source: ABdhPJwJHm9wHLgBGSZ7FmlGNvcLqlh2j6gUYpZat/k4e9UljHEhGTJYZBfk1it+aXdUYgPNZUM9Xc6m/A5tF66yHFk=
-X-Received: by 2002:a05:6830:1bea:: with SMTP id k10mr11942905otb.29.1642526978945;
- Tue, 18 Jan 2022 09:29:38 -0800 (PST)
+        id S1347314AbiARRaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 12:30:09 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:43150 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1347244AbiARRaI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 12:30:08 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1n9sIu-0000RU-G7; Tue, 18 Jan 2022 18:29:56 +0100
+Message-ID: <28a005b7-9ae3-fe0d-b003-9aedba27dc85@maciej.szmigiero.name>
+Date:   Tue, 18 Jan 2022 18:29:50 +0100
 MIME-Version: 1.0
-References: <20211116204053.220523-1-zxwang42@gmail.com> <7ecac5d3-a132-73cd-e5b9-8f35cf946d4b@redhat.com>
-In-Reply-To: <7ecac5d3-a132-73cd-e5b9-8f35cf946d4b@redhat.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Tue, 18 Jan 2022 09:29:27 -0800
-Message-ID: <CAA03e5E9qBrs3GXZnkxR71-hi0GyvhQMkvbCgqRk8aZ_b=euuA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 00/10] x86_64 UEFI set up process
- refactor and scripts fixes
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Zixuan Wang <zxwang42@gmail.com>, kvm list <kvm@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Content-Language: en-US
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Nikunj A Dadhania <nikunj@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20220118110621.62462-1-nikunj@amd.com>
+ <20220118110621.62462-7-nikunj@amd.com>
+ <010ef70c-31a2-2831-a2a7-950db14baf23@maciej.szmigiero.name>
+Subject: Re: [RFC PATCH 6/6] KVM: SVM: Pin SEV pages in MMU during
+ sev_launch_update_data()
+In-Reply-To: <010ef70c-31a2-2831-a2a7-950db14baf23@maciej.szmigiero.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 8:51 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/16/21 21:40, Zixuan Wang wrote:
-> > Hello,
-> >
-> > This patch series refactors the x86_64 UEFI set up process, fixes the
-> > `run-tests.sh` script to run under UEFI, and improves the boot speed
-> > under UEFI. The patches are organized as four parts.
-> >
-> > The first part (patches 1-3) refactors the x86_64 UEFI set up process.
-> > The previous UEFI setup calls arch-specific setup functions twice and
-> > generates arch-specific data structure. As Andrew suggested [1], we
-> > refactor this process to make only one call to the arch-specific
-> > function and generate arch-neutral data structures. This simplifies the
-> > set up process and makes it easier to develop UEFI support for other
-> > architectures.
-> >
-> > The second part (patch 4) converts several x86 test cases to
-> > position-independent code (PIC) to run under UEFI. This patch is ported
-> > from the initial UEFI support patchset [2] with fixes to the 32-bit
-> > compilation.
-> >
-> > The third part (patches 5-8) fixes the UEFI runner scripts. Patch 5
-> > sets UEFI OVMF image as read-only. Patch 6 fixes test cases' return
-> > code under UEFI, enabling Patch 7-8 to fix the `run-tests.sh` script
-> > under UEFI.
-> >
-> > The fourth part (patches 9-10) improves the boot speed under UEFI.
-> > Patch 9 renames the EFI executables to EFI/BOOT/BOOTX64.EFI. UEFI OVMF
-> > recognizes this file by default and skips the 5-second user input
-> > waiting. Patch 10 makes `run-tests.sh` work with this new EFI
-> > executable filename.
-> >
-> > This patchset is based on the `uefi` branch.
->
-> Hi, I have now merged this series and the uefi branch into master.
->
-> Paolo
->
+On 18.01.2022 16:00, Maciej S. Szmigiero wrote:
+> Hi Nikunj,
+> 
+> On 18.01.2022 12:06, Nikunj A Dadhania wrote:
+>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>>
+>> Pin the memory for the data being passed to launch_update_data()
+>> because it gets encrypted before the guest is first run and must
+>> not be moved which would corrupt it.
+>>
+>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> [ * Changed hva_to_gva() to take an extra argument and return gpa_t.
+>>    * Updated sev_pin_memory_in_mmu() error handling.
+>>    * As pinning/unpining pages is handled within MMU, removed
+>>      {get,put}_user(). ]
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> ---
+>>   arch/x86/kvm/svm/sev.c | 122 ++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 119 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 14aeccfc500b..1ae714e83a3c 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -22,6 +22,7 @@
+>>   #include <asm/trapnr.h>
+>>   #include <asm/fpu/xcr.h>
+>> +#include "mmu.h"
+>>   #include "x86.h"
+>>   #include "svm.h"
+>>   #include "svm_ops.h"
+>> @@ -490,6 +491,110 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+>>       return pages;
+>>   }
+>> +#define SEV_PFERR_RO (PFERR_USER_MASK)
+>> +#define SEV_PFERR_RW (PFERR_WRITE_MASK | PFERR_USER_MASK)
+>> +
+>> +static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm,
+>> +                          unsigned long hva)
+>> +{
+>> +    struct kvm_memslots *slots = kvm_memslots(kvm);
+>> +    struct kvm_memory_slot *memslot;
+>> +    int bkt;
+>> +
+>> +    kvm_for_each_memslot(memslot, bkt, slots) {
+>> +        if (hva >= memslot->userspace_addr &&
+>> +            hva < memslot->userspace_addr +
+>> +            (memslot->npages << PAGE_SHIFT))
+>> +            return memslot;
+>> +    }
+>> +
+>> +    return NULL;
+>> +}
+> 
+> We have kvm_for_each_memslot_in_hva_range() now, please don't do a linear
+> search through memslots.
+> You might need to move the aforementioned macro from kvm_main.c to some
+> header file, though.
 
-Excellent! The change to the last patch looks good to me by the way.
+Besides performance considerations I can't see the code here taking into
+account the fact that a hva can map to multiple memslots (they an overlap
+in the host address space).
+
+Thanks,
+Maciej
