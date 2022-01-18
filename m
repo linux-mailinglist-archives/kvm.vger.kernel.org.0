@@ -2,255 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DE53492D8B
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 19:40:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8E11492DB1
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 19:47:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348010AbiARSj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 13:39:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58336 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233142AbiARSj6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 13:39:58 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20IIRJng021149;
-        Tue, 18 Jan 2022 18:39:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Rs2al6LS+eqYTKg9jzmsQkX16EoAs2C/zzCF8/DEQTc=;
- b=PNUrTXfEHVgvSVNDENuyDnnUVyw0Z2GcNGyC8Vzm/RNQhDFYupcvzDaU+8+t3mO0/kkg
- UiwwS66CAAvPMVTLjSEkyrh16RSBSrFvsfstdMD9/My368nITtlDr0pSOBuxJAb7fKKA
- G1egqZOjoOpnN/2AALF59w1PKWPFV3boT1CpXE4focGLkBfCrSqqAQWMrJziVeyfDwWf
- LEnHjo5v2XrVV2AqHnk9sYOJLJ9WJumD398D/5oT9VE0pXBN25pLBYwz1pBBmQnGp+Fz
- moaWE5lVIybNtQCrdy9mHHx700W3IyQa9KzFA8uwSRMJ1xLCjM6Ws4+TmkELoMteKXtw /Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dp2uh0esn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 18:39:57 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20IIRatJ022028;
-        Tue, 18 Jan 2022 18:39:57 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dp2uh0esb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 18:39:57 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20IIbBcK032228;
-        Tue, 18 Jan 2022 18:39:56 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma03dal.us.ibm.com with ESMTP id 3dknwc57yn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 18:39:56 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20IIdsJ722479156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 18:39:54 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C64466E04E;
-        Tue, 18 Jan 2022 18:39:54 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B50A96E053;
-        Tue, 18 Jan 2022 18:39:52 +0000 (GMT)
-Received: from [9.163.19.30] (unknown [9.163.19.30])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 18:39:52 +0000 (GMT)
-Message-ID: <03cc0e2b-13df-02b3-f6d6-0bef3e9e64a7@linux.ibm.com>
-Date:   Tue, 18 Jan 2022 13:39:52 -0500
+        id S1348293AbiARSrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 13:47:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348291AbiARSq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 13:46:59 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A22C061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:46:59 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id s61-20020a17090a69c300b001b4d0427ea2so3199330pjj.4
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:46:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fXS78uXhSmoWSsnTWRvk1W8ZphXSF/CI260GoCdAENk=;
+        b=HmGEkDklhQg9E1ifJuIEVWwrc1FnQ/8CJjSyCKK2t86Nt2WsGeTnAod7hpsHxBwUvO
+         1yVJkrfZW9by+xqFvC1ye4HlCI8oTCa4i8Cu+VmLjgZqL6JnItnIdhxQJ2iD/D0gwGPO
+         7X87FK2F6WQXBE8XgQIDUPhtxnYD0kvlHoT3CCRbQWYY1hp1FTM6SdxXmvbt3EnhVVCx
+         Qr43hAQJCw325wtIsVPjDhwDisG/slT62o3yy38Vl9nQqM+o2Q7e72Iy3x1x4VNXk7SA
+         /kem6mehPf0GGpXQIyiUyts8/S+BLvatqcxdALYs/4ht94/o9Wkx03drNEGd7pUTxzZk
+         fXTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fXS78uXhSmoWSsnTWRvk1W8ZphXSF/CI260GoCdAENk=;
+        b=ri3V3LI+PaSgPXZWZBNbgx6zjdABurTdt0WimBJtXefXR3VvGJP7108cwYt3SU7Kyo
+         8l0XjaMEjc2ZuhYEnbHAVCEapbRra15adKC5MMOl6wNfd+TfDD6ppJL3GEc+blEDdvcD
+         soISAmexchCAoOLOLyApM+jOChFPg4aWqEoUjNaJz7PtI+7ZqcOQaPOTpStM7O1UMqTl
+         tTKPoKX34nksbLmJZUKdmp7rg+PCHeA+/blZeey7V2A6Dw8GSaaNfXe83D2rEiwweppb
+         CauCSexf9o7zocN/eRYMtFzfsdPch7fPPJxy8JvZUtuIxmNwB/9pEprVyqWNZUkm5g80
+         2oLw==
+X-Gm-Message-State: AOAM5336Te8H54iFz8+EQt+UrQuE7BEHQvf6zkd/0/zlExZSRAFMy5gY
+        nG/0wwvGbYMZl4YnMv9X7qP8pA==
+X-Google-Smtp-Source: ABdhPJxd3mlOV3j1TmuQMKoytdYRgqF8o8Wr/BBHzYd0SQ7KgtQ4XIkNVDytApX388JXnq1+NbGnBg==
+X-Received: by 2002:a17:902:9893:b0:14a:c958:2c19 with SMTP id s19-20020a170902989300b0014ac9582c19mr7338202plp.39.1642531618770;
+        Tue, 18 Jan 2022 10:46:58 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id h1sm18014816pfi.109.2022.01.18.10.46.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jan 2022 10:46:58 -0800 (PST)
+Date:   Tue, 18 Jan 2022 18:46:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Liam Merwick <liam.merwick@oracle.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Subject: Re: Query about calling kvm_vcpu_gfn_to_memslot() with a GVA (Re:
+ [PATCH 1/2] KVM: SVM: avoid infinite loop on NPF from bad address
+Message-ID: <YecLHrLwtdtnjpsW@google.com>
+References: <20200417163843.71624-2-pbonzini@redhat.com>
+ <74de09d4-6c3a-77e1-5051-c122de712f9b@oracle.com>
+ <YeBZ+QcXUIQ7/fD2@google.com>
+ <fcf4c5c8-aa13-11bf-ec6d-1775b3bd9cd2@oracle.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v2 14/30] KVM: s390: pci: add basic kvm_zdev structure
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-15-mjrosato@linux.ibm.com>
- <adc3ce02-050d-356e-e911-81723f17ee00@linux.ibm.com>
- <4d181623-24b5-980d-d78f-36472a622538@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <4d181623-24b5-980d-d78f-36472a622538@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TyePBEiAxcduLqWnRXuB6a9eLGJSHsY_
-X-Proofpoint-GUID: zwZzuN1M4ydZqKlcEAOT471U40VAQKRa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-18_05,2022-01-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
- spamscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201180112
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcf4c5c8-aa13-11bf-ec6d-1775b3bd9cd2@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/18/22 12:32 PM, Pierre Morel wrote:
+On Mon, Jan 17, 2022, Liam Merwick wrote:
+> On 13/01/2022 16:57, Sean Christopherson wrote:
+> > On Thu, Jan 13, 2022, Liam Merwick wrote:
+> > > When looking into an SEV issue it was noted that the second arg to
+> > > kvm_vcpu_gfn_to_memslot() is a gfn_t but kvm_rip_read() will return guest
+> > > RIP which is a guest virtual address and memslots hold guest physical
+> > > addresses. How is KVM supposed to translate it to a memslot
+> > > and indicate if the guest RIP is valid?
+> > 
+> > Ugh, magic?  That code is complete garbage.  It worked to fix the selftest issue
+> > because the selftest identity maps the relevant guest code.
+> > 
+> > The entire idea is a hack.  If KVM gets into an infinite loop because the guest
+> > is attempting to fetch from MMIO, then the #NPF/#PF should have the FETCH bit set
+> > in the error code.  I.e. I believe the below change should fix the original issue,
+> > at which point we can revert the above.  I'll test today and hopefully get a patch
+> > sent out.
 > 
+> Thanks Sean.
 > 
-> On 1/17/22 17:25, Pierre Morel wrote:
->>
->>
->> On 1/14/22 21:31, Matthew Rosato wrote:
->>> This structure will be used to carry kvm passthrough information 
->>> related to
->>> zPCI devices.
->>>
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> ---
->>>   arch/s390/include/asm/kvm_pci.h | 29 +++++++++++++++++++++
->>>   arch/s390/include/asm/pci.h     |  3 +++
->>>   arch/s390/kvm/Makefile          |  2 +-
->>>   arch/s390/kvm/pci.c             | 46 +++++++++++++++++++++++++++++++++
->>>   4 files changed, 79 insertions(+), 1 deletion(-)
->>>   create mode 100644 arch/s390/include/asm/kvm_pci.h
->>>   create mode 100644 arch/s390/kvm/pci.c
->>>
->>> diff --git a/arch/s390/include/asm/kvm_pci.h 
->>> b/arch/s390/include/asm/kvm_pci.h
->>> new file mode 100644
->>> index 000000000000..aafee2976929
->>> --- /dev/null
->>> +++ b/arch/s390/include/asm/kvm_pci.h
->>> @@ -0,0 +1,29 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +/*
->>> + * KVM PCI Passthrough for virtual machines on s390
->>> + *
->>> + * Copyright IBM Corp. 2021
->>> + *
->>> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
->>> + */
->>> +
->>> +
->>
->> One blank line too much.
->>
->> Otherwise, look good to me.
->>
->> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
->>
->>> +#ifndef ASM_KVM_PCI_H
->>> +#define ASM_KVM_PCI_H
->>> +
->>> +#include <linux/types.h>
->>> +#include <linux/kvm_types.h>
->>> +#include <linux/kvm_host.h>
->>> +#include <linux/kvm.h>
->>> +#include <linux/pci.h>
->>> +
->>> +struct kvm_zdev {
->>> +    struct zpci_dev *zdev;
->>> +    struct kvm *kvm;
->>> +};
->>> +
->>> +int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
->>> +void kvm_s390_pci_dev_release(struct zpci_dev *zdev);
->>> +void kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm);
->>> +
->>> +#endif /* ASM_KVM_PCI_H */
->>> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
->>> index f3cd2da8128c..9b6c657d8d31 100644
->>> --- a/arch/s390/include/asm/pci.h
->>> +++ b/arch/s390/include/asm/pci.h
->>> @@ -97,6 +97,7 @@ struct zpci_bar_struct {
->>>   };
->>>   struct s390_domain;
->>> +struct kvm_zdev;
->>>   #define ZPCI_FUNCTIONS_PER_BUS 256
->>>   struct zpci_bus {
->>> @@ -190,6 +191,8 @@ struct zpci_dev {
->>>       struct dentry    *debugfs_dev;
->>>       struct s390_domain *s390_domain; /* s390 IOMMU domain data */
->>> +
->>> +    struct kvm_zdev *kzdev; /* passthrough data */
->>>   };
->>>   static inline bool zdev_enabled(struct zpci_dev *zdev)
->>> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
->>> index b3aaadc60ead..a26f4fe7b680 100644
->>> --- a/arch/s390/kvm/Makefile
->>> +++ b/arch/s390/kvm/Makefile
->>> @@ -11,5 +11,5 @@ ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
->>>   kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o 
->>> priv.o sigp.o
->>>   kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
->>> -
->>> +kvm-$(CONFIG_PCI) += pci.o
+> I have been running with this patch along with reverting commit
+> e72436bc3a52 ("KVM: SVM: avoid infinite loop on NPF from bad address")
+> with over 150 hours runtime on multiple machines and it resolves an SEV
+> guest crash I was encountering where if there were no decode assist bytes
+> available, it then continued on and hit the invalid RIP check.
 
-As discussed in other threads, I will look at changing this to
-kvm-$(CONFIG_VFIO_PCI_ZDEV) += pci.o
-Along with other IS_ENABLE(CONFIG_PCI) -> 
-IS_ENABLED(CONFIG_VFIO_PCI_ZDDEV) changes
+Nice!  Thanks for the update.  The below patch doesn't fully remedy KVM's woes,
+and it's not the best place to handle PFERR_FETCH_MASK for other reasons, so what
+I'll officially post (hopefully soon) will be different, but the basic gist will
+be the same.
 
->>>   obj-$(CONFIG_KVM) += kvm.o
->>> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
->>> new file mode 100644
->>> index 000000000000..1c33bc7bf2bd
->>> --- /dev/null
->>> +++ b/arch/s390/kvm/pci.c
->>> @@ -0,0 +1,46 @@
->>> +// SPDX-License-Identifier: GPL-2.0
->>> +/*
->>> + * s390 kvm PCI passthrough support
->>> + *
->>> + * Copyright IBM Corp. 2021
->>> + *
->>> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
->>> + */
->>> +
->>> +#include <linux/kvm_host.h>
->>> +#include <linux/pci.h>
->>> +#include <asm/kvm_pci.h>
->>> +
->>> +int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
->>> +{
->>> +    struct kvm_zdev *kzdev;
->>> +
->>> +    kzdev = kzalloc(sizeof(struct kvm_zdev), GFP_KERNEL);
->>> +    if (!kzdev)
->>> +        return -ENOMEM;
->>> +
->>> +    kzdev->zdev = zdev;
->>> +    zdev->kzdev = kzdev;
->>> +
->>> +    return 0;
->>> +}
->>> +EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_open);
->>> +
->>> +void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
->>> +{
->>> +    struct kvm_zdev *kzdev;
->>> +
->>> +    kzdev = zdev->kzdev;
->>> +    WARN_ON(kzdev->zdev != zdev);
->>> +    zdev->kzdev = 0;
->>> +    kfree(kzdev);
->>> +}
->>> +EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_release);
->>> +
->>> +void kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm)
->>> +{
->>> +    struct kvm_zdev *kzdev = zdev->kzdev;
->>> +
->>> +    kzdev->kvm = kvm;
->>> +}
->>> +EXPORT_SYMBOL_GPL(kvm_s390_pci_attach_kvm);
->>>
->>
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> Tested-by: Liam Merwick <liam.merwick@oracle.com>
 > 
-> Working now on patch 24, I am not sure that this function is necessary.
-> the only purpose seems to set kzdev->kvm = kvm while we already know 
-> kzdev in the caller.
+> > 
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index c3d9006478a4..e1d2a46e06bf 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -1995,6 +1995,17 @@ static void svm_set_dr7(struct kvm_vcpu *vcpu, unsigned long value)
+> >          vmcb_mark_dirty(svm->vmcb, VMCB_DR);
+> >   }
+> > 
+> > +static char *svm_get_pf_insn_bytes(struct vcpu_svm *svm)
+> > +{
+> > +       if (!static_cpu_has(X86_FEATURE_DECODEASSISTS))
+> > +               return NULL;
+> > +
+> > +       if (svm->vmcb->control.exit_info_1 & PFERR_FETCH_MASK)
+> > +               return NULL;
+> > +
+> > +       return svm->vmcb->control.insn_bytes;
+> > +}
+> > +
+> >   static int pf_interception(struct kvm_vcpu *vcpu)
+> >   {
+> >          struct vcpu_svm *svm = to_svm(vcpu);
+> > @@ -2003,9 +2014,8 @@ static int pf_interception(struct kvm_vcpu *vcpu)
+> >          u64 error_code = svm->vmcb->control.exit_info_1;
+> > 
+> >          return kvm_handle_page_fault(vcpu, error_code, fault_address,
+> > -                       static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+> > -                       svm->vmcb->control.insn_bytes : NULL,
+> > -                       svm->vmcb->control.insn_len);
+> > +                                    svm_get_pf_insn_bytes(svm),
+> > +                                    svm->vmcb->control.insn_len);
+> >   }
+> > 
+> >   static int npf_interception(struct kvm_vcpu *vcpu)
+> > @@ -2017,9 +2027,8 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+> > 
+> >          trace_kvm_page_fault(fault_address, error_code);
+> >          return kvm_mmu_page_fault(vcpu, fault_address, error_code,
+> > -                       static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+> > -                       svm->vmcb->control.insn_bytes : NULL,
+> > -                       svm->vmcb->control.insn_len);
+> > +                                 svm_get_pf_insn_bytes(svm),
+> > +                                 svm->vmcb->control.insn_len);
+> >   }
+> > 
+> >   static int db_interception(struct kvm_vcpu *vcpu)
 > 
-
-Yep, as mentioned in the patch 24 thread I will drop this function and 
-set kzdev->kvm = kvm directly in patch 24.
-
