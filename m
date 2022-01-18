@@ -2,142 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BD30492972
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 16:12:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C37794929CA
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 16:43:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344317AbiARPMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 10:12:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38150 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233331AbiARPMn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 10:12:43 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20IExPcf006029;
-        Tue, 18 Jan 2022 15:12:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Bje9CMfcuP7HbnfuChGhxkVv3srCh/t1cZHjbHU4SMM=;
- b=i9i3YA7zLR2/y+l9atKsvSPCdNRsFyFMc4aMMrCLENKvEEgwJY8StcrOB5YQ6HSNePgb
- mYq1eYC+2mjKcax6FZ+JwoM8bWkuYkQbKDGsSV8jWHcR0dVVxfJ4rpj3dcGuG5qwjubK
- hRwJPrLxsgA5TapAwy+kFu8knJmxVNrFw+Cy8fBRCaXKguocROE81ZPz4ZGCJ+wmTsNQ
- /5CIc4yQ1t8jIF1wu+Vq2/g8oN/dwaoUlXV7WbLEYjTJQ21c4BmmsebxJUPoWGCUg//o
- SCRrYadXAHYz9KYTFIk4SXKTWVR3lgkDqWfKD9Ye4xSnu+6Ychos+p0RA0NrnctoOGMS FA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dnvpmpxqg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 15:12:42 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20IExt1w008614;
-        Tue, 18 Jan 2022 15:12:41 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dnvpmpxps-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 15:12:41 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20IF7Z9q022507;
-        Tue, 18 Jan 2022 15:12:40 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3dknw9cdpy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 15:12:39 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20IFCY1h42533156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 15:12:34 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 40E94AE058;
-        Tue, 18 Jan 2022 15:12:34 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64CAAAE056;
-        Tue, 18 Jan 2022 15:12:32 +0000 (GMT)
-Received: from [9.171.19.84] (unknown [9.171.19.84])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 15:12:32 +0000 (GMT)
-Message-ID: <721c824f-c61d-6859-e583-acc7809a0ec5@linux.ibm.com>
-Date:   Tue, 18 Jan 2022 16:12:32 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [RFC PATCH v1 09/10] KVM: s390: Add capability for storage key
- extension of MEM_OP IOCTL
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
+        id S1345934AbiARPni (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 10:43:38 -0500
+Received: from foss.arm.com ([217.140.110.172]:59762 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236135AbiARPnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 10:43:37 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D2DA1FB;
+        Tue, 18 Jan 2022 07:43:37 -0800 (PST)
+Received: from C02TD0UTHF1T.local (unknown [10.57.37.52])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BA3A3F766;
+        Tue, 18 Jan 2022 07:43:30 -0800 (PST)
+Date:   Tue, 18 Jan 2022 15:43:28 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     Sven Schnelle <svens@linux.ibm.com>,
         Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220118095210.1651483-1-scgl@linux.ibm.com>
- <20220118095210.1651483-10-scgl@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220118095210.1651483-10-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C6Uv9_TICVhYqYcbVNxzayipcf1_ihrL
-X-Proofpoint-GUID: sOTj2FKG5Tp6avS4u-1qclGyAzojxU0n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-18_04,2022-01-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- phishscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201180093
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
+        alexandru.elisei@arm.com, anup.patel@wdc.com,
+        aou@eecs.berkeley.edu, atish.patra@wdc.com,
+        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
+        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
+        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, james.morse@arm.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        maz@kernel.org, mingo@redhat.com, mpe@ellerman.id.au,
+        nsaenzju@redhat.com, palmer@dabbelt.com, paulmck@kernel.org,
+        paulus@samba.org, paul.walmsley@sifive.com, seanjc@google.com,
+        suzuki.poulose@arm.com, tglx@linutronix.de,
+        tsbogend@alpha.franken.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, will@kernel.org
+Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
+Message-ID: <20220118154328.GD17938@C02TD0UTHF1T.local>
+References: <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
+ <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
+ <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
+ <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
+ <YeGUnwhbSvwJz5pD@FVFF77S0Q05N>
+ <8aa0cada-7f00-47b3-41e4-8a9e7beaae47@redhat.com>
+ <20220118120154.GA17938@C02TD0UTHF1T.local>
+ <6b6b8a2b-202c-8966-b3f7-5ce35cf40a7e@linux.ibm.com>
+ <20220118131223.GC17938@C02TD0UTHF1T.local>
+ <77e8d214-372b-3f0e-7b4e-5c2d23a4199c@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77e8d214-372b-3f0e-7b4e-5c2d23a4199c@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 18.01.22 um 10:52 schrieb Janis Schoetterl-Glausch:
-> Availability of the KVM_CAP_S390_MEM_OP_SKEY capability signals that:
-> * The vcpu MEM_OP IOCTL supports storage key checking.
-> * The vm MEM_OP IOCTL exists.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
-> Maybe this should be redesigned. As is, the capability mixes
-> support of storage keys for the vcpu ioctl with the availability
-> of the vm ioctl (which always supports storage keys).
-> 
-> We could have two capabilities, one to indicate the availability
-> of the vm memop and another used to derive the available functionality.
-> Janosch suggested that the second capability indicates the availability
-> of a "query" memop operation.
+On Tue, Jan 18, 2022 at 03:15:51PM +0100, Christian Borntraeger wrote:
+> Am 18.01.22 um 14:12 schrieb Mark Rutland:
+> > On Tue, Jan 18, 2022 at 01:42:26PM +0100, Christian Borntraeger wrote:
+> > > 
+> > > 
+> > > Am 18.01.22 um 13:02 schrieb Mark Rutland:
+> > > > On Mon, Jan 17, 2022 at 06:45:36PM +0100, Paolo Bonzini wrote:
+> > > > > On 1/14/22 16:19, Mark Rutland wrote:
+> > > > > > I also think there is another issue here. When an IRQ is taken from SIE, will
+> > > > > > user_mode(regs) always be false, or could it be true if the guest userspace is
+> > > > > > running? If it can be true I think tha context tracking checks can complain,
+> > > > > > and it*might*  be possible to trigger a panic().
+> > > > > 
+> > > > > I think that it would be false, because the guest PSW is in the SIE block
+> > > > > and switched on SIE entry and exit, but I might be incorrect.
+> > > > 
+> > > > Ah; that's the crux of my confusion: I had thought the guest PSW would
+> > > > be placed in the regular lowcore *_old_psw slots. From looking at the
+> > > > entry asm it looks like the host PSW (around the invocation of SIE) is
+> > > > stored there, since that's what the OUTSIDE + SIEEXIT handling is
+> > > > checking for.
+> > > > 
+> > > > Assuming that's correct, I agree this problem doesn't exist, and there's
+> > > > only the common RCU/tracing/lockdep management to fix.
+> > > 
+> > > Will you provide an s390 patch in your next iteration or shall we then do
+> > > one as soon as there is a v2? We also need to look into vsie.c where we
+> > > also call sie64a
+> > 
+> > I'm having a go at that now; my plan is to try to have an s390 patch as
+> > part of v2 in the next day or so.
+> > 
+> > Now that I have a rough idea of how SIE and exception handling works on
+> > s390, I think the structural changes to kvm-s390.c:__vcpu_run() and
+> > vsie.c:do_vsie_run() are fairly simple.
+> > 
+> > The only open bit is exactly how/where to identify when the interrupt
+> > entry code needs to wake RCU. I can add a per-cpu variable or thread
+> > flag to indicate that we're inside that EQS, or or I could move the irq
+> > enable/disable into the sie64a asm and identify that as with the OUTSIDE
+> > macro in the entry asm.
+> What exactly would the low-level interrupt handler need to do?
 
-I think one capability covering both changes is totally fine as long as we document
-that in api.rst.
+Having looked around a bit, I think the best bet is to have
+irqentry_enter() check PF_VCPU in addition to PF_IDLE (which it checks
+via is_idle_task()), at which point nothing needs to change in the s390
+entry code.
 
-> 
->   arch/s390/kvm/kvm-s390.c | 1 +
->   include/uapi/linux/kvm.h | 1 +
->   2 files changed, 2 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index ab07389fb4d9..3c6517ad43a3 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -565,6 +565,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_VCPU_RESETS:
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_S390_DIAG318:
-> +	case KVM_CAP_S390_MEM_OP_SKEY:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dd04170287fd..1bb38efd1156 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1134,6 +1134,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
->   #define KVM_CAP_ARM_MTE 205
->   #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> +#define KVM_CAP_S390_MEM_OP_SKEY 209
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
+I'm currently implementing that, let me have a go, and then we can see
+if that looks ok or whether we should do something else.
+
+> CC Sven, Heiko for the entry.S changes.
+
+I'll make sure you're all Cc'd when I send out vs with s390 patches.
+
+Thanks,
+Mark.
