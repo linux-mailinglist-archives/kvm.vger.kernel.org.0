@@ -2,116 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C37794929CA
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 16:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D443D4929D6
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 16:46:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345934AbiARPni (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 10:43:38 -0500
-Received: from foss.arm.com ([217.140.110.172]:59762 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236135AbiARPnh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 10:43:37 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D2DA1FB;
-        Tue, 18 Jan 2022 07:43:37 -0800 (PST)
-Received: from C02TD0UTHF1T.local (unknown [10.57.37.52])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BA3A3F766;
-        Tue, 18 Jan 2022 07:43:30 -0800 (PST)
-Date:   Tue, 18 Jan 2022 15:43:28 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     Sven Schnelle <svens@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
-        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
-        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
-        gor@linux.ibm.com, imbrenda@linux.ibm.com, james.morse@arm.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        maz@kernel.org, mingo@redhat.com, mpe@ellerman.id.au,
-        nsaenzju@redhat.com, palmer@dabbelt.com, paulmck@kernel.org,
-        paulus@samba.org, paul.walmsley@sifive.com, seanjc@google.com,
-        suzuki.poulose@arm.com, tglx@linutronix.de,
-        tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
-Message-ID: <20220118154328.GD17938@C02TD0UTHF1T.local>
-References: <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
- <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
- <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
- <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
- <YeGUnwhbSvwJz5pD@FVFF77S0Q05N>
- <8aa0cada-7f00-47b3-41e4-8a9e7beaae47@redhat.com>
- <20220118120154.GA17938@C02TD0UTHF1T.local>
- <6b6b8a2b-202c-8966-b3f7-5ce35cf40a7e@linux.ibm.com>
- <20220118131223.GC17938@C02TD0UTHF1T.local>
- <77e8d214-372b-3f0e-7b4e-5c2d23a4199c@linux.ibm.com>
+        id S1345998AbiARPqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 10:46:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345950AbiARPqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 10:46:14 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C937EC061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 07:46:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=rBYDtx+yhdQCukEhQ6wlaxPBRfixnikoYw7y1W9myjE=; b=l4NGkUF39DsBamx0uJYsnKdZA5
+        CNVr74NCCopmw/rmLfSOPHW2qdCrCIwZUlBkDBZZHaedmhx8A+elaNpOHo8atdoZNRaTiHnr0kWyA
+        7yrb2j4l1aUexB9Y/TCpMXz74siG+Svtgk19Yx/tFc9D+ZwKHBpwEjWeChYEC6BDRnMg10f8C5LCX
+        GhcVOFSxsSGdHZ3NTq1Y8HS1Kf0p4SsVrcbIvoinpCd/M96ZbcdEbEQNEKcDkqV5rMo/Fkz1e7JX4
+        8PwpkcLsnNToqzrcMH1dWaQjx7gl51R5dhbN2dW76smQ9utuR0abdVpdIg8gfy8hyhIe/ACmeBOzA
+        52izWP4A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56758)
+        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1n9qgM-0003vV-RC; Tue, 18 Jan 2022 15:46:02 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1n9qgF-0004PY-Lq; Tue, 18 Jan 2022 15:45:55 +0000
+Date:   Tue, 18 Jan 2022 15:45:55 +0000
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 11/69] KVM: arm64: nv: Add nested virt VCPU primitives
+ for vEL2 VCPU state
+Message-ID: <Yebgs/vsczGLfLqP@shell.armlinux.org.uk>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-12-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <77e8d214-372b-3f0e-7b4e-5c2d23a4199c@linux.ibm.com>
+In-Reply-To: <20211129200150.351436-12-maz@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 03:15:51PM +0100, Christian Borntraeger wrote:
-> Am 18.01.22 um 14:12 schrieb Mark Rutland:
-> > On Tue, Jan 18, 2022 at 01:42:26PM +0100, Christian Borntraeger wrote:
-> > > 
-> > > 
-> > > Am 18.01.22 um 13:02 schrieb Mark Rutland:
-> > > > On Mon, Jan 17, 2022 at 06:45:36PM +0100, Paolo Bonzini wrote:
-> > > > > On 1/14/22 16:19, Mark Rutland wrote:
-> > > > > > I also think there is another issue here. When an IRQ is taken from SIE, will
-> > > > > > user_mode(regs) always be false, or could it be true if the guest userspace is
-> > > > > > running? If it can be true I think tha context tracking checks can complain,
-> > > > > > and it*might*  be possible to trigger a panic().
-> > > > > 
-> > > > > I think that it would be false, because the guest PSW is in the SIE block
-> > > > > and switched on SIE entry and exit, but I might be incorrect.
-> > > > 
-> > > > Ah; that's the crux of my confusion: I had thought the guest PSW would
-> > > > be placed in the regular lowcore *_old_psw slots. From looking at the
-> > > > entry asm it looks like the host PSW (around the invocation of SIE) is
-> > > > stored there, since that's what the OUTSIDE + SIEEXIT handling is
-> > > > checking for.
-> > > > 
-> > > > Assuming that's correct, I agree this problem doesn't exist, and there's
-> > > > only the common RCU/tracing/lockdep management to fix.
-> > > 
-> > > Will you provide an s390 patch in your next iteration or shall we then do
-> > > one as soon as there is a v2? We also need to look into vsie.c where we
-> > > also call sie64a
-> > 
-> > I'm having a go at that now; my plan is to try to have an s390 patch as
-> > part of v2 in the next day or so.
-> > 
-> > Now that I have a rough idea of how SIE and exception handling works on
-> > s390, I think the structural changes to kvm-s390.c:__vcpu_run() and
-> > vsie.c:do_vsie_run() are fairly simple.
-> > 
-> > The only open bit is exactly how/where to identify when the interrupt
-> > entry code needs to wake RCU. I can add a per-cpu variable or thread
-> > flag to indicate that we're inside that EQS, or or I could move the irq
-> > enable/disable into the sie64a asm and identify that as with the OUTSIDE
-> > macro in the entry asm.
-> What exactly would the low-level interrupt handler need to do?
+On Mon, Nov 29, 2021 at 08:00:52PM +0000, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> When running a nested hypervisor we commonly have to figure out if
+> the VCPU mode is running in the context of a guest hypervisor or guest
+> guest, or just a normal guest.
+> 
+> Add convenient primitives for this.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Having looked around a bit, I think the best bet is to have
-irqentry_enter() check PF_VCPU in addition to PF_IDLE (which it checks
-via is_idle_task()), at which point nothing needs to change in the s390
-entry code.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I'm currently implementing that, let me have a go, and then we can see
-if that looks ok or whether we should do something else.
-
-> CC Sven, Heiko for the entry.S changes.
-
-I'll make sure you're all Cc'd when I send out vs with s390 patches.
-
-Thanks,
-Mark.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
