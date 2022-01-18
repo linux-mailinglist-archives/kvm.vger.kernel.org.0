@@ -2,191 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78B78492439
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 12:04:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 321F649243E
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 12:06:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238419AbiARLEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 06:04:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33500 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231758AbiARLEN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 06:04:13 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20IARPUf013977;
-        Tue, 18 Jan 2022 11:04:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=OjDVnGmEocH6YDQ2+l1VP/U/gCFVo2WBnHZ1QWnFcG8=;
- b=mEVb31kZw7FglXbHkznxWtpeNLwmt2STryfrwA7TBYFeMMm16KSRkJFOxo79A+XxLcXc
- X5/yoEspJq3nv5K9PzBkxda0wbAEbC88IJVwRZESgehQagXyxZCq5S4RfU1XBUOLGv4b
- GfsYPuyR1+iBiIkHRC44emqn9aTiQY12dBRr16dkaqeC2JFI34cX80rMV6GaRc/24lKI
- dr4py44E1FOBtBEvM/fAL2MLQ9TtTdU9Pzbs63s0JX5Lf3Te/i+rKS/nOStlBZvXtlif
- pOq5DkXFcAVf2WDRyZrHmRTBOURbDtGQBx4uVzy5kNhmA2tUpYYDPv8yxGDqj5gNTVnd JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnutjrnwt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 11:04:13 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20IASq1A021522;
-        Tue, 18 Jan 2022 11:04:12 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnutjrnvy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 11:04:12 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20IB4298021895;
-        Tue, 18 Jan 2022 11:04:10 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9k7r4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 11:04:10 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20IB43fe18547076
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 11:04:03 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CAA65AE053;
-        Tue, 18 Jan 2022 11:04:03 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D14DCAE04D;
-        Tue, 18 Jan 2022 11:04:02 +0000 (GMT)
-Received: from [9.171.70.230] (unknown [9.171.70.230])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 11:04:02 +0000 (GMT)
-Message-ID: <6eb0b596-c8b7-3529-55af-f3101821c74b@linux.ibm.com>
-Date:   Tue, 18 Jan 2022 12:05:46 +0100
+        id S238523AbiARLGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 06:06:53 -0500
+Received: from mail-dm6nam10on2089.outbound.protection.outlook.com ([40.107.93.89]:17036
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S238467AbiARLGw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 06:06:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i8ucB/q0xIRdNcq61b0okoSIDz4cC6qaYr3/GPun3hiJMDoAW5M+z1LsvBppObpr+I7N25/nj8LWptbKf9UevezosgFPZj9SBzazGdPwO8rCopanURArGFpTrdlSLeSMMCVW26MmQzzW1CpY0B/6E3nlWyHt7ILzNCjnpcRWvcmjURMXQbwJnkjNGXIWpu27YMrkuYRaqBON8RkPZYPtz5pbttHrDuWizdSDIABE4Z7uakVquWLjWn8pnsj67+4AL7zIGggsEoU14K63BqA7y+8zNg7eqClbwZKcQxeP9lyCl6YNeCl4YTbFB9UkR400biWQrcRGgWb4PMnkhC/B3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+cnsaWB5zBna2H46/nY9T+x59sv4GSJ27EDkRkj4UYg=;
+ b=SfAgFT+Orpnp0qZZ7f2GIhDawjQ01yn9ES8vkyWvBIzFSMz/yojhQ8RTCMlH2Pz83hQcn4L6REFCS1vJEPcv2BUTvAqAC4PDHHnTzMUQ1CaZTSYKE8qKh3mdVApti0NxOtCDilBJ6INkKgU2ERorkW5mzgFg1LW0O6Cme2ObiI7cVyJmCm09TmbO509Jiihfb6GArWlBgLmK1LdMKz8bi1qezcIZEnN05BvgxDjiYm8DWwrJ79r/Ei4nVnopvYfrvtI703ZcAjncYOKy1Rse4hk5gkxanJdtCXZBokKfgVFQSw8GBYGMVFkVNh8MmcJ/NTf3a00XmAD6mzIUoiJxbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+cnsaWB5zBna2H46/nY9T+x59sv4GSJ27EDkRkj4UYg=;
+ b=VDgrHdwIN2yshnszy7paaPQGEjq1YYgY0FNTiOy5RllA8MMKwVoIdW28uZRo0xX5S+F5ayRqNrUDuIYKx3yGlrrilw1YCOY6b2q3gC8mqcYHt27n/pfLsoCFDQtgADOwZhYx6XSifHvvxBFdlRPRS4wNK3yuHOZSg/mp6XYKPeI=
+Received: from CO1PR15CA0071.namprd15.prod.outlook.com (2603:10b6:101:20::15)
+ by CY4PR12MB1173.namprd12.prod.outlook.com (2603:10b6:903:41::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.11; Tue, 18 Jan
+ 2022 11:06:50 +0000
+Received: from CO1NAM11FT019.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:101:20:cafe::36) by CO1PR15CA0071.outlook.office365.com
+ (2603:10b6:101:20::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.11 via Frontend
+ Transport; Tue, 18 Jan 2022 11:06:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT019.mail.protection.outlook.com (10.13.175.57) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4888.9 via Frontend Transport; Tue, 18 Jan 2022 11:06:49 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Tue, 18 Jan
+ 2022 05:06:40 -0600
+From:   Nikunj A Dadhania <nikunj@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Peter Gonda <pgonda@google.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Nikunj A Dadhania <nikunj@amd.com>
+Subject: [RFC PATCH 0/6] KVM: SVM: Defer page pinning for SEV guests
+Date:   Tue, 18 Jan 2022 16:36:15 +0530
+Message-ID: <20220118110621.62462-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 22/30] KVM: s390: intercept the rpcit instruction
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-23-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220114203145.242984-23-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xJAv0UuB43DesG_btEXQitJ4Mlyb0gxl
-X-Proofpoint-ORIG-GUID: jk4H-WF8MInGKElj71OKEfNlelt_9gIH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-18_02,2022-01-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 phishscore=0 adultscore=0
- mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201180064
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f36799a7-a3d1-4ed2-95b7-08d9da72a05d
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1173:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1173A943A6AE225D5C831064E2589@CY4PR12MB1173.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Kz1hBfz1nQXTCHX1HX2uat6aqedcRZNokrqmWqaMX8nGjSvEUZ/OJW9AkuEx9YDEyJKMKW2NOG0RLvueM+JDJkxCqZLl5lWzpFL5exvNr2/jofhWg+/tuPaIVwenA+flFhXL06dF9jVDSrqL8j5UxDMLVppYZ2UTACNxylinKRb7EccqyWXR3k9kqMSnKfNWIxrmu37X9CaHACsZE1MsAfRXNzXG9KS5t1ueSxkDaWZGVUfDOOSc6vSQ8uOMKSmtUApvJCH5XTptEAiuYo2I38XnJV3qwY9eO51TNCQOY7k3jRSUofG/X0G0+Q87gDLSsGmyRoUfAKjoJfQSkz6bHhy69Qr89Ep3vle597GQp7yll1Xpmj4QGiAqe3eGRtxsjKrsIcNOtBtYvk/Ox4tNzuBoozbtCg9qe9YsSZlyBQRMWDEOR0qeTHJW/+89g1y52ssisNYl1+Yd2vPH75gW8u9Ta1N+6wbGM4UoGD/oG/6X7BLH/5IwGgkHnGf079MN8F38e1C/snfrmlnyIrdfFm7CuFkuDzWqAU65M7dQGuxnETDlkFBCZzrUN3plgx4BGglqYskHhH15+4nRUUXCehB8QXfiXB4uJmKjoAH1LvbKqIGhBQUOZqBB+8bjDsFW0GiAQAulLwPHhc3ZEek5AmNFBu1geZ0suQzllmlsNgvUrUsz/qaq33IScPP3w5oFgkIikMZ94CvopNHhTvfSBZgqwP1oVu0LDK1NYAWIFe8Mt9LoWi74IVgRB4zrbmOcMRHSA/+O7II70iRtCLWDp3idO9kcU+FBVOe6NKXkObu0Khb3CRu7pLkKTHehudes1pH9agKyafRs6Bzpa5cuGWU4aMDhKTGRKETarkOS064Krje+32Qy/cCVhvAuNMI3
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(40470700002)(36840700001)(46966006)(186003)(426003)(6916009)(966005)(356005)(47076005)(2906002)(70586007)(54906003)(81166007)(336012)(16526019)(8676002)(4326008)(82310400004)(6666004)(2616005)(83380400001)(36756003)(7696005)(40460700001)(316002)(26005)(8936002)(36860700001)(5660300002)(508600001)(1076003)(70206006)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:06:49.9688
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f36799a7-a3d1-4ed2-95b7-08d9da72a05d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT019.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1173
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+SEV guest requires the guest's pages to be pinned in host physical
+memory as migration of encrypted pages is not supported. The memory
+encryption scheme uses the physical address of the memory being
+encrypted. If guest pages are moved by the host, content decrypted in
+the guest would be incorrect thereby corrupting guest's memory.
 
+For SEV/SEV-ES guests, the hypervisor doesn't know which pages are
+encrypted and when the guest is done using those pages. Hypervisor
+should treat all the guest pages as encrypted until the guest is
+destroyed.
 
-On 1/14/22 21:31, Matthew Rosato wrote:
-> For faster handling of PCI translation refreshes, intercept in KVM
-> and call the associated handler.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   arch/s390/kvm/priv.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 46 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 417154b314a6..5b65c1830de2 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -29,6 +29,7 @@
->   #include <asm/ap.h>
->   #include "gaccess.h"
->   #include "kvm-s390.h"
-> +#include "pci.h"
->   #include "trace.h"
->   
->   static int handle_ri(struct kvm_vcpu *vcpu)
-> @@ -335,6 +336,49 @@ static int handle_rrbe(struct kvm_vcpu *vcpu)
->   	return 0;
->   }
->   
-> +static int handle_rpcit(struct kvm_vcpu *vcpu)
-> +{
-> +	int reg1, reg2;
-> +	u8 status;
-> +	int rc;
-> +
-> +	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
-> +		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
-> +
-> +	/* If the host doesn't support PCI, it must be an emulated device */
-> +	if (!IS_ENABLED(CONFIG_PCI))
-> +		return -EOPNOTSUPP;
+Actual pinning management is handled by vendor code via new
+kvm_x86_ops hooks. MMU calls in to vendor code to pin the page on
+demand. Metadata of the pinning is stored in architecture specific
+memslot area. During the memslot freeing path guest pages are
+unpinned.
 
-AFAIU this makes also sure that the following code is not compiled in 
-case PCI is not supported.
+Initially started with [1], where the idea was to store the pinning
+information using the software bit in the SPTE to track the pinned
+page. That is not feasible for the following reason:
 
-I am not very used to compilation options, is it true with all our 
-compilers and options?
-Or do we have to specify a compiler version?
+The pinned SPTE information gets stored in the shadow pages(SP). The
+way current MMU is designed, the full MMU context gets dropped
+multiple number of times even when CR0.WP bit gets flipped. Due to
+dropping of the MMU context (aka roots), there is a huge amount of SP
+alloc/remove churn. Pinned information stored in the SP gets lost
+during the dropping of the root and subsequent SP at the child levels.
+Without this information making decisions about re-pinnning page or
+unpinning during the guest shutdown will not be possible
 
-Another concern is, shouldn't we use IS_ENABLED(CONFIG_VFIO_PCI) ?
+[1] https://patchwork.kernel.org/project/kvm/cover/20200731212323.21746-1-sean.j.christopherson@intel.com/ 
 
+Nikunj A Dadhania (4):
+  KVM: x86/mmu: Add hook to pin PFNs on demand in MMU
+  KVM: SVM: Add pinning metadata in the arch memslot
+  KVM: SVM: Implement demand page pinning
+  KVM: SEV: Carve out routine for allocation of pages
 
+Sean Christopherson (2):
+  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by SEV/TDX
+  KVM: SVM: Pin SEV pages in MMU during sev_launch_update_data()
 
-> +
-> +	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
-> +
-> +	/* If the device has a SHM bit on, let userspace take care of this */
-> +	if (((vcpu->run->s.regs.gprs[reg1] >> 32) & aift->mdd) != 0)
-> +		return -EOPNOTSUPP;
-> +
-> +	rc = kvm_s390_pci_refresh_trans(vcpu, vcpu->run->s.regs.gprs[reg1],
-> +					vcpu->run->s.regs.gprs[reg2],
-> +					vcpu->run->s.regs.gprs[reg2+1],
-> +					&status);
-> +
-> +	switch (rc) {
-> +	case 0:
-> +		kvm_s390_set_psw_cc(vcpu, 0);
-> +		break;
-> +	case -EOPNOTSUPP:
-> +		return -EOPNOTSUPP;
-> +	default:
-> +		vcpu->run->s.regs.gprs[reg1] &= 0xffffffff00ffffffUL;
-> +		vcpu->run->s.regs.gprs[reg1] |= (u64) status << 24;
-> +		if (status != 0)
-> +			kvm_s390_set_psw_cc(vcpu, 1);
-> +		else
-> +			kvm_s390_set_psw_cc(vcpu, 3);
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   #define SSKE_NQ 0x8
->   #define SSKE_MR 0x4
->   #define SSKE_MC 0x2
-> @@ -1275,6 +1319,8 @@ int kvm_s390_handle_b9(struct kvm_vcpu *vcpu)
->   		return handle_essa(vcpu);
->   	case 0xaf:
->   		return handle_pfmf(vcpu);
-> +	case 0xd3:
-> +		return handle_rpcit(vcpu);
->   	default:
->   		return -EOPNOTSUPP;
->   	}
-> 
+ arch/x86/include/asm/kvm-x86-ops.h |   3 +
+ arch/x86/include/asm/kvm_host.h    |   9 +
+ arch/x86/kvm/mmu.h                 |   3 +
+ arch/x86/kvm/mmu/mmu.c             |  41 +++
+ arch/x86/kvm/mmu/tdp_mmu.c         |   7 +
+ arch/x86/kvm/svm/sev.c             | 423 +++++++++++++++++++----------
+ arch/x86/kvm/svm/svm.c             |   4 +
+ arch/x86/kvm/svm/svm.h             |   9 +-
+ arch/x86/kvm/x86.c                 |  11 +-
+ 9 files changed, 359 insertions(+), 151 deletions(-)
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.32.0
+
