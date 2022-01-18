@@ -2,151 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09602492CA4
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:45:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C6CC492CA9
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:51:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347536AbiARRps (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 12:45:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231299AbiARRpr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 12:45:47 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31BDC061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 09:45:46 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id bu18so50792459lfb.5
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 09:45:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O0Ib0frfoMxDIRercCSX6k9OgI0AaBuKyo1VFKlOsto=;
-        b=rqLYx3gw/w39B+13Cv8fWZHBqXcs+1bzLBic/BOwJ4M+kyhMOf2WNdDPMIF60d/GOA
-         qzMU93VyKMuC9rlfdDHtqhahEsDNCYbOpT7lTXzx8B2oilCsjpO+MpvMzYBtUWUX3Obx
-         4wx4P7duV8KdmCDBnNix8QjIAWOvLfjWGX7JH/6UfDDv5q4whbxzsa0uJpqsivc/Qd8r
-         oZMDJi6ovG0rXeunuX1qUwDqUvn/gNcUiFt06+pg3npw8/fBgbVbtEtj2thnRwCZMUEE
-         kgyg8R6DRK6bEOajImi885KEeM/Thils6ft114WKCZWBe3qUTYkXtQ5BOOGgLJQYtxtT
-         UZZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O0Ib0frfoMxDIRercCSX6k9OgI0AaBuKyo1VFKlOsto=;
-        b=jghpWC8Uu5zeV2E+bpWsZrU/5plA+rFocJkqBRKMOSplQeiMlu31MCm/WBu3duugfm
-         JUMWqTKNMhiJh45GQeSMnv9PaCott0coMfhE2M7IUNl7QTBJPBSEWn8p+XiUA3//2Beo
-         qLtMzuy6BwKLSncqoBzIQ9TFaB8pwg8jS+olemtow8arIKUlH3jPrQj6vTtvJYRZUzK8
-         WNVtgwgXKdRmMRyWuDhQ2vN401Dp9IAZNpAz1uO4fHynLtPcTRruTMF5i02m6DdAPMvG
-         WRDT4/BJkHQmM0J8DxNB26NbgS3ltdkNstLn85d6ff3vLktiFyBLhkuKsowKHqJHwYjl
-         rJww==
-X-Gm-Message-State: AOAM530BJz292WwXFo4oOsbaF/sdFizxLTVMg9rwnaDV85OkjziOzDhD
-        qaoNMpH9fXWElRMB2rYlg6w2SehmSKPCX0TdiaMFRA==
-X-Google-Smtp-Source: ABdhPJxb51BsQK4IUQPTDFxumGR1EosVMMppY0Xr548MJfyF4kP8olGjOztEu8Rz9+ST0RdWkyQXxw7IZMUUeTSczpA=
-X-Received: by 2002:a05:651c:1304:: with SMTP id u4mr12967662lja.49.1642527945002;
- Tue, 18 Jan 2022 09:45:45 -0800 (PST)
+        id S1347541AbiARRvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 12:51:05 -0500
+Received: from foss.arm.com ([217.140.110.172]:34458 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229934AbiARRvE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 12:51:04 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34280D6E;
+        Tue, 18 Jan 2022 09:51:04 -0800 (PST)
+Received: from C02TD0UTHF1T.local (unknown [10.57.37.52])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4186C3F774;
+        Tue, 18 Jan 2022 09:50:55 -0800 (PST)
+Date:   Tue, 18 Jan 2022 17:50:51 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Sven Schnelle <svens@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
+        alexandru.elisei@arm.com, anup.patel@wdc.com,
+        aou@eecs.berkeley.edu, atish.patra@wdc.com,
+        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
+        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
+        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
+        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
+        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
+        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
+        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
+        seanjc@google.com, suzuki.poulose@arm.com, tglx@linutronix.de,
+        tsbogend@alpha.franken.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, will@kernel.org
+Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
+Message-ID: <20220118175051.GE17938@C02TD0UTHF1T.local>
+References: <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
+ <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
+ <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
+ <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
+ <YeGUnwhbSvwJz5pD@FVFF77S0Q05N>
+ <8aa0cada-7f00-47b3-41e4-8a9e7beaae47@redhat.com>
+ <20220118120154.GA17938@C02TD0UTHF1T.local>
+ <6b6b8a2b-202c-8966-b3f7-5ce35cf40a7e@linux.ibm.com>
+ <20220118131223.GC17938@C02TD0UTHF1T.local>
+ <yt9dfsplc9fu.fsf@linux.ibm.com>
 MIME-Version: 1.0
-References: <20220113233020.3986005-1-dmatlack@google.com> <20220113233020.3986005-4-dmatlack@google.com>
- <YeH5QlwgGcpStZyp@google.com>
-In-Reply-To: <YeH5QlwgGcpStZyp@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 18 Jan 2022 09:45:18 -0800
-Message-ID: <CALzav=firKgTUMF87t8Qv0pnooUVj5T5EbcOo2TZ8Zv5D_-tLw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] KVM: x86/mmu: Document and enforce MMU-writable
- and Host-writable invariants
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yt9dfsplc9fu.fsf@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 2:29 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jan 13, 2022, David Matlack wrote:
-> > +/*
-> > + * *_SPTE_HOST_WRITEABLE (aka Host-writable) indicates whether the host permits
-> > + * writes to the guest page mapped by the SPTE. This bit is cleared on SPTEs
-> > + * that map guest pages in read-only memslots and read-only VMAs.
-> > + *
-> > + * Invariants:
-> > + *  - If Host-writable is clear, PT_WRITABLE_MASK must be clear.
-> > + *
-> > + *
-> > + * *_SPTE_MMU_WRITEABLE (aka MMU-writable) indicates whether the shadow MMU
-> > + * allows writes to the guest page mapped by the SPTE. This bit is cleared when
-> > + * the guest page mapped by the SPTE contains a page table that is being
-> > + * monitored for shadow paging. In this case the SPTE can only be made writable
-> > + * by unsyncing the shadow page under the mmu_lock.
-> > + *
-> > + * Invariants:
-> > + *  - If MMU-writable is clear, PT_WRITABLE_MASK must be clear.
-> > + *  - If MMU-writable is set, Host-writable must be set.
-> > + *
-> > + * If MMU-writable is set, PT_WRITABLE_MASK is normally set but can be cleared
-> > + * to track writes for dirty logging. For such SPTEs, KVM will locklessly set
-> > + * PT_WRITABLE_MASK upon the next write from the guest and record the write in
-> > + * the dirty log (see fast_page_fault()).
-> > + */
-> > +
-> > +/* Bits 9 and 10 are ignored by all non-EPT PTEs. */
-> > +#define DEFAULT_SPTE_HOST_WRITEABLE  BIT_ULL(9)
-> > +#define DEFAULT_SPTE_MMU_WRITEABLE   BIT_ULL(10)
->
-> Ha, so there's a massive comment above is_writable_pte() that covers a lot of
-> the same material.  More below.
->
-> > +
-> >  /*
-> >   * Low ignored bits are at a premium for EPT, use high ignored bits, taking care
-> >   * to not overlap the A/D type mask or the saved access bits of access-tracked
-> > @@ -316,8 +341,13 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
+On Tue, Jan 18, 2022 at 05:09:25PM +0100, Sven Schnelle wrote:
+> Hi Mark,
+
+Hi Sven,
+
+> Mark Rutland <mark.rutland@arm.com> writes:
+> > On Tue, Jan 18, 2022 at 01:42:26PM +0100, Christian Borntraeger wrote:
+> >> Will you provide an s390 patch in your next iteration or shall we then do
+> >> one as soon as there is a v2? We also need to look into vsie.c where we
+> >> also call sie64a
 > >
-> >  static inline bool spte_can_locklessly_be_made_writable(u64 spte)
-> >  {
-> > -     return (spte & shadow_host_writable_mask) &&
-> > -            (spte & shadow_mmu_writable_mask);
-> > +     if (spte & shadow_mmu_writable_mask) {
-> > +             WARN_ON_ONCE(!(spte & shadow_host_writable_mask));
-> > +             return true;
-> > +     }
-> > +
-> > +     WARN_ON_ONCE(spte & PT_WRITABLE_MASK);
->
-> I don't like having the WARNs here.  This is a moderately hot path, there are a
-> decent number of call sites, and the WARNs won't actually help detect the offender,
-> i.e. whoever wrote the bad SPTE long since got away.
+> > I'm having a go at that now; my plan is to try to have an s390 patch as
+> > part of v2 in the next day or so.
+> >
+> > Now that I have a rough idea of how SIE and exception handling works on
+> > s390, I think the structural changes to kvm-s390.c:__vcpu_run() and
+> > vsie.c:do_vsie_run() are fairly simple.
+> >
+> > The only open bit is exactly how/where to identify when the interrupt
+> > entry code needs to wake RCU. I can add a per-cpu variable or thread
+> > flag to indicate that we're inside that EQS, or or I could move the irq
+> > enable/disable into the sie64a asm and identify that as with the OUTSIDE
+> > macro in the entry asm.
+> 
+> I wonder whether the code in irqentry_enter() should call a function
+> is_eqs() instead of is_idle_task(). The default implementation would
+> be just a
+> 
+> #ifndef is_eqs
+> #define is_eqs is_idle_task
+> #endif
+> 
+> and if an architecture has special requirements, it could just define
+> is_eqs() and do the required checks there. This way the architecture
+> could define whether it's a percpu bit, a cpu flag or something else.
 
-Re: hot path. The "return true" case (for fast_page_fault()) already
-had to do 2 bitwise-ANDs and compares, so this patch shouldn't make
-that any worse.
+I had come to almost the same approach: I've added an arch_in_rcu_eqs()
+which is checked in addition to the existing is_idle_thread() check.
 
-But that's a good point that it doesn't help with detecting the
-offender. I agree these WARNs should move to where SPTEs are set.
+In the case of checking is_idle_thread() and checking for PF_VCPU, I'm
+assuming the compiler can merge the loads of current->flags, and there's
+little gain by making this entirely architecture specific, but we can
+always check that and/or reconsider in future.
 
->
-> And for whatever reason, I had a hell of a time (correctly) reading the second WARN :-)
->
-> Lastly, there's also an "overlapping" WARN in mark_spte_for_access_track().
->
-> > +     return false;
->
-> To kill a few birds with fewer stones, what if we:
->
->   a. Move is_writable_pte() into spte.h, somewhat close to the HOST/MMU_WRITABLE
->      definitions.
->
->   b. Add a new helper, spte_check_writable_invariants(), to enforce that a SPTE
->      is WRITABLE iff it's MMU-Writable, and that a SPTE is MMU-Writable iff it's
->      HOST-Writable.
->
->   c. Drop the WARN in mark_spte_for_access_track().
->
->   d. Call spte_check_writable_invariants() when setting SPTEs.
->
->   e. Document everything in a comment above spte_check_writable_invariants().
-
-Sounds good. I'll send a follow-up series.
+Thanks,
+Mark.
