@@ -2,111 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA0CA49251F
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 12:44:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F44492524
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 12:45:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240970AbiARLoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 06:44:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58566 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240912AbiARLoQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 06:44:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642506255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8U3jGh8wUjHRYKJpJBPp8vZAQ/5jxuWNA7E7/BWluDg=;
-        b=WnEc6rPKrnXBmdh6mt26i/gnR50ucrNyfZjKWduhJOW7jSdVxeFumuWNoNCpgXOBf7sNKV
-        zZT5Be1GkGQ4qPRj7AgycEoJiIsMyUf7DYA8zQMsUDi9t0cqOpui1dp4DlfT3QLTfJiWf5
-        PeVW8G6c7c1zm0WR6Z6P1JY+H7QezSE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-499-m-H996r7OPufnuSDi16ZHA-1; Tue, 18 Jan 2022 06:44:14 -0500
-X-MC-Unique: m-H996r7OPufnuSDi16ZHA-1
-Received: by mail-wm1-f70.google.com with SMTP id r131-20020a1c4489000000b0034d5c66d8f5so875392wma.5
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 03:44:14 -0800 (PST)
+        id S240965AbiARLp2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 06:45:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234192AbiARLp1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 06:45:27 -0500
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79BD8C061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 03:45:27 -0800 (PST)
+Received: by mail-lf1-x141.google.com with SMTP id o15so69397410lfo.11
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 03:45:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=I1sSEl7MKenQr/9UZ1q6fl+zmivFRoZ6Iw3ttDOsvog=;
+        b=lKqzA5B6DSz03TFUrVQoGiWKdzvZF93+esVqp+z9UQmSqMNy5GHrn0tVmiKYmNcABg
+         e9LdlVBYF/356WNxSPoSqsSZLyvCgjC3SATit4+SKtDG1PYBymm4hWHDSDeEQIlzAU5P
+         fJjjl35oJBf9h9kESIwZhv3WGSFte7dYUZFWRdqm3xeMW0EEjoaSc8ugTc1sRuBm98ht
+         GgpgkFdQs5Q61d4lpN2SAlBqD6NiwIpDT6GUuyEp5yDm7qEkDOXrh9R15i9O49trXuGC
+         DnOhSYX3GKrNtuY6qKqeQX+rCduKz9Bnd4KghiLBOdQmJP/N72teunU1H2EOAYVQ0fFq
+         Ia7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8U3jGh8wUjHRYKJpJBPp8vZAQ/5jxuWNA7E7/BWluDg=;
-        b=gUnPb6+Fs5BsiWCidRibxVVuUzpbJINGbz8Ms7vdY4NX6/P9CtLWn49fn7YGxWI2M7
-         SQUy9WzE6T3QhNRZlHrup/DkGuoXpK9hXEFpYr1+g095u7fWx+luH2yriQxAeA/BDyaw
-         XRKO5WF5QWMsnENVNv1a9iaXX8FgJnErFjpk42Jh+4vIbHN3HixjE3IgYrkEWdO4MKp1
-         NVQfGJY3rdCPF2DhKP45g1V2aWxnc5/jVQyxmbIfEzSQ56w8LLuhiA//MEfzrae0P5w8
-         vJ1CwsAd8feHdnsB45HzfV3ZxkSOXcho33DtEmspJtP14girFbx7uCtFUdEny8D5Bzmt
-         sNww==
-X-Gm-Message-State: AOAM531T/k62s2mtJNtv6cfbmb02D02Tm1eBrIGjrcFvXrrMy5trW9Do
-        cm0oIkZ0QLoe1jGi9yCmApZUvt81+SqjWX3rQBTwxDDVm8koH8HjoBTx8NRjVhhPeDuJ2uC0yoh
-        Oh1/JurYQX3V9
-X-Received: by 2002:a1c:19c1:: with SMTP id 184mr31261633wmz.61.1642506252864;
-        Tue, 18 Jan 2022 03:44:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyD4snZ3GPjXyCXaZbanPrNUOhbLbnXgN4NvXzdfnk1YTr19HNCsUmm/J3AjYWPohJ93Xh+QA==
-X-Received: by 2002:a1c:19c1:: with SMTP id 184mr31261606wmz.61.1642506252638;
-        Tue, 18 Jan 2022 03:44:12 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id m20sm2390928wms.4.2022.01.18.03.44.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jan 2022 03:44:12 -0800 (PST)
-Message-ID: <073cdc28-6dbb-a2d1-ee1b-f3b53d5b7c81@redhat.com>
-Date:   Tue, 18 Jan 2022 12:44:10 +0100
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=I1sSEl7MKenQr/9UZ1q6fl+zmivFRoZ6Iw3ttDOsvog=;
+        b=UKtPMd7Dw3vnrS7nYGHlUc2+66LQr4Z9jR/7zgO2BOUbQwlGlexu/0KH85RIPE2S7O
+         0n09KWDlJo6PfZtmBGPHP1+Z2ool0PnXgDt2r5bns4JzIfAhuHY98nPFzDiCIKdnsfHG
+         w1RLr15lB+l2crS/OahXe4kAigl2SX1+r5u2RUBDAwtSrOsIKMdjmT9rdAdlB9HPqF+M
+         W+TnRAtn3f6qz7SP1CiscmShJMcVYRWH0CM9/edmY4S5oW3ltwhTloFwNnMjwrvPogP1
+         WhGhHUhcY5vWH3iFR3kojbgAGbyCLv3lW9iiayUIDKoiPwllCIY6FA2c/pzzndflwauD
+         UupA==
+X-Gm-Message-State: AOAM5328chjeQVlR1umqcHNiWSvuOwl1+JyDPmm2fKiZT7iJhryySs9v
+        ++CIlLifN2FlEgDj6nDFfZYgKV6ou/hIJw3fDAU=
+X-Google-Smtp-Source: ABdhPJw70XRgnXeQ9lKrAjwf5aFcjKuLBCVq/xZjufHTnG4+aJtqKFx3zNAV4wapTsvJGUTafNM+bJVyLbt8u0rOttg=
+X-Received: by 2002:a2e:154a:: with SMTP id 10mr21079474ljv.264.1642506325850;
+ Tue, 18 Jan 2022 03:45:25 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: avoid warning on s390 in mark_page_dirty
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        dwmw2@infradead.org
-Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
- <20220113122924.740496-1-borntraeger@linux.ibm.com>
- <eda019b1-8e1d-5d2b-4be4-2725e5814b23@linux.ibm.com>
- <14380a1b-669f-8f0f-139b-7c89fabd4276@redhat.com>
- <d39d9a13-e797-b7d3-6240-db3957b6ff53@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <d39d9a13-e797-b7d3-6240-db3957b6ff53@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a05:6512:3e19:0:0:0:0 with HTTP; Tue, 18 Jan 2022 03:45:25
+ -0800 (PST)
+Reply-To: kjude081@gmail.com
+From:   Jude Kane <dawonbaadama@gmail.com>
+Date:   Tue, 18 Jan 2022 11:45:25 +0000
+Message-ID: <CAK8ii0cXD9HQwY8=6fM6dgmcpfFVbznY2VBwQXwma1gDYV7qOA@mail.gmail.com>
+Subject: Dear .
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/18/22 09:53, Christian Borntraeger wrote:
->>>
->>> Paolo, are you going to pick this for next for the time being?
->>>
->>
->> Yep, done now.
->>
->> Paolo
-> 
-> Thanks. I just realized that Davids patch meanwhile landed in Linus 
-> tree. So better
-> take this via master and not next.
+Dear .
 
-Yeah, I understood what you meant. :)  In fact, "master" right now is 
-still on 5.16 (for patches that are destined to stable, but have 
-conflicts merge window changes; those are pushed to master and merged 
-from there into next).  There will be another pull request this week and 
-it will have this patch.
+Please I am a solicitor at law and personal attorney to your late relative, a
+national of your country. Who died here in the year 2018, with his
+wife and their
+only daughter. I have contacted you as the beneficiary/next of kin to his
+estate fund valued at Twenty Million Five Hundred Thousand United States
+Dollars ($20,500.000) However he deposited the fund before his death. Your
+immediate/urgent attention is highly needed and don't fail to call me now.
 
-> Maybe also add
-> Fixes: 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without 
-> an active vCPU")
-> in case the patch is picked for stable
+Call me for more information and directive. You are also advised to provide the
+listed information below.
 
-Ok, will do.
+First and last name:
+Address:
+City:
+Country:
+Phone number:
+Occupation:
+Age:
+Email:
 
-Paolo
+Contact me on this email: kjude081@gmail.com
 
+I look forward to hearing from you asap.
+
+With Kind Regards,
+
+Jude Kane ESQ
+74 Rue du Segbe
+Lome, Togo
+Telephone:. +22897508769
