@@ -2,168 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 828CB4922FB
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:41:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4732F492316
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:48:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232884AbiARJlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 04:41:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46664 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiARJlU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 04:41:20 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944ACC061574;
-        Tue, 18 Jan 2022 01:41:20 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id w26so26294503wmi.0;
-        Tue, 18 Jan 2022 01:41:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=iFgNmHuHt5y/j3H8Tutu8lSHsdboxVy4VCgXSl8Gp+c=;
-        b=e4Voc0fMOqW5qm9lcEfLiDnhnQlQ6ZFzbAF5cwxJ5mcDpg1XMC/Vyh+ISO1xjBLFHn
-         OZBmu2WBQ32xYA5gY6rZ5u/wY0gIMbMOaCXhmxdWEL/YktAbkUhPn0sBgNnD6WBfO4DZ
-         3lgS5FAKp1slZEpEdZdF1kvBqji5sCHgY1Z5VYVRUY5XCBAh4H+zmAMqkWOKBen3pCKS
-         2xp25/UlpA2npVVRg0Krh4ljjtJgh7O4WBzK2+ajjOeLfP6kc35kOL5O3XeLGrYVEt5e
-         +OOlNWim2KvAfRD1p+w92PjKRBI7tqlc3+o8+GuaLoT3fyKPHPFgTwxzDUtGyu1OKYTj
-         y4Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=iFgNmHuHt5y/j3H8Tutu8lSHsdboxVy4VCgXSl8Gp+c=;
-        b=atcAkC9mnci5kNM9gmNnlk0Ni14vVJUA31kP/Ch6m+S0ufatAy3YG8MxtKRIaaK3nH
-         XqeBbh10U++lqbYjsKHZ/bOR8YlWpd76edSLYgtgBdStRKDSPRDCCFeVe2j65AFJxxYU
-         lcyKNXWFf1bSskToyGeh5v+qlwb2SeLeqtYjoMcREPeImG6oqMn93cD0g6BJlqrjaymc
-         85bq8rgS8iZe9EhssBqkyq5LMMaQjC9P+18uecP7KSHqsTEcn4IWntO0r2ZnV/+WxTmP
-         z9lS+whu8quyYViFroKWctyKH1HxlcSPeQasFJICQQzAKizjG50643aF5OdfHStThHcH
-         HDig==
-X-Gm-Message-State: AOAM531nOHqpJVOXwkBnfOIYEmvRF+RkG9yo0LZvcbJw2zZHDNNZ6V9u
-        LYCJgftGRqdOuroyMcHFMbc=
-X-Google-Smtp-Source: ABdhPJxVIuos7uF9wvC6FVb9WmzGng58cHgSsM5JWVjupB9kHiycluSpCGN3CNa/ueTUPlfFqJJAKA==
-X-Received: by 2002:a1c:1f82:: with SMTP id f124mr888011wmf.157.1642498879254;
-        Tue, 18 Jan 2022 01:41:19 -0800 (PST)
-Received: from [192.168.1.40] (154.red-83-50-83.dynamicip.rima-tde.net. [83.50.83.154])
-        by smtp.gmail.com with ESMTPSA id v13sm18556810wro.90.2022.01.18.01.41.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jan 2022 01:41:18 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Message-ID: <0ea887e9-1fd4-1962-cbaa-92b648b28b53@amsat.org>
-Date:   Tue, 18 Jan 2022 10:41:16 +0100
+        id S233683AbiARJse (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 04:48:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53992 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232585AbiARJse (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 04:48:34 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20I6QqHq016393;
+        Tue, 18 Jan 2022 09:48:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=EdPwNuQrqAvTuWVT0ODa8mxO+y2WE/frrmMVg5Z8hIA=;
+ b=Z2PMnoz0cg90e4GtGlC9Ptm2XKQkQfh7+MH00WhAJ96Y863vK1FJnyNMa8HBb2UFUlA7
+ rInuz2IovZoF0VNJ+zX+pC7JDCCffyhVYZFFh6A5wkKuPsdy2DDERuZG4adhACrYLFsf
+ vw6vUquFWGvhwElSBAHIqfcRPExWL9vVyfVvG8ljJFCyR+nxAo6WTQpnOgoLp+v0aEbn
+ aULm34S1v1SwWkO+DICDxsEzR4HhXxmarYfuddWWmkVxZ1+iuWB91UIcGOkuKhVzJFWd
+ XX8JXPWW2LbVZUvPMOHxpT99MXTkZMJqmTPKPC31xmU11rGKi5OXMd4DoaU4znNrPFlS OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnr9sm7xt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 09:48:33 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20I9bM83014697;
+        Tue, 18 Jan 2022 09:48:33 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnr9sm7wt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 09:48:32 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20I9m4qS005709;
+        Tue, 18 Jan 2022 09:48:30 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3dknw99ej8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 09:48:30 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20I9mPfY28180822
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jan 2022 09:48:25 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CCFFDAE045;
+        Tue, 18 Jan 2022 09:48:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE9FDAE04D;
+        Tue, 18 Jan 2022 09:48:24 +0000 (GMT)
+Received: from [9.171.70.230] (unknown [9.171.70.230])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Jan 2022 09:48:24 +0000 (GMT)
+Message-ID: <8a1ca4cf-a51a-9d45-0ed4-b48f6d8fb4a2@linux.ibm.com>
+Date:   Tue, 18 Jan 2022 10:50:07 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [RFC PATCH 10/13] softmmu/physmem: Add private memory address
- space
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 06/30] s390/airq: allow for airq structure that uses an
+ input vector
 Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>, jun.nakajima@intel.com,
-        david@redhat.com, "J . Bruce Fields" <bfields@fieldses.org>,
-        dave.hansen@intel.com, "H . Peter Anvin" <hpa@zytor.com>,
-        ak@linux.intel.com, Jonathan Corbet <corbet@lwn.net>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>, susie.li@intel.com,
-        Jeff Layton <jlayton@kernel.org>, john.ji@intel.com,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20211111141352.26311-1-chao.p.peng@linux.intel.com>
- <20211111141352.26311-11-chao.p.peng@linux.intel.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-In-Reply-To: <20211111141352.26311-11-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-7-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-7-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qB1WlVRsqgjGOTP_b6IfGDHdJ_gKI3S7
+X-Proofpoint-ORIG-GUID: rCzn2GvFPO6DyN4L_G_K8di86xPVJirz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-18_02,2022-01-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ malwarescore=0 suspectscore=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 clxscore=1015
+ bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201180057
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On 11/11/21 15:13, Chao Peng wrote:
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  include/exec/address-spaces.h |  2 ++
->  softmmu/physmem.c             | 13 +++++++++++++
->  2 files changed, 15 insertions(+)
+
+On 1/14/22 21:31, Matthew Rosato wrote:
+> When doing device passthrough where interrupts are being forwarded
+> from host to guest, we wish to use a pinned section of guest memory
+> as the vector (the same memory used by the guest as the vector).
 > 
-> diff --git a/include/exec/address-spaces.h b/include/exec/address-spaces.h
-> index db8bfa9a92..b3f45001c0 100644
-> --- a/include/exec/address-spaces.h
-> +++ b/include/exec/address-spaces.h
-> @@ -27,6 +27,7 @@
->   * until a proper bus interface is available.
->   */
->  MemoryRegion *get_system_memory(void);
-> +MemoryRegion *get_system_private_memory(void);
->  
->  /* Get the root I/O port region.  This interface should only be used
->   * temporarily until a proper bus interface is available.
-> @@ -34,6 +35,7 @@ MemoryRegion *get_system_memory(void);
->  MemoryRegion *get_system_io(void);
->  
->  extern AddressSpace address_space_memory;
-> +extern AddressSpace address_space_private_memory;
->  extern AddressSpace address_space_io;
->  
->  #endif
-> diff --git a/softmmu/physmem.c b/softmmu/physmem.c
-> index f4d6eeaa17..a2d339fd88 100644
-> --- a/softmmu/physmem.c
-> +++ b/softmmu/physmem.c
-> @@ -85,10 +85,13 @@
->  RAMList ram_list = { .blocks = QLIST_HEAD_INITIALIZER(ram_list.blocks) };
->  
->  static MemoryRegion *system_memory;
-> +static MemoryRegion *system_private_memory;
->  static MemoryRegion *system_io;
->  
->  AddressSpace address_space_io;
->  AddressSpace address_space_memory;
-> +AddressSpace address_space_private_memory;
-> +
->  
->  static MemoryRegion io_mem_unassigned;
->  
-> @@ -2669,6 +2672,11 @@ static void memory_map_init(void)
->      memory_region_init(system_memory, NULL, "system", UINT64_MAX);
->      address_space_init(&address_space_memory, system_memory, "memory");
->  
-> +    system_private_memory = g_malloc(sizeof(*system_private_memory));
-> +
-> +    memory_region_init(system_private_memory, NULL, "system-private", UINT64_MAX);
-> +    address_space_init(&address_space_private_memory, system_private_memory, "private-memory");
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Since the description is quite scarce, I don't understand why we need to
-add this KVM specific "system-private" MR/AS to all machines on all
-architectures.
 
->      system_io = g_malloc(sizeof(*system_io));
->      memory_region_init_io(system_io, NULL, &unassigned_io_ops, NULL, "io",
->                            65536);
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 
-(We already want to get ride of the "io" MR/AS which is specific to
-x86 or machines).
 
-> @@ -2680,6 +2688,11 @@ MemoryRegion *get_system_memory(void)
->      return system_memory;
->  }
->  
-> +MemoryRegion *get_system_private_memory(void)
-> +{
-> +    return system_private_memory;
-> +}
-> +
->  MemoryRegion *get_system_io(void)
->  {
->      return system_io;
+> ---
+>   arch/s390/include/asm/airq.h     |  4 +++-
+>   arch/s390/pci/pci_irq.c          |  8 ++++----
+>   drivers/s390/cio/airq.c          | 10 +++++++---
+>   drivers/s390/virtio/virtio_ccw.c |  2 +-
+>   4 files changed, 15 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
+> index 7918a7d09028..e82e5626e139 100644
+> --- a/arch/s390/include/asm/airq.h
+> +++ b/arch/s390/include/asm/airq.h
+> @@ -47,8 +47,10 @@ struct airq_iv {
+>   #define AIRQ_IV_PTR		4	/* Allocate the ptr array */
+>   #define AIRQ_IV_DATA		8	/* Allocate the data array */
+>   #define AIRQ_IV_CACHELINE	16	/* Cacheline alignment for the vector */
+> +#define AIRQ_IV_GUESTVEC	32	/* Vector is a pinned guest page */
+>   
+> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags);
+> +struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags,
+> +			       unsigned long *vec);
+>   void airq_iv_release(struct airq_iv *iv);
+>   unsigned long airq_iv_alloc(struct airq_iv *iv, unsigned long num);
+>   void airq_iv_free(struct airq_iv *iv, unsigned long bit, unsigned long num);
+> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
+> index cc4c8d7c8f5c..0d0a02a9fbbf 100644
+> --- a/arch/s390/pci/pci_irq.c
+> +++ b/arch/s390/pci/pci_irq.c
+> @@ -296,7 +296,7 @@ int arch_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
+>   		zdev->aisb = bit;
+>   
+>   		/* Create adapter interrupt vector */
+> -		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA | AIRQ_IV_BITLOCK);
+> +		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA | AIRQ_IV_BITLOCK, NULL);
+>   		if (!zdev->aibv)
+>   			return -ENOMEM;
+>   
+> @@ -419,7 +419,7 @@ static int __init zpci_directed_irq_init(void)
+>   	union zpci_sic_iib iib = {{0}};
+>   	unsigned int cpu;
+>   
+> -	zpci_sbv = airq_iv_create(num_possible_cpus(), 0);
+> +	zpci_sbv = airq_iv_create(num_possible_cpus(), 0, NULL);
+>   	if (!zpci_sbv)
+>   		return -ENOMEM;
+>   
+> @@ -441,7 +441,7 @@ static int __init zpci_directed_irq_init(void)
+>   		zpci_ibv[cpu] = airq_iv_create(cache_line_size() * BITS_PER_BYTE,
+>   					       AIRQ_IV_DATA |
+>   					       AIRQ_IV_CACHELINE |
+> -					       (!cpu ? AIRQ_IV_ALLOC : 0));
+> +					       (!cpu ? AIRQ_IV_ALLOC : 0), NULL);
+>   		if (!zpci_ibv[cpu])
+>   			return -ENOMEM;
+>   	}
+> @@ -458,7 +458,7 @@ static int __init zpci_floating_irq_init(void)
+>   	if (!zpci_ibv)
+>   		return -ENOMEM;
+>   
+> -	zpci_sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC);
+> +	zpci_sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC, NULL);
+>   	if (!zpci_sbv)
+>   		goto out_free;
+>   
+> diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
+> index 2f2226786319..375a58b1c838 100644
+> --- a/drivers/s390/cio/airq.c
+> +++ b/drivers/s390/cio/airq.c
+> @@ -122,10 +122,12 @@ static inline unsigned long iv_size(unsigned long bits)
+>    * airq_iv_create - create an interrupt vector
+>    * @bits: number of bits in the interrupt vector
+>    * @flags: allocation flags
+> + * @vec: pointer to pinned guest memory if AIRQ_IV_GUESTVEC
+>    *
+>    * Returns a pointer to an interrupt vector structure
+>    */
+> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+> +struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags,
+> +			       unsigned long *vec)
+>   {
+>   	struct airq_iv *iv;
+>   	unsigned long size;
+> @@ -146,6 +148,8 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+>   					     &iv->vector_dma);
+>   		if (!iv->vector)
+>   			goto out_free;
+> +	} else if (flags & AIRQ_IV_GUESTVEC) {
+> +		iv->vector = vec;
+>   	} else {
+>   		iv->vector = cio_dma_zalloc(size);
+>   		if (!iv->vector)
+> @@ -185,7 +189,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+>   	kfree(iv->avail);
+>   	if (iv->flags & AIRQ_IV_CACHELINE && iv->vector)
+>   		dma_pool_free(airq_iv_cache, iv->vector, iv->vector_dma);
+> -	else
+> +	else if (!(iv->flags & AIRQ_IV_GUESTVEC))
+>   		cio_dma_free(iv->vector, size);
+>   	kfree(iv);
+>   out:
+> @@ -204,7 +208,7 @@ void airq_iv_release(struct airq_iv *iv)
+>   	kfree(iv->bitlock);
+>   	if (iv->flags & AIRQ_IV_CACHELINE)
+>   		dma_pool_free(airq_iv_cache, iv->vector, iv->vector_dma);
+> -	else
+> +	else if (!(iv->flags & AIRQ_IV_GUESTVEC))
+>   		cio_dma_free(iv->vector, iv_size(iv->bits));
+>   	kfree(iv->avail);
+>   	kfree(iv);
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 52c376d15978..410498d693f8 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -241,7 +241,7 @@ static struct airq_info *new_airq_info(int index)
+>   		return NULL;
+>   	rwlock_init(&info->lock);
+>   	info->aiv = airq_iv_create(VIRTIO_IV_BITS, AIRQ_IV_ALLOC | AIRQ_IV_PTR
+> -				   | AIRQ_IV_CACHELINE);
+> +				   | AIRQ_IV_CACHELINE, NULL);
+>   	if (!info->aiv) {
+>   		kfree(info);
+>   		return NULL;
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
