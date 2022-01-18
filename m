@@ -2,281 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3C2149244A
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 12:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D5949245B
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 12:11:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238959AbiARLHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 06:07:16 -0500
-Received: from mail-mw2nam08on2060.outbound.protection.outlook.com ([40.107.101.60]:15840
-        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        id S238193AbiARLLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 06:11:35 -0500
+Received: from mail-mw2nam10on2065.outbound.protection.outlook.com ([40.107.94.65]:6273
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238886AbiARLHM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 06:07:12 -0500
+        id S234061AbiARLLe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 06:11:34 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BJwBubjBSPFyxTwH6vppkGK8Q4zHVzyvd0+j7IF6MKQ4fhRQro93+8/pJuvZ3P5hqPIIRFGAfPIFn6xj3jdKcHWLW/0PfD/Um45m5ub7ByIU3mRoM/zL8ghb9syqSW/rV3/dnsW/YklZyDLnVX3YpGubP19JqHFT9YGM5ww5Vb1PaFherU9AgEctd5bjGaqnn5Q9ybWFllv5/phqEid5VTz3MzlDMEIegveKCAKSlhg7J33p/AwiebB/kx2L18mnjXI1Mg+Jb8t7n0TXLWag7mGB61/A2v4blwZtsqJ0+7eH1tJMcB8vBHJD+ATjZf/NWJBj8PPwe1pJvEbQTzdnRg==
+ b=HGUJZ/L70Q+qRTh3lAmXBh1I/N0U0D9SFWC3t3M8jHV2L1fbCNV7FeXUclMs4PMlMsQh1p6s9l0mUVzoiIBbGxL6p0Z5HwcDPn/I+yw0dXHjTSLgJIiz3DD5FUrhJMS3AsD+g1swsP4vH6uKP5aEXtxsdrvLxBMNFyEYUjAVAp72RExd0dgJrScdJIwQ0uzCxX79SQaI7B18I/Xm56mmsa3tfacpmaWugjkCela/Enauk3FY+hAtt5kJV+7oknTgycWJBfedBFbiNNGi7TYvaWRPorAy3r9GKFwrx8ZImID2FJ0+dPGa3KRgbCGifTsdG/8lmAsgOl6EQq85WJG9Eg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yGs/NxoPmwMYt2qms90KlE15xs/G5gfvCH3JjBjSFzY=;
- b=K01YcWMTXvEOmp+Qmd/BEiof/oo1z7+6tmTR4BMbcTDza0Fyz/3OnO7KsbXy2Me0Y7KuNQJxezrioEuyrPhK/fybCMDaLLKux2vWkxeN+2gfJ7wQ3jNNmbQm1DROQcHxtYN9GeAmmp0+qF4l2CKcrvGMM3BRt6DeDi9gQzLNJUaSk9YvSWzZSGQAPUEIfLrPCqi0VX6VREEUOCd0ws8FXQBqEo5o/0MRWQgTJzoHiTnXKBhVsTq7ZLMXLOivpU35Hdh1UlgKpY6tShx1wS0ScOzPkJ9kdLj6NQmP2dNkYcvxJGFf9w266bYn2G/cx/5bb90yl8mfanZKXYC2C/zoKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
+ bh=Tl1pa7Sm/HW98b2Gif9DHedW63B7JRSaHCYvmjzXzEs=;
+ b=BAW5Ky64IhMwvvR7LWoFmykqc5F/78c4Sxjj7RiXZjrAkDWtFA6Od9DkJYmS3mgcBt6urMk/Ub9fu78BFiCe1fyUkUTpTv+7UPagvx4jbsyv999R0TYu/e923ljsjunpMkSlpRN3BOP13ZA8oOTYFWAu/f5NQiceeqiYGw7N5P3FLXQSDlGXzZ4qB4/3HqrXCj7YsvJZDLEt7j7o6AAw71DiUroJa+DyTQTiDIFSRNWTjsb/1hv3+yNdwaCAfcYuVc/Jg73D7QlBvMxSCPuIC14kSABX5rOh6nY/j6EiP+RymwG7fE4G4WnNg6OXSRmHUOfiSusFBWPIoSKMQF5NGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yGs/NxoPmwMYt2qms90KlE15xs/G5gfvCH3JjBjSFzY=;
- b=BfvcvGl/bBFD58Y+SV9MI70LsbWakVxIB8CDqawX3E0bt2W/VYDPe3I6rb7gWoj7ycUjpBKxhIhEarObhqzDhhKkGUZhBHUqeW/rJVAmZwTizd3vWd4h9elh2vOx2co7ZvH5C1NwjSCMEUtNJudTMDfizxQlTunMgf6nrRBfLCs=
-Received: from MWHPR14CA0048.namprd14.prod.outlook.com (2603:10b6:300:12b::34)
- by SJ0PR12MB5472.namprd12.prod.outlook.com (2603:10b6:a03:3bb::5) with
+ bh=Tl1pa7Sm/HW98b2Gif9DHedW63B7JRSaHCYvmjzXzEs=;
+ b=hU7q6oSPATdi4KvSAAuY7yYU/7TP+vE9nKXExxjCz14Bmcf84cIVER9LyPsCwHtEvaKHG64Re8KJhUl3Hio2nM+6CUVXxkhtnsSd7XN7xXH0NBxBV/8KD1tmehZfBq8W+t5rOBU+rJm7pCI97hcHnSBu0t/giIKMVD2Nax7DzGI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BN9PR12MB5179.namprd12.prod.outlook.com (2603:10b6:408:11c::18)
+ by BN9PR12MB5242.namprd12.prod.outlook.com (2603:10b6:408:11f::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.10; Tue, 18 Jan
- 2022 11:07:10 +0000
-Received: from CO1NAM11FT053.eop-nam11.prod.protection.outlook.com
- (2603:10b6:300:12b:cafe::d5) by MWHPR14CA0048.outlook.office365.com
- (2603:10b6:300:12b::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.7 via Frontend
- Transport; Tue, 18 Jan 2022 11:07:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT053.mail.protection.outlook.com (10.13.175.63) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4888.9 via Frontend Transport; Tue, 18 Jan 2022 11:07:10 +0000
-Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Tue, 18 Jan
- 2022 05:07:05 -0600
-From:   Nikunj A Dadhania <nikunj@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Peter Gonda <pgonda@google.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Nikunj A Dadhania <nikunj@amd.com>
-Subject: [RFC PATCH 6/6] KVM: SVM: Pin SEV pages in MMU during sev_launch_update_data()
-Date:   Tue, 18 Jan 2022 16:36:21 +0530
-Message-ID: <20220118110621.62462-7-nikunj@amd.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220118110621.62462-1-nikunj@amd.com>
-References: <20220118110621.62462-1-nikunj@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.7; Tue, 18 Jan
+ 2022 11:11:30 +0000
+Received: from BN9PR12MB5179.namprd12.prod.outlook.com
+ ([fe80::802f:ed0d:da05:5155]) by BN9PR12MB5179.namprd12.prod.outlook.com
+ ([fe80::802f:ed0d:da05:5155%6]) with mapi id 15.20.4888.014; Tue, 18 Jan 2022
+ 11:11:30 +0000
+Message-ID: <aaf59b12-4537-8f3e-6c7d-de2571630806@amd.com>
+Date:   Tue, 18 Jan 2022 16:41:16 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [kvm-unit-tests PATCH 0/3] Add L2 exception handling KVM unit
+ tests for nSVM
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Manali Shukla <manali.shukla@amd.com>
+Cc:     kvm@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>,
+        pbonzini@redhat.com
+References: <20211229062201.26269-1-manali.shukla@amd.com>
+ <Yd9ITZv48+ehuMsx@google.com>
+From:   "Shukla, Manali" <mashukla@amd.com>
+In-Reply-To: <Yd9ITZv48+ehuMsx@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0013.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:95::9) To BN9PR12MB5179.namprd12.prod.outlook.com
+ (2603:10b6:408:11c::18)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d680bbe2-6fc5-4471-51fc-08d9da72ac65
-X-MS-TrafficTypeDiagnostic: SJ0PR12MB5472:EE_
-X-Microsoft-Antispam-PRVS: <SJ0PR12MB547236AA652B936074E89E50E2589@SJ0PR12MB5472.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Office365-Filtering-Correlation-Id: 4efd9651-a218-4cdd-85cf-08d9da73473e
+X-MS-TrafficTypeDiagnostic: BN9PR12MB5242:EE_
+X-Microsoft-Antispam-PRVS: <BN9PR12MB524242657B088490B7CC66B4FD589@BN9PR12MB5242.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WGaQOJmurj8xUqnxz/YcrdMhnYLvCvKPh1xA9tkiPGWhOE6M/j5lGMMQGs6e8rQDwf/xmEFflE8cPChSDFZalrBUUSXG6lE02eEJfpxYtAxjapYGTKpptUXicBtRK9RvEOr/jaF/ciHcZnhUiWqtiQOwxCBa1ulAFqdmMTKAxDEukohc+3o9ydBDOH75XBIEBBE6KKxn4xpd1VnwOeYMxh+xneaSHP0/h1MeRo/de4JIbzEITlVp1sz7ossPvb//kxVEhMzx6aOo6fNHRdA4w9KtLUkPZtE5/HDvdcFe1omeL4BYWGO9z3Ohz42XzXJVkSQGjnZHZqXbIKuZxMZu6ilT179MPBI0el/rt5GEj317U8W313dBqlP9vKb+Kw9DQVSkm1eJcFLh7++u37SrkW4PlLa2zPwybdnLJ28baY0OFtMdgIK3nhnquByVXtbgenonYeMJuzP0kiHsNZlzCMNmt3Jb30S3Davt0sfHMYj6NTRM09aynjflVdU3Cl/bjZKqV1pLh9sRJ3hEtfnrKIsIiq/Xbr6n9vSnn+3+hBR6ax++NwxGPyOYfGwNDAWFgnw0aRNWjYuJmDj5Cws4QwkNMECZ33Lwo2FMdcPxkyB/Vy/h7woM0+dueEKTN5gcZOKcc4xY/vUQ8mAjSy7vWMIJYNmb9yyc31CDyN3WnOm8ylddkhvRMT7TQzAh5LFlHwxzt8DegNUArTL6E3M3T99WsGNjp4WgZ2deuG8RK6vj7kRBJbGw1DO3/qApL0JEkqwbPyQdFgJaMhY01C1+7uSXNgzreokEPxO9S0N1YQ8=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(40470700002)(46966006)(36840700001)(336012)(426003)(5660300002)(26005)(36756003)(81166007)(2616005)(1076003)(16526019)(47076005)(40460700001)(82310400004)(6916009)(186003)(83380400001)(54906003)(8676002)(316002)(2906002)(6666004)(7696005)(36860700001)(8936002)(70206006)(4326008)(70586007)(356005)(508600001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: jNpFddamrDHGI2H2Mbh9zAcYC4+kWUTWFF+BEvfbgMyeQD0Ja94a2UJUHQDdhntRqKGJBwE2tn18n9MJxV3XxIQvZJ8KIWnrVQtTcRk+yz9CdLWamdts7uNK5h66Vaxm4uYStBh/LVxMbdT1v5bi6AUjlOnYlEiLyRDJ7bmofYI0W9A3PXviPweHWVEwWNUONvDSC1c/U7xrzEfoHlfWEp7Yp6p3cGmHui+ij/sm3T439wikfWYFC7lLGiuC1/QLEbO2Q6YrY1Num0KKJS2WiYgPMTagJkSqLTrSVr1FoiAGmY+C0Ynp5lxwv88mXnXdI2pHreFWUCpKO1/1BwLUyhhbnlKciVsWedZJf9MO8r9SVAsvDfAqaFBaTkHcq9ZebyFCb9JPsPwZOFz5EmtpjdfT3g4tkBSMBTlus7wZMK5GXZxUJhO4VQ3BXOPZsoMnrxtrJ/xB0ki01ZtTBDFD8Kq8oAeIH9t8urJMj3/UWbR+VftW07f8tpYRO99oZT3iAuMWr4nJXLrNtCJUzJfft5t3pqvfRcoOYmoyKMLP5OYsbJhK3AQYHPHrp+lJkxvbRd+f4hXeKeFXVgdTbppO8XlvlrJujq7hNH6pfml2it8P0FzoLFj4NU32+Sg1wzYW79fswMfRnTSDtXJ5PxbnOyg4RKNcXGg/LCtSYedIjHWKVVg1LKZtGnpkmu4l/ApKBP5XZr01DdwHB4XUiMpQJ/1ixJBdamM6CaKxMvSVHwfgzvZlo5a7cPC5HZ+BVvm30FtQJ2tGmLs8YQN6JmkzZCZfzF3yjTPVnVA+GulFYMcrbxYmxXpWjo41ntIoHBtK
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31696002)(966005)(31686004)(316002)(4326008)(110136005)(36756003)(186003)(2906002)(8676002)(6636002)(8936002)(6486002)(508600001)(6512007)(2616005)(5660300002)(53546011)(6506007)(26005)(38100700002)(66556008)(66476007)(6666004)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THgySVd3Tm4zOVJ2TlNPR1YrUGdXUXliQWVmbHdRcloxVWVPSndhbCtsb1g3?=
+ =?utf-8?B?bzRoejc3VjZOekZaTWRtdXZyVGxZd1J0V1U2WHgrOU83cGxMejVNczJGUWxP?=
+ =?utf-8?B?Q3FQRXpWbXFRNUovWFVFNk82MzI0RUVFT1c1ZjRkZ0tVNlF3MzdVU1F2QVhQ?=
+ =?utf-8?B?UnhlNTZudGZneVQ0S21XMVp4cXdYMnBmQ2loUUtoYkpESUJSREVFMFVNSVd4?=
+ =?utf-8?B?eHAxSnZoSkkwMUNubGtSQVp5RS9EY2o0VC9OcmFOK2JENzQ4TC9YNXI3M3Fw?=
+ =?utf-8?B?THh5b3VzeHo5cDJ5UFI4TUE2ajhPak93Z3dub3NuWkhVaVQ0RmN1anFaM2pk?=
+ =?utf-8?B?MkpZVUY2S2Z3Q2t6NG9CbGpDQXQvU1BaVTc2N3psUUU5MDhGUlpIVzVobkwz?=
+ =?utf-8?B?Mkplc1Mzdi9UMHg4UDNZejJiNGtDaHVRN2tmeFpDN3Y2SjQ2NTdub1ZEZHA5?=
+ =?utf-8?B?WUtOalE4UVo4bFlwN0o2UlVyVzNpTnpYSnFOenFVZHg1cHhoQ0s4MnllbFZS?=
+ =?utf-8?B?U2RGUEIxZkJjUWhJSGlSbnA2d0xpUjBrbEk5ZHp5OEVVRXV1M3V4MWRhWWE5?=
+ =?utf-8?B?TTBaUENOZldMcFNkczVzdHNVOXJkUWNVcUgydHI5cnNCS3c4YmNSdkVKVEND?=
+ =?utf-8?B?S1FpeXU4NjBoUDAva3JLOWZPdWE1d0VYWFE5R0Q1cGp4STJFMWNJazhIS25w?=
+ =?utf-8?B?dm5MZkFwR0h5NmxGdjlHUUZ6YzViZnl5LzJDRDNMc09EankrTllwaVVjT3Bm?=
+ =?utf-8?B?Njh0OUNKak1hZ3hyZ2pKLzhBWjJNWlo3MUd0TkxCOE0yOVhFanZpZDNRQTVS?=
+ =?utf-8?B?dTdQRkk5blUycU1Lekp3dVY1ODJjK3UwSEduSi9CcFBIcU5YNlBTeExDMWRy?=
+ =?utf-8?B?WklINnJnaFFEdmVSSDlSRW1hWVV2R1h2WGh5OGllbHJFaXJOcVJPZnEvU0pQ?=
+ =?utf-8?B?YUNXUGZYUklpWXZvV3AxUmxZdklKRmcrN1o1WThMZVNTcHAxL29RRlVzbmZ5?=
+ =?utf-8?B?S0FGcy9BeEVqZWFSUk13Zi9qL0VRdVNkS0VST0JJMktxMXExaFBlUDFxZnVh?=
+ =?utf-8?B?WTdCVTVnS3hheHo2Q0EvYmFWYUx4SGUvSjhTZjh6QUIrYnZFZS9takNCajJ4?=
+ =?utf-8?B?VVdWRDlISUM1RFhMRkRwNGx1S3hIY29xODVCYk52UlNQb05DNUtRUm80Tmwz?=
+ =?utf-8?B?OE5BelZKR2ovZkVUcTBiWnBzNC9MZlB0SENFU2N5Y2NCei9zdGFMQ2xSR0Fm?=
+ =?utf-8?B?YWsxRHBBR1UrazErU0NGdW5PT0hPc0RWWjdKVDZNWGlKUXVXUzQyeG9DTTl3?=
+ =?utf-8?B?SHdpTXVNQmw3eDIySnZ2c1NWcDBSTHV5UjVhbE9ycnJaMGxlS2FQMFFteGEy?=
+ =?utf-8?B?Y0diWUY2R3JqNFVEN1piWW5sR095NWFsL2lzdmJHR0RXZjhQQ3lkdXRLYTBW?=
+ =?utf-8?B?ZWgyekdidGt4NU0rZWc0SG1FY1Y1clNYb2c0RlkzbFpORDBXK3JXK3Y4ZllE?=
+ =?utf-8?B?M1NoV1MrWnorTm5TcmZGU2NsYnpEVzBBQWZLU1U3UUdHUVhJSmRJYTdqWGpH?=
+ =?utf-8?B?ZWx1VTBVeXNBdlZzQ040UEVTTk4raXp3VGNHQ200VGpjd1I1VmdEbjBvL0pu?=
+ =?utf-8?B?M1V1Z3U2NndRK2RyNzJ0UlFaRHFSUjZKSjJjYldoUGwwRGZZaU4yUzB3TURZ?=
+ =?utf-8?B?YitiQkFGeFBJeUFNRXVyK3NSYTNSZXVQRnBRdHNsNnV0M3IwdlF6cEQ5bUdC?=
+ =?utf-8?B?NmxURDMvS05GSmpUL3cyS0dqbzdvcHppamRHN2J3eUJIcHJnd3A5SmFEam9y?=
+ =?utf-8?B?cjY1SW5aaHpQM05IR1h1cWV3d1E3RmRTdWVvUWtMZWZxMmdWYU9aOExtb25Z?=
+ =?utf-8?B?d3hwNDVyYWsrNGZpSytZZ0FsSzRJTVpWODlKSDdJcjhZaXRPUDNhTzVpV2Vw?=
+ =?utf-8?B?citTYTRWMms4YW9YMjM2b1dWeG9MQ0psWkJGcUh2NFhadEF2NFk5MUFkRjNM?=
+ =?utf-8?B?WTcwRUVCQ2k2S0tJRnlJbVd4MVNYT051Z3d1SDd6REpVZnoxczYxQ0JzTmxJ?=
+ =?utf-8?B?VXVDNGRZc2x5RDNDUXRydFlzMllkeG1CTVhhemUvRWczZ3hwK1l5L1hhWEww?=
+ =?utf-8?B?RlQ1RHE1bUcvMGRnSDIzOXgwbWZnTEkweUNjVjhwMTFocXpEcDB1UGlaYjVK?=
+ =?utf-8?Q?Jz9OeHCWy3FNtmZCDi6yAPA=3D?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:07:10.1209
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4efd9651-a218-4cdd-85cf-08d9da73473e
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:11:30.3821
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d680bbe2-6fc5-4471-51fc-08d9da72ac65
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT053.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5472
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qsokKgnAIR5ozw8ARe4FV+xfPUNHqfkBLBN/W8ewgBsoNXARs9+LSJC5vGkSZTZSrCmxPinP6Lhj5VA5RKotWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5242
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+On 1/13/2022 2:59 AM, Sean Christopherson wrote:
+> +Aaron, and +Paolo who may or may not subsribe to kvm@ :-)
+> 
+> On Wed, Dec 29, 2021, Manali Shukla wrote:
+>> This series adds 3 KVM Unit tests for nested SVM
+>> 1) Check #NM is handled in L2 when L2 #NM handler is registered
+>>    "fnop" instruction is called in L2 to generate the exception
+>>
+>> 2) Check #BP is handled in L2 when L2 #BP handler is registered
+>>    "int3" instruction is called in L2 to generate the exception
+>>
+>> 3) Check #OF is handled in L2 when L2 #OF handler is registered
+>>    "into" instruction with instrumented code is used in L2 to
+>>    generate the exception
+> 
+> This is all basically identical in terms of desired functionality to existing or
+> in-flight nVMX tests, e.g. vmx_nm_test() and Aaron's vmx_exception_test() work[*].
+> And much of the feedback I provided to Aaron's earlier revisions applies to this
+> series as well, e.g. create a framework to test intercpetion of arbitrary exceptions
+> instead of writing the same boilerplate for each and every test.
+> 
+> It doesn't seem like it'd be _that_ difficult to turn vmx_exception_test into a
+> generic-ish l2_exception_test.  To avoid too much scope creep, what if we first get
+> Aaron's code merged, and than attempt to extract the core functionality into a
+> shared library to reuse it for nSVM?  If it turns out to be more trouble then its
+> worth, we can always fall back to something like this series.
+> 
+> [*] https://lore.kernel.org/all/20211214011823.3277011-1-aaronlewis@google.com
 
-Pin the memory for the data being passed to launch_update_data()
-because it gets encrypted before the guest is first run and must
-not be moved which would corrupt it.
+This patch has already been queued by Paolo.
+I will wait till Aaron's code is merged and than do appropriate changes.
+I hope this is fine.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-[ * Changed hva_to_gva() to take an extra argument and return gpa_t.
-  * Updated sev_pin_memory_in_mmu() error handling.
-  * As pinning/unpining pages is handled within MMU, removed
-    {get,put}_user(). ]
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
----
- arch/x86/kvm/svm/sev.c | 122 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 119 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 14aeccfc500b..1ae714e83a3c 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -22,6 +22,7 @@
- #include <asm/trapnr.h>
- #include <asm/fpu/xcr.h>
- 
-+#include "mmu.h"
- #include "x86.h"
- #include "svm.h"
- #include "svm_ops.h"
-@@ -490,6 +491,110 @@ static unsigned long get_num_contig_pages(unsigned long idx,
- 	return pages;
- }
- 
-+#define SEV_PFERR_RO (PFERR_USER_MASK)
-+#define SEV_PFERR_RW (PFERR_WRITE_MASK | PFERR_USER_MASK)
-+
-+static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm,
-+					      unsigned long hva)
-+{
-+	struct kvm_memslots *slots = kvm_memslots(kvm);
-+	struct kvm_memory_slot *memslot;
-+	int bkt;
-+
-+	kvm_for_each_memslot(memslot, bkt, slots) {
-+		if (hva >= memslot->userspace_addr &&
-+		    hva < memslot->userspace_addr +
-+		    (memslot->npages << PAGE_SHIFT))
-+			return memslot;
-+	}
-+
-+	return NULL;
-+}
-+
-+static gpa_t hva_to_gpa(struct kvm *kvm, unsigned long hva, bool *ro)
-+{
-+	struct kvm_memory_slot *memslot;
-+	gpa_t gpa_offset;
-+
-+	memslot = hva_to_memslot(kvm, hva);
-+	if (!memslot)
-+		return UNMAPPED_GVA;
-+
-+	*ro = !!(memslot->flags & KVM_MEM_READONLY);
-+	gpa_offset = hva - memslot->userspace_addr;
-+	return ((memslot->base_gfn << PAGE_SHIFT) + gpa_offset);
-+}
-+
-+static struct page **sev_pin_memory_in_mmu(struct kvm *kvm, unsigned long addr,
-+					   unsigned long size,
-+					   unsigned long *npages)
-+{
-+	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct kvm_vcpu *vcpu;
-+	struct page **pages;
-+	unsigned long i;
-+	u32 error_code;
-+	kvm_pfn_t pfn;
-+	int idx, ret = 0;
-+	gpa_t gpa;
-+	bool ro;
-+
-+	pages = sev_alloc_pages(sev, addr, size, npages);
-+	if (IS_ERR(pages))
-+		return pages;
-+
-+	vcpu = kvm_get_vcpu(kvm, 0);
-+	if (mutex_lock_killable(&vcpu->mutex)) {
-+		kvfree(pages);
-+		return ERR_PTR(-EINTR);
-+	}
-+
-+	vcpu_load(vcpu);
-+	idx = srcu_read_lock(&kvm->srcu);
-+
-+	kvm_mmu_load(vcpu);
-+
-+	for (i = 0; i < *npages; i++, addr += PAGE_SIZE) {
-+		if (signal_pending(current)) {
-+			ret = -ERESTARTSYS;
-+			break;
-+		}
-+
-+		if (need_resched())
-+			cond_resched();
-+
-+		gpa = hva_to_gpa(kvm, addr, &ro);
-+		if (gpa == UNMAPPED_GVA) {
-+			ret = -EFAULT;
-+			break;
-+		}
-+
-+		error_code = ro ? SEV_PFERR_RO : SEV_PFERR_RW;
-+
-+		/*
-+		 * Fault in the page and sev_pin_page() will handle the
-+		 * pinning
-+		 */
-+		pfn = kvm_mmu_map_tdp_page(vcpu, gpa, error_code, PG_LEVEL_4K);
-+		if (is_error_noslot_pfn(pfn)) {
-+			ret = -EFAULT;
-+			break;
-+		}
-+		pages[i] = pfn_to_page(pfn);
-+	}
-+
-+	kvm_mmu_unload(vcpu);
-+	srcu_read_unlock(&kvm->srcu, idx);
-+	vcpu_put(vcpu);
-+	mutex_unlock(&vcpu->mutex);
-+
-+	if (!ret)
-+		return pages;
-+
-+	kvfree(pages);
-+	return ERR_PTR(ret);
-+}
-+
- static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
- 	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
-@@ -510,15 +615,21 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	vaddr_end = vaddr + size;
- 
- 	/* Lock the user memory. */
--	inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
-+	if (atomic_read(&kvm->online_vcpus))
-+		inpages = sev_pin_memory_in_mmu(kvm, vaddr, size, &npages);
-+	else
-+		inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
- 	if (IS_ERR(inpages))
- 		return PTR_ERR(inpages);
- 
- 	/*
- 	 * Flush (on non-coherent CPUs) before LAUNCH_UPDATE encrypts pages in
- 	 * place; the cache may contain the data that was written unencrypted.
-+	 * Flushing is automatically handled if the pages can be pinned in the
-+	 * MMU.
- 	 */
--	sev_clflush_pages(inpages, npages);
-+	if (!atomic_read(&kvm->online_vcpus))
-+		sev_clflush_pages(inpages, npages);
- 
- 	data.reserved = 0;
- 	data.handle = sev->handle;
-@@ -553,8 +664,13 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		set_page_dirty_lock(inpages[i]);
- 		mark_page_accessed(inpages[i]);
- 	}
-+
- 	/* unlock the user pages */
--	sev_unpin_memory(kvm, inpages, npages);
-+	if (atomic_read(&kvm->online_vcpus))
-+		kvfree(inpages);
-+	else
-+		sev_unpin_memory(kvm, inpages, npages);
-+
- 	return ret;
- }
- 
--- 
-2.32.0
-
+Thank you
+Manali
