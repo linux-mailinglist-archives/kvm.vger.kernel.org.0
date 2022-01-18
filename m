@@ -2,142 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBEEC492336
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:53:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1CB49231D
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:51:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236149AbiARJxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 04:53:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38094 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234412AbiARJwe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 04:52:34 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20I6YQ6M003501;
-        Tue, 18 Jan 2022 09:52:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=YmnpOvVMnVJCBPQFTQzSGP29GQCLDBp1L/Hu7pd2a94=;
- b=BUNgPNrRnaY9iDoLWhtbED+d8eOThqjngbcKWF8kFNL9n/VGTtuFBKaXTD39lhETQ/5v
- 3lbPAVgRPEa/eGnt2//HLytDSlRm39WL2nLrN+vkFbynVjy13zESbLlKs5WQiOSuHNVg
- jgHyeUqfob3jNRDcBOOcCua4Ss8BCPAzzndk3zQ7sRVXpMJEiTUDQjKBO+f7XnDESzLF
- p9Kprbl7IG/6ixnIRSCAZZDH6BdPPnEUmy7sdkhLMbW4Kz8yugaBcV3Z5HBMOe0LPfte
- 8oJYd9OfJgob/jSEqu58JivpymsTL4j/7Eplg7JWPNTzbLRbv0MCpHdbOisrP4BjOn8L ow== 
+        id S234056AbiARJv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 04:51:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52440 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231138AbiARJv1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 04:51:27 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20I9dmGF010451;
+        Tue, 18 Jan 2022 09:51:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wkQSZXMEaVNsfpa3rh5xL6K8iqoae3evtKToNnXBQDg=;
+ b=RvA3G9cyrCfSf6/EmB5v9/yQzWpWZZo0qYUpilTygousLbcMz5+3iJPp1Ja6dqmiDZVe
+ mPZ2v3gjQxXNrAqRRrnX6yvXIGS1CDb7MY8E6zvyiSJcKG6EjfmHzUv63xmMvTzar0d1
+ P1B1nJ+z1gES3e8R46UkM9+X9j1teVbwBM8nI+YohpWhnOsvVfiddSbXqcSGERl9tvAg
+ T89MgrJj9JgwG7yBnBiS01DBpLjDYaLeERUE252xZmps08QvcFA1GIeoouqE3JKVikHv
+ XG6dGCb1HPTyLaNpnDi9y+X60k02gbPXo+/2h6AwEDX0Mt3ORGVqnqnNhSnAMv4Gl9Mi cw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dngcqctfb-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnkwhh0at-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 09:52:33 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20I9CHoH032281;
-        Tue, 18 Jan 2022 09:52:33 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dngcqctf0-1
+        Tue, 18 Jan 2022 09:51:27 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20I94wPm039130;
+        Tue, 18 Jan 2022 09:51:26 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnkwhh0a7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 09:52:32 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20I9lPbL027155;
-        Tue, 18 Jan 2022 09:52:31 GMT
+        Tue, 18 Jan 2022 09:51:26 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20I9lEL1028620;
+        Tue, 18 Jan 2022 09:51:24 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3dknw99gjj-1
+        by ppma05fra.de.ibm.com with ESMTP id 3dnm6r2heq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 09:52:31 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20I9qRuF40894936
+        Tue, 18 Jan 2022 09:51:24 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20I9pJ6X41746784
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 09:52:28 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D186CA4057;
-        Tue, 18 Jan 2022 09:52:27 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90E6EA4051;
-        Tue, 18 Jan 2022 09:52:27 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 09:52:27 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v1 10/10] KVM: s390: selftests: Make use of capability in MEM_OP test
-Date:   Tue, 18 Jan 2022 10:52:10 +0100
-Message-Id: <20220118095210.1651483-11-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220118095210.1651483-1-scgl@linux.ibm.com>
-References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+        Tue, 18 Jan 2022 09:51:19 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5BBFCAE051;
+        Tue, 18 Jan 2022 09:51:19 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B94CAE056;
+        Tue, 18 Jan 2022 09:51:18 +0000 (GMT)
+Received: from [9.171.70.230] (unknown [9.171.70.230])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Jan 2022 09:51:18 +0000 (GMT)
+Message-ID: <d0113a43-5858-6283-89ef-882713df8175@linux.ibm.com>
+Date:   Tue, 18 Jan 2022 10:53:01 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 11/30] s390/pci: add helper function to find device by
+ handle
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-12-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-12-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Bj9j9ury-LIHZyEIAM_ientqs7Ca4KAg
-X-Proofpoint-ORIG-GUID: gjNmfIzPcFvb1I84G2tgZBOKhbTktv6H
+X-Proofpoint-ORIG-GUID: 1bfXwWhvq8C1_q3jgowm0JriXSb4HunK
+X-Proofpoint-GUID: nngQqh42oN8_dJUiUmkSVS8PIaxH7oKE
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-01-18_02,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 lowpriorityscore=0
- suspectscore=0 spamscore=0 impostorscore=0 clxscore=1015 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 lowpriorityscore=0 mlxscore=0 bulkscore=0 phishscore=0
+ impostorscore=0 spamscore=0 adultscore=0 priorityscore=1501 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2110150000 definitions=main-2201180057
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Only test the functionality whose availability is indicated by
-KVM_CAP_S390_MEM_OP_SKEY if the capability indicates support.
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/memop.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-index 774d5756f41d..7bdd6727d0ff 100644
---- a/tools/testing/selftests/kvm/s390x/memop.c
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
- 	struct kvm_vm *vm;
- 	struct kvm_run *run;
- 	struct kvm_s390_mem_op ksmo;
-+	bool has_skey_ext;
- 	vm_vaddr_t guest_mem1;
- 	vm_vaddr_t guest_mem2;
- 	vm_paddr_t guest_mem1_abs;
-@@ -322,6 +323,9 @@ int main(int argc, char *argv[])
- 	}
- 	if (maxsize > sizeof(mem1))
- 		maxsize = sizeof(mem1);
-+	has_skey_ext = kvm_check_cap(KVM_CAP_S390_MEM_OP_SKEY);
-+	if (!has_skey_ext)
-+		print_skip("CAP_S390_MEM_OP_SKEY not supported");
- 
- 	/* Create VM */
- 	vm = vm_create_default(VCPU_ID, 0, guest_code);
-@@ -342,7 +346,7 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(!memcmp(mem1, mem2, maxsize),
- 		    "Memory contents do not match!");
- 
--	{
-+	if (has_skey_ext) {
- 		vm_vaddr_t guest_0_page = vm_vaddr_alloc(vm, PAGE_SIZE, 0);
- 		vm_vaddr_t guest_last_page = vm_vaddr_alloc(vm, PAGE_SIZE, last_page_addr);
- 		vm_paddr_t guest_mem2_abs = addr_gva2gpa(vm, guest_mem2);
-@@ -515,6 +519,14 @@ int main(int argc, char *argv[])
- 		TEST_ASSERT(rv != 0, "Fetch should result in exception");
- 		rv = _vm_read_guest_key(vm, mem2, addr_gva2gpa(vm, 0), 2048, 2);
- 		TEST_ASSERT(rv == 4, "Fetch should result in protection exception");
-+	} else {
-+		struct ucall uc;
-+
-+		do {
-+			vcpu_run(vm, VCPU_ID);
-+			get_ucall(vm, VCPU_ID, &uc);
-+			ASSERT_EQ(uc.cmd, UCALL_SYNC);
-+		} while (uc.args[1] < 100);
- 	}
- 
- 	/* Check error conditions */
+On 1/14/22 21:31, Matthew Rosato wrote:
+> Intercepted zPCI instructions will specify the desired function via a
+> function handle.  Add a routine to find the device with the specified
+> handle.
+> 
+> Acked-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Eric Farman <farman@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+
+
+> ---
+>   arch/s390/include/asm/pci.h |  1 +
+>   arch/s390/pci/pci.c         | 16 ++++++++++++++++
+>   2 files changed, 17 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 1a8f9f42da3a..00a2c24d6d2b 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -275,6 +275,7 @@ static inline struct zpci_dev *to_zpci_dev(struct device *dev)
+>   }
+>   
+>   struct zpci_dev *get_zdev_by_fid(u32);
+> +struct zpci_dev *get_zdev_by_fh(u32 fh);
+>   
+>   /* DMA */
+>   int zpci_dma_init(void);
+> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+> index 0c9879dae752..1e939b4cf25e 100644
+> --- a/arch/s390/pci/pci.c
+> +++ b/arch/s390/pci/pci.c
+> @@ -76,6 +76,22 @@ struct zpci_dev *get_zdev_by_fid(u32 fid)
+>   	return zdev;
+>   }
+>   
+> +struct zpci_dev *get_zdev_by_fh(u32 fh)
+> +{
+> +	struct zpci_dev *tmp, *zdev = NULL;
+> +
+> +	spin_lock(&zpci_list_lock);
+> +	list_for_each_entry(tmp, &zpci_list, entry) {
+> +		if (tmp->fh == fh) {
+> +			zdev = tmp;
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock(&zpci_list_lock);
+> +	return zdev;
+> +}
+> +EXPORT_SYMBOL_GPL(get_zdev_by_fh);
+> +
+>   void zpci_remove_reserved_devices(void)
+>   {
+>   	struct zpci_dev *tmp, *zdev;
+> 
+
 -- 
-2.32.0
-
+Pierre Morel
+IBM Lab Boeblingen
