@@ -2,131 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05399492D15
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 19:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A144492D32
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 19:23:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347882AbiARSRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 13:17:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53440 "EHLO
+        id S244576AbiARSWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 13:22:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236336AbiARSRF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 13:17:05 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BE5C061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:17:04 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id b1-20020a17090a990100b001b14bd47532so135387pjp.0
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:17:04 -0800 (PST)
+        with ESMTP id S244533AbiARSWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 13:22:47 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DB6C06173E
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:22:47 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id a10-20020a9d260a000000b005991bd6ae3eso11825405otb.11
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 10:22:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=12XZNpl8o9OB6APkzQqhlT2zDw8cBU9If0BRD2I3ujg=;
-        b=pRX729irqFCPWqSZqfankoziffIirA/BN8R3rB4h45WiVzTpUfouL7NgCbxQdk00y2
-         cJp+rsxu40ORiWBHD8xLKcv2kDBDqHJyUGZp9hsCmtmpPtXM6oMr4XFHpftMqpBuHyMi
-         vE2XlapaFzKwjlWP/ZbLWgMAv/S1k5nTL/GgbOa04UxlKHpOcQovKM5LvmE39v2XpUVb
-         eGlP19Qm3+ZKKFMdEpcn6vffp7wQOF+f5ulXjB1FCXZjBPvegq1P+ZoQJpyvqBEkHvre
-         rCcvSVzBZYB2aVCma8XXfPg1Awf+5R/0ciiAByNtI1i2Qti1/4ifU7yennKOQ/81bdLF
-         31pQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1q/ydx49keEZGWsAWRg7W9al0WAO2oLskLJ8Qk4a3uA=;
+        b=Ti3pXq5PWkDKY2e94msFAZE9zQGy9QZOFNgzR4fLpdLlmvXEobm2Br9/aw0TkwMMML
+         gL/ivfTK5tpd25PDCCTleoLGVSPM58hXUlD3qR7jHRb/MaihBFQF1uUjdopF/kfCZY/v
+         iUZTzB/AO2Jcutw9XZUhUPnnQsp7nMOQCyNI0LpYgMOYp6kKr8Pg2ZWwZFW5AfflaBHs
+         gHPjfX3D2uYXhme4R3KAoEXdlzlZH+6Xp6J5OfxKVg953/vW31RYyUKV+bS00InLVJih
+         7IS/AGDVBI+Gf692c73nxgFdSHBzQITpz8Q/8KWF9urpq5z7kEHPvsoAKt+VdB3s3a8i
+         KsPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=12XZNpl8o9OB6APkzQqhlT2zDw8cBU9If0BRD2I3ujg=;
-        b=yv9rcVH5M7GDv5xtL5TUJhngWY/kxhgU/Dk0PG3/uOByWtWSbVfiDyZFA2hWRl9UNp
-         Unanwj8PiI5+cYpOEy4z7zZZ4LEp/0z4CmACEoSzvpJkeuLj3PdJXmARDQvlns6oIPbv
-         KAwb36QK8KaNz5APnAIbkbf3aAXGVYC4bGYJsERAN1YmfKAKJBMt4M8xqn0FmPqqlTqB
-         wAXIM0GduSq1q9IrOKmt1F/SLp7phD76kKgfhHWTZpz+RE93CcrPAPXWKlVQolOZ0xm4
-         H+WbZ7texZEwUz6ucXQZz7Mao0t2OUIUHXe8+s91jxSNlUC36r0ErZ9rnD1Cb88jMKZa
-         g9ug==
-X-Gm-Message-State: AOAM530Kj1Knn8VQOTdEE4iFctb7P1GD5XEdILV1vkIZeR2wq6Z0LZJ/
-        ov12JdJmID/0k8y47K06Sh0VMw==
-X-Google-Smtp-Source: ABdhPJyUSRbqIj2dSKIkusY2dU90msA5PvqdUHgKeVHIUXXv8vkWDAtgQs/5nZz810lFDv8k38rKOA==
-X-Received: by 2002:a17:90b:1892:: with SMTP id mn18mr22529691pjb.244.1642529824176;
-        Tue, 18 Jan 2022 10:17:04 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q17sm18927985pfj.119.2022.01.18.10.17.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jan 2022 10:17:03 -0800 (PST)
-Date:   Tue, 18 Jan 2022 18:17:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC
- mode with APIC-write VM exit
-Message-ID: <YecEHF9Dqf3E3t02@google.com>
-References: <20211231142849.611-1-guang.zeng@intel.com>
- <20211231142849.611-6-guang.zeng@intel.com>
- <YeCZpo+qCkvx5l5m@google.com>
- <ec578526-989d-0913-e40e-9e463fb85a8f@intel.com>
- <YeG0Fdn/2++phMWs@google.com>
- <8ab5f976-1f3e-e2a5-87f6-e6cf376ead2f@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1q/ydx49keEZGWsAWRg7W9al0WAO2oLskLJ8Qk4a3uA=;
+        b=qVIfbTBD2ex/BzjTmp2S095HJux1hE9D4zcThhB5vTXV1DLAUmfKgci/Sc0U9BBlKc
+         DR4SWdxngca2SIuXEjTSz6kjhNfhs4WtCFeO5hp8QG2G4p4iCiSSVQYXgaTl33/0nMzY
+         HjZeIqS/fEKHtbBv/WaAB0+VItKjRZCZLLTPf4SkM04plupRvvmxwsRqhnEn/qc+WAnE
+         2SRaqgpMogWG3A0yLMDv17yrxzSQYA7CoKrP2yWRhbBMqIRG2e47/JMfq0z2wkaZikPm
+         8c8YbQblgc5jY6OIKIn6txWIb0J3waD53pzEyuxT1E7emLvhFN/Etk6Oax5xfC0CMHoV
+         n+Yw==
+X-Gm-Message-State: AOAM533y2n8BpLSEicpW2GV/jmgOZ0gD8evLLm04a+I0dJEUNrSTgcTX
+        FWonK686HwpnEHxIsdCkW3y8W/ZJzRvq2/fgGgUA1g==
+X-Google-Smtp-Source: ABdhPJwOULlAveoN8jDLIzZCo5aBoG3v2UUBO58ENvhePozWMYoNZ6zqfzh9m0ZNRe07m/E2+L+g2Ea953jmmvaSv0Y=
+X-Received: by 2002:a9d:12f7:: with SMTP id g110mr21978798otg.299.1642530166827;
+ Tue, 18 Jan 2022 10:22:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8ab5f976-1f3e-e2a5-87f6-e6cf376ead2f@intel.com>
+References: <CALMp9eQZa_y3ZN0_xHuB6nW0YU8oO6=5zPEov=DUQYPbzLeQVA@mail.gmail.com>
+ <453a2a09-5f29-491e-c386-6b23d4244cc2@gmail.com> <CALMp9eSkYEXKkqDYLYYWpJ0oX10VWECJTwtk_pBWY5G-vN5H0A@mail.gmail.com>
+ <CALMp9eQAMpnJOSk_Rw+pp2amwi8Fk4Np1rviKYxJtoicas=6BQ@mail.gmail.com> <b3cffb4b-8425-06bb-d40e-89e7f01d5c05@gmail.com>
+In-Reply-To: <b3cffb4b-8425-06bb-d40e-89e7f01d5c05@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 18 Jan 2022 10:22:35 -0800
+Message-ID: <CALMp9eRhdLKq0Y372e+ZGnUCtDNQYv7pUiYL0bqJsYCDfqTpcQ@mail.gmail.com>
+Subject: Re: PMU virtualization and AMD erratum 1292
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stephane Eranian <eranian@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Ananth Narayan <ananth.narayan@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 15, 2022, Zeng Guang wrote:
-> > What about tweaking my prep patch from before to the below?  That would yield:
-> > 
-> > 	if (apic_x2apic_mode(apic)) {
-> > 		if (WARN_ON_ONCE(offset != APIC_ICR))
-> > 			return 1;
-> > 
-> > 		kvm_lapic_msr_read(apic, offset, &val);
-> 
-> I think it's problematic to use kvm_lapic_msr_read() in this case. It
-> premises the high 32bit value already valid at APIC_ICR2, while in handling
-> "nodecode" x2APIC writes we need get continuous 64bit data from offset 300H
-> first and prepare emulation of APIC_ICR2 write.
+On Mon, Jan 17, 2022 at 10:25 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> On 18/1/2022 12:08 pm, Jim Mattson wrote:
+> > On Mon, Jan 17, 2022 at 12:57 PM Jim Mattson <jmattson@google.com> wrote:
+> >>
+> >> On Sun, Jan 16, 2022 at 8:26 PM Like Xu <like.xu.linux@gmail.com> wrote:
+> >> ...
+> >>> It's easy for KVM to clear the reserved bit PERF_CTL2[43]
+> >>> for only (AMD Family 19h Models 00h-0Fh) guests.
+> >>
+> >> KVM is currently *way* too aggressive about synthesizing #GP for
+> >> "reserved" bits on AMD hardware. Note that "reserved" generally has a
+> >> much weaker definition in AMD documentation than in Intel
+> >> documentation. When Intel says that an MSR bit is "reserved," it means
+> >> that an attempt to set the bit will raise #GP. When AMD says that an
+> >> MSR bit is "reserved," it does not necessarily mean the same thing.
+>
+> I agree. And I'm curious as to why there are hardly any guest user complaints.
+>
+> The term "reserved" is described in the AMD "Conventions and Definitions":
+>
+>         Fields marked as reserved may be used at some future time.
+>         To preserve compatibility with future processors, reserved fields require
+> special handling when
+>         read or written by software. Software must not depend on the state of a
+> reserved field (unless
+>         qualified as RAZ), nor upon the ability of such fields to return a previously
+> written state.
+>
+>         If a field is marked reserved *without qualification*, software must not change
+> the state of
+>         that field; it must reload that field with the same value returned from a prior
+> read.
+>
+>         Reserved fields may be qualified as IGN, MBZ, RAZ, or SBZ.
+>
+> For AMD, #GP comes from "Writing 1 to any bit that must be zero (MBZ) in the MSR."
+>
+> >> (Usually, AMD will write MBZ to indicate that the bit must be zero.)
+> >>
+> >> On my Zen3 CPU, I can write 0xffffffffffffffff to MSR 0xc0010204,
+> >> without getting a #GP. Hence, KVM should not synthesize a #GP for any
+> >> writes to this MSR.
+> >>
+>
+> ; storage behind bit 43 test
+> ; CPU family:          25
+> ; Model:               1
+>
+> wrmsr -p 0 0xc0010204 0x80000000000
+> rdmsr -p 0 0xc0010204 # return 0x80000000000
 
-Ah, I read this part of the spec:
+Oops. You're right. The host that I thought was a Zen3 was actually a
+Zen2. Switching to an actual Zen3, I find that there is storage behind
+bits 42 and 43, both of which are indicated as reserved.
 
-  All 64 bits of the ICR are written by using WRMSR to access the MSR with index 830H.
-  If ECX = 830H, WRMSR writes the 64-bit value in EDX:EAX to the ICR, causing the APIC
-  to send an IPI. If any of bits 13, 17:16, or 31:20 are set in EAX, WRMSR detects a
-  reserved-bit violation and causes a general-protection exception (#GP).
 
-but not the part down below that explicit says
+> >> Note that the value I get back from rdmsr is 0x30fffdfffff, so there
+> >> appears to be no storage behind bit 43. If KVM allows this bit to be
+> >> set, it should ensure that reads of this bit always return 0, as they
+> >> do on hardware.
+>
+> The PERF_CTL2[43] is marked reserved without qualification in the in Figure 13-7.
+>
+> I'm not sure we really need a cleanup storm of #GP for all SVM's non-MBZ
+> reserved bits.
 
-  VICR refers the 64-bit field at offset 300H on the virtual-APIC page. When the
-  “virtualize x2APIC mode” VM-execution control is 1 (indicating virtualization of
-  x2APIC mode), this field is used to virtualize the entire ICR.
+OTOH, we wouldn't need to have this discussion if these MSRs had been
+implemented correctly to begin with.
 
-But that's indicative of an existing KVM problem.  KVM's emulation of x2APIC is
-broken.  The SDM, in section 10.12.9 ICR Operation in x2APIC Mode, clearly states
-that the ICR is extended to 64-bits.  ICR2 does not exist in x2APIC mode, full stop.
-KVM botched things by effectively aliasing ICR[63:32] to ICR2.
+> >
+> > Bit 19 (Intel's old Pin Control bit) seems to have storage behind it.
+> > It is interesting that in Figure 13-7 "Core Performance Event-Select
+> > Register (PerfEvtSeln)" of the APM volume 2, this "reserved" bit is
+> > not marked in grey. The remaining "reserved" bits (which are marked in
+> > grey), should probably be annotated with "RAZ."
+> >
+>
+> In any diagram, we at least have three types of "reservation":
+>
+> - Reserved + grey
+> - Reserved, MBZ + grey
+> - Reserved + no grey
+>
+> So it is better not to think of "Reserved + grey" as "Reserved, MBZ + grey".
 
-We can and should fix that issue before merging IPIv suport, that way we don't
-further propagate KVM's incorrect behavior.  KVM will need to manipulate the APIC
-state in KVM_{G,S}ET_LAPIC so as not to "break" migration, "break" in quotes because
-I highly doubt any kernel reads ICR[63:32] for anything but debug purposes.  But
-we'd need to do that anyways for IPIv, otherwise migration from an IPIv host to
-a non-IPIv host would suffer the same migration bug.
-
-I'll post a series this week, in theory we should be able to reduce the patch for
-IPIv support to just having to only touching kvm_apic_write_nodecode().
+Right. None of these bits MBZ. I was observing that the grey fields
+RAZ. However, that observation was on Zen2. Zen3 is different. Now,
+it's not clear to me what the grey highlights mean. Perhaps nothing at
+all.
