@@ -2,172 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B412E492CA1
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:43:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09602492CA4
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:45:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347522AbiARRna (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 12:43:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27170 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231299AbiARRn3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 12:43:29 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20IHRA6P010476;
-        Tue, 18 Jan 2022 17:43:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=EyVUYdpuI6QI9oyP5AhRC+WmLc0caH/xe7ho5eIeAI4=;
- b=HBj26SzwnKzCQt+dJPVuemaVuQuI7tsvOemaa+ul9ZLEMg4Fdj0IqW0jzS0xWP9T0DAK
- Xd3YC2dNLo2wwzCzs1LJtFdzVzSBI+ymdng4kYdzPO6wWa2staxeYoVreGokkUjOshU/
- bfsDlCDH4pAs/fYhKXmJ1WjsJ38wLZbLrXnSSDWzHJ0qTL7DZByUxycO4L5YJSlugddp
- cVThdsM9BlBvcrsElMY5b7/6w/oSYehuwilSatyEZrqNYwp3i0dbjuMTE/kL/ZltoUIH
- Zcti/pbTaM9p+zRGZx4555l9+Al2mcfWKcuEqWJXFcamdcfQFRTXvl2S2EjpawQio3M7 Wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dp1yarcrh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 17:43:28 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20IHRYos011720;
-        Tue, 18 Jan 2022 17:43:28 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dp1yarcr1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 17:43:28 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20IHXjxU003059;
-        Tue, 18 Jan 2022 17:43:26 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dknhjeuy5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 17:43:26 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20IHhNIg24904114
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 17:43:23 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE019AE057;
-        Tue, 18 Jan 2022 17:43:22 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D7935AE053;
-        Tue, 18 Jan 2022 17:43:21 +0000 (GMT)
-Received: from [9.171.70.230] (unknown [9.171.70.230])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 17:43:21 +0000 (GMT)
-Message-ID: <4cde7eee-72ef-6bec-bb19-606ca57302dd@linux.ibm.com>
-Date:   Tue, 18 Jan 2022 18:45:04 +0100
+        id S1347536AbiARRps (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 12:45:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231299AbiARRpr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 12:45:47 -0500
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31BDC061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 09:45:46 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id bu18so50792459lfb.5
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 09:45:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=O0Ib0frfoMxDIRercCSX6k9OgI0AaBuKyo1VFKlOsto=;
+        b=rqLYx3gw/w39B+13Cv8fWZHBqXcs+1bzLBic/BOwJ4M+kyhMOf2WNdDPMIF60d/GOA
+         qzMU93VyKMuC9rlfdDHtqhahEsDNCYbOpT7lTXzx8B2oilCsjpO+MpvMzYBtUWUX3Obx
+         4wx4P7duV8KdmCDBnNix8QjIAWOvLfjWGX7JH/6UfDDv5q4whbxzsa0uJpqsivc/Qd8r
+         oZMDJi6ovG0rXeunuX1qUwDqUvn/gNcUiFt06+pg3npw8/fBgbVbtEtj2thnRwCZMUEE
+         kgyg8R6DRK6bEOajImi885KEeM/Thils6ft114WKCZWBe3qUTYkXtQ5BOOGgLJQYtxtT
+         UZZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O0Ib0frfoMxDIRercCSX6k9OgI0AaBuKyo1VFKlOsto=;
+        b=jghpWC8Uu5zeV2E+bpWsZrU/5plA+rFocJkqBRKMOSplQeiMlu31MCm/WBu3duugfm
+         JUMWqTKNMhiJh45GQeSMnv9PaCott0coMfhE2M7IUNl7QTBJPBSEWn8p+XiUA3//2Beo
+         qLtMzuy6BwKLSncqoBzIQ9TFaB8pwg8jS+olemtow8arIKUlH3jPrQj6vTtvJYRZUzK8
+         WNVtgwgXKdRmMRyWuDhQ2vN401Dp9IAZNpAz1uO4fHynLtPcTRruTMF5i02m6DdAPMvG
+         WRDT4/BJkHQmM0J8DxNB26NbgS3ltdkNstLn85d6ff3vLktiFyBLhkuKsowKHqJHwYjl
+         rJww==
+X-Gm-Message-State: AOAM530BJz292WwXFo4oOsbaF/sdFizxLTVMg9rwnaDV85OkjziOzDhD
+        qaoNMpH9fXWElRMB2rYlg6w2SehmSKPCX0TdiaMFRA==
+X-Google-Smtp-Source: ABdhPJxb51BsQK4IUQPTDFxumGR1EosVMMppY0Xr548MJfyF4kP8olGjOztEu8Rz9+ST0RdWkyQXxw7IZMUUeTSczpA=
+X-Received: by 2002:a05:651c:1304:: with SMTP id u4mr12967662lja.49.1642527945002;
+ Tue, 18 Jan 2022 09:45:45 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 23/30] vfio/pci: re-introduce CONFIG_VFIO_PCI_ZDEV
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-24-mjrosato@linux.ibm.com>
- <1ea61cf3-65b2-87ec-55b4-7dfa5f623d15@linux.ibm.com>
- <e1cd6368-bb1a-1a4d-df83-8190524b9a4d@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <e1cd6368-bb1a-1a4d-df83-8190524b9a4d@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zNt8jZDwymp1I01CqxrO2RSAbQ2ZUTfs
-X-Proofpoint-GUID: 6Z4K1HEghG6ikZCacyVQm61irZiioPM7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-18_05,2022-01-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 bulkscore=0
- priorityscore=1501 clxscore=1015 impostorscore=0 suspectscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201180105
+References: <20220113233020.3986005-1-dmatlack@google.com> <20220113233020.3986005-4-dmatlack@google.com>
+ <YeH5QlwgGcpStZyp@google.com>
+In-Reply-To: <YeH5QlwgGcpStZyp@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 18 Jan 2022 09:45:18 -0800
+Message-ID: <CALzav=firKgTUMF87t8Qv0pnooUVj5T5EbcOo2TZ8Zv5D_-tLw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: x86/mmu: Document and enforce MMU-writable
+ and Host-writable invariants
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Gardon <bgardon@google.com>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jan 14, 2022 at 2:29 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Jan 13, 2022, David Matlack wrote:
+> > +/*
+> > + * *_SPTE_HOST_WRITEABLE (aka Host-writable) indicates whether the host permits
+> > + * writes to the guest page mapped by the SPTE. This bit is cleared on SPTEs
+> > + * that map guest pages in read-only memslots and read-only VMAs.
+> > + *
+> > + * Invariants:
+> > + *  - If Host-writable is clear, PT_WRITABLE_MASK must be clear.
+> > + *
+> > + *
+> > + * *_SPTE_MMU_WRITEABLE (aka MMU-writable) indicates whether the shadow MMU
+> > + * allows writes to the guest page mapped by the SPTE. This bit is cleared when
+> > + * the guest page mapped by the SPTE contains a page table that is being
+> > + * monitored for shadow paging. In this case the SPTE can only be made writable
+> > + * by unsyncing the shadow page under the mmu_lock.
+> > + *
+> > + * Invariants:
+> > + *  - If MMU-writable is clear, PT_WRITABLE_MASK must be clear.
+> > + *  - If MMU-writable is set, Host-writable must be set.
+> > + *
+> > + * If MMU-writable is set, PT_WRITABLE_MASK is normally set but can be cleared
+> > + * to track writes for dirty logging. For such SPTEs, KVM will locklessly set
+> > + * PT_WRITABLE_MASK upon the next write from the guest and record the write in
+> > + * the dirty log (see fast_page_fault()).
+> > + */
+> > +
+> > +/* Bits 9 and 10 are ignored by all non-EPT PTEs. */
+> > +#define DEFAULT_SPTE_HOST_WRITEABLE  BIT_ULL(9)
+> > +#define DEFAULT_SPTE_MMU_WRITEABLE   BIT_ULL(10)
+>
+> Ha, so there's a massive comment above is_writable_pte() that covers a lot of
+> the same material.  More below.
+>
+> > +
+> >  /*
+> >   * Low ignored bits are at a premium for EPT, use high ignored bits, taking care
+> >   * to not overlap the A/D type mask or the saved access bits of access-tracked
+> > @@ -316,8 +341,13 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
+> >
+> >  static inline bool spte_can_locklessly_be_made_writable(u64 spte)
+> >  {
+> > -     return (spte & shadow_host_writable_mask) &&
+> > -            (spte & shadow_mmu_writable_mask);
+> > +     if (spte & shadow_mmu_writable_mask) {
+> > +             WARN_ON_ONCE(!(spte & shadow_host_writable_mask));
+> > +             return true;
+> > +     }
+> > +
+> > +     WARN_ON_ONCE(spte & PT_WRITABLE_MASK);
+>
+> I don't like having the WARNs here.  This is a moderately hot path, there are a
+> decent number of call sites, and the WARNs won't actually help detect the offender,
+> i.e. whoever wrote the bad SPTE long since got away.
 
+Re: hot path. The "return true" case (for fast_page_fault()) already
+had to do 2 bitwise-ANDs and compares, so this patch shouldn't make
+that any worse.
 
-On 1/18/22 18:32, Matthew Rosato wrote:
-> On 1/18/22 12:20 PM, Pierre Morel wrote:
->>
->>
->> On 1/14/22 21:31, Matthew Rosato wrote:
->>> This was previously removed as unnecessary; while that was true, 
->>> subsequent
->>> changes will make KVM an additional required component for 
->>> vfio-pci-zdev.
->>> Let's re-introduce CONFIG_VFIO_PCI_ZDEV as now there is actually a 
->>> reason
->>> to say 'n' for it (when not planning to CONFIG_KVM).
->>>
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> ---
->>>   drivers/vfio/pci/Kconfig      | 11 +++++++++++
->>>   drivers/vfio/pci/Makefile     |  2 +-
->>>   include/linux/vfio_pci_core.h |  2 +-
->>>   3 files changed, 13 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
->>> index 860424ccda1b..fedd1d4cb592 100644
->>> --- a/drivers/vfio/pci/Kconfig
->>> +++ b/drivers/vfio/pci/Kconfig
->>> @@ -42,5 +42,16 @@ config VFIO_PCI_IGD
->>>         and LPC bridge config space.
->>>         To enable Intel IGD assignment through vfio-pci, say Y.
->>> +
->>> +config VFIO_PCI_ZDEV
->>> +    bool "VFIO PCI extensions for s390x KVM passthrough"
->>> +    depends on S390 && KVM
->>> +    default y
->>> +    help
->>> +      Support s390x-specific extensions to enable support for 
->>> enhancements
->>> +      to KVM passthrough capabilities, such as interpretive 
->>> execution of
->>> +      zPCI instructions.
->>> +
->>> +      To enable s390x KVM vfio-pci extensions, say Y.
->>
->> In several patches we check on CONFIG_PCI (14,15,16,17 and 22) but we 
->> may have PCI without VFIO_PCI, wouldn't it be a problem?
->>
->> Here we define a new CONFIG entry and I have two questions:
->>
->> 1- there is no dependency on VFIO_PCI while the functionality is 
->> obviously based on VFIO_PCI
-> 
-> It's not obvious from this diff, but this 'config VFIO_PCI_ZDEV' 
-> statement is within an 'if VFIO_PCI' statement, just like VFIO_PCI_IGD 
-> above -- so the dependency is there.
+But that's a good point that it doesn't help with detecting the
+offender. I agree these WARNs should move to where SPTEs are set.
 
-sorry, I remember now you already answered this to Christian last time.
+>
+> And for whatever reason, I had a hell of a time (correctly) reading the second WARN :-)
+>
+> Lastly, there's also an "overlapping" WARN in mark_spte_for_access_track().
+>
+> > +     return false;
+>
+> To kill a few birds with fewer stones, what if we:
+>
+>   a. Move is_writable_pte() into spte.h, somewhat close to the HOST/MMU_WRITABLE
+>      definitions.
+>
+>   b. Add a new helper, spte_check_writable_invariants(), to enforce that a SPTE
+>      is WRITABLE iff it's MMU-Writable, and that a SPTE is MMU-Writable iff it's
+>      HOST-Writable.
+>
+>   c. Drop the WARN in mark_spte_for_access_track().
+>
+>   d. Call spte_check_writable_invariants() when setting SPTEs.
+>
+>   e. Document everything in a comment above spte_check_writable_invariants().
 
-> 
->>
->> 2- Wouldn't it be possible to use this item and the single condition 
->> for the different checks we need through the new VFIO interpretation 
->> functionality.
-> 
-> Possibly, but 1) we'd have to make linking arch/s390/kvm/pci.o dependent 
-> on CONFIG_VFIO_PCI instead of CONFIG_PCI in patch 14 and 2) if the 
-> relationship between CONFIG_VFIO_PCI and CONFIG_PCI were to ever change 
-> (though I don't see why it would..), we would be broken because the 
-> symbols we are referencing really require CONFIG_PCI (as they are 
-> located in s390 PCI).
-> 
-
-Yes but VFIO_PCI_ZDEV depends on KVM, PCI and on VFIO_PCI
-Wouldn't a single config item for this new code be easier to manage and 
-understand?
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Sounds good. I'll send a follow-up series.
