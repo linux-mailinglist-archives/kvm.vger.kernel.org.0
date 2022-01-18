@@ -2,103 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C6CC492CA9
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:51:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE60D492CAF
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 18:52:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347541AbiARRvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 12:51:05 -0500
-Received: from foss.arm.com ([217.140.110.172]:34458 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229934AbiARRvE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 12:51:04 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34280D6E;
-        Tue, 18 Jan 2022 09:51:04 -0800 (PST)
-Received: from C02TD0UTHF1T.local (unknown [10.57.37.52])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4186C3F774;
-        Tue, 18 Jan 2022 09:50:55 -0800 (PST)
-Date:   Tue, 18 Jan 2022 17:50:51 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Sven Schnelle <svens@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
-        alexandru.elisei@arm.com, anup.patel@wdc.com,
-        aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com,
-        chenhuacai@kernel.org, dave.hansen@linux.intel.com,
-        david@redhat.com, frankja@linux.ibm.com, frederic@kernel.org,
-        gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
-        james.morse@arm.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, maz@kernel.org, mingo@redhat.com,
-        mpe@ellerman.id.au, nsaenzju@redhat.com, palmer@dabbelt.com,
-        paulmck@kernel.org, paulus@samba.org, paul.walmsley@sifive.com,
-        seanjc@google.com, suzuki.poulose@arm.com, tglx@linutronix.de,
-        tsbogend@alpha.franken.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org
-Subject: Re: [PATCH 0/5] kvm: fix latent guest entry/exit bugs
-Message-ID: <20220118175051.GE17938@C02TD0UTHF1T.local>
-References: <YeFqUlhqY+7uzUT1@FVFF77S0Q05N>
- <ae1a42ab-f719-4a4e-8d2a-e2b4fa6e9580@linux.ibm.com>
- <YeF7Wvz05JhyCx0l@FVFF77S0Q05N>
- <b66c4856-7826-9cff-83f3-007d7ed5635c@linux.ibm.com>
- <YeGUnwhbSvwJz5pD@FVFF77S0Q05N>
- <8aa0cada-7f00-47b3-41e4-8a9e7beaae47@redhat.com>
- <20220118120154.GA17938@C02TD0UTHF1T.local>
- <6b6b8a2b-202c-8966-b3f7-5ce35cf40a7e@linux.ibm.com>
- <20220118131223.GC17938@C02TD0UTHF1T.local>
- <yt9dfsplc9fu.fsf@linux.ibm.com>
+        id S1347574AbiARRwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 12:52:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41290 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237208AbiARRwn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 12:52:43 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20IFveV7032467;
+        Tue, 18 Jan 2022 17:52:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=uCUxBqDyR2tolxbZOcuhtf45ykrVGQr2zUHl3ocZUBs=;
+ b=PoUsG/cVkMi3OHsjWeH+YTmatAmH0z7++673Gihjri3jwlt1m9WeFvjmJLNN4ARQsiga
+ AQnPs5c/QlqCDUr4pPO+Adxt9a3ZXzh2u80Bsm6T+sYWALYUZqnjfRbanagCHWmTf1PS
+ +1GYaU2fYFNKs+6DrM5IYarBxWFhcbliS/E3k5owOaeZ9a+iQFSLGrCvgVO0hXOF9FHR
+ jYfsWzTxThCSVSt8BNW7NSrnAxROBINwFEBGcNA9zCSzW8ept6V+SCANa3k9mKISxRqU
+ UYxH3fMg0NdKkRaoSyHQ0xHPX/3tYWrXhK3yGtBq5MwEXC74vaYrdmc8Y8888aaV1o0D kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dp0ncjgxp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 17:52:42 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20IHgQMu021120;
+        Tue, 18 Jan 2022 17:52:42 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dp0ncjgwv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 17:52:42 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20IHlsSi011311;
+        Tue, 18 Jan 2022 17:52:39 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9pumc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jan 2022 17:52:39 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20IHqaeY46924272
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jan 2022 17:52:36 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 780F5AE059;
+        Tue, 18 Jan 2022 17:52:36 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E78BAE053;
+        Tue, 18 Jan 2022 17:52:35 +0000 (GMT)
+Received: from [9.171.70.230] (unknown [9.171.70.230])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Jan 2022 17:52:35 +0000 (GMT)
+Message-ID: <05a6d673-df46-3d0e-9b20-a935f294e4c3@linux.ibm.com>
+Date:   Tue, 18 Jan 2022 18:54:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yt9dfsplc9fu.fsf@linux.ibm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 22/30] KVM: s390: intercept the rpcit instruction
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-23-mjrosato@linux.ibm.com>
+ <6eb0b596-c8b7-3529-55af-f3101821c74b@linux.ibm.com>
+ <e474b7a1-66de-1ede-3bbf-ccd7eff9eb7c@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <e474b7a1-66de-1ede-3bbf-ccd7eff9eb7c@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: U-8gveMCLpJjalyLCe0Limz-BUWVYZJf
+X-Proofpoint-GUID: RtatWE7pdKFA9oRW2fGxsgBzdlcLAfNT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-18_05,2022-01-18_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
+ bulkscore=0 suspectscore=0 phishscore=0 clxscore=1015 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201180105
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 05:09:25PM +0100, Sven Schnelle wrote:
-> Hi Mark,
 
-Hi Sven,
 
-> Mark Rutland <mark.rutland@arm.com> writes:
-> > On Tue, Jan 18, 2022 at 01:42:26PM +0100, Christian Borntraeger wrote:
-> >> Will you provide an s390 patch in your next iteration or shall we then do
-> >> one as soon as there is a v2? We also need to look into vsie.c where we
-> >> also call sie64a
-> >
-> > I'm having a go at that now; my plan is to try to have an s390 patch as
-> > part of v2 in the next day or so.
-> >
-> > Now that I have a rough idea of how SIE and exception handling works on
-> > s390, I think the structural changes to kvm-s390.c:__vcpu_run() and
-> > vsie.c:do_vsie_run() are fairly simple.
-> >
-> > The only open bit is exactly how/where to identify when the interrupt
-> > entry code needs to wake RCU. I can add a per-cpu variable or thread
-> > flag to indicate that we're inside that EQS, or or I could move the irq
-> > enable/disable into the sie64a asm and identify that as with the OUTSIDE
-> > macro in the entry asm.
+On 1/18/22 18:27, Matthew Rosato wrote:
+> On 1/18/22 6:05 AM, Pierre Morel wrote:
+>>
+>>
+>> On 1/14/22 21:31, Matthew Rosato wrote:
+>>> For faster handling of PCI translation refreshes, intercept in KVM
+>>> and call the associated handler.
+>>>
+>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>> ---
+>>>   arch/s390/kvm/priv.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 46 insertions(+)
+>>>
+>>> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+>>> index 417154b314a6..5b65c1830de2 100644
+>>> --- a/arch/s390/kvm/priv.c
+>>> +++ b/arch/s390/kvm/priv.c
+>>> @@ -29,6 +29,7 @@
+>>>   #include <asm/ap.h>
+>>>   #include "gaccess.h"
+>>>   #include "kvm-s390.h"
+>>> +#include "pci.h"
+>>>   #include "trace.h"
+>>>   static int handle_ri(struct kvm_vcpu *vcpu)
+>>> @@ -335,6 +336,49 @@ static int handle_rrbe(struct kvm_vcpu *vcpu)
+>>>       return 0;
+>>>   }
+>>> +static int handle_rpcit(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +    int reg1, reg2;
+>>> +    u8 status;
+>>> +    int rc;
+>>> +
+>>> +    if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+>>> +        return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+>>> +
+>>> +    /* If the host doesn't support PCI, it must be an emulated 
+>>> device */
+>>> +    if (!IS_ENABLED(CONFIG_PCI))
+>>> +        return -EOPNOTSUPP;
+>>
+>> AFAIU this makes also sure that the following code is not compiled in 
+>> case PCI is not supported.
+>>
+>> I am not very used to compilation options, is it true with all our 
+>> compilers and options?
+>> Or do we have to specify a compiler version?
+>>
+>> Another concern is, shouldn't we use IS_ENABLED(CONFIG_VFIO_PCI) ?
 > 
-> I wonder whether the code in irqentry_enter() should call a function
-> is_eqs() instead of is_idle_task(). The default implementation would
-> be just a
+> Same idea as in the other thread -- What we are trying to protect 
+> against here is referencing symbols that won't be linked (like 
+> zpci_refresh_trans, or the aift->mdd a few lines below)
 > 
-> #ifndef is_eqs
-> #define is_eqs is_idle_task
-> #endif
+> It is indeed true that we should never need to handle the rpcit 
+> intercept in KVM if CONFIG_VFIO_PCI=n -- but the necessary symbols/code 
+> are linked at least, so we can just let the SHM logic sort this out. 
+> When CONFIG_PCI=y|m, arch/s390/kvm/pci.o will be linked and so we can 
+> compare the function handle against afit->mdd (check to see if the 
+> device is emulated) and use this to determine whether or not to 
+> immediately send to userspace -- And if CONFIG_VFIO_PCI=n, a SHM bit 
+> will always be on and so we'll always go to userspace via this check.
+
+So we agree.
+But as I I said somewhere else I wonder if CONFIG_VFIO_PCI_ZDEV would 
+not even be better here.
+
 > 
-> and if an architecture has special requirements, it could just define
-> is_eqs() and do the required checks there. This way the architecture
-> could define whether it's a percpu bit, a cpu flag or something else.
+>>
+>>
+>>
+>>> +
+>>> +    kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
+>>> +
+>>> +    /* If the device has a SHM bit on, let userspace take care of 
+>>> this */
+>>> +    if (((vcpu->run->s.regs.gprs[reg1] >> 32) & aift->mdd) != 0)
+>>> +        return -EOPNOTSUPP;
+>>> +
+>>> +    rc = kvm_s390_pci_refresh_trans(vcpu, vcpu->run->s.regs.gprs[reg1],
+>>> +                    vcpu->run->s.regs.gprs[reg2],
+>>> +                    vcpu->run->s.regs.gprs[reg2+1],
+>>> +                    &status);
+>>> +
+>>> +    switch (rc) {
+>>> +    case 0:
+>>> +        kvm_s390_set_psw_cc(vcpu, 0);
+>>> +        break;
+>>> +    case -EOPNOTSUPP:
+>>> +        return -EOPNOTSUPP;
+>>> +    default:
+>>> +        vcpu->run->s.regs.gprs[reg1] &= 0xffffffff00ffffffUL;
+>>> +        vcpu->run->s.regs.gprs[reg1] |= (u64) status << 24;
+>>> +        if (status != 0)
+>>> +            kvm_s390_set_psw_cc(vcpu, 1);
+>>> +        else
+>>> +            kvm_s390_set_psw_cc(vcpu, 3);
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>   #define SSKE_NQ 0x8
+>>>   #define SSKE_MR 0x4
+>>>   #define SSKE_MC 0x2
+>>> @@ -1275,6 +1319,8 @@ int kvm_s390_handle_b9(struct kvm_vcpu *vcpu)
+>>>           return handle_essa(vcpu);
+>>>       case 0xaf:
+>>>           return handle_pfmf(vcpu);
+>>> +    case 0xd3:
+>>> +        return handle_rpcit(vcpu);
+>>>       default:
+>>>           return -EOPNOTSUPP;
+>>>       }
+>>>
+>>
+> 
 
-I had come to almost the same approach: I've added an arch_in_rcu_eqs()
-which is checked in addition to the existing is_idle_thread() check.
-
-In the case of checking is_idle_thread() and checking for PF_VCPU, I'm
-assuming the compiler can merge the loads of current->flags, and there's
-little gain by making this entirely architecture specific, but we can
-always check that and/or reconsider in future.
-
-Thanks,
-Mark.
+-- 
+Pierre Morel
+IBM Lab Boeblingen
