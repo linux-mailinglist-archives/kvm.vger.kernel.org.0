@@ -2,120 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3F0F49287E
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 15:35:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA506492884
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 15:37:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238089AbiAROfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 09:35:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28196 "EHLO
+        id S245344AbiAROhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 09:37:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:56689 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235461AbiAROfh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 09:35:37 -0500
+        by vger.kernel.org with ESMTP id S245283AbiAROhG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 09:37:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642516536;
+        s=mimecast20190719; t=1642516625;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zO56Q09aUpTDvis1ATNxTEf5i/l2MGs9tufQPSMA4GM=;
-        b=Tf/HpNOcAluzHswEmI7MpXdVyhH6VmAq8xhZomHe4nz8ivLWjMtxhGJUoMyuth8pi1gqye
-        bIyLF1py1WfSMiscgRs9NF9tjSafedDhudPFceQ2Ut+exn+oMo+ZA+/i8CI50IXVZnY/W1
-        VVVRB/ks2GSAbB/qPDc5GdRIYYGoNA0=
+        bh=I1Roh1bswl/1psuf+8JsW8+b4eb0eTKZBCJnJTJbWm4=;
+        b=hU14JOWQazlp+1RIFocZI5sUk3bmw1qYGvxho7DmafrT+4T6huboIG5WGlK6FdudRe88nm
+        xm9dkKkrDXeOBs6Dh0PuRhmfRxfBYkRa8lShSAEgPKdWEpbnuVE7RN4E67r1Ak7ymyQUDJ
+        ENfKeR8F/FToWvmtEgo8jksVQxSFZpw=
 Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
  [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-bDn00gdPNBi-dF5h556Kkw-1; Tue, 18 Jan 2022 09:35:35 -0500
-X-MC-Unique: bDn00gdPNBi-dF5h556Kkw-1
-Received: by mail-ed1-f69.google.com with SMTP id s9-20020aa7d789000000b004021d03e2dfso6936220edq.18
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 06:35:35 -0800 (PST)
+ us-mta-627-qIRx8rEhPD-H1eUBV8Z3Xw-1; Tue, 18 Jan 2022 09:37:04 -0500
+X-MC-Unique: qIRx8rEhPD-H1eUBV8Z3Xw-1
+Received: by mail-ed1-f69.google.com with SMTP id bm21-20020a0564020b1500b00402c34373f9so5020913edb.2
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 06:37:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zO56Q09aUpTDvis1ATNxTEf5i/l2MGs9tufQPSMA4GM=;
-        b=jNwE4d76N0FXALJrmQRfph6F50KYZDJ/0+/qopj8o36DCFl1vyPPmhaLlFaQqBASM3
-         fv0zdyoFMf8hMIopR5hXBJBkkncGouMYE+G2oO5JV+wXvJxO4mmQA5bIog8irXktIzD9
-         UjfVc/1cgb88MDWmRYUCrIB1v/Bfc9hHj9owGQ63ImFo1boeEibcFFbQP2smZLqMQf3K
-         +ACOINwo+to91zv/64sGmjzbeljWmfkcTGtGMVdlCKolg/ZFoRuj8Oi/0NlrIuMsnkE5
-         fd/DqcIQpxnywiNVT6RPTeC2/aXQr4TyYhTzUbC0fojFOsK2In4OHAxNINd30xm1+lZb
-         gl3A==
-X-Gm-Message-State: AOAM53034qeZX2AO35dG42/9vP6A0XChxz7u3l9GtmQHR5CJ2Zh/pUwc
-        UDYpXchKJoJa+Sw1aOS3CqvXbrf9SH5o1AWNWuWxn325GPKBPqOHSj4eA3VjU80ZGCFM4PkaZop
-        T3wpVHHajWKHs
-X-Received: by 2002:a17:907:3d01:: with SMTP id gm1mr20279304ejc.749.1642516533973;
-        Tue, 18 Jan 2022 06:35:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwss7y31/0dF5od58DVlTkQA8CaCauTNMQEa0nCt8L/Pa5H1yYps+xfo6rOrrwvuZTC0MVFDA==
-X-Received: by 2002:a17:907:3d01:: with SMTP id gm1mr20279293ejc.749.1642516533755;
-        Tue, 18 Jan 2022 06:35:33 -0800 (PST)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id mp5sm5413623ejc.46.2022.01.18.06.35.32
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=I1Roh1bswl/1psuf+8JsW8+b4eb0eTKZBCJnJTJbWm4=;
+        b=rC96pV9FPBJhzCO3QqvwTvQO6jRfFVbXYZNweHzYTH7cOcXjOXUthispcAm7Y14Wg3
+         6gL5hTU+3KWVu9GOfcyVRVniVbQ1PeQNyTD6ABqj03F/xuxvRJmPEC9KMiuzjjDt16NK
+         Es8njXB2EubcxZoC9wqngbmXzBpqWh7aPJQ5f5tjxgvoTBahUCMQKu1Eyp4aV6ybyluh
+         u/cgfekdSVBzdlGF/ZQW/mZfehoQhzDn9XxTdPh2U2Y2oENqDG5S/45Hy/LqairthpJd
+         HuKqzsRAz9rqD+NQyU/DBc4zB+elXTiacCpKlzy2T0QefejkQTTDUOby4d+Poe6UYExG
+         QvtQ==
+X-Gm-Message-State: AOAM531NZgycUVEqkTv99d8lsn8uISLlzIZjQWWXsex8EC0k7z93R5ui
+        hEFalUPGZwZUjT92YThi1Z4wWar35dYzi2h59ovvXT+anV37zeGuJWBayHDKdymqeUccBvBhbSf
+        kCY9gg/rvcsJy
+X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr20555829ejc.696.1642516622860;
+        Tue, 18 Jan 2022 06:37:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyJziAnMIo7Ue83WoM483kFpdpRDcWL4HxXt+a5HKtfJ+yVSF2XwVc5D5V3zdoybTJ7oVrJEw==
+X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr20555817ejc.696.1642516622684;
+        Tue, 18 Jan 2022 06:37:02 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id sh38sm5304355ejc.70.2022.01.18.06.37.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jan 2022 06:35:33 -0800 (PST)
-Date:   Tue, 18 Jan 2022 15:35:31 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        Tue, 18 Jan 2022 06:37:02 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] KVM: x86: Partially allow KVM_SET_CPUID{,2}
- after KVM_RUN for CPU hotplug
-Message-ID: <20220118153531.11e73048@redhat.com>
-In-Reply-To: <20220117150542.2176196-1-vkuznets@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] KVM: x86: Partially allow KVM_SET_CPUID{,2}
+ after KVM_RUN
+In-Reply-To: <87pmopl9m2.fsf@redhat.com>
 References: <20220117150542.2176196-1-vkuznets@redhat.com>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.31; x86_64-redhat-linux-gnu)
+ <20220117150542.2176196-3-vkuznets@redhat.com>
+ <c427371c-474e-1233-4e57-66210bfc5687@redhat.com>
+ <87pmopl9m2.fsf@redhat.com>
+Date:   Tue, 18 Jan 2022 15:37:01 +0100
+Message-ID: <87h7a1kt4i.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Jan 2022 16:05:38 +0100
-Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-> Changes since v1:
-> - Drop the allowlist of items which were allowed to change and just allow
-> the exact same CPUID data [Sean, Paolo]. Adjust selftest accordingly.
-> - Drop PATCH1 as the exact same change got merged upstream.
-> 
-> Recently, KVM made it illegal to change CPUID after KVM_RUN but
-> unfortunately this change is not fully compatible with existing VMMs.
-> In particular, QEMU reuses vCPU fds for CPU hotplug after unplug and it
-> calls KVM_SET_CPUID2. Relax the requirement by implementing an allowing
-> KVM_SET_CPUID{,2} with the exact same data.
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>
+>> On 1/17/22 16:05, Vitaly Kuznetsov wrote:
+>>>   
+>>> +/* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
+>>> +static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+>>> +				 int nent)
+>>> +{
+>>> +	struct kvm_cpuid_entry2 *best;
+>>> +	int i;
+>>> +
+>>> +	for (i = 0; i < nent; i++) {
+>>> +		best = kvm_find_cpuid_entry(vcpu, e2[i].function, e2[i].index);
+>>> +		if (!best)
+>>> +			return -EINVAL;
+>>> +
+>>> +		if (e2[i].eax != best->eax || e2[i].ebx != best->ebx ||
+>>> +		    e2[i].ecx != best->ecx || e2[i].edx != best->edx)
+>>> +			return -EINVAL;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>
+>> What about this alternative implementation:
+>>
+...
+>>
+>> avoiding the repeated calls to kvm_find_cpuid_entry?
+>>
+>
+> My version is a bit more permissive as it allows supplying CPUID entries
+> in any order, not necessarily matching the original. I *guess* this
+> doesn't matter much for the QEMU problem we're trying to workaround,
+> I'll have to check.
 
+I tried this with QEMU and nothing blew up, during CPU hotplug entries
+come in the same order as the original. v3 which I've just sent
+implements this suggestion.
 
-Can you check following scenario:
- * on host that has IA32_TSX_CTRL and TSX enabled (RTM/HLE cpuid bits present)
- * boot 2 vcpus VM with TSX enabled on VMM side but with tsx=off on kernel CLI
-
-     that should cause kernel to set MSR_IA32_TSX_CTRL to 3H from initial 0H
-     and clear RTM+HLE bits in CPUID, check that RTM/HLE cpuid it cleared
-
- * hotunplug a VCPU and then replug it again
-    if IA32_TSX_CTRL is reset to initial state, that should re-enable
-    RTM/HLE cpuid bits and KVM_SET_CPUID2 might fail due to difference
-
-and as Sean pointed out there might be other non constant leafs,
-where exact match check could leave userspace broken.
-     
-
-> Vitaly Kuznetsov (4):
->   KVM: x86: Do runtime CPUID update before updating
->     vcpu->arch.cpuid_entries
->   KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN
->   KVM: selftests: Rename 'get_cpuid_test' to 'cpuid_test'
->   KVM: selftests: Test KVM_SET_CPUID2 after KVM_RUN
-> 
->  arch/x86/kvm/cpuid.c                          | 67 ++++++++++++++++---
->  arch/x86/kvm/x86.c                            | 19 ------
->  tools/testing/selftests/kvm/.gitignore        |  2 +-
->  tools/testing/selftests/kvm/Makefile          |  4 +-
->  .../selftests/kvm/include/x86_64/processor.h  |  7 ++
->  .../selftests/kvm/lib/x86_64/processor.c      | 33 +++++++--
->  .../x86_64/{get_cpuid_test.c => cpuid_test.c} | 30 +++++++++
->  7 files changed, 126 insertions(+), 36 deletions(-)
->  rename tools/testing/selftests/kvm/x86_64/{get_cpuid_test.c => cpuid_test.c} (83%)
-> 
+-- 
+Vitaly
 
