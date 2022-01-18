@@ -2,98 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CBCC492281
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:19:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47C3A492296
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:21:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345590AbiARJTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 04:19:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41624 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240567AbiARJTr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 04:19:47 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E562FC061574;
-        Tue, 18 Jan 2022 01:19:46 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9F9FAB81247;
-        Tue, 18 Jan 2022 09:19:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A077BC340E4;
-        Tue, 18 Jan 2022 09:19:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1642497584;
-        bh=/Rdu/D+fiOf/x38JO5sE42aJ+q6RYz1CwV95zFg8HXY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Uo3DnIwN47etRtaC+bcn9hIw8UTdKtcUC7pPoSr1AYPgOE24HWstDbZrjzH+8ILZA
-         W4N/cT120Vt4dChmnKKj2ockfrwn+tCW9CvFK3LgE/AbYXAOtdOETJ7+CJ5udZPxe4
-         YBZUW8zi8wQUNZRExVsYl37iHhYkVr4T+C7VR32Q=
-Date:   Tue, 18 Jan 2022 10:19:40 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Wei Wang <wei.w.wang@intel.com>, stable@vger.kernel.org
-Subject: Re: [PATCH stable] KVM: x86: remove PMU FIXED_CTR3 from
- msrs_to_save_all
-Message-ID: <YeaGLM2U74OEPq7Z@kroah.com>
-References: <20220118091107.1007603-1-pbonzini@redhat.com>
+        id S1345605AbiARJVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 04:21:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50553 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345636AbiARJVf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 04:21:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642497694;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=V0up1jTBKdJRELCW3kgB+6Gb4eRzyxkdBmk1g6b9cN0=;
+        b=RmDX/0z39KwQXp82h+Jd5HkmfXa5HfEXYzALg9EfShbUVJQ9CIY2pLYT5EZoINpaoHsFxH
+        kFX4hK271G0SR84M4YX1843khPHprHqWLgMlpMa6FS9+g6Z1vShBigTV5rW1D3DQRiBl1o
+        WqzXBHPGqxCM4WtwPDXgv/74YiaX+tI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-298-3N1ZJQBtP6qk-qulCQzLvw-1; Tue, 18 Jan 2022 04:21:32 -0500
+X-MC-Unique: 3N1ZJQBtP6qk-qulCQzLvw-1
+Received: by mail-wm1-f71.google.com with SMTP id p7-20020a05600c1d8700b0034a0c77dad6so1620349wms.7
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 01:21:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=V0up1jTBKdJRELCW3kgB+6Gb4eRzyxkdBmk1g6b9cN0=;
+        b=KHowlRDm2Gv7mBLYpKy1BKCuyuQNKu+yQ2UKgN012jf0QVe5RmsdWrsrok6fAR5vA3
+         NMcrvIIufz63ZKP4clh17KmxpwXYK8z1dMNuiZLKvxI37uttzQKGyJTQHTNMZdN9a+z/
+         6AED+TKeOhpibmTW6FqeOSSapbKjHRkG2n/3mNJAqwycdKQBKMhIuR+Aa1BLMCdn78bD
+         qsJMnRvWrFAvV4Wr5Tp+4fqASULSz2A/qVTLpQtPUsVVF/7JNkBIkMHyw3e9vTy4wwQ7
+         hOnhRTm5qidLeZIbaC8b3bDc6XoMWWmxuXmGzLHJ2vwEy2bV8sh8x402jzpTcNGpyhkQ
+         IDJQ==
+X-Gm-Message-State: AOAM533u/LtMlSTRncPsBkbTMTGfHIjG43Xb9uYI3tLcPmPgP4uzhUFq
+        Su+6NBG1fNA+6TwTUe2JiofTEsHXBQXNN//aUx5OuS0gvZydSL3vnI7QIT+bSGuCH0/BPxXvJr3
+        bjE7VenMoV42a
+X-Received: by 2002:adf:f14d:: with SMTP id y13mr22460412wro.4.1642497691020;
+        Tue, 18 Jan 2022 01:21:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyQZpKJtdKUtknQlsuVUdAZ6wJLHmkM7UkdnWQguNwuAKRrv3aVJPWLp8uRn42swBXemfm2AA==
+X-Received: by 2002:adf:f14d:: with SMTP id y13mr22460397wro.4.1642497690840;
+        Tue, 18 Jan 2022 01:21:30 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id t8sm1800816wmq.43.2022.01.18.01.21.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jan 2022 01:21:30 -0800 (PST)
+Message-ID: <d6e6d814-bcbb-b4a0-04cb-8f90dcbf68e4@redhat.com>
+Date:   Tue, 18 Jan 2022 10:21:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220118091107.1007603-1-pbonzini@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [kvm-unit-tests PATCH 0/3] Add L2 exception handling KVM unit
+ tests for nSVM
+Content-Language: en-US
+To:     Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org
+References: <20211229062201.26269-1-manali.shukla@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211229062201.26269-1-manali.shukla@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 04:11:07AM -0500, Paolo Bonzini wrote:
-> From: Wei Wang <wei.w.wang@intel.com>
+On 12/29/21 07:21, Manali Shukla wrote:
+> This series adds 3 KVM Unit tests for nested SVM
+> 1) Check #NM is handled in L2 when L2 #NM handler is registered
+>     "fnop" instruction is called in L2 to generate the exception
 > 
-> [ upstream commit 9fb12fe5b93b94b9e607509ba461e17f4cc6a264 ]
+> 2) Check #BP is handled in L2 when L2 #BP handler is registered
+>     "int3" instruction is called in L2 to generate the exception
 > 
-> The fixed counter 3 is used for the Topdown metrics, which hasn't been
-> enabled for KVM guests. Userspace accessing to it will fail as it's not
-> included in get_fixed_pmc(). This breaks KVM selftests on ICX+ machines,
-> which have this counter.
+> 3) Check #OF is handled in L2 when L2 #OF handler is registered
+>     "into" instruction with instrumented code is used in L2 to
+>     generate the exception
 > 
-> To reproduce it on ICX+ machines, ./state_test reports:
-> ==== Test Assertion Failure ====
-> lib/x86_64/processor.c:1078: r == nmsrs
-> pid=4564 tid=4564 - Argument list too long
-> 1  0x000000000040b1b9: vcpu_save_state at processor.c:1077
-> 2  0x0000000000402478: main at state_test.c:209 (discriminator 6)
-> 3  0x00007fbe21ed5f92: ?? ??:0
-> 4  0x000000000040264d: _start at ??:?
->  Unexpected result from KVM_GET_MSRS, r: 17 (failed MSR was 0x30c)
+> Manali Shukla (3):
+>    x86: nSVM: Check #NM exception handling in L2
+>    x86: nSVM: Check #BP exception handling in L2
+>    x86: nSVM: Check #OF exception handling in L2
 > 
-> With this patch, it works well.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Message-Id: <20211217124934.32893-1-wei.w.wang@intel.com>
-> Fixes: e2ada66ec418 ("kvm: x86: Add Intel PMU MSRs to msrs_to_save[]")
-> Cc: stable@vger.kernel.org # 5.4.x
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9a2972fdae82..d490b83d640c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1331,7 +1331,7 @@ static const u32 msrs_to_save_all[] = {
->  	MSR_IA32_UMWAIT_CONTROL,
->  
->  	MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
-> -	MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
-> +	MSR_ARCH_PERFMON_FIXED_CTR0 + 2,
->  	MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
->  	MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
->  	MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
-> -- 
-> 2.31.1
+>   x86/svm_tests.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 114 insertions(+)
 > 
 
-Now queued up, thanks.
+Queued, thanks.
 
-greg k-h
+Paolo
+
