@@ -2,265 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 883C94912F2
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 01:44:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F8344913D0
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 02:57:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236395AbiARAoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 19:44:13 -0500
-Received: from mga07.intel.com ([134.134.136.100]:25747 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229632AbiARAoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 19:44:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642466652; x=1674002652;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fC5OmCNrq2on5Z2DCLXH2zztCSuT3R3WK2oNnnsL7Lw=;
-  b=ndLbYCbQ3hZj+z85O85HxWHY4DwKP4INDAZbUvegdVc8fPyUFmmb/cmc
-   JBIVODSwe3UtGGCnUE4zZ8ppoqxtCS62+JvQDhXy9YlMWiEHwtvK9pJmy
-   mXKsi8iH9RtdfA1E+YYZlliwcb290cvkHi6QDLsMnZQKd+SQf5H+V/Klm
-   mBmwyLE+88v7pt9kpGiI0i7/Xo87WgmsUi8+FOK5z+KFnW/wx+0kK6Moa
-   86cXvs0Go2QTACyH7T1gUbaMTGbJBOix9jF9sgSFl9tvM4hFqoHzsJ3gU
-   YJa2plb4H+YFZivH9LPsejpXRpdmeBXnC5tyxq00JIeYiNU61OFj7dG5N
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10230"; a="308050191"
-X-IronPort-AV: E=Sophos;i="5.88,296,1635231600"; 
-   d="scan'208";a="308050191"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2022 16:44:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,296,1635231600"; 
-   d="scan'208";a="531529613"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga008.jf.intel.com with ESMTP; 17 Jan 2022 16:44:06 -0800
-Date:   Tue, 18 Jan 2022 08:44:05 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S239132AbiARB5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 20:57:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239084AbiARB5I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 20:57:08 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0213C061574
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 17:57:07 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id i6-20020a626d06000000b004c0abfd53b3so7192179pfc.12
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 17:57:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=vJOiObhxu95/kxDXA87lBI0whmijrZSeIBoPadjg9mo=;
+        b=Pt60whvLgekWJhH1GRWxJSl/e5HGmX1wB5gUdjm2pEz6QXWyaVd4fG5NFIZvX3th6k
+         L6RyOu9Limw3r9t5JXd45PhYQ9KOT34iq8bQnDZe5fmCSotaFdD93kRGqcWtcGh/8DhI
+         v1rx3CsjPK4ApY/SBPTbinMBBvHW5RruKG7y2Sf5ihfOmOAwPL4ZVEd6Cq/pALCWFc+5
+         bfY3/QneI0cRibvCdD+yMAO0ZmlDCmNRhuK0QHy7oSAQnTZYUQ+vWgTJ8Wm0HPnL7K2+
+         XPhdsddsnYC2TneQ79IVqcTOLR9F8lKHcBOrjvdfFX3rNUFJkrGZXrpxQm934/Luquu7
+         AUOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=vJOiObhxu95/kxDXA87lBI0whmijrZSeIBoPadjg9mo=;
+        b=7xnohjHGo8O5ldAIZpVSsVYyhBUR7/xltnoC9xs3v/LwJa87Fi6Jv/vQxRd+VnAf5F
+         YZL+PJtoc42iMCqd5C1w2K62i5N0usHJemZTrCdrbDzj8d6ipLLUVpHY9KN0cjY1gHP4
+         8qe6wfhbs2/E4oMBumDmm6GplMx9Tb1BopOgl/9aq9uQo2YEpKcmXvPsFCMFedpGfAe5
+         jYR+HDiR2b6mFAZuriOg2rZ0w2O7Am7Aw6a9TzvrcFu37IAkh7bxXaP1czKsM8Pnt3jc
+         jnharZTD7k56OvvMj6k7dh2jf/pE/4+UeEzlgPZg+jq79+hJStznoygtadSOIWq5FQNg
+         yAmA==
+X-Gm-Message-State: AOAM532+EGNfexkKq92QqC1QJfv2EXV90G/zNReYVlIkQeIKEZ2SHJaD
+        TXZ4qoO00kdO0ISEY3W0t4b0VwvqhtOtAgWyG9RVKQPND4PLVC0usoS9rvpBHEFC5BDDecTGNwk
+        rPjpGPq7gwdbLX65viNUTFj9u5HCns7tH0nBOWkmnDhxqeDmTg7S8wd6cA2NGCSXhcpRlIGg=
+X-Google-Smtp-Source: ABdhPJwRk9u/XzSP0HuCbMjd6ti3DsYyIEU8xQCyhdJ7euIPihphq+67Gz5FH5UrKmUCSggrkREN7GbJpKNcZfeDlA==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:902:e8c8:b0:149:eb6d:23fb with
+ SMTP id v8-20020a170902e8c800b00149eb6d23fbmr25496710plg.53.1642471026898;
+ Mon, 17 Jan 2022 17:57:06 -0800 (PST)
+Date:   Tue, 18 Jan 2022 01:57:00 +0000
+Message-Id: <20220118015703.3630552-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
+Subject: [PATCH v2 0/3] ARM64: Guest performance improvement during dirty
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH v5 5/8] KVM: x86: Support interrupt dispatch in x2APIC
- mode with APIC-write VM exit
-Message-ID: <20220118004405.po36x3lxi26mkwsz@yy-desk-7060>
-References: <20211231142849.611-1-guang.zeng@intel.com>
- <20211231142849.611-6-guang.zeng@intel.com>
- <YeCZpo+qCkvx5l5m@google.com>
- <ec578526-989d-0913-e40e-9e463fb85a8f@intel.com>
- <YeG0Fdn/2++phMWs@google.com>
- <8ab5f976-1f3e-e2a5-87f6-e6cf376ead2f@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ab5f976-1f3e-e2a5-87f6-e6cf376ead2f@intel.com>
-User-Agent: NeoMutt/20171215
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 15, 2022 at 10:08:10AM +0800, Zeng Guang wrote:
-> On 1/15/2022 1:34 AM, Sean Christopherson wrote:
-> > On Fri, Jan 14, 2022, Zeng Guang wrote:
-> > > kvm_lapic_reg_read() is limited to read up to 4 bytes. It needs extension to
-> > > support 64bit read.
-> > Ah, right.
-> >
-> > > And another concern is here getting reg value only specific from vICR(no
-> > > other regs need take care), going through whole path on kvm_lapic_reg_read()
-> > > could be time-consuming unnecessarily. Is it proper that calling
-> > > kvm_lapic_get_reg64() to retrieve vICR value directly?
-> > Hmm, no, I don't think that's proper.  Retrieving a 64-bit value really is unique
-> > to vICR.  Yes, the code does WARN on that, but if future architectural extensions
-> > even generate APIC-write exits on other registers, then using kvm_lapic_get_reg64()
-> > would be wrong and this code would need to be updated again.
-> Split on x2apic and WARN on (offset != APIC_ICR) already limit register read
-> to vICR only. Actually
-> we just need consider to deal with 64bit data specific to vICR in APIC-write
-> exits. From this point of
-> view, previous design can be compatible on handling other registers even if
-> future architectural
-> extensions changes. :)
-> >
-> > What about tweaking my prep patch from before to the below?  That would yield:
-> >
-> > 	if (apic_x2apic_mode(apic)) {
-> > 		if (WARN_ON_ONCE(offset != APIC_ICR))
-> > 			return 1;
-> >
-> > 		kvm_lapic_msr_read(apic, offset, &val);
->
-> I think it's problematic to use kvm_lapic_msr_read() in this case. It
-> premises the high 32bit value
-> already valid at APIC_ICR2, while in handling "nodecode" x2APIC writes we
-> need get continuous 64bit
-> data from offset 300H first and prepare emulation of APIC_ICR2 write. At
-> this time, APIC_ICR2 is not
-> ready yet.
+This patch is to reduce the performance degradation of guest workload during
+dirty logging on ARM64. A fast path is added to handle permission relaxation
+during dirty logging. The MMU lock is replaced with rwlock, by which all
+permision relaxations on leaf pte can be performed under the read lock. This
+greatly reduces the MMU lock contention during dirty logging. With this
+solution, the source guest workload performance degradation can be improved
+by more than 60%.
 
-How about combine them, then you can handle the ICR write vmexit for
-IPI virtualization and Sean's patch can still work with code reusing,
-like below:
+Problem:
+  * A Google internal live migration test shows that the source guest workload
+  performance has >99% degradation for about 105 seconds, >50% degradation
+  for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+  This shows that most of the time, the guest workload degradtion is above
+  99%, which obviously needs some improvement compared to the test result
+  on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+  * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB, PageSize: 4K
+  * VM spec: #vCPU: 48, #Mem/vCPU: 4GB, PageSize: 4K, 2M hugepage backed
 
-	if (apic_x2apic_mode(apic)) {
-		if (WARN_ON_ONCE(offset != APIC_ICR))
-			kvm_lapic_msr_read(apic, offset, &val);
-		else
-			kvm_lapic_get_reg64(apic, offset, &val);
+Analysis:
+  * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+    the number of contentions of MMU lock and the "dirty memory time" on
+    various VM spec. The "dirty memory time" is the time vCPU threads spent
+    in KVM after fault. Higher "dirty memory time" means higher degradation
+    to guest workload.
+    '-m 2' specifies the mode "PA-bits:48,  VA-bits:48,  4K pages".
+    By using test command
+    ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
+    Below are the results:
+    +-------+------------------------+-----------------------+
+    | #vCPU | dirty memory time (ms) | number of contentions |
+    +-------+------------------------+-----------------------+
+    | 1     | 926                    | 0                     |
+    +-------+------------------------+-----------------------+
+    | 2     | 1189                   | 4732558               |
+    +-------+------------------------+-----------------------+
+    | 4     | 2503                   | 11527185              |
+    +-------+------------------------+-----------------------+
+    | 8     | 5069                   | 24881677              |
+    +-------+------------------------+-----------------------+
+    | 16    | 10340                  | 50347956              |
+    +-------+------------------------+-----------------------+
+    | 32    | 20351                  | 100605720             |
+    +-------+------------------------+-----------------------+
+    | 64    | 40994                  | 201442478             |
+    +-------+------------------------+-----------------------+
 
-		kvm_lapic_msr_write(apic, offset, val);
-	} else {
-		kvm_lapic_reg_read(apic, offset, 4, &val);
-		kvm_lapic_reg_write(apic, offset, val);
-	}
+  * From the test results above, the "dirty memory time" and the number of
+    MMU lock contention scale with the number of vCPUs. That means all the
+    dirty memory operations from all vCPU threads have been serialized by
+    the MMU lock. Further analysis also shows that the permission relaxation
+    during dirty logging is where vCPU threads get serialized.
 
->
-> > 		kvm_lapic_msr_write(apic, offset, val);
-> > 	} else {
-> > 		kvm_lapic_reg_read(apic, offset, 4, &val);
-> > 		kvm_lapic_reg_write(apic, offset, val);
-> > 	}
-> >
-> > I like that the above has "msr" in the low level x2apic helpers, and it maximizes
-> > code reuse.  Compile tested only...
-> >
-> > From: Sean Christopherson <seanjc@google.com>
-> > Date: Fri, 14 Jan 2022 09:29:34 -0800
-> > Subject: [PATCH] KVM: x86: Add helpers to handle 64-bit APIC MSR read/writes
-> >
-> > Add helpers to handle 64-bit APIC read/writes via MSRs to deduplicate the
-> > x2APIC and Hyper-V code needed to service reads/writes to ICR.  Future
-> > support for IPI virtualization will add yet another path where KVM must
-> > handle 64-bit APIC MSR reads/write (to ICR).
-> >
-> > Opportunistically fix the comment in the write path; ICR2 holds the
-> > destination (if there's no shorthand), not the vector.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/lapic.c | 59 ++++++++++++++++++++++----------------------
-> >   1 file changed, 29 insertions(+), 30 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index f206fc35deff..cc4531eb448f 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2787,6 +2787,30 @@ int kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr)
-> >   	return 0;
-> >   }
-> >
-> > +static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data)
-> > +{
-> > +	u32 low, high = 0;
-> > +
-> > +	if (kvm_lapic_reg_read(apic, reg, 4, &low))
-> > +		return 1;
-> > +
-> > +	if (reg == APIC_ICR &&
-> > +	    WARN_ON_ONCE(kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high)))
-> > +		return 1;
-> > +
-> > +	*data = (((u64)high) << 32) | low;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int kvm_lapic_msr_write(struct kvm_lapic *apic, u32 reg, u64 data)
-> > +{
-> > +	/* For 64-bit ICR writes, set ICR2 (dest) before ICR (command). */
-> > +	if (reg == APIC_ICR)
-> > +		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
-> > +	return kvm_lapic_reg_write(apic, reg, (u32)data);
-> > +}
-> > +
-> >   int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
-> >   {
-> >   	struct kvm_lapic *apic = vcpu->arch.apic;
-> > @@ -2798,16 +2822,13 @@ int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
-> >   	if (reg == APIC_ICR2)
-> >   		return 1;
-> >
-> > -	/* if this is ICR write vector before command */
-> > -	if (reg == APIC_ICR)
-> > -		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
-> > -	return kvm_lapic_reg_write(apic, reg, (u32)data);
-> > +	return kvm_lapic_msr_write(apic, reg, data);
-> >   }
-> >
-> >   int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
-> >   {
-> >   	struct kvm_lapic *apic = vcpu->arch.apic;
-> > -	u32 reg = (msr - APIC_BASE_MSR) << 4, low, high = 0;
-> > +	u32 reg = (msr - APIC_BASE_MSR) << 4;
-> >
-> >   	if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(apic))
-> >   		return 1;
-> > @@ -2815,45 +2836,23 @@ int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
-> >   	if (reg == APIC_DFR || reg == APIC_ICR2)
-> >   		return 1;
-> >
-> > -	if (kvm_lapic_reg_read(apic, reg, 4, &low))
-> > -		return 1;
-> > -	if (reg == APIC_ICR)
-> > -		kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high);
-> > -
-> > -	*data = (((u64)high) << 32) | low;
-> > -
-> > -	return 0;
-> > +	return kvm_lapic_msr_read(apic, reg, data);
-> >   }
-> >
-> >   int kvm_hv_vapic_msr_write(struct kvm_vcpu *vcpu, u32 reg, u64 data)
-> >   {
-> > -	struct kvm_lapic *apic = vcpu->arch.apic;
-> > -
-> >   	if (!lapic_in_kernel(vcpu))
-> >   		return 1;
-> >
-> > -	/* if this is ICR write vector before command */
-> > -	if (reg == APIC_ICR)
-> > -		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
-> > -	return kvm_lapic_reg_write(apic, reg, (u32)data);
-> > +	return kvm_lapic_msr_write(vcpu->arch.apic, reg, data);
-> >   }
-> >
-> >   int kvm_hv_vapic_msr_read(struct kvm_vcpu *vcpu, u32 reg, u64 *data)
-> >   {
-> > -	struct kvm_lapic *apic = vcpu->arch.apic;
-> > -	u32 low, high = 0;
-> > -
-> >   	if (!lapic_in_kernel(vcpu))
-> >   		return 1;
-> >
-> > -	if (kvm_lapic_reg_read(apic, reg, 4, &low))
-> > -		return 1;
-> > -	if (reg == APIC_ICR)
-> > -		kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high);
-> > -
-> > -	*data = (((u64)high) << 32) | low;
-> > -
-> > -	return 0;
-> > +	return kvm_lapic_msr_read(vcpu->arch.apic, reg, data);
-> >   }
-> >
-> >   int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
-> > --
+Solution:
+  * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+    the dirty-bit solution for dirty logging is much complicated compared to
+    the write-protection solution. The straight way to reduce the guest
+    performance degradation is to enhance the concurrency for the permission
+    fault path during dirty logging.
+  * In this patch, we only put leaf PTE permission relaxation for dirty
+    logging under read lock, all others would go under write lock.
+    Below are the results based on the fast path solution:
+    +-------+------------------------+
+    | #vCPU | dirty memory time (ms) |
+    +-------+------------------------+
+    | 1     | 965                    |
+    +-------+------------------------+
+    | 2     | 1006                   |
+    +-------+------------------------+
+    | 4     | 1128                   |
+    +-------+------------------------+
+    | 8     | 2005                   |
+    +-------+------------------------+
+    | 16    | 3903                   |
+    +-------+------------------------+
+    | 32    | 7595                   |
+    +-------+------------------------+
+    | 64    | 15783                  |
+    +-------+------------------------+
+
+  * Furtuer analysis shows that there is another bottleneck caused by the
+    setup of the test code itself. The 3rd commit is meant to fix that by
+    setting up vgic in the test code. With the test code fix, below are
+    the results which show better improvement.
+    +-------+------------------------+
+    | #vCPU | dirty memory time (ms) |
+    +-------+------------------------+
+    | 1     | 803                    |
+    +-------+------------------------+
+    | 2     | 843                    |
+    +-------+------------------------+
+    | 4     | 942                    |
+    +-------+------------------------+
+    | 8     | 1458                   |
+    +-------+------------------------+
+    | 16    | 2853                   |
+    +-------+------------------------+
+    | 32    | 5886                   |
+    +-------+------------------------+
+    | 64    | 12190                  |
+    +-------+------------------------+
+    All "dirty memory time" has been reduced by more than 60% when the
+    number of vCPU grows.
+  * Based on the solution, the test results from the Google internal live
+    migration test also shows more than 60% improvement with >99% for 30s,
+    >50% for 58s and >10% for 76s.
+
+---
+
+* v1 -> v2
+  - Renamed flag name from use_mmu_readlock to logging_perm_fault.
+  - Removed unnecessary check for fault_granule to use readlock.
+* RFC -> v1
+  - Rebase to kvm/queue, commit fea31d169094
+    (KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event)
+  - Moved the fast path in user_mem_abort, as suggested by Marc.
+  - Addressed other comments from Marc.
+
+[v1] https://lore.kernel.org/all/20220113221829.2785604-1-jingzhangos@google.com
+[RFC] https://lore.kernel.org/all/20220110210441.2074798-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (3):
+  KVM: arm64: Use read/write spin lock for MMU protection
+  KVM: arm64: Add fast path to handle permission relaxation during dirty
+    logging
+  KVM: selftests: Add vgic initialization for dirty log perf test for
+    ARM
+
+ arch/arm64/include/asm/kvm_host.h             |  2 +
+ arch/arm64/kvm/mmu.c                          | 49 ++++++++++++-------
+ .../selftests/kvm/dirty_log_perf_test.c       | 10 ++++
+ 3 files changed, 43 insertions(+), 18 deletions(-)
+
+
+base-commit: fea31d1690945e6dd6c3e89ec5591490857bc3d4
+-- 
+2.34.1.703.g22d0c6ccf7-goog
+
