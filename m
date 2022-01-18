@@ -2,84 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2B95491E57
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 04:55:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62E32491E65
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 05:09:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345701AbiARDzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jan 2022 22:55:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
+        id S1343693AbiAREJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jan 2022 23:09:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356918AbiARDyy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jan 2022 22:54:54 -0500
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87738C06175D
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 19:54:31 -0800 (PST)
-Received: by mail-ot1-x331.google.com with SMTP id q13-20020a9d4b0d000000b0059b1209d708so2013649otf.10
-        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 19:54:31 -0800 (PST)
+        with ESMTP id S245344AbiAREJI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jan 2022 23:09:08 -0500
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7447C061574
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 20:09:07 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id r138so26684099oie.3
+        for <kvm@vger.kernel.org>; Mon, 17 Jan 2022 20:09:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=VbBaRhq0Zl172wZjFD6mMT0O+mfQ7/gwQxGz/7ZESEw=;
-        b=gRfcuuT1j/h0h++snV+0azr2NTp2dXTmL/7iBpO88Sm9O8kzlmj213Oz3xFMwGh8PL
-         +lUlIH16CN9kdS5ljfI426WUpceaPGrlugHtY8ejXwV5Y17NLWNsF1bjmhyVnHjgWP4K
-         LvfSGQY7v3sI5DyyODGziT+78AG6cRPSqJVaozM9XHX9s33i0sAHcV49DNlTWriwk4U6
-         t0r/aBF+EKkAHYjJXD9hsBjTlrmdaqv9RjCWMsnphnN5WvneCfC7Q4eUDZH4E7DaxrYF
-         GtPwTooeTtxnEnZbKz7YImers6XYk8x4bxGauiPqfGGCSwwbEFCA4ssK2R8zuHe+GD44
-         egGA==
+        bh=U8OOIDNjUJ77GHdf9PAPOZyv54eYdoAaAy1PMG/qK4U=;
+        b=pHwQS1hXuX9sGssSqsed0YtI1zp4dpTt8VfEnBlXDdnh1S7iJCMfO9A7pG9o+5jby3
+         WY2/YetVM2Z8GLhiczIIKLSku5xD40vpBP1KaDs5oPsaAm/EftQcgbSXEhA5ruTzBxrz
+         I5N1NQMx53DoAOQ+qU9Tskmyg/3/ZQX8LAFjAsEZzUrr3d7qGfp2FQcTmJ+jS7uG17jc
+         ZDBDj8v0QE7H3Kn5bkQvAcjrsURizt98JtJnI2/UyZgYCBrPoJtit/JyRBcIgjrkpqIF
+         0nW5PEE5pEteFPkDtq2iDNn9I5XkEMhpjdAj5R7pirF2UCloWZ0ERTWjx12hzBKTpjrD
+         wzMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=VbBaRhq0Zl172wZjFD6mMT0O+mfQ7/gwQxGz/7ZESEw=;
-        b=FLgbvHLK4yqD6kBqOyOyn9oSicytk1yVJv3haY7Ri+DW84wnyQXUHhMIDjqTEf2WU5
-         Avf9y6xi95EPS035tzdaH1VW65JAWOvNPQO+STBh3dX9KJfHiDZspwMOmu3FgedoAm3w
-         0j00gwhsaFK+GQj9/ZGiiSkG/rZxTPx544T61g/FPnBdI+ruB141AInfnHxctDjiEYdc
-         ZDPiwPVaBVHdYeW8Cl4uB4LoZJyo+ZAdrrG0X/NABHSw4cZNQew/n1jKkmuK1faCZ55Z
-         pmRBHudr2GEzVlGG0yHk1jRTU+HQnMV1CLxLXoY1IThXpBDilwnUe49QTLI2OFbM2Nno
-         tqEg==
-X-Gm-Message-State: AOAM531LT9N2kPK/czXf21WsrIBA+WxqEmyRXcp4OVkSEbQdiibzB24E
-        B/ST7ex1ntlUDhctDwTVRdv+jifYsEtqfBFCrL93gg==
-X-Google-Smtp-Source: ABdhPJztuFTJAskYbZKN3kZ8V6YI+W//Vkcww6VhLq+9TDPFxFaCO6o11iAv//nmCDJoMmBtj2sDkespnMW5lZ+Mky4=
-X-Received: by 2002:a9d:d12:: with SMTP id 18mr16395258oti.75.1642478070388;
- Mon, 17 Jan 2022 19:54:30 -0800 (PST)
+        bh=U8OOIDNjUJ77GHdf9PAPOZyv54eYdoAaAy1PMG/qK4U=;
+        b=BAxX30BoelvP8NcG0B7XfiFFQUVaucPrikV0Hu5L0n1xbOE8tuy01ZSmKxKRwOrvxz
+         F0tN1gZMC2+J/reAYOmk2SCKr1EzrkDlBmQdIoL5wv6GEfsZ9v0ciMzkyMuft+FKJF/6
+         Ju+X435/gWoGiHzrfEfudZ1oo0VmoRAW861i7/9GSHlB0aZ6u62Un7cEGtTmr5VbMAJ/
+         BC7T//chFYLl4WqdVLwZd1+2GdiiYIrheo6sY62fRInSjGCQ6X2PYnroQHf7X34QLk+j
+         OZo5hwPtonKxRpMSwvISoj29YtBM4lIFkSPv1j3Wv25bykSVIHRlG234RmwWlOoTUdKV
+         yvPw==
+X-Gm-Message-State: AOAM531v+uQ+xhAb0KMK7nq5Yf46HlEEytYf2Imbm/c7zokRIajNge8Q
+        F2C1Lm/K/Wcy1/wGRaG2OyAdYsSDV95+pzCFx2tTzA==
+X-Google-Smtp-Source: ABdhPJwsm1aTZCoBTz6977RBP8vTFxxPygcCN+9go8h+6X/o3FQtLE/eSA8yKeXAi5GnWRiKuG8190WBEKvnsdmx2a4=
+X-Received: by 2002:a05:6808:297:: with SMTP id z23mr4647060oic.68.1642478946700;
+ Mon, 17 Jan 2022 20:09:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20211217124934.32893-1-wei.w.wang@intel.com>
-In-Reply-To: <20211217124934.32893-1-wei.w.wang@intel.com>
+References: <CALMp9eQZa_y3ZN0_xHuB6nW0YU8oO6=5zPEov=DUQYPbzLeQVA@mail.gmail.com>
+ <453a2a09-5f29-491e-c386-6b23d4244cc2@gmail.com> <CALMp9eSkYEXKkqDYLYYWpJ0oX10VWECJTwtk_pBWY5G-vN5H0A@mail.gmail.com>
+In-Reply-To: <CALMp9eSkYEXKkqDYLYYWpJ0oX10VWECJTwtk_pBWY5G-vN5H0A@mail.gmail.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 17 Jan 2022 19:54:19 -0800
-Message-ID: <CALMp9eR18D6omo6kVTUXQ2enPpUBE=5oQWvQ5uiYu_0h6npE8A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: remove PMU FIXED_CTR3 from msrs_to_save_all
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
+Date:   Mon, 17 Jan 2022 20:08:55 -0800
+Message-ID: <CALMp9eQAMpnJOSk_Rw+pp2amwi8Fk4Np1rviKYxJtoicas=6BQ@mail.gmail.com>
+Subject: Re: PMU virtualization and AMD erratum 1292
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stephane Eranian <eranian@google.com>,
+        kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 17, 2021 at 6:05 AM Wei Wang <wei.w.wang@intel.com> wrote:
+On Mon, Jan 17, 2022 at 12:57 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> The fixed counter 3 is used for the Topdown metrics, which hasn't been
-> enabled for KVM guests. Userspace accessing to it will fail as it's not
-> included in get_fixed_pmc(). This breaks KVM selftests on ICX+ machines,
-> which have this counter.
+> On Sun, Jan 16, 2022 at 8:26 PM Like Xu <like.xu.linux@gmail.com> wrote:
+> ...
+> > It's easy for KVM to clear the reserved bit PERF_CTL2[43]
+> > for only (AMD Family 19h Models 00h-0Fh) guests.
 >
-> To reproduce it on ICX+ machines, ./state_test reports:
-> ==== Test Assertion Failure ====
-> lib/x86_64/processor.c:1078: r == nmsrs
-> pid=4564 tid=4564 - Argument list too long
-> 1  0x000000000040b1b9: vcpu_save_state at processor.c:1077
-> 2  0x0000000000402478: main at state_test.c:209 (discriminator 6)
-> 3  0x00007fbe21ed5f92: ?? ??:0
-> 4  0x000000000040264d: _start at ??:?
->  Unexpected result from KVM_GET_MSRS, r: 17 (failed MSR was 0x30c)
+> KVM is currently *way* too aggressive about synthesizing #GP for
+> "reserved" bits on AMD hardware. Note that "reserved" generally has a
+> much weaker definition in AMD documentation than in Intel
+> documentation. When Intel says that an MSR bit is "reserved," it means
+> that an attempt to set the bit will raise #GP. When AMD says that an
+> MSR bit is "reserved," it does not necessarily mean the same thing.
+> (Usually, AMD will write MBZ to indicate that the bit must be zero.)
 >
-> With this patch, it works well.
+> On my Zen3 CPU, I can write 0xffffffffffffffff to MSR 0xc0010204,
+> without getting a #GP. Hence, KVM should not synthesize a #GP for any
+> writes to this MSR.
 >
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Reviewed-and-tested-by: Jim Mattson <jmattson@google.com>
+> Note that the value I get back from rdmsr is 0x30fffdfffff, so there
+> appears to be no storage behind bit 43. If KVM allows this bit to be
+> set, it should ensure that reads of this bit always return 0, as they
+> do on hardware.
 
-I believe this fixes commit 2e8cd7a3b828 ("kvm: x86: limit the maximum
-number of vPMU fixed counters to 3") from v5.9. Should this be cc'ed
-to stable?
+Bit 19 (Intel's old Pin Control bit) seems to have storage behind it.
+It is interesting that in Figure 13-7 "Core Performance Event-Select
+Register (PerfEvtSeln)" of the APM volume 2, this "reserved" bit is
+not marked in grey. The remaining "reserved" bits (which are marked in
+grey), should probably be annotated with "RAZ."
