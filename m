@@ -2,147 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D49364921AA
-	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 09:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E82D4492236
+	for <lists+kvm@lfdr.de>; Tue, 18 Jan 2022 10:10:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344995AbiARIxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 03:53:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44280 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229762AbiARIxc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jan 2022 03:53:32 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20I7VAsf006436;
-        Tue, 18 Jan 2022 08:53:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=f8n/nm79ebuzyK9dbiGbeICF1KGhYlIIhAz7ACIrlNM=;
- b=hrwglocs4xaOeoIzabT8EsQkulLgGCtlQxEkEGyNkOWeJlV//czH27QSVrpXTE0NJ3Hk
- YUogtNXpKOZKAI7LghxR8dRr35tFkJ1h0A4iuiYGKlDGHzfOlF1gh6kTZfjsvBzjRoyT
- wIS4O5VnT+V4X7QtP3sBfArTfJtLGcBdEvX2l1YERqMhxnuuoF60Uc9nOYpPJ9szMFvO
- JtOBi4+KX9EdIp9X0fOAP+0tETJ5/coM6u0p1AgPpT7L+ZvF1uvu3MWF/BKdkpbxgV3V
- g1+KvIaD3gZe4Yaih+/xAEMusyNixpVLsNKmrGrokFVM9oT6mbQwmjdIGYEAxWfHv+cZ AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnfgy4wep-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 08:53:30 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20I8kPKQ010600;
-        Tue, 18 Jan 2022 08:53:30 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dnfgy4we6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 08:53:30 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20I8fDf9020407;
-        Tue, 18 Jan 2022 08:53:27 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3dknwa93n5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jan 2022 08:53:27 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20I8rOdE19136964
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jan 2022 08:53:24 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 727F34C040;
-        Tue, 18 Jan 2022 08:53:24 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BF0DF4C058;
-        Tue, 18 Jan 2022 08:53:23 +0000 (GMT)
-Received: from [9.171.19.84] (unknown [9.171.19.84])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jan 2022 08:53:23 +0000 (GMT)
-Message-ID: <d39d9a13-e797-b7d3-6240-db3957b6ff53@linux.ibm.com>
-Date:   Tue, 18 Jan 2022 09:53:23 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: avoid warning on s390 in mark_page_dirty
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, dwmw2@infradead.org
-Cc:     butterflyhuangxx@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com,
+        id S235107AbiARJKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 04:10:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234599AbiARJK3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 04:10:29 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA98CC061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 01:10:28 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9kUa-0004vq-CT; Tue, 18 Jan 2022 10:09:28 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9kUO-00AyFG-5e; Tue, 18 Jan 2022 10:09:15 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1n9kUN-0002sb-15; Tue, 18 Jan 2022 10:09:15 +0100
+Date:   Tue, 18 Jan 2022 10:09:13 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, netdev <netdev@vger.kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        openipmi-developer@lists.sourceforge.net,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Sebastian Reichel <sre@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        Benson Leung <bleung@chromium.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <e9e5521d-21e5-8f6f-902c-17b0516b9839@redhat.com>
- <20220113122924.740496-1-borntraeger@linux.ibm.com>
- <eda019b1-8e1d-5d2b-4be4-2725e5814b23@linux.ibm.com>
- <14380a1b-669f-8f0f-139b-7c89fabd4276@redhat.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <14380a1b-669f-8f0f-139b-7c89fabd4276@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sn5TIcq1oEcEU3i10RvD_Li7TgQykj0l
-X-Proofpoint-ORIG-GUID: ZvseGFlLZjZRliYEn4S9CrhkUBpqPkRv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-18_01,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- bulkscore=0 phishscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201180053
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+Message-ID: <20220118090913.pjumkq4zf4iqtlha@pengutronix.de>
+References: <61b80939-357d-14f5-df99-b8d102a4e1a1@omp.ru>
+ <20220114202226.ugzklxv4wzr6egwj@pengutronix.de>
+ <c9026f17-2b3f-ee94-0ea3-5630f981fbc1@omp.ru>
+ <CAMuHMdXVbRudGs69f9ZzaP1PXhteDNZiXA658eMFAwP4nr9r3w@mail.gmail.com>
+ <20220117092444.opoedfcf5k5u6otq@pengutronix.de>
+ <CAMuHMdUgZUeraHadRAi2Z=DV+NuNBrKPkmAKsvFvir2MuquVoA@mail.gmail.com>
+ <20220117114923.d5vajgitxneec7j7@pengutronix.de>
+ <CAMuHMdWCKERO20R2iVHq8P=BaoauoBAtiampWzfMRYihi3Sb0g@mail.gmail.com>
+ <20220117170609.yxaamvqdkivs56ju@pengutronix.de>
+ <CAMuHMdXbuZqEpYivyS6hkaRN+CwTOGaHq_OROwVAWvDD6OXODQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="bm2t43tlpbmr2x5i"
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdXbuZqEpYivyS6hkaRN+CwTOGaHq_OROwVAWvDD6OXODQ@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 18.01.22 um 09:44 schrieb Paolo Bonzini:
-> On 1/18/22 09:37, Christian Borntraeger wrote:
->> Am 13.01.22 um 13:29 schrieb Christian Borntraeger:
->>> Avoid warnings on s390 like
->>> [ 1801.980931] CPU: 12 PID: 117600 Comm: kworker/12:0 Tainted: G            E 5.17.0-20220113.rc0.git0.32ce2abb03cf.300.fc35.s390x+next #1
->>> [ 1801.980938] Workqueue: events irqfd_inject [kvm]
->>> [...]
->>> [ 1801.981057] Call Trace:
->>> [ 1801.981060]  [<000003ff805f0f5c>] mark_page_dirty_in_slot+0xa4/0xb0 [kvm]
->>> [ 1801.981083]  [<000003ff8060e9fe>] adapter_indicators_set+0xde/0x268 [kvm]
->>> [ 1801.981104]  [<000003ff80613c24>] set_adapter_int+0x64/0xd8 [kvm]
->>> [ 1801.981124]  [<000003ff805fb9aa>] kvm_set_irq+0xc2/0x130 [kvm]
->>> [ 1801.981144]  [<000003ff805f8d86>] irqfd_inject+0x76/0xa0 [kvm]
->>> [ 1801.981164]  [<0000000175e56906>] process_one_work+0x1fe/0x470
->>> [ 1801.981173]  [<0000000175e570a4>] worker_thread+0x64/0x498
->>> [ 1801.981176]  [<0000000175e5ef2c>] kthread+0x10c/0x110
->>> [ 1801.981180]  [<0000000175de73c8>] __ret_from_fork+0x40/0x58
->>> [ 1801.981185]  [<000000017698440a>] ret_from_fork+0xa/0x40
->>>
->>> when writing to a guest from an irqfd worker as long as we do not have
->>> the dirty ring.
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
->>> ---
->>>   virt/kvm/kvm_main.c | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>> index 504158f0e131..1a682d3e106d 100644
->>> --- a/virt/kvm/kvm_main.c
->>> +++ b/virt/kvm/kvm_main.c
->>> @@ -3163,8 +3163,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>   {
->>>       struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->>> +#ifdef CONFIG_HAVE_KVM_DIRTY_RING
->>>       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
->>>           return;
->>> +#endif
->>>       if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
->>>           unsigned long rel_gfn = gfn - memslot->base_gfn;
->>
->> Paolo, are you going to pick this for next for the time being?
->>
-> 
-> Yep, done now.
-> 
-> Paolo
 
-Thanks. I just realized that Davids patch meanwhile landed in Linus tree. So better
-take this via master and not next.
-Maybe also add
-Fixes: 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
-in case the patch is picked for stable
+--bm2t43tlpbmr2x5i
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello Geert,
+
+On Tue, Jan 18, 2022 at 09:25:01AM +0100, Geert Uytterhoeven wrote:
+> On Mon, Jan 17, 2022 at 6:06 PM Uwe Kleine-K=F6nig
+> <u.kleine-koenig@pengutronix.de> wrote:
+> > On Mon, Jan 17, 2022 at 02:08:19PM +0100, Geert Uytterhoeven wrote:
+> > > On Mon, Jan 17, 2022 at 12:49 PM Uwe Kleine-K=F6nig
+> > > <u.kleine-koenig@pengutronix.de> wrote:
+> > > > > So there are three reasons: because the absence of an optional IRQ
+> > > > > is not an error, and thus that should not cause (a) an error code
+> > > > > to be returned, and (b) an error message to be printed, and (c)
+> > > > > because it can simplify the logic in device drivers.
+> > > >
+> > > > I don't agree to (a). If the value signaling not-found is -ENXIO or=
+ 0
+> > > > (or -ENODEV) doesn't matter much. I wouldn't deviate from the return
+> > > > code semantics of platform_get_irq() just for having to check again=
+st 0
+> > > > instead of -ENXIO. Zero is then just another magic value.
+> > >
+> > > Zero is a natural magic value (also for pointers).
+> > > Errors are always negative.
+> > > Positive values are cookies (or pointers) associated with success.
+> >
+> > Yeah, the issue where we don't agree is if "not-found" is special enough
+> > to deserve the natural magic value. For me -ENXIO is magic enough to
+> > handle the absence of an irq line. I consider it even the better magic
+> > value.
+>=20
+> It differs from other subsystems (clk, gpio, reset), which do return
+> zero on not found.
+
+IMHO it doesn't matter at all that the return value is zero, relevant is
+the semantic of the returned value. For clk, gpio, reset and regulator
+NULL is a usable dummy, for irqs it's not. So what you do with the value
+returned by platform_get_irq_whatever() is: you compare it with the
+(magic?) not-found value, and if it matches, you enter a suitable
+if-block.
+
+For the (clk|gpiod|regulator)_get_optional() you don't have to check
+against the magic not-found value (so no implementation detail magic
+leaks into the caller code) and just pass it to the next API function.
+(And my expectation would be that if you chose to represent not-found by
+(void *)66 instead of NULL, you won't have to adapt any user, just the
+framework internal checks. This is a good thing!)
+
+> What's the point in having *_optional() APIs if they just return the
+> same values as the non-optional ones?
+
+The upside is that functions with a similar name have similar semantics.
+But I agree, having platform_get_irq_optional() with the same return
+value for not-found is bad. Changing the return semantic is only one way
+to cope with that, renaming such the actual semantic difference is
+obvious from the function name is another (IMHO better one).=20
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--bm2t43tlpbmr2x5i
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHmg7YACgkQwfwUeK3K
+7Amhogf/dAjmJCBciWgz5NV3TfnJ8zBdFusKYKkLMRX6hggDS981lVDd/+0J/CXt
+OTZ/mg6pMVEdM4ZgmE7oLUUXSj26rQAXG0Tn0LElJNjNi2w6+jApwXacf1NIrjdY
+xuNSbiN94DwWHsG5fgK6ij9XQ1Y0VM23PBPhfBFJUBh2uwTWa/N2akSLPpO4xpcI
+qRk9h8QiaRxs+68qmLL5RA1wkp7oyAigMEUcgBr3qUFhTdSGAENP2ZWfgy1ONoFr
+ajWgfvPfJ0DAwLiGwyrLebtzFgmd1NwSqNEVsBLdDSkGDq1ysDF6kccVIYnJmWdD
+ioq82+vTregbKeZC6dz5wBLZ/E1KSA==
+=u/8Z
+-----END PGP SIGNATURE-----
+
+--bm2t43tlpbmr2x5i--
