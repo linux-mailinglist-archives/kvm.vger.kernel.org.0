@@ -2,188 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EBEE493BAB
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 15:05:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B242D493C04
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 15:38:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355017AbiASOFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 09:05:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21910 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1350177AbiASOFF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 09:05:05 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20JDXUji014693;
-        Wed, 19 Jan 2022 14:05:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=o9CQMpaJnZqvK3R8V42BAt85drqoIwZy3maZORN92Dc=;
- b=Uf7agktaYCT8UgRb1P8e2weSANk7YjRHk+lXTr6ffdVkzUXT1l7tC5BO1xDkf36MEh8/
- WDMZ+8In1b/tn267G6k4rBnjspoYQRUedDA/2uc9cFHf15BUJ9zWSqB9dHHWQMecXADH
- zmz0VyvlmNZdxaEYF0b3jGMpq4vc9UOPE1EpkGXFD6JgcwS2PGufddec04+VzgZlCPUQ
- Qkus7WPEpjc/neCMfskYAZO2v1oR9gt4MelFMZms3muKG8Anxxge16wCAXooTcdm3mYN
- n39VVDLPZwrnOPSSE10tplU/qo7Sdq4Q+M03LTCue97W8hISKgXZMM1v6MrTJVNWUUGn NQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dpkmsgtpx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jan 2022 14:05:03 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20JDbZ02028035;
-        Wed, 19 Jan 2022 14:05:03 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dpkmsgtny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jan 2022 14:05:03 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20JDw0pQ029012;
-        Wed, 19 Jan 2022 14:05:01 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9xj9n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jan 2022 14:05:01 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20JE4wjE15466834
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jan 2022 14:04:58 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5121A406D;
-        Wed, 19 Jan 2022 14:04:57 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC4AEA406B;
-        Wed, 19 Jan 2022 14:04:56 +0000 (GMT)
-Received: from [9.171.7.240] (unknown [9.171.7.240])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Jan 2022 14:04:56 +0000 (GMT)
-Message-ID: <2aa80655-f02f-1af9-c9b9-84f9633a7ed0@linux.ibm.com>
-Date:   Wed, 19 Jan 2022 15:06:40 +0100
+        id S1355173AbiASOiG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 09:38:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59178 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1355162AbiASOiG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 09:38:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642603085;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a01rUYdHW+bO+StXD3HoNzD8eXkiC4JLXNvROzx2a7U=;
+        b=SlyMPt24v6za0oUiPizF+7UB/ZPjNEqHQTTCIj3F4ANFnXxMaHXqAb1L4USsYE39sJgwv2
+        vLC++BqPNl/6H4dUG12FzVYc7Ua35aZkIv1JY4qWfwKZyFM4yDFtRr9ULurIl9U7ujcMsY
+        Nmh6Qy/CplqQURXIEKpTZETAvEpPG9E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-86-eqE4JhtINsCAlUEDJ6gAjw-1; Wed, 19 Jan 2022 09:38:02 -0500
+X-MC-Unique: eqE4JhtINsCAlUEDJ6gAjw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8C0E802924;
+        Wed, 19 Jan 2022 14:38:00 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-16.ams2.redhat.com [10.36.112.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D55037E64B;
+        Wed, 19 Jan 2022 14:37:55 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 6608F113865F; Wed, 19 Jan 2022 15:37:54 +0100 (CET)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, lvivier@redhat.com,
+        thuth@redhat.com, mtosatti@redhat.com, pbonzini@redhat.com,
+        richard.henderson@linaro.org, eblake@redhat.com, philmd@redhat.com,
+        marcel.apfelbaum@gmail.com, eduardo@habkost.net, den@openvz.org,
+        valery.vdovin.s@gmail.com,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Subject: Re: [PATCH v16] qapi: introduce 'x-query-x86-cpuid' QMP command.
+References: <20211222123124.130107-1-vsementsov@virtuozzo.com>
+Date:   Wed, 19 Jan 2022 15:37:54 +0100
+In-Reply-To: <20211222123124.130107-1-vsementsov@virtuozzo.com> (Vladimir
+        Sementsov-Ogievskiy's message of "Wed, 22 Dec 2021 13:31:24 +0100")
+Message-ID: <87lezbdc59.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 22/30] KVM: s390: intercept the rpcit instruction
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-23-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220114203145.242984-23-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _mqBAvUVIgunIckkTajWwAp5-KD0XdTf
-X-Proofpoint-ORIG-GUID: bydUnRCsR4Pbe1XJuSKJJvqeJDTgbsEi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-19_08,2022-01-19_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 bulkscore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 clxscore=1015 spamscore=0
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201190082
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
+> From: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+>
+> Introducing new QMP command 'query-x86-cpuid'. This command can be used to
+> get virtualized cpu model info generated by QEMU during VM initialization in
+> the form of cpuid representation.
+>
+> Diving into more details about virtual CPU generation: QEMU first parses '-cpu'
+> command line option. From there it takes the name of the model as the basis for
+> feature set of the new virtual CPU. After that it uses trailing '-cpu' options,
+> that state if additional cpu features should be present on the virtual CPU or
+> excluded from it (tokens '+'/'-' or '=on'/'=off').
+> After that QEMU checks if the host's cpu can actually support the derived
+> feature set and applies host limitations to it.
+> After this initialization procedure, virtual CPU has it's model and
+> vendor names, and a working feature set and is ready for identification
+> instructions such as CPUID.
+>
+> To learn exactly how virtual CPU is presented to the guest machine via CPUID
+> instruction, new QMP command can be used. By calling 'query-x86-cpuid'
+> command, one can get a full listing of all CPUID leaves with subleaves which are
+> supported by the initialized virtual CPU.
+>
+> Other than debug, the command is useful in cases when we would like to
+> utilize QEMU's virtual CPU initialization routines and put the retrieved
+> values into kernel CPUID overriding mechanics for more precise control
+> over how various processes perceive its underlying hardware with
+> container processes as a good example.
+>
+> The command is specific to x86. It is currenly only implemented for KVM acceleator.
 
-On 1/14/22 21:31, Matthew Rosato wrote:
-> For faster handling of PCI translation refreshes, intercept in KVM
-> and call the associated handler.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Please wrap your commit messages around column 70.
 
+>
+> Output format:
+> The output is a plain list of leaf/subleaf argument combinations, that
+> return 4 words in registers EAX, EBX, ECX, EDX.
+>
+> Use example:
+> qmp_request: {
+>   "execute": "x-query-x86-cpuid"
+> }
+>
+> qmp_response: {
+>   "return": [
+>     {
+>       "eax": 1073741825,
+>       "edx": 77,
+>       "in-eax": 1073741824,
+>       "ecx": 1447775574,
+>       "ebx": 1263359563
+>     },
+>     {
+>       "eax": 16777339,
+>       "edx": 0,
+>       "in-eax": 1073741825,
+>       "ecx": 0,
+>       "ebx": 0
+>     },
+>     {
+>       "eax": 13,
+>       "edx": 1231384169,
+>       "in-eax": 0,
+>       "ecx": 1818588270,
+>       "ebx": 1970169159
+>     },
+>     {
+>       "eax": 198354,
+>       "edx": 126614527,
+>       "in-eax": 1,
+>       "ecx": 2176328193,
+>       "ebx": 2048
+>     },
+>     ....
+>     {
+>       "eax": 12328,
+>       "edx": 0,
+>       "in-eax": 2147483656,
+>       "ecx": 0,
+>       "ebx": 0
+>     }
+>   ]
+> }
+>
+> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Aside our previous discussion, 2 small codingstyle to fix
-> ---
->   arch/s390/kvm/priv.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 46 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 417154b314a6..5b65c1830de2 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -29,6 +29,7 @@
->   #include <asm/ap.h>
->   #include "gaccess.h"
->   #include "kvm-s390.h"
-> +#include "pci.h"
->   #include "trace.h"
->   
->   static int handle_ri(struct kvm_vcpu *vcpu)
-> @@ -335,6 +336,49 @@ static int handle_rrbe(struct kvm_vcpu *vcpu)
->   	return 0;
->   }
->   
-> +static int handle_rpcit(struct kvm_vcpu *vcpu)
-> +{
-> +	int reg1, reg2;
-> +	u8 status;
-> +	int rc;
+This needs review from x86 CPU maintainers.  Eduardo?
+
+[...]
+
+> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> index f5ec4bc172..0ac575b1b9 100644
+> --- a/qapi/machine-target.json
+> +++ b/qapi/machine-target.json
+> @@ -341,3 +341,49 @@
+>                     'TARGET_I386',
+>                     'TARGET_S390X',
+>                     'TARGET_MIPS' ] } }
 > +
-> +	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
-> +		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+> +##
+> +# @CpuidEntry:
+> +#
+> +# A single entry of a CPUID response.
+> +#
+> +# One entry holds full set of information (leaf) returned to the guest
+> +# in response to it calling a CPUID instruction with eax, ecx used as
+> +# the arguments to that instruction. ecx is an optional argument as
+> +# not all of the leaves support it.
+> +#
+> +# @in-eax: CPUID argument in eax
+> +# @in-ecx: CPUID argument in ecx
+> +# @eax: CPUID result in eax
+> +# @ebx: CPUID result in ebx
+> +# @ecx: CPUID result in ecx
+> +# @edx: CPUID result in edx
+> +#
+> +# Since: 7.0
+> +##
+> +{ 'struct': 'CpuidEntry',
+> +  'data': { 'in-eax' : 'uint32',
+> +            '*in-ecx' : 'uint32',
+> +            'eax' : 'uint32',
+> +            'ebx' : 'uint32',
+> +            'ecx' : 'uint32',
+> +            'edx' : 'uint32'
+> +          },
+> +  'if': 'TARGET_I386' }
 > +
-> +	/* If the host doesn't support PCI, it must be an emulated device */
-> +	if (!IS_ENABLED(CONFIG_PCI))
-> +		return -EOPNOTSUPP;
-> +
-> +	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
-> +
-> +	/* If the device has a SHM bit on, let userspace take care of this */
-> +	if (((vcpu->run->s.regs.gprs[reg1] >> 32) & aift->mdd) != 0)
-> +		return -EOPNOTSUPP;
-> +
-> +	rc = kvm_s390_pci_refresh_trans(vcpu, vcpu->run->s.regs.gprs[reg1],
-> +					vcpu->run->s.regs.gprs[reg2],
-> +					vcpu->run->s.regs.gprs[reg2+1],
+> +##
+> +# @x-query-x86-cpuid:
+> +#
+> +# Returns raw data from the emulated CPUID table for the first VCPU.
+> +# The emulated CPUID table defines the response to the CPUID
+> +# instruction when executed by the guest operating system.
+> +#
+> +#
+> +# Returns: a list of CpuidEntry. Returns error when qemu is configured with
+> +#          --disable-kvm flag or if qemu is run with any other accelerator than KVM.
 
-Here, spaces around "+"
+Long line, please wrap around column 70.
 
-> +					&status);
-> +
-> +	switch (rc) {
-> +	case 0:
-> +		kvm_s390_set_psw_cc(vcpu, 0);
-> +		break;
-> +	case -EOPNOTSUPP:
-> +		return -EOPNOTSUPP;
-> +	default:
-> +		vcpu->run->s.regs.gprs[reg1] &= 0xffffffff00ffffffUL;
-> +		vcpu->run->s.regs.gprs[reg1] |= (u64) status << 24;
+> +#
+> +# Since: 7.0
+> +##
+> +{ 'command': 'x-query-x86-cpuid',
+> +  'returns': ['CpuidEntry'],
+> +  'if': 'TARGET_I386' }
 
-Here no blank after cast.
+Needs feature 'unstable' now; see commit a3c45b3e62 'qapi: New special
+feature flag "unstable"' and also commit 57df0dff1a "qapi: Extend
+-compat to set policy for unstable interfaces".  Incremental patch
+appended for your convenience.
 
-> +		if (status != 0)
-> +			kvm_s390_set_psw_cc(vcpu, 1);
-> +		else
-> +			kvm_s390_set_psw_cc(vcpu, 3);
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   #define SSKE_NQ 0x8
->   #define SSKE_MR 0x4
->   #define SSKE_MC 0x2
-> @@ -1275,6 +1319,8 @@ int kvm_s390_handle_b9(struct kvm_vcpu *vcpu)
->   		return handle_essa(vcpu);
->   	case 0xaf:
->   		return handle_pfmf(vcpu);
-> +	case 0xd3:
-> +		return handle_rpcit(vcpu);
->   	default:
->   		return -EOPNOTSUPP;
->   	}
-> 
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index 0ac575b1b9..049fa48a35 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -378,6 +378,8 @@
+ # The emulated CPUID table defines the response to the CPUID
+ # instruction when executed by the guest operating system.
+ #
++# Features:
++# @unstable: This command is experimental.
+ #
+ # Returns: a list of CpuidEntry. Returns error when qemu is configured with
+ #          --disable-kvm flag or if qemu is run with any other accelerator than KVM.
+@@ -386,4 +388,5 @@
+ ##
+ { 'command': 'x-query-x86-cpuid',
+   'returns': ['CpuidEntry'],
+-  'if': 'TARGET_I386' }
++  'if': 'TARGET_I386',
++  'features': [ 'unstable' ] }
+
