@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBABB494397
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 00:09:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A9684943B0
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 00:10:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357732AbiASXJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 18:09:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50512 "EHLO
+        id S1344272AbiASXJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 18:09:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343638AbiASXH6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 18:07:58 -0500
+        with ESMTP id S240071AbiASXH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 18:07:59 -0500
 Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D667C06175C
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 15:07:58 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id q3-20020a638c43000000b0034c9c0fb2d2so2488969pgn.22
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 15:07:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8B9C06175D
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 15:07:59 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id j186-20020a636ec3000000b00340c5f3a0cbso2542219pgc.0
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 15:07:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=YDqrNo/wldgkip0bjkyjtlYC24PWdJYaAJiVksfVa1s=;
-        b=pI6o0jOUFXYEfIpTgP1sKyK34MbesDr4s9XQNKYpB5+6eeJuz9urLWcDbJWTbdBj3K
-         EnYrWlVWHCJG43hl+szowXw7XKp6pBkR0QIGXGG3NAkdrxeeHj6Wp12m9/kPuz5kLmkM
-         TuYlOS+R5Zfe0KcdiztQnlwnmZcBEm4U+u1pG4RFnTrfdOfHf+Lh9TuANno4tDR8RxBP
-         EM0G/sRzNn9LjlWXxO1JJAvubiyWiD22PnUCc6pO/pjQ6caAODelxoTiUCScfK/yOH5i
-         5ZIdq7LXbv9WA9I9Vqoztfdre8mNHyx0h3KfO2GJQ8T/PlC9LsGtFKJgp25cE0RF0t7d
-         TXtA==
+        bh=M/E6s/KdP8Nhq2HrOUVfsx3LUjXAmeogBGtH3TxkicY=;
+        b=YqoHC8NPXtG95qTU5rAxxQgNFb8IjTkeXRsA4alfO+8aIptQbt4vJ/HtpODcbD2K2K
+         agkI7RtojQkj2rPvIRQdrZ5I+6D10xLraJ1hmaKgy/vrLkgHuHA6Je0bWbZzYbcPI3pb
+         SkYSl0Q18beAlW8hq5dtJHbE0itxdEKgRoEHmkQceRpasZ2pJXyDz91QPf38baIabqy4
+         c75NmSyNbozY4Rc1K9+2u6BW/Ax68KQLhqCDBCT0zrLziZ3arVmYQBQXoXxT8aap0VaD
+         oC5bKDmibnqtZfYkrbyRQ6iYxQCKmOqZ2nKX0iCqCOqeXk4wf0esl0A6Kgs2AETjCq+G
+         P2UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=YDqrNo/wldgkip0bjkyjtlYC24PWdJYaAJiVksfVa1s=;
-        b=4Y7CW7Olfej87mu2qyqchIHBmGDguaDQ7yODjWufYk8bI6UxfTcXivQXyPeLGAZXXd
-         04U55rVeqNX4pOwFXs4z7W5+t6plxcnka8njgZmXV4lj1C1xzztohxnWTJpLfNmzCxLE
-         ODrFo5eHGOUYo9gOTmqn/nYArnF1taApNJERBhKXc9Yq5wjOMGD79iBzUV5rd9/f+Nq6
-         5Dl5UJV4058ez/1gNzzIPPWVPGfv6cX5EODLTK+JR2XxNjID9aiMqlYnIpGLpgNfL9Ny
-         Ku6Xy0CouFCR1wBNf297MZW5b9Gud0AnJQO4m1V2E/rCiyX+REhHGB6lwwsOFTzeBt6r
-         n3eg==
-X-Gm-Message-State: AOAM532qLTSmCF2quhDND8iA/yTlzZ2qaPrSmFZAh+1bZYqxIneptbXL
-        qcOznmmriCWvwLJ0eGWdrHJx8Gx+87VCvw==
-X-Google-Smtp-Source: ABdhPJxC3RGwtAncFp0wYVbbZ2N9aYR6GBFCFJtxe8PRZ2utdWX60ujqYUINh4yx92vGsYBiRKEg0vafeL1S+g==
+        bh=M/E6s/KdP8Nhq2HrOUVfsx3LUjXAmeogBGtH3TxkicY=;
+        b=rIKODSUJng1Q5ck0ExSD91007bcgYbN5WMdqXTqzbxCoNT8vsSwJaSGsaUAammw9+y
+         QoLw7w+ko6DVwT2gO/VLBOHQETZFU/jV5c/G8hPigppW0OGCkd/tjKDV4XYWAb6wmi8D
+         WAJHfxTJaU2rUs4GybQ/dmLEz4U2MustnOfcYoqSw9jwis7TF5T1AmAzqDq5jCrOXJRl
+         0d3p57AaPKnFcRhpiNFaJ1VNJSiHFqeLMmSsuHzsDGOPKViWIfmwmfmLtPCP5NOSlZBq
+         H/ok705RwyULiSVrVb4lRMiSSOewQ8e9hGj2+GMxUuQlH3UWEKKO98LIAXmHHGUpEcpX
+         LwHA==
+X-Gm-Message-State: AOAM531mOQ65r01XfK/7r40vdr8p2L1XGJt5wvCV2dwg9VNuN/qQHU2x
+        ZLJ48+GLrDSUxp4KQW4qN85IAzRNMLDSrw==
+X-Google-Smtp-Source: ABdhPJx7XqrEq/4TJkaQcjPDMOPEQRIHEJJFKAfaOUpV0DS4BqYcdJqAYuJKc52gCaZvyBBGoSyOIts+HR4Y1g==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90b:4d84:: with SMTP id
- oj4mr741490pjb.0.1642633677370; Wed, 19 Jan 2022 15:07:57 -0800 (PST)
-Date:   Wed, 19 Jan 2022 23:07:27 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:7bce:: with SMTP id
+ d14mr965518pjl.7.1642633679272; Wed, 19 Jan 2022 15:07:59 -0800 (PST)
+Date:   Wed, 19 Jan 2022 23:07:28 +0000
 In-Reply-To: <20220119230739.2234394-1-dmatlack@google.com>
-Message-Id: <20220119230739.2234394-7-dmatlack@google.com>
+Message-Id: <20220119230739.2234394-8-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220119230739.2234394-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH v2 06/18] KVM: x86/mmu: Rename handle_removed_tdp_mmu_page()
- to handle_removed_pt()
+Subject: [PATCH v2 07/18] KVM: x86/mmu: Consolidate logic to atomically
+ install a new TDP MMU page table
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -72,57 +72,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-First remove tdp_mmu_ from the name since it is redundant given that it
-is a static function in tdp_mmu.c. There is a pattern of using tdp_mmu_
-as a prefix in the names of static TDP MMU functions, but all of the
-other handle_*() variants do not include such a prefix. So drop it
-entirely.
+Consolidate the logic to atomically replace an SPTE with an SPTE that
+points to a new page table into a single helper function. This will be
+used in a follow-up commit to split huge pages, which involves replacing
+each huge page SPTE with an SPTE that points to a page table.
 
-Then change "page" to "pt" to convey that this is operating on a page
-table rather than an struct page. Purposely use "pt" instead of "sp"
-since this function takes the raw RCU-protected page table pointer as an
-argument rather than  a pointer to the struct kvm_mmu_page.
+Opportunistically drop the call to trace_kvm_mmu_get_page() in
+kvm_tdp_mmu_map() since it is redundant with the identical tracepoint in
+tdp_mmu_alloc_sp().
 
 No functional change intended.
 
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 68 ++++++++++++++++++++------------------
+ 1 file changed, 36 insertions(+), 32 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 15cce503ffde..902dd6e49e50 100644
+index 902dd6e49e50..f6144db48367 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -295,7 +295,7 @@ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+@@ -251,24 +251,6 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	}
  }
  
+-/**
+- * tdp_mmu_link_sp() - Add a new shadow page to the list of used pages
+- *
+- * @kvm: kvm instance
+- * @sp: the new page
+- * @account_nx: This page replaces a NX large page and should be marked for
+- *		eventual reclaim.
+- */
+-static void tdp_mmu_link_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+-			    bool account_nx)
+-{
+-	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+-	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
+-	if (account_nx)
+-		account_huge_nx_page(kvm, sp);
+-	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+-}
+-
  /**
-- * handle_removed_tdp_mmu_page - handle a pt removed from the TDP structure
-+ * handle_removed_pt() - handle a page table removed from the TDP structure
+  * tdp_mmu_unlink_sp() - Remove a shadow page from the list of used pages
   *
-  * @kvm: kvm instance
-  * @pt: the page removed from the paging structure
-@@ -311,8 +311,7 @@ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
-  * this thread will be responsible for ensuring the page is freed. Hence the
-  * early rcu_dereferences in the function.
-  */
--static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
--					bool shared)
-+static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- {
- 	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(pt));
- 	int level = sp->role.level;
-@@ -472,8 +471,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	 * the paging structure.
- 	 */
- 	if (was_present && !was_leaf && (pfn_changed || !is_present))
--		handle_removed_tdp_mmu_page(kvm,
--				spte_to_child_pt(old_spte, level), shared);
-+		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
+@@ -959,6 +941,38 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 	return ret;
  }
  
- static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
++/*
++ * tdp_mmu_link_sp_atomic - Atomically replace the given spte with an spte
++ * pointing to the provided page table.
++ *
++ * @kvm: kvm instance
++ * @iter: a tdp_iter instance currently on the SPTE that should be set
++ * @sp: The new TDP page table to install.
++ * @account_nx: True if this page table is being installed to split a
++ *              non-executable huge page.
++ *
++ * Returns: 0 if the new page table was installed. Non-0 if the page table
++ *          could not be installed (e.g. the atomic compare-exchange failed).
++ */
++static int tdp_mmu_link_sp_atomic(struct kvm *kvm, struct tdp_iter *iter,
++				  struct kvm_mmu_page *sp, bool account_nx)
++{
++	u64 spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
++	int ret;
++
++	ret = tdp_mmu_set_spte_atomic(kvm, iter, spte);
++	if (ret)
++		return ret;
++
++	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
++	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
++	if (account_nx)
++		account_huge_nx_page(kvm, sp);
++	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
++
++	return 0;
++}
++
+ /*
+  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
+  * page tables and SPTEs to translate the faulting guest physical address.
+@@ -968,8 +982,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	struct tdp_iter iter;
+ 	struct kvm_mmu_page *sp;
+-	u64 *child_pt;
+-	u64 new_spte;
+ 	int ret;
+ 
+ 	kvm_mmu_hugepage_adjust(vcpu, fault);
+@@ -1004,6 +1016,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		}
+ 
+ 		if (!is_shadow_present_pte(iter.old_spte)) {
++			bool account_nx = fault->huge_page_disallowed &&
++					  fault->req_level >= iter.level;
++
+ 			/*
+ 			 * If SPTE has been frozen by another thread, just
+ 			 * give up and retry, avoiding unnecessary page table
+@@ -1013,18 +1028,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 				break;
+ 
+ 			sp = tdp_mmu_alloc_sp(vcpu, iter.gfn, iter.level - 1);
+-			child_pt = sp->spt;
+-
+-			new_spte = make_nonleaf_spte(child_pt,
+-						     !shadow_accessed_mask);
+-
+-			if (!tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, new_spte)) {
+-				tdp_mmu_link_sp(vcpu->kvm, sp,
+-						fault->huge_page_disallowed &&
+-						fault->req_level >= iter.level);
+-
+-				trace_kvm_mmu_get_page(sp, true);
+-			} else {
++			if (tdp_mmu_link_sp_atomic(vcpu->kvm, &iter, sp, account_nx)) {
+ 				tdp_mmu_free_sp(sp);
+ 				break;
+ 			}
 -- 
 2.35.0.rc0.227.g00780c9af4-goog
 
