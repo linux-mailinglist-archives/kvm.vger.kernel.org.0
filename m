@@ -2,196 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F9FF4940B7
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 20:20:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BA9D494048
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 20:05:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbiASTUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 14:20:05 -0500
-Received: from mga09.intel.com ([134.134.136.24]:46925 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239752AbiASTTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 14:19:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642619990; x=1674155990;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=GrIa/eIkS4G4kb2rO6T4E37qSkXPKSwhy4Oe6Ceo9GE=;
-  b=Ks/3HUvVsWkTUYJa/4ZMdoPiTTOvIVu4N5vGSVNIgBMIpKUFJDpaVJsA
-   EXWo/0GjwdvwnEOEFpVd0O7SeNs7lL5keSDSz+RPWqdhQ4ffsiZhh6Jy1
-   led0+7j6qXeab/lVKMGvzIQ2k/UrscgKtA2x4/Q2UOXxd6aeN/3kTzSyl
-   u6Z+8vCeBIceyDcsgaBpKJsypR4p3mndFe41m5qcZLlLo9uwF8STJFdYn
-   vhufn7waodXb4VESKPHGk/N5ux2Ot1WYL60mjawln0QZ9/bMPx4qlzY48
-   O8odoesT1i5jmSDbpjwZU3JimCWmbatGCREUwibyRrz2J+6xbeojmDQwS
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10231"; a="244961252"
-X-IronPort-AV: E=Sophos;i="5.88,300,1635231600"; 
-   d="scan'208";a="244961252"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 11:01:51 -0800
-X-IronPort-AV: E=Sophos;i="5.88,300,1635231600"; 
-   d="scan'208";a="595498167"
-Received: from smile.fi.intel.com ([10.237.72.61])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 11:01:29 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.95)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1nAG9n-00CEAT-Kb;
-        Wed, 19 Jan 2022 20:58:07 +0200
-Date:   Wed, 19 Jan 2022 20:58:07 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>, Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        platform-driver-x86@vger.kernel.org,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        openipmi-developer@lists.sourceforge.net,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Niklas =?iso-8859-1?Q?S=F6derlund?= 
-        <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
-Message-ID: <YehfP23nMd4wn48K@smile.fi.intel.com>
-References: <20220112085009.dbasceh3obfok5dc@pengutronix.de>
- <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
- <Yd9L9SZ+g13iyKab@sirena.org.uk>
- <29f0c65d-77f2-e5b2-f6cc-422add8a707d@omp.ru>
- <20220114092557.jrkfx7ihg26ekzci@pengutronix.de>
- <61b80939-357d-14f5-df99-b8d102a4e1a1@omp.ru>
- <20220114202226.ugzklxv4wzr6egwj@pengutronix.de>
- <57af1851-9341-985e-7b28-d2ba86770ecb@omp.ru>
- <20220117084732.cdy2sash5hxp4lwo@pengutronix.de>
+        id S232211AbiASTFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 14:05:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52428 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230427AbiASTFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 14:05:08 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25EC4C061574;
+        Wed, 19 Jan 2022 11:05:08 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id w12-20020a17090a528c00b001b276aa3aabso7478120pjh.0;
+        Wed, 19 Jan 2022 11:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=rRh+idUwbOdly6bknpYwWmsx3IX/EG0YgmQNjU2Me8w=;
+        b=Mn1dOVIkJPRudD5S+4bqqB0SgTsXe1/SRjq9+d/3NLil2nKYd+51WR0mfQqxIdIL7E
+         XLuCWZ2RrMpIX3Fa7EPtb1nlgr4P/0Ou8R337jSark5p0P3MQ6uhZ/Io+yVBbaCIvzsL
+         DhOJOPXtM51TFNfHTsGDj+j9QN00tHs3tuok0UvznETQqi3kBhSXC0XRQjFYeRWmO/6K
+         4eeU7XvljzQPZHNjmj2YBxate/YP9hN4RqJUr723tPynsxtaG7/8j6EdlmYjIhCQuNkr
+         hqt1+MXZHZsqBpwMQsX0bZm1+GGPIxZnJwViaI1E4KRSLP7zLsBzptqB3dhZ/nazKlHy
+         raPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=rRh+idUwbOdly6bknpYwWmsx3IX/EG0YgmQNjU2Me8w=;
+        b=Z2A/vK+REFOwf5mVLpqSYvULEk+WrjIJV/vIBH7cjWFcYY4sYLiZPqn8G4S9gQdLAW
+         3JHpJKllBiAxXJ5X22kOXfQL66b1s0L3xsJmFd3YGGGz44PpZr0gT7zEvtZS8wtNHA0B
+         69HrGLQDeaQgvBTsJIAhq/VY2vhjiH+ENG5UxTFRqc2hbjRytl+45kj/wolS7FkAQ1lM
+         7tyS03wLMOUc2k3K8ecxRiW296eOVc6JYflMOKCRuZmfj71WDp/oFKFZMJ94c1Rgc12c
+         Kyl8/e6/FAG24pOqzcWRzAQKHBINkbTRGMH1fNgWuZWrkgsTvf7goEIzVsen4hSOq78R
+         gpSw==
+X-Gm-Message-State: AOAM531hGRNRGij4pMBxYPr7nyGgUx0d/gRQ4VGPItyVxGYywqM7IECY
+        fgk4EfaEyWVYmEdxdrEZWJA=
+X-Google-Smtp-Source: ABdhPJwoS0m/QykotRUJH3Qi7VVx/2n8pQ/rcYLz3C51+SNORi/AogJ1gvg8zwSw+v2Ein5dC5jn+g==
+X-Received: by 2002:a17:90a:474d:: with SMTP id y13mr6030824pjg.4.1642619107410;
+        Wed, 19 Jan 2022 11:05:07 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id j8sm411341pfc.127.2022.01.19.11.05.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jan 2022 11:05:07 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 19 Jan 2022 09:05:05 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        seanjc@google.com, lizefan.x@bytedance.com, hannes@cmpxchg.org,
+        dmatlack@google.com, jiangshanlai@gmail.com, kvm@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: Move VM's worker kthreads back to the original
+ cgroups before exiting.
+Message-ID: <Yehg4doAwoUTBHLX@slm.duckdns.org>
+References: <20211222225350.1912249-1-vipinsh@google.com>
+ <20220105180420.GC6464@blackbody.suse.cz>
+ <CAHVum0e84nUcGtdPYQaJDQszKj-QVP5gM+nteBpSTaQ2sWYpmQ@mail.gmail.com>
+ <Yeclbe3GNdCMLlHz@slm.duckdns.org>
+ <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
+ <YehY0z2vHYVZk52J@slm.duckdns.org>
+ <CAHVum0fqhMQd2uFic5_7RN=Ah6TTH2G2qLNZuxnQXSazR57m6g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220117084732.cdy2sash5hxp4lwo@pengutronix.de>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <CAHVum0fqhMQd2uFic5_7RN=Ah6TTH2G2qLNZuxnQXSazR57m6g@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 17, 2022 at 09:47:32AM +0100, Uwe Kleine-König wrote:
-> On Sun, Jan 16, 2022 at 09:15:20PM +0300, Sergey Shtylyov wrote:
+On Wed, Jan 19, 2022 at 10:49:57AM -0800, Vipin Sharma wrote:
+> Sean suggested that we can use the real_parent of the kthread task
+> which will always be kthreadd_task, this will also not require any
+> changes in the cgroup API. I like that approach, I will give it a try.
+> This will avoid changes in cgroup APIs completely.
 
-...
+Yeah, that's better than the original but still not great in that it's still
+a workaround and just pushes up the problem. You can get the same race if
+the cgroups are nested. e.g. if you have a kvm instance under a/b and when
+kvm exits, the management software removes b and then realizes that a is
+empty too and then tries to delete that too.
 
-> Because with your change we have:
-> 
->  - < 0 -> error
->  - == 0 -> no irq
->  - > 0 -> irq
-> 
-> For my part I'd say this doesn't justify the change, but at least I
-> could better life with the reasoning. If you start at:
-> 
-> 	irq = platform_get_irq_optional(...)
-> 	if (irq < 0 && irq != -ENXIO)
-> 		return irq
-> 	else if (irq > 0)
-> 		setup_irq(irq);
-> 	else
-> 		setup_polling()
-> 
-> I'd change that to
-> 
-> 	irq = platform_get_irq_optional(...)
-> 	if (irq > 0) /* or >= 0 ? */
-> 		setup_irq(irq)
-> 	else if (irq == -ENXIO)
-> 		setup_polling()
-> 	else
-> 		return irq
-> 
-> This still has to mention -ENXIO, but this is ok and checking for 0 just
-> hardcodes a different return value.
+It'd be great if we can make kthread_stop actually wait for what most others
+consider thread exit but if we're just gonna work around them, just doing it
+in userspace might be better - e.g. after kvm exits, wait for !populated
+event (this is a pollable event) on the cgroup and then clean up.
 
-It's what we are against of. The idea is to have
-
-	irq = platform_get_irq_optional(...)
-	if (irq < 0) // we do not care about special cookies here
-		return irq;
-
-	if (irq)
-		setup_irq(irq)
-	else
-		setup_polling()
-
-See the difference? Your code is convoluted.
-
-> Anyhow, I think if you still want to change platform_get_irq_optional
-> you should add a few patches converting some drivers which demonstrates
-> the improvement for the callers.
-
-
+Thanks.
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+tejun
