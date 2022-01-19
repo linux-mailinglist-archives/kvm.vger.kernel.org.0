@@ -2,146 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62A434939C4
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:42:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B2DF4939DF
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:49:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354277AbiASLmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 06:42:20 -0500
-Received: from mxout03.lancloud.ru ([45.84.86.113]:32826 "EHLO
-        mxout03.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236274AbiASLmT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 06:42:19 -0500
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru 3B47720D46BF
-Received: from LanCloud
-Received: from LanCloud
-Received: from LanCloud
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
- (summary)
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
-CC:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>, <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        <linux-iio@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        <alsa-devel@alsa-project.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        <linux-mtd@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        <linux-phy@lists.infradead.org>, <linux-spi@vger.kernel.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        <openipmi-developer@lists.sourceforge.net>,
-        "Khuong Dinh" <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        "Jiri Slaby" <jirislaby@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        <bcm-kernel-feedback-list@broadcom.com>,
-        <linux-serial@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        "Jaroslav Kysela" <perex@perex.cz>, <linux-pwm@vger.kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>, <linux-pm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        "John Garry" <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        <linux-gpio@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "Sebastian Reichel" <sre@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        "Takashi Iwai" <tiwai@suse.com>,
-        <platform-driver-x86@vger.kernel.org>,
-        Benson Leung <bleung@chromium.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-edac@vger.kernel.org>, Tony Luck <tony.luck@intel.com>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>, <netdev@vger.kernel.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, <linux-mmc@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-renesas-soc@vger.kernel.org>,
-        "Vinod Koul" <vkoul@kernel.org>, James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
-        <linux-mediatek@lists.infradead.org>,
-        "Brian Norris" <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de> <YeQpWu2sUVOSaT9I@kroah.com>
- <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
- <b6038ec2-da4a-de92-b845-cac2be0efcd1@omp.ru>
- <20220119113314.tpqfdgi6nurmzfun@pengutronix.de>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <a42e1c8b-2c3d-e3f2-e48c-ad145322ad3d@omp.ru>
-Date:   Wed, 19 Jan 2022 14:42:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S1354220AbiASLtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 06:49:23 -0500
+Received: from gandalf.ozlabs.org ([150.107.74.76]:52991 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233640AbiASLtW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 06:49:22 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Jf3p80ltYz4y3p;
+        Wed, 19 Jan 2022 22:49:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1642592960;
+        bh=AI8Xp8WmFMzDYfkAVqP8te/3eXUi2hDB4d00oNT2g3g=;
+        h=Date:From:To:Cc:Subject:From;
+        b=iWx5D1yShLEExjx2+/bZbAIBXwoWH5lO7wB4dm19dwy9KqjBOxc18HHvICVn37Te0
+         qNoNv0JZ3PyjZxu3G0h3QAdOhX0ECLtR8uwQ4Vp6SNf3pTHDi9DgORiyIG8CpNct2A
+         pF3F0H0rYSwXoyiDW1Fwvua/cHx4nV9IWX5MvRkBmfh0yOTzxWc/hnmi/qvKg7BikA
+         uWEKIyfxJaHOlIwPFWQezpKf4xlKd4yIfwSPaSzkze/+9OOIpAZeu8LKB2Cv1jM/Vm
+         e10XFrWpE4fapoCzjTTshX8GKLhDDVdZ4gEXFNbP+z7RSv1caYRn1NthUPIfzJSyq8
+         u1yJJUuZnLd1w==
+Date:   Wed, 19 Jan 2022 22:49:18 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Wei Wang <wei.w.wang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm tree
+Message-ID: <20220119224918.026a21f1@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20220119113314.tpqfdgi6nurmzfun@pengutronix.de>
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [192.168.11.198]
-X-ClientProxiedBy: LFEXT02.lancloud.ru (fd00:f066::142) To
- LFEX1907.lancloud.ru (fd00:f066::207)
+Content-Type: multipart/signed; boundary="Sig_/YP+XCLo2kK.6P1+hz607rTI";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/19/22 2:33 PM, Uwe Kleine-König wrote:
+--Sig_/YP+XCLo2kK.6P1+hz607rTI
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-[...]
->>>>> A possible compromise: We can have both. We rename
->>>>> platform_get_irq_optional() to platform_get_irq_silent() (or
->>>>> platform_get_irq_silently() if this is preferred) and once all users are
->>>>> are changed (which can be done mechanically), we reintroduce a
->>>>> platform_get_irq_optional() with Sergey's suggested semantic (i.e.
->>>>> return 0 on not-found, no error message printking).
->>>>
->>>> Please do not do that as anyone trying to forward-port an old driver
->>>> will miss the abi change of functionality and get confused.  Make
->>>> build-breaking changes, if the way a function currently works is
->>>> changed in order to give people a chance.
->>>
->>> Fine for me. I assume this is a Nack for Sergey's patch?
->>
->>    Which patch do you mean? I'm starting to get really muddled... :-(
-> 
-> I'm talking about "[PATCH 1/2] platform: make
-> platform_get_irq_optional() optional"
+Hi all,
 
-   I thought GregKH was talking about your renaming patch... :-/
+In commit
 
-> because "trying to forward-port an
-> old driver will miss the abi" applies to it.
+  32c8644b37cf ("kvm: selftests: conditionally build vm_xsave_req_perm()")
 
-   Mhm... why not tell me right from the start? Jr even tell that to Andy
-instead of merging his patch, so I wouldn't get sucked into this work? 
-I wouldn't bother with v2 and it would have saved a lot of time spent on
-email... :-(
-   Do we also remember that "the stable API is a nonsense" thing? :-)
+Fixes tag
 
-> Best regards
-> Uwe
+  Fixes: 415a3c33e8 ("kvm: selftests: Add support for KVM_CAP_XSAVE2")
 
-MBR, Sergey
+has these problem(s):
+
+  - SHA1 should be at least 12 digits long
+    Can be fixed in the future by setting core.abbrev to 12 (or more) or
+    (for git v2.11 or later) just making sure it is not set (or set to
+    "auto").
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/YP+XCLo2kK.6P1+hz607rTI
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHn+r8ACgkQAVBC80lX
+0Gz0OggAiMDH9+/N4KishH8m9aWwABnNUu0uAHYkKbaZEI2TSnQSENmQ9Zydug23
+ZH+pvst4VJHP5t0n7dkD5GdoGy56KrwiioX8cldpfoidXjLyMBoJ0iIN9vhpOLam
+pzWWECxTaNl+q+9J+AEY72/BFFLjFphbD+pWEvOUiddIaqhCBCZCdiWbsYG+xLCN
+sIPHrsJWyWD5Q2DJqrhjgFJhKtjmlgmobzRxkjISfKLUvPBKvFrlzrV8FVQgjzjr
+32he1Hh6An12wideEFKbE+kknsoMSE7i1EeCavQI6oiZFM9sC725GfEPX9lpjtWj
+iSrRroT+N3tm+acoKa/WfYqafebQkg==
+=2Fns
+-----END PGP SIGNATURE-----
+
+--Sig_/YP+XCLo2kK.6P1+hz607rTI--
