@@ -2,85 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B2DF4939DF
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:49:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEDBC4939E7
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:51:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354220AbiASLtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 06:49:23 -0500
-Received: from gandalf.ozlabs.org ([150.107.74.76]:52991 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233640AbiASLtW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 06:49:22 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Jf3p80ltYz4y3p;
-        Wed, 19 Jan 2022 22:49:20 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1642592960;
-        bh=AI8Xp8WmFMzDYfkAVqP8te/3eXUi2hDB4d00oNT2g3g=;
-        h=Date:From:To:Cc:Subject:From;
-        b=iWx5D1yShLEExjx2+/bZbAIBXwoWH5lO7wB4dm19dwy9KqjBOxc18HHvICVn37Te0
-         qNoNv0JZ3PyjZxu3G0h3QAdOhX0ECLtR8uwQ4Vp6SNf3pTHDi9DgORiyIG8CpNct2A
-         pF3F0H0rYSwXoyiDW1Fwvua/cHx4nV9IWX5MvRkBmfh0yOTzxWc/hnmi/qvKg7BikA
-         uWEKIyfxJaHOlIwPFWQezpKf4xlKd4yIfwSPaSzkze/+9OOIpAZeu8LKB2Cv1jM/Vm
-         e10XFrWpE4fapoCzjTTshX8GKLhDDVdZ4gEXFNbP+z7RSv1caYRn1NthUPIfzJSyq8
-         u1yJJUuZnLd1w==
-Date:   Wed, 19 Jan 2022 22:49:18 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Wei Wang <wei.w.wang@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvm tree
-Message-ID: <20220119224918.026a21f1@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/YP+XCLo2kK.6P1+hz607rTI";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        id S1354320AbiASLu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 06:50:28 -0500
+Received: from mx405.baidu.com ([124.64.200.26]:32843 "EHLO mx421.baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1354318AbiASLuU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 06:50:20 -0500
+Received: from bjhw-sys-rpm015653cc5.bjhw.baidu.com (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
+        by mx421.baidu.com (Postfix) with ESMTP id 454482F00920;
+        Wed, 19 Jan 2022 19:50:15 +0800 (CST)
+Received: from localhost (localhost [127.0.0.1])
+        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id 35F5BD9932;
+        Wed, 19 Jan 2022 19:50:15 +0800 (CST)
+From:   Yuan ZhaoXiong <yuanzhaoxiong@baidu.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com
+Cc:     lirongqing@baidu.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v1] KVM: X86: Introduce vfio_intr_stat per-vm debugfs file
+Date:   Wed, 19 Jan 2022 19:50:15 +0800
+Message-Id: <1642593015-28729-1-git-send-email-yuanzhaoxiong@baidu.com>
+X-Mailer: git-send-email 1.7.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/YP+XCLo2kK.6P1+hz607rTI
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Use this file to export correspondence between guest_irq, host_irq,
+vector and vcpu belonging to VFIO passthrough devices.
 
-Hi all,
+An example output of this looks like (a vm with VFIO passthrough
+devices):
+   guest_irq     host_irq       vector         vcpu
+          24          201           37            8
+          25          202           35           25
+          26          203           35           20
+   ......
 
-In commit
+When a VM has VFIO passthrough devices, the correspondence between
+guest_irq, host_irq, vector and vcpu may need to be known especially
+in AMD platform with avic disabled. The AMD avic is disabled, and
+the passthrough devices may cause vcpu vm exit twice for a interrupt.
+One extrernal interrupt caused by vfio host irq, other ipi to inject
+a interrupt to vm.
 
-  32c8644b37cf ("kvm: selftests: conditionally build vm_xsave_req_perm()")
+If the system administrator known these information, set vfio host
+irq affinity to Pcpu which the correspondece guest irq affinited vcpu,
+to avoid extra vm exit.
 
-Fixes tag
+Co-developed-by: Li RongQing <lirongqing@baidu.com>
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Signed-off-by: Yuan ZhaoXiong <yuanzhaoxiong@baidu.com>
+---
+diff with v0: modifying the code format.
 
-  Fixes: 415a3c33e8 ("kvm: selftests: Add support for KVM_CAP_XSAVE2")
+ arch/x86/kvm/debugfs.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
-has these problem(s):
+diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
+index 9240b3b..be16bfe 100644
+--- a/arch/x86/kvm/debugfs.c
++++ b/arch/x86/kvm/debugfs.c
+@@ -10,6 +10,11 @@
+ #include "mmu.h"
+ #include "mmu/mmu_internal.h"
+ 
++#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
++#include <linux/kvm_irqfd.h>
++#include <asm/irq_remapping.h>
++#endif
++
+ static int vcpu_get_timer_advance_ns(void *data, u64 *val)
+ {
+ 	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) data;
+@@ -181,9 +186,94 @@ static int kvm_mmu_rmaps_stat_release(struct inode *inode, struct file *file)
+ 	.release	= kvm_mmu_rmaps_stat_release,
+ };
+ 
++#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
++static int kvm_vfio_intr_stat_show(struct seq_file *m, void *v)
++{
++	struct kvm_kernel_irq_routing_entry *e;
++	struct kvm_irq_routing_table *irq_rt;
++	unsigned int host_irq, guest_irq;
++	struct kvm_kernel_irqfd *irqfd;
++	struct kvm *kvm = m->private;
++	struct kvm_lapic_irq irq;
++	struct kvm_vcpu *vcpu;
++	int idx;
++
++	if (!kvm_arch_has_assigned_device(kvm) ||
++			!irq_remapping_cap(IRQ_POSTING_CAP)) {
++		return 0;
++	}
++
++	seq_printf(m, "%12s %12s %12s %12s\n",
++			"guest_irq", "host_irq", "vector", "vcpu");
++
++	spin_lock_irq(&kvm->irqfds.lock);
++	idx = srcu_read_lock(&kvm->irq_srcu);
++	irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
++
++	list_for_each_entry(irqfd, &kvm->irqfds.items, list) {
++		if (!irqfd->producer)
++			continue;
++
++		host_irq = irqfd->producer->irq;
++		guest_irq = irqfd->gsi;
++
++		if (guest_irq >= irq_rt->nr_rt_entries ||
++				hlist_empty(&irq_rt->map[guest_irq])) {
++			pr_warn_once("no route for guest_irq %u/%u (broken user space?)\n",
++					guest_irq, irq_rt->nr_rt_entries);
++			continue;
++		}
++
++		hlist_for_each_entry(e, &irq_rt->map[guest_irq], link) {
++			if (e->type != KVM_IRQ_ROUTING_MSI)
++				continue;
++
++			kvm_set_msi_irq(kvm, e, &irq);
++			if (kvm_intr_is_single_vcpu(kvm, &irq, &vcpu)) {
++				seq_printf(m, "%12u %12u %12u %12u\n",
++						guest_irq, host_irq, irq.vector, vcpu->vcpu_id);
++			}
++		}
++	}
++	srcu_read_unlock(&kvm->irq_srcu, idx);
++	spin_unlock_irq(&kvm->irqfds.lock);
++	return 0;
++}
++
++static int kvm_vfio_intr_stat_open(struct inode *inode, struct file *file)
++{
++	struct kvm *kvm = inode->i_private;
++
++	if (!kvm_get_kvm_safe(kvm))
++		return -ENOENT;
++
++	return single_open(file, kvm_vfio_intr_stat_show, kvm);
++}
++
++static int kvm_vfio_intr_stat_release(struct inode *inode, struct file *file)
++{
++	struct kvm *kvm = inode->i_private;
++
++	kvm_put_kvm(kvm);
++	return single_release(inode, file);
++}
++
++static const struct file_operations vfio_intr_stat_fops = {
++	.open    = kvm_vfio_intr_stat_open,
++	.read    = seq_read,
++	.llseek  = seq_lseek,
++	.release = kvm_vfio_intr_stat_release,
++};
++#endif
++
+ int kvm_arch_create_vm_debugfs(struct kvm *kvm)
+ {
+ 	debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
+ 			    &mmu_rmaps_stat_fops);
++
++#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
++	debugfs_create_file("vfio_intr_stat", 0444, kvm->debugfs_dentry, kvm,
++			    &vfio_intr_stat_fops);
++#endif
+ 	return 0;
+ }
+-- 
+1.8.3.1
 
-  - SHA1 should be at least 12 digits long
-    Can be fixed in the future by setting core.abbrev to 12 (or more) or
-    (for git v2.11 or later) just making sure it is not set (or set to
-    "auto").
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/YP+XCLo2kK.6P1+hz607rTI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHn+r8ACgkQAVBC80lX
-0Gz0OggAiMDH9+/N4KishH8m9aWwABnNUu0uAHYkKbaZEI2TSnQSENmQ9Zydug23
-ZH+pvst4VJHP5t0n7dkD5GdoGy56KrwiioX8cldpfoidXjLyMBoJ0iIN9vhpOLam
-pzWWECxTaNl+q+9J+AEY72/BFFLjFphbD+pWEvOUiddIaqhCBCZCdiWbsYG+xLCN
-sIPHrsJWyWD5Q2DJqrhjgFJhKtjmlgmobzRxkjISfKLUvPBKvFrlzrV8FVQgjzjr
-32he1Hh6An12wideEFKbE+kknsoMSE7i1EeCavQI6oiZFM9sC725GfEPX9lpjtWj
-iSrRroT+N3tm+acoKa/WfYqafebQkg==
-=2Fns
------END PGP SIGNATURE-----
-
---Sig_/YP+XCLo2kK.6P1+hz607rTI--
