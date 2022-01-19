@@ -2,271 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 333F549360D
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 09:16:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA47049362C
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 09:22:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352260AbiASIPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 03:15:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43414 "EHLO
+        id S1347732AbiASIWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 03:22:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352259AbiASIPI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 03:15:08 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13583C061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 00:15:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=r2A7/vnGfmsU6jMSTCyA2zwzLDyp5krgzmUZYAkmzRI=; b=p1aqH1goT7amobU/LeyCmCd6Vb
-        6Deka82O6XQ6agkA8PGt8yV80pRpMh8oQQ7QBMrCkJLkhtGGbn6CEe5JlZFaecqEdEn2YK0FDbtAN
-        I9OsWfJdrH14HEB0cjPNwmmpGIJ33GHYVy4qfW8fdGG/eDsCuvWKMTVFYPP0oBZlwTF6ezhIDBTY6
-        TejOGCHITfeLf3AQdRTdetKDCz1eMnyQPSTLlbm2Vf35dPwCLFX5MaKNjJit+uIuXCXXYZwGR1IFU
-        zuekEgQSBNLeOPHom6Tc/dTEXhFacy7fte0470BENbJtEYgLaqjhyyiPUvP1kGb6Dt6ysgg7LhdAW
-        5Kblu9Sw==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nA67C-004JDU-4h; Wed, 19 Jan 2022 08:14:46 +0000
-Message-ID: <791794474839b5bcad08b1282998d8a5cb47f0e5.camel@infradead.org>
-Subject: Re: [PATCH v6 0/6] x86/xen: Add in-kernel Xen event channel delivery
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Date:   Wed, 19 Jan 2022 08:14:32 +0000
-In-Reply-To: <Yd5GlAKgh0L0ZQir@xz-m1.local>
-References: <20211210163625.2886-1-dwmw2@infradead.org>
-         <33f3a978-ae3b-21de-b184-e3e4cd1dd4e3@redhat.com>
-         <a727e8ae9f1e35330b3e2cad49782d0b352bee1c.camel@infradead.org>
-         <e2ed79e6-612a-44a3-d77b-297135849656@redhat.com>
-         <YcTpJ369cRBN4W93@google.com>
-         <daeba2e20c50bbede7fbe32c4f3c0aed7091382e.camel@infradead.org>
-         <YdjaOIymuiRhXUeT@google.com> <Yd5GlAKgh0L0ZQir@xz-m1.local>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-uNLH6+OIfLm99C9WiA8S"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S238265AbiASIWi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 03:22:38 -0500
+Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD8EC061574;
+        Wed, 19 Jan 2022 00:22:38 -0800 (PST)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: usama.anjum)
+        with ESMTPSA id 3E8C21F44337
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1642580556;
+        bh=QAiGrnVKHtXCjw/54yKAb5LW6GftwIG4hgUhexVMISE=;
+        h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+        b=JohVKnqdhrmr88zSpbdIWeVwW3aFTlZUvzKGmFDgndI5DqkPMsRlz8Z96jPFtiiX0
+         /VEFcHN1Eot2dnhZuuSiUQllmiUfT5+mkD2gM9mGlWWnt1S2TWLtumObED/Mhq+GZC
+         drcqHoTPrLauJseDOSsl5GxyC9Z+5+eERpBMq8Bd8JUkW0mJtwjMu3/2RgHxvwIEq7
+         pRFVMWddEY5sgUzcHQEEhqNbl+1xFwhtiaRVInPGfFIsYEl9C64wAmYfBTtq3Y70q4
+         J4Nie9+0qLfZyJTtQbBjtMgMjJgl+Nejt2uzZGLnRgV9etJ+3P7+6JzE2pyXUQcM67
+         8uQ3p0Sofitbg==
+Message-ID: <ccae1b7a-4888-ca86-9610-89fd4f3d714d@collabora.com>
+Date:   Wed, 19 Jan 2022 13:22:26 +0500
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Cc:     usama.anjum@collabora.com, kernel@collabora.com
+Subject: Re: [PATCH 08/10] selftests: mptcp: Add the uapi headers include
+ variable
+Content-Language: en-US
+To:     Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Shuah Khan <shuah@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        chiminghao <chi.minghao@zte.com.cn>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        "open list:LANDLOCK SECURITY MODULE" 
+        <linux-security-module@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        "open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
+References: <20220118112909.1885705-1-usama.anjum@collabora.com>
+ <20220118112909.1885705-9-usama.anjum@collabora.com>
+ <4d60a170-53d7-3f9f-fa48-34d6c4020346@tessares.net>
+From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <4d60a170-53d7-3f9f-fa48-34d6c4020346@tessares.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Matthieu,
 
---=-uNLH6+OIfLm99C9WiA8S
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thank you for putting details below.
 
-On Wed, 2022-01-12 at 11:10 +0800, Peter Xu wrote:
-> On Sat, Jan 08, 2022 at 12:26:32AM +0000, Sean Christopherson wrote:
-> > +Peter
-> >=20
-> > On Wed, Jan 05, 2022, David Woodhouse wrote:
-> > > On Thu, 2021-12-23 at 21:24 +0000, Sean Christopherson wrote:
-> > > > Commit e880c6ea55b9 ("KVM: x86: hyper-v: Prevent using not-yet-upda=
-ted TSC page
-> > > > by secondary CPUs") is squarely to blame as it was added after dirt=
-y ring, though
-> > > > in Vitaly's defense, David put it best: "That's a fairly awful bear=
- trap".
-> > >=20
-> > > Even with the WARN to keep us honest, this is still awful.
-> > >=20
-> > > We have kvm_vcpu_write_guest()... but the vcpu we pass it is ignored
-> > > and only vcpu->kvm is used. But you have to be running on a physical
-> > > CPU which currently owns *a* vCPU of that KVM, or you might crash.
-> > >=20
-> > > There is also kvm_write_guest() which doesn't take a vCPU as an
-> > > argument, and looks for all the world like it was designed for you no=
-t
-> > > to need one... but which still needs there to be a vCPU or it might
-> > > crash.
->=20
-> Right, I agree too those are slightly confusing.
->=20
-> > >=20
-> > > I think I want to kill the latter, make the former use the vCPU it's
-> > > given, add a spinlock to the dirty ring which will be uncontended
-> > > anyway in the common case so it shouldn't hurt (?),
-> >=20
-> > IIRC, Peter did a fair amount of performance testing and analysis that =
-led to
-> > the current behavior.
->=20
-> Yes that comes out from the discussion when working on dirty ring.  I can=
-'t
-> remember the details too, but IIRC what we figured is 99% cases of guest
-> dirtying pages are with vcpu context.
->=20
-> The only outlier at that time (at least for x86) was kvm-gt who uses dire=
-ct kvm
-> context but then it turns out that's an illegal use of the kvm API and kv=
-m-gt
-> fixed itself instead.
->=20
-> Then we come to the current kvm_get_running_vcpu() approach because all t=
-he
-> dirty track contexts are within an existing vcpu context.  Dirty ring cou=
-ld be
-> simplified too because we don't need the default vcpu0 trick, nor do we n=
-eed an
-> extra ring just to record no-vcpu contexts (in very early version of dirt=
-y ring
-> we do have N+1 rings, where N is the vcpu number, and the extra is for th=
-is).
->=20
-> kvm_get_running_vcpu() also has a slight benefit that it guarantees no sp=
-inlock
-> needed.
->=20
-> >=20
-> > > and then let people use kvm->vcpu[0] when they really need to, with a
-> > > documented caveat that when there are *no* vCPUs in a KVM, dirty trac=
-king
-> > > might not work.  Which is fine, as migration of a KVM that hasn't bee=
-n fully
-> > > set up yet is silly.
-> >=20
-> > "when they really need to" can be a slippery slope, using vcpu[0] is al=
-so quite
-> > gross.  Though I 100% agree that always using kvm_get_running_vcpu() is=
- awful.
->=20
-> I agreed none of them looks like an extreme clean approach.
->=20
-> So far I'd hope we can fix the problem with what Sean suggested on postpo=
-ning
-> the page update until when we have the vcpu context, so we keep the assum=
-ption
-> still true on "having a vcpu context" at least for x86 and that'll be the
-> simplest, afaiu.
->=20
-> Or do we have explicit other requirement that needs to dirty guest pages
-> without vcpu context at all?
+On 1/19/22 2:47 AM, Matthieu Baerts wrote:
+> Hi Muhammad,
+> 
+> On 18/01/2022 12:29, Muhammad Usama Anjum wrote:
+>> Out of tree build of this test fails if relative path of the output
+>> directory is specified. Remove the un-needed include paths and use
+>> KHDR_INCLUDES to correctly reach the headers.
+> 
+> Thank you for looking at that!
+> 
+>> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+>> ---
+>>  tools/testing/selftests/net/mptcp/Makefile | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
+>> index 0356c4501c99..fed6866d3b73 100644
+>> --- a/tools/testing/selftests/net/mptcp/Makefile
+>> +++ b/tools/testing/selftests/net/mptcp/Makefile
+>> @@ -1,9 +1,8 @@
+>>  # SPDX-License-Identifier: GPL-2.0
+>>  
+>> -top_srcdir = ../../../../..
+> 
+> Removing this line breaks our CI validating MPTCP selftests. That's
+> because this "top_srcdir" variable is needed in the "lib.mk" file which
+> is included at the end of this Makefile.
+> 
+> But that's maybe a misuse from our side. Indeed to avoid compiling
+> binaries and more from the VM, our CI does that as a preparation job
+> before starting the VM and run MPTCP selftests:
+> 
+>   $ make O=(...) INSTALL_HDR_PATH=(...)/kselftest/usr headers_install
+>   $ make O=(...) -C tools/testing/selftests/net/mptcp
+> 
+> From the VM, we re-use the same source directory and we can start
+> individual tests without having to compile anything else:
+> 
+>   $ cd tools/testing/selftests/net/mptcp
+>   $ ./mptcp_connect.sh
+> 
+> We want to do that because some scripts are launched multiple times with
+> different parameters.
+> 
+> With your modifications, we can drop the headers_install instruction but
+> we need to pass new parameters to the last 'make' command:
+> 
+>   $ make O=(...) top_srcdir=../../../../.. \
+>                  KHDR_INCLUDES=-I(...)/usr/include \
+>          -C tools/testing/selftests/net/mptcp
+> 
+> Or is there a better way to do that?
+> Can we leave the definition of "top_srcdir" like it was or did we miss
+> something else?
+> 
+It seems like I've missed this use cases where people can build only one
+individual test. It is not my intention to break individual test builds.
+I shouldn't be fixing one thing while breaking something else. I'll
+update these patches such that individual tests are also build-able. For
+this to happen, I'll just add $(KHDR_INCLUDES) to the build flags while
+leaving everything else intact. I'll send a V2.
 
-Delivering interrupts may want to do so. That's the one we hit for
-S390, and I only avoided it for Xen event channel delivery on x86 by
-declaring that the Xen shared info page is exempt from dirty tracking
-and should *always* be considered dirty.
-
---=-uNLH6+OIfLm99C9WiA8S
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMTE5MDgxNDMyWjAvBgkqhkiG9w0BCQQxIgQgI/sclC3Q
-B8UKshtcG4nmEhZ/a1pnphrhJIaPSEwQ0WQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCEZ5GDqJHg8+lBaXr7ZMSuzmA84qc+1b23
-TqK6Do2Eo6cVL4Q+lTrPQ0FK5p3hDQ2vwhGHNTTsye2WaO+TRRWMrnQZ7swqsvAAkYGKnsDr66Nq
-Jg5GYdQ2US/9cC0FqISf3eO5qNMhd4FsdqOfmk/mcmv1kRh3lWBwCydv2GzC9Z7mrGoS9nKkAydH
-AQeKNtMcQCLMfDwbxPxaCHwOyQwR/C0fiB8Xx3TnG0nu3klxzbyA7/neI994lkVOYvYohJBhqoUF
-r4O7CAmMfElaF6EZ6wOpMVw6SkqcIuKXZpupfDieypGsWZlvN31fYEG0ZI4xIU0MILtg4AMSKbi5
-/MNWpZy+7BH2UN9QMEODGb9eByvArFOjPeG+hOAuYLzLcB5i/wbzFZYZk7cRbvXJWwYlbgAc7gE1
-H7vBs7YJvjTtYscHmOPXQke0k50D4NBB/rIrimGZgs4+066Yxw+MbGkjx2IO2HyIOy8f+6geoV5z
-0n7a1GitfOjjdZ+arReN4zpdHwz2+rsRkVAISAnv2NArQ+GcY9LmQ65QLiZRtHUrCmSsf4vsQ22G
-/22j7VIP+lSKvFUHh6zwDObfHxeFY0cSZP1Ns9+jlxAgAJnoR1IvknUonVoPDLGTqtzPNm1i9iN1
-G+xXiA1JcrvN3f2J9rITpO4VWvW9Ol68WYazq/5TFgAAAAAAAA==
-
-
---=-uNLH6+OIfLm99C9WiA8S--
-
+>>  KSFT_KHDR_INSTALL := 1
+>>  
+>> -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g  -I$(top_srcdir)/usr/include
+>> +CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g $(KHDR_INCLUDES)
+>>  
+>>  TEST_PROGS := mptcp_connect.sh pm_netlink.sh mptcp_join.sh diag.sh \
+>>  	      simult_flows.sh mptcp_sockopt.sh
+> 
+> Note: I see there is a very long recipients list. If my issue is not
+> directly due to your modifications, we can probably continue the
+> discussion with a restricted audience.
+> 
+> Cheers,
+> Matt
