@@ -2,122 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7A6F49400A
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:37:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE09B49402E
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:51:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356842AbiASSh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 13:37:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47779 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356723AbiASShz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 13:37:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642617475;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yEREuIwhli7iJjgFoyBi+FO+07r4F6yeofjnLnMk0U8=;
-        b=LIbir6FQ2mxNJqG95L+m2hbJigaYPq+7UhKORcHpx49QXOfZorbEeWUOcFVYsq+09P0mZi
-        B7tEtDcE99V3fhJTUbkLeldkhby0GPo3wvZG/VUyF+qx++RZMC8HuvszyA9t3+/fUBUJNX
-        2v5BaxREyVfqyepwXJ8sUyl8jHMd9o0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-367-RuX0CmDnNtOs8Qh9oZNvIw-1; Wed, 19 Jan 2022 13:37:54 -0500
-X-MC-Unique: RuX0CmDnNtOs8Qh9oZNvIw-1
-Received: by mail-wm1-f69.google.com with SMTP id a3-20020a05600c348300b0034a0dfc86aaso4775063wmq.6
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 10:37:53 -0800 (PST)
+        id S1356900AbiASSun (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 13:50:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1356903AbiASSui (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 13:50:38 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CCA1C06173F
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 10:50:35 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id bu18so11956427lfb.5
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 10:50:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Wj3R0FRfn1yO5ogKeGc8aripFNfSyJxmajRu2on35kY=;
+        b=pe1iWhZirUTGmhYFeMyFbD34nGrpS52XKubMcy7XhUsPHYDaweveoSSJ0xnTHhRHWK
+         20m5NC6R9tJIDsHjIbD1VFPqYLDmsG/N0Szv1UrZm9xhVPlG9AJJli7CV6iYMrgR6Rwu
+         NhOEIJxv0osNjyejn4S6X35hD31YubMuEqCY2s7DYdDUc6uTefMSQbbc/Se0C5xs8nmB
+         ccI4yd5EFGZv+k4tvN8+95FjVBq0L8Uub4f5y/1nX/vM3XeUsEW7Audld9eBL5dk72Yu
+         AAkeVbwfhIrCNp+6Q4qlOOkWhGRMnA9Tb8TOCRMyLgl9GUZrTl+LJ2hRvgWNXwivZO25
+         2x+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=yEREuIwhli7iJjgFoyBi+FO+07r4F6yeofjnLnMk0U8=;
-        b=JIS3A9IUuqczKngHifDC+atFmKPM0i1Zr8Oa+fqXx1QBye1rzbs05mIUHDgb07FAsi
-         ITDqAcYbZ8mY5e6iQJy6KX54N+lwrQTqhQqvTXoFiZ2tCLiebie6ODeUP9O0aXvdRl9s
-         jRqyoCji8AypHuxtTIe/9w1VZz/92EQJuShT83cJrTizvQvt43jHE4HAGbeAOlEGVJKH
-         tfdXvBfklRu+rj3fC2ybiBC4jjdLUSmjU6J12zvL8D6VBKmRD+bUKxkmAbA+JXk5MqZN
-         gdBX9GfluEaivJ1oUgWLtobw9F3CIoOaMmVPG8zLW1Ysaafix3VkOX56htDCpq2JrYC9
-         p03A==
-X-Gm-Message-State: AOAM533l00X5MGMa2IfKXVmKXi19upW17zaZqmgaq/E1pkDYyJKqQChn
-        1ZSnqcnL4Q6qN5Q/gzsjSIFkcgGv9tK6/nlzCmty9dwah74hKqaUR7I7tKO6ncERdXH7cAFgXlz
-        qrjWkIg96hR7i
-X-Received: by 2002:a5d:4404:: with SMTP id z4mr14188676wrq.227.1642617472731;
-        Wed, 19 Jan 2022 10:37:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwyZFHgQhMucWDMGC5Bo4G9movDj4dSOqUphWsssCtw3O4y8rH0o4YVhpuc6L5s8ueVVP9c5g==
-X-Received: by 2002:a5d:4404:: with SMTP id z4mr14188657wrq.227.1642617472536;
-        Wed, 19 Jan 2022 10:37:52 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id n14sm590533wri.101.2022.01.19.10.37.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jan 2022 10:37:51 -0800 (PST)
-Message-ID: <d4b47a8e-77f2-eef2-2245-bdc7eaf8f57f@redhat.com>
-Date:   Wed, 19 Jan 2022 19:37:50 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Wj3R0FRfn1yO5ogKeGc8aripFNfSyJxmajRu2on35kY=;
+        b=55dhUpq34KgycLY7mFicMOYREMEqYFN1TmRqCRT7ksUkTA0sf3xLFsa3WkmkujZMxR
+         7CIxq1JpCv9WLt8ZpUslwaaWzmVjP4QjE/4P9d0qXtHN6Q3cnBRu3iDiR3seZ38uUAHV
+         hq6XNIWz73yqQaJM6f4JK776BFCklW+l+R3rH0ZOq8MW/oXwarmLSHQB+ZmBXKxkYkjS
+         3qqmmIKULaMyXUujPBboI1+vT+RTefSPzqbJcvA0mm67rNTrohqXljyBrNkcTF/BuDD9
+         OTmk+cZvQ8CQWrno5wNasoaBBX4yttZM6PcyXtSWFMCw+YeH1b4uUWbHBri82f7mEhtm
+         A7oQ==
+X-Gm-Message-State: AOAM5311WDdcYPRTy6p+NNofgrasXAdCT0w6z4jWxuZcJ6t+0J4CvjMQ
+        NuVcdQ6qP2sNDlZCO0lWcApjra3zOudoiS12/3eWBQ==
+X-Google-Smtp-Source: ABdhPJxlWimiZNLmr8h++3TY1Fh0zvEgbDHKd8bwKwVQGXviRDQ5XXrBx6FNgZ9IhOY46CUuigHNzP3pTgPWPhbpLkM=
+X-Received: by 2002:a05:6512:3b94:: with SMTP id g20mr28870780lfv.119.1642618233416;
+ Wed, 19 Jan 2022 10:50:33 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] selftests: kvm/x86: Fix the warning in
- lib/x86_64/processor.c
-Content-Language: en-US
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220119140325.59369-1-cloudliang@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220119140325.59369-1-cloudliang@tencent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20211222225350.1912249-1-vipinsh@google.com> <20220105180420.GC6464@blackbody.suse.cz>
+ <CAHVum0e84nUcGtdPYQaJDQszKj-QVP5gM+nteBpSTaQ2sWYpmQ@mail.gmail.com>
+ <Yeclbe3GNdCMLlHz@slm.duckdns.org> <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
+ <YehY0z2vHYVZk52J@slm.duckdns.org>
+In-Reply-To: <YehY0z2vHYVZk52J@slm.duckdns.org>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Wed, 19 Jan 2022 10:49:57 -0800
+Message-ID: <CAHVum0fqhMQd2uFic5_7RN=Ah6TTH2G2qLNZuxnQXSazR57m6g@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: Move VM's worker kthreads back to the original
+ cgroups before exiting.
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        seanjc@google.com, lizefan.x@bytedance.com, hannes@cmpxchg.org,
+        dmatlack@google.com, jiangshanlai@gmail.com, kvm@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/19/22 15:03, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> The following warning appears when executing
-> make -C tools/testing/selftests/kvm
-> 
-> In file included from lib/x86_64/processor.c:11:
-> lib/x86_64/processor.c: In function ':
-> include/x86_64/processor.h:290:2: warning: 'ecx' may be used uninitialized in this
-> function [-Wmaybe-uninitialized]
->    asm volatile("cpuid"
->    ^~~
-> lib/x86_64/processor.c:1523:21: note: 'ecx' was declared here
->    uint32_t eax, ebx, ecx, edx, max_ext_leaf;
-> 
-> Just initialize ecx to remove this warning.
-> 
-> Fixes: c8cc43c1eae2 ("selftests: KVM: avoid failures due to reserved
-> HyperTransport region")
-> 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->   tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 59dcfe1967cc..4a4c7945cf3e 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -1520,7 +1520,7 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
->   {
->   	const unsigned long num_ht_pages = 12 << (30 - vm->page_shift); /* 12 GiB */
->   	unsigned long ht_gfn, max_gfn, max_pfn;
-> -	uint32_t eax, ebx, ecx, edx, max_ext_leaf;
-> +	uint32_t eax, ebx, ecx = 0, edx, max_ext_leaf;
->   
->   	max_gfn = (1ULL << (vm->pa_bits - vm->page_shift)) - 1;
->   
-
-A separate assignment of "ecx = 0" is slightly more conforming to the 
-coding standards.  Queued nevertheless, thanks.
-
-Paolo
-
+On Wed, Jan 19, 2022 at 10:30 AM Tejun Heo <tj@kernel.org> wrote:
+>
+> On Wed, Jan 19, 2022 at 07:02:53PM +0100, Paolo Bonzini wrote:
+> > On 1/18/22 21:39, Tejun Heo wrote:
+> > > So, these are normally driven by the !populated events. That's how everyone
+> > > else is doing it. If you want to tie the kvm workers lifetimes to kvm
+> > > process, wouldn't it be cleaner to do so from kvm side? ie. let kvm process
+> > > exit wait for the workers to be cleaned up.
+> >
+> > It does.  For example kvm_mmu_post_init_vm's call to
+> > kvm_vm_create_worker_thread is matched with the call to
+> > kthread_stop in kvm_mmu_pre_destroy_vm.
+> > According to Vpin, the problem is that there's a small amount of time
+> > between the return from kthread_stop and the point where the cgroup
+> > can be removed.  My understanding of the race is the following:
+>
+> Okay, this is because kthread_stop piggy backs on vfork_done to wait for the
+> task exit intead of the usual exit notification, so it only waits till
+> exit_mm(), which is uhh... weird. So, migrating is one option, I guess,
+> albeit a rather ugly one. It'd be nicer if we can make kthread_stop()
+> waiting more regular but I couldn't find a good existing place and routing
+> the usual parent signaling might be too complicated. Anyone has better
+> ideas?
+>
+Sean suggested that we can use the real_parent of the kthread task
+which will always be kthreadd_task, this will also not require any
+changes in the cgroup API. I like that approach, I will give it a try.
+This will avoid changes in cgroup APIs completely.
