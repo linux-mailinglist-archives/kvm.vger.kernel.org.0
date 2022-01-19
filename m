@@ -2,96 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BA9D494048
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 20:05:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D43774940CD
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 20:27:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232211AbiASTFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 14:05:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52428 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230427AbiASTFI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 14:05:08 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25EC4C061574;
-        Wed, 19 Jan 2022 11:05:08 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id w12-20020a17090a528c00b001b276aa3aabso7478120pjh.0;
-        Wed, 19 Jan 2022 11:05:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rRh+idUwbOdly6bknpYwWmsx3IX/EG0YgmQNjU2Me8w=;
-        b=Mn1dOVIkJPRudD5S+4bqqB0SgTsXe1/SRjq9+d/3NLil2nKYd+51WR0mfQqxIdIL7E
-         XLuCWZ2RrMpIX3Fa7EPtb1nlgr4P/0Ou8R337jSark5p0P3MQ6uhZ/Io+yVBbaCIvzsL
-         DhOJOPXtM51TFNfHTsGDj+j9QN00tHs3tuok0UvznETQqi3kBhSXC0XRQjFYeRWmO/6K
-         4eeU7XvljzQPZHNjmj2YBxate/YP9hN4RqJUr723tPynsxtaG7/8j6EdlmYjIhCQuNkr
-         hqt1+MXZHZsqBpwMQsX0bZm1+GGPIxZnJwViaI1E4KRSLP7zLsBzptqB3dhZ/nazKlHy
-         raPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=rRh+idUwbOdly6bknpYwWmsx3IX/EG0YgmQNjU2Me8w=;
-        b=Z2A/vK+REFOwf5mVLpqSYvULEk+WrjIJV/vIBH7cjWFcYY4sYLiZPqn8G4S9gQdLAW
-         3JHpJKllBiAxXJ5X22kOXfQL66b1s0L3xsJmFd3YGGGz44PpZr0gT7zEvtZS8wtNHA0B
-         69HrGLQDeaQgvBTsJIAhq/VY2vhjiH+ENG5UxTFRqc2hbjRytl+45kj/wolS7FkAQ1lM
-         7tyS03wLMOUc2k3K8ecxRiW296eOVc6JYflMOKCRuZmfj71WDp/oFKFZMJ94c1Rgc12c
-         Kyl8/e6/FAG24pOqzcWRzAQKHBINkbTRGMH1fNgWuZWrkgsTvf7goEIzVsen4hSOq78R
-         gpSw==
-X-Gm-Message-State: AOAM531hGRNRGij4pMBxYPr7nyGgUx0d/gRQ4VGPItyVxGYywqM7IECY
-        fgk4EfaEyWVYmEdxdrEZWJA=
-X-Google-Smtp-Source: ABdhPJwoS0m/QykotRUJH3Qi7VVx/2n8pQ/rcYLz3C51+SNORi/AogJ1gvg8zwSw+v2Ein5dC5jn+g==
-X-Received: by 2002:a17:90a:474d:: with SMTP id y13mr6030824pjg.4.1642619107410;
-        Wed, 19 Jan 2022 11:05:07 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id j8sm411341pfc.127.2022.01.19.11.05.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 11:05:07 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 19 Jan 2022 09:05:05 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        seanjc@google.com, lizefan.x@bytedance.com, hannes@cmpxchg.org,
-        dmatlack@google.com, jiangshanlai@gmail.com, kvm@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: Move VM's worker kthreads back to the original
- cgroups before exiting.
-Message-ID: <Yehg4doAwoUTBHLX@slm.duckdns.org>
-References: <20211222225350.1912249-1-vipinsh@google.com>
- <20220105180420.GC6464@blackbody.suse.cz>
- <CAHVum0e84nUcGtdPYQaJDQszKj-QVP5gM+nteBpSTaQ2sWYpmQ@mail.gmail.com>
- <Yeclbe3GNdCMLlHz@slm.duckdns.org>
- <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
- <YehY0z2vHYVZk52J@slm.duckdns.org>
- <CAHVum0fqhMQd2uFic5_7RN=Ah6TTH2G2qLNZuxnQXSazR57m6g@mail.gmail.com>
+        id S239815AbiAST1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 14:27:16 -0500
+Received: from mga12.intel.com ([192.55.52.136]:65533 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229593AbiAST1P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 14:27:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642620434; x=1674156434;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=dmpN7qUU9C3uIKfow/OKVaXBm34Ban3OqHYGXm/yruw=;
+  b=HuENwB+KiblncFi7b4ON8zpexWmy7WU8DzDmU80D+4f8eqK/gg8Q75yk
+   Fxk0LTVozkuRFOz6PZ/hBfLXCp6A9IqxFmqz9kh/GNYg/pSw+9GSuwtxH
+   ySsBO8OAw2DIx2N35p8KdU4NUjboDk9LI7T2lboXoCo2IELMjjsBvaxcm
+   qKj+/WrMzbl0YYiefehGa4zlCYl17AGNDGFhHi7e22yzIPUX1Jk5exYGs
+   MQ96dqY187LazQn1+mrLDB1ZoNbAOhCEWuWiGifYSxJgruofVfTeKPLof
+   6Nsgx8bClFHPny7/ZzfTJE6e92SGxOZtQH5RU232m3SZNTvBYrXrYSsJp
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10231"; a="225147777"
+X-IronPort-AV: E=Sophos;i="5.88,300,1635231600"; 
+   d="scan'208";a="225147777"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 11:07:45 -0800
+X-IronPort-AV: E=Sophos;i="5.88,300,1635231600"; 
+   d="scan'208";a="477498862"
+Received: from smile.fi.intel.com ([10.237.72.61])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 11:07:29 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1nAGHg-00CEIt-Ug;
+        Wed, 19 Jan 2022 21:06:16 +0200
+Date:   Wed, 19 Jan 2022 21:06:16 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
+        Sebastian Reichel <sre@kernel.org>,
+        linux-phy@lists.infradead.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
+        linux-gpio@vger.kernel.org,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Guenter Roeck <groeck@chromium.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        openipmi-developer@lists.sourceforge.net,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        kvm@vger.kernel.org, Kamal Dasu <kdasu.kdev@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Robert Richter <rric@kernel.org>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Benson Leung <bleung@chromium.org>,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        Tony Luck <tony.luck@intel.com>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Eric Auger <eric.auger@redhat.com>, netdev@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        linux-spi@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Niklas =?iso-8859-1?Q?S=F6derlund?= 
+        <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+ (summary)
+Message-ID: <YehhKMl9ZIydj1fJ@smile.fi.intel.com>
+References: <20220110195449.12448-1-s.shtylyov@omp.ru>
+ <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAHVum0fqhMQd2uFic5_7RN=Ah6TTH2G2qLNZuxnQXSazR57m6g@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 10:49:57AM -0800, Vipin Sharma wrote:
-> Sean suggested that we can use the real_parent of the kthread task
-> which will always be kthreadd_task, this will also not require any
-> changes in the cgroup API. I like that approach, I will give it a try.
-> This will avoid changes in cgroup APIs completely.
+On Sat, Jan 15, 2022 at 07:36:43PM +0100, Uwe Kleine-König wrote:
+> Hello,
+> 
+> I'm trying to objectively summarize the discussions in this thread in
+> the hope this helps finding a way that most people can live with.
+> 
+> First a description of the status quo:
 
-Yeah, that's better than the original but still not great in that it's still
-a workaround and just pushes up the problem. You can get the same race if
-the cgroups are nested. e.g. if you have a kvm instance under a/b and when
-kvm exits, the management software removes b and then realizes that a is
-empty too and then tries to delete that too.
+I do not really understand why we put an equal sign in all implications between
+meaning of the 0 cookie and NULL as an (non-existed) instance of an object?
 
-It'd be great if we can make kthread_stop actually wait for what most others
-consider thread exit but if we're just gonna work around them, just doing it
-in userspace might be better - e.g. after kvm exits, wait for !populated
-event (this is a pollable event) on the cgroup and then clean up.
-
-Thanks.
+It's like comparing None object in Python to False.
 
 -- 
-tejun
+With Best Regards,
+Andy Shevchenko
+
+
