@@ -2,152 +2,412 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CA47049362C
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 09:22:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DC28493739
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 10:27:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347732AbiASIWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 03:22:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45110 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238265AbiASIWi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 03:22:38 -0500
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD8EC061574;
-        Wed, 19 Jan 2022 00:22:38 -0800 (PST)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: usama.anjum)
-        with ESMTPSA id 3E8C21F44337
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1642580556;
-        bh=QAiGrnVKHtXCjw/54yKAb5LW6GftwIG4hgUhexVMISE=;
-        h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-        b=JohVKnqdhrmr88zSpbdIWeVwW3aFTlZUvzKGmFDgndI5DqkPMsRlz8Z96jPFtiiX0
-         /VEFcHN1Eot2dnhZuuSiUQllmiUfT5+mkD2gM9mGlWWnt1S2TWLtumObED/Mhq+GZC
-         drcqHoTPrLauJseDOSsl5GxyC9Z+5+eERpBMq8Bd8JUkW0mJtwjMu3/2RgHxvwIEq7
-         pRFVMWddEY5sgUzcHQEEhqNbl+1xFwhtiaRVInPGfFIsYEl9C64wAmYfBTtq3Y70q4
-         J4Nie9+0qLfZyJTtQbBjtMgMjJgl+Nejt2uzZGLnRgV9etJ+3P7+6JzE2pyXUQcM67
-         8uQ3p0Sofitbg==
-Message-ID: <ccae1b7a-4888-ca86-9610-89fd4f3d714d@collabora.com>
-Date:   Wed, 19 Jan 2022 13:22:26 +0500
+        id S1353071AbiASJ1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 04:27:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45008 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1352766AbiASJ12 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 04:27:28 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20J8Rq63014373;
+        Wed, 19 Jan 2022 09:27:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9W0ifsnFqqA1O4RNHpUc+NyrcJ9s6shJm0TwViRtohc=;
+ b=M8rOlqOMVclrdWfLHBDv+yeWXX/uFTJRstfMtGD+ddMmQPzxcp/9Pn8PSfBS+W34ZCh6
+ fMh1HsDLf2Ps4FHrb/2H/49qkjz9EuGY+kDis64QhxGo8Ry+EhKPQcb87xTwRiYCBufl
+ 9NqSpJlRG9N4Yzjl/AKr/VziJ9WSu4tr6o36Ptek5b68EdRqk2tX5fVlGExxvGzWCrci
+ kPxlgNTaj3/RIY4FQW6Pxs/kENpuyP5gzV2L9iLlAD2HVtUcoPxdm1128+BsrDkoDV6k
+ 71+e9wt3eXVl6zIGR9dmICJlt8iyT+z0nW/39GypBOtkekEttmr9L3lcUAbDOMTXc3H2 CA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dpf5h14xx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 09:27:27 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20J8gQc3002328;
+        Wed, 19 Jan 2022 09:27:26 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dpf5h14xk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 09:27:26 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20J9BxNM004010;
+        Wed, 19 Jan 2022 09:27:25 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3dknw9uq72-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 09:27:24 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20J9I0GG14352660
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jan 2022 09:18:01 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B6EF7A4059;
+        Wed, 19 Jan 2022 09:27:19 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F2B8A4051;
+        Wed, 19 Jan 2022 09:27:18 +0000 (GMT)
+Received: from [9.171.7.240] (unknown [9.171.7.240])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Jan 2022 09:27:18 +0000 (GMT)
+Message-ID: <265e3448-2e8e-c38b-e625-1546ae3d408b@linux.ibm.com>
+Date:   Wed, 19 Jan 2022 10:29:02 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Cc:     usama.anjum@collabora.com, kernel@collabora.com
-Subject: Re: [PATCH 08/10] selftests: mptcp: Add the uapi headers include
- variable
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 21/30] KVM: s390: pci: handle refresh of PCI
+ translations
 Content-Language: en-US
-To:     Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Shuah Khan <shuah@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        chiminghao <chi.minghao@zte.com.cn>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:LANDLOCK SECURITY MODULE" 
-        <linux-security-module@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        "open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-References: <20220118112909.1885705-1-usama.anjum@collabora.com>
- <20220118112909.1885705-9-usama.anjum@collabora.com>
- <4d60a170-53d7-3f9f-fa48-34d6c4020346@tessares.net>
-From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
-In-Reply-To: <4d60a170-53d7-3f9f-fa48-34d6c4020346@tessares.net>
-Content-Type: text/plain; charset=UTF-8
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-22-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-22-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6WhABobjSFm26SEWLViY8CmpSRwVVrsc
+X-Proofpoint-ORIG-GUID: Y3UPRGUPpAyRqclYPeei0QMdl_O-2v6w
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-19_06,2022-01-18_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 spamscore=0 priorityscore=1501 impostorscore=0
+ adultscore=0 mlxscore=0 phishscore=0 bulkscore=0 suspectscore=0
+ mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201190049
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Matthieu,
 
-Thank you for putting details below.
 
-On 1/19/22 2:47 AM, Matthieu Baerts wrote:
-> Hi Muhammad,
+On 1/14/22 21:31, Matthew Rosato wrote:
+> Add a routine that will perform a shadow operation between a guest
+> and host IOAT.  A subsequent patch will invoke this in response to
+> an 04 RPCIT instruction intercept.
 > 
-> On 18/01/2022 12:29, Muhammad Usama Anjum wrote:
->> Out of tree build of this test fails if relative path of the output
->> directory is specified. Remove the un-needed include paths and use
->> KHDR_INCLUDES to correctly reach the headers.
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_pci.h |   1 +
+>   arch/s390/include/asm/pci_dma.h |   1 +
+>   arch/s390/kvm/pci.c             | 208 +++++++++++++++++++++++++++++++-
+>   arch/s390/kvm/pci.h             |   8 +-
+>   4 files changed, 216 insertions(+), 2 deletions(-)
 > 
-> Thank you for looking at that!
-> 
->> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
->> ---
->>  tools/testing/selftests/net/mptcp/Makefile | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
->> index 0356c4501c99..fed6866d3b73 100644
->> --- a/tools/testing/selftests/net/mptcp/Makefile
->> +++ b/tools/testing/selftests/net/mptcp/Makefile
->> @@ -1,9 +1,8 @@
->>  # SPDX-License-Identifier: GPL-2.0
->>  
->> -top_srcdir = ../../../../..
-> 
-> Removing this line breaks our CI validating MPTCP selftests. That's
-> because this "top_srcdir" variable is needed in the "lib.mk" file which
-> is included at the end of this Makefile.
-> 
-> But that's maybe a misuse from our side. Indeed to avoid compiling
-> binaries and more from the VM, our CI does that as a preparation job
-> before starting the VM and run MPTCP selftests:
-> 
->   $ make O=(...) INSTALL_HDR_PATH=(...)/kselftest/usr headers_install
->   $ make O=(...) -C tools/testing/selftests/net/mptcp
-> 
-> From the VM, we re-use the same source directory and we can start
-> individual tests without having to compile anything else:
-> 
->   $ cd tools/testing/selftests/net/mptcp
->   $ ./mptcp_connect.sh
-> 
-> We want to do that because some scripts are launched multiple times with
-> different parameters.
-> 
-> With your modifications, we can drop the headers_install instruction but
-> we need to pass new parameters to the last 'make' command:
-> 
->   $ make O=(...) top_srcdir=../../../../.. \
->                  KHDR_INCLUDES=-I(...)/usr/include \
->          -C tools/testing/selftests/net/mptcp
-> 
-> Or is there a better way to do that?
-> Can we leave the definition of "top_srcdir" like it was or did we miss
-> something else?
-> 
-It seems like I've missed this use cases where people can build only one
-individual test. It is not my intention to break individual test builds.
-I shouldn't be fixing one thing while breaking something else. I'll
-update these patches such that individual tests are also build-able. For
-this to happen, I'll just add $(KHDR_INCLUDES) to the build flags while
-leaving everything else intact. I'll send a V2.
+> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+> index 770849f13a70..fa90729a35cf 100644
+> --- a/arch/s390/include/asm/kvm_pci.h
+> +++ b/arch/s390/include/asm/kvm_pci.h
+> @@ -30,6 +30,7 @@ struct kvm_zdev_ioat {
+>   struct kvm_zdev {
+>   	struct zpci_dev *zdev;
+>   	struct kvm *kvm;
+> +	u64 rpcit_count;
+>   	struct kvm_zdev_ioat ioat;
+>   	struct zpci_fib fib;
+>   };
+> diff --git a/arch/s390/include/asm/pci_dma.h b/arch/s390/include/asm/pci_dma.h
+> index 69e616d0712c..38004e0a4383 100644
+> --- a/arch/s390/include/asm/pci_dma.h
+> +++ b/arch/s390/include/asm/pci_dma.h
+> @@ -52,6 +52,7 @@ enum zpci_ioat_dtype {
+>   #define ZPCI_TABLE_ENTRIES		(ZPCI_TABLE_SIZE / ZPCI_TABLE_ENTRY_SIZE)
+>   #define ZPCI_TABLE_PAGES		(ZPCI_TABLE_SIZE >> PAGE_SHIFT)
+>   #define ZPCI_TABLE_ENTRIES_PAGES	(ZPCI_TABLE_ENTRIES * ZPCI_TABLE_PAGES)
+> +#define ZPCI_TABLE_ENTRIES_PER_PAGE	(ZPCI_TABLE_ENTRIES / ZPCI_TABLE_PAGES)
+>   
+>   #define ZPCI_TABLE_BITS			11
+>   #define ZPCI_PT_BITS			8
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> index 39c13c25a700..38d2b77ec565 100644
+> --- a/arch/s390/kvm/pci.c
+> +++ b/arch/s390/kvm/pci.c
+> @@ -149,6 +149,208 @@ int kvm_s390_pci_aen_init(u8 nisc)
+>   	return rc;
+>   }
+>   
+> +static int dma_shadow_cpu_trans(struct kvm_vcpu *vcpu, unsigned long *entry,
+> +				unsigned long *gentry)
+> +{
+> +	phys_addr_t gaddr = 0;
+> +	unsigned long idx;
+> +	struct page *page;
+> +	kvm_pfn_t pfn;
+> +	gpa_t addr;
+> +	int rc = 0;
+> +
+> +	if (pt_entry_isvalid(*gentry)) {
+> +		/* pin and validate */
+> +		addr = *gentry & ZPCI_PTE_ADDR_MASK;
+> +		idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
+> +		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +		if (is_error_page(page))
+> +			return -EIO;
+> +		gaddr = page_to_phys(page) + (addr & ~PAGE_MASK);
+> +	}
+> +
+> +	if (pt_entry_isvalid(*entry)) {
+> +		/* Either we are invalidating, replacing or no-op */
+> +		if (gaddr != 0) {
+> +			if ((*entry & ZPCI_PTE_ADDR_MASK) == gaddr) {
+> +				/* Duplicate */
+> +				kvm_release_pfn_dirty(*entry >> PAGE_SHIFT);
+> +			} else {
+> +				/* Replace */
+> +				pfn = (*entry >> PAGE_SHIFT);
+> +				invalidate_pt_entry(entry);
+> +				set_pt_pfaa(entry, gaddr);
+> +				validate_pt_entry(entry);
+> +				kvm_release_pfn_dirty(pfn);
+> +				rc = 1;
+> +			}
+> +		} else {
+> +			/* Invalidate */
+> +			pfn = (*entry >> PAGE_SHIFT);
+> +			invalidate_pt_entry(entry);
+> +			kvm_release_pfn_dirty(pfn);
+> +			rc = 1;
+> +		}
+> +	} else if (gaddr != 0) {
+> +		/* New Entry */
+> +		set_pt_pfaa(entry, gaddr);
+> +		validate_pt_entry(entry);
+> +	}
+> +
+> +	return rc;
+> +}
+> +
+> +static unsigned long *dma_walk_guest_cpu_trans(struct kvm_vcpu *vcpu,
+> +					       struct kvm_zdev_ioat *ioat,
+> +					       dma_addr_t dma_addr)
+> +{
+> +	unsigned long *rto, *sto, *pto;
+> +	unsigned int rtx, rts, sx, px, idx;
+> +	struct page *page;
+> +	gpa_t addr;
+> +	int i;
+> +
+> +	/* Pin guest segment table if needed */
+> +	rtx = calc_rtx(dma_addr);
+> +	rto = ioat->head[(rtx / ZPCI_TABLE_ENTRIES_PER_PAGE)];
+> +	rts = rtx * ZPCI_TABLE_PAGES;
+> +	if (!ioat->seg[rts]) {
+> +		if (!reg_entry_isvalid(rto[rtx % ZPCI_TABLE_ENTRIES_PER_PAGE]))
+> +			return NULL;
+> +		sto = get_rt_sto(rto[rtx % ZPCI_TABLE_ENTRIES_PER_PAGE]);
+> +		addr = ((u64)sto & ZPCI_RTE_ADDR_MASK);
+> +		idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
+> +			page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
+> +			if (is_error_page(page)) {
+> +				srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +				return NULL;
+> +			}
+> +			ioat->seg[rts + i] = page_to_virt(page) +
+> +					     (addr & ~PAGE_MASK);
+> +			addr += PAGE_SIZE;
+> +		}
+> +		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +	}
+> +
+> +	/* Allocate pin pointers for another segment table if needed */
+> +	if (!ioat->pt[rtx]) {
+> +		ioat->pt[rtx] = kcalloc(ZPCI_TABLE_ENTRIES,
+> +					(sizeof(unsigned long *)), GFP_KERNEL);
+> +		if (!ioat->pt[rtx])
+> +			return NULL;
+> +	}
+> +	/* Pin guest page table if needed */
+> +	sx = calc_sx(dma_addr);
+> +	sto = ioat->seg[(rts + (sx / ZPCI_TABLE_ENTRIES_PER_PAGE))];
+> +	if (!ioat->pt[rtx][sx]) {
+> +		if (!reg_entry_isvalid(sto[sx % ZPCI_TABLE_ENTRIES_PER_PAGE]))
+> +			return NULL;
+> +		pto = get_st_pto(sto[sx % ZPCI_TABLE_ENTRIES_PER_PAGE]);
+> +		if (!pto)
+> +			return NULL;
+> +		addr = ((u64)pto & ZPCI_STE_ADDR_MASK);
+> +		idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +		page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
+> +		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +		if (is_error_page(page))
+> +			return NULL;
+> +		ioat->pt[rtx][sx] = page_to_virt(page) + (addr & ~PAGE_MASK);
+> +	}
+> +	pto = ioat->pt[rtx][sx];
+> +
+> +	/* Return guest PTE */
+> +	px = calc_px(dma_addr);
+> +	return &pto[px];
+> +}
+> +
+> +
+> +static int dma_table_shadow(struct kvm_vcpu *vcpu, struct zpci_dev *zdev,
+> +			    dma_addr_t dma_addr, size_t size)
+> +{
+> +	unsigned int nr_pages = PAGE_ALIGN(size) >> PAGE_SHIFT;
+> +	struct kvm_zdev *kzdev = zdev->kzdev;
+> +	unsigned long *entry, *gentry;
+> +	int i, rc = 0, rc2;
+> +
+> +	if (!nr_pages || !kzdev)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&kzdev->ioat.lock);
+> +	if (!zdev->dma_table || !kzdev->ioat.head[0]) {
+> +		rc = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	for (i = 0; i < nr_pages; i++) {
+> +		gentry = dma_walk_guest_cpu_trans(vcpu, &kzdev->ioat, dma_addr);
+> +		if (!gentry)
+> +			continue;
+> +		entry = dma_walk_cpu_trans(zdev->dma_table, dma_addr);
+> +
+> +		if (!entry) {
+> +			rc = -ENOMEM;
+> +			goto out_unlock;
+> +		}
+> +
+> +		rc2 = dma_shadow_cpu_trans(vcpu, entry, gentry);
+> +		if (rc2 < 0) {
+> +			rc = -EIO;
+> +			goto out_unlock;
+> +		}
+> +		dma_addr += PAGE_SIZE;
+> +		rc += rc2;
+> +	}
+> +
 
->>  KSFT_KHDR_INSTALL := 1
->>  
->> -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g  -I$(top_srcdir)/usr/include
->> +CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g $(KHDR_INCLUDES)
->>  
->>  TEST_PROGS := mptcp_connect.sh pm_netlink.sh mptcp_join.sh diag.sh \
->>  	      simult_flows.sh mptcp_sockopt.sh
+In case of error, shouldn't we invalidate the shadow tables entries we 
+did validate until the error?
+
+> +out_unlock:
+> +	mutex_unlock(&kzdev->ioat.lock);
+> +	return rc;
+> +}
+> +
+> +int kvm_s390_pci_refresh_trans(struct kvm_vcpu *vcpu, unsigned long req,
+> +			       unsigned long start, unsigned long size,
+> +			       u8 *status)
+> +{
+> +	struct zpci_dev *zdev;
+> +	u32 fh = req >> 32;
+> +	int rc;
+> +
+> +	/* Make sure this is a valid device associated with this guest */
+> +	zdev = get_zdev_by_fh(fh);
+> +	if (!zdev || !zdev->kzdev || zdev->kzdev->kvm != vcpu->kvm) {
+> +		*status = 0;
+
+Wouldn't it be interesting to add some debug information here.
+When would this appear?
+
+Also if we have this error this looks like we have a VM problem, 
+shouldn't we treat this in QEMU and return -EOPNOTSUPP ?
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Only proceed if the device is using the assist */
+> +	if (zdev->kzdev->ioat.head[0] == 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	rc = dma_table_shadow(vcpu, zdev, start, size);
+> +	if (rc < 0) {
+> +		/*
+> +		 * If errors encountered during shadow operations, we must
+> +		 * fabricate status to present to the guest
+> +		 */
+> +		switch (rc) {
+> +		case -ENOMEM:
+> +			*status = KVM_S390_RPCIT_INS_RES;
+> +			break;
+> +		default:
+> +			*status = KVM_S390_RPCIT_ERR;
+> +			break;
+> +		}
+> +	} else if (rc > 0) {
+> +		/* Host RPCIT must be issued */
+> +		rc = zpci_refresh_trans((u64) zdev->fh << 32, start, size,
+> +					status);
+> +	}
+> +	zdev->kzdev->rpcit_count++;
+> +
+> +	return rc;
+> +}
+> +
+>   /* Modify PCI: Register floating adapter interruption forwarding */
+>   static int kvm_zpci_set_airq(struct zpci_dev *zdev)
+>   {
+> @@ -620,6 +822,8 @@ EXPORT_SYMBOL_GPL(kvm_s390_pci_attach_kvm);
+>   
+>   int kvm_s390_pci_init(void)
+>   {
+> +	int rc;
+> +
+>   	aift = kzalloc(sizeof(struct zpci_aift), GFP_KERNEL);
+>   	if (!aift)
+>   		return -ENOMEM;
+> @@ -627,5 +831,7 @@ int kvm_s390_pci_init(void)
+>   	spin_lock_init(&aift->gait_lock);
+>   	mutex_init(&aift->lock);
+>   
+> -	return 0;
+> +	rc = zpci_get_mdd(&aift->mdd);
+> +
+> +	return rc;
+>   }
+> diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
+> index 54355634df82..bb2be7fc3934 100644
+> --- a/arch/s390/kvm/pci.h
+> +++ b/arch/s390/kvm/pci.h
+> @@ -18,6 +18,9 @@
+>   
+>   #define KVM_S390_PCI_DTSM_MASK 0x40
+>   
+> +#define KVM_S390_RPCIT_INS_RES 0x10
+> +#define KVM_S390_RPCIT_ERR 0x28
+> +
+>   struct zpci_gaite {
+>   	u32 gisa;
+>   	u8 gisc;
+> @@ -33,6 +36,7 @@ struct zpci_aift {
+>   	struct kvm_zdev **kzdev;
+>   	spinlock_t gait_lock; /* Protects the gait, used during AEN forward */
+>   	struct mutex lock; /* Protects the other structures in aift */
+> +	u32 mdd;
+>   };
+>   
+>   extern struct zpci_aift *aift;
+> @@ -47,7 +51,9 @@ static inline struct kvm *kvm_s390_pci_si_to_kvm(struct zpci_aift *aift,
+>   
+>   int kvm_s390_pci_aen_init(u8 nisc);
+>   void kvm_s390_pci_aen_exit(void);
+> -
+> +int kvm_s390_pci_refresh_trans(struct kvm_vcpu *vcpu, unsigned long req,
+> +			       unsigned long start, unsigned long end,
+> +			       u8 *status);
+>   int kvm_s390_pci_init(void);
+>   
+>   #endif /* __KVM_S390_PCI_H */
 > 
-> Note: I see there is a very long recipients list. If my issue is not
-> directly due to your modifications, we can probably continue the
-> discussion with a restricted audience.
-> 
-> Cheers,
-> Matt
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
