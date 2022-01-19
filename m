@@ -2,118 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 604B8493B31
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 14:39:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7D22493B2E
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 14:38:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349725AbiASNjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 08:39:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33394 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343938AbiASNjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 08:39:21 -0500
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 001B4C061574;
-        Wed, 19 Jan 2022 05:39:20 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id w204so2363580pfc.7;
-        Wed, 19 Jan 2022 05:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8NOXdq1kEY3pOnmXg+Zn+1SGl/zikNGQrQDpkrXSeQA=;
-        b=Grw0I8Bzf3z0IHW0BPyppfRlgsOpAmqrKFVYYTprerDwmzSoS+tmFuXTp2661nCk2s
-         0sdPZfeHJLIhB+PkiPaVNCvF1QRQxTNAsQ7Zig7jaMPJLOj5M1j7J9VPEw0+E60+5rZP
-         ME64QZRADsy/M4/FKXSx7nBw1Lk9omFXkAn+iN4ABo78VjzUV4N9ND4MSF2kk9Mbtl+v
-         JieQ7jRnuSftsO4NNb2VYpYwSSXuyuILLMcLuEQjRZDrHO9Ji4wrwjHDqeYa4PRXtpyr
-         iJ86LZfzPyHPerpqy1dhKTkrhxmSZhSUrj4ktbsU1P0WrcfHvSa08of8QOklJ1AoBZ8K
-         J5RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8NOXdq1kEY3pOnmXg+Zn+1SGl/zikNGQrQDpkrXSeQA=;
-        b=Zap0HZ+DbR2LsgXjwnc5zb7RDj3wipv6A/22IjYc7oTKi+Hs7BynHesWND2gUgkv3T
-         Uh7Yeda79LlPQDxmU3lugRNtJPWKiSvtmOFvuYcaRtIclZ5VyUSBqxIKQmWg+mxq7Bmv
-         mOqsBLLZWJx79/mXzXHqusttcRei5El0+pZ18jrzljTetFOP682t9t3xFIwL/LPsF74R
-         i8Vr6T6FwDGVegYahWYdjJcW/1YgIMs0u3e9UbrWjgflpLhGqt+c3ORxB1cvwjMfbRWn
-         Ro646x6dpf/4zvmVTjJIvumuPW97kxzKi/zdS6sYcRN0T9GsVNJbeLEt4t2uJZD5Hoyt
-         CvkA==
-X-Gm-Message-State: AOAM533NjWotDYqWX0rmAMxsg6wg1Iku0iWvRLL2XUnVr3h9vFZFuea2
-        HFUVKlV2vjzEf+jSEE/4PLkVCn/lfrmS9Q==
-X-Google-Smtp-Source: ABdhPJyL4RU+b4ur6zVEBaWRJjK+Yu7CyMHGZG9MfIb/O1kNRFEH+BmBCNgrlOzx2zEa2oQiXac5hg==
-X-Received: by 2002:a62:1996:0:b0:4bb:db58:9f6d with SMTP id 144-20020a621996000000b004bbdb589f6dmr30887470pfz.31.1642599560575;
-        Wed, 19 Jan 2022 05:39:20 -0800 (PST)
-Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id k8sm6308709pjj.3.2022.01.19.05.39.17
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Jan 2022 05:39:20 -0800 (PST)
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests: kvm/x86: Fix the warning in pmu_event_filter_test.c
-Date:   Wed, 19 Jan 2022 21:39:10 +0800
-Message-Id: <20220119133910.56285-1-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+        id S239666AbiASNiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 08:38:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48580 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230422AbiASNiV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 08:38:21 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20JBSog9005162;
+        Wed, 19 Jan 2022 13:38:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HbG6NWXqGqLalCu6NZEP7hHtQq8F8NOCoIRmlek7Bno=;
+ b=SNSSV78S2GjtWceMDcycJ6VJ9AWL4E11EqTYNynwAasEj5DBs4ogyS8J2XCjHXDmV0Ve
+ wjMatMIkU1jmIOsseB/l8dUPGNr4mN3qI+VXYiQOZIVJ0AhUVOFbGbBvDiCKMEoPPxMy
+ DIyhKno3iF7Tr8nEyenIWOEoJG2V657zpLX+zwDHKVHMNhgDzBUALmPc+6po62qHPn6p
+ 31yN2dhB/iiYpKgpOmJzuqYIYfKqVdYNE8UCVxRazUgPo5mAC9lY4oFtKB4Ji9505XER
+ 9mLpmy1ioxbfe1bmrZlHUq1UUPw6KR6jAEPzwG+VJKCjnrPMfnk0Ga9KHXRdXxRmHcMC Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dpht2jpfq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 13:38:21 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20JDLsxm011940;
+        Wed, 19 Jan 2022 13:38:20 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dpht2jpeu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 13:38:20 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20JDXKtb001327;
+        Wed, 19 Jan 2022 13:38:17 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3dnm6rdhx4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 13:38:17 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20JDcE3s41746752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jan 2022 13:38:14 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25B2DA4040;
+        Wed, 19 Jan 2022 13:38:14 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 30FADA405F;
+        Wed, 19 Jan 2022 13:38:13 +0000 (GMT)
+Received: from [9.171.7.240] (unknown [9.171.7.240])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Jan 2022 13:38:13 +0000 (GMT)
+Message-ID: <27c5a295-8bb0-f6b2-bafe-9900e28403a7@linux.ibm.com>
+Date:   Wed, 19 Jan 2022 14:39:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 29/30] KVM: s390: introduce CPU feature for zPCI
+ Interpretation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-30-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-30-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BN6ZRbAKBMcKcLIfc0phijYHIHjy_GNf
+X-Proofpoint-ORIG-GUID: dUR76aNluFTFVqxfsaA22EhpFowP68QH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-19_08,2022-01-19_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 suspectscore=0 adultscore=0
+ clxscore=1015 phishscore=0 spamscore=0 mlxscore=0 impostorscore=0
+ bulkscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201190078
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinrong Liang <cloudliang@tencent.com>
 
-The following warning appears when executing
-make -C tools/testing/selftests/kvm
 
-x86_64/pmu_event_filter_test.c: In function ‘vcpu_supports_intel_br_retired’:
-x86_64/pmu_event_filter_test.c:241:28: warning: variable ‘cpuid’ set but not used [-Wunused-but-set-variable]
-  241 |         struct kvm_cpuid2 *cpuid;
-      |                            ^~~~~
-x86_64/pmu_event_filter_test.c: In function ‘vcpu_supports_amd_zen_br_retired’:
-x86_64/pmu_event_filter_test.c:258:28: warning: variable ‘cpuid’ set but not used [-Wunused-but-set-variable]
-  258 |         struct kvm_cpuid2 *cpuid;
-      |                            ^~~~~
+On 1/14/22 21:31, Matthew Rosato wrote:
+> KVM_S390_VM_CPU_FEAT_ZPCI_INTERP relays whether zPCI interpretive
+> execution is possible based on the available hardware facilities.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/uapi/asm/kvm.h | 1 +
+>   arch/s390/kvm/kvm-s390.c         | 4 ++++
+>   2 files changed, 5 insertions(+)
+> 
+> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+> index 7a6b14874d65..ed06458a871f 100644
+> --- a/arch/s390/include/uapi/asm/kvm.h
+> +++ b/arch/s390/include/uapi/asm/kvm.h
+> @@ -130,6 +130,7 @@ struct kvm_s390_vm_cpu_machine {
+>   #define KVM_S390_VM_CPU_FEAT_PFMFI	11
+>   #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
+>   #define KVM_S390_VM_CPU_FEAT_KSS	13
+> +#define KVM_S390_VM_CPU_FEAT_ZPCI_INTERP 14
+>   struct kvm_s390_vm_cpu_feat {
+>   	__u64 feat[16];
+>   };
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index b6c32fc3b272..3ed59fe512dd 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -434,6 +434,10 @@ static void kvm_s390_cpu_feat_init(void)
+>   	if (test_facility(151)) /* DFLTCC */
+>   		__insn32_query(INSN_DFLTCC, kvm_s390_available_subfunc.dfltcc);
+>   
+> +	if (test_facility(69) && test_facility(70) && test_facility(71) &&
+> +	    test_facility(72)) /* zPCI Interpretation */
+> +		allow_cpu_feat(KVM_S390_VM_CPU_FEAT_ZPCI_INTERP);
+> +
 
-Just delete the unused variables to stay away from warnings.
+Don't we want to start the support of ZPCI interpretation starting with 
+Z14 ?
 
-Fixes: dc7e75b3b3ee ("selftests: kvm/x86: Add test for KVM_SET_PMU_EVENT_FILTER")
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
- tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c | 4 ----
- 1 file changed, 4 deletions(-)
+>   	if (MACHINE_HAS_ESOP)
+>   		allow_cpu_feat(KVM_S390_VM_CPU_FEAT_ESOP);
+>   	/*
+> 
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 8ac99d4cbc73..0611a5c24bbc 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -238,9 +238,7 @@ static void test_not_member_allow_list(struct kvm_vm *vm)
- static bool vcpu_supports_intel_br_retired(void)
- {
- 	struct kvm_cpuid_entry2 *entry;
--	struct kvm_cpuid2 *cpuid;
- 
--	cpuid = kvm_get_supported_cpuid();
- 	entry = kvm_get_supported_cpuid_index(0xa, 0);
- 	return entry &&
- 		(entry->eax & 0xff) &&
-@@ -255,9 +253,7 @@ static bool vcpu_supports_intel_br_retired(void)
- static bool vcpu_supports_amd_zen_br_retired(void)
- {
- 	struct kvm_cpuid_entry2 *entry;
--	struct kvm_cpuid2 *cpuid;
- 
--	cpuid = kvm_get_supported_cpuid();
- 	entry = kvm_get_supported_cpuid_index(1, 0);
- 	return entry &&
- 		((x86_family(entry->eax) == 0x17 &&
 -- 
-2.33.1
-
+Pierre Morel
+IBM Lab Boeblingen
