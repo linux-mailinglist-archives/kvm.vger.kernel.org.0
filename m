@@ -2,107 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 659B2493F41
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 18:44:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49E69493F88
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:03:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356505AbiASRoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 12:44:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33606 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356525AbiASRo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 12:44:27 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789DAC061746
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:44:27 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id t32so3260276pgm.7
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:44:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kjpCz81smuXlqDsUJ+xTPPyd2+p7TwFvzeJvK3dmbfc=;
-        b=n4lk16/mQRQhzDlbYOkuxki1pIs9PLcw0+h7yTUJmpIoxgVgyxAx0MQzlCl/b2WvbZ
-         1FuWNuWG6x6fP/YTzaGe739ddyJyBv2UF5vVIh5T4M26jGwotGP+KH6pym8y2k6wZZfJ
-         9d8LlVoKSAIJRWa3ZYOgwcLYooJVdN4FoX6WqDBWRFm1wbJt6ec8dW62V7WOz5UYyzux
-         TZ1Zsjji2JWeaIlpiCMCNMePlVxqA7rPpzmVe6W7LGw8+U2AsJ2KXja+Yfv+7TaTrGvk
-         KrZtmD4UjOfclp6WIPKOGWTQJpMim6Z2fYAB0Dp+p5DCCpmrTibcyqu7kcyK6vHxSvil
-         5YoA==
+        id S1356607AbiASSDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 13:03:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31882 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345674AbiASSDA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 13:03:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642615380;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=czyQcT5AvdpFdccMDnqOJP5PsUxctttwWttnV2WSAI4=;
+        b=T8gJ1i0aTtAdERDiXt4BeCytBiK3KhfgQQy9Gq7Wy33WoF52ZUe1UW1dpuvLrqAZdZVAQB
+        mbM9i88E0JobMJbh78/r6smiQDdfg3k/CFFEMRiopgN6fK8/XeV8daj3NXQucuCFGqgUIe
+        b/Dq+MExsOJjzxQeUHntfBfnK5am6XA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-266-c18338kFMECs_G-HKN1-Ag-1; Wed, 19 Jan 2022 13:02:58 -0500
+X-MC-Unique: c18338kFMECs_G-HKN1-Ag-1
+Received: by mail-wm1-f71.google.com with SMTP id v190-20020a1cacc7000000b0034657bb6a66so1559041wme.6
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 10:02:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kjpCz81smuXlqDsUJ+xTPPyd2+p7TwFvzeJvK3dmbfc=;
-        b=neFaRDuNJR+fVMGPkDR6Xv9oA7AbZwIXObocDEvWZI8MMxeWhUpz6qxD1qgdC5VxB7
-         ZgBKerEm4jaQPVV6hochb9cdOJKIi8YGJX3MfKTvbgxrF2maJ99JBoJ7rEu238CQHn9Y
-         ONw9BYyYnQb+c3yLhSHpxlojZdNE4HCFCsyKcyAcITpohJiy+pmlCnD/Sw8mp1kP7bal
-         v4H6pkIZDgGc4Te3xZG8kczJf3AKRFxwNAaFW19BkgnLlOJ0sv2VbKOizqPGnYjutJzS
-         XyRFuvZiwyy/hwK7VDY9g+oXyfN3u3Szy3EOook0X6B/UCw26XDIAaeRSQT70JX7fHap
-         junA==
-X-Gm-Message-State: AOAM533qHm/ycsU+ijufr+fpRdYPuuwgxaTDV8pDsdSwjaTsCaPYaH5C
-        IG+HKh1lSxpdx+iWGzsflQZdOg==
-X-Google-Smtp-Source: ABdhPJzUzHmOJnYs8prM/sBikO4z8Cc8PmVmEF8g+1QsVSMkjw673BlqB5V+t5p/weH7+J1vRGRE+g==
-X-Received: by 2002:a63:3705:: with SMTP id e5mr27255386pga.258.1642614266722;
-        Wed, 19 Jan 2022 09:44:26 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d20sm313134pfv.23.2022.01.19.09.44.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 09:44:26 -0800 (PST)
-Date:   Wed, 19 Jan 2022 17:44:22 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Subject: Re: [PATCH v6 0/6] x86/xen: Add in-kernel Xen event channel delivery
-Message-ID: <YehN9pmMXy535+qS@google.com>
-References: <33f3a978-ae3b-21de-b184-e3e4cd1dd4e3@redhat.com>
- <a727e8ae9f1e35330b3e2cad49782d0b352bee1c.camel@infradead.org>
- <e2ed79e6-612a-44a3-d77b-297135849656@redhat.com>
- <YcTpJ369cRBN4W93@google.com>
- <daeba2e20c50bbede7fbe32c4f3c0aed7091382e.camel@infradead.org>
- <YdjaOIymuiRhXUeT@google.com>
- <Yd5GlAKgh0L0ZQir@xz-m1.local>
- <791794474839b5bcad08b1282998d8a5cb47f0e5.camel@infradead.org>
- <cf2d56a2-2644-31f2-c2a5-07077c66243a@redhat.com>
- <37493a2c50389f7843308685f50a93201f1f39c5.camel@infradead.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=czyQcT5AvdpFdccMDnqOJP5PsUxctttwWttnV2WSAI4=;
+        b=qnrGMs92NxLNY7uGtzBcKvUUSrBeOSYUUdGVkjkQ+lej8jzWP2n68o3ck0gvyXYLwB
+         CdArKmz/01ryxBUDs2hJqrpBknC4kBBet8GHRqPmvK5tUNWJJgUhL0tcnaq/NCQKT1/1
+         2aH3yyE3ddGd1ruCQ+zftx4UV0v0SArXKH36O27vTRJqZQTbd4ZaHSETZvzyxIBNbWgA
+         SnZgGKadn88vT591PYj21Ebi8LWwqW51P4NtT1r+G+QIgJksRMMWe/shfCoIOBPUi2EL
+         OvHuXlFaIRhEmhI8tLGQfcNYM/2fKmNcaxfYNmsmqsGMmjne6+CYRcDHHGgIm6HRHF8D
+         6LpA==
+X-Gm-Message-State: AOAM532rHlbR8bIBMBIFT1xRur9XtARBXeGJH2hKijLiiuWlxT+SkojI
+        EDrZbwRrcfMlkFFzaIeF33aEHj92mOcnWkRvq8CB/32G7GZNjCDZADPEIuoTrrmIQ2C2+hyMQSC
+        xGcsjheSR8BM2
+X-Received: by 2002:adf:d1e9:: with SMTP id g9mr16362036wrd.94.1642615377585;
+        Wed, 19 Jan 2022 10:02:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzWiK4YX1B5gdEVQZODtrmTI10OiMW4QGl94Z1D+eFnE79lslF625dzQ56217EHdanwhn1q9A==
+X-Received: by 2002:adf:d1e9:: with SMTP id g9mr16361991wrd.94.1642615376863;
+        Wed, 19 Jan 2022 10:02:56 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id u7sm233710wmc.11.2022.01.19.10.02.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jan 2022 10:02:56 -0800 (PST)
+Message-ID: <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
+Date:   Wed, 19 Jan 2022 19:02:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <37493a2c50389f7843308685f50a93201f1f39c5.camel@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v2] KVM: Move VM's worker kthreads back to the original
+ cgroups before exiting.
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>, Vipin Sharma <vipinsh@google.com>
+Cc:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        seanjc@google.com, lizefan.x@bytedance.com, hannes@cmpxchg.org,
+        dmatlack@google.com, jiangshanlai@gmail.com, kvm@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211222225350.1912249-1-vipinsh@google.com>
+ <20220105180420.GC6464@blackbody.suse.cz>
+ <CAHVum0e84nUcGtdPYQaJDQszKj-QVP5gM+nteBpSTaQ2sWYpmQ@mail.gmail.com>
+ <Yeclbe3GNdCMLlHz@slm.duckdns.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Yeclbe3GNdCMLlHz@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022, David Woodhouse wrote:
-> On Wed, 2022-01-19 at 18:36 +0100, Paolo Bonzini wrote:
-> > On 1/19/22 09:14, David Woodhouse wrote:
-> > > > Or do we have explicit other requirement that needs to dirty guest pages
-> > > > without vcpu context at all?
-> > > 
-> > > Delivering interrupts may want to do so. That's the one we hit for
-> > > S390, and I only avoided it for Xen event channel delivery on x86 by
-> > > declaring that the Xen shared info page is exempt from dirty tracking
-> > > and should*always*  be considered dirty.
-> > 
-> > We also have one that I just found out about in 
-> > kvm_hv_invalidate_tsc_page, called from KVM_SET_CLOCK. :/
+On 1/18/22 21:39, Tejun Heo wrote:
+> So, these are normally driven by the !populated events. That's how everyone
+> else is doing it. If you want to tie the kvm workers lifetimes to kvm
+> process, wouldn't it be cleaner to do so from kvm side? ie. let kvm process
+> exit wait for the workers to be cleaned up.
 
-I think we can fix that usage though:
+It does.  For example kvm_mmu_post_init_vm's call to
+kvm_vm_create_worker_thread is matched with the call to
+kthread_stop in kvm_mmu_pre_destroy_vm.
+  
+According to Vpin, the problem is that there's a small amount of time
+between the return from kthread_stop and the point where the cgroup
+can be removed.  My understanding of the race is the following:
 
-https://lore.kernel.org/all/YcTpJ369cRBN4W93@google.com
+user process			kthread			management
+------------			-------			----------
+							wait4()
+exit_task_work()
+   ____fput()
+     kvm_mmu_pre_destroy_vm()
+       kthread_stop();
+         wait_for_completion();
+				exit_signals()
+				  /* set PF_EXITING */
+				exit_mm()
+				  exit_mm_release()
+				    complete_vfork_done()
+				      complete();
+cgroup_exit()
+   cgroup_set_move_task()
+     css_set_update_populated()
+exit_notify()
+   do_notify_parent()
+							<wakeup>
+							rmdir()
+							  cgroup_destroy_locked()
+							    cgroup_is_populated()
+							    return -EBUSY
+				cgroup_exit()
+				  cgroup_set_move_task()
+				    css_set_update_populated()
 
-> > So either we have another special case to document for the dirty ring 
-> > buffer (and retroactively so, even), or we're in bad need for a solution.
-> 
-> Seems like adding that warning is having precisely the desired effect :)
+I cannot find the code that makes it possible to rmdir a cgroup
+if PF_EXITING is set.
 
-The WARN is certainly useful.  Part of me actually likes the restriction of needing
-to have a valid vCPU, at least for x86, as there really aren't many legitimate cases
-where KVM should be marking memory dirty without a vCPU.
+Paolo
+
