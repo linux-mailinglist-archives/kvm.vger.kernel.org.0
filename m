@@ -2,110 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 585474935C5
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 08:47:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DC194935F0
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 08:56:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352167AbiASHrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 02:47:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352161AbiASHra (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 02:47:30 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6BF1C061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 23:47:30 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id r5so1816505pfl.2
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 23:47:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qbiJb2UVtirrAHsd/tlBtET4SjB9SQTlHXui+2izr3s=;
-        b=bP8mpKrUKYYcA4KRpX/Iab6PVeCaEBou0Rle0wK4u0oCxHKHJNxK3XOy8B6lcxgvXY
-         FOco+CP1Zd+i3br6c9kACIwlpelrznWTBYQUgGtAv7CIL5/Vnzro9VaR+3UOWqaq8BVB
-         xO6cf+i5UOhU4GoneriU5p5ARzP2ioFnBe4GfgF/C+JvyNABeyjbtY0rfzzo/ABYY++3
-         iJR1Xxp98BG1ihJUwNmD+zPbT8XFXRlCn6TXC5AqGaP9hKk35oUB0BaIZ9HYjhj8NlBp
-         FAWsGfVPMfQ2g6v6WkTOQ8wNCoRN/d9yFYycIOipiN0vhIS7vAg3sF7aPCVLXrVqbIL7
-         RxNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qbiJb2UVtirrAHsd/tlBtET4SjB9SQTlHXui+2izr3s=;
-        b=8GYaqTS+l+GMlHkz5KDgC61qQReqU8xqNYdqX4SFwczLga44EZhkmuzXc10f6gxROT
-         zS1uBKbv8/yxnf6zUfuXFmkTrHzivPyw7AsKY3mgb9etXXXnTP+Kpn1h+JEfmM1BYImx
-         epfj6g2BcRgHE4nxGZ1wLbWz7yfIK2NC1lkwCEXz+SsjdvEblQkclV76Y58MVkGeVLwl
-         i6NPg3G+E3xQiY5D3Ao3b5a28JaD+J9ntiGVxfeGEkn9nwlyHp9ZH1kUhva9dW/DeGVe
-         iSdFscMY+lXBincl9QE/w3BMUJ1qUjspYZjrBuykjIlvzxU4Qs4ikS3DVGY7BOATFUaJ
-         rH1A==
-X-Gm-Message-State: AOAM53171TOnmt7aKmBylH3R7sDOvcPy246u9yEcK/Jb0bk9Umu8bQLJ
-        7LTYgobO3DEDLCQbndwe0hmPm3kYjYsbCmfsRi0Y4w==
-X-Google-Smtp-Source: ABdhPJynjuL5EJyIFAzAyBjd8DX1zCihK90pwXV5JoP1UY92TV4OnkyTmudcqtrcfRqYDdlvxWABUiftzGEKe/ZrgUE=
-X-Received: by 2002:a63:7d42:: with SMTP id m2mr26257918pgn.491.1642578450084;
- Tue, 18 Jan 2022 23:47:30 -0800 (PST)
+        id S1344765AbiASH4B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 02:56:01 -0500
+Received: from mga14.intel.com ([192.55.52.115]:28552 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235096AbiASH4A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 02:56:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642578960; x=1674114960;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Os56kLMd0kjXcgux4x7i9dbY012Pv8vPfsbJq5keC/4=;
+  b=M/grDbHjzpYn/pO0GX+Cp00Lv9t27OYGlyPcnZbrN/Yus+4FoduMvBT+
+   mF3fy6hSfw+NyhSTI4tJrX6BbsToq+UymSAHEK0UbJyCwaPENayLkzALL
+   BY0crew1G0M7T/ZEqubSaBds8/gBNre50zHk4IFihj8rnVn9YONke9vLd
+   C61/kz6u0eWUBvwxpwzUW4wa2Q5M82eqin2MbYObcG+TP8YoVCPFX63OS
+   UErs36Ak3AjCunNYxsfVYFyxwIS+wx0e5c4VKp4i9lJn2n60WYJ8g9Nas
+   zPjD0dZk5nSAv9mgc1aVikNKr5Wu4kQgOJ0vHB2LXPJ99KWmdiGD3HaeE
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10231"; a="245205912"
+X-IronPort-AV: E=Sophos;i="5.88,299,1635231600"; 
+   d="scan'208";a="245205912"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2022 23:55:59 -0800
+X-IronPort-AV: E=Sophos;i="5.88,299,1635231600"; 
+   d="scan'208";a="532162832"
+Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.0.96]) ([10.238.0.96])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2022 23:55:54 -0800
+Message-ID: <aba84be5-562a-369e-913d-1b834c141cc6@intel.com>
+Date:   Wed, 19 Jan 2022 15:55:47 +0800
 MIME-Version: 1.0
-References: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
- <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
- <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
- <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
- <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
- <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
- <YeBfj89mIf8SezfD@google.com> <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
- <YedWUJNnQK3HFrWC@google.com>
-In-Reply-To: <YedWUJNnQK3HFrWC@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 18 Jan 2022 23:47:13 -0800
-Message-ID: <CAAeT=FyJAG1dEFLvrQ4UXrwUqBUhY0AKkjzFpyi74zCJZUEYVg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.5.0
+Subject: Re: [PATCH v5 8/8] KVM: VMX: Resize PID-ponter table on demand for
+ IPI virtualization
+Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        linux-kernel@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+ <20211231142849.611-9-guang.zeng@intel.com> <YeCjHbdAikyIFQc9@google.com>
+ <43200b86-aa40-f7a3-d571-dc5fc3ebd421@intel.com>
+ <YeGiVCn0wNH9eqxX@google.com>
+ <67262b95-d577-0620-79bf-20fc37906869@intel.com>
+ <Yeb1vkEclYzD27R/@google.com>
+From:   Zeng Guang <guang.zeng@intel.com>
+In-Reply-To: <Yeb1vkEclYzD27R/@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 4:07 PM Sean Christopherson <seanjc@google.com> wrote:
+
+On 1/19/2022 1:15 AM, Sean Christopherson wrote:
+> On Mon, Jan 17, 2022, Zeng Guang wrote:
+>> On 1/15/2022 12:18 AM, Sean Christopherson wrote:
+>>> Userspace can simply do KVM_CREATE_VCPU until it hits KVM_MAX_VCPU_IDS...
+>> IIUC, what you proposed is to use max_vcpus in kvm for x86 arch (currently
+>> not present yet) and
+>> provide new api for userspace to notify kvm how many vcpus in current vm
+>> session prior to vCPU creation.
+>> Thus IPIv can setup PID-table with this information in one shot.
+>> I'm thinking this may have several things uncertain:
+>> 1. cannot identify the exact max APIC ID corresponding to max vcpus
+>> APIC ID definition is platform dependent. A large APIC ID could be assigned
+>> to one vCPU in theory even running with
+>> small max_vcpus. We cannot figure out max APIC ID supported mapping to
+>> max_vcpus.
+> Gah, I conflated KVM_CAP_MAX_VCPUS and KVM_MAX_VCPU_IDS.  But the underlying idea
+> still works: extend KVM_MAX_VCPU_IDS to allow userspace to lower the max allowed
+> vCPU ID to reduce the memory footprint of densely "packed" and/or small VMs.
+
+Possibly it may not work well as expected. From user's perspective, 
+assigning
+max apic id requires knowledge of apic id implementation on various 
+platform.
+It's hard to let user to determine an appropriate value for every vm 
+session.
+User may know his exact demand on vcpu resource like cpu number of smp ,
+max cpus for cpu hotplug etc, but highly possibly not know or care about 
+what
+the apic id should be. If an improper value is provided, we cannot 
+achieve the
+goal to reduce the memory footprint, but also may lead to unexpected 
+failure on
+vcpu creation, e.g. actual vcpu id(=apic id) is larger than max apic id 
+assigned.  So
+this solution seems still have potential problem existing.
+Besides, it also need change user hypervisor(QEMU etc.) and kvm (kvm arch,
+vcpu creation policy etc.) which unnecessarily interrelate such modules 
+together.
+ From these point of view, it's given not much advantage other than 
+simplifying IPIv
+memory management on PID table.
+
+>> 2. cannot optimize the memory consumption on PID table to the least at
+>> run-time
+>>   In case "-smp=small_n,maxcpus=large_N", kvm has to allocate memory to
+>> accommodate large_N vcpus at the
+>> beginning no matter whether all maxcpus will run.
+> That's a feature.  E.g. if userspace defines a max vCPU ID that is larger than
+> what is required at boot, e.g. to hotplug vCPUs, then consuming a few extra pages
+> of memory to ensure that IPIv will be supported for hotplugged vCPUs is very
+> desirable behavior.  Observing poor performance on hotplugged vCPUs because the
+> host was under memory pressure is far worse.
 >
-> On Fri, Jan 14, 2022, Reiji Watanabe wrote:
-> > The restriction, with which KVM doesn't need to worry about the changes
-> > in the registers after KVM_RUN, could potentially protect or be useful
-> > to protect KVM and simplify future changes/maintenance of the KVM codes
-> > that consumes the values.
->
-> That sort of protection is definitely welcome, the previously mentioned CPUID mess
-> on x86 would have benefit greatly by KVM being restrictive in the past.  That said,
-> hooking KVM_RUN is likely the wrong way to go about implementing any restrictions.
-> Running a vCPU is where much of the vCPU's state is explicitly consumed, but it's
-> all too easy for KVM to implicity/indirectly consume state via a different ioctl(),
-> e.g. if there are side effects that are visible in other registers, than an update
-> can also be visible to userspace via KVM_{G,S}ET_{S,}REGS, at which point disallowing
-> modifying state after KVM_RUN but not after reading/writing regs is arbitrary and
-> inconsitent.
+> And the goal isn't to achieve the smallest memory footprint possible, it's to
+> avoid allocating 32kb of memory when userspace wants to run a VM with only a
+> handful of vCPUs, i.e. when 4kb will suffice.  Consuming 32kb of memory for a VM
+> with hundreds of vCPUs is a non-issue, e.g. it's highly unlikely to be running
+> multiple such VMs on a single host, and such hosts will likely have hundreds of
+> gb of RAM.  Conversely, hosts running run small VMs will likely run tens or hudreds
+> of small VMs, e.g. for container scenarios, in which case reducing the per-VM memory
+> footprint is much more valuable and also easier to achieve.
+Agree. This is the purpose to implement this patch. With current 
+solution we proposed,  IPIv just
+use memory as less as possible in all kinds of scenarios, and keep 4Kb 
+in most cases instead of 32Kb.
+It's self-adaptive , standalone function module in kvm, no any extra 
+limitation introduced and scalable
+even future extension on KVM_MAX_VCPU_IDS or new apic id implementation 
+released.
+How do you think ? :)
+>> 3. Potential backward-compatible problem
+>> If running with old QEMU version,  kvm cannot get expected information so as
+>> to make a fallback to use
+>> KVM_MAX_VCPU_IDS by default. It's feasible but not benefit on memory
+>> optimization for PID table.
+> That's totally fine.  This is purely a memory optimization, IPIv will still work
+> as intended if usersepace doesn't lower the max vCPU ID, it'll just consume a bit
+> more memory.
 
-Thank you for your comments !
-I think I understand your concern, and that's a great point.
-That's not the case for those pseudo registers though at least for now :)
-BTW, is this concern specific to hooking KVM_RUN ? (Wouldn't it be the
-same for the option with "if kvm->created_vcpus > 0" ?)
-
-
-> If possible, preventing modification if kvm->created_vcpus > 0 is ideal as it's
-> a relatively common pattern in KVM, and provides a clear boundary to userpace
-> regarding what is/isn't allowed.
-
-Yes, I agree that would be better in general.  For (pseudo) registers,
-I would think preventing modification if kvm->created_vcpus > 0 might
-not be a very good option for KVM/ARM though considering usage of
-KVM_GET_REG_LIST and KVM_{G,S}ET_ONE_REG.
-
-Thanks,
-Reiji
