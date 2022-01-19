@@ -2,180 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D49F5493B42
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 14:42:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2542493B5E
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 14:47:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354855AbiASNmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 08:42:35 -0500
-Received: from mail-dm6nam12on2050.outbound.protection.outlook.com ([40.107.243.50]:50911
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234312AbiASNme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 08:42:34 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O4+FO7mZn5M7LDqotLo1I4k5ZX/BO9Kjvcn+P3p06A3J0JRy8RV3cNJ4ASxbGAyi8NihQCuRmczZmU/CYpFSJH/S605PGaGQ29VMqqLIFNfiBdwCcyTJm7E5QsDjwGhzdrw3FETLZHzA1V8lKDJufiFSOE4X6IXPfAt1s9kci0ll5d6BuCSxdoXH2Wu+LMuY1yzRnpTLEYOOtaKoB3g9ntgH0gU75O9PvhiNC74ch92HoH12E3y9JRaHEeOVw+rM0/vkpnZ64A78IZ7APCx37jZFYzhyovfs6JgUflluX5ssj6hIAAtuC6+QzNVOREk8mO5WyPBnXThyMKKJbg1ycg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jtffe/ld4Cm1Yo5vxqBQoMvDYfheTFpXgHdqsdBtSX8=;
- b=BZCnCcdSbQyyyE4T1qiWqsG3RJj3Tt2dQiesQR0qcw9upyvLuDi201/1b7h5B9Yq2QVd5fV2OapZJyL2Epl9OijizCN6fCuWEMyGclNdlirbcfFFj6TlMrwmlXLAGhys2cG0d1B4eLFWCxPRzCnXJUhkJfIDDT5neCDh1QdiyrotDGGPSgDMhpGCcgg3CDKiselyWF3CdvNedL8aht77RmdiyKrhswRdO3nvlF0nZHeZ6p0EgWIN23xlupxJim2PfuQ8eY71FpfCDmlWKK1DabN6xwV3qc34dKjUIDYtK8M6QiPsGYsSDvVXA0vt8kGcyG16DfMkjYnUpIXEHS+W1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jtffe/ld4Cm1Yo5vxqBQoMvDYfheTFpXgHdqsdBtSX8=;
- b=lmlxr2PeAnn5crf1bLDEcNnunQNq+Z3ICA4kZyJJzT1vGfCtxTiFUkq3sYeEtsXrRUMWIFvj8zN/+u2xDuguCi6/FpiQYMxHu2tFJVQ/rS8YxJKkrCjs7MA/wNAtsQHyAlhgAicx1d0FHbOrcw8GuU2L1G+LdWGVgLcIMMsKAH503CGhsQeZVY8xpDdCR+E3tlp7F8vGOdrJqEyuQzxCoA2wFGmKHTvK2iiX6CFew6fESkurbbi5TltWufpkB24vhLxNRCTFzzLdD1zUtIs7e56WYInHJUCATkCu9Zc+MtF+zuVpRx3wQ4UAGdo8/5FCtN1JAydsbc7F4OnbuUT1yQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB2468.namprd12.prod.outlook.com (2603:10b6:207:44::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.7; Wed, 19 Jan
- 2022 13:42:33 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af%8]) with mapi id 15.20.4909.008; Wed, 19 Jan 2022
- 13:42:32 +0000
-Date:   Wed, 19 Jan 2022 09:42:30 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC] vfio: Revise and update the migration uAPI
- description
-Message-ID: <20220119134230.GM84788@nvidia.com>
-References: <0-v1-a4f7cab64938+3f-vfio_mig_states_jgg@nvidia.com>
- <20220118125522.6c6bb1bb.alex.williamson@redhat.com>
- <20220118210048.GG84788@nvidia.com>
- <87sftkc5s4.fsf@redhat.com>
- <20220119124432.GJ84788@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220119124432.GJ84788@nvidia.com>
-X-ClientProxiedBy: BL1PR13CA0433.namprd13.prod.outlook.com
- (2603:10b6:208:2c3::18) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S245443AbiASNrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 08:47:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18028 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236230AbiASNrG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 08:47:06 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20JDT4oa004740;
+        Wed, 19 Jan 2022 13:47:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=YkJC5ufyIJ7odpcEovakSnN6VL47BQcgEbKqHQVgTDg=;
+ b=sjgqPecy0cb4oan9uXp7ydoYGYXk9p0H0mS0d3ytjifboksWjAaX5hQatubOWdhuw+VF
+ nkJcPhduTCKIXTVCnHA2XCi2Wnkh5AS6Y69IBg0FZ1QGlNZUsplS5LrszCo4J8fi6BsW
+ sXjg2nKbmsZirGkaEGVO4pUIVVSSyHCMcIfH7ZxzR5/Xpr52jX6mbLURvPZGh+QC67YK
+ EJoPWm4pyu0tRIpzRxx+9Q5vz1j9pAF/8tk+UZV7nK73lxFbH3RoQnPYC2MQe88ACUnQ
+ LfO5IX6lxMO++XZPAE9rSY7+VewBnMhpCswaIBfnHw0i4eNOpA+HnMIj1t+vYcQFwAbI fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dpkjb0c7y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 13:47:06 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20JDZc8o008343;
+        Wed, 19 Jan 2022 13:47:06 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dpkjb0c6y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 13:47:05 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20JDhiSm020558;
+        Wed, 19 Jan 2022 13:47:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3dknw9e9wf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 13:47:03 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20JDl09544106180
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jan 2022 13:47:00 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 157D4A4065;
+        Wed, 19 Jan 2022 13:47:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A6E9A405F;
+        Wed, 19 Jan 2022 13:46:59 +0000 (GMT)
+Received: from [9.171.7.240] (unknown [9.171.7.240])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Jan 2022 13:46:59 +0000 (GMT)
+Message-ID: <cf373eb1-02d2-387c-208d-d6dbb24cc64a@linux.ibm.com>
+Date:   Wed, 19 Jan 2022 14:48:43 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cc1cd65e-8b51-4563-8483-08d9db518b3d
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2468:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB24689DEE78D8F0BA7B87F8FEC2599@BL0PR12MB2468.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JgkipX42DC54axZbZMmau7Vpx5Kk2bPgkHZh4NaGAqtyIdpSEs+3QqksDhsscD5QH343EJ8URPOjNQQnu/m+Gy9R6tRU8+0FOWbdeukOhd1+KIuPiVeP4Bdb9zW73wvwfbsS35JHGOcROM6J7SCneqCRWwX9EolhMc0fAgKV7c47EAzLu4ksrSP9O43JmQeF8h/qhzo2zrXHcWne4is5i++eXNnw5AqROy8pzxf+3QivhRGHZDsApg6WMq7o4zUnb8slSA7cprHMbYvOKA1Winz3vPsDA4V4Uq7ao2C6qSnUrqxsaACcqkmQreORDnLQVzk8KEwx2GQhlvdG3vkinkk1MhjaEiIf0uEKofgPcaC9A2+mJNcEqOkZr8inTH6u0hRZYrVjLIuJvdKVveqZdyEMDCh8TxOV6tqg+3SSIIyADl5/6/iDgsTOs0WZbJdI8/+WELLhQulCx4/vt5hAYoEt/PL4rx/Yvd9TzSfBFIKuFIk4wSPCEcUzVhCMBexazfGrwGvk8r1fu7ZtR6o3HsXr/AI4w7zOb6s5UaMgnXBjZnD0EPG171bgr6IZiQgxVIwGGonVYEM7BNmye4/H6BsqyR6g7GA50uyVSTW7DDEHqp+oKFqQYjciHfzPiWrYI2R0g4e5qL+wBvokikveJg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(26005)(33656002)(2616005)(1076003)(6512007)(38100700002)(66476007)(66556008)(66946007)(6506007)(5660300002)(107886003)(4326008)(186003)(54906003)(36756003)(316002)(83380400001)(6916009)(508600001)(8936002)(6486002)(86362001)(2906002)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RWq9NXgbHsfBoit+YMJgumHXFlbU9WvQlc4H01XFki9a5SQu+/bjvM47Qj/c?=
- =?us-ascii?Q?+e49BCzsbCylwlE452rlsiS1rVXPMZ/p6mcQamE3HgNICb8ylXOI0mUvqLH2?=
- =?us-ascii?Q?kX7Sfi4f1v9LRCWmvVdiMxcvc2eyJcE5pmxRSOk4Dfe8YZhkEdYgLd1BtG1z?=
- =?us-ascii?Q?KHLQeloS50/ciBQStGUZ6ReO8PLNkWMHLZUHopJZIwhfjQPfHlkScoJfJuwF?=
- =?us-ascii?Q?O2IPUfmExYyGeXJ/5Zi6vOxN1awsCz30QNEA+dpr2ZT39J5GUG2Jmx0vM31t?=
- =?us-ascii?Q?hc6l4zlLUQjO7cardxO7TaPfJTkuFW4TIkg/oZltRsHJqRmAgtF6SANXbx7Q?=
- =?us-ascii?Q?gT2MxnV6iH2SH3L2Ha93BLMRMyL2m+eWsAUksFhr68BZPi0APh4jHWp0vdJG?=
- =?us-ascii?Q?1x/3TDyN4fTQHmpI/bi/lntYgCeOP70J8wqM4j3DQIzgXyrxBuN2cczYmEg/?=
- =?us-ascii?Q?bmyNdIebSMqeNdYMkcvg/SBsJEQ6A48T9VDO1At/l1P7IrmsUIaU2GHCoQkG?=
- =?us-ascii?Q?AZQWipcOdMnbpJS6TRW1uAwlVZmycvQ4CzGl6beUDTdlGdHkPXi/ShvPVhRQ?=
- =?us-ascii?Q?4LAXdG1Pel/2SgNnyCBUmLk+LEewK96W7pJLUEJ7PECvqKUWmwCmhimW6Njm?=
- =?us-ascii?Q?UI9J2nMuUxX8xmW+k5XPTkapedPCBFok/nhd++gX6U7sRhsI8+1Cdx2uG9tS?=
- =?us-ascii?Q?Ror8SxF7dEfQou56AEM2kabHzJGfsskf1PTVrzyc9Ohjp/0wJisnJ3JZ/yh7?=
- =?us-ascii?Q?PUJql7faSiLUq0B7bPAbsS+UQmr9F6c5WEXPSe11RgabjsmSQ+U4vz1PT+Su?=
- =?us-ascii?Q?UZYnkjKq7O/f6etZ2UoOF9ulwCaD81K77zpYR18VzRf+dt6qfHLIx2EJLQ6x?=
- =?us-ascii?Q?5Ki4G/G4VG1Zd1Oi2v5ifRMOOCjS9i3aRLgCT4Nc8kGzAfmCe3lWRH6zSyre?=
- =?us-ascii?Q?md7FTddGmDBYFeEWt28Pq9nxNgthnQrvt4NL7qMP9K1oERVS0NGQn5m+Lhvs?=
- =?us-ascii?Q?VQE+aDiueSyRHtf6vw4bfAONsl2vaV9OfQBQA6JaqsoGpxlQbLbv0TBoul1L?=
- =?us-ascii?Q?u7nMBpQgSCEAcSrrnvFCH0QVbQoLu7kh7TlXqwrfVFvjUeLi0YS8GCngHUe8?=
- =?us-ascii?Q?0pjoEPmlX8/v807R2JCIqqA/yGKI3up97Z7pZ2k+D5K9nX8tqSSPn0YrNsu1?=
- =?us-ascii?Q?VQJBD4CUVIUETrYv0nbTg6vi1v9uNz9+NrJqvOlVA5ej9E+/f6Fb+AS8JEdG?=
- =?us-ascii?Q?cZaYulYJrbyQfsltPxSgxEOGyfEpSevYkh+UX1yjTYeTJD9XkK3caTcDQQYm?=
- =?us-ascii?Q?iucdYyWSK9S7JBnvBjUT246uGohLNr9lxBX/qVISFeQlbxoxyY39amkbfx0T?=
- =?us-ascii?Q?Ls1PWt+e3s6PIq9OvfDjsmRc5QdSVJUn/q8PvkZWmXXnNeU8Gc9aO31C8ReO?=
- =?us-ascii?Q?XV66DvKNKYmpDFYP+THf12K2/hWYJmueQXTD8MCGeNjTEkZO7kMKc7cFK2X3?=
- =?us-ascii?Q?KtsLDuI/DBZFYAqQ17MkO3mA67HYjNzc7TwDybgGwgJC/Vbb8HgZzo6DvhBR?=
- =?us-ascii?Q?jYXduJc4lK1j/2sKLg0=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc1cd65e-8b51-4563-8483-08d9db518b3d
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2022 13:42:32.6096
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lVSYWgSsBj7ItRTJPW1zgpzp26l0wDPQQ1RARDbaMh19Mw1R2hvMGWozg3b2zJzT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2468
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 28/30] vfio-pci/zdev: add DTSM to clp group capability
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-29-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-29-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iYBxSG5dYL4GzuPdkMQKVUOzCUjf0xjJ
+X-Proofpoint-GUID: pq1B-2MP5nMgq8iOce4jvm9XAmcmHRix
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-19_08,2022-01-19_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 malwarescore=0
+ bulkscore=0 mlxlogscore=999 phishscore=0 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201190078
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 08:44:32AM -0400, Jason Gunthorpe wrote:
 
-> > What about leaving the existing migration region alone (in order to not
-> > break whatever exists out there) and add a v2 migration region that
-> > defines a base specification (the mandatory part that everyone must
-> > support) and a capability mechanism to allow for extensions like
-> > P2P?
 
-Actually, I misunderstood your remark, I think.
+On 1/14/22 21:31, Matthew Rosato wrote:
+> The DTSM, or designation type supported mask, indicates what IOAT formats
+> are available to the guest.  For an interpreted device, userspace will not
+> know what format(s) the IOAT assist supports, so pass it via the
+> capability chain.  Since the value belongs to the Query PCI Function Group
+> clp, let's extend the existing capability with a new version.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-The ARC_SUPPORTED *is* the capability mechanism you are asking for. 
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 
-It is naturally defined in terms of the thing we are querying instead
-of being an 'capability bit'.
 
-It would be reasonable to define bundles of arcs, eg if any of these
-are supported then all of them must be supported:
 
-        PRE_COPY -> RUNNING
-        PRE_COPY -> STOP_COPY
-        RESUMING -> STOP
-        RUNNING -> PRE_COPY
-        RUNNING -> STOP
-        STOP -> RESUMING
-        STOP -> RUNNING
-        STOP -> STOP_COPY
-        STOP_COPY -> STOP
+> ---
+>   drivers/vfio/pci/vfio_pci_zdev.c | 9 ++++++---
+>   include/uapi/linux/vfio_zdev.h   | 3 +++
+>   2 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+> index 2b169d688937..aa2ef9067c7d 100644
+> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+> @@ -45,19 +45,22 @@ static int zpci_group_cap(struct zpci_dev *zdev, struct vfio_info_cap *caps)
+>   {
+>   	struct vfio_device_info_cap_zpci_group cap = {
+>   		.header.id = VFIO_DEVICE_INFO_CAP_ZPCI_GROUP,
+> -		.header.version = 1,
+> +		.header.version = 2,
+>   		.dasm = zdev->dma_mask,
+>   		.msi_addr = zdev->msi_addr,
+>   		.flags = VFIO_DEVICE_INFO_ZPCI_FLAG_REFRESH,
+>   		.mui = zdev->fmb_update,
+>   		.noi = zdev->max_msi,
+>   		.maxstbl = ZPCI_MAX_WRITE_SIZE,
+> -		.version = zdev->version
+> +		.version = zdev->version,
+> +		.dtsm = 0
+>   	};
+>   
+>   	/* Some values are different for interpreted devices */
+> -	if (zdev->kzdev && zdev->kzdev->interp)
+> +	if (zdev->kzdev && zdev->kzdev->interp) {
+>   		cap.maxstbl = zdev->maxstbl;
+> +		cap.dtsm = kvm_s390_pci_get_dtsm(zdev);
+> +	}
+>   
+>   	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
+>   }
+> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
+> index 1a5229b7bb18..b4c2ba8e71f0 100644
+> --- a/include/uapi/linux/vfio_zdev.h
+> +++ b/include/uapi/linux/vfio_zdev.h
+> @@ -47,6 +47,9 @@ struct vfio_device_info_cap_zpci_group {
+>   	__u16 noi;		/* Maximum number of MSIs */
+>   	__u16 maxstbl;		/* Maximum Store Block Length */
+>   	__u8 version;		/* Supported PCI Version */
+> +	/* End of version 1 */
+> +	__u8 dtsm;		/* Supported IOAT Designations */
+> +	/* End of version 2 */
+>   };
+>   
+>   /**
+> 
 
-(And since we already defined this as mandatory already, it must
-succeed)
-
-And similar for P2P, if any are supported all must be supported
-
-        PRE_COPY -> PRE_COPY_P2P
-        PRE_COPY_P2P -> PRE_COPY
-        PRE_COPY_P2P -> RUNNING_P2P
-        PRE_COPY_P2P -> STOP_COPY
-        RUNNING -> RUNNING_P2P
-        RUNNING_P2P -> PRE_COPY_P2P
-        RUNNING_P2P -> RUNNING
-        RUNNING_P2P -> STOP
-        STOP -> RUNNING_P2P
-
-        [Plus the frst group]
-
-This is pretty much the intention anyhow, even if it is was not
-fully written down.
-
-Which means that qemu needs to do one ARC_SUPPORTED call to determine
-if it should use the P2P arcs or not.
-
-We also have the possible STOP_COPY -> PRE_COPY scenario Alex thought
-about which fits nicely here as well.
-
-I can't see a good reason to use capability flags to represent the
-same thing, that is less precise and a bit more obfuscated, IMHO. But
-it doesn't really matter either way - it expresses the same idea. We
-used a cap flag in the prior attempt for NDMA already, it isn't a big
-change.
-
-Please lets just pick the colour of this bike shed and move on.
-
-Thanks,
-Jason
+-- 
+Pierre Morel
+IBM Lab Boeblingen
