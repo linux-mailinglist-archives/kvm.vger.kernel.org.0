@@ -2,109 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A8BF4939BB
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:41:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62A434939C4
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:42:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354256AbiASLlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 06:41:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44655 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236274AbiASLlB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 06:41:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642592455;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FmMUtwULPN23DvBwyj9A3TEyqM30MbuwdE8vFcNpedo=;
-        b=fsr/Pq15vwFy95PMbEHKMJk2EmCyenK2996S/p3vZSPaN/7VoC1FLHo8Sdb2qFFPD44HHz
-        5ZoCEQm5e+0ndwh2vWT1S26PiSnmYOKUngyLpW13rOwdJr+VWQ9vBJzth9gHAGksgcDEv/
-        /lPS4js2TQRY/4pUaaVWhC9CpG9lbo0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-491-EYdCWlqQMYKzKVthj5jqDg-1; Wed, 19 Jan 2022 06:40:52 -0500
-X-MC-Unique: EYdCWlqQMYKzKVthj5jqDg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EAC41091DA1;
-        Wed, 19 Jan 2022 11:40:51 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B3461059584;
-        Wed, 19 Jan 2022 11:40:45 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC] vfio: Revise and update the migration uAPI description
-In-Reply-To: <20220118210048.GG84788@nvidia.com>
-Organization: Red Hat GmbH
-References: <0-v1-a4f7cab64938+3f-vfio_mig_states_jgg@nvidia.com>
- <20220118125522.6c6bb1bb.alex.williamson@redhat.com>
- <20220118210048.GG84788@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Wed, 19 Jan 2022 12:40:43 +0100
-Message-ID: <87sftkc5s4.fsf@redhat.com>
+        id S1354277AbiASLmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 06:42:20 -0500
+Received: from mxout03.lancloud.ru ([45.84.86.113]:32826 "EHLO
+        mxout03.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236274AbiASLmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 06:42:19 -0500
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru 3B47720D46BF
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+ (summary)
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
+CC:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        <linux-iio@vger.kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        <alsa-devel@alsa-project.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        <linux-mtd@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        <linux-phy@lists.infradead.org>, <linux-spi@vger.kernel.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        <openipmi-developer@lists.sourceforge.net>,
+        "Khuong Dinh" <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        "Jiri Slaby" <jirislaby@kernel.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        <bcm-kernel-feedback-list@broadcom.com>,
+        <linux-serial@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        "Jaroslav Kysela" <perex@perex.cz>, <linux-pwm@vger.kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>, <linux-pm@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        "John Garry" <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        <linux-gpio@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "Sebastian Reichel" <sre@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        "Takashi Iwai" <tiwai@suse.com>,
+        <platform-driver-x86@vger.kernel.org>,
+        Benson Leung <bleung@chromium.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-edac@vger.kernel.org>, Tony Luck <tony.luck@intel.com>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Eric Auger <eric.auger@redhat.com>, <netdev@vger.kernel.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>, <linux-mmc@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-renesas-soc@vger.kernel.org>,
+        "Vinod Koul" <vkoul@kernel.org>, James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
+        <linux-mediatek@lists.infradead.org>,
+        "Brian Norris" <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+References: <20220110195449.12448-1-s.shtylyov@omp.ru>
+ <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de> <YeQpWu2sUVOSaT9I@kroah.com>
+ <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
+ <b6038ec2-da4a-de92-b845-cac2be0efcd1@omp.ru>
+ <20220119113314.tpqfdgi6nurmzfun@pengutronix.de>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a42e1c8b-2c3d-e3f2-e48c-ad145322ad3d@omp.ru>
+Date:   Wed, 19 Jan 2022 14:42:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20220119113314.tpqfdgi6nurmzfun@pengutronix.de>
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT02.lancloud.ru (fd00:f066::142) To
+ LFEX1907.lancloud.ru (fd00:f066::207)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 1/19/22 2:33 PM, Uwe Kleine-König wrote:
 
-> On Tue, Jan 18, 2022 at 12:55:22PM -0700, Alex Williamson wrote:
->> At some point later hns support is ready, it supports the migration
->> region, but migration fails with all existing userspace written to the
->> below spec.  I can't imagine that a device advertising migration, but it
->> being essentially guaranteed to fail is a viable condition and we can't
->> retroactively add this proposed ioctl to existing userspace binaries.
->> I think our recourse here would be to rev the migration sub-type again
->> so that userspace that doesn't know about devices that lack P2P won't
->> enable migration support.
->
-> Global versions are rarely a good idea. What happens if we have three
-> optional things, what do you set the version to in order to get
-> maximum compatibility?
->
-> For the scenario you describe it is much better for qemu to call
-> VFIO_DEVICE_MIG_ARC_SUPPORTED on every single transition it intends to
-> use when it first opens the device. If any fail then it can deem the
-> device as having some future ABI and refuse to use it with migration.
+[...]
+>>>>> A possible compromise: We can have both. We rename
+>>>>> platform_get_irq_optional() to platform_get_irq_silent() (or
+>>>>> platform_get_irq_silently() if this is preferred) and once all users are
+>>>>> are changed (which can be done mechanically), we reintroduce a
+>>>>> platform_get_irq_optional() with Sergey's suggested semantic (i.e.
+>>>>> return 0 on not-found, no error message printking).
+>>>>
+>>>> Please do not do that as anyone trying to forward-port an old driver
+>>>> will miss the abi change of functionality and get confused.  Make
+>>>> build-breaking changes, if the way a function currently works is
+>>>> changed in order to give people a chance.
+>>>
+>>> Fine for me. I assume this is a Nack for Sergey's patch?
+>>
+>>    Which patch do you mean? I'm starting to get really muddled... :-(
+> 
+> I'm talking about "[PATCH 1/2] platform: make
+> platform_get_irq_optional() optional"
 
-Userspace having to discover piecemeal what is and what isn't supported
-does not sound like a very good idea. It should be able to figure that
-out in one go.
+   I thought GregKH was talking about your renaming patch... :-/
 
->
->> So I think this ends up being a poor example of how to extend the uAPI.
->> An opt-out for part of the base specification is hard, it's much easier
->> to opt-in P2P as a feature.
->
-> I'm not sure I understand this 'base specification'. 
->
-> My remark was how we took current qemu as an ABI added P2P to the
-> specification and defined it in a way that is naturally backwards
-> compatible and is still well specified.
+> because "trying to forward-port an
+> old driver will miss the abi" applies to it.
 
-I agree with Alex that this approach, while clever, is not a good way to
-extend the uapi.
+   Mhm... why not tell me right from the start? Jr even tell that to Andy
+instead of merging his patch, so I wouldn't get sucked into this work? 
+I wouldn't bother with v2 and it would have saved a lot of time spent on
+email... :-(
+   Do we also remember that "the stable API is a nonsense" thing? :-)
 
-What about leaving the existing migration region alone (in order to not
-break whatever exists out there) and add a v2 migration region that
-defines a base specification (the mandatory part that everyone must
-support) and a capability mechanism to allow for extensions like P2P?
-The base specification should really only contain what everybody can and
-will need to implement; if we know that mlx5 will need more, we simply
-need to define those additional features right from the start.
+> Best regards
+> Uwe
 
-(I do not object to using a FSM for describing the state transitions; I
-have not reviewed it so far.)
-
+MBR, Sergey
