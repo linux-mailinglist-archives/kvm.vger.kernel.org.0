@@ -2,148 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD5A8493F2E
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 18:40:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 659B2493F41
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 18:44:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356466AbiASRk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 12:40:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60870 "EHLO
+        id S1356505AbiASRoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 12:44:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243884AbiASRkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 12:40:25 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4100C06161C
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:40:25 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id h12so3100751pjq.3
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:40:25 -0800 (PST)
+        with ESMTP id S1356525AbiASRo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 12:44:27 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789DAC061746
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:44:27 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id t32so3260276pgm.7
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:44:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=TkCPJ5rTo0uF59bfdAd3GqFt3FGsGKqeHq3FuhHr0Dw=;
-        b=pOVmACCHhoZBlvWm+GzZoQ1q/ot6ZfDPb8RoVjO9K4d1w1/4bNUlwelRel1FqMpHHy
-         urjxnaAAS7e6BbmyWlvEl59ZS0hE/KavrVqhqeDNRvn3vXzYhUiSIaNyYrKIdKTwDSnV
-         iSDY3GhJMc5R3h0aa7cIb2ctyWMVNBaQE4vo2QcyU7nN6NhAKjkDTR8gFnukaDWcOCP2
-         X2iaOqOMOwADpwgQxStGn7uxSRTYw21xlZiUIapIyTTxb5lYhe8OuVPH20xYUna2xdjL
-         rM46iIAmPV7Ct4tkO+tZ/PBNKbvyzzBIJTkOnXSRcMI8kQBbUXRkvUWEylLjoVHfyl4K
-         W/Tw==
+        bh=kjpCz81smuXlqDsUJ+xTPPyd2+p7TwFvzeJvK3dmbfc=;
+        b=n4lk16/mQRQhzDlbYOkuxki1pIs9PLcw0+h7yTUJmpIoxgVgyxAx0MQzlCl/b2WvbZ
+         1FuWNuWG6x6fP/YTzaGe739ddyJyBv2UF5vVIh5T4M26jGwotGP+KH6pym8y2k6wZZfJ
+         9d8LlVoKSAIJRWa3ZYOgwcLYooJVdN4FoX6WqDBWRFm1wbJt6ec8dW62V7WOz5UYyzux
+         TZ1Zsjji2JWeaIlpiCMCNMePlVxqA7rPpzmVe6W7LGw8+U2AsJ2KXja+Yfv+7TaTrGvk
+         KrZtmD4UjOfclp6WIPKOGWTQJpMim6Z2fYAB0Dp+p5DCCpmrTibcyqu7kcyK6vHxSvil
+         5YoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=TkCPJ5rTo0uF59bfdAd3GqFt3FGsGKqeHq3FuhHr0Dw=;
-        b=xHxCn36Dm6DyFS1tCTcVhHC/Vr1PzUoyaHYQLDY/nb93t34a/AOy/diJgrwCtO/zb9
-         9si9c/Cxn14AHyAYwRiwYTg2eIJ1+Xu0RRW3G4+1TwxvpGJN0ODKIJqoRSst9Cj+8u/U
-         Ok23jSGZw6u2E1ZoVEgfC9/gyfMSE9z7z8xu89G2PINUUjwCoM/As37+DcJSoV15LR8i
-         xGRQ502O78TU7bs/IbNqm+9C7KBmBhBOTcJGcs2mCYiqIxdOnntudrl/2W0iSRTfcK+e
-         v96Es+h16y9bqTixAiPeGwkNnpeXEhSU2QeZOL2/shzs23+P1AyDklOYbPwvnjEUkFMF
-         sWIQ==
-X-Gm-Message-State: AOAM531Wg2wq5mAnzbjuoojsh03vntAhDQG7hXVKnvshQxzMONSZSPxr
-        m7g/XmS8vSD3S8OTUDoKdNNOKgswlP16cQ==
-X-Google-Smtp-Source: ABdhPJxAWPyLuDuvfz1a/S+HH8TNH9UpCakDiPZ6DAznKAyeg2V3AkPuN6zZs6zDAB9ttd92kqniPQ==
-X-Received: by 2002:a17:90b:3ecd:: with SMTP id rm13mr5592097pjb.49.1642614024832;
-        Wed, 19 Jan 2022 09:40:24 -0800 (PST)
+        bh=kjpCz81smuXlqDsUJ+xTPPyd2+p7TwFvzeJvK3dmbfc=;
+        b=neFaRDuNJR+fVMGPkDR6Xv9oA7AbZwIXObocDEvWZI8MMxeWhUpz6qxD1qgdC5VxB7
+         ZgBKerEm4jaQPVV6hochb9cdOJKIi8YGJX3MfKTvbgxrF2maJ99JBoJ7rEu238CQHn9Y
+         ONw9BYyYnQb+c3yLhSHpxlojZdNE4HCFCsyKcyAcITpohJiy+pmlCnD/Sw8mp1kP7bal
+         v4H6pkIZDgGc4Te3xZG8kczJf3AKRFxwNAaFW19BkgnLlOJ0sv2VbKOizqPGnYjutJzS
+         XyRFuvZiwyy/hwK7VDY9g+oXyfN3u3Szy3EOook0X6B/UCw26XDIAaeRSQT70JX7fHap
+         junA==
+X-Gm-Message-State: AOAM533qHm/ycsU+ijufr+fpRdYPuuwgxaTDV8pDsdSwjaTsCaPYaH5C
+        IG+HKh1lSxpdx+iWGzsflQZdOg==
+X-Google-Smtp-Source: ABdhPJzUzHmOJnYs8prM/sBikO4z8Cc8PmVmEF8g+1QsVSMkjw673BlqB5V+t5p/weH7+J1vRGRE+g==
+X-Received: by 2002:a63:3705:: with SMTP id e5mr27255386pga.258.1642614266722;
+        Wed, 19 Jan 2022 09:44:26 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w9sm319511pfu.42.2022.01.19.09.40.23
+        by smtp.gmail.com with ESMTPSA id d20sm313134pfv.23.2022.01.19.09.44.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 09:40:24 -0800 (PST)
-Date:   Wed, 19 Jan 2022 17:40:20 +0000
+        Wed, 19 Jan 2022 09:44:26 -0800 (PST)
+Date:   Wed, 19 Jan 2022 17:44:22 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/4] KVM: x86: Partially allow KVM_SET_CPUID{,2} after
- KVM_RUN
-Message-ID: <YehNBCRosuQVJFEU@google.com>
-References: <20220118141801.2219924-1-vkuznets@redhat.com>
- <20220118141801.2219924-3-vkuznets@redhat.com>
- <Yebs21Vnt4WBQBw5@google.com>
- <878rvckpq4.fsf@redhat.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
+        butt3rflyh4ck <butterflyhuangxx@gmail.com>
+Subject: Re: [PATCH v6 0/6] x86/xen: Add in-kernel Xen event channel delivery
+Message-ID: <YehN9pmMXy535+qS@google.com>
+References: <33f3a978-ae3b-21de-b184-e3e4cd1dd4e3@redhat.com>
+ <a727e8ae9f1e35330b3e2cad49782d0b352bee1c.camel@infradead.org>
+ <e2ed79e6-612a-44a3-d77b-297135849656@redhat.com>
+ <YcTpJ369cRBN4W93@google.com>
+ <daeba2e20c50bbede7fbe32c4f3c0aed7091382e.camel@infradead.org>
+ <YdjaOIymuiRhXUeT@google.com>
+ <Yd5GlAKgh0L0ZQir@xz-m1.local>
+ <791794474839b5bcad08b1282998d8a5cb47f0e5.camel@infradead.org>
+ <cf2d56a2-2644-31f2-c2a5-07077c66243a@redhat.com>
+ <37493a2c50389f7843308685f50a93201f1f39c5.camel@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <878rvckpq4.fsf@redhat.com>
+In-Reply-To: <37493a2c50389f7843308685f50a93201f1f39c5.camel@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> >> @@ -313,6 +335,20 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
-> >>  
-> >>  	__kvm_update_cpuid_runtime(vcpu, e2, nent);
-> >> +	/*
-> >> +	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
-> >> +	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
-> >> +	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
-> >> +	 * faults due to reusing SPs/SPTEs. In practice no sane VMM mucks with
-> >> +	 * the core vCPU model on the fly. It would've been better to forbid any
-> >> +	 * KVM_SET_CPUID{,2} calls after KVM_RUN altogether but unfortunately
-> >> +	 * some VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
-> >> +	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
-> >> +	 * whether the supplied CPUID data is equal to what's already set.
-> >
-> > This is misleading/wrong. KVM_RUN isn't the only problematic ioctl(),
+On Wed, Jan 19, 2022, David Woodhouse wrote:
+> On Wed, 2022-01-19 at 18:36 +0100, Paolo Bonzini wrote:
+> > On 1/19/22 09:14, David Woodhouse wrote:
+> > > > Or do we have explicit other requirement that needs to dirty guest pages
+> > > > without vcpu context at all?
+> > > 
+> > > Delivering interrupts may want to do so. That's the one we hit for
+> > > S390, and I only avoided it for Xen event channel delivery on x86 by
+> > > declaring that the Xen shared info page is exempt from dirty tracking
+> > > and should*always*  be considered dirty.
+> > 
+> > We also have one that I just found out about in 
+> > kvm_hv_invalidate_tsc_page, called from KVM_SET_CLOCK. :/
+
+I think we can fix that usage though:
+
+https://lore.kernel.org/all/YcTpJ369cRBN4W93@google.com
+
+> > So either we have another special case to document for the dirty ring 
+> > buffer (and retroactively so, even), or we're in bad need for a solution.
 > 
-> Well, it wasn't me who wrote the comment about KVM_RUN :-) My addition
-> can be improved of course.
+> Seems like adding that warning is having precisely the desired effect :)
 
-Don't^W^W^W shoot the messenger?  :-)
-
-> > it's just the one that we decided to use to detect that userspace is
-> > being stupid.  And forbidding KVM_SET_CPUID after KVM_RUN (or even all
-> > problematic ioctls()) wouldn't solve problem as providing different
-> > CPUID configurations for vCPUs in a VM will also cause the MMU to fall
-> > on its face.
-> 
-> True, but how do we move forward? We can either let userspace do stupid
-> things and (potentially) create hard-to-debug problems or we try to
-> cover at least some use-cases with checks (like the one we introduce
-> here).
-
-I completely agree, and if this were an internal API or a KVM module param I
-would be jumping all over the idea of restricing how it can be used.  What I don't
-like is bolting on restrictions to a set of ioctl()s that have been in use for years.
-
-> Different CPUID configurations for different vCPUs is actually an
-> interesting case. It makes me (again) think about the
-> allowlist/blocklist approaches: we can easily enhance the
-> 'vcpu->arch.last_vmentry_cpu != -1' check below and start requiring
-> CPUIDs to [almost] match. The question then is how to change CPUID for a
-> multi-vCPU guest as it will become effectively forbidden. BTW, is there
-> a good use-case for changing CPUIDs besides testing purposes?
-
-No idea.  That's a big reason for my concern; we've really only got input from
-QEMU, and there are plenty of users beyond QEMU.
-
-> >> +	if (vcpu->arch.last_vmentry_cpu != -1)
-> >> +		return kvm_cpuid_check_equal(vcpu, e2, nent);
-> >
-> > And technically, checking last_vmentry_cpu doesn't forbid changing CPUID after
-> > KVM_RUN, it forbids changing CPUID after successfully entering the guest (or
-> > emulating instructions on VMX).
-> >
-> > I realize I'm being very pedantic, as a well-intended userspace is obviously not
-> > going to change CPUID after -EINTR or whatever.  But I do want to highlight that
-> > this approach is by no means bulletproof, and that what is/isn't allowed with
-> > respect to guest CPUID isn't necessarily associated with what is/isn't "safe".
-> > In other words, this check doesn't guarantee that userspace can't misuse KVM_SET_CPUID,
-> > and on the flip side it disallows using KVM_SET_CPUID in ways that are perfectly ok
-> > (if userspace is careful and deliberate).
-> 
-> All true but I don't see a 'bulletproof' approach here unless we start
-> designing new KVM API for userspace and I don't think the problem here
-> is a good enough justification for that.
-
-Yeah, agreed.
-
-> Another approach would be to name the "don't change CPUIDs after KVM_RUN at
-> will" comment in the code a good enough sentinel and hope that no real world
-> userspace actually does such things.
-
-I'm ok with that, so long as the KVM code is kept simple (a single memcmp() 
-qualifies) and we are quick to revert the whole thing if it turns out there's an
-existing user and/or valid use case.
+The WARN is certainly useful.  Part of me actually likes the restriction of needing
+to have a valid vCPU, at least for x86, as there really aren't many legitimate cases
+where KVM should be marking memory dirty without a vCPU.
