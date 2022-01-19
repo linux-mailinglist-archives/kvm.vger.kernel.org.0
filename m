@@ -2,108 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 438B5493547
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 08:12:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06B16493575
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 08:25:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351919AbiASHMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 02:12:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57484 "EHLO
+        id S1346481AbiASHZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 02:25:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346462AbiASHMU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 02:12:20 -0500
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA4FDC061574;
-        Tue, 18 Jan 2022 23:12:20 -0800 (PST)
-Received: by mail-ot1-x32e.google.com with SMTP id v8-20020a9d6048000000b005960952c694so1849300otj.12;
-        Tue, 18 Jan 2022 23:12:20 -0800 (PST)
+        with ESMTP id S245723AbiASHZg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 02:25:36 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251C8C061574;
+        Tue, 18 Jan 2022 23:25:36 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id s2-20020a17090ad48200b001b501977b23so483708pju.2;
+        Tue, 18 Jan 2022 23:25:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=o7eCy47p8PgyTrOH5oES78YY4Yx66VgoOxIZhjYdi4s=;
-        b=jl2DNY2l03Hn739PZbt1QyBMPoc+BjoqY6cKv7uJnJfgaL6TBDarXSUEkkZUXujpE2
-         ovVuyCnAYU+WNitEsjwJNNNCroUah20OjR7R2h9qDYFlp19uEdb8YA0V9CE62V09I057
-         RnviYjVGmBruwusx/CT8rhBRF4S9u3sR1vcT1D/sNvmWErrQggJ77prMpaSJFICoB70w
-         RPyEsofSaHOmMxbYQBMFNHRuQWSr/54FXNGDE4esGqsRx0JQupQi56JHiTWxqhMFgyM2
-         E7LKVSkzir1DbTunVzPPJ4TaBcM/d914v8eqiUuiwUxUzmcbHPUBxQXoRV0C0ywv++yL
-         bzbQ==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=vfGaApu8wQmCPciFtkN6NAlobrxb1oXN8EoIi5l8GHQ=;
+        b=QppLXnIWB7RadcAP+fi1YRTqLnzMr67TF9r3sq5WSGiN0VOcDfUeeRRYu8T4vFhmEo
+         WHnD/3qhnFFJoascXBiYQLnqTKMK1k6onos0kS+o8pRCdErlbaD6KTxlG2BiricXI3mc
+         3yU7nmr9lqJV+9kDKS7WdiMpEeWsxET4QC2NK/FCQeKJp66NmNTRWDhbsiV+F+5evnKa
+         ATxu9MU6gA63cMGXuvTNOUa8xjQJpGdagYxkBwiThWxTWD+M9lU/RYmqPMy8yy8FotT0
+         0Gj1Jp/GmpJLvVkvpsG7XUD6Aok+W9vra/WC98H4IKI3tLZbgaWriM8CN04hThkHT5z6
+         1q6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=o7eCy47p8PgyTrOH5oES78YY4Yx66VgoOxIZhjYdi4s=;
-        b=6INuRiesyhrAZd261cUuBRZ1d+NODNkEwSeOhvsJVcEGbgcpjvrH4Hj5hSC006PEIy
-         g4Is9/FeCUtumQfLxBWs5Z+ZrG58KkRmbByWH91gZvAlwYLTK+3JNx5DB19CkwEMs8mO
-         apXjJYO+FmKY1ZisG7PPvBL5k0uZqeVkCzF3dket6RRor9FKWMLLroCEMkkWiDf91oY0
-         6OxZu/6KMITIQBVmsWQUkJefcFBo8D22vZjacOqFepbQayyhqFmevoH9egihWSsCT7XZ
-         H+aA52E5ZrG4tTbZ/sFjgKNhhKcgGmYjUE+q7mHurDQ/GUcj/99ohYu2wJ3CBOvz9VYC
-         9u8Q==
-X-Gm-Message-State: AOAM533FTMf18bJ8YBeKoogEkhLUKKW90NsCPuu3juzoeqNT8pKoqaoK
-        aikj2OZmFMv83YNVQg7+MpUGQ7VEccymstgsW7A=
-X-Google-Smtp-Source: ABdhPJxe++bk388gQOrGSG70DftId7fwHoXzzJ4sJ04VPBYqnpYEWJRQg3tiaOSKXH1cVtWcfNf2H5NgQWOv7KCNvN8=
-X-Received: by 2002:a9d:7212:: with SMTP id u18mr9062189otj.145.1642576340166;
- Tue, 18 Jan 2022 23:12:20 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=vfGaApu8wQmCPciFtkN6NAlobrxb1oXN8EoIi5l8GHQ=;
+        b=7CDRbz6/rbCQRcF/rLB/K7P0rMlYDVBJhhPu2Wmp/z/SGMVm9g6JPuGbtlrUXxijTU
+         3FgHka+qleuAjXsNtTOfmxCPk6xnj1xEf/Ich7bHokwPOnSTXk1pchTctxijX0f4/Kbr
+         Jqx2ExD2jW+/YdIMTeA29Hx/CDRM1spoXjilP/n8YSh5TMlhTfbP3CQdtYQk6NQ3Zazs
+         +ic9ZpHssR6SP8l+F7Jf1LV7aoFp85gC0qPYiV3rZ5wVlXcF5XMKoWe26F5G41gCyU2g
+         PxUhQm86l71FNKRB9Mc64uc8F7m15dLsnVzMtr7U4kNdPN/Egamu419yQ7qIOMbhWvO5
+         M6UA==
+X-Gm-Message-State: AOAM5316cAFOokp/96bF+e5MpdtiP/qWTbAwIu82nS+Ss7e0n6LA7zhY
+        LENI6w4QPxGNxJX8xVq0IMsgGmtjFIB8zMzs
+X-Google-Smtp-Source: ABdhPJxW/8NadmfPxqAtIs1ydmNWawR4Z0lXbnP3vjln6ZY4FIm+JyuhopJ00Gin+2IGL4v3kMt4FQ==
+X-Received: by 2002:a17:90b:4c52:: with SMTP id np18mr2826931pjb.192.1642577135517;
+        Tue, 18 Jan 2022 23:25:35 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id t126sm10541138pfd.143.2022.01.18.23.25.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jan 2022 23:25:35 -0800 (PST)
+Message-ID: <a847ba90-7f15-4e79-b42b-75be0d6cf9fe@gmail.com>
+Date:   Wed, 19 Jan 2022 15:25:25 +0800
 MIME-Version: 1.0
-References: <1641471612-34483-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1641471612-34483-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 19 Jan 2022 15:12:09 +0800
-Message-ID: <CANRm+CxOvAo_bvMYOkdwRh8og4HxU3mRR94Jp0SO1+qEP2ak_g@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: LAPIC: Enable timer posted-interrupt when
- mwait/hlt is advertised
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.0
+Subject: Re: [PATCH] KVM: x86: Update the states size cpuid even if
+ XCR0/IA32_XSS is reset
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Aili Yao <yaoaili@kingsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220117082631.86143-1-likexu@tencent.com>
+ <YecHK2DmooVlMr2U@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+In-Reply-To: <YecHK2DmooVlMr2U@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kindly ping, :)
-On Thu, 6 Jan 2022 at 20:21, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via posted interrupt)
-> mentioned that the host admin should well tune the guest setup, so that vCPUs
-> are placed on isolated pCPUs, and with several pCPUs surplus for *busy* housekeeping.
-> It is better to disable mwait/hlt/pause vmexits to keep the vCPUs in non-root
-> mode. However, we may isolate pCPUs for other purpose like DPDK or we can make
-> some guests isolated and others not, we may lose vmx preemption timer/timer fastpath
-> due to not well tuned setup, and the checking in kvm_can_post_timer_interrupt()
-> is not enough. Let's guarantee mwait/hlt is advertised before enabling posted-interrupt
-> interrupt. vmx preemption timer/timer fastpath can continue to work if both of them
-> are not advertised.
->
-> Reported-by: Aili Yao <yaoaili@kingsoft.com>
-> Cc: Aili Yao <yaoaili@kingsoft.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v1 -> v2:
->  * also check kvm_hlt_in_guest since sometime mwait is disabled on host
->
->  arch/x86/kvm/lapic.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index f206fc3..fdb7c81 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -113,7 +113,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
->
->  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
->  {
-> -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> +       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> +               (kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
->  }
->
->  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
-> --
-> 2.7.4
->
+On 19/1/2022 2:30 am, Sean Christopherson wrote:
+> On Mon, Jan 17, 2022, Like Xu wrote:
+>> From: Like Xu <likexu@tencent.com>
+>>
+>> XCR0 is reset to 1 by RESET but not INIT and IA32_XSS is zeroed by
+>> both RESET and INIT. In both cases, the size in bytes of the XSAVE
+>> area containing all states enabled by XCR0 or (XCRO | IA32_XSS)
+>> needs to be updated.
+>>
+>> Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>>   arch/x86/kvm/x86.c | 8 ++++++++
+>>   1 file changed, 8 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 76b4803dd3bd..5748a57e1cb7 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -11134,6 +11134,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>   	struct kvm_cpuid_entry2 *cpuid_0x1;
+>>   	unsigned long old_cr0 = kvm_read_cr0(vcpu);
+>>   	unsigned long new_cr0;
+>> +	bool need_update_cpuid = false;
+>>   
+>>   	/*
+>>   	 * Several of the "set" flows, e.g. ->set_cr0(), read other registers
+>> @@ -11199,6 +11200,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>   
+>>   		vcpu->arch.msr_misc_features_enables = 0;
+>>   
+>> +		if (vcpu->arch.xcr0 != XFEATURE_MASK_FP)
+>> +			need_update_cpuid = true;
+>>   		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+>>   	}
+>>   
+>> @@ -11216,6 +11219,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>   	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
+>>   	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
+>>   
+>> +	if (vcpu->arch.ia32_xss)
+>> +		need_update_cpuid = true;
+> 
+> This means that kvm_set_msr_common()'s handling of MSR_IA32_XSS also needs to
+> update kvm_update_cpuid_runtime().  And then for bnoth XCR0 and XSS, I would very
+> strongly prefer that use the helpers to write the values and let the helpers call
+
+Looks good to me and let me apply it in the next version.
+
+> kvm_update_cpuid_runtime().  Yes, that will mean kvm_update_cpuid_runtime() may be
+> called multiple times during INIT, but that's already true (CR4), and this isn't
+> exactly a fast path.
+
+An undisclosed lazy mechanism is under analyzed for performance gains.
+
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 55518b7d3b96..22d4b1d15e94 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11256,7 +11256,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> 
+>                  vcpu->arch.msr_misc_features_enables = 0;
+> 
+> -               vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+> +               __kvm_set_xcr(vcpu, 0, XFEATURE_MASK_FP);
+>          }
+> 
+>          /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+> @@ -11273,7 +11273,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>          cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
+>          kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
+> 
+> -       vcpu->arch.ia32_xss = 0;
+> +       __kvm_set_msr(vcpu, MSR_IA32_XSS, 0, true);
+> 
+>          static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
+> 
+> 
