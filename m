@@ -2,178 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 542204933D0
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 04:54:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A063749340D
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 05:36:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351432AbiASDyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jan 2022 22:54:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42264 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351390AbiASDyN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jan 2022 22:54:13 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D9FC061574
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 19:54:13 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id 188so1170199pgf.1
-        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 19:54:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=As+hUVutO1ZU06X+Fr8CLVqO0TMk0HTA9Vzv1i8wCbs=;
-        b=mk0vv1zXMkDMubyJZqG2vlBn8Zw++85rvxi1X4cJHBKCKUSmAsn9qMmpdxiagEAaUg
-         9DP30D2mMcawp9yDPi6BYiBBXbY5aIsfXfGZkeZ8QEhE4iiTV1C4PHtu4Gpaw6LHr8DC
-         l9s5rqCpnMRZgEcTtteXfYp5rKqufPNsr+/lX2E+MJ3W560wiaXrtE+wXyaEyqjucZAX
-         pmW25a+bP4hlOUNuPunw3pyByvo9R1+XjramR/hMF2NWk5dsg/DRfZ5WRxdwOJRmjB0S
-         1kCahW3Imhtny/l/Fw1+kAceIhByF2jE2jd5pZt4IG1+GUXWHraHij41txWhPIf1rxFn
-         2OwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=As+hUVutO1ZU06X+Fr8CLVqO0TMk0HTA9Vzv1i8wCbs=;
-        b=UstY5MbTTuG6yftcTeUrRP03kvW+qhFrF3ByqXkuwVLLx9KmCvbwnlF/+d/nEAktA8
-         3L2nTQILqqSy2C3e2LI5cc9s+HIctUhGvumyZFVgXvgLb31SxJFnsfhS/iB+NzfMiaWS
-         GsY95NmUyEnFb/+4PZLXATjpS/rPPz5OxkzQbVhp6QSxM3My33hNm6lBth+uCgQAuwCt
-         QLoAxaAd66eoY2xoSsPsUoM+HOhN5STuITTb46ggXi97YpwOhV85Yi3U1LIsdmoa9GNQ
-         VMU/OW4rEVg3cVNesjH2V+KXm4fupLFLNPpX9c/qC2LkUXi2exKcWsaGiV4FGt5tEqF+
-         ukLA==
-X-Gm-Message-State: AOAM532c3ZLh1mRYnItGqr3MNS2iZwHA9LteB+Q1kiDa7DfMZ9l6T6j0
-        L12lK0NNjZFedvWjMLnY3Zc=
-X-Google-Smtp-Source: ABdhPJw5ohI2V+ZAz4Ki6PPKoe9wW8ZtMKrhhQVloBMffw+/d70wF4989a1JUNsFSvYzcDmUXsgBnw==
-X-Received: by 2002:a05:6a00:1946:b0:492:64f1:61b5 with SMTP id s6-20020a056a00194600b0049264f161b5mr28840876pfk.52.1642564452726;
-        Tue, 18 Jan 2022 19:54:12 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id k30sm6548431pgi.2.2022.01.18.19.54.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jan 2022 19:54:12 -0800 (PST)
-Message-ID: <4fd35b75-a79d-e6f6-1cca-49abda43206e@gmail.com>
-Date:   Wed, 19 Jan 2022 11:54:03 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
+        id S1351466AbiASEgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jan 2022 23:36:49 -0500
+Received: from mail-bn8nam12on2073.outbound.protection.outlook.com ([40.107.237.73]:13921
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1351481AbiASEgs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jan 2022 23:36:48 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ao+kjCl9EZhR0Wn4zGOevFU6YFddkBAU7ZXdD2LKTOe/dBqh21Sjef1R1E1J6GPusHfX/O6nAw+Zd2eDpaLoyPIJlX/pRy5YDFdcrpbJmLF77BGN2PhLOYSq0DFbIulsRtCt/SyzEHTO+/ehwrrSX3H1Np+5EpGvnGnfzKXe8ZscCt4JE1NccwDNlffFOaOdertV7Ca/19IP8iuxEXu6focE+o+JMaP+DteuE2MPOKRHwZujRdjfvByPDXHbbHWkY3nqVEJkwgfus8WqqaOUgZddjg59DotdmB+bxHho5TMcA2ACkOFw8MZ5lvgfNDUNvwU/RTIjWILMvNlPE/28Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k1GH7n6peZsNYk7J/nlZmOhC5CIvmXDqEAGrb8BaW7E=;
+ b=Azs6P7BU9W1WOkF08YuwFp3vEZbZZ8KtPXqHIn0Y7g9LH05t7ERhSVgWuVz8XhigmfQfhwA+xbPBveJBMGXwmW0L4qbOeu5EfblU8NEdodjDTvc4RJMboqgOMQnuiCwMcKDuQ+f3PPl0gGBThkIUv5+cNpkl8OlkFoV9QbzHBZp1PN1jL9lR7tsufHJMxlR0qh8CvrJZr3ZudZOywN1W0vj+PPGhYeYKzG907wU8YbMlhclH0zmv+Xi356nwUifG3WqF9wPnOSRFhycYPKqN05fFiGzzcFw29AcyLMNqZwkMyuZlUZ3T/QYN1bRCgo/mKPYXNpOD0yx4S2LPBNSNYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k1GH7n6peZsNYk7J/nlZmOhC5CIvmXDqEAGrb8BaW7E=;
+ b=KNjC71gvJ7ux3DS3qPeQCa9G6fI1DDj92V8LViLF0VeS97Xb1cYjCjM13DRX+pGOHY2yOyyNgPuMDMDq1ZCq+E8s3lHvL+I9wQZTDFlqwHL3YWc1U8AVfzPo4iFL/m+qA7mL/VhUxHKUb0du45Zb2zhsrf4mjWuNivBT21ivGs8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN2PR12MB4045.namprd12.prod.outlook.com (2603:10b6:208:1d6::15)
+ by CY4PR12MB1509.namprd12.prod.outlook.com (2603:10b6:910:8::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.13; Wed, 19 Jan
+ 2022 04:36:45 +0000
+Received: from MN2PR12MB4045.namprd12.prod.outlook.com
+ ([fe80::f4d8:4aef:33b1:1480]) by MN2PR12MB4045.namprd12.prod.outlook.com
+ ([fe80::f4d8:4aef:33b1:1480%4]) with mapi id 15.20.4888.014; Wed, 19 Jan 2022
+ 04:36:45 +0000
+Message-ID: <598e5492-e049-823f-c2c8-e3b1d3eb5f27@amd.com>
+Date:   Wed, 19 Jan 2022 10:06:33 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
 Subject: Re: PMU virtualization and AMD erratum 1292
 Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>,
+        Jim Mattson <jmattson@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Stephane Eranian <eranian@google.com>,
         kvm list <kvm@vger.kernel.org>,
-        Ananth Narayan <ananth.narayan@amd.com>
+        "Bangoria, Ravikumar" <ravi.bangoria@amd.com>
 References: <CALMp9eQZa_y3ZN0_xHuB6nW0YU8oO6=5zPEov=DUQYPbzLeQVA@mail.gmail.com>
  <453a2a09-5f29-491e-c386-6b23d4244cc2@gmail.com>
  <CALMp9eSkYEXKkqDYLYYWpJ0oX10VWECJTwtk_pBWY5G-vN5H0A@mail.gmail.com>
  <CALMp9eQAMpnJOSk_Rw+pp2amwi8Fk4Np1rviKYxJtoicas=6BQ@mail.gmail.com>
  <b3cffb4b-8425-06bb-d40e-89e7f01d5c05@gmail.com>
  <CALMp9eRhdLKq0Y372e+ZGnUCtDNQYv7pUiYL0bqJsYCDfqTpcQ@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <CALMp9eRhdLKq0Y372e+ZGnUCtDNQYv7pUiYL0bqJsYCDfqTpcQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <4fd35b75-a79d-e6f6-1cca-49abda43206e@gmail.com>
+From:   Ananth Narayan <ananth.narayan@amd.com>
+In-Reply-To: <4fd35b75-a79d-e6f6-1cca-49abda43206e@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BM1PR01CA0106.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00::22)
+ To MN2PR12MB4045.namprd12.prod.outlook.com (2603:10b6:208:1d6::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 46888e0d-3a49-44b8-bb48-08d9db054c61
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1509:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB150941A7A09EB9E88447354E85599@CY4PR12MB1509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bBJbE/lZxoHo/GV+91t+dbbgqszXNjMgj7b/rbBtgIS0rYTen2u/jV47nTNDA+lfYKvJZG2fjWaKNjwl4h/NwsWPCHVgfeW18JQKu5yje8teuzMzC2cv39ykUdbrYzahFh8Th8DZliHaz+daWrtwSduF9Y6PuWOu7/pHEw89NcZeeipiJk+F+G6jyqnqvoXg9naoPoFpawTsEDl5ZKISVx9hut5/TtzoVkMECCRVUuxsD39NvOXJB75FZiccw2idoip9QBivIP2dXsaL1/YgCloHlNdatV2mL8KbtRfAFdihYJ/Mjgn8Cph0qPw28nv4Vo+iDoDfI2B9Da36Xj4z4fzxssH42krE84y3D3YMh9Q7ID5cwBbw5dR3fxunyGOQ9LsjVl7V2jo7AdsRuCygZyxru4DAOmjNpQ+oW9vRFcHNEqDw6VqZ2eCuKUEocL1vi4ipXsi+vR9rxXYuXiv7Gh2SV+wccAMYvw4FUuvv9E0n4sFbCqWcPDpglq+Gj1MneWUm9SVKmgj24aBLj/C1JPKFKaxeefsh/rnEKO+t5BrTE1uJ+t2ZMMN89pM9r4x87HPxf541aYXmmEF33mFki4ZGoJ++5GrkQfjsmnaUHcy9q7D26plvUCboWa03YUtp/L7aCPjJ6c7zEtntsP0jHmRrkjyvDX5S9Q+pwmrcBfctXG11bqvMkmZEV8VO17KQpA3xqkVVtmrn4KWTuFI/vQ7iWi3vfQgBwP8jKBgh7Mg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4045.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(86362001)(6486002)(2906002)(53546011)(6512007)(31686004)(316002)(36756003)(110136005)(54906003)(186003)(6666004)(6506007)(66556008)(31696002)(8676002)(4744005)(8936002)(38100700002)(66946007)(66476007)(2616005)(44832011)(26005)(5660300002)(4326008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFJJaW5wYWViSmc4RHZnY0F5dHNiUStBQ053c0hRenlId3lTSzZFa0w1RU14?=
+ =?utf-8?B?UEhmbGRyd3YxbnJFSkdLSVo2RlNLUXJZL1NyNVdEcldTVXE2Uis3MVpSRUVh?=
+ =?utf-8?B?Q2NPeHFyNjd3QjZVckdpeFJGQWpocHIzU05iNDZvWURncGZKSVRCRjFROVFO?=
+ =?utf-8?B?Y3JMSllMYkpLdGlXMWRyTWtiSWE1czNwMWJtV0dGUjJBUWR2dzB5czR3SXY4?=
+ =?utf-8?B?MGJiVXZEWG0rbHM3T0x2U3dHNDVpUEZQUFNjTXNTYUF1SHF3Qkk2QkY3ZEda?=
+ =?utf-8?B?cDl1NWpxZjdYVkh5U3pkUkxmN1JscWVVN1ljRjlOYi9MWTMwQVFkTGtkTFp3?=
+ =?utf-8?B?ZDhHc1ovWUgzNDJscCtsTSt1Tk9ocFB2bW5uR093UngxMnloQnMzeFpiNUNC?=
+ =?utf-8?B?MW5BMTl0M1lsTVc3Zm1XUmE1T2IreHZiSXVvNjBwNS9CTUlmeENRbnY2ZFIx?=
+ =?utf-8?B?Uk9rTjRuMVU2empWdWRyK2JsRVZPSHdTbm9hK3kwVGNqanp5anBsUzJnaHlD?=
+ =?utf-8?B?b1k4bmZiSlc2MTdINllmWXNTSDV3WU1xYzY0bVhqWHF4dFRyKzNIOG1xU0xF?=
+ =?utf-8?B?OFNxVjZuVVZONVJkMWpBVzc0cFBVTTZjU2RBL1REbWtMNG41cGd3bzNKSml3?=
+ =?utf-8?B?azJUNlRCcnJONzJYNkprU25CUElTV0N4TXdpWWhxYUQyc0d1TDRaZzQxT21y?=
+ =?utf-8?B?ZElqc2taYW5najhTb09JTWFNT0hsT3RRSGUvUG5LbkZxRm13ZVlhcm5GTmNq?=
+ =?utf-8?B?Vkl0MDZIK3hyZDdZZkthcXl6dXJoUTVYWmFDK2ZneE5FTGh4NUxreWVjQWRv?=
+ =?utf-8?B?aGx2VHViZWYzaHh2bVNRWndvaGh2YjhLMVJpQW9lSEE4Zm4xSWgrMzhBNndo?=
+ =?utf-8?B?USthZDFvTW9FQlY3MENicXJQUzZDNmp3NXRHQmRwODRTeDBjMC9RdXI1VGFw?=
+ =?utf-8?B?VkMxTGFCaFhIbldXUng5amtLN0paaGZVQUlxU0hHLzlXS3Q4YkovWGJxLzVo?=
+ =?utf-8?B?Nm9QcWhKcVBYamF1YWE5NTZvd21ZVGFiMzBER0poOWJmUERNZDdJQ1R2NmdV?=
+ =?utf-8?B?dXIrVjYySERoK3lZdS9yRXIwd0tUcG9KZ0R3TllNSWowb3FJdnU5c29xVWNY?=
+ =?utf-8?B?ZUs2MG9mVWVoOXVqNmZSSmcrU05xMnF4RE5sOXBTK2x3bUxqSWd0dFFJNmZm?=
+ =?utf-8?B?cGlmUUkyTUl5OGFaTmhRRkFad0FhTW9meXA3YkJhUndqbzdIdWZpNGpOZ2ZG?=
+ =?utf-8?B?Q1hUMVdsM0ovZWl6WXQvbkY5amd2UEVpTTQ2aytWUlpoZGhEdUR1OFh1cHVI?=
+ =?utf-8?B?YVo3dFJ4a2Vza0huZ3Z0VlRyNXUrRlJna2dQUFhGY3JFbHB2TXZTR2pYL3BG?=
+ =?utf-8?B?QjY4KzhqT3JvbHM3cTAvTDluNjFhVHNqRmFhWnArQWhaYWxIRmR1V3BsWkVK?=
+ =?utf-8?B?M0x2cUVHczl4RldHV08vTmQ1dFFUUmJ6M1J2aGttK1dVWjRoVkI1RXNHVEpk?=
+ =?utf-8?B?MEIrMncrVGVpcGRFTzJQZzBnSDcvZkJCSlNJWHZzaXltU3htSXhkc2pEYm1L?=
+ =?utf-8?B?Y3JYQnZQcXo4VU1GNnJZSjJuSlZlaUJOYnBaMEVXTEQ5T1NpcXM1SDVZZ1hn?=
+ =?utf-8?B?VFU0WkZCdUV0aVZhdzlKUU1QeTFKeXIya2VkcE9LeWIxV2JuQzVleUx0ejlq?=
+ =?utf-8?B?UnVqaXJFVTR1VklqOWdwWmZtbjFOeXRqdXdFalZmZUtPd082R1ZlUkliNGZ1?=
+ =?utf-8?B?RTIyTk5yQlZjb2pNODluSEgvMXZIcnAwMFdkSWtzT0ppZ1N5K2RJYmdFVXpp?=
+ =?utf-8?B?Ri85NzNDcXVQdVRocjVjeVRzaG93dmhoMFlicFNzRTdaWkFEOVV5ZjJScHkv?=
+ =?utf-8?B?NTUvUkZEZlVtOHVwZ3A2eFZzckJWUmxLN2hFN01PT25hMmxzYzNhWG5aR09U?=
+ =?utf-8?B?aXA5d2NINWpSOGYzU3dCMDM0N1FOY0ZJcTdHVkZIU0R0aDRJVHVKdTcvd20w?=
+ =?utf-8?B?WHRaMlZkSWRZc3REckhDYjhJZGJ0dGxhV0xzbktBcDA3aWNkelg4TmYyOUVx?=
+ =?utf-8?B?Q2ZmZG1neStZTFJWQmkrOVYvVDFBakRVZEdKWlUxR2s5ZEZIdDdUL29OaEc4?=
+ =?utf-8?B?VitLYzBIU3hCS0YvQTFDcDdkVG5PSG9kT1lYMFptK0R1OXlQdFVqN0ZITHJm?=
+ =?utf-8?Q?AFx3SqBIInZKxnN09sM0h+c=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46888e0d-3a49-44b8-bb48-08d9db054c61
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4045.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2022 04:36:45.6490
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vE6XTILa6D7RUuZIU0cjK6XS7UxenTqwN2PKTHCqJH4jn826qwMWNKWDHfRbwmPkW+9odAbTvaevYw5YwC8fDQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/1/2022 2:22 am, Jim Mattson wrote:
-> On Mon, Jan 17, 2022 at 10:25 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> On 18/1/2022 12:08 pm, Jim Mattson wrote:
->>> On Mon, Jan 17, 2022 at 12:57 PM Jim Mattson <jmattson@google.com> wrote:
->>>>
->>>> On Sun, Jan 16, 2022 at 8:26 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>>> ...
->>>>> It's easy for KVM to clear the reserved bit PERF_CTL2[43]
->>>>> for only (AMD Family 19h Models 00h-0Fh) guests.
->>>>
->>>> KVM is currently *way* too aggressive about synthesizing #GP for
->>>> "reserved" bits on AMD hardware. Note that "reserved" generally has a
->>>> much weaker definition in AMD documentation than in Intel
->>>> documentation. When Intel says that an MSR bit is "reserved," it means
->>>> that an attempt to set the bit will raise #GP. When AMD says that an
->>>> MSR bit is "reserved," it does not necessarily mean the same thing.
->>
->> I agree. And I'm curious as to why there are hardly any guest user complaints.
->>
->> The term "reserved" is described in the AMD "Conventions and Definitions":
->>
->>          Fields marked as reserved may be used at some future time.
->>          To preserve compatibility with future processors, reserved fields require
->> special handling when
->>          read or written by software. Software must not depend on the state of a
->> reserved field (unless
->>          qualified as RAZ), nor upon the ability of such fields to return a previously
->> written state.
->>
->>          If a field is marked reserved *without qualification*, software must not change
->> the state of
->>          that field; it must reload that field with the same value returned from a prior
->> read.
->>
->>          Reserved fields may be qualified as IGN, MBZ, RAZ, or SBZ.
->>
->> For AMD, #GP comes from "Writing 1 to any bit that must be zero (MBZ) in the MSR."
->>
->>>> (Usually, AMD will write MBZ to indicate that the bit must be zero.)
->>>>
->>>> On my Zen3 CPU, I can write 0xffffffffffffffff to MSR 0xc0010204,
->>>> without getting a #GP. Hence, KVM should not synthesize a #GP for any
->>>> writes to this MSR.
->>>>
->>
->> ; storage behind bit 43 test
->> ; CPU family:          25
->> ; Model:               1
->>
->> wrmsr -p 0 0xc0010204 0x80000000000
->> rdmsr -p 0 0xc0010204 # return 0x80000000000
-> 
-> Oops. You're right. The host that I thought was a Zen3 was actually a
-> Zen2. Switching to an actual Zen3, I find that there is storage behind
-> bits 42 and 43, both of which are indicated as reserved.
-> 
-> 
->>>> Note that the value I get back from rdmsr is 0x30fffdfffff, so there
->>>> appears to be no storage behind bit 43. If KVM allows this bit to be
->>>> set, it should ensure that reads of this bit always return 0, as they
->>>> do on hardware.
->>
->> The PERF_CTL2[43] is marked reserved without qualification in the in Figure 13-7.
->>
->> I'm not sure we really need a cleanup storm of #GP for all SVM's non-MBZ
->> reserved bits.
-> 
-> OTOH, we wouldn't need to have this discussion if these MSRs had been
-> implemented correctly to begin with.
+On 19-01-2022 09:24 am, Like Xu wrote:
 
-So should KVM remove all #GP for AMD's non-MBZ reserved bits?
+...
 
-Not a small amount of work, plus almost none guest user complaints.
-
-> 
+>>> In any diagram, we at least have three types of "reservation":
 >>>
->>> Bit 19 (Intel's old Pin Control bit) seems to have storage behind it.
->>> It is interesting that in Figure 13-7 "Core Performance Event-Select
->>> Register (PerfEvtSeln)" of the APM volume 2, this "reserved" bit is
->>> not marked in grey. The remaining "reserved" bits (which are marked in
->>> grey), should probably be annotated with "RAZ."
+>>> - Reserved + grey
+>>> - Reserved, MBZ + grey
+>>> - Reserved + no grey
 >>>
+>>> So it is better not to think of "Reserved + grey" as "Reserved, MBZ + grey".
 >>
->> In any diagram, we at least have three types of "reservation":
->>
->> - Reserved + grey
->> - Reserved, MBZ + grey
->> - Reserved + no grey
->>
->> So it is better not to think of "Reserved + grey" as "Reserved, MBZ + grey".
+>> Right. None of these bits MBZ. I was observing that the grey fields
+>> RAZ. However, that observation was on Zen2. Zen3 is different. Now,
+>> it's not clear to me what the grey highlights mean. Perhaps nothing at
+>> all.
 > 
-> Right. None of these bits MBZ. I was observing that the grey fields
-> RAZ. However, that observation was on Zen2. Zen3 is different. Now,
-> it's not clear to me what the grey highlights mean. Perhaps nothing at
-> all.
+> Anyway, does this fix [0] help with this issue, assuming AMD guys would come
+> up with a workaround for the host perf scheduler as usual ?
 
-Anyway, does this fix [0] help with this issue, assuming AMD guys would come
-up with a workaround for the host perf scheduler as usual ?
+Yes, that is WIP. You'll see a patch from Ravi.
 
-[0] https://lore.kernel.org/kvm/20220117055703.52020-1-likexu@tencent.com/
+Regards,
+Ananth
