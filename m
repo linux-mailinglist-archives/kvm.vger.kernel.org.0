@@ -2,94 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE09B49402E
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:51:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01A32494033
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:53:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356900AbiASSun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 13:50:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356903AbiASSui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 13:50:38 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CCA1C06173F
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 10:50:35 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id bu18so11956427lfb.5
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 10:50:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Wj3R0FRfn1yO5ogKeGc8aripFNfSyJxmajRu2on35kY=;
-        b=pe1iWhZirUTGmhYFeMyFbD34nGrpS52XKubMcy7XhUsPHYDaweveoSSJ0xnTHhRHWK
-         20m5NC6R9tJIDsHjIbD1VFPqYLDmsG/N0Szv1UrZm9xhVPlG9AJJli7CV6iYMrgR6Rwu
-         NhOEIJxv0osNjyejn4S6X35hD31YubMuEqCY2s7DYdDUc6uTefMSQbbc/Se0C5xs8nmB
-         ccI4yd5EFGZv+k4tvN8+95FjVBq0L8Uub4f5y/1nX/vM3XeUsEW7Audld9eBL5dk72Yu
-         AAkeVbwfhIrCNp+6Q4qlOOkWhGRMnA9Tb8TOCRMyLgl9GUZrTl+LJ2hRvgWNXwivZO25
-         2x+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Wj3R0FRfn1yO5ogKeGc8aripFNfSyJxmajRu2on35kY=;
-        b=55dhUpq34KgycLY7mFicMOYREMEqYFN1TmRqCRT7ksUkTA0sf3xLFsa3WkmkujZMxR
-         7CIxq1JpCv9WLt8ZpUslwaaWzmVjP4QjE/4P9d0qXtHN6Q3cnBRu3iDiR3seZ38uUAHV
-         hq6XNIWz73yqQaJM6f4JK776BFCklW+l+R3rH0ZOq8MW/oXwarmLSHQB+ZmBXKxkYkjS
-         3qqmmIKULaMyXUujPBboI1+vT+RTefSPzqbJcvA0mm67rNTrohqXljyBrNkcTF/BuDD9
-         OTmk+cZvQ8CQWrno5wNasoaBBX4yttZM6PcyXtSWFMCw+YeH1b4uUWbHBri82f7mEhtm
-         A7oQ==
-X-Gm-Message-State: AOAM5311WDdcYPRTy6p+NNofgrasXAdCT0w6z4jWxuZcJ6t+0J4CvjMQ
-        NuVcdQ6qP2sNDlZCO0lWcApjra3zOudoiS12/3eWBQ==
-X-Google-Smtp-Source: ABdhPJxlWimiZNLmr8h++3TY1Fh0zvEgbDHKd8bwKwVQGXviRDQ5XXrBx6FNgZ9IhOY46CUuigHNzP3pTgPWPhbpLkM=
-X-Received: by 2002:a05:6512:3b94:: with SMTP id g20mr28870780lfv.119.1642618233416;
- Wed, 19 Jan 2022 10:50:33 -0800 (PST)
+        id S1356917AbiASSww (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 13:52:52 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:54600 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230509AbiASSwv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 13:52:51 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1nAG4U-0005cZ-P9; Wed, 19 Jan 2022 19:52:38 +0100
+Message-ID: <416d8fde-9fbc-afaa-1abe-0a35fa2085c4@maciej.szmigiero.name>
+Date:   Wed, 19 Jan 2022 19:52:32 +0100
 MIME-Version: 1.0
-References: <20211222225350.1912249-1-vipinsh@google.com> <20220105180420.GC6464@blackbody.suse.cz>
- <CAHVum0e84nUcGtdPYQaJDQszKj-QVP5gM+nteBpSTaQ2sWYpmQ@mail.gmail.com>
- <Yeclbe3GNdCMLlHz@slm.duckdns.org> <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
- <YehY0z2vHYVZk52J@slm.duckdns.org>
-In-Reply-To: <YehY0z2vHYVZk52J@slm.duckdns.org>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Wed, 19 Jan 2022 10:49:57 -0800
-Message-ID: <CAHVum0fqhMQd2uFic5_7RN=Ah6TTH2G2qLNZuxnQXSazR57m6g@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: Move VM's worker kthreads back to the original
- cgroups before exiting.
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        seanjc@google.com, lizefan.x@bytedance.com, hannes@cmpxchg.org,
-        dmatlack@google.com, jiangshanlai@gmail.com, kvm@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Content-Language: en-US
+To:     "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Bharata B Rao <bharata@amd.com>
+References: <20220118110621.62462-1-nikunj@amd.com>
+ <20220118110621.62462-7-nikunj@amd.com>
+ <010ef70c-31a2-2831-a2a7-950db14baf23@maciej.szmigiero.name>
+ <0e523405-f52c-b152-1dd3-aa65a9caee3c@amd.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [RFC PATCH 6/6] KVM: SVM: Pin SEV pages in MMU during
+ sev_launch_update_data()
+In-Reply-To: <0e523405-f52c-b152-1dd3-aa65a9caee3c@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 10:30 AM Tejun Heo <tj@kernel.org> wrote:
->
-> On Wed, Jan 19, 2022 at 07:02:53PM +0100, Paolo Bonzini wrote:
-> > On 1/18/22 21:39, Tejun Heo wrote:
-> > > So, these are normally driven by the !populated events. That's how everyone
-> > > else is doing it. If you want to tie the kvm workers lifetimes to kvm
-> > > process, wouldn't it be cleaner to do so from kvm side? ie. let kvm process
-> > > exit wait for the workers to be cleaned up.
-> >
-> > It does.  For example kvm_mmu_post_init_vm's call to
-> > kvm_vm_create_worker_thread is matched with the call to
-> > kthread_stop in kvm_mmu_pre_destroy_vm.
-> > According to Vpin, the problem is that there's a small amount of time
-> > between the return from kthread_stop and the point where the cgroup
-> > can be removed.  My understanding of the race is the following:
->
-> Okay, this is because kthread_stop piggy backs on vfork_done to wait for the
-> task exit intead of the usual exit notification, so it only waits till
-> exit_mm(), which is uhh... weird. So, migrating is one option, I guess,
-> albeit a rather ugly one. It'd be nicer if we can make kthread_stop()
-> waiting more regular but I couldn't find a good existing place and routing
-> the usual parent signaling might be too complicated. Anyone has better
-> ideas?
->
-Sean suggested that we can use the real_parent of the kthread task
-which will always be kthreadd_task, this will also not require any
-changes in the cgroup API. I like that approach, I will give it a try.
-This will avoid changes in cgroup APIs completely.
+On 19.01.2022 07:33, Nikunj A. Dadhania wrote:
+> Hi Maciej,
+> 
+> On 1/18/2022 8:30 PM, Maciej S. Szmigiero wrote:
+>> Hi Nikunj,
+>>
+>> On 18.01.2022 12:06, Nikunj A Dadhania wrote:
+>>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>
+>>> Pin the memory for the data being passed to launch_update_data()
+>>> because it gets encrypted before the guest is first run and must
+>>> not be moved which would corrupt it.
+>>>
+>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>> [ * Changed hva_to_gva() to take an extra argument and return gpa_t.
+>>>     * Updated sev_pin_memory_in_mmu() error handling.
+>>>     * As pinning/unpining pages is handled within MMU, removed
+>>>       {get,put}_user(). ]
+>>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>>> ---
+>>>    arch/x86/kvm/svm/sev.c | 122 ++++++++++++++++++++++++++++++++++++++++-
+>>>    1 file changed, 119 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>> index 14aeccfc500b..1ae714e83a3c 100644
+>>> --- a/arch/x86/kvm/svm/sev.c
+>>> +++ b/arch/x86/kvm/svm/sev.c
+>>> @@ -22,6 +22,7 @@
+>>>    #include <asm/trapnr.h>
+>>>    #include <asm/fpu/xcr.h>
+>>>    +#include "mmu.h"
+>>>    #include "x86.h"
+>>>    #include "svm.h"
+>>>    #include "svm_ops.h"
+>>> @@ -490,6 +491,110 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+>>>        return pages;
+>>>    }
+>>>    +#define SEV_PFERR_RO (PFERR_USER_MASK)
+>>> +#define SEV_PFERR_RW (PFERR_WRITE_MASK | PFERR_USER_MASK)
+>>> +
+>>> +static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm,
+>>> +                          unsigned long hva)
+>>> +{
+>>> +    struct kvm_memslots *slots = kvm_memslots(kvm);
+>>> +    struct kvm_memory_slot *memslot;
+>>> +    int bkt;
+>>> +
+>>> +    kvm_for_each_memslot(memslot, bkt, slots) {
+>>> +        if (hva >= memslot->userspace_addr &&
+>>> +            hva < memslot->userspace_addr +
+>>> +            (memslot->npages << PAGE_SHIFT))
+>>> +            return memslot;
+>>> +    }
+>>> +
+>>> +    return NULL;
+>>> +}
+>>
+>> We have kvm_for_each_memslot_in_hva_range() now, please don't do a linear
+>> search through memslots.
+>> You might need to move the aforementioned macro from kvm_main.c to some
+>> header file, though.
+> 
+> Sure, let me try optimizing with this newly added macro.
+
+👍
+
+>>
+>>> +static gpa_t hva_to_gpa(struct kvm *kvm, unsigned long hva, bool *ro)
+>>> +{
+>>> +    struct kvm_memory_slot *memslot;
+>>> +    gpa_t gpa_offset;
+>>> +
+>>> +    memslot = hva_to_memslot(kvm, hva);
+>>> +    if (!memslot)
+>>> +        return UNMAPPED_GVA;
+>>> +
+>>> +    *ro = !!(memslot->flags & KVM_MEM_READONLY);
+>>> +    gpa_offset = hva - memslot->userspace_addr;
+>>> +    return ((memslot->base_gfn << PAGE_SHIFT) + gpa_offset);
+>>> +}
+>>> +
+>>> +static struct page **sev_pin_memory_in_mmu(struct kvm *kvm, unsigned long addr,
+>>> +                       unsigned long size,
+>>> +                       unsigned long *npages)
+>>> +{
+>>> +    struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>> +    struct kvm_vcpu *vcpu;
+>>> +    struct page **pages;
+>>> +    unsigned long i;
+>>> +    u32 error_code;
+>>> +    kvm_pfn_t pfn;
+>>> +    int idx, ret = 0;
+>>> +    gpa_t gpa;
+>>> +    bool ro;
+>>> +
+>>> +    pages = sev_alloc_pages(sev, addr, size, npages);
+>>> +    if (IS_ERR(pages))
+>>> +        return pages;
+>>> +
+>>> +    vcpu = kvm_get_vcpu(kvm, 0);
+>>> +    if (mutex_lock_killable(&vcpu->mutex)) {
+>>> +        kvfree(pages);
+>>> +        return ERR_PTR(-EINTR);
+>>> +    }
+>>> +
+>>> +    vcpu_load(vcpu);
+>>> +    idx = srcu_read_lock(&kvm->srcu);
+>>> +
+>>> +    kvm_mmu_load(vcpu);
+>>> +
+>>> +    for (i = 0; i < *npages; i++, addr += PAGE_SIZE) {
+>>> +        if (signal_pending(current)) {
+>>> +            ret = -ERESTARTSYS;
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        if (need_resched())
+>>> +            cond_resched();
+>>> +
+>>> +        gpa = hva_to_gpa(kvm, addr, &ro);
+>>> +        if (gpa == UNMAPPED_GVA) {
+>>> +            ret = -EFAULT;
+>>> +            break;
+>>> +        }
+>>
+>> This function is going to have worst case O(n²) complexity if called with
+>> the whole VM memory (or O(n * log(n)) when hva_to_memslot() is modified
+>> to use kvm_for_each_memslot_in_hva_range()).
+> 
+> I understand your concern and will address it. BTW, this is called for a small
+> fragment of VM memory( <10MB), that needs to be pinned before the guest execution
+> starts.
+
+I understand it is a relatively small memory area now, but a rewrite of
+this patch that makes use of kvm_for_each_memslot_in_hva_range() while
+taking care of other considerations (like overlapping hva) will also
+solve the performance issue.
+
+>> That's really bad for something that can be done in O(n) time - look how
+>> kvm_for_each_memslot_in_gfn_range() does it over gfns.
+>>
+> 
+> I saw one use of kvm_for_each_memslot_in_gfn_range() in __kvm_zap_rmaps(), and
+> that too calls slot_handle_level_range() which has a for_each_slot_rmap_range().
+> How would that be O(n) ?
+> 
+> kvm_for_each_memslot_in_gfn_range() {
+> 	...
+> 	slot_handle_level_range()
+> 	...
+> }
+> 
+> slot_handle_level_range() {
+> 	...
+> 	for_each_slot_rmap_range() {
+> 		...
+> 	}
+> 	...
+> }
+
+kvm_for_each_memslot_in_gfn_range() iterates over gfns, which are unique,
+so at most one memslot is returned per gfn (and if a memslot covers
+multiple gfns in the requested range it will be returned just once).
+
+for_each_slot_rmap_range() then iterates over rmaps covering that
+*single* memslot: look at slot_rmap_walk_next() - the memslot under
+iteration is not advanced.
+
+So each memslot returned by kvm_for_each_memslot_in_gfn_range() is
+iterated over just once by the aforementioned macro.
+
+>> Besides performance considerations I can't see the code here taking into
+>> account the fact that a hva can map to multiple memslots (they an overlap
+>> in the host address space).
+> 
+> You are right I was returning at the first match, looks like if I switch to using 
+> kvm_for_each_memslot_in_hva_range() it should take care of overlapping hva, 
+> is this understanding correct ?
+
+Let's say that the requested range of hva for sev_pin_memory_in_mmu() to
+handle is 0x1000 - 0x2000.
+
+If there are three memslots:
+1: hva 0x1000 - 0x2000 -> gpa 0x1000 - 0x2000
+2: hva 0x1000 - 0x2000 -> gpa 0x2000 - 0x3000
+3: hva 0x2000 - 0x3000 -> gpa 0x3000 - 0x4000
+
+then kvm_for_each_memslot_in_hva_range() will return the first two,
+essentially covering the hva range of 0x1000 - 0x2000 twice.
+
+If such hva aliases are permitted the code has to be ready for this case
+and handle it sensibly:
+If you need to return just a single struct page per a hva AND / OR pin
+operations aren't idempotent then it has to keep track which hva were
+already processed.
+
+Another, and probably the easiest option would be to simply disallow
+such overlapping memslots in the requested range and make
+KVM_SEV_LAUNCH_UPDATE_DATA ioctl return something like EINVAL in this
+case - if that would be acceptable semantics for this ioctl.
+
+In any case, the main loop in sev_pin_memory_in_mmu() will probably
+need to be build around a kvm_for_each_memslot_in_hva_range() call,
+which will then solve the performance issue, too.
+
+> Regards,
+> Nikunj
+
+Thanks,
+Maciej
