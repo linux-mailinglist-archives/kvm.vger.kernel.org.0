@@ -2,128 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EFA64938FC
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:56:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06CFB49395D
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:17:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353389AbiASK4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 05:56:22 -0500
-Received: from mxout04.lancloud.ru ([45.84.86.114]:57474 "EHLO
-        mxout04.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240254AbiASK4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:56:21 -0500
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru A771820D27E6
-Received: from LanCloud
-Received: from LanCloud
-Received: from LanCloud
-Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
- (summary)
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>
-CC:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>, <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        <linux-iio@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        <alsa-devel@alsa-project.org>, Liam Girdwood <lgirdwood@gmail.com>,
-        "Guenter Roeck" <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        <linux-mtd@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        <linux-phy@lists.infradead.org>, Lee Jones <lee.jones@linaro.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        "Florian Fainelli" <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        "Bartosz Golaszewski" <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "Tony Luck" <tony.luck@intel.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        <bcm-kernel-feedback-list@broadcom.com>,
-        <linux-serial@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        "Matthias Brugger" <matthias.bgg@gmail.com>,
-        <platform-driver-x86@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        "Saravanan Sekar" <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>, <linux-pm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        "John Garry" <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        <linux-gpio@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        <openipmi-developer@lists.sourceforge.net>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-edac@vger.kernel.org>,
-        "Richard Weinberger" <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        "Hans de Goede" <hdegoede@redhat.com>, <netdev@vger.kernel.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, <linux-mmc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-renesas-soc@vger.kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
-        <linux-mediatek@lists.infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20220110195449.12448-1-s.shtylyov@omp.ru>
- <20220110195449.12448-2-s.shtylyov@omp.ru>
- <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de> <YeQpWu2sUVOSaT9I@kroah.com>
- <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <b6038ec2-da4a-de92-b845-cac2be0efcd1@omp.ru>
-Date:   Wed, 19 Jan 2022 13:56:12 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S1354078AbiASLRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 06:17:35 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:32896 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1353333AbiASLRe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 06:17:34 -0500
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 80D521EC0104;
+        Wed, 19 Jan 2022 12:17:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1642591048;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=3JZMc0cZY/SUPYpFhVyzLfJhcLypzpNmmb+t6qBlwLE=;
+        b=qUTlStzkk+lxcVwq7swjPFQ90VBHDXor/Tws967xJSIi7NJbDhMSz/XastqXpZeuvyTGp7
+        dxN3rR3fv510nGlnMCZYnyEltwTGh0aoC7CcRFjap1yroqzhNbhErBllK8CVsvnbqoQuzX
+        AyR9nydZAv2CUODYccXnBOA4d3FTOhA=
+Date:   Wed, 19 Jan 2022 12:17:22 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 29/40] x86/compressed/64: add support for SEV-SNP
+ CPUID table in #VC handlers
+Message-ID: <YefzQuqrV8kdLr9z@zn.tnic>
+References: <20220118043521.exgma53qrzrbalpd@amd.com>
+ <YebIiN6Ftq2aPtyF@zn.tnic>
+ <20220118142345.65wuub2p3alavhpb@amd.com>
+ <20220118143238.lu22npcktxuvadwk@amd.com>
+ <20220118143730.wenhm2bbityq7wwy@amd.com>
+ <YebsKcpnYzvjaEjs@zn.tnic>
+ <20220118172043.djhy3dwg4fhhfqfs@amd.com>
+ <Yeb7vOaqDtH6Fpsb@zn.tnic>
+ <20220118184930.nnwbgrfr723qabnq@amd.com>
+ <20220119011806.av5rtxfv4et2sfkl@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [192.168.11.198]
-X-ClientProxiedBy: LFEXT02.lancloud.ru (fd00:f066::142) To
- LFEX1907.lancloud.ru (fd00:f066::207)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220119011806.av5rtxfv4et2sfkl@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/18/22 12:18 PM, Uwe Kleine-König wrote:
-> On Sun, Jan 16, 2022 at 03:19:06PM +0100, Greg Kroah-Hartman wrote:
->> On Sat, Jan 15, 2022 at 07:36:43PM +0100, Uwe Kleine-König wrote:
->>> A possible compromise: We can have both. We rename
->>> platform_get_irq_optional() to platform_get_irq_silent() (or
->>> platform_get_irq_silently() if this is preferred) and once all users are
->>> are changed (which can be done mechanically), we reintroduce a
->>> platform_get_irq_optional() with Sergey's suggested semantic (i.e.
->>> return 0 on not-found, no error message printking).
->>
->> Please do not do that as anyone trying to forward-port an old driver
->> will miss the abi change of functionality and get confused.  Make
->> build-breaking changes, if the way a function currently works is
->> changed in order to give people a chance.
+On Tue, Jan 18, 2022 at 07:18:06PM -0600, Michael Roth wrote:
+> If 'fake_count'/'reported_count' is greater than the actual number of
+> entries in the table, 'actual_count', then all table entries up to
+> 'fake_count' will also need to pass validation. Generally the table
+> will be zero'd out initially, so those additional/bogus entries will
+> be interpreted as a CPUID leaves where all fields are 0. Unfortunately,
+> that's still considered a valid leaf, even if it's a duplicate of the
+> *actual* 0x0 leaf present earlier in the table. The current code will
+> handle this fine, since it scans the table in order, and uses the
+> valid 0x0 leaf earlier in the table.
+
+I guess it would be prudent to have some warnings when enumerating those
+leafs and when the count index "goes off into the weeds", so to speak,
+and starts reading 0-CPUID entries. I.e., "dear guest owner, your HV is
+giving you a big lie: a weird/bogus CPUID leaf count..."
+
+:-)
+
+And lemme make sure I understand it: the ->count itself is not
+measured/encrypted because you want to be flexible here and supply
+different blobs with different CPUID leafs?
+
+> This is isn't really a special case though, it falls under the general
+> category of a hypervisor inserting garbage entries that happen to pass
+> validation, but don't reflect values that a guest would normally see.
+> This will be detectable as part of guest owner attestation, since the
+> guest code is careful to guarantee that the values seen after boot,
+> once the attestation stage is reached, will be identical to the values
+> seen during boot, so if this sort of manipulation of CPUID values
+> occurred, the guest owner will notice this during attestation, and can
+> abort the boot at that point. The Documentation patch addresses this
+> in more detail.
+
+Yap, it is important this is properly explained there so that people can
+pay attention to during attestation.
+
+> If 'fake_count' is less than 'actual_count', then the PSP skips
+> validation for anything >= 'fake_count', and leaves them in the table.
+> That should also be fine though, since guest code should never exceed
+> 'fake_count'/'reported_count', as that's a blatant violation of the
+> spec, and it doesn't make any sense for a guest to do this. This will
+> effectively 'hide' entries, but those resulting missing CPUID leaves
+> will be noticeable to the guest owner once attestation phase is
+> reached.
+
+Noticeable because the guest owner did supply a CPUID table with X
+entries but the HV is reporting Y?
+
+If so, you can make this part of the attestation process: guest owners
+should always check the CPUID entries count to be of a certain value.
+
+> This does all highlight the need for some very thorough guidelines
+> on how a guest owner should implement their attestation checks for
+> cpuid, however. I think a section in the reference implementation
+> notes/document that covers this would be a good starting point. I'll
+> also check with the PSP team on tightening up some of these CPUID
+> page checks to rule out some of these possibilities in the future.
+
+Now you're starting to grow the right amount of paranoia - I'm glad I
+was able to sensitize you properly!
+
+:-)))
+
+> Nevermind, that doesn't work since snp_cpuid_info_get_ptr() is also called
+> by snp_cpuid_info_get_ptr() *prior* to initializing the table, so it ends
+> seeing cpuid->count==0 and fails right away. So your initial suggestion
+> of checking cpuid->count==0 at the call-sites to determine if the table
+> is enabled is probably the best option.
 > 
-> Fine for me. I assume this is a Nack for Sergey's patch?
+> Sorry for the noise/confusion.
 
-   Which patch do you mean? I'm starting to get really muddled... :-(
+No worries - the end result is important!
 
-> Best regards
-> Uwe
+Thx.
 
-MBR, Sergey
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
