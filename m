@@ -2,99 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAEDA493FF5
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:31:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F89A493FF6
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 19:31:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239739AbiASSbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 13:31:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356799AbiASSar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 13:30:47 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E676EC061574;
-        Wed, 19 Jan 2022 10:30:46 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id v11-20020a17090a520b00b001b512482f36so585208pjh.3;
-        Wed, 19 Jan 2022 10:30:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=pILDFV1B0pcs8CFlfnc4VuEEfnu7s3r3AjaWa+U4qlU=;
-        b=G/3SbGpYSVIOIGF7kh+kzHoGUA5tjQNhhwD8Ct/g4lU1Vu7oi22nFS+AZudtTGWnr3
-         rrhbbDLZytfxj5YVdB3iT4iolvT7lMZWM+MNINx7AQydBvXsMdbYOmkzq2tgcTNbGPWu
-         Qpa+33b4JH7QozpPtVL7r0KodsrkmTOGQP2niwVLRhBjZo9fy3C+npjUu6X50dKpWeEM
-         yKN/XtEo/mnaJhpjliB+QNljmjRXxQlYGPfYEPyyoxvCI5hzEnSFX540cpRZtqmRW9A+
-         Ji9zM1OR2SJi0kJeAZdohbNCC1kjFVNUXaYGmn8+JxFeoizkJJ86x1FDWsXiU1XNd3oN
-         hbag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=pILDFV1B0pcs8CFlfnc4VuEEfnu7s3r3AjaWa+U4qlU=;
-        b=P+gfIXQ/w3gcd9K9hH95DJdaGm1f1GDfa5g+fk9whB24Xlm9ALRubYXyEBbSET1AqI
-         99I/wPfI4JLZ7LW41NXdfluCC6hT/JdO8URVNi/fAYvmSufOi2bNAEkjSRofYn6Bixqc
-         TPCL7jQHMLFYJkt5oZtnpO3k33VE3SAJz56EW/3quBViwQU22korY4X+QGazBrMwkqrk
-         b/c11qg6loPSgVzizO4V6CzuziaiJ2jXnItng2FRT8VMq/YZE2Bup8qgbeHuL+TutkzQ
-         uLsTwvLhpAeNeGoBeW/zeMW05YLKHzRBonIKl/CiDGVHDcDQCKwUi/qiaXLTYUiJYrFx
-         88tQ==
-X-Gm-Message-State: AOAM532oa8LPwmjK9VqrvCeLK2SdBCq/vj+PrKdlaMneA3coG4EhAc5F
-        Qn9oRJs1fFCqcwKk/KnjHz8=
-X-Google-Smtp-Source: ABdhPJwyGwotVAkWmz3BsMf7Fv2uH9oDXZUXNCwmEF/EdbNauj90GncquVipF0USQAD+rXlnrhLtAw==
-X-Received: by 2002:a17:903:2342:b0:14a:e540:6c83 with SMTP id c2-20020a170903234200b0014ae5406c83mr7261385plh.69.1642617046283;
-        Wed, 19 Jan 2022 10:30:46 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id b5sm373150pgl.22.2022.01.19.10.30.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 10:30:45 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 19 Jan 2022 08:30:43 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vipin Sharma <vipinsh@google.com>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        seanjc@google.com, lizefan.x@bytedance.com, hannes@cmpxchg.org,
-        dmatlack@google.com, jiangshanlai@gmail.com, kvm@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: Move VM's worker kthreads back to the original
- cgroups before exiting.
-Message-ID: <YehY0z2vHYVZk52J@slm.duckdns.org>
-References: <20211222225350.1912249-1-vipinsh@google.com>
- <20220105180420.GC6464@blackbody.suse.cz>
- <CAHVum0e84nUcGtdPYQaJDQszKj-QVP5gM+nteBpSTaQ2sWYpmQ@mail.gmail.com>
- <Yeclbe3GNdCMLlHz@slm.duckdns.org>
- <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
+        id S1356782AbiASSb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 13:31:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29425 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239661AbiASSbB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 13:31:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642617060;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=tqOpyMa00tfPsqC0RnRf2Jd0tOS0rTOYnQjP7uMG2F8=;
+        b=BwLHHfUlkTkbuK/tNV7HafIrQhyf0QzSenjReoTGgWyGASs+GXUtjUEQNctbbRcXGgO0kJ
+        iT7nHyzBAkSypbYfqc0p68Frd3vwv2Lq3LYzylDTLeYDnEsUAmg3l+p3CAA0/RF146W8Bw
+        vBWj5LfwkE8UkTtVOPLRI1HIiLXJ6ec=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-197-1vM5tktMM5md-udGeQca8Q-1; Wed, 19 Jan 2022 13:30:58 -0500
+X-MC-Unique: 1vM5tktMM5md-udGeQca8Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D1051091DA4;
+        Wed, 19 Jan 2022 18:30:57 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0185B7BB6C;
+        Wed, 19 Jan 2022 18:30:56 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     yang.zhong@intel.com, seanjc@google.com
+Subject: [PATCH] kvm: selftests: sync uapi/linux/kvm.h with Linux header
+Date:   Wed, 19 Jan 2022 13:30:56 -0500
+Message-Id: <20220119183056.1627675-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a0bc562-9f25-392d-5c05-9dbcd350d002@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 07:02:53PM +0100, Paolo Bonzini wrote:
-> On 1/18/22 21:39, Tejun Heo wrote:
-> > So, these are normally driven by the !populated events. That's how everyone
-> > else is doing it. If you want to tie the kvm workers lifetimes to kvm
-> > process, wouldn't it be cleaner to do so from kvm side? ie. let kvm process
-> > exit wait for the workers to be cleaned up.
-> 
-> It does.  For example kvm_mmu_post_init_vm's call to
-> kvm_vm_create_worker_thread is matched with the call to
-> kthread_stop in kvm_mmu_pre_destroy_vm.
-> According to Vpin, the problem is that there's a small amount of time
-> between the return from kthread_stop and the point where the cgroup
-> can be removed.  My understanding of the race is the following:
+KVM_CAP_XSAVE2 is out of sync due to a conflict.  Copy the whole
+file while at it.
 
-Okay, this is because kthread_stop piggy backs on vfork_done to wait for the
-task exit intead of the usual exit notification, so it only waits till
-exit_mm(), which is uhh... weird. So, migrating is one option, I guess,
-albeit a rather ugly one. It'd be nicer if we can make kthread_stop()
-waiting more regular but I couldn't find a good existing place and routing
-the usual parent signaling might be too complicated. Anyone has better
-ideas?
+Reported-by: Yang Zhong <yang.zhong@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tools/include/uapi/linux/kvm.h | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-Thanks.
-
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index f066637ee206..9563d294f181 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -1131,7 +1131,8 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+ #define KVM_CAP_ARM_MTE 205
+ #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
+-#define KVM_CAP_XSAVE2 207
++#define KVM_CAP_VM_GPA_BITS 207
++#define KVM_CAP_XSAVE2 208
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1163,11 +1164,20 @@ struct kvm_irq_routing_hv_sint {
+ 	__u32 sint;
+ };
+ 
++struct kvm_irq_routing_xen_evtchn {
++	__u32 port;
++	__u32 vcpu;
++	__u32 priority;
++};
++
++#define KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL ((__u32)(-1))
++
+ /* gsi routing entry types */
+ #define KVM_IRQ_ROUTING_IRQCHIP 1
+ #define KVM_IRQ_ROUTING_MSI 2
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+ #define KVM_IRQ_ROUTING_HV_SINT 4
++#define KVM_IRQ_ROUTING_XEN_EVTCHN 5
+ 
+ struct kvm_irq_routing_entry {
+ 	__u32 gsi;
+@@ -1179,6 +1189,7 @@ struct kvm_irq_routing_entry {
+ 		struct kvm_irq_routing_msi msi;
+ 		struct kvm_irq_routing_s390_adapter adapter;
+ 		struct kvm_irq_routing_hv_sint hv_sint;
++		struct kvm_irq_routing_xen_evtchn xen_evtchn;
+ 		__u32 pad[8];
+ 	} u;
+ };
+@@ -1209,6 +1220,7 @@ struct kvm_x86_mce {
+ #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
+ #define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
+ #define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
++#define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
+ 
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+@@ -1552,8 +1564,6 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_XSAVE */
+ #define KVM_GET_XSAVE		  _IOR(KVMIO,  0xa4, struct kvm_xsave)
+ #define KVM_SET_XSAVE		  _IOW(KVMIO,  0xa5, struct kvm_xsave)
+-/* Available with KVM_CAP_XSAVE2 */
+-#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+ /* Available with KVM_CAP_XCRS */
+ #define KVM_GET_XCRS		  _IOR(KVMIO,  0xa6, struct kvm_xcrs)
+ #define KVM_SET_XCRS		  _IOW(KVMIO,  0xa7, struct kvm_xcrs)
+@@ -1613,6 +1623,9 @@ struct kvm_enc_region {
+ #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
+ #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
+ 
++/* Available with KVM_CAP_XSAVE2 */
++#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
++
+ struct kvm_s390_pv_sec_parm {
+ 	__u64 origin;
+ 	__u64 length;
 -- 
-tejun
+2.31.1
+
