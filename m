@@ -2,155 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06B16493575
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 08:25:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 585474935C5
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 08:47:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346481AbiASHZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 02:25:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
+        id S1352167AbiASHrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 02:47:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245723AbiASHZg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 02:25:36 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251C8C061574;
-        Tue, 18 Jan 2022 23:25:36 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id s2-20020a17090ad48200b001b501977b23so483708pju.2;
-        Tue, 18 Jan 2022 23:25:36 -0800 (PST)
+        with ESMTP id S1352161AbiASHra (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 02:47:30 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6BF1C061574
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 23:47:30 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id r5so1816505pfl.2
+        for <kvm@vger.kernel.org>; Tue, 18 Jan 2022 23:47:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=vfGaApu8wQmCPciFtkN6NAlobrxb1oXN8EoIi5l8GHQ=;
-        b=QppLXnIWB7RadcAP+fi1YRTqLnzMr67TF9r3sq5WSGiN0VOcDfUeeRRYu8T4vFhmEo
-         WHnD/3qhnFFJoascXBiYQLnqTKMK1k6onos0kS+o8pRCdErlbaD6KTxlG2BiricXI3mc
-         3yU7nmr9lqJV+9kDKS7WdiMpEeWsxET4QC2NK/FCQeKJp66NmNTRWDhbsiV+F+5evnKa
-         ATxu9MU6gA63cMGXuvTNOUa8xjQJpGdagYxkBwiThWxTWD+M9lU/RYmqPMy8yy8FotT0
-         0Gj1Jp/GmpJLvVkvpsG7XUD6Aok+W9vra/WC98H4IKI3tLZbgaWriM8CN04hThkHT5z6
-         1q6A==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qbiJb2UVtirrAHsd/tlBtET4SjB9SQTlHXui+2izr3s=;
+        b=bP8mpKrUKYYcA4KRpX/Iab6PVeCaEBou0Rle0wK4u0oCxHKHJNxK3XOy8B6lcxgvXY
+         FOco+CP1Zd+i3br6c9kACIwlpelrznWTBYQUgGtAv7CIL5/Vnzro9VaR+3UOWqaq8BVB
+         xO6cf+i5UOhU4GoneriU5p5ARzP2ioFnBe4GfgF/C+JvyNABeyjbtY0rfzzo/ABYY++3
+         iJR1Xxp98BG1ihJUwNmD+zPbT8XFXRlCn6TXC5AqGaP9hKk35oUB0BaIZ9HYjhj8NlBp
+         FAWsGfVPMfQ2g6v6WkTOQ8wNCoRN/d9yFYycIOipiN0vhIS7vAg3sF7aPCVLXrVqbIL7
+         RxNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=vfGaApu8wQmCPciFtkN6NAlobrxb1oXN8EoIi5l8GHQ=;
-        b=7CDRbz6/rbCQRcF/rLB/K7P0rMlYDVBJhhPu2Wmp/z/SGMVm9g6JPuGbtlrUXxijTU
-         3FgHka+qleuAjXsNtTOfmxCPk6xnj1xEf/Ich7bHokwPOnSTXk1pchTctxijX0f4/Kbr
-         Jqx2ExD2jW+/YdIMTeA29Hx/CDRM1spoXjilP/n8YSh5TMlhTfbP3CQdtYQk6NQ3Zazs
-         +ic9ZpHssR6SP8l+F7Jf1LV7aoFp85gC0qPYiV3rZ5wVlXcF5XMKoWe26F5G41gCyU2g
-         PxUhQm86l71FNKRB9Mc64uc8F7m15dLsnVzMtr7U4kNdPN/Egamu419yQ7qIOMbhWvO5
-         M6UA==
-X-Gm-Message-State: AOAM5316cAFOokp/96bF+e5MpdtiP/qWTbAwIu82nS+Ss7e0n6LA7zhY
-        LENI6w4QPxGNxJX8xVq0IMsgGmtjFIB8zMzs
-X-Google-Smtp-Source: ABdhPJxW/8NadmfPxqAtIs1ydmNWawR4Z0lXbnP3vjln6ZY4FIm+JyuhopJ00Gin+2IGL4v3kMt4FQ==
-X-Received: by 2002:a17:90b:4c52:: with SMTP id np18mr2826931pjb.192.1642577135517;
-        Tue, 18 Jan 2022 23:25:35 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t126sm10541138pfd.143.2022.01.18.23.25.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jan 2022 23:25:35 -0800 (PST)
-Message-ID: <a847ba90-7f15-4e79-b42b-75be0d6cf9fe@gmail.com>
-Date:   Wed, 19 Jan 2022 15:25:25 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qbiJb2UVtirrAHsd/tlBtET4SjB9SQTlHXui+2izr3s=;
+        b=8GYaqTS+l+GMlHkz5KDgC61qQReqU8xqNYdqX4SFwczLga44EZhkmuzXc10f6gxROT
+         zS1uBKbv8/yxnf6zUfuXFmkTrHzivPyw7AsKY3mgb9etXXXnTP+Kpn1h+JEfmM1BYImx
+         epfj6g2BcRgHE4nxGZ1wLbWz7yfIK2NC1lkwCEXz+SsjdvEblQkclV76Y58MVkGeVLwl
+         i6NPg3G+E3xQiY5D3Ao3b5a28JaD+J9ntiGVxfeGEkn9nwlyHp9ZH1kUhva9dW/DeGVe
+         iSdFscMY+lXBincl9QE/w3BMUJ1qUjspYZjrBuykjIlvzxU4Qs4ikS3DVGY7BOATFUaJ
+         rH1A==
+X-Gm-Message-State: AOAM53171TOnmt7aKmBylH3R7sDOvcPy246u9yEcK/Jb0bk9Umu8bQLJ
+        7LTYgobO3DEDLCQbndwe0hmPm3kYjYsbCmfsRi0Y4w==
+X-Google-Smtp-Source: ABdhPJynjuL5EJyIFAzAyBjd8DX1zCihK90pwXV5JoP1UY92TV4OnkyTmudcqtrcfRqYDdlvxWABUiftzGEKe/ZrgUE=
+X-Received: by 2002:a63:7d42:: with SMTP id m2mr26257918pgn.491.1642578450084;
+ Tue, 18 Jan 2022 23:47:30 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: x86: Update the states size cpuid even if
- XCR0/IA32_XSS is reset
-Content-Language: en-US
+References: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+ <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+ <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+ <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
+ <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+ <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+ <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
+ <YeBfj89mIf8SezfD@google.com> <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+ <YedWUJNnQK3HFrWC@google.com>
+In-Reply-To: <YedWUJNnQK3HFrWC@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Tue, 18 Jan 2022 23:47:13 -0800
+Message-ID: <CAAeT=FyJAG1dEFLvrQ4UXrwUqBUhY0AKkjzFpyi74zCJZUEYVg@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220117082631.86143-1-likexu@tencent.com>
- <YecHK2DmooVlMr2U@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <YecHK2DmooVlMr2U@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        linux-kernel@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/1/2022 2:30 am, Sean Christopherson wrote:
-> On Mon, Jan 17, 2022, Like Xu wrote:
->> From: Like Xu <likexu@tencent.com>
->>
->> XCR0 is reset to 1 by RESET but not INIT and IA32_XSS is zeroed by
->> both RESET and INIT. In both cases, the size in bytes of the XSAVE
->> area containing all states enabled by XCR0 or (XCRO | IA32_XSS)
->> needs to be updated.
->>
->> Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->>   arch/x86/kvm/x86.c | 8 ++++++++
->>   1 file changed, 8 insertions(+)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 76b4803dd3bd..5748a57e1cb7 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -11134,6 +11134,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>   	struct kvm_cpuid_entry2 *cpuid_0x1;
->>   	unsigned long old_cr0 = kvm_read_cr0(vcpu);
->>   	unsigned long new_cr0;
->> +	bool need_update_cpuid = false;
->>   
->>   	/*
->>   	 * Several of the "set" flows, e.g. ->set_cr0(), read other registers
->> @@ -11199,6 +11200,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>   
->>   		vcpu->arch.msr_misc_features_enables = 0;
->>   
->> +		if (vcpu->arch.xcr0 != XFEATURE_MASK_FP)
->> +			need_update_cpuid = true;
->>   		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
->>   	}
->>   
->> @@ -11216,6 +11219,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>   	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
->>   	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
->>   
->> +	if (vcpu->arch.ia32_xss)
->> +		need_update_cpuid = true;
-> 
-> This means that kvm_set_msr_common()'s handling of MSR_IA32_XSS also needs to
-> update kvm_update_cpuid_runtime().  And then for bnoth XCR0 and XSS, I would very
-> strongly prefer that use the helpers to write the values and let the helpers call
+On Tue, Jan 18, 2022 at 4:07 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Jan 14, 2022, Reiji Watanabe wrote:
+> > The restriction, with which KVM doesn't need to worry about the changes
+> > in the registers after KVM_RUN, could potentially protect or be useful
+> > to protect KVM and simplify future changes/maintenance of the KVM codes
+> > that consumes the values.
+>
+> That sort of protection is definitely welcome, the previously mentioned CPUID mess
+> on x86 would have benefit greatly by KVM being restrictive in the past.  That said,
+> hooking KVM_RUN is likely the wrong way to go about implementing any restrictions.
+> Running a vCPU is where much of the vCPU's state is explicitly consumed, but it's
+> all too easy for KVM to implicity/indirectly consume state via a different ioctl(),
+> e.g. if there are side effects that are visible in other registers, than an update
+> can also be visible to userspace via KVM_{G,S}ET_{S,}REGS, at which point disallowing
+> modifying state after KVM_RUN but not after reading/writing regs is arbitrary and
+> inconsitent.
 
-Looks good to me and let me apply it in the next version.
+Thank you for your comments !
+I think I understand your concern, and that's a great point.
+That's not the case for those pseudo registers though at least for now :)
+BTW, is this concern specific to hooking KVM_RUN ? (Wouldn't it be the
+same for the option with "if kvm->created_vcpus > 0" ?)
 
-> kvm_update_cpuid_runtime().  Yes, that will mean kvm_update_cpuid_runtime() may be
-> called multiple times during INIT, but that's already true (CR4), and this isn't
-> exactly a fast path.
 
-An undisclosed lazy mechanism is under analyzed for performance gains.
+> If possible, preventing modification if kvm->created_vcpus > 0 is ideal as it's
+> a relatively common pattern in KVM, and provides a clear boundary to userpace
+> regarding what is/isn't allowed.
 
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 55518b7d3b96..22d4b1d15e94 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11256,7 +11256,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> 
->                  vcpu->arch.msr_misc_features_enables = 0;
-> 
-> -               vcpu->arch.xcr0 = XFEATURE_MASK_FP;
-> +               __kvm_set_xcr(vcpu, 0, XFEATURE_MASK_FP);
->          }
-> 
->          /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
-> @@ -11273,7 +11273,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->          cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
->          kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
-> 
-> -       vcpu->arch.ia32_xss = 0;
-> +       __kvm_set_msr(vcpu, MSR_IA32_XSS, 0, true);
-> 
->          static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
-> 
-> 
+Yes, I agree that would be better in general.  For (pseudo) registers,
+I would think preventing modification if kvm->created_vcpus > 0 might
+not be a very good option for KVM/ARM though considering usage of
+KVM_GET_REG_LIST and KVM_{G,S}ET_ONE_REG.
+
+Thanks,
+Reiji
