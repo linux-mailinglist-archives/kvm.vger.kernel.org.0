@@ -2,104 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42E7B49383C
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:18:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 359D249384A
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:21:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353695AbiASKRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 05:17:24 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:47820 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353710AbiASKRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:17:09 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: usama.anjum)
-        with ESMTPSA id AC62B1F44443
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1642587428;
-        bh=ZgAzpMGfSGdCPLE/fHhKIS82NhtSqBUPZr7WBPwkwXI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C0mGMmA7q7UPYsiXK18YhhsNEQ//QfrpSJuvfRmQUme1U5Fg4vobtB0Ao0YZiGUUk
-         L3hEF7/vTCey+drcto8FB1II8khu5KrNSHj6tZDVDCrTS/eyExq2QqwYILoP2Qy10F
-         8Lmdf9wO/NjKg5Xp17P9zVfjJyRzSjdWaMGg9JMiYgITkIDPxQCI6DPGYbmCiq48wl
-         KdwbBRzvSFh0zarKFe2Y/qPcaWxXsJAdqBodS6834V2pv09q05jLvBfhen5Zoq/3Ih
-         uJqUJrZT+o/JZh8YBKDePxlOaWJ6AvYf+Pwr482gk45PmGVBeQDczi22XKAu6KIjXv
-         v5snzb//VssZA==
-From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
-To:     Shuah Khan <shuah@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>,
+        id S1349479AbiASKVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 05:21:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44748 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240254AbiASKVY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 05:21:24 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2730CC061574;
+        Wed, 19 Jan 2022 02:21:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BBD6061571;
+        Wed, 19 Jan 2022 10:21:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC9AC004E1;
+        Wed, 19 Jan 2022 10:21:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642587683;
+        bh=cP9cLTMdUSfF40o+P6T3LFzIpDG8KykxdcBvwSmIf8o=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=CDzzzwVotsmKyOYUjqR0h8Y9SowCQOZoRlzI9UqqqOaI/AfV3HDu8bFn/q6AZ+e9Z
+         R8s6cbEQuw2EkCkBaYnhAEj1ROLtiqTbTAB8gqa+YPB/d7oYuJ4Bdy94IqngPMcJ1J
+         3OJbKVBq9DD1AD2PgsFWc6pag8DABg/JYHsY+Hae72JEu4mFUC/uZg7qOO5CIp2++i
+         t6J83yx7NxxjNPFsuTvWM9tSM//ASfPGxpLUn+huASndGzL0Gom8pGDYMoqs1aH2Nx
+         pEUGWDkyODqJ+AcaoqRC6Ko2ZX1w8BFl17pz3CjgQ9OUxkeukHDvueRJDL48Tzvvtu
+         HdLj31S+fGbTg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nA85g-001Ren-K2; Wed, 19 Jan 2022 10:21:20 +0000
+Date:   Wed, 19 Jan 2022 10:21:20 +0000
+Message-ID: <87ee5481r3.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        chiminghao <chi.minghao@zte.com.cn>,
-        linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-        linux-kernel@vger.kernel.org (open list),
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
-        linux-security-module@vger.kernel.org (open list:LANDLOCK SECURITY
-        MODULE), netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-        mptcp@lists.linux.dev (open list:NETWORKING [MPTCP]),
-        linux-mm@kvack.org (open list:MEMORY MANAGEMENT)
-Cc:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
-        kernel@collabora.com
-Subject: [PATCH V2 10/10] selftests: vm: remove dependecy from internal kernel macros
-Date:   Wed, 19 Jan 2022 15:15:31 +0500
-Message-Id: <20220119101531.2850400-11-usama.anjum@collabora.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220119101531.2850400-1-usama.anjum@collabora.com>
-References: <20220119101531.2850400-1-usama.anjum@collabora.com>
-MIME-Version: 1.0
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v3 04/11] KVM: arm64: Setup a framework for hypercall bitmap firmware registers
+In-Reply-To: <960d4166-1718-55ef-d324-507a8add7e3e@redhat.com>
+References: <20220104194918.373612-1-rananta@google.com>
+        <20220104194918.373612-5-rananta@google.com>
+        <960d4166-1718-55ef-d324-507a8add7e3e@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jasowang@redhat.com, rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The defination of swap() is used from kernel's internal header when this
-test is built in source tree. The build fails when this test is built
-out of source tree as defination of swap() isn't found. Selftests
-shouldn't depend on kernel's internal header files. They can only depend
-on uapi header files. Add the defination of swap() to fix the build
-error:
+On Wed, 19 Jan 2022 06:42:15 +0000,
+Jason Wang <jasowang@redhat.com> wrote:
+>=20
+>=20
+> =E5=9C=A8 2022/1/5 =E4=B8=8A=E5=8D=883:49, Raghavendra Rao Ananta =E5=86=
+=99=E9=81=93:
+> > KVM regularly introduces new hypercall services to the guests without
+> > any consent from the Virtual Machine Manager (VMM). This means, the
+> > guests can observe hypercall services in and out as they migrate
+> > across various host kernel versions. This could be a major problem
+> > if the guest discovered a hypercall, started using it, and after
+> > getting migrated to an older kernel realizes that it's no longer
+> > available. Depending on how the guest handles the change, there's
+> > a potential chance that the guest would just panic.
+> >=20
+> > As a result, there's a need for the VMM to elect the services that
+> > it wishes the guest to discover. VMM can elect these services based
+> > on the kernels spread across its (migration) fleet. To remedy this,
+> > extend the existing firmware psuedo-registers, such as
+> > KVM_REG_ARM_PSCI_VERSION, for all the hypercall services available.
+>=20
+>=20
+>=20
+> Haven't gone through the series but I wonder whether it's better to
+> have a (e)BPF filter for this like seccomp.
 
-	gcc -Wall  -I/linux_mainline2/build/usr/include -no-pie    userfaultfd.c -lrt -lpthread -o /linux_mainline2/build/kselftest/vm/userfaultfd
-	userfaultfd.c: In function ‘userfaultfd_stress’:
-	userfaultfd.c:1530:3: warning: implicit declaration of function ‘swap’; did you mean ‘swab’? [-Wimplicit-function-declaration]
-	 1530 |   swap(area_src, area_dst);
-	      |   ^~~~
-	      |   swab
-	/usr/bin/ld: /tmp/cclUUH7V.o: in function `userfaultfd_stress':
-	userfaultfd.c:(.text+0x4d64): undefined reference to `swap'
-	/usr/bin/ld: userfaultfd.c:(.text+0x4d82): undefined reference to `swap'
-	collect2: error: ld returned 1 exit status
+No, please. This has to fit in the save/restore model, and should be
+under control of the VMM. If you want to filter things using seccomp,
+that's fine, but also that's completely orthogonal.
 
-Fixes: 2c769ed7137a ("tools/testing/selftests/vm/userfaultfd.c: use swap() to make code cleaner")
-Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
----
- tools/testing/selftests/vm/userfaultfd.c | 3 +++
- 1 file changed, 3 insertions(+)
+	M.
 
-diff --git a/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/selftests/vm/userfaultfd.c
-index d3fd24f9fae8..d2480ab93037 100644
---- a/tools/testing/selftests/vm/userfaultfd.c
-+++ b/tools/testing/selftests/vm/userfaultfd.c
-@@ -119,6 +119,9 @@ struct uffd_stats {
- 				 ~(unsigned long)(sizeof(unsigned long long) \
- 						  -  1)))
- 
-+#define swap(a, b) \
-+	do { typeof(a) __tmp = (a); (a) = (b); (b) = __tmp; } while (0)
-+
- const char *examples =
-     "# Run anonymous memory test on 100MiB region with 99999 bounces:\n"
-     "./userfaultfd anon 100 99999\n\n"
--- 
-2.30.2
-
+--=20
+Without deviation from the norm, progress is not possible.
