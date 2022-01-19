@@ -2,138 +2,350 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CD93493EB9
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 18:02:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAC5C493ECC
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 18:08:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353522AbiASRCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 12:02:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29990 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243684AbiASRCW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 12:02:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642611741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3ahQMiXbH1Jqvjp7e2uPCr+IpogzTLVBiu5OQ3/CX8M=;
-        b=izkZB9uUTNky62/HGLUgCGszNWt9Mbwu5ScRjhZ2CQL7Fjrm0jft5pHSuC9zaTipT231Zv
-        mTvMf/BpNBmuijxDPQkc/jUfbjFnRwmV4cdoQr1nkV+zZLItYoeoEJNIfMHwhWSaPIDiPs
-        oP3wjSjfI2r8dCp1LrVh7i3FAoW5HsQ=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-471-PFnbcqrnOQeIAEeWLMKeDg-1; Wed, 19 Jan 2022 12:02:20 -0500
-X-MC-Unique: PFnbcqrnOQeIAEeWLMKeDg-1
-Received: by mail-oi1-f198.google.com with SMTP id o9-20020acaf009000000b002c84fff9098so2076857oih.17
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 09:02:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3ahQMiXbH1Jqvjp7e2uPCr+IpogzTLVBiu5OQ3/CX8M=;
-        b=rOtT6S02mDHAbZUev/txWRI3g5rec+VZ/mp6Zcv8hUNLgMMn6HIkgRnJbE/IHOYuwc
-         AHp7/9z04j7erBRNY9m4fBTwdHMi5WnKDBy1J0P/0KZ6dbUsb2o3kn89S1IdQEPb+lZj
-         IsqtZd8ylBTlxzybi+MS4q4bcOQWWJ5VmessZPegHBqnu7JElPwQ1/UzyLZ9z5ghNwqb
-         Kj5KsjgXL/dKbEErckpogF4UKXGz3ssxqXarYDUHt6yCHguVIWtFrNvsHaZ34Zhq6IVo
-         tBUpuGQNKfoWSUWimh5LR0fGQUDNOuuToWEXYH01llvep2lc6Z4YlfHU/FicZJxMru6V
-         4V9w==
-X-Gm-Message-State: AOAM5300heAGytQhjp8AcGlrNYtzUnLC1xDbDmSLwQRttc6zcSfElPrT
-        Ju+9ZJ/4rZ+SYye6wZcPEnSDM7DO5EFh9lAQorNiXg8RiLxwPHlMLq5VMJnC7MNP2bfFXvlNsmL
-        SxY5T4eZQ54ix
-X-Received: by 2002:a05:6808:f91:: with SMTP id o17mr2504182oiw.137.1642611738991;
-        Wed, 19 Jan 2022 09:02:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz3VPKcnLANIlM3FHHCGcHE6krFWo8OHNhl7zH8DTqLxZLqyvViC1GVid2mIXBMa8Of5BSsmw==
-X-Received: by 2002:a05:6808:f91:: with SMTP id o17mr2504159oiw.137.1642611738756;
-        Wed, 19 Jan 2022 09:02:18 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id y4sm139883oov.32.2022.01.19.09.02.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 09:02:18 -0800 (PST)
-Date:   Wed, 19 Jan 2022 10:02:17 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC] vfio: Revise and update the migration uAPI
- description
-Message-ID: <20220119100217.4aee7451.alex.williamson@redhat.com>
-In-Reply-To: <20220119163821.GP84788@nvidia.com>
-References: <0-v1-a4f7cab64938+3f-vfio_mig_states_jgg@nvidia.com>
-        <20220118125522.6c6bb1bb.alex.williamson@redhat.com>
-        <20220118210048.GG84788@nvidia.com>
-        <20220119083222.4dc529a4.alex.williamson@redhat.com>
-        <20220119154028.GO84788@nvidia.com>
-        <20220119090614.5f67a9e7.alex.williamson@redhat.com>
-        <20220119163821.GP84788@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S1345385AbiASRI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 12:08:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58658 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237375AbiASRI1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 12:08:27 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20JFhPKa023537;
+        Wed, 19 Jan 2022 17:08:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=oaxRr0rBnBqFhk5zud2h81gfcCCumGJq39eeMtPzEeE=;
+ b=nJIQC59/dAFV+g00kn651zmTPXG2Ee9+1gI93BI1SUEVDJnL1PSnZuG5SFpV3JtaQapO
+ Hv150cKN3XoABiPH5Q5kRU1f+vY8fVk0hI06gCZORJqLps2TGAAjgGqDGWOHTNcjYpYk
+ MJGziEVHFBLumVvpdOYbB6G1Nd28Z1l7a1sgPVBPGFmCJyUh7tjCo5xYNo6A851GjAm5
+ b0yskHyFLS9zrsc2BnQlnbkeA8pQe7N7PNugdFs9Vytg5ykGlpMbSOtIqfKNYw3J9/5a
+ p3Q4Pca/07ta61E7yzBE1u+f5QCbWiOIh+oQDWyt7qczY5hK1Rq1pzit7r/USK2KS0Fl yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dpkje5j8g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 17:08:25 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20JGrQeK005346;
+        Wed, 19 Jan 2022 17:08:25 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dpkje5j7d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 17:08:25 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20JH359v011174;
+        Wed, 19 Jan 2022 17:08:23 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3dknwapxjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 17:08:23 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20JH8Job17564122
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jan 2022 17:08:20 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D7E37A4040;
+        Wed, 19 Jan 2022 17:08:19 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4BC6A405F;
+        Wed, 19 Jan 2022 17:08:18 +0000 (GMT)
+Received: from [9.171.7.240] (unknown [9.171.7.240])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Jan 2022 17:08:18 +0000 (GMT)
+Message-ID: <adc1df1b-97a0-c41b-cfbf-71a68ea4362d@linux.ibm.com>
+Date:   Wed, 19 Jan 2022 18:10:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 26/30] vfio-pci/zdev: wire up zPCI adapter interrupt
+ forwarding support
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-27-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-27-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _uuAx3iatHu00WZRZOzL2I6YTr36vvhe
+X-Proofpoint-ORIG-GUID: IWjeG_BuylC7fTVtPPqEhtpVFW_tks0Z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-19_09,2022-01-19_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 clxscore=1015 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2201190096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Jan 2022 12:38:21 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Wed, Jan 19, 2022 at 09:06:14AM -0700, Alex Williamson wrote:
-> > On Wed, 19 Jan 2022 11:40:28 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Wed, Jan 19, 2022 at 08:32:22AM -0700, Alex Williamson wrote:
-> > >   
-> > > > If the order was to propose a new FSM uAPI compatible to the existing
-> > > > bit definitions without the P2P states, then add a new ioctl and P2P
-> > > > states, and require userspace to use the ioctl to validate support for
-> > > > those new P2P states, I might be able to swallow that.    
-> > > 
-> > > That is what this achieves!
-> > > 
-> > > Are you really asking that we have to redo all the docs/etc again just
-> > > to split them slightly differently into patches? What benefit is this
-> > > make work to anyone?  
-> > 
-> > Only if you're really set on trying to claim compatibility with the
-> > existing migration sub-type.  The simpler solution is to roll the
-> > arc-supported ioctl into this proposal, bump the sub-type to v2 and  
+
+On 1/14/22 21:31, Matthew Rosato wrote:
+> Introduce support for VFIO_DEVICE_FEATURE_ZPCI_AIF, which is a new
+> VFIO_DEVICE_FEATURE ioctl.  This interface is used to indicate that an
+> s390x vfio-pci device wishes to enable/disable zPCI adapter interrupt
+> forwarding, which allows underlying firmware to deliver interrupts
+> directly to the associated kvm guest.
 > 
-> How about we just order the arc-supported ioctl patch first, then the
-> spec revision and include the language about how to use arc-supported
-> that is currently in the arc-supported ioctl?
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_pci.h  |  2 +
+>   drivers/vfio/pci/vfio_pci_core.c |  2 +
+>   drivers/vfio/pci/vfio_pci_zdev.c | 98 +++++++++++++++++++++++++++++++-
+>   include/linux/vfio_pci_core.h    | 10 ++++
+>   include/uapi/linux/vfio.h        |  7 +++
+>   include/uapi/linux/vfio_zdev.h   | 20 +++++++
+>   6 files changed, 138 insertions(+), 1 deletion(-)
 > 
-> I'm still completely mystified why you think we need to bump the
-> sub-type at all??
+> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+> index dc00c3f27a00..dbab349a4a75 100644
+> --- a/arch/s390/include/asm/kvm_pci.h
+> +++ b/arch/s390/include/asm/kvm_pci.h
+> @@ -36,6 +36,8 @@ struct kvm_zdev {
+>   	struct zpci_fib fib;
+>   	struct notifier_block nb;
+>   	bool interp;
+> +	bool aif;
+> +	bool fhost;
+>   };
+>   
+>   int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 2b2d64a2190c..01658de660bd 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1174,6 +1174,8 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+>   			return 0;
+>   		case VFIO_DEVICE_FEATURE_ZPCI_INTERP:
+>   			return vfio_pci_zdev_feat_interp(vdev, feature, arg);
+> +		case VFIO_DEVICE_FEATURE_ZPCI_AIF:
+> +			return vfio_pci_zdev_feat_aif(vdev, feature, arg);
+>   		default:
+>   			return -ENOTTY;
+>   		}
+> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+> index 4339f48b98bc..891cfa016d63 100644
+> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+> @@ -13,6 +13,7 @@
+>   #include <linux/vfio_zdev.h>
+>   #include <asm/pci_clp.h>
+>   #include <asm/pci_io.h>
+> +#include <asm/pci_insn.h>
+>   #include <asm/kvm_pci.h>
+>   
+>   #include <linux/vfio_pci_core.h>
+> @@ -208,6 +209,99 @@ int vfio_pci_zdev_feat_interp(struct vfio_pci_core_device *vdev,
+>   	return rc;
+>   }
+>   
+> +int vfio_pci_zdev_feat_aif(struct vfio_pci_core_device *vdev,
+> +			   struct vfio_device_feature feature,
+> +			   unsigned long arg)
+> +{
+> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
+> +	struct vfio_device_zpci_aif *data;
+> +	struct vfio_device_feature *feat;
+> +	unsigned long minsz;
+> +	int size, rc = 0;
+> +
+> +	if (!zdev || !zdev->kzdev)
+> +		return -EINVAL;
+> +
+> +	/* If PROBE specified, return probe results immediately */
+> +	if (feature.flags & VFIO_DEVICE_FEATURE_PROBE)
+> +		return kvm_s390_pci_aif_probe(zdev);
+> +
+> +	/* GET and SET are mutually exclusive */
+> +	if ((feature.flags & VFIO_DEVICE_FEATURE_GET) &&
+> +	    (feature.flags & VFIO_DEVICE_FEATURE_SET))
+> +		return -EINVAL;
+> +
+> +	size = sizeof(*feat) + sizeof(*data);
+> +	feat = kzalloc(size, GFP_KERNEL);
+> +	if (!feat)
+> +		return -ENOMEM;
+> +
+> +	data = (struct vfio_device_zpci_aif *)&feat->data;
+> +	minsz = offsetofend(struct vfio_device_feature, flags);
+> +
+> +	if (feature.argsz < minsz + sizeof(*data))
+> +		return -EINVAL;
+> +
+> +	/* Get the rest of the payload for GET/SET */
+> +	rc = copy_from_user(data, (void __user *)(arg + minsz),
+> +			    sizeof(*data));
+> +	if (rc)
+> +		rc = -EINVAL;
+> +
+> +	if (feature.flags & VFIO_DEVICE_FEATURE_GET) {
+> +		if (zdev->kzdev->aif)
+> +			data->flags = VFIO_DEVICE_ZPCI_FLAG_AIF_FLOAT;
+> +		if (zdev->kzdev->fhost)
+> +			data->flags |= VFIO_DEVICE_ZPCI_FLAG_AIF_HOST;
+> +
+> +		if (copy_to_user((void __user *)arg, feat, size))
+> +			rc = -EFAULT;
+> +	} else if (feature.flags & VFIO_DEVICE_FEATURE_SET) {
+> +		if (data->flags & VFIO_DEVICE_ZPCI_FLAG_AIF_FLOAT) {
+> +			/* create a guest fib */
+> +			struct zpci_fib fib;
+> +
+> +			fib.fmt0.aibv = data->ibv;
+> +			fib.fmt0.isc = data->isc;
+> +			fib.fmt0.noi = data->noi;
+> +			if (data->sb != 0) {
+> +				fib.fmt0.aisb = data->sb;
+> +				fib.fmt0.aisbo = data->sbo;
+> +				fib.fmt0.sum = 1;
+> +			} else {
+> +				fib.fmt0.aisb = 0;
+> +				fib.fmt0.aisbo = 0;
+> +				fib.fmt0.sum = 0;
+> +			}
+> +			if (data->flags & VFIO_DEVICE_ZPCI_FLAG_AIF_HOST) {
+> +				rc = kvm_s390_pci_aif_enable(zdev, &fib, false);
+> +				if (!rc) {
+> +					zdev->kzdev->aif = true;
+> +					zdev->kzdev->fhost = true;
+> +				}
+> +			} else {
+> +				rc = kvm_s390_pci_aif_enable(zdev, &fib, true);
+> +				if (!rc)
+> +					zdev->kzdev->aif = true;
+> +			}
+> +		} else if (data->flags == 0) {
+> +			rc = kvm_s390_pci_aif_disable(zdev);
+> +			if (!rc) {
+> +				zdev->kzdev->aif = false;
+> +				zdev->kzdev->fhost = false;
+> +			}
+> +		} else {
+> +			rc = -EINVAL;
+> +		}
+> +	} else {
+> +		/* Neither GET nor SET were specified */
+> +		rc = -EINVAL;
+> +	}
+> +
+> +	kfree(feat);
+> +	return rc;
+> +}
+> +
+>   static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
+>   					unsigned long action, void *data)
+>   {
+> @@ -255,8 +349,10 @@ void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
+>   	 * If the device was using interpretation, don't trust that userspace
+>   	 * did the appropriate cleanup
+>   	 */
+> -	if (zdev->gd != 0)
+> +	if (zdev->gd != 0) {
+> +		kvm_s390_pci_aif_disable(zdev);
+>   		kvm_s390_pci_interp_disable(zdev);
+> +	}
+>   
+>   	kvm_s390_pci_dev_release(zdev);
+>   }
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index 0db2b1051931..7ec5e82e7933 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -201,6 +201,9 @@ extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+>   int vfio_pci_zdev_feat_interp(struct vfio_pci_core_device *vdev,
+>   			      struct vfio_device_feature feature,
+>   			      unsigned long arg);
+> +int vfio_pci_zdev_feat_aif(struct vfio_pci_core_device *vdev,
+> +			   struct vfio_device_feature feature,
+> +			   unsigned long arg);
+>   void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev);
+>   void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev);
+>   #else
+> @@ -217,6 +220,13 @@ static inline int vfio_pci_zdev_feat_interp(struct vfio_pci_core_device *vdev,
+>   	return -ENOTTY;
+>   }
+>   
+> +static inline int vfio_pci_zdev_feat_aif(struct vfio_pci_core_device *vdev,
+> +					 struct vfio_device_feature feature,
+> +					 unsigned long arg)
+> +{
+> +	return -ENOTTY;
+> +}
+> +
+>   static inline void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
+>   {
+>   }
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index b9a75485b8e7..fe3bfd99bf50 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1009,6 +1009,13 @@ struct vfio_device_feature {
+>    */
+>   #define VFIO_DEVICE_FEATURE_ZPCI_INTERP		(1)
+>   
+> +/*
+> + * Provide support for enbaling adapter interruption forwarding for zPCI
+> + * devices.  This feature is only valid for s390x PCI devices.  Data provided
+> + * when setting and getting this feature is further described in vfio_zdev.h
+> + */
+> +#define VFIO_DEVICE_FEATURE_ZPCI_AIF		(2)
+> +
+>   /* -------- API for Type1 VFIO IOMMU -------- */
+>   
+>   /**
+> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
+> index 575f0410dc66..c574e23f9385 100644
+> --- a/include/uapi/linux/vfio_zdev.h
+> +++ b/include/uapi/linux/vfio_zdev.h
+> @@ -90,4 +90,24 @@ struct vfio_device_zpci_interp {
+>   	__u32 fh;		/* Host device function handle */
+>   };
+>   
+> +/**
+> + * VFIO_DEVICE_FEATURE_ZPCI_AIF
+> + *
+> + * This feature is used for enabling forwarding of adapter interrupts directly
+> + * from firmware to the guest.  When setting this feature, the flags indicate
+> + * whether to enable/disable the feature and the structure defined below is
+> + * used to setup the forwarding structures.  When getting this feature, only
+> + * the flags are used to indicate the current state.
+> + */
+> +struct vfio_device_zpci_aif {
+> +	__u64 flags;
+> +#define VFIO_DEVICE_ZPCI_FLAG_AIF_FLOAT 1
+> +#define VFIO_DEVICE_ZPCI_FLAG_AIF_HOST 2
+
+Generaly it looks good to me but I miss some explanation on these flags.
+
+Which makes me realize that a more complete documentation under 
+Documentation/S390 for VFIO zPCI as we have for VFIO AP and VFIO CCW 
+would be of great interest.
+
+
+> +	__u64 ibv;		/* Address of guest interrupt bit vector */
+> +	__u64 sb;		/* Address of guest summary bit */
+> +	__u32 noi;		/* Number of interrupts */
+> +	__u8 isc;		/* Guest interrupt subclass */
+> +	__u8 sbo;		/* Offset of guest summary bit vector */
+> +};
+> +
+>   #endif
 > 
-> If you insist, but I'd like a good reason because I know it is going
-> to hurt a bunch of people out there. ie can you point at something
-> that is actually practically incompatible?
 
-I'm equally as mystified who is going to break by bumping the sub-type.
-QEMU support is experimental and does not properly handle multiple
-devices.  I'm only aware of one proprietary driver that includes
-migration code, but afaik it's not supported due to the status of QEMU.
-
-Using a new sub-type allows us an opportunity to update QEMU to fully
-support this new uAPI without any baggage to maintain support for the
-v1 uAPI or risk breaking unknown users.
-
-Minimally QEMU support needs to be marked non-experimental before I
-feel like we're really going to "hurt a bunch of people", so it really
-ought not to be an issue to revise support to the new uAPI at the same
-time.
-
-If a hypervisor vendor has chosen to run with experimental QEMU
-support, it's on them to handle long term support and a transition plan
-and I think that's also easier to do when it's clear whether the device
-is exposing the original migration uAPI or the updated FSM model with
-p2p states and an arc-supported ioctl.  Thanks,
-
-Alex
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
