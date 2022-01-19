@@ -2,179 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12F9249422B
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 21:57:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2736F494302
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 23:25:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244713AbiASU4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 15:56:38 -0500
-Received: from mga17.intel.com ([192.55.52.151]:54135 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229541AbiASU4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 15:56:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642625797; x=1674161797;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Zn3K2EdVeDLJCMJ0xbcykPqu/tTiNlke9kM/JdHhcyA=;
-  b=UKP5BPWQ+uw2sBH+BM1UqeeTghbHvgaSjb/HR8XqV2m/L0x+YVEmxOGG
-   flhgx042uwtvDmyFlbH1w3PHokLzPGv6z+k+i45vi98jaPXt+vr175APx
-   AbZt1GcjiOufYlT52vxr4qzItwd0SVdtcN8WG3VZf89UFYd8sgki/FTZ0
-   nAJVaJF3b9itTPyNWKR/tIDClRlUTOZwB+qhiCz2ulEGjz2iqqn3ekqLu
-   wBY0+mwl9tNWjORFuFbtJE0r88oQiNJ8px6dZJvxRVbsCoXYnnCWjk+qF
-   bKdDmFFe8Dlc4vZoy0A9phMp1kTFErGo9dZCebUQjx5RAQ/pMMDiEL2gZ
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10231"; a="225862988"
-X-IronPort-AV: E=Sophos;i="5.88,300,1635231600"; 
-   d="scan'208";a="225862988"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 12:56:37 -0800
-X-IronPort-AV: E=Sophos;i="5.88,300,1635231600"; 
-   d="scan'208";a="615845335"
-Received: from smile.fi.intel.com ([10.237.72.61])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 12:56:21 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.95)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1nAHz3-00CGxM-Ht;
-        Wed, 19 Jan 2022 22:55:09 +0200
-Date:   Wed, 19 Jan 2022 22:55:09 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        platform-driver-x86@vger.kernel.org,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        John Garry <john.garry@huawei.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        openipmi-developer@lists.sourceforge.net,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Benson Leung <bleung@chromium.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Niklas =?iso-8859-1?Q?S=F6derlund?= 
-        <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] driver core: platform: Rename
- platform_get_irq_optional() to platform_get_irq_silent()
-Message-ID: <Yeh6rdBjEMiavLfh@smile.fi.intel.com>
-References: <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
- <Yd9L9SZ+g13iyKab@sirena.org.uk>
- <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
- <YeA7CjOyJFkpuhz/@sirena.org.uk>
- <20220113194358.xnnbhsoyetihterb@pengutronix.de>
- <YeF05vBOzkN+xYCq@smile.fi.intel.com>
- <20220115154539.j3tsz5ioqexq2yuu@pengutronix.de>
- <YehdsUPiOTwgZywq@smile.fi.intel.com>
- <b7edb713-dd91-14e7-34ff-d8fb559e8e92@omp.ru>
+        id S232704AbiASWZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 17:25:32 -0500
+Received: from gandalf.ozlabs.org ([150.107.74.76]:52633 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1357489AbiASWZb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 17:25:31 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JfKw91KTXz4y3q;
+        Thu, 20 Jan 2022 09:25:28 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1642631129;
+        bh=HUdoUmXAE4umbq1ha82W4mzfeV6PIiWF9Q2FlUbPvhg=;
+        h=Date:From:To:Cc:Subject:From;
+        b=kot4OaUkUGOhlUT+7MXUvBZXx3gI0a6zPGKst2UDvK83yrHlpkmGkmyYmCyHF5aom
+         vXG3fycxnCL+7+Nn6ZHpWroq9gGR8RM0omi1bdi3cIeRrT5bL5ANgtgCOQwpAhKMrd
+         ptfmBB9jZhRRgMcvECVqlE6+0TuhOlQvc7hdwocpPKxDxomP1OPOSb3Vj4f+wcY/D4
+         PUzy6XVD277dp/t7HdyzmcTbKyf2P2Djis/77KqmpGzUysHXFvRmm4j7oDufqLt4GM
+         6NioQUwYNH/nCYPActkdAUdQDWuOMLlXRR9ZPw4Vza6COHJ0wqINzJtU4zdvPPPnzG
+         B9mQz/dQ4fPPQ==
+Date:   Thu, 20 Jan 2022 09:25:27 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: linux-next: manual merge of the kvm-fixes tree with Linus' tree
+Message-ID: <20220120092527.71e3a85f@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7edb713-dd91-14e7-34ff-d8fb559e8e92@omp.ru>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: multipart/signed; boundary="Sig_/SwT/asWo.n/bgmzssX9Tue0";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 10:47:06PM +0300, Sergey Shtylyov wrote:
-> On 1/19/22 9:51 PM, Andy Shevchenko wrote:
+--Sig_/SwT/asWo.n/bgmzssX9Tue0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> >>>>> It'd certainly be good to name anything that doesn't correspond to one
-> >>>>> of the existing semantics for the API (!) something different rather
-> >>>>> than adding yet another potentially overloaded meaning.
-> >>>>
-> >>>> It seems we're (at least) three who agree about this. Here is a patch
-> >>>> fixing the name.
-> >>>
-> >>> And similar number of people are on the other side.
-> >>
-> >> If someone already opposed to the renaming (and not only the name) I
-> >> must have missed that.
-> >>
-> >> So you think it's a good idea to keep the name
-> >> platform_get_irq_optional() despite the "not found" value returned by it
-> >> isn't usable as if it were a normal irq number?
-> > 
-> > I meant that on the other side people who are in favour of Sergey's patch.
-> > Since that I commented already that I opposed the renaming being a standalone
-> > change.
-> > 
-> > Do you agree that we have several issues with platform_get_irq*() APIs?
-> > 
-> > 1. The unfortunate naming
-> 
->    Mmm, "what's in a name?"... is this the topmost prio issue?
+Hi all,
 
-The order is arbitrary.
+Today's linux-next merge of the kvm-fixes tree got a conflict in:
 
-> > 2. The vIRQ0 handling: a) WARN() followed by b) returned value 0
-> 
->    This is the most severe issue, I think...
-> 
-> > 3. The specific cookie for "IRQ not found, while no error happened" case
+  arch/x86/kvm/vmx/posted_intr.c
 
--- 
-With Best Regards,
-Andy Shevchenko
+between commits:
 
+  c95717218add ("KVM: VMX: Drop unnecessary PI logic to handle impossible c=
+onditions")
+  29802380b679 ("KVM: VMX: Drop pointless PI.NDST update when blocking")
+  89ef0f21cf96 ("KVM: VMX: Save/restore IRQs (instead of CLI/STI) during PI=
+ pre/post block")
+  cfb0e1306a37 ("KVM: VMX: Read Posted Interrupt "control" exactly once per=
+ loop iteration")
+  baed82c8e489 ("KVM: VMX: Remove vCPU from PI wakeup list before updating =
+PID.NV")
+  45af1bb99b72 ("KVM: VMX: Clean up PI pre/post-block WARNs")
 
+from Linus' tree and commit:
+
+  5f02ef741a78 ("KVM: VMX: switch blocked_vcpu_on_cpu_lock to raw spinlock")
+
+from the kvm-fixes tree.
+
+I fixed it up (I think - see below) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+It may be worth while rebasing this fix on top of Linus' current tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/x86/kvm/vmx/posted_intr.c
+index 88c53c521094,21ea58d25771..000000000000
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@@ -11,23 -11,11 +11,23 @@@
+  #include "vmx.h"
+ =20
+  /*
+ - * We maintain a per-CPU linked-list of vCPU, so in wakeup_handler() we
+ - * can find which vCPU should be waken up.
+ + * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_ha=
+ndler()
+ + * when a WAKEUP_VECTOR interrupted is posted.  vCPUs are added to the li=
+st when
+ + * the vCPU is scheduled out and is blocking (e.g. in HLT) with IRQs enab=
+led.
+ + * The vCPUs posted interrupt descriptor is updated at the same time to s=
+et its
+ + * notification vector to WAKEUP_VECTOR, so that posted interrupt from de=
+vices
+ + * wake the target vCPUs.  vCPUs are removed from the list and the notifi=
+cation
+ + * vector is reset when the vCPU is scheduled in.
+   */
+  static DEFINE_PER_CPU(struct list_head, blocked_vcpu_on_cpu);
+ +/*
+-  * Protect the per-CPU list with a per-CPU spinlock to handle task migrat=
+ion.
+++ * Protect the per-CPU list with a per-CPU raw_spinlock to handle task mi=
+gration.
+ + * When a blocking vCPU is awakened _and_ migrated to a different pCPU, t=
+he
+ + * ->sched_in() path will need to take the vCPU off the list of the _prev=
+ious_
+ + * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock =
+will
+ + * occur if a wakeup IRQ arrives and attempts to acquire the lock.
+ + */
+- static DEFINE_PER_CPU(spinlock_t, blocked_vcpu_on_cpu_lock);
++ static DEFINE_PER_CPU(raw_spinlock_t, blocked_vcpu_on_cpu_lock);
+ =20
+  static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
+  {
+@@@ -129,25 -103,17 +129,25 @@@ static void __pi_post_block(struct kvm_
+  	struct pi_desc old, new;
+  	unsigned int dest;
+ =20
+ -	do {
+ -		old.control =3D new.control =3D pi_desc->control;
+ -		WARN(old.nv !=3D POSTED_INTR_WAKEUP_VECTOR,
+ -		     "Wakeup handler not enabled while the VCPU is blocked\n");
+ +	/*
+ +	 * Remove the vCPU from the wakeup list of the _previous_ pCPU, which
+ +	 * will not be the same as the current pCPU if the task was migrated.
+ +	 */
+- 	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+++	raw_spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+ +	list_del(&vcpu->blocked_vcpu_list);
+- 	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+++	raw_spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+ =20
+ -		dest =3D cpu_physical_id(vcpu->cpu);
+ +	dest =3D cpu_physical_id(vcpu->cpu);
+ +	if (!x2apic_mode)
+ +		dest =3D (dest << 8) & 0xFF00;
+ =20
+ -		if (x2apic_mode)
+ -			new.ndst =3D dest;
+ -		else
+ -			new.ndst =3D (dest << 8) & 0xFF00;
+ +	WARN(pi_desc->nv !=3D POSTED_INTR_WAKEUP_VECTOR,
+ +	     "Wakeup handler not enabled while the vCPU was blocking");
+ +
+ +	do {
+ +		old.control =3D new.control =3D READ_ONCE(pi_desc->control);
+ +
+ +		new.ndst =3D dest;
+ =20
+  		/* set 'NV' to 'notification vector' */
+  		new.nv =3D POSTED_INTR_VECTOR;
+@@@ -170,27 -143,45 +170,27 @@@
+   */
+  int pi_pre_block(struct kvm_vcpu *vcpu)
+  {
+ -	unsigned int dest;
+  	struct pi_desc old, new;
+  	struct pi_desc *pi_desc =3D vcpu_to_pi_desc(vcpu);
+ +	unsigned long flags;
+ =20
+ -	if (!vmx_can_use_vtd_pi(vcpu->kvm))
+ +	if (!vmx_can_use_vtd_pi(vcpu->kvm) ||
+ +	    vmx_interrupt_blocked(vcpu))
+  		return 0;
+ =20
+ -	WARN_ON(irqs_disabled());
+ -	local_irq_disable();
+ -	if (!WARN_ON_ONCE(vcpu->pre_pcpu !=3D -1)) {
+ -		vcpu->pre_pcpu =3D vcpu->cpu;
+ -		raw_spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+ -		list_add_tail(&vcpu->blocked_vcpu_list,
+ -			      &per_cpu(blocked_vcpu_on_cpu,
+ -				       vcpu->pre_pcpu));
+ -		raw_spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+ -	}
+ +	local_irq_save(flags);
+ +
+ +	vcpu->pre_pcpu =3D vcpu->cpu;
+- 	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
+++	raw_spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
+ +	list_add_tail(&vcpu->blocked_vcpu_list,
+ +		      &per_cpu(blocked_vcpu_on_cpu, vcpu->cpu));
+- 	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
+++	raw_spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
+ +
+ +	WARN(pi_desc->sn =3D=3D 1,
+ +	     "Posted Interrupt Suppress Notification set before blocking");
+ =20
+  	do {
+ -		old.control =3D new.control =3D pi_desc->control;
+ -
+ -		WARN((pi_desc->sn =3D=3D 1),
+ -		     "Warning: SN field of posted-interrupts "
+ -		     "is set before blocking\n");
+ -
+ -		/*
+ -		 * Since vCPU can be preempted during this process,
+ -		 * vcpu->cpu could be different with pre_pcpu, we
+ -		 * need to set pre_pcpu as the destination of wakeup
+ -		 * notification event, then we can find the right vCPU
+ -		 * to wakeup in wakeup handler if interrupts happen
+ -		 * when the vCPU is in blocked state.
+ -		 */
+ -		dest =3D cpu_physical_id(vcpu->pre_pcpu);
+ -
+ -		if (x2apic_mode)
+ -			new.ndst =3D dest;
+ -		else
+ -			new.ndst =3D (dest << 8) & 0xFF00;
+ +		old.control =3D new.control =3D READ_ONCE(pi_desc->control);
+ =20
+  		/* set 'NV' to 'wakeup vector' */
+  		new.nv =3D POSTED_INTR_WAKEUP_VECTOR;
+@@@ -229,10 -220,10 +229,10 @@@ void pi_wakeup_handler(void
+  			blocked_vcpu_list) {
+  		struct pi_desc *pi_desc =3D vcpu_to_pi_desc(vcpu);
+ =20
+ -		if (pi_test_on(pi_desc) =3D=3D 1)
+ +		if (pi_test_on(pi_desc))
+  			kvm_vcpu_kick(vcpu);
+  	}
+- 	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
++ 	raw_spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+  }
+ =20
+  void __init pi_init_cpu(int cpu)
+
+--Sig_/SwT/asWo.n/bgmzssX9Tue0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHoj9cACgkQAVBC80lX
+0Gxd9wf8DAP2lOImp9lnQArh/E/fz55khWRz9nh70lEZNgr8fB5bkL377MEkPEBU
+R096IX2DeDRPNiLOJGkyCOanzp6TbFKEcfQ1TPTtb4mFd9igcgLUqkTirwIA/wRP
+WpOAa+wRE3sxXwEDKKBFzsab8NTaGT26ygl/3KnbECqgPlJu5JD63ZK29OT6+v/9
+3fkorntB0p88kR0NnQWfkJrZ6xPwx+X1TIkZvtgbPrThGCFK/P5siNI6Zdd5F9vP
+iV1z/cVfo+RTwHIJC1vG5zpVcex0TExdubIkSs7AWRpTTv53zNWI1cWAJ9b/knUk
+g00pm3vVW858FPesIoJI1Eizb4KOXg==
+=1Eg8
+-----END PGP SIGNATURE-----
+
+--Sig_/SwT/asWo.n/bgmzssX9Tue0--
