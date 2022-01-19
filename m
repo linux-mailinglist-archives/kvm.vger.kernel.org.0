@@ -2,176 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52D9E4937E3
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:02:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C331493808
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:16:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353414AbiASKCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 05:02:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40338 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1353090AbiASKCr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 05:02:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642586567;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=abfS2icOuWpdTxqSWF3BYTWApiC68lAeGLn8EnVYmNE=;
-        b=YlbbI8pLK7jYe3sucLTEXUx1nNHLFnyKOJHBTmNP3wcRTukaXTTs4+4xKIFUksginOJdl+
-        pYB8+b/KMfhf35Q80aYVYixlFqZLx7OfV/kkDls4ldfMYmLVOTJ9/UhCuYHJ46SdibSORT
-        IFDELC7YFYllxLt3a6jEp9eBF1YO4ls=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-638-sN784ZbxNESF1Xj64s17Zg-1; Wed, 19 Jan 2022 05:02:46 -0500
-X-MC-Unique: sN784ZbxNESF1Xj64s17Zg-1
-Received: by mail-ed1-f71.google.com with SMTP id h11-20020a05640250cb00b003fa024f87c2so1828689edb.4
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 02:02:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=abfS2icOuWpdTxqSWF3BYTWApiC68lAeGLn8EnVYmNE=;
-        b=cxLuozma2uFCAZLUFuHejNRq5w/zPeR9toEhL8doDwXst/l7BTuWbSrCNr/cMUkKzR
-         md2PbqXIJlbs4qnW1sVuqb0osI31PVaxZPsT8fpmppik4PZsLnqWbOZ7Ce5/h4JhB87E
-         tmVL3WuYD3WMD3KN/uq/9Mb1fav87WOZj2PtBMa+jFoIdfTKR0Tf4bGEboKBmnKUc+q4
-         lbWO2N3pAoLv/QUCSZJ/RqwBwpfZhj5mhznH7gTexiQaebllLrbVUocljXhWTo34oXN4
-         Y5w4FNuvSJeEyLwrXVDd/ZlR8p5UWMUZUhKe2QrpdkJxfT6oPbp24WpzQBeZb7UtZ3xM
-         W7TQ==
-X-Gm-Message-State: AOAM5308XXNcDsx+cQXEOBXz+zfE7+jA6GndLDplvC7uGlsk3BtykK45
-        yExqhqWiKVKgAvoVJO1boGcflq4MeogzPwVdDqzFRF9yk8xjhCT0YVZjMiePZo8fYVLxh2wU1vJ
-        O4IRE2nypalHd
-X-Received: by 2002:a17:906:9743:: with SMTP id o3mr23422696ejy.162.1642586564792;
-        Wed, 19 Jan 2022 02:02:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzKs3tvi7eu0pEo37qMQnxQYuOPsJEa/XhNVcVFXAYh96CC1F8BGlQlduqYlTUKe8iKLBUVkA==
-X-Received: by 2002:a17:906:9743:: with SMTP id o3mr23422671ejy.162.1642586564494;
-        Wed, 19 Jan 2022 02:02:44 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i26sm981649edq.28.2022.01.19.02.02.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 02:02:44 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/4] KVM: x86: Partially allow KVM_SET_CPUID{,2}
- after KVM_RUN
-In-Reply-To: <Yebs21Vnt4WBQBw5@google.com>
-References: <20220118141801.2219924-1-vkuznets@redhat.com>
- <20220118141801.2219924-3-vkuznets@redhat.com>
- <Yebs21Vnt4WBQBw5@google.com>
-Date:   Wed, 19 Jan 2022 11:02:43 +0100
-Message-ID: <878rvckpq4.fsf@redhat.com>
+        id S1353507AbiASKPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 05:15:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43284 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353474AbiASKPw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 05:15:52 -0500
+Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C97C061574;
+        Wed, 19 Jan 2022 02:15:51 -0800 (PST)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: usama.anjum)
+        with ESMTPSA id 7FB081F44427
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1642587349;
+        bh=XYDVAxDFFZ3GjKZiYyLIQ7Ax/B1PlxHAo12P/LTWddY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=QyNw3SnikBjxgmXldT58LDxt+66FxBTgRH/NFcT508gIl9Mo/FfR5aLJfGlutBmBh
+         TiNACBRkmu1H+lpBMOChjSwlTXNzv/uov/IfDI5sCYV25iGqHYmXS9lE0rlQhLCnit
+         KhRu728rGpQQTLF3vwYnT6k0kEOKnqaJC/O/C/ovuzrJf1x43QWkD4ZCVC9EG5h/83
+         NGwXJjN/JtVN2u5Nvk/bBOIG80m3VM1PqMNzh56eDaoqadx2Jz1MrAjgesDzGW/T8Z
+         wsGhO5dStqXKya0txfhufgUBcLmMBHnY1S1x0HOjI32Q/LEYyh5wGcxijiG8ugVVtl
+         SFNIHZFa3tYcQ==
+From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
+To:     Shuah Khan <shuah@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        chiminghao <chi.minghao@zte.com.cn>,
+        linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
+        linux-kernel@vger.kernel.org (open list),
+        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
+        linux-security-module@vger.kernel.org (open list:LANDLOCK SECURITY
+        MODULE), netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+        mptcp@lists.linux.dev (open list:NETWORKING [MPTCP]),
+        linux-mm@kvack.org (open list:MEMORY MANAGEMENT)
+Cc:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
+        kernel@collabora.com
+Subject: [PATCH V2 00/10] selftests: Fix separate output directory builds
+Date:   Wed, 19 Jan 2022 15:15:21 +0500
+Message-Id: <20220119101531.2850400-1-usama.anjum@collabora.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Build of several selftests fail if separate output directory is
+specified by the following methods:
+1) make -C tools/testing/selftests O=<build_dir>
+2) export KBUILD_OUTPUT="build_dir"; make -C tools/testing/selftests
 
-> On Tue, Jan 18, 2022, Vitaly Kuznetsov wrote:
->> +/* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
->> +static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
->> +				 int nent)
->> +{
->> +	struct kvm_cpuid_entry2 *orig;
->> +	int i;
->> +
->> +	if (nent != vcpu->arch.cpuid_nent)
->> +		return -EINVAL;
->> +
->> +	for (i = 0; i < nent; i++) {
->> +		orig = &vcpu->arch.cpuid_entries[i];
->> +		if (e2[i].function != orig->function ||
->> +		    e2[i].index != orig->index ||
->> +		    e2[i].eax != orig->eax || e2[i].ebx != orig->ebx ||
->> +		    e2[i].ecx != orig->ecx || e2[i].edx != orig->edx)
->> +			return -EINVAL;
->
-> This needs to check .flags for the above check on .index to be meaningful, and at
-> that point, can't we be even more agressive and just do?
->
-> 	if (memcmp(e2, vcpu->arch.cpuid_entries, nent * sizeof(e2)))
-> 		return -EINVAL;
->
-> 	return 0;
->
+Build fails because of several reasons:
+1) The kernel headers aren't found.
+2) The path of output objects is wrong and hence unaccessible.
 
-Sure, looks good to me.
+These problems can be solved by:
+1) Including the correct path of uapi header files
+2) By setting the BUILD variable correctly inside Makefile
 
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  static void kvm_update_kvm_cpuid_base(struct kvm_vcpu *vcpu)
->>  {
->>  	u32 function;
->> @@ -313,6 +335,20 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
->>  
->>  	__kvm_update_cpuid_runtime(vcpu, e2, nent);
->> +	/*
->> +	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
->> +	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
->> +	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
->> +	 * faults due to reusing SPs/SPTEs. In practice no sane VMM mucks with
->> +	 * the core vCPU model on the fly. It would've been better to forbid any
->> +	 * KVM_SET_CPUID{,2} calls after KVM_RUN altogether but unfortunately
->> +	 * some VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
->> +	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
->> +	 * whether the supplied CPUID data is equal to what's already set.
->
-> This is misleading/wrong. KVM_RUN isn't the only problematic ioctl(),
+Following different build scenarios have been tested after making these
+changes to verify that nothing gets broken with these changes:
+make -C tools/testing/selftests
+make -C tools/testing/selftests/futex
+make -C tools/testing/selftests/kvm
+make -C tools/testing/selftests/landlock
+make -C tools/testing/selftests/net
+make -C tools/testing/selftests/net/mptcp
+make -C tools/testing/selftests/vm
+make -C tools/testing/selftests O=build
+make -C tools/testing/selftests o=/opt/build
+export KBUILD_OUTPUT="/opt/build"; make -C tools/testing/selftests
+export KBUILD_OUTPUT="build"; make -C tools/testing/selftests
+cd <any_dir>; make -C <src_path>/tools/testing/selftests
+cd <any_dir>; make -C <src_path>/tools/testing/selftests O=build
 
-Well, it wasn't me who wrote the comment about KVM_RUN :-) My addition
-can be improved of course.
+---
+Changes in V2:
+        Revert the excessive cleanup which was breaking the individual
+test build.
 
-> it's just the one that we decided to use to detect that userspace is
-> being stupid.  And forbidding KVM_SET_CPUID after KVM_RUN (or even all
-> problematic ioctls()) wouldn't solve problem as providing different
-> CPUID configurations for vCPUs in a VM will also cause the MMU to fall
-> on its face.
+Muhammad Usama Anjum (10):
+  selftests: set the BUILD variable to absolute path
+  selftests: Add and export a kernel uapi headers path
+  selftests: Correct the headers install path
+  selftests: futex: Add the uapi headers include variable
+  selftests: kvm: Add the uapi headers include variable
+  selftests: landlock: Add the uapi headers include variable
+  selftests: net: Add the uapi headers include variable
+  selftests: mptcp: Add the uapi headers include variable
+  selftests: vm: Add the uapi headers include variable
+  selftests: vm: remove dependecy from internal kernel macros
 
-True, but how do we move forward? We can either let userspace do stupid
-things and (potentially) create hard-to-debug problems or we try to
-cover at least some use-cases with checks (like the one we introduce
-here).
-
-Different CPUID configurations for different vCPUs is actually an
-interesting case. It makes me (again) think about the
-allowlist/blocklist approaches: we can easily enhance the
-'vcpu->arch.last_vmentry_cpu != -1' check below and start requiring
-CPUIDs to [almost] match. The question then is how to change CPUID for a
-multi-vCPU guest as it will become effectively forbidden. BTW, is there
-a good use-case for changing CPUIDs besides testing purposes?
-
->
->> +	if (vcpu->arch.last_vmentry_cpu != -1)
->> +		return kvm_cpuid_check_equal(vcpu, e2, nent);
->
-> And technically, checking last_vmentry_cpu doesn't forbid changing CPUID after
-> KVM_RUN, it forbids changing CPUID after successfully entering the guest (or
-> emulating instructions on VMX).
->
-> I realize I'm being very pedantic, as a well-intended userspace is obviously not
-> going to change CPUID after -EINTR or whatever.  But I do want to highlight that
-> this approach is by no means bulletproof, and that what is/isn't allowed with
-> respect to guest CPUID isn't necessarily associated with what is/isn't "safe".
-> In other words, this check doesn't guarantee that userspace can't misuse KVM_SET_CPUID,
-> and on the flip side it disallows using KVM_SET_CPUID in ways that are perfectly ok
-> (if userspace is careful and deliberate).
-
-All true but I don't see a 'bulletproof' approach here unless we start
-designing new KVM API for userspace and I don't think the problem here
-is a good enough justification for that. Another approach would be to
-name the "don't change CPUIDs after KVM_RUN at will" comment in the code
-a good enough sentinel and hope that no real world userspace actually
-does such things.
+ tools/testing/selftests/Makefile              | 32 +++++++++++++------
+ .../selftests/futex/functional/Makefile       |  5 ++-
+ tools/testing/selftests/kvm/Makefile          |  2 +-
+ tools/testing/selftests/landlock/Makefile     |  2 +-
+ tools/testing/selftests/net/Makefile          |  2 +-
+ tools/testing/selftests/net/mptcp/Makefile    |  2 +-
+ tools/testing/selftests/vm/Makefile           |  2 +-
+ tools/testing/selftests/vm/userfaultfd.c      |  3 ++
+ 8 files changed, 32 insertions(+), 18 deletions(-)
 
 -- 
-Vitaly
+2.30.2
 
