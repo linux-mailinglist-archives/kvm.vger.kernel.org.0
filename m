@@ -2,221 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE4C449E554
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 16:00:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E9F449E83E
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 18:00:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238801AbiA0PAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 10:00:47 -0500
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:7596 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235483AbiA0PAq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 10:00:46 -0500
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.1.2/8.16.1.2) with ESMTP id 20REuegi000654
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 07:00:45 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=GRcrIr1gX0kHQmVMS9cm4xJeXE4kFAS5T39vBuMVnpU=;
- b=oJSAAzf2e4i++Fas+yoQ8ul/SIobVVcAUJBwBDBA4PQJPqC1Sl2g5PvQGXEJwYvRzKJI
- gum/UsQ1GEjSKsCXLE2hT6czwmM3dYSuR7vt4GMud07Ti0CzJFAQo+O+XAqBPUUnmHoB
- hAVoMN1ef90uY9joz9/NGhK25tu0ewFpP1E= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by m0001303.ppops.net (PPS) with ESMTPS id 3dujwbb3ep-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 07:00:45 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 27 Jan 2022 07:00:44 -0800
+        id S244226AbiA0RAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 12:00:36 -0500
+Received: from mail-bn8nam12on2053.outbound.protection.outlook.com ([40.107.237.53]:3040
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229861AbiA0RAe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 12:00:34 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LSVNJUE4wfJVPiL3o8HWhzi9eawsaQ7xHsfcZHtI7EX3iHPiUMBGIpjpOO4W/ouDLUTGq+1BIWFz8mDPJeg6stHR0uhBlBR9xRtcdjdO8gftKjQX/ye/E9hSWql3hZA+5/c9kuBz5LJmiGNsSfpwT179LZUXBPLWK08qwMqeNfBdLXsibgmNXmYD+t7M0aS+ObEQxvhPLhWhtrN6rZYvDodyXutzEB3Ttq/fOcK4OTudHyx+WWnQFP7qCfPqwMF7kJOtph7Zri7CXGhuYYUUrO5LBpt9IEfLSoewwpF55RwyTaGEKRE8C1VaRorFQm3DE2DclCrnA1kk0JAfmzRdtA==
+ b=jLdgbV+Ml0ySQLd4Lj//hXTEnvh1uhGOsriZpYbUCHc98Y81Pv98D5pNflrzyeMvdgwgkqCgdG2HTqvZp8bCBIq+0Z1aoETlLCY5Sta9T4hqUd7+fbrrezPShuKZSSsUFlaF8Y+JZyPXC+FZ8n2RHniLGQaaQeAnzHN8y5Pj8iQFF0oBwlBqVMR/BPZIwZelWo5i8ALeyC7+IN7ZfZ3C6tWRldIUEcTBiNGrqbqacnZsp5nX0tbwopgHF4P/GVK6V4ptO3svbRI1FLo5iRLq4AZuuS7d63YzxqLejEyBaiOdk6RFqjOcW0ob2feps0OcIe61o5T7Ea+koyoCIyWUnA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GRcrIr1gX0kHQmVMS9cm4xJeXE4kFAS5T39vBuMVnpU=;
- b=GnHch6UvEdPDKgYH/RIxK1uKXhfZa3YgJVW+DjgoqbQqybrBpUFmf3delabR4fgkEsxTNNfKLN4PPp21jLu85d9pRIk06/iVQuP4/F+YwsIrJDfNJFIB2zz52KxVii7T0j68sy9ebfmiLIijghVmW3WHiv/42w+4hvMfisZJD+7vPbYiMc83B3WaNgpl6PBzZQAdRN1D+IUCtoNPRrUU+YdYCBButsDY+XcpgCrwqmtEAcKKTNmVnXcCUSDZMqzd6Suw6raw3PGfsikrXjnjddmbevIKcFK/1QoN/NKwJL6HWfeFrnZ51VD5PTEnXGK94GeKlDwZFUG1M/7xRwBYVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from MN2PR15MB4287.namprd15.prod.outlook.com (2603:10b6:208:1b6::13)
- by DM6PR15MB3782.namprd15.prod.outlook.com (2603:10b6:5:2bd::10) with
+ bh=cunN01VHRVxIyA3QvZpAEHjVfiFejgrRcAVfPkofpY0=;
+ b=VKE8y1gSNaf6fIazqZOMAFD6LRWljsb8XzTo3XpYNmvHysQpTNlH8fE0pT5T//1Bza0CXTS0R36nYUG8YYEV7TbwFwjcwiUeYFhwgaTtI/oNf3FDYabStGT7ebciS6Y+DhKv73DlpnLWqZnftalflzIOC1QNKOxvvN7pGUh/fGQFvstO3M8m625SwDTxS91YHblAYg90il0WecOmA4MYfUWex6O1tmqyi1jUMjv3ooyoFYX0yfcBlb2AHvmX58JqZNTusWXjP4VGPDac44flbwxZQJV8yGn0JAsT8Tjn0i7sibU5H5eatAf/zyGNcsT2nvNVhgDE7pAjlciYAjj3rw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cunN01VHRVxIyA3QvZpAEHjVfiFejgrRcAVfPkofpY0=;
+ b=gPNID77eXTeJKK0M2jZAVTLKV78rWx0QFFF/9Za9Py86nHqrVc/XLMiUCB+EcCpK2Ad4taP2n3TYBVwXitoCepK3EvHtKppYDrnIMvjhWi9wEwH6kIilcyvF4ee6qS+PtlZXpyYSOOhfGqUUKsWa9c6S29WNx2NaIqam9Hwo8jc=
+Received: from BN9PR03CA0431.namprd03.prod.outlook.com (2603:10b6:408:113::16)
+ by SA1PR12MB5671.namprd12.prod.outlook.com (2603:10b6:806:23b::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17; Thu, 27 Jan
- 2022 15:00:42 +0000
-Received: from MN2PR15MB4287.namprd15.prod.outlook.com
- ([fe80::3102:7e69:9b1:3d30]) by MN2PR15MB4287.namprd15.prod.outlook.com
- ([fe80::3102:7e69:9b1:3d30%6]) with mapi id 15.20.4930.015; Thu, 27 Jan 2022
- 15:00:42 +0000
-From:   Chris Mason <clm@fb.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Boris Burkov <boris@bur.io>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.13; Thu, 27 Jan
+ 2022 17:00:32 +0000
+Received: from BN8NAM11FT019.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:113:cafe::3) by BN9PR03CA0431.outlook.office365.com
+ (2603:10b6:408:113::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.17 via Frontend
+ Transport; Thu, 27 Jan 2022 17:00:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT019.mail.protection.outlook.com (10.13.176.158) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4930.15 via Frontend Transport; Thu, 27 Jan 2022 17:00:31 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 27 Jan
+ 2022 11:00:25 -0600
+Date:   Wed, 19 Jan 2022 10:27:47 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Kernel Team <Kernel-team@fb.com>
-Subject: Re: [PATCH] KVM: use set_page_dirty rather than SetPageDirty
-Thread-Topic: [PATCH] KVM: use set_page_dirty rather than SetPageDirty
-Thread-Index: AQHYEu6ezDBN9b9XPkaUx3YvgIhZsax12f4AgAAUH4CAAA5vgIAAGk+AgADglYA=
-Date:   Thu, 27 Jan 2022 15:00:42 +0000
-Message-ID: <8D468962-7231-4000-935C-E4CD43BB0108@fb.com>
-References: <08b5b2c516b81788ca411dc031d403de4594755e.1643226777.git.boris@bur.io>
- <YfHEJpP+1c9QZxA0@google.com> <YfHVB5RmLZn2ku5M@zen>
- <3876CE62-6E66-4CCE-ADED-69010EA72394@fb.com> <YfH3NR+g0uRIruCc@google.com>
-In-Reply-To: <YfH3NR+g0uRIruCc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3693.40.0.1.81)
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 61e1a4ef-69da-4e01-3891-08d9e1a5ca1c
-x-ms-traffictypediagnostic: DM6PR15MB3782:EE_
-x-microsoft-antispam-prvs: <DM6PR15MB37820E0CAC65F088F94EF50BD3219@DM6PR15MB3782.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: CqlrZh7tegdbVMQruHHd132DUdQsp6HUVihW0BNMx20GtQRvG+Ah1f4kkE1wmD+qJyGK+Gp7Njf9SquiAPh4ZZalfOytAsp8I4loo8elghoyJcEJaTzna6BTliqSsmO/yIwfu8DYvji+hh9buwLsQtDU3K8lVM+P4PrqMdIsDyQucGWrZzSuTzigwXdLP5gdC8FYJVHXRzG35IFanQPow8dUfg8TaeRbLAbbi8zBqDQrgMWSxlXo8skQAZ6l95RlXb67IlJx6stIpOS+mLOp4y8bgVFqajM3zPdt2tYdry7w1e5qovRkL3gR38tEhp+t1C+l5bmeMW2IMvUxRKwskj9qe3+hCFGAE9omn64ZV50WXsuDHICHgu83OPfmKCP+EwCfnudsyaZY7oqBH4nXjMXfac5tMALwOTaoaXMZU0T6kZX0cKnViKATfuQ6QSeHA6Xgat1a+WLfd0cq704EPc09J3VVUNOiA5mOLmJFBsN5NATNzGsqUY4WmwNBA4VkCjnk2h4ed3xT6Uqzqo9nvQmtS9owHxk97SmbZk1gnv8xQGI+Lv/c6rPBUmLrDbSbpf1ksfqfx81REWdw3ryDeTGOJNMwMSV+1o4YU9GreYRyxTuycgA1HuLFj+cqoRlrFkKRQkjDXG/Fdtc+cP37j1SYa9O8jk3c3np6bsXiDRzOiq45Fwu06gycISN7RHr9ZmE7C28pGSxI1nUc6QC9aZ5oJQvf9x5JLP83K6DYr/cy/JKh+MxvaKEafOOdyZmLx43B2SqR6lDXPOyRT0cnPg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR15MB4287.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(86362001)(2906002)(8936002)(8676002)(316002)(4326008)(6512007)(6486002)(38070700005)(2616005)(6506007)(53546011)(186003)(54906003)(5660300002)(6916009)(71200400001)(508600001)(36756003)(76116006)(66446008)(83380400001)(33656002)(38100700002)(122000001)(66946007)(66556008)(66476007)(64756008)(14143004)(45980500001)(20210929001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TWdnZStTWUlDWEJUbzROSkVpazBKZE5pVWJxa1g5MGorUXVsWUpuNzJLd3dV?=
- =?utf-8?B?VVNGUERWdDh5NjlKS25UMUxzMElIM21IMWpyazVOSUdjSUVDV0JKam5RODl4?=
- =?utf-8?B?b0FSUk9IZ1NMSWNQWmw3djBmcldLWjRrQzNGUnpuZ1lBbjN6STIweEoxVzlO?=
- =?utf-8?B?TEVMdXdEZzI1NXFIM3lXMzBCeHZNTzhxa2JZc2xTUW1ZdHFISmFHaEJUOUlG?=
- =?utf-8?B?bytXb3FUL2ZzTU84ckpLeitlNi9xdDZmaU1DdnBGYkxlY2NrODY0YWpsNE9w?=
- =?utf-8?B?d3F6aWZySFhKcWduRDZsZXJja05acTBrcWFnaGdUbFM5N1BsU2FnT2pxb2VH?=
- =?utf-8?B?SkhsR0gzNWR1czNGaDJ3MVV3aFR4ZHRxMEMwbSt4aWpEcTFmNDVxclpNL1F1?=
- =?utf-8?B?cVhTTXk5eUtQODhoeXllcTJDbEVCMFRtVnlFeUM1VFR5MzVENmxYL2U1RERX?=
- =?utf-8?B?N3RHM1luSnU3TUpaSTI1VzNEKzJCUmxCeUFUWmlKa24yOXR2NWNOcHJIaUhk?=
- =?utf-8?B?WFRLYWx4R2NBYXJHLzUrSThVYnZLUHVaWkg0YXF2NloyaldoS2dpcy9pUXVk?=
- =?utf-8?B?dEtoWldHZG00RFhpQk9NSE5mQjRMZDdIUGtaN1ZTc21mZVJ0S1FQNFprYjJw?=
- =?utf-8?B?N2xKcll1TkI3d3Y2MzFjSXNLNEw0U04yNy93bWsrNlh4cW5FUUNWUHFaV3V3?=
- =?utf-8?B?SXlsaW05WEs0ZFBVZmpJVUtwbk9DTE1UZ1NiWFRmVnBINVFGR2E1R2lsRmJw?=
- =?utf-8?B?L1QrTmJkRE5UOVlnTXZ6RjNFVVh5OEVRdnFIVmNLQ2xQS2h5Ym9QTFNVY3Zx?=
- =?utf-8?B?SXFYUUw2M05icDdXVUpiVDVWcGdKNTBqOHlROS9qRERKaGJaU1owYmRxem95?=
- =?utf-8?B?aXFOTGluVFdzbWpzWjFCeUtQQ2wyS1UrRHliUTBSNjJPVDI5OVBvcFgrbTVt?=
- =?utf-8?B?cVVsd1BjNXU3TDdLSGZWV2lpb3U1STA5eGluUlFmWEExZ1FIUVV5bGhPcWxI?=
- =?utf-8?B?Q2pSQ0hrY3lTODE2SE9qeUJ2d3pLc2xRQkI4MUp2ZWwvNmt3dzF3aWhzRVc5?=
- =?utf-8?B?ak5sT0tzbmJvcmIwVjFFMjA4SDVYRTVOeHpTU2RialMxUGIwRlUvQVRuMlFV?=
- =?utf-8?B?V3d4dDczb2lNWWxMa3hSbktnU2pZL1pWNFZxM0huSE5sVlQzcXZJd2crUGZI?=
- =?utf-8?B?SVVFV2xzTUFLK09ETlBCczdSTUlHT001QW1NL25mQ2YyRlNaV3ZtRktrRW9I?=
- =?utf-8?B?c2w0L0FLNjgyUUtaaTZJdGZ5NnNKN1ZzR0k2Ny94TVdoeDFQbU0vbzN4TnBL?=
- =?utf-8?B?bTVaUzNxQXpLK2tJVTFCQ1V3eUxIdHlNUUlvM1l3REgzMHlxSC9BemhReXNi?=
- =?utf-8?B?K01BVHRlZG5FZE1xeUlFbDY5NzU3MDhXdjNoTDdLWG9RNXBqUFdtZ3VRT0E1?=
- =?utf-8?B?U3dxbXlFSG5uYzcvZzZCdTBmM1hiQzlzaGxGckc4N01RZVo3alE2Qkc0TGc0?=
- =?utf-8?B?WkNmV3hnS01SdUt0enZzK2VWT0lpVzI2L1BtU0EzT3dseHZWajh4T0o0MUE3?=
- =?utf-8?B?MlRDNUM5dEhFK1JheENZSjFWYkVXR2lKRm0wbTN3UGl3anA5WFg4cU55Y21D?=
- =?utf-8?B?TGFUZFNFeGNHc2FPZmJYTlBKVjNmaGRDUXA5S1QxWk9vUFRTbkQyUkEvMkhk?=
- =?utf-8?B?Y2Q0cTh2SnlKaWVOL1o4c3QxMVowNFczV0Eyd0ZqeGpQT25pcXB1RHJMa2lN?=
- =?utf-8?B?Wk9jTytMSmhoY2lRTTltRi8zQnFqbUFwa1dvSUlnWHhiSHpxMXhHVHhlODk3?=
- =?utf-8?B?eVlHVXUvNW41UzVaaW1wcVVFMmtKVCtFUG0ra2UrMk5Xb1l3ZkVZTllpN0pS?=
- =?utf-8?B?RDZ4SUpjemx4QmVKWEQrdldZcWk5d1VKWnpxZStOQ1cycGZORW9qWUNrQk1E?=
- =?utf-8?B?a1drUDZ1all0VnNybG5kL21ZNUJ1dHl3VmRIcXJXZWJVWFFWbDR6S0NBbytj?=
- =?utf-8?B?RTcrZGRGWnBYeFdlSkVKb1l0SE92M0U4dXpXSjRBWHpsaERxeDMrdWhwSXJm?=
- =?utf-8?B?Z1pyU0JxR0NJaFgyR0dCY3RCNnNPTjJHZytzUzkvYUZxcC9DMkFjU1JsWVdG?=
- =?utf-8?B?QTV1OSs4UVlxUDBsb1NRSmZEalFyL1NtM2JVMnJUUHU3UTV2Rk84Y2kvc2Jr?=
- =?utf-8?B?a0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <016EB57A7B3B304E864408E60696612B@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH v8 29/40] x86/compressed/64: add support for SEV-SNP
+ CPUID table in #VC handlers
+Message-ID: <20220119162747.ewgxirwcnrcajazm@amd.com>
+References: <YebIiN6Ftq2aPtyF@zn.tnic>
+ <20220118142345.65wuub2p3alavhpb@amd.com>
+ <20220118143238.lu22npcktxuvadwk@amd.com>
+ <20220118143730.wenhm2bbityq7wwy@amd.com>
+ <YebsKcpnYzvjaEjs@zn.tnic>
+ <20220118172043.djhy3dwg4fhhfqfs@amd.com>
+ <Yeb7vOaqDtH6Fpsb@zn.tnic>
+ <20220118184930.nnwbgrfr723qabnq@amd.com>
+ <20220119011806.av5rtxfv4et2sfkl@amd.com>
+ <YefzQuqrV8kdLr9z@zn.tnic>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR15MB4287.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61e1a4ef-69da-4e01-3891-08d9e1a5ca1c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2022 15:00:42.5867
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <YefzQuqrV8kdLr9z@zn.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 69d74272-89ac-49b7-fe42-08d9e1b686fc
+X-MS-TrafficTypeDiagnostic: SA1PR12MB5671:EE_
+X-Microsoft-Antispam-PRVS: <SA1PR12MB5671FD0B2E72B9D4F7630B5A95219@SA1PR12MB5671.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r8EycPUhCXElC6By25NxG8uxtrnScWXDZOS3p6LTos0iMt/zXYJqZ8J5kbyaDJ14FZSjnjUh+qLGyYLGgAnpen/qjTK6wOH1wW11x+V8VHgGp5VZZsEo020PDops54p/dK32sWGst2SGoZKkaWTWfKeYXm/y3ieHwTebYYJCyV2MtGo0F5HFFfySyPY2/VMo0+wnNzhl6uEmyxy8Qyl92ekogThID6Jqg7WO1yGohdxq+8AcPWDBju267AXtKvEwbQ059534WPFOyey9YrLpJ8WARJMu+8EJQJsHzRpQgYjTOSBktA0H4lKR0OMkqpxo/CPjdXEhMrd+/ZgXKoyEi0sl9pzhBty0vpO3/VNP/BuDjWcU1UkPKs5UN4iQk7tJ0mGJ/4gBIWDC27qhZcZPu/bB9n04D06yjuccem6RD0HV5B58rgQEVgeNJbQ3gcQgfkig2lOMYQbl9ypgR5McvJJdv/pxqZgJTZXQwP4egjlwwXyfpwWpdvjfB3R1sbVszdNJ3ccswNP07CFoLcHz8nhUhYR0GN3ogTvuSe5eoAgV7aF7zeJwAVzEtGuglPDie/WRZEg+UTNMV+TkPHUR80ymJb8mVFj36vsAxYdpcjFr4WC5sx5sMrZ3IfUDmbq8piEAMiBTOPb5xI2V7xrdC2mSU1ekM/WumZeTxcXq6DH4d814GzjIEcFjC27SPbWCDSNpnW1vOF40OlZu/P4tAAQW+MzXYyRNNY9fvzGMe2R9TVONpHOoZQttua/Dro75zmr0hAyOw+bsCvCSy9Ehju/6uv0BAnEPl0LU5n6Z8rk=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(40470700004)(36840700001)(46966006)(8676002)(2616005)(6666004)(1076003)(82310400004)(36860700001)(508600001)(16526019)(3716004)(186003)(70586007)(26005)(40460700003)(86362001)(426003)(4326008)(2906002)(54906003)(6916009)(7416002)(81166007)(7406005)(36756003)(83380400001)(70206006)(5660300002)(356005)(44832011)(47076005)(8936002)(316002)(336012)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2022 17:00:31.4035
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qsAD2L/s5uci6G+dPM46rrK+8CRB/SjxBJiH7VLqeL0AI1F2S0LKLPGVPdWkW8ZL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR15MB3782
-X-OriginatorOrg: fb.com
-X-Proofpoint-GUID: qYyUj_yk3O7Rq6EQbkVBXlMG8QHl1e5q
-X-Proofpoint-ORIG-GUID: qYyUj_yk3O7Rq6EQbkVBXlMG8QHl1e5q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-27_03,2022-01-27_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 phishscore=0
- lowpriorityscore=0 impostorscore=0 suspectscore=0 spamscore=0 mlxscore=0
- malwarescore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
- priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2201270092
-X-FB-Internal: deliver
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69d74272-89ac-49b7-fe42-08d9e1b686fc
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT019.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5671
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+IE9uIEphbiAyNiwgMjAyMiwgYXQgODozNiBQTSwgU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2Vh
-bmpjQGdvb2dsZS5jb20+IHdyb3RlOg0KPiANCj4gT24gVGh1LCBKYW4gMjcsIDIwMjIsIENocmlz
-IE1hc29uIHdyb3RlOg0KPj4gDQo+PiANCj4+PiBPbiBKYW4gMjYsIDIwMjIsIGF0IDY6MTEgUE0s
-IEJvcmlzIEJ1cmtvdiA8Ym9yaXNAYnVyLmlvPiB3cm90ZToNCj4+PiANCj4+PiBPbiBXZWQsIEph
-biAyNiwgMjAyMiBhdCAwOTo1OTowMlBNICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3Rl
-Og0KPj4+PiBPbiBXZWQsIEphbiAyNiwgMjAyMiwgQm9yaXMgQnVya292IHdyb3RlOg0KPj4+Pj4g
-SSB0ZXN0ZWQgdGhpcyBmaXggb24gdGhlIHdvcmtsb2FkIGFuZCBpdCBkaWQgcHJldmVudCB0aGUg
-aGFuZ3MuIEhvd2V2ZXIsDQo+Pj4+PiBJIGFtIHVuc3VyZSBpZiB0aGUgZml4IGlzIGFwcHJvcHJp
-YXRlIGZyb20gYSBsb2NraW5nIHBlcnNwZWN0aXZlLCBzbyBJDQo+Pj4+PiBob3BlIHRvIGRyYXcg
-c29tZSBleHRyYSBhdHRlbnRpb24gdG8gdGhhdCBhc3BlY3QuIHNldF9wYWdlX2RpcnR5X2xvY2sg
-aW4NCj4+Pj4+IG1tL3BhZ2Utd3JpdGViYWNrLmMgaGFzIGEgY29tbWVudCBhYm91dCBsb2NraW5n
-IHRoYXQgc2F5cyBzZXRfcGFnZV9kaXJ0eQ0KPj4+Pj4gc2hvdWxkIGJlIGNhbGxlZCB3aXRoIHRo
-ZSBwYWdlIGxvY2tlZCBvciB3aGlsZSBkZWZpbml0ZWx5IGhvbGRpbmcgYQ0KPj4+Pj4gcmVmZXJl
-bmNlIHRvIHRoZSBtYXBwaW5nJ3MgaG9zdCBpbm9kZS4gSSBiZWxpZXZlIHRoYXQgdGhlIG1tYXAg
-c2hvdWxkDQo+Pj4+PiBoYXZlIHRoYXQgcmVmZXJlbmNlLCBzbyBmb3IgZmVhciBvZiBodXJ0aW5n
-IEtWTSBwZXJmb3JtYW5jZSBvcg0KPj4+Pj4gaW50cm9kdWNpbmcgYSBkZWFkbG9jaywgSSBvcHRl
-ZCBmb3IgdGhlIHVubG9ja2VkIHZhcmlhbnQuDQo+Pj4+IA0KPj4+PiBLVk0gZG9lc24ndCBob2xk
-IGEgcmVmZXJlbmNlIHBlciBzZSwgYnV0IGl0IGRvZXMgc3Vic2NyaWJlIHRvIG1tdV9ub3RpZmll
-ciBldmVudHMNCj4+Pj4gYW5kIHdpbGwgbm90IG1hcmsgdGhlIHBhZ2UgZGlydHkgYWZ0ZXIgS1ZN
-IGhhcyBiZWVuIGluc3RydWN0ZWQgdG8gdW5tYXAgdGhlIHBhZ2UNCj4+Pj4gKGJhcnJpbmcgYnVn
-cywgd2hpY2ggd2UndmUgaGFkIGEgc2xldyBvZikuICBTbyB5ZWFoLCB0aGUgdW5sb2NrZWQgdmFy
-aWFudCBzaG91bGQNCj4+Pj4gYmUgc2FmZS4NCj4+Pj4gDQo+Pj4+IElzIGl0IGZlYXNpYmxlIHRv
-IHRyaWdnZXIgdGhpcyBiZWhhdmlvciBpbiBhIHNlbGZ0ZXN0PyAgS1ZNIGhhcyBoYWQsIGFuZCBw
-cm9iYWJseQ0KPj4+PiBzdGlsbCBoYXMsIG1hbnkgYnVncyB0aGF0IGFsbCBib2lsIGRvd24gdG8g
-S1ZNIGFzc3VtaW5nIGd1ZXN0IG1lbW9yeSBpcyBiYWNrZWQgYnkNCj4+Pj4gZWl0aGVyIGFub255
-bW91cyBtZW1vcnkgb3Igc29tZXRoaW5nIGxpa2Ugc2htZW0vSHVnZVRMQkZTL21lbWZkIHRoYXQg
-aXNuJ3QgdHlwaWNhbGx5DQo+Pj4+IHRydW5jYXRlZCBieSB0aGUgaG9zdC4NCj4+PiANCj4+PiBJ
-IGhhdmVuJ3QgYmVlbiBhYmxlIHRvIGlzb2xhdGUgYSByZXByb2R1Y2VyLCB5ZXQuIEkgYW0gYSBi
-aXQgc3R1bXBlZA0KPj4+IGJlY2F1c2UgdGhlcmUgaXNuJ3QgYSBsb3QgZm9yIG1lIHRvIGdvIG9m
-ZiBmcm9tIHRoYXQgc3RhY2sgSSBzaGFyZWQtLXRoZQ0KPj4+IGJlc3QgSSBoYXZlIHNvIGZhciBp
-cyB0aGF0IEkgbmVlZCB0byB0cmljayBLVk0gaW50byBlbXVsYXRpbmcNCj4+PiBpbnN0cnVjdGlv
-bnMgYXQgc29tZSBwb2ludCB0byBnZXQgdG8gdGhpcyAnY29tcGxldGVfdXNlcnNwYWNlX2lvJw0K
-Pj4+IGNvZGVwYXRoPyBJIHdpbGwga2VlcCB0cnlpbmcsIHNpbmNlIEkgdGhpbmsgaXQgd291bGQg
-YmUgdmFsdWFibGUgdG8ga25vdw0KPj4+IHdoYXQgZXhhY3RseSBoYXBwZW5lZC4gT3BlbiB0byB0
-cnkgYW55IHN1Z2dlc3Rpb25zIHlvdSBtaWdodCBoYXZlIGFzDQo+Pj4gd2VsbC4NCj4+IA0KPj4g
-RnJvbSB0aGUgYnRyZnMgc2lkZSwgYmFyZSBjYWxscyB0byBzZXRfcGFnZV9kaXJ0eSgpIGFyZSBz
-dWJvcHRpbWFsLCBzaW5jZSBpdA0KPj4gZG9lc27igJl0IGdvIHRocm91Z2ggdGhlIC0+cGFnZV9t
-a3dyaXRlKCkgZGFuY2UgdGhhdCB3ZSB1c2UgdG8gcHJvcGVybHkgQ09XDQo+PiB0aGluZ3MuICBJ
-dOKAmXMgc3RpbGwgbXVjaCBiZXR0ZXIgdGhhbiBTZXRQYWdlRGlydHkoKSwgYnV0IEnigJlkIGxv
-dmUgdG8NCj4+IHVuZGVyc3RhbmQgd2h5IGt2bSBuZWVkcyB0byBkaXJ0eSB0aGUgcGFnZSBzbyB3
-ZSBjYW4gZmlndXJlIG91dCBob3cgdG8gZ28NCj4+IHRocm91Z2ggdGhlIG5vcm1hbCBtbWFwIGZp
-bGUgaW8gcGF0aHMuDQo+IA0KPiBBaCwgaXMgdGhlIGlzc3VlIHRoYXQgd3JpdGViYWNrIGdldHMg
-c3R1Y2sgYmVjYXVzZSBLVk0gcGVycGV0dWFsbHkgbWFya3MgdGhlDQo+IHBhZ2UgYXMgZGlydHk/
-ICBUaGUgcGFnZSBpbiBxdWVzdGlvbiBzaG91bGQgaGF2ZSBhbHJlYWR5IGdvbmUgdGhyb3VnaCAt
-PnBhZ2VfbWt3cml0ZSgpLg0KPiBPdXRzaWRlIG9mIG9uZSBvciB0d28gaW50ZXJuYWwgbW1hcHMg
-dGhhdCBLVk0gZnVsbHkgY29udHJvbHMgYW5kIGFyZSBhbm9ueW1vdXMgbWVtb3J5LA0KPiBLVk0g
-ZG9lc24ndCBtb2RpZnkgVk1Bcy4gIEtWTSBpcyBjYWxsaW5nIFNldFBhZ2VEaXJ0eSgpIHRvIG1h
-cmsgdGhhdCBpdCBoYXMgd3JpdHRlbg0KPiB0byB0aGUgcGFnZTsgS1ZNIGVpdGhlciB3aGVuIGl0
-IHVubWFwcyB0aGUgcGFnZSBmcm9tIHRoZSBndWVzdCwgb3IgaW4gdGhpcyBjYXNlLCB3aGVuDQo+
-IGl0IGt1bm1hcCgpJ3MgYSBwYWdlIEtWTSBpdHNlbGYgYWNjZXNzZWQuDQo+IA0KDQpJIHRoaW5r
-IEtWTSBpcyBqdXN0IGNhbGxpbmcgU2V0UGFnZURpcnR5KCkgb25jZS4gIFRoZSBwcm9ibGVtIGlz
-IHRoYXQgU2V0UGFnZURpcnR5KCkganVzdCBmbGlwcyB0aGUgYml0IGFuZCBkb2VzbuKAmXQgc2V0
-IGFueSBvZiB0aGUgdGFncyBpbiB0aGUgcmFkaXggdHJlZSwgc28gd2UgY2FuIGVhc2lseSBoaXQg
-dGhpcyBjaGVjayBpbiBmaWxlbWFwX2ZkYXRhd3JpdGVfd2JjKCk6DQoNCiAgICAgICAgaWYgKCFt
-YXBwaW5nX2Nhbl93cml0ZWJhY2sobWFwcGluZykgfHwNCiAgICAgICAgICAgICFtYXBwaW5nX3Rh
-Z2dlZChtYXBwaW5nLCBQQUdFQ0FDSEVfVEFHX0RJUlRZKSkNCiAgICAgICAgICAgICAgICByZXR1
-cm4gMDsNCg0KU2luY2UgYWxtb3N0IGV2ZXJ5b25lIHdyaXRpbmcgZGlydHkgcGFnZXMgdG8gZGlz
-ayB3YW5kZXJzIHRocm91Z2ggYSBjaGVjayBvciBzZWFyY2ggZm9yIHRhZ2dlZCBwYWdlcywgdGhl
-IHBhZ2UganVzdCBuZXZlciBnZXRzIHdyaXR0ZW4gYXQgYWxsLg0KDQo+IEJhc2VkIG9uIHRoZSBj
-YWxsIHN0YWNrLCBteSBiZXN0IGd1ZXN0IGlzIHRoYXQgS1ZNIGlzIHVkcGF0aW5nIHN0ZWFsX3Rp
-bWUgaW5mby4NCj4gVGhhdCdzIHRyaWdnZXJlZCB3aGVuIHRoZSB2Q1BVIGlzIChyZSlsb2FkZWQs
-IHdoaWNoIHdvdWxkIGV4cGxhaW4gdGhlIGNvcnJlbGF0aW9uDQo+IHRvIGNvbXBsZXRlX3VzZXJz
-cGFjZV9pbygpIGFzIEtWTSB1bmxvYWRzPT5yZWxvYWRzIHRoZSB2Q1BVIGJlZm9yZS9hZnRlciBl
-eGl0aW5nDQo+IHRvIHVzZXJzcGFjZSB0byBoYW5kbGUgZW11bGF0ZSBJL08uDQo+IA0KPiBPaCEg
-IEkgYXNzdW1lIHRoYXQgdGhlIHBhZ2UgaXMgZWl0aGVyIHVubWFwcGVkIG9yIG1hZGUgcmVhZC1v
-bmx5IGJlZm9yZSB3cml0ZWJhY2s/DQo+IHY1LjYgKGFuZCBtYW55IGtlcm5lbHMgc2luY2UpIGhh
-ZCBhIGJ1ZyB3aGVyZSBLVk0gd291bGQgIm1pc3MiIG1tdV9ub3RpZmllciBldmVudHMNCj4gZm9y
-IHRoZSBzdGVhbF90aW1lIGNhY2hlLiAgSXQncyBiYXNpY2FsbHkgYSB1c2UtYWZ0ZXItZnJlZSBp
-c3N1ZSBhdCB0aGF0IHBvaW50LiAgQ29tbWl0DQo+IDdlMjE3NWViZDY5NSAoIktWTTogeDg2OiBG
-aXggcmVjb3JkaW5nIG9mIGd1ZXN0IHN0ZWFsIHRpbWUgLyBwcmVlbXB0ZWQgc3RhdHVz4oCdKQ0K
-DQpPaCwgbG9va3MgbGlrZSB3ZSBhcmUgbWlzc2luZyB0aGF0IG9uZSwgaW50ZXJlc3RpbmcuICBX
-ZSB1c2UgY2xlYXJfcGFnZV9kaXJ0eV9mb3JfaW8oKSBiZWZvcmUgd3JpdGluZyBwYWdlcywgc28g
-eWVzIGl0IGRvZXMgZ2V0IHNldCByZWFkb25seSB2aWEgcGFnZV9ta2NsZWFuKCkNCg0KLWNocmlz
-DQoNCg==
+On Wed, Jan 19, 2022 at 12:17:22PM +0100, Borislav Petkov wrote:
+> On Tue, Jan 18, 2022 at 07:18:06PM -0600, Michael Roth wrote:
+> > If 'fake_count'/'reported_count' is greater than the actual number of
+> > entries in the table, 'actual_count', then all table entries up to
+> > 'fake_count' will also need to pass validation. Generally the table
+> > will be zero'd out initially, so those additional/bogus entries will
+> > be interpreted as a CPUID leaves where all fields are 0. Unfortunately,
+> > that's still considered a valid leaf, even if it's a duplicate of the
+> > *actual* 0x0 leaf present earlier in the table. The current code will
+> > handle this fine, since it scans the table in order, and uses the
+> > valid 0x0 leaf earlier in the table.
+> 
+> I guess it would be prudent to have some warnings when enumerating those
+> leafs and when the count index "goes off into the weeds", so to speak,
+> and starts reading 0-CPUID entries. I.e., "dear guest owner, your HV is
+> giving you a big lie: a weird/bogus CPUID leaf count..."
+> 
+> :-)
+
+Ok, there's some sanity checks that happen a little later in boot via
+snp_cpuid_check_status(), after printk is enabled, that reports some
+basic details to dmesg like the number of entries in the table. I can
+add some additional sanity checks to flag the above case (really,
+all-zero entries never make sense, since CPUID 0x0 is supposed to report
+the max standard-range CPUID leaf, and leaf 0x1 at least should always
+be present). I'll print a warning for such cases, add maybe dump the
+cpuid the table in that case so it can be examined more easily by
+owner.
+
+> 
+> And lemme make sure I understand it: the ->count itself is not
+> measured/encrypted because you want to be flexible here and supply
+> different blobs with different CPUID leafs?
+
+Yes, but to be clear it's the entire CPUID page, including the count,
+that's not measured (though it is encrypted after passing PSP
+validation). Probably the biggest reason is the logistics of having
+untrusted cloud vendors provide a copy of the CPUID values they plan
+to pass to the guest, since a new measurement would need to be
+calculated for every new configuration (using different guest
+cpuflags, SMP count, etc.), since those table values will need to be
+made easily-accessible to guest owner for all these measurement
+calculations, and they can't be trusted so each table would need to
+be checked either manually or by some tooling that could be difficult
+to implement unless it was something simple like "give me the expected
+CPUID values and I'll check if the provided CPUID table agrees with
+that".
+
+At that point it's much easier for the guest owner to just check the
+CPUID values directly against known good values for a particular
+configuration as part of their attestation process and leave the
+untrusted cloud vendor out of it completely. So not measuring the
+CPUID page as part of SNP attestation allows for that flexibility.
+
+> 
+> > This is isn't really a special case though, it falls under the general
+> > category of a hypervisor inserting garbage entries that happen to pass
+> > validation, but don't reflect values that a guest would normally see.
+> > This will be detectable as part of guest owner attestation, since the
+> > guest code is careful to guarantee that the values seen after boot,
+> > once the attestation stage is reached, will be identical to the values
+> > seen during boot, so if this sort of manipulation of CPUID values
+> > occurred, the guest owner will notice this during attestation, and can
+> > abort the boot at that point. The Documentation patch addresses this
+> > in more detail.
+> 
+> Yap, it is important this is properly explained there so that people can
+> pay attention to during attestation.
+> 
+> > If 'fake_count' is less than 'actual_count', then the PSP skips
+> > validation for anything >= 'fake_count', and leaves them in the table.
+> > That should also be fine though, since guest code should never exceed
+> > 'fake_count'/'reported_count', as that's a blatant violation of the
+> > spec, and it doesn't make any sense for a guest to do this. This will
+> > effectively 'hide' entries, but those resulting missing CPUID leaves
+> > will be noticeable to the guest owner once attestation phase is
+> > reached.
+> 
+> Noticeable because the guest owner did supply a CPUID table with X
+> entries but the HV is reporting Y?
+
+Or even more simply by the guest owner simply running 'cpuid -r -1' on
+the guest after boot, and making sure all the expected entries are
+present. If the HV manipulated the count to be lower, there would be
+missing entries, if they manipulated it to be higher, then there would
+either be extra duplicate entries at the end of the table (which the
+#VC handler would ignore due to it using the first matching entry in
+the table when doing lookups), or additional non-duplicate garbage
+entries, which will show up in 'cpuid -r -1' as unexpected entries.
+
+Really 'cpuid -r -1' is the guest owner/userspace view of things, so
+some of these nuances about the table contents might be noteworthy,
+but wouldn't actually affect guest behavior, which would be the main
+thing attestation process should be concerned with.
+
+> 
+> If so, you can make this part of the attestation process: guest owners
+> should always check the CPUID entries count to be of a certain value.
+> 
+> > This does all highlight the need for some very thorough guidelines
+> > on how a guest owner should implement their attestation checks for
+> > cpuid, however. I think a section in the reference implementation
+> > notes/document that covers this would be a good starting point. I'll
+> > also check with the PSP team on tightening up some of these CPUID
+> > page checks to rule out some of these possibilities in the future.
+> 
+> Now you're starting to grow the right amount of paranoia - I'm glad I
+> was able to sensitize you properly!
+> 
+> :-)))
+
+Hehe =*D
+
+Thanks!
+
+-Mike
