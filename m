@@ -2,178 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AEDBC4939E7
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:51:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A4254939F3
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 12:53:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354320AbiASLu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 06:50:28 -0500
-Received: from mx405.baidu.com ([124.64.200.26]:32843 "EHLO mx421.baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1354318AbiASLuU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 06:50:20 -0500
-Received: from bjhw-sys-rpm015653cc5.bjhw.baidu.com (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-        by mx421.baidu.com (Postfix) with ESMTP id 454482F00920;
-        Wed, 19 Jan 2022 19:50:15 +0800 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id 35F5BD9932;
-        Wed, 19 Jan 2022 19:50:15 +0800 (CST)
-From:   Yuan ZhaoXiong <yuanzhaoxiong@baidu.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com
-Cc:     lirongqing@baidu.com, kvm@vger.kernel.org, x86@kernel.org,
+        id S1354371AbiASLxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 06:53:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:35351 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1354364AbiASLxE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jan 2022 06:53:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642593183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J9Mk8x6h3+3pv2pI2IYU/SKL9nrxKC/9/vUTNplQZ3o=;
+        b=H1ff2Q8x3eJKRfsW7cLCwPjgLenuFrFsgXf1bbGZS+BB18o9znPW/XqAaIlHD1dLjIumEM
+        7GFdj5PBlXfU67kNnZ3n0XFczLWlH8Fj5rbfkV/tWHDaJv6HhYJYpLGHv/f9shkoteX20n
+        F7DemMhGOut4CdMVCsK0W2m1Y5LZ33s=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-507-qSF3vTUQM3O3AZZBu9cIPg-1; Wed, 19 Jan 2022 06:53:02 -0500
+X-MC-Unique: qSF3vTUQM3O3AZZBu9cIPg-1
+Received: by mail-wm1-f70.google.com with SMTP id f7-20020a1cc907000000b0034b63f314ccso1740176wmb.6
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 03:53:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=J9Mk8x6h3+3pv2pI2IYU/SKL9nrxKC/9/vUTNplQZ3o=;
+        b=Q7rZ4kNxP92RyUb+1oSQqF4FngXGKByijfBhmzLLdECLG4U5OzZNauiw0YZ8S2LL8R
+         QuZLmvHCuccw8FsvYNYcDYswty020eykYo+B2IuM5ijLoGegV83TLCehkJvVwSbb675C
+         kQHTp2Ve0zAKTJs86z5c59dYQ4d7Se4H0Myf0/aIbpfUUg98ZfKTf7EZuLewrDzRxo4H
+         77h4C3It3/tDyTu3isP9dC9dHU8SF9UsusmPZ/zNN/j/vyLv6wqIzZATDzwo23pc4wHX
+         Su1UsXrB4usKCAPtpNfdC2BWRTCdA9otXehbd6+dWljOMijYcNkhpiCBgkYfy4WkFBe/
+         Wyiw==
+X-Gm-Message-State: AOAM531fuERXRx9ypjZ+4xzz80zlHlhCzkoCHxxEJytQDetGt+3WUr+V
+        N1SvPzw2Z3bDslEstZNYWSIFrQgiwBjsPERY5RGQTiYhwjw6a88PBvGP7IQD7yolmImNr9jU02u
+        9SCkIhbxCEkvD
+X-Received: by 2002:a5d:690c:: with SMTP id t12mr29073774wru.536.1642593180967;
+        Wed, 19 Jan 2022 03:53:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz+coOAxfk7/pEhrWiTHo6300RiSHyo2Xld6RFO2DMG3eym1SZ8ER4ToceMXeLTZvGpp1oxBA==
+X-Received: by 2002:a5d:690c:: with SMTP id t12mr29073761wru.536.1642593180763;
+        Wed, 19 Jan 2022 03:53:00 -0800 (PST)
+Received: from [192.168.8.100] (tmo-096-151.customers.d1-online.com. [80.187.96.151])
+        by smtp.gmail.com with ESMTPSA id l13sm5267757wmq.22.2022.01.19.03.52.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jan 2022 03:53:00 -0800 (PST)
+Message-ID: <a3a143f8-8fd5-49bf-9b2b-2f7cb04732de@redhat.com>
+Date:   Wed, 19 Jan 2022 12:52:58 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [RFC PATCH v1 06/10] KVM: s390: Add vm IOCTL for key checked
+ guest absolute memory access
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v1] KVM: X86: Introduce vfio_intr_stat per-vm debugfs file
-Date:   Wed, 19 Jan 2022 19:50:15 +0800
-Message-Id: <1642593015-28729-1-git-send-email-yuanzhaoxiong@baidu.com>
-X-Mailer: git-send-email 1.7.1
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+ <20220118095210.1651483-7-scgl@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220118095210.1651483-7-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use this file to export correspondence between guest_irq, host_irq,
-vector and vcpu belonging to VFIO passthrough devices.
+On 18/01/2022 10.52, Janis Schoetterl-Glausch wrote:
+> Channel I/O honors storage keys and is performed on absolute memory.
+> For I/O emulation user space therefore needs to be able to do key
+> checked accesses.
 
-An example output of this looks like (a vm with VFIO passthrough
-devices):
-   guest_irq     host_irq       vector         vcpu
-          24          201           37            8
-          25          202           35           25
-          26          203           35           20
-   ......
+Can't we do the checking in userspace? We already have functions for 
+handling the storage keys there (see hw/s390x/s390-skeys-kvm.c), so why 
+can't we do the checking in QEMU?
 
-When a VM has VFIO passthrough devices, the correspondence between
-guest_irq, host_irq, vector and vcpu may need to be known especially
-in AMD platform with avic disabled. The AMD avic is disabled, and
-the passthrough devices may cause vcpu vm exit twice for a interrupt.
-One extrernal interrupt caused by vfio host irq, other ipi to inject
-a interrupt to vm.
-
-If the system administrator known these information, set vfio host
-irq affinity to Pcpu which the correspondece guest irq affinited vcpu,
-to avoid extra vm exit.
-
-Co-developed-by: Li RongQing <lirongqing@baidu.com>
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Signed-off-by: Yuan ZhaoXiong <yuanzhaoxiong@baidu.com>
----
-diff with v0: modifying the code format.
-
- arch/x86/kvm/debugfs.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
-
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index 9240b3b..be16bfe 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -10,6 +10,11 @@
- #include "mmu.h"
- #include "mmu/mmu_internal.h"
- 
-+#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+#include <linux/kvm_irqfd.h>
-+#include <asm/irq_remapping.h>
-+#endif
-+
- static int vcpu_get_timer_advance_ns(void *data, u64 *val)
- {
- 	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) data;
-@@ -181,9 +186,94 @@ static int kvm_mmu_rmaps_stat_release(struct inode *inode, struct file *file)
- 	.release	= kvm_mmu_rmaps_stat_release,
- };
- 
-+#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+static int kvm_vfio_intr_stat_show(struct seq_file *m, void *v)
-+{
-+	struct kvm_kernel_irq_routing_entry *e;
-+	struct kvm_irq_routing_table *irq_rt;
-+	unsigned int host_irq, guest_irq;
-+	struct kvm_kernel_irqfd *irqfd;
-+	struct kvm *kvm = m->private;
-+	struct kvm_lapic_irq irq;
-+	struct kvm_vcpu *vcpu;
-+	int idx;
-+
-+	if (!kvm_arch_has_assigned_device(kvm) ||
-+			!irq_remapping_cap(IRQ_POSTING_CAP)) {
-+		return 0;
-+	}
-+
-+	seq_printf(m, "%12s %12s %12s %12s\n",
-+			"guest_irq", "host_irq", "vector", "vcpu");
-+
-+	spin_lock_irq(&kvm->irqfds.lock);
-+	idx = srcu_read_lock(&kvm->irq_srcu);
-+	irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
-+
-+	list_for_each_entry(irqfd, &kvm->irqfds.items, list) {
-+		if (!irqfd->producer)
-+			continue;
-+
-+		host_irq = irqfd->producer->irq;
-+		guest_irq = irqfd->gsi;
-+
-+		if (guest_irq >= irq_rt->nr_rt_entries ||
-+				hlist_empty(&irq_rt->map[guest_irq])) {
-+			pr_warn_once("no route for guest_irq %u/%u (broken user space?)\n",
-+					guest_irq, irq_rt->nr_rt_entries);
-+			continue;
-+		}
-+
-+		hlist_for_each_entry(e, &irq_rt->map[guest_irq], link) {
-+			if (e->type != KVM_IRQ_ROUTING_MSI)
-+				continue;
-+
-+			kvm_set_msi_irq(kvm, e, &irq);
-+			if (kvm_intr_is_single_vcpu(kvm, &irq, &vcpu)) {
-+				seq_printf(m, "%12u %12u %12u %12u\n",
-+						guest_irq, host_irq, irq.vector, vcpu->vcpu_id);
-+			}
-+		}
-+	}
-+	srcu_read_unlock(&kvm->irq_srcu, idx);
-+	spin_unlock_irq(&kvm->irqfds.lock);
-+	return 0;
-+}
-+
-+static int kvm_vfio_intr_stat_open(struct inode *inode, struct file *file)
-+{
-+	struct kvm *kvm = inode->i_private;
-+
-+	if (!kvm_get_kvm_safe(kvm))
-+		return -ENOENT;
-+
-+	return single_open(file, kvm_vfio_intr_stat_show, kvm);
-+}
-+
-+static int kvm_vfio_intr_stat_release(struct inode *inode, struct file *file)
-+{
-+	struct kvm *kvm = inode->i_private;
-+
-+	kvm_put_kvm(kvm);
-+	return single_release(inode, file);
-+}
-+
-+static const struct file_operations vfio_intr_stat_fops = {
-+	.open    = kvm_vfio_intr_stat_open,
-+	.read    = seq_read,
-+	.llseek  = seq_lseek,
-+	.release = kvm_vfio_intr_stat_release,
-+};
-+#endif
-+
- int kvm_arch_create_vm_debugfs(struct kvm *kvm)
- {
- 	debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
- 			    &mmu_rmaps_stat_fops);
-+
-+#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+	debugfs_create_file("vfio_intr_stat", 0444, kvm->debugfs_dentry, kvm,
-+			    &vfio_intr_stat_fops);
-+#endif
- 	return 0;
- }
--- 
-1.8.3.1
+  Thomas
 
