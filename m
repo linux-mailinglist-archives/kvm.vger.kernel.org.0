@@ -2,108 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 359D249384A
-	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:21:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EFA64938FC
+	for <lists+kvm@lfdr.de>; Wed, 19 Jan 2022 11:56:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349479AbiASKVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 05:21:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44748 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240254AbiASKVY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:21:24 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2730CC061574;
-        Wed, 19 Jan 2022 02:21:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BBD6061571;
-        Wed, 19 Jan 2022 10:21:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC9AC004E1;
-        Wed, 19 Jan 2022 10:21:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642587683;
-        bh=cP9cLTMdUSfF40o+P6T3LFzIpDG8KykxdcBvwSmIf8o=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CDzzzwVotsmKyOYUjqR0h8Y9SowCQOZoRlzI9UqqqOaI/AfV3HDu8bFn/q6AZ+e9Z
-         R8s6cbEQuw2EkCkBaYnhAEj1ROLtiqTbTAB8gqa+YPB/d7oYuJ4Bdy94IqngPMcJ1J
-         3OJbKVBq9DD1AD2PgsFWc6pag8DABg/JYHsY+Hae72JEu4mFUC/uZg7qOO5CIp2++i
-         t6J83yx7NxxjNPFsuTvWM9tSM//ASfPGxpLUn+huASndGzL0Gom8pGDYMoqs1aH2Nx
-         pEUGWDkyODqJ+AcaoqRC6Ko2ZX1w8BFl17pz3CjgQ9OUxkeukHDvueRJDL48Tzvvtu
-         HdLj31S+fGbTg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nA85g-001Ren-K2; Wed, 19 Jan 2022 10:21:20 +0000
-Date:   Wed, 19 Jan 2022 10:21:20 +0000
-Message-ID: <87ee5481r3.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>,
-        Andrew Jones <drjones@redhat.com>,
+        id S1353389AbiASK4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 05:56:22 -0500
+Received: from mxout04.lancloud.ru ([45.84.86.114]:57474 "EHLO
+        mxout04.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240254AbiASK4V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 05:56:21 -0500
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru A771820D27E6
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Subject: Re: [PATCH 1/2] platform: make platform_get_irq_optional() optional
+ (summary)
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>
+CC:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        <linux-iio@vger.kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        <alsa-devel@alsa-project.org>, Liam Girdwood <lgirdwood@gmail.com>,
+        "Guenter Roeck" <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        <linux-mtd@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        <linux-phy@lists.infradead.org>, Lee Jones <lee.jones@linaro.org>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        "Florian Fainelli" <f.fainelli@gmail.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        "Bartosz Golaszewski" <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "Tony Luck" <tony.luck@intel.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        <bcm-kernel-feedback-list@broadcom.com>,
+        <linux-serial@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        "Matthias Brugger" <matthias.bgg@gmail.com>,
+        <platform-driver-x86@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        "Saravanan Sekar" <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>, <linux-pm@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        "John Garry" <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        "William Breathitt Gray" <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        <linux-gpio@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        <openipmi-developer@lists.sourceforge.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Benson Leung <bleung@chromium.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-edac@vger.kernel.org>,
+        "Richard Weinberger" <richard@nod.at>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        "Hans de Goede" <hdegoede@redhat.com>, <netdev@vger.kernel.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>, <linux-mmc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-renesas-soc@vger.kernel.org>, Vinod Koul <vkoul@kernel.org>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v3 04/11] KVM: arm64: Setup a framework for hypercall bitmap firmware registers
-In-Reply-To: <960d4166-1718-55ef-d324-507a8add7e3e@redhat.com>
-References: <20220104194918.373612-1-rananta@google.com>
-        <20220104194918.373612-5-rananta@google.com>
-        <960d4166-1718-55ef-d324-507a8add7e3e@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jasowang@redhat.com, rananta@google.com, drjones@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, catalin.marinas@arm.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund@ragnatech.se>,
+        <linux-mediatek@lists.infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+References: <20220110195449.12448-1-s.shtylyov@omp.ru>
+ <20220110195449.12448-2-s.shtylyov@omp.ru>
+ <20220115183643.6zxalxqxrhkfgdfq@pengutronix.de> <YeQpWu2sUVOSaT9I@kroah.com>
+ <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <b6038ec2-da4a-de92-b845-cac2be0efcd1@omp.ru>
+Date:   Wed, 19 Jan 2022 13:56:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <20220118091819.zzxpffrxbckoxiys@pengutronix.de>
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT02.lancloud.ru (fd00:f066::142) To
+ LFEX1907.lancloud.ru (fd00:f066::207)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Jan 2022 06:42:15 +0000,
-Jason Wang <jasowang@redhat.com> wrote:
->=20
->=20
-> =E5=9C=A8 2022/1/5 =E4=B8=8A=E5=8D=883:49, Raghavendra Rao Ananta =E5=86=
-=99=E9=81=93:
-> > KVM regularly introduces new hypercall services to the guests without
-> > any consent from the Virtual Machine Manager (VMM). This means, the
-> > guests can observe hypercall services in and out as they migrate
-> > across various host kernel versions. This could be a major problem
-> > if the guest discovered a hypercall, started using it, and after
-> > getting migrated to an older kernel realizes that it's no longer
-> > available. Depending on how the guest handles the change, there's
-> > a potential chance that the guest would just panic.
-> >=20
-> > As a result, there's a need for the VMM to elect the services that
-> > it wishes the guest to discover. VMM can elect these services based
-> > on the kernels spread across its (migration) fleet. To remedy this,
-> > extend the existing firmware psuedo-registers, such as
-> > KVM_REG_ARM_PSCI_VERSION, for all the hypercall services available.
->=20
->=20
->=20
-> Haven't gone through the series but I wonder whether it's better to
-> have a (e)BPF filter for this like seccomp.
+On 1/18/22 12:18 PM, Uwe Kleine-König wrote:
+> On Sun, Jan 16, 2022 at 03:19:06PM +0100, Greg Kroah-Hartman wrote:
+>> On Sat, Jan 15, 2022 at 07:36:43PM +0100, Uwe Kleine-König wrote:
+>>> A possible compromise: We can have both. We rename
+>>> platform_get_irq_optional() to platform_get_irq_silent() (or
+>>> platform_get_irq_silently() if this is preferred) and once all users are
+>>> are changed (which can be done mechanically), we reintroduce a
+>>> platform_get_irq_optional() with Sergey's suggested semantic (i.e.
+>>> return 0 on not-found, no error message printking).
+>>
+>> Please do not do that as anyone trying to forward-port an old driver
+>> will miss the abi change of functionality and get confused.  Make
+>> build-breaking changes, if the way a function currently works is
+>> changed in order to give people a chance.
+> 
+> Fine for me. I assume this is a Nack for Sergey's patch?
 
-No, please. This has to fit in the save/restore model, and should be
-under control of the VMM. If you want to filter things using seccomp,
-that's fine, but also that's completely orthogonal.
+   Which patch do you mean? I'm starting to get really muddled... :-(
 
-	M.
+> Best regards
+> Uwe
 
---=20
-Without deviation from the norm, progress is not possible.
+MBR, Sergey
