@@ -2,101 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 742F84952D9
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 18:04:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A17024952F7
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 18:13:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377207AbiATREV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 12:04:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40050 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347546AbiATREQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 12:04:16 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9718FC06161C
-        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:04:16 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id u10so1604524pfg.10
-        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:04:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=X+dlhCbZ1T5bEOv35DYnl7QCyW3kKdcFIjuIjbSmC1g=;
-        b=St3JnP6QUs2HRDevifufDbBMbF0cWX2WnRDleOvqov0iUtvDBmX+Fb1SteYzmz+sEq
-         /bFyQ7jeNbQIjcpNeMGkfGM0bMw2XgcMVKd5VQe47fXv2k+as7+Iok3mRNyMHYZaYPSj
-         uVECXjRj6XczcuM7iwuNuiLizJWgY4WEQ9SN+MfF+avoFFN0e0OuVJqN0jN6aDg8gcuv
-         ROIdN+/QWovhjXk9+7/90qv/SYD4IX3D3h1e3z3eqSr6Fi2t2gvYED6Fvjyss5+ngs24
-         KVK4/TdXAU1yQjYHFBFYiPCTb2Ocj08DKDYs9jKoEwIrFZBzsxA12ihbVFEQl0OhC96g
-         X2AA==
+        id S1377259AbiATRNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 12:13:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52416 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1377256AbiATRNq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 12:13:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642698825;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fC9Rz1nl0EcRlodZgKlLvJmeGdyFjLwk5wksOksI7Rg=;
+        b=EfwNF0r2WqjSCgXBiAmPNLF6LNfZqJLyqaecVr81p8SxC9NeEnH/MqEHBYl4wAaozLOlro
+        h3Ads0Uv2D9Q2Z3jKsXz+SW58IYm87/fee/U8e22spFaX7ihJQ0cObh1WeRFM+qg6okZlA
+        LuJFhviQ1ijkrxaR3evRktMAVZi+F6Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-516-MLc_PjorPb22oa9k3AQ6VA-1; Thu, 20 Jan 2022 12:13:41 -0500
+X-MC-Unique: MLc_PjorPb22oa9k3AQ6VA-1
+Received: by mail-wm1-f72.google.com with SMTP id a3-20020a05600c348300b0034a0dfc86aaso7317992wmq.6
+        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:13:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=X+dlhCbZ1T5bEOv35DYnl7QCyW3kKdcFIjuIjbSmC1g=;
-        b=tp0bQz4MONC/oE37314h29HS2lqzJAkpi3z/QmZwcscktFUc9FziS2bmUL68mZWwlE
-         RUFvbVSWVxVbaXtpPSWNMzMUIeLigY1uK+WBIWKWvIC/cFDp7uT1fdfqyn84D7YEk9z8
-         OQzja6THwP633h9i87tnQ1/Ja526XIpCmoGyoflyniBPCzY6qIf1A7JmOJTvMsXbT0p9
-         YrOTHo24Q9Dpx0lyVX3qidYlZVlPiH/AOKW9iSTpoYD6hwEXH4LZcOiRKvO/3tUI66Qn
-         ryWvs3wGKwdreZnYzHsrPL12pVOZ/PfZGJ54UzXxkmoj7dS7jP4BIi5XUxEC2dJWlOzM
-         c66w==
-X-Gm-Message-State: AOAM532Un+gxrAW7Fo3NGyeaFDnkR5gOHluxD77ho5ov8t8Mqo+OX1VU
-        IZYfBvzW4ee/mpPdMA6og09YYQ==
-X-Google-Smtp-Source: ABdhPJzFn3mYlfxXIvBSzOPt1u8pptmsUxahomIWS83zSxjIk1TcuWEgX+FYkyvyadwpq8zn9db2mQ==
-X-Received: by 2002:a63:f508:: with SMTP id w8mr17788070pgh.152.1642698255953;
-        Thu, 20 Jan 2022 09:04:15 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h14sm4366518pfh.95.2022.01.20.09.04.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jan 2022 09:04:15 -0800 (PST)
-Date:   Thu, 20 Jan 2022 17:04:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Liam Merwick <liam.merwick@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH 6/9] KVM: SVM: WARN if KVM attempts emulation on #UD or
- #GP for SEV guests
-Message-ID: <YemWCwhQ8aYcqUw9@google.com>
-References: <20220120010719.711476-1-seanjc@google.com>
- <20220120010719.711476-7-seanjc@google.com>
- <483ed34e-3125-7efb-1178-22f02173667a@oracle.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fC9Rz1nl0EcRlodZgKlLvJmeGdyFjLwk5wksOksI7Rg=;
+        b=GI1VABQBli5AMZmZcu7wK2uIwmJqGBNUMkF8zEeStjkL21ePuk+kTzyK8dSLvv+UuV
+         NWMv4ZP60uGSV8SUnVa/sRJZX1HwF5VrZ1TQDKPenpjNjs8vDebhKnvL8++10UkZnDO4
+         eX9X7ZnqZ+m67ywwgZCt3LrhveDp5FEzFWSFz3qjsxaloCssJFw0hQCAiFaMoZAudpI8
+         Hl8QNog2c3+yEA7r/LV8fMR0phjnGmLvJx4VCwp6O81JpIqBtFnrz+AwSMybzjFsJWw0
+         mlbcBmZ9ue+xGM6sS3gzpc1IQDsVbP9tN4jk8nrtilSe7sLG1q10Ff/Zbb97W54t1RRX
+         gyHA==
+X-Gm-Message-State: AOAM531GJexrEAlYaczD3q+oOJlBzENBzRLhzoIbf04vrd/qAiQHuhzJ
+        28M+7A+eLKeM0vFAh8K5EBeJmAz0EA7KVgx24p8DvYg4H5sJ0BIOr1kWkZ6bIHDj9508kRfGvOS
+        bkonE8icSHeXW
+X-Received: by 2002:a05:6000:1c1d:: with SMTP id ba29mr44921wrb.78.1642698820504;
+        Thu, 20 Jan 2022 09:13:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwSRCeywcM8eh72JNxUN49HsBHUyB5WOOk/6NBHCfm9T8/pz+/9qoxd3PuDX/ZTwiwJwLUUSw==
+X-Received: by 2002:a05:6000:1c1d:: with SMTP id ba29mr44901wrb.78.1642698820240;
+        Thu, 20 Jan 2022 09:13:40 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id a18sm3616586wrw.5.2022.01.20.09.13.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Jan 2022 09:13:39 -0800 (PST)
+Message-ID: <39bb00be-e4e4-1eb5-de25-192d66aa2bc4@redhat.com>
+Date:   Thu, 20 Jan 2022 18:13:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <483ed34e-3125-7efb-1178-22f02173667a@oracle.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] docs: kvm: fix WARNINGs from api.rst
+Content-Language: en-US
+To:     Wei Wang <wei.w.wang@intel.com>, sfr@canb.auug.org.au
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220120045003.315177-1-wei.w.wang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220120045003.315177-1-wei.w.wang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 20, 2022, Liam Merwick wrote:
-> On 20/01/2022 01:07, Sean Christopherson wrote:
-> > WARN if KVM attempts to emulate in response to #UD or #GP for SEV guests,
-> > i.e. if KVM intercepts #UD or #GP, as emulation on any fault except #NPF
-> > is impossible since KVM cannot read guest private memory to get the code
-> > stream, and the CPU's DecodeAssists feature only provides the instruction
-> > bytes on #NPF.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/svm/svm.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 994224ae2731..ed2ca875b84b 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -4267,6 +4267,9 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
-> >   	if (!sev_guest(vcpu->kvm))
-> >   		return true;
-> > +	/* #UD and #GP should never be intercepted for SEV guests. */
-> > +	WARN_ON_ONCE(emul_type & (EMULTYPE_TRAP_UD | EMULTYPE_VMWARE_GP));
+On 1/20/22 05:50, Wei Wang wrote:
+> Use the api number 134 for KVM_GET_XSAVE2, instead of 42, which has been
+> used by KVM_GET_XSAVE.
+> Also, fix the WARNINGs of the underlines being too short.
 > 
-> What about EMULTYPE_TRAP_UD_FORCED?
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> ---
+>   Documentation/virt/kvm/api.rst | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index d3791a14eb9a..bb8cfddbb22d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5545,8 +5545,8 @@ the trailing ``'\0'``, is indicated by ``name_size`` in the header.
+>   The Stats Data block contains an array of 64-bit values in the same order
+>   as the descriptors in Descriptors block.
+>   
+> -4.42 KVM_GET_XSAVE2
+> -------------------
+> +4.134 KVM_GET_XSAVE2
+> +--------------------
+>   
+>   :Capability: KVM_CAP_XSAVE2
+>   :Architectures: x86
+> @@ -7363,7 +7363,7 @@ trap and emulate MSRs that are outside of the scope of KVM as well as
+>   limit the attack surface on KVM's MSR emulation code.
+>   
+>   8.28 KVM_CAP_ENFORCE_PV_FEATURE_CPUID
+> ------------------------------
+> +-------------------------------------
+>   
+>   Architectures: x86
+>   
 
-Hmm, yeah, it's worth adding, there's no additional cost.  I was thinking it was
-a modifier to EMULTYPE_TRAP_UD, but it's a replacement specifically to bypass
-the EmulateOnUD check (which I should have remembered since I added the type...).
+Queued, thanks.
+
+Paolo
+
