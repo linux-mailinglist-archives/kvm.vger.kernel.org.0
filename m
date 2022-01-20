@@ -2,224 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9E964945F4
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 04:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D06E494630
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 04:36:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358248AbiATDCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 22:02:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46138 "EHLO
+        id S1358388AbiATDgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 22:36:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiATDCk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 22:02:40 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30CD1C061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 19:02:40 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id mi14-20020a17090b4b4e00b001b51b28c055so586684pjb.1
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 19:02:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:cc:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=TdxRZhtmU115mCypw4hI9M8Dl6cb7KOaj+L4WncT7zw=;
-        b=TJGf3BA9rilCGKyXX5nF51tokhcp0FfUvJZOPXAQpGOE/m2hjHJ6lcJVuRhi0qhTg8
-         QKadul04CapjDCszn9Y8Q1G72zEC2NsNoWMitJM55vWtMKHrFtvXHmjfs00PxQTmRoWx
-         EN3ultPr8Y8jTYQlGyqZAiBuoBIr71FnEsV7cASKkU/H3E3aUNURuz89ung0ZP6hfLk1
-         ov5FB84YvS2cQXpu9DZGpa2nHucO9C2C/Eyw3W4xtd1EuDc7e5xLgIvJdPce+qwDPEyh
-         G/A/GUT9FGTxUHkNKo7mDwH6BVHNhUBwY53ArMw7e0yxtGt0XO/a4tCeJ0CwS/Jnk6Q8
-         6x+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:cc:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=TdxRZhtmU115mCypw4hI9M8Dl6cb7KOaj+L4WncT7zw=;
-        b=jwuNJ6wF2sRQfzzc0SvELruRKmT9ykqcNdLz05VvY8UQsMRdg2YwzX8G9H/PIs0o1W
-         p2HZtD0BtPhKwGWHLHzZYn/DG7L0PMU4EQcj1iUgVdXCRF9CYqQaWJ+g79fbYSemNakm
-         /br5TNM5cMkYec1z1NEVSRLW8R69ev00eXfg1ESgFHfbJbG5M2hK43ncTU5M5tnyA+T8
-         GJ0wmgxq3GhrXOrkrXRNb6rsUZmA/duqnK85MrTwM7kThmk69lYXysTFGB99KWVe/mW1
-         PmIPfkBLCi2yyvxguNZHPSQ9XlDFWoqrea5aaPah4onq90a5T6acI8XFS1hq3Re0exc7
-         Qfig==
-X-Gm-Message-State: AOAM530AnWsSrRom2JHrT26TCM4q11XynQwfpfXzNsUXsw4njc1azRJN
-        XXeD79Ya4OjmScneyYzEA1dkfHeTC//ZCA==
-X-Google-Smtp-Source: ABdhPJwt+a4YcfiRj/ZObOxYUvhkfBgChqSlKVcndKpKamEfwHPkbDViHoqBS2qLUVVCKu1e3RooeA==
-X-Received: by 2002:a17:902:ab85:b0:149:ca14:4a15 with SMTP id f5-20020a170902ab8500b00149ca144a15mr36085858plr.169.1642647759614;
-        Wed, 19 Jan 2022 19:02:39 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h10sm1019725pfc.103.2022.01.19.19.02.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jan 2022 19:02:39 -0800 (PST)
-Message-ID: <e7322f03-1572-ffb2-ed36-5499e90a685f@gmail.com>
-Date:   Thu, 20 Jan 2022 11:02:31 +0800
+        with ESMTP id S232151AbiATDgW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 22:36:22 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F5DC061574;
+        Wed, 19 Jan 2022 19:36:22 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JfSpr0VjRz4xmx;
+        Thu, 20 Jan 2022 14:36:19 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1642649780;
+        bh=SQFUWSYH6b85H0qk+VmSPcOcr+KOF+oja5YY+V9CgJs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=McvjR4ncDckHiXlfITouI69ZfthqoCDodAYCZ/LHJma9K9+OtkPU+JirTymlGyxs+
+         g4o2bg5OpnBcvow74dpkzwWP0XvPqWlInbX7xrNjjoPnFNH7L70GR8/LWTHgrsrQWF
+         qOIK0xs2zozgs3rIbqLlVywK8CVpp3CtNTYTCOGi3BqVGoJ4eFJMdUDQkWOch4ZkJ1
+         jqi7IBgfTYSn0f6wX/JEdNv201KaRHd8Dy8F3ekpe+NOdDYP1g8HO24pCDfx6TV0FZ
+         vQ5UvrANQFgRKko4GjsLc2Td9nKSEblajwhZzurNqW4p57jbtf/6sN9JPdbu639Gqi
+         QbY30H1h/p2Cg==
+Date:   Thu, 20 Jan 2022 14:36:19 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Wang, Wei W" <wei.w.wang@intel.com>, KVM <kvm@vger.kernel.org>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Linux Next Mailing List" <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build warning after merge of the kvm tree
+Message-ID: <20220120143619.4803cb36@canb.auug.org.au>
+In-Reply-To: <507a652f97de4e0fb26d604084ef6f25@intel.com>
+References: <20220110195844.7de09681@canb.auug.org.au>
+        <507a652f97de4e0fb26d604084ef6f25@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
-Subject: Re: [PATCH 1/3] Provide VM capability to disable PMU virtualization
- for individual VMs
-Content-Language: en-US
-To:     David Dunn <daviddunn@google.com>
-References: <20220119182818.3641304-1-daviddunn@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org)" 
-        <pbonzini@redhat.com>,
-        =?UTF-8?B?Y2xvdWRsaWFuZyjmooHph5HojaMp?= <cloudliang@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <20220119182818.3641304-1-daviddunn@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/HfHf2ONiXooc+6U6KWkks9p";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+--Sig_/HfHf2ONiXooc+6U6KWkks9p
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for coming to address this.
+Hi all,
 
-Please modify the patch(es) subject to follow the convention.
+On Tue, 11 Jan 2022 02:55:56 +0000 "Wang, Wei W" <wei.w.wang@intel.com> wro=
+te:
+>
+> On Monday, January 10, 2022 4:59 PM, Stephen Rothwell wrote:
+> > After merging the kvm tree, today's linux-next build (htmldocs) produce=
+d this
+> > warning:
+> >=20
+> > Documentation/virt/kvm/api.rst:5549: WARNING: Title underline too short.
+> >=20
+> > 4.42 KVM_GET_XSAVE2
+> > ------------------ =20
+>=20
+> Should add one more "_" above.
+> 4.42 KVM_GET_XSAVE2
+> -------------------
+> +-------------------
+>=20
+> Paolo, do you want us to send another patch to add it or you can just add=
+ it?
 
-On 20/1/2022 2:28 am, David Dunn wrote:
-> When PMU virtualization is enabled via the module parameter, usermode
-> can disable PMU virtualization on individual VMs using this new
-> capability.
+I am still seeing this warning.
 
-Will the user space fail or be notified when the enable_pmu say no ?
+--=20
+Cheers,
+Stephen Rothwell
 
-> 
-> This provides a uniform way to disable PMU virtualization on x86.  Since
-> AMD doesn't have a CPUID bit for PMU support, disabling PMU
+--Sig_/HfHf2ONiXooc+6U6KWkks9p
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Not entirely absent, such as PERFCTR_CORE.
+-----BEGIN PGP SIGNATURE-----
 
-> virtualization requires some other state to indicate whether the PMU
-> related MSRs are ignored.
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHo2LMACgkQAVBC80lX
+0GzpAQf+NPzN/Q8H/rh9e9knNd7c5olE+Xwa1Iwvv8RVzj5FoiYjHJ4MhTVsnNkV
+QO0M7Lr/J8w/43kmVckSEOLYBwrtgN6+XR7aR7cOBMZcNpksnqyQEboIVzRv2kDM
+VSM9pHO0cz5Q46bTXtLS3/D01mmTb+h6ZXQPNRiyl+DsZFAkGlvpo7aqA5CeR2c+
+qqwobv0t3hzQSbsqxc4EE+yMlr7Zj0jhBAu1zaaiOPnTF5lg25rkoLIxs5IK6gV2
+zEWHwoxVK9yi2NAXnKkCIldyKJOFo7qfePLK6dzAgaNeBK7qSqMyfY8LQRrv9zdc
+tBtehl7WTdUm8/gTsgHOiXUX7+GIUg==
+=crtO
+-----END PGP SIGNATURE-----
 
-Not just ignored, but made to disappear altogether.
-
-> 
-> Since KVM_GET_SUPPORTED_CPUID reports the maximal CPUID information
-> based on module parameters, usermode will need to adjust CPUID when
-> disabling PMU virtualization on individual VMs.  On Intel CPUs, the
-> change to PMU enablement will not alter existing until SET_CPUID2 is
-> invoked.
-
-Please clarify. Do we have a requirement for the order in which the
-SET_CPUID2 and ioctl_enable_cap interfaces are called?
-
-> 
-> Signed-off-by: David Dunn <daviddunn@google.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  1 +
->   arch/x86/kvm/svm/pmu.c          |  2 +-
->   arch/x86/kvm/vmx/pmu_intel.c    |  2 +-
->   arch/x86/kvm/x86.c              | 11 +++++++++++
->   include/uapi/linux/kvm.h        |  1 +
->   tools/include/uapi/linux/kvm.h  |  1 +
->   6 files changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 682ad02a4e58..5cdcd4a7671b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1232,6 +1232,7 @@ struct kvm_arch {
->   	hpa_t	hv_root_tdp;
->   	spinlock_t hv_root_tdp_lock;
->   #endif
-> +	bool enable_pmu;
-
-The name makes it difficult to distinguish the scope of access to the variable.
-Try storing it via "pmu->version == 0".
-
->   };
->   
->   struct kvm_vm_stat {
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 5aa45f13b16d..605bcfb55625 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -101,7 +101,7 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
->   {
->   	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
->   
-> -	if (!enable_pmu)
-> +	if (!enable_pmu || !vcpu->kvm->arch.enable_pmu)
->   		return NULL;
->   
->   	switch (msr) {
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 466d18fc0c5d..4c3885765027 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -487,7 +487,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->   	pmu->reserved_bits = 0xffffffff00200000ull;
->   
->   	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
-> -	if (!entry || !enable_pmu)
-> +	if (!entry || !vcpu->kvm->arch.enable_pmu || !enable_pmu)
->   		return;
->   	eax.full = entry->eax;
->   	edx.full = entry->edx;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 55518b7d3b96..9b640c5bb4f6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4326,6 +4326,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   		if (r < sizeof(struct kvm_xsave))
->   			r = sizeof(struct kvm_xsave);
->   		break;
-> +	case KVM_CAP_ENABLE_PMU:
-> +		r = enable_pmu;
-> +		break;
->   	}
->   	default:
->   		break;
-> @@ -5937,6 +5940,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		kvm->arch.exit_on_emulation_error = cap->args[0];
->   		r = 0;
->   		break;
-> +	case KVM_CAP_ENABLE_PMU:
-> +		r = -EINVAL;
-> +		if (!enable_pmu || cap->args[0] & ~1)
-> +			break;
-> +		kvm->arch.enable_pmu = cap->args[0];
-> +		r = 0;
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		break;
-> @@ -11562,6 +11572,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->   
->   	kvm->arch.guest_can_read_msr_platform_info = true;
-> +	kvm->arch.enable_pmu = true;
->   
->   #if IS_ENABLED(CONFIG_HYPERV)
->   	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 9563d294f181..37cbcdffe773 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1133,6 +1133,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
->   #define KVM_CAP_VM_GPA_BITS 207
->   #define KVM_CAP_XSAVE2 208
-> +#define KVM_CAP_ENABLE_PMU 209
-
-Rename it to KVM_CAP_PMU_CAPABILITY and use the bit 0 for *DISABLE_PMU*.
-
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index f066637ee206..e71712c71ab1 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -1132,6 +1132,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_ARM_MTE 205
->   #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
->   #define KVM_CAP_XSAVE2 207
-> +#define KVM_CAP_ENABLE_PMU 209
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
+--Sig_/HfHf2ONiXooc+6U6KWkks9p--
