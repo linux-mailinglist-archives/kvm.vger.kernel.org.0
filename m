@@ -2,284 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D101495215
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 17:11:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 040C1495231
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 17:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346641AbiATQLs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 11:11:48 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:10510 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233045AbiATQLr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 11:11:47 -0500
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20KFhRob018332;
-        Thu, 20 Jan 2022 16:11:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=6Ox8eyWrLwQAtzexuRRN3SRkI2nODJsGswFIkHW/wl4=;
- b=XYZfOQrTydseA8YT/xQzJvaG0Cp1otfVVN7XLaY26P5XE6GAhk3lUSs71huKjxGeeezu
- FJ5QcDEW9pPiPhgSuk7A52lBUBIiBqIUE/8VhuKJisCMxq69aYN16gn3EyZ3fiVDU16A
- MsYoARx4MiTbgFcqujKA0IercbsLsBb71LknA/LHf3/Kt5HuhwzbbKcm4HTvMea2kHKj
- HmONdCk4TZvRqAhVnrDD2Ta1JA/pE9OYvk+zJp1kteYw3cZE+OW25/HmLchZ2gnSvYO/
- Xm6UJcfajBeD/xAueJ1WPAQfppbSMKNwKLU0qD5dTVHSoRy11pY88hNWQIM5RfxOp39k Qw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dqamq82j9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Jan 2022 16:11:13 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20KFug7w089783;
-        Thu, 20 Jan 2022 16:11:11 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2173.outbound.protection.outlook.com [104.47.55.173])
-        by userp3030.oracle.com with ESMTP id 3dkkd2hd9p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Jan 2022 16:11:11 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DRftiK0jMWjKWBnPq4YeD6QlgPT5yGz50Jc65lSGuVnbQenXoD78A2jNhA0AfpuRLTGbFUNXOLbFk4Cgk6EHfiD+M8mz+s4qr6OffaygNMsRhojVziJAd+JIr/lPTSp1yz9v9jKQfh+AGMSJpsm2lVIkiXAgGxsoMvokCwWTD6Raol+gdhfRI7mihLsNZIxUpzv65/8tSvxuUmlXe1kOC0P8GOZPtkpbMfhW0xDqpv6M1vIAFs60P6SX+ZjkaDwpN3+x1gxs8O+W0dk2gf6wGYTjXtM8MGJ5ewnn5crxYAuLF2JGrfsVWz6lJL607sD12lcjA8hCM9+D26IMfvpB9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6Ox8eyWrLwQAtzexuRRN3SRkI2nODJsGswFIkHW/wl4=;
- b=hxuCq/tv+2vhx6zIQQSRhkigcb8iloCEWwqz5XBV0luGzYaTOZMUaswWbsDhbEnWML3zJcnhmT+zGRPMGzN2CmeyYgKuMu1doJN7iRsJg9liajGb9I9M4xjm+8V9D0OQcgpF8bF2dVUjpse4twjSoGDxb+8j6h28BSxcu9l4k69oSEbQp46bZFTMEbor+Sdr+6WRt9iECXD3cbQT+QzTwVfEUa+28iqTbW1oParepmBbf9PX3nPDlT6CwND4bnfarlViM+eQcE5VM9Ikpr+l74pnjO4NyVb4aNbUBNA3YLAKVJ4Y5Uy6hPGPE4nO//egA3vhEIwdAxU0GaPmchMObg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
+        id S1347070AbiATQRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 11:17:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57584 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233059AbiATQRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 11:17:31 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9FBC061574
+        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 08:17:30 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id x22so23497766lfd.10
+        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 08:17:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Ox8eyWrLwQAtzexuRRN3SRkI2nODJsGswFIkHW/wl4=;
- b=gQ+KR54vdMPC6SeQgRwqsf925gTA5J+B10DJ+pgb+0NpenhYHo9QfUEwpmk+rdLECy43t8KCM3heXq5abtueUlXFfwgCLEYrpektwvLrtU1pss7bOE+tsOyD8kM7NHzs0jrkTHWelWbl23nOMcw9cimpFBPXDqKoD7WVR4wbvvs=
-Received: from DS7PR10MB5038.namprd10.prod.outlook.com (2603:10b6:5:38c::5) by
- BN8PR10MB3123.namprd10.prod.outlook.com (2603:10b6:408:c7::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4909.7; Thu, 20 Jan 2022 16:11:09 +0000
-Received: from DS7PR10MB5038.namprd10.prod.outlook.com
- ([fe80::e01a:f38f:1282:5677]) by DS7PR10MB5038.namprd10.prod.outlook.com
- ([fe80::e01a:f38f:1282:5677%3]) with mapi id 15.20.4909.008; Thu, 20 Jan 2022
- 16:11:09 +0000
-Message-ID: <ac496e47-c949-0e9d-4735-d51a7c9c0f62@oracle.com>
-Date:   Thu, 20 Jan 2022 16:11:02 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 7/9] KVM: SVM: Inject #UD on attempted emulation for SEV
- guest w/o insn buffer
-Content-Language: en-GB
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A84aj5UGI1NYrvkhOFIhb/Cs0SMGHG68d0x1Mrz2Olk=;
+        b=ofFZI5gQS4+4hIGdZCMWgXw5MgHoP0NCo/XNXBn3rS/1BFshHj85BeUabsurO1Jg8i
+         SchSM2Vs7e4hoyEd4NqCQQN89yCrACaqhXPpGU0F/ME9zbm+gv/8mYfDvqnv6ih6YQZV
+         AZuAFGHQY4gF0eC7Rcwin1957iLSGWiPRv/D50TPyRSHnJg2f5InZhpxIEAlwDrxr/nM
+         av74W3HWHeooOBK9o4ve3/xwL1Dd9VRHVfKRlGWRLbMnG0BWfZhEmCqAQSW/Sj++IXxh
+         XdqEz+PY4fpaJLYkzrzMgbsn2S/kEP1CqKLN6DKvoE3FBad8BOP6BJn0XqQEwGVYkDx8
+         H1iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A84aj5UGI1NYrvkhOFIhb/Cs0SMGHG68d0x1Mrz2Olk=;
+        b=mw5gZ9h/nTnZ7oGPCa5lLgIwTCF9IzjwrNfkzXuqWPlf24G0c1FZvavO4Ma72eE3BX
+         B1wFNJAlc8iFP66HhUJn29UFmvsLXRZw7uznn2RU2LrIBddVONsMv/nB67xtUQjIn4bS
+         YuHzeYmlfZ+45piZ3ccWYLI+6sb+2DDnNYfDaRQZdmZlhQkY/qi9Rjo6sDlFbVDecefZ
+         rmuGkVfaQoEpd/SIjQ9gu1js3WPFtDYyt4C/+kYdtZ0rEna6IcneC/MUReHDNgYJdwmo
+         gPjEdTrZxaPuiOUvV1Ky89020mghGJeyqR2D7iP1CR1a1XZlWhrQKZkHq3Jnv0Okc/1O
+         srJw==
+X-Gm-Message-State: AOAM533JhxIFniG3NOQlbSioF4NHVjPBtXufdnGAxxS4V1t8AMEdIQYO
+        wE9/x0lUFaemEDlo6jStT2n/l/Kt+KtfNE9H+JkM2FmU24xXVQ==
+X-Google-Smtp-Source: ABdhPJzgKvahsgA2dYfEUogEjezEPLnpfvYmPEnG4OkDlebsoQzHT8ag6j0avC3sA35DmmMhMEHBBzin14U+DLGr2gQ=
+X-Received: by 2002:a05:6512:1293:: with SMTP id u19mr30390170lfs.373.1642695448810;
+ Thu, 20 Jan 2022 08:17:28 -0800 (PST)
+MIME-Version: 1.0
+References: <20220118110621.62462-1-nikunj@amd.com> <20220118110621.62462-7-nikunj@amd.com>
+In-Reply-To: <20220118110621.62462-7-nikunj@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 20 Jan 2022 09:17:17 -0700
+Message-ID: <CAMkAt6p1-82LTRNB3pkPRwYh=wGpreUN=jcUeBj_dZt8ss9w0Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 6/6] KVM: SVM: Pin SEV pages in MMU during sev_launch_update_data()
+To:     Nikunj A Dadhania <nikunj@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Brijesh Singh <brijesh.singh@amd.com>,
-        Liam Merwick <liam.merwick@oracle.com>
-References: <20220120010719.711476-1-seanjc@google.com>
- <20220120010719.711476-8-seanjc@google.com>
-From:   Liam Merwick <liam.merwick@oracle.com>
-In-Reply-To: <20220120010719.711476-8-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0059.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:60::23) To DS7PR10MB5038.namprd10.prod.outlook.com
- (2603:10b6:5:38c::5)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1365683a-ccd0-435b-1958-08d9dc2f782b
-X-MS-TrafficTypeDiagnostic: BN8PR10MB3123:EE_
-X-Microsoft-Antispam-PRVS: <BN8PR10MB3123DA5B891233AB69349007E85A9@BN8PR10MB3123.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6YKVhBByct1EMoin0bBI8nAbNarYrk+6c0op7pYov3XFzzXCvXcIVbQUxgImZsqcitojIUbmcwKqoPjp8jKdxqqv6PVYtAZKznjpo0X3ZZiNfNI7PMFvHdI/pBqeqpEYS8/u+Iy3bw9mJzCmT3wjGqH4UhwcHCxqgAHQFqugsB8Oa9fz2PuRf0Zy76cH4FGZ6WtyrbVipknUFZtfgUKfk4uvZAzabNqREY/T6n+j0wpmZ2e65KbOfAuza53qcJak/U+w6cs/i8JBqLLA4BDv5wQPJ8nCOmaufosy4YasHI0zuxR9txudD8LnMNBgvcFOKmOFFNlXFas3PkQ6H1adJlYEqlT/Bpzles/mAR51SAmYEIi0xjmAbJYkLS1iXpCVjwplANTg36rbBug3urOoQ2ra8ONWYEdsVjFm+WUpi6eROIctOuX1UBWDmiNTe00FTSwdPf1F5RphLGMaVIYnlY2SLRlsh8xJPmhtLR8FBn/MYKxBT7fNo1TFP+ksuwKGz5qygfruhslm3C29DkRI13TX1vzKMuNoVZl4cDwGT8+owXjU5+Qv/nQIxbE85r/1x9v9D4wX34taCbgqSsxybVjsG59rD01XonmjXPhnlgquenvmg17jt0bpDmSVZ4WOvdW2Is/D13ectybvagyHY8sqv+14phwOxqQ4+jBbC7Z9MN/7x0KaBqkKyQLKaiKC4WgsxH0h6x8zM9k4ZblldmF5GPf374SAyPw2gXPW1DibCLul4Aa3fx2k46/P9uau62zekV6QIOjNvbx15q+3VA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5038.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(31696002)(52116002)(6506007)(107886003)(6486002)(83380400001)(6666004)(5660300002)(186003)(2616005)(2906002)(7416002)(53546011)(66556008)(66476007)(54906003)(86362001)(8936002)(26005)(8676002)(38100700002)(38350700002)(44832011)(66946007)(110136005)(4326008)(31686004)(316002)(508600001)(6512007)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDZvY1lybiswMmVXOEkxMExra1VsZ3JjdVZYNi9YOWsvOWpwVjRaT1h3eitV?=
- =?utf-8?B?U2IzR1dmcEFWVmpqV3pONXJ2TURxWVFQeHF2TWZuMGFtd3h1MzFrcFFCWG4z?=
- =?utf-8?B?ODV1cHg1RGl6aE1zZXg0UkIwOEFlcGlqOENYMjdVdzhzTHRmMExreWZEOUxO?=
- =?utf-8?B?bFZ3UUs5QjdmTlJwOThNcG9oVkd2VDErU0FDRU9JaEJQL3NibEc1SGV0aVI5?=
- =?utf-8?B?WmJZMkx0T1NRQ0p6b3FhTXRmeHVDd0JSK2IzakY0d0RWeUZxNzVNTnBSdExL?=
- =?utf-8?B?eFd5TXYwK0lWRnAzTkhyZTcxTEgyVU9tNmJRU1BmWWNLTzJlUlh5TTloT1BR?=
- =?utf-8?B?SkMxdnFKK3FOZG9VNjRVWGtpemdOSmxjQVUwZVFlS29rSjNOMDU5ak1ub1Ry?=
- =?utf-8?B?eVB4N1YwVDZoMWZRYTU1ZENtYlVEblM5RWVib3Fid1E5aXQxQnU2OUhvbDk5?=
- =?utf-8?B?WXRBVzA3ajNYeHBLUFV0dEpMaDNjTEVaYWNiRTNqRjJrYXMrY2hrR1J6dThE?=
- =?utf-8?B?bXY5ZUc0c3IvQTBtNytxeCtST3Jjd3VGQitES3g2NXBPOVhCR3pocEpwai9q?=
- =?utf-8?B?RTJHWUxUUWprU3NEOFU4ek9yZEJEZGxnQkp3QlJQY3NTcHBvOTNGVFRaaUo2?=
- =?utf-8?B?WnN4cDIzRlZBZ0sweDcxcWc0cTcxcktFV3hHRitLd09WcXRXdFZnQ0l4SjZB?=
- =?utf-8?B?a1lyYXFVd29zRDVKVDhYVGV4cUNiSEVReEtkNjVNYVlWKzkveXhhMDVpdjV4?=
- =?utf-8?B?STIzVGZmcEpMYU5jMHY3blYzaFF1WnJLYlRzREIwSy9GTTB6aFRYSUYvTngy?=
- =?utf-8?B?bmhvUnNpZVFMTkttZUtYZTY3djMxMkREVi93YVBLZWRTMjRkQWRJU0tzRWdn?=
- =?utf-8?B?RGllcVp2aStWeExQWmhFQWt1cXlUQnZOTlR4dS9TY2FzY2t3LzFsTHFTWTht?=
- =?utf-8?B?Q0JvZjI2L2I2Zkl3amJqRHkrWUVyanUrQXpQWnR1eTZCSjdmSmxQNW5iZHhV?=
- =?utf-8?B?TDNEUW1jTFhieGpJRGdodEQ0UGE0TFNOUHdXeURxWFJNNHc1S21CTzNCSVdF?=
- =?utf-8?B?MlV0bzNRVlRKbE12UmNsODl4cGJPTEVDUk5NMjVmYUtKRkphQktwdktsYWI3?=
- =?utf-8?B?aElBYVlnU1RrNzN5Ky9Dc1Y2ZTZRZVNsVG9qN1JxbHRNTlVyaGVaWVBjRllk?=
- =?utf-8?B?MENOMHd4VGhsUlluS2licnpaY2JSTXBrZ0xNOUgvekx0ekE1RGhScVRDVktY?=
- =?utf-8?B?TVNrcU16T2kzVVNwZzdhRmlUS2E0QUVYc05LNkhoejJPdTA4cng3ZzNXcUpp?=
- =?utf-8?B?elM1VEt1MXU1RUR5UGZWcjB3Q0hMbmEzYmxCSVcxL2FNZnFaT1U0UUR6N0RL?=
- =?utf-8?B?T2VJNll6cTRvZlZzYXBiSUdFVzgwTzJtSUdGeEd6TjY2L3ptMUtKWXR4aDBM?=
- =?utf-8?B?R3Z1eVcxdW5JZ3QrUzVsY2xvSVZpeC8yQlJBTER2RkQzejkxRTBKcXJCMitQ?=
- =?utf-8?B?Y2s2Ukh1UnVmNkdYbWlyRUZ1YXZwVzJoZXlPbCtiLzNTSGJIbkQzallLaVhE?=
- =?utf-8?B?b2RpWHhEVStITXNHK1FOYWx2WEJDM25WRENpdlBpaVhabWllakJyTWFuK3Q5?=
- =?utf-8?B?c09sVjdzakZDNFhzVThaaGNpcGtDUUVGblMzSXpzVnM5TFVoMGZPZVhZNWdM?=
- =?utf-8?B?Vlkxb2xpQlF4SlRMdE9mb0pYQ3VjQVYyZ1JTQmE5b2UxTzBWdnhHa2x3TUYz?=
- =?utf-8?B?MjVNMWZNYW5EWnFHa292V2JpMXFCRFNRUjVkdHZBOVI1NGZ1L1hKUDNhSWNj?=
- =?utf-8?B?WnpEK2hxMkNrd1ptK3dMUFQ3dGV0UU9RYTVESVhTTy9zR2pmNGVnMUtSYkxy?=
- =?utf-8?B?QzQ4K3dtQXVQcUNYZlVFYjh2ZWg0TFhWRGFBVDQrTjVEWGp6L3pWRE5Xd2pX?=
- =?utf-8?B?K0s2Y0ZKZkxFeVMyc3lsZ2F2K21WL0lxSHJ2d0xZckthWGh6RWtKWW8wUjhW?=
- =?utf-8?B?TUd4L2sxbllwcmdjb0U4eE5NZmdJdlZPTk0xNWttWWhqd1JmcXJLWTQ0cDlM?=
- =?utf-8?B?dkk0Q09LMy9GUTMwWFYzTE1nYmRmakNIcmZnVzdxekRPalY2b0dqeXEvN2tm?=
- =?utf-8?B?RlNkNnVoNjFzRnV2UEtzWUIzRFh2UmtpcFFZSVk3aXNKRnZROXFrbWdYZnNL?=
- =?utf-8?Q?rRtuOmZcV21atz/x8sdKbUw=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1365683a-ccd0-435b-1958-08d9dc2f782b
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5038.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2022 16:11:08.9799
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C+CK4N+UOaG0T9n7ym2VM4jwuPLSaYDtGn/VcHvBoFWnigbl4VwpNxQJzg1e1ddm7BA1O2aVuzRLA2uWzbgwDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR10MB3123
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10233 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
- malwarescore=0 adultscore=0 phishscore=0 mlxscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201200083
-X-Proofpoint-GUID: vXNG9d46771HpImfWZDTqw6zQpupjTo3
-X-Proofpoint-ORIG-GUID: vXNG9d46771HpImfWZDTqw6zQpupjTo3
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/01/2022 01:07, Sean Christopherson wrote:
-> Inject #UD if KVM attempts emulation for an SEV guests without an insn
-> buffer and instruction decoding is required.  The previous behavior of
-> allowing emulation if there is no insn buffer is undesirable as doing so
-> means KVM is reading guest private memory and thus decoding cyphertext,
-> i.e. is emulating garbage.  The check was previously necessary as the
-> emulation type was not provided, i.e. SVM needed to allow emulation to
-> handle completion of emulation after exiting to userspace to handle I/O.
-> 
-
-A few cyphertext references...
-
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-
+On Tue, Jan 18, 2022 at 4:07 AM Nikunj A Dadhania <nikunj@amd.com> wrote:
+>
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> Pin the memory for the data being passed to launch_update_data()
+> because it gets encrypted before the guest is first run and must
+> not be moved which would corrupt it.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> [ * Changed hva_to_gva() to take an extra argument and return gpa_t.
+>   * Updated sev_pin_memory_in_mmu() error handling.
+>   * As pinning/unpining pages is handled within MMU, removed
+>     {get,put}_user(). ]
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 > ---
->   arch/x86/kvm/svm/svm.c | 89 ++++++++++++++++++++++++++----------------
->   1 file changed, 55 insertions(+), 34 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ed2ca875b84b..d324183fc596 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4277,49 +4277,70 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
->   	if (sev_es_guest(vcpu->kvm))
->   		return false;
->   
-> +	/*
-> +	 * Emulation is possible if the instruction is already decoded, e.g.
-> +	 * when completing I/O after returning from userspace.
-> +	 */
-> +	if (emul_type & EMULTYPE_NO_DECODE)
-> +		return true;
+>  arch/x86/kvm/svm/sev.c | 122 ++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 119 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 14aeccfc500b..1ae714e83a3c 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -22,6 +22,7 @@
+>  #include <asm/trapnr.h>
+>  #include <asm/fpu/xcr.h>
+>
+> +#include "mmu.h"
+>  #include "x86.h"
+>  #include "svm.h"
+>  #include "svm_ops.h"
+> @@ -490,6 +491,110 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+>         return pages;
+>  }
+>
+> +#define SEV_PFERR_RO (PFERR_USER_MASK)
+> +#define SEV_PFERR_RW (PFERR_WRITE_MASK | PFERR_USER_MASK)
 > +
-> +	/*
-> +	 * Emulation is possible for SEV guests if and only if a prefilled
-> +	 * buffer containing the bytes of the intercepted instruction is
-> +	 * available. SEV guest memory is encrypted with a guest specific key
-> +	 * and cannot be decrypted by KVM, i.e. KVM would read cyphertext and
-> +	 * decode garbage.
-> +	 *
-> +	 * Inject #UD if KVM reached this point without an instruction buffer.
-> +	 * In practice, this path should never be hit by a well-behaved guest,
-> +	 * e.g. KVM doesn't intercept #UD or #GP for SEV guests, but this path
-> +	 * is still theoretically reachable, e.g. via unaccelerated fault-like
-> +	 * AVIC access, and needs to be handled by KVM to avoid putting the
-> +	 * guest into an infinite loop.   Injecting #UD is somewhat arbitrary,
-> +	 * but its the least awful option given lack of insight into the guest.
-> +	 */
-> +	if (unlikely(!insn)) {
-> +		kvm_queue_exception(vcpu, UD_VECTOR);
-> +		return false;
-> +	}
+> +static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm,
+> +                                             unsigned long hva)
+> +{
+> +       struct kvm_memslots *slots = kvm_memslots(kvm);
+> +       struct kvm_memory_slot *memslot;
+> +       int bkt;
 > +
-> +	/*
-> +	 * Emulate for SEV guests if the insn buffer is not empty.  The buffer
-> +	 * will be empty if the DecodeAssist microcode cannot fetch bytes for
-> +	 * the faulting instruction because the code fetch itself faulted, e.g.
-> +	 * the guest attempted to fetch from emulated MMIO or a guest page
-> +	 * table used to translate CS:RIP resides in emulated MMIO.
-> +	 */
-> +	if (likely(insn_len))
-> +		return true;
+> +       kvm_for_each_memslot(memslot, bkt, slots) {
+> +               if (hva >= memslot->userspace_addr &&
+> +                   hva < memslot->userspace_addr +
+> +                   (memslot->npages << PAGE_SHIFT))
+> +                       return memslot;
+> +       }
 > +
->   	/*
->   	 * Detect and workaround Errata 1096 Fam_17h_00_0Fh.
->   	 *
->   	 * Errata:
-> -	 * When CPU raise #NPF on guest data access and vCPU CR4.SMAP=1, it is
-> -	 * possible that CPU microcode implementing DecodeAssist will fail
-> -	 * to read bytes of instruction which caused #NPF. In this case,
-> -	 * GuestIntrBytes field of the VMCB on a VMEXIT will incorrectly
-> -	 * return 0 instead of the correct guest instruction bytes.
-> -	 *
-> -	 * This happens because CPU microcode reading instruction bytes
-> -	 * uses a special opcode which attempts to read data using CPL=0
-> -	 * privileges. The microcode reads CS:RIP and if it hits a SMAP
-> -	 * fault, it gives up and returns no instruction bytes.
-> +	 * When CPU raises #NPF on guest data access and vCPU CR4.SMAP=1, it is
-> +	 * possible that CPU microcode implementing DecodeAssist will fail to
-> +	 * read guest memory at CS:RIP and vmcb.GuestIntrBytes will incorrectly
-> +	 * be '0'.  This happens because microcode reads CS:RIP using a _data_
-> +	 * loap uop with CPL=0 privileges.  If the load hits a SMAP #PF, ucode
-> +	 * gives up and does not fill the instruction bytes buffer.
->   	 *
->   	 * Detection:
-> -	 * We reach here in case CPU supports DecodeAssist, raised #NPF and
-> -	 * returned 0 in GuestIntrBytes field of the VMCB.
-> -	 * First, errata can only be triggered in case vCPU CR4.SMAP=1.
-> -	 * Second, if vCPU CR4.SMEP=1, errata could only be triggered
-> -	 * in case vCPU CPL==3 (Because otherwise guest would have triggered
-> -	 * a SMEP fault instead of #NPF).
-> -	 * Otherwise, vCPU CR4.SMEP=0, errata could be triggered by any vCPU CPL.
-> -	 * As most guests enable SMAP if they have also enabled SMEP, use above
-> -	 * logic in order to attempt minimize false-positive of detecting errata
-> -	 * while still preserving all cases semantic correctness.
-> +	 * KVM reaches this point if the VM is an SEV guest, the CPU supports
-> +	 * DecodeAssist, a #NPF was raised, KVM's page fault handler triggered
-> +	 * emulation (e.g. for MMIO), and the CPU returned 0 in GuestIntrBytes
-> +	 * field of the VMCB.
->   	 *
-> -	 * Workaround:
-> -	 * To determine what instruction the guest was executing, the hypervisor
-> -	 * will have to decode the instruction at the instruction pointer.
-> +	 * This does _not_ mean that the erratum has been encountered, as the
-> +	 * DecodeAssist will also fail if the load for CS:RIP hits a legitimate
-> +	 * #PF, e.g. if the guest attempt to execute from emulated MMIO and
-> +	 * encountered a reserved/not-present #PF.
->   	 *
-> -	 * In non SEV guest, hypervisor will be able to read the guest
-> -	 * memory to decode the instruction pointer when insn_len is zero
-> -	 * so we return true to indicate that decoding is possible.
-> -	 *
-> -	 * But in the SEV guest, the guest memory is encrypted with the
-> -	 * guest specific key and hypervisor will not be able to decode the
-> -	 * instruction pointer so we will not able to workaround it. Lets
-> -	 * print the error and request to kill the guest.
-> +	 * To reduce the likelihood of false positives, take action if and only
-> +	 * if CR4.SMAP=1 (obviously required to hit the erratum) and CR4.SMEP=0
-> +	 * or CPL=3.  If SMEP=1 and CPL!=3, the erratum cannot have been hit as
-> +	 * the guest would have encountered a SMEP violation #PF, not a #NPF.
->   	 */
-> -	if (likely(!insn || insn_len))
-> -		return true;
-> -
->   	cr4 = kvm_read_cr4(vcpu);
->   	smep = cr4 & X86_CR4_SMEP;
->   	smap = cr4 & X86_CR4_SMAP;
+> +       return NULL;
+> +}
+> +
+> +static gpa_t hva_to_gpa(struct kvm *kvm, unsigned long hva, bool *ro)
+> +{
+> +       struct kvm_memory_slot *memslot;
+> +       gpa_t gpa_offset;
+> +
+> +       memslot = hva_to_memslot(kvm, hva);
+> +       if (!memslot)
+> +               return UNMAPPED_GVA;
+> +
+> +       *ro = !!(memslot->flags & KVM_MEM_READONLY);
+> +       gpa_offset = hva - memslot->userspace_addr;
+> +       return ((memslot->base_gfn << PAGE_SHIFT) + gpa_offset);
+> +}
+> +
+> +static struct page **sev_pin_memory_in_mmu(struct kvm *kvm, unsigned long addr,
+> +                                          unsigned long size,
+> +                                          unsigned long *npages)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct kvm_vcpu *vcpu;
+> +       struct page **pages;
+> +       unsigned long i;
+> +       u32 error_code;
+> +       kvm_pfn_t pfn;
+> +       int idx, ret = 0;
+> +       gpa_t gpa;
+> +       bool ro;
+> +
+> +       pages = sev_alloc_pages(sev, addr, size, npages);
+> +       if (IS_ERR(pages))
+> +               return pages;
+> +
+> +       vcpu = kvm_get_vcpu(kvm, 0);
+> +       if (mutex_lock_killable(&vcpu->mutex)) {
+> +               kvfree(pages);
+> +               return ERR_PTR(-EINTR);
+> +       }
+> +
+> +       vcpu_load(vcpu);
+> +       idx = srcu_read_lock(&kvm->srcu);
+> +
+> +       kvm_mmu_load(vcpu);
+> +
+> +       for (i = 0; i < *npages; i++, addr += PAGE_SIZE) {
+> +               if (signal_pending(current)) {
+> +                       ret = -ERESTARTSYS;
+> +                       break;
+> +               }
+> +
+> +               if (need_resched())
+> +                       cond_resched();
+> +
+> +               gpa = hva_to_gpa(kvm, addr, &ro);
+> +               if (gpa == UNMAPPED_GVA) {
+> +                       ret = -EFAULT;
+> +                       break;
+> +               }
+> +
+> +               error_code = ro ? SEV_PFERR_RO : SEV_PFERR_RW;
+> +
+> +               /*
+> +                * Fault in the page and sev_pin_page() will handle the
+> +                * pinning
+> +                */
+> +               pfn = kvm_mmu_map_tdp_page(vcpu, gpa, error_code, PG_LEVEL_4K);
+> +               if (is_error_noslot_pfn(pfn)) {
+> +                       ret = -EFAULT;
+> +                       break;
+> +               }
+> +               pages[i] = pfn_to_page(pfn);
+> +       }
+> +
+> +       kvm_mmu_unload(vcpu);
+> +       srcu_read_unlock(&kvm->srcu, idx);
+> +       vcpu_put(vcpu);
+> +       mutex_unlock(&vcpu->mutex);
+> +
+> +       if (!ret)
+> +               return pages;
+> +
+> +       kvfree(pages);
+> +       return ERR_PTR(ret);
+> +}
+> +
+>  static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>         unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+> @@ -510,15 +615,21 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         vaddr_end = vaddr + size;
+>
+>         /* Lock the user memory. */
+> -       inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
+> +       if (atomic_read(&kvm->online_vcpus))
+> +               inpages = sev_pin_memory_in_mmu(kvm, vaddr, size, &npages);
 
+IIUC we can only use the sev_pin_memory_in_mmu() when there is an
+online vCPU because that means the MMU has been setup enough to use?
+Can we add a variable and a comment to help explain that?
+
+bool mmu_usable = atomic_read(&kvm->online_vcpus) > 0;
+
+> +       else
+> +               inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
+
+So I am confused about this case. Since svm_register_enc_region() is
+now a NOOP how can a user ensure that memory remains pinned from
+sev_launch_update_data() to when the memory would be demand pinned?
+
+Before users could svm_register_enc_region() which pins the region,
+then sev_launch_update_data(), then the VM could run an the data from
+sev_launch_update_data() would have never moved. I don't think that
+same guarantee is held here?
+
+>         if (IS_ERR(inpages))
+>                 return PTR_ERR(inpages);
+>
+>         /*
+>          * Flush (on non-coherent CPUs) before LAUNCH_UPDATE encrypts pages in
+>          * place; the cache may contain the data that was written unencrypted.
+> +        * Flushing is automatically handled if the pages can be pinned in the
+> +        * MMU.
+>          */
+> -       sev_clflush_pages(inpages, npages);
+> +       if (!atomic_read(&kvm->online_vcpus))
+> +               sev_clflush_pages(inpages, npages);
+>
+>         data.reserved = 0;
+>         data.handle = sev->handle;
+> @@ -553,8 +664,13 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>                 set_page_dirty_lock(inpages[i]);
+>                 mark_page_accessed(inpages[i]);
+>         }
+> +
+>         /* unlock the user pages */
+> -       sev_unpin_memory(kvm, inpages, npages);
+> +       if (atomic_read(&kvm->online_vcpus))
+> +               kvfree(inpages);
+> +       else
+> +               sev_unpin_memory(kvm, inpages, npages);
+> +
+>         return ret;
+>  }
+>
+> --
+> 2.32.0
+>
