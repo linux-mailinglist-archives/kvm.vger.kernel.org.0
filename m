@@ -2,123 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C04D5494494
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 01:27:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A47ED4944A1
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 01:29:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357776AbiATA1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 19:27:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40000 "EHLO
+        id S1357711AbiATA32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 19:29:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357766AbiATA1U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 19:27:20 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB86C061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:27:20 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id d5so1707009pjk.5
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:27:20 -0800 (PST)
+        with ESMTP id S1344860AbiATA31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 19:29:27 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A2E0C061574
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:29:27 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id z3-20020a17090a468300b001b4df1f5a6eso2861302pjf.6
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:29:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+TqAt14XKXCbtB/P6ewZv6dez1U9WqxQBNJ+sItXmlI=;
-        b=F/r6jm4JzyNVaU7DF6e9U4M2zV1h4k4Mrg4VYBW7l2IN1j8EcwrQiXOcu6Gvnk3jmR
-         Zm2RatSb4zvpG74iCIhDtzCg6rvMo+nBURyCB3QB1+fQAnKweumNAkvx1I0SD+PE25XA
-         5QD9kMNy3iNJXNSIyNTNzCWpvVz749GYxa3+R3vpzTKty2zLTAegEINhm195SOL+mC+y
-         tkU6I6kM6Ccpiy6EtPro96tevnIfYb9L/UeN5LaOpwbNxRGL8uOeJwIGfpi1eufa0kdF
-         F7O2Ur+Xe5ycOLIpqYgay4HF0msKYazYuSjCZjRzZrXKKAgO4PZHEWZ7mwcdTem4h2oT
-         zocg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=xGZFB5oitmoGiXBBflNxGwPgP1wyJ5Z4WqYt/VFwkiA=;
+        b=NJvpYqFsz6ZeovbRKj7OmMHLCguJFKdO+CbKb/3g1hyUq1QBWmNPxKoEiNFMvKE2h4
+         23dNp22ynkJzw0GeaSnDAvk5UUbNdPBvwQXqUBYQ/CBgYpTlZrUrpy0SY32ZIXuHecMF
+         JyE5kd/H0UhWUzOgyK0b3WL3eOysXoSQfDqqd8aek71ToQXv1/K1GdDq7awEUqo9Gm2v
+         4TpefpWZrkohuID94LHw8udTjEwocADW9JvSNJlLFz7Pb9XKhU3Nal5gNV+KaXVunLI4
+         71FdQ9ZsB1Keifk9NMnzTvT2/7CUSsn2ViAP6hueKUU2jNr9qF/RmprGmwyCMVYjVnUd
+         whzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+TqAt14XKXCbtB/P6ewZv6dez1U9WqxQBNJ+sItXmlI=;
-        b=c/AUR0pBhoIdZj3eUyoiLywXgUAV00NAq+nEql83NdGDEhg3/m9jFK08CpHed7M94T
-         5M6sgUHMxSch/f/3jD9qm47VPB29OWmu3CRHcToYM6sn/1UYnXDFc9/vy5b33K/idYXl
-         YoK+8Mj855IK8X+azeMR80/lMbOLFSaXj/TyZkVcUbt4A32QjQvmK0KTxgwsLak3ro2C
-         aV5ymqDCMHWkSL1TtFcvUB75q8tArurtUd7/4zlnubNTPSfgsa6kMDWhZUwJZ9LQKmkb
-         vMQ13MNu+PtsdDft+nCc2QZw4fbGv6JuXMTAVV8CR0X4s+I7XNZx97iqXpO9QV9k5wem
-         BooQ==
-X-Gm-Message-State: AOAM532gN0N9debPbLuCelJrtZ00IG+Tc76T+aAnxCD88lL/jSNCgyXZ
-        R9tRVkEIVGs9A4Zx6W06HpnW9w==
-X-Google-Smtp-Source: ABdhPJy8eb351Wq5iEXEb6Pkw/V9Y3ntyEY4dpEYnYofdfrP1ruzhmhasshPA0tIWyfCz/62Czq8cA==
-X-Received: by 2002:a17:90a:5d07:: with SMTP id s7mr7432257pji.226.1642638440008;
-        Wed, 19 Jan 2022 16:27:20 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a3sm706367pfo.163.2022.01.19.16.27.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 16:27:19 -0800 (PST)
-Date:   Thu, 20 Jan 2022 00:27:16 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=xGZFB5oitmoGiXBBflNxGwPgP1wyJ5Z4WqYt/VFwkiA=;
+        b=3U0whuWMHUzNBoqlvebFv8NlT1RMAtnlFKUVxOkHvOcgugvUoTzfABdUq/RufjwFqE
+         8ZCcZst99Qo3cNTaiHZGHFyz7Pb3DSj+C3jZHpq6U8NjgPHzac6Z1EuokS/9QDwmQAM9
+         nbJWESF8alAwdNG+ueK7ceZsW4kJZE6aIy7dXMXXtWKxNjOAHC850IJkVSL1N93UBH6J
+         barlOr/Ltl25W3t1ltP5mX0ohD+9Sq+eeiI3wGR0MZdyrK2sE2amChNa7zdCROEVGT2Y
+         V8J/6pJiZLdZXtlhsgXjSazGzumUloU5YgMucb/iII76EFgOSXHwDVhUkAbgSKYu//jD
+         mq6Q==
+X-Gm-Message-State: AOAM531WjCYN9QrONnlaSuyNHn7kk8VLOFrQxDcoeDonbyNUnnvYgYUp
+        FlCiTlF90jNJqUkUwZ9p83BtjQxq1Xg=
+X-Google-Smtp-Source: ABdhPJztAmWUYS6iDZVpfxrvowC/HS88XndWtavsP2LLYhIb0NEM6yDcvuwOytOvS5eyfCLgzRmAAmIxgk0=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a62:5f07:0:b0:4be:3e19:6c08 with SMTP id
+ t7-20020a625f07000000b004be3e196c08mr33740482pfb.71.1642638566582; Wed, 19
+ Jan 2022 16:29:26 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 20 Jan 2022 00:29:16 +0000
+Message-Id: <20220120002923.668708-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
+Subject: [kvm-unit-tests PATCH 0/7] x86/debug: More single-step #DB tests
 From:   Sean Christopherson <seanjc@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        linux-kernel@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-Message-ID: <YeisZCJedWYJPLV5@google.com>
-References: <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
- <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
- <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
- <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
- <YeBfj89mIf8SezfD@google.com>
- <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
- <YedWUJNnQK3HFrWC@google.com>
- <CAAeT=FyJAG1dEFLvrQ4UXrwUqBUhY0AKkjzFpyi74zCJZUEYVg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FyJAG1dEFLvrQ4UXrwUqBUhY0AKkjzFpyi74zCJZUEYVg@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alexander Graf <graf@amazon.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 18, 2022, Reiji Watanabe wrote:
-> On Tue, Jan 18, 2022 at 4:07 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Fri, Jan 14, 2022, Reiji Watanabe wrote:
-> > > The restriction, with which KVM doesn't need to worry about the changes
-> > > in the registers after KVM_RUN, could potentially protect or be useful
-> > > to protect KVM and simplify future changes/maintenance of the KVM codes
-> > > that consumes the values.
-> >
-> > That sort of protection is definitely welcome, the previously mentioned CPUID mess
-> > on x86 would have benefit greatly by KVM being restrictive in the past.  That said,
-> > hooking KVM_RUN is likely the wrong way to go about implementing any restrictions.
-> > Running a vCPU is where much of the vCPU's state is explicitly consumed, but it's
-> > all too easy for KVM to implicity/indirectly consume state via a different ioctl(),
-> > e.g. if there are side effects that are visible in other registers, than an update
-> > can also be visible to userspace via KVM_{G,S}ET_{S,}REGS, at which point disallowing
-> > modifying state after KVM_RUN but not after reading/writing regs is arbitrary and
-> > inconsitent.
-> 
-> Thank you for your comments !
-> I think I understand your concern, and that's a great point.
-> That's not the case for those pseudo registers though at least for now :)
-> BTW, is this concern specific to hooking KVM_RUN ? (Wouldn't it be the
-> same for the option with "if kvm->created_vcpus > 0" ?)
+Add single-step #DB + STI/MOVSS blocking regression tests for a related
+KVM bug[*].  Before adding the test (last patch), overhaul asm/debugreg.h
+and clean up x86's "debug" test.
 
-Not really?  The goal with created_vcpus is to avoid having inconsistent state in
-"struct kvm_vcpu" with respect to the VM as whole.  "struct kvm" obvioulsy can't
-be inconsistent with itself, e.g. even if userspace consumes some side effect,
-that's simply "the state".  Did that make sense?  Hard to explain in writing :-)
+[*] https://lore.kernel.org/all/20220120000624.655815-1-seanjc@google.com
 
-> > If possible, preventing modification if kvm->created_vcpus > 0 is ideal as it's
-> > a relatively common pattern in KVM, and provides a clear boundary to userpace
-> > regarding what is/isn't allowed.
-> 
-> Yes, I agree that would be better in general.  For (pseudo) registers,
+Sean Christopherson (7):
+  bitops: Include stdbool.h and stddef.h as necessary
+  x86/debug: Add framework for single-step #DB tests
+  x86/debug: Test OUT instead of RDMSR for single-step #DB emulation
+    test
+  x86/debug: Run single-step #DB tests in usermode (and kernel mode)
+  x86: Overhaul definitions for DR6 and DR7 bits
+  x86/debug: Add single-step #DB + STI/MOVSS blocking tests
+  x86/debug: Explicitly write DR6 in the H/W watchpoint + DR6.BS
+    sub-test
 
-What exactly are these pseudo registers?  If it's something that's an immutable
-property of the (virtual) system, then it might make sense to use a separate,
-non-vCPU mechanism for setting/getting their values.  Then you can easily restrict
-the <whatever> to pre-created_vcpus, e.g. see x86's KVM_SET_IDENTITY_MAP_ADDR.
+ lib/bitops.h           |   3 +
+ lib/x86/asm/debugreg.h | 125 ++++++--------
+ x86/debug.c            | 384 ++++++++++++++++++++++++++++++++++-------
+ x86/emulator.c         |  14 +-
+ x86/vmx_tests.c        |  27 +--
+ 5 files changed, 405 insertions(+), 148 deletions(-)
 
-> I would think preventing modification if kvm->created_vcpus > 0 might
-> not be a very good option for KVM/ARM though considering usage of
-> KVM_GET_REG_LIST and KVM_{G,S}ET_ONE_REG.
+
+base-commit: 92a6c9b95ab10eba66bff3ff44476ab0c015b276
+-- 
+2.34.1.703.g22d0c6ccf7-goog
+
