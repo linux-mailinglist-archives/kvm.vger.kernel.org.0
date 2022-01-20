@@ -2,111 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3C8494B0E
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 10:49:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 182DA494BA7
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 11:28:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359643AbiATJtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 04:49:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27834 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233682AbiATJtF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 04:49:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642672144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3ASD723Fq05/u+RSMddSwINm6iuW+XRhy8TGVViJ7jE=;
-        b=Y3OEwjfD/FReXDiKMhg38/LHeAX346JrJUsPWWKA0rmy9HIgAEHeiPA8XOoK0oBKz6PI+k
-        emnB+gLhpR09exfgp8VLNg1QAL3fBqPhKEenBIOf4itcSmwdisyJzu7h8RRS1RMBdjw6x9
-        oHMAbG01QFJVGry8YCcP3qGkCS9mLrI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-LRvCHgxZPo-M4y8bckGT1g-1; Thu, 20 Jan 2022 04:49:03 -0500
-X-MC-Unique: LRvCHgxZPo-M4y8bckGT1g-1
-Received: by mail-wm1-f69.google.com with SMTP id z2-20020a05600c220200b0034d2eb95f27so3708620wml.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 01:49:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=3ASD723Fq05/u+RSMddSwINm6iuW+XRhy8TGVViJ7jE=;
-        b=MnxKu/3jJ3XtkJ+c8VerY81UNDASuPUOKkLU5jz4OL5UDMrBwy5sebWrooA9UuQDCw
-         pWkWIqMMouADQvQXXixtwuabGkX6naDhq9Zf2P8n6oLafOPAjHn1ojQC7AUoGLMy93EA
-         rSbjqmBTUV/t1Es98csQV/EWSFGNUq2LLrv5McYnm/01CzQi3v5tZi5jmc6iAZDZkiOP
-         EiTpOQJM+B8sxNbQ9QxIfhqyFrOJj8rJU2p/wJXvp56VsyW9IPPFDbUrDPrFv3unWkkq
-         LYq9gDXHVaUzcj1LZGH6F0P/xjw8trETklxn9FhS59KPOWXHRgQGIyww+PXSN4irVcPR
-         5nmQ==
-X-Gm-Message-State: AOAM5301koc54VnuNTUxPLdOd7bC+GhX8nokMBbp12Qzk+7SQjoNvG/J
-        DZijldqKzDGAkoquQ6m58tJg3Q9TiM9NFBFYullJ9cjuwOhlSy8ftaikpk0u8r5wtD/WwIc9Lyp
-        vgPp18qGeMOTd
-X-Received: by 2002:a5d:464e:: with SMTP id j14mr27171729wrs.252.1642672142057;
-        Thu, 20 Jan 2022 01:49:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwlYe/3RfiOjswaZnOooonISxe6eEP7wKl0mY0RlahITBbXhrOgxhrgk3MGbTim1FUrgIqcHw==
-X-Received: by 2002:a5d:464e:: with SMTP id j14mr27171710wrs.252.1642672141823;
-        Thu, 20 Jan 2022 01:49:01 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r2sm3567451wrz.99.2022.01.20.01.49.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jan 2022 01:49:01 -0800 (PST)
-Message-ID: <5de5120f-e4b1-5888-58cb-b642361ea5cd@redhat.com>
-Date:   Thu, 20 Jan 2022 10:49:00 +0100
+        id S1359858AbiATK14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 05:27:56 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11074 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241964AbiATK1u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 05:27:50 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20K9wbex020333;
+        Thu, 20 Jan 2022 10:27:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DVIj3GFgTkgKFo2VvBZ/iCyurbcDaBoDFE2fV/wwMxE=;
+ b=VKTX+OH0G5TYiuEH20v5oDLvR2Z2yGd+RShzd4JK3xZ4xbSDaylOOBbAbqiLPNG6BxUp
+ FV9wia2OYYk5VJQ4/gauu+SqSm+gf1V2GfND88i3AD+xm0oVrxTAjELumLjLHyVvDm5Q
+ ++FnGXmTWVFRtx7Bji3VMsFwjRmm48O2XvBlOu5ef2cvKJxlyOuG3PW3F29NlrPWF7aJ
+ Xriymftk45GZIOcgjlcGel+FhbFGdQ4Za1jV0pIQgOoGVW7sVoxXd00wIYS9Fc0hpD6D
+ ZjMiPUrxMrZ4paZG9JRsSavcnXiFc88ifun05/pIlCdSgB59uPRkYSZ+uPGU5df5bOG4 qA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dq5k1rgw0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 10:27:50 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20KA0JwE024807;
+        Thu, 20 Jan 2022 10:27:50 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dq5k1rgvk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 10:27:50 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20KANp0C026798;
+        Thu, 20 Jan 2022 10:27:48 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3dknhk030r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 10:27:47 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20KARirJ10354998
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jan 2022 10:27:44 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0EBFA4082;
+        Thu, 20 Jan 2022 10:27:44 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B98AA405F;
+        Thu, 20 Jan 2022 10:27:44 +0000 (GMT)
+Received: from [9.171.38.24] (unknown [9.171.38.24])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Jan 2022 10:27:44 +0000 (GMT)
+Message-ID: <d5247a6c-2088-cbfa-20f9-c1c748f90daf@linux.ibm.com>
+Date:   Thu, 20 Jan 2022 11:27:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [DROP][PATCH] KVM: x86: Fix the #GP(0) and #UD conditions for
- XSETBV emulation
+Subject: Re: [RFC PATCH v1 02/10] KVM: s390: Honor storage keys when accessing
+ guest memory
 Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jun Nakajima <jun.nakajima@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220117072456.71155-1-likexu@tencent.com>
- <a133d6e2-34de-8a41-475e-3858fc2902bf@redhat.com>
- <9c655b21-640f-6ce8-61b4-c6444995091e@gmail.com>
- <0d7ed850-8791-42b4-ef9a-bbaa8c52279e@redhat.com>
- <92b16faf-c9a7-4be3-43f7-3450259346e9@gmail.com>
- <19c4168f-c65b-fc9a-fe4c-152284e18d30@redhat.com>
- <d0855fb0-4e98-1090-a230-132b08864ed3@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <d0855fb0-4e98-1090-a230-132b08864ed3@intel.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+ <20220118095210.1651483-3-scgl@linux.ibm.com>
+ <e5b06907-471d-fe4f-8461-a7dea37abca2@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <e5b06907-471d-fe4f-8461-a7dea37abca2@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1Y7FW37KP1asLZqtYofSVCCT09h35gef
+X-Proofpoint-ORIG-GUID: t_eo0gSrPiFTT1nOlu1ssWHltFclHPuQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-20_03,2022-01-20_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxlogscore=999 phishscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201200050
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/20/22 10:31, Xiaoyao Li wrote:
->>
->> So while my gut feeling that #UD would not cause a vmexit was correct,
->> technically I was reading the SDM incorrectly.
-> 
-> SDM also states
-> 
->    Certain exceptions have priority over VM exits. These include
->    invalid-opcode exception, faults based on privilege level,
->    and general-protection exceptions that are based on checking
->    I/O permission bits in the task-state segment(TSS)
-> 
-> in "Relative Priority of Faults and VM Exits"
-> 
-> So my understanding is that the architectural check always takes the 
-> higher priority than VM exit.
 
-Good point!  It's right above in 25.1.1.  I was confused by the specific 
-mention of GETSEC, but the reason for the footnote is because undefined 
-GETSEC leaves cause a vmexit instead of #UD, and GETSEC vmexits also 
-override #GP faults based on privilege level.
 
-Thanks,
+Am 18.01.22 um 15:38 schrieb Janosch Frank:
+[...]
+> /*
+> We'll do an actual access via the mv instruction which will return access errors to us so we don't need to check here.
+> */
 
-Paolo
+Be slightly more verbose I guess. Something like
+We'll do an actual access via the mv instruction which will return access errors to us so we don't need to check here.
+By using key 0 all checks are skipped and no performance overhead occurs.
 
+?
+
+>> +    rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode, 0);
