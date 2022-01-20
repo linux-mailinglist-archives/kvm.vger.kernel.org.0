@@ -2,158 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C5149456F
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 02:16:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB75D494573
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 02:18:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240567AbiATBPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 20:15:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51082 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbiATBPv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 20:15:51 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F03C061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 17:15:51 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id pf13so4264980pjb.0
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 17:15:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=w+ACjmQj/mxjLPRVwNvc/tjG2xIG1XyGQYSZl8IL2SI=;
-        b=EJlGdNfCAuAvcA3VFyhYgZh3NRTeJJtjsfJE73eMvPvLp7THFcP0BLxKzETQiQXcJl
-         uel7kdeScf6U/3b8Z37eTcrzIZdXCwBx1sM8Wn5Utg9+0qdVOMWetT6imCw+xVZOeJez
-         ttOWF8D8OVnu8hbelXiRgZNEuNvixkAEukj3bzYNaZ/OIvJlHp4gWHd8/aCSDdQHVow2
-         5xXxbdpwnohNAw0E/p13bQJOAkKIcrMWKzWNalRqNdC9JlwzqVrAN0AQVFGfRoAgPJOp
-         RSHUsNRsWLEgcOWkl0BTaZ+f+1q1qUtzATKp04bmj54cukZJNa672Qe2yy5gmoO+8aTO
-         BSwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=w+ACjmQj/mxjLPRVwNvc/tjG2xIG1XyGQYSZl8IL2SI=;
-        b=c27Z2A+YwLIaEAcQ7dDrERYbGMPi6EHbpb3hB9gq6AVCxqvSrJ8g2IgbRcSYgRjiXh
-         ZMM1N8d636HOWqB3f6SeTQjg6jwmG4dO2bU9voMTAAO2QJK6u8Q6WKqdlBB01qHpsrZX
-         czt2ma34myQacyPxqCqvjfQMDgA2IoOFlog1S6lMA5VIH0pzUcSwTCdVtBxXWZ8wJFdg
-         9B7FBMMPRs7fz5PVqxjqPqhwp8E3tWgggqG/+4Jng4iWDWYmqkFdgxVNjJfQH7dR++b0
-         jQ0nuj5a6uIyIdqcUuwCODWpQzX+KbaHKMDgprNg/NA946YnenwxbLwEMizRbwvnt3zh
-         WhAA==
-X-Gm-Message-State: AOAM532Bj/3BTlwUA/KsRilSmdae7aueHw9PeJKqc3CX2rv+jw5zGVoj
-        BDUEEypje17QG2Vdtdc4ZJQdpg==
-X-Google-Smtp-Source: ABdhPJxRWrFpB8PZ3TdvMovfqWJ0zlfYwEn0cLlFn/6MLGhvEEOxYRHysPA8Ktntc3X0rc7Lr09PgQ==
-X-Received: by 2002:a17:90b:4c0e:: with SMTP id na14mr7787356pjb.84.1642641350791;
-        Wed, 19 Jan 2022 17:15:50 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b2sm799339pfv.134.2022.01.19.17.15.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jan 2022 17:15:50 -0800 (PST)
-Date:   Thu, 20 Jan 2022 01:15:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Dunn <daviddunn@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
-        jmattson@google.com, cloudliang@tencent.com
-Subject: Re: [PATCH 1/3] Provide VM capability to disable PMU virtualization
- for individual VMs
-Message-ID: <Yei3whU32mupq9RV@google.com>
-References: <20220119182818.3641304-1-daviddunn@google.com>
+        id S245507AbiATBSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 20:18:53 -0500
+Received: from mail-dm6nam11on2051.outbound.protection.outlook.com ([40.107.223.51]:65120
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231224AbiATBSu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 20:18:50 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bY39drpjYkBymhsE3MDA1v5638+6XiJLBsbcvsIbbhL+WLDNIaURrbi3q6kHgwQpu73oUq8/25cVPjWVEZ4G0/iIIyc1SWJl1cRB6vhenjOHOSbctH6oZnbJPdqDAg4Vx+53+CkS4bHCcZfXkEDcNbYEX58KW6ONyFwGH74t/PHfprQG7uYwPnT/VWE7rqLSK/d5lSj4XkeCdgUoilH5Kxp/2F8ad3NqIagJZZ4YLqgf/6/i7Z4DSVIE9wbTj76oM9p7I/1r/GC2P1coO6qvB6bt1z6aW5Kr9QnxZT6i2gOV7a1f/Rf9YVk4oJrIBGoFt5591caGxCMUe19GKrgnzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zJuvjpm5Wp6Ne/P2A3nc9aYv0zwe010cpA9T7V+8IMo=;
+ b=QDbktrL+LDayerdYSeDPu4bwjPu7H7GsKPZx/hsaxbp3ar0V5JER/lw6DfjjX/ph6ClVRIugg8RSiHV2RnFWUA6DnL4W5+ZVCqgkqzdcGBQZ7gsTd6NYwf97AsLpJ5n4xe8DCUZFuTzGfHfW6Kcwoar5YPOJPRa2G7jy6cLq/0UO+GgeX77dkiUF48nQoJgK2qPLBiTJGh9n5hWppM2q7iHKVZOA0D20S6tjvIVszOyS31AyhRUYycwrv6U5maVww9/bhAta0FFWVXFpVOn/IkoPZsJPmkE+4dIUg12PE93gBlHKwRv5kBzKk4B2kY1ZiKfuG7JZOiIfznxvm335Kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zJuvjpm5Wp6Ne/P2A3nc9aYv0zwe010cpA9T7V+8IMo=;
+ b=Ws6v+ILI5ZhoizKLeBTBueUL9wQzypL7GdjsPutQelk+nkPPSIXzHGRQiixZ0ips4uqyef7Y1WdC8WG9lyZvC7DUgGQdEJlxARw5S3GlE9op+8h6XgRSgCB0dRoTGdCBejPwUOpWUf4n6/TIgwQpERAgR6Wl+WVEABi7i2c6ttjhkvBDiXxTdIhTGov5/7zecPPP934OnC8QvAmWA/u8REMzGv3jXPTgI8PUHdzDG3J2TIp1MfTDpqYEumbDreT2iT21c8xENRrlGMvE2DQcAmwBbriE1pYWApURKXPJZcpTVdRaDMkfXtrHexL2t0Hqlo/q5VL4ngIcI6VLLq/15Q==
+Received: from MW4PR04CA0382.namprd04.prod.outlook.com (2603:10b6:303:81::27)
+ by BYAPR12MB4710.namprd12.prod.outlook.com (2603:10b6:a03:9f::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.11; Thu, 20 Jan
+ 2022 01:18:48 +0000
+Received: from CO1NAM11FT020.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:81:cafe::16) by MW4PR04CA0382.outlook.office365.com
+ (2603:10b6:303:81::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.8 via Frontend
+ Transport; Thu, 20 Jan 2022 01:18:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (12.22.5.235) by
+ CO1NAM11FT020.mail.protection.outlook.com (10.13.174.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4909.7 via Frontend Transport; Thu, 20 Jan 2022 01:18:47 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 20 Jan
+ 2022 01:18:47 +0000
+Received: from nvdebian.localnet (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.9; Wed, 19 Jan 2022
+ 17:18:42 -0800
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Shuah Khan <shuah@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        =?ISO-8859-1?Q?Andr=E9?= Almeida <andrealmeid@collabora.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        chiminghao <chi.minghao@zte.com.cn>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        "open list:LANDLOCK SECURITY MODULE" 
+        <linux-security-module@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        "open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+        Muhammad Usama Anjum <usama.anjum@collabora.com>,
+        <kernel@collabora.com>
+Subject: Re: [PATCH V2 09/10] selftests: vm: Add the uapi headers include variable
+Date:   Thu, 20 Jan 2022 12:18:39 +1100
+Message-ID: <54757552.kJZYbtWA24@nvdebian>
+In-Reply-To: <20220119101531.2850400-10-usama.anjum@collabora.com>
+References: <20220119101531.2850400-1-usama.anjum@collabora.com> <20220119101531.2850400-10-usama.anjum@collabora.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220119182818.3641304-1-daviddunn@google.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 10abd2f1-c3f7-44fd-3a1f-08d9dbb2cf60
+X-MS-TrafficTypeDiagnostic: BYAPR12MB4710:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB4710AA8FA2265A4DC9A56E54DF5A9@BYAPR12MB4710.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2PrGDR22P30U4oAOvt1Ew6Gv2KYg6Gy4QW91H79kT/zmrgGHFiBjCwWiq7xmqhfmHXMZN6tJd/n4JGFAdTKK92xJa4GN5HEO3AesYssBBDfsTRLlEKrT8IZSd++oeajAW+n1djOR44UGlydQk5ZgDpOu8lZU1z4ZBQMgjAC65uaDogUAGaI2EwlPuGMOOI1phwCuZks7l1PjAM1u8tbvPqU96WJnwLpe5EgkZ8X3fW4Obd9qyyP7RqnF94YNW+JS9+e16eDQ4HGL3zmgaPGwFn3c0lIRKwP3ThI3LaFLuo2w/MLaUynMvLJJpG1PofqLVgmFIQvi4IpImPVB7KTF5nupRwyJPQCbe0fHTj02qh7OUbBO0nfuy7rSsnNdgvRUzh4MZy0TgAZ+eFzlZ03klU/D7YdqkFaL8vsMIwO2wg6rL1kI9n7W/lHTssjI4HZtNstl8TSaCCjeIdr5ywaQJdsihDKWU+7/2m2ZT0EcBMVJ3yRfTHDGv5O2/kzTfto/tiSU6kTYsFBuP5YGiMNitCCvZ1OSePhVTqUWg9wnY6v1vxXi4rYUUB4ihpLZgn82uHS3xEZtbHgiDBygWNhUTz0qpRruvGG3TThq/340FvQXl7Mg0kX1L5NYWjHKbtHOj1GXcavCUBLg4dvuKlCZ/qB/d3ce7yO/id0bMr3J9ZmA2T1KoBAehguNzrScGIoF7CP7DiiWHTwE4L2j9iTdKMTrFP/BajpT6Fh6vzQPHT/YU9pWOdUmBXB4qq9+X0DzqOYk7jeV8bkQC4KvYxk5lOWnw/9gn9UGvDP6VdY79cYvw+0WfLZgG5rOZWGQ3zgvcNG4hpzWDCL/wkY9eogps0nQmq4I2Z5EzfG53Mr6FrQ=
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(40470700002)(9686003)(81166007)(5660300002)(40460700001)(186003)(26005)(6666004)(47076005)(316002)(86362001)(70586007)(83380400001)(426003)(336012)(70206006)(16526019)(82310400004)(8676002)(921005)(9576002)(2906002)(33716001)(508600001)(7416002)(8936002)(36860700001)(110136005)(356005)(39026012)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2022 01:18:47.8393
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10abd2f1-c3f7-44fd-3a1f-08d9dbb2cf60
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT020.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4710
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022, David Dunn wrote:
-> When PMU virtualization is enabled via the module parameter, usermode
-> can disable PMU virtualization on individual VMs using this new
-> capability.
+Thanks for fixing this! It has been annoying me for a while but I never found
+the time to investigate properly. Feel free to add:
+
+Tested-by: Alistair Popple <apopple@nvidia.com>
+
+On Wednesday, 19 January 2022 9:15:30 PM AEDT Muhammad Usama Anjum wrote:
+> Out of tree build of this test fails if relative path of the output
+> directory is specified. Add the KHDR_INCLUDES to correctly reach the
+> headers.
 > 
-> This provides a uniform way to disable PMU virtualization on x86.  Since
-> AMD doesn't have a CPUID bit for PMU support, disabling PMU
-> virtualization requires some other state to indicate whether the PMU
-> related MSRs are ignored.
-> 
-> Since KVM_GET_SUPPORTED_CPUID reports the maximal CPUID information
-> based on module parameters, usermode will need to adjust CPUID when
-> disabling PMU virtualization on individual VMs.  On Intel CPUs, the
-> change to PMU enablement will not alter existing until SET_CPUID2 is
-> invoked.
-> 
-> Signed-off-by: David Dunn <daviddunn@google.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 > ---
-
-I'm not necessarily opposed to this capability, but can't userspace get the same
-result by using MSR filtering to inject #GP on the PMU MSRs?
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 55518b7d3b96..9b640c5bb4f6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4326,6 +4326,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		if (r < sizeof(struct kvm_xsave))
->  			r = sizeof(struct kvm_xsave);
->  		break;
-> +	case KVM_CAP_ENABLE_PMU:
-> +		r = enable_pmu;
-> +		break;
->  	}
->  	default:
->  		break;
-> @@ -5937,6 +5940,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		kvm->arch.exit_on_emulation_error = cap->args[0];
->  		r = 0;
->  		break;
-> +	case KVM_CAP_ENABLE_PMU:
-> +		r = -EINVAL;
-> +		if (!enable_pmu || cap->args[0] & ~1)
-
-Probably worth adding a #define in uapi/.../kvm.h for bit 0.
-
-> +			break;
-> +		kvm->arch.enable_pmu = cap->args[0];
-> +		r = 0;
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -11562,6 +11572,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->  
->  	kvm->arch.guest_can_read_msr_platform_info = true;
-> +	kvm->arch.enable_pmu = true;
-
-Rather than default to "true", just capture the global "enable_pmu" and then all
-the sites that check "enable_pmu" in VM context can check _only_ kvm->arch.enable_pmu.
-enable_pmu is readonly, so there's no danger of it being toggled after the VM is
-created.
-
->  #if IS_ENABLED(CONFIG_HYPERV)
->  	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 9563d294f181..37cbcdffe773 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1133,6 +1133,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
->  #define KVM_CAP_VM_GPA_BITS 207
->  #define KVM_CAP_XSAVE2 208
-> +#define KVM_CAP_ENABLE_PMU 209
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index f066637ee206..e71712c71ab1 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -1132,6 +1132,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_MTE 205
->  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
->  #define KVM_CAP_XSAVE2 207
-> +#define KVM_CAP_ENABLE_PMU 209
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> -- 
-> 2.34.1.703.g22d0c6ccf7-goog
+> Changes in V2:
+>         Revert the excessive cleanup which was breaking the individual
+> test build.
+> ---
+>  tools/testing/selftests/vm/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
+> index 7d100a7dc462..96714d2d49dc 100644
+> --- a/tools/testing/selftests/vm/Makefile
+> +++ b/tools/testing/selftests/vm/Makefile
+> @@ -23,7 +23,7 @@ MACHINE ?= $(shell echo $(uname_M) | sed -e 's/aarch64.*/arm64/' -e 's/ppc64.*/p
+>  # LDLIBS.
+>  MAKEFLAGS += --no-builtin-rules
+>  
+> -CFLAGS = -Wall -I ../../../../usr/include $(EXTRA_CFLAGS)
+> +CFLAGS = -Wall -I ../../../../usr/include $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+>  LDLIBS = -lrt -lpthread
+>  TEST_GEN_FILES = compaction_test
+>  TEST_GEN_FILES += gup_test
+> 
+
+
+
+
