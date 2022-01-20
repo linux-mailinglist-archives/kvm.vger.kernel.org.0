@@ -2,171 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6CE249457C
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 02:21:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E63FA494602
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 04:18:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345118AbiATBVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 20:21:05 -0500
-Received: from mail-dm6nam12on2046.outbound.protection.outlook.com ([40.107.243.46]:51216
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1344114AbiATBVE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 20:21:04 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gVxsCbgjoz/d2OYBB3oD9tXHRB4xzvKRA2EGJm5s2AqxMKRlttJ7hu4sMAM4CwGQy/YJ66MO3l5UGiAaU1azUi6SRG1uL6jH2szMdS/AXiiuhL90K4U+yPA+eapoHak5XNl0f0rYBl11kk+zmNnp4Kx0tI0VrCs9I4bUtxDUdexppmLJEFHUFxL4cN4xFn4T9Ma+qqX2BnOIIOMgfG0EBF2qDtzYUaj1DD7yKgiI4uIpuokOCTt/ohEtHPVp0/8hFqGGyayG4f7rE2ZrFNgcVqb1GrNOjcGqisa18x7qR18YF9LhwawDOi16vSm+m/KCe01D6SDFuM4I7DBxgLWLtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pbTqnzyO0Rs/2I3ICXZzgTul8NQ7Zu4IhThSIY2uumw=;
- b=avsaPq1cWdDULJgIMs6SQTq8piMyz49il0WE+G1XuyQ3XCbD7xkewaJj6lnTvFwJIoz2Eocap2U1YmumnRXnOy5dGE21zHHY44WRL6Jff48e7Cxfx96M4lezHa3VgbVtrMqQeaBJ3Gq6J2u6s3f4WVNV8oQhTmF+q7TVnzxyXl/dJ/OOPfY6b47l0PGuBLovhgOgMcLKoSjmYA3eKTrDpKHx9KAUB1uP6oJTM9sBNVZ5FPbPxK8Ra1zvKQLE6ovM7gZLG9kmOb8lOH5uA8jQD8Jp1jSXXfN30hLfZNGMNaUkhmMa/xWjxi+tZEeyJviGAu7yY5QnCwLnbIg4Br0vWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.238) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pbTqnzyO0Rs/2I3ICXZzgTul8NQ7Zu4IhThSIY2uumw=;
- b=Q3mUl/kI4J18hsoF7daDmT/VDTMh9x4Bx1VZqqgPiidMTgWVIxt6Hhn9JaXYtBSvLhABmK8HykHM67RCyo8+7As1P5a9o2B8v5afIvK5Z/zA7YSoEoXGxH22YfvA2nUmmsZbRJgB/2fVQllXO5SnVzTPY3JQvR+Y/wu5IVtXYM8Bt3u7fhsWUQskNTLnWGWBDr6GkEqPsc0twnKl5hiPzK+YV7hPCXi6mYAd9fVqehb93v62PyqM8KRCFXWJ5pYUrVPYt6qNpA88tSN1YOz3IalLJfK+ujZnAPu1YL3jmaR30J35O4iSkFMoaVUQopIGejzIL4DjRApKcgKkgOSQwg==
-Received: from BN6PR1201CA0023.namprd12.prod.outlook.com
- (2603:10b6:405:4c::33) by MN2PR12MB3293.namprd12.prod.outlook.com
- (2603:10b6:208:106::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.11; Thu, 20 Jan
- 2022 01:21:02 +0000
-Received: from BN8NAM11FT056.eop-nam11.prod.protection.outlook.com
- (2603:10b6:405:4c:cafe::34) by BN6PR1201CA0023.outlook.office365.com
- (2603:10b6:405:4c::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.7 via Frontend
- Transport; Thu, 20 Jan 2022 01:21:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.238; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (12.22.5.238) by
- BN8NAM11FT056.mail.protection.outlook.com (10.13.177.26) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4909.7 via Frontend Transport; Thu, 20 Jan 2022 01:21:01 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL105.nvidia.com
- (10.27.9.14) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 20 Jan
- 2022 01:20:59 +0000
-Received: from nvdebian.localnet (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.9; Wed, 19 Jan 2022
- 17:20:54 -0800
-From:   Alistair Popple <apopple@nvidia.com>
-To:     Shuah Khan <shuah@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        =?ISO-8859-1?Q?Andr=E9?= Almeida <andrealmeid@collabora.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        chiminghao <chi.minghao@zte.com.cn>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:LANDLOCK SECURITY MODULE" 
-        <linux-security-module@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        "open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-        Muhammad Usama Anjum <usama.anjum@collabora.com>
-CC:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
-        <kernel@collabora.com>
-Subject: Re: [PATCH V2 10/10] selftests: vm: remove dependecy from internal kernel macros
-Date:   Thu, 20 Jan 2022 12:20:51 +1100
-Message-ID: <8257315.FuKUqIaFJu@nvdebian>
-In-Reply-To: <20220119101531.2850400-11-usama.anjum@collabora.com>
-References: <20220119101531.2850400-1-usama.anjum@collabora.com> <20220119101531.2850400-11-usama.anjum@collabora.com>
+        id S234625AbiATDSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 22:18:17 -0500
+Received: from ppsw-33.csi.cam.ac.uk ([131.111.8.133]:59392 "EHLO
+        ppsw-33.csi.cam.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232282AbiATDSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 22:18:16 -0500
+X-Greylist: delayed 1042 seconds by postgrey-1.27 at vger.kernel.org; Wed, 19 Jan 2022 22:18:16 EST
+X-Cam-AntiVirus: no malware found
+X-Cam-ScannerInfo: https://help.uis.cam.ac.uk/email-scanner-virus
+Received: from hades.srcf.societies.cam.ac.uk ([131.111.179.67]:49372)
+        by ppsw-33.csi.cam.ac.uk (ppsw.cam.ac.uk [131.111.8.137]:25)
+        with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        id 1nANgO-0005zr-iJ (Exim 4.95)
+        (return-path <amc96@srcf.net>);
+        Thu, 20 Jan 2022 03:00:16 +0000
+Received: from [192.168.1.10] (host-92-12-61-86.as13285.net [92.12.61.86])
+        (Authenticated sender: amc96)
+        by hades.srcf.societies.cam.ac.uk (Postfix) with ESMTPSA id 5EA821FBFF;
+        Thu, 20 Jan 2022 03:00:16 +0000 (GMT)
+Message-ID: <f3239ec0-9fb8-722a-00c5-11b18f19f047@srcf.net>
+Date:   Thu, 20 Jan 2022 03:00:15 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b17aa941-ef21-4860-0aff-08d9dbb31f39
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3293:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB3293C2F6B58D94B62743A2F7DF5A9@MN2PR12MB3293.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XoloNfPO5dWRVcuYsdezIKOxguVvwQwJ3mnJbjdmM54tfwa2P+pknSiRta6S2el+LCKYQKpLGHeHpXM41t42cpCJHEnqtk+OL307MkjQRGrGuftbcwGoEEq/H01kQ3T205DiDxTRFU44GEmbED3fwMDWr7dK7c1O3SFAHRbQxmFZOB8O/X9S8VGfurs6lp74yJ+bGFlYqfW7EN+F4b+8ePszIzzkdygt7wBYij5ZqCmaCUPOCdyhoaxyq9VODtYKQTxzAj3db/gWSjlQp81WA/1BHmaEvN8qER/xiD6KA5eRgIVOIPMVcqm7j5QJGOyLI2/o4ZemA2rJ7Cktl4hdnMm1ER6NZaJwAgrXb3HCSj5J5EmzrPiU9D8aLdUNN0k06kKUhHDjnbZgNHlrCIUNEz0RQZGqK5rEuFgeolirEx/qEtVWRiPZom8CWgeHFj+qGfv3xSRs/g/2EUpoLIt7jgwbWtUMBUJzse37177aBJAS7NUXE96uQD0xPA+UKHA20lqdDUjVgUBPr4ZgpudvWXvCU+cEcBAfqiWcKKoilRtjQwKq/zyoFwASTC1Z/Pt/WlZYPrdNcDfvBb+EFlnZ9VhcdRr+Jn77kiHBOwgK1HVsSQiDV81JrB+nVEh5o+95pQYCVfDNFGBl4FFhWCykenzkAL1BqTLjZfpgrR9W21xZe85YvEBAnij84St0tn67dXqGioarYgfNUUYsRJ2JfFqWj8Re6rHagD0sTjEZ3JxM62cW868hbI7L3cPo2MvCtfFyF5OQLP7glC4OaochIYED57rnuvOR0ZZKjWsuLQEGYa57Bvh+lgbKbddbWcPi
-X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(4636009)(40470700002)(36840700001)(46966006)(426003)(83380400001)(36860700001)(316002)(2906002)(8676002)(16526019)(82310400004)(86362001)(47076005)(81166007)(508600001)(40460700001)(9576002)(921005)(8936002)(6666004)(7416002)(356005)(9686003)(186003)(110136005)(70206006)(5660300002)(4326008)(26005)(54906003)(33716001)(336012)(70586007)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2022 01:21:01.7221
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b17aa941-ef21-4860-0aff-08d9dbb31f39
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT056.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3293
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-GB
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alexander Graf <graf@amazon.de>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Andrew Cooper <amc96@srcf.net>
+References: <20220120000624.655815-1-seanjc@google.com>
+From:   Andrew Cooper <amc96@srcf.net>
+Subject: Re: [PATCH] KVM: VMX: Set vmcs.PENDING_DBG.BS on #DB in STI/MOVSS
+ blocking shadow
+In-Reply-To: <20220120000624.655815-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reviewed-by: Alistair Popple <apopple@nvidia.com>
+On 20/01/2022 00:06, Sean Christopherson wrote:
+> Set vmcs.GUEST_PENDING_DBG_EXCEPTIONS.BS, a.k.a. the pending single-step
+> breakpoint flag, when re-injecting a #DB with RFLAGS.TF=1, and STI or
+> MOVSS blocking is active.  Setting the flag is necessary to make VM-Entry
+> consistency checks happy, as VMX has an invariant that if RFLAGS.TF is
+> set and STI/MOVSS blocking is true, then the previous instruction must
+> have been STI or MOV/POP, and therefore a single-step #DB must be pending
+> since the RFLAGS.TF cannot have been set by the previous instruction,
+> i.e. the one instruction delay after setting RFLAGS.TF must have already
+> expired.
+>
+> Normally, the CPU sets vmcs.GUEST_PENDING_DBG_EXCEPTIONS.BS appropriately
+> when recording guest state as part of a VM-Exit, but #DB VM-Exits
+> intentionally do not treat the #DB as "guest state" as interception of
+> the #DB effectively makes the #DB host-owned, thus KVM needs to manually
+> set PENDING_DBG.BS when forwarding/re-injecting the #DB to the guest.
 
-On Wednesday, 19 January 2022 9:15:31 PM AEDT Muhammad Usama Anjum wrote:
-> The defination of swap() is used from kernel's internal header when this
-> test is built in source tree. The build fails when this test is built
-> out of source tree as defination of swap() isn't found. Selftests
-> shouldn't depend on kernel's internal header files. They can only depend
-> on uapi header files. Add the defination of swap() to fix the build
-> error:
->=20
-> 	gcc -Wall  -I/linux_mainline2/build/usr/include -no-pie    userfaultfd.c=
- -lrt -lpthread -o /linux_mainline2/build/kselftest/vm/userfaultfd
-> 	userfaultfd.c: In function =E2=80=98userfaultfd_stress=E2=80=99:
-> 	userfaultfd.c:1530:3: warning: implicit declaration of function =E2=80=
-=98swap=E2=80=99; did you mean =E2=80=98swab=E2=80=99? [-Wimplicit-function=
-=2Ddeclaration]
-> 	 1530 |   swap(area_src, area_dst);
-> 	      |   ^~~~
-> 	      |   swab
-> 	/usr/bin/ld: /tmp/cclUUH7V.o: in function `userfaultfd_stress':
-> 	userfaultfd.c:(.text+0x4d64): undefined reference to `swap'
-> 	/usr/bin/ld: userfaultfd.c:(.text+0x4d82): undefined reference to `swap'
-> 	collect2: error: ld returned 1 exit status
->=20
-> Fixes: 2c769ed7137a ("tools/testing/selftests/vm/userfaultfd.c: use swap(=
-) to make code cleaner")
-> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> ---
->  tools/testing/selftests/vm/userfaultfd.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/sel=
-ftests/vm/userfaultfd.c
-> index d3fd24f9fae8..d2480ab93037 100644
-> --- a/tools/testing/selftests/vm/userfaultfd.c
-> +++ b/tools/testing/selftests/vm/userfaultfd.c
-> @@ -119,6 +119,9 @@ struct uffd_stats {
->  				 ~(unsigned long)(sizeof(unsigned long long) \
->  						  -  1)))
-> =20
-> +#define swap(a, b) \
-> +	do { typeof(a) __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } while (0)
-> +
->  const char *examples =3D
->      "# Run anonymous memory test on 100MiB region with 99999 bounces:\n"
->      "./userfaultfd anon 100 99999\n\n"
->=20
+The problem is that none of this is documented.
+
+Amongst other things, the vmentry consistency check misses the case when
+#DB really is pending in ENTRY_INTR_INFO.
 
 
+It is very clear that to use VT-x/SVM correctly, required reading
+includes the core microcode and RTL, which of course all of us have
+access to...
 
+> Note, although this bug can be triggered by guest userspace, doing so
+> requires IOPL=3, and guest userspace running with IOPL=3 has full access
+> to all I/O ports (from the guest's perspective) and can crash/reboot the
+> guest any number of ways.  IOPL=3 is required because STI blocking kicks
+> in if and only if RFLAGS.IF is toggled 0=>1, and if CPL>IOPL, STI either
+> takes a #GP or modifies RFLAGS.VIF, not RFLAGS.IF.
+>
+> MOVSS blocking can be initiated by userspace, but can be coincident with
+> a #DB if and only if DR7.GD=1 (General Detect enabled) and a MOV DR is
+> executed in the MOVSS shadow.  MOV DR #GPs at CPL>0, thus MOVSS blocking
+> is problematic only for CPL0 (and only if the guest is crazy enough to
+> access a DR in a MOVSS shadow).  All other sources of #DBs are either
+> suppressed by MOVSS blocking (single-step, code fetch, data, and I/O),
 
+It is more complicated than this and undocumented.  Single step is
+discard in a shadow, while data breakpoints are deferred.
+
+I've just run an experiment with code breakpoints, as they're faults
+like General Detect:
+
+bool do_unhandled_exception(struct cpu_regs *regs)
+{
+    static int limit;
+
+    if ( limit++ > 10 )
+        return false;
+
+    if ( regs->entry_vector == X86_EXC_DB )
+    {
+        unsigned int pending_dbg = read_dr6() ^ X86_DR6_DEFAULT;
+        unsigned int dr7 = read_dr7(), spurious = 0;
+
+        for ( int i = 0; i < 4; ++i )
+            if ( pending_dbg & (1 << i) && ((dr7 >> (2 * i)) & 3) == 0 )
+                spurious |= (1 << i);
+
+        printk("#DB at %04x:%p, pending %08x, spurious %x\n",
+               regs->cs, _p(regs->ip), pending_dbg ^ spurious, spurious);
+        write_dr6(X86_DR6_DEFAULT);
+
+        return true;
+    }
+
+    return false;
+}
+
+void test_main(void)
+{
+    extern char l0[] asm ("0f"), l1[] asm ("1f");
+    extern char l2[] asm ("2f"), l3[] asm ("3f");
+    unsigned int tmp;
+
+    write_cr4(read_cr4() | X86_CR4_DE);
+
+    write_dr0(_u(l0));
+    write_dr1(_u(l1));
+    write_dr2(_u(l2));
+    write_dr3(_u(l3));
+
+    write_dr7(/* DR7_SYM(0, G, X) | */
+              /* DR7_SYM(1, G, X) | */
+              DR7_SYM(2, G, X) |
+              /* DR7_SYM(3, G, X) | */
+              X86_DR7_GE);
+
+    asm volatile("mov %%ss, %[tmp];"
+                 "pushf;"
+                 "pushf;"
+                 "orl $"STR(X86_EFLAGS_TF)", (%%"_ASM_SP");"
+                 "popf;"
+                 "nop;"
+                 "0: nop;"
+                 "1: mov %[tmp], %%ss;"
+                 "2: nop;"
+                 "3: popf;"
+                 : [tmp] "=r" (tmp));
+
+    /* If the VM is still alive, it didn't suffer a vmentry failure. */
+    xtf_success("Success: Not vulnerable to XSA-308\n");
+}
+
+$ objdump -d tests/xsa-308/test-hvm64-xsa-308 | grep -A25 '<test_main>:'
+001048a0 <test_main>:
+  1048a0:    0f 20 e0                 mov    %cr4,%rax
+  1048a3:    48 83 c8 08              or     $0x8,%rax
+  1048a7:    0f 22 e0                 mov    %rax,%cr4
+  1048aa:    b8 df 48 10 00           mov    $0x1048df,%eax
+  1048af:    0f 23 c0                 mov    %rax,%db0
+  1048b2:    b8 e0 48 10 00           mov    $0x1048e0,%eax
+  1048b7:    0f 23 c8                 mov    %rax,%db1
+  1048ba:    b8 e2 48 10 00           mov    $0x1048e2,%eax
+  1048bf:    0f 23 d0                 mov    %rax,%db2
+  1048c2:    b8 e3 48 10 00           mov    $0x1048e3,%eax
+  1048c7:    0f 23 d8                 mov    %rax,%db3
+  1048ca:    b8 20 02 00 00           mov    $0x220,%eax
+  1048cf:    0f 23 f8                 mov    %rax,%db7
+  1048d2:    8c d0                    mov    %ss,%eax
+  1048d4:    9c                       pushf 
+  1048d5:    9c                       pushf 
+  1048d6:    81 0c 24 00 01 00 00     orl    $0x100,(%rsp)
+  1048dd:    9d                       popf  
+  1048de:    90                       nop
+  1048df:    90                       nop
+  1048e0:    8e d0                    mov    %eax,%ss
+  1048e2:    90                       nop
+  1048e3:    9d                       popf  
+  1048e4:    bf 00 3e 11 00           mov    $0x113e00,%edi
+  1048e9:    31 c0                    xor    %eax,%eax
+
+gives
+
+--- Xen Test Framework ---
+Environment: HVM 64bit (Long mode 4 levels)
+XSA-308 PoC
+#DB at 0008:00000000001048df, pending 00004000, spurious 1
+#DB at 0008:00000000001048e0, pending 00004000, spurious 2
+#DB at 0008:00000000001048e3, pending 00004000, spurious 8
+#DB at 0008:00000000001048e4, pending 00004000, spurious 0
+Success: Not vulnerable to XSA-308
+
+which suggests that the active code breakpoint in the MovSS shadow is
+discarded too, because of no #DB on the 0x1048e2 boundary.
+
+This test is obscured by another bug/misfeature/something where the
+B{0..3} get lost on vmexit if BT is also set.
+
+> are mutually exclusive with MOVSS blocking (T-bit task switch),
+
+Howso?  MovSS prevents external interrupts from triggering task
+switches, but instruction sources still trigger in a shadow.
+
+>  or are
+> already handled by KVM (ICEBP, a.k.a. INT1).
+
+Other sources of #DB include RTM debugging, with errata causing a
+fault-style #DB pointing at the XBEGIN instruction, rather than
+vectoring to the abort handler, and splitlock which is new since I last
+thought about this problem.
+
+> This bug was originally found by running tests[1] created for XSA-308[2].
+> Note that Xen's userspace test emits ICEBP in the MOVSS shadow, which is
+> presumably why the Xen bug was deemed to be an exploitable DOS from guest
+> userspace.
+
+As I recall, the original report to the security team was something
+along the lines of "Steam has just updated game, and now when I start
+it, the VM explodes".
+
+>   KVM already handles ICEBP by skipping the ICEBP instruction
+> and thus clears MOVSS blocking as a side effect of its "emulation".
+>
+> [1] http://xenbits.xenproject.org/docs/xtf/xsa-308_2main_8c_source.html
+
+This URL is at the whim of doxygen and not necessarily stable.
+
+https://xenbits.xen.org/gitweb/?p=xtf.git;a=blob;f=tests/xsa-308/main.c
+ought to have better longevity, as well as including test description.
+
+~Andrew
