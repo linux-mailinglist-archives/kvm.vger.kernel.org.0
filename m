@@ -2,248 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6501E4948EF
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 08:58:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B56049492B
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 09:11:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343994AbiATH6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 02:58:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344430AbiATH6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 02:58:31 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374AFC061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 23:58:31 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nASK7-0002RI-3O; Thu, 20 Jan 2022 08:57:35 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nASJu-00BJom-IA; Thu, 20 Jan 2022 08:57:21 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nASJt-000Bvo-3V; Thu, 20 Jan 2022 08:57:21 +0100
-Date:   Thu, 20 Jan 2022 08:57:18 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Andrew Lunn <andrew@lunn.ch>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Guenter Roeck <groeck@chromium.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
-        openipmi-developer@lists.sourceforge.net,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Saravanan Sekar <sravanhome@gmail.com>,
-        Corey Minyard <minyard@acm.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Peter Korsgaard <peter@korsgaard.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Sebastian Reichel <sre@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        platform-driver-x86@vger.kernel.org,
-        Benson Leung <bleung@chromium.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Hans de Goede <hdegoede@redhat.com>, netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Vinod Koul <vkoul@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        linux-mediatek@lists.infradead.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] driver core: platform: Rename
- platform_get_irq_optional() to platform_get_irq_silent()
-Message-ID: <20220120075718.5qtrpc543kkykaow@pengutronix.de>
-References: <20220112085009.dbasceh3obfok5dc@pengutronix.de>
- <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
- <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
- <Yd9L9SZ+g13iyKab@sirena.org.uk>
- <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
- <YeA7CjOyJFkpuhz/@sirena.org.uk>
- <20220113194358.xnnbhsoyetihterb@pengutronix.de>
- <YeF05vBOzkN+xYCq@smile.fi.intel.com>
- <20220115154539.j3tsz5ioqexq2yuu@pengutronix.de>
- <YehdsUPiOTwgZywq@smile.fi.intel.com>
+        id S1359103AbiATILf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 03:11:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35274 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1358401AbiATILY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 03:11:24 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20K4vUx9008169;
+        Thu, 20 Jan 2022 08:11:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=c9PmOdTbAfPIsrLIi5pY5ZdtQiZKC9uuJMMdKGDae8U=;
+ b=k+ri4nERJ7hdftGFuFEEMo9RgT2xiGW1HmnR5QQEkWZqKMKf8XiXEbakSNOhRFKF7TVs
+ Y5O0vQPJvRL6rfdLnN/l8TjNga4J/OIKGfzZ1Ux0WOUm1bJEOjIA+t4Jjrk7FiAOjw1U
+ Nn8RPTKiKAkZzeM7FuVDT9cJfYhqXWRC/x5oj23ZR7sIOuDsvUCMe/wkPtmzX0/RfjO+
+ pCwoh7B1tB1BmfxFlD9VNIads/hNhQKCs/PJlWYV9FLVVOt/tBRwDM0a+igMEnKfiM9T
+ wmfndyaoAK28amuN4eXRZOYLdSYaj8KME8I+aPNoq4OI97Xe1VwjF515mPIwvGCVKPF2 VA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dq15w34x0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 08:11:23 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20K7nTkf031605;
+        Thu, 20 Jan 2022 08:11:22 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dq15w34w8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 08:11:22 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20K87sP4025135;
+        Thu, 20 Jan 2022 08:11:20 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3dknhjxu46-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 08:11:20 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20K8BH7516581010
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jan 2022 08:11:17 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DCB411C052;
+        Thu, 20 Jan 2022 08:11:17 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 97BD811C04A;
+        Thu, 20 Jan 2022 08:11:16 +0000 (GMT)
+Received: from [9.171.35.3] (unknown [9.171.35.3])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Jan 2022 08:11:16 +0000 (GMT)
+Message-ID: <f507580f-ab5b-827f-592e-42d38e639c71@linux.ibm.com>
+Date:   Thu, 20 Jan 2022 09:11:16 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="vtmtr3soi3npiqhl"
-Content-Disposition: inline
-In-Reply-To: <YehdsUPiOTwgZywq@smile.fi.intel.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [RFC PATCH v1 02/10] KVM: s390: Honor storage keys when accessing
+ guest memory
+Content-Language: en-US
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+ <20220118095210.1651483-3-scgl@linux.ibm.com>
+ <1bbc2b03-6daa-5e27-956c-4d022bd8e9cb@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <1bbc2b03-6daa-5e27-956c-4d022bd8e9cb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: e_Wcji67YDndT18kQMQZr6wmW3g0cWeW
+X-Proofpoint-ORIG-GUID: rFwAkMTyvB4P5eGz1E0BbKIlXaA_e9qh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-20_03,2022-01-19_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 priorityscore=1501 lowpriorityscore=0
+ impostorscore=0 adultscore=0 suspectscore=0 phishscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201200042
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 1/19/22 20:27, Christian Borntraeger wrote:
+> Am 18.01.22 um 10:52 schrieb Janis Schoetterl-Glausch:
+>> Storage key checking had not been implemented for instructions emulated
+>> by KVM. Implement it by enhancing the functions used for guest access,
+>> in particular those making use of access_guest which has been renamed
+>> to access_guest_with_key.
+>> Accesses via access_guest_real should not be key checked.
+>>
+>> For actual accesses, key checking is done by __copy_from/to_user_with_key
+>> (which internally uses MVCOS/MVCP/MVCS).
+>> In cases where accessibility is checked without an actual access,
+>> this is performed by getting the storage key and checking
+>> if the access key matches.
+>> In both cases, if applicable, storage and fetch protection override
+>> are honored.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>>   arch/s390/include/asm/ctl_reg.h |   2 +
+>>   arch/s390/include/asm/page.h    |   2 +
+>>   arch/s390/kvm/gaccess.c         | 174 +++++++++++++++++++++++++++++---
+>>   arch/s390/kvm/gaccess.h         |  78 ++++++++++++--
+>>   arch/s390/kvm/intercept.c       |  12 +--
+>>   arch/s390/kvm/kvm-s390.c        |   4 +-
+>>   6 files changed, 241 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/arch/s390/include/asm/ctl_reg.h b/arch/s390/include/asm/ctl_reg.h
+>> index 04dc65f8901d..c800199a376b 100644
+>> --- a/arch/s390/include/asm/ctl_reg.h
+>> +++ b/arch/s390/include/asm/ctl_reg.h
+>> @@ -12,6 +12,8 @@
+>>     #define CR0_CLOCK_COMPARATOR_SIGN    BIT(63 - 10)
+>>   #define CR0_LOW_ADDRESS_PROTECTION    BIT(63 - 35)
+>> +#define CR0_FETCH_PROTECTION_OVERRIDE    BIT(63 - 38)
+>> +#define CR0_STORAGE_PROTECTION_OVERRIDE    BIT(63 - 39)
+>>   #define CR0_EMERGENCY_SIGNAL_SUBMASK    BIT(63 - 49)
+>>   #define CR0_EXTERNAL_CALL_SUBMASK    BIT(63 - 50)
+>>   #define CR0_CLOCK_COMPARATOR_SUBMASK    BIT(63 - 52)
+>> diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
+>> index d98d17a36c7b..cfc4d6fb2385 100644
+>> --- a/arch/s390/include/asm/page.h
+>> +++ b/arch/s390/include/asm/page.h
+>> @@ -20,6 +20,8 @@
+>>   #define PAGE_SIZE    _PAGE_SIZE
+>>   #define PAGE_MASK    _PAGE_MASK
+>>   #define PAGE_DEFAULT_ACC    0
+>> +/* storage-protection override */
+>> +#define PAGE_SPO_ACC        9
+>>   #define PAGE_DEFAULT_KEY    (PAGE_DEFAULT_ACC << 4)
+>>     #define HPAGE_SHIFT    20
+>> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+>> index 4460808c3b9a..92ab96d55504 100644
+>> --- a/arch/s390/kvm/gaccess.c
+>> +++ b/arch/s390/kvm/gaccess.c
+>> @@ -10,6 +10,7 @@
+>>   #include <linux/mm_types.h>
+>>   #include <linux/err.h>
+>>   #include <linux/pgtable.h>
+>> +#include <linux/bitfield.h>
+>>     #include <asm/gmap.h>
+>>   #include "kvm-s390.h"
+>> @@ -794,6 +795,79 @@ static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
+>>       return 1;
+>>   }
+>>   +static bool fetch_prot_override_applicable(struct kvm_vcpu *vcpu, enum gacc_mode mode,
+>> +                       union asce asce)
+>> +{
+>> +    psw_t *psw = &vcpu->arch.sie_block->gpsw;
+>> +    unsigned long override;
+>> +
+>> +    if (mode == GACC_FETCH || mode == GACC_IFETCH) {
+>> +        /* check if fetch protection override enabled */
+>> +        override = vcpu->arch.sie_block->gcr[0];
+>> +        override &= CR0_FETCH_PROTECTION_OVERRIDE;
+>> +        /* not applicable if subject to DAT && private space */
+>> +        override = override && !(psw_bits(*psw).dat && asce.p);
+>> +        return override;
+>> +    }
+>> +    return false;
+>> +}
+>> +
+>> +static bool fetch_prot_override_applies(unsigned long ga, unsigned int len)
+>> +{
+>> +    return ga < 2048 && ga + len <= 2048;
+>> +}
+>> +
+>> +static bool storage_prot_override_applicable(struct kvm_vcpu *vcpu)
+>> +{
+>> +    /* check if storage protection override enabled */
+>> +    return vcpu->arch.sie_block->gcr[0] & CR0_STORAGE_PROTECTION_OVERRIDE;
+>> +}
+>> +
+>> +static bool storage_prot_override_applies(char access_control)
+>> +{
+>> +    /* matches special storage protection override key (9) -> allow */
+>> +    return access_control == PAGE_SPO_ACC;
+>> +}
+>> +
+>> +static int vcpu_check_access_key(struct kvm_vcpu *vcpu, char access_key,
+>> +                 enum gacc_mode mode, union asce asce, gpa_t gpa,
+>> +                 unsigned long ga, unsigned int len)
+>> +{
+>> +    unsigned char storage_key, access_control;
+>> +    unsigned long hva;
+>> +    int r;
+>> +
+>> +    /* access key 0 matches any storage key -> allow */
+>> +    if (access_key == 0)
+>> +        return 0;
+>> +    /*
+>> +     * caller needs to ensure that gfn is accessible, so we can
+>> +     * assume that this cannot fail
+>> +     */
+>> +    hva = gfn_to_hva(vcpu->kvm, gpa_to_gfn(gpa));
+>> +    mmap_read_lock(current->mm);
+>> +    r = get_guest_storage_key(current->mm, hva, &storage_key);
+>> +    mmap_read_unlock(current->mm);
+>> +    if (r)
+>> +        return r;
+>> +    access_control = FIELD_GET(_PAGE_ACC_BITS, storage_key);
+>> +    /* access key matches storage key -> allow */
+>> +    if (access_control == access_key)
+>> +        return 0;
+>> +    if (mode == GACC_FETCH || mode == GACC_IFETCH) {
+>> +        /* mismatching keys, no fetch protection -> allowed */
+>> +        if (!(storage_key & _PAGE_FP_BIT))
+>> +            return 0;
+>> +        if (fetch_prot_override_applicable(vcpu, mode, asce))
+>> +            if (fetch_prot_override_applies(ga, len))
+>> +                return 0;
+>> +    }
+>> +    if (storage_prot_override_applicable(vcpu))
+>> +        if (storage_prot_override_applies(access_control))
+>> +            return 0;
+>> +    return PGM_PROTECTION;
+>> +}
+> 
+> This function is just a pre-check (and early-exit) and we do an additional final check
+> in the MVCOS routing later on, correct? It might actually be faster to get rid of this
 
---vtmtr3soi3npiqhl
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No, this exists for those cases that do not do an actual access, that is MEMOPs with
+the check only flag, as well as the TEST PROTECTION emulation. access_guest_with_key
+passes key 0 so we take the early return. It's easy to miss so Janosch suggested a comment there.
 
-On Wed, Jan 19, 2022 at 08:51:29PM +0200, Andy Shevchenko wrote:
-> On Sat, Jan 15, 2022 at 04:45:39PM +0100, Uwe Kleine-K=F6nig wrote:
-> > On Fri, Jan 14, 2022 at 03:04:38PM +0200, Andy Shevchenko wrote:
-> > > On Thu, Jan 13, 2022 at 08:43:58PM +0100, Uwe Kleine-K=F6nig wrote:
-> > > > > It'd certainly be good to name anything that doesn't correspond t=
-o one
-> > > > > of the existing semantics for the API (!) something different rat=
-her
-> > > > > than adding yet another potentially overloaded meaning.
-> > > >=20
-> > > > It seems we're (at least) three who agree about this. Here is a pat=
-ch
-> > > > fixing the name.
-> > >=20
-> > > And similar number of people are on the other side.
-> >=20
-> > If someone already opposed to the renaming (and not only the name) I
-> > must have missed that.
-> >=20
-> > So you think it's a good idea to keep the name
-> > platform_get_irq_optional() despite the "not found" value returned by it
-> > isn't usable as if it were a normal irq number?
->=20
-> I meant that on the other side people who are in favour of Sergey's patch.
-> Since that I commented already that I opposed the renaming being a standa=
-lone
-> change.
->=20
-> Do you agree that we have several issues with platform_get_irq*() APIs?
->=20
-> 1. The unfortunate naming
+> pre-test and simply rely on MVCOS. MVCOS is usually just some cycles while ISKE to read
+> the key is really slow path and take hundreds of cycles. This would even simplify the
+> patch (assuming that we do proper key checking all the time).
 
-unfortunate naming for the currently implemented semantic, yes.
-
-> 2. The vIRQ0 handling: a) WARN() followed by b) returned value 0
-
-I'm happy with the vIRQ0 handling. Today platform_get_irq() and it's
-silent variant returns either a valid and usuable irq number or a
-negative error value. That's totally fine.
-
-> 3. The specific cookie for "IRQ not found, while no error happened" case
-
-Not sure what you mean here. I have no problem that a situation I can
-cope with is called an error for the query function. I just do error
-handling and continue happily. So the part "while no error happened" is
-irrelevant to me.
-
-Additionally I see the problems:
-
-4. The semantic as implemented in Sergey's patch isn't better than the
-current one. platform_get_irq*() is still considerably different from
-(clk|gpiod)_get* because the not-found value for the _optional variant
-isn't usuable for the irq case. For clk and gpio I get rid of a whole if
-branch, for irq I only change the if-condition. (And if that change is
-considered good or bad seems to be subjective.)
-
-For the idea to add a warning to platform_get_irq_optional for all but
--ENXIO (and -EPROBE_DEFER), I see the problem:
-
-5. platform_get_irq*() issuing an error message is only correct most of
-the time and given proper error handling in the caller (which might be
-able to handle not only -ENXIO but maybe also -EINVAL[1]) the error message
-is irritating. Today platform_get_irq() emits an error message for all
-but -EPROBE_DEFER. As soon as we find a driver that handles -EINVAL we
-need a function platform_get_irq_variant1 to be silent for -EINVAL,
--EPROBE_DEFER and -ENXIO (or platform_get_irq_variant2 that is only
-silent for -EINVAL and -EPROBE_DEFER?)
-
-IMHO a query function should always be silent and let the caller do the
-error handling. And if it's only because
-
-	mydev: IRQ index 0 not found
-
-is worse than
-
-	mydev: neither TX irq not a muxed RX/TX irq found
-
-=2E Also "index 0" is irritating for devices that are expected to have
-only a single irq (i.e. the majority of all devices).
-
-Yes, I admit, we can safe some code by pushing the error message in a
-query function. But that doesn't only have advantages.
-
-Best regards
-Uwe
-
-[1] Looking through the source I wonder: What are the errors that can happen
-    in platform_get_irq*()? (calling everything but a valid irq number
-    an error) Looking at many callers, they only seem to expect "not
-    found" and some "probe defer" (even platform_get_irq() interprets
-    everything but -EPROBE_DEFER as "IRQ index %u not found\n".)
-    IMHO before we should consider to introduce a platform_get_irq*()
-    variant with improved semantics, some cleanup in the internals of
-    the irq lookup are necessary.
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---vtmtr3soi3npiqhl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHpFdoACgkQwfwUeK3K
-7AlpCwf8CIVWD1ztALs4saPfU+hCAXGdHPMYsVb4ZTfj+uT0g5uOPF3Vn08Dfosw
-tyqmKEnwGKIMZpavCJ+pScDwmT2FfANDq+R3xZzWj1hEcEvhjMFWB/IDU+s33/IB
-9pbnCAE8Oa/2PGjM3+FGf5OA6q8vCcuO8XHluolGQqPqvajsCulKZytLIFnnTc9t
-UXm+5HxATeIlvcxF5NHMcNFRt2ADkTGVGj0zrEOxinsiT3edhaWLDR5/vSnbXySV
-NKWnnkWO/T3Huohcr85IS2dVfqbqxuMmfU6RyQKdMat7ZUzOqtffi2I6KdXRRjog
-OHR+PLT7KSOdf6ODGMs+9P8AMEotwg==
-=El6G
------END PGP SIGNATURE-----
-
---vtmtr3soi3npiqhl--
