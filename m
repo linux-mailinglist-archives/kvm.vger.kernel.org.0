@@ -2,173 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B80ED49536D
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 18:39:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D57B495377
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 18:42:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiATRjN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 12:39:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
+        id S230041AbiATRml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 12:42:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbiATRjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 12:39:13 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0259BC061574
-        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:39:13 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id s8-20020a056a00178800b004c480752316so4275161pfg.7
-        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:39:12 -0800 (PST)
+        with ESMTP id S229597AbiATRml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 12:42:41 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAD76C06161C
+        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:42:40 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id w190so66653pfw.7
+        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 09:42:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=CTLiJ+83lYrDlIHsDATdvmKA2ZyAMqENkPuhv/61vCM=;
-        b=e6mOfDZvTSolwbDSuNOJVSL+TxIsiCr+Gp2jFNaM8e8yk1g1GCGEv7o4hvFyEz49UP
-         Jn8Bfz+oe9O6ba1+4JT+l786ax9I6MIGgQe3bqdMg0WCF8L3aZ6qVTSQYw0rNLOS+aY4
-         O0nrHAwuCh6zKGOO6t6322kpF7Y3IhDNA51uDF6iCbxlwSp/tT1VRHAmUDFOJrN9Lsx8
-         McF/zbTOJqCSPdIGZEFp8CF9gkuFAknybIn7/v8hxbHqb2uunxffVPTW+fJVpxfGzz8G
-         KBOvGS/z8I1vTSaD59GHp5W9GoeSUhfG8vvdPfDO3ITmunu3qjfGQ5voPlj+sUbNlj7G
-         xNgA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=siipzw5qPVJE6LD0sjuwipz56WHSg09btQLgfJcwUzw=;
+        b=mu8r0/mBXFnknkfCLySkbX+XsCqQBw7DAX/pnrFPmkiyj/VMPKRZecN7+Fo/Nk2UXq
+         gAEY6BUDFrKyik8DsXdv3uRyjv4xUli2vsq8iq8F33HXsAqdVfwRylI4tEgh+9XREwiN
+         0GOLpeenqRKGWHs3ZVyL6QrZklGh1RlO9gV2G57s2CP5B9qNBHip7zqUGA+iiqoFXVdf
+         EHbJ6zMCX5Y3Fl0pJ8wvVcWzPWhlZ6dh28MkzM7x8KHkaoThkYFrs9D3rVLZd8keKpGx
+         LH/bdye5K3EsY4hqcSmLciVPWcHwzXcWzi9//QgJRIEmZyBwelVCdoztMjprlYB7wYGK
+         oBxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=CTLiJ+83lYrDlIHsDATdvmKA2ZyAMqENkPuhv/61vCM=;
-        b=6LbguzTHnC9ycnSv5KPhCM9Y/yTDloTs5utT5+ib6F9JpvNNOU6tzf/F4P3spPQKW1
-         ANLw13uHzxx0qtmOHeOV/k4y/ukEbG7ff/48bxfRzcfhNjaSJO819v6Sa4zzqHBpDlCr
-         omrySl0L+u/MatlLoNFaLu7ateZs8jurVKiIB4XyRqGKUheHfUzmTf9Dfy49WgepTdzj
-         kwBoRHDpgl11NoMKC2AlkZkqRfO+1u13MKn5AskjsNT5NaSDm6k6V4K5T0k899nFwUyC
-         xTY/8rlJ7xoXEv7MBKH8afmOIBieziFgueIQvZEh2gEz3CH/pL1N+XNThl2o6q1VViqM
-         +CAA==
-X-Gm-Message-State: AOAM531bWA2GuRCMXlg1EViQc8DW0Z5znCssjPL6G5XgUknVQ5/X1wQE
-        WT+NAGfMoUa49xX6rMJ032qeQXsuVun+mN1oXZ84rclkbmDRuKRR/SBl4oZrYrcokvgXIqe6VxN
-        Dv5Lbi94C7eiuHUi0pmmuCc7r5QCwHQSxR9aDG4IHnOZUMu1OVXea4EZc2fGjcVo=
-X-Google-Smtp-Source: ABdhPJwjGcqXz/hYyuZbzxhUVMqRBrunnyekQcvGwkFdAnKhWY+rEeikvVJe5wKvJxCWz2VfZFrZMAAri7QrcQ==
-X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90b:3546:: with SMTP id
- lt6mr6968371pjb.68.1642700352448; Thu, 20 Jan 2022 09:39:12 -0800 (PST)
-Date:   Thu, 20 Jan 2022 09:39:05 -0800
-In-Reply-To: <20220120173905.1047015-1-ricarkol@google.com>
-Message-Id: <20220120173905.1047015-3-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20220120173905.1047015-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH 2/2] kvm: selftests: aarch64: fix some vgic related comments
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com
-Cc:     maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        oupton@google.com, reijiw@google.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=siipzw5qPVJE6LD0sjuwipz56WHSg09btQLgfJcwUzw=;
+        b=nwhRfmDKYPCZOqYHqnD2xu2B6Rdovz0z61FvPzzn1n+vtHiXvw0A/TJTa8ozNpcRSn
+         5/QeEFklegs9U+RInP2QRSszzjQzmLIV8Y8Y1El3+CF3uXF3lTPM1Iesb+iDd69tC2J2
+         rxIW1nl1YJIn0oMRYh3xpaJ/HPwsRlO8bkt9VRWC8vbNMSsVV5PKfh3fVL8QRInbFvBt
+         DjRKRBTrCfAQ87KALLGjztP3npv+M7+9xz1/wGH7X071KqKBvbeRNknTXFeH1LuiEFn2
+         RLv0nlkGALz9AhWb9gH3AeU99ni5wvuqelFpWs3v4815zCclHelJVqXNxyOb+PlRieEp
+         AA2w==
+X-Gm-Message-State: AOAM530P794mmAH7fOYk2Hov5n6rlj9PJIKy47VqLUpBTHRBD72ajTya
+        w2RnA1hObZwDcoNvhLlKV6+CVw==
+X-Google-Smtp-Source: ABdhPJx41k3hd3KJSLVFf9u1FAJE0Mg/PY5ptjVA+lOdd1XHy8dCzwGzOkVd6PXrLSh9k8rgPuVwxQ==
+X-Received: by 2002:a62:14d5:0:b0:4c7:43cb:863 with SMTP id 204-20020a6214d5000000b004c743cb0863mr54850pfu.23.1642700560231;
+        Thu, 20 Jan 2022 09:42:40 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z10sm4148214pfh.77.2022.01.20.09.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jan 2022 09:42:39 -0800 (PST)
+Date:   Thu, 20 Jan 2022 17:42:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Cooper <amc96@srcf.net>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alexander Graf <graf@amazon.de>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: [PATCH] KVM: VMX: Set vmcs.PENDING_DBG.BS on #DB in STI/MOVSS
+ blocking shadow
+Message-ID: <YemfC17ZJyR0CLYr@google.com>
+References: <20220120000624.655815-1-seanjc@google.com>
+ <f3239ec0-9fb8-722a-00c5-11b18f19f047@srcf.net>
+ <YemPeqpcFDjhGfRQ@google.com>
+ <81aebe8e-ff2a-6b56-fe50-b7917a3948ed@srcf.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81aebe8e-ff2a-6b56-fe50-b7917a3948ed@srcf.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix the formatting of some comments and the wording of one of them (in
-gicv3_access_reg).
+On Thu, Jan 20, 2022, Andrew Cooper wrote:
+> On 20/01/2022 16:36, Sean Christopherson wrote:
+> > On Thu, Jan 20, 2022, Andrew Cooper wrote:
+> >> On 20/01/2022 00:06, Sean Christopherson wrote:
+> >>> MOVSS blocking can be initiated by userspace, but can be coincident with
+> >>> a #DB if and only if DR7.GD=1 (General Detect enabled) and a MOV DR is
+> >>> executed in the MOVSS shadow.  MOV DR #GPs at CPL>0, thus MOVSS blocking
+> >>> is problematic only for CPL0 (and only if the guest is crazy enough to
+> >>> access a DR in a MOVSS shadow).  All other sources of #DBs are either
+> >>> suppressed by MOVSS blocking (single-step, code fetch, data, and I/O),
+> >> It is more complicated than this and undocumented.  Single step is
+> >> discard in a shadow, while data breakpoints are deferred.
+> > But for the purposes of making the consitency check happy, whether they are
+> > deferred or dropped should be irrelevant, no?
+> 
+> From that point of view, yes.  The consistency check is specific to TS. 
+> I suppose I was mostly questioning the wording of the explanation.
+> 
+> >>> are mutually exclusive with MOVSS blocking (T-bit task switch),
+> >> Howso?  MovSS prevents external interrupts from triggering task
+> >> switches, but instruction sources still trigger in a shadow.
+> > T-bit #DBs are traps, and arrive after the task switch has completed.  The switch
+> > can be initiated in the shadow, but the #DB will be delivered after the instruction
+> > retires and so after MOVSS blocking goes away.  Or am I missing something?
+> 
+> Well - this is where the pipeline RTL is needed, in lieu of anything
+> better.  Trap-style #DBs are part of the current instruction, and
+> specifically ahead (in the instruction cycle) of the subsequent intchk.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
-Reported-by: Reiji Watanabe <reijiw@google.com>
-Cc: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 12 ++++++++----
- tools/testing/selftests/kvm/lib/aarch64/gic_v3.c | 11 +++++++----
- tools/testing/selftests/kvm/lib/aarch64/vgic.c   |  3 ++-
- 3 files changed, 17 insertions(+), 9 deletions(-)
+And T-bit traps in particular have crazy high priority...
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index e6c7d7f8fbd1..258bb5150a07 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -306,7 +306,8 @@ static void guest_restore_active(struct test_args *args,
- 	uint32_t prio, intid, ap1r;
- 	int i;
- 
--	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
-+	/*
-+	 * Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
- 	 * in descending order, so intid+1 can preempt intid.
- 	 */
- 	for (i = 0, prio = (num - 1) * 8; i < num; i++, prio -= 8) {
-@@ -315,7 +316,8 @@ static void guest_restore_active(struct test_args *args,
- 		gic_set_priority(intid, prio);
- 	}
- 
--	/* In a real migration, KVM would restore all GIC state before running
-+	/*
-+	 * In a real migration, KVM would restore all GIC state before running
- 	 * guest code.
- 	 */
- 	for (i = 0; i < num; i++) {
-@@ -503,7 +505,8 @@ static void guest_code(struct test_args args)
- 		test_injection_failure(&args, f);
- 	}
- 
--	/* Restore the active state of IRQs. This would happen when live
-+	/*
-+	 * Restore the active state of IRQs. This would happen when live
- 	 * migrating IRQs in the middle of being handled.
- 	 */
- 	for_each_supported_activate_fn(&args, set_active_fns, f)
-@@ -837,7 +840,8 @@ int main(int argc, char **argv)
- 		}
- 	}
- 
--	/* If the user just specified nr_irqs and/or gic_version, then run all
-+	/*
-+	 * If the user just specified nr_irqs and/or gic_version, then run all
- 	 * combinations.
- 	 */
- 	if (default_args) {
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-index e4945fe66620..93fc35b88410 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-@@ -19,7 +19,7 @@ struct gicv3_data {
- 	unsigned int nr_spis;
- };
- 
--#define sgi_base_from_redist(redist_base) 	(redist_base + SZ_64K)
-+#define sgi_base_from_redist(redist_base)	(redist_base + SZ_64K)
- #define DIST_BIT				(1U << 31)
- 
- enum gicv3_intid_range {
-@@ -105,7 +105,8 @@ static void gicv3_set_eoi_split(bool split)
- {
- 	uint32_t val;
- 
--	/* All other fields are read-only, so no need to read CTLR first. In
-+	/*
-+	 * All other fields are read-only, so no need to read CTLR first. In
- 	 * fact, the kernel does the same.
- 	 */
- 	val = split ? (1U << 1) : 0;
-@@ -160,8 +161,10 @@ static void gicv3_access_reg(uint32_t intid, uint64_t offset,
- 
- 	GUEST_ASSERT(bits_per_field <= reg_bits);
- 	GUEST_ASSERT(!write || *val < (1U << bits_per_field));
--	/* Some registers like IROUTER are 64 bit long. Those are currently not
--	 * supported by readl nor writel, so just asserting here until then.
-+	/*
-+	 * This function does not support 64 bit accesses as those are
-+	 * currently not supported by readl nor writel, so just asserting here
-+	 * until then.
- 	 */
- 	GUEST_ASSERT(reg_bits == 32);
- 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-index b3a0fca0d780..79864b941617 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-@@ -150,7 +150,8 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
- 		attr += SZ_64K;
- 	}
- 
--	/* All calls will succeed, even with invalid intid's, as long as the
-+	/*
-+	 * All calls will succeed, even with invalid intid's, as long as the
- 	 * addr part of the attr is within 32 bits (checked above). An invalid
- 	 * intid will just make the read/writes point to above the intended
- 	 * register space (i.e., ICPENDR after ISPENDR).
--- 
-2.35.0.rc0.227.g00780c9af4-goog
+> There are implementations where NMI/INTR/etc won't be delivered at the
+> head of an exception generated in a shadow, which would suggest that
+> these implementations have the falling edge of the shadow after intchk
+> on the instruction boundary.  (Probably certainly what happens is that
+> intchk is responsible for clearing the shadow, but this is entirely
+> guesswork on my behalf.)
 
+Well, thankfully hardware's behavior should be moot for VM-Entry since task switches
+unconditionally VM-Exit, and KVM has a big fat TODO for handling the T-bit.
+
+> >> and splitlock which is new since I last thought about this problem.
+> > Eww.  Split Lock is trap-like, which begs the question of what happens if the
+> > MOV/POP SS splits a cache line when loading the source data.  I'm guess it's
+> > suppressed, a la data breakpoints, but that'd be a fun one to test.
+> 
+> They're both reads of their memory operand, so aren't eligible to be
+> locked accesses.
+
+Hah, right, the "lock" part of "split lock" is just a minor detail...
+
+> However, a devious kernel can misalign the GDT/LDT such that setting the
+> descriptor access bit does trigger a splitlock.  I suppose "kernel
+> doesn't misalign structures", or "kernel doesn't write a descriptor with
+> the access bit clear" are both valid mitigations.
+> 
+> >>> This bug was originally found by running tests[1] created for XSA-308[2].
+> >>> Note that Xen's userspace test emits ICEBP in the MOVSS shadow, which is
+> >>> presumably why the Xen bug was deemed to be an exploitable DOS from guest
+> >>> userspace.
+> >> As I recall, the original report to the security team was something
+> >> along the lines of "Steam has just updated game, and now when I start
+> >> it, the VM explodes".
+> > Lovely.  I wonder if the game added some form of anti-cheat?  I don't suppose you
+> > have disassembly from the report?  I'm super curious what on earth a game would
+> > do to trigger this.
+> 
+> Anti-cheat was my guess too, but no disassembly happened.
+> 
+> I was already aware of the STI issue, and had posted
+> https://lore.kernel.org/xen-devel/1528120755-17455-11-git-send-email-andrew.cooper3@citrix.com/
+> more than a year previously.  The security report showed ICEBP pending
+> in the INTR_INFO field, and extending the STI test case in light of this
+> was all of 30s of work to get a working repro.
+> 
+> ~Andrew
