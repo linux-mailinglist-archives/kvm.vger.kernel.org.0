@@ -2,83 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1303A4944DA
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 01:38:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27904494508
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 01:46:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233199AbiATAid (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 19:38:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42616 "EHLO
+        id S1345476AbiATAqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 19:46:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232101AbiATAi3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 19:38:29 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F85C061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:38:29 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id t18-20020a63dd12000000b00342725203b5so2618410pgg.16
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:38:29 -0800 (PST)
+        with ESMTP id S237369AbiATAqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 19:46:09 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F43CC061574
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:46:09 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id h13so3244213plf.2
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:46:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=JcxsUGoLkTPVyhoQhkOKqpMUlYmQwaBH44AN1S2xDuM=;
-        b=Ivmu9MriEiRe73VhNf3gzE9uP/5oTFFK1I/hgi3SRrWWgMp8gZgjfoArPF5zFeI8Kv
-         CIEf950Xks8/0aFRtGz5QdCHtSa+UC5jgDtiqDymJNZNOLDY23srEHUs77VkXWSCmhEF
-         q+xxyAxPW8KZvsPQP/DA1e0aOWg+M+nIVJpSBoTrZ9wAECUGiERd0RMNuN2ekGq5jjel
-         mF40r0dJStJpotHjBwBLWhGk5NkFzpm9rIYf+mBKTuqiOKaJ+yatSCvCZdu+bjpAZHxu
-         6GA42H2zTPQ+wOc5FihpyKfH28x/Yzqvj8YsHdSjVSNOEUUwxmFPFXa84cLCnEjdZqI1
-         KsNA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=z1+U22Ey9LHJyAQychC6fcENsG+quV5jEHyAx5BylAw=;
+        b=Bz0p8Zcp6TiQdxq+B7pfMnQ2uWc+Gwc7mIbxWuImGZ2IqYsA/+ua/R++MjT+bHOoYI
+         alnQCi7yjl2wdnfo0WbFHLIcr4zLyV41sEiSwiqHjZXc2iilfficow6CsHu6tyxHgzgL
+         kz3gskljZcQbzmPAB/E9Wq+ghCCL66hYLG0HXFqh4nEPnSateGWMQbC038uVQJ8AZXUP
+         dKG8L5M0sX7qICEx1sogWejAvaeb6RnP2C5cN7AtvHwL0DFNBdUbf6y0/wpSDYussPJV
+         S0af1oWoleTyG2Oc5FRml51gDGA6CJwbqbnNd1ikJ9G5G9ttFaD9UApTqIozc8tW8u9J
+         wQpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=JcxsUGoLkTPVyhoQhkOKqpMUlYmQwaBH44AN1S2xDuM=;
-        b=8MOO4Jznin4mVFn92XYMNwWJ1qDV3ca0Pqf8/XjTmT061BLAGyKfiLuN4HQ3hOBryx
-         R+PJK7Vpw0quI+V/jIuA4Aw+QtigxuI7SKHbYjwvWPCSt5w82hWb/+fv9/bq/nHWdSnj
-         aGtjQ835h2bfAahCn047UXUptOMzP9+H6PM6SpPMHU5MQxUM2/68DzVXutn0eibj9YyQ
-         DPiGBCHRQ/ss8WceZ7eX2p1cRLxHWR+oeXSI4dp9eMrRWjucAeXIf207ApdG1+pfdcL8
-         teVVTHxBLk+ulWbrIhKzWDVPJKgGoEfiyrWZOxo9GFCzHyZjSiordG/SsDoM8e2713cH
-         xlig==
-X-Gm-Message-State: AOAM531ZIiPshS81Q2gPkgjVndYjjrRUbQUW915v9bg0WKU/okyb5c3I
-        q4v+wamkx+w4HzY5JoBcWdBN1k0cTK9XxQ==
-X-Google-Smtp-Source: ABdhPJxwTcU+Q6B8TH8Nd2zy9K+oVMtijfHFgvpxgcvrkjB6D4ja4jkdlgOADxEXAHgWFR78rw6/AUgYq7OINg==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:3f09:: with SMTP id
- l9mr7486278pjc.38.1642639108708; Wed, 19 Jan 2022 16:38:28 -0800 (PST)
-Date:   Thu, 20 Jan 2022 00:38:26 +0000
-Message-Id: <20220120003826.2805036-1-dmatlack@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH] KVM: selftests: Re-enable access_tracking_perf_test
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=z1+U22Ey9LHJyAQychC6fcENsG+quV5jEHyAx5BylAw=;
+        b=uhhGf9+L5wj8yZt+7z0FP1diG9Ng5nMryFEKU3tQIJhm3k9QL0AyS5Y/zC0fNaOTMC
+         XGniy3MLAE4l19bY4480KCoHl23YNQxoNq32WsFWfhWU/nqlHmW2BxPmHIIaczfk7Cs6
+         s+WaTki/jpfOuX/n3rQBOCN4CqT3HRNj2tUD1KymUHiHrB80cuCMo6A/l1aQMhJd4oYN
+         KE5K/BCGUSzg4tZzLYGhc/s3fqrgGCTjM7u7OUmKPSEkLhduCmAZ9Eif2EGUQ6aH62Fq
+         uQsrm2nyDT/ala+U72LwGsaVX3MElg/eYbB4JbyV1XTWpRtoqv6iZbT7EKOujLdBfRX9
+         uIlw==
+X-Gm-Message-State: AOAM5306zPvdDTRj2wWqqToJdLrNPoZMkJgIs0k9n9cfBI4+3DhkmraR
+        HdoeA3EXmtdQ2X0Hnpx0KcaFhQ==
+X-Google-Smtp-Source: ABdhPJxagGHiAunUi3cXKfBOcqeiMDzVCT/4wqGdFgLfzK2Qdj6qmm+STb8BuYXMNDY/gFtl4KfFEg==
+X-Received: by 2002:a17:902:e84e:b0:14a:f05f:5897 with SMTP id t14-20020a170902e84e00b0014af05f5897mr6063562plg.108.1642639568765;
+        Wed, 19 Jan 2022 16:46:08 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g7sm412266pjk.37.2022.01.19.16.46.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jan 2022 16:46:08 -0800 (PST)
+Date:   Thu, 20 Jan 2022 00:46:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [kvm-unit-tests PATCH v2 3/4] x86: Add a test framework for
+ nested_vmx_reflect_vmexit() testing
+Message-ID: <YeiwzMT/7AQcJsvd@google.com>
+References: <20211214011823.3277011-1-aaronlewis@google.com>
+ <20211214011823.3277011-4-aaronlewis@google.com>
+ <Yd8+n+/2GCZtIhaB@google.com>
+ <CAAAPnDG+eoE42se67ZFaeBG7H6QeAwx2LpZuVqKuXL_eY4eq=g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAAPnDG+eoE42se67ZFaeBG7H6QeAwx2LpZuVqKuXL_eY4eq=g@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This selftest was accidentally removed by commit 6a58150859fd
-("selftest: KVM: Add intra host migration tests"). Add it back.
+On Wed, Jan 19, 2022, Aaron Lewis wrote:
+> >
+> > > diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> > > index 9fcdcae..0353b69 100644
+> > > --- a/x86/unittests.cfg
+> > > +++ b/x86/unittests.cfg
+> > > @@ -368,6 +368,13 @@ arch = x86_64
+> > >  groups = vmx nested_exception
+> > >  check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
+> > >
+> > > +[vmx_exception_test]
+> > > +file = vmx.flat
+> > > +extra_params = -cpu max,+vmx -append vmx_exception_test
+> > > +arch = x86_64
+> > > +groups = vmx nested_exception
+> > > +timeout = 10
+> >
+> > Why add a new test case instead of folding this into "vmx"?  It's quite speedy.
+> > The "vmx" bucket definitely needs some cleanup, but I don't thinking adding a bunch
+> > of one-off tests is the way forward.
+> >
+> 
+> I'm not sure I follow.  The test does run in the "vmx" bucket
+> AFAICT... Oh, do you mean it should be added to the extra_params here
+> along with the other tests?
 
-Fixes: 6a58150859fd ("selftest: KVM: Add intra host migration tests")
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/kvm/Makefile | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 81ebf99d6ff0..0e4926bc9a58 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -85,6 +85,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_pi_mmio_test
- TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
- TEST_GEN_PROGS_x86_64 += x86_64/amx_test
-+TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-
-base-commit: edb9e50dbe18394d0fc9d0494f5b6046fc912d33
--- 
-2.35.0.rc0.227.g00780c9af4-goog
-
+Yep, exactly.  "vmx" really needs to be split up and/or reworked so that it's
+command line isn't so ridiculous, but that's a future problem.
