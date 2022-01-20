@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80AF2494554
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 02:08:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 203A7494556
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 02:08:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358055AbiATBH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 20:07:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49052 "EHLO
+        id S1358075AbiATBHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 20:07:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357983AbiATBH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 20:07:26 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5327FC061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 17:07:26 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id t18-20020a63dd12000000b00342725203b5so2662097pgg.16
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 17:07:26 -0800 (PST)
+        with ESMTP id S1358034AbiATBH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 20:07:27 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98292C06161C
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 17:07:27 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id x15-20020a17090a46cf00b001b35ee9643fso5007498pjg.6
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 17:07:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=SYLTfRN0UdpLZb7rj/xZArHK2NjDhiJ3xTDdO+xMLpw=;
-        b=e/ddioxUJ2mGT/zPwMN6e7mbsWUnUxxxhQxEVYvACcfWAQZcWx0nzK28hvkIJENFKX
-         XH2iEDb2gVbVia2qJwA6c/NSm70agmWw6VhQlSe+7UHL8HrSEhfEwdImJeRfSXzT+dnO
-         bjGrBLZfvF+/f/9BCMxWfuAFLuc49tZ2WMvGZYePJ8BMWfAlHReGyXdEXMT6RiWekqXt
-         /mHKG8P6cHuyPkOKEd73Gmcq6NiHsrdztLlRqxjZ/jRZ1sZVrqT+ECTPTAvjCZkUw4IZ
-         H37d3TjzTBk7oW2VPuqnhydCTFsoXCgkqQKUQ9qMyRfoN6rSBcw6VHS6c4LpgvrO8ACT
-         15dw==
+        bh=Juh5ZOlMsSeAWLXziqBZ7hfTYcz1GBOOW6Gc4QgkpAc=;
+        b=GtfeymlahDJq8GbLIHsgKU1pkM/psWDB6FaaA9uBAH4K1H+aRW5dwP8RdupCLpWoDT
+         oYxl+VfEKCriqB+z5dTojuQILPK1pdmyAQSapnqeyW5E1HUpfyt4YfDuA4k5hMDsek8l
+         ud8FQv5Gm5rps/XrixIn5418PNQU1F4D1LgNwJuQnBnvRRXOi695Mg1TsIio58wyzAJy
+         r6a2D76teZ9oIwqMEfSZvzJpixH4NVQ7YdnpiSB+dqviU8jFhba12o+8FcZ3f5Aczhxq
+         Y8hNBdXjhDMKUJq9UrDFQ3Aw++XstSFNEdDdZALzH72fR6rSpYt2El5zMBsKyMMAkYuH
+         AVtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=SYLTfRN0UdpLZb7rj/xZArHK2NjDhiJ3xTDdO+xMLpw=;
-        b=i6CZ9lBUUOxzlS6P7WXl32teToDZwlQzBs9KFWpbCjyL0aqplZbqdJIlZFfJYlC+42
-         e4nnQu9+mEgWJsJHB+OltmdNYggwnv/X4Skf+I59l88CyBPTIujrxsxTxW2UlrhqTud0
-         jzpopsYzeOStSV8i5xUl7fuIQFl20MEvldYsDHA+31EQbhwlN/Mhzu2HiNALT8ZS1HvI
-         CWOl7afLcmgQVhzsnIVhxB4ICwurL+5fWNPPBVEFEotnjq1CyJ2Jac3S+r4AFjORYnRr
-         qahPe3rB3jpPVRROIyIzx7V05KS6Qz0sG4QjTZad0UuBW3J7ornjmB95JVMSzYfefOGy
-         RVZA==
-X-Gm-Message-State: AOAM531UFNzH5UBRUA1lWDcup7R89NDf5ItBS1f/gVPNfszalBCn4UDa
-        +hXhY8/R+ZE9SY99J0aLn5s/6Et+RwE=
-X-Google-Smtp-Source: ABdhPJwTvVOzUZqs0xBVFNeu53Do/4EVDZXsNm3N619mlDWiUPwRr5jQ04+APop3sG4+nQGWt1Qr6nbA4tk=
+        bh=Juh5ZOlMsSeAWLXziqBZ7hfTYcz1GBOOW6Gc4QgkpAc=;
+        b=LX+azCp3+nHZWdAjV3MyoSN/A+EaH4GGs6Pqvxcr9xNulGRRq6zcNlxyrgCd/svzbW
+         S975hP4p67S1a4bwk1pAju3aDPWrOu43Kfcd8WoHvgQ2BOuUusTl6Ytvl609ern4EL5+
+         UDZWNoZs8MTS7KVEXAuAaSVcG2X+bqEyEVeSqAF/r0xhf2Mdy8AzeQ83wouvt25OecTA
+         n57vQh6Z0vvqpdk/p3A4dAwgbi5krz5Y2NBHP/kQIevthEiv56bqPYQG6yE1/Hwk0ZEI
+         itoDNMllMe4n6dN1jIQxc0Cf2OsD2k9izuZnkGzrB6S4bLkwRYbgE8dHjsZygyrC8zEh
+         qnbA==
+X-Gm-Message-State: AOAM533Ot/gczHzhxYlUQwugUMSKqGxnpajvCKQZkGr/kUaXMY4bKVbn
+        xCyMlx9RV0hxfF47dNGK6nQ/InGdVfs=
+X-Google-Smtp-Source: ABdhPJzjjAsbw39gYVbrNDfA6srZk5+ykqTMw++E0hDvNbPZ/Nf/6L8kjhpSLEzx25PIbPON7JqSCpN2hko=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4d84:: with SMTP id
- oj4mr791349pjb.0.1642640845477; Wed, 19 Jan 2022 17:07:25 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a63:d044:: with SMTP id s4mr15422908pgi.350.1642640847082;
+ Wed, 19 Jan 2022 17:07:27 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 20 Jan 2022 01:07:11 +0000
+Date:   Thu, 20 Jan 2022 01:07:12 +0000
 In-Reply-To: <20220120010719.711476-1-seanjc@google.com>
-Message-Id: <20220120010719.711476-2-seanjc@google.com>
+Message-Id: <20220120010719.711476-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220120010719.711476-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
-Subject: [PATCH 1/9] KVM: SVM: Never reject emulation due to SMAP errata for
- !SEV guests
+Subject: [PATCH 2/9] Revert "KVM: SVM: avoid infinite loop on NPF from bad address"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,50 +68,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Always signal that emulation is possible for !SEV guests regardless of
-whether or not the CPU provided a valid instruction byte stream.  KVM can
-read all guest state (memory and registers) for !SEV guests, i.e. can
-fetch the code stream from memory even if the CPU failed to do so because
-of the SMAP errata.
+Revert a completely broken check on an "invalid" RIP in SVM's workaround
+for the DecodeAssists SMAP errata.  kvm_vcpu_gfn_to_memslot() obviously
+expects a gfn, i.e. operates in the guest physical address space, whereas
+RIP is a virtual (not even linear) address.  The "fix" worked for the
+problematic KVM selftest because the test identity mapped RIP.
 
-Fixes: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len maybe zero on SMAP violation)")
+Fully revert the hack instead of trying to translate RIP to a GPA, as the
+non-SEV case is now handled earlier, and KVM cannot access guest page
+tables to translate RIP.
+
+This reverts commit e72436bc3a5206f95bb384e741154166ddb3202e.
+
+Fixes: e72436bc3a52 ("KVM: SVM: avoid infinite loop on NPF from bad address")
+Reported-by: Liam Merwick <liam.merwick@oracle.com>
 Cc: stable@vger.kernel.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/svm.c | 7 -------
+ virt/kvm/kvm_main.c    | 1 -
+ 2 files changed, 8 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6d31d357a83b..aa1649b8cd8f 100644
+index aa1649b8cd8f..85703145eb0a 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4257,8 +4257,13 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int i
- 	bool smep, smap, is_user;
- 	unsigned long cr4;
+@@ -4311,13 +4311,6 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int i
+ 	if (likely(!insn || insn_len))
+ 		return true;
  
-+	/* Emulation is always possible when KVM has access to all guest state. */
-+	if (!sev_guest(vcpu->kvm))
-+		return true;
-+
- 	/*
--	 * When the guest is an SEV-ES guest, emulation is not possible.
-+	 * Emulation is impossible for SEV-ES guests as KVM doesn't have access
-+	 * to guest register state.
- 	 */
- 	if (sev_es_guest(vcpu->kvm))
- 		return false;
-@@ -4318,9 +4323,6 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int i
- 	smap = cr4 & X86_CR4_SMAP;
- 	is_user = svm_get_cpl(vcpu) == 3;
- 	if (smap && (!smep || is_user)) {
--		if (!sev_guest(vcpu->kvm))
--			return true;
+-	/*
+-	 * If RIP is invalid, go ahead with emulation which will cause an
+-	 * internal error exit.
+-	 */
+-	if (!kvm_vcpu_gfn_to_memslot(vcpu, kvm_rip_read(vcpu) >> PAGE_SHIFT))
+-		return true;
 -
- 		pr_err_ratelimited("KVM: SEV Guest triggered AMD Erratum 1096\n");
- 		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
- 	}
+ 	cr4 = kvm_read_cr4(vcpu);
+ 	smep = cr4 & X86_CR4_SMEP;
+ 	smap = cr4 & X86_CR4_SMAP;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5a1164483e6c..0bacecda79cf 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2248,7 +2248,6 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+ 
+ 	return NULL;
+ }
+-EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
+ 
+ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+ {
 -- 
 2.34.1.703.g22d0c6ccf7-goog
 
