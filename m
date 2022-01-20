@@ -2,81 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9902495389
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 18:50:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71F78495431
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 19:29:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232852AbiATRuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 12:50:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22848 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232616AbiATRuU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 12:50:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642701019;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=PX67YbF8eMZTe9OThRlcIQJMcAFWnuGSg3N6hvzpSBg=;
-        b=BNbdeo5INjkvfEVz7WA766W5hlili9r2KRBWNh+S2GWnYJyBWCvZrxCKPE1MwW/xHzhuGq
-        f+2UIJUUOfNQNEKZDbvvwCMKVAbV9XTYeZd9F17mZpaBNyH3JYEnCD6RObNOKMy1htxKCZ
-        5Tt/udLE28jX5E8mF9Zw+b8nagYk40Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-330-ifg5JFc5MCSfOeVqF4U9iQ-1; Thu, 20 Jan 2022 12:50:18 -0500
-X-MC-Unique: ifg5JFc5MCSfOeVqF4U9iQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 395C5100C661;
-        Thu, 20 Jan 2022 17:50:17 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ED63E7DE41;
-        Thu, 20 Jan 2022 17:50:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: x86: skip host CPUID call for hypervisor leaves
-Date:   Thu, 20 Jan 2022 12:50:15 -0500
-Message-Id: <20220120175015.1747392-1-pbonzini@redhat.com>
+        id S1346978AbiATS3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 13:29:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233412AbiATS3u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 13:29:50 -0500
+X-Greylist: delayed 554 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 20 Jan 2022 10:29:50 PST
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [IPv6:2001:1600:3:17::bc09])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05ADBC061574
+        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 10:29:49 -0800 (PST)
+Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4JfrR30wHPzMpp4H;
+        Thu, 20 Jan 2022 19:20:31 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4JfrR04KcwzlhSM0;
+        Thu, 20 Jan 2022 19:20:28 +0100 (CET)
+Message-ID: <4d2b0f3f-4783-3681-382d-4084c6bf79fc@digikod.net>
+Date:   Thu, 20 Jan 2022 19:20:38 +0100
 MIME-Version: 1.0
+User-Agent: 
+Content-Language: en-US
+To:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        chiminghao <chi.minghao@zte.com.cn>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
+        "open list:LANDLOCK SECURITY MODULE" 
+        <linux-security-module@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        "open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
+Cc:     kernel@collabora.com
+References: <20220119101531.2850400-1-usama.anjum@collabora.com>
+ <20220119101531.2850400-7-usama.anjum@collabora.com>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Subject: Re: [PATCH V2 06/10] selftests: landlock: Add the uapi headers
+ include variable
+In-Reply-To: <20220119101531.2850400-7-usama.anjum@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hypervisor leaves are always synthesized by __do_cpuid_func.  Just return
-zeroes and do not ask the host, it would return a bogus value anyway if
-it were used.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/cpuid.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+On 19/01/2022 11:15, Muhammad Usama Anjum wrote:
+> Out of tree build of this test fails if relative path of the output
+> directory is specified. Add the KHDR_INCLUDES to correctly reach the
+> headers.
+> 
+> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> ---
+> Changes in V2:
+>          Revert the excessive cleanup which was breaking the individual
+> test build.
+> ---
+>   tools/testing/selftests/landlock/Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/landlock/Makefile b/tools/testing/selftests/landlock/Makefile
+> index a99596ca9882..0b0049e133bb 100644
+> --- a/tools/testing/selftests/landlock/Makefile
+> +++ b/tools/testing/selftests/landlock/Makefile
+> @@ -1,6 +1,6 @@
+>   # SPDX-License-Identifier: GPL-2.0
+>   
+> -CFLAGS += -Wall -O2
+> +CFLAGS += -Wall -O2 $(KHDR_INCLUDES)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 3902c28fb6cb..fd949e89120a 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -692,9 +692,17 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
- 
- 	entry = &array->entries[array->nent++];
- 
-+	memset(entry, 0, sizeof(*entry));
- 	entry->function = function;
- 	entry->index = index;
--	entry->flags = 0;
-+	switch (function & 0xC0000000) {
-+	case 0x40000000:
-+		/* Hypervisor leaves are always synthesized by __do_cpuid_func.  */
-+		return entry;
-+
-+	default:
-+		break;
-+	}
- 
- 	cpuid_count(entry->function, entry->index,
- 		    &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
--- 
-2.31.1
+Reviewed-by: Mickaël Salaün <mic@linux.microsoft.com>
 
+It works for me, but I'm wondering if a missing -I path could cause any 
+issue (cf. -I$(khdr_dir) bellow in this file). My GCC and clang ignore 
+such non-existent paths unless -Wmissing-include-dirs is used, which 
+would print a warning on your CI, but I guess that's OK.
+
+>   
+>   src_test := $(wildcard *_test.c)
+>   
