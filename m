@@ -2,185 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 218A7494DC7
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 13:18:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0249C494DD5
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 13:23:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241284AbiATMSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 07:18:36 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:44738 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237697AbiATMSe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 07:18:34 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A0B6F1EC01B5;
-        Thu, 20 Jan 2022 13:18:28 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1642681108;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=XO6AT+gIfZtH9EDaR1V0c6Fkovljr0vEcHMLtYZNXi0=;
-        b=ZvS9JkdJCYllJDFBD0tsEGn3u9iKtDu9RRyiFn28RlB9ttb3/cSuVBse0GV9xDiAmJXru1
-        G7WhLPYYU8EKqnivp/dBPCdF6YYQ7q3y6G8vJIsVo2jZaCOyhOigOuYlQCmxRcEn/trNns
-        hHEBxqnny4SO9CJxR0abXyH3IFJubqs=
-Date:   Thu, 20 Jan 2022 13:18:22 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 32/40] x86/compressed: use firmware-validated CPUID
- for SEV-SNP guests
-Message-ID: <YelTDp4gsEyscWTI@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-33-brijesh.singh@amd.com>
+        id S241524AbiATMXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 07:23:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57570 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241517AbiATMXN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 07:23:13 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20KBEk8q030809;
+        Thu, 20 Jan 2022 12:23:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gdfraUqe7O/sEr0YUMnn0FtEk5QXT9TtM5k5fPBmDac=;
+ b=EJk2cLSHLzJ8v/MifcUtOBX/QEyBpa1VxzDSmy9MTZdNB4l364pB0x1TsJlARClAVN2t
+ M/e4r5nnqwWQ4tR9BsAtgusnRgUAz0DTk2E5N0h9w6HKrzuJ0QWhYprTntOz0XZ06eZY
+ 63f+9BMqYwCgrlS33Wfz3RwQfFqN0G3UY9ag88Rcr7KFZLlxdZSs8JTi7xUehJ8LhDC9
+ lh7WoNLky6wLbbFFO47kcbZanDbEFHPw6ElGJUPmEaW/8kkZgY5nE+V0SduID5x5joOE
+ bzZUjoIGLBxeitORVhJqfMqj5Uk87NSSpDHMGh4VZeYHRAWC+EZ41NFBU3uUSs52brI1 Rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dq0re0b6a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 12:23:12 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20KBvkRN025452;
+        Thu, 20 Jan 2022 12:23:12 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dq0re0b5n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 12:23:12 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20KCI7oC011901;
+        Thu, 20 Jan 2022 12:23:10 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3dknwa99wb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 12:23:09 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20KCDj4g16843184
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jan 2022 12:13:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BBEA5AE058;
+        Thu, 20 Jan 2022 12:23:06 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 458F7AE045;
+        Thu, 20 Jan 2022 12:23:06 +0000 (GMT)
+Received: from [9.171.39.5] (unknown [9.171.39.5])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Jan 2022 12:23:06 +0000 (GMT)
+Message-ID: <8647fcaf-6d8a-4678-0695-4b1cc797b3b1@linux.ibm.com>
+Date:   Thu, 20 Jan 2022 13:23:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-33-brijesh.singh@amd.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [RFC PATCH v1 06/10] KVM: s390: Add vm IOCTL for key checked
+ guest absolute memory access
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+ <20220118095210.1651483-7-scgl@linux.ibm.com>
+ <069c72b6-457f-65c7-652e-e6eca7235fca@redhat.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <069c72b6-457f-65c7-652e-e6eca7235fca@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: y5WmcWTMmONw2_MuTtiJ7-Qj7v8TpxAK
+X-Proofpoint-ORIG-GUID: nKscVOzIFJRqtOETdf0qOSSahSegn1nP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-20_04,2022-01-20_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 suspectscore=0
+ spamscore=0 mlxscore=0 bulkscore=0 impostorscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2201200062
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 09:43:24AM -0600, Brijesh Singh wrote:
-> Subject: Re: [PATCH v8 32/40] x86/compressed: use firmware-validated CPUID for SEV-SNP guests
-									    ^
-									    leafs
-
-or so.
-
-> From: Michael Roth <michael.roth@amd.com>
+On 1/20/22 11:38, Thomas Huth wrote:
+> On 18/01/2022 10.52, Janis Schoetterl-Glausch wrote:
+>> Channel I/O honors storage keys and is performed on absolute memory.
+>> For I/O emulation user space therefore needs to be able to do key
+>> checked accesses.
+>> The vm IOCTL supports read/write accesses, as well as checking
+>> if an access would succeed.
+> ...
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index e3f450b2f346..dd04170287fd 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -572,6 +572,8 @@ struct kvm_s390_mem_op {
+>>   #define KVM_S390_MEMOP_LOGICAL_WRITE    1
+>>   #define KVM_S390_MEMOP_SIDA_READ    2
+>>   #define KVM_S390_MEMOP_SIDA_WRITE    3
+>> +#define KVM_S390_MEMOP_ABSOLUTE_READ    4
+>> +#define KVM_S390_MEMOP_ABSOLUTE_WRITE    5
 > 
-> SEV-SNP guests will be provided the location of special 'secrets'
-> 'CPUID' pages via the Confidential Computing blob. This blob is
-> provided to the boot kernel either through an EFI config table entry,
-> or via a setup_data structure as defined by the Linux Boot Protocol.
+> Not quite sure about this - maybe it is, but at least I'd like to see this discussed: Do we really want to re-use the same ioctl layout for both, the VM and the VCPU file handles? Where the userspace developer has to know that the *_ABSOLUTE_* ops only work with VM handles, and the others only work with the VCPU handles? A CPU can also address absolute memory, so why not adding the *_ABSOLUTE_* ops there, too? And if we'd do that, wouldn't it be sufficient to have the VCPU ioctls only - or do you want to call these ioctls from spots in QEMU where you do not have a VCPU handle available? (I/O instructions are triggered from a CPU, so I'd assume that you should have a VCPU handle around?)
+
+There are some differences between the vm and the vcpu memops.
+No storage or fetch protection overrides apply to IO/vm memops, after all there is no control register to enable them.
+Additionally, quiescing is not required for IO, tho in practice we use the same code path for the vcpu and the vm here.
+Allowing absolute accesses with a vcpu is doable, but I'm not sure what the use case for it would be, I'm not aware of
+a precedence in the architecture. Of course the vcpu memop already supports logical=real accesses.
 > 
-> Locate the Confidential Computing from these sources and, if found,
-> use the provided CPUID page/table address to create a copy that the
-> boot kernel will use when servicing cpuid instructions via a #VC
-
-CPUID
-
-> handler.
+>  Thomas
 > 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/boot/compressed/sev.c | 13 ++++++++++
->  arch/x86/include/asm/sev.h     |  1 +
->  arch/x86/kernel/sev-shared.c   | 43 ++++++++++++++++++++++++++++++++++
->  3 files changed, 57 insertions(+)
 > 
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 93e125da12cf..29dfb34b5907 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -415,6 +415,19 @@ bool snp_init(struct boot_params *bp)
->  	if (!cc_info)
->  		return false;
->  
-> +	/*
-> +	 * If SEV-SNP-specific Confidential Computing blob is present, then
-	     ^
-	     a
 
-
-> +	 * firmware/bootloader have indicated SEV-SNP support. Verifying this
-> +	 * involves CPUID checks which will be more reliable if the SEV-SNP
-> +	 * CPUID table is used. See comments for snp_cpuid_info_create() for
-
-s/for/over/ ?
-
-> +	 * more details.
-> +	 */
-> +	snp_cpuid_info_create(cc_info);
-> +
-> +	/* SEV-SNP CPUID table should be set up now. */
-> +	if (!snp_cpuid_active())
-> +		sev_es_terminate(1, GHCB_TERM_CPUID);
-
-Right, that is not needed now.
-
->  	 * Pass run-time kernel a pointer to CC info via boot_params so EFI
->  	 * config table doesn't need to be searched again during early startup
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index cd189c20bcc4..4fa7ca20d7c9 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -157,6 +157,7 @@ bool snp_init(struct boot_params *bp);
->   * sev-shared.c via #include and these declarations can be dropped.
->   */
->  struct cc_blob_sev_info *snp_find_cc_blob_setup_data(struct boot_params *bp);
-> +void snp_cpuid_info_create(const struct cc_blob_sev_info *cc_info);
->  #else
->  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
->  static inline void sev_es_ist_exit(void) { }
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index bd58a4ce29c8..5cb8f87df4b3 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -403,6 +403,23 @@ snp_cpuid_find_validated_func(u32 func, u32 subfunc, u32 *eax, u32 *ebx,
->  	return false;
->  }
->  
-> +static void __init snp_cpuid_set_ranges(void)
-> +{
-> +	const struct snp_cpuid_info *cpuid_info = snp_cpuid_info_get_ptr();
-> +	int i;
-> +
-> +	for (i = 0; i < cpuid_info->count; i++) {
-> +		const struct snp_cpuid_fn *fn = &cpuid_info->fn[i];
-> +
-> +		if (fn->eax_in == 0x0)
-> +			cpuid_std_range_max = fn->eax;
-> +		else if (fn->eax_in == 0x40000000)
-> +			cpuid_hyp_range_max = fn->eax;
-> +		else if (fn->eax_in == 0x80000000)
-> +			cpuid_ext_range_max = fn->eax;
-> +	}
-> +}
-
-Kinda arbitrary to have a separate function which has a single caller.
-You can just as well move the loop into snp_cpuid_info_create() and put
-a comment above it:
-
-	/* Set CPUID ranges. */
-	for (i = 0; i < cpuid_info->count; i++) {
-		...
-
-Also, snp_cpuid_info_create() should be called snp_setup_cpuid_table()
-which is what this thing does.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
