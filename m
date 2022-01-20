@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A47ED4944A1
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 01:29:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09B254944A2
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 01:29:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357711AbiATA32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jan 2022 19:29:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40482 "EHLO
+        id S1357786AbiATA33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jan 2022 19:29:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344860AbiATA31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jan 2022 19:29:27 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A2E0C061574
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:29:27 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id z3-20020a17090a468300b001b4df1f5a6eso2861302pjf.6
-        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:29:27 -0800 (PST)
+        with ESMTP id S1344860AbiATA32 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jan 2022 19:29:28 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80531C061574
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:29:28 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id g12-20020a63200c000000b00342cd03227aso2602636pgg.19
+        for <kvm@vger.kernel.org>; Wed, 19 Jan 2022 16:29:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=xGZFB5oitmoGiXBBflNxGwPgP1wyJ5Z4WqYt/VFwkiA=;
-        b=NJvpYqFsz6ZeovbRKj7OmMHLCguJFKdO+CbKb/3g1hyUq1QBWmNPxKoEiNFMvKE2h4
-         23dNp22ynkJzw0GeaSnDAvk5UUbNdPBvwQXqUBYQ/CBgYpTlZrUrpy0SY32ZIXuHecMF
-         JyE5kd/H0UhWUzOgyK0b3WL3eOysXoSQfDqqd8aek71ToQXv1/K1GdDq7awEUqo9Gm2v
-         4TpefpWZrkohuID94LHw8udTjEwocADW9JvSNJlLFz7Pb9XKhU3Nal5gNV+KaXVunLI4
-         71FdQ9ZsB1Keifk9NMnzTvT2/7CUSsn2ViAP6hueKUU2jNr9qF/RmprGmwyCMVYjVnUd
-         whzA==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=xEzpTHEoEq/G2HUv56/F7AxziHIAxPWYaVOa6/Yl4Pg=;
+        b=c/GzDa7EgQaKRcAx4Q+UWyj+uNfyioFgcnD9+SvMeG1WteNlyUyctG0TAJOJ6eCc3B
+         qYIbdpXkndSr419hBEYNqopv7psZy/rGb7MmGKFNZDNq1FSZf0pyVF3P/ezcwpbYFBAN
+         RRzgNvVIEePVQZtbqmH78BeRQbRk+vCqw2/EQO2fAF0bTudYtvR1FY3EHvpjWtACdpaJ
+         9PKJcEO+pQd/SLvD5dr00Jfdcm77FIh6loT7IbzLdIoQQ2nb2AiCnmiOV/u8VIWmj5T6
+         MxWsWw6/jFWSEBrSbnj03Sbf01onBmp7C8Nat02yHjYL0mcQ823HXC9ZsichM4hskKCH
+         hdtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=xGZFB5oitmoGiXBBflNxGwPgP1wyJ5Z4WqYt/VFwkiA=;
-        b=3U0whuWMHUzNBoqlvebFv8NlT1RMAtnlFKUVxOkHvOcgugvUoTzfABdUq/RufjwFqE
-         8ZCcZst99Qo3cNTaiHZGHFyz7Pb3DSj+C3jZHpq6U8NjgPHzac6Z1EuokS/9QDwmQAM9
-         nbJWESF8alAwdNG+ueK7ceZsW4kJZE6aIy7dXMXXtWKxNjOAHC850IJkVSL1N93UBH6J
-         barlOr/Ltl25W3t1ltP5mX0ohD+9Sq+eeiI3wGR0MZdyrK2sE2amChNa7zdCROEVGT2Y
-         V8J/6pJiZLdZXtlhsgXjSazGzumUloU5YgMucb/iII76EFgOSXHwDVhUkAbgSKYu//jD
-         mq6Q==
-X-Gm-Message-State: AOAM531WjCYN9QrONnlaSuyNHn7kk8VLOFrQxDcoeDonbyNUnnvYgYUp
-        FlCiTlF90jNJqUkUwZ9p83BtjQxq1Xg=
-X-Google-Smtp-Source: ABdhPJztAmWUYS6iDZVpfxrvowC/HS88XndWtavsP2LLYhIb0NEM6yDcvuwOytOvS5eyfCLgzRmAAmIxgk0=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=xEzpTHEoEq/G2HUv56/F7AxziHIAxPWYaVOa6/Yl4Pg=;
+        b=cxs9+SITx0yw0H/UjM4Y+AM0wHzg1+JIaDlGHR1xDXMwImOjE8hgguMIaIS/iYX8Y7
+         FCw8IMoFgLork0w/ZhYAMKVd5imuEu3zmBGZos1R9qCgvduLhsEGPy15snek1gwExIlY
+         fIIZybJBkiwcHuxAT9pkq4ILHnai7OLDjXcNU2b1gzAP3EDi4VkX7fSP801x7qmeMA6U
+         DnrDkJFwCnjGcr4wee4AlwYSrKSork0VZ/TR3034vcWveGHXKKvfGpmjRo4iz8dR67Um
+         1/h8HvlSwk4+HuiqaKPGS/opvR/GX/IsJD2eKS1DylZw1sfXVR9Q/M/jf0C1x+A/DCPd
+         MBiQ==
+X-Gm-Message-State: AOAM533KTL0eq8mkJxi1e8ochtYq+5AGuZlmgD4R3JaPA0X0OZ8U5C4a
+        lg2fk/mMiZTc0z6wwNIWfzyJb5cQs2k=
+X-Google-Smtp-Source: ABdhPJwNEOUEw+J76vOyLCIWpykmV+Ct02d1jMC9kUqwl+CnVwyLCiS8T4o+LEqzhyJgTtd/bsRM4H30j4A=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a62:5f07:0:b0:4be:3e19:6c08 with SMTP id
- t7-20020a625f07000000b004be3e196c08mr33740482pfb.71.1642638566582; Wed, 19
- Jan 2022 16:29:26 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:56:: with SMTP id
+ 22mr7381810pjb.199.1642638568059; Wed, 19 Jan 2022 16:29:28 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 20 Jan 2022 00:29:16 +0000
-Message-Id: <20220120002923.668708-1-seanjc@google.com>
+Date:   Thu, 20 Jan 2022 00:29:17 +0000
+In-Reply-To: <20220120002923.668708-1-seanjc@google.com>
+Message-Id: <20220120002923.668708-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20220120002923.668708-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
-Subject: [kvm-unit-tests PATCH 0/7] x86/debug: More single-step #DB tests
+Subject: [kvm-unit-tests PATCH 1/7] bitops: Include stdbool.h and stddef.h as necessary
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -60,32 +62,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add single-step #DB + STI/MOVSS blocking regression tests for a related
-KVM bug[*].  Before adding the test (last patch), overhaul asm/debugreg.h
-and clean up x86's "debug" test.
+Include stdbool.h and stddef.h in bitops.h to pick up the definitions for
+"bool" and "size_t" respectively.
 
-[*] https://lore.kernel.org/all/20220120000624.655815-1-seanjc@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ lib/bitops.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Sean Christopherson (7):
-  bitops: Include stdbool.h and stddef.h as necessary
-  x86/debug: Add framework for single-step #DB tests
-  x86/debug: Test OUT instead of RDMSR for single-step #DB emulation
-    test
-  x86/debug: Run single-step #DB tests in usermode (and kernel mode)
-  x86: Overhaul definitions for DR6 and DR7 bits
-  x86/debug: Add single-step #DB + STI/MOVSS blocking tests
-  x86/debug: Explicitly write DR6 in the H/W watchpoint + DR6.BS
-    sub-test
-
- lib/bitops.h           |   3 +
- lib/x86/asm/debugreg.h | 125 ++++++--------
- x86/debug.c            | 384 ++++++++++++++++++++++++++++++++++-------
- x86/emulator.c         |  14 +-
- x86/vmx_tests.c        |  27 +--
- 5 files changed, 405 insertions(+), 148 deletions(-)
-
-
-base-commit: 92a6c9b95ab10eba66bff3ff44476ab0c015b276
+diff --git a/lib/bitops.h b/lib/bitops.h
+index 308aa865..81a06a47 100644
+--- a/lib/bitops.h
++++ b/lib/bitops.h
+@@ -1,6 +1,9 @@
+ #ifndef _BITOPS_H_
+ #define _BITOPS_H_
+ 
++#include <stdbool.h>
++#include <stddef.h>
++
+ /*
+  * Adapted from
+  *   include/linux/bitops.h
 -- 
 2.34.1.703.g22d0c6ccf7-goog
 
