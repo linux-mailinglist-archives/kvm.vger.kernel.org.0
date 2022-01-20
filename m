@@ -2,346 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A507649519A
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 16:40:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC6DB4951B3
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 16:45:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376767AbiATPkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 10:40:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7038 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1376650AbiATPkL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 10:40:11 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20KFBgGx030870;
-        Thu, 20 Jan 2022 15:40:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : from : to : cc : references : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=kwVPwpzFh9EH0PtrrxoFC5hUpP+oKIzag7+1qFj0DPE=;
- b=hdwPwslRrraHiuTlAhcVgxejzNyXaxOxQd9Mr4lqo6bRvNi2nz3G6Uwhku5i5K5dmhgO
- MYsYQtGZTPe06tZcQPgrhBgJXn58tu96TqF734Slob+gRKSCkel4KS0XEe7HtXddCHhI
- BriOFwUxFbwvBqhgBmN8rgb8qGGVRDE46dDX3zR8nffmTIRNTdLA7IhjxVgKdp5wk5m3
- v+I1TLpi+B0flCTyY4uDKKaxKD14mnTSZG5A/YEA9STOGVgPWTu7++GjClxIu1tlbdqJ
- MZo5Teeg1iATsbV2aKWRpwz9qXwnj0pM2+X933123jBWHXYvL2MiVq4/k3Ze+UquukgJ nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dqa5nrn2u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Jan 2022 15:40:11 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20KFHiX5030085;
-        Thu, 20 Jan 2022 15:40:11 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dqa5nrn1w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Jan 2022 15:40:11 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20KFLq41013444;
-        Thu, 20 Jan 2022 15:40:08 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dknhk33f8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Jan 2022 15:40:08 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20KFe4Sx47841726
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Jan 2022 15:40:04 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 69C2852054;
-        Thu, 20 Jan 2022 15:40:04 +0000 (GMT)
-Received: from [9.145.179.177] (unknown [9.145.179.177])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0C68152052;
-        Thu, 20 Jan 2022 15:40:03 +0000 (GMT)
-Message-ID: <c5ce5d0b-444b-ba33-a670-3bd3893af475@linux.ibm.com>
-Date:   Thu, 20 Jan 2022 16:40:03 +0100
-MIME-Version: 1.0
+        id S1376783AbiATPov (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 10:44:51 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:44924 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347001AbiATPou (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 10:44:50 -0500
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20KFhJRQ002189;
+        Thu, 20 Jan 2022 15:44:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=xEm0GcOEdB/PJ+h6uH+Tvqy33Lo7K+t6cYUSUhWKnSo=;
+ b=odOlCVXUtG3FACxAIbTZmlg1ByO5IkvS6bw0/7aodIvNaJPC+133tRx/h6iVhMS5TE1c
+ Nu74zjWwtVDe0bO0B+mphRy8IS4Z95l0uM78zFLKm4VANeazLnYVyDyF71oOBEbZm3sw
+ 4wAJEXJ0li/SUtvlhAIns36UqL+gwiQOBAZr70wW6KJ+soVmqqB6X40YtG3VEmxmQAJX
+ hG2JVwiAElcertMPWcKOr93HVd94gEyiNFf0T3sTFEz6nAtPb8FKB2OKbn2nKpTWACO3
+ OTv2JQSRuT+Kkr7xQv9dYR5hxnljUDXGfKOoL5XztAL7pg20IuGrZc86ps0i0nKpZCDw yQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3dqammr030-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jan 2022 15:44:14 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20KFf6B9190287;
+        Thu, 20 Jan 2022 15:44:13 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2101.outbound.protection.outlook.com [104.47.70.101])
+        by aserp3030.oracle.com with ESMTP id 3dpvj28t70-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jan 2022 15:44:12 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GCH89uPB3BFxJ1hzdH+GE7KWA+Ez2I0Eo9rSiUyUb3upm19OwfFWp0z01Fe6P69Kt6fTCzO+rMfaskgp9AdqH54paTmdgXNMvW4WlMzvd1Kn/Ajv3RqUT/i9O1tU/ljmdSiVsKUTyq3WSGfMMGIrwfdRqvc6Lr5E1EkvFraczLS8b8rvDy2myvJftPkUx0wJvE3fTI3OhX7NhzBz7M9pohDITOSSEUn+AHYLB4HN4su2E0ZF6DKNXjIhzd5PYPfFH7AHXVx3z65qxf3967tvlRi3JUkxowAz9DlTQ/mqmW3HtcMmwJVg308yevSLNtBFdR3s71ZI6iDo7ZlHI0pDrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xEm0GcOEdB/PJ+h6uH+Tvqy33Lo7K+t6cYUSUhWKnSo=;
+ b=V3mLmJf24J+fa0emYmnL4rppKex0x3pCx4kAnLO/uijQFxAJEZQC6mVsFuBojY6zog4G31EWL5Ubk9fX41l4QdmkagTmfrr19Z7X8mgSEyn40oPy2LPFbNl0QUfuPZVLpmjpjx4oMmSGffPLall9bZR234sreuYaU0PFRehtOJAKlX9SYWj9LNpR7F2lDpDH4GAyo0172hw/+uRbwMNlv1UiwwNXxAq+njDEZFQW0ONqj+CAXoDSdQqaXyBjdV386s7A+wPG/nn/s/OHKpmEpTFPH/6yzi21zJXTuKCVUNsp1yPYnnwZIAAN+xfycA3HPKhcnzx84eSHUqYPdXktqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xEm0GcOEdB/PJ+h6uH+Tvqy33Lo7K+t6cYUSUhWKnSo=;
+ b=QGTYVrMhz+7OMY6ey/ODw5dy8oHHviFLITic6Amoa7VeXmvaiEq0ZEeVfhKZbfCYQ5GbMkOfnH6oK/MCLvO1oof+6ytwAOTbfr/NK9MT7p/8eCnjCg2r+g1JfJ3I8gFhzs92JlWkexBflDaiYuMFtjfSOR86AELCQg/NEv8J/DE=
+Received: from DS7PR10MB5038.namprd10.prod.outlook.com (2603:10b6:5:38c::5) by
+ MWHPR10MB1583.namprd10.prod.outlook.com (2603:10b6:300:27::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4888.12; Thu, 20 Jan 2022 15:44:10 +0000
+Received: from DS7PR10MB5038.namprd10.prod.outlook.com
+ ([fe80::e01a:f38f:1282:5677]) by DS7PR10MB5038.namprd10.prod.outlook.com
+ ([fe80::e01a:f38f:1282:5677%3]) with mapi id 15.20.4909.008; Thu, 20 Jan 2022
+ 15:44:10 +0000
+Message-ID: <483ed34e-3125-7efb-1178-22f02173667a@oracle.com>
+Date:   Thu, 20 Jan 2022 15:44:04 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220118095210.1651483-1-scgl@linux.ibm.com>
- <20220118095210.1651483-5-scgl@linux.ibm.com>
-Content-Language: en-US
-Subject: Re: [RFC PATCH v1 04/10] KVM: s390: selftests: Test TEST PROTECTION
- emulation
-In-Reply-To: <20220118095210.1651483-5-scgl@linux.ibm.com>
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 6/9] KVM: SVM: WARN if KVM attempts emulation on #UD or
+ #GP for SEV guests
+Content-Language: en-GB
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Liam Merwick <liam.merwick@oracle.com>
+References: <20220120010719.711476-1-seanjc@google.com>
+ <20220120010719.711476-7-seanjc@google.com>
+From:   Liam Merwick <liam.merwick@oracle.com>
+In-Reply-To: <20220120010719.711476-7-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jdaw49tV8FlvegRmHxjiYOq1WbDuU6Oe
-X-Proofpoint-GUID: UzTWKOWDFgGsPuo7cUSFZYyF4xPiBMD_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-20_06,2022-01-20_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- adultscore=0 spamscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+X-ClientProxiedBy: LO2P265CA0126.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:9f::18) To DS7PR10MB5038.namprd10.prod.outlook.com
+ (2603:10b6:5:38c::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 974e5b7b-1d3b-44d4-bd8c-08d9dc2bb35a
+X-MS-TrafficTypeDiagnostic: MWHPR10MB1583:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR10MB1583A5B9D1C70262B89ACD31E85A9@MWHPR10MB1583.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WwG0BDeLnvJVAW+9ho/usjiTZNmEIg6JgKTuNxsDGkc7h08ZjMf+QX+VY4J+7tmqLOaxLqaQfFlplRrJHTzRi0KvxX8CjiGLOCTiJy+mbBV6tDlVPVvq233YeBKF6ZBZbQK+JQEeGNm8wTShSKkgeJ89AoeoXxJdcvYHqDqKU43uu0ZWwUB/eHl2jhwXk6Rtc2Lc94BCiAG00QrDBucPAn9zQr7oIwXVcRXjOOvEdkv5pIryRTC+9BlajHwBKyhKoGe1ifmAMSPfqYOGJo9iu7OfK7QV+22pKcR4DNXqWCG/eNt5IVagn0D8CDpbQv9XLCAyEzaCd7xi6x4z5cAXDx4msl90970U7nfM6exfflTQwc/RlCbrFoMM2H5GKtpGPSswJjDTArGmEPDK7jCpUHarD92xt9B4ylHlWxrL+Mj+4Hr/AzIZWm6x5pVw8wwVtJovMGxvz5rdca3u6hx/40XVl5RS1opLnzdSnr/blRbYHCCh9/Lbd/hBImnh8RuPwnh6kVkBfHgzQdQy8S0X6UPLW2/l3R7KBej2ULhZBzUNtFJFIioL1bHXhhM4gXO6X0tHfQn3QladFsjmWZreQFOSunH7m6bagtUEx4gtbNsG+CyalQUbud1ELIvj9QxL0sDIoKV+KC6RCiJQoaXS76F1CrTxcIn5z2cdQBdwupVY5mv1y6HELUTWJlsnZjd2r9np4HXuN+IoUhvy7stTc8nvLEPFP55ENPZexIQgrhP36xoAf9kEaE9gV7V503ZV+4T5MHgVW8bSQYQSYszgKg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5038.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(38100700002)(6486002)(38350700002)(7416002)(66946007)(54906003)(6512007)(186003)(66476007)(31686004)(8676002)(86362001)(107886003)(4326008)(83380400001)(316002)(8936002)(52116002)(26005)(44832011)(2906002)(31696002)(6506007)(53546011)(66556008)(5660300002)(2616005)(508600001)(36756003)(6666004)(110136005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L3VVVjI3c09rMHV3OW9ibjNVL3dPV3U5NzV2STVIbXlrZ1F0RWJqQ3ZXTXRY?=
+ =?utf-8?B?eWQrdDNYZE9EeG5NR1ZHZ256RHk0ckQrWldGVndBVmdyaHlvRnlJK2I5Z2Q5?=
+ =?utf-8?B?RStqbzBGcVV6WU5HRFhsRllZd0VKbngxWElIQmZ3S1lya0Z0NlRucFRHNlh4?=
+ =?utf-8?B?QWNkSm5qTks1V1N5aFN4eVJsME9nRjc5bGtYbXdHdHpDQ0xQNFB0aGJPL3VS?=
+ =?utf-8?B?NnVMTzNtOXJmQTF1ZHNHUU5jR3d5Ui9jK2IydlN6YjhnTHJHU0EzaWNPNjZ4?=
+ =?utf-8?B?TnlPTi96a2dTN0pVN3AzakJFMmRnWnRXVVdaRGw4bndGY29oaitCMUgvSk44?=
+ =?utf-8?B?OU12ay9GREVwYnhEWkVmTVlMQjJPTzVQMFlEWVdaa0k2b0F4MDlYM3I1Y05r?=
+ =?utf-8?B?MWQ3VjJCU0o2MUFVSVN2dWJac2xoOXd1N1JvT0gwaUZzRFduOXg0QTRmS2pL?=
+ =?utf-8?B?cTBVRW9ZRzBGR241THNWMDdtdFNwckpiQ0NkakxBcmhKdklmUzZTRVZDdGs4?=
+ =?utf-8?B?YzR5WnZJNlRoaWNYaytFRCsrT2xyWlF6eXV1RmFNUGJERVUrTmJ5dVdqbncr?=
+ =?utf-8?B?MXhlY1JkMTF5d1VMWTJQNFNWV3RCQm5iUEdDcWhxMFpjbnc3S01CQ0VtNmh0?=
+ =?utf-8?B?MlIwT2Z4cjQySUJJQnNqd0FENDBTaHdsU1I0aXRaTEx1NXNWRWRWanhuY3VI?=
+ =?utf-8?B?RXUvY0ZTMnY3L2JEZFBqcnhBRmpTNm1ZS1d0Ty9VKzQ2VXQxL2lDMzAyZzl1?=
+ =?utf-8?B?bWNkMDBXZHduK2FFcXZFVkhlbHI3azhna20vSWRoL1FnK1d2NTBUWS9MU1lz?=
+ =?utf-8?B?TFJTUllpZGU5cWhHK3ZjblkySmNHazRpYnQzcnM5YlFYY2QrQ0xlaTRlTWZo?=
+ =?utf-8?B?S25DUUlLRWtMcHpzYStBa0NwZkxmclFJVnNFYWhWSzdneFMzU2x4U0dBa0VN?=
+ =?utf-8?B?d1pvTDBrUHZCblljZkdyZ3BOSDdmV25YenF3TFRsYkl3ZEM0QmdERFp1QVpC?=
+ =?utf-8?B?a25pdUJYYU1GNldhemE0NDJHZVVEZW5SL2MyTGFZaHV3RmR2T2V5azJjVFdH?=
+ =?utf-8?B?UmdxUStDbXhWT0FoNWN2R0Y2QlpmbFN4RUNZaGNRQXBzY0w4TGlQK0Y1Rk1K?=
+ =?utf-8?B?T1hpMmVEaGdxVkJudHZLbUluRzFqUmkxQ0ZUOHZMVmtPL0NnN1BwRmIzWnFI?=
+ =?utf-8?B?QlpVbVg0QWlUaTVud1pvcU9wc0RHMWw4NDNBK1VzNktWMVljUjgyQkp1dTdJ?=
+ =?utf-8?B?QVFjWDlTaEd5VWVXSnZET2xaejFzOVg3T3VheCtjTVl6SkIzZ3E5RDB3TUlp?=
+ =?utf-8?B?QXplMFhUS1dqNnIzOVB1YUliMk9vcXNNZ2JkTklKUEZUaTQwYkR5YUFqQzlI?=
+ =?utf-8?B?TTA4M1l5Tno5dG9LeklvOUZ5WFRxUk9BV3BEdERsWURyL1pFc1ZRU3B6eVpZ?=
+ =?utf-8?B?Z1FxYnIydG1WNzRyRFpWL1JRNDVWTjgxSER6YjdJRUZrV2YveW1IZHdRTTZK?=
+ =?utf-8?B?RFpuK216L21YbGhJNENieWphcms1NkRLZmkvaUpBbHl0Z0RMNVR6RXBSQVIx?=
+ =?utf-8?B?OWhiMHI1VUx5SWhHcStqVVVIK1V1MmRCNitucmljQm9pM05sdEI2K0JrWkZN?=
+ =?utf-8?B?NkhTc2NwVk5qTjBEU0lnTjJSKzJhanZhYUdreDBWRk9jR2FBQ2NXM1U1OERu?=
+ =?utf-8?B?N0ZTaHF5bFlyU2lEVFhPMElHMGxFeUtuS1lHc3E3MTRYYjZJZTNTNXVHZW52?=
+ =?utf-8?B?QnhaQyswWGlkVHExRWEzRFU3S0FPRmxRencyRVRQdFlNZ095RmltbXhKUmsv?=
+ =?utf-8?B?RkY3MVZVMVdYZlh5RGtMaWM3bDhrMEhUTTBMSXNiL2hxUkl6ZHhObHJhYVdl?=
+ =?utf-8?B?RVVIOUN0NzQ5ODBvdUVXaXZpZWNOTTRoRDBNWWxtYzRHeE5yUCs1RlJ6eVNi?=
+ =?utf-8?B?ZlVYcjF0M3gwWHQwYk02KzBjUUJyM1dCcmhFV0NnTzhLSlprWFJDTDgxL0xz?=
+ =?utf-8?B?bHJkV1dGZHVTZWR2QUp6TnN0VGhaa2k3SVk3eXNkVWhUd3pweEhlaEMrTVZm?=
+ =?utf-8?B?WjRxZGozMm0rcXpxUXlpUk9ORHN0WlRsSjVwQUw4UTFHejdEWE1tV2ROWG53?=
+ =?utf-8?B?cE9QZFA0akxieG1Fc3VRTjlKTTlHOUdvUG9CbVhpa0xVeXZZUi9na0RDOFAw?=
+ =?utf-8?Q?aaKKPQpOlOdHBjUT1ESkDa8=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 974e5b7b-1d3b-44d4-bd8c-08d9dc2bb35a
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5038.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2022 15:44:10.2908
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a4J/HRkoBj0jOqpimcou/js1FNehK45E1KaFk9Z2Sb0DC/QY5lceoMZSIIoDHaPYX3A/jdSR9FmQe8xSPTbaRg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1583
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10233 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 malwarescore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 phishscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
  definitions=main-2201200081
+X-Proofpoint-GUID: 3o7ipg-V97RX8Cjc_Agqz0E_VZMwS6eV
+X-Proofpoint-ORIG-GUID: 3o7ipg-V97RX8Cjc_Agqz0E_VZMwS6eV
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/18/22 10:52, Janis Schoetterl-Glausch wrote:
-> Test the emulation of TEST PROTECTION in the presence of storage keys.
-> Emulation only occurs under certain conditions, one of which is the host
-> page being protected.
-> Trigger this by protecting the test pages via mprotect.
+On 20/01/2022 01:07, Sean Christopherson wrote:
+> WARN if KVM attempts to emulate in response to #UD or #GP for SEV guests,
+> i.e. if KVM intercepts #UD or #GP, as emulation on any fault except #NPF
+> is impossible since KVM cannot read guest private memory to get the code
+> stream, and the CPU's DecodeAssists feature only provides the instruction
+> bytes on #NPF.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   tools/testing/selftests/kvm/.gitignore    |   1 +
->   tools/testing/selftests/kvm/Makefile      |   1 +
->   tools/testing/selftests/kvm/s390x/tprot.c | 184 ++++++++++++++++++++++
->   3 files changed, 186 insertions(+)
->   create mode 100644 tools/testing/selftests/kvm/s390x/tprot.c
+>   arch/x86/kvm/svm/svm.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 3763105029fb..82c0470b6849 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -7,6 +7,7 @@
->   /s390x/memop
->   /s390x/resets
->   /s390x/sync_regs_test
-> +/s390x/tprot
->   /x86_64/cr4_cpuid_sync_test
->   /x86_64/debug_regs
->   /x86_64/evmcs_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index c4e34717826a..df6de8d155e8 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -109,6 +109,7 @@ TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
->   TEST_GEN_PROGS_s390x = s390x/memop
->   TEST_GEN_PROGS_s390x += s390x/resets
->   TEST_GEN_PROGS_s390x += s390x/sync_regs_test
-> +TEST_GEN_PROGS_s390x += s390x/tprot
->   TEST_GEN_PROGS_s390x += demand_paging_test
->   TEST_GEN_PROGS_s390x += dirty_log_test
->   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-> diff --git a/tools/testing/selftests/kvm/s390x/tprot.c b/tools/testing/selftests/kvm/s390x/tprot.c
-> new file mode 100644
-> index 000000000000..8b52675307f6
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/s390x/tprot.c
-> @@ -0,0 +1,184 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Test TEST PROTECTION emulation.
-> + * In order for emulation occur the target page has to be DAT protected in the
-> + * host mappings. Since the page tables are shared, we can use mprotect
-> + * to achieve this.
-> + *
-> + * Copyright IBM Corp. 2021
-> + */
-> +
-> +#include <sys/mman.h>
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +
-> +#define PAGE_SHIFT 12
-> +#define PAGE_SIZE (1 << PAGE_SHIFT)
-> +#define CR0_FETCH_PROTECTION_OVERRIDE	(1UL << (63 - 38))
-> +#define CR0_STORAGE_PROTECTION_OVERRIDE	(1UL << (63 - 39))
-> +
-> +#define VCPU_ID 1
-> +
-> +static __aligned(PAGE_SIZE) uint8_t pages[2][PAGE_SIZE];
-> +static uint8_t *const page_store_prot = pages[0];
-> +static uint8_t *const page_fetch_prot = pages[1];
-> +
-> +static int set_storage_key(void *addr, uint8_t key)
-> +{
-> +	int not_mapped = 0;
-> +
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 994224ae2731..ed2ca875b84b 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4267,6 +4267,9 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
+>   	if (!sev_guest(vcpu->kvm))
+>   		return true;
+>   
+> +	/* #UD and #GP should never be intercepted for SEV guests. */
+> +	WARN_ON_ONCE(emul_type & (EMULTYPE_TRAP_UD | EMULTYPE_VMWARE_GP));
 
-Maybe add a short comment:
-Check if address is mapped via lra and set the storage key if it is.
+What about EMULTYPE_TRAP_UD_FORCED?
 
-> +	asm volatile (
-> +		       "lra	%[addr], 0(0,%[addr])\n"
-> +		"	jz	0f\n"
-> +		"	llill	%[not_mapped],1\n"
-> +		"	j	1f\n"
-> +		"0:	sske	%[key], %[addr]\n"
-> +		"1:"
-> +		: [addr] "+&a" (addr), [not_mapped] "+r" (not_mapped)
+Otherwise
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 
-Shouldn't this be a "=r" instead of a "+r" for not_mapped?
 
-> +		: [key] "r" (key)
-> +		: "cc"
-> +	);
-> +	return -not_mapped;
-> +}
 > +
-> +enum permission {
-> +	READ_WRITE = 0,
-> +	READ = 1,
-> +	NONE = 2,
-> +	UNAVAILABLE = 3,
-
-TRANSLATION_NA ?
-I'm not completely happy with these names but I've yet to come up with a 
-better naming scheme here.
-
-> +};
-> +
-> +static enum permission test_protection(void *addr, uint8_t key)
-> +{
-> +	uint64_t mask;
-> +
-> +	asm volatile (
-> +		       "tprot	%[addr], 0(%[key])\n"
-> +		"	ipm	%[mask]\n"
-> +		: [mask] "=r" (mask)
-> +		: [addr] "Q" (*(char *)addr),
-> +		  [key] "a" (key)
-> +		: "cc"
-> +	);
-> +
-> +	return (enum permission)mask >> 28;
-
-You could replace the shift with the "srl" that we normally do.
-
-> +}
-> +
-> +enum stage {
-> +	STAGE_END,
-> +	STAGE_INIT_SIMPLE,
-> +	TEST_SIMPLE,
-> +	STAGE_INIT_FETCH_PROT_OVERRIDE,
-> +	TEST_FETCH_PROT_OVERRIDE,
-> +	TEST_STORAGE_PROT_OVERRIDE,
-> +};
-> +
-> +struct test {
-> +	enum stage stage;
-> +	void *addr;
-> +	uint8_t key;
-> +	enum permission expected;
-> +} tests[] = {
-> +	/* Those which result in NONE/UNAVAILABLE will be interpreted by SIE,
-> +	 * not KVM, but there is no harm in testing them also.
-> +	 * See Enhanced Suppression-on-Protection Facilities in the
-> +	 * Interpretive-Execution Mode
-> +	 */
-
-Outside of net/ we put the first line on "*" not on "/*"
-
-s/Those which result in/Tests resulting in/ ?
-
-> +	{ TEST_SIMPLE, page_store_prot, 0x00, READ_WRITE },
-> +	{ TEST_SIMPLE, page_store_prot, 0x10, READ_WRITE },
-> +	{ TEST_SIMPLE, page_store_prot, 0x20, READ },
-> +	{ TEST_SIMPLE, page_fetch_prot, 0x00, READ_WRITE },
-> +	{ TEST_SIMPLE, page_fetch_prot, 0x90, READ_WRITE },
-> +	{ TEST_SIMPLE, page_fetch_prot, 0x10, NONE },
-> +	{ TEST_SIMPLE, (void *)0x00, 0x10, UNAVAILABLE },
-> +	/* Fetch-protection override */
-> +	{ TEST_FETCH_PROT_OVERRIDE, (void *)0x00, 0x10, READ },
-> +	{ TEST_FETCH_PROT_OVERRIDE, (void *)2049, 0x10, NONE },
-> +	/* Storage-protection override */
-> +	{ TEST_STORAGE_PROT_OVERRIDE, page_fetch_prot, 0x10, READ_WRITE },
-> +	{ TEST_STORAGE_PROT_OVERRIDE, page_store_prot, 0x20, READ },
-> +	{ TEST_STORAGE_PROT_OVERRIDE, (void *)2049, 0x10, READ_WRITE },
-> +	/* End marker */
-> +	{ STAGE_END, 0, 0, 0 },
-> +};
-> +
-> +static enum stage perform_next_stage(int *i, bool mapped_0)
-> +{
-> +	enum stage stage = tests[*i].stage;
-> +	enum permission result;
-> +	bool skip;
-> +
-> +	for (; tests[*i].stage == stage; (*i)++) {
-> +		skip = tests[*i].addr < (void *)4096 &&
-> +		       !mapped_0 &&
-> +		       tests[*i].expected != UNAVAILABLE;
-
-Time for a comment?
-
-> +		if (!skip) {
-> +			result = test_protection(tests[*i].addr, tests[*i].key);
-> +			GUEST_ASSERT_2(result == tests[*i].expected, *i, result);
-> +		}
-> +	}
-> +	return stage;
-> +}
-> +
-> +static void guest_code(void)
-> +{
-> +	bool mapped_0;
-> +	int i = 0;
-> +
-
-It's __really__ hard to understand this since the state is changed both 
-by the guest and host. Please add comments to this and maybe also add 
-some to the test struct explaining why you expect the results for each test.
-
-> +	GUEST_ASSERT_EQ(set_storage_key(page_store_prot, 0x10), 0);
-> +	GUEST_ASSERT_EQ(set_storage_key(page_fetch_prot, 0x98), 0);
-> +	GUEST_SYNC(STAGE_INIT_SIMPLE);
-> +	GUEST_SYNC(perform_next_stage(&i, false));
-> +
-> +	/* Fetch-protection override */
-> +	mapped_0 = !set_storage_key((void *)0, 0x98);
-> +	GUEST_SYNC(STAGE_INIT_FETCH_PROT_OVERRIDE);
-> +	GUEST_SYNC(perform_next_stage(&i, mapped_0));
-> +
-> +	/* Storage-protection override */
-> +	GUEST_SYNC(perform_next_stage(&i, mapped_0));
-> +}
-> +
-> +#define HOST_SYNC(vmp, stage)							\
-> +({										\
-> +	struct kvm_vm *__vm = (vmp);						\
-> +	struct ucall uc;							\
-> +	int __stage = (stage);							\
-> +										\
-> +	vcpu_run(__vm, VCPU_ID);						\
-> +	get_ucall(__vm, VCPU_ID, &uc);						\
-> +	if (uc.cmd == UCALL_ABORT) {						\
-> +		TEST_FAIL("line %lu: %s, hints: %lu, %lu", uc.args[1],		\
-> +			  (const char *)uc.args[0], uc.args[2], uc.args[3]);	\
-> +	}									\
-> +	ASSERT_EQ(uc.cmd, UCALL_SYNC);						\
-> +	ASSERT_EQ(uc.args[1], __stage);						\
-> +})
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	struct kvm_vm *vm;
-> +	struct kvm_run *run;
-> +	vm_vaddr_t guest_0_page;
-> +
-> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +	run = vcpu_state(vm, VCPU_ID);
-> +
-> +	HOST_SYNC(vm, STAGE_INIT_SIMPLE);
-> +	mprotect(addr_gva2hva(vm, (vm_vaddr_t)pages), PAGE_SIZE * 2, PROT_READ);
-> +	HOST_SYNC(vm, TEST_SIMPLE);
-> +
-> +	guest_0_page = vm_vaddr_alloc(vm, PAGE_SIZE, 0);
-> +	if (guest_0_page != 0)
-> +		print_skip("Did not allocate page at 0 for fetch protection override tests");
-> +	HOST_SYNC(vm, STAGE_INIT_FETCH_PROT_OVERRIDE);
-> +	if (guest_0_page == 0)
-> +		mprotect(addr_gva2hva(vm, (vm_vaddr_t)0), PAGE_SIZE, PROT_READ);
-> +	run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
-> +	run->kvm_dirty_regs = KVM_SYNC_CRS;
-> +	HOST_SYNC(vm, TEST_FETCH_PROT_OVERRIDE);
-> +
-> +	run->s.regs.crs[0] |= CR0_STORAGE_PROTECTION_OVERRIDE;
-> +	run->kvm_dirty_regs = KVM_SYNC_CRS;
-> +	HOST_SYNC(vm, TEST_STORAGE_PROT_OVERRIDE);
-> +}
-> 
-
+>   	/*
+>   	 * Emulation is impossible for SEV-ES guests as KVM doesn't have access
+>   	 * to guest register state.
 
