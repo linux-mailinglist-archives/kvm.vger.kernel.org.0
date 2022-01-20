@@ -2,115 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51E52494AD0
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 10:33:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61FDA494AF4
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 10:42:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359294AbiATJdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 04:33:36 -0500
-Received: from out0-136.mail.aliyun.com ([140.205.0.136]:50954 "EHLO
-        out0-136.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358140AbiATJdf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 04:33:35 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047203;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---.MfqJchL_1642671212;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.MfqJchL_1642671212)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 20 Jan 2022 17:33:32 +0800
-From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1359604AbiATJl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 04:41:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbiATJl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 04:41:59 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C965C061574;
+        Thu, 20 Jan 2022 01:41:59 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id q75so5123185pgq.5;
+        Thu, 20 Jan 2022 01:41:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=od5lEluMiGvBUjmC4y/AtLj9FnkbJ2imydvHba8V9xo=;
+        b=C1km0VG/pH//jLQuXC20a2R3wRb4D+dYENZXr9lnf5mT+cUYEkevy820XidXfr5Gnq
+         Nv5cfdod5AqC+R1OaHCApj6XjDIDB0RiYQhB1H3jPzRcfUllkMTk+hiUdvawmNUtsZas
+         AbVz2ZQFCsskgeipf6MG8pGmXmCfZncQslymqfZDAmkU6WyMGjbuxMYpEW/bSjIF79rc
+         jFkFqk79ra1SWyabnTNfPPJOiAzYwoaI1geXc4QWwcbRGRf7b6RFbuXN8KFlRAQJRaxP
+         NC2yXs+xdH9uKekso56PSD3sr6oMKw5zkTKuDy4zMtlj1k7xcYqAWk1zbRM8ZyT3B+uF
+         EsSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=od5lEluMiGvBUjmC4y/AtLj9FnkbJ2imydvHba8V9xo=;
+        b=rbQxHOM91nM6nEPVS3y0gtcJ1iHchUC40PUw8H/MwZtrXKL9t5sisoacybdbkpaK0m
+         Kg7lMbWBrVrFBTHXzIt2W35S0okrGvueFWe26D4txlzKrzKD4Tm4p6/QtTyg9PAGhmZd
+         O3WQ6zTt9pAR/TMZZRc0LUazqlEwV1tf0SdBwfKkIr1Fd12vvWnAFjuidfzFa9FEGsjj
+         eNO/tRq0ix+ReX+GuUjk9xJEgCMz0KnQpWihCXxUxGOFX8BCtC5aGpG1fwkQdRNnW4aR
+         do5EDgkOX6+YagZ/ZaUBKme6mMRmKqnMw0Q9kv8bOEk+igxEa+anfzKWcHYCwadyyd4D
+         LOLA==
+X-Gm-Message-State: AOAM533Ga6l0G94W+xzWx8hU8LBWhILqXhV7meT6WsPMPm+/xS8yAs+R
+        yNUnKtIcUO+uEqqDM+2ws5U=
+X-Google-Smtp-Source: ABdhPJw2NIBuh+JBCdphWcJLkjEVQFv/pHmY5GECLaJLfv1/EA6mDX5dpYukkkvFnigO43qosn29BA==
+X-Received: by 2002:a05:6a00:2410:b0:4bc:dda9:2e92 with SMTP id z16-20020a056a00241000b004bcdda92e92mr34645915pfh.76.1642671717965;
+        Thu, 20 Jan 2022 01:41:57 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id u9sm2745790pfi.14.2022.01.20.01.41.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jan 2022 01:41:57 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: x86: Fix wrong privilege check for code segment in __load_segment_descriptor()
-Date:   Thu, 20 Jan 2022 17:33:30 +0800
-Message-Id: <ed8917d7bab80a1c1a130beae45c7d6ecdef47fc.1642669684.git.houwenlong.hwl@antgroup.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1642669684.git.houwenlong.hwl@antgroup.com>
-References: <cover.1642669684.git.houwenlong.hwl@antgroup.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests: kvm/x86: Check if cpuid_d_0_ebx follows XCR0 value change
+Date:   Thu, 20 Jan 2022 17:41:46 +0800
+Message-Id: <20220120094146.66525-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Code segment descriptor can be loaded by jmp/call/ret, iret
-and int. The privilege checks are different between those
-instructions above realmode. Although, the emulator has
-use x86_transfer_type enumerate to differentiate them, but
-it is not really used in __load_segment_descriptor(). Note,
-far jump/call to call gate, task gate or task state segment
-are not implemented in emulator.
+From: Like Xu <likexu@tencent.com>
 
-As for far jump/call to code segment, if DPL > CPL for conforming
-code or (RPL > CPL or DPL != CPL) for non-conforming code, it
-should trigger #GP. The current checks are ok.
+Intel SDM says the CPUID.0xd.EBX reports the maximum size required by
+enabled features in XCR0. Add a simple test that writes two different
+non #GP values via  __xsetbv() and verify that the cpuid data is updated.
 
-As for far return, if RPL < CPL or DPL > RPL for conforming
-code or DPL != RPL for non-conforming code, it should trigger #GP.
-Outer level return is not implemented above virtual-8086 mode in
-emulator. So it implies that RPL <= CPL, but the current checks
-wouldn't trigger #GP if RPL < CPL.
+Opportunistically, move the __x{s,g}etbv helpers  to the x86_64/processor.h
 
-As for code segment loading in task switch, if DPL > RPL for conforming
-code or DPL != RPL for non-conforming code, it should trigger #TS. Since
-segment selector is loaded before segment descriptor when load state from
-tss, it implies that RPL = CPL, so the current checks are ok.
-
-The only problem in current implementation is mssing RPL < CPL check for
-far return. However, change code to follow the manual is better.
-
-Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/emulate.c | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+Related link: https://lore.kernel.org/kvm/20220119070427.33801-1-likexu@tencent.com/
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 864db6fbe8db..b7ce2a85e58e 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -1631,14 +1631,28 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
- 		if (!(seg_desc.type & 8))
- 			goto exception;
+ .../selftests/kvm/include/x86_64/processor.h  | 18 ++++++++++
+ tools/testing/selftests/kvm/x86_64/amx_test.c | 18 ----------
+ .../testing/selftests/kvm/x86_64/cpuid_test.c | 34 +++++++++++++++++--
+ 3 files changed, 49 insertions(+), 21 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 122447827954..65097ca6d7b2 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -296,6 +296,24 @@ static inline void cpuid(uint32_t *eax, uint32_t *ebx,
+ 	    : "memory");
+ }
  
--		if (seg_desc.type & 4) {
--			/* conforming */
--			if (dpl > cpl)
--				goto exception;
--		} else {
--			/* nonconforming */
--			if (rpl > cpl || dpl != cpl)
--				goto exception;
-+		if (transfer == X86_TRANSFER_RET && rpl < cpl)
-+			goto exception;
-+		if (transfer == X86_TRANSFER_RET || X86_TRANSFER_TASK_SWITCH) {
-+			if (seg_desc.type & 4) {
-+				/* conforming */
-+				if (dpl > rpl)
-+					goto exception;
-+			} else {
-+				/* nonconforming */
-+				if (dpl != rpl)
-+					goto exception;
-+			}
-+		} else { /* X86_TRANSFER_CALL_JMP */
-+			if (seg_desc.type & 4) {
-+				/* conforming */
-+				if (dpl > cpl)
-+					goto exception;
-+			} else {
-+				/* nonconforming */
-+				if (rpl > cpl || dpl != cpl)
-+					goto exception;
-+			}
- 		}
- 		/* in long-mode d/b must be clear if l is set */
- 		if (seg_desc.d && seg_desc.l) {
++static inline u64 __xgetbv(u32 index)
++{
++	u32 eax, edx;
++
++	asm volatile("xgetbv;"
++		     : "=a" (eax), "=d" (edx)
++		     : "c" (index));
++	return eax + ((u64)edx << 32);
++}
++
++static inline void __xsetbv(u32 index, u64 value)
++{
++	u32 eax = value;
++	u32 edx = value >> 32;
++
++	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
++}
++
+ #define SET_XMM(__var, __xmm) \
+ 	asm volatile("movq %0, %%"#__xmm : : "r"(__var) : #__xmm)
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+index 523c1e99ed64..c3cbb2dc450d 100644
+--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
++++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+@@ -78,24 +78,6 @@ struct xtile_info {
+ 
+ static struct xtile_info xtile;
+ 
+-static inline u64 __xgetbv(u32 index)
+-{
+-	u32 eax, edx;
+-
+-	asm volatile("xgetbv;"
+-		     : "=a" (eax), "=d" (edx)
+-		     : "c" (index));
+-	return eax + ((u64)edx << 32);
+-}
+-
+-static inline void __xsetbv(u32 index, u64 value)
+-{
+-	u32 eax = value;
+-	u32 edx = value >> 32;
+-
+-	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
+-}
+-
+ static inline void __ldtilecfg(void *cfg)
+ {
+ 	asm volatile(".byte 0xc4,0xe2,0x78,0x49,0x00"
+diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+index 16d2465c5634..169ec54a928c 100644
+--- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
++++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+@@ -20,8 +20,7 @@ struct {
+ 	u32 index;
+ } mangled_cpuids[] = {
+ 	/*
+-	 * These entries depend on the vCPU's XCR0 register and IA32_XSS MSR,
+-	 * which are not controlled for by this test.
++	 * These entries depend on the vCPU's XCR0 register and IA32_XSS MSR.
+ 	 */
+ 	{.function = 0xd, .index = 0},
+ 	{.function = 0xd, .index = 1},
+@@ -55,6 +54,31 @@ static void test_cpuid_40000000(struct kvm_cpuid2 *guest_cpuid)
+ 	GUEST_ASSERT(eax == 0x40000001);
+ }
+ 
++static void test_cpuid_d(struct kvm_cpuid2 *guest_cpuid)
++{
++	uint64_t cr4;
++	u32 eax, ebx, ecx, edx;
++	u32 before, after;
++
++	cr4 = get_cr4();
++	cr4 |= X86_CR4_OSXSAVE;
++	set_cr4(cr4);
++
++	__xsetbv(0x0, 0x1);
++	eax = 0xd;
++	ebx = ecx = edx = 0;
++	cpuid(&eax, &ebx, &ecx, &edx);
++	before = ebx;
++
++	__xsetbv(0x0, 0x3);
++	eax = 0xd;
++	ebx = ecx = edx = 0;
++	cpuid(&eax, &ebx, &ecx, &edx);
++	after = ebx;
++
++	GUEST_ASSERT(before != after);
++}
++
+ static void guest_main(struct kvm_cpuid2 *guest_cpuid)
+ {
+ 	GUEST_SYNC(1);
+@@ -65,6 +89,10 @@ static void guest_main(struct kvm_cpuid2 *guest_cpuid)
+ 
+ 	test_cpuid_40000000(guest_cpuid);
+ 
++	GUEST_SYNC(3);
++
++	test_cpuid_d(guest_cpuid);
++
+ 	GUEST_DONE();
+ }
+ 
+@@ -200,7 +228,7 @@ int main(void)
+ 
+ 	vcpu_args_set(vm, VCPU_ID, 1, cpuid_gva);
+ 
+-	for (stage = 0; stage < 3; stage++)
++	for (stage = 0; stage < 4; stage++)
+ 		run_vcpu(vm, VCPU_ID, stage);
+ 
+ 	set_cpuid_after_run(vm, cpuid2);
 -- 
-2.31.1
+2.33.1
 
