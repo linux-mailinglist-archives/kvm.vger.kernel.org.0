@@ -2,269 +2,346 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AEA2495121
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 16:13:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A507649519A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 16:40:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346406AbiATPNH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 10:13:07 -0500
-Received: from foss.arm.com ([217.140.110.172]:41592 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1376604AbiATPMt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 10:12:49 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08029101E;
-        Thu, 20 Jan 2022 07:12:48 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D04C83F73D;
-        Thu, 20 Jan 2022 07:12:45 -0800 (PST)
-Date:   Thu, 20 Jan 2022 15:12:54 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-Message-ID: <Yel79mQSV/8iINrS@monolith.localdoman>
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-19-maz@kernel.org>
+        id S1376767AbiATPkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 10:40:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7038 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1376650AbiATPkL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 10:40:11 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20KFBgGx030870;
+        Thu, 20 Jan 2022 15:40:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : from : to : cc : references : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kwVPwpzFh9EH0PtrrxoFC5hUpP+oKIzag7+1qFj0DPE=;
+ b=hdwPwslRrraHiuTlAhcVgxejzNyXaxOxQd9Mr4lqo6bRvNi2nz3G6Uwhku5i5K5dmhgO
+ MYsYQtGZTPe06tZcQPgrhBgJXn58tu96TqF734Slob+gRKSCkel4KS0XEe7HtXddCHhI
+ BriOFwUxFbwvBqhgBmN8rgb8qGGVRDE46dDX3zR8nffmTIRNTdLA7IhjxVgKdp5wk5m3
+ v+I1TLpi+B0flCTyY4uDKKaxKD14mnTSZG5A/YEA9STOGVgPWTu7++GjClxIu1tlbdqJ
+ MZo5Teeg1iATsbV2aKWRpwz9qXwnj0pM2+X933123jBWHXYvL2MiVq4/k3Ze+UquukgJ nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dqa5nrn2u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 15:40:11 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20KFHiX5030085;
+        Thu, 20 Jan 2022 15:40:11 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dqa5nrn1w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 15:40:11 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20KFLq41013444;
+        Thu, 20 Jan 2022 15:40:08 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3dknhk33f8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 15:40:08 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20KFe4Sx47841726
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jan 2022 15:40:04 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 69C2852054;
+        Thu, 20 Jan 2022 15:40:04 +0000 (GMT)
+Received: from [9.145.179.177] (unknown [9.145.179.177])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0C68152052;
+        Thu, 20 Jan 2022 15:40:03 +0000 (GMT)
+Message-ID: <c5ce5d0b-444b-ba33-a670-3bd3893af475@linux.ibm.com>
+Date:   Thu, 20 Jan 2022 16:40:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-19-maz@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+ <20220118095210.1651483-5-scgl@linux.ibm.com>
+Content-Language: en-US
+Subject: Re: [RFC PATCH v1 04/10] KVM: s390: selftests: Test TEST PROTECTION
+ emulation
+In-Reply-To: <20220118095210.1651483-5-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jdaw49tV8FlvegRmHxjiYOq1WbDuU6Oe
+X-Proofpoint-GUID: UzTWKOWDFgGsPuo7cUSFZYyF4xPiBMD_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-20_06,2022-01-20_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ adultscore=0 spamscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
+ clxscore=1015 impostorscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2201200081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Mon, Nov 29, 2021 at 08:00:59PM +0000, Marc Zyngier wrote:
-> KVM internally uses accessor functions when reading or writing the
-> guest's system registers. This takes care of accessing either the stored
-> copy or using the "live" EL1 system registers when the host uses VHE.
+On 1/18/22 10:52, Janis Schoetterl-Glausch wrote:
+> Test the emulation of TEST PROTECTION in the presence of storage keys.
+> Emulation only occurs under certain conditions, one of which is the host
+> page being protected.
+> Trigger this by protecting the test pages via mprotect.
 > 
-> With the introduction of virtual EL2 we add a bunch of EL2 system
-> registers, which now must also be taken care of:
-> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
->   revert to the stored version of that, and not use the CPU's copy.
-> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
->   also use the stored version, since the CPU carries the EL1 copy.
-> - Some EL2 system registers are supposed to affect the current execution
->   of the system, so we need to put them into their respective EL1
->   counterparts. For this we need to define a mapping between the two.
->   This is done using the newly introduced struct el2_sysreg_map.
-> - Some EL2 system registers have a different format than their EL1
->   counterpart, so we need to translate them before writing them to the
->   CPU. This is done using an (optional) translate function in the map.
-> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
->   which need some separate handling (SPSR_EL2 is being handled in a
->   separate patch).
-> 
-> All of these cases are now wrapped into the existing accessor functions,
-> so KVM users wouldn't need to care whether they access EL2 or EL1
-> registers and also which state the guest is in.
-> 
-> This handles what was formerly known as the "shadow state" dynamically,
-> without requiring a separate copy for each vCPU EL.
-> 
-> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 143 ++++++++++++++++++++++++++++++++++++--
->  1 file changed, 139 insertions(+), 4 deletions(-)
+>   tools/testing/selftests/kvm/.gitignore    |   1 +
+>   tools/testing/selftests/kvm/Makefile      |   1 +
+>   tools/testing/selftests/kvm/s390x/tprot.c | 184 ++++++++++++++++++++++
+>   3 files changed, 186 insertions(+)
+>   create mode 100644 tools/testing/selftests/kvm/s390x/tprot.c
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 730a24468915..61596355e42d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -24,6 +24,7 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
->  #include <asm/perf_event.h>
->  #include <asm/sysreg.h>
->  
-> @@ -64,23 +65,157 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->  	return false;
->  }
->  
-> +#define PURE_EL2_SYSREG(el2)						\
-> +	case el2: {							\
-> +		*el1r = el2;						\
-> +		return true;						\
-> +	}
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 3763105029fb..82c0470b6849 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -7,6 +7,7 @@
+>   /s390x/memop
+>   /s390x/resets
+>   /s390x/sync_regs_test
+> +/s390x/tprot
+>   /x86_64/cr4_cpuid_sync_test
+>   /x86_64/debug_regs
+>   /x86_64/evmcs_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c4e34717826a..df6de8d155e8 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -109,6 +109,7 @@ TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
+>   TEST_GEN_PROGS_s390x = s390x/memop
+>   TEST_GEN_PROGS_s390x += s390x/resets
+>   TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+> +TEST_GEN_PROGS_s390x += s390x/tprot
+>   TEST_GEN_PROGS_s390x += demand_paging_test
+>   TEST_GEN_PROGS_s390x += dirty_log_test
+>   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> diff --git a/tools/testing/selftests/kvm/s390x/tprot.c b/tools/testing/selftests/kvm/s390x/tprot.c
+> new file mode 100644
+> index 000000000000..8b52675307f6
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/s390x/tprot.c
+> @@ -0,0 +1,184 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Test TEST PROTECTION emulation.
+> + * In order for emulation occur the target page has to be DAT protected in the
+> + * host mappings. Since the page tables are shared, we can use mprotect
+> + * to achieve this.
+> + *
+> + * Copyright IBM Corp. 2021
+> + */
 > +
-> +#define MAPPED_EL2_SYSREG(el2, el1, fn)					\
-> +	case el2: {							\
-> +		*xlate = fn;						\
-> +		*el1r = el1;						\
-> +		return true;						\
-> +	}
+> +#include <sys/mman.h>
+> +#include "test_util.h"
+> +#include "kvm_util.h"
 > +
-> +static bool get_el2_mapping(unsigned int reg,
-> +			    unsigned int *el1r, u64 (**xlate)(u64))
-
-Nitpick: this could be renamed to get_el2_to_el1_mapping() to remove any
-ambiguities regarding what is being mapped to what (and to match the
-translate_* functions). With our without this change, the patch looks
-correct to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
+> +#define PAGE_SHIFT 12
+> +#define PAGE_SIZE (1 << PAGE_SHIFT)
+> +#define CR0_FETCH_PROTECTION_OVERRIDE	(1UL << (63 - 38))
+> +#define CR0_STORAGE_PROTECTION_OVERRIDE	(1UL << (63 - 39))
+> +
+> +#define VCPU_ID 1
+> +
+> +static __aligned(PAGE_SIZE) uint8_t pages[2][PAGE_SIZE];
+> +static uint8_t *const page_store_prot = pages[0];
+> +static uint8_t *const page_fetch_prot = pages[1];
+> +
+> +static int set_storage_key(void *addr, uint8_t key)
 > +{
-> +	switch (reg) {
-> +		PURE_EL2_SYSREG(  VPIDR_EL2	);
-> +		PURE_EL2_SYSREG(  VMPIDR_EL2	);
-> +		PURE_EL2_SYSREG(  ACTLR_EL2	);
-> +		PURE_EL2_SYSREG(  HCR_EL2	);
-> +		PURE_EL2_SYSREG(  MDCR_EL2	);
-> +		PURE_EL2_SYSREG(  HSTR_EL2	);
-> +		PURE_EL2_SYSREG(  HACR_EL2	);
-> +		PURE_EL2_SYSREG(  VTTBR_EL2	);
-> +		PURE_EL2_SYSREG(  VTCR_EL2	);
-> +		PURE_EL2_SYSREG(  RVBAR_EL2	);
-> +		PURE_EL2_SYSREG(  TPIDR_EL2	);
-> +		PURE_EL2_SYSREG(  HPFAR_EL2	);
-> +		PURE_EL2_SYSREG(  ELR_EL2	);
-> +		PURE_EL2_SYSREG(  SPSR_EL2	);
-> +		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
-> +				  translate_sctlr_el2_to_sctlr_el1	     );
-> +		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
-> +				  translate_cptr_el2_to_cpacr_el1	     );
-> +		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
-> +				  translate_ttbr0_el2_to_ttbr0_el1	     );
-> +		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(TCR_EL2,     TCR_EL1,
-> +				  translate_tcr_el2_to_tcr_el1		     );
-> +		MAPPED_EL2_SYSREG(VBAR_EL2,    VBAR_EL1,    NULL	     );
-> +		MAPPED_EL2_SYSREG(AFSR0_EL2,   AFSR0_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(AFSR1_EL2,   AFSR1_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(ESR_EL2,     ESR_EL1,     NULL	     );
-> +		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
-> +		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
-> +		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(CNTHCTL_EL2, CNTKCTL_EL1,
-> +				  translate_cnthctl_el2_to_cntkctl_el1	     );
-> +	default:
-> +		return false;
-> +	}
+> +	int not_mapped = 0;
+> +
+
+Maybe add a short comment:
+Check if address is mapped via lra and set the storage key if it is.
+
+> +	asm volatile (
+> +		       "lra	%[addr], 0(0,%[addr])\n"
+> +		"	jz	0f\n"
+> +		"	llill	%[not_mapped],1\n"
+> +		"	j	1f\n"
+> +		"0:	sske	%[key], %[addr]\n"
+> +		"1:"
+> +		: [addr] "+&a" (addr), [not_mapped] "+r" (not_mapped)
+
+Shouldn't this be a "=r" instead of a "+r" for not_mapped?
+
+> +		: [key] "r" (key)
+> +		: "cc"
+> +	);
+> +	return -not_mapped;
 > +}
 > +
->  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->  {
->  	u64 val = 0x8badf00d8badf00d;
-> +	u64 (*xlate)(u64) = NULL;
-> +	unsigned int el1r;
+> +enum permission {
+> +	READ_WRITE = 0,
+> +	READ = 1,
+> +	NONE = 2,
+> +	UNAVAILABLE = 3,
+
+TRANSLATION_NA ?
+I'm not completely happy with these names but I've yet to come up with a 
+better naming scheme here.
+
+> +};
 > +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		goto memory_read;
+> +static enum permission test_protection(void *addr, uint8_t key)
+> +{
+> +	uint64_t mask;
 > +
-> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-> +		if (!is_hyp_ctxt(vcpu))
-> +			goto memory_read;
+> +	asm volatile (
+> +		       "tprot	%[addr], 0(%[key])\n"
+> +		"	ipm	%[mask]\n"
+> +		: [mask] "=r" (mask)
+> +		: [addr] "Q" (*(char *)addr),
+> +		  [key] "a" (key)
+> +		: "cc"
+> +	);
 > +
-> +		/*
-> +		 * ELR_EL2 is special cased for now.
-> +		 */
-> +		switch (reg) {
-> +		case ELR_EL2:
-> +			return read_sysreg_el1(SYS_ELR);
+> +	return (enum permission)mask >> 28;
+
+You could replace the shift with the "srl" that we normally do.
+
+> +}
+> +
+> +enum stage {
+> +	STAGE_END,
+> +	STAGE_INIT_SIMPLE,
+> +	TEST_SIMPLE,
+> +	STAGE_INIT_FETCH_PROT_OVERRIDE,
+> +	TEST_FETCH_PROT_OVERRIDE,
+> +	TEST_STORAGE_PROT_OVERRIDE,
+> +};
+> +
+> +struct test {
+> +	enum stage stage;
+> +	void *addr;
+> +	uint8_t key;
+> +	enum permission expected;
+> +} tests[] = {
+> +	/* Those which result in NONE/UNAVAILABLE will be interpreted by SIE,
+> +	 * not KVM, but there is no harm in testing them also.
+> +	 * See Enhanced Suppression-on-Protection Facilities in the
+> +	 * Interpretive-Execution Mode
+> +	 */
+
+Outside of net/ we put the first line on "*" not on "/*"
+
+s/Those which result in/Tests resulting in/ ?
+
+> +	{ TEST_SIMPLE, page_store_prot, 0x00, READ_WRITE },
+> +	{ TEST_SIMPLE, page_store_prot, 0x10, READ_WRITE },
+> +	{ TEST_SIMPLE, page_store_prot, 0x20, READ },
+> +	{ TEST_SIMPLE, page_fetch_prot, 0x00, READ_WRITE },
+> +	{ TEST_SIMPLE, page_fetch_prot, 0x90, READ_WRITE },
+> +	{ TEST_SIMPLE, page_fetch_prot, 0x10, NONE },
+> +	{ TEST_SIMPLE, (void *)0x00, 0x10, UNAVAILABLE },
+> +	/* Fetch-protection override */
+> +	{ TEST_FETCH_PROT_OVERRIDE, (void *)0x00, 0x10, READ },
+> +	{ TEST_FETCH_PROT_OVERRIDE, (void *)2049, 0x10, NONE },
+> +	/* Storage-protection override */
+> +	{ TEST_STORAGE_PROT_OVERRIDE, page_fetch_prot, 0x10, READ_WRITE },
+> +	{ TEST_STORAGE_PROT_OVERRIDE, page_store_prot, 0x20, READ },
+> +	{ TEST_STORAGE_PROT_OVERRIDE, (void *)2049, 0x10, READ_WRITE },
+> +	/* End marker */
+> +	{ STAGE_END, 0, 0, 0 },
+> +};
+> +
+> +static enum stage perform_next_stage(int *i, bool mapped_0)
+> +{
+> +	enum stage stage = tests[*i].stage;
+> +	enum permission result;
+> +	bool skip;
+> +
+> +	for (; tests[*i].stage == stage; (*i)++) {
+> +		skip = tests[*i].addr < (void *)4096 &&
+> +		       !mapped_0 &&
+> +		       tests[*i].expected != UNAVAILABLE;
+
+Time for a comment?
+
+> +		if (!skip) {
+> +			result = test_protection(tests[*i].addr, tests[*i].key);
+> +			GUEST_ASSERT_2(result == tests[*i].expected, *i, result);
 > +		}
-> +
-> +		/*
-> +		 * If this register does not have an EL1 counterpart,
-> +		 * then read the stored EL2 version.
-> +		 */
-> +		if (reg == el1r)
-> +			goto memory_read;
-> +
-> +		/*
-> +		 * If we have a non-VHE guest and that the sysreg
-> +		 * requires translation to be used at EL1, use the
-> +		 * in-memory copy instead.
-> +		 */
-> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
-> +			goto memory_read;
-> +
-> +		/* Get the current version of the EL1 counterpart. */
-> +		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
-> +		return val;
 > +	}
+> +	return stage;
+> +}
 > +
-> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
-> +	if (unlikely(is_hyp_ctxt(vcpu)))
-> +		goto memory_read;
->  
-> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
-> -	    __vcpu_read_sys_reg_from_cpu(reg, &val))
-> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
->  		return val;
->  
-> +memory_read:
->  	return __vcpu_sys_reg(vcpu, reg);
->  }
->  
->  void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->  {
-> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
-> -	    __vcpu_write_sys_reg_to_cpu(val, reg))
-> +	u64 (*xlate)(u64) = NULL;
-> +	unsigned int el1r;
+> +static void guest_code(void)
+> +{
+> +	bool mapped_0;
+> +	int i = 0;
 > +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		goto memory_write;
+
+It's __really__ hard to understand this since the state is changed both 
+by the guest and host. Please add comments to this and maybe also add 
+some to the test struct explaining why you expect the results for each test.
+
+> +	GUEST_ASSERT_EQ(set_storage_key(page_store_prot, 0x10), 0);
+> +	GUEST_ASSERT_EQ(set_storage_key(page_fetch_prot, 0x98), 0);
+> +	GUEST_SYNC(STAGE_INIT_SIMPLE);
+> +	GUEST_SYNC(perform_next_stage(&i, false));
 > +
-> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-> +		if (!is_hyp_ctxt(vcpu))
-> +			goto memory_write;
+> +	/* Fetch-protection override */
+> +	mapped_0 = !set_storage_key((void *)0, 0x98);
+> +	GUEST_SYNC(STAGE_INIT_FETCH_PROT_OVERRIDE);
+> +	GUEST_SYNC(perform_next_stage(&i, mapped_0));
 > +
-> +		/*
-> +		 * Always store a copy of the write to memory to avoid having
-> +		 * to reverse-translate virtual EL2 system registers for a
-> +		 * non-VHE guest hypervisor.
-> +		 */
-> +		__vcpu_sys_reg(vcpu, reg) = val;
+> +	/* Storage-protection override */
+> +	GUEST_SYNC(perform_next_stage(&i, mapped_0));
+> +}
 > +
-> +		switch (reg) {
-> +		case ELR_EL2:
-> +			write_sysreg_el1(val, SYS_ELR);
-> +			return;
-> +		}
+> +#define HOST_SYNC(vmp, stage)							\
+> +({										\
+> +	struct kvm_vm *__vm = (vmp);						\
+> +	struct ucall uc;							\
+> +	int __stage = (stage);							\
+> +										\
+> +	vcpu_run(__vm, VCPU_ID);						\
+> +	get_ucall(__vm, VCPU_ID, &uc);						\
+> +	if (uc.cmd == UCALL_ABORT) {						\
+> +		TEST_FAIL("line %lu: %s, hints: %lu, %lu", uc.args[1],		\
+> +			  (const char *)uc.args[0], uc.args[2], uc.args[3]);	\
+> +	}									\
+> +	ASSERT_EQ(uc.cmd, UCALL_SYNC);						\
+> +	ASSERT_EQ(uc.args[1], __stage);						\
+> +})
 > +
-> +		/* No EL1 counterpart? We're done here.? */
-> +		if (reg == el1r)
-> +			return;
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_run *run;
+> +	vm_vaddr_t guest_0_page;
 > +
-> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
-> +			val = xlate(val);
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +	run = vcpu_state(vm, VCPU_ID);
 > +
-> +		/* Redirect this to the EL1 version of the register. */
-> +		WARN_ON(!__vcpu_write_sys_reg_to_cpu(val, el1r));
-> +		return;
-> +	}
+> +	HOST_SYNC(vm, STAGE_INIT_SIMPLE);
+> +	mprotect(addr_gva2hva(vm, (vm_vaddr_t)pages), PAGE_SIZE * 2, PROT_READ);
+> +	HOST_SYNC(vm, TEST_SIMPLE);
 > +
-> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
-> +	if (unlikely(is_hyp_ctxt(vcpu)))
-> +		goto memory_write;
+> +	guest_0_page = vm_vaddr_alloc(vm, PAGE_SIZE, 0);
+> +	if (guest_0_page != 0)
+> +		print_skip("Did not allocate page at 0 for fetch protection override tests");
+> +	HOST_SYNC(vm, STAGE_INIT_FETCH_PROT_OVERRIDE);
+> +	if (guest_0_page == 0)
+> +		mprotect(addr_gva2hva(vm, (vm_vaddr_t)0), PAGE_SIZE, PROT_READ);
+> +	run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
+> +	run->kvm_dirty_regs = KVM_SYNC_CRS;
+> +	HOST_SYNC(vm, TEST_FETCH_PROT_OVERRIDE);
 > +
-> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
->  		return;
->  
-> +memory_write:
->  	 __vcpu_sys_reg(vcpu, reg) = val;
->  }
->  
-> -- 
-> 2.30.2
+> +	run->s.regs.crs[0] |= CR0_STORAGE_PROTECTION_OVERRIDE;
+> +	run->kvm_dirty_regs = KVM_SYNC_CRS;
+> +	HOST_SYNC(vm, TEST_STORAGE_PROT_OVERRIDE);
+> +}
 > 
+
+
