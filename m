@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E63E6494AB7
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 10:28:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C7520494AB9
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 10:28:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359501AbiATJ2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 04:28:34 -0500
-Received: from out0-158.mail.aliyun.com ([140.205.0.158]:58139 "EHLO
-        out0-158.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239743AbiATJ2a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 04:28:30 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R431e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047188;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---.Mft2meF_1642670907;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.Mft2meF_1642670907)
+        id S1359550AbiATJ2j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 04:28:39 -0500
+Received: from out0-156.mail.aliyun.com ([140.205.0.156]:54761 "EHLO
+        out0-156.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1359532AbiATJ2f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 04:28:35 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047204;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---.MfqJbYj_1642670913;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.MfqJbYj_1642670913)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 20 Jan 2022 17:28:27 +0800
+          Thu, 20 Jan 2022 17:28:33 +0800
 From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
 To:     kvm@vger.kernel.org
 Cc:     "Hou Wenlong" <houwenlong.hwl@antgroup.com>,
         "Paolo Bonzini" <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH 1/2] x86/emulator: Add some tests for lret instruction emulation
-Date:   Thu, 20 Jan 2022 17:26:58 +0800
-Message-Id: <70e1054ea95f1935d5fbee417bbc6e88696287c3.1642669912.git.houwenlong.hwl@antgroup.com>
+Subject: [kvm-unit-tests PATCH 2/2] x86/emulator: Add some tests for ljmp instruction emulation
+Date:   Thu, 20 Jan 2022 17:26:59 +0800
+Message-Id: <c91cbae0f98647917b7402ef4943dc061f54956d.1642669912.git.houwenlong.hwl@antgroup.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1642669912.git.houwenlong.hwl@antgroup.com>
 References: <cover.1642669912.git.houwenlong.hwl@antgroup.com>
@@ -32,237 +32,190 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Per Intel's SDM on the "Instruction Set Reference", when
-loading segment descriptor for far return, not-present segment
+loading segment descriptor for ljmp, not-present segment
 check should be after all type and privilege checks. However,
 __load_segment_descriptor() in x86's emulator does not-present
 segment check first, so it would trigger #NP instead of #GP
 if type or privilege checks fail and the segment is not present.
 
-And if RPL < CPL, it should trigger #GP, but the check is missing
-in emulator.
-
-So add some tests for lret instruction, and it will test
+So add some tests for ljmp instruction, and it will test
 those tests in hardware and emulator. Enable
 kvm.force_emulation_prefix when try to test them in emulator.
 
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- x86/emulator.c | 181 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 181 insertions(+)
+ x86/emulator.c | 102 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 89 insertions(+), 13 deletions(-)
 
 diff --git a/x86/emulator.c b/x86/emulator.c
-index c5f584a9d8cc..480333a40eba 100644
+index 480333a40eba..c80e2cf8374e 100644
 --- a/x86/emulator.c
 +++ b/x86/emulator.c
-@@ -19,6 +19,88 @@ static int exceptions;
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
- #define KVM_FEP_LENGTH 5
- static int fep_available = 1;
-+static unsigned int fep_vector = -1;
-+static unsigned int fep_error_code = -1;
-+
-+struct fep_test_case {
-+	uint16_t rpl;
-+	uint16_t type;
-+	uint16_t dpl;
-+	uint16_t p;
-+	unsigned int vector;
-+	unsigned int error_code;
-+	const char *msg;
-+};
-+
-+enum fep_test_inst_type {
-+	FEP_TEST_LRET,
-+};
-+
-+struct fep_test {
-+	enum fep_test_inst_type type;
-+	unsigned long rip_advance;
-+	struct fep_test_case *kernel_testcases;
-+	unsigned int kernel_testcases_count;
-+	struct fep_test_case *user_testcases;
-+	unsigned int user_testcases_count;
-+};
-+
-+#define NON_CONFORM_CS_TYPE	0xb
-+#define CONFORM_CS_TYPE		0xf
-+#define DS_TYPE			0x3
-+
-+static struct fep_test_case lret_kernel_testcases[] = {
-+	{0, DS_TYPE, 0, 0, GP_VECTOR, FIRST_SPARE_SEL, "lret desc.type!=code && desc.p=0"},
-+	{0, NON_CONFORM_CS_TYPE, 3, 0, GP_VECTOR, FIRST_SPARE_SEL, "lret non-conforming && dpl!=rpl && desc.p=0"},
-+	{0, CONFORM_CS_TYPE, 3, 0, GP_VECTOR, FIRST_SPARE_SEL, "lret conforming && dpl>rpl && desc.p=0"},
-+	{0, NON_CONFORM_CS_TYPE, 0, 0, NP_VECTOR, FIRST_SPARE_SEL, "lret desc.p=0"},
-+};
-+
-+static struct fep_test_case lret_user_testcases[] = {
-+	{0, NON_CONFORM_CS_TYPE, 3, 1, GP_VECTOR, FIRST_SPARE_SEL, "lret rpl<cpl"},
-+};
-+
-+static struct fep_test fep_test_lret = {
-+	.type = FEP_TEST_LRET,
-+	.kernel_testcases = lret_kernel_testcases,
-+	.kernel_testcases_count = sizeof(lret_kernel_testcases) / sizeof(struct fep_test_case),
-+	.user_testcases = lret_user_testcases,
-+	.user_testcases_count = sizeof(lret_user_testcases) / sizeof(struct fep_test_case),
-+};
-+
-+static void test_in_user(bool emulate, uint16_t rpl, enum fep_test_inst_type type);
-+
-+#define TEST_LRET_ASM(seg, prefix)		\
-+	asm volatile("pushq %[asm_seg]\n\t"	\
-+		     "pushq $1f\n\t"		\
-+		      prefix "lretq\n\t"	\
-+		     "addq $16, %%rsp\n\t"	\
-+		     "1:"			\
-+		     : : [asm_seg]"r"(seg)	\
-+		     : "memory");
-+
-+#define TEST_FEP_RESULT(vector, error_code, msg)	\
-+	report(fep_vector == vector &&			\
-+	       fep_error_code == error_code,msg);	\
-+	fep_vector = -1;				\
-+	fep_error_code = -1;
-+
-+#define TEST_FEP_INST(emulate, inst, seg, vector, error_code, msg) \
-+	do {							   \
-+		if (emulate) {					   \
-+			TEST_##inst##_ASM(seg, KVM_FEP);	   \
-+		} else {					   \
-+			TEST_##inst##_ASM(seg, "");		   \
-+		}						   \
-+		TEST_FEP_RESULT(vector, error_code, msg);	   \
-+	} while (0)
-+
-+#define TEST_FEP_INST_IN_USER(inst, emulate, rpl, dummy, vector, error_code, msg)\
-+	do {								\
-+		run_in_user((usermode_func)test_in_user, UD_VECTOR,	\
-+			     emulate, rpl, FEP_TEST_##inst, 0, dummy);	\
-+		TEST_FEP_RESULT(vector, error_code, msg);		\
-+	} while (0)
+@@ -34,6 +34,7 @@ struct fep_test_case {
  
- struct regs {
- 	u64 rax, rbx, rcx, rdx;
-@@ -890,6 +972,103 @@ static void test_mov_dr(uint64_t *mem)
- 	report(rax == dr6_fixed_1, "mov_dr6");
+ enum fep_test_inst_type {
+ 	FEP_TEST_LRET,
++	FEP_TEST_LJMP,
+ };
+ 
+ struct fep_test {
+@@ -68,6 +69,29 @@ static struct fep_test fep_test_lret = {
+ 	.user_testcases_count = sizeof(lret_user_testcases) / sizeof(struct fep_test_case),
+ };
+ 
++static struct fep_test_case ljmp_kernel_testcases[] = {
++	{0, DS_TYPE, 0, 0, GP_VECTOR, FIRST_SPARE_SEL, "ljmp desc.type!=code && desc.p=0"},
++	{0, NON_CONFORM_CS_TYPE, 3, 0, GP_VECTOR, FIRST_SPARE_SEL, "jmp non-conforming && dpl!=cpl && desc.p=0"},
++	{3, NON_CONFORM_CS_TYPE, 0, 0, GP_VECTOR, FIRST_SPARE_SEL, "ljmp conforming && rpl>cpl && desc.p=0"},
++	{0, CONFORM_CS_TYPE, 3, 0, GP_VECTOR, FIRST_SPARE_SEL, "ljmp conforming && dpl>cpl && desc.p=0"},
++	{0, NON_CONFORM_CS_TYPE, 0, 0, NP_VECTOR, FIRST_SPARE_SEL, "ljmp desc.p=0"},
++};
++
++static struct fep_test_case ljmp_user_testcases[] = {
++	{3, CONFORM_CS_TYPE, 0, 1, -1, -1, "ljmp dpl<cpl"},
++};
++
++static struct fep_test fep_test_ljmp = {
++	.type = FEP_TEST_LJMP,
++	.kernel_testcases = ljmp_kernel_testcases,
++	.kernel_testcases_count = sizeof(ljmp_kernel_testcases) / sizeof(struct fep_test_case),
++	.user_testcases = ljmp_user_testcases,
++	.user_testcases_count = sizeof(ljmp_user_testcases) / sizeof(struct fep_test_case),
++};
++
++static unsigned long fep_jmp_buf[2];
++static unsigned long *fep_jmp_buf_ptr = &fep_jmp_buf[0];
++
+ static void test_in_user(bool emulate, uint16_t rpl, enum fep_test_inst_type type);
+ 
+ #define TEST_LRET_ASM(seg, prefix)		\
+@@ -79,6 +103,14 @@ static void test_in_user(bool emulate, uint16_t rpl, enum fep_test_inst_type typ
+ 		     : : [asm_seg]"r"(seg)	\
+ 		     : "memory");
+ 
++#define TEST_LJMP_ASM(seg, prefix)			\
++	*(uint16_t *)(&fep_jmp_buf[1]) = seg;		\
++	asm volatile("movq $1f, (%[mem])\n\t"		\
++		     prefix "rex64 ljmp *(%[mem])\n\t"	\
++		     "1:"				\
++		     : : [mem]"a"(fep_jmp_buf_ptr)	\
++		     : "memory"); \
++
+ #define TEST_FEP_RESULT(vector, error_code, msg)	\
+ 	report(fep_vector == vector &&			\
+ 	       fep_error_code == error_code,msg);	\
+@@ -383,19 +415,6 @@ static void test_pop(void *mem)
+ 	       "enter");
  }
  
-+static void fep_exception_handler(struct ex_regs *regs)
-+{
-+	fep_vector = regs->vector;
-+	fep_error_code = regs->error_code;
-+	regs->rip += rip_advance;
-+}
-+
-+static void test_in_user(bool emulate, uint16_t rpl, enum fep_test_inst_type type)
-+{
-+	uint16_t seg = FIRST_SPARE_SEL | rpl;
-+
-+	switch (type) {
-+	case FEP_TEST_LRET:
+-static void test_ljmp(void *mem)
+-{
+-    unsigned char *m = mem;
+-    volatile int res = 1;
+-
+-    *(unsigned long**)m = &&jmpf;
+-    asm volatile ("data16 mov %%cs, %0":"=m"(*(m + sizeof(unsigned long))));
+-    asm volatile ("rex64 ljmp *%0"::"m"(*m));
+-    res = 0;
+-jmpf:
+-    report(res, "ljmp");
+-}
+-
+ static void test_incdecnotneg(void *mem)
+ {
+     unsigned long *m = mem, v = 1234;
+@@ -991,6 +1010,13 @@ static void test_in_user(bool emulate, uint16_t rpl, enum fep_test_inst_type typ
+ 			TEST_LRET_ASM(seg, "");
+ 		}
+ 		break;
++	case FEP_TEST_LJMP:
 +		if (emulate) {
-+			TEST_LRET_ASM(seg, KVM_FEP);
++			TEST_LJMP_ASM(seg, KVM_FEP);
 +		} else {
-+			TEST_LRET_ASM(seg, "");
++			TEST_LJMP_ASM(seg, "");
 +		}
 +		break;
-+	}
-+}
-+
-+static void test_fep_common(bool emulate, struct fep_test *test)
-+{
-+	int i;
-+	bool dummy;
-+	struct fep_test_case *t;
-+	uint16_t seg = FIRST_SPARE_SEL;
-+
-+	handle_exception(GP_VECTOR, fep_exception_handler);
-+	handle_exception(NP_VECTOR, fep_exception_handler);
-+	rip_advance = test->rip_advance;
-+
-+	gdt[seg / 8] = gdt[KERNEL_CS / 8];
-+	t = test->kernel_testcases;
-+	for (i = 0; i < test->kernel_testcases_count; i++) {
-+		seg = FIRST_SPARE_SEL | t[i].rpl;
-+		gdt[seg / 8].type = t[i].type;
-+		gdt[seg / 8].dpl = t[i].dpl;
-+		gdt[seg / 8].p = t[i].p;
-+
-+		switch (test->type) {
-+		case FEP_TEST_LRET:
-+			TEST_FEP_INST(emulate, LRET, seg, t[i].vector,
+ 	}
+ }
+ 
+@@ -1018,6 +1044,10 @@ static void test_fep_common(bool emulate, struct fep_test *test)
+ 			TEST_FEP_INST(emulate, LRET, seg, t[i].vector,
+ 				      t[i].error_code, t[i].msg);
+ 			break;
++		case FEP_TEST_LJMP:
++			TEST_FEP_INST(emulate, LJMP, seg, t[i].vector,
 +				      t[i].error_code, t[i].msg);
 +			break;
-+		}
-+	}
-+
-+	gdt[seg / 8] = gdt[USER_CS64 / 8];
-+	t = test->user_testcases;
-+	for (i = 0; i < test->user_testcases_count; i++) {
-+		gdt[seg / 8].type = t[i].type;
-+		gdt[seg / 8].dpl = t[i].dpl;
-+		gdt[seg / 8].p = t[i].p;
-+
-+		switch (test->type) {
-+		case FEP_TEST_LRET:
-+			TEST_FEP_INST_IN_USER(LRET, emulate, t[i].rpl,
+ 		}
+ 	}
+ 
+@@ -1034,6 +1064,11 @@ static void test_fep_common(bool emulate, struct fep_test *test)
+ 					      &dummy, t[i].vector,
+ 				              t[i].error_code, t[i].msg);
+ 			break;
++		case FEP_TEST_LJMP:
++			TEST_FEP_INST_IN_USER(LJMP, emulate, t[i].rpl,
 +					      &dummy, t[i].vector,
 +				              t[i].error_code, t[i].msg);
 +			break;
-+		}
-+	}
-+
-+	handle_exception(GP_VECTOR, 0);
-+	handle_exception(NP_VECTOR, 0);
-+}
-+
-+static unsigned long get_lret_rip_advance(void)
+ 		}
+ 	}
+ 
+@@ -1041,6 +1076,46 @@ static void test_fep_common(bool emulate, struct fep_test *test)
+ 	handle_exception(NP_VECTOR, 0);
+ }
+ 
++static unsigned long get_ljmp_rip_advance(void)
 +{
-+	extern char lret_start, lret_end;
-+	unsigned long lret_rip_advance = &lret_end - &lret_start;
++	extern char ljmp_start, ljmp_end;
++	unsigned long ljmp_rip_advance = &ljmp_end - &ljmp_start;
 +
-+	asm volatile("data16 mov %%cs, %%rax\n\t"
-+		     "pushq %%rax\n\t"
-+		     "pushq $1f\n\t"
-+		     "lret_start: lretq; lret_end:\n\t"
-+		     "1:\n\t"
-+		     : : : "ax", "memory");
++	fep_jmp_buf[0] = (unsigned long)&ljmp_end;
++	*(uint16_t *)(&fep_jmp_buf[1]) = KERNEL_CS;
++	asm volatile ("ljmp_start: rex64 ljmp *(%0); ljmp_end:\n\t"
++		      ::"a"(fep_jmp_buf_ptr) : "memory");
 +
-+	return lret_rip_advance;
++	return ljmp_rip_advance;
 +}
 +
-+static void test_lret(uint64_t *mem)
++static void test_ljmp(void *mem)
 +{
-+	printf("test lret in hw\n");
-+	fep_test_lret.rip_advance = get_lret_rip_advance();
-+	test_fep_common(false, &fep_test_lret);
++	unsigned char *m = mem;
++	volatile int res = 1;
++
++	*(unsigned long**)m = &&jmpf;
++	asm volatile ("data16 mov %%cs, %0":"=m"(*(m + sizeof(unsigned long))));
++	asm volatile ("rex64 ljmp *%0"::"m"(*m));
++	res = 0;
++jmpf:
++	report(res, "ljmp");
++
++	printf("test ljmp in hw\n");
++	fep_test_ljmp.rip_advance = get_ljmp_rip_advance();
++	test_fep_common(false, &fep_test_ljmp);
++	/* reset CS to KERNEL_CS */
++	(void)get_ljmp_rip_advance();
 +}
 +
-+static void test_em_lret(uint64_t *mem)
++static void test_em_ljmp(void *mem)
 +{
-+	printf("test lret in emulator\n");
-+	test_fep_common(true, &fep_test_lret);
++	printf("test ljmp in emulator\n");
++	test_fep_common(true, &fep_test_ljmp);
++	/* reset CS to KERNEL_CS */
++	(void)get_ljmp_rip_advance();
 +}
 +
- static void test_push16(uint64_t *mem)
+ static unsigned long get_lret_rip_advance(void)
  {
- 	uint64_t rsp1, rsp2;
-@@ -1164,6 +1343,7 @@ int main(void)
- 	test_smsw(mem);
- 	test_lmsw();
- 	test_ljmp(mem);
-+	test_lret(mem);
- 	test_stringio();
- 	test_incdecnotneg(mem);
- 	test_btc(mem);
-@@ -1188,6 +1368,7 @@ int main(void)
+ 	extern char lret_start, lret_end;
+@@ -1368,6 +1443,7 @@ int main(void)
  		test_smsw_reg(mem);
  		test_nop(mem);
  		test_mov_dr(mem);
-+		test_em_lret(mem);
++		test_em_ljmp(mem);
+ 		test_em_lret(mem);
  	} else {
  		report_skip("skipping register-only tests, "
- 			    "use kvm.force_emulation_prefix=1 to enable");
 -- 
 2.31.1
 
