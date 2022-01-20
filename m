@@ -2,194 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EBAC494E4B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 13:52:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A61B9494FA7
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 14:57:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244090AbiATMwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 07:52:19 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:49082 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243673AbiATMwN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 07:52:13 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id CD6D4218E9;
-        Thu, 20 Jan 2022 12:52:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1642683132; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AtoA6q/GKeI6tuoywiJtjx2k9+Gj7KYL9VHmZ5tR8BE=;
-        b=rdZSj+WrLLtkg5PewcluXzmt0nohZhz2GNtBSIqJetXIgDtHut2PCJM/S5pdZm4WuKrT9V
-        hnx5eE0LQQGrUVVe+SjFj17mbxdT23Xkb/miL3SMYlsimLv9/MKVyYBfq5EPgJ01/WOcwV
-        E95Xi5t1mcog8NDp/8lU3WWVvIBPY4Q=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 43A6B13B51;
-        Thu, 20 Jan 2022 12:52:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id aCWWDvxa6WGIagAAMHmgww
-        (envelope-from <varad.gautam@suse.com>); Thu, 20 Jan 2022 12:52:12 +0000
-From:   Varad Gautam <varad.gautam@suse.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
-Cc:     marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
-        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de,
-        varad.gautam@suse.com
-Subject: [kvm-unit-tests 13/13] x86: AMD SEV-ES: Handle string IO for IOIO #VC
-Date:   Thu, 20 Jan 2022 13:51:22 +0100
-Message-Id: <20220120125122.4633-14-varad.gautam@suse.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220120125122.4633-1-varad.gautam@suse.com>
-References: <20220120125122.4633-1-varad.gautam@suse.com>
+        id S242624AbiATN5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 08:57:53 -0500
+Received: from foss.arm.com ([217.140.110.172]:39108 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241081AbiATN5x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 08:57:53 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 897671FB;
+        Thu, 20 Jan 2022 05:57:52 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 321643F766;
+        Thu, 20 Jan 2022 05:57:50 -0800 (PST)
+Date:   Thu, 20 Jan 2022 13:58:02 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 14/69] KVM: arm64: nv: Support virtual EL2 exceptions
+Message-ID: <YelqampUOCIt3YZE@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-15-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211129200150.351436-15-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using Linux's IOIO #VC processing logic.
+Hi Marc,
 
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
----
- lib/x86/amd_sev_vc.c | 108 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 106 insertions(+), 2 deletions(-)
+On Mon, Nov 29, 2021 at 08:00:55PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Support injecting exceptions and performing exception returns to and
+> from virtual EL2.  This must be done entirely in software except when
+> taking an exception from vEL0 to vEL2 when the virtual HCR_EL2.{E2H,TGE}
+> == {1,1}  (a VHE guest hypervisor).
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> [maz: switch to common exception injection framework]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>
+> [..]
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> new file mode 100644
+> index 000000000000..339e8272b01e
+> --- /dev/null
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -0,0 +1,176 @@
+> +/*
+> + * Copyright (C) 2016 - Linaro and Columbia University
+> + * Author: Jintack Lim <jintack.lim@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_nested.h>
+> +
+> +#include "hyp/include/hyp/adjust_pc.h"
+> +
+> +#include "trace.h"
+> +
+> +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 spsr, elr, mode;
+> +	bool direct_eret;
+> +
+> +	/*
+> +	 * Going through the whole put/load motions is a waste of time
+> +	 * if this is a VHE guest hypervisor returning to its own
+> +	 * userspace, or the hypervisor performing a local exception
+> +	 * return. No need to save/restore registers, no need to
+> +	 * switch S2 MMU. Just do the canonical ERET.
+> +	 */
+> +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> +
+> +	direct_eret  = (mode == PSR_MODE_EL0t &&
+> +			vcpu_el2_e2h_is_set(vcpu) &&
+> +			vcpu_el2_tge_is_set(vcpu));
+> +	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> +
+> +	if (direct_eret) {
+> +		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+> +		*vcpu_cpsr(vcpu) = spsr;
+> +		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+> +		return;
+> +	}
+> +
+> +	preempt_disable();
+> +	kvm_arch_vcpu_put(vcpu);
+> +
+> +	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+> +
+> +	trace_kvm_nested_eret(vcpu, elr, spsr);
+> +
+> +	/*
+> +	 * Note that the current exception level is always the virtual EL2,
+> +	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
+> +	 */
+> +	*vcpu_pc(vcpu) = elr;
+> +	*vcpu_cpsr(vcpu) = spsr;
+> +
+> +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> +	preempt_enable();
 
-diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index bb912e4..24db992 100644
---- a/lib/x86/amd_sev_vc.c
-+++ b/lib/x86/amd_sev_vc.c
-@@ -307,10 +307,46 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
- 	return ES_OK;
- }
- 
-+static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
-+					  void *src, unsigned char *buf,
-+					  unsigned int data_size,
-+					  unsigned int count,
-+					  bool backwards)
-+{
-+	int i, b = backwards ? -1 : 1;
-+
-+	for (i = 0; i < count; i++) {
-+		void *s = src + (i * data_size * b);
-+		unsigned char *d = buf + (i * data_size);
-+
-+		memcpy(d, s, data_size);
-+	}
-+
-+	return ES_OK;
-+}
-+
-+static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
-+					   void *dst, unsigned char *buf,
-+					   unsigned int data_size,
-+					   unsigned int count,
-+					   bool backwards)
-+{
-+	int i, s = backwards ? -1 : 1;
-+
-+	for (i = 0; i < count; i++) {
-+		void *d = dst + (i * data_size * s);
-+		unsigned char *b = buf + (i * data_size);
-+
-+		memcpy(d, b, data_size);
-+	}
-+
-+	return ES_OK;
-+}
-+
- static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct ex_regs *regs = ctxt->regs;
--	u64 exit_info_1;
-+	u64 exit_info_1, exit_info_2;
- 	enum es_result ret;
- 
- 	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-@@ -318,7 +354,75 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 		return ret;
- 
- 	if (exit_info_1 & IOIO_TYPE_STR) {
--		ret = ES_VMM_ERROR;
-+		/* (REP) INS/OUTS */
-+
-+		bool df = ((regs->rflags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
-+		unsigned int io_bytes, exit_bytes;
-+		unsigned int ghcb_count, op_count;
-+		unsigned long es_base;
-+		u64 sw_scratch;
-+
-+		/*
-+		 * For the string variants with rep prefix the amount of in/out
-+		 * operations per #VC exception is limited so that the kernel
-+		 * has a chance to take interrupts and re-schedule while the
-+		 * instruction is emulated.
-+		 */
-+		io_bytes   = (exit_info_1 >> 4) & 0x7;
-+		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-+
-+		op_count    = (exit_info_1 & IOIO_REP) ? regs->rcx : 1;
-+		exit_info_2 = op_count < ghcb_count ? op_count : ghcb_count;
-+		exit_bytes  = exit_info_2 * io_bytes;
-+
-+		es_base = 0;
-+
-+		/* Read bytes of OUTS into the shared buffer */
-+		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-+			ret = vc_insn_string_read(ctxt,
-+					       (void *)(es_base + regs->rsi),
-+					       ghcb->shared_buffer, io_bytes,
-+					       exit_info_2, df);
-+			if (ret)
-+				return ret;
-+		}
-+
-+		/*
-+		 * Issue an VMGEXIT to the HV to consume the bytes from the
-+		 * shared buffer or to have it write them into the shared buffer
-+		 * depending on the instruction: OUTS or INS.
-+		 */
-+		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
-+		ghcb_set_sw_scratch(ghcb, sw_scratch);
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
-+					  exit_info_1, exit_info_2);
-+		if (ret != ES_OK)
-+			return ret;
-+
-+		/* Read bytes from shared buffer into the guest's destination. */
-+		if (exit_info_1 & IOIO_TYPE_IN) {
-+			ret = vc_insn_string_write(ctxt,
-+						   (void *)(es_base + regs->rdi),
-+						   ghcb->shared_buffer, io_bytes,
-+						   exit_info_2, df);
-+			if (ret)
-+				return ret;
-+
-+			if (df)
-+				regs->rdi -= exit_bytes;
-+			else
-+				regs->rdi += exit_bytes;
-+		} else {
-+			if (df)
-+				regs->rsi -= exit_bytes;
-+			else
-+				regs->rsi += exit_bytes;
-+		}
-+
-+		if (exit_info_1 & IOIO_REP)
-+			regs->rcx -= exit_info_2;
-+
-+		ret = regs->rcx ? ES_RETRY : ES_OK;
- 	} else {
- 		/* IN/OUT into/from rAX */
- 
--- 
-2.32.0
+According to ARM DDI 0487G.a, page D13-3289, ERET'ing to EL1 when HCR_EL2.TGE is
+set is an illegal exception return. I don't see this case treated here.
 
+Thanks,
+Alex
