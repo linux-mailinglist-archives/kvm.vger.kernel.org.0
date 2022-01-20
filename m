@@ -2,234 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F1C3494D5A
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 12:48:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACCB7494D6B
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 12:51:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232035AbiATLsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 06:48:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51466 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231245AbiATLsc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jan 2022 06:48:32 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB86C061574;
-        Thu, 20 Jan 2022 03:48:32 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id n11so4997155plf.4;
-        Thu, 20 Jan 2022 03:48:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=seC6Kkrfn03WWvAoxpMMD58mY5Lutg3rpLxG7Rxl/FQ=;
-        b=TWO2HWgjV5q3GaiSxIWxH0m/RaKLojeMeam3x7qU1ne7cPjrM2pyqnaYAN9E3LGqVU
-         mHgWmJpX5sGYjqkfnPFDb3N4s88R07ao2huReJV+p1F3s8b+daKAXl6c4YwG8YqF4CVO
-         8W+4020XryGs/4pVgwSOcMHN/PeapfSZqFF2A3njKlMxt+CIyWP7eA3n4zrqn3p65p9M
-         eUaDzaZ1xa1EP4i9V+7BIR1AOybumKh8bNZSh6OMrigM3nSFDZ6uIx0+tHSNEnsCgksQ
-         uMeDY1TKV7MY3Lt8r5o2BPwpmDUcozuROzD4jDXD2g95U0OC9KyhSD4bxFI5fDJ8lTcg
-         erYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=seC6Kkrfn03WWvAoxpMMD58mY5Lutg3rpLxG7Rxl/FQ=;
-        b=BRho1ygiIArIFQuPoymdUQNir3jxvbJUn3b8e93kcPCLZrV4WEKE5AZVHAGuK8fBOX
-         tFlKUWrBMY1Zpe3aw63RvEAZy1YjX45pEBF9POpdxczK7I75PipaaQgtRPxZC+O4B3Sk
-         PCjUIMXJihEoXlDXwDGvgy5Sj6dlZFIQsaOeD73COT1uzJNAE9LTfo2Gtnbs/nWQ27IW
-         e72kEYIfH9EO6gB+vb0Df2MldcfKVmUIJdjoZs8W5Zmzo2xFarARYtc/RKGdxGaNnwbr
-         +IUXVm2gNw0Uv8UXvfX0GxeymLwPAbu83TzzbK7QrpdG8/olDWTP6espgy+KAXz0CfNo
-         jMTg==
-X-Gm-Message-State: AOAM5339f6Y+JTtmIGOseZPrmQodcui/XsjKCP2tn51KjGmQJ9H5adzb
-        uBurCJZoS0JIriQ6oOWjvVM=
-X-Google-Smtp-Source: ABdhPJxWML/DjpeeXhldOLuh4tbwmdxnolJz4O/r5vj1pmZ0N5mbOQGKT9nCjFPvyWcT+ZW05ZlGzg==
-X-Received: by 2002:a17:90a:6409:: with SMTP id g9mr10319630pjj.108.1642679311673;
-        Thu, 20 Jan 2022 03:48:31 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id r11sm3264966pff.81.2022.01.20.03.48.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jan 2022 03:48:31 -0800 (PST)
-Message-ID: <885b4ace-42b5-824e-8e7c-a41c3e9fc514@gmail.com>
-Date:   Thu, 20 Jan 2022 19:48:21 +0800
+        id S232157AbiATLvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 06:51:54 -0500
+Received: from foss.arm.com ([217.140.110.172]:35030 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232099AbiATLvy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 06:51:54 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4741ED1;
+        Thu, 20 Jan 2022 03:51:53 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA9583F774;
+        Thu, 20 Jan 2022 03:51:51 -0800 (PST)
+Date:   Thu, 20 Jan 2022 11:52:00 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 17/69] KVM: arm64: nv: Add non-VHE-EL2->EL1
+ translation helpers
+Message-ID: <YelM4PNEjbxYkpZ3@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-18-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
-Subject: [PATCH v2] selftests: kvm/x86: Check if cpuid_d_0_ebx follows XCR0
- value change
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220120094146.66525-1-likexu@tencent.com>
-Organization: Tencent
-In-Reply-To: <20220120094146.66525-1-likexu@tencent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211129200150.351436-18-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Hi Marc,
 
-Intel SDM says the CPUID.0xd.EBX reports the maximum size required by
-enabled features in XCR0. Add a simple test that writes two different
-non #GP values via  __xsetbv() and verify that the cpuid data is updated.
+On Mon, Nov 29, 2021 at 08:00:58PM +0000, Marc Zyngier wrote:
+> Some EL2 system registers immediately affect the current execution
+> of the system, so we need to use their respective EL1 counterparts.
+> For this we need to define a mapping between the two. In general,
+> this only affects non-VHE guest hypervisors, as VHE system registers
+> are compatible with the EL1 counterparts.
+> 
+> These helpers will get used in subsequent patches.
+> 
+> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 50 +++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 1028ac65a897..67a2c0d05233 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -2,6 +2,7 @@
+>  #ifndef __ARM64_KVM_NESTED_H
+>  #define __ARM64_KVM_NESTED_H
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/kvm_host.h>
+>  
+>  static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> @@ -11,4 +12,53 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+>  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+>  }
+>  
+> +/* Translation helpers from non-VHE EL2 to EL1 */
+> +static inline u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
 
-The oddity thing is that CPUID[0d, 00].ebx doesn't enumerate the
-XFEATURE_SSE size if only set bits 0 and 1:
+When E2H = 0, there is no IPS field in TCR_EL2, but there is a PS field.
+And for TCR_EL1, there is no PS field, but there is an IPS field. Maybe
+tcr_el2_ps_to_tcr_el1_ips() would be more precise, and would also match the
+field defines used by the function?
 
-  XCR0 = 001B, ebx=00000240
-  XCR0 = 011B, ebx=00000240
-  XCR0 = 111B, ebx=00000340
+> +{
+> +	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
+> +}
+> +
+> +static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
+> +{
+> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
+> +	       (tcr & TCR_EL2_TG0_MASK) |
+> +	       (tcr & TCR_EL2_ORGN0_MASK) |
+> +	       (tcr & TCR_EL2_IRGN0_MASK) |
+> +	       (tcr & TCR_EL2_T0SZ_MASK);
 
-Opportunistically, move the __x{s,g}etbv helpers  to the x86_64/processor.h
+There are a few fields in TCR_EL2 which have a corresponding field in
+TCR_EL1, when E2H = 0: HPD -> HPD0 (hierarchical permissions toggle), HA
+and HD (hardware management of dirty bit and access flag), DS (when
+FEAT_LPA2), and probably others. Why do we not also translate them? Is it
+because we hide the feature they depend on (FEAT_HPDS, FEAT_HAFBDS, etc) in
+the guest ID registers? Is it something else?
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
-  .../selftests/kvm/include/x86_64/processor.h  | 18 +++++++++
-  tools/testing/selftests/kvm/x86_64/amx_test.c | 18 ---------
-  .../testing/selftests/kvm/x86_64/cpuid_test.c | 40 +++++++++++++++++--
-  3 files changed, 55 insertions(+), 21 deletions(-)
+> +}
+> +
+> +static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
+> +{
+> +	u64 cpacr_el1 = 0;
+> +
+> +	if (!(cptr_el2 & CPTR_EL2_TFP))
+> +		cpacr_el1 |= CPACR_EL1_FPEN;
+> +	if (cptr_el2 & CPTR_EL2_TTA)
+> +		cpacr_el1 |= CPACR_EL1_TTA;
+> +	if (!(cptr_el2 & CPTR_EL2_TZ))
+> +		cpacr_el1 |= CPACR_EL1_ZEN;
+> +
+> +	return cpacr_el1;
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h 
-b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 122447827954..65097ca6d7b2 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -296,6 +296,24 @@ static inline void cpuid(uint32_t *eax, uint32_t *ebx,
-  	    : "memory");
-  }
+Nitpick: it would make comparing against the architecture easier if the
+fields were checked in the order they were definied in the architecture. So
+first check the TTA bit, then TFP and lastly TZ.
 
-+static inline u64 __xgetbv(u32 index)
-+{
-+	u32 eax, edx;
-+
-+	asm volatile("xgetbv;"
-+		     : "=a" (eax), "=d" (edx)
-+		     : "c" (index));
-+	return eax + ((u64)edx << 32);
-+}
-+
-+static inline void __xsetbv(u32 index, u64 value)
-+{
-+	u32 eax = value;
-+	u32 edx = value >> 32;
-+
-+	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
-+}
-+
-  #define SET_XMM(__var, __xmm) \
-  	asm volatile("movq %0, %%"#__xmm : : "r"(__var) : #__xmm)
+I checked the field definitions for CPTR_EL2 and the above looks correct to
+me, as TFP, TTA and TZ were the only fields which affect EL2; I also
+checked that the values in CPACR_EL1 are set correctly to mirror the
+CPTR_EL2 settings.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c 
-b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 523c1e99ed64..c3cbb2dc450d 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -78,24 +78,6 @@ struct xtile_info {
+> +}
+> +
+> +static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 sctlr)
+> +{
+> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
+> +	return sctlr | BIT(20);
 
-  static struct xtile_info xtile;
+Bits 8 and 7 in SCTLR_EL2 are RES0 when E2H,TGE != {1,1}, but they are RES1
+in SCTLR_EL1 if EL0 is not capable of using AArch32. Shouldn't we also set
+them?
 
--static inline u64 __xgetbv(u32 index)
--{
--	u32 eax, edx;
--
--	asm volatile("xgetbv;"
--		     : "=a" (eax), "=d" (edx)
--		     : "c" (index));
--	return eax + ((u64)edx << 32);
--}
--
--static inline void __xsetbv(u32 index, u64 value)
--{
--	u32 eax = value;
--	u32 edx = value >> 32;
--
--	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
--}
--
-  static inline void __ldtilecfg(void *cfg)
-  {
-  	asm volatile(".byte 0xc4,0xe2,0x78,0x49,0x00"
-diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c 
-b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-index 16d2465c5634..6f280a12b849 100644
---- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-@@ -20,8 +20,7 @@ struct {
-  	u32 index;
-  } mangled_cpuids[] = {
-  	/*
--	 * These entries depend on the vCPU's XCR0 register and IA32_XSS MSR,
--	 * which are not controlled for by this test.
-+	 * These entries depend on the vCPU's XCR0 register and IA32_XSS MSR.
-  	 */
-  	{.function = 0xd, .index = 0},
-  	{.function = 0xd, .index = 1},
-@@ -55,6 +54,37 @@ static void test_cpuid_40000000(struct kvm_cpuid2 *guest_cpuid)
-  	GUEST_ASSERT(eax == 0x40000001);
-  }
+Bit 5 in SCTLR_EL2 is RES1 when E2H,TGE != {1,1}, but it is RES0 in
+SCTLR_EL1 if EL0 is not capable of using AArch32. Shouldn't we clear it?
 
-+static void test_cpuid_d(struct kvm_cpuid2 *guest_cpuid)
-+{
-+	uint64_t cr4;
-+	u32 eax, ebx, ecx, edx;
-+	u32 size001, size011, size111;
-+
-+	cr4 = get_cr4();
-+	cr4 |= X86_CR4_OSXSAVE;
-+	set_cr4(cr4);
-+
-+	__xsetbv(0x0, 0x1);
-+	eax = 0xd;
-+	ebx = ecx = edx = 0;
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	size001 = ebx;
-+
-+	__xsetbv(0x0, 0x7);
-+	eax = 0xd;
-+	ebx = ecx = edx = 0;
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	size111 = ebx;
-+
-+	__xsetbv(0x0, 0x3);
-+	eax = 0xd;
-+	ebx = ecx = edx = 0;
-+	cpuid(&eax, &ebx, &ecx, &edx);
-+	size011 = ebx;
-+
-+	GUEST_ASSERT(size001 == size011 && size011 != size111);
-+}
-+
-  static void guest_main(struct kvm_cpuid2 *guest_cpuid)
-  {
-  	GUEST_SYNC(1);
-@@ -65,6 +95,10 @@ static void guest_main(struct kvm_cpuid2 *guest_cpuid)
+> +}
+> +
+> +static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+> +{
+> +	/* Force ASID to 0 (ASID 0 or RES0) */
 
-  	test_cpuid_40000000(guest_cpuid);
+That got me confused at first, until I realized that the first ASID refers
+to the ASID field of the register, and the second ASID to the translation
+table property. Might be more helpful if the comment was simply "Clear the
+ASID field" or something like that.
 
-+	GUEST_SYNC(3);
-+
-+	test_cpuid_d(guest_cpuid);
-+
-  	GUEST_DONE();
-  }
+> +	return ttbr0 & ~GENMASK_ULL(63, 48);
+> +}
+> +
+> +static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+> +{
+> +	return ((FIELD_GET(CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN, cnthctl) << 10) |
 
-@@ -200,7 +234,7 @@ int main(void)
+I don't understand why those two bits are left shifted by 10, the result is
+0x3 << 10 and CNTKCTL_EL[16:10] is RES0.
 
-  	vcpu_args_set(vm, VCPU_ID, 1, cpuid_gva);
+> +		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
 
--	for (stage = 0; stage < 3; stage++)
-+	for (stage = 0; stage < 4; stage++)
-  		run_vcpu(vm, VCPU_ID, stage);
+CNTKCTL_EL1.{EVNTI,EVNTDIR,EVNTEN} refer to CNT*V*CT_EL0,
+CNTHCTL_EL2.{EVNTI,EVNTDIR,EVNTEN} refer to CNT*P*CT_EL0. I don't
+understand why they are treated as equivalent.
 
-  	set_cpuid_after_run(vm, cpuid2);
--- 
-2.33.1
+I get the feeling I'm misunderstanding something about this function.
 
+Thanks,
+Alex
 
+> +}
+> +
+>  #endif /* __ARM64_KVM_NESTED_H */
+> -- 
+> 2.30.2
+> 
