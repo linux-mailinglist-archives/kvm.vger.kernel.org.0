@@ -2,198 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F2949510B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 16:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AEA2495121
+	for <lists+kvm@lfdr.de>; Thu, 20 Jan 2022 16:13:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376484AbiATPIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jan 2022 10:08:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46928 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1376471AbiATPIt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jan 2022 10:08:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642691328;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gYYcMS9ElXmPxhejwGj3w8BFf5deCBvIUvWdoFiI1Oo=;
-        b=EJD7E8ejrHNuxo8LJWUM6ntAyDHLmUFGhweTBZhm9Q3SrYcLFFB1iUOmvvuG+KmIE/IFWW
-        OjaIjEfM6lf3dQYu7NoAbzqge/6cMMR6gQ+lELsyfCcy+Qvo4epMq5Zw+T+C5JYJ7ykf4w
-        AHzs+XX+MNLETDUmD7SiacBdN9gnKrU=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-126-cVBpQcYbPpyQ5FuTVunDcg-1; Thu, 20 Jan 2022 10:08:47 -0500
-X-MC-Unique: cVBpQcYbPpyQ5FuTVunDcg-1
-Received: by mail-qk1-f199.google.com with SMTP id b13-20020a05620a270d00b0047ba5ddde8dso4349783qkp.2
-        for <kvm@vger.kernel.org>; Thu, 20 Jan 2022 07:08:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gYYcMS9ElXmPxhejwGj3w8BFf5deCBvIUvWdoFiI1Oo=;
-        b=Vsy9+D/QhGrI8kfENvJTKKdDglTU8wvCXXltXwxafGLdI2ZG2M/afMdone86Yquhzm
-         t+8XbtFLjqI8qk3IG+l13ytQO2VyYhko9kFft2GiRhUOyfjn37GITeMXlt53tFgsB79R
-         CRP7nntHemrlNIiJ2AVSVplJGLtPk0l3cTa6Vjk6vK+jmXjau3Ofkxgpn+OM8SysgQ/5
-         nqEXZT77bkE8FacfpeGrLDn86zK8j/VTjyf7cPSxXIGa1blxlW3ko6pztOBUHJiCrsD3
-         KPJWEOBcYEcV4Ps7w9ILDA3+ImzoLBEh4xgbI5La5uE+tMilVLYQe6mYi25yU29bCUzZ
-         DmtQ==
-X-Gm-Message-State: AOAM531ggezvdWmr8/d7xbOfWChxXLk6hk0P0qUaeJgAQfSJQdYw+jOR
-        NLKmMnkqcgtMGTCn6L9h2bnPZEWeW6HvnPy+yydfTc1cfRWWnEAioipZ20H6wIBRwS1KMuSh2lA
-        FMrXvzsYmOilf
-X-Received: by 2002:a37:be05:: with SMTP id o5mr24710547qkf.783.1642691326852;
-        Thu, 20 Jan 2022 07:08:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy5Pi4s98oM6StYysiaSOHyNFUiF/d2WGoxCsgiVXZwqPlJaOX0N2+jgGMV1C+i5MoHhbalXA==
-X-Received: by 2002:a37:be05:: with SMTP id o5mr24710516qkf.783.1642691326552;
-        Thu, 20 Jan 2022 07:08:46 -0800 (PST)
-Received: from steredhat (host-95-238-125-214.retail.telecomitalia.it. [95.238.125.214])
-        by smtp.gmail.com with ESMTPSA id o126sm1512302qke.53.2022.01.20.07.08.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jan 2022 07:08:45 -0800 (PST)
-Date:   Thu, 20 Jan 2022 16:08:39 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        kvm <kvm@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v1] vhost: cache avail index in vhost_enable_notify()
-Message-ID: <CAGxU2F7r6cH9Ywygv1QNxKyfyn=yGoDPNDQ-tHkeFMUcbpfXYA@mail.gmail.com>
-References: <20220114090508.36416-1-sgarzare@redhat.com>
- <20220114074454-mutt-send-email-mst@kernel.org>
- <20220114133816.7niyaqygvdveddmi@steredhat>
- <20220114084016-mutt-send-email-mst@kernel.org>
+        id S1346406AbiATPNH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jan 2022 10:13:07 -0500
+Received: from foss.arm.com ([217.140.110.172]:41592 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1376604AbiATPMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jan 2022 10:12:49 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08029101E;
+        Thu, 20 Jan 2022 07:12:48 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D04C83F73D;
+        Thu, 20 Jan 2022 07:12:45 -0800 (PST)
+Date:   Thu, 20 Jan 2022 15:12:54 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
+ vcpu_read/write_sys_reg()
+Message-ID: <Yel79mQSV/8iINrS@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-19-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220114084016-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20211129200150.351436-19-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 2:40 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Fri, Jan 14, 2022 at 02:38:16PM +0100, Stefano Garzarella wrote:
-> > On Fri, Jan 14, 2022 at 07:45:35AM -0500, Michael S. Tsirkin wrote:
-> > > On Fri, Jan 14, 2022 at 10:05:08AM +0100, Stefano Garzarella wrote:
-> > > > In vhost_enable_notify() we enable the notifications and we read
-> > > > the avail index to check if new buffers have become available in
-> > > > the meantime.
-> > > >
-> > > > We are not caching the avail index, so when the device will call
-> > > > vhost_get_vq_desc(), it will find the old value in the cache and
-> > > > it will read the avail index again.
-> > > >
-> > > > It would be better to refresh the cache every time we read avail
-> > > > index, so let's change vhost_enable_notify() caching the value in
-> > > > `avail_idx` and compare it with `last_avail_idx` to check if there
-> > > > are new buffers available.
-> > > >
-> > > > Anyway, we don't expect a significant performance boost because
-> > > > the above path is not very common, indeed vhost_enable_notify()
-> > > > is often called with unlikely(), expecting that avail index has
-> > > > not been updated.
-> > > >
-> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > >
-> > > ... and can in theory even hurt due to an extra memory write.
-> > > So ... performance test restults pls?
-> >
-> > Right, could be.
-> >
-> > I'll run some perf test with vsock, about net, do you have a test suite or
-> > common step to follow to test it?
-> >
-> > Thanks,
-> > Stefano
->
-> You can use the vhost test as a unit test as well.
+Hi Marc,
 
-Thanks for the advice, I did indeed use it!
+On Mon, Nov 29, 2021 at 08:00:59PM +0000, Marc Zyngier wrote:
+> KVM internally uses accessor functions when reading or writing the
+> guest's system registers. This takes care of accessing either the stored
+> copy or using the "live" EL1 system registers when the host uses VHE.
+> 
+> With the introduction of virtual EL2 we add a bunch of EL2 system
+> registers, which now must also be taken care of:
+> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+>   revert to the stored version of that, and not use the CPU's copy.
+> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+>   also use the stored version, since the CPU carries the EL1 copy.
+> - Some EL2 system registers are supposed to affect the current execution
+>   of the system, so we need to put them into their respective EL1
+>   counterparts. For this we need to define a mapping between the two.
+>   This is done using the newly introduced struct el2_sysreg_map.
+> - Some EL2 system registers have a different format than their EL1
+>   counterpart, so we need to translate them before writing them to the
+>   CPU. This is done using an (optional) translate function in the map.
+> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
+>   which need some separate handling (SPSR_EL2 is being handled in a
+>   separate patch).
+> 
+> All of these cases are now wrapped into the existing accessor functions,
+> so KVM users wouldn't need to care whether they access EL2 or EL1
+> registers and also which state the guest is in.
+> 
+> This handles what was formerly known as the "shadow state" dynamically,
+> without requiring a separate copy for each vCPU EL.
+> 
+> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 143 ++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 139 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 730a24468915..61596355e42d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -24,6 +24,7 @@
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_nested.h>
+>  #include <asm/perf_event.h>
+>  #include <asm/sysreg.h>
+>  
+> @@ -64,23 +65,157 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+>  	return false;
+>  }
+>  
+> +#define PURE_EL2_SYSREG(el2)						\
+> +	case el2: {							\
+> +		*el1r = el2;						\
+> +		return true;						\
+> +	}
+> +
+> +#define MAPPED_EL2_SYSREG(el2, el1, fn)					\
+> +	case el2: {							\
+> +		*xlate = fn;						\
+> +		*el1r = el1;						\
+> +		return true;						\
+> +	}
+> +
+> +static bool get_el2_mapping(unsigned int reg,
+> +			    unsigned int *el1r, u64 (**xlate)(u64))
 
-I run virtio_test (with vhost_test.ko) using 64 as batch to increase the 
-chance of the path being taken. (I changed bufs=0x1000000 in 
-virtio_test.c to increase the duration).
+Nitpick: this could be renamed to get_el2_to_el1_mapping() to remove any
+ambiguities regarding what is being mapped to what (and to match the
+translate_* functions). With our without this change, the patch looks
+correct to me:
 
-I used `perf stat` to take some numbers, running this command:
-
-   taskset -c 2 perf stat -r 10 --log-fd 1 -- ./virtio_test --batch=64
-
-- Linux v5.16 without the patch applied
-
- Performance counter stats for './virtio_test --batch=64' (10 runs):
-
-          2,791.70 msec task-clock                #    0.996 CPUs utilized            ( +-  0.36% )
-                23      context-switches          #    8.209 /sec                     ( +-  2.75% )
-                 0      cpu-migrations            #    0.000 /sec
-                79      page-faults               #   28.195 /sec                     ( +-  0.41% )
-     7,249,926,989      cycles                    #    2.587 GHz                      ( +-  0.36% )
-     7,711,999,656      instructions              #    1.06  insn per cycle           ( +-  1.08% )
-     1,838,436,806      branches                  #  656.134 M/sec                    ( +-  1.44% )
-         3,055,439      branch-misses             #    0.17% of all branches          ( +-  6.22% )
-
-            2.8024 +- 0.0100 seconds time elapsed  ( +-  0.36% )
-
-- Linux v5.16 with this patch applied
-
- Performance counter stats for './virtio_test --batch=64' (10 runs):
-
-          2,753.36 msec task-clock                #    0.998 CPUs utilized            ( +-  0.20% )
-                24      context-switches          #    8.699 /sec                     ( +-  2.86% )
-                 0      cpu-migrations            #    0.000 /sec
-                76      page-faults               #   27.545 /sec                     ( +-  0.56% )
-     7,150,358,721      cycles                    #    2.592 GHz                      ( +-  0.20% )
-     7,420,639,950      instructions              #    1.04  insn per cycle           ( +-  0.76% )
-     1,745,759,193      branches                  #  632.730 M/sec                    ( +-  1.03% )
-         3,022,508      branch-misses             #    0.17% of all branches          ( +-  3.24% )
-
-           2.75952 +- 0.00561 seconds time elapsed  ( +-  0.20% )
-
-
-The difference seems minimal with a slight improvement.
-
-To try to stress the patch more, I modified vhost_test.ko to call 
-vhost_enable_notify()/vhost_disable_notify() on every cycle when calling 
-vhost_get_vq_desc():
-
-- Linux v5.16 modified without the patch applied
-
- Performance counter stats for './virtio_test --batch=64' (10 runs):
-
-          4,126.66 msec task-clock                #    1.006 CPUs utilized            ( +-  0.25% )
-                28      context-switches          #    6.826 /sec                     ( +-  3.41% )
-                 0      cpu-migrations            #    0.000 /sec
-                85      page-faults               #   20.721 /sec                     ( +-  0.44% )
-    10,716,808,883      cycles                    #    2.612 GHz                      ( +-  0.25% )
-    11,804,381,462      instructions              #    1.11  insn per cycle           ( +-  0.86% )
-     3,138,813,438      branches                  #  765.153 M/sec                    ( +-  1.03% )
-        11,286,860      branch-misses             #    0.35% of all branches          ( +-  1.23% )
-
-            4.1027 +- 0.0103 seconds time elapsed  ( +-  0.25% )
-
-- Linux v5.16 modified with this patch applied
-
- Performance counter stats for './virtio_test --batch=64' (10 runs):
-
-          3,953.55 msec task-clock                #    1.001 CPUs utilized            ( +-  0.33% )
-                29      context-switches          #    7.345 /sec                     ( +-  2.67% )
-                 0      cpu-migrations            #    0.000 /sec
-                83      page-faults               #   21.021 /sec                     ( +-  0.65% )
-    10,267,242,653      cycles                    #    2.600 GHz                      ( +-  0.33% )
-     7,972,866,579      instructions              #    0.78  insn per cycle           ( +-  0.21% )
-     1,663,770,390      branches                  #  421.377 M/sec                    ( +-  0.45% )
-        16,986,093      branch-misses             #    1.02% of all branches          ( +-  0.47% )
-
-            3.9489 +- 0.0130 seconds time elapsed  ( +-  0.33% )
-
-In this case the difference is bigger, with a reduction in execution 
-time (3.7 %) and fewer branches and instructions. It should be the 
-branch `if (vq->avail_idx == vq->last_avail_idx)` in vhost_get_vq_desc() 
-that is not taken.
-
-Should I resend the patch adding some more performance information?
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
-Stefano
+Alex
 
+> +{
+> +	switch (reg) {
+> +		PURE_EL2_SYSREG(  VPIDR_EL2	);
+> +		PURE_EL2_SYSREG(  VMPIDR_EL2	);
+> +		PURE_EL2_SYSREG(  ACTLR_EL2	);
+> +		PURE_EL2_SYSREG(  HCR_EL2	);
+> +		PURE_EL2_SYSREG(  MDCR_EL2	);
+> +		PURE_EL2_SYSREG(  HSTR_EL2	);
+> +		PURE_EL2_SYSREG(  HACR_EL2	);
+> +		PURE_EL2_SYSREG(  VTTBR_EL2	);
+> +		PURE_EL2_SYSREG(  VTCR_EL2	);
+> +		PURE_EL2_SYSREG(  RVBAR_EL2	);
+> +		PURE_EL2_SYSREG(  TPIDR_EL2	);
+> +		PURE_EL2_SYSREG(  HPFAR_EL2	);
+> +		PURE_EL2_SYSREG(  ELR_EL2	);
+> +		PURE_EL2_SYSREG(  SPSR_EL2	);
+> +		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
+> +				  translate_sctlr_el2_to_sctlr_el1	     );
+> +		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
+> +				  translate_cptr_el2_to_cpacr_el1	     );
+> +		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
+> +				  translate_ttbr0_el2_to_ttbr0_el1	     );
+> +		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(TCR_EL2,     TCR_EL1,
+> +				  translate_tcr_el2_to_tcr_el1		     );
+> +		MAPPED_EL2_SYSREG(VBAR_EL2,    VBAR_EL1,    NULL	     );
+> +		MAPPED_EL2_SYSREG(AFSR0_EL2,   AFSR0_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(AFSR1_EL2,   AFSR1_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(ESR_EL2,     ESR_EL1,     NULL	     );
+> +		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
+> +		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
+> +		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(CNTHCTL_EL2, CNTKCTL_EL1,
+> +				  translate_cnthctl_el2_to_cntkctl_el1	     );
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  {
+>  	u64 val = 0x8badf00d8badf00d;
+> +	u64 (*xlate)(u64) = NULL;
+> +	unsigned int el1r;
+> +
+> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> +		goto memory_read;
+> +
+> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto memory_read;
+> +
+> +		/*
+> +		 * ELR_EL2 is special cased for now.
+> +		 */
+> +		switch (reg) {
+> +		case ELR_EL2:
+> +			return read_sysreg_el1(SYS_ELR);
+> +		}
+> +
+> +		/*
+> +		 * If this register does not have an EL1 counterpart,
+> +		 * then read the stored EL2 version.
+> +		 */
+> +		if (reg == el1r)
+> +			goto memory_read;
+> +
+> +		/*
+> +		 * If we have a non-VHE guest and that the sysreg
+> +		 * requires translation to be used at EL1, use the
+> +		 * in-memory copy instead.
+> +		 */
+> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
+> +			goto memory_read;
+> +
+> +		/* Get the current version of the EL1 counterpart. */
+> +		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
+> +		return val;
+> +	}
+> +
+> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +	if (unlikely(is_hyp_ctxt(vcpu)))
+> +		goto memory_read;
+>  
+> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
+> -	    __vcpu_read_sys_reg_from_cpu(reg, &val))
+> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+>  		return val;
+>  
+> +memory_read:
+>  	return __vcpu_sys_reg(vcpu, reg);
+>  }
+>  
+>  void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  {
+> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
+> -	    __vcpu_write_sys_reg_to_cpu(val, reg))
+> +	u64 (*xlate)(u64) = NULL;
+> +	unsigned int el1r;
+> +
+> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> +		goto memory_write;
+> +
+> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto memory_write;
+> +
+> +		/*
+> +		 * Always store a copy of the write to memory to avoid having
+> +		 * to reverse-translate virtual EL2 system registers for a
+> +		 * non-VHE guest hypervisor.
+> +		 */
+> +		__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +		switch (reg) {
+> +		case ELR_EL2:
+> +			write_sysreg_el1(val, SYS_ELR);
+> +			return;
+> +		}
+> +
+> +		/* No EL1 counterpart? We're done here.? */
+> +		if (reg == el1r)
+> +			return;
+> +
+> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
+> +			val = xlate(val);
+> +
+> +		/* Redirect this to the EL1 version of the register. */
+> +		WARN_ON(!__vcpu_write_sys_reg_to_cpu(val, el1r));
+> +		return;
+> +	}
+> +
+> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +	if (unlikely(is_hyp_ctxt(vcpu)))
+> +		goto memory_write;
+> +
+> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
+>  		return;
+>  
+> +memory_write:
+>  	 __vcpu_sys_reg(vcpu, reg) = val;
+>  }
+>  
+> -- 
+> 2.30.2
+> 
