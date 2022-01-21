@@ -2,417 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4816496312
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 17:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF73E496399
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 18:14:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378744AbiAUQp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 11:45:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47542 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345050AbiAUQpz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 11:45:55 -0500
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62557C06173B;
-        Fri, 21 Jan 2022 08:45:55 -0800 (PST)
-Received: by mail-ot1-x32f.google.com with SMTP id t4-20020a05683022e400b00591aaf48277so12420753otc.13;
-        Fri, 21 Jan 2022 08:45:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ojyQZXVH6xO5d+3ttXWHWJ4YFDHvnaljBcpusb/bm/Y=;
-        b=hR3Tf/qzNb2+R1EPxpg6y4V3Ha8vohcPmd00D4U2G1ZRh4D7XYSK94lVmUrDK6/PRq
-         tcY04cigWNsLmAgnhe3BgUfLw/MPj5G5Eo8UeKgdD+wWw4YgJMwQuZdFo742b+MNcWH9
-         bpMDOK5D+npvxrtF7Y5RH6n57bhQqK9GtfLXMogfcSCjF7n0vmUA7H3D2n8MuRZxFHm8
-         NxPx5QGyE9wO0XGwDPZxAH3d12X5/MQV9SNLf9NUJLkMDC0Uq53X67iLG+sr3mfU5vTH
-         NL9adc9vYHqKdAzFDat9ivfbPhxnlESlOc3THN0W+thbM5/FzzVtz0PJFNXS76JEDanB
-         ARFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ojyQZXVH6xO5d+3ttXWHWJ4YFDHvnaljBcpusb/bm/Y=;
-        b=wMSarkdCGrdtUaXE4T9m30JjMaYZidO+b1/qtbgMDHhR6hNVWWK9Sz+JIVh9ucbiFi
-         X9Be2NwVPOhNKj1C8AciDbQ2d1pUAICacNkCgiEx8tKpsZ7Zv806QKczaAkWJFmmqeyY
-         Cll/7vDm3a1h2Fk8pGLGZOKlRZd1UwmPpXoSB1ParE1JA8EscMZS56lZtdw1O22KNmke
-         KQWcb6TiN/dkPr/91KTPiV5zs9tAQ+/paR4YaSbBMc4BoYkp3Nu2fdJLWbQBrHkGUhXx
-         e8h/oDOYzeVGVjpUPxBWjpt2TIseEMwgzg6ck3uOkPJPkLnEtOpL7VnajePdEx+hqxC/
-         HXGg==
-X-Gm-Message-State: AOAM531eFkDnejp0v4GK00XQZsYXvLBxlG8tzYo+U+eliNddFXVNqbC6
-        YDkx0IpqFigT9+0thD0ncer65lusJ+J5rXNmDrE=
-X-Google-Smtp-Source: ABdhPJzhY0Q64qx9nqwSCQ1ULkoH5Xv7CRXvDu3tkqrDrrEihcgXOEECeu+dK4NAZv0M1M54PeH+0p/nHM6nFly3YSM=
-X-Received: by 2002:a05:6830:19e6:: with SMTP id t6mr3458344ott.357.1642783554524;
- Fri, 21 Jan 2022 08:45:54 -0800 (PST)
-MIME-Version: 1.0
-References: <87ee57c8fu.fsf@turner.link> <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
- <87a6ftk9qy.fsf@dmarc-none.turner.link> <87zgnp96a4.fsf@turner.link> <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
-In-Reply-To: <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
-From:   Alex Deucher <alexdeucher@gmail.com>
-Date:   Fri, 21 Jan 2022 11:45:43 -0500
-Message-ID: <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
-Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
- PCI-passed-through to Windows VM
-To:     Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     James Turner <linuxkernel.foss@dmarc-none.turner.link>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Lijo Lazar <lijo.lazar@amd.com>, regressions@lists.linux.dev,
-        kvm@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        id S1378835AbiAUROS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 12:14:18 -0500
+Received: from mail-bn1nam07on2046.outbound.protection.outlook.com ([40.107.212.46]:24699
+        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231567AbiAUROR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 12:14:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aQv0PsjU4w9MEwrY4Da4el8UrFepL/YktwBdIKbz+LmEJxyTJrnZFXNebv1yrvh1v3TCma+Kn56LLljyez77qNbcn3s0EQJGxZGY+cFceYNmLnhsxKQ95MwJ3mXzTlEu8kid7vGyGzX9VzbxysVJ2WR65DHsvsquQ2Q7GnShQ1kBQ86oRHD0uWT/2AbuKEEhkSO170uCsEAWTxjk1qe1JNuwEsGxXQnQJ3rGcwQMQci6PLL0anIfCRhrhUaaWyP1GzFqSaNC02g4LLL2EtyxlBZIRT8ceOJEmfiDCgfC+v035LPc+nz7/UnkU0QCbXvhWxeBMheyJyPd1qRq3opggg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8wynW7sCUe7/Ggs+t9f5YntYbce8yRZjJase/jHdAT0=;
+ b=B8y1JHJh9/S20etnDdA60rwumUN8wkKoY5V7SbaYhQ+E1cX+E1rHpB4EIGFqGYdV5VJ+mU5oz7RW0C3KTZGRz/z5uFtmPoVd6X+w69CNIAIeYuLehSTnlYyijoA6RCbwNjrXtIizmSYis9eqoS6SiWA6whhX658dWuVWOZZBFoGZcdSQvQNKoTOPvWu8MHOHsirsKpwS/Xy3j/eKPTAiobLpU/1Xdk2DFsSznIAJhkw8rQZlE7TMwBmS7Rgy6x2F191M8NEiw6RXKWGos9/cQpgwuDWRKGA6Emb+nDV8Y6EGFi12usrI/P4uQN4PHLibEn4aBo2Cu2aSj/aVzLJ8iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8wynW7sCUe7/Ggs+t9f5YntYbce8yRZjJase/jHdAT0=;
+ b=NmnCXyP86RJj89Qb8H8wJNZsjaYiVrn3AfUWOnR9LqSqDxzyCFE3QCJ3iqRy3+aNJOY2+4wT3hjw7C6Bcn1s0dtXe8+dbvuJV85C+BFg2f3QmrNHFvnTYWJTBq27uOBOeur0KKfkMdw1Xgsx/pe3HI3m8+DI9uiuWKB6IuNrNdQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB2470.namprd12.prod.outlook.com (2603:10b6:4:b4::39) by
+ DM5PR12MB1803.namprd12.prod.outlook.com (2603:10b6:3:10d::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4909.10; Fri, 21 Jan 2022 17:14:15 +0000
+Received: from DM5PR12MB2470.namprd12.prod.outlook.com
+ ([fe80::f110:6f08:2156:15dc]) by DM5PR12MB2470.namprd12.prod.outlook.com
+ ([fe80::f110:6f08:2156:15dc%7]) with mapi id 15.20.4909.011; Fri, 21 Jan 2022
+ 17:14:15 +0000
+Message-ID: <33da2a09-603e-dca9-7f93-a481fe6cbccf@amd.com>
+Date:   Fri, 21 Jan 2022 22:44:05 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        Bharata B Rao <bharata@amd.com>
+Subject: Re: [RFC PATCH 6/6] KVM: SVM: Pin SEV pages in MMU during
+ sev_launch_update_data()
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>
+References: <20220118110621.62462-1-nikunj@amd.com>
+ <20220118110621.62462-7-nikunj@amd.com>
+ <CAMkAt6p1-82LTRNB3pkPRwYh=wGpreUN=jcUeBj_dZt8ss9w0Q@mail.gmail.com>
+ <4e68ae1c-e0ed-2620-fbd1-0f0f7eb28c4f@amd.com>
+ <CAMkAt6pnk8apG4VAdM3NRUokBH32pZx-VOrnhzq+7qJu+ubJ3A@mail.gmail.com>
+From:   "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <CAMkAt6pnk8apG4VAdM3NRUokBH32pZx-VOrnhzq+7qJu+ubJ3A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0162.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:26::17) To DM5PR12MB2470.namprd12.prod.outlook.com
+ (2603:10b6:4:b4::39)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e753017d-ea7d-4660-8dc1-08d9dd017326
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1803:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR12MB18033E66299C2B7838F73781E25B9@DM5PR12MB1803.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6bUAUKxkdEMqHv4pNz5gQbvPgzUCVb7IWYJdSsbDBfB5SNpotLxNQZiV4a7Ht6JdrWlY8QRKYywp8CiwKJxDC9emToIfLC+ropSVX11D6j2hv9M4+FRHGdr1HwFvxRkxlTY1qAZPAaiz4w2aZw4ivsignj/VflHOIXZjPu8Fo9AljysMopgyrPgrMrEBJRdRC2IfLwtAy6/L/HCID2EWB1uRRb9x84OIRp+KG7Y3SxoF+4JJntCw/EQIhSlA93zB31yRRn0WEAdGVo+zmRwGMw0qUByhC42BXsWC/qdFn0+7g4NaKZZ9Jr9fSZNwvloOHF6sYn0oEObWoAm+y5S8JJtYvPlZmLbiHJURTpPoSpTci0lmpBxjkO9Q3p65pqMgaj9oB0S779/CsY/VwkRiQsf5e+dduqZrHI7iuQ3QDj7iTI6P2l10h1r1TS+uemVaaOt1q0AnKeu+zDkdftFsMz/Ivm20YI53sRVcxwHJnYqXjPpoLxAtXaYFTA64tVaqzD36TVQE3vd/0tLeEl0116C2TJ0xtydmobXsl2AibS9UdjX+QnhUfkvhh1DAXxTl1bCml+4ST6Y61beA4rJn/86Ti5c+o4DmiE1OQfJkPOfBhmLotQxRI1Q/OdJVY29nRDjFZzTwc+XsRKgNBypB4OPlbhmcjIpwvh+2MuE3sjQaFdo/zgmaY5XglrcBfS37lksW1V9rUJruswq+gqdZGpOe2OkiSm86GxL5CRDiNBw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB2470.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(36756003)(2906002)(4326008)(6666004)(66556008)(66476007)(53546011)(66946007)(8936002)(6512007)(38100700002)(6486002)(6916009)(6506007)(26005)(186003)(31686004)(2616005)(8676002)(54906003)(5660300002)(316002)(508600001)(31696002)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UkVXT1d1bnh4Ui9pVkFNVG9MeU1iMVExZStKbXpkcC9BelB1S1pnVGJvdTZT?=
+ =?utf-8?B?d1FObC9CYnpOckpLTnJnS2h5Um4ycXovWW9KU2hhVW9MUlVtbVgrQ3Z1NzVz?=
+ =?utf-8?B?QWFqdEhXakYzNldIRzVkbmNxVHRXTDBKM3dvVTF1WTk0bm1DQ2NoQTloTjFm?=
+ =?utf-8?B?QUJtQWFQU0QwYWhQVlViNnlCZHg0cTNkUlYvS2dwMGt0K1RFVkRKL3J1dlAy?=
+ =?utf-8?B?eVF6enZld2lLVjllNjJaaXJIS3VHaWY1WE1QU1JJTGIwWWxJZzE4UUsvRFhE?=
+ =?utf-8?B?YXM2dUFaajFJYTNxZ2d1TVJyOWtYUDhncXdidUxBRXh0c0tBc29QUWNGMXhH?=
+ =?utf-8?B?c240clhDdlkwaTcwT2QyZVI2Ky90bkpySGNOTzIzdEFMMzc4bHFxTE1hTmE5?=
+ =?utf-8?B?eVh0NWphZlloMi96c1UvUjYzdkpPYzg1T1NybTZiRld5TlVnK1FZaVltNmsw?=
+ =?utf-8?B?UmxMdDY0aGt0b1g2WFBuUkRDb2Ewdlg4M2YzS0ExWHRNdGYxMFpXNFlmY2Qw?=
+ =?utf-8?B?cW1OVUZkRHEvNFBUTUNuMmd4SEpia0RScllEUlNQSnYwekQyZnZGNVR4MFpR?=
+ =?utf-8?B?NWNzWTZoQ3FNcnZpcG5LNW9zYTgxL1YwVnl6bHVCRk9SOFV2MFRYeUpQUHAv?=
+ =?utf-8?B?aGpxVHdKdU9NYVB2QkZxM1g0N0o4VnZSSXNDQkRPSFVpaDhRekZ4VTNRcDBz?=
+ =?utf-8?B?aU9ZQkwyeUQ0bkdJc1pUWWkwODhhNWc5b0tOTTF4ZjR5UHNqdTRaRURvZ0pu?=
+ =?utf-8?B?dzB2L3ExeGFIYUM3QityUFVTd3JrVVFTdVppZGYrYnp4R2pPMk5FRFRBZUhk?=
+ =?utf-8?B?YkI2VlhtRjdVQXN1QkVuZjJyNmtiSEJQOUtnRWZjQmpVL1UyQkxMY0FHUW1T?=
+ =?utf-8?B?OU1XZlVzSTV5RkovK0xkaGpXTzJzWkU5VWF3cUw1SUZZajh3aC9NNVZYWDVH?=
+ =?utf-8?B?Nzc2b2xyUFA3cXdrTXlMeGNnTFBwR3JNRE4wOHNtM0xtU251Mm8vVUY5Z3VF?=
+ =?utf-8?B?QWcrVTJ5aTkxMS9NNVdXNFl2RElROEZQdjRRWDZFOXFoZDhkUHNOcnVvNlVi?=
+ =?utf-8?B?S1l3VFdMUWVHY253UktrTlZ0NTFuUGJIQlNOM0hDd0JEMWRNWUlxOUFsVnMr?=
+ =?utf-8?B?bnJKV1BaODYzK3dSZGZDTXkrVStlS2FBQ1hZalRabW5TWThnQTFESFZMa3la?=
+ =?utf-8?B?NmhTY2JBYWh2Zkt4VDRIam9vaWpHTVhnZVdkd21vV0Z4ZVRKNG9LcGV6bUJy?=
+ =?utf-8?B?akFpU0I5Tmw0VUZuRERvSEIxMDhQSVFkWDMwS0VtWVdzNGw1a1FKOE9hOFhn?=
+ =?utf-8?B?U0VzckZ1cjdVbkZvalJzekgxNnVBU01QVkhwbFdOUlQzLzc3Rk5rOVFqcFcx?=
+ =?utf-8?B?K0hpVXo2b3RYR0lLSnBHeUxQTWhVVkNRVmRvT3luUGp4MUhxZ2t5d1NaSGRZ?=
+ =?utf-8?B?eEh6TUhHRGVCSzBkcTVPRXBjRTFkL1o5a1JKSWNxdU0yTVVvZVd2ZURDUmFy?=
+ =?utf-8?B?YjNja2FYUHhtR1ZIaGM0dmJ3MXZ6bkxMd1E4S09HWHV6NXVSUmExdjdVMVUr?=
+ =?utf-8?B?cDVqTUtFTXlOQXBUSThzVEFoNW5nMFVla3VsYmZ2elRxaGtKQTNOUmhNVFRi?=
+ =?utf-8?B?QWkvYlNTMUpqUlFLQzNQOEFoTms5QVh6Yi9BTjFGUVJzcVlzczRKNDhHbmV3?=
+ =?utf-8?B?VTFtTXRpdXJieXJXU2NVYUJ5VVByVzJ6RlVqcHpLSVpMamRmcUFHVUJTazl5?=
+ =?utf-8?B?a0JXL0RuL3lkMUdyYmt0eUlIcXBRN0IvNXNHc2ZGMlZjV3RaTkdaV3B3S3I0?=
+ =?utf-8?B?WnM1ZmE3enZWRlhhL01DOFY5OUpJeWhkTDhKTWRSWFo5M1cwclhNNisrNXZU?=
+ =?utf-8?B?dzkxL0oreURIUklISTlLZG5jYVRSTEhIYytjK0d1UUlzZ3p6djdlOFRhMWh1?=
+ =?utf-8?B?b2tLUnQzOGwyQVN2SVRNUXlhWDMxUXpzRmtXY2NDREpKNS9xUVl6Mm5SRlN4?=
+ =?utf-8?B?VzVWdi9VcDNQZGV6UUFZdktuNVByeVV1TWxIRzFtYkhtS29tdDZQQk9sUmZD?=
+ =?utf-8?B?WTZwbXN6OHBCbFZhSDBmZzFXNm1PTVJDUGpObFIrMllOak5BbVV0ZUtTTU00?=
+ =?utf-8?B?MXpvOXpucWo2b1JiTXpBTWJKZ1pqUnNpWU9kd1lYNytiWUZkckVEc3pQbXd4?=
+ =?utf-8?Q?QIfIzNECs6dxA0SieMtC5uY=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e753017d-ea7d-4660-8dc1-08d9dd017326
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB2470.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2022 17:14:15.1247
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mOuwD/nMQ2lPR3f+EKy7Dhw3Ihqv0OTzYYBXgrrOKw/ruJGo26Ug6w8yE5IxRQeqrPA1ZXq22tbWUTea6uNhEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1803
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 21, 2022 at 3:35 AM Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
->
-> Hi, this is your Linux kernel regression tracker speaking.
->
-> On 21.01.22 03:13, James Turner wrote:
-> >
-> > I finished the bisection (log below). The issue was introduced in
-> > f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)").
->
-> FWIW, that was:
->
-> > drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)
-> > They are global ACPI methods, so maybe the structures
-> > global in the driver. This simplified a number of things
-> > in the handling of these methods.
-> >
-> > v2: reset the handle if verify interface fails (Lijo)
-> > v3: fix compilation when ACPI is not defined.
-> >
-> > Reviewed-by: Lijo Lazar <lijo.lazar@amd.com>
-> > Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
->
-> In that case we need to get those two and the maintainers for the driver
-> involved by addressing them with this mail. And to make it easy for them
-> here is a link and a quote from the original report:
->
-> https://lore.kernel.org/all/87ee57c8fu.fsf@turner.link/
+On 1/21/2022 9:30 PM, Peter Gonda wrote:
+> On Thu, Jan 20, 2022 at 9:08 PM Nikunj A. Dadhania <nikunj@amd.com> wrote:
+>>
+>> On 1/20/2022 9:47 PM, Peter Gonda wrote:
+>>> On Tue, Jan 18, 2022 at 4:07 AM Nikunj A Dadhania <nikunj@amd.com> wrote:
 
-Are you ever loading the amdgpu driver in your tests?  If not, I don't
-see how this patch would affect anything as the driver code would
-never have executed.  It would appear not based on your example.
+>>>>  static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>>>  {
+>>>>         unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+>>>> @@ -510,15 +615,21 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>>>         vaddr_end = vaddr + size;
+>>>>
+>>>>         /* Lock the user memory. */
+>>>> -       inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
+>>>> +       if (atomic_read(&kvm->online_vcpus))
+>>>> +               inpages = sev_pin_memory_in_mmu(kvm, vaddr, size, &npages);
+>>>
+>>> IIUC we can only use the sev_pin_memory_in_mmu() when there is an
+>>> online vCPU because that means the MMU has been setup enough to use?
+>>> Can we add a variable and a comment to help explain that?
+>>>
+>>> bool mmu_usable = atomic_read(&kvm->online_vcpus) > 0;
+>>
+>> Sure, will add comment and the variable.
+>>
+>>>
+>>>> +       else
+>>>> +               inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
+>>>
+>>> So I am confused about this case. Since svm_register_enc_region() is
+>>> now a NOOP how can a user ensure that memory remains pinned from
+>>> sev_launch_update_data() to when the memory would be demand pinned?
+>>>
+>>> Before users could svm_register_enc_region() which pins the region,
+>>> then sev_launch_update_data(), then the VM could run an the data from
+>>> sev_launch_update_data() would have never moved. I don't think that
+>>> same guarantee is held here?
+>>
+>> Yes, you are right. One way is to error out of this call if MMU is not setup.
+>> Other one would require us to maintain all list of pinned memory via sev_pin_memory()
+>> and unpin them in the destroy path.
+> 
+> Got it. So we'll probably still need regions_list to track those
+> pinned regions and free them on destruction.
+>
+Yes, I will have to bring that structure back.
+ 
+> Also similar changes are probably needed in sev_receive_update_data()?
 
-Alex
+Right, there are multiple locations where sev_pin_memory() is used, I will go through each 
+case and make changes. Alternatively, add to the region_list in sev_pin_memory() and free in 
+destruction.
 
->
-> ```
-> > Hi,
-> >
-> > With newer kernels, starting with the v5.14 series, when using a MS
-> > Windows 10 guest VM with PCI passthrough of an AMD Radeon Pro WX 3200
-> > discrete GPU, the passed-through GPU will not run above 501 MHz, even
-> > when it is under 100% load and well below the temperature limit. As a
-> > result, GPU-intensive software (such as video games) runs unusably
-> > slowly in the VM.
-> >
-> > In contrast, with older kernels, the passed-through GPU runs at up to
-> > 1295 MHz (the correct hardware limit), so GPU-intensive software runs at
-> > a reasonable speed in the VM.
-> >
-> > I've confirmed that the issue exists with the following kernel versions:
-> >
-> > - v5.16
-> > - v5.14
-> > - v5.14-rc1
-> >
-> > The issue does not exist with the following kernels:
-> >
-> > - v5.13
-> > - various packaged (non-vanilla) 5.10.* Arch Linux `linux-lts` kernels
-> >
-> > So, the issue was introduced between v5.13 and v5.14-rc1. I'm willing to
-> > bisect the commit history to narrow it down further, if that would be
-> > helpful.
-> >
-> > The configuration details and test results are provided below. In
-> > summary, for the kernels with this issue, the GPU core stays at a
-> > constant 0.8 V, the GPU core clock ranges from 214 MHz to 501 MHz, and
-> > the GPU memory stays at a constant 625 MHz, in the VM. For the correctly
-> > working kernels, the GPU core ranges from 0.85 V to 1.0 V, the GPU core
-> > clock ranges from 214 MHz to 1295 MHz, and the GPU memory stays at 1500
-> > MHz, in the VM.
-> >
-> > Please let me know if additional information would be helpful.
-> >
-> > Regards,
-> > James Turner
-> >
-> > # Configuration Details
-> >
-> > Hardware:
-> >
-> > - Dell Precision 7540 laptop
-> > - CPU: Intel Core i7-9750H (x86-64)
-> > - Discrete GPU: AMD Radeon Pro WX 3200
-> > - The internal display is connected to the integrated GPU, and external
-> >   displays are connected to the discrete GPU.
-> >
-> > Software:
-> >
-> > - KVM host: Arch Linux
-> >   - self-built vanilla kernel (built using Arch Linux `PKGBUILD`
-> >     modified to use vanilla kernel sources from git.kernel.org)
-> >   - libvirt 1:7.10.0-2
-> >   - qemu 6.2.0-2
-> >
-> > - KVM guest: Windows 10
-> >   - GPU driver: Radeon Pro Software Version 21.Q3 (Note that I also
-> >     experienced this issue with the 20.Q4 driver, using packaged
-> >     (non-vanilla) Arch Linux kernels on the host, before updating to the
-> >     21.Q3 driver.)
-> >
-> > Kernel config:
-> >
-> > - For v5.13, v5.14-rc1, and v5.14, I used
-> >   https://github.com/archlinux/svntogit-packages/blob/89c24952adbfa645d9e1a6f12c572929f7e4e3c7/trunk/config
-> >   (The build script ran `make olddefconfig` on that config file.)
-> >
-> > - For v5.16, I used
-> >   https://github.com/archlinux/svntogit-packages/blob/94f84e1ad8a530e54aa34cadbaa76e8dcc439d10/trunk/config
-> >   (The build script ran `make olddefconfig` on that config file.)
-> >
-> > I set up the VM with PCI passthrough according to the instructions at
-> > https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF
-> >
-> > I'm passing through the following PCI devices to the VM, as listed by
-> > `lspci -D -nn`:
-> >
-> >   0000:01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
-> >   0000:01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
-> >
-> > The host kernel command line includes the following relevant options:
-> >
-> >   intel_iommu=on vfio-pci.ids=1002:6981,1002:aae0
-> >
-> > to enable IOMMU and bind the `vfio-pci` driver to the PCI devices.
-> >
-> > My `/etc/mkinitcpio.conf` includes the following line:
-> >
-> >   MODULES=(vfio_pci vfio vfio_iommu_type1 vfio_virqfd i915 amdgpu)
-> >
-> > to load `vfio-pci` before the graphics drivers. (Note that removing
-> > `i915 amdgpu` has no effect on this issue.)
-> >
-> > I'm using libvirt to manage the VM. The relevant portions of the XML
-> > file are:
-> >
-> >   <hostdev mode="subsystem" type="pci" managed="yes">
-> >     <source>
-> >       <address domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
-> >     </source>
-> >     <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
-> >   </hostdev>
-> >   <hostdev mode="subsystem" type="pci" managed="yes">
-> >     <source>
-> >       <address domain="0x0000" bus="0x01" slot="0x00" function="0x1"/>
-> >     </source>
-> >     <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
-> >   </hostdev>
-> >
-> > # Test Results
-> >
-> > For testing, I used the following procedure:
-> >
-> > 1. Boot the host machine and log in.
-> >
-> > 2. Run the following commands to gather information. For all the tests,
-> >    the output was identical.
-> >
-> >    - `cat /proc/sys/kernel/tainted` printed:
-> >
-> >      0
-> >
-> >    - `hostnamectl | grep "Operating System"` printed:
-> >
-> >      Operating System: Arch Linux
-> >
-> >    - `lspci -nnk -d 1002:6981` printed
-> >
-> >      01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
-> >       Subsystem: Dell Device [1028:0926]
-> >       Kernel driver in use: vfio-pci
-> >       Kernel modules: amdgpu
-> >
-> >    - `lspci -nnk -d 1002:aae0` printed
-> >
-> >      01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
-> >       Subsystem: Dell Device [1028:0926]
-> >       Kernel driver in use: vfio-pci
-> >       Kernel modules: snd_hda_intel
-> >
-> >    - `sudo dmesg | grep -i vfio` printed the kernel command line and the
-> >      following messages:
-> >
-> >      VFIO - User Level meta-driver version: 0.3
-> >      vfio-pci 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
-> >      vfio_pci: add [1002:6981[ffffffff:ffffffff]] class 0x000000/00000000
-> >      vfio_pci: add [1002:aae0[ffffffff:ffffffff]] class 0x000000/00000000
-> >      vfio-pci 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
-> >
-> > 3. Start the Windows VM using libvirt and log in. Record sensor
-> >    information.
-> >
-> > 4. Run a graphically-intensive video game to put the GPU under load.
-> >    Record sensor information.
-> >
-> > 5. Stop the game. Record sensor information.
-> >
-> > 6. Shut down the VM. Save the output of `sudo dmesg`.
-> >
-> > I compared the `sudo dmesg` output for v5.13 and v5.14-rc1 and didn't
-> > see any relevant differences.
-> >
-> > Note that the issue occurs only within the guest VM. When I'm not using
-> > a VM (after removing `vfio-pci.ids=1002:6981,1002:aae0` from the kernel
-> > command line so that the PCI devices are bound to their normal `amdgpu`
-> > and `snd_hda_intel` drivers instead of the `vfio-pci` driver), the GPU
-> > operates correctly on the host.
-> >
-> > ## Linux v5.16 (issue present)
-> >
-> > $ cat /proc/version
-> > Linux version 5.16.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 01:51:08 +0000
-> >
-> > Before running the game:
-> >
-> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 53.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > While running the game:
-> >
-> > - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > After stopping the game:
-> >
-> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 51.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > ## Linux v5.14 (issue present)
-> >
-> > $ cat /proc/version
-> > Linux version 5.14.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 03:19:35 +0000
-> >
-> > Before running the game:
-> >
-> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 50.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > While running the game:
-> >
-> > - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > After stopping the game:
-> >
-> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 49.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > ## Linux v5.14-rc1 (issue present)
-> >
-> > $ cat /proc/version
-> > Linux version 5.14.0-rc1-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 18:31:35 +0000
-> >
-> > Before running the game:
-> >
-> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 50.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > While running the game:
-> >
-> > - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > After stopping the game:
-> >
-> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 49.0 degC
-> > - GPU memory: 625.0 MHz
-> >
-> > ## Linux v5.13 (works correctly, issue not present)
-> >
-> > $ cat /proc/version
-> > Linux version 5.13.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 02:39:18 +0000
-> >
-> > Before running the game:
-> >
-> > - GPU core: 214.0 MHz, 0.850 V, 0.0% load, 55.0 degC
-> > - GPU memory: 1500.0 MHz
-> >
-> > While running the game:
-> >
-> > - GPU core: 1295.0 MHz, 1.000 V, 100.0% load, 67.0 degC
-> > - GPU memory: 1500.0 MHz
-> >
-> > After stopping the game:
-> >
-> > - GPU core: 214.0 MHz, 0.850 V, 0.0% load, 52.0 degC
-> > - GPU memory: 1500.0 MHz
->
-> ```
->
-> Ciao, Thorsten (wearing his 'Linux kernel regression tracker' hat)
->
-> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
-> on my table. I can only look briefly into most of them. Unfortunately
-> therefore I sometimes will get things wrong or miss something important.
-> I hope that's not the case here; if you think it is, don't hesitate to
-> tell me about it in a public reply, that's in everyone's interest.
->
-> BTW, I have no personal interest in this issue, which is tracked using
-> regzbot, my Linux kernel regression tracking bot
-> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
-> this mail to get things rolling again and hence don't need to be CC on
-> all further activities wrt to this regression.
->
-> #regzbot introduced f9b7f3703ff9
-> #regzbot title drm: amdgpu: Too-low frequency limit for AMD GPU
-> PCI-passed-through to Windows VM
->
->
-> > Would any additional information be helpful?
-> >
-> > git bisect start
-> > # bad: [e73f0f0ee7541171d89f2e2491130c7771ba58d3] Linux 5.14-rc1
-> > git bisect bad e73f0f0ee7541171d89f2e2491130c7771ba58d3
-> > # good: [62fb9874f5da54fdb243003b386128037319b219] Linux 5.13
-> > git bisect good 62fb9874f5da54fdb243003b386128037319b219
-> > # bad: [e058a84bfddc42ba356a2316f2cf1141974625c9] Merge tag 'drm-next-2021-07-01' of git://anongit.freedesktop.org/drm/drm
-> > git bisect bad e058a84bfddc42ba356a2316f2cf1141974625c9
-> > # good: [a6eaf3850cb171c328a8b0db6d3c79286a1eba9d] Merge tag 'sched-urgent-2021-06-30' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
-> > git bisect good a6eaf3850cb171c328a8b0db6d3c79286a1eba9d
-> > # good: [007b312c6f294770de01fbc0643610145012d244] Merge tag 'mac80211-next-for-net-next-2021-06-25' of git://git.kernel.org/pub/scm/linux/kernel/git/jberg/mac80211-next
-> > git bisect good 007b312c6f294770de01fbc0643610145012d244
-> > # bad: [18703923a66aecf6f7ded0e16d22eb412ddae72f] drm/amdgpu: Fix incorrect register offsets for Sienna Cichlid
-> > git bisect bad 18703923a66aecf6f7ded0e16d22eb412ddae72f
-> > # good: [c99c4d0ca57c978dcc2a2f41ab8449684ea154cc] Merge tag 'amd-drm-next-5.14-2021-05-19' of https://gitlab.freedesktop.org/agd5f/linux into drm-next
-> > git bisect good c99c4d0ca57c978dcc2a2f41ab8449684ea154cc
-> > # good: [43ed3c6c786d996a264fcde68dbb36df6f03b965] Merge tag 'drm-misc-next-2021-06-01' of git://anongit.freedesktop.org/drm/drm-misc into drm-next
-> > git bisect good 43ed3c6c786d996a264fcde68dbb36df6f03b965
-> > # bad: [050cd3d616d96c3a04f4877842a391c0a4fdcc7a] drm/amd/display: Add support for SURFACE_PIXEL_FORMAT_GRPH_ABGR16161616.
-> > git bisect bad 050cd3d616d96c3a04f4877842a391c0a4fdcc7a
-> > # good: [f43ae2d1806c2b8a0934cb4acddd3cf3750d10f8] drm/amdgpu: Fix inconsistent indenting
-> > git bisect good f43ae2d1806c2b8a0934cb4acddd3cf3750d10f8
-> > # good: [6566cae7aef30da8833f1fa0eb854baf33b96676] drm/amd/display: fix odm scaling
-> > git bisect good 6566cae7aef30da8833f1fa0eb854baf33b96676
-> > # good: [5ac1dd89df549648b67f4d5e3a01b2d653914c55] drm/amd/display/dc/dce/dmub_outbox: Convert over to kernel-doc
-> > git bisect good 5ac1dd89df549648b67f4d5e3a01b2d653914c55
-> > # good: [a76eb7d30f700e5bdecc72d88d2226d137b11f74] drm/amd/display/dc/dce110/dce110_hw_sequencer: Include header containing our prototypes
-> > git bisect good a76eb7d30f700e5bdecc72d88d2226d137b11f74
-> > # good: [dd1d82c04e111b5a864638ede8965db2fe6d8653] drm/amdgpu/swsmu/aldebaran: fix check in is_dpm_running
-> > git bisect good dd1d82c04e111b5a864638ede8965db2fe6d8653
-> > # bad: [f9b7f3703ff97768a8dfabd42bdb107681f1da22] drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)
-> > git bisect bad f9b7f3703ff97768a8dfabd42bdb107681f1da22
-> > # good: [f1688bd69ec4b07eda1657ff953daebce7cfabf6] drm/amd/amdgpu:save psp ring wptr to avoid attack
-> > git bisect good f1688bd69ec4b07eda1657ff953daebce7cfabf6
-> > # first bad commit: [f9b7f3703ff97768a8dfabd42bdb107681f1da22] drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)
-> >
-> > James
-> >
+Regards
+Nikunj
