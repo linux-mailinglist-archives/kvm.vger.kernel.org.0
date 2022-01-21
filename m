@@ -2,392 +2,417 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B667496306
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 17:40:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4816496312
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 17:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351551AbiAUQj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 11:39:59 -0500
-Received: from mail-eopbgr30109.outbound.protection.outlook.com ([40.107.3.109]:14185
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1351529AbiAUQj5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 11:39:57 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MNmxwc6A7iDn/ndQ+i/8nnSBsH66tnx6K5P+8Aq5hXqjFLSz8REZFIHAAhrStY9e1MezxI100psyGn2Digr6wEgPqtKR+3Ue2HJz+fNDpI/KQ4aVNOpMlCziDKlpCpXYioscxHkQku/Q0nrgt9z8+SDiSrc7Go3vEwlbcG6wruWsAJEmUr/04bH7iPwERH4zqcW9zRddx09p0dCsRZHUAQpvf2qWC7mvB5QLH5YvFLoc0w4krM5Wvcw5CCAq4ideRkljWBqEkL+23ZjtuuVFgkwETPw5kXYktczzy2ihQBtmIVVYfKWmnTpJw/cNFObIYVtrLVgIvkvEdlbb6cmvWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CqLzZHN0H995YMchR5QYAKCR7gF5miTDNwenQEef+4Y=;
- b=iKP4aG+ewKZnL/lTo321rHE+rAgTajnYdMaA1Ns5ZyQgS7G8eOuYq7afBOQLzq7eQeBk+A1/vMRoY781F3sGCu1cdGvmMzGfbI7VzjNTsYb4oUwGA1YVnfLST02KfrdFzwvgbMS4PxUf/Dgjw9UgCkzBXfcj1o+qVwKSWvWgmWl2PmNzasUMZDcs/3b85jvGEIxZqtTwExaM9Wyd/NfVs8ud64a2o/N5TI1Qoo2Cdg9Ug/sEEOM9FfjlGM0B1jQ5vgrirclK65A9v6HVMrLW8RHCl0us2M4VgyeM+Wx7T9FgjwVNBC7bYnP7qC2Ueg/Djl3nUq9c8i37zsUVvkhCQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CqLzZHN0H995YMchR5QYAKCR7gF5miTDNwenQEef+4Y=;
- b=Vr+fo4Q/X/JF2vl6I7gqfN/TVdbER150UXSL+cZJV5qlMaS3jrLUUT4ZyLMZWkqZhuZjgkzF5tUEiYVf6n0UQsxzNi8zY5j/YT9OXeZA003hRrcVq2rK5yCnVGjiS7T1e+jqSkhAaPyosDTIJAdxNKfBOwcQd57EXjSps3a5kFI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM9PR08MB6737.eurprd08.prod.outlook.com (2603:10a6:20b:304::18)
- by AM0PR08MB3348.eurprd08.prod.outlook.com (2603:10a6:208:65::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.7; Fri, 21 Jan
- 2022 16:39:54 +0000
-Received: from AM9PR08MB6737.eurprd08.prod.outlook.com
- ([fe80::4def:4b08:dfe6:b4bd]) by AM9PR08MB6737.eurprd08.prod.outlook.com
- ([fe80::4def:4b08:dfe6:b4bd%3]) with mapi id 15.20.4909.012; Fri, 21 Jan 2022
- 16:39:53 +0000
-From:   Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com,
-        mtosatti@redhat.com, richard.henderson@linaro.org,
-        pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com,
-        wangyanan55@huawei.com, f4bug@amsat.org,
-        marcel.apfelbaum@gmail.com, eduardo@habkost.net,
-        vsementsov@virtuozzo.com, valery.vdovin.s@gmail.com,
-        den@openvz.org, Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Subject: [PATCH v17] qapi: introduce 'x-query-x86-cpuid' QMP command.
-Date:   Fri, 21 Jan 2022 17:39:43 +0100
-Message-Id: <20220121163943.2720015-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.31.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM6PR10CA0097.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:209:8c::38) To AM9PR08MB6737.eurprd08.prod.outlook.com
- (2603:10a6:20b:304::18)
+        id S1378744AbiAUQp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 11:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345050AbiAUQpz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 11:45:55 -0500
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62557C06173B;
+        Fri, 21 Jan 2022 08:45:55 -0800 (PST)
+Received: by mail-ot1-x32f.google.com with SMTP id t4-20020a05683022e400b00591aaf48277so12420753otc.13;
+        Fri, 21 Jan 2022 08:45:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ojyQZXVH6xO5d+3ttXWHWJ4YFDHvnaljBcpusb/bm/Y=;
+        b=hR3Tf/qzNb2+R1EPxpg6y4V3Ha8vohcPmd00D4U2G1ZRh4D7XYSK94lVmUrDK6/PRq
+         tcY04cigWNsLmAgnhe3BgUfLw/MPj5G5Eo8UeKgdD+wWw4YgJMwQuZdFo742b+MNcWH9
+         bpMDOK5D+npvxrtF7Y5RH6n57bhQqK9GtfLXMogfcSCjF7n0vmUA7H3D2n8MuRZxFHm8
+         NxPx5QGyE9wO0XGwDPZxAH3d12X5/MQV9SNLf9NUJLkMDC0Uq53X67iLG+sr3mfU5vTH
+         NL9adc9vYHqKdAzFDat9ivfbPhxnlESlOc3THN0W+thbM5/FzzVtz0PJFNXS76JEDanB
+         ARFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ojyQZXVH6xO5d+3ttXWHWJ4YFDHvnaljBcpusb/bm/Y=;
+        b=wMSarkdCGrdtUaXE4T9m30JjMaYZidO+b1/qtbgMDHhR6hNVWWK9Sz+JIVh9ucbiFi
+         X9Be2NwVPOhNKj1C8AciDbQ2d1pUAICacNkCgiEx8tKpsZ7Zv806QKczaAkWJFmmqeyY
+         Cll/7vDm3a1h2Fk8pGLGZOKlRZd1UwmPpXoSB1ParE1JA8EscMZS56lZtdw1O22KNmke
+         KQWcb6TiN/dkPr/91KTPiV5zs9tAQ+/paR4YaSbBMc4BoYkp3Nu2fdJLWbQBrHkGUhXx
+         e8h/oDOYzeVGVjpUPxBWjpt2TIseEMwgzg6ck3uOkPJPkLnEtOpL7VnajePdEx+hqxC/
+         HXGg==
+X-Gm-Message-State: AOAM531eFkDnejp0v4GK00XQZsYXvLBxlG8tzYo+U+eliNddFXVNqbC6
+        YDkx0IpqFigT9+0thD0ncer65lusJ+J5rXNmDrE=
+X-Google-Smtp-Source: ABdhPJzhY0Q64qx9nqwSCQ1ULkoH5Xv7CRXvDu3tkqrDrrEihcgXOEECeu+dK4NAZv0M1M54PeH+0p/nHM6nFly3YSM=
+X-Received: by 2002:a05:6830:19e6:: with SMTP id t6mr3458344ott.357.1642783554524;
+ Fri, 21 Jan 2022 08:45:54 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6e5edb4d-a475-4939-9754-08d9dcfca697
-X-MS-TrafficTypeDiagnostic: AM0PR08MB3348:EE_
-X-Microsoft-Antispam-PRVS: <AM0PR08MB33486D775D362D413E080E43C15B9@AM0PR08MB3348.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wKwj5a4V0JL9trXUYSHIVKLTrNogxAFFiCDsFVQ9elb7UtaYTrBx9NGMaW9Y07JfQFBvaB6e720JK4Ano2xkELd38asluHpsqUdPniE6pyupssoFDiErmW01/mKxmaAJqngLBSV+Jga4/ROnhs8wi+TbBxvQC7SyNIilBn79xg6tKe/7IjtuaXQCSK7zcL3nM8LmcXDSTlCo9WnoBH1/R5ESO6m1eCLQPvJO2MajoeCGOgbIHec+I4fNWHH1OMhXPpoUWpSFx7WFUjPft8+Zb1wjskZutSJGYoC4X9N27zPBBYPpjXLasL2D6OORYZWYECGeVxx87T5bFOdsH8cihtpV/Q7SdyRI7kVAxAdSXGhE0WQas5r+Tzn2MhzPpWKtHes3OB0qosPLAh8chWDvF1AjkUVvGeBFUV26HeMWlmsXFnekUiOM/7WxeZs0K/1Qojhj7Xikq+B7lGDlcwW+VdWzDi0NxHJxgSg6zQGiEahMx0Aw+rt6JzGYR3aXgwvyHEwHOyuoCrVZ3/3TZotTkGYB7KG35Z4S/tVZvXluWLgrtwwCm8mU3ljZH8+Ox7j3vRE7xtYrp63bbG2eYInqn6HWpSiWs+jqoBctBeReLS5XY2wAZ4nZnQodXUMdxlcDMnZbRGXRFEgKyDmfHPob1jvWSKuDmBF2BRyTI9HTI6KR4SKNNgxPVnhoBmMdcST6bhicstX6FO3BUFbWmg7cVQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR08MB6737.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66476007)(66556008)(5660300002)(38100700002)(36756003)(26005)(508600001)(66946007)(6506007)(6486002)(38350700002)(6666004)(4326008)(107886003)(1076003)(186003)(316002)(83380400001)(2616005)(2906002)(52116002)(6512007)(8676002)(86362001)(8936002)(7416002)(6916009);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?049K0OPxFNbB/GRz9+PDUjA/V6cmr1cKmBpyZwjTXHRh3RMTbdmmLjaCfuMx?=
- =?us-ascii?Q?O8wcWJ8xanY81BXsscpxeM/fW+I8XwG4kMR3CN2oQIbLz0Cw/X6l1Eor1oHk?=
- =?us-ascii?Q?nVLJfQWa1H1rXzXQtfm3fyZENUhUKpqe3PDOpv5cSWegyBAhvJqMwv75fdi1?=
- =?us-ascii?Q?g3IsSMZqS9wCsxQA3JT7AuKqkysHKL2mPbhNu6/WX2u8AFvlsNH1z67lAXhQ?=
- =?us-ascii?Q?+/e6XdzXWtqsBysKFioDQNWXWKeWpnLmtp4zRTxcHuHBjn5J39cD78xU6Jmg?=
- =?us-ascii?Q?NPcPXrYbvz5iH5+XLoIEtwor6qvOY7XPdIT+OPHis6kw6AKnYB2LBbMFH7eY?=
- =?us-ascii?Q?Ty8wALIVFFKrjN8irC0ybjYgFBF/vfVIwm2HnsCiMvUN1o3jFaLl5ratltwq?=
- =?us-ascii?Q?AMWl8ZMKrli6LDZ6ySFYQgfjesxxdSfCru6BjgzfpBBOnAihD6mnc2gCqx9/?=
- =?us-ascii?Q?sm8evf0sdAI2rdXVrggz5xfdJbKD0zxUe1lbdB6Z/8F/P6nNJk6cI30NVAn8?=
- =?us-ascii?Q?EYxy9ugtTQuSfRVuZWm4sUtf2gl7X5CG6WeOCeUDrGPpz70uZ7ZeqFYipdBw?=
- =?us-ascii?Q?MJglIUygxHUyiHusQdzaEdi3WUF9ezRIMpAcnHfRyxXjILjgBbi3Tc4vTLS9?=
- =?us-ascii?Q?a9U5W7gDIe2XTUQ4jqbdHciNsJ/9DTpp6NmRcMVqDAV/I5/zUzmVGg6zSL/x?=
- =?us-ascii?Q?iO9F6qO+xK6IQP0cHMWWP1Qu0ICRXWWazF+v8kqftMf1+HkWGymfsbD4SMHh?=
- =?us-ascii?Q?bbChq3aWtt9P/8UKzZb/ZV9Husa5IfPOyRDBpjyYcsPXofRcOVc7Ut1cR0OZ?=
- =?us-ascii?Q?dFNiNnPkXcOyGHyx1z7uw6gEkHMWzwfmz+HZIUwf0sKgOXwSkerZ1iWbOlnE?=
- =?us-ascii?Q?UGOgr1IecD1vCh/dmv+Bqz2qf0m9SDHf23BIWQmw4mVGvTzgNa+3q8RQIVC0?=
- =?us-ascii?Q?n3Yi6L2HFgRy+SP6rmVgV2QpPTMT3msUhhWmWkSnv5W+f9Ji9eX4NSCpDnli?=
- =?us-ascii?Q?U4b2W3tGmIggC40+3dvrAuhs8dxM85Qu+6J995EvG2qYSV+J3kPn+9aKV0Ii?=
- =?us-ascii?Q?hiVdInpu21E8BqdRI8E6djc51qz2/GVRuk0zcQ3DZEqmlO8y7HDKOTqwEKP/?=
- =?us-ascii?Q?gvUddCPF3EGnOynhtnTz5xts2m6FApztqcvIeFiXgB4DXYfO6/FRNjHiASpW?=
- =?us-ascii?Q?KxjL4ecoDH+4SbGcBchh73XUaW/3x3ZrY7W2O4m2amgTIrIPvZhDFJJgePwe?=
- =?us-ascii?Q?FMgqPnDbqsguHOqTlIO+Kx6D25t5inQ+0dFOL4JOv+XyUNMFAT0eNY8MhQ3F?=
- =?us-ascii?Q?qFZh0GDspumFJ+dhiV22A2MTQTSlDAbVUifQ0wpUF+OWPYOSvWnVt384UNj2?=
- =?us-ascii?Q?ffJVDZOPI2VFlFCDOMGuDm/atP9y7FY4xaN+cDh4pifnweSAUggcMP9PFwpF?=
- =?us-ascii?Q?r8RY+pJRvOpJKEPRf/eLsmVOcWye6q0M/L7aE0mMhl842ccLYnZ4yFBlBkLJ?=
- =?us-ascii?Q?nCcjrwvwZ8TcfCJczJsg/ZQ0IJI5yCnsZ1vB4H7MnTp2t6PDaR8C5ebWvVp+?=
- =?us-ascii?Q?pJ4+ZbXk9LWb4q5qOx6/WLw5O3wea6R8JJ70pVoVUoNFilHFKQy3sMRYuEB8?=
- =?us-ascii?Q?wa4MlWGplTvQ3YorEoC0VhTahnHZ2hm8mmittboYjTXbNKdQ2048B1e3FbUR?=
- =?us-ascii?Q?tPozwQ=3D=3D?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e5edb4d-a475-4939-9754-08d9dcfca697
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR08MB6737.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2022 16:39:53.9312
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eaNHJdhqdHhU7MCPBqA+keiD3Gcx6+0j87tSUVNu9ZLVS+vVA3IADB6qd0PIAb4x4vmN7yJF7RZ6dg6k6SUyOkhM4We4yS3LTHAK7M8ajH8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3348
+References: <87ee57c8fu.fsf@turner.link> <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
+ <87a6ftk9qy.fsf@dmarc-none.turner.link> <87zgnp96a4.fsf@turner.link> <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
+In-Reply-To: <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
+From:   Alex Deucher <alexdeucher@gmail.com>
+Date:   Fri, 21 Jan 2022 11:45:43 -0500
+Message-ID: <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
+Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
+ PCI-passed-through to Windows VM
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     James Turner <linuxkernel.foss@dmarc-none.turner.link>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Lijo Lazar <lijo.lazar@amd.com>, regressions@lists.linux.dev,
+        kvm@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+On Fri, Jan 21, 2022 at 3:35 AM Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
+>
+> Hi, this is your Linux kernel regression tracker speaking.
+>
+> On 21.01.22 03:13, James Turner wrote:
+> >
+> > I finished the bisection (log below). The issue was introduced in
+> > f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)").
+>
+> FWIW, that was:
+>
+> > drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)
+> > They are global ACPI methods, so maybe the structures
+> > global in the driver. This simplified a number of things
+> > in the handling of these methods.
+> >
+> > v2: reset the handle if verify interface fails (Lijo)
+> > v3: fix compilation when ACPI is not defined.
+> >
+> > Reviewed-by: Lijo Lazar <lijo.lazar@amd.com>
+> > Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+>
+> In that case we need to get those two and the maintainers for the driver
+> involved by addressing them with this mail. And to make it easy for them
+> here is a link and a quote from the original report:
+>
+> https://lore.kernel.org/all/87ee57c8fu.fsf@turner.link/
 
-Introducing new QMP command 'query-x86-cpuid'. This command can be
-used to get virtualized cpu model info generated by QEMU during VM
-initialization in the form of cpuid representation.
+Are you ever loading the amdgpu driver in your tests?  If not, I don't
+see how this patch would affect anything as the driver code would
+never have executed.  It would appear not based on your example.
 
-Diving into more details about virtual CPU generation: QEMU first
-parses '-cpu' command line option. From there it takes the name of the
-model as the basis for feature set of the new virtual CPU. After that
-it uses trailing '-cpu' options, that state if additional cpu features
-should be present on the virtual CPU or excluded from it (tokens
-'+'/'-' or '=on'/'=off').
-After that QEMU checks if the host's cpu can actually support the
-derived feature set and applies host limitations to it.
-After this initialization procedure, virtual CPU has it's model and
-vendor names, and a working feature set and is ready for
-identification instructions such as CPUID.
+Alex
 
-To learn exactly how virtual CPU is presented to the guest machine via
-CPUID instruction, new QMP command can be used. By calling
-'query-x86-cpuid' command, one can get a full listing of all CPUID
-leaves with subleaves which are supported by the initialized virtual
-CPU.
-
-Other than debug, the command is useful in cases when we would like to
-utilize QEMU's virtual CPU initialization routines and put the
-retrieved values into kernel CPUID overriding mechanics for more
-precise control over how various processes perceive its underlying
-hardware with container processes as a good example.
-
-The command is specific to x86. It is currenly only implemented for
-KVM acceleator.
-
-Output format:
-The output is a plain list of leaf/subleaf argument combinations, that
-return 4 words in registers EAX, EBX, ECX, EDX.
-
-Use example:
-qmp_request: {
-  "execute": "x-query-x86-cpuid"
-}
-
-qmp_response: {
-  "return": [
-    {
-      "eax": 1073741825,
-      "edx": 77,
-      "in-eax": 1073741824,
-      "ecx": 1447775574,
-      "ebx": 1263359563
-    },
-    {
-      "eax": 16777339,
-      "edx": 0,
-      "in-eax": 1073741825,
-      "ecx": 0,
-      "ebx": 0
-    },
-    {
-      "eax": 13,
-      "edx": 1231384169,
-      "in-eax": 0,
-      "ecx": 1818588270,
-      "ebx": 1970169159
-    },
-    {
-      "eax": 198354,
-      "edx": 126614527,
-      "in-eax": 1,
-      "ecx": 2176328193,
-      "ebx": 2048
-    },
-    ....
-    {
-      "eax": 12328,
-      "edx": 0,
-      "in-eax": 2147483656,
-      "ecx": 0,
-      "ebx": 0
-    }
-  ]
-}
-
-Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
-
-v17: wrap long lines, add QAPI feature 'unstable' [Markus]
-
- qapi/machine-target.json   | 50 ++++++++++++++++++++++++++++++++++++++
- softmmu/cpus.c             |  2 +-
- target/i386/kvm/kvm-stub.c |  9 +++++++
- target/i386/kvm/kvm.c      | 44 +++++++++++++++++++++++++++++++++
- tests/qtest/qmp-cmd-test.c |  1 +
- 5 files changed, 105 insertions(+), 1 deletion(-)
-
-diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-index f5ec4bc172..1568e17e74 100644
---- a/qapi/machine-target.json
-+++ b/qapi/machine-target.json
-@@ -341,3 +341,53 @@
-                    'TARGET_I386',
-                    'TARGET_S390X',
-                    'TARGET_MIPS' ] } }
-+
-+##
-+# @CpuidEntry:
-+#
-+# A single entry of a CPUID response.
-+#
-+# One entry holds full set of information (leaf) returned to the guest
-+# in response to it calling a CPUID instruction with eax, ecx used as
-+# the arguments to that instruction. ecx is an optional argument as
-+# not all of the leaves support it.
-+#
-+# @in-eax: CPUID argument in eax
-+# @in-ecx: CPUID argument in ecx
-+# @eax: CPUID result in eax
-+# @ebx: CPUID result in ebx
-+# @ecx: CPUID result in ecx
-+# @edx: CPUID result in edx
-+#
-+# Since: 7.0
-+##
-+{ 'struct': 'CpuidEntry',
-+  'data': { 'in-eax' : 'uint32',
-+            '*in-ecx' : 'uint32',
-+            'eax' : 'uint32',
-+            'ebx' : 'uint32',
-+            'ecx' : 'uint32',
-+            'edx' : 'uint32'
-+          },
-+  'if': 'TARGET_I386' }
-+
-+##
-+# @x-query-x86-cpuid:
-+#
-+# Returns raw data from the emulated CPUID table for the first VCPU.
-+# The emulated CPUID table defines the response to the CPUID
-+# instruction when executed by the guest operating system.
-+#
-+# Features:
-+# @unstable: This command is experimental.
-+#
-+# Returns: a list of CpuidEntry. Returns error when qemu is configured
-+#          with --disable-kvm flag or if qemu is run with any other
-+#          accelerator than KVM.
-+#
-+# Since: 7.0
-+##
-+{ 'command': 'x-query-x86-cpuid',
-+  'returns': [ 'CpuidEntry' ],
-+  'if': 'TARGET_I386',
-+  'features': [ 'unstable' ] }
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index 23bca46b07..33045bf45c 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -129,7 +129,7 @@ void hw_error(const char *fmt, ...)
- /*
-  * The chosen accelerator is supposed to register this.
-  */
--static const AccelOpsClass *cpus_accel;
-+const AccelOpsClass *cpus_accel;
- 
- void cpu_synchronize_all_states(void)
- {
-diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
-index f6e7e4466e..71631e560d 100644
---- a/target/i386/kvm/kvm-stub.c
-+++ b/target/i386/kvm/kvm-stub.c
-@@ -12,6 +12,7 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "kvm_i386.h"
-+#include "qapi/error.h"
- 
- #ifndef __OPTIMIZE__
- bool kvm_has_smm(void)
-@@ -44,3 +45,11 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
- {
-     abort();
- }
-+
-+CpuidEntryList *qmp_x_query_x86_cpuid(Error **errp);
-+
-+CpuidEntryList *qmp_x_query_x86_cpuid(Error **errp)
-+{
-+    error_setg(errp, "Not implemented in --disable-kvm configuration");
-+    return NULL;
-+}
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 2c8feb4a6f..eb73869039 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -20,11 +20,13 @@
- 
- #include <linux/kvm.h>
- #include "standard-headers/asm-x86/kvm_para.h"
-+#include "qapi/qapi-commands-machine-target.h"
- 
- #include "cpu.h"
- #include "host-cpu.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/hw_accel.h"
-+#include "sysemu/accel-ops.h"
- #include "sysemu/kvm_int.h"
- #include "sysemu/runstate.h"
- #include "kvm_i386.h"
-@@ -1565,6 +1567,44 @@ static Error *invtsc_mig_blocker;
- 
- #define KVM_MAX_CPUID_ENTRIES  100
- 
-+struct kvm_cpuid2 *cpuid_data_cached;
-+
-+
-+CpuidEntryList *qmp_x_query_x86_cpuid(Error **errp)
-+{
-+    int i;
-+    struct kvm_cpuid_entry2 *kvm_entry;
-+    CpuidEntryList *head = NULL, **tail = &head;
-+    CpuidEntry *entry;
-+
-+    if (!kvm_enabled()) {
-+        error_setg(errp, "Not implemented for non-kvm accel");
-+        return NULL;
-+    }
-+
-+    if (!cpuid_data_cached) {
-+        error_setg(errp, "VCPU was not initialized yet");
-+        return NULL;
-+    }
-+
-+    for (i = 0; i < cpuid_data_cached->nent; ++i) {
-+        kvm_entry = &cpuid_data_cached->entries[i];
-+        entry = g_malloc0(sizeof(*entry));
-+        entry->in_eax = kvm_entry->function;
-+        if (kvm_entry->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) {
-+            entry->in_ecx = kvm_entry->index;
-+            entry->has_in_ecx = true;
-+        }
-+        entry->eax = kvm_entry->eax;
-+        entry->ebx = kvm_entry->ebx;
-+        entry->ecx = kvm_entry->ecx;
-+        entry->edx = kvm_entry->edx;
-+        QAPI_LIST_APPEND(tail, entry);
-+    }
-+
-+    return head;
-+}
-+
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     struct {
-@@ -1981,6 +2021,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     if (r) {
-         goto fail;
-     }
-+    if (!cpuid_data_cached) {
-+        cpuid_data_cached = g_malloc0(sizeof(cpuid_data));
-+        memcpy(cpuid_data_cached, &cpuid_data, sizeof(cpuid_data));
-+    }
- 
-     if (has_xsave) {
-         env->xsave_buf_len = sizeof(struct kvm_xsave);
-diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-index 7f103ea3fd..94d9184a84 100644
---- a/tests/qtest/qmp-cmd-test.c
-+++ b/tests/qtest/qmp-cmd-test.c
-@@ -54,6 +54,7 @@ static int query_error_class(const char *cmd)
-         /* Only valid with accel=tcg */
-         { "x-query-jit", ERROR_CLASS_GENERIC_ERROR },
-         { "x-query-opcount", ERROR_CLASS_GENERIC_ERROR },
-+        { "x-query-x86-cpuid", ERROR_CLASS_GENERIC_ERROR },
-         { NULL, -1 }
-     };
-     int i;
--- 
-2.31.1
-
+>
+> ```
+> > Hi,
+> >
+> > With newer kernels, starting with the v5.14 series, when using a MS
+> > Windows 10 guest VM with PCI passthrough of an AMD Radeon Pro WX 3200
+> > discrete GPU, the passed-through GPU will not run above 501 MHz, even
+> > when it is under 100% load and well below the temperature limit. As a
+> > result, GPU-intensive software (such as video games) runs unusably
+> > slowly in the VM.
+> >
+> > In contrast, with older kernels, the passed-through GPU runs at up to
+> > 1295 MHz (the correct hardware limit), so GPU-intensive software runs at
+> > a reasonable speed in the VM.
+> >
+> > I've confirmed that the issue exists with the following kernel versions:
+> >
+> > - v5.16
+> > - v5.14
+> > - v5.14-rc1
+> >
+> > The issue does not exist with the following kernels:
+> >
+> > - v5.13
+> > - various packaged (non-vanilla) 5.10.* Arch Linux `linux-lts` kernels
+> >
+> > So, the issue was introduced between v5.13 and v5.14-rc1. I'm willing to
+> > bisect the commit history to narrow it down further, if that would be
+> > helpful.
+> >
+> > The configuration details and test results are provided below. In
+> > summary, for the kernels with this issue, the GPU core stays at a
+> > constant 0.8 V, the GPU core clock ranges from 214 MHz to 501 MHz, and
+> > the GPU memory stays at a constant 625 MHz, in the VM. For the correctly
+> > working kernels, the GPU core ranges from 0.85 V to 1.0 V, the GPU core
+> > clock ranges from 214 MHz to 1295 MHz, and the GPU memory stays at 1500
+> > MHz, in the VM.
+> >
+> > Please let me know if additional information would be helpful.
+> >
+> > Regards,
+> > James Turner
+> >
+> > # Configuration Details
+> >
+> > Hardware:
+> >
+> > - Dell Precision 7540 laptop
+> > - CPU: Intel Core i7-9750H (x86-64)
+> > - Discrete GPU: AMD Radeon Pro WX 3200
+> > - The internal display is connected to the integrated GPU, and external
+> >   displays are connected to the discrete GPU.
+> >
+> > Software:
+> >
+> > - KVM host: Arch Linux
+> >   - self-built vanilla kernel (built using Arch Linux `PKGBUILD`
+> >     modified to use vanilla kernel sources from git.kernel.org)
+> >   - libvirt 1:7.10.0-2
+> >   - qemu 6.2.0-2
+> >
+> > - KVM guest: Windows 10
+> >   - GPU driver: Radeon Pro Software Version 21.Q3 (Note that I also
+> >     experienced this issue with the 20.Q4 driver, using packaged
+> >     (non-vanilla) Arch Linux kernels on the host, before updating to the
+> >     21.Q3 driver.)
+> >
+> > Kernel config:
+> >
+> > - For v5.13, v5.14-rc1, and v5.14, I used
+> >   https://github.com/archlinux/svntogit-packages/blob/89c24952adbfa645d9e1a6f12c572929f7e4e3c7/trunk/config
+> >   (The build script ran `make olddefconfig` on that config file.)
+> >
+> > - For v5.16, I used
+> >   https://github.com/archlinux/svntogit-packages/blob/94f84e1ad8a530e54aa34cadbaa76e8dcc439d10/trunk/config
+> >   (The build script ran `make olddefconfig` on that config file.)
+> >
+> > I set up the VM with PCI passthrough according to the instructions at
+> > https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF
+> >
+> > I'm passing through the following PCI devices to the VM, as listed by
+> > `lspci -D -nn`:
+> >
+> >   0000:01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
+> >   0000:01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
+> >
+> > The host kernel command line includes the following relevant options:
+> >
+> >   intel_iommu=on vfio-pci.ids=1002:6981,1002:aae0
+> >
+> > to enable IOMMU and bind the `vfio-pci` driver to the PCI devices.
+> >
+> > My `/etc/mkinitcpio.conf` includes the following line:
+> >
+> >   MODULES=(vfio_pci vfio vfio_iommu_type1 vfio_virqfd i915 amdgpu)
+> >
+> > to load `vfio-pci` before the graphics drivers. (Note that removing
+> > `i915 amdgpu` has no effect on this issue.)
+> >
+> > I'm using libvirt to manage the VM. The relevant portions of the XML
+> > file are:
+> >
+> >   <hostdev mode="subsystem" type="pci" managed="yes">
+> >     <source>
+> >       <address domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
+> >     </source>
+> >     <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
+> >   </hostdev>
+> >   <hostdev mode="subsystem" type="pci" managed="yes">
+> >     <source>
+> >       <address domain="0x0000" bus="0x01" slot="0x00" function="0x1"/>
+> >     </source>
+> >     <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
+> >   </hostdev>
+> >
+> > # Test Results
+> >
+> > For testing, I used the following procedure:
+> >
+> > 1. Boot the host machine and log in.
+> >
+> > 2. Run the following commands to gather information. For all the tests,
+> >    the output was identical.
+> >
+> >    - `cat /proc/sys/kernel/tainted` printed:
+> >
+> >      0
+> >
+> >    - `hostnamectl | grep "Operating System"` printed:
+> >
+> >      Operating System: Arch Linux
+> >
+> >    - `lspci -nnk -d 1002:6981` printed
+> >
+> >      01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Lexa XT [Radeon PRO WX 3200] [1002:6981]
+> >       Subsystem: Dell Device [1028:0926]
+> >       Kernel driver in use: vfio-pci
+> >       Kernel modules: amdgpu
+> >
+> >    - `lspci -nnk -d 1002:aae0` printed
+> >
+> >      01:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
+> >       Subsystem: Dell Device [1028:0926]
+> >       Kernel driver in use: vfio-pci
+> >       Kernel modules: snd_hda_intel
+> >
+> >    - `sudo dmesg | grep -i vfio` printed the kernel command line and the
+> >      following messages:
+> >
+> >      VFIO - User Level meta-driver version: 0.3
+> >      vfio-pci 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
+> >      vfio_pci: add [1002:6981[ffffffff:ffffffff]] class 0x000000/00000000
+> >      vfio_pci: add [1002:aae0[ffffffff:ffffffff]] class 0x000000/00000000
+> >      vfio-pci 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
+> >
+> > 3. Start the Windows VM using libvirt and log in. Record sensor
+> >    information.
+> >
+> > 4. Run a graphically-intensive video game to put the GPU under load.
+> >    Record sensor information.
+> >
+> > 5. Stop the game. Record sensor information.
+> >
+> > 6. Shut down the VM. Save the output of `sudo dmesg`.
+> >
+> > I compared the `sudo dmesg` output for v5.13 and v5.14-rc1 and didn't
+> > see any relevant differences.
+> >
+> > Note that the issue occurs only within the guest VM. When I'm not using
+> > a VM (after removing `vfio-pci.ids=1002:6981,1002:aae0` from the kernel
+> > command line so that the PCI devices are bound to their normal `amdgpu`
+> > and `snd_hda_intel` drivers instead of the `vfio-pci` driver), the GPU
+> > operates correctly on the host.
+> >
+> > ## Linux v5.16 (issue present)
+> >
+> > $ cat /proc/version
+> > Linux version 5.16.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 01:51:08 +0000
+> >
+> > Before running the game:
+> >
+> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 53.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > While running the game:
+> >
+> > - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > After stopping the game:
+> >
+> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 51.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > ## Linux v5.14 (issue present)
+> >
+> > $ cat /proc/version
+> > Linux version 5.14.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 03:19:35 +0000
+> >
+> > Before running the game:
+> >
+> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 50.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > While running the game:
+> >
+> > - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > After stopping the game:
+> >
+> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 49.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > ## Linux v5.14-rc1 (issue present)
+> >
+> > $ cat /proc/version
+> > Linux version 5.14.0-rc1-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 18:31:35 +0000
+> >
+> > Before running the game:
+> >
+> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 50.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > While running the game:
+> >
+> > - GPU core: 501.0 MHz, 0.800 V, 100.0% load, 54.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > After stopping the game:
+> >
+> > - GPU core: 214.0 MHz, 0.800 V, 0.0% load, 49.0 degC
+> > - GPU memory: 625.0 MHz
+> >
+> > ## Linux v5.13 (works correctly, issue not present)
+> >
+> > $ cat /proc/version
+> > Linux version 5.13.0-1 (linux@archlinux) (gcc (GCC) 11.1.0, GNU ld (GNU Binutils) 2.36.1) #1 SMP PREEMPT Sun, 16 Jan 2022 02:39:18 +0000
+> >
+> > Before running the game:
+> >
+> > - GPU core: 214.0 MHz, 0.850 V, 0.0% load, 55.0 degC
+> > - GPU memory: 1500.0 MHz
+> >
+> > While running the game:
+> >
+> > - GPU core: 1295.0 MHz, 1.000 V, 100.0% load, 67.0 degC
+> > - GPU memory: 1500.0 MHz
+> >
+> > After stopping the game:
+> >
+> > - GPU core: 214.0 MHz, 0.850 V, 0.0% load, 52.0 degC
+> > - GPU memory: 1500.0 MHz
+>
+> ```
+>
+> Ciao, Thorsten (wearing his 'Linux kernel regression tracker' hat)
+>
+> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
+> on my table. I can only look briefly into most of them. Unfortunately
+> therefore I sometimes will get things wrong or miss something important.
+> I hope that's not the case here; if you think it is, don't hesitate to
+> tell me about it in a public reply, that's in everyone's interest.
+>
+> BTW, I have no personal interest in this issue, which is tracked using
+> regzbot, my Linux kernel regression tracking bot
+> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
+> this mail to get things rolling again and hence don't need to be CC on
+> all further activities wrt to this regression.
+>
+> #regzbot introduced f9b7f3703ff9
+> #regzbot title drm: amdgpu: Too-low frequency limit for AMD GPU
+> PCI-passed-through to Windows VM
+>
+>
+> > Would any additional information be helpful?
+> >
+> > git bisect start
+> > # bad: [e73f0f0ee7541171d89f2e2491130c7771ba58d3] Linux 5.14-rc1
+> > git bisect bad e73f0f0ee7541171d89f2e2491130c7771ba58d3
+> > # good: [62fb9874f5da54fdb243003b386128037319b219] Linux 5.13
+> > git bisect good 62fb9874f5da54fdb243003b386128037319b219
+> > # bad: [e058a84bfddc42ba356a2316f2cf1141974625c9] Merge tag 'drm-next-2021-07-01' of git://anongit.freedesktop.org/drm/drm
+> > git bisect bad e058a84bfddc42ba356a2316f2cf1141974625c9
+> > # good: [a6eaf3850cb171c328a8b0db6d3c79286a1eba9d] Merge tag 'sched-urgent-2021-06-30' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+> > git bisect good a6eaf3850cb171c328a8b0db6d3c79286a1eba9d
+> > # good: [007b312c6f294770de01fbc0643610145012d244] Merge tag 'mac80211-next-for-net-next-2021-06-25' of git://git.kernel.org/pub/scm/linux/kernel/git/jberg/mac80211-next
+> > git bisect good 007b312c6f294770de01fbc0643610145012d244
+> > # bad: [18703923a66aecf6f7ded0e16d22eb412ddae72f] drm/amdgpu: Fix incorrect register offsets for Sienna Cichlid
+> > git bisect bad 18703923a66aecf6f7ded0e16d22eb412ddae72f
+> > # good: [c99c4d0ca57c978dcc2a2f41ab8449684ea154cc] Merge tag 'amd-drm-next-5.14-2021-05-19' of https://gitlab.freedesktop.org/agd5f/linux into drm-next
+> > git bisect good c99c4d0ca57c978dcc2a2f41ab8449684ea154cc
+> > # good: [43ed3c6c786d996a264fcde68dbb36df6f03b965] Merge tag 'drm-misc-next-2021-06-01' of git://anongit.freedesktop.org/drm/drm-misc into drm-next
+> > git bisect good 43ed3c6c786d996a264fcde68dbb36df6f03b965
+> > # bad: [050cd3d616d96c3a04f4877842a391c0a4fdcc7a] drm/amd/display: Add support for SURFACE_PIXEL_FORMAT_GRPH_ABGR16161616.
+> > git bisect bad 050cd3d616d96c3a04f4877842a391c0a4fdcc7a
+> > # good: [f43ae2d1806c2b8a0934cb4acddd3cf3750d10f8] drm/amdgpu: Fix inconsistent indenting
+> > git bisect good f43ae2d1806c2b8a0934cb4acddd3cf3750d10f8
+> > # good: [6566cae7aef30da8833f1fa0eb854baf33b96676] drm/amd/display: fix odm scaling
+> > git bisect good 6566cae7aef30da8833f1fa0eb854baf33b96676
+> > # good: [5ac1dd89df549648b67f4d5e3a01b2d653914c55] drm/amd/display/dc/dce/dmub_outbox: Convert over to kernel-doc
+> > git bisect good 5ac1dd89df549648b67f4d5e3a01b2d653914c55
+> > # good: [a76eb7d30f700e5bdecc72d88d2226d137b11f74] drm/amd/display/dc/dce110/dce110_hw_sequencer: Include header containing our prototypes
+> > git bisect good a76eb7d30f700e5bdecc72d88d2226d137b11f74
+> > # good: [dd1d82c04e111b5a864638ede8965db2fe6d8653] drm/amdgpu/swsmu/aldebaran: fix check in is_dpm_running
+> > git bisect good dd1d82c04e111b5a864638ede8965db2fe6d8653
+> > # bad: [f9b7f3703ff97768a8dfabd42bdb107681f1da22] drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)
+> > git bisect bad f9b7f3703ff97768a8dfabd42bdb107681f1da22
+> > # good: [f1688bd69ec4b07eda1657ff953daebce7cfabf6] drm/amd/amdgpu:save psp ring wptr to avoid attack
+> > git bisect good f1688bd69ec4b07eda1657ff953daebce7cfabf6
+> > # first bad commit: [f9b7f3703ff97768a8dfabd42bdb107681f1da22] drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)
+> >
+> > James
+> >
