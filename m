@@ -2,138 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0CED496452
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 18:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E47C4964AF
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 19:00:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382039AbiAURnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 12:43:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60570 "EHLO
+        id S242591AbiAUSAG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 13:00:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381001AbiAURmf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 12:42:35 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDE1C061760
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 09:41:33 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id w190so3330052pfw.7
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 09:41:33 -0800 (PST)
+        with ESMTP id S229560AbiAUSAF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 13:00:05 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8636DC06173B
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 10:00:05 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id f8so8746896pgf.8
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 10:00:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=A08Ccraan/AKDZfYkDQ9mm3WlR3VsKmTkfr8toIHlHM=;
-        b=SGlFOIc1sMpla6BJvpx4/MxlT+28zl3a04jhvp9QYpl3fcIV5eG2dstIg8QMh4Skqk
-         j85T224IZJnztnH97jgYW8ZTn4UJmNlUz0+pXo0DPZjflSbnBWs/DNAdv6/lOsvCMm97
-         txFAE6oxn9ua3mqQbuzJTBCEKzQl6A/fjDuZPGbjaQUemCkJNSrkDEE6Hxz7iZmaEC1k
-         NvbGw7HxfULDHyJITSJmX3gmsRbnHiJW4KcLdx5BnKH4O3Lj/ozACUpRXHDYg4GxekaE
-         ZFkmLA5iC49F5xOeXYvO92wTGORrqtm+z7fO0VOk/RDRrEWGHOZKp+te7Z2N7WjQOx3q
-         vZIQ==
+        bh=v85lRG8sRjq/kx7Rqoj4Hif1SSh/rvErnjKWtx8VBVU=;
+        b=Bz/IN/yNwGc6AybFEUD4oLN+Opm0CnszF8TpOnZWWKUhvWi6ePj3KhxE93gEoMBX+a
+         y+04s9Eot40MWi1zDTQfSi3Rh8hghcCCBDEYGbR1FlKD39NqzDGiiHPOMctx6dEqK6u/
+         oYEbBB1CiNTL0vIz2xzKdcqNpa/Vi+lJcA6DWuThCFcUdP4Q5ojhlhR4pbufv8J33O89
+         Qin2PxHOuZs0qXXyXFl7B+U+FQUuC+5RGCZfzOTO2zd5TKREZZbU6Oq4ovhOJtrMk5tj
+         qYukN9K/HfKwv1KlVQl7VWpe1mDazWdQUwvH0oAHyfWftAM/J6w4ER0IGqwA5hza+5Uc
+         CruQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=A08Ccraan/AKDZfYkDQ9mm3WlR3VsKmTkfr8toIHlHM=;
-        b=vFTChMM/i5lCcHzIDzg/ARUWDEYvrTWoC0B2Y3RVB5h57NsyFBPt8dU6rQZeMQ9/kI
-         vbOpKmfHMZJ5TkACgSAiWNwbyIU0hGG7FdGKAr8XamSWCE7pNLwiy3fpt40NpldVhto/
-         WntWVCPkrPRnlpjnrzhd6d8ZNNeRf2uGi0z4DBBQe9adtPlXwEZz0pcn3nVeQX4nich0
-         waYUnNpGYeocmo5sDT86OXnK9tabaZMCK4zJBk5vy14UZGWUN3Sk5XDUxmh2o96UVy3O
-         Scxh9RxVvy8nuAw5Q5Qh2nMnexssBTWfamzeK7Bsr1miwGRmYvIf+56+qSM8D40d2Ez5
-         CaSw==
-X-Gm-Message-State: AOAM530lQy9t6FwehJp9t2J1JCfSsk1NmZSXys3p46tfcYBZLZ9VzQBI
-        uLBVNRxvyWxcWmJlg55deouyLg==
-X-Google-Smtp-Source: ABdhPJzSXXvOYYHgRVPijDxuwCBBXp7YZtFak1w6xBQ8ACTqju/uw6i23EnKaSSYWU+nGZLjHwaw7w==
-X-Received: by 2002:a63:f807:: with SMTP id n7mr3761498pgh.162.1642786892851;
-        Fri, 21 Jan 2022 09:41:32 -0800 (PST)
+        bh=v85lRG8sRjq/kx7Rqoj4Hif1SSh/rvErnjKWtx8VBVU=;
+        b=Qz5ENS31wcj+/+LGjH62SP1kS7Hncn6f+fM4HecqxOA9RpxE99T1Y1G1aLkYSUbqOx
+         ZJ0EPNv94+Ydl5OoleB4/4ZIq6DPxu/rtfqc7Rpa0gaBmMhZIANccBKnhEmHSbK7IIuB
+         5doTS0MXgyjckqJRwIz0SJFxp5xWO0Pt3JxKA45rDVZ1ZyyJPoOoZ7mSZ83BkgkKT5I7
+         +Nf+GGwZiNIVtGty2zCZMnV2WxFznclcWfBjem8MiSYPZXrMWaLQlErwtWUDdgEAQzDp
+         bpUZvE8Khio0+w21abwBSSoMSJwf2VVetUHRsxrToR1XzkSmN5kGnfP6IMeXs33o4YEq
+         L0hg==
+X-Gm-Message-State: AOAM531AXEsH5rj3LKCfpP7hi+SiOc29RYLz86zW8MYQWAvHFzZqMyDw
+        dFlHsmMj6guxArUNDynraJzMxJA2gBjaSA==
+X-Google-Smtp-Source: ABdhPJzDyG6N0Pr+p65ACCNXzwTBmJ3hMoD3Qm0w3ugeYZHJkzBUWTuTFN2BMRO848R56tXX+GUyYg==
+X-Received: by 2002:a63:6cc5:: with SMTP id h188mr3636254pgc.401.1642788004763;
+        Fri, 21 Jan 2022 10:00:04 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p64sm5361656pga.13.2022.01.21.09.41.31
+        by smtp.gmail.com with ESMTPSA id o5sm7447321pfk.172.2022.01.21.10.00.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jan 2022 09:41:32 -0800 (PST)
-Date:   Fri, 21 Jan 2022 17:41:28 +0000
+        Fri, 21 Jan 2022 10:00:04 -0800 (PST)
+Date:   Fri, 21 Jan 2022 18:00:00 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Aaron Lewis <aaronlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [kvm-unit-tests PATCH v4 2/3] x86: Add support for running a
- nested guest multiple times in one test
-Message-ID: <YerwSEIvpVs9un23@google.com>
+Subject: Re: [kvm-unit-tests PATCH v4 3/3] x86: Add test coverage for
+ nested_vmx_reflect_vmexit() testing
+Message-ID: <Yer0oCazOfKXs4t3@google.com>
 References: <20220121155855.213852-1-aaronlewis@google.com>
- <20220121155855.213852-3-aaronlewis@google.com>
+ <20220121155855.213852-4-aaronlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220121155855.213852-3-aaronlewis@google.com>
+In-Reply-To: <20220121155855.213852-4-aaronlewis@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Jan 21, 2022, Aaron Lewis wrote:
-> KUT has a limit of only being able to run one nested guest per vmx test.
-> This is limiting and not necessary.  Add support for allowing a test to
-> run guest code multiple times.
+> Add a framework and test cases to ensure exceptions that occur in L2 are
+> forwarded to the correct place by nested_vmx_reflect_vmexit().
+> 
+> Add testing for exceptions: #GP, #UD, #DE, #DB, #BP, and #AC.
 > 
 > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Change-Id: I0196071571671f06165983b5055ed7382fa3e1fb
+
+Don't forget to strip the Change-Id before posting.
+
 > ---
->  x86/vmx.c | 24 ++++++++++++++++++++++--
->  x86/vmx.h |  2 ++
->  2 files changed, 24 insertions(+), 2 deletions(-)
+>  x86/unittests.cfg |   9 +++-
+>  x86/vmx_tests.c   | 129 ++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 137 insertions(+), 1 deletion(-)
 > 
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index f4fbb94..51eed8c 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -1884,15 +1884,35 @@ void test_add_teardown(test_teardown_func func, void *data)
->  	step->data = data;
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 9a70ba3..6ec7a98 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -288,7 +288,7 @@ arch = i386
+>  
+>  [vmx]
+>  file = vmx.flat
+> -extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test -vmx_pf_exception_test -vmx_pf_no_vpid_test -vmx_pf_invvpid_test -vmx_pf_vpid_test"
+> +extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test -vmx_pf_exception_test -vmx_pf_no_vpid_test -vmx_pf_invvpid_test -vmx_pf_vpid_test -vmx_exception_test"
+>  arch = x86_64
+>  groups = vmx
+>  
+> @@ -390,6 +390,13 @@ arch = x86_64
+>  groups = vmx nested_exception
+>  check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
+>  
+> +[vmx_exception_test]
+> +file = vmx.flat
+> +extra_params = -cpu max,+vmx -append vmx_exception_test
+> +arch = x86_64
+> +groups = vmx nested_exception
+> +timeout = 10
+
+Leave this out (for now), including it in the main "vmx" test is sufficient.
+I'm definitely in favor of splitting up the "vmx" behemoth, but it's probably
+best to do that in a separate commit/series so that we can waste time bikeshedding
+over how to organize things :-)
+
+> +
+>  [debug]
+>  file = debug.flat
+>  arch = x86_64
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 3d57ed6..af6f33b 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -21,6 +21,7 @@
+>  #include "smp.h"
+>  #include "delay.h"
+>  #include "access.h"
+> +#include "x86/usermode.h"
+>  
+>  #define VPID_CAP_INVVPID_TYPES_SHIFT 40
+>  
+> @@ -10701,6 +10702,133 @@ static void vmx_pf_vpid_test(void)
+>  	__vmx_pf_vpid_test(invalidate_tlb_new_vpid, 1);
 >  }
 >  
-> +static void __test_set_guest(test_guest_func func)
+> +static void vmx_l2_gp_test(void)
 > +{
-> +	assert(current->v2);
-> +	v2_guest_main = func;
+> +	*(volatile u64 *)NONCANONICAL = 0;
 > +}
 > +
->  /*
->   * Set the target of the first enter_guest call. Can only be called once per
->   * test. Must be called before first enter_guest call.
->   */
->  void test_set_guest(test_guest_func func)
->  {
-> -	assert(current->v2);
->  	TEST_ASSERT_MSG(!v2_guest_main, "Already set guest func.");
-> -	v2_guest_main = func;
-> +	__test_set_guest(func);
+> +static void vmx_l2_ud_test(void)
+> +{
+> +	asm volatile ("ud2");
 > +}
 > +
-> +/*
-> + * Set the target of the enter_guest call and reset the RIP so 'func' will
-> + * start from the beginning.  This can be called multiple times per test.
-> + */
-> +void test_override_guest(test_guest_func func)
+> +static void vmx_l2_de_test(void)
 > +{
-> +	__test_set_guest(func);
-> +	init_vmcs_guest();
+> +	asm volatile (
+> +		"xor %%eax, %%eax\n\t"
+> +		"xor %%ebx, %%ebx\n\t"
+> +		"xor %%edx, %%edx\n\t"
+> +		"idiv %%ebx\n\t"
+> +		::: "eax", "ebx", "edx");
 > +}
 > +
-> +void test_set_guest_finished(void)
+> +static void vmx_l2_bp_test(void)
 > +{
-> +	guest_finished = 1;
+> +	asm volatile ("int3");
+> +}
+> +
+> +static void vmx_l2_db_test(void)
+> +{
+> +	write_rflags(read_rflags() | X86_EFLAGS_TF);
+> +}
+> +
+> +static uint64_t usermode_callback(void)
+> +{
+> +	/* Trigger an #AC by writing 8 bytes to a 4-byte aligned address. */
+> +	asm volatile(
+> +		"sub $0x10, %rsp\n\t"
+> +		"movq $0, 0x4(%rsp)\n\t"
+> +		"add $0x10, %rsp\n\t");
 
-Adding test_set_guest_finished() should be a separate commit.
+Sorry, didn't look closely at this before.  This can simply be:
 
->  }
->  
->  static void check_for_guest_termination(union exit_reason exit_reason)
-> diff --git a/x86/vmx.h b/x86/vmx.h
-> index 4423986..11cb665 100644
-> --- a/x86/vmx.h
-> +++ b/x86/vmx.h
-> @@ -1055,7 +1055,9 @@ void hypercall(u32 hypercall_no);
->  typedef void (*test_guest_func)(void);
->  typedef void (*test_teardown_func)(void *data);
->  void test_set_guest(test_guest_func func);
-> +void test_override_guest(test_guest_func func);
->  void test_add_teardown(test_teardown_func func, void *data);
->  void test_skip(const char *msg);
-> +void test_set_guest_finished(void);
->  
->  #endif
-> -- 
-> 2.35.0.rc0.227.g00780c9af4-goog
-> 
+	asm volatile("movq $0, 0x4(%rsp)\n\t");
+
+as the access is expected to fault.  Or if you want to be paranoid about not
+overwriting the stack:
+
+	asm volatile("movq $0, -0x4(%rsp)\n\t");
+
+It's probably also a good idea to call out that the stack is aligned on a 16-byte
+boundary.  If you were trying to guarnatee alignment, then you would need to use
+AND instead of SUB.  E.g.
+
+        asm volatile("push  %rbp\n\t"
+                     "movq  %rsp, %rbp\n\t"
+                     "andq  $-0x10, %rsp\n\t"
+                     "movq  $0, -0x4(%rsp)\n\t"
+                     "movq  %rbp, %rsp\n\t"
+                     "popq  %rbp\n\t");
+
+But my vote would be to just add a comment, I would consider it a test bug if the
+stack isn't properly aligned.
+
+> +
+> +	return 0;
+> +}
+> +
+> +static void vmx_l2_ac_test(void)
+> +{
+> +	bool raised_vector = false;
+
+Nit, hit_ac or so is more intuive.
+
+> +
+> +	write_cr0(read_cr0() | X86_CR0_AM);
+> +	write_rflags(read_rflags() | X86_EFLAGS_AC);
+> +
+> +	run_in_user(usermode_callback, AC_VECTOR, 0, 0, 0, 0, &raised_vector);
+> +	report(raised_vector, "#AC vector raised from usermode in L2");
+
+And continuing the nits, "Usermode #AC handled in L2".
+
+> +	vmcall();
+> +}
+> +
