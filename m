@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E40EB496829
-	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 00:19:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A90749682A
+	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 00:19:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232583AbiAUXTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 18:19:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51252 "EHLO
+        id S232691AbiAUXTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 18:19:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232230AbiAUXTB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 18:19:01 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6119C06173B
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 15:19:01 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id z20-20020a63d014000000b0034270332922so6377774pgf.1
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 15:19:01 -0800 (PST)
+        with ESMTP id S231706AbiAUXTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 18:19:03 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496E6C06173B
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 15:19:03 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id x11-20020aa7918b000000b004bd70cde509so6806820pfa.9
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 15:19:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=yksNPuWZyRhT13UzbVIIBoQZLyQViEwETeRZvr7mhpc=;
-        b=fpAT37swEd1+omeDehJGa5RXdjQmX+AN1nr6+iYu4otYXj8RaZIInTl6kWf8jYHYli
-         EqNHk3xlwjBWIiTxeuzkhaxgtSI6biS4W7bigs12zReZbjuBbr8rMZO4472xh+4jDp3P
-         SzlLvT/vv/0JgTRIhrsbwVdtL8X6+pp2wVahm6mQIOjFGBcPJPeNq7aPDJFvLFAoGW19
-         pGIIBsbya2Par2sjH0XvABqdz5t7ErsSAG5aWkZoP4HFrjgnGlbXfH5MygDsOqpI5upM
-         OXbKV6hWBxs0hHxicAOKBj7dUwxftOst6rOFH54Qjj0JMWZQuQa0ErNV9EPRiM2SSNVX
-         lYmQ==
+        bh=gAiYTlDomFLhaAbXuzA8ZYvN5J2ZcjhlHOIQldpQdgc=;
+        b=Og4Ep44yuXN9d66fJdhvAg1nF7Zj8m3uZPOQKZ4r7SCWqoDqBNDt1oOKxtxEGPIrhO
+         XUeI4xdvI07blXnRn7GT8ihCo//pjEkrVbZMr/E0Byz5JkOzkmYn2FglkXt1ofIxCToH
+         8hdjb5rKKG0UrvCDLR0z1z8zmGEAbKWFL5u3iOgjNVUpZEIzUcoVUKdIYMyAcmcxsHaX
+         UW5XLXsz7frDO1V77toQRPJ73qh3OF1OG15XiYxXVZYWTlIVFxIZa04BzePQzQjOx4MT
+         1MUbf6cfzNFgrVb9WiD6GvMGXpp0/6davryMzXok8r9JEb5D9VIUPTSbAvp76nerNOS4
+         KxCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=yksNPuWZyRhT13UzbVIIBoQZLyQViEwETeRZvr7mhpc=;
-        b=L3kLwbBHx2ZNUNAktgSESKngH/E/ADsHEQSxJx4T7NEki0Zf/Cr4zb3OjdmxGOOhHg
-         xcBzH/9LarJUcT05XAXDLGVpo42ftxsQm8+fwaSWoxYFPHofIXW1Xwq8YoDwD2KOEDLG
-         OITTlqECAkPKB/DNu3Cccnv4TO9yxaGOKlwV6FOxHcY3IZ5VFZTyAzy5ridaXPUafCV9
-         L5A9WY5BSNkIPVZWtHeH4LW13lKqu5kFthm2/tR9C/llfu81JNSGue/ypFMEjk3Rb5XQ
-         5NlPllLjePYq7ehoSry33lkh/MY9jOojw8YJ6qqJ6U1m4aynDPLE/gNK6nmwZqt/Tfl9
-         2z9w==
-X-Gm-Message-State: AOAM532gc/1qMSSHpY96f0oTusg7OLtUTb1vXltTFeH/mfXDJT56PEM3
-        YRJ/E04BsHNmvxWObnhD3N0yAuFalnI=
-X-Google-Smtp-Source: ABdhPJzcUdhxVZFKgm+Uhcbx6/C5bvruxo/XQ3/FuEQRT1vjpjyHQnHYz5bFSeFirkkJVbVGKV1eVGTeru8=
+        bh=gAiYTlDomFLhaAbXuzA8ZYvN5J2ZcjhlHOIQldpQdgc=;
+        b=zBEgrLpo1EYT8NIAvsHMJMKILyrXSWUvYcVtcacFuv+NwD4QGThaBgFUBSTWcebRHW
+         wnicU9EV0Dj6ZhnIlgJlRzs1tt7ejNJ4WmMsgo1sGX3rI9u01g5gHe43t0JtR+N7ZUfH
+         2r7s7AVjjzKjWi+tVMAxDdECqk3u8RxKnfsEmrumYvL3nrpaw4ThUr/mcSXOdlmvC8rU
+         jFfggKCH42HfFjIyfbNGlVwooqLhf8acOvHOXksAz1hiHcrnzMOqXAunEn3VKY6/sWiq
+         v9WZMJ5MHwt8XxnQbNdsZ3VOiaViyyd3D5RsmfDJbk1YkiwD7py1OZbOKSJeXeKN63yz
+         FjIA==
+X-Gm-Message-State: AOAM532Airzsgv1jsvRjtm82OlOS7+5JGFBptokNrVGu1M1u0sOE/8eq
+        7z8y6egTgv9lPs6IoAvOZiz7kgYWUXQ=
+X-Google-Smtp-Source: ABdhPJyeTjPeGuE0moS5ZpAMqO5AYy0YltiUbBUfXcTvsRfCUT//E3YISSM7FqX0iVI8mAqhAi70SR0o1aA=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1308:b0:4c5:e231:afd4 with SMTP id
- j8-20020a056a00130800b004c5e231afd4mr5762840pfu.34.1642807141259; Fri, 21 Jan
- 2022 15:19:01 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:7e82:b0:149:9714:699e with SMTP id
+ z2-20020a1709027e8200b001499714699emr5907598pla.66.1642807142820; Fri, 21 Jan
+ 2022 15:19:02 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jan 2022 23:18:47 +0000
+Date:   Fri, 21 Jan 2022 23:18:48 +0000
 In-Reply-To: <20220121231852.1439917-1-seanjc@google.com>
-Message-Id: <20220121231852.1439917-4-seanjc@google.com>
+Message-Id: <20220121231852.1439917-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220121231852.1439917-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [kvm-unit-tests PATCH 3/8] x86: smp: Replace spaces with tabs
+Subject: [kvm-unit-tests PATCH 4/8] x86: desc: Replace spaces with tabs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -68,206 +68,303 @@ No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/smp.c | 129 +++++++++++++++++++++++++-------------------------
- 1 file changed, 64 insertions(+), 65 deletions(-)
+ lib/x86/desc.c | 121 +++++++++++++++++++++++++------------------------
+ lib/x86/desc.h |  68 +++++++++++++--------------
+ 2 files changed, 95 insertions(+), 94 deletions(-)
 
-diff --git a/lib/x86/smp.c b/lib/x86/smp.c
-index 2ac0ef74..b24675fd 100644
---- a/lib/x86/smp.c
-+++ b/lib/x86/smp.c
-@@ -21,128 +21,127 @@ static atomic_t active_cpus;
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index 16b72562..25c5ac55 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -58,35 +58,35 @@ void do_handle_exception(struct ex_regs *regs);
  
- static __attribute__((used)) void ipi(void)
+ void set_idt_entry(int vec, void *addr, int dpl)
  {
--    void (*function)(void *data) = ipi_function;
--    void *data = ipi_data;
--    bool wait = ipi_wait;
-+	void (*function)(void *data) = ipi_function;
-+	void *data = ipi_data;
-+	bool wait = ipi_wait;
- 
--    if (!wait) {
--	ipi_done = 1;
--	apic_write(APIC_EOI, 0);
--    }
--    function(data);
--    atomic_dec(&active_cpus);
--    if (wait) {
--	ipi_done = 1;
--	apic_write(APIC_EOI, 0);
--    }
-+	if (!wait) {
-+		ipi_done = 1;
-+		apic_write(APIC_EOI, 0);
-+	}
-+	function(data);
-+	atomic_dec(&active_cpus);
-+	if (wait) {
-+		ipi_done = 1;
-+		apic_write(APIC_EOI, 0);
-+	}
- }
- 
- asm (
--     "ipi_entry: \n"
--     "   call ipi \n"
-+	 "ipi_entry: \n"
-+	 "   call ipi \n"
- #ifndef __x86_64__
--     "   iret"
-+	 "   iret"
- #else
--     "   iretq"
-+	 "   iretq"
+-    idt_entry_t *e = &boot_idt[vec];
+-    memset(e, 0, sizeof *e);
+-    e->offset0 = (unsigned long)addr;
+-    e->selector = read_cs();
+-    e->ist = 0;
+-    e->type = 14;
+-    e->dpl = dpl;
+-    e->p = 1;
+-    e->offset1 = (unsigned long)addr >> 16;
++	idt_entry_t *e = &boot_idt[vec];
++	memset(e, 0, sizeof *e);
++	e->offset0 = (unsigned long)addr;
++	e->selector = read_cs();
++	e->ist = 0;
++	e->type = 14;
++	e->dpl = dpl;
++	e->p = 1;
++	e->offset1 = (unsigned long)addr >> 16;
+ #ifdef __x86_64__
+-    e->offset2 = (unsigned long)addr >> 32;
++	e->offset2 = (unsigned long)addr >> 32;
  #endif
--     );
-+	 );
- 
- int cpu_count(void)
- {
--    return _cpu_count;
-+	return _cpu_count;
  }
  
- int smp_id(void)
+ void set_idt_dpl(int vec, u16 dpl)
  {
--    unsigned id;
-+	unsigned id;
- 
--    asm ("mov %%gs:0, %0" : "=r"(id));
--    return id;
-+	asm ("mov %%gs:0, %0" : "=r"(id));
-+	return id;
+-    idt_entry_t *e = &boot_idt[vec];
+-    e->dpl = dpl;
++	idt_entry_t *e = &boot_idt[vec];
++	e->dpl = dpl;
  }
  
- static void setup_smp_id(void *data)
+ void set_idt_sel(int vec, u16 sel)
  {
--    asm ("mov %0, %%gs:0" : : "r"(apic_id()) : "memory");
-+	asm ("mov %0, %%gs:0" : : "r"(apic_id()) : "memory");
+-    idt_entry_t *e = &boot_idt[vec];
+-    e->selector = sel;
++	idt_entry_t *e = &boot_idt[vec];
++	e->selector = sel;
  }
  
--static void __on_cpu(int cpu, void (*function)(void *data), void *data,
--                     int wait)
-+static void __on_cpu(int cpu, void (*function)(void *data), void *data, int wait)
- {
--    unsigned int target = id_map[cpu];
-+	const u32 ipi_icr = APIC_INT_ASSERT | APIC_DEST_PHYSICAL | APIC_DM_FIXED | IPI_VECTOR;
-+	unsigned int target = id_map[cpu];
+ struct ex_record {
+-    unsigned long rip;
+-    unsigned long handler;
++	unsigned long rip;
++	unsigned long handler;
+ };
  
--    spin_lock(&ipi_lock);
--    if (target == smp_id())
--	function(data);
--    else {
--	atomic_inc(&active_cpus);
--	ipi_done = 0;
--	ipi_function = function;
--	ipi_data = data;
--	ipi_wait = wait;
--	apic_icr_write(APIC_INT_ASSERT | APIC_DEST_PHYSICAL | APIC_DM_FIXED
--                       | IPI_VECTOR, target);
--	while (!ipi_done)
--	    ;
+ extern struct ex_record exception_table_start, exception_table_end;
+@@ -154,20 +154,20 @@ void unhandled_exception(struct ex_regs *regs, bool cpu)
+ 
+ static void check_exception_table(struct ex_regs *regs)
+ {
+-    struct ex_record *ex;
+-    unsigned ex_val;
++	struct ex_record *ex;
++	unsigned ex_val;
+ 
+-    ex_val = regs->vector | (regs->error_code << 16) |
++	ex_val = regs->vector | (regs->error_code << 16) |
+ 		(((regs->rflags >> 16) & 1) << 8);
+-    asm("mov %0, %%gs:4" : : "r"(ex_val));
++	asm("mov %0, %%gs:4" : : "r"(ex_val));
+ 
+-    for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
+-        if (ex->rip == regs->rip) {
+-            regs->rip = ex->handler;
+-            return;
+-        }
 -    }
--    spin_unlock(&ipi_lock);
-+	spin_lock(&ipi_lock);
-+	if (target == smp_id()) {
-+		function(data);
-+	} else {
-+		atomic_inc(&active_cpus);
-+		ipi_done = 0;
-+		ipi_function = function;
-+		ipi_data = data;
-+		ipi_wait = wait;
-+		apic_icr_write(ipi_icr, target);
-+		while (!ipi_done)
-+			;
+-    unhandled_exception(regs, false);
++	for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
++		if (ex->rip == regs->rip) {
++			regs->rip = ex->handler;
++			return;
++		}
 +	}
-+	spin_unlock(&ipi_lock);
++	unhandled_exception(regs, false);
  }
  
- void on_cpu(int cpu, void (*function)(void *data), void *data)
- {
--    __on_cpu(cpu, function, data, 1);
-+	__on_cpu(cpu, function, data, 1);
- }
+ static handler exception_handlers[32];
+@@ -278,51 +278,52 @@ static void *idt_handlers[32] = {
  
- void on_cpu_async(int cpu, void (*function)(void *data), void *data)
- {
--    __on_cpu(cpu, function, data, 0);
-+	__on_cpu(cpu, function, data, 0);
- }
- 
- void on_cpus(void (*function)(void *data), void *data)
- {
--    int cpu;
-+	int cpu;
- 
--    for (cpu = cpu_count() - 1; cpu >= 0; --cpu)
--        on_cpu_async(cpu, function, data);
-+	for (cpu = cpu_count() - 1; cpu >= 0; --cpu)
-+		on_cpu_async(cpu, function, data);
- 
--    while (cpus_active() > 1)
--        pause();
-+	while (cpus_active() > 1)
-+		pause();
- }
- 
- int cpus_active(void)
- {
--    return atomic_read(&active_cpus);
-+	return atomic_read(&active_cpus);
- }
- 
- void smp_init(void)
+ void setup_idt(void)
  {
 -    int i;
--    void ipi_entry(void);
+-    static bool idt_initialized = false;
 +	int i;
-+	void ipi_entry(void);
++	static bool idt_initialized = false;
  
--    _cpu_count = fwcfg_get_nb_cpus();
-+	_cpu_count = fwcfg_get_nb_cpus();
- 
--    setup_idt();
--    init_apic_map();
--    set_idt_entry(IPI_VECTOR, ipi_entry, 0);
-+	setup_idt();
-+	init_apic_map();
-+	set_idt_entry(IPI_VECTOR, ipi_entry, 0);
- 
--    setup_smp_id(0);
--    for (i = 1; i < cpu_count(); ++i)
--        on_cpu(i, setup_smp_id, 0);
-+	setup_smp_id(0);
-+	for (i = 1; i < cpu_count(); ++i)
-+		on_cpu(i, setup_smp_id, 0);
- 
--    atomic_inc(&active_cpus);
-+	atomic_inc(&active_cpus);
+-    if (idt_initialized) {
+-        return;
+-    }
+-    idt_initialized = true;
+-    for (i = 0; i < 32; i++)
+-	    if (idt_handlers[i])
+-		    set_idt_entry(i, idt_handlers[i], 0);
+-    handle_exception(0, check_exception_table);
+-    handle_exception(6, check_exception_table);
+-    handle_exception(13, check_exception_table);
++	if (idt_initialized)
++		return;
++
++	idt_initialized = true;
++	for (i = 0; i < 32; i++) {
++		if (idt_handlers[i])
++			set_idt_entry(i, idt_handlers[i], 0);
++	}
++	handle_exception(0, check_exception_table);
++	handle_exception(6, check_exception_table);
++	handle_exception(13, check_exception_table);
  }
  
- static void do_reset_apic(void *data)
+ unsigned exception_vector(void)
  {
--    reset_apic();
-+	reset_apic();
+-    unsigned char vector;
++	unsigned char vector;
+ 
+-    asm volatile("movb %%gs:4, %0" : "=q"(vector));
+-    return vector;
++	asm volatile("movb %%gs:4, %0" : "=q"(vector));
++	return vector;
  }
  
- void smp_reset_apic(void)
+ int write_cr4_checking(unsigned long val)
  {
--    int i;
-+	int i;
- 
--    reset_apic();
--    for (i = 1; i < cpu_count(); ++i)
--        on_cpu(i, do_reset_apic, 0);
-+	reset_apic();
-+	for (i = 1; i < cpu_count(); ++i)
-+		on_cpu(i, do_reset_apic, 0);
- 
--    atomic_inc(&active_cpus);
-+	atomic_inc(&active_cpus);
+-    asm volatile(ASM_TRY("1f")
+-            "mov %0,%%cr4\n\t"
+-            "1:": : "r" (val));
+-    return exception_vector();
++	asm volatile(ASM_TRY("1f")
++		"mov %0,%%cr4\n\t"
++		"1:": : "r" (val));
++	return exception_vector();
  }
+ 
+ unsigned exception_error_code(void)
+ {
+-    unsigned short error_code;
++	unsigned short error_code;
+ 
+-    asm volatile("mov %%gs:6, %0" : "=r"(error_code));
+-    return error_code;
++	asm volatile("mov %%gs:6, %0" : "=r"(error_code));
++	return error_code;
+ }
+ 
+ bool exception_rflags_rf(void)
+ {
+-    unsigned char rf_flag;
++	unsigned char rf_flag;
+ 
+-    asm volatile("movb %%gs:5, %b0" : "=q"(rf_flag));
+-    return rf_flag & 1;
++	asm volatile("movb %%gs:5, %b0" : "=q"(rf_flag));
++	return rf_flag & 1;
+ }
+ 
+ static char intr_alt_stack[4096];
+@@ -352,20 +353,20 @@ void set_gdt_entry(int sel, unsigned long base,  u32 limit, u8 type, u8 flags)
+ #ifndef __x86_64__
+ void set_gdt_task_gate(u16 sel, u16 tss_sel)
+ {
+-    set_gdt_entry(sel, tss_sel, 0, 0x85, 0); // task, present
++	set_gdt_entry(sel, tss_sel, 0, 0x85, 0); // task, present
+ }
+ 
+ void set_idt_task_gate(int vec, u16 sel)
+ {
+-    idt_entry_t *e = &boot_idt[vec];
++	idt_entry_t *e = &boot_idt[vec];
+ 
+-    memset(e, 0, sizeof *e);
++	memset(e, 0, sizeof *e);
+ 
+-    e->selector = sel;
+-    e->ist = 0;
+-    e->type = 5;
+-    e->dpl = 0;
+-    e->p = 1;
++	e->selector = sel;
++	e->ist = 0;
++	e->type = 5;
++	e->dpl = 0;
++	e->p = 1;
+ }
+ 
+ /*
+diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+index 9b81da0c..2660300b 100644
+--- a/lib/x86/desc.h
++++ b/lib/x86/desc.h
+@@ -7,20 +7,20 @@ void setup_idt(void);
+ void setup_alt_stack(void);
+ 
+ struct ex_regs {
+-    unsigned long rax, rcx, rdx, rbx;
+-    unsigned long dummy, rbp, rsi, rdi;
++	unsigned long rax, rcx, rdx, rbx;
++	unsigned long dummy, rbp, rsi, rdi;
+ #ifdef __x86_64__
+-    unsigned long r8, r9, r10, r11;
+-    unsigned long r12, r13, r14, r15;
++	unsigned long r8, r9, r10, r11;
++	unsigned long r12, r13, r14, r15;
+ #endif
+-    unsigned long vector;
+-    unsigned long error_code;
+-    unsigned long rip;
+-    unsigned long cs;
+-    unsigned long rflags;
++	unsigned long vector;
++	unsigned long error_code;
++	unsigned long rip;
++	unsigned long cs;
++	unsigned long rflags;
+ #ifdef __x86_64__
+-    unsigned long rsp;
+-    unsigned long ss;
++	unsigned long rsp;
++	unsigned long ss;
+ #endif
+ };
+ 
+@@ -80,19 +80,19 @@ typedef struct  __attribute__((packed)) {
+ } tss64_t;
+ 
+ #ifdef __x86_64
+-#define ASM_TRY(catch)                                  \
+-    "movl $0, %%gs:4 \n\t"                              \
+-    ".pushsection .data.ex \n\t"                        \
+-    ".quad 1111f, " catch "\n\t"                        \
+-    ".popsection \n\t"                                  \
+-    "1111:"
++#define ASM_TRY(catch)			\
++	"movl $0, %%gs:4 \n\t"		\
++	".pushsection .data.ex \n\t"	\
++	".quad 1111f, " catch "\n\t"	\
++	".popsection \n\t"		\
++	"1111:"
+ #else
+-#define ASM_TRY(catch)                                  \
+-    "movl $0, %%gs:4 \n\t"                              \
+-    ".pushsection .data.ex \n\t"                        \
+-    ".long 1111f, " catch "\n\t"                        \
+-    ".popsection \n\t"                                  \
+-    "1111:"
++#define ASM_TRY(catch)			\
++	"movl $0, %%gs:4 \n\t"		\
++	".pushsection .data.ex \n\t"	\
++	".long 1111f, " catch "\n\t"	\
++	".popsection \n\t"		\
++	"1111:"
+ #endif
+ 
+ /*
+@@ -152,18 +152,18 @@ typedef struct  __attribute__((packed)) {
+ #define TSS_MAIN 0x80
+ 
+ typedef struct {
+-    unsigned short offset0;
+-    unsigned short selector;
+-    unsigned short ist : 3;
+-    unsigned short : 5;
+-    unsigned short type : 4;
+-    unsigned short : 1;
+-    unsigned short dpl : 2;
+-    unsigned short p : 1;
+-    unsigned short offset1;
++	unsigned short offset0;
++	unsigned short selector;
++	unsigned short ist : 3;
++	unsigned short : 5;
++	unsigned short type : 4;
++	unsigned short : 1;
++	unsigned short dpl : 2;
++	unsigned short p : 1;
++	unsigned short offset1;
+ #ifdef __x86_64__
+-    unsigned offset2;
+-    unsigned reserved;
++	unsigned offset2;
++	unsigned reserved;
+ #endif
+ } idt_entry_t;
+ 
 -- 
 2.35.0.rc0.227.g00780c9af4-goog
 
