@@ -2,62 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B1964967C5
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 23:20:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AEE04967E1
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 23:29:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232893AbiAUWUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 17:20:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38460 "EHLO
+        id S229629AbiAUW3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 17:29:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232516AbiAUWUw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 17:20:52 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01A38C06173B
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 14:20:50 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id l12-20020a7bc34c000000b003467c58cbdfso30210351wmj.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 14:20:50 -0800 (PST)
+        with ESMTP id S230179AbiAUW3j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 17:29:39 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7552C06173B
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 14:29:38 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id n2-20020a255902000000b0060f9d75eafeso21923376ybb.1
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 14:29:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=plAqQ1BRYw9kzUekn9PRJRDnkbfDvH4L1RVPSJPx+uE=;
-        b=bJId4QLdFuV1WWYeQqItbZbbg+RXMGeCpwAsAyLRfYfTIQUnufFuLeXbvW5HG6l3Hg
-         d0XtoudPytuTT0cORNagk07GcCE1zL7FNAmijewXvJ9mPq2Ju7Y+LbitqusPPX9b5fd1
-         jOgZVqIvkXyGuop9hnVou+WBFx92bzObBuJV7Ubp9eDxTjm8lmKsNn0GIV9em028kkeq
-         AQLme7j6hBhcZ8Uc8V5Q75O4/IQmVsCJwHQxAuBWKm+FlXW2rw2YgIWxP1/hH5LK5sBF
-         2g2rHsBxUt2pvBdOhOulZ/rZbT12+7qZoMA7OaZ0dfw8KUXP/TbRdaPSOjeIq2aGM7Ho
-         L74A==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=A/ow/CQlY0zqHstt4Zs3QK0O11/NS0VBhiM4HuVhI3w=;
+        b=G3WdVzUOMS4N1LRl1GLTVoZjpIunTtpuw/WxbEjTqUP22tOgVocLRzJZft0Zvc9nZv
+         Vv4L768PbhMH7NbV9xloqnk0ORiWk6qDCOE3AXpekgdaPgTh/Vo5OX6uM4n4mNdzbxDD
+         tqJ6RI0GP6uf3pnF07Xkkw0w6ONcY0loF91SkHBzkgyaghoWQrhd/PTDoaU12tH8W1ES
+         V3foe9IR8oruSpgAlSu6vMh9Fe5MFw7SVF1QZtLGcESYNjvmFS9FGSwwpQSwRl372m/a
+         x+jQkDSysHXXeiftRnHojcNoET2+TNtcOZlHSug3XxtYpM/P0mP4omc/NCNxyODDC+O2
+         w7sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=plAqQ1BRYw9kzUekn9PRJRDnkbfDvH4L1RVPSJPx+uE=;
-        b=tLVXyijfgvq6SIEJFK9k67cQ/ORH6eOnd1b/3rm2APpJ1X0YTydNsHuHNBp8jNxS4y
-         Om/GAPTlrKuarVPhLByn30lHFR1LtGR9Z+Hl0GLnVKcaFJlXN2Kb0QIrQsVeHlQoahKy
-         LYOPsD7gowalHzi1F/qc3aEIW818BHstLG5K1dXy2mGHfdr2BlM/VHYv2IoFxIyjFdfi
-         bluTv2GraVTXBBVyF+egFH24CoQr/aUKDHd5y5Pd9hDuv/axEl4O9W/dm8T3WONcEcSY
-         ticwVBreJL96ao6FP3URlhMdvW/juf1h7khggwIQZZnPnSmrJQ7kw1W0FzlAtFBeYEnB
-         IjtA==
-X-Gm-Message-State: AOAM531funPJozHs12te4yY5yc+cqE0YcgXKJre1IurdL8p0JczFdJoP
-        8xcCXQoo0AG9TrCc6k7+937wJjVoQW0wuw5BUthFYo6fvgE=
-X-Google-Smtp-Source: ABdhPJwCmEAuiKe7yoZVHiwx53vZ0QAJEJbzbXMdw+r4Y8CxVfJ8ah4ZgWBWltaTxIpXf3gIoHIcYqHEV2XAF2sOaIY=
-X-Received: by 2002:a7b:c148:: with SMTP id z8mr2487650wmi.110.1642803647060;
- Fri, 21 Jan 2022 14:20:47 -0800 (PST)
-MIME-Version: 1.0
-References: <20220121210702.635477-1-daviddunn@google.com>
-In-Reply-To: <20220121210702.635477-1-daviddunn@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=A/ow/CQlY0zqHstt4Zs3QK0O11/NS0VBhiM4HuVhI3w=;
+        b=jI9uRQ+hvkdjSb98JREgyKMs9BJ1LCpxpP8buc/iCgnH9U7jpmGvnBkFTiAFWCUR/t
+         gctNPgUpmMFGYP/ROrkBO+YKT1sA7C1aFBbqaLMqbrRy3Yggjk6azJogzlORQbn/Qc/Y
+         74T7dbZt/WfA5g/1ZExhyNLO+iZROkmAeenyF+vGbGJ3ibtSGGVbn3AorhlP3KY4qIHx
+         slC8UEsmWf8d+f945qEJY70I+chZrLoUwKTG1AzDnn9rCfW4ImXNXmasbej0R+NH+E8n
+         pnlfDzpQ1Djo2VKwd3S4wDUtPaetnYB5XXYffEaqPbtq+Nm/Jxpkvk0CgVmzUTfxcrhr
+         lReA==
+X-Gm-Message-State: AOAM531tY98WCAFbT2S/RYZhJOSaQ3pH6SE/kxWItVGUHR/JqXN0/HbT
+        bxWrgS09DeXVxfFz7bDFnTVa/fSSj/ey3TlK09loGnI8XHgHNqZqoH6trMhEDFnXL8FpCgEo/YV
+        dccx1abq+4fjJVSbavjzVcpObRVSDr/I4hEQr1tMBX0gbk6fgLXb+rAeSMfqr3uW3fw==
+X-Google-Smtp-Source: ABdhPJz/ghZ44E4Z1HvceJDJxDuhVMB828pIroKJCfWynj+sXyzXT+WjNnXyUcG2hSlje5w+inH3SvTsFCt4e4Y=
+X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
+ (user=daviddunn job=sendgmr) by 2002:a05:6902:51:: with SMTP id
+ m17mr8740206ybh.464.1642804177919; Fri, 21 Jan 2022 14:29:37 -0800 (PST)
+Date:   Fri, 21 Jan 2022 22:29:30 +0000
+Message-Id: <20220121222933.696067-1-daviddunn@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
+Subject: [PATCH v4 0/3] KVM: x86: Provide per VM capability for disabling PMU virtualization
 From:   David Dunn <daviddunn@google.com>
-Date:   Fri, 21 Jan 2022 14:20:36 -0800
-Message-ID: <CABOYuvYB49_PL9FOUXXn9YvhjQMyt1pDHa1zfmxJyRWAMANF9A@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] KVM: x86: Provide per VM capability for disabling
- PMU virtualization
-To:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jim Mattson <jmattson@google.com>, cloudliang@tencent.com,
-        Sean Christopherson <seanjc@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
+        jmattson@google.com, cloudliang@tencent.com, seanjc@google.com
+Cc:     daviddunn@google.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please ignore this v3 patchset.  I made an error and did not amend my
-commits prior to creating this patch set.  I will send out v4 shortly.
+This patch set allows usermode to disable PMU virtualization on
+individual x86 VMs.  When disabled, the PMU is not advertised to
+or accessible from the guest.
+
+Corrected changes that I missed committing into v3 patch set.  This
+incorporates Like's suggestions from reviewing v2.
+
+David Dunn (3):
+  KVM: x86: Provide per VM capability for disabling PMU virtualization
+  KVM: selftests: Allow creation of selftest VM without vcpus
+  KVM: selftests: Verify disabling PMU virtualization via
+    KVM_CAP_CONFIG_PMU
+
+ Documentation/virt/kvm/api.rst                | 21 ++++++++
+ arch/x86/include/asm/kvm_host.h               |  1 +
+ arch/x86/kvm/cpuid.c                          |  8 ++++
+ arch/x86/kvm/svm/pmu.c                        |  2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |  2 +-
+ arch/x86/kvm/x86.c                            | 12 +++++
+ include/uapi/linux/kvm.h                      |  4 ++
+ tools/include/uapi/linux/kvm.h                |  4 ++
+ .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 48 ++++++++++++++-----
+ .../kvm/x86_64/pmu_event_filter_test.c        | 45 +++++++++++++++++
+ 11 files changed, 135 insertions(+), 15 deletions(-)
+
+-- 
+2.35.0.rc0.227.g00780c9af4-goog
+
