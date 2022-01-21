@@ -2,60 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 283AD496E35
-	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 23:25:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA5E1496E40
+	for <lists+kvm@lfdr.de>; Sun, 23 Jan 2022 00:19:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235016AbiAVWZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jan 2022 17:25:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42226 "EHLO
+        id S235047AbiAVXGF convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 22 Jan 2022 18:06:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbiAVWZz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Jan 2022 17:25:55 -0500
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92587C06173B
-        for <kvm@vger.kernel.org>; Sat, 22 Jan 2022 14:25:54 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id c15so2010052qtv.1
-        for <kvm@vger.kernel.org>; Sat, 22 Jan 2022 14:25:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=2sXe8OnEy5tHpjKg60R0Ff0ADmQIY55eD9X8p0CO2Yg=;
-        b=OkUlSiauheFbPo0LM4zA1zI6V0+vxsGekd9pvGFATrzMhcE1dIkQvL14Be37WQ4DbY
-         PIO+EiMs4UURrbGI3tVTD9fWY1S5T1W68+Xf/yNbH2bBHo3RqEKmIzANjVWLoPwhdBJP
-         kbUUwnnxwSNLhCsDQ9gjOhQLYlelOAkdip34mwgISxvvmufc78pMCZGgETSzfuuQk9hg
-         4KWO24ZSVpef9kflmwMbB3mnVil8LJpaf75RNcwNBKyIpg3lW9KeqfuFEU0rxMXGLPLx
-         cm/ogyi2W6vx3LabVF4D+zJ9wfMj3er7PaGL5cBCMf8slnxX2ag+FMeZfbNyJl66kp+a
-         oDYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=2sXe8OnEy5tHpjKg60R0Ff0ADmQIY55eD9X8p0CO2Yg=;
-        b=0VGfU10jGY2pNB2roVpHWPNNCHn4q8qDPcyhy55iF9TXCjny5Lku4w63gXtQouVQO/
-         ykHuY9ReS29wWuwlDIHYLfFjYJn4RaakonENO3QvmFak2laaeqv1yf4GOFUInLiqywSc
-         vTlxtqAhImQM+7khKqxdkmoVNie839QNQi3xXcxqDFJG22zB2k2mZpJ9jlQcJqaRVoH3
-         +qor8xv/yYDvrmkYhFV+yI4DKrqFJZsPRRjb2KFzl/ngX1s+U7p2rG8uJXbpcEt8upgF
-         FS8qbvxabTad2sNifGdqisVgGkc2EB+X3HL6Ph4XbU5Mk0lwIc741kMUJWGK3hWHT4xN
-         irxQ==
-X-Gm-Message-State: AOAM533NAcJkV/BuKexvY6utapE6/AeTxB+YlvnWiFX3yKGBgIyx+ufX
-        ViaAUHOpLeBnu4v2pqKnTgLvMnPJryTDv+gra1Q=
-X-Google-Smtp-Source: ABdhPJyb4KAmD8hib9iZDKsqYbrEdgYkx+puf0m7Bf/Vp5hLJxDhOvntWXQgNLfXN58HnXicRw0wXeJgeiqYQK632Js=
-X-Received: by 2002:a05:622a:189:: with SMTP id s9mr6390539qtw.165.1642890353671;
- Sat, 22 Jan 2022 14:25:53 -0800 (PST)
+        with ESMTP id S231288AbiAVXGF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jan 2022 18:06:05 -0500
+X-Greylist: delayed 56469 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 22 Jan 2022 15:06:04 PST
+Received: from fjxxll.cn (unknown [IPv6:240e:37a:2b7:1f00:211:32ff:fe2c:a785])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E0FC06173B;
+        Sat, 22 Jan 2022 15:06:04 -0800 (PST)
+Received: from Unknown (unknown [203.128.77.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by fjxxll.cn (Postfix) with ESMTPSA id 57DC250DB8B1;
+        Fri, 21 Jan 2022 15:53:30 +0800 (CST)
+Message-ID: <232690C3C81C32815D5811ADA9C3E26F@tjwlenn>
+Reply-To: "Fredrik Elvebakk" <fcresswell9@gmail.com>
+From:   "Fredrik Elvebakk" <investment@dnb.no>
+Subject: Re:
+Date:   Thu, 20 Jan 2022 23:53:24 -0800
 MIME-Version: 1.0
-Received: by 2002:ad4:5fcb:0:0:0:0:0 with HTTP; Sat, 22 Jan 2022 14:25:53
- -0800 (PST)
-Reply-To: fionahill.usa@outlook.com
-From:   Fiona Hill <sylviajones045@gmail.com>
-Date:   Sat, 22 Jan 2022 14:25:53 -0800
-Message-ID: <CAEsQPx7t_aPbjgoE5sGLOTyxWSCmPEKb44b3y5RrrkuuX5ES6w@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        format=flowed;
+        charset="windows-1251";
+        reply-type=original
+Content-Transfer-Encoding: 8BIT
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Windows Live Mail 16.4.3528.331
+X-MimeOLE: Produced By Microsoft MimeOLE V16.4.3528.331
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Hi,Diid you receive   my  message i send to you ? I'm waiting for your
-urgent respond,
+Hello,
+
+Am Fredrik Elvebakk an Investment Manager from Norway. I wish to solicit 
+your interest in an investment project that is currently ongoing in my company (DNB); 
+It is a short term investment with good returns. 
+Simply reply for me to confirm the validity of your email so i shall give you comprehensive details about the project.
+
+Best Regards,
+Fredrik Elvebakk
+Business Consultant
