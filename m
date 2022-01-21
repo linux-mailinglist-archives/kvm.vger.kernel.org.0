@@ -2,139 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6E584967E4
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 23:29:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69F5A496826
+	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 00:18:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230362AbiAUW3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 17:29:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40460 "EHLO
+        id S231238AbiAUXS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 18:18:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbiAUW3s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 17:29:48 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E18C06173B
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 14:29:48 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id o9-20020a170902d4c900b0014ab4c82aacso2195018plg.16
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 14:29:47 -0800 (PST)
+        with ESMTP id S229557AbiAUXS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 18:18:57 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A169C06173B
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 15:18:57 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id b136-20020a621b8e000000b004bfc3cd755cso6808632pfb.4
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 15:18:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ccjI/IWR5Whh2qHqkqlzXUnNsqIJF67ztrFNI0VfcTU=;
-        b=rQ+aq92nBfOUrsMfWPnWTUsKkN4XRhmHDAtMMVmKMPvxSh6uY5Ku7QDdXq75X/tlxe
-         pOYL6nT3fTiwTwfVf7NQdu+k65FX8A7VWloE5UWTXcNqYghoIC2ToAWA+ilMVLB+27gF
-         G4NEDZOq7zWipi4ZoKkD8dLK72Zn4m0Aq10jr24e64mYeKWw3U6j9UZw+6jV9ahreuKT
-         vxHNl8hukSU1GQi68T3xxQ9Jo5uMDVFA5p50SF4eU8ZIQGtf3bvU8JxUp+6T+z/IX3ie
-         p+Tcrnv1Ulw+nTojosgnD0u1b406P3VMz61ZvWZWCewFaJTowCRDJomfupq9KpKn7W3K
-         4UWw==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=LPeP+CLz6BW/wFm6eZxkqUXXQnD2033C/C7cPV4SsQs=;
+        b=jXAs4QP0BKiRm/KkfCFEP7BKUQMTOVKCwVtfk9Z5zzn/Zr7H/dtEH/eDdpO2uKtqZ6
+         c/lxbx1k+RDWU1PNIA4xReCxD33jyo2pOb9U0EU+yu0foCvgxZFsSRqBvI1z7vJw6aJL
+         UBSEFHWBnI93eLAqcSxxyVB68U2OGulxBbEgIesuJIGcSV+zelBrXSvTzAuamy+8zgkd
+         yqQF95M9B4qkPT8R3lkyXUAHZUDSB3to4h7lKrgLwNN8bNhKExwWsCc+a9YnIxy3Z2p8
+         gLetoGchfXQluNBMQnA+pleQzxtklm3fW+UVaz7oM1aB/mrBiprPOI0feDxtZ9EV1XRk
+         Jeiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ccjI/IWR5Whh2qHqkqlzXUnNsqIJF67ztrFNI0VfcTU=;
-        b=aHKBtjkuNSVeUZo7/YcZK1LJc1zST/bx46nGlbGeahLe/f5CPXiw+4JmWmOfCjUhvT
-         ARUS4yS03rtJEb7t52qfK+ec1iAUxt/caImg9EMCx+PoUBMCUTZLdTQr7NPyNsccQ3zB
-         Zz0gN410OXiX8tYn1JzVRTNUnnHdtUgtu4I7KywnuT8Io5Hr5BYQRFjNnqytkl1vymlw
-         fA5g4C188NsGoJL7xNg47IbSEdDDyL2bnwohgYjqp2/zQU2LJ3lowCrAGSF16bxX9BMb
-         KiNhf6mvW3+0YfqZ+wVUZWwZT3hb5jJkMcJZM8HUpSlwWJ8s8TZOof3Nr6Q5S1kg/de4
-         5hzA==
-X-Gm-Message-State: AOAM5325IWjBnNcm9iVS8sRm72YMVWq4VCNccJ1HLhPUdK3aBtIT/yZl
-        wSVyG6kE3Bzm0Cdh/6uIAQH5xhZTG93p/nfCDYUux07hRBHLLzhbrmrTNLwohRlqFeURYk/4Ayv
-        Y4PQKlzd7PzKtS3wU/mnbLocBftaet32x5wI3J1nQVC/jSAurFaapbGWL62CX84Dk1w==
-X-Google-Smtp-Source: ABdhPJwfWXndTh6X8eWgatCKmTxULPAEYfzSnr0flSVrN/nrg1dtkdRcAjZSlg3fTmXTAigL9r1S1xCKNal5IG0=
-X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
- (user=daviddunn job=sendgmr) by 2002:a63:4c09:: with SMTP id
- z9mr2201896pga.471.1642804187375; Fri, 21 Jan 2022 14:29:47 -0800 (PST)
-Date:   Fri, 21 Jan 2022 22:29:33 +0000
-In-Reply-To: <20220121222933.696067-1-daviddunn@google.com>
-Message-Id: <20220121222933.696067-4-daviddunn@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=LPeP+CLz6BW/wFm6eZxkqUXXQnD2033C/C7cPV4SsQs=;
+        b=QpK0q5gwDl76RGUeGAWGlRm9U7MO8T4/jp+fn3/rPuQlhqzlkP0uWfk9/lkoEyrP8H
+         kw6L/y537VxwP2G2jj/oL0VtzoaY9i79fIjOE/fUct1SWKW2b/NIe64YHDH2rR8MD/nF
+         Rj4ppMMVmiasUXxXY/nC5w96rEkX2v9ivJmxhadCrRkxk98x4bnbtZYRTqQmVgFBTr7k
+         9pHur59BVVpyOAi4c7eZaV9elBZddjQJC+SUd1Uym6dSdPedm1FJPGyg34w9969ztBOt
+         pWG9XsnMs1QevmNGdQ+a7/lDzy6j2guNZNgLZMRjcgv6BST9+weNWy0rjN72WjnONlck
+         V+wA==
+X-Gm-Message-State: AOAM533LUrwxyCWCey8Y2k92IaMlkjaDCBmSn3ScZ1ErV8ThggyaKbQr
+        QSVgDM7AQ07y5jgTIneND0xkOzUdGTk=
+X-Google-Smtp-Source: ABdhPJz6Ra6EE2DGVnQP7ipwXXh/AP+8MUHLzF78Yt+OMabaZDcQgoQSdAiMZk3QiumRzYocdqRsdFj0PjU=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:3f09:: with SMTP id
+ l9mr2902528pjc.36.1642807136742; Fri, 21 Jan 2022 15:18:56 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 21 Jan 2022 23:18:44 +0000
+Message-Id: <20220121231852.1439917-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20220121222933.696067-1-daviddunn@google.com>
 X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH v4 3/3] KVM: selftests: Verify disabling PMU virtualization
- via KVM_CAP_CONFIG_PMU
-From:   David Dunn <daviddunn@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
-        jmattson@google.com, cloudliang@tencent.com, seanjc@google.com
-Cc:     daviddunn@google.com
+Subject: [kvm-unit-tests PATCH 0/8] x86: APIC bug fix and cleanup
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a VM with PMU disabled via KVM_CAP_PMU_CONFIG, the PMU will not be
-usable by the guest.  On Intel, this causes a #GP.  And on AMD, the
-counters no longer increment.
+Fix a bug introduced by the UEFI support where setup_tss() can race with
+enable_x2apic() and crash the test due to attempting to read an x2APIC MSR
+prior to enabling x2APIC (failure manifests in smptest3).
 
-KVM_CAP_PMU_CONFIG must be invoked on a VM prior to creating VCPUs.
+In an attempt to avoid similar bugs in the future, clean up the per-cpu
+stuff and convert apic_ops into a per-cpu pointer.  32-bit KUT has a
+chick-and-egg problem due to using the APIC ID to choose the selector
+for GS (the per-cpu segment), so the original bug "has" to say on a
+dedicated helper.
 
-Signed-off-by: David Dunn <daviddunn@google.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 45 +++++++++++++++++++
- 1 file changed, 45 insertions(+)
+Sean Christopherson (8):
+  x86: Always use legacy xAPIC to get APIC ID during TSS setup
+  x86: nVMX: Load actual GS.base for both guest and host
+  x86: smp: Replace spaces with tabs
+  x86: desc: Replace spaces with tabs
+  x86: Add proper helpers for per-cpu reads/writes
+  x86: apic: Replace spaces with tabs
+  x86: apic: Track APIC ops on a per-cpu basis
+  x86: apic: Make xAPIC and I/O APIC pointers static
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index c715adcbd487..cffa2e019eac 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -325,6 +325,49 @@ static void test_not_member_allow_list(struct kvm_vm *vm)
- 	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
- }
- 
-+/*
-+ * Verify KVM_CAP_PMU_DISABLE prevents the use of the PMU.
-+ *
-+ * Note that KVM_CAP_PMU_CAPABILITY must be invoked prior to creating VCPUs.
-+ */
-+static void test_pmu_config_disable(void (*guest_code)(void))
-+{
-+	int r;
-+	struct kvm_vm *vm;
-+	struct kvm_cpuid2 *cpuid2;
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_enable_cap cap = { 0 };
-+	bool sane;
-+
-+	r = kvm_check_cap(KVM_CAP_PMU_CAPABILITY);
-+	if ((r & KVM_CAP_PMU_DISABLE) == 0)
-+		return;
-+
-+	vm = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
-+
-+	cap.cap = KVM_CAP_PMU_CAPABILITY;
-+	cap.args[0] = KVM_CAP_PMU_DISABLE;
-+	r = vm_enable_cap(vm, &cap);
-+	TEST_ASSERT(r == 0, "Failed KVM_CAP_PMU_DISABLE.");
-+
-+	vm_vcpu_add_default(vm, VCPU_ID, guest_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+
-+	cpuid2 = vcpu_get_cpuid(vm, VCPU_ID);
-+	entry = get_cpuid(cpuid2, 0xA, 0);
-+	if (entry) {
-+		TEST_ASSERT(entry->eax == 0 && entry->ebx == 0 &&
-+			    entry->ecx == 0 && entry->edx == 0,
-+			    "CPUID should not advertise PMU when disabled.");
-+	}
-+
-+	sane = sanity_check_pmu(vm);
-+	TEST_ASSERT(!sane, "Guest should not be able to use disabled PMU.");
-+
-+	kvm_vm_free(vm);
-+}
-+
- /*
-  * Check for a non-zero PMU version, at least one general-purpose
-  * counter per logical processor, an EBX bit vector of length greater
-@@ -430,5 +473,7 @@ int main(int argc, char *argv[])
- 
- 	kvm_vm_free(vm);
- 
-+	test_pmu_config_disable(guest_code);
-+
- 	return 0;
- }
+ lib/x86/apic-defs.h |   3 +-
+ lib/x86/apic.c      | 157 ++++++++++++++++++++++++--------------------
+ lib/x86/apic.h      |   5 +-
+ lib/x86/desc.c      | 120 ++++++++++++++++-----------------
+ lib/x86/desc.h      |  68 +++++++++----------
+ lib/x86/setup.c     |   4 +-
+ lib/x86/smp.c       | 128 +++++++++++++++++-------------------
+ lib/x86/smp.h       |  67 +++++++++++++++++++
+ x86/vmx.c           |   4 +-
+ 9 files changed, 311 insertions(+), 245 deletions(-)
+
+
+base-commit: 3df301615cead4142fe28629d86142de32fc6768
 -- 
 2.35.0.rc0.227.g00780c9af4-goog
 
