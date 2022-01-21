@@ -2,147 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B41A6496577
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 20:12:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE227496716
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 22:07:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbiAUTMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 14:12:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52840 "EHLO
+        id S230383AbiAUVHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 16:07:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbiAUTMS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jan 2022 14:12:18 -0500
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A16DC06173B
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 11:12:18 -0800 (PST)
-Received: by mail-yb1-xb32.google.com with SMTP id h14so30224771ybe.12
-        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 11:12:18 -0800 (PST)
+        with ESMTP id S229520AbiAUVHU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jan 2022 16:07:20 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C86C06173B
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 13:07:20 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id a14-20020a170902710e00b0014ad8395c0dso2107218pll.21
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 13:07:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9s//Ke6XVp/BFtyxa2zRwkd1F0XoucRgvD4MGu7oJe4=;
-        b=WZ+SYoyd5jOVdb6zNfY7s7A+pH7BJGfMvy/gpYcs0XN7z8mS4oFSuHxL72kDr5qrb7
-         0ICMKQPCeYWCp9Dd8kzr6U/xCUs0b1QYzVhMyeNOfKQzeAyXLzkyWcnH6jVPyQ6Oll54
-         WzLCautazM9iZ3jvCbHmuAzV/ptXCDjvFCgIbqtoiidssZS1AhJNc+alBNW9GLeXGczL
-         0wzVEWg5BBPVPecoWTEBV07a1H6f8dWUrkVgupzTXeHjgPmRilNX+E/QiYGcQnAl0p06
-         3PIQS/DefEI3SfaRQCLFlkjzF47riGlDOnBlkUQFLvEs351ueh/vm8hqlCwj63TDy/JA
-         lnnQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Wlx7t0bhB5h3Smpslggps27Oc56VnWH6Y0AnqqHthBw=;
+        b=e5+4L7ajiDIfj5p2xWddFrtT/UlT1v3d/fSFSfB54xMeCggu9IIT2lIOdofJEkuRVF
+         E9ueM/H47Lpfsc2f6W4ZvkzHX8hpsokdrVur1+QYdXi953CxoabmOfaohd7pYTWAn5Uz
+         zJ2EPuRPxu84msdP5lW5foB4lHNKzcA6c21hJuQGG8BJPxxupCDdWUOjZ7/AEpfuSrpf
+         g1auzxeisf7AhlCA6A6yHLS36r0MaYv2wkZA2OP6XAJh+TDXuC3m/d7iCc6tCYhWg3Fu
+         JVanpLKyjYLs3s0Fo+CeeohxdO9SXm4e2r0vYTIZ+LpWr++c7iImLKfC8lbtO1xAuxrG
+         dsYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9s//Ke6XVp/BFtyxa2zRwkd1F0XoucRgvD4MGu7oJe4=;
-        b=Wse2wZJc6FZA6CjZWc0o/B3mVTpS8tOWchf+1wYzwaziIPhmsPMSR26zEBMqOX81zL
-         Ju6U+zJqEgNa1nMDYkAS4CN0yO/wwxFKhRHj6vm+elBMsNzKZ2rRqZ7idIFoBOMImoJX
-         2zON56SLey/fMEYAzEyNg45gsCghWZA423494Z3j74YICYoP63mhapYR8ifIPVzjlC+r
-         ZKJgZVv1iS5IzoPbYtv0gz5AKEA3Bg0WtHV28Lj5ECn57jgA9Q5EZLudOXCSn/KPrpnm
-         zsWf1lkNUks3mh4ZEg3ZlOxvqSnxRAtppNFfob33lhQUlVyltXyGCgoURqJYu5oIHbn5
-         /oeA==
-X-Gm-Message-State: AOAM531jnqEwwwXBVBQsP5dkF5EU8QGAhLd+MMJLJbk7+Slo1sTywA1h
-        MYPC/yWEolHSlFQ0KVo3IcWkk74Oyy1Gd/ZaPa0ASg==
-X-Google-Smtp-Source: ABdhPJw0IX097xeTBOPoA1sndovvtYOnVG7MqkMeCM6gXFlVBaewFQkRdaPj1BUPjy4Y87YrBxIxu88WkOrKjglXi4k=
-X-Received: by 2002:a25:264e:: with SMTP id m75mr7767041ybm.31.1642792337129;
- Fri, 21 Jan 2022 11:12:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20220121155855.213852-1-aaronlewis@google.com>
- <20220121155855.213852-4-aaronlewis@google.com> <Yer0oCazOfKXs4t3@google.com>
-In-Reply-To: <Yer0oCazOfKXs4t3@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Fri, 21 Jan 2022 11:12:05 -0800
-Message-ID: <CAAAPnDEgV5HYeqE+pFRdZ4b6y1VMhwv=aXWVGWHS4M84-w5LHQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v4 3/3] x86: Add test coverage for
- nested_vmx_reflect_vmexit() testing
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Wlx7t0bhB5h3Smpslggps27Oc56VnWH6Y0AnqqHthBw=;
+        b=mVRhCeiLWk4XU2dNR0yIX6uUTeNJ0C/aLV52Kc85Cymc0S4lqkBozsJOkJXKikv/x5
+         cjDfvuQiDKFHjF2LMh1FJZuvOgOfxmW7MpXJl2pR0PH8h9loNcq6G+eD6rbzyeSNVWG7
+         L/SUaUcTNH1nkHcbslzxoItrb8gl4Ptm+pZ0a1uAp1Tdht6M8Aq0Pk+4ZZwQNsuV2n4W
+         jo4Riy+OxDZOkc78kofrBMGvGzbsAos6Onb1T1rXvTcZ/KOZZKltyK+OBIAV3aXoL3xy
+         lLAj35zM7nFKn6jW1/WjCWht7tIfvoMNAmyF2H5603PQyibRYZCzKVILpG9NccLoLua3
+         FYMg==
+X-Gm-Message-State: AOAM5335+lSUN198RjlwRt/qpXRNlb3+tDrRpRXphouoNLMrmbq5wbhU
+        4y66nftOaFNeXuYDouEIF+M3avVAB6m0ldXnVTMNkfY3V0mO9UlpzpHT5lmEnI67rDl03MZxUn6
+        Fn9sbrnKiaXotmwkqXc+xxLqSBNu5rOAJg5z7NL4pzEHk2HPzkrfaVEQIJEHNSbjg2w==
+X-Google-Smtp-Source: ABdhPJx7hMA3izuaRKiJCGGu/hKYY4fswHSxFLs1iESbEOQ8vB8OrTm49HlvqcXv7ssvHsY/+BuXorM5EZFHv1s=
+X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
+ (user=daviddunn job=sendgmr) by 2002:a17:902:d2c8:b0:14a:55fb:cfe5 with SMTP
+ id n8-20020a170902d2c800b0014a55fbcfe5mr5573323plc.51.1642799240018; Fri, 21
+ Jan 2022 13:07:20 -0800 (PST)
+Date:   Fri, 21 Jan 2022 21:06:59 +0000
+Message-Id: <20220121210702.635477-1-daviddunn@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
+Subject: [PATCH v3 0/3] KVM: x86: Provide per VM capability for disabling PMU virtualization
+From:   David Dunn <daviddunn@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
+        jmattson@google.com, cloudliang@tencent.com, seanjc@google.com
+Cc:     daviddunn@google.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 21, 2022 at 10:00 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Jan 21, 2022, Aaron Lewis wrote:
-> > Add a framework and test cases to ensure exceptions that occur in L2 are
-> > forwarded to the correct place by nested_vmx_reflect_vmexit().
-> >
-> > Add testing for exceptions: #GP, #UD, #DE, #DB, #BP, and #AC.
-> >
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > Change-Id: I0196071571671f06165983b5055ed7382fa3e1fb
->
-> Don't forget to strip the Change-Id before posting.
+This patch set allows usermode to disable PMU virtualization on
+individual x86 VMs.  When disabled, the PMU is not advertised to
+or accessible from the guest.
 
-D'oh... Good catch.
+Thanks again to Like and Sean for great feedback.  I have incorporated
+Like's v2 suggestions in this version.
 
->
-> > ---
-> >  x86/unittests.cfg |   9 +++-
-> >  x86/vmx_tests.c   | 129 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 137 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> > index 9a70ba3..6ec7a98 100644
-> > --- a/x86/unittests.cfg
-> > +++ b/x86/unittests.cfg
-> > @@ -288,7 +288,7 @@ arch = i386
+David Dunn (3):
+  KVM: x86: Provide per VM capability for disabling PMU virtualization
+  KVM: selftests: Allow creation of selftest VM without vcpus
+  KVM: selftests: Verify disabling PMU virtualization via
+    KVM_CAP_CONFIG_PMU
 
-> > +[vmx_exception_test]
-> > +file = vmx.flat
-> > +extra_params = -cpu max,+vmx -append vmx_exception_test
-> > +arch = x86_64
-> > +groups = vmx nested_exception
-> > +timeout = 10
->
-> Leave this out (for now), including it in the main "vmx" test is sufficient.
-> I'm definitely in favor of splitting up the "vmx" behemoth, but it's probably
-> best to do that in a separate commit/series so that we can waste time bikeshedding
-> over how to organize things :-)
->
+ Documentation/virt/kvm/api.rst                | 21 ++++++++
+ arch/x86/include/asm/kvm_host.h               |  1 +
+ arch/x86/kvm/cpuid.c                          |  8 ++++
+ arch/x86/kvm/svm/pmu.c                        |  2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |  2 +-
+ arch/x86/kvm/x86.c                            | 12 +++++
+ include/uapi/linux/kvm.h                      |  4 ++
+ tools/include/uapi/linux/kvm.h                |  4 ++
+ .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 48 ++++++++++++++-----
+ .../kvm/x86_64/pmu_event_filter_test.c        | 35 ++++++++++++++
+ 11 files changed, 125 insertions(+), 15 deletions(-)
 
-Why leave this out when vmx_pf_exception_test, vmx_pf_no_vpid_test,
-vmx_pf_invvpid_test, and vmx_pf_vpid_test have their own?  They seem
-similar to me.
+-- 
+2.35.0.rc0.227.g00780c9af4-goog
 
-> > +
-> > +static uint64_t usermode_callback(void)
-> > +{
-> > +     /* Trigger an #AC by writing 8 bytes to a 4-byte aligned address. */
-> > +     asm volatile(
-> > +             "sub $0x10, %rsp\n\t"
-> > +             "movq $0, 0x4(%rsp)\n\t"
-> > +             "add $0x10, %rsp\n\t");
->
-> Sorry, didn't look closely at this before.  This can simply be:
->
->         asm volatile("movq $0, 0x4(%rsp)\n\t");
->
-> as the access is expected to fault.  Or if you want to be paranoid about not
-> overwriting the stack:
->
->         asm volatile("movq $0, -0x4(%rsp)\n\t");
->
-> It's probably also a good idea to call out that the stack is aligned on a 16-byte
-> boundary.  If you were trying to guarnatee alignment, then you would need to use
-> AND instead of SUB.  E.g.
->
->         asm volatile("push  %rbp\n\t"
->                      "movq  %rsp, %rbp\n\t"
->                      "andq  $-0x10, %rsp\n\t"
->                      "movq  $0, -0x4(%rsp)\n\t"
->                      "movq  %rbp, %rsp\n\t"
->                      "popq  %rbp\n\t");
->
-> But my vote would be to just add a comment, I would consider it a test bug if the
-> stack isn't properly aligned.
->
-
-I can improve the comment, and I agree that it would be a test bug if
-the stack isn't properly aligned.
-
-I'll switch this to using the more paranoid approach if I'm not going
-to modify RSP.
-
-> > +
-> > +     return 0;
-> > +}
-> > +
