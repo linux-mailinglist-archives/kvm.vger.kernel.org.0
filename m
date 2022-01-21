@@ -2,261 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 068254961CD
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 16:10:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E41749621B
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 16:31:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381509AbiAUPKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 10:10:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40166 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1381504AbiAUPJl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Jan 2022 10:09:41 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20LEoUCe024085;
-        Fri, 21 Jan 2022 15:09:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=eq5mIyptuCWeTYO1JjS7B+FUEpXGCgS1AnfUylFZ0y8=;
- b=A8Pu3MpHYwjyZoPCszmXYO5R4ztjDoIaTESh/JmOU3+9OWl5JFEU8h39UI0JlvtkPwLM
- tKER2pqEqVwsLaThBzAsEn2pQOD6GbDWMvt1TSTf3gBLklGgGEbuCYwd7my1norxt6As
- pUmQPG1wp+oOJazugfnBM5lCi8qG2MpxwR+NPR19EFk2fauyiSTOzrh2V+c5Wi2IlDGY
- 6qFxiLE7XREl6rsDOc+GjUIG8pEMnKY5A3QPwmaUc5UpktbSM2r3g/3B07Gn1YQfwcS9
- aQBErKgOFQ1nEe17FFmNBurAEDBDRqRpBVL0XUjI1Lc95y9gDBNkkuX2w3Q0olJXIOn7 zA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dqtv5nn42-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Jan 2022 15:09:40 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20LF5tIN016838;
-        Fri, 21 Jan 2022 15:09:40 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dqtv5nn3q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Jan 2022 15:09:40 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20LF1xPF013926;
-        Fri, 21 Jan 2022 15:09:38 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3dqj37wx3p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Jan 2022 15:09:38 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20LF9YUf37683678
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Jan 2022 15:09:34 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C0DF42049;
-        Fri, 21 Jan 2022 15:09:34 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F12442045;
-        Fri, 21 Jan 2022 15:09:34 +0000 (GMT)
-Received: from t46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Jan 2022 15:09:34 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com
-Subject: [PATCH kvm-unit-tests v1 8/8] s390x: Add EPSW test
-Date:   Fri, 21 Jan 2022 16:09:31 +0100
-Message-Id: <20220121150931.371720-9-nrb@linux.ibm.com>
+        id S1381582AbiAUPbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 10:31:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28852 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1381592AbiAUPbX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Jan 2022 10:31:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642779082;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OtUoNHq7A4SE6zFtDfLA7te7a+Lq28AP0hpcNcpECag=;
+        b=SjWRc6tYNIF3Y7Yksmwq1lZ49YMjMHcQSEixwpXNVfHGv0nz2ZAq7cWD5LKiB3xjJ+ust6
+        YQfaqWPVdQWBauI+j3Zze30QXneJcqyeNepujbpBfE8TW0DnCZxM+aQ3LbWoeNAbTJidfq
+        0o38K/UfKg4GtxdNpG3ST6mUnbOYEvM=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-587-c981JSfTPPC5rlVN2TblzQ-1; Fri, 21 Jan 2022 10:31:21 -0500
+X-MC-Unique: c981JSfTPPC5rlVN2TblzQ-1
+Received: by mail-pf1-f197.google.com with SMTP id y2-20020aa78042000000b004c5f182c0b4so4160395pfm.14
+        for <kvm@vger.kernel.org>; Fri, 21 Jan 2022 07:31:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OtUoNHq7A4SE6zFtDfLA7te7a+Lq28AP0hpcNcpECag=;
+        b=QZo6nX2P/CuLbL30CsHSAhjgeb3C++UD00p6QVlAE7pq9WcHreDJR/E5VDjDEvdUOZ
+         VnSafVZiMXGxgYutMNazQLUz02YqP34ebzs+8SnF+biZYWRwjE2OI1uIXHT1iUYVAKCf
+         JzDzMAc8t/uJE+TE3zI7dXe042SHQxo+5Y3yri/CM4CKnGfDNJgpEb1fe6/l22nqP8hl
+         cL9Z611goo+MjEiIkUbjikE+qbx7l+HWOZkZtFNFex2wXWozmdPNzpuF23DKC+m9mwwa
+         lPSFsHt6Fj1yrrD+PAJ9DB3tRDw/pIRW7zoXwIeV2Uxl+OPHQTj/+ZqASsxbtnI5DFVY
+         GbZg==
+X-Gm-Message-State: AOAM531ZaUVaMsSr1WcNDd7QkCBu/TSsG00s5bR+WGp3UkTDCTDQjyqQ
+        yp1/gG7plQoEnIEA3MPj2iMkBBquAa258gUBi99QTlkRXYLFLkUwyn6yCvLFxBtoSNSe2F5Fw0+
+        r0H87+Y/D1iwE
+X-Received: by 2002:a62:ab03:0:b0:4c6:419e:f8f2 with SMTP id p3-20020a62ab03000000b004c6419ef8f2mr4067814pff.4.1642779080354;
+        Fri, 21 Jan 2022 07:31:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx6q0reQiVxMv8WMVszJ9f1J1yC2BTK8uM93yxVR4UChzktBXihhcIJ52HJnaO4J45jUP3f6A==
+X-Received: by 2002:a62:ab03:0:b0:4c6:419e:f8f2 with SMTP id p3-20020a62ab03000000b004c6419ef8f2mr4067798pff.4.1642779080064;
+        Fri, 21 Jan 2022 07:31:20 -0800 (PST)
+Received: from steredhat.redhat.com (host-95-238-125-214.retail.telecomitalia.it. [95.238.125.214])
+        by smtp.gmail.com with ESMTPSA id s6sm5394612pgk.44.2022.01.21.07.31.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jan 2022 07:31:18 -0800 (PST)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org
+Subject: [PATCH v2] vhost: cache avail index in vhost_enable_notify()
+Date:   Fri, 21 Jan 2022 16:31:08 +0100
+Message-Id: <20220121153108.187291-1-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220121150931.371720-1-nrb@linux.ibm.com>
-References: <20220121150931.371720-1-nrb@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: btHg7hbSCj82AqU_h-l250ca6B4gkJI-
-X-Proofpoint-ORIG-GUID: 1RYZTZAdasPHM15vMdWWaIuOCUXCiEzT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-21_06,2022-01-21_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 clxscore=1015 adultscore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2201210102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-EPSW is only intercepted in certain cases. One of these cases is if we
-have a CRW pending and machine check interrupts are masked. This can be
-achieved by issuing a RCHP on a valid channel path. This is why we need
-the CSS lib and an IO device in this test and hence need to skip it
-when not running under QEMU.
+In vhost_enable_notify() we enable the notifications and we read
+the avail index to check if new buffers have become available in
+the meantime.
 
-Three special cases deserve our attention:
+We are not caching the avail index, so when the device will call
+vhost_get_vq_desc(), it will find the old value in the cache and
+it will read the avail index again.
 
-- upper 32 bits of both operands are never modified,
-- second operand is not modified if it is zero.
-- when both operands are zero, bits 0-11 and 13-31 of the PSW are
-  stored in r0.
+It would be better to refresh the cache every time we read avail
+index, so let's change vhost_enable_notify() caching the value in
+`avail_idx` and compare it with `last_avail_idx` to check if there
+are new buffers available.
 
-We also verify we get the correct contents when the second operand is
-zero. To do so, we save the data stored at the first operand in the
-first case as a reference. As we don't mess with the PSW, the only thing
-that might change is the Condition Code (CC) due to some instruction in
-between, so we zero it out using zero_out_cc_from_epsw_op1().
+We don't expect a significant performance boost because
+the above path is not very common, indeed vhost_enable_notify()
+is often called with unlikely(), expecting that avail index has
+not been updated.
 
-This test must be fenced when running in non-QEMU. For this, we need
-vm_is_kvm() from Pierre's patchset
-"[kvm-unit-tests PATCH v3 0/4] S390x: CPU Topology Information"
-(Message-Id: <20220110133755.22238-3-pmorel@linux.ibm.com>)
+We ran virtio-test/vhost-test and noticed minimal improvement as
+expected. To stress the patch more, we modified vhost_test.ko to
+call vhost_enable_notify()/vhost_disable_notify() on every cycle
+when calling vhost_get_vq_desc(); in this case we observed a more
+evident improvement, with a reduction of the test execution time
+of about 3.7%.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- s390x/Makefile      |   1 +
- s390x/epsw.c        | 113 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   4 ++
- 3 files changed, 118 insertions(+)
- create mode 100644 s390x/epsw.c
+v2
+- added performance info in the commit description [MST]
+---
+ drivers/vhost/vhost.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index a76b78e5a011..25449708da0d 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -27,6 +27,7 @@ tests += $(TEST_DIR)/edat.elf
- tests += $(TEST_DIR)/mvpg-sie.elf
- tests += $(TEST_DIR)/spec_ex-sie.elf
- tests += $(TEST_DIR)/firq.elf
-+tests += $(TEST_DIR)/epsw.elf
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 59edb5a1ffe2..07363dff559e 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+ 		       &vq->avail->idx, r);
+ 		return false;
+ 	}
++	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
  
- pv-tests += $(TEST_DIR)/pv-diags.elf
+-	return vhost16_to_cpu(vq, avail_idx) != vq->avail_idx;
++	return vq->avail_idx != vq->last_avail_idx;
+ }
+ EXPORT_SYMBOL_GPL(vhost_enable_notify);
  
-diff --git a/s390x/epsw.c b/s390x/epsw.c
-new file mode 100644
-index 000000000000..192115cf2fac
---- /dev/null
-+++ b/s390x/epsw.c
-@@ -0,0 +1,113 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * EPSW Interception Tests
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+#include <libcflat.h>
-+#include <css.h>
-+#include <vm.h>
-+
-+static uint32_t zero_out_cc_from_epsw_op1(uint32_t epsw_op1)
-+{
-+	return epsw_op1 & ~GENMASK(31 - 18, 31 - 20);
-+}
-+
-+static void generate_crw(void)
-+{
-+	int test_device_sid = css_enumerate();
-+	int cc, ret;
-+
-+	if (!(test_device_sid & SCHID_ONE)) {
-+		report_fail("No I/O device found");
-+		return;
-+	}
-+
-+	cc = css_enable(test_device_sid, IO_SCH_ISC);
-+	report(cc == 0, "Enable subchannel %08x", test_device_sid);
-+
-+	ret = css_generate_crw(test_device_sid);
-+	if (ret)
-+		report_fail("Couldn't generate CRW");
-+}
-+
-+static void test_epsw(void)
-+{
-+	const uint64_t MAGIC1 = 0x1234567890abcdefUL;
-+	const uint64_t MAGIC2 = 0xcafedeadbeeffaceUL;
-+
-+	uint64_t op1 = MAGIC1;
-+	uint64_t op2 = MAGIC2;
-+	uint32_t prev_epsw_op1;
-+
-+	/*
-+	 * having machine check interrupts masked and pending CRW ensures
-+	 * EPSW is intercepted under KVM
-+	 */
-+	generate_crw();
-+
-+	report_prefix_push("both operands given");
-+	asm volatile(
-+		"epsw %0, %1\n"
-+		: "+&d" (op1), "+&a" (op2));
-+	report(upper_32_bits(op1) == upper_32_bits(MAGIC1) &&
-+	       upper_32_bits(op2) == upper_32_bits(MAGIC2),
-+	       "upper 32 bits unmodified");
-+	report(lower_32_bits(op1) != lower_32_bits(MAGIC1) &&
-+	       lower_32_bits(op2) != lower_32_bits(MAGIC2),
-+	       "lower 32 bits modified");
-+	prev_epsw_op1 = zero_out_cc_from_epsw_op1(lower_32_bits(op1));
-+	report_prefix_pop();
-+
-+	report_prefix_push("second operand 0");
-+	op1 = MAGIC1;
-+	op2 = MAGIC2;
-+	asm volatile(
-+		"	lgr 0,%[op2]\n"
-+		"	epsw %[op1], 0\n"
-+		"	lgr %[op2],0\n"
-+		: [op2] "+&d" (op2), [op1] "+&a" (op1)
-+		:
-+		: "0");
-+	report(upper_32_bits(op1) == upper_32_bits(MAGIC1),
-+	       "upper 32 bits of first operand unmodified");
-+	report(zero_out_cc_from_epsw_op1(lower_32_bits(op1)) == prev_epsw_op1,
-+	       "first operand matches previous reading");
-+	report(op2 == MAGIC2, "r0 unmodified");
-+	report_prefix_pop();
-+
-+	report_prefix_push("both operands 0");
-+	op1 = MAGIC1;
-+	asm volatile(
-+		"	lgr 0,%[op1]\n"
-+		"	epsw 0, 0\n"
-+		"	lgr %[op1],0\n"
-+		: [op1] "+&d" (op1)
-+		:
-+		: "0");
-+	report(upper_32_bits(op1) == upper_32_bits(MAGIC1),
-+	       "upper 32 bits of first operand unmodified");
-+	report(zero_out_cc_from_epsw_op1(lower_32_bits(op1)) == prev_epsw_op1,
-+	       "first operand matches previous reading");
-+	report_prefix_pop();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	if (!vm_is_kvm() && !vm_is_tcg()) {
-+		report_skip("Not running under QEMU");
-+		goto done;
-+	}
-+
-+	report_prefix_push("epsw");
-+
-+	test_epsw();
-+
-+done:
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 3b99d22147e2..1fd177c4b24c 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -125,3 +125,7 @@ extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -devi
- 
- [sck]
- file = sck.elf
-+
-+[epsw]
-+file = epsw.elf
-+extra_params = -device virtio-net-ccw
 -- 
 2.31.1
 
