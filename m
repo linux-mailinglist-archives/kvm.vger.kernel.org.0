@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D517495FC8
-	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 14:29:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0861495FCA
+	for <lists+kvm@lfdr.de>; Fri, 21 Jan 2022 14:29:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380782AbiAUN3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jan 2022 08:29:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41942 "EHLO
+        id S1380727AbiAUN3Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jan 2022 08:29:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57179 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1380714AbiAUN3J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Jan 2022 08:29:09 -0500
+        by vger.kernel.org with ESMTP id S1380726AbiAUN3L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Jan 2022 08:29:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642771748;
+        s=mimecast20190719; t=1642771750;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XcWu6s4pN5jlEkVju4/UBrdbowSjhtmAIaPpgML9RtY=;
-        b=DZxgFXkGayLgzZ9GtHQ0sVX+gXyAjBv2oYUPK9PIscYkyHY5Cgr9psFaF1ig1xq4vcXb+5
-        ZJaS2EdVj91u+o8Gjxx4U6HpTPXSaVQBufwqlFYFxlZhXaS6n4pVS+O4yMdGIbjq1t6VqZ
-        8PPNkwTPk3RwTkslTiWIujaSl53qulU=
+        bh=2PBE8349W+pORnjnNy3WMgm07NQBV8dZAmx6X3HKn1A=;
+        b=Mb9EXCGIA9pJC3LS6zt7QyDxSypyObPwqeoWTAQaXZ+0qtYLvUXpwptiWecxLJxbXnJfNg
+        /YNcKK30n7oCy2rdp2ByVsCbRfQsvkeGEajuoZ+KATroYv4TowBOImPm3xtC654UhD5b4z
+        uyeB1n+fV3eGTWb9E6cfoOp57E/9oFI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-325-HZhNq7LqNTe5hEetPfEeuQ-1; Fri, 21 Jan 2022 08:29:05 -0500
-X-MC-Unique: HZhNq7LqNTe5hEetPfEeuQ-1
+ us-mta-36-DsspPE7UO0aD9UtMTOEkmQ-1; Fri, 21 Jan 2022 08:29:07 -0500
+X-MC-Unique: DsspPE7UO0aD9UtMTOEkmQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FC6084DA41;
-        Fri, 21 Jan 2022 13:29:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B05A884DA41;
+        Fri, 21 Jan 2022 13:29:06 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.195.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E8457E228;
-        Fri, 21 Jan 2022 13:29:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D9637E213;
+        Fri, 21 Jan 2022 13:29:04 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -41,9 +41,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Igor Mammedov <imammedo@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 3/5] KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN
-Date:   Fri, 21 Jan 2022 14:28:50 +0100
-Message-Id: <20220121132852.2482355-4-vkuznets@redhat.com>
+Subject: [PATCH v4 4/5] KVM: selftests: Rename 'get_cpuid_test' to 'cpuid_test'
+Date:   Fri, 21 Jan 2022 14:28:51 +0100
+Message-Id: <20220121132852.2482355-5-vkuznets@redhat.com>
 In-Reply-To: <20220121132852.2482355-1-vkuznets@redhat.com>
 References: <20220121132852.2482355-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -53,106 +53,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
-forbade changing CPUID altogether but unfortunately this is not fully
-compatible with existing VMMs. In particular, QEMU reuses vCPU fds for
-CPU hotplug after unplug and it calls KVM_SET_CPUID2. Instead of full ban,
-check whether the supplied CPUID data is equal to what was previously set.
+In preparation to reusing the existing 'get_cpuid_test' for testing
+"KVM_SET_CPUID{,2} after KVM_RUN" rename it to 'cpuid_test' to avoid
+the confusion.
 
-Reported-by: Igor Mammedov <imammedo@redhat.com>
-Fixes: feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
+No functional change intended.
+
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/cpuid.c | 31 +++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c   | 19 -------------------
- 2 files changed, 31 insertions(+), 19 deletions(-)
+ tools/testing/selftests/kvm/.gitignore                        | 2 +-
+ tools/testing/selftests/kvm/Makefile                          | 4 ++--
+ .../selftests/kvm/x86_64/{get_cpuid_test.c => cpuid_test.c}   | 0
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+ rename tools/testing/selftests/kvm/x86_64/{get_cpuid_test.c => cpuid_test.c} (100%)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 7c48daee6670..96556bf494fc 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -119,6 +119,19 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
- 	return fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, xfeatures);
- }
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 8c129961accf..20b4c921c9a2 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -8,11 +8,11 @@
+ /s390x/memop
+ /s390x/resets
+ /s390x/sync_regs_test
++/x86_64/cpuid_test
+ /x86_64/cr4_cpuid_sync_test
+ /x86_64/debug_regs
+ /x86_64/evmcs_test
+ /x86_64/emulator_error_test
+-/x86_64/get_cpuid_test
+ /x86_64/get_msr_index_features
+ /x86_64/kvm_clock_test
+ /x86_64/kvm_pv_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index ee8cf2149824..ec78a8692899 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -43,11 +43,11 @@ LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handler
+ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+ LIBKVM_riscv = lib/riscv/processor.c lib/riscv/ucall.c
  
-+/* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
-+static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
-+				 int nent)
-+{
-+	if (nent != vcpu->arch.cpuid_nent)
-+		return -EINVAL;
-+
-+	if (memcmp(e2, vcpu->arch.cpuid_entries, nent * sizeof(*e2)))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static void kvm_update_kvm_cpuid_base(struct kvm_vcpu *vcpu)
- {
- 	u32 function;
-@@ -325,6 +338,24 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 
- 	__kvm_update_cpuid_runtime(vcpu, e2, nent);
- 
-+	/*
-+	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
-+	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
-+	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
-+	 * faults due to reusing SPs/SPTEs. In practice no sane VMM mucks with
-+	 * the core vCPU model on the fly. To avoid potential hard to debug
-+	 * problems, forbid changing CPUID data after successfully entering the
-+	 * guest. Banning KVM_SET_CPUID{,2} altogether is incompatible with
-+	 * certain VMMs (e.g. QEMU) which reuse vCPU fds for CPU hotplug as
-+	 * KVM_SET_CPUID{,2} call (with the same CPUID data) may be issued again
-+	 * upon hotplug.
-+	 * Note, there are other problematic scenarios which are currently not
-+	 * being handled, e.g. supplying different CPUID data for different
-+	 * vCPUs also won't be handled correctly by KVM MMU.
-+	 */
-+	if (vcpu->arch.last_vmentry_cpu != -1)
-+		return kvm_cpuid_check_equal(vcpu, e2, nent);
-+
- 	r = kvm_check_cpuid(vcpu, e2, nent);
- 	if (r)
- 		return r;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 76b4803dd3bd..ff1416010728 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5230,17 +5230,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		struct kvm_cpuid __user *cpuid_arg = argp;
- 		struct kvm_cpuid cpuid;
- 
--		/*
--		 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
--		 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
--		 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
--		 * faults due to reusing SPs/SPTEs.  In practice no sane VMM mucks with
--		 * the core vCPU model on the fly, so fail.
--		 */
--		r = -EINVAL;
--		if (vcpu->arch.last_vmentry_cpu != -1)
--			goto out;
--
- 		r = -EFAULT;
- 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
- 			goto out;
-@@ -5251,14 +5240,6 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		struct kvm_cpuid2 __user *cpuid_arg = argp;
- 		struct kvm_cpuid2 cpuid;
- 
--		/*
--		 * KVM_SET_CPUID{,2} after KVM_RUN is forbidded, see the comment in
--		 * KVM_SET_CPUID case above.
--		 */
--		r = -EINVAL;
--		if (vcpu->arch.last_vmentry_cpu != -1)
--			goto out;
--
- 		r = -EFAULT;
- 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
- 			goto out;
+-TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
++TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
++TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
+-TEST_GEN_PROGS_x86_64 += x86_64/get_cpuid_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
+diff --git a/tools/testing/selftests/kvm/x86_64/get_cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+similarity index 100%
+rename from tools/testing/selftests/kvm/x86_64/get_cpuid_test.c
+rename to tools/testing/selftests/kvm/x86_64/cpuid_test.c
 -- 
 2.34.1
 
