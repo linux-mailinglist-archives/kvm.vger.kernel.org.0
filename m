@@ -2,113 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDCC7496E1B
-	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 22:21:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 283AD496E35
+	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 23:25:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234920AbiAVVVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jan 2022 16:21:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45265 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230339AbiAVVVy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 22 Jan 2022 16:21:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642886513;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uu/ZUweKKjJVMvOwUFTv/e/eF5a0GpR7aY3c+G2pH8I=;
-        b=dcbpanwkk5a7eCj57Oaq1dBkcuUQTedcIse74LB6pnSksOY+5Y36W0Osk8tFjKEgz+iiE5
-        EnD6PCHgqMmzXWlBuS6IBUrOUonlUVaxboJLEK/WQhp1s9S4E4BaSgYzAtLU6vLKnwvJD+
-        qs+cS8AIS7bf/i1Om3PqPFg8u0XNpSg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-79-3hRQtEFAMoWrcShi4LWqnQ-1; Sat, 22 Jan 2022 16:21:52 -0500
-X-MC-Unique: 3hRQtEFAMoWrcShi4LWqnQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21D3D18397B3;
-        Sat, 22 Jan 2022 21:21:51 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CDDD2E716;
-        Sat, 22 Jan 2022 21:21:48 +0000 (UTC)
-Message-ID: <5c84ef95b457091964c3fd0ceac4bb99900018b3.camel@redhat.com>
-Subject: Re: [PATCH] KVM: x86: nSVM: skip eax alignment check for non-SVM
- instructions
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Denis Valeev <lemniscattaden@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Date:   Sat, 22 Jan 2022 23:21:47 +0200
-In-Reply-To: <Yexlhaoe1Fscm59u@q>
-References: <Yexlhaoe1Fscm59u@q>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S235016AbiAVWZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jan 2022 17:25:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230284AbiAVWZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jan 2022 17:25:55 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92587C06173B
+        for <kvm@vger.kernel.org>; Sat, 22 Jan 2022 14:25:54 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id c15so2010052qtv.1
+        for <kvm@vger.kernel.org>; Sat, 22 Jan 2022 14:25:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=2sXe8OnEy5tHpjKg60R0Ff0ADmQIY55eD9X8p0CO2Yg=;
+        b=OkUlSiauheFbPo0LM4zA1zI6V0+vxsGekd9pvGFATrzMhcE1dIkQvL14Be37WQ4DbY
+         PIO+EiMs4UURrbGI3tVTD9fWY1S5T1W68+Xf/yNbH2bBHo3RqEKmIzANjVWLoPwhdBJP
+         kbUUwnnxwSNLhCsDQ9gjOhQLYlelOAkdip34mwgISxvvmufc78pMCZGgETSzfuuQk9hg
+         4KWO24ZSVpef9kflmwMbB3mnVil8LJpaf75RNcwNBKyIpg3lW9KeqfuFEU0rxMXGLPLx
+         cm/ogyi2W6vx3LabVF4D+zJ9wfMj3er7PaGL5cBCMf8slnxX2ag+FMeZfbNyJl66kp+a
+         oDYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=2sXe8OnEy5tHpjKg60R0Ff0ADmQIY55eD9X8p0CO2Yg=;
+        b=0VGfU10jGY2pNB2roVpHWPNNCHn4q8qDPcyhy55iF9TXCjny5Lku4w63gXtQouVQO/
+         ykHuY9ReS29wWuwlDIHYLfFjYJn4RaakonENO3QvmFak2laaeqv1yf4GOFUInLiqywSc
+         vTlxtqAhImQM+7khKqxdkmoVNie839QNQi3xXcxqDFJG22zB2k2mZpJ9jlQcJqaRVoH3
+         +qor8xv/yYDvrmkYhFV+yI4DKrqFJZsPRRjb2KFzl/ngX1s+U7p2rG8uJXbpcEt8upgF
+         FS8qbvxabTad2sNifGdqisVgGkc2EB+X3HL6Ph4XbU5Mk0lwIc741kMUJWGK3hWHT4xN
+         irxQ==
+X-Gm-Message-State: AOAM533NAcJkV/BuKexvY6utapE6/AeTxB+YlvnWiFX3yKGBgIyx+ufX
+        ViaAUHOpLeBnu4v2pqKnTgLvMnPJryTDv+gra1Q=
+X-Google-Smtp-Source: ABdhPJyb4KAmD8hib9iZDKsqYbrEdgYkx+puf0m7Bf/Vp5hLJxDhOvntWXQgNLfXN58HnXicRw0wXeJgeiqYQK632Js=
+X-Received: by 2002:a05:622a:189:: with SMTP id s9mr6390539qtw.165.1642890353671;
+ Sat, 22 Jan 2022 14:25:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received: by 2002:ad4:5fcb:0:0:0:0:0 with HTTP; Sat, 22 Jan 2022 14:25:53
+ -0800 (PST)
+Reply-To: fionahill.usa@outlook.com
+From:   Fiona Hill <sylviajones045@gmail.com>
+Date:   Sat, 22 Jan 2022 14:25:53 -0800
+Message-ID: <CAEsQPx7t_aPbjgoE5sGLOTyxWSCmPEKb44b3y5RrrkuuX5ES6w@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2022-01-22 at 23:13 +0300, Denis Valeev wrote:
-> The bug occurs on #GP triggered by VMware backdoor when eax value is
-> unaligned. eax alignment check should not be applied to non-SVM
-> instructions because it leads to incorrect omission of the instructions
-> emulation.
-> Apply the alignment check only to SVM instructions to fix.
-> 
-> Fixes: d1cba6c92237 ("KVM: x86: nSVM: test eax for 4K alignment for GP errata workaround")
-> 
-> Signed-off-by: Denis Valeev <lemniscattaden@gmail.com>
-> ---
-> This bug breaks nyx-fuzz (https://nyx-fuzz.com) that uses VMware backdoor
-> as an alternative way for hypercall from guest user-mode. With this bug
-> a hypercall interpreted as a GP and leads to process termination.
-> 
->  arch/x86/kvm/svm/svm.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index e64f16237b60..b5e4731080ef 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2233,10 +2233,6 @@ static int gp_interception(struct kvm_vcpu *vcpu)
->  	if (error_code)
->  		goto reinject;
->  
-> -	/* All SVM instructions expect page aligned RAX */
-> -	if (svm->vmcb->save.rax & ~PAGE_MASK)
-> -		goto reinject;
-> -
->  	/* Decode the instruction for usage later */
->  	if (x86_decode_emulated_instruction(vcpu, 0, NULL, 0) != EMULATION_OK)
->  		goto reinject;
-> @@ -2254,8 +2250,13 @@ static int gp_interception(struct kvm_vcpu *vcpu)
->  		if (!is_guest_mode(vcpu))
->  			return kvm_emulate_instruction(vcpu,
->  				EMULTYPE_VMWARE_GP | EMULTYPE_NO_DECODE);
-> -	} else
-> +	} else {
-> +		/* All SVM instructions expect page aligned RAX */
-> +		if (svm->vmcb->save.rax & ~PAGE_MASK)
-> +			goto reinject;
-> +
->  		return emulate_svm_instr(vcpu, opcode);
-> +	}
->  
->  reinject:
->  	kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
-
-
-Oops.
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-
-Thanks,
-Best regards,
-	Maxim Levitsky
-
+-- 
+Hi,Diid you receive   my  message i send to you ? I'm waiting for your
+urgent respond,
