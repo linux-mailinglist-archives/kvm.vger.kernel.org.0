@@ -2,201 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 992F6496E1D
-	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 22:39:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDCC7496E1B
+	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 22:21:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234934AbiAVVix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jan 2022 16:38:53 -0500
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:60923 "EHLO
-        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230339AbiAVViw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 22 Jan 2022 16:38:52 -0500
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.nyi.internal (Postfix) with ESMTP id B31AA5802A6;
-        Sat, 22 Jan 2022 16:38:51 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Sat, 22 Jan 2022 16:38:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=turner.link; h=
-        cc:cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; bh=MsViZzLF8Kq6HOdr8iHnwG72oVaccjfy8JbG24
-        /A8XM=; b=BaVO64CFNCl14UaN1iXZ5HD7QFcdTRYaBRpbTDciSr3gyP7ujk9Vmx
-        B6MFRCT6GKfuvsr1QiJ1eMtFE6ZW/uNTPhsiZPKd3IY0ElAcB0ubjGQ7IEIymtQh
-        n+1xCJy1RqQljRrRi1yK2mwhbu2P2Vb+1VCIRe2ROLWAgPrMffBYfTFyFIxX/oNw
-        /uAfakYLKqROBYc/XHjL3PwjpignZkAao/QvG7DrQV6WpBTgJj0y0HdFbK/PjNOo
-        oQiDUtXYZ/wmIaSShFoZ0AR078ztRtk7kGnKTYH3LsNlaqUFjgL9TzbWdfXDlHQf
-        4+3rMHNmnPmPwR9PQV5kyZdSm8pAcUOw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=MsViZzLF8Kq6HOdr8
-        iHnwG72oVaccjfy8JbG24/A8XM=; b=KFEkrIVKNzlC5WO9zT68QI+pffxmYHKRl
-        +TcDFrUZh+xL1dRc/ucNnZwGca1Y8k2XKK7IWMwvBAQurhqBlfjBAtJHX03pkC0h
-        3Qckz2ghniY4pisdXEjke+rB4D6PB6TX5rHFTlEgniQzN4UTrV0NDDJospwgetE7
-        2IVmniPay70zbZZxGotOff1f/NqNYNWBeVeO/wRqIgxzPVd/V0qTKq/eQWJjw5Vc
-        Ilnakbupl0/9zqz3UneLsDrJu3rPi+BciK/ssHG+c3rgjInUNKHj0kAE/F4JkbbQ
-        fQu3Z1QpA7n54ldPxk2wihngZVnCW8R71TGb8ndikvw5EWK1YRQEw==
-X-ME-Sender: <xms:a3nsYRcAVeLoznYBFOIN9rAomBHI__VSU3Q9KBKlCzAfhPJ3UP7uCg>
-    <xme:a3nsYfPPbwuqtLAxyO89nP-9SbFv8pVsJ4YEFomX08lU8Ocd97NYJqgObR0gHbAcq
-    dmx9JdtHiVc4BRs7Q>
-X-ME-Received: <xmr:a3nsYag01LgO-MrezA50wVPoMpLgXXcd4u71q_Gml9S5iRZwpWiG0tH0GnHw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrvddvgdduhedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfhfhvffuffgjkfggtgesthdtredttddttdenucfhrhhomheplfgrmhgvshcu
-    vfhurhhnvghruceolhhinhhugihkvghrnhgvlhdrfhhoshhssegumhgrrhgtqdhnohhnvg
-    drthhurhhnvghrrdhlihhnkheqnecuggftrfgrthhtvghrnheptedvfeduheeiueefgffh
-    vdetiedttdevhfeiteeuhfelveduvedttdffgffggfetnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheplhhinhhugihkvghrnhgvlhdrfhhoshhs
-    segumhgrrhgtqdhnohhnvgdrthhurhhnvghrrdhlihhnkh
-X-ME-Proxy: <xmx:a3nsYa_HbNlh01OToipZGyFTiZrDRc15AEX9OKOAv4UqcdFsrSfvIg>
-    <xmx:a3nsYdsDUGLZZHE5gStW8bNSqOmEeoYU0FvXNgdVn-7KaU1MwdaS7g>
-    <xmx:a3nsYZECU7jeWJJqxgXEsSeqAXlz6MNXqWMSCQBZG4LLivcwQBjRSQ>
-    <xmx:a3nsYeOYkJCmJ45IwgFYSH84jAHm5CKnMkMX9QQqZC7a3hdeigzGww>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 22 Jan 2022 16:38:51 -0500 (EST)
-References: <87ee57c8fu.fsf@turner.link>
- <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
- <87a6ftk9qy.fsf@dmarc-none.turner.link> <87zgnp96a4.fsf@turner.link>
- <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
- <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
- <87czkk1pmt.fsf@dmarc-none.turner.link>
- <BYAPR12MB46140BE09E37244AE129C01A975C9@BYAPR12MB4614.namprd12.prod.outlook.com>
-From:   James Turner <linuxkernel.foss@dmarc-none.turner.link>
-To:     "Lazar, Lijo" <Lijo.Lazar@amd.com>
-Cc:     Alex Deucher <alexdeucher@gmail.com>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
-        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Koenig, Christian" <Christian.Koenig@amd.com>
-Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU
- PCI-passed-through to Windows VM
-Date:   Sat, 22 Jan 2022 16:11:13 -0500
-In-reply-to: <BYAPR12MB46140BE09E37244AE129C01A975C9@BYAPR12MB4614.namprd12.prod.outlook.com>
-Message-ID: <87sftfqwlx.fsf@dmarc-none.turner.link>
+        id S234920AbiAVVVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jan 2022 16:21:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45265 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230339AbiAVVVy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 22 Jan 2022 16:21:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642886513;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uu/ZUweKKjJVMvOwUFTv/e/eF5a0GpR7aY3c+G2pH8I=;
+        b=dcbpanwkk5a7eCj57Oaq1dBkcuUQTedcIse74LB6pnSksOY+5Y36W0Osk8tFjKEgz+iiE5
+        EnD6PCHgqMmzXWlBuS6IBUrOUonlUVaxboJLEK/WQhp1s9S4E4BaSgYzAtLU6vLKnwvJD+
+        qs+cS8AIS7bf/i1Om3PqPFg8u0XNpSg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-79-3hRQtEFAMoWrcShi4LWqnQ-1; Sat, 22 Jan 2022 16:21:52 -0500
+X-MC-Unique: 3hRQtEFAMoWrcShi4LWqnQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21D3D18397B3;
+        Sat, 22 Jan 2022 21:21:51 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CDDD2E716;
+        Sat, 22 Jan 2022 21:21:48 +0000 (UTC)
+Message-ID: <5c84ef95b457091964c3fd0ceac4bb99900018b3.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86: nSVM: skip eax alignment check for non-SVM
+ instructions
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Denis Valeev <lemniscattaden@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Date:   Sat, 22 Jan 2022 23:21:47 +0200
+In-Reply-To: <Yexlhaoe1Fscm59u@q>
+References: <Yexlhaoe1Fscm59u@q>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Lijo,
-
-> Could you provide the pp_dpm_* values in sysfs with and without the
-> patch? Also, could you try forcing PCIE to gen3 (through pp_dpm_pcie)
-> if it's not in gen3 when the issue happens?
-
-AFAICT, I can't access those values while the AMD GPU PCI devices are
-bound to `vfio-pci`. However, I can at least access the link speed and
-width elsewhere in sysfs. So, I gathered what information I could for
-two different cases:
-
-- With the PCI devices bound to `vfio-pci`. With this configuration, I
-  can start the VM, but the `pp_dpm_*` values are not available since
-  the devices are bound to `vfio-pci` instead of `amdgpu`.
-
-- Without the PCI devices bound to `vfio-pci` (i.e. after removing the
-  `vfio-pci.ids=...` kernel command line argument). With this
-  configuration, I can access the `pp_dpm_*` values, since the PCI
-  devices are bound to `amdgpu`. However, I cannot use the VM. If I try
-  to start the VM, the display (both the external monitors attached to
-  the AMD GPU and the built-in laptop display attached to the Intel
-  iGPU) completely freezes.
-
-The output shown below was identical for both the good commit:
-f1688bd69ec4 ("drm/amd/amdgpu:save psp ring wptr to avoid attack")
-and the commit which introduced the issue:
-f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)")
-
-Note that the PCI link speed increased to 8.0 GT/s when the GPU was
-under heavy load for both versions, but the clock speeds of the GPU were
-different under load. (For the good commit, it was 1295 MHz; for the bad
-commit, it was 501 MHz.)
-
-
-# With the PCI devices bound to `vfio-pci`
-
-## Before starting the VM
-
-% ls /sys/module/amdgpu/drivers/pci:amdgpu
-module  bind  new_id  remove_id  uevent  unbind
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -print -exec cat {} \;
-/sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-8.0 GT/s PCIe
-
-## While running the VM, before placing the AMD GPU under heavy load
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -print -exec cat {} \;
-/sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-2.5 GT/s PCIe
-
-## While running the VM, with the AMD GPU under heavy load
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -print -exec cat {} \;
-/sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-8.0 GT/s PCIe
-
-## While running the VM, after stopping the heavy load on the AMD GPU
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -print -exec cat {} \;
-/sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-2.5 GT/s PCIe
-
-## After stopping the VM
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -print -exec cat {} \;
-/sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-2.5 GT/s PCIe
+On Sat, 2022-01-22 at 23:13 +0300, Denis Valeev wrote:
+> The bug occurs on #GP triggered by VMware backdoor when eax value is
+> unaligned. eax alignment check should not be applied to non-SVM
+> instructions because it leads to incorrect omission of the instructions
+> emulation.
+> Apply the alignment check only to SVM instructions to fix.
+> 
+> Fixes: d1cba6c92237 ("KVM: x86: nSVM: test eax for 4K alignment for GP errata workaround")
+> 
+> Signed-off-by: Denis Valeev <lemniscattaden@gmail.com>
+> ---
+> This bug breaks nyx-fuzz (https://nyx-fuzz.com) that uses VMware backdoor
+> as an alternative way for hypercall from guest user-mode. With this bug
+> a hypercall interpreted as a GP and leads to process termination.
+> 
+>  arch/x86/kvm/svm/svm.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index e64f16237b60..b5e4731080ef 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2233,10 +2233,6 @@ static int gp_interception(struct kvm_vcpu *vcpu)
+>  	if (error_code)
+>  		goto reinject;
+>  
+> -	/* All SVM instructions expect page aligned RAX */
+> -	if (svm->vmcb->save.rax & ~PAGE_MASK)
+> -		goto reinject;
+> -
+>  	/* Decode the instruction for usage later */
+>  	if (x86_decode_emulated_instruction(vcpu, 0, NULL, 0) != EMULATION_OK)
+>  		goto reinject;
+> @@ -2254,8 +2250,13 @@ static int gp_interception(struct kvm_vcpu *vcpu)
+>  		if (!is_guest_mode(vcpu))
+>  			return kvm_emulate_instruction(vcpu,
+>  				EMULTYPE_VMWARE_GP | EMULTYPE_NO_DECODE);
+> -	} else
+> +	} else {
+> +		/* All SVM instructions expect page aligned RAX */
+> +		if (svm->vmcb->save.rax & ~PAGE_MASK)
+> +			goto reinject;
+> +
+>  		return emulate_svm_instr(vcpu, opcode);
+> +	}
+>  
+>  reinject:
+>  	kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
 
 
-# Without the PCI devices bound to `vfio-pci`
+Oops.
 
-% ls /sys/module/amdgpu/drivers/pci:amdgpu
-0000:01:00.0  module  bind  new_id  remove_id  uevent  unbind
-
-% for f in /sys/module/amdgpu/drivers/pci:amdgpu/*/pp_dpm_*; do echo "$f"; cat "$f"; echo; done
-/sys/module/amdgpu/drivers/pci:amdgpu/0000:01:00.0/pp_dpm_mclk
-0: 300Mhz
-1: 625Mhz
-2: 1500Mhz *
-
-/sys/module/amdgpu/drivers/pci:amdgpu/0000:01:00.0/pp_dpm_pcie
-0: 2.5GT/s, x8
-1: 8.0GT/s, x16 *
-
-/sys/module/amdgpu/drivers/pci:amdgpu/0000:01:00.0/pp_dpm_sclk
-0: 214Mhz
-1: 501Mhz
-2: 850Mhz
-3: 1034Mhz
-4: 1144Mhz
-5: 1228Mhz
-6: 1275Mhz
-7: 1295Mhz *
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -print -exec cat {} \;
-/sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-8.0 GT/s PCIe
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 
-James
+Thanks,
+Best regards,
+	Maxim Levitsky
+
