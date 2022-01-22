@@ -2,175 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ACFF496B09
-	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 09:37:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8798F496BB7
+	for <lists+kvm@lfdr.de>; Sat, 22 Jan 2022 11:39:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233835AbiAVIhv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jan 2022 03:37:51 -0500
-Received: from mga06.intel.com ([134.134.136.31]:1159 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233816AbiAVIht (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Jan 2022 03:37:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642840669; x=1674376669;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/2yKZZzBR/4spt2HHQNijmNABVsLfrNg0wchrY9Olw8=;
-  b=Ox4qWLzVLLq3Bl/EOQrq5ACiVDsxypVTYJFWgTAT579IMopBPTQMVAG4
-   n76KIv3QzMre6uOmWoOfXEGiTG3572RDYqsDXNesOZyiDt40BXRQTlDxM
-   DySAZgLIa8znwhW7IXKylzz7hJybcjbeJixgclW4J4qSodnLlXHW4jzqA
-   j1SQlrs4IW26U+g6xGnAI8unAgm4xMUL9fYhggjD0/ll3ZQIgkYIG5XfE
-   Fpk5ZBRNPYnDdZr+dLSgOIDDC/tzLTeTCMWJMzzS2+Na3JRNSws1CWjT3
-   U7UycviTjzRj4anmyUTlLdT3jhlnLtilM2khI6pA71FjH7G5KUUfQa7s+
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10234"; a="306524177"
-X-IronPort-AV: E=Sophos;i="5.88,307,1635231600"; 
-   d="scan'208";a="306524177"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2022 00:37:49 -0800
-X-IronPort-AV: E=Sophos;i="5.88,307,1635231600"; 
-   d="scan'208";a="765937386"
-Received: from sqa-gate.sh.intel.com (HELO michael.clx.dev.tsp.org) ([10.239.48.212])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2022 00:37:46 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, ehabkost@redhat.com, mtosatti@redhat.com,
-        richard.henderson@linaro.org, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, likexu@tencent.com, wei.w.wang@intel.com
-Cc:     weijiang.yang@intel.com, Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v5 2/2] target/i386: Add lbr-fmt vPMU option to support guest LBR
-Date:   Sun, 23 Jan 2022 00:12:01 +0800
-Message-Id: <20220122161201.73528-3-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20220122161201.73528-1-weijiang.yang@intel.com>
-References: <20220122161201.73528-1-weijiang.yang@intel.com>
+        id S233807AbiAVKjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jan 2022 05:39:48 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:40746 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233790AbiAVKjs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jan 2022 05:39:48 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0ECA6B81B9C
+        for <kvm@vger.kernel.org>; Sat, 22 Jan 2022 10:39:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA7CDC004E1;
+        Sat, 22 Jan 2022 10:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642847985;
+        bh=eICj53nhUD6oDafxEW9rj8YPqjwYnnth05JyfsVW8b4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=J7H7rBMZIaPwOI0kc27QWeLOb9kuzS23lcn/0MIBZ8VASl4GO556v1lWs+DneAOdd
+         sG5u2P3c6JHveJPA+kih8WFkQT0WriCeaq34Jcl26YyGOrRZmZ4fiqH3cmOmVVanpl
+         CdvmNpEIwS2x2Tk5lHyzZ1N3Yb0jLjji8HGkjVHf3sYNIgilQwlwwHeZIWzgJjYuiV
+         jO6z64pr4Q1/t9Q0pnm4tYfDXdroTCbMWXgTy8bTi/VSIdVxbrOzTghziAco5FraTD
+         Zx2fQOBIKOt5UNLpzLQWddKMzZmnTFr25ZKPfvNCc9sg2QnuUxOU7kueKW1NykQUIf
+         Is/mo2KbONf/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nBDo7-0024oU-Bi; Sat, 22 Jan 2022 10:39:43 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] KVM: arm64: vgic-v3: Restrict SEIS workaround to known broken systems
+Date:   Sat, 22 Jan 2022 10:39:12 +0000
+Message-Id: <20220122103912.795026-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, ardb@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Last Branch Recording (LBR) is a performance monitor unit (PMU)
-feature on Intel processors which records a running trace of the most
-recent branches taken by the processor in the LBR stack. This option
-indicates the LBR format to enable for guest perf.
+Contrary to what df652bcf1136 ("KVM: arm64: vgic-v3: Work around GICv3
+locally generated SErrors") was asserting, there is at least one other
+system out there (Cavium ThunderX2) implementing SEIS, and not in
+an obviously broken way.
 
-The LBR feature is enabled if below conditions are met:
-1) KVM is enabled and the PMU is enabled.
-2) msr-based-feature IA32_PERF_CAPABILITIES is supporterd on KVM.
-3) Supported returned value for lbr_fmt from above msr is non-zero.
-4) Guest vcpu model does support FEAT_1_ECX.CPUID_EXT_PDCM.
-5) User-provided lbr-fmt value doesn't violate its bitmask (0x3f).
-6) Target guest LBR format matches that of host.
+So instead of imposing the M1 workaround on an innocent bystander,
+let's limit it to the two known broken Apple implementations.
 
-Co-developed-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Fixes: df652bcf1136 ("KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors")
+Reported-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- target/i386/cpu.c | 40 ++++++++++++++++++++++++++++++++++++++++
- target/i386/cpu.h | 10 ++++++++++
- 2 files changed, 50 insertions(+)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c |  3 +++
+ arch/arm64/kvm/vgic/vgic-v3.c   | 17 +++++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index aa9e636800..55eb519214 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6280,6 +6280,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     CPUX86State *env = &cpu->env;
-     Error *local_err = NULL;
-     static bool ht_warned;
-+    uint64_t requested_lbr_fmt;
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 20db2f281cf2..4fb419f7b8b6 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -983,6 +983,9 @@ static void __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ 	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
+ 	/* IDbits */
+ 	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
++	/* SEIS */
++	if (kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK)
++		val |= BIT(ICC_CTLR_EL1_SEIS_SHIFT);
+ 	/* A3V */
+ 	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
+ 	/* EOImode */
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 78cf674c1230..d34a795f730c 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -609,6 +609,18 @@ static int __init early_gicv4_enable(char *buf)
+ }
+ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
  
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-         error_setg(errp, "apic-id property was not initialized properly");
-@@ -6297,6 +6298,42 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         goto out;
-     }
- 
-+    /*
-+     * Override env->features[FEAT_PERF_CAPABILITIES].LBR_FMT
-+     * with user-provided setting.
-+     */
-+    if (cpu->lbr_fmt != ~PERF_CAP_LBR_FMT) {
-+        if ((cpu->lbr_fmt & PERF_CAP_LBR_FMT) != cpu->lbr_fmt) {
-+            error_setg(errp, "invalid lbr-fmt");
-+            return;
-+        }
-+        env->features[FEAT_PERF_CAPABILITIES] &= ~PERF_CAP_LBR_FMT;
-+        env->features[FEAT_PERF_CAPABILITIES] |= cpu->lbr_fmt;
-+    }
++static struct midr_range broken_seis[] = {
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
++	{},
++};
 +
-+    /*
-+     * vPMU LBR is supported when 1) KVM is enabled 2) Option pmu=on and
-+     * 3)vPMU LBR format matches that of host setting.
-+     */
-+    requested_lbr_fmt =
-+        env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_LBR_FMT;
-+    if (requested_lbr_fmt && kvm_enabled()) {
-+        uint64_t host_perf_cap =
-+            x86_cpu_get_supported_feature_word(FEAT_PERF_CAPABILITIES, false);
-+        uint64_t host_lbr_fmt = host_perf_cap & PERF_CAP_LBR_FMT;
++static bool vgic_v3_broken_seis(void)
++{
++	return ((kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK) &&
++		is_midr_in_range_list(read_cpuid_id(), broken_seis));
++}
 +
-+        if (!cpu->enable_pmu) {
-+            error_setg(errp, "vPMU: LBR is unsupported without pmu=on");
-+            return;
-+        }
-+        if (requested_lbr_fmt != host_lbr_fmt) {
-+            error_setg(errp, "vPMU: the lbr-fmt value (0x%lx) mismatches "
-+                        "the host supported value (0x%lx).",
-+                        requested_lbr_fmt, host_lbr_fmt);
-+            return;
-+        }
-+    }
-+
-     x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid);
+ /**
+  * vgic_v3_probe - probe for a VGICv3 compatible interrupt controller
+  * @info:	pointer to the GIC description
+@@ -676,9 +688,10 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 		group1_trap = true;
+ 	}
  
-     if (cpu->enforce_cpuid && x86_cpu_have_filtered_features(cpu)) {
-@@ -6649,6 +6686,8 @@ static void x86_cpu_initfn(Object *obj)
-     object_property_add_alias(obj, "sse4_2", obj, "sse4.2");
+-	if (kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK) {
+-		kvm_info("GICv3 with locally generated SEI\n");
++	if (vgic_v3_broken_seis()) {
++		kvm_info("GICv3 with broken locally generated SEI\n");
  
-     object_property_add_alias(obj, "hv-apicv", obj, "hv-avic");
-+    cpu->lbr_fmt = ~PERF_CAP_LBR_FMT;
-+    object_property_add_alias(obj, "lbr_fmt", obj, "lbr-fmt");
- 
-     if (xcc->model) {
-         x86_cpu_load_model(cpu, xcc->model);
-@@ -6804,6 +6843,7 @@ static Property x86_cpu_properties[] = {
- #endif
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-+    DEFINE_PROP_UINT64_CHECKMASK("lbr-fmt", X86CPU, lbr_fmt, PERF_CAP_LBR_FMT),
- 
-     DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-                        HYPERV_SPINLOCK_NEVER_NOTIFY),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 9911d7c871..ee8974abc9 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -383,6 +383,7 @@ typedef enum X86Seg {
- #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
- 
- #define MSR_IA32_PERF_CAPABILITIES      0x345
-+#define PERF_CAP_LBR_FMT                0x3f
- 
- #define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
-@@ -1775,6 +1776,15 @@ struct X86CPU {
-      */
-     bool enable_pmu;
- 
-+    /*
-+     * Enable LBR_FMT bits of IA32_PERF_CAPABILITIES MSR.
-+     * This can't be initialized with a default because it doesn't have
-+     * stable ABI support yet. It is only allowed to pass all LBR_FMT bits
-+     * returned by kvm_arch_get_supported_msr_feature()(which depends on both
-+     * host CPU and kernel capabilities) to the guest.
-+     */
-+    uint64_t lbr_fmt;
-+
-     /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
-      * disabled by default to avoid breaking migration between QEMU with
-      * different LMCE configurations.
++		kvm_vgic_global_state.ich_vtr_el2 &= ~ICH_VTR_SEIS_MASK;
+ 		group0_trap = true;
+ 		group1_trap = true;
+ 		if (ich_vtr_el2 & ICH_VTR_TDS_MASK)
 -- 
-2.27.0
+2.34.1
 
