@@ -2,35 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB087496F34
-	for <lists+kvm@lfdr.de>; Sun, 23 Jan 2022 01:17:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0512C496F15
+	for <lists+kvm@lfdr.de>; Sun, 23 Jan 2022 01:16:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236031AbiAWARP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jan 2022 19:17:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37300 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236125AbiAWAPv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Jan 2022 19:15:51 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4A2C061774;
-        Sat, 22 Jan 2022 16:14:32 -0800 (PST)
+        id S235859AbiAWAQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jan 2022 19:16:13 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:46956 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235860AbiAWAOv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jan 2022 19:14:51 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6C61F60FE3;
-        Sun, 23 Jan 2022 00:14:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3DA6C340E2;
-        Sun, 23 Jan 2022 00:14:30 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id F3FADCE0AD1;
+        Sun, 23 Jan 2022 00:14:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 905F8C340E2;
+        Sun, 23 Jan 2022 00:14:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642896871;
-        bh=B4b/v8rgLAQzM1fDet8n5dlholfeAY0dB3jJ34q97cs=;
+        s=k20201202; t=1642896887;
+        bh=yl0l0j2VPk+eSVZF0zPGiJCcHO4dECQ+JZzfFDsuVDM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sjzLE2KLkv6R63GH8JvIazeZ33btUg1HyaUncmlDdlbtXoGym9zWGlUmgzt+rID8O
-         l2kfeU2o2J0F3PMmwl8ZPVh3csZVjFcEJa/4zahxrfiH1xXsKAkgvTvk0g2sVGxuQt
-         kz66hc03lPSdtMwl38d4BWCkXQQCQK/sPY8aj8XV726MKXhFzvsZgQ1ogwW1+02U9F
-         qrgFWyGsZrKvfLm3SPd5lbRXcb/7hDJ4wk5dCuzxoNmk55r1oXkT6lHTtVxj6ca81J
-         DRYEN9F4u5NnIXhyRIlkLZYh3d0lkn8luoOcBCwhOBSvQlJw8jfvMj+2s8XXZRveiD
-         RvjrKyAdRDxDA==
+        b=lqYFGEFnFoXM3qF3pQxDWhdTjzLu+G8/PYlXOOaQrfakgNOO/hmK0YoOdyiZiHs1g
+         GZgOk4IhFjSJZnK5EBWbg8gHp/3hoEFomUc3vTRg9hHwlWeNj/pNMZaH7IyCoUOwWx
+         26XMxK1A6Rn3o0+Hnc/cfaKUvL4kweOWHkDvqtqGqms28WV/RxP6IkIXx7v/K4+3Dr
+         wvYxuleEigXggmjFo6O8JFzmurrHcv/gQ2A6xxqkch+or2sZRq7Y5WA+cHSp4sYQfw
+         PUzJoCAZ4/O4eFxKmJRT+3l6mFk9Y0EOnq1Ob+onDg/+NCa36Ye/baNQ91n8F3bNKj
+         GMinQP+1hmR2A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
@@ -38,12 +35,12 @@ Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
         Jason Wang <jasowang@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 4/4] vhost/test: fix memory leak of vhost virtqueues
-Date:   Sat, 22 Jan 2022 19:14:21 -0500
-Message-Id: <20220123001423.2461009-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 3/3] vhost/test: fix memory leak of vhost virtqueues
+Date:   Sat, 22 Jan 2022 19:14:32 -0500
+Message-Id: <20220123001434.2461073-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220123001423.2461009-1-sashal@kernel.org>
-References: <20220123001423.2461009-1-sashal@kernel.org>
+In-Reply-To: <20220123001434.2461073-1-sashal@kernel.org>
+References: <20220123001434.2461073-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,7 +65,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-index 682fc58e1f752..3abe6833be88e 100644
+index 6666ca451452a..8a438642255ad 100644
 --- a/drivers/vhost/test.c
 +++ b/drivers/vhost/test.c
 @@ -166,6 +166,7 @@ static int vhost_test_release(struct inode *inode, struct file *f)
