@@ -2,131 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 423C249746D
-	for <lists+kvm@lfdr.de>; Sun, 23 Jan 2022 19:40:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B5B54974C9
+	for <lists+kvm@lfdr.de>; Sun, 23 Jan 2022 19:46:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239660AbiAWSkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Jan 2022 13:40:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53454 "EHLO
+        id S229576AbiAWSpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Jan 2022 13:45:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239653AbiAWSkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Jan 2022 13:40:10 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDADC06174E;
-        Sun, 23 Jan 2022 10:40:08 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d1so13469511plh.10;
-        Sun, 23 Jan 2022 10:40:08 -0800 (PST)
+        with ESMTP id S229791AbiAWSps (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Jan 2022 13:45:48 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B780BC06173B
+        for <kvm@vger.kernel.org>; Sun, 23 Jan 2022 10:45:48 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id j9-20020a17090a7e8900b001b58e473d48so613312pjl.5
+        for <kvm@vger.kernel.org>; Sun, 23 Jan 2022 10:45:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=fXTatFQVxk5Bi3xsp9CFfQ0rYZTcQkLIFRbBZJuCKTo=;
-        b=KYb54rPHkbyc69CRDBpNpVXaOnbgnehqVIcw6Q5nYZrUJqD8fYG2PdedR79iLsupu1
-         0gdBCwGbPIeYyZXmni9s7ZZpmKmo/Qkt6ciMlPncE4deOuznLGJzZl1K94T185JjDU1/
-         0BM4tN7Pc3cUFGARdyGOI4WjOia7CvHbWBmFiJQomUMYAPygd6mJY/DqSogM2u5pn9Al
-         mLIiLcJHMr9gmdThRmWN027YvK50UezK0LFgIFkLjtOSJtI19b+k2G8Scgm6vJnRW1yL
-         NAcnbU0VWi26fHR+siKm19tyEpaeiFoGlNWzQNa+ac8t06cAXMt05iN57RqKTVDHGZd7
-         reYw==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=P5Qm+G5FGiCdB4fLNFODyMa91rweiiWMeJsiF0yU5Mg=;
+        b=K9otBkGqgRDqrO8zUcB0wDR/yt64jhyVjgkIFYEId8VsF4Z5j0iluLyfSBaqXeHBYz
+         AJKzCI/hoSJOaJJS1X2ydCR52AiJyx+N4+0LQ3M31GL5xHpPUO/YC9jUqSVaQklaRftZ
+         fPHmU7NMA66q3MPJ7FmDXQgvtK4OuiGnCWwEcfau06Ok0bryxaamWSiPr44dbGq6dBQX
+         YWLYarAL7X4YiA/RTU14OBru/bY8ljNn+KMlqNgNm5F5w33y07DUfc5481MMuGjOccC2
+         JLXo6qVSHGo8AYMT2TTUnR30uWy9SZaib6hnGARBJtyggbUtG/H/hP57GA4/JzlUkUjA
+         M5qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=fXTatFQVxk5Bi3xsp9CFfQ0rYZTcQkLIFRbBZJuCKTo=;
-        b=gY2zTaPAOGGcOun3NSiwPOGJJ71sZn0VRWIwu4ehkfUYSLlm9lX6hzhRmXopTkHBSV
-         qAsRnBOZ9cGxvlZKTur/+fnlQsthSgp0296bMII2f86EZzmLQMQHe3sf1ntRzx3CAjSH
-         aTcknjGC6qF+x1j5+uPQIgVQKGUbA3Hdf6CNvJvcQP79WRYLXWbjcfNegz7n8wnnQG8D
-         QP/M7fdwCdfrNS7+CGO2VnGBT9+yYmY791KTkiOL4QFoLmi3/Sjal3YGD+XiK1XJHQYZ
-         iQLrfZDXsUT7oQHYWGCgN7Ki+SXoX4xaRHRqyzV6Jawghnk7NXk8JzgKycd5w3UvyNzw
-         E6/Q==
-X-Gm-Message-State: AOAM532QpD+NZ2y4UuKCqTBZ7ylfKMylbzsETBYsinYE4V8QnB31PXEJ
-        IV1OYbB1nxkKQOw7cmtcqNU=
-X-Google-Smtp-Source: ABdhPJxGmwUYVMRzODasTSE+4WExw7bWOf9Gl61W4KWfE3KrsgTh2yrUpg0D0gJG15OcPQdnUHlrww==
-X-Received: by 2002:a17:902:7844:b0:14a:9cff:66c7 with SMTP id e4-20020a170902784400b0014a9cff66c7mr11824524pln.14.1642963207648;
-        Sun, 23 Jan 2022 10:40:07 -0800 (PST)
-Received: from localhost (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id m13sm10828821pjl.39.2022.01.23.10.40.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jan 2022 10:40:07 -0800 (PST)
-From:   Yury Norov <yury.norov@gmail.com>
-To:     Yury Norov <yury.norov@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Laight <David.Laight@aculab.com>,
-        Joe Perches <joe@perches.com>, Dennis Zhou <dennis@kernel.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-        Alexey Klimov <aklimov@redhat.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH 06/54] x86/kvm: replace bitmap_weight with bitmap_empty where appropriate
-Date:   Sun, 23 Jan 2022 10:38:37 -0800
-Message-Id: <20220123183925.1052919-7-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220123183925.1052919-1-yury.norov@gmail.com>
-References: <20220123183925.1052919-1-yury.norov@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=P5Qm+G5FGiCdB4fLNFODyMa91rweiiWMeJsiF0yU5Mg=;
+        b=a7lcnVb7TxD9SNpszHp2e8m6PDxFe9AIUCZ+1FfAXYyEbgEuzaO8Ltz9KOatsGXwf6
+         Vtd4nZ4c6sgDHBqxLvarf1WnlUbmZ8AWH4waQ0K+GLlUPqKezBa+SCWwZA2oF/KDHL1E
+         FzykFZdBry3PWWT2wde7gleYOA+F+VK5CTK0DtpXhXbWLnVAD4vPquSYjwRKynCY2HDi
+         g1EPkhC7NF5hdF/DoBUa469bCbHiEeVluslfg0Hk3xiJc1wLbrlk1Lq17kUcnwIegpwB
+         NfzFpUXpcCbGc84fWQI5fwiipMbcT9DLU2lyGIAqk05epl6ZY/nGytOvntmGLCLRQhEW
+         DhQA==
+X-Gm-Message-State: AOAM532yztkxIizwNJPL5Bdht4TniuEscEWqQrMxlpwaouR0jCu4r+YS
+        CSwQ02rzUAcj4wO3uV1QqmXy0RWDMPUnl1o7+Eoc1NZA9kLpRElhU7dQgSL3Gtl8ctFSrvw+g+J
+        PIox8L0nLfawmGnMslkJpewaSnYYy/x4jCzP0QGAwnzfNBvlNX95Om/MSkTkBRX0M5A==
+X-Google-Smtp-Source: ABdhPJzIejWg6+Jg3GOXFDY81mIbCq6AvOcTwv/VoV5OG3c6P8beQ9V07+E2ti1pBVlEmlwvtwNqn93vvBoRehE=
+X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
+ (user=daviddunn job=sendgmr) by 2002:a17:90a:1919:: with SMTP id
+ 25mr9907531pjg.181.1642963548079; Sun, 23 Jan 2022 10:45:48 -0800 (PST)
+Date:   Sun, 23 Jan 2022 18:45:38 +0000
+Message-Id: <20220123184541.993212-1-daviddunn@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
+Subject: [PATCH v5 0/3] KVM: x86: Provide per VM capability for disabling PMU virtualization
+From:   David Dunn <daviddunn@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, like.xu.linux@gmail.com,
+        jmattson@google.com, cloudliang@tencent.com, seanjc@google.com
+Cc:     daviddunn@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In some places kvm/hyperv.c code calls bitmap_weight() to check if any bit
-of a given bitmap is set. It's better to use bitmap_empty() in that case
-because bitmap_empty() stops traversing the bitmap as soon as it finds
-first set bit, while bitmap_weight() counts all bits unconditionally.
+Changes since v4:
+- Remove automatic CPUID adjustment when PMU disabled [Like]
+- Update documentation and changelog to reflect above.
+- Update documentation to document arg[0] and return values.  [Like].
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- arch/x86/kvm/hyperv.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Original description:
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 6e38a7d22e97..2c3400dea4b3 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -90,7 +90,7 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
- {
- 	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
- 	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
--	int auto_eoi_old, auto_eoi_new;
-+	bool auto_eoi_old, auto_eoi_new;
- 
- 	if (vector < HV_SYNIC_FIRST_VALID_VECTOR)
- 		return;
-@@ -100,16 +100,16 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
- 	else
- 		__clear_bit(vector, synic->vec_bitmap);
- 
--	auto_eoi_old = bitmap_weight(synic->auto_eoi_bitmap, 256);
-+	auto_eoi_old = bitmap_empty(synic->auto_eoi_bitmap, 256);
- 
- 	if (synic_has_vector_auto_eoi(synic, vector))
- 		__set_bit(vector, synic->auto_eoi_bitmap);
- 	else
- 		__clear_bit(vector, synic->auto_eoi_bitmap);
- 
--	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
-+	auto_eoi_new = bitmap_empty(synic->auto_eoi_bitmap, 256);
- 
--	if (!!auto_eoi_old == !!auto_eoi_new)
-+	if (auto_eoi_old == auto_eoi_new)
- 		return;
- 
- 	down_write(&vcpu->kvm->arch.apicv_update_lock);
+This patch set allows usermode to disable PMU virtualization on
+individual x86 VMs.  When disabled, the PMU is not advertised to
+or accessible from the guest.
+
+David Dunn (3):
+  KVM: x86: Provide per VM capability for disabling PMU virtualization
+  KVM: selftests: Allow creation of selftest VM without vcpus
+  KVM: selftests: Verify disabling PMU virtualization via
+    KVM_CAP_CONFIG_PMU
+
+ Documentation/virt/kvm/api.rst                | 22 +++++++++
+ arch/x86/include/asm/kvm_host.h               |  1 +
+ arch/x86/kvm/svm/pmu.c                        |  2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |  2 +-
+ arch/x86/kvm/x86.c                            | 12 +++++
+ include/uapi/linux/kvm.h                      |  4 ++
+ tools/include/uapi/linux/kvm.h                |  4 ++
+ .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 48 ++++++++++++++-----
+ .../kvm/x86_64/pmu_event_filter_test.c        | 35 ++++++++++++++
+ 10 files changed, 118 insertions(+), 15 deletions(-)
+
 -- 
-2.30.2
+2.35.0.rc0.227.g00780c9af4-goog
 
