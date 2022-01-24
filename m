@@ -2,288 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 877944981F1
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 15:21:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 450704981F8
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 15:23:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235183AbiAXOVQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 09:21:16 -0500
-Received: from mail-mw2nam12on2078.outbound.protection.outlook.com ([40.107.244.78]:35169
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233777AbiAXOVO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jan 2022 09:21:14 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GcvVKueUPPWd3317PskEPp1TPQEPoNYiPRxkQGq7nkmfyB6KyZ+7EQyiIIcL1KpSUiFu/wZzkBdh8+njALqrwOClRzWJv5IB6ed5apdJMGBGHCueAJOsBboXiW2ZNWU3g86c4T+NcEK13obcang5WoB75R274Ctc2BEZTvgKcKnNxKqvWFeN1Nvg0jNf+tiD9ve3QwJXBfw8BbGfNLO8KElF95GgS5a2embqWsERVwoSE/JB4LntDuIMhy6HPwYSGhp0dsTopsAWh8pMUKfjmhEg1cc9+LitTo9XkBB/spOcG2CBo3jt74Wxf7+HbkH8Prt7512w0cf0FPH9C6HP8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=34RXcdeqhKSl/M212jErLufedHiugAI1UHh1hFDVDso=;
- b=EUAPUmkqLSG9YgAFXM5uB0/jLpT+L/sro17MGRnfhmGqLKcE3Nbrfe3NxI1uP+ndi8opGgV8dwwhxnynabOu34h7lMPIDlNfNNkbIEnT7+6CWBFoFXx87z/VNOn17U246gFQ/ul1G1sLE0oaM0MPrp9ierKb+mejOqnI1YE4e8GlHjRDHD4Z63EMjFdBCqF8Hyp5cu8J/bwmP+02mjJH4jGQErRfC9DVUrA/d72oYJfrKWYF4Jy3Yje9LBwf3p5eKUKTdMq6cpzyi/k/E9L++3Gwl1r01hcIYh03OkET3osUsg1uw2WJocpOaFfTxIep1p0peKulHlI3qpjQaQTWAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=34RXcdeqhKSl/M212jErLufedHiugAI1UHh1hFDVDso=;
- b=J724V+Dd0ur0gQxN26ymv6/6/Vj8Jvcs/sqvRISYaRwAiE72IaM5x5PRxC3liOiwGgW+74XyOeaIKBqCWdQkpBikfcCZBapzz4djD4F6F5tOOzn1HtdT2ViXBrqoHjM9k5dIz76kRUb/noRQj8X6clTAFrigYAvgrPqTStKRO/g=
-Received: from BYAPR12MB4614.namprd12.prod.outlook.com (2603:10b6:a03:a6::22)
- by BN9PR12MB5195.namprd12.prod.outlook.com (2603:10b6:408:11c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.7; Mon, 24 Jan
- 2022 14:21:11 +0000
-Received: from BYAPR12MB4614.namprd12.prod.outlook.com
- ([fe80::b07d:3a18:d06d:cb0b]) by BYAPR12MB4614.namprd12.prod.outlook.com
- ([fe80::b07d:3a18:d06d:cb0b%4]) with mapi id 15.20.4909.017; Mon, 24 Jan 2022
- 14:21:11 +0000
-From:   "Lazar, Lijo" <Lijo.Lazar@amd.com>
-To:     James Turner <linuxkernel.foss@dmarc-none.turner.link>
-CC:     Alex Deucher <alexdeucher@gmail.com>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
-        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Koenig, Christian" <Christian.Koenig@amd.com>
-Subject: RE: [REGRESSION] Too-low frequency limit for AMD GPU
- PCI-passed-through to Windows VM
-Thread-Topic: [REGRESSION] Too-low frequency limit for AMD GPU
- PCI-passed-through to Windows VM
-Thread-Index: AQHYDo+lzAdL4BCVWUC/DLCLGS2ze6xtr4mAgACHo4CAAFNgYIABAYCAgAKvjdA=
-Date:   Mon, 24 Jan 2022 14:21:11 +0000
-Message-ID: <BYAPR12MB4614E2CFEDDDEAABBAB986A0975E9@BYAPR12MB4614.namprd12.prod.outlook.com>
-References: <87ee57c8fu.fsf@turner.link>
- <acd2fd5e-d622-948c-82ef-629a8030c9d8@leemhuis.info>
- <87a6ftk9qy.fsf@dmarc-none.turner.link> <87zgnp96a4.fsf@turner.link>
- <fc2b7593-db8f-091c-67a0-ae5ffce71700@leemhuis.info>
- <CADnq5_Nr5-FR2zP1ViVsD_ZMiW=UHC1wO8_HEGm26K_EG2KDoA@mail.gmail.com>
- <87czkk1pmt.fsf@dmarc-none.turner.link>
- <BYAPR12MB46140BE09E37244AE129C01A975C9@BYAPR12MB4614.namprd12.prod.outlook.com>
- <87sftfqwlx.fsf@dmarc-none.turner.link>
-In-Reply-To: <87sftfqwlx.fsf@dmarc-none.turner.link>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_Enabled=true;
- MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_SetDate=2022-01-24T14:20:55Z;
- MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_Method=Privileged;
- MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_Name=Public-AIP 2.0;
- MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_ActionId=18d65763-0318-4e86-85cd-1cdd7a355da1;
- MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_ContentBits=1
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_enabled: true
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_setdate: 2022-01-24T14:21:08Z
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_method: Privileged
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_name: Public-AIP 2.0
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_actionid: 1ecf78f0-f5f8-4aeb-b712-061d4725b5a0
-msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3c54190e-7c10-4d41-32f5-08d9df44c5bc
-x-ms-traffictypediagnostic: BN9PR12MB5195:EE_
-x-microsoft-antispam-prvs: <BN9PR12MB519578979EA0D635CCB1ADEA975E9@BN9PR12MB5195.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3826;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: smFnBKetHSE3LLfn9JbdoWU2tXUV0ljSnYCqtsUNOU3By1YfHmznpC3IjGXRlltNig7qlmm42YCFPieI6EUqjDIXNo1F7mxYI6koMcqQtq2LMBSuF63QjNfjNYVDEBlnlVKJXtnsT24C4Ou3EKmUawQK5VhBoC8tKLAxdI6PsZIhWzZ09GVv5R+TTbckELwh5ExNwF6qjboWRQgrTvBkkAbbnIf+7cO48m1aquR0phqt2rxpNhWr26m1M/aK4fYNwNQHOotEKA4TQWj/ysLKcUEf1OSrp59SCm/xMYqa3aQl1wo9wF9J37fVra+NihZ3LCokqDjyPA4Scl2Z4GzA7a6hIscNEW/ndmqgYQmDHFSw8RF9e3shXSFi/mQI9V3ygfa1Lti6RR8c6cujFnOeLe0FhjIEqCbXx3yirT4C+GhVKnk8duChA+EO0+WOl8Ho4D2KhmEr2YuaTzDSwolkhH59nLaA0CBc0crHOnrhdOg1ZwLXrpQA9r4Cp8qo1vEgh4omze0/iJjAMkfmKA1D6n7IYNOLNwu94Y/SYqjhcG1f6I9UectJp2REfibMx7vUIaS9BaLKoD7wD/oDmq8Y87YpaJMjjoLmq8Z8ikuwHUv+Bkn2SkG5AbQzD25tDHSO2r2ddaECq4WiYdRV6cQkmfsFEfOoMbNF2uVQoYREx2DK7VotQlAQFz5J/bd3E3e3GdquSs6YbSRkVs33xV5E5A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB4614.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(9686003)(71200400001)(33656002)(26005)(66946007)(4326008)(54906003)(66446008)(55016003)(38100700002)(6916009)(7696005)(76116006)(52536014)(86362001)(122000001)(66556008)(8936002)(64756008)(508600001)(186003)(8676002)(38070700005)(6506007)(53546011)(83380400001)(5660300002)(2906002)(316002)(66476007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hNbOQ/MDDPosiUSkORbLBGtFYCkpHzSHFaeOjYu7/jBEAHw2Z1yPHFPrE48u?=
- =?us-ascii?Q?6NkjP/Hjm+ED/OKMVVcpAwSF0FQzwveEfzmAK70aPmDmf3M23UYZ/yKt+XXb?=
- =?us-ascii?Q?r0e3CCZLSEUeA57fgd/HCxVlQ6l0MHe29vc8KVYaq6hYAuXopF5/GFlTgTiS?=
- =?us-ascii?Q?2ERd4LrElg67zX4HtrEGCqtGgUoxgodoX8H9fDsrtfhEpULNpICOnnY1cztx?=
- =?us-ascii?Q?Bl5Z29dqIX3GTi1/osky7ZrpCNJe4FMsvkNbKixj131QdMwIU8+JQFOdD7+c?=
- =?us-ascii?Q?VBBOa8GNYeA0o96sJyibEIj57v60D4850QXqNH/qkvp3hIXzSTOo2LYhkqNh?=
- =?us-ascii?Q?uDFGDAc/1QkX1WDzRY9Rth9jh20Qom1UCplWTKM2yLqgvamgnfzC+7VC7waY?=
- =?us-ascii?Q?Yr9jc0mRmv2/85UTL6RwHueCoJc44v4JzzNR2BEUampdmnqGrpMkEMD8rVzU?=
- =?us-ascii?Q?xbT75kNMoMtOLmah3KHj2gKtsG81fSfQm7yco+/90bQS6SCntT5ZDFrxKsEM?=
- =?us-ascii?Q?LDe89RigN6PVAcd/+HkgAL6rWJpwvUaO3RPSgIrpm5xQldPRkwyZMudKAlcn?=
- =?us-ascii?Q?xfRMi1kut0s3yD5QBeKi5a9cIdhNKISmj7NF0y+G2jRPGCeHWAq111oEMcZq?=
- =?us-ascii?Q?hCjMTICC8rW7EWSIe3ZITDOmxg8xNQxZDLXxrGmhWRi4d+T5Deps1iwyoAvt?=
- =?us-ascii?Q?cuF81TpGVGso+5PB1jI9MdjBkgxSdDokljGGNklNsGkq9ba0FklvisnetS6k?=
- =?us-ascii?Q?MGPpud24NJ1YGmpfCigadJKdcLPwXwL5Y0noHkvtCxOG+txE/il/thNkPVVs?=
- =?us-ascii?Q?RNHBKzyDbXtIG9pREhpm7mH+WdyLvWIwUdmJRVId5HJAaKlO4calPY7vE/ND?=
- =?us-ascii?Q?QshFp7k/tiaX9gmsZKP3m7GwJxNDfvOU1Dh9uuI6YbHW5AgaLlYeEbvL7stQ?=
- =?us-ascii?Q?FAqkeO3oQzQq8sv4WQX55p10ON1UwVqjVU3gZ9M+oLVgs68Cft0URMl2IApJ?=
- =?us-ascii?Q?WIMRww/TramAAPYrneDkW5vmVxEVJxETTix21N/30zUMoLQuCXYPn3tJibtj?=
- =?us-ascii?Q?OLxrC4i08uLn6JWTyb/bjE5ZVWptYzTDkbX9s4jUIuzatDkqULPxQCOl3Eyh?=
- =?us-ascii?Q?GCSNSKpFfqymLAwINUvnTHuetjPdT068RBDbn2CTW+fnsISpWLvssdF+Tk41?=
- =?us-ascii?Q?L9u0QXuqOkJAtDniDeGEBtsyCJDKLY1cCXHgW0ILy0D4V6i415T9LMDXZUQh?=
- =?us-ascii?Q?2QYdoxJltiEXuYhP+MB7NHk/29jTdNN7E3TgRDVwJwjngEx1v/PJv6p85efc?=
- =?us-ascii?Q?BFsdOz7V1rJwkyG1rDuNtTi3yKJmlq0DkpMCGQpdhnhWZTe+fdsGfTzmhB/2?=
- =?us-ascii?Q?GfUxyWA9UwoYhcXbUAd0EoVIYfz8tUOhkUdRiQJEyTcfvliqMlxZVQPXY9gU?=
- =?us-ascii?Q?197e6guxs38gL9roO28Zk5yFmXhGMfkv4KVm4C9tlrakl++Eh1lYuYkLGXM9?=
- =?us-ascii?Q?QXJx/0Sjqunt8mgOJWMhE00P9toTp6Fih2F5jc8U5zwNfI+bDpmBLahnKehk?=
- =?us-ascii?Q?4q+oybWjs3zlYfErJfg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S237684AbiAXOXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 09:23:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58464 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233777AbiAXOXJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jan 2022 09:23:09 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20OEHn9d024040;
+        Mon, 24 Jan 2022 14:23:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3Gi2hLt+bNgz5tm+Bi1697AiriDVx9I1AVurtmodAV4=;
+ b=oZQoeoVlYFzq6XEK3fSHVHJWUNlQC49I0yWF/ZCSzZKNwv1IOvOKKqGQipdSMV73zCyj
+ GbnH8NmQqqnEhdCpTPJvq9oz5+lA+j35oEV4tkEQ7gUN5cJwynogzAwz8EYCAaeq3F7b
+ jnnE8a4MTmEnrGymQNb0M4n56yFblyScZCvmiv4GokS3orwPbaaDFbARqI5fRpF06n/f
+ xzQxYGpk7r2hs5XEaw5VVo1MkgQ92zW7z+VCMis7K5eSBycVO8IVXOnnXgGXEM7Hpx/i
+ YoKHmnLG3D4vN0g79CDxRr7lL9FCIFCK++IiL+cKl/cImjbCBsPwsr1+CIcXi0sJRPw2 Hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dsuwab4yc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jan 2022 14:23:09 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20OEHwvX025092;
+        Mon, 24 Jan 2022 14:23:08 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dsuwab4xd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jan 2022 14:23:08 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20OEIFDY030997;
+        Mon, 24 Jan 2022 14:23:06 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3dr96j5a84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jan 2022 14:23:06 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20OEN2vL45875592
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jan 2022 14:23:02 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 74E0252051;
+        Mon, 24 Jan 2022 14:23:02 +0000 (GMT)
+Received: from [9.171.67.78] (unknown [9.171.67.78])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6C67652052;
+        Mon, 24 Jan 2022 14:23:01 +0000 (GMT)
+Message-ID: <7125d611-5440-09ae-429a-7a087dd77868@linux.ibm.com>
+Date:   Mon, 24 Jan 2022 15:24:51 +0100
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB4614.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c54190e-7c10-4d41-32f5-08d9df44c5bc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2022 14:21:11.5820
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: f99NYWWcDb9ZDQ8fpKgrfd7OQpEJYSEfjgTqTpkAOdd658wnli18rUPLKxcoutz3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5195
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v2 17/30] KVM: s390: mechanism to enable guest zPCI
+ Interpretation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+ <20220114203145.242984-18-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220114203145.242984-18-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 69c1T2xJGaRDDGl2HI-Ja3HIsCn4C4Ic
+X-Proofpoint-GUID: 4JjUKej3LRprS32yTqfFsSkk-vnLuGGj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-24_07,2022-01-24_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
+ phishscore=0 mlxscore=0 impostorscore=0 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2201240094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[Public]
-
-Not able to relate to how it affects gfx/mem DPM alone. Unless Alex has oth=
-er ideas, would you be able to enable drm debug messages and share the log?
-
-	Enabling verbose debug messages is done through the drm.debug parameter, e=
-ach category being enabled by a bit:
-
-	drm.debug=3D0x1 will enable CORE messages
-	drm.debug=3D0x2 will enable DRIVER messages
-	drm.debug=3D0x3 will enable CORE and DRIVER messages
-	...
-	drm.debug=3D0x1ff will enable all messages
-	An interesting feature is that it's possible to enable verbose logging at =
-run-time by echoing the debug value in its sysfs node:
-
-	# echo 0xf > /sys/module/drm/parameters/debug
-
-Thanks,
-Lijo
-
------Original Message-----
-From: James Turner <linuxkernel.foss@dmarc-none.turner.link>=20
-Sent: Sunday, January 23, 2022 2:41 AM
-To: Lazar, Lijo <Lijo.Lazar@amd.com>
-Cc: Alex Deucher <alexdeucher@gmail.com>; Thorsten Leemhuis <regressions@le=
-emhuis.info>; Deucher, Alexander <Alexander.Deucher@amd.com>; regressions@l=
-ists.linux.dev; kvm@vger.kernel.org; Greg KH <gregkh@linuxfoundation.org>; =
-Pan, Xinhui <Xinhui.Pan@amd.com>; LKML <linux-kernel@vger.kernel.org>; amd-=
-gfx@lists.freedesktop.org; Alex Williamson <alex.williamson@redhat.com>; Ko=
-enig, Christian <Christian.Koenig@amd.com>
-Subject: Re: [REGRESSION] Too-low frequency limit for AMD GPU PCI-passed-th=
-rough to Windows VM
-
-Hi Lijo,
-
-> Could you provide the pp_dpm_* values in sysfs with and without the=20
-> patch? Also, could you try forcing PCIE to gen3 (through pp_dpm_pcie)=20
-> if it's not in gen3 when the issue happens?
-
-AFAICT, I can't access those values while the AMD GPU PCI devices are bound=
- to `vfio-pci`. However, I can at least access the link speed and width els=
-ewhere in sysfs. So, I gathered what information I could for two different =
-cases:
-
-- With the PCI devices bound to `vfio-pci`. With this configuration, I
-  can start the VM, but the `pp_dpm_*` values are not available since
-  the devices are bound to `vfio-pci` instead of `amdgpu`.
-
-- Without the PCI devices bound to `vfio-pci` (i.e. after removing the
-  `vfio-pci.ids=3D...` kernel command line argument). With this
-  configuration, I can access the `pp_dpm_*` values, since the PCI
-  devices are bound to `amdgpu`. However, I cannot use the VM. If I try
-  to start the VM, the display (both the external monitors attached to
-  the AMD GPU and the built-in laptop display attached to the Intel
-  iGPU) completely freezes.
-
-The output shown below was identical for both the good commit:
-f1688bd69ec4 ("drm/amd/amdgpu:save psp ring wptr to avoid attack") and the =
-commit which introduced the issue:
-f9b7f3703ff9 ("drm/amdgpu/acpi: make ATPX/ATCS structures global (v2)")
-
-Note that the PCI link speed increased to 8.0 GT/s when the GPU was under h=
-eavy load for both versions, but the clock speeds of the GPU were different=
- under load. (For the good commit, it was 1295 MHz; for the bad commit, it =
-was 501 MHz.)
 
 
-# With the PCI devices bound to `vfio-pci`
+On 1/14/22 21:31, Matthew Rosato wrote:
+> The guest must have access to certain facilities in order to allow
+> interpretive execution of zPCI instructions and adapter event
+> notifications.  However, there are some cases where a guest might
+> disable interpretation -- provide a mechanism via which we can defer
+> enabling the associated zPCI interpretation facilities until the guest
+> indicates it wishes to use them.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h |  4 ++++
+>   arch/s390/kvm/kvm-s390.c         | 40 ++++++++++++++++++++++++++++++++
+>   arch/s390/kvm/kvm-s390.h         | 10 ++++++++
+>   3 files changed, 54 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 3f147b8d050b..38982c1de413 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -252,7 +252,10 @@ struct kvm_s390_sie_block {
+>   #define ECB2_IEP	0x20
+>   #define ECB2_PFMFI	0x08
+>   #define ECB2_ESCA	0x04
+> +#define ECB2_ZPCI_LSI	0x02
+>   	__u8    ecb2;                   /* 0x0062 */
+> +#define ECB3_AISI	0x20
+> +#define ECB3_AISII	0x10
+>   #define ECB3_DEA 0x08
+>   #define ECB3_AES 0x04
+>   #define ECB3_RI  0x01
+> @@ -938,6 +941,7 @@ struct kvm_arch{
+>   	int use_cmma;
+>   	int use_pfmfi;
+>   	int use_skf;
+> +	int use_zpci_interp;
+>   	int user_cpu_state_ctrl;
+>   	int user_sigp;
+>   	int user_stsi;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index ab8b56deed11..b6c32fc3b272 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1029,6 +1029,44 @@ static int kvm_s390_vm_set_crypto(struct kvm *kvm, struct kvm_device_attr *attr)
+>   	return 0;
+>   }
+>   
+> +static void kvm_s390_vcpu_pci_setup(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Only set the ECB bits after guest requests zPCI interpretation */
+> +	if (!vcpu->kvm->arch.use_zpci_interp)
+> +		return;
+> +
+> +	vcpu->arch.sie_block->ecb2 |= ECB2_ZPCI_LSI;
+> +	vcpu->arch.sie_block->ecb3 |= ECB3_AISII + ECB3_AISI;
 
-## Before starting the VM
+As far as I understood, the interpretation is only possible if a gisa 
+designation is associated with the PCI function via CLP enable.
 
-% ls /sys/module/amdgpu/drivers/pci:amdgpu
-module  bind  new_id  remove_id  uevent  unbind
+Why do we setup the SIE ECB only when the guest requests for 
+interpretation and not systematically in vcpu_setup?
 
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -pr=
-int -exec cat {} \; /sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-8.0 GT/s PCIe
+If ECB2_ZPCI_LSI, ECB3_AISII or ECB3_AISI have an effect when the gisa 
+designation is not specified shouldn't we have a way to clear these bits?
 
-## While running the VM, before placing the AMD GPU under heavy load
+> +}
+> +
+> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	int i;
+> +
+> +	/*
+> +	 * If host is configured for PCI and the necessary facilities are
+> +	 * available, turn on interpretation for the life of this guest
+> +	 */
+> +	if (!IS_ENABLED(CONFIG_PCI) || !sclp.has_zpci_lsi || !sclp.has_aisii ||
+> +	    !sclp.has_aeni || !sclp.has_aisi)
+> +		return;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	kvm->arch.use_zpci_interp = 1;
+> +
+> +	kvm_s390_vcpu_block_all(kvm);
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		kvm_s390_vcpu_pci_setup(vcpu);
+> +		kvm_s390_sync_request(KVM_REQ_VSIE_RESTART, vcpu);
+> +	}
+> +
+> +	kvm_s390_vcpu_unblock_all(kvm);
+> +	mutex_unlock(&kvm->lock);
+> +}
+> +
+>   static void kvm_s390_sync_request_broadcast(struct kvm *kvm, int req)
+>   {
+>   	int cx;
+> @@ -3282,6 +3320,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>   
+>   	kvm_s390_vcpu_crypto_setup(vcpu);
+>   
+> +	kvm_s390_vcpu_pci_setup(vcpu);
+> +
+>   	mutex_lock(&vcpu->kvm->lock);
+>   	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>   		rc = kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index c07a050d757d..a2eccb8b977e 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -481,6 +481,16 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
+>    */
+>   void kvm_s390_vcpu_crypto_reset_all(struct kvm *kvm);
+>   
+> +/**
+> + * kvm_s390_vcpu_pci_enable_interp
+> + *
+> + * Set the associated PCI attributes for each vcpu to allow for zPCI Load/Store
+> + * interpretation as well as adapter interruption forwarding.
+> + *
+> + * @kvm: the KVM guest
+> + */
+> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm);
+> +
+>   /**
+>    * diag9c_forwarding_hz
+>    *
+> 
 
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -pr=
-int -exec cat {} \; /sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-2.5 GT/s PCIe
-
-## While running the VM, with the AMD GPU under heavy load
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -pr=
-int -exec cat {} \; /sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-8.0 GT/s PCIe
-
-## While running the VM, after stopping the heavy load on the AMD GPU
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -pr=
-int -exec cat {} \; /sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-2.5 GT/s PCIe
-
-## After stopping the VM
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -pr=
-int -exec cat {} \; /sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-2.5 GT/s PCIe
-
-
-# Without the PCI devices bound to `vfio-pci`
-
-% ls /sys/module/amdgpu/drivers/pci:amdgpu
-0000:01:00.0  module  bind  new_id  remove_id  uevent  unbind
-
-% for f in /sys/module/amdgpu/drivers/pci:amdgpu/*/pp_dpm_*; do echo "$f"; =
-cat "$f"; echo; done /sys/module/amdgpu/drivers/pci:amdgpu/0000:01:00.0/pp_=
-dpm_mclk
-0: 300Mhz
-1: 625Mhz
-2: 1500Mhz *
-
-/sys/module/amdgpu/drivers/pci:amdgpu/0000:01:00.0/pp_dpm_pcie
-0: 2.5GT/s, x8
-1: 8.0GT/s, x16 *
-
-/sys/module/amdgpu/drivers/pci:amdgpu/0000:01:00.0/pp_dpm_sclk
-0: 214Mhz
-1: 501Mhz
-2: 850Mhz
-3: 1034Mhz
-4: 1144Mhz
-5: 1228Mhz
-6: 1275Mhz
-7: 1295Mhz *
-
-% find /sys/bus/pci/devices/0000:01:00.0/ -type f -name 'current_link*' -pr=
-int -exec cat {} \; /sys/bus/pci/devices/0000:01:00.0/current_link_width
-8
-/sys/bus/pci/devices/0000:01:00.0/current_link_speed
-8.0 GT/s PCIe
-
-
-James
+-- 
+Pierre Morel
+IBM Lab Boeblingen
