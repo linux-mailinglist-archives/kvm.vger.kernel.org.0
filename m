@@ -2,275 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBF74498494
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 17:22:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 86997498497
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 17:23:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243666AbiAXQWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 11:22:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35352 "EHLO
+        id S243664AbiAXQXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 11:23:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240842AbiAXQWK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jan 2022 11:22:10 -0500
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B7DC06173B
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 08:22:09 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id s127so26285656oig.2
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 08:22:09 -0800 (PST)
+        with ESMTP id S240986AbiAXQXO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jan 2022 11:23:14 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E79C06173B
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 08:23:14 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id j10so3665960pgc.6
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 08:23:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Tas5AbzcTcQxkjTh80aoeGdBDNzOmo4QIeXV2TcoEGc=;
-        b=A6ZxEY7kZWYRmUXB9AnJu03se+0+yrE1ha8XTsaYULIzIofkM9b87UR7jWDGmnNiOE
-         1e/ksqWlYh3zsWE7iDerPvDny8Sx/nNam16/BtEJXxpeHPBs5oo5maEPUagHmciGRuXG
-         5IIZpZtDJUDJVNb52cN8srtTvbSBBgURl+h/WaShLfOGieT0DLZ97TpomHlluPZVkVd2
-         ErzMfoqI8VHJTWx/5BnqKcSmaQ7smIOjfgYI5eJaRPoQKa6lKwjTn95cxE+S96Kla63y
-         xyWOhDlbJl/amWXoGAEEd1dGnuuTg2K/GKVLGpzRMMhLxmnJecZ6C+0ydUm+DWH1g2Bj
-         Y5sw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=l7aZJnt8QJHGg+NhfzeZeueXVQnuGTn1GJNwLw97API=;
+        b=aMgOFBudEvo/1+mRGOn+iLXumNUshu9rs2Jl4IUpDDpx4RwzMzW4x8HTOy1fGwmdiM
+         55Dw8smutxb6UOvriTHkEd5g7L3tWNtxbP0d5S0ywsFR0Gk4yY/ON+XcwJNLBtO7pQR9
+         +QXL+eYiYtZ2IDlrIl9YlJCWJ5xEOQUbk9vKcW9POGqHRvmC1FIOaNps3gZnPnetlIDu
+         +ghHC6fCb6nqd5h6RINSXYVRfDYALCAN8wJn/+NyBpuz0yg4TC3NVOrl3VKUj2TlUE85
+         oBHKi3R6q4kWUNYx2XRJPFgN9rBd+PSgQRKr6TgNOc2LcdcZ1IFIaN0wwmjom0fA3sB3
+         Fu+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Tas5AbzcTcQxkjTh80aoeGdBDNzOmo4QIeXV2TcoEGc=;
-        b=yUyMYjy8SMdLcNzgqwk8w5z6+eAhesnGdMVwkEUAnNX5lu7XDashh/FPG2GB4FeloF
-         8EOhTNxK+T0cQNEHtKlK144Cf4lDsBPqJpkQnqDjGwd9ImZjy/dY8fP2D0mXFEfBuM5L
-         VklOluFpmlItCCO9bvRXQt1curOjSROwJatSdbs9raeT1Z0RGwekADIwAssWQPQ2AiGR
-         G1fHL2Rijj6cwIPZ8kvkNtgoFzUI1Y4CcngBb/soKvS2rxSdMwm8IVcoioIMSqsL7yor
-         jIbYvtjm/6Q/YZx1bF064A4/mv0+d0QdPkhp9bcV7XMd4UTdeKIltSVkWKF5RsmWmSs3
-         DaYg==
-X-Gm-Message-State: AOAM532arj9BCFGCHvS3COvnSLyBVgYBccpBSOfLQNTDdZLYEJgZvuzm
-        udbCi8Q9YyNZ1mQFBzINcLvK+PEBxXi8oFrtW117IA==
-X-Google-Smtp-Source: ABdhPJy0xze+kYEb3O+BA8yiLfrII+cCnt3mZXTrFCxYbbrwrAhMFPf+eucXwvPEkUPMtreTBEf/hCDY0+5i5b0TEU4=
-X-Received: by 2002:aca:1204:: with SMTP id 4mr2016816ois.85.1643041328609;
- Mon, 24 Jan 2022 08:22:08 -0800 (PST)
-MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-3-reijiw@google.com>
-In-Reply-To: <20220106042708.2869332-3-reijiw@google.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 24 Jan 2022 16:21:32 +0000
-Message-ID: <CA+EHjTxVe3baCwpde+QFYKvyUaUGu9F37t-=r8k32JcHBOY61Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=l7aZJnt8QJHGg+NhfzeZeueXVQnuGTn1GJNwLw97API=;
+        b=6pubwIgZdkjPCVwxGBvZ73GHpg0gfuetITIcPlsG8kI4ITd3Sk4Mi8YMykwnuSD72R
+         k6Fz+QtN5dBvoLsrCpii8GkpaW6ElSt9DtsPDAzfrYkuHWqzIHW07moYpmN0NMrkfrD5
+         wPjbsqbEwZbytPF5k5hXn3NI7jTgFO/uU3Xe//CQ+qai5iWifG6Vhr8xzGtDtpapQ7v5
+         +lGqMETSpv6brnMkQcaWjwScK6fhT2FA2Y6OK4QaFCNl5M0HgPRR0EWnk01oq56OceE+
+         ZSyfXAhzpTtabeqonWq+XxH7va6pgfcUZ7WO9MLL7gJ3YPpqhM0HwppJ94akzsii24Pw
+         G9Zw==
+X-Gm-Message-State: AOAM530oR5j96hvJ1KW4D0z+2+IiBX9IOvGNMtr4PC2JNaLC/9FJgHzF
+        +R9rHYfRPpab3R+QN7fjEDshLg==
+X-Google-Smtp-Source: ABdhPJxVMo1edQcNkn0O784je5xXtByJ/sPu5BxFgdgA331J9x1X3lWhbYdWQ6XphC5dfFHpuu3EhA==
+X-Received: by 2002:a63:81c6:: with SMTP id t189mr12364478pgd.417.1643041393455;
+        Mon, 24 Jan 2022 08:23:13 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id nu15sm5412136pjb.5.2022.01.24.08.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jan 2022 08:23:12 -0800 (PST)
+Date:   Mon, 24 Jan 2022 16:23:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86/cpuid: Exclude unpermitted xfeatures for
+ vcpu->arch.guest_supported_xcr0
+Message-ID: <Ye7SbfPL/QAjOI6s@google.com>
+References: <20220123055025.81342-1-likexu@tencent.com>
+ <BN9PR11MB52762E2DEF810DF9AFAE1DDC8C5E9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <38c1fbc3-d770-48f3-5432-8fa1fde033f5@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <38c1fbc3-d770-48f3-5432-8fa1fde033f5@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On Mon, Jan 24, 2022, Like Xu wrote:
+> On 24/1/2022 3:06 pm, Tian, Kevin wrote:
+> > > From: Like Xu <like.xu.linux@gmail.com>
+> > > Sent: Sunday, January 23, 2022 1:50 PM
+> > > 
+> > > From: Like Xu <likexu@tencent.com>
+> > > 
+> > > A malicious user space can bypass xstate_get_guest_group_perm() in the
+> > > KVM_GET_SUPPORTED_CPUID mechanism and obtain unpermitted xfeatures,
+> > > since the validity check of xcr0 depends only on guest_supported_xcr0.
+> > 
+> > Unpermitted xfeatures cannot pass kvm_check_cpuid()...
+> 
+> Indeed, 5ab2f45bba4894a0db4af8567da3efd6228dd010.
+> 
+> This part of logic is pretty fragile and fragmented due to semantic
+> inconsistencies between supported_xcr0 and guest_supported_xcr0
+> in other three places:
 
-On Thu, Jan 6, 2022 at 4:28 AM Reiji Watanabe <reijiw@google.com> wrote:
->
-> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> Use the saved ones when ID registers are read by the guest or
-> userspace (via KVM_GET_ONE_REG).
->
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 16 ++++++++
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/sys_regs.c         | 62 ++++++++++++++++++++++---------
->  3 files changed, 62 insertions(+), 17 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2a5f7f38006f..c789a0137f58 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -102,6 +102,17 @@ struct kvm_s2_mmu {
->  struct kvm_arch_memory_slot {
->  };
->
-> +/*
-> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> + * where 0<=crm<8, 0<=op2<8.
-> + */
-> +#define KVM_ARM_ID_REG_MAX_NUM 64
-> +#define IDREG_IDX(id)          ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> +#define is_id_reg(id)  \
-> +       (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&        \
-> +        sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 0 &&        \
-> +        sys_reg_CRm(id) < 8)
-> +
+There are no inconsistencies, at least not in the examples below, as the examples
+are intended to work in host context.  guest_supported_xcr0 is about what the guest
+is/isn't allowed to access, it has no bearing on what host userspace can/can't do.
+Or are you talking about a different type of inconsistency?
 
-This is consistent with the Arm ARM "Table D12-2 System instruction
-encodings for non-Debug System register accesses".
+> - __do_cpuid_func
 
-Minor nit, would it be better to have IDREG_IDX and is_id_reg in
-arch/arm64/kvm/sys_regs.h, since other similar and related ones are
-there?
+Reporting what KVM supports to host userspace.
 
->  struct kvm_arch {
->         struct kvm_s2_mmu mmu;
->
-> @@ -137,6 +148,9 @@ struct kvm_arch {
->
->         /* Memory Tagging Extension enabled for the guest */
->         bool mte_enabled;
-> +
-> +       /* ID registers for the guest. */
-> +       u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
->  };
->
->  struct kvm_vcpu_fault_info {
-> @@ -734,6 +748,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->                                 struct kvm_arm_copy_mte_tags *copy_tags);
->
-> +void set_default_id_regs(struct kvm *kvm);
-> +
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e4727dc771bf..5f497a0af254 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->         kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
->
->         set_default_spectre(kvm);
-> +       set_default_id_regs(kvm);
->
->         return ret;
->  out_free_stage2_pgd:
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e3ec1a44f94d..80dc62f98ef0 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -33,6 +33,8 @@
->
->  #include "trace.h"
->
-> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
-> +
->  /*
->   * All of this file is extremely similar to the ARM coproc.c, but the
->   * types are different. My gut feeling is that it should be pretty
-> @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
->                           struct sys_reg_params *p,
->                           const struct sys_reg_desc *r)
->  {
-> -       u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> +       u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
->         u32 sr = reg_to_encoding(r);
->
->         if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-> @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->         return true;
->  }
->
-> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> -               struct sys_reg_desc const *r, bool raz)
-> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
-> -       u32 id = reg_to_encoding(r);
-> -       u64 val;
-> -
-> -       if (raz)
-> -               return 0;
-> -
-> -       val = read_sanitised_ftr_reg(id);
-> +       u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
->
->         switch (id) {
->         case SYS_ID_AA64PFR0_EL1:
-> @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->         return val;
->  }
->
-> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> +                      struct sys_reg_desc const *r, bool raz)
-> +{
-> +       u32 id = reg_to_encoding(r);
-> +
-> +       return raz ? 0 : __read_id_reg(vcpu, id);
-> +}
-> +
->  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->                                   const struct sys_reg_desc *r)
->  {
-> @@ -1223,9 +1225,8 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  /*
->   * cpufeature ID register user accessors
->   *
-> - * For now, these registers are immutable for userspace, so no values
-> - * are stored, and for set_id_reg() we don't allow the effective value
-> - * to be changed.
-> + * For now, these registers are immutable for userspace, so for set_id_reg()
-> + * we don't allow the effective value to be changed.
->   */
->  static int __get_id_reg(const struct kvm_vcpu *vcpu,
->                         const struct sys_reg_desc *rd, void __user *uaddr,
-> @@ -1237,7 +1238,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
->         return reg_to_user(uaddr, &val, id);
->  }
->
-> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> +static int __set_id_reg(struct kvm_vcpu *vcpu,
->                         const struct sys_reg_desc *rd, void __user *uaddr,
->                         bool raz)
+> - kvm_mpx_supported
 
-Minor nit: why remove the const in this patch? This is required for a
-future patch but not for this one.
+This is a check on host support.
 
-Thanks,
-/fuad
+> - kvm_vcpu_ioctl_x86_set_xsave
 
+"write" from host userspace.
 
->  {
-> @@ -1837,8 +1838,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
->         if (p->is_write) {
->                 return ignore_write(vcpu, p);
->         } else {
-> -               u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> -               u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> +               u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> +               u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
->                 u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
->
->                 p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-> @@ -2850,3 +2851,30 @@ void kvm_sys_reg_table_init(void)
->         /* Clear all higher bits. */
->         cache_levels &= (1 << (i*3))-1;
->  }
-> +
-> +/*
-> + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> + * with ID_SANITISED() to the host's sanitized value.
-> + */
-> +void set_default_id_regs(struct kvm *kvm)
-> +{
-> +       int i;
-> +       u32 id;
-> +       const struct sys_reg_desc *rd;
-> +       u64 val;
-> +
-> +       for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> +               rd = &sys_reg_descs[i];
-> +               if (rd->access != access_id_reg)
-> +                       /* Not ID register, or hidden/reserved ID register */
-> +                       continue;
-> +
-> +               id = reg_to_encoding(rd);
-> +               if (WARN_ON_ONCE(!is_id_reg(id)))
-> +                       /* Shouldn't happen */
-> +                       continue;
-> +
-> +               val = read_sanitised_ftr_reg(id);
-> +               kvm->arch.id_regs[IDREG_IDX(id)] = val;
-> +       }
-> +}
-> --
-> 2.34.1.448.ga2b2bfdf31-goog
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Have you identified all their areas of use ?
