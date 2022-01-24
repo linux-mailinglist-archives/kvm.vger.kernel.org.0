@@ -2,92 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BB6E498CC3
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 20:32:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35563498D18
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 20:33:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350059AbiAXTYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 14:24:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50172 "EHLO
+        id S1351674AbiAXT1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 14:27:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345327AbiAXTWY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jan 2022 14:22:24 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D27C02B860
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 11:08:43 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id 187so16039283pga.10
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 11:08:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rVsQvo+ZjtK46Xp9A91RBZT4Worccr7KUw8/eqjUom4=;
-        b=oBwmdtH13x9b6kAQu+AfvDYJoAIzyE+GKZg3N4sPHI6da5W4ZAw0iucdO03Hsjwk6P
-         CxBAQ3AdTNCbqMwBxdqC2VysY9FZyaT/nmnwtCR1kaN7E/e+uRBV766ByYloQunh0WvK
-         kNP8Nb4DjJK1oMj+xMboRHrl/r4uYzKGxpFYlaI4AaPfXU00JRGG+WhsLeyq0fjWERzq
-         +xOrVG4tdVVa0Fv3m7HtNGGNlIEdZqSS8l/dxo9SW6E01VQA5b5rMLSz1Bek8egU8muk
-         MBNeMStA5TimanH4T9D+u0ruY5E4N8jzcQAqZxcFWA3M7ELce0p3WnkldfQG4796IoxW
-         phvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rVsQvo+ZjtK46Xp9A91RBZT4Worccr7KUw8/eqjUom4=;
-        b=gu7xKCvpD0t6Tut768CQRlYuScolt2gz1VW+rX2Qs/wkbUZONxQsePox0N4alON/8k
-         UeDf0pCrxYw5QIhR9YZeNoU0+7GwIJ/WTsIQ9qNCZam3uhaF98cScKoRS1bzcUd/CmL1
-         hFXXYCZUjj1Xl89bRVps2rBEysteN7HsKyRrR+El4poQ0Yt6xWhgLTlrTH36XYfiWh7S
-         +foLCClNh4HTkSlx+arzWhhHj8gvMc2qqPAOrt8nB6k7YFEDV+qu1PyH3IHt2usRtTnV
-         1wtX4O/mb+9q/MY+PafbbrYSVfF7/eDGQ/S0sCjWAbsPkdu33iUdDju/CDbkISsMHkIx
-         Vh5Q==
-X-Gm-Message-State: AOAM533KlwoS2MSecpFWDugnj+z8tfycoNhMA4zfoZZYF1YVBh5bFfYF
-        8slgAJJfMLb9+kuy41SCmrL0GQ==
-X-Google-Smtp-Source: ABdhPJxGnukKA6tJEogfNC/QfbWw1VjuOOgZ06J37PBc5sW91RZk/AE0UMR+mdF9nkRQtPlsnbtgzw==
-X-Received: by 2002:a63:ad42:: with SMTP id y2mr12736198pgo.386.1643051322966;
-        Mon, 24 Jan 2022 11:08:42 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g21sm2080660pfc.11.2022.01.24.11.08.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jan 2022 11:08:42 -0800 (PST)
-Date:   Mon, 24 Jan 2022 19:08:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Use memcmp in kvm_cpuid_check_equal()
-Message-ID: <Ye75NpxFoOwCi23e@google.com>
-References: <20220124103606.2630588-1-vkuznets@redhat.com>
- <20220124103606.2630588-3-vkuznets@redhat.com>
- <95f63ed6-743b-3547-dda1-4fe83bc39070@redhat.com>
- <87bl01i2zl.fsf@redhat.com>
- <Ye7ZQJ6NYoZqK9yk@google.com>
- <979883b4-8fcd-7488-0313-de6348863b21@redhat.com>
+        with ESMTP id S1350847AbiAXTZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jan 2022 14:25:25 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722DDC02B86E;
+        Mon, 24 Jan 2022 11:12:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=630GZf2pl7dUC09jByd2lRVEJ71rHFIBrI9U48V8bzA=; b=l0WJXVDaYcmJ3/V3RWFezwDDer
+        C44GbJGe7OjLN0KX4PaF1IWCv0kAoNTjNLYvwuH+jZell6Ad2JgbYr55poxlvv5DL8vopnnR/7kMY
+        vn/kveSmXCK7I5QKtfyV0XYyRC15LtirFVJpZLpus0tksAvWxi6l/uO/J6VOZyNLBn7KViVZO+pmi
+        tCMavBPk+ocRsC6yujO5bPnGRcZhKLBisgW7TtJG3/FxTW3BAp4mXk9rBm2YHM6MqRSSbpG11QU3K
+        iU0eefreID+Mspii6FT8TND1o3Wgkgcez5ouyqVdYFPOacbzF1GFPC3zVTqT0YP/NTts2M908BtFX
+        6ETemMoQ==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nC4l3-003F5b-C0; Mon, 24 Jan 2022 19:12:05 +0000
+Message-ID: <aca104cf-5f5f-b696-754a-35e62dbe64c3@infradead.org>
+Date:   Mon, 24 Jan 2022 11:11:56 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <979883b4-8fcd-7488-0313-de6348863b21@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: Build regressions/improvements in v5.17-rc1
+Content-Language: en-US
+To:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Alex Deucher <alexdeucher@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-um <linux-um@lists.infradead.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "Tobin C. Harding" <me@tobin.cc>
+References: <20220123125737.2658758-1-geert@linux-m68k.org>
+ <alpine.DEB.2.22.394.2201240851560.2674757@ramsan.of.borg>
+ <CADnq5_MUq0fX7wMLJyUUxxa+2xoRinonL-TzD8tUhXALRfY8-A@mail.gmail.com>
+ <CAMuHMdWUWqHYbbavtMT-XAD_sarDPC5xnc3c0pX1ZAh3Wuzuzg@mail.gmail.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <CAMuHMdWUWqHYbbavtMT-XAD_sarDPC5xnc3c0pX1ZAh3Wuzuzg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 24, 2022, Paolo Bonzini wrote:
-> On 1/24/22 17:52, Sean Christopherson wrote:
-> > On Mon, Jan 24, 2022, Vitaly Kuznetsov wrote:
-> > > Paolo Bonzini <pbonzini@redhat.com> writes:
-> > > > > +	if (memcmp(e2, vcpu->arch.cpuid_entries, nent * sizeof(*e2)))
-> > > > > +		return -EINVAL;
-> > > > 
-> > > > Hmm, not sure about that due to the padding in struct kvm_cpuid_entry2.
-> > > >    It might break userspace that isn't too careful about zeroing it.
-> > 
-> > Given that we already are fully committed to potentially breaking userspace by
-> > disallowing KVM_SET_CPUID{2} after KVM_RUN, we might as well get greedy.
-> 
-> Hmm, I thought this series was because we were _not_ fully committed. :)
 
-We're fully committed in the sense that we know disallowing KVM_SET_CPUID2 after
-KVM_RUN broke at least one use case, and instead of reverting we are doubling down
-and adding more KVM code/complexity to grandfather in that one use case.  There's
-no guarantee that there aren't other use cases that will break, but haven't been
-reported simply because their users haven't yet moved to a 5.16 kernel.
+
+On 1/24/22 10:55, Geert Uytterhoeven wrote:
+> Hi Alex,
+> 
+> On Mon, Jan 24, 2022 at 7:52 PM Alex Deucher <alexdeucher@gmail.com> wrote:
+>> On Mon, Jan 24, 2022 at 5:25 AM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>>> On Sun, 23 Jan 2022, Geert Uytterhoeven wrote:
+>>>>  + /kisskb/src/drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c: error: control reaches end of non-void function [-Werror=return-type]:  => 1560:1
+>>
+>> I don't really see what's going on here:
+>>
+>> #ifdef CONFIG_X86_64
+>> return cpu_data(first_cpu_of_numa_node).apicid;
+>> #else
+>> return first_cpu_of_numa_node;
+>> #endif
+> 
+> Ah, the actual failure causing this was not included:
+> 
+> In file included from /kisskb/src/arch/x86/um/asm/processor.h:41:0,
+>                  from /kisskb/src/include/linux/mutex.h:19,
+>                  from /kisskb/src/include/linux/kernfs.h:11,
+>                  from /kisskb/src/include/linux/sysfs.h:16,
+>                  from /kisskb/src/include/linux/kobject.h:20,
+>                  from /kisskb/src/include/linux/pci.h:35,
+>                  from
+> /kisskb/src/drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c:25:
+> /kisskb/src/drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c: In
+> function 'kfd_cpumask_to_apic_id':
+> /kisskb/src/arch/um/include/asm/processor-generic.h:103:18: error:
+> called object is not a function or function pointer
+>  #define cpu_data (&boot_cpu_data)
+>                   ^
+> /kisskb/src/drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c:1556:9:
+> note: in expansion of macro 'cpu_data'
+>   return cpu_data(first_cpu_of_numa_node).apicid;
+>          ^
+> /kisskb/src/drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c:1560:1:
+> error: control reaches end of non-void function [-Werror=return-type]
+>  }
+>  ^
+
+ah yes, UML.
+I have a bunch of UML fixes that I have been hesitant to post.
+
+This is one of them.
+What do people think about this?
+
+thanks.
+
+---
+From: Randy Dunlap <rdunlap@infradead.org>
+
+
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c:1556:9: note: in expansion of macro ‘cpu_data’
+  return cpu_data(first_cpu_of_numa_node).apicid;
+         ^~~~~~~~
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_topology.c:1560:1: error: control reaches end of non-void function [-Werror=return-type]
+
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_crat.c: In function ‘kfd_fill_iolink_info_for_cpu’:
+../arch/um/include/asm/processor-generic.h:103:19: error: called object is not a function or function pointer
+ #define cpu_data (&boot_cpu_data)
+                  ~^~~~~~~~~~~~~~~
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_crat.c:1688:27: note: in expansion of macro ‘cpu_data’
+  struct cpuinfo_x86 *c = &cpu_data(0);
+                           ^~~~~~~~
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_crat.c:1691:7: error: dereferencing pointer to incomplete type ‘struct cpuinfo_x86’
+  if (c->x86_vendor == X86_VENDOR_AMD)
+       ^~
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_crat.c:1691:23: error: ‘X86_VENDOR_AMD’ undeclared (first use in this function); did you mean ‘X86_VENDOR_ANY’?
+  if (c->x86_vendor == X86_VENDOR_AMD)
+                       ^~~~~~~~~~~~~~
+                       X86_VENDOR_ANY
+
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_crat.c: In function ‘kfd_create_vcrat_image_cpu’:
+../drivers/gpu/drm/amd/amdgpu/../amdkfd/kfd_crat.c:1742:11: warning: unused variable ‘entries’ [-Wunused-variable]
+  uint32_t entries = 0;
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ drivers/gpu/drm/amd/amdkfd/kfd_crat.c     |    6 +++---
+ drivers/gpu/drm/amd/amdkfd/kfd_topology.c |    2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+--- linux-next-20220107.orig/drivers/gpu/drm/amd/amdkfd/kfd_topology.c
++++ linux-next-20220107/drivers/gpu/drm/amd/amdkfd/kfd_topology.c
+@@ -1552,7 +1552,7 @@ static int kfd_cpumask_to_apic_id(const
+ 	first_cpu_of_numa_node = cpumask_first(cpumask);
+ 	if (first_cpu_of_numa_node >= nr_cpu_ids)
+ 		return -1;
+-#ifdef CONFIG_X86_64
++#if defined(CONFIG_X86_64) && !defined(CONFIG_UML)
+ 	return cpu_data(first_cpu_of_numa_node).apicid;
+ #else
+ 	return first_cpu_of_numa_node;
+--- linux-next-20220107.orig/drivers/gpu/drm/amd/amdkfd/kfd_crat.c
++++ linux-next-20220107/drivers/gpu/drm/amd/amdkfd/kfd_crat.c
+@@ -1679,7 +1679,7 @@ static int kfd_fill_mem_info_for_cpu(int
+ 	return 0;
+ }
+ 
+-#ifdef CONFIG_X86_64
++#if defined(CONFIG_X86_64) && !defined(CONFIG_UML)
+ static int kfd_fill_iolink_info_for_cpu(int numa_node_id, int *avail_size,
+ 				uint32_t *num_entries,
+ 				struct crat_subtype_iolink *sub_type_hdr)
+@@ -1738,7 +1738,7 @@ static int kfd_create_vcrat_image_cpu(vo
+ 	struct crat_subtype_generic *sub_type_hdr;
+ 	int avail_size = *size;
+ 	int numa_node_id;
+-#ifdef CONFIG_X86_64
++#if defined(CONFIG_X86_64) && !defined(CONFIG_UML)
+ 	uint32_t entries = 0;
+ #endif
+ 	int ret = 0;
+@@ -1803,7 +1803,7 @@ static int kfd_create_vcrat_image_cpu(vo
+ 			sub_type_hdr->length);
+ 
+ 		/* Fill in Subtype: IO Link */
+-#ifdef CONFIG_X86_64
++#if defined(CONFIG_X86_64) && !defined(CONFIG_UML)
+ 		ret = kfd_fill_iolink_info_for_cpu(numa_node_id, &avail_size,
+ 				&entries,
+ 				(struct crat_subtype_iolink *)sub_type_hdr);
+
+
