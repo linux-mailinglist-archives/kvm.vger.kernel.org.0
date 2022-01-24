@@ -2,98 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2CAA497D43
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 11:37:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AABF1497E06
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 12:32:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234162AbiAXKhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 05:37:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40502 "EHLO
+        id S237586AbiAXLcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 06:32:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36527 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233480AbiAXKhU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jan 2022 05:37:20 -0500
+        by vger.kernel.org with ESMTP id S237573AbiAXLcF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jan 2022 06:32:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643020640;
+        s=mimecast20190719; t=1643023924;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=76KFo7+F7q/+fa6TW0D3p4zQquAYFcS3k3/N/jXiLDk=;
-        b=XLahYA1ulLZoEOMl9VVcDarXCB59YgqhAhXrCWoyZprh8Afvs5hCRxYxob9xRDTS+pR122
-        l+2ED+Tc+6My6uG2vpt6lOMnpDPhgqmHycZhMlvE9LQKY+ehh4G4M9cL03IahUwVBqtN29
-        IBBRQJ2qQQXZ7qLsGaPBmAGAL89NnAQ=
+        bh=qORMnoIdgKPzaKMb6YWMbi2BpiXpkDZcr/xPk+9njEw=;
+        b=YM4VmH8TsI/t8gXvRtXNP4dL4JYVZSpEGWlI0oc9C46W7siB8d9ZGH4DJ6wSJT49xv23Mo
+        whLPeXA49JWP9sx7KJe3zIAdYoz2tJzAkfblv6Onm8xhIwP3YJ2LNqQeg8RlDiOtD6ixTV
+        kJG0Eb0x/BLJVyZcAH3+EJ4+wpIHxWE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-185-_QmXsZ7vPhWpAkpRBoH_XA-1; Mon, 24 Jan 2022 05:37:16 -0500
-X-MC-Unique: _QmXsZ7vPhWpAkpRBoH_XA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-564-CSH3-giRNCe3megBcHYkmA-1; Mon, 24 Jan 2022 06:32:02 -0500
+X-MC-Unique: CSH3-giRNCe3megBcHYkmA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FCDC425DB;
-        Mon, 24 Jan 2022 10:37:15 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FC401F305;
-        Mon, 24 Jan 2022 10:37:13 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: x86: Use memcmp in kvm_cpuid_check_equal()
-Date:   Mon, 24 Jan 2022 11:36:06 +0100
-Message-Id: <20220124103606.2630588-3-vkuznets@redhat.com>
-In-Reply-To: <20220124103606.2630588-1-vkuznets@redhat.com>
-References: <20220124103606.2630588-1-vkuznets@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE2B4814243;
+        Mon, 24 Jan 2022 11:32:01 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8CF3410589B1;
+        Mon, 24 Jan 2022 11:31:50 +0000 (UTC)
+Date:   Mon, 24 Jan 2022 11:31:49 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v1] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <Ye6OJdi2M1EBx7b3@stefanha-x1.localdomain>
+References: <20220114090508.36416-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="MUPe2nEeErvXt6ea"
+Content-Disposition: inline
+In-Reply-To: <20220114090508.36416-1-sgarzare@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_cpuid_check_equal() should also check .flags equality but instead
-of adding it to the existing check, just switch to using memcmp() for
-the whole 'struct kvm_cpuid_entry2'.
 
-When .flags are not checked, kvm_cpuid_check_equal() may allow an update
-which it shouldn't but kvm_set_cpuid() does not actually update anything
-and just returns success.
+--MUPe2nEeErvXt6ea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/cpuid.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+On Fri, Jan 14, 2022 at 10:05:08AM +0100, Stefano Garzarella wrote:
+> In vhost_enable_notify() we enable the notifications and we read
+> the avail index to check if new buffers have become available in
+> the meantime.
+>=20
+> We are not caching the avail index, so when the device will call
+> vhost_get_vq_desc(), it will find the old value in the cache and
+> it will read the avail index again.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 89d7822a8f5b..7dd9c8f4f46e 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -123,20 +123,11 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
- static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 				 int nent)
- {
--	struct kvm_cpuid_entry2 *orig;
--	int i;
--
- 	if (nent != vcpu->arch.cpuid_nent)
- 		return -EINVAL;
- 
--	for (i = 0; i < nent; i++) {
--		orig = &vcpu->arch.cpuid_entries[i];
--		if (e2[i].function != orig->function ||
--		    e2[i].index != orig->index ||
--		    e2[i].eax != orig->eax || e2[i].ebx != orig->ebx ||
--		    e2[i].ecx != orig->ecx || e2[i].edx != orig->edx)
--			return -EINVAL;
--	}
-+	if (memcmp(e2, vcpu->arch.cpuid_entries, nent * sizeof(*e2)))
-+		return -EINVAL;
- 
- 	return 0;
- }
--- 
-2.34.1
+I think this wording is clearer because we do keep a cached the avail
+index value, but the issue is we don't update it:
+s/We are not caching the avail index/We do not update the cached avail
+index value/
+
+>=20
+> It would be better to refresh the cache every time we read avail
+> index, so let's change vhost_enable_notify() caching the value in
+> `avail_idx` and compare it with `last_avail_idx` to check if there
+> are new buffers available.
+>=20
+> Anyway, we don't expect a significant performance boost because
+> the above path is not very common, indeed vhost_enable_notify()
+> is often called with unlikely(), expecting that avail index has
+> not been updated.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+> v1:
+> - improved the commit description [MST, Jason]
+> ---
+>  drivers/vhost/vhost.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 59edb5a1ffe2..07363dff559e 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, str=
+uct vhost_virtqueue *vq)
+>  		       &vq->avail->idx, r);
+>  		return false;
+>  	}
+> +	vq->avail_idx =3D vhost16_to_cpu(vq, avail_idx);
+> =20
+> -	return vhost16_to_cpu(vq, avail_idx) !=3D vq->avail_idx;
+> +	return vq->avail_idx !=3D vq->last_avail_idx;
+
+vhost_vq_avail_empty() has a fast path that's missing in
+vhost_enable_notify():
+
+  if (vq->avail_idx !=3D vq->last_avail_idx)
+      return false;
+
+--MUPe2nEeErvXt6ea
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmHujiUACgkQnKSrs4Gr
+c8j4FQgAqGNimsQXmBYd5xvOIaFAPOU7K643vUM2nqHYrdNnPg2GVtVXiyulBb0N
+gyajwW3HtC/CjTsb0mTXhAeHHiHJ+0ImiFGCsPrYhwwDQE9fK9QTwVNW0P++Suc1
+yvHSZtUCHzoy9MxvTtfzPGFFZvyCnFCAM+VR3mTPvV6d5X9kM1iMMb4SOMP3eEJ5
+Sr56/F6EgVy6IRHk5jw4b50dv/PXGkemVBToPYM1lJKpk6QItPkhO1Oz6cju47+l
+/sEYr52mKCa+j4HT4wg9cOZQwrP9FzDmr41yDHQsz/4hLllTilrz4WxiwMU5hUsc
+HGd9PcRpzj36BwxUcI3kzjr6yf9Sjw==
+=t889
+-----END PGP SIGNATURE-----
+
+--MUPe2nEeErvXt6ea--
 
