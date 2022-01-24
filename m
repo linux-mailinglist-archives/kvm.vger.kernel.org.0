@@ -2,89 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CAA9498546
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 17:52:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B84349859F
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 18:01:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243946AbiAXQw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 11:52:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
+        id S243907AbiAXRBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 12:01:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241220AbiAXQwW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jan 2022 11:52:22 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF009C061748
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 08:52:21 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id h20-20020a17090adb9400b001b518bf99ffso13802354pjv.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 08:52:21 -0800 (PST)
+        with ESMTP id S244058AbiAXRBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jan 2022 12:01:16 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B76AC061401
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 09:01:16 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id s185so9634361oie.3
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 09:01:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4DOMOYJSvvN5tnBDytVLTINey3QTpUnHaOAFRbqi0qA=;
-        b=eOxxRt2pWH99m36u/u55DMJLDubxckBXickqh3FzfHWNuaYDbZbTaMzn7ptFPCdJVt
-         8rYlwt9d5/MV2CVAa1Tvx9w255XzaXxs3chu0eZoC3rn1OUcuMKeSkNc7q4jxbZeB5gV
-         hp+zPCL2Ziw+lyylMXAmk9LakpKKdTJ9Wc70E8kWXs52MwxLpGV7GvRfSZkR8oenjUx1
-         ufne8AtTFjOwOkCS2imN8rl/XqP2He3ilTXCVsdjUBCTrxDkBRsVvy6mriDTXkXBUdmJ
-         QVmsDJtwaEvxkiIj+LO1lbRAJu13iPL0ZatjQ6yLu7hxn+FkvNJf08gzaCYe5TSCxgr7
-         4Tew==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Aj8Xi1kqw/YrKDgEErjzlaUQl2VTJLMRENCyteFx/Ug=;
+        b=E7B3oJbpJ+F3M93IgmUCjE08YdCmVk7Wln2n1QapnKTA0f7HnnX9/aIc9E6A+8NQN4
+         bX4kq775b+RQWSSzPJ8ne2VbohHUwcaOwWNCwbLooIsho9jMy2yeSQ9P+QmMrlmSAyxv
+         /k0HQPlnDn1ThIQJcp8sRrTltOzGqlTQWs1R+Scq+3zJITapZ6o8Kug89ck3dKVSCzwR
+         sDdKMeappC75/8Wek8GhBFggjXrJt2NXB80SPGGlmO9oGb/LBfVR3L18f4VDgfda9SX4
+         Z+8e1A7ORNDJyUv02U7NRrKQ4EpFS8hPOwo9KfIRAevtTPYTGyH55q5NZbg5cZFaN45g
+         cLhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4DOMOYJSvvN5tnBDytVLTINey3QTpUnHaOAFRbqi0qA=;
-        b=YUJS8VaSaS/Vx7xRA+N/jCZsNVirSq1eNSpjgTf4wyjAtEU68YeWDouM3eFe6Rn+CH
-         7gmFw7ddBS8ZDNwcK+15OrBGAa7gUcuYM9Almw7IAC7fhYRK0nsNUztCFNyEGPVAXdXZ
-         +b74E/gh3uOKT0KD5FsR45pz70Gma7HJSmT/eArufI/OWddLEyP+bFjxSfRUp4sM68kz
-         RAcMyy9a0/AduEaY0+HCvBs/WeHgaIficF+lg5EBrCo0q91pluqiLfHKVhiDlZo8rCaY
-         fxNe7jTxoqp7VuxJrZZ8uAjsHg+jf0Ttn4owE+dkj4SGwvMU6WhKcMrNuZT/QkTYLFE7
-         Lu1A==
-X-Gm-Message-State: AOAM530RpGzbdMSTy87l/t6bZzXoif/U9ogke5SdkinVs11OKr+rMYVI
-        QtnfQ5Y+71Xm3ibqXo0ca2ier9Xk7Hn99w==
-X-Google-Smtp-Source: ABdhPJyMr6O+G5WxooofruAM9cjUIrILwgimKxImnOMxYXRK8GJLu9w8hNxfYs9Rj7AXIu+opbzEwQ==
-X-Received: by 2002:a17:90b:3ec2:: with SMTP id rm2mr2718033pjb.141.1643043141062;
-        Mon, 24 Jan 2022 08:52:21 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k12sm17871572pfc.107.2022.01.24.08.52.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jan 2022 08:52:20 -0800 (PST)
-Date:   Mon, 24 Jan 2022 16:52:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Use memcmp in kvm_cpuid_check_equal()
-Message-ID: <Ye7ZQJ6NYoZqK9yk@google.com>
-References: <20220124103606.2630588-1-vkuznets@redhat.com>
- <20220124103606.2630588-3-vkuznets@redhat.com>
- <95f63ed6-743b-3547-dda1-4fe83bc39070@redhat.com>
- <87bl01i2zl.fsf@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Aj8Xi1kqw/YrKDgEErjzlaUQl2VTJLMRENCyteFx/Ug=;
+        b=Ro7IwnQulsKicoK431qa/HVaYTDd3XuaEljeI8/m320Rri+/13rVgnagI2ajyESjer
+         dmMG9wMJHdg+oDYpwghS6ddYR29CrYJ6mrD9S1F37GArdkIhzrZuwOznyPBuckbfYbLk
+         PJ/yuadXK21Ffx2ut82tPOyFlodPj9W8BtgKFWdL+B0qc9ub433HeYFKx5crJAk250Ez
+         ZMgpbl0vXTU6UqDc0UzBVaBpnj+0iWOCRF/YwC06sc3I+gMxy9PqMA6DcA8JjomuWdEl
+         vt4wke4uJhkqRAd/1t9CNs/QAI1MAt+Pi42puOO9K7HCrAPcXt+ROcNSIzHuCNu4csk7
+         EodA==
+X-Gm-Message-State: AOAM530H/QHibTG6PR8U1KVOtWHTaNQuh7jnPi2ynwLXdT3elosgTpZx
+        HHe+UXaiidooT0j0wtpW/OSEWDWns1UUjJfNw38a35BGXo8UmA==
+X-Google-Smtp-Source: ABdhPJzxcvJw0ecG6sIAoWVzbp4b0QCZWJB9HqLs8Eqzh+bYnR+k/J+JZ4wCWm+2nKk0MzwhG8VLgq0Wt6aWBvjcMHU=
+X-Received: by 2002:aca:1204:: with SMTP id 4mr2189252ois.85.1643043674943;
+ Mon, 24 Jan 2022 09:01:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bl01i2zl.fsf@redhat.com>
+References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-15-reijiw@google.com>
+In-Reply-To: <20220106042708.2869332-15-reijiw@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 24 Jan 2022 17:00:38 +0000
+Message-ID: <CA+EHjTzQK2kswrW3LDf0ybz4estOCdafCvtRZHWwvTv2nH-UVw@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 14/26] KVM: arm64: Add consistency checking for
+ frac fields of ID registers
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 24, 2022, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> >> +	if (memcmp(e2, vcpu->arch.cpuid_entries, nent * sizeof(*e2)))
-> >> +		return -EINVAL;
-> >
-> > Hmm, not sure about that due to the padding in struct kvm_cpuid_entry2. 
-> >   It might break userspace that isn't too careful about zeroing it.
+Hi Reiji,
 
-Given that we already are fully committed to potentially breaking userspace by
-disallowing KVM_SET_CPUID{2} after KVM_RUN, we might as well get greedy.
+On Thu, Jan 6, 2022 at 4:29 AM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Feature fractional field of an ID register cannot be simply validated
+> at KVM_SET_ONE_REG because its validity depends on its (main) feature
+> field value, which could be in a different ID register (and might be
+> set later).
+> Validate fractional fields at the first KVM_RUN instead.
+>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   1 +
+>  arch/arm64/kvm/arm.c              |   3 +
+>  arch/arm64/kvm/sys_regs.c         | 116 +++++++++++++++++++++++++++++-
+>  3 files changed, 117 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4509f9e7472d..7b3f86bd6a6b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -750,6 +750,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>
+>  void set_default_id_regs(struct kvm *kvm);
+>  int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
+> +int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu);
+>
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 5f497a0af254..16fc2ce32069 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -596,6 +596,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+>         if (!kvm_arm_vcpu_is_finalized(vcpu))
+>                 return -EPERM;
+>
+> +       if (!kvm_vm_is_protected(kvm) && kvm_id_regs_consistency_check(vcpu))
+> +               return -EPERM;
+> +
+>         vcpu->arch.has_run_once = true;
+>
+>         kvm_arm_vcpu_init_debug(vcpu);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index ddbeefc3881c..6adb7b04620c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -756,9 +756,6 @@ static struct id_reg_info id_aa64pfr0_el1_info = {
+>
+>  static struct id_reg_info id_aa64pfr1_el1_info = {
+>         .sys_reg = SYS_ID_AA64PFR1_EL1,
+> -       .ignore_mask = ARM64_FEATURE_MASK(ID_AA64PFR1_RASFRAC) |
+> -                      ARM64_FEATURE_MASK(ID_AA64PFR1_MPAMFRAC) |
+> -                      ARM64_FEATURE_MASK(ID_AA64PFR1_CSV2FRAC),
+>         .init = init_id_aa64pfr1_el1_info,
+>         .validate = validate_id_aa64pfr1_el1,
+>         .vcpu_mask = vcpu_mask_id_aa64pfr1_el1,
+> @@ -3434,10 +3431,109 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>         return write_demux_regids(uindices);
+>  }
+>
+> +/* ID register's fractional field information with its feature field. */
+> +struct feature_frac {
+> +       u32     id;
+> +       u32     shift;
+> +       u32     frac_id;
+> +       u32     frac_shift;
+> +       u8      frac_ftr_check;
+> +};
 
-> FWIW, QEMU zeroes the whole thing before setting individual CPUID
-> entries. Legacy KVM_SET_CPUID call is also not afffected as it copies
-> entries to a newly allocated "struct kvm_cpuid_entry2[]" and explicitly
-> zeroes padding.
-> 
-> Do we need to at least add a check for ".flags"?
+frac_ftr_check doesn't seem to be used. Also, it would be easier to
+read if the ordering of the fields match the ordering you initialize
+them below.
 
-Yes.
+> +
+> +static struct feature_frac feature_frac_table[] = {
+> +       {
+> +               .frac_id = SYS_ID_AA64PFR1_EL1,
+> +               .frac_shift = ID_AA64PFR1_RASFRAC_SHIFT,
+> +               .id = SYS_ID_AA64PFR0_EL1,
+> +               .shift = ID_AA64PFR0_RAS_SHIFT,
+> +       },
+> +       {
+> +               .frac_id = SYS_ID_AA64PFR1_EL1,
+> +               .frac_shift = ID_AA64PFR1_MPAMFRAC_SHIFT,
+> +               .id = SYS_ID_AA64PFR0_EL1,
+> +               .shift = ID_AA64PFR0_MPAM_SHIFT,
+> +       },
+> +       {
+> +               .frac_id = SYS_ID_AA64PFR1_EL1,
+> +               .frac_shift = ID_AA64PFR1_CSV2FRAC_SHIFT,
+> +               .id = SYS_ID_AA64PFR0_EL1,
+> +               .shift = ID_AA64PFR0_CSV2_SHIFT,
+> +       },
+> +};
+> +
+> +/*
+> + * Return non-zero if the feature/fractional fields pair are not
+> + * supported. Return zero otherwise.
+> + * This function validates only the fractional feature field,
+> + * and relies on the fact the feature field is validated before
+> + * through arm64_check_features.
+> + */
+> +static int vcpu_id_reg_feature_frac_check(const struct kvm_vcpu *vcpu,
+> +                                         const struct feature_frac *ftr_frac)
+> +{
+> +       const struct id_reg_info *id_reg;
+> +       u32 id;
+> +       u64 val, lim, mask;
+> +
+> +       /* Check if the feature field value is same as the limit */
+> +       id = ftr_frac->id;
+> +       id_reg = GET_ID_REG_INFO(id);
+> +
+> +       mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->shift;
+> +       val = __read_id_reg(vcpu, id) & mask;
+> +       lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
+> +       lim &= mask;
+> +
+> +       if (val != lim)
+> +               /*
+> +                * The feature level is lower than the limit.
+> +                * Any fractional version should be fine.
+> +                */
+> +               return 0;
+> +
+> +       /* Check the fractional feature field */
+> +       id = ftr_frac->frac_id;
+> +       id_reg = GET_ID_REG_INFO(id);
+> +
+> +       mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->frac_shift;
+> +       val = __read_id_reg(vcpu, id) & mask;
+> +       lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
+> +       lim &= mask;
+> +
+> +       if (val == lim)
+> +               /*
+> +                * Both the feature and fractional fields are the same
+> +                * as limit.
+> +                */
+> +               return 0;
+> +
+> +       return arm64_check_features(id, val, lim);
+> +}
+> +
+> +int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu)
+
+Nit: considering that this is only checking the fractional fields,
+should the function name reflect that?
+
+> +{
+> +       int i, err;
+> +       const struct feature_frac *frac;
+> +
+> +       /*
+> +        * Check ID registers' fractional fields, which aren't checked
+> +        * at KVM_SET_ONE_REG.
+> +        */
+> +       for (i = 0; i < ARRAY_SIZE(feature_frac_table); i++) {
+> +               frac = &feature_frac_table[i];
+> +               err = vcpu_id_reg_feature_frac_check(vcpu, frac);
+> +               if (err)
+> +                       return err;
+> +       }
+> +       return 0;
+> +}
+> +
+>  static void id_reg_info_init_all(void)
+>  {
+>         int i;
+>         struct id_reg_info *id_reg;
+> +       struct feature_frac *frac;
+> +       u64 ftr_mask = ARM64_FEATURE_FIELD_MASK;
+>
+>         for (i = 0; i < ARRAY_SIZE(id_reg_info_table); i++) {
+>                 id_reg = (struct id_reg_info *)id_reg_info_table[i];
+> @@ -3446,6 +3542,20 @@ static void id_reg_info_init_all(void)
+>
+>                 id_reg_info_init(id_reg);
+>         }
+> +
+> +       /*
+> +        * Update ignore_mask of ID registers based on fractional fields
+> +        * information.  Any ID register that have fractional fields
+> +        * is expected to have its own id_reg_info.
+> +        */
+> +       for (i = 0; i < ARRAY_SIZE(feature_frac_table); i++) {
+> +               frac = &feature_frac_table[i];
+> +               id_reg = GET_ID_REG_INFO(frac->frac_id);
+> +               if (WARN_ON_ONCE(!id_reg))
+> +                       continue;
+> +
+> +               id_reg->ignore_mask |= ftr_mask << frac->frac_shift;
+> +       }
+>  }
+
+Thanks,
+/fuad
+
+
+>
+>  void kvm_sys_reg_table_init(void)
+> --
+> 2.34.1.448.ga2b2bfdf31-goog
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
