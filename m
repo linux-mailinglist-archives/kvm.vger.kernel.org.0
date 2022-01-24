@@ -2,126 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6374497ABB
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 09:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA5FF497AD3
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 09:57:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242369AbiAXIwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 03:52:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51848 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236352AbiAXIwE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jan 2022 03:52:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643014323;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type; bh=LXRVvwoiwZzifxDn36r5XLBHH/133EA03m6HU6kUIs8=;
-        b=EsrnpfKBPP4oFb8zA/4EMxGah/tPSO/2BGb83o6RMatQqr+5qjhWghL3sjAzWorieiLLe0
-        rJUvjqxPBAFAyqUIGxBXKaLKEiopAnOJZGivWp+NE6QvnU3p5T74iJkqqNPaqdDDpVKf3Y
-        XGAlJDVQlUXIiUmjl3a2xZenxz7d4G4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-36-AEuLbdXaNQCYj_osvz1cbw-1; Mon, 24 Jan 2022 03:52:02 -0500
-X-MC-Unique: AEuLbdXaNQCYj_osvz1cbw-1
-Received: by mail-wm1-f72.google.com with SMTP id j18-20020a05600c1c1200b0034aeea95dacso14600863wms.8
-        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 00:52:02 -0800 (PST)
+        id S242531AbiAXI5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 03:57:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242528AbiAXI5U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jan 2022 03:57:20 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46413C061401
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 00:57:20 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id e81so24446465oia.6
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 00:57:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7LOYL+rXbKkBxwKnxxUJRI+JYuYrzmRIZD8R7ss33Fo=;
+        b=mOOM32JvhyWHxDNT1yl3o3ilV91m8p0sbxYBFE2MaJPRhEDNPFjsP2l/9YgR1e4n/j
+         /+Ki5Wm3HUJjPfHmtoyeLbLIo740NpCjaxlELrLzkpxjvTtLVLgFWh8GpXYSEC2vg8xw
+         iALRbAuJMSsqq2pRpY9vxpEREZ4RJi0zTV/KM0ihwHpDnu4BVD/4YzgHzVTpsoFaN6M/
+         fUNijqYnsFrEFtdDqrP8v+9Q5RTA3dsVOlW+tn4g5RcNPn2AzUI2B4k2Th2N4rlXs+NR
+         YVgFC+bMIftycOG+A/gPsTHZFp/9Ps/r6PvQpOeBiH4RaPhbQKDlyKSAj7xOc1Q1HQYY
+         XRNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:user-agent:reply-to:date
-         :message-id:mime-version;
-        bh=LXRVvwoiwZzifxDn36r5XLBHH/133EA03m6HU6kUIs8=;
-        b=ElPIXVHIEpBqXKa/E/g0xClPbHFVb3bLYQ+wflw9PD55A/wqv0QuQH8EEdBHAU5Fpi
-         +wdsPyPa/i8+pQPEOA+TO2hqKbx//9uY/VDa9TroyRqxPRY2oActEbSBrfjV/UlMOoLs
-         NWE611O9iHTjky0uK4A15hmlRvtgWqrkDGZ99hRj1UltcKfYSFKnkJmqDc4qYIdl/c9e
-         h+5W9+AanbS1QDmEFcUJpVIISkL+D2W29bgRnhP4v3sfM1yXk/b7Zfag6mtI46S1Bj+D
-         9e3nmYJ6oZJ1kJjhOPXmhKAk5nDwUKpipPfaI+CWx0BI6g494T4xb4//HhOr87BpeXxr
-         QPqA==
-X-Gm-Message-State: AOAM53060OgI9E9KxfHEMEQRuLuNYmArnZ1r1iPa0UU9sf6FJRf6GBPV
-        ZNrmT2Znge2lTfQmco5VgUwJgE4pI8Wsloz/RFFZyXRruicPtowiShCAN4/QOpvzvdo+Q9fhy9B
-        F6ERbJW2hNsTFe7MbFt1Cuos2ebcC06GA9Cedq0UbMAE/njzXatvdrEIIT4oDQwH6
-X-Received: by 2002:a05:600c:4e4e:: with SMTP id e14mr857526wmq.98.1643014320955;
-        Mon, 24 Jan 2022 00:52:00 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJweugE/T1AI2/YI2Cq1E8ZAzZqGnBoCZEb6UCIovSBN7a7OQuU0OFTQ77CISW3JTub+9knOTA==
-X-Received: by 2002:a05:600c:4e4e:: with SMTP id e14mr857511wmq.98.1643014320687;
-        Mon, 24 Jan 2022 00:52:00 -0800 (PST)
-Received: from localhost ([47.61.17.76])
-        by smtp.gmail.com with ESMTPSA id l4sm540392wrs.6.2022.01.24.00.51.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jan 2022 00:52:00 -0800 (PST)
-From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-Subject: KVM call for agenda for 2022-01-25
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Mon, 24 Jan 2022 09:51:59 +0100
-Message-ID: <87y2355xe8.fsf@secure.mitica>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7LOYL+rXbKkBxwKnxxUJRI+JYuYrzmRIZD8R7ss33Fo=;
+        b=uOr++SJJ5uNbiya0UIUUkfX7alRpBtOXYGroSYCMOzuhFveBOfSX0xUEDaQRV4ygoM
+         WQZ16R7lvWiiTz3xKoDsNSFruEWQGVzl0FwV8FX7mHUvr7KS98AH518LSy35cnq7qS9h
+         4hTQVAqo5929G05LjmAzxmI5X5AlmtxlvC7rN3cQrK33JqaVqkpFAHhCpYOPezDmT0HZ
+         jFA11rPgmGVa1SsMDWOoyqRBlTMrUDt1Tl26HWsZCI3rNHv3bLNhBJeuSGrX1ndJC610
+         guPlY3pDvclnOI0VFPClwz9YP6r9ACAHa6H/QgLj+/usR31nd1/cYHH3vnT70nMyOf0d
+         ouVg==
+X-Gm-Message-State: AOAM532bH88r9v+k+LQ74S8+zqAVWyIOlQf92Pthb2pPSOy2zuVkx7+F
+        qRTwlyoqPDGIvkUi1xpUDx5bF46pE9WpTGKwVQfCEg==
+X-Google-Smtp-Source: ABdhPJxyYrXLQdtFig50Jm9MpWiRAsg7rBHxdCaoci5ZAoy/TpI9NboFii/+p4yqn/MGRoXXtldKiGH6LOsbJbsLU20=
+X-Received: by 2002:aca:1e14:: with SMTP id m20mr640396oic.14.1643014639400;
+ Mon, 24 Jan 2022 00:57:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20220121184207.423426-1-maz@kernel.org>
+In-Reply-To: <20220121184207.423426-1-maz@kernel.org>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 24 Jan 2022 08:56:43 +0000
+Message-ID: <CA+EHjTzks6CpViFPc=xCq4SGpdiEPy_88L3MTjikmNA-9bC0Tg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Use shadow SPSR_EL1 when injecting exceptions
+ on !VHE
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, kernel-team@android.com,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Marc,
+
+On Fri, Jan 21, 2022 at 6:42 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Injecting an exception into a guest with non-VHE is risky business.
+> Instead of writing in the shadow register for the switch code to
+> restore it, we override the CPU register instead. Which gets
+> overriden a few instructions later by said restore code.
+
+I see that in __sysreg_restore_el1_state(), which as you said is
+called after __vcpu_write_spsr().
+
+> The result is that although the guest correctly gets the exception,
+> it will return to the original context in some random state,
+> depending on what was there the first place... Boo.
+>
+> Fix the issue by writing to the shadow register. The original code
+> is absolutely fine on VHE, as the state is already loaded, and writing
+> to the shadow register in that case would actually be a bug.
+
+Which happens via kvm_vcpu_load_sysregs_vhe() calling
+__sysreg_restore_el1_state() before __vcpu_write_spsr() in this case.
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
 
 
-Hi
-
-Please, send any topic that you are interested in covering.
-
-This week we have a continuation of 2 weeks ago call to discuss how to
-enable creation of machines from QMP sooner on the boot.
-
-There was already a call about this 2 weeks ago where we didn't finished
-everything.
-I have been on vacation last week and I haven't been able to send a
-"kind of resume" of the call.
-
-Basically what we need is:
-- being able to create machines sooner that we are today
-- being able to change the devices that are in the boards, in
-  particular, we need to be able to create a board deciding what devices
-  it has and how they are connected without recompiling qemu.
-  This means to launch QMP sooner that we do today.
-- Several options was proposed:
-  - create a new binary that only allows QMP machine creation.
-    and continue having the old command line
-  - create a new binary, and change current HMP/command line to just
-    call this new binary.  This way we make sure that everything can be
-    done through QMP.
-  - stay with only one binary but change it so we can call QMP sooner.
-- There is agreement that we need to be able to call QMP sooner.
-- There is NO agreement about how the best way to proceed:
-  * We don't want this to be a multiyear effort, i.e. we want something
-    that can be used relatively soon (this means that using only one
-    binary can be tricky).
-  * If we start with a new binary that only allows qmp and we wait until
-    everything has been ported to QMP, it can take forever, and during
-    that time we have to maintain two binaries.
-  * Getting a new binary lets us to be more agreessive about what we can
-    remove/change. i.e. easier experimentation.
-  * Management Apps will only use QMP, not the command line, or they
-    even use libvirt and don't care at all about qemu.  So it appears
-    that HMP is only used for developers, so we can be loose about
-    backwards compatibility. I.e. if we allow the same functionality,
-    but the syntax is different, we don't care.
-
-Discussion was longer, but it was difficult to take notes and as I said,
-the only thing that appears that everybody agrees is that we need an
-agreement about what is the plan to go there.
-
-After discussions on the QEMU Summit, we are going to have always open a
-KVM call where you can add topics.
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
-
+> Fixes: bb666c472ca2 ("KVM: arm64: Inject AArch64 exceptions from HYP")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/exception.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 0418399e0a20..c5d009715402 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -38,7 +38,10 @@ static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>
+>  static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
+>  {
+> -       write_sysreg_el1(val, SYS_SPSR);
+> +       if (has_vhe())
+> +               write_sysreg_el1(val, SYS_SPSR);
+> +       else
+> +               __vcpu_sys_reg(vcpu, SPSR_EL1) = val;
+>  }
+>
+>  static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
+> --
+> 2.34.1
+>
