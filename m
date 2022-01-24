@@ -2,170 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B12749810A
-	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 14:30:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9869498155
+	for <lists+kvm@lfdr.de>; Mon, 24 Jan 2022 14:46:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243163AbiAXNaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 08:30:19 -0500
-Received: from mga07.intel.com ([134.134.136.100]:10513 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239975AbiAXNaS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jan 2022 08:30:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643031018; x=1674567018;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=s3MS9jlacq/GjKUc1J7BgRzARDrYpUsH/uofSxi2lpg=;
-  b=KLRPcaAbDHrNZpMyBof98siiy0gAuPPtlI4CKpGuBwNxzRetDKWphdC2
-   M1oo/sIUZg4nrBGVO7nf9hlVbZSIAk28FR33u2qrrLP8crYqrxVoqC1Ve
-   cmSg8ewfLxDCphmv31A8o4+OaeeCPJMYavnkHXm3z2TtHIiLW5PkXs9Z5
-   v7X0BUG/w3HXdktUQLGkGqIqKHVxb2InaeKZh+1njd7FhTt6wRy/BI88k
-   W4hfEndP3MtbUrRgJ698e30lU51j0NlhN71QgYKyLSWHo8nzZT3ZksVNr
-   Oh95EDet0nyKSanTgNQsC+shQhzmHA0UFcS5Sx7sUpfC/zB+Iyx2PqSPz
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10236"; a="309362579"
-X-IronPort-AV: E=Sophos;i="5.88,311,1635231600"; 
-   d="scan'208";a="309362579"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2022 05:30:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,311,1635231600"; 
-   d="scan'208";a="532077916"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by fmsmga007.fm.intel.com with ESMTP; 24 Jan 2022 05:30:05 -0800
-Date:   Mon, 24 Jan 2022 21:29:36 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v4 02/12] mm/memfd: Introduce MFD_INACCESSIBLE flag
-Message-ID: <20220124132936.GA55051@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-3-chao.p.peng@linux.intel.com>
- <8f1eba03-e5e9-e9fc-084d-0ef683093d65@arm.com>
+        id S233206AbiAXNqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 08:46:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25460 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229562AbiAXNqe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jan 2022 08:46:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643031993;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VMWjUFPNROSNZ1gB7bIAJHjMk/KVdbCxC1i1CaU9o8k=;
+        b=dLaq+IBnNeXqPubyheXgyWNkID+xMyS8+JlPZKTFbclUe2gHPL7G0/GxOfs5yBNV6AK3BZ
+        vzBU70fEpeQR88+AaddKhapHfh5n1sqZFNb35lqpuJFLuNh+CIDhCNzXoBgUtdxK08DVcF
+        IFHGeb529SqUGYtE6FMivvH+FSUv7ls=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-134-bYncPiTgPEOR2nWGNSIWfA-1; Mon, 24 Jan 2022 08:46:31 -0500
+X-MC-Unique: bYncPiTgPEOR2nWGNSIWfA-1
+Received: by mail-ed1-f70.google.com with SMTP id p17-20020aa7c891000000b004052d1936a5so8793618eds.7
+        for <kvm@vger.kernel.org>; Mon, 24 Jan 2022 05:46:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=VMWjUFPNROSNZ1gB7bIAJHjMk/KVdbCxC1i1CaU9o8k=;
+        b=Cqz1KEJa6RpagGQJmYBRXXFbh4bFg1+vHIOtk4EDPXztuMzh5+M7R8BQ3gfQk4/jQ1
+         uUtZ/WPEEqucfNSH21Kdm9STRGe+cUYcRtKiwZMvEZZ4SIOBxnmyvVGZNL+AGaSFiFbZ
+         IymGa2Ef3+Qj23ZfDXBmezu5a4wUSazdDvxEmENMjmr/CfbuouxeqkeHBkyTqUS3t/SD
+         oNlc6uRCKqWJa5C18P16LLEHCI80QnXDUZ5+QSRZqHMSWZqlBiZ7JRcYu99Zg6xKIlBV
+         QDbqtjDj/P3FRzNCNWSNCRMqGiTt05GZh79c8fKkoDebPxJOJPj0lFdX3aUqnpdX4XgM
+         dd1A==
+X-Gm-Message-State: AOAM532XjLbfm6Wc/2nGxLeZW80/OUe0ZHNL4CO+0Juo8hXLzsaEuBlr
+        HcuI4usi1qYAzMiT6QSB/KagiXAq74Ny9Flaz5O9VJZRGFMa0bfz6MLOf3gzOoVgKb+Qpi0cCtF
+        ZzONRSRfOvKYo
+X-Received: by 2002:a05:6402:650:: with SMTP id u16mr16286107edx.163.1643031990562;
+        Mon, 24 Jan 2022 05:46:30 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyPPS6Cfx4PZykBtvSaLRQRaAbKk4CngKeatZ4sjeSvxKkSns8X1naDMiTsILFxx8eTjvA0Ag==
+X-Received: by 2002:a05:6402:650:: with SMTP id u16mr16286089edx.163.1643031990351;
+        Mon, 24 Jan 2022 05:46:30 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id gh14sm4886125ejb.38.2022.01.24.05.46.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jan 2022 05:46:29 -0800 (PST)
+Message-ID: <93cd45a7-700b-2437-d56b-3597bdadb657@redhat.com>
+Date:   Mon, 24 Jan 2022 14:46:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f1eba03-e5e9-e9fc-084d-0ef683093d65@arm.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] KVM: VMX: Zero host's SYSENTER_ESP iff SYSENTER is NOT
+ used
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>
+References: <20220122015211.1468758-1-seanjc@google.com>
+ <8735lgjgwl.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <8735lgjgwl.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 21, 2022 at 03:50:55PM +0000, Steven Price wrote:
-> On 18/01/2022 13:21, Chao Peng wrote:
-> > Introduce a new memfd_create() flag indicating the content of the
-> > created memfd is inaccessible from userspace. It does this by force
-> > setting F_SEAL_INACCESSIBLE seal when the file is created. It also set
-> > F_SEAL_SEAL to prevent future sealing, which means, it can not coexist
-> > with MFD_ALLOW_SEALING.
-> > 
-> > The pages backed by such memfd will be used as guest private memory in
-> > confidential computing environments such as Intel TDX/AMD SEV. Since
-> > page migration/swapping is not yet supported for such usages so these
-> > pages are currently marked as UNMOVABLE and UNEVICTABLE which makes
-> > them behave like long-term pinned pages.
-> > 
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >  include/uapi/linux/memfd.h |  1 +
-> >  mm/memfd.c                 | 20 +++++++++++++++++++-
-> >  2 files changed, 20 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/uapi/linux/memfd.h b/include/uapi/linux/memfd.h
-> > index 7a8a26751c23..48750474b904 100644
-> > --- a/include/uapi/linux/memfd.h
-> > +++ b/include/uapi/linux/memfd.h
-> > @@ -8,6 +8,7 @@
-> >  #define MFD_CLOEXEC		0x0001U
-> >  #define MFD_ALLOW_SEALING	0x0002U
-> >  #define MFD_HUGETLB		0x0004U
-> > +#define MFD_INACCESSIBLE	0x0008U
-> >  
-> >  /*
-> >   * Huge page size encoding when MFD_HUGETLB is specified, and a huge page
-> > diff --git a/mm/memfd.c b/mm/memfd.c
-> > index 9f80f162791a..26998d96dc11 100644
-> > --- a/mm/memfd.c
-> > +++ b/mm/memfd.c
-> > @@ -245,16 +245,19 @@ long memfd_fcntl(struct file *file, unsigned int cmd, unsigned long arg)
-> >  #define MFD_NAME_PREFIX_LEN (sizeof(MFD_NAME_PREFIX) - 1)
-> >  #define MFD_NAME_MAX_LEN (NAME_MAX - MFD_NAME_PREFIX_LEN)
-> >  
-> > -#define MFD_ALL_FLAGS (MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_HUGETLB)
-> > +#define MFD_ALL_FLAGS (MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_HUGETLB | \
-> > +		       MFD_INACCESSIBLE)
-> >  
-> >  SYSCALL_DEFINE2(memfd_create,
-> >  		const char __user *, uname,
-> >  		unsigned int, flags)
-> >  {
-> > +	struct address_space *mapping;
-> >  	unsigned int *file_seals;
-> >  	struct file *file;
-> >  	int fd, error;
-> >  	char *name;
-> > +	gfp_t gfp;
-> >  	long len;
-> >  
-> >  	if (!(flags & MFD_HUGETLB)) {
-> > @@ -267,6 +270,10 @@ SYSCALL_DEFINE2(memfd_create,
-> >  			return -EINVAL;
-> >  	}
-> >  
-> > +	/* Disallow sealing when MFD_INACCESSIBLE is set. */
-> > +	if (flags & MFD_INACCESSIBLE && flags & MFD_ALLOW_SEALING)
-> > +		return -EINVAL;
-> > +
-> >  	/* length includes terminating zero */
-> >  	len = strnlen_user(uname, MFD_NAME_MAX_LEN + 1);
-> >  	if (len <= 0)
-> > @@ -315,6 +322,17 @@ SYSCALL_DEFINE2(memfd_create,
-> >  		*file_seals &= ~F_SEAL_SEAL;
-> >  	}
-> >  
-> > +	if (flags & MFD_INACCESSIBLE) {
-> > +		mapping = file_inode(file)->i_mapping;
-> > +		gfp = mapping_gfp_mask(mapping);
-> > +		gfp &= ~__GFP_MOVABLE;
-> > +		mapping_set_gfp_mask(mapping, gfp);
-> > +		mapping_set_unevictable(mapping);
-> > +
-> > +		file_seals = memfd_file_seals_ptr(file);
-> > +		*file_seals &= F_SEAL_SEAL | F_SEAL_INACCESSIBLE;
+On 1/22/22 09:47, Vitaly Kuznetsov wrote:
+>>   	 */
+>> -	vmcs_writel(HOST_IA32_SYSENTER_ESP, 0);
+>> +	if (!IS_ENABLED(CONFIG_IA32_EMULATION) && !IS_ENABLED(CONFIG_X86_32))
+> Isn't it the same as "!IS_ENABLED(CONFIG_COMPAT_32)"? (same goes to the
+> check in vmx_vcpu_load_vmcs())
 > 
-> This looks backwards - the flags should be set on *file_seals, but here
-> you are unsetting all other flags.
 
-Thanks Steve. '|=' actually should be used here.
+It is, but I think it's clearer to write it as it's already done in 
+arch/x86/kvm/vmx/vmx.c, or possibly
 
-Chao
-> 
-> Steve
-> 
-> > +	}
-> > +
-> >  	fd_install(fd, file);
-> >  	kfree(name);
-> >  	return fd;
-> > 
+if (IS_ENABLED(CONFIG_X86_64) && !IS_ENABLED(CONFIG_IA32_EMULATION))
+
+CONFIG_COMPAT_32 doesn't say as clearly whether it's enabled for 32-bit 
+systems or not.
+
+Paolo
+
