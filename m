@@ -2,141 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 197CE49B4B3
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:14:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BAB949B4F9
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:26:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385395AbiAYNOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 08:14:41 -0500
-Received: from mail-dm6nam10on2040.outbound.protection.outlook.com ([40.107.93.40]:50656
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S245176AbiAYNME (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 08:12:04 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bAeEVgARFV8mOsSaRKmSeXMJ+7rwtuoqHZvefvAZjeYeBUJmbUJY0A12aagR3fXVwn2a0TbKql0BBevEPNFABMzmgb866I3gC3vD3IIdH5EfUH+TFPt3DS/aA+lMiIeigwz3/T0eQjC45mrsF3gUIP17ct+EJjUwZZN7XI8ntcjrlSxzBD8RiuMlEeYLVXNjxnQ6FskpWyFnMVzVEIaUfsZVAOK3Gd64mC8KTf68MbNdZZnY9rBnr//+Immr6YJR+qt19Dq/B7I+Ke4/RGIlXm2CgxJBgECaXy3ZYIfN2Lo2IJmag/X99tCE8RtFucZAq4ji0aJEguO382SUs1KBDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6bDJm5SZ22naaKNva7dsUB2Oep09W9noTRz5PEsQbsU=;
- b=WKDa+JElTANajOiONPQIobCcYC5rJ0xTUmwvKv1ZtrZsCdZ+wZ9cDkgp8FHKmLGOJwLukrWk5AYXgmjfh6wqVw4vuH9a9RJbnOtdW9TIiFrkQJT/W6NEP3sTGQU9gecvPjEKeaowkFupneI9uv2iYZtp24BPBpY9sY7R3p/8Lxvjvnw2L5e3BB8svoI1HHpoOWqDo4M0buhQBuqPTCN1iwJBu5vvgeWyKl2t+Rz9IdziyixeIbM0815QFnczVHcI7oEsAWDXsaQp4tO4HhQFvo2IrXKZ8PZqfgp/DTxXstmmbMiEWf7p1aVeLCBBgYxW1ACp35nIiP++xWFlaUWQUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6bDJm5SZ22naaKNva7dsUB2Oep09W9noTRz5PEsQbsU=;
- b=tpKqCKhda8udiYT5a73HWIf3ppqOt204Vsq9GjIhU38BwdToBfbRAmTOaBp1Khv+P2299/ZfkcQcr+pTliCXUU2P+B8TYoHnhlu8RvlvxfkJNj/q8zdotdFwwPMAdiUx597OiEnhVbcdKZNZhTX09IeIwEPqkIVFcrgBtnKzM6TAmXOyRn4b3ZOQlDzhMGlCEtztY24G7hWEquyFQ4GMLarh1NJM8+Yc8JLgpbOjNvQYIM/QB9YX+uRpWAbqRMgiQqUi5wjk3IY8DN9kjqpIZ3Up+ixT4runQ2+RofqDheSZmNBuwfFAXcrCm9Hhdw9CtzxlxjSdlpwTZjffTWxhuQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by BL1PR12MB5256.namprd12.prod.outlook.com (2603:10b6:208:319::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.8; Tue, 25 Jan
- 2022 13:11:59 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ad3f:373f:b7d3:19c2]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::ad3f:373f:b7d3:19c2%7]) with mapi id 15.20.4909.019; Tue, 25 Jan 2022
- 13:11:59 +0000
-Date:   Tue, 25 Jan 2022 09:11:58 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC] vfio: Revise and update the migration uAPI
- description
-Message-ID: <20220125131158.GJ84788@nvidia.com>
-References: <0-v1-a4f7cab64938+3f-vfio_mig_states_jgg@nvidia.com>
- <BN9PR11MB5276BD5DB1F51694501849568C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276BD5DB1F51694501849568C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0229.namprd13.prod.outlook.com
- (2603:10b6:208:2bf::24) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        id S1386784AbiAYNZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 08:25:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1576467AbiAYNWL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 08:22:11 -0500
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9773EC06177F
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 05:22:10 -0800 (PST)
+Received: by mail-oi1-x22e.google.com with SMTP id p203so14550028oih.10
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 05:22:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DIZdKOVntrHNivrgeyNyjrvEE5HK8nFj+9d8ue+W9UI=;
+        b=Y8Rq3AfgPDqXzFKT7ddTRyU3YPSy+h8XqrGJVpIaWPALow7SF1NYUjY9OzsmGch//Y
+         oOlYR2gcgwWuUH/J3Mm37QUN5A0d7SHbtsFlkZJ1cxHfqqZ2zc8QHdfI8L1KAuBpOQlN
+         HGtHhzJ/RSxDpc6qZ/4VP+TujTfXVGP1fni/NggDIugN/6PySpK/anof7BQRjhc4u6Z9
+         HAKlBi0phRG5pB+B/wIu/TFuBnOX9nYoUlBFFdMNaRayJjG7tG6zZs5osg6j4Zj/IT+r
+         jR5Q5JNGq9r8cHlO+sejl6Cw5h0oV1fcXLrSgNMR4eR70khNQA3U1v/Gns2h/lNpzJ2u
+         RLDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DIZdKOVntrHNivrgeyNyjrvEE5HK8nFj+9d8ue+W9UI=;
+        b=l6F3qVz4SkJR8G+3U9r/Fd6cItNdWrA8jANX+zWr2aPw8+fUC6aoUjTy/D6DZIOKT6
+         cXzMi46A8a6hwi5RnMDqhQZIChlioCFWgBOUryr/BdBYemZtdPOfHktQmPP52HRQN6vD
+         7KL6sjBA3F1vfXAqNuWfzODdAkDwe54qDPi4jcUt0L+jysB7v8CnWhXYoRDxonluGXLo
+         1PVoqVsk+XUamsa5Lqvz5NWWCzHy0We0y481UQDw/4FBNt+zVgcAGOvGZxwLjasYbwAY
+         VqDsHWQwHzyOqN1uD2E1Fa0htZNdd9X8SUMTllWnEW7lRSTbnH1/Bb46x6/XD3WxJBOK
+         IGfQ==
+X-Gm-Message-State: AOAM5321+eWbZjhsRDh2/THSTJVgQzWD5aKlpobs5UELq3QSZJOaOaqs
+        3fTSU2fGPqLSDkGuctor94+4gtjAaMWR65+aCPv9Vw==
+X-Google-Smtp-Source: ABdhPJw73QNU1SoK95Ga6itnQQ5mRnTtANbJ4sNAfP3dixa4cg59oUV25yyAMk97f7TmM34Lljgsh/GSCQvcW58Qnds=
+X-Received: by 2002:a05:6808:ec2:: with SMTP id q2mr618595oiv.124.1643116929640;
+ Tue, 25 Jan 2022 05:22:09 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 95bd92d0-bf4a-4a98-ed7d-08d9e0044510
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5256:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB52562CABC94B2BB8C160E8F8C25F9@BL1PR12MB5256.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gQEWTRtSu3phATNqU2F6mifGxwdbE72ylAB9s3mpEQpUn8RWf5EUga44MAgse9ocVpOFi1sERHZLnM/1xA7U1Ss8YwrZUMYU1BBqZhCLXZdHnu85b7QS3mFSr0WlOqfi4SapX7UXBWunOCnUdG6vJc4pAcWaor2CgTLFjH3zv+83a4oJqU3cBVBpzHioOy/v94QFvAO1+k2QWVUWg92WURcPo2ZoAZAWdaC3HVowaGsiVGdiuGcKp+RQrpNPprOcJbnjMmJW/d1CA+5SzjuddURvPJntkJJAFB9hBosywmRjQ4Khg7ziw5HHghX5dsEBn0WUnvOnLd3ZWR4GttAeEQZ0VTjeKXq1TJ8y6/ckcY77oI644kwVHHbVQmBqNGu9/4V42UncUKQIiAP2yC8ZEsNn9HfeP3ToXaDsWGn7p3FYVcxwmt6oUb5UmtUglheoqNAPZL4l6jPkRu10rrENuoLIDGvrO2ULtrdnuY3SKs2vyV81bpbRTlKJGvQp1Ko8fGeXTGKTOpj0kXBGMA2Z1jWuU7RuAsDsBt2O8QOkSPjEsUX7zvlyLTNjeYN+sWSMr2V53FBRRxVaA4XZ6GS9OI9j+gs/T1etw8LbfCHQH9Cmw/YFKKZDoXoyRVvABLJXumuoZ5zcMiYRiYzEou1nlw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66476007)(66556008)(36756003)(6512007)(66946007)(6916009)(38100700002)(2906002)(83380400001)(8676002)(6486002)(1076003)(8936002)(107886003)(2616005)(4326008)(5660300002)(6506007)(316002)(186003)(54906003)(508600001)(33656002)(86362001)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aQezmvv/1YedOZFQBN+EtCjjV3BtO1L2TRW2hCixfCSR/75mhf8UslehF+6v?=
- =?us-ascii?Q?xDQgCJDQ6wBbnnUsJrox2V05e1lVKGFueQx+SA+OJY/dxqQA0kjuHNExHNvt?=
- =?us-ascii?Q?dVqiYBfBi4vwBbndRazKd4is/XJD0yrVRtBsIlZlrkVgHOCHJbHWy5la+NvU?=
- =?us-ascii?Q?XjB573o6KfIr4UTWh/8PpSnBHlJyLre5P1twfeE93+2pfceX+ajih0CSELY6?=
- =?us-ascii?Q?r7nNu6hSUodX0UtF9nKPYWRX2KX7jbf7m7c7Co4U7iMUhSznO4TEyGM3i0xS?=
- =?us-ascii?Q?19hF9d3oZaett+j3z/JcnfFMUHajjgO6NbUePXx8rlV5B0HvbKZHuqLVRrgn?=
- =?us-ascii?Q?6hYOS1gx2ATt8on1sHdOOEBUsLNPE8f2bf9HS0Toch3WeSWPAvk03bLF1CP3?=
- =?us-ascii?Q?NNDlOlqQQUyMovtgutc4CxVg3mcnMZhZqXqrfVS/0++y2x4zQGm98rmQY/nC?=
- =?us-ascii?Q?z++cn5/ulYSueTJfjFvMRVufI1ovwGo4eGHBXQLP/7Bw+C9PF5tOFg0SjTI6?=
- =?us-ascii?Q?kdK7kfeFkUoydVJ+SM5a5smXyQznvIpRrgFySbp2+2uj/KzAac43rm2T2Sel?=
- =?us-ascii?Q?VsWJqaHvWLWlqT6z8nl3JAXwU/+0ey2/QG1Dckj3GxvGLeURwDSt+HRUHQla?=
- =?us-ascii?Q?nfLe2Nq6Ce/A9QYUpGQpMVAUHnfNGMAX2cmKNAbwZC2TblYc2o0gnvm1rlzn?=
- =?us-ascii?Q?PJy2OyXeAVP7Cr/ve6wE8o46t5JUxcKhbxmNGK/ErIs5nMPQTdLmZzbaEZ8e?=
- =?us-ascii?Q?IeMeiJ902FQtndNey1ZQUl4xc9Gyplo5EwL7BQ11wXc/IYY5CEQwixzqydG0?=
- =?us-ascii?Q?v0ipqoY6gS5iWdUf6fKyqeNd+hcVn0qd4v1AGsk6wl4dm416tAuERocsBJaA?=
- =?us-ascii?Q?ofdKEH+v2kOnZ8OQ5tIKVFfS3A8UaaGICAPN3adFJNvHiOUY8KmMSpmWzwSF?=
- =?us-ascii?Q?xgo9VSau+qUUzKyircuGK83+guEEr5YvatX/prNJrVW1pC5NaHYOkooJOV4D?=
- =?us-ascii?Q?91P9O1c2UCeXKJh/oq2BHmaqWdmQHiWviFKBvhzTKZzoeiLwmZIfcZ2tYkNA?=
- =?us-ascii?Q?+XbngJJ6ZvkBqM05O10rgLFloaZMYHoXMROerIgD8YWeNGEM9CvILi05G9Bz?=
- =?us-ascii?Q?pIn9mgb/dJZ7OcXYV81+Fx1bz1U+vpOqCOMhyI6105AtkXcF9W7Thpbd/KTa?=
- =?us-ascii?Q?eua6NPfHiOEHLDBxHRzMPjTscLRAOznXFwYT40T3HSQJgbWpANYSOoEQrY2x?=
- =?us-ascii?Q?dVOzlcBvZqktirZyhvIiefzI8QPZB29zqJPG2ETeFO2BjjnrJerWrCuIA5cl?=
- =?us-ascii?Q?Ha6j6uW3IsIWbkRfcsVuuaNKMCVVjICJ/Q6l46QU/3zfrqAOILM7A9crpWmb?=
- =?us-ascii?Q?M78D5a33KdOQZy0PqdEr1fhrkc8ZhCkWBGPly8MiOy+sFuBIoUJgRzmMSG0X?=
- =?us-ascii?Q?MD9A81zXLpcjr5CyH4mA1pdYWBXAYUpZ8CSvAAHKuP0g0uKKtuXMke3xkAVQ?=
- =?us-ascii?Q?+zeC26UhTzi2uAVkU4DJ2Ez5LRH9BEhmXP6JvGO1w7eP4grt+o85cnrLvSkM?=
- =?us-ascii?Q?ACezZNcg3eTg9jMjz+Q=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95bd92d0-bf4a-4a98-ed7d-08d9e0044510
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2022 13:11:59.4113
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Jp8PvCjRWb2a4hC4hznZ1eRsEXV5TItcgMb/7ynaUEl0xHhNbQ619r37ToZi6nl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5256
+References: <20220118015703.3630552-1-jingzhangos@google.com>
+In-Reply-To: <20220118015703.3630552-1-jingzhangos@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Tue, 25 Jan 2022 13:21:33 +0000
+Message-ID: <CA+EHjTwZsODk4pY9sYsUeyETUXQTLNDViPKjD_KbuaPF4sBu=A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] ARM64: Guest performance improvement during dirty
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 25, 2022 at 03:55:31AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Saturday, January 15, 2022 3:35 AM
-> > + *
-> > + *   The peer to peer (P2P) quiescent state is intended to be a quiescent
-> > + *   state for the device for the purposes of managing multiple devices
-> > within
-> > + *   a user context where peer-to-peer DMA between devices may be active.
-> > The
-> > + *   PRE_COPY_P2P and RUNNING_P2P states must prevent the device from
-> > + *   initiating any new P2P DMA transactions. If the device can identify P2P
-> > + *   transactions then it can stop only P2P DMA, otherwise it must stop all
-> > + *   DMA.  The migration driver must complete any such outstanding
-> > operations
-> > + *   prior to completing the FSM arc into either P2P state.
-> > + *
-> 
-> Now NDMA is renamed to P2P... but we did discuss the potential
-> usage of using this state on devices which cannot stop DMA quickly 
-> thus needs to drain pending page requests which further requires 
-> running vCPUs if the fault is on guest I/O page table.
+Hi Jing,
 
-I think this needs to be fleshed out more before we can add it,
-ideally along with a driver and some qemu implementation
+On Tue, Jan 18, 2022 at 1:57 AM Jing Zhang <jingzhangos@google.com> wrote:
+>
+> This patch is to reduce the performance degradation of guest workload during
+> dirty logging on ARM64. A fast path is added to handle permission relaxation
+> during dirty logging. The MMU lock is replaced with rwlock, by which all
+> permision relaxations on leaf pte can be performed under the read lock. This
+> greatly reduces the MMU lock contention during dirty logging. With this
+> solution, the source guest workload performance degradation can be improved
+> by more than 60%.
+>
+> Problem:
+>   * A Google internal live migration test shows that the source guest workload
+>   performance has >99% degradation for about 105 seconds, >50% degradation
+>   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+>   This shows that most of the time, the guest workload degradtion is above
+>   99%, which obviously needs some improvement compared to the test result
+>   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+>   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB, PageSize: 4K
+>   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB, PageSize: 4K, 2M hugepage backed
+>
+> Analysis:
+>   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+>     the number of contentions of MMU lock and the "dirty memory time" on
+>     various VM spec. The "dirty memory time" is the time vCPU threads spent
+>     in KVM after fault. Higher "dirty memory time" means higher degradation
+>     to guest workload.
+>     '-m 2' specifies the mode "PA-bits:48,  VA-bits:48,  4K pages".
+>     By using test command
+>     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
+>     Below are the results:
+>     +-------+------------------------+-----------------------+
+>     | #vCPU | dirty memory time (ms) | number of contentions |
+>     +-------+------------------------+-----------------------+
+>     | 1     | 926                    | 0                     |
+>     +-------+------------------------+-----------------------+
+>     | 2     | 1189                   | 4732558               |
+>     +-------+------------------------+-----------------------+
+>     | 4     | 2503                   | 11527185              |
+>     +-------+------------------------+-----------------------+
+>     | 8     | 5069                   | 24881677              |
+>     +-------+------------------------+-----------------------+
+>     | 16    | 10340                  | 50347956              |
+>     +-------+------------------------+-----------------------+
+>     | 32    | 20351                  | 100605720             |
+>     +-------+------------------------+-----------------------+
+>     | 64    | 40994                  | 201442478             |
+>     +-------+------------------------+-----------------------+
+>
+>   * From the test results above, the "dirty memory time" and the number of
+>     MMU lock contention scale with the number of vCPUs. That means all the
+>     dirty memory operations from all vCPU threads have been serialized by
+>     the MMU lock. Further analysis also shows that the permission relaxation
+>     during dirty logging is where vCPU threads get serialized.
 
-It looks like the qemu part for this will not be so easy..
+I am curious about any changes to performance for this case (the base
+case) with the changes in patch 3.
 
-Jason
+Thanks,
+/fuad
+
+
+
+>
+> Solution:
+>   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+>     the dirty-bit solution for dirty logging is much complicated compared to
+>     the write-protection solution. The straight way to reduce the guest
+>     performance degradation is to enhance the concurrency for the permission
+>     fault path during dirty logging.
+>   * In this patch, we only put leaf PTE permission relaxation for dirty
+>     logging under read lock, all others would go under write lock.
+>     Below are the results based on the fast path solution:
+>     +-------+------------------------+
+>     | #vCPU | dirty memory time (ms) |
+>     +-------+------------------------+
+>     | 1     | 965                    |
+>     +-------+------------------------+
+>     | 2     | 1006                   |
+>     +-------+------------------------+
+>     | 4     | 1128                   |
+>     +-------+------------------------+
+>     | 8     | 2005                   |
+>     +-------+------------------------+
+>     | 16    | 3903                   |
+>     +-------+------------------------+
+>     | 32    | 7595                   |
+>     +-------+------------------------+
+>     | 64    | 15783                  |
+>     +-------+------------------------+
+>
+>   * Furtuer analysis shows that there is another bottleneck caused by the
+>     setup of the test code itself. The 3rd commit is meant to fix that by
+>     setting up vgic in the test code. With the test code fix, below are
+>     the results which show better improvement.
+>     +-------+------------------------+
+>     | #vCPU | dirty memory time (ms) |
+>     +-------+------------------------+
+>     | 1     | 803                    |
+>     +-------+------------------------+
+>     | 2     | 843                    |
+>     +-------+------------------------+
+>     | 4     | 942                    |
+>     +-------+------------------------+
+>     | 8     | 1458                   |
+>     +-------+------------------------+
+>     | 16    | 2853                   |
+>     +-------+------------------------+
+>     | 32    | 5886                   |
+>     +-------+------------------------+
+>     | 64    | 12190                  |
+>     +-------+------------------------+
+>     All "dirty memory time" has been reduced by more than 60% when the
+>     number of vCPU grows.
+>   * Based on the solution, the test results from the Google internal live
+>     migration test also shows more than 60% improvement with >99% for 30s,
+>     >50% for 58s and >10% for 76s.
+>
+> ---
+>
+> * v1 -> v2
+>   - Renamed flag name from use_mmu_readlock to logging_perm_fault.
+>   - Removed unnecessary check for fault_granule to use readlock.
+> * RFC -> v1
+>   - Rebase to kvm/queue, commit fea31d169094
+>     (KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event)
+>   - Moved the fast path in user_mem_abort, as suggested by Marc.
+>   - Addressed other comments from Marc.
+>
+> [v1] https://lore.kernel.org/all/20220113221829.2785604-1-jingzhangos@google.com
+> [RFC] https://lore.kernel.org/all/20220110210441.2074798-1-jingzhangos@google.com
+>
+> ---
+>
+> Jing Zhang (3):
+>   KVM: arm64: Use read/write spin lock for MMU protection
+>   KVM: arm64: Add fast path to handle permission relaxation during dirty
+>     logging
+>   KVM: selftests: Add vgic initialization for dirty log perf test for
+>     ARM
+>
+>  arch/arm64/include/asm/kvm_host.h             |  2 +
+>  arch/arm64/kvm/mmu.c                          | 49 ++++++++++++-------
+>  .../selftests/kvm/dirty_log_perf_test.c       | 10 ++++
+>  3 files changed, 43 insertions(+), 18 deletions(-)
+>
+>
+> base-commit: fea31d1690945e6dd6c3e89ec5591490857bc3d4
+> --
+> 2.34.1.703.g22d0c6ccf7-goog
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
