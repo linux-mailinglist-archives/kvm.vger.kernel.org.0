@@ -2,414 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6888F49B431
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 13:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 601CF49B473
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:01:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1453010AbiAYMm1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 07:42:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18872 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1383526AbiAYMjy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 07:39:54 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20PCK2EM007397;
-        Tue, 25 Jan 2022 12:39:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=SlywLxpsS5eWz0E4+pWBh8y5971KSf+ttGtRG3Lqu3k=;
- b=b9VVPRtMSo22exWAFDoH4O/QIR9Y6OgPBkvDs2370CnA/pbyoKhzSyuSv0Q1mPLQngJH
- pnM6il1efSAj5qFDKsPDzbIwJmdGcmuTTQpjbIuwyuWEVFBWwbaGR9H2MtWbJDNhUPdG
- JG+xev46hhslSyO0ri66ZYsHI4lILxHWDZ3Bdby+caedlp9RQwM107JWTIWraHHW+5co
- Qulu92yBpCAZsLwP3rcMug2yzZ0VmLXsDTF1fjr3hLkEexw2R7UTMM/MkVwZnbdiYIrX
- G84Li9jItckRzTcK4jEEWrAPLH0FY84rsuaBt2CjdVO9fKm2Bbdp2V21JyIOoMgud1p7 2A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dth2rgf30-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:39:52 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20PCK3oH007628;
-        Tue, 25 Jan 2022 12:39:52 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dth2rgf1v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:39:52 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20PCWKxY011423;
-        Tue, 25 Jan 2022 12:39:50 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dr96je31y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:39:49 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20PCdkuW41157052
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jan 2022 12:39:46 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C427AE058;
-        Tue, 25 Jan 2022 12:39:46 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F90DAE059;
-        Tue, 25 Jan 2022 12:39:45 +0000 (GMT)
-Received: from [9.171.58.95] (unknown [9.171.58.95])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jan 2022 12:39:45 +0000 (GMT)
-Message-ID: <bb8f5da2-19d2-bf94-a2b4-f5b6f0f91995@linux.ibm.com>
-Date:   Tue, 25 Jan 2022 13:41:35 +0100
+        id S239643AbiAYM7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 07:59:23 -0500
+Received: from mx1.tq-group.com ([93.104.207.81]:23582 "EHLO mx1.tq-group.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1359066AbiAYM4T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 07:56:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1643115378; x=1674651378;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qmHH9G8TVCwWdo3uTby79rF+j0/3SailZLcBZpByLtg=;
+  b=MB4CtmBY/kKUZUkbx858aLxhxtieEwNP3ArjS4boMb6N8oV/9x7+oe+7
+   vBRLZ4YVEvZ/1JO2JM7klGULc8cKXlCkrMAODKUDhoRxB28SicAlb3MwA
+   z4BaKpNCiXG7OZsbwPxYNCX20Nvck+6x4Hz/LZ+ldX2fSU+OXD7ABJ1L3
+   qhCGVEW1kcKUCt7niPCL5EASKNk6v9jLS3splPrSApHD9OyMA3IK+xWnD
+   qyyDv4o+OVOldOqDDmEWH7qIkVMd4VmaPCCCi8zZkUsMRkMvEb3Tf3C3R
+   UUuaUcupgO11DYD/qAb/ED5oLYw/xNWULPE2SGkeHr9g/mXySY1kfHonr
+   w==;
+X-IronPort-AV: E=Sophos;i="5.88,315,1635199200"; 
+   d="scan'208";a="21697221"
+Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
+  by mx1-pgp.tq-group.com with ESMTP; 25 Jan 2022 13:56:08 +0100
+Received: from mx1.tq-group.com ([192.168.6.7])
+  by tq-pgp-pr1.tq-net.de (PGP Universal service);
+  Tue, 25 Jan 2022 13:56:09 +0100
+X-PGP-Universal: processed;
+        by tq-pgp-pr1.tq-net.de on Tue, 25 Jan 2022 13:56:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1643115368; x=1674651368;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qmHH9G8TVCwWdo3uTby79rF+j0/3SailZLcBZpByLtg=;
+  b=DZazWES6Z7qX74NIrM+i69skWo5ObJhdpFykKEns/urrKSV7FmjkeM2t
+   YnBYyu8w987PyL5eZzlJ5LqVC1ihXP16gqLHPxLAtK9NLfyfbbnxMJjnE
+   xkheSFbGqZGupY07RAOmoaOCOMZDwMnZDGO5NYbNANthuHRau78001vK2
+   zJddEGsKEXtkeB0hUhuWkr3kF7tYn69GziEH85Y5mupr+z4GI7q8lpN8I
+   tHnvDwxI2K5PUlNNRZSdV0LyBsYg2DAs8tg6Mfpsr/QsP6qCBNv225Vhv
+   9E6GQFdFpwV+AAWYlFUvOpxFqY72lFs4EOW/dDH0eW9QyDbiOHxD6zCA3
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.88,315,1635199200"; 
+   d="scan'208";a="21697220"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 25 Jan 2022 13:56:08 +0100
+Received: from schifferm-ubuntu (SCHIFFERM-M2.tq-net.de [10.121.201.138])
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id 966B4280065;
+        Tue, 25 Jan 2022 13:56:07 +0100 (CET)
+Message-ID: <33e55c4c0a637b23d76db5d33872378ad04121bd.camel@ew.tq-group.com>
+Subject: Re: [PATCH] driver core: platform: Rename
+ platform_get_irq_optional() to platform_get_irq_silent()
+From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-iio@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Guenter Roeck <groeck@chromium.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-phy@lists.infradead.org, Jiri Slaby <jirislaby@kernel.org>,
+        openipmi-developer@lists.sourceforge.net,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Joakim Zhang <qiangqing.zhang@nxp.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        Robert Richter <rric@kernel.org>,
+        Saravanan Sekar <sravanhome@gmail.com>,
+        Corey Minyard <minyard@acm.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        John Garry <john.garry@huawei.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Mark Gross <markgross@kernel.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Sebastian Reichel <sre@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        Benson Leung <bleung@chromium.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-edac@vger.kernel.org, Tony Luck <tony.luck@intel.com>,
+        Mun Yew Tham <mun.yew.tham@intel.com>,
+        Hans de Goede <hdegoede@redhat.com>, netdev@vger.kernel.org,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Zha Qipeng <qipeng.zha@intel.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Niklas =?ISO-8859-1?Q?S=F6derlund?= 
+        <niklas.soderlund@ragnatech.se>,
+        linux-mediatek@lists.infradead.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Date:   Tue, 25 Jan 2022 13:56:05 +0100
+In-Reply-To: <CAMuHMdXouECKa43OwUgQ6dA+gNeOqEZHZgOmQzqknzYiA924YA@mail.gmail.com>
+References: <CAMuHMdWsMGPiQaPS0-PJ_+Mc5VQ37YdLfbHr_aS40kB+SfW-aw@mail.gmail.com>
+         <20220112213121.5ruae5mxwj6t3qiy@pengutronix.de>
+         <Yd9L9SZ+g13iyKab@sirena.org.uk>
+         <20220113110831.wvwbm75hbfysbn2d@pengutronix.de>
+         <YeA7CjOyJFkpuhz/@sirena.org.uk>
+         <20220113194358.xnnbhsoyetihterb@pengutronix.de>
+         <YeF05vBOzkN+xYCq@smile.fi.intel.com>
+         <20220115154539.j3tsz5ioqexq2yuu@pengutronix.de>
+         <YehdsUPiOTwgZywq@smile.fi.intel.com>
+         <20220120075718.5qtrpc543kkykaow@pengutronix.de>
+         <Ye6/NgfxsZnpXE09@smile.fi.intel.com>
+         <15796e57-f7d4-9c66-3b53-0b026eaf31d8@omp.ru>
+         <CAMuHMdXouECKa43OwUgQ6dA+gNeOqEZHZgOmQzqknzYiA924YA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 19/30] KVM: s390: pci: provide routines for
- enabling/disabling interrupt forwarding
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-20-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220114203145.242984-20-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oP0Omze7txDfAZSgiv_LhcVOwylGaruv
-X-Proofpoint-ORIG-GUID: MJmP7jYmdwQA9dkL3Pmloyp__ruAlOpw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-25_02,2022-01-25_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 malwarescore=0 bulkscore=0 clxscore=1015 spamscore=0
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 priorityscore=1501
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201250081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/14/22 21:31, Matthew Rosato wrote:
-> These routines will be wired into the vfio_pci_zdev ioctl handlers to
-> respond to requests to enable / disable a device for Adapter Event
-> Notifications / Adapter Interuption Forwarding.
+On Tue, 2022-01-25 at 09:25 +0100, Geert Uytterhoeven wrote:
+> Hi Sergey,
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_pci.h |   7 ++
->   arch/s390/kvm/pci.c             | 203 ++++++++++++++++++++++++++++++++
->   arch/s390/pci/pci_insn.c        |   1 +
->   3 files changed, 211 insertions(+)
+> On Mon, Jan 24, 2022 at 10:02 PM Sergey Shtylyov <s.shtylyov@omp.ru>
+> wrote:
+> > On 1/24/22 6:01 PM, Andy Shevchenko wrote:
+> > > > > > > > > It'd certainly be good to name anything that doesn't
+> > > > > > > > > correspond to one
+> > > > > > > > > of the existing semantics for the API (!) something
+> > > > > > > > > different rather
+> > > > > > > > > than adding yet another potentially overloaded
+> > > > > > > > > meaning.
+> > > > > > > > 
+> > > > > > > > It seems we're (at least) three who agree about this.
+> > > > > > > > Here is a patch
+> > > > > > > > fixing the name.
+> > > > > > > 
+> > > > > > > And similar number of people are on the other side.
+> > > > > > 
+> > > > > > If someone already opposed to the renaming (and not only
+> > > > > > the name) I
+> > > > > > must have missed that.
+> > > > > > 
+> > > > > > So you think it's a good idea to keep the name
+> > > > > > platform_get_irq_optional() despite the "not found" value
+> > > > > > returned by it
+> > > > > > isn't usable as if it were a normal irq number?
+> > > > > 
+> > > > > I meant that on the other side people who are in favour of
+> > > > > Sergey's patch.
+> > > > > Since that I commented already that I opposed the renaming
+> > > > > being a standalone
+> > > > > change.
+> > > > > 
+> > > > > Do you agree that we have several issues with
+> > > > > platform_get_irq*() APIs?
+> > [...]
+> > > > > 2. The vIRQ0 handling: a) WARN() followed by b) returned
+> > > > > value 0
+> > > > 
+> > > > I'm happy with the vIRQ0 handling. Today platform_get_irq() and
+> > > > it's
+> > > > silent variant returns either a valid and usuable irq number or
+> > > > a
+> > > > negative error value. That's totally fine.
+> > > 
+> > > It might return 0.
+> > > Actually it seems that the WARN() can only be issued in two
+> > > cases:
+> > > - SPARC with vIRQ0 in one of the array member
+> > > - fallback to ACPI for GPIO IRQ resource with index 0
+> > 
+> >    You have probably missed the recent discovery that
+> > arch/sh/boards/board-aps4*.c
+> > causes IRQ0 to be passed as a direct IRQ resource?
 > 
-> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
-> index 072401aa7922..01fe14fffd7a 100644
-> --- a/arch/s390/include/asm/kvm_pci.h
-> +++ b/arch/s390/include/asm/kvm_pci.h
-> @@ -16,16 +16,23 @@
->   #include <linux/kvm_host.h>
->   #include <linux/kvm.h>
->   #include <linux/pci.h>
-> +#include <asm/pci_insn.h>
->   
->   struct kvm_zdev {
->   	struct zpci_dev *zdev;
->   	struct kvm *kvm;
-> +	struct zpci_fib fib;
->   };
->   
->   int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
->   void kvm_s390_pci_dev_release(struct zpci_dev *zdev);
->   void kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm);
->   
-> +int kvm_s390_pci_aif_probe(struct zpci_dev *zdev);
-> +int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
-> +			    bool assist);
-> +int kvm_s390_pci_aif_disable(struct zpci_dev *zdev);
-> +
->   int kvm_s390_pci_interp_probe(struct zpci_dev *zdev);
->   int kvm_s390_pci_interp_enable(struct zpci_dev *zdev);
->   int kvm_s390_pci_interp_disable(struct zpci_dev *zdev);
-> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-> index 122d0992b521..7ed9abc476b6 100644
-> --- a/arch/s390/kvm/pci.c
-> +++ b/arch/s390/kvm/pci.c
-> @@ -12,6 +12,7 @@
->   #include <asm/kvm_pci.h>
->   #include <asm/pci.h>
->   #include <asm/pci_insn.h>
-> +#include <asm/pci_io.h>
->   #include <asm/sclp.h>
->   #include "pci.h"
->   #include "kvm-s390.h"
-> @@ -145,6 +146,204 @@ int kvm_s390_pci_aen_init(u8 nisc)
->   	return rc;
->   }
->   
-> +/* Modify PCI: Register floating adapter interruption forwarding */
-> +static int kvm_zpci_set_airq(struct zpci_dev *zdev)
-> +{
-> +	u64 req = ZPCI_CREATE_REQ(zdev->fh, 0, ZPCI_MOD_FC_REG_INT);
-> +	struct zpci_fib fib = {0};
+> So far no one reported seeing the big fat warning ;-)
 
-I prefer {} instead of {0} even it does the same it looks wrong to me.
+FWIW, we had a similar issue with an IRQ resource passed from the
+tqmx86 MFD driver do the GPIO driver, which we noticed due to this
+warning, and which was fixed
+in a946506c48f3bd09363c9d2b0a178e55733bcbb6
+and 9b87f43537acfa24b95c236beba0f45901356eb2.
+I believe these changes are what promted this whole discussion and led
+to my "Reported-by" on the patch?
 
-> +	u8 status;
-> +
-> +	fib.fmt0.isc = zdev->kzdev->fib.fmt0.isc;
-> +	fib.fmt0.sum = 1;       /* enable summary notifications */
-> +	fib.fmt0.noi = airq_iv_end(zdev->aibv);
-> +	fib.fmt0.aibv = virt_to_phys(zdev->aibv->vector);
-> +	fib.fmt0.aibvo = 0;
-> +	fib.fmt0.aisb = virt_to_phys(aift->sbv->vector + (zdev->aisb / 64) * 8);
-> +	fib.fmt0.aisbo = zdev->aisb & 63;
-> +	fib.gd = zdev->gd;
-> +
-> +	return zpci_mod_fc(req, &fib, &status) ? -EIO : 0;
-> +}
-> +
-> +/* Modify PCI: Unregister floating adapter interruption forwarding */
-> +static int kvm_zpci_clear_airq(struct zpci_dev *zdev)
-> +{
-> +	u64 req = ZPCI_CREATE_REQ(zdev->fh, 0, ZPCI_MOD_FC_DEREG_INT);
-> +	struct zpci_fib fib = {0};
+It is not entirely clear to me when IRQ 0 is valid and when it isn't,
+but the warning seems useful to me. Maybe it would make more sense to
+warn when such an IRQ resource is registered for a platform device, and
+not when it is looked up?
 
-same here
+My opinion is that it would be very confusing if there are any places
+in the kernel (on some platforms) where IRQ 0 is valid, but for
+platform_get_irq() it would suddenly mean "not found". Keeping a
+negative return value seems preferable to me for this reason.
 
-> +	u8 cc, status;
-> +
-> +	fib.gd = zdev->gd;
-> +
-> +	cc = zpci_mod_fc(req, &fib, &status);
-> +	if (cc == 3 || (cc == 1 && status == 24))
-> +		/* Function already gone or IRQs already deregistered. */
-> +		cc = 0;
-> +
-> +	return cc ? -EIO : 0;
-> +}
-> +
-> +int kvm_s390_pci_aif_probe(struct zpci_dev *zdev)
-> +{
-> +	/* Must have appropriate hardware facilities */
-> +	if (!(sclp.has_aeni && test_facility(71)))
-> +		return -EINVAL;
-> +
-> +	/* Must have a KVM association registered */
-> +	if (!zdev->kzdev || !zdev->kzdev->kvm)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_aif_probe);
-> +
-> +int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
-> +			    bool assist)
-> +{
-> +	struct page *aibv_page, *aisb_page = NULL;
-> +	unsigned int msi_vecs, idx;
-> +	struct zpci_gaite *gaite;
-> +	unsigned long bit;
-> +	struct kvm *kvm;
-> +	phys_addr_t gaddr;
-> +	int rc = 0;
-> +
-> +	/*
-> +	 * Interrupt forwarding is only applicable if the device is already
-> +	 * enabled for interpretation
-> +	 */
-> +	if (zdev->gd == 0)
-> +		return -EINVAL;
-> +
-> +	kvm = zdev->kzdev->kvm;
-> +	msi_vecs = min_t(unsigned int, fib->fmt0.noi, zdev->max_msi);
-> +
-> +	/* Replace AIBV address */
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	aibv_page = gfn_to_page(kvm, gpa_to_gfn((gpa_t)fib->fmt0.aibv));
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +	if (is_error_page(aibv_page)) {
-> +		rc = -EIO;
-> +		goto out;
-> +	}
-> +	gaddr = page_to_phys(aibv_page) + (fib->fmt0.aibv & ~PAGE_MASK);
-> +	fib->fmt0.aibv = gaddr;
-> +
-> +	/* Pin the guest AISB if one was specified */
-> +	if (fib->fmt0.sum == 1) {
-> +		idx = srcu_read_lock(&kvm->srcu);
-> +		aisb_page = gfn_to_page(kvm, gpa_to_gfn((gpa_t)fib->fmt0.aisb));
-> +		srcu_read_unlock(&kvm->srcu, idx);
-> +		if (is_error_page(aisb_page)) {
-> +			rc = -EIO;
-> +			goto unpin1;
-> +		}
-> +	}
-> +
-> +	/* AISB must be allocated before we can fill in GAITE */
-> +	mutex_lock(&aift->lock);
-> +	bit = airq_iv_alloc_bit(aift->sbv);
-> +	if (bit == -1UL)
-> +		goto unpin2;
-> +	zdev->aisb = bit;
+(An alternative, more involved idea would be to add 1 to all IRQ
+"cookies", so IRQ 0 would return 1, leaving 0 as a special value. I
+have absolutely no idea how big the API surface is that would need
+changes, and it is likely not worth the effort at all.)
 
-aisb here is the aisb offset right?
-Then may be add a comment as in gait and fmt0 aisb is an address.
 
-> +	zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA |
-> +					      AIRQ_IV_BITLOCK |
-> +					      AIRQ_IV_GUESTVEC,
-> +				    (unsigned long *)fib->fmt0.aibv);
-
-phys_to_virt ?
-
-> +
-> +	spin_lock_irq(&aift->gait_lock);
-> +	gaite = (struct zpci_gaite *)aift->gait + (zdev->aisb *
-> +						   sizeof(struct zpci_gaite));
-> +
-> +	/* If assist not requested, host will get all alerts */
-> +	if (assist)
-> +		gaite->gisa = (u32)(u64)&kvm->arch.sie_page2->gisa;
-
-virt_to_phys ?
-
-> +	else
-> +		gaite->gisa = 0;
-> +
-> +	gaite->gisc = fib->fmt0.isc;
-> +	gaite->count++;
-> +	gaite->aisbo = fib->fmt0.aisbo;
-> +	gaite->aisb = virt_to_phys(page_address(aisb_page) + (fib->fmt0.aisb &
-> +							      ~PAGE_MASK));
-> +	aift->kzdev[zdev->aisb] = zdev->kzdev;
-> +	spin_unlock_irq(&aift->gait_lock);
-> +
-> +	/* Update guest FIB for re-issue */
-> +	fib->fmt0.aisbo = zdev->aisb & 63;
-> +	fib->fmt0.aisb = virt_to_phys(aift->sbv->vector + (zdev->aisb / 64) * 8);
-> +	fib->fmt0.isc = kvm_s390_gisc_register(kvm, gaite->gisc);
-> +
-> +	/* Save some guest fib values in the host for later use */
-> +	zdev->kzdev->fib.fmt0.isc = fib->fmt0.isc;
-> +	zdev->kzdev->fib.fmt0.aibv = fib->fmt0.aibv;
-> +	mutex_unlock(&aift->lock);
-> +
-> +	/* Issue the clp to setup the irq now */
-> +	rc = kvm_zpci_set_airq(zdev);
-> +	return rc;
-> +
-> +unpin2:
-> +	mutex_unlock(&aift->lock);
-> +	if (fib->fmt0.sum == 1) {
-> +		gaddr = page_to_phys(aisb_page);
-> +		kvm_release_pfn_dirty(gaddr >> PAGE_SHIFT);
-> +	}
-> +unpin1:
-> +	kvm_release_pfn_dirty(fib->fmt0.aibv >> PAGE_SHIFT);
-> +out:
-> +	return rc;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_aif_enable);
-> +
-> +int kvm_s390_pci_aif_disable(struct zpci_dev *zdev)
-> +{
-> +	struct kvm_zdev *kzdev = zdev->kzdev;
-> +	struct zpci_gaite *gaite;
-> +	int rc;
-> +	u8 isc;
-> +
-> +	if (zdev->gd == 0)
-> +		return -EINVAL;
-> +
-> +	/* Even if the clear fails due to an error, clear the GAITE */
-> +	rc = kvm_zpci_clear_airq(zdev);
-
-Having a look at kvm_zpci_clear_airq() the only possible error seems to 
-be when an error recovery is in progress.
-The error returned for a wrong FH, function does not exist anymore, or 
-if the interrupt vectors are already deregistered by the instruction are 
-returned as success by the function.
-
-How can we be sure that we have no conflict with a recovery in progress?
-Shouldn't we in this case let the recovery process handle the function 
-and stop here?
-
-Doesn't the aif lock mutex placed after and not before the clear_irq 
-open a door for race condition with the recovery?
-
-> +
-> +	mutex_lock(&aift->lock);
-> +	if (zdev->kzdev->fib.fmt0.aibv == 0)
-> +		goto out;
-> +	spin_lock_irq(&aift->gait_lock);
-> +	gaite = (struct zpci_gaite *)aift->gait + (zdev->aisb *
-> +						   sizeof(struct zpci_gaite));
-> +	isc = gaite->gisc;
-> +	gaite->count--;
-> +	if (gaite->count == 0) {
-> +		/* Release guest AIBV and AISB */
-> +		kvm_release_pfn_dirty(kzdev->fib.fmt0.aibv >> PAGE_SHIFT);
-> +		if (gaite->aisb != 0)
-> +			kvm_release_pfn_dirty(gaite->aisb >> PAGE_SHIFT);
-> +		/* Clear the GAIT entry */
-> +		gaite->aisb = 0;
-> +		gaite->gisc = 0;
-> +		gaite->aisbo = 0;
-> +		gaite->gisa = 0;
-> +		aift->kzdev[zdev->aisb] = 0;
-> +		/* Clear zdev info */
-> +		airq_iv_free_bit(aift->sbv, zdev->aisb);
-> +		airq_iv_release(zdev->aibv);
-> +		zdev->aisb = 0;
-> +		zdev->aibv = NULL;
-> +	}
-> +	spin_unlock_irq(&aift->gait_lock);
-> +	kvm_s390_gisc_unregister(kzdev->kvm, isc);
-
-Don't we need to check the return value?
-And maybe to report it to the caller?
-
-> +	kzdev->fib.fmt0.isc = 0;
-> +	kzdev->fib.fmt0.aibv = 0;
-> +out:
-> +	mutex_unlock(&aift->lock);
-> +
-> +	return rc;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_aif_disable);
-> +
->   int kvm_s390_pci_interp_probe(struct zpci_dev *zdev)
->   {
->   	/* Must have appropriate hardware facilities */
-> @@ -221,6 +420,10 @@ int kvm_s390_pci_interp_disable(struct zpci_dev *zdev)
->   	if (zdev->gd == 0)
->   		return -EINVAL;
->   
-> +	/* Forwarding must be turned off before interpretation */
-> +	if (zdev->kzdev->fib.fmt0.aibv != 0)
-> +		kvm_s390_pci_aif_disable(zdev);
-> +
->   	/* Remove the host CLP guest designation */
->   	zdev->gd = 0;
->   
-> diff --git a/arch/s390/pci/pci_insn.c b/arch/s390/pci/pci_insn.c
-> index ca6399d52767..f7d0e29bbf0b 100644
-> --- a/arch/s390/pci/pci_insn.c
-> +++ b/arch/s390/pci/pci_insn.c
-> @@ -59,6 +59,7 @@ u8 zpci_mod_fc(u64 req, struct zpci_fib *fib, u8 *status)
->   
->   	return cc;
->   }
-> +EXPORT_SYMBOL_GPL(zpci_mod_fc);
->   
->   /* Refresh PCI Translations */
->   static inline u8 __rpcit(u64 fn, u64 addr, u64 range, u8 *status)
 > 
+> > > The bottom line here is the SPARC case. Anybody familiar with the
+> > > platform
+> > > can shed a light on this. If there is no such case, we may remove
+> > > warning
+> > > along with ret = 0 case from platfrom_get_irq().
+> > 
+> >    I'm afraid you're too fast here... :-)
+> >    We'll have a really hard time if we continue to allow IRQ0 to be
+> > returned by
+> > platform_get_irq() -- we'll have oto fileter it out in the callers
+> > then...
+> 
+> So far no one reported seeing the big fat warning?
+> 
+> > > > > 3. The specific cookie for "IRQ not found, while no error
+> > > > > happened" case
+> > > > 
+> > > > Not sure what you mean here. I have no problem that a situation
+> > > > I can
+> > > > cope with is called an error for the query function. I just do
+> > > > error
+> > > > handling and continue happily. So the part "while no error
+> > > > happened" is
+> > > > irrelevant to me.
+> > > 
+> > > I meant that instead of using special error code, 0 is very much
+> > > good for
+> > > the cases when IRQ is not found. It allows to distinguish -ENXIO
+> > > from the
+> > > low layer from -ENXIO with this magic meaning.
+> > 
+> >    I don't see how -ENXIO can trickle from the lower layers,
+> > frankly...
+> 
+> It might one day, leading to very hard to track bugs.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+As gregkh noted, changing the return value without also making the
+compile fail will be a huge PITA whenever driver patches are back- or
+forward-ported, as it would require subtle changes in error paths,
+which can easily slip through unnoticed, in particular with half-
+automated stable backports.
+
+Even if another return value like -ENODEV might be better aligned with
+...regulator_get_optional() and similar functions, or we even find a
+way to make 0 usable for this, none of the proposed changes strike me
+as big enough a win to outweigh the churn caused by making such a
+change at all.
+
+Kind regards,
+Matthias
+
+
+
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- 
+> geert@linux-m68k.org
+> 
+> In personal conversations with technical people, I call myself a
+> hacker. But
+> when I'm talking to journalists I just say "programmer" or something
+> like that.
+>                                 -- Linus Torvalds
+
