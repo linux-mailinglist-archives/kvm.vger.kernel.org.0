@@ -2,329 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88B6849B48A
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:04:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 197CE49B4B3
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:14:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384713AbiAYNBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 08:01:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22240 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1348692AbiAYM7o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 07:59:44 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20PCg3W9029371;
-        Tue, 25 Jan 2022 12:59:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=tl6Cs7TnQDyQv3GmXJtbo2WKbDnaVetS+2E9nqwdUHE=;
- b=AChDC8aXuSLRr21EAvtQfDQkwTOmW2sTfZmvSdYp8eLMZf1Yv6BzVVyoaYuOsN4kT+t3
- p4PSSeATdtaJBgbMIn87Z7wZeJy9ov2gNl+SEU7DbDf7FKt7iGbt3zxUvt27FI/a6Gw0
- hFPDkVRLE66WRAirEM544RJzLUOPKMrm/1Yid0khAJI71SKkwBXuMcOccDpBTAQ8p1fu
- J39uOEmpln27c/uVv3439blwQEVWOb+Z2/Z6bq5ykpWxlIc5VaFziLmscOdY6k5GeSRU
- SU8Y39hFVXggQpPWz1yWyO06UCaAsJ9CatPRxF0kKKhIeJCB0po1rGeW4QzyfUblzDbD jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dthehrap1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:59:38 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20PChawG003320;
-        Tue, 25 Jan 2022 12:59:38 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dthehranj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:59:38 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20PCwL5P021981;
-        Tue, 25 Jan 2022 12:59:36 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dr96je7s7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:59:36 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20PCxVQr47055132
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jan 2022 12:59:31 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 61A66AE051;
-        Tue, 25 Jan 2022 12:59:31 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B33B8AE045;
-        Tue, 25 Jan 2022 12:59:29 +0000 (GMT)
-Received: from [9.171.58.95] (unknown [9.171.58.95])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jan 2022 12:59:29 +0000 (GMT)
-Message-ID: <17ccab21-b654-636f-2dfa-57014f4cd4eb@linux.ibm.com>
-Date:   Tue, 25 Jan 2022 14:01:19 +0100
+        id S1385395AbiAYNOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 08:14:41 -0500
+Received: from mail-dm6nam10on2040.outbound.protection.outlook.com ([40.107.93.40]:50656
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S245176AbiAYNME (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 08:12:04 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bAeEVgARFV8mOsSaRKmSeXMJ+7rwtuoqHZvefvAZjeYeBUJmbUJY0A12aagR3fXVwn2a0TbKql0BBevEPNFABMzmgb866I3gC3vD3IIdH5EfUH+TFPt3DS/aA+lMiIeigwz3/T0eQjC45mrsF3gUIP17ct+EJjUwZZN7XI8ntcjrlSxzBD8RiuMlEeYLVXNjxnQ6FskpWyFnMVzVEIaUfsZVAOK3Gd64mC8KTf68MbNdZZnY9rBnr//+Immr6YJR+qt19Dq/B7I+Ke4/RGIlXm2CgxJBgECaXy3ZYIfN2Lo2IJmag/X99tCE8RtFucZAq4ji0aJEguO382SUs1KBDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6bDJm5SZ22naaKNva7dsUB2Oep09W9noTRz5PEsQbsU=;
+ b=WKDa+JElTANajOiONPQIobCcYC5rJ0xTUmwvKv1ZtrZsCdZ+wZ9cDkgp8FHKmLGOJwLukrWk5AYXgmjfh6wqVw4vuH9a9RJbnOtdW9TIiFrkQJT/W6NEP3sTGQU9gecvPjEKeaowkFupneI9uv2iYZtp24BPBpY9sY7R3p/8Lxvjvnw2L5e3BB8svoI1HHpoOWqDo4M0buhQBuqPTCN1iwJBu5vvgeWyKl2t+Rz9IdziyixeIbM0815QFnczVHcI7oEsAWDXsaQp4tO4HhQFvo2IrXKZ8PZqfgp/DTxXstmmbMiEWf7p1aVeLCBBgYxW1ACp35nIiP++xWFlaUWQUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6bDJm5SZ22naaKNva7dsUB2Oep09W9noTRz5PEsQbsU=;
+ b=tpKqCKhda8udiYT5a73HWIf3ppqOt204Vsq9GjIhU38BwdToBfbRAmTOaBp1Khv+P2299/ZfkcQcr+pTliCXUU2P+B8TYoHnhlu8RvlvxfkJNj/q8zdotdFwwPMAdiUx597OiEnhVbcdKZNZhTX09IeIwEPqkIVFcrgBtnKzM6TAmXOyRn4b3ZOQlDzhMGlCEtztY24G7hWEquyFQ4GMLarh1NJM8+Yc8JLgpbOjNvQYIM/QB9YX+uRpWAbqRMgiQqUi5wjk3IY8DN9kjqpIZ3Up+ixT4runQ2+RofqDheSZmNBuwfFAXcrCm9Hhdw9CtzxlxjSdlpwTZjffTWxhuQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BL1PR12MB5256.namprd12.prod.outlook.com (2603:10b6:208:319::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.8; Tue, 25 Jan
+ 2022 13:11:59 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ad3f:373f:b7d3:19c2]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::ad3f:373f:b7d3:19c2%7]) with mapi id 15.20.4909.019; Tue, 25 Jan 2022
+ 13:11:59 +0000
+Date:   Tue, 25 Jan 2022 09:11:58 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH RFC] vfio: Revise and update the migration uAPI
+ description
+Message-ID: <20220125131158.GJ84788@nvidia.com>
+References: <0-v1-a4f7cab64938+3f-vfio_mig_states_jgg@nvidia.com>
+ <BN9PR11MB5276BD5DB1F51694501849568C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276BD5DB1F51694501849568C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0229.namprd13.prod.outlook.com
+ (2603:10b6:208:2bf::24) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 25/30] vfio-pci/zdev: wire up zPCI interpretive
- execution support
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-26-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220114203145.242984-26-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gxu6dUrP3EQJXCtEJR2aWICrbrRLS4HG
-X-Proofpoint-GUID: -7CtNxsBinYA5Uo-8HgZm70o5LGwD5aL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-25_02,2022-01-25_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 clxscore=1015 mlxscore=0 phishscore=0 spamscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 malwarescore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201250081
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 95bd92d0-bf4a-4a98-ed7d-08d9e0044510
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5256:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB52562CABC94B2BB8C160E8F8C25F9@BL1PR12MB5256.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gQEWTRtSu3phATNqU2F6mifGxwdbE72ylAB9s3mpEQpUn8RWf5EUga44MAgse9ocVpOFi1sERHZLnM/1xA7U1Ss8YwrZUMYU1BBqZhCLXZdHnu85b7QS3mFSr0WlOqfi4SapX7UXBWunOCnUdG6vJc4pAcWaor2CgTLFjH3zv+83a4oJqU3cBVBpzHioOy/v94QFvAO1+k2QWVUWg92WURcPo2ZoAZAWdaC3HVowaGsiVGdiuGcKp+RQrpNPprOcJbnjMmJW/d1CA+5SzjuddURvPJntkJJAFB9hBosywmRjQ4Khg7ziw5HHghX5dsEBn0WUnvOnLd3ZWR4GttAeEQZ0VTjeKXq1TJ8y6/ckcY77oI644kwVHHbVQmBqNGu9/4V42UncUKQIiAP2yC8ZEsNn9HfeP3ToXaDsWGn7p3FYVcxwmt6oUb5UmtUglheoqNAPZL4l6jPkRu10rrENuoLIDGvrO2ULtrdnuY3SKs2vyV81bpbRTlKJGvQp1Ko8fGeXTGKTOpj0kXBGMA2Z1jWuU7RuAsDsBt2O8QOkSPjEsUX7zvlyLTNjeYN+sWSMr2V53FBRRxVaA4XZ6GS9OI9j+gs/T1etw8LbfCHQH9Cmw/YFKKZDoXoyRVvABLJXumuoZ5zcMiYRiYzEou1nlw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66476007)(66556008)(36756003)(6512007)(66946007)(6916009)(38100700002)(2906002)(83380400001)(8676002)(6486002)(1076003)(8936002)(107886003)(2616005)(4326008)(5660300002)(6506007)(316002)(186003)(54906003)(508600001)(33656002)(86362001)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aQezmvv/1YedOZFQBN+EtCjjV3BtO1L2TRW2hCixfCSR/75mhf8UslehF+6v?=
+ =?us-ascii?Q?xDQgCJDQ6wBbnnUsJrox2V05e1lVKGFueQx+SA+OJY/dxqQA0kjuHNExHNvt?=
+ =?us-ascii?Q?dVqiYBfBi4vwBbndRazKd4is/XJD0yrVRtBsIlZlrkVgHOCHJbHWy5la+NvU?=
+ =?us-ascii?Q?XjB573o6KfIr4UTWh/8PpSnBHlJyLre5P1twfeE93+2pfceX+ajih0CSELY6?=
+ =?us-ascii?Q?r7nNu6hSUodX0UtF9nKPYWRX2KX7jbf7m7c7Co4U7iMUhSznO4TEyGM3i0xS?=
+ =?us-ascii?Q?19hF9d3oZaett+j3z/JcnfFMUHajjgO6NbUePXx8rlV5B0HvbKZHuqLVRrgn?=
+ =?us-ascii?Q?6hYOS1gx2ATt8on1sHdOOEBUsLNPE8f2bf9HS0Toch3WeSWPAvk03bLF1CP3?=
+ =?us-ascii?Q?NNDlOlqQQUyMovtgutc4CxVg3mcnMZhZqXqrfVS/0++y2x4zQGm98rmQY/nC?=
+ =?us-ascii?Q?z++cn5/ulYSueTJfjFvMRVufI1ovwGo4eGHBXQLP/7Bw+C9PF5tOFg0SjTI6?=
+ =?us-ascii?Q?kdK7kfeFkUoydVJ+SM5a5smXyQznvIpRrgFySbp2+2uj/KzAac43rm2T2Sel?=
+ =?us-ascii?Q?VsWJqaHvWLWlqT6z8nl3JAXwU/+0ey2/QG1Dckj3GxvGLeURwDSt+HRUHQla?=
+ =?us-ascii?Q?nfLe2Nq6Ce/A9QYUpGQpMVAUHnfNGMAX2cmKNAbwZC2TblYc2o0gnvm1rlzn?=
+ =?us-ascii?Q?PJy2OyXeAVP7Cr/ve6wE8o46t5JUxcKhbxmNGK/ErIs5nMPQTdLmZzbaEZ8e?=
+ =?us-ascii?Q?IeMeiJ902FQtndNey1ZQUl4xc9Gyplo5EwL7BQ11wXc/IYY5CEQwixzqydG0?=
+ =?us-ascii?Q?v0ipqoY6gS5iWdUf6fKyqeNd+hcVn0qd4v1AGsk6wl4dm416tAuERocsBJaA?=
+ =?us-ascii?Q?ofdKEH+v2kOnZ8OQ5tIKVFfS3A8UaaGICAPN3adFJNvHiOUY8KmMSpmWzwSF?=
+ =?us-ascii?Q?xgo9VSau+qUUzKyircuGK83+guEEr5YvatX/prNJrVW1pC5NaHYOkooJOV4D?=
+ =?us-ascii?Q?91P9O1c2UCeXKJh/oq2BHmaqWdmQHiWviFKBvhzTKZzoeiLwmZIfcZ2tYkNA?=
+ =?us-ascii?Q?+XbngJJ6ZvkBqM05O10rgLFloaZMYHoXMROerIgD8YWeNGEM9CvILi05G9Bz?=
+ =?us-ascii?Q?pIn9mgb/dJZ7OcXYV81+Fx1bz1U+vpOqCOMhyI6105AtkXcF9W7Thpbd/KTa?=
+ =?us-ascii?Q?eua6NPfHiOEHLDBxHRzMPjTscLRAOznXFwYT40T3HSQJgbWpANYSOoEQrY2x?=
+ =?us-ascii?Q?dVOzlcBvZqktirZyhvIiefzI8QPZB29zqJPG2ETeFO2BjjnrJerWrCuIA5cl?=
+ =?us-ascii?Q?Ha6j6uW3IsIWbkRfcsVuuaNKMCVVjICJ/Q6l46QU/3zfrqAOILM7A9crpWmb?=
+ =?us-ascii?Q?M78D5a33KdOQZy0PqdEr1fhrkc8ZhCkWBGPly8MiOy+sFuBIoUJgRzmMSG0X?=
+ =?us-ascii?Q?MD9A81zXLpcjr5CyH4mA1pdYWBXAYUpZ8CSvAAHKuP0g0uKKtuXMke3xkAVQ?=
+ =?us-ascii?Q?+zeC26UhTzi2uAVkU4DJ2Ez5LRH9BEhmXP6JvGO1w7eP4grt+o85cnrLvSkM?=
+ =?us-ascii?Q?ACezZNcg3eTg9jMjz+Q=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95bd92d0-bf4a-4a98-ed7d-08d9e0044510
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2022 13:11:59.4113
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7Jp8PvCjRWb2a4hC4hznZ1eRsEXV5TItcgMb/7ynaUEl0xHhNbQ619r37ToZi6nl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/14/22 21:31, Matthew Rosato wrote:
-> Introduce support for VFIO_DEVICE_FEATURE_ZPCI_INTERP, which is a new
-> VFIO_DEVICE_FEATURE ioctl.  This interface is used to indicate that an
-> s390x vfio-pci device wishes to enable/disable zPCI interpretive
-> execution, which allows zPCI instructions to be executed directly by
-> underlying firmware without KVM involvement.
+On Tue, Jan 25, 2022 at 03:55:31AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Saturday, January 15, 2022 3:35 AM
+> > + *
+> > + *   The peer to peer (P2P) quiescent state is intended to be a quiescent
+> > + *   state for the device for the purposes of managing multiple devices
+> > within
+> > + *   a user context where peer-to-peer DMA between devices may be active.
+> > The
+> > + *   PRE_COPY_P2P and RUNNING_P2P states must prevent the device from
+> > + *   initiating any new P2P DMA transactions. If the device can identify P2P
+> > + *   transactions then it can stop only P2P DMA, otherwise it must stop all
+> > + *   DMA.  The migration driver must complete any such outstanding
+> > operations
+> > + *   prior to completing the FSM arc into either P2P state.
+> > + *
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_pci.h  |  1 +
->   drivers/vfio/pci/vfio_pci_core.c |  2 +
->   drivers/vfio/pci/vfio_pci_zdev.c | 78 ++++++++++++++++++++++++++++++++
->   include/linux/vfio_pci_core.h    | 10 ++++
->   include/uapi/linux/vfio.h        |  7 +++
->   include/uapi/linux/vfio_zdev.h   | 15 ++++++
->   6 files changed, 113 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
-> index 97a90b37c87d..dc00c3f27a00 100644
-> --- a/arch/s390/include/asm/kvm_pci.h
-> +++ b/arch/s390/include/asm/kvm_pci.h
-> @@ -35,6 +35,7 @@ struct kvm_zdev {
->   	struct kvm_zdev_ioat ioat;
->   	struct zpci_fib fib;
->   	struct notifier_block nb;
-> +	bool interp;
+> Now NDMA is renamed to P2P... but we did discuss the potential
+> usage of using this state on devices which cannot stop DMA quickly 
+> thus needs to drain pending page requests which further requires 
+> running vCPUs if the fault is on guest I/O page table.
 
-NIT: s/interp/interpretation/ ?
+I think this needs to be fleshed out more before we can add it,
+ideally along with a driver and some qemu implementation
 
->   };
->   
->   int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index fc57d4d0abbe..2b2d64a2190c 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1172,6 +1172,8 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
->   			mutex_unlock(&vdev->vf_token->lock);
->   
->   			return 0;
-> +		case VFIO_DEVICE_FEATURE_ZPCI_INTERP:
-> +			return vfio_pci_zdev_feat_interp(vdev, feature, arg);
->   		default:
->   			return -ENOTTY;
->   		}
-> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-> index 5c2bddc57b39..4339f48b98bc 100644
-> --- a/drivers/vfio/pci/vfio_pci_zdev.c
-> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
-> @@ -54,6 +54,10 @@ static int zpci_group_cap(struct zpci_dev *zdev, struct vfio_info_cap *caps)
->   		.version = zdev->version
->   	};
->   
-> +	/* Some values are different for interpreted devices */
-> +	if (zdev->kzdev && zdev->kzdev->interp)
-> +		cap.maxstbl = zdev->maxstbl;
-> +
->   	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
->   }
->   
-> @@ -138,6 +142,72 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->   	return ret;
->   }
->   
-> +int vfio_pci_zdev_feat_interp(struct vfio_pci_core_device *vdev,
-> +			      struct vfio_device_feature feature,
-> +			      unsigned long arg)
-> +{
-> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
-> +	struct vfio_device_zpci_interp *data;
-> +	struct vfio_device_feature *feat;
-> +	unsigned long minsz;
-> +	int size, rc;
-> +
-> +	if (!zdev || !zdev->kzdev)
-> +		return -EINVAL;
-> +
-> +	/* If PROBE specified, return probe results immediately */
-> +	if (feature.flags & VFIO_DEVICE_FEATURE_PROBE)
-> +		return kvm_s390_pci_interp_probe(zdev);
-> +
-> +	/* GET and SET are mutually exclusive */
-> +	if ((feature.flags & VFIO_DEVICE_FEATURE_GET) &&
-> +	    (feature.flags & VFIO_DEVICE_FEATURE_SET))
-> +		return -EINVAL;
+It looks like the qemu part for this will not be so easy..
 
-Isn't the check already done in VFIO core?
-
-> +
-> +	size = sizeof(*feat) + sizeof(*data);
-> +	feat = kzalloc(size, GFP_KERNEL);
-> +	if (!feat)
-> +		return -ENOMEM;
-> +
-> +	data = (struct vfio_device_zpci_interp *)&feat->data;
-> +	minsz = offsetofend(struct vfio_device_feature, flags);
-> +
-> +	if (feature.argsz < minsz + sizeof(*data))
-> +		return -EINVAL;
-> +
-> +	/* Get the rest of the payload for GET/SET */
-> +	rc = copy_from_user(data, (void __user *)(arg + minsz),
-> +			    sizeof(*data));
-> +	if (rc)
-> +		rc = -EINVAL;
-> +
-> +	if (feature.flags & VFIO_DEVICE_FEATURE_GET) {
-> +		if (zdev->gd != 0)
-> +			data->flags = VFIO_DEVICE_ZPCI_FLAG_INTERP;
-> +		else
-> +			data->flags = 0;
-> +		data->fh = zdev->fh;
-> +		/* userspace is using host fh, give interpreted clp values */
-> +		zdev->kzdev->interp = true;
-> +
-> +		if (copy_to_user((void __user *)arg, feat, size))
-> +			rc = -EFAULT;
-> +	} else if (feature.flags & VFIO_DEVICE_FEATURE_SET) {
-> +		if (data->flags == VFIO_DEVICE_ZPCI_FLAG_INTERP)
-> +			rc = kvm_s390_pci_interp_enable(zdev);
-> +		else if (data->flags == 0)
-> +			rc = kvm_s390_pci_interp_disable(zdev);
-> +		else
-> +			rc = -EINVAL;
-> +	} else {
-> +		/* Neither GET nor SET were specified */
-> +		rc = -EINVAL;
-> +	}
-> +
-> +	kfree(feat);
-> +	return rc;
-> +}
-> +
->   static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
->   					unsigned long action, void *data)
->   {
-> @@ -164,6 +234,7 @@ void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
->   		return;
->   
->   	zdev->kzdev->nb.notifier_call = vfio_pci_zdev_group_notifier;
-> +	zdev->kzdev->interp = false;
->   
->   	if (vfio_register_notifier(vdev->vdev.dev, VFIO_GROUP_NOTIFY,
->   				   &events, &zdev->kzdev->nb))
-> @@ -180,5 +251,12 @@ void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
->   	vfio_unregister_notifier(vdev->vdev.dev, VFIO_GROUP_NOTIFY,
->   				 &zdev->kzdev->nb);
->   
-> +	/*
-> +	 * If the device was using interpretation, don't trust that userspace
-> +	 * did the appropriate cleanup
-> +	 */
-> +	if (zdev->gd != 0)
-> +		kvm_s390_pci_interp_disable(zdev);
-> +
->   	kvm_s390_pci_dev_release(zdev);
->   }
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 05287f8ac855..0db2b1051931 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -198,6 +198,9 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
->   #ifdef CONFIG_VFIO_PCI_ZDEV
->   extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->   				       struct vfio_info_cap *caps);
-> +int vfio_pci_zdev_feat_interp(struct vfio_pci_core_device *vdev,
-> +			      struct vfio_device_feature feature,
-> +			      unsigned long arg);
->   void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev);
->   void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev);
->   #else
-> @@ -207,6 +210,13 @@ static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->   	return -ENODEV;
->   }
->   
-> +static inline int vfio_pci_zdev_feat_interp(struct vfio_pci_core_device *vdev,
-> +					    struct vfio_device_feature feature,
-> +					    unsigned long arg)
-> +{
-> +	return -ENOTTY;
-> +}
-> +
->   static inline void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
->   {
->   }
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index ef33ea002b0b..b9a75485b8e7 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1002,6 +1002,13 @@ struct vfio_device_feature {
->    */
->   #define VFIO_DEVICE_FEATURE_PCI_VF_TOKEN	(0)
->   
-> +/*
-> + * Provide support for enabling interpretation of zPCI instructions.  This
-> + * feature is only valid for s390x PCI devices.  Data provided when setting
-> + * and getting this feature is futher described in vfio_zdev.h
-> + */
-> +#define VFIO_DEVICE_FEATURE_ZPCI_INTERP		(1)
-> +
->   /* -------- API for Type1 VFIO IOMMU -------- */
->   
->   /**
-> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
-> index b4309397b6b2..575f0410dc66 100644
-> --- a/include/uapi/linux/vfio_zdev.h
-> +++ b/include/uapi/linux/vfio_zdev.h
-> @@ -75,4 +75,19 @@ struct vfio_device_info_cap_zpci_pfip {
->   	__u8 pfip[];
->   };
->   
-> +/**
-> + * VFIO_DEVICE_FEATURE_ZPCI_INTERP
-> + *
-> + * This feature is used for enabling zPCI instruction interpretation for a
-> + * device.  No data is provided when setting this feature.  When getting
-> + * this feature, the following structure is provided which details whether
-> + * or not interpretation is active and provides the guest with host device
-> + * information necessary to enable interpretation.
-> + */
-> +struct vfio_device_zpci_interp {
-> +	__u64 flags;
-> +#define VFIO_DEVICE_ZPCI_FLAG_INTERP 1
-> +	__u32 fh;		/* Host device function handle */
-> +};
-> +
->   #endif
-> 
-
-Otherwise LGTM
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Jason
