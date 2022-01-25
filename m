@@ -2,54 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11B7049B752
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 16:13:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0AE549B770
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 16:18:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1581822AbiAYPN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 10:13:29 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:48054 "EHLO
+        id S1344481AbiAYPSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 10:18:20 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:49880 "EHLO
         ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1581574AbiAYPLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 10:11:03 -0500
+        with ESMTP id S1359583AbiAYPQE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 10:16:04 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 33B14B81817;
-        Tue, 25 Jan 2022 15:10:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB4B6C340E5;
-        Tue, 25 Jan 2022 15:10:54 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 25137B815F3;
+        Tue, 25 Jan 2022 15:15:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5364C340E0;
+        Tue, 25 Jan 2022 15:15:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643123454;
-        bh=827Zl6UTbu4+DODgqO5pwb2rOj9GCDpTQYVElhmcxEk=;
+        s=k20201202; t=1643123756;
+        bh=gld+cOICDVSyR3eBycE7Kw4pbeGx/5O8Kju3l/BFsZc=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=vAftbCY6wfyApG6ImaV7i4/RB+857+ZVJG5aasCxCyYUaBgWyju/37RZVSeoZNQm0
-         ePQJq1yfPtHz4E8LAG23pqp6Qv/305+5RSMdyf0B5jQBw6hD6ICgWZpFk6i+NnNza+
-         Z/RdHWNh35bj5WVSklD+twb6YCCMMatGVd6+iKjvbkl4BStJa2nGmLEUXJ6d0Jz/AO
-         JCejWJ3Ycz3eIX85LP9y0t5BNE58/3caA4QzIW98rCKZ14mE/rYjPl2YI8wxPUKGOf
-         0eaE+/Qf7d1W8U//CIG4h4EhNiaximmfy8drzLYznmu22dubxrKEpTWOXMR3jlijiO
-         v7xGW9oF4LMzA==
+        b=uxCMXUS9vU3rX/8c9OHaV7K9zy+vIlk9FYXci6vHqKNTHiqFFWa5VoQEPxjeSmo78
+         dVZK2zk2T8b97wcUmepHBWBZz9Z0YtsEbRF1hODLtXMlDNFe2pGycWZoBNY+6ebs9b
+         uT18I/myxa1sQhLDgqtgZtjx5ofKpVmGDbq86OkbEUJdIMPB9QsAV4E9AXqg5es3Qt
+         9O+uvPMXRWMES2Z8cKYEeZQOSQ7HHZ+ujQDFUwLZnOk5Vr51p42emfZmN+rIK11EEJ
+         UQ+UBvZ1roGlKILKO+1CeXAN3tpu2vKa53/41SWX9HD9V31UfvsB1eS7w4De7P55ji
+         4yY+q+2hMW/Eg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nCNTA-002wXr-LC; Tue, 25 Jan 2022 15:10:52 +0000
-Date:   Tue, 25 Jan 2022 15:10:52 +0000
-Message-ID: <87pmof7sw3.wl-maz@kernel.org>
+        id 1nCNY2-002weW-Nr; Tue, 25 Jan 2022 15:15:54 +0000
+Date:   Tue, 25 Jan 2022 15:15:54 +0000
+Message-ID: <87o83z7snp.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+Cc:     Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
         linux-kernel@vger.kernel.org,
         Catalin Marinas <catalin.marinas@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Jim Mattson <jmattson@google.com>
 Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-In-Reply-To: <YeBfj89mIf8SezfD@google.com>
-References: <20220104194918.373612-1-rananta@google.com>
-        <20220104194918.373612-2-rananta@google.com>
-        <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+In-Reply-To: <YedWUJNnQK3HFrWC@google.com>
+References: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
         <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
         <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
         <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
@@ -58,69 +57,53 @@ References: <20220104194918.373612-1-rananta@google.com>
         <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
         <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
         <YeBfj89mIf8SezfD@google.com>
+        <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+        <YedWUJNnQK3HFrWC@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, rananta@google.com, jmattson@google.com, kvm@vger.kernel.org, will@kernel.org, pshier@google.com, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: seanjc@google.com, reijiw@google.com, rananta@google.com, kvm@vger.kernel.org, pshier@google.com, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, pbonzini@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, jmattson@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's probably time I jump on this thread
-
-On Thu, 13 Jan 2022 17:21:19 +0000,
+On Wed, 19 Jan 2022 00:07:44 +0000,
 Sean Christopherson <seanjc@google.com> wrote:
 > 
-> On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
-> > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
-> > > Perhaps it would help if you explained *why* you are doing this. It
-> > > sounds like you are either trying to protect against a malicious
-> > > userspace, or you are trying to keep userspace from doing something
-> > > stupid. In general, kvm only enforces constraints that are necessary
-> > > to protect the host. If that's what you're doing, I don't understand
-> > > why live migration doesn't provide an end-run around your protections.
-> > It's mainly to safeguard the guests. With respect to migration, KVM
-> > and the userspace are collectively playing a role here. It's up to the
-> > userspace to ensure that the registers are configured the same across
-> > migrations and KVM ensures that the userspace doesn't modify the
-> > registers after KVM_RUN so that they don't see features turned OFF/ON
-> > during execution. I'm not sure if it falls into the definition of
-> > protecting the host. Do you see a value in adding this extra
-> > protection from KVM?
+> On Fri, Jan 14, 2022, Reiji Watanabe wrote:
+> > The restriction, with which KVM doesn't need to worry about the changes
+> > in the registers after KVM_RUN, could potentially protect or be useful
+> > to protect KVM and simplify future changes/maintenance of the KVM codes
+> > that consumes the values.
 > 
-> Short answer: probably not?
-
-Well, I beg to defer.
-
-> There is precedent for disallowing userspace from doing stupid
-> things, but that's either for KVM's protection (as Jim pointed out),
-> or because KVM can't honor the change, e.g. x86 is currently in the
-> process of disallowing most CPUID changes after KVM_RUN because KVM
-> itself consumes the CPUID information and KVM doesn't support
-> updating some of it's own internal state (because removing features
-> like GB hugepage support is nonsensical and would require a large
-> pile of complicated, messy code).
-
-We provide quite a lot of CPU emulation based on the feature
-registers exposed to the guest. Allowing userspace to change this
-stuff once the guest is running is a massive attack vector.
-
-> Restricing CPUID changes does offer some "protection" to the guest, but that's
-> not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
-> case, and trying to do so is a fool's errand.
+> That sort of protection is definitely welcome, the previously mentioned CPUID mess
+> on x86 would have benefit greatly by KVM being restrictive in the past.  That said,
+> hooking KVM_RUN is likely the wrong way to go about implementing any restrictions.
+> Running a vCPU is where much of the vCPU's state is explicitly consumed, but it's
+> all too easy for KVM to implicity/indirectly consume state via a different ioctl(),
+> e.g. if there are side effects that are visible in other registers, than an update
+> can also be visible to userspace via KVM_{G,S}ET_{S,}REGS, at which point disallowing
+> modifying state after KVM_RUN but not after reading/writing regs is arbitrary and
+> inconsitent.
 > 
-> If restricting updates in the arm64 is necessary to ensure KVM provides sane
-> behavior, then it could be justified.  But if it's purely a sanity check on
-> behalf of the guest, then it's not justified.
+> If possible, preventing modification if kvm->created_vcpus > 0 is
+> ideal as it's a relatively common pattern in KVM, and provides a
+> clear boundary to userpace regarding what is/isn't allowed.
 
-No. This is about preventing userspace from tripping the kernel into
-doing things it really shouldn't by flipping bits of configuration
-that should be set in stone.
+No, that's way too late. The configuration is in general per-CPU, and
+I really don't want to expand the surface of the userspace API to
+allow all sort of magic trick depending on the nature of what you
+save/restore.
+
+The "first run" crap is already there. We have it on a per-CPU basis,
+and we need it at the VM level for other reasons (see the recent
+discussion about PMU filtering vs binding to a specific PMU
+implementation).
 
 	M.
 
