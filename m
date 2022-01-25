@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D518849B126
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E50D349B149
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:26:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239273AbiAYKEB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 05:04:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60230 "EHLO
+        id S239468AbiAYKEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 05:04:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238517AbiAYJ7q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:59:46 -0500
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BBEC06175E;
-        Tue, 25 Jan 2022 01:59:44 -0800 (PST)
-Received: by mail-pj1-x1041.google.com with SMTP id q63so14779972pja.1;
-        Tue, 25 Jan 2022 01:59:44 -0800 (PST)
+        with ESMTP id S238530AbiAYJ7r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:59:47 -0500
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02508C06175F;
+        Tue, 25 Jan 2022 01:59:47 -0800 (PST)
+Received: by mail-pl1-x642.google.com with SMTP id c9so18743507plg.11;
+        Tue, 25 Jan 2022 01:59:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gJXu3XDntG3sYuZsaAy93XgNQyjjQDdCF6KOBgCQ6T8=;
-        b=l4Qf+2yFfQZKC8zuNjxLmbGXa1WmfnQIutDsVBe4VjYUa30G4bJXmx8CRWmeXK9tAO
-         16zdGhUe2dZtpd41xgzg4prgqcEizIpe/A/MBeTbUei/FcP4l08vTIU9A4WfOBlt7a2I
-         vOJ9FkxOGwfBlEUY5drA+6kClr19yU/LSKTG8l9iRo9LRycWlOChrLg4brdA3ymmGFSS
-         IlgsK2WmixCkmUNCbglGLRHXZ5UX8KtYPFh+k2yXkFp0y61KdH/JjUb5ZNEXFcWE6fnF
-         mkaNdk2YBpuwgT7J74DUQoOFXdDTmih93v9KsoISfsi6D1fompENqtP+1AESiVvFjT8a
-         164w==
+        bh=xy58X9ZqsU+Q+x1fD7dGP98jr1M3OQ5O7hFyw/uTpBo=;
+        b=K1csWq0YFWq17jyYUVKdjSWRmI9iFTTulrCS8E81NVmcF5tVCX3tYwOWDkjGG9uDgZ
+         S71g6dScNDDK2kJIyb2zRwlBRLJTTbhLWCO645QTYytf+zmY+jUpVtCGl+Y8+mNl/Ood
+         VEWfj0YcCnbZkgUh/bExJckvquMNY6e0BUEhYRgi3aCmG/rJR4Bsy6kjcYzIWKOYd7sO
+         LWHfi6ey9ev+O5OGhH0gHOWYUP4Hf7rJclBZMvxDrfO8llYsi7P+3se3Q4I/RACKbTXL
+         uZULM8kNpohHbIkOhTDcHenEGFdd9PhcwuvOSi+qILGzQMK5+N1h27WtT3Q5kTqIHBJm
+         8vFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gJXu3XDntG3sYuZsaAy93XgNQyjjQDdCF6KOBgCQ6T8=;
-        b=GaVBo7CJ4tPTAsq4LCI6AS7VvgSdmqOLe5rEqPKjuYof9mrTAaVRKH1GZtXkkAe8Ms
-         c0lPVUPK/YN+k4A3QA3klvfzcPMKWJF2zbutLDEWl8gXu637sGrNc+foFVaCS0TfTKe0
-         sx1A0mixSVxHXmbObE4MzC2xpaOuvTqgpxEqHjxZ4nkqX6ieniPflF9LDsB/6083m+aq
-         sjNwLeqx9P+0bwxOTPdzPWX2Dvl96Q+qy43ebSYqB9FdyTBiHPQLStsTnmG7j8G2oo+6
-         sHFnoTtzRAIkq9DrQU+A6SAogWItFFd+/z6MfN5mfrRWDlcWFiNePBTMUvdMsS7fgpUT
-         KRFw==
-X-Gm-Message-State: AOAM532kGCLTdyeSVKCH2YpPSaWOWg1mHUZbnIICJ1qIFTBYqd3L1PuC
-        SLUkf76IakwcvbHpqv1u/Izw9TFkWJsqUQ==
-X-Google-Smtp-Source: ABdhPJxmvtMII3KhHayu1fLjLASIEeiLAP6uRb1v+w7SNfbXr/hHJ4ol7JH0ir2ec2HDUxEViqz3vg==
-X-Received: by 2002:a17:90b:3148:: with SMTP id ip8mr2731496pjb.72.1643104784108;
-        Tue, 25 Jan 2022 01:59:44 -0800 (PST)
+        bh=xy58X9ZqsU+Q+x1fD7dGP98jr1M3OQ5O7hFyw/uTpBo=;
+        b=lfbgLCbeZ9xJ757YWtxo6wX5QOjd/D+dzSslWolgFweSfBMn3fXEasblRvoGlrB3wg
+         r7OODd4b/zvIMCJbFfrb44gmzqB+WOT7Nj4fU87pYy+UsuK0AmX7AzSUThYWqPIQIX0m
+         YUV0zGra2otcOfW5cOFSixbAqRRAE9QZUx8xhCiiscX63Tw7ItAvKsbaONRzZRkYWK9d
+         QW0K0vIHhBXBIFv29LIaIXiQpljrYxCE4t5k5PfEdNOq1aPmIfy22gWrdBfq8Iqt7bYP
+         osmr/gOkiNQOI3oLxSuvNbIfAzTkprH4EFZPn01K/Hz13MdpRl1nrvWgmp/bU3LSbLJa
+         bONw==
+X-Gm-Message-State: AOAM532eDyDas/kOPoDztzgBMD5q0OdZtQLoWh22WulDMa7g6MTyzCBS
+        rUJzfqCN5qKir0edeUVxB2Q=
+X-Google-Smtp-Source: ABdhPJzhUcAag9bH49+qyomod77yB4zrMr6c2mVnNwikP5K8xDfXGKVEcCyL1nqCdpa2kl1JeFxt0g==
+X-Received: by 2002:a17:90a:5503:: with SMTP id b3mr2630839pji.187.1643104786499;
+        Tue, 25 Jan 2022 01:59:46 -0800 (PST)
 Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.41
+        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.44
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jan 2022 01:59:43 -0800 (PST)
+        Tue, 25 Jan 2022 01:59:46 -0800 (PST)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 11/19] KVM: x86/svm: Remove unused "vector" of sev_vcpu_deliver_sipi_vector()
-Date:   Tue, 25 Jan 2022 17:59:01 +0800
-Message-Id: <20220125095909.38122-12-cloudliang@tencent.com>
+Subject: [PATCH 12/19] KVM: x86/i8259: Remove unused "addr" of elcr_ioport_{read,write}()
+Date:   Tue, 25 Jan 2022 17:59:02 +0800
+Message-Id: <20220125095909.38122-13-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20220125095909.38122-1-cloudliang@tencent.com>
 References: <20220125095909.38122-1-cloudliang@tencent.com>
@@ -71,55 +71,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-The "struct kvm_vcpu *vcpu" parameter of sev_vcpu_deliver_sipi_vector()
+The "u32 addr" parameter of elcr_ioport_write() and elcr_ioport_read()
 is not used, so remove it. No functional change intended.
 
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- arch/x86/kvm/svm/sev.c | 2 +-
- arch/x86/kvm/svm/svm.c | 2 +-
- arch/x86/kvm/svm/svm.h | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/i8259.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0727ac7221d7..2fd1e91054b3 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2925,7 +2925,7 @@ void sev_es_prepare_guest_switch(unsigned int cpu)
- 	hostsa->xss = host_xss;
+diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+index 814064d06016..be99dc86293d 100644
+--- a/arch/x86/kvm/i8259.c
++++ b/arch/x86/kvm/i8259.c
+@@ -437,13 +437,13 @@ static u32 pic_ioport_read(void *opaque, u32 addr)
+ 	return ret;
  }
  
--void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
-+void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu)
+-static void elcr_ioport_write(void *opaque, u32 addr, u32 val)
++static void elcr_ioport_write(void *opaque, u32 val)
  {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3e75ae834412..aead235a90ee 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4348,7 +4348,7 @@ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 	if (!sev_es_guest(vcpu->kvm))
- 		return kvm_vcpu_deliver_sipi_vector(vcpu, vector);
- 
--	sev_vcpu_deliver_sipi_vector(vcpu, vector);
-+	sev_vcpu_deliver_sipi_vector(vcpu);
+ 	struct kvm_kpic_state *s = opaque;
+ 	s->elcr = val & s->elcr_mask;
  }
  
- static void svm_vm_destroy(struct kvm *kvm)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 0a749bbda738..61c96f4a7006 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -621,7 +621,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
- void sev_es_init_vmcb(struct vcpu_svm *svm);
- void sev_es_vcpu_reset(struct vcpu_svm *svm);
--void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
-+void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu);
- void sev_es_prepare_guest_switch(unsigned int cpu);
- void sev_es_unmap_ghcb(struct vcpu_svm *svm);
- 
+-static u32 elcr_ioport_read(void *opaque, u32 addr1)
++static u32 elcr_ioport_read(void *opaque)
+ {
+ 	struct kvm_kpic_state *s = opaque;
+ 	return s->elcr;
+@@ -474,7 +474,7 @@ static int picdev_write(struct kvm_pic *s,
+ 	case 0x4d0:
+ 	case 0x4d1:
+ 		pic_lock(s);
+-		elcr_ioport_write(&s->pics[addr & 1], addr, data);
++		elcr_ioport_write(&s->pics[addr & 1], data);
+ 		pic_unlock(s);
+ 		break;
+ 	default:
+@@ -505,7 +505,7 @@ static int picdev_read(struct kvm_pic *s,
+ 	case 0x4d0:
+ 	case 0x4d1:
+ 		pic_lock(s);
+-		*data = elcr_ioport_read(&s->pics[addr & 1], addr);
++		*data = elcr_ioport_read(&s->pics[addr & 1]);
+ 		pic_unlock(s);
+ 		break;
+ 	default:
 -- 
 2.33.1
 
