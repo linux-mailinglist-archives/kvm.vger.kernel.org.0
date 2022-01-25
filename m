@@ -2,126 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63EAB49B293
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 12:06:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D544A49B2CE
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 12:20:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380307AbiAYLGv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 06:06:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37860 "EHLO
+        id S1356892AbiAYLRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 06:17:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20258 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352568AbiAYLE1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 06:04:27 -0500
+        by vger.kernel.org with ESMTP id S1381205AbiAYLPK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 06:15:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643108661;
+        s=mimecast20190719; t=1643109269;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=i7G0OM7Y6gkeN7L3Twl5XgwRAGbGyt6JwwryGZdSxEo=;
-        b=B+lIyMKWCntQVWGRBouF5mFnbd9mQKDXYjIDtfEgkVA95tiQ4fka8EvnthTb/aIDMPIMP3
-        MxJPuyxW7ntx9cEEajZL/wkX3lVv4xktLjMtvN0eg2+DjEFbiHHujvAaua/F0L1G5gbipt
-        zgflEwaT3mZTS3HTbPrD8O2C4CxARRc=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Rvvfbm9DdsitiqMaGToeqN6bn83eZm9ryJcgfNBtuTE=;
+        b=bBOVjBHq53facUWBbvuIHfo3I5PLagm+WzYt51CVxypEflsi81YOfjstxLSfYiZNcTY8gQ
+        899VCKt9WGahF077TQ2MP6qJLylbPqf9gRGVejC/O19W8VyGP+GLkeUZqZbKC5Ske6qMu1
+        XFAbmlh/seXjgf7GNlxOe3exFF/BKts=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-77-I3IPkFNJNR2ZkDVqtqdEJg-1; Tue, 25 Jan 2022 06:04:20 -0500
-X-MC-Unique: I3IPkFNJNR2ZkDVqtqdEJg-1
-Received: by mail-ej1-f72.google.com with SMTP id o4-20020a170906768400b006a981625756so3369932ejm.0
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 03:04:19 -0800 (PST)
+ us-mta-76-Wy3fibmiMyStvNpRr1_fXA-1; Tue, 25 Jan 2022 06:14:27 -0500
+X-MC-Unique: Wy3fibmiMyStvNpRr1_fXA-1
+Received: by mail-wr1-f72.google.com with SMTP id v28-20020adfa1dc000000b001dd1cb24081so473868wrv.10
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 03:14:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=i7G0OM7Y6gkeN7L3Twl5XgwRAGbGyt6JwwryGZdSxEo=;
-        b=wb5db4uo+u6wIJhWicyQ98iG+qpuEE/xUKjyYpadMA5Yrht/ObX2jiSeUyW1swmZPI
-         KPdPASJzmELnHWj8w45t1o18+FtpmQX9BW1AZKdswtBgazh54cn9zWVAgwR445bn1clj
-         +5ivfgiLEOSGJ5WAeJNTzAzJyGeV7uAgpaN5cAYQDCagjTACCXlkDbz5NtLikeEW9A9G
-         tZuyVeJ7tbFEKd3vyeBtjDK8a4S5qf2VzDSnyMe3FL9pog8mJ7hUueo1WxwmfaJoenIH
-         9rdUniGoqQR5xZdGVQIbZJTPvP431js73F9b3OOCmPQ3XiDEL94Bp+Nna1YKCIyiSgHN
-         DTkw==
-X-Gm-Message-State: AOAM530eiGbDO3O487UrdRGVW7kzgIBPdobF1KFSC4MEzjMhzsHUnQ/W
-        o59cSX6gVq8BSHw+DL2dqh+53uqkHyV22eGW3knm5CA7wh1m6z9wYkpckBtXLOs9XgVFsk/IYZ5
-        3dN0QxLAhgQZQ
-X-Received: by 2002:a17:907:d8e:: with SMTP id go14mr11357371ejc.616.1643108658449;
-        Tue, 25 Jan 2022 03:04:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzNY6jb0cUQ7mIMNUdgnmmXyT6nMhdcmxgVsQmrqUHzgupsYg9+NzQuxadWZFpCYLDnSlOgjA==
-X-Received: by 2002:a17:907:d8e:: with SMTP id go14mr11357351ejc.616.1643108658233;
-        Tue, 25 Jan 2022 03:04:18 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id gz12sm6060382ejc.124.2022.01.25.03.04.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jan 2022 03:04:17 -0800 (PST)
-Message-ID: <5bae05d4-d4c4-c949-1d26-78cb222e1da5@redhat.com>
-Date:   Tue, 25 Jan 2022 12:04:16 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Rvvfbm9DdsitiqMaGToeqN6bn83eZm9ryJcgfNBtuTE=;
+        b=PXzJcDBW6cYKX2YIzai005uBjdksqGNu6gJL19sQ+dNxMc0RIHa+8pkkGveh20mz9K
+         1b8J7tUawBfQCpKkNoezS4M9yOSTcQaLMFhdOxIRXz6x9Yjd+KiYy1YwYzAtu9M8YWVi
+         gBKqNxgGuTI73ectw4XP4QjyKqE9qCM+zXWRYd0kqUTpaj+KUzPypDXmUK0nmctX53sS
+         6IOErht9TrsvIny6HKx5oHUURdPc7ABOh4jVA90W3qJYPaZCqrcubB9extg5nhgsH+P2
+         Il6lKN0blbp+LZXufVWI/m7yCJxIfmaNZdjE/LXI3YQagQkWe2VR8FBlG1Mzmv8xYJZI
+         wJRQ==
+X-Gm-Message-State: AOAM533CccELLzNOBMa9uYDFxFp8YoC9CGpZMTGOAmdZkl+I0BITG12k
+        bXnMTEgpu0lNLlEAbGeaCpQEQuKcEYtcBJ5ffYUAHaDlcquElSBL+LOCotTpnW59SS3TGcJth1y
+        JVMNj+tqq8Kzm
+X-Received: by 2002:adf:ebd2:: with SMTP id v18mr18147959wrn.502.1643109266377;
+        Tue, 25 Jan 2022 03:14:26 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwe9f8UE+t1HaCGIVAqAvlkesdvDMkIgGHznqy4t0x7dqgJcd7Nmt776tM9Ir7lrl12OgiLkA==
+X-Received: by 2002:adf:ebd2:: with SMTP id v18mr18147939wrn.502.1643109266078;
+        Tue, 25 Jan 2022 03:14:26 -0800 (PST)
+Received: from steredhat ([62.19.185.119])
+        by smtp.gmail.com with ESMTPSA id t14sm60428wmq.21.2022.01.25.03.14.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jan 2022 03:14:25 -0800 (PST)
+Date:   Tue, 25 Jan 2022 12:14:22 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v1] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <20220125111422.tmsnk575jo7ckt46@steredhat>
+References: <20220114090508.36416-1-sgarzare@redhat.com>
+ <Ye6OJdi2M1EBx7b3@stefanha-x1.localdomain>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: LAPIC: Also cancel preemption timer during SET_LAPIC
-Content-Language: en-US
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1643102220-35667-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1643102220-35667-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <Ye6OJdi2M1EBx7b3@stefanha-x1.localdomain>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/22 10:17, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> The below warning is splatting during guest reboot.
-> 
->    ------------[ cut here ]------------
->    WARNING: CPU: 0 PID: 1931 at arch/x86/kvm/x86.c:10322 kvm_arch_vcpu_ioctl_run+0x874/0x880 [kvm]
->    CPU: 0 PID: 1931 Comm: qemu-system-x86 Tainted: G          I       5.17.0-rc1+ #5
->    RIP: 0010:kvm_arch_vcpu_ioctl_run+0x874/0x880 [kvm]
->    Call Trace:
->     <TASK>
->     kvm_vcpu_ioctl+0x279/0x710 [kvm]
->     __x64_sys_ioctl+0x83/0xb0
->     do_syscall_64+0x3b/0xc0
->     entry_SYSCALL_64_after_hwframe+0x44/0xae
->    RIP: 0033:0x7fd39797350b
-> 
-> This can be triggered by not exposing tsc-deadline mode and doing a reboot in
-> the guest. The lapic_shutdown() function which is called in sys_reboot path
-> will not disarm the flying timer, it just masks LVTT. lapic_shutdown() clears
-> APIC state w/ LVT_MASKED and timer-mode bit is 0, this can trigger timer-mode
-> switch between tsc-deadline and oneshot/periodic, which can result in preemption
-> timer be cancelled in apic_update_lvtt(). However, We can't depend on this when
-> not exposing tsc-deadline mode and oneshot/periodic modes emulated by preemption
-> timer. Qemu will synchronise states around reset, let's cancel preemption timer
-> under KVM_SET_LAPIC.
-> 
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->   arch/x86/kvm/lapic.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index baca9fa37a91..4662469240bc 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2629,7 +2629,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
->   	kvm_apic_set_version(vcpu);
->   
->   	apic_update_ppr(apic);
-> -	hrtimer_cancel(&apic->lapic_timer.timer);
-> +	cancel_apic_timer(apic);
->   	apic->lapic_timer.expired_tscdeadline = 0;
->   	apic_update_lvtt(apic);
->   	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+On Mon, Jan 24, 2022 at 11:31:49AM +0000, Stefan Hajnoczi wrote:
+>On Fri, Jan 14, 2022 at 10:05:08AM +0100, Stefano Garzarella wrote:
+>> In vhost_enable_notify() we enable the notifications and we read
+>> the avail index to check if new buffers have become available in
+>> the meantime.
+>>
+>> We are not caching the avail index, so when the device will call
+>> vhost_get_vq_desc(), it will find the old value in the cache and
+>> it will read the avail index again.
+>
+>I think this wording is clearer because we do keep a cached the avail
+>index value, but the issue is we don't update it:
+>s/We are not caching the avail index/We do not update the cached avail
+>index value/
 
-Queued, with Cc to stable.
+I'll fix in v3.
+It seems I forgot to CC you on v2: 
+https://lore.kernel.org/virtualization/20220121153108.187291-1-sgarzare@redhat.com/
 
-Paolo
+>
+>>
+>> It would be better to refresh the cache every time we read avail
+>> index, so let's change vhost_enable_notify() caching the value in
+>> `avail_idx` and compare it with `last_avail_idx` to check if there
+>> are new buffers available.
+>>
+>> Anyway, we don't expect a significant performance boost because
+>> the above path is not very common, indeed vhost_enable_notify()
+>> is often called with unlikely(), expecting that avail index has
+>> not been updated.
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>> v1:
+>> - improved the commit description [MST, Jason]
+>> ---
+>>  drivers/vhost/vhost.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index 59edb5a1ffe2..07363dff559e 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, 
+>> struct vhost_virtqueue *vq)
+>>  		       &vq->avail->idx, r);
+>>  		return false;
+>>  	}
+>> +	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
+>>
+>> -	return vhost16_to_cpu(vq, avail_idx) != vq->avail_idx;
+>> +	return vq->avail_idx != vq->last_avail_idx;
+>
+>vhost_vq_avail_empty() has a fast path that's missing in
+>vhost_enable_notify():
+>
+>  if (vq->avail_idx != vq->last_avail_idx)
+>      return false;
+
+Yep, I thought about that, but devices usually call 
+vhost_enable_notify() right when vq->avail_idx == vq->last_avail_idx, so 
+I don't know if it's an extra check for a branch that will never be 
+taken.
+
+Do you think it is better to add that check? (maybe with unlikely())
+
+Thanks,
+Stefano
 
