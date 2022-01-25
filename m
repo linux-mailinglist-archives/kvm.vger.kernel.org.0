@@ -2,55 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C702849BF57
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 00:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0523A49BF59
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 00:07:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234652AbiAYXFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 18:05:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44318 "EHLO
+        id S234654AbiAYXHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 18:07:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231925AbiAYXFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 18:05:31 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04192C06161C
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 15:05:31 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id q21-20020a170902edd500b0014ae79cc6d5so5805345plk.18
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 15:05:30 -0800 (PST)
+        with ESMTP id S230468AbiAYXHR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 18:07:17 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F55C06161C
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 15:07:17 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id z37-20020a056a001da500b004c74e3fd644so6915231pfw.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 15:07:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=konIu66tln70B4/KL1+Z+6gW9IXzyYE6pA+Z6X0RYPM=;
-        b=oRPyQTE04G79fKhAUa9INSk+SDvbPvDYwvBhS6SkCHfqemQOR20h5gnyralD8fHuAF
-         cJoRI4ybnOu4w/U7u/hzn9Th/fTEB2dkWYXg+ca0zwTzmppPOOMeX52rYQvAxC5cuvrl
-         ftX1Fn8rt4b3D0Twuju/+5oFT0oFGt5qa2lbpmrezdU8gSkGov1a8zsRfYMENjdjfFwQ
-         kWCAEojt73MRUdUQCab1gH5feUVM+wLUZJ0EuXARG3gNSJoiJXMkn0FcTCtikKOUwklt
-         8bmZbxWLgmHYpmmBm1RV5X7TfuB35/iAqyPmDQj2z4chZufUUfZG+xK7sXe4hGSt2CYo
-         lkhA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=pj1P7x8X7Ztb282Wj3Bmrv1L4P94RF1b7x52MOCWza4=;
+        b=rYZoX8kxiFsQyvsl9DsRt5gN5DgAAIXMF4LdjF6t27+wxPEO/CzPwbF+cRh6tdjbHk
+         Nb0+4hNNoU7BV0RvNe7q2UyKXNogSYflQXDz+aguFJ6ID8NmlSl0TuC8jnHsEAjDUMbr
+         uWd6sC81MoHVt1ieEWz6XUbP6xE2JnyAP7v86COxQAzA2Oe2Mb4Euaybj2y0eRT8BGv6
+         zK08klcphjrmvlBfbU5ciKkA3DX6uaXnUw/K3zqabHbeYMFaCn28M1jn95EKwDLROj4+
+         lK4CF0YNpytz1GWnvhhiiqtbcdmTBMzTyefdrvhL62Q87t2b2qhNtBmQxV8JASMaEjos
+         mbNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=konIu66tln70B4/KL1+Z+6gW9IXzyYE6pA+Z6X0RYPM=;
-        b=q6Kk/XUNR8iNZYXYYOK1ziF3rLge/8BbDii4aFlzlXKc0MmRaBIBacmaKx4tBcbN7f
-         v7Os1zehRC0FUrUjgF1qUf7A9v68erPn+OSXJzoXI7Ar8B90Rs+5nIrasqaI0UjQKmwD
-         cRGzE17IDXhIPw+4l633cs9OnJzxggZuzDk8pgBatp2RxUpE79TOvsUbPCT70WnL13L4
-         T5xoVPE00Aias3siO01SzfAqvs2j8D8/jY1I281NQhnNvUoaBXGhMKYgFSdW4HJgl4Fg
-         Gxz7Tt9wGCYHNIJ9BuAU9Fz1oZOqfooug9q4m5f/dkU1LJ7qfG1E2RH9ExfDDarzl9MS
-         Bp/A==
-X-Gm-Message-State: AOAM533140+t0CzFVZpxu1iq2SOtqaodX5HIWlU/7hZAwZuKzTir/0XQ
-        JQiJPLyEKZ6IccQm7qP4fGEBoUUssuixOQ==
-X-Google-Smtp-Source: ABdhPJxN5JyFU7LEcJ2LMIGHaiVteFmQAJ+ky7pNyaIQPSmd4URUzNuloeTgEywJWXsmK55o4FhJpCFHkwmEDA==
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=pj1P7x8X7Ztb282Wj3Bmrv1L4P94RF1b7x52MOCWza4=;
+        b=BQgN/WvjL4Kcnyet3aCndjKUXiMkWgeC8GAU3ntIJkce/kAdPKCsVnVtMH+ztfCgm4
+         5uz7NxnlBMiYJfVnMb1fIWB4Y+TCwVSO4Icz5ufDIqXrD8+m9dhYItKmxcIZbMwsdZdO
+         wQfRs7J8hVx9f3UQVv2GjDoNY5N9a5HLi2/tnARN3bwJLDX2yq1dZ1YelmtuZmH+zOcA
+         L3A2IfHLeIIiY49umiiiV/AU1+s2W3HtHjGYXFMI7PuLhf6Gu9p1OiUKFQEE8Ukxgf1A
+         +fBtfo+oWkJ/jrdQBNafC1fI9nF18Gu5YGSv3bXCcfucRsCmUV0NW8+jE9Y5nQVuzBt8
+         Qp5w==
+X-Gm-Message-State: AOAM533FxaBJlZYepwTj8zdCXq67sgvZSWKxW7Z7dexyuljbc9KZ4+/f
+        DENLaTSi0UREsc4s+yFT5WKag/4pCX3SRg==
+X-Google-Smtp-Source: ABdhPJzQcOGKL9PXP4agWmfsmouEcPlm0KKTvr3/sLN7RHf4XUMyp/VzLriEH1jGP3h9Uc/Mf2EZtnVF8/fVcQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:5d8c:: with SMTP id
- t12mr5687134pji.189.1643151930485; Tue, 25 Jan 2022 15:05:30 -0800 (PST)
-Date:   Tue, 25 Jan 2022 23:05:16 +0000
-In-Reply-To: <20220125230518.1697048-1-dmatlack@google.com>
-Message-Id: <20220125230518.1697048-4-dmatlack@google.com>
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:2484:b0:4c8:ffbd:4c78 with SMTP
+ id c4-20020a056a00248400b004c8ffbd4c78mr11224261pfv.24.1643152036746; Tue, 25
+ Jan 2022 15:07:16 -0800 (PST)
+Date:   Tue, 25 Jan 2022 23:07:13 +0000
+Message-Id: <20220125230713.1700406-1-dmatlack@google.com>
 Mime-Version: 1.0
-References: <20220125230518.1697048-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH 3/5] KVM: x86/mmu: Move is_writable_pte() to spte.h
+Subject: [PATCH 4/5] KVM: x86/mmu: Rename DEFAULT_SPTE_MMU_WRITEABLE to DEFAULT_SPTE_MMU_WRITABLE
 From:   David Matlack <dmatlack@google.com>
 To:     pbonzini@redhat.com
 Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
@@ -61,127 +58,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move is_writable_pte() close to the other functions that check
-writability information about SPTEs. While here opportunistically
-replace the open-coded bit arithmetic in
-check_spte_writable_invariants() with a call to is_writable_pte().
+Both "writeable" and "writable" are valid, but we should be consistent
+about which we use. DEFAULT_SPTE_MMU_WRITEABLE was the odd one out in
+the SPTE code, so rename it to DEFAULT_SPTE_MMU_WRITABLE.
 
 No functional change intended.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu.h      | 38 --------------------------------------
- arch/x86/kvm/mmu/spte.h | 40 +++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 39 deletions(-)
+ arch/x86/kvm/mmu/mmu.c  | 2 +-
+ arch/x86/kvm/mmu/spte.c | 4 ++--
+ arch/x86/kvm/mmu/spte.h | 8 ++++----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index e9fbb2c8bbe2..51faa2c76ca5 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -202,44 +202,6 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	return vcpu->arch.mmu->page_fault(vcpu, &fault);
- }
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 795db506c230..88f3aa5f2a36 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5847,7 +5847,7 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+ 	 * will clear a separate software-only bit (MMU-writable) and skip the
+ 	 * flush if-and-only-if this bit was already clear.
+ 	 *
+-	 * See DEFAULT_SPTE_MMU_WRITEABLE for more details.
++	 * See DEFAULT_SPTE_MMU_WRITABLE for more details.
+ 	 */
+ 	if (flush)
+ 		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 24d66bb899a4..ad6acdd61a9f 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -360,8 +360,8 @@ void kvm_mmu_reset_all_pte_masks(void)
+ 	shadow_acc_track_mask	= 0;
+ 	shadow_me_mask		= sme_me_mask;
  
--/*
-- * Currently, we have two sorts of write-protection, a) the first one
-- * write-protects guest page to sync the guest modification, b) another one is
-- * used to sync dirty bitmap when we do KVM_GET_DIRTY_LOG. The differences
-- * between these two sorts are:
-- * 1) the first case clears MMU-writable bit.
-- * 2) the first case requires flushing tlb immediately avoiding corrupting
-- *    shadow page table between all vcpus so it should be in the protection of
-- *    mmu-lock. And the another case does not need to flush tlb until returning
-- *    the dirty bitmap to userspace since it only write-protects the page
-- *    logged in the bitmap, that means the page in the dirty bitmap is not
-- *    missed, so it can flush tlb out of mmu-lock.
-- *
-- * So, there is the problem: the first case can meet the corrupted tlb caused
-- * by another case which write-protects pages but without flush tlb
-- * immediately. In order to making the first case be aware this problem we let
-- * it flush tlb if we try to write-protect a spte whose MMU-writable bit
-- * is set, it works since another case never touches MMU-writable bit.
-- *
-- * Anyway, whenever a spte is updated (only permission and status bits are
-- * changed) we need to check whether the spte with MMU-writable becomes
-- * readonly, if that happens, we need to flush tlb. Fortunately,
-- * mmu_spte_update() has already handled it perfectly.
-- *
-- * The rules to use MMU-writable and PT_WRITABLE_MASK:
-- * - if we want to see if it has writable tlb entry or if the spte can be
-- *   writable on the mmu mapping, check MMU-writable, this is the most
-- *   case, otherwise
-- * - if we fix page fault on the spte or do write-protection by dirty logging,
-- *   check PT_WRITABLE_MASK.
-- *
-- * TODO: introduce APIs to split these two cases.
-- */
--static inline bool is_writable_pte(unsigned long pte)
--{
--	return pte & PT_WRITABLE_MASK;
--}
--
- /*
-  * Check if a given access (described through the I/D, W/R and U/S bits of a
-  * page fault error code pfec) causes a permission fault with the given PTE
+-	shadow_host_writable_mask = DEFAULT_SPTE_HOST_WRITEABLE;
+-	shadow_mmu_writable_mask  = DEFAULT_SPTE_MMU_WRITEABLE;
++	shadow_host_writable_mask = DEFAULT_SPTE_HOST_WRITABLE;
++	shadow_mmu_writable_mask  = DEFAULT_SPTE_MMU_WRITABLE;
+ 
+ 	/*
+ 	 * Set a reserved PA bit in MMIO SPTEs to generate page faults with
 diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index b8fd055acdbd..e1ddba45bba1 100644
+index e1ddba45bba1..a179f089e3dd 100644
 --- a/arch/x86/kvm/mmu/spte.h
 +++ b/arch/x86/kvm/mmu/spte.h
-@@ -339,6 +339,44 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
- 	       __is_rsvd_bits_set(rsvd_check, spte, level);
- }
+@@ -75,7 +75,7 @@ static_assert(SPTE_TDP_AD_ENABLED_MASK == 0);
+ static_assert(!(SPTE_TDP_AD_MASK & SHADOW_ACC_TRACK_SAVED_MASK));
  
-+/*
-+ * Currently, we have two sorts of write-protection, a) the first one
-+ * write-protects guest page to sync the guest modification, b) another one is
-+ * used to sync dirty bitmap when we do KVM_GET_DIRTY_LOG. The differences
-+ * between these two sorts are:
-+ * 1) the first case clears MMU-writable bit.
-+ * 2) the first case requires flushing tlb immediately avoiding corrupting
-+ *    shadow page table between all vcpus so it should be in the protection of
-+ *    mmu-lock. And the another case does not need to flush tlb until returning
-+ *    the dirty bitmap to userspace since it only write-protects the page
-+ *    logged in the bitmap, that means the page in the dirty bitmap is not
-+ *    missed, so it can flush tlb out of mmu-lock.
-+ *
-+ * So, there is the problem: the first case can meet the corrupted tlb caused
-+ * by another case which write-protects pages but without flush tlb
-+ * immediately. In order to making the first case be aware this problem we let
-+ * it flush tlb if we try to write-protect a spte whose MMU-writable bit
-+ * is set, it works since another case never touches MMU-writable bit.
-+ *
-+ * Anyway, whenever a spte is updated (only permission and status bits are
-+ * changed) we need to check whether the spte with MMU-writable becomes
-+ * readonly, if that happens, we need to flush tlb. Fortunately,
-+ * mmu_spte_update() has already handled it perfectly.
-+ *
-+ * The rules to use MMU-writable and PT_WRITABLE_MASK:
-+ * - if we want to see if it has writable tlb entry or if the spte can be
-+ *   writable on the mmu mapping, check MMU-writable, this is the most
-+ *   case, otherwise
-+ * - if we fix page fault on the spte or do write-protection by dirty logging,
-+ *   check PT_WRITABLE_MASK.
-+ *
-+ * TODO: introduce APIs to split these two cases.
-+ */
-+static inline bool is_writable_pte(unsigned long pte)
-+{
-+	return pte & PT_WRITABLE_MASK;
-+}
-+
- /* Note: spte must be a shadow-present leaf SPTE. */
- static inline void check_spte_writable_invariants(u64 spte)
- {
-@@ -347,7 +385,7 @@ static inline void check_spte_writable_invariants(u64 spte)
- 			  "kvm: MMU-writable SPTE is not Host-writable: %llx",
- 			  spte);
- 	else
--		WARN_ONCE(spte & PT_WRITABLE_MASK,
-+		WARN_ONCE(is_writable_pte(spte),
- 			  "kvm: Writable SPTE is not MMU-writable: %llx", spte);
- }
+ /*
+- * *_SPTE_HOST_WRITEABLE (aka Host-writable) indicates whether the host permits
++ * *_SPTE_HOST_WRITABLE (aka Host-writable) indicates whether the host permits
+  * writes to the guest page mapped by the SPTE. This bit is cleared on SPTEs
+  * that map guest pages in read-only memslots and read-only VMAs.
+  *
+@@ -83,7 +83,7 @@ static_assert(!(SPTE_TDP_AD_MASK & SHADOW_ACC_TRACK_SAVED_MASK));
+  *  - If Host-writable is clear, PT_WRITABLE_MASK must be clear.
+  *
+  *
+- * *_SPTE_MMU_WRITEABLE (aka MMU-writable) indicates whether the shadow MMU
++ * *_SPTE_MMU_WRITABLE (aka MMU-writable) indicates whether the shadow MMU
+  * allows writes to the guest page mapped by the SPTE. This bit is cleared when
+  * the guest page mapped by the SPTE contains a page table that is being
+  * monitored for shadow paging. In this case the SPTE can only be made writable
+@@ -100,8 +100,8 @@ static_assert(!(SPTE_TDP_AD_MASK & SHADOW_ACC_TRACK_SAVED_MASK));
+  */
  
+ /* Bits 9 and 10 are ignored by all non-EPT PTEs. */
+-#define DEFAULT_SPTE_HOST_WRITEABLE	BIT_ULL(9)
+-#define DEFAULT_SPTE_MMU_WRITEABLE	BIT_ULL(10)
++#define DEFAULT_SPTE_HOST_WRITABLE	BIT_ULL(9)
++#define DEFAULT_SPTE_MMU_WRITABLE	BIT_ULL(10)
+ 
+ /*
+  * Low ignored bits are at a premium for EPT, use high ignored bits, taking care
 -- 
 2.35.0.rc0.227.g00780c9af4-goog
 
