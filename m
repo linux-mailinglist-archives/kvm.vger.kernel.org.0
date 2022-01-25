@@ -2,139 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D544A49B2CE
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 12:20:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7479749B307
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 12:41:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356892AbiAYLRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 06:17:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20258 "EHLO
+        id S1355992AbiAYLlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 06:41:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25000 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1381205AbiAYLPK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 06:15:10 -0500
+        by vger.kernel.org with ESMTP id S1356607AbiAYLgS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 06:36:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643109269;
+        s=mimecast20190719; t=1643110572;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Rvvfbm9DdsitiqMaGToeqN6bn83eZm9ryJcgfNBtuTE=;
-        b=bBOVjBHq53facUWBbvuIHfo3I5PLagm+WzYt51CVxypEflsi81YOfjstxLSfYiZNcTY8gQ
-        899VCKt9WGahF077TQ2MP6qJLylbPqf9gRGVejC/O19W8VyGP+GLkeUZqZbKC5Ske6qMu1
-        XFAbmlh/seXjgf7GNlxOe3exFF/BKts=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HdAh07n39LkLkBs/H9oheuevBjaeT4FvPn+TzmQfVY8=;
+        b=S6Usuai4x7/zm6h537AK5U3GyV3xRDcORvlyIKEUz7+EBw+jx2MqurFN6ZWn1jhfdXI6Pt
+        pwksGgU6AsAWWQv2a1lAvC7PdjQwesbD56/Shgib2CI5RraGkJ74FCZnQHmZXuxcEZvpIa
+        H4Inb9HIF2/Bm8pHzYV6eHkF+PL3oFE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-76-Wy3fibmiMyStvNpRr1_fXA-1; Tue, 25 Jan 2022 06:14:27 -0500
-X-MC-Unique: Wy3fibmiMyStvNpRr1_fXA-1
-Received: by mail-wr1-f72.google.com with SMTP id v28-20020adfa1dc000000b001dd1cb24081so473868wrv.10
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 03:14:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Rvvfbm9DdsitiqMaGToeqN6bn83eZm9ryJcgfNBtuTE=;
-        b=PXzJcDBW6cYKX2YIzai005uBjdksqGNu6gJL19sQ+dNxMc0RIHa+8pkkGveh20mz9K
-         1b8J7tUawBfQCpKkNoezS4M9yOSTcQaLMFhdOxIRXz6x9Yjd+KiYy1YwYzAtu9M8YWVi
-         gBKqNxgGuTI73ectw4XP4QjyKqE9qCM+zXWRYd0kqUTpaj+KUzPypDXmUK0nmctX53sS
-         6IOErht9TrsvIny6HKx5oHUURdPc7ABOh4jVA90W3qJYPaZCqrcubB9extg5nhgsH+P2
-         Il6lKN0blbp+LZXufVWI/m7yCJxIfmaNZdjE/LXI3YQagQkWe2VR8FBlG1Mzmv8xYJZI
-         wJRQ==
-X-Gm-Message-State: AOAM533CccELLzNOBMa9uYDFxFp8YoC9CGpZMTGOAmdZkl+I0BITG12k
-        bXnMTEgpu0lNLlEAbGeaCpQEQuKcEYtcBJ5ffYUAHaDlcquElSBL+LOCotTpnW59SS3TGcJth1y
-        JVMNj+tqq8Kzm
-X-Received: by 2002:adf:ebd2:: with SMTP id v18mr18147959wrn.502.1643109266377;
-        Tue, 25 Jan 2022 03:14:26 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwe9f8UE+t1HaCGIVAqAvlkesdvDMkIgGHznqy4t0x7dqgJcd7Nmt776tM9Ir7lrl12OgiLkA==
-X-Received: by 2002:adf:ebd2:: with SMTP id v18mr18147939wrn.502.1643109266078;
-        Tue, 25 Jan 2022 03:14:26 -0800 (PST)
-Received: from steredhat ([62.19.185.119])
-        by smtp.gmail.com with ESMTPSA id t14sm60428wmq.21.2022.01.25.03.14.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jan 2022 03:14:25 -0800 (PST)
-Date:   Tue, 25 Jan 2022 12:14:22 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v1] vhost: cache avail index in vhost_enable_notify()
-Message-ID: <20220125111422.tmsnk575jo7ckt46@steredhat>
-References: <20220114090508.36416-1-sgarzare@redhat.com>
- <Ye6OJdi2M1EBx7b3@stefanha-x1.localdomain>
+ us-mta-508-A4R6AmTLN2yXGDSH9ZebpQ-1; Tue, 25 Jan 2022 06:36:10 -0500
+X-MC-Unique: A4R6AmTLN2yXGDSH9ZebpQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D27D100C661;
+        Tue, 25 Jan 2022 11:36:09 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-10.ams2.redhat.com [10.36.112.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FB34106C064;
+        Tue, 25 Jan 2022 11:36:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id F3A9E113864A; Tue, 25 Jan 2022 12:36:07 +0100 (CET)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Juan Quintela <quintela@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
+Subject: Re: KVM call for agenda for 2022-01-25
+References: <87y2355xe8.fsf@secure.mitica>
+Date:   Tue, 25 Jan 2022 12:36:07 +0100
+In-Reply-To: <87y2355xe8.fsf@secure.mitica> (Juan Quintela's message of "Mon,
+        24 Jan 2022 09:51:59 +0100")
+Message-ID: <87mtjk2gk8.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <Ye6OJdi2M1EBx7b3@stefanha-x1.localdomain>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 24, 2022 at 11:31:49AM +0000, Stefan Hajnoczi wrote:
->On Fri, Jan 14, 2022 at 10:05:08AM +0100, Stefano Garzarella wrote:
->> In vhost_enable_notify() we enable the notifications and we read
->> the avail index to check if new buffers have become available in
->> the meantime.
->>
->> We are not caching the avail index, so when the device will call
->> vhost_get_vq_desc(), it will find the old value in the cache and
->> it will read the avail index again.
+Juan Quintela <quintela@redhat.com> writes:
+
+> Hi
 >
->I think this wording is clearer because we do keep a cached the avail
->index value, but the issue is we don't update it:
->s/We are not caching the avail index/We do not update the cached avail
->index value/
-
-I'll fix in v3.
-It seems I forgot to CC you on v2: 
-https://lore.kernel.org/virtualization/20220121153108.187291-1-sgarzare@redhat.com/
-
+> Please, send any topic that you are interested in covering.
 >
->>
->> It would be better to refresh the cache every time we read avail
->> index, so let's change vhost_enable_notify() caching the value in
->> `avail_idx` and compare it with `last_avail_idx` to check if there
->> are new buffers available.
->>
->> Anyway, we don't expect a significant performance boost because
->> the above path is not very common, indeed vhost_enable_notify()
->> is often called with unlikely(), expecting that avail index has
->> not been updated.
->>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->> v1:
->> - improved the commit description [MST, Jason]
->> ---
->>  drivers/vhost/vhost.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->> index 59edb5a1ffe2..07363dff559e 100644
->> --- a/drivers/vhost/vhost.c
->> +++ b/drivers/vhost/vhost.c
->> @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, 
->> struct vhost_virtqueue *vq)
->>  		       &vq->avail->idx, r);
->>  		return false;
->>  	}
->> +	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
->>
->> -	return vhost16_to_cpu(vq, avail_idx) != vq->avail_idx;
->> +	return vq->avail_idx != vq->last_avail_idx;
+> This week we have a continuation of 2 weeks ago call to discuss how to
+> enable creation of machines from QMP sooner on the boot.
 >
->vhost_vq_avail_empty() has a fast path that's missing in
->vhost_enable_notify():
+> There was already a call about this 2 weeks ago where we didn't finished
+> everything.
+> I have been on vacation last week and I haven't been able to send a
+> "kind of resume" of the call.
 >
->  if (vq->avail_idx != vq->last_avail_idx)
->      return false;
+> Basically what we need is:
+> - being able to create machines sooner that we are today
+> - being able to change the devices that are in the boards, in
+>   particular, we need to be able to create a board deciding what devices
+>   it has and how they are connected without recompiling qemu.
+>   This means to launch QMP sooner that we do today.
+> - Several options was proposed:
+>   - create a new binary that only allows QMP machine creation.
+>     and continue having the old command line
+>   - create a new binary, and change current HMP/command line to just
+>     call this new binary.  This way we make sure that everything can be
+>     done through QMP.
+>   - stay with only one binary but change it so we can call QMP sooner.
+> - There is agreement that we need to be able to call QMP sooner.
+> - There is NO agreement about how the best way to proceed:
+>   * We don't want this to be a multiyear effort, i.e. we want something
+>     that can be used relatively soon (this means that using only one
+>     binary can be tricky).
+>   * If we start with a new binary that only allows qmp and we wait until
+>     everything has been ported to QMP, it can take forever, and during
+>     that time we have to maintain two binaries.
+>   * Getting a new binary lets us to be more agreessive about what we can
+>     remove/change. i.e. easier experimentation.
+>   * Management Apps will only use QMP, not the command line, or they
+>     even use libvirt and don't care at all about qemu.  So it appears
+>     that HMP is only used for developers, so we can be loose about
+>     backwards compatibility. I.e. if we allow the same functionality,
+>     but the syntax is different, we don't care.
+>
+> Discussion was longer, but it was difficult to take notes and as I said,
+> the only thing that appears that everybody agrees is that we need an
+> agreement about what is the plan to go there.
+>
+> After discussions on the QEMU Summit, we are going to have always open a
+> KVM call where you can add topics.
+>
+>  Call details:
+>
+> By popular demand, a google calendar public entry with it
+>
+>   https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+>
+> (Let me know if you have any problems with the calendar entry.  I just
+> gave up about getting right at the same time CEST, CET, EDT and DST).
 
-Yep, I thought about that, but devices usually call 
-vhost_enable_notify() right when vq->avail_idx == vq->last_avail_idx, so 
-I don't know if it's an extra check for a branch that will never be 
-taken.
+https://wiki.qemu.org/Contribute claims the call is at
 
-Do you think it is better to add that check? (maybe with unlikely())
+    $ date -d 'TZ="America/New_York" Tuesday 10:00 am'
+    Tue Jan 25 16:00:00 CET 2022
 
-Thanks,
-Stefano
+Is that correct?
+
+> If you need phone number details,  contact me privately
+>
+> Thanks, Juan.
 
