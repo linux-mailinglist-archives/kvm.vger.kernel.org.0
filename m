@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BD2549B121
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B89749B124
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239064AbiAYKDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 05:03:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59736 "EHLO
+        id S239132AbiAYKDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 05:03:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238516AbiAYJ7k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:59:40 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B13C061755;
-        Tue, 25 Jan 2022 01:59:39 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id v3so12559877pgc.1;
-        Tue, 25 Jan 2022 01:59:39 -0800 (PST)
+        with ESMTP id S238524AbiAYJ7q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:59:46 -0500
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D22C061756;
+        Tue, 25 Jan 2022 01:59:42 -0800 (PST)
+Received: by mail-pj1-x1041.google.com with SMTP id nn16-20020a17090b38d000b001b56b2bce31so2271291pjb.3;
+        Tue, 25 Jan 2022 01:59:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nE41yYPMv1zFtz9X94ECgyvNJnmsVPwBnhbwEvP7f3E=;
-        b=QOHgBqmr88TELjvu7ow7qs6mVlO/IpLLPivcSo971gunDB2aTWTaeDwJILuJ2jnGeN
-         eBQiNhAid2Lwe1phF9w7FiAQM/kk9Zdrn3Bphr53O4R8bh+CNN7CJwSSeiMA/+nyvsv8
-         zwNmADVbtIZaII1GLULpDWwSY/kPQUFI3BveVcftx4UoV62yXgpmAVsx6xJ1hdZtJFMc
-         0ME6VsXJwrq+XbwPRvyR5e+Yu/ianA7FtRCMMC8k00hbpoBb51DBXXwTTN/SWspJIl1E
-         TFwatVo2/Wt4+pvBFspqQCDIG0fPXPipnZRrSROxTsUSACaqvdMSMhmVOCxM+Ri5Og3q
-         FhNA==
+        bh=YCL/z3KlGNzFsVCJ/3z3F4LH/FmJiw0KoHdi2KVVmgk=;
+        b=gVcJuLPGV54zqq+spLjzSiaCND99bX63oHpJ6CucKDneVPQ4zgveS0nl2SuK31c6WA
+         s9/RSvBxt2ab6cAM0aUY73Uuak5ORezldkllhRLXYip2s/qgHeJFndT2ZubDM8nCt6o2
+         AJcobDggVSijg32KWNmyczUK8JwgPMo6KXhvnuPY5sPBvBYt1bkqVl3G1MUeUimsJPn4
+         MvSg62qys7MfPTPR50RkZ8kBjZW4jOq1MjtzHVFWeYbDhZBJCLMWogYlyGVlL7e3SmWN
+         OX46SAWqxHw/qTyZNzIQodX5UuLkJXJC8X+Kphs6LipNnawwZpfeZQU24LaDmWr2Y6Ji
+         8VMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nE41yYPMv1zFtz9X94ECgyvNJnmsVPwBnhbwEvP7f3E=;
-        b=fURvZI38tldXZfHMp8JeGuAeomfmGy8gpJUCh+v2VUYZamGgG1WQj5EQHdFSGR45wI
-         SgtnwhDnqS3DA915Fcx4SkXtv6MEPKDkbE2nld+GEbabY2vvk+KhB29KJQHG6ow+a17R
-         VXwZsct4kj8cAvPOeJgAeqeQyk75aj9DD7bgTGdVd/cw3gjri05wSvQa5wogxTWOd7w4
-         xsYGwYpA9/R//gp+Gr8tltoMJt8zB2CAkPdadmuVN743bR4JCoS7q0FcotvoRMelQEWS
-         oy96fAfHgpJFgau+/EMSOouxcIyKatj1PoQTMqXS4yBQTfEyoEw/PjXPPA1/auFEhR+P
-         BJaQ==
-X-Gm-Message-State: AOAM533o72sa7WSpwBb5vlsfWGFhpvNQj97N11JvXEDfuOXI89xPntWh
-        DlWANyg9c/YVUMHz1IWk0Cg=
-X-Google-Smtp-Source: ABdhPJzHX7bMzjHlAQz7S1myug705M1pTgB4K+zlQhlFPEQCrmaQ6lkr7d7MP/x7zngSMZPAKYfDrA==
-X-Received: by 2002:a63:1053:: with SMTP id 19mr14746034pgq.478.1643104779383;
-        Tue, 25 Jan 2022 01:59:39 -0800 (PST)
+        bh=YCL/z3KlGNzFsVCJ/3z3F4LH/FmJiw0KoHdi2KVVmgk=;
+        b=cSg0lMUcuzbuyjoVhJNgGb8IdV9podlYSUJmVBJpL9nhduiD0fsI0Z6EmpscfCfd21
+         1QYgV96YcDWNL8jPKWfCAZHfY1Qj+lFPCY0Xnv53+oRsUxEr6j794S0KRt8hwrf4U+Gj
+         Xv8GTrEk7SgG99xCzZ8Y2k4sSU1cVdZfItWOG95IyO4P+8uTB7hkuCK6BHkyQ0NJjYBq
+         IVQKlS0YgzqlWWo1Elk/dwm3B2ZOP25iicpZmn159uiJsQ4QAbIzq7Z93t3k7C/vWIxq
+         qtQ/t0Sk0btJGit8xByYYEgZnIFotf/VfHIOVivh0LLngPYF3ppQHI2Jt0kKv7vguJUb
+         1xVA==
+X-Gm-Message-State: AOAM532FWQaACbs7spEGo0GDhVwnoaP5bXi8DizXlYnknD01J/R+aqJf
+        yLj2nCgYjJPT9/hPaY8EOls=
+X-Google-Smtp-Source: ABdhPJzPVmkIK7wMi/i4VnSk7XEpJzBzxl3aNCucA2MqQnRG7cLZU+sJOmCW3ilnTvg4V0olJVHGuQ==
+X-Received: by 2002:a17:90a:f413:: with SMTP id ch19mr2650547pjb.19.1643104781737;
+        Tue, 25 Jan 2022 01:59:41 -0800 (PST)
 Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.37
+        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.39
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jan 2022 01:59:39 -0800 (PST)
+        Tue, 25 Jan 2022 01:59:41 -0800 (PST)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 09/19] KVM: x86/svm: Remove unused "svm" of sev_es_prepare_guest_switch()
-Date:   Tue, 25 Jan 2022 17:58:59 +0800
-Message-Id: <20220125095909.38122-10-cloudliang@tencent.com>
+Subject: [PATCH 10/19] KVM: x86/sev: Remove unused "kvm" of sev_unbind_asid()
+Date:   Tue, 25 Jan 2022 17:59:00 +0800
+Message-Id: <20220125095909.38122-11-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20220125095909.38122-1-cloudliang@tencent.com>
 References: <20220125095909.38122-1-cloudliang@tencent.com>
@@ -71,55 +71,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-The "struct vcpu_svm *svm" parameter of sev_es_prepare_guest_switch()
-is not used, so remove it. No functional change intended.
+The "struct kvm *kvm" parameter of sev_unbind_asid() is not used,
+so remove it. No functional change intended.
 
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- arch/x86/kvm/svm/sev.c | 2 +-
- arch/x86/kvm/svm/svm.c | 2 +-
- arch/x86/kvm/svm/svm.h | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/sev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6a22798eaaee..eae234afe04e 100644
+index eae234afe04e..0727ac7221d7 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2902,7 +2902,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
- 					    sev_enc_bit));
+@@ -217,7 +217,7 @@ static void sev_decommission(unsigned int handle)
+ 	sev_guest_decommission(&decommission, NULL);
  }
  
--void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
-+void sev_es_prepare_guest_switch(unsigned int cpu)
+-static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
++static void sev_unbind_asid(unsigned int handle)
  {
- 	struct svm_cpu_data *sd = per_cpu(svm_data, cpu);
- 	struct vmcb_save_area *hostsa;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 744ddc7ad6ad..3e75ae834412 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1276,7 +1276,7 @@ static void svm_prepare_guest_switch(struct kvm_vcpu *vcpu)
- 	 * or subsequent vmload of host save area.
- 	 */
- 	if (sev_es_guest(vcpu->kvm)) {
--		sev_es_prepare_guest_switch(svm, vcpu->cpu);
-+		sev_es_prepare_guest_switch(vcpu->cpu);
- 	} else {
- 		vmsave(__sme_page_pa(sd->save_area));
- 	}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 47ef8f4a9358..0a749bbda738 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -622,7 +622,7 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
- void sev_es_init_vmcb(struct vcpu_svm *svm);
- void sev_es_vcpu_reset(struct vcpu_svm *svm);
- void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
--void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
-+void sev_es_prepare_guest_switch(unsigned int cpu);
- void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+ 	struct sev_data_deactivate deactivate;
  
- /* vmenter.S */
+@@ -363,7 +363,7 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	/* return handle to userspace */
+ 	params.handle = start.handle;
+ 	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params))) {
+-		sev_unbind_asid(kvm, start.handle);
++		sev_unbind_asid(start.handle);
+ 		ret = -EFAULT;
+ 		goto e_free_session;
+ 	}
+@@ -1426,7 +1426,7 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (copy_to_user((void __user *)(uintptr_t)argp->data,
+ 			 &params, sizeof(struct kvm_sev_receive_start))) {
+ 		ret = -EFAULT;
+-		sev_unbind_asid(kvm, start.handle);
++		sev_unbind_asid(start.handle);
+ 		goto e_free_session;
+ 	}
+ 
+@@ -2078,7 +2078,7 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		}
+ 	}
+ 
+-	sev_unbind_asid(kvm, sev->handle);
++	sev_unbind_asid(sev->handle);
+ 	sev_asid_free(sev);
+ }
+ 
 -- 
 2.33.1
 
