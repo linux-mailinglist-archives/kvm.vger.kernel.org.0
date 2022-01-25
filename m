@@ -2,107 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA9A149AFAC
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 10:16:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8530C49B049
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 10:42:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1453532AbiAYJP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 04:15:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46518 "EHLO
+        id S1573673AbiAYJbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 04:31:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1455703AbiAYJGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:06:05 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DEBCC06118F
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 00:50:48 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id n32so9961747pfv.11
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 00:50:48 -0800 (PST)
+        with ESMTP id S1455873AbiAYJHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:07:47 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7242FC0604E1
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 00:52:32 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id c3so18576544pls.5
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 00:52:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=WpVbBkGVuYAEOTubZPIVkilPzINucv+qEAj8FIbI7Eo=;
-        b=SjqcvJfmWT0LsSwKjLl8/oGty8JaGm5hpMzu76P1PSvKSeC9LqJG+1wXghK/zmBdJX
-         qhqwfdMVbkhpp3zA35nVfS4kBFUNsAeaF9OLoms0rPTVihXNZKAGiLblSjNID0iRGLOu
-         ytMuyivulEfCH1MZ4wjmwzCAnOxox/TD94/7b6Sftqf3Bn48N9DlXmy3IWLsin5tQSIq
-         VtJ7el8ULiGNPnyDl0IKBo6tYoNRIyhv1yw6ijkaoDgrZzI6OD8e+mn7jCGXQGHpa2p5
-         XRkWVVakd/2VqTlXPbq1KDIhMSH/iap/cCibF76qi4XJQF8oRpUZFPm4udqyVfmob0tT
-         33KQ==
+        bh=z6BUBIXxwk4JS7jq5Yl7ItB5kjOCwOltRASPAnQYIJw=;
+        b=isin369zUSC40ktqW1doEJCXWOEH1OU5ukhknSdIN4RWE4rkPLugFGrL4HYjTnuK9p
+         Y8jFQpCuI/ESuhyEQhI9LBentgNgik6941Y2a0pJ2mPikrhj6FYXExGQATyUT68+1HHe
+         iNxyCvMdyw+C6J5lP5q4tKtmBJVLcad6GMqokKtHlzsva6c/phxQkw6HCaXwT0PDvtD5
+         T4T3R+T4mNGjUkhXriMwlsTj0TSmjoj3gG0bspRcezdlrC4b1kuCSQmWYneNBET3mm7+
+         FRw0WmyHpjKPEFqEtftPkDOIAs5kcF9vaSFfQFoNKMD0hCWUUnMfpxLaeUQPwQjUcYeM
+         mcvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=WpVbBkGVuYAEOTubZPIVkilPzINucv+qEAj8FIbI7Eo=;
-        b=ZkYwur1dbTwx7eXCrX4Zk1grP9LIE1dpgiDhQ+EOSsKthXsGp+oxq48bUMT0c6wxd9
-         E+Wbz4b+OQ9mZk7MOsT3E+A5UrC+0PTJ5QvzveA9SiYBbKBidRiG4IsFYefWWhv0cp2s
-         YAlhfe85mALNcsneFkKAMVauEVQryV1B6X4sp4PvdyyPHEEhjKm7o+607VRTZVhhUAz5
-         jsAR7vMwAoM2OZNKnI60ORROZGkqy8F4MxghcVpKEnjXGPQKSFmUxITXuAg0QjwM+5Vj
-         TMzG19Opj8Gvp8MASP93mZ4ul+Z/tFK7B4lEXKxtL5oqmva0rMAQLNzltNCC44s3b4vU
-         oWow==
-X-Gm-Message-State: AOAM5322/qOjaJuMv9Ci0eWUDBNyvDtDogCWJulnQ6kOtpn18PQ9fdRA
-        6982KRoA+6fcV+uHYEzv45mXdmXgKtROqbSXvUGTxQ==
-X-Google-Smtp-Source: ABdhPJwqX8GsZEMUBsU+KrzF/fAqCLjp+zS06T9nv57NrxBtnCsMNA5eiRqCSmPTIbg7/wLyDlXtIiURagwkkqHNiS8=
-X-Received: by 2002:a63:e805:: with SMTP id s5mr14747932pgh.369.1643100647835;
- Tue, 25 Jan 2022 00:50:47 -0800 (PST)
+        bh=z6BUBIXxwk4JS7jq5Yl7ItB5kjOCwOltRASPAnQYIJw=;
+        b=F3OmAAuk5Usv1Ys4nd0QdQmF4AJ+NMfYRyDH628upo/9fb7jvtrTwBow2BMWLXC3D3
+         O6O0eRwkpUy3IsOFX10acxm46v/vJHRTrASAb08tJM99fDo1kuzfyGN7fwDTd3vBBRRk
+         i5qz54vShHaVJiIKwfMjHunzywohHZVPAIVMbkF/czB8sBlvWmHyhQjFC4XanGmncAow
+         JgGJBx1n5p69H2v6VAGnVYCeke+pag76D8Q6/DgdcyZ6vI6iNF0WL0zI7dOMYugqOJ3g
+         pxG1U5Iys8RRLo4mZROWuiCY3GG3oFIFQFYbzGqStyvSTYaSaQl8OwHwmKzDSzUAFYIT
+         ZQXQ==
+X-Gm-Message-State: AOAM532K+xia+CLPG+Uh6SylgV2Jbil8v7jMiJnA53RawryPlbKh07Ia
+        uyvTZxFlA0snGqF80yiRVSmjVFUx35FJ9nzeqD4oAw==
+X-Google-Smtp-Source: ABdhPJyJCDBExRKo1Z2uaO9BO1hoBiSILCxHvfufTUddE7i5PKusvobUkxXsUsTI4l9zR+XhF8mPIQT697Ywp8srQVA=
+X-Received: by 2002:a17:90b:1881:: with SMTP id mn1mr2400939pjb.236.1643100751744;
+ Tue, 25 Jan 2022 00:52:31 -0800 (PST)
 MIME-Version: 1.0
-References: <20220123195337.509882-1-ayushranjan@google.com>
- <45a6395e-63f3-12b2-e6d1-52ccf00272e7@redhat.com> <Ye7cNMZku7jlRHa+@google.com>
-In-Reply-To: <Ye7cNMZku7jlRHa+@google.com>
+References: <20220123195239.509528-1-ayushranjan@google.com> <Ye7gykcvjig7aPNM@google.com>
+In-Reply-To: <Ye7gykcvjig7aPNM@google.com>
 From:   Ayush Ranjan <ayushranjan@google.com>
-Date:   Tue, 25 Jan 2022 00:50:12 -0800
-Message-ID: <CALqkrRWD53MsHUYTDQ9+BiSD27uYUGNtU6pPeD3yiUwtJy2_jA@mail.gmail.com>
-Subject: Re: [PATCH] gvisor: add some missing definitions to vmx.h
+Date:   Tue, 25 Jan 2022 00:51:55 -0800
+Message-ID: <CALqkrRUVVEiM9HxOCffVVDczxBr7yGCw4r0vdH1W0K0B4+h6iQ@mail.gmail.com>
+Subject: Re: [PATCH] x86: add additional EPT bit definitions
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ben Gardon <bgardon@google.com>,
         Jim Mattson <jmattson@google.com>,
         Andrei Vagin <avagin@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>
+        linux-kernel@vger.kernel.org, Michael Pratt <mpratt@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Abandoning this patch in favor of the more complete series of work quoted above.
+Abandoning this patch.
 
-On Mon, Jan 24, 2022 at 9:04 AM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Jan 24, 2022 at 9:24 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Mon, Jan 24, 2022, Paolo Bonzini wrote:
-> > On 1/23/22 20:53, Ayush Ranjan wrote:
-> > > From: Michael Davidson <md@google.com>
-> > >
-> > > gvisor needs definitions for some additional secondary exec controls.
-> > >
-> > > Tested: builds
-> > > Signed-off-by: Ayush Ranjan <ayushranjan@google.com>
-> > > Signed-off-by: Michael Davidson <md@google.com>
+> On Sun, Jan 23, 2022, Ayush Ranjan wrote:
+> > From: Michael Pratt <mpratt@google.com>
 > >
-> > Incorrect order of the Signed-off-by header (author goes first, submitter
-> > goes last).
-> >
-> > > ---
-> > >   arch/x86/include/asm/vmx.h | 1 +
-> > >   1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> > > index c77ad687cdf7..df40dc568eb9 100644
-> > > --- a/arch/x86/include/asm/vmx.h
-> > > +++ b/arch/x86/include/asm/vmx.h
-> > > @@ -67,6 +67,7 @@
-> > >   #define SECONDARY_EXEC_ENCLS_EXITING              VMCS_CONTROL_BIT(ENCLS_EXITING)
-> > >   #define SECONDARY_EXEC_RDSEED_EXITING             VMCS_CONTROL_BIT(RDSEED_EXITING)
-> > >   #define SECONDARY_EXEC_ENABLE_PML               VMCS_CONTROL_BIT(PAGE_MOD_LOGGING)
-> > > +#define SECONDARY_EXEC_EPT_VE                      VMCS_CONTROL_BIT(EPT_VIOLATION_VE)
-> > >   #define SECONDARY_EXEC_PT_CONCEAL_VMX             VMCS_CONTROL_BIT(PT_CONCEAL_VMX)
-> > >   #define SECONDARY_EXEC_XSAVES                     VMCS_CONTROL_BIT(XSAVES)
-> > >   #define SECONDARY_EXEC_MODE_BASED_EPT_EXEC        VMCS_CONTROL_BIT(MODE_BASED_EPT_EXEC)
-> >
-> > I'm not sure why gvisor would care about an internal Linux header. gvisor
-> > should only use arch/x86/include/uapi headers.
+> > Used in gvisor for EPT support.
 >
-> It's Google-internal kernel crud, this patch should not be merged.  Though with a
-> bit of patience, an equivalent patch will come with TDX support.  If we do merge
-> something before TDX, I'd strongly prefer to take that "complete" version with a
-> rewritten changelog.
+> As you may have surmised from the other patch, the changelogs from patches carried
+> in our internal kernels rarely meet the criteria for acceptance upstream.  E.g. this
+> doesn't provide sufficient justification since there's obviously no in-kernel gvisor
+> that's consuming this.
 >
-> [*] https://lore.kernel.org/all/e519d6ae1e75a4bea494bb3940e1272e935ead18.1625186503.git.isaku.yamahata@intel.com
+> Submitting patches that we carry internally is perfectly ok, but there needs to be
+> sufficient justfication, and the patch needs to follow the rules laid out by
+> Documentation/process/submitting-patches.rst.
+>
+> > Tested: Builds cleanly
+> > Signed-off-by: Ayush Ranjan <ayushranjan@google.com>
+> > Signed-off-by: Michael Pratt <mpratt@google.com>
+> > ---
+> >  arch/x86/include/asm/vmx.h | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> > index 0ffaa3156a4e..c77ad687cdf7 100644
+> > --- a/arch/x86/include/asm/vmx.h
+> > +++ b/arch/x86/include/asm/vmx.h
+> > @@ -496,7 +496,9 @@ enum vmcs_field {
+> >  #define VMX_EPT_WRITABLE_MASK                        0x2ull
+> >  #define VMX_EPT_EXECUTABLE_MASK                      0x4ull
+> >  #define VMX_EPT_IPAT_BIT                     (1ull << 6)
+> > -#define VMX_EPT_ACCESS_BIT                   (1ull << 8)
+> > +#define VMX_EPT_PSE_BIT                              (1ull << 7)
+>
+> I'm not a fan of "PSE", it's unnecessarily terse and "PSE" has different meaning
+> in IA32 paging.  VMX_EPT_PAGE_SIZE_BIT would be choice.
+>
+> As for justification, something that has been mentioned once or thrice is the lack
+> of build-time assertions that the PT_* bits in mmu.h that are reused for EPT entries
+> do indeed match the EPT definitions.  I can throw together a patch/series to add
+> that and do the below cleanup.
+>
+> > +#define VMX_EPT_ACCESS_SHIFT                 8
+>
+> I'd prefer we don't define the "shifts" for EPT (or PTE) bits, they really shouldn't
+> be used as doing things like test_and_clear_bit() via a shift value can generate
+> unnecessary lock instructions.  arch/x86/kvm/mmu.h could use a bit of spring cleaning
+> in this regard.
+>
+> > +#define VMX_EPT_ACCESS_BIT                   (1ull << VMX_EPT_ACCESS_SHIFT)
+> >  #define VMX_EPT_DIRTY_BIT                    (1ull << 9)
+> >  #define VMX_EPT_RWX_MASK                        (VMX_EPT_READABLE_MASK |       \
+> >                                                VMX_EPT_WRITABLE_MASK |       \
+> > --
+> > 2.35.0.rc0.227.g00780c9af4-goog
+> >
