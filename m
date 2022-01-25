@@ -2,115 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1CC049AE05
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 09:32:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8992749AF9F
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 10:15:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352891AbiAYIaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 03:30:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46905 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1450454AbiAYI15 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 03:27:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643099276;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xGAGC8ZSjobiyDfU0CWYjPdtebj6fAowX1E7dpabtwo=;
-        b=h7srgkEhudQxcGQNpJ+7hgupuIc4FXN8lolhOR6S/6j5/QlNnL7ihaznqtUynbwGFSX0q4
-        93hvRpP+EH+9pWQkGyfHcvsx6fdsE0jsPE3gKxB+u5+lC3RB0J5O7qRyLDh3RSIKv0frr7
-        TCru7mzCYC0PsUp6XDbD/3Mcv5os7j4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-428-7H6R4jghPkWS4Np3DFYDtw-1; Tue, 25 Jan 2022 03:27:55 -0500
-X-MC-Unique: 7H6R4jghPkWS4Np3DFYDtw-1
-Received: by mail-ed1-f70.google.com with SMTP id bc24-20020a056402205800b00407cf07b2e0so4022540edb.8
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 00:27:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xGAGC8ZSjobiyDfU0CWYjPdtebj6fAowX1E7dpabtwo=;
-        b=3Ycc4RF6xwDxVXDqKSPXh3e51s7RIjODFN6unVnwKK4zRz/jsEJIa0fGRLW6vUZtHJ
-         iZcTQ/17y1Vms5RpYH9mdzLLeV2qGXqbE972aLCc6hOpiCWWitOhYSLKWsFXZ+Is9XOH
-         WVenzHo0j6A5Xv4WvE74FVJKAuoCGTH+iRdvr3UtdPsN13xp2OXNNb6D5rPy8DUglIZu
-         dGbexyrsM9Bdfuw0BjnA/auBR+Kbts+FPoPDz/Hc5daLv6tXqLmlLM4dnWLAXbrhYXEj
-         FTMonfjG4+woLrAQWnXEsqdohMH0W0fRBvtujnb9UbTXWrMXDNo1YQzAl0GLNAntwARf
-         qXUg==
-X-Gm-Message-State: AOAM530DOg8S74z9qnGjqSoAkfei4OEdLKbEW4GRISzf1MNXVgCsWRM7
-        3eN1yeyzgiqxmY92Dqdmm7h6jyvkkh5OXkGmX1z/yAFJFgFKsEqcrBpXFgmv+fqlEeQLqO6AfVn
-        OBgBqxcV5yVvn
-X-Received: by 2002:a05:6402:11ca:: with SMTP id j10mr19666876edw.169.1643099274040;
-        Tue, 25 Jan 2022 00:27:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzCXChr6Nh3ynRGb84TO3tGZbNPGj7Pfqsa1dBNHIpYahatyjTZ5IoE6kYc3KjFcQ9PBgrAMg==
-X-Received: by 2002:a05:6402:11ca:: with SMTP id j10mr19666860edw.169.1643099273816;
-        Tue, 25 Jan 2022 00:27:53 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id a11sm7867537edv.76.2022.01.25.00.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jan 2022 00:27:53 -0800 (PST)
-Message-ID: <f00d0e56-e5d3-4ac6-1519-fa843fb4d734@redhat.com>
-Date:   Tue, 25 Jan 2022 09:27:47 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86/cpuid: Exclude unpermitted xfeatures for
- vcpu->arch.guest_supported_xcr0
-Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     "Liu, Jing2" <jing2.liu@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-References: <20220123055025.81342-1-likexu@tencent.com>
- <BN9PR11MB52762E2DEF810DF9AFAE1DDC8C5E9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <38c1fbc3-d770-48f3-5432-8fa1fde033f5@gmail.com>
- <Ye7SbfPL/QAjOI6s@google.com>
- <e5744e0b-00fc-8563-edb7-b6bf52c63b0e@redhat.com>
- <BN9PR11MB5276170712A9EF842B36ACE48C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <BN9PR11MB5276170712A9EF842B36ACE48C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S1456776AbiAYJMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 04:12:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1455295AbiAYJDz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:03:55 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391B3C061756
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 00:45:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 952826137C
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 08:45:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01173C340E0;
+        Tue, 25 Jan 2022 08:45:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643100358;
+        bh=o5P0EESqXEiVqLSm7A8kn65YVJDoZnbdLQ/5TGwA6to=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AEtTFdCq0bI0DCfv/5Ls9NQG93g5YJ6Wf4Anx9xGjdianL5hrM0D8s78lGOPZpcua
+         Jz7jRQoGPJpvOj4PQGRIcZLoLTAaNvIcwkMabkmepjehhkJ0tDkfFoPTYLxkM6+lpb
+         jY8WJmEPoc0K38vP0kZHAI/5sVgVkII2ysOPVqHKx9crzpGxy6I9LZd+TnrxsT6HUB
+         eKiGfDJ/ZoJS/4AgjESgdGMTBKJL5Pjc3CwEjs0xAiKY13k8PWO+nNdyYMtJEfrwYX
+         1ecGC968iT2a1uHckwxaq6i7ICowBvjzkqMFcwgDtXuXW/oXopeQgA3EWfh0DgPPPH
+         Kj04X7tpRdPxw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nCHSd-002nE7-CG; Tue, 25 Jan 2022 08:45:55 +0000
+Date:   Tue, 25 Jan 2022 08:45:54 +0000
+Message-ID: <875yq88app.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        pshier@google.com, ricarkol@google.com, reijiw@google.com,
+        jingzhangos@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+References: <YSVhV+UIMY12u2PW@google.com>
+        <87mtp5q3gx.wl-maz@kernel.org>
+        <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+        <87fsuxq049.wl-maz@kernel.org>
+        <20210825150713.5rpwzm4grfn7akcw@gator.home>
+        <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+        <877dg8ppnt.wl-maz@kernel.org>
+        <YSfiN3Xq1vUzHeap@google.com>
+        <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
+        <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+        <87ilyitt6e.wl-maz@kernel.org>
+        <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+        <87lf3drmvp.wl-maz@kernel.org>
+        <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+        <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org, seanjc@google.com, oupton@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/22 02:54, Tian, Kevin wrote:
->> The extra complication is that arch_prctl(ARCH_REQ_XCOMP_GUEST_PERM)
->> changes what host userspace can/can't do.  It would be easier if we
->> could just say that KVM_GET_SUPPORTED_CPUID returns "the most" that
->> userspace can do, but we already have the contract that userspace can
->> take KVM_GET_SUPPORTED_CPUID and pass it straight to KVM_SET_CPUID2.
->>
->> Therefore,  KVM_GET_SUPPORTED_CPUID must limit its returned values to
->> what has already been enabled.
->>
->> While reviewing the QEMU part of AMX support (this morning), I also
->> noticed that there is no equivalent for guest permissions of
->> ARCH_GET_XCOMP_SUPP.  This needs to know KVM's supported_xcr0, so it's
->> probably best realized as a new KVM_CHECK_EXTENSION rather than as an
->> arch_prctl.
->>
-> Would that lead to a weird situation where although KVM says no support
-> of guest permissions while the user can still request them via prctl()?
+On Tue, 25 Jan 2022 03:47:04 +0000,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> Hello all,
+> 
+> Based on the recent discussion on the patch '[RFC PATCH v3 01/11] KVM:
+> Capture VM start' [1], Reiji, I (and others in the team) were
+> wondering, since the hypercall feature-map is technically per-VM and
+> not per-vCPU, would it make more sense to present it as a kvm_device,
+> rather than vCPU psuedo-registers to the userspace?
 
-This is already the case for the current implementation of 
-KVM_GET_SUPPORTED_CPUID.
+I really don't think so.
 
-Paolo
+> If I understand correctly, the original motivation for going with
+> pseudo-registers was to comply with QEMU, which uses KVM_GET_REG_LIST
+> and KVM_[GET|SET]_ONE_REG interface, but I'm guessing the VMMs doing
+> save/restore across migration might write the same values for every
+> vCPU.
 
-> I wonder whether it's cleaner to do it still via prctl() if we really want to
-> enhance this part. But as you said then it needs a mechanism to know
-> KVM's supported_xcr0 (and if KVM is not loaded then no guest permission
-> support at all)...
+KVM currently restricts the vcpu features to be unified across vcpus,
+but that's only an implementation choice. The ARM architecture doesn't
+mandate that these registers are all the same, and it isn't impossible
+that we'd allow for the feature set to become per-vcpu at some point
+in time. So this argument doesn't really hold.
 
+Furthermore, compatibility with QEMU's save/restore model is
+essential, and AFAICT, there is no open source alternative.
+
+> Granted that we would be diverging from the existing implementation
+> (psci versioning and spectre WA registers), but this can be a cleaner
+> way forward for extending hypercall support.
+
+Cleaner? Why? How? You'd have the exact same constraints, plus the
+disadvantages of having to maintain a new interface concurrently with
+the existing ones.
+
+> The kvm_device interface
+> can be made backward compatible with the way hypercalls are exposed
+> today, it can have the same registers/features discovery mechanisms
+> that we discussed above, and majorly the userspace has to configure it
+> only once per-VM. We can probably make the feature selection immutable
+> just before any vCPU is created.
+
+What is the problem with immutability on first run? Or even with a
+'finalize' ioctl (we already have one)?
+
+> 
+> Please let me know your thoughts or any disadvantages that I'm overlooking.
+
+A device means yet another configuration and migration API. Don't you
+think we have enough of those? The complexity of KVM/arm64 userspace
+API is already insane, and extremely fragile. Adding to it will be a
+validation nightmare (it already is, and I don't see anyone actively
+helping with it).
+
+So no, I have no plan to consider anything but the GET/SET_ONE_REG
+interface, and until someone writes another open source VMM that has
+the same save/restore capabilities and proves that this interface
+isn't fit for purpose, I see no incentive in deviating from a model
+that is known to work.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
