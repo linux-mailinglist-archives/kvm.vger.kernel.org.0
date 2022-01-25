@@ -2,162 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E2DA49B71A
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 16:02:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11B7049B752
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 16:13:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1389699AbiAYPAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 10:00:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3900 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1581111AbiAYO51 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 09:57:27 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20PElpep016074;
-        Tue, 25 Jan 2022 14:57:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Nf3VGbuEa9NgDLjSbsvh58gLX9qjCGzfLwEMH/artt4=;
- b=QIOD+RwLSNZCcyR1DLNcQVs4qBiKcD4bF4E+FGB86CF34WzfUtRsfOQGTW9prqT5J4bi
- QW6o/FKQ2MhiA58XdjsjbEyLRQRNmXqfE9onu5y6HfGMnQ1C0GpYMowz0yilk/q4YvWl
- 5PhOTb9ruVXRAZC/5J3JMt7RQJAONLcDnK3ji+Mc1k3cC//AZeZhjtBaThv5JByF7G+Q
- IfVXa7q1iz97hVEJ5oECvcKQhheWgPsv6k3XDKW5l7KymA6uZeCdhmHQMhLh0gPz7Uov
- EvQkvNPpRbcKlWD5AUXuO/KO+Xc6RRe2nArpTTV3Y4RxeruZbHCJ9M8i3SEnmVT0Uuah jA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dtk9h86mx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 14:57:21 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20PEvLhn010292;
-        Tue, 25 Jan 2022 14:57:21 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dtk9h86mg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 14:57:21 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20PEv1e9017165;
-        Tue, 25 Jan 2022 14:57:20 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma02dal.us.ibm.com with ESMTP id 3dt1x9e6tc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 14:57:20 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20PEvIRG23003470
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jan 2022 14:57:18 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE8AEC606E;
-        Tue, 25 Jan 2022 14:57:18 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E8241C6067;
-        Tue, 25 Jan 2022 14:57:16 +0000 (GMT)
-Received: from [9.163.21.206] (unknown [9.163.21.206])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jan 2022 14:57:16 +0000 (GMT)
-Message-ID: <2d9c8cd8-94cf-a1aa-e5e9-d25f607b0b67@linux.ibm.com>
-Date:   Tue, 25 Jan 2022 09:57:16 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v2 15/30] KVM: s390: pci: do initial setup for AEN
- interpretation
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-16-mjrosato@linux.ibm.com>
- <9df849f6-dd99-93ea-8e35-3daffd38e694@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <9df849f6-dd99-93ea-8e35-3daffd38e694@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MSQrLXi2GrqVvHFcDLOY20_s4TOyKrA7
-X-Proofpoint-GUID: nUSSeGzWLQ0nC3Ff0GZT5tPGmmMt9wrM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-25_02,2022-01-25_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- phishscore=0 bulkscore=0 adultscore=0 clxscore=1015 malwarescore=0
- spamscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201250094
+        id S1581822AbiAYPN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 10:13:29 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:48054 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1581574AbiAYPLD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 10:11:03 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 33B14B81817;
+        Tue, 25 Jan 2022 15:10:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB4B6C340E5;
+        Tue, 25 Jan 2022 15:10:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643123454;
+        bh=827Zl6UTbu4+DODgqO5pwb2rOj9GCDpTQYVElhmcxEk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=vAftbCY6wfyApG6ImaV7i4/RB+857+ZVJG5aasCxCyYUaBgWyju/37RZVSeoZNQm0
+         ePQJq1yfPtHz4E8LAG23pqp6Qv/305+5RSMdyf0B5jQBw6hD6ICgWZpFk6i+NnNza+
+         Z/RdHWNh35bj5WVSklD+twb6YCCMMatGVd6+iKjvbkl4BStJa2nGmLEUXJ6d0Jz/AO
+         JCejWJ3Ycz3eIX85LP9y0t5BNE58/3caA4QzIW98rCKZ14mE/rYjPl2YI8wxPUKGOf
+         0eaE+/Qf7d1W8U//CIG4h4EhNiaximmfy8drzLYznmu22dubxrKEpTWOXMR3jlijiO
+         v7xGW9oF4LMzA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nCNTA-002wXr-LC; Tue, 25 Jan 2022 15:10:52 +0000
+Date:   Tue, 25 Jan 2022 15:10:52 +0000
+Message-ID: <87pmof7sw3.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        linux-kernel@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+In-Reply-To: <YeBfj89mIf8SezfD@google.com>
+References: <20220104194918.373612-1-rananta@google.com>
+        <20220104194918.373612-2-rananta@google.com>
+        <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+        <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+        <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+        <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+        <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
+        <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+        <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+        <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
+        <YeBfj89mIf8SezfD@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, rananta@google.com, jmattson@google.com, kvm@vger.kernel.org, will@kernel.org, pshier@google.com, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/22 7:23 AM, Pierre Morel wrote:
-> 
-> 
-> On 1/14/22 21:31, Matthew Rosato wrote:
->> Initial setup for Adapter Event Notification Interpretation for zPCI
->> passthrough devices.  Specifically, allocate a structure for 
->> forwarding of
->> adapter events and pass the address of this structure to firmware.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/pci.h      |   4 +
->>   arch/s390/include/asm/pci_insn.h |  12 +++
->>   arch/s390/kvm/interrupt.c        |  14 +++
->>   arch/s390/kvm/kvm-s390.c         |   9 ++
->>   arch/s390/kvm/pci.c              | 144 +++++++++++++++++++++++++++++++
->>   arch/s390/kvm/pci.h              |  42 +++++++++
->>   arch/s390/pci/pci.c              |   6 ++
->>   7 files changed, 231 insertions(+)
->>   create mode 100644 arch/s390/kvm/pci.h
->>
-> ...snip...
-> 
->> new file mode 100644
->> index 000000000000..b2000ed7b8c3
->> --- /dev/null
->> +++ b/arch/s390/kvm/pci.h
->> @@ -0,0 +1,42 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * s390 kvm PCI passthrough support
->> + *
->> + * Copyright IBM Corp. 2021
->> + *
->> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
->> + */
->> +
->> +#ifndef __KVM_S390_PCI_H
->> +#define __KVM_S390_PCI_H
->> +
->> +#include <linux/pci.h>
->> +#include <linux/mutex.h>
->> +#include <asm/airq.h>
->> +#include <asm/kvm_pci.h>
->> +
->> +struct zpci_gaite {
->> +    u32 gisa;
->> +    u8 gisc;
->> +    u8 count;
->> +    u8 reserved;
->> +    u8 aisbo;
->> +    u64 aisb;
->> +};
->> +
->> +struct zpci_aift {
->> +    struct zpci_gaite *gait;
->> +    struct airq_iv *sbv;
->> +    struct kvm_zdev **kzdev;
->> +    spinlock_t gait_lock; /* Protects the gait, used during AEN 
->> forward */
->> +    struct mutex lock; /* Protects the other structures in aift */
-> 
-> To facilitate review and debug, can we please rename the lock aift_lock?
-> 
-> 
+It's probably time I jump on this thread
 
-OK, sure
+On Thu, 13 Jan 2022 17:21:19 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
+> > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
+> > > Perhaps it would help if you explained *why* you are doing this. It
+> > > sounds like you are either trying to protect against a malicious
+> > > userspace, or you are trying to keep userspace from doing something
+> > > stupid. In general, kvm only enforces constraints that are necessary
+> > > to protect the host. If that's what you're doing, I don't understand
+> > > why live migration doesn't provide an end-run around your protections.
+> > It's mainly to safeguard the guests. With respect to migration, KVM
+> > and the userspace are collectively playing a role here. It's up to the
+> > userspace to ensure that the registers are configured the same across
+> > migrations and KVM ensures that the userspace doesn't modify the
+> > registers after KVM_RUN so that they don't see features turned OFF/ON
+> > during execution. I'm not sure if it falls into the definition of
+> > protecting the host. Do you see a value in adding this extra
+> > protection from KVM?
+> 
+> Short answer: probably not?
 
+Well, I beg to defer.
+
+> There is precedent for disallowing userspace from doing stupid
+> things, but that's either for KVM's protection (as Jim pointed out),
+> or because KVM can't honor the change, e.g. x86 is currently in the
+> process of disallowing most CPUID changes after KVM_RUN because KVM
+> itself consumes the CPUID information and KVM doesn't support
+> updating some of it's own internal state (because removing features
+> like GB hugepage support is nonsensical and would require a large
+> pile of complicated, messy code).
+
+We provide quite a lot of CPU emulation based on the feature
+registers exposed to the guest. Allowing userspace to change this
+stuff once the guest is running is a massive attack vector.
+
+> Restricing CPUID changes does offer some "protection" to the guest, but that's
+> not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
+> case, and trying to do so is a fool's errand.
+> 
+> If restricting updates in the arm64 is necessary to ensure KVM provides sane
+> behavior, then it could be justified.  But if it's purely a sanity check on
+> behalf of the guest, then it's not justified.
+
+No. This is about preventing userspace from tripping the kernel into
+doing things it really shouldn't by flipping bits of configuration
+that should be set in stone.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
