@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B32B49B11B
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C804749B119
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:03:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238732AbiAYKCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 05:02:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59664 "EHLO
+        id S238369AbiAYKCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 05:02:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238382AbiAYJ7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238387AbiAYJ7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 25 Jan 2022 04:59:25 -0500
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4C2C061401;
-        Tue, 25 Jan 2022 01:59:22 -0800 (PST)
-Received: by mail-pj1-x1043.google.com with SMTP id d5so17022438pjk.5;
-        Tue, 25 Jan 2022 01:59:22 -0800 (PST)
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52148C061747;
+        Tue, 25 Jan 2022 01:59:25 -0800 (PST)
+Received: by mail-pg1-x541.google.com with SMTP id h23so17806688pgk.11;
+        Tue, 25 Jan 2022 01:59:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=zds+6NGj4r5Cgf49TNd0ICEUzlDMHJlb5d/51ngIGcY=;
-        b=FPq9Vcjqt0nTW+XIHcP+SFASqW+hp1tbi/NDSAy5DGJNynrClbaVord3oKGHXwgk0e
-         y1yov5feI2dwoI5FcjI0YIXpZJhLWRyf2vT1R/KvWLhNaNk6FHVAMofkk/UxEbwAw6fh
-         r5IsdNml1hDxTvdyJ+Iv4Yf6Wcjud8kQ4DEwdXWtsxrumZKgzFwgbSv4Gi+7Zk8KA7kV
-         3YrhRRtt98L2nrt4AYjLwG1MyTex+0YqaVtOCkAG0xVNwORhZDrIgP2A61Ysd3fVO72Q
-         Xww2Jf2mMfK+6gXVbmOopE3KHM0UpPP9j8cAU2QzgPtekl0fFrH3KWw5GsnEuf7YMI9+
-         UrqA==
+        bh=sFcu61MZ2RkaH+ZyWsgAfQkoqzX6pbxtu6BZspxx0Xc=;
+        b=QT54k1tCufiOx+YVxE6HumrP+DNXKuk5L+k+bjRS0b2lw1vWHg8wr5sYQ2uUxoFexl
+         DIwVskQW4gsK2jXahHsK53XODLiZAsfYdSZGP9rpCiyhFh3769ccPuYXWSZci5StAKf9
+         uiI8Hhs0PVvrrFO+66DdGOuKaa03btdF17R4JaWwJGw+JYBF2m+fcCcMf7rjJgy7A/OZ
+         PlppjIIwNKSGcsxteWYCXJ55c+EoJg8d7k8o6EebGgW8RWvtwM9qwogKUW5nry7r81Iv
+         ssHvaD2ENoU3mhjVBg7xOKuAsWjnT0egZn/K7ticw2I0tWsYGmkjLEmu6wJjlE6LVJ74
+         ixrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=zds+6NGj4r5Cgf49TNd0ICEUzlDMHJlb5d/51ngIGcY=;
-        b=p5jAt7ihPfBADiJyFsdF/7R2IARyniBlBEcSjKHzbaqWsQk40vGa+u957/7lN4MV5l
-         yyRkwhYSdFbY612CbX1aHb0NCIeTXkJnDGiNoY2f2vWktIyxj5T+mvMElIHt7F09dFif
-         j0uuwxYoLOJs1LfK7kRKRhNaa9EGa2AEppXS1+UrPV8C4C9ZV1efucGSNWckwdW534ir
-         vYJGfiNIlaAfSU1xkxfLYQg4oNW5NgvdGXigsMCDR4F9RBgIU7hXQ53nnZngPZhbxVtW
-         RscCGBJQtRz5bdFTZI2EnzrscORp8Rb+RoJhvhTDfDTaoUYC8vpzgGiemt2AHMc/LjJT
-         cY4Q==
-X-Gm-Message-State: AOAM531jlWWrGM6gKODj+MulQ6e3LI2m7t7TB2H+Sv3+YEK7ZtZW3Y2A
-        FE1qmkywuIFU3tncXLLdJ/A=
-X-Google-Smtp-Source: ABdhPJyJ/kfuWDn6T2bse0t/3zBL2P2KyOlJhtUHjbpznQcxoh4DcmAlrs6pIXWssTrGtABK9yzabA==
-X-Received: by 2002:a17:903:24d:b0:149:b68f:579 with SMTP id j13-20020a170903024d00b00149b68f0579mr18675922plh.1.1643104762396;
-        Tue, 25 Jan 2022 01:59:22 -0800 (PST)
+        bh=sFcu61MZ2RkaH+ZyWsgAfQkoqzX6pbxtu6BZspxx0Xc=;
+        b=FL+Yhyoko8+80DSfTEQ0vEnT6DpIIF/ucKV6g1gGYw0Vj/LjKZNE+L7ynw/CYfg4jX
+         JAHgm0yYthSECgbnOKDaEKVHbVaQIXnpLCFa8olSco34zhJccfWaH2Qk/olfXkF5fNMs
+         bULgvDrULZjwH+QSGyZwv8xRjAuJAIpT6k4lEWYIVd41USksNN4VNvfzM7MP4mDxGsyg
+         49Z/zzHtzf5V55GUeOc9I7GRPGZINHaA31v+QtPZ7HbkWRBUmESurrrc9ssJD5UQoNXa
+         hYotKZfMsIg42jVOy2fOYbGHVfqLl39Pl8+TcQ8ABoN+QKy6KVQ+3RpMAK1wFw38eFn6
+         ARng==
+X-Gm-Message-State: AOAM531I/Yz5pXbwSfOIOiKmcabQ0zwRh+AigV1nC+VQDu+zYG9eyQN3
+        HcrKNfY6RPHuhsti2kdkF/8=
+X-Google-Smtp-Source: ABdhPJwquQamYHSxsC3lEIS7IKvKf6wBEC/mw7iq2LyFO56MVpNoYvwYoPIF2BtEN9I1Oi/rzpa04A==
+X-Received: by 2002:a63:2262:: with SMTP id t34mr14735801pgm.341.1643104764866;
+        Tue, 25 Jan 2022 01:59:24 -0800 (PST)
 Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.20
+        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.22
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jan 2022 01:59:22 -0800 (PST)
+        Tue, 25 Jan 2022 01:59:24 -0800 (PST)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 02/19] KVM: x86/mmu: Remove unused "kvm" of __rmap_write_protect()
-Date:   Tue, 25 Jan 2022 17:58:52 +0800
-Message-Id: <20220125095909.38122-3-cloudliang@tencent.com>
+Subject: [PATCH 03/19] KVM: x86/mmu: Remove unused "vcpu" of reset_{tdp,ept}_shadow_zero_bits_mask()
+Date:   Tue, 25 Jan 2022 17:58:53 +0800
+Message-Id: <20220125095909.38122-4-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20220125095909.38122-1-cloudliang@tencent.com>
 References: <20220125095909.38122-1-cloudliang@tencent.com>
@@ -71,55 +71,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-The "struct kvm *kvm" parameter of __rmap_write_protect()
-is not used, so remove it. No functional change intended.
+The "struct kvm_vcpu *vcpu" parameter of reset_ept_shadow_zero_bits_mask()
+and reset_tdp_shadow_zero_bits_mask() is not used, so remove it.
+
+No functional change intended.
 
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 305aa0c5026f..bb9791564ca9 100644
+index bb9791564ca9..b29fc88b51b4 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1229,8 +1229,7 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
- 	return mmu_spte_update(sptep, spte);
+@@ -4473,8 +4473,7 @@ static inline bool boot_cpu_is_amd(void)
+  * possible, however, kvm currently does not do execution-protection.
+  */
+ static void
+-reset_tdp_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
+-				struct kvm_mmu *context)
++reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+ {
+ 	struct rsvd_bits_validate *shadow_zero_check;
+ 	int i;
+@@ -4505,8 +4504,7 @@ reset_tdp_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
+  * is the shadow page table for intel nested guest.
+  */
+ static void
+-reset_ept_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
+-				struct kvm_mmu *context, bool execonly)
++reset_ept_shadow_zero_bits_mask(struct kvm_mmu *context, bool execonly)
+ {
+ 	__reset_rsvds_bits_mask_ept(&context->shadow_zero_check,
+ 				    reserved_hpa_bits(), execonly,
+@@ -4793,7 +4791,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+ 		context->gva_to_gpa = paging32_gva_to_gpa;
+ 
+ 	reset_guest_paging_metadata(vcpu, context);
+-	reset_tdp_shadow_zero_bits_mask(vcpu, context);
++	reset_tdp_shadow_zero_bits_mask(context);
  }
  
--static bool __rmap_write_protect(struct kvm *kvm,
--				 struct kvm_rmap_head *rmap_head,
-+static bool __rmap_write_protect(struct kvm_rmap_head *rmap_head,
- 				 bool pt_protect)
- {
- 	u64 *sptep;
-@@ -1311,7 +1310,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	while (mask) {
- 		rmap_head = gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
- 					PG_LEVEL_4K, slot);
--		__rmap_write_protect(kvm, rmap_head, false);
-+		__rmap_write_protect(rmap_head, false);
- 
- 		/* clear the first set bit */
- 		mask &= mask - 1;
-@@ -1410,7 +1409,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		for (i = min_level; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
- 			rmap_head = gfn_to_rmap(gfn, i, slot);
--			write_protected |= __rmap_write_protect(kvm, rmap_head, true);
-+			write_protected |= __rmap_write_protect(rmap_head, true);
- 		}
- 	}
- 
-@@ -5802,7 +5801,7 @@ static bool slot_rmap_write_protect(struct kvm *kvm,
- 				    struct kvm_rmap_head *rmap_head,
- 				    const struct kvm_memory_slot *slot)
- {
--	return __rmap_write_protect(kvm, rmap_head, false);
-+	return __rmap_write_protect(rmap_head, false);
+ static union kvm_mmu_role
+@@ -4947,7 +4945,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 	update_permission_bitmask(context, true);
+ 	context->pkru_mask = 0;
+ 	reset_rsvds_bits_mask_ept(vcpu, context, execonly, huge_page_level);
+-	reset_ept_shadow_zero_bits_mask(vcpu, context, execonly);
++	reset_ept_shadow_zero_bits_mask(context, execonly);
  }
+ EXPORT_SYMBOL_GPL(kvm_init_shadow_ept_mmu);
  
- void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
 -- 
 2.33.1
 
