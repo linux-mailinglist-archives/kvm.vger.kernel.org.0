@@ -2,101 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16CFD49BADB
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 19:02:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70CEA49BB76
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 19:45:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358625AbiAYSBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 13:01:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57936 "EHLO
+        id S233383AbiAYSor (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 13:44:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386981AbiAYR75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 12:59:57 -0500
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0155CC061755
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 09:59:53 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id q22so9266374ljh.7
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 09:59:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lFjB3Wm/k6WQfraTITgg2GtwyUa0VJgZe+4Lv6O2Co4=;
-        b=XC5zj1EbYhH7i02SUszkuxdEq0CFUvpTJK9gm5UwhigE44rfmwdE6x6nljyc4wBmr8
-         +9gzi8AOlUFfPFKEFqIwj+klWB2qDZbQlAPOxGka+SkqcGN9CjTVC/vwS1V1i/oD0S3+
-         S8hPQ3oIKDhd1uMCbsp5GLhly7UnWipGCxHLSRRYGY8TEOKQGZgJPMj5E+YcrG3H7ut5
-         7mFlRRRHYV3rnD9QBRZtPiCyULiclVVv7bpi9AsacwAYK3p7HDPXTtboG07mH0LllT/Y
-         nGLk5GMhdQNROjEBLCxP4tUiMaaqyA9Dy065MJcIDkpo5ihz6CFmqFHJiUd1/eegzCxE
-         pVrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lFjB3Wm/k6WQfraTITgg2GtwyUa0VJgZe+4Lv6O2Co4=;
-        b=jNofIPRXw01nqpDqZUWmGKr5JRM1QfK/AqvLTNc4qf3w0IdoQq85UpbjYoNxDxyuoi
-         wJymi+/8qw3Jy7czMT6cUi8ca6OpV7gCNIzsCzoYVHrTMns42ECJIT5Z4E9oKeFKYZZM
-         1wN1zSvngnwKhPODU/saSMp5GgnoK9By14cXM3EyVvxaLkQUgHZ51sOkb8ZEFUiuEi8c
-         3xt6zECH8R0z21I8f8Cma21oPDsaF39BMAk+CmrmEjMAfHLs6ODOWWeULkn24RcBemMw
-         lHYF2hqTMtxmw+yiQMehqJYcIY2VBIzsWdmQ5sNAXXoF76JWQ5Fi0idkNRgjYs6l5YBt
-         X86Q==
-X-Gm-Message-State: AOAM530jPgUArC2l8Xhn+IR0DcDrJbeOCr4ztwgY+93U/kxbWbvFPlq8
-        cVfwxg98tkYbncfmHfi6d58PHK1qeIAejYQftGSv3A==
-X-Google-Smtp-Source: ABdhPJxQ9nD4vwnn29xZGWj3D6iRwIXJNsR5YJoMUhf3PKdCUcgDUmQUmPwG7N4/S9I9QoC2u/Aky+rHtMS1l9BwtgY=
-X-Received: by 2002:a2e:8e73:: with SMTP id t19mr3579753ljk.132.1643133590805;
- Tue, 25 Jan 2022 09:59:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20220118110621.62462-1-nikunj@amd.com> <20220118110621.62462-4-nikunj@amd.com>
- <CAMkAt6rxeGZ3SpF9UoSW0U5XWmTNe-iSMc5jgCmOLP587J03Aw@mail.gmail.com> <04698792-95b8-f5b6-5b2c-375806626de6@amd.com>
-In-Reply-To: <04698792-95b8-f5b6-5b2c-375806626de6@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 25 Jan 2022 10:59:39 -0700
-Message-ID: <CAMkAt6rCU3K-dk7edxa9iKrOZ0uh5442K0U5Fbux=js0q6qQ+g@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/6] KVM: SVM: Implement demand page pinning
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S233409AbiAYSoD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 13:44:03 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 258E5C061770;
+        Tue, 25 Jan 2022 10:43:34 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 760941EC052A;
+        Tue, 25 Jan 2022 19:43:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1643136208;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wvIvlS2dO1ThS+LV2yQ6h0qiGd4NN+hsLFVW5buEbs0=;
+        b=ejvEMtrV/x1ErR80f7OgCzdqcxU5KzdO9+Ac3btdyfg/CxP+qm/1swhS/pWjt0C92J8iC5
+        uHKxx/bZxLwSU3b8spXf5TW0DlCut6rOPx7VoczJgu0PwancC+Xu1O4NzkoZ9SPpd/thwA
+        1SN8jQOFx0HVOzq0CPayGnJz5UBxBoc=
+Date:   Tue, 25 Jan 2022 19:43:23 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bharata B Rao <bharata@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 34/40] x86/sev: add SEV-SNP feature detection/setup
+Message-ID: <YfBEy6QD38u9DSrP@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-35-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211210154332.11526-35-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 25, 2022 at 10:49 AM Nikunj A. Dadhania <nikunj@amd.com> wrote:
->
-> Hi Peter
->
-> On 1/25/2022 10:17 PM, Peter Gonda wrote:
-> >> @@ -1637,8 +1627,6 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
-> >>         src->handle = 0;
-> >>         src->pages_locked = 0;
-> >>         src->enc_context_owner = NULL;
-> >> -
-> >> -       list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
-> > I think we need to move the pinned SPTE entries into the target, and
-> > repin the pages in the target here. Otherwise the pages will be
-> > unpinned when the source is cleaned up. Have you thought about how
-> > this could be done?
-> >
-> I am testing migration with pinned_list, I see that all the guest pages are
-> transferred/pinned on the other side during migration. I think that there is
-> assumption that all private pages needs to be moved.
->
-> QEMU: target/i386/sev.c:bool sev_is_gfn_in_unshared_region(unsigned long gfn)
->
-> Will dig more on this.
+On Fri, Dec 10, 2021 at 09:43:26AM -0600, Brijesh Singh wrote:
+> +static struct cc_blob_sev_info *snp_find_cc_blob(struct boot_params *bp)
+> +{
+> +	struct cc_blob_sev_info *cc_info;
+> +
+> +	/* Boot kernel would have passed the CC blob via boot_params. */
+> +	if (bp->cc_blob_address) {
+> +		cc_info = (struct cc_blob_sev_info *)
+> +			  (unsigned long)bp->cc_blob_address;
 
-The code you linked appears to be for a remote migration. This
-function is for an "intra-host" migration meaning we are just moving
-the VMs memory and state to a new userspace VMM on the same not an
-entirely new host.
+No need to break that line.
 
->
-> Regards
-> Nikunj
+> +		goto found_cc_info;
+> +	}
+> +
+> +	/*
+> +	 * If kernel was booted directly, without the use of the
+> +	 * boot/decompression kernel, the CC blob may have been passed via
+> +	 * setup_data instead.
+> +	 */
+> +	cc_info = snp_find_cc_blob_setup_data(bp);
+> +	if (!cc_info)
+> +		return NULL;
+> +
+> +found_cc_info:
+> +	if (cc_info->magic != CC_BLOB_SEV_HDR_MAGIC)
+> +		sev_es_terminate(1, GHCB_SNP_UNSUPPORTED);
+
+snp_abort() if you're gonna call it that.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
