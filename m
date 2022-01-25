@@ -2,19 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D021B49B60A
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 15:21:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A50349B63C
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 15:30:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1578514AbiAYOUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 09:20:07 -0500
-Received: from 8bytes.org ([81.169.241.247]:46334 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1453146AbiAYOQx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 09:16:53 -0500
+        id S242327AbiAYO1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 09:27:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1578345AbiAYOSt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 09:18:49 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB72BC06175A;
+        Tue, 25 Jan 2022 06:18:48 -0800 (PST)
 Received: from cap.home.8bytes.org (p549ad610.dip0.t-ipconnect.de [84.154.214.16])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 49359740;
+        by theia.8bytes.org (Postfix) with ESMTPSA id 9EA317FA;
         Tue, 25 Jan 2022 15:16:33 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -26,9 +29,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v6 4/7] KVM: SVM: Set "released" on INIT-SIPI iff SEV-ES vCPU was in AP reset hold
-Date:   Tue, 25 Jan 2022 15:16:23 +0100
-Message-Id: <20220125141626.16008-5-joro@8bytes.org>
+Subject: [PATCH v6 5/7] KVM: SVM: Add support to handle AP reset MSR protocol
+Date:   Tue, 25 Jan 2022 15:16:24 +0100
+Message-Id: <20220125141626.16008-6-joro@8bytes.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220125141626.16008-1-joro@8bytes.org>
 References: <20220125141626.16008-1-joro@8bytes.org>
@@ -38,137 +41,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Set ghcb->sw_exit_info_2 when releasing a vCPU from an AP reset hold if
-and only if the vCPU is actually in a reset hold.  Move the handling to
-INIT (was SIPI) so that KVM can check the current MP state; when SIPI is
-received, the vCPU will be in INIT_RECEIVED and will have lost track of
-whether or not the vCPU was in a reset hold.
+Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+available in version 2 of the GHCB specification.
 
-Drop the received_first_sipi flag, which was a hack to workaround the
-fact that KVM lost track of whether or not the vCPU was in a reset hold.
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kvm/svm/sev.c | 34 ++++++++++++----------------------
- arch/x86/kvm/svm/svm.c | 13 ++++++++-----
- arch/x86/kvm/svm/svm.h |  4 +---
- 3 files changed, 21 insertions(+), 30 deletions(-)
+ arch/x86/kvm/svm/sev.c | 52 +++++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h |  1 +
+ 2 files changed, 47 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index bec5b6f4f75d..5ece46eca87f 100644
+index 5ece46eca87f..1219c1771895 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2900,8 +2900,19 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
- 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, 1, 1);
+@@ -2656,9 +2656,34 @@ static u64 ghcb_msr_version_info(void)
+ 	return msr;
  }
  
--void sev_es_vcpu_reset(struct vcpu_svm *svm)
-+void sev_es_vcpu_reset(struct vcpu_svm *svm, bool init_event)
+-static int sev_emulate_ap_reset_hold(struct vcpu_svm *svm)
++
++static u64 ghcb_msr_ap_rst_resp(u64 value)
++{
++	return (u64)GHCB_MSR_AP_RESET_HOLD_RESP | (value << GHCB_DATA_LOW);
++}
++
++static int sev_emulate_ap_reset_hold(struct vcpu_svm *svm, u64 hold_type)
  {
-+	if (init_event) {
+ 	int ret = kvm_skip_emulated_instruction(&svm->vcpu);
++	if (hold_type == GHCB_MSR_AP_RESET_HOLD_REQ) {
 +		/*
-+		 * If the vCPU is in a "reset" hold, signal via SW_EXIT_INFO_2
-+		 * that, assuming it receives a SIPI, the vCPU was "released".
++		 * Preset the result to a non-SIPI return and then only set
++		 * the result to non-zero when delivering a SIPI.
 +		 */
-+		if (svm->vcpu.arch.mp_state == KVM_MP_STATE_AP_RESET_HOLD &&
-+		    svm->sev_es.ghcb)
-+			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
-+		return;
++		svm->vmcb->control.ghcb_gpa = ghcb_msr_ap_rst_resp(0);
++		svm->reset_hold_msr_protocol = true;
++	} else {
++		WARN_ON_ONCE(hold_type != SVM_VMGEXIT_AP_HLT_LOOP);
++		svm->reset_hold_msr_protocol = false;
 +	}
 +
- 	/*
- 	 * Set the GHCB MSR value as per the GHCB specification when emulating
- 	 * vCPU RESET for an SEV-ES guest.
-@@ -2931,24 +2942,3 @@ void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
- 	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
- 	hostsa->xss = host_xss;
- }
--
--void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
--{
--	struct vcpu_svm *svm = to_svm(vcpu);
--
--	/* First SIPI: Use the values as initially set by the VMM */
--	if (!svm->sev_es.received_first_sipi) {
--		svm->sev_es.received_first_sipi = true;
--		return;
--	}
--
--	/*
--	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
--	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
--	 * non-zero value.
--	 */
--	if (!svm->sev_es.ghcb)
--		return;
--
--	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
--}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2c99b18d76c0..1fd662c0ab14 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1146,9 +1146,6 @@ static void __svm_vcpu_reset(struct kvm_vcpu *vcpu)
- 	svm_init_osvw(vcpu);
- 	vcpu->arch.microcode_version = 0x01000065;
- 	svm->tsc_ratio_msr = kvm_default_tsc_scaling_ratio;
--
--	if (sev_es_guest(vcpu->kvm))
--		sev_es_vcpu_reset(svm);
- }
- 
- static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-@@ -1162,6 +1159,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 
- 	if (!init_event)
- 		__svm_vcpu_reset(vcpu);
-+
-+	if (sev_es_guest(vcpu->kvm))
-+		sev_es_vcpu_reset(svm, init_event);
- }
- 
- void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb)
-@@ -4345,10 +4345,13 @@ static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
- 
- static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- {
 +	/*
-+	 * SEV-ES (and later derivatives) use INIT-SIPI to bring up APs, but
-+	 * the guest is responsible for transitioning to Real Mode and setting
-+	 * CS:RIP, GPRs, etc...  KVM just needs to make the vCPU runnable.
++	 * Ensure the writes to ghcb_gpa and reset_hold_msr_protocol are visible
++	 * before the MP state change so that the INIT-SIPI doesn't misread
++	 * reset_hold_msr_protocol or write ghcb_gpa before this.  Pairs with
++	 * the smp_rmb() in sev_vcpu_reset().
 +	 */
- 	if (!sev_es_guest(vcpu->kvm))
- 		return kvm_vcpu_deliver_sipi_vector(vcpu, vector);
--
--	sev_vcpu_deliver_sipi_vector(vcpu, vector);
- }
++	smp_wmb();
  
- static void svm_vm_destroy(struct kvm *kvm)
+ 	return __kvm_emulate_halt(&svm->vcpu,
+ 				  KVM_MP_STATE_AP_RESET_HOLD, KVM_EXIT_AP_RESET_HOLD) && ret;
+@@ -2710,6 +2735,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 
+ 		break;
+ 	}
++	case GHCB_MSR_AP_RESET_HOLD_REQ:
++		ret = sev_emulate_ap_reset_hold(svm, GHCB_MSR_AP_RESET_HOLD_REQ);
++		break;
+ 	case GHCB_MSR_TERM_REQ: {
+ 		u64 reason_set, reason_code;
+ 
+@@ -2800,7 +2828,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
+-		ret = sev_emulate_ap_reset_hold(svm);
++		ret = sev_emulate_ap_reset_hold(svm, SVM_VMGEXIT_AP_HLT_LOOP);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+ 		struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+@@ -2905,11 +2933,23 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm, bool init_event)
+ 	if (init_event) {
+ 		/*
+ 		 * If the vCPU is in a "reset" hold, signal via SW_EXIT_INFO_2
+-		 * that, assuming it receives a SIPI, the vCPU was "released".
++		 * (or the GHCB_GPA for the MSR protocol) that, assuming it
++		 * receives a SIPI, the vCPU was "released".
+ 		 */
+-		if (svm->vcpu.arch.mp_state == KVM_MP_STATE_AP_RESET_HOLD &&
+-		    svm->sev_es.ghcb)
+-			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
++		if (svm->vcpu.arch.mp_state == KVM_MP_STATE_AP_RESET_HOLD) {
++			/*
++			 * Ensure mp_state is read before reset_hold_msr_protocol
++			 * and before writing ghcb_gpa to ensure KVM conumes the
++			 * correct protocol.  Pairs with the smp_wmb() in
++			 * sev_emulate_ap_reset_hold().
++			 */
++			smp_rmb();
++			if (svm->reset_hold_msr_protocol)
++				svm->vmcb->control.ghcb_gpa = ghcb_msr_ap_rst_resp(1);
++			else if (svm->sev_es.ghcb)
++				ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
++			svm->reset_hold_msr_protocol = false;
++		}
+ 		return;
+ 	}
+ 
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 776be8ff9e50..17812418d346 100644
+index 17812418d346..dbecafc25574 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -170,7 +170,6 @@ struct vcpu_sev_es_state {
- 	struct vmcb_save_area *vmsa;
- 	struct ghcb *ghcb;
- 	struct kvm_host_map ghcb_map;
--	bool received_first_sipi;
+@@ -243,6 +243,7 @@ struct vcpu_svm {
+ 	struct vcpu_sev_es_state sev_es;
  
- 	/* SEV-ES scratch area support */
- 	void *ghcb_sa;
-@@ -615,8 +614,7 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu);
- int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
- void sev_es_init_vmcb(struct vcpu_svm *svm);
--void sev_es_vcpu_reset(struct vcpu_svm *svm);
--void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
-+void sev_es_vcpu_reset(struct vcpu_svm *svm, bool init_event);
- void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
- void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+ 	bool guest_state_loaded;
++	bool reset_hold_msr_protocol;
+ };
  
+ struct svm_cpu_data {
 -- 
 2.34.1
 
