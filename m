@@ -2,207 +2,483 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8D3649AB08
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 05:44:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D725649AB09
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 05:44:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357537AbiAYEFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jan 2022 23:05:09 -0500
-Received: from mga12.intel.com ([192.55.52.136]:22221 "EHLO mga12.intel.com"
+        id S3418000AbiAYEFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jan 2022 23:05:55 -0500
+Received: from mga07.intel.com ([134.134.136.100]:14053 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S3420575AbiAYCYt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jan 2022 21:24:49 -0500
+        id S248010AbiAYDzp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jan 2022 22:55:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643077489; x=1674613489;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=9QRgxHm21iFW7RW5EhUCu2uoFYa84HxTfvUSQEuv2Kw=;
-  b=fFVSsTn1IqR0ZXfvDpbzo1slMSwwuGAlbnmVG2WYQarDktTF2L3ubCKz
-   WhtL8RiyA7nVxfIJMp8VUfRZIwXLOqEXQSMkf0ud+qvin0nC2ZEV7w4V6
-   AwWKczD7j9FaQ8wRVOYiUPZauQKT7syi2PeN3BwQwqfjjHZfhfsSvsj11
-   bBB57dCcpk+T4nQknDIKMlozAh6WrSRqQYukowVKKQN8mjhZBEpPtCH9L
-   YRVh4/u7IvNMvqL6J2I5tr/4L2IN6VyPOgmxxiyYC8bod+Xr3lFvutmK7
-   X1fgCaaKnpINQ5QkAZrgR9r1mY1u+CpbIl9rYAdZ6yhdKQQrGuz0SW1in
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10237"; a="226173614"
-X-IronPort-AV: E=Sophos;i="5.88,313,1635231600"; 
-   d="scan'208";a="226173614"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2022 17:54:57 -0800
+  t=1643082945; x=1674618945;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=63ESE7Tc2CYT1m5Oit+Z+quuqyGdO13wm2AqQxbFE78=;
+  b=eZw3OglALguvmks8gYQ/WABk6lI+B2qOrw5jSF1p5lUC4ODxhXJOPWyj
+   GB8WiA6WYSqa1aZFoE9jFG4cp7gq1BCOz/Ke2Q/WBAyNzP+JF2gNnjwEQ
+   y6HNTWs38z8Y5DOWrykXKeWmYNXxwB8ny9wfOmkdqFffMPW0FDwHCduoN
+   GAqqtfHJ5Zi0xDlIiD93UHuD+lMgvWxgRUc3sU1YFJqjxakm/dl9VATQC
+   2sUQnBPJLOEiarjk+fT9u2/LUo34cgk2Hi2mLPz8XP1XnO4vcA/mcR4Sk
+   g5zy1l4a1yFCXdkNdzgyukxAf0J2k3coS6hv2/XJzzTV5IwpslXbFjAD6
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10237"; a="309530415"
+X-IronPort-AV: E=Sophos;i="5.88,314,1635231600"; 
+   d="scan'208";a="309530415"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2022 19:48:24 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,313,1635231600"; 
-   d="scan'208";a="624300981"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by fmsmga002.fm.intel.com with ESMTP; 24 Jan 2022 17:54:56 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 24 Jan 2022 17:54:55 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Mon, 24 Jan 2022 17:54:55 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.172)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Mon, 24 Jan 2022 17:54:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DP3c4ckl6TvT6KACHuBAytQDSGumh8oAB+wD4gIxo9i7wL/QCn7XPeAvnSFdKbGWJd3DlhFr9CJF7MJsw53g4atiOPxiGmy6rPonAGP2wiN+YkL8x3c1cECvzWjXrVredbkNbNylKrxXuWl+UBx9qdGS/EQ/0VTfpi/zEsayHtCE2NI63MEIwPPsh49Jj/rZnpK0U8B8QCu7PZpn0QaP+KXe2kYvuUMoERYnC/l7LQ+/w61tzv/sXrukImkvIuc1L2FmzonnSQsIrR5C1cmJvIw8ud/e36UlodLA/YksNWQ2L/fiyTp9W0cUqgTPEZQC25rWK4XJPVp8Pq+XCfb21Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9QRgxHm21iFW7RW5EhUCu2uoFYa84HxTfvUSQEuv2Kw=;
- b=IGT2kIgOsErEte14nRyG08ZXLb+C5qJFqP0Swrp5sIwKqKXi8PSJ+gEHVOOq2gw8gFF2v9vTxAr1gWre4drfDu090yy+gM3UWhdxOaFTnzoglEO/anSrK4mQtsdxLdc68l6dNHXoZx/SdcJHH3J41Ni0ihVLbjWuN85DeQNvimdK72jxtq6nukvThalKuSbNvIOEHI7JxcYN5OBKwrVCLP3sCqnH2/cmocG2njmVZToZ8ICXuwhQ4GOaziJcTH59uWjorMYAIwmnGg14sGc0m28eUgrASk7hZBv7s20gEo3We7cC/DYKXUyEGfBxCBiQQy17BWKnWMPWTobOjshHLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DM5PR1101MB2298.namprd11.prod.outlook.com (2603:10b6:4:53::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.14; Tue, 25 Jan
- 2022 01:54:52 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e46b:a312:2f85:76dc]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e46b:a312:2f85:76dc%5]) with mapi id 15.20.4909.017; Tue, 25 Jan 2022
- 01:54:52 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Like Xu <like.xu.linux@gmail.com>
-CC:     "Liu, Jing2" <jing2.liu@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+X-IronPort-AV: E=Sophos;i="5.88,314,1635231600"; 
+   d="scan'208";a="627754818"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 24 Jan 2022 19:48:21 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nCCoe-000JIq-Sr; Tue, 25 Jan 2022 03:48:20 +0000
+Date:   Tue, 25 Jan 2022 11:48:17 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Tian Kevin <kevin.tian@intel.com>,
         Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Zhong, Yang" <yang.zhong@intel.com>
-Subject: RE: [PATCH] KVM: x86/cpuid: Exclude unpermitted xfeatures for
- vcpu->arch.guest_supported_xcr0
-Thread-Topic: [PATCH] KVM: x86/cpuid: Exclude unpermitted xfeatures for
- vcpu->arch.guest_supported_xcr0
-Thread-Index: AQHYEB04i+jH6+Lv20CJG71ADhixA6xxwR/ggAADloCAAJhpgIAAAciAgACa5uA=
-Date:   Tue, 25 Jan 2022 01:54:52 +0000
-Message-ID: <BN9PR11MB5276170712A9EF842B36ACE48C5F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220123055025.81342-1-likexu@tencent.com>
- <BN9PR11MB52762E2DEF810DF9AFAE1DDC8C5E9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <38c1fbc3-d770-48f3-5432-8fa1fde033f5@gmail.com>
- <Ye7SbfPL/QAjOI6s@google.com>
- <e5744e0b-00fc-8563-edb7-b6bf52c63b0e@redhat.com>
-In-Reply-To: <e5744e0b-00fc-8563-edb7-b6bf52c63b0e@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8eda921d-1b08-4aff-27ab-08d9dfa5ad7b
-x-ms-traffictypediagnostic: DM5PR1101MB2298:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <DM5PR1101MB2298B7DB675643A15DD3110E8C5F9@DM5PR1101MB2298.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DB/pavotzm4N6Ef24K3ETxTZFBy9jLV/YnzmjPVRv2Lbz7F4oAC+OxzH1wxstJaI17tcr74BNI1FwC02DKQqEftqSD+QPEFax8BEVB+XIUHd4l9ytABMJM39iSAQe80aU8oY8bHg5RfPzJAIZoz3DMDuawTp/qausZlZM9tPW3i6+RvqxWZWAL44GjCjrB8a60XaiXciQDD+rofDWd0kGkIx02+b3PHHgsFBzRbv47Q8MsC2/hP/kpWBOLv3XT/5e7u7lajGv0rxE2G2bRQrM1Btw0kHF8vssvGo/hk9UCK3EnyGtnm2xUi3a3TDVG8QunM5CEk1neJb4RNBFz/sRRI+Mmym7wUN7SigbKGDN5YR2OGfVy6KMltJzkYMM8WJuOvT4M1kxKE3GRsGwFP0AbD9jHwa3132VR5n9Gy0Ehvib3cZYZ3TFH09OxqXf4uXB02W4i91xTKmOP9S/Kllqap6CLg8p44A81TgzQDGYWjfR6RcXwIEObAbbdLD21DfTYaUn4tqbGRmVknP/FLrclfMkJkXbrXCSTtIBtHG9P+iYEDeW9Ajh1AqQg5hqMQqJ2madk9SzMT5OeGapYz+yyS1ThKMaYUje1VIuZheo5ImyhyKipNrT1eVN3Yl828mzUXpVDT5AtfQ1d0TJzGRcV8e5Pl9cKibvdQsucEb5rd45rc3f55tB8K/ZgP4iCKstk/VMEbfu8y8E6uTYJ7haQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(508600001)(2906002)(86362001)(82960400001)(5660300002)(64756008)(54906003)(76116006)(316002)(4326008)(66946007)(66476007)(66446008)(38070700005)(52536014)(6506007)(8676002)(83380400001)(55016003)(7696005)(110136005)(8936002)(186003)(9686003)(33656002)(53546011)(107886003)(38100700002)(66556008)(26005)(71200400001)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MlhXY1phVkJGTFVMbnZkaXN4cU12Y0FKdngzczY3OGNXUjdjRS9DWFdvZXlT?=
- =?utf-8?B?UXlaZ0RKZStYWjg3Ty95akNOdnlDalJxSFFLN1RQeTYwanpXbVBpamkwczli?=
- =?utf-8?B?ekUwSWhtc0ZBRzJObVdnZ3E2ejZmRlNMeCtVSGtSekdYOEU3UmNCU1pNZkM5?=
- =?utf-8?B?NE51b1pPbnh2eWxLR0xiaGpTOWdqQkZhVDQ1UkJoMFFnZVpOZy9ZWm4vZTRh?=
- =?utf-8?B?U2p5dStjT0FycUF6Mm9vN3F5UjcraENGVjRFb2VQYW4wWmZ0Nk9KcldjUmhB?=
- =?utf-8?B?dU9rVktiLzg3Z0dtbXlTbFRZMHlXTVRaTk5DdHZpeWlUWFlRejJjQVJJQU1a?=
- =?utf-8?B?MHRHWlJuSVdMMTNONWdaN0wyK1FYRy9wMlJuRmNSU3h6SitjUlVGMDZidG1n?=
- =?utf-8?B?T2twcS9uK1krYzV0dHhicHNzMEkzWEdDVlRPTDVqUjhDOUJGU0poNkRYclBN?=
- =?utf-8?B?QUd1S3N5ZHpTMkt5TDdLRTQ1M0hLNVA3WWk3cksrOW5GN2tabnBWZkZiajF3?=
- =?utf-8?B?MDh2WmtGK2ZsbUhtczJkZjRzS0hsTGMvTHZnbFNTVnBlRWdiWXF6czBlTy9u?=
- =?utf-8?B?czh5TkV1SUxaM0ZPMXRsLzliS01TMlhwcFlKdmFCOUZWWEVETU5iMnROdUxV?=
- =?utf-8?B?T3hoaEhUdGYrQll3Ui9WMktVdUJDMFJ2UXRiaG4wVXhVK2RhcDRkQVZsT2Vk?=
- =?utf-8?B?bXJjTnE3VmtxY1dBOVlkdFBoVHJoend1RXM4Mjh5T2pTenkxZU9XUHFacEc1?=
- =?utf-8?B?LzY0T0RFR011Vms3ZS93LzFmM0gxT3hUV1VjSHZ5dDJRUlU0aWlRWnIyMldC?=
- =?utf-8?B?MXQvMzR0QXh3eDhKNUJNcEpGVzV5ZlZOSHdacXdFU2NCNy91R280U2NMWlJ4?=
- =?utf-8?B?TmtzYzRLZGxFbDhOQmVHVFBXVG1aeW9EelJ5MHJkMkZkZmo5L2FkRmRSMHFj?=
- =?utf-8?B?YlpDMm5wRVZCNE9CRUtsdVFFUDAyUmRiU0VDZVROazJFWFBLV2F6NWY1TnZo?=
- =?utf-8?B?ZmlSM3NMZHJYcU44TVM4VFV0TDAwaGtjd0h4YVdjWHBkR1NCaHFFVEx1WDBR?=
- =?utf-8?B?N0NvWmFpVy9aTkk3TUFQbTUvMUJORFJQS1ZnVDg3QVFqamRSaGl4UEw3dHJX?=
- =?utf-8?B?aC9ybWxiMDVxODVwSEx6eVhiZWtEZW85SFJUOS94U0x0YjJJcXFQVHNWWDlG?=
- =?utf-8?B?UmlvdUdhYjdwQ0w3U21NT0RtOUVCNzBkeFIyY3V5R1RVYWY1bVY3MzFZTmM1?=
- =?utf-8?B?L01Ob1I4aWZxTXBISGYzQWVlRE5Fd3RQMkthYzJpSDdic1VWRUFLZEtjcVp6?=
- =?utf-8?B?dTJMQUlVZG1GSmttby9rTTY3OTNpa2FGVmM1OVhaOHZoS0ZzaVJYcm1uanQ2?=
- =?utf-8?B?enFEa09CUE9zV1V1VjVvWlhKK2hQYWJmY1owc2JBcHJIMzdsZ0E1NHFZbFFa?=
- =?utf-8?B?STZHdThoU0ZLc3I3NlJxbUJ5a01MbjhEdWxtelB6RTNXWXBEdUlpQTlqbmcw?=
- =?utf-8?B?ZWpYOVRyOWRlYzFXRDU5OUdNWUFuRmNHaHNUQUZYTlZ3Q1dQOEJDN1JvR1NS?=
- =?utf-8?B?VGVSLzhORjdWTmovRVpmcXFOWVJ0WWdERk8rckFmNENUTmdqMjlDWnJ0NjZi?=
- =?utf-8?B?N2c4STIvemhQWHlERlllcVVuQ093RFhYQ2dsaVJoSXg2d2x1eXB5ZjJBL3Er?=
- =?utf-8?B?Y0RaV1p5QTZoWndFWnlWQkxWektBUHlnUHlaelRDZHNQMEV0ZVhwUUlkQWxK?=
- =?utf-8?B?UTBFY1dBWG1zL2pZb3BhbVJPTFNrMngyUm1zL0pDd1JlVk9zTjZzTlYrdlRY?=
- =?utf-8?B?L2YzQWFLSHNwLytMV0o4ZVYwOGVsZlJFWnZ0N25YS0llVEJnNm5raEdZdzhq?=
- =?utf-8?B?eGRWV0dLNmZJL1R3RUZRRTU2bzlGeUMwQ3o0UmVadU91bExMRnBZdVZRMmdS?=
- =?utf-8?B?Q2pPdjNLT0hEdGd3d2RVdUE2L3ZIcit3c1gzeDlQYjJ1azJBenNOUVFjMy9q?=
- =?utf-8?B?SFpKVVlRTzVNYkh5WFFQa1prSjdFU09aeW9YRVZiU0Q4MVdQUzlMY1BtSFZt?=
- =?utf-8?B?MS9icjlvQitGWDdnMW9JVVRGUm41UmFwcUNKNTNrSDB6ckRzK3VwSHRiOXlr?=
- =?utf-8?B?TjA0Mk1JNzNUUGk4UXFOeWN4dDMyZlB6N1o1NThiWG1lMnFiSHN5RnprMHhv?=
- =?utf-8?Q?KFZ3U7v6HfePVRe9VY2ZcUs=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/cpuid: Exclude unpermitted xfeatures sizes at
+ KVM_GET_SUPPORTED_CPUID
+Message-ID: <202201251137.85eenHWr-lkp@intel.com>
+References: <20220124080251.60558-1-likexu@tencent.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8eda921d-1b08-4aff-27ab-08d9dfa5ad7b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jan 2022 01:54:52.1982
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0QS+ilB0wiWJvGdIK1B22kqmk6oWfXd8JCTfCKTlhwu7KUEKmGYhmUQIxRrdG2yXMN9LijeSM0t01ZxPV0UdnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1101MB2298
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220124080251.60558-1-likexu@tencent.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTZW50OiBUdWVz
-ZGF5LCBKYW51YXJ5IDI1LCAyMDIyIDEyOjMwIEFNDQo+IA0KPiBPbiAxLzI0LzIyIDE3OjIzLCBT
-ZWFuIENocmlzdG9waGVyc29uIHdyb3RlOg0KPiA+IE9uIE1vbiwgSmFuIDI0LCAyMDIyLCBMaWtl
-IFh1IHdyb3RlOg0KPiA+PiBPbiAyNC8xLzIwMjIgMzowNiBwbSwgVGlhbiwgS2V2aW4gd3JvdGU6
-DQo+ID4+Pj4gRnJvbTogTGlrZSBYdSA8bGlrZS54dS5saW51eEBnbWFpbC5jb20+DQo+ID4+Pj4g
-U2VudDogU3VuZGF5LCBKYW51YXJ5IDIzLCAyMDIyIDE6NTAgUE0NCj4gPj4+Pg0KPiA+Pj4+IEZy
-b206IExpa2UgWHUgPGxpa2V4dUB0ZW5jZW50LmNvbT4NCj4gPj4+Pg0KPiA+Pj4+IEEgbWFsaWNp
-b3VzIHVzZXIgc3BhY2UgY2FuIGJ5cGFzcyB4c3RhdGVfZ2V0X2d1ZXN0X2dyb3VwX3Blcm0oKSBp
-bg0KPiB0aGUNCj4gPj4+PiBLVk1fR0VUX1NVUFBPUlRFRF9DUFVJRCBtZWNoYW5pc20gYW5kIG9i
-dGFpbiB1bnBlcm1pdHRlZA0KPiB4ZmVhdHVyZXMsDQo+ID4+Pj4gc2luY2UgdGhlIHZhbGlkaXR5
-IGNoZWNrIG9mIHhjcjAgZGVwZW5kcyBvbmx5IG9uIGd1ZXN0X3N1cHBvcnRlZF94Y3IwLg0KPiA+
-Pj4NCj4gPj4+IFVucGVybWl0dGVkIHhmZWF0dXJlcyBjYW5ub3QgcGFzcyBrdm1fY2hlY2tfY3B1
-aWQoKS4uLg0KPiA+Pg0KPiA+PiBJbmRlZWQsIDVhYjJmNDViYmE0ODk0YTBkYjRhZjg1NjdkYTNl
-ZmQ2MjI4ZGQwMTAuDQo+ID4+DQo+ID4+IFRoaXMgcGFydCBvZiBsb2dpYyBpcyBwcmV0dHkgZnJh
-Z2lsZSBhbmQgZnJhZ21lbnRlZCBkdWUgdG8gc2VtYW50aWMNCj4gPj4gaW5jb25zaXN0ZW5jaWVz
-IGJldHdlZW4gc3VwcG9ydGVkX3hjcjAgYW5kIGd1ZXN0X3N1cHBvcnRlZF94Y3IwDQo+ID4+IGlu
-IG90aGVyIHRocmVlIHBsYWNlczoNCj4gPg0KPiA+IFRoZXJlIGFyZSBubyBpbmNvbnNpc3RlbmNp
-ZXMsIGF0IGxlYXN0IG5vdCBpbiB0aGUgZXhhbXBsZXMgYmVsb3csIGFzIHRoZQ0KPiBleGFtcGxl
-cw0KPiA+IGFyZSBpbnRlbmRlZCB0byB3b3JrIGluIGhvc3QgY29udGV4dC4gIGd1ZXN0X3N1cHBv
-cnRlZF94Y3IwIGlzIGFib3V0IHdoYXQNCj4gdGhlIGd1ZXN0DQo+ID4gaXMvaXNuJ3QgYWxsb3dl
-ZCB0byBhY2Nlc3MsIGl0IGhhcyBubyBiZWFyaW5nIG9uIHdoYXQgaG9zdCB1c2Vyc3BhY2UNCj4g
-Y2FuL2Nhbid0IGRvLg0KPiA+IE9yIGFyZSB5b3UgdGFsa2luZyBhYm91dCBhIGRpZmZlcmVudCB0
-eXBlIG9mIGluY29uc2lzdGVuY3k/DQo+IA0KPiBUaGUgZXh0cmEgY29tcGxpY2F0aW9uIGlzIHRo
-YXQgYXJjaF9wcmN0bChBUkNIX1JFUV9YQ09NUF9HVUVTVF9QRVJNKQ0KPiBjaGFuZ2VzIHdoYXQg
-aG9zdCB1c2Vyc3BhY2UgY2FuL2Nhbid0IGRvLiAgSXQgd291bGQgYmUgZWFzaWVyIGlmIHdlDQo+
-IGNvdWxkIGp1c3Qgc2F5IHRoYXQgS1ZNX0dFVF9TVVBQT1JURURfQ1BVSUQgcmV0dXJucyAidGhl
-IG1vc3QiIHRoYXQNCj4gdXNlcnNwYWNlIGNhbiBkbywgYnV0IHdlIGFscmVhZHkgaGF2ZSB0aGUg
-Y29udHJhY3QgdGhhdCB1c2Vyc3BhY2UgY2FuDQo+IHRha2UgS1ZNX0dFVF9TVVBQT1JURURfQ1BV
-SUQgYW5kIHBhc3MgaXQgc3RyYWlnaHQgdG8gS1ZNX1NFVF9DUFVJRDIuDQo+IA0KPiBUaGVyZWZv
-cmUsICBLVk1fR0VUX1NVUFBPUlRFRF9DUFVJRCBtdXN0IGxpbWl0IGl0cyByZXR1cm5lZCB2YWx1
-ZXMgdG8NCj4gd2hhdCBoYXMgYWxyZWFkeSBiZWVuIGVuYWJsZWQuDQo+IA0KPiBXaGlsZSByZXZp
-ZXdpbmcgdGhlIFFFTVUgcGFydCBvZiBBTVggc3VwcG9ydCAodGhpcyBtb3JuaW5nKSwgSSBhbHNv
-DQo+IG5vdGljZWQgdGhhdCB0aGVyZSBpcyBubyBlcXVpdmFsZW50IGZvciBndWVzdCBwZXJtaXNz
-aW9ucyBvZg0KPiBBUkNIX0dFVF9YQ09NUF9TVVBQLiAgVGhpcyBuZWVkcyB0byBrbm93IEtWTSdz
-IHN1cHBvcnRlZF94Y3IwLCBzbyBpdCdzDQo+IHByb2JhYmx5IGJlc3QgcmVhbGl6ZWQgYXMgYSBu
-ZXcgS1ZNX0NIRUNLX0VYVEVOU0lPTiByYXRoZXIgdGhhbiBhcyBhbg0KPiBhcmNoX3ByY3RsLg0K
-PiANCg0KV291bGQgdGhhdCBsZWFkIHRvIGEgd2VpcmQgc2l0dWF0aW9uIHdoZXJlIGFsdGhvdWdo
-IEtWTSBzYXlzIG5vIHN1cHBvcnQNCm9mIGd1ZXN0IHBlcm1pc3Npb25zIHdoaWxlIHRoZSB1c2Vy
-IGNhbiBzdGlsbCByZXF1ZXN0IHRoZW0gdmlhIHByY3RsKCk/DQoNCkkgd29uZGVyIHdoZXRoZXIg
-aXQncyBjbGVhbmVyIHRvIGRvIGl0IHN0aWxsIHZpYSBwcmN0bCgpIGlmIHdlIHJlYWxseSB3YW50
-IHRvDQplbmhhbmNlIHRoaXMgcGFydC4gQnV0IGFzIHlvdSBzYWlkIHRoZW4gaXQgbmVlZHMgYSBt
-ZWNoYW5pc20gdG8ga25vdyANCktWTSdzIHN1cHBvcnRlZF94Y3IwIChhbmQgaWYgS1ZNIGlzIG5v
-dCBsb2FkZWQgdGhlbiBubyBndWVzdCBwZXJtaXNzaW9uDQpzdXBwb3J0IGF0IGFsbCkuLi4NCg0K
-VGhhbmtzDQpLZXZpbg0K
+Hi Like,
+
+Thank you for the patch! Yet something to improve:
+
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on v5.17-rc1 next-20220124]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Like-Xu/KVM-x86-cpuid-Exclude-unpermitted-xfeatures-sizes-at-KVM_GET_SUPPORTED_CPUID/20220124-160452
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+config: i386-randconfig-a002 (https://download.01.org/0day-ci/archive/20220125/202201251137.85eenHWr-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 2e58a18910867ba6795066e044293e6daf89edf5)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/b29c71ea177d9a2225208d501987598610261749
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Like-Xu/KVM-x86-cpuid-Exclude-unpermitted-xfeatures-sizes-at-KVM_GET_SUPPORTED_CPUID/20220124-160452
+        git checkout b29c71ea177d9a2225208d501987598610261749
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kvm/cpuid.c:890:24: error: variable 'supported_xcr0' is uninitialized when used within its own initialization [-Werror,-Wuninitialized]
+                   u64 supported_xcr0 = supported_xcr0 & xstate_get_guest_group_perm();
+                       ~~~~~~~~~~~~~~   ^~~~~~~~~~~~~~
+   1 error generated.
+
+
+vim +/supported_xcr0 +890 arch/x86/kvm/cpuid.c
+
+   758	
+   759	static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+   760	{
+   761		struct kvm_cpuid_entry2 *entry;
+   762		int r, i, max_idx;
+   763	
+   764		/* all calls to cpuid_count() should be made on the same cpu */
+   765		get_cpu();
+   766	
+   767		r = -E2BIG;
+   768	
+   769		entry = do_host_cpuid(array, function, 0);
+   770		if (!entry)
+   771			goto out;
+   772	
+   773		switch (function) {
+   774		case 0:
+   775			/* Limited to the highest leaf implemented in KVM. */
+   776			entry->eax = min(entry->eax, 0x1fU);
+   777			break;
+   778		case 1:
+   779			cpuid_entry_override(entry, CPUID_1_EDX);
+   780			cpuid_entry_override(entry, CPUID_1_ECX);
+   781			break;
+   782		case 2:
+   783			/*
+   784			 * On ancient CPUs, function 2 entries are STATEFUL.  That is,
+   785			 * CPUID(function=2, index=0) may return different results each
+   786			 * time, with the least-significant byte in EAX enumerating the
+   787			 * number of times software should do CPUID(2, 0).
+   788			 *
+   789			 * Modern CPUs, i.e. every CPU KVM has *ever* run on are less
+   790			 * idiotic.  Intel's SDM states that EAX & 0xff "will always
+   791			 * return 01H. Software should ignore this value and not
+   792			 * interpret it as an informational descriptor", while AMD's
+   793			 * APM states that CPUID(2) is reserved.
+   794			 *
+   795			 * WARN if a frankenstein CPU that supports virtualization and
+   796			 * a stateful CPUID.0x2 is encountered.
+   797			 */
+   798			WARN_ON_ONCE((entry->eax & 0xff) > 1);
+   799			break;
+   800		/* functions 4 and 0x8000001d have additional index. */
+   801		case 4:
+   802		case 0x8000001d:
+   803			/*
+   804			 * Read entries until the cache type in the previous entry is
+   805			 * zero, i.e. indicates an invalid entry.
+   806			 */
+   807			for (i = 1; entry->eax & 0x1f; ++i) {
+   808				entry = do_host_cpuid(array, function, i);
+   809				if (!entry)
+   810					goto out;
+   811			}
+   812			break;
+   813		case 6: /* Thermal management */
+   814			entry->eax = 0x4; /* allow ARAT */
+   815			entry->ebx = 0;
+   816			entry->ecx = 0;
+   817			entry->edx = 0;
+   818			break;
+   819		/* function 7 has additional index. */
+   820		case 7:
+   821			entry->eax = min(entry->eax, 1u);
+   822			cpuid_entry_override(entry, CPUID_7_0_EBX);
+   823			cpuid_entry_override(entry, CPUID_7_ECX);
+   824			cpuid_entry_override(entry, CPUID_7_EDX);
+   825	
+   826			/* KVM only supports 0x7.0 and 0x7.1, capped above via min(). */
+   827			if (entry->eax == 1) {
+   828				entry = do_host_cpuid(array, function, 1);
+   829				if (!entry)
+   830					goto out;
+   831	
+   832				cpuid_entry_override(entry, CPUID_7_1_EAX);
+   833				entry->ebx = 0;
+   834				entry->ecx = 0;
+   835				entry->edx = 0;
+   836			}
+   837			break;
+   838		case 9:
+   839			break;
+   840		case 0xa: { /* Architectural Performance Monitoring */
+   841			struct x86_pmu_capability cap;
+   842			union cpuid10_eax eax;
+   843			union cpuid10_edx edx;
+   844	
+   845			perf_get_x86_pmu_capability(&cap);
+   846	
+   847			/*
+   848			 * The guest architecture pmu is only supported if the architecture
+   849			 * pmu exists on the host and the module parameters allow it.
+   850			 */
+   851			if (!cap.version || !enable_pmu)
+   852				memset(&cap, 0, sizeof(cap));
+   853	
+   854			eax.split.version_id = min(cap.version, 2);
+   855			eax.split.num_counters = cap.num_counters_gp;
+   856			eax.split.bit_width = cap.bit_width_gp;
+   857			eax.split.mask_length = cap.events_mask_len;
+   858	
+   859			edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
+   860			edx.split.bit_width_fixed = cap.bit_width_fixed;
+   861			if (cap.version)
+   862				edx.split.anythread_deprecated = 1;
+   863			edx.split.reserved1 = 0;
+   864			edx.split.reserved2 = 0;
+   865	
+   866			entry->eax = eax.full;
+   867			entry->ebx = cap.events_mask;
+   868			entry->ecx = 0;
+   869			entry->edx = edx.full;
+   870			break;
+   871		}
+   872		/*
+   873		 * Per Intel's SDM, the 0x1f is a superset of 0xb,
+   874		 * thus they can be handled by common code.
+   875		 */
+   876		case 0x1f:
+   877		case 0xb:
+   878			/*
+   879			 * Populate entries until the level type (ECX[15:8]) of the
+   880			 * previous entry is zero.  Note, CPUID EAX.{0x1f,0xb}.0 is
+   881			 * the starting entry, filled by the primary do_host_cpuid().
+   882			 */
+   883			for (i = 1; entry->ecx & 0xff00; ++i) {
+   884				entry = do_host_cpuid(array, function, i);
+   885				if (!entry)
+   886					goto out;
+   887			}
+   888			break;
+   889		case 0xd: {
+ > 890			u64 supported_xcr0 = supported_xcr0 & xstate_get_guest_group_perm();
+   891	
+   892			entry->eax &= supported_xcr0;
+   893			entry->ebx = xstate_required_size(supported_xcr0, false);
+   894			entry->ecx = entry->ebx;
+   895			entry->edx &= supported_xcr0 >> 32;
+   896			if (!supported_xcr0)
+   897				break;
+   898	
+   899			entry = do_host_cpuid(array, function, 1);
+   900			if (!entry)
+   901				goto out;
+   902	
+   903			cpuid_entry_override(entry, CPUID_D_1_EAX);
+   904			if (entry->eax & (F(XSAVES)|F(XSAVEC)))
+   905				entry->ebx = xstate_required_size(supported_xcr0 | supported_xss,
+   906								  true);
+   907			else {
+   908				WARN_ON_ONCE(supported_xss != 0);
+   909				entry->ebx = 0;
+   910			}
+   911			entry->ecx &= supported_xss;
+   912			entry->edx &= supported_xss >> 32;
+   913	
+   914			for (i = 2; i < 64; ++i) {
+   915				bool s_state;
+   916				if (supported_xcr0 & BIT_ULL(i))
+   917					s_state = false;
+   918				else if (supported_xss & BIT_ULL(i))
+   919					s_state = true;
+   920				else
+   921					continue;
+   922	
+   923				entry = do_host_cpuid(array, function, i);
+   924				if (!entry)
+   925					goto out;
+   926	
+   927				/*
+   928				 * The supported check above should have filtered out
+   929				 * invalid sub-leafs.  Only valid sub-leafs should
+   930				 * reach this point, and they should have a non-zero
+   931				 * save state size.  Furthermore, check whether the
+   932				 * processor agrees with supported_xcr0/supported_xss
+   933				 * on whether this is an XCR0- or IA32_XSS-managed area.
+   934				 */
+   935				if (WARN_ON_ONCE(!entry->eax || (entry->ecx & 0x1) != s_state)) {
+   936					--array->nent;
+   937					continue;
+   938				}
+   939	
+   940				if (!kvm_cpu_cap_has(X86_FEATURE_XFD))
+   941					entry->ecx &= ~BIT_ULL(2);
+   942				entry->edx = 0;
+   943			}
+   944			break;
+   945		}
+   946		case 0x12:
+   947			/* Intel SGX */
+   948			if (!kvm_cpu_cap_has(X86_FEATURE_SGX)) {
+   949				entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+   950				break;
+   951			}
+   952	
+   953			/*
+   954			 * Index 0: Sub-features, MISCSELECT (a.k.a extended features)
+   955			 * and max enclave sizes.   The SGX sub-features and MISCSELECT
+   956			 * are restricted by kernel and KVM capabilities (like most
+   957			 * feature flags), while enclave size is unrestricted.
+   958			 */
+   959			cpuid_entry_override(entry, CPUID_12_EAX);
+   960			entry->ebx &= SGX_MISC_EXINFO;
+   961	
+   962			entry = do_host_cpuid(array, function, 1);
+   963			if (!entry)
+   964				goto out;
+   965	
+   966			/*
+   967			 * Index 1: SECS.ATTRIBUTES.  ATTRIBUTES are restricted a la
+   968			 * feature flags.  Advertise all supported flags, including
+   969			 * privileged attributes that require explicit opt-in from
+   970			 * userspace.  ATTRIBUTES.XFRM is not adjusted as userspace is
+   971			 * expected to derive it from supported XCR0.
+   972			 */
+   973			entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
+   974				      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
+   975				      SGX_ATTR_KSS;
+   976			entry->ebx &= 0;
+   977			break;
+   978		/* Intel PT */
+   979		case 0x14:
+   980			if (!kvm_cpu_cap_has(X86_FEATURE_INTEL_PT)) {
+   981				entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+   982				break;
+   983			}
+   984	
+   985			for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
+   986				if (!do_host_cpuid(array, function, i))
+   987					goto out;
+   988			}
+   989			break;
+   990		/* Intel AMX TILE */
+   991		case 0x1d:
+   992			if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+   993				entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+   994				break;
+   995			}
+   996	
+   997			for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
+   998				if (!do_host_cpuid(array, function, i))
+   999					goto out;
+  1000			}
+  1001			break;
+  1002		case 0x1e: /* TMUL information */
+  1003			if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+  1004				entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+  1005				break;
+  1006			}
+  1007			break;
+  1008		case KVM_CPUID_SIGNATURE: {
+  1009			const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
+  1010			entry->eax = KVM_CPUID_FEATURES;
+  1011			entry->ebx = sigptr[0];
+  1012			entry->ecx = sigptr[1];
+  1013			entry->edx = sigptr[2];
+  1014			break;
+  1015		}
+  1016		case KVM_CPUID_FEATURES:
+  1017			entry->eax = (1 << KVM_FEATURE_CLOCKSOURCE) |
+  1018				     (1 << KVM_FEATURE_NOP_IO_DELAY) |
+  1019				     (1 << KVM_FEATURE_CLOCKSOURCE2) |
+  1020				     (1 << KVM_FEATURE_ASYNC_PF) |
+  1021				     (1 << KVM_FEATURE_PV_EOI) |
+  1022				     (1 << KVM_FEATURE_CLOCKSOURCE_STABLE_BIT) |
+  1023				     (1 << KVM_FEATURE_PV_UNHALT) |
+  1024				     (1 << KVM_FEATURE_PV_TLB_FLUSH) |
+  1025				     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
+  1026				     (1 << KVM_FEATURE_PV_SEND_IPI) |
+  1027				     (1 << KVM_FEATURE_POLL_CONTROL) |
+  1028				     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
+  1029				     (1 << KVM_FEATURE_ASYNC_PF_INT);
+  1030	
+  1031			if (sched_info_on())
+  1032				entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
+  1033	
+  1034			entry->ebx = 0;
+  1035			entry->ecx = 0;
+  1036			entry->edx = 0;
+  1037			break;
+  1038		case 0x80000000:
+  1039			entry->eax = min(entry->eax, 0x8000001f);
+  1040			break;
+  1041		case 0x80000001:
+  1042			cpuid_entry_override(entry, CPUID_8000_0001_EDX);
+  1043			cpuid_entry_override(entry, CPUID_8000_0001_ECX);
+  1044			break;
+  1045		case 0x80000006:
+  1046			/* L2 cache and TLB: pass through host info. */
+  1047			break;
+  1048		case 0x80000007: /* Advanced power management */
+  1049			/* invariant TSC is CPUID.80000007H:EDX[8] */
+  1050			entry->edx &= (1 << 8);
+  1051			/* mask against host */
+  1052			entry->edx &= boot_cpu_data.x86_power;
+  1053			entry->eax = entry->ebx = entry->ecx = 0;
+  1054			break;
+  1055		case 0x80000008: {
+  1056			unsigned g_phys_as = (entry->eax >> 16) & 0xff;
+  1057			unsigned virt_as = max((entry->eax >> 8) & 0xff, 48U);
+  1058			unsigned phys_as = entry->eax & 0xff;
+  1059	
+  1060			/*
+  1061			 * If TDP (NPT) is disabled use the adjusted host MAXPHYADDR as
+  1062			 * the guest operates in the same PA space as the host, i.e.
+  1063			 * reductions in MAXPHYADDR for memory encryption affect shadow
+  1064			 * paging, too.
+  1065			 *
+  1066			 * If TDP is enabled but an explicit guest MAXPHYADDR is not
+  1067			 * provided, use the raw bare metal MAXPHYADDR as reductions to
+  1068			 * the HPAs do not affect GPAs.
+  1069			 */
+  1070			if (!tdp_enabled)
+  1071				g_phys_as = boot_cpu_data.x86_phys_bits;
+  1072			else if (!g_phys_as)
+  1073				g_phys_as = phys_as;
+  1074	
+  1075			entry->eax = g_phys_as | (virt_as << 8);
+  1076			entry->edx = 0;
+  1077			cpuid_entry_override(entry, CPUID_8000_0008_EBX);
+  1078			break;
+  1079		}
+  1080		case 0x8000000A:
+  1081			if (!kvm_cpu_cap_has(X86_FEATURE_SVM)) {
+  1082				entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+  1083				break;
+  1084			}
+  1085			entry->eax = 1; /* SVM revision 1 */
+  1086			entry->ebx = 8; /* Lets support 8 ASIDs in case we add proper
+  1087					   ASID emulation to nested SVM */
+  1088			entry->ecx = 0; /* Reserved */
+  1089			cpuid_entry_override(entry, CPUID_8000_000A_EDX);
+  1090			break;
+  1091		case 0x80000019:
+  1092			entry->ecx = entry->edx = 0;
+  1093			break;
+  1094		case 0x8000001a:
+  1095		case 0x8000001e:
+  1096			break;
+  1097		case 0x8000001F:
+  1098			if (!kvm_cpu_cap_has(X86_FEATURE_SEV)) {
+  1099				entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+  1100			} else {
+  1101				cpuid_entry_override(entry, CPUID_8000_001F_EAX);
+  1102	
+  1103				/*
+  1104				 * Enumerate '0' for "PA bits reduction", the adjusted
+  1105				 * MAXPHYADDR is enumerated directly (see 0x80000008).
+  1106				 */
+  1107				entry->ebx &= ~GENMASK(11, 6);
+  1108			}
+  1109			break;
+  1110		/*Add support for Centaur's CPUID instruction*/
+  1111		case 0xC0000000:
+  1112			/*Just support up to 0xC0000004 now*/
+  1113			entry->eax = min(entry->eax, 0xC0000004);
+  1114			break;
+  1115		case 0xC0000001:
+  1116			cpuid_entry_override(entry, CPUID_C000_0001_EDX);
+  1117			break;
+  1118		case 3: /* Processor serial number */
+  1119		case 5: /* MONITOR/MWAIT */
+  1120		case 0xC0000002:
+  1121		case 0xC0000003:
+  1122		case 0xC0000004:
+  1123		default:
+  1124			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+  1125			break;
+  1126		}
+  1127	
+  1128		r = 0;
+  1129	
+  1130	out:
+  1131		put_cpu();
+  1132	
+  1133		return r;
+  1134	}
+  1135	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
