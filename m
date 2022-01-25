@@ -2,159 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D7EF49B47C
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:01:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F45C49B48E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 14:04:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384527AbiAYNAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 08:00:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62988 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1384528AbiAYM5i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 07:57:38 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20PCK2wM003850;
-        Tue, 25 Jan 2022 12:57:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=bnV43IDhnbn73XgH66pXLzvQyc/EZwGHvfAzRO6+zAs=;
- b=oXPZI5QqC/xF9TZ4fkwMwC+vNTR94kr7ZRAZT73H8yrVm8JYS2wZ09wCPmqFYm2nh/lw
- wuWwc/B1KtGwWMUGqIGyCkF/qy+mkjbyl8ZOIwZnt6aXgJxNZ34tmAMxoSLEgVgcBNxG
- HdRAK2xnH8dtdOHA0cVB3GEgloQHrgU8U0b+qiZjZnK/4BQJhucMCKcZY4y9otXPOt+I
- oBvkyXRaY0XX8GRcH/KA5E975igCaZ/CvBgj7A54pc4liuBd49qgxOTd8MKr81v/FZY7
- DIHF7fmsv5oQJlj8KhNsaWWzyKclOi+yd5HDcAnzlOlvdomfFb2Im+7sysDF+uSfdCsz vA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dth2r0uy7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:57:33 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20PCkbpo007644;
-        Tue, 25 Jan 2022 12:57:33 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dth2r0uxn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:57:33 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20PCvOKK003847;
-        Tue, 25 Jan 2022 12:57:31 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3dr9j964vn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jan 2022 12:57:31 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20PClsjV49152436
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jan 2022 12:47:54 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D688AAE04D;
-        Tue, 25 Jan 2022 12:57:26 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72F90AE051;
-        Tue, 25 Jan 2022 12:57:26 +0000 (GMT)
-Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.50.253])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jan 2022 12:57:26 +0000 (GMT)
-Message-ID: <c49a6f09765b4228097a5946bb805eb8d6a873e0.camel@linux.ibm.com>
-Subject: Re: [PATCH kvm-unit-tests v1 1/8] s390x: Add more tests for MSCH
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        id S1575209AbiAYNCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 08:02:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39034 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1574850AbiAYNAM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 08:00:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643115610;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QhLcThaEu0PlskFzQFT7M5fP0clt93A0xhvHp5D289k=;
+        b=X4IZW3kD9Ij1j5Jv8DBYOgFyA1IF1zKl6Ei3/smoQkCZF4zXctwtnJ6fIQi8T4RDN7UmdG
+        NIvGQvRjofnvU4nfLSoU5BowLqn8gTIFFLEe5CLGjm/p7rkRo+ObCHO0ClVWQ958Ah067t
+        nScQZ21rgA0b7Ld5IwUBCExHKTGbnCA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-647-tiAqr1A8N3KeLe_9gOt25Q-1; Tue, 25 Jan 2022 08:00:09 -0500
+X-MC-Unique: tiAqr1A8N3KeLe_9gOt25Q-1
+Received: by mail-wr1-f71.google.com with SMTP id x4-20020adfbb44000000b001d83e815683so3009237wrg.8
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 05:00:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=QhLcThaEu0PlskFzQFT7M5fP0clt93A0xhvHp5D289k=;
+        b=EcC6AYzg3fnKvTrQS9BdvXlIB2xmgOdaCgFE/ExnHK94VPlcmRrYzA4mSu6KIHhqPU
+         Md9NwMze49jR3iJMoPxZEO0R/KpUQjGYe9h/rwRe1qyW3Su0ohWuy6075bWpLvPxw7+t
+         kW7+fl/QA+sgIXajrvwgrzEsAqwFWyHT0ar3SnDvIwpnI6Du5URvSrIYm/9op1QXB/PT
+         oLTx8HXNsdszqAvXB4HU/hZmFc2ECvlRUJi9Xlkc7XSCty2LDOETtHldZSXIT0O4LTum
+         PkKcaJYM1OxoZXgR4O+ukDSYIonw5tg3EP5SgpA+lBKxs4ukd9hjH1Q5xcf+fUpiRuLx
+         mfJQ==
+X-Gm-Message-State: AOAM531h5fQXS4U8vdQHERzm+/HPghriRCdgZA1vPU7ikyVvJMnLHuGS
+        zKwsWe8XdnVqWveSMa20NFakaoSQd0shzCKeTNf6tU0rIqNNSqGfTaWiKpGl4RP70DwoKA56lbO
+        mXBZrB+/cFZVC
+X-Received: by 2002:adf:d1ed:: with SMTP id g13mr3352960wrd.495.1643115608016;
+        Tue, 25 Jan 2022 05:00:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx5h9igq4e4apmtvdHXBXtAlwPbOJYJVq3Fp0yhdWOnYTW62PA01UrRJZkdZJcOoleBxG6oIg==
+X-Received: by 2002:adf:d1ed:: with SMTP id g13mr3352938wrd.495.1643115607776;
+        Tue, 25 Jan 2022 05:00:07 -0800 (PST)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id b2sm9779406wrd.64.2022.01.25.05.00.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jan 2022 05:00:07 -0800 (PST)
+Message-ID: <07910e67-a506-424c-f851-d1f279e3b8df@redhat.com>
+Date:   Tue, 25 Jan 2022 14:00:06 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH kvm-unit-tests v1 2/8] s390x: Add test for PFMF
+ low-address protection
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
 Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com
-Date:   Tue, 25 Jan 2022 13:57:26 +0100
-In-Reply-To: <aa2f0f15-56d3-5009-1741-5d3664286c46@redhat.com>
 References: <20220121150931.371720-1-nrb@linux.ibm.com>
-         <20220121150931.371720-2-nrb@linux.ibm.com>
-         <aa2f0f15-56d3-5009-1741-5d3664286c46@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NpaxQ-sJioG4gPJ5Sbsi5isijGSzgFsA
-X-Proofpoint-GUID: HCuIExmVZYa-eRyEMaKkbcvcyAfIaleB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-25_02,2022-01-25_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0 adultscore=0
- suspectscore=0 spamscore=0 clxscore=1015 mlxscore=0 impostorscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201250081
+ <20220121150931.371720-3-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220121150931.371720-3-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-01-25 at 12:54 +0100, Thomas Huth wrote:
-> On 21/01/2022 16.09, Nico Boehr wrote:
+On 21/01/2022 16.09, Nico Boehr wrote:
+> PFMF should respect the low-address protection when clearing pages, hence
+> add some tests for it.
 > 
-[...]
-> > diff --git a/s390x/css.c b/s390x/css.c
-> > index 881206ba1cef..afe1f71bb576 100644
-> > --- a/s390x/css.c
-> > +++ b/s390x/css.c
-> > @@ -27,6 +27,8 @@ static int test_device_sid;
-> >   static struct senseid *senseid;
-> >   struct ccw1 *ccw;
-> >   
-> > +char alignment_test_page[PAGE_SIZE]
-> > __attribute__((aligned(PAGE_SIZE)));
+> When low-address protection fails, clearing frame 0 is a destructive
+> operation. It messes up interrupts and thus printing test results won't
+> work properly. Hence, we first attempt to clear frame 1 which is not as
+> destructive.
 > 
-> Alternatively, you could also use alloc_page() in that new
-> function... not 
-> sure what's nicer, though.
-
-I don't have a strong opinion. Happy to change to whatever you or the
-others prefer.
-
-
-> >   
-> > +static void test_msch(void)
-> > +{
-[...]
-> > +
-> > +       report_prefix_push("Invalid SCHIB");
-> > +       old_pmcw_flags = schib.pmcw.flags;
-> > +       for (int i = 0; i < ARRAY_SIZE(invalid_pmcw_flags); i++) {
-> > +               invalid_flag = invalid_pmcw_flags[i];
-> > +
-> > +               report_prefix_pushf("PMCW flag bit %d set",
-> > invalid_flag);
-> > +
-> > +               schib.pmcw.flags = old_pmcw_flags | BIT(15 -
-> > invalid_flag);
-> > +               expect_pgm_int();
-> > +               msch(test_device_sid, &schib);
-> > +               check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> > +
-> > +               report_prefix_pop();
-> > +       }
+> Doing it this way around increases the chances for the user to see a
+> proper failure message instead of QEMU randomly quitting in the middle
+> of the test run.
 > 
-> Maybe restore schib.pmcw.flags = old_pmcw_flags at the end, in case
-> someone 
-> wants to add more tests later?
-
-Yes, awesome idea, will do.
-
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   s390x/pfmf.c | 29 +++++++++++++++++++++++++++++
+>   1 file changed, 29 insertions(+)
 > 
-> > +       report_prefix_pop();
-> > +}
-> > +
-> >   static struct {
-> >         const char *name;
-> >         void (*func)(void);
-> > @@ -343,6 +393,7 @@ static struct {
-> >         { "measurement block (schm)", test_schm },
-> >         { "measurement block format0", test_schm_fmt0 },
-> >         { "measurement block format1", test_schm_fmt1 },
-> > +       { "msch", test_msch },
-> >         { NULL, NULL }
-> >   };
-> >   
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+> diff --git a/s390x/pfmf.c b/s390x/pfmf.c
+> index 2f3cb110dc4c..aa1305292ee8 100644
+> --- a/s390x/pfmf.c
+> +++ b/s390x/pfmf.c
+> @@ -113,6 +113,34 @@ static void test_1m_clear(void)
+>   	report_prefix_pop();
+>   }
+>   
+> +static void test_low_addr_prot(void)
+> +{
+> +	union pfmf_r1 r1 = {
+> +		.reg.cf = 1,
+> +		.reg.fsc = PFMF_FSC_4K
+> +	};
+> +
+> +	report_prefix_push("low-address protection");
+> +
+> +	report_prefix_push("0x1000");
+> +	expect_pgm_int();
+> +	low_prot_enable();
+> +	pfmf(r1.val, (void *)0x1000);
+> +	low_prot_disable();
+> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("0x0");
+> +	expect_pgm_int();
+> +	low_prot_enable();
+> +	pfmf(r1.val, 0);
+> +	low_prot_disable();
+> +	check_pgm_int_code(PGM_INT_CODE_PROTECTION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>   int main(void)
+>   {
+>   	bool has_edat = test_facility(8);
+> @@ -124,6 +152,7 @@ int main(void)
+>   	}
+>   
+>   	test_priv();
+> +	test_low_addr_prot();
+>   	/* Force the buffer pages in */
+>   	memset(pagebuf, 0, PAGE_SIZE * 256);
+>   
 
-Thanks.
-
-Nico
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
