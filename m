@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6A5E49B11F
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D31F349B11E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238994AbiAYKDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 05:03:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60176 "EHLO
+        id S238952AbiAYKC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 05:02:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238491AbiAYJ7d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:59:33 -0500
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B69EC06175B;
-        Tue, 25 Jan 2022 01:59:32 -0800 (PST)
-Received: by mail-pl1-x643.google.com with SMTP id j16so8192691plx.4;
-        Tue, 25 Jan 2022 01:59:32 -0800 (PST)
+        with ESMTP id S238496AbiAYJ7h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:59:37 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42E3C061744;
+        Tue, 25 Jan 2022 01:59:34 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id a8so13907222pfa.6;
+        Tue, 25 Jan 2022 01:59:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=j/rRmDiMdmGlDszyCo/+/fHqa/st5+5A7HjoH3NKV08=;
-        b=cYnSfuu7cXdFeqfoM+hegTyG4JSAyN1qSNbeBX1V1k3y0Jlvzele4X5rrqc9MTA70F
-         DzRy3+qKF2rm3varwe20/g098zxwHdokrfUwZEX4Wxogx8HSQ4T7sRoJWww7gUgESoOQ
-         h3G2sIxGvdfDG5pJChVK8Imr40QYdabRIDM+8C8aldKJP7YyycSxpVny2yrr5bsB0mUy
-         8M3P4MZOAJSiyn46N6gOGXSIHQYSWSAEvduVq3dYxskroY7W7zaqiKsMRGUr/A5komaF
-         qGqADiMqXzL1IgljGbkw5dTH0oSZomXCmAXqtEA4ybI+rASYG3iW76UceqT8kMCWmTyM
-         4TSg==
+        bh=scA+WO/7zy1xEMVYISep/dAL7wm6VBA9xpopPadR530=;
+        b=mZN8F9BJMrFhJhSJVwScLdFEt8dhtp6iOh0kBzJye9ur29QN3+jVxB+5+UJsqojwht
+         jJeNXxT4C74bxDAFgfh2VQcC4RlzsYizLG8gtXFzRa1op4dp3fJxltsvd2tTboN2IOxk
+         L3tIBILIRKwjGUF1Os9oi59SRVOHCjE5wrKMfqBq8SrrKF9jMO4K7id3YOcPaF6I44fB
+         TDeHnSHFBB0Cc1kBIfAD7czYkh0Qs6wqq3uPTsvgpn0JoweE+OyHMo5jd7e0DR90wTFu
+         ZzRnS67P/X3i0GRjFPld2Qo7UVzYETUomV8TTrr56WEziUR6u5mBLsxl2nIuBjUk5XLa
+         xLHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=j/rRmDiMdmGlDszyCo/+/fHqa/st5+5A7HjoH3NKV08=;
-        b=sAr1hl1fkusq4RnkvB1m6yt/tg7M1OWu1JoFx6nUoMATRPH4sYFBY2HEZrFdtukdQB
-         25GIpJROHgb6dFNwl8tNyMp6bL64QmOBkLi7tYpR0Q6PS7A3NDPvSfYgHOa4ZhvHaNd4
-         sARXegfG2FEc0x4gvWYY9BEkeHli/u8mYLaAQlQMhjxKJOEVqcQsT20ih7/HNH8Kp/L7
-         6XSr77cM9qjHnANVEW1ZyhzlBJMJ/oYjewssThatKvjaBxwxGgISWJZz13xW9WOgCKxa
-         S+CPib/GR5fGpcTF8uOIdOg4/cTQhzFIT9+hkQaRQknK76QXm3i8J5czXIdvCT2gSFh4
-         5M1Q==
-X-Gm-Message-State: AOAM53255f5/VaJgIiFq5ArNl6rmfLBFBz/6kakMVo57EXRA+2Xyf5WD
-        ++AtOE4QqzaRvyVpJPQigGI=
-X-Google-Smtp-Source: ABdhPJwLivPrqbSTiB4hpRIeQmhCIfmFOKjpzqLDUHj2ySIix16rb7GMsX2N9oGFO7SEmd9UopVAwg==
-X-Received: by 2002:a17:902:dac6:b0:14b:51c2:5d6d with SMTP id q6-20020a170902dac600b0014b51c25d6dmr8068078plx.3.1643104772108;
-        Tue, 25 Jan 2022 01:59:32 -0800 (PST)
+        bh=scA+WO/7zy1xEMVYISep/dAL7wm6VBA9xpopPadR530=;
+        b=cPWLXZlbluYqEVf3FMddr78LTuzDEzmSQxVrwJ6Zmxarhtj34j7fKCel8blhh0KrRC
+         qkoPilOXohjy1AgI7MNdrCvJUOFKwDuEJmxoYKxhZc3fbzIer56v0mZX8f0dV+FH+fgx
+         j3lMQetddXU6JXnVlHMY6JhEd4OJ1QKmWuvB+BuawzZQWxESj5nFpyX3wP0uHkwwbaRy
+         NWxTmsb4ca3Nxr0swmQqaNeshYKtxlGmxkC5aS31r6Gi4uyfGRpfpfH+paVFYbCLjJ64
+         xVDiNtu3P7toqDE7eYh8bG20j2mivGtbSzorjLxWTQpaYtqV979yfVDph2DC+gAw34c/
+         Bnlw==
+X-Gm-Message-State: AOAM532WF6ZvDadgp/4vzR5zlPEPx6mcZDFw5zI2ije98ympgLgZRFS2
+        RqCJ/WLXNbWB+UFCj8uiJZ0=
+X-Google-Smtp-Source: ABdhPJxwOLoU1nzuWo/msDqKR1WDXqXoaEO9O2aNuVN6/BK251EHfGQyFCnlmL2XZ1VJmbr+PKN7pw==
+X-Received: by 2002:a63:7019:: with SMTP id l25mr2991454pgc.321.1643104774522;
+        Tue, 25 Jan 2022 01:59:34 -0800 (PST)
 Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.29
+        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.32
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jan 2022 01:59:31 -0800 (PST)
+        Tue, 25 Jan 2022 01:59:34 -0800 (PST)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 06/19] KVM: x86/svm: Remove unused "vcpu" of svm_check_exit_valid()
-Date:   Tue, 25 Jan 2022 17:58:56 +0800
-Message-Id: <20220125095909.38122-7-cloudliang@tencent.com>
+Subject: [PATCH 07/19] KVM: x86/svm: Remove unused "vcpu" of nested_svm_check_tlb_ctl()
+Date:   Tue, 25 Jan 2022 17:58:57 +0800
+Message-Id: <20220125095909.38122-8-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20220125095909.38122-1-cloudliang@tencent.com>
 References: <20220125095909.38122-1-cloudliang@tencent.com>
@@ -71,36 +71,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-The "struct kvm_vcpu *vcpu" parameter of svm_check_exit_valid()
+The "struct kvm_vcpu *vcpu" parameter of nested_svm_check_tlb_ctl()
 is not used, so remove it. No functional change intended.
 
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- arch/x86/kvm/svm/svm.c | 4 ++--
+ arch/x86/kvm/svm/nested.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6d31d357a83b..bc733dbadbdd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3120,7 +3120,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
- 	       "excp_to:", save->last_excp_to);
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index cf206855ebf0..5a1a2678a2b1 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -209,7 +209,7 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
+ 	    kvm_vcpu_is_legal_gpa(vcpu, addr + size - 1);
  }
  
--static bool svm_check_exit_valid(struct kvm_vcpu *vcpu, u64 exit_code)
-+static bool svm_check_exit_valid(u64 exit_code)
+-static bool nested_svm_check_tlb_ctl(struct kvm_vcpu *vcpu, u8 tlb_ctl)
++static bool nested_svm_check_tlb_ctl(u8 tlb_ctl)
  {
- 	return (exit_code < ARRAY_SIZE(svm_exit_handlers) &&
- 		svm_exit_handlers[exit_code]);
-@@ -3140,7 +3140,7 @@ static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
+ 	/* Nested FLUSHBYASID is not supported yet.  */
+ 	switch(tlb_ctl) {
+@@ -240,7 +240,7 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+ 					   IOPM_SIZE)))
+ 		return false;
  
- int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code)
- {
--	if (!svm_check_exit_valid(vcpu, exit_code))
-+	if (!svm_check_exit_valid(exit_code))
- 		return svm_handle_invalid_exit(vcpu, exit_code);
+-	if (CC(!nested_svm_check_tlb_ctl(vcpu, control->tlb_ctl)))
++	if (CC(!nested_svm_check_tlb_ctl(control->tlb_ctl)))
+ 		return false;
  
- #ifdef CONFIG_RETPOLINE
+ 	return true;
 -- 
 2.33.1
 
