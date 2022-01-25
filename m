@@ -2,110 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2B7949B04B
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 10:42:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAE5549B115
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:03:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1574068AbiAYJbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 04:31:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50702 "EHLO
+        id S237868AbiAYKBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 05:01:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377051AbiAYJV7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:21:59 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFFD5C061788;
-        Tue, 25 Jan 2022 01:17:51 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id i65so19129932pfc.9;
-        Tue, 25 Jan 2022 01:17:51 -0800 (PST)
+        with ESMTP id S238379AbiAYJ7W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:59:22 -0500
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD4FC06173B;
+        Tue, 25 Jan 2022 01:59:17 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id j16so8192112plx.4;
+        Tue, 25 Jan 2022 01:59:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=VI7aOgi8DP+rWss8fUyiKKAKnxyW61GK39+BQqf7IjQ=;
-        b=kpoc+jN7Oh0Xh8sqifOd+tY8Ghm2bNiqb4sbBQuTro16HbQ2BbOMHBePTsdlmGr1pl
-         hEAewiRLTJx2IXZUrxyIu3hdOmjInM5Zwnk/Td0LTVdcvO2xzKX90rtU7gEpsckEInGI
-         1qGxCKElOueff2YWOXMYF4rsdE8eYnztSNWVTPLgRq+ZgXI+wCc8106BGSg0QJpfnULB
-         nHYLJ+ehlOpBdZrchedyDpZKJ1xakH48GpLwl0KVdu7myWug/yJ/v9BofVUrnC3NulwC
-         W5OrmoishELJOfTHlIPzabjaYu6q8a9egYyQm3Rc6pto0aTgFOFqixSw+g6/Rh66y4uF
-         NbsQ==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fFdstgg2rUPcDb1ze6Gb3FBjJ5NhUjfUjZg63XhP3m8=;
+        b=d+kNdAtMC6VO/K1pd0rlN3+UkQOHTSr4/8Gvkn1XwyLvTnRQ/TA3GNk3a2s1bCr2Gd
+         3xuvmKQHZ3Fy9dVJw6BkE4phM9S95dvpNcR683U5+kTyWv8JQvTZmFLZVyvaluxvP1o5
+         +Wpx8L1PAgT5V9HdJURbByv1VzZq1ANPnl28o6uHseAe0V1tJUF6/LKGT+nMvK/xt7y5
+         ckk8STa/NEXmMkks/iqDTEARcLiofyLonnojaiQ26bLAnylen+NUHqpP/VwoCy70Oxrw
+         G2myquSEOWdac1UHYok3RKBzxT1s2Y06/YTb1+IRAcchqE1v1j6GsmXeO23aUDER9Yyu
+         wtpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=VI7aOgi8DP+rWss8fUyiKKAKnxyW61GK39+BQqf7IjQ=;
-        b=ZDV4dS8dtxv7xiaaMiQXkrPRXwxlDjo/gd9aLlyJnp5/8qaWtj7Cc/DV9iy90zgw5J
-         jDpLjB50ZS4QHaJ/s5JgJIcYMCNpFnkj6VwPXELweRcS3olIYNsOgWGbq44acmNL5FJM
-         PKgThh22VvDTPM/zrc/+Y6bekRRnjawb74KKL2dVAkcjfe8EC1n0EHGI6zQqa7xEkK1O
-         ZLGai2juZC+toHMPMnme3ufr8XVH9GwkZwT9nq2wTgsCVOAzl5PM6+OhVbTkMqQr7flD
-         481Q1yQ8y4Lii+rnn2xRC93LRc+FZpaFGRBj0uDFmX2+AScZ8OJ4FjCCLhqwdKkXCyGI
-         xlcw==
-X-Gm-Message-State: AOAM532zswOQT+xttIRKR+NU3MvfFTIBO3mYwBMyGb7KR7f3HDChioZi
-        xNptAgBQKHGlEZgsywlWvvh5Vzf4o765GQ==
-X-Google-Smtp-Source: ABdhPJzAP7k1ap1vXtrYUwPxmesHj8MzzPsBeIsoCfmfcwnVaT/kuY4a0eAnOru1MxPReVwZLnzPgw==
-X-Received: by 2002:a62:7705:0:b0:4c6:d435:573c with SMTP id s5-20020a627705000000b004c6d435573cmr17716034pfc.57.1643102271349;
-        Tue, 25 Jan 2022 01:17:51 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.112])
-        by smtp.googlemail.com with ESMTPSA id y13sm2114780pfi.2.2022.01.25.01.17.48
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fFdstgg2rUPcDb1ze6Gb3FBjJ5NhUjfUjZg63XhP3m8=;
+        b=psNXcdOy0jAo8UoY/f0pN+V1p0iO9r5zgJECP2trw/Mqr+PtXg1rbM8H+vZQZzkhRR
+         ADvCzkNhaQNK/2IKI2aznkE8ieCrSQy5U+W5RWG3WpQ94rMw/FxwEpVtb+Guw/ISznwo
+         t/d1Phe/h9FxamdzKpf8vuEDv8OANsQteIfB5ys+Lk2auMFVpN/xxy4gJA3mOZ2nyrks
+         lqyzi2mmxzDkjV/5QmMhEM9YLQ2buZLsuF2XvHooLgQiN+CU1NwaLE50wB2aGaFqMCHZ
+         DJ8M6kFgfmgHzeGdO8/1RfSPv3FQeRVEvcLzzuLL6oLidWY8xxOLKuzDCddWEcGWuZQu
+         eTXg==
+X-Gm-Message-State: AOAM531zDRKPAE83yJXBk1a5O0GUC5/FbgaHoz37GMqWpQWfsPUc6C3a
+        2Lu4Ae+l3G3RTVGf01Im+wQ=
+X-Google-Smtp-Source: ABdhPJynTjSw3NN4RTxtz7nF2flKZPjtCXyUXoOuXHJABCpRtZ88n0dzVJCCdj/R1ZW5yc4xCGtwog==
+X-Received: by 2002:a17:902:8695:b0:14a:f006:db03 with SMTP id g21-20020a170902869500b0014af006db03mr17647228plo.173.1643104757470;
+        Tue, 25 Jan 2022 01:59:17 -0800 (PST)
+Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.15
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jan 2022 01:17:51 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tue, 25 Jan 2022 01:59:17 -0800 (PST)
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
+        Jim Mattson <jmattson@google.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: LAPIC: Also cancel preemption timer during SET_LAPIC
-Date:   Tue, 25 Jan 2022 01:17:00 -0800
-Message-Id: <1643102220-35667-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 00/19] KVM: x86: Bulk removal of unused function parameters
+Date:   Tue, 25 Jan 2022 17:58:50 +0800
+Message-Id: <20220125095909.38122-1-cloudliang@tencent.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+From: Like Xu <likexu@tencent.com>
 
-The below warning is splatting during guest reboot.
+Hi,
 
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1931 at arch/x86/kvm/x86.c:10322 kvm_arch_vcpu_ioctl_run+0x874/0x880 [kvm]
-  CPU: 0 PID: 1931 Comm: qemu-system-x86 Tainted: G          I       5.17.0-rc1+ #5
-  RIP: 0010:kvm_arch_vcpu_ioctl_run+0x874/0x880 [kvm]
-  Call Trace:
-   <TASK>
-   kvm_vcpu_ioctl+0x279/0x710 [kvm]
-   __x64_sys_ioctl+0x83/0xb0
-   do_syscall_64+0x3b/0xc0
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-  RIP: 0033:0x7fd39797350b
+This patch set is a follow up to a similar patch [1], and may
+hopefully help to improve the code quality of KVM.
 
-This can be triggered by not exposing tsc-deadline mode and doing a reboot in
-the guest. The lapic_shutdown() function which is called in sys_reboot path
-will not disarm the flying timer, it just masks LVTT. lapic_shutdown() clears
-APIC state w/ LVT_MASKED and timer-mode bit is 0, this can trigger timer-mode
-switch between tsc-deadline and oneshot/periodic, which can result in preemption
-timer be cancelled in apic_update_lvtt(). However, We can't depend on this when 
-not exposing tsc-deadline mode and oneshot/periodic modes emulated by preemption 
-timer. Qemu will synchronise states around reset, let's cancel preemption timer 
-under KVM_SET_LAPIC.
+Basically, the cleanup is triggered by a compiler feature[2], but obviously
+there are a lot of false positives here, and so far we may apply at least
+this changset, which also helps the related developers to think more
+carefully about why these functions were declared that way in the first
+place or what is left after a series of loosely-coupled clean-ups.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[1] https://lore.kernel.org/kvm/20220124020456.156386-1-xianting.tian@linux.alibaba.com/
+[2] ccflags-y += -Wunused-parameter
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index baca9fa37a91..4662469240bc 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2629,7 +2629,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	kvm_apic_set_version(vcpu);
- 
- 	apic_update_ppr(apic);
--	hrtimer_cancel(&apic->lapic_timer.timer);
-+	cancel_apic_timer(apic);
- 	apic->lapic_timer.expired_tscdeadline = 0;
- 	apic_update_lvtt(apic);
- 	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+Thanks,
+Like Xu
+
+Jinrong Liang (19):
+  KVM: x86/mmu: Remove unused "kvm" of kvm_mmu_unlink_parents()
+  KVM: x86/mmu: Remove unused "kvm" of __rmap_write_protect()
+  KVM: x86/mmu: Remove unused "vcpu" of
+    reset_{tdp,ept}_shadow_zero_bits_mask()
+  KVM: x86/tdp_mmu: Remove unused "kvm" of kvm_tdp_mmu_get_root()
+  KVM: x86/mmu_audit: Remove unused "level" of audit_spte_after_sync()
+  KVM: x86/svm: Remove unused "vcpu" of svm_check_exit_valid()
+  KVM: x86/svm: Remove unused "vcpu" of nested_svm_check_tlb_ctl()
+  KVM: x86/svm: Remove unused "vcpu" of kvm_after_interrupt()
+  KVM: x86/sev: Remove unused "svm" of sev_es_prepare_guest_switch()
+  KVM: x86/sev: Remove unused "kvm" of sev_unbind_asid()
+  KVM: x86/sev: Remove unused "vector" of sev_vcpu_deliver_sipi_vector()
+  KVM: x86/i8259: Remove unused "addr" of elcr_ioport_{read,write}()
+  KVM: x86/ioapic: Remove unused "addr" and "length" of
+    ioapic_read_indirect()
+  KVM: x86/emulate: Remove unused "ctxt" of setup_syscalls_segments()
+  KVM: x86/emulate: Remove unused "ctxt" of task_switch_{16, 32}()
+  KVM: x86: Remove unused "vcpu" of kvm_arch_tsc_has_attr()
+  KVM: x86: Remove unused "vcpu" of kvm_scale_tsc()
+  KVM: Remove unused "kvm" of kvm_make_vcpu_request()
+  KVM: Remove unused "flags" of kvm_pv_kick_cpu_op()
+
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/emulate.c          | 20 ++++++++------------
+ arch/x86/kvm/i8259.c            |  8 ++++----
+ arch/x86/kvm/ioapic.c           |  6 ++----
+ arch/x86/kvm/mmu/mmu.c          | 23 ++++++++++-------------
+ arch/x86/kvm/mmu/mmu_audit.c    |  4 ++--
+ arch/x86/kvm/mmu/tdp_mmu.c      |  4 ++--
+ arch/x86/kvm/mmu/tdp_mmu.h      |  3 +--
+ arch/x86/kvm/svm/nested.c       |  4 ++--
+ arch/x86/kvm/svm/sev.c          | 12 ++++++------
+ arch/x86/kvm/svm/svm.c          | 10 +++++-----
+ arch/x86/kvm/svm/svm.h          |  4 ++--
+ arch/x86/kvm/vmx/vmx.c          |  2 +-
+ arch/x86/kvm/x86.c              | 25 ++++++++++++-------------
+ arch/x86/kvm/x86.h              |  2 +-
+ virt/kvm/kvm_main.c             |  9 ++++-----
+ 16 files changed, 63 insertions(+), 75 deletions(-)
+
 -- 
-2.25.1
+2.33.1
 
