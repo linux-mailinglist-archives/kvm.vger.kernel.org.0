@@ -2,149 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D63649B37E
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 13:05:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2D4049B37C
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 13:05:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391989AbiAYMEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 07:04:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59432 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382757AbiAYMAo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 07:00:44 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DBB3C06173B;
-        Tue, 25 Jan 2022 04:00:30 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id w12-20020a17090a528c00b001b276aa3aabso1911538pjh.0;
-        Tue, 25 Jan 2022 04:00:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=Z2eSIKO2hPoT+F0EzCBQkbD8++MWEeeyBWhA5iN+68Y=;
-        b=ALI7ZgAa3oPCEuVPuONBKC63VKdQnQJeEy7qFRK699JkPvR7gWOFbzGjLsglzuYD52
-         2yHA3r92N2bIK0ZksZD8njL5BAlHHcNCheGp1PHn+D1fVjO76qBpFlTNfLnUv/DlR7DW
-         AO2VFW08Twc34e8cqgQS/gaYEmzYtu2iaW6IVT/QEfqVPibZoSv/2zt8U8wwCsqJuEAH
-         1M2Vl5l55ywHvBrjbwXyTAM1idFUjbWRv+K5t5Tz/yk+mObHo5H3zy6OG02HLn9MUZsS
-         T7MCeAg5A30xSfp9RtGu0u+EoShs6bZ6VVL7rvBi6YfpwnJ7BGb+qeovwbebc1cVJICc
-         vE2w==
+        id S1391586AbiAYME2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 07:04:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31889 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1382795AbiAYMAo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jan 2022 07:00:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643112031;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2lsdYPIqQ4QlcpvU2QM4ze8T2zz+UGakXhoLQCT2xuc=;
+        b=NED8xet4OZL3J00CxHbetxFWuuzj/zWX2STD+VrGJdB37A/qMKhs8nxC65RLm7yxzmz1zT
+        +hDy7aXN5hhqYv0WnACEd1yF3TuL8XdQ/DRmNQl8PjAMNR0l/LrcJzULRGI2i2L0ojI3cE
+        w2QJgyiFK28SD9G8lPfzikK6+qm111E=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-346-V2YNY87SN4eE8Mg4okBMDw-1; Tue, 25 Jan 2022 07:00:30 -0500
+X-MC-Unique: V2YNY87SN4eE8Mg4okBMDw-1
+Received: by mail-wm1-f69.google.com with SMTP id o194-20020a1ca5cb000000b00350b177fb22so354434wme.3
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 04:00:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Z2eSIKO2hPoT+F0EzCBQkbD8++MWEeeyBWhA5iN+68Y=;
-        b=sfFITQCQSJDzN0Sq3ap2cHgQGRfVa1SXUSIB9o26LwUsDPGE1f81dRli186yl3jtU7
-         E/tg3kx9rZo48Q+pELESi+WplbsRK5AmnjOtF7IE7TVGoQuQNOYdbLZQ02Wav1iYCFND
-         qy9HXsZh8F5HeQkDZg+dcAE/stGR6qIC4OdSwFEBnYYCcfW6/j7SRWXX6Swa2m4rNBsi
-         hDF2hXux+QwIcltL36eu0t5BpsN1JVKFQshdaaPLagCFx4iirFmYHaw3ofBDoj1y33SD
-         mnGi6BcoeXQw0e6MxMNU8GkNbs2L9LWCECR1kZMRW5kx5XHhztMjoLSYaUfeQYBfRgYi
-         9gzQ==
-X-Gm-Message-State: AOAM531ZIVAp1gjlCBeSEHd6gAazQ3KIHWB5BVIgawcHNEiV+HDnLl0s
-        ypRGLMm0ma8R2RWLnzdlgODJ+VhPlwoAsQ==
-X-Google-Smtp-Source: ABdhPJxboyPEW0uwim9wsTVOxgUlkUtCTkh+LyP78FY20vNjpwPE1Uw/P3LJf5XOzjr/65Rvwj6LJQ==
-X-Received: by 2002:a17:90a:de08:: with SMTP id m8mr3209326pjv.102.1643112029424;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=2lsdYPIqQ4QlcpvU2QM4ze8T2zz+UGakXhoLQCT2xuc=;
+        b=2Dv8raiPxKDli2ipX+vb9doVZYTOcW9j7tdeAlSaGrQ4UbKisnySEZnz2nBEN6gONm
+         jcF2w5nw7eLFPLH+lCHrzNs7MLX/qJJxHShq2ktB/bONK/FzkActL/eJPn+Q6/g7qEgw
+         kY0iv1bhhl4hH0pLjfiJXSLLMnUq+EF996NzWRZKi5M5PL70d/+0AhMDMGBd6CNpuInA
+         C1t1x0EtFxV7dxiiRI7+Ci9tX4WxBtaGfJGa/zFfWjx79cFfugoRktyUU5qQIjtibom7
+         GXx5HB8//LH/aKLAAIimveEbvqtLUKBZmaf7c/4KlfH6T46sDFz97a66zN2GszbIpNy+
+         1t4g==
+X-Gm-Message-State: AOAM530kVzJe9WXT9afLLK2NIUG0fhJISibW2eC91rciHhjBvHqmNr9I
+        xCIbiw1lsIeXOMx7ynTTerJQjWL8KbrBfUW35dQ0dXKhDPkJBiL10XTileywTV5O8aUjAgM4pw2
+        LLFCMhBFFvg4m
+X-Received: by 2002:a1c:cc08:: with SMTP id h8mr2659695wmb.156.1643112029287;
         Tue, 25 Jan 2022 04:00:29 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.110])
-        by smtp.googlemail.com with ESMTPSA id ga21sm2566108pjb.2.2022.01.25.04.00.27
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+X-Google-Smtp-Source: ABdhPJygqV37/XDy+29IPJuuFxB8Vr2Cp0cFygEJ6RlKk0ecIA/aj6eOc5JLqKQTmnbzn5TcAS8pZA==
+X-Received: by 2002:a1c:cc08:: with SMTP id h8mr2659671wmb.156.1643112029092;
         Tue, 25 Jan 2022 04:00:29 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH RESEND v2] KVM: VMX: Dont' send posted IRQ if vCPU == this vCPU and vCPU is IN_GUEST_MODE
-Date:   Tue, 25 Jan 2022 03:59:39 -0800
-Message-Id: <1643111979-36447-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id g5sm12180088wri.108.2022.01.25.04.00.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jan 2022 04:00:28 -0800 (PST)
+Message-ID: <3035e023-d71a-407b-2ba6-45ad0ae85a9e@redhat.com>
+Date:   Tue, 25 Jan 2022 13:00:27 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [RFC PATCH v1 06/10] KVM: s390: Add vm IOCTL for key checked
+ guest absolute memory access
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+ <20220118095210.1651483-7-scgl@linux.ibm.com>
+ <069c72b6-457f-65c7-652e-e6eca7235fca@redhat.com>
+ <8647fcaf-6d8a-4678-0695-4b1cc797b3b1@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <8647fcaf-6d8a-4678-0695-4b1cc797b3b1@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 20/01/2022 13.23, Janis Schoetterl-Glausch wrote:
+> On 1/20/22 11:38, Thomas Huth wrote:
+>> On 18/01/2022 10.52, Janis Schoetterl-Glausch wrote:
+>>> Channel I/O honors storage keys and is performed on absolute memory.
+>>> For I/O emulation user space therefore needs to be able to do key
+>>> checked accesses.
+>>> The vm IOCTL supports read/write accesses, as well as checking
+>>> if an access would succeed.
+>> ...
+>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>> index e3f450b2f346..dd04170287fd 100644
+>>> --- a/include/uapi/linux/kvm.h
+>>> +++ b/include/uapi/linux/kvm.h
+>>> @@ -572,6 +572,8 @@ struct kvm_s390_mem_op {
+>>>    #define KVM_S390_MEMOP_LOGICAL_WRITE    1
+>>>    #define KVM_S390_MEMOP_SIDA_READ    2
+>>>    #define KVM_S390_MEMOP_SIDA_WRITE    3
+>>> +#define KVM_S390_MEMOP_ABSOLUTE_READ    4
+>>> +#define KVM_S390_MEMOP_ABSOLUTE_WRITE    5
+>>
+>> Not quite sure about this - maybe it is, but at least I'd like to see this discussed: Do we really want to re-use the same ioctl layout for both, the VM and the VCPU file handles? Where the userspace developer has to know that the *_ABSOLUTE_* ops only work with VM handles, and the others only work with the VCPU handles? A CPU can also address absolute memory, so why not adding the *_ABSOLUTE_* ops there, too? And if we'd do that, wouldn't it be sufficient to have the VCPU ioctls only - or do you want to call these ioctls from spots in QEMU where you do not have a VCPU handle available? (I/O instructions are triggered from a CPU, so I'd assume that you should have a VCPU handle around?)
+> 
+> There are some differences between the vm and the vcpu memops.
+> No storage or fetch protection overrides apply to IO/vm memops, after all there is no control register to enable them.
+> Additionally, quiescing is not required for IO, tho in practice we use the same code path for the vcpu and the vm here.
+> Allowing absolute accesses with a vcpu is doable, but I'm not sure what the use case for it would be, I'm not aware of
+> a precedence in the architecture. Of course the vcpu memop already supports logical=real accesses.
 
-When delivering a virtual interrupt, don't actually send a posted interrupt
-if the target vCPU is also the currently running vCPU and is IN_GUEST_MODE,
-in which case the interrupt is being sent from a VM-Exit fastpath and the
-core run loop in vcpu_enter_guest() will manually move the interrupt from
-the PIR to vmcs.GUEST_RVI.  IRQs are disabled while IN_GUEST_MODE, thus
-there's no possibility of the virtual interrupt being sent from anything
-other than KVM, i.e. KVM won't suppress a wake event from an IRQ handler
-(see commit fdba608f15e2, "KVM: VMX: Wake vCPU when delivering posted IRQ
-even if vCPU == this vCPU").
+Ok. Maybe it then would be better to call new ioctl and the new op defines 
+differently, to avoid confusion? E.g. call it "vmmemop" and use:
 
-Eliding the posted interrupt restores the performance provided by the
-combination of commits 379a3c8ee444 ("KVM: VMX: Optimize posted-interrupt
-delivery for timer fastpath") and 26efe2fd92e5 ("KVM: VMX: Handle
-preemption timer fastpath").
+#define KVM_S390_VMMEMOP_ABSOLUTE_READ    1
+#define KVM_S390_VMMEMOP_ABSOLUTE_WRITE   2
 
-Thanks Sean for better comments.
+?
 
-Suggested-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/vmx/vmx.c | 40 +++++++++++++++++++++-------------------
- 1 file changed, 21 insertions(+), 19 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fe06b02994e6..e06377c9a4cf 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3908,31 +3908,33 @@ static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
- #ifdef CONFIG_SMP
- 	if (vcpu->mode == IN_GUEST_MODE) {
- 		/*
--		 * The vector of interrupt to be delivered to vcpu had
--		 * been set in PIR before this function.
-+		 * The vector of the virtual has already been set in the PIR.
-+		 * Send a notification event to deliver the virtual interrupt
-+		 * unless the vCPU is the currently running vCPU, i.e. the
-+		 * event is being sent from a fastpath VM-Exit handler, in
-+		 * which case the PIR will be synced to the vIRR before
-+		 * re-entering the guest.
- 		 *
--		 * Following cases will be reached in this block, and
--		 * we always send a notification event in all cases as
--		 * explained below.
-+		 * When the target is not the running vCPU, the following
-+		 * possibilities emerge:
- 		 *
--		 * Case 1: vcpu keeps in non-root mode. Sending a
--		 * notification event posts the interrupt to vcpu.
-+		 * Case 1: vCPU stays in non-root mode. Sending a notification
-+		 * event posts the interrupt to the vCPU.
- 		 *
--		 * Case 2: vcpu exits to root mode and is still
--		 * runnable. PIR will be synced to vIRR before the
--		 * next vcpu entry. Sending a notification event in
--		 * this case has no effect, as vcpu is not in root
--		 * mode.
-+		 * Case 2: vCPU exits to root mode and is still runnable. The
-+		 * PIR will be synced to the vIRR before re-entering the guest.
-+		 * Sending a notification event is ok as the host IRQ handler
-+		 * will ignore the spurious event.
- 		 *
--		 * Case 3: vcpu exits to root mode and is blocked.
--		 * vcpu_block() has already synced PIR to vIRR and
--		 * never blocks vcpu if vIRR is not cleared. Therefore,
--		 * a blocked vcpu here does not wait for any requested
--		 * interrupts in PIR, and sending a notification event
--		 * which has no effect is safe here.
-+		 * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
-+		 * has already synced PIR to vIRR and never blocks the vCPU if
-+		 * the vIRR is not empty. Therefore, a blocked vCPU here does
-+		 * not wait for any requested interrupts in PIR, and sending a
-+		 * notification event also results in a benign, spurious event.
- 		 */
- 
--		apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
-+		if (vcpu != kvm_get_running_vcpu())
-+			apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
- 		return;
- 	}
- #endif
--- 
-2.25.1
+  Thomas
 
