@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13C9249B11C
-	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6A5E49B11F
+	for <lists+kvm@lfdr.de>; Tue, 25 Jan 2022 11:04:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238855AbiAYKCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jan 2022 05:02:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
+        id S238994AbiAYKDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jan 2022 05:03:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238468AbiAYJ7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:59:30 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A451C061751;
-        Tue, 25 Jan 2022 01:59:30 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id k17so1215266plk.0;
-        Tue, 25 Jan 2022 01:59:30 -0800 (PST)
+        with ESMTP id S238491AbiAYJ7d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jan 2022 04:59:33 -0500
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B69EC06175B;
+        Tue, 25 Jan 2022 01:59:32 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id j16so8192691plx.4;
+        Tue, 25 Jan 2022 01:59:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=oYvl3LXfq2Z7qoIfNjZ5GsgYEqtM3wk9CuvlXSIi+kA=;
-        b=Wlj/sKZXZpqy/o1WYQu+xr6CjK2FGzWSNz5NdVM4P9zzuRB0zxYaBgxFZONutu7xka
-         EmdMealNBliAlnARYU4X5e6CkhJYajhepYqoI/N0tdLPXuG81BbVram+8k1pL562Bw84
-         /pfACoBuVGEaOyOjBS/beEz03XCBvTQyz3hfFvn64B/FazsZMojNICTOrYx5mO/ms9TE
-         1Rs7hASxXb9SIZ7nOcfUbIHyn30T1nVeX3J0OEbRER3UKskVCVh4giP6/CFH8yvW2Tjw
-         8GDcaO4i1nIIK0NXIb4rp9SOBIZ+J5Q1BEc2TnD7wOTzZ+cHs36X9AURRpOy7TQp3XTH
-         sFBw==
+        bh=j/rRmDiMdmGlDszyCo/+/fHqa/st5+5A7HjoH3NKV08=;
+        b=cYnSfuu7cXdFeqfoM+hegTyG4JSAyN1qSNbeBX1V1k3y0Jlvzele4X5rrqc9MTA70F
+         DzRy3+qKF2rm3varwe20/g098zxwHdokrfUwZEX4Wxogx8HSQ4T7sRoJWww7gUgESoOQ
+         h3G2sIxGvdfDG5pJChVK8Imr40QYdabRIDM+8C8aldKJP7YyycSxpVny2yrr5bsB0mUy
+         8M3P4MZOAJSiyn46N6gOGXSIHQYSWSAEvduVq3dYxskroY7W7zaqiKsMRGUr/A5komaF
+         qGqADiMqXzL1IgljGbkw5dTH0oSZomXCmAXqtEA4ybI+rASYG3iW76UceqT8kMCWmTyM
+         4TSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=oYvl3LXfq2Z7qoIfNjZ5GsgYEqtM3wk9CuvlXSIi+kA=;
-        b=WwFSA6+RsA6RSnKIkgnaX6VhNF4aOmYDx0053rM7TFCm34JTR4kC//eVBt9hFkhW7A
-         XESk8+HyxGvLaPrAlxuN9qvpAYkXByioxVx8NcACAUMonuP/CbEX/k0bdtIYC3TEGE8+
-         dszG8wup8C+dP8iSFiWD8q9IiDqs99F2G2u/Z3QZginczrYH/ssn+VE/uL791eapksKZ
-         2r5TDvLyHDpgzcQNDYYPyDN6ZoibGUc3SpDjqTQD2OV4DPHs847xdTTaer0YtSDKOPIF
-         FOgtmo3JpH+FL0f7QUiWoiCIx+M4diXE+MZ33qEBbU2XphqKECl2agnJZGVRNz1h96gH
-         yB3g==
-X-Gm-Message-State: AOAM5339MvZeS5uag/5qp1NsVaWrvOVN+GRWmocZQ6D5F6csEXzsgeco
-        zdVNJo4dfpP2glTwHB9zu6M=
-X-Google-Smtp-Source: ABdhPJwu6Vdz0Bw1KltVyRagJh0tG49h6WEICpjQ7NHc6M397SQTTLplnau8Wgr6EO6lb4bOPLePwg==
-X-Received: by 2002:a17:90b:3b88:: with SMTP id pc8mr2716352pjb.245.1643104769736;
-        Tue, 25 Jan 2022 01:59:29 -0800 (PST)
+        bh=j/rRmDiMdmGlDszyCo/+/fHqa/st5+5A7HjoH3NKV08=;
+        b=sAr1hl1fkusq4RnkvB1m6yt/tg7M1OWu1JoFx6nUoMATRPH4sYFBY2HEZrFdtukdQB
+         25GIpJROHgb6dFNwl8tNyMp6bL64QmOBkLi7tYpR0Q6PS7A3NDPvSfYgHOa4ZhvHaNd4
+         sARXegfG2FEc0x4gvWYY9BEkeHli/u8mYLaAQlQMhjxKJOEVqcQsT20ih7/HNH8Kp/L7
+         6XSr77cM9qjHnANVEW1ZyhzlBJMJ/oYjewssThatKvjaBxwxGgISWJZz13xW9WOgCKxa
+         S+CPib/GR5fGpcTF8uOIdOg4/cTQhzFIT9+hkQaRQknK76QXm3i8J5czXIdvCT2gSFh4
+         5M1Q==
+X-Gm-Message-State: AOAM53255f5/VaJgIiFq5ArNl6rmfLBFBz/6kakMVo57EXRA+2Xyf5WD
+        ++AtOE4QqzaRvyVpJPQigGI=
+X-Google-Smtp-Source: ABdhPJwLivPrqbSTiB4hpRIeQmhCIfmFOKjpzqLDUHj2ySIix16rb7GMsX2N9oGFO7SEmd9UopVAwg==
+X-Received: by 2002:a17:902:dac6:b0:14b:51c2:5d6d with SMTP id q6-20020a170902dac600b0014b51c25d6dmr8068078plx.3.1643104772108;
+        Tue, 25 Jan 2022 01:59:32 -0800 (PST)
 Received: from CLOUDLIANG-MB0.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.27
+        by smtp.gmail.com with ESMTPSA id mq3sm201606pjb.4.2022.01.25.01.59.29
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Jan 2022 01:59:29 -0800 (PST)
+        Tue, 25 Jan 2022 01:59:31 -0800 (PST)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -57,9 +57,9 @@ Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 05/19] KVM: x86/mmu_audit: Remove unused "level" of audit_spte_after_sync()
-Date:   Tue, 25 Jan 2022 17:58:55 +0800
-Message-Id: <20220125095909.38122-6-cloudliang@tencent.com>
+Subject: [PATCH 06/19] KVM: x86/svm: Remove unused "vcpu" of svm_check_exit_valid()
+Date:   Tue, 25 Jan 2022 17:58:56 +0800
+Message-Id: <20220125095909.38122-7-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20220125095909.38122-1-cloudliang@tencent.com>
 References: <20220125095909.38122-1-cloudliang@tencent.com>
@@ -71,36 +71,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-The "int level" parameter of audit_spte_after_sync() is not used,
-so remove it. No functional change intended.
+The "struct kvm_vcpu *vcpu" parameter of svm_check_exit_valid()
+is not used, so remove it. No functional change intended.
 
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- arch/x86/kvm/mmu/mmu_audit.c | 4 ++--
+ arch/x86/kvm/svm/svm.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
-index 9e7dcf999f08..f31fdb874f1f 100644
---- a/arch/x86/kvm/mmu/mmu_audit.c
-+++ b/arch/x86/kvm/mmu/mmu_audit.c
-@@ -163,7 +163,7 @@ static void audit_sptes_have_rmaps(struct kvm_vcpu *vcpu, u64 *sptep, int level)
- 		inspect_spte_has_rmap(vcpu->kvm, sptep);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 6d31d357a83b..bc733dbadbdd 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3120,7 +3120,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+ 	       "excp_to:", save->last_excp_to);
  }
  
--static void audit_spte_after_sync(struct kvm_vcpu *vcpu, u64 *sptep, int level)
-+static void audit_spte_after_sync(struct kvm_vcpu *vcpu, u64 *sptep)
+-static bool svm_check_exit_valid(struct kvm_vcpu *vcpu, u64 exit_code)
++static bool svm_check_exit_valid(u64 exit_code)
  {
- 	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+ 	return (exit_code < ARRAY_SIZE(svm_exit_handlers) &&
+ 		svm_exit_handlers[exit_code]);
+@@ -3140,7 +3140,7 @@ static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
  
-@@ -225,7 +225,7 @@ static void audit_spte(struct kvm_vcpu *vcpu, u64 *sptep, int level)
+ int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code)
  {
- 	audit_sptes_have_rmaps(vcpu, sptep, level);
- 	audit_mappings(vcpu, sptep, level);
--	audit_spte_after_sync(vcpu, sptep, level);
-+	audit_spte_after_sync(vcpu, sptep);
- }
+-	if (!svm_check_exit_valid(vcpu, exit_code))
++	if (!svm_check_exit_valid(exit_code))
+ 		return svm_handle_invalid_exit(vcpu, exit_code);
  
- static void audit_vcpu_spte(struct kvm_vcpu *vcpu)
+ #ifdef CONFIG_RETPOLINE
 -- 
 2.33.1
 
