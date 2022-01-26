@@ -2,86 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E787E49CF3E
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:09:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0138E49CFBA
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:30:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238530AbiAZQIM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 11:08:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236433AbiAZQIJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 11:08:09 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC9EC06173B
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:08:08 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id g2so21501487pgo.9
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:08:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RXbr9ZV0Py1ZrZ3gePRRUjbiJrxRVqlHjZYB9UaSH3c=;
-        b=hsj2vCaycqgImUlDVo/2tN6tdut4f4lJogQ3VzmgwHjxJ8fsgs6S8lrRUME699j7KM
-         WhNzh3Kpehe9jy3sn4AdPT1GbqOUP808iCWHWbpHW8/B06Ij6i3vjFtX6rY3LS0KrHDw
-         OhfwHHtEUc17ZFoaLuGrQYbkDFnokSeKEwCgIy09YsA+0BSfKv5OsUvaL5JVWedkwgC4
-         Sa91RGLcaG00AOcUCCgygiLOI5QUKUmgSgHXiF0ccNYswh++H/XckpSWL7X2P87hZEc5
-         R8l/quDbDS0KOaJ+z1XSBvqLBlY2lxSNx/quUl3f/Te5xAU3W2Nv9YDDX85KOyTZhZUM
-         kDxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RXbr9ZV0Py1ZrZ3gePRRUjbiJrxRVqlHjZYB9UaSH3c=;
-        b=KxH1YAFbPnHXeemsSAVvp8+Tt4ddQK9MfUnCG0jZOlkgc7vpZc3grldjqRj5TVKy33
-         9FOlf5rfBYmiisEo6gqWXk/kJ7rqwMi2+RPbh467m+Jb+MZwblqA8PFn0q5jsbsLRD0H
-         63U0jPpVK8WkGjzBirkKy3wVfpRnmCJJ5q+VnCbFd193K9oXZqP7XTeoZILdbY/79zW2
-         kSYmwv2F7wAtL4dHzBBVT50A1OK3jgjHNj4/prxLvKQyYaQhb+BciJx4U6aPWrs61j0W
-         gE1aIaVXMIa5vMiZaeEoZA4qbttrsEOZNPjJ/oTtAbC3vKK1/iLvmgJBDcBcZudXR85S
-         woAw==
-X-Gm-Message-State: AOAM533qE0IcshEMb75sOuwbda8irTUhR2eL6VEqLE6kTkCORBDB4iSr
-        H05tBJfqmt1WfrW+pL/2CqeIQA==
-X-Google-Smtp-Source: ABdhPJy5BvxtkYVC/XIW5ZxQCaspp66xlzK/p2zYKQaW31dS3ics9CHm2fQLWB8jT8Z3Jglzoat/lg==
-X-Received: by 2002:a63:f610:: with SMTP id m16mr19556229pgh.69.1643213288237;
-        Wed, 26 Jan 2022 08:08:08 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y13sm11923042pgi.8.2022.01.26.08.08.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 08:08:07 -0800 (PST)
-Date:   Wed, 26 Jan 2022 16:08:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+8112db3ab20e70d50c31@syzkaller.appspotmail.com
-Subject: Re: [PATCH] KVM: x86: Forcibly leave nested virt when SMM state is
- toggled
-Message-ID: <YfFx5LZ2rMMtbDWG@google.com>
-References: <20220125220358.2091737-1-seanjc@google.com>
- <7eb8c6722a522e42f8e8974c084c7cab3098d9fa.camel@redhat.com>
+        id S243123AbiAZQad (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 11:30:33 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:35912 "EHLO
+        beetle.greensocs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234216AbiAZQac (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 11:30:32 -0500
+X-Greylist: delayed 555 seconds by postgrey-1.27 at vger.kernel.org; Wed, 26 Jan 2022 11:30:31 EST
+Received: from [192.168.1.102] (cable-24-135-22-90.dynamic.sbb.rs [24.135.22.90])
+        by beetle.greensocs.com (Postfix) with ESMTPSA id 97DE821C69;
+        Wed, 26 Jan 2022 16:21:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+        s=mail; t=1643214074;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Uqh4KsL2gMxH4281NwmFQFGLD8dC2GISW8I2RMN2qa4=;
+        b=ogpc7z33MBwwcdMUM/Aq/9Fz4eULAw5sKBbS1ekso8hjBo5r/e7SQtZ6/5g7INvYH36dUS
+        wfO8APCXkwFufLhVociCyuUFCWjw2v2zJu4Os762A31pnCJQ29JXVnuAyZ5RuwlKzKpMEK
+        fUi+ErLeYDz0lSUwCkJURx1yLvHwMiI=
+Subject: Re: KVM call minutes for 2022-01-25
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        quintela@redhat.com, kvm-devel <kvm@vger.kernel.org>,
+        qemu-devel@nongnu.org
+References: <87k0enrcr0.fsf@secure.mitica>
+ <6ba8efb0-b4e0-dbda-e1f1-fac9dfa847fd@amsat.org>
+From:   Mirela Grujic <mirela.grujic@greensocs.com>
+Message-ID: <9fa5088c-0f43-747a-77f3-90fb68a05945@greensocs.com>
+Date:   Wed, 26 Jan 2022 17:21:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7eb8c6722a522e42f8e8974c084c7cab3098d9fa.camel@redhat.com>
+In-Reply-To: <6ba8efb0-b4e0-dbda-e1f1-fac9dfa847fd@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 26, 2022, Maxim Levitsky wrote:
-> On Tue, 2022-01-25 at 22:03 +0000, Sean Christopherson wrote:
-> > Peeking at QEMU source, AFAICT QEMU restores nested state before events,
-> > but I don't see how that can possibly work.  I assume QEMU does something
-> > where it restores the "run" state first and then does a full restore?
-> 
-> Well, according to my testing, nested migration with SMM *is* still quite broken,
-> (on both SVM and VMX)
-> resulting in various issues up to L1 crash. 
-> 
-> When I last tackled SMM, I fixed most issues that
-> happen just when the L2 is running and I inject flood of SMIs to L1 - even that
-> was crashing things all around, so this might be as well the reason for that.
 
-Heh, that would certainly explain why QEMU's code looks broken.  Thanks!
+On 1/25/22 5:54 PM, Philippe Mathieu-Daudé wrote:
+> On 25/1/22 17:39, Juan Quintela wrote:
+>>
+>> Hi
+>>
+>> Today we have the KVM devel call.  We discussed how to create machines
+>> from QMP without needing to recompile QEMU.
+>>
+>>
+>> Three different problems:
+>> - startup QMP (*)
+>>    not discussed today
+>> - one binary or two
+>>    not discussed today
+>> - being able to create machines dynamically.
+>>    everybody agrees that we want this. Problem is how.
+>> - current greensocs approach
+>> - interested for all architectures, they need a couple of them
+>>
+>> what greensocs have:
+>> - python program that is able to read a blob that have a device tree 
+>> from the blob
+>> - basically the machine type is empty and is configured from there
+>> - 100 machines around 400 devices models
+>> - Need to do the configuration before the machine construction happens
+>> - different hotplug/coldplug
+>> - How to describe devices that have multiple connections
+>
+> - problem realizing objects that have inter-dependent link properties
+>
+> Mirela, you mention an issue with TYPE_CPU_CLUSTER / TYPE_CPU, is that
+> an example of this qom inter-link problem?
+>
+
+Yes, for cluster/cpu specifically it is the parent-child relationship 
+between objects.
+
+
+>> As the discussion is quite complicated, here is the recording of it.
+>>
+>> Later, Juan.
+>>
+>>
+>> https://redhat.bluejeans.com/m/TFyaUsLqt3T/?share=True
+>>
+>> *: We will talk about this on the next call
+>>
+>>
+>
