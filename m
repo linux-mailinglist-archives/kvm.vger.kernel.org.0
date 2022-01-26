@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF61849CDEA
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 16:22:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF21249CDFB
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 16:22:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242743AbiAZPWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 10:22:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43818 "EHLO
+        id S242756AbiAZPW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 10:22:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:34732 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242711AbiAZPWR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 10:22:17 -0500
+        by vger.kernel.org with ESMTP id S242749AbiAZPWU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 10:22:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643210536;
+        s=mimecast20190719; t=1643210539;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mdi1x6oMBIyjGligUHuX1SgRn3QEMz4lIBHFRWbBweM=;
-        b=CXfWXqsiyoL0/zflV9JdsP5iE6DK0+7sBVNUKihrwG8C5etzuavbUNKBdnu1NK2+KeWQnY
-        b8wZTxMo0FDkj8k+YNKny67911wiykXp59xYT5mGv48t/Zvd+RwSKQnLqil6ymd3Ivcfbp
-        N+qGfJGDVt7H8pYYiD7K5LykRtyUP14=
+        bh=AtISGxDKqp2+YL6RMZb18kawYorGajMtuStz3sh+IE8=;
+        b=h+P0mVDPQzglfJPKyIHsMyDKYJRCQTD9TWxGVZ7cljw0bm+vGwDTZgispwq1ssnJDBv7U5
+        BG3FL6IsGhFDyD4Gw4HObUj8rGhWaGpVfangvq1VjaASI6QIrQQ6WlzhEJ3eouG4KYW7Aq
+        5C/oKGjH5qjeKVmYemzOMParpJX2SGE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-52-KwROlKd1NIyszrJ9_hw3GQ-1; Wed, 26 Jan 2022 10:22:15 -0500
-X-MC-Unique: KwROlKd1NIyszrJ9_hw3GQ-1
+ us-mta-375-IrvEyJjaNM2rGXiag1ouWQ-1; Wed, 26 Jan 2022 10:22:16 -0500
+X-MC-Unique: IrvEyJjaNM2rGXiag1ouWQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A50831937FF8;
-        Wed, 26 Jan 2022 15:22:12 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0F0310168D8;
+        Wed, 26 Jan 2022 15:22:13 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD3C034D5C;
-        Wed, 26 Jan 2022 15:22:11 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5794B38E0F;
+        Wed, 26 Jan 2022 15:22:12 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     yang.zhong@intel.com, seanjc@google.com
-Subject: [PATCH 1/3] selftests: kvm: move vm_xsave_req_perm call to amx_test
-Date:   Wed, 26 Jan 2022 10:22:08 -0500
-Message-Id: <20220126152210.3044876-2-pbonzini@redhat.com>
+Subject: [PATCH 2/3] KVM: x86: add system attribute to retrieve full set of supported xsave states
+Date:   Wed, 26 Jan 2022 10:22:09 -0500
+Message-Id: <20220126152210.3044876-3-pbonzini@redhat.com>
 In-Reply-To: <20220126152210.3044876-1-pbonzini@redhat.com>
 References: <20220126152210.3044876-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -49,109 +49,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is no need for tests other than amx_test to enable dynamic xsave
-states.  Remove the call to vm_xsave_req_perm from generic code,
-and move it inside the test.  While at it, allow customizing the bit
-that is requested, so that future tests can use it differently.
+Because KVM_GET_SUPPORTED_CPUID is meant to be passed (by simple-minded
+VMMs) to KVM_SET_CPUID2, it cannot include any dynamic xsave states that
+have not been enabled.  Probing those, for example so that they can be
+passed to ARCH_REQ_XCOMP_GUEST_PERM, requires a new ioctl or arch_prctl.
+The latter is in fact worse, even though that is what the rest of the
+API uses, because it would require supported_xcr0 to be moved from the
+KVM module to the kernel just for this use.  In addition, the value
+would be nonsensical (or an error would have to be returned) until
+the KVM module is loaded in.
+
+KVM_CHECK_EXTENSION cannot be used because it only has 32 bits of
+output; in order to limit the growth of capabilities and ioctls, the
+series adds a /dev/kvm variant of KVM_{GET,HAS}_DEVICE_ATTR that
+can be used in the future and by other architectures.  It then
+implements it in x86 with just one group (0) and attribute
+(KVM_X86_XCOMP_GUEST_SUPP).
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util_base.h  |  1 -
- .../testing/selftests/kvm/include/x86_64/processor.h |  1 +
- tools/testing/selftests/kvm/lib/kvm_util.c           |  7 -------
- tools/testing/selftests/kvm/lib/x86_64/processor.c   | 12 ++++++------
- tools/testing/selftests/kvm/x86_64/amx_test.c        |  2 ++
- 5 files changed, 9 insertions(+), 14 deletions(-)
+ Documentation/virt/kvm/api.rst  |  4 ++-
+ arch/x86/include/uapi/asm/kvm.h |  3 +++
+ arch/x86/kvm/x86.c              | 45 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 4 files changed, 52 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 66775de26952..4ed6aa049a91 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -345,7 +345,6 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
-  *   guest_code - The vCPU's entry point
-  */
- void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
--void vm_xsave_req_perm(void);
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index bb8cfddbb22d..a4267104db50 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3268,6 +3268,7 @@ number.
  
- bool vm_is_unrestricted_guest(struct kvm_vm *vm);
+ :Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device,
+              KVM_CAP_VCPU_ATTRIBUTES for vcpu device
++             KVM_CAP_SYS_ATTRIBUTES for system (/dev/kvm) device (no set)
+ :Type: device ioctl, vm ioctl, vcpu ioctl
+ :Parameters: struct kvm_device_attr
+ :Returns: 0 on success, -1 on error
+@@ -3302,7 +3303,8 @@ transferred is defined by the particular attribute.
+ ------------------------
  
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 423d8a61bd2e..8a470da7b71a 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -458,6 +458,7 @@ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
- struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
- void vcpu_set_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
- struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
-+void vm_xsave_req_perm(int bit);
+ :Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device,
+-	     KVM_CAP_VCPU_ATTRIBUTES for vcpu device
++             KVM_CAP_VCPU_ATTRIBUTES for vcpu device
++             KVM_CAP_SYS_ATTRIBUTES for system (/dev/kvm) device
+ :Type: device ioctl, vm ioctl, vcpu ioctl
+ :Parameters: struct kvm_device_attr
+ :Returns: 0 on success, -1 on error
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 2da3316bb559..bf6e96011dfe 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -452,6 +452,9 @@ struct kvm_sync_regs {
  
- enum x86_page_size {
- 	X86_PAGE_SIZE_4K = 0,
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 8c53f96ab7fe..d8cf851ab119 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -393,13 +393,6 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
- 	struct kvm_vm *vm;
- 	int i;
+ #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE	0x00000001
  
--#ifdef __x86_64__
--	/*
--	 * Permission needs to be requested before KVM_SET_CPUID2.
--	 */
--	vm_xsave_req_perm();
--#endif
--
- 	/* Force slot0 memory size not small than DEFAULT_GUEST_PHY_PAGES */
- 	if (slot0_mem_pages < DEFAULT_GUEST_PHY_PAGES)
- 		slot0_mem_pages = DEFAULT_GUEST_PHY_PAGES;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 5f9d7e91dc69..c1d1c195a838 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -665,16 +665,16 @@ static bool is_xfd_supported(void)
- 	return !!(eax & CPUID_XFD_BIT);
++/* attributes for system fd (group 0) */
++#define KVM_X86_XCOMP_GUEST_SUPP	0
++
+ struct kvm_vmx_nested_state_data {
+ 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+ 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 056e30f85424..b533301af95a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4229,6 +4229,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SREGS2:
+ 	case KVM_CAP_EXIT_ON_EMULATION_FAILURE:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
++	case KVM_CAP_SYS_ATTRIBUTES:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+@@ -4331,7 +4332,35 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ 	}
+ 	return r;
++}
++
++static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
++{
++	if (attr->group)
++		return -ENXIO;
++
++	switch (attr->attr) {
++	case KVM_X86_XCOMP_GUEST_SUPP:
++		if (put_user(supported_xcr0, (u64 __user *)attr->addr))
++			return -EFAULT;
++		return 0;
++	default:
++		return -ENXIO;
++		break;
++	}
++}
++
++static int kvm_x86_dev_has_attr(struct kvm_device_attr *attr)
++{
++	if (attr->group)
++		return -ENXIO;
+ 
++	switch (attr->attr) {
++	case KVM_X86_XCOMP_GUEST_SUPP:
++		return 0;
++	default:
++		return -ENXIO;
++	}
  }
  
--void vm_xsave_req_perm(void)
-+void vm_xsave_req_perm(int bit)
- {
--	unsigned long bitmask;
-+	u64 bitmask;
- 	long rc;
+ long kvm_arch_dev_ioctl(struct file *filp,
+@@ -4422,6 +4451,22 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 	case KVM_GET_SUPPORTED_HV_CPUID:
+ 		r = kvm_ioctl_get_supported_hv_cpuid(NULL, argp);
+ 		break;
++	case KVM_GET_DEVICE_ATTR: {
++		struct kvm_device_attr attr;
++		r = -EFAULT;
++		if (copy_from_user(&attr, (void __user *)arg, sizeof(attr)))
++			break;
++		r = kvm_x86_dev_get_attr(&attr);
++		break;
++	}
++	case KVM_HAS_DEVICE_ATTR: {
++		struct kvm_device_attr attr;
++		r = -EFAULT;
++		if (copy_from_user(&attr, (void __user *)arg, sizeof(attr)))
++			break;
++		r = kvm_x86_dev_has_attr(&attr);
++		break;
++	}
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 9563d294f181..b46bcdb0cab1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1133,6 +1133,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
+ #define KVM_CAP_VM_GPA_BITS 207
+ #define KVM_CAP_XSAVE2 208
++#define KVM_CAP_SYS_ATTRIBUTES 209
  
- 	if (!is_xfd_supported())
--		return;
-+		exit(KSFT_SKIP);
-+
-+	rc = syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, bit);
- 
--	rc = syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM,
--		     XSTATE_XTILE_DATA_BIT);
- 	/*
- 	 * The older kernel version(<5.15) can't support
- 	 * ARCH_REQ_XCOMP_GUEST_PERM and directly return.
-@@ -684,7 +684,7 @@ void vm_xsave_req_perm(void)
- 
- 	rc = syscall(SYS_arch_prctl, ARCH_GET_XCOMP_GUEST_PERM, &bitmask);
- 	TEST_ASSERT(rc == 0, "prctl(ARCH_GET_XCOMP_GUEST_PERM) error: %ld", rc);
--	TEST_ASSERT(bitmask & XFEATURE_XTILE_MASK,
-+	TEST_ASSERT(bitmask & (1ULL << bit),
- 		    "prctl(ARCH_REQ_XCOMP_GUEST_PERM) failure bitmask=0x%lx",
- 		    bitmask);
- }
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 523c1e99ed64..52a3ef6629e8 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -329,6 +329,8 @@ int main(int argc, char *argv[])
- 	u32 amx_offset;
- 	int stage, ret;
- 
-+	vm_xsave_req_perm(XSTATE_XTILE_DATA_BIT);
-+
- 	/* Create VM */
- 	vm = vm_create_default(VCPU_ID, 0, guest_code);
+ #ifdef KVM_CAP_IRQ_ROUTING
  
 -- 
 2.31.1
