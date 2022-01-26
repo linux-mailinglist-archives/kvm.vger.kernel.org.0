@@ -2,108 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A29F49CF1D
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:05:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A8EF49CF3B
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:09:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235524AbiAZQFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 11:05:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60203 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231276AbiAZQFf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 11:05:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643213134;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tXp1kCQwqJ4o9Do0kiE0pBfB82AEFKSqEr3EbL8QkxQ=;
-        b=JESWYZCuYXLKmBKkW6hCOEsCV02qlAsi2TU2YLyTS+RnEiT7D99mw2VlGYL9CaXX6gbjLz
-        efTH+pCthusP+zZtu2MZeuFWqGFGPurMXiiDdw2aPjRTyB/DNTiUS2vZYRftyr+1vzP13X
-        aGD8bMNH6HXPYDfY9tBsKIz84H5q1HE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-662-IE5unW5YNvGYOh2kExbgSA-1; Wed, 26 Jan 2022 11:05:33 -0500
-X-MC-Unique: IE5unW5YNvGYOh2kExbgSA-1
-Received: by mail-ed1-f70.google.com with SMTP id k10-20020a50cb8a000000b00403c8326f2aso16951105edi.6
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:05:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=tXp1kCQwqJ4o9Do0kiE0pBfB82AEFKSqEr3EbL8QkxQ=;
-        b=qmLDIyNc7Canch2/vHpCrbsol2ulzLNJ42TMMiRSgkFz0vllLUB/eZvwNwQGLGgJd6
-         wFYv8TJubDooibfF/dzwpfgqUWotQOCX3dzXseZrRwI/MUyoO62HB/cPwdZNs7Xdz8V5
-         vtxF1eCOXyGB4Tcv+L5b1qlaYVIKNkUG8dBHw/PKbohMbjGCkNekUIOFCond401gqKu1
-         8M4MjymYjI68DnXqBq9ntokUchAWYoGI2/KYjFs9h8N+U30OJiR9LPT7kIE+mjpEZ1KJ
-         CG3OlNgEt1aHd5fkg3wSaFTifeu9YZ0WHdGSwa0tgFvBF0l4dUrQ64XdV1SePBKqg5gI
-         vJxA==
-X-Gm-Message-State: AOAM531QuPOScW4ZUn5ONOC8aW4cpg/AAu7lumCgHdvrvw5yLJblkFVc
-        EySQWHIf7hkKamOVD51STrHY6yGVnbLTYq2GQx9d+hWfVi43NWdag/nI6Pu2ud4paDk6oiCIu56
-        OnohDhwaCxwUx
-X-Received: by 2002:a05:6402:40d5:: with SMTP id z21mr22472809edb.239.1643213132078;
-        Wed, 26 Jan 2022 08:05:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwbC0lCdymtOtM4+kKjEtqy3QzwTeDO/fGzCIbzeQr+TYlQ/duyFjLW5r0RETLMzr+MOO59rw==
-X-Received: by 2002:a05:6402:40d5:: with SMTP id z21mr22472769edb.239.1643213131825;
-        Wed, 26 Jan 2022 08:05:31 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id a23sm9936111eda.94.2022.01.26.08.05.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 08:05:31 -0800 (PST)
-Message-ID: <053bb241-ea71-abf8-262b-7b452dc49d37@redhat.com>
-Date:   Wed, 26 Jan 2022 17:05:30 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: nVMX: WARN on any attempt to allocate shadow VMCS
- for vmcs02
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220125220527.2093146-1-seanjc@google.com>
- <87r18uh4of.fsf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87r18uh4of.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S237681AbiAZQIL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 11:08:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235880AbiAZQIH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 11:08:07 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD44C06161C
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:08:07 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CFF83B81EAC
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 16:08:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8128AC340E3;
+        Wed, 26 Jan 2022 16:08:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643213284;
+        bh=tcYVnR+6bu9js6MrGvF92RyHbLvpOlSpAkUBxlI3y1g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qqrhHrPWJ/2eSmXtw53akc6EZTXaVp+gCQfWlX4HWF/CmizGRRq6nmPKxLukHBUST
+         QfZ1JZJbZqogaYDc+/iCdLv6qrAX8waGvn+fIKf0s6j/rq8iu4UhvkIWzei1YXEOb8
+         GMx9q6vebm6xsupxINJoKbvkLLFcgdC/OpiRdTOMEoQziPwIP3qoJqUE4mQRyta/4C
+         VBTEyg/vxdIKa/uzP4V6mFFivh+h8NYEZpclxmIjpPb/RGUGM+huTgpGX+1iBsQfsf
+         PAi5lvXX7BugQwJQ/j0K5ruKGM9CJ/BhUtj+XBvgVR6Dwh2REgrn09go/ywqBFy/YV
+         OlZOWyY0W3Ucg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nCkq2-003H3H-Ix; Wed, 26 Jan 2022 16:08:02 +0000
+Date:   Wed, 26 Jan 2022 16:08:02 +0000
+Message-ID: <878rv27a59.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 12/69] KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+In-Reply-To: <YeVTnZcW82G36cda@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-13-maz@kernel.org>
+        <YeVTnZcW82G36cda@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/22 16:56, Vitaly Kuznetsov wrote:
->> -	WARN_ON(loaded_vmcs == &vmx->vmcs01 && loaded_vmcs->shadow_vmcs);
->> +	if (WARN_ON(loaded_vmcs != &vmx->vmcs01 || loaded_vmcs->shadow_vmcs))
->> +		return loaded_vmcs->shadow_vmcs;
-> Stupid question: why do we want to care about 'loaded_vmcs' at all,
-> i.e. why can't we hardcode 'vmx->vmcs01' in alloc_shadow_vmcs()? The
-> only caller is enter_vmx_operation() and AFAIU 'loaded_vmcs' will always
-> be pointing to 'vmx->vmcs01' (as enter_vmx_operation() allocates
-> &vmx->nested.vmcs02 so 'loaded_vmcs' can't point there!).
+On Mon, 17 Jan 2022 11:31:41 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
+> Hi Marc,
+> 
+> Nitpick, but HCR_EL2.NV also traps accesses to *_EL02 and *_EL12 registers,
+> according to ARM DDI 0487G.a, page D5-2770. The subject could be changed to
+> "Handle HCR_EL2.NV *_EL2 system register traps" to better match the
+> content, but doesn't make much a difference overall.
+> 
+> On Mon, Nov 29, 2021 at 08:00:53PM +0000, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+> > this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+> > addition, executing the following instructions in EL1 will trap to EL2:
+> > tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+> > instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+> > ARM v8.3. The only instruction that was not undef is eret.
+> > 
+> > This patch sets up a handler for EL2 registers and SP_EL1 register
+> > accesses at EL1. The host hypervisor keeps those register values in
+> > memory, and will emulate their behavior.
+> > 
+> > This patch doesn't set the NV bit yet. It will be set in a later patch
+> > once nested virtualization support is completed.
+> > 
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > [maz: added SCTLR_EL2 RES0/RES1 handling]
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h |  41 +++++++++++-
+> >  arch/arm64/kvm/sys_regs.c       | 109 ++++++++++++++++++++++++++++++--
+> >  2 files changed, 144 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 615dd6278f8b..c77fe5401826 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -531,10 +531,26 @@
+> >  
+> >  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+> >  
+> > +#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+> > +#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+> > +
+> >  #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+> > +#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+> > +#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+> > +#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
+> > +#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
+> > +#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+> >  #define SYS_HFGRTR_EL2			sys_reg(3, 4, 1, 1, 4)
+> >  #define SYS_HFGWTR_EL2			sys_reg(3, 4, 1, 1, 5)
+> >  #define SYS_HFGITR_EL2			sys_reg(3, 4, 1, 1, 6)
+> > +#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
+> > +
+> > +#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
+> > +#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+> > +#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> > +#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> > +#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> > +
+> >  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+> >  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> >  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+> > @@ -543,14 +559,26 @@
+> >  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+> >  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+> >  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+> > +#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+> >  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
+> > +#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
+> > +#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+> >  #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+> >  #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+> >  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+> >  #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
+> >  #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+> >  
+> > -#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
+> > +#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+> > +#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
+> > +
+> > +#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+> > +#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
+> > +
+> > +#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+> > +#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+> > +#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
+> > +#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+> >  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+> >  #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+> >  #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+> > @@ -592,15 +620,24 @@
+> >  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+> >  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+> >  
+> > +#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
+> > +#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
+> > +
+> > +#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+> > +#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+> > +
+> >  /* VHE encodings for architectural EL0/1 system registers */
+> >  #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+> >  #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+> >  #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
+> > +
+> >  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+> >  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+> >  #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
+> > +
+> >  #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+> >  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+> > +
+> >  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+> >  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+> >  #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+> > @@ -618,6 +655,8 @@
+> >  #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+> >  #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
+> >  
+> > +#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+> 
+> Checked the encoding for the newly added registers, they match.
+> 
+> > +
+> >  /* Common SCTLR_ELx flags. */
+> >  #define SCTLR_ELx_DSSBS	(BIT(44))
+> >  #define SCTLR_ELx_ATA	(BIT(43))
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index e3ec1a44f94d..a23701f29858 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -105,6 +105,46 @@ static u32 get_ccsidr(u32 csselr)
+> >  	return ccsidr;
+> >  }
+> >  
+> > +static bool access_rw(struct kvm_vcpu *vcpu,
+> > +		      struct sys_reg_params *p,
+> > +		      const struct sys_reg_desc *r)
+> > +{
+> > +	if (p->is_write)
+> > +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+> > +	else
+> > +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
+> > +			     struct sys_reg_params *p,
+> > +			     const struct sys_reg_desc *r)
+> > +{
+> > +	if (p->is_write) {
+> > +		u64 val = p->regval;
+> > +
+> > +		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
+> > +			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
+> > +				 BIT_ULL(17) | BIT_ULL(9));
+> > +			val |=  SCTLR_EL1_RES1;
+> > +		} else {
+> > +			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
+> > +				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
+> > +				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
+> > +				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
+> > +				 GENMASK(10, 7));
+> > +			val |=  SCTLR_EL2_RES1;
+> > +		}
+> 
+> Some bits in SCTLR_EL2 are functional bits when {E2H, TGE} = {1, 1}, otherwise
+> they are RES0. This is how ARM DDI 0487G.a describes the behaviour of bits which
+> are RES0 only in some contexts (page Glossary-8529, emphasis added by me):
+> 
+> "For a bit in a read/write register, when the bit is described as RES0:
+> 
+> - An indirect write to the register sets the bit to 0.
+> 
+> - ** A read of the bit must return the value last successfully written to the bit,
+>   by either a direct or an indirect write, regardless of the use of the register
+>   when the bit was written **
+> 
+> If the bit has not been successfully written since reset, then the read of the bit returns the reset
+> value if there is one, or otherwise returns an UNKNOWN value.
+> 
+> - A direct write to the bit must update a storage location associated with the bit.
+> 
+> - While the use of the register is such that the bit is described as RES0, the
+>   value of the bit must have no effect on the operation of the PE, other than
+>   determining the value read back from that bit, unless this Manual
+>   explicitly defines additional properties for the bit."
+> 
+> Let's take bit 24, E0E, as an example. When E2H,TGE != {1,1} (which means the
+> bit is now RES0), KVM clears the bit on a write, when according to the above
+> definition, it should save the value.
 
-Well, that's why the WARN never happens.  The idea is that if shadow 
-VMCS _virtualization_ (not emulation, i.e. running L2 VMREAD/VMWRITE 
-without even a vmexit to L0) was supported, then you would need a 
-non-NULL shadow_vmcs in vmx->vmcs02.
+That's an interesting observation. It means we should munge these bits
+at save/restore time (specially in the nVHE case where we have to
+translate SCTLR_EL2 to the SCTLR_EL1 format), rather than at access
+time.
 
-Regarding the patch, the old WARN was messy but it was also trying to 
-avoid a NULL pointer dereference in the caller.
+This would also solve the discrepancy we have between the ARMv8.3
+trapping and the ARMv8.4 memory write (we can sanitise the former, but
+not the latter).
 
-What about:
+Thanks,
 
-	if (WARN_ON(loaded_vmcs->shadow_vmcs))
-		return loaded_vmcs->shadow_vmcs;
+	M.
 
-	/* Go ahead anyway.  */
-	WARN_ON(loaded_vmcs != &vmx->vmcs01);
-
-?
-
-Paolo
-
+-- 
+Without deviation from the norm, progress is not possible.
