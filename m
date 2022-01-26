@@ -2,92 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A8D549CF18
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:02:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A29F49CF1D
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:05:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235524AbiAZQCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 11:02:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234531AbiAZQCn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 11:02:43 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180B9C06161C
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:02:43 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id z10-20020a17090acb0a00b001b520826011so4804563pjt.5
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:02:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2IfSXw9nL+nORiatmKtgy9CzQGOYYGNdKe3zwh1wqUQ=;
-        b=hIWNHemPUaZS9d4TqwNxEXXX6uy5wQM+sgQZchBZJ/10uXILZuMYLxBXaEAMAHaLft
-         YLUSwY1iL6NmN3NBfR4nRvkcCjNO07qV1ITwZC1rcmuQleqYOp+erOUAlOUWQ9ZvzAAS
-         iFB/pEJuX09u4uv/j1Bb4Mb1dOnMLJCvQ3qCwfwybq/dKOYUK9lHDJGPbjgz2I1eYwZq
-         AcwZMQYe9TkQf++ywwQgE/bGkV0CEzpcTxmlt8j1UqWIjBr6yCi4Ztw8Bs9YWu22aP+8
-         nwqW5N3LHqGf9Zj6mnhmJzCd9ZBnbnIa/OP48hrFKtOdQjRq5y1RRtvX5t/3dNsqOeK2
-         SicQ==
+        id S235524AbiAZQFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 11:05:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60203 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231276AbiAZQFf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 11:05:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643213134;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tXp1kCQwqJ4o9Do0kiE0pBfB82AEFKSqEr3EbL8QkxQ=;
+        b=JESWYZCuYXLKmBKkW6hCOEsCV02qlAsi2TU2YLyTS+RnEiT7D99mw2VlGYL9CaXX6gbjLz
+        efTH+pCthusP+zZtu2MZeuFWqGFGPurMXiiDdw2aPjRTyB/DNTiUS2vZYRftyr+1vzP13X
+        aGD8bMNH6HXPYDfY9tBsKIz84H5q1HE=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-662-IE5unW5YNvGYOh2kExbgSA-1; Wed, 26 Jan 2022 11:05:33 -0500
+X-MC-Unique: IE5unW5YNvGYOh2kExbgSA-1
+Received: by mail-ed1-f70.google.com with SMTP id k10-20020a50cb8a000000b00403c8326f2aso16951105edi.6
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:05:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2IfSXw9nL+nORiatmKtgy9CzQGOYYGNdKe3zwh1wqUQ=;
-        b=2y3/zi2nzs8R0Gx52sZIAiR32jl1I8jshDoikI4FXCgtyHfZNbnnGa9LsmtDeh821W
-         ZGV0sMVCxcAFCCq0XY5KTOiS3D8d6wc3FifWlEzOpWrCnYPr+JsFl52aoSxU8zX75Poh
-         AYWnrFZjNmovJGHoeiSfNwjSsDAp7uBjjKvGzTs3TwABnEbtUY1D1kx0D6B7ClHLn4EX
-         1ac+gKpXrmWmHFP8P6uKWbXHWMfU0ylCHXtE+o2/K/rAQIvyB+jcSgzM+fZPInBgbaVa
-         V2ayPq2c8fL1sVyPEq91X0na7TTuR4jiRaho69/wkm+a+xZrvqTNjfC19Av9oxGBr4G8
-         6NlQ==
-X-Gm-Message-State: AOAM532y6butf6cLUnptmBPKwDcGPsyIYmEG9frPQthtNjyQOSU+DAbO
-        ihqrjyUwp5dQr8gvqiUYRDKrow==
-X-Google-Smtp-Source: ABdhPJxsAXA1pkhB3NsCjYQJQFS7ORIMGxFAGg6JVacCZMA/CkYRb+db2dBV0gTkxRpI0+0/3BPs+w==
-X-Received: by 2002:a17:902:d505:b0:14b:ce9:800e with SMTP id b5-20020a170902d50500b0014b0ce9800emr23513976plg.1.1643212962275;
-        Wed, 26 Jan 2022 08:02:42 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id oo2sm2287317pjb.31.2022.01.26.08.02.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 08:02:41 -0800 (PST)
-Date:   Wed, 26 Jan 2022 16:02:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Joe Perches <joe@perches.com>, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Use memcmp in kvm_cpuid_check_equal()
-Message-ID: <YfFwnm3Vp0eOPElp@google.com>
-References: <20220124103606.2630588-1-vkuznets@redhat.com>
- <20220124103606.2630588-3-vkuznets@redhat.com>
- <864dfbfdc44e288e99cf7baa3aa8f7c8568db507.camel@perches.com>
- <878rv2izjp.fsf@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=tXp1kCQwqJ4o9Do0kiE0pBfB82AEFKSqEr3EbL8QkxQ=;
+        b=qmLDIyNc7Canch2/vHpCrbsol2ulzLNJ42TMMiRSgkFz0vllLUB/eZvwNwQGLGgJd6
+         wFYv8TJubDooibfF/dzwpfgqUWotQOCX3dzXseZrRwI/MUyoO62HB/cPwdZNs7Xdz8V5
+         vtxF1eCOXyGB4Tcv+L5b1qlaYVIKNkUG8dBHw/PKbohMbjGCkNekUIOFCond401gqKu1
+         8M4MjymYjI68DnXqBq9ntokUchAWYoGI2/KYjFs9h8N+U30OJiR9LPT7kIE+mjpEZ1KJ
+         CG3OlNgEt1aHd5fkg3wSaFTifeu9YZ0WHdGSwa0tgFvBF0l4dUrQ64XdV1SePBKqg5gI
+         vJxA==
+X-Gm-Message-State: AOAM531QuPOScW4ZUn5ONOC8aW4cpg/AAu7lumCgHdvrvw5yLJblkFVc
+        EySQWHIf7hkKamOVD51STrHY6yGVnbLTYq2GQx9d+hWfVi43NWdag/nI6Pu2ud4paDk6oiCIu56
+        OnohDhwaCxwUx
+X-Received: by 2002:a05:6402:40d5:: with SMTP id z21mr22472809edb.239.1643213132078;
+        Wed, 26 Jan 2022 08:05:32 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwbC0lCdymtOtM4+kKjEtqy3QzwTeDO/fGzCIbzeQr+TYlQ/duyFjLW5r0RETLMzr+MOO59rw==
+X-Received: by 2002:a05:6402:40d5:: with SMTP id z21mr22472769edb.239.1643213131825;
+        Wed, 26 Jan 2022 08:05:31 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id a23sm9936111eda.94.2022.01.26.08.05.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jan 2022 08:05:31 -0800 (PST)
+Message-ID: <053bb241-ea71-abf8-262b-7b452dc49d37@redhat.com>
+Date:   Wed, 26 Jan 2022 17:05:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878rv2izjp.fsf@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] KVM: nVMX: WARN on any attempt to allocate shadow VMCS
+ for vmcs02
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220125220527.2093146-1-seanjc@google.com>
+ <87r18uh4of.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87r18uh4of.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 26, 2022, Vitaly Kuznetsov wrote:
-> Joe Perches <joe@perches.com> writes:
+On 1/26/22 16:56, Vitaly Kuznetsov wrote:
+>> -	WARN_ON(loaded_vmcs == &vmx->vmcs01 && loaded_vmcs->shadow_vmcs);
+>> +	if (WARN_ON(loaded_vmcs != &vmx->vmcs01 || loaded_vmcs->shadow_vmcs))
+>> +		return loaded_vmcs->shadow_vmcs;
+> Stupid question: why do we want to care about 'loaded_vmcs' at all,
+> i.e. why can't we hardcode 'vmx->vmcs01' in alloc_shadow_vmcs()? The
+> only caller is enter_vmx_operation() and AFAIU 'loaded_vmcs' will always
+> be pointing to 'vmx->vmcs01' (as enter_vmx_operation() allocates
+> &vmx->nested.vmcs02 so 'loaded_vmcs' can't point there!).
 > 
-> > On Mon, 2022-01-24 at 11:36 +0100, Vitaly Kuznetsov wrote:
-> >> kvm_cpuid_check_equal() should also check .flags equality but instead
-> >> of adding it to the existing check, just switch to using memcmp() for
-> >> the whole 'struct kvm_cpuid_entry2'.
-> >
-> > Is the struct padding guaranteed to be identical ?
-> >
-> 
-> Well, yes (or we're all doomeed):
-> - 'struct kvm_cpuid_entry2' is part of KVM userspace ABI, it is supposed
-> to be stable.
-> - Here we compare structs which come from the same userspace during one
-> session (vCPU fd stays open), I can't imagine how structure layout can
-> change on-the-fly.
 
-I'm pretty sure Joe was asking if the contents of the padding field would be
-identical, i.e. if KVM can guarnatee there won't be false positives on mismatches,
-which is the same reason Paolo passed on this patch.  Though I still think we
-should roll the dice :-)
+Well, that's why the WARN never happens.  The idea is that if shadow 
+VMCS _virtualization_ (not emulation, i.e. running L2 VMREAD/VMWRITE 
+without even a vmexit to L0) was supported, then you would need a 
+non-NULL shadow_vmcs in vmx->vmcs02.
+
+Regarding the patch, the old WARN was messy but it was also trying to 
+avoid a NULL pointer dereference in the caller.
+
+What about:
+
+	if (WARN_ON(loaded_vmcs->shadow_vmcs))
+		return loaded_vmcs->shadow_vmcs;
+
+	/* Go ahead anyway.  */
+	WARN_ON(loaded_vmcs != &vmx->vmcs01);
+
+?
+
+Paolo
+
