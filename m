@@ -2,100 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D7A749D114
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:43:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1491A49D120
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:48:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243746AbiAZRnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 12:43:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55285 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237260AbiAZRnl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 12:43:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643219020;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7LmRcM3oOywyD4WcSEs68i+HAwbzXKDVMeR2HY4Bz8Q=;
-        b=OHZAPEF0YCKOGtuNzAPM95AMdB+rxrAxe5CIM/VspBavEb7RIQi1pxUh9eEB/7qL+tZdFv
-        HkuUqwmtrvAOOiP0uPIXIvWAHkSWyiAwRJN5IkTDRoX6oi8XwOZenPVVFYLVOu4F8pTrJg
-        of2cOdPOR67+5G6tWuL+ZABzxpzxwGc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-221-eDqE3HL8PPGFjpRu-CYg6Q-1; Wed, 26 Jan 2022 12:43:39 -0500
-X-MC-Unique: eDqE3HL8PPGFjpRu-CYg6Q-1
-Received: by mail-wm1-f71.google.com with SMTP id j6-20020a05600c1c0600b0034c02775da7so34167wms.3
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:43:39 -0800 (PST)
+        id S243911AbiAZRsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 12:48:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237260AbiAZRsN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 12:48:13 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D111C06173B
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:48:13 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d1so222032plh.10
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:48:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cNfxPUvWvaI1vHO/jmsIjiSEzNXExUCiFtH31cxBIdo=;
+        b=LoqmHXH523JnCj+p+8Rc/S9F5Y06QO7Q0xw2slJ2Ei/D6SbNPbbHBQAMEnxOcutBHB
+         Ju0IJZE4f2IWVpl2YW5W0bRsCRXRv5ANtlQf28JmbFRXOV5kbZY/4yUwqxOWbNHqKf+l
+         lDbZZnOjZ08qpJVMISJiLzXgNjxUCG+yQhQ7K+aLI3qAWKv0i70R+zlADzFYVsICutYJ
+         r2iPLS0593bUYMoURAqZxpeVu+m1XvDfZECG6CC6ifVRRXXg+keDo3vfkqieMtuaGX8E
+         ifbtkzcQOeoVoQhzurv50K5samEA0tvwrl1DY5HO2RrhmkfavJJr0eB2WEHRl+BMVLzy
+         m4Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7LmRcM3oOywyD4WcSEs68i+HAwbzXKDVMeR2HY4Bz8Q=;
-        b=B6tQt8Ly91VgN4+ECHLHW1OjUkbES4Ni7/zdvUQoro4+rdNsxyFE6mT+vh29YQC/jN
-         biCVH6yVrDmZMMYGo95hw6sTS0jMi6zLJXIDZ97M4XSM5W4kMQTPBTkxmvYR5jeW7nvC
-         PimxPq0QxyNNt7XFJDCVW4TZ5HViyrLf/fgGvEwGWAsFy74/GnQO6/N8zwnRs7FpgRWa
-         w/Hou4MXtNbFggbixFH77OXsTFqFTGsuMLw/auvZSZyFlZw/IHWaqXwR1HFstgX8ApVZ
-         FihAY80s7rm9J95J5R9VOJ1B/tnv/aFjo0OsKOGDM7nqnG/1u1rW01cjFjYbFopdoD5i
-         nXRg==
-X-Gm-Message-State: AOAM533a0hLc73bdkBIoLQP12MHd6EtPc7TN2fBrr48oAbWx7A6w84mS
-        facRLHcS2BWx5tlFLOIa+qA3VNB5tLPGwNI/dZdQENS0csZbLkiNjkKoiZVet0shvRBMs4n/H3z
-        c8ZEk5P34A780
-X-Received: by 2002:a1c:256:: with SMTP id 83mr8502290wmc.89.1643219017159;
-        Wed, 26 Jan 2022 09:43:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxkX6l8iYrRkIpopYI00Hyq6o9wmikSAL4sFrhwF12Qem5QO771vGwWeuh+9gQvmxZHFciyhA==
-X-Received: by 2002:a1c:256:: with SMTP id 83mr8502274wmc.89.1643219016890;
-        Wed, 26 Jan 2022 09:43:36 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id f6sm19859506wrj.26.2022.01.26.09.43.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 09:43:36 -0800 (PST)
-Message-ID: <3e978189-4c9a-53c3-31e7-c8ac1c51af31@redhat.com>
-Date:   Wed, 26 Jan 2022 18:43:35 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 0/3] KVM: x86: XSS and XCR0 fixes
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cNfxPUvWvaI1vHO/jmsIjiSEzNXExUCiFtH31cxBIdo=;
+        b=V/6Ic4H+cBC5BD3SxEVypQu+MWHazeNcWmvs4v1ReQ3bn8/wI2e42l74jDB2OqFUtd
+         9ScDwTjkTqW8g9xIIZUBK8Qn+zGYIcp138QjmRfceaJQS7zI0EELlAYtaeSCuIJHsgZw
+         tQyn1gUx1324rZL0UH7yjb4t6MY09UGrc+8d2AxQP2L52Dbu7zCYLgqJmQwRFpOz9mGy
+         0xO9R7ByL7cPQKFgG1kFAQbdybAIJ8/0hiNbfcSWzyrF9SbIIy0Ny9djXIMUMTzEFD0w
+         mxgcp4oVpXIoCydCAKkc8uYlLtdET99xJYgE+QaSyj+FP0ehy+jxZu7+gOfntisMPk1+
+         kwBw==
+X-Gm-Message-State: AOAM531+c56CDQiL6mMhUdy0LZd1I2be7GmNr8DZHWMDiNbzbpdwbJ1Q
+        RbL6+tUKIWvtMwtuEdFlwAK1Hw==
+X-Google-Smtp-Source: ABdhPJxwsiEqrNgJNlq8u/NfwI/GMmXVNl3SBs8rnKUQWQw1WWtgCuYRSuQeqhARV4DBKFuSYR7tNQ==
+X-Received: by 2002:a17:90a:ab91:: with SMTP id n17mr915pjq.238.1643219292505;
+        Wed, 26 Jan 2022 09:48:12 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k12sm2822797pfc.107.2022.01.26.09.48.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jan 2022 09:48:11 -0800 (PST)
+Date:   Wed, 26 Jan 2022 17:48:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
         Like Xu <likexu@tencent.com>
+Subject: Re: [PATCH 0/3] KVM: x86: XSS and XCR0 fixes
+Message-ID: <YfGJWNVuFYZ8kl2I@google.com>
 References: <20220126172226.2298529-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220126172226.2298529-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <3e978189-4c9a-53c3-31e7-c8ac1c51af31@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e978189-4c9a-53c3-31e7-c8ac1c51af31@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/22 18:22, Sean Christopherson wrote:
-> For convenience, Like's patch split up and applied on top of Xiaoyao.
-> Tagged all for @stable, probably want to (retroactively?) get Xiaoyao's
-> patch tagged too?
->   
-> Like Xu (2):
->    KVM: x86: Update vCPU's runtime CPUID on write to MSR_IA32_XSS
->    KVM: x86: Sync the states size with the XCR0/IA32_XSS at, any time
+On Wed, Jan 26, 2022, Paolo Bonzini wrote:
+> On 1/26/22 18:22, Sean Christopherson wrote:
+> > For convenience, Like's patch split up and applied on top of Xiaoyao.
+> > Tagged all for @stable, probably want to (retroactively?) get Xiaoyao's
+> > patch tagged too?
+> > Like Xu (2):
+> >    KVM: x86: Update vCPU's runtime CPUID on write to MSR_IA32_XSS
+> >    KVM: x86: Sync the states size with the XCR0/IA32_XSS at, any time
+> > 
+> > Xiaoyao Li (1):
+> >    KVM: x86: Keep MSR_IA32_XSS unchanged for INIT
+> > 
+> >   arch/x86/kvm/x86.c | 6 +++---
+> >   1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > 
+> > base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
 > 
-> Xiaoyao Li (1):
->    KVM: x86: Keep MSR_IA32_XSS unchanged for INIT
-> 
->   arch/x86/kvm/x86.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> 
-> base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
+> Queued, though I'll note that I kinda disagree with the stable@ marking of
+> patch 1 (and therefore with the patch order) as it has no effect in
+> practice.
 
-Queued, though I'll note that I kinda disagree with the stable@ marking 
-of patch 1 (and therefore with the patch order) as it has no effect in 
-practice.
-
-Paolo
-
+Hmm, that's not a given, is it?  E.g. the guest can configure XSS early on and
+then expect the configured value to live across INIT-SIPI-SIPI.  I agree it's
+highly unlikely for any guest to actually do that, but I don't like assuming all
+guests will behave a certain way.
