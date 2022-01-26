@@ -2,98 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7856349D0AA
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F18E49D0C7
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:31:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232482AbiAZRY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 12:24:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43820 "EHLO
+        id S243744AbiAZRbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 12:31:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiAZRY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 12:24:27 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53C45C06161C
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:24:27 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id d18so208804plg.2
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:24:27 -0800 (PST)
+        with ESMTP id S240391AbiAZRbO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 12:31:14 -0500
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3005C06161C
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:31:13 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id ka4so4564ejc.11
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:31:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BwB9d/7Tq/xB798GOJXJ0kZ9fYWtI6hgc0A8KgtQUJw=;
-        b=LiomPXZUIWdg3C4oKu49AivjVUHNrDnAEyiIy6FUPkXkMTX9AF79pMwVOQjDKqs8PI
-         5VTUc6BU9KJbnD10qWze31Wx2Jy73xa3TmX4AavxkPKQHNU2kIf3tiul2XFsD2yH5OW3
-         Ql3R8qX1LfcHzdVRqkH9KuTSAQGnpOB+/lWMs58s4LYIctvXtkuAtuI7EVFP6qTpJj2G
-         +X+ze2a7o+AVp+JTQthcOR2maD509xWwh75dX1yNMIPHiwhkHD79gxgE5FTibmHElsC0
-         OC7WFv1srwzgpNOHGLw/w5WPbJ2BYGVoM0JMl+ZK1fdqUHDsVzFRr2ITDmDGUAGJipxx
-         xgXA==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=C2FqzIUM0ytBIAqH7tnk1WNRuJWxyE72m8rDwvVR+AE=;
+        b=fDpt0ZZZXRg9X4g2pJwxy4YPt54K33csceSyXGonvL/OUhe7UDNUf/S9ElHleNltcf
+         17b6VpWxeKiQAPbJrUHJu4+fr5Ql7FnebqF1UKK8GIG7W0S/iKOrnovqZ/Jj/5xWwD4S
+         msvadOpjZyXZ5mgCdKcItYBKuxea6pwd/SjdAWp8rYnhyAZzw//8GW6gzhNP/YV1QDH4
+         vc9+htByO5ZO9DPFJVslpoOmy6fe8oT2gWUpW2WnCTO51amZlZgtXHrqfRdM9NjhjGpw
+         O3K0xJH321fSVcsFu5FgL4Z0k741AfdS4SqlUi/rVwl2I5YYdun5deWdsZ/UmxQEDSIv
+         Vqyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BwB9d/7Tq/xB798GOJXJ0kZ9fYWtI6hgc0A8KgtQUJw=;
-        b=abb2TGIpO6phyTS++E2aq/m8JUnmPJW3Gb/bJ/vHgHc7SLkxxyTG0HI/nfgdEC3fxV
-         6J00a6It8Wi+IQj5A7L0aDCiMBD8fygDnt1xYai39qtzEGFmpd6BTqf6/13YOgmbR/ok
-         e159BQmdC3dmXL/jayFJgo4SzWCiV/aPmL7Txjzi6hQshS7Q3JSolEPkjXIO0aNdeNZB
-         TYS5p8kSUDAAYzWgnr/AsDGxvPP/HI9EWYo1BWu9gvEy7/VCSWc73JH+A042D4fhqsiR
-         h+DpJwX4JvX2Nehp8dnmtrNxnqofeS4GlSiaoHFp/6eo9dL8sdwfn9Qv8zqEv8DicPhk
-         Yq7A==
-X-Gm-Message-State: AOAM531qKrGKy5vMR3mL8o/ZNKsAPIdzo2wIP7WowE3TILnCdsgAY5UE
-        9fuWVCQfI/k6wQ4AZ+qsO8qM3A==
-X-Google-Smtp-Source: ABdhPJxjWZIU+BjoneOeCuxV0UTvnO+oWxfIHvDeB0avkFkHAGEHJYdWa72Ul+sttaTbbwsQpG4dHg==
-X-Received: by 2002:a17:902:bd4b:b0:14a:e79a:c146 with SMTP id b11-20020a170902bd4b00b0014ae79ac146mr24603300plx.33.1643217866729;
-        Wed, 26 Jan 2022 09:24:26 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o4sm15126137pgs.3.2022.01.26.09.24.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 09:24:26 -0800 (PST)
-Date:   Wed, 26 Jan 2022 17:24:22 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Pavel Skripkin <paskripkin@gmail.com>, vkuznets@redhat.com,
-        wanpengli@tencent.com, kvm@vger.kernel.org
-Subject: Re: orphan section warnings while building v5.17-rc1
-Message-ID: <YfGDxlRzjklaYz95@google.com>
-References: <97ce2686-205b-8c46-fd24-116b094a7265@gmail.com>
- <YfF9mqcNVYLVERjl@google.com>
- <769dc0cb-e38a-4139-d0da-4019b83047cb@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=C2FqzIUM0ytBIAqH7tnk1WNRuJWxyE72m8rDwvVR+AE=;
+        b=Mla9EMmrVV/pmxkOehN82NZvmLDL+NF5kvJuJ3oKHfMb9U819Dm1wrPbdc2efuBuNd
+         wKYsyfCl3Ofq5DUV0PGUKmuDcP05IautmsHDTpVO16b7uPGMuhs6QnThq0dirvcqPMTw
+         YwsX37aW0UiYSP8bfc9rpSoDScS6J7JZx/Ua86ToUHqldNb9XOlVt4FV/mcxbB/x6FUz
+         y3U7LQXSoEn5EosBMzoDLad8XzbJHfjg7PuEJjmCHbS16GPx/lbsClHqiNQPFfBbtPYx
+         xQE+7zJBAXzvL8422b+H1UJzJrSCEqiExEbAecc8CFazPw3MTJ4GL63Cb33k2cCH4tC1
+         cmOw==
+X-Gm-Message-State: AOAM531N/0OsmrYB8uppSTdMNo8ZRm1vRynn52e6TwQ4wLrGRlh2RQZ8
+        eYM0MDEfkbbZcPNB0G5hlcA=
+X-Google-Smtp-Source: ABdhPJyqUsZn+bcD7AEQgkeSI3XxMrxRHh8kxbklhlZwu1Nx2gu3PnaBSwc9KJijzeohZIl00ijtlg==
+X-Received: by 2002:a17:906:2856:: with SMTP id s22mr21329597ejc.330.1643218272335;
+        Wed, 26 Jan 2022 09:31:12 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id co19sm10114077edb.7.2022.01.26.09.31.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jan 2022 09:31:11 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <cba77fc7-678a-5a16-969d-234415232061@redhat.com>
+Date:   Wed, 26 Jan 2022 18:31:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <769dc0cb-e38a-4139-d0da-4019b83047cb@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [kvm-unit-tests PATCH v4 3/3] x86: Add test coverage for
+ nested_vmx_reflect_vmexit() testing
+Content-Language: en-US
+To:     Aaron Lewis <aaronlewis@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, jmattson@google.com
+References: <20220121155855.213852-1-aaronlewis@google.com>
+ <20220121155855.213852-4-aaronlewis@google.com> <Yer0oCazOfKXs4t3@google.com>
+ <CAAAPnDEgV5HYeqE+pFRdZ4b6y1VMhwv=aXWVGWHS4M84-w5LHQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAAAPnDEgV5HYeqE+pFRdZ4b6y1VMhwv=aXWVGWHS4M84-w5LHQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 26, 2022, Paolo Bonzini wrote:
-> On 1/26/22 17:58, Sean Christopherson wrote:
-> > On Tue, Jan 25, 2022, Pavel Skripkin wrote:
-> > > Hi kvm developers,
-> > > 
-> > > while building newest kernel (0280e3c58f92b2fe0e8fbbdf8d386449168de4a8) with
-> > > mostly random config I met following warnings:
-> > > 
-> > >    LD      .tmp_vmlinux.btf
-> > > ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
-> > > in section `.fixup'
-> > >    BTF     .btf.vmlinux.bin.o
-> > >    LD      .tmp_vmlinux.kallsyms1
-> > > ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
-> > > in section `.fixup'
-> > >    KSYMS   .tmp_vmlinux.kallsyms1.S
-> > >    AS      .tmp_vmlinux.kallsyms1.S
-> > >    LD      .tmp_vmlinux.kallsyms2
-> > > ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
-> > > in section `.fixup'
-> > >    KSYMS   .tmp_vmlinux.kallsyms2.S
-> > >    AS      .tmp_vmlinux.kallsyms2.S
-> > >    LD      vmlinux
-> > > ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
-> > > in section `.fixup'
-> > 
-> > Yep, xen.c has unnecessary usage of .fixup.  I'll get a patch sent.
+On 1/21/22 20:12, Aaron Lewis wrote:
+>>> +[vmx_exception_test]
+>>> +file = vmx.flat
+>>> +extra_params = -cpu max,+vmx -append vmx_exception_test
+>>> +arch = x86_64
+>>> +groups = vmx nested_exception
+>>> +timeout = 10
+>> Leave this out (for now), including it in the main "vmx" test is sufficient.
+>> I'm definitely in favor of splitting up the "vmx" behemoth, but it's probably
+>> best to do that in a separate commit/series so that we can waste time bikeshedding
+>> over how to organize things:-)
+>>
+> Why leave this out when vmx_pf_exception_test, vmx_pf_no_vpid_test,
+> vmx_pf_invvpid_test, and vmx_pf_vpid_test have their own?  They seem
+> similar to me.
 > 
-> Peter Zijlstra has already posted "x86,kvm/xen: Remove superfluous .fixup
-> usage".
 
-That's why this seemed so familiar... :-)
+Because they take a very long time (minutes).
+
+Paolo
