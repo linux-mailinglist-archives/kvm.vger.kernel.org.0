@@ -2,105 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76CE849D0A3
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 305E049D0A8
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:23:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243632AbiAZRWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 12:22:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43316 "EHLO
+        id S237147AbiAZRXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 12:23:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243646AbiAZRWe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 12:22:34 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92ABBC061747
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:22:34 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id u24-20020a656718000000b0035e911d79edso34063pgf.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:22:34 -0800 (PST)
+        with ESMTP id S229470AbiAZRXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 12:23:32 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F8AC06161C;
+        Wed, 26 Jan 2022 09:23:32 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id k18so206185wrg.11;
+        Wed, 26 Jan 2022 09:23:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=ff0gIIVT5mkOusZfHSkDsjrfQJ504HRuYB+DqdCYRzo=;
-        b=sTzD25hboOP7p75R02/TLTWw//Il8gFhJL7Vz+HbfZ87lxCmYMp5oWAU6axG+RVQ87
-         /CN2IwWa3VZk5ZmAvYeQjN+DmbdtnvL3gfxHeRuC+xKv4sZHQeyerJZLW2ixNDdsORPf
-         bMTiRLh2vPc0I3b64auOVBcwuVbX8BkpMMDfa3hA/IkVPPgt9RhHsXuRN7yx3ZyrHuxf
-         CM3pngA/s3TeL/XmM+EItNhSUW0hA0xfcuiglqxqyenTXNtuxCqo4Sy8ym9s2Gw76isb
-         6n8uR62WCmVky2WU/cShi8umiIBPimr9+6k1+Dz4qbidJV3jD+ug2VtH9SpRzrbd+vZe
-         Dktw==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=V0Tp1GHHecUi/P4l2E9yO+GMXfgnTyE6j4Sd+guldZs=;
+        b=b3BDIRCil9T9ZDhSv45ih/ZPe1l6qgT2LuWBqoLTgaOUBz4yEfEXvR3ubcvBZelIz1
+         ubY3XJVpkUXsrnLgqj0a27BnBOFsu9osesEptKM6a16oMZpMSP8jMO3ik0h9SLI5cBPi
+         OWkZr9mlnifMg2H0npgLaVf1FGwwQI7yNTKKb2Ib8k/kVBTtJLXUiI4XwjL5pMB8yAb9
+         xcJgigsdZbZB+2qDgQqZ5vftMBdQaGe3T+xMH+NGU094Rwn1WtYFUwzE71L/B5+OZtZV
+         ZvS3ycz81BmzAi4lmhT8NR01dZdyd5tcHtBzkOWau81sdLXQbCboxuHponxTrglCplb+
+         sHLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=ff0gIIVT5mkOusZfHSkDsjrfQJ504HRuYB+DqdCYRzo=;
-        b=T/hJ1roAYAUpqQjXAGuzm+Y8nK8lbgZi+v/9/UoqDlaKC1N+F2CrChwhdypPjZzS/l
-         9X4UIv46p990PoQauWsmJ2bWgFmec6QDXIRA9Gcp06AXNcaaV9pmH+i7pNNd6SgFHFIE
-         Tgvf7aV/LD48FqamPFglTo/6QXKlYVIRimWhP9eQHkuN3d9bc0op/HCbuUKGFnMyqZzL
-         JNXpVOWn8JA1YcjTqlHORv/ZP6FlNzL8MVORxlwRImIdY8cXxR/Zhu0EZVgSh/RSRM6W
-         Hwx+Qu8eas3HuF7WwuWZ20SjonoWrGWCPMYRRReas3ej2n2lkGROER7+iJYG4CcqMQAN
-         fN6w==
-X-Gm-Message-State: AOAM531uubNqe26LZOlABh747pqWzX/Apnm4LxC5UpUW81NR1D43ElW+
-        auX65ufLPTwFbxhICyHr9mxsLNwSphk=
-X-Google-Smtp-Source: ABdhPJykFRaRlXBaojklngrMWzzMi+AE/Ri/f9JoeyGhR1SzYF9FA8YbNxzu1MkcoaS3qIkqNFc8hZ2rAs0=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a63:7110:: with SMTP id m16mr19433809pgc.123.1643217753999;
- Wed, 26 Jan 2022 09:22:33 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 26 Jan 2022 17:22:26 +0000
-In-Reply-To: <20220126172226.2298529-1-seanjc@google.com>
-Message-Id: <20220126172226.2298529-4-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220126172226.2298529-1-seanjc@google.com>
-X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH 3/3] KVM: x86: Sync the states size with the XCR0/IA32_XSS at,
- any time
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=V0Tp1GHHecUi/P4l2E9yO+GMXfgnTyE6j4Sd+guldZs=;
+        b=uLePghoA/ZZAG9NSX9NW2HkCOA4OQBGoc2rPmo4WzeJm5VNTKCLPQMvERYmlFhupT+
+         oVKiZ0tNWlJUB84p5r55ZxdrfokXwBNcuro6rM8VFRfgiUPQcycbcbAqnBlXjxkKH2ro
+         wEqFEc4VEGMTbndEO8ccBfUVjj/ZwjPgzPqr73qFlpwYXiQvOeFwGy8K0n+b5g+yE5Op
+         WV+SCl4T0sOJ2wKGarWAWf+3fBXeYtWFapTqlkPhKOd3qoAFFuvai+IVtNL7wc58sKRb
+         uMOaMUJBymV+4VU8nVXZZDniwCsgiuKSuvbOnkrlK9J/oVZvkSFuEibT4b/WRvMOhdRf
+         XrSw==
+X-Gm-Message-State: AOAM532GOUK70qqvo3+rGBB9AnF8UJO1Ux4nPxU8s+dHoBgZJYOxyTpw
+        2ER10gK+fIndikf6nhmLbIE=
+X-Google-Smtp-Source: ABdhPJyUGT6cmmBLvD2d7e1C35Ip1UeTxiYVLX4XhgDDbLr7mgXII1Y8s38ffNbkAuVdFqaJYU3wtw==
+X-Received: by 2002:adf:f249:: with SMTP id b9mr22627050wrp.623.1643217810791;
+        Wed, 26 Jan 2022 09:23:30 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id t1sm7826436wre.45.2022.01.26.09.23.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jan 2022 09:23:30 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <40d65efe-69dc-f1d6-b26c-a5cd243002a6@redhat.com>
+Date:   Wed, 26 Jan 2022 18:23:28 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] KVM: x86: skip host CPUID call for hypervisor leaves
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220120175015.1747392-1-pbonzini@redhat.com>
+ <87r191jqh9.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87r191jqh9.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 1/21/22 12:08, Vitaly Kuznetsov wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> Hypervisor leaves are always synthesized by __do_cpuid_func.  Just return
+>> zeroes and do not ask the host, it would return a bogus value anyway if
+>> it were used.
+> 
+> Why always bogus? Nested virtualization is a thing, isn't it? :-) It
+> is, however, true that __do_cpuid_func() will throw the result away.
 
-XCR0 is reset to 1 by RESET but not INIT and IA32_XSS is zeroed by
-both RESET and INIT. The kvm_set_msr_common()'s handling of MSR_IA32_XSS
-also needs to update kvm_update_cpuid_runtime(). In the above cases, the
-size in bytes of the XSAVE area containing all states enabled by XCR0 or
-(XCRO | IA32_XSS) needs to be updated.
+Well, bogus because all hypercalls and MSRs would go through us so it 
+makes little if any sense (given the current hypercall and MSR code) for 
+the host values to be used in KVM_GET_SUPPORTED_CPUID.
 
-For simplicity and consistency, existing helpers are used to write values
-and call kvm_update_cpuid_runtime(), and it's not exactly a fast path.
+> FWIW, 0x40000XXX leaves are not the only ones where we don't use
+> do_host_cpuid() result at all, e.g. I can see that we also return
+> constant values for 0x3, 0x5, 0x6, 0xC0000002 - 0xC0000004.
+> 
+> Out of pure curiosity, what's the motivation for the patch? We seem to
+> only use __do_cpuid_func() to serve KVM_GET_SUPPORTED_CPUID/KVM_GET_EMULATED_CPUID,
+> not for kvm_emulate_cpuid() so these few CPUID calls we save here should
+> not give us any performace gain..
 
-Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
-Cc: stable@vger.kernel.org
-Signed-off-by: Like Xu <likexu@tencent.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I just have it in queue because of another change that I have not 
+submitted yet.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 13793582f26d..2e8a8fb42269 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11257,8 +11257,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 
- 		vcpu->arch.msr_misc_features_enables = 0;
- 
--		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
--		vcpu->arch.ia32_xss = 0;
-+		__kvm_set_xcr(vcpu, 0, XFEATURE_MASK_FP);
-+		__kvm_set_msr(vcpu, MSR_IA32_XSS, 0, true);
- 	}
- 
- 	/* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
--- 
-2.35.0.rc0.227.g00780c9af4-goog
+Paolo
+
+>> +
+>> +	default:
+>> +		break;
+>> +	}
+>>   
+>>   	cpuid_count(entry->function, entry->index,
+>>   		    &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+> 
+> The patch seems to be correct, so
+> 
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> 
 
