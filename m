@@ -2,93 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F18E49D0C7
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:31:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D7A749D114
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:43:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243744AbiAZRbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 12:31:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240391AbiAZRbO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 12:31:14 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3005C06161C
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:31:13 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id ka4so4564ejc.11
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:31:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=C2FqzIUM0ytBIAqH7tnk1WNRuJWxyE72m8rDwvVR+AE=;
-        b=fDpt0ZZZXRg9X4g2pJwxy4YPt54K33csceSyXGonvL/OUhe7UDNUf/S9ElHleNltcf
-         17b6VpWxeKiQAPbJrUHJu4+fr5Ql7FnebqF1UKK8GIG7W0S/iKOrnovqZ/Jj/5xWwD4S
-         msvadOpjZyXZ5mgCdKcItYBKuxea6pwd/SjdAWp8rYnhyAZzw//8GW6gzhNP/YV1QDH4
-         vc9+htByO5ZO9DPFJVslpoOmy6fe8oT2gWUpW2WnCTO51amZlZgtXHrqfRdM9NjhjGpw
-         O3K0xJH321fSVcsFu5FgL4Z0k741AfdS4SqlUi/rVwl2I5YYdun5deWdsZ/UmxQEDSIv
-         Vqyg==
+        id S243746AbiAZRnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 12:43:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55285 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237260AbiAZRnl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 12:43:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643219020;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7LmRcM3oOywyD4WcSEs68i+HAwbzXKDVMeR2HY4Bz8Q=;
+        b=OHZAPEF0YCKOGtuNzAPM95AMdB+rxrAxe5CIM/VspBavEb7RIQi1pxUh9eEB/7qL+tZdFv
+        HkuUqwmtrvAOOiP0uPIXIvWAHkSWyiAwRJN5IkTDRoX6oi8XwOZenPVVFYLVOu4F8pTrJg
+        of2cOdPOR67+5G6tWuL+ZABzxpzxwGc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-221-eDqE3HL8PPGFjpRu-CYg6Q-1; Wed, 26 Jan 2022 12:43:39 -0500
+X-MC-Unique: eDqE3HL8PPGFjpRu-CYg6Q-1
+Received: by mail-wm1-f71.google.com with SMTP id j6-20020a05600c1c0600b0034c02775da7so34167wms.3
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:43:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=C2FqzIUM0ytBIAqH7tnk1WNRuJWxyE72m8rDwvVR+AE=;
-        b=Mla9EMmrVV/pmxkOehN82NZvmLDL+NF5kvJuJ3oKHfMb9U819Dm1wrPbdc2efuBuNd
-         wKYsyfCl3Ofq5DUV0PGUKmuDcP05IautmsHDTpVO16b7uPGMuhs6QnThq0dirvcqPMTw
-         YwsX37aW0UiYSP8bfc9rpSoDScS6J7JZx/Ua86ToUHqldNb9XOlVt4FV/mcxbB/x6FUz
-         y3U7LQXSoEn5EosBMzoDLad8XzbJHfjg7PuEJjmCHbS16GPx/lbsClHqiNQPFfBbtPYx
-         xQE+7zJBAXzvL8422b+H1UJzJrSCEqiExEbAecc8CFazPw3MTJ4GL63Cb33k2cCH4tC1
-         cmOw==
-X-Gm-Message-State: AOAM531N/0OsmrYB8uppSTdMNo8ZRm1vRynn52e6TwQ4wLrGRlh2RQZ8
-        eYM0MDEfkbbZcPNB0G5hlcA=
-X-Google-Smtp-Source: ABdhPJyqUsZn+bcD7AEQgkeSI3XxMrxRHh8kxbklhlZwu1Nx2gu3PnaBSwc9KJijzeohZIl00ijtlg==
-X-Received: by 2002:a17:906:2856:: with SMTP id s22mr21329597ejc.330.1643218272335;
-        Wed, 26 Jan 2022 09:31:12 -0800 (PST)
+        bh=7LmRcM3oOywyD4WcSEs68i+HAwbzXKDVMeR2HY4Bz8Q=;
+        b=B6tQt8Ly91VgN4+ECHLHW1OjUkbES4Ni7/zdvUQoro4+rdNsxyFE6mT+vh29YQC/jN
+         biCVH6yVrDmZMMYGo95hw6sTS0jMi6zLJXIDZ97M4XSM5W4kMQTPBTkxmvYR5jeW7nvC
+         PimxPq0QxyNNt7XFJDCVW4TZ5HViyrLf/fgGvEwGWAsFy74/GnQO6/N8zwnRs7FpgRWa
+         w/Hou4MXtNbFggbixFH77OXsTFqFTGsuMLw/auvZSZyFlZw/IHWaqXwR1HFstgX8ApVZ
+         FihAY80s7rm9J95J5R9VOJ1B/tnv/aFjo0OsKOGDM7nqnG/1u1rW01cjFjYbFopdoD5i
+         nXRg==
+X-Gm-Message-State: AOAM533a0hLc73bdkBIoLQP12MHd6EtPc7TN2fBrr48oAbWx7A6w84mS
+        facRLHcS2BWx5tlFLOIa+qA3VNB5tLPGwNI/dZdQENS0csZbLkiNjkKoiZVet0shvRBMs4n/H3z
+        c8ZEk5P34A780
+X-Received: by 2002:a1c:256:: with SMTP id 83mr8502290wmc.89.1643219017159;
+        Wed, 26 Jan 2022 09:43:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxkX6l8iYrRkIpopYI00Hyq6o9wmikSAL4sFrhwF12Qem5QO771vGwWeuh+9gQvmxZHFciyhA==
+X-Received: by 2002:a1c:256:: with SMTP id 83mr8502274wmc.89.1643219016890;
+        Wed, 26 Jan 2022 09:43:36 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id co19sm10114077edb.7.2022.01.26.09.31.11
+        by smtp.googlemail.com with ESMTPSA id f6sm19859506wrj.26.2022.01.26.09.43.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 09:31:11 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <cba77fc7-678a-5a16-969d-234415232061@redhat.com>
-Date:   Wed, 26 Jan 2022 18:31:10 +0100
+        Wed, 26 Jan 2022 09:43:36 -0800 (PST)
+Message-ID: <3e978189-4c9a-53c3-31e7-c8ac1c51af31@redhat.com>
+Date:   Wed, 26 Jan 2022 18:43:35 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [kvm-unit-tests PATCH v4 3/3] x86: Add test coverage for
- nested_vmx_reflect_vmexit() testing
+Subject: Re: [PATCH 0/3] KVM: x86: XSS and XCR0 fixes
 Content-Language: en-US
-To:     Aaron Lewis <aaronlewis@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, jmattson@google.com
-References: <20220121155855.213852-1-aaronlewis@google.com>
- <20220121155855.213852-4-aaronlewis@google.com> <Yer0oCazOfKXs4t3@google.com>
- <CAAAPnDEgV5HYeqE+pFRdZ4b6y1VMhwv=aXWVGWHS4M84-w5LHQ@mail.gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+        Like Xu <likexu@tencent.com>
+References: <20220126172226.2298529-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAAPnDEgV5HYeqE+pFRdZ4b6y1VMhwv=aXWVGWHS4M84-w5LHQ@mail.gmail.com>
+In-Reply-To: <20220126172226.2298529-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/21/22 20:12, Aaron Lewis wrote:
->>> +[vmx_exception_test]
->>> +file = vmx.flat
->>> +extra_params = -cpu max,+vmx -append vmx_exception_test
->>> +arch = x86_64
->>> +groups = vmx nested_exception
->>> +timeout = 10
->> Leave this out (for now), including it in the main "vmx" test is sufficient.
->> I'm definitely in favor of splitting up the "vmx" behemoth, but it's probably
->> best to do that in a separate commit/series so that we can waste time bikeshedding
->> over how to organize things:-)
->>
-> Why leave this out when vmx_pf_exception_test, vmx_pf_no_vpid_test,
-> vmx_pf_invvpid_test, and vmx_pf_vpid_test have their own?  They seem
-> similar to me.
+On 1/26/22 18:22, Sean Christopherson wrote:
+> For convenience, Like's patch split up and applied on top of Xiaoyao.
+> Tagged all for @stable, probably want to (retroactively?) get Xiaoyao's
+> patch tagged too?
+>   
+> Like Xu (2):
+>    KVM: x86: Update vCPU's runtime CPUID on write to MSR_IA32_XSS
+>    KVM: x86: Sync the states size with the XCR0/IA32_XSS at, any time
 > 
+> Xiaoyao Li (1):
+>    KVM: x86: Keep MSR_IA32_XSS unchanged for INIT
+> 
+>   arch/x86/kvm/x86.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> 
+> base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
 
-Because they take a very long time (minutes).
+Queued, though I'll note that I kinda disagree with the stable@ marking 
+of patch 1 (and therefore with the patch order) as it has no effect in 
+practice.
 
 Paolo
+
