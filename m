@@ -2,101 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4535B49CECF
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 16:44:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B2A049CED4
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 16:46:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243057AbiAZPos (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 10:44:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57348 "EHLO
+        id S243081AbiAZPqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 10:46:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58972 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236101AbiAZPor (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 10:44:47 -0500
+        by vger.kernel.org with ESMTP id S243029AbiAZPqC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 10:46:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643211886;
+        s=mimecast20190719; t=1643211961;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OE2o1EX3RpFpjJ9IFNscD0lnVIpsfwDRSieBpWxhAkg=;
-        b=QM9wyOnYpp+O4nm4XvOGm5QyEgEMVc2gHCJZbmsYvKd/TsqnamqXu86Ezh/ceT62qDqmo3
-        rTJYzG/oum1FuLlyn/rbz2UFJR6uIHJE3WLSMr7xnzSHhwpj+VnutvHJYhR5a3nsz+/UQC
-        aMxtUnT79R+UV3k+KXW5oTVXxvXEvQs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=85xNqoR4ThIkZTm0ksRjdnAn/hdDPYPlrpJkOEBO+Gw=;
+        b=JTGWsYQpM5dbPo8z68CO+kDCdhUNr3ZE0QphQQSfnErwJFOKlPgzDh0pdWmnvvfwlp21Ya
+        vTfwPX+JOFNryHGSlAlRXYfXmBdJdVXiMKdromNdwvnnLNNTMKzCCe/eU+HMwuGWQMJeRZ
+        Hd95iOO723ip1ZmhnB8xRgrPXh5zwS4=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-fNsiOLT4PmWJP6h66wVsvg-1; Wed, 26 Jan 2022 10:44:45 -0500
-X-MC-Unique: fNsiOLT4PmWJP6h66wVsvg-1
-Received: by mail-ed1-f70.google.com with SMTP id i22-20020a50fd16000000b00405039f2c59so12818407eds.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 07:44:44 -0800 (PST)
+ us-mta-372-7RqXBpHdMQqRiYWQ-QPqNA-1; Wed, 26 Jan 2022 10:46:00 -0500
+X-MC-Unique: 7RqXBpHdMQqRiYWQ-QPqNA-1
+Received: by mail-ej1-f69.google.com with SMTP id v2-20020a1709062f0200b006a5f725efc1so5070398eji.23
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 07:45:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=OE2o1EX3RpFpjJ9IFNscD0lnVIpsfwDRSieBpWxhAkg=;
-        b=Iih3yN3VdFOPxwZgvu0r0ffumG5sZO8VPVaZ3NTB1Foby4n4V6vk2K7qXZNrUvkKi3
-         FJ1yxVjPi6xsghQSc/LdEd76O6xzTMzhYD5vvtKicn+g1j1Q+e7vsKmJWDyG0ZtLoCZO
-         EPLryZ+2glEnDmCUKs8dJfC4TDY0z1I3zWGTizEYcLcj5dEUPjtYylfuH53VL95wrh67
-         ZzsP5Gs92Vy/NMKYQ/C1tLpEARhoK5T5TMad4Ly2xhyNanXszyby5UADbD+NTTDrsYoF
-         HHkV+OM6RoLBoBXjFmJc1cLFma7YpPUqZs82xzwzCotMca+NBNnwRJ3iQ8ggQEskGdY1
-         3rAw==
-X-Gm-Message-State: AOAM532KPg0DEUeo9n6FYEZbZuJSKt3ZJ0ZLyXrr8K/3TeloM2lTywyU
-        r2kw9TbTEH/4AY9jSSNC23hP/axcFROVesHskjlqbQBcZb0tyTyYS4JZVRJMScGsxyXeWLS7N/7
-        sl8QRp5lqVHnY
-X-Received: by 2002:a05:6402:1e94:: with SMTP id f20mr14266191edf.58.1643211883904;
-        Wed, 26 Jan 2022 07:44:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy7uQ0EN1LS78KOt+2SzSj8bnbPTHkmly9oJVJGISCGWR7A4V/TczlXQmSzFDjFNSc5l/4G9w==
-X-Received: by 2002:a05:6402:1e94:: with SMTP id f20mr14266172edf.58.1643211883676;
-        Wed, 26 Jan 2022 07:44:43 -0800 (PST)
+        bh=85xNqoR4ThIkZTm0ksRjdnAn/hdDPYPlrpJkOEBO+Gw=;
+        b=AQBsN7rJky/DFy1LR6RhlDpFTSUKQcwA8eakZkVQmuNiW+snaB87Iejt5iP+KflTwt
+         3lSA7eAon3ZtANlazun4YsKcejj7lhN1hj8rCAXuM6shJOTLkFt77/yG4A6OZ3K/4bJr
+         W+99qcvwpti8MFVBZzMAlnmgp/oR3TnVdx/JJyamZEvPQ31baNnTZjrJ8t07l88f5/5b
+         DjOoiejaxmYlY2s18ZVDndW7rHY2tubb5HaAEJn5JPYRQEDWZxzPtnJHn1QaF3pB92C2
+         4k7rvc+ZdJeOzZav2wh5XO7DNPoBTi7Z2DiymPbBdfLBe+rZRUQ8X+FGe0aGF30UXrQY
+         /FdQ==
+X-Gm-Message-State: AOAM530gmpeyRIUwh3uyzJgvOZoL0Kmz0F+8y/IDU0wlCSU/zQwQp/7r
+        UsGhXC0QaUchYdL9oOE8MMRsDczErEGk4tvuJnLjp9fRswsC5oqIUKMk5IOMNoey6CHRO/MLyxw
+        wHWAHBSpxiS/j
+X-Received: by 2002:a17:907:608b:: with SMTP id ht11mr19968287ejc.644.1643211957984;
+        Wed, 26 Jan 2022 07:45:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxpEDNBOKy7dIjLhVKX4NyD/FEvAkY4wpp1H4YHhCLVbMYQN/BtgG/EAr7zu3rkoVxfQk9vLQ==
+X-Received: by 2002:a17:907:608b:: with SMTP id ht11mr19968273ejc.644.1643211957786;
+        Wed, 26 Jan 2022 07:45:57 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id bx18sm6707218edb.93.2022.01.26.07.44.42
+        by smtp.googlemail.com with ESMTPSA id l5sm7667966ejn.59.2022.01.26.07.45.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 07:44:43 -0800 (PST)
-Message-ID: <718ac952-e9ec-a211-9a43-d4b4a1ea001a@redhat.com>
-Date:   Wed, 26 Jan 2022 16:44:42 +0100
+        Wed, 26 Jan 2022 07:45:57 -0800 (PST)
+Message-ID: <e570f7d2-03fc-1498-bd91-6fd7aabae766@redhat.com>
+Date:   Wed, 26 Jan 2022 16:45:56 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86: Check .flags in kvm_cpuid_check_equal() too
+Subject: Re: [PATCH] KVM: selftests: Don't skip L2's VMCALL in SMM test for
+ SVM guest
 Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-References: <20220126131804.2839410-1-vkuznets@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20220125221725.2101126-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220126131804.2839410-1-vkuznets@redhat.com>
+In-Reply-To: <20220125221725.2101126-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/22 14:18, Vitaly Kuznetsov wrote:
-> kvm_cpuid_check_equal() checks for the (full) equality of the supplied
-> CPUID data so .flags need to be checked too.
+On 1/25/22 23:17, Sean Christopherson wrote:
+> Don't skip the vmcall() in l2_guest_code() prior to re-entering L2, doing
+> so will result in L2 running to completion, popping '0' off the stack for
+> RET, jumping to address '0', and ultimately dying with a triple fault
+> shutdown.
 > 
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Fixes: c6617c61e8fe ("KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> It's not at all obvious why the test re-enters L2 and re-executes VMCALL,
+> but presumably it serves a purpose.  The VMX path doesn't skip vmcall(),
+> and the test can't possibly have passed on SVM, so just do what VMX does.
+> 
+> Fixes: d951b2210c1a ("KVM: selftests: smm_test: Test SMM enter from L2")
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arch/x86/kvm/cpuid.c | 1 +
->   1 file changed, 1 insertion(+)
+>   tools/testing/selftests/kvm/x86_64/smm_test.c | 1 -
+>   1 file changed, 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 89d7822a8f5b..ddfd97f62ba8 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -133,6 +133,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
->   		orig = &vcpu->arch.cpuid_entries[i];
->   		if (e2[i].function != orig->function ||
->   		    e2[i].index != orig->index ||
-> +		    e2[i].flags != orig->flags ||
->   		    e2[i].eax != orig->eax || e2[i].ebx != orig->ebx ||
->   		    e2[i].ecx != orig->ecx || e2[i].edx != orig->edx)
->   			return -EINVAL;
+> diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
+> index 2da8eb8e2d96..a626d40fdb48 100644
+> --- a/tools/testing/selftests/kvm/x86_64/smm_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
+> @@ -105,7 +105,6 @@ static void guest_code(void *arg)
+>   
+>   		if (cpu_has_svm()) {
+>   			run_guest(svm->vmcb, svm->vmcb_gpa);
+> -			svm->vmcb->save.rip += 3;
+>   			run_guest(svm->vmcb, svm->vmcb_gpa);
+>   		} else {
+>   			vmlaunch();
+> 
+> base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
 
-Queued, with Cc to stable.
+Queued, thanks.
 
 Paolo
 
