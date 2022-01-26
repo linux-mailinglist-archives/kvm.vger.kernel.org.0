@@ -2,216 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0206F49C52B
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 09:23:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3FB49C538
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 09:26:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238356AbiAZIW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 03:22:58 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14662 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238350AbiAZIWz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 03:22:55 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20Q7khuc013832;
-        Wed, 26 Jan 2022 08:22:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=0HKj4vuGbcinAe1GzLh6aNEB1u8mvxh6oyXEwscZzS8=;
- b=je5oIOzCOR06K6HGBsLxjCBNMVMM8fm9Y8qPd+JibJiJ1gd1UDMm7gOhuLeQrGCtF/2d
- zJUeU5CWvObIohgb6Vll3EwdToUcgG4LAgWRaa2pXljuuo79qkyZ9jdtQTQWX4IidPzg
- QBClpp/KVsTJEM/UMXKo6GtTrUA85MspG9jNfZ1LFo5RefAPz+p/9mcilV1pbsq7A7zE
- xCi1QHrUjW+qux0rNjLpaKOvg5tOhPFnB7Lv+YTfZp7VPF6yO2wuKflyArMrcMwHsDoM
- f6m8YGzz5rMMZH3hOXKlUj+/0EdhiC2R69aMwaHFFl45TsPCsSdnDorzA2QWvjbSAEvG ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3du2758kyc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jan 2022 08:22:54 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20Q8FT5c014780;
-        Wed, 26 Jan 2022 08:22:54 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3du2758ky0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jan 2022 08:22:54 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20Q8L289025199;
-        Wed, 26 Jan 2022 08:22:52 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3dr9j9jhbp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jan 2022 08:22:52 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20Q8MmHp47186372
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Jan 2022 08:22:49 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DCE13AE045;
-        Wed, 26 Jan 2022 08:22:48 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A156DAE05A;
-        Wed, 26 Jan 2022 08:22:47 +0000 (GMT)
-Received: from [9.171.51.88] (unknown [9.171.51.88])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Jan 2022 08:22:47 +0000 (GMT)
-Message-ID: <479f0342-f6f8-9bb5-6ee5-6d788dc25631@linux.ibm.com>
-Date:   Wed, 26 Jan 2022 09:24:39 +0100
+        id S238427AbiAZI0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 03:26:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29388 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238378AbiAZI0X (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 03:26:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643185582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TuRDu2Zc3JklbYAirunPG0MUEqQDIpCZCpW+No7J470=;
+        b=P5gwnv/4reekcRQZUwRkkcf23WjLVUi/FgSfCN7JS2LB82eJsWHYQgvPwkCYMk/u/DWB/n
+        0r/Qc6TaccGUPKFQ0kG3RPUXCDT1BLYZZ4UR1fOUWdswLpzI1qTz0BfOLde0Mfv+Eyh5WC
+        KpOHOSEDZgYZXP8aQBffmoxl3tXFs48=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-1RjO9k1mOjyZtLkLuiTPdQ-1; Wed, 26 Jan 2022 03:26:13 -0500
+X-MC-Unique: 1RjO9k1mOjyZtLkLuiTPdQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5768A100C660;
+        Wed, 26 Jan 2022 08:26:11 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D89084DC24;
+        Wed, 26 Jan 2022 08:26:07 +0000 (UTC)
+Message-ID: <7eb8c6722a522e42f8e8974c084c7cab3098d9fa.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Forcibly leave nested virt when SMM state is
+ toggled
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+8112db3ab20e70d50c31@syzkaller.appspotmail.com
+Date:   Wed, 26 Jan 2022 10:26:06 +0200
+In-Reply-To: <20220125220358.2091737-1-seanjc@google.com>
+References: <20220125220358.2091737-1-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 26/30] vfio-pci/zdev: wire up zPCI adapter interrupt
- forwarding support
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-27-mjrosato@linux.ibm.com>
- <75c74f80-0a74-40dc-6797-473522ef2803@linux.ibm.com>
- <5f3797f7-e127-7de0-dc96-4b04e5ff839a@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <5f3797f7-e127-7de0-dc96-4b04e5ff839a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0-qreF1s6gmw-5k7SUT5vQn5Mbw0U93G
-X-Proofpoint-ORIG-GUID: kgeb6-9OH2SG9V8RsnCbafHxUt7-rDjT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-26_02,2022-01-25_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=0 lowpriorityscore=0 mlxscore=0
- phishscore=0 mlxlogscore=999 clxscore=1015 adultscore=0 impostorscore=0
- bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201260044
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/25/22 15:16, Matthew Rosato wrote:
-> On 1/25/22 7:36 AM, Pierre Morel wrote:
->>
->>
->> On 1/14/22 21:31, Matthew Rosato wrote:
->>> Introduce support for VFIO_DEVICE_FEATURE_ZPCI_AIF, which is a new
->>> VFIO_DEVICE_FEATURE ioctl.  This interface is used to indicate that an
->>> s390x vfio-pci device wishes to enable/disable zPCI adapter interrupt
->>> forwarding, which allows underlying firmware to deliver interrupts
->>> directly to the associated kvm guest.
->>>
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> ---
->>>   arch/s390/include/asm/kvm_pci.h  |  2 +
->>>   drivers/vfio/pci/vfio_pci_core.c |  2 +
->>>   drivers/vfio/pci/vfio_pci_zdev.c | 98 +++++++++++++++++++++++++++++++-
->>>   include/linux/vfio_pci_core.h    | 10 ++++
->>>   include/uapi/linux/vfio.h        |  7 +++
->>>   include/uapi/linux/vfio_zdev.h   | 20 +++++++
->>>   6 files changed, 138 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/s390/include/asm/kvm_pci.h 
->>> b/arch/s390/include/asm/kvm_pci.h
->>> index dc00c3f27a00..dbab349a4a75 100644
->>> --- a/arch/s390/include/asm/kvm_pci.h
->>> +++ b/arch/s390/include/asm/kvm_pci.h
->>> @@ -36,6 +36,8 @@ struct kvm_zdev {
->>>       struct zpci_fib fib;
->>>       struct notifier_block nb;
->>>       bool interp;
->>> +    bool aif;
->>> +    bool fhost;
->>
->> Can we please have a comment on these booleans? > Can we have explicit 
->> naming to be able to follow their usage more easily?
->> May be aif_float and aif_host to match with the VFIO feature?
+On Tue, 2022-01-25 at 22:03 +0000, Sean Christopherson wrote:
+> Forcibly leave nested virtualization operation if userspace toggles SMM
+> state via KVM_SET_VCPU_EVENTS or KVM_SYNC_X86_EVENTS.  If userspace
+> forces the vCPU out of SMM while it's post-VMXON and then injects an SMI,
+> vmx_enter_smm() will overwrite vmx->nested.smm.vmxon and end up with both
+> vmxon=false and smm.vmxon=false, but all other nVMX state allocated.
 > 
-> Sure, rename would be fine.
+> Don't attempt to gracefully handle the transition as (a) most transitions
+> are nonsencial, e.g. forcing SMM while L2 is running, (b) there isn't
+> sufficient information to handle all transitions, e.g. SVM wants access
+> to the SMRAM save state, and (c) KVM_SET_VCPU_EVENTS must precede
+> KVM_SET_NESTED_STATE during state restore as the latter disallows putting
+> the vCPU into L2 if SMM is active, and disallows tagging the vCPU as
+> being post-VMXON in SMM if SMM is not active.
 > 
-> As for a comment, maybe something like
+> Abuse of KVM_SET_VCPU_EVENTS manifests as a WARN and memory leak in nVMX
+> due to failure to free vmcs01's shadow VMCS, but the bug goes far beyond
+> just a memory leak, e.g. toggling SMM on while L2 is active puts the vCPU
+> in an architecturally impossible state.
 > 
-> bool aif_float; /* Enabled for floating interrupt assist */
-> bool aif_host;  /* Require host delivery */
+>   WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
+>   WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
+>   Modules linked in:
+>   CPU: 1 PID: 3606 Comm: syz-executor725 Not tainted 5.17.0-rc1-syzkaller #0
+>   Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+>   RIP: 0010:free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
+>   RIP: 0010:free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
+>   Code: <0f> 0b eb b3 e8 8f 4d 9f 00 e9 f7 fe ff ff 48 89 df e8 92 4d 9f 00
+>   Call Trace:
+>    <TASK>
+>    kvm_arch_vcpu_destroy+0x72/0x2f0 arch/x86/kvm/x86.c:11123
+>    kvm_vcpu_destroy arch/x86/kvm/../../../virt/kvm/kvm_main.c:441 [inline]
+>    kvm_destroy_vcpus+0x11f/0x290 arch/x86/kvm/../../../virt/kvm/kvm_main.c:460
+>    kvm_free_vcpus arch/x86/kvm/x86.c:11564 [inline]
+>    kvm_arch_destroy_vm+0x2e8/0x470 arch/x86/kvm/x86.c:11676
+>    kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1217 [inline]
+>    kvm_put_kvm+0x4fa/0xb00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1250
+>    kvm_vm_release+0x3f/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1273
+>    __fput+0x286/0x9f0 fs/file_table.c:311
+>    task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+>    exit_task_work include/linux/task_work.h:32 [inline]
+>    do_exit+0xb29/0x2a30 kernel/exit.c:806
+>    do_group_exit+0xd2/0x2f0 kernel/exit.c:935
+>    get_signal+0x4b0/0x28c0 kernel/signal.c:2862
+>    arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:868
+>    handle_signal_work kernel/entry/common.c:148 [inline]
+>    exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+>    exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:207
+>    __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+>    syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
+>    do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+>    entry_SYSCALL_64_after_hwframe+0x44/0xae
+>    </TASK>
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+8112db3ab20e70d50c31@syzkaller.appspotmail.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> 
+> Peeking at QEMU source, AFAICT QEMU restores nested state before events,
+> but I don't see how that can possibly work.  I assume QEMU does something
+> where it restores the "run" state first and then does a full restore?
 
-good for me.
+Well, according to my testing, nested migration with SMM *is* still quite broken,
+(on both SVM and VMX)
+resulting in various issues up to L1 crash. 
 
+When I last tackled SMM, I fixed most issues that
+happen just when the L2 is running and I inject flood of SMIs to L1 - even that
+was crashing things all around, so this might be as well the reason for that.
 
-> 
-> ...
-> 
->>> diff --git a/include/uapi/linux/vfio_zdev.h 
->>> b/include/uapi/linux/vfio_zdev.h
->>> index 575f0410dc66..c574e23f9385 100644
->>> --- a/include/uapi/linux/vfio_zdev.h
->>> +++ b/include/uapi/linux/vfio_zdev.h
->>> @@ -90,4 +90,24 @@ struct vfio_device_zpci_interp {
->>>       __u32 fh;        /* Host device function handle */
->>>   };
->>> +/**
->>> + * VFIO_DEVICE_FEATURE_ZPCI_AIF
->>> + *
->>> + * This feature is used for enabling forwarding of adapter 
->>> interrupts directly
->>> + * from firmware to the guest.  When setting this feature, the flags 
->>> indicate
->>> + * whether to enable/disable the feature and the structure defined 
->>> below is
->>> + * used to setup the forwarding structures.  When getting this 
->>> feature, only
->>> + * the flags are used to indicate the current state.
->>> + */
->>> +struct vfio_device_zpci_aif {
->>> +    __u64 flags;
->>> +#define VFIO_DEVICE_ZPCI_FLAG_AIF_FLOAT 1
->>> +#define VFIO_DEVICE_ZPCI_FLAG_AIF_HOST 2
->>
->> I think we need more information on these flags.
->> What does AIF_FLOAT and what does AIF_HOST ?
->>
-> 
-> You actually asked for this already on Jan 19 :), here's a copy of that 
-> response inline here:
+I'll get back to it soon.
 
-:) I forgot
+Best regards,
+	Maxim Levitsky
 
 > 
-> I can add a small line comment for each, like:
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/svm/nested.c       | 9 +++++----
+>  arch/x86/kvm/svm/svm.c          | 2 +-
+>  arch/x86/kvm/svm/svm.h          | 2 +-
+>  arch/x86/kvm/vmx/nested.c       | 1 +
+>  arch/x86/kvm/x86.c              | 4 +++-
+>  6 files changed, 12 insertions(+), 7 deletions(-)
 > 
->   AIF_FLOAT 1 /* Floating interrupts enabled */
->   AIF_HOST 2  /* Host delivery forced */
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 682ad02a4e58..df22b04b11c3 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1495,6 +1495,7 @@ struct kvm_x86_ops {
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> +	void (*leave_nested)(struct kvm_vcpu *vcpu);
+>  	int (*check_events)(struct kvm_vcpu *vcpu);
+>  	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
+>  	void (*triple_fault)(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index cf206855ebf0..1218b5a342fc 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -983,9 +983,9 @@ void svm_free_nested(struct vcpu_svm *svm)
+>  /*
+>   * Forcibly leave nested mode in order to be able to reset the VCPU later on.
+>   */
+> -void svm_leave_nested(struct vcpu_svm *svm)
+> +void svm_leave_nested(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_vcpu *vcpu = &svm->vcpu;
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+>  	if (is_guest_mode(vcpu)) {
+>  		svm->nested.nested_run_pending = 0;
+> @@ -1411,7 +1411,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>  		return -EINVAL;
+>  
+>  	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
+> -		svm_leave_nested(svm);
+> +		svm_leave_nested(vcpu);
+>  		svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
+>  		return 0;
+>  	}
+> @@ -1478,7 +1478,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>  	 */
+>  
+>  	if (is_guest_mode(vcpu))
+> -		svm_leave_nested(svm);
+> +		svm_leave_nested(vcpu);
+>  	else
+>  		svm->nested.vmcb02.ptr->save = svm->vmcb01.ptr->save;
+>  
+> @@ -1532,6 +1532,7 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  struct kvm_x86_nested_ops svm_nested_ops = {
+> +	.leave_nested = svm_leave_nested,
+>  	.check_events = svm_check_nested_events,
+>  	.triple_fault = nested_svm_triple_fault,
+>  	.get_nested_state_pages = svm_get_nested_state_pages,
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 6d31d357a83b..78123ed3906f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -290,7 +290,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+>  
+>  	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
+>  		if (!(efer & EFER_SVME)) {
+> -			svm_leave_nested(svm);
+> +			svm_leave_nested(vcpu);
+>  			svm_set_gif(svm, true);
+>  			/* #GP intercept is still needed for vmware backdoor */
+>  			if (!enable_vmware_backdoor)
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 47ef8f4a9358..c55d9936bb8b 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -525,7 +525,7 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+>  
+>  int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
+>  			 u64 vmcb_gpa, struct vmcb *vmcb12, bool from_vmrun);
+> -void svm_leave_nested(struct vcpu_svm *svm);
+> +void svm_leave_nested(struct kvm_vcpu *vcpu);
+>  void svm_free_nested(struct vcpu_svm *svm);
+>  int svm_allocate_nested(struct vcpu_svm *svm);
+>  int nested_svm_vmrun(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index f235f77cbc03..7eebfdf7204f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6771,6 +6771,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+>  }
+>  
+>  struct kvm_x86_nested_ops vmx_nested_ops = {
+> +	.leave_nested = vmx_leave_nested,
+>  	.check_events = vmx_check_nested_events,
+>  	.hv_timer_pending = nested_vmx_preemption_timer_pending,
+>  	.triple_fault = nested_vmx_triple_fault,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 55518b7d3b96..22040c682d4a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4860,8 +4860,10 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+>  		vcpu->arch.apic->sipi_vector = events->sipi_vector;
+>  
+>  	if (events->flags & KVM_VCPUEVENT_VALID_SMM) {
+> -		if (!!(vcpu->arch.hflags & HF_SMM_MASK) != events->smi.smm)
+> +		if (!!(vcpu->arch.hflags & HF_SMM_MASK) != events->smi.smm) {
+> +			kvm_x86_ops.nested_ops->leave_nested(vcpu);
+>  			kvm_smm_changed(vcpu, events->smi.smm);
+> +		}
+>  
+>  		vcpu->arch.smi_pending = events->smi.pending;
+>  
 > 
-> But here's a bit more detail:
-> 
-> On SET:
-> AIF_FLOAT = 1 means enable the interrupt forwarding assist for floating 
-> interrupt delivery
-> AIF_FLOAT = 0 means to disable it.
-> AIF_HOST = 1 means the assist will always deliver the interrupt to the 
-> host and let the host inject it
-> AIF_HOST = 0 host only gets interrupts when firmware can't deliver
-> 
-> on GET, we just indicate the current settings from the most recent SET, 
-> meaning:
-> AIF_FLOAT = 1 interrupt forwarding assist is currently active
-> AIF_FLOAT = 0 interrupt forwarding assist is not currently active
-> AIF_HOST = 1 interrupt forwarding will always go through host
-> AIF_HOST = 0 interrupt forwarding will only go through the host when 
-> necessary
-> 
-> My thought would be add the line comments in this patch and then the 
-> additional detail in a follow-on patch that adds vfio zPCI to 
-> Documentation/S390
-> 
+> base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
 
-good for me.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
