@@ -2,129 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AEE9449CF03
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 16:56:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD9EA49CF16
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:01:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233131AbiAZP4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 10:56:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51786 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232848AbiAZP4F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 10:56:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643212565;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FJWfgd90wDJ2caykgoOLYgRtS2Ouj0kY/I7mDEGleaM=;
-        b=PFsO1Nw9B3Y7WPti18QPRwchp+u2QqgBxCZ+jQgYvBJzBSSQhtlHRiDN4pEDq548ysySbz
-        bkBf+vcGG7zckPPeVIz4Lc8SaVeF5Ugbl8wleG/3GYN8qlvGXeltv5ZaqNKZllvNPxPAul
-        JvapjCz+KKCFLuKpYpl7CrE5Yvop+/0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-592-FHqbJ4J7NpqqDizAGiNOIg-1; Wed, 26 Jan 2022 10:56:03 -0500
-X-MC-Unique: FHqbJ4J7NpqqDizAGiNOIg-1
-Received: by mail-wr1-f72.google.com with SMTP id g6-20020adfbc86000000b001a2d62be244so4474725wrh.23
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 07:56:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=FJWfgd90wDJ2caykgoOLYgRtS2Ouj0kY/I7mDEGleaM=;
-        b=uwa0O4TKXYQxwGn+gU9Hyw1Ptj+thEFGLsQVxsyYwwA9iyQ/id2G3o/vbtluF56aL9
-         dSSkgCPaAboCB7lVoqy/laeaPIiYUJAeFRdPmB7r2O25Ujyjq3/hV6i2CulvBGtEmP8G
-         YRufJPfi4utPiCtm8U1lxnkH8+7Q8YMZ4B64936i9hAmpD2OxYu/38K3xDBjgDHip8Sb
-         bQmLcpAv02MpJzPU6gMbuqjNsGLZ4KYhsznNfS+V6sXgWiHacnqMmo7CifRw6V82V+Pv
-         ZZ5+QV/50sd61Hf6CC87xzPW8JPE7UeM1oFPuMGWG+MST6LlHamYQjoAJIFN3P4I3Pjx
-         EL1g==
-X-Gm-Message-State: AOAM530NKllKTh8IXCawkmzwPTN4UNHZgkdeHCXo7aR5wotiJMCbKtRx
-        ta8XsqBQXjCuEyJC86dXe19At0dOXk7oMtyIXhTCbHWXGElH2UhqI+P/rs2nt+hLGjQQ/UIVYij
-        M5vGpfTyqHFT4
-X-Received: by 2002:a05:600c:3551:: with SMTP id i17mr7941088wmq.21.1643212562440;
-        Wed, 26 Jan 2022 07:56:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwRQ8DNnI8KrRxxFt7FdCM/y7wG2icqG9UafMU81NHIVWpIdY0LeJq8CZHEpbDd1boleaNUkA==
-X-Received: by 2002:a05:600c:3551:: with SMTP id i17mr7941071wmq.21.1643212562161;
-        Wed, 26 Jan 2022 07:56:02 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id l15sm3328294wmh.6.2022.01.26.07.56.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 07:56:01 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: WARN on any attempt to allocate shadow VMCS
- for vmcs02
-In-Reply-To: <20220125220527.2093146-1-seanjc@google.com>
-References: <20220125220527.2093146-1-seanjc@google.com>
-Date:   Wed, 26 Jan 2022 16:56:00 +0100
-Message-ID: <87r18uh4of.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S235465AbiAZQB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 11:01:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52716 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235066AbiAZQBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 11:01:54 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365F2C06161C
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:01:54 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 44B96CE1E56
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 16:01:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8719BC340E3;
+        Wed, 26 Jan 2022 16:01:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643212910;
+        bh=Zm56TX38N4k6+PcIP+qv/GJxQSw/9vyV20Gjbh9l/xI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ks+ECd1EC2NMbczzCdGXwwmsG+sn/t+c5A44Rje+RzmMjsJuWuU9VwTZHy6cvaTXQ
+         7iPQyhzQp9DRL8RRwjtTEZEAUIsBci2IPxExDsANpOlTybasS7rQSL6GbPkaW/OMCs
+         Z63D+JoHwtFM/Itt6eBVHWYNhEcxVkzOc67+YYGY5oxXSOHoSdwayLv7OEGO2VZ2yc
+         eJ0GI5MRln99zgf6tTrhSBJv4AyTb1tJqUJnVHvqdU97sbJhA+oF3ORpayCx+z5YPm
+         dukBzj0+rqDGxOf21lhVt8wz5kkOcnRynD5amqs9danfgNBZQicl9LdGyOT02OwAmL
+         yuOfEE8fszv/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nCkk0-003Gwb-9C; Wed, 26 Jan 2022 16:01:48 +0000
+Date:   Wed, 26 Jan 2022 16:01:47 +0000
+Message-ID: <87a6fi7afo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 12/69] KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+In-Reply-To: <YebiAjUTzVECLOun@shell.armlinux.org.uk>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-13-maz@kernel.org>
+        <YebiAjUTzVECLOun@shell.armlinux.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue, 18 Jan 2022 15:51:30 +0000,
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> 
+> On Mon, Nov 29, 2021 at 08:00:53PM +0000, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+> > this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+> > addition, executing the following instructions in EL1 will trap to EL2:
+> > tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+> > instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+> > ARM v8.3. The only instruction that was not undef is eret.
+> > 
+> > This patch sets up a handler for EL2 registers and SP_EL1 register
+> > accesses at EL1. The host hypervisor keeps those register values in
+> > memory, and will emulate their behavior.
+> > 
+> > This patch doesn't set the NV bit yet. It will be set in a later patch
+> > once nested virtualization support is completed.
+> > 
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > [maz: added SCTLR_EL2 RES0/RES1 handling]
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> ...
+> > @@ -1825,9 +1882,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
+> >  	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+> >  
+> > +	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
+> > +
+> > +	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
+> > +	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, CPTR_EL2_DEFAULT },
+> > +	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
+> > +
+> > +	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
+> > +	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
+> > +	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, TCR_EL2_RES1 },
+> > +	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
+> > +
+> >  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> > +	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+> > +
+> >  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
+> > +	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
+> > +	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
+> > +	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
+> >  	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
+> > +
+> > +	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
+> > +
+> > +	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
+> > +
+> > +	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
+> > +
+> > +	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
+> > +	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
+> > +
+> > +	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
+> > +	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
+> > +
+> > +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+> 
+> Doesn't this have an effect on the ability to migrate guests between
+> identical hardware but running kernels with vs without this patch?
+> From what I remember, QEMU fails a migration if the migration target
+> has less system registers than the migration source.
+> 
+> If so, this should at the very least be spelt out in the commit
+> message - it's a user experience breaking change. Maybe also preventing
+> the exposure of these when NV is disabled would be a good idea?
 
-> WARN if KVM attempts to allocate a shadow VMCS for vmcs02.  KVM emulates
-> VMCS shadowing but doesn't virtualize it, i.e. KVM should never allocate
-> a "real" shadow VMCS for L2.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 22 ++++++++++++----------
->  1 file changed, 12 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index f235f77cbc03..92ee0d821a06 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4851,18 +4851,20 @@ static struct vmcs *alloc_shadow_vmcs(struct kvm_vcpu *vcpu)
->  	struct loaded_vmcs *loaded_vmcs = vmx->loaded_vmcs;
->  
->  	/*
-> -	 * We should allocate a shadow vmcs for vmcs01 only when L1
-> -	 * executes VMXON and free it when L1 executes VMXOFF.
-> -	 * As it is invalid to execute VMXON twice, we shouldn't reach
-> -	 * here when vmcs01 already have an allocated shadow vmcs.
-> +	 * KVM allocates a shadow VMCS only when L1 executes VMXON and frees it
-> +	 * when L1 executes VMXOFF or the vCPU is forced out of nested
-> +	 * operation.  VMXON faults if the CPU is already post-VMXON, so it
-> +	 * should be impossible to already have an allocated shadow VMCS.  KVM
-> +	 * doesn't support virtualization of VMCS shadowing, so vmcs01 should
-> +	 * always be the loaded VMCS.
->  	 */
-> -	WARN_ON(loaded_vmcs == &vmx->vmcs01 && loaded_vmcs->shadow_vmcs);
-> +	if (WARN_ON(loaded_vmcs != &vmx->vmcs01 || loaded_vmcs->shadow_vmcs))
-> +		return loaded_vmcs->shadow_vmcs;
+Yes, that's a known issue. I have taken steps to avoid exposing these
+registers (the get-reg-list test now passes on a !NV system, while it
+didn't before).
 
-Stupid question: why do we want to care about 'loaded_vmcs' at all,
-i.e. why can't we hardcode 'vmx->vmcs01' in alloc_shadow_vmcs()? The
-only caller is enter_vmx_operation() and AFAIU 'loaded_vmcs' will always
-be pointing to 'vmx->vmcs01' (as enter_vmx_operation() allocates
-&vmx->nested.vmcs02 so 'loaded_vmcs' can't point there!).
+Thanks,
 
-> +
-> +	loaded_vmcs->shadow_vmcs = alloc_vmcs(true);
-> +	if (loaded_vmcs->shadow_vmcs)
-> +		vmcs_clear(loaded_vmcs->shadow_vmcs);
->  
-> -	if (!loaded_vmcs->shadow_vmcs) {
-> -		loaded_vmcs->shadow_vmcs = alloc_vmcs(true);
-> -		if (loaded_vmcs->shadow_vmcs)
-> -			vmcs_clear(loaded_vmcs->shadow_vmcs);
-> -	}
->  	return loaded_vmcs->shadow_vmcs;
->  }
->  
->
-> base-commit: edb9e50dbe18394d0fc9d0494f5b6046fc912d33
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
