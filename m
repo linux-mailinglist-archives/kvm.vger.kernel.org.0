@@ -2,74 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C99A49CA8F
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 14:18:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B5DD49CC49
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 15:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238273AbiAZNSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 08:18:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23429 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238347AbiAZNSN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 08:18:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643203093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=utFAR93ugTdxvdfcY+avXvlaf0GmpnMgBzRTz2+S36I=;
-        b=FMiiOljmfmy/OaluSUPMMeSn+SB+IPNqRGUn0eUjTIYo8ygV+Pf6TBfcWp9qRNEtuDakHt
-        kxmpsNS2KiT985sXbH8un6twaBHuwTvbMvkz9qhH0uSE5kmIsNWqJH74Mun+KoCXKCGiia
-        4Y5IcBf7T/DMZlIOiE0IVHnbe6yYMFM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-249-KeciOn9cOsasd1ir2TxtVg-1; Wed, 26 Jan 2022 08:18:09 -0500
-X-MC-Unique: KeciOn9cOsasd1ir2TxtVg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S242107AbiAZO0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 09:26:09 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:34450 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235227AbiAZO0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 09:26:05 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F8F883DD28;
-        Wed, 26 Jan 2022 13:18:08 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D6EAE21ECB;
-        Wed, 26 Jan 2022 13:18:05 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: Check .flags in kvm_cpuid_check_equal() too
-Date:   Wed, 26 Jan 2022 14:18:04 +0100
-Message-Id: <20220126131804.2839410-1-vkuznets@redhat.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3E8002113B;
+        Wed, 26 Jan 2022 14:26:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643207164; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WLyKhfXHS44+Znkmdw5Wkn13IOJ7HmCc2bqdYmRAEVg=;
+        b=oxNzeR3EjZyJqfzhIUshnheJ0INLWf66MfyocLgT8F2bMmX9rDhOpeOucc8uVnXkZnlwrL
+        N6DmoMYW3MhH5LkEKjNETbnhojlh6h7S2PMJeLFWEUdQHmfizHlU7tRzGWjzCoobQEbKJf
+        Ig3Kn6r6NxAW9MfIjTmTj8hdFAJj694=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643207164;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WLyKhfXHS44+Znkmdw5Wkn13IOJ7HmCc2bqdYmRAEVg=;
+        b=Zf9Zim80aCa4MDEXnNy318W3kpCJ/XdcZx5iwGuSF2NMAz3RXI1cSFR9dyB9uSO5TpCLIW
+        +YTW2Lzh1DdMS1CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5A9AA13E1A;
+        Wed, 26 Jan 2022 14:26:03 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id oZl4FPtZ8WHxegAAMHmgww
+        (envelope-from <jroedel@suse.de>); Wed, 26 Jan 2022 14:26:03 +0000
+Date:   Wed, 26 Jan 2022 15:26:01 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Eric Biederman <ebiederm@xmission.com>,
+        kexec@lists.infradead.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 07/12] x86/sev: Setup code to park APs in the AP Jump
+ Table
+Message-ID: <YfFZ+SRutJhDoAkz@suse.de>
+References: <20210913155603.28383-1-joro@8bytes.org>
+ <20210913155603.28383-8-joro@8bytes.org>
+ <YYv1TPawuorQv1PR@zn.tnic>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <YYv1TPawuorQv1PR@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_cpuid_check_equal() checks for the (full) equality of the supplied
-CPUID data so .flags need to be checked too.
+On Wed, Nov 10, 2021 at 05:37:32PM +0100, Borislav Petkov wrote:
+> On Mon, Sep 13, 2021 at 05:55:58PM +0200, Joerg Roedel wrote:
+> >  extern unsigned char real_mode_blob[];
+> > diff --git a/arch/x86/include/asm/sev-ap-jumptable.h b/arch/x86/include/asm/sev-ap-jumptable.h
+> > new file mode 100644
+> > index 000000000000..1c8b2ce779e2
+> > --- /dev/null
+> > +++ b/arch/x86/include/asm/sev-ap-jumptable.h
+> 
+> Why a separate header? arch/x86/include/asm/sev.h looks small enough.
 
-Reported-by: Sean Christopherson <seanjc@google.com>
-Fixes: c6617c61e8fe ("KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN")
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/cpuid.c | 1 +
- 1 file changed, 1 insertion(+)
+The header is included in assembly, so I made a separate one.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 89d7822a8f5b..ddfd97f62ba8 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -133,6 +133,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
- 		orig = &vcpu->arch.cpuid_entries[i];
- 		if (e2[i].function != orig->function ||
- 		    e2[i].index != orig->index ||
-+		    e2[i].flags != orig->flags ||
- 		    e2[i].eax != orig->eax || e2[i].ebx != orig->ebx ||
- 		    e2[i].ecx != orig->ecx || e2[i].edx != orig->edx)
- 			return -EINVAL;
+> > +void __init sev_es_setup_ap_jump_table_data(void *base, u32 pa)
+> 
+> Why is this a separate function?
+> 
+> It is all part of the jump table setup.
+
+Right, but the sev_es_setup_ap_jump_table_blob() function is already
+pretty big and I wanted to keep things readable.
+
+> 
+> > +		return 0;
+> 
+> Why are you returning 0 here and below?
+
+This is in an initcall and it returns just 0 when the environment is not
+ready to setup the ap jump table. Returning non-zero would create a
+warning message in the caller for something that is not a bug in the
+kernel.
+
+> > + * This file contains the source code for the binary blob which gets copied to
+> > + * the SEV-ES AP Jumptable to park APs while offlining CPUs or booting a new
+> 
+> I've seen "Jumptable", "Jump Table" and "jump table" at least. I'd say, do
+> the last one everywhere pls.
+
+Fair, sorry for my english being too german :) I changed everything to
+'jump table'.
+
+> > +	/* Reset remaining registers */
+> > +	movl	$0, %esp
+> > +	movl	$0, %eax
+> > +	movl	$0, %ebx
+> > +	movl	$0, %edx
+> 
+> All 4: use xor
+
+XOR changes EFLAGS, can not use them here.
+
+> > +
+> > +	/* Reset CR0 to get out of protected mode */
+> > +	movl	$0x60000010, %ecx
+> 
+> Another magic naked number.
+
+This is the CR0 reset value. I have updated the comment to make this
+more clear.
+
+Thanks,
+
 -- 
-2.34.1
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
 
