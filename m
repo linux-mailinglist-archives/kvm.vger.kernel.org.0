@@ -2,194 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C2E549C7F4
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 11:50:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5B9C49C848
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 12:09:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240213AbiAZKuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 05:50:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22418 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233176AbiAZKuV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 05:50:21 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20QAa46m006863
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 10:50:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=Mds6KfXCGiuY6ShHHtm5dfUvh7nv2Tw1cd7RNYNSWTU=;
- b=jvPQ/RU00jjtCXvvTjk1rD1tQ5P3JEI4aSY+Gsdi3l63Qo4NdqArGZBgm/M3wsx5i65f
- tszHaBcF0eO7Mjn+sM96SEg0yRo25wsqrUL/Hqqwjx+4oqd/Tr5ujVTjmn8UnPLbpS+E
- YhgH4MO6Xaecghl/NvBWidsLRhC2Ch/Zsqf6Le+CyQwV0PNsvJo2C//2Rg1W6YizcZ7w
- inNZU5QavKK1+8+1Zw1qGCCvjtgqHiMx4S1gza5ZGyZUTAcTuTzO6wFEE7gPsNCxlviH
- KzUQF+XaPTkDK0N0apC41BMoBMrgraxH4Sx2hJTUI2J1EGrNRlCmM8Y6fSCVVvWg+90B YA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3du30vtcev-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 10:50:21 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20QAfJfJ028636
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 10:50:21 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3du30vtcec-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jan 2022 10:50:21 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20QAgROE012576;
-        Wed, 26 Jan 2022 10:50:18 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dr96jn8t2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jan 2022 10:50:18 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20QAoG4e45941136
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Jan 2022 10:50:16 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2916BA405B;
-        Wed, 26 Jan 2022 10:50:16 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DAC04A4066;
-        Wed, 26 Jan 2022 10:50:15 +0000 (GMT)
-Received: from [9.145.146.49] (unknown [9.145.146.49])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Jan 2022 10:50:15 +0000 (GMT)
-Message-ID: <871d090d-36c9-1c6f-016f-634a7c705d4b@linux.ibm.com>
-Date:   Wed, 26 Jan 2022 11:50:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH] Use a prefix for the STANDALONE
- environment variable
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Andrew Jones <drjones@redhat.com>,
+        id S240476AbiAZLJB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 06:09:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30071 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240460AbiAZLJA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 06:09:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643195339;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hPtwTDwHghQtVyxWRc+Fq5g+xzmJLLojUxCSBluBiYo=;
+        b=VmXvMu6uli0+sYiiCxIur/HSuspf+qdY38HyEjeBOFnKU4D9+gunA7UGZq/y6wiKdDJU3p
+        LPsPLYtGjTBlcP6HM/tWM3iPUIgS0wpQvpJRacN9TIg/5e0RNuiUnBaXy8zeIqb1nwfsAj
+        1N49nX/5HAVyhpAGMNraA2yuwvxFlwg=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-184--RwrkGRSN3O94gKaiRLQxQ-1; Wed, 26 Jan 2022 06:08:58 -0500
+X-MC-Unique: -RwrkGRSN3O94gKaiRLQxQ-1
+Received: by mail-ej1-f71.google.com with SMTP id v2-20020a1709062f0200b006a5f725efc1so4735612eji.23
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 03:08:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=hPtwTDwHghQtVyxWRc+Fq5g+xzmJLLojUxCSBluBiYo=;
+        b=ZDXkSpj4QGOe0EecuKDXnj9aH2eQT7Hp5QtzousfXuCsdjx2JCOztsvuwIe1eYcdrU
+         khw7n2lPn3JT1r8BvMNobtiB9QCTNC+zqBKAzZcJyJf0OqN/XG21AVz3wNX42100wDFY
+         Ckkx3p0y5GKKQRicJWPWicLxNGCRrehea6t9h6KVs9Tt3gYXNNp3PHZsvXSCnEy+PPHn
+         A6MNWJI1PiHG/DnjGUl8FF+PKZLxFSAnTGYslwgrw6NE5NbVRdNJ1cHEmjX3khlEdfnw
+         gThAOjPj093zX1idqGfSolbxhNNMI+UWkFjb5+KqcvYRXzv2SmxTNi02y2ure5ISE3Bg
+         ObEw==
+X-Gm-Message-State: AOAM5304MTLitlgUde+pWX95nlKjWEL87MCNBpi1+yGRGfEyYrnv3+b/
+        DcS41vAIUEVG8M0z1enOTR+ri9Qwieo0luA1pUnAZED5IyvSRjDEwkpFd8YIgdMQKqp68ewfXYn
+        qAB7Iu6EHT1XE
+X-Received: by 2002:a17:907:7ea8:: with SMTP id qb40mr12708725ejc.541.1643195337424;
+        Wed, 26 Jan 2022 03:08:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwdUKeSXIU4o2kPWVGr2pmhV25aDoIatAXpL9c40+cFEd5lpNFyesBxrQl6LE484+Sgc9ijKA==
+X-Received: by 2002:a17:907:7ea8:: with SMTP id qb40mr12708697ejc.541.1643195337159;
+        Wed, 26 Jan 2022 03:08:57 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id dc24sm7251220ejb.201.2022.01.26.03.08.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jan 2022 03:08:56 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Laurent Vivier <lvivier@redhat.com>
-References: <20220120182200.152835-1-thuth@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220120182200.152835-1-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q7a1llc2CXD2URHJ6-Uo5m0IWw9amE6H
-X-Proofpoint-GUID: 0TbQeVyWf5dD3AmGml0vFnAGYZKbF_PP
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+be576ad7655690586eec@syzkaller.appspotmail.com
+Subject: Re: [PATCH] KVM: x86: Free kvm_cpuid_entry2 array on post-KVM_RUN
+ KVM_SET_CPUID{,2}
+In-Reply-To: <20220125210445.2053429-1-seanjc@google.com>
+References: <20220125210445.2053429-1-seanjc@google.com>
+Date:   Wed, 26 Jan 2022 12:08:55 +0100
+Message-ID: <875yq6iwjc.fsf@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-26_02,2022-01-26_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015 adultscore=0
- suspectscore=0 mlxscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2201260061
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/20/22 19:22, Thomas Huth wrote:
-> Seems like "STANDALONE" is too generic and causes a conflict in
-> certain environments (see bug link below). Add a prefix here to
-> decrease the possibility of a conflict here.
-> 
-> Resolves: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/issues/3
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Sean Christopherson <seanjc@google.com> writes:
 
-Doesn't look like this would impact our ci in a meaningful way, so:
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-
+> Free the "struct kvm_cpuid_entry2" array on successful post-KVM_RUN
+> KVM_SET_CPUID{,2} to fix a memory leak, the callers of kvm_set_cpuid()
+> free the array only on failure.
+>
+>  BUG: memory leak
+>  unreferenced object 0xffff88810963a800 (size 2048):
+>   comm "syz-executor025", pid 3610, jiffies 4294944928 (age 8.080s)
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 0d 00 00 00  ................
+>     47 65 6e 75 6e 74 65 6c 69 6e 65 49 00 00 00 00  GenuntelineI....
+>   backtrace:
+>     [<ffffffff814948ee>] kmalloc_node include/linux/slab.h:604 [inline]
+>     [<ffffffff814948ee>] kvmalloc_node+0x3e/0x100 mm/util.c:580
+>     [<ffffffff814950f2>] kvmalloc include/linux/slab.h:732 [inline]
+>     [<ffffffff814950f2>] vmemdup_user+0x22/0x100 mm/util.c:199
+>     [<ffffffff8109f5ff>] kvm_vcpu_ioctl_set_cpuid2+0x8f/0xf0 arch/x86/kvm/cpuid.c:423
+>     [<ffffffff810711b9>] kvm_arch_vcpu_ioctl+0xb99/0x1e60 arch/x86/kvm/x86.c:5251
+>     [<ffffffff8103e92d>] kvm_vcpu_ioctl+0x4ad/0x950 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4066
+>     [<ffffffff815afacc>] vfs_ioctl fs/ioctl.c:51 [inline]
+>     [<ffffffff815afacc>] __do_sys_ioctl fs/ioctl.c:874 [inline]
+>     [<ffffffff815afacc>] __se_sys_ioctl fs/ioctl.c:860 [inline]
+>     [<ffffffff815afacc>] __x64_sys_ioctl+0xfc/0x140 fs/ioctl.c:860
+>     [<ffffffff844a3335>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>     [<ffffffff844a3335>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>     [<ffffffff84600068>] entry_SYSCALL_64_after_hwframe+0x44/0xae
+>
+> Fixes: c6617c61e8fe ("KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN")
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+be576ad7655690586eec@syzkaller.appspotmail.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arm/run                 | 2 +-
->   powerpc/run             | 2 +-
->   s390x/run               | 2 +-
->   scripts/mkstandalone.sh | 2 +-
->   scripts/runtime.bash    | 4 ++--
->   x86/run                 | 2 +-
->   6 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arm/run b/arm/run
-> index a390ca5..a94e1c7 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -1,6 +1,6 @@
->   #!/usr/bin/env bash
->   
-> -if [ -z "$STANDALONE" ]; then
-> +if [ -z "$KUT_STANDALONE" ]; then
->   	if [ ! -f config.mak ]; then
->   		echo "run ./configure && make first. See ./configure -h"
->   		exit 2
-> diff --git a/powerpc/run b/powerpc/run
-> index 597ab96..ee38e07 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -1,6 +1,6 @@
->   #!/usr/bin/env bash
->   
-> -if [ -z "$STANDALONE" ]; then
-> +if [ -z "$KUT_STANDALONE" ]; then
->   	if [ ! -f config.mak ]; then
->   		echo "run ./configure && make first. See ./configure -h"
->   		exit 2
-> diff --git a/s390x/run b/s390x/run
-> index c615caa..064ecd1 100755
-> --- a/s390x/run
-> +++ b/s390x/run
-> @@ -1,6 +1,6 @@
->   #!/usr/bin/env bash
->   
-> -if [ -z "$STANDALONE" ]; then
-> +if [ -z "$KUT_STANDALONE" ]; then
->   	if [ ! -f config.mak ]; then
->   		echo "run ./configure && make first. See ./configure -h"
->   		exit 2
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index cefdec3..86c7e54 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -35,7 +35,7 @@ generate_test ()
->   	done
->   
->   	echo "#!/usr/bin/env bash"
-> -	echo "export STANDALONE=yes"
-> +	echo "export KUT_STANDALONE=yes"
->   	echo "export ENVIRON_DEFAULT=$ENVIRON_DEFAULT"
->   	echo "export HOST=\$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')"
->   	echo "export PRETTY_PRINT_STACKS=no"
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index c513761..6d5fced 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -36,7 +36,7 @@ get_cmdline()
->   skip_nodefault()
->   {
->       [ "$run_all_tests" = "yes" ] && return 1
-> -    [ "$STANDALONE" != "yes" ] && return 0
-> +    [ "$KUT_STANDALONE" != "yes" ] && return 0
->   
->       while true; do
->           read -r -p "Test marked not to be run by default, are you sure (y/N)? " yn
-> @@ -155,7 +155,7 @@ function run()
->       summary=$(eval $cmdline 2> >(RUNTIME_log_stderr $testname) \
->                                > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
->       ret=$?
-> -    [ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $testname $kernel)
-> +    [ "$KUT_STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $testname $kernel)
->   
->       if [ $ret -eq 0 ]; then
->           print_result "PASS" $testname "$summary"
-> diff --git a/x86/run b/x86/run
-> index ab91753..582d1ed 100755
-> --- a/x86/run
-> +++ b/x86/run
-> @@ -1,6 +1,6 @@
->   #!/usr/bin/env bash
->   
-> -if [ -z "$STANDALONE" ]; then
-> +if [ -z "$KUT_STANDALONE" ]; then
->   	if [ ! -f config.mak ]; then
->   		echo "run ./configure && make first. See ./configure -h"
->   		exit 2
-> 
+>  arch/x86/kvm/cpuid.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 3902c28fb6cb..0a08db384fb9 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -346,8 +346,14 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+>  	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
+>  	 * whether the supplied CPUID data is equal to what's already set.
+>  	 */
+> -	if (vcpu->arch.last_vmentry_cpu != -1)
+> -		return kvm_cpuid_check_equal(vcpu, e2, nent);
+> +	if (vcpu->arch.last_vmentry_cpu != -1) {
+> +		r = kvm_cpuid_check_equal(vcpu, e2, nent);
+> +		if (r)
+> +			return r;
+> +
+> +		kvfree(e2);
+> +		return 0;
+> +	}
+>  
+>  	r = kvm_check_cpuid(vcpu, e2, nent);
+>  	if (r)
+>
+> base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+Thanks!
+
+-- 
+Vitaly
 
