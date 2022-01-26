@@ -2,278 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 175DF49C2FE
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 06:22:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90EBA49C36C
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 07:04:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232201AbiAZFWX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 00:22:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44316 "EHLO
+        id S234564AbiAZGEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 01:04:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbiAZFWX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 00:22:23 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA009C06161C
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 21:22:22 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id h14so4573213plf.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 21:22:22 -0800 (PST)
+        with ESMTP id S233524AbiAZGEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 01:04:44 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC506C06161C
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 22:04:43 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 133so20311694pgb.0
+        for <kvm@vger.kernel.org>; Tue, 25 Jan 2022 22:04:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NOoWjvyVLqfIkw2JFMhzZWLlrGE6AAdot/2kzaXU3VI=;
-        b=EjAEeSuUX32yK4JahNfTxSoeN7Z/GDGdGWMaRX6msmxldrmUbUIlxaJfuNyehuENzP
-         XJ/Y8XThsBptZnW5xRXQTEPtkAkGr/0k3kLgomgTty3iAjouf3iNXc4efK2y3ugEW/hI
-         g2Tj+udzGglj9XgGRZGE+a6FOIGlxmHGRPgcXAFZPSaHelO/aMIPsPHF814UjrYI9uUP
-         dGY3bfB1KZkM/AXwLWdQ50wThEcRBPtjr4jSeqNsp/4Kjd/Lfa7vkCpQP6n1jPRh2mAD
-         vLd28jAQpgSJQxpIRnO26qcsbn5ra6/9XJzu4dCe/ZaDDpsWkoxp/VZ+6Cc1mcDZ3C/L
-         4oSg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Xd7lpBs3fg2+dxWL2E53F45VMmbGE2eht3kadsQcGNA=;
+        b=QkS4b1UrnnBPaF6xGkrUHFc5lHaYz+lPJeb2AGnZ0xBTPvmK5pwNVRlpFAG53eXsvb
+         eostD9W5CCGqlyUmD8B0Wtem+4LBDpF1b/548CzDG7l4LpgMdlSYx2STJJiN7WfmxHWQ
+         5Mlq2bczBtiipGHOWzeEHEStZZpsz3DgZXqTYCUHP1ZFZfeGvrsiLoGn3Sj2oSf+iK5+
+         gZ/Ax5KTzKHNekusU9UFqXkQW/ZXR7COe+nzShQEussToFxXCupAExRYWp4LW3o3Av5e
+         XY/WcQYH4Vu+oSbIjci8nKLMd7vAjkuGu0QxJ/iX4VJLuAOh1mJjQ15ALTjxBOrx369B
+         pzcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NOoWjvyVLqfIkw2JFMhzZWLlrGE6AAdot/2kzaXU3VI=;
-        b=wbrEwIOyHv9EZV67eH6egqaK8lzrjlfkzVX9tbVMVhUfDVoTNGt6dUOywmNd/9VYmQ
-         n4LqEWwaeZ2I3e0H5zoepAkUKc++yu6LgX/NWY51eddr1X97EgtDQGP4Ww1jU/4MUjAJ
-         HkJbMux0h9wkBQSkT+kpkYxqObdndnlSjHxM4moTgD9BMgXSzwslRPyLtZGYBX5fvt3D
-         IwiWv8iuvLnGezj2oYKOrhOMkSwImPwXyWyQLwpNU9zg8ASprU6bS3DKTLEvDJFmxuA0
-         gweyIgXk6Wr4QaSSzdNGKxeDXjiIz9+vuhsdKDhjrfMXBAyX6tfLOHBXOecuyiy0LYy3
-         lBNg==
-X-Gm-Message-State: AOAM5318cyzCnpitBDq1AX3aWNOLyObgyR8H5f3ukQdFA+bvYv8HDKEb
-        AJuLc73EahZYgJ95y+r/uvznOQ==
-X-Google-Smtp-Source: ABdhPJwyLx+5eAlTJPtgJIvXyC2iwxmisAyHMyKDzZKtjO/Aqsn9ofM0P83getrTAM+DrFefFCeCGw==
-X-Received: by 2002:a17:903:31c8:b0:149:a463:ad38 with SMTP id v8-20020a17090331c800b00149a463ad38mr21425083ple.76.1643174542251;
-        Tue, 25 Jan 2022 21:22:22 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id k16sm700956pfu.140.2022.01.25.21.22.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jan 2022 21:22:21 -0800 (PST)
-Date:   Tue, 25 Jan 2022 21:22:17 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-Message-ID: <YfDaiUbSkpi9/5YY@google.com>
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-3-reijiw@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Xd7lpBs3fg2+dxWL2E53F45VMmbGE2eht3kadsQcGNA=;
+        b=M00S6Xt9QwVXS/WxPFW4WsMH8emnMoqElcWQZdaHOWXa2oxb1WizdP3gGa1hy2IP5K
+         PAAMli2LwIFKAXia6t0bgRfCv1EPDdMbESCJa3tEbckhTi5O3CKHLz4V5rQSDvwBdsHr
+         aPrH2HiEKjkE3bGNN7xv+4YKaegXdVetLOZZzFnPpvzm62hL3FEcgRKYBGVl/XPedlxf
+         rSqq75djBaAPfr0J9XGtJzihzFlQ5TsyBWwim7UqtWYDLcjSzPTQupcQyi0pr7WPLlmo
+         duQ5aiDlQEOX/itoWEHJQFQmH+O5UNUfjbXBwqWtQVchYA6iWxMjADd76vUQ9EpaUNrX
+         tCbg==
+X-Gm-Message-State: AOAM531VQiI7WAH3UQ15BUpjhulATd29FBO1WAv9CembIX0PHIc44dOQ
+        UDzDt2PY6ll74JWONY0pR/WA2BF/ITehcY7NChEWFQ==
+X-Google-Smtp-Source: ABdhPJzw0M1bslpmvBR8WXUGKxOcMeZd18HsYC5FwjHDxo5uLelw8Cp4WTb6uUKVMpdC8T9RoqW4QSMOunfsFm8/tOQ=
+X-Received: by 2002:a05:6a00:ac4:b0:4bd:6555:1746 with SMTP id
+ c4-20020a056a000ac400b004bd65551746mr21625175pfl.39.1643177083215; Tue, 25
+ Jan 2022 22:04:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220106042708.2869332-3-reijiw@google.com>
+References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-2-reijiw@google.com>
+ <CA+EHjTx+b0ZVw30riW4OUVP4BCPeJZe+gr5_ycHkPbwU=y7sqA@mail.gmail.com>
+In-Reply-To: <CA+EHjTx+b0ZVw30riW4OUVP4BCPeJZe+gr5_ycHkPbwU=y7sqA@mail.gmail.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Tue, 25 Jan 2022 22:04:26 -0800
+Message-ID: <CAAeT=Fy8AXaM1SGs1wRssTZ9QW9bH-d1d_sCdSrC7EitZLPKBw@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 01/26] KVM: arm64: Introduce a validation function
+ for an ID register
+To:     Fuad Tabba <tabba@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 05, 2022 at 08:26:44PM -0800, Reiji Watanabe wrote:
-> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> Use the saved ones when ID registers are read by the guest or
-> userspace (via KVM_GET_ONE_REG).
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 16 ++++++++
->  arch/arm64/kvm/arm.c              |  1 +
->  arch/arm64/kvm/sys_regs.c         | 62 ++++++++++++++++++++++---------
->  3 files changed, 62 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2a5f7f38006f..c789a0137f58 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -102,6 +102,17 @@ struct kvm_s2_mmu {
->  struct kvm_arch_memory_slot {
->  };
->  
-> +/*
-> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> + * where 0<=crm<8, 0<=op2<8.
+Hi Fuad,
 
-Is this observation based on this table?
+> > +/*
+> > + * Override entries in @orig_ftrp with the ones in @new_ftrp when their shift
+> > + * fields match.  The last entry of @orig_ftrp and @new_ftrp must be
+> > + * ARM64_FTR_END (.width == 0).
+> > + */
+> > +static void arm64_ftr_reg_bits_overrite(struct arm64_ftr_bits *orig_ftrp,
+>
+> s/overrite/override
 
-Table D12-2 System instruction encodings for non-Debug System register accesses
+Thank you for catching this. I will fix it.
 
-in that case, it seems that the ID registers list might grow after
-crm=7, and as CRm has 4 bits, why not 16*8=128?
 
-> + */
-> +#define KVM_ARM_ID_REG_MAX_NUM	64
-> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> +#define is_id_reg(id)	\
-> +	(sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&	\
-> +	 sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 0 &&	\
-> +	 sys_reg_CRm(id) < 8)
-> +
->  struct kvm_arch {
->  	struct kvm_s2_mmu mmu;
->  
-> @@ -137,6 +148,9 @@ struct kvm_arch {
->  
->  	/* Memory Tagging Extension enabled for the guest */
->  	bool mte_enabled;
-> +
-> +	/* ID registers for the guest. */
-> +	u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
->  };
->  
->  struct kvm_vcpu_fault_info {
-> @@ -734,6 +748,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  				struct kvm_arm_copy_mte_tags *copy_tags);
->  
-> +void set_default_id_regs(struct kvm *kvm);
-> +
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e4727dc771bf..5f497a0af254 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
->  
->  	set_default_spectre(kvm);
-> +	set_default_id_regs(kvm);
->  
->  	return ret;
->  out_free_stage2_pgd:
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e3ec1a44f94d..80dc62f98ef0 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -33,6 +33,8 @@
->  
->  #include "trace.h"
->  
-> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
-> +
->  /*
->   * All of this file is extremely similar to the ARM coproc.c, but the
->   * types are different. My gut feeling is that it should be pretty
-> @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
->  			  struct sys_reg_params *p,
->  			  const struct sys_reg_desc *r)
->  {
-> -	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> +	u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
->  	u32 sr = reg_to_encoding(r);
->  
->  	if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-> @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> -		struct sys_reg_desc const *r, bool raz)
-> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
-> -	u32 id = reg_to_encoding(r);
-> -	u64 val;
-> -
-> -	if (raz)
-> -		return 0;
-> -
-> -	val = read_sanitised_ftr_reg(id);
-> +	u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
->  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  	return val;
->  }
->  
-> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_desc const *r, bool raz)
-> +{
-> +	u32 id = reg_to_encoding(r);
-> +
-> +	return raz ? 0 : __read_id_reg(vcpu, id);
-> +}
-> +
->  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->  				  const struct sys_reg_desc *r)
->  {
-> @@ -1223,9 +1225,8 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  /*
->   * cpufeature ID register user accessors
->   *
-> - * For now, these registers are immutable for userspace, so no values
-> - * are stored, and for set_id_reg() we don't allow the effective value
-> - * to be changed.
-> + * For now, these registers are immutable for userspace, so for set_id_reg()
-> + * we don't allow the effective value to be changed.
->   */
->  static int __get_id_reg(const struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
-> @@ -1237,7 +1238,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
->  	return reg_to_user(uaddr, &val, id);
->  }
->  
-> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> +static int __set_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
->  {
-> @@ -1837,8 +1838,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
->  	if (p->is_write) {
->  		return ignore_write(vcpu, p);
->  	} else {
-> -		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> -		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> +		u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> +		u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
->  		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
->  
->  		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-> @@ -2850,3 +2851,30 @@ void kvm_sys_reg_table_init(void)
->  	/* Clear all higher bits. */
->  	cache_levels &= (1 << (i*3))-1;
->  }
-> +
-> +/*
-> + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> + * with ID_SANITISED() to the host's sanitized value.
-> + */
-> +void set_default_id_regs(struct kvm *kvm)
-> +{
-> +	int i;
-> +	u32 id;
-> +	const struct sys_reg_desc *rd;
-> +	u64 val;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> +		rd = &sys_reg_descs[i];
-> +		if (rd->access != access_id_reg)
-> +			/* Not ID register, or hidden/reserved ID register */
-> +			continue;
-> +
-> +		id = reg_to_encoding(rd);
-> +		if (WARN_ON_ONCE(!is_id_reg(id)))
-> +			/* Shouldn't happen */
-> +			continue;
-> +
-> +		val = read_sanitised_ftr_reg(id);
+> > +                                       struct arm64_ftr_bits *new_ftrp)
+>
+> Should this be const struct arm64_ftr_bits *new_ftrp, which would also
+> make it consistent with copy_arm64_ftr_bits()?
 
-I'm a bit confused. Shouldn't the default+sanitized values already use
-arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
+Yes, I will make new_ftrp const.
 
-> +		kvm->arch.id_regs[IDREG_IDX(id)] = val;
-> +	}
-> +}
-> -- 
-> 2.34.1.448.ga2b2bfdf31-goog
-> 
+>
+> > +{
+> > +       struct arm64_ftr_bits *o_ftrp, *n_ftrp;
+> > +
+> > +       for (n_ftrp = new_ftrp; n_ftrp->width; n_ftrp++) {
+> > +               for (o_ftrp = orig_ftrp; o_ftrp->width; o_ftrp++) {
+> > +                       if (o_ftrp->shift == n_ftrp->shift) {
+> > +                               *o_ftrp = *n_ftrp;
+> > +                               break;
+> > +                       }
+> > +               }
+> > +       }
+> > +}
+> > +
+>
+> ...
+>
+> > +/*
+> > + * Initialize arm64_ftr_bits_kvm.  Copy arm64_ftr_bits for each ID register
+> > + * from arm64_ftr_regs to arm64_ftr_bits_kvm, and then override entries in
+> > + * arm64_ftr_bits_kvm with ones in arm64_ftr_bits_kvm_override.
+> > + */
+> > +static int init_arm64_ftr_bits_kvm(void)
+> > +{
+> > +       struct arm64_ftr_bits ftr_temp[MAX_FTR_BITS_LEN];
+> > +       static struct __ftr_reg_bits_entry *reg_bits_array, *bits, *o_bits;
+> > +       int i, j, nent, ret;
+> > +
+> > +       mutex_lock(&arm64_ftr_bits_kvm_lock);
+> > +       if (arm64_ftr_bits_kvm) {
+> > +               /* Already initialized */
+> > +               ret = 0;
+> > +               goto unlock_exit;
+> > +       }
+> > +
+> > +       nent = ARRAY_SIZE(arm64_ftr_regs);
+> > +       reg_bits_array = kcalloc(nent, sizeof(struct __ftr_reg_bits_entry),
+> > +                                GFP_KERNEL);
+> > +       if (!reg_bits_array) {
+> > +               ret = ENOMEM;
+>
+> Should this be -ENOMEM?
+
+Yes, I will fix it.
+
+
+> > +               goto unlock_exit;
+> > +       }
+> > +
+> > +       /* Copy entries from arm64_ftr_regs to reg_bits_array */
+> > +       for (i = 0; i < nent; i++) {
+> > +               bits = &reg_bits_array[i];
+> > +               bits->sys_id = arm64_ftr_regs[i].sys_id;
+> > +               bits->ftr_bits = (struct arm64_ftr_bits *)arm64_ftr_regs[i].reg->ftr_bits;
+> > +       };
+> > +
+> > +       /*
+> > +        * Override the entries in reg_bits_array with the ones in
+> > +        * arm64_ftr_bits_kvm_override.
+> > +        */
+> > +       for (i = 0; i < ARRAY_SIZE(arm64_ftr_bits_kvm_override); i++) {
+> > +               o_bits = &arm64_ftr_bits_kvm_override[i];
+> > +               for (j = 0; j < nent; j++) {
+> > +                       bits = &reg_bits_array[j];
+> > +                       if (bits->sys_id != o_bits->sys_id)
+> > +                               continue;
+> > +
+> > +                       memset(ftr_temp, 0, sizeof(ftr_temp));
+> > +
+> > +                       /*
+> > +                        * Temporary save all entries in o_bits->ftr_bits
+> > +                        * to ftr_temp.
+> > +                        */
+> > +                       copy_arm64_ftr_bits(ftr_temp, o_bits->ftr_bits);
+> > +
+> > +                       /*
+> > +                        * Copy entries from bits->ftr_bits to o_bits->ftr_bits.
+> > +                        */
+> > +                       copy_arm64_ftr_bits(o_bits->ftr_bits, bits->ftr_bits);
+> > +
+> > +                       /*
+> > +                        * Override entries in o_bits->ftr_bits with the
+> > +                        * saved ones, and update bits->ftr_bits with
+> > +                        * o_bits->ftr_bits.
+> > +                        */
+> > +                       arm64_ftr_reg_bits_overrite(o_bits->ftr_bits, ftr_temp);
+> > +                       bits->ftr_bits = o_bits->ftr_bits;
+> > +                       break;
+> > +               }
+> > +       }
+>
+> Could you please explain using ftr_temp[] and changing the value in
+> arm64_ftr_bits_kvm_override, rather than just
+> arm64_ftr_reg_bits_overrite(bits->ftr_bits, o_bits->ftr_bits)?
+
+I would like to maintain the order of the entries in the original
+ftr_bits so that (future) functions that work for the original ones
+also work for the KVM's.
+The copy and override is an easy way to do that.  The same thing can
+be done without ftr_temp[], but it would look a bit tricky.
+
+If we assume the order shouldn't matter or entries in ftr_bits
+are always in descending order, just changing the value in
+arm64_ftr_bits_kvm_override would be a much simpler way though.
+
+
+>
+>
+> > +static const struct arm64_ftr_bits *get_arm64_ftr_bits_kvm(u32 sys_id)
+> > +{
+> > +       const struct __ftr_reg_bits_entry *ret;
+> > +       int err;
+> > +
+> > +       if (!arm64_ftr_bits_kvm) {
+> > +               /* arm64_ftr_bits_kvm is not initialized yet. */
+> > +               err = init_arm64_ftr_bits_kvm();
+>
+> Rather than doing this check, can we just initialize it earlier, maybe
+> (indirectly) via kvm_arch_init_vm() or around the same time?
+
+Thank you for the comment.
+I will consider when it should be initialized.
+( perhaps even earlier than kvm_arch_init_vm())
+
+>
+>
+> > +               if (err)
+> > +                       return NULL;
+> > +       }
+> > +
+> > +       ret = bsearch((const void *)(unsigned long)sys_id,
+> > +                     arm64_ftr_bits_kvm,
+> > +                     arm64_ftr_bits_kvm_nentries,
+> > +                     sizeof(arm64_ftr_bits_kvm[0]),
+> > +                     search_cmp_ftr_reg_bits);
+> > +       if (ret)
+> > +               return ret->ftr_bits;
+> > +
+> > +       return NULL;
+> > +}
+> > +
+> > +/*
+> > + * Check if features (or levels of features) that are indicated in the ID
+> > + * register value @val are also indicated in @limit.
+> > + * This function is for KVM to check if features that are indicated in @val,
+> > + * which will be used as the ID register value for its guest, are supported
+> > + * on the host.
+> > + * For AA64MMFR0_EL1.TGranX_2 fields, which don't follow the standard ID
+> > + * scheme, the function checks if values of the fields in @val are the same
+> > + * as the ones in @limit.
+> > + */
+> > +int arm64_check_features(u32 sys_reg, u64 val, u64 limit)
+> > +{
+> > +       const struct arm64_ftr_bits *ftrp = get_arm64_ftr_bits_kvm(sys_reg);
+> > +       u64 exposed_mask = 0;
+> > +
+> > +       if (!ftrp)
+> > +               return -ENOENT;
+> > +
+> > +       for (; ftrp->width; ftrp++) {
+> > +               s64 ftr_val = arm64_ftr_value(ftrp, val);
+> > +               s64 ftr_lim = arm64_ftr_value(ftrp, limit);
+> > +
+> > +               exposed_mask |= arm64_ftr_mask(ftrp);
+> > +
+> > +               if (ftr_val == ftr_lim)
+> > +                       continue;
+>
+> At first I thought that this check isn't necessary, it should be
+> covered by the check below (arm64_ftr_safe_value. However, I think
+> that it's needed for the FTR_HIGHER_OR_ZERO_SAFE case. If my
+> understanding is correct, it might be worth adding a comment, or even
+> encapsulating this logic in a arm64_is_safe_value() function for
+> clarity.
+
+In my understanding, arm64_ftr_safe_value() provides a safe value
+when two values are different, and I think there is nothing special
+about the usage of this function (This is actually how the function
+is used by update_cpu_ftr_reg()).
+Without the check, it won't work for FTR_EXACT, but there might be
+more in the future.
+
+Perhaps it might be more straightforward to add the equality check
+into arm64_ftr_safe_value() ?
+
+>
+> > +
+> > +               if (ftr_val != arm64_ftr_safe_value(ftrp, ftr_val, ftr_lim))
+> > +                       return -E2BIG;
+> > +       }
+> > +
+> > +       /* Make sure that no unrecognized fields are set in @val. */
+> > +       if (val & ~exposed_mask)
+> > +               return -E2BIG;
+> > +
+> > +       return 0;
+> > +}
+
+Thanks,
+Reiji
