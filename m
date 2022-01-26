@@ -2,111 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 813E549D084
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:15:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A62349D09B
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:22:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243642AbiAZRPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 12:15:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54371 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243634AbiAZRPW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 12:15:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643217321;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QG6ySHAezAZJk/nwAFZwk/0OoVXz59pzUB8tyROetQI=;
-        b=QBX2E/RTc+pgYtULGTdwACWeIckQHtLcK6Wb9+9WbExVqaTtculFCien+QOn+WolNAeclN
-        HzOhqVT+7bYjmplyMHCzO+Q1epNCWGyxh7HBSEH6XqZiMIGsDW5GT14TUPOUqK87VLgUX5
-        A7SsPUji276UKWyVkSegitynMJX1dlc=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-543-uxmQLpnmM9yaP1Ku18F5bA-1; Wed, 26 Jan 2022 12:15:20 -0500
-X-MC-Unique: uxmQLpnmM9yaP1Ku18F5bA-1
-Received: by mail-ej1-f72.google.com with SMTP id la22-20020a170907781600b006a7884de505so4725ejc.7
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:15:19 -0800 (PST)
+        id S243660AbiAZRWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 12:22:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43284 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243292AbiAZRW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 12:22:29 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A89C06161C
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:22:29 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id u24-20020a656718000000b0035e911d79edso33989pgf.1
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:22:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=4zdqvDRcKscDm+lnZv7gUuJZV8rrHFi40CWOKIaL7JI=;
+        b=aB+N+NsJ2bzr0imFihYSeflE2CQvIUancoVRwZRxvgRXBSsvH6WyZ4qorMMtoLiPoK
+         mzU/8QfNGqpuc9LHzoEr0ykFebxxw3UdHeAUjPE8+Rnk98TZ7rismWQmnL2dkhEm/DrQ
+         gxyeHvYimaS3vwQC7N5m0RQJbtvlsIwxSfO2PRpyBNAebd8JqcWrS7jIADG2tLt0S1A4
+         6hFjoxBfbK7q0JkSH25T6AggzpUyqVFCaV9SnZiqXbwSk0+9/iBu5FscSkAKbXQMbsc/
+         TE5ZL0VeANPHRAMEdwJDaSe3NmT+vJWASJNoM/1QADyxXrUcruPmPe4fFOcmtufrlRcQ
+         dxtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QG6ySHAezAZJk/nwAFZwk/0OoVXz59pzUB8tyROetQI=;
-        b=GgVN/55YN3L5rYmAqTRouBmIQcJs5eb+Uu0CeijIeA5F0Gldr64KpOo9MKrIi4N1ao
-         u4VXMGs0QummFTlzAsoPnrrbFi7Ndjv6nqwY6yR77RGQ5DWwZJe+Ql8Vca9Okhn1GWRK
-         pdsljSyWJt8i2L6e4h9ReCL3d3p2AuoKAbo+5YpN+ssbhVWG0xWtS61WOPQxrA9o1lB/
-         UrbwpOPgaussoTkffG1QYujK4OJPjHphBDIQdjAjWHOMeD2x8zMe0e55AnHpqSMGqdKI
-         4fOM6QlxqjeAaD5rQ4FFy0bZOgmgr/VaQ7wV2OfWPgPwCdxEGE3x+uC7N6pgtutGUl4F
-         G6Ew==
-X-Gm-Message-State: AOAM530DOMYKsFqC7L61cnE9OYixwhstYsDECAgcjPHkR7RbUkBm0D6p
-        u7B4siUeLq5mqmcbzucQYKPUsCdBOxA5lTYqiFKbmZOPpSj8eFa3uU+Ziqhz2Akw7n9+qd+gwfp
-        lx5CorcjvyFMN
-X-Received: by 2002:a17:906:17d5:: with SMTP id u21mr20687553eje.348.1643217318353;
-        Wed, 26 Jan 2022 09:15:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyJI+NBcV+9lwyIqhuJJlEVa+16GJ2LPjRWvUNrCU+JH8M12jcqkXcQDhl5BnCySYFJy/zHXA==
-X-Received: by 2002:a17:906:17d5:: with SMTP id u21mr20687534eje.348.1643217318162;
-        Wed, 26 Jan 2022 09:15:18 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id fh23sm7744998ejc.176.2022.01.26.09.15.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 09:15:17 -0800 (PST)
-Message-ID: <6decc356-b24b-583e-7a96-b221afd91af8@redhat.com>
-Date:   Wed, 26 Jan 2022 18:15:07 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: x86: Keep MSR_IA32_XSS unchanged for INIT
-Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=4zdqvDRcKscDm+lnZv7gUuJZV8rrHFi40CWOKIaL7JI=;
+        b=1K1ai1ydZZhcLUPjovRPf3hXZ0RbVzM30LYRf4k92HNNVxEJdBjd/QMVKlKkkEmOGS
+         U4ybhtRToW6zGQiItHMZL2f7XU9QtIm42KZ9gxrC2J9Et4/EdtfXxbFX4eaTQ+wSgdng
+         2rcJL7OKcdq/m39H40TGedcOuVE3vtpg98+Al+/aPJ1gxL8Il4ju9boRBGl5+xTtRBsc
+         DilPUrwCtVm8R3KKIolQQ2QYCHIpJ34idyMNIngvr2KQKVnRK50Ttvf56KS2/gdHeu7R
+         F0KcjiYPkd0nxoFjnQ2OElztprz/Ij2fb0DTG0ZNFrldHxvB9DF2rrE2CvPHfPQ2anYo
+         Y/dw==
+X-Gm-Message-State: AOAM533E5aChTlFSlhfm2BOpeckKcY58KwPjPI4nuYpjiK2BjZoRlATb
+        FQ6tDvDfFHWaQlFQcpeIVzcYoAsvJ4Q=
+X-Google-Smtp-Source: ABdhPJze6iHI9zyjeiCDEqcUR8gsQq0yQvuwzmzW1OiviDNX4h/PXCj4/Sox6hvyBgl/o0xftcyY4xt5PJM=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:902:bf08:b0:14a:bb95:6980 with SMTP id
+ bi8-20020a170902bf0800b0014abb956980mr24265454plb.139.1643217749066; Wed, 26
+ Jan 2022 09:22:29 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 26 Jan 2022 17:22:23 +0000
+Message-Id: <20220126172226.2298529-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
+Subject: [PATCH 0/3] KVM: x86: XSS and XCR0 fixes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220126034750.2495371-1-xiaoyao.li@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220126034750.2495371-1-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+        Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/22 04:47, Xiaoyao Li wrote:
-> It has been corrected from SDM version 075 that MSR_IA32_XSS is reset to
-> zero on Power up and Reset but keeps unchanged on INIT.
-> 
-> Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->   arch/x86/kvm/x86.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 55518b7d3b96..c0727939684e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11257,6 +11257,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   		vcpu->arch.msr_misc_features_enables = 0;
->   
->   		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
-> +		vcpu->arch.ia32_xss = 0;
->   	}
->   
->   	/* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
-> @@ -11273,8 +11274,6 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
->   	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
->   
-> -	vcpu->arch.ia32_xss = 0;
-> -
->   	static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
->   
->   	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+For convenience, Like's patch split up and applied on top of Xiaoyao.
+Tagged all for @stable, probably want to (retroactively?) get Xiaoyao's
+patch tagged too?
+ 
+Like Xu (2):
+  KVM: x86: Update vCPU's runtime CPUID on write to MSR_IA32_XSS
+  KVM: x86: Sync the states size with the XCR0/IA32_XSS at, any time
 
-Queued, thanks.
+Xiaoyao Li (1):
+  KVM: x86: Keep MSR_IA32_XSS unchanged for INIT
 
-Paolo
+ arch/x86/kvm/x86.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+
+base-commit: e2e83a73d7ce66f62c7830a85619542ef59c90e4
+-- 
+2.35.0.rc0.227.g00780c9af4-goog
 
