@@ -2,109 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8071149CFA7
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:27:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C14549CFD3
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 17:37:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243123AbiAZQ1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 11:27:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21799 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236712AbiAZQ1N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 11:27:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643214432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=efzC2IwqGzejEAIdbekALVZEUqxrdpopAyww58idfp8=;
-        b=SA+donqYp+rAoMJ4gISW//JCe04SN8W3z750NY052iDabqcaZtR+DdZf0EhqhkAUZgWf2q
-        FpVNITOfcb6PtCi2sh+QrhHHTTr/go5iKBLSaLzQpdxZhopYgPh77jywCsxh8XKCxbZHAI
-        sTRFSWhci189IqwoCDCnI0qjU0bjXcA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-599-U5jTIf-ANIOCZfReT-S1xQ-1; Wed, 26 Jan 2022 11:27:11 -0500
-X-MC-Unique: U5jTIf-ANIOCZfReT-S1xQ-1
-Received: by mail-wm1-f70.google.com with SMTP id s190-20020a1ca9c7000000b00347c6c39d9aso106767wme.5
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:27:10 -0800 (PST)
+        id S243173AbiAZQhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 11:37:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32910 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243174AbiAZQhk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 11:37:40 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3194C06173B
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:37:39 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id my12-20020a17090b4c8c00b001b528ba1cd7so222825pjb.1
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 08:37:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=0lkZXVf0iO42qTs6hmWV+2+LZ5uEDOqbitDpMYhaXGE=;
+        b=U35s0iOlg1H127K2jntAKAz9pNUTT4BjIPRQR3LmfMrto8XQT9oVEI8fImw584Xrhg
+         Kb2Fkwx7b2BPIGTNgkGxnyoHslX+Kgt4S4aBPkqamXByT+Nimjw7/9f7Y1oY6XAbtKLW
+         vEd7QNcl9vw82H+7wrUcszlx0+Al5md/yU0u38N5lyfA3rjNhSIIHTbBpW+1td5S3s5a
+         S4gseYjxmHJoRJ2D5Mo32mSoAJqh9ponRVGa+mNPArgvcdBRyHY+KK5UGNNdfyRZGEzm
+         sKzQFDZNBrrTi8PBzUwDu7B/j8Kg1imcXCuG5jyRFpJP93CFbp+YsiNX3X4QxH72ZZIj
+         ecdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=efzC2IwqGzejEAIdbekALVZEUqxrdpopAyww58idfp8=;
-        b=ZvqjI+e70LweAhx4BgXyMDf4/POjjopKtZshZncmBef2SfxiXdCkibzBXer70VT0L1
-         S9xCIJO5UCpnV3C2vGIod73RBGVjzQK6bjdvn3LHF0Sg732PNwsJYP1a1IBqX7RSIjFI
-         CrW3GCcJVXEj5LQKsFMirKJZeRNNdzVmFSUovou+HX0C+BqTAaEExaBZ39o3ueJWmR+U
-         OG7s3uhfzraxIDNeH4H3VyfTeEO6Fpht0hAjA5R6CNSdaSuddpDan70vTECPvLhCqH+s
-         kzkJim6atDLy+MYmY7+V+CbUdiJCosrXFA8WiYsUgXymU7Y+pthUs7WHfWXf2RvcwYSB
-         XuuA==
-X-Gm-Message-State: AOAM533zd4bqaHRv8o8eC1MSLw/V78RRNn/q8DBplwhkXrVi93Lwv1kx
-        OnBS7rj/9oSaW1Dsg6vHdlAVZugZqHCvEwsdtPfRczPzKj+zBRnh8big/3ZjiP29FJd+qyznnGn
-        xA+6VVmiuMSw/
-X-Received: by 2002:a7b:c08b:: with SMTP id r11mr8062071wmh.111.1643214429803;
-        Wed, 26 Jan 2022 08:27:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzat5xFG+n6X0ZtwIT2WzJvrNYAslBIVDm2zn1aj/rH3RM3gfE4afk84ck3WLdB4s/rkdFzNA==
-X-Received: by 2002:a7b:c08b:: with SMTP id r11mr8062061wmh.111.1643214429639;
-        Wed, 26 Jan 2022 08:27:09 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id a14sm21852909wri.25.2022.01.26.08.27.08
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0lkZXVf0iO42qTs6hmWV+2+LZ5uEDOqbitDpMYhaXGE=;
+        b=UxZf0Xgrsd1CLiWNANXZZNdqdlqUUvCWp0g8NquBBHZXTivityZIkt8FmOpjtra8Pw
+         jWrw0V5+umU8lhFZpgZ2olIzo5D4dyVWXO+42lnz+0XJ7Xfz6umEksRGxOvYFbS8g5Zz
+         /sjuvfTWXtG5LAyQ6w5dfb+VDHhTaAaal4qI3MVRvtoxnDG//fuOJeBrgmsczM0yhc2q
+         0LrQhC408WivXffeTxvYShMpxyT+B8sFwslzREZyBTvdOaSkGr0ZPm7L9xSQicyzil2h
+         OJqiX3Yd/6Uz5uycE0VrD2xkGh02MzYYS/x8EAQBnBwikrQaES/Wzpiqf0mI2fdkKcXb
+         Iuiw==
+X-Gm-Message-State: AOAM531fHxtb0g6RKo7FB6+2WPiG4rI6i5NeHANnjgFAPGEYzrvLTzJ1
+        qVusO4YC/mMRCTmsDIURNyjHTg==
+X-Google-Smtp-Source: ABdhPJx3wnTz6Lmd7CP8lDGl/you1LvrfJY9yqRtpA+GKDRZbVlp9xUtDYLSM7/YLkgGC6ty9Ba5jg==
+X-Received: by 2002:a17:902:b718:b0:14a:c2ac:6ae2 with SMTP id d24-20020a170902b71800b0014ac2ac6ae2mr23555204pls.125.1643215059266;
+        Wed, 26 Jan 2022 08:37:39 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ha11sm5027116pjb.3.2022.01.26.08.37.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 08:27:09 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Wed, 26 Jan 2022 08:37:38 -0800 (PST)
+Date:   Wed, 26 Jan 2022 16:37:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: WARN on any attempt to allocate shadow VMCS
- for vmcs02
-In-Reply-To: <053bb241-ea71-abf8-262b-7b452dc49d37@redhat.com>
-References: <20220125220527.2093146-1-seanjc@google.com>
- <87r18uh4of.fsf@redhat.com>
- <053bb241-ea71-abf8-262b-7b452dc49d37@redhat.com>
-Date:   Wed, 26 Jan 2022 17:27:08 +0100
-Message-ID: <87k0emh38j.fsf@redhat.com>
+Subject: Re: [PATCH v3] KVM: x86: Sync the states size with the XCR0/IA32_XSS
+ at, any time
+Message-ID: <YfF4z5ye8YCfoqzJ@google.com>
+References: <20220117082631.86143-1-likexu@tencent.com>
+ <f9edf9b5-0f84-a424-f8e9-73cad901d993@redhat.com>
+ <eacf3f83-96f5-301e-de54-8a0f6c8f9fe5@gmail.com>
+ <YerUQa+SN/xWMhvB@google.com>
+ <dc8c75a6-a39f-be1d-6cf3-024b88bdf5fe@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dc8c75a6-a39f-be1d-6cf3-024b88bdf5fe@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Sun, Jan 23, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> XCR0 is reset to 1 by RESET but not INIT and IA32_XSS is zeroed by
+> both RESET and INIT. The kvm_set_msr_common()'s handling of MSR_IA32_XSS
+> also needs to update kvm_update_cpuid_runtime(). In the above cases, the
+> size in bytes of the XSAVE area containing all states enabled by XCR0 or
+> (XCRO | IA32_XSS) needs to be updated.
+> 
+> For simplicity and consistency, existing helpers are used to write values
+> and call kvm_update_cpuid_runtime(), and it's not exactly a fast path.
+> 
+> Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+> v2 -> v3 Changelog:
+> - Apply s/legacy/existing in the commit message; (Sean)
+> - Invoke kvm_update_cpuid_runtime() for MSR_IA32_XSS; (Sean)
+> 
+>  arch/x86/kvm/x86.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 55518b7d3b96..4b509b26d9ab 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3535,6 +3535,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct
+> msr_data *msr_info)
+>  		if (data & ~supported_xss)
+>  			return 1;
+>  		vcpu->arch.ia32_xss = data;
+> +		kvm_update_cpuid_runtime(vcpu);
+>  		break;
+>  	case MSR_SMI_COUNT:
+>  		if (!msr_info->host_initiated)
+> @@ -11256,7 +11257,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> 
+>  		vcpu->arch.msr_misc_features_enables = 0;
+> 
+> -		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+> +		__kvm_set_xcr(vcpu, 0, XFEATURE_MASK_FP);
+>  	}
+> 
+>  	/* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+> @@ -11273,7 +11274,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
+>  	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
+> 
+> -	vcpu->arch.ia32_xss = 0;
+> +	__kvm_set_msr(vcpu, MSR_IA32_XSS, 0, true);
 
-> On 1/26/22 16:56, Vitaly Kuznetsov wrote:
->>> -	WARN_ON(loaded_vmcs == &vmx->vmcs01 && loaded_vmcs->shadow_vmcs);
->>> +	if (WARN_ON(loaded_vmcs != &vmx->vmcs01 || loaded_vmcs->shadow_vmcs))
->>> +		return loaded_vmcs->shadow_vmcs;
->> Stupid question: why do we want to care about 'loaded_vmcs' at all,
->> i.e. why can't we hardcode 'vmx->vmcs01' in alloc_shadow_vmcs()? The
->> only caller is enter_vmx_operation() and AFAIU 'loaded_vmcs' will always
->> be pointing to 'vmx->vmcs01' (as enter_vmx_operation() allocates
->> &vmx->nested.vmcs02 so 'loaded_vmcs' can't point there!).
->> 
->
-> Well, that's why the WARN never happens.  The idea is that if shadow 
-> VMCS _virtualization_ (not emulation, i.e. running L2 VMREAD/VMWRITE 
-> without even a vmexit to L0) was supported, then you would need a 
-> non-NULL shadow_vmcs in vmx->vmcs02.
->
-> Regarding the patch, the old WARN was messy but it was also trying to 
-> avoid a NULL pointer dereference in the caller.
->
-> What about:
->
-> 	if (WARN_ON(loaded_vmcs->shadow_vmcs))
-> 		return loaded_vmcs->shadow_vmcs;
->
-> 	/* Go ahead anyway.  */
-> 	WARN_ON(loaded_vmcs != &vmx->vmcs01);
->
-> ?
->
+Heh, this now conflicts with a patch Xiaoyao just posted, turns out the SDM was
+wrong.  I think there's also some whitespace change or something that prevents
+this from applying cleanly.  For convenience, I'll post a miniseries with this
+and Xiaoyao's patch.
 
-FWIW, this looks better [to my personal taste].
+[*] https://lore.kernel.org/all/20220126034750.2495371-1-xiaoyao.li@intel.com
 
--- 
-Vitaly
-
+> 
+>  	static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
+> 
+> -- 
+> 2.33.1
+> 
+> 
