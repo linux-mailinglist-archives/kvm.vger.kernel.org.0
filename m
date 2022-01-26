@@ -2,105 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CF5949D070
-	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:11:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 813E549D084
+	for <lists+kvm@lfdr.de>; Wed, 26 Jan 2022 18:15:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243590AbiAZRLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 12:11:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32386 "EHLO
+        id S243642AbiAZRPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 12:15:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54371 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236841AbiAZRLc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 12:11:32 -0500
+        by vger.kernel.org with ESMTP id S243634AbiAZRPW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jan 2022 12:15:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643217091;
+        s=mimecast20190719; t=1643217321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TntdNX4Of9iI5OjuxRo//9c3hal8k6KEzvMjsLVCKCw=;
-        b=WB7frHcDAAtmDvMSMQ86/gnU3oPi1j/Bt8JFee82S36q0YM3ve/t2vcXqJzbroBZwTYRo7
-        ZCAJVzBwop9pAvJAbC+M8/+eJeXhhGrjYxaKI2v7RgqwOXduUwYI8fyOnlB7QZzyz4O+1V
-        6vmJ5LV1WyCUo5X/QJ/3ulNs4TlRnmQ=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QG6ySHAezAZJk/nwAFZwk/0OoVXz59pzUB8tyROetQI=;
+        b=QBX2E/RTc+pgYtULGTdwACWeIckQHtLcK6Wb9+9WbExVqaTtculFCien+QOn+WolNAeclN
+        HzOhqVT+7bYjmplyMHCzO+Q1epNCWGyxh7HBSEH6XqZiMIGsDW5GT14TUPOUqK87VLgUX5
+        A7SsPUji276UKWyVkSegitynMJX1dlc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-187-gQPsKEsoOoat3Azvv0dXIw-1; Wed, 26 Jan 2022 12:11:30 -0500
-X-MC-Unique: gQPsKEsoOoat3Azvv0dXIw-1
-Received: by mail-ej1-f70.google.com with SMTP id lb14-20020a170907784e00b006aa178894fcso1387ejc.6
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:11:29 -0800 (PST)
+ us-mta-543-uxmQLpnmM9yaP1Ku18F5bA-1; Wed, 26 Jan 2022 12:15:20 -0500
+X-MC-Unique: uxmQLpnmM9yaP1Ku18F5bA-1
+Received: by mail-ej1-f72.google.com with SMTP id la22-20020a170907781600b006a7884de505so4725ejc.7
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 09:15:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=TntdNX4Of9iI5OjuxRo//9c3hal8k6KEzvMjsLVCKCw=;
-        b=bdXO4CqHHmedAZEuZEdZQXUv+Fa6StUoIlBn4OjNBfHR57natxVIoIXrYdAmOiHKP8
-         26EDjtilOqLVUiViQpfEMb69giR1ozg0b3mjDnzekur0hFlv+P7AhiAOtSzuspn66JRl
-         /W5WxtO7mu+kxn2In5sUUWkvR9988fRXLaxRN3mrc/1cTuZFcD21hk6NHTxSOm9jaQjC
-         ekwLbrhgVAnjJhVQlRoPbb0jLqDoto0M9EtCy6ILG9pdqDLYng0YxrmOS+jdSIVbOyhp
-         38c903oCcEL8yUS8Yx7lSdhvceS6w04g/lCzyp9fR8wPcdtAE2HPDfQgjyHf4SkNS1yh
-         iW8g==
-X-Gm-Message-State: AOAM532Js++x6E7s1N9eRriEXR6RS9yCqmoIYKGVrhvIGJb1tUpADCFM
-        DbZGYaQBLJucpb1aJZOrQu2GKTATyHyZGlfChT6BECbzynoF2Ml0I9UC80qvYSMhXoNLsa4VL6C
-        h91q9m3lGSucc
-X-Received: by 2002:a17:907:a089:: with SMTP id hu9mr1008387ejc.442.1643217088897;
-        Wed, 26 Jan 2022 09:11:28 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxgmlf9aAgSgXTJWpb4XHmg5jWPw8gUT1fG5rxd+AkVCOTpnzW4Gq2EBRRh8xzpN+5AfgJ8/w==
-X-Received: by 2002:a17:907:a089:: with SMTP id hu9mr1008373ejc.442.1643217088691;
-        Wed, 26 Jan 2022 09:11:28 -0800 (PST)
+        bh=QG6ySHAezAZJk/nwAFZwk/0OoVXz59pzUB8tyROetQI=;
+        b=GgVN/55YN3L5rYmAqTRouBmIQcJs5eb+Uu0CeijIeA5F0Gldr64KpOo9MKrIi4N1ao
+         u4VXMGs0QummFTlzAsoPnrrbFi7Ndjv6nqwY6yR77RGQ5DWwZJe+Ql8Vca9Okhn1GWRK
+         pdsljSyWJt8i2L6e4h9ReCL3d3p2AuoKAbo+5YpN+ssbhVWG0xWtS61WOPQxrA9o1lB/
+         UrbwpOPgaussoTkffG1QYujK4OJPjHphBDIQdjAjWHOMeD2x8zMe0e55AnHpqSMGqdKI
+         4fOM6QlxqjeAaD5rQ4FFy0bZOgmgr/VaQ7wV2OfWPgPwCdxEGE3x+uC7N6pgtutGUl4F
+         G6Ew==
+X-Gm-Message-State: AOAM530DOMYKsFqC7L61cnE9OYixwhstYsDECAgcjPHkR7RbUkBm0D6p
+        u7B4siUeLq5mqmcbzucQYKPUsCdBOxA5lTYqiFKbmZOPpSj8eFa3uU+Ziqhz2Akw7n9+qd+gwfp
+        lx5CorcjvyFMN
+X-Received: by 2002:a17:906:17d5:: with SMTP id u21mr20687553eje.348.1643217318353;
+        Wed, 26 Jan 2022 09:15:18 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyJI+NBcV+9lwyIqhuJJlEVa+16GJ2LPjRWvUNrCU+JH8M12jcqkXcQDhl5BnCySYFJy/zHXA==
+X-Received: by 2002:a17:906:17d5:: with SMTP id u21mr20687534eje.348.1643217318162;
+        Wed, 26 Jan 2022 09:15:18 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id gh14sm7608749ejb.126.2022.01.26.09.11.27
+        by smtp.googlemail.com with ESMTPSA id fh23sm7744998ejc.176.2022.01.26.09.15.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 09:11:28 -0800 (PST)
-Message-ID: <769dc0cb-e38a-4139-d0da-4019b83047cb@redhat.com>
-Date:   Wed, 26 Jan 2022 18:11:27 +0100
+        Wed, 26 Jan 2022 09:15:17 -0800 (PST)
+Message-ID: <6decc356-b24b-583e-7a96-b221afd91af8@redhat.com>
+Date:   Wed, 26 Jan 2022 18:15:07 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: orphan section warnings while building v5.17-rc1
+Subject: Re: [PATCH] KVM: x86: Keep MSR_IA32_XSS unchanged for INIT
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Pavel Skripkin <paskripkin@gmail.com>
-Cc:     vkuznets@redhat.com, wanpengli@tencent.com, kvm@vger.kernel.org
-References: <97ce2686-205b-8c46-fd24-116b094a7265@gmail.com>
- <YfF9mqcNVYLVERjl@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220126034750.2495371-1-xiaoyao.li@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YfF9mqcNVYLVERjl@google.com>
+In-Reply-To: <20220126034750.2495371-1-xiaoyao.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/22 17:58, Sean Christopherson wrote:
-> On Tue, Jan 25, 2022, Pavel Skripkin wrote:
->> Hi kvm developers,
->>
->> while building newest kernel (0280e3c58f92b2fe0e8fbbdf8d386449168de4a8) with
->> mostly random config I met following warnings:
->>
->>    LD      .tmp_vmlinux.btf
->> ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
->> in section `.fixup'
->>    BTF     .btf.vmlinux.bin.o
->>    LD      .tmp_vmlinux.kallsyms1
->> ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
->> in section `.fixup'
->>    KSYMS   .tmp_vmlinux.kallsyms1.S
->>    AS      .tmp_vmlinux.kallsyms1.S
->>    LD      .tmp_vmlinux.kallsyms2
->> ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
->> in section `.fixup'
->>    KSYMS   .tmp_vmlinux.kallsyms2.S
->>    AS      .tmp_vmlinux.kallsyms2.S
->>    LD      vmlinux
->> ld: warning: orphan section `.fixup' from `arch/x86/kvm/xen.o' being placed
->> in section `.fixup'
+On 1/26/22 04:47, Xiaoyao Li wrote:
+> It has been corrected from SDM version 075 that MSR_IA32_XSS is reset to
+> zero on Power up and Reset but keeps unchanged on INIT.
 > 
-> Yep, xen.c has unnecessary usage of .fixup.  I'll get a patch sent.
+> Fixes: a554d207dc46 ("KVM: X86: Processor States following Reset or INIT")
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>   arch/x86/kvm/x86.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 55518b7d3b96..c0727939684e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11257,6 +11257,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   		vcpu->arch.msr_misc_features_enables = 0;
+>   
+>   		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+> +		vcpu->arch.ia32_xss = 0;
+>   	}
+>   
+>   	/* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+> @@ -11273,8 +11274,6 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1, 0);
+>   	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
+>   
+> -	vcpu->arch.ia32_xss = 0;
+> -
+>   	static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
+>   
+>   	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
 
-Peter Zijlstra has already posted "x86,kvm/xen: Remove superfluous 
-.fixup usage".
+Queued, thanks.
 
 Paolo
 
