@@ -2,107 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8968849E147
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 12:39:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C07949E18E
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 12:48:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234420AbiA0Ljw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 06:39:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:26954 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230084AbiA0Ljv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 06:39:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643283590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OFSkuMtjecn1Ao4cJOdT1Z78AZK8OQBI3s9NUphbPsk=;
-        b=TUap3GLJacoPIJKE1/W2y/4mJtCOszNlGoIfQixRPq9ki/QDhkEG6QlJWIEGHNGWZareUM
-        pjmY4R7HqLEpuvGWPRUXsmEzw2ei4oTAQvfam/VT7qnAV8wnn4GLtkLqQY0J7ujNCXhUTf
-        3sLYyIiBWkXdaYi/fAh8brptYx44Q+U=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-335-3Gewl8HXN0ik_QjVnr_WDQ-1; Thu, 27 Jan 2022 06:39:49 -0500
-X-MC-Unique: 3Gewl8HXN0ik_QjVnr_WDQ-1
-Received: by mail-ej1-f71.google.com with SMTP id r18-20020a17090609d200b006a6e943d09eso1185875eje.20
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 03:39:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=OFSkuMtjecn1Ao4cJOdT1Z78AZK8OQBI3s9NUphbPsk=;
-        b=wTEeTP7uXmrKbv3Q3I663O1ohkWQoNyQojMvyloGa5wE3dWfkvqd+PSSKDj9+9/4UK
-         sg7HHxbqQEgvqLGKYhLj0A+PDc13v3O9uh9G+OUE+2HrYOcEvsZEannnCv+N5vH8A2Oo
-         CyjSvKfZ3JtEpqmWOl+rM9EW2OUqPtUH0TYxjmyidF5PoIZ1HRgBJ8eYQzA/9MCCJL2B
-         Wn5TbjoxJDrIE9DcbExzUzRafDFb5/NXmqvSYhX62BP3zIFawuEg1zRBSR1YxM60aozU
-         /6w69HiGGXIJ2hfFhhAol8GQIZyu9FQsI2Pn/1WCahHnIVsqzB+TktxZxEmYFbln6+Ll
-         1EEA==
-X-Gm-Message-State: AOAM531wxG7XpJgPR2m+0H+BQKXLee9nuCWl+kpnaoaHwXNYN6skjmDB
-        R6cwP+aqNbW9LbjpaSmcgGs7jxLb9bO67k4WxqRZSSHOQAoIlSNjjw/4MCSQnc7AhaW+YsgZpL3
-        zuI9XcMUtq7Rl
-X-Received: by 2002:a17:907:c01:: with SMTP id ga1mr2609883ejc.704.1643283587972;
-        Thu, 27 Jan 2022 03:39:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy/ecef1ehAnS/s3juMqmFUV0MZItUuLZABwzSOHgyfLpFssLK+a8jbbDkdglPCHV4YWtBZrg==
-X-Received: by 2002:a17:907:c01:: with SMTP id ga1mr2609870ejc.704.1643283587763;
-        Thu, 27 Jan 2022 03:39:47 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id f19sm6524950edu.22.2022.01.27.03.39.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jan 2022 03:39:47 -0800 (PST)
-Message-ID: <444e5056-d593-7fea-afe6-6a35ee9c90b3@redhat.com>
-Date:   Thu, 27 Jan 2022 12:39:42 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [kvm:queue 305/328] arch/x86/kvm/x86.c:4345:32: warning: cast to
- pointer from integer of different size
-Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        kernel test robot <lkp@intel.com>
-References: <202201270930.LTyNaecg-lkp@intel.com>
- <32f14a72-456d-b213-80c5-5d729b829c90@gmail.com>
- <5ec51239-0ec3-a9fd-a770-ea6020815e0c@redhat.com>
-In-Reply-To: <5ec51239-0ec3-a9fd-a770-ea6020815e0c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S240914AbiA0LsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 06:48:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39832 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240877AbiA0LsL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 06:48:11 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F01DC061747
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 03:48:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id A0F4CCE21A1
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 11:48:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D87C340EB;
+        Thu, 27 Jan 2022 11:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643284087;
+        bh=xCqfeUzSsfMIQ36LI/gRTI/XYXEjr23cIsrNayduwco=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RWpiHXrAzPQ/+jzK0XDusG6l8RdoqqvHeOxNtT9PmIsNLNZErjJ8XsRyLvpT+WEMi
+         31NiMgBzHeJ+WPlueHen21rhVye0UVontHjS97uYvRe1KsHYdt0wD4wT6LP4PbIx8d
+         uDAYlFy0QFOUL2dM9Pssf20klHRfwP1yvf8KQssi2VYGUlqEUiTfpv9dO3xyaS9x45
+         gggos/HEBi8neB9+HJ0y4EgI1pt+ap0nbHtQFPrT8zXcSYnk2nnsFnD0IH95KZSgDG
+         iROI65D7s1ZPT33lL4KpOboD8aRvluYRuJ6DvUM/QKM3bl0JGnH+QGAdkUCWLjyTdO
+         gudATOFkMYGfw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nD3G1-003UZm-TI; Thu, 27 Jan 2022 11:48:06 +0000
+Date:   Thu, 27 Jan 2022 11:48:05 +0000
+Message-ID: <8735l9762y.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 67/69] KVM: arm64: nv: Enable ARMv8.4-NV support
+In-Reply-To: <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-68-maz@kernel.org>
+        <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/27/22 09:09, Paolo Bonzini wrote:
-> On 1/27/22 09:08, Like Xu wrote:
->>>
->>
->> Similar to kvm_arch_tsc_{s,g}et_attr(), how about this fix:
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 8033eca6f..6d4e961d0 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4342,7 +4342,7 @@ static int kvm_x86_dev_get_attr(struct 
->> kvm_device_attr *attr)
->>
->>          switch (attr->attr) {
->>          case KVM_X86_XCOMP_GUEST_SUPP:
->> -               if (put_user(supported_xcr0, (u64 __user *)attr->addr))
->> +               if (put_user(supported_xcr0, (u64 __user *)(unsigned 
->> long)attr->addr))
->>                          return -EFAULT;
->>                  return 0;
->>          default:
+On Tue, 18 Jan 2022 11:50:18 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> This has to be (at least in the future) 64 bits, so it has to use 
-> copy_to_user.
+> 
+> 
+> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> > As all the VNCR-capable system registers are nicely separated
+> > from the rest of the crowd, let's set HCR_EL2.NV2 on and let
+> > the ball rolling.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/kvm_arm.h     |  1 +
+> >   arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
+> >   arch/arm64/include/asm/sysreg.h      |  1 +
+> >   arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
+> >   4 files changed, 28 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index b603466803d2..18c35446249f 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -20,6 +20,7 @@
+> >   #define HCR_AMVOFFEN	(UL(1) << 51)
+> >   #define HCR_FIEN	(UL(1) << 47)
+> >   #define HCR_FWB		(UL(1) << 46)
+> > +#define HCR_NV2		(UL(1) << 45)
+> >   #define HCR_AT		(UL(1) << 44)
+> >   #define HCR_NV1		(UL(1) << 43)
+> >   #define HCR_NV		(UL(1) << 42)
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 1664430be698..f282997e4a4c 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -245,21 +245,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+> >     static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context
+> > *ctxt, u64 val)
+> >   {
+> > -	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+> > -		/*
+> > -		 * Clear the .M field when writing SPSR to the CPU, so that we
+> > -		 * can detect when the CPU clobbered our SPSR copy during a
+> > -		 * local exception.
+> > -		 */
+> > -		val &= ~0xc;
+> > -	}
+> > +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> > +
+> > +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+> > +		return val;
+> >   -	return val;
+> > +	/*
+> > +	 * Clear the .M field when writing SPSR to the CPU, so that we
+> > +	 * can detect when the CPU clobbered our SPSR copy during a
+> > +	 * local exception.
+> > +	 */
+> > +	return val &= ~0xc;
+> >   }
+> >     static inline u64 __fixup_spsr_el2_read(const struct
+> > kvm_cpu_context *ctxt, u64 val)
+> >   {
+> > -	if (__vcpu_el2_e2h_is_set(ctxt))
+> > +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> > +
+> > +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+> >   		return val;
+> >     	/*
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 71e6a0410e7c..5de90138d0a4 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -550,6 +550,7 @@
+> >   #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> >   #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> >   #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> > +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> >     #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+> >   #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index ef4488db6dc1..5cadda79089a 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -45,7 +45,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+> >   			 * the EL1 virtual memory control register accesses
+> >   			 * as well as the AT S1 operations.
+> >   			 */
+> > -			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
+> > +			if (enhanced_nested_virt_in_use(vcpu)) {
+> > +				hcr &= ~HCR_TVM;
+> 
+> I think, we should clear TRVM also?
+> 				hcr &= ~(HCR_TVM | HCR_TRVM);
 
-Nevermind, I was still asleep.  Of course you're right.
+Hmmm. But TRVM is never set the first place, is it? It is only here
+that we augment the host HCR_EL2 with various trap configurations
+depending on whether the host is NV2 capable or not, whether the
+guest is VHE or not, and whether the guest as set of additional flags
+of its own.
 
-Paolo
+Given that, I don't think there is a need to clear this bit.
 
+Thanks,
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
