@@ -2,110 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7BEE49DA5A
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 06:54:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C219849DB06
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 07:54:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236338AbiA0Fyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 00:54:55 -0500
-Received: from mga04.intel.com ([192.55.52.120]:10536 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229551AbiA0Fyz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 00:54:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643262895; x=1674798895;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wZNiQ5pkRxeJ8Ao6cIn34CxSJY+ary9AZNzrIwzYuZw=;
-  b=DAm4AWoVR//pENCcSmxfnRtRFFYka0wru3n9iha4lTHYWBMNStNAIpYy
-   jvwARkDpvcYeWPFrSDv3/jOvdSVlUE7RlhLENZ/XSVferQ6/PmlTSsufx
-   xDE7yi6WnR5/P/E1qZwGGuzfOA9tCnT6vPtp2bOx0wuu+q+VmnIlYCdQx
-   tRJlPILjHFC6MlmYMaBpDUxy6IIG89TVfqlIRpRF8DOTvRjlWzZL1Tisi
-   XcPCz0srr91B/8XiiXjEPTV7rSIlIiHgHb/tBJUEkQySHxqJx34ljwAA5
-   D81D53nZP1I7SS1QF6a8gr7LSMkm6NNlBQOyyJPtQbCUkJtSJdfEHFFdp
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10239"; a="245596571"
-X-IronPort-AV: E=Sophos;i="5.88,320,1635231600"; 
-   d="scan'208";a="245596571"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2022 21:54:54 -0800
-X-IronPort-AV: E=Sophos;i="5.88,320,1635231600"; 
-   d="scan'208";a="628566642"
-Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.145.56])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 26 Jan 2022 21:54:52 -0800
-Date:   Thu, 27 Jan 2022 13:39:29 +0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, yang.zhong@intel.com
-Subject: Re: [PATCH 0/3] KVM: x86: export supported_xcr0 via UAPI
-Message-ID: <20220127053929.GA8503@yangzhon-Virtual>
-References: <20220126152210.3044876-1-pbonzini@redhat.com>
+        id S231415AbiA0Gyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 01:54:52 -0500
+Received: from out0-136.mail.aliyun.com ([140.205.0.136]:51346 "EHLO
+        out0-136.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229565AbiA0Gyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 01:54:52 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R301e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047213;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---.MiyL62r_1643266489;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.MiyL62r_1643266489)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 27 Jan 2022 14:54:50 +0800
+From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
+To:     kvm@vger.kernel.org
+Cc:     Hou Wenlong <houwenlong93@linux.alibaba.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: eventfd: Fix false positive RCU usage warning
+Date:   Thu, 27 Jan 2022 14:54:49 +0800
+Message-Id: <f98bac4f5052bad2c26df9ad50f7019e40434512.1643265976.git.houwenlong.hwl@antgroup.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <ab1358b84c60e6c942c270e3fe1a32bfa3177f3c.1641264282.git.houwenlong93@linux.alibaba.com>
+References: <ab1358b84c60e6c942c270e3fe1a32bfa3177f3c.1641264282.git.houwenlong93@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220126152210.3044876-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 10:22:07AM -0500, Paolo Bonzini wrote:
-> While working on the QEMU support for AMX, I noticed that there is no
-> equivalent of ARCH_GET_XCOMP_SUPP in the KVM API.  This is important
-> because KVM_GET_SUPPORTED_CPUID is meant to be passed (by simple-minded
-> VMMs) to KVM_SET_CPUID2, and therefore it cannot include any dynamic
-> xsave states that have not been enabled.  Probing the availability of
-> dynamic xsave states therefore, requires a new ioctl or arch_prctl.
-> 
-> In order to avoid moving supported_xcr0 to the kernel from the KVM
-> module just for this use, and to ensure that the value can only be
-> probed if/after the KVM module has been loaded, this series goes
-> for the former option.
-> 
-> KVM_CHECK_EXTENSION cannot be used because it only has 32 bits of
-> output; in order to limit the growth of capabilities and ioctls, the
-> series adds a /dev/kvm variant of KVM_{GET,HAS}_DEVICE_ATTR that
-> can be used in the future and by other architectures.  It then
-> implements it in x86 with just one group (0) and attribute
-> (KVM_X86_XCOMP_GUEST_SUPP).
-> 
-> The corresponding changes to the tests, in patches 1 and 3, are
-> designed so that the code will be covered (to the possible extent)
-> even when running the tests on systems that do not support AMX.
-> However, the patches have not been tested with AMX.
->
+From: Hou Wenlong <houwenlong93@linux.alibaba.com>
 
-  Paolo, thanks for this patchset. I applied this patchset into latest
-  Linux release, and verified it from kvm selftest tool and Qemu side
-  (In order to verify this easily, I reused the older request permission
-   function like kvm selftest did), all work well. thanks!
+Fix the following false positive warning:
+ =============================
+ WARNING: suspicious RCU usage
+ 5.16.0-rc4+ #57 Not tainted
+ -----------------------------
+ arch/x86/kvm/../../../virt/kvm/eventfd.c:484 RCU-list traversed in non-reader section!!
 
-  Yang
- 
-> Thanks,
-> 
-> Paolo
-> 
-> 
-> Paolo Bonzini (3):
->   selftests: kvm: move vm_xsave_req_perm call to amx_test
->   KVM: x86: add system attribute to retrieve full set of supported xsave
->     states
->   selftests: kvm: check dynamic bits against KVM_X86_XCOMP_GUEST_SUPP
-> 
->  Documentation/virt/kvm/api.rst                |  4 +-
->  arch/x86/include/uapi/asm/kvm.h               |  3 ++
->  arch/x86/kvm/x86.c                            | 45 +++++++++++++++++++
->  include/uapi/linux/kvm.h                      |  1 +
->  tools/arch/x86/include/uapi/asm/kvm.h         |  3 ++
->  tools/include/uapi/linux/kvm.h                |  1 +
->  .../selftests/kvm/include/kvm_util_base.h     |  1 -
->  .../selftests/kvm/include/x86_64/processor.h  |  1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  7 ---
->  .../selftests/kvm/lib/x86_64/processor.c      | 27 ++++++++---
->  tools/testing/selftests/kvm/x86_64/amx_test.c |  2 +
->  11 files changed, 80 insertions(+), 15 deletions(-)
-> 
-> -- 
-> 2.31.1
+ other info that might help us debug this:
+
+ rcu_scheduler_active = 2, debug_locks = 1
+ 3 locks held by fc_vcpu 0/330:
+  #0: ffff8884835fc0b0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x88/0x6f0 [kvm]
+  #1: ffffc90004c0bb68 (&kvm->srcu){....}-{0:0}, at: vcpu_enter_guest+0x600/0x1860 [kvm]
+  #2: ffffc90004c0c1d0 (&kvm->irq_srcu){....}-{0:0}, at: kvm_notify_acked_irq+0x36/0x180 [kvm]
+
+ stack backtrace:
+ CPU: 26 PID: 330 Comm: fc_vcpu 0 Not tainted 5.16.0-rc4+
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x44/0x57
+  kvm_notify_acked_gsi+0x6b/0x70 [kvm]
+  kvm_notify_acked_irq+0x8d/0x180 [kvm]
+  kvm_ioapic_update_eoi+0x92/0x240 [kvm]
+  kvm_apic_set_eoi_accelerated+0x2a/0xe0 [kvm]
+  handle_apic_eoi_induced+0x3d/0x60 [kvm_intel]
+  vmx_handle_exit+0x19c/0x6a0 [kvm_intel]
+  vcpu_enter_guest+0x66e/0x1860 [kvm]
+  kvm_arch_vcpu_ioctl_run+0x438/0x7f0 [kvm]
+  kvm_vcpu_ioctl+0x38a/0x6f0 [kvm]
+  __x64_sys_ioctl+0x89/0xc0
+  do_syscall_64+0x3a/0x90
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Since kvm_unregister_irq_ack_notifier() does synchronize_srcu(&kvm->irq_srcu),
+i.e. kvm->irq_ack_notifier_list is protected by kvm->irq_srcu. And
+kvm->irq_srcu SRCU read lock is held in kvm_notify_acked_irq(), it's
+a false positive warning. Use hlist_for_each_entry_srcu() instead of
+hlist_for_each_entry_rcu() as it also checkes if the right lock is held.
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
+---
+ virt/kvm/eventfd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 2ad013b8bde9..59b1dd4a549e 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -463,8 +463,8 @@ bool kvm_irq_has_notifier(struct kvm *kvm, unsigned irqchip, unsigned pin)
+ 	idx = srcu_read_lock(&kvm->irq_srcu);
+ 	gsi = kvm_irq_map_chip_pin(kvm, irqchip, pin);
+ 	if (gsi != -1)
+-		hlist_for_each_entry_rcu(kian, &kvm->irq_ack_notifier_list,
+-					 link)
++		hlist_for_each_entry_srcu(kian, &kvm->irq_ack_notifier_list,
++					  link, srcu_read_lock_held(&kvm->irq_srcu))
+ 			if (kian->gsi == gsi) {
+ 				srcu_read_unlock(&kvm->irq_srcu, idx);
+ 				return true;
+@@ -480,8 +480,8 @@ void kvm_notify_acked_gsi(struct kvm *kvm, int gsi)
+ {
+ 	struct kvm_irq_ack_notifier *kian;
+
+-	hlist_for_each_entry_rcu(kian, &kvm->irq_ack_notifier_list,
+-				 link)
++	hlist_for_each_entry_srcu(kian, &kvm->irq_ack_notifier_list,
++				  link, srcu_read_lock_held(&kvm->irq_srcu))
+ 		if (kian->gsi == gsi)
+ 			kian->irq_acked(kian);
+ }
+--
+2.31.1
+
