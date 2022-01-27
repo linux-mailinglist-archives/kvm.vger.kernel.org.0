@@ -2,104 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60B4749E2AA
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:42:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59A4449E2BE
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:42:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241369AbiA0MmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 07:42:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29757 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241313AbiA0Mlv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 07:41:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643287311;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uNXpPtb2OXqXG9hmJBWkzD608J4s2s8/JsJidLVyecU=;
-        b=CW05eK1vUvlsPfFp6m9vJhou6V3Y9/AL8THswO2fdF4SXMpo4F731s7uMnTUxGznDD6E4e
-        uwDR5Q9PoLR++ma/yl1nUewvXFniju1YSdIYVcQmM0NsnNWcw8la6w2Lt7a00oIjsY+bF8
-        zEJkhCs0DRofSijDmdYq8esi6pqS8bU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-166-DNEJ1_r1Ptu4U-wnxuNvDw-1; Thu, 27 Jan 2022 07:41:49 -0500
-X-MC-Unique: DNEJ1_r1Ptu4U-wnxuNvDw-1
-Received: by mail-ed1-f72.google.com with SMTP id i22-20020a0564020f1600b00407b56326a2so1351851eda.18
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 04:41:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uNXpPtb2OXqXG9hmJBWkzD608J4s2s8/JsJidLVyecU=;
-        b=KPVacrjDjqip3xfudjCdGRRPs3dUjDMe8y/yWesVZNhV3f44RG1zNP8SjOY2nDfG7F
-         wF9WWR2sQOTgCUqedi9+DsqElQyWe9IBpUzw4oJfolFY3OKfnA/97FqAAOxPqgk20RJ6
-         YxKAFPNJLGVup6SKE3f17V5KRUXRsfqfPaSGgzailx6xFuImgL8rMfgsNk+c5PcCveEL
-         MQWfiKxrFl8e+5/gYCu3LOZqCMGzWxRUK3vA1lqo7ILqJmVetzcD3lJexIMDnPQPBY3C
-         oZ6Jx7uG2/oiVOlsjVY7W4asGc9qrc44f4y8pcNr5PmuNVlKIXiL/V6ln2Lm3RW9/2tB
-         RmtA==
-X-Gm-Message-State: AOAM530W8GxKOrsRbUe9neCbg3wEmcbN7QsfZSCiiVpdNdXkMxMwHWel
-        gWkDFmxAuA3BjWuxPFnsYKnft9f++gsSOuSBz/ytPfeaGtU/nkhSGj308RRODtpKjSjrccHeUJV
-        DnEZUqUsBF9Up
-X-Received: by 2002:a17:907:7d89:: with SMTP id oz9mr2684960ejc.400.1643287308392;
-        Thu, 27 Jan 2022 04:41:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyotloQ/8jLEyYVrL4x9QKTye3cSBEx1XpJh+giSQrDeyBAnixpRAjtIqNHOtrp8KFRexubOA==
-X-Received: by 2002:a17:907:7d89:: with SMTP id oz9mr2684950ejc.400.1643287308220;
-        Thu, 27 Jan 2022 04:41:48 -0800 (PST)
-Received: from redhat.com ([2.55.140.126])
-        by smtp.gmail.com with ESMTPSA id g9sm8674052ejf.98.2022.01.27.04.41.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jan 2022 04:41:47 -0800 (PST)
-Date:   Thu, 27 Jan 2022 07:41:44 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yin Xiujiang <yinxiujiang@kylinos.cn>
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: Make use of the helper macro kthread_run()
-Message-ID: <20220127074050-mutt-send-email-mst@kernel.org>
-References: <20220127020807.844630-1-yinxiujiang@kylinos.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220127020807.844630-1-yinxiujiang@kylinos.cn>
+        id S236525AbiA0Mms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 07:42:48 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:42704 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241263AbiA0Mmq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 07:42:46 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B43C261AAF
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 12:42:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2249EC340E4;
+        Thu, 27 Jan 2022 12:42:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643287365;
+        bh=s8JwE7IpMdhphIDvw7ZfD172DcVRc+TtOqsjRZ8vULQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Nfhc0zGfLYqC4MQhK5OzLpm9S9rLPY0kPSFJ41ZErUqYqtBUJFdDatOTLYSC1PQEj
+         p3n9Tfeuz7lxhVdTbELbyrXRy8iGvKURJLe/p0kfNfmbwC4J9Te8CLBvgfefOr5xHE
+         LX/eyh7SuJr93cCyZjhzPdfLphXNcOHM3n81o1dzpzsqB4Vn4dwSxjXVi81kmB6kVn
+         JH+B0rEEgvsyvx0YIynqNQZENTGls774sDRUheyirhWIV+4pUHhOGF11FaoS7DNN0i
+         3l4HK5WVTmsQUdCScvRkiTSDQvBc37ZawwEMeAFf0+yFfQh6TyejpYUdNitcaVnIZk
+         wIMBgOG/7g77A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nD46t-003Vau-5p; Thu, 27 Jan 2022 12:42:43 +0000
+Date:   Thu, 27 Jan 2022 12:42:42 +0000
+Message-ID: <87y2315ozh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Chase Conklin <chase.conklin@arm.com>
+Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
+        christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com,
+        haibo.xu@linaro.org, james.morse@arm.com, jintack@cs.columbia.edu,
+        kernel-team@android.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        suzuki.poulose@arm.com
+Subject: Re: [PATCH v5 08/69] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+In-Reply-To: <20220107215401.61828-1-chase.conklin@arm.com>
+References: <20211129200150.351436-9-maz@kernel.org>
+        <20220107215401.61828-1-chase.conklin@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: chase.conklin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, haibo.xu@linaro.org, james.morse@arm.com, jintack@cs.columbia.edu, kernel-team@android.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 10:08:07AM +0800, Yin Xiujiang wrote:
-> Repalce kthread_create/wake_up_process() with kthread_run()
-> to simplify the code.
+On Fri, 07 Jan 2022 21:54:01 +0000,
+Chase Conklin <chase.conklin@arm.com> wrote:
 > 
-> Signed-off-by: Yin Xiujiang <yinxiujiang@kylinos.cn>
-> ---
->  drivers/vhost/vhost.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> Hi Marc,
 > 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 59edb5a1ffe2..19e9eda9fc71 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -595,7 +595,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
->  
->  	dev->kcov_handle = kcov_common_handle();
->  	if (dev->use_worker) {
-> -		worker = kthread_create(vhost_worker, dev,
-> +		worker = kthread_run(vhost_worker, dev,
->  					"vhost-%d", current->pid);
->  		if (IS_ERR(worker)) {
->  			err = PTR_ERR(worker);
-> @@ -603,7 +603,6 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
->  		}
->  
->  		dev->worker = worker;
-> -		wake_up_process(worker); /* avoid contributing to loadavg */
->  
->  		err = vhost_attach_cgroups(dev);
->  		if (err)
+> On Mon Nov 29 15:00:49 EST 2021, Marc Zyngier <maz@kernel.org> wrote:
+> > From: Christoffer Dall <christoffer.dall at arm.com>
+> >
+> > Reset the VCPU with PSTATE.M = EL2h when the nested virtualization
+> > feature is enabled on the VCPU.
+> >
+> > Signed-off-by: Christoffer Dall <christoffer.dall at arm.com>
+> > [maz: rework register reset not to use empty data structures]
+> > Signed-off-by: Marc Zyngier <maz at kernel.org>
+> > ---
+> >  arch/arm64/kvm/reset.c | 10 ++++++++--
+> >  1 file changed, 8 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > index 426bd7fbc3fd..38a7182819fb 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -27,6 +27,7 @@
+> >  #include <asm/kvm_asm.h>
+> >  #include <asm/kvm_emulate.h>
+> >  #include <asm/kvm_mmu.h>
+> > +#include <asm/kvm_nested.h>
+> >  #include <asm/virt.h>
+> >  
+> >  /* Maximum phys_shift supported for any VM on this host */
+> > @@ -38,6 +39,9 @@ static u32 kvm_ipa_limit;
+> >  #define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+> >  				 PSR_F_BIT | PSR_D_BIT)
+> >  
+> > +#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
+> > +				 PSR_F_BIT | PSR_D_BIT)
+> > +
+> >  #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+> >  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+> >  
+> > @@ -176,8 +180,8 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> >  	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
+> >  		return false;
+> >  
+> > -	/* MTE is incompatible with AArch32 */
+> > -	if (kvm_has_mte(vcpu->kvm) && is32bit)
+> > +	/* MTE and NV are incompatible with AArch32 */
+> > +	if ((kvm_has_mte(vcpu->kvm) || nested_virt_in_use(vcpu)) && is32bit)
+> >  		return false;
+> 
+> Should something similar be done for SVE? I see from the ID register emulation
+> that SVE is hidden from the guest but there isn't anything in
+> kvm_vcpu_enable_sve() that checks if NV is in use. That means it's possible to
+> have both nested_virt_in_use(vcpu) and vcpu_has_sve(vcpu) be true
+> simultaneously. If that happens, the FPSIMD fixup can get confused
+> 
+> 	/*
+> 	 * Don't handle SVE traps for non-SVE vcpus here. This
+> 	 * includes NV guests for the time being.
+> 	 */
+> 	if (!sve_guest && (esr_ec != ESR_ELx_EC_FP_ASIMD ||
+> 			   guest_hyp_fpsimd_traps_enabled(vcpu)))
+> 		return false;
+> 
+> and incorrectly restore the wrong context instead of forwarding a
+> FPSIMD trap to the guest hypervisor.
 
-I think if you do this, you need to set dev->worker earlier.
+Yes, nice catch. I have added this to kvm_reset_vcpu() to prevent the
+issue.
 
-> -- 
-> 2.30.0
+	if (nested_virt_in_use(vcpu) &&
+	    vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
+		ret = -EINVAL;
+		goto out;
+	}
 
+I may also rename nested_virt_in_use() to vcpu_has_nv(), which would
+fit the rest of the code a bit better.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
