@@ -2,118 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D60C149DD2B
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 10:01:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E29E49DE29
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 10:36:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238121AbiA0JBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 04:01:35 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:50524 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231668AbiA0JBe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 04:01:34 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 87ABA1F882;
-        Thu, 27 Jan 2022 09:01:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643274093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        id S232155AbiA0Jg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 04:36:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52739 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234153AbiA0Jg1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 04:36:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643276186;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=uf6L1U20L42jQ06xefiKuwA7v4ertkV/8P81jUSoYis=;
-        b=VqCRighSWgCkUFJuLikNgA17cNUdoQJUUMG40XffnG266MZ4zbi84gI2NlZBRuFTgJEaa0
-        fELyOdxO5Leeh+/wwz6VwxGtf+BdohVQUq4AQrdEgo3ph2A2b9/RzhSfnndwAtTjMobW1X
-        RTKbzaqsHULmA3qdggTQzuSflnpTVG0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643274093;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uf6L1U20L42jQ06xefiKuwA7v4ertkV/8P81jUSoYis=;
-        b=vGIapNrOTT3gC/AXlc2MXAoxBVjNtZ5L1hGxECi4SW4qf5MejumWnp/9gYGPfVvWB+VRLl
-        rSXoTgEUWwhr6uAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B85E313CFB;
-        Thu, 27 Jan 2022 09:01:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 7cJPK2xf8mFaEwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Thu, 27 Jan 2022 09:01:32 +0000
-Date:   Thu, 27 Jan 2022 10:01:31 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Eric Biederman <ebiederm@xmission.com>,
-        kexec@lists.infradead.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2 08/12] x86/sev: Park APs on AP Jump Table with GHCB
- protocol version 2
-Message-ID: <YfJfa955Pkg1y6Gv@suse.de>
-References: <20210913155603.28383-1-joro@8bytes.org>
- <20210913155603.28383-9-joro@8bytes.org>
- <YY6XQfmvmpmUiIGj@zn.tnic>
+        bh=PV01ELli/hyFaStUxqX6n9QaOQmZ2C+YT0HIqDtWr78=;
+        b=PD/vRxvkLzpuofTBrI5y6GEAjzyU0OBKnkyC+AhwjhBaje5oUZpG/6UkZ34YWLcNStX+ym
+        +Oagl86ufVHeToF/7c5+8TDlqXAvNcZfpsluxqxfvYGx0TAI4ftDsOC5caH4/RPBZ9Pvap
+        +m1LaIBlruM2JU2c3tqeRxLV3JbBBxM=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-67-yWokpziLO4aOQBNqyjZyJA-1; Thu, 27 Jan 2022 04:36:24 -0500
+X-MC-Unique: yWokpziLO4aOQBNqyjZyJA-1
+Received: by mail-ed1-f69.google.com with SMTP id a18-20020aa7d752000000b00403d18712beso1115703eds.17
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 01:36:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=PV01ELli/hyFaStUxqX6n9QaOQmZ2C+YT0HIqDtWr78=;
+        b=mvW2FVPdAA6hgrwmx2Dq+nYZPC/sbfsF6gBW2ejfcsryd3Brir+rxg/TVE+JIRVj4t
+         TVIt8j5GAzxkIwhzR4Lf6GbPp+9XbTmlhnNurB2t4WlZpBbUcAFsBRzcig1IwW8hRmxC
+         69XcnmZFOrHabSv36triGIaGmo5VLZQg/9P7ZzLwrkRfxXZdOfsVa1Fp8ddvwYHxaHz5
+         7LSVFIs55q4OAHCY5+ZwIpx2Jr7ulGQdQyNWZEaodCnuy36/H3A/cCQTWS07pOxbMKHA
+         eMK47i1rQNjT0qY1vGvc+rqH+jV+GBeQjN0PDDOAucbNgiPV/xBI0HbQKZ7hNcecOtbZ
+         8Cqw==
+X-Gm-Message-State: AOAM531aRSUvFRbEVlgaR0IHFGA7X27aLF9GW1sAnJdbLamb2gJN/XrJ
+        ws3OnwTK5CABDQLtp4AQqjCTN2x7SvRAqZGb2OanMzbNeQ4c/GOzwvHmjP99Q3gLCHnkuHbOa6X
+        mK4NYSHd2qiZ8nxxzWr3o2leoLv5vowjwDNNq2KDU4djRWlZTZAngxt7DTJpTrqph
+X-Received: by 2002:aa7:c40a:: with SMTP id j10mr2815819edq.232.1643276183832;
+        Thu, 27 Jan 2022 01:36:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzSDbYtEKfjFx4mZY8KRDFwpmKOB6JY/3sQYjWOBAHu7dHGUuXD0KB1JiyVurp5evEm9AatQw==
+X-Received: by 2002:aa7:c40a:: with SMTP id j10mr2815802edq.232.1643276183640;
+        Thu, 27 Jan 2022 01:36:23 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id i16sm8495187eja.8.2022.01.27.01.36.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jan 2022 01:36:23 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/5] KVM: nVMX: Fix Windows 11 + WSL2 + Enlightened VMCS
+In-Reply-To: <87k0exktsx.fsf@redhat.com>
+References: <20220112170134.1904308-1-vkuznets@redhat.com>
+ <87k0exktsx.fsf@redhat.com>
+Date:   Thu, 27 Jan 2022 10:36:22 +0100
+Message-ID: <87ee4th65l.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YY6XQfmvmpmUiIGj@zn.tnic>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 05:33:05PM +0100, Borislav Petkov wrote:
-> On Mon, Sep 13, 2021 at 05:55:59PM +0200, Joerg Roedel wrote:
-> > +		     "ljmpl	*%0" : :
-> > +		     "m" (real_mode_header->sev_real_ap_park_asm),
-> > +		     "b" (sev_es_jump_table_pa >> 4));
-> 
-> In any case, this asm needs comments: why those regs, why
-> sev_es_jump_table_pa >> 4 in rbx (I found later in the patch why) and so
-> on.
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-Turned out the jump_table_pa is not used in asm code anymore. It was a
-left-over from a previous version of the patch, it is removed now.
+> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+>
+>> Changes since v2 [Sean]:
+>> - Tweak a comment in PATCH5.
+>> - Add Reviewed-by: tags to PATCHes 3 and 5.
+>>
+>> Original description:
+>>
+>> Windows 11 with enabled Hyper-V role doesn't boot on KVM when Enlightened
+>> VMCS interface is provided to it. The observed behavior doesn't conform to
+>> Hyper-V TLFS. In particular, I'm observing 'VMREAD' instructions trying to
+>> access field 0x4404 ("VM-exit interruption information"). TLFS, however, is
+>> very clear this should not be happening:
+>>
+>> "Any VMREAD or VMWRITE instructions while an enlightened VMCS is active is
+>> unsupported and can result in unexpected behavior."
+>>
+>> Microsoft confirms this is a bug in Hyper-V which is supposed to get fixed
+>> eventually. For the time being, implement a workaround in KVM allowing 
+>> VMREAD instructions to read from the currently loaded Enlightened VMCS.
+>>
+>> Patches 1-2 are unrelated fixes to VMX feature MSR filtering when eVMCS is
+>> enabled. Patches 3 and 4 are preparatory changes, patch 5 implements the
+>> workaround.
+>>
+>
+> Paolo,
+>
+> would it be possible to pick this up for 5.17? Technically, this is a
+> "fix", even if the bug itself is not in KVM)
 
-> > +SYM_INNER_LABEL(sev_ap_park_paging_off, SYM_L_GLOBAL)
-> 
-> Global symbol but used only in this file. .L-prefix then?
-
-It needs to be a global symbol so the pa_ variant can be generated.
-
-Regards,
+Ping)
 
 -- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
+Vitaly
 
