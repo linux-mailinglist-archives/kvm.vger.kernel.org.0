@@ -2,286 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94CB949DE8C
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 10:56:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5B6249DECC
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 11:11:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234587AbiA0Jz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 04:55:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34638 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232024AbiA0Jz5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 04:55:57 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20R9fFmi005515;
-        Thu, 27 Jan 2022 09:55:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=v7vgdFMmlLjZ//7aqE8miSDxEZzVBEmKPW6Ytz7CoCA=;
- b=CkpaBU0nF1n6CcaTGsYEGLnPWEq2SaMOJKspqQWXrwpU9+j9pV1t4frd1lkaKKqUrPRf
- DDcHBN7E8KFKo+MEf6GjvKvLNFDOtdSm1ZcgvVddnjdU55hu+A+2tejiXXLVkO4rsjnM
- 3LejFkC4i+1byf2/4XrnfNmHJPZGUJKzKTypAfrqkse1cLHEqG94Lj2J36xi6/2X45TC
- 4TrPbI8gWBHcX3FM1ZtyZiEVUVgIPxs7kPkpIJET598tqRguBYhcgODrJtlDttzx9ivl
- QwzAM1Aeod6DftB8QU0smCfFfRrdIGqTl5WfhKB23SOCnkCuWG5KEoJEU6h1siKVIAx6 6Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dupt030cr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jan 2022 09:55:56 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20R9j2Wq017096;
-        Thu, 27 Jan 2022 09:55:55 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dupt030ca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jan 2022 09:55:55 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20R9q24c019496;
-        Thu, 27 Jan 2022 09:55:53 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3dr9j9nwnq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jan 2022 09:55:53 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20R9tlCX42008882
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jan 2022 09:55:47 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4CDE1AE04D;
-        Thu, 27 Jan 2022 09:55:47 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2497EAE055;
-        Thu, 27 Jan 2022 09:55:46 +0000 (GMT)
-Received: from [9.171.44.35] (unknown [9.171.44.35])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Jan 2022 09:55:46 +0000 (GMT)
-Message-ID: <88d68802-56d5-849c-ae91-57c795d37250@linux.ibm.com>
-Date:   Thu, 27 Jan 2022 10:57:36 +0100
+        id S238952AbiA0KLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 05:11:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233778AbiA0KLW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 05:11:22 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03769C06173B;
+        Thu, 27 Jan 2022 02:11:21 -0800 (PST)
+Received: from cap.home.8bytes.org (p549ad610.dip0.t-ipconnect.de [84.154.214.16])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 71DD01B0;
+        Thu, 27 Jan 2022 11:11:18 +0100 (CET)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        Eric Biederman <ebiederm@xmission.com>,
+        kexec@lists.infradead.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: [PATCH v3 00/10] x86/sev: KEXEC/KDUMP support for SEV-ES guests
+Date:   Thu, 27 Jan 2022 11:10:34 +0100
+Message-Id: <20220127101044.13803-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v2 07/30] s390/pci: externalize the SIC operation controls
- and routine
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
- <20220114203145.242984-8-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220114203145.242984-8-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZFedqtx1C1NkDizt388mrvEXgpMwDMsN
-X-Proofpoint-ORIG-GUID: dqmFXFBGJwR-yL6zj2kWYrsVIvygMCIO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-27_02,2022-01-26_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- suspectscore=0 priorityscore=1501 clxscore=1015 phishscore=0
- lowpriorityscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201270057
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Joerg Roedel <jroedel@suse.de>
+
+Hi,
+
+here are changes to enable kexec/kdump in SEV-ES guests. The biggest
+problem for supporting kexec/kdump under SEV-ES is to find a way to
+hand the non-boot CPUs (APs) from one kernel to another.
+
+Without SEV-ES the first kernel parks the CPUs in a HLT loop until
+they get reset by the kexec'ed kernel via an INIT-SIPI-SIPI sequence.
+For virtual machines the CPU reset is emulated by the hypervisor,
+which sets the vCPU registers back to reset state.
+
+This does not work under SEV-ES, because the hypervisor has no access
+to the vCPU registers and can't make modifications to them. So an
+SEV-ES guest needs to reset the vCPU itself and park it using the
+AP-reset-hold protocol. Upon wakeup the guest needs to jump to
+real-mode and to the reset-vector configured in the AP-Jump-Table.
+
+The code to do this is the main part of this patch-set. It works by
+placing code on the AP Jump-Table page itself to park the vCPU and for
+jumping to the reset vector upon wakeup. The code on the AP Jump Table
+runs in 16-bit protected mode with segment base set to the beginning
+of the page. The AP Jump-Table is usually not within the first 1MB of
+memory, so the code can't run in real-mode.
+
+The AP Jump-Table is the best place to put the parking code, because
+the memory is owned, but read-only by the firmware and writeable by
+the OS. Only the first 4 bytes are used for the reset-vector, leaving
+the rest of the page for code/data/stack to park a vCPU. The code
+can't be in kernel memory because by the time the vCPU wakes up the
+memory will be owned by the new kernel, which might have overwritten it
+already.
+
+The other patches add initial GHCB Version 2 protocol support, because
+kexec/kdump need the MSR-based (without a GHCB) AP-reset-hold VMGEXIT,
+which is a GHCB protocol version 2 feature.
+
+The kexec'ed kernel is also entered via the decompressor and needs
+MMIO support there, so this patch-set also adds MMIO #VC support to
+the decompressor and support for handling CLFLUSH instructions.
+
+Finally there is also code to disable kexec/kdump support at runtime
+when the environment does not support it (e.g. no GHCB protocol
+version 2 support or AP Jump Table over 4GB).
+
+The diffstat looks big, but most of it is moving code for MMIO #VC
+support around to make it available to the decompressor.
+
+The previous version of this patch-set can be found here:
+
+	https://lore.kernel.org/lkml/20210913155603.28383-1-joro@8bytes.org/
+
+Please review.
+
+Thanks,
+
+	Joerg
+
+Changes v2->v3:
+
+	- Rebased to v5.17-rc1
+	- Applied most review comments by Boris
+	- Use the name 'AP jump table' consistently
+	- Make kexec-disabling for unsupported guests x86-specific
+	- Cleanup and consolidate patches to detect GHCB v2 protocol
+	  support
+
+Joerg Roedel (10):
+  x86/kexec/64: Disable kexec when SEV-ES is active
+  x86/sev: Save and print negotiated GHCB protocol version
+  x86/sev: Set GHCB data structure version
+  x86/sev: Cache AP Jump Table Address
+  x86/sev: Setup code to park APs in the AP Jump Table
+  x86/sev: Park APs on AP Jump Table with GHCB protocol version 2
+  x86/sev: Use AP Jump Table blob to stop CPU
+  x86/sev: Add MMIO handling support to boot/compressed/ code
+  x86/sev: Handle CLFLUSH MMIO events
+  x86/kexec/64: Support kexec under SEV-ES with AP Jump Table Blob
+
+ arch/x86/boot/compressed/sev.c          |  45 +-
+ arch/x86/include/asm/insn-eval.h        |   1 +
+ arch/x86/include/asm/realmode.h         |   5 +
+ arch/x86/include/asm/sev-ap-jumptable.h |  29 +
+ arch/x86/include/asm/sev.h              |  11 +-
+ arch/x86/kernel/machine_kexec_64.c      |  12 +
+ arch/x86/kernel/process.c               |   8 +
+ arch/x86/kernel/sev-shared.c            | 233 +++++-
+ arch/x86/kernel/sev.c                   | 404 +++++------
+ arch/x86/lib/insn-eval-shared.c         | 913 ++++++++++++++++++++++++
+ arch/x86/lib/insn-eval.c                | 909 +----------------------
+ arch/x86/realmode/Makefile              |   9 +-
+ arch/x86/realmode/rm/Makefile           |  11 +-
+ arch/x86/realmode/rm/header.S           |   3 +
+ arch/x86/realmode/rm/sev.S              |  85 +++
+ arch/x86/realmode/rmpiggy.S             |   6 +
+ arch/x86/realmode/sev/Makefile          |  33 +
+ arch/x86/realmode/sev/ap_jump_table.S   | 131 ++++
+ arch/x86/realmode/sev/ap_jump_table.lds |  24 +
+ 19 files changed, 1730 insertions(+), 1142 deletions(-)
+ create mode 100644 arch/x86/include/asm/sev-ap-jumptable.h
+ create mode 100644 arch/x86/lib/insn-eval-shared.c
+ create mode 100644 arch/x86/realmode/rm/sev.S
+ create mode 100644 arch/x86/realmode/sev/Makefile
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.S
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.lds
 
 
-On 1/14/22 21:31, Matthew Rosato wrote:
-> A subsequent patch will be issuing SIC from KVM -- export the necessary
-> routine and make the operation control definitions available from a header.
-> Because the routine will now be exported, let's rename __zpci_set_irq_ctrl
-> to zpci_set_irq_ctrl and get rid of the zero'd iib wrapper function of
-> the same name.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-
-
-> ---
->   arch/s390/include/asm/pci_insn.h | 17 +++++++++--------
->   arch/s390/pci/pci_insn.c         |  3 ++-
->   arch/s390/pci/pci_irq.c          | 26 ++++++++++++--------------
->   3 files changed, 23 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/pci_insn.h b/arch/s390/include/asm/pci_insn.h
-> index 61cf9531f68f..5331082fa516 100644
-> --- a/arch/s390/include/asm/pci_insn.h
-> +++ b/arch/s390/include/asm/pci_insn.h
-> @@ -98,6 +98,14 @@ struct zpci_fib {
->   	u32 gd;
->   } __packed __aligned(8);
->   
-> +/* Set Interruption Controls Operation Controls  */
-> +#define	SIC_IRQ_MODE_ALL		0
-> +#define	SIC_IRQ_MODE_SINGLE		1
-> +#define	SIC_IRQ_MODE_DIRECT		4
-> +#define	SIC_IRQ_MODE_D_ALL		16
-> +#define	SIC_IRQ_MODE_D_SINGLE		17
-> +#define	SIC_IRQ_MODE_SET_CPU		18
-> +
->   /* directed interruption information block */
->   struct zpci_diib {
->   	u32 : 1;
-> @@ -134,13 +142,6 @@ int __zpci_store(u64 data, u64 req, u64 offset);
->   int zpci_store(const volatile void __iomem *addr, u64 data, unsigned long len);
->   int __zpci_store_block(const u64 *data, u64 req, u64 offset);
->   void zpci_barrier(void);
-> -int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib);
-> -
-> -static inline int zpci_set_irq_ctrl(u16 ctl, u8 isc)
-> -{
-> -	union zpci_sic_iib iib = {{0}};
-> -
-> -	return __zpci_set_irq_ctrl(ctl, isc, &iib);
-> -}
-> +int zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib);
->   
->   #endif
-> diff --git a/arch/s390/pci/pci_insn.c b/arch/s390/pci/pci_insn.c
-> index 4dd58b196cea..2a47b3936e44 100644
-> --- a/arch/s390/pci/pci_insn.c
-> +++ b/arch/s390/pci/pci_insn.c
-> @@ -97,7 +97,7 @@ int zpci_refresh_trans(u64 fn, u64 addr, u64 range)
->   }
->   
->   /* Set Interruption Controls */
-> -int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib)
-> +int zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib)
->   {
->   	if (!test_facility(72))
->   		return -EIO;
-> @@ -108,6 +108,7 @@ int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib)
->   
->   	return 0;
->   }
-> +EXPORT_SYMBOL_GPL(zpci_set_irq_ctrl);
->   
->   /* PCI Load */
->   static inline int ____pcilg(u64 *data, u64 req, u64 offset, u8 *status)
-> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
-> index 0d0a02a9fbbf..2f675355fd0c 100644
-> --- a/arch/s390/pci/pci_irq.c
-> +++ b/arch/s390/pci/pci_irq.c
-> @@ -15,13 +15,6 @@
->   
->   static enum {FLOATING, DIRECTED} irq_delivery;
->   
-> -#define	SIC_IRQ_MODE_ALL		0
-> -#define	SIC_IRQ_MODE_SINGLE		1
-> -#define	SIC_IRQ_MODE_DIRECT		4
-> -#define	SIC_IRQ_MODE_D_ALL		16
-> -#define	SIC_IRQ_MODE_D_SINGLE		17
-> -#define	SIC_IRQ_MODE_SET_CPU		18
-> -
->   /*
->    * summary bit vector
->    * FLOATING - summary bit per function
-> @@ -154,6 +147,7 @@ static struct irq_chip zpci_irq_chip = {
->   static void zpci_handle_cpu_local_irq(bool rescan)
->   {
->   	struct airq_iv *dibv = zpci_ibv[smp_processor_id()];
-> +	union zpci_sic_iib iib = {{0}};
-
-
-
->   	unsigned long bit;
->   	int irqs_on = 0;
->   
-> @@ -165,7 +159,7 @@ static void zpci_handle_cpu_local_irq(bool rescan)
->   				/* End of second scan with interrupts on. */
->   				break;
->   			/* First scan complete, reenable interrupts. */
-> -			if (zpci_set_irq_ctrl(SIC_IRQ_MODE_D_SINGLE, PCI_ISC))
-> +			if (zpci_set_irq_ctrl(SIC_IRQ_MODE_D_SINGLE, PCI_ISC, &iib))
->   				break;
->   			bit = 0;
->   			continue;
-> @@ -193,6 +187,7 @@ static void zpci_handle_remote_irq(void *data)
->   static void zpci_handle_fallback_irq(void)
->   {
->   	struct cpu_irq_data *cpu_data;
-> +	union zpci_sic_iib iib = {{0}};
->   	unsigned long cpu;
->   	int irqs_on = 0;
->   
-> @@ -203,7 +198,7 @@ static void zpci_handle_fallback_irq(void)
->   				/* End of second scan with interrupts on. */
->   				break;
->   			/* First scan complete, reenable interrupts. */
-> -			if (zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC))
-> +			if (zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC, &iib))
->   				break;
->   			cpu = 0;
->   			continue;
-> @@ -234,6 +229,7 @@ static void zpci_directed_irq_handler(struct airq_struct *airq,
->   static void zpci_floating_irq_handler(struct airq_struct *airq,
->   				      struct tpi_info *tpi_info)
->   {
-> +	union zpci_sic_iib iib = {{0}};
->   	unsigned long si, ai;
->   	struct airq_iv *aibv;
->   	int irqs_on = 0;
-> @@ -247,7 +243,7 @@ static void zpci_floating_irq_handler(struct airq_struct *airq,
->   				/* End of second scan with interrupts on. */
->   				break;
->   			/* First scan complete, reenable interrupts. */
-> -			if (zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC))
-> +			if (zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC, &iib))
->   				break;
->   			si = 0;
->   			continue;
-> @@ -407,11 +403,12 @@ static struct airq_struct zpci_airq = {
->   static void __init cpu_enable_directed_irq(void *unused)
->   {
->   	union zpci_sic_iib iib = {{0}};
-> +	union zpci_sic_iib ziib = {{0}};
->   
->   	iib.cdiib.dibv_addr = (u64) zpci_ibv[smp_processor_id()]->vector;
->   
-> -	__zpci_set_irq_ctrl(SIC_IRQ_MODE_SET_CPU, 0, &iib);
-> -	zpci_set_irq_ctrl(SIC_IRQ_MODE_D_SINGLE, PCI_ISC);
-> +	zpci_set_irq_ctrl(SIC_IRQ_MODE_SET_CPU, 0, &iib);
-> +	zpci_set_irq_ctrl(SIC_IRQ_MODE_D_SINGLE, PCI_ISC, &ziib);
->   }
->   
->   static int __init zpci_directed_irq_init(void)
-> @@ -426,7 +423,7 @@ static int __init zpci_directed_irq_init(void)
->   	iib.diib.isc = PCI_ISC;
->   	iib.diib.nr_cpus = num_possible_cpus();
->   	iib.diib.disb_addr = virt_to_phys(zpci_sbv->vector);
-> -	__zpci_set_irq_ctrl(SIC_IRQ_MODE_DIRECT, 0, &iib);
-> +	zpci_set_irq_ctrl(SIC_IRQ_MODE_DIRECT, 0, &iib);
->   
->   	zpci_ibv = kcalloc(num_possible_cpus(), sizeof(*zpci_ibv),
->   			   GFP_KERNEL);
-> @@ -471,6 +468,7 @@ static int __init zpci_floating_irq_init(void)
->   
->   int __init zpci_irq_init(void)
->   {
-> +	union zpci_sic_iib iib = {{0}};
->   	int rc;
->   
->   	irq_delivery = sclp.has_dirq ? DIRECTED : FLOATING;
-> @@ -502,7 +500,7 @@ int __init zpci_irq_init(void)
->   	 * Enable floating IRQs (with suppression after one IRQ). When using
->   	 * directed IRQs this enables the fallback path.
->   	 */
-> -	zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC);
-> +	zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, PCI_ISC, &iib);
->   
->   	return 0;
->   out_airq:
-> 
-
+base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.34.1
+
