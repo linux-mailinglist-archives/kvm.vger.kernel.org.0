@@ -2,127 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CD2349D784
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 02:37:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 134B849D79F
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 02:52:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234580AbiA0Bg7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 20:36:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234574AbiA0Bg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 20:36:58 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A15C06173B
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 17:36:58 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id z5so1158159plg.8
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 17:36:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=TdbcAW8Wcsbhbg+STcZ6rCmSH6CygPXwwlC04FLl3Fk=;
-        b=qbIR8ggpmVwwdHq60/YeZ10maSd+yjnxnuOFwpuV7+i5epS3/uhkgm4YedelnprmUc
-         YQiOdj/oYSh44GzfhLk0x17DEwQ2jWzqLlt1kH2e7Z9FHbBW/YWizX3spo8Ei9dMmugF
-         tCtNc4H1d+86hxejIsI8GwaEJm3v4vagbx+h0QVOI1qbb0xSu9jW+aL2TAADWaPxf/bz
-         Wn/KCOgrEEVMSGcrVvsmmvmYq2yarnk4JsH2kTUeUa1MUYTGe2ZMZouAUqRtf2I5SakR
-         fFwcstjiPL3MkdAnpajNxnxS96l1N3qvJlj+k6m1RAjQ4tNWvaSU8tHqu5V3IOG4lYEa
-         hVXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=TdbcAW8Wcsbhbg+STcZ6rCmSH6CygPXwwlC04FLl3Fk=;
-        b=OEAEZTxii4kq0QLt51p6OmSx0eE+ufDBzWjtQhmi52xkU4FYmgiZVw4meEAm6m7m+P
-         N1Vn9YvpIQMG9+bcEuxlQxsY5YET3Sa7LbpPnHi4whTh1bb+7jWzvp0BHGILbTpScCPi
-         EDEJg9qfxrTfEVxNsiOIYLoCQER0pygSHEDh2xE+TycP9ksZcZNVODaPIU0vDETXHVvm
-         EJ4X1n9qXziR4mQmYtcbofxRIhnrAGHx0BLoM8sr9mXn4vW0ljH1sCD3yOt7dhIAD9h3
-         iewT+6INkOcrmqfi2cPHvlE518Vnoco4o9/+u4ixeTEcR+bWB6+dk1HQGXa2Q9qiY6jx
-         zfnQ==
-X-Gm-Message-State: AOAM533RjU1/mwCJVjhT83sztjmJNA6SeKXzI10Vm998vCBLmnpxDZSw
-        EXbqVH6NgHnCQGEB+anX0SSbow==
-X-Google-Smtp-Source: ABdhPJwyv9IYD8tAHriwPMy+UM17hPFPXQd1hQvtQq4xlXy8l+CGsqikmNk43pNMZncp1y6I8ifS/w==
-X-Received: by 2002:a17:902:e545:: with SMTP id n5mr1099208plf.160.1643247417591;
-        Wed, 26 Jan 2022 17:36:57 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ha11sm5476388pjb.3.2022.01.26.17.36.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 17:36:57 -0800 (PST)
-Date:   Thu, 27 Jan 2022 01:36:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chris Mason <clm@fb.com>
-Cc:     Boris Burkov <boris@bur.io>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kernel Team <Kernel-team@fb.com>
-Subject: Re: [PATCH] KVM: use set_page_dirty rather than SetPageDirty
-Message-ID: <YfH3NR+g0uRIruCc@google.com>
-References: <08b5b2c516b81788ca411dc031d403de4594755e.1643226777.git.boris@bur.io>
- <YfHEJpP+1c9QZxA0@google.com>
- <YfHVB5RmLZn2ku5M@zen>
- <3876CE62-6E66-4CCE-ADED-69010EA72394@fb.com>
+        id S234695AbiA0Bwg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 20:52:36 -0500
+Received: from mga03.intel.com ([134.134.136.65]:64816 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234680AbiA0Bwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 20:52:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643248352; x=1674784352;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=Zn6FBnuPEEI2Cb2M7YzXMP2WnCuo4at1k1dY0EJeSnw=;
+  b=VMgckLjW/fAXhFGj6Yl7RItjHkDPDh3xLqrqn7ZtX3a/zVQyc/a+DR7j
+   kbU30wlgs3VDdkp/GXS0YUcLLKcRQ5sMZjvSBbLM9LujDcvUD4+eSa3+4
+   ghrWUDExR0Wpmdf3zGpwxqR/hyaQq54JqWLp4AlULbf57oC4/DWvf5GpD
+   zx8pMIeuRGZeJmct1exRQu0TFgKKPGXy48Mo51T3E7C7W5ftm49J5ijes
+   eeuV1zNFTtICnWtxC+cVjjdG91gbo8oHQEP5pAkGKl3VHRh+W9QSCJ/Hw
+   V03hvVsLY7xoPG6BjDVLACZ40iCm9LKPwLBtohsJbDT6U+T+zawbD1ZI+
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10239"; a="246662482"
+X-IronPort-AV: E=Sophos;i="5.88,319,1635231600"; 
+   d="scan'208";a="246662482"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2022 17:52:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,319,1635231600"; 
+   d="scan'208";a="696453841"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 26 Jan 2022 17:52:29 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nCtxd-000LxU-6o; Thu, 27 Jan 2022 01:52:29 +0000
+Date:   Thu, 27 Jan 2022 09:52:03 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>
+Subject: [kvm:queue 305/328] arch/x86/kvm/x86.c:4345:32: warning: cast to
+ pointer from integer of different size
+Message-ID: <202201270930.LTyNaecg-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3876CE62-6E66-4CCE-ADED-69010EA72394@fb.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 27, 2022, Chris Mason wrote:
-> 
-> 
-> > On Jan 26, 2022, at 6:11 PM, Boris Burkov <boris@bur.io> wrote:
-> > 
-> > On Wed, Jan 26, 2022 at 09:59:02PM +0000, Sean Christopherson wrote:
-> >> On Wed, Jan 26, 2022, Boris Burkov wrote:
-> >>> I tested this fix on the workload and it did prevent the hangs. However,
-> >>> I am unsure if the fix is appropriate from a locking perspective, so I
-> >>> hope to draw some extra attention to that aspect. set_page_dirty_lock in
-> >>> mm/page-writeback.c has a comment about locking that says set_page_dirty
-> >>> should be called with the page locked or while definitely holding a
-> >>> reference to the mapping's host inode. I believe that the mmap should
-> >>> have that reference, so for fear of hurting KVM performance or
-> >>> introducing a deadlock, I opted for the unlocked variant.
-> >> 
-> >> KVM doesn't hold a reference per se, but it does subscribe to mmu_notifier events
-> >> and will not mark the page dirty after KVM has been instructed to unmap the page
-> >> (barring bugs, which we've had a slew of).  So yeah, the unlocked variant should
-> >> be safe.
-> >> 
-> >> Is it feasible to trigger this behavior in a selftest?  KVM has had, and probably
-> >> still has, many bugs that all boil down to KVM assuming guest memory is backed by
-> >> either anonymous memory or something like shmem/HugeTLBFS/memfd that isn't typically
-> >> truncated by the host.
-> > 
-> > I haven't been able to isolate a reproducer, yet. I am a bit stumped
-> > because there isn't a lot for me to go off from that stack I shared--the
-> > best I have so far is that I need to trick KVM into emulating
-> > instructions at some point to get to this 'complete_userspace_io'
-> > codepath? I will keep trying, since I think it would be valuable to know
-> > what exactly happened. Open to try any suggestions you might have as
-> > well.
-> 
-> From the btrfs side, bare calls to set_page_dirty() are suboptimal, since it
-> doesn’t go through the ->page_mkwrite() dance that we use to properly COW
-> things.  It’s still much better than SetPageDirty(), but I’d love to
-> understand why kvm needs to dirty the page so we can figure out how to go
-> through the normal mmap file io paths.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   b029c138e8f090f5cb9ba77ef20509f903ef0004
+commit: db9556a4eb6b43313cee57abcbbbad01f2708baa [305/328] KVM: x86: add system attribute to retrieve full set of supported xsave states
+config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20220127/202201270930.LTyNaecg-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=db9556a4eb6b43313cee57abcbbbad01f2708baa
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm queue
+        git checkout db9556a4eb6b43313cee57abcbbbad01f2708baa
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/
 
-Ah, is the issue that writeback gets stuck because KVM perpetually marks the
-page as dirty?  The page in question should have already gone through ->page_mkwrite().
-Outside of one or two internal mmaps that KVM fully controls and are anonymous memory,
-KVM doesn't modify VMAs.  KVM is calling SetPageDirty() to mark that it has written
-to the page; KVM either when it unmaps the page from the guest, or in this case, when
-it kunmap()'s a page KVM itself accessed.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Based on the call stack, my best guest is that KVM is udpating steal_time info.
-That's triggered when the vCPU is (re)loaded, which would explain the correlation
-to complete_userspace_io() as KVM unloads=>reloads the vCPU before/after exiting
-to userspace to handle emulate I/O.
+All warnings (new ones prefixed by >>):
 
-Oh!  I assume that the page is either unmapped or made read-only before writeback?
-v5.6 (and many kernels since) had a bug where KVM would "miss" mmu_notifier events
-for the steal_time cache.  It's basically a use-after-free issue at that point.  Commit
-7e2175ebd695 ("KVM: x86: Fix recording of guest steal time / preempted status").
+   In file included from include/linux/uaccess.h:11,
+                    from include/linux/sched/task.h:11,
+                    from include/linux/sched/signal.h:9,
+                    from include/linux/rcuwait.h:6,
+                    from include/linux/percpu-rwsem.h:7,
+                    from include/linux/fs.h:33,
+                    from include/linux/huge_mm.h:8,
+                    from include/linux/mm.h:717,
+                    from include/linux/kvm_host.h:16,
+                    from arch/x86/kvm/x86.c:19:
+   arch/x86/kvm/x86.c: In function 'kvm_x86_dev_get_attr':
+>> arch/x86/kvm/x86.c:4345:32: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+         |                                ^
+   arch/x86/include/asm/uaccess.h:221:24: note: in definition of macro 'do_put_user_call'
+     221 |  register __typeof__(*(ptr)) __val_pu asm("%"_ASM_AX);  \
+         |                        ^~~
+   arch/x86/kvm/x86.c:4345:7: note: in expansion of macro 'put_user'
+    4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+         |       ^~~~~~~~
+>> arch/x86/kvm/x86.c:4345:32: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+         |                                ^
+   arch/x86/include/asm/uaccess.h:223:14: note: in definition of macro 'do_put_user_call'
+     223 |  __ptr_pu = (ptr);      \
+         |              ^~~
+   arch/x86/kvm/x86.c:4345:7: note: in expansion of macro 'put_user'
+    4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+         |       ^~~~~~~~
+>> arch/x86/kvm/x86.c:4345:32: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+    4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+         |                                ^
+   arch/x86/include/asm/uaccess.h:230:31: note: in definition of macro 'do_put_user_call'
+     230 |          [size] "i" (sizeof(*(ptr)))   \
+         |                               ^~~
+   arch/x86/kvm/x86.c:4345:7: note: in expansion of macro 'put_user'
+    4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+         |       ^~~~~~~~
+
+
+vim +4345 arch/x86/kvm/x86.c
+
+  4337	
+  4338	static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
+  4339	{
+  4340		if (attr->group)
+  4341			return -ENXIO;
+  4342	
+  4343		switch (attr->attr) {
+  4344		case KVM_X86_XCOMP_GUEST_SUPP:
+> 4345			if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+  4346				return -EFAULT;
+  4347			return 0;
+  4348		default:
+  4349			return -ENXIO;
+  4350			break;
+  4351		}
+  4352	}
+  4353	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
