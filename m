@@ -2,189 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A15849E846
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 18:02:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1076949E8D5
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 18:22:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238676AbiA0RCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 12:02:21 -0500
-Received: from mail-co1nam11on2072.outbound.protection.outlook.com ([40.107.220.72]:39873
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230347AbiA0RCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 12:02:20 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RF8+0ymEnrq5DTwAD7dX871zfbMted+GeQIjFkSEX+BqVJeM5bCfT+yfDvOwXod3xfWYbW9+fW50TR3lbUKyHRlXWEk5Ap3zRAxWjqzHjleTTpdGSUr1dSUAuTFQv2Au/M0FC2v+Lc1a+B/9PUjjJILJVjmVTb65ZOwDlJXZdfgeVfVTbwTc5KyIll8QfVaIwg2rxAh/WuNEMLvCHUJlgiD0huWXm/8ZG3wLqDbgglOGeTPsnnbIS90jBnrYxNtnt/3V2sGOCPA4Hpsb9R0uxyPra/OEALAgmKLfkmC4wpMTUEcbpbMBktXbKFlKNZ/A6AJ0xpBQlRowGdleej2XPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h7s5qOPMcfkPpk0DGk2PV2+ks21L6nuBDU5y8AAivxQ=;
- b=jT3Z9cnigDe6N0hTKmWo944J6TRF0ZWaQSDrOLLPhDevWZEXP0qBUUBhd/8UUbAbF15UoGDIeFH7U730Tu2/9mX1by7AUAUvebSTRBnk2D/nf303HA/Nkel3W3/kS/vBva0WXk2t6S4/T2Je+nMrSEIol/xxTl2wrzF6yu1vUqvrDn+o5juJh9r0gZlyUjxAwbz7gsruOp8qxAfR0WFK7XilgmINXFrcO1v9uprq/bKy8oG27UE8lKMeqUKYVVQR0Dy7zYJParnkMom7VPaO7o8KY2UIo58M/kAwlPiUPKDReDdFcZrpLsbG2Kp0Io6gyBNwXIiQYfsyMYHbJYFTYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h7s5qOPMcfkPpk0DGk2PV2+ks21L6nuBDU5y8AAivxQ=;
- b=Vg4x3ueIPIdfL35yf78bYh641oD+t7VZl4q0Q1gFV71xu8A8rHgAZBoAA/ezypllXfvod9QIVI6cNGZqJhXBS/sk+c1pL5HJwu4QOd3zCSuK4TYe70C25f1CX4S1klNwS6V//PdzASZrmKNuxIyqKt5FAzSC+Vm6RVnQgnyx+qM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by BY5PR12MB4888.namprd12.prod.outlook.com (2603:10b6:a03:1d8::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.15; Thu, 27 Jan
- 2022 17:02:19 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c%6]) with mapi id 15.20.4909.019; Thu, 27 Jan 2022
- 17:02:19 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 36/40] x86/sev: Provide support for SNP guest request
- NAEs
-To:     Borislav Petkov <bp@alien8.de>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-37-brijesh.singh@amd.com> <YfLGcp8q5f+OW72p@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <87d4999a-14cc-5070-4f03-001dd5f1d2b1@amd.com>
-Date:   Thu, 27 Jan 2022 11:02:13 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-In-Reply-To: <YfLGcp8q5f+OW72p@zn.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1PR13CA0378.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::23) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 875508c0-c8ba-4b29-f45d-08d9e1b6c6e2
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4888:EE_
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4888F6D21BC4D5FF78432480E5219@BY5PR12MB4888.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: c9wMaLf/QTmu9xszRGqLgR8oQ7FwYMALFORqP2VwPggxXkURw03RsETPU64vewuIHmQTsKk5jj9xyBD5fysJRvJhORD2itU6a7Yx0j0cW1tsipf9VhKxuIBJrcw6RX+zHTxhrlDmZSp0KWaOQ/s0+RrsFaHtBkIfUHSOCpeqY5DXL29xuB2OCo8gADE474RpTHnfUM2SlP177izsypBXAkTctljDmCmpeOHYudcAWSoYQLkgqGTnYj9O4bfPqJpNHJzlZ0BPINyQ1ABBgwSc6qvfd7qakPZMAbJmOirSg5XegTqr3seN09ekfYctsg2T0WV8G3Qsgl7NCYoTEZ1fAaW5xK3eUvqTD374/3OSU7tICebPdnjGVKzprq3AbN+Gnh0ESdWvwEy74pDPsTwg6I/A/GsHj4Gmexpt+aHxIwdEmm/MJ8yPWCccCGGRbFKwo0DAAsI+5sKwK+unBX2Q33eTZJNwMfcX/zvef5aUcrUK7mvCrku1tGncJlPB22Bq86Plq11grVJDcBAeo2WIjAxAcOE6UMS+V7XGhSBdi3HIrDD6pCD51yz0j/rzWJtH4AMPKck0fWG7H9gbGwwMGcrWWwN/sCGDVTPP/8TQliVJJBI8y+pT7l/k4cpTSRACNYmidqEULeHw5WVnE6m/fR8cdglTI42arN8g0kmOsroWFs7bPoAteqqMlJykfAIi/r1cqwG5gA8HOfG06Zk8etGaiWsjvToajHv1cXg9dnHPalkgV3znUL0wuspn9iUzkytHwz4YfM6KCqT5kb2MWY/7XsMYZcbBeOfgMcxYsCk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(6666004)(6512007)(7406005)(44832011)(7416002)(53546011)(86362001)(31696002)(2906002)(38100700002)(4326008)(8936002)(5660300002)(8676002)(26005)(66476007)(6916009)(66556008)(508600001)(83380400001)(36756003)(54906003)(66946007)(2616005)(6486002)(316002)(186003)(31686004)(43740500002)(45980500001)(20210929001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VDRlMUUrQmJwZGhkbWlMaW4rT0lJTi9uUkZZV0duQVlGTzJzOHA4cVViZWg3?=
- =?utf-8?B?VGg2dXdqWlE1TFptVnRFenRacXFteENHdFR6VHVLcytUU3VwR0hjK3NRTWdm?=
- =?utf-8?B?a2lJRDlxb0VZVGlDY09DU1FDbWpmTGxGS1Fob1lXUDBwdU1TTmZuRVVYdDJ2?=
- =?utf-8?B?cFY1d3F1cnFka202SVhBc0FCZFFJMlkrUFRGWWtuTzhQTzhWbjdYY1d4cVZJ?=
- =?utf-8?B?N0RMVjV3L3p2Wklkank2MTVWYnZqY1pZS0o3V3NaczZXdTNMaVM2QjJHTWdJ?=
- =?utf-8?B?Tmc5TjVzMjRqVkRERmMrZXUxY2dadEU5eWJoT0dLVHJPUDQ2NlBiZCtjUkdk?=
- =?utf-8?B?bFM4RTZnNlZ2TGdFeG5uVzVJQUVhUnNoenJOQ1IvajdyUmhqQkdBeFFpSEg4?=
- =?utf-8?B?RGhwdUZTb2pXRnhZNktoUGRrYTRpVmEraEJ2T3I4NWM2eHVmMjZzRmxlQW9C?=
- =?utf-8?B?YnlDUFEvNUI0SGFsR2lpZGZvZnZFNGI3MWFQSnFrOURwZDhKdjZFaEVTNTFM?=
- =?utf-8?B?NGtveFp6ODBrTS90enNkY1EvMURpamxxQmJMbGQ0QWNCK3A5TTZDRnBmT3Nn?=
- =?utf-8?B?M1NFTTFycklMYWVkbFdVdlptekZRTnZrbnZOWGlFK3ZVRUxjRmhPaWlsSEk1?=
- =?utf-8?B?QzVYVHJYalhpdS96MzNjZDJqUk9uaGoyTjFuLzRmbUtTRjNEdmlWb3VBdlZh?=
- =?utf-8?B?bitvK0RTZ1c3OEgyY0VQS0loN3h2TGdEd2pnZ2QrSjMwMk81ZEF3c0pNQXRZ?=
- =?utf-8?B?bHA4d1JIT2R5bk5UM201T1QvTFFSaXk0UHBRcHNQU1FVS09mNU4wQlBhODdl?=
- =?utf-8?B?VVpJbFdjUEh4aXdiVVc1U1dicWV2UXpPNU95SzlMTHpnbDAwSEk4c3BHWU9m?=
- =?utf-8?B?UlMwMXBnTkpNWVZNT2hGQU1pQkhaRSsxMXU4UnRTN3hmUXRWQm1JYjd4S29k?=
- =?utf-8?B?bEV5anNaaEUrbG1aVEhqM1Q2QnQvYkJNU3dnOVNib2xvT0o3bGYwV0Q3Vldt?=
- =?utf-8?B?a3VEeU00QWdaRGppZ1pSWW05V043cFVpaWgrNWloQkZnYzJVTnQ2TGlFL0cw?=
- =?utf-8?B?RUVlbStyajd5TzRCaFpOb1BmM0tqYnBZbUJzaDN0NFpEbVo3d2laUWlkcStU?=
- =?utf-8?B?MzQ0enZBZkRkeE43QXdzTWtZZHhicDdGTmFMczhxcFdtem15cXNMK1kxODFr?=
- =?utf-8?B?YjZZZlZTY1ZDTjJ3T2FyMy9tM2VVbjBuSU9rZVFCZXFvR0IyMFJLVnRrL0ND?=
- =?utf-8?B?Q0Z2SDBxZ29xK3Vob1ZjZm56aHlWNm1QTU1GRWVpY2p6S2xoK2pVNFBjRVpm?=
- =?utf-8?B?VHY1WE9LNWpIbGNCV3JBUEd5UjRuOHVsNTEzWmFtVWg2VTg1WU1WSWp0cEFU?=
- =?utf-8?B?NWl2VzZUMWRnZmlFcENDVTk1SHlGS1JMbmZLUDBQZm5JZDk0aHh5bUFJUnYw?=
- =?utf-8?B?YjhNMzBpdDNNclBjTHBtbFlIclRZYkZ3cnczdm16VzJBdjY2ejF3M2VxQ2Zk?=
- =?utf-8?B?V1ZoTlZnQlF6dmo5RWFRVnNjNzBTNzgwSW5scjg4UW56T29TVEVNWDhWSFZF?=
- =?utf-8?B?UUM0V3lSNm5xVXNESGZ1SFpZRnFxU2lrZmhhT1l6dEJubkJ2WUFjaEVDZ3gz?=
- =?utf-8?B?RDU4N00yanloWXZOWDFqT2lUN1Vhajh4KzNXSkg3YUljY3M4RzNIbkVwVzhk?=
- =?utf-8?B?TWE3RGtKMVcyM3dvaFpmbDlBbU9RczdNOFNTdFFiazhJeEp4Qng3TXVkNk12?=
- =?utf-8?B?WE5BbW90Q1kzcWFuNDR0RWJrOVlSY2IxWUZmOWhjdWdTMlh1aXdNTXY0OFVa?=
- =?utf-8?B?WFo5QjMya2t1U0tVY2ZyNE5LSkhXWlg4OWJhbDBRV29ZNjZrVmlsM2lSR1I2?=
- =?utf-8?B?R2RnR0xOVmhpQUlOZjZPOGJsZ1R1RlM2UGpMUms0Sko4clJHRWtWOVhYWkwz?=
- =?utf-8?B?TEdsSGVYMFprSDRhK1hZOFhHZ0lldEdSVkdQYmplbVcwUHZmc21LWjl2VTRF?=
- =?utf-8?B?blVTdE1Dem1EbEU4VVBwUlZISmF1L1NIMXZZMVFZVkZRMlFWL2pKdE9PL1Rm?=
- =?utf-8?B?RmFCUE9CdXBVM2Y3ZzRxVHR5VnF3RjZaM1QwdkRmQ0QyNmlKMEU5SGs4OFFO?=
- =?utf-8?B?Vk5ocGc5T0IyN3BEUGVGU2U1d0NRTnlYOG9jbHZIV0RVQWpnZFhlMzllTUh5?=
- =?utf-8?Q?Op8yyh96za7vugvtPR99Pdo=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 875508c0-c8ba-4b29-f45d-08d9e1b6c6e2
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2022 17:02:18.8964
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bL7aB4z4ofC8QE5eC1SzfF5WrG6qBJ9dN4Z6j+pSfbc6rVSgHouSYgHChnaW/TBlFEHwdaznrV0estM9dPfstQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4888
+        id S232577AbiA0RW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 12:22:57 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:50518 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232024AbiA0RWw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 12:22:52 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E979861353
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 17:22:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 378CEC340E8;
+        Thu, 27 Jan 2022 17:22:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643304171;
+        bh=p+CyitWw10vjIIJBhU1YoixOpxCqj1u65/JmhVq73uI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=WjG64SQqRdRHX5YdMsTh/ztXtALJOS+l/s3H1Ebrblt9y0arvcp23drv5c8R788XL
+         1HQ6wm/kZdOoWsqq4QUD0k//gkB8C5xfs1BAVQCBADW7QtvYj1mU1Ctr4qT6JB2+2f
+         NYNrur+4k0ojw5TTOwowvGIArfO2OMKluU0TXQQH+SPSmo2NIxCDlHlDnfZYcwIlG5
+         ND6EyT40+h7uHctBLdLXPdXQ0Csr5YqrNycq9UYetWJxEVrjZD3Jxu3Tc8BDavGUAy
+         2103GGdKNVorDEI3kzgIygTNYJjCJpLb4vAY9AY1DOWYirQ6j6L5v1iWOGnnDI+oYY
+         DKTM6CEIhBSBg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nD8Tx-003a2y-1a; Thu, 27 Jan 2022 17:22:49 +0000
+Date:   Thu, 27 Jan 2022 17:22:48 +0000
+Message-ID: <87tudp5c0n.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 17/69] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+In-Reply-To: <YelM4PNEjbxYkpZ3@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-18-maz@kernel.org>
+        <YelM4PNEjbxYkpZ3@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/27/22 10:21 AM, Borislav Petkov wrote:
-> On Fri, Dec 10, 2021 at 09:43:28AM -0600, Brijesh Singh wrote:
->> Version 2 of GHCB specification provides SNP_GUEST_REQUEST and
->> SNP_EXT_GUEST_REQUEST NAE that can be used by the SNP guest to communicate
->> with the PSP.
->>
->> While at it, add a snp_issue_guest_request() helper that can be used by
+On Thu, 20 Jan 2022 11:52:00 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Not "that can" but "that will".
+> Hi Marc,
 > 
-Noted.
-
->>   
->> +/* Guest message request error code */
->> +#define SNP_GUEST_REQ_INVALID_LEN	BIT_ULL(32)
+> On Mon, Nov 29, 2021 at 08:00:58PM +0000, Marc Zyngier wrote:
+> > Some EL2 system registers immediately affect the current execution
+> > of the system, so we need to use their respective EL1 counterparts.
+> > For this we need to define a mapping between the two. In general,
+> > this only affects non-VHE guest hypervisors, as VHE system registers
+> > are compatible with the EL1 counterparts.
+> > 
+> > These helpers will get used in subsequent patches.
+> > 
+> > Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h | 50 +++++++++++++++++++++++++++++
+> >  1 file changed, 50 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index 1028ac65a897..67a2c0d05233 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -2,6 +2,7 @@
+> >  #ifndef __ARM64_KVM_NESTED_H
+> >  #define __ARM64_KVM_NESTED_H
+> >  
+> > +#include <linux/bitfield.h>
+> >  #include <linux/kvm_host.h>
+> >  
+> >  static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> > @@ -11,4 +12,53 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> >  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> >  }
+> >  
+> > +/* Translation helpers from non-VHE EL2 to EL1 */
+> > +static inline u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
 > 
-> SZ_4G is more descriptive, perhaps...
+> When E2H = 0, there is no IPS field in TCR_EL2, but there is a PS field.
+> And for TCR_EL1, there is no PS field, but there is an IPS field. Maybe
+> tcr_el2_ps_to_tcr_el1_ips() would be more precise, and would also match the
+> field defines used by the function?
+
+Yes, good point. Done.
+
 > 
-
-I am okay with using SZ_4G but per the spec they don't spell that its 4G 
-size. It says bit 32 will should be set on error.
-
-
-
->> +
->> +	ret = sev_es_ghcb_hv_call(ghcb, true, NULL, exit_code, input->req_gpa, input->resp_gpa);
-> 					      ^^^^^
+> > +{
+> > +	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
+> > +}
+> > +
+> > +static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
+> > +{
+> > +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+> > +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+> > +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
+> > +	       (tcr & TCR_EL2_TG0_MASK) |
+> > +	       (tcr & TCR_EL2_ORGN0_MASK) |
+> > +	       (tcr & TCR_EL2_IRGN0_MASK) |
+> > +	       (tcr & TCR_EL2_T0SZ_MASK);
 > 
-> That's ctxt which is accessed without a NULL check in
-> verify_exception_info().
+> There are a few fields in TCR_EL2 which have a corresponding field in
+> TCR_EL1, when E2H = 0: HPD -> HPD0 (hierarchical permissions toggle), HA
+> and HD (hardware management of dirty bit and access flag), DS (when
+> FEAT_LPA2), and probably others. Why do we not also translate them? Is it
+> because we hide the feature they depend on (FEAT_HPDS, FEAT_HAFBDS, etc) in
+> the guest ID registers? Is it something else?
+
+We do hide the features, and for some of them they simply cannot be
+implemented. HA/HD are pretty good example of how the architecture is
+broken in this respect (the PT update happens in the shadow, while the
+guest can only look at its own copy).
+
+>
+> > +}
+> > +
+> > +static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
+> > +{
+> > +	u64 cpacr_el1 = 0;
+> > +
+> > +	if (!(cptr_el2 & CPTR_EL2_TFP))
+> > +		cpacr_el1 |= CPACR_EL1_FPEN;
+> > +	if (cptr_el2 & CPTR_EL2_TTA)
+> > +		cpacr_el1 |= CPACR_EL1_TTA;
+> > +	if (!(cptr_el2 & CPTR_EL2_TZ))
+> > +		cpacr_el1 |= CPACR_EL1_ZEN;
+> > +
+> > +	return cpacr_el1;
 > 
-> Why aren't you allocating a ctxt on stack like the other callers do?
+> Nitpick: it would make comparing against the architecture easier if the
+> fields were checked in the order they were definied in the architecture. So
+> first check the TTA bit, then TFP and lastly TZ.
 
-Typically the sev_es_ghcb_hv_handler() is called from #VC handler, which 
-provides the context structure. But in this and PSC case, the caller is 
-not a #VC handler, so we don't have a context structure. But as you 
-pointed, we could allocate context structure on the stack and pass it 
-down so that verify_exception_info() does not cause a panic with NULL 
-deference (when HV violates the spec and inject exception while handling 
-this NAE).
+You are easy to please! ;-) Done.
 
-thanks
+> 
+> I checked the field definitions for CPTR_EL2 and the above looks correct to
+> me, as TFP, TTA and TZ were the only fields which affect EL2; I also
+> checked that the values in CPACR_EL1 are set correctly to mirror the
+> CPTR_EL2 settings.
+> 
+> > +}
+> > +
+> > +static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 sctlr)
+> > +{
+> > +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
+> > +	return sctlr | BIT(20);
+> 
+> Bits 8 and 7 in SCTLR_EL2 are RES0 when E2H,TGE != {1,1}, but they are RES1
+> in SCTLR_EL1 if EL0 is not capable of using AArch32. Shouldn't we also set
+> them?
+> 
+> Bit 5 in SCTLR_EL2 is RES1 when E2H,TGE != {1,1}, but it is RES0 in
+> SCTLR_EL1 if EL0 is not capable of using AArch32. Shouldn't we clear
+> it?
+
+I actually reworked all of that as such:
+
+static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
+{
+	/* Only preserve the minimal set of bits we support */
+	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
+		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
+	val |= SCTLR_EL1_RES1;
+
+	return val;
+}
+
+> > +}
+> > +
+> > +static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+> > +{
+> > +	/* Force ASID to 0 (ASID 0 or RES0) */
+> 
+> That got me confused at first, until I realized that the first ASID refers
+> to the ASID field of the register, and the second ASID to the translation
+> table property. Might be more helpful if the comment was simply "Clear the
+> ASID field" or something like that.
+
+Done.
+
+> 
+> > +	return ttbr0 & ~GENMASK_ULL(63, 48);
+> > +}
+> > +
+> > +static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+> > +{
+> > +	return ((FIELD_GET(CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN, cnthctl) << 10) |
+> 
+> I don't understand why those two bits are left shifted by 10, the result is
+> 0x3 << 10 and CNTKCTL_EL[16:10] is RES0.
+> 
+> > +		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
+> 
+> CNTKCTL_EL1.{EVNTI,EVNTDIR,EVNTEN} refer to CNT*V*CT_EL0,
+> CNTHCTL_EL2.{EVNTI,EVNTDIR,EVNTEN} refer to CNT*P*CT_EL0. I don't
+> understand why they are treated as equivalent.
+> 
+> I get the feeling I'm misunderstanding something about this
+> function.
+
+It's a classic one. Remember that we are running VHE, and remapping a
+nVHE view of CNTHCTL_EL2 into the VHE view *for the guest*, and that
+these things are completely shifted around (it has the CNTKCTL_EL1
+format).
+
+For example, on nVHE, CNTHCTL_EL2.EL1PCTEN is bit 0. On nVHE, this is
+bit 10. That's why we have this shift, and that you now need some
+paracetamol.
+
+You can also look at the way we deal with the same stuff in
+kvm_timer_init_vhe().
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
