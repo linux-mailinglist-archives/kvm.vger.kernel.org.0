@@ -2,135 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C74049DEE5
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 11:12:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00E4149DF6E
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 11:29:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239062AbiA0KLj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 05:11:39 -0500
-Received: from 8bytes.org ([81.169.241.247]:48002 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238978AbiA0KL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 05:11:26 -0500
-Received: from cap.home.8bytes.org (p549ad610.dip0.t-ipconnect.de [84.154.214.16])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id C1787DB2;
-        Thu, 27 Jan 2022 11:11:24 +0100 (CET)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Eric Biederman <ebiederm@xmission.com>,
-        kexec@lists.infradead.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 10/10] x86/kexec/64: Support kexec under SEV-ES with AP Jump Table Blob
-Date:   Thu, 27 Jan 2022 11:10:44 +0100
-Message-Id: <20220127101044.13803-11-joro@8bytes.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220127101044.13803-1-joro@8bytes.org>
-References: <20220127101044.13803-1-joro@8bytes.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S231728AbiA0K3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 05:29:10 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38704 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229563AbiA0K3K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 05:29:10 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20R9fYpo005534;
+        Thu, 27 Jan 2022 10:29:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=i0QH81i71Tm/lFBYLPKE/sEwnm/KMMnA0Qqt2vNwhIk=;
+ b=VJ+6Ti4/kCaljJQmHg2UDJ6XpK/6+C/8Ra+b0ngkfVHdFG0sbwbwiebRNodzfITIhHRC
+ GCh/jPUjkSjAsoXTaqYZVrzEPhVPBDDoMpq/854/Qhz4HGuUthfqYRJw2EYLw3fYO80i
+ CrNdFsAETp8Xh3X4WakCp2Ki3kbvbPGl8pGXDmWQUdwduuBKsVqnIeto0rfKZmbwjuyY
+ +74RwihHS2YIgNzfMAgoYXZ0glVXIP600LjPYcOejJR+DJej6Bl6N3smx9Oawz0eulKJ
+ Jgv4YO8fEK6O964HdJnvOaQjdasdE7tm/ah+1qKkHf2SJEPcdmQ4aX8P7nYfxDZVK/iU /Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dus00h2dq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jan 2022 10:29:09 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20RA1e58016950;
+        Thu, 27 Jan 2022 10:29:08 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dus00h2d2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jan 2022 10:29:08 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20RAS2J3008899;
+        Thu, 27 Jan 2022 10:29:07 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3dr9j9p7qc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jan 2022 10:29:06 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20RAT3ia9830682
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jan 2022 10:29:03 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8DF6C4C052;
+        Thu, 27 Jan 2022 10:29:03 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DBB34C04E;
+        Thu, 27 Jan 2022 10:29:02 +0000 (GMT)
+Received: from sig-9-145-73-120.uk.ibm.com (unknown [9.145.73.120])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Jan 2022 10:29:02 +0000 (GMT)
+Message-ID: <01e6afd408f979f0c57767d9b1d434ae355033f2.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 12/30] s390/pci: get SHM information from list pci
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 27 Jan 2022 11:29:02 +0100
+In-Reply-To: <20220114203145.242984-13-mjrosato@linux.ibm.com>
+References: <20220114203145.242984-1-mjrosato@linux.ibm.com>
+         <20220114203145.242984-13-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Y0JMYQ6KCqVf6d1PnIiUr4ngbGpPmJ9V
+X-Proofpoint-ORIG-GUID: Y2eCOO0ZdV-F5CKAuZ7Dn-J4HT2QYW41
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-27_02,2022-01-27_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ adultscore=0 spamscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
+ phishscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2201270061
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+On Fri, 2022-01-14 at 15:31 -0500, Matthew Rosato wrote:
+> KVM will need information on the special handle mask used to indicate
+> emulated devices.  In order to obtain this, a new type of list pci call
+> must be made to gather the information.  Extend clp_list_pci_req to
+> also fetch the model-dependent-data field that holds this mask.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/pci.h     |  1 +
+>  arch/s390/include/asm/pci_clp.h |  2 +-
+>  arch/s390/pci/pci_clp.c         | 28 +++++++++++++++++++++++++---
+>  3 files changed, 27 insertions(+), 4 deletions(-)
+> 
+---8<---
+>  
+> +int zpci_get_mdd(u32 *mdd)
+> +{
+> +	struct clp_req_rsp_list_pci *rrb;
+> +	u64 resume_token = 0;
+> +	int nentries, rc;
+> +
+> +	if (!mdd)
+> +		return -EINVAL;
+> +
+> +	rrb = clp_alloc_block(GFP_KERNEL);
+> +	if (!rrb)
+> +		return -ENOMEM;
+> +
+> +	rc = clp_list_pci_req(rrb, &resume_token, &nentries, mdd);
+> +
+> +	clp_free_block(rrb);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(zpci_get_mdd);
+> +
+>  static int clp_base_slpc(struct clp_req *req, struct clp_req_rsp_slpc *lpcb)
+>  {
+>  	unsigned long limit = PAGE_SIZE - sizeof(lpcb->request);
 
-When the AP jump table blob is installed the kernel can hand over the
-APs from the old to the new kernel. Enable kexec when the AP jump
-table blob has been installed.
+Looks good.
 
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/include/asm/sev.h         |  2 ++
- arch/x86/kernel/machine_kexec_64.c |  3 ++-
- arch/x86/kernel/sev.c              | 15 +++++++++++++++
- 3 files changed, 19 insertions(+), 1 deletion(-)
+Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
 
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index e342dce3e7a1..41e07d037b6e 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -91,6 +91,7 @@ extern enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
- 					  u64 exit_code, u64 exit_info_1,
- 					  u64 exit_info_2);
- void sev_es_stop_this_cpu(void);
-+bool sev_kexec_supported(void);
- #else
- static inline void sev_es_ist_enter(struct pt_regs *regs) { }
- static inline void sev_es_ist_exit(void) { }
-@@ -98,6 +99,7 @@ static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { ret
- static inline void sev_es_nmi_complete(void) { }
- static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
- static inline void sev_es_stop_this_cpu(void) { }
-+static inline bool sev_kexec_supported(void) { return true; }
- #endif
- 
- #endif
-diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
-index 5079a75f8944..c58808fe3fb5 100644
---- a/arch/x86/kernel/machine_kexec_64.c
-+++ b/arch/x86/kernel/machine_kexec_64.c
-@@ -27,6 +27,7 @@
- #include <asm/kexec-bzimage64.h>
- #include <asm/setup.h>
- #include <asm/set_memory.h>
-+#include <asm/sev.h>
- 
- #ifdef CONFIG_ACPI
- /*
-@@ -271,7 +272,7 @@ static void load_segments(void)
- 
- static bool machine_kexec_supported(void)
- {
--	if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-+	if (!sev_kexec_supported())
- 		return false;
- 
- 	return true;
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 1bced5b49150..17dcbcddd6ab 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -884,6 +884,21 @@ static int __init sev_setup_ap_jump_table(void)
- }
- core_initcall(sev_setup_ap_jump_table);
- 
-+bool sev_kexec_supported(void)
-+{
-+	if (!cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-+		return true;
-+
-+	/*
-+	 * KEXEC with SEV-ES and more than one CPU is only supported
-+	 * when the AP jump table is installed.
-+	 */
-+	if (num_possible_cpus() > 1)
-+		return sev_ap_jumptable_blob_installed;
-+	else
-+		return true;
-+}
-+
- static void __init alloc_runtime_data(int cpu)
- {
- 	struct sev_es_runtime_data *data;
--- 
-2.34.1
 
