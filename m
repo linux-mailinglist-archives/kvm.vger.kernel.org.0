@@ -2,246 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8978D49E8DD
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 18:23:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D795C49E91A
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 18:34:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237975AbiA0RX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 12:23:57 -0500
-Received: from mail-mw2nam08on2089.outbound.protection.outlook.com ([40.107.101.89]:42336
-        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230193AbiA0RX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 12:23:56 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mh0Dvrya+ak7wnuStDXQ8bvmXwTPOevkg2dg1RWDFy9YabC1WuZ8kS+nz5KFguQHF4QcL+6xllDp8xEA/b9WbDe9BXKbRsT+R/h1aM2p1yLC6mi6psimd556J8g29Q2XJxBN3rC+EgUTB/AYtLeJ1WSxGzfdYXiuserHxk2aIrPDlN3lw1wqEC9/SIjjXBwjJnxiQp9oM7ept3JufeKrDeoIYaNdWrdktylHUcFPrTQDEHr3EY0dvcBJKJ51d0bE7ICr0TcPpZ6ypi+p8eUUXFX5dKzmCKjXP//eXs8Qyh9dD5FLBFaUICxVe0vvLyAzFrLsCwFgsFR2Z70K9AuiZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TE1VBFnA90hYRW1pYSUROKkXBeREUPNpDB1wYyPhPJE=;
- b=jEJrbklYTYU6u+UIlB6uSdIMVcl05rW0qdfs3hpysydrhLNOhwtLS+UnYxGO0K84lIVfTn6nhLBuviILwDTgtT9bSukvqIWEuX65UWYmU6MxSCX/tx1264ztjB/z93cO0XTo/zsSaN/8gKHUhIFHy895LTAWH+AlKOUYE7Uznsmyl1R1z5hzYlIWw0u+ORUU8kIPslT+CjdT2+/WUmLkQu2G/izZ56kb1yIgBqtQLBEOE0wH6HVmOtOOy2EkIZbkl3Eo5Ihu8Uqt5lfArlxpHnlN/PcmumPBhgY39IMjib8vlASCgEatlQMyqEXiBXx0lclphDz+U4mlX/Cra4JifQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TE1VBFnA90hYRW1pYSUROKkXBeREUPNpDB1wYyPhPJE=;
- b=P55ITN/rNRdleLBP4+HU3AVWWq2tVNKm3etpcZEf/Dk0sn7OalBMF6U13RwFNqtihs0FIK4/TkJrpGHrMEbzx/YXmgZ3SyY7YplaDz/fFdgHguErAn2CrWcrthcjK7sD4EH0xjevEqGhVVpGyf0xvpn1moBByE1qwy1ch9adlcw=
-Received: from MW4PR03CA0279.namprd03.prod.outlook.com (2603:10b6:303:b5::14)
- by CO6PR12MB5410.namprd12.prod.outlook.com (2603:10b6:5:35b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17; Thu, 27 Jan
- 2022 17:23:54 +0000
-Received: from CO1NAM11FT027.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b5:cafe::ac) by MW4PR03CA0279.outlook.office365.com
- (2603:10b6:303:b5::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.15 via Frontend
- Transport; Thu, 27 Jan 2022 17:23:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT027.mail.protection.outlook.com (10.13.174.224) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4930.15 via Frontend Transport; Thu, 27 Jan 2022 17:23:53 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 27 Jan
- 2022 11:23:52 -0600
-Date:   Thu, 27 Jan 2022 11:23:08 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH v8 29/40] x86/compressed/64: add support for SEV-SNP
- CPUID table in #VC handlers
-Message-ID: <20220127172308.erfrpuwm6ivbdh5q@amd.com>
-References: <20220118142345.65wuub2p3alavhpb@amd.com>
- <20220118143238.lu22npcktxuvadwk@amd.com>
- <20220118143730.wenhm2bbityq7wwy@amd.com>
- <YebsKcpnYzvjaEjs@zn.tnic>
- <20220118172043.djhy3dwg4fhhfqfs@amd.com>
- <Yeb7vOaqDtH6Fpsb@zn.tnic>
- <20220118184930.nnwbgrfr723qabnq@amd.com>
- <20220119011806.av5rtxfv4et2sfkl@amd.com>
- <YefzQuqrV8kdLr9z@zn.tnic>
- <20220119162747.ewgxirwcnrcajazm@amd.com>
+        id S244665AbiA0Red (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 12:34:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61172 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S234612AbiA0Rec (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 12:34:32 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20RH6MBw022435;
+        Thu, 27 Jan 2022 17:34:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+1Y7Dk2Z3towDl4Jpbnuh4qqmZHKJI/5PABityw3HJk=;
+ b=b/7zcjxvzMBCMFRFPo5C6Mps/9uBNh5XDQomawX8j9l2meUiY425zJwTc62XMp20WoX2
+ 4c6HjdOK360/wbOjyGiIkUuQyu9FJuTKedLf12j8EMvU7vhpnZK/S0dMVqhTlLPaDqoL
+ 1Fe9BgbZvxf+NNwqNM2JSogFhfI4JRoLyJEC4/H5X1iIo88ztVIVQmGaov93IfI55cxs
+ Y+1wR/LorMzb16MJZ0zr9tEUcw1fTDCDhak1uJrNDAcLLD1beNfaL5qBNJCZNa8yYplg
+ G5D0UN/KHFyUcF8A83YTSd1iXijS/v+DHZE/bgB3A6OanmVgFhLbSqowuyE/dZkTnwso Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3duwujju78-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jan 2022 17:34:31 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20RHBCO4010562;
+        Thu, 27 Jan 2022 17:34:30 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3duwujju6c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jan 2022 17:34:30 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20RHIct8019457;
+        Thu, 27 Jan 2022 17:34:29 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3dr9j9tja8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jan 2022 17:34:28 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20RHOjKd47841706
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jan 2022 17:24:45 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BAE0AA405C;
+        Thu, 27 Jan 2022 17:34:23 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D999A4062;
+        Thu, 27 Jan 2022 17:34:23 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.145])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Jan 2022 17:34:23 +0000 (GMT)
+Date:   Thu, 27 Jan 2022 18:34:20 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v1 06/10] KVM: s390: Add vm IOCTL for key checked
+ guest absolute memory access
+Message-ID: <20220127183420.76dd7f15@p-imbrenda>
+In-Reply-To: <71eb83a1-131d-f667-b1ef-ae214c724ba4@linux.ibm.com>
+References: <20220118095210.1651483-1-scgl@linux.ibm.com>
+        <20220118095210.1651483-7-scgl@linux.ibm.com>
+        <069c72b6-457f-65c7-652e-e6eca7235fca@redhat.com>
+        <8647fcaf-6d8a-4678-0695-4b1cc797b3b1@linux.ibm.com>
+        <3035e023-d71a-407b-2ba6-45ad0ae85a9e@redhat.com>
+        <71eb83a1-131d-f667-b1ef-ae214c724ba4@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220119162747.ewgxirwcnrcajazm@amd.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 975bec9a-9af1-445c-0d81-08d9e1b9ca9c
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5410:EE_
-X-Microsoft-Antispam-PRVS: <CO6PR12MB54102B7DB1569C521A28054795219@CO6PR12MB5410.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HZ0gjAw7w+vY7xxdns0CA8REuTzgDddVOIIWdRXgcIdl2PT97t8nSArgi3tedycMamY51MH6VEcJsU6l8rQYHaq/Twn0DTVtYAcqrQgRaZvferpSSaUS1j5AEmMSNw1zdoVJZgvilW8CuKA+kg3Yj0u5xwqtZYJEf+K8F+Me5DuBY4WPagLEHpAa1gYyTPNc4rdBysfhDr2AgEUbGu6Qyfva6OKqEoGCxkoBwvmDRoAa8jkmpBjqs53H+NceLvejo6G0pIZCwRL64NpjU+7G9av+L4MeNoIFSJj5DUTPJplOlYttv+nKwHHW2TxObyN63jmPRUbPVXj/Coe2CS8lwU8HRiqbRUJTZfBpHO40RPevqIVG0XYu8swGZrGefez4Cjc6DksLlbhvG9s+A3LiNB3QRFFDhwpkbQ8PPDEZ3mI5NTt1p87CZQUjzqwlZf4EqNapXZ3N/nPbRFb1v03SOCRXGda/veKhNM+IC2lEBpAhMB9NwYKL3sNNTxHLSn6fROFeBzyImsl8sdi2F39bAPGo3p9KVjF98SPsAe+zv3OJdNySYWJ5vHxU72RXMngL9E+VqKDJ24PFfnLNMapvPHxBcATrZTYLYgqIbRUZ7M21FIw3ewl6/EUsWJ8Ga4xgzaT4ouFkvR6HUXaeJdvZgR7ore6nbCCoDAlbP+q+YD5AtVIs88ogYN24FatqE2Set9L+oMsP3mnBkBUJyUfXrQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(16526019)(7416002)(36860700001)(6666004)(40460700003)(186003)(1076003)(26005)(7406005)(86362001)(82310400004)(83380400001)(5660300002)(47076005)(2616005)(426003)(508600001)(336012)(8936002)(8676002)(4326008)(44832011)(70206006)(70586007)(81166007)(316002)(356005)(36756003)(54906003)(6916009)(2906002)(36900700001)(20210929001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2022 17:23:53.2185
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 975bec9a-9af1-445c-0d81-08d9e1b9ca9c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT027.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5410
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JdK3eWlFoFHP7lnJnYMqzQBCQA8ClrYn
+X-Proofpoint-GUID: KGxAk64TmxKHerkRT8iUXuSGNF0el9D_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-27_03,2022-01-27_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ adultscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2201270102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 10:27:47AM -0600, Michael Roth wrote:
-> On Wed, Jan 19, 2022 at 12:17:22PM +0100, Borislav Petkov wrote:
-> > On Tue, Jan 18, 2022 at 07:18:06PM -0600, Michael Roth wrote:
-> > > If 'fake_count'/'reported_count' is greater than the actual number of
-> > > entries in the table, 'actual_count', then all table entries up to
-> > > 'fake_count' will also need to pass validation. Generally the table
-> > > will be zero'd out initially, so those additional/bogus entries will
-> > > be interpreted as a CPUID leaves where all fields are 0. Unfortunately,
-> > > that's still considered a valid leaf, even if it's a duplicate of the
-> > > *actual* 0x0 leaf present earlier in the table. The current code will
-> > > handle this fine, since it scans the table in order, and uses the
-> > > valid 0x0 leaf earlier in the table.
-> > 
-> > I guess it would be prudent to have some warnings when enumerating those
-> > leafs and when the count index "goes off into the weeds", so to speak,
-> > and starts reading 0-CPUID entries. I.e., "dear guest owner, your HV is
-> > giving you a big lie: a weird/bogus CPUID leaf count..."
-> > 
-> > :-)
-> 
+On Thu, 27 Jan 2022 17:29:44 +0100
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-Sorry for the delay, this response got stuck in my mail queue apparently.
+> On 1/25/22 13:00, Thomas Huth wrote:
+> > On 20/01/2022 13.23, Janis Schoetterl-Glausch wrote: =20
+> >> On 1/20/22 11:38, Thomas Huth wrote: =20
+> >>> On 18/01/2022 10.52, Janis Schoetterl-Glausch wrote: =20
+> >>>> Channel I/O honors storage keys and is performed on absolute memory.
+> >>>> For I/O emulation user space therefore needs to be able to do key
+> >>>> checked accesses.
+> >>>> The vm IOCTL supports read/write accesses, as well as checking
+> >>>> if an access would succeed. =20
+> >>> ... =20
+> >>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> >>>> index e3f450b2f346..dd04170287fd 100644
+> >>>> --- a/include/uapi/linux/kvm.h
+> >>>> +++ b/include/uapi/linux/kvm.h
+> >>>> @@ -572,6 +572,8 @@ struct kvm_s390_mem_op {
+> >>>> =C2=A0=C2=A0 #define KVM_S390_MEMOP_LOGICAL_WRITE=C2=A0=C2=A0=C2=A0 1
+> >>>> =C2=A0=C2=A0 #define KVM_S390_MEMOP_SIDA_READ=C2=A0=C2=A0=C2=A0 2
+> >>>> =C2=A0=C2=A0 #define KVM_S390_MEMOP_SIDA_WRITE=C2=A0=C2=A0=C2=A0 3
+> >>>> +#define KVM_S390_MEMOP_ABSOLUTE_READ=C2=A0=C2=A0=C2=A0 4
+> >>>> +#define KVM_S390_MEMOP_ABSOLUTE_WRITE=C2=A0=C2=A0=C2=A0 5 =20
+> >>>
+> >>> Not quite sure about this - maybe it is, but at least I'd like to see=
+ this discussed: Do we really want to re-use the same ioctl layout for both=
+, the VM and the VCPU file handles? Where the userspace developer has to kn=
+ow that the *_ABSOLUTE_* ops only work with VM handles, and the others only=
+ work with the VCPU handles? A CPU can also address absolute memory, so why=
+ not adding the *_ABSOLUTE_* ops there, too? And if we'd do that, wouldn't =
+it be sufficient to have the VCPU ioctls only - or do you want to call thes=
+e ioctls from spots in QEMU where you do not have a VCPU handle available? =
+(I/O instructions are triggered from a CPU, so I'd assume that you should h=
+ave a VCPU handle around?) =20
+> >>
+> >> There are some differences between the vm and the vcpu memops.
+> >> No storage or fetch protection overrides apply to IO/vm memops, after =
+all there is no control register to enable them.
+> >> Additionally, quiescing is not required for IO, tho in practice we use=
+ the same code path for the vcpu and the vm here.
+> >> Allowing absolute accesses with a vcpu is doable, but I'm not sure wha=
+t the use case for it would be, I'm not aware of
+> >> a precedence in the architecture. Of course the vcpu memop already sup=
+ports logical=3Dreal accesses. =20
+> >=20
+> > Ok. Maybe it then would be better to call new ioctl and the new op defi=
+nes differently, to avoid confusion? E.g. call it "vmmemop" and use:
+> >=20
+> > #define KVM_S390_VMMEMOP_ABSOLUTE_READ=C2=A0=C2=A0=C2=A0 1
+> > #define KVM_S390_VMMEMOP_ABSOLUTE_WRITE=C2=A0=C2=A0 2
+> >=20
+> > ?
+> >=20
+> > =C2=A0Thomas
+> >  =20
+>=20
+> Thanks for the suggestion, I had to think about it for a while :). Here a=
+re my thoughts:
+> The ioctl type (vm/vcpu) and the operations cannot be completely orthogon=
+al (vm + logical cannot work),
+> but with regards to the absolute operations they could be. We don't have =
+a use case for that
+> right now and the semantics are a bit unclear, so I think we should choos=
+e a design now that
+> leaves us space for future extension. If we need to, we can add a NON_QUI=
+ESCING flag backwards compatibly
+> (tho it seems a rather unlikely requirement to me), that would behave the=
+ same for vm/vcpu memops.
+> We could also have a NO_PROT_OVERRIDE flag, which the vm memop would igno=
+re.
+> Whether override is possible is dependent on the vcpu state, so user spac=
+e leaves the exact behavior to KVM anyway.
+> If you wanted to enforce that protection override occurs, you would have =
+to adjust
+> the vcpu state and therefore there should be no confusion about whether t=
+o use a vcpu or vm ioctl.
+>=20
+> So I'm inclined to have one ioctl code and keep the operations as they ar=
+e.
+> I moved the key to the union. One question that remains is whether to enf=
+orce that reserved bytes must be 0.
+> In general I think that it is a good idea, since it leaves a bigger desig=
+n space for future extensions.
+> However the vcpu memop has not done that. I think it should be enforced f=
+or new functionality (operations, flags),
 
-> Ok, there's some sanity checks that happen a little later in boot via
-> snp_cpuid_check_status(), after printk is enabled, that reports some
-> basic details to dmesg like the number of entries in the table. I can
-> add some additional sanity checks to flag the above case (really,
-> all-zero entries never make sense, since CPUID 0x0 is supposed to report
-> the max standard-range CPUID leaf, and leaf 0x1 at least should always
-> be present). I'll print a warning for such cases, add maybe dump the
-> cpuid the table in that case so it can be examined more easily by
-> owner.
-> 
-> > 
-> > And lemme make sure I understand it: the ->count itself is not
-> > measured/encrypted because you want to be flexible here and supply
-> > different blobs with different CPUID leafs?
-> 
-> Yes, but to be clear it's the entire CPUID page, including the count,
-> that's not measured (though it is encrypted after passing PSP
-> validation). Probably the biggest reason is the logistics of having
-> untrusted cloud vendors provide a copy of the CPUID values they plan
-> to pass to the guest, since a new measurement would need to be
-> calculated for every new configuration (using different guest
-> cpuflags, SMP count, etc.), since those table values will need to be
-> made easily-accessible to guest owner for all these measurement
-> calculations, and they can't be trusted so each table would need to
-> be checked either manually or by some tooling that could be difficult
-> to implement unless it was something simple like "give me the expected
-> CPUID values and I'll check if the provided CPUID table agrees with
-> that".
-> 
-> At that point it's much easier for the guest owner to just check the
-> CPUID values directly against known good values for a particular
-> configuration as part of their attestation process and leave the
-> untrusted cloud vendor out of it completely. So not measuring the
-> CPUID page as part of SNP attestation allows for that flexibility.
-> 
-> > 
-> > > This is isn't really a special case though, it falls under the general
-> > > category of a hypervisor inserting garbage entries that happen to pass
-> > > validation, but don't reflect values that a guest would normally see.
-> > > This will be detectable as part of guest owner attestation, since the
-> > > guest code is careful to guarantee that the values seen after boot,
-> > > once the attestation stage is reached, will be identical to the values
-> > > seen during boot, so if this sort of manipulation of CPUID values
-> > > occurred, the guest owner will notice this during attestation, and can
-> > > abort the boot at that point. The Documentation patch addresses this
-> > > in more detail.
-> > 
-> > Yap, it is important this is properly explained there so that people can
-> > pay attention to during attestation.
-> > 
-> > > If 'fake_count' is less than 'actual_count', then the PSP skips
-> > > validation for anything >= 'fake_count', and leaves them in the table.
-> > > That should also be fine though, since guest code should never exceed
-> > > 'fake_count'/'reported_count', as that's a blatant violation of the
-> > > spec, and it doesn't make any sense for a guest to do this. This will
-> > > effectively 'hide' entries, but those resulting missing CPUID leaves
-> > > will be noticeable to the guest owner once attestation phase is
-> > > reached.
-> > 
-> > Noticeable because the guest owner did supply a CPUID table with X
-> > entries but the HV is reporting Y?
-> 
-> Or even more simply by the guest owner simply running 'cpuid -r -1' on
-> the guest after boot, and making sure all the expected entries are
-> present. If the HV manipulated the count to be lower, there would be
-> missing entries, if they manipulated it to be higher, then there would
-> either be extra duplicate entries at the end of the table (which the
-> #VC handler would ignore due to it using the first matching entry in
-> the table when doing lookups), or additional non-duplicate garbage
-> entries, which will show up in 'cpuid -r -1' as unexpected entries.
-> 
-> Really 'cpuid -r -1' is the guest owner/userspace view of things, so
-> some of these nuances about the table contents might be noteworthy,
-> but wouldn't actually affect guest behavior, which would be the main
-> thing attestation process should be concerned with.
-> 
-> > 
-> > If so, you can make this part of the attestation process: guest owners
-> > should always check the CPUID entries count to be of a certain value.
-> > 
-> > > This does all highlight the need for some very thorough guidelines
-> > > on how a guest owner should implement their attestation checks for
-> > > cpuid, however. I think a section in the reference implementation
-> > > notes/document that covers this would be a good starting point. I'll
-> > > also check with the PSP team on tightening up some of these CPUID
-> > > page checks to rule out some of these possibilities in the future.
-> > 
-> > Now you're starting to grow the right amount of paranoia - I'm glad I
-> > was able to sensitize you properly!
-> > 
-> > :-)))
-> 
-> Hehe =*D
-> 
-> Thanks!
-> 
-> -Mike
+I agree with enforcing that unused bits should be 0
+
+> any objections?
+>=20
+> I'll try to be thorough in documenting the currently supported behavior.
+
+this is also a good idea :)
+
