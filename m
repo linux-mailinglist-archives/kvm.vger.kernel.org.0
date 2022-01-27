@@ -2,109 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6004449DC96
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 09:33:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D60C149DD2B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 10:01:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237792AbiA0IcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 03:32:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23733 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237778AbiA0IcO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 03:32:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643272333;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S238121AbiA0JBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 04:01:35 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:50524 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231668AbiA0JBe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 04:01:34 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 87ABA1F882;
+        Thu, 27 Jan 2022 09:01:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643274093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+hzsSfEt812B+qp8pLaEKXZY4iqaixHPcS2PC/AJjRY=;
-        b=MurpCxLX4MVfpLh+nEA96tThpLOhga6z7gnKh/XUDxLL+ELwWmcZzeRtvf6tuyONCxq+Ou
-        Azycl2Am14mXf/34nNrDFznt6XCwMW9zbLOPAv8rRrbN+Hemlq/9WHN1Lr/xaygnPKnGmq
-        IqhnfIrWIrNtvqavcD8pp2yEwxrqj9I=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-645-POB9TrtXPYCjrFQNmzgYNQ-1; Thu, 27 Jan 2022 03:32:11 -0500
-X-MC-Unique: POB9TrtXPYCjrFQNmzgYNQ-1
-Received: by mail-lf1-f70.google.com with SMTP id e5-20020ac25465000000b0043796e33a85so798328lfn.1
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 00:32:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+hzsSfEt812B+qp8pLaEKXZY4iqaixHPcS2PC/AJjRY=;
-        b=EOSWR/0zbZCxlgA3D2pfa/Qsiy628U6eY5IDcxzavhMWK8oWgeg7W2cnASvoYyfBv7
-         GQYscmgOH/Al1n1ws3Vr5T5watr1n1eCYIiIb2Ulnrv8k1t1ICSaafko3Qm/F1DhJHMW
-         dL/c/5ugAl4zher75NOmCy1qHi5F5wmKlEWBNf+Xe/Wf9LuSYX1wX8vPiTfz508F3Lsr
-         iM0r4+pi4D6SUtXrgMvbSshDSxAQCkHwl5iZYkkaRQQESt5ZrX/Ug1yb8vNQqtjiSlYy
-         FE0MjKPYAQSLKfz0PmGU1CaR9uMt+HGPRlynfGzFKWvS00EhJ/gXJmmegoR9L5XUYcjK
-         O5Vw==
-X-Gm-Message-State: AOAM530nkRlpkpSK+DRnM+7+Yr8xYcE5jDyK6hFEZksmTtzZmt+nEztZ
-        xLT2z4HoV4mRL8XT6M1vOhy6850V5Rie2TfnNAQICj3jVlGqzTAsanaxC/jDWxSKeV6sbe1cqRQ
-        iCL97bHS8JZEqRiWrINFrxwm5JaIy
-X-Received: by 2002:a19:6a12:: with SMTP id u18mr2163154lfu.348.1643272330197;
-        Thu, 27 Jan 2022 00:32:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzn9eSiGGfhLO0zjsI1+u0gJevThcq9mgdnntxuPkuBy9qCRRpx6z8S1fE44dsCdfLi8ZxWyEDp9ctCVdi+w8s=
-X-Received: by 2002:a19:6a12:: with SMTP id u18mr2163143lfu.348.1643272329966;
- Thu, 27 Jan 2022 00:32:09 -0800 (PST)
+        bh=uf6L1U20L42jQ06xefiKuwA7v4ertkV/8P81jUSoYis=;
+        b=VqCRighSWgCkUFJuLikNgA17cNUdoQJUUMG40XffnG266MZ4zbi84gI2NlZBRuFTgJEaa0
+        fELyOdxO5Leeh+/wwz6VwxGtf+BdohVQUq4AQrdEgo3ph2A2b9/RzhSfnndwAtTjMobW1X
+        RTKbzaqsHULmA3qdggTQzuSflnpTVG0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643274093;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uf6L1U20L42jQ06xefiKuwA7v4ertkV/8P81jUSoYis=;
+        b=vGIapNrOTT3gC/AXlc2MXAoxBVjNtZ5L1hGxECi4SW4qf5MejumWnp/9gYGPfVvWB+VRLl
+        rSXoTgEUWwhr6uAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B85E313CFB;
+        Thu, 27 Jan 2022 09:01:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 7cJPK2xf8mFaEwAAMHmgww
+        (envelope-from <jroedel@suse.de>); Thu, 27 Jan 2022 09:01:32 +0000
+Date:   Thu, 27 Jan 2022 10:01:31 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Eric Biederman <ebiederm@xmission.com>,
+        kexec@lists.infradead.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 08/12] x86/sev: Park APs on AP Jump Table with GHCB
+ protocol version 2
+Message-ID: <YfJfa955Pkg1y6Gv@suse.de>
+References: <20210913155603.28383-1-joro@8bytes.org>
+ <20210913155603.28383-9-joro@8bytes.org>
+ <YY6XQfmvmpmUiIGj@zn.tnic>
 MIME-Version: 1.0
-References: <20220127020807.844630-1-yinxiujiang@kylinos.cn>
-In-Reply-To: <20220127020807.844630-1-yinxiujiang@kylinos.cn>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 27 Jan 2022 16:31:58 +0800
-Message-ID: <CACGkMEtEYmVNWqaaEhLZgiv9HZGUAP6zwqXfpdDA_CM2_tav0Q@mail.gmail.com>
-Subject: Re: [PATCH] vhost: Make use of the helper macro kthread_run()
-To:     Yin Xiujiang <yinxiujiang@kylinos.cn>
-Cc:     mst <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YY6XQfmvmpmUiIGj@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 10:08 AM Yin Xiujiang <yinxiujiang@kylinos.cn> wrote:
->
-> Repalce kthread_create/wake_up_process() with kthread_run()
-> to simplify the code.
->
-> Signed-off-by: Yin Xiujiang <yinxiujiang@kylinos.cn>
-> ---
->  drivers/vhost/vhost.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 59edb5a1ffe2..19e9eda9fc71 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -595,7 +595,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
->
->         dev->kcov_handle = kcov_common_handle();
->         if (dev->use_worker) {
-> -               worker = kthread_create(vhost_worker, dev,
-> +               worker = kthread_run(vhost_worker, dev,
->                                         "vhost-%d", current->pid);
+On Fri, Nov 12, 2021 at 05:33:05PM +0100, Borislav Petkov wrote:
+> On Mon, Sep 13, 2021 at 05:55:59PM +0200, Joerg Roedel wrote:
+> > +		     "ljmpl	*%0" : :
+> > +		     "m" (real_mode_header->sev_real_ap_park_asm),
+> > +		     "b" (sev_es_jump_table_pa >> 4));
+> 
+> In any case, this asm needs comments: why those regs, why
+> sev_es_jump_table_pa >> 4 in rbx (I found later in the patch why) and so
+> on.
 
-Mike plans to introduce user_worker_create() to allow rlimit check[1].
-So this is probably not needed.
+Turned out the jump_table_pa is not used in asm code anymore. It was a
+left-over from a previous version of the patch, it is removed now.
 
-Thanks
+> > +SYM_INNER_LABEL(sev_ap_park_paging_off, SYM_L_GLOBAL)
+> 
+> Global symbol but used only in this file. .L-prefix then?
 
-[1] https://www.spinics.net/lists/kernel/msg4161030.html (I'm not sure
-this is the recent version, please check the list)
+It needs to be a global symbol so the pa_ variant can be generated.
 
+Regards,
 
->                 if (IS_ERR(worker)) {
->                         err = PTR_ERR(worker);
-> @@ -603,7 +603,6 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
->                 }
->
->                 dev->worker = worker;
-> -               wake_up_process(worker); /* avoid contributing to loadavg */
->
->                 err = vhost_attach_cgroups(dev);
->                 if (err)
-> --
-> 2.30.0
->
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
 
