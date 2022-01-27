@@ -2,90 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D6C049E22E
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:20:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60B4749E2AA
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:42:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240908AbiA0MUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 07:20:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58188 "EHLO
+        id S241369AbiA0MmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 07:42:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29757 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236183AbiA0MU2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 07:20:28 -0500
+        by vger.kernel.org with ESMTP id S241313AbiA0Mlv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 07:41:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643286028;
+        s=mimecast20190719; t=1643287311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uzpPscL9z4wKz7qcRqkschJ/Kte7IRMKOsYVxWkBfuo=;
-        b=dD9wyTWfF2jVCToiHHjZgVJRU2arm+0aFlD52fTmDicLkv5wiT7W2UV7pAIDCGlJQF1Rmx
-        oa/sBao5P1S1syR9O6TrEeDd0SPvgsLN9Z6yzI7fjYNqw6lvFgLbllAre2DyQl/UfXw5jr
-        kwKE0vpkxbr/vzw3c1+zjG6VE19Wnik=
+        bh=uNXpPtb2OXqXG9hmJBWkzD608J4s2s8/JsJidLVyecU=;
+        b=CW05eK1vUvlsPfFp6m9vJhou6V3Y9/AL8THswO2fdF4SXMpo4F731s7uMnTUxGznDD6E4e
+        uwDR5Q9PoLR++ma/yl1nUewvXFniju1YSdIYVcQmM0NsnNWcw8la6w2Lt7a00oIjsY+bF8
+        zEJkhCs0DRofSijDmdYq8esi6pqS8bU=
 Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
  [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-632-mwbYJzFyNzegA7DWTg6i6w-1; Thu, 27 Jan 2022 07:20:26 -0500
-X-MC-Unique: mwbYJzFyNzegA7DWTg6i6w-1
-Received: by mail-ed1-f72.google.com with SMTP id en7-20020a056402528700b00404aba0a6ffso1339548edb.5
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 04:20:26 -0800 (PST)
+ us-mta-166-DNEJ1_r1Ptu4U-wnxuNvDw-1; Thu, 27 Jan 2022 07:41:49 -0500
+X-MC-Unique: DNEJ1_r1Ptu4U-wnxuNvDw-1
+Received: by mail-ed1-f72.google.com with SMTP id i22-20020a0564020f1600b00407b56326a2so1351851eda.18
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 04:41:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=uzpPscL9z4wKz7qcRqkschJ/Kte7IRMKOsYVxWkBfuo=;
-        b=0pRdfyM2KAjNj/n2sOeY9YSZgHwdgfazbSj09gqYhhAgdcn714RQLVxeqIyy7ZKXjE
-         iZE7ZBrRrcqCuDXOLS7aIZCs8mO2PrAQy+aCNOHAZwCVfKgTQvCnqsX8U3KZ6+DJ1xVI
-         1JsiFTSjDxd/fCt+943trI8Es1wQ6rzgPnCqDgRY1wZDnrkVH8JPWP4v9M7CjqbQ5v1h
-         bbdldppgB/Qemw5cy9LF7cCOzugB401XT8QDsCRs5N78sKThlj32T7DwTDT2E1GB7rPU
-         KYJCy9GMwyeIfCOasXf6eeCbiqNznNshmmhiTZguw6RpvsmuPV+xi3NV8+ACWCi8MO9u
-         yJIw==
-X-Gm-Message-State: AOAM533IMe8kjmyyMZnkE6+fdloOAGThRVdLObGylXq7LWwd/xkPUPsG
-        3ss4NIaaL1dkEt4BMrxS7eJ7uof4jPB+lG3H0r4GhR+HBEqnTn8rV38ZQJyEN/h6GDpJ9SSIrPa
-        Lc4v2ZkGs/Ew8
-X-Received: by 2002:a05:6402:1c95:: with SMTP id cy21mr3510977edb.180.1643286025707;
-        Thu, 27 Jan 2022 04:20:25 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwovAiE8N4jHhYASNZqJZt1yAAMrrkhIsQg2fCzq3+XZzBwoZpG3I1ETIWyayqdACKNNzfFAg==
-X-Received: by 2002:a05:6402:1c95:: with SMTP id cy21mr3510962edb.180.1643286025540;
-        Thu, 27 Jan 2022 04:20:25 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id c14sm11297432edy.66.2022.01.27.04.20.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jan 2022 04:20:25 -0800 (PST)
-Message-ID: <3f4efc3d-f351-0fcb-e231-b422ea262f66@redhat.com>
-Date:   Thu, 27 Jan 2022 13:20:23 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uNXpPtb2OXqXG9hmJBWkzD608J4s2s8/JsJidLVyecU=;
+        b=KPVacrjDjqip3xfudjCdGRRPs3dUjDMe8y/yWesVZNhV3f44RG1zNP8SjOY2nDfG7F
+         wF9WWR2sQOTgCUqedi9+DsqElQyWe9IBpUzw4oJfolFY3OKfnA/97FqAAOxPqgk20RJ6
+         YxKAFPNJLGVup6SKE3f17V5KRUXRsfqfPaSGgzailx6xFuImgL8rMfgsNk+c5PcCveEL
+         MQWfiKxrFl8e+5/gYCu3LOZqCMGzWxRUK3vA1lqo7ILqJmVetzcD3lJexIMDnPQPBY3C
+         oZ6Jx7uG2/oiVOlsjVY7W4asGc9qrc44f4y8pcNr5PmuNVlKIXiL/V6ln2Lm3RW9/2tB
+         RmtA==
+X-Gm-Message-State: AOAM530W8GxKOrsRbUe9neCbg3wEmcbN7QsfZSCiiVpdNdXkMxMwHWel
+        gWkDFmxAuA3BjWuxPFnsYKnft9f++gsSOuSBz/ytPfeaGtU/nkhSGj308RRODtpKjSjrccHeUJV
+        DnEZUqUsBF9Up
+X-Received: by 2002:a17:907:7d89:: with SMTP id oz9mr2684960ejc.400.1643287308392;
+        Thu, 27 Jan 2022 04:41:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyotloQ/8jLEyYVrL4x9QKTye3cSBEx1XpJh+giSQrDeyBAnixpRAjtIqNHOtrp8KFRexubOA==
+X-Received: by 2002:a17:907:7d89:: with SMTP id oz9mr2684950ejc.400.1643287308220;
+        Thu, 27 Jan 2022 04:41:48 -0800 (PST)
+Received: from redhat.com ([2.55.140.126])
+        by smtp.gmail.com with ESMTPSA id g9sm8674052ejf.98.2022.01.27.04.41.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jan 2022 04:41:47 -0800 (PST)
+Date:   Thu, 27 Jan 2022 07:41:44 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yin Xiujiang <yinxiujiang@kylinos.cn>
+Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost: Make use of the helper macro kthread_run()
+Message-ID: <20220127074050-mutt-send-email-mst@kernel.org>
+References: <20220127020807.844630-1-yinxiujiang@kylinos.cn>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] KVM: use set_page_dirty rather than SetPageDirty
-Content-Language: en-US
-To:     Chris Mason <clm@fb.com>, Boris Burkov <boris@bur.io>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>
-References: <08b5b2c516b81788ca411dc031d403de4594755e.1643226777.git.boris@bur.io>
- <YfHEJpP+1c9QZxA0@google.com> <YfHVB5RmLZn2ku5M@zen>
- <3876CE62-6E66-4CCE-ADED-69010EA72394@fb.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <3876CE62-6E66-4CCE-ADED-69010EA72394@fb.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220127020807.844630-1-yinxiujiang@kylinos.cn>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/27/22 01:02, Chris Mason wrote:
-> From the btrfs side, bare calls to set_page_dirty() are suboptimal,
-> since it doesn’t go through the ->page_mkwrite() dance that we use to
-> properly COW things.  It’s still much better than SetPageDirty(), but
-> I’d love to understand why kvm needs to dirty the page so we can
-> figure out how to go through the normal mmap file io paths.
-Shouldn't ->page_mkwrite() occur at the point of get_user_pages, such as 
-via handle_mm_fault->handle_pte_fault->do_fault->do_shared_fault?  That 
-always happens before SetPageDirty(), or set_page_dirty() after Boris's 
-patch.
+On Thu, Jan 27, 2022 at 10:08:07AM +0800, Yin Xiujiang wrote:
+> Repalce kthread_create/wake_up_process() with kthread_run()
+> to simplify the code.
+> 
+> Signed-off-by: Yin Xiujiang <yinxiujiang@kylinos.cn>
+> ---
+>  drivers/vhost/vhost.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 59edb5a1ffe2..19e9eda9fc71 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -595,7 +595,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+>  
+>  	dev->kcov_handle = kcov_common_handle();
+>  	if (dev->use_worker) {
+> -		worker = kthread_create(vhost_worker, dev,
+> +		worker = kthread_run(vhost_worker, dev,
+>  					"vhost-%d", current->pid);
+>  		if (IS_ERR(worker)) {
+>  			err = PTR_ERR(worker);
+> @@ -603,7 +603,6 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+>  		}
+>  
+>  		dev->worker = worker;
+> -		wake_up_process(worker); /* avoid contributing to loadavg */
+>  
+>  		err = vhost_attach_cgroups(dev);
+>  		if (err)
 
-Thanks,
+I think if you do this, you need to set dev->worker earlier.
 
-Paolo
+> -- 
+> 2.30.0
 
