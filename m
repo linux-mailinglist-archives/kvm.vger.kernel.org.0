@@ -2,52 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 393FD49D8CB
+	by mail.lfdr.de (Postfix) with ESMTP id AEDE049D8CC
 	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 04:09:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232655AbiA0DJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jan 2022 22:09:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37082 "EHLO
+        id S233048AbiA0DJG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jan 2022 22:09:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231422AbiA0DJD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jan 2022 22:09:03 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F39BC06161C
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 19:09:03 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id f1-20020a17090a8e8100b001b44bb75678so962664pjo.0
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 19:09:03 -0800 (PST)
+        with ESMTP id S231422AbiA0DJF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jan 2022 22:09:05 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C62C06161C
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 19:09:04 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id ik14-20020a170902ab0e00b0014c84153eb0so264212plb.17
+        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 19:09:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=qQhHuHqO4mFrHPSE8WimHoA11N0d1fYrE1SY2mGY6Qc=;
-        b=AeahOZQjcsgIAlBb1KD/OZ8PVPYBQ2ylDADyPOudw4Z4kXmYPJ1MrGdcSVR5uLaI67
-         +LrpE7Pm7x8uzhzrkEpct9nGSwUhH+sprWnwFAVs0iZ+iUDWTgBxg+bV+qJ7FuA4I5Hl
-         5TJbhQNlDMOuLzuCiQ2uWYF16f0T0pTJWe1ctXitY60ZEW6Zbj08b1baBBDl2Dgc6rnn
-         l5vachi7RMN0G0V0sGLeWL+FiFK9io56q3X9SfSbF7O1Q+S4i5jk1316hGU1XPzpIIRo
-         h9Zv71Ewj5zg7Mf64bT8zyYz4N1Tx/iAYF8ftqeuZgbvcjNzz473OFeBybIJKB34qsbs
-         QBaA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=y8xiYhpGFxFKO0m5kKEQAv7sJcYQ8XNaG5VWu+Ph1Do=;
+        b=FEdpoVYgU4JntAof5I9WPwlqD9ZAVq8CUvLK6LaYoB1EHNTpqXFRq12cfq0POmb7u4
+         iwYEykWf5MFxuGpvTqbIeaHJmgchKLL9KC1XEH+L+9QbWZJDbn3bZc8H3/u00ZPHtr0X
+         VuRcbdSQdY18NlDVx9MBPJBs/5uX5ghdFrbf4hHJDui+jCFIRSYmq3J+/k2aAAZQ2crs
+         x98ADrn7phtxBIpgPUpS+kmW4QqRruyi9+Wrds4PZGFQa3+cEBJTeyV1aUaSgBE6VrRr
+         ui92v01imlYes9h9PEykIb9PDmtvZK5kxw/IFLpZcaPVIrnzb6DRfnLa/aXe2eLRHe0a
+         qJNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=qQhHuHqO4mFrHPSE8WimHoA11N0d1fYrE1SY2mGY6Qc=;
-        b=fGVenrBP5fionz1K3HJu2EzaG8XWVxDb0GVbisQgsroH8G4ossMkfuUAq4mUyYquHh
-         ck/Sl1ktpNxrgt05QYxvL008p0mqiix6ugNMN8fO36Va0xpv1KFHTBvIBy6mQ7pEApzV
-         xjMK2L2ZUQkCqfKdwDw2YJd10NYWx4nMNhHre+exP+2oHSJJ/faxf6y6jwqr3WBVkWcM
-         9CcsC94GylVeCjsNoXoKVOrJHcH0kt5hbUsbWSAlOBPpQbO6zzI4475kfWztdbUKiyxf
-         CgGP7PvuzoxjNBd7CPHqaaL7OFZhgn4TPfz8iTlgEW/gQ0k3DEOT+1+EIaquZ3A4pWJM
-         L92g==
-X-Gm-Message-State: AOAM533rYwjtRqTjjNW4XvxYcxvtwQCn6d3IBB6+mgrbFqu4oAqC0twW
-        HBwOhYQYtE/AfyoJ5wFF/mpU6zgFT4MLPN1l8ThO9rLVpK0n+0uOxLOfmiAfnS9XPRhFxcO6awt
-        qGnQ00libYd/RWkF02Ft/OgqZVxFeVaux2PTvS97waXWyazFgy8j9Wj1kUBRPZqA=
-X-Google-Smtp-Source: ABdhPJwUKp1D8NergYPjzU7Dnd2HDvJg74lXmpzVjlCsIjbC/2nBeb7exjp/OrMe5BZ5inmqkLiTId0amwMHIQ==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=y8xiYhpGFxFKO0m5kKEQAv7sJcYQ8XNaG5VWu+Ph1Do=;
+        b=PF8ANe5rtOu8bvWdjHyj51lT1seOaiTdYhlOy558s3BsqFUHTJLYdToWc++K6skBA8
+         vV9YuFfLlKLn5f0lqerLH2DDoLtcmWC2jsAujtDkllsy00t+OBcC6CVcSc4/GGaWr51s
+         Oh8EXgTdb4UrMP3dkGJZJ8B1+4zedg6HGara2PdftGRglKGN+LgfcLKRTo3EZ5sEkEDD
+         gfNWb+mhz7gXEdgjAckejTmo1q9Z45xI4ZuFHOW103J+ZpoTl5xeSQw/U9ZTZeG7K2ku
+         qTRXN8ZZBkXwXbJ/L/aSLH6OWN/1TZN5fpZJ+cQSH2mk5Z7+0pCvLf6b5Zw4JBk9+T2Q
+         tQbA==
+X-Gm-Message-State: AOAM531UXnSO+rlWeGD3sJPNr54BrwW5/AFlQ730BayqGzcluRE8DNsk
+        EMaOXL2JMDvLP0TXwlvvzrgf6KRuDGnkChdIrzGnZWTDZaVxo2VQD3NX7sop8vS4s7lqk4wonEQ
+        Nc5ZkSK+sYbQXsV7OnjcIMObHu+PUnr/Ot16BhIyUDuJCu/UFrTm8zgwRbjO5BwM=
+X-Google-Smtp-Source: ABdhPJxmaasoGq2r0NV2rJ2gM2vKa93DMcKl2L+uSImOPLZd8TXUisygF0ba4SClaxCVIoaZZ4OxxQkMcxetyw==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a62:5292:: with SMTP id
- g140mr1282751pfb.55.1643252942452; Wed, 26 Jan 2022 19:09:02 -0800 (PST)
-Date:   Wed, 26 Jan 2022 19:08:53 -0800
-Message-Id: <20220127030858.3269036-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a63:d943:: with SMTP id
+ e3mr1310151pgj.427.1643252944210; Wed, 26 Jan 2022 19:09:04 -0800 (PST)
+Date:   Wed, 26 Jan 2022 19:08:54 -0800
+In-Reply-To: <20220127030858.3269036-1-ricarkol@google.com>
+Message-Id: <20220127030858.3269036-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20220127030858.3269036-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-Subject: [PATCH v2 0/5] kvm: selftests: aarch64: some fixes for vgic_irq
+Subject: [PATCH v2 1/5] kvm: selftests: aarch64: fix assert in gicv3_access_reg
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com
@@ -59,39 +63,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reiji discovered multiple issues with the vgic_irq series [0]:
-1. there's an assert that needs fixing.
-2. some guest arguments are not set correctly.
-3. the failure test in kvm_set_gsi_routing_irqchip_check is wrong.
-4. there are lots of comments that use the wrong formatting.
-5. vgic_poke_irq() could use a tighter assert check.
+The val argument in gicv3_access_reg can have any value when used for a
+read, not necessarily 0.  Fix the assert by checking val only for
+writes.
 
-The first 3 issues above are critical, the last 2 would be nice to have.  I
-haven't hit the failed assert (1.), but just by chance: my compiler is
-initializing the respective local variable to 0. The second issue (2.) leads to
-not testing one of the injection methods (irqfd). The third issue could be hit
-if we tested more intids.
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reported-by: Reiji Watanabe <reijiw@google.com>
+Cc: Andrew Jones <drjones@redhat.com>
+---
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v1 -> v2:
-- adding 3 more fixes: 2, 3, 5 above. (Reiji)
-- corrected the comments in 4 above. (Andrew)
-- dded drjones@ reviewed-by tag.
-
-[0] https://lore.kernel.org/kvmarm/164072141023.1027791.3183483860602648119.b4-ty@kernel.org/
-
-Ricardo Koller (5):
-  kvm: selftests: aarch64: fix assert in gicv3_access_reg
-  kvm: selftests: aarch64: pass vgic_irq guest args as a pointer
-  kvm: selftests: aarch64: fix the failure check in
-    kvm_set_gsi_routing_irqchip_check
-  kvm: selftests: aarch64: fix some vgic related comments
-  kvm: selftests: aarch64: use a tighter assert in vgic_poke_irq()
-
- .../testing/selftests/kvm/aarch64/vgic_irq.c  | 45 +++++++++++--------
- .../selftests/kvm/lib/aarch64/gic_v3.c        | 12 ++---
- .../testing/selftests/kvm/lib/aarch64/vgic.c  |  9 ++--
- 3 files changed, 38 insertions(+), 28 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+index 00f613c0583c..e4945fe66620 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+@@ -159,7 +159,7 @@ static void gicv3_access_reg(uint32_t intid, uint64_t offset,
+ 	uint32_t cpu_or_dist;
+ 
+ 	GUEST_ASSERT(bits_per_field <= reg_bits);
+-	GUEST_ASSERT(*val < (1U << bits_per_field));
++	GUEST_ASSERT(!write || *val < (1U << bits_per_field));
+ 	/* Some registers like IROUTER are 64 bit long. Those are currently not
+ 	 * supported by readl nor writel, so just asserting here until then.
+ 	 */
 -- 
 2.35.0.rc0.227.g00780c9af4-goog
 
