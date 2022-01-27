@@ -2,42 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C07949E18E
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 12:48:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C13A649E198
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 12:50:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240914AbiA0LsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 06:48:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240877AbiA0LsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 06:48:11 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F01DC061747
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 03:48:11 -0800 (PST)
+        id S236031AbiA0Lug (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 06:50:36 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:46576 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230026AbiA0Lug (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 06:50:36 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id A0F4CCE21A1
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 11:48:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D87C340EB;
-        Thu, 27 Jan 2022 11:48:07 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id ABF26CE2191
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 11:50:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2314DC340E4;
+        Thu, 27 Jan 2022 11:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643284087;
-        bh=xCqfeUzSsfMIQ36LI/gRTI/XYXEjr23cIsrNayduwco=;
+        s=k20201202; t=1643284233;
+        bh=Fj6rO6IaAAe0YbSiAt6fjuOzaeN3xp1+03RZCltF6rs=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=RWpiHXrAzPQ/+jzK0XDusG6l8RdoqqvHeOxNtT9PmIsNLNZErjJ8XsRyLvpT+WEMi
-         31NiMgBzHeJ+WPlueHen21rhVye0UVontHjS97uYvRe1KsHYdt0wD4wT6LP4PbIx8d
-         uDAYlFy0QFOUL2dM9Pssf20klHRfwP1yvf8KQssi2VYGUlqEUiTfpv9dO3xyaS9x45
-         gggos/HEBi8neB9+HJ0y4EgI1pt+ap0nbHtQFPrT8zXcSYnk2nnsFnD0IH95KZSgDG
-         iROI65D7s1ZPT33lL4KpOboD8aRvluYRuJ6DvUM/QKM3bl0JGnH+QGAdkUCWLjyTdO
-         gudATOFkMYGfw==
+        b=JQXFBkdwSCOaHmz5Cs6OTKaLnLNHdXTyq3D13G8DzRkTUVG8MExagW9w3SpN4gLVx
+         ANX8bKduLwrEY9MoksbsBVgFy2Sh0BKdy5mrEAFzEmXsWvgqi5w1gOTHMoqSwgoo3g
+         4ArYBI2Rx4hwjRr/sRJdAmHATuYOt0+kPM+oeLPgM9fgeKeS4feiXrNu2Hmw/y+t6u
+         oBrXWorCAxGA0O29HxquAH9PhmkkmTv4YnxjRsJTH8+BgtsbWJyCMmEJEnTvE1awZ4
+         nHTiRYS+Q2NwnCFK38PFvFusRyVMtPnsMQsHgFqoiIK2aWAjyGzD8lQfnLS9ktpHFP
+         6lQO8SJohJe6A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nD3G1-003UZm-TI; Thu, 27 Jan 2022 11:48:06 +0000
-Date:   Thu, 27 Jan 2022 11:48:05 +0000
-Message-ID: <8735l9762y.wl-maz@kernel.org>
+        id 1nD3IN-003UfR-8X; Thu, 27 Jan 2022 11:50:31 +0000
+Date:   Thu, 27 Jan 2022 11:50:30 +0000
+Message-ID: <871r0t75yx.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -49,11 +46,11 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH v5 67/69] KVM: arm64: nv: Enable ARMv8.4-NV support
-In-Reply-To: <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
+Subject: Re: [PATCH v5 38/69] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+In-Reply-To: <21b0fca8-6b31-dc63-7637-2f80c4b3a272@os.amperecomputing.com>
 References: <20211129200150.351436-1-maz@kernel.org>
-        <20211129200150.351436-68-maz@kernel.org>
-        <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
+        <20211129200150.351436-39-maz@kernel.org>
+        <21b0fca8-6b31-dc63-7637-2f80c4b3a272@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,108 +64,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Jan 2022 11:50:18 +0000,
+On Tue, 18 Jan 2022 11:24:04 +0000,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
 > 
 > 
 > On 30-11-2021 01:31 am, Marc Zyngier wrote:
-> > As all the VNCR-capable system registers are nicely separated
-> > from the rest of the crowd, let's set HCR_EL2.NV2 on and let
-> > the ball rolling.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >   arch/arm64/include/asm/kvm_arm.h     |  1 +
-> >   arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
-> >   arch/arm64/include/asm/sysreg.h      |  1 +
-> >   arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
-> >   4 files changed, 28 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index b603466803d2..18c35446249f 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -20,6 +20,7 @@
-> >   #define HCR_AMVOFFEN	(UL(1) << 51)
-> >   #define HCR_FIEN	(UL(1) << 47)
-> >   #define HCR_FWB		(UL(1) << 46)
-> > +#define HCR_NV2		(UL(1) << 45)
-> >   #define HCR_AT		(UL(1) << 44)
-> >   #define HCR_NV1		(UL(1) << 43)
-> >   #define HCR_NV		(UL(1) << 42)
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index 1664430be698..f282997e4a4c 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -245,21 +245,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
-> >     static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context
-> > *ctxt, u64 val)
-> >   {
-> > -	if (!__vcpu_el2_e2h_is_set(ctxt)) {
-> > -		/*
-> > -		 * Clear the .M field when writing SPSR to the CPU, so that we
-> > -		 * can detect when the CPU clobbered our SPSR copy during a
-> > -		 * local exception.
-> > -		 */
-> > -		val &= ~0xc;
-> > -	}
-> > +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> > +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+> > +{
+> > +	bool nested_stage2_enabled = hcr & HCR_VM;
+> > +	int i;
 > > +
-> > +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
-> > +		return val;
-> >   -	return val;
+> > +	/* Don't consider the CnP bit for the vttbr match */
+> > +	vttbr = vttbr & ~VTTBR_CNP_BIT;
+> > +
 > > +	/*
-> > +	 * Clear the .M field when writing SPSR to the CPU, so that we
-> > +	 * can detect when the CPU clobbered our SPSR copy during a
-> > +	 * local exception.
-> > +	 */
-> > +	return val &= ~0xc;
-> >   }
-> >     static inline u64 __fixup_spsr_el2_read(const struct
-> > kvm_cpu_context *ctxt, u64 val)
-> >   {
-> > -	if (__vcpu_el2_e2h_is_set(ctxt))
-> > +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
-> > +
-> > +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
-> >   		return val;
-> >     	/*
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 71e6a0410e7c..5de90138d0a4 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -550,6 +550,7 @@
-> >   #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
-> >   #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-> >   #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-> > +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
-> >     #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
-> >   #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index ef4488db6dc1..5cadda79089a 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -45,7 +45,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
-> >   			 * the EL1 virtual memory control register accesses
-> >   			 * as well as the AT S1 operations.
-> >   			 */
-> > -			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
-> > +			if (enhanced_nested_virt_in_use(vcpu)) {
-> > +				hcr &= ~HCR_TVM;
+> > +	 * Two possibilities when looking up a S2 MMU context:
+> > +	 *
+> > +	 * - either S2 is enabled in the guest, and we need a context that
+> > +         *   is S2-enabled and matches the full VTTBR (VMID+BADDR), which
+> > +         *   makes it safe from a TLB conflict perspective (a broken guest
+> > +         *   won't be able to generate them),
+> > +	 *
+> > +	 * - or S2 is disabled, and we need a context that is S2-disabled
+> > +         *   and matches the VMID only, as all TLBs are tagged by VMID even
+> > +         *   if S2 translation is enabled.
 > 
-> I think, we should clear TRVM also?
-> 				hcr &= ~(HCR_TVM | HCR_TRVM);
+> I think you were intended to say "if S2 translation is disabled".
 
-Hmmm. But TRVM is never set the first place, is it? It is only here
-that we augment the host HCR_EL2 with various trap configurations
-depending on whether the host is NV2 capable or not, whether the
-guest is VHE or not, and whether the guest as set of additional flags
-of its own.
-
-Given that, I don't think there is a need to clear this bit.
+Yes, absolutely. Good catch.
 
 Thanks,
+
 	M.
 
 -- 
