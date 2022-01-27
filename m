@@ -2,113 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8594C49DBF4
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 08:51:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB59649DC39
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 09:08:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237523AbiA0Hv1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 02:51:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46522 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229949AbiA0Hv0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 02:51:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643269885;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GZX/pfOEsztdvqNPhksRj9ximKWEK/m51aO4OO9gIOw=;
-        b=b7Jp4AcX3kuHQxt/Fk5erIL/0UiD5952SRoSIA7LKavxlHgr/qmBXNKI30Ag9x0NH7nSN+
-        JaIlOmwGGHO0hjrxyUZJyCQW672B5XDVaiUJE3v2MQ9B+oFDwSiJrUObG+x1wDQuhmBPFK
-        2ZCTfVMKyTfiagqs/sBR4qZm+6JHrME=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-204-mn7MAz0jMpa3xTDfx5jVKQ-1; Thu, 27 Jan 2022 02:51:24 -0500
-X-MC-Unique: mn7MAz0jMpa3xTDfx5jVKQ-1
-Received: by mail-ej1-f72.google.com with SMTP id l18-20020a1709063d3200b006a93f7d4941so961180ejf.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jan 2022 23:51:24 -0800 (PST)
+        id S237647AbiA0II4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 03:08:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44246 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230127AbiA0IIz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 03:08:55 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61485C061714
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 00:08:55 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id s61-20020a17090a69c300b001b4d0427ea2so6790454pjj.4
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 00:08:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=ukAePQcf9i0MGvA93UEEE3eWPNIcxKo3bKjwJk0vYgM=;
+        b=Uhb7uzZ89NE6F6e1HJRS7fnGaaQhKXxyGA8iLxQ1f4pkmT6lEVYQGyAWlnj9IsOg1Z
+         Vq49UNsdGuu8baiVUxA81oAmTS9IsBmLKwBw+lzG6qsd+U/J5bgClivPd1GPej9I17s2
+         g6RNa3yx97npsN0+i4gHsMW2oh3e3cPFhO9iDDwJeT7PGvhoG4FvV8/E9JuOYicgntZJ
+         UJAROeZIntKfGiPilraLq+P7tPd9uljJO9+Qq1ccTYMLIrox6d1rCfi/2jjLlj4K7K6s
+         HnTz9SvUKQAm5GXu+o5si0Q+ranoqohtM2M4dAnEOHirT07aYurd1WNbKQt+yMJtlPsG
+         oYvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GZX/pfOEsztdvqNPhksRj9ximKWEK/m51aO4OO9gIOw=;
-        b=8Oll2obdvpRlkmnTwPSC/DPyo/K9I6btO88am5iOso9UDnWWpvXOObLHTwcQx17vBv
-         L+Tktx8ppcxREX7sazfUy+Oh35YFVSat91li8kLY9Zy0VwU/5VvDfMP6T+P3vjVush5V
-         p7WIt3OLSf8oShYklnp32AXIb7NaTMcXujAgt0IeoMRY7wVs9cYMlcjibvmOGOgj98/D
-         JNQ63BogkXLOaKv+dMBFBfRgGSYMNnGT7vMVRphmatNYqeFw5ZcKmu31WsJ/WAj9mbL2
-         UF92raST1yUrx7v56//a79ecZM8WhNPqs0bvoTkUsoRwG61zhL3KUG875dkDfUoHG9sZ
-         0WSQ==
-X-Gm-Message-State: AOAM533uqtvzrWTAFl0cf0rgQNrYXENNkFoDWVgsGmcgAtl2TkZUkwfq
-        6cKdVzzA+v6IZV7UtHaC74/USSiDtKe6CV7AwHb+H/+8PJbc6Sy3iu3wJQa69d2uTTL5Kq46Z+F
-        pbAseQf1O4PgW
-X-Received: by 2002:a17:907:7ba9:: with SMTP id ne41mr2137813ejc.554.1643269883097;
-        Wed, 26 Jan 2022 23:51:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwG/4UQhcMKE386PoihoaUB7txnfoFbjmOGSKcgi5XKPa25Kh8n1GHpKiCaWiNcG0+jyHaPGA==
-X-Received: by 2002:a17:907:7ba9:: with SMTP id ne41mr2137807ejc.554.1643269882938;
-        Wed, 26 Jan 2022 23:51:22 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id g15sm10892632edy.77.2022.01.26.23.51.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 23:51:22 -0800 (PST)
-Date:   Thu, 27 Jan 2022 08:51:20 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH v2 5/5] kvm: selftests: aarch64: use a tighter assert in
- vgic_poke_irq()
-Message-ID: <20220127075120.5ntwadlgf2ncd2ua@gator>
-References: <20220127030858.3269036-1-ricarkol@google.com>
- <20220127030858.3269036-6-ricarkol@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=ukAePQcf9i0MGvA93UEEE3eWPNIcxKo3bKjwJk0vYgM=;
+        b=Tev6cVLMDq/0hdqsy8TaUh9xjIS/SqfYj4GsdHuddaZDgHh8440Urvs9S6jAbzYmfI
+         9zSP2oaz5aP2KJHP1gMQvjPgWiIZcSqp+9c4jcidQ+lGuuqKlbqcj+CJLC+FNGKbwIGC
+         gnvZ0YYmd9BU+Z0HIun6Gx4PtUAK/Y4viemAF4nbay0qV043B4mml8gTcy0oZDPAmL1N
+         Vu3NcW4BJ6uqPYgxB/JUGkf/L8RExseqvZZ7s0wM1jKJkIrtRpG20scejXzRvfn5ABTQ
+         2yA3p14ypjI1nrKUiz0vdifbeFgDrATYwvWcyGgPGpbzdfXiGshyg1aA87VMWSBWebft
+         yBhQ==
+X-Gm-Message-State: AOAM531KhhnZuS9Kuf25Qh1X4Nz9qjufiRYtO9D5T4g1IRenlIlUoKcd
+        7o3F0S82xc5UMlCVzy1SXAA=
+X-Google-Smtp-Source: ABdhPJyduXrHWfK1hAI5gdVlTBM1OhGiL6kjUZduDacN/AeT3oWCQmpCNeRPUJ9CTWGtutYvocOklA==
+X-Received: by 2002:a17:90b:4b88:: with SMTP id lr8mr12890029pjb.166.1643270934215;
+        Thu, 27 Jan 2022 00:08:54 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id p42sm4501760pfw.71.2022.01.27.00.08.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jan 2022 00:08:53 -0800 (PST)
+Message-ID: <32f14a72-456d-b213-80c5-5d729b829c90@gmail.com>
+Date:   Thu, 27 Jan 2022 16:08:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220127030858.3269036-6-ricarkol@google.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.0
+Subject: Re: [kvm:queue 305/328] arch/x86/kvm/x86.c:4345:32: warning: cast to
+ pointer from integer of different size
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        kernel test robot <lkp@intel.com>
+References: <202201270930.LTyNaecg-lkp@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+In-Reply-To: <202201270930.LTyNaecg-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 07:08:58PM -0800, Ricardo Koller wrote:
-> vgic_poke_irq() checks that the attr argument passed to the vgic device
-> ioctl is sane. Make this check tighter by moving it to after the last
-> attr update.
+On 27/1/2022 9:52 am, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+> head:   b029c138e8f090f5cb9ba77ef20509f903ef0004
+> commit: db9556a4eb6b43313cee57abcbbbad01f2708baa [305/328] KVM: x86: add system attribute to retrieve full set of supported xsave states
+> config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20220127/202201270930.LTyNaecg-lkp@intel.com/config)
+> compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+> reproduce (this is a W=1 build):
+>          # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=db9556a4eb6b43313cee57abcbbbad01f2708baa
+>          git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+>          git fetch --no-tags kvm queue
+>          git checkout db9556a4eb6b43313cee57abcbbbad01f2708baa
+>          # save the config file to linux build tree
+>          mkdir build_dir
+>          make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Cc: Andrew Jones <drjones@redhat.com>
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>     In file included from include/linux/uaccess.h:11,
+>                      from include/linux/sched/task.h:11,
+>                      from include/linux/sched/signal.h:9,
+>                      from include/linux/rcuwait.h:6,
+>                      from include/linux/percpu-rwsem.h:7,
+>                      from include/linux/fs.h:33,
+>                      from include/linux/huge_mm.h:8,
+>                      from include/linux/mm.h:717,
+>                      from include/linux/kvm_host.h:16,
+>                      from arch/x86/kvm/x86.c:19:
+>     arch/x86/kvm/x86.c: In function 'kvm_x86_dev_get_attr':
+>>> arch/x86/kvm/x86.c:4345:32: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+>      4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>           |                                ^
+
+Similar to kvm_arch_tsc_{s,g}et_attr(), how about this fix:
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8033eca6f..6d4e961d0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4342,7 +4342,7 @@ static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
+
+         switch (attr->attr) {
+         case KVM_X86_XCOMP_GUEST_SUPP:
+-               if (put_user(supported_xcr0, (u64 __user *)attr->addr))
++               if (put_user(supported_xcr0, (u64 __user *)(unsigned 
+long)attr->addr))
+                         return -EFAULT;
+                 return 0;
+         default:
+
+>     arch/x86/include/asm/uaccess.h:221:24: note: in definition of macro 'do_put_user_call'
+>       221 |  register __typeof__(*(ptr)) __val_pu asm("%"_ASM_AX);  \
+>           |                        ^~~
+>     arch/x86/kvm/x86.c:4345:7: note: in expansion of macro 'put_user'
+>      4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>           |       ^~~~~~~~
+>>> arch/x86/kvm/x86.c:4345:32: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+>      4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>           |                                ^
+>     arch/x86/include/asm/uaccess.h:223:14: note: in definition of macro 'do_put_user_call'
+>       223 |  __ptr_pu = (ptr);      \
+>           |              ^~~
+>     arch/x86/kvm/x86.c:4345:7: note: in expansion of macro 'put_user'
+>      4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>           |       ^~~~~~~~
+>>> arch/x86/kvm/x86.c:4345:32: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+>      4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>           |                                ^
+>     arch/x86/include/asm/uaccess.h:230:31: note: in definition of macro 'do_put_user_call'
+>       230 |          [size] "i" (sizeof(*(ptr)))   \
+>           |                               ^~~
+>     arch/x86/kvm/x86.c:4345:7: note: in expansion of macro 'put_user'
+>      4345 |   if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>           |       ^~~~~~~~
+> 
+> 
+> vim +4345 arch/x86/kvm/x86.c
+> 
+>    4337	
+>    4338	static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
+>    4339	{
+>    4340		if (attr->group)
+>    4341			return -ENXIO;
+>    4342	
+>    4343		switch (attr->attr) {
+>    4344		case KVM_X86_XCOMP_GUEST_SUPP:
+>> 4345			if (put_user(supported_xcr0, (u64 __user *)attr->addr))
+>    4346				return -EFAULT;
+>    4347			return 0;
+>    4348		default:
+>    4349			return -ENXIO;
+>    4350			break;
+>    4351		}
+>    4352	}
+>    4353	
+> 
 > ---
->  tools/testing/selftests/kvm/lib/aarch64/vgic.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> index 79864b941617..f365c32a7296 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -138,9 +138,6 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
->  	uint64_t val;
->  	bool intid_is_private = INTID_IS_SGI(intid) || INTID_IS_PPI(intid);
->  
-> -	/* Check that the addr part of the attr is within 32 bits. */
-> -	assert(attr <= KVM_DEV_ARM_VGIC_OFFSET_MASK);
-> -
->  	uint32_t group = intid_is_private ? KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
->  					  : KVM_DEV_ARM_VGIC_GRP_DIST_REGS;
->  
-> @@ -150,6 +147,9 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
->  		attr += SZ_64K;
->  	}
->  
-> +	/* Check that the addr part of the attr is within 32 bits. */
-> +	assert((attr & ~KVM_DEV_ARM_VGIC_OFFSET_MASK) == 0);
-> +
->  	/*
->  	 * All calls will succeed, even with invalid intid's, as long as the
->  	 * addr part of the attr is within 32 bits (checked above). An invalid
-> -- 
-> 2.35.0.rc0.227.g00780c9af4-goog
->
-
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
