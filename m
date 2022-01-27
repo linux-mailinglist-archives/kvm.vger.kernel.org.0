@@ -2,97 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C13A649E198
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 12:50:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A5E249E19A
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 12:50:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236031AbiA0Lug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 06:50:36 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:46576 "EHLO
+        id S236035AbiA0Luq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 06:50:46 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:46616 "EHLO
         sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbiA0Lug (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 06:50:36 -0500
+        with ESMTP id S236038AbiA0Lup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 06:50:45 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id ABF26CE2191
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 11:50:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2314DC340E4;
-        Thu, 27 Jan 2022 11:50:33 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 421DACE2191
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 11:50:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B206AC340E4;
+        Thu, 27 Jan 2022 11:50:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643284233;
-        bh=Fj6rO6IaAAe0YbSiAt6fjuOzaeN3xp1+03RZCltF6rs=;
+        s=k20201202; t=1643284242;
+        bh=EHG35VhiFenk9etoqbqcNVwjMc/WsFfgliwTB9AIFJM=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JQXFBkdwSCOaHmz5Cs6OTKaLnLNHdXTyq3D13G8DzRkTUVG8MExagW9w3SpN4gLVx
-         ANX8bKduLwrEY9MoksbsBVgFy2Sh0BKdy5mrEAFzEmXsWvgqi5w1gOTHMoqSwgoo3g
-         4ArYBI2Rx4hwjRr/sRJdAmHATuYOt0+kPM+oeLPgM9fgeKeS4feiXrNu2Hmw/y+t6u
-         oBrXWorCAxGA0O29HxquAH9PhmkkmTv4YnxjRsJTH8+BgtsbWJyCMmEJEnTvE1awZ4
-         nHTiRYS+Q2NwnCFK38PFvFusRyVMtPnsMQsHgFqoiIK2aWAjyGzD8lQfnLS9ktpHFP
-         6lQO8SJohJe6A==
+        b=aFiHYu8/xdaef46fz7K/wPxY7df2ZCwNlMVypNehpGgBd5fY992ODsXOTdyAis0kj
+         MHG1l2Vp+b9HV3nmL1MD0OkzWny7VTYcTPMJ4GG0vTiYuEspdK+JemRTP5Oh9sUR4z
+         ykP7WGZX0pvOJrlhK3kZjr4vSic/sMv1qTdPKKzpc8yAQvvOO4TTWpad6CA4N/mcrY
+         MV8R67K0ki9ChFaHFHUwFSumaxV9sI8O8StSSLD07pEum67DEaZ5vZS2+LcDxKYNY9
+         mz7dobWobDjBo0Y0QLzh/yqYLBQ0czWTrh3BgbRGAgBWOhszJwbvdYPie/Bk0GxbJY
+         Gx3iUyu8gXf/A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nD3IN-003UfR-8X; Thu, 27 Jan 2022 11:50:31 +0000
-Date:   Thu, 27 Jan 2022 11:50:30 +0000
-Message-ID: <871r0t75yx.wl-maz@kernel.org>
+        id 1nD3IW-003UfZ-KY; Thu, 27 Jan 2022 11:50:40 +0000
+Date:   Thu, 27 Jan 2022 11:50:40 +0000
+Message-ID: <87zgnh5re7.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
         Christoffer Dall <christoffer.dall@arm.com>,
         Jintack Lim <jintack@cs.columbia.edu>,
         Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH v5 38/69] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-In-Reply-To: <21b0fca8-6b31-dc63-7637-2f80c4b3a272@os.amperecomputing.com>
+Subject: Re: [PATCH v5 16/69] KVM: arm64: nv: Handle trapped ERET from virtual EL2
+In-Reply-To: <Yebsq0wWHO5mWZjx@monolith.localdoman>
 References: <20211129200150.351436-1-maz@kernel.org>
-        <20211129200150.351436-39-maz@kernel.org>
-        <21b0fca8-6b31-dc63-7637-2f80c4b3a272@os.amperecomputing.com>
+        <20211129200150.351436-17-maz@kernel.org>
+        <Yebsq0wWHO5mWZjx@monolith.localdoman>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Jan 2022 11:24:04 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Tue, 18 Jan 2022 16:36:59 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
+> Hi Marc,
 > 
-> 
-> On 30-11-2021 01:31 am, Marc Zyngier wrote:
-> > +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
-> > +{
-> > +	bool nested_stage2_enabled = hcr & HCR_VM;
-> > +	int i;
+> On Mon, Nov 29, 2021 at 08:00:57PM +0000, Marc Zyngier wrote:
+> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > 
+> > When a guest hypervisor running virtual EL2 in EL1 executes an ERET
+> > instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
+> > that we can emulate the exception return in software.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/esr.h     |  5 +++++
+> >  arch/arm64/include/asm/kvm_arm.h |  2 +-
+> >  arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
+> >  3 files changed, 16 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > index d52a0b269ee8..6835e4231119 100644
+> > --- a/arch/arm64/include/asm/esr.h
+> > +++ b/arch/arm64/include/asm/esr.h
+> > @@ -257,6 +257,11 @@
+> >  		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
+> >  		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+> >  
+> > +/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
 > > +
-> > +	/* Don't consider the CnP bit for the vttbr match */
-> > +	vttbr = vttbr & ~VTTBR_CNP_BIT;
-> > +
-> > +	/*
-> > +	 * Two possibilities when looking up a S2 MMU context:
-> > +	 *
-> > +	 * - either S2 is enabled in the guest, and we need a context that
-> > +         *   is S2-enabled and matches the full VTTBR (VMID+BADDR), which
-> > +         *   makes it safe from a TLB conflict perspective (a broken guest
-> > +         *   won't be able to generate them),
-> > +	 *
-> > +	 * - or S2 is disabled, and we need a context that is S2-disabled
-> > +         *   and matches the VMID only, as all TLBs are tagged by VMID even
-> > +         *   if S2 translation is enabled.
-> 
-> I think you were intended to say "if S2 translation is disabled".
+> > +#define ESR_ELx_ERET_ISS_ERET_ERETAx	0x2
+> > +#define ESR_ELx_ERET_ISS_ERETA_ERATAB	0x1
+>                             ^^^^^
+> Shouldn't that be ERETAA?
 
-Yes, absolutely. Good catch.
+Hmm, this is rather ambiguous indeed. I'm going to repaint it as:
+
+#define ESR_ELx_ERET_ISS_ERET		0x2
+#define ESR_ELx_ERET_ISS_ERETA		0x1
+
+which matches the ARM ARM wording as of DDI0487G.b.
 
 Thanks,
 
