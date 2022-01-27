@@ -2,148 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D4AA49E2C5
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:43:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B3E149E305
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 14:04:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236738AbiA0Mnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 07:43:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52954 "EHLO
+        id S241475AbiA0NEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 08:04:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233016AbiA0Mns (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 07:43:48 -0500
+        with ESMTP id S238381AbiA0NEI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 08:04:08 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E6EC061747
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 04:43:48 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5EEEC061714
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 05:04:07 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 01DD3B82213
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 12:43:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B218AC340E4;
-        Thu, 27 Jan 2022 12:43:45 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 43CF8B82235
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 13:04:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8CCEC340E4;
+        Thu, 27 Jan 2022 13:04:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643287425;
-        bh=68fog+LxidxW2xkTBF4OzGMOW1IHoZtRHgu/53kvJ3s=;
+        s=k20201202; t=1643288645;
+        bh=qMZ0svqK5htZaSgXJT3ca1NFnVOJRjs9aPXrpCGNpFs=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=XDjYncGb0F3rlAga9c7Y6gNbbK0eeAVYPaJpRYRsaIU+M2NbtOtXc7UKla/H6DP6Y
-         Pie4aL3Df71FkgusCmsPxFSTGSGRbldJ3GoN6ptINsXBz8jJppWJpWy/NmrTZPdaKG
-         oGmvbt7tiH69KB66Z7DTGd4Mwk3BdjzhCkKOzmt06QHD2RwwF9SGnN0X/zHSKhOn3z
-         uXPtWQBMKQmCtRJwnresjGzL6zodx17e+fz194NKu0MmnK87sCsKuIOfV+oEgX0rSi
-         PDZVkpoqT292UGLU+fiB5CBMYtF8EckfEKrKHtGfyMhefBHOpOtLqFK0OTey6VwGo6
-         MMADUMKFHyRZw==
+        b=K6HFDmz6fZyaYO5TfEDPf3JzSHva9TrXwR663EBPsuJyagrEruThk7SHKj2XArCGd
+         7OVA6Bb/YnYTLV9pH3qVOkFlMfUge1J7DZ9wLYAnHGl20yG06LmV8Ry0zRKqriIORg
+         3M/VQHKkgWiqJhizgr2s8kx/6iLqcrWVFqGAdz7FOLrWz4v165lWgHWj7PYKry/MZ9
+         xDHbCHahuNQu/91zdAINUtFyZeiKqSxng9vDf6O2CVjAq3ow7IK9/qJfpznbkW8KCx
+         0OfuoeWeMe5GoVtKSnP4acDnS5QyqyfQGL6s0MeM1y5y33KESwlT8UY8lVe0Qrsn4Z
+         qBzJOMBCKo70g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nD47r-003VcX-L1; Thu, 27 Jan 2022 12:43:43 +0000
-Date:   Thu, 27 Jan 2022 12:43:43 +0000
-Message-ID: <87wnil5oxs.wl-maz@kernel.org>
+        id 1nD4RW-003Vpx-Uc; Thu, 27 Jan 2022 13:04:03 +0000
+Date:   Thu, 27 Jan 2022 13:04:02 +0000
+Message-ID: <87v8y55nzx.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
         Christoffer Dall <christoffer.dall@arm.com>,
         Jintack Lim <jintack@cs.columbia.edu>,
         Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH v5 08/69] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
-In-Reply-To: <YeWiAgWbDhTreD7y@shell.armlinux.org.uk>
+Subject: Re: [PATCH v5 36/69] KVM: arm64: nv: Filter out unsupported features from ID regs
+In-Reply-To: <300f7a61-acd1-21bd-d36d-1532d2cecf44@os.amperecomputing.com>
 References: <20211129200150.351436-1-maz@kernel.org>
-        <20211129200150.351436-9-maz@kernel.org>
-        <YeWiAgWbDhTreD7y@shell.armlinux.org.uk>
+        <20211129200150.351436-37-maz@kernel.org>
+        <e850857c-9cab-8e16-0568-acb513514ae8@os.amperecomputing.com>
+        <87h7b3wqe9.wl-maz@kernel.org>
+        <ef667048-7fbe-55dc-9856-546fd9d3c690@os.amperecomputing.com>
+        <87zgouuxvy.wl-maz@kernel.org>
+        <300f7a61-acd1-21bd-d36d-1532d2cecf44@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Jan 2022 17:06:10 +0000,
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On Fri, 21 Jan 2022 11:33:30 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> On Mon, Nov 29, 2021 at 08:00:49PM +0000, Marc Zyngier wrote:
-> > From: Christoffer Dall <christoffer.dall@arm.com>
+> Hi Marc,
+> 
+> On 21-12-2021 02:40 pm, Marc Zyngier wrote:
+> > On Tue, 21 Dec 2021 06:03:49 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> 
+> >> On 20-12-2021 03:26 pm, Marc Zyngier wrote:
+> >>> On Mon, 20 Dec 2021 07:26:50 +0000,
+> >>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >>>> 
+> >>>> 
+> >>>> Hi Marc,
+> >>>> 
+> >>>> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> >>>>> As there is a number of features that we either can't support,
+> >>>>> or don't want to support right away with NV, let's add some
+> >>>>> basic filtering so that we don't advertize silly things to the
+> >>>>> EL2 guest.
+> >>>>> 
+> >>>>> Whilst we are at it, avertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+> >>>>> 
+> >>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>>>> ---
+> >>>>>     arch/arm64/include/asm/kvm_nested.h |   6 ++
+> >>>>>     arch/arm64/kvm/nested.c             | 152 ++++++++++++++++++++++++++++
+> >>>>>     arch/arm64/kvm/sys_regs.c           |   4 +-
+> >>>>>     arch/arm64/kvm/sys_regs.h           |   2 +
+> >>>>>     4 files changed, 163 insertions(+), 1 deletion(-)
+> >>>>> 
+> >>>>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> >>>>> index 07c15f51cf86..026ddaad972c 100644
+> >>>>> --- a/arch/arm64/include/asm/kvm_nested.h
+> >>>>> +++ b/arch/arm64/include/asm/kvm_nested.h
+> >>>>> @@ -67,4 +67,10 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+> >>>>>     extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+> >>>>>     extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> >>>>>     +struct sys_reg_params;
+> >>>>> +struct sys_reg_desc;
+> >>>>> +
+> >>>>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >>>>> +			  const struct sys_reg_desc *r);
+> >>>>> +
+> >>>>>     #endif /* __ARM64_KVM_NESTED_H */
+> >>>>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> >>>>> index 42a96c8d2adc..19b674983e13 100644
+> >>>>> --- a/arch/arm64/kvm/nested.c
+> >>>>> +++ b/arch/arm64/kvm/nested.c
+> >>>>> @@ -20,6 +20,10 @@
+> >>>>>     #include <linux/kvm_host.h>
+> >>>>>       #include <asm/kvm_emulate.h>
+> >>>>> +#include <asm/kvm_nested.h>
+> >>>>> +#include <asm/sysreg.h>
+> >>>>> +
+> >>>>> +#include "sys_regs.h"
+> >>>>>       /*
+> >>>>>      * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+> >>>>> @@ -38,3 +42,151 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+> >>>>>       	return -EINVAL;
+> >>>>>     }
+> >>>>> +
+> >>>>> +/*
+> >>>>> + * Our emulated CPU doesn't support all the possible features. For the
+> >>>>> + * sake of simplicity (and probably mental sanity), wipe out a number
+> >>>>> + * of feature bits we don't intend to support for the time being.
+> >>>>> + * This list should get updated as new features get added to the NV
+> >>>>> + * support, and new extension to the architecture.
+> >>>>> + */
+> >>>>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >>>>> +			  const struct sys_reg_desc *r)
+> >>>>> +{
+> >>>>> +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+> >>>>> +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+> >>>>> +	u64 val, tmp;
+> >>>>> +
+> >>>>> +	if (!nested_virt_in_use(v))
+> >>>>> +		return;
+> >>>>> +
+> >>>>> +	val = p->regval;
+> >>>>> +
+> >>>>> +	switch (id) {
+> >>>>> +	case SYS_ID_AA64ISAR0_EL1:
+> >>>>> +		/* Support everything but O.S. and Range TLBIs */
+> >>>>> +		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
+> >>>>> +			 GENMASK_ULL(27, 24)		|
+> >>>>> +			 GENMASK_ULL(3, 0));
+> >>>>> +		break;
+> >>>>> +
+> >>>>> +	case SYS_ID_AA64ISAR1_EL1:
+> >>>>> +		/* Support everything but PtrAuth and Spec Invalidation */
+> >>>>> +		val &= ~(GENMASK_ULL(63, 56)		|
+> >>>>> +			 FEATURE(ID_AA64ISAR1_SPECRES)	|
+> >>>>> +			 FEATURE(ID_AA64ISAR1_GPI)	|
+> >>>>> +			 FEATURE(ID_AA64ISAR1_GPA)	|
+> >>>>> +			 FEATURE(ID_AA64ISAR1_API)	|
+> >>>>> +			 FEATURE(ID_AA64ISAR1_APA));
+> >>>>> +		break;
+> >>>>> +
+> >>>>> +	case SYS_ID_AA64PFR0_EL1:
+> >>>>> +		/* No AMU, MPAM, S-EL2, RAS or SVE */
+> >>>>> +		val &= ~(GENMASK_ULL(55, 52)		|
+> >>>>> +			 FEATURE(ID_AA64PFR0_AMU)	|
+> >>>>> +			 FEATURE(ID_AA64PFR0_MPAM)	|
+> >>>>> +			 FEATURE(ID_AA64PFR0_SEL2)	|
+> >>>>> +			 FEATURE(ID_AA64PFR0_RAS)	|
+> >>>>> +			 FEATURE(ID_AA64PFR0_SVE)	|
+> >>>>> +			 FEATURE(ID_AA64PFR0_EL3)	|
+> >>>>> +			 FEATURE(ID_AA64PFR0_EL2));
+> >>>>> +		/* 64bit EL2/EL3 only */
+> >>>>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
+> >>>>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), 0b0001);
+> >>>>> +		break;
+> >>>>> +
+> >>>>> +	case SYS_ID_AA64PFR1_EL1:
+> >>>>> +		/* Only support SSBS */
+> >>>>> +		val &= FEATURE(ID_AA64PFR1_SSBS);
+> >>>>> +		break;
+> >>>>> +
+> >>>>> +	case SYS_ID_AA64MMFR0_EL1:
+> >>>>> +		/* Hide ECV, FGT, ExS, Secure Memory */
+> >>>>> +		val &= ~(GENMASK_ULL(63, 43)			|
+> >>>>> +			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
+> >>>>> +			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
+> >>>>> +			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
+> >>>>> +			 FEATURE(ID_AA64MMFR0_SNSMEM));
+> >>>>> +
+> >>>>> +		/* Disallow unsupported S2 page sizes */
+> >>>>> +		switch (PAGE_SIZE) {
+> >>>>> +		case SZ_64K:
+> >>>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
+> >>>>> +			fallthrough;
+> >>>>> +		case SZ_16K:
+> >>>>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
+> >>>>> +			fallthrough;
+> >>>>> +		case SZ_4K:
+> >>>>> +			/* Support everything */
+> >>>>> +			break;
+> >>>>> +		}
+> >>>> 
+> >>>> It seems to me that Host hypervisor(L0) has to boot with 4KB page size
+> >>>> to support all (4, 16 and 64KB) page sizes at L1, any specific reason
+> >>>> for this restriction?
+> >>> 
+> >>> Well, yes.
+> >>> 
+> >>> If you have a L0 that has booted with (let's say) 64kB page size, how
+> >>> do you provide S2 mappings with 4kB granularity so that you can
+> >>> implement the permissions that a L1 guest hypervisor can impose on its
+> >>> own guest, given that KVM currently mandates S1 and S2 to use the same
+> >>> page sizes?
+> >>> 
+> >>> You can't. That's why we tell the guest hypervisor how much we
+> >>> support, and the guest hypervisor can decide to go ahead or not
+> >>> depending on what it does.
+> >>> 
+> >>> If one day we can support S2 mappings that are smaller than the host
+> >>> page sizes, then we'll be able to allow to advertise all page sizes.
+> >>> But I wouldn't hold my breath for this to happen.
+> >> 
+> >> Thanks for the detailed explanation!.
+> >> Can we put one line comment that explains why this manipulation?
+> >> It would be helpful to see a comment like S2 PAGE_SIZE should be
+> >> at-least the size of Host PAGE_SIZE?
 > > 
-> > Reset the VCPU with PSTATE.M = EL2h when the nested virtualization
-> > feature is enabled on the VCPU.
+> > Can do, but we need to get the terminology straight, because this is
+> > very quickly becoming confusing. Something like:
 > > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > [maz: rework register reset not to use empty data structures]
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 7c9dd1edf011..d35a947f5679 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -850,7 +850,12 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >   			/* Support everything */
+> >   			break;
+> >   		}
+> > -		/* Advertize supported S2 page sizes */
+> > +		/*
+> > +		 * Since we can't support a guest S2 page size smaller than
+> > +		 * the host's own page size (due to KVM only populating its
+> > +		 * own S2 using the kernel's page size), advertise the
+> > +		 * limitation using FEAT_GTG.
+> > +		 */
 > 
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> However, a couple of comments below.
-> 
-> > ---
-> >  arch/arm64/kvm/reset.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > index 426bd7fbc3fd..38a7182819fb 100644
-> > --- a/arch/arm64/kvm/reset.c
-> > +++ b/arch/arm64/kvm/reset.c
-> > @@ -27,6 +27,7 @@
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_mmu.h>
-> > +#include <asm/kvm_nested.h>
-> >  #include <asm/virt.h>
-> >  
-> >  /* Maximum phys_shift supported for any VM on this host */
-> > @@ -38,6 +39,9 @@ static u32 kvm_ipa_limit;
-> >  #define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
-> >  				 PSR_F_BIT | PSR_D_BIT)
-> >  
-> > +#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
-> > +				 PSR_F_BIT | PSR_D_BIT)
-> > +
-> >  #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
-> >  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
-> >  
-> > @@ -176,8 +180,8 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> >  	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
-> >  		return false;
-> >  
-> > -	/* MTE is incompatible with AArch32 */
-> > -	if (kvm_has_mte(vcpu->kvm) && is32bit)
-> > +	/* MTE and NV are incompatible with AArch32 */
-> > +	if ((kvm_has_mte(vcpu->kvm) || nested_virt_in_use(vcpu)) && is32bit)
-> >  		return false;
-> 
-> It seems we have a bunch of:
-> 
-> 	if (something && is32bit)
-> 		return false;
-> 
-> tests here - would it make sense to do:
-> 
-> 	if (is32bit) {
-> 		if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
-> 			return false;
-> 
-> 		/* MTE is incompatible with AArch32 */
-> 		if (kvm_has_mte(vcpu->kvm))
-> 			return false;
-> 
-> 		/* NV is incompatible with AArch32 */
-> 		if (nested_virt_in_use(vcpu))
-> 			return false;
-> 	}
-> 
-> in terms of improved readability?
+> I have tried booting L0 with 4K page-size and L1 with 64K and with
+> this config the L2/NestedVM boot hangs. I have tried L2 with
+> page-sizes 4K and 64K(though S1 page size of L2 should not matter?).
 
-Agreed. I've now reworked to follow this pattern.
+S1 shouldn't matter, but if that's what you are seeing, there is
+obviously an issue trying to satisfy a translation fault in this
+configuration, and we get stuck.
+
+Could you please add some tracing and work out whether this is the
+case? I bet this is an issue trying to combine the L1 S2 translation
+(which will be 64kB aligned) with the faulting IPA address, but I
+can't immediately pinpoint the bug.
 
 Thanks,
 
