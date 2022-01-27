@@ -2,82 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59A4449E2BE
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:42:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D4AA49E2C5
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 13:43:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236525AbiA0Mms (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 07:42:48 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:42704 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241263AbiA0Mmq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 07:42:46 -0500
+        id S236738AbiA0Mnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 07:43:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52954 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233016AbiA0Mns (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jan 2022 07:43:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E6EC061747
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 04:43:48 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B43C261AAF
-        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 12:42:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2249EC340E4;
-        Thu, 27 Jan 2022 12:42:45 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 01DD3B82213
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 12:43:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B218AC340E4;
+        Thu, 27 Jan 2022 12:43:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643287365;
-        bh=s8JwE7IpMdhphIDvw7ZfD172DcVRc+TtOqsjRZ8vULQ=;
+        s=k20201202; t=1643287425;
+        bh=68fog+LxidxW2xkTBF4OzGMOW1IHoZtRHgu/53kvJ3s=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Nfhc0zGfLYqC4MQhK5OzLpm9S9rLPY0kPSFJ41ZErUqYqtBUJFdDatOTLYSC1PQEj
-         p3n9Tfeuz7lxhVdTbELbyrXRy8iGvKURJLe/p0kfNfmbwC4J9Te8CLBvgfefOr5xHE
-         LX/eyh7SuJr93cCyZjhzPdfLphXNcOHM3n81o1dzpzsqB4Vn4dwSxjXVi81kmB6kVn
-         JH+B0rEEgvsyvx0YIynqNQZENTGls774sDRUheyirhWIV+4pUHhOGF11FaoS7DNN0i
-         3l4HK5WVTmsQUdCScvRkiTSDQvBc37ZawwEMeAFf0+yFfQh6TyejpYUdNitcaVnIZk
-         wIMBgOG/7g77A==
+        b=XDjYncGb0F3rlAga9c7Y6gNbbK0eeAVYPaJpRYRsaIU+M2NbtOtXc7UKla/H6DP6Y
+         Pie4aL3Df71FkgusCmsPxFSTGSGRbldJ3GoN6ptINsXBz8jJppWJpWy/NmrTZPdaKG
+         oGmvbt7tiH69KB66Z7DTGd4Mwk3BdjzhCkKOzmt06QHD2RwwF9SGnN0X/zHSKhOn3z
+         uXPtWQBMKQmCtRJwnresjGzL6zodx17e+fz194NKu0MmnK87sCsKuIOfV+oEgX0rSi
+         PDZVkpoqT292UGLU+fiB5CBMYtF8EckfEKrKHtGfyMhefBHOpOtLqFK0OTey6VwGo6
+         MMADUMKFHyRZw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nD46t-003Vau-5p; Thu, 27 Jan 2022 12:42:43 +0000
-Date:   Thu, 27 Jan 2022 12:42:42 +0000
-Message-ID: <87y2315ozh.wl-maz@kernel.org>
+        id 1nD47r-003VcX-L1; Thu, 27 Jan 2022 12:43:43 +0000
+Date:   Thu, 27 Jan 2022 12:43:43 +0000
+Message-ID: <87wnil5oxs.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Chase Conklin <chase.conklin@arm.com>
-Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
-        christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com,
-        haibo.xu@linaro.org, james.morse@arm.com, jintack@cs.columbia.edu,
-        kernel-team@android.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        suzuki.poulose@arm.com
+To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
 Subject: Re: [PATCH v5 08/69] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
-In-Reply-To: <20220107215401.61828-1-chase.conklin@arm.com>
-References: <20211129200150.351436-9-maz@kernel.org>
-        <20220107215401.61828-1-chase.conklin@arm.com>
+In-Reply-To: <YeWiAgWbDhTreD7y@shell.armlinux.org.uk>
+References: <20211129200150.351436-1-maz@kernel.org>
+        <20211129200150.351436-9-maz@kernel.org>
+        <YeWiAgWbDhTreD7y@shell.armlinux.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: chase.conklin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, haibo.xu@linaro.org, james.morse@arm.com, jintack@cs.columbia.edu, kernel-team@android.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 07 Jan 2022 21:54:01 +0000,
-Chase Conklin <chase.conklin@arm.com> wrote:
+On Mon, 17 Jan 2022 17:06:10 +0000,
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 > 
-> Hi Marc,
-> 
-> On Mon Nov 29 15:00:49 EST 2021, Marc Zyngier <maz@kernel.org> wrote:
-> > From: Christoffer Dall <christoffer.dall at arm.com>
-> >
+> On Mon, Nov 29, 2021 at 08:00:49PM +0000, Marc Zyngier wrote:
+> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > 
 > > Reset the VCPU with PSTATE.M = EL2h when the nested virtualization
 > > feature is enabled on the VCPU.
-> >
-> > Signed-off-by: Christoffer Dall <christoffer.dall at arm.com>
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > > [maz: rework register reset not to use empty data structures]
-> > Signed-off-by: Marc Zyngier <maz at kernel.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> 
+> However, a couple of comments below.
+> 
 > > ---
 > >  arch/arm64/kvm/reset.c | 10 ++++++++--
 > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> >
+> > 
 > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
 > > index 426bd7fbc3fd..38a7182819fb 100644
 > > --- a/arch/arm64/kvm/reset.c
@@ -110,34 +121,29 @@ Chase Conklin <chase.conklin@arm.com> wrote:
 > > +	if ((kvm_has_mte(vcpu->kvm) || nested_virt_in_use(vcpu)) && is32bit)
 > >  		return false;
 > 
-> Should something similar be done for SVE? I see from the ID register emulation
-> that SVE is hidden from the guest but there isn't anything in
-> kvm_vcpu_enable_sve() that checks if NV is in use. That means it's possible to
-> have both nested_virt_in_use(vcpu) and vcpu_has_sve(vcpu) be true
-> simultaneously. If that happens, the FPSIMD fixup can get confused
+> It seems we have a bunch of:
 > 
-> 	/*
-> 	 * Don't handle SVE traps for non-SVE vcpus here. This
-> 	 * includes NV guests for the time being.
-> 	 */
-> 	if (!sve_guest && (esr_ec != ESR_ELx_EC_FP_ASIMD ||
-> 			   guest_hyp_fpsimd_traps_enabled(vcpu)))
+> 	if (something && is32bit)
 > 		return false;
 > 
-> and incorrectly restore the wrong context instead of forwarding a
-> FPSIMD trap to the guest hypervisor.
+> tests here - would it make sense to do:
+> 
+> 	if (is32bit) {
+> 		if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
+> 			return false;
+> 
+> 		/* MTE is incompatible with AArch32 */
+> 		if (kvm_has_mte(vcpu->kvm))
+> 			return false;
+> 
+> 		/* NV is incompatible with AArch32 */
+> 		if (nested_virt_in_use(vcpu))
+> 			return false;
+> 	}
+> 
+> in terms of improved readability?
 
-Yes, nice catch. I have added this to kvm_reset_vcpu() to prevent the
-issue.
-
-	if (nested_virt_in_use(vcpu) &&
-	    vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
-		ret = -EINVAL;
-		goto out;
-	}
-
-I may also rename nested_virt_in_use() to vcpu_has_nv(), which would
-fit the rest of the code a bit better.
+Agreed. I've now reworked to follow this pattern.
 
 Thanks,
 
