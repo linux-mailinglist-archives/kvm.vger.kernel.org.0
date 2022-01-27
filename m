@@ -2,305 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14AF749E467
-	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 15:16:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C7849E52B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jan 2022 15:52:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242274AbiA0OQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 09:16:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30474 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242236AbiA0OQP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 09:16:15 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20RECnhP008008;
-        Thu, 27 Jan 2022 14:16:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Od5uOzYnKejJ5cLuSTaAqupHlu5/SClRvAWtLKCDJFE=;
- b=seUoqn3oQTn77DOpzRX1EATFPgVD01CbFG9eZ94p8hIEEIaGIr4I1SHy9iDlVtnhTGBM
- BWeg2rksz1t+AW4eotcqm7LgPhbNuTQ/5HkktCWPx6nJ+WhIXBJIIO0BRyu+vQ+yK95i
- 8xRu1OR7Kvfc/H5jgS/yuI/gti3fIImvcY5TkV5C641WUUxoLfjj9H6yP0Rqfan4pJXn
- xQjE1QDQbANkGEo4KPZg+4sGupGzqlb8oxRsCpyp/8XnRegKsXIM7HOVPagDzdyN8SRh
- YY/U9f7h/RcgKGV0ADSLgVWwjIdrXpuIX5/dbDuREjTC/4AGXzbYneDv0xJLV++nQnNq dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3duvxxg2dc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jan 2022 14:16:14 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20REECPR014819;
-        Thu, 27 Jan 2022 14:16:14 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3duvxxg2ce-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jan 2022 14:16:13 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20RECSHu026469;
-        Thu, 27 Jan 2022 14:16:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3dr96jxs59-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jan 2022 14:16:11 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20REG7LJ47513936
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jan 2022 14:16:07 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DB9FF52059;
-        Thu, 27 Jan 2022 14:16:06 +0000 (GMT)
-Received: from linux7.. (unknown [9.114.12.92])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BEC7352079;
-        Thu, 27 Jan 2022 14:16:05 +0000 (GMT)
-From:   Steffen Eiden <seiden@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 4/4] s390x: uv-guest: Add attestation tests
-Date:   Thu, 27 Jan 2022 14:15:59 +0000
-Message-Id: <20220127141559.35250-5-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220127141559.35250-1-seiden@linux.ibm.com>
-References: <20220127141559.35250-1-seiden@linux.ibm.com>
+        id S242562AbiA0Owt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jan 2022 09:52:49 -0500
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:53858 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242696AbiA0Owo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jan 2022 09:52:44 -0500
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20R2i8c6027476
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 06:52:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=facebook;
+ bh=POuSnQTLrViN9T1EEOlUF76qQp6KqvYJWCNjp0X8MZM=;
+ b=DLaW0y2sWOXl/vQaAN7SfXpdZRmmvEmhCGFk2AxaIKlGNkrJtnCZxCo3W1kWhCMN8YFp
+ e3AOI8ToK+drRo/VLG7LXYSKU7ErNXFH2F/7q8i+7ZLAYWfsR5iGauA9/O1VY24UAwUx
+ wf0Sdy+yXHVXHNusVGvqJMt1EW9x1J45fb8= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3dujv3u16q-5
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 06:52:42 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (100.104.98.9) by
+ o365-in.thefacebook.com (100.104.94.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 27 Jan 2022 06:52:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eWeIcoUcPhRd+Zoa7OZkJU8Gc+2YTKaUoCYyG1/vGZGGjemiSeCNn1t4p14D3++j0RxsukOahLY+IuVfLy8O8KQLnguQgwdn4r4KMSVtqhH4OP0Rcs3/PzExG7KEVPHTWSTuCmEMwRRx1JG/gObSzgWGtE27KDmDO1kbJPjH9LtorQO8Tex4YfEG1znYInzR2CgX/thzDg7YdKA2KWk9Am9KohHJaZNFZwSs25wAWCDNyi9NlVrgtoHHgmD0JRmFsfgBIavNK182KFDru3n4S6q3nnxHyZ8i2gbiR/ee6MmZ/YWEtRuzePWR06B5LMWKwpiTc+wMy6ygIyVZk4ajmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=POuSnQTLrViN9T1EEOlUF76qQp6KqvYJWCNjp0X8MZM=;
+ b=QIKXfb9QJFF8SgkxYMf0lHBDPq6jl3gYq0rVS3IIfoofHWTsbj+kSL/4APfqcF1eB0vE8QRJLLDamo1WWQw+liw5I2tuHlywQ+/JRZx7QMJBIeT2x9gsUNbrulqf5J0fjHiWNJfgiO1snGwsK3WUhIUXbx3y1yk6LqhJLpuvevFZFo4NQqglXs9riHaRM+O0XkQ7uJgMmYSb/pc8/kztkqBKm5GmtzBadrlxKI3iOBu//C61eWc/bc4IlMZMeY/QDIqQRXLxbv3kXM9pK6YS/Cya80PV+2DV7XjMm/2X7HeqYRWmiS2nJKtmA55av7IfgjeAeoJG3dYuG9oq0VpLwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from MN2PR15MB4287.namprd15.prod.outlook.com (2603:10b6:208:1b6::13)
+ by SN7PR15MB4160.namprd15.prod.outlook.com (2603:10b6:806:10e::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17; Thu, 27 Jan
+ 2022 14:52:39 +0000
+Received: from MN2PR15MB4287.namprd15.prod.outlook.com
+ ([fe80::3102:7e69:9b1:3d30]) by MN2PR15MB4287.namprd15.prod.outlook.com
+ ([fe80::3102:7e69:9b1:3d30%6]) with mapi id 15.20.4930.015; Thu, 27 Jan 2022
+ 14:52:39 +0000
+From:   Chris Mason <clm@fb.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Boris Burkov <boris@bur.io>,
+        Sean Christopherson <seanjc@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Kernel Team <Kernel-team@fb.com>
+Subject: Re: [PATCH] KVM: use set_page_dirty rather than SetPageDirty
+Thread-Topic: [PATCH] KVM: use set_page_dirty rather than SetPageDirty
+Thread-Index: AQHYEu6ezDBN9b9XPkaUx3YvgIhZsax12f4AgAAUH4CAAA5vgIAAzhqAgAAqi4A=
+Date:   Thu, 27 Jan 2022 14:52:39 +0000
+Message-ID: <DFECB1B9-9A83-48B2-92F1-74D8BA77C728@fb.com>
+References: <08b5b2c516b81788ca411dc031d403de4594755e.1643226777.git.boris@bur.io>
+ <YfHEJpP+1c9QZxA0@google.com> <YfHVB5RmLZn2ku5M@zen>
+ <3876CE62-6E66-4CCE-ADED-69010EA72394@fb.com>
+ <3f4efc3d-f351-0fcb-e231-b422ea262f66@redhat.com>
+In-Reply-To: <3f4efc3d-f351-0fcb-e231-b422ea262f66@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3693.40.0.1.81)
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: cdf3feed-9ac2-448e-eec7-08d9e1a4aa4b
+x-ms-traffictypediagnostic: SN7PR15MB4160:EE_
+x-microsoft-antispam-prvs: <SN7PR15MB41605EEF105501CD98988037D3219@SN7PR15MB4160.namprd15.prod.outlook.com>
+x-fb-source: Internal
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: syxpVR9scZd/TwzIVpeTbFccMLufyD53M+ff0b7cnSZG9rEjW/M+sDv5jz1fQ6zfRQMKY43slLtEOkeoNsHncYR9ezhnp9sw4Z77u6791JF9kpsWe3hRNY3OhpsRPEhmQULbKQjvNFBJVy16OTRRyfWancZSUQTiXu/uozVzedPqCueHH4qcAI88AqNWuJQ6cvSIIn9z0VFizgN+ox53FmcAmptsSN0MOcoHc0ZCCxsBKJIK9UT7Xi8xGPo3vbvZqKxccfGe1WtsYYvCxV6j3gXu0tdapuDXAKB6bF9Se+YQtINCWbLQ2qyl7xvYIFmP7n9R2zvXEglica91+mW2afY4TkUI7MsZ28Cn4LVBblRD1nkqXJfqsd2p/+T1KxRJ/bpmMSqx1TyfZxQ49cYZBpzAJmCSCo9aaf/3BJzdE1H31elOm44fqhe04/suj40ONJZ2NRkMSjmm+41vDCXoIrPmvaYNIDXx2vhomOcrtEmG3cLfGpeGH+TKrTFW6k7fFqOLVe3rRgZhA9m2ECXfO2jOqJ06xeCsoru7xr4KtSlRg7BkDpjA5KDZhAhlNL7BqPd9duM6gZ7TM2zbK+TJAIqABl4/LfNprVAtEBQ+75YizxGFWrzdslD5d/cSMS3+jJBqB0Yx3sT4umsmtyJIbJeXLR2XWsHR06J0Krizwd+KKqDiocFZ2XuH4A68EX65+FpyjqQD0LDFTXLI8Slv4OCpf88kLamSNwUouZ4pBYwasliZ6BhgWBOqIfSOn86ABzzvgz4eXP3lfF3hNPOMIT+4G4JMMuR0L6Fwy28xjErNdFafkNDw7Ojh2f/3ayZEMkeQdALjWiKr0T9GJ7ookw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR15MB4287.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(86362001)(316002)(76116006)(66946007)(6916009)(6506007)(6512007)(508600001)(4326008)(5660300002)(66446008)(66476007)(64756008)(66556008)(8676002)(53546011)(8936002)(36756003)(966005)(6486002)(71200400001)(33656002)(2906002)(2616005)(38070700005)(54906003)(38100700002)(122000001)(186003)(14143004)(45980500001)(20210929001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bTdpL0dKbWRwQlU0SXZRcnNQSDE0OUVRZlUxSEpJVmF3TndTVE9zMlMzVndE?=
+ =?utf-8?B?UDByeGdqTVN1UGlERjlOdWNyenhLWkF2ZERUUDNhRTdVTXZqdW12c1k0N01D?=
+ =?utf-8?B?dHRoWGNQNEU0eGU1VDQ3VWV4dEkxMjVtd3lIaTN1YzhmbFI2eXlOczdiU1FU?=
+ =?utf-8?B?NFd4bmxhZmxZbE0zcmVLbEJod3Y1bTA5WG95SWo4enBaQlB3Q1hmb3JFLzVV?=
+ =?utf-8?B?d280MFVKZTlUbWdsd1dDQ1RlM1E4dHppQWt1WVBHQXlpR1c2aEduMytOWG5W?=
+ =?utf-8?B?akRMV3dUNWE1T0NtV2VaMmViN2doWVJLdEF1N2JFMytvZ285d1BOc2MwcDEy?=
+ =?utf-8?B?N2pOTUN1MTViNlBwTmF0aDRsU0cxMkMyUmhvWlhIWVF1Y294MmlWVXdvK1hz?=
+ =?utf-8?B?cm5RWng0L291dzFjcFhGR0ZBQm5mTkIzTHpQc3hmc0FuZWgzZFhkVi80V3Fo?=
+ =?utf-8?B?YnUyU3g5YVdIMURlQVhsN1UyWlRDMklCa0p1bFVpYXZFOXNKK1NoTHhuQzgw?=
+ =?utf-8?B?UWViS2I0NUlHbzkydlZVNVN4Z1BCQUMyUUtRSEgzWjlCL2kyYjFtTThHa2c2?=
+ =?utf-8?B?bWRsKzhuNmw0dXJ1cjNNNkpGQnRydEZNaS84ZTNUUnBqUHlHTitVWURIMzFT?=
+ =?utf-8?B?VTFxU0hYZ05TanJCZllLcVczekg0T044UkkrbGxzUnNPT01nWjY2dUIyRGpF?=
+ =?utf-8?B?TVpqK1dQcDV5MGZKUjB3U1NkZWRRQnRnc294REJ6SFJhMjBKdkM0bU10cjRw?=
+ =?utf-8?B?ZmltSzEzS3B5MUlzY1JjbjRkVFVrYnVMbVM3dkpsVUtyb0RRVlFvY0Z0UHVM?=
+ =?utf-8?B?bnlIVlJMU2hXclZVT1cxWjFCcm96L3JtMWRjcEErOTl5a2UwVy9BRlNlcmJB?=
+ =?utf-8?B?UEhvSjBNa012UFlkM0hNbjYwcDFnNFNGV255T3RSS2V3QVlmbW42cEVObGVh?=
+ =?utf-8?B?bmVINFBvK25PaWlyTDlVTVZNTGhEWUhiTGh0bHBTcHpQVlZMcmNxVXNoQXVP?=
+ =?utf-8?B?Ky9hUEd1WmpOSHpCQ25GK1ByNEVNMmoxNDVNMitybFhlaDZxU3NubFJvOEwy?=
+ =?utf-8?B?WDF0Q2phcTVMRS80UmdDTzdtRDNPNG1OZTFlQlUxbnA4YmhnaU11cDZ4Rmtx?=
+ =?utf-8?B?M25BWlN5ZVZhMGxJbnR3YldXcXd5TnNuRklrY0I5MGVjNUV4MEdMK3RiNHc4?=
+ =?utf-8?B?c0RNWDNGMWRmNVBsNEkvT0YrYUJYaDlxRnh6QzBOOGo4aGE0ek9PbHFERGJZ?=
+ =?utf-8?B?WnJ3Q1J0VDBCVVdqS2h6eDFDUzhjcVZxOUR3TlZmNUROcTQzZnFlNnFjdXJI?=
+ =?utf-8?B?cHlobTlDVjVYSkhvWmtTWEtRaVAyZ1lCMFZHanVMbXdyTkN5b2kwR2RuS0FC?=
+ =?utf-8?B?ME5WcWpyTGxrNzFUbzRUSFpVd3Zzd2dXWEs4dVNyRzJLd1JBVm11YkFxN1gz?=
+ =?utf-8?B?b3dadDZnNkFtcWNCVGxxcDQyMWFQQ3FyN1FiNmFXRTFiNm1QYWN0L2x2aTlX?=
+ =?utf-8?B?TVY1NyszSDBibjlmUFV5dXFJVEoxS2d2SUREVFh2SC9zWWk5ZmMxK3F6QzVy?=
+ =?utf-8?B?Z29iY0V0dExrYVlUdGRSZ1FaTzA4ak9saHBLYm9FOWN6TWExMlFIK09UNkpU?=
+ =?utf-8?B?RUNsVmdVa1h2Y0FXT3Zqd3NHSGlUbGJmZ2hkd1Z0MGh5R2hjOTVjYThqUU8y?=
+ =?utf-8?B?R2YrVWZEbm5DZERWQVoxdGF3ZjFTT0MvajBQYXFVekVYOUdNelc2YlBRSVNP?=
+ =?utf-8?B?dEIwdzRPdjArSWRkWm0vSjk0VE9wVGFxNUk0eGRSMlBrT0ZuNHlaUmhIVml1?=
+ =?utf-8?B?UjU4ZjVUeEo1NHF4NkNHT0UrL2lMR215dFZpQTZkeG9kK0krbkc0WGh3UXNY?=
+ =?utf-8?B?OUphMmcraVVBUVVyVDVzakJFMmZNTEo4ejBiV2tDSGRRQkJ1dENWeXF6MWs3?=
+ =?utf-8?B?dnZTKzNnekd5SUljZ240bGtQSjYxV09NeVEzVm9oeGNaY2o4K1JoOHZQbjZB?=
+ =?utf-8?B?a0JldDFKd0k5L3FYQ1piL3E0NXN1TWhob2l6dHpTQTVKaHVmNVpvcmNMZEls?=
+ =?utf-8?B?Z2ErcVZ2dU9TNURkQnowcmo5NUJUcG15UUZjKzZZMVJFWHRuMXVCQWZESVBk?=
+ =?utf-8?B?NENoOEJOSis4bnVWbDMyN3BkL2VLSTBLbkRBOUxzb1MzMDdrZy9tRUdXa0VN?=
+ =?utf-8?B?dlE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5F640C4BA7AFE241B5DD339C7379D0D6@namprd15.prod.outlook.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR15MB4287.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cdf3feed-9ac2-448e-eec7-08d9e1a4aa4b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2022 14:52:39.6687
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QkqPT+boPSEHc8/KQRJPEmnvzvZdBdIOrCl2UzsCRksR80LB8t+2JfUOLwrDsBAc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR15MB4160
+X-OriginatorOrg: fb.com
+X-Proofpoint-ORIG-GUID: Moz4pCJsTsKTUbSm3y4Ks1PqXX8VXh6a
+X-Proofpoint-GUID: Moz4pCJsTsKTUbSm3y4Ks1PqXX8VXh6a
+Content-Transfer-Encoding: base64
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aRKowUcuQaGiPzyuaYZ5Fa1cpcIDwJ4J
-X-Proofpoint-ORIG-GUID: tcRxrv3WzVSHn54I_t4oywoohBnPNGsk
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-01-27_03,2022-01-27_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999 spamscore=0
- malwarescore=0 clxscore=1015 priorityscore=1501 phishscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201270086
+X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 lowpriorityscore=0
+ mlxscore=0 suspectscore=0 mlxlogscore=843 spamscore=0 phishscore=0
+ priorityscore=1501 clxscore=1015 adultscore=0 malwarescore=0
+ impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2201270090
+X-FB-Internal: deliver
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adds several tests to verify correct error paths of attestation.
-
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- lib/s390x/asm/uv.h |   5 +-
- s390x/uv-guest.c   | 164 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 168 insertions(+), 1 deletion(-)
-
-diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-index 38c322bf..e8e1698e 100644
---- a/lib/s390x/asm/uv.h
-+++ b/lib/s390x/asm/uv.h
-@@ -109,7 +109,10 @@ struct uv_cb_qui {
- 	u8  reserved88[158 - 136];	/* 0x0088 */
- 	uint16_t max_guest_cpus;	/* 0x009e */
- 	u64 uv_feature_indications;	/* 0x00a0 */
--	u8  reserveda8[200 - 168];	/* 0x00a8 */
-+	u8  reserveda8[224 - 168];	/* 0x00a8 */
-+	u64 supported_att_hdr_versions;	/* 0x00e0 */
-+	u64 supported_paf;		/* 0x00e8 */
-+	u8  reservedf0[256 - 240];	/* 0x00f0 */
- }  __attribute__((packed))  __attribute__((aligned(8)));
- 
- struct uv_cb_cgc {
-diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-index 909b7256..92b9a53b 100644
---- a/s390x/uv-guest.c
-+++ b/s390x/uv-guest.c
-@@ -6,6 +6,7 @@
-  *
-  * Authors:
-  *  Janosch Frank <frankja@linux.ibm.com>
-+ *  Steffen Eiden <seiden@linux.ibm.com>
-  */
- 
- #include <libcflat.h>
-@@ -53,6 +54,15 @@ static void test_priv(void)
- 	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
- 	report_prefix_pop();
- 
-+	report_prefix_push("attest");
-+	uvcb.cmd = UVC_CMD_ATTESTATION;
-+	uvcb.len = sizeof(struct uv_cb_attest);
-+	expect_pgm_int();
-+	enter_pstate();
-+	uv_call_once(0, (u64)&uvcb);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
- 	report_prefix_pop();
- }
- 
-@@ -111,7 +121,160 @@ static void test_sharing(void)
- 	cc = uv_call(0, (u64)&uvcb);
- 	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "unshare");
- 	report_prefix_pop();
-+}
-+
-+/* arcb with one key slot and no nonce */
-+struct uv_arcb_v1 {
-+	uint64_t	reserved0;	/* 0x0000 */
-+	uint32_t	arvn;		/* 0x0008 */
-+	uint32_t	arl;		/* 0x000c */
-+	uint8_t		iv[12];		/* 0x0010 */
-+	uint32_t	reserved1c;	/* 0x001c */
-+	uint8_t		reserved20[7];	/* 0x0020 */
-+	uint8_t		nks;		/* 0x0027 */
-+	uint32_t	reserved28;	/* 0x0028 */
-+	uint32_t	sea;		/* 0x002c */
-+	uint64_t	paf;		/* 0x0030 */
-+	uint32_t	mai;		/* 0x0038 */
-+	uint32_t	reserved3c;	/* 0x003c */
-+	uint8_t		cpk[160];	/* 0x0040 */
-+	uint8_t		key_slot[80];	/* 0x00e0 */
-+	uint8_t		m_key[64];	/* 0x0130 */
-+	uint8_t		tag[16];	/* 0x0170 */
-+} __attribute__((packed));
-+
-+static void test_attest_v1(u64 supported_paf)
-+{
-+	struct uv_cb_attest uvcb = {
-+		.header.cmd = UVC_CMD_ATTESTATION,
-+		.header.len = sizeof(uvcb),
-+	};
-+	struct uv_arcb_v1 *arcb = (void *)page;
-+	uint64_t measurement = page + sizeof(*arcb);
-+	size_t measurement_size = 64;
-+	uint64_t additional = measurement + measurement_size;
-+	size_t additional_size = 64;
-+	int cc;
-+
-+	memset((void *) page, 0, PAGE_SIZE);
-+
-+	/* create a minimal arcb/uvcb such that FW has everything to start unsealing the request. */
-+	arcb->arvn = 0x0100;
-+	arcb->arl = sizeof(*arcb);
-+	arcb->nks = 1;
-+	arcb->sea = 64;
-+	/* HMAC SHA512 */
-+	arcb->mai = 1;
-+	uvcb.arcb_addr = page;
-+	uvcb.measurement_address = measurement;
-+	uvcb.measurement_length = measurement_size;
-+	uvcb.add_data_address = additional;
-+	uvcb.add_data_length = additional_size;
-+
-+	uvcb.continuation_token = 0xff;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0101, "invalid continuation token");
-+	uvcb.continuation_token = 0;
-+
-+	uvcb.user_data_length = sizeof(uvcb.user_data) + 1;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0102, "invalid user data size");
-+	uvcb.user_data_length = 0;
-+
-+	uvcb.arcb_addr = 0;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0103, "invalid address arcb");
-+	uvcb.arcb_addr = page;
-+
-+	/* 0104 - 0105 need an unseal-able request */
-+
-+	/* version 0000 is an illegal version number */
-+	arcb->arvn = 0x0000;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0106, "unsupported version");
-+	arcb->arvn = 0x0100;
-+
-+	arcb->arl += 1;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0107, "invalid arcb size 1");
-+	arcb->arl -= 1;
-+	arcb->nks = 2;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0107, "invalid arcb size 2");
-+	arcb->nks = 1;
-+
-+	arcb->nks = 0;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0108, "invalid num key slots low");
-+	arcb->nks = 1;
- 
-+	/* possible valid size (when using nonce). However, arl to small to host a nonce */
-+	arcb->sea = 80;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0109, "invalid encrypted size 1");
-+	arcb->sea = 17;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x0109, "invalid encrypted size 2");
-+	arcb->sea = 64;
-+
-+	arcb->paf = supported_paf ^ ((u64) -1);
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010a, "invalid paf");
-+	arcb->paf = 0;
-+
-+	/* reserved value */
-+	arcb->mai = 0;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010b, "invalid mai");
-+	arcb->mai = 1;
-+
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010c, "unable unseal");
-+
-+	uvcb.measurement_length = 0;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc == 1 && uvcb.header.rc == 0x010d, "invalid measurement size");
-+	uvcb.measurement_length = 64;
-+}
-+
-+static void test_attest(void)
-+{
-+	struct uv_cb_attest uvcb = {
-+		.header.cmd = UVC_CMD_ATTESTATION,
-+		.header.len = sizeof(uvcb),
-+	};
-+	const struct uv_cb_qui *uvcb_qui = uv_get_info();
-+	int cc;
-+
-+	report_prefix_push("attest");
-+
-+	if (!uv_query_test_call(BIT_UVC_CMD_ATTESTATION)) {
-+		report_skip("Attestation not supported.");
-+		goto done;
-+	}
-+
-+	/* Verify that the uv supports at least one header version */
-+	report(uvcb_qui->supported_att_hdr_versions, "has hdr support");
-+
-+	memset((void *) page, 0, PAGE_SIZE);
-+
-+	uvcb.header.len -= 1;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc && uvcb.header.rc == UVC_RC_INV_LEN, "invalid uvcb size 1");
-+	uvcb.header.len += 1;
-+
-+	uvcb.header.len += 1;
-+	cc = uv_call(0, (u64)&uvcb);
-+	report(cc && uvcb.header.rc == UVC_RC_INV_LEN, "invalid uvcb size 2");
-+	uvcb.header.len -= 1;
-+
-+	report_prefix_push("v1");
-+	if (test_bit_inv(0, &uvcb_qui->supported_att_hdr_versions))
-+		test_attest_v1(uvcb_qui->supported_paf);
-+	else
-+		report_skip("Attestation version 1 not supported");
-+	report_prefix_pop();
-+done:
- 	report_prefix_pop();
- }
- 
-@@ -179,6 +342,7 @@ int main(void)
- 	test_invalid();
- 	test_query();
- 	test_sharing();
-+	test_attest();
- 	free_page((void *)page);
- done:
- 	report_prefix_pop();
--- 
-2.30.2
-
+DQo+IE9uIEphbiAyNywgMjAyMiwgYXQgNzoyMCBBTSwgUGFvbG8gQm9uemluaSA8cGJvbnppbmlA
+cmVkaGF0LmNvbT4gd3JvdGU6DQo+IA0KPiBPbiAxLzI3LzIyIDAxOjAyLCBDaHJpcyBNYXNvbiB3
+cm90ZToNCj4+IEZyb20gdGhlIGJ0cmZzIHNpZGUsIGJhcmUgY2FsbHMgdG8gc2V0X3BhZ2VfZGly
+dHkoKSBhcmUgc3Vib3B0aW1hbCwNCj4+IHNpbmNlIGl0IGRvZXNu4oCZdCBnbyB0aHJvdWdoIHRo
+ZSAtPnBhZ2VfbWt3cml0ZSgpIGRhbmNlIHRoYXQgd2UgdXNlIHRvDQo+PiBwcm9wZXJseSBDT1cg
+dGhpbmdzLiAgSXTigJlzIHN0aWxsIG11Y2ggYmV0dGVyIHRoYW4gU2V0UGFnZURpcnR5KCksIGJ1
+dA0KPj4gSeKAmWQgbG92ZSB0byB1bmRlcnN0YW5kIHdoeSBrdm0gbmVlZHMgdG8gZGlydHkgdGhl
+IHBhZ2Ugc28gd2UgY2FuDQo+PiBmaWd1cmUgb3V0IGhvdyB0byBnbyB0aHJvdWdoIHRoZSBub3Jt
+YWwgbW1hcCBmaWxlIGlvIHBhdGhzLg0KPiBTaG91bGRuJ3QgLT5wYWdlX21rd3JpdGUoKSBvY2N1
+ciBhdCB0aGUgcG9pbnQgb2YgZ2V0X3VzZXJfcGFnZXMsIHN1Y2ggYXMgdmlhIGhhbmRsZV9tbV9m
+YXVsdC0+aGFuZGxlX3B0ZV9mYXVsdC0+ZG9fZmF1bHQtPmRvX3NoYXJlZF9mYXVsdD8gIFRoYXQg
+YWx3YXlzIGhhcHBlbnMgYmVmb3JlIFNldFBhZ2VEaXJ0eSgpLCBvciBzZXRfcGFnZV9kaXJ0eSgp
+IGFmdGVyIEJvcmlzJ3MgcGF0Y2guDQoNCnBhZ2VfbWt3cml0ZSgpIGlzIHdoZXJlIGJ0cmZzIGRv
+ZXMgaXRzIENPVyBzZXR1cCwgd2FpdHMgZm9yIElPIGluIGZsaWdodCwgYW5kIGFsc28gc2V0cyB0
+aGUgcGFnZSBkaXJ0eS4gIElmIHRoYXTigJlzIGFscmVhZHkgaGFwcGVuaW5nIGZvciB0aGVzZSBw
+YWdlcywgZG8gd2UgbmVlZCBhbiBhZGRpdGlvbmFsIHNldF9wYWdlX2RpcnR5KCkgYXQgYWxsPw0K
+DQpCb3JpcyBmb3VuZCBodHRwczovL2xpc3RzLm9wZW53YWxsLm5ldC9saW51eC1rZXJuZWwvMjAx
+Ni8wMi8xMS83MDIsIHdoZXJlIE1heGltIHN1Z2dlc3RzIGp1c3QgZHJvcHBpbmcgdGhlIFNldFBh
+Z2VEaXJ0eSgpIG9uIGZpbGUgYmFjayBwYWdlcy4NCg0KVGhlIHByb2JsZW0gd2l0aCBiYXJlIHNl
+dF9wYWdlX2RpcnR5KCkgY2FsbHMgaXMgdGhhdCBpdCBieXBhc3NlcyBvdXIgc3luY2hyb25pemF0
+aW9uIGZvciBzdGFibGUgcGFnZXMuICBXZSBoYXZlIHRvIHN1cHBvcnQgaXQgYmVjYXVzZSBvZiB3
+ZWlyZCBnZXRfdXNlcl9wYWdlcygpIGNvcm5lcnMsIGJ1dCBwYWdlX213a3JpdGUoKSBpcyBtdWNo
+IHByZWZlcnJlZC4gIEhvcGVmdWxseSBvdXIgdXNlIG9mIGNsZWFyX3BhZ2VfZGlydHlfZm9yX2lv
+KCkgbWFrZXMgc3VyZSB0aGF0IGFueSBtb2RpZmljYXRpb25zIHRvIHRoZSBwYWdlIGdvIHRocm91
+Z2ggcGFnZV9ta3dyaXRlKCkgYWdhaW4sIHNvIEkgdGhpbmsgTWF4aW3igJlzIHBhdGNoIG1pZ2h0
+IGp1c3QgYmUgY29ycmVjdC4NCg0KLWNocmlz
