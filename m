@@ -2,212 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFBF849F194
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 03:57:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6619A49F315
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 06:40:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237025AbiA1C5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jan 2022 21:57:33 -0500
-Received: from mga17.intel.com ([192.55.52.151]:38657 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229811AbiA1C5c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jan 2022 21:57:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643338652; x=1674874652;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=sbB5DbFwgn6MZ3jXJtvL/bQpgxlHMv6s1gejhPlpnDk=;
-  b=hy9s5xoU9xB7zy/2hBqgwtzkb8rcN74l5spzaRdRCCs7Gh7Y7OjfsY0P
-   qZxq0wJzly0MngIGFeWbakV2z4M2Z40ETgCG26X8rbA+xdCfWOFEnGNfG
-   GQ/hFDC6Mg3FjJs71gPb2S/+R+CUVIv2YZNpbt+N24gJgzHep27klMFKC
-   Q0ma2qqODEHyx/X+AYqaV1gDAhaUrOE6PZ68S6ngmVZnomQnd/lSFOM4X
-   RwqAJ0pUV0TPqYWDNGwEe/1rHFxSVCXvTxNr3ygTBjmKYLGswV9iK/MaJ
-   v0CmxAuY7dyKnM9tmzCznoS6VA8fCRV3Eii1WSgB4ddPtJJbepPqDdDW/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10240"; a="227700251"
-X-IronPort-AV: E=Sophos;i="5.88,322,1635231600"; 
-   d="scan'208";a="227700251"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2022 18:56:58 -0800
-X-IronPort-AV: E=Sophos;i="5.88,322,1635231600"; 
-   d="scan'208";a="535955362"
-Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.145.56])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 27 Jan 2022 18:56:55 -0800
-Date:   Fri, 28 Jan 2022 10:41:32 +0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, yang.zhong@intel.com
-Subject: Re: [PATCH 2/3] KVM: x86: add system attribute to retrieve full set
- of supported xsave states
-Message-ID: <20220128024132.GA10089@yangzhon-Virtual>
-References: <20220126152210.3044876-1-pbonzini@redhat.com>
- <20220126152210.3044876-3-pbonzini@redhat.com>
- <YfK71pSnmtpnSJQ8@google.com>
+        id S234678AbiA1Fkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 00:40:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231204AbiA1Fkc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 00:40:32 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1247FC061714
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 21:40:32 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d18so4935060plg.2
+        for <kvm@vger.kernel.org>; Thu, 27 Jan 2022 21:40:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kQgaN91aBojrZB98q50IoV/CyP18WN7SkHg7seKU5xM=;
+        b=EfTcJpL2x2G+dT8lRtAOauEbP/eW8+MqMsieb6Ut4RCRsYhJmat4RREDbZ33oNm6IO
+         HKsd32id5H2KfCMOsm3MMgrWFzClW5lB6+wE6U7N33IKzkksl+ZZDuVNfCxCJJWDtNJt
+         S058unC4LH+8U2HBt4Mtnj9qxD5PJOwMwpSm5enImFwCgg0SY+7Y0W25Pl2q6MKYzMv2
+         tpnWRdowQoKyeyKaXKSbA893V0hAp8TQdaSJG5cRvPOX/d1EKqkf6/vqvC+IAFORcdgL
+         WwZLN33GewPKgfj6UZQf16RgtsUxr9Ma4P6ZdC28j3LQaQvrj0R0tyVr0tQ/c+enMMle
+         UzsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kQgaN91aBojrZB98q50IoV/CyP18WN7SkHg7seKU5xM=;
+        b=vA3UpFUVbjDlpzgWmjE5QngyUwh2ctQDkfBzDyN7MSzTeBmLiNAucVy4NbyCYxIeLg
+         JrEHgeDaGIOdijKmA+eDJvd3rFlKRxQlzuQgXhadNuV4DJ83Va5DsQeJhFsC2BD+MON4
+         4dX0LaBY2890r4ZB94Ug5KvefKGJn/JgezzCgW88qlWwdLf+mM1IDRTVDG0YIrIvpu9Z
+         kB3jbebtBGSCGh/wla5n4yyGUJFWdievxuwVt1lpvXMbP3tJkfz8+RpyptBMir74IGoR
+         2pd0OGSKhUC2xxwv0S067KZYv2B7NvbLl4ZQESBcZ2Nk67Z11sx8kJp9DPXASyavqdKg
+         kEcA==
+X-Gm-Message-State: AOAM5328NmK9B0VjzgVE4nmW435aOJhLKsBj+f1Ctn4xXUz2sWhKyMrL
+        /mpcqujRDiKZwheWCKWPHUsv3v4ocGCbSctB6QAwpg==
+X-Google-Smtp-Source: ABdhPJw9oXiDHGetc7Kw5MzZ3rsTL6M2LnLubbiAM9+CcBEUzz/qRI1KGvq1K+4tioDROw4QG+bdUkzuQNyvRL+9FI0=
+X-Received: by 2002:a17:902:d109:: with SMTP id w9mr6874586plw.138.1643348431315;
+ Thu, 27 Jan 2022 21:40:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YfK71pSnmtpnSJQ8@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-23-reijiw@google.com>
+ <CA+EHjTyimL8nuE0gH8B3V-MzoA9rz+n3KazqFxMtdJKgjefAag@mail.gmail.com>
+In-Reply-To: <CA+EHjTyimL8nuE0gH8B3V-MzoA9rz+n3KazqFxMtdJKgjefAag@mail.gmail.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Thu, 27 Jan 2022 21:40:15 -0800
+Message-ID: <CAAeT=Fw5LC559c=NxSp8xk1WO0CkD-DoJd-sACf78Uf6Yu1nMA@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 22/26] KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
+To:     Fuad Tabba <tabba@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 03:35:50PM +0000, Sean Christopherson wrote:
-> On Wed, Jan 26, 2022, Paolo Bonzini wrote:
-> > +static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
-> > +{
-> > +	if (attr->group)
-> > +		return -ENXIO;
-> > +
-> > +	switch (attr->attr) {
-> > +	case KVM_X86_XCOMP_GUEST_SUPP:
-> > +		if (put_user(supported_xcr0, (u64 __user *)attr->addr))
-> 
-> Deja vu[*].
-> 
->   arch/x86/kvm/x86.c: In function ‘kvm_x86_dev_get_attr’:
->   arch/x86/kvm/x86.c:4345:46: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
->    4345 |                 if (put_user(supported_xcr0, (u64 __user *)attr->addr))
->         |                                              ^
->   arch/x86/include/asm/uaccess.h:221:31: note: in definition of macro ‘do_put_user_call’
->     221 |         register __typeof__(*(ptr)) __val_pu asm("%"_ASM_AX);           \
->         |                               ^~~
->   arch/x86/kvm/x86.c:4345:21: note: in expansion of macro ‘put_user’
->    4345 |                 if (put_user(supported_xcr0, (u64 __user *)attr->addr))
->         |                     ^~~~~~~~
->   arch/x86/kvm/x86.c:4345:46: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
->    4345 |                 if (put_user(supported_xcr0, (u64 __user *)attr->addr))
->         |                                              ^
->   arch/x86/include/asm/uaccess.h:223:21: note: in definition of macro ‘do_put_user_call’
->     223 |         __ptr_pu = (ptr);                                               \
->         |                     ^~~
->   arch/x86/kvm/x86.c:4345:21: note: in expansion of macro ‘put_user’
->    4345 |                 if (put_user(supported_xcr0, (u64 __user *)attr->addr))
->         |                     ^~~~~~~~
->   arch/x86/kvm/x86.c:4345:46: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
->    4345 |                 if (put_user(supported_xcr0, (u64 __user *)attr->addr))
->         |                                              ^
->   arch/x86/include/asm/uaccess.h:230:45: note: in definition of macro ‘do_put_user_call’
->     230 |                        [size] "i" (sizeof(*(ptr)))                      \
->         |                                             ^~~
->   arch/x86/kvm/x86.c:4345:21: note: in expansion of macro ‘put_user’
->    4345 |                 if (put_user(supported_xcr0, (u64 __user *)attr->addr))
-> 
-> Given that we're collectively 2 for 2 in mishandling {g,s}et_attr(), what about
-> a prep pacth like so?  Compile tested only...
+Hi Fuad,
+
+On Mon, Jan 24, 2022 at 9:20 AM Fuad Tabba <tabba@google.com> wrote:
 >
+> .Hi Reiji,
+>
+> On Thu, Jan 6, 2022 at 4:29 AM Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Add feature_config_ctrl for PMUv3, PMS and TraceFilt, which are
+> > indicated in ID_AA64DFR0_EL1, to program configuration registers
+> > to trap guest's using those features when they are not exposed to
+> > the guest.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 47 +++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 47 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 72e745c5a9c2..229671ec3abd 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -349,6 +349,22 @@ static void feature_mte_trap_activate(struct kvm_vcpu *vcpu)
+> >         feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TID5, HCR_DCT | HCR_ATA);
+> >  }
+> >
+> > +static void feature_pmuv3_trap_activate(struct kvm_vcpu *vcpu)
+> > +{
+> > +       feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TPM, 0);
+>
+> I think that for full coverage it might be good to include setting
+> MDCR_EL2_TPMCR, and clearing MDCR_EL2_HPME | MDCR_EL2_MTPME |
+> MDCR_EL2_HPMN_MASK, even if redundant at this point.
 
-  Sean, It's strange that I could not find those issues in my last day's build.
-  
-  My build environment:
-  #make -v
-  GNU Make 4.3
-  
-  # gcc -v
-  gcc version 9.3.0 (Ubuntu 9.3.0-17ubuntu1~20.04)
+I included what is needed only, and I would prefer not to let KVM
+do things that are not needed to trap guest's using the feature.
+Please let me know if you have a specific reason why you think it
+would be better to include them.
 
-  I will apply your extra patch to check again, thanks!
-  
-
-  Yang
-
- 
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Thu, 27 Jan 2022 07:31:53 -0800
-> Subject: [PATCH] KVM: x86: Add a helper to retrieve userspace address from
->  kvm_device_attr
-> 
-> Add a helper to handle converting the u64 userspace address embedded in
-> struct kvm_device_attr into a userspace pointer, it's all too easy to
-> forget the intermediate "unsigned long" cast as well as the truncation
-> check.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/x86.c | 28 +++++++++++++++++++++-------
->  1 file changed, 21 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 8033eca6f3a1..67836f7c71f5 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4335,14 +4335,28 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	return r;
->  }
-> 
-> +static inline void __user *kvm_get_attr_addr(struct kvm_device_attr *attr)
-> +{
-> +	void __user *uaddr = (void __user*)(unsigned long)attr->addr;
-> +
-> +	if ((u64)(unsigned long)uaddr != attr->addr)
-> +		return ERR_PTR(-EFAULT);
-> +	return uaddr;
-> +}
-> +
->  static int kvm_x86_dev_get_attr(struct kvm_device_attr *attr)
->  {
-> +	u64 __user *uaddr = kvm_get_attr_addr(attr);
-> +
->  	if (attr->group)
->  		return -ENXIO;
-> 
-> +	if (IS_ERR(uaddr))
-> +		return PTR_ERR(uaddr);
-> +
->  	switch (attr->attr) {
->  	case KVM_X86_XCOMP_GUEST_SUPP:
-> -		if (put_user(supported_xcr0, (u64 __user *)attr->addr))
-> +		if (put_user(supported_xcr0, uaddr))
->  			return -EFAULT;
->  		return 0;
->  	default:
-> @@ -5070,11 +5084,11 @@ static int kvm_arch_tsc_has_attr(struct kvm_vcpu *vcpu,
->  static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
->  				 struct kvm_device_attr *attr)
->  {
-> -	u64 __user *uaddr = (u64 __user *)(unsigned long)attr->addr;
-> +	u64 __user *uaddr = kvm_get_attr_addr(attr);
->  	int r;
-> 
-> -	if ((u64)(unsigned long)uaddr != attr->addr)
-> -		return -EFAULT;
-> +	if (IS_ERR(uaddr))
-> +		return PTR_ERR(uaddr);
-> 
->  	switch (attr->attr) {
->  	case KVM_VCPU_TSC_OFFSET:
-> @@ -5093,12 +5107,12 @@ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
->  static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
->  				 struct kvm_device_attr *attr)
->  {
-> -	u64 __user *uaddr = (u64 __user *)(unsigned long)attr->addr;
-> +	u64 __user *uaddr = kvm_get_attr_addr(attr);
->  	struct kvm *kvm = vcpu->kvm;
->  	int r;
-> 
-> -	if ((u64)(unsigned long)uaddr != attr->addr)
-> -		return -EFAULT;
-> +	if (IS_ERR(uaddr))
-> +		return PTR_ERR(uaddr);
-> 
->  	switch (attr->attr) {
->  	case KVM_VCPU_TSC_OFFSET: {
-> --
-> 
-> 
-> 
-> [*] https://lore.kernel.org/all/20211007231647.3553604-1-seanjc@google.com
-> 
-> 
-> > +			return -EFAULT;
-> > +		return 0;
-> > +	default:
-> > +		return -ENXIO;
-> > +		break;
-> > +	}
+>
 > > +}
 > > +
+> > +static void feature_pms_trap_activate(struct kvm_vcpu *vcpu)
+> > +{
+> > +       feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TPMS,
+> > +                             MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT);
+> > +}
+> > +
+> > +static void feature_tracefilt_trap_activate(struct kvm_vcpu *vcpu)
+> > +{
+> > +       feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TTRF, 0);
+> > +}
+> > +
+> >  /* For ID_AA64PFR0_EL1 */
+> >  static struct feature_config_ctrl ftr_ctrl_ras = {
+> >         .ftr_reg = SYS_ID_AA64PFR0_EL1,
+> > @@ -375,6 +391,31 @@ static struct feature_config_ctrl ftr_ctrl_mte = {
+> >         .trap_activate = feature_mte_trap_activate,
+> >  };
+> >
+> > +/* For ID_AA64DFR0_EL1 */
+> > +static struct feature_config_ctrl ftr_ctrl_pmuv3 = {
+> > +       .ftr_reg = SYS_ID_AA64DFR0_EL1,
+> > +       .ftr_shift = ID_AA64DFR0_PMUVER_SHIFT,
+> > +       .ftr_min = ID_AA64DFR0_PMUVER_8_0,
+> > +       .ftr_signed = FTR_UNSIGNED,
+> > +       .trap_activate = feature_pmuv3_trap_activate,
+> > +};
+> > +
+> > +static struct feature_config_ctrl ftr_ctrl_pms = {
+> > +       .ftr_reg = SYS_ID_AA64DFR0_EL1,
+> > +       .ftr_shift = ID_AA64DFR0_PMSVER_SHIFT,
+> > +       .ftr_min = ID_AA64DFR0_PMSVER_8_2,
+> > +       .ftr_signed = FTR_UNSIGNED,
+> > +       .trap_activate = feature_pms_trap_activate,
+> > +};
+> > +
+> > +static struct feature_config_ctrl ftr_ctrl_tracefilt = {
+> > +       .ftr_reg = SYS_ID_AA64DFR0_EL1,
+> > +       .ftr_shift = ID_AA64DFR0_TRACE_FILT_SHIFT,
+> > +       .ftr_min = 1,
+> > +       .ftr_signed = FTR_UNSIGNED,
+> > +       .trap_activate = feature_tracefilt_trap_activate,
+> > +};
+>
+> I think you might be missing trace, ID_AA64DFR0_TRACEVER -> CPTR_EL2_TTA.
+
+Thank you for catching this. I will add the trace.
+
+Thanks,
+Reiji
