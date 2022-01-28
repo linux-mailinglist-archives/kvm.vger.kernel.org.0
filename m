@@ -2,420 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D1D49F7D7
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 12:08:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC62749F910
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 13:19:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348013AbiA1LIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 06:08:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20374 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348000AbiA1LIG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 06:08:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643368086;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=r/Z89cDjHpntAHUD/RSb3guWlLGmU+c1d1Z61HpvZ50=;
-        b=UkPnP3h2J7+RCf/rNNCulBU9MttB3/Kqgxljmva3Un02NVjhWxixJ/LuD8lhCgfjlKozXm
-        teoRiyP8k5nD5WvYcDxnlUV6cb82Ezq/aGEw3dnYh2aHgImZVgCvbx4smRHWclmQK/pJGp
-        dfYFnGSQuSGxWn2tOM0zxxZPSmoloCM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-110-FkQTCBm2Omyv0WEfc8osgQ-1; Fri, 28 Jan 2022 06:08:04 -0500
-X-MC-Unique: FkQTCBm2Omyv0WEfc8osgQ-1
-Received: by mail-wr1-f72.google.com with SMTP id x4-20020adfbb44000000b001d83e815683so2120912wrg.8
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 03:08:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=r/Z89cDjHpntAHUD/RSb3guWlLGmU+c1d1Z61HpvZ50=;
-        b=OqBd8KXByRj/RMqB/b+YvaQtx2KlSk//Qjac1TI5B2vj2QZQMMd1wXKQMJUsH+vhHh
-         wdG0MJzDMd1JvHNokBHyG10rHQaCSzi4r9KSTc5i9lDZCKhi+ZAwsA1cH5RS3n0zaZLg
-         9OlJ61QZvxaUIK0rhDAfb4A6NZuiCu+qbu6URMOA3WOKQGbS1NXIA3NJ8nFW1Sff0az8
-         ZU+Uprov4wBR8tdfGJxpa/KRxhywfoW0KoGpjUS+MvGt8BCRZylNuSEVyK3gJzVQq8EK
-         M+xGeG5oka6naIccMqZmU/13o5kCdkYeKduVA1lvqbHOO/BBDz2s8DaHSLmuTpp3mJN6
-         OCmw==
-X-Gm-Message-State: AOAM530J8dk0bpEatFurzv+NLxQsuLAa6lXqiZa1E+YBcl6X1b5QwwKT
-        2dxSLCysH2VoZMQ9WMZWSIqFu3PbE++4B3lC5EZ+OPnKMWLLA3sDzjWriCNO2I0K8Ahw2tAWdYP
-        n/jruCvVjJk7R
-X-Received: by 2002:a1c:cc07:: with SMTP id h7mr15956170wmb.50.1643368083524;
-        Fri, 28 Jan 2022 03:08:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyGSxkD+x/HGNqu62fVuWQR5UvYZe4M0tfmZqqbG2QMxvuo6OHoohmnOIdvXtTCKrBrWjPbew==
-X-Received: by 2002:a1c:cc07:: with SMTP id h7mr15956149wmb.50.1643368083223;
-        Fri, 28 Jan 2022 03:08:03 -0800 (PST)
-Received: from ?IPV6:2003:cb:c70e:5c00:522f:9bcd:24a0:cd70? (p200300cbc70e5c00522f9bcd24a0cd70.dip0.t-ipconnect.de. [2003:cb:c70e:5c00:522f:9bcd:24a0:cd70])
-        by smtp.gmail.com with ESMTPSA id n10sm1621775wmr.25.2022.01.28.03.08.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jan 2022 03:08:02 -0800 (PST)
-Message-ID: <99e39466-513b-6db9-6b3a-f40e68997cec@redhat.com>
-Date:   Fri, 28 Jan 2022 12:08:01 +0100
+        id S1348386AbiA1MT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 07:19:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40190 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243048AbiA1MT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 07:19:27 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB213C061714
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 04:19:26 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8911A61345
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 12:19:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6349C340E6;
+        Fri, 28 Jan 2022 12:19:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643372366;
+        bh=hsG3ROQDWq32IhFhvaa0G4T355RjVp+ePhiZfPfoVUk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=oJusbHPx++gfx9M9z0bDuy92tZsjSEfsnefJvRDGFR3dk7jHsPiWYvv51Q6/MErj8
+         8C2pIUgKUEvg4xQDzcsJfZjzskNH8Jm/fA+iGtAui9SNJTI3Pn0TI75HgbwwiYkcKL
+         ZGld2oIYcsDq9alvbq9200ArvqD/Iyx4rPqn3lPQ3WLSjEN9ytRNTswOz/DS/2HX8s
+         AaCmx38qxuRPH4RSRj0MfHynlfJSlz9FTqmfLFDEKu9ZyQiboVlWNO14v9OJ1GpqG+
+         dODf/O9Sd+VzLXjsKA7RavjJBzPFYeXfgyZQfudww8Z0a9+ACUow/MqHvJcXZYDwBf
+         zT+GpNWhjVpcQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nDQDr-003njR-M5; Fri, 28 Jan 2022 12:19:23 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: [PATCH v6 00/64] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+Date:   Fri, 28 Jan 2022 12:18:08 +0000
+Message-Id: <20220128121912.509006-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [RFC PATCH 3/6] KVM: SVM: Implement demand page pinning
-Content-Language: en-US
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Bharata B Rao <bharata@amd.com>
-References: <20220118110621.62462-1-nikunj@amd.com>
- <20220118110621.62462-4-nikunj@amd.com>
- <99248ffb-2c7c-ba25-5d56-2c577e58da4c@redhat.com>
- <c7918558-4eb3-0592-f3e1-9a1c4f36f7c0@amd.com>
- <ef8dcee4-8ce7-cb91-6938-feb39f0bdaba@redhat.com>
- <bd8e94d6-e2fd-16a9-273e-c2563af235df@amd.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <bd8e94d6-e2fd-16a9-273e-c2563af235df@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, karl.heubaum@oracle.com, mihai.carabas@oracle.com, miguel.luis@oracle.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.01.22 12:04, Nikunj A. Dadhania wrote:
-> On 1/28/2022 1:57 PM, David Hildenbrand wrote:
->> On 28.01.22 07:57, Nikunj A. Dadhania wrote:
->>> On 1/26/2022 4:16 PM, David Hildenbrand wrote:
->>>> On 18.01.22 12:06, Nikunj A Dadhania wrote:
->>>>> Use the memslot metadata to store the pinned data along with the pfns.
->>>>> This improves the SEV guest startup time from O(n) to a constant by
->>>>> deferring guest page pinning until the pages are used to satisfy nested
->>>>> page faults. The page reference will be dropped in the memslot free
->>>>> path.
->>>>>
->>>>> Remove the enc_region structure definition and the code which did
->>>>> upfront pinning, as they are no longer needed in view of the demand
->>>>> pinning support.
->>>>>
->>>>> Leave svm_register_enc_region() and svm_unregister_enc_region() as stubs
->>>>> since qemu is dependent on this API.
->>>>>
->>>>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
->>>>> ---
->>>>>  arch/x86/kvm/svm/sev.c | 208 ++++++++++++++++-------------------------
->>>>>  arch/x86/kvm/svm/svm.c |   1 +
->>>>>  arch/x86/kvm/svm/svm.h |   3 +-
->>>>>  3 files changed, 81 insertions(+), 131 deletions(-)
->>>>>
->>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>>>> index d972ab4956d4..a962bed97a0b 100644
->>>>> --- a/arch/x86/kvm/svm/sev.c
->>>>> +++ b/arch/x86/kvm/svm/sev.c
->>>>> @@ -66,14 +66,6 @@ static unsigned int nr_asids;
->>>>>  static unsigned long *sev_asid_bitmap;
->>>>>  static unsigned long *sev_reclaim_asid_bitmap;
->>>>>  
->>>>> -struct enc_region {
->>>>> -	struct list_head list;
->>>>> -	unsigned long npages;
->>>>> -	struct page **pages;
->>>>> -	unsigned long uaddr;
->>>>> -	unsigned long size;
->>>>> -};
->>>>> -
->>>>>  /* Called with the sev_bitmap_lock held, or on shutdown  */
->>>>>  static int sev_flush_asids(int min_asid, int max_asid)
->>>>>  {
->>>>> @@ -257,8 +249,6 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>>>>  	if (ret)
->>>>>  		goto e_free;
->>>>>  
->>>>> -	INIT_LIST_HEAD(&sev->regions_list);
->>>>> -
->>>>>  	return 0;
->>>>>  
->>>>>  e_free:
->>>>> @@ -1637,8 +1627,6 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
->>>>>  	src->handle = 0;
->>>>>  	src->pages_locked = 0;
->>>>>  	src->enc_context_owner = NULL;
->>>>> -
->>>>> -	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
->>>>>  }
->>>>>  
->>>>>  static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
->>>>> @@ -1861,115 +1849,13 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->>>>>  int svm_register_enc_region(struct kvm *kvm,
->>>>>  			    struct kvm_enc_region *range)
->>>>>  {
->>>>> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>>>> -	struct enc_region *region;
->>>>> -	int ret = 0;
->>>>> -
->>>>> -	if (!sev_guest(kvm))
->>>>> -		return -ENOTTY;
->>>>> -
->>>>> -	/* If kvm is mirroring encryption context it isn't responsible for it */
->>>>> -	if (is_mirroring_enc_context(kvm))
->>>>> -		return -EINVAL;
->>>>> -
->>>>> -	if (range->addr > ULONG_MAX || range->size > ULONG_MAX)
->>>>> -		return -EINVAL;
->>>>> -
->>>>> -	region = kzalloc(sizeof(*region), GFP_KERNEL_ACCOUNT);
->>>>> -	if (!region)
->>>>> -		return -ENOMEM;
->>>>> -
->>>>> -	mutex_lock(&kvm->lock);
->>>>> -	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
->>>>> -	if (IS_ERR(region->pages)) {
->>>>> -		ret = PTR_ERR(region->pages);
->>>>> -		mutex_unlock(&kvm->lock);
->>>>> -		goto e_free;
->>>>> -	}
->>>>> -
->>>>> -	region->uaddr = range->addr;
->>>>> -	region->size = range->size;
->>>>> -
->>>>> -	list_add_tail(&region->list, &sev->regions_list);
->>>>> -	mutex_unlock(&kvm->lock);
->>>>> -
->>>>> -	/*
->>>>> -	 * The guest may change the memory encryption attribute from C=0 -> C=1
->>>>> -	 * or vice versa for this memory range. Lets make sure caches are
->>>>> -	 * flushed to ensure that guest data gets written into memory with
->>>>> -	 * correct C-bit.
->>>>> -	 */
->>>>> -	sev_clflush_pages(region->pages, region->npages);
->>>>> -
->>>>> -	return ret;
->>>>> -
->>>>> -e_free:
->>>>> -	kfree(region);
->>>>> -	return ret;
->>>>> -}
->>>>> -
->>>>> -static struct enc_region *
->>>>> -find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
->>>>> -{
->>>>> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>>>> -	struct list_head *head = &sev->regions_list;
->>>>> -	struct enc_region *i;
->>>>> -
->>>>> -	list_for_each_entry(i, head, list) {
->>>>> -		if (i->uaddr == range->addr &&
->>>>> -		    i->size == range->size)
->>>>> -			return i;
->>>>> -	}
->>>>> -
->>>>> -	return NULL;
->>>>> -}
->>>>> -
->>>>> -static void __unregister_enc_region_locked(struct kvm *kvm,
->>>>> -					   struct enc_region *region)
->>>>> -{
->>>>> -	sev_unpin_memory(kvm, region->pages, region->npages);
->>>>> -	list_del(&region->list);
->>>>> -	kfree(region);
->>>>> +	return 0;
->>>>>  }
->>>>>  
->>>>>  int svm_unregister_enc_region(struct kvm *kvm,
->>>>>  			      struct kvm_enc_region *range)
->>>>>  {
->>>>> -	struct enc_region *region;
->>>>> -	int ret;
->>>>> -
->>>>> -	/* If kvm is mirroring encryption context it isn't responsible for it */
->>>>> -	if (is_mirroring_enc_context(kvm))
->>>>> -		return -EINVAL;
->>>>> -
->>>>> -	mutex_lock(&kvm->lock);
->>>>> -
->>>>> -	if (!sev_guest(kvm)) {
->>>>> -		ret = -ENOTTY;
->>>>> -		goto failed;
->>>>> -	}
->>>>> -
->>>>> -	region = find_enc_region(kvm, range);
->>>>> -	if (!region) {
->>>>> -		ret = -EINVAL;
->>>>> -		goto failed;
->>>>> -	}
->>>>> -
->>>>> -	/*
->>>>> -	 * Ensure that all guest tagged cache entries are flushed before
->>>>> -	 * releasing the pages back to the system for use. CLFLUSH will
->>>>> -	 * not do this, so issue a WBINVD.
->>>>> -	 */
->>>>> -	wbinvd_on_all_cpus();
->>>>> -
->>>>> -	__unregister_enc_region_locked(kvm, region);
->>>>> -
->>>>> -	mutex_unlock(&kvm->lock);
->>>>>  	return 0;
->>>>> -
->>>>> -failed:
->>>>> -	mutex_unlock(&kvm->lock);
->>>>> -	return ret;
->>>>>  }
->>>>>  
->>>>>  int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
->>>>> @@ -2018,7 +1904,6 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
->>>>>  	mirror_sev->fd = source_sev->fd;
->>>>>  	mirror_sev->es_active = source_sev->es_active;
->>>>>  	mirror_sev->handle = source_sev->handle;
->>>>> -	INIT_LIST_HEAD(&mirror_sev->regions_list);
->>>>>  	ret = 0;
->>>>>  
->>>>>  	/*
->>>>> @@ -2038,8 +1923,6 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
->>>>>  void sev_vm_destroy(struct kvm *kvm)
->>>>>  {
->>>>>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>>>> -	struct list_head *head = &sev->regions_list;
->>>>> -	struct list_head *pos, *q;
->>>>>  
->>>>>  	WARN_ON(sev->num_mirrored_vms);
->>>>>  
->>>>> @@ -2066,18 +1949,6 @@ void sev_vm_destroy(struct kvm *kvm)
->>>>>  	 */
->>>>>  	wbinvd_on_all_cpus();
->>>>>  
->>>>> -	/*
->>>>> -	 * if userspace was terminated before unregistering the memory regions
->>>>> -	 * then lets unpin all the registered memory.
->>>>> -	 */
->>>>> -	if (!list_empty(head)) {
->>>>> -		list_for_each_safe(pos, q, head) {
->>>>> -			__unregister_enc_region_locked(kvm,
->>>>> -				list_entry(pos, struct enc_region, list));
->>>>> -			cond_resched();
->>>>> -		}
->>>>> -	}
->>>>> -
->>>>>  	sev_unbind_asid(kvm, sev->handle);
->>>>>  	sev_asid_free(sev);
->>>>>  }
->>>>> @@ -2946,13 +2817,90 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
->>>>>  	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
->>>>>  }
->>>>>  
->>>>> +void sev_pin_spte(struct kvm *kvm, gfn_t gfn, enum pg_level level,
->>>>> +		  kvm_pfn_t pfn)
->>>>> +{
->>>>> +	struct kvm_arch_memory_slot *aslot;
->>>>> +	struct kvm_memory_slot *slot;
->>>>> +	gfn_t rel_gfn, pin_pfn;
->>>>> +	unsigned long npages;
->>>>> +	kvm_pfn_t old_pfn;
->>>>> +	int i;
->>>>> +
->>>>> +	if (!sev_guest(kvm))
->>>>> +		return;
->>>>> +
->>>>> +	if (WARN_ON_ONCE(is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn)))
->>>>> +		return;
->>>>> +
->>>>> +	/* Tested till 1GB pages */
->>>>> +	if (KVM_BUG_ON(level > PG_LEVEL_1G, kvm))
->>>>> +		return;
->>>>> +
->>>>> +	slot = gfn_to_memslot(kvm, gfn);
->>>>> +	if (!slot || !slot->arch.pfns)
->>>>> +		return;
->>>>> +
->>>>> +	/*
->>>>> +	 * Use relative gfn index within the memslot for the bitmap as well as
->>>>> +	 * the pfns array
->>>>> +	 */
->>>>> +	rel_gfn = gfn - slot->base_gfn;
->>>>> +	aslot = &slot->arch;
->>>>> +	pin_pfn = pfn;
->>>>> +	npages = KVM_PAGES_PER_HPAGE(level);
->>>>> +
->>>>> +	/* Pin the page, KVM doesn't yet support page migration. */
->>>>> +	for (i = 0; i < npages; i++, rel_gfn++, pin_pfn++) {
->>>>> +		if (test_bit(rel_gfn, aslot->pinned_bitmap)) {
->>>>> +			old_pfn = aslot->pfns[rel_gfn];
->>>>> +			if (old_pfn == pin_pfn)
->>>>> +				continue;
->>>>> +
->>>>> +			put_page(pfn_to_page(old_pfn));
->>>>> +		}
->>>>> +
->>>>> +		set_bit(rel_gfn, aslot->pinned_bitmap);
->>>>> +		aslot->pfns[rel_gfn] = pin_pfn;
->>>>> +		get_page(pfn_to_page(pin_pfn));
->>>>
->>>>
->>>> I assume this is to replace KVM_MEMORY_ENCRYPT_REG_REGION, which ends up
->>>> calling svm_register_enc_region()->sev_pin_memory(), correct?
->>>
->>> Yes, that is correct.
->>>>
->>>> sev_pin_memory() correctly checks the RLIMIT_MEMLOCK and uses
->>>> pin_user_pages_fast().
->>>>
->>>> I have to strongly assume that sev_pin_memory() is *wrong* as is because
->>>> it's supposed to supply FOLL_LONGTERM -- after all we're pinning these
->>>> pages possibly forever.
->>>>
->>>>
->>>> I might be wrong but
->>>>
->>>> 1. You are missing the RLIMIT_MEMLOCK check
->>>
->>> Yes, I will add this check during the enc_region registration.
->>>
->>>> 2. get_page() is the wong way of long-term pinning a page. You would
->>>> have to mimic what pin_user_pages_fast(FOLL_LONGTERM) does to eventually
->>>> get it right (e.g., migrate the page off of MIGRATE_CMA or ZONE_MOVABLE).
->>>
->>> Let me go through this and I will come back. Thanks for pointing this out.
->>
->> I asusme the "issue" is that KVM uses mmu notifier and does a simple
->> get_user_pages() to obtain the references, to drop the reference when
->> the entry is invalidated via a mmu notifier call. So once you intent to
->> long-term pin, it's already to late.
->>
->> If you could teach KVM to do a long-term pin when stumbling over these
->> special encrypted memory regions (requires a proper matching
->> unpin_user_pages() call from KVM), then you could "take over" that pin
->> by get_page(), and let KVM do the ordinary put_page(), while you would
->> do the unpin_user_pages().
->>
-> 
-> The fault path looks like this in KVM x86 mmu code:
-> 
-> direct_page_fault()
-> -> kvm_faultin_pfn()
->    -> __gfn_to_pfn_memslot()
->       -> hva_to_pfn()
->          -> hva_to_pfn_{slow,fast}()
->             -> get_user_pages_*()      <<<<==== This is where the
->                                                 reference is taken
-> 
-> Next step is to create the mappings which is done in below functions:
-> 
-> -> kvm_tdp_mmu_map() / __direct_map()
-> 
->    -> Within this function (patch 1/6), I call sev_pin_spte to take an extra 
->       reference to pin it using get_page. 
-> 
->       Is it possible to use pin_user_pages(FOLL_LONGTERM) here? Wouldn't that 
->       be equivalent to "take over" solution that you are suggesting?
-> 
+Here the first drop of the KVM/arm64 NV support code for 2022. Nothing
+to worry about, it certainly isn't going to be the last!
 
-The issue is that pin_user_pages(FOLL_LONGTERM) might have to migrate
-the page, which will fail if there is already an additional reference
-from get_user_pages_*().
+A number of changes since [1]:
+
+- The exposure of the EL2 sysregs to userspace is now gated by NV
+  being enabled, as you'd expect. Which means we shouldn't break live
+  migration anymore (yay!).
+
+- We now correctly detect and handle an Illegal Exception Return from
+  vEL2. Don't try this at home, kids!
+
+- Non-nested exception injection when executing at EL0 has been fixed.
+
+- We forbid NV+SVE for now. This is a change in ABI, and I hope to
+  remove this requirement at some point. I've pushed out a kvmtool
+  change that enforces this [2], and QEMU will need similar surgery
+  for now.
+
+- nested_virt_in_use() is now renamed to vcpu_has_nv() (resp
+  vcpu_has_nv2() for the v8.4 support).
+
+- A bunch of small nits being tidied up, thanks to our eagle eyed
+  reviewers.
+
+Many thanks to Alexandru, Chase, Ganapatrao and Russell for spending a
+lot of time reviewing this and actively spotting issues. There is a
+pending issue that Ganapatrao mentioned when running L0 with 4kB and
+L1 with 64kB, resulting in no forward progress. I haven't investigated
+this yet, but I strongly suspect that something is amiss in the S2 PTW
+at the point where we combine the L2 IPA with the L1 IPA.
+
+As usual, blame me for any bug, and nobody else. It has been tested on
+my usual zoo, and nothing caught fire. Which means nothing, of course.
+Obviously, it isn't feature complete, and it is quite easy to write a
+guest that will not behave as intended. The current goal is to make
+sure that non-NV KVM is unaffected by the NV stuff.
+
+It is massively painful to run on the FVP, but if you have a Neoverse
+V1 or N2 system (or anything else with ARMv8.4-NV) that is collecting
+dust, I have the right stuff to keep it busy.
+
+	M.
+
+[1] https://lore.kernel.org/r/20211129200150.351436-1-maz@kernel.org
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
+
+Andre Przywara (1):
+  KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+
+Christoffer Dall (15):
+  KVM: arm64: nv: Introduce nested virtualization VCPU feature
+  KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+  KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
+  KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+  KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+  KVM: arm64: nv: Handle trapped ERET from virtual EL2
+  KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+  KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
+  KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
+    changes
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+  KVM: arm64: nv: arch_timer: Support hyp timer emulation
+  KVM: arm64: nv: vgic: Emulate the HW bit in software
+  KVM: arm64: nv: Add nested GICv3 tracepoints
+  KVM: arm64: nv: Sync nested timer state with ARMv8.4
+
+Jintack Lim (18):
+  arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+  KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+  KVM: arm64: nv: Support virtual EL2 exceptions
+  KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+  KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+  KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+  KVM: arm64: nv: Handle PSCI call via smc from the guest
+  KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+  KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+  KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
+  KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
+  KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+  KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+  KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
+  KVM: arm64: nv: Set a handler for the system instruction traps
+  KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+  KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+  KVM: arm64: nv: Nested GICv3 Support
+
+Marc Zyngier (30):
+  KVM: arm64: nv: Add EL2 system registers to vcpu context
+  KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+  KVM: arm64: nv: Handle virtual EL2 registers in
+    vcpu_read/write_sys_reg()
+  KVM: arm64: nv: Handle SPSR_EL2 specially
+  KVM: arm64: nv: Handle HCR_EL2.E2H specially
+  KVM: arm64: nv: Save/Restore vEL2 sysregs
+  KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
+  KVM: arm64: nv: Forward debug traps to the nested guest
+  KVM: arm64: nv: Filter out unsupported features from ID regs
+  KVM: arm64: nv: Hide RAS from nested guests
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+  KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
+  KVM: arm64: nv: Add handling of EL2-specific timer registers
+  KVM: arm64: nv: Load timer before the GIC
+  KVM: arm64: nv: Don't load the GICv4 context on entering a nested
+    guest
+  KVM: arm64: nv: Implement maintenance interrupt forwarding
+  KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+  KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB invalidation
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Tag shadow S2 entries with nested level
+  KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+  KVM: arm64: nv: Map VNCR-capable registers to a separate page
+  KVM: arm64: nv: Move nested vgic state into the sysreg file
+  KVM: arm64: Add ARMv8.4 Enhanced Nested Virt cpufeature
+  KVM: arm64: nv: Allocate VNCR page when required
+  KVM: arm64: nv: Enable ARMv8.4-NV support
+  KVM: arm64: nv: Fast-track 'InHost' exception returns
+  KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+
+ .../admin-guide/kernel-parameters.txt         |    7 +-
+ .../virt/kvm/devices/arm-vgic-v3.rst          |   12 +-
+ arch/arm64/include/asm/esr.h                  |    5 +
+ arch/arm64/include/asm/kvm_arm.h              |   27 +-
+ arch/arm64/include/asm/kvm_asm.h              |    4 +
+ arch/arm64/include/asm/kvm_emulate.h          |  143 +-
+ arch/arm64/include/asm/kvm_host.h             |  185 ++-
+ arch/arm64/include/asm/kvm_hyp.h              |    2 +
+ arch/arm64/include/asm/kvm_mmu.h              |   18 +-
+ arch/arm64/include/asm/kvm_nested.h           |  156 ++
+ arch/arm64/include/asm/sysreg.h               |  101 +-
+ arch/arm64/include/asm/vncr_mapping.h         |   74 +
+ arch/arm64/include/uapi/asm/kvm.h             |    2 +
+ arch/arm64/kernel/cpufeature.c                |   34 +
+ arch/arm64/kvm/Makefile                       |    4 +-
+ arch/arm64/kvm/arch_timer.c                   |  202 ++-
+ arch/arm64/kvm/arm.c                          |   42 +-
+ arch/arm64/kvm/at.c                           |  219 +++
+ arch/arm64/kvm/emulate-nested.c               |  211 +++
+ arch/arm64/kvm/guest.c                        |    6 +
+ arch/arm64/kvm/handle_exit.c                  |   81 +-
+ arch/arm64/kvm/hyp/exception.c                |   49 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |   12 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   24 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |    2 +-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |    2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |    2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c               |  181 ++-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |  125 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c                  |   83 ++
+ arch/arm64/kvm/inject_fault.c                 |   68 +-
+ arch/arm64/kvm/mmu.c                          |  206 ++-
+ arch/arm64/kvm/nested.c                       |  915 ++++++++++++
+ arch/arm64/kvm/reset.c                        |   30 +-
+ arch/arm64/kvm/sys_regs.c                     | 1252 ++++++++++++++++-
+ arch/arm64/kvm/sys_regs.h                     |   14 +-
+ arch/arm64/kvm/trace_arm.h                    |   65 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   30 +
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |   22 +
+ arch/arm64/kvm/vgic/vgic-nested-trace.h       |  137 ++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          |  242 ++++
+ arch/arm64/kvm/vgic/vgic-v3.c                 |   39 +-
+ arch/arm64/kvm/vgic/vgic.c                    |   44 +
+ arch/arm64/kvm/vgic/vgic.h                    |   10 +
+ arch/arm64/tools/cpucaps                      |    2 +
+ include/kvm/arm_arch_timer.h                  |    9 +-
+ include/kvm/arm_vgic.h                        |   16 +
+ include/uapi/linux/kvm.h                      |    1 +
+ tools/arch/arm/include/uapi/asm/kvm.h         |    1 +
+ 49 files changed, 4947 insertions(+), 171 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_nested.h
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ create mode 100644 arch/arm64/kvm/at.c
+ create mode 100644 arch/arm64/kvm/emulate-nested.c
+ create mode 100644 arch/arm64/kvm/nested.c
+ create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
+ create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
 
 -- 
-Thanks,
-
-David / dhildenb
+2.30.2
 
