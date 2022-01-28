@@ -2,125 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D38824A007E
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 19:55:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC2524A00D5
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 20:27:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350725AbiA1SzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 13:55:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21380 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1344428AbiA1Sy7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 13:54:59 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20SI94hl028721
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 18:54:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=MmdyLm6rXn33C0pvWqpMEaXEfi3rxXcbXk7aY2y3fn8=;
- b=nA7P+g8rkJL91kL8yq1dXCoLXrGqe60ABU2ecEzLe+WfQqGPDbPBK5i56TPNKmIKJSYD
- X2E8fbiV2TdsWJcabU25zVvlj0l7C9GtrPD5qgJ7ZIvYEVkTy0WiYikmEiStb6X+/Y2J
- kj5cOx8/dr2crLopRYo3Yu+Y9vJlL3CVesSmCJFD5QQsCCiVUnJ1hS9U9LPfh+w5Wp+t
- RwhwsqhgrPPaYe94QZ2Cx1FQiTT6b7dc2VLG/O0fSxTOTixgsBFQI0S4jVenQuL4HsKT
- ndPi8Sku9Zldta3x6JtKzvQDcRbaCWIz9fVf8zMwe171RdkFV3wuG5yJiJnDuRJGESNn zA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dvgqj77b0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 18:54:58 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20SIhQBI020273
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 18:54:57 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3dvgqj77ak-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jan 2022 18:54:57 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20SIqOqn030490;
-        Fri, 28 Jan 2022 18:54:56 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma02fra.de.ibm.com with ESMTP id 3dr9ja9hs9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jan 2022 18:54:55 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20SIsq7j40501660
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jan 2022 18:54:52 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5EADA405C;
-        Fri, 28 Jan 2022 18:54:52 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D986A4068;
-        Fri, 28 Jan 2022 18:54:52 +0000 (GMT)
-Received: from p-imbrenda.bredband2.com (unknown [9.145.7.17])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jan 2022 18:54:52 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        nrb@linux.ibm.com, scgl@linux.ibm.com, seiden@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v1 5/5] s390x: skrf: avoid hardcoded CPU addresses
-Date:   Fri, 28 Jan 2022 19:54:49 +0100
-Message-Id: <20220128185449.64936-6-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220128185449.64936-1-imbrenda@linux.ibm.com>
-References: <20220128185449.64936-1-imbrenda@linux.ibm.com>
+        id S240567AbiA1T1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 14:27:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55678 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229968AbiA1T1f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 14:27:35 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE5FC061714
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 11:27:35 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id j23so11807175edp.5
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 11:27:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rGi3kvUTWLMlTMsLo7Uiwt0VLKLoGeVNXRBhLXdxbYg=;
+        b=BAoRGYHWM81Tqy6/WtRLJ3S5YhFVToMahxbexRpQVvAPy5/dCikD2CLI8dv5yTq++X
+         Xh8B8zeMXAVtSz3qSb3/pGtVoHlr3A4Cu1iE+pkSif7kzmRQgG6xaMuAOowwhqcPT0aS
+         1ltQQOfNhQ0TUZA6D+5JylaeODzyKbHjoacKbq/uycdasxcsvf1xyvPYFHAf9YZvWkaU
+         iFPmhOLuoVTMXejz4bvjiFOaz78K7mr212QySlMcTzNHNj9c16P1iPFRLtHY1UyVzb5c
+         GvQ3mYQ8nZHtd2XYUpZXEAANSNvuVroWdMzNan90UAOSy/2NDEiYUZXbReiWZH4Jo0qW
+         Cokg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rGi3kvUTWLMlTMsLo7Uiwt0VLKLoGeVNXRBhLXdxbYg=;
+        b=idHLPmEOkivw85g+Lzz+SnKA7BN/Ny6Fn+jN83h2hog6Qsdd93SQ9W+wyFaDwf9ZHx
+         Z1GLrqDL0TXavZc9693ip4k871ZOahldxVBOPmsKdRiIoiPl1xarNwDEoLCNshwelCxL
+         3mibwqPTxrzc66FiH2iUAp+tQads58NSrcHyI583wv7gmpVbS6G9h1m7C0xd4Lz2XnI/
+         IFG/DyiHoplLXjFMpMQTVMhGbzy1qTi2mhqN4TqwktTTEQoBX2B8wG7aSt4SCVj2YZ1t
+         /hj8UrYtTuuTTjo9KObpUwgLFO4NYliEe98tNUxy4qYhBkd1WDon600szJq1MQgy+9xv
+         ytIg==
+X-Gm-Message-State: AOAM530YmvJnbhSejCyaV8U5w5sJAituWIwIrazSMGz1XwQRhNi+IqZn
+        Flc2tmN28+HWjUpse+X4cdvMUYCHNB3L4GuXaE8KRw==
+X-Google-Smtp-Source: ABdhPJwfca8B8rOhxbI8lwoElPyVVie0Abri7eCEDHDUIBYUY2U55XJiRS0ZLuT8wvnSUDk5afJL5gn1VvdwooEJ2uk=
+X-Received: by 2002:aa7:cd08:: with SMTP id b8mr9312715edw.265.1643398053850;
+ Fri, 28 Jan 2022 11:27:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ayn7oP-tLtMHovjw9nprOFbhrO6fTsJA
-X-Proofpoint-ORIG-GUID: pAWIUB9dIeL04_pzen-4bF-i-TC70ZAH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-28_05,2022-01-28_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- bulkscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015 adultscore=0
- suspectscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2201280108
+References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-3-reijiw@google.com>
+ <YfDaiUbSkpi9/5YY@google.com> <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
+In-Reply-To: <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Fri, 28 Jan 2022 11:27:21 -0800
+Message-ID: <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
+ value per guest
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the recently introduced smp_cpu_addr_from_idx to discover the
-addresses of the CPUs to use in the test, instead of using hardcoded
-values. This makes the test more portable.
+On Thu, Jan 27, 2022 at 10:24 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Ricardo,
+>
+> On Tue, Jan 25, 2022 at 9:22 PM Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > On Wed, Jan 05, 2022 at 08:26:44PM -0800, Reiji Watanabe wrote:
+> > > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> > > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> > > Use the saved ones when ID registers are read by the guest or
+> > > userspace (via KVM_GET_ONE_REG).
+> > >
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 16 ++++++++
+> > >  arch/arm64/kvm/arm.c              |  1 +
+> > >  arch/arm64/kvm/sys_regs.c         | 62 ++++++++++++++++++++++---------
+> > >  3 files changed, 62 insertions(+), 17 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 2a5f7f38006f..c789a0137f58 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -102,6 +102,17 @@ struct kvm_s2_mmu {
+> > >  struct kvm_arch_memory_slot {
+> > >  };
+> > >
+> > > +/*
+> > > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> > > + * where 0<=crm<8, 0<=op2<8.
+> >
+> > Is this observation based on this table?
+> >
+> > Table D12-2 System instruction encodings for non-Debug System register accesses
+> > in that case, it seems that the ID registers list might grow after
+> > crm=7, and as CRm has 4 bits, why not 16*8=128?
+>
+> This is basically for registers that are already reserved as RAZ in the
+> table (sys_reg_descs[] has entries for the reserved ones as well).
+> Registers with crm > 7 are not reserved yet, and that will be expanded
+> later as needed later.
+>
+>
+> >
+> > > + */
+> > > +#define KVM_ARM_ID_REG_MAX_NUM       64
+> > > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > +#define is_id_reg(id)        \
+> > > +     (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&        \
+> > > +      sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 0 &&        \
+> > > +      sys_reg_CRm(id) < 8)
+> > > +
+> > >  struct kvm_arch {
+> > >       struct kvm_s2_mmu mmu;
+> > >
+> > > @@ -137,6 +148,9 @@ struct kvm_arch {
+> > >
+> > >       /* Memory Tagging Extension enabled for the guest */
+> > >       bool mte_enabled;
+> > > +
+> > > +     /* ID registers for the guest. */
+> > > +     u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
+> > >  };
+> > >
+> > >  struct kvm_vcpu_fault_info {
+> > > @@ -734,6 +748,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> > >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> > >                               struct kvm_arm_copy_mte_tags *copy_tags);
+> > >
+> > > +void set_default_id_regs(struct kvm *kvm);
+> > > +
+> > >  /* Guest/host FPSIMD coordination helpers */
+> > >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> > >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index e4727dc771bf..5f497a0af254 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> > >       kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+> > >
+> > >       set_default_spectre(kvm);
+> > > +     set_default_id_regs(kvm);
+> > >
+> > >       return ret;
+> > >  out_free_stage2_pgd:
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index e3ec1a44f94d..80dc62f98ef0 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -33,6 +33,8 @@
+> > >
+> > >  #include "trace.h"
+> > >
+> > > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+> > > +
+> > >  /*
+> > >   * All of this file is extremely similar to the ARM coproc.c, but the
+> > >   * types are different. My gut feeling is that it should be pretty
+> > > @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+> > >                         struct sys_reg_params *p,
+> > >                         const struct sys_reg_desc *r)
+> > >  {
+> > > -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > +     u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
+> > >       u32 sr = reg_to_encoding(r);
+> > >
+> > >       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
+> > > @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> > >       return true;
+> > >  }
+> > >
+> > > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > > -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > > -             struct sys_reg_desc const *r, bool raz)
+> > > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> > >  {
+> > > -     u32 id = reg_to_encoding(r);
+> > > -     u64 val;
+> > > -
+> > > -     if (raz)
+> > > -             return 0;
+> > > -
+> > > -     val = read_sanitised_ftr_reg(id);
+> > > +     u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
+> > >
+> > >       switch (id) {
+> > >       case SYS_ID_AA64PFR0_EL1:
+> > > @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >       return val;
+> > >  }
+> > >
+> > > +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > > +                    struct sys_reg_desc const *r, bool raz)
+> > > +{
+> > > +     u32 id = reg_to_encoding(r);
+> > > +
+> > > +     return raz ? 0 : __read_id_reg(vcpu, id);
+> > > +}
+> > > +
+> > >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+> > >                                 const struct sys_reg_desc *r)
+> > >  {
+> > > @@ -1223,9 +1225,8 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > >  /*
+> > >   * cpufeature ID register user accessors
+> > >   *
+> > > - * For now, these registers are immutable for userspace, so no values
+> > > - * are stored, and for set_id_reg() we don't allow the effective value
+> > > - * to be changed.
+> > > + * For now, these registers are immutable for userspace, so for set_id_reg()
+> > > + * we don't allow the effective value to be changed.
+> > >   */
+> > >  static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> > >                       const struct sys_reg_desc *rd, void __user *uaddr,
+> > > @@ -1237,7 +1238,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> > >       return reg_to_user(uaddr, &val, id);
+> > >  }
+> > >
+> > > -static int __set_id_reg(const struct kvm_vcpu *vcpu,
+> > > +static int __set_id_reg(struct kvm_vcpu *vcpu,
+> > >                       const struct sys_reg_desc *rd, void __user *uaddr,
+> > >                       bool raz)
+> > >  {
+> > > @@ -1837,8 +1838,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+> > >       if (p->is_write) {
+> > >               return ignore_write(vcpu, p);
+> > >       } else {
+> > > -             u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> > > -             u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> > > +             u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
+> > > +             u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
+> > >               u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
+> > >
+> > >               p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
+> > > @@ -2850,3 +2851,30 @@ void kvm_sys_reg_table_init(void)
+> > >       /* Clear all higher bits. */
+> > >       cache_levels &= (1 << (i*3))-1;
+> > >  }
+> > > +
+> > > +/*
+> > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
+> > > + * with ID_SANITISED() to the host's sanitized value.
+> > > + */
+> > > +void set_default_id_regs(struct kvm *kvm)
+> > > +{
+> > > +     int i;
+> > > +     u32 id;
+> > > +     const struct sys_reg_desc *rd;
+> > > +     u64 val;
+> > > +
+> > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> > > +             rd = &sys_reg_descs[i];
+> > > +             if (rd->access != access_id_reg)
+> > > +                     /* Not ID register, or hidden/reserved ID register */
+> > > +                     continue;
+> > > +
+> > > +             id = reg_to_encoding(rd);
+> > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
+> > > +                     /* Shouldn't happen */
+> > > +                     continue;
+> > > +
+> > > +             val = read_sanitised_ftr_reg(id);
+> >
+> > I'm a bit confused. Shouldn't the default+sanitized values already use
+> > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
+>
+> I'm not sure if I understand your question.
+> arm64_ftr_bits_kvm is used for feature support checkings when
+> userspace tries to modify a value of ID registers.
+> With this patch, KVM just saves the sanitized values in the kvm's
+> buffer, but userspace is still not allowed to modify values of ID
+> registers yet.
+> I hope it answers your question.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- s390x/skrf.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Based on the previous commit I was assuming that some registers, like
+id_aa64dfr0,
+would default to the overwritten values as the sanitized values. More
+specifically: if
+userspace doesn't modify any ID reg, shouldn't the defaults have the
+KVM overwritten
+values (arm64_ftr_bits_kvm)?
 
-diff --git a/s390x/skrf.c b/s390x/skrf.c
-index ca4efbf1..bd0abba0 100644
---- a/s390x/skrf.c
-+++ b/s390x/skrf.c
-@@ -164,6 +164,7 @@ static void test_exception_ext_new(void)
- 		.mask = extract_psw_mask(),
- 		.addr = (unsigned long)ecall_setup
- 	};
-+	uint16_t cpu1;
- 
- 	report_prefix_push("exception external new");
- 	if (smp_query_num_cpus() < 2) {
-@@ -171,14 +172,15 @@ static void test_exception_ext_new(void)
- 		report_prefix_pop();
- 		return;
- 	}
-+	cpu1 = smp_cpu_addr_from_idx(1);
- 
--	smp_cpu_setup(1, psw);
-+	smp_cpu_setup(cpu1, psw);
- 	wait_for_flag();
- 	set_flag(0);
- 
--	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
-+	sigp(cpu1, SIGP_EXTERNAL_CALL, 0, NULL);
- 	wait_for_flag();
--	smp_cpu_stop(1);
-+	smp_cpu_stop(cpu1);
- 	report_prefix_pop();
- }
- 
--- 
-2.34.1
-
+>
+> Thanks,
+> Reiji
+>
+> >
+> > > +             kvm->arch.id_regs[IDREG_IDX(id)] = val;
+> > > +     }
+> > > +}
+> > > --
+> > > 2.34.1.448.ga2b2bfdf31-goog
+> > >
