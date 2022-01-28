@@ -2,78 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 384C64A0296
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 22:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 123B04A02F6
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 22:37:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234345AbiA1VTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 16:19:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52590 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbiA1VTA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jan 2022 16:19:00 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED4EAC061714
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 13:18:59 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id x11so14311622lfa.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 13:18:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=Beo1JbGwOLhZ2MWlPDrwyZ5ZOtgw4EejZBlER1C2tow=;
-        b=fBIkTsNGFqP16Ah8GVeCKUJN+dS9OnCtX4mVGT8WnGpg50eugM8KzQIwlWQI5S4qZj
-         BKzF3+XPLuaOQ6qX/JtO1rTV1TWBXuEev4g8PpwwqYffVaxaHF08HvQVJxgavbLPdFdE
-         E25vbtRHy1Xcd+Pn1ZvxBshm1dUbQ5g31RApEOGsJ5ulRhB4nt3WYyrYpfkMSY+o2cm0
-         TXrwgzY3mb2/HTD3q39XMkxWQ8JrGzHHmlxbIgJdmkvImVqKXRO+q6rp25oOL/oC4jzr
-         uUzei4XprEM61yccgkBevUfiQYlDWkxuZK6nBPMKPBjyhmt+Ot21MO+ACWTS9ygQALlZ
-         daIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=Beo1JbGwOLhZ2MWlPDrwyZ5ZOtgw4EejZBlER1C2tow=;
-        b=cmT8jZI3eHqTJeQm8sim6Jr88iSEB81WAbZbeYH0d7THgI+FTqhfyftf4G89x/rEx4
-         BhLGfdiGxlsUA7P6CWj4kCU1tCBDNzkTiHhvmJ2TQQoELiRUS0Cc5/FrWmhy+tnmuXM+
-         aFqbs0ygGNblyqPySSbAlDUmrXfa2ja2zgDHWLSNvmAAqoL/KxxzXka73ReRMDQYwtd0
-         6q3+jA8mzNAjsjt2Edk/P0YJPujdjcJbXjsaEonDPrOpvofbya954Etn3jOnoi1NrZ+z
-         RStItJx2mn64rXhf8Q9rSExYs53pBbMkHoepFsAFSiUSajARUJQkIgiYFfiHv4SPIMbd
-         ayyQ==
-X-Gm-Message-State: AOAM531Vg8LZhiU8gSJX2mZJ+bRSXU7bkdPCRv0xvHpqy0v55ZrN5SsY
-        EjQsnNbI/goCD6WVJlQlF9CmIYFVm69wYO7N5g0=
-X-Google-Smtp-Source: ABdhPJzqOJnAbUGnHkfRY+lPugvXB5LWDvmSwQ4q/ld08c4DExJN3uYx2EK164QcUqT6PZRYzrqNxanTHunA8Dt2730=
-X-Received: by 2002:ac2:4304:: with SMTP id l4mr7723041lfh.304.1643404738193;
- Fri, 28 Jan 2022 13:18:58 -0800 (PST)
+        id S1351469AbiA1VhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 16:37:07 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:34544 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1347668AbiA1VhF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 16:37:05 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1nDYvI-0008TI-5c; Fri, 28 Jan 2022 22:36:48 +0100
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Michal Hocko <mhocko@suse.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Fix rmap allocation for very large memslots
+Date:   Fri, 28 Jan 2022 22:36:42 +0100
+Message-Id: <1acaee7fa7ef7ab91e51f4417572b099caf2f400.1643405658.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Received: by 2002:a2e:9ecd:0:0:0:0:0 with HTTP; Fri, 28 Jan 2022 13:18:57
- -0800 (PST)
-Reply-To: greogebrown@gmail.com
-From:   george brown <kagnalex@gmail.com>
-Date:   Fri, 28 Jan 2022 22:18:57 +0100
-Message-ID: <CACemp=5gztW72+c_4rXnXpsWg5p1T5rkx7Wqy4HfzQ38ZyR_zg@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hallo
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Mein Name ist George Brown. Ich bin von Beruf Rechtsanwalt. m=C3=B6chte ich
-Ihnen anbieten
-die n=C3=A4chsten Angeh=C3=B6rigen meines Mandanten. Sie werden die Summe v=
-on
-($8,5 Millionen) erben
-Dollar, die mein Mandant vor seinem Tod auf der Bank gelassen hat.
+Commit 7661809d493b ("mm: don't allow oversized kvmalloc() calls") has
+forbidden using kvmalloc() to make allocations larger than INT_MAX (2 GiB).
 
-Mein Mandant ist ein B=C3=BCrger Ihres Landes, der mit seiner Frau bei
-einem Autounfall ums Leben kam
-und einziger Sohn. Ich habe Anspruch auf 50 % des Gesamtfonds, w=C3=A4hrend
-50 % Anspruch haben
-sein f=C3=BCr dich.
-Bitte kontaktieren Sie meine private E-Mail hier f=C3=BCr weitere Details:
-greogebrown@gmail.com
+Unfortunately, adding a memslot exceeding 1 TiB in size will result in rmap
+code trying to make an allocation exceeding this limit.
+Besides failing this allocation, such operation will also trigger a
+WARN_ON_ONCE() added by the aforementioned commit.
 
-Vielen Dank im Voraus,
-Herr George Brown,
+Since we probably still want to use kernel slab for small rmap allocations
+let's only redirect such oversized allocations to vmalloc.
+
+A possible alternative would be to add some kind of a __GFP_LARGE flag to
+skip the INT_MAX check behind kvmalloc(), however this will impact the
+common kernel memory allocation code, not just KVM.
+
+Fixes: a7c3e901a4 ("mm: introduce kv[mz]alloc helpers")
+Cc: stable@vger.kernel.org
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+ arch/x86/kvm/x86.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8033eca6f3a1..c64bac8614c7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11806,24 +11806,36 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+ 
+ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
+ {
+-	const int sz = sizeof(*slot->arch.rmap[0]);
++	const size_t sz = sizeof(*slot->arch.rmap[0]);
+ 	int i;
+ 
+ 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+ 		int level = i + 1;
+-		int lpages = __kvm_mmu_slot_lpages(slot, npages, level);
++		size_t lpages = __kvm_mmu_slot_lpages(slot, npages, level);
++		size_t rmap_size;
+ 
+ 		if (slot->arch.rmap[i])
+ 			continue;
+ 
+-		slot->arch.rmap[i] = kvcalloc(lpages, sz, GFP_KERNEL_ACCOUNT);
+-		if (!slot->arch.rmap[i]) {
+-			memslot_rmap_free(slot);
+-			return -ENOMEM;
+-		}
++		if (unlikely(check_mul_overflow(lpages, sz, &rmap_size)))
++			goto ret_fail;
++
++		/* kvzalloc() only allows sizes up to INT_MAX */
++		if (unlikely(rmap_size > INT_MAX))
++			slot->arch.rmap[i] = __vmalloc(rmap_size,
++						       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++		else
++			slot->arch.rmap[i] = kvzalloc(rmap_size, GFP_KERNEL_ACCOUNT);
++
++		if (!slot->arch.rmap[i])
++			goto ret_fail;
+ 	}
+ 
+ 	return 0;
++
++ret_fail:
++	memslot_rmap_free(slot);
++	return -ENOMEM;
+ }
+ 
+ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
