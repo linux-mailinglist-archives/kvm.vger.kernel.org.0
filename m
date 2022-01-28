@@ -2,110 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29BA949FD10
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 16:47:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0852049FE4B
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 17:47:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349411AbiA1PrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 10:47:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32908 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348753AbiA1PrU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jan 2022 10:47:20 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0713DC061714
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 07:47:20 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id o64so6813071pjo.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 07:47:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=/5GaBjAPDkft9rss8AjJbYiyeSgUzkGFpx6lcIFGalg=;
-        b=CUgy2U8mNb65Wm9Bm4YduWGDpEY+TZoG9/0sL4d/O604sGT4RL3O6TIjRru2FGXGs2
-         9Il9/O2yLeq3NB1QvqvZEP8Ptil3dVLRJt8GAfBYVZ3y5bwRrq9jTPobsjRQTKwdpvE0
-         gXS5gtjgVw/ArFMnZ+dUpyVn8WZ4bINoQN6EwUPFuLZQDsA/114R9rkn3vJSLmNp+7rc
-         yGZHDCx5TM0fZ5M4pQLci+d8sE4JT43D8ITyoXCzLoYrWQRilLZSr96pfcjR/lh+aORQ
-         oupgzREQrEjwpmClDeb7UlpW+0WPAGIQgzu9GwgrNYIUIbIsTt5ruOGVu3Zv1m8AsWNy
-         OcMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=/5GaBjAPDkft9rss8AjJbYiyeSgUzkGFpx6lcIFGalg=;
-        b=BzEg8YUQYIr8ZBkPz1+B5zxSMLo9L/Y/97BCqJyN/7Zmpg/s9T9QdolBSVoIRUEOD2
-         akEBolPAVzwqmASozHBZJHwmCV0ujlyC1/ldQjkvvsqpZ9Pm7fy/3B+4aJelkLqOBEpX
-         oyuQAHmDaaNRlcUZUitoJ2XKK9YGcUVBigFO7S3DoJIMgGEI7ei63oYFBOVq2FIShJZU
-         +ejbROxuE1eWEXDnWD6GhyL/dkHpa7Fra8td58lnKRt5s1EoUCXuhaweRLlWzM5HjDN1
-         Rs3t9qffDtS5AOu/MU0xXExVK0RPlt3nhPA3sQ0DHowubCOIViRx4Yojrso9mSdfotsZ
-         jzng==
-X-Gm-Message-State: AOAM531IkrfnD+Og2PXbi+VILOVvrevyxkWKT646EHmWjwhd4xNYMAFQ
-        TrHU6aSILd9kgV98vab3Dm5FLy86Z5Jrn13mRx8=
-X-Google-Smtp-Source: ABdhPJz07lUVrIA488ClPtp8e7LOJ/LZf0rzcLMV7vdst+jqtEFW2z52dNVLNB298s5Bx3475Czb6PnszVa8e1+opYE=
-X-Received: by 2002:a17:902:9303:: with SMTP id bc3mr8614449plb.145.1643384839415;
- Fri, 28 Jan 2022 07:47:19 -0800 (PST)
+        id S1350214AbiA1Qrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 11:47:31 -0500
+Received: from foss.arm.com ([217.140.110.172]:53660 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1349936AbiA1Qra (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 11:47:30 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EB6F113E;
+        Fri, 28 Jan 2022 08:47:30 -0800 (PST)
+Received: from [10.57.13.224] (unknown [10.57.13.224])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0C573F793;
+        Fri, 28 Jan 2022 08:47:25 -0800 (PST)
+Message-ID: <3326f57a-169d-8eb8-2b8b-0379c33ba7a5@arm.com>
+Date:   Fri, 28 Jan 2022 16:47:24 +0000
 MIME-Version: 1.0
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Fri, 28 Jan 2022 15:47:08 +0000
-Message-ID: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
-Subject: Call for GSoC and Outreachy project ideas for summer 2022
-To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>
-Cc:     =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        John Snow <jsnow@redhat.com>, Sergio Lopez <slp@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Alex Agache <aagch@amazon.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        hreitz@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v4 00/12] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Content-Language: en-GB
+To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear QEMU, KVM, and rust-vmm communities,
-QEMU will apply for Google Summer of Code 2022
-(https://summerofcode.withgoogle.com/) and has been accepted into
-Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-submit internship project ideas for QEMU, KVM, and rust-vmm!
+On 18/01/2022 13:21, Chao Peng wrote:
+> This is the v4 of this series which try to implement the fd-based KVM
+> guest private memory. The patches are based on latest kvm/queue branch
+> commit:
+> 
+>   fea31d169094 KVM: x86/pmu: Fix available_event_types check for
+>                REF_CPU_CYCLES event
+> 
+> Introduction
+> ------------
+> In general this patch series introduce fd-based memslot which provides
+> guest memory through memory file descriptor fd[offset,size] instead of
+> hva/size. The fd can be created from a supported memory filesystem
+> like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
+> and the the memory backing store exchange callbacks when such memslot
+> gets created. At runtime KVM will call into callbacks provided by the
+> backing store to get the pfn with the fd+offset. Memory backing store
+> will also call into KVM callbacks when userspace fallocate/punch hole
+> on the fd to notify KVM to map/unmap secondary MMU page tables.
+> 
+> Comparing to existing hva-based memslot, this new type of memslot allows
+> guest memory unmapped from host userspace like QEMU and even the kernel
+> itself, therefore reduce attack surface and prevent bugs.
+> 
+> Based on this fd-based memslot, we can build guest private memory that
+> is going to be used in confidential computing environments such as Intel
+> TDX and AMD SEV. When supported, the memory backing store can provide
+> more enforcement on the fd and KVM can use a single memslot to hold both
+> the private and shared part of the guest memory. 
 
-If you have experience contributing to QEMU, KVM, or rust-vmm you can
-be a mentor. It's a great way to give back and you get to work with
-people who are just starting out in open source.
+This looks like it will be useful for Arm's Confidential Compute
+Architecture (CCA) too - in particular we need a way of ensuring that
+user space cannot 'trick' the kernel into accessing memory which has
+been delegated to a realm (i.e. protected guest), and a memfd seems like
+a good match.
 
-Please reply to this email by February 21st with your project ideas.
+Some comments below.
 
-Good project ideas are suitable for remote work by a competent
-programmer who is not yet familiar with the codebase. In
-addition, they are:
-- Well-defined - the scope is clear
-- Self-contained - there are few dependencies
-- Uncontroversial - they are acceptable to the community
-- Incremental - they produce deliverables along the way
+> mm extension
+> ---------------------
+> Introduces new F_SEAL_INACCESSIBLE for shmem and new MFD_INACCESSIBLE
+> flag for memfd_create(), the file created with these flags cannot read(),
+> write() or mmap() etc via normal MMU operations. The file content can
+> only be used with the newly introduced memfile_notifier extension.
 
-Feel free to post ideas even if you are unable to mentor the project.
-It doesn't hurt to share the idea!
+For Arm CCA we are expecting to seed the realm with an initial memory
+contents (e.g. kernel and initrd) which will then be measured before
+execution starts. The 'obvious' way of doing this with a memfd would be
+to populate parts of the memfd then seal it with F_SEAL_INACCESSIBLE.
 
-I will review project ideas and keep you up-to-date on QEMU's
-acceptance into GSoC.
+However as things stand it's not possible to set the INACCESSIBLE seal
+after creating a memfd (F_ALL_SEALS hasn't been updated to include it).
 
-Internship program details:
-- Paid, remote work open source internships
-- GSoC projects are 175 or 350 hours, Outreachy projects are 30
-hrs/week for 12 weeks
-- Mentored by volunteers from QEMU, KVM, and rust-vmm
-- Mentors typically spend at least 5 hours per week during the coding period
+One potential workaround would be for arm64 to provide a custom KVM
+ioctl to effectively memcpy() into the guest's protected memory which
+would only be accessible before the guest has started. The drawback is
+that it requires two copies of the data during guest setup.
 
-Changes since last year: GSoC now has 175 or 350 hour project sizes
-instead of 12 week full-time projects. GSoC will accept applicants who
-are not students, before it was limited to students.
+Do you think things could be relaxed so the F_SEAL_INACCESSIBLE flag
+could be set after a memfd has been created (and partially populated)?
 
-For more background on QEMU internships, check out this video:
-https://www.youtube.com/watch?v=xNVCX7YMUL8
+Thanks,
 
-Please let me know if you have any questions!
+Steve
 
-Stefan
+> The memfile_notifier extension provides two sets of callbacks for KVM to
+> interact with the memory backing store:
+>   - memfile_notifier_ops: callbacks for memory backing store to notify
+>     KVM when memory gets allocated/invalidated.
+>   - memfile_pfn_ops: callbacks for KVM to call into memory backing store
+>     to request memory pages for guest private memory.
+> 
+> memslot extension
+> -----------------
+> Add the private fd and the fd offset to existing 'shared' memslot so that
+> both private/shared guest memory can live in one single memslot. A page in
+> the memslot is either private or shared. A page is private only when it's
+> already allocated in the backing store fd, all the other cases it's treated
+> as shared, this includes those already mapped as shared as well as those
+> having not been mapped. This means the memory backing store is the place
+> which tells the truth of which page is private.
+> 
+> Private memory map/unmap and conversion
+> ---------------------------------------
+> Userspace's map/unmap operations are done by fallocate() ioctl on the
+> backing store fd.
+>   - map: default fallocate() with mode=0.
+>   - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
+> The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
+> secondary MMU page tables.
+> 
+> Test
+> ----
+> To test the new functionalities of this patch TDX patchset is needed.
+> Since TDX patchset has not been merged so I did two kinds of test:
+> 
+> -  Regresion test on kvm/queue (this patch)
+>    Most new code are not covered. I only tested building and booting.
+> 
+> -  New Funational test on latest TDX code
+>    The patch is rebased to latest TDX code and tested the new
+>    funcationalities.
+> 
+> For TDX test please see below repos:
+> Linux: https://github.com/chao-p/linux/tree/privmem-v4.3
+> QEMU: https://github.com/chao-p/qemu/tree/privmem-v4
+> 
+> And an example QEMU command line:
+> -object tdx-guest,id=tdx \
+> -object memory-backend-memfd-private,id=ram1,size=2G \
+> -machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
+> 
+> Changelog
+> ----------
+> v4:
+>   - Decoupled the callbacks between KVM/mm from memfd and use new
+>     name 'memfile_notifier'.
+>   - Supported register multiple memslots to the same backing store.
+>   - Added per-memslot pfn_ops instead of per-system.
+>   - Reworked the invalidation part.
+>   - Improved new KVM uAPIs (private memslot extension and memory
+>     error) per Sean's suggestions.
+>   - Addressed many other minor fixes for comments from v3.
+> v3:
+>   - Added locking protection when calling
+>     invalidate_page_range/fallocate callbacks.
+>   - Changed memslot structure to keep use useraddr for shared memory.
+>   - Re-organized F_SEAL_INACCESSIBLE and MEMFD_OPS.
+>   - Added MFD_INACCESSIBLE flag to force F_SEAL_INACCESSIBLE.
+>   - Commit message improvement.
+>   - Many small fixes for comments from the last version.
+> 
+> Links of previous discussions
+> -----------------------------
+> [1] Original design proposal:
+> https://lkml.kernel.org/kvm/20210824005248.200037-1-seanjc@google.com/
+> [2] Updated proposal and RFC patch v1:
+> https://lkml.kernel.org/linux-fsdevel/20211111141352.26311-1-chao.p.peng@linux.intel.com/
+> [3] Patch v3: https://lkml.org/lkml/2021/12/23/283
+> 
+> Chao Peng (11):
+>   mm/memfd: Introduce MFD_INACCESSIBLE flag
+>   mm: Introduce memfile_notifier
+>   mm/shmem: Support memfile_notifier
+>   KVM: Extend the memslot to support fd-based private memory
+>   KVM: Use kvm_userspace_memory_region_ext
+>   KVM: Add KVM_EXIT_MEMORY_ERROR exit
+>   KVM: Use memfile_pfn_ops to obtain pfn for private pages
+>   KVM: Handle page fault for private memory
+>   KVM: Register private memslot to memory backing store
+>   KVM: Zap existing KVM mappings when pages changed in the private fd
+>   KVM: Expose KVM_MEM_PRIVATE
+> 
+> Kirill A. Shutemov (1):
+>   mm/shmem: Introduce F_SEAL_INACCESSIBLE
+> 
+>  arch/x86/kvm/Kconfig             |   1 +
+>  arch/x86/kvm/mmu/mmu.c           |  73 +++++++++++-
+>  arch/x86/kvm/mmu/paging_tmpl.h   |  11 +-
+>  arch/x86/kvm/x86.c               |  12 +-
+>  include/linux/kvm_host.h         |  49 +++++++-
+>  include/linux/memfile_notifier.h |  53 +++++++++
+>  include/linux/shmem_fs.h         |   4 +
+>  include/uapi/linux/fcntl.h       |   1 +
+>  include/uapi/linux/kvm.h         |  17 +++
+>  include/uapi/linux/memfd.h       |   1 +
+>  mm/Kconfig                       |   4 +
+>  mm/Makefile                      |   1 +
+>  mm/memfd.c                       |  20 +++-
+>  mm/memfile_notifier.c            |  99 ++++++++++++++++
+>  mm/shmem.c                       | 121 +++++++++++++++++++-
+>  virt/kvm/kvm_main.c              | 188 +++++++++++++++++++++++++++----
+>  16 files changed, 614 insertions(+), 41 deletions(-)
+>  create mode 100644 include/linux/memfile_notifier.h
+>  create mode 100644 mm/memfile_notifier.c
+> 
+
