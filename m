@@ -2,114 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C76049FCFC
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 16:41:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6D8249FCFF
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 16:42:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245094AbiA1Plo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 10:41:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19758 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231320AbiA1Pln (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 10:41:43 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20SFDsTH003114;
-        Fri, 28 Jan 2022 15:41:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=mIVC4tQn5urWzaW41VWBK+MJStHSJn6U89EnXjbE3rE=;
- b=RJ8KPUwxbfNfcjGo1b5rmJ4kcDaJhu1+/G1QyRROuY4A2xVZxpmenPKrIImx3AqFjHrR
- eLid26hs1C6S5baPAMRh7WH3vBEyEyc5uF1ovb0WRFTOmOrFKNNQCrCqKyZq3GkoTlbL
- oXcLU+nuq/waYXfsqF1pp3RJfI7vZ7qTymQieOYt3YbTrNwhFr2iTmIJqCJYnNWRafLE
- lUAWJbcVBGVDOsIz3TKxeCKX/tEefbQv1xX4wUU4xCC3naACrVzBBYCz5EbnydYgebfS
- kIl0HeyEfUDOQj/Wtd8ZjJzqIZEiTiqQ++Hgz3suOHdbPRnueYbZWvbrAfZuj0xKhgb+ 0Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dvfvb4ubx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jan 2022 15:41:31 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20SFE1ji003675;
-        Fri, 28 Jan 2022 15:41:30 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dvfvb4ub5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jan 2022 15:41:30 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20SFWtDS023981;
-        Fri, 28 Jan 2022 15:41:27 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 3dr9ja8d0t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jan 2022 15:41:27 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20SFfPu824183278
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jan 2022 15:41:25 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2343D11C050;
-        Fri, 28 Jan 2022 15:41:25 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8405311C066;
-        Fri, 28 Jan 2022 15:41:23 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jan 2022 15:41:23 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, guang.zeng@intel.com,
-        jing2.liu@intel.com, kevin.tian@intel.com, seanjc@google.com,
-        tglx@linutronix.de, wei.w.wang@intel.com, yang.zhong@intel.com
-Subject: [PATCH] kvm: Move KVM_GET_XSAVE2 IOCTL definition at the end of kvm.h
-Date:   Fri, 28 Jan 2022 15:40:25 +0000
-Message-Id: <20220128154025.102666-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
+        id S1349636AbiA1Pmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 10:42:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231320AbiA1Pmx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 10:42:53 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 863B9C06173B
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 07:42:53 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id d1so6241061plh.10
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 07:42:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=8cQiGIW7LrGAvgSo7SrwK7BDrdq6t9tzSMhHudcU/rs=;
+        b=cU5U0mO08WxFQS7m8O7fIDlpMlElcqhBbIXtvbv/0BX3a18uy6Og8Z95GVemMqvRJB
+         Se7mIrefKld7NWk3xoHo5/t91eTSkWAZhj/1wSGFSoQLFhhQhAm6kYyuaD0eqWwbfPmw
+         zmWtJiKcMN7DO5+9JDJIVI8CVVmfW5YsKpzh+obD/n8WePb7kM6uzmxNStCEvwjMJivb
+         23yAEUSIx/rsz/AAcH6spyAKUZ/Gn3TiSFqhgA1rvBHervyLwrKNb9pbMWUR6LEftZLW
+         TMcMhRPoJ9lyRlHjDIQtLoKOgmATRVSyvewMCjAgunRr8G/6pc5iYV9Ja+IxP62mpnKT
+         t6+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=8cQiGIW7LrGAvgSo7SrwK7BDrdq6t9tzSMhHudcU/rs=;
+        b=MZdO+CDQtGSr+ZrCxFlPGK/LTFXUNGRJxfQWa0rSiAXmkM/jBA/B1An+Q6OJIgh9eY
+         w0y+qE5T3wiMzuErXIbo+TgoA4k8zzoG9+LSEwFl7VQEHdWUneiUWqTokXQeC7709OIz
+         lFBaXP2nAHvJqs56RvONn2ZkxG6gSBozI+tKbTiY31/ge0nPvb9SMFyybbhI1LLoTS8C
+         +iTvD8bRCPSslEyeH/85iGbJvqCy7QQrb0u6Q+NvMNS0dEhQ5rp27sTJ3xtV5h4JUA7i
+         gTBic8PpaOdRLCiG+Ud2wrg0K4BlG7loW9T9uRVm4okMJZOCMCdNfS6MSh3rR1UOMLXI
+         l5TA==
+X-Gm-Message-State: AOAM533BUpcvmUq6oeG7gk0z9dlqjoBLDC1gMbjY1oMMIare1ANhM82X
+        s6CiMMVgD5zCb3IQr+8Qj+Um/w==
+X-Google-Smtp-Source: ABdhPJzGCRvVnPAS0yk1YsryL/2cBsLsN12clibk4RleUoV/vt2H4rWeK6zEg423wLzTB2+/HFvuZA==
+X-Received: by 2002:a17:903:4053:: with SMTP id n19mr9357650pla.37.1643384572865;
+        Fri, 28 Jan 2022 07:42:52 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t14sm2880879pjd.6.2022.01.28.07.42.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jan 2022 07:42:52 -0800 (PST)
+Date:   Fri, 28 Jan 2022 15:42:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH 01/22] KVM: x86: Drop unnecessary and confusing
+ KVM_X86_OP_NULL macro
+Message-ID: <YfQO+ADS1wnefoSr@google.com>
+References: <20220128005208.4008533-1-seanjc@google.com>
+ <20220128005208.4008533-2-seanjc@google.com>
+ <152db376-b0f3-3102-233c-a0dbb4011d0c@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -uiKA0YRqUO9Fvd8H9dVOt-g1rUD7k-I
-X-Proofpoint-ORIG-GUID: BXvA1Awgy1RUwIGL4zNAYE-i2P-NrMDv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-28_04,2022-01-28_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 malwarescore=0
- adultscore=0 mlxlogscore=999 clxscore=1011 phishscore=0 mlxscore=0
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2201280097
+In-Reply-To: <152db376-b0f3-3102-233c-a0dbb4011d0c@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This way we can more easily find the next free IOCTL number when
-adding new IOCTLs.
+On Fri, Jan 28, 2022, Paolo Bonzini wrote:
+> On 1/28/22 01:51, Sean Christopherson wrote:
+> > Drop KVM_X86_OP_NULL, which is superfluous and confusing.  The macro is
+> > just a "pass-through" to KVM_X86_OP; it was added with the intent of
+> > actually using it in the future, but that obviously never happened.  The
+> > name is confusing because its intended use was to provide a way for
+> > vendor implementations to specify a NULL pointer, and even if it were
+> > used, wouldn't necessarily be synonymous with declaring a kvm_x86_op as
+> > DEFINE_STATIC_CALL_NULL.
+> > 
+> > Lastly, actually using KVM_X86_OP_NULL as intended isn't a maintanable
+> > approach, e.g. bleeds vendor details into common x86 code, and would
+> > either be prone to bit rot or would require modifying common x86 code
+> > when modifying a vendor implementation.
+> 
+> I have some patches that redefine KVM_X86_OP_NULL as "must be used with
+> static_call_cond".  That's a more interesting definition, as it can be used
+> to WARN if KVM_X86_OP is used with a NULL function pointer.
 
-Fixes: be50b2065dfa ("kvm: x86: Add support for getting/setting expanded xstate buffer")
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- include/uapi/linux/kvm.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I'm skeptical that will actually work well and be maintainble.  E.g. sync_pir_to_ir()
+must be explicitly check for NULL in apic_has_interrupt_for_ppr(), forcing that path
+to do static_call_cond() will be odd.  Ditto for ops that are wired up to ioctl()s,
+e.g. the confidential VM stuff, and for ops that are guarded by other stuff, e.g. the
+hypervisor timer.
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 9563d294f181..efe81fef25eb 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1623,9 +1623,6 @@ struct kvm_enc_region {
- #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
- #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
- 
--/* Available with KVM_CAP_XSAVE2 */
--#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
--
- struct kvm_s390_pv_sec_parm {
- 	__u64 origin;
- 	__u64 length;
-@@ -2047,4 +2044,7 @@ struct kvm_stats_desc {
- 
- #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
- 
-+/* Available with KVM_CAP_XSAVE2 */
-+#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
-+
- #endif /* __LINUX_KVM_H */
--- 
-2.32.0
+Actually, it won't just be odd, it will be impossible to disallow NULL a pointer
+for KVM_X86_OP and require static_call_cond() for KVM_X86_OP_NULL.  static_call_cond()
+forces the return to "void", so any path that returns a value needs to be manually
+guarded and can't use static_call_cond(), e.g.
 
+arch/x86/kvm/x86.c: In function ‘kvm_arch_vm_ioctl’:
+arch/x86/kvm/x86.c:6450:19: error: void value not ignored as it ought to be
+ 6450 |                 r = static_call_cond(kvm_x86_mem_enc_ioctl)(kvm, argp);
+      |                   ^
