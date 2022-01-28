@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE4DD49F9F0
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 13:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53DEB49F9FF
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 13:50:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348691AbiA1Mu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 07:50:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47790 "EHLO
+        id S1348701AbiA1Mur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 07:50:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348685AbiA1Mu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jan 2022 07:50:27 -0500
+        with ESMTP id S1348720AbiA1Muq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 07:50:46 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361ABC061714
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 04:50:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4F5C06174E
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 04:50:46 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E9E37B8258F
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 12:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B52FC340E0;
-        Fri, 28 Jan 2022 12:50:24 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DE051B8258F
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 12:50:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEEE6C340E0;
+        Fri, 28 Jan 2022 12:50:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643374224;
-        bh=ifpaLR5N6tP322CyuD07egnWhJpbvOQzB29IWFZfTbI=;
+        s=k20201202; t=1643374243;
+        bh=DODeF9o8Sl2vkui25obN2Ct4mXtkcYS1+9H7aC1HxUc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GzfPGI2Ym46BH5x2UIPqjKCwdXCjSy9OTeawDCyEKNlWle+LMMmZQDvmDEIoC1Jmi
-         bI9T63yi412KFmQRwCf2XphxTW+nsHo2+tZPoaBiwmD0Pvwd+9gY9dAnpQmWkHAUyp
-         yJu5vXwuQVH6/vhkpuh7pMPfpgol3H8aFuFKffRUkk+VyhkM8WlE82LmUXHCyG5bLq
-         BnitbUUtXnN5kCrzSfUQ1jI4uorJhWNrZLMltiNGIAmpo4v6s7JYjmTleGzeCaBWqF
-         nM/PQAUCCH8uJ/0ERlkjpHrUChzJVeUnEH1Qr103Dj1sdR+ck2LHKQZqXtPCaV1OpG
-         NAwwagWDYCuMg==
+        b=fCTWqJCfwI202ExJ0XgYw6eqmW9biV0iPa4FPbQId4aKlzLcLWEvoOBbpuH1Brn+r
+         t+7hyp4BUSNS7dQkITGMXmjArsRl5Mw7espg7ORu8hPdqqwPObzv0mGJcv6jMBA+j/
+         t2s0dvo5qAWWyhO+j3NmMYeQeaboZGMqyzL4CJu1Avsx1j2otxglzu4R3DhXjMKg3B
+         4JQxXQyaB784u/3rGJiIMC8/EAFhdKjBC9fxCfdEyNEdNR/l8Q3rDam+sY95Er5uBN
+         3nM6lWU7U42FvYwgGDq/xIUnV2f+jjOrtTzfzHW6PNwvFipInmlv8ik5XP2aFhc165
+         MvQ3CThhCnDgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1nDQEY-003njR-Jy; Fri, 28 Jan 2022 12:20:06 +0000
+        id 1nDQEY-003njR-Uf; Fri, 28 Jan 2022 12:20:07 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -51,9 +51,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         karl.heubaum@oracle.com, mihai.carabas@oracle.com,
         miguel.luis@oracle.com, kernel-team@android.com
-Subject: [PATCH v6 55/64] KVM: arm64: nv: Tag shadow S2 entries with nested level
-Date:   Fri, 28 Jan 2022 12:19:03 +0000
-Message-Id: <20220128121912.509006-56-maz@kernel.org>
+Subject: [PATCH v6 56/64] KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+Date:   Fri, 28 Jan 2022 12:19:04 +0000
+Message-Id: <20220128121912.509006-57-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -67,72 +67,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Populate bits [56:55] of the leaf entry with the level provided
-by the guest's S2 translation.
+VNCR_EL2 points to a page containing a number of system registers
+accessed by a guest hypervisor when ARMv8.4-NV is enabled.
+
+Let's document the offsets in that page, as we are going to use
+this layout.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  7 +++++++
- arch/arm64/kvm/mmu.c                | 11 +++++++++++
- 2 files changed, 18 insertions(+)
+ arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 847b652bd376..3b5838a2f29e 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -5,6 +5,8 @@
- #include <linux/bitfield.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/kvm_pgtable.h>
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+new file mode 100644
+index 000000000000..c0a2acd5045c
+--- /dev/null
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -0,0 +1,74 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * System register offsets in the VNCR page
++ * All offsets are *byte* displacements!
++ */
 +
- static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- {
- 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-@@ -140,4 +142,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 
- #define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
- 
-+static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
-+{
-+	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
-+}
++#ifndef __ARM64_VNCR_MAPPING_H__
++#define __ARM64_VNCR_MAPPING_H__
 +
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 4b38f2f3c997..6caa48da1b2e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1281,11 +1281,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * Potentially reduce shadow S2 permissions to match the guest's own
- 	 * S2. For exec faults, we'd only reach this point if the guest
- 	 * actually allowed it (see kvm_s2_handle_perm_fault).
-+	 *
-+	 * Also encode the level of the nested translation in the SW bits of
-+	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
-+	 * the guest.
- 	 */
- 	if (kvm_is_shadow_s2_fault(vcpu)) {
- 		writable &= kvm_s2_trans_writable(nested);
- 		if (!kvm_s2_trans_readable(nested))
- 			prot &= ~KVM_PGTABLE_PROT_R;
++#define VNCR_VTTBR_EL2          0x020
++#define VNCR_VTCR_EL2           0x040
++#define VNCR_VMPIDR_EL2         0x050
++#define VNCR_CNTVOFF_EL2        0x060
++#define VNCR_HCR_EL2            0x078
++#define VNCR_HSTR_EL2           0x080
++#define VNCR_VPIDR_EL2          0x088
++#define VNCR_TPIDR_EL2          0x090
++#define VNCR_VNCR_EL2           0x0B0
++#define VNCR_CPACR_EL1          0x100
++#define VNCR_CONTEXTIDR_EL1     0x108
++#define VNCR_SCTLR_EL1          0x110
++#define VNCR_ACTLR_EL1          0x118
++#define VNCR_TCR_EL1            0x120
++#define VNCR_AFSR0_EL1          0x128
++#define VNCR_AFSR1_EL1          0x130
++#define VNCR_ESR_EL1            0x138
++#define VNCR_MAIR_EL1           0x140
++#define VNCR_AMAIR_EL1          0x148
++#define VNCR_MDSCR_EL1          0x158
++#define VNCR_SPSR_EL1           0x160
++#define VNCR_CNTV_CVAL_EL0      0x168
++#define VNCR_CNTV_CTL_EL0       0x170
++#define VNCR_CNTP_CVAL_EL0      0x178
++#define VNCR_CNTP_CTL_EL0       0x180
++#define VNCR_SCXTNUM_EL1        0x188
++#define VNCR_TFSR_EL1		0x190
++#define VNCR_ZCR_EL1            0x1E0
++#define VNCR_TTBR0_EL1          0x200
++#define VNCR_TTBR1_EL1          0x210
++#define VNCR_FAR_EL1            0x220
++#define VNCR_ELR_EL1            0x230
++#define VNCR_SP_EL1             0x240
++#define VNCR_VBAR_EL1           0x250
++#define VNCR_ICH_LR0_EL2        0x400
++//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
++#define VNCR_ICH_AP0R0_EL2      0x480
++//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
++#define VNCR_ICH_AP1R0_EL2      0x4A0
++//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
++#define VNCR_ICH_HCR_EL2        0x4C0
++#define VNCR_ICH_VMCR_EL2       0x4C8
++#define VNCR_VDISR_EL2          0x500
++#define VNCR_PMBLIMITR_EL1      0x800
++#define VNCR_PMBPTR_EL1         0x810
++#define VNCR_PMBSR_EL1          0x820
++#define VNCR_PMSCR_EL1          0x828
++#define VNCR_PMSEVFR_EL1        0x830
++#define VNCR_PMSICR_EL1         0x838
++#define VNCR_PMSIRR_EL1         0x840
++#define VNCR_PMSLATFR_EL1       0x848
++#define VNCR_TRFCR_EL1          0x880
++#define VNCR_MPAM1_EL1          0x900
++#define VNCR_MPAMHCR_EL2        0x930
++#define VNCR_MPAMVPMV_EL2       0x938
++#define VNCR_MPAMVPM0_EL2       0x940
++#define VNCR_MPAMVPM1_EL2       0x948
++#define VNCR_MPAMVPM2_EL2       0x950
++#define VNCR_MPAMVPM3_EL2       0x958
++#define VNCR_MPAMVPM4_EL2       0x960
++#define VNCR_MPAMVPM5_EL2       0x968
++#define VNCR_MPAMVPM6_EL2       0x970
++#define VNCR_MPAMVPM7_EL2       0x978
 +
-+		prot |= kvm_encode_nested_level(nested);
- 	}
- 
- 	spin_lock(&kvm->mmu_lock);
-@@ -1336,6 +1342,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
- 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
-+		/*
-+		 * Drop the SW bits in favour of those stored in the
-+		 * PTE, which will be preserved.
-+		 */
-+		prot &= ~KVM_NV_GUEST_MAP_SZ;
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
- 	} else {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
++#endif /* __ARM64_VNCR_MAPPING_H__ */
 -- 
 2.30.2
 
