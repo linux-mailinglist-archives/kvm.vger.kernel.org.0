@@ -2,216 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C76DC4A0304
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 22:40:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A8FA4A0325
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 22:48:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348274AbiA1Vkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 16:40:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57594 "EHLO
+        id S1351628AbiA1VsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 16:48:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235969AbiA1Vkr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jan 2022 16:40:47 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131F8C06173B
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 13:40:47 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id e28so7356392pfj.5
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 13:40:47 -0800 (PST)
+        with ESMTP id S1351614AbiA1Vr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 16:47:59 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22B61C06173B
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 13:47:59 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id a19so1398166pfx.4
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 13:47:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=k6jLROMjFao7umAdNdU2nps7DNd/2hCKqNaRX+GNrNE=;
-        b=pOYMyVsviS5ZXyX7QpGw6+81A8UaDif16k7CLTQFrvekf8dwrkBhGLAWdz93ScVtOu
-         WMnDA2tm/ZDx7NT4hH8D/wd3r/3ErWY8XEErncthtxDnP/u9tNqoFOAEgc+0PPU2BJi2
-         n+M2JJO5eDxOGM6u+sFuk6CAapVGxZuYUp/vh0JHmvgNjNfxun9dnMJoJopoU1rGVGJ8
-         4S3p0HKBn8N6qFb+mHlD4p6yJ4iwqGMZkmGm7jODd0R1VotNaJJQTkA/qFyXVTme98Az
-         9kXNWt1Giuo9RQEEEapqrs4qhvm4WVPV3X5mTU+69VWMFb+xqjd/FXkBBgMByFvYHn2U
-         axAw==
+         :content-disposition:in-reply-to;
+        bh=gEFhmZLFOnXMQveiDfoP1+6Mljbbxm8tsJX8s0nRB78=;
+        b=ZuM+rah6VlxJjLQN6XGuzLjNMOR8gefWcnDB4s6zlMlT6qajSenVWettyIecArWDnC
+         Fq0slbwG5XONSEXFvWzvMRN9PXT1+IBmW6lwfBLr4Q9wyOX5ambmxjvNzbI+2898WjCK
+         tf0bZSvggWSVNk+Exkq7K5V+qAYWlclBozqSSAbbIPaMFXdD2TDQj6ziFP3Kc5c6FoAP
+         OW4n/CPH5jbNcRJLgNSBY35il5AQS5qh8n2ID/SNJxAeIi/N40gCxCj4Si00oLlZiMGx
+         7T4OTsXHLOSivcWgzIWtNMKTJbdoOpXQjUfaczYJ0L39kRCHd6D/YQ/56kpj/Jz3jvAe
+         eqEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=k6jLROMjFao7umAdNdU2nps7DNd/2hCKqNaRX+GNrNE=;
-        b=zCnHmCAVomF47UOuYG9iEIgspP4RE+7zXAvu6N1vL8BF8NHbcT+fbbfilqVmMLNl9f
-         2JzT+qWa68coGwD90G6NGWbvkwPSzquEQolMsM/R+4QvNKURtxQpyPU7fzD1LFrVYUUZ
-         BF+XX6rBnD7Zv/A9+pEa/ww99ErDif0e7T70k2i35l5JouDuGc1f0UkS/M/65bOMmtUb
-         IJPJ6z1+QmiP9HxBBGd4NHeB78GZtpSav45j66rmaGyUT4YDC/uR6fRaX8wRRT7P8pQ1
-         NNq0G4OJQKhY6GvTTTYN8DNrhRny2Z7iluLZU5BcUwFTpY1D+s37h2yX0SxH6tuV0Zgu
-         3u5w==
-X-Gm-Message-State: AOAM532K/pzBGYTbR3UE9hxyb4w9OhxHXnuKwl0U/k0+a5jBwwVbWOw7
-        B73/xNjDyyOuPuignSldi7DZfg==
-X-Google-Smtp-Source: ABdhPJzXoBblVcuVDnL1lifFneIqQS9ZvH4X/NVw99B5JBvAaq0FNjqEHxxVES3PMPWNKxnlAGqtBQ==
-X-Received: by 2002:a63:2a92:: with SMTP id q140mr8072875pgq.379.1643406046304;
-        Fri, 28 Jan 2022 13:40:46 -0800 (PST)
+         :mime-version:content-disposition:in-reply-to;
+        bh=gEFhmZLFOnXMQveiDfoP1+6Mljbbxm8tsJX8s0nRB78=;
+        b=P3OsUwY6KYTyEovpql7ukL6ZAlDZ0upMGuX16cny2hmZCAs9VntT6YLiJM8TTVbnmt
+         4XySCRZb4BoCfDtCfPbcsfhcjDJLcE28cfwp31zw4o/IuEBop2AhBLMkQUidJFJT5/Q5
+         9shq4GcO2Le/cQXVMwyuWTM+q1KxFSGooGHs4cfeSa4QT07dqT/yFFyFz/wYYjjnd8q9
+         gz/8XJA8AOgWuOwVgGTICBEKCGb0Q1pUrp1ZzDbta0MlT46Mu6PK1gPrrG9pX9Ksgldp
+         HXFlonICgJ3xQoDC7OJatUWHK+tjVvDM+4BMw1kowCXnr1v18U+nD7xhlFfeDZHUs9Nk
+         9s3w==
+X-Gm-Message-State: AOAM532sCt3GdOzQOpwUe0cWa0rF92TLtg0KeY/A7c7Da6kbCuem31ED
+        Q3mgkf1nyU+b06W4i2xhqnclpw==
+X-Google-Smtp-Source: ABdhPJwX5sN3fH7qxvbXfpsrKjhMhqnPjg2rx9bnF3SHFEOoCAYH0x1xlE0N3SmaKtEpvCSO3Qiw9Q==
+X-Received: by 2002:a65:424d:: with SMTP id d13mr8034233pgq.82.1643406478387;
+        Fri, 28 Jan 2022 13:47:58 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u16sm10756333pfg.192.2022.01.28.13.40.45
+        by smtp.gmail.com with ESMTPSA id v13sm9977689pfi.201.2022.01.28.13.47.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jan 2022 13:40:45 -0800 (PST)
-Date:   Fri, 28 Jan 2022 21:40:42 +0000
+        Fri, 28 Jan 2022 13:47:57 -0800 (PST)
+Date:   Fri, 28 Jan 2022 21:47:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
-        "luolongjun@huawei.com" <luolongjun@huawei.com>,
-        "hejingxian@huawei.com" <hejingxian@huawei.com>
-Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
-Message-ID: <YfRi2sY0hVfri5eR@google.com>
-References: <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
- <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
- <b13eac6c-ea87-aef9-437f-7266be2e2031@amd.com>
- <721484e0fa719e99f9b8f13e67de05033dd7cc86.camel@infradead.org>
- <1401c5a1-c8a2-cca1-e548-cab143f59d8f@amd.com>
- <2bfb13ed5d565ab09bd794f69a6ef2b1b75e507a.camel@infradead.org>
- <b798bcef-d750-ce42-986c-0d11d0bb47b0@amd.com>
- <41e63d89f1b2debc0280f243d7c8c3212e9499ee.camel@infradead.org>
- <c3dbd3b9-accf-bc28-f808-1d842d642309@amd.com>
- <7e92a196e67b1bfa37c1e61a789f2b75a735c06f.camel@infradead.org>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Michal Hocko <mhocko@suse.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix rmap allocation for very large memslots
+Message-ID: <YfRkivAI2P6urdfn@google.com>
+References: <1acaee7fa7ef7ab91e51f4417572b099caf2f400.1643405658.git.maciej.szmigiero@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7e92a196e67b1bfa37c1e61a789f2b75a735c06f.camel@infradead.org>
+In-Reply-To: <1acaee7fa7ef7ab91e51f4417572b099caf2f400.1643405658.git.maciej.szmigiero@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022, David Woodhouse wrote:
-> On Fri, 2021-12-17 at 14:55 -0600, Tom Lendacky wrote:
-> > On 12/17/21 2:13 PM, David Woodhouse wrote:
-> > > On Fri, 2021-12-17 at 13:46 -0600, Tom Lendacky wrote:
-> > > > There's no WARN or PANIC, just a reset. I can look to try and capture some
-> > > > KVM trace data if that would help. If so, let me know what events you'd
-> > > > like captured.
-> > > 
-> > > 
-> > > Could start with just kvm_run_exit?
-> > > 
-> > > Reason 8 would be KVM_EXIT_SHUTDOWN and would potentially indicate a
-> > > triple fault.
-> > 
-> > qemu-system-x86-24093   [005] .....  1601.759486: kvm_exit: vcpu 112 reason shutdown rip 0xffffffff81070574 info1 0x0000000000000000 info2 0x0000000000000000 intr_info 0x80000b08 error_code 0x00000000
-> > 
-> > # addr2line -e woodhouse-build-x86_64/vmlinux 0xffffffff81070574
-> > /root/kernels/woodhouse-build-x86_64/./arch/x86/include/asm/desc.h:272
-> > 
-> > Which is: asm volatile("ltr %w0"::"q" (GDT_ENTRY_TSS*8));
+On Fri, Jan 28, 2022, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> So, I remain utterly bemused by this, and the Milan *guests* I have
-> access to can't even kexec with a stock kernel; that is also "too fast"
-> and they take a triple fault during the bringup in much the same way —
-> even without my parallel patches, and even going back to fairly old
-> kernels.
+> Commit 7661809d493b ("mm: don't allow oversized kvmalloc() calls") has
+> forbidden using kvmalloc() to make allocations larger than INT_MAX (2 GiB).
 > 
-> I wasn't able to follow up with raw serial output during the bringup to
-> pinpoint precisely where it happens, because the VM would tear itself
-> down in response to the triple fault without actually flushing the last
-> virtual serial output :)
+> Unfortunately, adding a memslot exceeding 1 TiB in size will result in rmap
+> code trying to make an allocation exceeding this limit.
+> Besides failing this allocation, such operation will also trigger a
+> WARN_ON_ONCE() added by the aforementioned commit.
 > 
-> It would be really useful to get access to a suitable host where I can
-> spawn this in qemu and watch it fail. I am suspecting a chip-specific
-> quirk or bug at this point.
+> Since we probably still want to use kernel slab for small rmap allocations
+> let's only redirect such oversized allocations to vmalloc.
+> 
+> A possible alternative would be to add some kind of a __GFP_LARGE flag to
+> skip the INT_MAX check behind kvmalloc(), however this will impact the
+> common kernel memory allocation code, not just KVM.
 
-Nope.  You missed a spot.  This also reproduces on a sufficiently large Intel
-system (and Milan).  initial_gs gets overwritten by common_cpu_up(), which leads
-to a CPU getting the wrong MSR_GS_BASE and then the wrong raw_smp_processor_id(),
-resulting in cpu_init_exception_handling() stuffing the wrong GDT and leaving a
-NULL TR descriptor for itself.
+Paolo has a cleaner fix for this[1][2], but it appears to have stalled out somewhere.
 
-You also have a lurking bug in the x2APIC ID handling.  Stripping the boot flags
-from the prescribed APICID needs to happen before retrieving the x2APIC ID from
-CPUID, otherwise bits 31:16 of the ID will be lost.
+Paolo???
 
-You owe me two beers ;-)
-
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index dcdf49a137d6..23df88c86a0e 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -208,11 +208,14 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_GLOBAL)
-         * in smpboot_control:
-         * Bit 0-15     APICID if STARTUP_USE_CPUID_0B is not set
-         * Bit 16       Secondary boot flag
--        * Bit 17       Parallel boot flag
-+        * Bit 17       Parallel boot flag (STARTUP_USE_CPUID_0B)
-         */
-        testl   $STARTUP_USE_CPUID_0B, %eax
--       jz      .Lsetup_AP
-+       jnz     .Luse_cpuid_0b
-+       andl    $0xFFFF, %eax
-+       jmp     .Lsetup_AP
-
-+.Luse_cpuid_0b:
-        mov     $0x0B, %eax
-        xorl    %ecx, %ecx
-        cpuid
-@@ -220,7 +223,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_GLOBAL)
-
- .Lsetup_AP:
-        /* EAX contains the APICID of the current CPU */
--       andl    $0xFFFF, %eax
-        xorl    %ecx, %ecx
-        leaq    cpuid_to_apicid(%rip), %rbx
-
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 04f5c8de5606..e7fda406f39a 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1093,6 +1093,17 @@ wakeup_cpu_via_init_nmi(int cpu, unsigned long start_ip, int apicid,
-        return boot_error;
- }
-
-+static bool do_parallel_bringup = true;
-+
-+static int __init no_parallel_bringup(char *str)
-+{
-+       do_parallel_bringup = false;
-+
-+       return 0;
-+}
-+early_param("no_parallel_bringup", no_parallel_bringup);
-+
-+
- int common_cpu_up(unsigned int cpu, struct task_struct *idle)
- {
-        int ret;
-@@ -1112,7 +1123,8 @@ int common_cpu_up(unsigned int cpu, struct task_struct *idle)
-        /* Stack for startup_32 can be just as for start_secondary onwards */
-        per_cpu(cpu_current_top_of_stack, cpu) = task_top_of_stack(idle);
- #else
--       initial_gs = per_cpu_offset(cpu);
-+       if (!do_parallel_bringup)
-+               initial_gs = per_cpu_offset(cpu);
- #endif
-        return 0;
- }
-@@ -1336,16 +1348,6 @@ int do_cpu_up(unsigned int cpu, struct task_struct *tidle)
-        return ret;
- }
-
--static bool do_parallel_bringup = true;
--
--static int __init no_parallel_bringup(char *str)
--{
--       do_parallel_bringup = false;
--
--       return 0;
--}
--early_param("no_parallel_bringup", no_parallel_bringup);
--
- int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
- {
-        int ret;
-
+[1] https://lore.kernel.org/all/20211015165519.135670-1-pbonzini@redhat.com
+[2] https://lore.kernel.org/all/20211016064302.165220-1-pbonzini@redhat.com
