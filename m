@@ -2,101 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5D0849FCA7
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 16:17:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F22049FCE7
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 16:34:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242016AbiA1PR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 10:17:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60602 "EHLO
+        id S1349595AbiA1Pek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 10:34:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24651 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344522AbiA1PRX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 10:17:23 -0500
+        by vger.kernel.org with ESMTP id S234786AbiA1Pek (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 10:34:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643383043;
+        s=mimecast20190719; t=1643384079;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=B+4SyMhuYjgUIEdNZ7ziPDUu6V9n9YlAEf3lZkpwc1s=;
-        b=TT8Xp4gh3zHxfJyvBJ41Qk1igkyzwYBf9+JFogm5tGM6akaHPNHixhExnFvAuIjvSl2hyU
-        O7T1Cmc82unBQVyRJo2eIPgam57PlVugJljQxUrsaL7LAaTfE3PSjju3TpeEcvEukdbix7
-        WHJwDHyqvJneFxnW3W0xWyFubXz3hhY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FddNkihBKrpyFAjQbGjNX8VSm5TbuzI1tnV/kFzwOrM=;
+        b=WV/u/GCxwlzhdWPQptq185cpTgM94LlxmJwMUave3mQMKoKwYnjUMAaprMdsK1NNxJUXNL
+        rfpSb9hzYAQvV4APk/nAHl7b8GVsAF3WAIvtDtW2Lf1m3+Bx9FkcXxeHWuGlsQSaTyhe5q
+        vUl2yrC6J2Pe/vADph81ZYhQOwwUJcU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-357-YVWowbXgOr-TAVqswMff5g-1; Fri, 28 Jan 2022 10:17:21 -0500
-X-MC-Unique: YVWowbXgOr-TAVqswMff5g-1
-Received: by mail-ej1-f70.google.com with SMTP id v2-20020a1709062f0200b006a5f725efc1so3014130eji.23
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 07:17:21 -0800 (PST)
+ us-mta-30-Iu82EzVgPQ-u5PhwPvuMCQ-1; Fri, 28 Jan 2022 10:34:38 -0500
+X-MC-Unique: Iu82EzVgPQ-u5PhwPvuMCQ-1
+Received: by mail-ej1-f71.google.com with SMTP id l18-20020a1709063d3200b006a93f7d4941so3066199ejf.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 07:34:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=B+4SyMhuYjgUIEdNZ7ziPDUu6V9n9YlAEf3lZkpwc1s=;
-        b=C82nheFHih+VlgB/u8Z3MvcHuyd9leEmTDLeIVSi1G/c/1Fij/EuESX6FO6+KVUgco
-         abI3EnHZKQDpX14sdZ0LFpxI2OkD+hZWfuB7GshvQ0B/b3AleVRP+C/T6FG6hPwQ/ESI
-         GX8W2AQDRNk7PfVc05n4SMrctV9nmw5Hz/y07Kxmk12WFPVoo9UVnlVa3SyqMByg+kb+
-         Ho+aX/cUFYf2L31JseIHMDYwBQgSDx/y1Qe+mrqGixos5yx0+kI4pMUZc0Fv8CUhRS76
-         u6kBlDMeAOIXuhc17lEdFX+Es8MVIK/48GOHRUbqmZy+hoSWbMaPMS/6HcZaEW/vHXq+
-         HlvA==
-X-Gm-Message-State: AOAM532GtwxJbEz13vmh+4f/uWoKkEOIYbnSV32OlZ0lvg3As1GJBamz
-        IXdpDcg9C6iiq6WgBXxNQpf6Osw44LxxyxgE01M4XoTy47Yn8Q7Dw0Wn00cvk3nc6hxVLM/pDDV
-        sU458lfkyxUfZ
-X-Received: by 2002:a17:907:97c9:: with SMTP id js9mr7100689ejc.216.1643383040127;
-        Fri, 28 Jan 2022 07:17:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzQrEIxmdb869XlcJXV5GjKMYeT47z1MiIhOYP4j90slWPmc7DrQPPAndA9o3p1i+vBHvQxIg==
-X-Received: by 2002:a17:907:97c9:: with SMTP id js9mr7100665ejc.216.1643383039870;
-        Fri, 28 Jan 2022 07:17:19 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id jt14sm10164479ejc.32.2022.01.28.07.17.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jan 2022 07:17:19 -0800 (PST)
-Message-ID: <3f5d9eb7-7ad7-ae08-c31d-a41eef6659e4@redhat.com>
-Date:   Fri, 28 Jan 2022 16:17:18 +0100
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=FddNkihBKrpyFAjQbGjNX8VSm5TbuzI1tnV/kFzwOrM=;
+        b=Pq1LDqOfeaQU/T5Qhz4Di569S/NcCTCCylIuFF+/UjpLoJsTuvHaWqG2VaMdGaKVA9
+         mZLzhfxPLCdQGzO/Ldf3fPyS4DyayL2mfp61sLkSCaapmhSBxJ7hJJuzu96/na9/OJbM
+         sFQzuBRaZEGuW0d/X2a1bhtgWqOx4BrQ1YoTMjU7kV1431T14aLe0Qn8g7PstVv4cbbP
+         uQSrKJ4N6NjizTUq+EYFPaKhP9S8nfHJqp3AWiEbULBfheYtobCMPtle28fZPSAJQ1KX
+         b8XW1sgdwtWiMjtwb0ov7c0Sk/r2BatRl1TZKuNayV9q/SvhMwNpOJnsM4MhPc+9ZYdS
+         cqbA==
+X-Gm-Message-State: AOAM53027RL+6F2m897ogX8eZo7+cN9mK45xnPc071TP3+llqWI+lPWc
+        8AZD9joSiULw5L6WJAW4dV0GgsjjMmv5k2rCItszMyNk4tc1HzZm3krr2eU3iV3qRglkZyb6LIl
+        5VYgqCBMi8g8g0uxaKhfL5asOe0XULg3lrD4jL0Bzy0gsEvDLxda80RVpCQk1ROvb
+X-Received: by 2002:a17:907:3d9e:: with SMTP id he30mr7398620ejc.625.1643384076858;
+        Fri, 28 Jan 2022 07:34:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwwLL+POnsBqFB2XKtrVYeYBbTz8onLQhw2ZyyyQ9/AMR2vPIoGCO/UMj3nGYWHOnUUShojAg==
+X-Received: by 2002:a17:907:3d9e:: with SMTP id he30mr7398598ejc.625.1643384076595;
+        Fri, 28 Jan 2022 07:34:36 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id g9sm9985829ejf.33.2022.01.28.07.34.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jan 2022 07:34:35 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/5] KVM: nVMX: Fix Windows 11 + WSL2 + Enlightened VMCS
+In-Reply-To: <b84dbb2c-0319-e9cc-adbe-bf78be6652d5@redhat.com>
+References: <20220112170134.1904308-1-vkuznets@redhat.com>
+ <87k0exktsx.fsf@redhat.com>
+ <86b78fe0-7123-4534-6aaf-12bd30463665@redhat.com>
+ <87wnikeyr9.fsf@redhat.com>
+ <b84dbb2c-0319-e9cc-adbe-bf78be6652d5@redhat.com>
+Date:   Fri, 28 Jan 2022 16:34:34 +0100
+Message-ID: <87pmobg9h1.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Define wrtsc(tsc) as
- wrmsr(MSR_IA32_TSC, tsc)
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-References: <20220127215548.2016946-1-jmattson@google.com>
- <20220127215548.2016946-3-jmattson@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220127215548.2016946-3-jmattson@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/27/22 22:55, Jim Mattson wrote:
-> Remove some inline assembly code duplication and opportunistically
-> replace the magic constant, "0x10," with "MSR_IA32_TSC."
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->   lib/x86/processor.h | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index fe5add548261..117032a4895c 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -592,9 +592,7 @@ static inline unsigned long long rdtscp(u32 *aux)
->   
->   static inline void wrtsc(u64 tsc)
->   {
-> -	unsigned a = tsc, d = tsc >> 32;
-> -
-> -	asm volatile("wrmsr" : : "a"(a), "d"(d), "c"(0x10));
-> +	wrmsr(MSR_IA32_TSC, tsc);
->   }
->   
->   static inline void irq_disable(void)
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Queued all three, thanks.
+> On 1/28/22 15:11, Vitaly Kuznetsov wrote:
+>> I see your pull request to Linus, will send the backport when it lands.
+>> In fact, all 5 patches apply to 5.16 without issues but I guess stable@
+>> tooling won't pick them up automatically.
+>
+> I noticed, but I wasn't sure what the dependencies were among them and 
+> whether you'd prefer to only have patches 3-5; so I didn't just add "Cc: 
+> stable" myself.
 
-Paolo
+Actually yes, patches 1/2 don't fix any "real" issue (afair) so we can
+be a bit more conservative with 5.16.
+
+-- 
+Vitaly
 
