@@ -2,114 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15ABE49F9A2
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 13:39:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6640449F9C7
+	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 13:48:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbiA1Mjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 07:39:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57626 "EHLO
+        id S1348642AbiA1MsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 07:48:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59040 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348560AbiA1Mjw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 07:39:52 -0500
+        by vger.kernel.org with ESMTP id S229487AbiA1MsV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jan 2022 07:48:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643373591;
+        s=mimecast20190719; t=1643374100;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XLdIy983W00HY23HijSjN7Dj8OaLX+kcdPFkbzmAAbQ=;
-        b=J/gJc9wZHM+7oJEN99IQpEK7BkWhRAl9Eyq1SiNQS1gki6pUqENH7K7kMt/564pX0DVe2Z
-        FwTRQI1fRd3W4VgpDObJmp/TfpKtxnrS4HEa36KZOfzgi7/f8xFkkwRavbDAotiHtb9TQf
-        zyi4EtCCwIBOSa2fXYftVHu6fgOZHbA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Bo8ZOiKS2adjR5eMsgOruuTsYEGNkSRUgFp15Xq4s0k=;
+        b=QMP7GH1WY4x+NvZZOzwM01+7NE/mdCL3pxS5wZwf6M7OfUHWIZvCUg6jgYXA0DG5ksFwhO
+        5RMc3fm7yhynGyuYqsmRvtP/XLfpZCzYe43vziQubhbR7M0H9V0uY3pE4ImttSOp155B4N
+        OdY0ZTOFVi0tbstKVjIvxIIK1bjvqAA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-203-1P_A2qjmPo26o6mOdP_1JA-1; Fri, 28 Jan 2022 07:39:50 -0500
-X-MC-Unique: 1P_A2qjmPo26o6mOdP_1JA-1
-Received: by mail-ed1-f69.google.com with SMTP id o5-20020a50c905000000b00403bbdcef64so2509994edh.14
-        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 04:39:50 -0800 (PST)
+ us-mta-257-Md5Jm9iSOoS9aQrcGqBKwg-1; Fri, 28 Jan 2022 07:48:19 -0500
+X-MC-Unique: Md5Jm9iSOoS9aQrcGqBKwg-1
+Received: by mail-ed1-f71.google.com with SMTP id p17-20020aa7c891000000b004052d1936a5so3003736eds.7
+        for <kvm@vger.kernel.org>; Fri, 28 Jan 2022 04:48:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=XLdIy983W00HY23HijSjN7Dj8OaLX+kcdPFkbzmAAbQ=;
-        b=zggnBQUHnWXz5lseRvwrmyIQvabo6lf2EYdn/ONMWqhRdmpkifyXSOA1d9LJSOkulo
-         9IZzPNKEdKdY70+9SHre1ZenUudSN8ialFSpwUMXTcsipDP6sBcnFmWymo7rCd/97lyn
-         XvEgJBxxnl5d4fr1U4xRNkPCHHX+SW8e21tdp1ZF6migfB0LYBvveNenYKfw5App0pvB
-         yxKB3v6bhwJQDs+TkvRcKOWXz0/icvCU3Rew23jDevD489HevY6Ksve+MvLhE45S2/xc
-         so4kYFf9PrLnwZXl9c6fnX3pBid9l4ll5gMB5POK1GoJaVeihLjyAJ+nPqwPHlsoi1tq
-         3OiQ==
-X-Gm-Message-State: AOAM532gqjaFe7TK+u5Ikl5Y0z+Rvykydy2lJudWxdnmcciBl0kLtr2U
-        zbfDuTPiT4Kc8KS+b/WydtiTDwE5Mqp521g/GN6Hi0EOdDhV9zrNepF6PEqEJxYXeC2zSDhUBIZ
-        tbz9WwO5ofres
-X-Received: by 2002:aa7:d799:: with SMTP id s25mr7885092edq.272.1643373589391;
-        Fri, 28 Jan 2022 04:39:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx24fxwd87A17OyboBva44f+bn420kREB83IoTX6XY5R1S3dYOyCYPwMJDB+SRMkrWzyxZHfA==
-X-Received: by 2002:aa7:d799:: with SMTP id s25mr7885074edq.272.1643373589175;
-        Fri, 28 Jan 2022 04:39:49 -0800 (PST)
+        bh=Bo8ZOiKS2adjR5eMsgOruuTsYEGNkSRUgFp15Xq4s0k=;
+        b=DRew/rnJv1bbRnmYPOnRHdKMAMTt7ycqiFcRd4eZajXwfJnhKy3JzwWgohyTwYn2FJ
+         hNuyZz7J0Z2GF+zlHN7APJBhWKIvN+701kngAf4jK7+oOFOmlukJzGu8/PTAzsVLRyN2
+         tUW/cCPSWiE1JaiUbIgS7HjId3WK5vmIozjHoH+VGM6rpBwWjOgB6aUNhHciIiAQMF9z
+         YcocJBtw7vVD3kYtMQy38tbEeMRngbtFOMxz8/fM+zODcMHFq2GumyRCQUcJBvboU8jo
+         2Ol6qiqlaEXdE7nX2mAw4d9/fBLAronixnb85vRo/BdrubFSJWFmsG7xJaaH4O7ejjhL
+         AxYg==
+X-Gm-Message-State: AOAM530RTwSfO/tq7xi0pJgmAX+BDxtuoY6xIr9X+0mqaVdbRwxBQ6VA
+        gaU3QBYIhIZ3r2beypwRzUAgsBfQ0KAxLnwFn/80OlZObGMViuf8hTXJtKIeCfKwKOOF7UTW/qg
+        z13auu19f1xmr
+X-Received: by 2002:a05:6402:650:: with SMTP id u16mr8010745edx.167.1643374098330;
+        Fri, 28 Jan 2022 04:48:18 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwB2OzlwLHsX6cQfqU4/ONk7VwKQxBpbkHfUGKrzVKUNTmNb3W4B/+uFDcrKSXpWkuMhcbW/Q==
+X-Received: by 2002:a05:6402:650:: with SMTP id u16mr8010728edx.167.1643374098108;
+        Fri, 28 Jan 2022 04:48:18 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id gj10sm5543335ejb.192.2022.01.28.04.39.48
+        by smtp.googlemail.com with ESMTPSA id d3sm2657530edq.13.2022.01.28.04.48.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jan 2022 04:39:48 -0800 (PST)
-Message-ID: <86b78fe0-7123-4534-6aaf-12bd30463665@redhat.com>
-Date:   Fri, 28 Jan 2022 13:39:47 +0100
+        Fri, 28 Jan 2022 04:48:17 -0800 (PST)
+Message-ID: <8a78eca4-79b2-e183-f01a-6f56124bfdeb@redhat.com>
+Date:   Fri, 28 Jan 2022 13:48:10 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [PATCH v3 0/5] KVM: nVMX: Fix Windows 11 + WSL2 + Enlightened
- VMCS
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.17, take #1
 Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220112170134.1904308-1-vkuznets@redhat.com>
- <87k0exktsx.fsf@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, kernel-team@android.com
+References: <20220128101245.506715-1-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87k0exktsx.fsf@redhat.com>
+In-Reply-To: <20220128101245.506715-1-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/18/22 15:22, Vitaly Kuznetsov wrote:
-> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+On 1/28/22 11:12, Marc Zyngier wrote:
+> The following changes since commit 1c53a1ae36120997a82f936d044c71075852e521:
 > 
->> Changes since v2 [Sean]:
->> - Tweak a comment in PATCH5.
->> - Add Reviewed-by: tags to PATCHes 3 and 5.
->>
->> Original description:
->>
->> Windows 11 with enabled Hyper-V role doesn't boot on KVM when Enlightened
->> VMCS interface is provided to it. The observed behavior doesn't conform to
->> Hyper-V TLFS. In particular, I'm observing 'VMREAD' instructions trying to
->> access field 0x4404 ("VM-exit interruption information"). TLFS, however, is
->> very clear this should not be happening:
->>
->> "Any VMREAD or VMWRITE instructions while an enlightened VMCS is active is
->> unsupported and can result in unexpected behavior."
->>
->> Microsoft confirms this is a bug in Hyper-V which is supposed to get fixed
->> eventually. For the time being, implement a workaround in KVM allowing
->> VMREAD instructions to read from the currently loaded Enlightened VMCS.
->>
->> Patches 1-2 are unrelated fixes to VMX feature MSR filtering when eVMCS is
->> enabled. Patches 3 and 4 are preparatory changes, patch 5 implements the
->> workaround.
->>
+>    Merge branch kvm-arm64/misc-5.17 into kvmarm-master/next (2022-01-04 17:16:15 +0000)
 > 
-> Paolo,
+> are available in the Git repository at:
 > 
-> would it be possible to pick this up for 5.17? Technically, this is a
-> "fix", even if the bug itself is not in KVM)
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-1
+> 
+> for you to fetch changes up to 278583055a237270fac70518275ba877bf9e4013:
+> 
+>    KVM: arm64: Use shadow SPSR_EL1 when injecting exceptions on !VHE (2022-01-24 09:39:03 +0000)
 
-Yes, it is.  I have queued the patch, and feel free to send a 5.16 
-backport too.
+Pulled, thanks.
 
 Paolo
 
