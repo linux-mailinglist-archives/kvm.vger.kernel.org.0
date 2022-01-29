@@ -2,95 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 962454A03FF
-	for <lists+kvm@lfdr.de>; Fri, 28 Jan 2022 23:58:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D59DA4A2B00
+	for <lists+kvm@lfdr.de>; Sat, 29 Jan 2022 02:35:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241961AbiA1W6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jan 2022 17:58:43 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:53298 "EHLO mail.skyhub.de"
+        id S1352048AbiA2BfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jan 2022 20:35:17 -0500
+Received: from mga01.intel.com ([192.55.52.88]:2662 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229658AbiA1W6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jan 2022 17:58:43 -0500
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 782941EC0541;
-        Fri, 28 Jan 2022 23:58:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1643410717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=YiDtT4AmBwaBafxN19hikHkQnXHuV/Zji75Dg4d6z9o=;
-        b=JeMERGTf8a8RMw2DrlfHpHUsES5/Meq6ySSpY6TOuLfyFrvzNtDn7lveOsMTQ4SU6arz+m
-        vxDfM4FJAPWYkgfWaV36naGgiPVOxezlLHTHlm1xJzgUAY1EVilAiIfwlzUYOoK9QYfL72
-        YM+sGX1caWZrfkO6VxwW0DyxEL2P9J8=
-Date:   Fri, 28 Jan 2022 23:58:32 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 29/40] x86/compressed/64: add support for SEV-SNP
- CPUID table in #VC handlers
-Message-ID: <YfR1GNb/yzKu4n5+@zn.tnic>
-References: <20220118142345.65wuub2p3alavhpb@amd.com>
- <20220118143238.lu22npcktxuvadwk@amd.com>
- <20220118143730.wenhm2bbityq7wwy@amd.com>
- <YebsKcpnYzvjaEjs@zn.tnic>
- <20220118172043.djhy3dwg4fhhfqfs@amd.com>
- <Yeb7vOaqDtH6Fpsb@zn.tnic>
- <20220118184930.nnwbgrfr723qabnq@amd.com>
- <20220119011806.av5rtxfv4et2sfkl@amd.com>
- <YefzQuqrV8kdLr9z@zn.tnic>
- <20220119162747.ewgxirwcnrcajazm@amd.com>
+        id S1352031AbiA2BfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jan 2022 20:35:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643420116; x=1674956116;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qMy5y86mw+A/NGGUbaCdJHeBtrkxEidZHOoXYgeJm6A=;
+  b=GbtAM7zyMnKXTsrO2w4vBGqrtvYEu+5t9gG3BzyhlBx/DFpyio0e4wXQ
+   W3pMA8uWHWpkfWKvjp/iu3Nzv4BQsVQqQK2wB5Yvtv0KVdNLsPmDjYFqc
+   kq5jbb9HA1o/qr0wEph3jmDFKI2YBcmhbhq6dUAUBzKwjA2nvwAo3M2jQ
+   qXX6BH7X8uikCDRh5nbbEi2APW9kRxNhPpIpfVqeyGfyw0pfUGpLtfami
+   kHxfQPSDHmkMBBA7/SsS+Sj7oqusl+6lDVsb3i2NLdjhQXUOKi47grRUU
+   2lEiRAt9zl1BGTso9vzYFDfLnsISOqjli/1GYypBtVgRsg5rdOGeDNnv/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10241"; a="271691369"
+X-IronPort-AV: E=Sophos;i="5.88,325,1635231600"; 
+   d="scan'208";a="271691369"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2022 17:35:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,325,1635231600"; 
+   d="scan'208";a="770272078"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga005.fm.intel.com with ESMTP; 28 Jan 2022 17:35:16 -0800
+Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 28 Jan 2022 17:35:15 -0800
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ SHSMSX604.ccr.corp.intel.com (10.109.6.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 29 Jan 2022 09:35:13 +0800
+Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
+ SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2308.020;
+ Sat, 29 Jan 2022 09:35:13 +0800
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Zhong, Yang" <yang.zhong@intel.com>
+Subject: RE: [PATCH] kvm: Move KVM_GET_XSAVE2 IOCTL definition at the end of
+ kvm.h
+Thread-Topic: [PATCH] kvm: Move KVM_GET_XSAVE2 IOCTL definition at the end of
+ kvm.h
+Thread-Index: AQHYFF2HAjhbV221DEecjLl79IeG66x5LLxg
+Date:   Sat, 29 Jan 2022 01:35:13 +0000
+Message-ID: <c3d33dc642834f1db0a51e97fcc7f455@intel.com>
+References: <20220128154025.102666-1-frankja@linux.ibm.com>
+In-Reply-To: <20220128154025.102666-1-frankja@linux.ibm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.200.16
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220119162747.ewgxirwcnrcajazm@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 10:27:47AM -0600, Michael Roth wrote:
-> At that point it's much easier for the guest owner to just check the
-> CPUID values directly against known good values for a particular
-> configuration as part of their attestation process and leave the
-> untrusted cloud vendor out of it completely. So not measuring the
-> CPUID page as part of SNP attestation allows for that flexibility.
+On Friday, January 28, 2022 11:40 PM, Janosch Frank wrote:
+> This way we can more easily find the next free IOCTL number when adding
+> new IOCTLs.
 
-Well, in that case, I guess you don't need the sanity-checking in the
-guest either - you simply add it to the attestation TODO-list for the
-guest owner to go through:
+Yes, this is good, but sometimes the relevant code tend to be put together =
+(e.g. ioctl for vm fd and ioctls for vcpu fds), so not necessary to force t=
+hem to be put in the number order.
+I think it would be better to record the last used number in the comment on=
+ top, and new additions need to update it (similar to the case that we upda=
+te the api doc):
 
-Upon booting, the guest owner should compare the CPUID leafs the guest
-sees with the ones supplied during boot.
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 9563d294f181..b7e5199ec47e 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -6,6 +6,9 @@
+  * Userspace interface for /dev/kvm - kernel based virtual machine
+  *
+  * Note: you must update KVM_API_VERSION if you change this interface.
++ *
++ * Last used cap number: KVM_CAP_XSAVE2(208)
++ * Last used ioctl number: KVM_HAS_DEVICE_ATTR(0xe3)
+  */
 
--- 
-Regards/Gruss,
-    Boris.
+ #include <linux/const.h>
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Wei
