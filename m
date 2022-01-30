@@ -2,66 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C0F34A33AE
-	for <lists+kvm@lfdr.de>; Sun, 30 Jan 2022 05:26:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BA2F74A36A6
+	for <lists+kvm@lfdr.de>; Sun, 30 Jan 2022 15:30:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233029AbiA3EZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Jan 2022 23:25:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237740AbiA3EZu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Jan 2022 23:25:50 -0500
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67402C06173B
-        for <kvm@vger.kernel.org>; Sat, 29 Jan 2022 20:25:50 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id c19so1665437ybf.2
-        for <kvm@vger.kernel.org>; Sat, 29 Jan 2022 20:25:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=B5teSI3NqSzeGu7ngV/22RiyR60khzQ8THYZDZ9DX3Q=;
-        b=M1OnfbQKkbFETwilKxM6j9nOGvaaE0N6GUsjV/2Xms6yqHgnmJVLQ3U6K2Ld94U1tq
-         LntkZy2HqHgZWFgyuOPRHMM+lNmzLEF3jF4S5HWloZQOkAOWmxdXXNTyb31UltzN3XJ7
-         hkIyVwtVe1Itnbv5TnU9DZKimjZktSCoZyZpnZmZUfB5boy6pVSYDXaCOYeMod8HWeSp
-         tcICMhlG+l58PMJcVtv5bLPJUx7/6QUbc6h7T0GWKiaLnYGlt3BSAV9q4QFhXoUcA0hH
-         MqNK1lpAd+NXxXWpGCKOpqJe4mhglrhaUJxCm98XiZ0Ob8F3hPtL02Oxc/ICQfYa8dAh
-         7OhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=B5teSI3NqSzeGu7ngV/22RiyR60khzQ8THYZDZ9DX3Q=;
-        b=7we5616VsbD5hRUqjLv4c2yLxp3/WxugyhSqVIC7U4RWz12x2Ps9KREmruceEihSO0
-         HNphAf9dIlAnX8ci0HbbqtiWU0Zq8SlP/RwSXnx7oVMpmDBlURBzcmD8uAQqF/kohUJu
-         kW2hFwFU1tMjWsvr5anxu8vCUtMqsyrgJY1Ow0+QMeFiDuwFl0e/jG1zxirkNzuIpgyE
-         1PKMF3EMlQF6qBiGB+x3M5s5haYDb7P8ezlW9Sar4HcJIN/HyuYylDvZ2R/kYXWwZdRg
-         vFKElArGsGejSS5ozxxX/SoPE0/hOukAhS5K7sYI1jxjl5Pp/tvoBMcOzYpi2bVU7CKo
-         10+Q==
-X-Gm-Message-State: AOAM530FM5F0DZkDiieBLmizs2ImD76s/+cXOUpU7zR/eROL01bHCA2J
-        NV0wGptzXY9FYgJP8ArycEqOK9gbg3oYUe2WgkI=
-X-Google-Smtp-Source: ABdhPJxEze2YxN38OKG2jz4Ej718s9xaQn2IHtExZCWtdaFX5ZMvLuqzHI9b9S+InDYbD7C3JExfA2qUmshN2tQeCV4=
-X-Received: by 2002:a25:cc4e:: with SMTP id l75mr5725334ybf.189.1643516749404;
- Sat, 29 Jan 2022 20:25:49 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a05:7010:2312:b0:201:cd76:102e with HTTP; Sat, 29 Jan 2022
- 20:25:49 -0800 (PST)
-Reply-To: mrs.bill.chantalone01@gmail.com
-From:   "Mrs.Bill.Chantal" <grassroot309@gmail.com>
-Date:   Sun, 30 Jan 2022 05:25:49 +0100
-Message-ID: <CAO3iUMCSK6JJj5i8itPRR8ZRKP2yBsXjcGc-qLNagyeMOZVS7w@mail.gmail.com>
-Subject: Hello....
-To:     undisclosed-recipients:;
+        id S1354991AbiA3O3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Jan 2022 09:29:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38501 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1354990AbiA3O3R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 30 Jan 2022 09:29:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643552956;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xZ8Bb3OLQ5Ki+babJAgzafxxNgyDnDE0Uiome1ZxJDU=;
+        b=X4x+6j0Rru55OgX7iqmw8hoWoJFwlcotVgJN/pfAMVZhGnNWp9lFC7gKMbi03Ze24IgGup
+        8JPBfg1hHVGbHV6M4EIyI79IecQbP2lFpN/OGRaYWMNTEdKbJOKUkGM1Mn9GvjbfJBvRlS
+        DstcIoBkP4iqiGxdrWOp+HP1DpgDKrk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-515-0RUYqhY-Mg2j0Mw9Qo7x-A-1; Sun, 30 Jan 2022 09:29:14 -0500
+X-MC-Unique: 0RUYqhY-Mg2j0Mw9Qo7x-A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85CB2814243;
+        Sun, 30 Jan 2022 14:29:13 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A80B784A11;
+        Sun, 30 Jan 2022 14:29:03 +0000 (UTC)
+Message-ID: <11324ba7075ce90dee9d424c78db0bf97b1c4444.camel@redhat.com>
+Subject: Re: Why do we need KVM_REQ_GET_NESTED_STATE_PAGES after all
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gilbert <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>
+Date:   Sun, 30 Jan 2022 16:29:02 +0200
+In-Reply-To: <CALMp9eT2cP7kdptoP3=acJX+5_Wg6MXNwoDh42pfb21-wdXvJg@mail.gmail.com>
+References: <fc6bea3249f26e8dd973ce1bd1e3f6f42c142469.camel@redhat.com>
+         <CALMp9eT2cP7kdptoP3=acJX+5_Wg6MXNwoDh42pfb21-wdXvJg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-You have been compensated with the sum of 9.5 million dollars in this
-united nation the payment will be issue into atm visa  card and send
-to you from the santander bank we need your address and your
-Whatsapp number  + 1 6465853907  this my email.ID
-( mrs.bill.chantal.roland@gmail.com )  contact  me
+On Thu, 2022-01-27 at 11:39 -0800, Jim Mattson wrote:
+> On Thu, Jan 27, 2022 at 8:04 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > I would like to raise a question about this elephant in the room which I wanted to understand for
+> > quite a long time.
+> > 
+> > For my nested AVIC work I once again need to change the KVM_REQ_GET_NESTED_STATE_PAGES code and once
+> > again I am asking myself, maybe we can get rid of this code, after all?
+> 
+> We (GCE) use it so that, during post-copy, a vCPU thread can exit to
 
-Thanks my
+Thank you very much for a very detailed response!
 
-mrs bill chantal
+> userspace and demand these pages from the source itself, rather than
+> funneling all demands through a single "demand paging listener"
+That is something I didn't think of!
+
+The question is however, can that happen between setting the nested state
+and running a vCPU first time. 
+
+I guess it is possible in therory that you set the nested state, then run 1 vCPU, 
+which faults and exits to userspace,
+then userspace populates the faulted memory which triggers memslots update,
+and only then you run another vCPU for first time.
+needs will be need when this request is processed, and it will fail if they aren't.
+
+
+
+> thread, which I believe is the equivalent of qemu's userfaultfd "fault
+> handler" thread. Our (internal) post-copy mechanism scales quite well,
+> because most demand paging requests are triggered by an EPT violation,
+> which happens to be a convenient place to exit to userspace. Very few
+> pages are typically demanded as a result of
+> kvm_vcpu_{read,write}_guest, where the vCPU thread is so deep in the
+> kernel call stack that it has to request the page via the demand
+> paging listener thread. With nested virtualization, the various vmcs12
+> pages consulted directly by kvm (bypassing the EPT tables) were a
+> scalability issue.
+I assume that you patched all these calls to exit to userspace for the
+demand paging scheme you are using.
+
+> 
+> (Note that, unlike upstream, we don't call nested_get_vmcs12_pages
+> directly from VMLAUNCH/VMRESUME emulation; we always call it as a
+> result of this request that you don't like.)
+Also I guess something specific to your downstream patches.
+
+
+> 
+> As we work on converting from our (hacky) demand paging scheme to
+> userfaultfd, we will have to solve the scalability issue anyway
+> (unless someone else beats us to it). Eventually, I expect that our
+> need for this request will go away.
+
+Great!
+
+The question is, if we remove it now, will that affect you?
+
+What if we depricate it (add option to keep the current behavier,
+but keep an module param to revert back to old behavier, with
+the eventual goal of removing it.
+
+
+> 
+> Honestly, without the exits to userspace, I don't really see how this
+> request buys you anything upstream. When I originally submitted it, I
+> was prepared for rejection, but Paolo said that qemu had a similar
+> need for it, and I happily never questioned that assertion.
+
+Exactly! I didn't questioned it as well, because I didn't knew MMU at all,
+and it is one of the harderst KVM parts - who knows what it caches,
+and what magic it needs to be up to date.
+
+But now, I don't think there are still large areas of MMU that I don't understand,
+thus I started asking myself why it is need.
+
+That request is a ripe source of bugs. Just off my hand, Vitaly spent at least a week
+understanding why after vmcb01/02 split, eVMCS stopped working, only to figure out that
+KVM_REQ_GET_NESTED_STATE_PAGES might not be called after nested entry since there
+could be nested VM exit before we even enter the guest, and since then one more
+hack has to be added to work that around (nothing against the hack, its not the
+root cause of the problem).
+
+I also indirectly caused and fixed a CVE like issue, which started 
+ with the patch that added KVM_REQ_GET_NESTED_STATE_PAGES to SVM - 
+it made KVM switch to nested msr bitmap
+and back then there was no vmcb01/02 split. Problem is that back then
+we didn't cancel that request if we have VM exit right after VM entry,
+so it would be still pending on VM entry, and it will switch to nested MSR bitmap
+even if we are no longer nested - then I added patch to free the nested state
+on demand, and boom - we have L1 using freed (and usualy zeroed) MSR bitmap - free
+access to all host msrs from L1...
+
+There is another hidden issue in this request, that it makes it impossible to
+handle failure gracefully.
+
+If for example, loading nested state pages needs to allocate memory and that
+fails, we could just fail the nested VM entry if that request wasn't there.
+While this is not ideal for the nested guest, it likely to survive, and
+might even retry entering the nested guest.
+
+On the other hand during the request if something fails, nested state is
+already loaded, and all we can do is to kill the L1.
+
+
+Thanks again!
+Best regards,
+	Maxim Levitsky
+
+> 
+
+
+
+
