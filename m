@@ -2,90 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92BD34A5170
-	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 22:27:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3DF74A536B
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 00:41:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381064AbiAaV1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jan 2022 16:27:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49046 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381061AbiAaV1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jan 2022 16:27:16 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF05C06173E
-        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 13:27:15 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id z20so21264510ljo.6
-        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 13:27:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=RcCyF58LaRxi/j1nHAT0ApLeXmQ9s66f3iMVqhPacvY=;
-        b=VR6ACimxalshq0DMs5xD7bpPq0SiJ0k99qbNjwqp7hq3Cg9+JjDH0aieK1oBq4nb4U
-         L9/IfMQm5x5lAYJf95leGiQRTs2HYkm/XHasj/Fj9E98589CpmmTBIvQv+hMjQrOtxtY
-         +4ronhB1HLytRtcQD6HPo1it0t62ErtjkqfRiV+2AkGsanCViPh9qcQVWB4FnenN6gi6
-         i45A38UiK/VU2+WNN/GSQ0Pqyrxly4tiDcMQUsTkk1uonPi1FQeqeKsWx9B0AG7wSeEi
-         eVhE2Wm1sZQfROP0V2YuuNgB2CJU0AXoK+ADw/OzQlYk2OYH6J8xuVhCvupSnAPccT56
-         Ojag==
+        id S229685AbiAaXlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jan 2022 18:41:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26322 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229668AbiAaXlt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 31 Jan 2022 18:41:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643672509;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IsJZQuAnrZzrOSNtgUK/+418ygrBDiEFHYd4U7hkJP0=;
+        b=jCmKBZiSRCm/THbgR4bi1a4cqX4iCS3vAtPXdOFbPE37wqHYe1ev6EfSwp+/4sEX+Z0l8X
+        ZdGVTd1Zz0EZVTLM3cgupg8+L1gwapuUc0nURIHKWLQbnbqOwjMcoqNO3wtDYU/8ph2p7d
+        JTbfa2h5CjD9V/S4flbd97p2YgsMk1M=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-210-72R2gdEvP_Cw5UeBcYZUDw-1; Mon, 31 Jan 2022 18:41:47 -0500
+X-MC-Unique: 72R2gdEvP_Cw5UeBcYZUDw-1
+Received: by mail-ot1-f72.google.com with SMTP id n99-20020a9d206c000000b00590dde2cca8so8751786ota.9
+        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 15:41:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=RcCyF58LaRxi/j1nHAT0ApLeXmQ9s66f3iMVqhPacvY=;
-        b=tggElNKkmLjMUIHD5eAOhkQ033v+OLEayBSp/ajDVcBzEiTRclFg4tgOV2mHWXK0Fw
-         vjBjIYycd76/7+4c+VBiY/FCmEjIVHW3F5id/LJR6QSNs0Ghza6cW1h4v2TVj2aTmP7m
-         pLz/84ruzRuXTotSTn1PpAMTIVakF3H7nDUwrIDoG2qktA+afoH7BPgJbIIvikoAedMz
-         7MlGf9jgkgbQSpCaSh+gVq6FJqqbtu3ocxIIDBbvkFrl1YkKSuoLDdbW0L8evN/6uOaK
-         QXuWXo+eysdUrXgGo2HUJZSY3i/yKCOBCz+/j07Fl9CofRXgn9ja3S3ULcHVNeJUkuHo
-         r87Q==
-X-Gm-Message-State: AOAM531Fgid8rNuULlfNbZD4Ej1/qVxlo+WRu226f9ITbuYqgAWiuOAs
-        quJvLyvugtC9MxuIqImqED+t402Tvjw4uwZOUks=
-X-Google-Smtp-Source: ABdhPJxPO/0JakfDNREqHMyGBGePTOD6O8DnpueiyuzHHZijCQClNT+bzhXBg8LSaAIIA6SnEyflB8ebnZCZGWjMfWY=
-X-Received: by 2002:a2e:7c0c:: with SMTP id x12mr14663206ljc.526.1643664433912;
- Mon, 31 Jan 2022 13:27:13 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=IsJZQuAnrZzrOSNtgUK/+418ygrBDiEFHYd4U7hkJP0=;
+        b=l8KMg2Hq0iDG+KI1PDhd2Y6rWSf0Xxrps3zF459tMMaglV9Rc7V27h/zLN2w1SUp0t
+         HNmSYrAAPLT9/oJTHyDh+fwx2RtmgFDyN8DexD41AisiQ5E3jklLf2vKrMBwGmk9SWdu
+         XrRMAJZdZlMLa3dl2aLhP0ersACn2yU9c1Ms0cMjcT8RHRH+WuzASvCB2GPI6DHOXIGl
+         wj00Ff/mI3NntAQAhXGxYXCo8rcNJTYTba2zPclBnBHLG5X3VV4brtWLei++muMeXJCI
+         aUycjDr3drNdX22s24OUGBmw4fLDeVzIXL4a+hWAH3mSS7y61io4gb4LZgg+ASsS4J67
+         g15g==
+X-Gm-Message-State: AOAM530qVDku1W9bPqfIPWDdF/doG8HOf1aCWJQ+lvaOgDvZgAwcuAK/
+        J73XZKC+X2yHh4U1UFWzGg374TT6VPXj88yb1a62D7H8uG14r2xrfulfYP4QPLuZ3V0yIYwrI0D
+        5F3AY0dUvh1Ds
+X-Received: by 2002:a05:6808:170c:: with SMTP id bc12mr18626105oib.171.1643672506954;
+        Mon, 31 Jan 2022 15:41:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyh4qPDVhHYhJ+cdHNlNgk4ULx7R1+bmY3JDl6uPWenQ+Kn8B9uxAH1rlJjD/2b+rIpUxClBg==
+X-Received: by 2002:a05:6808:170c:: with SMTP id bc12mr18626093oib.171.1643672506710;
+        Mon, 31 Jan 2022 15:41:46 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id x1sm10661262oto.38.2022.01.31.15.41.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jan 2022 15:41:46 -0800 (PST)
+Date:   Mon, 31 Jan 2022 16:41:43 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V6 mlx5-next 07/15] vfio: Have the core code decode the
+ VFIO_DEVICE_FEATURE ioctl
+Message-ID: <20220131164143.6c145fdb.alex.williamson@redhat.com>
+In-Reply-To: <20220130160826.32449-8-yishaih@nvidia.com>
+References: <20220130160826.32449-1-yishaih@nvidia.com>
+        <20220130160826.32449-8-yishaih@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: by 2002:aa6:c26a:0:b0:197:c37e:80d4 with HTTP; Mon, 31 Jan 2022
- 13:27:13 -0800 (PST)
-Reply-To: westerunion909@gmail.com
-From:   "Antonia Lloyd." <anthonylloydatmxxx06@gmail.com>
-Date:   Mon, 31 Jan 2022 13:27:13 -0800
-Message-ID: <CAAO1aFNQa23hTqtvGE0qm-zDagMuwe7-xVpHYcYsGb=_LX2xyQ@mail.gmail.com>
-Subject: Dear Email ID Owner.(USD$4000 IMF COMPENSATION FUND TO PICK UP TODAY).
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Email ID Owner.
+On Sun, 30 Jan 2022 18:08:18 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-The IMF is compensating all the email address that was funds as one of
-the ward win Victims and your email address and your name is among the
-listed one of approved to pay the sum of $3.6 million U.S Dollars. We
-have concluded to effect your own payment through Western Union Money
-Transfer for easy pick-up of those funds in good condition,$4000 twice
-daily,till the $3.6 million is completely transferred to you.We now
-need your information where we will be sending the funds,such
-as;Receiver name(Your full Name)address and phone number.Contact
-Western Union agent with this Email: ( westerunion995@gmail.com  ) for
-your payment fund.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> Invoke a new device op 'device_feature' to handle just the data array
+> portion of the command. This lifts the ioctl validation to the core code
+> and makes it simpler for either the core code, or layered drivers, to
+> implement their own feature values.
+> 
+> Provide vfio_check_feature() to consolidate checking the flags/etc against
+> what the driver supports.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c      |  1 +
+>  drivers/vfio/pci/vfio_pci_core.c | 90 ++++++++++++--------------------
+>  drivers/vfio/vfio.c              | 46 ++++++++++++++--
+>  include/linux/vfio.h             | 32 ++++++++++++
+>  include/linux/vfio_pci_core.h    |  2 +
+>  5 files changed, 109 insertions(+), 62 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index a5ce92beb655..2b047469e02f 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -130,6 +130,7 @@ static const struct vfio_device_ops vfio_pci_ops = {
+>  	.open_device	= vfio_pci_open_device,
+>  	.close_device	= vfio_pci_core_close_device,
+>  	.ioctl		= vfio_pci_core_ioctl,
+> +	.device_feature = vfio_pci_core_ioctl_feature,
+>  	.read		= vfio_pci_core_read,
+>  	.write		= vfio_pci_core_write,
+>  	.mmap		= vfio_pci_core_mmap,
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index f948e6cd2993..14a22ff20ef8 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1114,70 +1114,44 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+>  
+>  		return vfio_pci_ioeventfd(vdev, ioeventfd.offset,
+>  					  ioeventfd.data, count, ioeventfd.fd);
+> -	} else if (cmd == VFIO_DEVICE_FEATURE) {
+> -		struct vfio_device_feature feature;
+> -		uuid_t uuid;
+> -
+> -		minsz = offsetofend(struct vfio_device_feature, flags);
+> -
+> -		if (copy_from_user(&feature, (void __user *)arg, minsz))
+> -			return -EFAULT;
+> -
+> -		if (feature.argsz < minsz)
+> -			return -EINVAL;
+> -
+> -		/* Check unknown flags */
+> -		if (feature.flags & ~(VFIO_DEVICE_FEATURE_MASK |
+> -				      VFIO_DEVICE_FEATURE_SET |
+> -				      VFIO_DEVICE_FEATURE_GET |
+> -				      VFIO_DEVICE_FEATURE_PROBE))
+> -			return -EINVAL;
+> -
+> -		/* GET & SET are mutually exclusive except with PROBE */
+> -		if (!(feature.flags & VFIO_DEVICE_FEATURE_PROBE) &&
+> -		    (feature.flags & VFIO_DEVICE_FEATURE_SET) &&
+> -		    (feature.flags & VFIO_DEVICE_FEATURE_GET))
+> -			return -EINVAL;
+> -
+> -		switch (feature.flags & VFIO_DEVICE_FEATURE_MASK) {
+> -		case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
+> -			if (!vdev->vf_token)
+> -				return -ENOTTY;
+> -
+> -			/*
+> -			 * We do not support GET of the VF Token UUID as this
+> -			 * could expose the token of the previous device user.
+> -			 */
+> -			if (feature.flags & VFIO_DEVICE_FEATURE_GET)
+> -				return -EINVAL;
+> -
+> -			if (feature.flags & VFIO_DEVICE_FEATURE_PROBE)
+> -				return 0;
+> -
+> -			/* Don't SET unless told to do so */
+> -			if (!(feature.flags & VFIO_DEVICE_FEATURE_SET))
+> -				return -EINVAL;
+> +	}
+> +	return -ENOTTY;
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl);
+>  
+> -			if (feature.argsz < minsz + sizeof(uuid))
+> -				return -EINVAL;
+> +int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
+> +				void __user *arg, size_t argsz)
+> +{
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(device, struct vfio_pci_core_device, vdev);
+> +	uuid_t uuid;
+> +	int ret;
 
-Ms.Maria Zatto
-E-mail:westerunion995@gmail.com
-Telephone: +229 682 97 169
+Nit, should uuid at least be scoped within the token code?  Or token
+code pushed to a separate function?
 
-Contact Ms.Maria,immediately you get this mail through western union
-email address above to enable her speed-up.your payment and release
-the $4000 dollars MTCN today for you to pick up the payment OK.
+>  
+> -			if (copy_from_user(&uuid, (void __user *)(arg + minsz),
+> -					   sizeof(uuid)))
+> -				return -EFAULT;
+> +	switch (flags & VFIO_DEVICE_FEATURE_MASK) {
+> +	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
+> +		if (!vdev->vf_token)
+> +			return -ENOTTY;
+> +		/*
+> +		 * We do not support GET of the VF Token UUID as this could
+> +		 * expose the token of the previous device user.
+> +		 */
+> +		ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET,
+> +					sizeof(uuid));
+> +		if (ret != 1)
+> +			return ret;
+>  
+> -			mutex_lock(&vdev->vf_token->lock);
+> -			uuid_copy(&vdev->vf_token->uuid, &uuid);
+> -			mutex_unlock(&vdev->vf_token->lock);
+> +		if (copy_from_user(&uuid, arg, sizeof(uuid)))
+> +			return -EFAULT;
+>  
+> -			return 0;
+> -		default:
+> -			return -ENOTTY;
+> -		}
+> +		mutex_lock(&vdev->vf_token->lock);
+> +		uuid_copy(&vdev->vf_token->uuid, &uuid);
+> +		mutex_unlock(&vdev->vf_token->lock);
+> +		return 0;
+> +	default:
+> +		return -ENOTTY;
+>  	}
+> -
+> -	return -ENOTTY;
+>  }
+> -EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl);
+> +EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl_feature);
+...
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 76191d7abed1..ca69516f869d 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -55,6 +55,7 @@ struct vfio_device {
+>   * @match: Optional device name match callback (return: 0 for no-match, >0 for
+>   *         match, -errno for abort (ex. match with insufficient or incorrect
+>   *         additional args)
+> + * @device_feature: Fill in the VFIO_DEVICE_FEATURE ioctl
+>   */
+>  struct vfio_device_ops {
+>  	char	*name;
+> @@ -69,8 +70,39 @@ struct vfio_device_ops {
+>  	int	(*mmap)(struct vfio_device *vdev, struct vm_area_struct *vma);
+>  	void	(*request)(struct vfio_device *vdev, unsigned int count);
+>  	int	(*match)(struct vfio_device *vdev, char *buf);
+> +	int	(*device_feature)(struct vfio_device *device, u32 flags,
+> +				  void __user *arg, size_t argsz);
+>  };
+>  
+> +/**
+> + * vfio_check_feature - Validate user input for the VFIO_DEVICE_FEATURE ioctl
+> + * @flags: Arg from the device_feature op
+> + * @argsz: Arg from the device_feature op
+> + * @supported_ops: Combination of VFIO_DEVICE_FEATURE_GET and SET the driver
+> + *                 supports
+> + * @minsz: Minimum data size the driver accepts
+> + *
+> + * For use in a driver's device_feature op. Checks that the inputs to the
+> + * VFIO_DEVICE_FEATURE ioctl are correct for the driver's feature. Returns 1 if
+> + * the driver should execute the get or set, otherwise the relevant
+> + * value should be returned.
+> + */
+> +static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,
+> +				    size_t minsz)
+> +{
+> +	if ((flags & (VFIO_DEVICE_FEATURE_GET | VFIO_DEVICE_FEATURE_SET)) &
+> +	    ~supported_ops)
+> +		return -EINVAL;
 
-You are expected to provide us with the details as prescribed below to
-enable safe and easy release of your funds today.
+These look like cases where it would be useful for userspace debugging
+to differentiate errnos.
 
-(1)Your Full name:
-(2)Your Phone number:
-(3)Your Country:
-(4)Your Age:
+-EOPNOTSUPP?
 
-Thank you,
-Dr.Antonia Lloyd.
-Contact Dir.Western Union Money Transfer,
-Cotonou-Benin Republic.
+> +	if (flags & VFIO_DEVICE_FEATURE_PROBE)
+> +		return 0;
+> +	/* Without PROBE one of GET or SET must be requested */
+> +	if (!(flags & (VFIO_DEVICE_FEATURE_GET | VFIO_DEVICE_FEATURE_SET)))
+> +		return -EINVAL;
+> +	if (argsz < minsz)
+> +		return -EINVAL;
+
+-ENOSPC?
+
+Thanks,
+Alex
+
