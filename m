@@ -2,97 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04B6D4A48E5
-	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 15:00:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39B994A4936
+	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 15:22:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359353AbiAaN77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jan 2022 08:59:59 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:41116 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348918AbiAaN75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jan 2022 08:59:57 -0500
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B1C931EC0347;
-        Mon, 31 Jan 2022 14:59:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1643637591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=OiqGrPMnbQIGw2+zC+4XudA/cLM9mrsP0jF/0Bd4QuQ=;
-        b=B1bfoGuvGOFIzbVcNaBP0Z+si2wluMNhvOWIaHfam12kzi8OhDQJzZzYFskxalWY3v/4qM
-        9Qo7hkumcoibiHxtCvVrlvKKDUEQxhWIx/KwrVoGGy7ZSSCr/1g1jtlzZAzV5ZptuacS1F
-        nGg+nK3P5+PoYvWU2nuxS3TDH2dVBeM=
-Date:   Mon, 31 Jan 2022 14:59:48 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
-        "luolongjun@huawei.com" <luolongjun@huawei.com>,
-        "hejingxian@huawei.com" <hejingxian@huawei.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Subject: Re: [PATCH v3 6/9] x86/smpboot: Support parallel startup of
- secondary CPUs
-Message-ID: <YffrVMiO/NalRZjL@zn.tnic>
-References: <20211215145633.5238-1-dwmw2@infradead.org>
- <20211215145633.5238-7-dwmw2@infradead.org>
- <d10f529e-b1ee-6220-c6fc-80435f0061ee@amd.com>
- <f25c6ad00689fee6ce3e294393c13f3dcdd5985f.camel@infradead.org>
- <3d8e2d0d-1830-48fb-bc2d-995099f39ef0@amd.com>
- <e742473935bf81be84adea6fa8061ce0846cc630.camel@infradead.org>
- <330bedfee12022c1180d8752fb4abe908dac08d1.camel@infradead.org>
+        id S232149AbiAaOWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jan 2022 09:22:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35170 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231178AbiAaOWV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jan 2022 09:22:21 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9575C061714;
+        Mon, 31 Jan 2022 06:22:20 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id u15so25765714wrt.3;
+        Mon, 31 Jan 2022 06:22:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=epZCgtRDGQmeZnI22oh+prdRoR4meGsNZ1G4F0nBuuM=;
+        b=D8nxhTyhA1svClYRBCifjcmjBPll4xh40nG3vU02PFtBqk2yUXb/MvUBspIM1OuylZ
+         3bTbr6L8ip2wkWPSfmWnnwhkaFk1CaBH0b8g2ezphXwayKDkK0TS5x65zFnoJF++MRCp
+         dfox9M9sk7kKE5RFfi0RxOYGrsRKYsihBIz4mJdtvhe4j+P6AIOwrEKJRXVeTs60KN94
+         URBWNdcSmgOPX+d/Oy6GEZGBt2gpI7gOpoQRTtSsosiLdWqI+rXi1Hu4ofrfpBIwYWyn
+         q+I34GPwIQ6ABk7Lwg9qwMpP+PY574gwxiLXS1uOro5p9xGisaHcpmsRmSNYBPCqhbfM
+         Ogdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=epZCgtRDGQmeZnI22oh+prdRoR4meGsNZ1G4F0nBuuM=;
+        b=BhRbtUWHFDnZ4n1psJAAoHJi+CbsIIzFf9JHolljKb3owl4LhH1wIBd1TWxiKmX9dO
+         282qmkfI1O6P2HyFqXryGL+78L+OOXk8MHPDzb/8N5INJol/wnyGM1Jb291Jydh3S+O0
+         ooVVc4XUYhlxibWnH/eqJsTTfQ27/vyfbwM4Ovriti9lvzXKtN9tVGln4GIE0LYWkkf+
+         WDOgul39b/dZksrldTw4l6XN6ykFS9QbiXO9Wep1hKZoNsm7XTtKIEzX9DYkJ3RnXea4
+         eRIpw1aoeTPPMhJilnqQM+T4kmyNm18TgxRndFgjzYK0c9n6KteD4c1dzgl/CF9Mb5QR
+         W+9Q==
+X-Gm-Message-State: AOAM5316PgrdEX9h3WKGpGbJY2tCdItIvwH1RVKeEIUCITlrPgpgi8Oo
+        rZklhVuKbxq8Z0A0RVL1o6QGjz+Ptoc=
+X-Google-Smtp-Source: ABdhPJwt2j3IKptHM8KFnTXa7Q1gjquSm9HfdHDFX0qMW9IQNq16gP60qpMuzW4XbuggwI3v5BVQKQ==
+X-Received: by 2002:a5d:60c5:: with SMTP id x5mr17551684wrt.376.1643638938993;
+        Mon, 31 Jan 2022 06:22:18 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id y3sm13619535wry.109.2022.01.31.06.22.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jan 2022 06:22:18 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <8396dda5-d82c-8b5d-f94e-28ba84ec422d@redhat.com>
+Date:   Mon, 31 Jan 2022 15:22:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <330bedfee12022c1180d8752fb4abe908dac08d1.camel@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH] kvm: Move KVM_GET_XSAVE2 IOCTL definition at the end of
+ kvm.h
+Content-Language: en-US
+To:     Janosch Frank <frankja@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, guang.zeng@intel.com, jing2.liu@intel.com,
+        kevin.tian@intel.com, seanjc@google.com, tglx@linutronix.de,
+        wei.w.wang@intel.com, yang.zhong@intel.com
+References: <20220128154025.102666-1-frankja@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220128154025.102666-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 29, 2022 at 12:04:19PM +0000, David Woodhouse wrote:
-> I've rebased and pushed to
-> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/parallel-5.17
+On 1/28/22 16:40, Janosch Frank wrote:
+> This way we can more easily find the next free IOCTL number when
+> adding new IOCTLs.
 > 
-> I'll do some more testing and repost the series during next week. The
-> win is slightly more modest than the original patch sets because it now
-> only parallelises x86/cpu:kick. I'm going to do more careful review and
-> testing before doing the same for x86/cpu:wait-init in a later series.
-> You can see that coming together in the git tree but I'm only going to
-> post up to the 'Serialise topology updates' patch again for now.
+> Fixes: be50b2065dfa ("kvm: x86: Add support for getting/setting expanded xstate buffer")
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   include/uapi/linux/kvm.h | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 9563d294f181..efe81fef25eb 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1623,9 +1623,6 @@ struct kvm_enc_region {
+>   #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
+>   #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
+>   
+> -/* Available with KVM_CAP_XSAVE2 */
+> -#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+> -
+>   struct kvm_s390_pv_sec_parm {
+>   	__u64 origin;
+>   	__u64 length;
+> @@ -2047,4 +2044,7 @@ struct kvm_stats_desc {
+>   
+>   #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
+>   
+> +/* Available with KVM_CAP_XSAVE2 */
+> +#define KVM_GET_XSAVE2		  _IOR(KVMIO,  0xcf, struct kvm_xsave)
+> +
+>   #endif /* __LINUX_KVM_H */
 
-Btw, Mr. Cooper points out a very important aspect and I don't know
-whether you've verified this already or whether this is not affected
-by your series ... yet. In any case it should be checked: microcode
-loading.
-
-See __reload_late() and all that dance we do to keep SMT siblings do
-nothing at the same time while updating microcode.
-
-With the current boot order, the APs should all do nothing so they won't
-need that sync for early loading - load_ucode_{ap,bsp} - but I don't
-know if you're changing that order with the parallel startup.
-
-If you do, you'll probably need such syncing for the early loading
-too...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Queued, thanks.
