@@ -2,117 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA2824A4A67
-	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 16:20:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 683684A4A9F
+	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 16:33:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379386AbiAaPUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jan 2022 10:20:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34048 "EHLO
+        id S1379638AbiAaPdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jan 2022 10:33:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36706 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1378963AbiAaPUD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 Jan 2022 10:20:03 -0500
+        by vger.kernel.org with ESMTP id S1377952AbiAaPdF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 31 Jan 2022 10:33:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643642402;
+        s=mimecast20190719; t=1643643184;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=51s/H7CPhdBcCYJZdO78Kl5hIb9+WtEbkmwC56ZgtGY=;
-        b=Sum1lHBJ0VnnAGz2yO0MGSdZQh0r9tM6onGRLR8Zd2gMuxJwQviAB2UYZ/sSeFf7ldi2V7
-        /75hHNTl+dL+Qa4WGwqpArbpTL3pr/tJGfyNtu1HU6q1JMx50IgkyAk7yQJ1OTmnXEUIL9
-        S9FyeY1KTNcwA0DsGWNvYu627ZPXq2Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MqkwAw4wuOZd8apS0xcc2rXhPmZK3L0to+YK8fdXzXQ=;
+        b=IOj2iQAxXxHoThHjnJru1+giGcXfjbISx0hBgJPxZKyXH4pQ1FKUxVycmgq59Y/uYVaNxi
+        T/oAMRYQXGXXGBX+4JHtSjAM9vH/LSzh5AsAaSYamrI08z43hWRKzg8PSpFmyHpUHxjhnh
+        UQ5/1Oz4TjVx/Owup3jedyQElwmkX60=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-368-IYhhTc-eNS2u5b808v0H8A-1; Mon, 31 Jan 2022 10:19:59 -0500
-X-MC-Unique: IYhhTc-eNS2u5b808v0H8A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A75DF1091DA3;
-        Mon, 31 Jan 2022 15:19:56 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8477584D06;
-        Mon, 31 Jan 2022 15:19:53 +0000 (UTC)
-Message-ID: <864b41e42a88a92586b1c2361bebaf04446a98d5.camel@redhat.com>
-Subject: Re: [PATCH 01/22] KVM: x86: Drop unnecessary and confusing
- KVM_X86_OP_NULL macro
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Date:   Mon, 31 Jan 2022 17:19:52 +0200
-In-Reply-To: <6979e482-1f07-4148-b9d7-d91cfa98c081@redhat.com>
-References: <20220128005208.4008533-1-seanjc@google.com>
-         <20220128005208.4008533-2-seanjc@google.com>
-         <152db376-b0f3-3102-233c-a0dbb4011d0c@redhat.com>
-         <YfQO+ADS1wnefoSr@google.com>
-         <6979e482-1f07-4148-b9d7-d91cfa98c081@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-224-_oYEwlsgMleq3jDThdZzMg-1; Mon, 31 Jan 2022 10:33:03 -0500
+X-MC-Unique: _oYEwlsgMleq3jDThdZzMg-1
+Received: by mail-ot1-f70.google.com with SMTP id k3-20020a9d4b83000000b005a1871e98cbso8164580otf.10
+        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 07:33:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MqkwAw4wuOZd8apS0xcc2rXhPmZK3L0to+YK8fdXzXQ=;
+        b=wvHy24oG5Lo2wBAmwPEmjwd3rTT2QWZd/uapsv6SUeXnb8yld4mXueAmmCJte/vPW+
+         dUtP3PsXjP0wTSo03ezICNCX3bRFm0Jw1EC1qvmGzQyQv6KH/kccmR/UjObbNaulKzDa
+         k8PJGsL9s3o5FSEwds88bwmJvx5bM/yVbhcYPnQNC+tZW+dCHrk21dAIxQx3Kjkod15T
+         HLRF0PNbQGVlvnBw0TxTAo9f7U8PNyb8p9XZrfENYYSqDUE0VEB/TkuBqjbTpAumaxA4
+         BvGGXbFsLbUliJZVC4A5xCAyGkGrPol8KTaVjYgGsU3yQRkcMZg2NSrB4Uhbn0NkGV9y
+         zRFg==
+X-Gm-Message-State: AOAM5313xyFphWafkkENwElhrOCpTqTgLLkDyjfVE/w1HPrsmxofQUWn
+        mf+sw8edwZ78fqIFWpnZtZSE+/vESG2UmI16S/48HVGLQrNrsHDMvHvgDqH8fJ7N/blH6At2lcc
+        02HapRwzWkjjh
+X-Received: by 2002:aca:aa96:: with SMTP id t144mr19411038oie.132.1643643182464;
+        Mon, 31 Jan 2022 07:33:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJymr2dsBCKlgP7OeGj6aD5XCERLPQYOTSNplzQW6dStWy8SIH9lqk49likkpXiG7dI3/kwJvw==
+X-Received: by 2002:aca:aa96:: with SMTP id t144mr19411018oie.132.1643643182208;
+        Mon, 31 Jan 2022 07:33:02 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id bb16sm1343181oob.42.2022.01.31.07.33.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jan 2022 07:33:01 -0800 (PST)
+Date:   Mon, 31 Jan 2022 08:33:00 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Abhishek Sahu <abhsahu@nvidia.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 3/5] vfio/pci: fix memory leak during D3hot to D0
+ tranistion
+Message-ID: <20220131083300.50045695.alex.williamson@redhat.com>
+In-Reply-To: <b0f25525-362a-c2dc-f255-22fa533fda26@nvidia.com>
+References: <20220124181726.19174-1-abhsahu@nvidia.com>
+        <20220124181726.19174-4-abhsahu@nvidia.com>
+        <20220127170525.51043f23.alex.williamson@redhat.com>
+        <b0f25525-362a-c2dc-f255-22fa533fda26@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-01-31 at 15:56 +0100, Paolo Bonzini wrote:
-> On 1/28/22 16:42, Sean Christopherson wrote:
-> > On Fri, Jan 28, 2022, Paolo Bonzini wrote:
-> > > On 1/28/22 01:51, Sean Christopherson wrote:
-> > > > Drop KVM_X86_OP_NULL, which is superfluous and confusing.  The macro is
-> > > > just a "pass-through" to KVM_X86_OP; it was added with the intent of
-> > > > actually using it in the future, but that obviously never happened.  The
-> > > > name is confusing because its intended use was to provide a way for
-> > > > vendor implementations to specify a NULL pointer, and even if it were
-> > > > used, wouldn't necessarily be synonymous with declaring a kvm_x86_op as
-> > > > DEFINE_STATIC_CALL_NULL.
-> > > > 
-> > > > Lastly, actually using KVM_X86_OP_NULL as intended isn't a maintanable
-> > > > approach, e.g. bleeds vendor details into common x86 code, and would
-> > > > either be prone to bit rot or would require modifying common x86 code
-> > > > when modifying a vendor implementation.
-> > > 
-> > > I have some patches that redefine KVM_X86_OP_NULL as "must be used with
-> > > static_call_cond".  That's a more interesting definition, as it can be used
-> > > to WARN if KVM_X86_OP is used with a NULL function pointer.
+On Mon, 31 Jan 2022 17:04:12 +0530
+Abhishek Sahu <abhsahu@nvidia.com> wrote:
+
+> On 1/28/2022 5:35 AM, Alex Williamson wrote:
+> > External email: Use caution opening links or attachments
 > > 
-> > I'm skeptical that will actually work well and be maintainble.  E.g. sync_pir_to_ir()
-> > must be explicitly check for NULL in apic_has_interrupt_for_ppr(), forcing that path
-> > to do static_call_cond() will be odd.  Ditto for ops that are wired up to ioctl()s,
-> > e.g. the confidential VM stuff, and for ops that are guarded by other stuff, e.g. the
-> > hypervisor timer.
 > > 
-> > Actually, it won't just be odd, it will be impossible to disallow NULL a pointer
-> > for KVM_X86_OP and require static_call_cond() for KVM_X86_OP_NULL.  static_call_cond()
-> > forces the return to "void", so any path that returns a value needs to be manually
-> > guarded and can't use static_call_cond(), e.g.
+> > On Mon, 24 Jan 2022 23:47:24 +0530
+> > Abhishek Sahu <abhsahu@nvidia.com> wrote:
+> >   
+> >> If needs_pm_restore is set (PCI device does not have support for no
+> >> soft reset), then the current PCI state will be saved during D0->D3hot
+> >> transition and same will be restored back during D3hot->D0 transition.
+> >> For saving the PCI state locally, pci_store_saved_state() is being
+> >> used and the pci_load_and_free_saved_state() will free the allocated
+> >> memory.
+> >>
+> >> But for reset related IOCTLs, vfio driver calls PCI reset related
+> >> API's which will internally change the PCI power state back to D0. So,
+> >> when the guest resumes, then it will get the current state as D0 and it
+> >> will skip the call to vfio_pci_set_power_state() for changing the
+> >> power state to D0 explicitly. In this case, the memory pointed by
+> >> pm_save will never be freed.
+> >>
+> >> Also, in malicious sequence, the state changing to D3hot followed by
+> >> VFIO_DEVICE_RESET/VFIO_DEVICE_PCI_HOT_RESET can be run in loop and
+> >> it can cause an OOM situation. This patch stores the power state locally
+> >> and uses the same for comparing the current power state. For the
+> >> places where D0 transition can happen, call vfio_pci_set_power_state()
+> >> to transition to D0 state. Since the vfio power state is still D3hot,
+> >> so this D0 transition will help in running the logic required
+> >> from D3hot->D0 transition. Also, to prevent any miss during
+> >> future development to detect this condition, this patch puts a
+> >> check and frees the memory after printing warning.
+> >>
+> >> This locally saved power state will help in subsequent patches
+> >> also.  
+> > 
+> > Ideally let's put fixes patches at the start of the series, or better
+> > yet send them separately, and don't include changes that only make
+> > sense in the context of a subsequent patch.
+> > 
+> > Fixes: 51ef3a004b1e ("vfio/pci: Restore device state on PM transition")
+> >   
 > 
-> You're right and I should have looked up the series instead of going by 
-> memory.  What I did was mostly WARNing on KVM_X86_OP that sets NULL, as 
-> non-NULL ops are the common case.  I also added KVM_X86_OP_RET0 to 
-> remove some checks on kvm_x86_ops for ops that return a value.
+>  Thanks Alex for reviewing this patch.
+>  I have added Fixes tag and sent this patch separately.
 > 
-> All in all I totally agree with patches 2-11 and will apply them (patch 
-> 2 to 5.17 even, as a prerequisite to fix the AVIC race).  Several of 
-> patches 13-21 are also mostly useful as it clarifies the code, and the 
-> others I guess are okay in the context of a coherent series though 
-> probably they would have been rejected as one-offs.  However, patches 12 
-> and 22 are unnecessary uses of the C preprocessor in my opinion.
-> 
+>  Should I update this patch series or you are planning to review the
+>  other patches first of this patch series first. 
 
-I will send my patches very very soon - I'll rebase on top of this,
-and review this patch series soon as well.
+Thanks for splitting this out.  I'll keep the remainder of the series
+on the review queue, I expect I'll have some comments and it will be
+easy enough to imagine vfio_pci_core_device.power_state being declared
+in another patch if there's still a worthwhile use for it.  Thanks,
 
-Best regards,
-	Maxim Levitsky
-
-> Paolo
-> 
-
+Alex
 
