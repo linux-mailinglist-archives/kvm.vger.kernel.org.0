@@ -2,160 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 531A84A3CBE
-	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 04:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B16424A3CE0
+	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 05:17:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357504AbiAaDke (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Jan 2022 22:40:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58248 "EHLO
+        id S1357573AbiAaERW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Jan 2022 23:17:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbiAaDkb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Jan 2022 22:40:31 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7FCC061714
-        for <kvm@vger.kernel.org>; Sun, 30 Jan 2022 19:40:31 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id t32so11060755pgm.7
-        for <kvm@vger.kernel.org>; Sun, 30 Jan 2022 19:40:31 -0800 (PST)
+        with ESMTP id S231515AbiAaERV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Jan 2022 23:17:21 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9E6AC06173B
+        for <kvm@vger.kernel.org>; Sun, 30 Jan 2022 20:17:20 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id k6-20020a05600c1c8600b003524656034cso5410096wms.2
+        for <kvm@vger.kernel.org>; Sun, 30 Jan 2022 20:17:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kKkdVczReHlJmEq2mHCzOlF2f9zOsI8Qlek1CLGRtXg=;
-        b=gv2/52IHXhxJ9V+CpUkuE8dj13TXoUzbfqNmRA89Z8RxAggQ29fLbrg/TdohGYCGSN
-         epfA+Wly5u0v1Nx+89fgyFvCuAxqUB1+uAfDYmOdC9BofPSGSqFqKnpQACBXfQlOKKsM
-         +2eRoGjDdz7lRlO+Bp8JWFrK6/khewbv7ZCqyl2edW/X3iTiLFoAruAsFfZ3PcQNyH0Z
-         wr9saZ31sYhvjT2tG2f/gMzb2jo+TJ2r82NuCxKfFVUv0uxjTV8Pjvml3lgYvje/3qjK
-         VWrOQqtFQcpjE+Nei63rhSfgH9jC52UKbOzVjej4FYqNmJEGPiwpu7GUUfoHFjwjD0lQ
-         S11A==
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8HnH9Zt6R9fMT+vzNU6lZCDo2VCXBihuUUKx7xESYC4=;
+        b=0eomZB6oDi+B2PWHxL749knbLFreIeZoy97lij1LRfXB9GM1IDHoeX87wMHRFVMpRW
+         mZQKccb+LLGrXoFeBn8JeYS4oL+nEovgL98ccI4ifqSpbQtieKS5bOYSbvhXqMvrObwm
+         qXLU185eoDiLIw9+hfivqFudXrjxwwj4P3xcRWnQu53fgYhtG2uoZh8+QwmviA907yI6
+         4F0qU/H/gzY7geH/J6lYqcrywqPwZqkqhRHk+8N5uAndk317jHDHWCYS3I7q19PjlwzK
+         6ogFaV6lAC+znFXrPWYBe14i2LSYVkkODrvLmmRIfN9YU7xR6iGeskBiJSZFYnpWRn74
+         Ds7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kKkdVczReHlJmEq2mHCzOlF2f9zOsI8Qlek1CLGRtXg=;
-        b=Wzrw0m5qPkgmr7Q0Xz7wfyZVy/Sl2CATPpzf6Xg+vqJG2/VY/DJ8BSbQEsqGQxa50J
-         QdpEqb91tBiyd+aLHOX1WwCR8YYYFWKPFxmzPePdyAfppjjCfSe+1frBmRQxc8el03xH
-         RlWoe4RO8/8lOgMHwsgHHJ90+LzOVZMCH0fvuhhDYnbPuZ7/1gvZDnoXcPzaBAJo4sBN
-         wVQoF6npZvNkH4VMR4HnPOf5HlnIXOW9MBwZr5t7/GdM/P/X+9r+mGtRx5EGPdnwgZuB
-         MngWl3r6UuAyLa1fvgbpjwDs09Z/pQG8cBV3dlveyqhG/QpJnAdYuuNo7xr6gt/UL/6a
-         RzPw==
-X-Gm-Message-State: AOAM533wRCKMME5WfPtu2TVIlNk9pGKFNW3bjrNoSQ1uhCwRDpT/XwWD
-        1erpfL+grGpVCI2/Tiw0eu4EQA==
-X-Google-Smtp-Source: ABdhPJw80u0ql8gqDhxSKNzAHP5XbIa8eMWvNhJoZHnaH+q7E1P+ygb864/BAuMsFe+9AhCI1lRiGA==
-X-Received: by 2002:a05:6a00:1a86:: with SMTP id e6mr18886798pfv.2.1643600430510;
-        Sun, 30 Jan 2022 19:40:30 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id y15sm16663120pfi.87.2022.01.30.19.40.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jan 2022 19:40:29 -0800 (PST)
-Date:   Sun, 30 Jan 2022 19:40:26 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-Message-ID: <YfdaKpBqFkULxgX/@google.com>
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-3-reijiw@google.com>
- <YfDaiUbSkpi9/5YY@google.com>
- <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
- <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
- <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8HnH9Zt6R9fMT+vzNU6lZCDo2VCXBihuUUKx7xESYC4=;
+        b=BT7qluo62OCUVQ4wmGeW4XpyOPPILOIHCxlzcp54QJVX32VFunwuczhs1MFc6FWIXq
+         O8ypZh4TxO36No2xHF3qviT846iHGY0njHtZeRTWzq4QnfWVAXEQBienCCdR149n6763
+         LfOpn5l7wrBA5z2jV82gLJc4V8lzTF9QHLzNxWLYpOTSKaHis2X6Q73HJaXpaBFQhq7e
+         ZHCDl7QjmjzW8xtafgV+6uZnvul19ESy/OS3BSmMnA2iafwCWRZlKcYJn2v0gR9yCC/r
+         azh4LAVYgj6EmcJIZn/so9NX7Kfe4p4F4ErFf2RXWyMuclVL8wJIfjd4eOh8rPeoNvwZ
+         hYbw==
+X-Gm-Message-State: AOAM530VKpCC7v9xMlWyDmKzjrVmGblpZm3yqdpdQXDACvQOnBhuuM+m
+        NpYaxUWYEJNO+mweNvzA0H0HceQnmx2SOue4zM+Y4w==
+X-Google-Smtp-Source: ABdhPJzVMzJp/elZCaxwqku1hZwYdiGLhgfcNoVLwLf27ozYDMCaPEGd8/rdnwQeKt1LHLsO+LAlMfv7evAMDGmJ/F0=
+X-Received: by 2002:a1c:750f:: with SMTP id o15mr16545257wmc.137.1643602639403;
+ Sun, 30 Jan 2022 20:17:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com>
+References: <20220111010454.126241-1-yang.lee@linux.alibaba.com>
+In-Reply-To: <20220111010454.126241-1-yang.lee@linux.alibaba.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 31 Jan 2022 09:47:05 +0530
+Message-ID: <CAAhSdy1xnb=D70rHkewRka6_-bT0+7JAMTYc3fM1MRjs+s1uRQ@mail.gmail.com>
+Subject: Re: [PATCH -next] RISC-V: KVM: remove unneeded semicolon
+To:     Yang Li <yang.lee@linux.alibaba.com>
+Cc:     Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Abaci Robot <abaci@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 09:52:21PM -0800, Reiji Watanabe wrote:
-> Hi Ricardo,
-> 
-> > > > > +
-> > > > > +/*
-> > > > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > > > > + * with ID_SANITISED() to the host's sanitized value.
-> > > > > + */
-> > > > > +void set_default_id_regs(struct kvm *kvm)
-> > > > > +{
-> > > > > +     int i;
-> > > > > +     u32 id;
-> > > > > +     const struct sys_reg_desc *rd;
-> > > > > +     u64 val;
-> > > > > +
-> > > > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > > > > +             rd = &sys_reg_descs[i];
-> > > > > +             if (rd->access != access_id_reg)
-> > > > > +                     /* Not ID register, or hidden/reserved ID register */
-> > > > > +                     continue;
-> > > > > +
-> > > > > +             id = reg_to_encoding(rd);
-> > > > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > > > +                     /* Shouldn't happen */
-> > > > > +                     continue;
-> > > > > +
-> > > > > +             val = read_sanitised_ftr_reg(id);
-> > > >
-> > > > I'm a bit confused. Shouldn't the default+sanitized values already use
-> > > > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
-> > >
-> > > I'm not sure if I understand your question.
-> > > arm64_ftr_bits_kvm is used for feature support checkings when
-> > > userspace tries to modify a value of ID registers.
-> > > With this patch, KVM just saves the sanitized values in the kvm's
-> > > buffer, but userspace is still not allowed to modify values of ID
-> > > registers yet.
-> > > I hope it answers your question.
-> >
-> > Based on the previous commit I was assuming that some registers, like
-> > id_aa64dfr0,
-> > would default to the overwritten values as the sanitized values. More
-> > specifically: if
-> > userspace doesn't modify any ID reg, shouldn't the defaults have the
-> > KVM overwritten
-> > values (arm64_ftr_bits_kvm)?
-> 
-> arm64_ftr_bits_kvm doesn't have arm64_ftr_reg but arm64_ftr_bits,
-> and arm64_ftr_bits_kvm doesn't have the sanitized values.
-> 
-> Thanks,
+On Tue, Jan 11, 2022 at 6:35 AM Yang Li <yang.lee@linux.alibaba.com> wrote:
+>
+> Eliminate the following coccicheck warning:
+> ./arch/riscv/kvm/vcpu_sbi_v01.c:117:2-3: Unneeded semicolon
+>
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
 
-Hey Reiji,
+Thanks, I have queued this patch for 5.18
 
-Sorry, I wasn't very clear. This is what I meant.
+Regards,
+Anup
 
-If I set DEBUGVER to 0x5 (w/ FTR_EXACT) using this patch on top of the
-series:
-
- static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
-        S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
--       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-+       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x5),
-
-it means that userspace would not be able to set DEBUGVER to anything
-but 0x5. But I'm not sure what it should mean for the default KVM value
-of DEBUGVER, specifically the value calculated in set_default_id_regs().
-As it is, KVM is still setting the guest-visible value to 0x6, and my
-"desire" to only allow booting VMs with DEBUGVER=0x5 is being ignored: I
-booted a VM and the DEBUGVER value from inside is still 0x6. I was
-expecting it to not boot, or to show a warning.
-
-I think this has some implications for migrations. It would not be
-possible to migrate the example VM on the patched kernel from above: you
-can boot a VM with DEBUGVER=0x5 but you can't migrate it.
-
-Thanks,
-Ricardo
+> ---
+>  arch/riscv/kvm/vcpu_sbi_v01.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_sbi_v01.c b/arch/riscv/kvm/vcpu_sbi_v01.c
+> index 4c7e13ec9ccc..9acc8fa21d1f 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_v01.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_v01.c
+> @@ -114,7 +114,7 @@ static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>         default:
+>                 ret = -EINVAL;
+>                 break;
+> -       };
+> +       }
+>
+>         return ret;
+>  }
+> --
+> 2.20.1.7.g153144c
+>
