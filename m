@@ -2,243 +2,436 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70C4E4A466E
-	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 12:56:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C3CB4A4672
+	for <lists+kvm@lfdr.de>; Mon, 31 Jan 2022 12:58:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345035AbiAaL4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jan 2022 06:56:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14450 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1379847AbiAaLyR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 Jan 2022 06:54:17 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20VALpM5005878;
-        Mon, 31 Jan 2022 11:54:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=jc2JNsmqbDJCnzfBwqTksS9W3mCw8QOBMkrWxU+FpRI=;
- b=sIKDFFiEOVMg4hIM9hvIv6m+Ve5QTOSknkTVcdda2OcDuGuQGVfGNJusyPHpQWQbEpDW
- MEgT4M9p9Fk07JIHY6yKTDS9HSB7UpXSI4hH4PbScyeXMA/PzK4Sp51/C8BGVkKifVLr
- CeoB2yfhKpgUKN02aWnyU+/hGvqJgCRNm9Z7WA0zKAo2fOd7yp78fJevmQVtuL0rfXft
- Xf8OVaPixTPEvdGWcYe9sUL1UNnshNIGGd8OUYdLv99Q7rAoKn/ZKmgV1ce9mrliXVVt
- e6AlGccJQGV/F3Fddy3SiQ5dFTd8RaPyCQ14kGgkcLVtbPdI6h5UJvnbqtxR5LAQPIy/ 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dx66cshdc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Jan 2022 11:54:13 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20VBnGas014679;
-        Mon, 31 Jan 2022 11:54:12 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dx66cshcq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Jan 2022 11:54:12 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20VBkJVP005252;
-        Mon, 31 Jan 2022 11:54:10 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3dvvuj3216-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Jan 2022 11:54:10 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20VBs4gQ43778356
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 31 Jan 2022 11:54:04 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C0AEDA4062;
-        Mon, 31 Jan 2022 11:54:04 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0BA6FA4054;
-        Mon, 31 Jan 2022 11:54:04 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.30.167])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon, 31 Jan 2022 11:54:03 +0000 (GMT)
-Date:   Mon, 31 Jan 2022 12:53:37 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Petr =?UTF-8?B?VGVzYcWZw61r?= <ptesarik@suse.cz>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Michael Mueller <mimu@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 1/1] KVM: s390: index kvm->arch.idle_mask by vcpu_idx
-Message-ID: <20220131125337.05f73251.pasic@linux.ibm.com>
-In-Reply-To: <3ca4de98-8f4d-9937-923e-f8865c96f82c@suse.cz>
-References: <20210827125429.1912577-1-pasic@linux.ibm.com>
-        <3ca4de98-8f4d-9937-923e-f8865c96f82c@suse.cz>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S245194AbiAaL61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jan 2022 06:58:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52233 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1377763AbiAaL5B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 31 Jan 2022 06:57:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643630220;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=caGDsbZJl0Bi3Amsj8oGgiSVfFyJCBFNbZuYWVg2loY=;
+        b=SlJ8nxGAaW72p/BDYjemgfaz/o8hZZregANBBdZb+aWELbdJAQVSkJxADjHfZTIJRL0PbT
+        0mbQ8l+UVCCldhqIog7F/eDM6z7G8hRQmVAr7HLKCUr2j6RR/mWga7oNHug7CyVXgvpuWF
+        XC7iC6QRgGJnC1MApwPw5snU3nSjm+o=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-618-VG_UgvxJM0CF1nBISaZV6Q-1; Mon, 31 Jan 2022 06:56:58 -0500
+X-MC-Unique: VG_UgvxJM0CF1nBISaZV6Q-1
+Received: by mail-wr1-f71.google.com with SMTP id r27-20020adfb1db000000b001d7567e33baso4700433wra.12
+        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 03:56:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=caGDsbZJl0Bi3Amsj8oGgiSVfFyJCBFNbZuYWVg2loY=;
+        b=KhmerUF926SfEwznc67nzR+6OZXwGWeHcFLuOrOtAFS4NYQpvHnn9Lkf9Ire937+n6
+         xVmdAo+MyLOtDv4TF8yZPO2oyo3S77tdu6zk3Gu5UAzNc5UKgIYAEfSP/fThI6hA5HEe
+         5Ag0N+pCiGHtziFRlICpxdOBHae1IyEk4VsanIHnBjG0nlqqMAZ+6uh2ztb1tyoslasj
+         CpO41RiV2RXqDMqsMSqYAtN3gV1HUZNeOr7OhtWmBcHs0iJ0rNS0PHGCZ6LENzonq2LP
+         OpCmxgAtfYIf3Ik0hSHmr05mM++9Mg63lwyo6Z7SFZ9njMfgjyjrS07IQYYYo/t5BmE5
+         cYUA==
+X-Gm-Message-State: AOAM532O2Cd1FZyfnkN1imntmVSAyTJ8OZrXrsdBaMPT7liGuwiVT/fL
+        xotMDXA3fTlGev7IPtZINp9mAOi2g7se4hXMftR2y6umMZ5Ej6Q+oF9X4d2sgqIjkSUivqfikz3
+        of2CI5dz1cXAJ
+X-Received: by 2002:a05:600c:25a:: with SMTP id 26mr17968072wmj.184.1643630217491;
+        Mon, 31 Jan 2022 03:56:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwLS5OJmPNoO5844YalfhGDZs5ZeOjUMvLdaZqLgQjoByVgyxDcpm3x1iaxFLq1hAApxMMvAA==
+X-Received: by 2002:a05:600c:25a:: with SMTP id 26mr17968045wmj.184.1643630217161;
+        Mon, 31 Jan 2022 03:56:57 -0800 (PST)
+Received: from ?IPV6:2003:cb:c709:b200:f007:5a26:32e7:8ef5? (p200300cbc709b200f0075a2632e78ef5.dip0.t-ipconnect.de. [2003:cb:c709:b200:f007:5a26:32e7:8ef5])
+        by smtp.gmail.com with ESMTPSA id 5sm13432191wrb.113.2022.01.31.03.56.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jan 2022 03:56:56 -0800 (PST)
+Message-ID: <6597e635-b488-3a4c-ce84-8c17d225747e@redhat.com>
+Date:   Mon, 31 Jan 2022 12:56:55 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [RFC PATCH 3/6] KVM: SVM: Implement demand page pinning
+Content-Language: en-US
+From:   David Hildenbrand <david@redhat.com>
+To:     "Nikunj A. Dadhania" <nikunj@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Bharata B Rao <bharata@amd.com>
+References: <20220118110621.62462-1-nikunj@amd.com>
+ <20220118110621.62462-4-nikunj@amd.com>
+ <99248ffb-2c7c-ba25-5d56-2c577e58da4c@redhat.com>
+ <c7918558-4eb3-0592-f3e1-9a1c4f36f7c0@amd.com>
+ <ef8dcee4-8ce7-cb91-6938-feb39f0bdaba@redhat.com>
+ <bd8e94d6-e2fd-16a9-273e-c2563af235df@amd.com>
+ <99e39466-513b-6db9-6b3a-f40e68997cec@redhat.com>
+Organization: Red Hat
+In-Reply-To: <99e39466-513b-6db9-6b3a-f40e68997cec@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DLJPiBPGkgXLP74QnMzf_7wRLvHMlYG0
-X-Proofpoint-ORIG-GUID: fVGO_KlqpsYh9m2hCs-yqCkwDA-VKiGY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-31_04,2022-01-28_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- mlxlogscore=999 clxscore=1011 bulkscore=0 priorityscore=1501 adultscore=0
- spamscore=0 suspectscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2201310077
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 31 Jan 2022 11:13:18 +0100
-Petr Tesařík <ptesarik@suse.cz> wrote:
-
-> Hi Halil,
+On 28.01.22 12:08, David Hildenbrand wrote:
+> On 28.01.22 12:04, Nikunj A. Dadhania wrote:
+>> On 1/28/2022 1:57 PM, David Hildenbrand wrote:
+>>> On 28.01.22 07:57, Nikunj A. Dadhania wrote:
+>>>> On 1/26/2022 4:16 PM, David Hildenbrand wrote:
+>>>>> On 18.01.22 12:06, Nikunj A Dadhania wrote:
+>>>>>> Use the memslot metadata to store the pinned data along with the pfns.
+>>>>>> This improves the SEV guest startup time from O(n) to a constant by
+>>>>>> deferring guest page pinning until the pages are used to satisfy nested
+>>>>>> page faults. The page reference will be dropped in the memslot free
+>>>>>> path.
+>>>>>>
+>>>>>> Remove the enc_region structure definition and the code which did
+>>>>>> upfront pinning, as they are no longer needed in view of the demand
+>>>>>> pinning support.
+>>>>>>
+>>>>>> Leave svm_register_enc_region() and svm_unregister_enc_region() as stubs
+>>>>>> since qemu is dependent on this API.
+>>>>>>
+>>>>>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>>>>>> ---
+>>>>>>  arch/x86/kvm/svm/sev.c | 208 ++++++++++++++++-------------------------
+>>>>>>  arch/x86/kvm/svm/svm.c |   1 +
+>>>>>>  arch/x86/kvm/svm/svm.h |   3 +-
+>>>>>>  3 files changed, 81 insertions(+), 131 deletions(-)
+>>>>>>
+>>>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>>>>> index d972ab4956d4..a962bed97a0b 100644
+>>>>>> --- a/arch/x86/kvm/svm/sev.c
+>>>>>> +++ b/arch/x86/kvm/svm/sev.c
+>>>>>> @@ -66,14 +66,6 @@ static unsigned int nr_asids;
+>>>>>>  static unsigned long *sev_asid_bitmap;
+>>>>>>  static unsigned long *sev_reclaim_asid_bitmap;
+>>>>>>  
+>>>>>> -struct enc_region {
+>>>>>> -	struct list_head list;
+>>>>>> -	unsigned long npages;
+>>>>>> -	struct page **pages;
+>>>>>> -	unsigned long uaddr;
+>>>>>> -	unsigned long size;
+>>>>>> -};
+>>>>>> -
+>>>>>>  /* Called with the sev_bitmap_lock held, or on shutdown  */
+>>>>>>  static int sev_flush_asids(int min_asid, int max_asid)
+>>>>>>  {
+>>>>>> @@ -257,8 +249,6 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>>>>>  	if (ret)
+>>>>>>  		goto e_free;
+>>>>>>  
+>>>>>> -	INIT_LIST_HEAD(&sev->regions_list);
+>>>>>> -
+>>>>>>  	return 0;
+>>>>>>  
+>>>>>>  e_free:
+>>>>>> @@ -1637,8 +1627,6 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
+>>>>>>  	src->handle = 0;
+>>>>>>  	src->pages_locked = 0;
+>>>>>>  	src->enc_context_owner = NULL;
+>>>>>> -
+>>>>>> -	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
+>>>>>>  }
+>>>>>>  
+>>>>>>  static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+>>>>>> @@ -1861,115 +1849,13 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>>>>>>  int svm_register_enc_region(struct kvm *kvm,
+>>>>>>  			    struct kvm_enc_region *range)
+>>>>>>  {
+>>>>>> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>>>>> -	struct enc_region *region;
+>>>>>> -	int ret = 0;
+>>>>>> -
+>>>>>> -	if (!sev_guest(kvm))
+>>>>>> -		return -ENOTTY;
+>>>>>> -
+>>>>>> -	/* If kvm is mirroring encryption context it isn't responsible for it */
+>>>>>> -	if (is_mirroring_enc_context(kvm))
+>>>>>> -		return -EINVAL;
+>>>>>> -
+>>>>>> -	if (range->addr > ULONG_MAX || range->size > ULONG_MAX)
+>>>>>> -		return -EINVAL;
+>>>>>> -
+>>>>>> -	region = kzalloc(sizeof(*region), GFP_KERNEL_ACCOUNT);
+>>>>>> -	if (!region)
+>>>>>> -		return -ENOMEM;
+>>>>>> -
+>>>>>> -	mutex_lock(&kvm->lock);
+>>>>>> -	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
+>>>>>> -	if (IS_ERR(region->pages)) {
+>>>>>> -		ret = PTR_ERR(region->pages);
+>>>>>> -		mutex_unlock(&kvm->lock);
+>>>>>> -		goto e_free;
+>>>>>> -	}
+>>>>>> -
+>>>>>> -	region->uaddr = range->addr;
+>>>>>> -	region->size = range->size;
+>>>>>> -
+>>>>>> -	list_add_tail(&region->list, &sev->regions_list);
+>>>>>> -	mutex_unlock(&kvm->lock);
+>>>>>> -
+>>>>>> -	/*
+>>>>>> -	 * The guest may change the memory encryption attribute from C=0 -> C=1
+>>>>>> -	 * or vice versa for this memory range. Lets make sure caches are
+>>>>>> -	 * flushed to ensure that guest data gets written into memory with
+>>>>>> -	 * correct C-bit.
+>>>>>> -	 */
+>>>>>> -	sev_clflush_pages(region->pages, region->npages);
+>>>>>> -
+>>>>>> -	return ret;
+>>>>>> -
+>>>>>> -e_free:
+>>>>>> -	kfree(region);
+>>>>>> -	return ret;
+>>>>>> -}
+>>>>>> -
+>>>>>> -static struct enc_region *
+>>>>>> -find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+>>>>>> -{
+>>>>>> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>>>>> -	struct list_head *head = &sev->regions_list;
+>>>>>> -	struct enc_region *i;
+>>>>>> -
+>>>>>> -	list_for_each_entry(i, head, list) {
+>>>>>> -		if (i->uaddr == range->addr &&
+>>>>>> -		    i->size == range->size)
+>>>>>> -			return i;
+>>>>>> -	}
+>>>>>> -
+>>>>>> -	return NULL;
+>>>>>> -}
+>>>>>> -
+>>>>>> -static void __unregister_enc_region_locked(struct kvm *kvm,
+>>>>>> -					   struct enc_region *region)
+>>>>>> -{
+>>>>>> -	sev_unpin_memory(kvm, region->pages, region->npages);
+>>>>>> -	list_del(&region->list);
+>>>>>> -	kfree(region);
+>>>>>> +	return 0;
+>>>>>>  }
+>>>>>>  
+>>>>>>  int svm_unregister_enc_region(struct kvm *kvm,
+>>>>>>  			      struct kvm_enc_region *range)
+>>>>>>  {
+>>>>>> -	struct enc_region *region;
+>>>>>> -	int ret;
+>>>>>> -
+>>>>>> -	/* If kvm is mirroring encryption context it isn't responsible for it */
+>>>>>> -	if (is_mirroring_enc_context(kvm))
+>>>>>> -		return -EINVAL;
+>>>>>> -
+>>>>>> -	mutex_lock(&kvm->lock);
+>>>>>> -
+>>>>>> -	if (!sev_guest(kvm)) {
+>>>>>> -		ret = -ENOTTY;
+>>>>>> -		goto failed;
+>>>>>> -	}
+>>>>>> -
+>>>>>> -	region = find_enc_region(kvm, range);
+>>>>>> -	if (!region) {
+>>>>>> -		ret = -EINVAL;
+>>>>>> -		goto failed;
+>>>>>> -	}
+>>>>>> -
+>>>>>> -	/*
+>>>>>> -	 * Ensure that all guest tagged cache entries are flushed before
+>>>>>> -	 * releasing the pages back to the system for use. CLFLUSH will
+>>>>>> -	 * not do this, so issue a WBINVD.
+>>>>>> -	 */
+>>>>>> -	wbinvd_on_all_cpus();
+>>>>>> -
+>>>>>> -	__unregister_enc_region_locked(kvm, region);
+>>>>>> -
+>>>>>> -	mutex_unlock(&kvm->lock);
+>>>>>>  	return 0;
+>>>>>> -
+>>>>>> -failed:
+>>>>>> -	mutex_unlock(&kvm->lock);
+>>>>>> -	return ret;
+>>>>>>  }
+>>>>>>  
+>>>>>>  int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>>>>>> @@ -2018,7 +1904,6 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>>>>>>  	mirror_sev->fd = source_sev->fd;
+>>>>>>  	mirror_sev->es_active = source_sev->es_active;
+>>>>>>  	mirror_sev->handle = source_sev->handle;
+>>>>>> -	INIT_LIST_HEAD(&mirror_sev->regions_list);
+>>>>>>  	ret = 0;
+>>>>>>  
+>>>>>>  	/*
+>>>>>> @@ -2038,8 +1923,6 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>>>>>>  void sev_vm_destroy(struct kvm *kvm)
+>>>>>>  {
+>>>>>>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>>>>> -	struct list_head *head = &sev->regions_list;
+>>>>>> -	struct list_head *pos, *q;
+>>>>>>  
+>>>>>>  	WARN_ON(sev->num_mirrored_vms);
+>>>>>>  
+>>>>>> @@ -2066,18 +1949,6 @@ void sev_vm_destroy(struct kvm *kvm)
+>>>>>>  	 */
+>>>>>>  	wbinvd_on_all_cpus();
+>>>>>>  
+>>>>>> -	/*
+>>>>>> -	 * if userspace was terminated before unregistering the memory regions
+>>>>>> -	 * then lets unpin all the registered memory.
+>>>>>> -	 */
+>>>>>> -	if (!list_empty(head)) {
+>>>>>> -		list_for_each_safe(pos, q, head) {
+>>>>>> -			__unregister_enc_region_locked(kvm,
+>>>>>> -				list_entry(pos, struct enc_region, list));
+>>>>>> -			cond_resched();
+>>>>>> -		}
+>>>>>> -	}
+>>>>>> -
+>>>>>>  	sev_unbind_asid(kvm, sev->handle);
+>>>>>>  	sev_asid_free(sev);
+>>>>>>  }
+>>>>>> @@ -2946,13 +2817,90 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>>>>>>  	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
+>>>>>>  }
+>>>>>>  
+>>>>>> +void sev_pin_spte(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+>>>>>> +		  kvm_pfn_t pfn)
+>>>>>> +{
+>>>>>> +	struct kvm_arch_memory_slot *aslot;
+>>>>>> +	struct kvm_memory_slot *slot;
+>>>>>> +	gfn_t rel_gfn, pin_pfn;
+>>>>>> +	unsigned long npages;
+>>>>>> +	kvm_pfn_t old_pfn;
+>>>>>> +	int i;
+>>>>>> +
+>>>>>> +	if (!sev_guest(kvm))
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	if (WARN_ON_ONCE(is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn)))
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	/* Tested till 1GB pages */
+>>>>>> +	if (KVM_BUG_ON(level > PG_LEVEL_1G, kvm))
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	slot = gfn_to_memslot(kvm, gfn);
+>>>>>> +	if (!slot || !slot->arch.pfns)
+>>>>>> +		return;
+>>>>>> +
+>>>>>> +	/*
+>>>>>> +	 * Use relative gfn index within the memslot for the bitmap as well as
+>>>>>> +	 * the pfns array
+>>>>>> +	 */
+>>>>>> +	rel_gfn = gfn - slot->base_gfn;
+>>>>>> +	aslot = &slot->arch;
+>>>>>> +	pin_pfn = pfn;
+>>>>>> +	npages = KVM_PAGES_PER_HPAGE(level);
+>>>>>> +
+>>>>>> +	/* Pin the page, KVM doesn't yet support page migration. */
+>>>>>> +	for (i = 0; i < npages; i++, rel_gfn++, pin_pfn++) {
+>>>>>> +		if (test_bit(rel_gfn, aslot->pinned_bitmap)) {
+>>>>>> +			old_pfn = aslot->pfns[rel_gfn];
+>>>>>> +			if (old_pfn == pin_pfn)
+>>>>>> +				continue;
+>>>>>> +
+>>>>>> +			put_page(pfn_to_page(old_pfn));
+>>>>>> +		}
+>>>>>> +
+>>>>>> +		set_bit(rel_gfn, aslot->pinned_bitmap);
+>>>>>> +		aslot->pfns[rel_gfn] = pin_pfn;
+>>>>>> +		get_page(pfn_to_page(pin_pfn));
+>>>>>
+>>>>>
+>>>>> I assume this is to replace KVM_MEMORY_ENCRYPT_REG_REGION, which ends up
+>>>>> calling svm_register_enc_region()->sev_pin_memory(), correct?
+>>>>
+>>>> Yes, that is correct.
+>>>>>
+>>>>> sev_pin_memory() correctly checks the RLIMIT_MEMLOCK and uses
+>>>>> pin_user_pages_fast().
+>>>>>
+>>>>> I have to strongly assume that sev_pin_memory() is *wrong* as is because
+>>>>> it's supposed to supply FOLL_LONGTERM -- after all we're pinning these
+>>>>> pages possibly forever.
+>>>>>
+>>>>>
+>>>>> I might be wrong but
+>>>>>
+>>>>> 1. You are missing the RLIMIT_MEMLOCK check
+>>>>
+>>>> Yes, I will add this check during the enc_region registration.
+>>>>
+>>>>> 2. get_page() is the wong way of long-term pinning a page. You would
+>>>>> have to mimic what pin_user_pages_fast(FOLL_LONGTERM) does to eventually
+>>>>> get it right (e.g., migrate the page off of MIGRATE_CMA or ZONE_MOVABLE).
+>>>>
+>>>> Let me go through this and I will come back. Thanks for pointing this out.
+>>>
+>>> I asusme the "issue" is that KVM uses mmu notifier and does a simple
+>>> get_user_pages() to obtain the references, to drop the reference when
+>>> the entry is invalidated via a mmu notifier call. So once you intent to
+>>> long-term pin, it's already to late.
+>>>
+>>> If you could teach KVM to do a long-term pin when stumbling over these
+>>> special encrypted memory regions (requires a proper matching
+>>> unpin_user_pages() call from KVM), then you could "take over" that pin
+>>> by get_page(), and let KVM do the ordinary put_page(), while you would
+>>> do the unpin_user_pages().
+>>>
+>>
+>> The fault path looks like this in KVM x86 mmu code:
+>>
+>> direct_page_fault()
+>> -> kvm_faultin_pfn()
+>>    -> __gfn_to_pfn_memslot()
+>>       -> hva_to_pfn()
+>>          -> hva_to_pfn_{slow,fast}()
+>>             -> get_user_pages_*()      <<<<==== This is where the
+>>                                                 reference is taken
+>>
+>> Next step is to create the mappings which is done in below functions:
+>>
+>> -> kvm_tdp_mmu_map() / __direct_map()
+>>
+>>    -> Within this function (patch 1/6), I call sev_pin_spte to take an extra 
+>>       reference to pin it using get_page. 
+>>
+>>       Is it possible to use pin_user_pages(FOLL_LONGTERM) here? Wouldn't that 
+>>       be equivalent to "take over" solution that you are suggesting?
+>>
 > 
-> Dne 27. 08. 21 v 14:54 Halil Pasic napsal(a):
-> > While in practice vcpu->vcpu_idx ==  vcpu->vcp_id is often true,
-> > it may not always be, and we must not rely on this.
-> > 
-> > Currently kvm->arch.idle_mask is indexed by vcpu_id, which implies
-> > that code like
-> > for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
-> >                  vcpu = kvm_get_vcpu(kvm, vcpu_id);
-> > 		do_stuff(vcpu);
-> > }
-> > is not legit. The trouble is, we do actually use kvm->arch.idle_mask
-> > like this. To fix this problem we have two options. Either use
-> > kvm_get_vcpu_by_id(vcpu_id), which would loop to find the right vcpu_id,
-> > or switch to indexing via vcpu_idx. The latter is preferable for obvious
-> > reasons.  
-> 
-> I'm just backporting this fix to SLES 12 SP5, and I've noticed that 
-> there is still this code in __floating_irq_kick():
-> 
-> 	/* find idle VCPUs first, then round robin */
-> 	sigcpu = find_first_bit(fi->idle_mask, online_vcpus);
-> /* ... round robin loop removed ...
-> 	dst_vcpu = kvm_get_vcpu(kvm, sigcpu);
-> 
-> It seems to me that this does exactly the thing that is not legit, but 
-> I'm no expert. Did I miss something?
+> The issue is that pin_user_pages(FOLL_LONGTERM) might have to migrate
+> the page, which will fail if there is already an additional reference
+> from get_user_pages_*().
 > 
 
-We made that legit by making the N-th bit in idle_mask correspond to the
-vcpu whose vcpu_idx == N. The second argument of kvm_get_vcpu() is the
-vcpu_idx. IMHO that ain't super-intuitive because it ain't spelled out.
+Minor addition: hva_to_pfn_{slow,fast}() *don't* take a reference,
+because we neither supply FOLL_GET nor FOLL_PIN. GUP users that rely on
+memory notifiers don't require refernces.
 
-So before this was a mismatch (with a vcpu_id based bitmap we would have
-to use kvm_get_vcpu_by_id()), and with this patch applied this code
-becomes legit because both idle_mask and kvm_get_vcpu() operate with
-vcpu_idx.
+I don't know what the implications would be if you FOLL_PIN |
+FOLL_LONGTERM after already having a reference via
+hva_to_pfn_{slow,fast}() in your hand in the callpath. Migration code
+would effectively want to unmap the old page and call mmu notifiers to
+properly invalidate the KVM MMU ...
 
-Does that make sense?
+In an ideal word, you'd really do a FOLL_PIN | FOLL_LONGTERM right away,
+not doing the  get_user_pages_*()  first.
 
-I'm sorry the commit message did not convey this clearly enough...
+-- 
+Thanks,
 
-Regards,
-Halil
-
-
-> Petr T
-> 
-> > Let us make switch from indexing kvm->arch.idle_mask by vcpu_id to
-> > indexing it by vcpu_idx.  To keep gisa_int.kicked_mask indexed by the
-> > same index as idle_mask lets make the same change for it as well.
-> > 
-> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > Fixes: 1ee0bc559dc3 ("KVM: s390: get rid of local_int array")
-> > Cc: <stable@vger.kernel.org> # 3.15+
-> > ---
-> >   arch/s390/include/asm/kvm_host.h |  1 +
-> >   arch/s390/kvm/interrupt.c        | 12 ++++++------
-> >   arch/s390/kvm/kvm-s390.c         |  2 +-
-> >   arch/s390/kvm/kvm-s390.h         |  2 +-
-> >   4 files changed, 9 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> > index 161a9e12bfb8..630eab0fa176 100644
-> > --- a/arch/s390/include/asm/kvm_host.h
-> > +++ b/arch/s390/include/asm/kvm_host.h
-> > @@ -957,6 +957,7 @@ struct kvm_arch{
-> >   	atomic64_t cmma_dirty_pages;
-> >   	/* subset of available cpu features enabled by user space */
-> >   	DECLARE_BITMAP(cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
-> > +	/* indexed by vcpu_idx */
-> >   	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
-> >   	struct kvm_s390_gisa_interrupt gisa_int;
-> >   	struct kvm_s390_pv pv;
-> > diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> > index d548d60caed2..16256e17a544 100644
-> > --- a/arch/s390/kvm/interrupt.c
-> > +++ b/arch/s390/kvm/interrupt.c
-> > @@ -419,13 +419,13 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
-> >   static void __set_cpu_idle(struct kvm_vcpu *vcpu)
-> >   {
-> >   	kvm_s390_set_cpuflags(vcpu, CPUSTAT_WAIT);
-> > -	set_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
-> > +	set_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
-> >   }
-> >   
-> >   static void __unset_cpu_idle(struct kvm_vcpu *vcpu)
-> >   {
-> >   	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_WAIT);
-> > -	clear_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
-> > +	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
-> >   }
-> >   
-> >   static void __reset_intercept_indicators(struct kvm_vcpu *vcpu)
-> > @@ -3050,18 +3050,18 @@ int kvm_s390_get_irq_state(struct kvm_vcpu *vcpu, __u8 __user *buf, int len)
-> >   
-> >   static void __airqs_kick_single_vcpu(struct kvm *kvm, u8 deliverable_mask)
-> >   {
-> > -	int vcpu_id, online_vcpus = atomic_read(&kvm->online_vcpus);
-> > +	int vcpu_idx, online_vcpus = atomic_read(&kvm->online_vcpus);
-> >   	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-> >   	struct kvm_vcpu *vcpu;
-> >   
-> > -	for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
-> > -		vcpu = kvm_get_vcpu(kvm, vcpu_id);
-> > +	for_each_set_bit(vcpu_idx, kvm->arch.idle_mask, online_vcpus) {
-> > +		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
-> >   		if (psw_ioint_disabled(vcpu))
-> >   			continue;
-> >   		deliverable_mask &= (u8)(vcpu->arch.sie_block->gcr[6] >> 24);
-> >   		if (deliverable_mask) {
-> >   			/* lately kicked but not yet running */
-> > -			if (test_and_set_bit(vcpu_id, gi->kicked_mask))
-> > +			if (test_and_set_bit(vcpu_idx, gi->kicked_mask))
-> >   				return;
-> >   			kvm_s390_vcpu_wakeup(vcpu);
-> >   			return;
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 4527ac7b5961..8580543c5bc3 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -4044,7 +4044,7 @@ static int vcpu_pre_run(struct kvm_vcpu *vcpu)
-> >   		kvm_s390_patch_guest_per_regs(vcpu);
-> >   	}
-> >   
-> > -	clear_bit(vcpu->vcpu_id, vcpu->kvm->arch.gisa_int.kicked_mask);
-> > +	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.gisa_int.kicked_mask);
-> >   
-> >   	vcpu->arch.sie_block->icptcode = 0;
-> >   	cpuflags = atomic_read(&vcpu->arch.sie_block->cpuflags);
-> > diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> > index 9fad25109b0d..ecd741ee3276 100644
-> > --- a/arch/s390/kvm/kvm-s390.h
-> > +++ b/arch/s390/kvm/kvm-s390.h
-> > @@ -79,7 +79,7 @@ static inline int is_vcpu_stopped(struct kvm_vcpu *vcpu)
-> >   
-> >   static inline int is_vcpu_idle(struct kvm_vcpu *vcpu)
-> >   {
-> > -	return test_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
-> > +	return test_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
-> >   }
-> >   
-> >   static inline int kvm_is_ucontrol(struct kvm *kvm)
-> > 
-> > base-commit: 77dd11439b86e3f7990e4c0c9e0b67dca82750ba  
+David / dhildenb
 
