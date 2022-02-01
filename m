@@ -2,120 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 564674A613C
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 17:17:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01B214A6176
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 17:38:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240998AbiBAQRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 11:17:13 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:60902 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238531AbiBAQRM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 11:17:12 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DEC57B82EDA;
-        Tue,  1 Feb 2022 16:17:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE9EC340FA;
-        Tue,  1 Feb 2022 16:17:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643732229;
-        bh=tXC6QnhULfDX3AZU8FS9vMXtAGqHkE62Trq7DiDQG+g=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=WJwwKHQP2bQp4H+CbO5qOL36XV8TdcUQG/3UyMIqqA9B0Hwm4ETCJEY3lHVClFDXF
-         TLDjmG25OjAf2nWbeEIBc7t8N6VE6PYypR1RiqaNALAFRjmNGja8nlfdih+bKRqoXa
-         6iwO5cLgem5/buaDb/tp+Lpy7o2qEqI1/UGsUQSKfz+TMPo3z+mSnz3cG8BYoXAAbi
-         +TGuHLaymkpv5tyOnUYoe58IArN1k0mbH+FEHC5NNnewgR/sbHx2qa2lZX/kI6lLTq
-         KC7FQoHP9N2fB3arkAzwfzPk2f0PAVZIsC9IjuCJdCCr1g3uteH/QlaN158hB2ZU0/
-         Ol0fY9iB4pcnw==
-Received: by mail-lj1-f176.google.com with SMTP id e9so24888821ljq.1;
-        Tue, 01 Feb 2022 08:17:09 -0800 (PST)
-X-Gm-Message-State: AOAM531LUfggg7lGTuuWP5QLpOiCFxi3VVslhGV08HcMSa2rScks7I6v
-        bwBglKQuqWrAr/mBEaycxyBZtJZ2iY/d/vYXvdk=
-X-Google-Smtp-Source: ABdhPJxXcBxe7hc9p5AvEq+x7+VhWiTcTDw0Bpv+4IzlGIScnrvZJUOiEvnRa3Lc9ryY4B1x/+EnE7mJkMbtxGuSWBE=
-X-Received: by 2002:a2e:bd82:: with SMTP id o2mr1407770ljq.454.1643732227579;
- Tue, 01 Feb 2022 08:17:07 -0800 (PST)
+        id S238784AbiBAQiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 11:38:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55046 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233760AbiBAQiL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 11:38:11 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27895C061714
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 08:38:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=1lTsDEbwIELOLsQQ3LW7YTALtUz0mwSPckKDI4izXLA=; b=MBrbQx2kPnS1qOhHR005ucRtL2
+        QUby9b49hytlEAupmcgr6Lex8Lk+lBOpUqlEmuPYmUywvUjGI+mdVf3p87XZo6xKoue25YQHu2AmD
+        LIgZ4VJrDA06LB4AqGx5DcB3++FmZ2AlnYQkdVwByjsfwHrhLTjrrQGA4Qq2ElyGlfQtt0QDRToZB
+        C2YKg10OI51HN52UCV2ja7zIcO35E8mPUzZyxbswIRV6n0jeqtNvezBp9K7n2BBOLoulB+kg0lmNw
+        MWPYxtCUk+ANHPmRxLQNU7WUrDVFKZYb7vQrHksQmrRyUf/gv2cAKE/r4NLEJKqSNdvu3jDeZp9/R
+        OYHfBUVg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56968)
+        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1nEwAJ-0000oc-3y; Tue, 01 Feb 2022 16:37:59 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1nEwA5-0002D4-92; Tue, 01 Feb 2022 16:37:45 +0000
+Date:   Tue, 1 Feb 2022 16:37:45 +0000
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 12/64] KVM: arm64: nv: Add non-VHE-EL2->EL1
+ translation helpers
+Message-ID: <Yflh2ad0lkoqTSqX@shell.armlinux.org.uk>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-13-maz@kernel.org>
 MIME-Version: 1.0
-References: <20220201150545.1512822-1-guoren@kernel.org> <20220201150545.1512822-22-guoren@kernel.org>
- <CAAhSdy27nVvh9F08kPgffJe-Y-gOOc9cnQtCLFAE0GbDhHVbiQ@mail.gmail.com>
- <f8359e15-412a-03d6-1b0c-a9f253816497@redhat.com> <CAAhSdy0U+41OWG_0C=820U+07accLsHxNYENtp=ZZsy6K4mJ0g@mail.gmail.com>
-In-Reply-To: <CAAhSdy0U+41OWG_0C=820U+07accLsHxNYENtp=ZZsy6K4mJ0g@mail.gmail.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Wed, 2 Feb 2022 00:16:55 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTQj2vE-1LC5iUa594zSqBt1yMFjiw8pBPTbWVYp7YoitA@mail.gmail.com>
-Message-ID: <CAJF2gTQj2vE-1LC5iUa594zSqBt1yMFjiw8pBPTbWVYp7YoitA@mail.gmail.com>
-Subject: Re: [PATCH V5 21/21] KVM: compat: riscv: Prevent KVM_COMPAT from
- being selected
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        liush <liush@allwinnertech.com>, Wei Fu <wefu@redhat.com>,
-        Drew Fustini <drew@beagleboard.org>,
-        Wang Junqiang <wangjunqiang@iscas.ac.cn>,
-        Christoph Hellwig <hch@lst.de>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-csky@vger.kernel.org,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Parisc List <linux-parisc@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Guo Ren <guoren@linux.alibaba.com>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-13-maz@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 2, 2022 at 12:11 AM Anup Patel <anup@brainfault.org> wrote:
->
-> On Tue, Feb 1, 2022 at 9:31 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 2/1/22 16:44, Anup Patel wrote:
-> > > +Paolo
-> > >
-> > > On Tue, Feb 1, 2022 at 8:38 PM <guoren@kernel.org> wrote:
-> > >>
-> > >> From: Guo Ren <guoren@linux.alibaba.com>
-> > >>
-> > >> Current riscv doesn't support the 32bit KVM API. Let's make it
-> > >> clear by not selecting KVM_COMPAT.
-> > >>
-> > >> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > >> Signed-off-by: Guo Ren <guoren@kernel.org>
-> > >> Cc: Arnd Bergmann <arnd@arndb.de>
-> > >> Cc: Anup Patel <anup@brainfault.org>
-> > >
-> > > This looks good to me.
-> > >
-> > > Reviewed-by: Anup Patel <anup@brainfault.org>
-> >
-> > Hi Anup,
-> >
-> > feel free to send this via a pull request (perhaps together with Mark
-> > Rutland's entry/exit rework).
->
-> Sure, I will do like you suggested.
-Great, thx.
+On Fri, Jan 28, 2022 at 12:18:20PM +0000, Marc Zyngier wrote:
+> Some EL2 system registers immediately affect the current execution
+> of the system, so we need to use their respective EL1 counterparts.
+> For this we need to define a mapping between the two. In general,
+> this only affects non-VHE guest hypervisors, as VHE system registers
+> are compatible with the EL1 counterparts.
+> 
+> These helpers will get used in subsequent patches.
+> 
+> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
->
-> Regards,
-> Anup
->
-> >
-> > Paolo
-> >
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 54 +++++++++++++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index fd601ea68d13..5a85be6d8eb3 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -2,6 +2,7 @@
+>  #ifndef __ARM64_KVM_NESTED_H
+>  #define __ARM64_KVM_NESTED_H
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/kvm_host.h>
+>  
+>  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+> @@ -11,4 +12,57 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+>  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+>  }
+>  
+> +/* Translation helpers from non-VHE EL2 to EL1 */
+> +static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
+> +{
+> +	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
 
+I frowned about the use of FIELD_GET() but not FIELD_PREP(), which
+would be:
+
+	return FIELD_PREP(TCR_IPS_MASK, FIELD_GET(TCR_EL2_PS_MASK, tcr_el2));
+
+However, I'm not bothered by this beyond frowning!
 
 -- 
-Best Regards
- Guo Ren
-
-ML: https://lore.kernel.org/linux-csky/
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
