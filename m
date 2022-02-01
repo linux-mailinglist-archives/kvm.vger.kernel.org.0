@@ -2,155 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 302A34A6769
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 22:58:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12D714A6851
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 00:01:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236064AbiBAV6D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 16:58:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45538 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232585AbiBAV6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 16:58:02 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BFA6C061714
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 13:58:02 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id n32so17071835pfv.11
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 13:58:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ltjF8d5F9x1GgyN29xq25R53ErC8uPxRhu4AGyyM9y4=;
-        b=cmJgpg0t93ZTq37e52YSl1WdM61IEHRAVm9N0bLgmydloJWktxnqq1gzaQaVT3kNuH
-         yxtTUembz+YViRgIGF1K0LucVHYx12NimPAMTl5sxbXUomHerJyoPCJtyxdCFOpNl32D
-         9rZI34Zs4H/yZl38SNvcH5OfxxRc20MyDcYsYDx/Alg55hVVBLMbos2REb5lgyVJP5LW
-         w8nZOZSRJAFePucr7ko54yhIF9mRSSg0GtQfWnxGUCpXsvxzVC/bGG1eZBE1Ct4k/gev
-         Ua0I8gc+YdFC3B4iechxGb8tdS1TdRp/Nvl05ggoPyKWqNNGG5txVg7ba72VY/TUCKrr
-         qd0w==
+        id S242554AbiBAXBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 18:01:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58674 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242492AbiBAXBL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 18:01:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643756470;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZZQsFy9xaSL/C+8tHxnl069hXf8XB97MOyjVaLm6KWA=;
+        b=gPL4po6fTkOJxZ3jS15cGUu9Hk4q4r600itP89dn9uTHPjB3reWGyPK9Nv3NSjGTak+ciJ
+        bCocr7JzzMNLljAZnH/TsI2y7nXpgRyw8O0Jj/SqFxjk7UoVPDh+63/z03cEbLg2E+8Sr0
+        ZPwrUK+Y8pA2PRi98IohowQrzW8UNIw=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-228-ba-eqgmNNoaZ5DLJRlGwWQ-1; Tue, 01 Feb 2022 18:01:09 -0500
+X-MC-Unique: ba-eqgmNNoaZ5DLJRlGwWQ-1
+Received: by mail-ot1-f71.google.com with SMTP id m28-20020a05683023bc00b005a485c04f3fso5557639ots.4
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 15:01:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ltjF8d5F9x1GgyN29xq25R53ErC8uPxRhu4AGyyM9y4=;
-        b=mTRy7OPqaAamCwfqd2KbuwLGeE2F94DYpasUCxdi+LOFGYzabIa0xk0Z0fJRWF70SS
-         cu0qv0MigoZLG/y2BvytI8wrZwBLdw+69B6M/+PzpB55U7yn35hbd5wKPrfUFeuHD9hq
-         leb1ssPLu8PE4c+A89sljf4uRV8PmwCSlvuMC2aYirAGLUBI/xllYFTHW/3HlhQluSoo
-         M0u7WcH7BRmqg5SWhxjZwu7CgfZLB41DfrmCMIf6Tj4lvljLJR4+5PVpYcJ9pssYEBzF
-         OhEyGgcoIHhMUR3yb9bcQ2/aToZ1RLZiS319xsKirHb+pXaTf9SVCJzHoAwJSgNY7u+0
-         oKyg==
-X-Gm-Message-State: AOAM532g4tY7b0qiMDbtINCAFQgBN0Ns+zzdAycW7XUKuE4sedluIa0/
-        AT3tP0v6E86EPE7oxY2wZpHxng==
-X-Google-Smtp-Source: ABdhPJwUYUmjATCCR09YewooMx3240UOnyinweW9dy971jFx83HnD9dHa4UJh4yNWaC8bz26ZlWpyw==
-X-Received: by 2002:a05:6a00:1494:: with SMTP id v20mr26687004pfu.82.1643752681672;
-        Tue, 01 Feb 2022 13:58:01 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id lp17sm4202784pjb.25.2022.02.01.13.58.00
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ZZQsFy9xaSL/C+8tHxnl069hXf8XB97MOyjVaLm6KWA=;
+        b=AhkE0DVeszaXUzxlS/okd5QgR/sxUo+gzyP5hoIdap/5Cp2PrLyj29AlA1nc3kd5HN
+         uY3T1KbAGWGmEx3/1iK47vKacoO2yxLret7ZdPY30zfC+/xfIOHjQbEI0XjRglHIwyT1
+         ORv1fmQySWqN40RxApywU3CEkXpdLS8p875g7tMuBGr91Lab+fUmXaZep7bJuyjQWsWk
+         sovE1ZkAyiftOons31n1uHTxRJbEL07XqJD18oEHDPhbhSzC7X82TqjoQl54/Qk+MXqu
+         +Usg5LzWxEsjDCiE+Tk7Bnzo4hQUvu07wnlnu3fe1p1F+BVhVreLXyHF6HQmFTnDimTO
+         Nb3g==
+X-Gm-Message-State: AOAM531gOKDfR9ZDS64/w6I1o6xnmmeleB0ZRMjQ7J6ZsBpnliIP9WU0
+        98Jqd8Lbev0eC3pXlUit9Q8fQSADNYjWDnjXoXT7dQwuATXtkp5ESkq9kVHwsZVT2dBjwL8DfDK
+        lyrt0UuuTLfSy
+X-Received: by 2002:a05:6808:20a7:: with SMTP id s39mr2718313oiw.306.1643756468629;
+        Tue, 01 Feb 2022 15:01:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxcB506OEAhqOJI745n4wG5GysVpVVMM9JD8hrzIrz8J+sFhUk3i/Fjf/mS8Hij0DFXWZZ5bQ==
+X-Received: by 2002:a05:6808:20a7:: with SMTP id s39mr2718298oiw.306.1643756468405;
+        Tue, 01 Feb 2022 15:01:08 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id bf15sm1581295oib.32.2022.02.01.15.01.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 13:58:00 -0800 (PST)
-Date:   Tue, 1 Feb 2022 21:57:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, mlevitsk@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        peterz@infradead.org, hpa@zytor.com, thomas.lendacky@amd.com,
-        jon.grimm@amd.com
-Subject: Re: [PATCH v3 3/3] KVM: SVM: Extend host physical APIC ID field to
- support more than 8-bit
-Message-ID: <Yfms5evHbN8JVbVX@google.com>
-References: <20211213113110.12143-1-suravee.suthikulpanit@amd.com>
- <20211213113110.12143-4-suravee.suthikulpanit@amd.com>
- <Yc3qt/x1YPYKe4G0@google.com>
- <34a47847-d80d-e93d-a3fe-c22382977c1c@amd.com>
+        Tue, 01 Feb 2022 15:01:08 -0800 (PST)
+Date:   Tue, 1 Feb 2022 16:01:06 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V6 mlx5-next 10/15] vfio: Remove migration protocol v1
+Message-ID: <20220201160106.0760bfea.alex.williamson@redhat.com>
+In-Reply-To: <87sft2yd50.fsf@redhat.com>
+References: <20220130160826.32449-1-yishaih@nvidia.com>
+        <20220130160826.32449-11-yishaih@nvidia.com>
+        <874k5izv8m.fsf@redhat.com>
+        <20220201121325.GB1786498@nvidia.com>
+        <87sft2yd50.fsf@redhat.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <34a47847-d80d-e93d-a3fe-c22382977c1c@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 01, 2022, Suthikulpanit, Suravee wrote:
-> > That implies that an APIC ID > 255 on older hardware what ignores bits 11:8 even
-> > in x2APIC will silently fail, and the whole point of this mask is to avoid exactly
-> > that.
+On Tue, 01 Feb 2022 13:39:23 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Tue, Feb 01 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> On current AMD system w/ x2APIC and 256 cpus (e.g. max APIC ID is 255), it would only
-> need 8 bits in the physical APIC ID table entry, and the bit 11:9 are reserved.
-> For newer system, it could take upto 12 bits to represent APIC ID.
-
-But x2APIC IDs are 32-bit values that, from the APM, are model specific:
-
-  The x2APIC_ID is a concatenation of several fields such as socket ID, core ID
-  and thread ID.
-
-  Because the number of sockets, cores and threads may differ for each SOC, the
-  format of x2APIC ID is model-dependent.
-
-In other words, there's nothing that _architecturally_ guarantees 8 bits are
-sufficient to hold the x2APIC ID.
-
-> > But at least one APM blurb appears to have been wrong (or the architecture is broken)
-> > prior to the larger AVIC width:
-> > 
-> >    Since a destination of FFh is used to specify a broadcast, physical APIC ID FFh
-> >    is reserved.
-> > 
-> > We have Rome systems with 256 CPUs and thus an x2APIC ID for a CPU of FFh.  So
-> > either the APM is wrong or AVIC is broken on older large systems.
+> > On Tue, Feb 01, 2022 at 12:23:05PM +0100, Cornelia Huck wrote:  
+> >> On Sun, Jan 30 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
+> >>   
+> >> > From: Jason Gunthorpe <jgg@nvidia.com>
+> >> >
+> >> > v1 was never implemented and is replaced by v2.
+> >> >
+> >> > The old uAPI definitions are removed from the header file. As per Linus's
+> >> > past remarks we do not have a hard requirement to retain compilation
+> >> > compatibility in uapi headers and qemu is already following Linus's
+> >> > preferred model of copying the kernel headers.  
+> >> 
+> >> If we are all in agreement that we will replace v1 with v2 (and I think
+> >> we are), we probably should remove the x-enable-migration stuff in QEMU
+> >> sooner rather than later, to avoid leaving a trap for the next
+> >> unsuspecting person trying to update the headers.  
+> >
+> > Once we have agreement on the kernel patch we plan to send a QEMU
+> > patch making it support the v2 interface and the migration
+> > non-experimental. We are also working to fixing the error paths, at
+> > least least within the limitations of the current qemu design.  
 > 
-> Actually, the statement is referred to the guest physical APIC ID, which is used to
-> index the per-vm physical APIC table in the host. So, it should be correct in the case
-> of AVIC, which only support APIC mode in the guest.
-
-Ah.  If you have the ear of the APM writers, can you ask that they insert a "guest",
-e.g. so that it reads:
-
-  Since a destination of FFh is used to specify a broadcast, guest physical APIC ID FFh is reserved.
- 
-> > Anyways, for the new larger mask, IMO dynamically computing the mask based on what
-> > APIC IDs were enumerated to the kernel is pointless.  If the AVIC doesn't support
-> > using bits 11:0 to address APIC IDs then KVM is silently hosed no matter what if
-> > any APIC ID is >255.
+> I'd argue that just ripping out the old interface first would be easier,
+> as it does not require us to synchronize with a headers sync (and does
+> not require to synchronize a headers sync with ripping it out...)
 > 
-> The reason for dynamic mask is to protect the reserved bits, which varies between
-> the current platform (i.e 11:8) vs. newer platform (i.e. 11:10), in which
-> there is no good way to tell except to check the max_physical_apicid (see below).
-
-...
-
-> > Ideally, there would be a feature flag enumerating the larger AVIC support so we
-> > could do:
-> > 
-> > 	if (!x2apic_mode || !boot_cpu_has(X86_FEATURE_FANCY_NEW_AVIC))
-> > 		avic_host_physical_id_mask = GENMASK(7:0);
-> > 	else
-> > 		avic_host_physical_id_mask = GENMASK(11:0);
-> > 
-> > but since it sounds like that's not the case, and presumably hardware is smart
-> > enough not to assign APIC IDs it can't address, this can simply be
-> > 
-> > 	if (!x2apic_mode)
-> > 		avic_host_physical_id_mask = GENMASK(7:0);
-> > 	else
-> > 		avic_host_physical_id_mask = GENMASK(11:0);
-> > 
-> > and patch 01 to add+export apic_get_max_phys_apicid() goes away.
+> > The v1 support should remain in old releases as it is being used in
+> > the field "experimentally".  
 > 
-> Unfortunately, we do not have the "X86_FEATURE_FANCY_NEW_AVIC" CPUID bit :(
+> Of course; it would be hard to rip it out retroactively :)
 > 
-> Also, based on the previous comment, we can't use the x2APIC mode in the host
-> to determine such condition. Hence, the need for dynamic mask based on
-> the max_physical_apicid.
+> But it should really be gone in QEMU 7.0.
+> 
+> Considering adding the v2 uapi, we might get unlucky: The Linux 5.18
+> merge window will likely be in mid-late March (and we cannot run a
+> headers sync before the patches hit Linus' tree), while QEMU 7.0 will
+> likely enter freeze in mid-late March as well. So there's a non-zero
+> chance that the new uapi will need to be deferred to 7.1.
 
-I don't get this.  The APM literally says bits 11:8 are:
 
-  Reserved/SBZ for legacy APIC; extension of Host Physical APIC ID when
-  x2APIC is enabled.
+Agreed that v1 migration TYPE/SUBTYPE should live in infamy as
+reserved, but I'm not sure why we need to make the rest of it a big
+complicated problem.  On one hand, leaving stubs for the necessary
+structure and macros until QEMU gets updated doesn't seem so terrible.
+Nor actually does letting the next QEMU header update cause build
+breakages, which would probably frustrate the person submitting that
+update, but it's not like QEMU hasn't done selective header updates in
+the past.  The former is probably the more friendly approach if we
+don't outrage someone in the kernel community in the meantime.  Thanks,
 
-so we absolutely should be able to key off x2APIC mode.  IMO, defining the mask
-based on apic_get_max_phys_apicid() is pointless and misleading.  The only thing
-it really protects is passing in a completely bogus value, e.g. -1.  If for some
-reason bits 11:8 are ignored/reserved by older CPUs even in x2APIC, and the CPU
-assigns an x2APIC ID with bits 11:8!=0, then KVM is hosed no matter what as the
-dynamic calculation will also allow the "bad" ID.
+Alex
+
