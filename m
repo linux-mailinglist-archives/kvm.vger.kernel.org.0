@@ -2,80 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5A6E4A6037
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 16:34:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D80D4A6063
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 16:45:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239499AbiBAPet (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 10:34:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:47380 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233563AbiBAPer (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 10:34:47 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D119113E;
-        Tue,  1 Feb 2022 07:34:47 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DA123F40C;
-        Tue,  1 Feb 2022 07:34:46 -0800 (PST)
-Date:   Tue, 1 Feb 2022 15:34:54 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Martin Radev <martin.b.radev@gmail.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool 5/5] mmio: Sanitize addr and len
-Message-ID: <YflS+zn1EPpVj8EM@monolith.localdoman>
-References: <cover.1642457047.git.martin.b.radev@gmail.com>
- <429afc3bf48379e3e981c3e63325cb83f8991e20.1642457047.git.martin.b.radev@gmail.com>
+        id S240473AbiBAPpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 10:45:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42808 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240372AbiBAPpK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 10:45:10 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80147C061748
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 07:45:09 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id l12-20020a7bc34c000000b003467c58cbdfso2309639wmj.2
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 07:45:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LCcU9g3LWk+Ni1MDTb90PSlSH2Ejv1l38RdD5isGmzA=;
+        b=dNCxlG7n/ZWCDBHispxymrFtrSs4c9YqEglHxbiG1ucYsKtBOTQqyfDQwy3eotCMjP
+         uLM2L/H5EOfuyuixCibGBeRPuEqC7JcUChO4/5W88/l97mdNAgNvT/xqYmtLFgbKxh5n
+         w5nISZOS0HKXiiexKQd+CqHtqM0kejpiHufa6rVenmJHxnYBkcSCvAZ+K0lfDvYe8v8/
+         paGmxHQs3RqMpJLOQQe5QQ5vAOhsHvaHBxJGkYOele0OKszptBqf8ga7cK7KXkXhM0iv
+         Gsb4gJ97geGtk3lJlPWcjuPmCn1m0Qbge+0Fy+Y8HGop/fCzxMmzbROs7ofYWtG8VEDd
+         mjlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LCcU9g3LWk+Ni1MDTb90PSlSH2Ejv1l38RdD5isGmzA=;
+        b=75L1WwzCno8OFKBRwLC8cvGF0bOmeH+JD4oZic26+6AyeXWq2u/+UcTVsY01yoaN1t
+         AoP0G2QCovBLEN798tR12T6VswPGbonWb5aSLz9OOGIW19vg8WBJ5sSHtvwIJK2PJzqw
+         QhM7lP34aSgn1SbHg3Zvd7AAhToyoJUK1ukchNGw+zdaOOyUeBejnTy9K96aRBnNWbHO
+         qmawH5eOE4Q9oAHttfCNyDT1pk0ODqHy9ZNFIhRmb43jt2fV9SmPZpGvYiagLRxgy7HP
+         F2TiTV52mzwUkZBorpiJhGotHQVW6dzOjOZ8mO3FhdP4vMxlGydIavQgbobNJr+7lCh5
+         F/DQ==
+X-Gm-Message-State: AOAM531i/Z4dwds4gf4IEIswGEQYpEjxQrgUl3Bpw1emO1qUzS0LPUUX
+        nMVw0wXbO/oj78qeALqc0YoH3RvIIsdroBizJx1yhw==
+X-Google-Smtp-Source: ABdhPJzLJXIjzEoU+zr9xqvCLUKq64QKzCzT5/D/E4v9iXKOT2PZW4bgO0vZKGKExLFNyrBqW6Lzx4h6BrcWo4/kvAI=
+X-Received: by 2002:a7b:c929:: with SMTP id h9mr2237691wml.176.1643730307764;
+ Tue, 01 Feb 2022 07:45:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <429afc3bf48379e3e981c3e63325cb83f8991e20.1642457047.git.martin.b.radev@gmail.com>
+References: <20220201150545.1512822-1-guoren@kernel.org> <20220201150545.1512822-22-guoren@kernel.org>
+In-Reply-To: <20220201150545.1512822-22-guoren@kernel.org>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 1 Feb 2022 21:14:56 +0530
+Message-ID: <CAAhSdy27nVvh9F08kPgffJe-Y-gOOc9cnQtCLFAE0GbDhHVbiQ@mail.gmail.com>
+Subject: Re: [PATCH V5 21/21] KVM: compat: riscv: Prevent KVM_COMPAT from
+ being selected
+To:     Guo Ren <guoren@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        liush <liush@allwinnertech.com>, Wei Fu <wefu@redhat.com>,
+        Drew Fustini <drew@beagleboard.org>,
+        Wang Junqiang <wangjunqiang@iscas.ac.cn>,
+        Christoph Hellwig <hch@lst.de>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        linux-csky@vger.kernel.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-parisc@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        x86@kernel.org, Guo Ren <guoren@linux.alibaba.com>,
+        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Martin,
++Paolo
 
-On Tue, Jan 18, 2022 at 12:12:03AM +0200, Martin Radev wrote:
-> This patch verifies that adding the addr and length arguments
-> from an MMIO op do not overflow. This is necessary because the
-> arguments are controlled by the VM. The length may be set to
-> an arbitrary value by using the rep prefix.
+On Tue, Feb 1, 2022 at 8:38 PM <guoren@kernel.org> wrote:
+>
+> From: Guo Ren <guoren@linux.alibaba.com>
+>
+> Current riscv doesn't support the 32bit KVM API. Let's make it
+> clear by not selecting KVM_COMPAT.
+>
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Anup Patel <anup@brainfault.org>
 
-The Arm architecture doesn'tt have instructions to access 0 bytes of
-memory. By "rep prefix" you mean the x86 rep* instructions, right?
+This looks good to me.
 
-> 
-> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
+
 > ---
->  mmio.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/mmio.c b/mmio.c
-> index a6dd3aa..04d2af6 100644
-> --- a/mmio.c
-> +++ b/mmio.c
-> @@ -32,6 +32,10 @@ static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
->  {
->  	struct rb_int_node *node;
->  
-> +	/* If len is zero or if there's an overflow, the MMIO op is invalid. */
-> +	if (len + addr <= addr)
-
-Would you mind rewriting the left side of the inequality to addr + len to match
-the argument to rb_int_search_range() below?
-
-Otherwise looks good:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
-> +		return NULL;
-> +
->  	node = rb_int_search_range(root, addr, addr + len);
->  	if (node == NULL)
->  		return NULL;
-> -- 
+>  virt/kvm/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index f4834c20e4a6..a8c5c9f06b3c 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -53,7 +53,7 @@ config KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>
+>  config KVM_COMPAT
+>         def_bool y
+> -       depends on KVM && COMPAT && !(S390 || ARM64)
+> +       depends on KVM && COMPAT && !(S390 || ARM64 || RISCV)
+>
+>  config HAVE_KVM_IRQ_BYPASS
+>         bool
+> --
 > 2.25.1
-> 
+>
