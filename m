@@ -2,115 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 945E24A587D
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 09:26:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD9484A5927
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 10:25:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235383AbiBAI0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 03:26:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235581AbiBAIYL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 03:24:11 -0500
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120B5C061401
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 00:24:11 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id me13so51745398ejb.12
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 00:24:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=GHl1OHNEBsppykLL0FZwPbFOi9foYqykYD+EcFet6qM=;
-        b=a7BBFEww46WyfPzbomNQG+Oqq2IlwS7J9fIC6wz4AdhnC7RyJpr/rJWZYYt2vAhObW
-         iKEwMUG4feE/X4hSNAxQoRtiComrQv51VvEEYRla9+kWV86j1LQbU6kx+vhGqEd61/cy
-         G2t3i2xZvnCqkVzIfZzQU2C62mnetTUKDAhzxiaYd34pcr2HvKXqAO0uOCOFqYacHePO
-         vs923UsYq5I2ob+UgyHh5m1WF0yrD59QYadBvnneQAQcj857TlY7IXviNdvZDwFw7Noa
-         sOmaqrashQAOt4ECeqnuo5hVWsTR85qX0g8Zx9Gh9fKZdbFMM1vrATkT2ORx5IRqOcsY
-         mpJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GHl1OHNEBsppykLL0FZwPbFOi9foYqykYD+EcFet6qM=;
-        b=b99maX4aeYbrANnakXVUiDdztEb5XU0G4T07erey1OoPQTqFZj6Jz0VrYusNKcTWnf
-         jTUIUFrrqV/gLSEiLr++zOcKgNFf9aaWEkhKP8fsgBxJ2cj0vi5v2oHsESdnU+zFFJNk
-         16oBh2T6k2DUFYjQHD1vvlV6Z0nM03Oo07aL1PDq4FaybYWJuItLtVerhZbpkOjhESRL
-         T1eU+S3x9gcX6Q+q6lJH9cNvwewlVQZ643QUhRwiFGLb3W8Kk4+Jsjohqn7zA5PXZWWf
-         3sR9VSG/CWK2xXIl7LxjBQBPvZ3+5ubl6IApDzJD0Rv3iacgGHJqQkavLGYARaMnD6O0
-         7uDA==
-X-Gm-Message-State: AOAM533nxMg5QOg8ojwPcDAzk0eq2lTe0DavuuQt+DnFlgH+sAEYq/qr
-        4gnCSPc4k3a7inZg/4XITp2OqA==
-X-Google-Smtp-Source: ABdhPJzCelwQYB0QuYOqiku+n7scTy7gUb/hHhHhs6GEaaroLB9AmfUKIaKTwSM1jvGPR/SYoABrkA==
-X-Received: by 2002:a17:906:58c6:: with SMTP id e6mr19318243ejs.733.1643703849679;
-        Tue, 01 Feb 2022 00:24:09 -0800 (PST)
-Received: from localhost.localdomain ([122.179.76.38])
-        by smtp.gmail.com with ESMTPSA id w8sm14312133ejq.220.2022.02.01.00.24.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 00:24:09 -0800 (PST)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH 6/6] RISC-V: KVM: Implement SBI HSM suspend call
-Date:   Tue,  1 Feb 2022 13:52:27 +0530
-Message-Id: <20220201082227.361967-7-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220201082227.361967-1-apatel@ventanamicro.com>
-References: <20220201082227.361967-1-apatel@ventanamicro.com>
+        id S235939AbiBAJZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 04:25:33 -0500
+Received: from mga05.intel.com ([192.55.52.43]:65221 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235822AbiBAJZc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 04:25:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643707533; x=1675243533;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gUWEXzJ4CQlIUlnkVKFBZZcmOw+scAStpajAHmMMh6s=;
+  b=axE5odOo1C9ZSq5WsMMgMZaQxHoTdQeJEZITtUT/M86NH8++lJU9LK6L
+   PB4U4aO/fyzpJjSSRB57qV9KobLCy3th49945nzHgtKtqZyjn1ht1mULB
+   lsswtiaki4QWFzluZB4zKhHw46YMzUnPMPB3BlT+8GU54+014eaYvHc3b
+   eBgnJAdK8Y0Avls7FpWlPLg8TjXzJ2k3oTruaUaAe2J2EVF4IJzqhkTPH
+   nq8Fo3bm+cses5S5RZ7p/vwdcLSaOVylMdpHkd80OVTWax14E3/bQmpIx
+   Y3rM1fykAyFh5PqeBrb2+/crincnH4zZTjMlqQh3Qsse48suXUrq4xSUO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10244"; a="334007657"
+X-IronPort-AV: E=Sophos;i="5.88,333,1635231600"; 
+   d="scan'208";a="334007657"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2022 01:25:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,333,1635231600"; 
+   d="scan'208";a="537730962"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 01 Feb 2022 01:25:29 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nEpPk-000T3l-JD; Tue, 01 Feb 2022 09:25:28 +0000
+Date:   Tue, 1 Feb 2022 17:25:00 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH 4/5] KVM: x86: Use __try_cmpxchg_user() to emulate atomic
+ accesses
+Message-ID: <202202011753.zksthphR-lkp@intel.com>
+References: <20220201010838.1494405-5-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220201010838.1494405-5-seanjc@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SBI v0.3 specification extends SBI HSM extension by adding SBI HSM
-suspend call and related HART states. This patch extends the KVM RISC-V
-HSM implementation to provide KVM guest a minimal SBI HSM suspend call
-which is equivalent to a WFI instruction.
+Hi Sean,
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+I love your patch! Yet something to improve:
+
+[auto build test ERROR on 26291c54e111ff6ba87a164d85d4a4e134b7315c]
+
+url:    https://github.com/0day-ci/linux/commits/Sean-Christopherson/x86-uaccess-CMPXCHG-KVM-bug-fixes/20220201-091001
+base:   26291c54e111ff6ba87a164d85d4a4e134b7315c
+config: i386-randconfig-a002 (https://download.01.org/0day-ci/archive/20220201/202202011753.zksthphR-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 6b1e844b69f15bb7dffaf9365cd2b355d2eb7579)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/5387711f4b49675e162ca30b05a3b2435326e5f9
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Sean-Christopherson/x86-uaccess-CMPXCHG-KVM-bug-fixes/20220201-091001
+        git checkout 5387711f4b49675e162ca30b05a3b2435326e5f9
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kvm/x86.c:7213:7: error: invalid output size for constraint '+a'
+                   r = emulator_try_cmpxchg_user(u64, hva, old, new);
+                       ^
+   arch/x86/kvm/x86.c:7159:3: note: expanded from macro 'emulator_try_cmpxchg_user'
+           (__try_cmpxchg_user((t *)(ptr), (t *)(old), *(t *)(new), efault ## t))
+            ^
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:606:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 1: __ret = __try_cmpxchg_user_asm("b", "q",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+>> arch/x86/kvm/x86.c:7213:7: error: invalid output size for constraint '+a'
+   arch/x86/kvm/x86.c:7159:3: note: expanded from macro 'emulator_try_cmpxchg_user'
+           (__try_cmpxchg_user((t *)(ptr), (t *)(old), *(t *)(new), efault ## t))
+            ^
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:610:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 2: __ret = __try_cmpxchg_user_asm("w", "r",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+>> arch/x86/kvm/x86.c:7213:7: error: invalid output size for constraint '+a'
+   arch/x86/kvm/x86.c:7159:3: note: expanded from macro 'emulator_try_cmpxchg_user'
+           (__try_cmpxchg_user((t *)(ptr), (t *)(old), *(t *)(new), efault ## t))
+            ^
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:614:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 4: __ret = __try_cmpxchg_user_asm("l", "r",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   3 errors generated.
+
+
+vim +7213 arch/x86/kvm/x86.c
+
+  7157	
+  7158	#define emulator_try_cmpxchg_user(t, ptr, old, new) \
+  7159		(__try_cmpxchg_user((t *)(ptr), (t *)(old), *(t *)(new), efault ## t))
+  7160	
+  7161	static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+  7162					     unsigned long addr,
+  7163					     const void *old,
+  7164					     const void *new,
+  7165					     unsigned int bytes,
+  7166					     struct x86_exception *exception)
+  7167	{
+  7168		struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+  7169		u64 page_line_mask;
+  7170		unsigned long hva;
+  7171		gpa_t gpa;
+  7172		int r;
+  7173	
+  7174		/* guests cmpxchg8b have to be emulated atomically */
+  7175		if (bytes > 8 || (bytes & (bytes - 1)))
+  7176			goto emul_write;
+  7177	
+  7178		gpa = kvm_mmu_gva_to_gpa_write(vcpu, addr, NULL);
+  7179	
+  7180		if (gpa == UNMAPPED_GVA ||
+  7181		    (gpa & PAGE_MASK) == APIC_DEFAULT_PHYS_BASE)
+  7182			goto emul_write;
+  7183	
+  7184		/*
+  7185		 * Emulate the atomic as a straight write to avoid #AC if SLD is
+  7186		 * enabled in the host and the access splits a cache line.
+  7187		 */
+  7188		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
+  7189			page_line_mask = ~(cache_line_size() - 1);
+  7190		else
+  7191			page_line_mask = PAGE_MASK;
+  7192	
+  7193		if (((gpa + bytes - 1) & page_line_mask) != (gpa & page_line_mask))
+  7194			goto emul_write;
+  7195	
+  7196		hva = kvm_vcpu_gfn_to_hva(vcpu, gpa_to_gfn(gpa));
+  7197		if (kvm_is_error_hva(addr))
+  7198			goto emul_write;
+  7199	
+  7200		hva += offset_in_page(gpa);
+  7201	
+  7202		switch (bytes) {
+  7203		case 1:
+  7204			r = emulator_try_cmpxchg_user(u8, hva, old, new);
+  7205			break;
+  7206		case 2:
+  7207			r = emulator_try_cmpxchg_user(u16, hva, old, new);
+  7208			break;
+  7209		case 4:
+  7210			r = emulator_try_cmpxchg_user(u32, hva, old, new);
+  7211			break;
+  7212		case 8:
+> 7213			r = emulator_try_cmpxchg_user(u64, hva, old, new);
+  7214			break;
+  7215		default:
+  7216			BUG();
+  7217		}
+  7218	
+  7219		if (r < 0)
+  7220			goto emul_write;
+  7221		if (r)
+  7222			return X86EMUL_CMPXCHG_FAILED;
+  7223	
+  7224		kvm_page_track_write(vcpu, gpa, new, bytes);
+  7225	
+  7226		return X86EMUL_CONTINUE;
+  7227	
+  7228	emul_write:
+  7229		printk_once(KERN_WARNING "kvm: emulating exchange as write\n");
+  7230	
+  7231		return emulator_write_emulated(ctxt, addr, new, bytes, exception);
+  7232	}
+  7233	
+
 ---
- arch/riscv/kvm/vcpu_sbi_hsm.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
-index 1ac4b2e8e4ec..239dec0a628a 100644
---- a/arch/riscv/kvm/vcpu_sbi_hsm.c
-+++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-@@ -61,6 +61,8 @@ static int kvm_sbi_hsm_vcpu_get_status(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
- 	if (!target_vcpu->arch.power_off)
- 		return SBI_HSM_STATE_STARTED;
-+	else if (vcpu->stat.generic.blocking)
-+		return SBI_HSM_STATE_SUSPENDED;
- 	else
- 		return SBI_HSM_STATE_STOPPED;
- }
-@@ -91,6 +93,18 @@ static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			ret = 0;
- 		}
- 		break;
-+	case SBI_EXT_HSM_HART_SUSPEND:
-+		switch (cp->a0) {
-+		case SBI_HSM_SUSPEND_RET_DEFAULT:
-+			kvm_riscv_vcpu_wfi(vcpu);
-+			break;
-+		case SBI_HSM_SUSPEND_NON_RET_DEFAULT:
-+			ret = -EOPNOTSUPP;
-+			break;
-+		default:
-+			ret = -EINVAL;
-+		}
-+		break;
- 	default:
- 		ret = -EOPNOTSUPP;
- 	}
--- 
-2.25.1
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
