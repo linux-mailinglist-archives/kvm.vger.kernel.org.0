@@ -2,203 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ECFA4A6419
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:39:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC63A4A6441
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:53:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236866AbiBASjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 13:39:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230302AbiBASjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 13:39:00 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BB4C061714
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 10:39:00 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id z5so16072994plg.8
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 10:39:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cjMVwAHRzuneEUKCTGxfeEiXs54VyjggPNF5H89xF7w=;
-        b=JTwSqzw1ISkkD95jXW49KDQXWIJU7LMPf79YGR5OHzdcWgTDFD2vZnmClEK8S9sIm7
-         JG1sjCJ4GHPHwknL7z/u6qBHDhfxVFHX/NZR9aig2Fs23tpjwAAQ0Gjiys78JXDkn1HY
-         dFBT9lQgnvLP5aD9U4HLgAiiOZ3h0N7wdeSCgbqTYWaw7czW4M15Q1uzshu0XbP1xikS
-         7RNnaQcvhA/21FQgG4dgj1WwLpDt9hu5ENsX4NCqQ/oncRs+0wQnR9kzkWdb1iJNk5zA
-         st0u3wgIde9hqiufaNdkLeO7+tGoj3tsm/SNjAzE/J4+XhFc2Z7l2rQqxNCTkSSuKloa
-         nToQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cjMVwAHRzuneEUKCTGxfeEiXs54VyjggPNF5H89xF7w=;
-        b=Ah6f5xLyz27l6AhhfbQmnsMGw3yMz/KA7fxuaxuiJELrXMHHe6FxWeGeVfZCmpT6iO
-         n7GkUb1V2xZYKSYmboxZ5bT3bFPmfEWDwlolbVIqosUgAznF51MCZzLGk2rMe0LUvylf
-         X6Z8cxZ470mykExy92q31eFEMzCegeYGDq+5E3UJh6BN/pF0ZAXsaH/Af7wyjA+4GYHE
-         GSwKe35dXsvRhal8rtDNYBuTwxTXlvXYkhTEmqXsKDMfWOS6YBN+UBbv8BZSNxmIXSzC
-         l7VLmLCfi5PWyLQE9kOunnPIpBxHIoPoOY4xwY642ewcK+joqFBr6i2kghjW4Qi2g0/y
-         0mGA==
-X-Gm-Message-State: AOAM531GqeETei6I+axBRmsiFiuFJaL9ftFIkpMdKbkq8asl362DwPLC
-        iFxcXHnJ1DNiSLFmT3qLxNMmSQ==
-X-Google-Smtp-Source: ABdhPJwABX4STQVMJpby2CBINrprsj+frRBmFwkzRq9nIq5ueQaSjnpQnxERileNsQ4/lJqG9fqj5w==
-X-Received: by 2002:a17:903:41c1:: with SMTP id u1mr21030773ple.91.1643740739772;
-        Tue, 01 Feb 2022 10:38:59 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id f8sm20287551pfv.24.2022.02.01.10.38.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 10:38:59 -0800 (PST)
-Date:   Tue, 1 Feb 2022 10:38:55 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-Message-ID: <Yfl+Pz4MWOyEHfhf@google.com>
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-3-reijiw@google.com>
- <YfDaiUbSkpi9/5YY@google.com>
- <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
- <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
- <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com>
- <YfdaKpBqFkULxgX/@google.com>
- <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
-MIME-Version: 1.0
+        id S242059AbiBASx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 13:53:26 -0500
+Received: from mail-bn8nam12on2056.outbound.protection.outlook.com ([40.107.237.56]:20961
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S242043AbiBASxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 13:53:25 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d+4OzUrEfmhkF+5R6yYLMHJLNAMDoic1IpLi5aw1iC8TAFFb5cgc70CScIR6tjPslk7QyDq4oU+1sn/fk3dVrI+tSsN3ivwEXVDv7XOAMABxVQZu6jeJ3MXDswE1S0l9hxSWSxq5gXWzymY00gX70ryMPE/w27V64EI9WVI9kDsvBhv0GVbhbAJurp2KfP79Y9fPeCVINay8oOGQA8dfv3NbhR+GcAH7e141cTqXRsi172U4huuClEv+3znJroxziywMLKzhYpO6WQoi1EVL3f78ezlvymmuG7k6M3v4/uUTVsEdnXwAJNXFRP0l8QNn1jBjCmOrdDA7BTnvyIX/qA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j22xXxJKHeIAXK9X4iBbNwYLMUh1GGElowZzRY+Jmm8=;
+ b=h1eJ3pHxdl6U/LzsikcV6RtUvTqD+yCbOP19ZravxUbMmcu9h6RI4ja6Y2fuEEc8Pr+ZBZqg6W3ubAl2uvnQo9Z1nDvfExWPI9YQwRS3Nw2w5j4GM7iGpro1dIizZKY1pJb/+m+Cq0YJ3XRDtLWd5e8o8jkFqqltpoElkiHvYPqKFSC2pvil+uRQ+wuh3qCudsZVtt2WM10Fi8mwDt+HeYEj5mjVUQBb34PwjK1QiyLiTtoSXqJ0A+tLy37gEMfsv34/Ctqy1xf8prxWmbOkHXPjUQwLl9xjgFwo2rvpJc08Q4jG/tsPUDdcTkmwwq+370gVifx4zKd0AEzL2xLVzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j22xXxJKHeIAXK9X4iBbNwYLMUh1GGElowZzRY+Jmm8=;
+ b=ronwKqt9ektotO5dxlIKgPkLRheD7/3gOOId38H3NqhbAZBsUzrnkSwsx71wfScovv5DHQbX0qmds1JPMTi4eI4l8Q1hkZzj0vLv6elgN5pWSOV8dTTqFzeKu4puZacrQ+HHzwIoepzczV9Wzaa3jTXrYphDAwsluWuIj+vSP36wL8VKzsQ+UtzFAP1bZaX51fSwLzp8UJR+HOHB5jCyDRsQRkft9RtILMkUJ4/gQyZG7k6iHl5InhGzhY9DFJAPMQM+Ura+K8+Q1QQoDv/f7aM9yk8RwmaU2gA0xRlyhQokKbPZewbWJbs/A6gUQmUueSdzdVQJKJsG5xnoE/LMCA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB3051.namprd12.prod.outlook.com (2603:10b6:5:119::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.19; Tue, 1 Feb
+ 2022 18:53:23 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4930.022; Tue, 1 Feb 2022
+ 18:53:22 +0000
+Date:   Tue, 1 Feb 2022 14:53:21 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V6 mlx5-next 09/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220201185321.GM1786498@nvidia.com>
+References: <20220130160826.32449-1-yishaih@nvidia.com>
+ <20220130160826.32449-10-yishaih@nvidia.com>
+ <20220201113144.0c8dfaa5.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
+In-Reply-To: <20220201113144.0c8dfaa5.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0320.namprd13.prod.outlook.com
+ (2603:10b6:208:2c1::25) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: eab5c3c1-f4a1-4ab4-596c-08d9e5b41eec
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3051:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB305184F1AB39B2B4F9E41678C2269@DM6PR12MB3051.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gMXztykR9jc6ZwzD50QJ5KcwWptrJpnfeiYGUqs9pStt4bcrxRz9g6MJ4aRmzVrt1iS7bpw8cvfq9zyUSn+JsVP6AXhJUoOfkqoAlMYRGceefV77Gzwk3kFCsD1V9vf9MeSEOGJQ4qoMNNRwQ8kiWEDwXP25kpY0VAUrqvaFiNsbEbUlC1C+g+c4kKePfj1775vfpQbNNjpKqQE/hiVnRZ5SGuAlRIgdotcJunEhUuVpjji8AErnN0rFDxR79dmixcog23YqYHZmNsdlPvRLUkzHyhU/f3JTK2iCDblfTljh8USTWDCg/8eYU0MCvEZsdCt7uSVuKiWE3TBsjyvGHMi0PvGchnhstly/QZh4+orpEvLRcXvSgRn71rTL+zVlDhkCa/qU3rDrwh63DGB+RNHWaCbXIUcYumeXG4pweuRIGgdY4Y3gHe7lx3zk1++cETsvMnZCP9ijCxsSm1cJhpbz6hrT7oKgwQVIk6gtVKoXzNxbflMsJA3JHviL5jP0PQ/t8CGbKqMaHF+S6heHHGcjxEWuNJ5NEftlRlOQ/SWBqkGe5SM78UNYlUDPHXbq02DO4IOCnvYfR55D63p7nelPUH50+2UciT6EX6Q1iyXhn8j8u2AFFEME1Ef9sZ6vIQuiZMHYmXqEbAW2bslcUA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66476007)(1076003)(508600001)(316002)(6506007)(26005)(66946007)(66556008)(5660300002)(8676002)(6512007)(4326008)(186003)(8936002)(2906002)(38100700002)(2616005)(6916009)(86362001)(107886003)(33656002)(83380400001)(6486002)(36756003)(20210929001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?n/7/ELSQhVIfTJfW0uADB06067MmNjryTFq1G+4gsNKujoGDOKQ50G3qn+II?=
+ =?us-ascii?Q?bSAzMmDkuhmznriVVKidd4lj/JyvvjWegD2ql/NrNwKw0/Gm0uJNvPVL390Z?=
+ =?us-ascii?Q?UzEQgKWwQksvkyZAYxzAUWNjT+tR1Un+1DfVcJqAQh4S9ZtPa6Q5tT7+jDqg?=
+ =?us-ascii?Q?lFWDCYbee+9BSDUKbab2Gm5J3IsDpsISUzx2kxh/sFDmFGxclR0YDtxpNDE0?=
+ =?us-ascii?Q?Ta7ydp950yoxGKWXKxFybpf/n4wbADZOfsn2/zxvyhYt2w7oKdaroHWmLI+z?=
+ =?us-ascii?Q?L5xWDYLZ+w7BzfbEC3E5xza80QPE/QegScXU1DfACTRyrIHEif9ZI6iSJBog?=
+ =?us-ascii?Q?rtibEjmtN23+z7ikiVWBt5UJtbSFT4usgvgq1pgFrBzDmBOd/GgDpWIHFaFB?=
+ =?us-ascii?Q?eMCqAyu/q9TTOqr3oIw0jdzMbwtD30UVXlkqXEqDkwWEsBxqhGDqpW/X3H4m?=
+ =?us-ascii?Q?n2W0mGyrk5KEnlvFcWC2tf05t6QYruhUGAyn7Q8DjCCuYjLVZM8p7UXn7jrM?=
+ =?us-ascii?Q?mOrQb9XjFlVa378xq30ND4jDvJflw1Io1ATDair01oeSjRZUCEgGlPT6hO0x?=
+ =?us-ascii?Q?tlWc6P7OAAWQ1/T5A6m2+lPsGdDgtNOG2ePa37h0zgnvQFvwoIBdMvbKlWnj?=
+ =?us-ascii?Q?0IsD7JiPiXWl4pAXEV4Av994iNX8kWBOKOWR/uoMwFrkWbz9tIAuaaIiKGBu?=
+ =?us-ascii?Q?5ki4EEbOia9iw5/mZXXxd+TUdzq5Aj1SH7OW6+/nXF2O1OvsmefDgIlEkko3?=
+ =?us-ascii?Q?6M3rgYZPvw7j9GfSfYtTlj6gs1rEBOwJ8iUbxogsd0fN5dZR1CulYUX9QBre?=
+ =?us-ascii?Q?j0wa2XjOxAXnxi+dNCJ3OfKpE3dRvMoYqmIlG4ciUQ6mqjhDE4QnEx49aShO?=
+ =?us-ascii?Q?2WUKJYzFudwFygMHL3w2NkV3Qr+zt2AONJaesMiBivomqioBH4rhonBkHfC+?=
+ =?us-ascii?Q?0OP7UITrvOMUtlwyRuNMCSzHOud0QKiqsSbC/wdrcNzDbMUWqfAZPuRSPfn/?=
+ =?us-ascii?Q?e14J3bYed3LWHzSOumwW7rQGV8Ecjck1EVk2X3hI/pf1qRBbLPam7V7IxZdo?=
+ =?us-ascii?Q?f7gmPijpfh1cfck+xyml4WUu9F8NeoNc94dNm9xYC7zke3KkfJ9StvqdqMX1?=
+ =?us-ascii?Q?SExOoZrvmsaqNrq8LlNXckR4yDrxPa0NE78zxCvZ/2WNrOjye1tkuD/yP/ro?=
+ =?us-ascii?Q?MjbBnB+YeCUYDzMgObY+xYkEgwjdsPhByIweqs74OaojH0kJpshFaOFB8w2e?=
+ =?us-ascii?Q?k1EKD5sZxvspMtRFgm5Uq16YHrmn6zCj7F2jLS5vt/ipsiZs2Wj95vSIAqI2?=
+ =?us-ascii?Q?g7CipKiISqUzxaIW4/tEqGPEpSywDRiGR4sA7fd1WtMcOIhQvtHzfostXIps?=
+ =?us-ascii?Q?MF9sztLkr9Yjd2yG6+sdMTIzligkAEuaAIbis1g2SpNgtLjXrN9pXozfj62X?=
+ =?us-ascii?Q?yHGJRDmTtGdRmIDJ5KxhRz/DyE51qTsBG73AyWoJN46+ONnGPWywXTh2xMQz?=
+ =?us-ascii?Q?nLAcbnz68eIuINf0A0fMxvaG6Vc/y5DhL69OlvJFXdLjeQWah5S4w5v+Pbig?=
+ =?us-ascii?Q?bJHrbk3yfSmOEjo72BU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eab5c3c1-f4a1-4ab4-596c-08d9e5b41eec
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2022 18:53:22.7815
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nQANp5Y2VBwfyO6Sea7kJy7REtej+/uuBQm/8pdIFeAffTmbxmu7GTPPAQA0gZu1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3051
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Reiji,
-
-On Mon, Jan 31, 2022 at 10:00:40PM -0800, Reiji Watanabe wrote:
-> Hi Ricardo,
+On Tue, Feb 01, 2022 at 11:31:44AM -0700, Alex Williamson wrote:
+> > +	bool have_p2p = device->migration_flags & VFIO_MIGRATION_P2P;
+> > +
+> >  	if (cur_fsm >= ARRAY_SIZE(vfio_from_fsm_table) ||
+> >  	    new_fsm >= ARRAY_SIZE(vfio_from_fsm_table))
+> >  		return VFIO_DEVICE_STATE_ERROR;
+> >  
+> > -	return vfio_from_fsm_table[cur_fsm][new_fsm];
+> > +	if (!have_p2p && (new_fsm == VFIO_DEVICE_STATE_RUNNING_P2P ||
+> > +			  cur_fsm == VFIO_DEVICE_STATE_RUNNING_P2P))
+> > +		return VFIO_DEVICE_STATE_ERROR;
 > 
-> On Sun, Jan 30, 2022 at 7:40 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > On Fri, Jan 28, 2022 at 09:52:21PM -0800, Reiji Watanabe wrote:
-> > > Hi Ricardo,
-> > >
-> > > > > > > +
-> > > > > > > +/*
-> > > > > > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > > > > > > + * with ID_SANITISED() to the host's sanitized value.
-> > > > > > > + */
-> > > > > > > +void set_default_id_regs(struct kvm *kvm)
-> > > > > > > +{
-> > > > > > > +     int i;
-> > > > > > > +     u32 id;
-> > > > > > > +     const struct sys_reg_desc *rd;
-> > > > > > > +     u64 val;
-> > > > > > > +
-> > > > > > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > > > > > > +             rd = &sys_reg_descs[i];
-> > > > > > > +             if (rd->access != access_id_reg)
-> > > > > > > +                     /* Not ID register, or hidden/reserved ID register */
-> > > > > > > +                     continue;
-> > > > > > > +
-> > > > > > > +             id = reg_to_encoding(rd);
-> > > > > > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > > > > > +                     /* Shouldn't happen */
-> > > > > > > +                     continue;
-> > > > > > > +
-> > > > > > > +             val = read_sanitised_ftr_reg(id);
-> > > > > >
-> > > > > > I'm a bit confused. Shouldn't the default+sanitized values already use
-> > > > > > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
-> > > > >
-> > > > > I'm not sure if I understand your question.
-> > > > > arm64_ftr_bits_kvm is used for feature support checkings when
-> > > > > userspace tries to modify a value of ID registers.
-> > > > > With this patch, KVM just saves the sanitized values in the kvm's
-> > > > > buffer, but userspace is still not allowed to modify values of ID
-> > > > > registers yet.
-> > > > > I hope it answers your question.
-> > > >
-> > > > Based on the previous commit I was assuming that some registers, like
-> > > > id_aa64dfr0,
-> > > > would default to the overwritten values as the sanitized values. More
-> > > > specifically: if
-> > > > userspace doesn't modify any ID reg, shouldn't the defaults have the
-> > > > KVM overwritten
-> > > > values (arm64_ftr_bits_kvm)?
-> > >
-> > > arm64_ftr_bits_kvm doesn't have arm64_ftr_reg but arm64_ftr_bits,
-> > > and arm64_ftr_bits_kvm doesn't have the sanitized values.
-> > >
-> > > Thanks,
-> >
-> > Hey Reiji,
-> >
-> > Sorry, I wasn't very clear. This is what I meant.
-> >
-> > If I set DEBUGVER to 0x5 (w/ FTR_EXACT) using this patch on top of the
-> > series:
-> >
-> >  static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
-> >         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
-> > -       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-> > +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x5),
-> >
-> > it means that userspace would not be able to set DEBUGVER to anything
-> > but 0x5. But I'm not sure what it should mean for the default KVM value
-> > of DEBUGVER, specifically the value calculated in set_default_id_regs().
-> > As it is, KVM is still setting the guest-visible value to 0x6, and my
-> > "desire" to only allow booting VMs with DEBUGVER=0x5 is being ignored: I
-> > booted a VM and the DEBUGVER value from inside is still 0x6. I was
-> > expecting it to not boot, or to show a warning.
->
-> Thank you for the explanation!
-> 
-> FTR_EXACT (in the existing code) means that the safe_val should be
-> used if values of the field are not identical between CPUs (see how
-> update_cpu_ftr_reg() uses arm64_ftr_safe_value()). For KVM usage,
-> it means that if the field value for a vCPU is different from the one
-> for the host's sanitized value, only the safe_val can be used safely
-> for the guest (purely in terms of CPU feature).
+> new_fsm is provided by the user, we pass set_state.device_state
+> directly to .migration_set_state.  We should do bounds checking and
+> compatibility testing on the end state in the core so that we can
 
-Let me double check my understanding using the DEBUGVER example, please.
-The safe_value would be DEBUGVER=5, and it contradicts the initial VM
-value calculated on the KVM side. Q1: Can a contradiction like this
-occur in practice? Q2: If the user saves and restores this id-reg on the
-same kernel, the AA64DFR0 userspace write would fail (ftr_val !=
-arm64_ftr_safe_value), right?
+This is the core :)
 
-> 
-> If KVM wants to restrict some features due to some reasons (e.g.
-> a feature for guests is not supported by the KVM yet), it should
-> be done by KVM (not by cpufeature.c), and  'validate' function in
-> "struct id_reg_info", which is introduced in patch-3, will be used
-> for such cases (the following patches actually use).
-> 
+> return an appropriate -EINVAL and -ENOSUPP respectively, otherwise
+> we're giving userspace a path to put the device into ERROR state, which
+> we claim is not allowed.
 
-Got it, thanks.
+Userspace can never put the device into error. As the function comment
+says VFIO_DEVICE_STATE_ERROR is returned to indicate the arc is not
+permitted. The driver is required to reflect that back as an errno
+like mlx5 shows:
 
-> Thanks,
-> Reiji
++		next_state = vfio_mig_get_next_state(vdev, mvdev->mig_state,
++						     new_state);
++		if (next_state == VFIO_DEVICE_STATE_ERROR) {
++			res = ERR_PTR(-EINVAL);
++			break;
++		}
+
+We never get the driver into error, userspaces gets an EINVAL and no
+change to the device state.
+
+It is organized this way because the driver controls the locking for
+its current state and thus the core code caller along the ioctl path
+cannot validate the arc before passing it to the driver. The code is
+shared by having the driver callback to the core to validate the
+entire fsm arc under its lock.
+
+The driver ends up with a small while loop that will probably be copy
+and pasted to each driver. As I said, I'm interested to lift this up
+as well but I need to better understand the locking needs of the other
+driver implementations first, or we need your patch series to use the
+inode for zap to land to eliminate the complicated locking in the
+first place..
+
+> Testing cur_fsm is more an internal consistency check, maybe those
+> should be WARN_ON.
+
+Sure
+ 
+> > +
+> > +	cur_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
+> > +	if (!have_p2p) {
+> > +		while (cur_fsm == VFIO_DEVICE_STATE_RUNNING_P2P)
+> > +			cur_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
+> > +	}
 > 
+> Perhaps this could be generalized with something like:
+
+Oh, that table could probably do both tests, if the bit isn't set it
+is an invalid cur/next_fsm as well..
 
 Thanks,
-Ricardo
-
-> >
-> > I think this has some implications for migrations. It would not be
-> > possible to migrate the example VM on the patched kernel from above: you
-> > can boot a VM with DEBUGVER=0x5 but you can't migrate it.
-> >
-> > Thanks,
-> > Ricardo
+Jason
