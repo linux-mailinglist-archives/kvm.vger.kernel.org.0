@@ -2,160 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 399624A63D4
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:30:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEDB14A63DB
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:31:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236987AbiBASa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 13:30:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236692AbiBASa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 13:30:27 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4D0C061714;
-        Tue,  1 Feb 2022 10:30:26 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id r7so13403516wmq.5;
-        Tue, 01 Feb 2022 10:30:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Jm8BXyrfEZYc6+12yNeq6/HE2c+1ykfSUn6L7kkAGNc=;
-        b=kba2yhGKR008LSm2zIRBWihztOVyxS1jpNzGWAUoCJay5eQRO7+iYOcABLRPMPtBmH
-         WOBTy6NpsTxS9oTyNy/zAOjW/FO/Mh0JZFMAa7nPp0QGXMPLO59ovrsVLVb6vy0nWfwi
-         irPPGDWY4TTZaOSzgZdJsJxIgo363FbWQLL7B4yKfHuS66r7uAAiOcNN1oUCORiFU7fT
-         quO9sw17p18/6T4NRsISB9nVeScFuQgDsRXDcEpSqI/MmS7ox5gX8ovf1qYAZUnUVYEI
-         YmPhmuvS46vw2Jpe6aqSy9qsoiHjUH9Hi3f95BlMznXPaEYhcNfJ5DLqrekFcjTwugha
-         2gWg==
+        id S229915AbiBASbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 13:31:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29646 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231693AbiBASbt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 13:31:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643740309;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lWcCCfSrxGYDduQ3iXNmhKq8eIpL0JoSBTfvltj/8CM=;
+        b=OqCzk/0TGdfDIZ+a8jrsuHMvxBf0o7K69F34fO6s+U21FnXVF2fQcN959GPEQfbERpOZ9b
+        bKlfF6NeH/wtnoHMbxlHQRlDq3UFP2QqYNa+DkjEsqRkL5RvGQO0EPRUTpo9LFnkIv0ckz
+        uKzzDcHft6uFOu4NuJ1m2Fma9sSddvw=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-151-_bpzkpEWMzm-lpY1pVLSuQ-1; Tue, 01 Feb 2022 13:31:47 -0500
+X-MC-Unique: _bpzkpEWMzm-lpY1pVLSuQ-1
+Received: by mail-ot1-f71.google.com with SMTP id q12-20020a9d654c000000b0059103bdc5ecso9921528otl.14
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 10:31:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Jm8BXyrfEZYc6+12yNeq6/HE2c+1ykfSUn6L7kkAGNc=;
-        b=mkSGZxB6wk+Xrix2XowjvHi4Qw00LIN4V534HudBA1oKTKH59Bh1qiAPS5iGYMEXlk
-         vGWnHe3YMs+2v1ZdHM4olJKXFD/p6hIuaLAE5tdG+LKe8rRUl/A46KlWo1v6rIH+AHT9
-         AJuqDC8LhGHlIGz0P1DxJYrY7JNPKw/7E3yUgltyqLtyHzdMBz9iY0sm0q6ichh780Mp
-         Jzj/VRF9Uy6NJTrThLISE6osCItp2US4ia5i/ZjGFeBA6Xz+N16eMfuW8gzYMX4aCKtQ
-         949lXn5fbYUtqGZLuEThrWmUSHZqlLY0cZTKsgKAo5kse7J9Mg5TGz6HE5t6MXvbAslQ
-         ydVQ==
-X-Gm-Message-State: AOAM532r0nFqy1WDA9TXUjmgr3K89idaX4OSvD5Vzd8XaBeWowMIzayf
-        WyQBeAASVpUNJeppLX2D13s=
-X-Google-Smtp-Source: ABdhPJyE5/RPRLYHIpK88MfiP/ehaCuXpmDBMFR7kByf7iHxYHR0rjEQkuskK/WR7/4VuefAhM/ABA==
-X-Received: by 2002:a7b:cbd9:: with SMTP id n25mr2938176wmi.141.1643740225043;
-        Tue, 01 Feb 2022 10:30:25 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id 44sm15238098wrm.103.2022.02.01.10.30.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Feb 2022 10:30:24 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <66bcd1bf-0df4-8f02-9c0d-f71cecef71f4@redhat.com>
-Date:   Tue, 1 Feb 2022 19:30:23 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=lWcCCfSrxGYDduQ3iXNmhKq8eIpL0JoSBTfvltj/8CM=;
+        b=cSwNMuClt+LRlb4CZvydQasyjUzg1iHxfguzDOWsTpVCdm8USBIufH+1vUAbU8WVUq
+         a6rPJPVE/6FqjxdU+/9xwrWHY4HOqGBzFHWl6mDPqbonkj8RbA/WGLo1A7jqw0tR4Ve2
+         mTeVJTtUsoan8W0SacTpu3lxPgEmGzF7/BCVOwFFpyPbGWDtxH6fnFP+vbCI75pjF3R+
+         D3EoV4WepLbZTeqNQDcK/0pD6j2HAP3hliA71x+DrVNI7Dhu6Llr9OG4mxgkJlyJbh0Z
+         ed3QA9IUMN+V6h4IRD+CQ04q+eWGQSZOhbJowgO5ypn2HO1VByNxmYSmypGD4yHkOKY0
+         YL/Q==
+X-Gm-Message-State: AOAM533ENsH7acQWTgeaR+9JG+yOQ9UmJGFHBMyyoEa0f4jPkV/O4BRk
+        OZIE0fbHvodtFGP1nYrr2BREbspXPxelaKwd5KDPhcAwStbxwRL4dEr5AmYWbctF2ISlmLCXJt6
+        X0Omioyw/HTQM
+X-Received: by 2002:a05:6808:bd6:: with SMTP id o22mr2056173oik.309.1643740306990;
+        Tue, 01 Feb 2022 10:31:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw8CVMKC1GZyh/e69wmJFpSseU2Qrzj5ioYE5cAr/3TsLa65dQuvn6qvN1/aRP6C70RiE9NBg==
+X-Received: by 2002:a05:6808:bd6:: with SMTP id o22mr2056155oik.309.1643740306743;
+        Tue, 01 Feb 2022 10:31:46 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r186sm10151672oie.23.2022.02.01.10.31.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Feb 2022 10:31:46 -0800 (PST)
+Date:   Tue, 1 Feb 2022 11:31:44 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V6 mlx5-next 09/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220201113144.0c8dfaa5.alex.williamson@redhat.com>
+In-Reply-To: <20220130160826.32449-10-yishaih@nvidia.com>
+References: <20220130160826.32449-1-yishaih@nvidia.com>
+        <20220130160826.32449-10-yishaih@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap for
- Hyper-V-on-KVM and fix it for KVM-on-Hyper-V
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org
-References: <20211220152139.418372-1-vkuznets@redhat.com>
- <35f06589-d300-c356-dc17-2c021ac97281@redhat.com> <87sft2bqup.fsf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87sft2bqup.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/22 15:31, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
+On Sun, 30 Jan 2022 18:08:20 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
+
+> From: Jason Gunthorpe <jgg@nvidia.com>
 > 
->> On 12/20/21 16:21, Vitaly Kuznetsov wrote:
->>> Enlightened MSR-Bitmap feature implements a PV protocol for L0 and L1
->>> hypervisors to collaborate and skip unneeded updates to MSR-Bitmap.
->>> KVM implements the feature for KVM-on-Hyper-V but it seems there was
->>> a flaw in the implementation and the feature may not be fully functional.
->>> PATCHes 1-2 fix the problem. The rest of the series implements the same
->>> feature for Hyper-V-on-KVM.
->>>
->>> Vitaly Kuznetsov (5):
->>>     KVM: SVM: Drop stale comment from
->>>       svm_hv_vmcb_dirty_nested_enlightenments()
->>>     KVM: SVM: hyper-v: Enable Enlightened MSR-Bitmap support for real
->>>     KVM: nSVM: Track whether changes in L0 require MSR bitmap for L2 to be
->>>       rebuilt
->>>     KVM: x86: Make kvm_hv_hypercall_enabled() static inline
->>>     KVM: nSVM: Implement Enlightened MSR-Bitmap feature
->>>
->>>    arch/x86/kvm/hyperv.c           | 12 +--------
->>>    arch/x86/kvm/hyperv.h           |  6 ++++-
->>>    arch/x86/kvm/svm/nested.c       | 47 ++++++++++++++++++++++++++++-----
->>>    arch/x86/kvm/svm/svm.c          |  3 ++-
->>>    arch/x86/kvm/svm/svm.h          | 16 +++++++----
->>>    arch/x86/kvm/svm/svm_onhyperv.h | 12 +++------
->>>    6 files changed, 63 insertions(+), 33 deletions(-)
->>>
->>
->> Queued 3-5 now, but it would be nice to have some testcases.
+> The RUNNING_P2P state is designed to support multiple devices in the same
+> VM that are doing P2P transactions between themselves. When in RUNNING_P2P
+> the device must be able to accept incoming P2P transactions but should not
+> generate outgoing transactions.
+> 
+> As an optional extension to the mandatory states it is defined as
+> inbetween STOP and RUNNING:
+>    STOP -> RUNNING_P2P -> RUNNING -> RUNNING_P2P -> STOP
+> 
+> For drivers that are unable to support RUNNING_P2P the core code silently
+> merges RUNNING_P2P and RUNNING together. Drivers that support this will be
+> required to implement 4 FSM arcs beyond the basic FSM. 2 of the basic FSM
+> arcs become combination transitions.
+> 
+> Compared to the v1 clarification, NDMA is redefined into FSM states and is
+> described in terms of the desired P2P quiescent behavior, noting that
+> halting all DMA is an acceptable implementation.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  drivers/vfio/vfio.c       | 70 ++++++++++++++++++++++++++++++---------
+>  include/linux/vfio.h      |  2 ++
+>  include/uapi/linux/vfio.h | 34 +++++++++++++++++--
+>  3 files changed, 88 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index b12be212d048..a722a1a8a48a 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -1573,39 +1573,55 @@ u32 vfio_mig_get_next_state(struct vfio_device *device,
+>  			    enum vfio_device_mig_state cur_fsm,
+>  			    enum vfio_device_mig_state new_fsm)
+>  {
+> -	enum { VFIO_DEVICE_NUM_STATES = VFIO_DEVICE_STATE_RESUMING + 1 };
+> +	enum { VFIO_DEVICE_NUM_STATES = VFIO_DEVICE_STATE_RUNNING_P2P + 1 };
+>  	/*
+> -	 * The coding in this table requires the driver to implement 6
+> +	 * The coding in this table requires the driver to implement
+>  	 * FSM arcs:
+>  	 *         RESUMING -> STOP
+> -	 *         RUNNING -> STOP
+>  	 *         STOP -> RESUMING
+> -	 *         STOP -> RUNNING
+>  	 *         STOP -> STOP_COPY
+>  	 *         STOP_COPY -> STOP
+>  	 *
+> -	 * The coding will step through multiple states for these combination
+> -	 * transitions:
+> -	 *         RESUMING -> STOP -> RUNNING
+> +	 * If P2P is supported then the driver must also implement these FSM
+> +	 * arcs:
+> +	 *         RUNNING -> RUNNING_P2P
+> +	 *         RUNNING_P2P -> RUNNING
+> +	 *         RUNNING_P2P -> STOP
+> +	 *         STOP -> RUNNING_P2P
+> +	 * Without P2P the driver must implement:
+> +	 *         RUNNING -> STOP
+> +	 *         STOP -> RUNNING
+> +	 *
+> +	 * If all optional features are supported then the coding will step
+> +	 * through multiple states for these combination transitions:
+> +	 *         RESUMING -> STOP -> RUNNING_P2P
+> +	 *         RESUMING -> STOP -> RUNNING_P2P -> RUNNING
+>  	 *         RESUMING -> STOP -> STOP_COPY
+> -	 *         RUNNING -> STOP -> RESUMING
+> -	 *         RUNNING -> STOP -> STOP_COPY
+> +	 *         RUNNING -> RUNNING_P2P -> STOP
+> +	 *         RUNNING -> RUNNING_P2P -> STOP -> RESUMING
+> +	 *         RUNNING -> RUNNING_P2P -> STOP -> STOP_COPY
+> +	 *         RUNNING_P2P -> STOP -> RESUMING
+> +	 *         RUNNING_P2P -> STOP -> STOP_COPY
+> +	 *         STOP -> RUNNING_P2P -> RUNNING
+>  	 *         STOP_COPY -> STOP -> RESUMING
+> -	 *         STOP_COPY -> STOP -> RUNNING
+> +	 *         STOP_COPY -> STOP -> RUNNING_P2P
+> +	 *         STOP_COPY -> STOP -> RUNNING_P2P -> RUNNING
+>  	 */
+>  	static const u8 vfio_from_fsm_table[VFIO_DEVICE_NUM_STATES][VFIO_DEVICE_NUM_STATES] = {
+>  		[VFIO_DEVICE_STATE_STOP] = {
+>  			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> -			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING_P2P,
+>  			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP_COPY,
+>  			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RESUMING,
+> +			[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_DEVICE_STATE_RUNNING_P2P,
+>  			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+>  		},
+>  		[VFIO_DEVICE_STATE_RUNNING] = {
+> -			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_RUNNING_P2P,
+>  			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
+> -			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
+> -			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_RUNNING_P2P,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RUNNING_P2P,
+> +			[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_DEVICE_STATE_RUNNING_P2P,
+>  			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+>  		},
+>  		[VFIO_DEVICE_STATE_STOP_COPY] = {
+> @@ -1613,6 +1629,7 @@ u32 vfio_mig_get_next_state(struct vfio_device *device,
+>  			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_STOP,
+>  			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP_COPY,
+>  			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_DEVICE_STATE_STOP,
+>  			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+>  		},
+>  		[VFIO_DEVICE_STATE_RESUMING] = {
+> @@ -1620,6 +1637,15 @@ u32 vfio_mig_get_next_state(struct vfio_device *device,
+>  			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_STOP,
+>  			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
+>  			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_RESUMING,
+> +			[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+> +		},
+> +		[VFIO_DEVICE_STATE_RUNNING_P2P] = {
+> +			[VFIO_DEVICE_STATE_STOP] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_RUNNING,
+> +			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_STOP,
+> +			[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_DEVICE_STATE_RUNNING_P2P,
+>  			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+>  		},
+>  		[VFIO_DEVICE_STATE_ERROR] = {
+> @@ -1627,14 +1653,26 @@ u32 vfio_mig_get_next_state(struct vfio_device *device,
+>  			[VFIO_DEVICE_STATE_RUNNING] = VFIO_DEVICE_STATE_ERROR,
+>  			[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_DEVICE_STATE_ERROR,
+>  			[VFIO_DEVICE_STATE_RESUMING] = VFIO_DEVICE_STATE_ERROR,
+> +			[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_DEVICE_STATE_ERROR,
+>  			[VFIO_DEVICE_STATE_ERROR] = VFIO_DEVICE_STATE_ERROR,
+>  		},
+>  	};
+> +	bool have_p2p = device->migration_flags & VFIO_MIGRATION_P2P;
+> +
+>  	if (cur_fsm >= ARRAY_SIZE(vfio_from_fsm_table) ||
+>  	    new_fsm >= ARRAY_SIZE(vfio_from_fsm_table))
+>  		return VFIO_DEVICE_STATE_ERROR;
+>  
+> -	return vfio_from_fsm_table[cur_fsm][new_fsm];
+> +	if (!have_p2p && (new_fsm == VFIO_DEVICE_STATE_RUNNING_P2P ||
+> +			  cur_fsm == VFIO_DEVICE_STATE_RUNNING_P2P))
+> +		return VFIO_DEVICE_STATE_ERROR;
 
-Hmm, it fails to compile with CONFIG_HYPERV disabled, and a trivial
-#if also fails due to an unused goto label.  Does this look good to you?
+new_fsm is provided by the user, we pass set_state.device_state
+directly to .migration_set_state.  We should do bounds checking and
+compatibility testing on the end state in the core so that we can
+return an appropriate -EINVAL and -ENOSUPP respectively, otherwise
+we're giving userspace a path to put the device into ERROR state, which
+we claim is not allowed.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index e3759a79d39a..a2b5267b3e73 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -173,9 +173,16 @@ void recalc_intercepts(struct vcpu_svm *svm)
-   */
-  static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
-  {
-+	int i;
-+
-+	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-+		return true;
-+
-+	svm->vmcb->control.msrpm_base_pa = __sme_set(__pa(svm->nested.msrpm));
-+
-+#if IS_ENABLED(CONFIG_HYPERV)
-  	struct hv_enlightenments *hve =
-  		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
--	int i;
-  
-  	/*
-  	 * MSR bitmap update can be skipped when:
-@@ -185,10 +192,8 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
-  	    kvm_hv_hypercall_enabled(&svm->vcpu) &&
-  	    hve->hv_enlightenments_control.msr_bitmap &&
-  	    (svm->nested.ctl.clean & VMCB_HV_NESTED_ENLIGHTENMENTS))
--		goto set_msrpm_base_pa;
--
--	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-  		return true;
-+#endif
-  
-  	for (i = 0; i < MSRPM_OFFSETS; i++) {
-  		u32 value, p;
-@@ -213,10 +216,6 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
-  	}
-  
-  	svm->nested.force_msr_bitmap_recalc = false;
--
--set_msrpm_base_pa:
--	svm->vmcb->control.msrpm_base_pa = __sme_set(__pa(svm->nested.msrpm));
--
-  	return true;
-  }
-  
+Testing cur_fsm is more an internal consistency check, maybe those
+should be WARN_ON.
 
+> +
+> +	cur_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
+> +	if (!have_p2p) {
+> +		while (cur_fsm == VFIO_DEVICE_STATE_RUNNING_P2P)
+> +			cur_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
+> +	}
+
+Perhaps this could be generalized with something like:
+
+	static const unsigned int state_flags_table[VFIO_DEVICE_NUM_STATES] = {
+		[VFIO_DEVICE_STATE_STOP] = VFIO_MIGRATION_STOP_COPY,
+		[VFIO_DEVICE_STATE_RUNNING] = VFIO_MIGRATION_STOP_COPY,
+		[VFIO_DEVICE_STATE_STOP_COPY] = VFIO_MIGRATION_STOP_COPY,
+		[VFIO_DEVICE_STATE_RESUMING] = VFIO_MIGRATION_STOP_COPY,
+		[VFIO_DEVICE_STATE_RUNNING_P2P] = VFIO_MIGRATION_P2P,
+		[VFIO_DEVICE_STATE_ERROR] = ~0U,
+	};
+
+	while (!(state_flags_table[cur_fsm] & device->migration_flags))
+		cur_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
 
 Thanks,
+Alex
 
-Paolo
