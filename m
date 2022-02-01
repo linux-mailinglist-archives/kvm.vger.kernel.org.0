@@ -2,145 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 698C94A64BC
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 20:13:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27D6E4A64E6
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 20:22:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239230AbiBATN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 14:13:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41386 "EHLO
+        id S239258AbiBATWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 14:22:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21897 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231982AbiBATN1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 14:13:27 -0500
+        by vger.kernel.org with ESMTP id S232461AbiBATWI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 14:22:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643742806;
+        s=mimecast20190719; t=1643743327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2Bv8VoBLV+1VuzuPIGW0d5N9XYcMTF/luFk9G3XTO14=;
-        b=AMISmdryrUA0ekdZFGQ7ddAs8TIU8iZ6P+cKXL89BsW953xp1r8/AFxPBqKVbatV2UdyDL
-        o5avPYfCppjoKR8Nk9PD4QCVaNn1DQxB422081sWGXb2meLwFBcaiSVaAoGw+dWALGuZYv
-        umUJCxcFvg6oYI3UJeIjpcwlMdx1NVI=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=KNLZeMJ1hLmOR320BSUE5LLY5y8wE3ZrAi1Mv89JbUQ=;
+        b=NvgvnSwUmE6cYMmGtc/7CUanv8tY63TCctez4FZmPoO3GhMs/eu85E3s31AgYxkcsJBhSg
+        Gm9T2FxOoQEDd6TGOSVMXLJcXBNi1PkNjBs+B7F4SP9FbJncN11OGjavw8N003c7NgjTKp
+        IVJ/0mDIrePDCLE3DkDtEGsxy0gY3S8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-339-px-SCie7OQSoLiRCdK_qNw-1; Tue, 01 Feb 2022 14:13:25 -0500
-X-MC-Unique: px-SCie7OQSoLiRCdK_qNw-1
-Received: by mail-oi1-f199.google.com with SMTP id a9-20020a056808128900b002cf97f0658dso7520167oiw.13
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 11:13:25 -0800 (PST)
+ us-mta-35-1VG_tkd4OHuQ-oyD1wN6rg-1; Tue, 01 Feb 2022 14:22:06 -0500
+X-MC-Unique: 1VG_tkd4OHuQ-oyD1wN6rg-1
+Received: by mail-ed1-f72.google.com with SMTP id i22-20020a0564020f1600b00407b56326a2so9211330eda.18
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 11:22:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2Bv8VoBLV+1VuzuPIGW0d5N9XYcMTF/luFk9G3XTO14=;
-        b=E2rxzm3Fnqw/xLxJMnioh/j6p1xtL9JX8rRJayv2QhJdJDiRQ1YVuCncA27T+mHp30
-         ppBXntBR0V+KXNo+NUUITB99btVS1fg1JvY1VUlC+88WA7ek5vRB9AnZC/DBp/aQhoNx
-         E1I1XcpxMtmfuUckaCmAklT8HVUGUnuT/c201gbZ4Qfq+TqanEnrMHzMJ7wHZjW8yMYz
-         2yXtfUHNc70cEq1D91SnVI2SVhJoVPBKeVV2saOOcHeOJkQn29HZ1VNhAeBMs4fNFxpO
-         mRQJ+5G8dUCNbsKyy3P82pkParxms6Xzwn88kToB+FoJ/3ofZs9UR+W7KAuqw6qMzAY0
-         obHA==
-X-Gm-Message-State: AOAM532Fr3IvoLkmvjV+dlRCpkBvlRM4S6ZTbqLoIJUuufNOFPgswmZr
-        56lHN1hnJd6KHRTGcRVZMXpwiK+nrYxvtyBIE0g+ZFLngW83KRTI6f7auMvmA5X5/vKsL1Ruynn
-        PdjOEUEzdSeZ0
-X-Received: by 2002:a05:6830:2304:: with SMTP id u4mr15013034ote.348.1643742804783;
-        Tue, 01 Feb 2022 11:13:24 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyQBKS3W6IUxBmPQTOQau2z0tBXaVcUDsVqIVj/M1dRNufpS6jseTjwATRhdirl/LBF777R4g==
-X-Received: by 2002:a05:6830:2304:: with SMTP id u4mr15013011ote.348.1643742804541;
-        Tue, 01 Feb 2022 11:13:24 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id y19sm4928296oti.49.2022.02.01.11.13.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 11:13:23 -0800 (PST)
-Date:   Tue, 1 Feb 2022 12:13:22 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V6 mlx5-next 09/15] vfio: Extend the device migration
- protocol with RUNNING_P2P
-Message-ID: <20220201121322.2f3ceaf2.alex.williamson@redhat.com>
-In-Reply-To: <20220201185321.GM1786498@nvidia.com>
-References: <20220130160826.32449-1-yishaih@nvidia.com>
-        <20220130160826.32449-10-yishaih@nvidia.com>
-        <20220201113144.0c8dfaa5.alex.williamson@redhat.com>
-        <20220201185321.GM1786498@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=KNLZeMJ1hLmOR320BSUE5LLY5y8wE3ZrAi1Mv89JbUQ=;
+        b=I0ks9PC9OW5y+mfmVBHoa7pcLJjIZeQKsrVaf69lGwQUW2qz65uyXkC7gDg5z/vo9c
+         2f34txX3woLHZPT1Peb4PE1tIsYtu/6uyPCnGLjY2YVljFS6snDRqSd8SBQKkkk+LS7o
+         vEwIJRughvdVbYP5CDBxSXbPJMXjmZPsHbcKgKq1oTCQC8tJClv4riLzzz7JsdQdlnNB
+         JNtV2uNRYcaS/Mq6kqEYF4jos5VctjFoKLRSwcc0pePU7yzM81CaCa+D/vezjpWxebFX
+         kcdKqF/SVflVUWwuIC6Ruj4dzLovObxxlYJO0aLmefj5b/ofPqq99ZHJTFNvlpR5Pg3A
+         Ptuw==
+X-Gm-Message-State: AOAM533HUYCvzbGSe70gh4JFYePZkJ0l4/abn3HTdpsEHkTkE+N8mQRd
+        qG3P0+iDdskd3KxzhRfdtWDRDkQil114QkL76LW6HqLSHZTwPv3TIUHsy8voEi9Xb3cgh/odOV7
+        xAMUWIiHsgD5J
+X-Received: by 2002:aa7:c0d4:: with SMTP id j20mr26748227edp.319.1643743325128;
+        Tue, 01 Feb 2022 11:22:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxB0QkeShLAjTU/5/HP9pcNPzROHxknHP3s2Qa0pyu4FMnViL6Fm6YTtV2jmrf6VcpsVq4mqA==
+X-Received: by 2002:aa7:c0d4:: with SMTP id j20mr26748210edp.319.1643743324942;
+        Tue, 01 Feb 2022 11:22:04 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id i6sm15057876eja.132.2022.02.01.11.22.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Feb 2022 11:22:04 -0800 (PST)
+Message-ID: <ebd368c8-5c2a-dc5b-203f-f058f68b7825@redhat.com>
+Date:   Tue, 1 Feb 2022 20:22:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap for
+ Hyper-V-on-KVM and fix it for KVM-on-Hyper-V
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        linux-kernel@vger.kernel.org
+References: <20211220152139.418372-1-vkuznets@redhat.com>
+ <35f06589-d300-c356-dc17-2c021ac97281@redhat.com> <87sft2bqup.fsf@redhat.com>
+ <66bcd1bf-0df4-8f02-9c0d-f71cecef71f4@redhat.com> <87o83qbehk.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87o83qbehk.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 1 Feb 2022 14:53:21 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Tue, Feb 01, 2022 at 11:31:44AM -0700, Alex Williamson wrote:
-> > > +	bool have_p2p = device->migration_flags & VFIO_MIGRATION_P2P;
-> > > +
-> > >  	if (cur_fsm >= ARRAY_SIZE(vfio_from_fsm_table) ||
-> > >  	    new_fsm >= ARRAY_SIZE(vfio_from_fsm_table))
-> > >  		return VFIO_DEVICE_STATE_ERROR;
-> > >  
-> > > -	return vfio_from_fsm_table[cur_fsm][new_fsm];
-> > > +	if (!have_p2p && (new_fsm == VFIO_DEVICE_STATE_RUNNING_P2P ||
-> > > +			  cur_fsm == VFIO_DEVICE_STATE_RUNNING_P2P))
-> > > +		return VFIO_DEVICE_STATE_ERROR;  
-> > 
-> > new_fsm is provided by the user, we pass set_state.device_state
-> > directly to .migration_set_state.  We should do bounds checking and
-> > compatibility testing on the end state in the core so that we can  
+On 2/1/22 19:58, Vitaly Kuznetsov wrote:
+>> Hmm, it fails to compile with CONFIG_HYPERV disabled, and a trivial
+>> #if also fails due to an unused goto label.  Does this look good to you?
+>>
+> Hm, it does but honestly I did not anticipate this dependency --
+> CONFIG_HYPERV is needed for KVM-on-Hyper-V but this feature is for
+> Hyper-V-on-KVM. Let me take a look tomorrow.
 > 
-> This is the core :)
 
-But this is the wrong place, we need to do it earlier rather than when
-we're already iterating next states.  I only mention core to avoid that
-I'm suggesting a per driver responsibility.
+It's because, without it, the relevant structs are not defined by 
+svm_onhyperv.h.  Go ahead and send a new version if you prefer, I can 
+unqueue it (really, just not push to kvm/queue).
 
-> 
-> > return an appropriate -EINVAL and -ENOSUPP respectively, otherwise
-> > we're giving userspace a path to put the device into ERROR state, which
-> > we claim is not allowed.  
-> 
-> Userspace can never put the device into error. As the function comment
-> says VFIO_DEVICE_STATE_ERROR is returned to indicate the arc is not
-> permitted. The driver is required to reflect that back as an errno
-> like mlx5 shows:
-> 
-> +		next_state = vfio_mig_get_next_state(vdev, mvdev->mig_state,
-> +						     new_state);
-> +		if (next_state == VFIO_DEVICE_STATE_ERROR) {
-> +			res = ERR_PTR(-EINVAL);
-> +			break;
-> +		}
-> 
-> We never get the driver into error, userspaces gets an EINVAL and no
-> change to the device state.
-
-Hmm, subtle.  I'd argue that if we do a bounds and support check of the
-end state in vfio_ioctl_mig_set_state() before calling
-.migration_set_state() then we could remove ERROR from
-vfio_from_fsm_table[] altogether and simply begin
-vfio_mig_get_next_state() with:
-
-	if (cur_fsm = ERROR)
-		return ERROR;
-
-Then we only get to ERROR by the driver placing us in ERROR and things
-feel a bit more sane to me.
-
-> It is organized this way because the driver controls the locking for
-> its current state and thus the core code caller along the ioctl path
-> cannot validate the arc before passing it to the driver. The code is
-> shared by having the driver callback to the core to validate the
-> entire fsm arc under its lock.
-
-P2P is defined in a way that if the endpoint is valid then the arc is
-valid.  We skip intermediate unsupported states.  We need to do that
-for compatibility.  So why do we care about driver locking to do that?
-Thanks,
-
-Alex
+Paolo
 
