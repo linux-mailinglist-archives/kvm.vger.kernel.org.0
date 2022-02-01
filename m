@@ -2,88 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 437D94A66E1
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 22:16:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4B934A6712
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 22:28:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237755AbiBAVQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 16:16:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36010 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236766AbiBAVQL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 16:16:11 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D92C06173B
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 13:16:10 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id t14so25932767ljh.8
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 13:16:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=q6yCl0yrttabI3s7nqjUHynlo3srHrhXhPGElzUkPOk=;
-        b=bmiNtc6Ae29Swmg5fc3H/k70xhmmRjtEjcPNh6FgLoUvJUpcAPPu97uoLwA0w0jrBm
-         pOM4eMl/IT8X7Cc+T6CXPeQN9ZhyAtdZvS+QxdMrD1DqVNceZpJM4lngftoZhGtHnGK4
-         ZWyyIS9wSZqC66iUtcrIssw5hmv6RSKrTKBrF2jdoFRuGK8OpPHYqiTapSwFfZGjK8Tq
-         LSwav0CpaPFnaGgLR7Q7ZTDTd2TRQ9mookKcao1R1BP/8Xe1sY2oucnvpapPvMkhzvbm
-         CI4j/p0vMv2nfp4JhWuXv39ktAikVGbiN6n6lu5GHzemWtezMJcc97L4SzCcaPrNdxtU
-         hzvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=q6yCl0yrttabI3s7nqjUHynlo3srHrhXhPGElzUkPOk=;
-        b=lS6QzQLS0g0DVPs3KzblH4XxIWvo1093iC+31zwTQIuM3K20Zyh/0VHvFDH7k7PK5K
-         RgcVFBOA4mpVWJci7wgOFQ6HHukdGJDDLaXr88cqswJPY6D3wSnTJNpt9o7XFO2EO9Iz
-         abilfr6XpyCdkAMb/m93quKcXqbFX9E36bkc9obrNh+8KWnHxlD44OEpX8uvYtIFa24L
-         7hFKOh64PKDr6LqBxgRBMRTO63ad0dYWSE3qcJkz1pWCknNutZwQI7dlqsDBNy9sVeiS
-         SaWbE/v4/+2xUmjxChTUzwi+6qrcB5trOW/ltyfZtG1vjT+dvViUAgXEymLLtxls3VIV
-         U7sw==
-X-Gm-Message-State: AOAM532imuSNJUAD/bkWSZ4/ZrEVUWc6iaJWmaelTc124BH+YOhzDtqb
-        sBbZL8X/SakGgeHpmvAazqg5+ZvWFpVb6eV/if6XtA==
-X-Google-Smtp-Source: ABdhPJwrMtZhliPhZS5ChFivx/H1H3iJJlf5uao7LihxBJyuwSEBW8JLn2Gy47GuM+rpUIC8+hvJOMzrexoadtJfL3Q=
-X-Received: by 2002:a05:651c:3c7:: with SMTP id f7mr13251141ljp.62.1643750168915;
- Tue, 01 Feb 2022 13:16:08 -0800 (PST)
-MIME-Version: 1.0
-References: <20220201010838.1494405-1-seanjc@google.com> <20220201010838.1494405-2-seanjc@google.com>
- <CAKwvOd=9nwR7z7wn50SU=mf5AywFLd95ZMH-EbYdHfbeHVvq1A@mail.gmail.com> <YfmedCAn8pK//I2R@google.com>
-In-Reply-To: <YfmedCAn8pK//I2R@google.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 1 Feb 2022 13:15:57 -0800
-Message-ID: <CAKwvOdk3rtHCDfW-kCmmQ=UueeXpVVBnG1XGwdoiWWHZgmt5yQ@mail.gmail.com>
-Subject: Re: [PATCH 1/5] Kconfig: Add option for asm goto w/ tied outputs to
- workaround clang-13 bug
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
+        id S232611AbiBAV2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 16:28:51 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:59112 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232463AbiBAV2u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 16:28:50 -0500
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BB1171EC04AD;
+        Tue,  1 Feb 2022 22:28:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1643750924;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=7l7vocFxdezL9X3EUKTSMo+nYjMem25yARKYTuyX8jo=;
+        b=UqY6/pu2Ue28uGppx/YJY4gkORX0RykPUqAdSDRchnnYt4NjKqnkwxUmhNgCRs7FckxK7f
+        1pzKGK6KEJUNmRbkUwTZape/D5jU3FBobXFz22E3nxw6f5eTL9EmNgVU99rgmM7c7b816l
+        I+PJ5mEE7Bl4LDHK9aNUF7u8RSHEypM=
+Date:   Tue, 1 Feb 2022 22:28:39 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v9 05/43] x86/compressed/64: Detect/setup SEV/SME
+ features earlier in boot
+Message-ID: <YfmmBykN2s0HsiAJ@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-6-brijesh.singh@amd.com>
+ <Yfl3FaTGPxE7qMCq@zn.tnic>
+ <20220201203507.goibbaln6dxyoogv@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220201203507.goibbaln6dxyoogv@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 1, 2022 at 12:56 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Feb 01, 2022, Nick Desaulniers wrote:
-> > Note: gcc-10 had a bug with the symbolic references to labels when
-> > using tied constraints.
-> > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98096
-> >
-> > Both compilers had bugs here, and it may be worth mentioning that in
-> > the commit message.
->
-> Is this wording accurate?
->
->   gcc also had a similar bug[3], fixed in gcc-11, where gcc failed to
->   account for its behavior of assigning two numbers to tied outputs (one
->   for input, one for output) when evaluating symbolic references.
+On Tue, Feb 01, 2022 at 02:35:07PM -0600, Michael Roth wrote:
+> Unfortunately rdmsr()/wrmsr()/__rdmsr()/__wrmsr() etc. definitions are all
+> already getting pulled in via:
+> 
+>   misc.h:
+>     #include linux/elf.h
+>       #include linux/thread_info.h
+>         #include linux/cpufeature.h
+>           #include linux/processor.h
+>             #include linux/msr.h
+> 
+> Those definitions aren't usable in boot/compressed because of __ex_table
+> and possibly some other dependency hellishness.
 
-SGTM
+And they should not be. Mixing kernel proper and decompressor code needs
+to stop and untangling that is a multi-year effort, unfortunately. ;-\
+
+> Would read_msr()/write_msr() be reasonable alternative names for these new
+> helpers, or something else that better distinguishes them from the
+> kernel proper definitions?
+
+Nah, just call them rdmsr/wrmsr(). There is already {read,write}_msr()
+tracepoint symbols in kernel proper and there's no point in keeping them
+apart using different names - that ship has long sailed.
+
+> It doesn't look like anything in boot/ pulls in boot/compressed/
+> headers. It seems to be the other way around, with boot/compressed
+> pulling in headers and whole C files from boot/.
+> 
+> So perhaps these new definitions should be added to a small boot/msr.h
+> header and pulled in from there?
+
+That sounds good too.
+
+> Should we introduce something like this as well for cpucheck.c? Or
+> re-write cpucheck.c to make use of the u64 versions? Or just set the
+> cpucheck.c rework aside for now? (but still introduce the above helpers
+> as boot/msr.h in preparation)?
+
+How about you model it after
+
+static int msr_read(u32 msr, struct msr *m)
+
+from arch/x86/lib/msr.c which takes struct msr from which you can return
+either u32s or a u64?
+
+The stuff you share between the decompressor and kernel proper you put
+in a arch/x86/include/asm/shared/ folder, for an example, see what we do
+there in the TDX patchset:
+
+https://lore.kernel.org/r/20220124150215.36893-11-kirill.shutemov@linux.intel.com
+
+I.e., you move struct msr in such a shared header and then you include
+it everywhere needed.
+
+The arch/x86/boot/ msr helpers are then plain and simple, without
+tracepoints and exception fixups and you define them in ...boot/msr.c or
+so.
+
+If the patch gets too big, make sure to split it in a couple so that it
+is clear what happens at each step.
+
+How does that sound?
+
+Thx.
+
 -- 
-Thanks,
-~Nick Desaulniers
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
