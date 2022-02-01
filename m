@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4DB84A60C4
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 16:53:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B991E4A60C9
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 16:53:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240713AbiBAPx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 10:53:26 -0500
-Received: from foss.arm.com ([217.140.110.172]:48436 "EHLO foss.arm.com"
+        id S240737AbiBAPxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 10:53:36 -0500
+Received: from foss.arm.com ([217.140.110.172]:48486 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237890AbiBAPx0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 10:53:26 -0500
+        id S240724AbiBAPxe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 10:53:34 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE86D113E;
-        Tue,  1 Feb 2022 07:53:25 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D1D711B3;
+        Tue,  1 Feb 2022 07:53:34 -0800 (PST)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC5033F40C;
-        Tue,  1 Feb 2022 07:53:24 -0800 (PST)
-Date:   Tue, 1 Feb 2022 14:57:25 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 033AB3F40C;
+        Tue,  1 Feb 2022 07:53:32 -0800 (PST)
+Date:   Tue, 1 Feb 2022 14:57:58 +0000
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Martin Radev <martin.b.radev@gmail.com>
 Cc:     kvm@vger.kernel.org, will@kernel.org,
@@ -25,12 +25,12 @@ Cc:     kvm@vger.kernel.org, will@kernel.org,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Marc Zyngier <maz@kernel.org>,
         Alexandru Elisei <Alexandru.Elisei@arm.com>
-Subject: Re: [PATCH kvmtool 2/5] virtio: Check for overflows in QUEUE_NOTIFY
- and QUEUE_SEL
-Message-ID: <20220201145725.2511ef07@donnerap.cambridge.arm.com>
-In-Reply-To: <bd5048ca2de1c548fa599d12fea0fa21397688af.1642457047.git.martin.b.radev@gmail.com>
+Subject: Re: [PATCH kvmtool 3/5] virtio/net: Warn if virtio_net is
+ implicitly enabled
+Message-ID: <20220201145758.0907f590@donnerap.cambridge.arm.com>
+In-Reply-To: <670fbbab84c770292118e9fb00bdfcdf1237678b.1642457047.git.martin.b.radev@gmail.com>
 References: <cover.1642457047.git.martin.b.radev@gmail.com>
-        <bd5048ca2de1c548fa599d12fea0fa21397688af.1642457047.git.martin.b.radev@gmail.com>
+        <670fbbab84c770292118e9fb00bdfcdf1237678b.1642457047.git.martin.b.radev@gmail.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -40,286 +40,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Jan 2022 00:12:00 +0200
+On Tue, 18 Jan 2022 00:12:01 +0200
 Martin Radev <martin.b.radev@gmail.com> wrote:
 
 Hi,
 
-> This patch checks for overflows in QUEUE_NOTIFY and QUEUE_SEL in
-> the PCI and MMIO operation handling paths. Further, the return
-> value type of get_vq_count is changed from int to u32 since negative
-> doesn't carry any semantic meaning.
+> The virtio_net device is implicitly enabled if user doesn't
+> explicitly specify that virtio_net is disabled. This is
+> counter-intuitive to how the rest of the virtio commandline
+> works.
+> 
+> For backwards-compatibility, the commandline parameters are
+> not changed. Instead, this patch prints out a warning if
+> virtio_net is implicitly enabled.
 > 
 > Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
 > ---
->  include/kvm/virtio.h |  2 +-
->  virtio/9p.c          |  2 +-
->  virtio/balloon.c     |  2 +-
->  virtio/blk.c         |  2 +-
->  virtio/console.c     |  2 +-
->  virtio/mmio.c        | 25 ++++++++++++++++++++++---
->  virtio/net.c         |  2 +-
->  virtio/pci.c         | 21 ++++++++++++++++++---
->  virtio/rng.c         |  2 +-
->  virtio/scsi.c        |  2 +-
->  virtio/vsock.c       |  2 +-
->  11 files changed, 49 insertions(+), 15 deletions(-)
+>  virtio/net.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-> index 3880e74..40f2a6d 100644
-> --- a/include/kvm/virtio.h
-> +++ b/include/kvm/virtio.h
-> @@ -187,7 +187,7 @@ struct virtio_ops {
->  	size_t (*get_config_size)(struct kvm *kvm, void *dev);
->  	u32 (*get_host_features)(struct kvm *kvm, void *dev);
->  	void (*set_guest_features)(struct kvm *kvm, void *dev, u32 features);
-> -	int (*get_vq_count)(struct kvm *kvm, void *dev);
-> +	u32 (*get_vq_count)(struct kvm *kvm, void *dev);
-
-I am not too happy about using an explicitly sized type for something that
-is not hardware related (should be just unsigned int), but it makes
-some sense below when we actually use the function.
-
->  	int (*init_vq)(struct kvm *kvm, void *dev, u32 vq, u32 page_size,
->  		       u32 align, u32 pfn);
->  	void (*exit_vq)(struct kvm *kvm, void *dev, u32 vq);
-> diff --git a/virtio/9p.c b/virtio/9p.c
-> index 89bec5e..8f1fc1f 100644
-> --- a/virtio/9p.c
-> +++ b/virtio/9p.c
-> @@ -1468,7 +1468,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return NUM_VIRT_QUEUES;
->  }
-> diff --git a/virtio/balloon.c b/virtio/balloon.c
-> index 233a3a5..de3882e 100644
-> --- a/virtio/balloon.c
-> +++ b/virtio/balloon.c
-> @@ -249,7 +249,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return NUM_VIRT_QUEUES;
->  }
-> diff --git a/virtio/blk.c b/virtio/blk.c
-> index 9164b51..46918a4 100644
-> --- a/virtio/blk.c
-> +++ b/virtio/blk.c
-> @@ -289,7 +289,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return NUM_VIRT_QUEUES;
->  }
-> diff --git a/virtio/console.c b/virtio/console.c
-> index 00bafa2..84466d0 100644
-> --- a/virtio/console.c
-> +++ b/virtio/console.c
-> @@ -214,7 +214,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return VIRTIO_CONSOLE_NUM_QUEUES;
->  }
-> diff --git a/virtio/mmio.c b/virtio/mmio.c
-> index 32bba17..fd9a411 100644
-> --- a/virtio/mmio.c
-> +++ b/virtio/mmio.c
-> @@ -171,14 +171,26 @@ static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
->  	struct virtio_mmio *vmmio = vdev->virtio;
->  	struct kvm *kvm = vmmio->kvm;
->  	u32 val = 0;
-> +	u32 vq_count = 0;
-> +	vq_count = vdev->ops->get_vq_count(kvm, vmmio->dev);
-
-This should be on one line.
-
->  
->  	switch (addr) {
->  	case VIRTIO_MMIO_HOST_FEATURES_SEL:
->  	case VIRTIO_MMIO_GUEST_FEATURES_SEL:
-> -	case VIRTIO_MMIO_QUEUE_SEL:
->  		val = ioport__read32(data);
->  		*(u32 *)(((void *)&vmmio->hdr) + addr) = val;
->  		break;
-> +	case VIRTIO_MMIO_QUEUE_SEL:
-> +		{
-
-Why the brackets here?
-
-> +			val = ioport__read32(data);
-> +			if (val >= vq_count) {
-> +				pr_warning("QUEUE_SEL value (%u) is larger than VQ count (%u)\n",
-> +					val, vq_count);
-> +				break;
-> +			}
-> +			*(u32 *)(((void *)&vmmio->hdr) + addr) = val;
-> +			break;
-> +		}
->  	case VIRTIO_MMIO_STATUS:
->  		vmmio->hdr.status = ioport__read32(data);
->  		if (!vmmio->hdr.status) /* Sample endianness on reset */
-> @@ -222,6 +234,11 @@ static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
->  		break;
->  	case VIRTIO_MMIO_QUEUE_NOTIFY:
->  		val = ioport__read32(data);
-> +		if (val > vq_count) {
-
-Shouldn't this be ">=" here?
-
-> +			pr_warning("QUEUE_NOTIFY value (%u) is larger than VQ count (%u)\n",
-> +				val, vq_count);
-> +			break;
-> +		}
->  		vdev->ops->notify_vq(vmmio->kvm, vmmio->dev, val);
->  		break;
->  	case VIRTIO_MMIO_INTERRUPT_ACK:
-> @@ -341,10 +358,12 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  
->  int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev)
->  {
-> -	int vq;
-> +	u32 vq;
->  	struct virtio_mmio *vmmio = vdev->virtio;
-> +	u32 vq_count;
-
-Why this change (and the lines below)? Since get_vq_count() returns an u32
-now, we should be safe?
-
->  
-> -	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vmmio->dev); vq++)
-> +	vq_count = vdev->ops->get_vq_count(kvm, vmmio->dev);
-> +	for (vq = 0; vq < vq_count; vq++)
->  		virtio_mmio_exit_vq(kvm, vdev, vq);
->  
->  	return 0;
 > diff --git a/virtio/net.c b/virtio/net.c
-> index 75d9ae5..9a25bfa 100644
+> index 9a25bfa..ab75d40 100644
 > --- a/virtio/net.c
 > +++ b/virtio/net.c
-> @@ -753,7 +753,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
+> @@ -1002,6 +1002,9 @@ int virtio_net__init(struct kvm *kvm)
 >  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	struct net_dev *ndev = dev;
->  
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index 50fdaa4..60ae2cb 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -308,9 +308,11 @@ static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vde
->  	struct virtio_pci *vpci;
->  	struct kvm *kvm;
->  	u32 val;
-> +	u32 vq_count;
->  
->  	kvm = vcpu->kvm;
->  	vpci = vdev->virtio;
-> +	vq_count = vdev->ops->get_vq_count(kvm, vpci->dev);
->  
->  	switch (offset) {
->  	case VIRTIO_PCI_GUEST_FEATURES:
-> @@ -330,10 +332,21 @@ static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vde
->  		}
->  		break;
->  	case VIRTIO_PCI_QUEUE_SEL:
-> -		vpci->queue_selector = ioport__read16(data);
-> +		val = ioport__read16(data);
-> +		if (val >= vq_count) {
-> +			pr_warning("QUEUE_SEL value (%u) is larger than VQ count (%u)\n",
-> +				val, vq_count);
-> +			return false;
-> +		}
-> +		vpci->queue_selector = val;
->  		break;
->  	case VIRTIO_PCI_QUEUE_NOTIFY:
->  		val = ioport__read16(data);
-> +		if (val >= vq_count) {
-> +			pr_warning("QUEUE_SEL value (%u) is larger than VQ count (%u)\n",
-> +				val, vq_count);
-> +			return false;
-> +		}
->  		vdev->ops->notify_vq(kvm, vpci->dev, val);
->  		break;
->  	case VIRTIO_PCI_STATUS:
-> @@ -626,10 +639,12 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  
->  int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
->  {
-> -	int vq;
-> +	u32 vq;
->  	struct virtio_pci *vpci = vdev->virtio;
-> +	u32 vq_count;
+>  	if (kvm->cfg.num_net_devices == 0 && kvm->cfg.no_net == 0) {
+>  		static struct virtio_net_params net_params;
+> +		pr_warning(
+> +			"No net devices configured, but no_net not specified. "
+> +			"Enabling virtio_net with default network settings...\n");
 
-Same here, looks like an unnecessary change, since vq_count is only used
-once below.
-
-Other than that it looks good in general.
+I am a bit unsure about it. We recently tried to get rid of those molly
+guard messages, so I am not sure we should issue a *warning* here. After
+all, nothing is wrong, it's documented behaviour.
 
 Cheers,
 Andre
 
 >  
-> -	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vpci->dev); vq++)
-> +	vq_count = vdev->ops->get_vq_count(kvm, vpci->dev);
-> +	for (vq = 0; vq < vq_count; vq++)
->  		virtio_pci_exit_vq(kvm, vdev, vq);
->  
->  	return 0;
-> diff --git a/virtio/rng.c b/virtio/rng.c
-> index c7835a0..d9b9e68 100644
-> --- a/virtio/rng.c
-> +++ b/virtio/rng.c
-> @@ -147,7 +147,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return NUM_VIRT_QUEUES;
->  }
-> diff --git a/virtio/scsi.c b/virtio/scsi.c
-> index 37418f8..cdf553d 100644
-> --- a/virtio/scsi.c
-> +++ b/virtio/scsi.c
-> @@ -174,7 +174,7 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
->  	return size;
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return NUM_VIRT_QUEUES;
->  }
-> diff --git a/virtio/vsock.c b/virtio/vsock.c
-> index 2df04d7..7d523df 100644
-> --- a/virtio/vsock.c
-> +++ b/virtio/vsock.c
-> @@ -202,7 +202,7 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
->  		die_perror("VHOST_SET_VRING_CALL failed");
->  }
->  
-> -static int get_vq_count(struct kvm *kvm, void *dev)
-> +static u32 get_vq_count(struct kvm *kvm, void *dev)
->  {
->  	return VSOCK_VQ_MAX;
->  }
+>  		net_params = (struct virtio_net_params) {
+>  			.guest_ip	= kvm->cfg.guest_ip,
 
