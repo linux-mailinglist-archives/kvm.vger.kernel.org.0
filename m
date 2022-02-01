@@ -2,134 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2A9B4A6521
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 20:44:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D44F14A6530
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 20:50:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231723AbiBAToy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 14:44:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229779AbiBATox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 14:44:53 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3781C061714
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 11:44:53 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id g2so16297747pgo.9
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 11:44:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iLUYsPWsZ3gWFEc3WUsQBFuy3jyJ9IS5Qr2rNhtAogo=;
-        b=WP4fhiCwUKuenhgLkNnSJQ1wkxqCGAvEsEnwA7lPfH61D6xrlzPHhbvy8iP5QMGqVg
-         BIp9LB4sBDY2IBMVlRnwjDN6h6ote/88AbwGAwDGsUEyor72pbA3JBpA/chT8vCCtqPQ
-         Z0DkEc7i/UYJlkQHREkZjonpm2eaX0WFAnE5yHbTCOMOIDMKWClHsgz+0/PdKokqUo2C
-         OZUUbmPwE2Sjxu+oOOMgSvbxfZ2EJQYS1w/lWEeTZ94eUNtwpuIKNt1+ajZUptiOs3OO
-         uSSeN4zX0bCtl27bid51IZKgVvR39ng7j3wVea/gp9YKAeBdxPUZP/yh61mDs+MBcasY
-         8+Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iLUYsPWsZ3gWFEc3WUsQBFuy3jyJ9IS5Qr2rNhtAogo=;
-        b=fvvQbj3BPH0iAsYKurDDhDk0BQ2AIzsH86UwREz8wJa2FVl+Yd1z/CKNCiEe2lSdmU
-         pjeaMHCvaVEcWa/l7lX5MOVO/rYuchl6Ut+S5F1+826if0A4gdLAhvH0KCrbEM4jjJkl
-         el8ZnTpeSOgcp0ge1jOkGqF0BtbCrHDoLnJF6xaK0+qiR7HSPVEYJ6Ymb4wqMwBIa2jv
-         7VEoLNhNJgMppSo9xG8ydjObK5fUNBVI8S9dilLB0FUllHe5neuaXpNdEE8NAd4t8cYc
-         V/4Pp8X52G+REOGw4E02CEO5T8vkdLloKQlZcRWLHaLg75am6bEicPi4sIPYp0hJVPbb
-         GQdA==
-X-Gm-Message-State: AOAM531rYXsFQj82SEtI5BWTWvW8QWRLHkePPAh8IL3xPIHFkL87/kjW
-        Dluz6LBG3+VUe9Nk6wOeC0WNfg==
-X-Google-Smtp-Source: ABdhPJxNhi4swR9br3qpPd4PvS2tuVE80PwWO1z5EGGnP0NA6BhvY6Soya7Zeb53xZuJ8NuJoAeCrQ==
-X-Received: by 2002:a63:171a:: with SMTP id x26mr21809360pgl.447.1643744692111;
-        Tue, 01 Feb 2022 11:44:52 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v12sm2445761pgr.68.2022.02.01.11.44.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 11:44:51 -0800 (PST)
-Date:   Tue, 1 Feb 2022 19:44:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: x86: Use __try_cmpxchg_user() to update guest
- PTE A/D bits
-Message-ID: <YfmNr8OjOWvsQBKx@google.com>
-References: <20220201010838.1494405-4-seanjc@google.com>
- <202202011400.EaZmWZ48-lkp@intel.com>
-MIME-Version: 1.0
+        id S233014AbiBATuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 14:50:07 -0500
+Received: from mail-co1nam11on2052.outbound.protection.outlook.com ([40.107.220.52]:21504
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231716AbiBATuH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 14:50:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gWSVtJ1BB4ak4c1JD2zXFB6Osft3n9O6IzcKpO6kAPisxDrKAqCJSKgvBSnPYzxqb7qT5BhKTkWJvgvIFmVS3ilq3WC5MWNodiLu7ZWkEzSxEcYIdL53Gj+RzvhqtQixzDVTRwWoqNp7Oc/1i4Vc++06qx9d/EChBlvYcvosrMwOP7Tlxc0QHkTyo5yUjcj/fD2TzQ++X1UspQq2nl0KC0/lOoPar4ntS0xAf5eNO6cyFhhmczWuf5bKXzugPj1cV2p0+Rx1HtquUUbc2ryp3r2423h15Abw7RsdLG8nUP6ejDXTVABL2avDjArIQw7/h9Dt0pG2sjplYhxZ7FQW5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NJvFfqTNI8x/4yjkmH6OeF3Ek1QaF1XoylhcACSe/9k=;
+ b=lyrRvf3GASOYZOhs9HzhjafzrcQo+aDVI5ufRYP+pxakl74JN8EyBZOk2ihKQYdLJQiy73r5T3w5jN+rLwgXuCvkIEhUYwRZbaqwhCAmlWGH/+LWaIF+I0tOCMC3cseP5KRPZowIf9P01soTckCbzmru8GBf9VB145Kttr9SyNVAZEIULH+YJcdh/Eyl/kj/ydVXRyvKZqJgW8uTG4HZhYjojixuEHGyibXFksRmSyqjI00aza37eYQS2vAyKHAQaFOaYNPHawgRg/xVjjEYsYgrPkjezD9n3zdiQJOzw493TNzofkK/MtL8hjaQsoAYu9ZfesScS7I+HV2TIhumuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NJvFfqTNI8x/4yjkmH6OeF3Ek1QaF1XoylhcACSe/9k=;
+ b=nrExDWBUufIL6di0QRYoeDfzfYFuUpOleFPlc0uSl7euxVeAt35WfMzsD4vN9eZkfUIk1Jrt4ehykEmJ4tcGFyw2P6Uo1mcdfEZc30KhEIoclhQtDSfQRtfVyRV4bfeaFz0+xQkWwu/ygxvzwpvQ6igVRZZDq5ggolMfUv345epOaTaRbLIXl8GcUPeZ3BLrO8jqgyEzog0mrdROnwyDx1yxDeWsP+IhGCAVXRDzGqGIA/G/ycXzafndJUbOCMCdK6AmPtpg8z3gT06vzcp9Ol14nKaXKCKv9B8izpIUXfe2dlREgMl98LjaATU1prA16LBmApRBSudfbUENKC8ilA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB4249.namprd12.prod.outlook.com (2603:10b6:5:223::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.18; Tue, 1 Feb
+ 2022 19:50:05 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4930.022; Tue, 1 Feb 2022
+ 19:50:05 +0000
+Date:   Tue, 1 Feb 2022 15:50:03 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V6 mlx5-next 09/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220201195003.GN1786498@nvidia.com>
+References: <20220130160826.32449-1-yishaih@nvidia.com>
+ <20220130160826.32449-10-yishaih@nvidia.com>
+ <20220201113144.0c8dfaa5.alex.williamson@redhat.com>
+ <20220201185321.GM1786498@nvidia.com>
+ <20220201121322.2f3ceaf2.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202202011400.EaZmWZ48-lkp@intel.com>
+In-Reply-To: <20220201121322.2f3ceaf2.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR11CA0018.namprd11.prod.outlook.com
+ (2603:10b6:208:23b::23) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c115454c-6d05-4f83-747f-08d9e5bc0b48
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4249:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB42494DE67FDD006DADF16C68C2269@DM6PR12MB4249.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UTTgzOFrkww65ebgTTeW3xK9IWIYBHHhSnCIyjXQRP1QGmFfatT5fRYxd6g+3FfU/xIA6641j4ToKP8GOGRmvBkoPiUleoQARTCg1bzlHwtIC6pccGJUBlQcpqdLCnbfiX4G4tdVUFgsUTPzAlgXU0qGdfmTLb5oaYznROHWsO8OLEHnaFskluQre0b8Lg0I6A2cP/wqaWXhdh/lm80DRRdWhW81GT4EFyfP9r9294oPkNM4Hi+/pHTI/LEbaXa0MqVacLpMxE3p2vc59K1BgkRv9YbUN7lNi5RiKXPM9wmLe+B6Grr7ovbd0fveD8j5ZCIDFxf+sth7OqqKHXjQrCa5rXHh5OIUFnGdlKE7ydjOenq0CJS6j82v0kLviUkvf+9j/DMsHoQ8iBDZQ84d2RFH23j+nTq53sjjf8rF5O420Rwb6qURdCSt4UyMRoQrqBlgRw+kWQHxC3pcXXPxlPCP8npg4Ai2TpyzGij3E7jKXnjJSE5Y5sy/5+xXK6oHcluQ2wEwb5oQzczW94+r4N9t33TpbjutDthF947o+sYX3AqKIFo99nz+VGTq/vjHM/n8BFwJ13gorwDl0gPMtlmv5KBMR1CpkD8TKUnBZCrkIeVrp4exjL9o7MiBNcynJldaioYxEAgFrm3yZgb4Rw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(33656002)(66476007)(4326008)(66946007)(8676002)(508600001)(66556008)(5660300002)(8936002)(6486002)(38100700002)(36756003)(83380400001)(6512007)(6916009)(1076003)(2616005)(186003)(86362001)(26005)(107886003)(2906002)(316002)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?w5rsaQEsHXBPlciOTe7lBRUNxfKO781Ehqji0s6u8h+P1UM3jnpJZN2UHnWQ?=
+ =?us-ascii?Q?S/hyRmtmt0uUaPyIBEfrHZAalkHBnbqcfOe860n2UC+kPN+5iA7aZoXNryXZ?=
+ =?us-ascii?Q?s5pctaqxTYI4YsB4PoiHk6KG1yVUdKMHo1mCLW1+duejXeK6/twsdWASRekJ?=
+ =?us-ascii?Q?eGvbLGmUt03CIpkp8mkzz6lWtaYK9//+NCh5QjY2RSzxLX+iSt78N0LLqh52?=
+ =?us-ascii?Q?CoyUpI8dTpn76PzOJRO8hpRM5S6G3HV7tbfyhSiNwYL20T+OE+jwX123Gyvc?=
+ =?us-ascii?Q?RTXLuJOv81Lr6OIOyA679aaDmLByHlacezHzVOpFKgvQ+aXdSbHJXegdHlT6?=
+ =?us-ascii?Q?kg6rn6KS/7D0m8xTld2hY1kAWML5lE6VIh+pjK/abhNXtqTckoOpuaXsZMEt?=
+ =?us-ascii?Q?w80uIzYAUIYoS6GpGLSCcjt6aDeFY1U9uTkDvo8aUa+jVT4FwiB7DwtDBrx0?=
+ =?us-ascii?Q?GbWPltQn6oyrMW+4uj1eUd22+WaWCJtnmSsMrNhIs34St6H8I0dC8IRPSc3t?=
+ =?us-ascii?Q?foV8xSP4IZ5afPAzfVXlVjgxfem1smLsgV9kVBjr1DWZPmhupHWN4GCVQplg?=
+ =?us-ascii?Q?JU+yJ6smmi4Easf9K+JgK2/lDKNedvAYb+lSaD1LYaAHx9EDSefrcdNVEaSW?=
+ =?us-ascii?Q?ie1X1of/CQHFM0W1LVFzSGOEH2m7aLetosTrG/jz6ZO3kqDKkA7GZ8d4lFZD?=
+ =?us-ascii?Q?gNG32Iz4m2YRu46THSvSPVqDr/GU8zscNrGDXG/DDaJakgezluoZ9Nez7Qlm?=
+ =?us-ascii?Q?f/DwdR2oFojZOYgBKcmMpj9qQVzjL6nWf9iAQL8yzZgK+4S+0IjZ1YG7Qh3x?=
+ =?us-ascii?Q?t9R49Wugq6fQw1ZVPEtkivVFvfMANEtJ0dKj76SoiGgM0AG3Fh2dTPxwCslH?=
+ =?us-ascii?Q?aVbR5z0Y8po8ku7cWzR1Co6DTbVZ+OHZ8nYkYlb26w7Kk45o/hifsgO8YPtU?=
+ =?us-ascii?Q?08CyjE31HA+dvbQZ7KwZfMun9BZXCbyIYPai4y6Rqh9vVjHYOkQA/AhuA6Qj?=
+ =?us-ascii?Q?YKjAgl9v5DXnviBZYMPf95Ewf/Xj1DsVyHFzJVVkdpY2KwTOR7OkgLoDgA/t?=
+ =?us-ascii?Q?dykByT4iwuQZ8NCRGfYXpDT2F5IKRFgbRgFp8FgDexf+Fsutj4KVvJ8GETxT?=
+ =?us-ascii?Q?PbpE5PVcd9CM38QZokK8OQGPX0PaI5EuW/HKlEcZIMx+92ih166jqjhX8SdX?=
+ =?us-ascii?Q?6YWdDfQWgiafdv3GJLYHwtESQqwqD64r55YG9cQ6Mq/uXiHU+5vB3Ijrd3LR?=
+ =?us-ascii?Q?CkRw5ZlnmQd1iUSi1UesBZqKd+iF2gX2IKPiMszKkwq+k10/4JWvxcd1ZHbA?=
+ =?us-ascii?Q?EJ8dLmXd/oGTWFWKmr4GBCPFVeX/wH3Hp+sGtTjZEsh/0sHHS4hLt9yzxaBH?=
+ =?us-ascii?Q?wvb6uA9Nd62NQJ3BXYd5/VhNpYz/YWOW7XvV3kxeXdp+YRx8cO8GSNDLdjTE?=
+ =?us-ascii?Q?5RH5diiL0or4W1j90TQHfTvJcVKrv9vZGm6QmeoNyeiogHaYTSZm7g7OJ6yt?=
+ =?us-ascii?Q?yAR6mwvcWfDqSDd1FokgAUs1f/qIlNkEdbVdislaL2sdSHiexQNdku2Et/E1?=
+ =?us-ascii?Q?b0vMourGEhDi8lsb6Kw=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c115454c-6d05-4f83-747f-08d9e5bc0b48
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2022 19:50:05.7733
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ePbH5nwr5RCBbUcMXYspaYoz00nUiEjyBMzKcgT10+XJoUsv722lAfudYmjUNInx
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4249
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 01, 2022, kernel test robot wrote:
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+On Tue, Feb 01, 2022 at 12:13:22PM -0700, Alex Williamson wrote:
+> On Tue, 1 Feb 2022 14:53:21 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
+> > On Tue, Feb 01, 2022 at 11:31:44AM -0700, Alex Williamson wrote:
+> > > > +	bool have_p2p = device->migration_flags & VFIO_MIGRATION_P2P;
+> > > > +
+> > > >  	if (cur_fsm >= ARRAY_SIZE(vfio_from_fsm_table) ||
+> > > >  	    new_fsm >= ARRAY_SIZE(vfio_from_fsm_table))
+> > > >  		return VFIO_DEVICE_STATE_ERROR;
+> > > >  
+> > > > -	return vfio_from_fsm_table[cur_fsm][new_fsm];
+> > > > +	if (!have_p2p && (new_fsm == VFIO_DEVICE_STATE_RUNNING_P2P ||
+> > > > +			  cur_fsm == VFIO_DEVICE_STATE_RUNNING_P2P))
+> > > > +		return VFIO_DEVICE_STATE_ERROR;  
+> > > 
+> > > new_fsm is provided by the user, we pass set_state.device_state
+> > > directly to .migration_set_state.  We should do bounds checking and
+> > > compatibility testing on the end state in the core so that we can  
+> > 
+> > This is the core :)
 > 
-> All errors (new ones prefixed by >>):
+> But this is the wrong place, we need to do it earlier rather than when
+> we're already iterating next states.  I only mention core to avoid that
+> I'm suggesting a per driver responsibility.
+
+Only the first vfio_mig_get_next_state() can return ERROR, once it
+succeeds the subsequent ones must also succeed.
+
+This is the earliest can be. It is done directly after taking the lock
+that allows us to read the current state to call this function to
+determine if the requested transition is acceptable.
+
+> > Userspace can never put the device into error. As the function comment
+> > says VFIO_DEVICE_STATE_ERROR is returned to indicate the arc is not
+> > permitted. The driver is required to reflect that back as an errno
+> > like mlx5 shows:
+> > 
+> > +		next_state = vfio_mig_get_next_state(vdev, mvdev->mig_state,
+> > +						     new_state);
+> > +		if (next_state == VFIO_DEVICE_STATE_ERROR) {
+> > +			res = ERR_PTR(-EINVAL);
+> > +			break;
+> > +		}
+> > 
+> > We never get the driver into error, userspaces gets an EINVAL and no
+> > change to the device state.
 > 
->    In file included from arch/x86/kvm/mmu/mmu.c:4246:
-> >> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
->                    ret = __try_cmpxchg_user(ptep_user, &orig_pte, pte, fault);
->                          ^
->    arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
->            __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
->                     ^
->    arch/x86/include/asm/uaccess.h:606:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
->            case 1: __ret = __try_cmpxchg_user_asm("b", "q",                \
->                            ^
->    arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
->                           [old] "+a" (__old)                               \
+> Hmm, subtle.  I'd argue that if we do a bounds and support check of the
+> end state in vfio_ioctl_mig_set_state() before calling
+> .migration_set_state() then we could remove ERROR from
+> vfio_from_fsm_table[] altogether and simply begin
+> vfio_mig_get_next_state() with:
 
-#$*&(#$ clang.
+Then we can't reject blocked arcs like STOP_COPY -> PRE_COPY.
 
-clang isn't smart enough to avoid compiling the impossible conditions it will
-throw away in the end, i.e. it compiles all cases given:
+It is setup this way to allow the core code to assert all policy, not
+just a simple validation of the next_fsm.
 
-  switch (8) {
-  case 1:
-  case 2:
-  case 4:
-  case 8:
-  }
+> Then we only get to ERROR by the driver placing us in ERROR and things
+> feel a bit more sane to me.
 
-I can fudge around that by casting the pointer, which I don't think can go sideways
-if the pointer value is a signed type?
+This is already true.
 
-@@ -604,15 +602,15 @@ extern void __try_cmpxchg_user_wrong_size(void);
-        bool __ret;                                                     \
-        switch (sizeof(*(_ptr))) {                                      \
-        case 1: __ret = __try_cmpxchg_user_asm("b", "q",                \
--                                              (_ptr), (_oldp),         \
-+                                              (u8 *)(_ptr), (_oldp),   \
-                                               (_nval), _label);        \
-                break;                                                  \
-        case 2: __ret = __try_cmpxchg_user_asm("w", "r",                \
--                                              (_ptr), (_oldp),         \
-+                                              (u16 *)(_ptr), (_oldp),  \
-                                               (_nval), _label);        \
-                break;                                                  \
-        case 4: __ret = __try_cmpxchg_user_asm("l", "r",                \
--                                              (_ptr), (_oldp),         \
-+                                              (u32 *)(_ptr), (_oldp),  \
-                                               (_nval), _label);        \
-                break;                                                  \
-        case 8: __ret = __try_cmpxchg64_user_asm((_ptr), (_oldp),       \
+Perhaps it is confusing using ERROR to indicate that
+vfio_mig_get_next_state() failed. Would you be happier with a -errno
+return?
 
+> > It is organized this way because the driver controls the locking for
+> > its current state and thus the core code caller along the ioctl path
+> > cannot validate the arc before passing it to the driver. The code is
+> > shared by having the driver callback to the core to validate the
+> > entire fsm arc under its lock.
+> 
+> P2P is defined in a way that if the endpoint is valid then the arc is
+> valid.  We skip intermediate unsupported states.  We need to do that
+> for compatibility.  So why do we care about driver locking to do
+> that?
 
-clang also lacks the intelligence to realize that it can/should use a single
-register for encoding the memory operand and consumes both ESI and EDI, leaving
-no register for the __err "+r" param in __try_cmpxchg64_user_asm().  That can be
-avoided by open coding CC_SET and using a single output register for both the
-result and the -EFAULT error path.
+Without the driver locking we can't identify the arc because we don't
+know the curent state the driver is in. We only know the target
+state.
+
+Jason
