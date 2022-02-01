@@ -2,92 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E60FA4A5E5A
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:32:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59C034A5E83
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:44:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239354AbiBAOcq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 09:32:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239361AbiBAOcm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 09:32:42 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28B4C061714
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 06:32:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=I18tNObjVFDm/kZz3nk5PXOupFozTlFQM8ZlXVFWPRs=; b=XrkHdF9USSifp4SbR3sZpOZ0kz
-        Oi3rg5K3Jj5wB03eUvBmUIJ8/vXxdMtjf37JlmIjTsY9QvCIm8OGDbIXaQPu+BUQSlHjH0tRsqgZL
-        FH2K7sOcOVSl8qx79SSqds2hpS+K6WT+8ojS25qzquvzfo2yGJG0oO6/i7RU8uKnz/lrO+HjrN76z
-        FbIdSkNyY/G+wHjIG50uF/d4Yj7lEjZs6FiBww7q7cZnf26Afopz5cIy2krYoHsCOcxon3nSeVZ8U
-        02fO7PBYwYzcpz3R9eVDMJt7H73cKtAH3Lh+ne5l4GrojSutG6k8JKx3qN/fd9MGhYMKh9cEe6O5h
-        fF6cOQfQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56966)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1nEuCw-0000hf-Bi; Tue, 01 Feb 2022 14:32:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1nEuCo-00028V-8b; Tue, 01 Feb 2022 14:32:26 +0000
-Date:   Tue, 1 Feb 2022 14:32:26 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
-        miguel.luis@oracle.com, kernel-team@android.com
-Subject: Re: [PATCH v6 07/64] KVM: arm64: nv: Handle HCR_EL2.NV system
- register traps
-Message-ID: <YflEev8U2xJCIwtm@shell.armlinux.org.uk>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-8-maz@kernel.org>
+        id S239404AbiBAOop (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 09:44:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31970 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232042AbiBAOon (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 09:44:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643726682;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xPr60qxZCyURf1wWnO6jqTyKtFPYAeP8pg9MJVVWY5E=;
+        b=i+HAYH5ch+qg91aKEEuUk3TLTK2yBB9IihnJX2d0FkUHD8bhxBumH9xSGRzF03LZZFqKxN
+        YqHuw+q3a39u78G6D5l6d8bVIiFCcblGv0SkhCJFfqD+JsVIw7lev11LwW3uuzFdgVkshr
+        Tcjfiow0UgA2q/9EZMES1P9NDVp1hM8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-183-hj8fa5_MPo6iNoFkXSatPA-1; Tue, 01 Feb 2022 09:44:41 -0500
+X-MC-Unique: hj8fa5_MPo6iNoFkXSatPA-1
+Received: by mail-ed1-f71.google.com with SMTP id a18-20020aa7d752000000b00403d18712beso8776497eds.17
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 06:44:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=xPr60qxZCyURf1wWnO6jqTyKtFPYAeP8pg9MJVVWY5E=;
+        b=jlVkyEasgB2OuX+05gccfHZ45l2Azkmwv1z6+9EWMczYCENBSqDKJQAx1IrWaq3pmD
+         Y8CPnU3NgOoB4IHGV3CgNU8K7ZPFwlPPFuLG3ZjRqGAqQrdZZj2empPkqMEwOHU6W2ib
+         myjg1HYhxpELlHJcQMC3ZaFKYupRkmaHXUmGDTp/Fjyhne5rqbNkerOrvXE7bTTWIMdC
+         UARxTJKfs5etkFJngzGyIeslzhcqaCZUUTXtcmin7vijor/mt8hwPoTTDfAqisqp/3qc
+         v2DhBcYRSzPgmXqP+qN3aNCP29scWPSp7W/ROZ+ZOe5KdkdXxc996C+y7eY7yP/3BOjZ
+         3P9A==
+X-Gm-Message-State: AOAM532GdJEU12Jb7JB3pYlYyF1BEdV3ciIYoAM0zM6Gcq8yU2pr8Cbw
+        C6cvURzkQH+9AtbCqtoMXSI6MgSb2OElPR+owxHyKyjcaA1TT2yt3IJmqbimqGrL0lfp7dYX358
+        QhqCRb7S3W1Ol
+X-Received: by 2002:a17:906:7945:: with SMTP id l5mr21603466ejo.104.1643726680177;
+        Tue, 01 Feb 2022 06:44:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJynyvXIDdrE1MhRE3SomRdqiNaV91tp5hjxrkxBUNOFv2HU89Omp/4lqyWDEBDXFkSRHTwgNA==
+X-Received: by 2002:a17:906:7945:: with SMTP id l5mr21603437ejo.104.1643726679954;
+        Tue, 01 Feb 2022 06:44:39 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id m13sm14613223eja.160.2022.02.01.06.44.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Feb 2022 06:44:39 -0800 (PST)
+Date:   Tue, 1 Feb 2022 15:44:37 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+        qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
+Message-ID: <20220201144437.fw5fv7xfxspf7a6s@gator>
+References: <20211112114734.3058678-1-alex.bennee@linaro.org>
+ <20211112132312.qrgmby55mlenj72p@gator.home>
+ <87wnldfoul.fsf@linaro.org>
+ <20211112145442.5ktlpwyolwdsxlnx@gator.home>
+ <877dd4umy6.fsf@linaro.org>
+ <20211119183059.jwrhb77jfjbv5rbz@gator.home>
+ <87a6hlzq8t.fsf@linaro.org>
+ <20211130143425.bh27yy47vpihllvs@gator.home>
+ <87sft2yboq.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-8-maz@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87sft2yboq.fsf@linaro.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 12:18:15PM +0000, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
+On Tue, Feb 01, 2022 at 01:10:13PM +0000, Alex Bennée wrote:
 > 
-> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
-> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
-> addition, executing the following instructions in EL1 will trap to EL2:
-> tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
-> instructions that trap to EL2 with the NV bit were undef at EL1 prior to
-> ARM v8.3. The only instruction that was not undef is eret.
-> 
-> This patch sets up a handler for EL2 registers and SP_EL1 register
-> accesses at EL1. The host hypervisor keeps those register values in
-> memory, and will emulate their behavior.
-> 
-> This patch doesn't set the NV bit yet. It will be set in a later patch
-> once nested virtualization support is completed.
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> [maz: EL2_REG() macros]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Gentle ping, I'm trying to clear this off my internal JIRA so let me
+> know if you want me to do anything to help.
+>
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Sorry Alex! I've been juggling too many balls lately and completely
+dropped this one. I'll rebase arm/queue now and run it through some
+sanity tests. If all it good, I'll do the MR right away.
 
-Thanks!
+Thanks,
+drew
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
