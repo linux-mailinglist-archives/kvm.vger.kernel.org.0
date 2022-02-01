@@ -2,117 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AEF94A57B7
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 08:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FC164A5833
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 09:02:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234872AbiBAH1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 02:27:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233720AbiBAH1m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 02:27:42 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D2FFC061714;
-        Mon, 31 Jan 2022 23:27:41 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id s16so14437070pgs.13;
-        Mon, 31 Jan 2022 23:27:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=gb6FpjDviXqkxJ6tLKBKooggf+e2HvpPzlaYq1JqIm4=;
-        b=bnc/76N1EHpYnVPW0XvmUduROAoPN/BPMdfuK+CbCaGMaDLhq9vVyYnoauw4VUy74M
-         goJr9Vz1HZ/knFlNZl3LdsRqn5exiyvIQX7oF1Klbm8vRves0iepp3npexp9I0RM91z6
-         B+LVOWEg0833b+k8LBpD4jzy5z172K9hHkAqbLSsiEPsJYn3p0mCW2DI7wau+ryZ7GAv
-         /petSKnTeBErJ1rtmG2aMKvd4oGx5YWsRRQMFqZXPK9PMXvU7nq2iXYnCREQ71USITOc
-         9b2uZN2O8lkx+N1A0KzvnJUIuU8do4nHw6v+WxEBj2+IGY8z32n9ioLMVuuRVxWTmSIZ
-         c9vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-transfer-encoding:content-language;
-        bh=gb6FpjDviXqkxJ6tLKBKooggf+e2HvpPzlaYq1JqIm4=;
-        b=FlV30beL7BmElpn7vHv1FPVFMrECdswllyJi+YVjTSHOxXXbvENHa+OqE63bSGQc9S
-         he8iVIwjD78qr2c0jEyvYiGJrpgHfZtk6CHpuSK9No4T2lEUh/aCJxvC1tgEm+hpSvFB
-         99lfN3vTVk1xKk1GKqTQAOPbfdmSBE6T2ns6IfglHRZTHEvLbJVdMwyx1irIk3kvFnBk
-         QU1auH5UX4syHPpryGs/70hMcVEAXdaMoLPqser/Gt5BxoPmom+o9SCTky3e4JN7Dk2S
-         UNr6E+efLavckOEtrkjvi3ehiq4UCfR/KanPsWANm6SFUPNlcjO7YlwlN2W0OImIfICG
-         VUrQ==
-X-Gm-Message-State: AOAM5302QhI8LFasHiAyZgfvtZWCtqJF6izTR7aXwsa8FVP5s11RQ/fV
-        GAmmgnAoFw++Ro0ro0C7BFxFrdqKjYs=
-X-Google-Smtp-Source: ABdhPJwE6FampCug81yvTDRInbet6MFgiUScRXkZxzKvq4ickx/7NOJpJQ0E7JVRTT0yev9CkhIFKw==
-X-Received: by 2002:a63:1a21:: with SMTP id a33mr19938856pga.35.1643700460589;
-        Mon, 31 Jan 2022 23:27:40 -0800 (PST)
-Received: from [10.59.0.6] ([85.203.23.80])
-        by smtp.gmail.com with ESMTPSA id c14sm19908190pfm.169.2022.01.31.23.27.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Jan 2022 23:27:39 -0800 (PST)
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: [BUG] vhost: two possible deadlocks involving locking and waiting
-To:     jasowang@redhat.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
-Message-ID: <22f57c53-1a0b-ced9-b36e-1b4de8d55572@gmail.com>
-Date:   Tue, 1 Feb 2022 15:27:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S235290AbiBAICT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 03:02:19 -0500
+Received: from elvis.franken.de ([193.175.24.41]:50685 "EHLO elvis.franken.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235217AbiBAICS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 03:02:18 -0500
+Received: from uucp (helo=alpha)
+        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
+        id 1nEo7E-0001iW-00; Tue, 01 Feb 2022 09:02:16 +0100
+Received: by alpha.franken.de (Postfix, from userid 1000)
+        id 9115BC1F78; Tue,  1 Feb 2022 09:01:41 +0100 (CET)
+Date:   Tue, 1 Feb 2022 09:01:41 +0100
+From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        linux-mips@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        James Hogan <jhogan@kernel.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH] MIPS: KVM: fix vz.c kernel-doc notation
+Message-ID: <20220201080141.GA5886@alpha.franken.de>
+References: <20220129205819.23781-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220129205819.23781-1-rdunlap@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Sat, Jan 29, 2022 at 12:58:19PM -0800, Randy Dunlap wrote:
+> Fix all kernel-doc warnings in mips/kvm/vz.c as reported by the
+> kernel test robot:
+> 
+>   arch/mips/kvm/vz.c:471: warning: Function parameter or member 'out_compare' not described in '_kvm_vz_save_htimer'
+>   arch/mips/kvm/vz.c:471: warning: Function parameter or member 'out_cause' not described in '_kvm_vz_save_htimer'
+>   arch/mips/kvm/vz.c:471: warning: Excess function parameter 'compare' description in '_kvm_vz_save_htimer'
+>   arch/mips/kvm/vz.c:471: warning: Excess function parameter 'cause' description in '_kvm_vz_save_htimer'
+>   arch/mips/kvm/vz.c:1551: warning: No description found for return value of 'kvm_trap_vz_handle_cop_unusable'
+>   arch/mips/kvm/vz.c:1552: warning: expecting prototype for kvm_trap_vz_handle_cop_unusuable(). Prototype was for kvm_trap_vz_handle_cop_unusable() instead
+>   arch/mips/kvm/vz.c:1597: warning: No description found for return value of 'kvm_trap_vz_handle_msa_disabled'
+> 
+> Fixes: c992a4f6a9b0 ("KVM: MIPS: Implement VZ support")
+> Fixes: f4474d50c7d4 ("KVM: MIPS/VZ: Support hardware guest timer")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> Cc: linux-mips@vger.kernel.org
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Cc: James Hogan <jhogan@kernel.org>
+> Cc: kvm@vger.kernel.org
+> ---
+>  arch/mips/kvm/vz.c |   12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 
-My static analysis tool reports two possible deadlocks in the vhost 
-driver in Linux 5.16:
+applied to mips-fixes.
 
-#BUG 1
-vhost_net_set_backend()
-   mutex_lock(&n->dev.mutex); --> Line 1511(Lock A)
-   vhost_net_ubuf_put_wait_and_free()
-     vhost_net_ubuf_put_and_wait()
-     wait_event(ubufs->wait ...); --> Line 260 (Wait X)
+Thomas.
 
-vhost_net_ioctl()
-   mutex_lock(&n->dev.mutex); --> Line 1734 (Lock A)
-   vhost_net_flush()
-     vhost_net_ubuf_put_and_wait()
-       vhost_net_ubuf_put()
-         wake_up(&ubufs->wait); --> Line 253 (Wake X)
-
-When vhost_net_set_backend() is executed, "Wait X" is performed by 
-holding "Lock A". If vhost_net_ioctl() is executed at this time, "Wake 
-X" cannot be performed to wake up "Wait X" in vhost_net_set_backend(), 
-because "Lock A" has been already hold by vhost_net_set_backend(), 
-causing a possible deadlock.
-
-#BUG2
-vhost_net_set_backend()
-   mutex_lock(&vq->mutex); --> Line 1522(Lock A)
-   vhost_net_ubuf_put_wait_and_free()
-     vhost_net_ubuf_put_and_wait()
-     wait_event(ubufs->wait ...); --> Line 260 (Wait X)
-
-handle_tx()
-   mutex_lock_nested(&vq->mutex, ...); --> Line 966 (Lock A)
-   handle_tx_zerocopy()
-     vhost_net_ubuf_put()
-       wake_up(&ubufs->wait); --> Line 253 (Wake X)
-
-When vhost_net_set_backend() is executed, "Wait X" is performed by 
-holding "Lock A". If handle_tx() is executed at this time, "Wake X" 
-cannot be performed to wake up "Wait X" in vhost_net_set_backend(), 
-because "Lock A" has been already hold by vhost_net_set_backend(), 
-causing a possible deadlock.
-
-I am not quite sure whether these possible problems are real and how to 
-fix them if they are real.
-Any feedback would be appreciated, thanks :)
-
-
-Best wishes,
-Jia-Ju Bai
-
+-- 
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
