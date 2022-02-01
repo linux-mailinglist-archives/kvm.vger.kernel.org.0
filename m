@@ -2,102 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 164C94A5E1B
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:19:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 070DE4A5E28
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:23:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239161AbiBAOTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 09:19:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46534 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239151AbiBAOT3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 09:19:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643725169;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kYjnMC9tPGNeYuQS/9IzugsptRNBQAJSLzF0SEucIUg=;
-        b=C398VwF2ErYD/oTb45xWTydO///2QvZpra32lq7ectYrAtx+1iLYUN/YfZ1wBy+bFxTpCs
-        4gWmwWIBEWWmVd9IQCx/Yce6Zznzu8UXvlMqYT8Y7+9eTDyOBAxKAwZ5KMIbR9RzqFJ14K
-        tqnf8DwaKkWt1E+5TMMjisbG07w65IU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-636-w-Zc9dibPL6gj8-g7kb4IA-1; Tue, 01 Feb 2022 09:19:25 -0500
-X-MC-Unique: w-Zc9dibPL6gj8-g7kb4IA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B68DD8144E4;
-        Tue,  1 Feb 2022 14:19:23 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A7A4708D3;
-        Tue,  1 Feb 2022 14:19:20 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        bhelgaas@google.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
-        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH V6 mlx5-next 10/15] vfio: Remove migration protocol v1
-In-Reply-To: <20220201135231.GF1786498@nvidia.com>
-Organization: Red Hat GmbH
-References: <20220130160826.32449-1-yishaih@nvidia.com>
- <20220130160826.32449-11-yishaih@nvidia.com> <874k5izv8m.fsf@redhat.com>
- <20220201121325.GB1786498@nvidia.com> <87sft2yd50.fsf@redhat.com>
- <20220201125444.GE1786498@nvidia.com> <87mtjayayi.fsf@redhat.com>
- <20220201135231.GF1786498@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Tue, 01 Feb 2022 15:19:18 +0100
-Message-ID: <87k0eey8ih.fsf@redhat.com>
+        id S239182AbiBAOXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 09:23:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239141AbiBAOXP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 09:23:15 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21B31C061714
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 06:23:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=hJw4juwcXiLROD+gBZlosjCAXy9f8rYxQll2UPCK+OM=; b=Fen7RYje802p8ZXgyeoWUH5B8+
+        hX5lpvYwXwE2uWGhtwosFdyKJhhJ3rg09dAekRcKnZBeVScYv2Lo/yhlx8/6e9D9mfihA+C0V1wvH
+        6+aKKjjNPj1byS3evLbvqzxB57Gtoot0rb6X5yts3nNaTArmwF99W2RPKRShrwFBXYGLY97OH0+RM
+        LuDVBmk40xMYkwKqneTtXAU7Xjqb94RBe5EvSgRdqCxZnTQVe0K4wQMGPNTK4RRLvTsA4Vh5i9toq
+        ZRhx9mXi4aXih2S3skeD8tKiLQdJd47jrWmchV/XVQdIjwRlqVWfwkQ2P8IoZ2Wva6BITOoD332tI
+        2DhnrNoA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56962)
+        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1nEu3j-0000gx-HF; Tue, 01 Feb 2022 14:23:03 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1nEu3d-00028L-0R; Tue, 01 Feb 2022 14:22:57 +0000
+Date:   Tue, 1 Feb 2022 14:22:56 +0000
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 01/64] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+Message-ID: <YflCQMLqX9lcAgsy@shell.armlinux.org.uk>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-2-maz@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 01 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Fri, Jan 28, 2022 at 12:18:09PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+> CPU has the ARMv8.3 nested virtualization capability, together
+> with the 'kvm-arm.mode=nested' command line option.
+> 
+> This will be used to support nested virtualization in KVM.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> [maz: moved the command-line option to kvm-arm.mode]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-> On Tue, Feb 01, 2022 at 02:26:29PM +0100, Cornelia Huck wrote:
->
->> > We can certainly defer the kernels removal patch for a release if it
->> > makes qemu's life easier?
->> 
->> No, I'm only talking about the QEMU implementation (i.e. the code that
->> uses the v1 definitions and exposes x-enable-migration). Any change in
->> the headers needs to be done via a sync with upstream Linux.
->
-> If we leave the v1 and v2 defs in the kernel header then qemu can sync
-> and do the trivial rename and keep going as-is.
->
-> Then we can come with the patches to qemu update to v2, however that
-> looks.
->
-> We'll clean the kernel header in the next cylce.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I'm not sure we're talking about the same things here...
-
-My proposal is:
-
-- remove the current QEMU implementation of vfio migration for 7.0 (it's
-  experimental, and if there's anybody experimenting with that, they can
-  stay on 6.2)
-- continue with getting this proposal for the kernel into good shape, so
-  that it can hopefully make the next merge window
-(- also continue to get the documentation into good shape)
-- have an RFC for QEMU that contains a provisional update of the
-  relevant vfio headers so that we can discuss the QEMU side (and maybe
-  shoot down any potential problems in the uapi before they are merged
-  in the kernel)
-
-I don't think a "dual version header" would really help here. If we
-don't want to rip out the old QEMU implementation yet, I can certainly
-also live with that. We just need to be mindful once the changes hit
-Linus' tree, but it is quite likely that QEMU would be in freeze by
-then. As long as updating the headers leads to an obvious failure, it's
-managable (although the removal would still be my preferred approach.)
-
-Alex, what do you think?
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
