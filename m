@@ -2,157 +2,448 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E78AC4A5EB5
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:57:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9C0A4A60C7
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 16:53:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239568AbiBAO5M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 09:57:12 -0500
-Received: from mail-mw2nam10on2070.outbound.protection.outlook.com ([40.107.94.70]:61921
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239524AbiBAO5L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 09:57:11 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JbzXCOjPgQ8Mqi+sEZsiGAHQaD6FsJwddyxJ/9GGt11MBx8g2GSZCyKg531UZvJnVvysIHtGsy9j+oewI8XAk/mIlTuMMnZhRsnxRdh63V6Y8gc2uFRxSpDDf5TygG6y7aP+SK6QSovhRMJNg7RqXiFV8aNooBMqO3X8YyA9Id36TuY4/vAAhYmwq4Jip6aDed3bw+bUIardh5Nl66esnnlKQ6Kf9MNUWlpQN35IpM5Ex5W7bDv45HTdWsI7hNZgr4vCRNb8Wl7ZTdObR7P7A7ARqntIx2JItop2IItZWR9EfpLwTXIf+zw/m1A42G8XD05F/drFFakxc6ArfFHGFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fjx35/uJcyZYEs230TYCYDgFv9i5OYEdIM4EHWeZo8U=;
- b=CBx/2q2gsAG3UQtjkqvnjV4VLfj/41y+IN768WQRJHW5k1lzFFj/JtBtPppuDn3TSDDH/nd5llcm3AWq5f4FzbVKnJi+VPH2DoY0egViSJ2Mco/lNH4e1L4y8GjTR5J3vQia0kONvoTdZb2ljrHVF0AZMyInRtZqBjerTfakNTOv/WdoEx+BuuqC8h3FmfsAFtRYf8wHN8UQEXSmnUYuwWv7nSORXIDQI454KFjkK1lWuBlaoOw1NmuqWlWXhHyDzCHFj3RqocmElHOY1PwiVVxqpl61yFfrTRAMS/4mGU8iEorR0fD82hWrI8ubLlaZEEJUTpYO9O/u89ehl/qaxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fjx35/uJcyZYEs230TYCYDgFv9i5OYEdIM4EHWeZo8U=;
- b=fp8qed3O42+MeTWHGCYy1tFLaRBo1v9SnrP+FFMhoxD+MGlpYJ0mU3FSZ+C0ZzHYCHnCyKH1DHr17p3iz4cTcneLLXP34+ttkKostc5+yCJkcLfJ3F4um6zJE7aRzEdvYeCXgCHUwimgS+33WIzz5lLjL83M4+eIcp4VU++t4o4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- CO6PR12MB5476.namprd12.prod.outlook.com (2603:10b6:303:138::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.11; Tue, 1 Feb
- 2022 14:57:08 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::389b:4009:8efc:8643]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::389b:4009:8efc:8643%5]) with mapi id 15.20.4930.022; Tue, 1 Feb 2022
- 14:57:08 +0000
-Message-ID: <45c0c1c2-f660-afb4-9631-e73cbbe60465@amd.com>
-Date:   Tue, 1 Feb 2022 21:56:55 +0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v3 3/3] KVM: SVM: Extend host physical APIC ID field to
- support more than 8-bit
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, mlevitsk@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        peterz@infradead.org, hpa@zytor.com, thomas.lendacky@amd.com,
-        jon.grimm@amd.com
-References: <20211213113110.12143-1-suravee.suthikulpanit@amd.com>
- <20211213113110.12143-4-suravee.suthikulpanit@amd.com>
- <Yc3qt/x1YPYKe4G0@google.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <Yc3qt/x1YPYKe4G0@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SGBP274CA0006.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::18)
- To DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7)
+        id S240729AbiBAPxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 10:53:32 -0500
+Received: from foss.arm.com ([217.140.110.172]:48470 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240718AbiBAPxc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 10:53:32 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C35E1113E;
+        Tue,  1 Feb 2022 07:53:31 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C278D3F40C;
+        Tue,  1 Feb 2022 07:53:30 -0800 (PST)
+Date:   Tue, 1 Feb 2022 14:55:06 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Martin Radev <martin.b.radev@gmail.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [PATCH kvmtool 1/5] virtio: Sanitize config accesses
+Message-ID: <20220201145506.73f0888c@donnerap.cambridge.arm.com>
+In-Reply-To: <4a68381d2251d4bdbc0a31f0210f3e0f1c3d18ce.1642457047.git.martin.b.radev@gmail.com>
+References: <cover.1642457047.git.martin.b.radev@gmail.com>
+        <4a68381d2251d4bdbc0a31f0210f3e0f1c3d18ce.1642457047.git.martin.b.radev@gmail.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 983af616-ad3d-4b92-ab6c-08d9e5931e4d
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5476:EE_
-X-Microsoft-Antispam-PRVS: <CO6PR12MB5476A36B48FD247B3BF162CFF3269@CO6PR12MB5476.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9l4o4wuDBmqAK5QPl7KUCmL6hQtVFW4mo1vNHAtTq5GYtBIB2ewYKFJHf57Nbu/06m5xGpt/eFoIzQgjAJ5TuhHEMlOSDXltfes15Nhem8NqehH9pKExyw9+TKBccQA87x9eaMss3Qp7mZaUpGd43AjpwQ9UEontQgZpo1ZPB8WW5y3igKb0VZO//80PCTMRgncMxQ9b4Pvq03EETkoCxX8FbOlf6TBlLMSdRTSLHsoJohuhhL+2RgddagQXkJQowNbWZm3eqEM8xQQ7DDYQmn6Oz+xA5IoOtlyGs8P3a17NUFF9BWaEPDtrYf0OKLcTsWOwXbRh3VCVKzTDPP4KiNcoWrcxliV+JhAThR3R0nAtVAG05DaFOwWxPmGYpP7/wsJEyI70Nc0c+5azguEVazLh/jJ19F9Wq2Mxu2QFN6A5WcKvbmaFQlzcSlMpl/6oPLIL0TyuhjMhQ6RGXy7kb0wKb/stvip5Y+lWXnchOSfsofcbcYO9JFC7P+hVf6B0XLCEyNkTtiC13v8e8d8MnktBCQ67683Y287ajCLD6K6T1K/8TwZcdSKFltgfbn0uKhDyzn6dzZpF0iGL0zRyIwA3YKeXqyjEm6Ce1cwvtDweEkkC3hhq7SSylTjsNksc+K/tWEY3c+OWyXQFhwjHuR1hbi9Ugyd18U88BytzXOFgEPjF0KwMbJfqN5PgRiTY6uh5e4Kf0Ab/P+Rg9VQSU6amWM5mhLRp9o2hypqGu90=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(508600001)(31696002)(86362001)(31686004)(8676002)(6486002)(53546011)(26005)(4326008)(36756003)(2906002)(186003)(2616005)(5660300002)(8936002)(66476007)(66556008)(7416002)(66946007)(6916009)(38100700002)(6666004)(6512007)(6506007)(316002)(43740500002)(45980500001)(20210929001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0pIcThCTVAxZy85Y2EzUkI2OElWS0ZXT01XMjR5ZWJtVXlzS05vR3BtaU5V?=
- =?utf-8?B?SDVNTGJFaHkvTEw5aTJ1ZnZVZmRsZE1ZZlZJbEl6YXl5SVVrV2hldUUwWW9P?=
- =?utf-8?B?R3RLMytjQUlwOExTYnNic0ZWUXRXZ1FTNmtueURXU1d3ZHh4SUtnMkJQTkpj?=
- =?utf-8?B?RDFKejdGeEVMb2NpWmJyNElBaDJPa3hQQm9ZWGY1NFlOWHFpOHVNdjFiT2Vx?=
- =?utf-8?B?OUNtTGdQNFJrZm9yL0pZWGZOYjZHVG9HZ3FkY21VOVFZUzRZakh5T0s4ZTVp?=
- =?utf-8?B?cEhmSDVjaGtoS096MnROWHo5WXNrVkY5czlXWHNyT3RjNmVnOXpPempXZXZP?=
- =?utf-8?B?QitVUUtPdWF1b3pGaVFzVFJ0ak9PTWF6a3g2UVBpdkFBam5WVkI4eGxjL2hZ?=
- =?utf-8?B?NWFMb3NrY01MRDBEM1NFVytsZUN4dzNhNUpqN1BRYmJSdUZFTUhaY0NYWmJn?=
- =?utf-8?B?aVhvcDBHNEJMVzVQWUFpMHlWT285MkxpVk14WGRQSXJFeHU0ejJHcHkxQ1Q4?=
- =?utf-8?B?dWdkWEcwMnU1eDIvYUk5N3FiRG1DTnJFZWN2NDZNR3R6d2ZEUDJVZHJkTVJB?=
- =?utf-8?B?S0NkS0ZjdGhGYnVVL3U1T1VMKzdEVW03Z0hvdkxwZFBHd3NXWXZ2WWFMWktw?=
- =?utf-8?B?aEp0VHF1ajRhdzMvUFVHelRYcld1UThRcys5OVE2Z25zMlJhdnA4ck1qQWw4?=
- =?utf-8?B?b245YUVpajRVYkl4c0Q2UksxNlIrK3lnciszd3VVVld4eGpMUmdFZGxKQ05o?=
- =?utf-8?B?dDFKVnFwN0dZT1lYbVMwUzBGeWxQNnZncHRYaS9sdDVQcGJpMDlHTzZvMTNj?=
- =?utf-8?B?aHpWYVlja2NKMzBSdU1kUXoxd3hmblFSRTM5RzUybm1aVkEwdGtPK3J0Q25T?=
- =?utf-8?B?K2hLbkpjQUhvUk9PdVc4dVBkdElXZ3lJcWJxekNmN2xLL1ZOeS9scmR2VXVZ?=
- =?utf-8?B?RU01eEd4Z2l2RndZZ1NlK0pkb1ZCVjlCNk9sWXQrbUFwUDhpalpMZzd6MjVN?=
- =?utf-8?B?TVBmQXlMWWV3SG1KTUtxWTdVc01sSStGRHRhNFFrOGtYR0Z6WnQydVRnZThr?=
- =?utf-8?B?OTBMNjNXcG01WTl3ZlNHUEFmUnpuZ0tkSm1YSnJrcTA5a1AyOXg5dHlWcmV1?=
- =?utf-8?B?c1g5dzZ4U0dSdWJIZVhDOExUaGRUR1JTV2NZc3UrUHRnWVBadE5GSVRqWVVz?=
- =?utf-8?B?TjA0czZOdWMxdkpjTDU2ZlBYbjN4anhyWXpmUTUvSHUyQy9TUk5FN1AzN1lN?=
- =?utf-8?B?OGpKUVlUUFZTWmYyTVdRU0lmbFdhSGdqWEc0SDNsWlJ5NEc4b2FGL2Rsdmxj?=
- =?utf-8?B?Q296Z2FNMFk4emdRSmw3WkNEaWdHYVd4cHlOSWdHdXkxRjdmcW1PYStHZGNX?=
- =?utf-8?B?TTV6eEEyckFMVGxwMzZqdm9yMmtJU3JqSkdmN3Z4Tnlkak5xV0RoeWhTb3Fq?=
- =?utf-8?B?RlFaak1wT3dKeld6UHF4b2VSTDd2S3ZtQVFxYmpreWtGYUVPWkQ4R1VaNGlw?=
- =?utf-8?B?RkJBNzg0K1NvQkY1d0hrVWd0ZEZLU0RIMFlWcHl0TU5iQWNZbGJibHlZL0Q2?=
- =?utf-8?B?emdmRUtZQTB6cHprWk5zOW5UbmkyeVFNNXVhZWdDd1RWajZKSkM5UXRwVHlp?=
- =?utf-8?B?bVNyb0RyR2F3VVlLSDdnQzFBd01zZVJ5U0VBSldwUXJDNlNVTDlyMjRWMkFG?=
- =?utf-8?B?WnNnNVVCVndkN09kUEFCOEZUeGgwWkdRNDJXRExZeGJ1TFUrL0dQcDFPdnJv?=
- =?utf-8?B?WHU0ZVd0NkVpd2N0TWtaTGxmMEVYS2YzYk5INjFYbHBWN2d4aGRMU2o4SzFa?=
- =?utf-8?B?RGFjRmJFYlZPRytyVkk5ODJkbC9xVkZVWDF3L0V5UHJaOGJ6eHlHMHpJMjdC?=
- =?utf-8?B?YTVsKzFLVlIzbDgzTzQ2b0hySGhxeW9sS1EyZHhjd0FkR1RlS1ZXSHhxS2lF?=
- =?utf-8?B?SFo2dFJGUEFHZmlmV0VhLzgrLy9UVEM2WFFrYjd1MFR6bXJFM3ZKVzhjdENa?=
- =?utf-8?B?WFllcTczd3N5SGwzaXpzc0dsVHN0SEhzZnU3dmIzMGJMcEdUUXpSZUZ2cktl?=
- =?utf-8?B?Q2kxME9nbXJVbzcrQ3BpbUVCMXJRZmE5aFBvYjhjK3NaaW5LcFB0Ty9rMjFj?=
- =?utf-8?B?azc4WW1aTm5ONjNDa2l1SlNKQm56NDU2OW1USU5HSkZVU0NOd2lvdGNTME1G?=
- =?utf-8?Q?Oboy6HR0HvC4TJzC9VL15Q8=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 983af616-ad3d-4b92-ab6c-08d9e5931e4d
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2022 14:57:08.5369
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0NHwzt/5++tnh9nWpce7FKEBVPEQyLAZGKNjNICWJLCSVMmreqivtBetCKAv1DYj1G8+ta3ryb+pm839A3nXjA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5476
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean,
+On Tue, 18 Jan 2022 00:11:59 +0200
+Martin Radev <martin.b.radev@gmail.com> wrote:
 
-On 12/31/2021 12:21 AM, Sean Christopherson wrote:
-> On Mon, Dec 13, 2021, Suravee Suthikulpanit wrote:
->> The AVIC physical APIC ID table entry contains the host physical
->> APIC ID field, which the hardware uses to keep track of where each
->> vCPU is running. Originally, the field is an 8-bit value, which can
->> only support physical APIC ID up to 255.
->>
->> To support system with larger APIC ID, the AVIC hardware extends
->> this field to support up to the largest possible physical APIC ID
->> available on the system.
->>
->> Therefore, replace the hard-coded mask value with the value
->> calculated from the maximum possible physical APIC ID in the system.
-> 
-> ...
-> 
->> +static void avic_init_host_physical_apicid_mask(void)
->> +{
->> +	if (!x2apic_mode) {
->> +		/* If host is in xAPIC mode, default to only 8-bit mask. */
->> +		avic_host_physical_id_mask = 0xffULL;
-> 
-> Use GENMASK(7:0) instead of open coding the equivalent.  Oh, and
-> avic_host_physical_id_mask doesn't need to be a u64, it's hard capped at 12 bits
-> and so can be a simple int.
-> 
+Hi Martin,
 
-Actually, shouldn't it be u16 since the value returned from kvm_cpu_get_apicid()
-would typically be 16-bit value (despite it has int as a return type).
+many thanks for sending this!
 
-Regards,
-Suravee
+In general that looks good to me, just some minor things below.
+
+> The handling of VIRTIO_PCI_O_CONFIG is prone to buffer access overflows.
+> This patch sanitizes this operation by using the newly added virtio op
+> get_config_size. Any access which goes beyond the config structure's
+> size is prevented and a failure is returned.
+> 
+> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
+> ---
+>  include/kvm/virtio-9p.h |  1 +
+>  include/kvm/virtio.h    |  1 +
+>  virtio/9p.c             | 19 ++++++++++++++++---
+>  virtio/balloon.c        |  6 ++++++
+>  virtio/blk.c            |  6 ++++++
+>  virtio/console.c        |  6 ++++++
+>  virtio/mmio.c           | 19 +++++++++++++++----
+>  virtio/net.c            |  6 ++++++
+>  virtio/pci.c            | 19 ++++++++++++++++++-
+>  virtio/rng.c            |  6 ++++++
+>  virtio/scsi.c           |  6 ++++++
+>  virtio/vsock.c          |  6 ++++++
+>  12 files changed, 93 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
+> index 3ea7698..77c5062 100644
+> --- a/include/kvm/virtio-9p.h
+> +++ b/include/kvm/virtio-9p.h
+> @@ -44,6 +44,7 @@ struct p9_dev {
+>  	struct virtio_device	vdev;
+>  	struct rb_root		fids;
+>  
+> +	size_t config_size;
+>  	struct virtio_9p_config	*config;
+>  	u32			features;
+>  
+> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+> index 3a311f5..3880e74 100644
+> --- a/include/kvm/virtio.h
+> +++ b/include/kvm/virtio.h
+> @@ -184,6 +184,7 @@ struct virtio_device {
+>  
+>  struct virtio_ops {
+>  	u8 *(*get_config)(struct kvm *kvm, void *dev);
+> +	size_t (*get_config_size)(struct kvm *kvm, void *dev);
+>  	u32 (*get_host_features)(struct kvm *kvm, void *dev);
+>  	void (*set_guest_features)(struct kvm *kvm, void *dev, u32 features);
+>  	int (*get_vq_count)(struct kvm *kvm, void *dev);
+> diff --git a/virtio/9p.c b/virtio/9p.c
+> index b78f2b3..89bec5e 100644
+> --- a/virtio/9p.c
+> +++ b/virtio/9p.c
+> @@ -1375,6 +1375,12 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(p9dev->config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	struct p9_dev *p9dev = dev;
+
+I think it's customary to have an empty line after variable declarations.
+
+> +	return p9dev->config_size;
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	return 1 << VIRTIO_9P_MOUNT_TAG;
+> @@ -1469,6 +1475,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  struct virtio_ops p9_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.init_vq		= init_vq,
+> @@ -1569,6 +1576,8 @@ int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
+>  {
+>  	struct p9_dev *p9dev;
+>  	int err = 0;
+> +	size_t tag_name_length = 0;
+> +	size_t config_size = 0;
+
+You should not need to initialise them here, as they are unconditionally
+set by the code below. Any premature use would then be spotted by the
+compiler.
+
+>  
+>  	p9dev = calloc(1, sizeof(*p9dev));
+>  	if (!p9dev)
+> @@ -1577,22 +1586,26 @@ int virtio_9p__register(struct kvm *kvm, const char *root, const char *tag_name)
+>  	if (!tag_name)
+>  		tag_name = VIRTIO_9P_DEFAULT_TAG;
+>  
+> -	p9dev->config = calloc(1, sizeof(*p9dev->config) + strlen(tag_name) + 1);
+> +	tag_name_length = strlen(tag_name);
+> +	config_size = sizeof(*p9dev->config) + tag_name_length + 1;
+> +
+> +	p9dev->config = calloc(1, config_size);
+>  	if (p9dev->config == NULL) {
+>  		err = -ENOMEM;
+>  		goto free_p9dev;
+>  	}
+> +	p9dev->config_size = config_size;
+>  
+>  	strncpy(p9dev->root_dir, root, sizeof(p9dev->root_dir));
+>  	p9dev->root_dir[sizeof(p9dev->root_dir)-1] = '\x00';
+>  
+> -	p9dev->config->tag_len = strlen(tag_name);
+> +	p9dev->config->tag_len = tag_name_length;
+>  	if (p9dev->config->tag_len > MAX_TAG_LEN) {
+>  		err = -EINVAL;
+>  		goto free_p9dev_config;
+>  	}
+>  
+> -	memcpy(&p9dev->config->tag, tag_name, strlen(tag_name));
+> +	memcpy(&p9dev->config->tag, tag_name, tag_name_length);
+>  
+>  	list_add(&p9dev->list, &devs);
+>  
+> diff --git a/virtio/balloon.c b/virtio/balloon.c
+> index 8e8803f..233a3a5 100644
+> --- a/virtio/balloon.c
+> +++ b/virtio/balloon.c
+> @@ -181,6 +181,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(&bdev->config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return sizeof(struct virtio_balloon_config);
+
+I wonder if we should return the size of the variable instead of the type,
+which is more future proof:
+        struct bln_dev *bdev = dev;
+
+        return sizeof bln_dev->config;
+
+(same for all the other occasions below)
+
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	return 1 << VIRTIO_BALLOON_F_STATS_VQ;
+> @@ -251,6 +256,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  struct virtio_ops bln_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.init_vq		= init_vq,
+> diff --git a/virtio/blk.c b/virtio/blk.c
+> index 4d02d10..9164b51 100644
+> --- a/virtio/blk.c
+> +++ b/virtio/blk.c
+> @@ -146,6 +146,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(&bdev->blk_config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return sizeof(struct virtio_blk_config);
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	struct blk_dev *bdev = dev;
+> @@ -291,6 +296,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  static struct virtio_ops blk_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.get_vq_count		= get_vq_count,
+> diff --git a/virtio/console.c b/virtio/console.c
+> index e0b98df..00bafa2 100644
+> --- a/virtio/console.c
+> +++ b/virtio/console.c
+> @@ -121,6 +121,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(&cdev->config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return sizeof(struct virtio_console_config);
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	return 0;
+> @@ -216,6 +221,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  static struct virtio_ops con_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.get_vq_count		= get_vq_count,
+> diff --git a/virtio/mmio.c b/virtio/mmio.c
+> index 875a288..32bba17 100644
+> --- a/virtio/mmio.c
+> +++ b/virtio/mmio.c
+> @@ -103,15 +103,26 @@ static void virtio_mmio_device_specific(struct kvm_cpu *vcpu,
+>  					u8 is_write, struct virtio_device *vdev)
+>  {
+>  	struct virtio_mmio *vmmio = vdev->virtio;
+> +	u8 *config_aperture = NULL;
+> +	u32 config_aperture_size = 0;
+
+Why is this a u32?
+And again, no need to initialise here, actually you can pull in the next
+two lines to initialise them properly right away.
+
+>  	u32 i;
+>  
+> +	config_aperture = vdev->ops->get_config(vmmio->kvm, vmmio->dev);
+> +	/* The cast here is safe because get_config_size will always fit in 32 bits. */
+> +	config_aperture_size = (u32)vdev->ops->get_config_size(vmmio->kvm, vmmio->dev);
+
+Why the cast in the first place? Can't you just leave the variable at
+size_t, and let the compiler deal with the promotion below?
+
+> +
+> +	/* Reduce length to no more than the config size to avoid buffer overflows. */
+> +	if (config_aperture_size < len) {
+> +		pr_warning("Length (%u) goes beyond config size (%u).\n",
+> +			len, config_aperture_size);
+
+So I appreciate the warning, but I wonder if this is too much, or should
+be rate limited, otherwise we allow the guest to flood the VMM's terminal.
+
+Is there any good practices for this problem? For kernel printk's we
+definitely don't allow this.
+
+ +		len = config_aperture_size;
+
+This should be safe in any case (even with different variable sizes), since
+you check that above. Or am I missing something?
+
+> +	}
+> +
+>  	for (i = 0; i < len; i++) {
+>  		if (is_write)
+> -			vdev->ops->get_config(vmmio->kvm, vmmio->dev)[addr + i] =
+> -					      *(u8 *)data + i;
+> +			config_aperture[addr + i] = *(u8 *)data + i;
+>  		else
+> -			data[i] = vdev->ops->get_config(vmmio->kvm,
+> -							vmmio->dev)[addr + i];
+> +			data[i] = config_aperture[addr+i];
+
+Nit:                                              addr + i
+
+>  	}
+>  }
+>  
+> diff --git a/virtio/net.c b/virtio/net.c
+> index 1ee3c19..75d9ae5 100644
+> --- a/virtio/net.c
+> +++ b/virtio/net.c
+> @@ -480,6 +480,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(&ndev->config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return sizeof(struct virtio_net_config);
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	u32 features;
+> @@ -757,6 +762,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  static struct virtio_ops net_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.get_vq_count		= get_vq_count,
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index 4108529..50fdaa4 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -136,7 +136,15 @@ static bool virtio_pci__specific_data_in(struct kvm *kvm, struct virtio_device *
+>  		return true;
+>  	} else if (type == VIRTIO_PCI_O_CONFIG) {
+>  		u8 cfg;
+> -
+> +		size_t config_size;
+> +
+> +		config_size = vdev->ops->get_config_size(kvm, vpci->dev);
+> +		if (config_offset >= config_size) {
+> +			/* Access goes beyond the config size, so return failure. */
+> +			pr_warning("Config access offset (%u) is beyond config size (%zu)\n",
+> +				config_offset, config_size);
+
+Again, do we always want to warn on the console?
+Another alternative would be to kill the guest at this point, but this is
+probably too much.
+
+Cheers,
+Andre
+
+
+> +			return false;
+> +		}
+>  		cfg = vdev->ops->get_config(kvm, vpci->dev)[config_offset];
+>  		ioport__write8(data, cfg);
+>  		return true;
+> @@ -276,6 +284,15 @@ static bool virtio_pci__specific_data_out(struct kvm *kvm, struct virtio_device
+>  
+>  		return true;
+>  	} else if (type == VIRTIO_PCI_O_CONFIG) {
+> +		size_t config_size;
+> +
+> +		config_size = vdev->ops->get_config_size(kvm, vpci->dev);
+> +		if (config_offset >= config_size) {
+> +			/* Access goes beyond the config size, so return failure. */
+> +			pr_warning("Config access offset (%u) is beyond config size (%zu)\n",
+> +				config_offset, config_size);
+> +			return false;
+> +		}
+>  		vdev->ops->get_config(kvm, vpci->dev)[config_offset] = *(u8 *)data;
+>  
+>  		return true;
+> diff --git a/virtio/rng.c b/virtio/rng.c
+> index 78eaa64..c7835a0 100644
+> --- a/virtio/rng.c
+> +++ b/virtio/rng.c
+> @@ -47,6 +47,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return 0;
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return 0;
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	/* Unused */
+> @@ -149,6 +154,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  static struct virtio_ops rng_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.init_vq		= init_vq,
+> diff --git a/virtio/scsi.c b/virtio/scsi.c
+> index 16a86cb..37418f8 100644
+> --- a/virtio/scsi.c
+> +++ b/virtio/scsi.c
+> @@ -38,6 +38,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(&sdev->config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return sizeof(struct virtio_scsi_config);
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	return	1UL << VIRTIO_RING_F_EVENT_IDX |
+> @@ -176,6 +181,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  static struct virtio_ops scsi_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.init_vq		= init_vq,
+> diff --git a/virtio/vsock.c b/virtio/vsock.c
+> index 5b99838..2df04d7 100644
+> --- a/virtio/vsock.c
+> +++ b/virtio/vsock.c
+> @@ -41,6 +41,11 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+>  	return ((u8 *)(&vdev->config));
+>  }
+>  
+> +static size_t get_config_size(struct kvm *kvm, void *dev)
+> +{
+> +	return sizeof(struct virtio_vsock_config);
+> +}
+> +
+>  static u32 get_host_features(struct kvm *kvm, void *dev)
+>  {
+>  	return 1UL << VIRTIO_RING_F_EVENT_IDX
+> @@ -204,6 +209,7 @@ static int get_vq_count(struct kvm *kvm, void *dev)
+>  
+>  static struct virtio_ops vsock_dev_virtio_ops = {
+>  	.get_config		= get_config,
+> +	.get_config_size	= get_config_size,
+>  	.get_host_features	= get_host_features,
+>  	.set_guest_features	= set_guest_features,
+>  	.init_vq		= init_vq,
+
