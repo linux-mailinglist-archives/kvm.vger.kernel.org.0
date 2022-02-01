@@ -2,87 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A50224A6472
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 20:01:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DAFF4A63C4
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:26:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242171AbiBATBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 14:01:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30991 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241471AbiBATBV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 14:01:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643742080;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=r1eAmaC6nbw5SHDAQ63+cFrjxWN6o33rHt0BCHNnB+E=;
-        b=MwY4Fuqquj2D8FjZnZCcqJo2vAcl1urqCNOAxeafzEaEjHktJhJq93w3/4TZYTUDu5G244
-        BFEjT7UpXWQ6tdNN/BCxuRXH78t68qo/1OUh6tY5rqhpgDHP84ORd4uNQN+O+a10JrFSK0
-        4to2/luq3cO1qJGoqcWhfk0iAJoUMHo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-127-pWt_tkg3PbGrP60HWOXV2g-1; Tue, 01 Feb 2022 14:01:19 -0500
-X-MC-Unique: pWt_tkg3PbGrP60HWOXV2g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82ACF84B9A5
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 19:01:18 +0000 (UTC)
-Received: from gator.home (unknown [10.40.194.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3474B5D9D5;
-        Tue,  1 Feb 2022 19:01:17 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, thuth@redhat.com
-Subject: [PATCH kvm-unit-tests] arm64: Fix compiling with ancient compiler
-Date:   Tue,  1 Feb 2022 20:01:16 +0100
-Message-Id: <20220201190116.182415-1-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        id S237152AbiBAS02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 13:26:28 -0500
+Received: from mga09.intel.com ([134.134.136.24]:60474 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236079AbiBAS01 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 13:26:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643739987; x=1675275987;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references;
+  bh=dV2iXUGHBYz0+bDQ60uKmH98uz1po4B9Da1wpjks3iM=;
+  b=H9g6s8jMnEeSNpIPHpKlt/eANydYZakhT8/CLX2JmlGCcISU3y1etcef
+   l1cQhFUJxRFnX2pRsJJxRC+0irUq4A7Ucr874dy8LukX1QEdGmTaoGz6Z
+   WuhvomZHqJFJ+eN6pgsPNaHqSQjgEnDle36xs88j5DksSLrWpkC2flqDD
+   hzZQXl1Q3NEwAEw39RifCt5YHXgurJK1mdAT9HL9zekdpLNlGdki0wc7x
+   AjP8PqMgHkxKBjei747FAHydyUme4o4p02ts/aRRAmec9qFQJ41BUdYaG
+   veQuCV/Wa34OhvmuFaUZ2ldRitXZ5Q42K65jO0nB1mmwMBdcGtg2U6dw+
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10245"; a="247527586"
+X-IronPort-AV: E=Sophos;i="5.88,334,1635231600"; 
+   d="scan'208";a="247527586"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2022 10:26:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,334,1635231600"; 
+   d="scan'208";a="565681651"
+Received: from otc-lr-04.jf.intel.com ([10.54.39.41])
+  by orsmga001.jf.intel.com with ESMTP; 01 Feb 2022 10:26:12 -0800
+From:   kan.liang@linux.intel.com
+To:     peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     ak@linux.intel.com, Wei Wang <wei.w.wang@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH 2/3] KVM: x86: use the KVM side max supported fixed counter
+Date:   Tue,  1 Feb 2022 13:23:22 -0800
+Message-Id: <1643750603-100733-2-git-send-email-kan.liang@linux.intel.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1643750603-100733-1-git-send-email-kan.liang@linux.intel.com>
+References: <1643750603-100733-1-git-send-email-kan.liang@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When compiling with an ancient compiler (gcc-4.8.5-36.el7_6.2.aarch64)
-the build fails with
+From: Wei Wang <wei.w.wang@intel.com>
 
-  lib/libcflat.a(alloc.o): In function `mult_overflow':
-  /home/drjones/kvm-unit-tests/lib/alloc.c:19: undefined reference to `__multi3'
+KVM vPMU doesn't support to emulate all the fixed counters that the
+host PMU driver has supported, e.g. the fixed counter 3 used by
+Topdown metrics hasn't been supported by KVM so far.
 
-According to kernel commit fb8722735f50 ("arm64: support __int128 on
-gcc 5+") GCC5+ will not emit __multi3 for __int128 multiplication,
-so let's just fallback to the non-__int128 overflow check when we
-use gcc versions older than 5.
+Rename MAX_FIXED_COUNTERS to KVM_PMC_MAX_FIXED to have a more
+straightforward naming convention as INTEL_PMC_MAX_FIXED used by the
+host PMU driver, and fix vPMU to use the KVM side KVM_PMC_MAX_FIXED
+for the virtual fixed counter emulation, instead of the host side
+INTEL_PMC_MAX_FIXED.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
 ---
- lib/alloc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 3 ++-
+ arch/x86/kvm/cpuid.c            | 3 ++-
+ arch/x86/kvm/pmu.h              | 2 --
+ arch/x86/kvm/vmx/pmu_intel.c    | 4 ++--
+ arch/x86/kvm/x86.c              | 2 +-
+ 5 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/lib/alloc.c b/lib/alloc.c
-index f4266f5d064e..70228aa32c6c 100644
---- a/lib/alloc.c
-+++ b/lib/alloc.c
-@@ -1,6 +1,7 @@
- #include "alloc.h"
- #include "asm/page.h"
- #include "bitops.h"
-+#include <linux/compiler.h>
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1384517..2ce8456 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -498,6 +498,7 @@ struct kvm_pmc {
+ 	bool intr;
+ };
  
- void *malloc(size_t size)
- {
-@@ -13,7 +14,7 @@ static bool mult_overflow(size_t a, size_t b)
- 	/* 32 bit system, easy case: just use u64 */
- 	return (u64)a * (u64)b >= (1ULL << 32);
- #else
--#ifdef __SIZEOF_INT128__
-+#if defined(__SIZEOF_INT128__) && (!defined(__aarch64__) || GCC_VERSION >= 50000)
- 	/* if __int128 is available use it (like the u64 case above) */
- 	unsigned __int128 res = a;
- 	res *= b;
++#define KVM_PMC_MAX_FIXED	3
+ struct kvm_pmu {
+ 	unsigned nr_arch_gp_counters;
+ 	unsigned nr_arch_fixed_counters;
+@@ -511,7 +512,7 @@ struct kvm_pmu {
+ 	u64 reserved_bits;
+ 	u8 version;
+ 	struct kvm_pmc gp_counters[INTEL_PMC_MAX_GENERIC];
+-	struct kvm_pmc fixed_counters[INTEL_PMC_MAX_FIXED];
++	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
+ 	struct irq_work irq_work;
+ 	DECLARE_BITMAP(reprogram_pmi, X86_PMC_IDX_MAX);
+ 	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 3902c28..28205ce 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -856,7 +856,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		eax.split.bit_width = cap.bit_width_gp;
+ 		eax.split.mask_length = cap.events_mask_len;
+ 
+-		edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
++		edx.split.num_counters_fixed =
++			min(cap.num_counters_fixed, KVM_PMC_MAX_FIXED);
+ 		edx.split.bit_width_fixed = cap.bit_width_fixed;
+ 		if (cap.version)
+ 			edx.split.anythread_deprecated = 1;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 7a7b8d5..9e66fba 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -15,8 +15,6 @@
+ #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
+ #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
+ 
+-#define MAX_FIXED_COUNTERS	3
+-
+ struct kvm_event_hw_type_mapping {
+ 	u8 eventsel;
+ 	u8 unit_mask;
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 466d18f..9b26596 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -565,7 +565,7 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
+ 		pmu->gp_counters[i].current_config = 0;
+ 	}
+ 
+-	for (i = 0; i < INTEL_PMC_MAX_FIXED; i++) {
++	for (i = 0; i < KVM_PMC_MAX_FIXED; i++) {
+ 		pmu->fixed_counters[i].type = KVM_PMC_FIXED;
+ 		pmu->fixed_counters[i].vcpu = vcpu;
+ 		pmu->fixed_counters[i].idx = i + INTEL_PMC_IDX_FIXED;
+@@ -591,7 +591,7 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+ 		pmc->counter = pmc->eventsel = 0;
+ 	}
+ 
+-	for (i = 0; i < INTEL_PMC_MAX_FIXED; i++) {
++	for (i = 0; i < KVM_PMC_MAX_FIXED; i++) {
+ 		pmc = &pmu->fixed_counters[i];
+ 
+ 		pmc_stop_counter(pmc);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9e43d75..b541a13 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6452,7 +6452,7 @@ static void kvm_init_msr_list(void)
+ 	u32 dummy[2];
+ 	unsigned i;
+ 
+-	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
++	BUILD_BUG_ON_MSG(KVM_PMC_MAX_FIXED != 3,
+ 			 "Please update the fixed PMCs in msrs_to_saved_all[]");
+ 
+ 	perf_get_x86_pmu_capability(&x86_pmu);
 -- 
-2.34.1
+2.7.4
 
