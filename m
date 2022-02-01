@@ -2,140 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA3264A6588
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 21:17:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DCB94A658C
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 21:17:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239130AbiBAURI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 15:17:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50154 "EHLO
+        id S239453AbiBAURR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 15:17:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239059AbiBAURH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 15:17:07 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12241C06173B
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 12:17:06 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id q127so25793316ljq.2
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 12:17:06 -0800 (PST)
+        with ESMTP id S239341AbiBAURQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 15:17:16 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9E9C06173D
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 12:17:15 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id j14so25793058lja.3
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 12:17:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=f3bcsAklugUA8X5S8eqHouC9oaHAaVuRIrrTe+rJW24=;
-        b=Kyj6Bc9QCO+JV2e2BYCdvw63ME+XVX7mD1L0xBJ/nJR7GpK9LZTXleDRaKPB68Hxqf
-         NF3WNVeqUx6R8F54VtcOKlozz9fWtsQTPFA/AD1Pn0jyl7Lj1dKaXDHiOb1YWkjeoGoJ
-         MtGMRnHvg7Z5dGCMlqb/pWt0QVDxwvRARjEk0xuXalkpvBZpFsZDM3SWTGZT17z6jwOS
-         lh3I5vIbaqNcWcZoxrH1NQILkUplY21IAs+EM9cLeg2p5s25+9obBeljDVfK+Hws4w3J
-         hK5/clJiK6Qu5YhvtVndyA1SEURtS0GIwvwz9ztDT22zdvvM/9IxjtIRXHGgvTG8fflo
-         UsOA==
+        bh=c1G+U9mCR+9y3z9D1TzfeiUfdMNDGnmglMpEe2+/2LE=;
+        b=VpWU+oS1r5knoJXzOyILe4moOYE+R2uHT5zRZ2Jk6DhbUyjF27qJ3+INmDQ6fgW21h
+         Tbks8twIhWx83GEmJz8SvyDl28seEQXqJqh3NV9g5rTHkqsOws4rhC3I/N/p7qcc254t
+         dO5dfpzfe+UZ1qwnCXB5UZJSurEkkiBYs4s3D9Zas6b0x9z+x5I85DrD9l2VaSp+bKq7
+         SMWCvA1VLe6N2jnWSR72sRQz1JDnI/ile1y5D0ika7OBCB6qjHvaKnf83FjnjAl6pUlX
+         yedLGvX4pfjFeVB5yjbxiMrAQ/0ETQPPiMCTCVHV0Dt1fljCfrW3KHBEl8XoGKzF8eOV
+         yQiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=f3bcsAklugUA8X5S8eqHouC9oaHAaVuRIrrTe+rJW24=;
-        b=Pbq31KvEfQbr+6XyKEds9qP3bGiINGTusZXOJUpkt3PIjvftqwofxDAOeukZaOrHdA
-         bHYv6dFO5ZFj6T5PcyTyJz4+xARUAvRIbw49fNnq4qcqNxANc70ZUHjv3/mK/Q+jYxAK
-         6VeOZjfdPtV2z7LdIwc5dPCMEan33vktJs5s/XmhYDOk5W1sZg8V047v03NQb28LTEmQ
-         KfGIFGk0onbc+TCvyEgZBsij/ShQ211JNy8XS4FEECU4YSBPSkfuTlfIGa+Xk2G5OJ5K
-         6j4IhMTDTYPR34LM+gyhpoyWu4T9tRmWlKFz9Cj3qW52+E66dV0H9DHAdTm6zGaLvVdh
-         Q94w==
-X-Gm-Message-State: AOAM532tlLpvLEozHC6ooHf69QHAe55EwP+KE6Mf1sZkNJkVyTLetFPM
-        GnG2b93X21Bkf1TQ8clXv2NekXVj63lmY3JrzYVy5Q==
-X-Google-Smtp-Source: ABdhPJyjkIdvcR7h9sTh/jFdfLCfqLgmMdmefPijoRUk1ZPBatDBaznmuG2+rrSk2e+yl8Dtm+jGInhyLkuUyY9YRjA=
-X-Received: by 2002:a2e:954:: with SMTP id 81mr8682225ljj.198.1643746624322;
- Tue, 01 Feb 2022 12:17:04 -0800 (PST)
+        bh=c1G+U9mCR+9y3z9D1TzfeiUfdMNDGnmglMpEe2+/2LE=;
+        b=rUZRI394HpQbHi50c3VH7CABuK8koVlzX/AhZ4c+SAHJsGi/NKTMynQelUoawvq6w9
+         06EWCeFwIyNsaTzwQzUZ9NzRXkHBndTYg8G1jA42HmoMPzu2IOEqnLUtU6vg+q68j5TY
+         8H5ZWHAFbzMI4BwAPDvUkPPsP4jx+zcYUKMiy4Of/ugh5QGouPsOXiHxrRMY2jQUP91x
+         Ee8tDvwowAMNs7REfToySHeJTqbhBxO/VyeAOAT+tiY/LKP/IA4pzErjWYdmQurrMtCL
+         L4xzjECrJYhnjzHp70KP0fVJHU7w+D5utDxeJzU3yfkWy3tvubuc1Pd/Q9gIOYJKkktk
+         NkCA==
+X-Gm-Message-State: AOAM531LKe9Nd5wKDuny/9Ufac+MGFti7HQCyehuuxmOsrVUFSVtK4Qz
+        aHdzTOPSk3f9Tfn+XpCjhbUU1SQB+c8EXj5sSP7rSw==
+X-Google-Smtp-Source: ABdhPJw/gG064uPw6B2Edvi7SJHms7j1vwY6jMCGatl6ahEztehk1/Zegz8WhJ1BfcdyuJ3eUs0emystXh2QL2v0bB8=
+X-Received: by 2002:a2e:a781:: with SMTP id c1mr16364597ljf.527.1643746633936;
+ Tue, 01 Feb 2022 12:17:13 -0800 (PST)
 MIME-Version: 1.0
-References: <20220201010838.1494405-1-seanjc@google.com> <20220201010838.1494405-2-seanjc@google.com>
-In-Reply-To: <20220201010838.1494405-2-seanjc@google.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 1 Feb 2022 12:16:52 -0800
-Message-ID: <CAKwvOd=9nwR7z7wn50SU=mf5AywFLd95ZMH-EbYdHfbeHVvq1A@mail.gmail.com>
-Subject: Re: [PATCH 1/5] Kconfig: Add option for asm goto w/ tied outputs to
- workaround clang-13 bug
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
+References: <20220128171804.569796-1-brijesh.singh@amd.com> <20220128171804.569796-40-brijesh.singh@amd.com>
+In-Reply-To: <20220128171804.569796-40-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 1 Feb 2022 13:17:02 -0700
+Message-ID: <CAMkAt6oycVLNwMbe=QD_x_jGVFmkNK+OSKqd9GhcMjD3Qo3ZJg@mail.gmail.com>
+Subject: Re: [PATCH v9 39/43] x86/sev: Provide support for SNP guest request NAEs
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, Tony Luck <tony.luck@intel.com>,
+        Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 31, 2022 at 5:08 PM Sean Christopherson <seanjc@google.com> wrote:
+On Fri, Jan 28, 2022 at 10:19 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
 >
-> Add a config option to guard (future) usage of asm_volatile_goto() that
-> includes "tied outputs", i.e. "+" constraints that specify both an input
-> and output parameter.  clang-13 has a bug[1] that causes compilation of
-> such inline asm to fail, and KVM wants to use a "+m" constraint to
-> implement a uaccess form of CMPXCHG[2].  E.g. the test code fails with
+> Version 2 of GHCB specification provides SNP_GUEST_REQUEST and
+> SNP_EXT_GUEST_REQUEST NAE that can be used by the SNP guest to communicate
+> with the PSP.
 >
->   <stdin>:1:29: error: invalid operand in inline asm: '.long (${1:l}) - .'
->   int foo(int *x) { asm goto (".long (%l[bar]) - .\n": "+m"(*x) ::: bar); return *x; bar: return 0; }
->                             ^
->   <stdin>:1:29: error: unknown token in expression
->   <inline asm>:1:9: note: instantiated into assembly here
->           .long () - .
->                  ^
->   2 errors generated.
+> While at it, add a snp_issue_guest_request() helper that will be used by
+> driver or other subsystem to issue the request to PSP.
 >
-> on clang-13, but passes on gcc (with appropriate asm goto support).  The
-> bug is fixed in clang-14, but won't be backported to clang-13 as the
-> changes are too invasive/risky.
-
-LGTM.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-
-If you're going to respin the series, consider adding a comment in the
-source along the lines of:
-```
-clang-14 and gcc-11 fixed this.
-```
-or w/e. This helps us find (via grep) and remove cruft when the
-minimum supported compiler versions are updated.
-
-Note: gcc-10 had a bug with the symbolic references to labels when
-using tied constraints.
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98096
-
-Both compilers had bugs here, and it may be worth mentioning that in
-the commit message.
-
+> See SEV-SNP firmware and GHCB spec for more details.
 >
-> [1] https://github.com/ClangBuiltLinux/linux/issues/1512
-> [2] https://lore.kernel.org/all/YfMruK8%2F1izZ2VHS@google.com
->
-> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  init/Kconfig | 4 ++++
->  1 file changed, 4 insertions(+)
+>  arch/x86/include/asm/sev-common.h |  3 ++
+>  arch/x86/include/asm/sev.h        | 14 ++++++++
+>  arch/x86/include/uapi/asm/svm.h   |  4 +++
+>  arch/x86/kernel/sev.c             | 55 +++++++++++++++++++++++++++++++
+>  4 files changed, 76 insertions(+)
 >
-> diff --git a/init/Kconfig b/init/Kconfig
-> index e9119bf54b1f..a206b21703be 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -77,6 +77,10 @@ config CC_HAS_ASM_GOTO_OUTPUT
->         depends on CC_HAS_ASM_GOTO
->         def_bool $(success,echo 'int foo(int x) { asm goto ("": "=r"(x) ::: bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index cd769984e929..442614879dad 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -128,6 +128,9 @@ struct snp_psc_desc {
+>         struct psc_entry entries[VMGEXIT_PSC_MAX_ENTRY];
+>  } __packed;
 >
-> +config CC_HAS_ASM_GOTO_TIED_OUTPUT
-> +       depends on CC_HAS_ASM_GOTO_OUTPUT
-> +       def_bool $(success,echo 'int foo(int *x) { asm goto (".long (%l[bar]) - .\n": "+m"(*x) ::: bar); return *x; bar: return 0; }' | $CC -x c - -c -o /dev/null)
+> +/* Guest message request error code */
+> +#define SNP_GUEST_REQ_INVALID_LEN      BIT_ULL(32)
 > +
->  config TOOLS_SUPPORT_RELR
->         def_bool $(success,env "CC=$(CC)" "LD=$(LD)" "NM=$(NM)" "OBJCOPY=$(OBJCOPY)" $(srctree)/scripts/tools-support-relr.sh)
+>  #define GHCB_MSR_TERM_REQ              0x100
+>  #define GHCB_MSR_TERM_REASON_SET_POS   12
+>  #define GHCB_MSR_TERM_REASON_SET_MASK  0xf
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 219abb4590f2..9830ee1d6ef0 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -87,6 +87,14 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
 >
+>  #define RMPADJUST_VMSA_PAGE_BIT                BIT(16)
+>
+> +/* SNP Guest message request */
+> +struct snp_req_data {
+> +       unsigned long req_gpa;
+> +       unsigned long resp_gpa;
+> +       unsigned long data_gpa;
+> +       unsigned int data_npages;
+> +};
+> +
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  extern struct static_key_false sev_es_enable_key;
+>  extern void __sev_es_ist_enter(struct pt_regs *regs);
+> @@ -154,6 +162,7 @@ void snp_set_memory_private(unsigned long vaddr, unsigned int npages);
+>  void snp_set_wakeup_secondary_cpu(void);
+>  bool snp_init(struct boot_params *bp);
+>  void snp_abort(void);
+> +int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
+>  #else
+>  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+>  static inline void sev_es_ist_exit(void) { }
+> @@ -173,6 +182,11 @@ static inline void snp_set_memory_private(unsigned long vaddr, unsigned int npag
+>  static inline void snp_set_wakeup_secondary_cpu(void) { }
+>  static inline bool snp_init(struct boot_params *bp) { return false; }
+>  static inline void snp_abort(void) { }
+> +static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input,
+> +                                         unsigned long *fw_err)
+> +{
+> +       return -ENOTTY;
+> +}
+>  #endif
+>
+>  #endif
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+> index 8b4c57baec52..5b8bc2b65a5e 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -109,6 +109,8 @@
+>  #define SVM_VMGEXIT_SET_AP_JUMP_TABLE          0
+>  #define SVM_VMGEXIT_GET_AP_JUMP_TABLE          1
+>  #define SVM_VMGEXIT_PSC                                0x80000010
+> +#define SVM_VMGEXIT_GUEST_REQUEST              0x80000011
+> +#define SVM_VMGEXIT_EXT_GUEST_REQUEST          0x80000012
+>  #define SVM_VMGEXIT_AP_CREATION                        0x80000013
+>  #define SVM_VMGEXIT_AP_CREATE_ON_INIT          0
+>  #define SVM_VMGEXIT_AP_CREATE                  1
+> @@ -225,6 +227,8 @@
+>         { SVM_VMGEXIT_AP_HLT_LOOP,      "vmgexit_ap_hlt_loop" }, \
+>         { SVM_VMGEXIT_AP_JUMP_TABLE,    "vmgexit_ap_jump_table" }, \
+>         { SVM_VMGEXIT_PSC,      "vmgexit_page_state_change" }, \
+> +       { SVM_VMGEXIT_GUEST_REQUEST,            "vmgexit_guest_request" }, \
+> +       { SVM_VMGEXIT_EXT_GUEST_REQUEST,        "vmgexit_ext_guest_request" }, \
+>         { SVM_VMGEXIT_AP_CREATION,      "vmgexit_ap_creation" }, \
+>         { SVM_VMGEXIT_HV_FEATURES,      "vmgexit_hypervisor_feature" }, \
+>         { SVM_EXIT_ERR,         "invalid_guest_state" }
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index cb97200bfda7..1d3ac83226fc 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2122,3 +2122,58 @@ static int __init snp_check_cpuid_table(void)
+>  }
+>
+>  arch_initcall(snp_check_cpuid_table);
+> +
+> +int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err)
+> +{
+> +       struct ghcb_state state;
+> +       struct es_em_ctxt ctxt;
+> +       unsigned long flags;
+> +       struct ghcb *ghcb;
+> +       int ret;
+> +
+> +       if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+> +               return -ENODEV;
+> +
+> +       /*
+> +        * __sev_get_ghcb() needs to run with IRQs disabled because it is using
+> +        * a per-CPU GHCB.
+> +        */
+> +       local_irq_save(flags);
+> +
+> +       ghcb = __sev_get_ghcb(&state);
+> +       if (!ghcb) {
+> +               ret = -EIO;
+> +               goto e_restore_irq;
+> +       }
+> +
+> +       vc_ghcb_invalidate(ghcb);
+> +
+> +       if (exit_code == SVM_VMGEXIT_EXT_GUEST_REQUEST) {
+> +               ghcb_set_rax(ghcb, input->data_gpa);
+> +               ghcb_set_rbx(ghcb, input->data_npages);
+> +       }
+> +
+> +       ret = sev_es_ghcb_hv_call(ghcb, true, &ctxt, exit_code, input->req_gpa, input->resp_gpa);
+> +       if (ret)
+> +               goto e_put;
+> +
+> +       if (ghcb->save.sw_exit_info_2) {
+> +               /* Number of expected pages are returned in RBX */
+> +               if (exit_code == SVM_VMGEXIT_EXT_GUEST_REQUEST &&
+> +                   ghcb->save.sw_exit_info_2 == SNP_GUEST_REQ_INVALID_LEN)
+> +                       input->data_npages = ghcb_get_rbx(ghcb);
+> +
+> +               if (fw_err)
+> +                       *fw_err = ghcb->save.sw_exit_info_2;
+
+In the PSP driver we've had a bit of discussion around the fw_err and
+the return code and that it would be preferable to have fw_err be a
+required parameter. And then we can easily make sure fw_err is always
+non-zero when the return code is non-zero. Thoughts about doing the
+same inside the guest?
+
+
+> +
+> +               ret = -EIO;
+> +       }
+> +
+> +e_put:
+> +       __sev_put_ghcb(&state);
+> +e_restore_irq:
+> +       local_irq_restore(flags);
+> +
+> +       return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_issue_guest_request);
 > --
-> 2.35.0.rc2.247.g8bbb082509-goog
+> 2.25.1
 >
-
-
--- 
-Thanks,
-~Nick Desaulniers
