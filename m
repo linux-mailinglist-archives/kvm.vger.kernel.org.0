@@ -2,82 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8980A4A60C3
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 16:53:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D28ED4A60E4
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 17:01:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240704AbiBAPxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 10:53:24 -0500
-Received: from foss.arm.com ([217.140.110.172]:48424 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237890AbiBAPxX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 10:53:23 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB077113E;
-        Tue,  1 Feb 2022 07:53:22 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DFEBC3F40C;
-        Tue,  1 Feb 2022 07:53:21 -0800 (PST)
-Date:   Tue, 1 Feb 2022 15:52:51 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Martin Radev <martin.b.radev@gmail.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [PATCH kvmtool 5/5] mmio: Sanitize addr and len
-Message-ID: <20220201155251.78749967@donnerap.cambridge.arm.com>
-In-Reply-To: <429afc3bf48379e3e981c3e63325cb83f8991e20.1642457047.git.martin.b.radev@gmail.com>
-References: <cover.1642457047.git.martin.b.radev@gmail.com>
-        <429afc3bf48379e3e981c3e63325cb83f8991e20.1642457047.git.martin.b.radev@gmail.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S240754AbiBAQBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 11:01:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:46439 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240757AbiBAQA7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 11:00:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643731259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9TOgZSvYLjnxXgPMR3aA+UnxenzdhiCu/Ec4ih921w8=;
+        b=BSmVh5+dDwgsRNDEWCtOEeHo6eIhcqUU3ULmfGd8XAN74cuc+y3vN2/HpiTRBSXh0LfdnT
+        3m+PsddiJbZSBbtSZwvywlw4JxaxPtOLz27lCRvaDZpOmkItJwbYmukX4jE7C9Az3ucCFE
+        PS/NEEEog/G7jImOLxKt3qmDsHefOk0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-507-8PiLKiyBOXaYYm3iKu63ZA-1; Tue, 01 Feb 2022 11:00:58 -0500
+X-MC-Unique: 8PiLKiyBOXaYYm3iKu63ZA-1
+Received: by mail-ed1-f71.google.com with SMTP id i22-20020a0564020f1600b00407b56326a2so8936572eda.18
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 08:00:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9TOgZSvYLjnxXgPMR3aA+UnxenzdhiCu/Ec4ih921w8=;
+        b=L4FhE/gvkvPTzbEb4hWzs+MBE9UWMytyLVJ1wmQqUhN9s9hEMAN0QrZWTqtGxaETEY
+         A5Px+byn7eRy8Lc/vsBIvobCKR11kWtR6toW2qyhYkcHRmFrN2Nr6de6ICX5L4bP10b4
+         cqjH92Q0KRBtEwvzdDGfWtcAr67OLdRXUHL8Bu3CCeFcDy6dcIOSgMx/yPRHYtEaZUbB
+         43bSvMBkEifJw8u3gRcaqzqphtQMnCYOSVhkZ9jX6na9m8d/BnHvCpXj44aLRmqhRuIQ
+         m0jMln+2cNEKruF52334A9o4aZKxqaEu5owiNIDLCY2LEGfH8xE2ryPm8DGqCWIl7qaN
+         niqQ==
+X-Gm-Message-State: AOAM532onBQEj9g8ZE+/4wkdR6ACt+qyq263Wdxr+8RvRieqnQVZHTdq
+        4OSJeHHGlxdiRQi5UGyF0RZwc4lQEUa+lbVjeRRJrdW+jzeZ8ukAoeJUJfVCLmikAo6SI04KzbB
+        fAutFwkcQ7rfA
+X-Received: by 2002:a17:907:72d6:: with SMTP id du22mr21767226ejc.179.1643731257016;
+        Tue, 01 Feb 2022 08:00:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyi6gqf6sTZV2adqJ/EwU8K0kh4yabr0HjJDqz0uGv4IXAxFUKBb//nn4tH0Br/W6v0yRG1zw==
+X-Received: by 2002:a17:907:72d6:: with SMTP id du22mr21767209ejc.179.1643731256826;
+        Tue, 01 Feb 2022 08:00:56 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id gh33sm14883510ejc.17.2022.02.01.08.00.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Feb 2022 08:00:56 -0800 (PST)
+Message-ID: <f8359e15-412a-03d6-1b0c-a9f253816497@redhat.com>
+Date:   Tue, 1 Feb 2022 17:00:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH V5 21/21] KVM: compat: riscv: Prevent KVM_COMPAT from
+ being selected
+Content-Language: en-US
+To:     Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        liush <liush@allwinnertech.com>, Wei Fu <wefu@redhat.com>,
+        Drew Fustini <drew@beagleboard.org>,
+        Wang Junqiang <wangjunqiang@iscas.ac.cn>,
+        Christoph Hellwig <hch@lst.de>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        linux-csky@vger.kernel.org, linux-s390@vger.kernel.org,
+        sparclinux@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-parisc@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        x86@kernel.org, Guo Ren <guoren@linux.alibaba.com>,
+        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>
+References: <20220201150545.1512822-1-guoren@kernel.org>
+ <20220201150545.1512822-22-guoren@kernel.org>
+ <CAAhSdy27nVvh9F08kPgffJe-Y-gOOc9cnQtCLFAE0GbDhHVbiQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAAhSdy27nVvh9F08kPgffJe-Y-gOOc9cnQtCLFAE0GbDhHVbiQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Jan 2022 00:12:03 +0200
-Martin Radev <martin.b.radev@gmail.com> wrote:
-
-> This patch verifies that adding the addr and length arguments
-> from an MMIO op do not overflow. This is necessary because the
-> arguments are controlled by the VM. The length may be set to
-> an arbitrary value by using the rep prefix.
-
-Mmh, interesting, so does the kernel collate this into one
-"giant" KVM_EXIT_MMIO with an arbitrary length? I wonder if there are
-assumptions in the MMIO code of len never being bigger than say 16. On
-ARM/ARM64 we probably never see len being bigger than 8 on those exits.
-
-But the check is certainly fine anyway...
-
-> Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Thanks,
-Andre
-
-> ---
->  mmio.c | 4 ++++
->  1 file changed, 4 insertions(+)
+On 2/1/22 16:44, Anup Patel wrote:
+> +Paolo
 > 
-> diff --git a/mmio.c b/mmio.c
-> index a6dd3aa..04d2af6 100644
-> --- a/mmio.c
-> +++ b/mmio.c
-> @@ -32,6 +32,10 @@ static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
->  {
->  	struct rb_int_node *node;
->  
-> +	/* If len is zero or if there's an overflow, the MMIO op is invalid. */
-> +	if (len + addr <= addr)
-> +		return NULL;
-> +
->  	node = rb_int_search_range(root, addr, addr + len);
->  	if (node == NULL)
->  		return NULL;
+> On Tue, Feb 1, 2022 at 8:38 PM <guoren@kernel.org> wrote:
+>>
+>> From: Guo Ren <guoren@linux.alibaba.com>
+>>
+>> Current riscv doesn't support the 32bit KVM API. Let's make it
+>> clear by not selecting KVM_COMPAT.
+>>
+>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+>> Signed-off-by: Guo Ren <guoren@kernel.org>
+>> Cc: Arnd Bergmann <arnd@arndb.de>
+>> Cc: Anup Patel <anup@brainfault.org>
+> 
+> This looks good to me.
+> 
+> Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Hi Anup,
+
+feel free to send this via a pull request (perhaps together with Mark 
+Rutland's entry/exit rework).
+
+Paolo
 
