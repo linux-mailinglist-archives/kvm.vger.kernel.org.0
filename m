@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 214C44A5E0B
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:14:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2C204A5E0E
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:14:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239125AbiBAOOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 09:14:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49926 "EHLO
+        id S239128AbiBAOO6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 09:14:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239062AbiBAOOj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 09:14:39 -0500
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A377BC061714
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 06:14:39 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id b15-20020a4a878f000000b002dccc412166so4155602ooi.11
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 06:14:39 -0800 (PST)
+        with ESMTP id S239129AbiBAOO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 09:14:57 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C014CC06173E
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 06:14:57 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id e81so33498195oia.6
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 06:14:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=0Mv4cSUeeZweAnsTUqHW1wUxBTbYbtVcIHd+m/V5bGY=;
-        b=fCCNxq817wuHQ5Hn6FTacPjcK+/v53kFh+ve+RyVcCTl2IImJNlBc4v9ZWuz7GHzBG
-         hZXiRsmVBAn83cRk3DvYCZw0iixXJ/SjeLeIKfD6ReQEE4rQAfzSYUks1JwL6RDNCS0B
-         tTrU4+GdmPOQ9b50/Tor9wI+iPKsH9NqYJtnJkG/eO0gNrHOiy6MuNiqTHPbakMZ7nDC
-         sYYAguuq7dKuQ+sPHxbM3CMdhDYcUkJ/O6l8MzkPxf6ZGCrkwHwUyqBMXumAKXrglZmB
-         bBHTacSaxw4YmH30TKTHRbgz8ucxl+vvk4YeWwmdH3leORh2dRhMJxwd831YzwjtPPGD
-         8MfA==
+        bh=6bOJYv1YXi57aXsNUO4DshkJvwNgZBMSvRbTKgSo7IM=;
+        b=AWQE60HZuXRdf3uBXurgIDDbIMW/+IJJ25UY1gTmKDmw1WRzhEaf2iJfYhqZVs7/oI
+         xkKLM9palj/+QbBbNhpvjIYROJDcGqerVuNAub/Kn4Z0zAa1cFcB2m/YcqKM0fG/P2f1
+         Gie4zgekiYmfVvh/p0zxjmcUFtTk+SOrLOAKzRQ5g/gbz8gmqXr152WzTBgSHfVFH5PE
+         mkmWGE3LF5kAXIYxKgggPCAoFJvYVaa9DKKEV58MdttyymffgCGu5jkT6y1LGKoTzN4A
+         7t2k6zl4sc7JZncOe0WuWVT7JwKUfQHYnDms6xTATvu/dGWd7vJIVNsPhBaCJlFvdbsr
+         C9vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=0Mv4cSUeeZweAnsTUqHW1wUxBTbYbtVcIHd+m/V5bGY=;
-        b=NO2EsVC4waJF9RRUtOQPlECXh76zlhFzEKXBkP0AebngO1z/+cS/SIr2Rw5Ucji3HA
-         l6YoY19bQ2bVjRrUxvzS0wm9Gkil2Exxr7BfmJ0yZGNCfklnYEWaNXpIzFpZ1mL15Bk/
-         emy5AhvLvG3+GDciTUMEf8ySeCWpl6SoCX7MqEzOrMYk9CBD30hMhZQJmReEM3eigj+U
-         cPtzOpV2PWv/W6Aeq+av/QjkKzk+3qcXiBFWYy+WPCuNxhg/YaX/ckxvfHWYoH3zzaNM
-         4xjsSjCyfpZ9frDBAn7X7ukWLdVAiLViEF/J0Dj00FGyBsk5SlO2MIkGMEl/Jo5WG6FO
-         XcjQ==
-X-Gm-Message-State: AOAM530wPGobGOVJHfJs0dhpyQ2MjQuaGS1dhZBucyDovDuoX7dIOZkt
-        zUFLbWFbhlzdND0/t0X7rJNVmFNVrPeMSRzyqIyPbQ==
-X-Google-Smtp-Source: ABdhPJxgxV32gOPH0Pj3ssxlVkD9gYwHxKl1vEQqOy/sFPwMIt/lSCEnnpsJKSJLfZZnQKuvk0/voIHWnwUup9EJpU0=
-X-Received: by 2002:a4a:a3c1:: with SMTP id t1mr8840770ool.31.1643724878826;
- Tue, 01 Feb 2022 06:14:38 -0800 (PST)
+        bh=6bOJYv1YXi57aXsNUO4DshkJvwNgZBMSvRbTKgSo7IM=;
+        b=EB7UyquDIDp/AtU9Rc8akVd23i6qyUz8kBKG5kQM5t6i/XTE9ZAeeEQdAV5Od7wqAl
+         OninFo9DqqdM2MS10cz8EH1XEGdVPGDaZaK1K0noaRV6CkKLlHSPrNJYdD70ly+fn2HS
+         jN82cFaJVaLJWmuoQY0usgr7LC/l0QP2Hv2nIUXVgp9D/VrrEuOToEYX/8AAk0B2/p+i
+         +TWBI770Sxd8eYu48k6KvMz0nwFNO/glwL2DJl5q2zXWSrdTaQXQARLLel+2BqAlhSj3
+         BMXBEFAmU33Hu/kHRFsiVmeGjYE0x/cJfRKXqIYGVjQuGs5VDCcntXqu8WFSsjCKoXY2
+         Av8g==
+X-Gm-Message-State: AOAM531ZLA1StEGAUfq5pdeYMgrRXELVbyoBPlddduPFzHiL9jc4lFdx
+        GjYXVm0hhPYa6A72TeGuOIZEXySmTqcSNgkxKe8bcw==
+X-Google-Smtp-Source: ABdhPJztijkLEYC0AMBbPf31NVpfBd3j1Dug7ndhyOGAhyIwbOmUQBb7IRhv9Rqqoj8sG1Fm2nt0s7rfxiTUrTZyh3I=
+X-Received: by 2002:a05:6808:230f:: with SMTP id bn15mr1264184oib.91.1643724896991;
+ Tue, 01 Feb 2022 06:14:56 -0800 (PST)
 MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-5-reijiw@google.com>
- <CA+EHjTxCWe2pFNhq+9gRUJ0RnjX4OcuV2WazDbProUaJE2ZTBg@mail.gmail.com> <CAAeT=FzBC+1P3jNuLvF_tLwy-aQehPyJXJ3dmAsijB8=ky-ZKA@mail.gmail.com>
-In-Reply-To: <CAAeT=FzBC+1P3jNuLvF_tLwy-aQehPyJXJ3dmAsijB8=ky-ZKA@mail.gmail.com>
+References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-21-reijiw@google.com>
+ <CA+EHjTy4L37G89orJ+cPTTZdFUehxNSMy0Pd36PW41JKVB0ohA@mail.gmail.com> <CAAeT=Fx1pM66cQaefkBTAJ7-Y0nzjmABJrp5DiNm4_47hdEyrg@mail.gmail.com>
+In-Reply-To: <CAAeT=Fx1pM66cQaefkBTAJ7-Y0nzjmABJrp5DiNm4_47hdEyrg@mail.gmail.com>
 From:   Fuad Tabba <tabba@google.com>
-Date:   Tue, 1 Feb 2022 14:14:02 +0000
-Message-ID: <CA+EHjTzK_We_vwu6QbR3N4J5wJqF00fKm6rf6X8RA_4Mjg=VXw@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 04/26] KVM: arm64: Make ID_AA64PFR0_EL1 writable
+Date:   Tue, 1 Feb 2022 14:14:21 +0000
+Message-ID: <CA+EHjTx=ztc-RnuazbUcR-JsKocyie+FtrukvzUP=SZ-y9WPuw@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 20/26] KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -66,32 +66,23 @@ Hi Reiji,
 
 ...
 
-> > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > > index 0a06d0648970..28d9bf0e178c 100644
-> > > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > > @@ -116,6 +116,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
-> > >         else
-> > >                 INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
-> > >
-> > > +       if (type == KVM_DEV_TYPE_ARM_VGIC_V3)
-> > > +               /* Set ID_AA64PFR0_EL1.GIC to 1 */
-> > > +               (void)kvm_set_id_reg_feature(kvm, SYS_ID_AA64PFR0_EL1,
-> > > +                                    ID_AA64PFR0_GIC3, ID_AA64PFR0_GIC_SHIFT);
-> > > +
+> > > +static void feature_amu_trap_activate(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TAM, 0);
 > >
-> > If this fails wouldn't it be better to return the error?
+> > Covers the CPTR flags for AMU, but as you mentioned, does not
+> > explicitly clear HCR_AMVOFFEN.
 >
-> This should never fail because kvm_vgic_create() prevents
-> userspace from running the first KVM_RUN for any vCPUs
-> while it calls kvm_set_id_reg_feature().
-> So, I am thinking of adding WARN_ON_ONCE() for the return value
-> rather than adding an unnecessary error handling.
+> In my understanding, clearing HCR_EL2.AMVOFFEN is not necessary as
+> CPTR_EL2.TAM == 1 traps the guest's accessing AMEVCNTR0<n>_EL0 and
+> AMEVCNTR1<n>_EL0 anyway (HCR_EL2.AMVOFFEN doesn't matter).
+> (Or is my understanding wrong ??)
 
-Consider this to be a nit from my part, as I don't have any strong
-feelings about this, but kvm_vgic_create() already returns an error if
-there's a problem. So I don't think that that would be imposing any
-additional error handling.
+You're right. However, I think they should be cleared first for
+completeness. Also, if I understand correctly, AMVOFFEN is about
+enabling and disabling virtualization of the registers, making
+indirect reads of the virtual offset registers as zero, so it's not
+just about trapping.
 
 Thanks,
 /fuad
