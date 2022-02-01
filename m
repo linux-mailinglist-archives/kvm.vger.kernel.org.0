@@ -2,141 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E83324A5D65
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 14:26:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45BB44A5DA6
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 14:48:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238598AbiBAN0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 08:26:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31227 "EHLO
+        id S236948AbiBANsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 08:48:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44526 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238569AbiBAN0h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 08:26:37 -0500
+        by vger.kernel.org with ESMTP id S238862AbiBANsB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 08:48:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643721996;
+        s=mimecast20190719; t=1643723281;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t4DZwBWjH4KMtaPN0r4y8wXSGSfdg/Ee8aiJ79lHN9s=;
-        b=GXH0JeuHxJo3EKtLBdB4sRkRCeFErh9kwi1o5LVejiq9n9MXOT9yD/6nmfXJqtvkXDSAV6
-        cpg63kHTImYVBe+FYnylVQSRYdfmdxPOhgBuQYWsRetkJCWYERVZWsMLucxjkt/dB9Mcoy
-        KSB0K/G6BXsz2y8S0a4iWSpFFhiVyV8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=jvjdmFpP+aywoc255+AEdYPS7LfT6vlQYF3LS6kxF8U=;
+        b=dxupm4QpOdmI3LgVzGjYHXOfzLkwgO7bntUsR/h+laFGj6iAx4p/M7pc1BIdV08Uechhpk
+        Rwu6lTplku3LmTP440vScbiEDc0MufDnPBcV7z0z5gR8lqTzye1PY4pVxSiTswgSWJHcl6
+        areCW9ljAoHkRuKmLIoHomAj2SU/J1U=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-605-Ps4YUhxlNiGFYKnj5GBr2g-1; Tue, 01 Feb 2022 08:26:33 -0500
-X-MC-Unique: Ps4YUhxlNiGFYKnj5GBr2g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E1D81091DA3;
-        Tue,  1 Feb 2022 13:26:31 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 38EF978DDD;
-        Tue,  1 Feb 2022 13:26:31 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        bhelgaas@google.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
-        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH V6 mlx5-next 10/15] vfio: Remove migration protocol v1
-In-Reply-To: <20220201125444.GE1786498@nvidia.com>
-Organization: Red Hat GmbH
-References: <20220130160826.32449-1-yishaih@nvidia.com>
- <20220130160826.32449-11-yishaih@nvidia.com> <874k5izv8m.fsf@redhat.com>
- <20220201121325.GB1786498@nvidia.com> <87sft2yd50.fsf@redhat.com>
- <20220201125444.GE1786498@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Tue, 01 Feb 2022 14:26:29 +0100
-Message-ID: <87mtjayayi.fsf@redhat.com>
+ us-mta-271-H3klWfZoMSG1NN0RCq9Kkg-1; Tue, 01 Feb 2022 08:47:59 -0500
+X-MC-Unique: H3klWfZoMSG1NN0RCq9Kkg-1
+Received: by mail-ed1-f72.google.com with SMTP id l16-20020aa7c3d0000000b004070ea10e7fso8649878edr.3
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 05:47:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=jvjdmFpP+aywoc255+AEdYPS7LfT6vlQYF3LS6kxF8U=;
+        b=mtCRIjj2kEATduYWmKd622cXIEMm421o1wffqYoHosu/RAySPmAx4xDfcJxfMt4Yi9
+         nikHrgHNMq0O8XnSfj79e1B+DpegkVjqJBvRKgg7gelVijjq4RWTl/7k0RvWld+Qx/5U
+         0EBb92R8q6Zul+TvE46fpp/YhRAEbGIjExfiyOjOi/t/3PTg2Hb3k1FwENms6mgyEtX2
+         Lh81XjMZAC7n3yqfQE4j5/8OfzOELTcikJjLik3ztVjlYFwCmGJgbvD+7ZtzJbziDL8r
+         jaR+RA1ShhOHn/V+wwL4uDhbSQay8xPZ01mcnFOdq1k28m4yc1TCTCM0aEVar+i9xiyu
+         dxlA==
+X-Gm-Message-State: AOAM530iy0o/YNtixfX7DbArd0TyNm/vLBQJeHIsoTF0SMxI9dDHv5rJ
+        giq84XapHtlMzd87OwkqKc+JByCgUnjl4SOtUIp5vu+ZUjakURaqQL6CfKgBqaTsx3P9a43uBpL
+        qi3IXJlboPxG6
+X-Received: by 2002:a05:6402:510b:: with SMTP id m11mr24890197edd.203.1643723278785;
+        Tue, 01 Feb 2022 05:47:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxrAn6f7jQ1xsfRbMafBTd7spTEbJU55+LKoGfzGdlknXLbTTVI9SS+8IKsUIyGryLogcl9+w==
+X-Received: by 2002:a05:6402:510b:: with SMTP id m11mr24890170edd.203.1643723278466;
+        Tue, 01 Feb 2022 05:47:58 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id z6sm14841091ejd.35.2022.02.01.05.47.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Feb 2022 05:47:57 -0800 (PST)
+Message-ID: <e509c138-941e-fa9c-d832-e447ce62a4b2@redhat.com>
+Date:   Tue, 1 Feb 2022 14:47:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 0/8] KVM: x86: Hyper-V hypercall fix and cleanups
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ajay Garg <ajaygargnsit@gmail.com>
+References: <20211207220926.718794-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211207220926.718794-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 01 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 12/7/21 23:09, Sean Christopherson wrote:
+> Fix a bug where KVM incorrectly skips an "all_cpus" IPI request, and misc
+> cleanups and enhancements for KVM handling of Hyper-V hypercalls.
+> 
+> Based on kvm/queue, commit 1cf84614b04a ("KVM: x86: Exit to ...").
+> 
+> v3:
+>    - Collect reviews. [Vitaly]
+>    - Add BUILD_BUG_ON() to protect KVM_HV_MAX_SPARSE_VCPU_SET_BITS. [Vitaly]
+>    - Fix misc typos. [Vitaly]
+>    - Opportunistically rename "cnt" to "rep_cnt" in tracepoint. [Vitaly]
+>    - Drop var_cnt checks for debug hypercalls due to lack of documentation
+>      as to their expected behavior. [Vitaly]
+>    - Tweak the changelog regarding the TLFS spec issue to reference the
+>      bug filed by Vitaly.
+> 
+> v2: https://lore.kernel.org/all/20211030000800.3065132-1-seanjc@google.com/
+> 
+> Sean Christopherson (8):
+>    KVM: x86: Ignore sparse banks size for an "all CPUs", non-sparse IPI
+>      req
+>    KVM: x86: Get the number of Hyper-V sparse banks from the VARHEAD
+>      field
+>    KVM: x86: Refactor kvm_hv_flush_tlb() to reduce indentation
+>    KVM: x86: Add a helper to get the sparse VP_SET for IPIs and TLB
+>      flushes
+>    KVM: x86: Don't bother reading sparse banks that end up being ignored
+>    KVM: x86: Shove vp_bitmap handling down into sparse_set_to_vcpu_mask()
+>    KVM: x86: Reject fixeds-size Hyper-V hypercalls with non-zero
+>      "var_cnt"
+>    KVM: x86: Add checks for reserved-to-zero Hyper-V hypercall fields
+> 
+>   arch/x86/kvm/hyperv.c             | 175 ++++++++++++++++++------------
+>   arch/x86/kvm/trace.h              |  14 ++-
+>   include/asm-generic/hyperv-tlfs.h |   7 ++
+>   3 files changed, 123 insertions(+), 73 deletions(-)
+> 
 
-> On Tue, Feb 01, 2022 at 01:39:23PM +0100, Cornelia Huck wrote:
->> On Tue, Feb 01 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
->> 
->> > On Tue, Feb 01, 2022 at 12:23:05PM +0100, Cornelia Huck wrote:
->> >> On Sun, Jan 30 2022, Yishai Hadas <yishaih@nvidia.com> wrote:
->> >> 
->> >> > From: Jason Gunthorpe <jgg@nvidia.com>
->> >> >
->> >> > v1 was never implemented and is replaced by v2.
->> >> >
->> >> > The old uAPI definitions are removed from the header file. As per Linus's
->> >> > past remarks we do not have a hard requirement to retain compilation
->> >> > compatibility in uapi headers and qemu is already following Linus's
->> >> > preferred model of copying the kernel headers.
->> >> 
->> >> If we are all in agreement that we will replace v1 with v2 (and I think
->> >> we are), we probably should remove the x-enable-migration stuff in QEMU
->> >> sooner rather than later, to avoid leaving a trap for the next
->> >> unsuspecting person trying to update the headers.
->> >
->> > Once we have agreement on the kernel patch we plan to send a QEMU
->> > patch making it support the v2 interface and the migration
->> > non-experimental. We are also working to fixing the error paths, at
->> > least least within the limitations of the current qemu design.
->> 
->> I'd argue that just ripping out the old interface first would be easier,
->> as it does not require us to synchronize with a headers sync (and does
->> not require to synchronize a headers sync with ripping it out...)
->
-> We haven't worked out the best way to organize the qemu patch series,
-> currently it is just one patch that updates everything together, but
-> that is perhaps a bit too big...
->
-> I have thought that a 3 patch series deleting the existing v1 code and
-> then readding it is a potential option, but we don't change
-> everything, just almost everything..
+Queued 2-8, thanks.
 
-Even in that case, removing the old code and adding the new one is
-probably much easier to review. (Also, you obviously need to have the
-header update in between those two stages.)
-
->
->> > The v1 support should remain in old releases as it is being used in
->> > the field "experimentally".
->> 
->> Of course; it would be hard to rip it out retroactively :)
->> 
->> But it should really be gone in QEMU 7.0.
->
-> Seems like you are arguing from both sides, we can't put the v2 in to
-> 7.0 because Linus has not accepted it but we have to rip the v1 out
-> even though Linus hasn't accepted that?
->
-> We can certainly defer the kernels removal patch for a release if it
-> makes qemu's life easier?
-
-No, I'm only talking about the QEMU implementation (i.e. the code that
-uses the v1 definitions and exposes x-enable-migration). Any change in
-the headers needs to be done via a sync with upstream Linux.
-
->
->> Considering adding the v2 uapi, we might get unlucky: The Linux 5.18
->> merge window will likely be in mid-late March (and we cannot run a
->> headers sync before the patches hit Linus' tree), while QEMU 7.0 will
->> likely enter freeze in mid-late March as well. So there's a non-zero
->> chance that the new uapi will need to be deferred to 7.1.
->
-> Usually in rdma land we start advancing the user side once the kernel
-> patches hit the kernel maintainer tree, not Linus's. I run a
-> non-rebasing tree so that gives a permanent git hash. It works well
-> enough and avoids these kinds of artificial delays.
-
-QEMU policy is "it must be in Linus' tree [*]", because we run a full
-header sync. We have been bitten by premature updates in the
-past. Updates of only parts of the headers are only acceptable during
-development of a patch series, and must be marked as "will be replaced
-with a proper header sync".
-
-[*] Preferrably a (full or -rc) release, but the very minimum is a git
-hash from his tree.
+Paolo
 
