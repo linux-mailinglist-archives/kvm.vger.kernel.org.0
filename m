@@ -2,132 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 806DF4A6331
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:07:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 589174A6343
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 19:09:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241700AbiBASHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 13:07:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47568 "EHLO
+        id S241803AbiBASId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 13:08:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234999AbiBASHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 13:07:10 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77486C061714
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 10:07:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=R0yDYfpqv6G0qJ4TWP//kGvyk3PTrL93oe5AIU5CW6c=; b=alv69qVY7neZLMb2jWDPTVT/gY
-        csZplivBxQyArYTFpA01gUCYds1v3D3yjk/04JAmQowplxF/zLpHbgRywYjI7MZzhpe8b5rTJImCF
-        8u+e30lFOLj+u6F0l5J9Rnp02ujyEJqlxg61WIA68z6D+DmBLzzHSXtsFpBZcFO6Tvh/Mjmq4Iz8h
-        va2Q1cUEIJ828sh6a+JiVB9LIqPaOD4FVTdK5/xdQ/N6VwVMMxtJtvzVjrpXYTbWhQeRKig5mCKd8
-        VgsngbRgHt71xMyadE56GZRHyZpxMpQaK/i7az1CJ5mVALEVElJWPO3co4hU1oyuYv2UIbTxLYtP9
-        quo/zp8w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56978)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1nExYR-0000vL-FQ; Tue, 01 Feb 2022 18:06:59 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1nExYJ-0002GW-9U; Tue, 01 Feb 2022 18:06:51 +0000
-Date:   Tue, 1 Feb 2022 18:06:51 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
-        miguel.luis@oracle.com, kernel-team@android.com
-Subject: Re: [PATCH v6 17/64] KVM: arm64: nv: Emulate PSTATE.M for a guest
- hypervisor
-Message-ID: <Yfl2u69WA2sYcyom@shell.armlinux.org.uk>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-18-maz@kernel.org>
+        with ESMTP id S240279AbiBASIc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 13:08:32 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B7AC061714;
+        Tue,  1 Feb 2022 10:08:32 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 516CF1EC0513;
+        Tue,  1 Feb 2022 19:08:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1643738905;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=HcxfykENH1gJphgVT/KA5LzM4HTc3s8TrkMJadPsK0o=;
+        b=KXbXzL/iB0jKOsbk9qpYGF6/22Lz5a/yb/4wRPItKGq08Nf9mtYk6z8AxfiRU+3tIkIfEG
+        FoO2WzE7cON07bDcMWOi4HfjZrFU5nNqFueDJlN3mRccAQLFfYx5q0RsEhan2J+KoAC6il
+        ptqdQQQZkYvoCP+d82KprLCa/WIl2XQ=
+Date:   Tue, 1 Feb 2022 19:08:21 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v9 05/43] x86/compressed/64: Detect/setup SEV/SME
+ features earlier in boot
+Message-ID: <Yfl3FaTGPxE7qMCq@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-6-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-18-maz@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20220128171804.569796-6-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 12:18:25PM +0000, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
-> 
-> We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
-> to the guest and vice versa when taking an exception to the hypervisor,
-> because we emulate virtual EL2 in EL1 and therefore have to translate
-> the mode field from EL2 to EL1 and vice versa.
-> 
-> This requires keeping track of the state we enter the guest, for which
-> we transiently use a dedicated flag.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h          |  1 +
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
->  arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
->  3 files changed, 43 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8fffe2888403..fa253f08e0fd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -472,6 +472,7 @@ struct kvm_vcpu_arch {
->  #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
->  #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
->  #define KVM_ARM64_FP_FOREIGN_FPSTATE	(1 << 14)
-> +#define KVM_ARM64_IN_HYP_CONTEXT	(1 << 15) /* Guest running in HYP context */
->  
->  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
->  				 KVM_GUESTDBG_USE_SW_BP | \
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index 283f780f5f56..e3689c6ce4cc 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -157,9 +157,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
->  	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
->  }
->  
-> +/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
-> +static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
+On Fri, Jan 28, 2022 at 11:17:26AM -0600, Brijesh Singh wrote:
+> diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+> index fd9441f40457..49064a9f96e2 100644
+> --- a/arch/x86/boot/compressed/head_64.S
+> +++ b/arch/x86/boot/compressed/head_64.S
+> @@ -191,9 +191,8 @@ SYM_FUNC_START(startup_32)
+>  	/*
+>  	 * Mark SEV as active in sev_status so that startup32_check_sev_cbit()
+>  	 * will do a check. The sev_status memory will be fully initialized
+
+That "sev_status memory" formulation is just weird. Pls fix it while
+you're touching that comment.
+
+> +static inline u64 rd_sev_status_msr(void)
 > +{
-> +	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> +	unsigned long low, high;
 > +
-> +	switch (mode) {
-> +	case PSR_MODE_EL2t:
-> +		mode = PSR_MODE_EL1t;
-> +		break;
-> +	case PSR_MODE_EL2h:
-> +		mode = PSR_MODE_EL1h;
-> +		break;
-> +	}
+> +	asm volatile("rdmsr" : "=a" (low), "=d" (high) :
+> +			"c" (MSR_AMD64_SEV));
 > +
-> +	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
+> +	return ((high << 32) | low);
 > +}
-> +
 
-Wondering if it makes sense to also have the reverse translation as an
-inline function after the above too, so the two translations are
-together - but as it's only used (in this patch at least) in switch.c
-there probably isn't too much point.
+Don't you see sev_es_rd_ghcb_msr() in that same file above? Do a common
+rdmsr() helper and call it where needed, pls, instead of duplicating
+code.
 
-So:
+misc.h looks like a good place.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Extra bonus points will be given if you unify callers in
+arch/x86/boot/cpucheck.c too but you don't have to - I can do that
+ontop.
+
+Thx.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
