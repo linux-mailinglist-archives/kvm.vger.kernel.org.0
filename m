@@ -2,108 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D6864A5E54
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:31:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E60FA4A5E5A
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 15:32:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230237AbiBAObt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 09:31:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44637 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234833AbiBAObr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 09:31:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643725907;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uMK8/jcOZdjpD/nh6+MuQsZsF0YOGLGqcOfutTCzX3o=;
-        b=K+WqCEtZKg/9L0Fh6FJ5M1WPgNdXxQqhTSqQuRNeKAkz9jPRgAxQ1+EjqJDVdVcsbrWTtP
-        znbtq2XnZGqG9FyfBUKHLkq978LacZ3bkFUHPHoixTbm3dOhoIniLcfEloqOzbGB3IpQGy
-        7eUg7+oyUnTMfYOJz5wXx87QhlcNF5Y=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-354-XLAi6bVLNKqVOZxXBGZqfw-1; Tue, 01 Feb 2022 09:31:45 -0500
-X-MC-Unique: XLAi6bVLNKqVOZxXBGZqfw-1
-Received: by mail-ed1-f71.google.com with SMTP id j1-20020aa7c341000000b0040417b84efeso8761473edr.21
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 06:31:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=uMK8/jcOZdjpD/nh6+MuQsZsF0YOGLGqcOfutTCzX3o=;
-        b=ujcYbtm2CJpmrqtumrTd3azganDMaRIrFXIA64nlfpBKy1Ero9xWx3vJY9tEWU/VPD
-         pLXUmUdl6y1lNSwW4l47lwN5vEQc4QKLpPU4XLWyNHNdg+FXBhrS6Fy3hw5fQYsKE5DZ
-         WwMdgG0G3OS3cB8y2qExUJ47PgqVm8Egq3UG94PXvryMfNNmY40RkqXOpLytkpZHFzxv
-         dGOzWb2orn97FyZWhv54VT/d2BxgXsqHDwhd6xaX11BqS88HJjw1Fnd/LAFeZHWbGj5o
-         eod02Nkh6ttYl5cGv6uMAostwbHamDsbtTF3dGYK1zLtnrIDPfyRuCK1bEGMnOq29l7z
-         A9ug==
-X-Gm-Message-State: AOAM531YE7H/s/7GCVQpnOtEZVSc95a3nYT7VG+Mych4FgPaol1FqwW3
-        ht7QIHwVSKf+CKhY6U+IWEFX8Ok8K5k9KSm0m0a6YPWm4sLBkJ8efF7a+GAaDsXNMB4twoJwGD2
-        naEfUDP8+WIzr
-X-Received: by 2002:a17:907:7b8d:: with SMTP id ne13mr6469269ejc.136.1643725904322;
-        Tue, 01 Feb 2022 06:31:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxaMlxQDg5uPVclG2SA1eg5ZnllWOcMasdnd7IS7AQ5IUKTYNl5m4fiRpbpgX/p7pKN5sDPOA==
-X-Received: by 2002:a17:907:7b8d:: with SMTP id ne13mr6469254ejc.136.1643725904126;
-        Tue, 01 Feb 2022 06:31:44 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id gh14sm14554716ejb.38.2022.02.01.06.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 06:31:43 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap
- for Hyper-V-on-KVM and fix it for KVM-on-Hyper-V
-In-Reply-To: <35f06589-d300-c356-dc17-2c021ac97281@redhat.com>
-References: <20211220152139.418372-1-vkuznets@redhat.com>
- <35f06589-d300-c356-dc17-2c021ac97281@redhat.com>
-Date:   Tue, 01 Feb 2022 15:31:42 +0100
-Message-ID: <87sft2bqup.fsf@redhat.com>
+        id S239354AbiBAOcq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 09:32:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239361AbiBAOcm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 09:32:42 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28B4C061714
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 06:32:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=I18tNObjVFDm/kZz3nk5PXOupFozTlFQM8ZlXVFWPRs=; b=XrkHdF9USSifp4SbR3sZpOZ0kz
+        Oi3rg5K3Jj5wB03eUvBmUIJ8/vXxdMtjf37JlmIjTsY9QvCIm8OGDbIXaQPu+BUQSlHjH0tRsqgZL
+        FH2K7sOcOVSl8qx79SSqds2hpS+K6WT+8ojS25qzquvzfo2yGJG0oO6/i7RU8uKnz/lrO+HjrN76z
+        FbIdSkNyY/G+wHjIG50uF/d4Yj7lEjZs6FiBww7q7cZnf26Afopz5cIy2krYoHsCOcxon3nSeVZ8U
+        02fO7PBYwYzcpz3R9eVDMJt7H73cKtAH3Lh+ne5l4GrojSutG6k8JKx3qN/fd9MGhYMKh9cEe6O5h
+        fF6cOQfQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56966)
+        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1nEuCw-0000hf-Bi; Tue, 01 Feb 2022 14:32:34 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1nEuCo-00028V-8b; Tue, 01 Feb 2022 14:32:26 +0000
+Date:   Tue, 1 Feb 2022 14:32:26 +0000
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 07/64] KVM: arm64: nv: Handle HCR_EL2.NV system
+ register traps
+Message-ID: <YflEev8U2xJCIwtm@shell.armlinux.org.uk>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-8-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-8-maz@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Fri, Jan 28, 2022 at 12:18:15PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+> addition, executing the following instructions in EL1 will trap to EL2:
+> tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+> instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+> ARM v8.3. The only instruction that was not undef is eret.
+> 
+> This patch sets up a handler for EL2 registers and SP_EL1 register
+> accesses at EL1. The host hypervisor keeps those register values in
+> memory, and will emulate their behavior.
+> 
+> This patch doesn't set the NV bit yet. It will be set in a later patch
+> once nested virtualization support is completed.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> [maz: EL2_REG() macros]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-> On 12/20/21 16:21, Vitaly Kuznetsov wrote:
->> Enlightened MSR-Bitmap feature implements a PV protocol for L0 and L1
->> hypervisors to collaborate and skip unneeded updates to MSR-Bitmap.
->> KVM implements the feature for KVM-on-Hyper-V but it seems there was
->> a flaw in the implementation and the feature may not be fully functional.
->> PATCHes 1-2 fix the problem. The rest of the series implements the same
->> feature for Hyper-V-on-KVM.
->> 
->> Vitaly Kuznetsov (5):
->>    KVM: SVM: Drop stale comment from
->>      svm_hv_vmcb_dirty_nested_enlightenments()
->>    KVM: SVM: hyper-v: Enable Enlightened MSR-Bitmap support for real
->>    KVM: nSVM: Track whether changes in L0 require MSR bitmap for L2 to be
->>      rebuilt
->>    KVM: x86: Make kvm_hv_hypercall_enabled() static inline
->>    KVM: nSVM: Implement Enlightened MSR-Bitmap feature
->> 
->>   arch/x86/kvm/hyperv.c           | 12 +--------
->>   arch/x86/kvm/hyperv.h           |  6 ++++-
->>   arch/x86/kvm/svm/nested.c       | 47 ++++++++++++++++++++++++++++-----
->>   arch/x86/kvm/svm/svm.c          |  3 ++-
->>   arch/x86/kvm/svm/svm.h          | 16 +++++++----
->>   arch/x86/kvm/svm/svm_onhyperv.h | 12 +++------
->>   6 files changed, 63 insertions(+), 33 deletions(-)
->> 
->
-> Queued 3-5 now, but it would be nice to have some testcases.
->
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Thanks, indeed, I'll try to draft something up, both for nVMX and nSVM.
+Thanks!
 
 -- 
-Vitaly
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
