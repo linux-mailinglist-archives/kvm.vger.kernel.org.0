@@ -2,283 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9999D4A5375
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 00:43:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AE794A53E6
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 01:11:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbiAaXnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jan 2022 18:43:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49515 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229691AbiAaXnY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 Jan 2022 18:43:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643672603;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/7xlInaUv5l6ue1e1S+wPZAboxKRTQW6AQoeIk3l2Vc=;
-        b=LXoJ2YuSYeMUNbLhOmlSc0lSwumxxomSEjhhNPR4/A9tmmfjH6CsFxoTo/qDXGA60SNjO2
-        6Y6Bo8w9obKuw+we3yjRGYEfikGm/USA6eM5gpdiYotpg851lkvSVNDg1BNrFEunRLDJ84
-        2Ny9WVhHrKqys1dxQRhvb1c+sJWyzKM=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-202-mTWHrb8GMCCoigrc44zSPA-1; Mon, 31 Jan 2022 18:43:22 -0500
-X-MC-Unique: mTWHrb8GMCCoigrc44zSPA-1
-Received: by mail-ot1-f69.google.com with SMTP id p17-20020a0568301d5100b005a3cd7c1e0bso5024961oth.7
-        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 15:43:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/7xlInaUv5l6ue1e1S+wPZAboxKRTQW6AQoeIk3l2Vc=;
-        b=OoOh30pXGEZrLshaE7H3MuIKc5qaQYTmk1up/1AvqQOhtRCUeRZk/Fe6siyj/bFjau
-         IR7z/hjNLsgJY+4JXGxpTjDOTrIQ234LbGs5tXcB8bdJQtiXu/87BkUAKc2kcbglI1vL
-         x4F037fnc0PAlIsTeFwSpefDmpIOQz+hHz2Vk0Bn7VVenc1xhX1b5XTfFpxsw1/iK8fn
-         WWZtGU1IJwyeHnWJPRqr9o/ruHvb0P//L1PZeIBCymEQEZJ9om6kLAL5+E8z5z7j/AY1
-         WDoFscn3FAVP11Pcr/WVxIUDHFwJKO+8YaCGbW6Tj2bUlQA+0JOAVgzwqskFg98W4P9x
-         8d9g==
-X-Gm-Message-State: AOAM532DN1vDpvxD1XDFyGWcx7Sd2BcGm/WL8q5c7vl4A8ZawJnG1awK
-        PBILurkwp0FizZKT2tmaULtIXLK5PrFipWv2msEJYKclMLdnMOzq0VO7lrGK6xGpkHkEIl7wLyM
-        vvv7MHJGgJa8v
-X-Received: by 2002:a9d:eca:: with SMTP id 68mr3231728otj.274.1643672600966;
-        Mon, 31 Jan 2022 15:43:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwIIscsCjZrdPrtfvgU68hP33J9m6+i95ENDKpW4UXSzQsbbIxZiIOevun4i4rf5nb72C02lA==
-X-Received: by 2002:a9d:eca:: with SMTP id 68mr3231699otj.274.1643672600315;
-        Mon, 31 Jan 2022 15:43:20 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id bc36sm3303827oob.45.2022.01.31.15.43.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jan 2022 15:43:20 -0800 (PST)
-Date:   Mon, 31 Jan 2022 16:43:18 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V6 mlx5-next 08/15] vfio: Define device migration
- protocol v2
-Message-ID: <20220131164318.3da9eae5.alex.williamson@redhat.com>
-In-Reply-To: <20220130160826.32449-9-yishaih@nvidia.com>
+        id S230256AbiBAALy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jan 2022 19:11:54 -0500
+Received: from mail-dm6nam11on2073.outbound.protection.outlook.com ([40.107.223.73]:12128
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230215AbiBAALx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jan 2022 19:11:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aMJ7V1TUvURvp+HcAA/F/gVNnwSk9bYCdzEt9Ypi9tnfuIF/XeQymSM0XJaphhLZRRlhnbnkAKzS/ktLKC35yg1aYAZRY7115sfJk/JH4V2x3r9haN2xjSDXBEPfW4mW+w37h0MfFCkeapwbWqVRhu/n+vdyVyGlhI2IH1VCKWaW4el+N19vdq1EhOIhIYj62Qrrf3LLed7qbcDvwtKX+l1cNF/SCZ7EVxFeHWwxX1eZyQo8gXk7WXvtvlah6bFZhl8I+hKtKbeSsYq3QtCHT+BZ/AjVk4Xx7elbkZz+zjyOMxilzzCyDWuiZ15lXTWvOIGXKdALrjDpjIIE01QMTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=boEGum0Z2VUpoJCSSK/oMyegBaLNtai7Wn265WWI+mE=;
+ b=TlTj8jQ1MW5NVo3ADliKW/MOe2sgGZvwOgUthrWZaXX/yh1yXFRmRXtlgnK1EFoO6NyIzKIOhxtk8BAjmhfAGIv6HdfkQjFd/hG84C9Oe9rlF1Y8c8nVX0o3q6RzogJOquxJnCahkA2ikKf25eoV6VJ+VKi/Xsac07X8dFKeCxMGXhMSso6p7vG0Ll6dXbLdulzzM7cna8/4jFZIrz/hAMhrvesMpZZDuRiINqGWA5tzkvpDBtBJJpjNd7tsNiz5lHUHgA+cE65fm6rX4+0g2fbUfuBi9Xlb8qQuNcjKncA/N11kxtuuXUXR0i6wgfSs3OsqA6YmfQ0zOTfThyBvRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=boEGum0Z2VUpoJCSSK/oMyegBaLNtai7Wn265WWI+mE=;
+ b=Etv7IvJl5cUZCVl2Z/r8M+VPw/1OfC5hbY6ENICmO0aSCsFe8wAIcI5f9boMYDhpmJB/CdKIp62ByX5WFIQAJz2HcrejNqBTKJy3ptLsBpm9yN6/frH0HzLzOan4o+5MZJF1QFh11GWGNEc5NZZln//mODrSfs/va0MkdrGx09JbdG1t0ErGvVuXi2gSGXb5gmU5POJA9vAr9divUos0Plbk2PwD9i+I8lrZycYRPc3y6HNpsbDHcmlAMeZPGusSFYq3x49wwLix7nHgL87mZVlQde8RWaC88H+ttsvP+D6kk16trbCaLGE2jm4yQxFzZJhuc1epZ9zKZNr6JCkvgQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MW3PR12MB4361.namprd12.prod.outlook.com (2603:10b6:303:5a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17; Tue, 1 Feb
+ 2022 00:11:51 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4930.022; Tue, 1 Feb 2022
+ 00:11:50 +0000
+Date:   Mon, 31 Jan 2022 20:11:48 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V6 mlx5-next 07/15] vfio: Have the core code decode the
+ VFIO_DEVICE_FEATURE ioctl
+Message-ID: <20220201001148.GY1786498@nvidia.com>
 References: <20220130160826.32449-1-yishaih@nvidia.com>
-        <20220130160826.32449-9-yishaih@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+ <20220130160826.32449-8-yishaih@nvidia.com>
+ <20220131164143.6c145fdb.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220131164143.6c145fdb.alex.williamson@redhat.com>
+X-ClientProxiedBy: BLAPR03CA0097.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::12) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: eac45d81-2e52-4b30-b683-08d9e517715d
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4361:EE_
+X-Microsoft-Antispam-PRVS: <MW3PR12MB4361C38AFE8726825D1F2F98C2269@MW3PR12MB4361.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +Qw070uzFGM1dUuRfC66PDXHafyKq4lDzvgdMYqWrgv/dFeleyzezcDUQoknraHpbpE0338C+q9EpYekTX646RMiNyyfVpryeKfC3D7NhTnApjVX5vF7ESrQ3twZ1MbYlddQurj98ZF0Ev3eI11s7otjFItXG7x0f2f04J/zNFN2uVzwG4msC7ZgSp0lmtClo4TGf9bKHdS9uJVY2TAE58NP3cTwWro0qkcFZpJVehdKuV+jVoO/Qjad1SKtOmB+WSA3yqG99i5gxSucdGw+8j1EJD6CQHwGO+8hCuDaIat954QgEiRYyrBVxV6fv87fakL4Hg+K+Kr05PumuD5IT1pEmtVGhocxmu7KyQBbLGTnacFod7ihnibPgUAtFl7iyv10azTVilfA6m0e2WSocIHS0BwnaQhZDSQa9JKvgTYja6EyUGHAIh9Jg9GmHmxwgZTZGXiNQc0H8cauCj7CR8Hr4i97eHW/vyB0z9ZySCPIrp1X3z/Dd3DNZq75D3QLmYiVP4ClrR6+EilKme+7ujO9j9x3aahHQACkoPPfOjuWn+JSBBSxze1o7CGXv0pZ6KZqQcA33kKDFv/7tlRbs0/z2rfvV8ZC1S7fZ7N7uoe3FOFSUSk/IqwuR7LoUNuDtgiNbU4MzeAByFHtohbxeQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(4326008)(8676002)(6486002)(86362001)(508600001)(8936002)(66556008)(66476007)(66946007)(38100700002)(6916009)(316002)(5660300002)(6512007)(36756003)(2616005)(107886003)(26005)(33656002)(186003)(1076003)(2906002)(6506007)(83380400001)(20210929001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Cz0ROUK4kAetnnhD1nzBPYG28mBSiO6ldwKh7Svr16tciEH0HcvtINuhzI9R?=
+ =?us-ascii?Q?RfVk76fAM1enx+IADc/3SvJ29OjClhEeKin7aEM3Bz6E+yH3z5g9Pxi0E7AT?=
+ =?us-ascii?Q?Do3UnfLyqduJW2euCSgE2y+NWQSIJRCDaMsNKq6QUjLetnKc1dc456dLsTGh?=
+ =?us-ascii?Q?4hO/K4EroOQSON4tOHL7EthIuAqNWRhawrJITGBBosozL+oXPatME7BQnSZT?=
+ =?us-ascii?Q?TbCM+nwN6VJqnPDKVrqMbVcphRUnqIswx6Wz7MF+kjFbyxLO7x6AW07EYqzr?=
+ =?us-ascii?Q?NuRZ7ebNZ8YW3LIvp8tqaOonBumqCFdDscBFBOVShbxhzpLnc2WnkgZvaYOg?=
+ =?us-ascii?Q?sVM8uYsp6VNUZgMe+/kHFqOheW1uo1oGM5kPpNvNuT+b8iBljPQTasqWKHab?=
+ =?us-ascii?Q?6C4nAUVE4rsmzVoUfBFYqQumUca7nyB/o3anwjSsd7DzDSkPSzCoApRYM2gs?=
+ =?us-ascii?Q?BSEYMVHl/5KveNwTcZuwJYJcQksVralDkKWhIxiP2k1JAXmGTjgZyneUT1pQ?=
+ =?us-ascii?Q?T1VvGm6E2bhGEbrypr+CsYTZ5MyzJ0lGH16ULcFOGnAVMjQna6ucm9t1Lfs3?=
+ =?us-ascii?Q?IKVsG1a3pJ7Ylag9BjQwaxsNvMGY7Pe6w4rSqIjLJuLYogc6YuM7CadahaK+?=
+ =?us-ascii?Q?DqX8XAC8mbsJVAkHeiNIlV/z8+pXE5bV8Hz4xmSNqQ8dFitTfKHGZ63aC7uv?=
+ =?us-ascii?Q?dmhLz/H0aGyF0gXcEv4kWSXl2rAZOgpnNJcD46qFwv+TB9e94fBjuV+San8z?=
+ =?us-ascii?Q?XZAAiSnPT+RBqsnQrQAzL1MPqQCvpu7inLEZz00rRK0J/cq40gKAibr8djXy?=
+ =?us-ascii?Q?ccClaWnNvBq/fnqZEip2sPg7enaSYLXvVRMLzCL7w5s+C8s7kEkCnFlz3JbO?=
+ =?us-ascii?Q?BXNhmpEVy3dx2iyxGpWs7toJqla96QOnTfZgLl/OWXFDsg+PXBq5TnTgrhzN?=
+ =?us-ascii?Q?d/HoyPB1w4wlbpmkUmLna9OYAgXC7GjutLQMmYTj7r01p0dDpqai62U+Sqif?=
+ =?us-ascii?Q?kDYzh8GrDpRN81sLyN9gBOgc8UDeUyz414kjvQXNov1IYYvZPUidl5thj/U/?=
+ =?us-ascii?Q?fwxDaz5EBfCTDU5i72L2ImxBS8J/63+4Lj/npgsQsAWLyatFPEIJ8CpDNE7n?=
+ =?us-ascii?Q?2wrRLa1tiWsNyd2wC3XqRoHbQuNDDIU+WFtbW7srShm2nWOw7tbIDbLC+26O?=
+ =?us-ascii?Q?iuKVQOq19YCbxedXRE2y/i+EKf6Gwjka8v+aZ2LVpJLSAVRpcHVFXYpoyXCP?=
+ =?us-ascii?Q?26nuiAY6gJ0VSdJHVP+7dxz1Jq+mFcTNKncThluTrcUCkq2/MX3gA64fvXuz?=
+ =?us-ascii?Q?6VuDX5OZbG0ffmUu6MsHQbY8oiMDvpPaOi2I6IBg2todfM/mN1vzGWUrzeh2?=
+ =?us-ascii?Q?SmycppBGDAUeL/RgM4iKjy+Du8OtNA7nRcc+fp11H+g2JNnca3V2yOr7uqBh?=
+ =?us-ascii?Q?OLF0R3qK17OyXcQXWNHJo6TpR6W9DGxTt79L0HOVvjmyyxaeSAb6TpvRgQ2N?=
+ =?us-ascii?Q?pMgkePxxNlO2l2tnz7i+lH7FPFRUs5hUgJYzbrLp/tnN4zq0HqVKf7Edhw8z?=
+ =?us-ascii?Q?lppGDV1ekud3zML8E7A=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eac45d81-2e52-4b30-b683-08d9e517715d
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2022 00:11:49.9861
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IPKswFiDD5/yaThQ+kOADBcFPWjB/AZWGIHOAFMIcsaL4pBO/IowTHgvJQzPBkdC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4361
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 30 Jan 2022 18:08:19 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index ef33ea002b0b..d9162702973a 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -605,10 +605,10 @@ struct vfio_region_gfx_edid {
->  
->  struct vfio_device_migration_info {
->  	__u32 device_state;         /* VFIO device state */
-> -#define VFIO_DEVICE_STATE_STOP      (0)
-> -#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
-> -#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
-> -#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-> +#define VFIO_DEVICE_STATE_V1_STOP      (0)
-> +#define VFIO_DEVICE_STATE_V1_RUNNING   (1 << 0)
-> +#define VFIO_DEVICE_STATE_V1_SAVING    (1 << 1)
-> +#define VFIO_DEVICE_STATE_V1_RESUMING  (1 << 2)
+On Mon, Jan 31, 2022 at 04:41:43PM -0700, Alex Williamson wrote:
+> > +int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
+> > +				void __user *arg, size_t argsz)
+> > +{
+> > +	struct vfio_pci_core_device *vdev =
+> > +		container_of(device, struct vfio_pci_core_device, vdev);
+> > +	uuid_t uuid;
+> > +	int ret;
+> 
+> Nit, should uuid at least be scoped within the token code?  Or token
+> code pushed to a separate function?
 
-I assume the below is kept until we rip out all the references, but I'm
-not sure why we're bothering to define V1 that's not used anywhere
-versus just deleting the above to avoid collision with the new enum.
+Sure, it wasn't done before, but it would be nicer,.
 
->  #define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
->  				     VFIO_DEVICE_STATE_SAVING |  \
->  				     VFIO_DEVICE_STATE_RESUMING)
-> @@ -1002,6 +1002,162 @@ struct vfio_device_feature {
->   */
->  #define VFIO_DEVICE_FEATURE_PCI_VF_TOKEN	(0)
->  
-> +/*
-> + * Indicates the device can support the migration API. See enum
-> + * vfio_device_mig_state for details. If present flags must be non-zero and
-> + * VFIO_DEVICE_MIG_SET_STATE is supported.
-> + *
-> + * VFIO_MIGRATION_STOP_COPY means that RUNNING, STOP, STOP_COPY and
-> + * RESUMING are supported.
-> + */
-> +struct vfio_device_feature_migration {
-> +	__aligned_u64 flags;
-> +#define VFIO_MIGRATION_STOP_COPY	(1 << 0)
-> +};
-> +#define VFIO_DEVICE_FEATURE_MIGRATION 1
-> +
-> +/*
-> + * The device migration Finite State Machine is described by the enum
-> + * vfio_device_mig_state. Some of the FSM arcs will create a migration data
-> + * transfer session by returning a FD, in this case the migration data will
-> + * flow over the FD using read() and write() as discussed below.
-> + *
-> + * There are 5 states to support VFIO_MIGRATION_STOP_COPY:
-> + *  RUNNING - The device is running normally
-> + *  STOP - The device does not change the internal or external state
-> + *  STOP_COPY - The device internal state can be read out
-> + *  RESUMING - The device is stopped and is loading a new internal state
-> + *  ERROR - The device has failed and must be reset
-> + *
-> + * The FSM takes actions on the arcs between FSM states. The driver implements
-> + * the following behavior for the FSM arcs:
-> + *
-> + * RUNNING -> STOP
-> + * STOP_COPY -> STOP
-> + *   While in STOP the device must stop the operation of the device. The
-> + *   device must not generate interrupts, DMA, or advance its internal
-> + *   state. When stopped the device and kernel migration driver must accept
-> + *   and respond to interaction to support external subsystems in the STOP
-> + *   state, for example PCI MSI-X and PCI config pace. Failure by the user to
-> + *   restrict device access while in STOP must not result in error conditions
-> + *   outside the user context (ex. host system faults).
-> + *
-> + *   The STOP_COPY arc will terminate a data transfer session.
-> + *
-> + * RESUMING -> STOP
-> + *   Leaving RESUMING terminates a data transfer session and indicates the
-> + *   device should complete processing of the data delivered by write(). The
-> + *   kernel migration driver should complete the incorporation of data written
-> + *   to the data transfer FD into the device internal state and perform
-> + *   final validity and consistency checking of the new device state. If the
-> + *   user provided data is found to be incomplete, inconsistent, or otherwise
-> + *   invalid, the migration driver must fail the SET_STATE ioctl and
-> + *   optionally go to the ERROR state as described below.
-> + *
-> + *   While in STOP the device has the same behavior as other STOP states
-> + *   described above.
-> + *
-> + *   To abort a RESUMING session the device must be reset.
-> + *
-> + * STOP -> RUNNING
-> + *   While in RUNNING the device is fully operational, the device may generate
-> + *   interrupts, DMA, respond to MMIO, all vfio device regions are functional,
-> + *   and the device may advance its internal state.
-> + *
-> + * STOP -> STOP_COPY
-> + *   This arc begin the process of saving the device state and will return a
-> + *   new data_fd.
-> + *
-> + *   While in the STOP_COPY state the device has the same behavior as STOP
-> + *   with the addition that the data transfers session continues to stream the
-> + *   migration state. End of stream on the FD indicates the entire device
-> + *   state has been transferred.
-> + *
-> + *   The user should take steps to restrict access to vfio device regions while
-> + *   the device is in STOP_COPY or risk corruption of the device migration data
-> + *   stream.
-> + *
-> + * STOP -> RESUMING
-> + *   Entering the RESUMING state starts a process of restoring the device
-> + *   state and will return a new data_fd. The data stream fed into the data_fd
-> + *   should be taken from the data transfer output of the saving group states
-> + *   from a compatible device. The migration driver may alter/reset the
-> + *   internal device state for this arc if required to prepare the device to
-> + *   receive the migration data.
-> + *
-> + * any -> ERROR
-> + *   ERROR cannot be specified as a device state, however any transition request
-> + *   can be failed with an errno return and may then move the device_state into
-> + *   ERROR. In this case the device was unable to execute the requested arc and
-> + *   was also unable to restore the device to any valid device_state. The ERROR
-> + *   state will be returned as described below in VFIO_DEVICE_MIG_SET_STATE. To
-> + *   recover from ERROR VFIO_DEVICE_RESET must be used to return the
-> + *   device_state back to RUNNING.
-> + *
-> + * The remaining possible transitions are interpreted as combinations of the
-> + * above FSM arcs. As there are multiple paths through the FSM arcs the path
-> + * should be selected based on the following rules:
-> + *   - Select the shortest path.
-> + * Refer to vfio_mig_get_next_state() for the result of the algorithm.
-> + *
-> + * The automatic transit through the FSM arcs that make up the combination
-> + * transition is invisible to the user. When working with combination arcs the
-> + * user may see any step along the path in the device_state if SET_STATE
-> + * fails. When handling these types of errors users should anticipate future
-> + * revisions of this protocol using new states and those states becoming
-> + * visible in this case.
-> + */
-> +enum vfio_device_mig_state {
-> +	VFIO_DEVICE_STATE_ERROR = 0,
-> +	VFIO_DEVICE_STATE_STOP = 1,
-> +	VFIO_DEVICE_STATE_RUNNING = 2,
-> +	VFIO_DEVICE_STATE_STOP_COPY = 3,
-> +	VFIO_DEVICE_STATE_RESUMING = 4,
-> +};
-> +
-> +/**
-> + * VFIO_DEVICE_MIG_SET_STATE - _IO(VFIO_TYPE, VFIO_BASE + 21)
-> + *
-> + * Execute a migration state change command on the VFIO device. The new state is
-> + * supplied in device_state.
-> + *
-> + * The kernel migration driver must fully transition the device to the new state
-> + * value before the write(2) operation returns to the user.
-> + *
-> + * The kernel migration driver must not generate asynchronous device state
-> + * transitions outside of manipulation by the user or the VFIO_DEVICE_RESET
-> + * ioctl as described above.
-> + *
-> + * If this function fails and returns -1 then the device_state is updated with
-> + * the current state the device is in. This may be the original operating state
-> + * or some other state along the combination transition path. The user can then
-> + * decide if it should execute a VFIO_DEVICE_RESET, attempt to return to the
-> + * original state, or attempt to return to some other state such as RUNNING or
-> + * STOP. If errno is set to EOPNOTSUPP, EFAULT or ENOTTY then the device_state
-> + * output is not reliable.
+> > +static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,
+> > +				    size_t minsz)
+> > +{
+> > +	if ((flags & (VFIO_DEVICE_FEATURE_GET | VFIO_DEVICE_FEATURE_SET)) &
+> > +	    ~supported_ops)
+> > +		return -EINVAL;
+> 
+> These look like cases where it would be useful for userspace debugging
+> to differentiate errnos.
 
-I haven't made it through the full series yet, but it's not clear to me
-why these specific errnos are being masked above.
+I tried to keep it unchanged from what it was today.
 
-> + *
-> + * If the new_state starts a new data transfer session then the FD associated
-> + * with that session is returned in data_fd. The user is responsible to close
-> + * this FD when it is finished. The user must consider the migration data
-> + * segments carried over the FD to be opaque and non-fungible. During RESUMING,
-> + * the data segments must be written in the same order they came out of the
-> + * saving side FD.
+> -EOPNOTSUPP?
 
-The lifecycle of this FD is a little sketchy.  The user is responsible
-to close the FD, are they required to?  ie. should the migration driver
-fail transitions if there's an outstanding FD?  Should the core code
-mangle the f_ops or force and EOF or in some other way disconnect the FD
-to avoid driver bugs/exploits with users poking stale FDs?  Should we
-be bumping a reference on the device FD such that we can't have
-outstanding migration FDs with the device closed (and re-assigned to a
-new user)?
+This would be my preference, but it would also be the first use in
+vfio
 
-> + *
-> + * Setting device_state to VFIO_DEVICE_STATE_ERROR will always fail with EINVAL,
-> + * and take no action. However the device_state will be updated with the current
-> + * value.
-> + *
-> + * Return: 0 on success, -1 and errno set on failure.
-> + */
-> +struct vfio_device_mig_set_state {
-> +	__u32 argsz;
-> +	__u32 device_state;
-> +	__s32 data_fd;
-> +	__u32 flags;
-> +};
+> > +	if (flags & VFIO_DEVICE_FEATURE_PROBE)
+> > +		return 0;
+> > +	/* Without PROBE one of GET or SET must be requested */
+> > +	if (!(flags & (VFIO_DEVICE_FEATURE_GET | VFIO_DEVICE_FEATURE_SET)))
+> > +		return -EINVAL;
+> > +	if (argsz < minsz)
+> > +		return -EINVAL;
+>
+> -ENOSPC?
 
-argsz and flags layout is inconsistent with all other vfio ioctls.
+Do you want to do all of these minsz then? There are lots..
 
-> +
-> +#define VFIO_DEVICE_MIG_SET_STATE _IO(VFIO_TYPE, VFIO_BASE + 21)
-
-Did you consider whether this could also be implemented as a
-VFIO_DEVICE_FEATURE?  Seems the feature struct would just be
-device_state and data_fd.  Perhaps there's a use case for GET as well.
-Thanks,
-
-Alex
-
+Jason
