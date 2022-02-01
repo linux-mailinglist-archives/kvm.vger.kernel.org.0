@@ -2,176 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3584B4A571C
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 07:01:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 241E64A576D
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 08:01:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233840AbiBAGBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 01:01:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbiBAGA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 01:00:57 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E69C061714
-        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 22:00:57 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id g2so14367020pgo.9
-        for <kvm@vger.kernel.org>; Mon, 31 Jan 2022 22:00:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Rj5HQhQyptq1prqqLiR0JYrAw/J6DdBaPhsGSRewuxA=;
-        b=O2IqdcrI8j0Fqi0KLhNgLfYvcMZ+S5gfnYs5VGOXc+eq31DvL1WRmHgOcbuf3PNREL
-         P6AZcPXN5ToMiFIcW6coJ7bhgKkYcUlVqxfDvGRyZo3aTU5AwV9eWsHLbUKVMUP12oyE
-         sa+Iue/3E32CRtHwt5vVuAGaGg8JLCtk69eABQICMWUF2f5mVN6QMObTbPmPdd3u7wlH
-         3O3W+bgX/B/R71yMf6doM+Ycw4bFIjy0jbZBgZl+oBW79vO2+3r2Eg1RcyI/ZohXHb4p
-         LrmULTQvqy2unNtfUCmIQwwrOsi04Uv5uwi/vHFROe6v/+11rAdmK+TIs8Vtyie4n5mf
-         LFdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Rj5HQhQyptq1prqqLiR0JYrAw/J6DdBaPhsGSRewuxA=;
-        b=SN6V607F5tHSg7iPKO380fzFLuswCw91uLMqCi2bzjZvVLkV5I7JVk+yq4g/WRCyNa
-         mh+qdQovM4caxlUPyg1b0EhAJdAkg9AmjWxG7o9p+RvLzg+Du/R4JwbKrgU0EEXyattJ
-         VtSaKilooPLDPi/ZYXjIpHf/Ahz03vVyWQdCOqtgfVJ2GAw0IJvIyFZPqEeKAr7cfjpZ
-         zY5yYRlLvvkQ2B1zbGZy5aUOKxujN80aw0XvjFIL5OSS5QdAFyIQ16rtr/jj1rY6RKzH
-         smlGqZhOFTVO0NvWO/UaGe3bjgk/7jjYxd5LiZocdJdWUEcsiZC2AmtMKYTpqBrXu7kF
-         HMeQ==
-X-Gm-Message-State: AOAM532WNYxKX/5kDJO38rTXJ29nyl2a7696xXFYEgU/YGFiJyTTSsKY
-        eR+nzgP50FUSHLpWDWHY/c/QIf/TZt6tBqJWhvXmgg==
-X-Google-Smtp-Source: ABdhPJx45aOEpU8XeKqNCF1T0wz5+DGu/Vk0J6PTyadiSbYSNQNorBZhyf+hidGFrdlNDTX4Oly9AlOgikkUK7Nr0OE=
-X-Received: by 2002:aa7:95b2:: with SMTP id a18mr23381629pfk.39.1643695256681;
- Mon, 31 Jan 2022 22:00:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-3-reijiw@google.com>
- <YfDaiUbSkpi9/5YY@google.com> <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
- <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
- <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com> <YfdaKpBqFkULxgX/@google.com>
-In-Reply-To: <YfdaKpBqFkULxgX/@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 31 Jan 2022 22:00:40 -0800
-Message-ID: <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        id S234500AbiBAHBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 02:01:32 -0500
+Received: from mga14.intel.com ([192.55.52.115]:32608 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231231AbiBAHBa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 02:01:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643698890; x=1675234890;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0rn+zx4Is4enDytQe+WBVqNYCrR1ao71qNPltgw9ICE=;
+  b=UPwlsy5JBw20hYuuXNkH9x6sV0Buz1AGd7gNOTdja80hoioweGclyNkj
+   C9KcG+ykj8BGlAa7gZQY308hzj7NU9LrF5dHpCRjSUZ1ghh/NQX5ZmWwn
+   NCJ0IEXOYSIFPXnC51MKB/SNyCG/sb43m5Z5z8+lzzDFZFet8fP1wNLxX
+   WSi416EKpREYaz+PxjFchflBW84EPRQ1OEPGd+36h4LmPH53SCyoM+nKw
+   5Ra7HLeLfkKNCjC3LdZp4W6Bj0XuOdC1HvhDgezGu3uUxTirRz63QBAPM
+   f0bt09Tz8keHdfsei6h/rwevowcTu/K5fSEtEuTeGFLmnESr98TGihNJW
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10244"; a="247851921"
+X-IronPort-AV: E=Sophos;i="5.88,333,1635231600"; 
+   d="scan'208";a="247851921"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2022 23:01:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,333,1635231600"; 
+   d="scan'208";a="675996016"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jan 2022 23:01:23 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nEnAI-000SvU-UU; Tue, 01 Feb 2022 07:01:22 +0000
+Date:   Tue, 1 Feb 2022 15:01:16 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/5] KVM: x86: Use __try_cmpxchg_user() to update guest
+ PTE A/D bits
+Message-ID: <202202011400.EaZmWZ48-lkp@intel.com>
+References: <20220201010838.1494405-4-seanjc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220201010838.1494405-4-seanjc@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Hi Sean,
 
-On Sun, Jan 30, 2022 at 7:40 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> On Fri, Jan 28, 2022 at 09:52:21PM -0800, Reiji Watanabe wrote:
-> > Hi Ricardo,
-> >
-> > > > > > +
-> > > > > > +/*
-> > > > > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > > > > > + * with ID_SANITISED() to the host's sanitized value.
-> > > > > > + */
-> > > > > > +void set_default_id_regs(struct kvm *kvm)
-> > > > > > +{
-> > > > > > +     int i;
-> > > > > > +     u32 id;
-> > > > > > +     const struct sys_reg_desc *rd;
-> > > > > > +     u64 val;
-> > > > > > +
-> > > > > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > > > > > +             rd = &sys_reg_descs[i];
-> > > > > > +             if (rd->access != access_id_reg)
-> > > > > > +                     /* Not ID register, or hidden/reserved ID register */
-> > > > > > +                     continue;
-> > > > > > +
-> > > > > > +             id = reg_to_encoding(rd);
-> > > > > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > > > > +                     /* Shouldn't happen */
-> > > > > > +                     continue;
-> > > > > > +
-> > > > > > +             val = read_sanitised_ftr_reg(id);
-> > > > >
-> > > > > I'm a bit confused. Shouldn't the default+sanitized values already use
-> > > > > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
-> > > >
-> > > > I'm not sure if I understand your question.
-> > > > arm64_ftr_bits_kvm is used for feature support checkings when
-> > > > userspace tries to modify a value of ID registers.
-> > > > With this patch, KVM just saves the sanitized values in the kvm's
-> > > > buffer, but userspace is still not allowed to modify values of ID
-> > > > registers yet.
-> > > > I hope it answers your question.
-> > >
-> > > Based on the previous commit I was assuming that some registers, like
-> > > id_aa64dfr0,
-> > > would default to the overwritten values as the sanitized values. More
-> > > specifically: if
-> > > userspace doesn't modify any ID reg, shouldn't the defaults have the
-> > > KVM overwritten
-> > > values (arm64_ftr_bits_kvm)?
-> >
-> > arm64_ftr_bits_kvm doesn't have arm64_ftr_reg but arm64_ftr_bits,
-> > and arm64_ftr_bits_kvm doesn't have the sanitized values.
-> >
-> > Thanks,
->
-> Hey Reiji,
->
-> Sorry, I wasn't very clear. This is what I meant.
->
-> If I set DEBUGVER to 0x5 (w/ FTR_EXACT) using this patch on top of the
-> series:
->
->  static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
->         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
-> -       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-> +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x5),
->
-> it means that userspace would not be able to set DEBUGVER to anything
-> but 0x5. But I'm not sure what it should mean for the default KVM value
-> of DEBUGVER, specifically the value calculated in set_default_id_regs().
-> As it is, KVM is still setting the guest-visible value to 0x6, and my
-> "desire" to only allow booting VMs with DEBUGVER=0x5 is being ignored: I
-> booted a VM and the DEBUGVER value from inside is still 0x6. I was
-> expecting it to not boot, or to show a warning.
+I love your patch! Yet something to improve:
 
-Thank you for the explanation!
+[auto build test ERROR on 26291c54e111ff6ba87a164d85d4a4e134b7315c]
 
-FTR_EXACT (in the existing code) means that the safe_val should be
-used if values of the field are not identical between CPUs (see how
-update_cpu_ftr_reg() uses arm64_ftr_safe_value()). For KVM usage,
-it means that if the field value for a vCPU is different from the one
-for the host's sanitized value, only the safe_val can be used safely
-for the guest (purely in terms of CPU feature).
+url:    https://github.com/0day-ci/linux/commits/Sean-Christopherson/x86-uaccess-CMPXCHG-KVM-bug-fixes/20220201-091001
+base:   26291c54e111ff6ba87a164d85d4a4e134b7315c
+config: i386-randconfig-a002 (https://download.01.org/0day-ci/archive/20220201/202202011400.EaZmWZ48-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 6b1e844b69f15bb7dffaf9365cd2b355d2eb7579)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/c880d7a9df876f20dc3acdd893c5c71f3cda5029
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Sean-Christopherson/x86-uaccess-CMPXCHG-KVM-bug-fixes/20220201-091001
+        git checkout c880d7a9df876f20dc3acdd893c5c71f3cda5029
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-If KVM wants to restrict some features due to some reasons (e.g.
-a feature for guests is not supported by the KVM yet), it should
-be done by KVM (not by cpufeature.c), and  'validate' function in
-"struct id_reg_info", which is introduced in patch-3, will be used
-for such cases (the following patches actually use).
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Thanks,
-Reiji
+All errors (new ones prefixed by >>):
 
->
-> I think this has some implications for migrations. It would not be
-> possible to migrate the example VM on the patched kernel from above: you
-> can boot a VM with DEBUGVER=0x5 but you can't migrate it.
->
-> Thanks,
-> Ricardo
+   In file included from arch/x86/kvm/mmu/mmu.c:4246:
+>> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
+                   ret = __try_cmpxchg_user(ptep_user, &orig_pte, pte, fault);
+                         ^
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:606:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 1: __ret = __try_cmpxchg_user_asm("b", "q",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   In file included from arch/x86/kvm/mmu/mmu.c:4246:
+>> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:610:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 2: __ret = __try_cmpxchg_user_asm("w", "r",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   In file included from arch/x86/kvm/mmu/mmu.c:4246:
+>> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:614:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 4: __ret = __try_cmpxchg_user_asm("l", "r",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   In file included from arch/x86/kvm/mmu/mmu.c:4250:
+>> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
+                   ret = __try_cmpxchg_user(ptep_user, &orig_pte, pte, fault);
+                         ^
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:606:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 1: __ret = __try_cmpxchg_user_asm("b", "q",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   In file included from arch/x86/kvm/mmu/mmu.c:4250:
+>> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:610:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 2: __ret = __try_cmpxchg_user_asm("w", "r",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   In file included from arch/x86/kvm/mmu/mmu.c:4250:
+>> arch/x86/kvm/mmu/paging_tmpl.h:244:9: error: invalid output size for constraint '+a'
+   arch/x86/include/asm/uaccess.h:629:11: note: expanded from macro '__try_cmpxchg_user'
+           __ret = !unsafe_try_cmpxchg_user(_ptr, _oldp, _nval, _label);   \
+                    ^
+   arch/x86/include/asm/uaccess.h:614:18: note: expanded from macro 'unsafe_try_cmpxchg_user'
+           case 4: __ret = __try_cmpxchg_user_asm("l", "r",                \
+                           ^
+   arch/x86/include/asm/uaccess.h:467:22: note: expanded from macro '__try_cmpxchg_user_asm'
+                          [old] "+a" (__old)                               \
+                                      ^
+   6 errors generated.
+
+
+vim +244 arch/x86/kvm/mmu/paging_tmpl.h
+
+   191	
+   192	static int FNAME(update_accessed_dirty_bits)(struct kvm_vcpu *vcpu,
+   193						     struct kvm_mmu *mmu,
+   194						     struct guest_walker *walker,
+   195						     gpa_t addr, int write_fault)
+   196	{
+   197		unsigned level, index;
+   198		pt_element_t pte, orig_pte;
+   199		pt_element_t __user *ptep_user;
+   200		gfn_t table_gfn;
+   201		int ret;
+   202	
+   203		/* dirty/accessed bits are not supported, so no need to update them */
+   204		if (!PT_HAVE_ACCESSED_DIRTY(mmu))
+   205			return 0;
+   206	
+   207		for (level = walker->max_level; level >= walker->level; --level) {
+   208			pte = orig_pte = walker->ptes[level - 1];
+   209			table_gfn = walker->table_gfn[level - 1];
+   210			ptep_user = walker->ptep_user[level - 1];
+   211			index = offset_in_page(ptep_user) / sizeof(pt_element_t);
+   212			if (!(pte & PT_GUEST_ACCESSED_MASK)) {
+   213				trace_kvm_mmu_set_accessed_bit(table_gfn, index, sizeof(pte));
+   214				pte |= PT_GUEST_ACCESSED_MASK;
+   215			}
+   216			if (level == walker->level && write_fault &&
+   217					!(pte & PT_GUEST_DIRTY_MASK)) {
+   218				trace_kvm_mmu_set_dirty_bit(table_gfn, index, sizeof(pte));
+   219	#if PTTYPE == PTTYPE_EPT
+   220				if (kvm_x86_ops.nested_ops->write_log_dirty(vcpu, addr))
+   221					return -EINVAL;
+   222	#endif
+   223				pte |= PT_GUEST_DIRTY_MASK;
+   224			}
+   225			if (pte == orig_pte)
+   226				continue;
+   227	
+   228			/*
+   229			 * If the slot is read-only, simply do not process the accessed
+   230			 * and dirty bits.  This is the correct thing to do if the slot
+   231			 * is ROM, and page tables in read-as-ROM/write-as-MMIO slots
+   232			 * are only supported if the accessed and dirty bits are already
+   233			 * set in the ROM (so that MMIO writes are never needed).
+   234			 *
+   235			 * Note that NPT does not allow this at all and faults, since
+   236			 * it always wants nested page table entries for the guest
+   237			 * page tables to be writable.  And EPT works but will simply
+   238			 * overwrite the read-only memory to set the accessed and dirty
+   239			 * bits.
+   240			 */
+   241			if (unlikely(!walker->pte_writable[level - 1]))
+   242				continue;
+   243	
+ > 244			ret = __try_cmpxchg_user(ptep_user, &orig_pte, pte, fault);
+   245			if (ret)
+   246				return ret;
+   247	
+   248			kvm_vcpu_mark_page_dirty(vcpu, table_gfn);
+   249			walker->ptes[level - 1] = pte;
+   250		}
+   251		return 0;
+   252	}
+   253	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
