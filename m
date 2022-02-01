@@ -2,115 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 540D94A61ED
-	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 18:09:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F3014A6236
+	for <lists+kvm@lfdr.de>; Tue,  1 Feb 2022 18:19:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236088AbiBARJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 12:09:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34122 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230490AbiBARJv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 12:09:51 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD595C061714;
-        Tue,  1 Feb 2022 09:09:50 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id q63so17699735pja.1;
-        Tue, 01 Feb 2022 09:09:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=PUIgelpXEQevWyX1W8jBsBa/dCPezZfxgXScg7BVU5c=;
-        b=SW54mIhtH5QKZwMa5XF99tt04pvq6dTodAAzJOC/fyaSsk3YbovTPXlN9dJtQRy9RV
-         sZ5Dr2tD8bdIVEhWaqhIYeHFefl4pgIq29m2gZi8tpzDap4fJXTdR3kIIi9/v+aYemK7
-         NBsYzn2I5t8ouHEH4apgnJHW2iZ5yr/UbkcAhqdSVDWJW6R9FmeJJWj9nc4+BDqoqw7K
-         Tpk2sYjpqGYmk+u2ZqauQdVk0zErJXuHJDqCphJZJ+T9yXMODdkf4BGotlaiakIQxOy0
-         t25O1aVH9BsUDt+a2ggdR+VkgUv2zOMBHz7WI2miDkM4USIWtb8TTbHAVKfcAvaWPXwj
-         2fBQ==
+        id S241230AbiBARTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 12:19:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57717 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239673AbiBARTe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 12:19:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643735974;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KcsFPU0hUyaRVw35zLc4ecfKycgP6KY1g6YUHK3IxEI=;
+        b=N3J7I6MrHsb1Ab8AUbJctQGXB8gxqEcdWByx4D9RvqGsoJadMvxEZXhpRjz5EpIeBARfsH
+        Nplg4Sk8xVoaWPsCEXhUQB3+ZqTs5UN2utfd6NDkW/OJx6s5bdzJeFxKumKeIQ4EuV4ZFA
+        VKr3whfpxpx/thWQ65nHwfGydtI6EVk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-495-hNabkTuPMgqvwH6u2tZQnA-1; Tue, 01 Feb 2022 12:19:32 -0500
+X-MC-Unique: hNabkTuPMgqvwH6u2tZQnA-1
+Received: by mail-ej1-f69.google.com with SMTP id fx12-20020a170906b74c00b006bbeab42f06so3235822ejb.3
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 09:19:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=PUIgelpXEQevWyX1W8jBsBa/dCPezZfxgXScg7BVU5c=;
-        b=Vopuoq1bZ8J/AYquUtebk1M0niGaCf2BTC09RVNTpby6WFxn+h2IzsmkQ7eLnJ6bkN
-         niqX//bfUQEMlK/cIP2lN14NHB4e1DtJDXnGgm8S5Alrg4xiUEe+ewucWrXHrYctQUNh
-         nlDsl8hfYqPs4WHzxGzrp9eOL3yq2UhJUCEmARingKXNZEGz65oiCcMb1LAQRyjcfA8S
-         h7BmW9lf4l6Jl4SwFFinnrZECST9owAWLgGHL6vxEFloQEd5V2AVyMdedpDjCgeYpFPX
-         BmLrZvtJGhRnnzM0DWIyfJDQ2zlE5/Q/6Yy0nPFHdbp7gRJ4FHp1OJ5QobKjCimmaXkh
-         Ng0w==
-X-Gm-Message-State: AOAM532Y6eM/MNSmjnN0dFn1xqjVKmEClWER3GXFI8nPxWbGGVWsncgZ
-        cruexvC/pi4z6HZbi+ptgfs=
-X-Google-Smtp-Source: ABdhPJz5yB07Ix5o19k8F+dU8Px3ktIP0ST5YMwenoAWVaxtH3aTzk6TAg04YPusVJsGsVMBn8uNyQ==
-X-Received: by 2002:a17:902:e812:: with SMTP id u18mr26752712plg.12.1643735390153;
-        Tue, 01 Feb 2022 09:09:50 -0800 (PST)
-Received: from [192.168.254.17] ([50.39.160.154])
-        by smtp.gmail.com with ESMTPSA id h14sm23508476pfh.95.2022.02.01.09.09.49
+        bh=KcsFPU0hUyaRVw35zLc4ecfKycgP6KY1g6YUHK3IxEI=;
+        b=topqZzc8w3B9JIOBn/PX9nfjWtCSSq2pFBuCOHGyljiJzH4Uq4jA26WFjcrP8cgp0m
+         e5Cd6XBygwclYeUlh6e4s6oiPOFcdO8Gm53g88pzljC9PYlQQbey8xceaioMJ5SytC7K
+         J+heHT/HhD8Yy6yHEOtgw31UM61v7JCxgtPkgRPVf4xefS8tFlODXKMXSwTZMtOp9kNZ
+         j0mnAwr+ZsFLt1sV8Rwo4Nmxs3xp7/3Ny4oRp6Mi6wfruZSnoLJtMsTr47dKif1B0VVO
+         vJqhm8fEE87xHFtRnpUTOePOZofkz/jfmttZRwS3jibdaXKLiBAgXBofrOowAHHwqpxs
+         Z30A==
+X-Gm-Message-State: AOAM5311L2tGK3FuxUkZVFAodjeVT3cRNirx6eCkrJJIT+XX/49jdbSF
+        ZSzxq95j3NRKiCWyN49yq3IOpC1843OlLGWfsJKeYUkO4Pkku4sgbr4Gse2hWjBrgEu2iOZlu6F
+        ARffMvhBNaMAc
+X-Received: by 2002:a05:6402:1705:: with SMTP id y5mr26171133edu.200.1643735971719;
+        Tue, 01 Feb 2022 09:19:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJziuvxK+tKS0kkMRWjqDG2bHnRyq174U3nOlorRasUEDjgAg9WJPr5K9WPoGdm3MeRzYXOF6g==
+X-Received: by 2002:a05:6402:1705:: with SMTP id y5mr26171112edu.200.1643735971491;
+        Tue, 01 Feb 2022 09:19:31 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id i6sm14964394eja.132.2022.02.01.09.19.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Feb 2022 09:09:49 -0800 (PST)
-Message-ID: <d065921b-784c-be0c-3ad2-f2ededb201ac@gmail.com>
-Date:   Tue, 1 Feb 2022 09:09:49 -0800
+        Tue, 01 Feb 2022 09:19:30 -0800 (PST)
+Message-ID: <75b07c8e-b951-fdde-5429-27c9ef198dcc@redhat.com>
+Date:   Tue, 1 Feb 2022 18:19:29 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH 0/5] x86: uaccess CMPXCHG + KVM bug fixes
+Subject: Re: [PATCH RESEND v2] KVM: LAPIC: Enable timer posted-interrupt when
+ mwait/hlt is advertised
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com,
-        Tadeusz Struk <tadeusz.struk@linaro.org>
-References: <20220201010838.1494405-1-seanjc@google.com>
-From:   Tadeusz Struk <tstruk@gmail.com>
-In-Reply-To: <20220201010838.1494405-1-seanjc@google.com>
+        Joerg Roedel <joro@8bytes.org>, Aili Yao <yaoaili@kingsoft.com>
+References: <1643112538-36743-1-git-send-email-wanpengli@tencent.com>
+ <ae828eca-40bd-60f3-263f-5b3de637a9aa@redhat.com>
+ <CANRm+CwkYJAsv=VngY6m1uQtCLa+WqOJwSJzx95dO7LRAkbsbg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CANRm+CwkYJAsv=VngY6m1uQtCLa+WqOJwSJzx95dO7LRAkbsbg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/31/22 17:08, Sean Christopherson wrote:
-> Add uaccess macros for doing CMPXCHG on userspace addresses and use the
-> macros to fix KVM bugs by replacing flawed code that maps memory into the
-> kernel address space without proper mmu_notifier protection (or with
-> broken pfn calculations in one case).
+On 2/1/22 14:57, Wanpeng Li wrote:
+> On Tue, 1 Feb 2022 at 20:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 1/25/22 13:08, Wanpeng Li wrote:
+>>> As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via posted interrupt)
+>>> mentioned that the host admin should well tune the guest setup, so that vCPUs
+>>> are placed on isolated pCPUs, and with several pCPUs surplus for*busy*  housekeeping.
+>>> It is better to disable mwait/hlt/pause vmexits to keep the vCPUs in non-root
+>>> mode. However, we may isolate pCPUs for other purpose like DPDK or we can make
+>>> some guests isolated and others not, we may lose vmx preemption timer/timer fastpath
+>>> due to not well tuned setup, and the checking in kvm_can_post_timer_interrupt()
+>>> is not enough. Let's guarantee mwait/hlt is advertised before enabling posted-interrupt
+>>> interrupt. vmx preemption timer/timer fastpath can continue to work if both of them
+>>> are not advertised.
+>>
+>> Is this the same thing that you meant?
+>>
+>> --------
+>> As commit 0c5f81dad46 ("KVM: LAPIC: Inject timer interrupt via posted interrupt")
+>> mentioned that the host admin should well tune the guest setup, so that vCPUs
+>> are placed on isolated pCPUs, and with several pCPUs surplus for *busy* housekeeping.
+>> In this setup, it is preferrable to disable mwait/hlt/pause vmexits to
+>> keep the vCPUs in non-root mode.
+>>
+>> However, if only some guests isolated and others not, they would not have
+>> any benefit from posted timer interrupts, and at the same time lose
+>> VMX preemption timer fast paths because kvm_can_post_timer_interrupt()
+>> returns true and therefore forces kvm_can_use_hv_timer() to false.
+>>
+>> By guaranteeing that posted-interrupt timer is only used if MWAIT or HLT
+>> are done without vmexit, KVM can make a better choice and use the
+>> VMX preemption timer and the corresponding fast paths.
+>> --------
 > 
-> Add yet another Kconfig for guarding asm_volatile_goto() to workaround a
-> clang-13 bug.  I've verified the test passes on gcc versions of arm64,
-> PPC, RISC-V, and s390x that also pass the CC_HAS_ASM_GOTO_OUTPUT test.
-> 
-> Patches 1-4 are tagged for stable@ as patches 3 and 4 (mostly 3) need a
-> backportable fix, and doing CMPXCHG on the userspace address is the
-> simplest fix from a KVM perspective.
-> 
-> Peter Zijlstra (1):
->    x86/uaccess: Implement macros for CMPXCHG on user addresses
-> 
-> Sean Christopherson (4):
->    Kconfig: Add option for asm goto w/ tied outputs to workaround
->      clang-13 bug
->    KVM: x86: Use __try_cmpxchg_user() to update guest PTE A/D bits
->    KVM: x86: Use __try_cmpxchg_user() to emulate atomic accesses
->    KVM: x86: Bail to userspace if emulation of atomic user access faults
-> 
->   arch/x86/include/asm/uaccess.h | 131 +++++++++++++++++++++++++++++++++
->   arch/x86/kvm/mmu/paging_tmpl.h |  45 +----------
->   arch/x86/kvm/x86.c             |  35 ++++-----
->   init/Kconfig                   |   4 +
->   4 files changed, 150 insertions(+), 65 deletions(-)
+> Looks better, thanks Paolo! :)
 
-This also fixes the following syzbot issue:
-https://syzkaller.appspot.com/bug?id=6cb6102a0a7b0c52060753dd62d070a1d1e71347
+Queued then, thanks!
 
-Tested-by: Tadeusz Struk <tadeusz.struk@linaro.org>
+Paolo
 
---
-Thanks,
-Tadeusz
