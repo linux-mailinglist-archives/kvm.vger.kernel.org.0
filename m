@@ -2,125 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10E434A6F8C
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 12:07:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F514A6FB0
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 12:14:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236838AbiBBLGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 06:06:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51858 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236708AbiBBLGj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 06:06:39 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF2CC06173E;
-        Wed,  2 Feb 2022 03:06:39 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C5E0E1EC0513;
-        Wed,  2 Feb 2022 12:06:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1643799993;
+        id S1343806AbiBBLOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 06:14:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27680 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236959AbiBBLOk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 06:14:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643800479;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=T5KarsviFxcdPdr91Ju50bIXrFx/Ww52H/WmFLJHWWk=;
-        b=oXHB2bMIYcC69Z2LEdY0Kp3e4q+aUB7LWsYhNn3wevkRodEY2WCg1LuVEpeNDtxTrfzab8
-        ct1X+4H0PojDxi5drGWWg6PRjOminwTVFtJA8ySyvP9PR9gy2fZC7eyO03NzYf5MlVpIpz
-        ttux2IT7OMBSjaXoLcwcmTzaun8uLjI=
-Date:   Wed, 2 Feb 2022 12:06:29 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 17/43] x86/kernel: Make the .bss..decrypted section
- shared in RMP table
-Message-ID: <YfpltcR7IqhP5KTq@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-18-brijesh.singh@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=GKi4fqp9T90PFymDadhmgce6wMt0VwHShO7jEqza5eU=;
+        b=iuGc8kuceYmiQNnim8rikVs72YZSGkCrM9os4WsBuFSRA+0MfrH/lkfu8xO/hCBhNQrGDu
+        UFlJLc0Tii92/pt4R8WDruPUGDbY9nHyP8VGi2rZJrVJIZEgsfNJ1xQ9CIco0j9MGTi8I3
+        EHOS65zcz2CBbvaHrjKC67OiJhYic/4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-343-dFIjoGhpNNqu9IWq3WKPLA-1; Wed, 02 Feb 2022 06:14:36 -0500
+X-MC-Unique: dFIjoGhpNNqu9IWq3WKPLA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E9DC8145E0;
+        Wed,  2 Feb 2022 11:14:35 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D9B110840C8;
+        Wed,  2 Feb 2022 11:14:31 +0000 (UTC)
+Date:   Wed, 2 Feb 2022 11:14:30 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <Yfpnlv2GudpPFwok@stefanha-x1.localdomain>
+References: <20220128094129.40809-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="fuCjJKl+rhQI04HL"
 Content-Disposition: inline
-In-Reply-To: <20220128171804.569796-18-brijesh.singh@amd.com>
+In-Reply-To: <20220128094129.40809-1-sgarzare@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 11:17:38AM -0600, Brijesh Singh wrote:
-> The encryption attribute for the .bss..decrypted section is cleared in the
-> initial page table build. This is because the section contains the data
-> that need to be shared between the guest and the hypervisor.
-> 
-> When SEV-SNP is active, just clearing the encryption attribute in the
-> page table is not enough. The page state need to be updated in the RMP
-> table.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+
+--fuCjJKl+rhQI04HL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 28, 2022 at 10:41:29AM +0100, Stefano Garzarella wrote:
+> In vhost_enable_notify() we enable the notifications and we read
+> the avail index to check if new buffers have become available in
+> the meantime.
+>=20
+> We do not update the cached avail index value, so when the device
+> will call vhost_get_vq_desc(), it will find the old value in the
+> cache and it will read the avail index again.
+>=20
+> It would be better to refresh the cache every time we read avail
+> index, so let's change vhost_enable_notify() caching the value in
+> `avail_idx` and compare it with `last_avail_idx` to check if there
+> are new buffers available.
+>=20
+> We don't expect a significant performance boost because
+> the above path is not very common, indeed vhost_enable_notify()
+> is often called with unlikely(), expecting that avail index has
+> not been updated.
+>=20
+> We ran virtio-test/vhost-test and noticed minimal improvement as
+> expected. To stress the patch more, we modified vhost_test.ko to
+> call vhost_enable_notify()/vhost_disable_notify() on every cycle
+> when calling vhost_get_vq_desc(); in this case we observed a more
+> evident improvement, with a reduction of the test execution time
+> of about 3.7%.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  arch/x86/kernel/head64.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> index 8075e91cff2b..1239bc104cda 100644
-> --- a/arch/x86/kernel/head64.c
-> +++ b/arch/x86/kernel/head64.c
-> @@ -143,7 +143,21 @@ static unsigned long sme_postprocess_startup(struct boot_params *bp, pmdval_t *p
->  	if (sme_get_me_mask()) {
->  		vaddr = (unsigned long)__start_bss_decrypted;
->  		vaddr_end = (unsigned long)__end_bss_decrypted;
-> +
->  		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
-> +			/*
-> +			 * When SEV-SNP is active then transition the page to
-> +			 * shared in the RMP table so that it is consistent with
-> +			 * the page table attribute change.
-> +			 *
-> +			 * At this point, kernel is running in identity mapped mode.
-> +			 * The __start_bss_decrypted is a regular kernel address. The
-> +			 * early_snp_set_memory_shared() requires a valid virtual
-> +			 * address, so use __pa() against __start_bss_decrypted to
-> +			 * get valid virtual address.
-> +			 */
+> v3
+> - reworded commit description [Stefan]
+> ---
+>  drivers/vhost/vhost.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 59edb5a1ffe2..07363dff559e 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, str=
+uct vhost_virtqueue *vq)
+>  		       &vq->avail->idx, r);
+>  		return false;
+>  	}
+> +	vq->avail_idx =3D vhost16_to_cpu(vq, avail_idx);
+> =20
+> -	return vhost16_to_cpu(vq, avail_idx) !=3D vq->avail_idx;
+> +	return vq->avail_idx !=3D vq->last_avail_idx;
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_enable_notify);
 
-How's that?
+This changes behavior (fixes a bug?): previously the function returned
+false when called with avail buffers still pending (vq->last_avail_idx <
+vq->avail_idx). Now it returns true because we compare against
+vq->last_avail_idx and I think that's reasonable.
 
-                        /*
-                         * On SNP, transition the page to shared in the RMP table so that
-                         * it is consistent with the page table attribute change.
-                         *
-                         * __start_bss_decrypted has a virtual address in the high range
-                         * mapping (kernel .text). PVALIDATE, by way of
-                         * early_snp_set_memory_shared(), requires a valid virtual
-                         * address but the kernel is currently running off of the identity
-                         * mapping so use __pa() to get a *currently* valid virtual address.
-                         */
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
--- 
-Regards/Gruss,
-    Boris.
+--fuCjJKl+rhQI04HL
+Content-Type: application/pgp-signature; name="signature.asc"
 
-https://people.kernel.org/tglx/notes-about-netiquette
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmH6Z5YACgkQnKSrs4Gr
+c8hzcAf+JA1nvAfB9vXnXaEvnqavzXy0JQP6jb39LJJcY+fOuScye2bC2h+EYGJk
++KItlNdztAg4O9VE6Tp9ufuyr7703+VHDMyD3JJlYlEhnzVMWcC7CF3xq8S9tQQF
+qV7wuXSciwoLHzMeqCtnNvjw5JeNQd5f6I33gESvqIKg+CxIsKpuWdqFPB+YLRtn
+KP2AwsbzDplPauvcs7iSeTii6q0S8TUe4Xxb+m/Ph8nESlST15G5TOA22+KCQU7h
+gjLk5rf0LMZjYkLi7TTDGUSfBGDmQtyY2cE8GhAxhnbkeMh0LQSXTnvrtIJcS5TB
+R8OcYI7Dk00alFycjUdq9M002b/KiA==
+=Qrnr
+-----END PGP SIGNATURE-----
+
+--fuCjJKl+rhQI04HL--
+
