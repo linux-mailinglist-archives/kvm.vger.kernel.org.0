@@ -2,155 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF2624A7B6D
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 00:04:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 081F64A7BA9
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 00:24:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347992AbiBBXEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 18:04:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47762 "EHLO
+        id S1348078AbiBBXYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 18:24:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242772AbiBBXEm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 18:04:42 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B04C061714
-        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 15:04:42 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id a185-20020a6bcac2000000b00604c268546dso555071iog.10
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 15:04:42 -0800 (PST)
+        with ESMTP id S230489AbiBBXYD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 18:24:03 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6510C06173B
+        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 15:24:03 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id i30so635238pfk.8
+        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 15:24:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=49EqflXLEqhjGeVuRi+NUNOqk5wUT6yfoOQ51n1x3mo=;
-        b=XhSn0fIbH8QaNW4Wkx15oVeWqxU2L/sTnsjfTIqM1WSpSbr08R3AR60btkAl0fzIV7
-         ZkN1zatwp7wQGAdPiUbJkOwaq0SkKzIX7MjuMFKjbnHj3fUbJY7m/Y6mxUx2j+TRtL8O
-         /37vD6PJxMpnwJSxz5eHgOsa9pUYuhpM6vg/Wd3pabTqR50QKBufhA1TBnb+5pAz8aCA
-         EtTlJ144IEQseHBA3xGf3ML1No4szQSFKQy2vI928iX07TVVgw6xLrsgvtxsD/iTrL/S
-         bU0Rg/etz0RN2piaEqpqXcROchDo3DIjkQN5ZJ8UaV9xkIdjO0amP4wBfzpSGDTo9bhf
-         IcXg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TMRuvj0YHSNq7J8xOEwAXO2ubsHdoBysuDc2sKEVP3s=;
+        b=ULms3/ZRHlzY8oLjMfRqpQyd8v2wX/UI9/n0bqukSNG9LV/tluvg6vlFRvnHwxb/jM
+         VX6uDlvynqTGzvXEuEnSI5GQ3BykMjyFrVKEU4oE9COK/+enYL+Day453MVa6rWZCVFM
+         7bqx8ZuDLYDU4AyDI7PcH4K5V7bY6dBp86ccmUp9vJERazJv+epOk2n8B5Siil7Oymd0
+         TOFtvlTXTsG9B6zeSRf+YJBdaguvjoqadDwP6K36H2+2tF3UqIFec0qy9giwGeqBPJT+
+         iiSAPOQFPGCakiSuNPpGfE1BrvmEnWgStWOtOlucxsxG/iKCvqx4gYoas04WUr0IWPdM
+         mIhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=49EqflXLEqhjGeVuRi+NUNOqk5wUT6yfoOQ51n1x3mo=;
-        b=p/hEroca+Soexj95PR8XZJ/kTyBtrni0PKLTjoGTYHu7UzY6L76068IoAFVETNpL6u
-         tdprNKt4Jox7o6HdTANQ3PKt8O2Kpc2wSyCpE3aHAOF74Icx2ZnfvxxrIFz0EVSEdizu
-         ZbFtzvYSvDPTVWglaGCu+bx+lmy/s6YXhd64J4HPa83KrrN6YM5Z4sfhA0JJ5OBdwm/f
-         wByGfR77ry9dKOvhc27TulCkIJ8VDnGe8/pI5OjujVU/C4ElcMDZ2OQIcfyzn4uHAc+N
-         9+bp8Pl8ncWh1GL7ztiZBIgNxFFrKKbhmmTYzT9ZDSG+8NUw7ju2hDEOPmIKwGdC7kwX
-         s9KA==
-X-Gm-Message-State: AOAM531swTqlR/382LzmpHROip8HrNZNjBiZxTY+d29k42j0G9eBv6zq
-        hTmV9Qq0eaDWNRpztlmoQVc9wn/LLs7riGYAX4reTpcsBUgDeJauTEr4Ox5wKpORgIkYpUxCBUV
-        mBVgJymrMvHImON4qbyFPBnaLmZCEfjjj9yt+noQi7WvoDpPe2LXSUbtR1w==
-X-Google-Smtp-Source: ABdhPJxCeUDeTkE43mdUzbWq0+k5bQfc3KqabiiRxOL3ZR4beQ9KVnqw0EY2+c1h70gUbZWRZXN2t71imLY=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a5d:884b:: with SMTP id t11mr16746514ios.53.1643843081925;
- Wed, 02 Feb 2022 15:04:41 -0800 (PST)
-Date:   Wed,  2 Feb 2022 23:04:33 +0000
-In-Reply-To: <20220202230433.2468479-1-oupton@google.com>
-Message-Id: <20220202230433.2468479-5-oupton@google.com>
-Mime-Version: 1.0
-References: <20220202230433.2468479-1-oupton@google.com>
-X-Mailer: git-send-email 2.35.0.rc2.247.g8bbb082509-goog
-Subject: [PATCH 4/4] selftests: KVM: Add test case for "{load/clear}
- IA32_BNDCFGS" invariance
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TMRuvj0YHSNq7J8xOEwAXO2ubsHdoBysuDc2sKEVP3s=;
+        b=m6tGlyZc/ozvI+w2mfkdFMandDhO2DHGkNr7WRIjbU4vJYgh1yf/4rDeXX/RrO7lPO
+         Zb8+MXHjb1DCnPQExeki5FsjLGDntwC9/0UVsDlkb30HNZPFMN4uZAkUdsDXl9DS4WXT
+         xjmsdZRfS81sgLbn1qeCJqKtAItxgNAmGJkEnsBvyj8KG+MJ6zbM2D3tgLiT41ki6VKo
+         DE5ozd7htpDkukU7hIm50H/l+I4ezuHBWo0pNav7pspVBUC+PXkH1qTe7LWEsly5Q1a3
+         ylsp1ZkPDX6rK3ZkaKmqmt0P32M8hBDbpcG02TnpdNeey3c5QjPFTxQQK7Evr+s5oXtp
+         rU5g==
+X-Gm-Message-State: AOAM533vN1PVeXOeFm5McaTRCOYM2QFnDSotOwdzcH238dQ/oDz7Xbii
+        ltZ9L/6yQMNThLJYh/3yUpfwTUB8oJ8LHQ==
+X-Google-Smtp-Source: ABdhPJw/VhzDp5WVmvlbQGPQXxyweppph1Vh5AQrAkvzGhAzooZZ0zxO4saiM9oL8DJQGQ56OGUU9Q==
+X-Received: by 2002:a63:485f:: with SMTP id x31mr8133318pgk.358.1643844242921;
+        Wed, 02 Feb 2022 15:24:02 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ne23sm4147784pjb.57.2022.02.02.15.24.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Feb 2022 15:24:02 -0800 (PST)
+Date:   Wed, 2 Feb 2022 23:23:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Chao Gao <chao.gao@intel.com>, Zeng Guang <guang.zeng@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>
+Subject: Re: [PATCH v5 7/8] KVM: VMX: Update PID-pointer table entry when
+ APIC ID is changed
+Message-ID: <YfsSjvnoQcfzdo68@google.com>
+References: <20211231142849.611-1-guang.zeng@intel.com>
+ <20211231142849.611-8-guang.zeng@intel.com>
+ <640e82f3-489d-60af-1d31-25096bef1a46@amd.com>
+ <4eee5de5-ab76-7094-17aa-adc552032ba0@intel.com>
+ <aa86022c-2816-4155-8d77-f4faf6018255@amd.com>
+ <aa7db6d2-8463-2517-95ce-c0bba22e80d4@intel.com>
+ <d058f7464084cadc183bd9dbf02c7f525bb9f902.camel@redhat.com>
+ <20220110074523.GA18434@gao-cwp>
+ <1ff69ed503faa4c5df3ad1b5abe8979d570ef2b8.camel@redhat.com>
+ <YeClaZWM1cM+WLjH@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YeClaZWM1cM+WLjH@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that clearing the "{load/clear IA32_BNDCFGS" bits is preserved
-across KVM_SET_CPUID2.
+On Thu, Jan 13, 2022, Sean Christopherson wrote:
+> On Tue, Jan 11, 2022, Maxim Levitsky wrote:
+> > Both Intel and AMD's PRM also state that changing APIC ID is implementation
+> > dependent.
+> >  
+> > I vote to forbid changing apic id, at least in the case any APIC acceleration
+> > is used, be that APICv or AVIC.
+> 
+> That has my vote as well.  For IPIv in particular there's not much concern with
+> backwards compability, i.e. we can tie the behavior to enable_ipiv.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../selftests/kvm/include/x86_64/vmx.h        |  2 +
- .../kvm/x86_64/vmx_capability_msrs_test.c     | 37 +++++++++++++++++++
- 2 files changed, 39 insertions(+)
+Hrm, it may not be that simple.  There's some crusty (really, really crusty) code
+in Linux's boot code that writes APIC_ID.  IIUC, the intent is to play nice with
+running a UP crash dump kernel on "BSP" that isn't "the BSP", e.g. has a non-zero
+APIC ID.
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-index 583ceb0d1457..811c66d9be74 100644
---- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-@@ -80,6 +80,7 @@
- #define VM_EXIT_SAVE_IA32_EFER			0x00100000
- #define VM_EXIT_LOAD_IA32_EFER			0x00200000
- #define VM_EXIT_SAVE_VMX_PREEMPTION_TIMER	0x00400000
-+#define VM_EXIT_CLEAR_BNDCFGS			0x00800000
- 
- #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
- 
-@@ -90,6 +91,7 @@
- #define VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL	0x00002000
- #define VM_ENTRY_LOAD_IA32_PAT			0x00004000
- #define VM_ENTRY_LOAD_IA32_EFER			0x00008000
-+#define VM_ENTRY_LOAD_BNDCFGS			0x00010000
- 
- #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
- 
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_capability_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_capability_msrs_test.c
-index 8a1a545e658b..a0851b1224aa 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_capability_msrs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_capability_msrs_test.c
-@@ -67,6 +67,42 @@ static void load_perf_global_ctrl_test(struct kvm_vm *vm)
- 		    "\"load IA32_PERF_GLOBAL_CTRL\" VM-Exit bit set");
- }
- 
-+/*
-+ * Test to assert that clearing the "load IA32_BNDCFGS" and "clear IA32_BNDCFGS"
-+ * control capability bits is preserved across a KVM_SET_CPUID2.
-+ */
-+static void bndcfgs_ctrl_test(struct kvm_vm *vm)
-+{
-+	uint32_t entry_low, entry_high, exit_low, exit_high;
-+	struct kvm_cpuid2 *cpuid;
-+
-+	get_vmx_capability_msr(vm, MSR_IA32_VMX_TRUE_ENTRY_CTLS, &entry_low, &entry_high);
-+	get_vmx_capability_msr(vm, MSR_IA32_VMX_TRUE_EXIT_CTLS, &exit_low, &exit_high);
-+
-+	if (!(entry_high & VM_ENTRY_LOAD_BNDCFGS) || !(exit_high & VM_EXIT_CLEAR_BNDCFGS)) {
-+		print_skip("\"{load,clear} IA32_BNDCFGS\" controls not supported");
-+		return;
-+	}
-+
-+	entry_high &= ~VM_ENTRY_LOAD_BNDCFGS;
-+	exit_high &= ~VM_EXIT_CLEAR_BNDCFGS;
-+
-+	set_vmx_capability_msr(vm, MSR_IA32_VMX_TRUE_ENTRY_CTLS, entry_low, entry_high);
-+	set_vmx_capability_msr(vm, MSR_IA32_VMX_TRUE_EXIT_CTLS, exit_low, exit_high);
-+
-+	cpuid = kvm_get_supported_cpuid();
-+	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+
-+	get_vmx_capability_msr(vm, MSR_IA32_VMX_TRUE_ENTRY_CTLS, &entry_low, &entry_high);
-+	get_vmx_capability_msr(vm, MSR_IA32_VMX_TRUE_EXIT_CTLS, &exit_low, &exit_high);
-+
-+	TEST_ASSERT(!(entry_high & VM_ENTRY_LOAD_BNDCFGS),
-+		    "\"load IA32_BNDCFGS\" VM-Entry bit set");
-+	TEST_ASSERT(!(exit_high & VM_EXIT_CLEAR_BNDCFGS),
-+		    "\"clear IA32_BNDCFGS\" VM-Exit bit set");
-+}
-+
-+
- int main(void)
- {
- 	struct kvm_vm *vm;
-@@ -77,6 +113,7 @@ int main(void)
- 	vm = vm_create_default(VCPU_ID, 0, NULL);
- 
- 	load_perf_global_ctrl_test(vm);
-+	bndcfgs_ctrl_test(vm);
- 
- 	kvm_vm_free(vm);
- }
--- 
-2.35.0.rc2.247.g8bbb082509-goog
+static void __init apic_bsp_up_setup(void)
+{
+#ifdef CONFIG_X86_64
+	apic_write(APIC_ID, apic->set_apic_id(boot_cpu_physical_apicid));
+#else
+	/*
+	 * Hack: In case of kdump, after a crash, kernel might be booting
+	 * on a cpu with non-zero lapic id. But boot_cpu_physical_apicid
+	 * might be zero if read from MP tables. Get it from LAPIC.
+	 */
+# ifdef CONFIG_CRASH_DUMP
+	boot_cpu_physical_apicid = read_apic_id();
+# endif
+#endif
+}
 
+The most helpful comment is in generic_processor_info():
+
+	/*
+	 * boot_cpu_physical_apicid is designed to have the apicid
+	 * returned by read_apic_id(), i.e, the apicid of the
+	 * currently booting-up processor. However, on some platforms,
+	 * it is temporarily modified by the apicid reported as BSP
+	 * through MP table. Concretely:
+	 *
+	 * - arch/x86/kernel/mpparse.c: MP_processor_info()
+	 * - arch/x86/mm/amdtopology.c: amd_numa_init()
+	 *
+	 * This function is executed with the modified
+	 * boot_cpu_physical_apicid. So, disabled_cpu_apicid kernel
+	 * parameter doesn't work to disable APs on kdump 2nd kernel.
+	 *
+	 * Since fixing handling of boot_cpu_physical_apicid requires
+	 * another discussion and tests on each platform, we leave it
+	 * for now and here we use read_apic_id() directly in this
+	 * function, generic_processor_info().
+	 */
+
+It's entirely possible that this path is unused in a KVM guest, but I don't think
+we can know that with 100% certainty.
+
+But I also completely agree that attempting to keep the tables up-to-date is ugly
+and a waste of time and effort, e.g. as Maxim pointed out, the current AVIC code
+is comically broken.
+
+Rather than disallowing the write, what if we add yet another inhibit that disables
+APICv if IPI virtualization is enabled and a vCPU has an APIC ID != vcpu_id?  KVM
+is equipped to handle the emulation, so it just means that a guest that's doing 
+weird things loses a big of performance.
