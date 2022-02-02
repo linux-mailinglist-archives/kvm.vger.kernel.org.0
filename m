@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F12F34A6ACC
+	by mail.lfdr.de (Postfix) with ESMTP id A73C14A6ACB
 	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 05:13:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244319AbiBBENl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 23:13:41 -0500
-Received: from mail-bn7nam10on2082.outbound.protection.outlook.com ([40.107.92.82]:23809
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S244299AbiBBENk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 23:13:40 -0500
+Received: from mail-dm6nam12on2046.outbound.protection.outlook.com ([40.107.243.46]:53569
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S244275AbiBBENf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S244041AbiBBENf (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Feb 2022 23:13:35 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P2IFgTHL92Y2/0T6/b+GY9fnxsXan84KLRDcNJFF4wTaVBl1bKNxRVOTesdlED8g/m9uqn2e6QC9stWx3tv15kGKKyS1sPZIHvy9xAAbbQxCxhCOBO8ytzRrrHvN/zjaw4GCSNaLk0FSlC5cy5stvVCxOaESvBVWXhvEJTTDGPu+Bz2ME+GGK953M7rRWrJFDScP5hZK6ELn1C0v21x+hvEavOSAMckKeir8UpyB1UMkMCpa9h0Ex2jjhk+A13xz8qURoBa/jV+IuFBP6nccucWpgL1wNRe1kh6qhotxGplRr3OduJtFJA0dKyXtIuDLF+0/+MEZvQHc7edoDAL1rg==
+ b=fqYrS75lwLY2Yko41sElU1SHti1PkYVIO3swAmt5NYnOei4m0Z6Xb68Afb5zdW7ykw+3PqBsN92v0Z6KzDjFMKVc3qklu/7ovZYRq0N6S9BxXkAsdgmtrMGGxsBODYKTZf1eckewoi3YV+Ed9FxppRa0c55nyXbehmsg0GqxOfs28M/9jc+Wt0zKtDrZLaNZY2K79elXs4NETLaohEIQe+JgugfFpnV2Z6xLZwo+EkZoXd75RTWMklhpSAMj58e68Eo3x+JmP5lxq+NZuTzfnYbc1ZuI7WjigM0+TLvFX3Yy8GM/MU79NmDK+6adyzYE/khdNKWL9nhSIAv7liSJgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=T8kDgA3ZhNJgcp8z9OczXhS/s3+uCb+h8OAHgrpCkbk=;
- b=joWhGRCSsFgU7NoDs/W/cGPp+oerKkmT5IEsPmlhK7IdUByPoYQHGSMsmQJQc6dgQaADaIpEkbk9ZT4YL3FqTzWrz8gV66vZLH1zOUEnvK7dTckRDpGw8tbgZzLu+i6cO1JVioIGrOik76rVDePQNudTTyTbVySJqJYhHeSxtotQelRjazpdkjWVj+qGNU268DZQWYk5NFirpuG9MrQ55KWg/qcUX1AvfB2EH1ojsIWrfG9nBDVGsU0phqUs1tVLHVSwmXl0ByrnH0BC6Ita9hX0YntkvRZf30gWTXfuHKTPvGwIE8EyPKPr2tWTzXrkzIDsSKi7Zn2+TZ2ZqGVr3Q==
+ bh=RYrcdxL/0Nmp4KpM+BbFq2Viz+0j2qsvxaFq4m+huW4=;
+ b=TnV5mTm9Y5Ed+6McIBj2dKO3bzZoBEZ4iJkbIZOpI9h48AzDgTVnVVG70X4xu31eIjbuZ/8yFPoZtpxdDrY0I7j3sdnt3df9fEHy4JVrgg27WkDT4dirOIs/VAbsGJICwBGCjt61jSbv+osndsHnP3Q+8i+i6oiKbgTgq8wHcvDTDTU2qpdFgBAFvaT43FiPE8L5xcYFIMIzOvavfuPtji6couNOuEv4lUX73ZN7/ZnSJcrPIoH9PUCY/oFTO38MUFD21rR4Kr/jUy5uEdjb67Q+/7dHdCKJppw1v5UBmCA1SxxXTOiEos9Yt1OViUjG9OaGIW42dP5xwtWo61jLCQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T8kDgA3ZhNJgcp8z9OczXhS/s3+uCb+h8OAHgrpCkbk=;
- b=A5euqg70RGVOGuWDeMwjGCajK2ai4IjbobcFlMWeREUhu2kWPon7n0+LJ/IjZOVQqKj3FQ95VaP06yHQiHO5UTrzNZcxNelmJbYIc1y7h0SvhUs9v/JaRSsFN/sWC2ZqgP5shoBqP1y+LXpiLzG/65B7Ez4GxxL8UgTuOJtx/VI=
-Received: from DM5PR2001CA0018.namprd20.prod.outlook.com (2603:10b6:4:16::28)
- by DM6PR12MB3196.namprd12.prod.outlook.com (2603:10b6:5:187::27) with
+ bh=RYrcdxL/0Nmp4KpM+BbFq2Viz+0j2qsvxaFq4m+huW4=;
+ b=Kb2R7sOI7HkF20AJTw+22gHk4csT18bd8A34yEugrzJBxWa8KctoehVnP1nenVH/t2xviGM2uueE2fAepP6I/UjqEMcDjFG8yi5a4Owe9OIaEEUEh3LxAROQ0uXbed/auOJkU22gcVkKPs5jRa2m8d7nnW6yY75rcbckFGiuJR8=
+Received: from DM6PR11CA0066.namprd11.prod.outlook.com (2603:10b6:5:14c::43)
+ by BN6PR12MB1713.namprd12.prod.outlook.com (2603:10b6:404:106::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.20; Wed, 2 Feb
- 2022 04:13:31 +0000
-Received: from DM6NAM11FT021.eop-nam11.prod.protection.outlook.com
- (2603:10b6:4:16:cafe::77) by DM5PR2001CA0018.outlook.office365.com
- (2603:10b6:4:16::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.22 via Frontend
- Transport; Wed, 2 Feb 2022 04:13:31 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.11; Wed, 2 Feb
+ 2022 04:13:32 +0000
+Received: from DM6NAM11FT030.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:14c:cafe::4a) by DM6PR11CA0066.outlook.office365.com
+ (2603:10b6:5:14c::43) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17 via Frontend
+ Transport; Wed, 2 Feb 2022 04:13:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -44,13 +44,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT021.mail.protection.outlook.com (10.13.173.76) with Microsoft SMTP
+ DM6NAM11FT030.mail.protection.outlook.com (10.13.172.146) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4951.12 via Frontend Transport; Wed, 2 Feb 2022 04:13:31 +0000
+ 15.20.4951.12 via Frontend Transport; Wed, 2 Feb 2022 04:13:32 +0000
 Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Tue, 1 Feb
- 2022 22:13:28 -0600
+ 2022 22:13:30 -0600
 From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <x86@kernel.org>
@@ -59,9 +59,9 @@ CC:     <seanjc@google.com>, <mlevitsk@redhat.com>, <pbonzini@redhat.com>,
         <bp@alien8.de>, <peterz@infradead.org>, <hpa@zytor.com>,
         <jon.grimm@amd.com>,
         "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>
-Subject: [PATCH v4 1/3] KVM: SVM: Only call vcpu_(un)blocking when AVIC is enabled.
-Date:   Tue, 1 Feb 2022 22:11:10 -0600
-Message-ID: <20220202041112.273017-2-suravee.suthikulpanit@amd.com>
+Subject: [PATCH v4 2/3] x86/apic: Add helper function to get maximum physical APIC ID
+Date:   Tue, 1 Feb 2022 22:11:11 -0600
+Message-ID: <20220202041112.273017-3-suravee.suthikulpanit@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220202041112.273017-1-suravee.suthikulpanit@amd.com>
 References: <20220202041112.273017-1-suravee.suthikulpanit@amd.com>
@@ -73,132 +73,67 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d38a0e75-6bb0-45f6-05ba-08d9e6025f56
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3196:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB31967D128F4E80412E965FB6F3279@DM6PR12MB3196.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:120;
+X-MS-Office365-Filtering-Correlation-Id: b549264e-4dd9-49df-f866-08d9e6025ff2
+X-MS-TrafficTypeDiagnostic: BN6PR12MB1713:EE_
+X-Microsoft-Antispam-PRVS: <BN6PR12MB171391F7DCA336E1DF06D16CF3279@BN6PR12MB1713.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1148;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GRYW76rGfG8ZDC0AKw0ROEBUueeDPZLXmpS/zD2HY3Dd4YFFgrXnCkylUCLn+RlfXem5CZTtFV4fom6Q1sxMY1JuBSpYzQRfwPhvDtANH23CRbA+tSbz94/ncgnbSgaMAfjZ93b6Cqi4Jbz4K5edQZankQl2q+PtxnwbAmaIeVkeUpuifg2cn1WStLb4tRlwwZuPBItGjy18BjO3SCZ6dVo4JkXZyzmQb5Lvd6k3pu0tpTPmb5uPqIkFIllk964e7naUeq0j87cFm/HbJ6RPWDkiz0sCpFYzXUPaF1eyVhMuc88caF6t2tsZRmfIPA65D70SS1/RbqW+Pc1nDX0HtJveVW48sGRQc+cu2Dsufd5Yh11tWILtWCyTU00Azpk6TCU6aT89NNk5f5oNFxv4UFweqKd52+GVf4xsrc6lOFX0BM1+IH5XL2BMf6IN+SH0T4ZRfv0NH6VkixvBqvLSrAibE2UXykE6l7piIqqBY580llu7n+qd3Ev+MPFW+zqcY+oAIz0j2AzLJo1iJHRXvgwdUU+QXG57XHZ8OQfXds5gpbFWapSDNm/hAPpBgw1AkiY5k+9dRwONEzVXxONPvCznp3nB4Xv5xEAcuHL3vDH0QUNbfloUbjFia974U03chXCRtSR6wRmjsqnK8SgqP3F5IKBZtUiuwkN3tREQF59VBbOpGbMny9fin+5bC7NZl+8YpctArAg2lQb2kFG6JxUGjSR+RYrsBbdflhr4sNtH7STeGAiLqTCrCevgYvmtUwnbGiy50glw5zGtletDYA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(82310400004)(2906002)(54906003)(7696005)(6666004)(110136005)(36756003)(7416002)(508600001)(8676002)(8936002)(316002)(44832011)(70586007)(4326008)(70206006)(5660300002)(47076005)(16526019)(83380400001)(81166007)(86362001)(356005)(1076003)(26005)(186003)(336012)(426003)(2616005)(36860700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 63BTeXs9+CQhWmX3B1tXFoQLflTFqzbCwRd4TniS9ppHw6ltSec0wvPJ7AtjO9yw5Mibz3d/6b/vAnNMIed91fqOCnfD6XwtSvhTetQFt91AErhhb/haWR8dQP9wRsGT+oUpCD3yFgY+lm2tyBl7yZ8kwPFlpWdonuqjY69FwkXYdfoI9syYv1++E1vo9g0XTGB1cOX3RZYP/OG65bsWDnMadwvhV8VaKYBgP9iqOIKAd521mYrc24l4q+zF+25kffkJLS0fhmsgR23yUnqwX1hQBiHtpsMlpjQhrbun2kKAT+bHfMtv/R2X7AwK/X8+hL/gDLoHmyKX9LDHltD2isCIZCFUWN9yAw7fMkTjsifkfe3LnOWI7kXlMz9HUKJsuj3MXblmSYkIcPuN5iy9ak1h1SKJ1Zx0y09XfNIjV1FXRhXZLSLx8pUtRNVSH6sTbvpBAmx7hACQf6QX/kyd7wQCpL3Z3qhCWdV3jy2Fip/yC+6Nl419lq2v15oszfwXE7GkxgmeYwpJus8LsXUvwQgsKeFYQitpmeHVcA0YDvkkOO0EPhyCeXThUbyU9YvxQECl0SrNTV2Ip3e9z5Ws57KS6y+AEvW3MZIxEYfv+Pdt0U0RBmZYP8OvDega1+ot8ttUspdatLiMyUXd9vtyjX4BFmv3xhoWDJSc3pBYLfCc+G1J3yda8Yk3p/nVhYfPWt9msRhiM00YT99Iz3io9Q==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(316002)(356005)(1076003)(36756003)(186003)(26005)(81166007)(110136005)(54906003)(16526019)(2616005)(5660300002)(44832011)(7416002)(82310400004)(2906002)(47076005)(8676002)(4326008)(8936002)(70586007)(70206006)(40460700003)(6666004)(508600001)(336012)(426003)(7696005)(86362001)(36860700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 04:13:31.2338
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 04:13:32.2780
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d38a0e75-6bb0-45f6-05ba-08d9e6025f56
+X-MS-Exchange-CrossTenant-Network-Message-Id: b549264e-4dd9-49df-f866-08d9e6025ff2
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT021.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT030.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3196
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1713
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kvm_x86_ops.vcpu_(un)blocking are needed by AVIC only.
-Therefore, set the ops only when AVIC is enabled.
+Export the max_physical_apicid via a helper function since this information
+is required by AMD SVM AVIC support.
 
-Also, refactor AVIC hardware setup logic into helper function
-To prepare for upcoming AVIC changes.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- arch/x86/kvm/svm/avic.c | 17 +++++++++++++++--
- arch/x86/kvm/svm/svm.c  | 10 ++--------
- arch/x86/kvm/svm/svm.h  |  3 +--
- 3 files changed, 18 insertions(+), 12 deletions(-)
+ arch/x86/include/asm/apic.h | 1 +
+ arch/x86/kernel/apic/apic.c | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 90364d02f22a..f5c6cab42d74 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -1027,7 +1027,7 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
- }
+diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+index 48067af94678..77d9cb2a7e28 100644
+--- a/arch/x86/include/asm/apic.h
++++ b/arch/x86/include/asm/apic.h
+@@ -435,6 +435,7 @@ static inline void apic_set_eoi_write(void (*eoi_write)(u32 reg, u32 v)) {}
+ #endif /* CONFIG_X86_LOCAL_APIC */
  
--void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
-+static void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+ extern void apic_ack_irq(struct irq_data *data);
++extern u32 apic_get_max_phys_apicid(void);
+ 
+ static inline void ack_APIC_irq(void)
  {
- 	if (!kvm_vcpu_apicv_active(vcpu))
- 		return;
-@@ -1052,7 +1052,7 @@ void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
- 	preempt_enable();
+diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
+index b70344bf6600..47653d8c05f2 100644
+--- a/arch/x86/kernel/apic/apic.c
++++ b/arch/x86/kernel/apic/apic.c
+@@ -2361,6 +2361,12 @@ bool apic_id_is_primary_thread(unsigned int apicid)
  }
+ #endif
  
--void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
-+static void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
- {
- 	int cpu;
- 
-@@ -1066,3 +1066,16 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
- 
- 	put_cpu();
- }
-+
-+bool avic_hardware_setup(struct kvm_x86_ops *x86_ops)
++u32 apic_get_max_phys_apicid(void)
 +{
-+	if (!npt_enabled || !boot_cpu_has(X86_FEATURE_AVIC))
-+		return false;
-+
-+	x86_ops->vcpu_blocking = avic_vcpu_blocking,
-+	x86_ops->vcpu_unblocking = avic_vcpu_unblocking,
-+
-+	pr_info("AVIC enabled\n");
-+	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
-+	return true;
++	return max_physical_apicid;
 +}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2c99b18d76c0..459edd2a1359 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4391,8 +4391,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.prepare_guest_switch = svm_prepare_guest_switch,
- 	.vcpu_load = svm_vcpu_load,
- 	.vcpu_put = svm_vcpu_put,
--	.vcpu_blocking = avic_vcpu_blocking,
--	.vcpu_unblocking = avic_vcpu_unblocking,
- 
- 	.update_exception_bitmap = svm_update_exception_bitmap,
- 	.get_msr_feature = svm_get_msr_feature,
-@@ -4676,13 +4674,9 @@ static __init int svm_hardware_setup(void)
- 			nrips = false;
- 	}
- 
--	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
-+	enable_apicv = avic = avic && avic_hardware_setup(&svm_x86_ops);
- 
--	if (enable_apicv) {
--		pr_info("AVIC enabled\n");
--
--		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
--	} else {
-+	if (!enable_apicv) {
- 		svm_x86_ops.vcpu_blocking = NULL;
- 		svm_x86_ops.vcpu_unblocking = NULL;
- 	}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 47ef8f4a9358..f2507d11a31a 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -572,6 +572,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- 
- #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
- 
-+bool avic_hardware_setup(struct kvm_x86_ops *ops);
- int avic_ga_log_notifier(u32 ga_tag);
- void avic_vm_destroy(struct kvm *kvm);
- int avic_vm_init(struct kvm *kvm);
-@@ -592,8 +593,6 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec);
- bool svm_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
- 		       uint32_t guest_irq, bool set);
--void avic_vcpu_blocking(struct kvm_vcpu *vcpu);
--void avic_vcpu_unblocking(struct kvm_vcpu *vcpu);
- 
- /* sev.c */
- 
++EXPORT_SYMBOL_GPL(apic_get_max_phys_apicid);
++
+ /*
+  * Should use this API to allocate logical CPU IDs to keep nr_logical_cpuids
+  * and cpuid_to_apicid[] synchronized.
 -- 
 2.25.1
 
