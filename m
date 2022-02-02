@@ -2,144 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BCC44A782A
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 19:45:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 462784A785F
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 19:59:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346725AbiBBSnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 13:43:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44684 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245220AbiBBSnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 13:43:31 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C07AC061714
-        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 10:43:31 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 133so300506pgb.0
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 10:43:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=SDBZmOfzCxzCugk5jd7ddO5i086r0OhAAAxVBt9bcn4=;
-        b=oCI/z/rsP2tCXkQEN/+3HjveKSrAnKOcocJwYaxxXbEW1w/eYlt67jmoJECImLXl6Y
-         m+naw7bWdoJmdRnn10lDq1HpA2C5Az22TBA6yOAyuycAtgvmvSp/UQeky9h/lq03T2xw
-         lFjkXkSHdF4LLPF0HB4gynXj3rNLfI65rrGnjcnuUumbMu6jj8AaMwam+iUKe7nJpgCo
-         iYbJCIHr1SG2YFaExtqHyGZ7n/VHGIJmWCAeqACFxUBHAO5mxQNGVKviHVdOY7eknFJ4
-         iKjM6a0XZmYtrfGna/2nc/lbsI0MgMcoJPezmgMWAFHDODU9wJXJBWHksMfgYyj917xU
-         GB0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SDBZmOfzCxzCugk5jd7ddO5i086r0OhAAAxVBt9bcn4=;
-        b=Wa9HtfuWajj2QqJrMKMBpn0oREbtrpvlGq6+Eg6oS9lohiLYagnVQXB5J3pY1FPd4F
-         r6a2tlO/0ltX1jbOA/T0M0WGNYT4kU+RUKWnXyjniW57LZxmRoKkO1YibZK4DrWDtXXp
-         5MErJROz0dulsPOY85if5MJR2mmfzpwJ0lDFIMTtkscjTA6Yt2tHZ5sLeu4EPstuE7/p
-         Hpp9Bk+GRRZoz8gMdvViTPSOI+T5mNcWQ72woXbSt8DPMpHSd0dv+eWNfkWRthT7soc4
-         6zETncnOGH4xDJjzy6VqJ1JMifwyPI8E6WI4ICCAab+U5XBZSH2OMuDEu/TjB3TCeOuG
-         Ia8Q==
-X-Gm-Message-State: AOAM533WkhRimVnSfhp8d6t49YCIbfpIO/cXiOrOdXH5+p9eQK9GvMHx
-        klTT5XGSJfdHuqHIT+jd03Op7Q==
-X-Google-Smtp-Source: ABdhPJyKY2bmBpNsgwyDJ0PlfhIstJxwGXU5jBuEN8xCwoW4q9qfWAOqxr1alAqmED6qNrXosDZfnA==
-X-Received: by 2002:aa7:9682:: with SMTP id f2mr31230350pfk.56.1643827410811;
-        Wed, 02 Feb 2022 10:43:30 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p22sm26858049pfo.163.2022.02.02.10.43.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Feb 2022 10:43:30 -0800 (PST)
-Date:   Wed, 2 Feb 2022 18:43:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Will McVicker <willmcvicker@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize
- perf_guest_info_callbacks
-Message-ID: <YfrQzoIWyv9lNljh@google.com>
-References: <20211111020738.2512932-1-seanjc@google.com>
- <20211111020738.2512932-10-seanjc@google.com>
+        id S1346808AbiBBS5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 13:57:49 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:45602 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232525AbiBBS5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 13:57:48 -0500
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 609371EC04E2;
+        Wed,  2 Feb 2022 19:57:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1643828262;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=3U8ZC9BzawtxrXmVgjq+VFamXu78o7dgi9QKX8beiZs=;
+        b=MDv7m46t4sdlGD3qdQjScPzNa+EG0UH+UnAFyVxGzAhV3Yw72N/tVvr+2NA3yYhGoDTbJu
+        PE6ls7I9F+5AMJEBl0qU/58v49+c2NkvUKY0vgpJUixC5teLwmC0vBKwC3DIWDQG9Ieuj6
+        xKWLIOdRG/BdhXkeqLw2mxTSMaVUgJk=
+Date:   Wed, 2 Feb 2022 19:57:37 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v9 05/43] x86/compressed/64: Detect/setup SEV/SME
+ features earlier in boot
+Message-ID: <YfrUIVv70fTwydZv@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-6-brijesh.singh@amd.com>
+ <Yfl3FaTGPxE7qMCq@zn.tnic>
+ <20220201203507.goibbaln6dxyoogv@amd.com>
+ <YfmmBykN2s0HsiAJ@zn.tnic>
+ <20220202005212.a3fnn6i76ko6u6t5@amd.com>
+ <YfogFFOoHvCV+/2Y@zn.tnic>
+ <20220202172801.4plsgy5ispu2bi7c@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20211111020738.2512932-10-seanjc@google.com>
+In-Reply-To: <20220202172801.4plsgy5ispu2bi7c@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Will and Sami, -most everyone else
+On Wed, Feb 02, 2022 at 11:28:01AM -0600, Michael Roth wrote:
+> Indeed... it looks like linux/{elf,io,efi,acpi}.h all end up pulling in
+> kernel proper's rdmsr()/wrmsr() definitions, and pulling them out ends up
+> breaking a bunch of other stuff,
 
-On Thu, Nov 11, 2021, Sean Christopherson wrote:
-> Use static_call to optimize perf's guest callbacks on arm64 and x86,
-> which are now the only architectures that define the callbacks.  Use
-> DEFINE_STATIC_CALL_RET0 as the default/NULL for all guest callbacks, as
-> the callback semantics are that a return value '0' means "not in guest".
-> 
-> static_call obviously avoids the overhead of CONFIG_RETPOLINE=y, but is
-> also advantageous versus other solutions, e.g. per-cpu callbacks, in that
-> a per-cpu memory load is not needed to detect the !guest case.
-> 
-> Based on code from Peter and Like.
-> 
-> Suggested-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+It's a nightmare - just gave it a try. No wonder they call it include
+hell.
 
-...
+> so I think we might be stuck using a different name like
+> rd_msr()/wr_msr() in the meantime.
 
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 1c8d341ecc77..b4fd928e4ff8 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -6524,12 +6524,23 @@ static void perf_pending_event(struct irq_work *entry)
->  #ifdef CONFIG_GUEST_PERF_EVENTS
->  struct perf_guest_info_callbacks __rcu *perf_guest_cbs;
->  
-> +DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
-> +DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
-> +DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
+Ok, but then pls call them boot_rdmsr() and boot_wrmsr() so that there's
+a clear distinction from all the other msr helpers. And put a comment
+above them in arch/x86/boot/msr.h explaining why they're called this
+way.
 
-Using __static_call_return0() makes clang's CFI sad on arm64 due to the resulting
-function prototype mistmatch, which IIUC, is verified by clang's __cfi_check()
-for indirect calls, i.e. architectures without CONFIG_HAVE_STATIC_CALL.
+One fine day I'll have this mess untangled and clean...
 
-We could fudge around the issue by using stubs, massaging prototypes, etc..., but
-that means doing that for every arch-agnostic user of __static_call_return0().
+Thx.
 
-Any clever ideas?  Can we do something like generate a unique function for every
-DEFINE_STATIC_CALL_RET0 for CONFIG_HAVE_STATIC_CALL=n, e.g. using typeof() to
-get the prototype?
+-- 
+Regards/Gruss,
+    Boris.
 
-  Kernel panic - not syncing: CFI failure (target: __static_call_return0+0x0/0x8)
-  CPU: 0 PID: 1625 Comm: batterystats-wo Tainted: G        W  OE     5.16.0-mainline #1$
-  Hardware name: Raven EVT 1.1 (DT)$
-  Call trace:$
-   dump_backtrace+0xf0/0x130$
-   show_stack+0x1c/0x2c$
-   dump_stack_lvl+0x68/0x98$
-   panic+0x168/0x420$
-   __cfi_check_fail+0x58/0x5c$
-   __cfi_slowpath_diag+0x150/0x1a4$
-   perf_misc_flags+0x74/0xa4$
-   perf_prepare_sample+0x50/0x44c$
-   perf_event_output_forward+0x5c/0xcc$
-   __perf_event_overflow+0xc8/0x188$
-   perf_swevent_event+0x7c/0x10c$
-   perf_tp_event+0x168/0x298$
-   perf_trace_run_bpf_submit+0x8c/0xdc$
-   perf_trace_sched_switch+0x180/0x1cc$
-   __schedule+0x850/0x924$
-   schedule+0x98/0xe0$
-   binder_wait_for_work+0x158/0x368$
-   binder_thread_read+0x278/0x243c$
-   binder_ioctl_write_read+0x120/0x45c$
-   binder_ioctl+0x1ac/0xc34$
-   __arm64_sys_ioctl+0xa8/0x118$
-   invoke_syscall+0x64/0x178$
-   el0_svc_common+0x8c/0x100$
-   do_el0_svc+0x28/0xa0$
-   el0_svc+0x24/0x84$
-   el0t_64_sync_handler+0x88/0xec$
-   el0t_64_sync+0x1b4/0x1b8$
+https://people.kernel.org/tglx/notes-about-netiquette
