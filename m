@@ -2,129 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3E7C4A6BBF
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 07:53:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 739DF4A6BDC
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 07:53:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244856AbiBBGwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 01:52:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50822 "EHLO
+        id S244899AbiBBGww (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 01:52:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244791AbiBBGwj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235104AbiBBGwj (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 2 Feb 2022 01:52:39 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C1F8C061757;
-        Tue,  1 Feb 2022 22:09:37 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 11E321EC0464;
-        Wed,  2 Feb 2022 07:09:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1643782171;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sZqgeaY2T05GRVx++Y85byZFFFlp+ohQpqesnax8x/o=;
-        b=KjtKrheXOmUc492KuKPtthqotPhBLPoisxL+wxk9XP9303vFRnbL9SZn3SUmPtGpeFNpYU
-        vi/W1tV6fApf2lZ0sK2bO1HWyJahbnRou6YbfB41YDwNdH//rUwztJa5AX4dCFPOGREpkM
-        w3nRBvX4FyEgNZYkh1vtwdiIRcJ4M3A=
-Date:   Wed, 2 Feb 2022 07:09:24 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 05/43] x86/compressed/64: Detect/setup SEV/SME
- features earlier in boot
-Message-ID: <YfogFFOoHvCV+/2Y@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-6-brijesh.singh@amd.com>
- <Yfl3FaTGPxE7qMCq@zn.tnic>
- <20220201203507.goibbaln6dxyoogv@amd.com>
- <YfmmBykN2s0HsiAJ@zn.tnic>
- <20220202005212.a3fnn6i76ko6u6t5@amd.com>
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BFE0C06175C
+        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 22:16:49 -0800 (PST)
+Received: by mail-yb1-xb29.google.com with SMTP id i10so57861585ybt.10
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 22:16:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C3p2gN4tjLo8jQpCh7Gc8fZEVp5pXdYViSw97S0CJgg=;
+        b=HlkVdkHTKAWdtrgBaBjhx/iJyD24xlqIyj8w7GX5qlf3NmXWt341lkdcCq5u7aSZ+Z
+         9cA9gwfSrBAoqWDmcbpQ/T8EnMMQW3JVogTB2gin6oZuY/4Ku2UY019/Sr48WoyMOWkD
+         TCESf4byBk9uedy9aZddJTeAjiXow3ta/B3z2jMe/y1/wGZZzXDqrIBrroWK6FYfK3TM
+         w9R4e4i+/ygoPlFgTAoWFptOABLJAvPjb5uE/pBaCxff5n8HCMAWRMcqU3BsS+QygZ05
+         VKfA4IZwwLAj/nN3VxYYGgj/VKu1mHye/m3YwlJJ8Xlblkdj7m3oA0Mfn4IMte2jKyfb
+         HNjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C3p2gN4tjLo8jQpCh7Gc8fZEVp5pXdYViSw97S0CJgg=;
+        b=KlR6SSVejSO5n21N6/LHfQf2RPb+91Fcb6FkmRGOv6ZBFT9yu3PJvO1YgU2K/Rap9T
+         eYKND4MMLzy+dh4+gl5yN9deciCZiGRm3Qdji1Tnh/Lz71aFij2ic7Sc9ypjRM7HBcSJ
+         WS++zBwt7G2R4TVxTF1FXviFnZ+/F/wkWIL18OiXQBffU3fi5GQAi6ZwD0QtsC14nfaB
+         NJJ8S4VmxAUI8HQ4hmdqG9trsrkDRLVMCBPE2GMCErV0iCuYvK7VSpqEWoaVX7/HytSn
+         vup1pTFv2r+g+BzCV3qEuBmMko3e88kX0gLrk+HpGK8+MQSCtj5H3ql11/GnuR6MoZjf
+         IN8g==
+X-Gm-Message-State: AOAM530yu8ZjzNc2y5499v5gP+n5RpoePbecHXWLAIkWvJ6YKLTIlfGp
+        eZorBRonBgpZtLb/PzohnnBMN6hGMbdt8E4vmlrgmE/kj34=
+X-Google-Smtp-Source: ABdhPJxzanj+lNeSdg4KaYgrviOgBE3GkTnPSfzQ1qj/KBsBAJeeb2cP1KLJEOlYQ+bzXZbbNofgdIuwSvwweP7kD4U=
+X-Received: by 2002:a5b:b84:: with SMTP id l4mr40689519ybq.665.1643782607589;
+ Tue, 01 Feb 2022 22:16:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220202005212.a3fnn6i76ko6u6t5@amd.com>
+References: <20220117055703.52020-1-likexu@tencent.com> <20220202042838.6532-1-ravi.bangoria@amd.com>
+ <CABPqkBQOSc=bwLdieBAX-sJ0Z+KwaxE=4PGXuuyzWyyZKf2ODg@mail.gmail.com> <4662f1dd-d7dc-ea19-82dc-f81e8f3dcf1a@amd.com>
+In-Reply-To: <4662f1dd-d7dc-ea19-82dc-f81e8f3dcf1a@amd.com>
+From:   Stephane Eranian <eranian@google.com>
+Date:   Tue, 1 Feb 2022 22:16:36 -0800
+Message-ID: <CABPqkBQXvkqArcrXKVweWCobcaQZBRV6t3AhFuW8X28MBRkqBg@mail.gmail.com>
+Subject: Re: [PATCH] perf/amd: Implement errata #1292 workaround for F19h M00-0Fh
+To:     Ravi Bangoria <ravi.bangoria@amd.com>
+Cc:     like.xu.linux@gmail.com, jmattson@google.com,
+        santosh.shukla@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        wanpengli@tencent.com, vkuznets@redhat.com, joro@8bytes.org,
+        peterz@infradead.org, mingo@redhat.com,
+        alexander.shishkin@linux.intel.com, tglx@linutronix.de,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, x86@kernel.org,
+        linux-perf-users@vger.kernel.org, ananth.narayan@amd.com,
+        kim.phillips@amd.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 01, 2022 at 06:52:12PM -0600, Michael Roth wrote:
-> Since the kernel proper rdmsr()/wrmsr() definitions are getting pulled in via
-> misc.h, I have to use a different name to avoid compiler errors. For now I've
-> gone with rd_msr()/wr_msr(), but no problem changing those if needed.
+On Tue, Feb 1, 2022 at 10:03 PM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
+>
+> Hi Stephane,
+>
+> On 02-Feb-22 10:57 AM, Stephane Eranian wrote:
+> > On Tue, Feb 1, 2022 at 8:29 PM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
+> >>
+> >> Perf counter may overcount for a list of Retire Based Events. Implement
+> >> workaround for Zen3 Family 19 Model 00-0F processors as suggested in
+> >> Revision Guide[1]:
+> >>
+> >>   To count the non-FP affected PMC events correctly:
+> >>     o Use Core::X86::Msr::PERF_CTL2 to count the events, and
+> >>     o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
+> >>     o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
+> >>
+> >> Above workaround suggests to clear PERF_CTL2[20], but that will disable
+> >> sampling mode. Given the fact that, there is already a skew between
+> >> actual counter overflow vs PMI hit, we are anyway not getting accurate
+> >> count for sampling events. Also, using PMC2 with both bit43 and bit20
+> >> set can result in additional issues. Hence Linux implementation of
+> >> workaround uses non-PMC2 counter for sampling events.
+> >>
+> > Something is missing from your description here. If you are not
+> > clearing bit[20] and
+> > not setting bit[43], then how does running on CTL2 by itself improve
+> > the count. Is that
+> > enough to make the counter count correctly?
+>
+> Yes. For counting retire based events, we need PMC2[43] set and
+> PMC2[20] clear so that it will not overcount.
+>
+Ok, I get that part now. You are forcing the bits in the
+get_constraint() function.
 
-Does that fix it too?
+> >
+> > For sampling events, your patch makes CTL2 not available. That seems
+> > to contradict the
+> > workaround. Are you doing this to free CTL2 for counting mode events
+> > instead? If you are
+> > not using CTL2, then you are not correcting the count. Are you saying
+> > this is okay in sampling mode
+> > because of the skid, anyway?
+>
+> Correct. The constraint I am placing is to count retire events on
+> PMC2 and sample retire events on other counters.
+>
+Why do you need to permanently exclude CTL2 for retired events given
+you are forcing the bits
+in the get_constraints() for counting events config only, i.e., as
+opposed to in CTL2 itself.
+If the sampling retired events are unconstrained, they can use any
+counters. If a counting retired
+event is added, it has a "stronger" constraints and will be scheduled
+before the unconstrained events,
+yield the same behavior you wanted, except on demand which is preferable.
 
-diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-index 16ed360b6692..346c46d072c8 100644
---- a/arch/x86/boot/compressed/misc.h
-+++ b/arch/x86/boot/compressed/misc.h
-@@ -21,7 +21,6 @@
- 
- #include <linux/linkage.h>
- #include <linux/screen_info.h>
--#include <linux/elf.h>
- #include <linux/io.h>
- #include <asm/page.h>
- #include <asm/boot.h>
----
-
-This is exactly what I mean with a multi-year effort of untangling what
-has been mindlessly mixed in over the years...
-
-> Since the rd_msr/wr_msr are oneliners, it seemed like it might be a
-> little cleaner to just define them in boot/msr.h as static inline and
-> include them directly as part of the header.
-
-Ok, that's fine too.
-
-> Here's what it looks like on top of this tree, and roughly how I plan to
-> split the patches for v10:
-> 
-> - define the rd_msr/wr_msr helpers
->   https://github.com/mdroth/linux/commit/982c6c5741478c8f634db8ac0ba36575b5eff946
-> 
-> - use the helpers in boot/compressed/sev.c and boot/cpucheck.c
->   https://github.com/mdroth/linux/commit/a16e11f727c01fc478d3b741e1bdd2fd44975d7c
-> 
-> For v10 though I'll likely just drop rd_sev_status_msr() completely and use
-> rd_msr() directly.
-> 
-> Let me know if I should make any changes and I'll make sure to get those in for
-> the next spin.
-
-Yap, looks good.
-
-Thanks for doing that!
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> Thanks,
+> Ravi
