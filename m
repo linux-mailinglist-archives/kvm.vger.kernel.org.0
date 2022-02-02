@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C778E4A77BC
+	by mail.lfdr.de (Postfix) with ESMTP id 7909E4A77BB
 	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 19:18:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346581AbiBBSSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 13:18:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48606 "EHLO
+        id S1346606AbiBBSS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 13:18:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51907 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346402AbiBBSST (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 13:18:19 -0500
+        by vger.kernel.org with ESMTP id S1346577AbiBBSSV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 13:18:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643825898;
+        s=mimecast20190719; t=1643825901;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EfsD89RXkHNrOo3rdM2WwXKnhzWTYXgov/7DgzmxMHk=;
-        b=OP17KHpLWG0imm66TBOyPYV91ttUFYI698Ei9FEDIIttdZZ2Ve3hojlpQtyneeCcbvv3r3
-        XEtI0HmF3YF2swL+uXykwDEEKrcF9/R7LOxRKxO05TbGnzuhjEpxpdUczRFQfatx8F6CCh
-        lN+AeHyL8bn0i9nUeoj1LHvrKTjJwzk=
+        bh=HCkmVYi4zqDPYm75x/aIL8dnazRAyGfaINH0ttQQ4CU=;
+        b=CNPZfnpKDCF5LQeEaglsrWuYvyAd03aqqEcpntKCOOKdota5+LX8VctEHCU+6BwOKI1YwL
+        GtL7aa4YuY0X1COwLUK9ZqQv7x6vlogiKD+Qe4GO9Z3OYal8M9IPXmW/RP0LNyXl9c2rwC
+        QxtNDvqcTSCY5BM++Bqvzoi4f7RAZkE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-282-WiEVCwneMGS54nEoUOwXMg-1; Wed, 02 Feb 2022 13:18:17 -0500
-X-MC-Unique: WiEVCwneMGS54nEoUOwXMg-1
+ us-mta-356-oxKSJTTWM8yqPx13UbJ2Eg-1; Wed, 02 Feb 2022 13:18:18 -0500
+X-MC-Unique: oxKSJTTWM8yqPx13UbJ2Eg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DEA1180FD62;
-        Wed,  2 Feb 2022 18:18:16 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31931835B4B;
+        Wed,  2 Feb 2022 18:18:17 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E1E87745F;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B0C727744F;
         Wed,  2 Feb 2022 18:18:16 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com
-Subject: [PATCH 4/5] KVM: x86: change hwapic_{irr,isr}_update to NULLable calls
-Date:   Wed,  2 Feb 2022 13:18:12 -0500
-Message-Id: <20220202181813.1103496-5-pbonzini@redhat.com>
+Subject: [PATCH 5/5] KVM: x86: allow defining return-0 static calls
+Date:   Wed,  2 Feb 2022 13:18:13 -0500
+Message-Id: <20220202181813.1103496-6-pbonzini@redhat.com>
 In-Reply-To: <20220202181813.1103496-1-pbonzini@redhat.com>
 References: <20220202181813.1103496-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -49,121 +49,196 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SVM does not need them, so mark them as optional.
+A few vendor callbacks are only used by VMX, but they return an integer
+or bool value.  Introduce KVM_X86_OP_RET0 for them: a NULL value in
+struct kvm_x86_ops will be changed to __static_call_return0.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |  4 ++--
- arch/x86/kvm/lapic.c               | 18 +++++++-----------
- arch/x86/kvm/svm/avic.c            |  8 --------
- arch/x86/kvm/svm/svm.c             |  2 --
- 4 files changed, 9 insertions(+), 23 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h | 13 +++++++------
+ arch/x86/include/asm/kvm_host.h    |  4 ++++
+ arch/x86/kvm/svm/avic.c            |  5 -----
+ arch/x86/kvm/svm/svm.c             | 26 --------------------------
+ arch/x86/kvm/x86.c                 |  2 +-
+ 5 files changed, 12 insertions(+), 38 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index a842f10f5778..843bd9efd2ae 100644
+index 843bd9efd2ae..89fa5dd21f34 100644
 --- a/arch/x86/include/asm/kvm-x86-ops.h
 +++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -74,8 +74,8 @@ KVM_X86_OP(enable_irq_window)
- KVM_X86_OP_NULL(update_cr8_intercept)
- KVM_X86_OP(check_apicv_inhibit_reasons)
+@@ -13,7 +13,7 @@ BUILD_BUG_ON(1)
+ KVM_X86_OP(hardware_enable)
+ KVM_X86_OP(hardware_disable)
+ KVM_X86_OP(hardware_unsetup)
+-KVM_X86_OP(cpu_has_accelerated_tpr)
++KVM_X86_OP_RET0(cpu_has_accelerated_tpr)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
+ KVM_X86_OP(vm_init)
+@@ -76,15 +76,15 @@ KVM_X86_OP(check_apicv_inhibit_reasons)
  KVM_X86_OP(refresh_apicv_exec_ctrl)
--KVM_X86_OP(hwapic_irr_update)
--KVM_X86_OP(hwapic_isr_update)
-+KVM_X86_OP_NULL(hwapic_irr_update)
-+KVM_X86_OP_NULL(hwapic_isr_update)
- KVM_X86_OP_NULL(guest_apic_has_interrupt)
+ KVM_X86_OP_NULL(hwapic_irr_update)
+ KVM_X86_OP_NULL(hwapic_isr_update)
+-KVM_X86_OP_NULL(guest_apic_has_interrupt)
++KVM_X86_OP_RET0(guest_apic_has_interrupt)
  KVM_X86_OP(load_eoi_exitmap)
  KVM_X86_OP(set_virtual_apic_mode)
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 09bbb6a01c1d..fd10dd070d26 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -492,8 +492,7 @@ static inline void apic_clear_irr(int vec, struct kvm_lapic *apic)
- 	if (unlikely(vcpu->arch.apicv_active)) {
- 		/* need to update RVI */
- 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
--		static_call(kvm_x86_hwapic_irr_update)(vcpu,
--				apic_find_highest_irr(apic));
-+		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
- 	} else {
- 		apic->irr_pending = false;
- 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
-@@ -523,7 +522,7 @@ static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
- 	 * just set SVI.
- 	 */
- 	if (unlikely(vcpu->arch.apicv_active))
--		static_call(kvm_x86_hwapic_isr_update)(vcpu, vec);
-+		static_call_cond(kvm_x86_hwapic_isr_update)(vcpu, vec);
- 	else {
- 		++apic->isr_count;
- 		BUG_ON(apic->isr_count > MAX_APIC_VECTOR);
-@@ -571,8 +570,7 @@ static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
- 	 * and must be left alone.
- 	 */
- 	if (unlikely(vcpu->arch.apicv_active))
--		static_call(kvm_x86_hwapic_isr_update)(vcpu,
--						apic_find_highest_isr(apic));
-+		static_call_cond(kvm_x86_hwapic_isr_update)(vcpu, apic_find_highest_isr(apic));
- 	else {
- 		--apic->isr_count;
- 		BUG_ON(apic->isr_count < 0);
-@@ -2370,8 +2368,8 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	apic_update_ppr(apic);
- 	if (vcpu->arch.apicv_active) {
- 		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
--		static_call(kvm_x86_hwapic_irr_update)(vcpu, -1);
--		static_call(kvm_x86_hwapic_isr_update)(vcpu, -1);
-+		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, -1);
-+		static_call_cond(kvm_x86_hwapic_isr_update)(vcpu, -1);
- 	}
+ KVM_X86_OP_NULL(set_apic_access_page_addr)
+ KVM_X86_OP(deliver_interrupt)
+ KVM_X86_OP_NULL(sync_pir_to_irr)
+-KVM_X86_OP(set_tss_addr)
+-KVM_X86_OP(set_identity_map_addr)
+-KVM_X86_OP(get_mt_mask)
++KVM_X86_OP_RET0(set_tss_addr)
++KVM_X86_OP_RET0(set_identity_map_addr)
++KVM_X86_OP_RET0(get_mt_mask)
+ KVM_X86_OP(load_mmu_pgd)
+ KVM_X86_OP(has_wbinvd_exit)
+ KVM_X86_OP(get_l2_tsc_offset)
+@@ -102,7 +102,7 @@ KVM_X86_OP_NULL(vcpu_unblocking)
+ KVM_X86_OP_NULL(pi_update_irte)
+ KVM_X86_OP_NULL(pi_start_assignment)
+ KVM_X86_OP_NULL(apicv_post_state_restore)
+-KVM_X86_OP_NULL(dy_apicv_has_pending_interrupt)
++KVM_X86_OP_RET0(dy_apicv_has_pending_interrupt)
+ KVM_X86_OP_NULL(set_hv_timer)
+ KVM_X86_OP_NULL(cancel_hv_timer)
+ KVM_X86_OP(setup_mce)
+@@ -126,3 +126,4 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
  
- 	vcpu->arch.apic_arb_prio = 0;
-@@ -2635,10 +2633,8 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	apic->highest_isr_cache = -1;
- 	if (vcpu->arch.apicv_active) {
- 		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
--		static_call(kvm_x86_hwapic_irr_update)(vcpu,
--				apic_find_highest_irr(apic));
--		static_call(kvm_x86_hwapic_isr_update)(vcpu,
--				apic_find_highest_isr(apic));
-+		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
-+		static_call_cond(kvm_x86_hwapic_isr_update)(vcpu, apic_find_highest_isr(apic));
- 	}
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
- 	if (ioapic_in_kernel(vcpu->kvm))
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 99f907ec5aa8..b49ee6f34fe7 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -592,14 +592,6 @@ void avic_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
- 	return;
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_NULL
++#undef KVM_X86_OP_RET0
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 61faeb57889c..e7e5bd9a984d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1540,6 +1540,7 @@ extern struct kvm_x86_ops kvm_x86_ops;
+ #define KVM_X86_OP(func) \
+ 	DECLARE_STATIC_CALL(kvm_x86_##func, *(((struct kvm_x86_ops *)0)->func));
+ #define KVM_X86_OP_NULL KVM_X86_OP
++#define KVM_X86_OP_RET0 KVM_X86_OP
+ #include <asm/kvm-x86-ops.h>
+ 
+ static inline void kvm_ops_static_call_update(void)
+@@ -1548,6 +1549,9 @@ static inline void kvm_ops_static_call_update(void)
+ 	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
+ #define KVM_X86_OP(func) \
+ 	WARN_ON(!kvm_x86_ops.func); KVM_X86_OP_NULL(func)
++#define KVM_X86_OP_RET0(func) \
++	static_call_update(kvm_x86_##func, kvm_x86_ops.func ? : \
++			   (typeof(kvm_x86_ops.func)) __static_call_return0);
+ #include <asm/kvm-x86-ops.h>
  }
  
--void avic_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr)
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index b49ee6f34fe7..c82457793fc8 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -707,11 +707,6 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+ 	return 0;
+ }
+ 
+-bool avic_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
 -{
+-	return false;
 -}
 -
--void avic_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
--{
--}
--
- static int avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
+ static void svm_ir_list_del(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
  {
- 	int ret = 0;
+ 	unsigned long flags;
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7f70f456a5a5..ab50d73b1e2e 100644
+index ab50d73b1e2e..5f75f50b861c 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4540,8 +4540,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.refresh_apicv_exec_ctrl = avic_refresh_apicv_exec_ctrl,
- 	.check_apicv_inhibit_reasons = avic_check_apicv_inhibit_reasons,
+@@ -3479,16 +3479,6 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ 	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+ }
+ 
+-static int svm_set_tss_addr(struct kvm *kvm, unsigned int addr)
+-{
+-	return 0;
+-}
+-
+-static int svm_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
+-{
+-	return 0;
+-}
+-
+ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -3863,11 +3853,6 @@ static int __init svm_check_processor_compat(void)
+ 	return 0;
+ }
+ 
+-static bool svm_cpu_has_accelerated_tpr(void)
+-{
+-	return false;
+-}
+-
+ /*
+  * The kvm parameter can be NULL (module initialization, or invocation before
+  * VM creation). Be sure to check the kvm parameter before using it.
+@@ -3890,11 +3875,6 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
+ 	return true;
+ }
+ 
+-static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+-{
+-	return 0;
+-}
+-
+ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4470,7 +4450,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.hardware_unsetup = svm_hardware_unsetup,
+ 	.hardware_enable = svm_hardware_enable,
+ 	.hardware_disable = svm_hardware_disable,
+-	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
+ 	.has_emulated_msr = svm_has_emulated_msr,
+ 
+ 	.vcpu_create = svm_vcpu_create,
+@@ -4542,10 +4521,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
  	.load_eoi_exitmap = avic_load_eoi_exitmap,
--	.hwapic_irr_update = avic_hwapic_irr_update,
--	.hwapic_isr_update = avic_hwapic_isr_update,
  	.apicv_post_state_restore = avic_apicv_post_state_restore,
  
- 	.set_tss_addr = svm_set_tss_addr,
+-	.set_tss_addr = svm_set_tss_addr,
+-	.set_identity_map_addr = svm_set_identity_map_addr,
+-	.get_mt_mask = svm_get_mt_mask,
+-
+ 	.get_exit_info = svm_get_exit_info,
+ 
+ 	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+@@ -4570,7 +4545,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.nested_ops = &svm_nested_ops,
+ 
+ 	.deliver_interrupt = svm_deliver_interrupt,
+-	.dy_apicv_has_pending_interrupt = avic_dy_apicv_has_pending_interrupt,
+ 	.pi_update_irte = avic_pi_update_irte,
+ 	.setup_mce = svm_setup_mce,
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a527cffd0a2b..2daca3dd128a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -129,6 +129,7 @@ struct kvm_x86_ops kvm_x86_ops __read_mostly;
+ 	DEFINE_STATIC_CALL_NULL(kvm_x86_##func,			     \
+ 				*(((struct kvm_x86_ops *)0)->func));
+ #define KVM_X86_OP_NULL KVM_X86_OP
++#define KVM_X86_OP_RET0 KVM_X86_OP
+ #include <asm/kvm-x86-ops.h>
+ EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
+ EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
+@@ -12057,7 +12058,6 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	return (is_guest_mode(vcpu) &&
+-			kvm_x86_ops.guest_apic_has_interrupt &&
+ 			static_call(kvm_x86_guest_apic_has_interrupt)(vcpu));
+ }
+ 
 -- 
 2.31.1
-
 
