@@ -2,80 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CC5F4A7352
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 15:37:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24C144A736F
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 15:44:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233634AbiBBOhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 09:37:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43710 "EHLO
+        id S232842AbiBBOnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 09:43:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbiBBOha (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 09:37:30 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE49C061714;
-        Wed,  2 Feb 2022 06:37:30 -0800 (PST)
+        with ESMTP id S1345074AbiBBOna (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 09:43:30 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E725C061714;
+        Wed,  2 Feb 2022 06:43:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=XU4E30VmAk4JZVSbcf6+v7UwHyq1GOzwWQ8ET0wddjk=; b=jcYMyMP7jGlMD5UcB8w29vteKo
-        axDDmdgkITjEQUEKPjfRbwb+cLh4JUC8O7fsvZkbGaUFuQ97GqRzqy6xlZdXiII80Y1tR1cgbhZXO
-        +qxT1vpIeS4D8wivMA0u0wAqs407UfA5bXisB/WCPZT8cvXtCsaRgm/9ZtoIPUTOk2Bt9Gv8BRVpw
-        hh0nlTeEanfep0nRmiXPBzi+vse3rM/4XwU+hB/K6PfYpX42wHN2C11WDHzde7/2ZPxtyx2l2Zbdu
-        rY6JKUz7GW6oNMtaqT7XZngshohL41+xTZOsS8dgiuH7Z+1nRF4foFxST2/8mW/edEUpZL2RxeKID
-        yRqUtEAA==;
+        bh=xufQ1Q9+1ygsCDJZkQhhHAWRleHJVLLr4QMMU3vcj5Y=; b=oOIEYjuILakE8XqGmGL6SEPV+T
+        k3Z1T7J1Ni4TDwlzj9JH+w9eKYjh7JvxasFf6ZJvIa1yph2ueVL7S4jDGsdYSN9mZ3IcgWkHFaLYg
+        5NgkC7K5e+UqFO0+2x1Gwk8mNXl9ip5gkrlIxJ1PbFckCa8t2JQJE4Hu5IgScl4LFXPizKTY00Fgd
+        K2eEWXOMF6GJyrBZPoZPeNdjl1ITT+Z0Wu8qEw3CwTR0OPepSXztO4T1QFIA/FlvBlj8n6JjwZSic
+        PKN89hiqv0IjCAfwi3Y2kZrGCfE8XR3WGmv/BEIG9EnNWxYkZyB/nqi8XkLqJbnQsJxT8N80DSrny
+        ehaJ2xrQ==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nFGkm-00Enmt-Py; Wed, 02 Feb 2022 14:37:01 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nFGqk-006Dr6-1S; Wed, 02 Feb 2022 14:43:10 +0000
 Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id E8040984C61; Wed,  2 Feb 2022 15:36:57 +0100 (CET)
-Date:   Wed, 2 Feb 2022 15:36:57 +0100
+        id A2626984C61; Wed,  2 Feb 2022 15:43:08 +0100 (CET)
+Date:   Wed, 2 Feb 2022 15:43:08 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
-To:     Ravi Bangoria <ravi.bangoria@amd.com>
-Cc:     like.xu.linux@gmail.com, jmattson@google.com, eranian@google.com,
-        santosh.shukla@amd.com, pbonzini@redhat.com, seanjc@google.com,
-        wanpengli@tencent.com, vkuznets@redhat.com, joro@8bytes.org,
-        mingo@redhat.com, alexander.shishkin@linux.intel.com,
-        tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-perf-users@vger.kernel.org, ananth.narayan@amd.com,
-        kim.phillips@amd.com
-Subject: Re: [PATCH v2] perf/amd: Implement erratum #1292 workaround for F19h
- M00-0Fh
-Message-ID: <20220202143657.GA20638@worktop.programming.kicks-ass.net>
-References: <2e96421f-44b5-c8b7-82f7-5a9a9040104b@amd.com>
- <20220202105158.7072-1-ravi.bangoria@amd.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
+Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
+ perfmon_event_map[] directly
+Message-ID: <20220202144308.GB20638@worktop.programming.kicks-ass.net>
+References: <20220117085307.93030-1-likexu@tencent.com>
+ <20220117085307.93030-3-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220202105158.7072-1-ravi.bangoria@amd.com>
+In-Reply-To: <20220117085307.93030-3-likexu@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 02, 2022 at 04:21:58PM +0530, Ravi Bangoria wrote:
-> +/* Overcounting of Retire Based Events Erratum */
-> +static struct event_constraint retire_event_constraints[] __read_mostly = {
-> +	EVENT_CONSTRAINT(0xC0, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC1, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC2, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC3, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC4, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC5, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC8, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xC9, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xCA, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xCC, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0xD1, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0x1000000C7, 0x4, AMD64_EVENTSEL_EVENT),
-> +	EVENT_CONSTRAINT(0x1000000D0, 0x4, AMD64_EVENTSEL_EVENT),
+On Mon, Jan 17, 2022 at 04:53:06PM +0800, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> Currently, we have [intel|knc|p4|p6]_perfmon_event_map on the Intel
+> platforms and amd_[f17h]_perfmon_event_map on the AMD platforms.
+> 
+> Early clumsy KVM code or other potential perf_event users may have
+> hard-coded these perfmon_maps (e.g., arch/x86/kvm/svm/pmu.c), so
+> it would not make sense to program a common hardware event based
+> on the generic "enum perf_hw_id" once the two tables do not match.
+> 
+> Let's provide an interface for callers outside the perf subsystem to get
+> the counter config based on the perfmon_event_map currently in use,
+> and it also helps to save bytes.
+> 
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/events/core.c            | 9 +++++++++
+>  arch/x86/include/asm/perf_event.h | 2 ++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index 38b2c779146f..751048f4cc97 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -693,6 +693,15 @@ void x86_pmu_disable_all(void)
+>  	}
+>  }
+>  
+> +u64 perf_get_hw_event_config(int perf_hw_id)
+> +{
+> +	if (perf_hw_id < x86_pmu.max_events)
+> +		return x86_pmu.event_map(perf_hw_id);
+> +
+> +	return 0;
+> +}
 
-Can't this be encoded nicer? Something like:
+Where does perf_hw_id come from? Does this need to be
+array_index_nospec() ?
 
-	EVENT_CONSTRAINT(0xC0, 0x4, AMD64_EVENTSEL_EVENT & ~0xF).
+> +EXPORT_SYMBOL_GPL(perf_get_hw_event_config);
 
-To match all of 0xCn ?
+Urgh... hate on kvm being a module again. We really need something like
+EXPORT_SYMBOL_KVM() or something.
 
 
-> +	EVENT_CONSTRAINT_END
-> +};
+>  struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
+>  {
+>  	return static_call(x86_pmu_guest_get_msrs)(nr);
+> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+> index 8fc1b5003713..d1e325517b74 100644
+> --- a/arch/x86/include/asm/perf_event.h
+> +++ b/arch/x86/include/asm/perf_event.h
+> @@ -492,9 +492,11 @@ static inline void perf_check_microcode(void) { }
+>  
+>  #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+>  extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
+> +extern u64 perf_get_hw_event_config(int perf_hw_id);
+>  extern int x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
+>  #else
+>  struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
+> +u64 perf_get_hw_event_config(int perf_hw_id);
+
+I think Paolo already spotted this one.
+
+>  static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
+>  {
+>  	return -1;
+> -- 
+> 2.33.1
+> 
