@@ -2,219 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7B284A6BE0
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 07:53:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10A6E4A6C47
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 08:23:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244834AbiBBGwp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 01:52:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50828 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244726AbiBBGwh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 01:52:37 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AB1C06177A
-        for <kvm@vger.kernel.org>; Tue,  1 Feb 2022 22:46:31 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id z10-20020a17090acb0a00b001b520826011so5870495pjt.5
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 22:46:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=n4I2R/hpf5Fa4L81XJ6bvxceN9VV7gkH/UQIc45psZ4=;
-        b=tIMuSrNzRH+KWp61Vo/OMMvaDkFTGOZvrsS0v4SKqfShDl+PQ3OrxwXGO10cig7KH0
-         brcJBL/bKE0lhbtp/HBpjl8yUDAZIr+3+OAp3aHtGlVyz8pl2ZDkN2dD93zpt/5KHz02
-         0E/PovCbpnSEtik2Y/iWeVjuCFFXvfJs8Vwshd3VGIeFzjV1j3CLTqG67f4uqtl0i2ka
-         ifuPeeci4ApuXeShICr+eGBiR+8gyLw5sre/ZFpDIg5UlGuKCxhjyTzyD36/s2RrvTX3
-         LuNCPHae9QrMzdR+0IJY5XUrXrrXz70jc5K8PUm3ajXy5lZj7CEpMJ+5hqPJptRHP17l
-         4N7g==
+        id S236161AbiBBHXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 02:23:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58910 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229813AbiBBHXj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 02:23:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643786619;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lS6VclXUcneOjC3oStQbwdBD5or1Egv5MK+etEu+Ej4=;
+        b=clQLe91fRuS9Kq07gHbvsXMWkOEFlvJZj4hlykh4rrSOaJjIxQ8ZYXKwXu2Cg/Jxvn2x5n
+        wMqXmfPQKj71nEfbK+6odUuo10FIqzC3kfFah9MF5NYgNB4matGZ7JkwyxHOzJlRv91kLW
+        MwHQkE8+k/oYcvtBZ4nQnjOtZtJWjiw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-49-AoWzS8lSOdqG9wSJguo-ZA-1; Wed, 02 Feb 2022 02:23:36 -0500
+X-MC-Unique: AoWzS8lSOdqG9wSJguo-ZA-1
+Received: by mail-ed1-f72.google.com with SMTP id f21-20020a50d555000000b00407a8d03b5fso9854508edj.9
+        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 23:23:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=n4I2R/hpf5Fa4L81XJ6bvxceN9VV7gkH/UQIc45psZ4=;
-        b=0+UihHbVQkkbSaXc8z/bkG0dLSuSBSxoy9pHofdhVHM2lJbQfi75yhgiUTnof44uqY
-         rYv3WWzuJ+YUBSbcFkUPtRXok6uM5RXXQvze+yg3ZMp8c/PGINFer/X1K8rBHnd1VPHk
-         GGenFLhMXNT8D46kYRyvAiqoeRhY/wsq+NEZKk1JoYpiCTdIvqFEZQBJSR/W12gGXsyt
-         Y7xIfrTK3gn5cmH6lnW7RVeDE2FOI1Qk2BAYlnKVxedRSW4MEghDDtK81UJ2BQxmKblN
-         GQviW15lCXJNJFq6hmyGXlweAMptEH1RfVSmktS1CRQ1BXF+7LC/iERp8mS1JrGbJLz4
-         zn5Q==
-X-Gm-Message-State: AOAM5301GdwMqQYidh2Y1I2wq8eMeMOTOTyarLCQohuEKNbAWM7pkB5l
-        S+tJT+xL+pTpTESUmul8azo0s9VdLgQH9tSsnCuYEg==
-X-Google-Smtp-Source: ABdhPJxoAC726UM4u8e1ITpNdSeFTzBmsKFwQ8RsnfrQGMs41DYzrOEDXws/ljWMGL4oA33Cq0yVqGM2HhAprUNIMQw=
-X-Received: by 2002:a17:902:b684:: with SMTP id c4mr1249326pls.122.1643784391037;
- Tue, 01 Feb 2022 22:46:31 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=lS6VclXUcneOjC3oStQbwdBD5or1Egv5MK+etEu+Ej4=;
+        b=gDyHXffJ52k/X/XUqFLXm0EHA+CB2JzMFNeGhPuicDwhQEYK68bzzTYPcr3hjYgf9P
+         DD3NK2Yw8BD6uahhlTDiRoqUCICfyZ6pfR1qLlNxzxDKVByuzd8PtKF8IVtd6TlxXqQ8
+         ML6nHAPs/hGnG1i8hP1j3pYmZswhLOxypbIHCc/jult8Zq/FZbIgV9gyCNU7KMmexU08
+         LFqrneWW4O6FyRWSgBQl38qmh7M8ZZMxqDI05WX6alx7dN+w5Z9dW5JLEtppdgdhTkrq
+         wR6wOKjBj672TmHL0LlJrQpbRnQxVF8wf75CBKZDENlHP/L00lzR/4Y1ewSXa/OkLykb
+         zbXA==
+X-Gm-Message-State: AOAM531ki7Y/j53afgjcfWEuKKESM2nVc+2/p2Iqav/ouVunlzrSB6Wq
+        BZ8kTQw6a3sD+qwb56hoIM/91ichtvDO0UgqTJstYGTVI2b/vyaAfrcKFjpM104/oQg8ZCM4Et1
+        EOXiVLBNE8eA0
+X-Received: by 2002:a17:906:6a19:: with SMTP id qw25mr24349256ejc.558.1643786614739;
+        Tue, 01 Feb 2022 23:23:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzagIl3d9kQo4OnIQYwllq35vwl2W8Kb/G1VNqSRNdeleQrKWx8UmZQ09Ky+iZpOYp6/cz01Q==
+X-Received: by 2002:a17:906:6a19:: with SMTP id qw25mr24349241ejc.558.1643786614459;
+        Tue, 01 Feb 2022 23:23:34 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id h15sm15530665ejg.144.2022.02.01.23.23.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Feb 2022 23:23:33 -0800 (PST)
+Message-ID: <817092d5-5af2-126d-7e1b-0dce2b82d7a5@redhat.com>
+Date:   Wed, 2 Feb 2022 08:23:31 +0100
 MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-2-reijiw@google.com>
- <CA+EHjTx+b0ZVw30riW4OUVP4BCPeJZe+gr5_ycHkPbwU=y7sqA@mail.gmail.com>
- <CAAeT=Fy8AXaM1SGs1wRssTZ9QW9bH-d1d_sCdSrC7EitZLPKBw@mail.gmail.com> <CA+EHjTwRiNpGq=i8LyuH4M3kCdTHFQKALXWNJcTZ+J5SQD87Wg@mail.gmail.com>
-In-Reply-To: <CA+EHjTwRiNpGq=i8LyuH4M3kCdTHFQKALXWNJcTZ+J5SQD87Wg@mail.gmail.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 1 Feb 2022 22:46:14 -0800
-Message-ID: <CAAeT=FzDVbLsCdshTP+jszn_E_CqK3fN0V5bXeozf98abCdTZg@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 01/26] KVM: arm64: Introduce a validation function
- for an ID register
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 5.10] KVM: x86: Forcibly leave nested virt when SMM state
+ is toggled
+Content-Language: en-US
+To:     Tadeusz Struk <tadeusz.struk@linaro.org>, stable@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+References: <20220201230427.2311393-1-tadeusz.struk@linaro.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220201230427.2311393-1-tadeusz.struk@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Fuad,
+On 2/2/22 00:04, Tadeusz Struk wrote:
+> From: Sean Christopherson <seanjc@google.com>
+> 
+> Commit f7e570780efc5cec9b2ed1e0472a7da14e864fdb upstream.
+> 
+> Please apply it to 5.10.y. It fixes the following syzbot issue:
+> Link: https://syzkaller.appspot.com/bug?id=c46ee6f22a68171154cdd9217216b2a02cf4b71c
+> 
+> Forcibly leave nested virtualization operation if userspace toggles SMM
+> state via KVM_SET_VCPU_EVENTS or KVM_SYNC_X86_EVENTS.  If userspace
+> forces the vCPU out of SMM while it's post-VMXON and then injects an SMI,
+> vmx_enter_smm() will overwrite vmx->nested.smm.vmxon and end up with both
+> vmxon=false and smm.vmxon=false, but all other nVMX state allocated.
+> 
+> Don't attempt to gracefully handle the transition as (a) most transitions
+> are nonsencial, e.g. forcing SMM while L2 is running, (b) there isn't
+> sufficient information to handle all transitions, e.g. SVM wants access
+> to the SMRAM save state, and (c) KVM_SET_VCPU_EVENTS must precede
+> KVM_SET_NESTED_STATE during state restore as the latter disallows putting
+> the vCPU into L2 if SMM is active, and disallows tagging the vCPU as
+> being post-VMXON in SMM if SMM is not active.
+> 
+> Abuse of KVM_SET_VCPU_EVENTS manifests as a WARN and memory leak in nVMX
+> due to failure to free vmcs01's shadow VMCS, but the bug goes far beyond
+> just a memory leak, e.g. toggling SMM on while L2 is active puts the vCPU
+> in an architecturally impossible state.
+> 
+>    WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
+>    WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
+>    Modules linked in:
+>    CPU: 1 PID: 3606 Comm: syz-executor725 Not tainted 5.17.0-rc1-syzkaller #0
+>    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+>    RIP: 0010:free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
+>    RIP: 0010:free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
+>    Code: <0f> 0b eb b3 e8 8f 4d 9f 00 e9 f7 fe ff ff 48 89 df e8 92 4d 9f 00
+>    Call Trace:
+>     <TASK>
+>     kvm_arch_vcpu_destroy+0x72/0x2f0 arch/x86/kvm/x86.c:11123
+>     kvm_vcpu_destroy arch/x86/kvm/../../../virt/kvm/kvm_main.c:441 [inline]
+>     kvm_destroy_vcpus+0x11f/0x290 arch/x86/kvm/../../../virt/kvm/kvm_main.c:460
+>     kvm_free_vcpus arch/x86/kvm/x86.c:11564 [inline]
+>     kvm_arch_destroy_vm+0x2e8/0x470 arch/x86/kvm/x86.c:11676
+>     kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1217 [inline]
+>     kvm_put_kvm+0x4fa/0xb00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1250
+>     kvm_vm_release+0x3f/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1273
+>     __fput+0x286/0x9f0 fs/file_table.c:311
+>     task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+>     exit_task_work include/linux/task_work.h:32 [inline]
+>     do_exit+0xb29/0x2a30 kernel/exit.c:806
+>     do_group_exit+0xd2/0x2f0 kernel/exit.c:935
+>     get_signal+0x4b0/0x28c0 kernel/signal.c:2862
+>     arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:868
+>     handle_signal_work kernel/entry/common.c:148 [inline]
+>     exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+>     exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:207
+>     __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+>     syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
+>     do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+>     entry_SYSCALL_64_after_hwframe+0x44/0xae
+>     </TASK>
+> 
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: <stable@vger.kernel.org>
+> Cc: <x86@kernel.org>
+> Cc: <kvm@vger.kernel.org>
+> 
+> Backported-by: Tadeusz Struk <tadeusz.struk@linaro.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  1 +
+>   arch/x86/kvm/svm/nested.c       | 10 ++++++++--
+>   arch/x86/kvm/svm/svm.c          |  2 +-
+>   arch/x86/kvm/svm/svm.h          |  2 +-
+>   arch/x86/kvm/vmx/nested.c       |  1 +
+>   arch/x86/kvm/x86.c              |  2 ++
+>   6 files changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b1cd8334db11..078494401046 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1285,6 +1285,7 @@ struct kvm_x86_ops {
+>   };
+>   
+>   struct kvm_x86_nested_ops {
+> +	void (*leave_nested)(struct kvm_vcpu *vcpu);
+>   	int (*check_events)(struct kvm_vcpu *vcpu);
+>   	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
+>   	int (*get_state)(struct kvm_vcpu *vcpu,
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index f0946872f5e6..23910e6a3f01 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -783,8 +783,10 @@ void svm_free_nested(struct vcpu_svm *svm)
+>   /*
+>    * Forcibly leave nested mode in order to be able to reset the VCPU later on.
+>    */
+> -void svm_leave_nested(struct vcpu_svm *svm)
+> +void svm_leave_nested(struct kvm_vcpu *vcpu)
+>   {
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+>   	if (is_guest_mode(&svm->vcpu)) {
+>   		struct vmcb *hsave = svm->nested.hsave;
+>   		struct vmcb *vmcb = svm->vmcb;
+> @@ -1185,7 +1187,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>   		return -EINVAL;
+>   
+>   	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
+> -		svm_leave_nested(svm);
+> +		svm_leave_nested(vcpu);
+>   		svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
+>   		return 0;
+>   	}
+> @@ -1238,6 +1240,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>   	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+>   	hsave->save = *save;
+>   
+> +	if (is_guest_mode(vcpu))
+> +		svm_leave_nested(vcpu);
+> +
+>   	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
+>   	load_nested_vmcb_control(svm, ctl);
+>   	nested_prepare_vmcb_control(svm);
+> @@ -1252,6 +1257,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>   }
+>   
+>   struct kvm_x86_nested_ops svm_nested_ops = {
+> +	.leave_nested = svm_leave_nested,
+>   	.check_events = svm_check_nested_events,
+>   	.get_nested_state_pages = svm_get_nested_state_pages,
+>   	.get_state = svm_get_nested_state,
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 5e1d7396a6b8..b4f4ce5ace6b 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -279,7 +279,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+>   
+>   	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
+>   		if (!(efer & EFER_SVME)) {
+> -			svm_leave_nested(svm);
+> +			svm_leave_nested(vcpu);
+>   			svm_set_gif(svm, true);
+>   
+>   			/*
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index be74e22b82ea..2c007241fbf5 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -393,7 +393,7 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+>   
+>   int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+>   			 struct vmcb *nested_vmcb);
+> -void svm_leave_nested(struct vcpu_svm *svm);
+> +void svm_leave_nested(struct kvm_vcpu *vcpu);
+>   void svm_free_nested(struct vcpu_svm *svm);
+>   int svm_allocate_nested(struct vcpu_svm *svm);
+>   int nested_svm_vmrun(struct vcpu_svm *svm);
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index d5f24a2f3e91..6a4b91b77cde 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6614,6 +6614,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+>   }
+>   
+>   struct kvm_x86_nested_ops vmx_nested_ops = {
+> +	.leave_nested = vmx_leave_nested,
+>   	.check_events = vmx_check_nested_events,
+>   	.hv_timer_pending = nested_vmx_preemption_timer_pending,
+>   	.get_state = vmx_get_nested_state,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b885063dc393..ab31745c04d0 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4390,6 +4390,8 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+>   				vcpu->arch.hflags |= HF_SMM_MASK;
+>   			else
+>   				vcpu->arch.hflags &= ~HF_SMM_MASK;
+> +
+> +			kvm_x86_ops.nested_ops->leave_nested(vcpu);
+>   			kvm_smm_changed(vcpu);
+>   		}
+>   
 
-On Tue, Feb 1, 2022 at 6:14 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Reiji,
->
-> ...
->
-> > > Could you please explain using ftr_temp[] and changing the value in
-> > > arm64_ftr_bits_kvm_override, rather than just
-> > > arm64_ftr_reg_bits_overrite(bits->ftr_bits, o_bits->ftr_bits)?
-> >
-> > I would like to maintain the order of the entries in the original
-> > ftr_bits so that (future) functions that work for the original ones
-> > also work for the KVM's.
-> > The copy and override is an easy way to do that.  The same thing can
-> > be done without ftr_temp[], but it would look a bit tricky.
-> >
-> > If we assume the order shouldn't matter or entries in ftr_bits
-> > are always in descending order, just changing the value in
-> > arm64_ftr_bits_kvm_override would be a much simpler way though.
->
-> Could you please add a comment in that case? I did find it to be
-> confusing until I read your explanation here.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Yes, I will add a comment for it.
+Paolo
 
->
-> >
-> > >
-> > >
-> > > > +static const struct arm64_ftr_bits *get_arm64_ftr_bits_kvm(u32 sys_id)
-> > > > +{
-> > > > +       const struct __ftr_reg_bits_entry *ret;
-> > > > +       int err;
-> > > > +
-> > > > +       if (!arm64_ftr_bits_kvm) {
-> > > > +               /* arm64_ftr_bits_kvm is not initialized yet. */
-> > > > +               err = init_arm64_ftr_bits_kvm();
-> > >
-> > > Rather than doing this check, can we just initialize it earlier, maybe
-> > > (indirectly) via kvm_arch_init_vm() or around the same time?
-> >
-> > Thank you for the comment.
-> > I will consider when it should be initialized.
-> > ( perhaps even earlier than kvm_arch_init_vm())
-> >
-> > >
-> > >
-> > > > +               if (err)
-> > > > +                       return NULL;
-> > > > +       }
-> > > > +
-> > > > +       ret = bsearch((const void *)(unsigned long)sys_id,
-> > > > +                     arm64_ftr_bits_kvm,
-> > > > +                     arm64_ftr_bits_kvm_nentries,
-> > > > +                     sizeof(arm64_ftr_bits_kvm[0]),
-> > > > +                     search_cmp_ftr_reg_bits);
-> > > > +       if (ret)
-> > > > +               return ret->ftr_bits;
-> > > > +
-> > > > +       return NULL;
-> > > > +}
-> > > > +
-> > > > +/*
-> > > > + * Check if features (or levels of features) that are indicated in the ID
-> > > > + * register value @val are also indicated in @limit.
-> > > > + * This function is for KVM to check if features that are indicated in @val,
-> > > > + * which will be used as the ID register value for its guest, are supported
-> > > > + * on the host.
-> > > > + * For AA64MMFR0_EL1.TGranX_2 fields, which don't follow the standard ID
-> > > > + * scheme, the function checks if values of the fields in @val are the same
-> > > > + * as the ones in @limit.
-> > > > + */
-> > > > +int arm64_check_features(u32 sys_reg, u64 val, u64 limit)
-> > > > +{
-> > > > +       const struct arm64_ftr_bits *ftrp = get_arm64_ftr_bits_kvm(sys_reg);
-> > > > +       u64 exposed_mask = 0;
-> > > > +
-> > > > +       if (!ftrp)
-> > > > +               return -ENOENT;
-> > > > +
-> > > > +       for (; ftrp->width; ftrp++) {
-> > > > +               s64 ftr_val = arm64_ftr_value(ftrp, val);
-> > > > +               s64 ftr_lim = arm64_ftr_value(ftrp, limit);
-> > > > +
-> > > > +               exposed_mask |= arm64_ftr_mask(ftrp);
-> > > > +
-> > > > +               if (ftr_val == ftr_lim)
-> > > > +                       continue;
-> > >
-> > > At first I thought that this check isn't necessary, it should be
-> > > covered by the check below (arm64_ftr_safe_value. However, I think
-> > > that it's needed for the FTR_HIGHER_OR_ZERO_SAFE case. If my
-> > > understanding is correct, it might be worth adding a comment, or even
-> > > encapsulating this logic in a arm64_is_safe_value() function for
-> > > clarity.
-> >
-> > In my understanding, arm64_ftr_safe_value() provides a safe value
-> > when two values are different, and I think there is nothing special
-> > about the usage of this function (This is actually how the function
-> > is used by update_cpu_ftr_reg()).
-> > Without the check, it won't work for FTR_EXACT, but there might be
-> > more in the future.
-> >
-> > Perhaps it might be more straightforward to add the equality check
-> > into arm64_ftr_safe_value() ?
->
-> I don't think this would work for all callers of
-> arm64_ftr_safe_value(). The thing is arm64_ftr_safe_value() doesn't
-> check whether the value is safe, but it returns the safe value that
-> supports the highest feature. Whereas arm64_check_features() on the
-> other hand is trying to determine whether a value is safe.
->
-> If you move the equality check there it would work for
-> arm64_check_features(), but I am not convinced it wouldn't change the
-> behavior for init_cpu_ftr_reg() in the case of FTR_EXACT, unless this
-> never applies to override->val. What do you think?
-
-The equality check (simply returns the new value if new == cur) could
-change a return value of arm64_ftr_safe_value only if ftr_ovr == ftr_new
-for FTR_EXACT case.  For init_cpu_ftr_reg, since ftr_ovr value doesn't
-matter if ftr_ovr == ftr_new, I would think the override behavior itself
-stays the same although the message that will be printed by
-init_cpu_ftr_reg() will change ("ignoring override" => "already set").
-
-Having said that, since the change (having arm64_ftr_safe_value does
-the equality check) isn't necessary, either way is fine, and
-I can keep the current implementation of arm64_ftr_safe_value().
-
-Thanks,
-Reiji
-
-
->
-> Thanks,
-> /fuad
->
->
-> > >
-> > > > +
-> > > > +               if (ftr_val != arm64_ftr_safe_value(ftrp, ftr_val, ftr_lim))
-> > > > +                       return -E2BIG;
-> > > > +       }
-> > > > +
-> > > > +       /* Make sure that no unrecognized fields are set in @val. */
-> > > > +       if (val & ~exposed_mask)
-> > > > +               return -E2BIG;
-> > > > +
-> > > > +       return 0;
-> > > > +}
-> >
-> > Thanks,
-> > Reiji
