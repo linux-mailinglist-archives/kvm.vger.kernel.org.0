@@ -2,222 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 348164A6E28
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 10:53:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 528184A6E2B
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 10:53:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245693AbiBBJwp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 04:52:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59969 "EHLO
+        id S245640AbiBBJxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 04:53:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59613 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245638AbiBBJwY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 04:52:24 -0500
+        by vger.kernel.org with ESMTP id S231217AbiBBJw7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 04:52:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643795543;
+        s=mimecast20190719; t=1643795578;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fKKUKbYAx10NZBmqUNI8MqZqdsr2f4RjKNSF3VFdLUk=;
-        b=Dq6dVJt7osLqjWP5Zqu5AvxRSLnwmvxdSzVRUCHv2OzmhqJNmgKhbu2mfld2FQOI3ZaqFc
-        NdA8axvs2WauuMd9UyxFY6cTL1kV1nfQUE9BemGP9e3MKguYlVXMyI3cUoCpvG5dAZe9sP
-        8qZsyXciEj7qFZ/YFZdx8shEhyu/PhY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FJYm0PPuSG5P58MkxPI9TQ7TBw2y3cTWuDQw+JeYdYw=;
+        b=EtZu8DeTc666Qq5QyJfzqpPnS6xd1vHTWiKsocZQgPOMBD+RuntzGrZ1kWIiETJ7N5U9As
+        Em6AnLHGr5Pe26Bzp4yBe0NcOUCOaq17aGv3j2w1WDqa1UWAWCCaDRjkfco+RsClQhrQup
+        PqnnWcESTQZM8lnY/RgtixRCSrNZeVA=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-359-8McRE6-iPW-k7kuGaVqgAg-1; Wed, 02 Feb 2022 04:52:22 -0500
-X-MC-Unique: 8McRE6-iPW-k7kuGaVqgAg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BBD4363A6;
-        Wed,  2 Feb 2022 09:52:21 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.240])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2DBF1752C8;
-        Wed,  2 Feb 2022 09:52:07 +0000 (UTC)
+ us-mta-640-k2LJcKlMOpKuVeQITGfR2g-1; Wed, 02 Feb 2022 04:52:57 -0500
+X-MC-Unique: k2LJcKlMOpKuVeQITGfR2g-1
+Received: by mail-ej1-f70.google.com with SMTP id m4-20020a170906160400b006be3f85906eso1979476ejd.23
+        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 01:52:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=FJYm0PPuSG5P58MkxPI9TQ7TBw2y3cTWuDQw+JeYdYw=;
+        b=Uf/eDJwbCoZexu6gYKu5bwH8wzR9bTtQVAkWKO3a7CDMAOy3SEhe7yX2D7dcjqNH3M
+         8uYuDFfRrR5Zg7y5D8YyTv6zZ8MmrEpUiMdiXoRybJG0MOn5KZrDZ6FcprhHJNaw6c7v
+         1+Ngg6SE8UBOX07BgcQzbUS4pb2gh/NBD9xTqG0SzisO6yeM1PYrmXUy6/erSGt6IP7/
+         /i604SlagojrdQ0ddQ/ht25jRb3n2z1VhXOGXcl9F+kUNRb5ipWOOlX7T5FIBDRl6FRe
+         ZZWoc4/PIEkmEfHi9/S/5DVRWYDTVHM5lvAN8oFyhwCf/OBq4JuRQN+ynQnA+HtsqodH
+         ahkA==
+X-Gm-Message-State: AOAM531AGr2PSAAK9zgTho7tdNnMNF6rNFcACyja9jpBQsGSmrC6Nfwn
+        AffkkEo6z4lwjKVsKG0NfWKIp+6S0VOxIyuwG1X0xIwK3UD7GpAlz1HtzprKMKQX5eEueiQhrzy
+        nGdK5T9v1tA0F
+X-Received: by 2002:a17:906:2e8b:: with SMTP id o11mr24527493eji.241.1643795576724;
+        Wed, 02 Feb 2022 01:52:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx5VEKcGjjuFf8IKMzODHl6ryi4f2cI9jzsIHgMrjlJYrW0OM0f6beiwbK4bDQ9FfeMUIgxjQ==
+X-Received: by 2002:a17:906:2e8b:: with SMTP id o11mr24527474eji.241.1643795576522;
+        Wed, 02 Feb 2022 01:52:56 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id dn22sm4575465edb.80.2022.02.02.01.52.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Feb 2022 01:52:56 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Vineeth Pillai <viremana@linux.microsoft.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] KVM: nSVM: Implement Enlightened MSR-Bitmap feature
-Date:   Wed,  2 Feb 2022 10:51:00 +0100
-Message-Id: <20220202095100.129834-5-vkuznets@redhat.com>
-In-Reply-To: <20220202095100.129834-1-vkuznets@redhat.com>
-References: <20220202095100.129834-1-vkuznets@redhat.com>
+Subject: Re: [PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap
+ for Hyper-V-on-KVM and fix it for KVM-on-Hyper-V
+In-Reply-To: <ebd368c8-5c2a-dc5b-203f-f058f68b7825@redhat.com>
+References: <20211220152139.418372-1-vkuznets@redhat.com>
+ <35f06589-d300-c356-dc17-2c021ac97281@redhat.com>
+ <87sft2bqup.fsf@redhat.com>
+ <66bcd1bf-0df4-8f02-9c0d-f71cecef71f4@redhat.com>
+ <87o83qbehk.fsf@redhat.com>
+ <ebd368c8-5c2a-dc5b-203f-f058f68b7825@redhat.com>
+Date:   Wed, 02 Feb 2022 10:52:55 +0100
+Message-ID: <87leytbnns.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Similar to nVMX commit 502d2bf5f2fd ("KVM: nVMX: Implement Enlightened MSR
-Bitmap feature"), add support for the feature for nSVM (Hyper-V on KVM).
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Notable differences from nVMX implementation:
-- As the feature uses SW reserved fields in VMCB control, KVM needs to
-make sure it's dealing with a Hyper-V guest (kvm_hv_hypercall_enabled()).
+> On 2/1/22 19:58, Vitaly Kuznetsov wrote:
+>>> Hmm, it fails to compile with CONFIG_HYPERV disabled, and a trivial
+>>> #if also fails due to an unused goto label.  Does this look good to you?
+>>>
+>> Hm, it does but honestly I did not anticipate this dependency --
+>> CONFIG_HYPERV is needed for KVM-on-Hyper-V but this feature is for
+>> Hyper-V-on-KVM. Let me take a look tomorrow.
+>> 
+>
+> It's because, without it, the relevant structs are not defined by 
+> svm_onhyperv.h.  Go ahead and send a new version if you prefer
 
-- 'msrpm_base_pa' needs to be always be overwritten in
-nested_svm_vmrun_msrpm(), even when the update is skipped. As an
-optimization, nested_vmcb02_prepare_control() copies it from VMCB01
-so when MSR-Bitmap feature for L2 is disabled nothing needs to be done.
+Should be fixed in v2. I still think it makes sense to keep this
+KVM-on-Hyper-V and Hyper-V-on-KVM separation as it's really confusing to
+an unprepared reader. There's still room for improvement in nVMX I
+believe but it's orthogonal to this nSVM feature.
 
-- 'struct vmcb_ctrl_area_cached' needs to be extended with clean
-fields/sw reserved data and __nested_copy_vmcb_control_to_cache() needs to
-copy it so nested_svm_vmrun_msrpm() can use it later.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c     |  7 +------
- arch/x86/kvm/svm/nested.c | 41 ++++++++++++++++++++++++++++++++-------
- arch/x86/kvm/svm/svm.h    |  2 ++
- 3 files changed, 37 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index ec01ec9992d4..9192b706be58 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2412,10 +2412,6 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 	if (kvm_x86_ops.nested_ops->get_evmcs_version)
- 		evmcs_ver = kvm_x86_ops.nested_ops->get_evmcs_version(vcpu);
- 
--	/* Skip NESTED_FEATURES if eVMCS is not supported */
--	if (!evmcs_ver)
--		--nent;
--
- 	if (cpuid->nent < nent)
- 		return -E2BIG;
- 
-@@ -2515,8 +2511,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 		case HYPERV_CPUID_NESTED_FEATURES:
- 			ent->eax = evmcs_ver;
--			if (evmcs_ver)
--				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
-+			ent->eax |= HV_X64_NESTED_MSR_BITMAP;
- 
- 			break;
- 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f27323728be2..7b26a4b518f7 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -28,6 +28,7 @@
- #include "cpuid.h"
- #include "lapic.h"
- #include "svm.h"
-+#include "hyperv.h"
- 
- #define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
- 
-@@ -165,14 +166,30 @@ void recalc_intercepts(struct vcpu_svm *svm)
- 	vmcb_set_intercept(c, INTERCEPT_VMSAVE);
- }
- 
-+/*
-+ * Merge L0's (KVM) and L1's (Nested VMCB) MSR permission bitmaps. The function
-+ * is optimized in that it only merges the parts where KVM MSR permission bitmap
-+ * may contain zero bits.
-+ */
- static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- {
-+	struct hv_enlightenments *hve =
-+		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
-+	int i;
-+
- 	/*
--	 * This function merges the msr permission bitmaps of kvm and the
--	 * nested vmcb. It is optimized in that it only merges the parts where
--	 * the kvm msr permission bitmap may contain zero bits
-+	 * MSR bitmap update can be skipped when:
-+	 * - MSR bitmap for L1 hasn't changed.
-+	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-+	 *   before.
-+	 * - Nested hypervisor (L1) is using Hyper-V emulation interface and
-+	 * tells KVM (L0) there were no changes in MSR bitmap for L2.
- 	 */
--	int i;
-+	if (!svm->nested.force_msr_bitmap_recalc &&
-+	    kvm_hv_hypercall_enabled(&svm->vcpu) &&
-+	    hve->hv_enlightenments_control.msr_bitmap &&
-+	    (svm->nested.ctl.clean & VMCB_HV_NESTED_ENLIGHTENMENTS))
-+		goto set_msrpm_base_pa;
- 
- 	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return true;
-@@ -195,6 +212,7 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- 
- 	svm->nested.force_msr_bitmap_recalc = false;
- 
-+set_msrpm_base_pa:
- 	svm->vmcb->control.msrpm_base_pa = __sme_set(__pa(svm->nested.msrpm));
- 
- 	return true;
-@@ -300,7 +318,8 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
- }
- 
- static
--void __nested_copy_vmcb_control_to_cache(struct vmcb_ctrl_area_cached *to,
-+void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
-+					 struct vmcb_ctrl_area_cached *to,
- 					 struct vmcb_control_area *from)
- {
- 	unsigned int i;
-@@ -333,12 +352,19 @@ void __nested_copy_vmcb_control_to_cache(struct vmcb_ctrl_area_cached *to,
- 	to->asid           = from->asid;
- 	to->msrpm_base_pa &= ~0x0fffULL;
- 	to->iopm_base_pa  &= ~0x0fffULL;
-+
-+	/* Hyper-V extensions (Enlightened VMCB) */
-+	if (kvm_hv_hypercall_enabled(vcpu)) {
-+		to->clean = from->clean;
-+		memcpy(to->reserved_sw, from->reserved_sw,
-+		       sizeof(struct hv_enlightenments));
-+	}
- }
- 
- void nested_copy_vmcb_control_to_cache(struct vcpu_svm *svm,
- 				       struct vmcb_control_area *control)
- {
--	__nested_copy_vmcb_control_to_cache(&svm->nested.ctl, control);
-+	__nested_copy_vmcb_control_to_cache(&svm->vcpu, &svm->nested.ctl, control);
- }
- 
- static void __nested_copy_vmcb_save_to_cache(struct vmcb_save_area_cached *to,
-@@ -1305,6 +1331,7 @@ static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
- 	dst->virt_ext              = from->virt_ext;
- 	dst->pause_filter_count   = from->pause_filter_count;
- 	dst->pause_filter_thresh  = from->pause_filter_thresh;
-+	/* 'clean' and 'reserved_sw' are not changed by KVM */
- }
- 
- static int svm_get_nested_state(struct kvm_vcpu *vcpu,
-@@ -1437,7 +1464,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		goto out_free;
- 
- 	ret = -EINVAL;
--	__nested_copy_vmcb_control_to_cache(&ctl_cached, ctl);
-+	__nested_copy_vmcb_control_to_cache(vcpu, &ctl_cached, ctl);
- 	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached))
- 		goto out_free;
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 92fc4f554634..96473ecb2c6e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -137,6 +137,8 @@ struct vmcb_ctrl_area_cached {
- 	u32 event_inj_err;
- 	u64 nested_cr3;
- 	u64 virt_ext;
-+	u32 clean;
-+	u8 reserved_sw[32];
- };
- 
- struct svm_nested_state {
 -- 
-2.34.1
+Vitaly
 
