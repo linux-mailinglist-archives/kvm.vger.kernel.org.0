@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9152A4A6ACE
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 05:13:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 840AC4A6AE1
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 05:29:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244041AbiBBENm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 23:13:42 -0500
-Received: from mail-bn8nam12on2085.outbound.protection.outlook.com ([40.107.237.85]:44129
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S244041AbiBBE32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 23:29:28 -0500
+Received: from mail-sn1anam02on2063.outbound.protection.outlook.com ([40.107.96.63]:20481
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S244284AbiBBENj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Feb 2022 23:13:39 -0500
+        id S232908AbiBBE30 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 23:29:26 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PIfFjswjtWYs1gU9SEx9JDG5egB5+bgBNciurJVaSCDjTqW+1IKV/479zVThca3qkeftCJi5G4KSLPh7tQ0RA2O5hkawhKwQcIzh00NxwGe4I2Of8StlA2QL58kgDLYhrvS1VYY+QN1mOloF7O0oEZzZoEBBLvvBK1CenFLtrI4bmmZgcZNRfBwMsWcMEQ+3HvqnjzrViOVR7rZEz3uGbWlxLR8VRiKDu/QivwfgkHBfmPCdqg4C55b2qDAwtHrCsldaN3dzwsNlYQgdNDNJLcP9YMVsPJttaX6OmNTnpND5JF58W+vMViLVleiaYZhKo2DSs+0Ijbpnf+jwREX1Ag==
+ b=ktb2Y5TMHx7Gufc9HPdkV3lIUZCPYAxRYbaImJ/QfdJSxMSRuFccW3bMJAnRLu47y/5aYD83tR0o9aAqB0kO9+5WNLJJy7Dl5aF7Lftb988oNE74nlNWLJb2h6CGRQWxda9ysX3n6VZ+7Uwl9gcoi7s5QhcbeIYCYuLYpysgDDmx3dshQopEkhpGpcylPgbh6Xu9N3BUSew0JjnhvPzJkPFsk7xr32o/ArG8qjE0nH3fIT0GWTg9Bv2Kwi2wTWLxjFJdvaS8T3gFt2vcpqpE0ErEw9wwjObEp9Wc6Z6G+/hXIHGeUwCNiYxgFlmxq+pFmJz/npjkFxAFUc89aFyOvw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jQhHVcB3XSF5DeZCvqLESGm6Wktrl8qqMwb0pA1Zt0s=;
- b=bKLyYlZGamr1j/0nJSibcpcHtB1XeWaTGdJmNqFlgnWxPUEVh+blNXt4mD+oLtPNnw4D+xKBnA1aYe95Yb3Hx/+WKdsA9Fvo2344BAVgohhDhDYKQzG5hbcQTKU/4iVTVOnVTBuRLKt+6UkOM8vru85fXJVY3CcarMJFA1HQ+pxnoqA1n8q8wkWKjs+1ao2DZpxIGGpQGscj6NCaftriEgaxOPF23+xMCOQUubUD8ZRsVG69fMEGGsK81F3c2Qc/icij7RAQfPLlBGxXd0H27pCZ1hx23EthtsQo7ZLGycG2uQtNvuxHBHrpAuRdHXnoGEXSeArIChjZ7M3MdPVT4Q==
+ bh=vqgMcUfhDrCwffj0CjUnqhMl1CtCUvkbCfnkbEx/aNM=;
+ b=cZzcyTZ1tUM9jz2EIfxAUhVWIkER205E4W3GpYJjWuxT9wDtvXN5juEMbmkbQ2D7RBgjUGVRGxL8BRGdACFKmOiMTLbyJ00Jraerc4ZGERjIARDV0Ut5d7YmMl085G1gs/5Kq3/Z4zu3Eu4M3HFt/iPJ3/YQJxG12ItDE45T4k/PoG09aAeJpSNOIy1DNziVtd68gAB7Dwh5lpZSEPFEemgQAoAZlzkAXTUUM/ivNgllluVdFrKqcFnchWT6+iQAyDi4CQL/cAdtTcYQUOSj0mcYWKXutRvgLkZ8uIVE/VGAWsx7eW4iQ3UOEXEfmclurFfIly3Yect5J5ThXfVWnw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jQhHVcB3XSF5DeZCvqLESGm6Wktrl8qqMwb0pA1Zt0s=;
- b=TeJEPF1OG3HbZ7YgDHrZ1qwgjTlrGYVDF5vsm3pqAxkx6OemUh8F80oZlSjIRXOZ1Q1hYeZPLYg5wEIzEisZI2DYDrwQjLuW/B7hz2pmrmsCNEVztVdJMDgK13ipHesyLZTFuPX0ZxtzwK4F4MFW6i5bF1lMduZoAuMOsSbhn0U=
-Received: from DM6PR02CA0152.namprd02.prod.outlook.com (2603:10b6:5:332::19)
- by BL0PR12MB2436.namprd12.prod.outlook.com (2603:10b6:207:42::19) with
+ bh=vqgMcUfhDrCwffj0CjUnqhMl1CtCUvkbCfnkbEx/aNM=;
+ b=QBMnqKiCKETaTYU88kFZ5x57yBEJ/jOOTWDUCkH0xkGy4qOWF5NXq5o5PJAEPYIoGsXCHfYYtfVLngTm+K046VmhiFjJxa92K4fImlw+CxUzMCYNOj80etynQ64WOAzcLX+yE2T6KK6bKusEfN7YpsP7uqySh3i56Mk2nAb1lEk=
+Received: from BN6PR20CA0067.namprd20.prod.outlook.com (2603:10b6:404:151::29)
+ by MN2PR12MB4439.namprd12.prod.outlook.com (2603:10b6:208:262::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.11; Wed, 2 Feb
- 2022 04:13:34 +0000
-Received: from DM6NAM11FT027.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:332:cafe::6c) by DM6PR02CA0152.outlook.office365.com
- (2603:10b6:5:332::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.15 via Frontend
- Transport; Wed, 2 Feb 2022 04:13:34 +0000
+ 2022 04:29:23 +0000
+Received: from BN8NAM11FT014.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:151:cafe::d4) by BN6PR20CA0067.outlook.office365.com
+ (2603:10b6:404:151::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12 via Frontend
+ Transport; Wed, 2 Feb 2022 04:29:23 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -44,172 +44,185 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT027.mail.protection.outlook.com (10.13.172.205) with Microsoft SMTP
+ BN8NAM11FT014.mail.protection.outlook.com (10.13.177.142) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4951.12 via Frontend Transport; Wed, 2 Feb 2022 04:13:33 +0000
-Received: from sp5-759chost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ 15.20.4951.12 via Frontend Transport; Wed, 2 Feb 2022 04:29:23 +0000
+Received: from BLR-5CG113396H.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Tue, 1 Feb
- 2022 22:13:31 -0600
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>
-CC:     <seanjc@google.com>, <mlevitsk@redhat.com>, <pbonzini@redhat.com>,
-        <joro@8bytes.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <bp@alien8.de>, <peterz@infradead.org>, <hpa@zytor.com>,
-        <jon.grimm@amd.com>,
-        "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>
-Subject: [PATCH v4 3/3] KVM: SVM: Add support for 12-bit host physical APIC ID
-Date:   Tue, 1 Feb 2022 22:11:12 -0600
-Message-ID: <20220202041112.273017-4-suravee.suthikulpanit@amd.com>
+ 2022 22:29:12 -0600
+From:   Ravi Bangoria <ravi.bangoria@amd.com>
+To:     <like.xu.linux@gmail.com>, <jmattson@google.com>
+CC:     <ravi.bangoria@amd.com>, <santosh.shukla@amd.com>,
+        <pbonzini@redhat.com>, <eranian@google.com>, <seanjc@google.com>,
+        <wanpengli@tencent.com>, <vkuznets@redhat.com>, <joro@8bytes.org>,
+        <peterz@infradead.org>, <mingo@redhat.com>,
+        <alexander.shishkin@linux.intel.com>, <tglx@linutronix.de>,
+        <bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+        <kvm@vger.kernel.org>, <x86@kernel.org>,
+        <linux-perf-users@vger.kernel.org>, <ananth.narayan@amd.com>,
+        <kim.phillips@amd.com>
+Subject: [PATCH] perf/amd: Implement errata #1292 workaround for F19h M00-0Fh
+Date:   Wed, 2 Feb 2022 09:58:38 +0530
+Message-ID: <20220202042838.6532-1-ravi.bangoria@amd.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220202041112.273017-1-suravee.suthikulpanit@amd.com>
-References: <20220202041112.273017-1-suravee.suthikulpanit@amd.com>
+In-Reply-To: <20220117055703.52020-1-likexu@tencent.com>
+References: <20220117055703.52020-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9d104e1c-bcf9-439c-2942-08d9e60260eb
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2436:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB243687A8BA3641EA5A8839EBF3279@BL0PR12MB2436.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:883;
+X-MS-Office365-Filtering-Correlation-Id: e6734e2e-5f6a-4b09-c768-08d9e60496e6
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4439:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB4439EA80ABD110686DE85410E0279@MN2PR12MB4439.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /92hMAsgBUDVhqdCdJjHATu81Y2CjoAxUi+lqXH9IkJEbWsWw0XeWqUMEoDwqij6f4MwHSsK1BGQhh0r0u2MZuYPLl44Y7MpkGA/thIhXk0f3rHOA/R60M4RiR/9o+DMp+D22QTpo8dWfuABY4W0ztcD851Qba25wZA72E9jcDoPAMeAazNaow4HgYol3zweY9NCwH/CLA7xVIlCt+QddCbBsYpMafFy8dqBHySdUW3wFjWEI2+XngRb2C8dNyaSdPlTXD6h+iBiGLkwVX+ecqbgyVdT96idGdeELnUrDhvzxeVfhj8LKXyrNUbVuG/x4KzAZ8Oq6WK9/GGb76w0N6eeDZmXoNEeq1p/1hV+t+WwDW09JSpnlT8l0evPqJCClJbSD8ORldD6HmkHglnYE38ytyvWI7V653KuM2pxMPvpUZWiHpvlXugtaOGZU8a9wDr6P0DyUXsETGdhUkjvmUcg5b8UgphXSapw9yfCIfYOys88o2iuKtoq3nVlin3+Dv8dxP+nysp0/SiFZRPiVYCQjR1tAyZk1WbLboF/hCTHwzi3Aj4Wr9XsSzxi7ueWtXp+JwicG2ndKTyrFikCg3pxHQiyCVHbtrX4R7lxoVdSw0Qr1LQPX4pyYFsQDb6CqcjN6gScf7FwplkhyZVloOLJNYfJ0gMC6mhPOj7w8URyYJC9HUjSTPILeY5tcpM6YHdAqSsDQ8Avwz0cZOjz3Q==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(36860700001)(8676002)(8936002)(7696005)(70206006)(6666004)(508600001)(186003)(16526019)(83380400001)(70586007)(4326008)(82310400004)(110136005)(316002)(26005)(54906003)(36756003)(1076003)(426003)(336012)(47076005)(86362001)(2906002)(81166007)(356005)(40460700003)(5660300002)(44832011)(2616005)(7416002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: N8oAxAfe1IeuTQYiy2Ge/3qhgtY3hcCKK5keFCs3+qxU/VX0i2TwUDiOd1BFIDehrtivUdfApkWnsob1ob+JkTfsGkN+5hbVEQOJuK8eSReaT3L6O0OiHTWa+XBI6MaawJAXGHT7m/+1fHfQPjELT+/ceMt6C9VZsiiz0w9WNm2uPNs/cd6LcOEkj5MgpycFYiuRvUb7ndUQuM9i18M2uipKVZgp5m2u1sNT96hxpzrISM6EKYFvEv/LHSZjA4lK41WfMuQSTQmoaMcGO0p6XDzfONWugm9uGvbhGdGBzyqdHVU3yUMyege+nxjYYCwZ0ci8e6HdvzoS1vGY1KU8tkQ1IA32kUW/8FnaUadosRX3x0suAIQ5TCs3uwQQdTo2ZXdGCyd3pbTDd1dv6lu/wmsTKGlbF5tGpJ2a6VB98MNFhbHRgF/Mk/mcwI/ia+r9ceHQybfV4v6LmcMbcpVNmeYwlsPqNZmC12i/HMEPUjZ0pmzemjuJCaDcQUwPooOr6+lFnI/1R13V22x+HxaO3fDn+KZ7abueOlANGwz08bhxDOeQB6O0aYYfXP0/ttnGMq1PoiAbmTxXPF1tQTdplcK8NOkA3WFRTA4YMKF0XZnwJJH3H+W188FXHC3OsO+fMscXhdHJdYgp0ioVBrqKJB9qwW/uogCk56loyMX/ytcyGgMrffjrn1dIuUHNICBA4bcNMueGChiQzFj8ZkQ089+pRlw8zYuWBCuBTes9yfxFFkrj/arnI8r1QKrI1etMyPoEPsPURvXSEV3DlMFRgbRl26yWCuETcH5EA1VNdihimjZCYEZk8oIBUty1nPgC95DkechzbZnstvpPRD2+8g==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(5660300002)(83380400001)(2906002)(44832011)(36756003)(36860700001)(508600001)(54906003)(110136005)(47076005)(7416002)(8676002)(81166007)(86362001)(4326008)(186003)(336012)(26005)(16526019)(356005)(8936002)(1076003)(82310400004)(316002)(426003)(2616005)(40460700003)(70586007)(966005)(6666004)(7696005)(70206006)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 04:13:33.8889
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 04:29:23.4975
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d104e1c-bcf9-439c-2942-08d9e60260eb
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6734e2e-5f6a-4b09-c768-08d9e60496e6
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT027.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT014.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2436
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4439
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The AVIC physical APIC ID table entry contains the host physical
-APIC ID field, which the hardware uses to keep track of where each
-vCPU is running. Originally, the field is an 8-bit value. For system
-w/ maximum physical APIC ID larger than 255, AVIC can support
-upto 12-bit value.
+Perf counter may overcount for a list of Retire Based Events. Implement
+workaround for Zen3 Family 19 Model 00-0F processors as suggested in
+Revision Guide[1]:
 
-However, there is no CPUID bit to help determine the AVIC capability
-to support 12-bit host physical APIC ID. Therefore, use the maximum
-physical APIC ID available on the system to determine the proper
-host physical APIC ID mask size.
+  To count the non-FP affected PMC events correctly:
+    o Use Core::X86::Msr::PERF_CTL2 to count the events, and
+    o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
+    o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Above workaround suggests to clear PERF_CTL2[20], but that will disable
+sampling mode. Given the fact that, there is already a skew between
+actual counter overflow vs PMI hit, we are anyway not getting accurate
+count for sampling events. Also, using PMC2 with both bit43 and bit20
+set can result in additional issues. Hence Linux implementation of
+workaround uses non-PMC2 counter for sampling events.
+
+Although the issue exists on all previous Zen revisions, the workaround
+is different and thus not included in this patch.
+
+This patch needs Like's patch[2] to make it work on kvm guest.
+
+[1] https://bugzilla.kernel.org/attachment.cgi?id=298241
+[2] https://lore.kernel.org/lkml/20220117055703.52020-1-likexu@tencent.com
+
+Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
 ---
- arch/x86/kvm/svm/avic.c | 33 ++++++++++++++++++++++++---------
- arch/x86/kvm/svm/svm.h  |  1 -
- 2 files changed, 24 insertions(+), 10 deletions(-)
+ arch/x86/events/amd/core.c | 75 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 74 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index f5c6cab42d74..3ca5776348a8 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -19,6 +19,7 @@
- #include <linux/amd-iommu.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/apic.h>
- #include <asm/irq_remapping.h>
- 
- #include "trace.h"
-@@ -63,6 +64,7 @@
- static DEFINE_HASHTABLE(svm_vm_data_hash, SVM_VM_DATA_HASH_BITS);
- static u32 next_vm_id = 0;
- static bool next_vm_id_wrapped = 0;
-+static u16 avic_host_physical_id_mask;
- static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
- 
- /*
-@@ -133,6 +135,23 @@ void avic_vm_destroy(struct kvm *kvm)
- 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
+diff --git a/arch/x86/events/amd/core.c b/arch/x86/events/amd/core.c
+index 9687a8aef01c..e2f172e75ce8 100644
+--- a/arch/x86/events/amd/core.c
++++ b/arch/x86/events/amd/core.c
+@@ -874,8 +874,78 @@ amd_get_event_constraints_f15h(struct cpu_hw_events *cpuc, int idx,
+ 	}
  }
  
-+static void avic_init_host_physical_apicid_mask(void)
-+{
-+	u32 count = get_count_order(apic_get_max_phys_apicid());
++/* Errata 1292: Overcounting of Retire Based Events */
++static struct event_constraint retire_event_count_constraints[] __read_mostly = {
++	EVENT_CONSTRAINT(0xC0, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC1, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC2, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC3, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC4, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC5, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC8, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC9, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xCA, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xCC, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xD1, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0x1000000C7, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0x1000000D0, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT_END
++};
 +
-+	/*
-+	 * Depending on the maximum host physical APIC ID available
-+	 * on the system, AVIC can support upto 8-bit or 12-bit host
-+	 * physical APIC ID.
-+	 */
-+	if (count <= 8)
-+		avic_host_physical_id_mask = GENMASK(7, 0);
-+	else
-+		avic_host_physical_id_mask = GENMASK(11, 0);
-+	pr_debug("Using AVIC host physical APIC ID mask %#0x\n",
-+		 avic_host_physical_id_mask);
++#define SAMPLE_IDX_MASK	(((1ULL << AMD64_NUM_COUNTERS_CORE) - 1) & ~0x4ULL)
++
++static struct event_constraint retire_event_sample_constraints[] __read_mostly = {
++	EVENT_CONSTRAINT(0xC0, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC0, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC1, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC2, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC3, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC4, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC5, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC8, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xC9, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xCA, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xCC, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xD1, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0x1000000C7, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0x1000000D0, SAMPLE_IDX_MASK, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT_END
++};
++
+ static struct event_constraint pair_constraint;
+ 
++/*
++ * Although 'Overcounting of Retire Based Events' errata exists
++ * for older generation cpus, workaround to set bit 43 works only
++ * for Family 19h Model 00-0Fh as per the Revision Guide.
++ */
++static struct event_constraint *
++amd_get_event_constraints_f19h_m00_0fh(struct cpu_hw_events *cpuc, int idx,
++				       struct perf_event *event)
++{
++	struct event_constraint *c;
++
++	if (amd_is_pair_event_code(&event->hw))
++		return &pair_constraint;
++
++	if (is_sampling_event(event)) {
++		for_each_event_constraint(c, retire_event_sample_constraints) {
++			if (constraint_match(c, event->hw.config))
++				return c;
++		}
++	} else {
++		for_each_event_constraint(c, retire_event_count_constraints) {
++			if (constraint_match(c, event->hw.config)) {
++				event->hw.config |= (1ULL << 43);
++				event->hw.config &= ~(1ULL << 20);
++				return c;
++			}
++		}
++	}
++
++	return &unconstrained;
 +}
 +
- int avic_vm_init(struct kvm *kvm)
- {
- 	unsigned long flags;
-@@ -974,17 +993,12 @@ avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
- void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	u64 entry;
--	/* ID = 0xff (broadcast), ID > 0xff (reserved) */
--	int h_physical_id = kvm_cpu_get_apicid(cpu);
-+	u16 h_physical_id = (u16)kvm_cpu_get_apicid(cpu);
- 	struct vcpu_svm *svm = to_svm(vcpu);
+ static struct event_constraint *
+ amd_get_event_constraints_f17h(struct cpu_hw_events *cpuc, int idx,
+ 			       struct perf_event *event)
+@@ -983,7 +1053,10 @@ static int __init amd_core_pmu_init(void)
+ 				    x86_pmu.num_counters / 2, 0,
+ 				    PERF_X86_EVENT_PAIR);
  
- 	lockdep_assert_preemption_disabled();
- 
--	/*
--	 * Since the host physical APIC id is 8 bits,
--	 * we can support host APIC ID upto 255.
--	 */
--	if (WARN_ON(h_physical_id > AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
-+	if (WARN_ON((h_physical_id & avic_host_physical_id_mask) != h_physical_id))
- 		return;
- 
- 	/*
-@@ -1000,8 +1014,8 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
- 	WARN_ON(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
- 
--	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
--	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
-+	entry &= ~((u64)avic_host_physical_id_mask);
-+	entry |= h_physical_id;
- 	entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
- 
- 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
-@@ -1076,6 +1090,7 @@ bool avic_hardware_setup(struct kvm_x86_ops *x86_ops)
- 	x86_ops->vcpu_unblocking = avic_vcpu_unblocking,
- 
- 	pr_info("AVIC enabled\n");
-+	avic_init_host_physical_apicid_mask();
- 	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
- 	return true;
- }
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index f2507d11a31a..70c55f20c0f1 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -565,7 +565,6 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- #define AVIC_LOGICAL_ID_ENTRY_VALID_BIT			31
- #define AVIC_LOGICAL_ID_ENTRY_VALID_MASK		(1 << 31)
- 
--#define AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK	(0xFFULL)
- #define AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK	(0xFFFFFFFFFFULL << 12)
- #define AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK		(1ULL << 62)
- #define AVIC_PHYSICAL_ID_ENTRY_VALID_MASK		(1ULL << 63)
+-		x86_pmu.get_event_constraints = amd_get_event_constraints_f17h;
++		if (boot_cpu_data.x86 == 0x19 && boot_cpu_data.x86_model <= 0xf)
++			x86_pmu.get_event_constraints = amd_get_event_constraints_f19h_m00_0fh;
++		else
++			x86_pmu.get_event_constraints = amd_get_event_constraints_f17h;
+ 		x86_pmu.put_event_constraints = amd_put_event_constraints_f17h;
+ 		x86_pmu.perf_ctr_pair_en = AMD_MERGE_EVENT_ENABLE;
+ 		x86_pmu.flags |= PMU_FL_PAIR;
 -- 
-2.25.1
+2.27.0
 
