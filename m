@@ -2,142 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 236084A7589
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 17:11:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8584C4A7584
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 17:11:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345696AbiBBQKM convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 2 Feb 2022 11:10:12 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4662 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiBBQKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 11:10:09 -0500
-Received: from fraeml740-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JpmqB2Czqz67nGj;
-        Thu,  3 Feb 2022 00:05:26 +0800 (CST)
-Received: from lhreml716-chm.china.huawei.com (10.201.108.67) by
- fraeml740-chm.china.huawei.com (10.206.15.221) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Feb 2022 17:10:07 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml716-chm.china.huawei.com (10.201.108.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Feb 2022 16:10:06 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Wed, 2 Feb 2022 16:10:06 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
-Thread-Topic: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
-Thread-Index: AQHYGDbmFHRHIXj6i0KnDwR2h2vbX6yAR7aggAAeEICAAAa58A==
-Date:   Wed, 2 Feb 2022 16:10:06 +0000
-Message-ID: <c8a0731c589e49068a78afcc73d66bfa@huawei.com>
-References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
- <20220202131448.GA2538420@nvidia.com>
- <a29ae3ea51344e18b9659424772a4b42@huawei.com>
- <20220202153945.GT1786498@nvidia.com>
-In-Reply-To: <20220202153945.GT1786498@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1345616AbiBBQLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 11:11:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37558 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229604AbiBBQLD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 11:11:03 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0716C061714;
+        Wed,  2 Feb 2022 08:11:03 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 82F7D1EC059E;
+        Wed,  2 Feb 2022 17:10:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1643818257;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=AL/TYP+FjyMYqNYKpHLjG276qQ1LF3QnRuNozDQQTPY=;
+        b=hVlgFCDt33VWeFAlZgAuBJx843Ihl9fiV4cvYtfgQtSybgKib/+DH0bxSARfzsockGvD1t
+        2zkRDwhszWILZLc73/LRzdHf3mpZsjA9Oh2VdKusDZxxNUXzWeFXhz6R3ZEYP4f5kkIEj+
+        AlMTMadYdWSQ8rMrwrWHpt1wQrs0/Lw=
+Date:   Wed, 2 Feb 2022 17:10:53 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v9 19/43] x86/mm: Add support to validate memory when
+ changing C-bit
+Message-ID: <YfqtDZGqfv+9mwPQ@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-20-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220128171804.569796-20-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jan 28, 2022 at 11:17:40AM -0600, Brijesh Singh wrote:
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 5ee0fbd98d0d..b7ae741a8c66 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -655,6 +655,173 @@ void __init snp_prep_memory(unsigned long paddr, unsigned int sz, enum psc_op op
+>  		WARN(1, "invalid memory op %d\n", op);
+>  }
+>  
+> +static int vmgexit_psc(struct snp_psc_desc *desc)
+> +{
+> +	int cur_entry, end_entry, ret = 0;
+> +	struct snp_psc_desc *data;
+> +	struct ghcb_state state;
+> +	struct es_em_ctxt ctxt;
+> +	unsigned long flags;
+> +	struct ghcb *ghcb;
+> +
+> +	/*
+> +	 * __sev_get_ghcb() needs to run with IRQs disabled because it is using
+> +	 * a per-CPU GHCB.
+> +	 */
+> +	local_irq_save(flags);
+> +
 
+I know the guest will terminate anyway but still...
 
-> -----Original Message-----
-> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
-> Sent: 02 February 2022 15:40
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
-> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
-> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
-> yuzenghui <yuzenghui@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
-> Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
+> +	ghcb = __sev_get_ghcb(&state);
+> +	if (unlikely(!ghcb))
+> +		return 1;
+
+This needs to be (btw, do you really need the unlikely()?)
+
+	if (!ghcb) {
+		ret = 1;
+		goto out_unlock;
+	}
+
+and at the end you have
+
+out:
+        __sev_put_ghcb(&state);
+
+out_unlock:
+        local_irq_restore(flags);
+
+...
+
+> +static void set_pages_state(unsigned long vaddr, unsigned int npages, int op)
+> +{
+> +	unsigned long vaddr_end, next_vaddr;
+> +	struct snp_psc_desc *desc;
+> +
+> +	desc = kmalloc(sizeof(*desc), GFP_KERNEL_ACCOUNT);
+> +	if (!desc)
+> +		panic("SEV-SNP: failed to allocate memory for PSC descriptor\n");
+> +
+> +	vaddr = vaddr & PAGE_MASK;
+> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
+> +
+> +	while (vaddr < vaddr_end) {
+> +		/*
+> +		 * Calculate the last vaddr that can be fit in one
+
+"... that fits in one ... "
+
+and then the comment *fits* :) on a single line too:
+
+		/* Calculate the last vaddr that fits in one struct snp_psc_desc. */
+
+> +		 * struct snp_psc_desc.
+> +		 */
+> +		next_vaddr = min_t(unsigned long, vaddr_end,
+> +				   (VMGEXIT_PSC_MAX_ENTRY * PAGE_SIZE) + vaddr);
+> +
+> +		__set_pages_state(desc, vaddr, next_vaddr, op);
+> +
+> +		vaddr = next_vaddr;
+> +	}
+> +
+> +	kfree(desc);
+> +}
+
+...
+
+> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+> index b4072115c8ef..1bc15b9d15f3 100644
+> --- a/arch/x86/mm/pat/set_memory.c
+> +++ b/arch/x86/mm/pat/set_memory.c
+> @@ -32,6 +32,7 @@
+>  #include <asm/set_memory.h>
+>  #include <asm/hyperv-tlfs.h>
+>  #include <asm/mshyperv.h>
+> +#include <asm/sev.h>
+>  
+>  #include "../mm_internal.h"
+>  
+> @@ -2012,8 +2013,22 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
+>  	 */
+>  	cpa_flush(&cpa, !this_cpu_has(X86_FEATURE_SME_COHERENT));
+>  
+> +	/*
+> +	 * To maintain the security guarantees of SEV-SNP guest invalidate the
+> +	 * memory before clearing the encryption attribute.
+> +	 */
+> +	if (!enc)
+> +		snp_set_memory_shared(addr, numpages);
+> +
+>  	ret = __change_page_attr_set_clr(&cpa, 1);
+>  
+> +	/*
+> +	 * Now that memory is mapped encrypted in the page table, validate it
+> +	 * so that is consistent with the above page state.
+
+" ... so that it is consistent... "
+
+> +	 */
+> +	if (!ret && enc)
+> +		snp_set_memory_private(addr, numpages);
+> +
+>  	/*
+>  	 * After changing the encryption attribute, we need to flush TLBs again
+>  	 * in case any speculative TLB caching occurred (but no need to flush
+> -- 
+> 2.25.1
 > 
-> On Wed, Feb 02, 2022 at 02:34:52PM +0000, Shameerali Kolothum Thodi
-> wrote:
-> 
-> > > There are few topics to consider:
-> > >  - Which of the three feature sets (STOP_COPY, P2P and PRECOPY) make
-> > >    sense for this driver?
-> >
-> > I think it will be STOP_COPY only for now. We might have PRECOPY
-> > feature once we have the SMMUv3 HTTU support in future.
-> 
-> HTTU is the dirty tracking feature? To be clear VFIO migration support for
-> PRECOPY has nothing to do with IOMMU based dirty page tracking.
 
-Yes, it is based on the IOMMU hardware dirty bit management support.
-A RFC was posted sometime back,
-https://lore.kernel.org/kvm/20210507103608.39440-1-zhukeqian1@huawei.com/
+-- 
+Regards/Gruss,
+    Boris.
 
-Ok, my guess was that the PRECOPY here was related. Thanks for clarifying.
-
-> 
-> > >  - I think we discussed the P2P implementation and decided it would
-> > >    work for this device? Can you re-read and confirm?
-> >
-> > In our case these devices are Integrated End Point devices and doesn't
-> > have P2P DMA capability. Hence the FSM arcs will be limited to
-> > STOP_COPY feature I guess. Also, since we cannot guarantee a NDMA
-> > state in STOP, my assumption currently is the onus of making sure that
-> > no MMIO access happens in STOP is on the user. Is that a valid assumption?
-> 
-> Yes, you can treat RUNNING_P2P as the same as STOP and rely on no MMIO
-> access to sustain it.
-
-Ok.
- 
-> (and I'm wondering sometimes if we should rename RUNNING_P2P to
-> STOP_P2P - ie the device is stopped but still allows inbound P2P to make this
-> clearer)
-> 
-> > Do we need to set the below before the feature query?
-> > Or am I using a wrong Qemu/kernel repo?
-> >
-> > +++ b/hw/vfio/migration.c
-> > @@ -488,6 +488,7 @@ static int vfio_migration_query_flags(VFIODevice
-> > *vbasedev, uint64_t *mig_flags)
-> >      struct vfio_device_feature_migration *mig = (void
-> > *)feature->data;
-> >
-> >      feature->argsz = sizeof(buf);
-> > +    feature->flags = VFIO_DEVICE_FEATURE_MIGRATION |
-> > + VFIO_DEVICE_FEATURE_GET;
-> >      if (ioctl(vbasedev->fd, VFIO_DEVICE_FEATURE, feature) != 0)
-> >          return -EOPNOTSUPP;
-> 
-> Oh, this is my mistake I thought this got pushed to that github already but
-> didn't, I updated it.
-
-Ok. Thanks.
- 
-> If you have a prototype can you post another RFC?
-
-Sure, will do. I just started and has only a skeleton proto based on v2 now.
-Will send out a RFC soon once I have all the FSM arcs implemented 
-and sanity tested.
-
-Thanks,
-Shameer
+https://people.kernel.org/tglx/notes-about-netiquette
