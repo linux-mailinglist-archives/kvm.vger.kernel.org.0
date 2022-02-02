@@ -2,114 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88B7D4A769B
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 18:14:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED17D4A76D8
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 18:28:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346171AbiBBROw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 12:14:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47634 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239078AbiBBROv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 12:14:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643822091;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z5luWBqzyOZ8TMy1EXyCPtbt4++Mrcm5+Fa6Hswl/gc=;
-        b=ZNbgl7THkzl3BizsrEXx5cXw/ub22rBRjGa13pk6cX82gKwmeYYsIDuycmaOAeIqCy4ryk
-        B++PrWyGJv2Ujojn8AAavXigGCbjvQR6QvJXkyhpIaNeVnptk4A3esw/tkrNTenmGGhNQY
-        iGF7SraRLz9rIGnRbnFJIDJCYyyBgtU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-597-rOWj6vRuM9eaJWkqibFZ2w-1; Wed, 02 Feb 2022 12:14:49 -0500
-X-MC-Unique: rOWj6vRuM9eaJWkqibFZ2w-1
-Received: by mail-wm1-f72.google.com with SMTP id o3-20020a1c4d03000000b003539520b248so32852wmh.3
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 09:14:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=z5luWBqzyOZ8TMy1EXyCPtbt4++Mrcm5+Fa6Hswl/gc=;
-        b=tNksHvbCeZuDFBYw1fIgVhhwDQ80yZR7iaovwLUWlOuCQqht0O4+ZLgihwV645yIT6
-         JB79VuDRONXRDGue+xcKzS8wDpd0Nvt8RsV+NOZ0ahgR3ynrWtzC+8FDqw9LHHZfb6PB
-         6dTlVV800qxN5tDc6leH58ZTX+xzp4aDxp59AsgYx1rnQwZcFlR3ZREUxHya1FnNcvOy
-         k+qHxSIbxJN/z/WTxocAww1zHYAA0hrXC2/Vaakdgng0u5XpW0lZmEv2H9jHEgTQUrr3
-         kKrRka6QDKMnvwHLAXOK0ZCz1UHrdtEnvMlBddh5vJpRrA8/ZbOl5GxwxJIAXWavajKE
-         TAFA==
-X-Gm-Message-State: AOAM533xE8sHsCKhiTHf1/HqNvlrhRCVGEEVrRz1tkmhFacllnuDEZhs
-        x/hxBTmP/75U973vfb0TTTGfVrAjpkM9y68mQNgMIwe5Bl+01yZpUx0T7Q/iIfgql5bWMZReVV4
-        KfmIT16ghdZRu
-X-Received: by 2002:a5d:6349:: with SMTP id b9mr25789771wrw.178.1643822088721;
-        Wed, 02 Feb 2022 09:14:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzxYywfTMgP3DeL9IBxHNRCeFE+uDAERjb3gBE+FqbAoFTNlYgMaIPAmOzHLnuT5Tho6NVoeg==
-X-Received: by 2002:a5d:6349:: with SMTP id b9mr25789754wrw.178.1643822088491;
-        Wed, 02 Feb 2022 09:14:48 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id n15sm21791299wrf.37.2022.02.02.09.14.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Feb 2022 09:14:47 -0800 (PST)
-Message-ID: <429afd81-7bef-8ead-6ca4-12671378d581@redhat.com>
-Date:   Wed, 2 Feb 2022 18:14:46 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 0/4] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap
- for Hyper-V-on-KVM
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S237999AbiBBR2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 12:28:25 -0500
+Received: from mail-dm6nam08on2078.outbound.protection.outlook.com ([40.107.102.78]:56929
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229588AbiBBR2X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 12:28:23 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PZPtAmdAqoStTJ7NC5rbXd4cfUdHilh99bfscc3DAkkPi5salfAdZhbvzoLl8NT2+LXzw9B2vW2NdlNGENfCHjeADKr0gIf8X3inZvH0LVfOqAErDZUeI/KuecLuQXz/dP3+LQTpwhEHK2eTFRqRM25G34p0v8CvgaJz4GJ1LZKJA1HocE1NcGKFGsozOhII11wTw68csbCEkx+UKobo/xrPwLAC3bRLPdfOyeJgILpeGMc8Iq5XrSyDrMaFS5mGN1pcm3Q4fYwEFYxFG0wavB6dOnz1Ow0C8nbUl/9nLEKDLLOeemmMC+ItumY7+ye3Bw9fPmlskIx6JDIXc//HNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EyWDAk54qqiEQMhQDyIoYwm6klf4P4e3MEWGlvNJvSQ=;
+ b=cKFxEnzLDX2lfKKXu79rli7wHJ0L0fWEVSHCkv5mJ7o5NfTCH1JkCdDvie9wnr6/fw1MF3qlAwYPz4oiGbZpT0RknMJIKNTZGS2+vw32nES1bBurxcq+AL2OAiERs2zJ7UZHnsztiHSnr9Mi+nufKq4PBcBqCMv9dYwbzedDqUTQ1yco//hhKTNnCPBPjh/oiNuwYLi5TTUeibIjsqcUo700R+ESMZSkWenAAl3TaDDYRo4PBVSd7Vy2EHPoCx18KoRYy+f2NkYnK4voxB3b53JhHosT6+OlMGoiGalcEke/IHAGQQyhjZxIRh+InZQPi8+xzoYP75dvsIOOtiZTpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EyWDAk54qqiEQMhQDyIoYwm6klf4P4e3MEWGlvNJvSQ=;
+ b=iy7kD0VCwx4euFv+5RR38NqjMSQUloJ1ZYZGr63FRTlJj2fXJLH2rEnINojkovRCkcL4q2VOxtTp963JiMfFJN6Jc2CTb7zwoOXMQXdvksBx0hALdU2IlnmFnB/pBwKZB3qfDvCoS4iEyUGaPJNQTFSRfsU0tMk7Ji8dNGXXNrg=
+Received: from BN6PR1401CA0018.namprd14.prod.outlook.com
+ (2603:10b6:405:4b::28) by MN2PR12MB4207.namprd12.prod.outlook.com
+ (2603:10b6:208:1d9::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Wed, 2 Feb
+ 2022 17:28:20 +0000
+Received: from BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:405:4b:cafe::f0) by BN6PR1401CA0018.outlook.office365.com
+ (2603:10b6:405:4b::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.11 via Frontend
+ Transport; Wed, 2 Feb 2022 17:28:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT007.mail.protection.outlook.com (10.13.177.109) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4951.12 via Frontend Transport; Wed, 2 Feb 2022 17:28:19 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Wed, 2 Feb
+ 2022 11:28:18 -0600
+Date:   Wed, 2 Feb 2022 11:28:01 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org
-References: <20220202095100.129834-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220202095100.129834-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        <brijesh.ksingh@gmail.com>, <tony.luck@intel.com>,
+        <marcorr@google.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH v9 05/43] x86/compressed/64: Detect/setup SEV/SME
+ features earlier in boot
+Message-ID: <20220202172801.4plsgy5ispu2bi7c@amd.com>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-6-brijesh.singh@amd.com>
+ <Yfl3FaTGPxE7qMCq@zn.tnic>
+ <20220201203507.goibbaln6dxyoogv@amd.com>
+ <YfmmBykN2s0HsiAJ@zn.tnic>
+ <20220202005212.a3fnn6i76ko6u6t5@amd.com>
+ <YfogFFOoHvCV+/2Y@zn.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <YfogFFOoHvCV+/2Y@zn.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 62bee106-c2e2-4269-136a-08d9e67167c7
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4207:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB420744992AB681F813DD3BA695279@MN2PR12MB4207.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9cP6IXXLhASjZrHYzhjg/hsYwk6NdNoAit6a2tIfzMOknRM5NuYetOes+qSY1prZIeGI3bHpTK1Gzb+nXpKrDU9nQvr3r6CsRIxMa8sucIjUcYd0q9zizPo7HPqrGL7w1wsMemVtRAP4LjVLgavW0E5whTXHMtQ0RjWcc3iwj08Z8QXmRd7VfjHV575akDMrHAm0PSFsbobNgrZwZkvZwRy74FXUH02YkqRGK53/puHPe9JRYXIsmqTzhc2De7rQvpX8myw61ORJDZUNMIf3U3VOzsx3+HyO7Wt3ANfNygcMk3I6+R0YJN7oeu0HmC+NvrND/vpay2wcQl1jR2rsfzTF/RabRTOSUGDcP85pmIDRJcmGBmv08KHP/TX7Clqi6D2eAJdYgwyC7J3gcK2C89NmvBXPHbvTMBHaH+ICEpmqFvBSWn9Xeji21X1bRqMSgozfBJQIlt2iKxS6/ewfontkuw+3ajU6xES6QCbwp1d1zgZts3HomxV48qLcfnP1LvyTQ83E7cAMnqEwVIUvVyNv0P9wCfP/YqmT29rTDbqXN6ZQfdq0afGy4MZxVCYQWxdPeaY3tWR/iv5dw3g/Ucy83S6zLG2piw59ZWEtJf377rM4jid7Xz1w227Dy1fYA/AAy3fJAnhX0sVOae15QLUDPbMKLQK3YIySAoM41qApdDYk4abaTLeSakLAlliEgYG4Xmf/TB8MqWjlxzl4qA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(47076005)(54906003)(6916009)(7406005)(36860700001)(82310400004)(5660300002)(316002)(508600001)(7416002)(70206006)(6666004)(70586007)(26005)(186003)(356005)(44832011)(1076003)(16526019)(4326008)(8676002)(336012)(426003)(2906002)(8936002)(2616005)(40460700003)(81166007)(86362001)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 17:28:19.5647
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62bee106-c2e2-4269-136a-08d9e67167c7
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4207
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/2/22 10:50, Vitaly Kuznetsov wrote:
-> Changes since v1:
-> - Patches 1/2 from "[PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened
->    MSR-Bitmap for Hyper-V-on-KVM and fix it for KVM-on-Hyper-V" are already
->    merged, dropped.
-> - Fix build when !CONFIG_HYPERV (PATCH3 "KVM: nSVM: Split off common
->    definitions for Hyper-V on KVM and KVM on Hyper-V" added).
+On Wed, Feb 02, 2022 at 07:09:24AM +0100, Borislav Petkov wrote:
+> On Tue, Feb 01, 2022 at 06:52:12PM -0600, Michael Roth wrote:
+> > Since the kernel proper rdmsr()/wrmsr() definitions are getting pulled in via
+> > misc.h, I have to use a different name to avoid compiler errors. For now I've
+> > gone with rd_msr()/wr_msr(), but no problem changing those if needed.
 > 
-> Description:
+> Does that fix it too?
 > 
-> Enlightened MSR-Bitmap feature implements a PV protocol for L0 and L1
-> hypervisors to collaborate and skip unneeded updates to MSR-Bitmap.
-> KVM already implements the feature for KVM-on-Hyper-V.
+> diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
+> index 16ed360b6692..346c46d072c8 100644
+> --- a/arch/x86/boot/compressed/misc.h
+> +++ b/arch/x86/boot/compressed/misc.h
+> @@ -21,7 +21,6 @@
+>  
+>  #include <linux/linkage.h>
+>  #include <linux/screen_info.h>
+> -#include <linux/elf.h>
+>  #include <linux/io.h>
+>  #include <asm/page.h>
+>  #include <asm/boot.h>
+> ---
 > 
-> Vitaly Kuznetsov (4):
->    KVM: nSVM: Track whether changes in L0 require MSR bitmap for L2 to be
->      rebuilt
->    KVM: x86: Make kvm_hv_hypercall_enabled() static inline
->    KVM: nSVM: Split off common definitions for Hyper-V on KVM and KVM on
->      Hyper-V
->    KVM: nSVM: Implement Enlightened MSR-Bitmap feature
-> 
->   arch/x86/kvm/hyperv.c           | 12 +--------
->   arch/x86/kvm/hyperv.h           |  6 ++++-
->   arch/x86/kvm/svm/hyperv.h       | 35 ++++++++++++++++++++++++
->   arch/x86/kvm/svm/nested.c       | 47 ++++++++++++++++++++++++++++-----
->   arch/x86/kvm/svm/svm.c          |  3 ++-
->   arch/x86/kvm/svm/svm.h          | 11 ++++++++
->   arch/x86/kvm/svm/svm_onhyperv.h | 25 +-----------------
->   7 files changed, 95 insertions(+), 44 deletions(-)
->   create mode 100644 arch/x86/kvm/svm/hyperv.h
-> 
+> This is exactly what I mean with a multi-year effort of untangling what
+> has been mindlessly mixed in over the years...
 
-Queued, thanks.
-
-Paolo
-
+Indeed... it looks like linux/{elf,io,efi,acpi}.h all end up pulling in
+kernel proper's rdmsr()/wrmsr() definitions, and pulling them out ends up
+breaking a bunch of other stuff, so I think we might be stuck using a
+different name like rd_msr()/wr_msr() in the meantime.
