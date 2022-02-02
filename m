@@ -2,136 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE8234A756B
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 17:06:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 236084A7589
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 17:11:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344315AbiBBQFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 11:05:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36252 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345730AbiBBQFi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 11:05:38 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE1AC061714
-        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 08:05:37 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id j10so18678970pgc.6
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 08:05:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=yqK5MLTl2xNuINrlf3fO99F6jKkeeqpnAsyOTq/QdsY=;
-        b=omj6doHtoJY17veFe8sQU7Cmg6x2J8MqoUhsX7k7C63TNCbhW5x9y1bGWckN2qif/x
-         6iScQHtPmlsw+gqCRU6ez4J0V9RC5VaOptJYWYILu98gte5z58yT//P7HodOcq+KNpLi
-         Rff7r7N9VCPAPcQG17PJxJzQXBegojuVs2kda+1oUA9QxzvBfQnVPpU4aiKYRN+D2DWw
-         462vBzLQlCF7x+vbgHdPl3wwkxDwmjxHt4sH/mFjxvDi3U2DNvn9FkEPu3OeCoa7cDdj
-         FyrnNxveN3s3SQBAWH963d9CuI45mNC40JSHM8W69GouMa3hBp0Gd3invDF8aHFrUu2n
-         kgwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yqK5MLTl2xNuINrlf3fO99F6jKkeeqpnAsyOTq/QdsY=;
-        b=E2sRfgi2WSrAP3Hz455Cki9Wt4Jry0WELqKKirf2MOntAifXWET7ZkaHgdinN5DxSZ
-         spgb3k4JDcSuEOl4pxKB85AEVSGbwj+KHGWA59w87rmkwrC+v6+CeoWatdiMPSCQs8YK
-         x/FrFf9XICDOjYWfzuhQyaBnq3UUjBA/l+XhN47OTYo1HIwjG1TLZu1TeWH2pweLu8dJ
-         NIlJFp1be/pKmiHKXD/tOF6O9SmJCnHpCDXe0H6emSsFVtvRTHiUbyVjNhuZRP/TWKXm
-         +stQy/4q2tCL9eBiOIIgfqdnzCGo7KhKh0mchNz8Q1r7thjwMIR70nUdOKqR7rLAkPuN
-         DIcg==
-X-Gm-Message-State: AOAM530CE2FWLzUcTrH2DoW2ivEqu9Bk32sasBfNUmI7t50WX/TIgkhE
-        ibvVt5gcdkHmORdf8/G3f7gsIQ==
-X-Google-Smtp-Source: ABdhPJyVuMgXy9sJ7c475B0/eoyoSeQgJcgUEYfrNF1AwDQH/tPYoLN1ijQ6+BjavEGag97f30Pbqg==
-X-Received: by 2002:a62:52d4:: with SMTP id g203mr30348392pfb.19.1643817936918;
-        Wed, 02 Feb 2022 08:05:36 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 12sm6902701pjd.33.2022.02.02.08.05.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Feb 2022 08:05:36 -0800 (PST)
-Date:   Wed, 2 Feb 2022 16:05:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, mlevitsk@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        peterz@infradead.org, hpa@zytor.com, thomas.lendacky@amd.com,
-        jon.grimm@amd.com
-Subject: Re: [PATCH v3 3/3] KVM: SVM: Extend host physical APIC ID field to
- support more than 8-bit
-Message-ID: <YfqrzHc0cbuiKKt0@google.com>
-References: <20211213113110.12143-1-suravee.suthikulpanit@amd.com>
- <20211213113110.12143-4-suravee.suthikulpanit@amd.com>
- <Yc3qt/x1YPYKe4G0@google.com>
- <34a47847-d80d-e93d-a3fe-c22382977c1c@amd.com>
- <Yfms5evHbN8JVbVX@google.com>
- <9d2ca4ab-b945-6356-5e4b-265b1a474657@amd.com>
- <YfqpFt5raCd/LZzr@google.com>
+        id S1345696AbiBBQKM convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 2 Feb 2022 11:10:12 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4662 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229604AbiBBQKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 11:10:09 -0500
+Received: from fraeml740-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JpmqB2Czqz67nGj;
+        Thu,  3 Feb 2022 00:05:26 +0800 (CST)
+Received: from lhreml716-chm.china.huawei.com (10.201.108.67) by
+ fraeml740-chm.china.huawei.com (10.206.15.221) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 2 Feb 2022 17:10:07 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml716-chm.china.huawei.com (10.201.108.67) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 2 Feb 2022 16:10:06 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Wed, 2 Feb 2022 16:10:06 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
+Thread-Topic: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
+Thread-Index: AQHYGDbmFHRHIXj6i0KnDwR2h2vbX6yAR7aggAAeEICAAAa58A==
+Date:   Wed, 2 Feb 2022 16:10:06 +0000
+Message-ID: <c8a0731c589e49068a78afcc73d66bfa@huawei.com>
+References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
+ <20220202131448.GA2538420@nvidia.com>
+ <a29ae3ea51344e18b9659424772a4b42@huawei.com>
+ <20220202153945.GT1786498@nvidia.com>
+In-Reply-To: <20220202153945.GT1786498@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YfqpFt5raCd/LZzr@google.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 02, 2022, Sean Christopherson wrote:
-> On Wed, Feb 02, 2022, Suthikulpanit, Suravee wrote:
-> > As I mentioned, the APM will be corrected to remove the word "x2APIC".
+
+
+> -----Original Message-----
+> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> Sent: 02 February 2022 15:40
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
+> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+> yuzenghui <yuzenghui@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
 > 
-> Ah, I misunderstood what part was being amended.
+> On Wed, Feb 02, 2022 at 02:34:52PM +0000, Shameerali Kolothum Thodi
+> wrote:
 > 
-> > Essentially, it will be changed to:
-> > 
-> >  * 7:0  - For systems w/ max APIC ID upto 255 (a.k.a old system)
-> >  * 11:8 - For systems w/ max APIC ID 256 and above (a.k.a new system). Otherwise, reserved and should be zero.
-> > 
-> > As for the required number of bits, there is no good way to tell what's the max
-> > APIC ID would be on a particular system. Hence, we utilize the apic_get_max_phys_apicid()
-> > to figure out how to properly program the table (which is leaving the reserved field
-> > alone when making change to the table).
-> > 
-> > The avic_host_physical_id_mask is not just for protecting APIC ID larger than
-> > the allowed fields. It is also currently used for clearing the old physical APIC ID table entry
-> > before programing it with the new APIC ID.
+> > > There are few topics to consider:
+> > >  - Which of the three feature sets (STOP_COPY, P2P and PRECOPY) make
+> > >    sense for this driver?
+> >
+> > I think it will be STOP_COPY only for now. We might have PRECOPY
+> > feature once we have the SMMUv3 HTTU support in future.
 > 
-> Just clear 11:0 unconditionally, the reserved bits are Should Be Zero.
+> HTTU is the dirty tracking feature? To be clear VFIO migration support for
+> PRECOPY has nothing to do with IOMMU based dirty page tracking.
 
-Actually, that needs to be crafted a bug fix that's sent to stable@, otherwise
-running old kernels on new hardware will break.  I'm pretty sure this is the
-entirety of what's needed.
+Yes, it is based on the IOMMU hardware dirty bit management support.
+A RFC was posted sometime back,
+https://lore.kernel.org/kvm/20210507103608.39440-1-zhukeqian1@huawei.com/
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 90364d02f22a..e4cfd8bf4f24 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -974,17 +974,12 @@ avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
- void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
-        u64 entry;
--       /* ID = 0xff (broadcast), ID > 0xff (reserved) */
-        int h_physical_id = kvm_cpu_get_apicid(cpu);
-        struct vcpu_svm *svm = to_svm(vcpu);
+Ok, my guess was that the PRECOPY here was related. Thanks for clarifying.
 
-        lockdep_assert_preemption_disabled();
+> 
+> > >  - I think we discussed the P2P implementation and decided it would
+> > >    work for this device? Can you re-read and confirm?
+> >
+> > In our case these devices are Integrated End Point devices and doesn't
+> > have P2P DMA capability. Hence the FSM arcs will be limited to
+> > STOP_COPY feature I guess. Also, since we cannot guarantee a NDMA
+> > state in STOP, my assumption currently is the onus of making sure that
+> > no MMIO access happens in STOP is on the user. Is that a valid assumption?
+> 
+> Yes, you can treat RUNNING_P2P as the same as STOP and rely on no MMIO
+> access to sustain it.
 
--       /*
--        * Since the host physical APIC id is 8 bits,
--        * we can support host APIC ID upto 255.
--        */
--       if (WARN_ON(h_physical_id > AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
-+       if (WARN_ON(h_physical_id & ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
-                return;
+Ok.
+ 
+> (and I'm wondering sometimes if we should rename RUNNING_P2P to
+> STOP_P2P - ie the device is stopped but still allows inbound P2P to make this
+> clearer)
+> 
+> > Do we need to set the below before the feature query?
+> > Or am I using a wrong Qemu/kernel repo?
+> >
+> > +++ b/hw/vfio/migration.c
+> > @@ -488,6 +488,7 @@ static int vfio_migration_query_flags(VFIODevice
+> > *vbasedev, uint64_t *mig_flags)
+> >      struct vfio_device_feature_migration *mig = (void
+> > *)feature->data;
+> >
+> >      feature->argsz = sizeof(buf);
+> > +    feature->flags = VFIO_DEVICE_FEATURE_MIGRATION |
+> > + VFIO_DEVICE_FEATURE_GET;
+> >      if (ioctl(vbasedev->fd, VFIO_DEVICE_FEATURE, feature) != 0)
+> >          return -EOPNOTSUPP;
+> 
+> Oh, this is my mistake I thought this got pushed to that github already but
+> didn't, I updated it.
 
-        /*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 73525353e424..a157af1cce6a 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -560,7 +560,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- #define AVIC_LOGICAL_ID_ENTRY_VALID_BIT                        31
- #define AVIC_LOGICAL_ID_ENTRY_VALID_MASK               (1 << 31)
+Ok. Thanks.
+ 
+> If you have a prototype can you post another RFC?
 
--#define AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK   (0xFFULL)
-+#define AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK   GENMASK_ULL(11:0)
- #define AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK       (0xFFFFFFFFFFULL << 12)
- #define AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK         (1ULL << 62)
- #define AVIC_PHYSICAL_ID_ENTRY_VALID_MASK              (1ULL << 63)
+Sure, will do. I just started and has only a skeleton proto based on v2 now.
+Will send out a RFC soon once I have all the FSM arcs implemented 
+and sanity tested.
+
+Thanks,
+Shameer
