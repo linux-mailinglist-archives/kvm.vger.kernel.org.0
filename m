@@ -2,186 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F21834A7679
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 18:08:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88B7D4A769B
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 18:14:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346114AbiBBRIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 12:08:17 -0500
-Received: from foss.arm.com ([217.140.110.172]:43360 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244540AbiBBRIQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 12:08:16 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2B38F113E;
-        Wed,  2 Feb 2022 09:08:16 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00F3A3F40C;
-        Wed,  2 Feb 2022 09:08:12 -0800 (PST)
-Date:   Wed, 2 Feb 2022 17:08:26 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
-        miguel.luis@oracle.com, kernel-team@android.com
-Subject: Re: [PATCH v6 12/64] KVM: arm64: nv: Add non-VHE-EL2->EL1
- translation helpers
-Message-ID: <Yfq6ig0TIv2Bs4Dq@monolith.localdoman>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-13-maz@kernel.org>
+        id S1346171AbiBBROw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 12:14:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47634 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239078AbiBBROv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 12:14:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643822091;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z5luWBqzyOZ8TMy1EXyCPtbt4++Mrcm5+Fa6Hswl/gc=;
+        b=ZNbgl7THkzl3BizsrEXx5cXw/ub22rBRjGa13pk6cX82gKwmeYYsIDuycmaOAeIqCy4ryk
+        B++PrWyGJv2Ujojn8AAavXigGCbjvQR6QvJXkyhpIaNeVnptk4A3esw/tkrNTenmGGhNQY
+        iGF7SraRLz9rIGnRbnFJIDJCYyyBgtU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-597-rOWj6vRuM9eaJWkqibFZ2w-1; Wed, 02 Feb 2022 12:14:49 -0500
+X-MC-Unique: rOWj6vRuM9eaJWkqibFZ2w-1
+Received: by mail-wm1-f72.google.com with SMTP id o3-20020a1c4d03000000b003539520b248so32852wmh.3
+        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 09:14:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=z5luWBqzyOZ8TMy1EXyCPtbt4++Mrcm5+Fa6Hswl/gc=;
+        b=tNksHvbCeZuDFBYw1fIgVhhwDQ80yZR7iaovwLUWlOuCQqht0O4+ZLgihwV645yIT6
+         JB79VuDRONXRDGue+xcKzS8wDpd0Nvt8RsV+NOZ0ahgR3ynrWtzC+8FDqw9LHHZfb6PB
+         6dTlVV800qxN5tDc6leH58ZTX+xzp4aDxp59AsgYx1rnQwZcFlR3ZREUxHya1FnNcvOy
+         k+qHxSIbxJN/z/WTxocAww1zHYAA0hrXC2/Vaakdgng0u5XpW0lZmEv2H9jHEgTQUrr3
+         kKrRka6QDKMnvwHLAXOK0ZCz1UHrdtEnvMlBddh5vJpRrA8/ZbOl5GxwxJIAXWavajKE
+         TAFA==
+X-Gm-Message-State: AOAM533xE8sHsCKhiTHf1/HqNvlrhRCVGEEVrRz1tkmhFacllnuDEZhs
+        x/hxBTmP/75U973vfb0TTTGfVrAjpkM9y68mQNgMIwe5Bl+01yZpUx0T7Q/iIfgql5bWMZReVV4
+        KfmIT16ghdZRu
+X-Received: by 2002:a5d:6349:: with SMTP id b9mr25789771wrw.178.1643822088721;
+        Wed, 02 Feb 2022 09:14:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzxYywfTMgP3DeL9IBxHNRCeFE+uDAERjb3gBE+FqbAoFTNlYgMaIPAmOzHLnuT5Tho6NVoeg==
+X-Received: by 2002:a5d:6349:: with SMTP id b9mr25789754wrw.178.1643822088491;
+        Wed, 02 Feb 2022 09:14:48 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id n15sm21791299wrf.37.2022.02.02.09.14.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Feb 2022 09:14:47 -0800 (PST)
+Message-ID: <429afd81-7bef-8ead-6ca4-12671378d581@redhat.com>
+Date:   Wed, 2 Feb 2022 18:14:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-13-maz@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 0/4] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap
+ for Hyper-V-on-KVM
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        linux-kernel@vger.kernel.org
+References: <20220202095100.129834-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220202095100.129834-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Fri, Jan 28, 2022 at 12:18:20PM +0000, Marc Zyngier wrote:
-> Some EL2 system registers immediately affect the current execution
-> of the system, so we need to use their respective EL1 counterparts.
-> For this we need to define a mapping between the two. In general,
-> this only affects non-VHE guest hypervisors, as VHE system registers
-> are compatible with the EL1 counterparts.
+On 2/2/22 10:50, Vitaly Kuznetsov wrote:
+> Changes since v1:
+> - Patches 1/2 from "[PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened
+>    MSR-Bitmap for Hyper-V-on-KVM and fix it for KVM-on-Hyper-V" are already
+>    merged, dropped.
+> - Fix build when !CONFIG_HYPERV (PATCH3 "KVM: nSVM: Split off common
+>    definitions for Hyper-V on KVM and KVM on Hyper-V" added).
 > 
-> These helpers will get used in subsequent patches.
+> Description:
 > 
-> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_nested.h | 54 +++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
+> Enlightened MSR-Bitmap feature implements a PV protocol for L0 and L1
+> hypervisors to collaborate and skip unneeded updates to MSR-Bitmap.
+> KVM already implements the feature for KVM-on-Hyper-V.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index fd601ea68d13..5a85be6d8eb3 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -2,6 +2,7 @@
->  #ifndef __ARM64_KVM_NESTED_H
->  #define __ARM64_KVM_NESTED_H
->  
-> +#include <linux/bitfield.h>
->  #include <linux/kvm_host.h>
->  
->  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-> @@ -11,4 +12,57 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
->  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
->  }
->  
-> +/* Translation helpers from non-VHE EL2 to EL1 */
-> +static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
-> +{
-> +	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
-> +}
-> +
-> +static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
-> +{
-> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
-> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
-> +	       tcr_el2_ps_to_tcr_el1_ips(tcr) |
-> +	       (tcr & TCR_EL2_TG0_MASK) |
-> +	       (tcr & TCR_EL2_ORGN0_MASK) |
-> +	       (tcr & TCR_EL2_IRGN0_MASK) |
-> +	       (tcr & TCR_EL2_T0SZ_MASK);
-> +}
-> +
-> +static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
-> +{
-> +	u64 cpacr_el1 = 0;
-> +
-> +	if (cptr_el2 & CPTR_EL2_TTA)
-> +		cpacr_el1 |= CPACR_EL1_TTA;
-> +	if (!(cptr_el2 & CPTR_EL2_TFP))
-> +		cpacr_el1 |= CPACR_EL1_FPEN;
-> +	if (!(cptr_el2 & CPTR_EL2_TZ))
-> +		cpacr_el1 |= CPACR_EL1_ZEN;
-> +
-> +	return cpacr_el1;
-> +}
-> +
-> +static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
-> +{
-> +	/* Only preserve the minimal set of bits we support */
-> +	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
-> +		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
-
-Checked that the bit positions are the same between SCTLR_EL2 and SCTLR_EL1. I
-think the IESB bit (bit 21) should be after the WXN bit (bit 19) to be
-consistent; doesn't really matter either way.
-
-> +	val |= SCTLR_EL1_RES1;
-> +
-> +	return val;
-> +}
-> +
-> +static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
-> +{
-> +	/* Clear the ASID field */
-> +	return ttbr0 & ~GENMASK_ULL(63, 48);
-> +}
-> +
-> +static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
-> +{
-> +	return ((FIELD_GET(CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN, cnthctl) << 10) |
-> +		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
-
-I asked about the field positions in the previous series and this is what you
-replied:
-
-> It's a classic one. Remember that we are running VHE, and remapping a
-> nVHE view of CNTHCTL_EL2 into the VHE view *for the guest*, and that
-> these things are completely shifted around (it has the CNTKCTL_EL1
-> format).
->
-> For example, on nVHE, CNTHCTL_EL2.EL1PCTEN is bit 0. On nVHE, this is
-> bit 10. That's why we have this shift, and that you now need some
-> paracetamol.
->
-> You can also look at the way we deal with the same stuff in
-> kvm_timer_init_vhe()".
-
-Here's how this function is used in vhe/sysreg-sr.c:
-
-static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
-{
-	[..]
-	if (__vcpu_el2_e2h_is_set(ctxt)) {
-		[..]
-	} else {
-		[..]
-		val = translate_cnthctl_el2_to_cntkctl_el1(ctxt_sys_reg(ctxt, CNTHCTL_EL2));
-		write_sysreg_el1(val, SYS_CNTKCTL);
-	}
-	[..]
-}
-
-CNTHCTL_EL2 is a pure EL2 register. The translate function is called when guest
-HCR_EL2.E2H is not set, therefore virtual CNTHCTL_EL2 has the non-VHE format.
-And the result of the function is used to write to the hardware CNTKCTL_EL1
-register (using the CNTKCTL_EL12 encoding), which is different from the
-CNTHCTL_EL2 register. CNTKCTL_EL1 also always has the same format regardless of
-the value of the HCR_EL2.E2H bit.
-
-I don't understand what the host running with VHE has to do with the translate
-function.
-
-Thanks,
-Alex
-
-> +}
-> +
->  #endif /* __ARM64_KVM_NESTED_H */
-> -- 
-> 2.30.2
+> Vitaly Kuznetsov (4):
+>    KVM: nSVM: Track whether changes in L0 require MSR bitmap for L2 to be
+>      rebuilt
+>    KVM: x86: Make kvm_hv_hypercall_enabled() static inline
+>    KVM: nSVM: Split off common definitions for Hyper-V on KVM and KVM on
+>      Hyper-V
+>    KVM: nSVM: Implement Enlightened MSR-Bitmap feature
 > 
+>   arch/x86/kvm/hyperv.c           | 12 +--------
+>   arch/x86/kvm/hyperv.h           |  6 ++++-
+>   arch/x86/kvm/svm/hyperv.h       | 35 ++++++++++++++++++++++++
+>   arch/x86/kvm/svm/nested.c       | 47 ++++++++++++++++++++++++++++-----
+>   arch/x86/kvm/svm/svm.c          |  3 ++-
+>   arch/x86/kvm/svm/svm.h          | 11 ++++++++
+>   arch/x86/kvm/svm/svm_onhyperv.h | 25 +-----------------
+>   7 files changed, 95 insertions(+), 44 deletions(-)
+>   create mode 100644 arch/x86/kvm/svm/hyperv.h
+> 
+
+Queued, thanks.
+
+Paolo
+
