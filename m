@@ -2,278 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E035C4A6889
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 00:32:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7468F4A692D
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 01:25:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242888AbiBAXcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Feb 2022 18:32:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54289 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230000AbiBAXb7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Feb 2022 18:31:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643758318;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q4nXqGkSOBhfpqUihr9Nmqi8YqjX2zF+f6WealGvq4g=;
-        b=JAB9k6h2yNaUG6mNSg8WVuza6O7b5cjRk5X/U7I85BoHbBPqR7re1FrJKBRCxTnj5XFXjj
-        ZN8cAWOO07n3NaICth7VJ0GSDn9bxq1ik6BHHHSV3wLGfyG0axYFS0H+cu6fcVKX/Ozz5A
-        4q0q2RTekqimf/gCgw0yanYr/xHolZk=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-390-o_UjXP5iM0qilyvM3z59Kw-1; Tue, 01 Feb 2022 18:31:57 -0500
-X-MC-Unique: o_UjXP5iM0qilyvM3z59Kw-1
-Received: by mail-ot1-f72.google.com with SMTP id h5-20020a9d5545000000b0059ecbfae94eso10255726oti.17
-        for <kvm@vger.kernel.org>; Tue, 01 Feb 2022 15:31:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=q4nXqGkSOBhfpqUihr9Nmqi8YqjX2zF+f6WealGvq4g=;
-        b=Fk3z+jx2b8LlGAxBxK9ALSWv3cBqt+e2bnwYgunK+RmcTd2DfBui5ef3LrMXvqkd6K
-         A7/sDPmAmzsGOwyKVYi7t5sXE77Ob74RoFrkDe4K6+YzowfamIakisHTvKkxl3b0A6uW
-         dpfy6GNjbogE8XWw2jb8kFOqBsFo8VlIP1oikdP1OwrJIqiJcWkhvvJ12k/Otvg58joZ
-         1rGARMiJdNCc2N08JPll4SauKR386v/oe+uLSKkCsUfSLfhH0UbW2a0ekwenEPCGjvp3
-         ur9X799gCuqA/i9zPxhLzDhJv7cvJZ7B142JoRczR45g1krghkJ4F6xnQv0SJuvE7W0q
-         ycmA==
-X-Gm-Message-State: AOAM5339T4bLJ+7CuPeQk4Thwuy6G5OGEEB1TJjcir+fZQrUl1kyvLb0
-        1YIDEdlTDzAj8NKXln/QZl1vmpB7BitXhKfrAMatOhZBaFwvc9HZavmmFrEfSouhUc04c8ynk+X
-        Q7X/lML1CTxLQ
-X-Received: by 2002:a05:6830:4081:: with SMTP id x1mr15380064ott.272.1643758316824;
-        Tue, 01 Feb 2022 15:31:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz7xbNBp424qduMgZNlEc7ffNGRkTuF/WEghc+E6iYgQoKm1sGpOUPXXnci61cs8iln5CdbTQ==
-X-Received: by 2002:a05:6830:4081:: with SMTP id x1mr15380056ott.272.1643758316507;
-        Tue, 01 Feb 2022 15:31:56 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l1sm13638894otd.18.2022.02.01.15.31.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 15:31:56 -0800 (PST)
-Date:   Tue, 1 Feb 2022 16:31:54 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhen Lei <thunder.leizhen@huawei.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] vfio/pci: fix memory leak during D3hot to D0
- transition
-Message-ID: <20220201163155.0529edc1.alex.williamson@redhat.com>
-In-Reply-To: <948e7798-7337-d093-6296-cedd09c733f5@nvidia.com>
-References: <20220131112450.3550-1-abhsahu@nvidia.com>
-        <20220131131151.4f113557.alex.williamson@redhat.com>
-        <948e7798-7337-d093-6296-cedd09c733f5@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S243298AbiBBAZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Feb 2022 19:25:04 -0500
+Received: from mail-dm3nam07on2064.outbound.protection.outlook.com ([40.107.95.64]:51909
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230330AbiBBAZD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Feb 2022 19:25:03 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cOPiKfFov6cbs9MnAA2LVKLvejFCE13eOR/t+A6Kl3xvaZ3MLOutaXTWk5jnsvbgVxiL8V443uzPKf8V+PXTBLorg7R3MMwk3n48W1sl56ZM+gmuUxZxpXpEec3ksiNZ2r2mWOOZ8NCtIkSLLbXw2iiRLM8giCxsNzozonwfyoSxVRGBE+W750o73F4ZipLKsaUxKGIF65FPriDkTeJM5eBVF24JW20TrmDFqLVfYUS7YINhLTiEw8qCtUxb+KRzWsv/eiHMb2HWDT52UY2mCxIs1ev8S+ZqL4qbl0i1/xsxLat0vrkWeIezFzJiMvxKCZCN5vaDiOg/y/wGSpFEiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FpMuvoRPvLMOr9isIkbupHiJ5gEWQT0W6qSch19W8T0=;
+ b=nBsrfUaWl8Mc6ERCCnTJ/ceE0SYzCjX+bQak7RmWbryqIC5WxIJ8p7g4O3g4h0jUike094+WA5vYH6OyXLoUA+2UzX+swUxJkBKfNyOdl/MUlt8koulEmCHr3iiSVCvVcbvApF558f6gKtPbMw5dCImbUYry5WspGN/41/Ymh2qi4VZUxXLbKTHH0z2BeAGYnefO3vIf0boxaOHkP/aBoZiz7cAAJGNIawZELN/OmhPnWtWBcNcVt4w/2XlWaTIM4n9ucPC4AN7EPA8fLs0KS/5KQsiQMvbtTFeFYHeJl3aObF9kDo0vuhpObyz12d501xDu54CNpkUlVZ8Mwjw+Pg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FpMuvoRPvLMOr9isIkbupHiJ5gEWQT0W6qSch19W8T0=;
+ b=Qz2rYybdHluuutEeRvTKBnsLRQbU+fdNOr/DyONMKpDYcB7ok3EbQyCM8qYVEshhI7PgsMQCgldKk5IlNMhdshaynKhtaznVz/SZJJOREdQC4X+uEmW2HBQKjfv1jD0OI4hK9y6qxYliqLi/7mZloFbk/T/3KlRnWf3PXmohmXhjRjSYkjZ8cgExXXexviX3v02jc86V+pWfxCk3HJkSBZOOpos4cVaMUCqQzCwuR6e41dKWD4Tw5rs0GV9m34j7cfTM7uge+FOgDVzkgUzO3nEjRpIHgaLT5LU31DZgd54t2NsnAUsbiIlvIUNoKqjF+FIrz57kgctFv0k77jyO6g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY4PR12MB1927.namprd12.prod.outlook.com (2603:10b6:903:127::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.19; Wed, 2 Feb
+ 2022 00:25:00 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4930.022; Wed, 2 Feb 2022
+ 00:25:00 +0000
+Date:   Tue, 1 Feb 2022 20:24:59 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V6 mlx5-next 08/15] vfio: Define device migration
+ protocol v2
+Message-ID: <20220202002459.GP1786498@nvidia.com>
+References: <20220130160826.32449-1-yishaih@nvidia.com>
+ <20220130160826.32449-9-yishaih@nvidia.com>
+ <20220131164318.3da9eae5.alex.williamson@redhat.com>
+ <20220201003124.GZ1786498@nvidia.com>
+ <20220201100408.4a68df09.alex.williamson@redhat.com>
+ <20220201183620.GL1786498@nvidia.com>
+ <20220201144916.14f75ca5.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220201144916.14f75ca5.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0419.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::34) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9da6d5aa-b02f-4f96-c91d-08d9e5e272fc
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1927:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB192756B3A0B2F573048929EFC2279@CY4PR12MB1927.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4qx8PgZ6O5d6vgrqMf5LSaozhfRcZLhZHId5mlXhk/sZKI2b1LFlqsUlDgU6kI1EiOiFwWMldmKflKUE2Evo3yQzO7VyfRFNScYtW8kMDFIhybZuDYYPftjZqokiLMQ832TTAldyRxetOIT2OVtSjClRNWuO6hzLV8jbZMxiiOO4oykxRTk9vjABTAqi0UKVP2BX4M8SVq2DrpbvWNkIaSbDaQJrNFYjkJZ7l2Mm4M28JJfYENm2R4wAooKYxWWXsCp6K6wU+gjVMSxARCAArSXaVHvf2LtKQlVEu5TypUPLpAPSXRaVeYliR3HbB+dKX2UzxGqvwcjYWCh9PpppjHtZEB1xNBqeopah7ZDoSkgLJIlvqwi7f2c7BxR03gPHCBBQnFQ86jKkBsF4wyGMwEZlep0pcm9BOyZnuZAj2RkVO0SqH0uQnwYSJ6T7iO4RlkeFIjl3VHScplA7Ex2sAOG2YdlHvTcCaAyJNHC8XU1J4WPOSoC4EvOSL6I80Py6kolMCSPpaqT1HKgqRHq+HXccQk2cE++6QxJopqIpoL1hsGoM/FOgliPj6/c4H4RJx7MdDAmn4/ugX6a63l6Qhov0l351sjS5MJT/EhPNNLobH9z1XC+5oSkWRDFDVOGDVs0vxSrVgyPb/vUkEFij+/Y4ztYiULqz3Ahqe2Zn4sjfKx+OqgDgZM6WQllPIUWzFvcA9rJPp5wkVAaRsalstw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2616005)(186003)(38100700002)(6916009)(508600001)(6486002)(316002)(2906002)(26005)(83380400001)(36756003)(107886003)(1076003)(5660300002)(66946007)(4326008)(33656002)(66476007)(8676002)(8936002)(6506007)(6512007)(66556008)(86362001)(21314003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PAOwD69bpbzQy/q2nXKbnjlfxYimPI2kUgQGJbWzwUahRtbSL3MnI34xm//2?=
+ =?us-ascii?Q?5jGibhCVWxgcMup6oXcohYX0tzJdxvXpcRRpjOc3NgyzXNCoQkF98f+ZTKHD?=
+ =?us-ascii?Q?6ntQyInnnaTnUAsmrYypuA0rk6z+XWO9S09Ef/MRmcejHsqT+wjvxj0RgswS?=
+ =?us-ascii?Q?KWOpt66sNRdCkSxgx0lnFXqoOTaP0XL8q4ebCCSpPCoWOVAak36JI5RoEhXu?=
+ =?us-ascii?Q?djOcJulDRF9VrlfFjvG+TNeDW/4mc0s8iywp8PRdRpjIIW8Tl2X8l+X4YQG2?=
+ =?us-ascii?Q?QolL2BNM6GBhtRsTksr8nHfVTRI2xa8iYTvgvlnGIme20yTxkHEjd712iaAg?=
+ =?us-ascii?Q?82Nro/2zNYfJJrfhrpKGeahEcRvXVTQM275ZqaxcK6oCDTFbecfreoa/lB3z?=
+ =?us-ascii?Q?biOyBINOyv6acdh43MC23UtAv9n6749N61DS4wYtarC7F5DZ0Clva7RAACyu?=
+ =?us-ascii?Q?OrNW6Tym2Kh+uVEvaf+Tmk17Es0YWOIsx+zYCRVn+86KqeJAeWn1XBVXeilo?=
+ =?us-ascii?Q?prrk0Fyf/0y4n9MBW1ULzpJbGNflls6YM9cmxtUEBMBW/ulCLYGcOgEvTO9p?=
+ =?us-ascii?Q?9OOw6jQKn8wYGmPImkm1uUOxDvyuDlhmE3Uw0v+Z7Uyah+M5i4ILefGjmPjT?=
+ =?us-ascii?Q?OMYVwG0JQqPVcuChMXJjNcaNdTlb7CJGDLG7SoswDeOYg2ySWa80Y0ijc+lz?=
+ =?us-ascii?Q?PVAc5epO11jrZkOV/TKJRzS7DVS4YpeBMxWRDQckMxXdupFOnXMwTSUaH6sL?=
+ =?us-ascii?Q?SDU8C/cdWk0eF9K84gPqwPa0rvAlap7B50gSnjhT7T1xoN3V2Q7y0vBbSPj5?=
+ =?us-ascii?Q?VYaBTSkEBWC2WE0PIlDF6RFQg+3cw4xCYEgHnbfnxY8sqlRKL+lvdAmu50ol?=
+ =?us-ascii?Q?aryEMjzNcEbcMxk1iehYu2FCAIYYAlbjHThr1pVGz4Wa2M/VHJCFfJfBQGp3?=
+ =?us-ascii?Q?IX4oSOc1artEH2DC5diccZsV7k9JgN3+kzTPsJt9nJjKNm9uYZ9MSEA+RB/P?=
+ =?us-ascii?Q?3EVnt/gR6+lL2yUpQKEsROzobqaklsSacbX4Uz3AxLYzjVOAT/ObTOOwzmwv?=
+ =?us-ascii?Q?j4SG5wi3XdtBct/DIOqe0ZU9n/gnSXsNVxt+V4DU55UDvqT9nGnhBCMf3Cw9?=
+ =?us-ascii?Q?qfSgAqh6PXHtKwY1LaNG57gA/CtOfiBPUx8moENdnpNPWCY1NhhNbY3YckRJ?=
+ =?us-ascii?Q?WCzxRKv8QSZlpJO5v2lpe4ckK0OuBFGlu6HO4hQQz25A+oPJyJcWOo3+LA2X?=
+ =?us-ascii?Q?tUve7Jlf+IOsBltn0rRdLth6RfKr8KFjmtj6AxKJfXQtGYhfSAUr+Agkr5xM?=
+ =?us-ascii?Q?aQyYoJJwN8cbV5AFN0W1weWO2PoYGcW8G1V9DCgBozQRI8vMuZjZAB/rAzXf?=
+ =?us-ascii?Q?3slPYog7Kpr6KOt0eLeqbJU+nNI74puuW3PuByYI+KyywBI5r86B6j3Ew42B?=
+ =?us-ascii?Q?tlV/A0bmtXxqmZuHaAKcMelhuO63ufhMUclhrs4MrURSiy4HBk223r8t9Cm3?=
+ =?us-ascii?Q?O8oIXYC8lLqchGIjOFzRibw6yE/AfMjRvcJG7Ws2nqH3en7x6H7I2t2KScHb?=
+ =?us-ascii?Q?raIvMQNWGSyNgr6guzA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9da6d5aa-b02f-4f96-c91d-08d9e5e272fc
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 00:25:00.5424
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tTBSZCE0ljeQs4NRxsqtePFKv6N4vqM8HIm7LUB2EO2NguvOq7BSLpelvEhpzYg3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1927
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 1 Feb 2022 17:06:43 +0530
-Abhishek Sahu <abhsahu@nvidia.com> wrote:
-
-> On 2/1/2022 1:41 AM, Alex Williamson wrote:
-> > On Mon, 31 Jan 2022 16:54:50 +0530
-> > Abhishek Sahu <abhsahu@nvidia.com> wrote:
-> >   
-> >> If needs_pm_restore is set (PCI device does not have support for no
-> >> soft reset), then the current PCI state will be saved during D0->D3hot
-> >> transition and same will be restored back during D3hot->D0 transition.
-> >> For saving the PCI state locally, pci_store_saved_state() is being
-> >> used and the pci_load_and_free_saved_state() will free the allocated
-> >> memory.
-> >>
-> >> But for reset related IOCTLs, vfio driver calls PCI reset related
-> >> API's which will internally change the PCI power state back to D0. So,
-> >> when the guest resumes, then it will get the current state as D0 and it
-> >> will skip the call to vfio_pci_set_power_state() for changing the
-> >> power state to D0 explicitly. In this case, the memory pointed by
-> >> pm_save will never be freed. In a malicious sequence, the state changing
-> >> to D3hot followed by VFIO_DEVICE_RESET/VFIO_DEVICE_PCI_HOT_RESET can be
-> >> run in a loop and it can cause an OOM situation.
-> >>
-> >> Also, pci_pm_reset() returns -EINVAL if we try to reset a device that
-> >> isn't currently in D0. Therefore any path where we're triggering a
-> >> function reset that could use a PM reset and we don't know if the device
-> >> is in D0, should wake up the device before we try that reset.
-> >>
-> >> This patch changes the device power state to D0 by invoking
-> >> vfio_pci_set_power_state() before calling reset related API's.
-> >> It will help in fixing the mentioned memory leak and making sure
-> >> that the device is in D0 during reset. Also, to prevent any similar
-> >> memory leak for future development, this patch frees memory first
-> >> before overwriting 'pm_save'.
-> >>
-> >> Fixes: 51ef3a004b1e ("vfio/pci: Restore device state on PM transition")
-> >> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
-> >> ---
-> >>
-> >> * Changes in v2
-> >>
-> >> - Add the Fixes tag and sent this patch independently.
-> >> - Invoke vfio_pci_set_power_state() before invoking reset related API's.
-> >> - Removed saving of power state locally.
-> >> - Removed warning before 'kfree(vdev->pm_save)'.
-> >> - Updated comments and commit message according to updated changes.
-> >>
-> >> * v1 of this patch was sent in
-> >> https://lore.kernel.org/lkml/20220124181726.19174-4-abhsahu@nvidia.com/
-> >>
-> >>  drivers/vfio/pci/vfio_pci_core.c | 27 +++++++++++++++++++++++++++
-> >>  1 file changed, 27 insertions(+)
-> >>
-> >> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> >> index f948e6cd2993..d6dd4f7c4b2c 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_core.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> >> @@ -228,6 +228,13 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
-> >>       if (!ret) {
-> >>               /* D3 might be unsupported via quirk, skip unless in D3 */
-> >>               if (needs_save && pdev->current_state >= PCI_D3hot) {
-> >> +                     /*
-> >> +                      * If somehow, the vfio driver was not able to free the
-> >> +                      * memory allocated in pm_save, then free the earlier
-> >> +                      * memory first before overwriting pm_save to prevent
-> >> +                      * memory leak.
-> >> +                      */
-> >> +                     kfree(vdev->pm_save);
-> >>                       vdev->pm_save = pci_store_saved_state(pdev);
-> >>               } else if (needs_restore) {
-> >>                       pci_load_and_free_saved_state(pdev, &vdev->pm_save);
-> >> @@ -322,6 +329,12 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
-> >>       /* For needs_reset */
-> >>       lockdep_assert_held(&vdev->vdev.dev_set->lock);
-> >>
-> >> +     /*
-> >> +      * This function can be invoked while the power state is non-D0,
-> >> +      * Change the device power state to D0 first.  
+On Tue, Feb 01, 2022 at 02:49:16PM -0700, Alex Williamson wrote:
+> On Tue, 1 Feb 2022 14:36:20 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Tue, Feb 01, 2022 at 10:04:08AM -0700, Alex Williamson wrote:
 > > 
-> > I think we need to describe more why we're doing this than what we're
-> > doing.  We need to make sure the device is in D0 in case we have a
-> > reset method that depends on that directly, ex. pci_pm_reset(), or
-> > possibly device specific resets that may access device BAR resources.
-> > I think it's placed here in the function so that the config space
-> > changes below aren't overwritten by restoring the saved state and maybe
-> > also because the set_irqs_ioctl() call might access device MMIO space.
-> >   
->  
->  Thanks Alex.
->  I will add more details here in the comment.
-> 
-> >> +      */
-> >> +     vfio_pci_set_power_state(vdev, PCI_D0);
-> >> +
-> >>       /* Stop the device from further DMA */
-> >>       pci_clear_master(pdev);
-> >>
-> >> @@ -921,6 +934,13 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-> >>                       return -EINVAL;
-> >>
-> >>               vfio_pci_zap_and_down_write_memory_lock(vdev);
-> >> +
-> >> +             /*
-> >> +              * This function can be invoked while the power state is non-D0,
-> >> +              * Change the device power state to D0 before doing reset.
-> >> +              */  
+> > > Ok, let me parrot back to see if I understand.  -ENOTTY will be
+> > > returned if the ioctl doesn't exist, in which case device_state is
+> > > untouched and cannot be trusted.  At the same time, we expect the user
+> > > to use the feature ioctl to make sure the ioctl exists, so it would
+> > > seem that we've reclaimed that errno if we believe the user should
+> > > follow the protocol.  
 > > 
-> > See below, reconsidering this...
-> >   
-> >> +             vfio_pci_set_power_state(vdev, PCI_D0);
-> >> +
-> >>               ret = pci_try_reset_function(vdev->pdev);
-> >>               up_write(&vdev->memory_lock);
-> >>
-> >> @@ -2055,6 +2075,13 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
-> >>       }
-> >>       cur_mem = NULL;
-> >>
-> >> +     /*
-> >> +      * This function can be invoked while the power state is non-D0.
-> >> +      * Change power state of all devices to D0 before doing reset.
-> >> +      */  
-> > 
-> > Here I have trouble convincing myself exactly what we're doing.  As you
-> > note in patch 1/ of the RFC series, pci_reset_bus(), or more precisely
-> > pci_dev_save_and_disable(), wakes the device to D0 before reset, so we
-> > can't be doing this only to get the device into D0.  The function level
-> > resets do the same.
-> > 
-> > Actually, now I'm remembering and debugging where I got myself confused
-> > previously with pci_pm_reset().  The scenario was a Windows guest with
-> > an assigned Intel 82574L NIC.  When doing a shutdown from the guest the
-> > device is placed in D3hot and we enter vfio_pci_core_disable() in that
-> > state.  That function however uses __pci_reset_function_locked(), which
-> > skips the pci_dev_save_and_disable() since much of it is redundant for
-> > that call path (I think I generalized this to all flavors of
-> > pci_reset_function() in my head).  
+> > I don't follow - the documentation says what the code does, if you get
+> > ENOTTY returned then you don't get the device_state too. Saying the
+> > user shouldn't have called it in the first place is completely
+> > correct, but doesn't change the device_state output.
 > 
->  Thanks for providing the background related with the original issue.
-> 
-> > 
-> > The standard call to pci_try_reset_function(), as in the previous
-> > chunk, will make use of pci_dev_save_and_disable(), so for either of
-> > these latter cases the concern cannot be simply having the device in D0,
-> > we need a reason that we want the previously saved state restored on the
-> > device before the reset, and thus restored to the device after the
-> > reset as the rationale for the change.
-> >   
-> 
->  I will add this as a comment.
-> 
-> >> +     list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
-> >> +             vfio_pci_set_power_state(cur, PCI_D0);
-> >> +
-> >>       ret = pci_reset_bus(pdev);
-> >>
-> >>  err_undo:  
-> > 
-> > 
-> > We also call pci_reset_bus() in vfio_pci_dev_set_try_reset().  In that
-> > case, none of the other devices can be in use by the user, but they can
-> > certainly be in D3hot with previous device state saved off into our
-> > pm_save cache.  If we don't have a good reason to restore in that case,
-> > I'm wondering if we really have a good reason to restore in the above
-> > two cases.
-> > 
-> > Perhaps we just need the first chunk above to resolve the memory leak,  
-> 
->  First chunk means only the changes done in vfio_pci_set_power_state()
->  which is calling kfree() before calling pci_store_saved_state().
->  Or I need to include more things in the first patch ?
+> The documentation says "...the device state output is not reliable", and
+> I have to question whether this qualifies as a well specified,
+> interoperable spec with such language.  We're essentially asking users
+> to keep track that certain errnos result in certain fields of the
+> structure _maybe_ being invalid.
 
-Correct, first chunk as is the first change in the patch.  Patch chunks
-are delineated by the @@ offset lines.
+So you are asking to remove "is not reliable" and just phrase is as:
 
+"device_state is updated to the current value when -1 is returned,
+except when these XXX errnos are returned?
+
+(actually userspace can tell directly without checking the errno - as
+if -1 is returned the device_state cannot be the requested target
+state anyhow)
+
+> Now you're making me wonder how much I care to invest in semantic
+> arguments over extended errnos :-\
+
+Well, I know I don't :) We don't have consistency in the kernel and
+userspace is hard pressed to make any sense of it most of the time,
+IMHO. It just doesn't practically matter..
+
+> > We don't know the device_state in the core code because it can only be
+> > read under locking that is controlled by the driver. I hope when we
+> > get another driver merged that we can hoist the locking, but right now
+> > I'm not really sure - it is a complicated lock.
 > 
->  With the kfree(), the original memory leak issue should be solved.
+> The device cannot self transition to a new state, so if the core were
+> to serialize this ioctl then the device_state provided by the driver is
+> valid, regardless of its internal locking.
+
+It is allowed to transition to RUNNING due to reset events it captures
+and since we capture the reset through the PCI hook, not from VFIO,
+the core code doesn't synchronize well. See patch 14
+
+> Whether this ioctl should be serialized anyway is probably another good
+> topic to breach.  Should a user be able to have concurrent ioctls
+> setting conflicting states?
+
+The driver is required to serialize, the core code doesn't touch any
+global state and doesn't need serializing.
+
+> I'd suggest that ioctl return structure is only valid at all on
+> success and we add a GET interface to return the current device
+
+We can do this too, but it is a bunch of code to achieve this and I
+don't have any use case to read back the device_state beyond debugging
+and debugging is fine with this. IMHO
+
+> It's entirely possible that I'm overly averse to ioctl proliferation,
+> but for every new ioctl we need to take a critical look at the proposed
+> API, use case, applicability, and extensibility.  
+
+This is all basicly the same no matter where it is put, the feature
+multiplexer is just an ioctl in some semi-standard format, but the
+vfio pattern of argsz/flags is also a standard format that is
+basically the same thing.
+
+We still need to think about extensibility, alignment, etc..
+
+The problem I usually see with ioctls is not proliferation, but ending
+up with too many choices and a big ?? when it comes to adding
+something new.
+
+Clear rules where things should go and why is the best, it matters
+less what the rules actually are IMHO.
+
+> > I don't want to touch capabilities, but we can try to use feature for
+> > set state. Please confirm this is what you want.
 > 
-> > and the second chunk as a separate patch to resolve the issue with
-> > devices entering vfio_pci_core_disable() in non-D0 state.  Sorry if I  
+> It's a team sport, but to me it seems like it fits well both in my
+> mental model of interacting with a device feature, without
+> significantly altering the uAPI you're defining anyway.
+
+Well, my advice is that ioctls are fine, and a bit easier all around.
+eg strace and syzkaller are a bit easier if everything neatly maps
+into one struct per ioctl - their generator tools are optimized for
+this common case.
+
+Simple multiplexors are next-best-fine, but there should be a clear
+idea when to use the multiplexer, or not.
+
+Things like the cap chains enter a whole world of adventure for
+strace/syzkaller :)
+
+> > You'll want the same for the PRE_COPY related information too?
 > 
->  And this second patch will contain rest of the things where
->  we will call vfio_pci_set_power_state() explicitly for moving to
->  D0 state ?
+> I hadn't gotten there yet.  It seems like a discontinuity to me that
+> we're handing out new FDs for data transfer sessions, but then we
+> require the user to come back to the device to query about the data its
+> reading through that other FD.  
 
-At least the first one in vfio_pci_core_disable(), the others need
-justification.
+An earlier draft of this put it on the data FD, but v6 made it fully
+optional with no functional impact on the data FD. The values decrease
+as the data FD progresses and increases as the VM dirties data - ie it
+is 50/50 data_fd/device behavior.
 
->  Also, We need to explore if setting to D0 state is really required at
->  all these places and If it is not required, then we don't need second
->  patch ?
+It doesn't matter which way, but it feels quite weird to have the main
+state function is a FEATURE and the precopy query is an ioctl.
 
-We need a second patch, I'm convinced that we don't otherwise wake the
-device to D0 before we potentially get to pci_pm_reset() in
-vfio_pci_core_disable().  It's the remaining cases of setting D0 that
-I'm less clear on.  If it's the case that we need to restore config
-space any time a NoSoftRst- device is woken from D3hot and the state
-saved and restored around the reset is meaningless otherwise, that's a
-valid justification, but is it accurate?  If so, we should recheck the
-other case of calling pci_reset_bus() too.  Thanks,
+> Should that be an ioctl on the data stream FD itself?  
 
-Alex
+I can be. Implementation wise it is about a wash.
 
+> Is there a use case for also having it on the STOP_COPY FD?
+
+I didn't think of one worthwhile enough to mandate implementing it in
+every driver.
+
+> > If we are into these very minor nitpicks does this mean you are OK
+> > with all the big topics now?
+> 
+> I'm not hating it, but I'd like to see buy-in from others who have a
+> vested interest in supporting migration.  I don't see Intel or Huawei
+> on the Cc list and the original collaborators of the v1 interface
+> from
+
+That is an oversight, I'll ping them. I think people have been staying
+away until the dust settles.
+
+> NVIDIA have been silent through this redesign.
+
+We've reviewed this internally with them. They reserve judgement on
+the data transfer performance until they work on it, but functionally
+it has all the necessary semantics.
+
+They have the same P2P issue mlx5 does, and are happy with the
+solution under the same general provisions as already discussed for
+the Huawei device - RUNNING_P2P is sustainable only while the device
+is not touched - ie the VCPU is halted.
+
+The f_ops implemenation we used for mlx5 is basic, the full
+performance version would want to use the read/write_iter() fop with
+async completions to support the modern zero-copy iouring based data
+motion in userspace. This is all part of the standard FD abstraction
+and why it is appealing to use it.
+
+Thanks,
+Jason
