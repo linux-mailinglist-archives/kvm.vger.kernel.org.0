@@ -2,250 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D61264A715B
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 14:16:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A34D4A7245
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 14:53:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344293AbiBBNQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 08:16:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiBBNQM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 08:16:12 -0500
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69956C061714
-        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 05:16:12 -0800 (PST)
-Received: by mail-qv1-xf2e.google.com with SMTP id h16so18835911qvk.10
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 05:16:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=79vq9TCxjR7x3uf5Z4nTfapSge2v9FIO7LTSjxZhZB4=;
-        b=QDHix+y/nSaLBBh8IYeYTNNuufCKmJvJIhDP7dv8D+/PO/8ZtBffJvjZkDhexp77dD
-         OrvGHZWhTFEzMMsF6HA3e4RNMx8n+RpyNPdXn8dbdJhyr6qOWJYS1Favw0ge1jR7QPrG
-         kGOdZ41p76og/ctAY26ziOaU6dXln0Zi54h5pVWcAuIhyBqvLa00KseLmdOvZtkP3nYH
-         UD/qF2QCRdgZyaZZ97TNQIr9HyXRU40C2Wqf8NZ259l+1vIW9DDzmTVdvmJD9Q5gPCwX
-         st/15sx9OX8bZn0wgOmrbx9i4N+Or+vfl+Wu3NU35qwhUiu2LC0axBxEJRJvRAwyfkRw
-         QxyA==
+        id S1344483AbiBBNxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 08:53:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53212 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229738AbiBBNxH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 08:53:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643809987;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dzs3pmpsecqWwS28UKT/9n4YfyBZy50vlVYoCws6yUE=;
+        b=Z1C4nylYj5BpS6MbkJffKjGwySKJMVJOh5lLnQiJWrOXZChxc47Famx5vV+MgjD3zsVyto
+        N4CJzzOaTuCG2r1gifAanXvsRzcqLhoSKSG18TvjVfqhy9C8CGSH9TKS8aHcIRRtvKKZes
+        enEth73mhdZb6K/nJf/NjpaZsoRU180=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-380-j-DFgihFO7CxSfwHaKjLVA-1; Wed, 02 Feb 2022 08:53:06 -0500
+X-MC-Unique: j-DFgihFO7CxSfwHaKjLVA-1
+Received: by mail-qt1-f197.google.com with SMTP id l15-20020ac84ccf000000b002cf9424cfa5so15490407qtv.7
+        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 05:53:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=79vq9TCxjR7x3uf5Z4nTfapSge2v9FIO7LTSjxZhZB4=;
-        b=h/Qv9OqPNB2h4m1lSGD1sdvRCQmjZKX60/rbKlcliF9+YMAi5W+UNG6rMp15CBEwJF
-         M1apLQSusorjsvEXzuHZEmFHPVhSjMKI7EMyz+2UNkuOf6WN1UZvNuga1qGS/FjxWZgY
-         nYYJtRellBXfTK/VDHkxwgKaeHzkrmq8nsSP3l+qck9pQ7r71TK8CjbSzFOpx+BCqB5A
-         J4Cl4wAQDaJjR51pdnrtURw0tVl7gBU+GzcdQ8uxCrF65zDkP4aEXIN/Kla8qY64VmuX
-         oMOJHA7cMzIBkPBFy3qeOTWn0K4YYLaYF1ajFFwIGqC2QlqsH1K5A+XBtyPVGzxtAtmW
-         hzog==
-X-Gm-Message-State: AOAM533foLcjQbyfHSCavMzlGe1KlzC10u6etIcurCi77oKdcN4zUuLQ
-        20FsBJIA9ynvSx8QSehBUi1dzkJny3+mpe8kz+GnAwNZcjfoWg==
-X-Google-Smtp-Source: ABdhPJwQrVW/eHXLU/tinP93jW39NySGosYXY6Qj8WY2B67cKscAR9BA9nPxclvoiD5jA8UBJ3CtD5UAfOQDMBp6HTA=
-X-Received: by 2002:a05:6214:21e4:: with SMTP id p4mr27327792qvj.31.1643807771168;
- Wed, 02 Feb 2022 05:16:11 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dzs3pmpsecqWwS28UKT/9n4YfyBZy50vlVYoCws6yUE=;
+        b=CemaW2qiR3CTm8tyOFqLsCJKKwam1BHx2zXU8fjmZgmcCkZu0w5CaL7jcpdjpfoYTu
+         AECjivqf3hbwpNa2peNFaUFm1Z5Dy2aZvNLinFtUt+IM0ZYS1jLn0b+DX3KD0lRbCl2T
+         k2WQGpc7ej22kO4Ug/bble2sAyNfmS9ZdoktsjM61C6OAjGrADsnAyicIGbb4x2JFJfX
+         J5PUUVQThh9rUnml4nsiCiCvLypYYPDiCNqTlkX/0Szo4V2lWT9xrM0RZOGzkZGn5luW
+         xK4N1bYx+f74w/+T/GLU10sh4GOyv1uxCLT102yAQiMBD7R/CiwO0m6hyfdmnTjOqVdi
+         9AYQ==
+X-Gm-Message-State: AOAM531M6mJzEVabiVjOt3MVzVq85sTXu5Pxjq4JpFzV08KozoWYVod5
+        vveL+EbyprkYjTNXwiOZao/UVy4UVG3vzEJk1g9Vzkd95ZMGo819+ySjt/3qGF2B/k+dwR3Z5iW
+        Fd1v0L/w1qh5m
+X-Received: by 2002:ad4:5dc4:: with SMTP id m4mr26516017qvh.17.1643809985995;
+        Wed, 02 Feb 2022 05:53:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy97PB6hOF6XRVh0laZSCO/T0ng/aOceXJMUfGN81RQHfwOdZhjN5x8YkGsaZRSWfCtenz6QA==
+X-Received: by 2002:ad4:5dc4:: with SMTP id m4mr26516006qvh.17.1643809985739;
+        Wed, 02 Feb 2022 05:53:05 -0800 (PST)
+Received: from steredhat (host-95-238-125-214.retail.telecomitalia.it. [95.238.125.214])
+        by smtp.gmail.com with ESMTPSA id c14sm10955065qtc.31.2022.02.02.05.53.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Feb 2022 05:53:05 -0800 (PST)
+Date:   Wed, 2 Feb 2022 14:53:00 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3] vhost: cache avail index in vhost_enable_notify()
+Message-ID: <20220202135300.5b366wk35ysqehgm@steredhat>
+References: <20220128094129.40809-1-sgarzare@redhat.com>
+ <Yfpnlv2GudpPFwok@stefanha-x1.localdomain>
+ <20220202062340-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Wed, 2 Feb 2022 14:15:59 +0100
-Message-ID: <CAFULd4bQa-EkiTc06VysryKRb+zXBTRZFPkEJe7wCUu3RyON+g@mail.gmail.com>
-Subject: [RFC/RFT PATCH] Introduce try_cmpxchg64 and use it in vmx/posted_intr.c
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: multipart/mixed; boundary="00000000000047c74f05d708d21d"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220202062340-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---00000000000047c74f05d708d21d
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Feb 02, 2022 at 06:24:05AM -0500, Michael S. Tsirkin wrote:
+>On Wed, Feb 02, 2022 at 11:14:30AM +0000, Stefan Hajnoczi wrote:
+>> On Fri, Jan 28, 2022 at 10:41:29AM +0100, Stefano Garzarella wrote:
+>> > In vhost_enable_notify() we enable the notifications and we read
+>> > the avail index to check if new buffers have become available in
+>> > the meantime.
+>> >
+>> > We do not update the cached avail index value, so when the device
+>> > will call vhost_get_vq_desc(), it will find the old value in the
+>> > cache and it will read the avail index again.
+>> >
+>> > It would be better to refresh the cache every time we read avail
+>> > index, so let's change vhost_enable_notify() caching the value in
+>> > `avail_idx` and compare it with `last_avail_idx` to check if there
+>> > are new buffers available.
+>> >
+>> > We don't expect a significant performance boost because
+>> > the above path is not very common, indeed vhost_enable_notify()
+>> > is often called with unlikely(), expecting that avail index has
+>> > not been updated.
+>> >
+>> > We ran virtio-test/vhost-test and noticed minimal improvement as
+>> > expected. To stress the patch more, we modified vhost_test.ko to
+>> > call vhost_enable_notify()/vhost_disable_notify() on every cycle
+>> > when calling vhost_get_vq_desc(); in this case we observed a more
+>> > evident improvement, with a reduction of the test execution time
+>> > of about 3.7%.
+>> >
+>> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > ---
+>> > v3
+>> > - reworded commit description [Stefan]
+>> > ---
+>> >  drivers/vhost/vhost.c | 3 ++-
+>> >  1 file changed, 2 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> > index 59edb5a1ffe2..07363dff559e 100644
+>> > --- a/drivers/vhost/vhost.c
+>> > +++ b/drivers/vhost/vhost.c
+>> > @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+>> >  		       &vq->avail->idx, r);
+>> >  		return false;
+>> >  	}
+>> > +	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
+>> >
+>> > -	return vhost16_to_cpu(vq, avail_idx) != vq->avail_idx;
+>> > +	return vq->avail_idx != vq->last_avail_idx;
+>> >  }
+>> >  EXPORT_SYMBOL_GPL(vhost_enable_notify);
+>>
+>> This changes behavior (fixes a bug?): previously the function returned
+>> false when called with avail buffers still pending (vq->last_avail_idx <
+>> vq->avail_idx). Now it returns true because we compare against
+>> vq->last_avail_idx and I think that's reasonable.
 
-Hello!
+Good catch!
 
-Attached RFC patch introduces try_cmpxchg64 and uses it in
-vmx/posted_intr.c. While the resulting code improvements on x86_64 are
-somehow minor (a compare and a move saved), the improvements on x86_32
-are quite noticeable. The code around cmpxchg8b improves from:
+>>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>
+>I don't see the behaviour change... could you explain the
+>scanario in more detail pls?
 
-  84:    89 74 24 30              mov    %esi,0x30(%esp)
-  88:    89 fe                    mov    %edi,%esi
-  8a:    0f b7 0c 02              movzwl (%edx,%eax,1),%ecx
-  8e:    c1 e1 08                 shl    $0x8,%ecx
-  91:    0f b7 c9                 movzwl %cx,%ecx
-  94:    89 4c 24 34              mov    %ecx,0x34(%esp)
-  98:    8b 96 24 1e 00 00        mov    0x1e24(%esi),%edx
-  9e:    8b 86 20 1e 00 00        mov    0x1e20(%esi),%eax
-  a4:    8b 5c 24 34              mov    0x34(%esp),%ebx
-  a8:    8b 7c 24 30              mov    0x30(%esp),%edi
-  ac:    89 44 24 38              mov    %eax,0x38(%esp)
-  b0:    0f b6 44 24 38           movzbl 0x38(%esp),%eax
-  b5:    8b 4c 24 38              mov    0x38(%esp),%ecx
-  b9:    89 54 24 3c              mov    %edx,0x3c(%esp)
-  bd:    83 e0 fd                 and    $0xfffffffd,%eax
-  c0:    89 5c 24 64              mov    %ebx,0x64(%esp)
-  c4:    8b 54 24 3c              mov    0x3c(%esp),%edx
-  c8:    89 4c 24 60              mov    %ecx,0x60(%esp)
-  cc:    8b 4c 24 34              mov    0x34(%esp),%ecx
-  d0:    88 44 24 60              mov    %al,0x60(%esp)
-  d4:    8b 44 24 38              mov    0x38(%esp),%eax
-  d8:    c6 44 24 62 f2           movb   $0xf2,0x62(%esp)
-  dd:    8b 5c 24 60              mov    0x60(%esp),%ebx
-  e1:    f0 0f c7 0f              lock cmpxchg8b (%edi)
-  e5:    89 d1                    mov    %edx,%ecx
-  e7:    8b 54 24 3c              mov    0x3c(%esp),%edx
-  eb:    33 44 24 38              xor    0x38(%esp),%eax
-  ef:    31 ca                    xor    %ecx,%edx
-  f1:    09 c2                    or     %eax,%edx
-  f3:    75 a3                    jne    98 <vmx_vcpu_pi_load+0x98>
+IIUC the behavior is different only when the device calls 
+vhost_enable_notify() with pending buffers (vq->avail_idx != 
+vq->last_avail_idx).
 
-to:
+Let's suppose that driver has not added new available buffers, so value 
+in cache (vq->avail_idx) is equal to the one we read back from the 
+guest, but the device has not consumed all available buffers 
+(vq->avail_idx != vq->last_avail_idx).
 
-  84:    0f b7 0c 02              movzwl (%edx,%eax,1),%ecx
-  88:    c1 e1 08                 shl    $0x8,%ecx
-  8b:    0f b7 c9                 movzwl %cx,%ecx
-  8e:    8b 86 20 1e 00 00        mov    0x1e20(%esi),%eax
-  94:    8b 96 24 1e 00 00        mov    0x1e24(%esi),%edx
-  9a:    89 4c 24 64              mov    %ecx,0x64(%esp)
-  9e:    89 c3                    mov    %eax,%ebx
-  a0:    89 44 24 60              mov    %eax,0x60(%esp)
-  a4:    83 e3 fd                 and    $0xfffffffd,%ebx
-  a7:    c6 44 24 62 f2           movb   $0xf2,0x62(%esp)
-  ac:    88 5c 24 60              mov    %bl,0x60(%esp)
-  b0:    8b 5c 24 60              mov    0x60(%esp),%ebx
-  b4:    f0 0f c7 0f              lock cmpxchg8b (%edi)
-  b8:    75 d4                    jne    8e <vmx_vcpu_pi_load+0x8e>
+Now if the device call vhost_enable_notify(), before this patch it 
+returned false, because there are no new buffers added (even if there 
+are some pending), with this patch it returns true, because there are 
+still some pending buffers (vq->avail_idx != vq->last_avail_idx).
 
-The patch was only lightly tested, so I would like to ask someone to
-spare a few cycles for a thorough test on 64bit and 32bit targets. As
-shown above, the try_cmpxchg64 functions should be generally usable
-for x86 targets, I plan to propose a patch that introduces these to
-x86 maintainers.
+IIUC the right behavior should be the one with the patch applied.
+However this difference would be seen only if we call 
+vhost_enable_notify() when vq->avail_idx != vq->last_avail_idx and 
+checking vhost-net, vhost-scsi and vhost-vsock, we use the return value 
+of vhost_enable_notify() only when there are not available buffers, so 
+vq->avail_idx == vq->last_avail_idx.
 
-Uros.
+So I think Stefan is right, but we should never experience the buggy 
+scenario.
 
---00000000000047c74f05d708d21d
-Content-Type: text/plain; charset="US-ASCII"; name="try_cmpxchg-4.diff.txt"
-Content-Disposition: attachment; filename="try_cmpxchg-4.diff.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kz5kozo40>
-X-Attachment-Id: f_kz5kozo40
+it seems that we used to check vq->last_avail_idx but we changed it 
+since commit 8dd014adfea6 ("vhost-net: mergeable buffers support"), 
+honestly I don't understand if it was intended or not.
 
-ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2NtcHhjaGdfMzIuaCBiL2FyY2gveDg2
-L2luY2x1ZGUvYXNtL2NtcHhjaGdfMzIuaAppbmRleCAwYTdmZTAzMjE2MTMuLmU4NzRmZjdmNzUy
-OSAxMDA2NDQKLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20vY21weGNoZ18zMi5oCisrKyBiL2Fy
-Y2gveDg2L2luY2x1ZGUvYXNtL2NtcHhjaGdfMzIuaApAQCAtNDIsNiArNDIsOSBAQCBzdGF0aWMg
-aW5saW5lIHZvaWQgc2V0XzY0Yml0KHZvbGF0aWxlIHU2NCAqcHRyLCB1NjQgdmFsdWUpCiAjZGVm
-aW5lIGFyY2hfY21weGNoZzY0X2xvY2FsKHB0ciwgbywgbikJCQkJCVwKIAkoKF9fdHlwZW9mX18o
-KihwdHIpKSlfX2NtcHhjaGc2NF9sb2NhbCgocHRyKSwgKHVuc2lnbmVkIGxvbmcgbG9uZykobyks
-IFwKIAkJCQkJICAgICAgICh1bnNpZ25lZCBsb25nIGxvbmcpKG4pKSkKKyNkZWZpbmUgYXJjaF90
-cnlfY21weGNoZzY0KHB0ciwgcG8sIG4pCQkJCQlcCisJKChfX3R5cGVvZl9fKCoocHRyKSkpX190
-cnlfY21weGNoZzY0KChwdHIpLCAodW5zaWduZWQgbG9uZyBsb25nICopKHBvKSwgXAorCQkJCQkg
-ICAgICh1bnNpZ25lZCBsb25nIGxvbmcpKG4pKSkKICNlbmRpZgogCiBzdGF0aWMgaW5saW5lIHU2
-NCBfX2NtcHhjaGc2NCh2b2xhdGlsZSB1NjQgKnB0ciwgdTY0IG9sZCwgdTY0IG5ldykKQEAgLTcw
-LDYgKzczLDI1IEBAIHN0YXRpYyBpbmxpbmUgdTY0IF9fY21weGNoZzY0X2xvY2FsKHZvbGF0aWxl
-IHU2NCAqcHRyLCB1NjQgb2xkLCB1NjQgbmV3KQogCXJldHVybiBwcmV2OwogfQogCitzdGF0aWMg
-aW5saW5lIGJvb2wgX190cnlfY21weGNoZzY0KHZvbGF0aWxlIHU2NCAqcHRyLCB1NjQgKnBvbGQs
-IHU2NCBuZXcpCit7CisJYm9vbCBzdWNjZXNzOworCXU2NCBwcmV2OworCWFzbSB2b2xhdGlsZShM
-T0NLX1BSRUZJWCAiY21weGNoZzhiICUyIgorCQkgICAgIENDX1NFVCh6KQorCQkgICAgIDogQ0Nf
-T1VUKHopIChzdWNjZXNzKSwKKwkJICAgICAgICI9QSIgKHByZXYpLAorCQkgICAgICAgIittIiAo
-KnB0cikKKwkJICAgICA6ICJiIiAoKHUzMiluZXcpLAorCQkgICAgICAgImMiICgodTMyKShuZXcg
-Pj4gMzIpKSwKKwkJICAgICAgICIxIiAoKnBvbGQpCisJCSAgICAgOiAibWVtb3J5Iik7CisKKwlp
-ZiAodW5saWtlbHkoIXN1Y2Nlc3MpKQorCQkqcG9sZCA9IHByZXY7CisJcmV0dXJuIHN1Y2Nlc3M7
-Cit9CisKICNpZm5kZWYgQ09ORklHX1g4Nl9DTVBYQ0hHNjQKIC8qCiAgKiBCdWlsZGluZyBhIGtl
-cm5lbCBjYXBhYmxlIHJ1bm5pbmcgb24gODAzODYgYW5kIDgwNDg2LiBJdCBtYXkgYmUgbmVjZXNz
-YXJ5CkBAIC0xMDgsNiArMTMwLDI3IEBAIHN0YXRpYyBpbmxpbmUgdTY0IF9fY21weGNoZzY0X2xv
-Y2FsKHZvbGF0aWxlIHU2NCAqcHRyLCB1NjQgb2xkLCB1NjQgbmV3KQogCQkgICAgICAgOiAibWVt
-b3J5Iik7CQkJCVwKIAlfX3JldDsgfSkKIAorI2RlZmluZSBhcmNoX3RyeV9jbXB4Y2hnNjQocHRy
-LCBwbywgbikJCQkJXAorKHsJCQkJCQkJCVwKKwlib29sIHN1Y2Nlc3M7CQkJCQkJXAorCV9fdHlw
-ZW9mX18oKihwdHIpKSBfX3ByZXY7CQkJCVwKKwlfX3R5cGVvZl9fKHB0cikgX29sZCA9IChfX3R5
-cGVvZl9fKHB0cikpKHBvKTsJCVwKKwlfX3R5cGVvZl9fKCoocHRyKSkgX19vbGQgPSAqX29sZDsJ
-CQlcCisJX190eXBlb2ZfXygqKHB0cikpIF9fbmV3ID0gKG4pOwkJCQlcCisJYWx0ZXJuYXRpdmVf
-aW8oTE9DS19QUkVGSVhfSEVSRQkJCQlcCisJCQkiY2FsbCBjbXB4Y2hnOGJfZW11IiwJCQlcCisJ
-CQkibG9jazsgY21weGNoZzhiICglJWVzaSkiICwJCVwKKwkJICAgICAgIFg4Nl9GRUFUVVJFX0NY
-OCwJCQkJXAorCQkgICAgICAgIj1BIiAoX19wcmV2KSwJCQkJXAorCQkgICAgICAgIlMiICgocHRy
-KSksICIwIiAoX19vbGQpLAkJXAorCQkgICAgICAgImIiICgodW5zaWduZWQgaW50KV9fbmV3KSwJ
-CVwKKwkJICAgICAgICJjIiAoKHVuc2lnbmVkIGludCkoX19uZXc+PjMyKSkJCVwKKwkJICAgICAg
-IDogIm1lbW9yeSIpOwkJCQlcCisJc3VjY2VzcyA9IChfX3ByZXYgPT0gX19vbGQpOwkJCQlcCisJ
-aWYgKHVubGlrZWx5KCFzdWNjZXNzKSkJCQkJCVwKKwkJKl9vbGQgPSBfX3ByZXY7CQkJCQlcCisJ
-bGlrZWx5KHN1Y2Nlc3MpOwkJCQkJXAorfSkKICNlbmRpZgogCiAjZGVmaW5lIHN5c3RlbV9oYXNf
-Y21weGNoZ19kb3VibGUoKSBib290X2NwdV9oYXMoWDg2X0ZFQVRVUkVfQ1g4KQpkaWZmIC0tZ2l0
-IGEvYXJjaC94ODYvaW5jbHVkZS9hc20vY21weGNoZ182NC5oIGIvYXJjaC94ODYvaW5jbHVkZS9h
-c20vY21weGNoZ182NC5oCmluZGV4IDA3MmU1NDU5ZmUyZi4uMjUwMTg3YWM4MjQ4IDEwMDY0NAot
-LS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9jbXB4Y2hnXzY0LmgKKysrIGIvYXJjaC94ODYvaW5j
-bHVkZS9hc20vY21weGNoZ182NC5oCkBAIC0xOSw2ICsxOSwxMiBAQCBzdGF0aWMgaW5saW5lIHZv
-aWQgc2V0XzY0Yml0KHZvbGF0aWxlIHU2NCAqcHRyLCB1NjQgdmFsKQogCWFyY2hfY21weGNoZ19s
-b2NhbCgocHRyKSwgKG8pLCAobikpOwkJCQlcCiB9KQogCisjZGVmaW5lIGFyY2hfdHJ5X2NtcHhj
-aGc2NChwdHIsIHBvLCBuKQkJCQkJXAorKHsJCQkJCQkJCQlcCisJQlVJTERfQlVHX09OKHNpemVv
-ZigqKHB0cikpICE9IDgpOwkJCQlcCisJYXJjaF90cnlfY21weGNoZygocHRyKSwgKHBvKSwgKG4p
-KTsJCQkJXAorfSkKKwogI2RlZmluZSBzeXN0ZW1faGFzX2NtcHhjaGdfZG91YmxlKCkgYm9vdF9j
-cHVfaGFzKFg4Nl9GRUFUVVJFX0NYMTYpCiAKICNlbmRpZiAvKiBfQVNNX1g4Nl9DTVBYQ0hHXzY0
-X0ggKi8KZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS92bXgvcG9zdGVkX2ludHIuYyBiL2FyY2gv
-eDg2L2t2bS92bXgvcG9zdGVkX2ludHIuYwppbmRleCBhYTFmZTkwODVkNzcuLjVjZTE4NWNhYTky
-YyAxMDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3ZteC9wb3N0ZWRfaW50ci5jCisrKyBiL2FyY2gv
-eDg2L2t2bS92bXgvcG9zdGVkX2ludHIuYwpAQCAtMzQsNyArMzQsNyBAQCBzdGF0aWMgaW5saW5l
-IHN0cnVjdCBwaV9kZXNjICp2Y3B1X3RvX3BpX2Rlc2Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQog
-CXJldHVybiAmKHRvX3ZteCh2Y3B1KS0+cGlfZGVzYyk7CiB9CiAKLXN0YXRpYyBpbnQgcGlfdHJ5
-X3NldF9jb250cm9sKHN0cnVjdCBwaV9kZXNjICpwaV9kZXNjLCB1NjQgb2xkLCB1NjQgbmV3KQor
-c3RhdGljIGludCBwaV90cnlfc2V0X2NvbnRyb2woc3RydWN0IHBpX2Rlc2MgKnBpX2Rlc2MsIHU2
-NCAqcG9sZCwgdTY0IG5ldykKIHsKIAkvKgogCSAqIFBJRC5PTiBjYW4gYmUgc2V0IGF0IGFueSB0
-aW1lIGJ5IGEgZGlmZmVyZW50IHZDUFUgb3IgYnkgaGFyZHdhcmUsCkBAIC00Miw3ICs0Miw3IEBA
-IHN0YXRpYyBpbnQgcGlfdHJ5X3NldF9jb250cm9sKHN0cnVjdCBwaV9kZXNjICpwaV9kZXNjLCB1
-NjQgb2xkLCB1NjQgbmV3KQogCSAqIHVwZGF0ZSBtdXN0IGJlIHJldHJpZWQgd2l0aCBhIGZyZXNo
-IHNuYXBzaG90IGFuIE9OIGNoYW5nZSBjYXVzZXMKIAkgKiB0aGUgY21weGNoZyB0byBmYWlsLgog
-CSAqLwotCWlmIChjbXB4Y2hnNjQoJnBpX2Rlc2MtPmNvbnRyb2wsIG9sZCwgbmV3KSAhPSBvbGQp
-CisJaWYgKCF0cnlfY21weGNoZzY0KCZwaV9kZXNjLT5jb250cm9sLCBwb2xkLCBuZXcpKQogCQly
-ZXR1cm4gLUVCVVNZOwogCiAJcmV0dXJuIDA7CkBAIC0xMTEsNyArMTExLDcgQEAgdm9pZCB2bXhf
-dmNwdV9waV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGNwdSkKIAkJICogZGVzY3Jp
-cHRvciB3YXMgbW9kaWZpZWQgb24gInB1dCIgdG8gdXNlIHRoZSB3YWtldXAgdmVjdG9yLgogCQkg
-Ki8KIAkJbmV3Lm52ID0gUE9TVEVEX0lOVFJfVkVDVE9SOwotCX0gd2hpbGUgKHBpX3RyeV9zZXRf
-Y29udHJvbChwaV9kZXNjLCBvbGQuY29udHJvbCwgbmV3LmNvbnRyb2wpKTsKKwl9IHdoaWxlIChw
-aV90cnlfc2V0X2NvbnRyb2wocGlfZGVzYywgJm9sZC5jb250cm9sLCBuZXcuY29udHJvbCkpOwog
-CiAJbG9jYWxfaXJxX3Jlc3RvcmUoZmxhZ3MpOwogCkBAIC0xNjEsNyArMTYxLDcgQEAgc3RhdGlj
-IHZvaWQgcGlfZW5hYmxlX3dha2V1cF9oYW5kbGVyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAog
-CQkvKiBzZXQgJ05WJyB0byAnd2FrZXVwIHZlY3RvcicgKi8KIAkJbmV3Lm52ID0gUE9TVEVEX0lO
-VFJfV0FLRVVQX1ZFQ1RPUjsKLQl9IHdoaWxlIChwaV90cnlfc2V0X2NvbnRyb2wocGlfZGVzYywg
-b2xkLmNvbnRyb2wsIG5ldy5jb250cm9sKSk7CisJfSB3aGlsZSAocGlfdHJ5X3NldF9jb250cm9s
-KHBpX2Rlc2MsICZvbGQuY29udHJvbCwgbmV3LmNvbnRyb2wpKTsKIAogCS8qCiAJICogU2VuZCBh
-IHdha2V1cCBJUEkgdG8gdGhpcyBDUFUgaWYgYW4gaW50ZXJydXB0IG1heSBoYXZlIGJlZW4gcG9z
-dGVkCmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMtaW5zdHJ1bWVudGVk
-LmggYi9pbmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMtaW5zdHJ1bWVudGVkLmgKaW5kZXggNWQ2
-OWIxNDNjMjhlLi43YTEzOWVjMDMwYjAgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvYXRvbWlj
-L2F0b21pYy1pbnN0cnVtZW50ZWQuaAorKysgYi9pbmNsdWRlL2xpbnV4L2F0b21pYy9hdG9taWMt
-aW5zdHJ1bWVudGVkLmgKQEAgLTIwMDYsNiArMjAwNiw0NCBAQCBhdG9taWNfbG9uZ19kZWNfaWZf
-cG9zaXRpdmUoYXRvbWljX2xvbmdfdCAqdikKIAlhcmNoX3RyeV9jbXB4Y2hnX3JlbGF4ZWQoX19h
-aV9wdHIsIF9fYWlfb2xkcCwgX19WQV9BUkdTX18pOyBcCiB9KQogCisjZGVmaW5lIHRyeV9jbXB4
-Y2hnNjQocHRyLCBvbGRwLCAuLi4pIFwKKyh7IFwKKwl0eXBlb2YocHRyKSBfX2FpX3B0ciA9IChw
-dHIpOyBcCisJdHlwZW9mKG9sZHApIF9fYWlfb2xkcCA9IChvbGRwKTsgXAorCWtjc2FuX21iKCk7
-IFwKKwlpbnN0cnVtZW50X2F0b21pY193cml0ZShfX2FpX3B0ciwgc2l6ZW9mKCpfX2FpX3B0cikp
-OyBcCisJaW5zdHJ1bWVudF9hdG9taWNfd3JpdGUoX19haV9vbGRwLCBzaXplb2YoKl9fYWlfb2xk
-cCkpOyBcCisJYXJjaF90cnlfY21weGNoZzY0KF9fYWlfcHRyLCBfX2FpX29sZHAsIF9fVkFfQVJH
-U19fKTsgXAorfSkKKworI2RlZmluZSB0cnlfY21weGNoZzY0X2FjcXVpcmUocHRyLCBvbGRwLCAu
-Li4pIFwKKyh7IFwKKwl0eXBlb2YocHRyKSBfX2FpX3B0ciA9IChwdHIpOyBcCisJdHlwZW9mKG9s
-ZHApIF9fYWlfb2xkcCA9IChvbGRwKTsgXAorCWluc3RydW1lbnRfYXRvbWljX3dyaXRlKF9fYWlf
-cHRyLCBzaXplb2YoKl9fYWlfcHRyKSk7IFwKKwlpbnN0cnVtZW50X2F0b21pY193cml0ZShfX2Fp
-X29sZHAsIHNpemVvZigqX19haV9vbGRwKSk7IFwKKwlhcmNoX3RyeV9jbXB4Y2hnNjRfYWNxdWly
-ZShfX2FpX3B0ciwgX19haV9vbGRwLCBfX1ZBX0FSR1NfXyk7IFwKK30pCisKKyNkZWZpbmUgdHJ5
-X2NtcHhjaGc2NF9yZWxlYXNlKHB0ciwgb2xkcCwgLi4uKSBcCisoeyBcCisJdHlwZW9mKHB0cikg
-X19haV9wdHIgPSAocHRyKTsgXAorCXR5cGVvZihvbGRwKSBfX2FpX29sZHAgPSAob2xkcCk7IFwK
-KwlrY3Nhbl9yZWxlYXNlKCk7IFwKKwlpbnN0cnVtZW50X2F0b21pY193cml0ZShfX2FpX3B0ciwg
-c2l6ZW9mKCpfX2FpX3B0cikpOyBcCisJaW5zdHJ1bWVudF9hdG9taWNfd3JpdGUoX19haV9vbGRw
-LCBzaXplb2YoKl9fYWlfb2xkcCkpOyBcCisJYXJjaF90cnlfY21weGNoZzY0X3JlbGVhc2UoX19h
-aV9wdHIsIF9fYWlfb2xkcCwgX19WQV9BUkdTX18pOyBcCit9KQorCisjZGVmaW5lIHRyeV9jbXB4
-Y2hnNjRfcmVsYXhlZChwdHIsIG9sZHAsIC4uLikgXAorKHsgXAorCXR5cGVvZihwdHIpIF9fYWlf
-cHRyID0gKHB0cik7IFwKKwl0eXBlb2Yob2xkcCkgX19haV9vbGRwID0gKG9sZHApOyBcCisJaW5z
-dHJ1bWVudF9hdG9taWNfd3JpdGUoX19haV9wdHIsIHNpemVvZigqX19haV9wdHIpKTsgXAorCWlu
-c3RydW1lbnRfYXRvbWljX3dyaXRlKF9fYWlfb2xkcCwgc2l6ZW9mKCpfX2FpX29sZHApKTsgXAor
-CWFyY2hfdHJ5X2NtcHhjaGc2NF9yZWxheGVkKF9fYWlfcHRyLCBfX2FpX29sZHAsIF9fVkFfQVJH
-U19fKTsgXAorfSkKKwogI2RlZmluZSBjbXB4Y2hnX2xvY2FsKHB0ciwgLi4uKSBcCiAoeyBcCiAJ
-dHlwZW9mKHB0cikgX19haV9wdHIgPSAocHRyKTsgXApAQCAtMjA0NSw0ICsyMDgzLDQgQEAgYXRv
-bWljX2xvbmdfZGVjX2lmX3Bvc2l0aXZlKGF0b21pY19sb25nX3QgKnYpCiB9KQogCiAjZW5kaWYg
-LyogX0xJTlVYX0FUT01JQ19JTlNUUlVNRU5URURfSCAqLwotLy8gODdjOTc0YjkzMDMyYWZkNDIx
-NDM2MTM0MzRkMWE3Nzg4ZmE1OThmOQorLy8gNzY0Zjc0MWViNzdhN2FkNTY1ZGM4ZDk5Y2UyODM3
-ZDU1NDJlOGFlZQpkaWZmIC0tZ2l0IGEvc2NyaXB0cy9hdG9taWMvZ2VuLWF0b21pYy1pbnN0cnVt
-ZW50ZWQuc2ggYi9zY3JpcHRzL2F0b21pYy9nZW4tYXRvbWljLWluc3RydW1lbnRlZC5zaAppbmRl
-eCA2OGY5MDI3MzFkMDEuLjc3YzA2NTI2YTU3NCAxMDA3NTUKLS0tIGEvc2NyaXB0cy9hdG9taWMv
-Z2VuLWF0b21pYy1pbnN0cnVtZW50ZWQuc2gKKysrIGIvc2NyaXB0cy9hdG9taWMvZ2VuLWF0b21p
-Yy1pbnN0cnVtZW50ZWQuc2gKQEAgLTE2Niw3ICsxNjYsNyBAQCBncmVwICdeW2Etel0nICIkMSIg
-fCB3aGlsZSByZWFkIG5hbWUgbWV0YSBhcmdzOyBkbwogZG9uZQogCiAKLWZvciB4Y2hnIGluICJ4
-Y2hnIiAiY21weGNoZyIgImNtcHhjaGc2NCIgInRyeV9jbXB4Y2hnIjsgZG8KK2ZvciB4Y2hnIGlu
-ICJ4Y2hnIiAiY21weGNoZyIgImNtcHhjaGc2NCIgInRyeV9jbXB4Y2hnIiAidHJ5X2NtcHhjaGc2
-NCI7IGRvCiAJZm9yIG9yZGVyIGluICIiICJfYWNxdWlyZSIgIl9yZWxlYXNlIiAiX3JlbGF4ZWQi
-OyBkbwogCQlnZW5feGNoZyAiJHt4Y2hnfSIgIiR7b3JkZXJ9IiAiIgogCQlwcmludGYgIlxuIgo=
---00000000000047c74f05d708d21d--
+Do you see any reason?
+
+Thanks,
+Stefano
+
