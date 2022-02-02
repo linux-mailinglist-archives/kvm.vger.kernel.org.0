@@ -2,168 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A34D4A7245
-	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 14:53:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DDE44A7263
+	for <lists+kvm@lfdr.de>; Wed,  2 Feb 2022 14:55:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344483AbiBBNxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 08:53:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53212 "EHLO
+        id S236996AbiBBNzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 08:55:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26421 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229738AbiBBNxH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 08:53:07 -0500
+        by vger.kernel.org with ESMTP id S232546AbiBBNzM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Feb 2022 08:55:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643809987;
+        s=mimecast20190719; t=1643810112;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dzs3pmpsecqWwS28UKT/9n4YfyBZy50vlVYoCws6yUE=;
-        b=Z1C4nylYj5BpS6MbkJffKjGwySKJMVJOh5lLnQiJWrOXZChxc47Famx5vV+MgjD3zsVyto
-        N4CJzzOaTuCG2r1gifAanXvsRzcqLhoSKSG18TvjVfqhy9C8CGSH9TKS8aHcIRRtvKKZes
-        enEth73mhdZb6K/nJf/NjpaZsoRU180=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=HLhl4bBPmyrydvFytaTsMCBmf2VczsHEP3qhhK1U8wk=;
+        b=bRqbqVcWtsqviYJqJyoDrpoO4ZlO4Nl906BBxm3w7UEJcWpyv9RKVrmI889IcdFhzJlw6T
+        uQnOzlMuI5lzp9MQB0ziAbscE2NNVJWRC7Lg0ae5UVqfTMYIXil9Ju/D2z/VXi7qR+cdYJ
+        Ix8EcqoMman9shraFFWAONW2H4aeM+k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-380-j-DFgihFO7CxSfwHaKjLVA-1; Wed, 02 Feb 2022 08:53:06 -0500
-X-MC-Unique: j-DFgihFO7CxSfwHaKjLVA-1
-Received: by mail-qt1-f197.google.com with SMTP id l15-20020ac84ccf000000b002cf9424cfa5so15490407qtv.7
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 05:53:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dzs3pmpsecqWwS28UKT/9n4YfyBZy50vlVYoCws6yUE=;
-        b=CemaW2qiR3CTm8tyOFqLsCJKKwam1BHx2zXU8fjmZgmcCkZu0w5CaL7jcpdjpfoYTu
-         AECjivqf3hbwpNa2peNFaUFm1Z5Dy2aZvNLinFtUt+IM0ZYS1jLn0b+DX3KD0lRbCl2T
-         k2WQGpc7ej22kO4Ug/bble2sAyNfmS9ZdoktsjM61C6OAjGrADsnAyicIGbb4x2JFJfX
-         J5PUUVQThh9rUnml4nsiCiCvLypYYPDiCNqTlkX/0Szo4V2lWT9xrM0RZOGzkZGn5luW
-         xK4N1bYx+f74w/+T/GLU10sh4GOyv1uxCLT102yAQiMBD7R/CiwO0m6hyfdmnTjOqVdi
-         9AYQ==
-X-Gm-Message-State: AOAM531M6mJzEVabiVjOt3MVzVq85sTXu5Pxjq4JpFzV08KozoWYVod5
-        vveL+EbyprkYjTNXwiOZao/UVy4UVG3vzEJk1g9Vzkd95ZMGo819+ySjt/3qGF2B/k+dwR3Z5iW
-        Fd1v0L/w1qh5m
-X-Received: by 2002:ad4:5dc4:: with SMTP id m4mr26516017qvh.17.1643809985995;
-        Wed, 02 Feb 2022 05:53:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy97PB6hOF6XRVh0laZSCO/T0ng/aOceXJMUfGN81RQHfwOdZhjN5x8YkGsaZRSWfCtenz6QA==
-X-Received: by 2002:ad4:5dc4:: with SMTP id m4mr26516006qvh.17.1643809985739;
-        Wed, 02 Feb 2022 05:53:05 -0800 (PST)
-Received: from steredhat (host-95-238-125-214.retail.telecomitalia.it. [95.238.125.214])
-        by smtp.gmail.com with ESMTPSA id c14sm10955065qtc.31.2022.02.02.05.53.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Feb 2022 05:53:05 -0800 (PST)
-Date:   Wed, 2 Feb 2022 14:53:00 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3] vhost: cache avail index in vhost_enable_notify()
-Message-ID: <20220202135300.5b366wk35ysqehgm@steredhat>
-References: <20220128094129.40809-1-sgarzare@redhat.com>
- <Yfpnlv2GudpPFwok@stefanha-x1.localdomain>
- <20220202062340-mutt-send-email-mst@kernel.org>
+ us-mta-604-HjeJSL3aPYOu5sR-upDznA-1; Wed, 02 Feb 2022 08:55:11 -0500
+X-MC-Unique: HjeJSL3aPYOu5sR-upDznA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4240484DA40
+        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 13:55:10 +0000 (UTC)
+Received: from virtlab612.virt.lab.eng.bos.redhat.com (virtlab612.virt.lab.eng.bos.redhat.com [10.19.152.52])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F3E1C798D5;
+        Wed,  2 Feb 2022 13:55:09 +0000 (UTC)
+From:   Cathy Avery <cavery@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [kvm-unit-tests v2 PATCH] vmx: Fix EPT accessed and dirty flag test
+Date:   Wed,  2 Feb 2022 08:55:09 -0500
+Message-Id: <20220202135509.3286-1-cavery@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220202062340-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 02, 2022 at 06:24:05AM -0500, Michael S. Tsirkin wrote:
->On Wed, Feb 02, 2022 at 11:14:30AM +0000, Stefan Hajnoczi wrote:
->> On Fri, Jan 28, 2022 at 10:41:29AM +0100, Stefano Garzarella wrote:
->> > In vhost_enable_notify() we enable the notifications and we read
->> > the avail index to check if new buffers have become available in
->> > the meantime.
->> >
->> > We do not update the cached avail index value, so when the device
->> > will call vhost_get_vq_desc(), it will find the old value in the
->> > cache and it will read the avail index again.
->> >
->> > It would be better to refresh the cache every time we read avail
->> > index, so let's change vhost_enable_notify() caching the value in
->> > `avail_idx` and compare it with `last_avail_idx` to check if there
->> > are new buffers available.
->> >
->> > We don't expect a significant performance boost because
->> > the above path is not very common, indeed vhost_enable_notify()
->> > is often called with unlikely(), expecting that avail index has
->> > not been updated.
->> >
->> > We ran virtio-test/vhost-test and noticed minimal improvement as
->> > expected. To stress the patch more, we modified vhost_test.ko to
->> > call vhost_enable_notify()/vhost_disable_notify() on every cycle
->> > when calling vhost_get_vq_desc(); in this case we observed a more
->> > evident improvement, with a reduction of the test execution time
->> > of about 3.7%.
->> >
->> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> > ---
->> > v3
->> > - reworded commit description [Stefan]
->> > ---
->> >  drivers/vhost/vhost.c | 3 ++-
->> >  1 file changed, 2 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->> > index 59edb5a1ffe2..07363dff559e 100644
->> > --- a/drivers/vhost/vhost.c
->> > +++ b/drivers/vhost/vhost.c
->> > @@ -2543,8 +2543,9 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
->> >  		       &vq->avail->idx, r);
->> >  		return false;
->> >  	}
->> > +	vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
->> >
->> > -	return vhost16_to_cpu(vq, avail_idx) != vq->avail_idx;
->> > +	return vq->avail_idx != vq->last_avail_idx;
->> >  }
->> >  EXPORT_SYMBOL_GPL(vhost_enable_notify);
->>
->> This changes behavior (fixes a bug?): previously the function returned
->> false when called with avail buffers still pending (vq->last_avail_idx <
->> vq->avail_idx). Now it returns true because we compare against
->> vq->last_avail_idx and I think that's reasonable.
+If ept_ad is not supported by the processor or has been
+turned off via kvm module param, test_ept_eptp() will
+incorrectly leave EPTP_AD_FLAG set in variable eptp
+causing the following failures of subsequent
+test_vmx_valid_controls calls:
 
-Good catch!
+FAIL: Enable-EPT enabled; reserved bits [11:7] 0: vmlaunch succeeds
+FAIL: Enable-EPT enabled; reserved bits [63:N] 0: vmlaunch succeeds
 
->>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->
->I don't see the behaviour change... could you explain the
->scanario in more detail pls?
+Signed-off-by: Cathy Avery <cavery@redhat.com>
+---
 
-IIUC the behavior is different only when the device calls 
-vhost_enable_notify() with pending buffers (vq->avail_idx != 
-vq->last_avail_idx).
+* Changes in v2:
 
-Let's suppose that driver has not added new available buffers, so value 
-in cache (vq->avail_idx) is equal to the one we read back from the 
-guest, but the device has not consumed all available buffers 
-(vq->avail_idx != vq->last_avail_idx).
+- Initialize vmcs EPTP to good values for page walk len
+  and ept memory type.
+- Restore eptp to known good values from eptp_saved
+- Cleanup test_vmx_vmlaunch to generate clearer and
+  more consolidated test reports.
+  New format suggested by seanjc@google.com
+---
+ x86/vmx_tests.c | 39 +++++++++++++++++++++++----------------
+ 1 file changed, 23 insertions(+), 16 deletions(-)
 
-Now if the device call vhost_enable_notify(), before this patch it 
-returned false, because there are no new buffers added (even if there 
-are some pending), with this patch it returns true, because there are 
-still some pending buffers (vq->avail_idx != vq->last_avail_idx).
-
-IIUC the right behavior should be the one with the patch applied.
-However this difference would be seen only if we call 
-vhost_enable_notify() when vq->avail_idx != vq->last_avail_idx and 
-checking vhost-net, vhost-scsi and vhost-vsock, we use the return value 
-of vhost_enable_notify() only when there are not available buffers, so 
-vq->avail_idx == vq->last_avail_idx.
-
-So I think Stefan is right, but we should never experience the buggy 
-scenario.
-
-it seems that we used to check vq->last_avail_idx but we changed it 
-since commit 8dd014adfea6 ("vhost-net: mergeable buffers support"), 
-honestly I don't understand if it was intended or not.
-
-Do you see any reason?
-
-Thanks,
-Stefano
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 3d57ed6..1269829 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -3392,14 +3392,21 @@ static void test_vmx_vmlaunch(u32 xerror)
+ 	bool success = vmlaunch_succeeds();
+ 	u32 vmx_inst_err;
+ 
+-	report(success == !xerror, "vmlaunch %s",
+-	       !xerror ? "succeeds" : "fails");
+-	if (!success && xerror) {
+-		vmx_inst_err = vmcs_read(VMX_INST_ERROR);
++	if (!success)
++	vmx_inst_err = vmcs_read(VMX_INST_ERROR);
++
++	if (success && !xerror)
++		report_pass("VMLAUNCH succeeded as expected");
++	else if (success && xerror)
++		report_fail("VMLAUNCH succeeded unexpectedly, wanted VM-Fail with error code = %d",
++			    xerror);
++	else if (!success && !xerror)
++		report_fail("VMLAUNCH hit unexpected VM-Fail with error code = %d",
++			    vmx_inst_err);
++	else
+ 		report(vmx_inst_err == xerror,
+-		       "VMX inst error is %d (actual %d)", xerror,
+-		       vmx_inst_err);
+-	}
++		       "VMLAUNCH hit VM-Fail as expected, wanted error code %d, got %d",
++		       xerror, vmx_inst_err);
+ }
+ 
+ /*
+@@ -4707,12 +4714,11 @@ static void test_ept_eptp(void)
+ {
+ 	u32 primary_saved = vmcs_read(CPU_EXEC_CTRL0);
+ 	u32 secondary_saved = vmcs_read(CPU_EXEC_CTRL1);
+-	u64 eptp_saved = vmcs_read(EPTP);
+ 	u32 primary = primary_saved;
+ 	u32 secondary = secondary_saved;
+-	u64 eptp = eptp_saved;
+ 	u32 i, maxphysaddr;
+ 	u64 j, resv_bits_mask = 0;
++	u64 eptp_saved, eptp;
+ 
+ 	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
+ 	    (ctrl_cpu_rev[1].clr & CPU_EPT))) {
+@@ -4720,6 +4726,9 @@ static void test_ept_eptp(void)
+ 		return;
+ 	}
+ 
++	setup_dummy_ept();
++	eptp = eptp_saved = vmcs_read(EPTP);
++
+ 	/* Support for 4-level EPT is mandatory. */
+ 	report(is_4_level_ept_supported(), "4-level EPT support check");
+ 
+@@ -4742,8 +4751,7 @@ static void test_ept_eptp(void)
+ 			test_vmx_invalid_controls();
+ 		report_prefix_pop();
+ 	}
+-
+-	eptp = (eptp & ~EPT_MEM_TYPE_MASK) | 6ul;
++	eptp = eptp_saved;
+ 
+ 	/*
+ 	 * Page walk length (bits 5:3).  Note, the value in VMCS.EPTP "is 1
+@@ -4762,9 +4770,7 @@ static void test_ept_eptp(void)
+ 			test_vmx_invalid_controls();
+ 		report_prefix_pop();
+ 	}
+-
+-	eptp = (eptp & ~EPTP_PG_WALK_LEN_MASK) |
+-	    3ul << EPTP_PG_WALK_LEN_SHIFT;
++	eptp = eptp_saved;
+ 
+ 	/*
+ 	 * Accessed and dirty flag (bit 6)
+@@ -4784,6 +4790,7 @@ static void test_ept_eptp(void)
+ 		eptp |= EPTP_AD_FLAG;
+ 		test_eptp_ad_bit(eptp, false);
+ 	}
++	eptp = eptp_saved;
+ 
+ 	/*
+ 	 * Reserved bits [11:7] and [63:N]
+@@ -4802,8 +4809,7 @@ static void test_ept_eptp(void)
+ 			test_vmx_invalid_controls();
+ 		report_prefix_pop();
+ 	}
+-
+-	eptp = (eptp & ~(EPTP_RESERV_BITS_MASK << EPTP_RESERV_BITS_SHIFT));
++	eptp = eptp_saved;
+ 
+ 	maxphysaddr = cpuid_maxphyaddr();
+ 	for (i = 0; i < (63 - maxphysaddr + 1); i++) {
+@@ -4822,6 +4828,7 @@ static void test_ept_eptp(void)
+ 			test_vmx_invalid_controls();
+ 		report_prefix_pop();
+ 	}
++	eptp = eptp_saved;
+ 
+ 	secondary &= ~(CPU_EPT | CPU_URG);
+ 	vmcs_write(CPU_EXEC_CTRL1, secondary);
+-- 
+2.31.1
 
