@@ -2,51 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEFE34A8A59
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:42:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B9B794A8A5A
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:42:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241397AbiBCRmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 12:42:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46542 "EHLO
+        id S1352975AbiBCRmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 12:42:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232712AbiBCRmD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Feb 2022 12:42:03 -0500
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64EFBC061714
-        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 09:42:03 -0800 (PST)
-Received: by mail-il1-x14a.google.com with SMTP id y18-20020a92c752000000b002bc083421e7so2153754ilp.13
-        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 09:42:03 -0800 (PST)
+        with ESMTP id S241501AbiBCRmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 12:42:04 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1375C061714
+        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 09:42:04 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id e130-20020a255088000000b006126feb051eso7221527ybb.18
+        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 09:42:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=wtbaMJAcQnUO9qTorbz70eUVIMRxM9RIgak6LcFUBbE=;
-        b=iWNSw66HK3xFVyVWo/nsSDvNahYyh+8iHQJGXCfl3MJyq2KHy6SMvZSRDHo7jjcsa6
-         aT/A4CoJClWOCyEsZ47ZyfOsfXa3mo2Zhq3huMk2v7GZ4Gbbd61Yr1kmKtsZ6G8rtpHp
-         9GhIdFPv67wk8HcMhQMhIXwyFx8eIq5z5rajhIq70WXQFf3Y0XVPvFPY44cFKQVm1Iz8
-         /mEUwV2WwvfAsZKWlqtuBOZstP64tAw4+ra1wS5tfyeKHuTxxMkhb3O7Uvwa7fP0N+xg
-         KMOxGB7rNY9eiz1+5dM25v5H9+y2stts4LjSN1YbGzmUAcyuAWCsKZ2d1Ot39Df9oQEf
-         I5Bg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=x5tD24Fm1rwvMTOsASLM22AFSW2OawoOEHLwGQ9pDuc=;
+        b=VqO8XHbAyLJ2tZ/5GGV07Lv8+Otgp2b4HXEJpAWIswlWiwrdoqvi8vWs6wFL2jgD0n
+         1Vej2KnZwNkNolZRflQhj+s0T1pg1WdwwIG+rGLP4BTyf/T08T7yN7C4SIaEdslOEPoI
+         KKf+gUUGANaBn05ZhcDUO5b6rLCjXe/hkWpQtHlL1Aibo1be2J3Z8aHKvtJvw/TqstNU
+         90SNgQ/dORslJNj3zwhSpWq3eer+0sllJSQ0Pfcu13cOXXr0Ps6siAOA/t65GUPkRzMX
+         h0LgAjLbVvmwKg0CIovvOg5CKRhNrja/c3DzkWvXZDDY+pDaV3lqb36AM28U9Nx04Tdp
+         XSwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=wtbaMJAcQnUO9qTorbz70eUVIMRxM9RIgak6LcFUBbE=;
-        b=Hkaj/Y7+hkDDYGO6kRllzLTurAJlGLSKktuLXgWFj1FkOnmqOpg1vPWCOF0CD5JSzl
-         qECHWz9+2kKbGkpiUHMFEkttCxOgtN+GvWSuPdJ9KgJ81vxUSQMttI51y/A8/RhQCpVN
-         lxQWfIHvXa4A/nQITkNTR9ljGyQnmZZ0nWdWHtcsj3yQs99EVak+UvIsfQVIOu1l4GLX
-         WmhAnH+a/pOoybxWdTXKDL+pi0MnhMOwoIq0qOilO/pOGZU1oLr8kUDtALRdvSL4MIvg
-         yU3rME1arwFe+KY4sA3Ko2uSemdCz+/mElybABMRGplyUmsoeE6GJ6KrFCf9kbv3TI6i
-         ObDA==
-X-Gm-Message-State: AOAM532IvqyN+v55jOPPUFoC7gsVjHl6dHhHWhNg6WfEiUXO1WBwsPOv
-        1wSUM4SRlKIZ0egRxDzKliM/wrGfkcc=
-X-Google-Smtp-Source: ABdhPJyjGwifMCspxAbvAxARlfmTo1KqwjLTOFFoUnnZSSU36ffXdntHhtr3u0pDpdD2d1Wz/BXGRIOMtWM=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=x5tD24Fm1rwvMTOsASLM22AFSW2OawoOEHLwGQ9pDuc=;
+        b=UwHqzoMKBCeaLaydWfDCwfxEcxkCX6ACtVP373JjoSykkd45YtdOOTnipVC4a03DRk
+         wPhsUaa4y0e9raHxZhu4/etOJLAbcX7tWxeaKQRDO0oJBdS/XlUST3d4w6GJ6ml9c9PW
+         9XO9mx3k2IKeEPXHSi+JQ9MJCt84YTqGipOxv9g/I7Ci7dzMl76Oew8t6SvGUFFGjR1h
+         eW7xaMtVPdCpXRha5mYMDhiP4O7mmonyakc4ev65UiVXuz5spZxSQxQfkGwDN2xg0sTf
+         QP+eKQnWsJFKOTW1e8h4ZvJXsa5A3aRoNPZMRTEWa3aYc/HxRMuzxj0tnYNy/oh+YWwl
+         09wQ==
+X-Gm-Message-State: AOAM530XIln5OmqGCK3PBNvIjtLHyx3y/CcazZwYbywbYCQJUKeuqAd/
+        l5sMIuoxyq2Ojpxt6huYD75YwElmDi8=
+X-Google-Smtp-Source: ABdhPJzjipG+LZdF5GKOtsltb9S8zXEjr6pV/0RmHZ+YGaUkd3Q7Jy3LB0RxNWMlPEsYdiA5+sBM+SojxyY=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a02:83c1:: with SMTP id j1mr18511925jah.185.1643910122833;
- Thu, 03 Feb 2022 09:42:02 -0800 (PST)
-Date:   Thu,  3 Feb 2022 17:41:53 +0000
-Message-Id: <20220203174159.2887882-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a0d:c7c6:: with SMTP id j189mr5174886ywd.395.1643910123903;
+ Thu, 03 Feb 2022 09:42:03 -0800 (PST)
+Date:   Thu,  3 Feb 2022 17:41:54 +0000
+In-Reply-To: <20220203174159.2887882-1-oupton@google.com>
+Message-Id: <20220203174159.2887882-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20220203174159.2887882-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH v5 0/6] KVM: arm64: Emulate the OS Lock
+Subject: [PATCH v5 1/6] KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -65,56 +69,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM does not implement the debug architecture to the letter of the
-specification. One such issue is the fact that KVM treats the OS Lock as
-RAZ/WI, rather than emulating its behavior on hardware. This series adds
-emulation support for the OS Lock to KVM. Emulation is warranted as the
-OS Lock affects debug exceptions taken from all ELs, and is not limited
-to only the context of the guest.
+Writes to OSLSR_EL1 are UNDEFINED and should never trap from EL1 to
+EL2, but the kvm trap handler for OSLSR_EL1 handles writes via
+ignore_write(). This is confusing to readers of code, but should have
+no functional impact.
 
-The 1st patch is a correctness fix for the OSLSR register, ensuring
-the trap handler actually is written to suggest WO behavior. Note that
-the changed code should never be reached on a correct implementation, as
-hardware should generate the undef, not KVM.
+For clarity, use write_to_read_only() rather than ignore_write(). If a
+trap is unexpectedly taken to EL2 in violation of the architecture, this
+will WARN_ONCE() and inject an undef into the guest.
 
-The 2nd patch adds the necessary context to track guest values of the
-OS Lock bit and exposes the value to userspace for the sake of
-migration.
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+[adopted Mark's changelog suggestion, thanks!]
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The 3rd patch makes the OSLK bit writable in OSLAR_EL1 (from the guest)
-and OSLSR_EL1 (from userspace), but does nothing with its value.
-
-The 4th patch actually implements the OS Lock behavior, disabling all
-debug exceptions (except breakpoint instructions) from the perspective
-of the guest. This is done by disabling MDE and SS in MDSCR_EL1.
-
-The 5th patch asserts that OSLSR_EL1 is exposed by KVM to userspace
-through the KVM_GET_REG_LIST ioctl. Lastly, the 6th patch asserts that
-no debug exceptions are routed to the guest when the OSLK bit is set.
-
-With this series a new register is exposed to userspace: OSLSR_EL1.
-Since the register was not exposed to userspace before, changes to
-register mutability do not have ABI breakage implications.
-
-This series applies cleanly to 5.17-rc2. Tested on an Ampere Altra
-machine with the included selftests patches.
-
-Oliver Upton (6):
-  KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
-  KVM: arm64: Stash OSLSR_EL1 in the cpu context
-  KVM: arm64: Allow guest to set the OSLK bit
-  KVM: arm64: Emulate the OS Lock
-  selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
-  selftests: KVM: Test OS lock behavior
-
- arch/arm64/include/asm/kvm_host.h             |  5 ++
- arch/arm64/include/asm/sysreg.h               |  8 ++
- arch/arm64/kvm/debug.c                        | 26 ++++++-
- arch/arm64/kvm/sys_regs.c                     | 74 ++++++++++++++-----
- .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++-
- .../selftests/kvm/aarch64/get-reg-list.c      |  1 +
- 6 files changed, 149 insertions(+), 23 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4dc2fba316ff..85208acd273d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -292,7 +292,7 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+ 			   const struct sys_reg_desc *r)
+ {
+ 	if (p->is_write) {
+-		return ignore_write(vcpu, p);
++		return write_to_read_only(vcpu, p, r);
+ 	} else {
+ 		p->regval = (1 << 3);
+ 		return true;
 -- 
 2.35.0.263.gb82422642f-goog
 
