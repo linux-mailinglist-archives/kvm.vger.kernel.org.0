@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 919524A7CFC
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 01:42:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A10524A7CFF
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 01:45:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348325AbiBCAmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 19:42:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42170 "EHLO
+        id S1348580AbiBCAo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 19:44:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239535AbiBCAmr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 19:42:47 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93DBC061714
-        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 16:42:46 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id a25so1521018lji.9
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 16:42:46 -0800 (PST)
+        with ESMTP id S239535AbiBCAo5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 19:44:57 -0500
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A62C061714
+        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 16:44:57 -0800 (PST)
+Received: by mail-lj1-x22b.google.com with SMTP id a25so1526515lji.9
+        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 16:44:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=I2CsW9/j6pAQT4zpRdG/Us4Mcz0r6Z0MURHErX6HpdY=;
-        b=fVdg4kYrU1FavbvOflnpSPP9TRB0Pm87i0+knebqn7IOQR8NNFBPWYAnHP1tDXCHoH
-         OMaywCKC/49JncJMXXUYNuFSXHa8ma+7sBSUrffR73r8p3OaWTxS0OP5aybohex03SFV
-         uVd7cO8/ba3czttGI1x5yRTph5nBSEE/mwxSMa7b+meETMmVb3qsRBWAnwyYvpZmX7yp
-         XYDQsXzZ4xzPhJbbKF5799qP7HjK3ItAPjPy3UMBB/KA6mzLFP8W25NCzGNv9Yfx+IkL
-         +mjGTUB6HdZ1fHZKy17ItpIl7FFiGocAOHt08gcZ2lN5TERaBXEt5eHnKHqojmMdZiOa
-         +l8g==
+        bh=Clr9DnpK5X9QbR4waWDD/RDesC1yIr9sPjUEQqYA5FU=;
+        b=dn2pQKQ6ISt1FIjtoJenVCQokscckXaDQEInIdRoMoBYebBTemXHdrQPZ+upUNgcHh
+         LKxIp7wUf8axAQMAKC5VXB+fEjsovqF/1Mv7Lupk3wNJFZOkCDaRom4aonn06PEi9T7X
+         eDLMhoYvBahIt+z9IC3xl3wgR2cjIl21xTaQTj0bZyV1TFWKtK5kebUbH2imDQuBvEz6
+         mh/FCG4DH2Q6zVz4o617gup9++Ru4pRwW11FYniv6274XWmUOZVMIj0RbQ0Fy1djiW8n
+         MPpa69Ww34SZOHhPKf0R1QHbYW603+cqdJh2aovWfqHoXwLZWQzWkEY6ZiK4rl9JLkEo
+         +naA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=I2CsW9/j6pAQT4zpRdG/Us4Mcz0r6Z0MURHErX6HpdY=;
-        b=okCMQb2NbE+5d+1VFpuDJDLXooe3nnLMyOEIDqTRJsCEq9spBHTm8iP8na6d7Kn7mp
-         neMIT0tSndlceVhsLde3Rcvol8aXtF2hh0Z/k5UI54WerNNVo2DiuPAI4GIx+q7bZRJP
-         8HAOxpxIdc5BFxZ4FdiisVX1SctRUcDmk2pdyyd+QO6J3CH03OpJsZyIBgv6daDyVpdG
-         GXZ2OTRWz38RysiCGub98HTpCFPoobpwhEg7DsGNNWxPqN2l4VWGgQlWL+SXAy07ivdv
-         O+EzNrz8ImtOtl/SJml/B6bWgUgYflY3j+JiFQVOfPYqU4f7n6FPo5LIQJz8qtB3LbVG
-         0PQg==
-X-Gm-Message-State: AOAM530I+XZTcXwOmXuaTIzC7Y1MgN/YbyzTjLKWmTO4vGOdw2aV4KB2
-        EEt/SF8NVrj/vZ+2eKcaCrG0HrmzCpEbTcG1SXGCYMYz5vxJfw==
-X-Google-Smtp-Source: ABdhPJyQQFUSvoArlXwiH6UrgffD/R+p/zrXNa14YiGbHk+A9GFczRLel3nWKF27JkhKJUJPAwwvZZfvxu3tA+C2oM4=
-X-Received: by 2002:a05:651c:108:: with SMTP id a8mr22282085ljb.479.1643848964879;
- Wed, 02 Feb 2022 16:42:44 -0800 (PST)
+        bh=Clr9DnpK5X9QbR4waWDD/RDesC1yIr9sPjUEQqYA5FU=;
+        b=ZXO9afXV1nnS0a2tol1RKZpGaTqC1L+3KLSaWtwc7OycCMc41lnqVirKhrfWKnAk9G
+         Rk5WpDFbSeL37rObQl6R5lw/9HlWvAR3uVaGGYO/9Ucknxp1HwQT9RBOokaV5uGYMR/k
+         H4/kiEvO4PJaY1zwfsXnwfNEs04Az9yXTdnJtt+tmMDB/zj3/1zxuvNGAa9/SKqbm4sl
+         nTzVuquHkw5sszCqOaR4WSAKgoMTp5KbrAauDz0zySSKiDXn6ZMTq73ePnH8uVNnHoFw
+         hUhvPJ9goMxdbUKs4jeP7/ecMXjQJEO69p6KxG93b11FcPwkg6KujsvH0d4jr4IjmFnJ
+         VphA==
+X-Gm-Message-State: AOAM531yUb6w8b9JMtYClZdzWE+6ailo7PLbca3kygE9QWWzwzvjkXqu
+        aulPtQ211msWnkKxS83iaPbK1yCODGTaaT3/Y2ND1w==
+X-Google-Smtp-Source: ABdhPJyF3ok0L0G7HS4CKFMuzTQGAfy189ohIrhpT2oVqWWr/a+A29hpIfjphxYoVXrdxccq1KbZ7oChvFkqyutTpF8=
+X-Received: by 2002:a2e:b058:: with SMTP id d24mr14259180ljl.374.1643849095513;
+ Wed, 02 Feb 2022 16:44:55 -0800 (PST)
 MIME-Version: 1.0
 References: <20220202230433.2468479-1-oupton@google.com> <CALMp9eRotJRKXwPp=kVdfDjGBkqMJ+6wM+N=-7WnN7yr-azvxQ@mail.gmail.com>
- <Yfsi2dSZ6Ga3SnIh@google.com>
-In-Reply-To: <Yfsi2dSZ6Ga3SnIh@google.com>
+ <Yfsi2dSZ6Ga3SnIh@google.com> <CALMp9eRDickv-1FYvWTMpoowde=QG+Ar4VUg77XsHgwgzBtBTg@mail.gmail.com>
+In-Reply-To: <CALMp9eRDickv-1FYvWTMpoowde=QG+Ar4VUg77XsHgwgzBtBTg@mail.gmail.com>
 From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 2 Feb 2022 16:42:33 -0800
-Message-ID: <CAOQ_Qsiv=QqKGr4H2dP30DEozzvmSpa1SLjX8T5vhSfv=gTy3g@mail.gmail.com>
+Date:   Wed, 2 Feb 2022 16:44:44 -0800
+Message-ID: <CAOQ_Qsh8ND+yGjum+qBeBCn7RCaLjfVdgh+hQHcD-7HTWiuygg@mail.gmail.com>
 Subject: Re: [PATCH 0/4] KVM: nVMX: Fixes for VMX capability MSR invariance
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -62,48 +62,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 2, 2022 at 4:33 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Feb 2, 2022 at 4:38 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> On Wed, Feb 02, 2022, Jim Mattson wrote:
-> > On Wed, Feb 2, 2022 at 3:04 PM Oliver Upton <oupton@google.com> wrote:
-> > >
-> > > Ultimately, it is the responsibility of userspace to configure an
-> > > appropriate MSR value for the CPUID it provides its guest. However,
-> > > there are a few bits in VMX capability MSRs where KVM intervenes. The
-> > > "load IA32_PERF_GLOBAL_CTRL", "load IA32_BNDCFGS", and "clear
-> > > IA32_BNDCFGS" bits in the VMX VM-{Entry,Exit} control capability MSRs
-> > > are updated every time userspace sets the guest's CPUID. In so doing,
-> > > there is an imposed ordering between ioctls, that userspace must set MSR
-> > > values *after* setting the guest's CPUID.
+> On Wed, Feb 2, 2022 at 4:33 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
-> >  Do you mean *before*?
+> > On Wed, Feb 02, 2022, Jim Mattson wrote:
+> > > On Wed, Feb 2, 2022 at 3:04 PM Oliver Upton <oupton@google.com> wrote:
+> > > >
+> > > > Ultimately, it is the responsibility of userspace to configure an
+> > > > appropriate MSR value for the CPUID it provides its guest. However,
+> > > > there are a few bits in VMX capability MSRs where KVM intervenes. The
+> > > > "load IA32_PERF_GLOBAL_CTRL", "load IA32_BNDCFGS", and "clear
+> > > > IA32_BNDCFGS" bits in the VMX VM-{Entry,Exit} control capability MSRs
+> > > > are updated every time userspace sets the guest's CPUID. In so doing,
+> > > > there is an imposed ordering between ioctls, that userspace must set MSR
+> > > > values *after* setting the guest's CPUID.
+> > >
+> > >  Do you mean *before*?
+> >
+> > No, after, otherwise the CPUID updates will override the MSR updates.
 >
-> No, after, otherwise the CPUID updates will override the MSR updates.
->
-> MSR_IA32_FEAT_CTL has this same issue.  But that mess also highlights an issue
-> with this series: if userspace relies on KVM to do the updates, it will break the
-> existing ABI, e.g. I'm pretty sure older versions of QEMU rely on KVM to adjust
-> the MSRs.
+> Wasn't that the intention behind this code in the first place (to
+> override KVM_SET_MSR based on CPUID bits)? If not, what was the
+> intention behind this code?
 
-I realize I failed to add a note about exactly this in the cover
-letter. It seems, based on the commit 5f76f6f5ff96 ("KVM: nVMX: Do not
-expose MPX VMX controls when guest MPX disabled") we opted to handle
-the VMX capability MSR in-kernel rather than expecting userspace to
-pick a sane value that matches the set CPUID. So what really has
-become ABI here? It seems as though one could broadly state that KVM
-owns VMX VM-{Entry,Exit} control MSRs without opt-in, or narrowly
-assert that only the bits in this series are in fact ABI.
-
-Regardless, since we must uphold this misbehavior as ABI, we have a
-regression since KVM doesn't override the MSR write if it comes after
+Suppose a VMM desperately wants to hide the "load
+IA32_PERF_GLOBAL_CTRL" bits, in spite of providing a supporting vPMU.
+The only way to do so at the moment is to write the control MSR after
 the CPUID write.
-
-> I agree that KVM should keep its nose out of this stuff, especially since most
-> VMX controls are technically not architecturally tied to CPUID.  But we probably
-> need an opt-in from userspace to stop mucking with the MSRs.
-
-Bleh, I wanted to avoid the age-old problem of naming, but alas...
-
---
-Thanks,
-Oliver
