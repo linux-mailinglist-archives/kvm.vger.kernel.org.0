@@ -2,136 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 482904A89F7
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:27:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6AD44A8A30
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:36:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239705AbiBCR1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 12:27:06 -0500
-Received: from foss.arm.com ([217.140.110.172]:59428 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344988AbiBCR1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Feb 2022 12:27:04 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B00A7147A;
-        Thu,  3 Feb 2022 09:27:03 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B4983F40C;
-        Thu,  3 Feb 2022 09:27:00 -0800 (PST)
-Date:   Thu, 3 Feb 2022 17:27:17 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
-        miguel.luis@oracle.com, kernel-team@android.com
-Subject: Re: [PATCH v6 19/64] KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and
- VBAR_EL1 from virtual EL2
-Message-ID: <YfwQB/jnlxYpYrBg@monolith.localdoman>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-20-maz@kernel.org>
+        id S1352884AbiBCReE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 12:34:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44532 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231171AbiBCReD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 12:34:03 -0500
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947FEC06173B
+        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 09:34:02 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id u15so6473896wrt.3
+        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 09:34:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c53te4gb4gbQ2BA9zEe7ibUShf/XoqZxMo0RjmKCsS4=;
+        b=PR/a8+x78qbvbyaHDAU3p5hE/7/RoI+gQzvv1o2U09FLV+kWLGCNNZ2fVy4y4j+qnX
+         Q+y8lLK3rZxA3bMRX+y/XjfwazG4/ulNOMg/rZqoNRJV2UAfn7K1skGS4YVhXrIaBUdJ
+         zaCBmsbQARI910hgblR2GJkNV6y/yimrKnjp+pAZuzkXx9J9JsF15eFxGjzIHvSJ5k4G
+         WZ9U2Hhtvz7mgodvtg1ir5vdp7jt7pinWUDqN+RpCiaKCwMSVjqIBYLUKXK4r+KXKoFB
+         8enYxo0LoQr+p3anbqvtABuh9EydkrwzM/lB6fuwd326H3xgiaKnTfomOAdYrUI6OK5q
+         jaAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c53te4gb4gbQ2BA9zEe7ibUShf/XoqZxMo0RjmKCsS4=;
+        b=TcpOgkqvD2lSKa/oWi6qbsNs9q9XRPkYJSmtjUc/cUg8XUBAUywjVtSrM8UxBsWvcb
+         1XqDJ4fpXGvqwj5fY68FyaGJDdwL7sY9hwhhfZNwE3cs6wmNpMOgNUFqbWZMPmTSM0la
+         ad2J+2k/gYIFpuAhq9+1laLybtn25TcQwHqEwEmBg0xHzvi3pbIeyn6GvrXgqJKnE/dN
+         LzF9k1GtVMliUtmfDQU1FWFFHgEwB8o9apEGts7r2AXIJEhBS5W8uJJMaVXKKu2c+2uW
+         YQfqRjgdkZ2DGNtFSd+0gNWPUFDfIdHcKO5gubdiO2IxEtUnKg4Ji0mIcvXzbl8T++pi
+         mtLg==
+X-Gm-Message-State: AOAM532SiwE/NeEnnj14Ps12MayNSAUEbkUVfNbGB0urNCTfQNQCU7gf
+        B7W4DGcVsTODSA6kmbXFXQ6/3bw//gBFM/7LY3d0Bg==
+X-Google-Smtp-Source: ABdhPJwGA56QJvpioobn/jD2H7dobA3RBTnANrtOSRHF6t4f20TsPoSgNhxAwWkp2B5F9XVj9iHWYdx5ogNKVw2WGhk=
+X-Received: by 2002:a5d:550f:: with SMTP id b15mr19836625wrv.384.1643909641056;
+ Thu, 03 Feb 2022 09:34:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-20-maz@kernel.org>
+References: <20220117085307.93030-1-likexu@tencent.com> <20220117085307.93030-3-likexu@tencent.com>
+ <20220202144308.GB20638@worktop.programming.kicks-ass.net> <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
+In-Reply-To: <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
+From:   David Dunn <daviddunn@google.com>
+Date:   Thu, 3 Feb 2022 09:33:49 -0800
+Message-ID: <CABOYuvZJrBkcr5MCosVtq0+om5=kwcXWcFRNGxDyX_JPwpKubw@mail.gmail.com>
+Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
+ perfmon_event_map[] directly
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Stephane Eranian <eranian@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The previous patch:
+Jim,
 
-"KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2" -> sets the trap
-bits to trap EL1 VM registers.
+I agree.
 
-This patch:
+It seems inevitable that the demands on the vPMU will continue to
+grow.  On the current path, we will keep adding complexity to perf
+until it essentially has a raw MSR interface used by KVM.
 
-"KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2" -> does
-not set the trap bits to trap the registers.
+Your proposal gives a clean separation where KVM notifies perf when
+the PMC will stop counting.  That handles both vPMU and TDX.  And it
+allows KVM to provide the full expressiveness to guests.
 
-Might be worth changing the subject to something like "Add accessors for
-<register list here>" to reflect what the patch does.
+Dave Dunn
 
-Other than that, the patch looks good to me.
+On Wed, Feb 2, 2022 at 2:35 PM Jim Mattson <jmattson@google.com> wrote:
 
-Thanks,
-Alex
-
-On Fri, Jan 28, 2022 at 12:18:27PM +0000, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
-> 
-> For the same reason we trap virtual memory register accesses at virtual
-> EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
-> introduces the HCR_EL2.NV1 bit to be able to trap on those register
-> accesses in EL1. Do not set this bit until the whole nesting support is
-> completed.
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
->  1 file changed, 28 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9d3520f1d17a..4f2bcc1e0c25 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1650,6 +1650,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static bool access_elr(struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_params *p,
-> +		       const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
-> +	else
-> +		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_spsr(struct kvm_vcpu *vcpu,
-> +			struct sys_reg_params *p,
-> +			const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
-> +	else
-> +		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
-> +
-> +	return true;
-> +}
-> +
->  static bool access_spsr_el2(struct kvm_vcpu *vcpu,
->  			    struct sys_reg_params *p,
->  			    const struct sys_reg_desc *r)
-> @@ -1812,6 +1836,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	PTRAUTH_KEY(APDB),
->  	PTRAUTH_KEY(APGA),
->  
-> +	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
-> +	{ SYS_DESC(SYS_ELR_EL1), access_elr},
-> +
->  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
->  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
->  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-> @@ -1859,7 +1886,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
->  	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
->  
-> -	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
-> +	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
->  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
->  
->  	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
-> -- 
-> 2.30.2
-> 
+> Given what's coming with TDX, I wonder if we should just bite the
+> bullet and cede the PMU to the guest while it's running, even for
+> non-TDX guests. That would solve (1) and (2) as well.
