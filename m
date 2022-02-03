@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D5444A7D16
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 02:02:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 682914A7D2C
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 02:03:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348698AbiBCBBZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Feb 2022 20:01:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46264 "EHLO
+        id S1348693AbiBCBB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Feb 2022 20:01:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348682AbiBCBBX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Feb 2022 20:01:23 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D7DC06173B
-        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 17:01:23 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id f35-20020a631f23000000b0035ec54b3bbcso600948pgf.0
-        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 17:01:23 -0800 (PST)
+        with ESMTP id S1348702AbiBCBB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Feb 2022 20:01:26 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE775C06173B
+        for <kvm@vger.kernel.org>; Wed,  2 Feb 2022 17:01:25 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id n9-20020a17090a73c900b001b5cafefa27so802091pjk.2
+        for <kvm@vger.kernel.org>; Wed, 02 Feb 2022 17:01:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=7i2xHlLNvbgpmgwj6zOsmV+bBljQ8N869Z7/+3akjow=;
-        b=e5yDU2i7oo0aPLzbtIWfvKcYXNa8Wis5VQ1ZuaH9yXXH4eaW1pWi7Nv1qrPVjFKNC4
-         NuAP8hYAchLKoKiYmciQ43Qwl+SjfV3DkfPWuP/IybjqTbyE5Ltui56IqKmHcMDgEPcr
-         Zwa/bHwd6WDP6Q3vVnuMo/SOOF0bFPExz6cKgjh5Snv9ZXJfjUPEuqAu5Z+0g5Rl1c2t
-         siHfqO1cyAFl5EfNRJMHdCAhb5mdQzkS+HblGw+R/tmHcLbwC66NZ8WqLZloaGoAky5f
-         +x+K7gr+lA/fVdwZ+N3A/1B3oS+31jy5ksKW9J9dx2SPMhAoGhDsTsDz8ak1WBIfz+up
-         aEaQ==
+        bh=dG8lD0mSLVvxVjmwCeTPEOlVoMVFkHAjpgklC5C2hr0=;
+        b=Tb+hFO3l/tZXXnLRSMyCx+rNoSddClKnj5+cIBYTAX0vggUv5HCtzn+HcKfOhB7MrN
+         xaL3mPzE8ojn/7c0A5nqichAroxT2P6lMZBG61FhbSmQEIF+XngX22mnisK394gW6H0P
+         Tz+W7qoBAa9uLRiHSXLiy4LuBcrlz07C4pcb1Vi+uY6Hb7p3oR2/duOwL343mZiH8K94
+         y5+/HJURWK3eSZM8O+RIk7IfG56TI1Jw7lcDhUO0Qs4HdwdB/1i//tc8jHsIpXrAtNUh
+         r//XLjNrkrIRIANgWt0m2gfIU38w8d64Tj6OPvgwE32/ULqgT88lynZKtItvWdd2JpTO
+         rYHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=7i2xHlLNvbgpmgwj6zOsmV+bBljQ8N869Z7/+3akjow=;
-        b=rtfazsfxrE4nTMVR5zftibau/zx4YVWUoCW1tpOmVPfVGRKOFeJeDX9k0pd/VndoFq
-         O0u0+6mr3cDCdwt1VG99wIQGmlW1+acP0HhyYMpj0QXFzaV1uz4XMHXj1mOmPVZIONrr
-         FNDbPLEAQm6qpZeK8i/+WlM5i2Ka57T7Jn9VKMh4+wMhrr70drC6v61Yg5D2L6V99rQC
-         x6WM10cmalm6ab/AOTvJUuxWzPfgdhYqUJEfwzs0UZJb9xGTTTVnTKalCN6LpB3VAfjC
-         EgTLB/qnEoqtzRS+pIDbRDWfNxAWJg/OMsk3c1eFWtEPCi5JPcrg1ZaMCCrcb4gVEvy+
-         s4Jg==
-X-Gm-Message-State: AOAM532FvApbfCbT1EmqdSsUt1PViVsFemMS9HWiRUnyOiJgPu7b88b6
-        IQSu83gbU+/stTvKlkvUSkK1wseX25/C+g==
-X-Google-Smtp-Source: ABdhPJwmGwymhrQh27IG1a7PzT4ff65krYYHzVi3gmHxg0bR7ciYI/vHfNfGWaJLtL/d03ozRAXYghJ9wNY3aw==
+        bh=dG8lD0mSLVvxVjmwCeTPEOlVoMVFkHAjpgklC5C2hr0=;
+        b=ztw1Rx8xX69zJCjOm3ZaSXOoaPYyOi4cB12V95qK56YPiytLSxboew/kQGAyKgHWUh
+         HHi9wNqlSoMNI+/vKMN+6b5l2cYT1RN0oK3PlFqvY7oNA4RpRz0pez43ky/AAwdDJrbD
+         dcrzqHp49MYy2/RApacdBgcCuAI6Xfo+clwil1W4JLVbjbi1Rcxq+6bf3Q+bgTUiloX+
+         Qi2Oj6qt7y39v6UJb9omtNcs+/r7YY49OJrJ6tFMtDa4jtuAM46FPqGKjrSbn6TMBJh2
+         dXgotj1IJ+Ez7kSBKoUyCXlOuVDqQydQ22PHGShOgOEdY5GmOndUaB29ksjRBI0b5WF9
+         etcA==
+X-Gm-Message-State: AOAM531fdWnjs3mor9rFI7jwFnU6qp9HG3XHNaBRbSii6JlAUr32D5kP
+        fVjelSkxqtvJBaU2J319AolJR6BERR3VIQ==
+X-Google-Smtp-Source: ABdhPJwKB7lDChWUDiVhb8aJ/SmbuUf4xyHtt90S1m7+3fNDfb7XbDiAptxnp2AmDTOh97DW70jPs75bCEElMQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:23ce:: with SMTP id
- g14mr32017877pfc.13.1643850083386; Wed, 02 Feb 2022 17:01:23 -0800 (PST)
-Date:   Thu,  3 Feb 2022 01:00:42 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:903:300d:: with SMTP id
+ o13mr33031316pla.110.1643850085134; Wed, 02 Feb 2022 17:01:25 -0800 (PST)
+Date:   Thu,  3 Feb 2022 01:00:43 +0000
 In-Reply-To: <20220203010051.2813563-1-dmatlack@google.com>
-Message-Id: <20220203010051.2813563-15-dmatlack@google.com>
+Message-Id: <20220203010051.2813563-16-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220203010051.2813563-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.0.rc2.247.g8bbb082509-goog
-Subject: [PATCH 14/23] KVM: x86/mmu: Cache the access bits of shadowed translations
+Subject: [PATCH 15/23] KVM: x86/mmu: Pass access information to make_huge_page_split_spte()
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -69,223 +69,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to split a huge page we need to know what access bits to assign
-to the role of the new child page table. This can't be easily derived
-from the huge page SPTE itself since KVM applies its own access policies
-on top, such as for HugePage NX.
-
-We could walk the guest page tables to determine the correct access
-bits, but that is difficult to plumb outside of a vCPU fault context.
-Instead, we can store the original access bits for each leaf SPTE
-alongside the GFN in the gfns array. The access bits only take up 3
-bits, which leaves 61 bits left over for gfns, which is more than
-enough. So this change does not require any additional memory.
-
-In order to keep the access bit cache in sync with the guest, we have to
-extend FNAME(sync_page) to also update the access bits.
-
-Now that the gfns array caches more information than just GFNs, rename
-it to shadowed_translation.
+Currently make_huge_page_split_spte() assumes execute permissions can be
+granted to any 4K SPTE when splitting huge pages. This is true for the
+TDP MMU but is not necessarily true for the shadow MMU. Huge pages
+mapped by the shadow MMU may be shadowing huge pages that the guest has
+disallowed execute permissions.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/mmu/mmu.c          | 32 +++++++++++++++++++-------------
- arch/x86/kvm/mmu/mmu_internal.h | 15 +++++++++++++--
- arch/x86/kvm/mmu/paging_tmpl.h  |  7 +++++--
- 4 files changed, 38 insertions(+), 18 deletions(-)
+ arch/x86/kvm/mmu/spte.c    | 5 +++--
+ arch/x86/kvm/mmu/spte.h    | 3 ++-
+ arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c371ee7e45f7..f00004c13ccf 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -686,7 +686,7 @@ struct kvm_vcpu_arch {
- 
- 	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
- 	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
--	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
-+	struct kvm_mmu_memory_cache mmu_shadowed_translation_cache;
- 	struct kvm_mmu_memory_cache mmu_page_header_cache;
- 
- 	/*
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ae1564e67e49..e2306a39526a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -719,7 +719,7 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
- 	if (r)
- 		return r;
- 	if (maybe_indirect) {
--		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
-+		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadowed_translation_cache,
- 					       PT64_ROOT_MAX_LEVEL);
- 		if (r)
- 			return r;
-@@ -732,7 +732,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
- {
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
--	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
-+	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_translation_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
- }
- 
-@@ -749,15 +749,17 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
- static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- {
- 	if (!sp->role.direct)
--		return sp->gfns[index];
-+		return sp->shadowed_translation[index].gfn;
- 
- 	return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
- }
- 
--static void kvm_mmu_page_set_gfn(struct kvm_mmu_page *sp, int index, gfn_t gfn)
-+static void kvm_mmu_page_set_gfn_access(struct kvm_mmu_page *sp, int index,
-+					gfn_t gfn, u32 access)
- {
- 	if (!sp->role.direct) {
--		sp->gfns[index] = gfn;
-+		sp->shadowed_translation[index].gfn = gfn;
-+		sp->shadowed_translation[index].access = access;
- 		return;
- 	}
- 
-@@ -1610,14 +1612,14 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- static void __rmap_add(struct kvm *kvm,
- 		       struct kvm_mmu_memory_cache *cache,
- 		       const struct kvm_memory_slot *slot,
--		       u64 *spte, gfn_t gfn)
-+		       u64 *spte, gfn_t gfn, u32 access)
- {
- 	struct kvm_mmu_page *sp;
- 	struct kvm_rmap_head *rmap_head;
- 	int rmap_count;
- 
- 	sp = sptep_to_sp(spte);
--	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
-+	kvm_mmu_page_set_gfn_access(sp, spte - sp->spt, gfn, access);
- 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
- 	rmap_count = pte_list_add(cache, spte, rmap_head);
- 
-@@ -1631,9 +1633,9 @@ static void __rmap_add(struct kvm *kvm,
- }
- 
- static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
--		     u64 *spte, gfn_t gfn)
-+		     u64 *spte, gfn_t gfn, u32 access)
- {
--	__rmap_add(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, slot, spte, gfn);
-+	__rmap_add(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, slot, spte, gfn, access);
- }
- 
- bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-@@ -1694,7 +1696,7 @@ void kvm_mmu_free_sp(struct kvm_mmu_page *sp)
- {
- 	free_page((unsigned long)sp->spt);
- 	if (!sp->role.direct)
--		free_page((unsigned long)sp->gfns);
-+		free_page((unsigned long)sp->shadowed_translation);
- 	kmem_cache_free(mmu_page_header_cache, sp);
- }
- 
-@@ -1731,8 +1733,12 @@ struct kvm_mmu_page *kvm_mmu_alloc_sp(struct kvm_vcpu *vcpu, bool direct)
- 
- 	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-+
-+	BUILD_BUG_ON(sizeof(sp->shadowed_translation[0]) != sizeof(u64));
-+
- 	if (!direct)
--		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
-+		sp->shadowed_translation =
-+			kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadowed_translation_cache);
- 
- 	return sp;
- }
-@@ -1742,7 +1748,7 @@ struct kvm_mmu_page *kvm_mmu_alloc_sp(struct kvm_vcpu *vcpu, bool direct)
-  *
-  * Huge page splitting always uses direct shadow pages since the huge page is
-  * being mapped directly with a lower level page table. Thus there's no need to
-- * allocate the gfns array.
-+ * allocate the shadowed_translation array.
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 20cf9e0d45dd..7cba5cffc240 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -215,7 +215,8 @@ static u64 make_spte_executable(u64 spte)
+  * This is used during huge page splitting to build the SPTEs that make up the
+  * new page table.
   */
- struct kvm_mmu_page *kvm_mmu_alloc_direct_sp_for_split(gfp_t gfp)
+-u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
++u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index,
++			      unsigned int access)
  {
-@@ -2833,7 +2839,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 
- 	if (!was_rmapped) {
- 		WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
--		rmap_add(vcpu, slot, sptep, gfn);
-+		rmap_add(vcpu, slot, sptep, gfn, pte_access);
+ 	u64 child_spte;
+ 	int child_level;
+@@ -243,7 +244,7 @@ u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
+ 		 * When splitting to a 4K page, mark the page executable as the
+ 		 * NX hugepage mitigation no longer applies.
+ 		 */
+-		if (is_nx_huge_page_enabled())
++		if (is_nx_huge_page_enabled() && (access & ACC_EXEC_MASK))
+ 			child_spte = make_spte_executable(child_spte);
  	}
  
- 	return ret;
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index e6bcea5a0aa9..9ee175adcc12 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -30,6 +30,11 @@ extern bool dbg;
- #define INVALID_PAE_ROOT	0
- #define IS_VALID_PAE_ROOT(x)	(!!(x))
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 73f12615416f..c7ccdd5c440d 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -415,7 +415,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+ 	       bool host_writable, u64 *new_spte);
+-u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index);
++u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index,
++			      unsigned int access);
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+ u64 mark_spte_for_access_track(u64 spte);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 34c451f1eac9..02bfbc1bebbe 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1310,7 +1310,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+ 	 * not been linked in yet and thus is not reachable from any other CPU.
+ 	 */
+ 	for (i = 0; i < PT64_ENT_PER_PAGE; i++)
+-		sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i);
++		sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i, ACC_ALL);
  
-+struct shadowed_translation_entry {
-+	u64 access:3;
-+	u64 gfn:56;
-+};
-+
- struct kvm_mmu_page {
  	/*
- 	 * Note, "link" through "spt" fit in a single 64 byte cache line on
-@@ -51,8 +56,14 @@ struct kvm_mmu_page {
- 	gfn_t gfn;
- 
- 	u64 *spt;
--	/* hold the gfn of each spte inside spt */
--	gfn_t *gfns;
-+	/*
-+	 * For indirect shadow pages, caches the result of the intermediate
-+	 * guest translation being shadowed by each SPTE.
-+	 *
-+	 * NULL for direct shadow pages.
-+	 */
-+	struct shadowed_translation_entry *shadowed_translation;
-+
- 	/* Currently serving as active root */
- 	union {
- 		int root_count;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index c533c191925e..703dfb062bf0 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1016,7 +1016,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- }
- 
- /*
-- * Using the cached information from sp->gfns is safe because:
-+ * Using the information in sp->shadowed_translation is safe because:
-  * - The spte has a reference to the struct page, so the pfn for a given gfn
-  *   can't change unless all sptes pointing to it are nuked first.
-  *
-@@ -1090,12 +1090,15 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
- 			continue;
- 
--		if (gfn != sp->gfns[i]) {
-+		if (gfn != sp->shadowed_translation[i].gfn) {
- 			drop_spte(vcpu->kvm, &sp->spt[i]);
- 			flush = true;
- 			continue;
- 		}
- 
-+		if (pte_access != sp->shadowed_translation[i].access)
-+			sp->shadowed_translation[i].access = pte_access;
-+
- 		sptep = &sp->spt[i];
- 		spte = *sptep;
- 		host_writable = spte & shadow_host_writable_mask;
+ 	 * Replace the huge spte with a pointer to the populated lower level
 -- 
 2.35.0.rc2.247.g8bbb082509-goog
 
