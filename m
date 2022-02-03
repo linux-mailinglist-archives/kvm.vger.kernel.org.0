@@ -2,154 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0509E4A7F69
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 07:50:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A48C74A8090
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 09:46:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344910AbiBCGuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 01:50:46 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:57642 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231599AbiBCGuq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Feb 2022 01:50:46 -0500
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 31F5D1EC052A;
-        Thu,  3 Feb 2022 07:50:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1643871040;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=NgVVgxFrnWWDzRBeIt1G+nS4mvlLadpwFtGpi1OsBDY=;
-        b=W7PkXA4BWOfHL2epgzq64IxceglUapTsm9fVBcMxiZeVngOLhvuPVR+DGq/C1Pu2OClb4D
-        mLamS3Mf82FSRYNmXEKHrC7/Lkw3EEJRfL/mxplBkopLWeX0BwQFM6cYmYgg/RlwQWvLDH
-        n23VNqfMU2hBhj/hclxRdcF/wWaAdWQ=
-Date:   Thu, 3 Feb 2022 07:50:35 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 20/43] x86/sev: Use SEV-SNP AP creation to start
- secondary CPUs
-Message-ID: <Yft7O06d+iNPGCuL@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-21-brijesh.singh@amd.com>
+        id S1349561AbiBCIqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 03:46:05 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56754 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229696AbiBCIqD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Feb 2022 03:46:03 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21388Cq6012988
+        for <kvm@vger.kernel.org>; Thu, 3 Feb 2022 08:46:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=NtyTzp0GHMShnM6jdY7BYz7TdRfHqxLfpUbCEy3VRUc=;
+ b=S1hKdFRua1FfVc8iSj+bEEfiRaEkq12456EEjtmSJgl6qw/XO4w+7SGtjq8LUBI4Esry
+ DhyT03PzoN+DtcMLS6ABCovPW/bk9jxHAVTmfgWUHLftHODUxLIy9hz+99stwtamppUf
+ lSBGdYPCoHvirJSFSbOkQNs1Hqf3DJ9QIV3BmfeNRuYdTB6zY3BSiniGT4bsvgEjlq6I
+ hYE/XbEz5fe1VVt+vQspi9TmNLTvbNse2wyjBEokKz8HNokeezawKDRpcZFum4HYGua5
+ DyGwbKvaTxruzRiA+vrRwIaGTI4LvXow5AztfANNZuC3QEGTj5YjXV5P83wPW6K9VjBj Jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dyvexj1t3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 08:46:03 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2138Cnom028610
+        for <kvm@vger.kernel.org>; Thu, 3 Feb 2022 08:46:03 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dyvexj1se-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Feb 2022 08:46:03 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2138bIJ4028873;
+        Thu, 3 Feb 2022 08:46:01 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3dvw79svk3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Feb 2022 08:46:00 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2138jv9d37552406
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 3 Feb 2022 08:45:57 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8BF344204C;
+        Thu,  3 Feb 2022 08:45:57 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E0B142041;
+        Thu,  3 Feb 2022 08:45:57 +0000 (GMT)
+Received: from [9.145.7.4] (unknown [9.145.7.4])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  3 Feb 2022 08:45:57 +0000 (GMT)
+Message-ID: <f8f09670-688b-2b12-f09a-860a9edffd54@linux.ibm.com>
+Date:   Thu, 3 Feb 2022 09:45:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220128171804.569796-21-brijesh.singh@amd.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v1 0/5] s390x: smp: avoid hardcoded CPU
+ addresses
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, seiden@linux.ibm.com
+References: <20220128185449.64936-1-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220128185449.64936-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hWD6YC1FPpiBb1cjYyofOXUHjnv-QtaO
+X-Proofpoint-GUID: UOiEp4-apnnRefB0nByymqlS_SIGwMbA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-03_02,2022-02-01_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 impostorscore=0 phishscore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 bulkscore=0 priorityscore=1501 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202030052
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 11:17:41AM -0600, Brijesh Singh wrote:
-> @@ -822,6 +842,236 @@ void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
->  	pvalidate_pages(vaddr, npages, true);
->  }
->  
-> +static int snp_set_vmsa(void *va, bool vmsa)
-> +{
-> +	u64 attrs;
-> +
-> +	/*
-> +	 * Running at VMPL0 allows the kernel to change the VMSA bit for a page
-> +	 * using the RMPADJUST instruction. However, for the instruction to
-> +	 * succeed it must target the permissions of a lesser privileged
+On 1/28/22 19:54, Claudio Imbrenda wrote:
+> On s390x there are no guarantees about the CPU addresses, except that
+> they shall be unique. This means that in some environments, it's
+> possible that there is no match between the CPU address and its
+> position (index) in the list of available CPUs returned by the system.
 
-"lesser privileged/higher number VMPL level"
+While I support this patch set I've yet to find an environment where 
+this gave me headaches.
 
-so that it is perfectly clear what this means.
+> 
+> This series fixes a small bug in the SMP initialization code, adds a
+> guarantee that the boot CPU will always have index 0, and introduces
+> some functions to allow tests to use CPU indexes instead of using
+> hardcoded CPU addresses. This will allow the tests to run successfully
+> in more environments (e.g. z/VM, LPAR).
 
-> +	 * VMPL level, so use VMPL1 (refer to the RMPADJUST instruction in the
-> +	 * AMD64 APM Volume 3).
-> +	 */
-> +	attrs = 1;
-> +	if (vmsa)
-> +		attrs |= RMPADJUST_VMSA_PAGE_BIT;
-> +
-> +	return rmpadjust((unsigned long)va, RMP_PG_SIZE_4K, attrs);
-> +}
+I'm wondering if we should do it the other way round and make the smp_* 
+functions take a idx instead of a cpu addr. The only instance where this 
+gets a bit ugly is the sigp calls which we would also need to convert.
 
-...
+> Some existing tests are adapted to take advantage of the new
+> functionalities.
+> 
+> Claudio Imbrenda (5):
+>    lib: s390x: smp: add functions to work with CPU indexes
+>    lib: s390x: smp: guarantee that boot CPU has index 0
+>    s390x: smp: avoid hardcoded CPU addresses
+>    s390x: firq: avoid hardcoded CPU addresses
+>    s390x: skrf: avoid hardcoded CPU addresses
+> 
+>   lib/s390x/smp.h |  2 ++
+>   lib/s390x/smp.c | 28 ++++++++++++-----
+>   s390x/firq.c    | 17 +++++-----
+>   s390x/skrf.c    |  8 +++--
+>   s390x/smp.c     | 83 ++++++++++++++++++++++++++-----------------------
+>   5 files changed, 79 insertions(+), 59 deletions(-)
+> 
 
-> +static int wakeup_cpu_via_vmgexit(int apic_id, unsigned long start_ip)
-> +{
-> +	struct sev_es_save_area *cur_vmsa, *vmsa;
-> +	struct ghcb_state state;
-> +	unsigned long flags;
-> +	struct ghcb *ghcb;
-> +	u8 sipi_vector;
-> +	int cpu, ret;
-> +	u64 cr4;
-> +
-> +	/*
-> +	 * SNP-SNP AP creation requires that the hypervisor must support SEV-SNP
-	   ^^^^^^^
-
-See what I mean? :-)
-
-That marketing has brainwashed y'all.
-
-> +	 * feature. The SEV-SNP feature check is already performed, so just check
-> +	 * for the AP_CREATION feature flag.
-> +	 */
-
-Let's clean this one:
-
-	/*
-	 * The hypervisor SNP feature support check has happened earlier, just check
-	 * the AP_CREATION one here.
-	 */
-
-
-> +	if (!(sev_hv_features & GHCB_HV_FT_SNP_AP_CREATION))
-> +		return -EOPNOTSUPP;
-> +
-> +	/*
-> +	 * Verify the desired start IP against the known trampoline start IP
-> +	 * to catch any future new trampolines that may be introduced that
-> +	 * would require a new protected guest entry point.
-> +	 */
-> +	if (WARN_ONCE(start_ip != real_mode_header->trampoline_start,
-> +		      "Unsupported SEV-SNP start_ip: %lx\n", start_ip))
-> +		return -EINVAL;
-> +
-> +	/* Override start_ip with known protected guest start IP */
-> +	start_ip = real_mode_header->sev_es_trampoline_start;
-
-Yah, I'd like to get rid of that ->sev_es_trampoline_start and use the
-normal ->trampoline_start. TDX is introducing a third one even and
-they're all mutually-exclusive u32 values.
-
-...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
