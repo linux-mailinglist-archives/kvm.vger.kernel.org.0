@@ -2,252 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23E3D4A8B2F
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 19:06:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 369144A8B59
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 19:16:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353140AbiBCSGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 13:06:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52518 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353105AbiBCSGT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Feb 2022 13:06:19 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2F4CC06173B
-        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 10:06:18 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id d18so2836172plg.2
-        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 10:06:18 -0800 (PST)
+        id S1353327AbiBCSQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 13:16:03 -0500
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:12263 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353310AbiBCSQA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 13:16:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:reply-to:mime-version
-         :content-transfer-encoding;
-        bh=5t2uJ1SRgWhDPevhVlaoaukHXWnQMBc0kE+r3X/iA4s=;
-        b=X+MS5/s1nZM3grMbUollWC4gHUlMqruvqgbJKiyaU1P2nODRvg+TSDgZ3zwPYdUZIv
-         3to4dgl3ln+iXeJPYMgKV7IBSTPXD66ZQ3IB1cFAC/WTJY+o/FOP5VbVcw7a4ln+bZcW
-         Qq7R68/TT6WECeXRwFxlUTtQwurdlBwfn8RLiuyscgJlEQCr46keKttM/V4nDANk5IP/
-         05hHO9Oo7gwCQ3Bgm7vzZUxkg28yJsr/8cIZeJUSCUkP0fQ91vp1+9D8GieAhQxqk0gE
-         RaSEfh+ipy/wH2UzWRMIAkVDgOzfU7a8ZqwsUf2SrxivsjwYytepI1WtnDoCaZDXdhM5
-         sAQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :mime-version:content-transfer-encoding;
-        bh=5t2uJ1SRgWhDPevhVlaoaukHXWnQMBc0kE+r3X/iA4s=;
-        b=OO29YJ/AaxQTtnysJtHT+HDAbSojtgxFICGqR7iyt13p0FyzTz8u77WqR63m/TZgmp
-         NyVC1mCm6+cBGRliaaJxqCMO1eR50FOaXBifVTHJDZ6jJEioAen2vhhtfrJRVshe1ZwR
-         /UL/ruKlYrDg7I3VZpZc6fYsCeqKzeHqdQBDyf1K+hO9ednjJhMCgQiTvrAUGkR41OX7
-         Hv5Z6Tq3Eapn9wSt6boYmr4yAKAU2NVeHZprosM0Yf7jGzIVrGd2pePmfg6dsw2tHyiY
-         oHpRcggTyujr15c66DgFF5Pamui68/vbiNwbSXZIX9d3IqXaAw71X8ZqEGmUK00j86lc
-         S9eA==
-X-Gm-Message-State: AOAM531+kPxqpDnMgMq5eXZ+MiF+WfaGuaZvxXTWK5kxavz8PMlhOV7Q
-        JSTOxHTPXTeAsUV/OxZtvVbrzA==
-X-Google-Smtp-Source: ABdhPJwQ0Z2ROaabUKQhz/8jClHQ4UvVVbLmF9atxRprOQdKwW1UFrzTZGUH458n23RIgCCo7NS5bg==
-X-Received: by 2002:a17:902:d483:: with SMTP id c3mr37441949plg.141.1643911577266;
-        Thu, 03 Feb 2022 10:06:17 -0800 (PST)
-Received: from localhost.localdomain ([50.39.160.154])
-        by smtp.gmail.com with ESMTPSA id p8sm31563026pfo.41.2022.02.03.10.06.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Feb 2022 10:06:16 -0800 (PST)
-From:   Tadeusz Struk <tadeusz.struk@linaro.org>
-To:     stable@vger.kernel.org
-Cc:     greg@kroah.com, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        kvm@vger.kernel.org, Tadeusz Struk <tadeusz.struk@linaro.org>
-Subject: [PATCH 5.10] KVM: x86: Forcibly leave nested virt when SMM state is toggled
-Date:   Thu,  3 Feb 2022 10:05:50 -0800
-Message-Id: <20220203180550.1167062-1-tadeusz.struk@linaro.org>
-X-Mailer: git-send-email 2.34.1
-Reply-To: YfwUuiOPjiQ2/EH1@kroah.com
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1643912160; x=1675448160;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P04UnRBV76MpDpOOK6q6643kAlnLXt09lfQX/PkSX+E=;
+  b=b5GAs4ypYj4piUVQuEYQ01A1DKTQs3KFxSBReYuERvIvozHkvwLILs28
+   RUn82lsA9zDrVIa7mV/Jnouj0mbbaJtHgv72gIUH64ovMHuhC05PvxAZx
+   gjTYAWJYDhaAj5fLJHg3mVOiYcR6DsLXDLP77uvbXqs+eEdXxIaBJQAig
+   s=;
+X-IronPort-AV: E=Sophos;i="5.88,340,1635206400"; 
+   d="scan'208";a="175354490"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-54a073b7.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 03 Feb 2022 18:15:49 +0000
+Received: from EX13D07EUA003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-54a073b7.us-east-1.amazon.com (Postfix) with ESMTPS id 75E19A28C2;
+        Thu,  3 Feb 2022 18:15:45 +0000 (UTC)
+Received: from dev-dsk-faresx-1b-818bcd8f.eu-west-1.amazon.com (10.43.160.132)
+ by EX13D07EUA003.ant.amazon.com (10.43.165.176) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.28; Thu, 3 Feb 2022 18:15:39 +0000
+From:   Fares Mehanna <faresx@amazon.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+CC:     <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-sgx@vger.kernel.org>,
+        Fares Mehanna <faresx@amazon.de>
+Subject: [PATCH] KVM: VMX: pass TME information to guests
+Date:   Thu, 3 Feb 2022 18:14:32 +0000
+Message-ID: <20220203181432.34911-1-faresx@amazon.de>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.43.160.132]
+X-ClientProxiedBy: EX13D11UWB001.ant.amazon.com (10.43.161.53) To
+ EX13D07EUA003.ant.amazon.com (10.43.165.176)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+Guests running on IceLake have TME-EN disabled in CPUID, and they can't read TME
+related MSRs [IA32_TME_CAPABILITY, IA32_TME_ACTIVATE, IA32_TME_EXCLUDE_MASK,
+IA32_TME_EXCLUDE_BASE].
 
-Commit f7e570780efc5cec9b2ed1e0472a7da14e864fdb upstream.
+So guests don't know if they are running with TME enabled or not.
 
-Please apply it to 5.10.y. It fixes the following syzbot issue:
-Link: https://syzkaller.appspot.com/bug?id=c46ee6f22a68171154cdd9217216b2a02cf4b71c
+In this patch, TME information is passed to the guest if the host has `TME-EN`
+enabled in CPUID and TME MSRs are locked and the exclusion range is disabled.
 
-Forcibly leave nested virtualization operation if userspace toggles SMM
-state via KVM_SET_VCPU_EVENTS or KVM_SYNC_X86_EVENTS.  If userspace
-forces the vCPU out of SMM while it's post-VMXON and then injects an SMI,
-vmx_enter_smm() will overwrite vmx->nested.smm.vmxon and end up with both
-vmxon=false and smm.vmxon=false, but all other nVMX state allocated.
+This will guarantee that hardware supports TME, MSRs are locked, so host can't
+change them and exclusion range is disabled, so TME rules apply on all host
+memory.
 
-Don't attempt to gracefully handle the transition as (a) most transitions
-are nonsencial, e.g. forcing SMM while L2 is running, (b) there isn't
-sufficient information to handle all transitions, e.g. SVM wants access
-to the SMRAM save state, and (c) KVM_SET_VCPU_EVENTS must precede
-KVM_SET_NESTED_STATE during state restore as the latter disallows putting
-the vCPU into L2 if SMM is active, and disallows tagging the vCPU as
-being post-VMXON in SMM if SMM is not active.
+In IA32_TME_CAPABILITY and IA32_TME_ACTIVATE we mask out the reserved bits and
+MKTME related bits.
 
-Abuse of KVM_SET_VCPU_EVENTS manifests as a WARN and memory leak in nVMX
-due to failure to free vmcs01's shadow VMCS, but the bug goes far beyond
-just a memory leak, e.g. toggling SMM on while L2 is active puts the vCPU
-in an architecturally impossible state.
+So in IA32_TME_CAPABILITY, we are passing:
+Bit[0]:  Support for AES-XTS 128-bit encryption algorithm
+Bit[2]:  Support for AES-XTS 256-bit encryption algorithm
+Bit[31]: TME encryption bypass supported
 
-  WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
-  WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
-  Modules linked in:
-  CPU: 1 PID: 3606 Comm: syz-executor725 Not tainted 5.17.0-rc1-syzkaller #0
-  Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-  RIP: 0010:free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
-  RIP: 0010:free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
-  Code: <0f> 0b eb b3 e8 8f 4d 9f 00 e9 f7 fe ff ff 48 89 df e8 92 4d 9f 00
-  Call Trace:
-   <TASK>
-   kvm_arch_vcpu_destroy+0x72/0x2f0 arch/x86/kvm/x86.c:11123
-   kvm_vcpu_destroy arch/x86/kvm/../../../virt/kvm/kvm_main.c:441 [inline]
-   kvm_destroy_vcpus+0x11f/0x290 arch/x86/kvm/../../../virt/kvm/kvm_main.c:460
-   kvm_free_vcpus arch/x86/kvm/x86.c:11564 [inline]
-   kvm_arch_destroy_vm+0x2e8/0x470 arch/x86/kvm/x86.c:11676
-   kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1217 [inline]
-   kvm_put_kvm+0x4fa/0xb00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1250
-   kvm_vm_release+0x3f/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1273
-   __fput+0x286/0x9f0 fs/file_table.c:311
-   task_work_run+0xdd/0x1a0 kernel/task_work.c:164
-   exit_task_work include/linux/task_work.h:32 [inline]
-   do_exit+0xb29/0x2a30 kernel/exit.c:806
-   do_group_exit+0xd2/0x2f0 kernel/exit.c:935
-   get_signal+0x4b0/0x28c0 kernel/signal.c:2862
-   arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:868
-   handle_signal_work kernel/entry/common.c:148 [inline]
-   exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
-   exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:207
-   __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
-   syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
-   do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-   </TASK>
+And in IA32_TME_ACTIVATE, we are passing:
+Bit[0]:   Lock RO
+Bit[1]:   TME Enable RWL
+Bit[2]:   Key select
+Bit[3]:   Save TME key for Standby
+Bit[4:7]: Encryption Algorithm
+Bit[31]:  TME Encryption Bypass Enable
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: <stable@vger.kernel.org>
-Cc: <x86@kernel.org>
-Cc: <kvm@vger.kernel.org>
+However IA32_TME_EXCLUDE_MASK and IA32_TME_EXCLUDE_BASE are read by the guest as
+zero, since we will only pass TME information if the exclusion range is
+disabled.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Tadeusz Struk <tadeusz.struk@linaro.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Those information are helpful for the guest to determine if TME is enabled by
+the BIOS or not.
+
+Signed-off-by: Fares Mehanna <faresx@amazon.de>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/svm/nested.c       | 10 ++++++++--
- arch/x86/kvm/svm/svm.c          |  2 +-
- arch/x86/kvm/svm/svm.h          |  2 +-
- arch/x86/kvm/vmx/nested.c       |  1 +
- arch/x86/kvm/x86.c              |  2 ++
- 6 files changed, 14 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/msr-index.h |  6 ++++++
+ arch/x86/include/asm/processor.h | 14 ++++++++++++++
+ arch/x86/kernel/cpu/intel.c      | 15 +--------------
+ arch/x86/kvm/cpuid.c             | 19 ++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c           | 20 ++++++++++++++++++++
+ 5 files changed, 59 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b1cd8334db11..078494401046 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1285,6 +1285,7 @@ struct kvm_x86_ops {
- };
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 3faf0f97edb1..908aad1a7cad 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -438,6 +438,12 @@
+ #define MSR_RELOAD_PMC0			0x000014c1
+ #define MSR_RELOAD_FIXED_CTR0		0x00001309
  
- struct kvm_x86_nested_ops {
-+	void (*leave_nested)(struct kvm_vcpu *vcpu);
- 	int (*check_events)(struct kvm_vcpu *vcpu);
- 	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
- 	int (*get_state)(struct kvm_vcpu *vcpu,
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f0946872f5e6..23910e6a3f01 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -783,8 +783,10 @@ void svm_free_nested(struct vcpu_svm *svm)
++/* Memory encryption MSRs */
++#define MSR_IA32_TME_CAPABILITY		0x981
++#define MSR_IA32_TME_ACTIVATE		0x982
++#define MSR_IA32_TME_EXCLUDE_MASK	0x983
++#define MSR_IA32_TME_EXCLUDE_BASE	0x984
++
  /*
-  * Forcibly leave nested mode in order to be able to reset the VCPU later on.
-  */
--void svm_leave_nested(struct vcpu_svm *svm)
-+void svm_leave_nested(struct kvm_vcpu *vcpu)
+  * AMD64 MSRs. Not complete. See the architecture manual for a more
+  * complete list.
+diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+index 2c5f12ae7d04..28387ae7277b 100644
+--- a/arch/x86/include/asm/processor.h
++++ b/arch/x86/include/asm/processor.h
+@@ -863,4 +863,18 @@ bool arch_is_platform_page(u64 paddr);
+ #define arch_is_platform_page arch_is_platform_page
+ #endif
+ 
++/* Helpers to access TME_ACTIVATE MSR */
++#define TME_ACTIVATE_LOCKED(x)		((x) & 0x1)
++#define TME_ACTIVATE_ENABLED(x)		((x) & 0x2)
++
++#define TME_ACTIVATE_POLICY(x)		(((x) >> 4) & 0xf)        /* Bits 7:4 */
++#define TME_ACTIVATE_POLICY_AES_XTS_128	0
++
++#define TME_ACTIVATE_KEYID_BITS(x)	(((x) >> 32) & 0xf)     /* Bits 35:32 */
++
++#define TME_ACTIVATE_CRYPTO_ALGS(x)	(((x) >> 48) & 0xffff)    /* Bits 63:48 */
++#define TME_ACTIVATE_CRYPTO_AES_XTS_128	1
++
++#define TME_EXCLUSION_ENABLED(x)	((x) & 0x800) /* Bit 11 */
++
+ #endif /* _ASM_X86_PROCESSOR_H */
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index 8321c43554a1..46ad006089a3 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -14,6 +14,7 @@
+ 
+ #include <asm/cpufeature.h>
+ #include <asm/msr.h>
++#include <asm/processor.h>
+ #include <asm/bugs.h>
+ #include <asm/cpu.h>
+ #include <asm/intel-family.h>
+@@ -492,20 +493,6 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
+ #endif
+ }
+ 
+-#define MSR_IA32_TME_ACTIVATE		0x982
+-
+-/* Helpers to access TME_ACTIVATE MSR */
+-#define TME_ACTIVATE_LOCKED(x)		(x & 0x1)
+-#define TME_ACTIVATE_ENABLED(x)		(x & 0x2)
+-
+-#define TME_ACTIVATE_POLICY(x)		((x >> 4) & 0xf)	/* Bits 7:4 */
+-#define TME_ACTIVATE_POLICY_AES_XTS_128	0
+-
+-#define TME_ACTIVATE_KEYID_BITS(x)	((x >> 32) & 0xf)	/* Bits 35:32 */
+-
+-#define TME_ACTIVATE_CRYPTO_ALGS(x)	((x >> 48) & 0xffff)	/* Bits 63:48 */
+-#define TME_ACTIVATE_CRYPTO_AES_XTS_128	1
+-
+ /* Values for mktme_status (SW only construct) */
+ #define MKTME_ENABLED			0
+ #define MKTME_DISABLED			1
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 28be02adc669..c5a18527f099 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -84,6 +84,22 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 	return NULL;
+ }
+ 
++static bool kvm_tme_supported(void)
++{
++	u64 tme_activation, tme_exclusion;
++
++	if (!feature_bit(TME))
++		return false;
++
++	if (rdmsrl_safe(MSR_IA32_TME_EXCLUDE_MASK, &tme_exclusion))
++		return false;
++	if (rdmsrl_safe(MSR_IA32_TME_ACTIVATE, &tme_activation))
++		return false;
++
++	return TME_ACTIVATE_LOCKED(tme_activation) &&
++		!TME_EXCLUSION_ENABLED(tme_exclusion);
++}
++
+ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ 			   struct kvm_cpuid_entry2 *entries,
+ 			   int nent)
+@@ -508,6 +524,7 @@ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+ 
+ void kvm_set_cpu_caps(void)
  {
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
- 	if (is_guest_mode(&svm->vcpu)) {
- 		struct vmcb *hsave = svm->nested.hsave;
- 		struct vmcb *vmcb = svm->vmcb;
-@@ -1185,7 +1187,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
--		svm_leave_nested(svm);
-+		svm_leave_nested(vcpu);
- 		svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
- 		return 0;
- 	}
-@@ -1238,6 +1240,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
- 	hsave->save = *save;
- 
-+	if (is_guest_mode(vcpu))
-+		svm_leave_nested(vcpu);
-+
- 	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
- 	load_nested_vmcb_control(svm, ctl);
- 	nested_prepare_vmcb_control(svm);
-@@ -1252,6 +1257,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- }
- 
- struct kvm_x86_nested_ops svm_nested_ops = {
-+	.leave_nested = svm_leave_nested,
- 	.check_events = svm_check_nested_events,
- 	.get_nested_state_pages = svm_get_nested_state_pages,
- 	.get_state = svm_get_nested_state,
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 5e1d7396a6b8..b4f4ce5ace6b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -279,7 +279,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- 
- 	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
- 		if (!(efer & EFER_SVME)) {
--			svm_leave_nested(svm);
-+			svm_leave_nested(vcpu);
- 			svm_set_gif(svm, true);
- 
- 			/*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index be74e22b82ea..2c007241fbf5 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -393,7 +393,7 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- 
- int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
- 			 struct vmcb *nested_vmcb);
--void svm_leave_nested(struct vcpu_svm *svm);
-+void svm_leave_nested(struct kvm_vcpu *vcpu);
- void svm_free_nested(struct vcpu_svm *svm);
- int svm_allocate_nested(struct vcpu_svm *svm);
- int nested_svm_vmrun(struct vcpu_svm *svm);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index d5f24a2f3e91..6a4b91b77cde 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6614,6 +6614,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
- }
- 
- struct kvm_x86_nested_ops vmx_nested_ops = {
-+	.leave_nested = vmx_leave_nested,
- 	.check_events = vmx_check_nested_events,
- 	.hv_timer_pending = nested_vmx_preemption_timer_pending,
- 	.get_state = vmx_get_nested_state,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b885063dc393..ab31745c04d0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4390,6 +4390,8 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 				vcpu->arch.hflags |= HF_SMM_MASK;
- 			else
- 				vcpu->arch.hflags &= ~HF_SMM_MASK;
-+
-+			kvm_x86_ops.nested_ops->leave_nested(vcpu);
- 			kvm_smm_changed(vcpu);
- 		}
- 
++	unsigned int f_tme = kvm_tme_supported() ? F(TME) : 0;
+ #ifdef CONFIG_X86_64
+ 	unsigned int f_gbpages = F(GBPAGES);
+ 	unsigned int f_lm = F(LM);
+@@ -565,7 +582,7 @@ void kvm_set_cpu_caps(void)
+ 		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
+ 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+ 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+-		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
++		f_tme | F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
+ 		F(SGX_LC) | F(BUS_LOCK_DETECT)
+ 	);
+ 	/* Set LA57 based on hardware capability. */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index aca3ae2a02f3..f8cbf935cfe0 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1913,6 +1913,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_DEBUGCTLMSR:
+ 		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+ 		break;
++	case MSR_IA32_TME_CAPABILITY:
++		if (!guest_cpuid_has(vcpu, X86_FEATURE_TME))
++			return 1;
++		if (rdmsrl_safe(MSR_IA32_TME_CAPABILITY, &msr_info->data))
++			return 1;
++		msr_info->data &= 0x80000005; /* Bit 0, 2, 31 */
++		break;
++	case MSR_IA32_TME_ACTIVATE:
++		if (!guest_cpuid_has(vcpu, X86_FEATURE_TME))
++			return 1;
++		if (rdmsrl_safe(MSR_IA32_TME_ACTIVATE, &msr_info->data))
++			return 1;
++		msr_info->data &= 0x800000FF; /* Bits [0-7] and Bit 31 */
++		break;
++	case MSR_IA32_TME_EXCLUDE_MASK:
++	case MSR_IA32_TME_EXCLUDE_BASE:
++		if (!guest_cpuid_has(vcpu, X86_FEATURE_TME))
++			return 1;
++		msr_info->data = 0x0;
++		break;
+ 	default:
+ 	find_uret_msr:
+ 		msr = vmx_find_uret_msr(vmx, msr_info->index);
 -- 
-2.34.1
+2.32.0
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
