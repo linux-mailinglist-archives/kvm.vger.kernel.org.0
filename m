@@ -2,176 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4F84A8A45
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:38:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1F024A8989
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:11:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352942AbiBCRiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 12:38:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12790 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352920AbiBCRiS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Feb 2022 12:38:18 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 213GhUKC006797;
-        Thu, 3 Feb 2022 17:38:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=UH8KPZHWVL/SjLef9PLK9/+V9aDWQdeyPcNJOCWgfas=;
- b=HWjdkOZ5Hop3y2XlWFHrw7f0uuJd+9XTqTTMHzwK4wbh2r3Xrtlf9rHUmN0GANslA/uS
- bjevYXbO1ISXaM1UN0afUn3LaFk+Ew52ABzM+DukECD26imJG2OU91SY9cYvv2dDTZfW
- AjAE0WULsA6hozuHPtMQ2C1/8h7axnESWQkhNKng0ykDBdvtVekvyaaaARD0PMMlkMrk
- XirhKR+tyshreF5vzHC10g86JbxctFK9x0BlovfNOoiaZd7q3HcBWUIDtvF1O6FOIMc3
- iPCxKYU0w4md1VcynMLGwC0FVDOGctVTIdj9bGkSQVkYod7MOtvcxZlcjHVspcL2wOTN qQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dyygrg8h5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Feb 2022 17:38:17 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 213HH5XP024209;
-        Thu, 3 Feb 2022 17:38:17 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dyygrg8gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Feb 2022 17:38:17 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 213HXBlF017941;
-        Thu, 3 Feb 2022 17:38:15 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3dvw79xpf5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Feb 2022 17:38:14 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 213HSF7q48628168
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Feb 2022 17:28:15 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C3BFA4057;
-        Thu,  3 Feb 2022 17:38:09 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B1285A404D;
-        Thu,  3 Feb 2022 17:38:08 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.1.135])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  3 Feb 2022 17:38:08 +0000 (GMT)
-Date:   Thu, 3 Feb 2022 17:37:39 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Steffen Eiden <seiden@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 1/4] s390x: uv-host: Add attestation
- test
-Message-ID: <20220203173739.2b3b7d1e@p-imbrenda>
-In-Reply-To: <20220203091935.2716-2-seiden@linux.ibm.com>
-References: <20220203091935.2716-1-seiden@linux.ibm.com>
- <20220203091935.2716-2-seiden@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S241251AbiBCRL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 12:11:26 -0500
+Received: from foss.arm.com ([217.140.110.172]:58282 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1352543AbiBCRLK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 12:11:10 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46358147A;
+        Thu,  3 Feb 2022 09:11:10 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7AD043F40C;
+        Thu,  3 Feb 2022 09:11:07 -0800 (PST)
+Date:   Thu, 3 Feb 2022 17:11:16 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 18/64] KVM: arm64: nv: Trap EL1 VM register accesses
+ in virtual EL2
+Message-ID: <YfwMtP/McwEJApy2@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-19-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: B8dpBd6y6Pim16T_jK08sZQR9FkLAvV_
-X-Proofpoint-GUID: aRAk8IHmC-a4MMutM0eOL9aR0HxODuxS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-03_06,2022-02-03_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 spamscore=0 malwarescore=0 suspectscore=0 bulkscore=0
- mlxscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202030106
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-19-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  3 Feb 2022 09:19:32 +0000
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+Hi Marc,
 
-> Adds an invalid command test for attestation in the uv-host.
+On Fri, Jan 28, 2022 at 12:18:26PM +0000, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->
+> When running in virtual EL2 mode, we actually run the hardware in EL1
+> and therefore have to use the EL1 registers to ensure correct operation.
+> 
+> By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
+> doesn't shoot itself in the foot when setting up what it believes to be
+> a different mode's system register state (for example when preparing to
+> switch to a VM).
+> 
+> We can leverage the existing sysregs infrastructure to support trapped
+> accesses to these registers.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  lib/s390x/asm/uv.h | 23 ++++++++++++++++++++++-
->  s390x/uv-host.c    |  1 +
->  2 files changed, 23 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +---
+>  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c         |  7 ++++++-
+>  arch/arm64/kvm/sys_regs.c               | 19 ++++++++++++++++---
+>  4 files changed, 24 insertions(+), 8 deletions(-)
 > 
-> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-> index 97c90e81..7afbcffd 100644
-> --- a/lib/s390x/asm/uv.h
-> +++ b/lib/s390x/asm/uv.h
-> @@ -1,7 +1,7 @@
->  /*
->   * s390x Ultravisor related definitions
->   *
-> - * Copyright (c) 2020 IBM Corp
-> + * Copyright IBM Corp. 2020, 2022
->   *
->   * Authors:
->   *  Janosch Frank <frankja@linux.ibm.com>
-> @@ -47,6 +47,7 @@
->  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
->  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
->  #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
-> +#define UVC_CMD_ATTESTATION		0x1020
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 58e14f8ead23..49c3b9eb09d7 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -110,10 +110,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  		write_sysreg(0, pmuserenr_el0);
+>  }
 >  
->  /* Bits in installed uv calls */
->  enum uv_cmds_inst {
-> @@ -71,6 +72,7 @@ enum uv_cmds_inst {
->  	BIT_UVC_CMD_UNSHARE_ALL = 20,
->  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
->  	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
-> +	BIT_UVC_CMD_ATTESTATION = 28,
->  };
+> -static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+> +static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
+>  {
+> -	u64 hcr = vcpu->arch.hcr_el2;
+> -
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+>  		hcr |= HCR_TVM;
 >  
->  struct uv_cb_header {
-> @@ -178,6 +180,25 @@ struct uv_cb_cfs {
->  	u64 paddr;
->  }  __attribute__((packed))  __attribute__((aligned(8)));
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 6410d21d8695..61a5627fd456 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -38,7 +38,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
 >  
-> +/* Retrieve Attestation Measurement */
-> +struct uv_cb_attest {
-> +	struct uv_cb_header header;	/* 0x0000 */
-> +	u64 reserved08[2];		/* 0x0008 */
-> +	u64 arcb_addr;			/* 0x0018 */
-> +	u64 continuation_token;		/* 0x0020 */
-> +	u8  reserved28[6];		/* 0x0028 */
-> +	u16 user_data_length;		/* 0x002e */
-> +	u8  user_data[256];		/* 0x0030 */
-> +	u32 reserved130[3];		/* 0x0130 */
-> +	u32 measurement_length;		/* 0x013c */
-> +	u64 measurement_address;	/* 0x0140 */
-> +	u8 config_uid[16];		/* 0x0148 */
-> +	u32 reserved158;		/* 0x0158 */
-> +	u32 add_data_length;		/* 0x015c */
-> +	u64 add_data_address;		/* 0x0160 */
-> +	u64 reserved168[4];		/* 0x0168 */
-
-please use uint*_t types!
-
-with that fixed: 
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> +}  __attribute__((packed))  __attribute__((aligned(8)));
+> -	___activate_traps(vcpu);
+> +	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+>  	__activate_traps_common(vcpu);
+>  
+>  	val = vcpu->arch.cptr_el2;
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 82ddaebe66de..6ed9e4893a02 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -32,9 +32,14 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+>  
+>  static void __activate_traps(struct kvm_vcpu *vcpu)
+>  {
+> +	u64 hcr = vcpu->arch.hcr_el2;
+>  	u64 val;
+>  
+> -	___activate_traps(vcpu);
+> +	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
+> +	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
+> +		hcr |= HCR_TVM | HCR_TRVM;
 > +
->  /* Set Secure Config Parameter */
->  struct uv_cb_ssc {
->  	struct uv_cb_header header;
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 92a41069..946f031e 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -418,6 +418,7 @@ static struct cmd_list invalid_cmds[] = {
->  	{ "bogus", 0x4242, sizeof(struct uv_cb_header), -1},
->  	{ "share", UVC_CMD_SET_SHARED_ACCESS, sizeof(struct uv_cb_share), BIT_UVC_CMD_SET_SHARED_ACCESS },
->  	{ "unshare", UVC_CMD_REMOVE_SHARED_ACCESS, sizeof(struct uv_cb_share), BIT_UVC_CMD_REMOVE_SHARED_ACCESS },
-> +	{ "attest", UVC_CMD_ATTESTATION, sizeof(struct uv_cb_attest), BIT_UVC_CMD_ATTESTATION },
->  	{ NULL, 0, 0 },
->  };
+> +	___activate_traps(vcpu, hcr);
 >  
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 102bc4906723..9d3520f1d17a 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -322,8 +322,15 @@ static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
+>  
+>  /*
+>   * Generic accessor for VM registers. Only called as long as HCR_TVM
+> - * is set. If the guest enables the MMU, we stop trapping the VM
+> - * sys_regs and leave it in complete control of the caches.
+> + * is set.
+> + *
+> + * This is set in two cases: either (1) we're running at vEL2, or (2)
+> + * we're running at EL1 and the guest has its MMU off.
+> + *
+> + * (1) TVM/TRVM is set, as we need to virtualise some of the VM
+> + * registers for the guest hypervisor
+> + * (2) Once the guest enables the MMU, we stop trapping the VM sys_regs
+> + * and leave it in complete control of the caches.
+>   */
+>  static bool access_vm_reg(struct kvm_vcpu *vcpu,
+>  			  struct sys_reg_params *p,
+> @@ -332,7 +339,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+>  	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+>  	u64 val, mask, shift;
+>  
+> -	BUG_ON(!p->is_write);
+> +	/* We don't expect TRVM on the host */
 
+I don't get what that means. Isn't KVM setting HCR_EL2.TRVM to trap reads?
+
+Other than that, the patch looks good:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
+
+> +	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
+> +
+> +	if (!p->is_write) {
+> +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> +		return true;
+> +	}
+>  
+>  	get_access_mask(r, &mask, &shift);
+>  
+> -- 
+> 2.30.2
+> 
