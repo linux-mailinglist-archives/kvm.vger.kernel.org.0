@@ -2,181 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C0CD4A8A68
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:42:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27F324A8A74
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:43:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353014AbiBCRmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 12:42:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46574 "EHLO
+        id S1353000AbiBCRnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 12:43:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353004AbiBCRmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Feb 2022 12:42:09 -0500
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B42DC06173B
-        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 09:42:09 -0800 (PST)
-Received: by mail-io1-xd49.google.com with SMTP id o189-20020a6bbec6000000b00604e5f63337so2419331iof.15
-        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 09:42:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=wrgfEfV14EVeGeVBLAsKjtwiGuvuEQxGhzBYOaaTqP4=;
-        b=YpzyUoEg7zq/DcVh3KyeU4vERdGA8ReR59CxEznCRJob+oEp3QY3eZ0VWIBhuOBMrr
-         t1Bj4upczXAJsjg23H0UQlGn7PuUMxUMi8BnCfkyRMADFajSDMHQIGaFP57BQ4wXw7G5
-         GSF1ORFT9coE27YVzmUtB3ha4th1yqtzjz6KjGvoOu/Zy9PMrrOwSOjQUIFbfcuv3Urm
-         fb8z8xZQ8TEtnL4YLX+tdae00N4XGnnVaeO1pnTiBfxZRmo+6zKUOYvvSyhc4D0dfjRM
-         fWtZ00OZbBqz7pz1CZfMeIB6r5m99pcTN9V3MWn+XMZs+DjbS8hHQhhN6/KJ7SzQCTtW
-         vO9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=wrgfEfV14EVeGeVBLAsKjtwiGuvuEQxGhzBYOaaTqP4=;
-        b=fi+RyhVrl4qjZB74Ur4mCkn1plu7yvLOSiZVQ/TQAzCv+gptGvqyYCoH0tj4BCXQ87
-         0fsAe3IinX2lzs2X4I9szgF3DKV8BKLA0awQPgH16I6qdE0axLHOVdWewlBPUQuynAoB
-         KrPp1eM141Y65ycUVYUpCsKcRKXxl1X4LLe3qjyZ4H4y622TmhDvsvg/jzMKhrugdiHZ
-         qJuLtpTi52xy5ELP9X6/8hOGYz5hIBRsryQIJmoHwTv2N++7jMIOcN8pk0B84NO0athY
-         fogORRuhH3hcr8A2ocAcCaJxDDwfyvwHKGN4OwgaD+VAR2zQhvgMAxUkwOQ5bZBMX3fr
-         y8SA==
-X-Gm-Message-State: AOAM532o0UTbDJ4kQ2KK8/tr2Ig//8u4QN4BHkTMUsfqa+Idm+ZDuVIN
-        lT21eJ3AiUNzQwsrhmeBl5VPwGQoz2I=
-X-Google-Smtp-Source: ABdhPJy86QQxEmk8vHHLHMGD7z7jHF4YL6H2YGYKUKkBCDrOUwuinXMawx6qJjo17l9XbIu4Ypf6lAox+V4=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:3045:: with SMTP id
- u5mr17309119jak.105.1643910128871; Thu, 03 Feb 2022 09:42:08 -0800 (PST)
-Date:   Thu,  3 Feb 2022 17:41:59 +0000
-In-Reply-To: <20220203174159.2887882-1-oupton@google.com>
-Message-Id: <20220203174159.2887882-7-oupton@google.com>
-Mime-Version: 1.0
-References: <20220203174159.2887882-1-oupton@google.com>
-X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH v5 6/6] selftests: KVM: Test OS lock behavior
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        with ESMTP id S1352965AbiBCRnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 12:43:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F22C061714
+        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 09:43:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7407061767
+        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 17:43:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA546C340E8;
+        Thu,  3 Feb 2022 17:43:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643910218;
+        bh=GXzpfeX2dU4ciuvs0rjklTbN/OCnPy0khj9+uIZBI3k=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EQPp34N+iZmTtf3ZIkXXu/JeEyCoYTdXCni8yqMmEGjJSqj7MIrTyq4c1mk2zN4WF
+         WlAVg1+dzuxy/bnOUEtBVZDg5UQItBh/Qcb7dhmGWi3lIw0L2UFEOhW1sMZ60lOPDc
+         jfLNXDfwP/7nITUgn8brcVv3QJZL4QlEkgdzoNYUnFqlveCK0D5Oxl9Y8Qdg+iQEjK
+         8jT28Fz5Yf3zQryvIgAJERqT2ki7KKDInOBL4fLQvCc+PsCU6qVqATYE8TXULyVcxB
+         LkrYjFKNdGrQLr+J0YG7WPXVKnsDr+LqvomtcVgn55uGFwC565edZRMnKPRfESLt8x
+         cc/vUqPuc2ehA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=billy-the-mountain.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nFg8u-005DPW-PU; Thu, 03 Feb 2022 17:43:36 +0000
+Date:   Thu, 03 Feb 2022 17:43:36 +0000
+Message-ID: <87h79f3kxj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 09/64] KVM: arm64: nv: Support virtual EL2 exceptions
+In-Reply-To: <Yfqh6BocbZA1jexU@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+        <20220128121912.509006-10-maz@kernel.org>
+        <Yfqh6BocbZA1jexU@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, karl.heubaum@oracle.com, mihai.carabas@oracle.com, miguel.luis@oracle.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM now correctly handles the OS Lock for its guests. When set, KVM
-blocks all debug exceptions originating from the guest. Add test cases
-to the debug-exceptions test to assert that software breakpoint,
-hardware breakpoint, watchpoint, and single-step exceptions are in fact
-blocked.
+On Wed, 02 Feb 2022 15:23:20 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> On Fri, Jan 28, 2022 at 12:18:17PM +0000, Marc Zyngier wrote:
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > new file mode 100644
+> > index 000000000000..f52cd4458947
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -0,0 +1,197 @@
+> 
+> Looks like this line:
+> 
+> // SPDX-License-Identifier: GPL-2.0-only
+> 
+> is missing.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++++++-
- 1 file changed, 56 insertions(+), 2 deletions(-)
+Indeed. I should check all the new files, as they are a bit... off.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index ea189d83abf7..63b2178210c4 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -23,7 +23,7 @@
- #define SPSR_D		(1 << 9)
- #define SPSR_SS		(1 << 21)
- 
--extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
-+extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
- static volatile uint64_t sw_bp_addr, hw_bp_addr;
- static volatile uint64_t wp_addr, wp_data_addr;
- static volatile uint64_t svc_addr;
-@@ -47,6 +47,14 @@ static void reset_debug_state(void)
- 	isb();
- }
- 
-+static void enable_os_lock(void)
-+{
-+	write_sysreg(1, oslar_el1);
-+	isb();
-+
-+	GUEST_ASSERT(read_sysreg(oslsr_el1) & 2);
-+}
-+
- static void install_wp(uint64_t addr)
- {
- 	uint32_t wcr;
-@@ -99,6 +107,7 @@ static void guest_code(void)
- 	GUEST_SYNC(0);
- 
- 	/* Software-breakpoint */
-+	reset_debug_state();
- 	asm volatile("sw_bp: brk #0");
- 	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
- 
-@@ -152,6 +161,51 @@ static void guest_code(void)
- 	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
- 	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
- 
-+	GUEST_SYNC(6);
-+
-+	/* OS Lock does not block software-breakpoint */
-+	reset_debug_state();
-+	enable_os_lock();
-+	sw_bp_addr = 0;
-+	asm volatile("sw_bp2: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp2));
-+
-+	GUEST_SYNC(7);
-+
-+	/* OS Lock blocking hardware-breakpoint */
-+	reset_debug_state();
-+	enable_os_lock();
-+	install_hw_bp(PC(hw_bp2));
-+	hw_bp_addr = 0;
-+	asm volatile("hw_bp2: nop");
-+	GUEST_ASSERT_EQ(hw_bp_addr, 0);
-+
-+	GUEST_SYNC(8);
-+
-+	/* OS Lock blocking watchpoint */
-+	reset_debug_state();
-+	enable_os_lock();
-+	write_data = '\0';
-+	wp_data_addr = 0;
-+	install_wp(PC(write_data));
-+	write_data = 'x';
-+	GUEST_ASSERT_EQ(write_data, 'x');
-+	GUEST_ASSERT_EQ(wp_data_addr, 0);
-+
-+	GUEST_SYNC(9);
-+
-+	/* OS Lock blocking single-step */
-+	reset_debug_state();
-+	enable_os_lock();
-+	ss_addr[0] = 0;
-+	install_ss();
-+	ss_idx = 0;
-+	asm volatile("mrs x0, esr_el1\n\t"
-+		     "add x0, x0, #1\n\t"
-+		     "msr daifset, #8\n\t"
-+		     : : : "x0");
-+	GUEST_ASSERT_EQ(ss_addr[0], 0);
-+
- 	GUEST_DONE();
- }
- 
-@@ -223,7 +277,7 @@ int main(int argc, char *argv[])
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
- 				ESR_EC_SVC64, guest_svc_handler);
- 
--	for (stage = 0; stage < 7; stage++) {
-+	for (stage = 0; stage < 11; stage++) {
- 		vcpu_run(vm, VCPU_ID);
- 
- 		switch (get_ucall(vm, VCPU_ID, &uc)) {
+> 
+> > +/*
+> > + * Copyright (C) 2016 - Linaro and Columbia University
+> > + * Author: Jintack Lim <jintack.lim@linaro.org>
+> > + */
+> > +
+> > +#include <linux/kvm.h>
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_nested.h>
+> > +
+> > +#include "hyp/include/hyp/adjust_pc.h"
+> > +
+> > +#include "trace.h"
+> > +
+> > +static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+> > +{
+> > +	u64 mode = spsr & PSR_MODE_MASK;
+> > +
+> > +	/*
+> > +	 * Possible causes for an Illegal Exception Return from EL2:
+> > +	 * - trying to return to EL3
+> > +	 * - trying to return to a 32bit EL
+> > +	 * - trying to return to EL1 with HCR_EL2.TGE set
+> > +	 */
+> > +	if (mode == PSR_MODE_EL3t || mode == PSR_MODE_EL3h ||
+> > +	    spsr & PSR_MODE32_BIT ||
+> 
+> I take it KVM will not allow a L1 hypervisor to run EL1 or EL0 in 32
+> bit mode?
+
+No, that'd really be a distraction at this stage. I don't expect any
+HW supporting NV NV to support AArch32 at EL1, and if someone really
+needs EL0 support (the HW support actually exists), they'll have to
+revisit this.
+
+>
+> > +	    (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
+> > +					   mode == PSR_MODE_EL1h))) {
+> 
+> I think these checks should also be added:
+> 
+> "A return where the value of the saved process state M[4] bit is 0,
+> indicating a return to AArch64 state, and one of the following is
+> true:
+> 
+> - The M[1] bit is 1.
+> - The M[3:0] bits are 0b0001.
+
+Definitely should add these two, probably in the form of a switch
+enumerating all the possible exception levels rather than checking for
+discrete bits that are hard to reason about.
+
+> - The Exception level being returned to is using AArch32 state, as
+>   programmed by the SCR_EL3.RW or HCR_EL2.RW bits, or as configured
+>   from reset."
+
+That's already caught with the SPSR check above.
+
+Thanks,
+
+	M.
+
 -- 
-2.35.0.263.gb82422642f-goog
-
+Without deviation from the norm, progress is not possible.
