@@ -2,134 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C09EB4A81F5
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 10:51:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69B164A8201
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 10:59:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349923AbiBCJvz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 04:51:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37127 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236063AbiBCJvy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Feb 2022 04:51:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643881914;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QK7QeelnBgMuLDC5Mt99kveOzip384EfbthyE/YqvhQ=;
-        b=cCi7cc/R323hupEPnQRY/c6n/xKl8eqdslc8iYdSnzX5wHEWNSggnpcDWDeSutJFxMcgwK
-        RYaeGm/kWdP27FojTmd29XghPT3I56dYxFCB/O7ztHZ/h2AsB7xEkgdb63x0/rDdMLZXbS
-        hVDCFfO/IlS/qsoTy3I8GHUJOaelD4s=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-161-1g-aMyahM1iobOCBAkW7tA-1; Thu, 03 Feb 2022 04:51:52 -0500
-X-MC-Unique: 1g-aMyahM1iobOCBAkW7tA-1
-Received: by mail-ej1-f72.google.com with SMTP id fx12-20020a170906b74c00b006bbeab42f06so935460ejb.3
-        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 01:51:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=QK7QeelnBgMuLDC5Mt99kveOzip384EfbthyE/YqvhQ=;
-        b=zLEJwnppPlLghVLpo1sLLk2aWcX0kVZazKog+rxEXxz7bUTnMqqW+XBEsHxHSM8TQx
-         E9UijjubLDHV4JmNKQI706FCyc+ZzinORZDZnJecKRZANYH1uQnwVgwgG7cc6GQP4fEL
-         mydM3J5meJAalbk5r0KDS5jRUJvxAWt4ze4KDfsWkdbLOoXF9+peR+siGS1xiHQxMzdN
-         6qZFeBk16vmuhAVtUAvmNuMdW+7JXAJLaw1TJYdXFpcr/q659nKmrj/BfjiD2jySjCsQ
-         7Dnlf4lR6sA8sG+KZRdyfisE5OMpq0IU05ZmyGUxDb4KMdD+DWsjWGQcS8/ZPnL08WlT
-         vK4Q==
-X-Gm-Message-State: AOAM530bGErnDkBAj2cid2L3m+4iAHeFSRvuchVQWf/luvd7x1uljKHI
-        oiktraN2KJdA3wxUVWq6L/ECSY7KnlyIQ6lKbWGBpXlr4Yitb6Ergwl4IZN29XAp4qOH/TN86k+
-        I1p8SMwFX0u5V
-X-Received: by 2002:aa7:c6c8:: with SMTP id b8mr34787595eds.392.1643881911533;
-        Thu, 03 Feb 2022 01:51:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy/idJWteG3a2i4lVifO74FtI/xr/NVTP5oo/QwQcQFsQSvQVVdEMI4k/TDJkIvwi541lQNJw==
-X-Received: by 2002:aa7:c6c8:: with SMTP id b8mr34787584eds.392.1643881911408;
-        Thu, 03 Feb 2022 01:51:51 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id bx18sm18752074edb.93.2022.02.03.01.51.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Feb 2022 01:51:50 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap
- for Hyper-V-on-KVM
-In-Reply-To: <429afd81-7bef-8ead-6ca4-12671378d581@redhat.com>
-References: <20220202095100.129834-1-vkuznets@redhat.com>
- <429afd81-7bef-8ead-6ca4-12671378d581@redhat.com>
-Date:   Thu, 03 Feb 2022 10:51:49 +0100
-Message-ID: <87czk4b7m2.fsf@redhat.com>
+        id S1349974AbiBCJ7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 04:59:33 -0500
+Received: from mail-dm6nam11on2065.outbound.protection.outlook.com ([40.107.223.65]:31457
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232318AbiBCJ7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 04:59:32 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G1SM1Hh12Yw2eJmhQxOhZSn93hQ8LOQHxZUzr6PXrBi6Qxu2pgphtvceKqCUgXwBJ+TdyQwpj/yI+BekSzII7UVXf+LeEUoa0NhpC3Q0hn0nhe31r/cEEWmNVdflqoiMRTy3HW2vkKwS5EW5aPaPcUuJd8zlB4+VbSZuOgEYJFg5wWtpHe4Og+JYBNYDbqew5rHrz05RK/CMD1By+e7IC6P/hpWewB3Xot0M9dQmD2O8AdXlyro61FFkLkCzs9v3ncZ81o9eXpgIEhfDRCyfb2cGXHZrdHh9XGwDOKyTfvILHBFBKNIasA2mefm7Zng8dy9fM3zXcntXAhU0FUUz5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cVd06XhffNDw6tJ7UMq3Vhz885g4m2On++XRUBb7l3Q=;
+ b=RW2CLnhPMlipiz7B3+ZPgijtjc/7XN6FpgZhoOfVtn8JQcXN/VUqpAr3xASoGAHuve9nCyKGR24voHTZ5u5Q8qvsCmI1zpeAjnYjs6K9KRBYkpddM6wggGS24XS+f8Gh5NCnP0OcKBv8btkmnlfQngHdMsNAZ2qPzGLJHrYI7w3c9KYnPLKNVK0aFaETy9mI9FqvNftCUqQbJcGIV7wscLoPVbOHBiQrT9fhrHVjF//HYgltyfOWDTgfZQcdwNRK5EUSP11kn9lyw/cbZeNAOWLX7c3br5ZW1IQPi5l5R+MougmaTLaGSim3PO83DXR2fhwtGXrOCe5NGY/qKfC3cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cVd06XhffNDw6tJ7UMq3Vhz885g4m2On++XRUBb7l3Q=;
+ b=X8RZmLpr0N1WttbeMPXxNhhSxecG8qXnEKtQGOlw3B3i7U0q1WaYSN7r74kqw1kR9DTM4HRUfNRbVuZut053JnFb7ffkq7WszpM5PZawiCFrRWnvdWEpiSwiIZi4TALv/E46oLn3xLDkzfIacWO770AOJmyZAg8j10i5u6EahKM=
+Received: from DM6PR03CA0032.namprd03.prod.outlook.com (2603:10b6:5:40::45) by
+ BYAPR12MB3494.namprd12.prod.outlook.com (2603:10b6:a03:ad::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4930.20; Thu, 3 Feb 2022 09:59:30 +0000
+Received: from DM6NAM11FT058.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:40:cafe::a4) by DM6PR03CA0032.outlook.office365.com
+ (2603:10b6:5:40::45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12 via Frontend
+ Transport; Thu, 3 Feb 2022 09:59:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT058.mail.protection.outlook.com (10.13.172.216) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4951.12 via Frontend Transport; Thu, 3 Feb 2022 09:59:29 +0000
+Received: from BLR-5CG113396H.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.18; Thu, 3 Feb
+ 2022 03:59:19 -0600
+From:   Ravi Bangoria <ravi.bangoria@amd.com>
+To:     <like.xu.linux@gmail.com>, <jmattson@google.com>,
+        <eranian@google.com>, <peterz@infradead.org>
+CC:     <ravi.bangoria@amd.com>, <santosh.shukla@amd.com>,
+        <pbonzini@redhat.com>, <seanjc@google.com>,
+        <wanpengli@tencent.com>, <vkuznets@redhat.com>, <joro@8bytes.org>,
+        <mingo@redhat.com>, <alexander.shishkin@linux.intel.com>,
+        <tglx@linutronix.de>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+        <kvm@vger.kernel.org>, <x86@kernel.org>,
+        <linux-perf-users@vger.kernel.org>, <ananth.narayan@amd.com>,
+        <kim.phillips@amd.com>
+Subject: [PATCH v3] perf/amd: Implement erratum #1292 workaround for F19h M00-0Fh
+Date:   Thu, 3 Feb 2022 15:28:41 +0530
+Message-ID: <20220203095841.7937-1-ravi.bangoria@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <fe53507b-9732-b47e-32e0-647a9bfc8a80@amd.com>
+References: <fe53507b-9732-b47e-32e0-647a9bfc8a80@amd.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: af234eb3-5950-40a0-f7b1-08d9e6fbdee6
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3494:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3494A1CEFD73DC2D1BC52460E0289@BYAPR12MB3494.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BSxVfb/pUfyFO2Ul4pjlholCII/Wj7PQzjQRRtrY1/VB81ESB9ac0aDDvNuTT0wNTc55eYo2EonNHMRjaXcQyTvSPuyrDeMWGP6ZUz35JmMy7j7/j39Xbr/vUpSdBXWb/PHfYXByqvpdJ4LMMPn+2gUIxoLCDgvP+nNlTH1rDinPYtmD6nIHB5R0zoiGR1QsLsJeNpIG5w0InMGL8f/F0iZD5R2isakcli8b2bSDlZA9Pa0OmhkfN8/ps3XyplA9aGm4kMDV+R3780cQibO/CGARYstFez8GBafG8dfE4EPOby0d+Uo3fAJYXK813QWLX60cFerlpvI4vqZpj5SlvilPE0Z1D7A5xKAhzUnFYXmDeIrrphYwL63j1hIvXx18wgSH59zGIXcnxiHrlyb3bzUpuQCmhZi151+K0YyRQdpfXO68an7OueD3k1Rx5316bWGpRHAGKr9vjN2tQ6UAckU05ukHhdMKBzc9VN227RIJ1mKTu93Y1vxdyQoAax1neFFzupd4YJL/ji4ywhcgkDD8CdEk2TO7yJ3JdCP48rqJEJE2LGSIhVqi8lIHqSP7fYGBJFrS+I3wpNoIynpW4UcUqHfcN6wD4jB32MBNDA/LIpz1s5CgIKDvYEgKjX3lnZUUSXE5C73YxUJBlVjW+iEiXg79E3yu/TMYIz+xfjRhyuAgJnk4DwsahR4Qus5nnMLwJi5rUhCGL7v95gzBLNvIst1jlmFUWKAedTen7yz96vnq+JKx25umtcriPDM6U0uCxbo1peNXD5QXamKEK9WmxVwzxVic2rkBNmr/f9vVMe7MxgXNSHb8uNVQRq6o2qDYRa/HZzDby2rCpMF7ig==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(40470700004)(36840700001)(7416002)(36860700001)(110136005)(26005)(8936002)(8676002)(2616005)(70586007)(426003)(16526019)(336012)(508600001)(356005)(6666004)(1076003)(2906002)(966005)(81166007)(7696005)(186003)(86362001)(70206006)(82310400004)(54906003)(36756003)(44832011)(4326008)(47076005)(40460700003)(316002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2022 09:59:29.9556
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: af234eb3-5950-40a0-f7b1-08d9e6fbdee6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT058.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3494
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+Perf counter may overcount for a list of Retire Based Events. Implement
+workaround for Zen3 Family 19 Model 00-0F processors as suggested in
+Revision Guide[1]:
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+  To count the non-FP affected PMC events correctly:
+    o Use Core::X86::Msr::PERF_CTL2 to count the events, and
+    o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
+    o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
 
-> On 2/2/22 10:50, Vitaly Kuznetsov wrote:
-...
->>    KVM: nSVM: Implement Enlightened MSR-Bitmap feature
-...
->
-> Queued, thanks.
+Note that the specified workaround applies only to counting events and
+not to sampling events. Thus sampling event will continue functioning
+as is.
 
-While writing a selftest for the feature, I've discovered an embarassing
-bug: in nested_svm_vmrun_msrpm() I check bit number instead of bit
-mask. It worked in testing by pure luck, it seems genuine Hyper-V sets
-some other clean fields simultaneously.
+Although the issue exists on all previous Zen revisions, the workaround
+is different and thus not included in this patch.
 
-Would it be possible to squash the attached patch in? Thanks!
+This patch needs Like's patch[2] to make it work on kvm guest.
 
-I'll be sending out selftests shortly.
+[1] https://bugzilla.kernel.org/attachment.cgi?id=298241
+[2] https://lore.kernel.org/lkml/20220117055703.52020-1-likexu@tencent.com
 
--- 
-Vitaly
-
-
---=-=-=
-Content-Type: text/x-patch
-Content-Disposition: inline;
- filename=0001-KVM-nSVM-Fix-the-check-for-VMCB_HV_NESTED_ENLIGHTENM.patch
-
-From cfb538876ccc59dade7cadde553863bea8312f90 Mon Sep 17 00:00:00 2001
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Thu, 3 Feb 2022 10:22:30 +0100
-Subject: [PATCH] KVM: nSVM: Fix the check for VMCB_HV_NESTED_ENLIGHTENMENTS
- bin in nested_svm_vmrun_msrpm()
-
-VMCB_HV_NESTED_ENLIGHTENMENTS (VMCB_SW) is a bit number, not a bit mask.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
 ---
- arch/x86/kvm/svm/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2: https://lore.kernel.org/r/20220202105158.7072-1-ravi.bangoria@amd.com
+v2->v3:
+  - Use EVENT_CONSTRAINT_RANGE() for continuous event codes.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 7b26a4b518f7..7acf4f2aa445 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -188,7 +188,7 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- 	if (!svm->nested.force_msr_bitmap_recalc &&
- 	    kvm_hv_hypercall_enabled(&svm->vcpu) &&
- 	    hve->hv_enlightenments_control.msr_bitmap &&
--	    (svm->nested.ctl.clean & VMCB_HV_NESTED_ENLIGHTENMENTS))
-+	    (svm->nested.ctl.clean & BIT(VMCB_HV_NESTED_ENLIGHTENMENTS)))
- 		goto set_msrpm_base_pa;
+ arch/x86/events/amd/core.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/x86/events/amd/core.c b/arch/x86/events/amd/core.c
+index 9687a8aef01c..124ec15851bc 100644
+--- a/arch/x86/events/amd/core.c
++++ b/arch/x86/events/amd/core.c
+@@ -874,6 +874,17 @@ amd_get_event_constraints_f15h(struct cpu_hw_events *cpuc, int idx,
+ 	}
+ }
  
- 	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
++/* Overcounting of Retire Based Events Erratum */
++static struct event_constraint retire_event_constraints[] __read_mostly = {
++	EVENT_CONSTRAINT_RANGE(0xC0, 0xC5, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT_RANGE(0xC8, 0xCA, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xCC, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0xD1, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0x1000000C7, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT(0x1000000D0, 0x4, AMD64_EVENTSEL_EVENT),
++	EVENT_CONSTRAINT_END
++};
++
+ static struct event_constraint pair_constraint;
+ 
+ static struct event_constraint *
+@@ -881,10 +892,30 @@ amd_get_event_constraints_f17h(struct cpu_hw_events *cpuc, int idx,
+ 			       struct perf_event *event)
+ {
+ 	struct hw_perf_event *hwc = &event->hw;
++	struct event_constraint *c;
+ 
+ 	if (amd_is_pair_event_code(hwc))
+ 		return &pair_constraint;
+ 
++	/*
++	 * Although 'Overcounting of Retire Based Events' erratum exists
++	 * for older generation cpus, workaround to set bit 43 works only
++	 * for Family 19h Model 00-0Fh as per the Revision Guide.
++	 */
++	if (boot_cpu_data.x86 == 0x19 && boot_cpu_data.x86_model <= 0xf) {
++		if (is_sampling_event(event))
++			goto out;
++
++		for_each_event_constraint(c, retire_event_constraints) {
++			if (constraint_match(c, event->hw.config)) {
++				event->hw.config |= (1ULL << 43);
++				event->hw.config &= ~(1ULL << 20);
++				return c;
++			}
++		}
++	}
++
++out:
+ 	return &unconstrained;
+ }
+ 
 -- 
-2.34.1
-
-
---=-=-=--
+2.27.0
 
