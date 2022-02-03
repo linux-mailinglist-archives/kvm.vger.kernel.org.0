@@ -2,269 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 593124A8BCB
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 19:40:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80C234A8BD1
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 19:43:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353530AbiBCSkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 13:40:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:48481 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234230AbiBCSkc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Feb 2022 13:40:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643913631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=di4FajHoZmn68gaJnUS8pnDPTefePlaVCP34o2CQYSk=;
-        b=IJjiHOdjPFi3kNEn5ciqWzU4qQa1jYUsFiWdqTQ67/ywjvlFsUfZ6/ls1UbV2cMdUtnJs8
-        D0c07h2y91tfZe0p8rvhON15JJ23XEuK2eA1YE1+OYO41B6+878VzwYzfYPmKl/IozFUR6
-        f1yTRY/TCgT85OqtRLRRs8V+lKOBl6k=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-349-vNCyoR4_M3Sd8eNQUaHmAg-1; Thu, 03 Feb 2022 13:40:30 -0500
-X-MC-Unique: vNCyoR4_M3Sd8eNQUaHmAg-1
-Received: by mail-ed1-f72.google.com with SMTP id ed6-20020a056402294600b004090fd8a936so1903907edb.23
-        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 10:40:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=di4FajHoZmn68gaJnUS8pnDPTefePlaVCP34o2CQYSk=;
-        b=NeIwFqhKeaX2JVekC5yKZsQX3oJIdGKJih11njq+gV6zO+9qPYtJnbmGvgTIhGa10T
-         SGM1tl9XP7mTKkGg5ZKqoBo42nGIO5ILOwBhbeHla1BL0wVnLW2K9m04qUC4PjGVVzvc
-         DLJQ8wTV5TWwvvF2QAjf91q7QC/egdkd+5WzXOsQH1MUnEW0Y1Qo/gtAPGMxkp0unyBl
-         HN8afg/c7twanPK6gPVQto7kF19zH5ZRmaGXOZhwYBuN6nA7cQSaevkmIAIUIzcyUHw5
-         +xGhx6r2OMA56fIvI/rF/DnaqK3gqw7+ZutlhkGZcM058cIWpl0JwTZ22wJPBh86XqO/
-         1obg==
-X-Gm-Message-State: AOAM531B4OEbz1DVK7m9Bzq37UjjTQuDEfJrqF/L+E1KwxVPfs2Izg8H
-        SjsNP96zLM4rWhmjmfKtwcOZyUrKvCFxjFT5BjA7TniRwNUTlFj3gnrelFufCXq7WzIMswOILBi
-        hC8Mxl1m43qxR
-X-Received: by 2002:a17:907:9620:: with SMTP id gb32mr30134972ejc.436.1643913629051;
-        Thu, 03 Feb 2022 10:40:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJygj6by+fjqx6dVgIa48/Eqf3NwrHdB9it2DxvG7W7p4qjr+p2zgu0sIQixhzKyeiCs3nAdqQ==
-X-Received: by 2002:a17:907:9620:: with SMTP id gb32mr30134957ejc.436.1643913628774;
-        Thu, 03 Feb 2022 10:40:28 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id x31sm22783949ede.26.2022.02.03.10.40.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Feb 2022 10:40:28 -0800 (PST)
-Message-ID: <745fc750-cd52-af1e-4e5e-0644ff3be007@redhat.com>
-Date:   Thu, 3 Feb 2022 19:40:25 +0100
+        id S1353537AbiBCSlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 13:41:06 -0500
+Received: from mga12.intel.com ([192.55.52.136]:60318 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236478AbiBCSlE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 13:41:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643913664; x=1675449664;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=j1rUkWkZiHJ+AeL3YGAaC3KE5WNVPE8P8N/y8SgMX4c=;
+  b=lhid75iIwAWl1IOkhwnYlt3c4ZwNB825rjcdu4JebT2PO2jZDMuqB5hH
+   x4wc2xHQwbWl1uHxd9AHIBF5cTMskEh+TGRg9uO4o0hvJbEvX+74hp2o6
+   F51cp+VEN0XHIo90ZY0+znDUQd3vkHRTvvUELvkMCGZBWC5Wc8Xiase7C
+   MJi04uoNK5J91kqtosJs73dMgcw1z8PvG4ZVFM1fB+mho6L/EUNm4U0tp
+   bI9EBL3ouFvJItW+X5sGO62f3/uJW0hZoLXvQX3ncF82BzHR5NHq5tFc7
+   ZpiBAdu3qhDj3vSgLq6AJyUggYYDkoCJmB2w6/LJQVgidWrC9OZi6JNiX
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10247"; a="228189381"
+X-IronPort-AV: E=Sophos;i="5.88,340,1635231600"; 
+   d="scan'208";a="228189381"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2022 10:40:53 -0800
+X-IronPort-AV: E=Sophos;i="5.88,340,1635231600"; 
+   d="scan'208";a="535299218"
+Received: from oshoron-mobl.amr.corp.intel.com (HELO [10.209.125.125]) ([10.209.125.125])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2022 10:40:52 -0800
+Message-ID: <6c55ac92-0470-07ba-77c0-4701c4ea7ce3@intel.com>
+Date:   Thu, 3 Feb 2022 10:40:50 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH 5/5] KVM: x86: allow defining return-0 static calls
 Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, Peter Zijlstra <peterz@infradead.org>
-References: <20220202181813.1103496-1-pbonzini@redhat.com>
- <20220202181813.1103496-6-pbonzini@redhat.com>
-In-Reply-To: <20220202181813.1103496-6-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Fares Mehanna <faresx@amazon.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "Shutemov, Kirill" <kirill.shutemov@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sgx@vger.kernel.org
+References: <20220203181432.34911-1-faresx@amazon.de>
+From:   Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH] KVM: VMX: pass TME information to guests
+In-Reply-To: <20220203181432.34911-1-faresx@amazon.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/2/22 19:18, Paolo Bonzini wrote:
-> A few vendor callbacks are only used by VMX, but they return an integer
-> or bool value.  Introduce KVM_X86_OP_RET0 for them: a NULL value in
-> struct kvm_x86_ops will be changed to __static_call_return0.
+On 2/3/22 10:14, Fares Mehanna wrote:
+> This will guarantee that hardware supports TME, MSRs are locked, so host can't
+> change them and exclusion range is disabled, so TME rules apply on all host
+> memory.
 
-This also needs EXPORT_SYMBOL_GPL(__static_call_ret0).  Peter, any 
-objections?
+But, what's the point?  Guests can't trust this information.  The host
+can lie all it wants about it.
 
-Paolo
+Also, your assumptions about TME rules applying to *all* host memory are
+a bit aggressive.
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h | 13 +++++++------
->   arch/x86/include/asm/kvm_host.h    |  4 ++++
->   arch/x86/kvm/svm/avic.c            |  5 -----
->   arch/x86/kvm/svm/svm.c             | 26 --------------------------
->   arch/x86/kvm/x86.c                 |  2 +-
->   5 files changed, 12 insertions(+), 38 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 843bd9efd2ae..89fa5dd21f34 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -13,7 +13,7 @@ BUILD_BUG_ON(1)
->   KVM_X86_OP(hardware_enable)
->   KVM_X86_OP(hardware_disable)
->   KVM_X86_OP(hardware_unsetup)
-> -KVM_X86_OP(cpu_has_accelerated_tpr)
-> +KVM_X86_OP_RET0(cpu_has_accelerated_tpr)
->   KVM_X86_OP(has_emulated_msr)
->   KVM_X86_OP(vcpu_after_set_cpuid)
->   KVM_X86_OP(vm_init)
-> @@ -76,15 +76,15 @@ KVM_X86_OP(check_apicv_inhibit_reasons)
->   KVM_X86_OP(refresh_apicv_exec_ctrl)
->   KVM_X86_OP_NULL(hwapic_irr_update)
->   KVM_X86_OP_NULL(hwapic_isr_update)
-> -KVM_X86_OP_NULL(guest_apic_has_interrupt)
-> +KVM_X86_OP_RET0(guest_apic_has_interrupt)
->   KVM_X86_OP(load_eoi_exitmap)
->   KVM_X86_OP(set_virtual_apic_mode)
->   KVM_X86_OP_NULL(set_apic_access_page_addr)
->   KVM_X86_OP(deliver_interrupt)
->   KVM_X86_OP_NULL(sync_pir_to_irr)
-> -KVM_X86_OP(set_tss_addr)
-> -KVM_X86_OP(set_identity_map_addr)
-> -KVM_X86_OP(get_mt_mask)
-> +KVM_X86_OP_RET0(set_tss_addr)
-> +KVM_X86_OP_RET0(set_identity_map_addr)
-> +KVM_X86_OP_RET0(get_mt_mask)
->   KVM_X86_OP(load_mmu_pgd)
->   KVM_X86_OP(has_wbinvd_exit)
->   KVM_X86_OP(get_l2_tsc_offset)
-> @@ -102,7 +102,7 @@ KVM_X86_OP_NULL(vcpu_unblocking)
->   KVM_X86_OP_NULL(pi_update_irte)
->   KVM_X86_OP_NULL(pi_start_assignment)
->   KVM_X86_OP_NULL(apicv_post_state_restore)
-> -KVM_X86_OP_NULL(dy_apicv_has_pending_interrupt)
-> +KVM_X86_OP_RET0(dy_apicv_has_pending_interrupt)
->   KVM_X86_OP_NULL(set_hv_timer)
->   KVM_X86_OP_NULL(cancel_hv_timer)
->   KVM_X86_OP(setup_mce)
-> @@ -126,3 +126,4 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
->   
->   #undef KVM_X86_OP
->   #undef KVM_X86_OP_NULL
-> +#undef KVM_X86_OP_RET0
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 61faeb57889c..e7e5bd9a984d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1540,6 +1540,7 @@ extern struct kvm_x86_ops kvm_x86_ops;
->   #define KVM_X86_OP(func) \
->   	DECLARE_STATIC_CALL(kvm_x86_##func, *(((struct kvm_x86_ops *)0)->func));
->   #define KVM_X86_OP_NULL KVM_X86_OP
-> +#define KVM_X86_OP_RET0 KVM_X86_OP
->   #include <asm/kvm-x86-ops.h>
->   
->   static inline void kvm_ops_static_call_update(void)
-> @@ -1548,6 +1549,9 @@ static inline void kvm_ops_static_call_update(void)
->   	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
->   #define KVM_X86_OP(func) \
->   	WARN_ON(!kvm_x86_ops.func); KVM_X86_OP_NULL(func)
-> +#define KVM_X86_OP_RET0(func) \
-> +	static_call_update(kvm_x86_##func, kvm_x86_ops.func ? : \
-> +			   (typeof(kvm_x86_ops.func)) __static_call_return0);
->   #include <asm/kvm-x86-ops.h>
->   }
->   
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index b49ee6f34fe7..c82457793fc8 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -707,11 +707,6 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
->   	return 0;
->   }
->   
-> -bool avic_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
-> -{
-> -	return false;
-> -}
-> -
->   static void svm_ir_list_del(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
->   {
->   	unsigned long flags;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ab50d73b1e2e..5f75f50b861c 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3479,16 +3479,6 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
->   	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
->   }
->   
-> -static int svm_set_tss_addr(struct kvm *kvm, unsigned int addr)
-> -{
-> -	return 0;
-> -}
-> -
-> -static int svm_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
-> -{
-> -	return 0;
-> -}
-> -
->   static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -3863,11 +3853,6 @@ static int __init svm_check_processor_compat(void)
->   	return 0;
->   }
->   
-> -static bool svm_cpu_has_accelerated_tpr(void)
-> -{
-> -	return false;
-> -}
-> -
->   /*
->    * The kvm parameter can be NULL (module initialization, or invocation before
->    * VM creation). Be sure to check the kvm parameter before using it.
-> @@ -3890,11 +3875,6 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
->   	return true;
->   }
->   
-> -static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> -{
-> -	return 0;
-> -}
-> -
->   static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -4470,7 +4450,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.hardware_unsetup = svm_hardware_unsetup,
->   	.hardware_enable = svm_hardware_enable,
->   	.hardware_disable = svm_hardware_disable,
-> -	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
->   	.has_emulated_msr = svm_has_emulated_msr,
->   
->   	.vcpu_create = svm_vcpu_create,
-> @@ -4542,10 +4521,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.load_eoi_exitmap = avic_load_eoi_exitmap,
->   	.apicv_post_state_restore = avic_apicv_post_state_restore,
->   
-> -	.set_tss_addr = svm_set_tss_addr,
-> -	.set_identity_map_addr = svm_set_identity_map_addr,
-> -	.get_mt_mask = svm_get_mt_mask,
-> -
->   	.get_exit_info = svm_get_exit_info,
->   
->   	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
-> @@ -4570,7 +4545,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.nested_ops = &svm_nested_ops,
->   
->   	.deliver_interrupt = svm_deliver_interrupt,
-> -	.dy_apicv_has_pending_interrupt = avic_dy_apicv_has_pending_interrupt,
->   	.pi_update_irte = avic_pi_update_irte,
->   	.setup_mce = svm_setup_mce,
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a527cffd0a2b..2daca3dd128a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -129,6 +129,7 @@ struct kvm_x86_ops kvm_x86_ops __read_mostly;
->   	DEFINE_STATIC_CALL_NULL(kvm_x86_##func,			     \
->   				*(((struct kvm_x86_ops *)0)->func));
->   #define KVM_X86_OP_NULL KVM_X86_OP
-> +#define KVM_X86_OP_RET0 KVM_X86_OP
->   #include <asm/kvm-x86-ops.h>
->   EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
->   EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
-> @@ -12057,7 +12058,6 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->   static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
->   {
->   	return (is_guest_mode(vcpu) &&
-> -			kvm_x86_ops.guest_apic_has_interrupt &&
->   			static_call(kvm_x86_guest_apic_has_interrupt)(vcpu));
->   }
->   
+Even if the guest knew for sure that it was reading an MSR directly, it
+doesn't mean that any guest memory is actually TME-protected.  The
+memory could be from a non-TME range like persistent memory.  There are
+some weasel words in the spec about this:
 
+> Upon activation, all memory (except in TME Exclusion range) attached
+> to CPU/SoC is encrypted using AES-XTS 128 bit ephemeral key (platform
+> key) that is generated by the CPU on every boot.
+
+The important part here is "attached to the CPU/SoC".  I guess they
+don't count persistent memory as "attached".  This also obviously would
+not apply to non-CPU-attached memory that was attached by something like
+CXL[1].
+
+The extra fun part of all this is that the architecture doesn't provide
+a way to tell if the memory is "attached to the CPU/SoC".  That makes it
+impossible to get any guarantees out of all this.
+
+In other words, you can't trust the exclusion range in the MSR to be the
+*ONLY* non-TME-protected area.
+
+1. https://www.computeexpresslink.org/
