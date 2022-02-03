@@ -2,149 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04D0A4A8A8C
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:45:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD2D4A8B06
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 18:57:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353049AbiBCRpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 12:45:50 -0500
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:41159 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1353041AbiBCRpe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Feb 2022 12:45:34 -0500
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 95A295801D6;
-        Thu,  3 Feb 2022 12:45:33 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Thu, 03 Feb 2022 12:45:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm3; bh=0IX3+OWg0QG3IIRK6BvjHe3DMt2yyMSk4nYD2c
-        qXzNw=; b=fKBNONDvktX8XnxuxwDJ3a+C0H5CKA+zJXMjkqVmBOjeF2PvxDIrnB
-        QQ5+qLPcsdZl559dQmDmOUHyNxyQteyxzJsH+tgbaQwwB1u3bLidaucIrg8RHSqC
-        hEOx/ntBnPKIBvt40yEJD4LDG3D3Nb9qZEDiH/f9LsVEYavXZoS7+Q31nVa4U3BL
-        5OMZ+tuU079A5UScV3Px7fM1xf7wO7NArYuJthpjbFuJpO5J4lZMV0PbRGiKRB7R
-        2PFMX1qtVKHcj57o8f9nF1HvAmMU3MZsCOsQ7b+mqgH53qnhJcMJqmHlYF1cWPJS
-        tXDOrLMKd/Y4py9Bfx7Gv12LP13vQybg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=0IX3+OWg0QG3IIRK6
-        BvjHe3DMt2yyMSk4nYD2cqXzNw=; b=BdTegrxWbSkRfT8jzUTOniSBaSwVSGuEN
-        jJrSmT1juhWqEps7Gzq2WerNdfPZLy4hcb1v53B3UuLPhPaLQ2RSRyy5YTjmZIMp
-        oxwezdIK1w0WrOOY/3yaOFYA2ePoIiWHL4+szXcSs3cbN6dPpE0Y+s3U+HvOTAwV
-        deuUh5ovOLFFhbMRCrY3egB0wYrmzjfN/+JFW0I5aihBLdjeAufErGn8W4KHEdps
-        L0z+b02sinD0ypiRwYFnqujnRaMRhatXH2+Q6yTCptInhhjUbWjedY6kLdht3cS9
-        4txkRZAK22mnPLkS9q8yvDCf2lp2Y2NxMY1Rzm9uXLTdDZyNvkQ+Q==
-X-ME-Sender: <xms:vRT8Yf6TK9zC5wTUqOv_tHcQhxP-wMc8NFDF9tae3eT1JlzdHfhfnA>
-    <xme:vRT8YU5Tot8qRMaixYhMIF46SzUk4lGAAKcwPEyWXFKRsrMZhSpGueLsiZeAvEReI
-    Zh82bVV4vrXrg>
-X-ME-Received: <xmr:vRT8YWfkPXYGUViGPBE-xjIL952TvgSxGY-3cxBQG3sHYvViH3jliG76cMrRG_ro_1ry0v_vfrR9tFHq3BD68dYQKtYq4tQJ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrgeejgddutdegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeejheehte
-    evieffuedthfelkeekfeelvefgudefhedtjeegjefhvdffgefgudegfeenucffohhmrghi
-    nhepshihiihkrghllhgvrhdrrghpphhsphhothdrtghomhenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:vRT8YQI2Zhl744JjHD7hlxx2eViiYCqVrm21VqbhlJpZcmiGWpujrg>
-    <xmx:vRT8YTKPJmdVCEzcFY3lnTtfrYivmQ_B6l-_3bNMih-bFLajvtiGSg>
-    <xmx:vRT8YZyAEG81lwrSa5nlLrLEZG0PGofpIUNtNMkbZYvqJOEjwwaY9g>
-    <xmx:vRT8YQBS97AHssaqoqNGKliJMLV0_GM63no5ZEjxT_WmGm7R7mnSEQ>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 3 Feb 2022 12:45:32 -0500 (EST)
-Date:   Thu, 3 Feb 2022 18:45:30 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Tadeusz Struk <tadeusz.struk@linaro.org>
-Cc:     stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 5.10] KVM: x86: Forcibly leave nested virt when SMM state
- is toggled
-Message-ID: <YfwUuiOPjiQ2/EH1@kroah.com>
-References: <20220201230427.2311393-1-tadeusz.struk@linaro.org>
+        id S233598AbiBCR4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 12:56:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50038 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229842AbiBCR4E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 12:56:04 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E144AC061714
+        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 09:56:03 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id n32so2840416pfv.11
+        for <kvm@vger.kernel.org>; Thu, 03 Feb 2022 09:56:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C8HaK0i9jf2UcVNcXuP8D7mSAZG8MOe1HhPyJaO7I8Q=;
+        b=TVxvv5yTB3OUqhojmDstZ7tQWhDcXZ4jpCyqkg9jbivK/C1566qKFHayI7jpBndbQ+
+         FOCDC2YcF3usx4dctmk9R8nJyNg5GvlCEv+PpbHsz25fOjUlbU8uSRBs2UcZlde0Behe
+         44RhXSykZ2O7bFeb/o9Ed1o9VScqAZVcVTVISw4llgs9aGFtXFypRYf6LaymPbBUfeX6
+         OfswONiwh32E/ZUFmZwRaNO40x3TmQLAEaYVK5A+FTnOn/NItMbLQRR8qs7Vnjh4VsAQ
+         lnoWBhIsjje0qkqX50LuBjwgjfoPX/4DU7y/RaD4QX7BBnqtFanLTdhJu3FnKVY/1fmv
+         grGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C8HaK0i9jf2UcVNcXuP8D7mSAZG8MOe1HhPyJaO7I8Q=;
+        b=hf9P+CSXFcZrpTC/XCV7ba4UOU+Q8Jnxir+5B9RgODAgxtSqkB3LGWigQY8685C4TJ
+         ysqpxn0iNHcmlnJgr6UGMsSFHbgI++kj9A8vUzPF937g2VF8adhByPWltl7Se9f9TsIy
+         OHEEMpZ6ed4JGD1ZbTDlLbX4AqkYkAiBLEuc8uPMFP4VBmo/YxCwW8HKkgeekwXnqM2T
+         BSM28Y/Juh/o4OLXR3BXqxs6Q2NcqPFnNyDgoMVs9+RkXbPYewH03P9L40wNQJyN0m/z
+         avngejWdaQfW6821MoQ1ugy0MMm7zsxUMRTzj12JyvVwv5LTPkT+vmADU5kyouXnWp5u
+         c4bw==
+X-Gm-Message-State: AOAM5338TL0GclLAckKqC1+Ry2Rg/jzA3AcI3ymlNW1n8vnGCB6E5oY/
+        vud+Bs5jIOIKxm5fdni6fsyJybKWqzwC6lrbcYNSwA==
+X-Google-Smtp-Source: ABdhPJzRZIzU+1TmLjz8JS/znJLlCO2nOV1qFO5xDB83D14HthfaMVGtwy+dHrERqfPkvjx3rBGtF97Ku7LaxYJ3o0g=
+X-Received: by 2002:a63:371b:: with SMTP id e27mr28863288pga.618.1643910963109;
+ Thu, 03 Feb 2022 09:56:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220201230427.2311393-1-tadeusz.struk@linaro.org>
+References: <2e96421f-44b5-c8b7-82f7-5a9a9040104b@amd.com> <20220202105158.7072-1-ravi.bangoria@amd.com>
+ <CALMp9eQHfAgcW-J1YY=01ki4m_YVBBEz6D1T662p2BUp05ZcPQ@mail.gmail.com> <3c97e081-ae46-d92d-fe8f-58642d6b773e@amd.com>
+In-Reply-To: <3c97e081-ae46-d92d-fe8f-58642d6b773e@amd.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 3 Feb 2022 09:55:51 -0800
+Message-ID: <CALMp9eS72bhP=hGJRzTwGxG9XrijEnGKnJ-pqtHxYG-5Shs+2g@mail.gmail.com>
+Subject: Re: [PATCH v2] perf/amd: Implement erratum #1292 workaround for F19h M00-0Fh
+To:     Ravi Bangoria <ravi.bangoria@amd.com>
+Cc:     like.xu.linux@gmail.com, eranian@google.com,
+        santosh.shukla@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        wanpengli@tencent.com, vkuznets@redhat.com, joro@8bytes.org,
+        peterz@infradead.org, mingo@redhat.com,
+        alexander.shishkin@linux.intel.com, tglx@linutronix.de,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, x86@kernel.org,
+        linux-perf-users@vger.kernel.org, ananth.narayan@amd.com,
+        kim.phillips@amd.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 01, 2022 at 03:04:27PM -0800, Tadeusz Struk wrote:
-> From: Sean Christopherson <seanjc@google.com>
-> 
-> Commit f7e570780efc5cec9b2ed1e0472a7da14e864fdb upstream.
-> 
-> Please apply it to 5.10.y. It fixes the following syzbot issue:
-> Link: https://syzkaller.appspot.com/bug?id=c46ee6f22a68171154cdd9217216b2a02cf4b71c
-> 
-> Forcibly leave nested virtualization operation if userspace toggles SMM
-> state via KVM_SET_VCPU_EVENTS or KVM_SYNC_X86_EVENTS.  If userspace
-> forces the vCPU out of SMM while it's post-VMXON and then injects an SMI,
-> vmx_enter_smm() will overwrite vmx->nested.smm.vmxon and end up with both
-> vmxon=false and smm.vmxon=false, but all other nVMX state allocated.
-> 
-> Don't attempt to gracefully handle the transition as (a) most transitions
-> are nonsencial, e.g. forcing SMM while L2 is running, (b) there isn't
-> sufficient information to handle all transitions, e.g. SVM wants access
-> to the SMRAM save state, and (c) KVM_SET_VCPU_EVENTS must precede
-> KVM_SET_NESTED_STATE during state restore as the latter disallows putting
-> the vCPU into L2 if SMM is active, and disallows tagging the vCPU as
-> being post-VMXON in SMM if SMM is not active.
-> 
-> Abuse of KVM_SET_VCPU_EVENTS manifests as a WARN and memory leak in nVMX
-> due to failure to free vmcs01's shadow VMCS, but the bug goes far beyond
-> just a memory leak, e.g. toggling SMM on while L2 is active puts the vCPU
-> in an architecturally impossible state.
-> 
->   WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
->   WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
->   Modules linked in:
->   CPU: 1 PID: 3606 Comm: syz-executor725 Not tainted 5.17.0-rc1-syzkaller #0
->   Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->   RIP: 0010:free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
->   RIP: 0010:free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
->   Code: <0f> 0b eb b3 e8 8f 4d 9f 00 e9 f7 fe ff ff 48 89 df e8 92 4d 9f 00
->   Call Trace:
->    <TASK>
->    kvm_arch_vcpu_destroy+0x72/0x2f0 arch/x86/kvm/x86.c:11123
->    kvm_vcpu_destroy arch/x86/kvm/../../../virt/kvm/kvm_main.c:441 [inline]
->    kvm_destroy_vcpus+0x11f/0x290 arch/x86/kvm/../../../virt/kvm/kvm_main.c:460
->    kvm_free_vcpus arch/x86/kvm/x86.c:11564 [inline]
->    kvm_arch_destroy_vm+0x2e8/0x470 arch/x86/kvm/x86.c:11676
->    kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1217 [inline]
->    kvm_put_kvm+0x4fa/0xb00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1250
->    kvm_vm_release+0x3f/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1273
->    __fput+0x286/0x9f0 fs/file_table.c:311
->    task_work_run+0xdd/0x1a0 kernel/task_work.c:164
->    exit_task_work include/linux/task_work.h:32 [inline]
->    do_exit+0xb29/0x2a30 kernel/exit.c:806
->    do_group_exit+0xd2/0x2f0 kernel/exit.c:935
->    get_signal+0x4b0/0x28c0 kernel/signal.c:2862
->    arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:868
->    handle_signal_work kernel/entry/common.c:148 [inline]
->    exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
->    exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:207
->    __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
->    syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
->    do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
->    entry_SYSCALL_64_after_hwframe+0x44/0xae
->    </TASK>
-> 
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: <stable@vger.kernel.org>
-> Cc: <x86@kernel.org>
-> Cc: <kvm@vger.kernel.org>
-> 
-> Backported-by: Tadeusz Struk <tadeusz.struk@linaro.org>
+On Wed, Feb 2, 2022 at 9:18 PM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
+>
+> Hi Jim,
+>
+> On 03-Feb-22 9:39 AM, Jim Mattson wrote:
+> > On Wed, Feb 2, 2022 at 2:52 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
+> >>
+> >> Perf counter may overcount for a list of Retire Based Events. Implement
+> >> workaround for Zen3 Family 19 Model 00-0F processors as suggested in
+> >> Revision Guide[1]:
+> >>
+> >>   To count the non-FP affected PMC events correctly:
+> >>     o Use Core::X86::Msr::PERF_CTL2 to count the events, and
+> >>     o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
+> >>     o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
+> >>
+> >> Note that the specified workaround applies only to counting events and
+> >> not to sampling events. Thus sampling event will continue functioning
+> >> as is.
+> >>
+> >> Although the issue exists on all previous Zen revisions, the workaround
+> >> is different and thus not included in this patch.
+> >>
+> >> This patch needs Like's patch[2] to make it work on kvm guest.
+> >
+> > IIUC, this patch along with Like's patch actually breaks PMU
+> > virtualization for a kvm guest.
+> >
+> > Suppose I have some code which counts event 0xC2 [Retired Branch
+> > Instructions] on PMC0 and event 0xC4 [Retired Taken Branch
+> > Instructions] on PMC1. I then divide PMC1 by PMC0 to see what
+> > percentage of my branch instructions are taken. On hardware that
+> > suffers from erratum 1292, both counters may overcount, but if the
+> > inaccuracy is small, then my final result may still be fairly close to
+> > reality.
+> >
+> > With these patches, if I run that same code in a kvm guest, it looks
+> > like one of those events will be counted on PMC2 and the other won't
+> > be counted at all. So, when I calculate the percentage of branch
+> > instructions taken, I either get 0 or infinity.
+>
+> Events get multiplexed internally. See below quick test I ran inside
+> guest. My host is running with my+Like's patch and guest is running
+> with only my patch.
 
-Nit, this should be "signed-off-by:" no need to make up new tags like
-this.
+Your guest may be multiplexing the counters. The guest I posited does not.
 
-thanks,
-
-greg k-h
+I hope that you are not saying that kvm's *thread-pinned* perf events
+are not being multiplexed at the host level, because that completely
+breaks PMU virtualization.
