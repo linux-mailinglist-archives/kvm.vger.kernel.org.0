@@ -2,270 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 369144A8B59
-	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 19:16:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF12E4A8BA7
+	for <lists+kvm@lfdr.de>; Thu,  3 Feb 2022 19:29:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353327AbiBCSQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Feb 2022 13:16:03 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:12263 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353310AbiBCSQA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Feb 2022 13:16:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1643912160; x=1675448160;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=P04UnRBV76MpDpOOK6q6643kAlnLXt09lfQX/PkSX+E=;
-  b=b5GAs4ypYj4piUVQuEYQ01A1DKTQs3KFxSBReYuERvIvozHkvwLILs28
-   RUn82lsA9zDrVIa7mV/Jnouj0mbbaJtHgv72gIUH64ovMHuhC05PvxAZx
-   gjTYAWJYDhaAj5fLJHg3mVOiYcR6DsLXDLP77uvbXqs+eEdXxIaBJQAig
-   s=;
-X-IronPort-AV: E=Sophos;i="5.88,340,1635206400"; 
-   d="scan'208";a="175354490"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-54a073b7.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 03 Feb 2022 18:15:49 +0000
-Received: from EX13D07EUA003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1d-54a073b7.us-east-1.amazon.com (Postfix) with ESMTPS id 75E19A28C2;
-        Thu,  3 Feb 2022 18:15:45 +0000 (UTC)
-Received: from dev-dsk-faresx-1b-818bcd8f.eu-west-1.amazon.com (10.43.160.132)
- by EX13D07EUA003.ant.amazon.com (10.43.165.176) with Microsoft SMTP Server
- (TLS) id 15.0.1497.28; Thu, 3 Feb 2022 18:15:39 +0000
-From:   Fares Mehanna <faresx@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-CC:     <x86@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-sgx@vger.kernel.org>,
-        Fares Mehanna <faresx@amazon.de>
-Subject: [PATCH] KVM: VMX: pass TME information to guests
-Date:   Thu, 3 Feb 2022 18:14:32 +0000
-Message-ID: <20220203181432.34911-1-faresx@amazon.de>
-X-Mailer: git-send-email 2.32.0
-MIME-Version: 1.0
-X-Originating-IP: [10.43.160.132]
-X-ClientProxiedBy: EX13D11UWB001.ant.amazon.com (10.43.161.53) To
- EX13D07EUA003.ant.amazon.com (10.43.165.176)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+        id S1346334AbiBCS3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Feb 2022 13:29:17 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:49612 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236917AbiBCS3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Feb 2022 13:29:16 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 70FE661908
+        for <kvm@vger.kernel.org>; Thu,  3 Feb 2022 18:29:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3049C340E8;
+        Thu,  3 Feb 2022 18:29:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643912955;
+        bh=ncqPtg+DYpNlGvx4X6HMr8JFXcAL5tl358yKDL55o44=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VtsBhmSjo+Kdf44472ysg4KDANbBqsE1QTfyaJqKrXxE1QsO2iUl7l0rknGcsOC7W
+         tfloh+wvu1VbcIgC1B6Z3j6iVaf5BustlGwoUgWbmKKgl5dr4M2bqMA+fg1Icum2/j
+         AaQK61Cpi+sHtIePYM69uGVnleZ51R9imPJkUMLXuEkaQpj6kRbzHfEK31k0LHartO
+         Tmf4TZ0xhnZ8SD8fOY4zTRGyvuS7jLkkVyyXzsWJ7PspVMqgax38B/r00C07JF7j1r
+         PA1YGFHQHhR/SATEwQeOrzlTMid/cPpDYphdwnp8MoPl9jL7jR+fFz8JBefxO18DeJ
+         hR5LSUW1Ozn5g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=billy-the-mountain.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nFgr3-005EBq-NS; Thu, 03 Feb 2022 18:29:13 +0000
+Date:   Thu, 03 Feb 2022 18:29:13 +0000
+Message-ID: <87fsoz3iti.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 12/64] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+In-Reply-To: <Yfq6ig0TIv2Bs4Dq@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+        <20220128121912.509006-13-maz@kernel.org>
+        <Yfq6ig0TIv2Bs4Dq@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, karl.heubaum@oracle.com, mihai.carabas@oracle.com, miguel.luis@oracle.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Guests running on IceLake have TME-EN disabled in CPUID, and they can't read TME
-related MSRs [IA32_TME_CAPABILITY, IA32_TME_ACTIVATE, IA32_TME_EXCLUDE_MASK,
-IA32_TME_EXCLUDE_BASE].
+On Wed, 02 Feb 2022 17:08:26 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Jan 28, 2022 at 12:18:20PM +0000, Marc Zyngier wrote:
+> > Some EL2 system registers immediately affect the current execution
+> > of the system, so we need to use their respective EL1 counterparts.
+> > For this we need to define a mapping between the two. In general,
+> > this only affects non-VHE guest hypervisors, as VHE system registers
+> > are compatible with the EL1 counterparts.
+> > 
+> > These helpers will get used in subsequent patches.
+> > 
+> > Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h | 54 +++++++++++++++++++++++++++++
+> >  1 file changed, 54 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index fd601ea68d13..5a85be6d8eb3 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -2,6 +2,7 @@
+> >  #ifndef __ARM64_KVM_NESTED_H
+> >  #define __ARM64_KVM_NESTED_H
+> >  
+> > +#include <linux/bitfield.h>
+> >  #include <linux/kvm_host.h>
+> >  
+> >  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+> > @@ -11,4 +12,57 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+> >  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> >  }
+> >  
+> > +/* Translation helpers from non-VHE EL2 to EL1 */
+> > +static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
+> > +{
+> > +	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
+> > +}
+> > +
+> > +static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
+> > +{
+> > +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+> > +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+> > +	       tcr_el2_ps_to_tcr_el1_ips(tcr) |
+> > +	       (tcr & TCR_EL2_TG0_MASK) |
+> > +	       (tcr & TCR_EL2_ORGN0_MASK) |
+> > +	       (tcr & TCR_EL2_IRGN0_MASK) |
+> > +	       (tcr & TCR_EL2_T0SZ_MASK);
+> > +}
+> > +
+> > +static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
+> > +{
+> > +	u64 cpacr_el1 = 0;
+> > +
+> > +	if (cptr_el2 & CPTR_EL2_TTA)
+> > +		cpacr_el1 |= CPACR_EL1_TTA;
+> > +	if (!(cptr_el2 & CPTR_EL2_TFP))
+> > +		cpacr_el1 |= CPACR_EL1_FPEN;
+> > +	if (!(cptr_el2 & CPTR_EL2_TZ))
+> > +		cpacr_el1 |= CPACR_EL1_ZEN;
+> > +
+> > +	return cpacr_el1;
+> > +}
+> > +
+> > +static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
+> > +{
+> > +	/* Only preserve the minimal set of bits we support */
+> > +	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
+> > +		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
+> 
+> Checked that the bit positions are the same between SCTLR_EL2 and SCTLR_EL1. I
+> think the IESB bit (bit 21) should be after the WXN bit (bit 19) to be
+> consistent; doesn't really matter either way.
+> 
+> > +	val |= SCTLR_EL1_RES1;
+> > +
+> > +	return val;
+> > +}
+> > +
+> > +static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+> > +{
+> > +	/* Clear the ASID field */
+> > +	return ttbr0 & ~GENMASK_ULL(63, 48);
+> > +}
+> > +
+> > +static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+> > +{
+> > +	return ((FIELD_GET(CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN, cnthctl) << 10) |
+> > +		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
+> 
+> I asked about the field positions in the previous series and this is what you
+> replied:
+> 
+> > It's a classic one. Remember that we are running VHE, and remapping a
+> > nVHE view of CNTHCTL_EL2 into the VHE view *for the guest*, and that
+> > these things are completely shifted around (it has the CNTKCTL_EL1
+> > format).
+> >
+> > For example, on nVHE, CNTHCTL_EL2.EL1PCTEN is bit 0. On nVHE, this is
+> > bit 10. That's why we have this shift, and that you now need some
+> > paracetamol.
+> >
+> > You can also look at the way we deal with the same stuff in
+> > kvm_timer_init_vhe()".
+> 
+> Here's how this function is used in vhe/sysreg-sr.c:
+> 
+> static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
+> {
+> 	[..]
+> 	if (__vcpu_el2_e2h_is_set(ctxt)) {
+> 		[..]
+> 	} else {
+> 		[..]
+> 		val = translate_cnthctl_el2_to_cntkctl_el1(ctxt_sys_reg(ctxt, CNTHCTL_EL2));
+> 		write_sysreg_el1(val, SYS_CNTKCTL);
+> 	}
+> 	[..]
+> }
+> 
+> CNTHCTL_EL2 is a pure EL2 register. The translate function is called
+> when guest HCR_EL2.E2H is not set, therefore virtual CNTHCTL_EL2 has
+> the non-VHE format.  And the result of the function is used to write
+> to the hardware CNTKCTL_EL1 register (using the CNTKCTL_EL12
+> encoding), which is different from the CNTHCTL_EL2
+> register. CNTKCTL_EL1 also always has the same format regardless of
+> the value of the HCR_EL2.E2H bit.
+> 
+> I don't understand what the host running with VHE has to do with the
+> translate function.
 
-So guests don't know if they are running with TME enabled or not.
+It's just that I completely misunderstood your question, and that I
+also failed to realise that this code is just plain buggy. Apologies
+for wasting your time on this.
 
-In this patch, TME information is passed to the guest if the host has `TME-EN`
-enabled in CPUID and TME MSRs are locked and the exclusion range is disabled.
+As it turns out, CNTHCTL_EL2 has *zero* influence on the hypervisor
+itself, so messing with it and trying to restore it into CNTKCTL_EL12
+is remarkably pointless. It is solely designed to influence the
+execution of EL1. Duh.
 
-This will guarantee that hardware supports TME, MSRs are locked, so host can't
-change them and exclusion range is disabled, so TME rules apply on all host
-memory.
+What it should do is to restore parts of this register *on the host*
+so that L1's EL1 is actually influenced by what L1's EL2 has set up
+(mostly to handle traps from EL1 to EL2).
 
-In IA32_TME_CAPABILITY and IA32_TME_ACTIVATE we mask out the reserved bits and
-MKTME related bits.
+To summarise:
 
-So in IA32_TME_CAPABILITY, we are passing:
-Bit[0]:  Support for AES-XTS 128-bit encryption algorithm
-Bit[2]:  Support for AES-XTS 256-bit encryption algorithm
-Bit[31]: TME encryption bypass supported
+- the name of the function is misleading: it should be something like
+  'translate_nvhe_cnthctl_el2_to_vhe()'. The function is otherwise
+  correct, and why I was rambling about the bit offsets.
 
-And in IA32_TME_ACTIVATE, we are passing:
-Bit[0]:   Lock RO
-Bit[1]:   TME Enable RWL
-Bit[2]:   Key select
-Bit[3]:   Save TME key for Standby
-Bit[4:7]: Encryption Algorithm
-Bit[31]:  TME Encryption Bypass Enable
+- the location of the save/restore is wrong: it should happen when
+  dealing with EL1 instead of EL2
 
-However IA32_TME_EXCLUDE_MASK and IA32_TME_EXCLUDE_BASE are read by the guest as
-zero, since we will only pass TME information if the exclusion range is
-disabled.
+- the register it targets is wrong: it should target CNTHTL_EL2 (or
+  CNTKCTL_EL1 as seen from VHE EL2)
 
-Those information are helpful for the guest to determine if TME is enabled by
-the BIOS or not.
+I'll stick a brown paper bag on my head and wear it for the evening.
 
-Signed-off-by: Fares Mehanna <faresx@amazon.de>
----
- arch/x86/include/asm/msr-index.h |  6 ++++++
- arch/x86/include/asm/processor.h | 14 ++++++++++++++
- arch/x86/kernel/cpu/intel.c      | 15 +--------------
- arch/x86/kvm/cpuid.c             | 19 ++++++++++++++++++-
- arch/x86/kvm/vmx/vmx.c           | 20 ++++++++++++++++++++
- 5 files changed, 59 insertions(+), 15 deletions(-)
+Thanks,
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 3faf0f97edb1..908aad1a7cad 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -438,6 +438,12 @@
- #define MSR_RELOAD_PMC0			0x000014c1
- #define MSR_RELOAD_FIXED_CTR0		0x00001309
- 
-+/* Memory encryption MSRs */
-+#define MSR_IA32_TME_CAPABILITY		0x981
-+#define MSR_IA32_TME_ACTIVATE		0x982
-+#define MSR_IA32_TME_EXCLUDE_MASK	0x983
-+#define MSR_IA32_TME_EXCLUDE_BASE	0x984
-+
- /*
-  * AMD64 MSRs. Not complete. See the architecture manual for a more
-  * complete list.
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index 2c5f12ae7d04..28387ae7277b 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -863,4 +863,18 @@ bool arch_is_platform_page(u64 paddr);
- #define arch_is_platform_page arch_is_platform_page
- #endif
- 
-+/* Helpers to access TME_ACTIVATE MSR */
-+#define TME_ACTIVATE_LOCKED(x)		((x) & 0x1)
-+#define TME_ACTIVATE_ENABLED(x)		((x) & 0x2)
-+
-+#define TME_ACTIVATE_POLICY(x)		(((x) >> 4) & 0xf)        /* Bits 7:4 */
-+#define TME_ACTIVATE_POLICY_AES_XTS_128	0
-+
-+#define TME_ACTIVATE_KEYID_BITS(x)	(((x) >> 32) & 0xf)     /* Bits 35:32 */
-+
-+#define TME_ACTIVATE_CRYPTO_ALGS(x)	(((x) >> 48) & 0xffff)    /* Bits 63:48 */
-+#define TME_ACTIVATE_CRYPTO_AES_XTS_128	1
-+
-+#define TME_EXCLUSION_ENABLED(x)	((x) & 0x800) /* Bit 11 */
-+
- #endif /* _ASM_X86_PROCESSOR_H */
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 8321c43554a1..46ad006089a3 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -14,6 +14,7 @@
- 
- #include <asm/cpufeature.h>
- #include <asm/msr.h>
-+#include <asm/processor.h>
- #include <asm/bugs.h>
- #include <asm/cpu.h>
- #include <asm/intel-family.h>
-@@ -492,20 +493,6 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
- #endif
- }
- 
--#define MSR_IA32_TME_ACTIVATE		0x982
--
--/* Helpers to access TME_ACTIVATE MSR */
--#define TME_ACTIVATE_LOCKED(x)		(x & 0x1)
--#define TME_ACTIVATE_ENABLED(x)		(x & 0x2)
--
--#define TME_ACTIVATE_POLICY(x)		((x >> 4) & 0xf)	/* Bits 7:4 */
--#define TME_ACTIVATE_POLICY_AES_XTS_128	0
--
--#define TME_ACTIVATE_KEYID_BITS(x)	((x >> 32) & 0xf)	/* Bits 35:32 */
--
--#define TME_ACTIVATE_CRYPTO_ALGS(x)	((x >> 48) & 0xffff)	/* Bits 63:48 */
--#define TME_ACTIVATE_CRYPTO_AES_XTS_128	1
--
- /* Values for mktme_status (SW only construct) */
- #define MKTME_ENABLED			0
- #define MKTME_DISABLED			1
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 28be02adc669..c5a18527f099 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -84,6 +84,22 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
- 	return NULL;
- }
- 
-+static bool kvm_tme_supported(void)
-+{
-+	u64 tme_activation, tme_exclusion;
-+
-+	if (!feature_bit(TME))
-+		return false;
-+
-+	if (rdmsrl_safe(MSR_IA32_TME_EXCLUDE_MASK, &tme_exclusion))
-+		return false;
-+	if (rdmsrl_safe(MSR_IA32_TME_ACTIVATE, &tme_activation))
-+		return false;
-+
-+	return TME_ACTIVATE_LOCKED(tme_activation) &&
-+		!TME_EXCLUSION_ENABLED(tme_exclusion);
-+}
-+
- static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
- 			   struct kvm_cpuid_entry2 *entries,
- 			   int nent)
-@@ -508,6 +524,7 @@ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
- 
- void kvm_set_cpu_caps(void)
- {
-+	unsigned int f_tme = kvm_tme_supported() ? F(TME) : 0;
- #ifdef CONFIG_X86_64
- 	unsigned int f_gbpages = F(GBPAGES);
- 	unsigned int f_lm = F(LM);
-@@ -565,7 +582,7 @@ void kvm_set_cpu_caps(void)
- 		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
- 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
- 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
--		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
-+		f_tme | F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
- 		F(SGX_LC) | F(BUS_LOCK_DETECT)
- 	);
- 	/* Set LA57 based on hardware capability. */
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index aca3ae2a02f3..f8cbf935cfe0 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1913,6 +1913,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_DEBUGCTLMSR:
- 		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
- 		break;
-+	case MSR_IA32_TME_CAPABILITY:
-+		if (!guest_cpuid_has(vcpu, X86_FEATURE_TME))
-+			return 1;
-+		if (rdmsrl_safe(MSR_IA32_TME_CAPABILITY, &msr_info->data))
-+			return 1;
-+		msr_info->data &= 0x80000005; /* Bit 0, 2, 31 */
-+		break;
-+	case MSR_IA32_TME_ACTIVATE:
-+		if (!guest_cpuid_has(vcpu, X86_FEATURE_TME))
-+			return 1;
-+		if (rdmsrl_safe(MSR_IA32_TME_ACTIVATE, &msr_info->data))
-+			return 1;
-+		msr_info->data &= 0x800000FF; /* Bits [0-7] and Bit 31 */
-+		break;
-+	case MSR_IA32_TME_EXCLUDE_MASK:
-+	case MSR_IA32_TME_EXCLUDE_BASE:
-+		if (!guest_cpuid_has(vcpu, X86_FEATURE_TME))
-+			return 1;
-+		msr_info->data = 0x0;
-+		break;
- 	default:
- 	find_uret_msr:
- 		msr = vmx_find_uret_msr(vmx, msr_info->index);
+	M.
+
 -- 
-2.32.0
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Without deviation from the norm, progress is not possible.
