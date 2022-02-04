@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7C3E4AA159
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 21:47:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CAD84AA15A
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 21:47:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238117AbiBDUrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 15:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52534 "EHLO
+        id S238929AbiBDUrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 15:47:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237301AbiBDUrO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 15:47:14 -0500
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2B7C06173D
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 12:47:13 -0800 (PST)
-Received: by mail-il1-x14a.google.com with SMTP id z11-20020a056e0217cb00b002bab54d8254so4839195ilu.18
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 12:47:13 -0800 (PST)
+        with ESMTP id S238376AbiBDUrP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 15:47:15 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884CCC061714
+        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 12:47:14 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 2-20020a251302000000b006118f867dadso15337010ybt.12
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 12:47:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=t3bi6FbPBwbvFSpb5eud1+ec03s+bf56QCIyPFsES0U=;
-        b=mpqMxckHGLPsT+uHuy09F7pFKbqRjBmE6sLIY6YD6HPx9DYJtDSyziIxfisKAIkFAF
-         uUd3OLCFvbDgF9C1aAxkAJGDkUDZ73wRroRNoEWXz/waip1Fbx9xk54+ovf9+JRQGjgU
-         nS50h1LsenI+hdnImHkLJiXUTNyiNKLLcTvTDpAi64jhKD3Ki5CZg4pOHImaGHEIaWFw
-         RL3AZejhcKyZMeyshJ2kWNwuCd0CaGXyrsop7JUyxra7LlH+AcGnjZwLebjckjEMkNvg
-         Q8Pq4xZ2LZf7hVXFaO+maWq6H8Kmqhpd+FGn6J9GG1S1ZnQCv470UAP1D9liQv/hasxf
-         R+Hg==
+        bh=wNEW0r3i/yh83WCbI4vGD4iW/NFLvLf/uskgDDYubyU=;
+        b=lgiQcgh1u5e3NMCAjj06zrynEs5CTxVHFTw0NCCQvGgSZ9OVdxp8IAQoIIMjqYS8qE
+         fyZRkR4vCH09+PiErMKnXoyBU6zN3ScDmMsuJcM0ZyOyp+Kstwh9YpueargozAgbjJpG
+         xZHHfQw7Wr5bWLmg1BOnkge6i5yYYIrnTlMuX4ct90IRqgtLLUqseHFEDiOBJYCRpIag
+         Kf9Ku09vF7bY9AmEJH0vOtxswhrEVKQM7GoqPRBag4MGQ12G+IsYoSucvGiK+40HaMNh
+         1hOYKRgwyAPeBaSinGL+fGCz1mS2SctUbs3LLQwJxEmgTPBedoqvmSfhCKDz33McdmxF
+         OelQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=t3bi6FbPBwbvFSpb5eud1+ec03s+bf56QCIyPFsES0U=;
-        b=Lway4v5wti8NoPfFksXpBk6mmviG8OlGmc4d+YYkP3FCmrZ8rmuH7kSxQN8V42GrKS
-         jgo2oDhxfQJVarxmp4q8VjDKeHSSHcSvfprrDyPo2He10oe/uKKmPq0b7uxvmm9evRII
-         zxowry/2/huL5TYkQ6N1jEkJvedL0eKLo1e6AoT7Ttch+U+TZk6dU0l1af7r5B0jNLw5
-         gSWq6VUJDddwlkcfR3g/GFj9/iMBkT55fA5/YRavGuyYV5n+6FOHrpeXZs9EivyaVuQd
-         vIVfSRYM9Q0wXsu+k7I7vgmMFMjJGf22p0CHvzWBU1z7Wmz0Gj3V1fmI730AtrHHqCEf
-         kEDQ==
-X-Gm-Message-State: AOAM532CRgBlKSq3sEUw8HQJLrG26P9Z3ywuolFUCziE99DwlVQB8H5X
-        QKPBwjRl8tyB/JeCZESEWFmrKegL3znkkDUzk1fztmD34COzGuZuQbxVh6+FRWRmeRilUWqQP6V
-        CUFz05Skn+tzVym0GwwtGO3i8/7GXZpBHU9IBxnDC4puy/HJX111YzFTooQ==
-X-Google-Smtp-Source: ABdhPJz68v1EL2eR2+Ct0VcHGf11IEXNE7eQ64dRIRCyEsK2OO17lW5RuOO6z5DFi5ACny/1AYQacP4PDek=
+        bh=wNEW0r3i/yh83WCbI4vGD4iW/NFLvLf/uskgDDYubyU=;
+        b=XHlbiP9jT14rfEpzlSOwkmSEsfRZkoPg2/K+nUPryR1ojFgYPtCHvD4xDbsie4g4fu
+         jMA+/DGxVto/5uImCrxBwod/tK7Q6BEkMQfy1fK7P7AFvDXzAyHxfVHmtr8LdVqWpgOx
+         BZCv3g/pvzzNH8PJ2MO5iAcjH7Lrg1+6ob8lqUAyBKk+nN6pg+lwt28OGUEpoOPWU616
+         vgHDInhI2ChT7b9QBB6k2z1vSoYwlaIcnhwfAAlVGQ17hP7VvTImFHcJ5hKW3mtOLwjA
+         PHUJEP2ILadQjFbZwZVFCqJwZR95ViKD8PqWx4KaxHgol7YUCD5PpFGGyGBg/B+b9LxW
+         MhuA==
+X-Gm-Message-State: AOAM5304hDaS9JbEUTZesFf2eYArnFANN8ESyWKqCaZfHE1NR6vS2j1P
+        OQuGbg50vRHqjBvJll9KDMbxv3PcmqOdjNkGAqUSIuksKH6YryFuXNU+DPyHZvnVFRTJn+8GiJu
+        4gZ1odFwOnjGuhPxac8XgAum4Lt45jqHKUZn9LYuydkMqt5JG6Tnzu7W7hQ==
+X-Google-Smtp-Source: ABdhPJy6vD0hnzI7gYy8ASHpyxgqi8zQXXCmGl6zTD9fo3y9iT6maUpZwKD2KrEi7loIPIKBit/8lC5cGuw=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6602:1407:: with SMTP id
- t7mr407600iov.82.1644007632693; Fri, 04 Feb 2022 12:47:12 -0800 (PST)
-Date:   Fri,  4 Feb 2022 20:47:01 +0000
+ (user=oupton job=sendgmr) by 2002:a5b:486:: with SMTP id n6mr999671ybp.547.1644007633725;
+ Fri, 04 Feb 2022 12:47:13 -0800 (PST)
+Date:   Fri,  4 Feb 2022 20:47:02 +0000
 In-Reply-To: <20220204204705.3538240-1-oupton@google.com>
-Message-Id: <20220204204705.3538240-4-oupton@google.com>
+Message-Id: <20220204204705.3538240-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20220204204705.3538240-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH v2 3/7] KVM: nVMX: Roll all entry/exit ctl updates into a
- single helper
+Subject: [PATCH v2 4/7] KVM: nVMX: Add a quirk for KVM tweaks to VMX control MSRs
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -73,98 +72,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-nested_vmx_pmu_entry_exit_ctls_update() is no longer useful; updating
-the entry/exit ctrl bits in the vendor vcpu_after_set_cpuid() hook is
-sufficient as KVM has already recalculated the vPMU version.
+KVM really has no business messing with the vCPU state. Nonetheless, it
+has become ABI for KVM to adjust certain bits of the VMX entry/exit
+control MSRs depending on the guest CPUID. Namely, the bits associated
+with the IA32_PERF_GLOBAL_CTRL and IA32_BNDCFGS MSRs were conditionally
+enabled if the guest CPUID allows for it.
 
-Keep all of KVM's bad behavior with regards to the VMX entry/exit
-control MSRs in one place. Remove all traces of the PMU helper and
-inline the bit twiddling to nested_vmx_entry_exit_ctls_update().
+Allow userspace to opt-out of changes to VMX control MSRs by adding a
+new KVM quirk.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/vmx/nested.c    | 21 ---------------------
- arch/x86/kvm/vmx/nested.h    |  1 -
- arch/x86/kvm/vmx/pmu_intel.c |  2 --
- arch/x86/kvm/vmx/vmx.c       |  8 +++++++-
- 4 files changed, 7 insertions(+), 25 deletions(-)
+ arch/x86/include/uapi/asm/kvm.h | 11 ++++++-----
+ arch/x86/kvm/vmx/vmx.c          |  3 +++
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 59164394569f..2e8facff93f8 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4806,27 +4806,6 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 	return 0;
- }
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index bf6e96011dfe..acbab6a97fae 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -428,11 +428,12 @@ struct kvm_sync_regs {
+ 	struct kvm_vcpu_events events;
+ };
  
--void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_vmx *vmx;
--
--	if (!nested_vmx_allowed(vcpu))
--		return;
--
--	vmx = to_vmx(vcpu);
--	if (kvm_x86_ops.pmu_ops->is_valid_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL)) {
--		vmx->nested.msrs.entry_ctls_high |=
--				VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
--		vmx->nested.msrs.exit_ctls_high |=
--				VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
--	} else {
--		vmx->nested.msrs.entry_ctls_high &=
--				~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
--		vmx->nested.msrs.exit_ctls_high &=
--				~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
--	}
--}
--
- static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer,
- 				int *ret)
- {
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index b69a80f43b37..14ad756aac46 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -32,7 +32,6 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data);
- int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata);
- int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 			u32 vmx_instruction_info, bool wr, int len, gva_t *ret);
--void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
- void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu);
- bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
- 				 int size);
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 466d18fc0c5d..ad1adbaa7d9e 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -541,8 +541,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	bitmap_set(pmu->all_valid_pmc_idx,
- 		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
+-#define KVM_X86_QUIRK_LINT0_REENABLED	   (1 << 0)
+-#define KVM_X86_QUIRK_CD_NW_CLEARED	   (1 << 1)
+-#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	   (1 << 2)
+-#define KVM_X86_QUIRK_OUT_7E_INC_RIP	   (1 << 3)
+-#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
++#define KVM_X86_QUIRK_LINT0_REENABLED		(1 << 0)
++#define KVM_X86_QUIRK_CD_NW_CLEARED		(1 << 1)
++#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE		(1 << 2)
++#define KVM_X86_QUIRK_OUT_7E_INC_RIP		(1 << 3)
++#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT	(1 << 4)
++#define KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS	(1 << 5)
  
--	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
--
- 	if (intel_pmu_lbr_is_compatible(vcpu))
- 		x86_perf_get_lbr(&lbr_desc->records);
- 	else
+ #define KVM_STATE_NESTED_FORMAT_VMX	0
+ #define KVM_STATE_NESTED_FORMAT_SVM	1
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 54ac382a0b73..395787b7e7ac 100644
+index 395787b7e7ac..60b1b76782e1 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7243,7 +7243,13 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
- 		}
- 	}
+@@ -7231,6 +7231,9 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
  
--	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
-+	if (kvm_pmu_is_valid_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL)) {
-+		vmx->nested.msrs.entry_ctls_high |= VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-+		vmx->nested.msrs.exit_ctls_high |= VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-+	} else {
-+		vmx->nested.msrs.entry_ctls_high &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-+		vmx->nested.msrs.exit_ctls_high &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-+	}
- }
++	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS))
++		return;
++
+ 	if (kvm_mpx_supported()) {
+ 		bool mpx_enabled = guest_cpuid_has(vcpu, X86_FEATURE_MPX);
  
- static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
 -- 
 2.35.0.263.gb82422642f-goog
 
