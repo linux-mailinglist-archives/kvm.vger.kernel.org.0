@@ -1,191 +1,155 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73A104A9F6C
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 19:45:44 +0100 (CET)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.lfdr.de (Postfix) with ESMTP id 6920D4A9FE5
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 20:18:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377712AbiBDSpn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 13:45:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50180 "EHLO
+        id S232654AbiBDTSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 14:18:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377783AbiBDSpm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 13:45:42 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82A25C06173D
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 10:45:42 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id g15-20020a17090a67cf00b001b7d5b6bedaso6886160pjm.4
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 10:45:42 -0800 (PST)
+        with ESMTP id S232452AbiBDTSO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 14:18:14 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16FADC06174E
+        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 11:18:14 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id v13-20020a17090ac90d00b001b87bc106bdso3282pjt.4
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 11:18:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=gf593opMzUkEFK3tkBnZbu7cRzsoKyOlw/rIRToe0ac=;
-        b=VpJq89SA99pGTZGihoJEHsjwAxCgw8CctLfFMpaUDVIKjP8gqFG9tVsMjC7svKnYKw
-         GQNJvU89pauWdxt168WBcwO+6ppmytdvoyEMO1x84ZwuAVmXs3x0KMTGQmfnneGXecGG
-         L/TFbujMiuZdM67Zo6685pkixvqD1Dx2iD3ryJyJ9H9pzjfKJNc8gH9qvC42w/zL7GB9
-         Hjy0NQQBF+NZxGKW3NBgMaJw0CspDifVu4+K4AHbGlLPRGzcgBI9ns04VRoZ8kLFh40U
-         PeOHOeuNlEBxm5KHwBpbvNGXTP3HLFaW5IfQeA4PbRe/y24NMwL3eSfE8BsXABeo/1at
-         1/mg==
+        bh=42P0RkbrK1PQHs+ZTbHwM7kEGdYNQVmANbDyAZZWTvA=;
+        b=RoWEUamAkogvX5xsJGspiXmzbfM7Z/vGADYLoaf24DKkM4nBRV2oB2lbIBztGhg2IM
+         EM+6CocXccze+NZZ5mJa7oRQyyokomkHjwSnBWDr9NDQvHy1terajLKrrooMkC7/vIZ/
+         VlBL7S+6uaf6Vznoi5qtsMzq429LRqhT77Kep6Z4wkjPtgohV7E/UyLYyJjXGhnr9Nvu
+         THi1xtJ0UwxpJR8UwAosyvfkqzfF9W1+5uqyVuN3EM6git1+c3ARRQ5EHyvEqnfIVGNB
+         7xjn9WSQzIH87J3wl8IoPPRDL/2+xUc3j2SoxXjMfDXqxeoBOFxrku5TOdOjib623uEg
+         pxLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=gf593opMzUkEFK3tkBnZbu7cRzsoKyOlw/rIRToe0ac=;
-        b=VzbJVNjPx6MR/c6rg5p+XOz5t0PgBHkCOn0CTOqOqs5Yjzy2TSMp+Fm8RiVz1KDXez
-         BswJ3iIu4fyvyTlubQtV12lEfEKcCxsvFgHgDWXRjnA9pIkHyohmvKlCcAGm0tt5iyzi
-         mOZtF1K4pAgH5KJ+AdpPkSXbvxeqbxJkR6CvWqGY6RAu3bBX45A7uawbYaCFfYW8+jZK
-         QBPjDzMn606UqZk+acGdTWlXcUm70+iDIDq+CAg1zWzcB2VXTJRvjzdA0QS+/393rgVM
-         D70S1JZd1TfHhvyOGSZk1LyDyzFC9q0ClsGc1gsITEcoJnGsVXfjU3beBw0TTfJVWnql
-         PrcA==
-X-Gm-Message-State: AOAM532FTcQr8SuRuidu/InqhkMzZg6cFLWhhXy+wZgKEKlm/8cJ/06u
-        f+LRV8L4iQeXbzl8GjmM7jR4jQ==
-X-Google-Smtp-Source: ABdhPJycSLWY7IYjsj5ZtRStDt5vmI7UjLZM7E0uZrthMB0W8a2jlm/J4AQbWFoKIMVQbh0bXEbArQ==
-X-Received: by 2002:a17:90b:1016:: with SMTP id gm22mr4680992pjb.155.1644000341823;
-        Fri, 04 Feb 2022 10:45:41 -0800 (PST)
+        bh=42P0RkbrK1PQHs+ZTbHwM7kEGdYNQVmANbDyAZZWTvA=;
+        b=Q7mi85Yz+WrETULlEcrcVeUlB9huArGPSecEYwxmUcLs8lbPiRgAUkl3iVs5xsxT36
+         HeKlURiGQ7P+pImdpzWf2Yp3hhohuoIeDsoXyMP5TLGf/2gGUh5PzP0956eO2YnrdU1a
+         lNaIjsNY2NcRA6KBkSDZ/EpjQeS5XyziDjzxLCsPqJIr0TPxAiHzn2KGHsV10Fm6olS4
+         kmVFkW76w1u/Ba05iV6x8OuWkMISU+YS7kII8rLLR/7ZVd2Tp9UocpHcPbBopyTnoPY2
+         jO3ln9gqqGs3YBKX4oevIuJnNuFQfOU9D6/WBZcJW2OL3ToaORxN0k1cfYORZIJhch6O
+         XgSQ==
+X-Gm-Message-State: AOAM5328fbWm1P2Q4GFYnzPfxi5PqxYH8d8aTWAgpGfqPpY/FXXw5oeP
+        /brE/dENrqbycpF71Q6ZLoT7+A==
+X-Google-Smtp-Source: ABdhPJx7D2gzMfV9sTiwH5KkbdXKRG6tBzNdXYfFViGkvxO5diPDLXGOCYtjcWUgqjTueEfTkx+kFw==
+X-Received: by 2002:a17:902:d4ca:: with SMTP id o10mr4685547plg.28.1644002293319;
+        Fri, 04 Feb 2022 11:18:13 -0800 (PST)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id u19sm3340304pfi.150.2022.02.04.10.45.40
+        by smtp.gmail.com with ESMTPSA id 3sm10604743pjk.29.2022.02.04.11.18.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Feb 2022 10:45:40 -0800 (PST)
-Date:   Fri, 4 Feb 2022 18:45:37 +0000
+        Fri, 04 Feb 2022 11:18:12 -0800 (PST)
+Date:   Fri, 4 Feb 2022 19:18:08 +0000
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         seanjc@google.com, vkuznets@redhat.com
-Subject: Re: [PATCH 05/23] KVM: MMU: pull computation of kvm_mmu_role_regs to
- kvm_init_mmu
-Message-ID: <Yf10UbHmV85rFz6G@google.com>
+Subject: Re: [PATCH 06/23] KVM: MMU: load new PGD once nested two-dimensional
+ paging is initialized
+Message-ID: <Yf178LYEY4pFJcLc@google.com>
 References: <20220204115718.14934-1-pbonzini@redhat.com>
- <20220204115718.14934-6-pbonzini@redhat.com>
+ <20220204115718.14934-7-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220204115718.14934-6-pbonzini@redhat.com>
+In-Reply-To: <20220204115718.14934-7-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 04, 2022 at 06:57:00AM -0500, Paolo Bonzini wrote:
-> The init_kvm_*mmu functions, with the exception of shadow NPT,
-> do not need to know the full values of CR0/CR4/EFER; they only
-> need to know the bits that make up the "role".  This cleanup
-> however will take quite a few incremental steps.  As a start,
-> pull the common computation of the struct kvm_mmu_role_regs
-> into their caller: all of them extract the struct from the vcpu
-> as the very first step.
+On Fri, Feb 04, 2022 at 06:57:01AM -0500, Paolo Bonzini wrote:
+> __kvm_mmu_new_pgd looks at the MMU's root_level and shadow_root_level
+> via fast_pgd_switch.
+
+Those checks are just for performance correct (to skip iterating through
+the list of roots)?
+
+Either way, it's probably worth including a Fixes tag below.
+
+> It makes no sense to call it before updating
+> these fields, even though it was done like that ever since nested
+> VMX grew the ability to use fast CR3 switch (commit 50c28f21d045,
+> "kvm: x86: Use fast CR3 switch for nested VMX").
+> 
+> Pull it to the end of the initialization of the shadow nested MMUs.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: David Matlack <dmatlack@google.com>
+
 > ---
->  arch/x86/kvm/mmu/mmu.c | 33 +++++++++++++++++----------------
->  1 file changed, 17 insertions(+), 16 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 41 +++++++++++++++++++----------------------
+>  1 file changed, 19 insertions(+), 22 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3add9d8b0630..577e70509510 100644
+> index 577e70509510..b8ab16323629 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4736,12 +4736,12 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
->  	return role;
+> @@ -4869,10 +4869,9 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+>  
+>  	new_role = kvm_calc_shadow_npt_root_page_role(vcpu, &regs);
+>  
+> -	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
+> -
+>  	shadow_mmu_init_context(vcpu, context, &regs, new_role);
+>  	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
+> +	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
 >  }
+>  EXPORT_SYMBOL_GPL(kvm_init_shadow_npt_mmu);
 >  
-> -static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
-> +static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
-> +			     const struct kvm_mmu_role_regs *regs)
->  {
->  	struct kvm_mmu *context = &vcpu->arch.root_mmu;
-> -	struct kvm_mmu_role_regs regs = vcpu_to_role_regs(vcpu);
->  	union kvm_mmu_role new_role =
-> -		kvm_calc_tdp_mmu_root_page_role(vcpu, &regs, false);
-> +		kvm_calc_tdp_mmu_root_page_role(vcpu, regs, false);
+> @@ -4906,27 +4905,25 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+>  		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
+>  						   execonly, level);
 >  
->  	if (new_role.as_u64 == context->mmu_role.as_u64)
->  		return;
-> @@ -4755,7 +4755,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
->  	context->get_guest_pgd = get_cr3;
->  	context->get_pdptr = kvm_pdptr_read;
->  	context->inject_page_fault = kvm_inject_page_fault;
-> -	context->root_level = role_regs_to_root_level(&regs);
-> +	context->root_level = role_regs_to_root_level(regs);
+> -	__kvm_mmu_new_pgd(vcpu, new_eptp, new_role.base);
+> -
+> -	if (new_role.as_u64 == context->mmu_role.as_u64)
+> -		return;
+> -
+> -	context->mmu_role.as_u64 = new_role.as_u64;
+> -
+> -	context->shadow_root_level = level;
+> -
+> -	context->ept_ad = accessed_dirty;
+> -	context->page_fault = ept_page_fault;
+> -	context->gva_to_gpa = ept_gva_to_gpa;
+> -	context->sync_page = ept_sync_page;
+> -	context->invlpg = ept_invlpg;
+> -	context->root_level = level;
+> -	context->direct_map = false;
+> +	if (new_role.as_u64 != context->mmu_role.as_u64) {
+> +		context->mmu_role.as_u64 = new_role.as_u64;
+> +
+> +		context->shadow_root_level = level;
+> +
+> +		context->ept_ad = accessed_dirty;
+> +		context->page_fault = ept_page_fault;
+> +		context->gva_to_gpa = ept_gva_to_gpa;
+> +		context->sync_page = ept_sync_page;
+> +		context->invlpg = ept_invlpg;
+> +		context->root_level = level;
+> +		context->direct_map = false;
+> +		update_permission_bitmask(context, true);
+> +		context->pkru_mask = 0;
+> +		reset_rsvds_bits_mask_ept(vcpu, context, execonly, huge_page_level);
+> +		reset_ept_shadow_zero_bits_mask(context, execonly);
+> +	}
 >  
->  	if (!is_cr0_pg(context))
->  		context->gva_to_gpa = nonpaging_gva_to_gpa;
-> @@ -4803,7 +4803,7 @@ kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu,
->  }
->  
->  static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
-> -				    struct kvm_mmu_role_regs *regs,
-> +				    const struct kvm_mmu_role_regs *regs,
->  				    union kvm_mmu_role new_role)
->  {
->  	if (new_role.as_u64 == context->mmu_role.as_u64)
-> @@ -4824,7 +4824,7 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
->  }
->  
->  static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
-> -				struct kvm_mmu_role_regs *regs)
-> +				const struct kvm_mmu_role_regs *regs)
->  {
->  	struct kvm_mmu *context = &vcpu->arch.root_mmu;
->  	union kvm_mmu_role new_role =
-> @@ -4845,7 +4845,7 @@ static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
->  
->  static union kvm_mmu_role
->  kvm_calc_shadow_npt_root_page_role(struct kvm_vcpu *vcpu,
-> -				   struct kvm_mmu_role_regs *regs)
-> +				   const struct kvm_mmu_role_regs *regs)
-
-Should these go in the previous commit? Aside from that,
-
-Reviewed-by: David Matlack <dmatlack@google>
-
->  {
->  	union kvm_mmu_role role =
->  		kvm_calc_shadow_root_page_role_common(vcpu, regs, false);
-> @@ -4930,12 +4930,12 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+> -	update_permission_bitmask(context, true);
+> -	context->pkru_mask = 0;
+> -	reset_rsvds_bits_mask_ept(vcpu, context, execonly, huge_page_level);
+> -	reset_ept_shadow_zero_bits_mask(context, execonly);
+> +	__kvm_mmu_new_pgd(vcpu, new_eptp, new_role.base);
 >  }
 >  EXPORT_SYMBOL_GPL(kvm_init_shadow_ept_mmu);
->  
-> -static void init_kvm_softmmu(struct kvm_vcpu *vcpu)
-> +static void init_kvm_softmmu(struct kvm_vcpu *vcpu,
-> +			     const struct kvm_mmu_role_regs *regs)
->  {
->  	struct kvm_mmu *context = &vcpu->arch.root_mmu;
-> -	struct kvm_mmu_role_regs regs = vcpu_to_role_regs(vcpu);
->  
-> -	kvm_init_shadow_mmu(vcpu, &regs);
-> +	kvm_init_shadow_mmu(vcpu, regs);
->  
->  	context->get_guest_pgd     = get_cr3;
->  	context->get_pdptr         = kvm_pdptr_read;
-> @@ -4959,10 +4959,9 @@ kvm_calc_nested_mmu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *
->  	return role;
->  }
->  
-> -static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
-> +static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
->  {
-> -	struct kvm_mmu_role_regs regs = vcpu_to_role_regs(vcpu);
-> -	union kvm_mmu_role new_role = kvm_calc_nested_mmu_role(vcpu, &regs);
-> +	union kvm_mmu_role new_role = kvm_calc_nested_mmu_role(vcpu, regs);
->  	struct kvm_mmu *g_context = &vcpu->arch.nested_mmu;
->  
->  	if (new_role.as_u64 == g_context->mmu_role.as_u64)
-> @@ -5002,12 +5001,14 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
->  
->  void kvm_init_mmu(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_mmu_role_regs regs = vcpu_to_role_regs(vcpu);
-> +
->  	if (mmu_is_nested(vcpu))
-> -		init_kvm_nested_mmu(vcpu);
-> +		init_kvm_nested_mmu(vcpu, &regs);
->  	else if (tdp_enabled)
-> -		init_kvm_tdp_mmu(vcpu);
-> +		init_kvm_tdp_mmu(vcpu, &regs);
->  	else
-> -		init_kvm_softmmu(vcpu);
-> +		init_kvm_softmmu(vcpu, &regs);
->  }
->  EXPORT_SYMBOL_GPL(kvm_init_mmu);
 >  
 > -- 
 > 2.31.1
