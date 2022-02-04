@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A0BE4AA284
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:44:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DC6E4AA289
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:44:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245204AbiBDVmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 16:42:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41198 "EHLO
+        id S244371AbiBDVmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 16:42:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245247AbiBDVmf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S244137AbiBDVmf (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Feb 2022 16:42:35 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1885C061755
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 13:42:19 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id k13-20020a65434d000000b00342d8eb46b4so3510478pgq.23
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 13:42:19 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88408C061758
+        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 13:42:21 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id z37-20020a056a001da500b004c74e3fd644so3565467pfw.1
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 13:42:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=k5UFgI2I9MLs2H4ssnRT873l7YLngEbdEt/P0KNnq10=;
-        b=rf3nxdHlYTt9yk9qc8xQwkwU37D+FTjmdYyFbOS1P0CJyzITmO2YxxakNBUTAi09Z7
-         VmbnBDoG1r+DcWx23X9OgAgLLX/SgwPlURVbet91RkY4W2w9BP85AiNHD1Mx6SSY6CTv
-         9D18qtAH/LlN4V5MAErzYlF2ZG8mDMM6ifQWpdJCwZzELTkUgbIC4jLNcxOe2sGuc+K4
-         MZFIYupxHpxirfJNXPedybQj95fb0rldAC7e9pnl+DVVjXliTXlI8CVNyjbyHDTZ0Mpm
-         Un+iqGqPLs15nsCoGBbabN0OC7IT5R/hf5v3NLvZNIA1JeuBmNk5PIuQwZpIRXjCNYRa
-         okkA==
+        bh=YoWYGJfioQ0uIXd5+Rw6SEDFktlGss0k/yZ4iiWeiEU=;
+        b=ZOLIb3xRq1ZobBOGfSnhbYAZw1vO2h0qbhMx22jtc4XVM8r2Frq/WmbJMtoIKIDMG+
+         uCsz+8PNekCH12cdRQ0bYmGKxxqdLLX0fsStT9g8tAixTUwNEXPWBZuHpxe7fWfzlSA8
+         Q1upmQglx0GAtVJX2pFBPwThCqItzoY4lyvtqOQty6U0YpTvmv6FHAEHpJrw2uLnYAz9
+         WPvBeCP+qvSd4VuvNKpqNx6VJemx/Vszv2ebbmnhNLkXCVZU7GqFJitLYRzGMfyNn8Px
+         FdkLhcMpSLIXYewx3zcGrJQda/9mC6pZoD2YkiLq/r7E+wN4xSFPx0W5dwVqwBDrtO9S
+         3Lzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=k5UFgI2I9MLs2H4ssnRT873l7YLngEbdEt/P0KNnq10=;
-        b=ipAOwQoieZAloP+c4xh+/nESiC10BoONHh16m+yX184rwnumqegsQ4p4llzFV3btCc
-         B/MuhjrfilfJaDp3pnoi/vBCfGGs1g0Ffslc08pY2IYpfizB6ss1CDIVG4zexnx3JtdH
-         USISIZxLwPhqaD8P+qdndWOdPHWiXqlqYuf3hWwuOvGHlDdf78ipJOVv969S6s5x4X8U
-         R7e9zu2Fv60njKLT9KZbdxemsvUL+DOK/nZBZdccqbgH25XJOlEIeLE22EorXpAAHnzw
-         CF66OKYPFw+kkH7K52wT77gyj+YJ8Bv0P2Dg8HbY5+8jU+MwzuXrpLqETcHq7IWvKMqn
-         z0YQ==
-X-Gm-Message-State: AOAM531V/aCB6Bp4ac10FUFewQTpe8ek84tQhVcPsiSisKFdczp5A9DA
-        PZZYWy6KYtfKNGHF2mSPnI8eDKh4g8s=
-X-Google-Smtp-Source: ABdhPJzobXBMkjgYQ5hcgjZNpX3NLiZ6BOhpRK4BZiHqfM7NniGi2ow+0kFIDeKTi+Z0wVXRqNfwwbQXHks=
+        bh=YoWYGJfioQ0uIXd5+Rw6SEDFktlGss0k/yZ4iiWeiEU=;
+        b=BvmZOipmn62BunlgXC0HO7tqao0ye5saxfq84YNxDsupYy3q41KPl1xsVGTXbzCQhn
+         tpZrCM6TVzriLo83Dnr6LD1R+uiR/dL2+HYcBhAzrLKISvxNgg8hC/IBv6FuFv86Ol+1
+         CmdaAqPn6qqGmNBYrQhcLm5nyC0By0xNSUIqPRMsuHinF4J5A3CTXz1PYqh4aTeSbq0F
+         pEVF2wYJWoV5e6rdvaXMciTx82GsqQ+FTWCeDoPSGjhQDQisjr7v8zN90HpRcXH00s7c
+         agJMhn5R4v8t3RQLipr4L1NpI3RgGDEPTucRSiYPyxfBfS7Ig4yvkOXx7ePDIuzNsfXC
+         DDmQ==
+X-Gm-Message-State: AOAM532wEq7yB5s6Sf+tFXVawykvi+4H/YQSMMVnTYHOxVvUU129XUEP
+        Uas4AIcOUjihWKhwEFqsLqaoxl5LFog=
+X-Google-Smtp-Source: ABdhPJyWg23tc+Cb4uAt5KO7qiovKm6IvOy/ybeDEnFCEzw2igAjUj1nSqnUdSmqWaKzntfhE3sgGcfmS2g=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:c68c:: with SMTP id
- n12mr1024171pjt.219.1644010939400; Fri, 04 Feb 2022 13:42:19 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:22ce:: with SMTP id
+ f14mr4975621pfj.60.1644010941067; Fri, 04 Feb 2022 13:42:21 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  4 Feb 2022 21:42:01 +0000
+Date:   Fri,  4 Feb 2022 21:42:02 +0000
 In-Reply-To: <20220204214205.3306634-1-seanjc@google.com>
-Message-Id: <20220204214205.3306634-8-seanjc@google.com>
+Message-Id: <20220204214205.3306634-9-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220204214205.3306634-1-seanjc@google.com>
 X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH 07/11] KVM: x86: Make kvm_lapic_reg_{read,write}() static
+Subject: [PATCH 08/11] KVM: x86: Add helpers to handle 64-bit APIC MSR read/writes
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -73,72 +73,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make the low level read/write lapic helpers static, any accesses to the
-local APIC from vendor code or non-APIC code should be routed through
-proper helpers.
+Add helpers to handle 64-bit APIC read/writes via MSRs to deduplicate the
+x2APIC and Hyper-V code needed to service reads/writes to ICR.  Future
+support for IPI virtualization will add yet another path where KVM must
+handle 64-bit APIC MSR reads/write (to ICR).
+
+Opportunistically fix the comment in the write path; ICR2 holds the
+destination (if there's no shorthand), not the vector.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 8 +++-----
- arch/x86/kvm/lapic.h | 3 ---
- 2 files changed, 3 insertions(+), 8 deletions(-)
+ arch/x86/kvm/lapic.c | 59 ++++++++++++++++++++++----------------------
+ 1 file changed, 29 insertions(+), 30 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4f57b6f5ebd4..deac73ce2de5 100644
+index deac73ce2de5..f72f3043134e 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -1385,8 +1385,8 @@ static inline struct kvm_lapic *to_lapic(struct kvm_io_device *dev)
- #define APIC_REGS_MASK(first, count) \
- 	(APIC_REG_MASK(first) * ((1ull << (count)) - 1))
- 
--int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
--		void *data)
-+static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
-+			      void *data)
- {
- 	unsigned char alignment = offset & 0xf;
- 	u32 result;
-@@ -1442,7 +1442,6 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
- 	}
+@@ -2782,6 +2782,30 @@ int kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr)
  	return 0;
  }
--EXPORT_SYMBOL_GPL(kvm_lapic_reg_read);
  
- static int apic_mmio_in_range(struct kvm_lapic *apic, gpa_t addr)
++static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data)
++{
++	u32 low, high = 0;
++
++	if (kvm_lapic_reg_read(apic, reg, 4, &low))
++		return 1;
++
++	if (reg == APIC_ICR &&
++	    WARN_ON_ONCE(kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high)))
++		return 1;
++
++	*data = (((u64)high) << 32) | low;
++
++	return 0;
++}
++
++static int kvm_lapic_msr_write(struct kvm_lapic *apic, u32 reg, u64 data)
++{
++	/* For 64-bit ICR writes, set ICR2 (dest) before ICR (command). */
++	if (reg == APIC_ICR)
++		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
++	return kvm_lapic_reg_write(apic, reg, (u32)data);
++}
++
+ int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
  {
-@@ -2003,7 +2002,7 @@ static void apic_manage_nmi_watchdog(struct kvm_lapic *apic, u32 lvt0_val)
- 	}
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+@@ -2793,16 +2817,13 @@ int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+ 	if (reg == APIC_ICR2)
+ 		return 1;
+ 
+-	/* if this is ICR write vector before command */
+-	if (reg == APIC_ICR)
+-		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
+-	return kvm_lapic_reg_write(apic, reg, (u32)data);
++	return kvm_lapic_msr_write(apic, reg, data);
  }
  
--int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-+static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
  {
- 	int ret = 0;
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+-	u32 reg = (msr - APIC_BASE_MSR) << 4, low, high = 0;
++	u32 reg = (msr - APIC_BASE_MSR) << 4;
  
-@@ -2151,7 +2150,6 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 	if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(apic))
+ 		return 1;
+@@ -2810,45 +2831,23 @@ int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
+ 	if (reg == APIC_DFR || reg == APIC_ICR2)
+ 		return 1;
  
- 	return ret;
+-	if (kvm_lapic_reg_read(apic, reg, 4, &low))
+-		return 1;
+-	if (reg == APIC_ICR)
+-		kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high);
+-
+-	*data = (((u64)high) << 32) | low;
+-
+-	return 0;
++	return kvm_lapic_msr_read(apic, reg, data);
  }
--EXPORT_SYMBOL_GPL(kvm_lapic_reg_write);
  
- static int apic_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
- 			    gpa_t address, int len, const void *data)
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 2b44e533fc8d..ab76896a8c3f 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -85,9 +85,6 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value);
- u64 kvm_lapic_get_base(struct kvm_vcpu *vcpu);
- void kvm_recalculate_apic_map(struct kvm *kvm);
- void kvm_apic_set_version(struct kvm_vcpu *vcpu);
--int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val);
--int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
--		       void *data);
- bool kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source,
- 			   int shorthand, unsigned int dest, int dest_mode);
- int kvm_apic_compare_prio(struct kvm_vcpu *vcpu1, struct kvm_vcpu *vcpu2);
+ int kvm_hv_vapic_msr_write(struct kvm_vcpu *vcpu, u32 reg, u64 data)
+ {
+-	struct kvm_lapic *apic = vcpu->arch.apic;
+-
+ 	if (!lapic_in_kernel(vcpu))
+ 		return 1;
+ 
+-	/* if this is ICR write vector before command */
+-	if (reg == APIC_ICR)
+-		kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
+-	return kvm_lapic_reg_write(apic, reg, (u32)data);
++	return kvm_lapic_msr_write(vcpu->arch.apic, reg, data);
+ }
+ 
+ int kvm_hv_vapic_msr_read(struct kvm_vcpu *vcpu, u32 reg, u64 *data)
+ {
+-	struct kvm_lapic *apic = vcpu->arch.apic;
+-	u32 low, high = 0;
+-
+ 	if (!lapic_in_kernel(vcpu))
+ 		return 1;
+ 
+-	if (kvm_lapic_reg_read(apic, reg, 4, &low))
+-		return 1;
+-	if (reg == APIC_ICR)
+-		kvm_lapic_reg_read(apic, APIC_ICR2, 4, &high);
+-
+-	*data = (((u64)high) << 32) | low;
+-
+-	return 0;
++	return kvm_lapic_msr_read(vcpu->arch.apic, reg, data);
+ }
+ 
+ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
 -- 
 2.35.0.263.gb82422642f-goog
 
