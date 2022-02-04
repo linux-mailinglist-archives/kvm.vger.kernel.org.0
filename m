@@ -2,143 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBC9C4A999A
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 14:01:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6E1B4A99B2
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 14:09:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231296AbiBDNBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 08:01:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244168AbiBDNBS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 08:01:18 -0500
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4A4C061714
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 05:01:18 -0800 (PST)
-Received: by mail-oi1-x230.google.com with SMTP id q186so8359948oih.8
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 05:01:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zxrOWR/gZztW7YQEW1JYcvX+yxiEfvcBy6vYQPVdyHo=;
-        b=T7MokBOygJuqC8MwMYoe7IQIR/ylS0JIrnND8YvA1v6psTjrzb5TXKnKBvCCr12ZxH
-         Ht8YuvVf0/Ll5yIL0SoniGRNgKyF1+zsWNky/YG+aj1/OvBH4YqkYLptsHJ3gyjBMd/T
-         b2KcYQF1AohONEFWoh0WDJFVbw+OC5iuMCHylGVYsVuOZPU1B3PdOtK7a7LBLVwxAtvQ
-         ngUUrZUFf7/THPaQ1ZOHLF4GE3g3u04CH1bRkAMmXnaJXoQosglH0uYYZGxdfEOeZ9AR
-         gAKryNuiFR7SBqT5gofy2OQQKB0gbGA/A8gNZwLMV1ckf1hhy54BT4sS5+vuMsVfUBAl
-         ZQRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zxrOWR/gZztW7YQEW1JYcvX+yxiEfvcBy6vYQPVdyHo=;
-        b=0/cpi0021FvFL9ujLRhuh/1j8Ctrkcjrk6SxXSxkiNsh8CX8jq8TUB9X3Ta5q0A+Ln
-         dlSd1Wr5lBwALY8z0UBsbhWl1DuGHxPhGuuiKNYvYY8zl1IyH1+whDT6z/AsGPlY7jGA
-         MLJKAVqZWqEunKwj27DlEizIHDIk/0wEtc7738SfxxLYEEECNcBsVGEap1cd9kFMEty2
-         1zZlmOriDCytOCTuWMzpfHBgXUEiwX1E0DVtwiDM/aozDAzVGC/TbgdLsFx+xoK7xrbh
-         gyqiu3UDK5chAnmBphSG2JhzMWQHwSoS86MSqBgxY1b6fTULIb9H2ZRweJRf2VfI1rSl
-         Qe+w==
-X-Gm-Message-State: AOAM530Kb9iD4kvd8Sy1/YFW6UPGjxxfNIrDBIFT7RDOTaCrkG07X4yp
-        z5VRPz78nREE5IPlwy07zW5DIp+039NP2pHJqY+sHQ==
-X-Google-Smtp-Source: ABdhPJzUI4MfqfBJjOeHn/jcFyfAqgoyixENV9Tfbs33cptyQeLioq/gssUH7JENaz+cVN5AzO7wM+j/ESGve7by9uY=
-X-Received: by 2002:a05:6808:1292:: with SMTP id a18mr1214335oiw.314.1643979675976;
- Fri, 04 Feb 2022 05:01:15 -0800 (PST)
+        id S237118AbiBDNJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 08:09:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21494 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S230425AbiBDNJD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 08:09:03 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 214CYH7x018087
+        for <kvm@vger.kernel.org>; Fri, 4 Feb 2022 13:09:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=0d7VlbNlG/MMFQTarHCyHQ5D+YilTgK4e6mPj/9h/bI=;
+ b=kdxKtXBdhC+OG2M8BcTkH9Q/OBaPUzgq1nE037kQZXuw2+/DAFKqh7EBphGtBjM8uATW
+ xkHJ5H+z9p/vOiAjwrhAMIZ+HGrL3zWVjHVk8sXtZnLq2KpZc8C3jaFOclsI5/rrM0La
+ McflsRWKQRwMKNCWiRXMI/Lix5yn8vwJlYiv4dvV4pFHt78w5ujYTU2KxeGj1+2/jMMT
+ rjM9IbeiuJ0ht1VaPEQmukqzDt3ieu6/Npz+vPstR4WyG+Ht6MHKwmQLZr/H8Pt+9OVh
+ HraODbYI8vLmVyG4n8TsjftLYInQ8OyZUEvyJutnhSiCOKL4EqfLcsIZtei5Ct/Q/g4z OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0qxfwcw5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 13:09:02 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 214D4J8I006437
+        for <kvm@vger.kernel.org>; Fri, 4 Feb 2022 13:09:02 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0qxfwcvn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 13:09:02 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 214D6mAY002424;
+        Fri, 4 Feb 2022 13:09:00 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3e0r0n4s30-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 13:09:00 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 214D8um444106040
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Feb 2022 13:08:57 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4E3F4C063;
+        Fri,  4 Feb 2022 13:08:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F0624C040;
+        Fri,  4 Feb 2022 13:08:56 +0000 (GMT)
+Received: from p-imbrenda.bredband2.com (unknown [9.145.8.50])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Feb 2022 13:08:56 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        nrb@linux.ibm.com, scgl@linux.ibm.com, seiden@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 0/6] s390x: smp: use CPU indexes instead of addresses
+Date:   Fri,  4 Feb 2022 14:08:49 +0100
+Message-Id: <20220204130855.39520-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <2e96421f-44b5-c8b7-82f7-5a9a9040104b@amd.com> <20220202105158.7072-1-ravi.bangoria@amd.com>
- <CALMp9eQHfAgcW-J1YY=01ki4m_YVBBEz6D1T662p2BUp05ZcPQ@mail.gmail.com>
- <3c97e081-ae46-d92d-fe8f-58642d6b773e@amd.com> <CALMp9eS72bhP=hGJRzTwGxG9XrijEnGKnJ-pqtHxYG-5Shs+2g@mail.gmail.com>
- <9b890769-e769-83ed-c953-d25930b067ba@amd.com>
-In-Reply-To: <9b890769-e769-83ed-c953-d25930b067ba@amd.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 4 Feb 2022 05:01:05 -0800
-Message-ID: <CALMp9eQ9K+CXHVZ1zSyw78n-agM2+NQ1xJ4niO-YxSkQCLcK-A@mail.gmail.com>
-Subject: Re: [PATCH v2] perf/amd: Implement erratum #1292 workaround for F19h M00-0Fh
-To:     Ravi Bangoria <ravi.bangoria@amd.com>
-Cc:     like.xu.linux@gmail.com, eranian@google.com,
-        santosh.shukla@amd.com, pbonzini@redhat.com, seanjc@google.com,
-        wanpengli@tencent.com, vkuznets@redhat.com, joro@8bytes.org,
-        peterz@infradead.org, mingo@redhat.com,
-        alexander.shishkin@linux.intel.com, tglx@linutronix.de,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        kvm@vger.kernel.org, x86@kernel.org,
-        linux-perf-users@vger.kernel.org, ananth.narayan@amd.com,
-        kim.phillips@amd.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wA6YoPP6FpE9UGCFN5IBdbBmiccHpgsD
+X-Proofpoint-ORIG-GUID: tocWAvuAjw2X3Xgwp5BQ0D5x51wpgca7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-04_04,2022-02-03_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 clxscore=1015 lowpriorityscore=0 adultscore=0 mlxscore=0
+ spamscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202040073
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 4, 2022 at 1:33 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
->
->
->
-> On 03-Feb-22 11:25 PM, Jim Mattson wrote:
-> > On Wed, Feb 2, 2022 at 9:18 PM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
-> >>
-> >> Hi Jim,
-> >>
-> >> On 03-Feb-22 9:39 AM, Jim Mattson wrote:
-> >>> On Wed, Feb 2, 2022 at 2:52 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
-> >>>>
-> >>>> Perf counter may overcount for a list of Retire Based Events. Implement
-> >>>> workaround for Zen3 Family 19 Model 00-0F processors as suggested in
-> >>>> Revision Guide[1]:
-> >>>>
-> >>>>   To count the non-FP affected PMC events correctly:
-> >>>>     o Use Core::X86::Msr::PERF_CTL2 to count the events, and
-> >>>>     o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
-> >>>>     o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
-> >>>>
-> >>>> Note that the specified workaround applies only to counting events and
-> >>>> not to sampling events. Thus sampling event will continue functioning
-> >>>> as is.
-> >>>>
-> >>>> Although the issue exists on all previous Zen revisions, the workaround
-> >>>> is different and thus not included in this patch.
-> >>>>
-> >>>> This patch needs Like's patch[2] to make it work on kvm guest.
-> >>>
-> >>> IIUC, this patch along with Like's patch actually breaks PMU
-> >>> virtualization for a kvm guest.
-> >>>
-> >>> Suppose I have some code which counts event 0xC2 [Retired Branch
-> >>> Instructions] on PMC0 and event 0xC4 [Retired Taken Branch
-> >>> Instructions] on PMC1. I then divide PMC1 by PMC0 to see what
-> >>> percentage of my branch instructions are taken. On hardware that
-> >>> suffers from erratum 1292, both counters may overcount, but if the
-> >>> inaccuracy is small, then my final result may still be fairly close to
-> >>> reality.
-> >>>
-> >>> With these patches, if I run that same code in a kvm guest, it looks
-> >>> like one of those events will be counted on PMC2 and the other won't
-> >>> be counted at all. So, when I calculate the percentage of branch
-> >>> instructions taken, I either get 0 or infinity.
-> >>
-> >> Events get multiplexed internally. See below quick test I ran inside
-> >> guest. My host is running with my+Like's patch and guest is running
-> >> with only my patch.
-> >
-> > Your guest may be multiplexing the counters. The guest I posited does not.
->
-> It would be helpful if you can provide an example.
+On s390x there are no guarantees about the CPU addresses, except that
+they shall be unique. This means that in some environments, it is
+theoretically possible that there is no match between the CPU address
+and its position (index) in the list of available CPUs returned by the
+system. Moreover, there are no guarantees about the ordering of the
+list, or even that it is consistent each time it is returned.
 
-Perf on any current Linux distro (i.e. without your fix).
+This series fixes a small bug in the SMP initialization code, adds a
+guarantee that the boot CPU will always have index 0, changes the
+existing smp_* functions to take indexes instead of addresses, and
+introduces some functions to allow tests to use CPU indexes instead of
+using hardcoded CPU addresses. This will allow the tests to run
+successfully in more environments (e.g. z/VM, LPAR).
 
-> > I hope that you are not saying that kvm's *thread-pinned* perf events
-> > are not being multiplexed at the host level, because that completely
-> > breaks PMU virtualization.
->
-> IIUC, multiplexing happens inside the guest.
+Some existing tests are adapted to take advantage of the new
+functionalities.
 
-I'm not sure that multiplexing is the answer. Extrapolation may
-introduce greater imprecision than the erratum.
+v1->v2
+* refactored the smp_* functions to accept indexes instead of addresses
+* also fixed uv-host test
 
-If you count something like "instructions retired" three ways:
-1) Unfixed counter
-2) PMC2 with the fix
-3) Multiplexed on PMC2 with the fix
+Claudio Imbrenda (6):
+  lib: s390x: smp: guarantee that boot CPU has index 0
+  lib: s390x: smp: refactor smp functions to accept indexes
+  s390x: smp: use CPU indexes instead of addresses
+  s390x: firq: use CPU indexes instead of addresses
+  s390x: skrf: use CPU indexes instead of addresses
+  s390x: uv-host: use CPU indexes instead of addresses
 
-Is (3) always more accurate than (1)?
+ lib/s390x/smp.h |  20 +++---
+ lib/s390x/smp.c | 173 +++++++++++++++++++++++++++++-------------------
+ s390x/firq.c    |  26 ++------
+ s390x/skrf.c    |   2 +-
+ s390x/smp.c     |  22 +++---
+ s390x/uv-host.c |   4 +-
+ 6 files changed, 137 insertions(+), 110 deletions(-)
 
-> Thanks,
-> Ravi
+-- 
+2.34.1
+
