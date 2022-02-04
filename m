@@ -2,205 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A2A94A9B21
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 15:41:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E59C04A9B90
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 16:02:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359374AbiBDOlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 09:41:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49826 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233365AbiBDOll (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 09:41:41 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13871C061714
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 06:41:41 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id k17so5355411plk.0
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 06:41:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dg20lHH+5hD5YQZ8GrVegKK1/VjQk9NXTtH1Zx4dOJI=;
-        b=Q0O6T9mUzP6wJy9zhpgHJbkyvT10vvCO1wiEmaykAZR23D+4jFHhT8dkvhBY2lp6Yd
-         kMAlLCr04o35/20X5iGzoiO9n672vtaUb9rr5gs7ZElqOxPpEopgPtaAV4GdDU0wlFkM
-         ihj2/UrAuFCGA/jNATtlzzl4awHx2drn0ReV1ZGuXnq0zmG/iom8TvKZoVxVi9Yaczwz
-         PqGPi/eTeQwWjqeu4gfbVMsnctKbwZebEDngDIYqtJIqDemnHoPipyI7iEyB1sZb7fEW
-         C4FS6Pb653PwLX4O6Y6lQlO52zbpC8TddXFgxgGLdBQALrSUAWRawK6su8G/93ztDNzW
-         BNxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dg20lHH+5hD5YQZ8GrVegKK1/VjQk9NXTtH1Zx4dOJI=;
-        b=x00d64DS7w3L4ot/AlZNicI/c0b4bX4+zfQQIBvK6vf6hR/M5XZ2eCvYc36fF+K2ap
-         eLi8tWT/Qrr3hNEJiBSTLIuJsNf+VXe9xFVCdSON6SPc0guoW8pSUd9EuvJKAN7XjSyT
-         +wTZ1Al2bzxSyvIifQDZguXqQiv4MWWeELHc/nhD2qzP9rDRhbG7pivf7vWiKWOiy7+L
-         cBjM/UBCdYiTE4uyPp0dKmYwM2W1wTZ7tgeXdYW073yvTCueIR882mktEw1Z3PuIrbvx
-         LJOXiDT/gpIo2/MsFF7qkitz7O2kEQdaj+RsTz+LKlNjZSeB0rOg4H2U54KP7cMEPQSk
-         jvCg==
-X-Gm-Message-State: AOAM532Kf3rPLH5zauePhQ2X5stJN6Ie71kANNmDd5PIR7/BRI54rvhs
-        g3XWSSbiPFX/C1vaHUboQ+OG+g==
-X-Google-Smtp-Source: ABdhPJxuZ3MRzFW5Hq5CFl1LOZ2xYN55KrXKqNYxi4zn6Kz1Gif+qEnOXKdqDWkXy6BdB1YNpaeU3Q==
-X-Received: by 2002:a17:902:d702:: with SMTP id w2mr3264277ply.17.1643985697349;
-        Fri, 04 Feb 2022 06:41:37 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id h25sm2634724pfn.208.2022.02.04.06.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Feb 2022 06:41:36 -0800 (PST)
-Date:   Fri, 4 Feb 2022 06:41:32 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-Message-ID: <Yf07HATXyDDeE68t@google.com>
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-3-reijiw@google.com>
- <YfDaiUbSkpi9/5YY@google.com>
- <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
- <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
- <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com>
- <YfdaKpBqFkULxgX/@google.com>
- <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
- <Yfl+Pz4MWOyEHfhf@google.com>
- <CAAeT=Fx3oBoyUmJjyMWmeyzMJJxcAZAYWDQuv4DUqZztm8ooKQ@mail.gmail.com>
+        id S1359488AbiBDPCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 10:02:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28680 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231511AbiBDPCC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 10:02:02 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 214EMP73005733
+        for <kvm@vger.kernel.org>; Fri, 4 Feb 2022 15:02:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Tixgy0GKxO4QomwKJUortUyGeCtcm+bDSfeiTl5lm64=;
+ b=GtQu1DnUW64BjihhZPuVvfGfjWvnuVFWNtAiOe7apYQdzyL11RB8+hLttrzw2OhQO9ep
+ mwCPmQ8shjsomvDVh14JQroB59C1pZAT2MZ7R1X7T/sRDCcQjh14sD2azAemr/fBh08q
+ wPohD05i+p6ktsjUFTqZFmfb1e35jUASRFqIZVaFjNLWfRB4Gy3lzgxtbdgwESgThzZ5
+ jJwgP4pYJZ/1ep9xiYrelsIMuSLkG5f0wIpi36fCxu+lijd6tMabFYREi72s8QxxBSXe
+ rTs/HHbRPXWcWqyZP1u41h3cW6IS7+EIk2uRxii/Z7GHpnYzm2mHNskG88lPgxY+KpP3 lA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e0r12f61t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 15:02:02 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 214F0Ir8014415
+        for <kvm@vger.kernel.org>; Fri, 4 Feb 2022 15:02:02 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e0r12f60w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 15:02:02 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 214F1TeL008743;
+        Fri, 4 Feb 2022 15:02:00 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04fra.de.ibm.com with ESMTP id 3e0r0u5n0w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 15:01:59 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 214F1t9935258746
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Feb 2022 15:01:55 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7BDC9A405D;
+        Fri,  4 Feb 2022 15:01:55 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37FA0A404D;
+        Fri,  4 Feb 2022 15:01:55 +0000 (GMT)
+Received: from [9.145.158.84] (unknown [9.145.158.84])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Feb 2022 15:01:55 +0000 (GMT)
+Message-ID: <96a1a92b-d97a-32e9-7cdc-305994904181@linux.ibm.com>
+Date:   Fri, 4 Feb 2022 16:01:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=Fx3oBoyUmJjyMWmeyzMJJxcAZAYWDQuv4DUqZztm8ooKQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v1 0/5] s390x: smp: avoid hardcoded CPU
+ addresses
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, seiden@linux.ibm.com
+References: <20220128185449.64936-1-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220128185449.64936-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IKvcmuOh9mfFvwzcl3xO_OKsky3RZ0St
+X-Proofpoint-ORIG-GUID: FS39kWt-Lu_fzvhXCWD5l3eQ5C0DaOyp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-04_05,2022-02-03_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ malwarescore=0 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
+ bulkscore=0 priorityscore=1501 suspectscore=0 adultscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202040086
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 02, 2022 at 10:31:26PM -0800, Reiji Watanabe wrote:
-> Hi Ricardo,
+On 1/28/22 19:54, Claudio Imbrenda wrote:
+> On s390x there are no guarantees about the CPU addresses, except that
+> they shall be unique. This means that in some environments, it's
+> possible that there is no match between the CPU address and its
+> position (index) in the list of available CPUs returned by the system.
 > 
-> On Tue, Feb 1, 2022 at 10:39 AM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > Hey Reiji,
-> >
-> > On Mon, Jan 31, 2022 at 10:00:40PM -0800, Reiji Watanabe wrote:
-> > > Hi Ricardo,
-> > >
-> > > On Sun, Jan 30, 2022 at 7:40 PM Ricardo Koller <ricarkol@google.com> wrote:
-> > > >
-> > > > On Fri, Jan 28, 2022 at 09:52:21PM -0800, Reiji Watanabe wrote:
-> > > > > Hi Ricardo,
-> > > > >
-> > > > > > > > > +
-> > > > > > > > > +/*
-> > > > > > > > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > > > > > > > > + * with ID_SANITISED() to the host's sanitized value.
-> > > > > > > > > + */
-> > > > > > > > > +void set_default_id_regs(struct kvm *kvm)
-> > > > > > > > > +{
-> > > > > > > > > +     int i;
-> > > > > > > > > +     u32 id;
-> > > > > > > > > +     const struct sys_reg_desc *rd;
-> > > > > > > > > +     u64 val;
-> > > > > > > > > +
-> > > > > > > > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > > > > > > > > +             rd = &sys_reg_descs[i];
-> > > > > > > > > +             if (rd->access != access_id_reg)
-> > > > > > > > > +                     /* Not ID register, or hidden/reserved ID register */
-> > > > > > > > > +                     continue;
-> > > > > > > > > +
-> > > > > > > > > +             id = reg_to_encoding(rd);
-> > > > > > > > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > > > > > > > +                     /* Shouldn't happen */
-> > > > > > > > > +                     continue;
-> > > > > > > > > +
-> > > > > > > > > +             val = read_sanitised_ftr_reg(id);
-> > > > > > > >
-> > > > > > > > I'm a bit confused. Shouldn't the default+sanitized values already use
-> > > > > > > > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
-> > > > > > >
-> > > > > > > I'm not sure if I understand your question.
-> > > > > > > arm64_ftr_bits_kvm is used for feature support checkings when
-> > > > > > > userspace tries to modify a value of ID registers.
-> > > > > > > With this patch, KVM just saves the sanitized values in the kvm's
-> > > > > > > buffer, but userspace is still not allowed to modify values of ID
-> > > > > > > registers yet.
-> > > > > > > I hope it answers your question.
-> > > > > >
-> > > > > > Based on the previous commit I was assuming that some registers, like
-> > > > > > id_aa64dfr0,
-> > > > > > would default to the overwritten values as the sanitized values. More
-> > > > > > specifically: if
-> > > > > > userspace doesn't modify any ID reg, shouldn't the defaults have the
-> > > > > > KVM overwritten
-> > > > > > values (arm64_ftr_bits_kvm)?
-> > > > >
-> > > > > arm64_ftr_bits_kvm doesn't have arm64_ftr_reg but arm64_ftr_bits,
-> > > > > and arm64_ftr_bits_kvm doesn't have the sanitized values.
-> > > > >
-> > > > > Thanks,
-> > > >
-> > > > Hey Reiji,
-> > > >
-> > > > Sorry, I wasn't very clear. This is what I meant.
-> > > >
-> > > > If I set DEBUGVER to 0x5 (w/ FTR_EXACT) using this patch on top of the
-> > > > series:
-> > > >
-> > > >  static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
-> > > >         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
-> > > > -       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-> > > > +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x5),
-> > > >
-> > > > it means that userspace would not be able to set DEBUGVER to anything
-> > > > but 0x5. But I'm not sure what it should mean for the default KVM value
-> > > > of DEBUGVER, specifically the value calculated in set_default_id_regs().
-> > > > As it is, KVM is still setting the guest-visible value to 0x6, and my
-> > > > "desire" to only allow booting VMs with DEBUGVER=0x5 is being ignored: I
-> > > > booted a VM and the DEBUGVER value from inside is still 0x6. I was
-> > > > expecting it to not boot, or to show a warning.
-> > >
-> > > Thank you for the explanation!
-> > >
-> > > FTR_EXACT (in the existing code) means that the safe_val should be
-> > > used if values of the field are not identical between CPUs (see how
-> > > update_cpu_ftr_reg() uses arm64_ftr_safe_value()). For KVM usage,
-> > > it means that if the field value for a vCPU is different from the one
-> > > for the host's sanitized value, only the safe_val can be used safely
-> > > for the guest (purely in terms of CPU feature).
-> >
-> > Let me double check my understanding using the DEBUGVER example, please.
-> > The safe_value would be DEBUGVER=5, and it contradicts the initial VM
-> > value calculated on the KVM side. Q1: Can a contradiction like this
-> > occur in practice? Q2: If the user saves and restores this id-reg on the
-> > same kernel, the AA64DFR0 userspace write would fail (ftr_val !=
-> > arm64_ftr_safe_value), right?
+> This series fixes a small bug in the SMP initialization code, adds a
+> guarantee that the boot CPU will always have index 0, and introduces
+> some functions to allow tests to use CPU indexes instead of using
+> hardcoded CPU addresses. This will allow the tests to run successfully
+> in more environments (e.g. z/VM, LPAR).
 > 
-> Thank you for the comment!
+> Some existing tests are adapted to take advantage of the new
+> functionalities.
 > 
-> For Q1, yes, we might possibly create a bug that makes a contradiction
-> between KVM and cpufeature.c.
-> For Q2, even with such a contradiction, userspace will still be able to
-> save and restore the id reg on the same kernel on the same system in most
-> cases because @limit that KVM will specify for arm64_check_features()
-> will mostly be the same as the initial value for the guest (except for
-> fields corresponding to opt-in CPU features, which are configured with
-> KVM_ARM_VCPU_INIT or etc) and arm64_check_features does an equality check
-> per field.  Having said that, as you suggested, it might be better to run
-> arm64_check_features for the initial value against the host value so we
-> can catch such a bug. I'll look into doing that in v5.
+> Claudio Imbrenda (5):
+>    lib: s390x: smp: add functions to work with CPU indexes
+>    lib: s390x: smp: guarantee that boot CPU has index 0
+>    s390x: smp: avoid hardcoded CPU addresses
+>    s390x: firq: avoid hardcoded CPU addresses
+>    s390x: skrf: avoid hardcoded CPU addresses
+> 
+>   lib/s390x/smp.h |  2 ++
+>   lib/s390x/smp.c | 28 ++++++++++++-----
+>   s390x/firq.c    | 17 +++++-----
+>   s390x/skrf.c    |  8 +++--
+>   s390x/smp.c     | 83 ++++++++++++++++++++++++++-----------------------
+
+We use smp/sigp in uv-host.c and one of those uses looks a bit strange 
+to me anyway.
+
+I think we also need to fix the sigp in cstart.S to only stop itself and 
+not the cpu with the addr 0.
+
+Up to now we very much assumed that cpu 0 is always our boot cpu so if 
+you start running the test with cpu addr 1 and 2 and leave out 0 you 
+might find more problematic code.
+
+
+>   5 files changed, 79 insertions(+), 59 deletions(-)
 > 
 
-Thanks Reiji. Looking forward to v5.
-
-> Thanks,
-> Reiji
