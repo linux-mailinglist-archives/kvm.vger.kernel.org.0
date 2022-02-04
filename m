@@ -2,91 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69ADA4A9D25
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 17:51:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E5CE4A9D84
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 18:15:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376648AbiBDQv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 11:51:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49277 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233477AbiBDQvZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 11:51:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643993484;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S1357239AbiBDRPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 12:15:13 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:52770 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234482AbiBDRPL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 12:15:11 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E68F11F382;
+        Fri,  4 Feb 2022 17:15:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643994910; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rzIOlYd+9ZslL42n6NRPIobhsXeoGnKPREOgdajJ/jA=;
-        b=N8DKtwnO5b1Erry49LK2uIdpPEix5TX8FTdWm5iH3Z7x0xv5X/nzpQAkZQbSfj83BwJDFA
-        6qmBPpsQlCuK1DAoAC2E5iLd7HvexA3T25Bv/2SyMUij67BB7ljvpnCRHCAIYYpla41vCZ
-        8/kI0mCPShNHGWCZaP9xZJWIHXHhBJk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-635-AgFPg5QyOvKUomRCW90_Rw-1; Fri, 04 Feb 2022 11:51:22 -0500
-X-MC-Unique: AgFPg5QyOvKUomRCW90_Rw-1
-Received: by mail-wm1-f69.google.com with SMTP id ay8-20020a05600c1e0800b00350de81da56so1147111wmb.9
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 08:51:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=rzIOlYd+9ZslL42n6NRPIobhsXeoGnKPREOgdajJ/jA=;
-        b=EmTnLKuhNROsxg4VaG13YhFVB4zUDlijgDxi+63FkQyJqsJQlD6KpC4wXcfbUobBqd
-         5y1RdXzSSWQ2fG4PakByEzPiSyCTnifi3+ARfCIQ9rDBhg0zJlPMs0lIAxJG9GnRWLOV
-         gNnqpGMNDuhd0sfdbfOOoMFPEYfSW5s+zCc1vA5Z1o3JKnDk1GkGko+YKkz5aDOUF8JF
-         sCGAyuyo84Bpn5L4A51uyU9jiHGCSu4KvzMyaLXqzkrxPbFr54n7THBsFs7a9xEqoUHW
-         o13EWQYBfza1PwkEQKmKLSTA9GBVsqa8DYyHL53pw6J0+cVQwo5rObIoOUjpDmNn4mqC
-         yNxQ==
-X-Gm-Message-State: AOAM533FVJWhy2ianr21IlApoGO/i7Bb1qSsKBb5ww/aJjow/hr/T55V
-        k8vEfu0+UwMxGlrR7u52tA6lJxYBPA7JMPDiiBa3vyeoLPfbs7Q+3hhBD9gnfPOYZLm8Sf30w7o
-        ZrmZOlDMDIaww
-X-Received: by 2002:adf:e281:: with SMTP id v1mr3152060wri.308.1643993481835;
-        Fri, 04 Feb 2022 08:51:21 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyGnZ0hSDCcs1Nkw2aH151iY8NFTMcfdaigY9cFsPZHw7QFpdoSVFcIC+F5GS5jPX3O5n+uTg==
-X-Received: by 2002:adf:e281:: with SMTP id v1mr3152049wri.308.1643993481688;
-        Fri, 04 Feb 2022 08:51:21 -0800 (PST)
-Received: from [192.168.8.100] (tmo-096-196.customers.d1-online.com. [80.187.96.196])
-        by smtp.gmail.com with ESMTPSA id b15sm2325190wrs.93.2022.02.04.08.51.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Feb 2022 08:51:21 -0800 (PST)
-Message-ID: <c3b79661-da57-354a-b766-928905354f23@redhat.com>
-Date:   Fri, 4 Feb 2022 17:51:20 +0100
+        bh=s7vNC8CSsCfiI79shKkEJVpiUepdRGycbTiluKJTORA=;
+        b=lhL/G3l5phePv45CbppBvNTzj1SXui65JakPjFE5x+Kyq8eFqdPHsPaJOVpt5moFRWdxXt
+        CfskR+imJIq7LjUEcOcFL1rMyk1jM8GQ9w3hpAG69NKOR145GNunUsZWYvjSTAI1JXQrK9
+        8vLoa2HtDSsqqFsIycmsVL4VaKZiMgU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643994910;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s7vNC8CSsCfiI79shKkEJVpiUepdRGycbTiluKJTORA=;
+        b=qkKi/nXx9Q+oSti8LEFKGPQx49QtsJKlR8Ypup26I08C5XMXV456F1aHh3w1lpXDnPdACp
+        URUBQL951u+zdKDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 67FBD13B29;
+        Fri,  4 Feb 2022 17:15:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id IZZsFx5f/WEnWgAAMHmgww
+        (envelope-from <jroedel@suse.de>); Fri, 04 Feb 2022 17:15:10 +0000
+Date:   Fri, 4 Feb 2022 18:15:08 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Marc Orr <marcorr@google.com>
+Cc:     Varad Gautam <varad.gautam@suse.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Zixuan Wang <zxwang42@gmail.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bp@suse.de
+Subject: Re: [kvm-unit-tests 02/13] x86: AMD SEV-ES: Setup #VC exception
+ handler for AMD SEV-ES
+Message-ID: <Yf1fHNHakPsaF8Uu@suse.de>
+References: <20220120125122.4633-1-varad.gautam@suse.com>
+ <20220120125122.4633-3-varad.gautam@suse.com>
+ <CAA03e5FbSoRo9tXwJocBtZHEc7xisJ3gEFuOW0FPvchbL9X8PQ@mail.gmail.com>
+ <Yf0GO8EydyQSdZvu@suse.de>
+ <CAA03e5HnyqZqDOyK8cbJgq_-zMPYEcrAuKr_CF8+=3DeykfV5A@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH kvm-unit-tests v2] arm64: Fix compiling with ancient
- compiler
-Content-Language: en-US
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-References: <20220203151344.437113-1-drjones@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220203151344.437113-1-drjones@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAA03e5HnyqZqDOyK8cbJgq_-zMPYEcrAuKr_CF8+=3DeykfV5A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/02/2022 16.13, Andrew Jones wrote:
-> When compiling with an ancient compiler (gcc-4.8.5-36.el7_6.2.aarch64)
-> the build fails with
+Hi Marc,
+
+On Fri, Feb 04, 2022 at 07:57:39AM -0800, Marc Orr wrote:
+> Regarding code review and testing, I can help with the following:
+> - Compare the patches being pulled into kvm-unit-tests to what's in
+> the Linux kernel and add my Reviewed-by tags if I don't see any
+> meaningful discrepancies.
+> - Test the entire series on Google's setup, which doesn't use QEMU and
+> add my Tested-by tag accordingly. My previous Tested-by tags were on
+> individual patches. I have not yet tested the entire series.
 > 
->    lib/libcflat.a(alloc.o): In function `mult_overflow':
->    /home/drjones/kvm-unit-tests/lib/alloc.c:19: undefined reference to `__multi3'
-> 
-> According to kernel commit fb8722735f50 ("arm64: support __int128 on
-> gcc 5+") gcc older than 5 will emit __multi3 for __int128 multiplication.
-> To fix this, let's just use check_mul_overflow(), which does overflow
-> checking with GCC7.1+ and nothing for older gcc. We lose the fallback
-> for older gcc, but oh, well, the heavily negative diffstat is just too
-> tempting to go for another solution.
+> Please let me know if this is useful. If not, I wouldn't spend the time :-).
 
-Sounds ok to me, too.
+I think it is definitly useful to run this in Googles environment too
+to get it tested and possible bugs ruled out. That can only help the
+upstream integration of these patches :)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Varad discussed an idea with me today where the core VC handling code
+could be put into a library and used by the kernel and unit-tests and
+possibly others as well. The has the benefit that the kvm-unit-tests
+would also test the kernels VC handler paths. But it is probably
+something for the future.
 
+Regards,
+
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
 
