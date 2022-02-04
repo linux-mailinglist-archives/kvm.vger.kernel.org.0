@@ -2,118 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 785584A9CDA
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 17:22:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B381C4A9CF7
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 17:30:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376437AbiBDQWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 11:22:02 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:54150 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230184AbiBDQWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 11:22:01 -0500
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 918581EC064D;
-        Fri,  4 Feb 2022 17:21:55 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1643991715;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=C3Aiz07fgWzpDuMjml0gbG/sKOww28AvWjFoDlVxnJA=;
-        b=bzscTGd8iNT4OCAu004DCeFYPE77BetHF+Z3Y3dygBfQ17HjWzjsDA+abRsi/Cq94sM42w
-        DaBD7U/xgfvsktQzKLAEHnMUsbJ4QEjn4EcQKkGeyiknG9PKQ7Ue/c7D/3e/V1xDmoTRyE
-        zamWAsnXmQ6R085hO5Os2nfNz0H65C0=
-Date:   Fri, 4 Feb 2022 17:21:51 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S230139AbiBDQan (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 11:30:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1376604AbiBDQaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 11:30:39 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 135D5C061714
+        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 08:30:39 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id l13so5580086plg.9
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 08:30:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zqgFTipAZj9pEj8eBBkdwsSaq6y1Vfc1/+fKsuVbzmM=;
+        b=HYgwvETeLmcfLy7X2U55nLwn0M4sZFi2WNXSAQfU0hr3M4BffFj7O9OETuB7HgHK+/
+         Q6PTDNg72CMcuiUfj9AJzCF038aF5QnwKpKg77aCEGU7tv9hLE/KneL/GBaqE8FNBgSi
+         irrcqjTNzDysAmSsDbcUsoYMZ9Yb0Sc3fg7EqyvdWb0u0TSEzIB9keq12ugiRZgfOERM
+         APpqHo4M1MrQERdXkOoG33Q1N3xZzR8dzm10iW99UvwGiFRWQCeIue0BlSMwT5N+9irH
+         uoAIhOz4ttQBSXD1P5XXJ0fksAjlDi55lRPAUjF+AgvG2QauCX7XH8zIbjtoCN5Ocq8S
+         dhgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zqgFTipAZj9pEj8eBBkdwsSaq6y1Vfc1/+fKsuVbzmM=;
+        b=RK8VU+eWPR70Hq93Xj71B38x/JYJiehOX8hpe2hIbWNyZW7YEjRRZeUszjtdhDMItN
+         irh/942h/291ys/RE352nWcHbu5hwXY2mhAO0noSwZ5qMlUYGQgB9LEPEmqlxSh+AyJr
+         +uRFU3LFhNQAcpGOGjkesTGM/XAxoLT333nXdWZJ3dMmevm0eUsIjxPtOtw7NXUVxwnL
+         m3Vc+OkC1QWyyRpdk6/eSVMzafQ5nXj7yW+FADt1K3KCfqOR88M2EEN60Teo2zEpcXEG
+         keTLZnuZX8exSoVBXXeaalbG1f8pJ2sS+LZIQ/ZN/Ep/5dFdB7kXmFfWftNi8q1Trg1k
+         lHjA==
+X-Gm-Message-State: AOAM531Qi72Pyk3a6Iq4CRQu444xiuf1gsFBjvq9V5XU7zIfx5S0yny9
+        o0mxBUY/VBhh1QlFClTfN5+gBw==
+X-Google-Smtp-Source: ABdhPJzZU6Fiq4IoCNGxXyy201S66PFs8Evk52FTKTDRc3WcHlGCoOfLDizAwODe9HE3xCIJ+eEHWw==
+X-Received: by 2002:a17:90a:f0c9:: with SMTP id fa9mr3984494pjb.131.1643992238294;
+        Fri, 04 Feb 2022 08:30:38 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id nu7sm2971164pjb.30.2022.02.04.08.30.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Feb 2022 08:30:37 -0800 (PST)
+Date:   Fri, 4 Feb 2022 16:30:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Orr <marcorr@google.com>
+Cc:     Joerg Roedel <jroedel@suse.de>,
+        Varad Gautam <varad.gautam@suse.com>,
+        kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Zixuan Wang <zxwang42@gmail.com>,
+        Erdem Aktas <erdemaktas@google.com>,
         David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 29/43] x86/boot: Add Confidential Computing type to
- setup_data
-Message-ID: <Yf1Sn4AdPgIzpih9@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-30-brijesh.singh@amd.com>
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bp@suse.de
+Subject: Re: [kvm-unit-tests 02/13] x86: AMD SEV-ES: Setup #VC exception
+ handler for AMD SEV-ES
+Message-ID: <Yf1UqmkfirgX1Nl+@google.com>
+References: <20220120125122.4633-1-varad.gautam@suse.com>
+ <20220120125122.4633-3-varad.gautam@suse.com>
+ <CAA03e5FbSoRo9tXwJocBtZHEc7xisJ3gEFuOW0FPvchbL9X8PQ@mail.gmail.com>
+ <Yf0GO8EydyQSdZvu@suse.de>
+ <CAA03e5HnyqZqDOyK8cbJgq_-zMPYEcrAuKr_CF8+=3DeykfV5A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220128171804.569796-30-brijesh.singh@amd.com>
+In-Reply-To: <CAA03e5HnyqZqDOyK8cbJgq_-zMPYEcrAuKr_CF8+=3DeykfV5A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 11:17:50AM -0600, Brijesh Singh wrote:
-> +/*
-> + * AMD SEV Confidential computing blob structure. The structure is
-> + * defined in OVMF UEFI firmware header:
-> + * https://github.com/tianocore/edk2/blob/master/OvmfPkg/Include/Guid/ConfidentialComputingSevSnpBlob.h
+On Fri, Feb 04, 2022, Marc Orr wrote:
+> On Fri, Feb 4, 2022 at 2:55 AM Joerg Roedel <jroedel@suse.de> wrote:
+> >         3) The firmware #VC handler might use state which is not
+> >            available anymore after ExitBootServices.
+> 
+> Of all the issues listed, this one seems the most serious.
+> 
+> >         4) If the firmware uses the kvm-unit-test GHCB after
+> >            ExitBootServices, it has the get the GHCB address from the
+> >            GHCB MSR, requiring an identity mapping.
+> >            Moreover it requires to keep the address of the GHCB in the
+> >            MSR at all times where a #VC could happen. This could be a
+> >            problem when we start to add SEV-ES specific tests to the
+> >            unit-tests, explcitily testing the MSR protocol.
+> 
+> Ack. I'd think we could require tests to save/restore the GHCB MSR.
+> 
+> > It is easy to violate this implicit protocol and breaking kvm-unit-tests
+> > just by a new version of OVMF being used. I think that is not a very
+> > robust approach and a separate #VC handler in the unit-test framework
+> > makes sense even now.
+> 
+> Thanks for the explanation! I hope we can keep the UEFI #VC handler
+> working, because like I mentioned, I think this work can be used to
+> test that code inside of UEFI. But I guess time will tell.
+> 
+> Of all the points listed above, I think point #3 is the most
+> concerning. The others seem like they can be managed.
 
-So looking at that typedef struct CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION there:
+  5) Debug.  I don't want to have to reverse engineer assembly code to understand
+     why a #VC handler isn't doing what I expect, or to a debug the exchanges
+     between guest and host.
 
-typedef struct {
-  UINT32    Header;
-  UINT16    Version;
-  UINT16    Reserved1;
-  UINT64    SecretsPhysicalAddress;
-  UINT32    SecretsSize;
-  UINT64    CpuidPhysicalAddress;
-  UINT32    CpuidLSize;
-} CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION;
 
-> + */
-> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
-> +struct cc_blob_sev_info {
-> +	u32 magic;
+On Thu, Jan 20, 2022 at 4:52 AM Varad Gautam <varad.gautam@suse.com> wrote:
+> If --amdsev-efi-vc is passed during ./configure, the tests will
+> continue using the UEFI #VC handler.
 
-That's called "Header" there.
-
-> +	u16 version;
-> +	u16 reserved;
-> +	u64 secrets_phys;
-> +	u32 secrets_len;
-> +	u32 rsvd1;
-
-You've added that member for padding but the fw blob one doesn't have
-it.
-
-But if we get a blob from the firmware and the structure layout differs,
-how is this supposed to even work?
-
-> +	u64 cpuid_phys;
-> +	u32 cpuid_len;
-> +	u32 rsvd2;
-
-That one too.
-
-Or are you going to change the blob layout in ovmf too, to match?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Why bother?  I would prefer we ditch the UEFI #VC handler entirely and not give
+users the option to using anything but the built-in handler.  What do we gain
+other than complexity?
