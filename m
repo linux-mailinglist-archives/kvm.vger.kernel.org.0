@@ -2,328 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF47E4AA2AA
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:57:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54B0D4AA3FB
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 00:07:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245059AbiBDV5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 16:57:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244978AbiBDV5d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 16:57:33 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2994FC06173D
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 13:57:32 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id c9so6258653plg.11
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 13:57:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=X5mQ7XgNN+wXIOoyBr6bEPCY6JnyKab78tFOCt/mw8M=;
-        b=f0s53wUDMeWAABIK90/+s023v71c8CXbsCTguKRbhpeoYsrOVMM82VyLxAKX8ZxmIo
-         AqCtBYgDq5jSe5xsU/c9v0Y+gU6II6lJDtPd4t1IdyChIcU29ViSQYdiwzZBzLlGi5JW
-         04qKzUAulgERC3XEWgigCpZJ2AT/Nb53TiWwlo8dJIUzyTepS3FmSOXHxd56VHo2JuuZ
-         3H7hXy49uYsQnXXwClLjACnQwx3u6YhntVqGTvsuH5b+SDxpLVg/qK+zXScBYwiZX47u
-         NYEqMHNsmvs2Yl82NxNU3icz+q3abBPdCe7/o8JYe5tbzLttH0f+HBZGoZaq3+0p++lE
-         MeWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=X5mQ7XgNN+wXIOoyBr6bEPCY6JnyKab78tFOCt/mw8M=;
-        b=TpLZJSlifaDTSPpUIyRFhYsGfJ/4mxpXTdzHW3u4eqgDIZvD+kyWmQ6ea9gLGuJAme
-         GcYkSuLJvRcxYsb+oxUgyuZwZYlZ8arhymQAfqpuPTxkO2118bhz0txR2dVG/164dBpN
-         pUfLVvOcYcv4imyrZShRxQqYuJfdvUgUXbZDiA1kMRy/OC7I+SC5ratjTYMuQQxISKGi
-         ggRWOoFrVB2q2i52hWT+beYja85HPpC1mOJCM4VSyIRs1YVSx5/pceo53Tlb75Vc6k5P
-         Zwa/fAOiminHvXGkOs1hte3wK6HvasFAXM5ZiMsC5Z6pBsoqaQ5c+4aM7VZ0BAZYTlyl
-         JMeA==
-X-Gm-Message-State: AOAM532T83cziNglPgFHnlcMMP1axRfROguMf1ZkYqaBsCNQ69DcXXd6
-        6c8A+3qOiSNmhVOPl8NER+2BCw==
-X-Google-Smtp-Source: ABdhPJzRWUpM8+rgedAJTRPqUF2/4bzzp5hsVBHxEVWYZwtgYXRoVbAgM5BjDVq5nlLwIs9fyreOyQ==
-X-Received: by 2002:a17:90a:a616:: with SMTP id c22mr1176474pjq.68.1644011851262;
-        Fri, 04 Feb 2022 13:57:31 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id l22sm3562372pfc.191.2022.02.04.13.57.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Feb 2022 13:57:30 -0800 (PST)
-Date:   Fri, 4 Feb 2022 21:57:26 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, vkuznets@redhat.com
-Subject: Re: [PATCH 10/23] KVM: MMU: split cpu_role from mmu_role
-Message-ID: <Yf2hRltaM1Ezd6SM@google.com>
-References: <20220204115718.14934-1-pbonzini@redhat.com>
- <20220204115718.14934-11-pbonzini@redhat.com>
-MIME-Version: 1.0
+        id S1377883AbiBDXHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 18:07:55 -0500
+Received: from mail-bn8nam11on2070.outbound.protection.outlook.com ([40.107.236.70]:50113
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1377870AbiBDXHx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 18:07:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hSQgSgRBdrdsCOieSkjV0HkSft0N6fHCj+X5uTsI07vMdM5r+lFvJMK+zJBByO+7M1oiR2jjIvEe/WmF/TEoqSKECRtCIIlgUnjSIxjkkimSpEHju4mRcVtysVkV6aAsw2pI1pfCeiU2j+Zvy7RJJUnt7ZscpM1ZY+WOuxUdxtL3YrS6xx14BgiO7y1xKuDNb6RXcnEi9wm97lMmftKPb04eJdEeQAThIx6gD52ELho+fjKQd8rAfgC70pfIQQ+FzuIMoxlgEs5dGVKRjEvO2yQnP8q7Ie7JAxNB4NsjvH6xUEcj+EkKdbS7zfqdapGfVGJuZDxAEnyNbUYSlUABqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Brnn+Oyi7kiZwhPWQMTmZ8mRJS9il/Ut0vUBF1C7x1A=;
+ b=YGHpn/DkeR76+pFFqZQ2i55PBDPTeT+cQ8xeBWFfkxVc19CtQYOx5ai8BA3fVQ5x7VWVOU3pVSJ+ugyw/yJdr14aaTlrYdXqaMJFzBjyqtb+ZvwY7vPlLQMXfPhacYFCkb5PVKoZf9A5i56fF9cJVQW6slKN6RHojYdtKNEH5+Kkq885KP6q0mTfqMCkTr1rReC3Rj42uc9eA9EHGYVTtKg0xcYVSwjYlwPZ+N+bXuYZ5SCpcqOZLhJLot+Kv2jzlWnpNmvy62sJuNjTdW7jA4dkLJc8DlH+Axn0cE4WGuDDeR2B7DPIZ7h5kX9pgM8vJFeKzOpcAE61CdKKhcFSVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Brnn+Oyi7kiZwhPWQMTmZ8mRJS9il/Ut0vUBF1C7x1A=;
+ b=XSA4y2DNIdfBj/uYYZyv31jmewGXOm5IF6a6aN3aJTVEQrSoYTAmNHUKAetxUO902CeH1eM3CIjcQOSuBUl2vh9cHhXtMScSkfPYuO6PjQl+ZYcCj48L1PrXyZf4J5X/ieCF+v09JpJMLQKK4f5XHTRjv8lqoiO9MtYh72BhsbLYLdcke/lurOQo9V3j9jCt9RS27fI+qKaNMCXcoaP6EASqlgBRJ0iH7bqYJVGCLYA7agbuPw5itThr+Ke4oG7KomIvIWBG6nYtx4mUFIurn+iux1PcwDR+PvCaW0s+/gCjUeeu+SVbc4lnadhDEdg2xtDVMTL50tuja8GF80vPrQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM4PR12MB5182.namprd12.prod.outlook.com (2603:10b6:5:395::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Fri, 4 Feb
+ 2022 23:07:51 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4951.016; Fri, 4 Feb 2022
+ 23:07:51 +0000
+Date:   Fri, 4 Feb 2022 19:07:50 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
+Message-ID: <20220204230750.GR1786498@nvidia.com>
+References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
+ <20220202131448.GA2538420@nvidia.com>
+ <a29ae3ea51344e18b9659424772a4b42@huawei.com>
+ <20220202153945.GT1786498@nvidia.com>
+ <c8a0731c589e49068a78afcc73d66bfa@huawei.com>
+ <20220202170329.GV1786498@nvidia.com>
+ <c6c3007e-3a2e-a376-67a0-b28801bf93aa@oracle.com>
+ <20220203151856.GD1786498@nvidia.com>
+ <e67654ce-5646-8fe7-1230-00bd7ee66ff3@oracle.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220204115718.14934-11-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+In-Reply-To: <e67654ce-5646-8fe7-1230-00bd7ee66ff3@oracle.com>
+X-ClientProxiedBy: BL0PR0102CA0065.prod.exchangelabs.com
+ (2603:10b6:208:25::42) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 862db495-7993-48a3-7150-08d9e8332b0b
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5182:EE_
+X-Microsoft-Antispam-PRVS: <DM4PR12MB51827F3A1F63B3605E4049A9C2299@DM4PR12MB5182.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MUbSJ3yShiHO8kK5id7KNlXbKq4QjDBlw7efUO7ZtNX7FDKAOgw5iCPdrvYNaDHG/vY7f254f705sqSeV9WahBJJlSOMDnkC1aiYbEoNRfh5HdbLYmoIsF0JBdzSthl17nI90Ne2zWqaNY0RK0tFhDoRs+hwE5p6/GkFv/FUI+CRwl0JO3yDlc2pAWGxI4vU695p51yJalgnHHREtOOtaKLiDRBmiu60D29j/ve1gW4UiG6hJCCFuY8BCj1mRILarOtfRQ9E8L4V9k1Vv2CDOwBxWsbGKX6hxMtmnNNQdP+OruwGQyx2Ak3UtQOmoKQ7/1fYQekpCszc1zyypDqhlIEQkRU2Cvtf4gG2tEub3hgR+6vnsz5ZAlCLEoLenIro/yZEYRBIZUYKdVE3d0G0oKsTqHyGXbNGwvwYqyLzFI+hRS1ZJDgqHTaIGPtn1EX2kmVmf5JxDYkO96rTv6VGGJdq5nFPq+PYgT288X6FUhjgicR4UDWImhtakij7VRAtcG0V29cRYxj9ws5TLW9kulDi95wFU8gdg7Zl1X0OYyB3ssQW6jKQo34xRet3bt11qiu9sJW7bPIe1jx+8lOqQQucdY1pNnGENRhmwQgzXoTwN+l3qHzI62gVDR0oG3reY2A5RkV1XTjNh+fBY1vg2Gxcr5hH1ALi2IH9QBQAcwmxCdIOXPPGwmi8RcNKC3Zyy0P9qd+dxQDnU2ffYWVySQWxvE30ar2NorfwCCr78o4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(4326008)(83380400001)(66946007)(8936002)(8676002)(66476007)(66556008)(5660300002)(6486002)(7416002)(38100700002)(2906002)(53546011)(36756003)(508600001)(86362001)(316002)(6512007)(966005)(1076003)(2616005)(186003)(26005)(6916009)(6506007)(54906003)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mgMdgSmf2Y8YAXDRYX1cM4fNh5PEWpKu2XWgKqBFVWK+UZLUqjLxc+qOVhIi?=
+ =?us-ascii?Q?8Ew2K0ndz9pZIqqgxcOXBuqqFIhHzEhmFUVPSI6vM4CoxvHZxnQCNdOFf+pm?=
+ =?us-ascii?Q?xagL3BOFsa4A+GOlnHseXT5DURH6AA6MEbJFL+UP6snc+i+rI7cOa/9DEEGa?=
+ =?us-ascii?Q?2FFj5Lgdhu0tX3s5fGVVvayBYkvcdp8fA+oEeQaYHTukK7aWFASRcH3+olEv?=
+ =?us-ascii?Q?OfpzlCmcBas0qjlV+wJVEcTgVTfKDViHw1+yiXxswn7W6XJ3b1U61kgW5/SC?=
+ =?us-ascii?Q?xzjlP+C5RlP9dnS2xO+wRhwIgCfKjpd9bVsTSfEQgObiN8d4KYTPOnJ/ck7D?=
+ =?us-ascii?Q?PHX9QVKXHbUyQEH25WzvzEgkNxiElUMp/TNbh6LZhQP7RQR+tMvCXkWvuHGJ?=
+ =?us-ascii?Q?zDJHQfpQXqQ1XN0xTBPSZipzDcl3y2AdnXFmyBF++yv3bPfKMTmAxJqgTDDC?=
+ =?us-ascii?Q?T2f/T6kyKNhUfaHdBgL4Ld1xHgGn+zEB9I9hBAmBdnVreZWSW1ClpS+3A0ol?=
+ =?us-ascii?Q?RCCS2dfPzTZPNAOWNJiw3gHX4HJhlTWNL/slXA6o2MQgJz8+S4GkEZCGzRmM?=
+ =?us-ascii?Q?SYlyfLkgER6y6a2KzPI36gxDO7rV1PFP/zjdyVlLEjx4643WBjqhr9dz4Kga?=
+ =?us-ascii?Q?Tq0eWa9bwdeGSRehjeaqx1WmXHCJRtM3RimTeyHARVcFC7DRZz6Z6sNxEGYl?=
+ =?us-ascii?Q?5FTkaCwJEPbX7yvc/rNmLeTwSZYPtO27jf70selLEbzpCeLnEX87CtdxzFFW?=
+ =?us-ascii?Q?yYjJJ55v0JceFoPJdgmyRM8+OJ35iRt574lmcbY4w4SjNUyW8hLQfmbDscwl?=
+ =?us-ascii?Q?124xHjWb3n9YfBpTke/wtL58Z/s34LcUlX45bHdT3KV57s/OmJBMU8Sp+IJd?=
+ =?us-ascii?Q?thjyFMkJmTMPPAd1UOtruyGJuRzAC/paXwMfndvjK46+v3KwlB72ME5AqBkc?=
+ =?us-ascii?Q?9khC5PsA7CUXdDt4wuTU5JMKbPif4CoKARLWU5uHOI3Du9IBNQq/kkxjeBo+?=
+ =?us-ascii?Q?yIRXNrBaTcy0RFQ45qfoOSsDbA0xRoftrxSqgmx0oMdbdroQKawDmRSBFmxE?=
+ =?us-ascii?Q?Sxw0tAoEuD2g9omJYsKg4fHMMsxtPmete7h5/UeLWqej8gmugFzgVf/dezEy?=
+ =?us-ascii?Q?oAn+cXa8FTXWNdr48pc5/ojzKujSIUoQSm+uqmbgZnaGK/dDash4xp0Ruwi9?=
+ =?us-ascii?Q?qeODqYiPIwZhSXzZ8aSYXOGUotnGu3iEjor202GMRIYOMxq7bp7l64BFPUsL?=
+ =?us-ascii?Q?w7teqgXB/rrNL8Ai1GwfSF3YVB2pKrIlnRQEVRUSyMkSPWznTThrdeD62ZiB?=
+ =?us-ascii?Q?G2j7uhBScwdo9ke2NXTtkMWqZ1NaTwyGAP1pCo3StfEi3/pLFJnSnAD/+oOu?=
+ =?us-ascii?Q?o7iyBUHWUcU/haxYv5Bns23TkYzVuvCGPXKmLTDOT3qulsG3NW7dHJrBXdjS?=
+ =?us-ascii?Q?dZ94ipRSkBT7fUPPsNrB4UmN5vUeFYqDJXzJxbGa9wvKjP4j0FhxGnbkawsV?=
+ =?us-ascii?Q?GH3SogOvZLzd2X6a5/e8HzNsjCy+W0kpg5acYgh6d8KAlZn0JZvS8DGCJudx?=
+ =?us-ascii?Q?t+YJFZDGm16t2s30lPE=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 862db495-7993-48a3-7150-08d9e8332b0b
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2022 23:07:51.5594
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AEBx87RxTpLC37JNTVCztSPdLc4s12EGNY9d9kRn3CMAYVdDRTfPXw2hmoduR5PD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5182
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 04, 2022 at 06:57:05AM -0500, Paolo Bonzini wrote:
-> Snapshot the state of the processor registers that govern page walk into
-> a new field of struct kvm_mmu.  This is a more natural representation
-> than having it *mostly* in mmu_role but not exclusively; the delta
-> right now is represented in other fields, such as root_level.  For
-> example, already in this patch we can replace role_regs_to_root_level
-> with the "level" field of the CPU role.
+On Fri, Feb 04, 2022 at 07:53:12PM +0000, Joao Martins wrote:
+> On 2/3/22 15:18, Jason Gunthorpe wrote:
+> > On Wed, Feb 02, 2022 at 07:05:02PM +0000, Joao Martins wrote:
+> >> On 2/2/22 17:03, Jason Gunthorpe wrote:
+> >>> how to integrate that with the iommufd work, which I hope will allow
+> >>> that series, and the other IOMMU drivers that can support this to be
+> >>> merged..
+> >>
+> >> The iommu-fd thread wasn't particularly obvious on how dirty tracking is done
+> >> there, but TBH I am not up to speed on iommu-fd yet so I missed something
+> >> obvious for sure. When you say 'integrate that with the iommufd' can you
+> >> expand on that?
+> > 
+> > The general idea is that iommufd is the place to put all the iommu
+> > driver uAPI for consumption by userspace. The IOMMU feature of dirty
+> > tracking would belong there.
+> > 
+> > So, some kind of API needs to be designed to meet the needs of the
+> > IOMMU drivers.
+> > 
+> /me nods
 > 
-> The nested MMU now has only the CPU role; and in fact the new function
-> kvm_calc_cpu_role is analogous to the previous kvm_calc_nested_mmu_role,
-> except that it has role.base.direct equal to CR0.PG.  It is not clear
-> what the code meant by "setting role.base.direct to true to detect bogus
-> usage of the nested MMU".
+> I am gonna assume below is the most up-to-date to iommufd (as you pointed
+> out in another thread IIRC):
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |   1 +
->  arch/x86/kvm/mmu/mmu.c          | 100 ++++++++++++++++++++------------
->  arch/x86/kvm/mmu/paging_tmpl.h  |   2 +-
->  3 files changed, 64 insertions(+), 39 deletions(-)
+>   https://github.com/jgunthorpe/linux iommufd
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 4ec7d1e3aa36..427ee486309c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -432,6 +432,7 @@ struct kvm_mmu {
->  	void (*invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa);
->  	hpa_t root_hpa;
->  	gpa_t root_pgd;
-> +	union kvm_mmu_role cpu_role;
->  	union kvm_mmu_role mmu_role;
->  	u8 root_level;
->  	u8 shadow_root_level;
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index dd69cfc8c4f6..f98444e1d834 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -230,7 +230,7 @@ BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
->  #define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)		\
->  static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
->  {								\
-> -	return !!(mmu->mmu_role. base_or_ext . reg##_##name);	\
-> +	return !!(mmu->cpu_role. base_or_ext . reg##_##name);	\
->  }
->  BUILD_MMU_ROLE_ACCESSOR(ext,  cr0, pg);
->  BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
-> @@ -4658,6 +4658,38 @@ static void paging32_init_context(struct kvm_mmu *context)
->  	context->direct_map = false;
->  }
->  
-> +static union kvm_mmu_role
-> +kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
-> +{
-> +	union kvm_mmu_role role = {0};
-> +
-> +	role.base.access = ACC_ALL;
-> +	role.base.smm = is_smm(vcpu);
-> +	role.base.guest_mode = is_guest_mode(vcpu);
-> +	role.base.direct = !____is_cr0_pg(regs);
-> +	if (!role.base.direct) {
-> +		role.base.efer_nx = ____is_efer_nx(regs);
-> +		role.base.cr0_wp = ____is_cr0_wp(regs);
-> +		role.base.smep_andnot_wp = ____is_cr4_smep(regs) && !____is_cr0_wp(regs);
-> +		role.base.smap_andnot_wp = ____is_cr4_smap(regs) && !____is_cr0_wp(regs);
-> +		role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
-> +		role.base.level = role_regs_to_root_level(regs);
-> +
-> +		role.ext.cr0_pg = 1;
-> +		role.ext.cr4_pae = ____is_cr4_pae(regs);
-> +		role.ext.cr4_smep = ____is_cr4_smep(regs);
-> +		role.ext.cr4_smap = ____is_cr4_smap(regs);
-> +		role.ext.cr4_pse = ____is_cr4_pse(regs);
-> +
-> +		/* PKEY and LA57 are active iff long mode is active. */
-> +		role.ext.cr4_pke = ____is_efer_lma(regs) && ____is_cr4_pke(regs);
-> +		role.ext.cr4_la57 = ____is_efer_lma(regs) && ____is_cr4_la57(regs);
-> +		role.ext.efer_lma = ____is_efer_lma(regs);
-> +	}
-> +
-> +	return role;
-> +}
-> +
->  static union kvm_mmu_role kvm_calc_mmu_role_common(struct kvm_vcpu *vcpu,
->  						   const struct kvm_mmu_role_regs *regs)
->  {
-> @@ -4716,13 +4748,16 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
->  			     const struct kvm_mmu_role_regs *regs)
->  {
->  	struct kvm_mmu *context = &vcpu->arch.root_mmu;
-> -	union kvm_mmu_role new_role =
-> +	union kvm_mmu_role cpu_role = kvm_calc_cpu_role(vcpu, regs);
-> +	union kvm_mmu_role mmu_role =
->  		kvm_calc_tdp_mmu_root_page_role(vcpu, regs);
->  
-> -	if (new_role.as_u64 == context->mmu_role.as_u64)
-> +	if (cpu_role.as_u64 == context->cpu_role.as_u64 &&
-> +	    mmu_role.as_u64 == context->mmu_role.as_u64)
->  		return;
->  
-> -	context->mmu_role.as_u64 = new_role.as_u64;
-> +	context->cpu_role.as_u64 = cpu_role.as_u64;
-> +	context->mmu_role.as_u64 = mmu_role.as_u64;
->  	context->page_fault = kvm_tdp_page_fault;
->  	context->sync_page = nonpaging_sync_page;
->  	context->invlpg = NULL;
-> @@ -4777,13 +4812,15 @@ kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu,
->  }
->  
->  static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
-> -				    const struct kvm_mmu_role_regs *regs,
-> -				    union kvm_mmu_role new_role)
-> +				    union kvm_mmu_role cpu_role,
-> +				    union kvm_mmu_role mmu_role)
->  {
-> -	if (new_role.as_u64 == context->mmu_role.as_u64)
-> +	if (cpu_role.as_u64 == context->cpu_role.as_u64 &&
-> +	    mmu_role.as_u64 == context->mmu_role.as_u64)
->  		return;
->  
-> -	context->mmu_role.as_u64 = new_role.as_u64;
-> +	context->cpu_role.as_u64 = cpu_role.as_u64;
-> +	context->mmu_role.as_u64 = mmu_role.as_u64;
->  
->  	if (!is_cr0_pg(context))
->  		nonpaging_init_context(context);
-> @@ -4791,20 +4828,21 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
->  		paging64_init_context(context);
->  	else
->  		paging32_init_context(context);
-> -	context->root_level = role_regs_to_root_level(regs);
-> +	context->root_level = cpu_role.base.level;
->  
->  	reset_guest_paging_metadata(vcpu, context);
-> -	context->shadow_root_level = new_role.base.level;
-> +	context->shadow_root_level = mmu_role.base.level;
->  }
->  
->  static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
->  				const struct kvm_mmu_role_regs *regs)
->  {
->  	struct kvm_mmu *context = &vcpu->arch.root_mmu;
-> -	union kvm_mmu_role new_role =
-> +	union kvm_mmu_role cpu_role = kvm_calc_cpu_role(vcpu, regs);
-> +	union kvm_mmu_role mmu_role =
->  		kvm_calc_shadow_mmu_root_page_role(vcpu, regs);
->  
-> -	shadow_mmu_init_context(vcpu, context, regs, new_role);
-> +	shadow_mmu_init_context(vcpu, context, cpu_role, mmu_role);
->  
->  	/*
->  	 * KVM uses NX when TDP is disabled to handle a variety of scenarios,
-> @@ -4839,11 +4877,10 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
->  		.cr4 = cr4 & ~X86_CR4_PKE,
->  		.efer = efer,
->  	};
-> -	union kvm_mmu_role new_role;
-> -
-> -	new_role = kvm_calc_shadow_npt_root_page_role(vcpu, &regs);
-> +	union kvm_mmu_role cpu_role = kvm_calc_cpu_role(vcpu, &regs);
-> +	union kvm_mmu_role mmu_role = kvm_calc_shadow_npt_root_page_role(vcpu, &regs);;
->  
-> -	shadow_mmu_init_context(vcpu, context, &regs, new_role);
-> +	shadow_mmu_init_context(vcpu, context, cpu_role, mmu_role);
->  	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
->  	kvm_mmu_new_pgd(vcpu, nested_cr3);
->  }
-> @@ -4862,7 +4899,6 @@ kvm_calc_shadow_ept_root_page_role(struct kvm_vcpu *vcpu, bool accessed_dirty,
->  	role.base.guest_mode = true;
->  	role.base.access = ACC_ALL;
->  
-> -	/* EPT, and thus nested EPT, does not consume CR0, CR4, nor EFER. */
->  	role.ext.word = 0;
->  	role.ext.execonly = execonly;
->  
-> @@ -4879,7 +4915,9 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
->  		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
->  						   execonly, level);
->  
-> -	if (new_role.as_u64 != context->mmu_role.as_u64) {
-> +	if (new_role.as_u64 != context->cpu_role.as_u64) {
-> +		/* EPT, and thus nested EPT, does not consume CR0, CR4, nor EFER. */
-> +		context->cpu_role.as_u64 = new_role.as_u64;
->  		context->mmu_role.as_u64 = new_role.as_u64;
->  
->  		context->shadow_root_level = level;
-> @@ -4913,32 +4951,15 @@ static void init_kvm_softmmu(struct kvm_vcpu *vcpu,
->  	context->inject_page_fault = kvm_inject_page_fault;
->  }
->  
-> -static union kvm_mmu_role
-> -kvm_calc_nested_mmu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
-> -{
-> -	union kvm_mmu_role role;
-> -
-> -	role = kvm_calc_shadow_root_page_role_common(vcpu, regs);
-> -
-> -	/*
-> -	 * Nested MMUs are used only for walking L2's gva->gpa, they never have
-> -	 * shadow pages of their own and so "direct" has no meaning.   Set it
-> -	 * to "true" to try to detect bogus usage of the nested MMU.
-> -	 */
-> -	role.base.direct = true;
-> -	role.base.level = role_regs_to_root_level(regs);
-> -	return role;
-> -}
-> -
->  static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
->  {
-> -	union kvm_mmu_role new_role = kvm_calc_nested_mmu_role(vcpu, regs);
-> +	union kvm_mmu_role new_role = kvm_calc_cpu_role(vcpu, regs);
->  	struct kvm_mmu *g_context = &vcpu->arch.nested_mmu;
->  
-> -	if (new_role.as_u64 == g_context->mmu_role.as_u64)
-> +	if (new_role.as_u64 == g_context->cpu_role.as_u64)
->  		return;
->  
-> -	g_context->mmu_role.as_u64 = new_role.as_u64;
-> +	g_context->cpu_role.as_u64 = new_role.as_u64;
->  	g_context->get_guest_pgd     = get_cr3;
->  	g_context->get_pdptr         = kvm_pdptr_read;
->  	g_context->inject_page_fault = kvm_inject_page_fault;
-> @@ -4997,6 +5018,9 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  	 * problem is swept under the rug; KVM's CPUID API is horrific and
->  	 * it's all but impossible to solve it without introducing a new API.
->  	 */
-> +	vcpu->arch.root_mmu.cpu_role.base.level = 0;
-> +	vcpu->arch.guest_mmu.cpu_role.base.level = 0;
-> +	vcpu->arch.nested_mmu.cpu_role.base.level = 0;
+> Let me know if it's not :)
 
-Will cpu_role.base.level already be 0 if CR0.PG=0 && !tdp_enabled? i.e.
-setting cpu_role.base.level to 0 might not have the desired effect.
+The iommufd part is pretty good, but there is hacky patch to hook it
+into vfio that isn't there, if you want to actually try it.
 
-It might not matter in practice since the shadow_mmu_init_context() and
-kvm_calc_mmu_role_common() check both the mmu_role and cpu_role, but does
-make this reset code confusing.
+> > But, as you say, it looks unnatural and inefficient when the domain
+> > itself is storing the dirty bits inside the IOPTE.
+> 
+> How much is this already represented as the io-pgtable in IOMMU internal kAPI
+> (if we exclude the UAPI portion of iommufd for now) ? FWIW, that is today
+> used by the AMD IOMMU and ARM IOMMUs. Albeit, not Intel :(
 
->  	vcpu->arch.root_mmu.mmu_role.base.level = 0;
->  	vcpu->arch.guest_mmu.mmu_role.base.level = 0;
->  	vcpu->arch.nested_mmu.mmu_role.base.level = 0;
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 6bb9a377bf89..b9f472f27077 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -323,7 +323,7 @@ static inline bool FNAME(is_last_gpte)(struct kvm_mmu *mmu,
->  	 * is not reserved and does not indicate a large page at this level,
->  	 * so clear PT_PAGE_SIZE_MASK in gpte if that is the case.
->  	 */
-> -	gpte &= level - (PT32_ROOT_LEVEL + mmu->mmu_role.ext.cr4_pse);
-> +	gpte &= level - (PT32_ROOT_LEVEL + mmu->cpu_role.ext.cr4_pse);
->  #endif
->  	/*
->  	 * PG_LEVEL_4K always terminates.  The RHS has bit 7 set
-> -- 
-> 2.31.1
+Which are you looking at? AFACIT there is no diry page support in
+iommu_ops ?
+
+> then potentially VMM/process can more efficiently scan the dirtied
+> set? But if some layer needs to somehow mediate between the vendor
+> IOPTE representation and an UAPI IOPTE representation, to be able to
+> make that delegation to userspace ... then maybe both might be
+> inefficient?  I didn't see how iommu-fd would abstract the IOPTEs
+> lookup as far as I glanced through the code, perhaps that's another
+> ioctl().
+
+It is based around the same model as VFIO container - map/unmap of
+user address space into the IOPTEs and the user space doesn't see
+anything resembling a 'pte' - at least for kernel owned IO page
+tables.
+
+User space page tables will not be abstracted and the userspace must
+know the direct HW format of the IOMMU they is being used.
+
+> But what strikes /specifically/ on the dirty bit feature is that it looks
+> simpler with the current VFIO, the heavy lifting seems to be
+> mostly on the IOMMU vendor. The proposed API above for VFIO looking at
+> the container (small changes), and IOMMU vendor would do most of it:
+
+It is basically the same, almost certainly the user API in iommufd
+will be some 'get dirty bits' and 'unmap and give me the dirty bits'
+just like vfio has.
+ 
+The tricky details are around how do you manage this when the system
+may have multiple things invovled capable, or not, of actualy doing
+dirty tracking.
+
+> At the same time, what particularly scares me perf-wise (for the
+> device being migrated) ... is the fact that we need to dynamically
+> split and collapse page tables to increase the granularity of which
+> we track. In the above interface it splits/collapses when you turn
+> on/off the dirty tracking (respectively). That's *probably* where we
+> need more flexibility, not sure.
+
+For sure that is a particularly big adventure in the iommu driver..
+
+> Do you have thoughts on what such device-dirty interface could look like?
+> (Perhaps too early to poke while the FSM/UAPI is being worked out)
+
+I've been thinking the same general read-and-clear of a dirty
+bitmap. It matches nicely the the KVM interface.
+
+> I was wondering if container has a dirty scan/sync callback funnelled
+> by a vendor IOMMU ops implemented (as Shameerali patches proposed), 
+
+Yes, this is almost certainly how the in-kernel parts will look
+
+> and vfio vendor driver provides one per device. 
+
+But this is less clear..
+
+> Or propagate the dirty tracking API to vendor vfio driver[*]. 
+> [*] considering the device may choose where to place its tracking storage, and
+> which scheme (bitmap, ring, etc) it might be.
+
+This has been my thinking, yes
+
+> The reporting of the dirtying, though, looks hazzy to achieve if you
+> try to make it uniform even to userspace. Perhaps with iommu-fd
+> you're thinking to mmap() the dirty region back to userspace, or an
+> iommu-fd ioctl() updates the PTEs, while letting the kernel clear
+> the dirty status via the mmap() object. And that would be the common
+> API regardless of dirty-hw scheme. Anyway, just thinking out loud.
+
+My general thinking has be that iommufd would control only the system
+IOMMU hardware. The FD interface directly exposes the iommu_domain as
+a manipulable object, so I'd imagine making userspace have a simple
+1:1 connection to the iommu_ops of a single iommu_domain.
+
+Doing this avoids all the weirdo questions about what do you do if
+there is non-uniformity in the iommu_domain's.
+
+Keeping with that theme the vfio_device would provide a similar
+interface, on its own device FD.
+
+I don't know if mmap should be involed here, the dirty bitmaps are not
+so big, I suspect a simple get_user_pages_fast() would be entirely OK.
+
+> > VFIO proposed to squash everything
+> > into the container code, but I've been mulling about having iommufd
+> > only do system iommu and push the PCI device internal tracking over to
+> > VFIO.
+> > 
 > 
-> 
+> Seems to me that the juicy part falls mostly in IOMMU vendor code, I am
+> not sure yet how much one can we 'offload' to a generic layer, at least
+> compared with this other proposal.
+
+Yes, I expect there is very little generic code here if we go this
+way. The generic layer is just marshalling the ioctl(s) to the iommu
+drivers. Certainly not providing storage or anything/
+
+> Give me some time (few days only, as I gotta sort some things) and I'll
+> respond here as follow up with link to a branch with the WIP/PoC patches.
+
+Great!
+  
+> 3) Dirty bit is sticky, hardware never clears it. Reading the access/dirty
+> bit is cheap, clearing them is 'expensive' because one needs to flush
+> IOTLB as the IOMMU hardware may cache the bits in the IOTLB as a result
+> of an address-translation/io-page-walk. Even though the IOMMU uses interlocked
+> operations to actually update the Access/Dirty bit in concurrency with
+> the CPU. The AMD manuals are a tad misleading as they talk about marking
+> non-present, but that would be catastrophic for migration as it would
+> mean a DMA target abort for the PCI device, unless I missed something obvious.
+> In any case, this means that the dirty bit *clearing* needs to be
+> batched as much as possible, to amortize the cost of flushing the IOTLB.
+> This is the same for Intel *IIUC*.
+
+You have to mark it as non-present to do the final read out if
+something unmaps while the tracker is on - eg emulating a viommu or
+something. Then you mark non-present, flush the iotlb and read back
+the dirty bit.
+
+Otherwise AFIAK, you flush the IOTLB to get the latest dirty bits and
+then read and clear them.
+
+> 4) Adjust the granularity of pagetables in place:
+> [This item wasn't done, but it is generic to any IOMMU because it
+> is mostly the ability to split existing IO pages in place.]
+
+This seems like it would be some interesting amount of driver work,
+but yes it could be a generic new iommu_domina op.
+
+> 4.b) Optionally starting dirtying earlier (at provisioning) and let
+> userspace dynamically split pages. This is to hopefully minimize the
+> IOTLB miss we induce ourselves in item 4.a) if we were to do eagerly.
+> So dirty tracking would be enabled at creation of the protection domain
+> after the vfio container is set up, and we would use pages dirtied
+> as a indication of what needs to be splited. Problem is for IO page
+> sizes bigger than 1G, which might unnecessarily lead to marking too
+> much as dirty early on; but at least it's better than transferring the
+> whole set.
+
+I'm not sure running with dirty tracking permanently on would be good
+for guest performance either.
+
+I'd suspect you'd be better to have a warm up period where you track
+dirtys and split down pages.
+
+It is interesting, this is a possible reason why device dirty tracking
+might actually perfom better because it can operate at a different
+granularity from the system iommu without disrupting the guest DMA
+performance.
+
+Jason
