@@ -2,110 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBAE44AA258
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:33:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51A1D4AA26F
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:42:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242146AbiBDVdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 16:33:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23534 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S241174AbiBDVdi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 16:33:38 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 214K1OB9015768;
-        Fri, 4 Feb 2022 21:33:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=V96kPHPcbaEFpFcl5wtymOsrVxw9OhMcRz8jBgjtioQ=;
- b=GpiJddThV7qffYS63IfRz3lxlkToiOMYssovW1yy/yWX9A6mdNbMeQ3tPo/Mvqh5QrGO
- 2jX8dN76fdt4ZNZSEX+2WZLgtYNGlySY59PVsqBo9heD/Ztr5TsKvWMRcNL2BAACgKR0
- c0rhKLZb8CEfCjSrWS9PdgAzacL/LMEzbrjEPQ7F3L8nAOJQ1F8Uz4AI2qBdgbZfZkZ2
- MP5aYjv03x/TX4O6Zaq8lTz4I7OVZCvYODxYZku+Rl9ishkxNpvakl8FKw5S4CzcEtTq
- h1/sxaGgsYGUimith4JVXAk83nS2+mJRk1vRe4kVrbvEiwOf89cnQudatZcfci6IjvUS Fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0yu5qe50-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Feb 2022 21:33:37 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 214LRbhL017632;
-        Fri, 4 Feb 2022 21:33:37 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0yu5qe4u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Feb 2022 21:33:37 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 214LWbPX029014;
-        Fri, 4 Feb 2022 21:33:36 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02wdc.us.ibm.com with ESMTP id 3e0r0kb4nr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Feb 2022 21:33:36 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 214LXZ7C29753792
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Feb 2022 21:33:35 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9CC4A28060;
-        Fri,  4 Feb 2022 21:33:35 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 966442805C;
-        Fri,  4 Feb 2022 21:33:30 +0000 (GMT)
-Received: from [9.211.82.52] (unknown [9.211.82.52])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Feb 2022 21:33:30 +0000 (GMT)
-Message-ID: <545e631c-8e0d-2aab-8429-b69da6198dae@linux.ibm.com>
-Date:   Fri, 4 Feb 2022 16:33:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 00/30] KVM: s390: enable zPCI for interpretive
- execution
-Content-Language: en-US
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
-In-Reply-To: <20220204211536.321475-1-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: d0cu8XSu5BX3OZVwNDzD1chPwFbGseqL
-X-Proofpoint-GUID: KOD5tdnq1kfTiTbwm0AVeMg-E36OZ5uv
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-04_07,2022-02-03_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 phishscore=0 clxscore=1015 mlxscore=0 bulkscore=0
- malwarescore=0 spamscore=0 mlxlogscore=885 lowpriorityscore=0 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202040119
+        id S243411AbiBDVmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 16:42:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40830 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243083AbiBDVmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 16:42:09 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF17FC061714
+        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 13:42:08 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id u24-20020a656718000000b0035e911d79edso3563234pgf.1
+        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 13:42:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=A80sxPQaWL6f5yGjquWZL0N8aen675OaLvQ0vL9tgic=;
+        b=Ue9TW2PPM/s7I+5nAselrLCj9uVE1MWUWqRCtAaQeBgZbEVHwuwYMJ+vb/NSFldbfS
+         KAzOOXyh6EnG4IxX/JRp0TzU/F8i7EOiJlejnoDCDwiWW3qJDMP5I1vyJHYG+VOGiKMd
+         cLzU4YL70sIqSaJ5JJPVUPIJ+waOhaOvItclVxJS/NRaQppBwHkS9Bcp4mIIujLOPF5T
+         oY2+4FTrr1JEPe43UdvtAg5FPLioQ/sOrGRgnwgfef84+HpDRdy21z0h1X7I6MnIc/m1
+         dcSZvPWNQk8va3DzzcUHiIuKARR16G9h8c02ZGOjtPeRatzSfG3Il/iwroN1mD7LXbdo
+         dx/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=A80sxPQaWL6f5yGjquWZL0N8aen675OaLvQ0vL9tgic=;
+        b=BMtYbk6Vm2FAC4MAZl21Pf3liMTYvSSZidwVSSZPgtqT0BZXPBU1IbBhpv09LAaPCd
+         btKqUeZy4Zu5MwuhZKOlPdipItJHsdkyvqQumiSKKFZzf8GHXq7C8gtdHubYT0jG3YHO
+         MrPRnEHzERbaLb2JGGikV73uhwY4tmTsMekMsTJOy6+iG7QvoGuYC+CVVHsqNTCMVFgF
+         69wYWYWzEAYIqOdWL9jyYqr1FL0ok92Gls8qpV8MHTYUIm5NKFT4MZIpS821OUiU0MnX
+         3krPN/vc6xpRVZVlPIi9Cdu8xoP/GaDjIIRu2hyahgg4KyMT98g6cmPxPPlhgZXhM6bX
+         5aJQ==
+X-Gm-Message-State: AOAM5331rOQ5isQZMEpNP7vpIyrQJnkvK2texlPY0Rf1uHUO/j7RL2Zv
+        T1nIk+jQ2kXs9gtyL8L/ob6pXMfS2Jo=
+X-Google-Smtp-Source: ABdhPJyvWM4OK4sgvDuUOvIgvTK7/Ym8wKVT2IloIOe2I8/OMLiKslX9+dYxCl+znng1ZvFdRj3ug6DuKMw=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:16d4:: with SMTP id
+ l20mr5020761pfc.5.1644010927914; Fri, 04 Feb 2022 13:42:07 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri,  4 Feb 2022 21:41:54 +0000
+Message-Id: <20220204214205.3306634-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
+Subject: [PATCH 00/11] KVM: x86: Prep work for VMX IPI virtualization
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Zeng Guang <guang.zeng@intel.com>,
+        Chao Gao <chao.gao@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.7 required=5.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/4/22 4:15 PM, Matthew Rosato wrote:
-> Enable interpretive execution of zPCI instructions + adapter interruption
-> forwarding for s390x KVM vfio-pci.  This is done by introducing a series
-> of new vfio-pci feature ioctls that are unique vfio-pci-zdev (s390x) and
-> are used to negotiate the various aspects of zPCI interpretation setup.
-> By allowing intepretation of zPCI instructions and firmware delivery of
-> interrupts to guests, we can significantly reduce the frequency of guest
-> SIE exits for zPCI.  We then see additional gains by handling a hot-path
-> instruction that can still intercept to the hypervisor (RPCIT) directly
-> in kvm.
-> 
->  From the perspective of guest configuration, you passthrough zPCI devices
-> in the same manner as before, with intepretation support being used by
-> default if available in kernel+qemu.
-> 
-> Will reply with a link to the associated QEMU series.
-https://lore.kernel.org/qemu-devel/20220204211918.321924-1-mjrosato@linux.ibm.com/
+Prepare for VMX's IPI virtualization, in which hardware treats ICR as a
+single 64-bit register in x2APIC mode.  The SDM wasn't clear on how ICR
+should be modeled, KVM just took the easier path and guessed wrong.
+
+Hardware's implementation of ICR as a 64-bit register requires explicit
+handling to maintain backwards compatibility in KVM_{G,S}ET_REG, as
+migrating a VM between hosts with different IPI virtualization support
+would lead to ICR "corruption" for writes that aren't intercepted by
+KVM (hardware doesn't fill ICR2 in vAPIC page).
+
+This series includes AVIC cleanups for things I encountered along the way.
+AVIC still has multiple issues, this only fixes the easy bugs.
+
+Sean Christopherson (11):
+  Revert "svm: Add warning message for AVIC IPI invalid target"
+  KVM: VMX: Handle APIC-write offset wrangling in VMX code
+  KVM: x86: Use "raw" APIC register read for handling APIC-write VM-Exit
+  KVM: SVM: Use common kvm_apic_write_nodecode() for AVIC write traps
+  KVM: SVM: Don't rewrite guest ICR on AVIC IPI virtualization failure
+  KVM: x86: WARN if KVM emulates an IPI without clearing the BUSY flag
+  KVM: x86: Make kvm_lapic_reg_{read,write}() static
+  KVM: x86: Add helpers to handle 64-bit APIC MSR read/writes
+  KVM: x86: Treat x2APIC's ICR as a 64-bit register, not two 32-bit regs
+  KVM: x86: Make kvm_lapic_set_reg() a "private" xAPIC helper
+  KVM: selftests: Add test to verify KVM handles x2APIC ICR=>ICR2 dance
+
+ arch/x86/kvm/lapic.c                          | 193 ++++++++++++------
+ arch/x86/kvm/lapic.h                          |  21 +-
+ arch/x86/kvm/svm/avic.c                       |  38 ++--
+ arch/x86/kvm/trace.h                          |   6 +-
+ arch/x86/kvm/vmx/vmx.c                        |  11 +-
+ arch/x86/kvm/x86.c                            |  15 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/apic.h       |   1 +
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 150 ++++++++++++++
+ 10 files changed, 325 insertions(+), 112 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+
+
+base-commit: 17179d0068b20413de2355f84c75a93740257e20
+-- 
+2.35.0.263.gb82422642f-goog
+
