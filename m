@@ -2,152 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9D3E4AA241
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:23:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBAE44AA258
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:33:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242369AbiBDVXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 16:23:54 -0500
-Received: from mga05.intel.com ([192.55.52.43]:11862 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234066AbiBDVXw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 16:23:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644009832; x=1675545832;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WhYPkBeKsla88L2pdt3CpVMQF4rx+1J8iSq8/P2VoZE=;
-  b=mYa1jzDfTSwIPjnZItVkvwzOWRr2YvMi/xQhnYu5fuCfKbwgvinUaBhp
-   oW8AS7uN0W3aTm208LpzwFaVIBe4dnCsQm6RokdaRGDrWpfKWpi6TkzHe
-   /96XCWRjIUGn70kyutn2HQUY5dEKK5CESd0HGL3tfqqbskGzDRl4EcYz0
-   OVypjhWu5lFSc4Bc6g0uxl4PPs7mtMmdIvgjQzg0n3FvWhX3NAwDQ0rT7
-   ZFXclINPhkTnamKz3bYHanH9ymjLsrQHpzwRpdat2/mC+wAwLIdka4eU6
-   eD2CcV9X7zOndEu60B2M2ONKC6J0UhVKTCCFVW8exRvuZZhkFzdw8lCfy
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10248"; a="334841202"
-X-IronPort-AV: E=Sophos;i="5.88,343,1635231600"; 
-   d="scan'208";a="334841202"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2022 13:23:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,343,1635231600"; 
-   d="scan'208";a="600343769"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 04 Feb 2022 13:23:49 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nG63Z-000YCz-6e; Fri, 04 Feb 2022 21:23:49 +0000
-Date:   Sat, 5 Feb 2022 05:22:47 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com
-Subject: Re: [PATCH v7 10/17] KVM: s390: pv: add mmu_notifier
-Message-ID: <202202050519.HMLLILGz-lkp@intel.com>
-References: <20220204155349.63238-11-imbrenda@linux.ibm.com>
+        id S242146AbiBDVdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 16:33:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23534 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S241174AbiBDVdi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 16:33:38 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 214K1OB9015768;
+        Fri, 4 Feb 2022 21:33:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=V96kPHPcbaEFpFcl5wtymOsrVxw9OhMcRz8jBgjtioQ=;
+ b=GpiJddThV7qffYS63IfRz3lxlkToiOMYssovW1yy/yWX9A6mdNbMeQ3tPo/Mvqh5QrGO
+ 2jX8dN76fdt4ZNZSEX+2WZLgtYNGlySY59PVsqBo9heD/Ztr5TsKvWMRcNL2BAACgKR0
+ c0rhKLZb8CEfCjSrWS9PdgAzacL/LMEzbrjEPQ7F3L8nAOJQ1F8Uz4AI2qBdgbZfZkZ2
+ MP5aYjv03x/TX4O6Zaq8lTz4I7OVZCvYODxYZku+Rl9ishkxNpvakl8FKw5S4CzcEtTq
+ h1/sxaGgsYGUimith4JVXAk83nS2+mJRk1vRe4kVrbvEiwOf89cnQudatZcfci6IjvUS Fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0yu5qe50-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 21:33:37 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 214LRbhL017632;
+        Fri, 4 Feb 2022 21:33:37 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0yu5qe4u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 21:33:37 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 214LWbPX029014;
+        Fri, 4 Feb 2022 21:33:36 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma02wdc.us.ibm.com with ESMTP id 3e0r0kb4nr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Feb 2022 21:33:36 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 214LXZ7C29753792
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Feb 2022 21:33:35 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9CC4A28060;
+        Fri,  4 Feb 2022 21:33:35 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 966442805C;
+        Fri,  4 Feb 2022 21:33:30 +0000 (GMT)
+Received: from [9.211.82.52] (unknown [9.211.82.52])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Feb 2022 21:33:30 +0000 (GMT)
+Message-ID: <545e631c-8e0d-2aab-8429-b69da6198dae@linux.ibm.com>
+Date:   Fri, 4 Feb 2022 16:33:29 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 00/30] KVM: s390: enable zPCI for interpretive
+ execution
+Content-Language: en-US
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
+In-Reply-To: <20220204211536.321475-1-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: d0cu8XSu5BX3OZVwNDzD1chPwFbGseqL
+X-Proofpoint-GUID: KOD5tdnq1kfTiTbwm0AVeMg-E36OZ5uv
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220204155349.63238-11-imbrenda@linux.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-04_07,2022-02-03_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 phishscore=0 clxscore=1015 mlxscore=0 bulkscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=885 lowpriorityscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202040119
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Claudio,
-
-I love your patch! Yet something to improve:
-
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on v5.17-rc2 next-20220204]
-[cannot apply to kvms390/next s390/features]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Claudio-Imbrenda/KVM-s390-pv-implement-lazy-destroy-for-reboot/20220204-235609
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-config: s390-randconfig-r044-20220203 (https://download.01.org/0day-ci/archive/20220205/202202050519.HMLLILGz-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/9ee65f25ad996d38f6935360c99a89e72024174b
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Claudio-Imbrenda/KVM-s390-pv-implement-lazy-destroy-for-reboot/20220204-235609
-        git checkout 9ee65f25ad996d38f6935360c99a89e72024174b
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=s390 SHELL=/bin/bash arch/s390/kvm/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   arch/s390/kvm/pv.c: In function 'kvm_s390_pv_init_vm':
->> arch/s390/kvm/pv.c:255:17: error: implicit declaration of function 'mmu_notifier_register'; did you mean 'mmu_notifier_release'? [-Werror=implicit-function-declaration]
-     255 |                 mmu_notifier_register(&kvm->arch.pv.mmu_notifier, kvm->mm);
-         |                 ^~~~~~~~~~~~~~~~~~~~~
-         |                 mmu_notifier_release
-   cc1: some warnings being treated as errors
-
-
-vim +255 arch/s390/kvm/pv.c
-
-   210	
-   211	int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-   212	{
-   213		struct uv_cb_cgc uvcb = {
-   214			.header.cmd = UVC_CMD_CREATE_SEC_CONF,
-   215			.header.len = sizeof(uvcb)
-   216		};
-   217		int cc, ret;
-   218		u16 dummy;
-   219	
-   220		ret = kvm_s390_pv_alloc_vm(kvm);
-   221		if (ret)
-   222			return ret;
-   223	
-   224		/* Inputs */
-   225		uvcb.guest_stor_origin = 0; /* MSO is 0 for KVM */
-   226		uvcb.guest_stor_len = kvm->arch.pv.guest_len;
-   227		uvcb.guest_asce = kvm->arch.gmap->asce;
-   228		uvcb.guest_sca = (unsigned long)kvm->arch.sca;
-   229		uvcb.conf_base_stor_origin = (u64)kvm->arch.pv.stor_base;
-   230		uvcb.conf_virt_stor_origin = (u64)kvm->arch.pv.stor_var;
-   231	
-   232		cc = uv_call_sched(0, (u64)&uvcb);
-   233		*rc = uvcb.header.rc;
-   234		*rrc = uvcb.header.rrc;
-   235		KVM_UV_EVENT(kvm, 3, "PROTVIRT CREATE VM: handle %llx len %llx rc %x rrc %x",
-   236			     uvcb.guest_handle, uvcb.guest_stor_len, *rc, *rrc);
-   237	
-   238		/* Outputs */
-   239		kvm->arch.pv.handle = uvcb.guest_handle;
-   240	
-   241		atomic_inc(&kvm->mm->context.protected_count);
-   242		if (cc) {
-   243			if (uvcb.header.rc & UVC_RC_NEED_DESTROY) {
-   244				kvm_s390_pv_deinit_vm(kvm, &dummy, &dummy);
-   245			} else {
-   246				atomic_dec(&kvm->mm->context.protected_count);
-   247				kvm_s390_pv_dealloc_vm(kvm);
-   248			}
-   249			return -EIO;
-   250		}
-   251		kvm->arch.gmap->guest_handle = uvcb.guest_handle;
-   252		/* Add the notifier only once. No races because we hold kvm->lock */
-   253		if (kvm->arch.pv.mmu_notifier.ops != &kvm_s390_pv_mmu_notifier_ops) {
-   254			kvm->arch.pv.mmu_notifier.ops = &kvm_s390_pv_mmu_notifier_ops;
- > 255			mmu_notifier_register(&kvm->arch.pv.mmu_notifier, kvm->mm);
-   256		}
-   257		return 0;
-   258	}
-   259	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+On 2/4/22 4:15 PM, Matthew Rosato wrote:
+> Enable interpretive execution of zPCI instructions + adapter interruption
+> forwarding for s390x KVM vfio-pci.  This is done by introducing a series
+> of new vfio-pci feature ioctls that are unique vfio-pci-zdev (s390x) and
+> are used to negotiate the various aspects of zPCI interpretation setup.
+> By allowing intepretation of zPCI instructions and firmware delivery of
+> interrupts to guests, we can significantly reduce the frequency of guest
+> SIE exits for zPCI.  We then see additional gains by handling a hot-path
+> instruction that can still intercept to the hypervisor (RPCIT) directly
+> in kvm.
+> 
+>  From the perspective of guest configuration, you passthrough zPCI devices
+> in the same manner as before, with intepretation support being used by
+> default if available in kernel+qemu.
+> 
+> Will reply with a link to the associated QEMU series.
+https://lore.kernel.org/qemu-devel/20220204211918.321924-1-mjrosato@linux.ibm.com/
