@@ -2,124 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1C864A9810
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 11:56:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 844FE4A9812
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 11:58:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244661AbiBDKz7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 05:55:59 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:47922 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230164AbiBDKz6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 05:55:58 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id BE8FF210FD;
-        Fri,  4 Feb 2022 10:55:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643972157; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lA8/BPXaj3Ztagr/EuUEXvaARoqPppd3lbBHOZf1thM=;
-        b=xtQ6BxaJ7GBm3q2CxOmOP6zQdsZvQUi6qJFjHuh6ASyi+UnliqoaR2EtLp1v1XhLZiN7xw
-        wkIzGZ6sgDkBDGLdnhTcGW9ohUrvQ0pmlHkN7fbtHwywf7f2W2mYWzw+oDG0/Ypuh7xXcc
-        9hN5ZZYNzmsebAkmlgvR123LhufWd44=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643972157;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lA8/BPXaj3Ztagr/EuUEXvaARoqPppd3lbBHOZf1thM=;
-        b=lO/VTPuECTgp1fk3cwyWVCTTvVJmGqHnht/H6ffjGL9AsTsxY7P3zkRZ2S6gCDuZNY3Rgz
-        s6mgBl9ooZnWaoAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5A39113A84;
-        Fri,  4 Feb 2022 10:55:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fA9ZFD0G/WE2JwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Fri, 04 Feb 2022 10:55:57 +0000
-Date:   Fri, 4 Feb 2022 11:55:55 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Zixuan Wang <zxwang42@gmail.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bp@suse.de
-Subject: Re: [kvm-unit-tests 02/13] x86: AMD SEV-ES: Setup #VC exception
- handler for AMD SEV-ES
-Message-ID: <Yf0GO8EydyQSdZvu@suse.de>
-References: <20220120125122.4633-1-varad.gautam@suse.com>
- <20220120125122.4633-3-varad.gautam@suse.com>
- <CAA03e5FbSoRo9tXwJocBtZHEc7xisJ3gEFuOW0FPvchbL9X8PQ@mail.gmail.com>
+        id S245163AbiBDK6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 05:58:34 -0500
+Received: from foss.arm.com ([217.140.110.172]:35034 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230164AbiBDK6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 05:58:33 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 338E22B;
+        Fri,  4 Feb 2022 02:58:33 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6062B3F774;
+        Fri,  4 Feb 2022 02:58:30 -0800 (PST)
+Date:   Fri, 4 Feb 2022 10:58:40 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 19/64] KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and
+ VBAR_EL1 from virtual EL2
+Message-ID: <Yf0G4Ka/ho0Rdt2N@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-20-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAA03e5FbSoRo9tXwJocBtZHEc7xisJ3gEFuOW0FPvchbL9X8PQ@mail.gmail.com>
+In-Reply-To: <20220128121912.509006-20-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hi Marc,
 
-On Sun, Jan 30, 2022 at 12:36:48PM -0800, Marc Orr wrote:
-> Please let me know if I'm mis-understanding this rationale or missing
-> any reasons for why folks want a built-in #VC handler.
+On Fri, Jan 28, 2022 at 12:18:27PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> For the same reason we trap virtual memory register accesses at virtual
+> EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
+> introduces the HCR_EL2.NV1 bit to be able to trap on those register
+> accesses in EL1. Do not set this bit until the whole nesting support is
+> completed.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 9d3520f1d17a..4f2bcc1e0c25 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1650,6 +1650,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool access_elr(struct kvm_vcpu *vcpu,
+> +		       struct sys_reg_params *p,
+> +		       const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+> +	else
+> +		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
 
-There are a couple of reasons which come all come down to one goal:
-Robustnes of the kvm-unit-tests.
+Going over the patch again, I was a bit confused why access_elr() uses
+vcpu_{read,write}_sys_reg(), but access_spsr() uses __vcpu_sys_reg(). In
+the end, vcpu_{read,write}_sys_reg() will write to the shadow copy of the
+registers, as the guest is executing at virtual non-VHE EL2, so the two are
+equivalent.
 
-If kvm-unit-tests continue to use the firmware #VC handler after
-ExitBootServices there needs to be a contract between the test
-framework and the firmware about:
+It's obviously me nitpicking, but the inconsistency is unexpected. How
+about using vcpu_{read,write}_sys_reg() for access_spsr() below?
 
-	1) Page-table layout - The page table needs to map the firmware
-	   and the shared GHCB used by the firmware.
+Thanks,
+Alex
 
-	2) The firmware is required to keep its #VC handler in the
-	   current IDT for kvm-unit-tests to find it and copy the #VC
-	   entry into its own IDT.
-
-	3) The firmware #VC handler might use state which is not
-	   available anymore after ExitBootServices.
-
-	4) If the firmware uses the kvm-unit-test GHCB after
-	   ExitBootServices, it has the get the GHCB address from the
-	   GHCB MSR, requiring an identity mapping.
-	   Moreover it requires to keep the address of the GHCB in the
-	   MSR at all times where a #VC could happen. This could be a
-	   problem when we start to add SEV-ES specific tests to the
-	   unit-tests, explcitily testing the MSR protocol.
-
-It is easy to violate this implicit protocol and breaking kvm-unit-tests
-just by a new version of OVMF being used. I think that is not a very
-robust approach and a separate #VC handler in the unit-test framework
-makes sense even now.
-
-Regards,
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
-
+> +
+> +	return true;
+> +}
+> +
+> +static bool access_spsr(struct kvm_vcpu *vcpu,
+> +			struct sys_reg_params *p,
+> +			const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
+> +	else
+> +		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
+> +
+> +	return true;
+> +}
+> +
+>  static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+> @@ -1812,6 +1836,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	PTRAUTH_KEY(APDB),
+>  	PTRAUTH_KEY(APGA),
+>  
+> +	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
+> +	{ SYS_DESC(SYS_ELR_EL1), access_elr},
+> +
+>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+> @@ -1859,7 +1886,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+>  	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+>  
+> -	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
+> +	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+>  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+>  
+>  	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+> -- 
+> 2.30.2
+> 
