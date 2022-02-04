@@ -2,155 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7E084A9C8A
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 16:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5665D4A9C9C
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 17:01:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238079AbiBDP5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 10:57:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbiBDP5v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 10:57:51 -0500
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EFC0C061714
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 07:57:51 -0800 (PST)
-Received: by mail-oi1-x22c.google.com with SMTP id m10so9026162oie.2
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 07:57:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=JzMp0TH3SfM8Msm2bRmXF4hKPpNm0D8O6SvkE6RylQA=;
-        b=p/K/lmVuIvTOmZr8MLCzwjXbK631g4Fq7Bou5SFqKQ+CfrncKqr0cm8hbT9CmfaYMQ
-         tOIDMclmQ0sxoAvd2rOrB802am4apYQ4X3y+vsDJiXoV8Cs+4fkTvg5Zziuax9HCGfE6
-         soB1XYfPozQ6bWbHDNuUiQfwZqM32qpVrQymug4xnTvOiMdF2zo+D4VmhicxejqX15YH
-         FhNzUy/G0im+2g/NnsCHlp2JCOWAsSCON6Or3WypkNTSUtRLf10w3hXXqQSH1rYBqLjB
-         btXOaV7raSpkdiXt7yWPZrlfUClWTMgHvt7FJsQ/KU4FttZ+d3if35u3Ir3lVkYDyMYB
-         UhzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=JzMp0TH3SfM8Msm2bRmXF4hKPpNm0D8O6SvkE6RylQA=;
-        b=nAnJ6NX4Mt5cmFhpRjam3VAI+SVxM+Z2AlD0uSvgQKgD8fB2+ECPDkj131SS+0oFXR
-         ZjZmcLOdnhCq/MMralSEolTD96ZlCis/81VEQXRETZ/Yd7g9cWdeAETYzE4Ft8tynRIP
-         CAJEvl4GGZcdQdTIVHxIGpRCXVaXDIhTdaxRjaQiABsVTAsCtRF2Ygcr8NiKTZ9E/lyV
-         9UFr5rxoqjRPyL1BQJsKg9pmHvJXD2TRfpzYJKcQHrHZ3jt3IrrMST/GC1hCF0iy5ioO
-         44mVpJiWKz1LOzBdapQGZsn/92ipwBugVsF5Akw9pHJCbU+9HN9J+HwEbWk1GgJed1Fx
-         LiFw==
-X-Gm-Message-State: AOAM530hs6g2vLxAX5aGjr0KNq/IAtFBVRZVPZgdwIPfWMezvtI8ulgM
-        P83GmnJ+45tkUKVkFqlt2Rm88V+JxHRdIFd8Lpi6+g==
-X-Google-Smtp-Source: ABdhPJyE5a3dAQIg0loNhw/CWNqHCRXMiBb9fG9Mo9mprsYV+63fYevPhidvC2SGRZREbD9V3xjU2ybJnP6oIIglqNQ=
-X-Received: by 2002:a05:6808:17a1:: with SMTP id bg33mr1561343oib.49.1643990270449;
- Fri, 04 Feb 2022 07:57:50 -0800 (PST)
+        id S1376334AbiBDQBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 11:01:10 -0500
+Received: from foss.arm.com ([217.140.110.172]:53746 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1376630AbiBDQBH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Feb 2022 11:01:07 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C8511396;
+        Fri,  4 Feb 2022 08:01:07 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 54B503F718;
+        Fri,  4 Feb 2022 08:01:04 -0800 (PST)
+Date:   Fri, 4 Feb 2022 16:01:13 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 22/64] KVM: arm64: nv: Respect virtual HCR_EL2.TWX
+ setting
+Message-ID: <Yf1Nq1XFJqayJCSt@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-23-maz@kernel.org>
+ <Yf1I3w/xPjwM9IiO@monolith.localdoman>
 MIME-Version: 1.0
-References: <20220120125122.4633-1-varad.gautam@suse.com> <20220120125122.4633-3-varad.gautam@suse.com>
- <CAA03e5FbSoRo9tXwJocBtZHEc7xisJ3gEFuOW0FPvchbL9X8PQ@mail.gmail.com> <Yf0GO8EydyQSdZvu@suse.de>
-In-Reply-To: <Yf0GO8EydyQSdZvu@suse.de>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 4 Feb 2022 07:57:39 -0800
-Message-ID: <CAA03e5HnyqZqDOyK8cbJgq_-zMPYEcrAuKr_CF8+=3DeykfV5A@mail.gmail.com>
-Subject: Re: [kvm-unit-tests 02/13] x86: AMD SEV-ES: Setup #VC exception
- handler for AMD SEV-ES
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Varad Gautam <varad.gautam@suse.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Zixuan Wang <zxwang42@gmail.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bp@suse.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yf1I3w/xPjwM9IiO@monolith.localdoman>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 4, 2022 at 2:55 AM Joerg Roedel <jroedel@suse.de> wrote:
->
+Hi,
+
+On Fri, Feb 04, 2022 at 03:40:15PM +0000, Alexandru Elisei wrote:
 > Hi Marc,
->
-> On Sun, Jan 30, 2022 at 12:36:48PM -0800, Marc Orr wrote:
-> > Please let me know if I'm mis-understanding this rationale or missing
-> > any reasons for why folks want a built-in #VC handler.
->
-> There are a couple of reasons which come all come down to one goal:
-> Robustnes of the kvm-unit-tests.
->
-> If kvm-unit-tests continue to use the firmware #VC handler after
-> ExitBootServices there needs to be a contract between the test
-> framework and the firmware about:
->
->         1) Page-table layout - The page table needs to map the firmware
->            and the shared GHCB used by the firmware.
->
->         2) The firmware is required to keep its #VC handler in the
->            current IDT for kvm-unit-tests to find it and copy the #VC
->            entry into its own IDT.
+> 
+> On Fri, Jan 28, 2022 at 12:18:30PM +0000, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+> > they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+> > 
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h |  2 ++
+> >  arch/arm64/kvm/Makefile             |  2 +-
+> >  arch/arm64/kvm/handle_exit.c        | 11 ++++++++++-
+> >  arch/arm64/kvm/nested.c             | 28 ++++++++++++++++++++++++++++
+> >  4 files changed, 41 insertions(+), 2 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/nested.c
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index 5a85be6d8eb3..79d382fa02ea 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -65,4 +65,6 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+> >  		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
+> >  }
+> >  
+> > +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+> > +
+> >  #endif /* __ARM64_KVM_NESTED_H */
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index b67c4ebd72b1..dbaf42ff65f1 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >  	 inject_fault.o va_layout.o handle_exit.o \
+> >  	 guest.o debug.o reset.o sys_regs.o \
+> >  	 vgic-sys-reg-v3.o fpsimd.o pmu.o pkvm.o \
+> > -	 arch_timer.o trng.o emulate-nested.o \
+> > +	 arch_timer.o trng.o emulate-nested.o nested.o \
+> >  	 vgic/vgic.o vgic/vgic-init.o \
+> >  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> >  	 vgic/vgic-v3.o vgic/vgic-v4.o \
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 0cedef6e0d80..a1b1bbf3d598 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -119,7 +119,16 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
+> >   */
+> >  static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+> >  {
+> > -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
+> > +	bool is_wfe = !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE);
+> > +
+> > +	if (vcpu_has_nv(vcpu)) {
+> > +		int ret = handle_wfx_nested(vcpu, is_wfe);
+> > +
+> > +		if (ret != -EINVAL)
+> > +			return ret;
+> 
+> I find this rather clunky. The common pattern is that a function returns
+> early when it encounters an error, but here this pattern is reversed:
+> -EINVAL means that handle_wfx_nested() failed in handling the WFx, so
+> proceed as usual; conversly, anything but -EINVAL means handle_wfx_nested()
+> was successful in handling WFx, so exit early from kvm_handle_wfx().
+> 
+> That would be ok by itself, but if we dig deeper, handle_wfx_nested() ends up
+> calling kvm_inject_nested(), where -EINVAL is actually an error code. Granted,
+> that should never happen, because kvm_handle_wfx() first checks vcpu_has_nv(),
+> but still feels like something that could be improved.
+> 
+> Maybe changing handle_wfx_nested() like this would be better:
+> [..]
 
-Yeah. I think we already resolved these first two issues in the
-initial patch set.
+Or change kvm_handle_wfx() to handle the WFx trap like kvm_handle_fpasimd():
 
->         3) The firmware #VC handler might use state which is not
->            available anymore after ExitBootServices.
+	if (guest_wfx_traps_enabled(vcpu))
+		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
 
-Of all the issues listed, this one seems the most serious.
-
->         4) If the firmware uses the kvm-unit-test GHCB after
->            ExitBootServices, it has the get the GHCB address from the
->            GHCB MSR, requiring an identity mapping.
->            Moreover it requires to keep the address of the GHCB in the
->            MSR at all times where a #VC could happen. This could be a
->            problem when we start to add SEV-ES specific tests to the
->            unit-tests, explcitily testing the MSR protocol.
-
-Ack. I'd think we could require tests to save/restore the GHCB MSR.
-
-> It is easy to violate this implicit protocol and breaking kvm-unit-tests
-> just by a new version of OVMF being used. I think that is not a very
-> robust approach and a separate #VC handler in the unit-test framework
-> makes sense even now.
-
-Thanks for the explanation! I hope we can keep the UEFI #VC handler
-working, because like I mentioned, I think this work can be used to
-test that code inside of UEFI. But I guess time will tell.
-
-Of all the points listed above, I think point #3 is the most
-concerning. The others seem like they can be managed.
-
-Nonetheless, based on this explanation plus prior mailing list
-discussions, it is clear that the preference is to make the built-in
-#VC handler the default. My only request to Varad is to update the
-cover letter/patch descriptions with a summary of this discussion.
-Also, it might be worth adding a comment in the configure script
-mentioning that the built-in #VC handler is the default due to
-robustness and future-proofing concerns.
-
-Regarding code review and testing, I can help with the following:
-- Compare the patches being pulled into kvm-unit-tests to what's in
-the Linux kernel and add my Reviewed-by tags if I don't see any
-meaningful discrepancies.
-- Test the entire series on Google's setup, which doesn't use QEMU and
-add my Tested-by tag accordingly. My previous Tested-by tags were on
-individual patches. I have not yet tested the entire series.
-
-Please let me know if this is useful. If not, I wouldn't spend the time :-)=
-.
-
-> Regards,
->
-> --
-> J=C3=B6rg R=C3=B6del
-> jroedel@suse.de
->
-> SUSE Software Solutions Germany GmbH
-> Maxfeldstr. 5
-> 90409 N=C3=BCrnberg
-> Germany
->
-> (HRB 36809, AG N=C3=BCrnberg)
-> Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev
->
+Thanks,
+Alex
