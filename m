@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E00E14AA1EC
-	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:17:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5565D4AA1F0
+	for <lists+kvm@lfdr.de>; Fri,  4 Feb 2022 22:17:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242050AbiBDVRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 16:17:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29900 "EHLO
+        id S241589AbiBDVRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Feb 2022 16:17:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48400 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S241622AbiBDVQ3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 16:16:29 -0500
+        by vger.kernel.org with ESMTP id S235523AbiBDVQa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Feb 2022 16:16:30 -0500
 Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 214L2tMp015915;
-        Fri, 4 Feb 2022 21:16:29 GMT
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 214Jx4el016005;
+        Fri, 4 Feb 2022 21:16:30 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=bL0tk3lLqAggK8Z5WMLaCYQCJPhbjjqs32HKAtitwj8=;
- b=lN3M6Qz3NAobQqnQdVQ8RCPQyMDjQ7LpBqLXtXF8hkUPQK/XKYqAR4T0gGRFR2zP1PtX
- 1uoEjOjUL1EhZnDJ+ubk8zWRG65b1c8Nv2dg6z91D7ed/aErvsOn6PmUjXxk8dQri4GY
- HPvM2iYRP4UVCFJ53J9654IqwoIfR2UjtiY+mDFmdR41ZW9SEuzCgUq2QBttpdlpSa+c
- srmIdTBDJ/QNt3NPvhZ0vtNJjLl48x8yq1eA1PvNYHxCQWChogk40mykime+KtsQt7Id
- VnbCp5tP44zIcLFcMpHL2nYQhkxwGIkFqDeWYr+hH6MhAgTWOip29ZV0uoqeWyjiVvhC 7Q== 
+ bh=hmcK15jmALasJ7KT7q+FT1Rdo+H8SgNMDwkoL8KHQaE=;
+ b=DzAnGAs7xAGV592O2X6ej+o3meh9M6LjhL7rfebZcRNRFtRbO9teibG4xnjc8+6NqJUs
+ 01jlFQqqQ8qnguD/gfzTcfQBFj5GDPCSD8y42Qjx4X0NX19jzoJKQzuwJ54pz5KhkYjF
+ pZI6a4YYQpiEYCFYlvTRyYhVlpGEztTacrVKlKkzhxY2pBKaPGa1VL+szHvU5t9bJHX9
+ D5A5eCMm1bFmc3nT8AU5Q2x9l8nCpIJ8ElYRUwRCd7LL+UbRNyqoinvT0fIELgVFcMBN
+ YYs7wmde2x/WdJLaYpko5F2EURVar94br1679tiUJ18dB3zqhJ0kubDaNhYC6YkGjHX5 hw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0rt5nn0a-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0rt5nn0n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 04 Feb 2022 21:16:29 +0000
 Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 214LGSbO003916;
-        Fri, 4 Feb 2022 21:16:28 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0rt5nmyx-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 214LDP3b016537;
+        Fri, 4 Feb 2022 21:16:29 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e0rt5nn09-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Feb 2022 21:16:28 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 214LDNQn006172;
+        Fri, 04 Feb 2022 21:16:29 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 214LCf8U011927;
         Fri, 4 Feb 2022 21:16:28 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03wdc.us.ibm.com with ESMTP id 3e0r0yaw2q-1
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma05wdc.us.ibm.com with ESMTP id 3e0r0m2wk5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 04 Feb 2022 21:16:28 +0000
 Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 214LGPjX16384314
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 214LGRA931785378
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Feb 2022 21:16:25 GMT
+        Fri, 4 Feb 2022 21:16:27 GMT
 Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A905136066;
+        by IMSVA (Postfix) with ESMTP id 15C0F136065;
+        Fri,  4 Feb 2022 21:16:27 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 59823136055;
         Fri,  4 Feb 2022 21:16:25 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 635E9136055;
-        Fri,  4 Feb 2022 21:16:23 +0000 (GMT)
 Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com.com (unknown [9.211.82.52])
         by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Feb 2022 21:16:23 +0000 (GMT)
+        Fri,  4 Feb 2022 21:16:25 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     linux-s390@vger.kernel.org
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
@@ -64,17 +64,17 @@ Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
         thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 21/30] KVM: s390: pci: provide routines for enabling/disabling IOAT assist
-Date:   Fri,  4 Feb 2022 16:15:27 -0500
-Message-Id: <20220204211536.321475-22-mjrosato@linux.ibm.com>
+Subject: [PATCH v3 22/30] KVM: s390: pci: handle refresh of PCI translations
+Date:   Fri,  4 Feb 2022 16:15:28 -0500
+Message-Id: <20220204211536.321475-23-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220204211536.321475-1-mjrosato@linux.ibm.com>
 References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UCFS3e6dX3-19Fc3x_CN7KSryGV9VAsA
-X-Proofpoint-ORIG-GUID: Pn9dJu1eJlpzO3IfvmUmD6HI3PM5rYrB
+X-Proofpoint-GUID: x4oF1JHi-K5m-tIH3gbYPqXqq3uaw-D3
+X-Proofpoint-ORIG-GUID: otz9KLY0R_XXqStTwBTvwgWglrlWq4YT
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-04_07,2022-02-03_01,2021-12-02_01
@@ -87,269 +87,299 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These routines will be wired into the vfio_pci_zdev ioctl handlers to
-respond to requests to enable / disable a device for PCI I/O Address
-Translation assistance.
+Add a routine that will perform a shadow operation between a guest
+and host IOAT.  A subsequent patch will invoke this in response to
+an 04 RPCIT instruction intercept.
 
 Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- arch/s390/include/asm/kvm_pci.h |  15 ++++
- arch/s390/include/asm/pci_dma.h |   2 +
- arch/s390/kvm/pci.c             | 142 ++++++++++++++++++++++++++++++++
- arch/s390/kvm/pci.h             |   2 +
- 4 files changed, 161 insertions(+)
+ arch/s390/include/asm/kvm_pci.h |   1 +
+ arch/s390/include/asm/pci_dma.h |   1 +
+ arch/s390/kvm/pci.c             | 201 +++++++++++++++++++++++++++++++-
+ arch/s390/kvm/pci.h             |   8 +-
+ 4 files changed, 209 insertions(+), 2 deletions(-)
 
 diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
-index 377eebcba2d1..370d6ba041fe 100644
+index 370d6ba041fe..e4696f5592e1 100644
 --- a/arch/s390/include/asm/kvm_pci.h
 +++ b/arch/s390/include/asm/kvm_pci.h
-@@ -15,11 +15,21 @@
- #include <linux/kvm_host.h>
- #include <linux/kvm.h>
- #include <linux/pci.h>
-+#include <linux/mutex.h>
- #include <asm/pci_insn.h>
-+#include <asm/pci_dma.h>
-+
-+struct kvm_zdev_ioat {
-+	unsigned long *head[ZPCI_TABLE_PAGES];
-+	unsigned long **seg;
-+	unsigned long ***pt;
-+	struct mutex ioat_lock; /* Must be held when modifying head/seg/pt */
-+};
- 
+@@ -29,6 +29,7 @@ struct kvm_zdev_ioat {
  struct kvm_zdev {
  	struct zpci_dev *zdev;
  	struct kvm *kvm;
-+	struct kvm_zdev_ioat ioat;
++	u64 rpcit_count;
+ 	struct kvm_zdev_ioat ioat;
  	struct zpci_fib fib;
  };
- 
-@@ -31,6 +41,11 @@ int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
- 			    bool assist);
- int kvm_s390_pci_aif_disable(struct zpci_dev *zdev, bool force);
- 
-+int kvm_s390_pci_ioat_probe(struct zpci_dev *zdev);
-+int kvm_s390_pci_ioat_enable(struct zpci_dev *zdev, u64 iota);
-+int kvm_s390_pci_ioat_disable(struct zpci_dev *zdev);
-+u8 kvm_s390_pci_get_dtsm(struct zpci_dev *zdev);
-+
- int kvm_s390_pci_interp_probe(struct zpci_dev *zdev);
- int kvm_s390_pci_interp_enable(struct zpci_dev *zdev);
- int kvm_s390_pci_interp_disable(struct zpci_dev *zdev, bool force);
 diff --git a/arch/s390/include/asm/pci_dma.h b/arch/s390/include/asm/pci_dma.h
-index 91e63426bdc5..69e616d0712c 100644
+index 69e616d0712c..38004e0a4383 100644
 --- a/arch/s390/include/asm/pci_dma.h
 +++ b/arch/s390/include/asm/pci_dma.h
-@@ -50,6 +50,8 @@ enum zpci_ioat_dtype {
- #define ZPCI_TABLE_ALIGN		ZPCI_TABLE_SIZE
- #define ZPCI_TABLE_ENTRY_SIZE		(sizeof(unsigned long))
+@@ -52,6 +52,7 @@ enum zpci_ioat_dtype {
  #define ZPCI_TABLE_ENTRIES		(ZPCI_TABLE_SIZE / ZPCI_TABLE_ENTRY_SIZE)
-+#define ZPCI_TABLE_PAGES		(ZPCI_TABLE_SIZE >> PAGE_SHIFT)
-+#define ZPCI_TABLE_ENTRIES_PAGES	(ZPCI_TABLE_ENTRIES * ZPCI_TABLE_PAGES)
+ #define ZPCI_TABLE_PAGES		(ZPCI_TABLE_SIZE >> PAGE_SHIFT)
+ #define ZPCI_TABLE_ENTRIES_PAGES	(ZPCI_TABLE_ENTRIES * ZPCI_TABLE_PAGES)
++#define ZPCI_TABLE_ENTRIES_PER_PAGE	(ZPCI_TABLE_ENTRIES / ZPCI_TABLE_PAGES)
  
  #define ZPCI_TABLE_BITS			11
  #define ZPCI_PT_BITS			8
 diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index 8e9044a7bce7..fa9d6ac1755b 100644
+index fa9d6ac1755b..6e1bd20d3552 100644
 --- a/arch/s390/kvm/pci.c
 +++ b/arch/s390/kvm/pci.c
-@@ -13,12 +13,15 @@
- #include <asm/pci.h>
- #include <asm/pci_insn.h>
- #include <asm/pci_io.h>
-+#include <asm/pci_dma.h>
- #include <asm/sclp.h>
- #include "pci.h"
- #include "kvm-s390.h"
- 
- struct zpci_aift *aift;
- 
-+#define shadow_ioat_init zdev->kzdev->ioat.head[0]
-+
- static inline int __set_irq_noiib(u16 ctl, u8 isc)
- {
- 	union zpci_sic_iib iib = {{0}};
-@@ -366,6 +369,138 @@ int kvm_s390_pci_aif_disable(struct zpci_dev *zdev, bool force)
+@@ -159,6 +159,201 @@ int kvm_s390_pci_aen_init(u8 nisc)
+ 	return rc;
  }
- EXPORT_SYMBOL_GPL(kvm_s390_pci_aif_disable);
  
-+int kvm_s390_pci_ioat_probe(struct zpci_dev *zdev)
++static int dma_shadow_cpu_trans(struct kvm_vcpu *vcpu, unsigned long *entry,
++				unsigned long *gentry)
 +{
-+	/*
-+	 * Using the IOAT assist is only valid for a device with a KVM guest
-+	 * registered
-+	 */
-+	if (!zdev->kzdev->kvm)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(kvm_s390_pci_ioat_probe);
-+
-+int kvm_s390_pci_ioat_enable(struct zpci_dev *zdev, u64 iota)
-+{
-+	gpa_t gpa = (gpa_t)(iota & ZPCI_RTE_ADDR_MASK);
-+	struct kvm_zdev_ioat *ioat;
++	phys_addr_t gaddr = 0;
++	unsigned long idx;
 +	struct page *page;
-+	struct kvm *kvm;
-+	unsigned int idx;
-+	void *iaddr;
-+	int i, rc;
++	kvm_pfn_t pfn;
++	gpa_t addr;
++	int rc = 0;
 +
-+	if (shadow_ioat_init)
-+		return -EINVAL;
++	if (pt_entry_isvalid(*gentry)) {
++		/* pin and validate */
++		addr = *gentry & ZPCI_PTE_ADDR_MASK;
++		idx = srcu_read_lock(&vcpu->kvm->srcu);
++		page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
++		srcu_read_unlock(&vcpu->kvm->srcu, idx);
++		if (is_error_page(page))
++			return -EIO;
++		gaddr = page_to_phys(page) + (addr & ~PAGE_MASK);
++	}
 +
-+	/* Ensure supported type specified */
-+	if ((iota & ZPCI_IOTA_RTTO_FLAG) != ZPCI_IOTA_RTTO_FLAG)
-+		return -EINVAL;
-+
-+	kvm = zdev->kzdev->kvm;
-+	ioat = &zdev->kzdev->ioat;
-+	mutex_lock(&ioat->ioat_lock);
-+	idx = srcu_read_lock(&kvm->srcu);
-+	for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
-+		page = gfn_to_page(kvm, gpa_to_gfn(gpa));
-+		if (is_error_page(page)) {
-+			srcu_read_unlock(&kvm->srcu, idx);
-+			rc = -EIO;
-+			goto unpin;
++	if (pt_entry_isvalid(*entry)) {
++		/* Either we are invalidating, replacing or no-op */
++		if (gaddr != 0) {
++			if ((*entry & ZPCI_PTE_ADDR_MASK) == gaddr) {
++				/* Duplicate */
++				kvm_release_pfn_dirty(*entry >> PAGE_SHIFT);
++			} else {
++				/* Replace */
++				pfn = (*entry >> PAGE_SHIFT);
++				invalidate_pt_entry(entry);
++				set_pt_pfaa(entry, gaddr);
++				validate_pt_entry(entry);
++				kvm_release_pfn_dirty(pfn);
++				rc = 1;
++			}
++		} else {
++			/* Invalidate */
++			pfn = (*entry >> PAGE_SHIFT);
++			invalidate_pt_entry(entry);
++			kvm_release_pfn_dirty(pfn);
++			rc = 1;
 +		}
-+		iaddr = page_to_virt(page) + (gpa & ~PAGE_MASK);
-+		ioat->head[i] = (unsigned long *)iaddr;
-+		gpa += PAGE_SIZE;
++	} else if (gaddr != 0) {
++		/* New Entry */
++		set_pt_pfaa(entry, gaddr);
++		validate_pt_entry(entry);
 +	}
-+	srcu_read_unlock(&kvm->srcu, idx);
 +
-+	ioat->seg = kcalloc(ZPCI_TABLE_ENTRIES_PAGES, sizeof(unsigned long *),
-+			    GFP_KERNEL);
-+	if (!ioat->seg)
-+		goto unpin;
-+	ioat->pt = kcalloc(ZPCI_TABLE_ENTRIES, sizeof(unsigned long **),
-+			   GFP_KERNEL);
-+	if (!ioat->pt)
-+		goto free_seg;
-+
-+	mutex_unlock(&ioat->ioat_lock);
-+	return 0;
-+
-+free_seg:
-+	kfree(ioat->seg);
-+	rc = -ENOMEM;
-+unpin:
-+	for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
-+		kvm_release_pfn_dirty((u64)ioat->head[i] >> PAGE_SHIFT);
-+		ioat->head[i] = 0;
-+	}
-+	mutex_unlock(&ioat->ioat_lock);
 +	return rc;
 +}
-+EXPORT_SYMBOL_GPL(kvm_s390_pci_ioat_enable);
 +
-+static void free_pt_entry(struct kvm_zdev_ioat *ioat, int st, int pt)
++static unsigned long *dma_walk_guest_cpu_trans(struct kvm_vcpu *vcpu,
++					       struct kvm_zdev_ioat *ioat,
++					       dma_addr_t dma_addr)
 +{
-+	if (!ioat->pt[st][pt])
-+		return;
-+
-+	kvm_release_pfn_dirty((u64)ioat->pt[st][pt]);
-+}
-+
-+static void free_seg_entry(struct kvm_zdev_ioat *ioat, int entry)
-+{
-+	int i, st, count = 0;
-+
-+	for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
-+		if (ioat->seg[entry + i]) {
-+			kvm_release_pfn_dirty((u64)ioat->seg[entry + i]);
-+			count++;
-+		}
-+	}
-+
-+	if (count == 0)
-+		return;
-+
-+	st = entry / ZPCI_TABLE_PAGES;
-+	for (i = 0; i < ZPCI_TABLE_ENTRIES; i++)
-+		free_pt_entry(ioat, st, i);
-+	kfree(ioat->pt[st]);
-+}
-+
-+int kvm_s390_pci_ioat_disable(struct zpci_dev *zdev)
-+{
-+	struct kvm_zdev_ioat *ioat;
++	unsigned long *rto, *sto, *pto;
++	unsigned int rtx, rts, sx, px, idx;
++	struct page *page;
++	gpa_t addr;
 +	int i;
 +
-+	if (!shadow_ioat_init)
-+		return -EINVAL;
-+
-+	ioat = &zdev->kzdev->ioat;
-+	mutex_lock(&ioat->ioat_lock);
-+	for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
-+		kvm_release_pfn_dirty((u64)ioat->head[i] >> PAGE_SHIFT);
-+		ioat->head[i] = 0;
++	/* Pin guest segment table if needed */
++	rtx = calc_rtx(dma_addr);
++	rto = ioat->head[(rtx / ZPCI_TABLE_ENTRIES_PER_PAGE)];
++	rts = rtx * ZPCI_TABLE_PAGES;
++	if (!ioat->seg[rts]) {
++		if (!reg_entry_isvalid(rto[rtx % ZPCI_TABLE_ENTRIES_PER_PAGE]))
++			return NULL;
++		sto = get_rt_sto(rto[rtx % ZPCI_TABLE_ENTRIES_PER_PAGE]);
++		addr = ((u64)sto & ZPCI_RTE_ADDR_MASK);
++		idx = srcu_read_lock(&vcpu->kvm->srcu);
++		for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
++			page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
++			if (is_error_page(page)) {
++				srcu_read_unlock(&vcpu->kvm->srcu, idx);
++				return NULL;
++			}
++			ioat->seg[rts + i] = page_to_virt(page) +
++					     (addr & ~PAGE_MASK);
++			addr += PAGE_SIZE;
++		}
++		srcu_read_unlock(&vcpu->kvm->srcu, idx);
 +	}
 +
-+	for (i = 0; i < ZPCI_TABLE_ENTRIES_PAGES; i += ZPCI_TABLE_PAGES)
-+		free_seg_entry(ioat, i);
++	/* Allocate pin pointers for another segment table if needed */
++	if (!ioat->pt[rtx]) {
++		ioat->pt[rtx] = kcalloc(ZPCI_TABLE_ENTRIES,
++					(sizeof(unsigned long *)), GFP_KERNEL);
++		if (!ioat->pt[rtx])
++			return NULL;
++	}
++	/* Pin guest page table if needed */
++	sx = calc_sx(dma_addr);
++	sto = ioat->seg[(rts + (sx / ZPCI_TABLE_ENTRIES_PER_PAGE))];
++	if (!ioat->pt[rtx][sx]) {
++		if (!reg_entry_isvalid(sto[sx % ZPCI_TABLE_ENTRIES_PER_PAGE]))
++			return NULL;
++		pto = get_st_pto(sto[sx % ZPCI_TABLE_ENTRIES_PER_PAGE]);
++		if (!pto)
++			return NULL;
++		addr = ((u64)pto & ZPCI_STE_ADDR_MASK);
++		idx = srcu_read_lock(&vcpu->kvm->srcu);
++		page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
++		srcu_read_unlock(&vcpu->kvm->srcu, idx);
++		if (is_error_page(page))
++			return NULL;
++		ioat->pt[rtx][sx] = page_to_virt(page) + (addr & ~PAGE_MASK);
++	}
++	pto = ioat->pt[rtx][sx];
 +
-+	kfree(ioat->seg);
-+	kfree(ioat->pt);
-+	mutex_unlock(&ioat->ioat_lock);
-+
-+	return 0;
++	/* Return guest PTE */
++	px = calc_px(dma_addr);
++	return &pto[px];
 +}
-+EXPORT_SYMBOL_GPL(kvm_s390_pci_ioat_disable);
 +
-+u8 kvm_s390_pci_get_dtsm(struct zpci_dev *zdev)
++
++static int dma_table_shadow(struct kvm_vcpu *vcpu, struct zpci_dev *zdev,
++			    dma_addr_t dma_addr, size_t size)
 +{
-+	return (zdev->dtsm & KVM_S390_PCI_DTSM_MASK);
++	unsigned int nr_pages = PAGE_ALIGN(size) >> PAGE_SHIFT;
++	struct kvm_zdev *kzdev = zdev->kzdev;
++	unsigned long *entry, *gentry;
++	int i, rc = 0, rc2;
++
++	if (!nr_pages || !kzdev)
++		return -EINVAL;
++
++	mutex_lock(&kzdev->ioat.ioat_lock);
++	if (!zdev->dma_table || !kzdev->ioat.head[0]) {
++		rc = -EINVAL;
++		goto out_unlock;
++	}
++
++	for (i = 0; i < nr_pages; i++) {
++		gentry = dma_walk_guest_cpu_trans(vcpu, &kzdev->ioat, dma_addr);
++		if (!gentry)
++			continue;
++		entry = dma_walk_cpu_trans(zdev->dma_table, dma_addr);
++
++		if (!entry) {
++			rc = -ENOMEM;
++			goto out_unlock;
++		}
++
++		rc2 = dma_shadow_cpu_trans(vcpu, entry, gentry);
++		if (rc2 < 0) {
++			rc = -EIO;
++			goto out_unlock;
++		}
++		dma_addr += PAGE_SIZE;
++		rc += rc2;
++	}
++
++out_unlock:
++	mutex_unlock(&kzdev->ioat.ioat_lock);
++	return rc;
 +}
-+EXPORT_SYMBOL_GPL(kvm_s390_pci_get_dtsm);
 +
- int kvm_s390_pci_interp_probe(struct zpci_dev *zdev)
++int kvm_s390_pci_refresh_trans(struct kvm_vcpu *vcpu, unsigned long req,
++			       unsigned long start, unsigned long size,
++			       u8 *status)
++{
++	struct zpci_dev *zdev;
++	u32 fh = req >> 32;
++	int rc;
++
++	/* Make sure this is a valid device associated with this guest */
++	zdev = get_zdev_by_fh(fh);
++	if (!zdev || !zdev->kzdev || zdev->kzdev->kvm != vcpu->kvm) {
++		*status = 0;
++		return -EINVAL;
++	}
++
++	/* Only proceed if the device is using the assist */
++	if (zdev->kzdev->ioat.head[0] == 0)
++		return -EOPNOTSUPP;
++
++	rc = dma_table_shadow(vcpu, zdev, start, size);
++	if (rc < 0) {
++		/*
++		 * If errors encountered during shadow operations, we must
++		 * fabricate status to present to the guest
++		 */
++		*status = KVM_S390_RPCIT_INS_RES;
++	} else if (rc > 0) {
++		/* Host RPCIT must be issued */
++		rc = zpci_refresh_trans((u64) zdev->fh << 32, start, size,
++					status);
++	}
++	zdev->kzdev->rpcit_count++;
++
++	return rc;
++}
++
+ /* Modify PCI: Register floating adapter interruption forwarding */
+ static int kvm_zpci_set_airq(struct zpci_dev *zdev)
  {
- 	/* Must have appropriate hardware facilities */
-@@ -449,6 +584,10 @@ int kvm_s390_pci_interp_disable(struct zpci_dev *zdev, bool force)
- 	if (zdev->kzdev->fib.fmt0.aibv != 0)
- 		kvm_s390_pci_aif_disable(zdev, force);
+@@ -640,6 +835,8 @@ EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_release);
  
-+	/* If we are using the IOAT assist, disable it now */
-+	if (zdev->kzdev->ioat.head[0])
-+		kvm_s390_pci_ioat_disable(zdev);
+ int kvm_s390_pci_init(void)
+ {
++	int rc;
 +
- 	/* Remove the host CLP guest designation */
- 	zdev->gisa = 0;
- 
-@@ -478,6 +617,8 @@ int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
- 	if (!kzdev)
+ 	aift = kzalloc(sizeof(struct zpci_aift), GFP_KERNEL);
+ 	if (!aift)
  		return -ENOMEM;
+@@ -647,5 +844,7 @@ int kvm_s390_pci_init(void)
+ 	spin_lock_init(&aift->gait_lock);
+ 	mutex_init(&aift->aift_lock);
  
-+	mutex_init(&kzdev->ioat.ioat_lock);
+-	return 0;
++	rc = zpci_get_mdd(&aift->mdd);
 +
- 	kzdev->zdev = zdev;
- 	zdev->kzdev = kzdev;
- 
-@@ -492,6 +633,7 @@ void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
- 	kzdev = zdev->kzdev;
- 	WARN_ON(kzdev->zdev != zdev);
- 	zdev->kzdev = 0;
-+	mutex_destroy(&kzdev->ioat.ioat_lock);
- 	kfree(kzdev);
++	return rc;
  }
- EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_release);
 diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
-index 4d3db58beb74..0fa0e3d61aaa 100644
+index 0fa0e3d61aaa..a409680a1dc2 100644
 --- a/arch/s390/kvm/pci.h
 +++ b/arch/s390/kvm/pci.h
-@@ -16,6 +16,8 @@
- #include <asm/airq.h>
- #include <asm/kvm_pci.h>
+@@ -18,6 +18,9 @@
  
-+#define KVM_S390_PCI_DTSM_MASK 0x40
+ #define KVM_S390_PCI_DTSM_MASK 0x40
+ 
++#define KVM_S390_RPCIT_INS_RES 0x10
++#define KVM_S390_RPCIT_ERR 0x28
 +
  struct zpci_gaite {
  	u32 gisa;
  	u8 gisc;
+@@ -33,6 +36,7 @@ struct zpci_aift {
+ 	struct kvm_zdev **kzdev;
+ 	spinlock_t gait_lock; /* Protects the gait, used during AEN forward */
+ 	struct mutex aift_lock; /* Protects the other structures in aift */
++	u32 mdd;
+ };
+ 
+ extern struct zpci_aift *aift;
+@@ -48,7 +52,9 @@ static inline struct kvm *kvm_s390_pci_si_to_kvm(struct zpci_aift *aift,
+ 
+ int kvm_s390_pci_aen_init(u8 nisc);
+ void kvm_s390_pci_aen_exit(void);
+-
++int kvm_s390_pci_refresh_trans(struct kvm_vcpu *vcpu, unsigned long req,
++			       unsigned long start, unsigned long end,
++			       u8 *status);
+ int kvm_s390_pci_init(void);
+ 
+ #endif /* __KVM_S390_PCI_H */
 -- 
 2.27.0
 
