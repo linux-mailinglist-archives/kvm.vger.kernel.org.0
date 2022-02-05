@@ -2,64 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EBA94AAABE
-	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 18:59:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DB7F4AAC52
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 20:41:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380827AbiBER7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Feb 2022 12:59:31 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:46950 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380816AbiBER7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Feb 2022 12:59:30 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EFA95B80CAC;
-        Sat,  5 Feb 2022 17:59:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A23F6C340E8;
-        Sat,  5 Feb 2022 17:59:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644083967;
-        bh=CGAwSsF+d1JCAM602DJ7DXSX3ofHbKXlLW2z0yqc8lU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=imWIbYZpoxZGebqXERyQIP95n5Y0OaICv5zXt3tLnkCyAeLwkSZmfwqnRyvUW1tpA
-         AcmmjvhL954zNbbZN80PKRi1RV3AMVSajTERSiWEmw8pFPByVMCHivHR86fAOJw9AX
-         v/8FTp+dxEZ7C3ab3pT8DN737ZUi0RGGllxd/oTP4S0W0dw+5Ro4rfLPgqmFHb0gEq
-         aNgXqIaLpSWf34OVie0Lnh0dTFfSxtG4lLPJ5ZyMTEo2lkGPVJFGfwfN6bCR2HuMpH
-         2Dh46CrphMM/Ln3wcY2FBSBPBs1A/ixfe2i+/ugbK4pykc7v47xS6zrNGpDo+aalEU
-         VcTAMP02hW0MQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90664E5869F;
-        Sat,  5 Feb 2022 17:59:27 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM fixes for Linux 5.17-rc3
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20220205060919.88656-1-pbonzini@redhat.com>
-References: <20220205060919.88656-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20220205060919.88656-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 7e6a6b400db8048bd1c06e497e338388413cf5bc
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 5fdb26213fcb912955e0c9eacbe2b8961628682f
-Message-Id: <164408396758.20735.17451039880823459064.pr-tracker-bot@kernel.org>
-Date:   Sat, 05 Feb 2022 17:59:27 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S1354918AbiBETlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Feb 2022 14:41:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59074 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233594AbiBETlw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Feb 2022 14:41:52 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64BC5C061348
+        for <kvm@vger.kernel.org>; Sat,  5 Feb 2022 11:41:51 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id t14so13624395ljh.8
+        for <kvm@vger.kernel.org>; Sat, 05 Feb 2022 11:41:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E3owvFE1hG/67lI61bEflxHtvlzjGnvYg4R3h1wAR3A=;
+        b=Q1V9Wx++abgaeTU6VkacuYFf5uOm7okgmKEb9B+/g4lxPn8Jjc6l5vP3c6kMVqCA6e
+         hr5FsoZVcKbwSVS9wiA8UTU6Qw7ZttD6drqjyB9bW8LR5H8HbojgspTyx9GpAZYVd9Mm
+         e/xyhA+s9YSFVhhUjAF9LBKB4Wow3n/62iY4DntAVBtZvdU7e+D1rjF+C/Tdu6yNTmpi
+         b44ymYzCmcpcFH5yKmwbNakHwi0xwE+xvZWwPzVO2FaI4SJCHs7jhtRpFGB0GbBwQFvs
+         mmvIRBXzP425Ur+37WgBmIQuPKwOIocZ4BIFp7RlTwyJ7mS//TiENPzWoKeW4QHn/B/e
+         PYHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E3owvFE1hG/67lI61bEflxHtvlzjGnvYg4R3h1wAR3A=;
+        b=7DeSbt4vA+ZayfzUdXc5+6qgtBhcdpKcLM1PWDcaHnTAypZOearnYdVirMKLkyFDKu
+         WFI+VLP53AV5uPXMHM+xsjxMCbgiUqZ764mjE+cNvIdGPFsVbVZt/zazEZwLaXB+Qg5Y
+         Am2hWJ+eVtXhxtM2H7o1xAHuYfRvKKw4hHhQ3NzT9nWLRb30CIII7kCEDBnDvnournKY
+         zS1+6Gou+Wh4qrRakpiaxuiHJfNJiAvZ6JSJL1Nl1Q2NW+UvRwHSvq43Qa5Py28/n12E
+         PsGb2faKX488Y7WCKeA/2MBX9o5JC3gdWz/KMeSxagaoqaiFkdR8FKUCwTG8LVUABzZZ
+         Oa0g==
+X-Gm-Message-State: AOAM531zfoLzSFar145tabc/B+xAHfJXDdIpzib+Mf0Y2g4g+woAEbwN
+        FHHAfUaVR3rU5eMGtgHEj6Ud/Saxu8T66T+7rsnLRA==
+X-Google-Smtp-Source: ABdhPJyxRLxYVUUr6SNSAXldSTtHVRrm3+rgnc4HnVWUxnFROxzjgr7u+4TE/1W62AkV64vUDaRTRbQ3wfWR+dGi98w=
+X-Received: by 2002:a05:651c:108:: with SMTP id a8mr3727711ljb.479.1644090109217;
+ Sat, 05 Feb 2022 11:41:49 -0800 (PST)
+MIME-Version: 1.0
+References: <20220204204705.3538240-4-oupton@google.com> <202202051529.y26BVBiF-lkp@intel.com>
+In-Reply-To: <202202051529.y26BVBiF-lkp@intel.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Sat, 5 Feb 2022 11:41:37 -0800
+Message-ID: <CAOQ_QsgWzfe-2-d709NFycJ_CpeBGR3Up4f9ORFseUCWMB=_UQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] KVM: nVMX: Roll all entry/exit ctl updates into a
+ single helper
+To:     kernel test robot <lkp@intel.com>
+Cc:     kvm@vger.kernel.org, kbuild-all@lists.01.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Sat,  5 Feb 2022 01:09:19 -0500:
+On Fri, Feb 4, 2022 at 11:44 PM kernel test robot <lkp@intel.com> wrote:
+> >> ERROR: modpost: "kvm_pmu_is_valid_msr" [arch/x86/kvm/kvm-intel.ko] undefined!
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Argh... Local tooling defaults to building KVM nonmodular so I missed this.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/5fdb26213fcb912955e0c9eacbe2b8961628682f
+Squashing the following in fixes the issue.
 
-Thank you!
+--
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index f614f95acc6b..18430547357d 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -396,6 +396,7 @@ bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+        return kvm_x86_ops.pmu_ops->msr_idx_to_pmc(vcpu, msr) ||
+                kvm_x86_ops.pmu_ops->is_valid_msr(vcpu, msr);
+ }
++EXPORT_SYMBOL_GPL(kvm_pmu_is_valid_msr);
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+ static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
+ {
