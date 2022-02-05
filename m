@@ -2,99 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A70C54AA984
-	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 15:50:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49E554AA986
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 15:52:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380195AbiBEOuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Feb 2022 09:50:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50811 "EHLO
+        id S1380231AbiBEOw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Feb 2022 09:52:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42495 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1380188AbiBEOux (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 5 Feb 2022 09:50:53 -0500
+        by vger.kernel.org with ESMTP id S1380221AbiBEOwU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 5 Feb 2022 09:52:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644072653;
+        s=mimecast20190719; t=1644072740;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5Rc8ijCVExWwCJv+VMGAynjPNWd83v7JPEXJNV8RCeA=;
-        b=FNQj24v9K5HEZPhag6iDP0eNrAIXLaRunFA/VNexWvZNrTD6KW/xwR4abCzfk3R0x2TGD1
-        PVKU9asiqEtcvAxLIYX3zvT2Wcp4gO+6Gz7haOvKncfyBZ2wbYboGXVBTWRXSpi28yO1jY
-        JuxMuutAXjOlqdDDGxNTy5YgNEQ5gNs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=3lARlYWJDeletNZJMM+ZTQxspiOumhW2kAAZSQM40XY=;
+        b=bKCjGGPvC9RACK3r2FSR34qkAZrC3AFIz4F8nycQzSaCC3Gm2OiEsTxJUWx3WphbVDoz41
+        RMSD5VJ8eMSxAr70CZMk0DvXFINgeasKkRr/6i/Mh7AHG5nOKNS4/cVCWYrqMzcOj7KQqe
+        7zcjkTKQQh5uhcd9K/BLR/Ufpp8DGDY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-440-RNRQSE4DMSia3FXRzSvIGg-1; Sat, 05 Feb 2022 09:50:51 -0500
-X-MC-Unique: RNRQSE4DMSia3FXRzSvIGg-1
-Received: by mail-ed1-f69.google.com with SMTP id k12-20020a50c8cc000000b0040f28426e5aso1128757edh.17
-        for <kvm@vger.kernel.org>; Sat, 05 Feb 2022 06:50:51 -0800 (PST)
+ us-mta-86-XecHyi6TM7O1ibckODcFwA-1; Sat, 05 Feb 2022 09:52:18 -0500
+X-MC-Unique: XecHyi6TM7O1ibckODcFwA-1
+Received: by mail-ed1-f71.google.com with SMTP id f21-20020a50d555000000b00407a8d03b5fso4731405edj.9
+        for <kvm@vger.kernel.org>; Sat, 05 Feb 2022 06:52:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=5Rc8ijCVExWwCJv+VMGAynjPNWd83v7JPEXJNV8RCeA=;
-        b=bvmAm91bdBrtfXZnQ1xgOeVjl29kOgUeZi+U1gJZF+ge7h2eSKP8ZHsORXS35bshqQ
-         lMxb1AZ+1zcFee8+E2Jd5AF1+93DgsTBaMCT9Lw1sLa9NpQqJXlvACELZ53i1dZQjPA0
-         l/kQ4eXfCG04iIk1g3feMVoWwbmZaF8pMUyI516RZi10UI5t9oFimfpn/5h7dS1KS1t8
-         bwFBRZrS9FWFzVzLwMpuPO9IvXZp2OKnGSppJvreSqZQW9It8qYJrHcnhV6Gsfce0f3U
-         TPKlYlvyivSuyUCpJjQNjUaj+8I/unfmSnO+RfXwsctdhDiAIQHTdTdMlJUU5MUvdiwj
-         u/nQ==
-X-Gm-Message-State: AOAM530TKMtLdjP2sC9CwurW+I7Oz6h4HP898H3BH1bVxDY2zpnnhbwR
-        OwB3xZWAbfGrxqlIe9EyhvFKBrvvCUs9fWuqyxNiPYQe7Ju5bgr7xGhc41aP5yYMN03a+DfLpFm
-        uYeaCug30rtjy
-X-Received: by 2002:a05:6402:2683:: with SMTP id w3mr4776347edd.405.1644072650703;
-        Sat, 05 Feb 2022 06:50:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzauDtqAvaJ/GElUfrMmdQtavm9QTuQ0dPoLeNID8Ql3GDWEKtV4Y/TrUFnpLdaxfgqo9WIPQ==
-X-Received: by 2002:a05:6402:2683:: with SMTP id w3mr4776326edd.405.1644072650511;
-        Sat, 05 Feb 2022 06:50:50 -0800 (PST)
+        bh=3lARlYWJDeletNZJMM+ZTQxspiOumhW2kAAZSQM40XY=;
+        b=SEUSfxMZxlwyZ39MiT8vVSPmnHX8puPaEATHWhDQTWzyvlT4wQAtCYL/izr4js6b/v
+         04e3w4NlxvhOa+O4MM4buZTcTuaCyJ41dB8eWF//SGtInoQSyM3unOzg5BMKsBDm3ncR
+         ThqZlO9ncqtL9x0aAkVv74izZ/B+QMi+ruF68hHb9MtP3sdMHB/+Vt7dYh8l21gQ2AdY
+         n1Uc0u0Z8ahRo8xLIXNHMxM2/34ClaFaUmlRZxuCDjfOJLvZn/X93U1ESWa9OR0DD0gG
+         r08TX2KIFHdIcQOFLqwPKaHGtTdz5zpKN7C4v9pKCzhqmcBUTydIe+EEfF1QZUrC3rEu
+         8Nfg==
+X-Gm-Message-State: AOAM532sxGlaDcIYusnSb110UYS2Z4V+LI1KJvagB4MR7i4r3D+cz0GD
+        vOUuOD4smD5wxKIn1jZCMaMiJpfnmcJ5OP67wE8+moPGIGkyPxS5ibZ/AFFKDjmQmcwGM8hhZqW
+        1cQ3FkG2ZsY8m
+X-Received: by 2002:a17:907:6088:: with SMTP id ht8mr3163515ejc.619.1644072737064;
+        Sat, 05 Feb 2022 06:52:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJypH0ci7mM7ixEHIqO1itdfG77maLYLOSfg5GdsnSqPQKtcDVLVYZQsVowBClda+vHT14MrPg==
+X-Received: by 2002:a17:907:6088:: with SMTP id ht8mr3163504ejc.619.1644072736880;
+        Sat, 05 Feb 2022 06:52:16 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id t8sm1673362ejx.217.2022.02.05.06.50.49
+        by smtp.googlemail.com with ESMTPSA id oz18sm1682235ejb.106.2022.02.05.06.52.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Feb 2022 06:50:49 -0800 (PST)
-Message-ID: <a7cc6ead-c30b-4d21-c92c-faf37d9023b7@redhat.com>
-Date:   Sat, 5 Feb 2022 15:50:49 +0100
+        Sat, 05 Feb 2022 06:52:16 -0800 (PST)
+Message-ID: <8081cbe5-6d12-9f99-9f0f-13c1d7617647@redhat.com>
+Date:   Sat, 5 Feb 2022 15:52:15 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH 03/23] KVM: MMU: remove valid from extended role
+Subject: Re: [PATCH 01/23] KVM: MMU: pass uses_nx directly to
+ reset_shadow_zero_bits_mask
 Content-Language: en-US
 To:     David Matlack <dmatlack@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         seanjc@google.com, vkuznets@redhat.com
 References: <20220204115718.14934-1-pbonzini@redhat.com>
- <20220204115718.14934-4-pbonzini@redhat.com> <Yf1xU+EVukcX4Exb@google.com>
+ <20220204115718.14934-2-pbonzini@redhat.com> <Yf1pk1EEBXj0O0/p@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yf1xU+EVukcX4Exb@google.com>
+In-Reply-To: <Yf1pk1EEBXj0O0/p@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/4/22 19:32, David Matlack wrote:
->> -	vcpu->arch.root_mmu.mmu_role.ext.valid = 0;
->> -	vcpu->arch.guest_mmu.mmu_role.ext.valid = 0;
->> -	vcpu->arch.nested_mmu.mmu_role.ext.valid = 0;
->> +	vcpu->arch.root_mmu.mmu_role.base.level = 0;
->> +	vcpu->arch.guest_mmu.mmu_role.base.level = 0;
->> +	vcpu->arch.nested_mmu.mmu_role.base.level = 0;
-> I agree this will work but I think it makes the code more difficult to
-> follow (and I start worrying that some code that relies on level being
-> accurate will creep in in the future). At minimum we should extend the
-> comment here to describe why level is being changed.
+On 2/4/22 18:59, David Matlack wrote:
+>> +	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
 > 
-> I did a half-assed attempt to pass something like "bool force_role_reset"
-> down to the MMU initialization functions as an alternative but it very
-> quickly got out of hand.
-> 
-> What about just changing `valid` to `cpuid_stale` and flip the meaning?
-> kvm_mmu_after_set_cpuid() would set the cpuid_stale bit and then reset
-> the MMUs.
-> 
+> Out of curiousity, how does KVM mitigate iTLB multi-hit when shadowing
+> NPT and the guest has not enabled EFER.NX?
 
-For now I'll swap this patch with one that clears the whole word, but 
-keep the ext bit as described in my other reply.
+You got me worried for a second but iTLB multihit is Intel-only, isn't it?
 
 Paolo
 
