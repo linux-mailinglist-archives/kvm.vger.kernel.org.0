@@ -2,112 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BAE34AA906
-	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 14:07:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37C8D4AA968
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 15:29:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379937AbiBENHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Feb 2022 08:07:53 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:41948 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233802AbiBENHv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Feb 2022 08:07:51 -0500
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D113E1EC051E;
-        Sat,  5 Feb 2022 14:07:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1644066466;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0xuIpKje8zkOvUagGUNB86BnlJAw32mk/ZqXAf5Gr+4=;
-        b=IUy7dO+ddvE4dWRGM+hDG+rqKvIhsL8kvqBT5KM38cC4/cUWC6MfOWm65C16n50FTJPZDH
-        7/FulyBflZG+slZjlrj38QcIZqR67m9NUmcpP/4ywOtL6eod7Aihc4aY/wde7Da11/E3C1
-        B4WI1FS0d1xiONTe0XeAJWVQ5fF0CUM=
-Date:   Sat, 5 Feb 2022 14:07:45 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 32/43] x86/boot: Add a pointer to Confidential
- Computing blob in bootparams
-Message-ID: <Yf52oebXr+fKioTJ@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-33-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220128171804.569796-33-brijesh.singh@amd.com>
+        id S1380125AbiBEO2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Feb 2022 09:28:55 -0500
+Received: from [106.75.232.68] ([106.75.232.68]:64448 "EHLO mail.uccard.co.jp"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1380122AbiBEO2y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Feb 2022 09:28:54 -0500
+Date:   Sat, 5 Feb 2022 22:28:40 +0800
+From:   =?utf-8?B?44Ki44OD44OI44Om44O844ON44OD44OI?= 
+        <atu@mail.uccard.co.jp>
+To:     <kvm@vger.kernel.org>
+Subject: =?utf-8?B?44CQ44Om44O844K344O844Kr44O844OJ44CR44GU5pys5Lq65qeY56K66KqN5a6M5LqG44Gu44GU6YCj?=
+        =?utf-8?B?57Wh?=
+Message-ID: <20220205222854028265@mail.uccard.co.jp>
+X-mailer: Foxmail 6, 13, 102, 15 [en]
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 11:17:53AM -0600, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
-> 
-> The previously defined Confidential Computing blob is provided to the
-> kernel via a setup_data structure or EFI config table entry. Currently
-> these are both checked for by boot/compressed kernel to access the
-> CPUID table address within it for use with SEV-SNP CPUID enforcement.
-> 
-> To also enable SEV-SNP CPUID enforcement for the run-time kernel,
-> similar early access to the CPUID table is needed early on while it's
-> still using the identity-mapped page table set up by boot/compressed,
-> where global pointers need to be accessed via fixup_pointer().
-> 
-> This isn't much of an issue for accessing setup_data, and the EFI
-> config table helper code currently used in boot/compressed *could* be
-> used in this case as well since they both rely on identity-mapping.
-> However, it has some reliance on EFI helpers/string constants that
-> would need to be accessed via fixup_pointer(), and fixing it up while
-> making it shareable between boot/compressed and run-time kernel is
-> fragile and introduces a good bit of uglyness.
-> 
-> Instead, add a boot_params->cc_blob_address pointer that the
-> boot/compressed kernel can initialize so that the run-time kernel can
-> access the CC blob from there instead of re-scanning the EFI config
-> table.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/bootparam_utils.h | 1 +
->  arch/x86/include/uapi/asm/bootparam.h  | 3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+44GT44Gu44Gf44G044Gv44CBVUPjgqvjg7zjg4njgpLjgZTliKnnlKjjgYTjgZ/jgaDjgY3jgYLj
+gorjgYzjgajjgYbjgZTjgZbjgYTjgb7jgZnjgIINCg0K44GU5pys5Lq65qeY56K66KqN44Gu44Gf
+44KB44Gu6KqN6Ki844GM6KGM44KP44KM44G+44GX44Gf44Gu44Gn44CB44GK55+l44KJ44Gb44GE
+44Gf44GX44G+44GZ44CCDQoNCuacrOOCteODvOODk+OCueOBr+OAgeS4h+OBjOS4gOOAgeOBlOac
+rOS6uuanmOS7peWkluOBq+OCiOOCi+S4jeato+ODreOCsOOCpOODs8K35pON5L2c562J44GM44GC
+44Gj44Gf5aC05ZCI44Gr44CB44GK5a6i5qeY44GM6YCf44KE44GLDQrjgavnorroqo3jgafjgY3j
+govjgojjgYbjgIHov73liqDoqo3oqLzjga7pg73luqbjgIHjg6Hjg7zjg6vjgpLpgIHkv6HjgZnj
+govjgrXjg7zjg5PjgrnjgafjgZnjgIINCg0K44GK5b+D5b2T44KK44Gu44Gq44GE5aC05ZCI44KE
+5LiN5a+p44Gq54K5562J44GU44GW44GE44G+44GX44Gf44KJ44CB5b6h5pep44KB44Gr56K66KqN
+44GX44Gm44GP44Gg44GV44GE44CCDQrjgIrmnKzkurrnorroqo3jga7mlrnms5XjgIsNCg0K4pa8
+44Oe44Kk44Oa44O844K444KI44KK5pys5Lq656K66KqN44KS5a6f5pa944GZ44KLDQogaHR0cHM6
+Ly9hcGktc2Fpc29uY2FyZC1jby1qcC51Y2NhcmQzLnh5eg0KDQoNCg0K77yc44GK5ZWP5ZCI44Gb
+5YWI77yeDQrjgJDmoKrlvI/kvJrnpL7jgq/jg6zjg4fjgqPjgrvjgr7jg7PnmbrooYzjga5VQ+OC
+q+ODvOODieOCkuOBiuaMgeOBoeOBruaWueOAkQ0K44CA44CA5p2x5Lqs44CA44CAMDMtNjg5My04
+MjAwDQrjgIDjgIDlpKfpmKrjgIDjgIAwNi03NzA5LTg1NTUNCuOAgOWWtualreaZgumWk+OAgDk6
+MDDvvZ4xNzowMOOAgDEvMeS8keOBvw0KDQrjgJDmoKrlvI/kvJrnpL7jgq/jg6zjg4fjgqPjgrvj
+gr7jg7PnmbrooYzku6XlpJbjga5VQ+OCq+ODvOODieOCkuOBiuaMgeOBoeOBruaWueOAkQ0K44CA
+44CA5p2x5Lqs44CA44CAMDMtNjg5My00MjcwDQrjgIDjgIDlpKfpmKrjgIDjgIAwNi03NzA5LTgy
+MjMNCuOAgOWWtualreaZgumWk+OAgDk6MDDvvZ4xNzowMOOAgDEvMeS8keOBvw0KDQrjg7vjg7vj
+g7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vj
+g7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vj
+g7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vj
+g7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7vjg7sNCuKAu+OBk+OB
+ruODoeODvOODq+OBr+OAjOOCouODg+ODiOODpuODvOODjeODg+ODiO+8geOAjeOBi+OCieiHquWL
+lemFjeS/oeOBl+OBpuOBiuOCiuOBvuOBmeOAgg0K4oC75pys44Oh44O844Or44Gr44GU6L+U5L+h
+44GE44Gf44Gg44GN44G+44GX44Gm44KC44CB44GU6LOq5ZWP44O744GU5L6d6aC844Gq44Gp44Gr
+DQrjgIDjgYrnrZTjgYjjgafjgY3jgb7jgZvjgpPjga7jgafjgIHjgYLjgonjgYvjgZjjgoHjgZTk
+uobmib/jgY/jgaDjgZXjgYTjgIINCuODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+OD
+u+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+OD
+u+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+OD
+u+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+ODu+OD
+u+ODu+ODu+ODu+ODu+ODu+ODuw0K44Ki44OD44OI44Om44O844ON44OD44OIDQoNCjIwMjIvMi81
+MjI6Mjg6NTQNCg==
 
-Another review comment ignored:
 
-https://lore.kernel.org/r/YeWyCtr11rL7dxpT@zn.tnic
-
-/me ignores this patch too.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
