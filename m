@@ -2,119 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E640F4AA795
-	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 09:17:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E6B04AA837
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 11:54:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243297AbiBEIRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Feb 2022 03:17:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20118 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243136AbiBEIRl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 5 Feb 2022 03:17:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644049061;
+        id S238327AbiBEKyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Feb 2022 05:54:14 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:53540 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230020AbiBEKyL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Feb 2022 05:54:11 -0500
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E27091EC02DD;
+        Sat,  5 Feb 2022 11:54:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1644058446;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2+z3ZjKtRxG6T6Z5VKFKBhdA6gfV81DVizdvw4/6PUk=;
-        b=PTI5329XRIFYkLV1CGeECdlRdpEsiECsN+SICqAWM40DZIJI300dTRsTnFExxmDLEBBR8X
-        wracAvVSISuVQ6bWtP4IkxCHd0TMYBANyfXamnFwa2u2cYI4go6eYYGx6570XT8AuC+duT
-        e3ABaulwnIiGn0rZH5I42N2skUtlJSs=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-314-9etv8YEnMA6vlhloORZlsg-1; Sat, 05 Feb 2022 03:17:38 -0500
-X-MC-Unique: 9etv8YEnMA6vlhloORZlsg-1
-Received: by mail-oo1-f69.google.com with SMTP id bb33-20020a056820162100b0031619149c44so4741948oob.5
-        for <kvm@vger.kernel.org>; Sat, 05 Feb 2022 00:17:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2+z3ZjKtRxG6T6Z5VKFKBhdA6gfV81DVizdvw4/6PUk=;
-        b=nS7jRNwMFTu9eMVRZZPtjQD6gl9Xe/PbGPZEwXqKWIJgOAmjWyeNyUT+AuKIho7eQu
-         ZvQaK2iD8gfXllQ0mQN9ASsf8qf9smd6RxaaLv99PkJ5RBSWtOZRp6Ynriaf/sAYCybm
-         ATqngq3ETelkLYmVMLvjW4dd5P0XdQ6CPekmEY81/5VyxDqfpwsOkqFtOoPlKhLMbpra
-         NuBNcnRr3c6Gsuf8QvMr+SKeBJfambOBYEvLaHZsNPhDAguYLnpioB1CfINeziJdczBB
-         6DEj8ER69XcWbpKnG3568bj2VX4Ct7psVnxFXaSybcpsXeMSNlAsSviYJbzCKLHd8Q8A
-         zN7A==
-X-Gm-Message-State: AOAM533XYeHsJPjfL7imnPQvKF5W0mfyzK/GpPyIhGjjaIn97SSEIfrc
-        HZF2Aj8z84pwoAC44sa8PDZT7snsQHBLQHekuUvi3vQZq9IPcSSKTB+kaeXZh7gyYVOHfv0w3rQ
-        lekTeVYb2uu+s
-X-Received: by 2002:a05:6808:17a9:: with SMTP id bg41mr1270102oib.41.1644049057517;
-        Sat, 05 Feb 2022 00:17:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz6PMVICTXXaDLc3Yid7XTSlSXktoo6ZqEOP3oQm+lihYzAmAhSDV2aZ6Tt5Yid/SGbl4RWdQ==
-X-Received: by 2002:a05:6808:17a9:: with SMTP id bg41mr1270088oib.41.1644049057343;
-        Sat, 05 Feb 2022 00:17:37 -0800 (PST)
-Received: from localhost.localdomain ([2804:431:c7f0:b1af:f10e:1643:81f3:16df])
-        by smtp.gmail.com with ESMTPSA id bg34sm1708795oob.14.2022.02.05.00.17.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Feb 2022 00:17:36 -0800 (PST)
-From:   Leonardo Bras <leobras@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=uZ7YbZrJGPMPUOZHBNRpUaCuf4fbjJb2e0v1A635574=;
+        b=Wi4j4RdBU/nduEspCZ+AEnQggLzEGh95jTHEMmr+DClFcPOZ5VKO1AVl1fq1d6uEZnyIR9
+        94WXRdpFGpUC7ZltmJ5nyNtLaG7ckLTwcARlP7XhLQJFPS3GpUVCjl56uVAd6DMN/r7f/0
+        HzQGDF4BaAeJsfhozkPmEQqp4+mkgvI=
+Date:   Sat, 5 Feb 2022 11:54:01 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Cc:     Leonardo Bras <leobras@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v1 2/2] x86/kvm/fpu: Limit setting guest fpu features based on guest_supported_xcr0
-Date:   Sat,  5 Feb 2022 05:16:59 -0300
-Message-Id: <20220205081658.562208-3-leobras@redhat.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220205081658.562208-1-leobras@redhat.com>
-References: <20220205081658.562208-1-leobras@redhat.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v9 31/43] x86/compressed/64: Add support for SEV-SNP
+ CPUID table in #VC handlers
+Message-ID: <Yf5XScto3mDXnl9u@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-32-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220128171804.569796-32-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As of today, if userspace tries to set guest's fpu features to any value
-(vcpu ioctl: KVM_SET_XSAVE), it is checked against the supported features
-of the host cpu, and the supported features of KVM.
+On Fri, Jan 28, 2022 at 11:17:52AM -0600, Brijesh Singh wrote:
+> +/*
+> + * Individual entries of the SEV-SNP CPUID table, as defined by the SEV-SNP
+> + * Firmware ABI, Revision 0.9, Section 7.1, Table 14.
+> + */
+> +struct snp_cpuid_fn {
+> +	u32 eax_in;
+> +	u32 ecx_in;
+> +	u64 xcr0_in;
+> +	u64 xss_in;
 
-This makes possible to set the guest fpstate with features that were not
-enabled during guest creation, but are available in the host cpu.
+So what's the end result here:
 
-This becomes an issue during guest migration, if the target host does not
-support the given feature:
-1 - Create guest vcpu without support to featureA, on a source host that
-    supports it,
-2 - Set featureA to guest vcpu, even if it does not support it.
-    It will run just fine, as the current host cpu supports featureA,
-3 - Migrate guest to another host, which does not support featureA,
-4 - After migration is completed, restoring guest fpustate to fpu regs will
-    cause a general-protection exception, and crash the guest.
+-+	u64 __unused;
+-+	u64 __unused2;
+++	u64 xcr0_in;
+++	u64 xss_in;
 
-A way to avoid the issue is by returning error if the user tries to set
-any feature not enabled during guest creation (guest_supported_xcr0).
+those are not unused fields anymore but xcr0 and xss input values?
 
-Signed-off-by: Leonardo Bras <leobras@redhat.com>
----
- arch/x86/kvm/x86.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Looking at the FW abi doc, they're only mentioned in "Table 14.
+CPUID_FUNCTION Structure" that they're XCR0 and XSS at the time of the
+CPUID execution.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 74b53a16f38a..f4e42de3560a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5010,7 +5010,8 @@ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
- 
- 	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu,
- 					      guest_xsave->region,
--					      supported_xcr0, &vcpu->arch.pkru);
-+					      vcpu->arch.guest_supported_xcr0,
-+					     &vcpu->arch.pkru);
- }
- 
- static void kvm_vcpu_ioctl_x86_get_xcrs(struct kvm_vcpu *vcpu,
+But those values are input values to what exactly, guest or firmware?
+
+There's a typo in the FW doc, btw:
+
+"The guest constructs an MSG_CPUID_REQ message as defined in Table 13.
+This message contains an array of CPUID function structures as defined
+in Table 13."
+
+That second "Table" is 14 not 13.
+
+So, if an array CPUID_FUNCTION[] is passed as part of an MSG_CPUID_REQ
+command, then, the two _IN variables contain what the guest received
+from the HV for XCR0 and XSS values. Which means, this is the guest
+asking the FW whether those values the HV gave the guest are kosher.
+
+Am I close?
+
+> +static const struct snp_cpuid_info *snp_cpuid_info_get_ptr(void)
+> +{
+> +	void *ptr;
+> +
+> +	asm ("lea cpuid_info_copy(%%rip), %0"
+> +	     : "=r" (ptr)
+
+Same question as the last time:
+
+Why not "=g" and let the compiler decide?
+
+> +	     : "p" (&cpuid_info_copy));
+> +
+> +	return ptr;
+> +}
+
+...
+
+> +static bool snp_cpuid_check_range(u32 func)
+> +{
+> +	if (func <= cpuid_std_range_max ||
+> +	    (func >= 0x40000000 && func <= cpuid_hyp_range_max) ||
+> +	    (func >= 0x80000000 && func <= cpuid_ext_range_max))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+> +static int snp_cpuid_postprocess(u32 func, u32 subfunc, u32 *eax, u32 *ebx,
+> +				 u32 *ecx, u32 *edx)
+
+And again, same question as the last time:
+
+I'm wondering if you could make everything a lot easier by doing
+
+static int snp_cpuid_postprocess(struct cpuid_leaf *leaf)
+
+and marshall around that struct cpuid_leaf which contains func, subfunc,
+e[abcd]x instead of dealing with 6 parameters.
+
+Callers of snp_cpuid() can simply allocate it on their stack and hand it
+in and it is all in sev-shared.c so nicely self-contained...
+
+Ok I'm ignoring this patch for now and I'll review it only after you've
+worked in all comments from the previous review.
+
 -- 
-2.35.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
