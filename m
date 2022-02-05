@@ -2,124 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02C574AA70C
-	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 07:09:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35CF54AA75E
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 08:44:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351184AbiBEGJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Feb 2022 01:09:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31589 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237797AbiBEGJq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 5 Feb 2022 01:09:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644041385;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9DjdP0NZq7FEwMEfMYlhPQOzj1IUaS2o/1SDmCK+oqQ=;
-        b=bCvhemCAnUBYBXUjSY4XrarFaxf+UtDM0NAJAqYazVmbot0HhetJnfUzJeATQZYBt3TTP0
-        h8SHkNkNkoQerWUw6fxnad1lU31JelwW/NCmCmMa9cbY9qRXj1zyfF+Xrft5RUiFF+TiHL
-        mYHX0zdDf2sTYOBXvHaqULRhN6VnRAw=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-318-KMCtjTJFOtmz1sG-36pAaQ-1; Sat, 05 Feb 2022 01:09:42 -0500
-X-MC-Unique: KMCtjTJFOtmz1sG-36pAaQ-1
-Received: by mail-ed1-f69.google.com with SMTP id i22-20020a0564020f1600b00407b56326a2so4212726eda.18
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 22:09:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9DjdP0NZq7FEwMEfMYlhPQOzj1IUaS2o/1SDmCK+oqQ=;
-        b=j/Q05dXGhG5ndKoWY2WAdqWPD6zQBftTxg6pAUh777e6ROXV7PodB5cigSrpuG1+tS
-         UC7sXGW8RjTFzcep7Bo87Qf857a1RvVciBiwhZXTvIYacVsePSbjhrWD5VGCa+1rGz3m
-         TIx6BKB9Que2LoH5EdLiTNcF3fhsMU46Ofy2kg9D+zUxUtp9D21yI1nGpt3YA1Bk+OXU
-         oa5c+BuR8VM/+DKfPELjnx5zmBVYpq8FzrcsmY18OahySw6Wqadq1THbJMqEx42slcY6
-         yEpXHq9MEmutyhP3vCP42E/O2dfYQaySIePLYxTUbxQHjNjNvHb66pViNHroUMdafBBQ
-         UuDg==
-X-Gm-Message-State: AOAM530iz5dOlHrargnAFXV5ByWodwgiKTGUAE4w+GeyOUPj6tdd8n9h
-        lF3Eseq+tExD7frkCUjMsn9j6ENNSH61F90M9GfcDFUdaYlU+kBM2utHeYxwFPIGJwnmOJwKOhp
-        ueutwxusZMzu/
-X-Received: by 2002:a05:6402:90b:: with SMTP id g11mr2688586edz.69.1644041381535;
-        Fri, 04 Feb 2022 22:09:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzDdtdx2OjSz5RZOamZ7u7/zDd1EnnB169l8sfvPwQjBB817q7JLa+K+N6Qip6n0byyG51eeA==
-X-Received: by 2002:a05:6402:90b:: with SMTP id g11mr2688559edz.69.1644041381267;
-        Fri, 04 Feb 2022 22:09:41 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id d6sm1673811eds.25.2022.02.04.22.09.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Feb 2022 22:09:40 -0800 (PST)
-Message-ID: <f41961a1-1248-7b6f-c19f-6d25565d93cf@redhat.com>
-Date:   Sat, 5 Feb 2022 07:09:37 +0100
+        id S1376677AbiBEHoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Feb 2022 02:44:21 -0500
+Received: from mga12.intel.com ([192.55.52.136]:14490 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232203AbiBEHoT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Feb 2022 02:44:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644047059; x=1675583059;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=O5k63NoEK7eQEOe5nVTsQKgM+XYmsqyennE1QHDOWrM=;
+  b=Yu6cDD9VY+377lE1vNALewWyw9JdNARrnitnZyQgHW+yN8V5Jetyw5Cn
+   4TOAFwa9dgi5iJXgZ8DffyvaYgKpfW4GmQHAab3x+7eOvs0U8xryUazIN
+   IMQhv+oSNYEX1bfIZ1b0usHL+meV2IhcpUbSCTF8AEX/yQE8nMYn3u7bU
+   iPJ6UmwNsG8xDHmOsrSDiqB0kb+KIud3uzuOQ9iLZ6tcnl3B5nBRVVLRh
+   wdS7K4h7aEt9OoEiU7dchObbopcsV/izWFe4Ygq88MqXYvSzLkJFkNV52
+   +Ut88Np2ejqwIdsJ5y+Xn/SW+/vEfSJRpL1qTvo1ZeZcVnYzulShY2DMb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10248"; a="228466105"
+X-IronPort-AV: E=Sophos;i="5.88,345,1635231600"; 
+   d="scan'208";a="228466105"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2022 23:44:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,345,1635231600"; 
+   d="scan'208";a="584352666"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 04 Feb 2022 23:44:17 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nGFk1-000YlQ-6S; Sat, 05 Feb 2022 07:44:17 +0000
+Date:   Sat, 5 Feb 2022 15:43:27 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 3/7] KVM: nVMX: Roll all entry/exit ctl updates into a
+ single helper
+Message-ID: <202202051529.y26BVBiF-lkp@intel.com>
+References: <20220204204705.3538240-4-oupton@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.17, take #2
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     James Morse <james.morse@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-References: <20220204135120.1000894-1-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220204135120.1000894-1-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220204204705.3538240-4-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/4/22 14:51, Marc Zyngier wrote:
-> Paolo,
-> 
-> Here's a handful of fixes for -rc3, all courtesy of James Morse.
-> 
-> Please pull,
-> 
-> 	M.
-> 
-> The following changes since commit 26291c54e111ff6ba87a164d85d4a4e134b7315c:
-> 
->    Linux 5.17-rc2 (2022-01-30 15:37:07 +0200)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-2
-> 
-> for you to fetch changes up to 1dd498e5e26ad71e3e9130daf72cfb6a693fee03:
-> 
->    KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata (2022-02-03 09:22:30 +0000)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 5.17, take #2
-> 
-> - A couple of fixes when handling an exception while a SError has been
->    delivered
-> 
-> - Workaround for Cortex-A510's single-step[ erratum
-> 
-> ----------------------------------------------------------------
-> James Morse (3):
->        KVM: arm64: Avoid consuming a stale esr value when SError occur
->        KVM: arm64: Stop handle_exit() from handling HVC twice when an SError occurs
->        KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata
-> 
->   Documentation/arm64/silicon-errata.rst  |  2 ++
->   arch/arm64/Kconfig                      | 16 ++++++++++++++++
->   arch/arm64/kernel/cpu_errata.c          |  8 ++++++++
->   arch/arm64/kvm/handle_exit.c            |  8 ++++++++
->   arch/arm64/kvm/hyp/include/hyp/switch.h | 23 +++++++++++++++++++++--
->   arch/arm64/tools/cpucaps                |  5 +++--
->   6 files changed, 58 insertions(+), 4 deletions(-)
-> 
+Hi Oliver,
 
-Pulled, thanks (and sent already the pull request to Linus).
+Thank you for the patch! Yet something to improve:
 
-Paolo
+[auto build test ERROR on linus/master]
+[also build test ERROR on v5.17-rc2 next-20220204]
+[cannot apply to kvm/queue mst-vhost/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
+url:    https://github.com/0day-ci/linux/commits/Oliver-Upton/VMX-nVMX-VMX-control-MSR-fixes/20220205-044901
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 86286e486cbdd68f01d330409307f6a6efcd4298
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20220205/202202051529.y26BVBiF-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/0day-ci/linux/commit/3053b58337c5bb48b67fce9fb0616887b7180370
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Oliver-Upton/VMX-nVMX-VMX-control-MSR-fixes/20220205-044901
+        git checkout 3053b58337c5bb48b67fce9fb0616887b7180370
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: "kvm_pmu_is_valid_msr" [arch/x86/kvm/kvm-intel.ko] undefined!
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
