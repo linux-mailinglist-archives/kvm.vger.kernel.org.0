@@ -2,194 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27A7C4AA578
-	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 02:55:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2767D4AA70A
+	for <lists+kvm@lfdr.de>; Sat,  5 Feb 2022 07:09:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378927AbiBEBzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Feb 2022 20:55:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34356 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242053AbiBEBzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Feb 2022 20:55:44 -0500
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58F53C061346
-        for <kvm@vger.kernel.org>; Fri,  4 Feb 2022 17:55:43 -0800 (PST)
-Received: by mail-oo1-xc32.google.com with SMTP id u25-20020a4ad0d9000000b002e8d4370689so6680733oor.12
-        for <kvm@vger.kernel.org>; Fri, 04 Feb 2022 17:55:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hsH4XSzPvplGNuSkHB3Wuw3VI1CbzbgPtHERwTztYTU=;
-        b=k+Ar6VYgB1tXJyhXbcDwM3+8R2RK3yTrevfyDo6jWTGg7kG4hdCtRcQF+Y1JO9XGBY
-         6sdT9BYf38NTEQELRFDj8kIn1317hb9Pg44IV92CzRnGgFtMBWPh/ex8krLEJ4OFR32g
-         yn7pff6De1KqLuHd+rjlZ2qL5OpFtlnn+rgmmFMX1u3M7chUlcKGq/ac8Aj/oqZRhtkA
-         WBXFU4YXdzTyeYfZGNdyb5nObWwpA00vVdw6D1md0O3RtDGGL5vRlFScvH5mOwCirVcN
-         rhA9hWlAR0hWiIlZTyfxuWwFBGd0C0hoQU4R4YMpjroQI3DoulCy1wfe5p53nyIyY4in
-         GShg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hsH4XSzPvplGNuSkHB3Wuw3VI1CbzbgPtHERwTztYTU=;
-        b=ZK4ZSNnX48H2kKBjsJ9u3d7xIqHLG99i5dxcOP14iRIqOtip0c9woJht9jQEnEs8YG
-         dtRVeNGOoe6y2vfiBqZI5rukn0e1/aUkhTnLfo9avaIH5g9Y2cvSEOO9TY4cmgJZL/07
-         LX6kPPax53hw1nnAfGs5CUjxS+oDvQ3nEr/P/9VGdlE2KVYBtPebczs+JXyFZY6d3fzw
-         J1leb3cS5mGkeq899AbGY0cyLTJz7N5UuknIxMsQeaFRmUfHOLckBLnfbtGz2tGmFj/U
-         t3symbX1/ri5cjjKArxSXle9/NYbANo/N1ALnGtN9GSgYwIO2LooQyzZivx4e45qoBZg
-         D8hQ==
-X-Gm-Message-State: AOAM530FyzrklvQtGnM3tAhLFh9jbg+1wxKNjtV2jh6A9v+tFYl/CerR
-        6GPDiOqf+c1O5nGR44HVAus4L/VtoxLDOkSsMyIB2g==
-X-Google-Smtp-Source: ABdhPJy0A+9GRscp1BaRP0N6zCOdlAtZFSTW6xYR0MyWybosHHvdX+gXO40emPtaYzyn8mvUHzK9Y4smLbJChvyPyTw=
-X-Received: by 2002:a05:6871:581:: with SMTP id u1mr464555oan.139.1644026142231;
- Fri, 04 Feb 2022 17:55:42 -0800 (PST)
+        id S1350638AbiBEGJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Feb 2022 01:09:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39811 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238891AbiBEGJZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 5 Feb 2022 01:09:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644041365;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CTujWjViNIykIXnrJ9Di78sXxHI4yOPC1t5GOAikn6E=;
+        b=SIp/gDPBM5+WT0ClrfowOUvggpaGvtY4dLoEBtcPFx2kwN1n8DQUjQVZRMYjjVDcEJEEIu
+        ujw82tt+s/rzQZC9RPuFaSBiSXZKXdYgys5kQ63Uv5v41Hv74rhglx+N7Fd/TEkITVeZnX
+        a7JMv4jjQMjlUrV66WCkKBy+xpgZUgo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-259-AEQl6MXGMVu60QH8VTbzkg-1; Sat, 05 Feb 2022 01:09:21 -0500
+X-MC-Unique: AEQl6MXGMVu60QH8VTbzkg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70E04814245;
+        Sat,  5 Feb 2022 06:09:20 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2252D6C1B3;
+        Sat,  5 Feb 2022 06:09:20 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.17-rc3
+Date:   Sat,  5 Feb 2022 01:09:19 -0500
+Message-Id: <20220205060919.88656-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20211130074221.93635-1-likexu@tencent.com> <20211130074221.93635-3-likexu@tencent.com>
-In-Reply-To: <20211130074221.93635-3-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 4 Feb 2022 17:55:31 -0800
-Message-ID: <CALMp9eQG7eqq+u3igApsRDV=tt0LdjZzmD_dC8zw=gt=f5NjSA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] KVM: x86/pmu: Refactoring find_arch_event() to pmc_perf_hw_id()
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 11:42 PM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> The find_arch_event() returns a "unsigned int" value,
-> which is used by the pmc_reprogram_counter() to
-> program a PERF_TYPE_HARDWARE type perf_event.
->
-> The returned value is actually the kernel defined gernic
-> perf_hw_id, let's rename it to pmc_perf_hw_id() with simpler
-> incoming parameters for better self-explanation.
->
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  arch/x86/kvm/pmu.c           | 8 +-------
->  arch/x86/kvm/pmu.h           | 3 +--
->  arch/x86/kvm/svm/pmu.c       | 8 ++++----
->  arch/x86/kvm/vmx/pmu_intel.c | 9 +++++----
->  4 files changed, 11 insertions(+), 17 deletions(-)
->
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 09873f6488f7..3b3ccf5b1106 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -174,7 +174,6 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
->  void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
->  {
->         unsigned config, type = PERF_TYPE_RAW;
-> -       u8 event_select, unit_mask;
->         struct kvm *kvm = pmc->vcpu->kvm;
->         struct kvm_pmu_event_filter *filter;
->         int i;
-> @@ -206,17 +205,12 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
->         if (!allow_event)
->                 return;
->
-> -       event_select = eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-> -       unit_mask = (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
-> -
->         if (!(eventsel & (ARCH_PERFMON_EVENTSEL_EDGE |
->                           ARCH_PERFMON_EVENTSEL_INV |
->                           ARCH_PERFMON_EVENTSEL_CMASK |
->                           HSW_IN_TX |
->                           HSW_IN_TX_CHECKPOINTED))) {
-> -               config = kvm_x86_ops.pmu_ops->find_arch_event(pmc_to_pmu(pmc),
-> -                                                     event_select,
-> -                                                     unit_mask);
-> +               config = kvm_x86_ops.pmu_ops->pmc_perf_hw_id(pmc);
->                 if (config != PERF_COUNT_HW_MAX)
->                         type = PERF_TYPE_HARDWARE;
->         }
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 59d6b76203d5..dd7dbb1c5048 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -24,8 +24,7 @@ struct kvm_event_hw_type_mapping {
->  };
->
->  struct kvm_pmu_ops {
-> -       unsigned (*find_arch_event)(struct kvm_pmu *pmu, u8 event_select,
-> -                                   u8 unit_mask);
-> +       unsigned int (*pmc_perf_hw_id)(struct kvm_pmc *pmc);
->         unsigned (*find_fixed_event)(int idx);
->         bool (*pmc_is_enabled)(struct kvm_pmc *pmc);
->         struct kvm_pmc *(*pmc_idx_to_pmc)(struct kvm_pmu *pmu, int pmc_idx);
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 0cf05e4caa4c..fb0ce8cda8a7 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -138,10 +138,10 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
->         return &pmu->gp_counters[msr_to_index(msr)];
->  }
->
-> -static unsigned amd_find_arch_event(struct kvm_pmu *pmu,
-> -                                   u8 event_select,
-> -                                   u8 unit_mask)
-> +static unsigned int amd_pmc_perf_hw_id(struct kvm_pmc *pmc)
->  {
-> +       u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-On AMD, the event select is 12 bits.
-> +       u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
->         int i;
->
->         for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
-> @@ -323,7 +323,7 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
->  }
->
->  struct kvm_pmu_ops amd_pmu_ops = {
-> -       .find_arch_event = amd_find_arch_event,
-> +       .pmc_perf_hw_id = amd_pmc_perf_hw_id,
->         .find_fixed_event = amd_find_fixed_event,
->         .pmc_is_enabled = amd_pmc_is_enabled,
->         .pmc_idx_to_pmc = amd_pmc_idx_to_pmc,
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index b7ab5fd03681..67a0188ecdc5 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -68,10 +68,11 @@ static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
->                 reprogram_counter(pmu, bit);
->  }
->
-> -static unsigned intel_find_arch_event(struct kvm_pmu *pmu,
-> -                                     u8 event_select,
-> -                                     u8 unit_mask)
-> +static unsigned int intel_pmc_perf_hw_id(struct kvm_pmc *pmc)
->  {
-> +       struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> +       u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-> +       u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
->         int i;
->
->         for (i = 0; i < ARRAY_SIZE(intel_arch_events); i++)
-> @@ -719,7 +720,7 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
->  }
->
->  struct kvm_pmu_ops intel_pmu_ops = {
-> -       .find_arch_event = intel_find_arch_event,
-> +       .pmc_perf_hw_id = intel_pmc_perf_hw_id,
->         .find_fixed_event = intel_find_fixed_event,
->         .pmc_is_enabled = intel_pmc_is_enabled,
->         .pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
-> --
-> 2.33.1
->
+Linus,
+
+The following changes since commit 26291c54e111ff6ba87a164d85d4a4e134b7315c:
+
+  Linux 5.17-rc2 (2022-01-30 15:37:07 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 7e6a6b400db8048bd1c06e497e338388413cf5bc:
+
+  Merge tag 'kvmarm-fixes-5.17-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2022-02-05 00:58:25 -0500)
+
+----------------------------------------------------------------
+ARM:
+
+* A couple of fixes when handling an exception while a SError has been delivered
+
+* Workaround for Cortex-A510's single-step erratum
+
+RISCV:
+
+* Make CY, TM, and IR counters accessible in VU mode
+
+* Fix SBI implementation version
+
+x86:
+
+* Report deprecation of x87 features in supported CPUID
+
+* Preparation for fixing an interrupt delivery race on AMD hardware
+
+* Sparse fix
+
+All except POWER and s390:
+
+* Rework guest entry code to correctly mark noinstr areas and fix vtime'
+  accounting (for x86, this was already mostly correct but not entirely;
+  for ARM, MIPS and RISC-V it wasn't)
+
+----------------------------------------------------------------
+Anup Patel (1):
+      RISC-V: KVM: Fix SBI implementation version
+
+James Morse (3):
+      KVM: arm64: Avoid consuming a stale esr value when SError occur
+      KVM: arm64: Stop handle_exit() from handling HVC twice when an SError occurs
+      KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata
+
+Janosch Frank (1):
+      kvm: Move KVM_GET_XSAVE2 IOCTL definition at the end of kvm.h
+
+Jim Mattson (1):
+      KVM: x86: Report deprecated x87 features in supported CPUID
+
+Mark Rutland (5):
+      kvm: add guest_state_{enter,exit}_irqoff()
+      kvm/mips: rework guest entry logic
+      kvm/x86: rework guest entry logic
+      kvm/arm64: rework guest entry logic
+      kvm/riscv: rework guest entry logic
+
+Mayuresh Chitale (1):
+      RISC-V: KVM: make CY, TM, and IR counters accessible in VU mode
+
+Paolo Bonzini (2):
+      Merge tag 'kvm-riscv-fixes-5.17-1' of https://github.com/kvm-riscv/linux into HEAD
+      Merge tag 'kvmarm-fixes-5.17-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+
+Sean Christopherson (2):
+      KVM: x86: Move delivery of non-APICv interrupt into vendor code
+      KVM: x86: Use ERR_PTR_USR() to return -EFAULT as a __user pointer
+
+ Documentation/arm64/silicon-errata.rst  |   2 +
+ arch/arm64/Kconfig                      |  16 +++++
+ arch/arm64/kernel/cpu_errata.c          |   8 +++
+ arch/arm64/kvm/arm.c                    |  51 ++++++++++-----
+ arch/arm64/kvm/handle_exit.c            |   8 +++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  23 ++++++-
+ arch/arm64/tools/cpucaps                |   5 +-
+ arch/mips/kvm/mips.c                    |  50 ++++++++++++--
+ arch/riscv/kvm/vcpu.c                   |  48 +++++++++-----
+ arch/riscv/kvm/vcpu_sbi_base.c          |   3 +-
+ arch/x86/include/asm/kvm-x86-ops.h      |   2 +-
+ arch/x86/include/asm/kvm_host.h         |   3 +-
+ arch/x86/kvm/cpuid.c                    |  13 ++--
+ arch/x86/kvm/lapic.c                    |  10 +--
+ arch/x86/kvm/svm/svm.c                  |  21 +++++-
+ arch/x86/kvm/vmx/vmx.c                  |  21 +++++-
+ arch/x86/kvm/x86.c                      |  10 +--
+ arch/x86/kvm/x86.h                      |  45 -------------
+ include/linux/kvm_host.h                | 112 +++++++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h                |   6 +-
+ 20 files changed, 336 insertions(+), 121 deletions(-)
+
