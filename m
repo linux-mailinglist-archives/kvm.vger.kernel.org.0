@@ -2,90 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27A134AAF52
-	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 14:08:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B57FF4AAF7A
+	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 14:38:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238174AbiBFNIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Feb 2022 08:08:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35470 "EHLO
+        id S239883AbiBFNiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Feb 2022 08:38:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbiBFNIl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Feb 2022 08:08:41 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C29FC06173B;
-        Sun,  6 Feb 2022 05:08:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=r+gFF/vh5cSrP7KvoK/nIgqjizm6gE7sf4GkpA389wU=; b=BxgIxsrU2QJcX39YxBcIRdWY9m
-        1InCvuuhaZSBAHPDyxkW4kpQEW0PNI5OxHuRe2VyAKR+rsthjZyBtDoLV9v7P5gRABQlP+rDck/2T
-        0Eum8llSq5MxbwmLQpdYtcwBE5lCjmmPWl/g3fZasID1Jm2FK8DaxmlkyVaAq7eksYG4vwOFtylsF
-        ByER5B38SETjK5k2BRG8SlZO3f49/oYQqWjBa94ODbHh0LFJZkMFeF/tx37n3wBcNQiV2YbfXfJZ7
-        empLcdFZ4dEfuW7xG5uJjCMhH1bF6ec2hmMvDRlW5hjO4ndYT9fBGOZQcYkdr18YfQKWXiF6erKkV
-        wpLVj/lA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nGhHM-007QNp-1l; Sun, 06 Feb 2022 13:08:32 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 9E68198622D; Sun,  6 Feb 2022 14:08:30 +0100 (CET)
-Date:   Sun, 6 Feb 2022 14:08:30 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sami Tolvanen <samitolvanen@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
-        Will McVicker <willmcvicker@google.com>
-Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize
- perf_guest_info_callbacks
-Message-ID: <20220206130830.GC23216@worktop.programming.kicks-ass.net>
-References: <20211111020738.2512932-1-seanjc@google.com>
- <20211111020738.2512932-10-seanjc@google.com>
- <YfrQzoIWyv9lNljh@google.com>
- <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
+        with ESMTP id S234549AbiBFNiS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Feb 2022 08:38:18 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E44EC06173B;
+        Sun,  6 Feb 2022 05:38:15 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 469F21EC032C;
+        Sun,  6 Feb 2022 14:38:07 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1644154687;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=jAuLPEHRUsnnnDOtFbaDbZZRlFj8WlIUOHei0nXkJ54=;
+        b=jbvbDK7pFpV/x4yx6ITBACVsTMl0wUK77KfaIR7xczK/wojWL/Y8vhtEsgvLu26XTwC7PI
+        Nz9PPVVb6VHGVQpY6Foh5zHng53Jlg0EGsBrkFj744JlWapTsjbYADAAzPIIKpVHLw1009
+        gWqRhpncPL6J0yOFXGPgmb2QQ/lJg8Q=
+Date:   Sun, 6 Feb 2022 14:37:59 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com
+Subject: Re: [PATCH v9 31/43] x86/compressed/64: Add support for SEV-SNP
+ CPUID table in #VC handlers
+Message-ID: <Yf/PN8rBy3m5seU9@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-32-brijesh.singh@amd.com>
+ <Yf5XScto3mDXnl9u@zn.tnic>
+ <20220205162249.4dkttihw6my7iha3@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20220205162249.4dkttihw6my7iha3@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 04, 2022 at 09:35:49AM -0800, Sami Tolvanen wrote:
-> On Wed, Feb 2, 2022 at 10:43 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
-> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
-> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
-> >
-> > Using __static_call_return0() makes clang's CFI sad on arm64 due to the resulting
-> > function prototype mistmatch, which IIUC, is verified by clang's __cfi_check()
-> > for indirect calls, i.e. architectures without CONFIG_HAVE_STATIC_CALL.
-> >
-> > We could fudge around the issue by using stubs, massaging prototypes, etc..., but
-> > that means doing that for every arch-agnostic user of __static_call_return0().
-> >
-> > Any clever ideas?  Can we do something like generate a unique function for every
-> > DEFINE_STATIC_CALL_RET0 for CONFIG_HAVE_STATIC_CALL=n, e.g. using typeof() to
-> > get the prototype?
-> 
-> I'm not sure there's a clever fix for this. On architectures without
-> HAVE_STATIC_CALL, this is an indirect call to a function with a
-> mismatching type, which CFI is intended to catch.
-> 
-> The obvious way to solve the problem would be to use a stub function
-> with the correct type, which I agree, isn't going to scale. You can
-> alternatively check if .func points to __static_call_return0 and not
-> make the indirect call if it does. If neither of these options are
-> feasible, you can disable CFI checking in the functions that have
-> these static calls using the __nocfi attribute.
+First of all,
 
-There's also the tp_stub_func() thing that does basically the same
-thing.
+let me give you a very important piece of advice for the future:
+ignoring review feedback is a very unfriendly thing to do:
+
+- if you agree with the feedback, you work it in in the next revision
+
+- if you don't agree, you *say* *why* you don't
+
+What you should avoid is what you've done - ignore it silently. Because
+reviewing submitters code is the most ungrateful work around the kernel,
+and, at the same time, it is the most important one.
+
+So please make sure you don't do that in the future when submitting
+patches for upstream inclusion. I'm sure you can imagine, the ignoring
+can go both ways.
+
+On Sat, Feb 05, 2022 at 10:22:49AM -0600, Michael Roth wrote:
+> The documentation for lea (APM Volume 3 Chapter 3) seemed to require
+> that the destination register be a general purpose register, so it
+> seemed like there was potential for breakage in allowing GCC to use
+> anything otherwise.
+
+There's no such potential: binutils encodes the unstruction operands
+and what types are allowed. IOW, the assembler knows that there goes a
+register.
+
+> Maybe GCC is smart enough to figure that out, but since we know the
+> constraint in advance it seemed safer to stick with the current
+> approach of enforcing that constraint.
+
+I guess in this particular case it won't matter whether it is "=r" or
+"=g" but still...
+
+> I did look into it and honestly it just seemed to add more abstractions that
+> made it harder to parse the specific operations taken place here. For
+> instance, post-processing of 0x8000001E entry, we have e{a,b,c,d}x from
+> the CPUID table, then to post process:
+> 
+>   switch (func):
+>   case 0x8000001E:
+>     /* extended APIC ID */
+>     snp_cpuid_hv(func, subfunc, eax, &ebx2, &ecx2, NULL);
+
+Well, my suggestion was to put it *all* in the subleaf struct - not just
+the regs:
+
+struct cpuid_leaf {
+	u32 func;
+	u32 subfunc;
+	u32 eax;
+	u32 ebx;
+	u32 ecx;
+	u32 edx;
+};
+
+so that the call signature is:
+
+	snp_cpuid_postprocess(struct cpuid_leaf *leaf)
+
+
+> and it all reads in a clear/familiar way to all the other
+> cpuid()/native_cpuid() users throughout the kernel,
+
+maybe it should read differently *on* *purpose*. Exactly because this is
+*not* the usual CPUID handling code but CPUID verification code for SNP
+guests.
+
+And please explain to me what's so unclear about leaf->eax vs *eax?!
+
+> and from the persective of someone auditing this from a security
+> perspective that needs to quickly check what registers come from the
+> CPUID table, what registers come from HV
+
+Having a struct which is properly named will actually be beneficial in
+this case:
+
+	hv_leaf->eax
+
+or even
+
+	hv_reported_leaf->eax
+
+vs
+
+	*eax
+
+Now guess which is which.
+
+> But if we start passing around this higher-level structure that does
+> not do anything other than abstract away e{a,b,c,x} to save on function
+> arguments, things become muddier, and there's more pointer dereference
+> operations and abstractions to sift through.
+
+Huh?! I'm sorry but I cannot follow that logic here.
+
+> I saved the diff from when I looked into it previously (was just a
+> rough-sketch, not build-tested), and included it below for reference,
+> but it just didn't seem to help with readability to me,
+
+Well, looking at it, the only difference is that the IO is done
+over a struct instead of separate pointers. And the diff is pretty
+straight-forward.
+
+So no, having a struct cpuid_leaf containing it all is actually better
+in this case because you know which is which if you name it properly and
+you have a single pointer argument which you pass around - something
+which is done all around the kernel.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
