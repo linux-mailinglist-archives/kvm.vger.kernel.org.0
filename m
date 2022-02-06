@@ -2,70 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8614AAFDF
-	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 15:10:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77F524AB060
+	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 16:46:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241136AbiBFOKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Feb 2022 09:10:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57326 "EHLO
+        id S244148AbiBFPqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Feb 2022 10:46:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236926AbiBFOKL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Feb 2022 09:10:11 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15D5C06173B;
-        Sun,  6 Feb 2022 06:10:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mI67syAIUWTfJyg9FU9W87lE6c5yK7WTkN3mqQzAN9Y=; b=O4BQMPvZRrJIH4kASoGMJquIrP
-        riojtP8gxpL8XWi0yxHkhbLGFMf2w5ZCosCclSbpg9Bln941ZmsmqpSY7t2chYHIl/yFaWIGG8Ljc
-        iXbQTjJN4TROZ+tV7p1LJaS+rLhD750l774ftlz/XsUFZMpHAuHEAsuaEntcqWQIPupmFUNVaAfuv
-        hfWxcma3LaVO9kY0XLYi32qaqXKw4aAsikUE1mQXM2s4QC2A4E4Y4gSkRDamYhAS/tlWNHTNt+bd6
-        wD5Mx2LSCmDVX96LfypR4/1yDfM5B0wNQ1n3oolOnP/qjvV2X30sIbQUghjqxEsstLUHoKu94NYt8
-        5L3b8ChA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nGiEw-00EKdv-SD; Sun, 06 Feb 2022 14:10:06 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2EEF8300470;
-        Sun,  6 Feb 2022 15:10:06 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 154F02CA510BA; Sun,  6 Feb 2022 15:10:06 +0100 (CET)
-Date:   Sun, 6 Feb 2022 15:10:06 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com
-Subject: Re: [PATCH 5/5] KVM: x86: allow defining return-0 static calls
-Message-ID: <Yf/WvmqxzBDVTTSm@hirez.programming.kicks-ass.net>
-References: <20220202181813.1103496-1-pbonzini@redhat.com>
- <20220202181813.1103496-6-pbonzini@redhat.com>
- <745fc750-cd52-af1e-4e5e-0644ff3be007@redhat.com>
+        with ESMTP id S233564AbiBFPqU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Feb 2022 10:46:20 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BADA9C06173B;
+        Sun,  6 Feb 2022 07:46:19 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DB7381EC032C;
+        Sun,  6 Feb 2022 16:46:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1644162374;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=I2ZGpe+v4nEY0jmVxtOXpQHTFNc9Pxn4PtQ3aRV2Qtc=;
+        b=CzcdKA8p9YEvjhiMkLz+0axjH596hm96hf61Ug0DiAzxmxq/rAY/+rv8CDyZa2vlSc5JjM
+        ZPo2fVWy148tDei8z8wsvYq9jNWZ+yI5KVCTDWmPBbGdMjx/hyzfSGtHgdPX7HpkdqxhXa
+        FEwZlI0OUAR4cZVrZex7WvXBG3Y1J1E=
+Date:   Sun, 6 Feb 2022 16:46:08 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>, brijesh.singh@amd.com,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v9 38/43] x86/sev: Use firmware-validated CPUID for
+ SEV-SNP guests
+Message-ID: <Yf/tQPqbP97lrVpg@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-39-brijesh.singh@amd.com>
+ <20220205171901.kt47bahdmh64b45x@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <745fc750-cd52-af1e-4e5e-0644ff3be007@redhat.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20220205171901.kt47bahdmh64b45x@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 03, 2022 at 07:40:25PM +0100, Paolo Bonzini wrote:
-> On 2/2/22 19:18, Paolo Bonzini wrote:
-> > A few vendor callbacks are only used by VMX, but they return an integer
-> > or bool value.  Introduce KVM_X86_OP_RET0 for them: a NULL value in
-> > struct kvm_x86_ops will be changed to __static_call_return0.
-> 
-> This also needs EXPORT_SYMBOL_GPL(__static_call_ret0).  Peter, any
-> objections?
+On Sat, Feb 05, 2022 at 11:19:01AM -0600, Michael Roth wrote:
+> I mentioned the concern you raised about out-of-spec hypervisors
+> using non-zero for Reserved fields, and potentially breaking future
+> guests that attempt to make use of them if they ever get re-purposed
+> for some other functionality, but their take on that is that such a
+> hypervisor is clearly out-of-spec, and would not be supported.
 
-__static_call_return0 I suppose, but no. Go ahead.
+Yah, like stating that something should not be done in the spec is
+going to stop people from doing it anyway. You folks need to understand
+one thing: the smaller the attack surface, the better. And you need to
+*enforce* that - not state it in a spec. No one cares about the spec
+when it comes to poking holes in the architecture. And people do poke
+and will poke holes *especially* in this architecture, as its main goal
+is security.
+
+> Another possibility is enforcing 0 in the firmware itself.
+
+Yes, this is the thing to do. If they're going to be reused in the
+future, then guests can be changed to handle that. Like we do all the
+time anyway.
+
+> So given their guidance on the Reserved fields, and your guidance
+> on not doing the other sanity-checks, my current plan to to drop
+> snp_check_cpuid_table() completely for v10, but if you have other
+> thoughts on that just let me know.
+
+Yes, and pls fix the firmware to zero them out, because from reading
+your very detailed explanation - btw, thanks for taking the time to
+explain properly what's not in the ABI doc:
+
+https://lore.kernel.org/r/20220205154243.s33gwghqwbb4efyl@amd.com
+
+it sounds like those two input fields are not really needed. So the
+earlier you fix them in the firmware and deprecate them, the better.
+
+Thx!
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
