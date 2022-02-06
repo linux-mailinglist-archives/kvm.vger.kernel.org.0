@@ -2,150 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E81174AB0AC
-	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 17:41:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D88974AB15B
+	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 19:45:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242360AbiBFQlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Feb 2022 11:41:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45852 "EHLO
+        id S242249AbiBFSpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Feb 2022 13:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233293AbiBFQlk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Feb 2022 11:41:40 -0500
-X-Greylist: delayed 11005 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Feb 2022 08:41:38 PST
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E79C06173B;
-        Sun,  6 Feb 2022 08:41:38 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3597F1EC01B7;
-        Sun,  6 Feb 2022 17:41:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1644165693;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Vf4uD77Lu81fzkyJFDjIK5AMPQsw8mdt+0qd3hoteKA=;
-        b=X1KzWt4kENbpoTW5g4vozGTNQPANq18LmTnDQ2DAE9tecHwlnKNuJDnjMhSDBVQt8EaGwK
-        isUMnTdSEnFc/dKWxahkZF0HJVXNcVjviK3CObEDSaAHBkUH1eycmrApfzGxtn8PhJEQQg
-        A9rixKjewzIEXSDO6AianN5uLuVtyhM=
-Date:   Sun, 6 Feb 2022 17:41:26 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        with ESMTP id S235212AbiBFSpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Feb 2022 13:45:17 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48590C06173B
+        for <kvm@vger.kernel.org>; Sun,  6 Feb 2022 10:45:17 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d187so9782101pfa.10
+        for <kvm@vger.kernel.org>; Sun, 06 Feb 2022 10:45:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=g99EK4RBFIcLjOA2xsAgfPy/FWBWvPsPH9rm8hJWuN4=;
+        b=biHHkqKY9Ho6lpFnUvZwHS3Q5oqNdHnItOI0AX5F4NU6WRtoewrftBfJOMU6myFuVw
+         +M3wYhBHPiacfrFCkY7wbQ5phlQLfD6QNZM/QDckqZyMqFBKPudW+ryJ+gMTIWn8VS/A
+         cRGemeQFuDF4522ZQFDF57DgekBIK9wYHAWPI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=g99EK4RBFIcLjOA2xsAgfPy/FWBWvPsPH9rm8hJWuN4=;
+        b=1KO0lNIYVneIaJ3UtkwZwJDfT4Vp9nBZkabJq/LEIzoqon3DRqCGVCwb4YuX+jj3OQ
+         wJUaw1BpxlAOFbwMOvsH7bW16BSETbrcOADqkMQy7hJHmTLCp6Guo49GxuglxySW51yV
+         MSB3ALJIe//Jo6JUb12b/4QdpsAi+yIliJiyz4bmJ76I7yoOK8+1B3O2gIdzbxpRnwr9
+         s4IaeMAzcINu7+rQM6ZhBa6FOxFhoTMOwdwgn7xryZIHg4+dsbCXdgavJuTHQhFSt9Jk
+         lX2enu1EbNe8kBkSyPINFfW/wxD+FO94NFHm7Pfw7wSKECe4/xzj3dBIIXuYfBz1zI2j
+         4JyQ==
+X-Gm-Message-State: AOAM533RGDFVkZwP4bIhRm2DdSOd83hdkKdgAxG14dvB1FVCj9XyEWmT
+        KL2N1XCrOiZgMVThqJvKMmt4Gw==
+X-Google-Smtp-Source: ABdhPJwsGxmyQ5I5YdyWqLxqzGVpFwSbHqBQWHaTvyZjbtd3CV9mMg9vZBIckMMYD9dBGO8G2KeEOA==
+X-Received: by 2002:a62:ce83:: with SMTP id y125mr12588532pfg.6.1644173116776;
+        Sun, 06 Feb 2022 10:45:16 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id bv22sm8729991pjb.31.2022.02.06.10.45.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Feb 2022 10:45:16 -0800 (PST)
+Date:   Sun, 6 Feb 2022 10:45:15 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Sami Tolvanen <samitolvanen@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 33/43] x86/compressed: Add SEV-SNP feature
- detection/setup
-Message-ID: <Yf/6NhnS50UDv4xV@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-34-brijesh.singh@amd.com>
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
+        Will McVicker <willmcvicker@google.com>
+Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize
+ perf_guest_info_callbacks
+Message-ID: <202202061011.A255DE55B@keescook>
+References: <20211111020738.2512932-1-seanjc@google.com>
+ <20211111020738.2512932-10-seanjc@google.com>
+ <YfrQzoIWyv9lNljh@google.com>
+ <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220128171804.569796-34-brijesh.singh@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 11:17:54AM -0600, Brijesh Singh wrote:
-> +static struct cc_setup_data *get_cc_setup_data(struct boot_params *bp)
-> +{
-> +	struct setup_data *hdr = (struct setup_data *)bp->hdr.setup_data;
-> +
-> +	while (hdr) {
-> +		if (hdr->type == SETUP_CC_BLOB)
-> +			return (struct cc_setup_data *)hdr;
-> +		hdr = (struct setup_data *)hdr->next;
-> +	}
-> +
-> +	return NULL;
-> +}
+On Fri, Feb 04, 2022 at 09:35:49AM -0800, Sami Tolvanen wrote:
+> On Wed, Feb 2, 2022 at 10:43 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
+> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
+> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
+> >
+> > Using __static_call_return0() makes clang's CFI sad on arm64 due to the resulting
+> > function prototype mistmatch, which IIUC, is verified by clang's __cfi_check()
+> > for indirect calls, i.e. architectures without CONFIG_HAVE_STATIC_CALL.
+> >
+> > We could fudge around the issue by using stubs, massaging prototypes, etc..., but
+> > that means doing that for every arch-agnostic user of __static_call_return0().
+> >
+> > Any clever ideas?  Can we do something like generate a unique function for every
+> > DEFINE_STATIC_CALL_RET0 for CONFIG_HAVE_STATIC_CALL=n, e.g. using typeof() to
+> > get the prototype?
+> 
+> I'm not sure there's a clever fix for this. On architectures without
+> HAVE_STATIC_CALL, this is an indirect call to a function with a
+> mismatching type, which CFI is intended to catch.
+> 
+> The obvious way to solve the problem would be to use a stub function
+> with the correct type, which I agree, isn't going to scale. You can
+> alternatively check if .func points to __static_call_return0 and not
+> make the indirect call if it does. If neither of these options are
+> feasible, you can disable CFI checking in the functions that have
+> these static calls using the __nocfi attribute.
+> 
+> Kees, any thoughts?
 
-Merge that function into its only caller.
+I'm digging through the macros to sort this out, but IIUC, an example of
+the problem is:
 
-...
+perf_guest_cbs->handle_intel_pt_intr is:
 
-> +static struct cc_blob_sev_info *snp_find_cc_blob(struct boot_params *bp)
+	unsigned int (*handle_intel_pt_intr)(void);
 
-static function, no need for the "snp_" prefix. Please audit all your
-patches for that and remove that prefix from all static functions.
+The declaration for this starts with:
 
-> +{
-> +	struct cc_blob_sev_info *cc_info;
-> +
-> +	cc_info = snp_find_cc_blob_efi(bp);
-> +	if (cc_info)
-> +		goto found_cc_info;
-> +
-> +	cc_info = snp_find_cc_blob_setup_data(bp);
-> +	if (!cc_info)
-> +		return NULL;
-> +
-> +found_cc_info:
-> +	if (cc_info->magic != CC_BLOB_SEV_HDR_MAGIC)
-> +		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
-> +
-> +	return cc_info;
-> +}
-> +
-> +bool snp_init(struct boot_params *bp)
-> +{
-> +	struct cc_blob_sev_info *cc_info;
-> +
-> +	if (!bp)
-> +		return false;
-> +
-> +	cc_info = snp_find_cc_blob(bp);
-> +	if (!cc_info)
-> +		return false;
-> +
-> +	/*
-> +	 * Pass run-time kernel a pointer to CC info via boot_params so EFI
-> +	 * config table doesn't need to be searched again during early startup
-> +	 * phase.
-> +	 */
-> +	bp->cc_blob_address = (u32)(unsigned long)cc_info;
-> +
-> +	/*
-> +	 * Indicate SEV-SNP based on presence of SEV-SNP-specific CC blob.
-> +	 * Subsequent checks will verify SEV-SNP CPUID/MSR bits.
-> +	 */
+DECLARE_STATIC_CALL(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
 
-Put that comment over the function name.
+which produces:
 
-Thx.
+extern struct static_call_key STATIC_CALL_KEY(__perf_guest_handle_intel_pt_intr);
+extern typeof(*perf_guest_cbs->handle_intel_pt_intr) STATIC_CALL_TRAMP(__perf_guest_handle_intel_pt_intr);
+
+and the last line becomes:
+
+extern unsigned int (*__SCT____perf_guest_handle_intel_pt_intr)(void);
+
+with !HAVE_STATIC_CALL, when perf_guest_handle_intel_pt_intr() does:
+
+	return static_call(__perf_guest_handle_intel_pt_intr)();
+
+it is resolving static_call() into:
+
+	((typeof(STATIC_CALL_TRAMP(name))*)(STATIC_CALL_KEY(name).func))
+
+so the caller is expecting "unsigned int (*)(void)" but the prototype
+of __static_call_return0 is "long (*)(void)":
+
+long __static_call_return0(void);
+
+Could we simply declare a type-matched ret0 trampoline too?
+
+#define STATIC_CALL_TRAMP_RET0_PREFIX	__SCT__ret0__
+#define STATIC_CALL_TRAMP_RET0(name)	__PASTE(STATIC_CALL_TRAMP_RET0_PREFIX, name)
+
+#define DEFINE_STATIC_CALL_RET0(name, _func)				\
+	static typeof(_func) STATIC_CALL_TRAMP_RET0(name) { return 0; }	\
+        __DEFINE_STATIC_CALL(name, _func, STATIC_CALL_TRAMP_RET0(name));
+
+static_call_update(__perf_guest_handle_intel_pt_intr,
+		   (void *)&STATIC_CALL_TRAMP_RET0(__perf_guest_handle_intel_pt_intr))
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Kees Cook
