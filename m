@@ -2,60 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 767354AAF09
-	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 12:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27A134AAF52
+	for <lists+kvm@lfdr.de>; Sun,  6 Feb 2022 14:08:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234454AbiBFLwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Feb 2022 06:52:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37838 "EHLO
+        id S238174AbiBFNIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Feb 2022 08:08:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234601AbiBFLmX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Feb 2022 06:42:23 -0500
-Received: from baidu.com (mx22.baidu.com [220.181.50.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 15A7DC06173B
-        for <kvm@vger.kernel.org>; Sun,  6 Feb 2022 03:42:23 -0800 (PST)
-Received: from BJHW-Mail-Ex14.internal.baidu.com (unknown [10.127.64.37])
-        by Forcepoint Email with ESMTPS id CD4D9CB6A666222446C5;
-        Sun,  6 Feb 2022 19:26:07 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BJHW-Mail-Ex14.internal.baidu.com (10.127.64.37) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Sun, 6 Feb 2022 19:26:07 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.020; Sun, 6 Feb 2022 19:26:07 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXVt2M10gS1ZNOiB4ODY6IHJlZmluZSBrdm1fdmNwdV9p?=
- =?gb2312?Q?s=5Fpreempted?=
-Thread-Topic: [PATCH][v3] KVM: x86: refine kvm_vcpu_is_preempted
-Thread-Index: AQHYC2RN7LhcUJPWaU64b/F31U+tS6x/7JgAgAAgBwCABnST8A==
-Date:   Sun, 6 Feb 2022 11:26:07 +0000
-Message-ID: <3ca3f4b132f14d079de706310ee393cf@baidu.com>
-References: <1642397842-46318-1-git-send-email-lirongqing@baidu.com>
- <20220202145414.GD20638@worktop.programming.kicks-ass.net>
- <Yfq19FSnASMfd0BH@google.com>
-In-Reply-To: <Yfq19FSnASMfd0BH@google.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.14.117.122]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2022-02-06 19:26:07:734
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        with ESMTP id S231196AbiBFNIl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Feb 2022 08:08:41 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C29FC06173B;
+        Sun,  6 Feb 2022 05:08:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=r+gFF/vh5cSrP7KvoK/nIgqjizm6gE7sf4GkpA389wU=; b=BxgIxsrU2QJcX39YxBcIRdWY9m
+        1InCvuuhaZSBAHPDyxkW4kpQEW0PNI5OxHuRe2VyAKR+rsthjZyBtDoLV9v7P5gRABQlP+rDck/2T
+        0Eum8llSq5MxbwmLQpdYtcwBE5lCjmmPWl/g3fZasID1Jm2FK8DaxmlkyVaAq7eksYG4vwOFtylsF
+        ByER5B38SETjK5k2BRG8SlZO3f49/oYQqWjBa94ODbHh0LFJZkMFeF/tx37n3wBcNQiV2YbfXfJZ7
+        empLcdFZ4dEfuW7xG5uJjCMhH1bF6ec2hmMvDRlW5hjO4ndYT9fBGOZQcYkdr18YfQKWXiF6erKkV
+        wpLVj/lA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nGhHM-007QNp-1l; Sun, 06 Feb 2022 13:08:32 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 9E68198622D; Sun,  6 Feb 2022 14:08:30 +0100 (CET)
+Date:   Sun, 6 Feb 2022 14:08:30 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Sami Tolvanen <samitolvanen@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
+        Will McVicker <willmcvicker@google.com>
+Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize
+ perf_guest_info_callbacks
+Message-ID: <20220206130830.GC23216@worktop.programming.kicks-ass.net>
+References: <20211111020738.2512932-1-seanjc@google.com>
+ <20211111020738.2512932-10-seanjc@google.com>
+ <YfrQzoIWyv9lNljh@google.com>
+ <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,34 +59,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBPbiBXZWQsIEZlYiAwMiwgMjAyMiwgUGV0ZXIgWmlqbHN0cmEgd3JvdGU6DQo+ID4gT24gTW9u
-LCBKYW4gMTcsIDIwMjIgYXQgMDE6Mzc6MjJQTSArMDgwMCwgTGkgUm9uZ1Fpbmcgd3JvdGU6DQo+
-ID4gPiBBZnRlciBzdXBwb3J0IHBhcmF2aXJ0dWFsaXplZCBUTEIgc2hvb3Rkb3ducywgc3RlYWxf
-dGltZS5wcmVlbXB0ZWQNCj4gPiA+IGluY2x1ZGVzIG5vdCBvbmx5IEtWTV9WQ1BVX1BSRUVNUFRF
-RCwgYnV0IGFsc28gS1ZNX1ZDUFVfRkxVU0hfVExCDQo+ID4gPg0KPiA+ID4gYW5kIGt2bV92Y3B1
-X2lzX3ByZWVtcHRlZCBzaG91bGQgdGVzdCBvbmx5IHdpdGggS1ZNX1ZDUFVfUFJFRU1QVEVEDQo+
-ID4NCj4gPiBUaGlzIHN0aWxsIGZhaWxzIHRvIGFjdHVhbGx5IGV4cGxhaW4gd2hhdCB0aGUgcHJv
-YmxlbSBpcywgd2h5IGRpZCB5b3UNCj4gPiB3cml0ZSB0aGlzIHBhdGNoPw0KPiANCj4gWWEsIGRl
-ZmluaXRlbHkgaXMgbGFja2luZyBkZXRhaWxzLiAgSSB0aGluayB0aGlzIGNhcHR1cmVzIGV2ZXJ5
-dGhpbmcuLi4NCj4gDQo+ICAgVHdlYWsgdGhlIGFzc2VtYmx5IGNvZGUgZm9yIGRldGVjdGluZyBL
-Vk1fVkNQVV9QUkVFTVBURUQgdG8gZnV0dXJlDQo+IHByb29mDQo+ICAgaXQgYWdhaW5zdCBuZXcg
-ZmVhdHVyZXMsIGNvZGUgcmVmYWN0b3JpbmdzLCBhbmQgdGhlb3JldGljYWwgY29tcGlsZXINCj4g
-ICBiZWhhdmlvci4NCj4gDQo+ICAgRXhwbGljaXRseSB0ZXN0IG9ubHkgdGhlIEtWTV9WQ1BVX1BS
-RUVNUFRFRCBmbGFnOyBzdGVhbF90aW1lLnByZWVtcHRlZA0KPiAgIGhhcyBhbHJlYWR5IGJlZW4g
-b3ZlcmxvYWRlZCBvbmNlIGZvciBLVk1fVkNQVV9GTFVTSF9UTEIsIGFuZCBjaGVja2luZw0KPiB0
-aGUNCj4gICBlbnRpcmUgYnl0ZSBmb3IgYSBub24temVybyB2YWx1ZSBjb3VsZCB5aWVsZCBhIGZh
-bHNlIHBvc2l0aXZlLiAgVGhpcw0KPiAgIGN1cnJlbnRseSBpc24ndCBwcm9ibGVtYXRpYyBhcyBQ
-UkVFTVBURUQgYW5kIEZMVVNIX1RMQiBhcmUgbXV0dWFsbHkNCj4gICBleGNsdXNpdmUsIGJ1dCB0
-aGF0IG1heSBub3QgaG9sZCB0cnVlIGZvciBmdXR1cmUgZmxhZ3MuDQo+IA0KPiAgIFVzZSBBTkQg
-aW5zdGVhZCBvZiBURVNUIGZvciBxdWVyeWluZyBQUkVFTVBURUQgdG8gY2xlYXIgUkFYWzYzOjhd
-IGJlZm9yZQ0KPiAgIHJldHVybmluZyB0byBhdm9pZCBhIHBvdGVudGlhbCBmYWxzZSBwb3N0aXZl
-IGluIHRoZSBjYWxsZXIgZHVlIHRvIGxlYXZpbmcNCj4gICB0aGUgYWRkcmVzcyAobm9uLXplcm8g
-dmFsdWUpIGluIHRoZSB1cHBlciBiaXRzLiAgQ29tcGlsZXJzIGFyZSB0ZWNobmljYWxseQ0KPiAg
-IGFsbG93ZWQgdG8gdXNlIG1vcmUgdGhhbiBhIGJ5dGUgZm9yIHN0b3JpbmcgX0Jvb2wsIGFuZCBp
-dCB3b3VsZCBiZSBhbGwgdG9vDQo+ICAgZWFzeSBmb3Igc29tZW9uZSB0byByZWZhY3RvciB0aGUg
-cmV0dXJuIHR5cGUgdG8gc29tZXRoaW5nIGxhcmdlci4NCj4gDQo+ICAgS2VlcCB0aGUgU0VUY2Mg
-KGJ1dCBjaGFuZ2UgaXQgdG8gc2V0bnogZm9yIHNhbml0eSdzIHNha2UpIGFzIHRoZSBmYWN0IHRo
-YXQNCj4gICBLVk1fVkNQVV9QUkVFTVBURUQgaGFwcGVucyB0byBiZSBiaXQgMCwgaS5lLiB0aGUg
-QU5EIHdpbGwgeWllbGQgMC8xIGFzDQo+ICAgbmVlZGVkIGZvciBfQm9vbCwgaXMgcHVyZSBjb2lu
-Y2lkZW5jZS4NCj4gY3B1X2lzX3ByZWVtcHRlZDsiDQoNCg0KU2VhbjoNCg0KQ291bGQgeW91IHJl
-c3VibWl0IHRoaXMgcGF0Y2gsIHRoYW5rcw0KDQotTGkgDQo=
+On Fri, Feb 04, 2022 at 09:35:49AM -0800, Sami Tolvanen wrote:
+> On Wed, Feb 2, 2022 at 10:43 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
+> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
+> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
+> >
+> > Using __static_call_return0() makes clang's CFI sad on arm64 due to the resulting
+> > function prototype mistmatch, which IIUC, is verified by clang's __cfi_check()
+> > for indirect calls, i.e. architectures without CONFIG_HAVE_STATIC_CALL.
+> >
+> > We could fudge around the issue by using stubs, massaging prototypes, etc..., but
+> > that means doing that for every arch-agnostic user of __static_call_return0().
+> >
+> > Any clever ideas?  Can we do something like generate a unique function for every
+> > DEFINE_STATIC_CALL_RET0 for CONFIG_HAVE_STATIC_CALL=n, e.g. using typeof() to
+> > get the prototype?
+> 
+> I'm not sure there's a clever fix for this. On architectures without
+> HAVE_STATIC_CALL, this is an indirect call to a function with a
+> mismatching type, which CFI is intended to catch.
+> 
+> The obvious way to solve the problem would be to use a stub function
+> with the correct type, which I agree, isn't going to scale. You can
+> alternatively check if .func points to __static_call_return0 and not
+> make the indirect call if it does. If neither of these options are
+> feasible, you can disable CFI checking in the functions that have
+> these static calls using the __nocfi attribute.
+
+There's also the tp_stub_func() thing that does basically the same
+thing.
