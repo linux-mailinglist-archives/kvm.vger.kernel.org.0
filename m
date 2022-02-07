@@ -2,152 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E29314ACD01
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 02:07:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57C184ACD0E
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 02:07:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235205AbiBHBFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 20:05:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45938 "EHLO
+        id S235823AbiBHBFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 20:05:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343683AbiBGXsS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 18:48:18 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2DF2C061355
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 15:48:16 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id v4so8611484pjh.2
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 15:48:16 -0800 (PST)
+        with ESMTP id S1343741AbiBGXxb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 18:53:31 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0676C0612A4
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 15:53:30 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id g8so5930748pfq.9
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 15:53:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DmAjZsfccwaVaNtes6EmfPZ2rG4blpFc0pyFaBFNy/c=;
-        b=O48QwLhH9/EyfzfbZFDBuyW7NgAxpUfsKFo77vRIIp/J97PxXdR/Nfj2Q5oBXNcuPo
-         Jf+QknfQrGr7pgD1rVD/n/xLnaeB/v8ecoI8tICXQpFrYlc8ZMljeCsh4aBWr+MUr3+G
-         Z+isaq63CF1Tym+PBdMK6+axq9i8a6odmcOzGYnYQtwotEiike8g+3qsd0ovrJL+iHr9
-         IRWBaGik6wVgAJ2agrzQUCGB/xt89X7wnTl3AQVzdoaewv8FDh3sJaMY7Az0F+paU4cv
-         ZGtrP1Ka76pG+mtfqeJGLgKYnsm2YYJsLXjwUbqakndlRzflCo3MlbsGS63DJb4uRxOi
-         pbXQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Dexw4mp88eho1hqWPLMgXA0V6dq/NOSshXT4P+meRXI=;
+        b=I5tbVd2tNRwEgyv1OaBRfTc0g38c7M8Uvsss+AWjzCTWD7GPF/2/a4fc+2QjbgPw+s
+         zVIC/jUvUMoaybysLG+yUXMp0YXxZxpS73gAIiOKOptsX4M/AJS7xVXvSDaREWoFtK7r
+         S//J2YHVt8vV0k7hhWfB2g9rvTPTmG1RMaTGXSadAV0JQrV4HPNtFG3Ms0KvfoeMiyoT
+         BEVjmOEZvFoQyHEvULInwQL2z5RWYRs//wuIeNnwjpxAkaBaDx0cDRTqnK+7IkAAzjRC
+         alRg+EZmzsHtpYroe8e+vGm4xUB0MB3da2u+YbGfPEXYjQGk1QN1tLvtiCgjUOpQ4H6F
+         FGqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DmAjZsfccwaVaNtes6EmfPZ2rG4blpFc0pyFaBFNy/c=;
-        b=7xdSbLWnqATjXUonZEek6TV87RCN9C7/CeT6j/ySHpt+LA4o4vBCfwUUeisqgV9rYq
-         /qBcSyRYc16ZCJ7inzTIbGHMyOfPOGWNqWm1nRKPJigHii4We9/krONg64gh0qWI+5gd
-         G7f2PvWnbzIxBh+eb1zkLkrjSfyKAQr/Sm6t65RN98aWo6x9lJ3PYhckl7phkqHfeSX2
-         dWcB7U52O1WSSoFUgGXVdTG/FzVDfcyHv5kktNtKPHPXzMwsfMrlqSq7wqRWKVxseUeD
-         jux6n83+yRHTFNcY/ITtxliMcSpoWBo4qJd4BFuXaVm/CPs2p9A+tCgsVoi37m44LG3O
-         wU4w==
-X-Gm-Message-State: AOAM53233aYdo3GeBIeFaEUY+mXl9PyJDjIphZsNh0KkViSP5udfSw4e
-        AHZYA42HJqd0BQR3ul/N+yTtbw==
-X-Google-Smtp-Source: ABdhPJxqxfPIQtuam5GkZBepPAbS7V0Q8IGPcsrc+Vbtsq0AWBZ7iKtmXQsqTlN6H1uGOVjInIYmRw==
-X-Received: by 2002:a17:902:d487:: with SMTP id c7mr2089230plg.0.1644277695967;
-        Mon, 07 Feb 2022 15:48:15 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u18sm13306160pfk.14.2022.02.07.15.48.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 15:48:15 -0800 (PST)
-Date:   Mon, 7 Feb 2022 23:48:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v9 30/43] KVM: SEV: Add documentation for SEV-SNP CPUID
- Enforcement
-Message-ID: <YgGvu1BsYP9cihwh@google.com>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-31-brijesh.singh@amd.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Dexw4mp88eho1hqWPLMgXA0V6dq/NOSshXT4P+meRXI=;
+        b=ASX76PBz78c0gtY2P6sg2QVdIFUzAkWvi0IihA1LkOgLjZI7QYtfehPnSsTExvuWq6
+         fPw+AG/6cb/5yIbnsEURa9EM2yN6Vk3bE8b/zBOI6oPNmxoZUC4Y0iCAvqcN3teFu5na
+         U658hdCJYdgi4tvqYRgst/rMcd0MVTQDn1Wd44WgCOPVq4pd+ytmGR/7FIn8+QeCSHaC
+         OiQpNkXWZLLzpTTPZpCTTZTD+rCvdiLOslwyNRCCNi+HWyDB4SLVAfZd4FsluneesSXd
+         mhC7KnlYjTQ3fBPcRs//9TPIn5LSV4Ou70XEhmxrS0W7YTr3a2QUdQjj9KxRg6uWXm9W
+         IQzw==
+X-Gm-Message-State: AOAM532loDCdDQjwbaRbEJSWDNveaHMa2D5TpqlDzjdvZw4AJqgtW14U
+        QmTPIIc7BJz+QQ67DhPcAZPtAP9x6kxKUjVaQGPJQQ==
+X-Google-Smtp-Source: ABdhPJxWliv+yfnKc0HU0BceLJDPP06+fnjL+v5N68nTmEu4T/ZBxC+x0b5KHflpht3+4et0fqJ5bUl2AlIlOLTNOkk=
+X-Received: by 2002:a65:5943:: with SMTP id g3mr1447475pgu.3.1644278010062;
+ Mon, 07 Feb 2022 15:53:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220128171804.569796-31-brijesh.singh@amd.com>
+References: <20220204115718.14934-1-pbonzini@redhat.com> <YgGmgMMR0dBmjW86@google.com>
+ <YgGq31edopd6RMts@google.com>
+In-Reply-To: <YgGq31edopd6RMts@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 7 Feb 2022 15:53:03 -0800
+Message-ID: <CALzav=d05sMd=ARkV+GMf9SkxKcg9c9n5ttb274M2fZrP27PDA@mail.gmail.com>
+Subject: Re: [PATCH 00/23] KVM: MMU: MMU role refactoring
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 28, 2022, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
-> 
-> Update the documentation with SEV-SNP CPUID enforcement.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  .../virt/kvm/amd-memory-encryption.rst        | 28 +++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-> index 1c6847fff304..0c72f44cc11a 100644
-> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
-> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+On Mon, Feb 7, 2022 at 3:27 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Feb 07, 2022, David Matlack wrote:
+> > On Fri, Feb 04, 2022 at 06:56:55AM -0500, Paolo Bonzini wrote:
+> > > The TDP MMU has a performance regression compared to the legacy
+> > > MMU when CR0 changes often.  This was reported for the grsecurity
+> > > kernel, which uses CR0.WP to implement kernel W^X.  In that case,
+> > > each change to CR0.WP unloads the MMU and causes a lot of unnecessary
+> > > work.  When running nested, this can even cause the L1 to hardly
+> > > make progress, as the L0 hypervisor it is overwhelmed by the amount
+> > > of MMU work that is needed.
+> > >
+> > > The root cause of the issue is that the "MMU role" in KVM is a mess
+> > > that mixes the CPU setup (CR0/CR4/EFER, SMM, guest mode, etc.)
+> > > and the shadow page table format.  Whenever something is different
+> > > between the MMU and the CPU, it is stored as an extra field in struct
+> > > kvm_mmu---and for extra bonus complication, sometimes the same thing
+> > > is stored in both the role and an extra field.
+> > >
+> > > So, this is the "no functional change intended" part of the changes
+> > > required to fix the performance regression.  It separates neatly
+> > > the shadow page table format ("MMU role") from the guest page table
+> > > format ("CPU role"), and removes the duplicate fields.
+> >
+> > What do you think about calling this the guest_role instead of cpu_role?
+> > There is a bit of a precedent for using "guest" instead of "cpu" already
+> > for this type of concept (e.g. guest_walker), and I find it more
+> > intuitive.
+>
+> Haven't looked at the series yet, but I'd prefer not to use guest_role, it's
+> too similar to is_guest_mode() and kvm_mmu_role.guest_mode.  E.g. we'd end up with
+>
+>   static union kvm_mmu_role kvm_calc_guest_role(struct kvm_vcpu *vcpu,
+>                                               const struct kvm_mmu_role_regs *regs)
+>   {
+>         union kvm_mmu_role role = {0};
+>
+>         role.base.access = ACC_ALL;
+>         role.base.smm = is_smm(vcpu);
+>         role.base.guest_mode = is_guest_mode(vcpu);
+>         role.base.direct = !____is_cr0_pg(regs);
+>
+>         ...
+>   }
+>
+> and possibly
+>
+>         if (guest_role.guest_mode)
+>                 ...
+>
+> which would be quite messy.  Maybe vcpu_role if cpu_role isn't intuitive?
 
-This doc is specifically for KVM's host-side implemenation, whereas the below is
-(a) mostly targeted at the guest and (b) has nothing to do with KVM.
+I agree it's a little odd. But actually it's somewhat intuitive (the
+guest is in guest-mode, i.e. we're running a nested guest).
 
-Documentation/x86/amd-memory-encryption.rst isn't a great fit either.
-
-Since TDX will need a fair bit of documentation, and SEV-ES could retroactively
-use docs as well, what about adding a sub-directory:
-
-	Documentation/virt/confidential_compute
-
-to match the "cc_platform_has" stuffr, and then we can add sev.rst and tdx.rst
-there?  Or sev-es.rst, sev-snp.rst, etc... if we want to split things up more.
-
-It might be worth extracting the SEV details from x86/amd-memory-encryption.rst
-into virt/ as well.  A big chunk of that file appears to be SEV specific, and it
-appears to have gotten a little out-of-whack.  E.g. this section no longer makes
-sense as the last paragraph below appears to be talking about SME (bit 23 in MSR
-0xc0010010), but walking back "this bit" would reference SEV.  I suspect a
-mostly-standalone sev.rst would be easier to follow than an intertwined SME+SEV.
-
-  If support for SME is present, MSR 0xc00100010 (MSR_AMD64_SYSCFG) can be used to
-  determine if SME is enabled and/or to enable memory encryption::
-
-          0xc0010010:
-                  Bit[23]   0 = memory encryption features are disabled
-                            1 = memory encryption features are enabled
-
-  If SEV is supported, MSR 0xc0010131 (MSR_AMD64_SEV) can be used to determine if
-  SEV is active::
-
-          0xc0010131:
-                  Bit[0]    0 = memory encryption is not active
-                            1 = memory encryption is active
-
-  Linux relies on BIOS to set this bit if BIOS has determined that the reduction
-  in the physical address space as a result of enabling memory encryption (see
-  CPUID information above) will not conflict with the address space resource
-  requirements for the system.  If this bit is not set upon Linux startup then
-  Linux itself will not set it and memory encryption will not be possible.
+Ok I'm stretching a little bit :). But if the trade-off is just
+"guest_role.guest_mode" requires a clarifying comment, but the rest of
+the code gets more readable (cpu_role is used a lot more than
+role.guest_mode), it still might be worth it.
