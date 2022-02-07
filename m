@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B5C64AC516
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 17:12:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB0BE4AC511
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 17:12:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242326AbiBGQD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 11:03:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36596 "EHLO
+        id S1442422AbiBGQEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 11:04:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377047AbiBGPzF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 10:55:05 -0500
+        with ESMTP id S1378835AbiBGPzM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 10:55:12 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C349EC0401DC
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 07:55:04 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 151D8C0401CF
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 07:55:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644249303;
+        s=mimecast20190719; t=1644249311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ckLuH3eXQt4Wu9Nzp1D8ksAkv1tHukiQ+KMKFiTtdwY=;
-        b=cIx6hvdW99GeleJU4jRK3RUHgV40wH49QCk2UgtyVVxMq7fkD+K5V9JcxmG1r6jcYVKWXm
-        h72qR6Uim788LQWPXDR/cCOy9iohJUdxq1+plDA3TTh1iSQAavw3LnQOSFiocbajLhCulu
-        eCqL8sWlE5+biPjldKlyHuETyp9qw7Y=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EQ3ltiA1zD8GMi+gBPOuvalM+7bzpftE5TYI4/s1Kfw=;
+        b=asbIsE73BWKAuEWfASPwQhe8QdYbJJ++4CYIWqnGS6bT6nEUyJ6yQWuG2+L7CQIYntP2xC
+        tWhVPACuqoFxbe/HxL9fGSIP1H+lOsUYO0NYX6atHVE1o3+lFD9HPNsjQVB6mDq+eWryKT
+        gK/rwuH+DKekm0S/lGuxFo5m5UQ61LE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-277-3oJzETgWM123BYxoIWYJeQ-1; Mon, 07 Feb 2022 10:55:00 -0500
-X-MC-Unique: 3oJzETgWM123BYxoIWYJeQ-1
+ us-mta-361-6tc-WsGFNY-HT2UZY1tsFQ-1; Mon, 07 Feb 2022 10:55:08 -0500
+X-MC-Unique: 6tc-WsGFNY-HT2UZY1tsFQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAE56100C609;
-        Mon,  7 Feb 2022 15:54:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8E0593923;
+        Mon,  7 Feb 2022 15:55:04 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 182D87DE5F;
-        Mon,  7 Feb 2022 15:54:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4DE7E7DE5F;
+        Mon,  7 Feb 2022 15:54:57 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Tony Luck <tony.luck@intel.com>,
@@ -63,17 +64,18 @@ Cc:     Tony Luck <tony.luck@intel.com>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Kan Liang <kan.liang@linux.intel.com>,
         Jani Nikula <jani.nikula@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH RESEND 00/30] My patch queue
-Date:   Mon,  7 Feb 2022 17:54:17 +0200
-Message-Id: <20220207155447.840194-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+        Maxim Levitsky <mlevitsk@redhat.com>, stable@vger.kernel.org
+Subject: [PATCH RESEND 01/30] KVM: x86: SVM: don't passthrough SMAP/SMEP/PKE bits in !NPT && !gCR0.PG case
+Date:   Mon,  7 Feb 2022 17:54:18 +0200
+Message-Id: <20220207155447.840194-2-mlevitsk@redhat.com>
+In-Reply-To: <20220207155447.840194-1-mlevitsk@redhat.com>
+References: <20220207155447.840194-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,88 +83,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is set of various patches that are stuck in my patch queue.=0D
-=0D
-KVM_REQ_GET_NESTED_STATE_PAGES patch is mostly RFC, but it does seem=0D
-to work for me.=0D
-=0D
-Read-only APIC ID is also somewhat RFC.=0D
-=0D
-Some of these patches are preparation for support for nested AVIC=0D
-which I almost done developing, and will start testing very soon.=0D
-=0D
-Resend with cleaned up CCs.=0D
-=0D
-Best regards,=0D
-	Maxim Levitsky=0D
-=0D
-Maxim Levitsky (30):=0D
-  KVM: x86: SVM: don't passthrough SMAP/SMEP/PKE bits in !NPT &&=0D
-    !gCR0.PG case=0D
-  KVM: x86: nSVM: fix potential NULL derefernce on nested migration=0D
-  KVM: x86: nSVM: mark vmcb01 as dirty when restoring SMM saved state=0D
-  KVM: x86: nSVM/nVMX: set nested_run_pending on VM entry which is a=0D
-    result of RSM=0D
-  KVM: x86: nSVM: expose clean bit support to the guest=0D
-  KVM: x86: mark syntethic SMM vmexit as SVM_EXIT_SW=0D
-  KVM: x86: nSVM: deal with L1 hypervisor that intercepts interrupts but=0D
-    lets L2 control them=0D
-  KVM: x86: lapic: don't touch irr_pending in kvm_apic_update_apicv when=0D
-    inhibiting it=0D
-  KVM: x86: SVM: move avic definitions from AMD's spec to svm.h=0D
-  KVM: x86: SVM: fix race between interrupt delivery and AVIC inhibition=0D
-  KVM: x86: SVM: use vmcb01 in avic_init_vmcb=0D
-  KVM: x86: SVM: allow AVIC to co-exist with a nested guest running=0D
-  KVM: x86: lapic: don't allow to change APIC ID when apic acceleration=0D
-    is enabled=0D
-  KVM: x86: lapic: don't allow to change local apic id when using older=0D
-    x2apic api=0D
-  KVM: x86: SVM: remove avic's broken code that updated APIC ID=0D
-  KVM: x86: SVM: allow to force AVIC to be enabled=0D
-  KVM: x86: mmu: trace kvm_mmu_set_spte after the new SPTE was set=0D
-  KVM: x86: mmu: add strict mmu mode=0D
-  KVM: x86: mmu: add gfn_in_memslot helper=0D
-  KVM: x86: mmu: allow to enable write tracking externally=0D
-  x86: KVMGT: use kvm_page_track_write_tracking_enable=0D
-  KVM: x86: nSVM: correctly virtualize LBR msrs when L2 is running=0D
-  KVM: x86: nSVM: implement nested LBR virtualization=0D
-  KVM: x86: nSVM: implement nested VMLOAD/VMSAVE=0D
-  KVM: x86: nSVM: support PAUSE filter threshold and count when=0D
-    cpu_pm=3Don=0D
-  KVM: x86: nSVM: implement nested vGIF=0D
-  KVM: x86: add force_intercept_exceptions_mask=0D
-  KVM: SVM: implement force_intercept_exceptions_mask=0D
-  KVM: VMX: implement force_intercept_exceptions_mask=0D
-  KVM: x86: get rid of KVM_REQ_GET_NESTED_STATE_PAGES=0D
-=0D
- arch/x86/include/asm/kvm-x86-ops.h    |   1 +=0D
- arch/x86/include/asm/kvm_host.h       |  24 +-=0D
- arch/x86/include/asm/kvm_page_track.h |   1 +=0D
- arch/x86/include/asm/msr-index.h      |   1 +=0D
- arch/x86/include/asm/svm.h            |  36 +++=0D
- arch/x86/include/uapi/asm/kvm.h       |   1 +=0D
- arch/x86/kvm/Kconfig                  |   3 -=0D
- arch/x86/kvm/hyperv.c                 |   4 +=0D
- arch/x86/kvm/lapic.c                  |  53 ++--=0D
- arch/x86/kvm/mmu.h                    |   8 +-=0D
- arch/x86/kvm/mmu/mmu.c                |  31 ++-=0D
- arch/x86/kvm/mmu/page_track.c         |  10 +-=0D
- arch/x86/kvm/svm/avic.c               | 135 +++-------=0D
- arch/x86/kvm/svm/nested.c             | 167 +++++++-----=0D
- arch/x86/kvm/svm/svm.c                | 375 ++++++++++++++++++++++----=0D
- arch/x86/kvm/svm/svm.h                |  60 +++--=0D
- arch/x86/kvm/svm/svm_onhyperv.c       |   1 +=0D
- arch/x86/kvm/vmx/nested.c             | 107 +++-----=0D
- arch/x86/kvm/vmx/vmcs.h               |   6 +=0D
- arch/x86/kvm/vmx/vmx.c                |  48 +++-=0D
- arch/x86/kvm/x86.c                    |  42 ++-=0D
- arch/x86/kvm/x86.h                    |   5 +=0D
- drivers/gpu/drm/i915/Kconfig          |   1 -=0D
- drivers/gpu/drm/i915/gvt/kvmgt.c      |   5 +=0D
- include/linux/kvm_host.h              |  10 +-=0D
- 25 files changed, 764 insertions(+), 371 deletions(-)=0D
-=0D
--- =0D
-2.26.3=0D
-=0D
+When the guest doesn't enable paging, and NPT/EPT is disabled, we
+use guest't paging CR3's as KVM's shadow paging pointer and
+we are technically in direct mode as if we were to use NPT/EPT.
+
+In direct mode we create SPTEs with user mode permissions
+because usually in the direct mode the NPT/EPT doesn't
+need to restrict access based on guest CPL
+(there are MBE/GMET extenstions for that but KVM doesn't use them).
+
+In this special "use guest paging as direct" mode however,
+and if CR4.SMAP/CR4.SMEP are enabled, that will make the CPU
+fault on each access and KVM will enter endless loop of page faults.
+
+Since page protection doesn't have any meaning in !PG case,
+just don't passthrough these bits.
+
+The fix is the same as was done for VMX in commit:
+commit 656ec4a4928a ("KVM: VMX: fix SMEP and SMAP without EPT")
+
+This fixes the boot of windows 10 without NPT for good.
+(Without this patch, BSP boots, but APs were stuck in endless
+loop of page faults, causing the VM boot with 1 CPU)
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: stable@vger.kernel.org
+---
+ arch/x86/kvm/svm/svm.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 975be872cd1a3..995c203a62fd9 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1596,6 +1596,7 @@ void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	u64 hcr0 = cr0;
++	bool old_paging = is_paging(vcpu);
+ 
+ #ifdef CONFIG_X86_64
+ 	if (vcpu->arch.efer & EFER_LME && !vcpu->arch.guest_state_protected) {
+@@ -1612,8 +1613,11 @@ void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ #endif
+ 	vcpu->arch.cr0 = cr0;
+ 
+-	if (!npt_enabled)
++	if (!npt_enabled) {
+ 		hcr0 |= X86_CR0_PG | X86_CR0_WP;
++		if (old_paging != is_paging(vcpu))
++			svm_set_cr4(vcpu, kvm_read_cr4(vcpu));
++	}
+ 
+ 	/*
+ 	 * re-enable caching here because the QEMU bios
+@@ -1657,8 +1661,12 @@ void svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 		svm_flush_tlb_current(vcpu);
+ 
+ 	vcpu->arch.cr4 = cr4;
+-	if (!npt_enabled)
++	if (!npt_enabled) {
+ 		cr4 |= X86_CR4_PAE;
++
++		if (!is_paging(vcpu))
++			cr4 &= ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
++	}
+ 	cr4 |= host_cr4_mce;
+ 	to_svm(vcpu)->vmcb->save.cr4 = cr4;
+ 	vmcb_mark_dirty(to_svm(vcpu)->vmcb, VMCB_CR);
+-- 
+2.26.3
 
