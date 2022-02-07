@@ -2,126 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D33114AC809
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 18:59:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01B664AC82D
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 19:03:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343907AbiBGR5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 12:57:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35448 "EHLO
+        id S242367AbiBGSDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 13:03:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344640AbiBGRwj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 12:52:39 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8CDC0401D9;
-        Mon,  7 Feb 2022 09:52:38 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4E7441EC01B7;
-        Mon,  7 Feb 2022 18:52:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1644256353;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=lj3M3QiQvXsBo94U4HlpV/D8C0ht7/jERvq5KAmCCTE=;
-        b=RBq8vE9Qzf2e+zlbZGA9DQP1MUr9EquOtpBPB/LIb0VrV3MWGw859eIXsOAguuxr3oh7RX
-        U+x/86JIZYerfBFoHjXGrzDqFJkJjKFYyQNGp9K5+LbWwdAqD0zvAhQGdLHiWxNfs5V7of
-        2pBZkpWHSDm+IkFL22w6dVHUxpVgwnk=
-Date:   Mon, 7 Feb 2022 18:52:28 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S238963AbiBGR4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 12:56:42 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92123C0401DA
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 09:56:42 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id g8so4425009pfq.9
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 09:56:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ETIFP07SP/TaaaC7o85g2t9HzBYeDg4pndm8e/jG5Lo=;
+        b=J6KNvjnq6cF3QqdIwkXT1M8ORFE/6WpxZMR4p7GrgA3uRjJmxjGoiRIilv8usw+tfL
+         Idr8aJ6MfwrAo9sQfHCLeBjfJZxyUJsj0USeAqtsJW23T97qdBpNqVufVSqxk4iiKa/l
+         R3yTuUKXrwc0rGxdNvlkawPS1XsekdKNnWzdhlXI5/u8hg2ZgOFRRu44/x8X12Ys87FL
+         yoJueBvGKpKADn5dVu99CeOql3E3d+Mok7IM6zryf3HxTcxVuPO3HI2WMBknlSVc19cy
+         a4U700wg4oW3p87RVx56DYzqxhrCIb7Kbh8iiVhXmR9ABeYWFBJ/B262OGAAm7PCccfF
+         caUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ETIFP07SP/TaaaC7o85g2t9HzBYeDg4pndm8e/jG5Lo=;
+        b=mxTbi7as+j30SjxC/k6YwsVyMuL/DRA8vXbY6zoW/DlcV7zlPYL8QNbPsCvbU4WCda
+         HYCGQ8mq2yONg+VMXaZ50QeuyE+rkcklolYzBN5cW0zcgd89QSJKhyOI3s/nX3cObGRa
+         qqYDVbQzW5gqd4lhFeTzfQX3QNtEdkKMsGXjHCSNOgL1Z/04efPvfQdFolxVvRcLzcPU
+         cYd3facCfoO/qWGOtkWcWmKxeG1R2XixsRz4OCuWrjoL6H1C7+p6nsdePioLPaiA+ghJ
+         efMUf3tG0K8LArymqFJmFPa3fa97WaTCTReIXnO/EMB3+ptRHBe9pWi1jEYTJ5LqVrhQ
+         gIFQ==
+X-Gm-Message-State: AOAM530GIMJAwikU/Uw+CwNJuPJVER89rrZr05lJGm4DbtZGq09ug4xc
+        nt1abMIuKZPBKq72QU2IAnIiTg==
+X-Google-Smtp-Source: ABdhPJw9zTj9wjitrb8gyyv5HkXnddCKMH3UK+X2OD+zcTDWnh5bLZ6rJTnIEpRpHMzh+aM85Q0Baw==
+X-Received: by 2002:a05:6a00:14c9:: with SMTP id w9mr509546pfu.69.1644256601964;
+        Mon, 07 Feb 2022 09:56:41 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d15sm12378076pfu.127.2022.02.07.09.56.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Feb 2022 09:56:41 -0800 (PST)
+Date:   Mon, 7 Feb 2022 17:56:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kernel test robot <lkp@intel.com>, kvm@vger.kernel.org,
+        kbuild-all@lists.01.org, Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com
-Subject: Re: [PATCH v9 31/43] x86/compressed/64: Add support for SEV-SNP
- CPUID table in #VC handlers
-Message-ID: <YgFcXMEvWs9xGTPF@zn.tnic>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-32-brijesh.singh@amd.com>
- <Yf5XScto3mDXnl9u@zn.tnic>
- <20220205162249.4dkttihw6my7iha3@amd.com>
- <Yf/PN8rBy3m5seU9@zn.tnic>
- <20220207153739.p63sa5tcaxtdx2wn@amd.com>
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH v2 3/7] KVM: nVMX: Roll all entry/exit ctl updates into a
+ single helper
+Message-ID: <YgFdVivGFRjXVOfo@google.com>
+References: <20220204204705.3538240-4-oupton@google.com>
+ <202202051529.y26BVBiF-lkp@intel.com>
+ <CAOQ_QsgWzfe-2-d709NFycJ_CpeBGR3Up4f9ORFseUCWMB=_UQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220207153739.p63sa5tcaxtdx2wn@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CAOQ_QsgWzfe-2-d709NFycJ_CpeBGR3Up4f9ORFseUCWMB=_UQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 07, 2022 at 09:37:39AM -0600, Michael Roth wrote:
-> Absolutely, I know a thorough review is grueling work, and would never
-> want to give the impression that I don't appreciate it. Was just hoping
-> to revisit these in the context of v9 since there were some concerning
-> things in flight WRT the spec handling and I was sort of focused on
-> getting ahead of those in case they involved firmware/spec changes. But
-> I realize that's resulted in a waste of your time and I should have at
-> least provided some indication of where I was with these before your
-> review. Won't happen again.
-
-Thanks, that's appreciated.
-
-And in case you're wondering, the kernel is the most flexible thing from
-all parties involved so even if you have to change the spec/fw, fixing
-the kernel is a lot easier than any of the other things. So make sure
-you do a good job with the spec/fw - the kernel will be fine. :-)
-
-> Ok, will work this in for v10. My plan is to introduce this struct:
+On Sat, Feb 05, 2022, Oliver Upton wrote:
+> On Fri, Feb 4, 2022 at 11:44 PM kernel test robot <lkp@intel.com> wrote:
+> > >> ERROR: modpost: "kvm_pmu_is_valid_msr" [arch/x86/kvm/kvm-intel.ko] undefined!
 > 
->   struct cpuid_leaf {
->       u32 fn;
->       u32 subfn;
->       u32 eax;
->       u32 ebx;
->       u32 ecx;
->       u32 edx;
->   }
-
-Ok.
-
-> as part of the patch which introduces sev_cpuid_hv():
+> Argh... Local tooling defaults to building KVM nonmodular so I missed this.
 > 
->   x86/sev: Move MSR-based VMGEXITs for CPUID to helper
+> Squashing the following in fixes the issue.
 > 
-> and then utilize that for the function parameters there, here, and any
-> other patches in the SNP code involved with fetching/manipulating cpuid
-> values before returning them to the #VC handler.
+> --
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index f614f95acc6b..18430547357d 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -396,6 +396,7 @@ bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>         return kvm_x86_ops.pmu_ops->msr_idx_to_pmc(vcpu, msr) ||
+>                 kvm_x86_ops.pmu_ops->is_valid_msr(vcpu, msr);
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_pmu_is_valid_msr);
 
-Sounds good.
+I'd much prefer to avoid this mess entirely.
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+[*] https://lore.kernel.org/all/20220128005208.4008533-9-seanjc@google.com
