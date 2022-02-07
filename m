@@ -2,99 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A04E34ACB64
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 22:39:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28EE74ACB9F
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 22:50:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240054AbiBGVjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 16:39:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55836 "EHLO
+        id S242966AbiBGVuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 16:50:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233647AbiBGVjR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 16:39:17 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0379C061355
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 13:39:16 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id u7so20091210lji.2
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 13:39:16 -0800 (PST)
+        with ESMTP id S242794AbiBGVuw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 16:50:52 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC116C043180
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 13:50:51 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id z19so29492616lfq.13
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 13:50:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=vj6d/kwNaVMSCvSwpd8SPBJUndIKEEtw3knv973Syso=;
-        b=QLnMWcre93OaJiLYldJtRWqs2HqybqunwmgEVs9I1LEXcGSlxFfOOYSD8R+pgn8LzV
-         V0gKqY0KcpXwQtfSgixPE9BEMFzu5WvYt0mYyrHYovLoKR5602RjdEDihU19rhcyd7C3
-         AcdnkuZanaPMEKCB3W+uoqUiZGd6cky9h2g7u3eFAAPLXDsUPrBd83uAgO/hiQsTMEzp
-         DhIqYvPNyAVtE+uAlCeqrA0CQO2vBKEhYX8lm9tfVQ82Gn2cqT+L7TRIsTMxLZw8iKcy
-         lJ2uFxMn2WKp2IP26br3cl4XwvsUkltNyCI63Xw1ONA10o9bljxMTrIFehgf6XpxExd1
-         KvKA==
+        bh=/ijq+SQEgOasCfrLHlBKCHwbcT+Y/IDNSQSnjTzRzSw=;
+        b=jBN9y7BxHTFMA+5Hqs8ZS/igmyf6qQbVUnCCODRSEUwBrCSjqqILU4uh0PypgUtLG5
+         O3bWTHyLGe7Ieqhbz9i1Xo+qNhh1Qm/jo9yFkRJvD/JCdrGdi9OpOqa23Pt5qs0rs+Qu
+         cn4VhJQK6in+29yAAMojj2zm6a8nagBBoYCFbMRWxe7gGPuo7pUPPm2vJXdW6Pvh78Id
+         D8ii/aNPzRzYxtROLqAlop6M4oW3n4+w99D9I08On+CJ2nM330kJWT+349yK4LVjmQfk
+         HXNxCDZpTW98l2JBY4bzgGrMEZH3KBAmbaDZdTOhxYAcum8xSmbtJbyawind7qxDE+sh
+         dujQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=vj6d/kwNaVMSCvSwpd8SPBJUndIKEEtw3knv973Syso=;
-        b=zrNVJgYKGzxauxqA1KTS/ur1fZ5Qb6qLEI15mf0kMSNMjD7/IvbTe9GNIMtoPf5SiZ
-         Du01ztCkDRF8OyO6F+jJrWOoyGfIsb2oCj7CO3MvsXKGlTKt/IoxTHMArxPbNSd1PI+z
-         f7Q60x2psagRMLwM7LuaBM1UaLryqWrjXpq0B2SfAUFyfav4vDVVMEdEs7lk+l1/6pjW
-         w+DnF+lN2scKFsIeeo4WsB3ukm+TQrD69xK3d6GUxe4MkqUkk8hP1ZJHUCoFme1EuQGo
-         ssBNygOw4rVxLW0KCQubrXscjbB1MbQt+c0NDevIuPbazauOf+Fb7atWAmMGg3zMcKtj
-         dpsw==
-X-Gm-Message-State: AOAM5318OEbMERKYSeMjyUNh8DdMFDpNbbF0AH9tdToTjnsGSmlO/jeo
-        rMcpUIBg6wrzwkCuxw2ZeLtb0lO1OUcK8iOxad/dyA==
-X-Google-Smtp-Source: ABdhPJxpaN+DjDrQNevmZdtABjjWGyCfImugc0tOdbHZyCwxssDdoL1MLAkcOTkaKWhmMHuCPTTbz0JbyN05FdyYVSI=
-X-Received: by 2002:a2e:a5cb:: with SMTP id n11mr845559ljp.361.1644269954862;
- Mon, 07 Feb 2022 13:39:14 -0800 (PST)
+        bh=/ijq+SQEgOasCfrLHlBKCHwbcT+Y/IDNSQSnjTzRzSw=;
+        b=8Fnn11ovsxeFR56vnxw07nzEOiF2tnKIWEX5YGJMjmvHyOMB0ISwp6Hu8cUs/h7z0O
+         6IiM3DFGRpDHaR1nYuUNGZjUaBQLXBNgYX3zOciTa3F4SOE5PN89T7I/YLL23O2cFQBe
+         xkmumyzg/gZUf+g50ryYIhTY+r/iADJQHAu1fccEoo2UFiKCMIx57A4mEXvFuFBGWxHz
+         xq9EbnD9bMyKAOCNgChQJDzpFiQZjsSkskgYtzqcFegrdnFo6OpCxtJ/E2qJFfE6JWaK
+         ncLrvJYeo5zQMV9jaj4wYgDOfPfClhHZZ0DJKk88He9AoGDNQ7LTPsuQ3SbjZ0YheQvx
+         lyMw==
+X-Gm-Message-State: AOAM533q9jYHmD+BUnAS8ixIZw1sr1N8NrXIu3oLAuryh0oTYNWyeIDK
+        UFzW9WnohEi0qXqZIpEnE2NceyA0iLCyaQubtR+VZ1/kZrc=
+X-Google-Smtp-Source: ABdhPJyyZyHGsx4zvOcYNokXStjUvR2p9IAVvxbSkLJKLHP62dNiRzw/RBz/mCHZp8HaItYXhfmeNONlNnlJXKM7rQ4=
+X-Received: by 2002:ac2:58c7:: with SMTP id u7mr999449lfo.518.1644270649934;
+ Mon, 07 Feb 2022 13:50:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20220204115718.14934-1-pbonzini@redhat.com> <20220204115718.14934-11-pbonzini@redhat.com>
- <Yf2hRltaM1Ezd6SM@google.com> <04e568ee-8e44-dabe-2cc3-94b9c95287e1@redhat.com>
-In-Reply-To: <04e568ee-8e44-dabe-2cc3-94b9c95287e1@redhat.com>
+References: <20220204115718.14934-1-pbonzini@redhat.com> <20220204115718.14934-2-pbonzini@redhat.com>
+ <Yf1pk1EEBXj0O0/p@google.com> <8081cbe5-6d12-9f99-9f0f-13c1d7617647@redhat.com>
+ <YgFEVr9NM1vXdexg@google.com>
+In-Reply-To: <YgFEVr9NM1vXdexg@google.com>
 From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 7 Feb 2022 13:38:48 -0800
-Message-ID: <CALzav=eTgXJaVhrtT4SUNVvXW=WLQNHquvNNG2s6rh+_cGh+3w@mail.gmail.com>
-Subject: Re: [PATCH 10/23] KVM: MMU: split cpu_role from mmu_role
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+Date:   Mon, 7 Feb 2022 13:50:23 -0800
+Message-ID: <CALzav=c9GzV3To=tjU2sdCmkzh7WLK+i+W5pUjtfZsnkcg1dcQ@mail.gmail.com>
+Subject: Re: [PATCH 01/23] KVM: MMU: pass uses_nx directly to reset_shadow_zero_bits_mask
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 5, 2022 at 6:49 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, Feb 7, 2022 at 8:10 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On 2/4/22 22:57, David Matlack wrote:
-> >> +    vcpu->arch.root_mmu.cpu_role.base.level = 0;
-> >> +    vcpu->arch.guest_mmu.cpu_role.base.level = 0;
-> >> +    vcpu->arch.nested_mmu.cpu_role.base.level = 0;
-> > Will cpu_role.base.level already be 0 if CR0.PG=0 && !tdp_enabled? i.e.
-> > setting cpu_role.base.level to 0 might not have the desired effect.
+> On Sat, Feb 05, 2022, Paolo Bonzini wrote:
+> > On 2/4/22 18:59, David Matlack wrote:
+> > > > + reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
+> > >
+> > > Out of curiousity, how does KVM mitigate iTLB multi-hit when shadowing
+> > > NPT and the guest has not enabled EFER.NX?
 > >
-> > It might not matter in practice since the shadow_mmu_init_context() and
-> > kvm_calc_mmu_role_common() check both the mmu_role and cpu_role, but does
-> > make this reset code confusing.
-> >
+> > You got me worried for a second but iTLB multihit is Intel-only, isn't it?
 >
-> Good point.  The (still unrealized) purpose of this series is to be able
-> to check mmu_role only, so for now I'll just keep the valid bit in the
-> ext part of the cpu_role.  The mmu_role's level however is never zero,
-> so I can already use the level when I remove the ext part from the mmu_role.
+> AFAIK, yes, big Core only.  arch/x86/kernel/cpu/common.c sets NO_ITLB_MULTIHIT
+> for all AMD, Hygon, and Atom CPUs.
 
-Agreed.
-
->
-> I'll remove the valid bit of the ext part only after the cpu_role check
-> is removed, because then it can trivially go.
-
-Ok sounds good.
-
->
-> Paolo
->
+Ah that's right, it's Intel-only. Thanks!
