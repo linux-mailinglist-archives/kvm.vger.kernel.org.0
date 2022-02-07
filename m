@@ -2,225 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8AFE4ABF96
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 14:28:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E0BF4ABF94
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 14:27:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238566AbiBGN1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 08:27:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48206 "EHLO
+        id S243859AbiBGN0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 08:26:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1445601AbiBGMmT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 07:42:19 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7170CE033DB9;
-        Mon,  7 Feb 2022 04:34:00 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 9B67F1F390;
-        Mon,  7 Feb 2022 12:24:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1644236683; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ua1slhO3tu08xV7nWywNOiJcEeO08Yt5cZK027Ezf3k=;
-        b=nqOMyxSjLMJbw6hGT7aanNF6FeXa6FgYOuO77ErGEuJACVK/WzQrAuxx4D21488QVNhJuX
-        M+sLFDEPq88gwTDe26b9nVE+8dD+rccnKtBCMorKDcqUMR/hUGcHCEQDFi9AQT2nbVRY6T
-        L9BFC+P98Kw1UD74kp27KbhpGlpRgMg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1644236683;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ua1slhO3tu08xV7nWywNOiJcEeO08Yt5cZK027Ezf3k=;
-        b=Ig+IalBCscALNaeSnDxlQzpZStR+QTv+QgbHxgBVrWcg56NLco/bfe/fTeu43aME0FqSGV
-        EH9EbjksryG48uCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 239E113BBC;
-        Mon,  7 Feb 2022 12:24:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id K8/ABosPAWKEfgAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Mon, 07 Feb 2022 12:24:43 +0000
-Message-ID: <64407833-1387-0c46-c569-8b6a3db8e88c@suse.cz>
-Date:   Mon, 7 Feb 2022 13:24:42 +0100
+        with ESMTP id S1353403AbiBGNFN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 08:05:13 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D7D8C0401D2;
+        Mon,  7 Feb 2022 05:05:04 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 217BaCje024832;
+        Mon, 7 Feb 2022 13:05:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9reA5PYbVXOY4Il5UEVRVO7g9nR9yFNlpSR7fCxMI7U=;
+ b=c7fc1zI8s5tgeRjQ+Bs+S+Ljfm81Ugmc7cOspG4a9lysRqflAbYKIXj7tdKrQ/zMPnXe
+ tGelKktw0wevQo43+T2T0+FrQe1z4ZJWDdjYSLCvQM89Qwq5tJsuPeZ6KPgf6GxHJEkk
+ tRMKEt34xc4r9N5HdEaONmduwt+ia98q/h0XmfwG2LaHKJhpac7K4sf7KtmMluNtKLmu
+ wwv9oKAEdHQ84sTXrR+p+E7VSKnh1GE2+srgTCqLKqZMolPh0FcGvjgh0RpOrwlnx1Vx
+ fUnP/6w7QzBVUdZ+QDR/FVwwTFoqytNKGpWxD7nbsXo30QmWTCvntlMkXoLYTe4QRKPg ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e22tqkxgg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Feb 2022 13:05:03 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 217D0Hkl012466;
+        Mon, 7 Feb 2022 13:05:03 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e22tqkxfm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Feb 2022 13:05:03 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 217CwHxL012846;
+        Mon, 7 Feb 2022 13:05:00 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3e1gv8vkbh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Feb 2022 13:05:00 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 217D4u7s30867896
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Feb 2022 13:04:56 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 81EC1A4070;
+        Mon,  7 Feb 2022 13:04:56 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94252A406D;
+        Mon,  7 Feb 2022 13:04:55 +0000 (GMT)
+Received: from [9.171.90.80] (unknown [9.171.90.80])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Feb 2022 13:04:55 +0000 (GMT)
+Message-ID: <9a186055-2637-0113-18be-ab08b5db1c74@linux.ibm.com>
+Date:   Mon, 7 Feb 2022 14:04:55 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 30/30] MAINTAINERS: additional files related kvm s390
+ pci passthrough
 Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <20220118132121.31388-2-chao.p.peng@linux.intel.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH v4 01/12] mm/shmem: Introduce F_SEAL_INACCESSIBLE
-In-Reply-To: <20220118132121.31388-2-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
+ <20220204211536.321475-31-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220204211536.321475-31-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: URjhQ3veZQwwF_Mw6-Jw4d08Ttlhjew-
+X-Proofpoint-GUID: BdCsKKWGCe2pWYq6U14wyGqQzTRWGCp9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-07_05,2022-02-07_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 phishscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 priorityscore=1501 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202070085
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/18/22 14:21, Chao Peng wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+
+
+Am 04.02.22 um 22:15 schrieb Matthew Rosato:
+> Add entries from the s390 kvm subdirectory related to pci passthrough.
 > 
-> Introduce a new seal F_SEAL_INACCESSIBLE indicating the content of
-> the file is inaccessible from userspace through ordinary MMU access
-> (e.g., read/write/mmap). However, the file content can be accessed
-> via a different mechanism (e.g. KVM MMU) indirectly.
-> 
-> It provides semantics required for KVM guest private memory support
-> that a file descriptor with this seal set is going to be used as the
-> source of guest memory in confidential computing environments such
-> as Intel TDX/AMD SEV but may not be accessible from host userspace.
-> 
-> At this time only shmem implements this seal.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+
+Can you change that to  borntraeger@linux.ibm.com ?
+
+
+
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 > ---
->  include/uapi/linux/fcntl.h |  1 +
->  mm/shmem.c                 | 40 ++++++++++++++++++++++++++++++++++++--
->  2 files changed, 39 insertions(+), 2 deletions(-)
+>   MAINTAINERS | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-> index 2f86b2ad6d7e..09ef34754dfa 100644
-> --- a/include/uapi/linux/fcntl.h
-> +++ b/include/uapi/linux/fcntl.h
-> @@ -43,6 +43,7 @@
->  #define F_SEAL_GROW	0x0004	/* prevent file from growing */
->  #define F_SEAL_WRITE	0x0008	/* prevent writes */
->  #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
-> +#define F_SEAL_INACCESSIBLE	0x0020  /* prevent ordinary MMU access (e.g. read/write/mmap) to file content */
->  /* (1U << 31) is reserved for signed error codes */
->  
->  /*
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index 18f93c2d68f1..72185630e7c4 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -1098,6 +1098,13 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
->  		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
->  			return -EPERM;
->  
-> +		if (info->seals & F_SEAL_INACCESSIBLE) {
-> +			if(i_size_read(inode))
-
-Is this needed? The rest of the function seems to trust oldsize obtained by
-plain reading inode->i_size well enough, so why be suddenly paranoid here?
-
-> +				return -EPERM;
-> +			if (newsize & ~PAGE_MASK)
-> +				return -EINVAL;
-> +		}
-> +
->  		if (newsize != oldsize) {
->  			error = shmem_reacct_size(SHMEM_I(inode)->flags,
->  					oldsize, newsize);
-> @@ -1364,6 +1371,8 @@ static int shmem_writepage(struct page *page, struct writeback_control *wbc)
->  		goto redirty;
->  	if (!total_swap_pages)
->  		goto redirty;
-> +	if (info->seals & F_SEAL_INACCESSIBLE)
-> +		goto redirty;
->  
->  	/*
->  	 * Our capabilities prevent regular writeback or sync from ever calling
-> @@ -2262,6 +2271,9 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
->  	if (ret)
->  		return ret;
->  
-> +	if (info->seals & F_SEAL_INACCESSIBLE)
-> +		return -EPERM;
-> +
->  	/* arm64 - allow memory tagging on RAM-based files */
->  	vma->vm_flags |= VM_MTE_ALLOWED;
->  
-> @@ -2459,12 +2471,15 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
->  	pgoff_t index = pos >> PAGE_SHIFT;
->  
->  	/* i_rwsem is held by caller */
-> -	if (unlikely(info->seals & (F_SEAL_GROW |
-> -				   F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))) {
-> +	if (unlikely(info->seals & (F_SEAL_GROW | F_SEAL_WRITE |
-> +				    F_SEAL_FUTURE_WRITE |
-> +				    F_SEAL_INACCESSIBLE))) {
->  		if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))
->  			return -EPERM;
->  		if ((info->seals & F_SEAL_GROW) && pos + len > inode->i_size)
->  			return -EPERM;
-> +		if (info->seals & F_SEAL_INACCESSIBLE)
-> +			return -EPERM;
->  	}
->  
->  	return shmem_getpage(inode, index, pagep, SGP_WRITE);
-> @@ -2538,6 +2553,21 @@ static ssize_t shmem_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
->  		end_index = i_size >> PAGE_SHIFT;
->  		if (index > end_index)
->  			break;
-> +
-> +		/*
-> +		 * inode_lock protects setting up seals as well as write to
-> +		 * i_size. Setting F_SEAL_INACCESSIBLE only allowed with
-> +		 * i_size == 0.
-> +		 *
-> +		 * Check F_SEAL_INACCESSIBLE after i_size. It effectively
-> +		 * serialize read vs. setting F_SEAL_INACCESSIBLE without
-> +		 * taking inode_lock in read path.
-> +		 */
-> +		if (SHMEM_I(inode)->seals & F_SEAL_INACCESSIBLE) {
-> +			error = -EPERM;
-> +			break;
-> +		}
-> +
->  		if (index == end_index) {
->  			nr = i_size & ~PAGE_MASK;
->  			if (nr <= offset)
-> @@ -2663,6 +2693,12 @@ static long shmem_fallocate(struct file *file, int mode, loff_t offset,
->  			goto out;
->  		}
->  
-> +		if ((info->seals & F_SEAL_INACCESSIBLE) &&
-> +		    (offset & ~PAGE_MASK || len & ~PAGE_MASK)) {
-
-Could we use PAGE_ALIGNED()?
-
-> +			error = -EINVAL;
-> +			goto out;
-> +		}
-> +
->  		shmem_falloc.waitq = &shmem_falloc_waitq;
->  		shmem_falloc.start = (u64)unmap_start >> PAGE_SHIFT;
->  		shmem_falloc.next = (unmap_end + 1) >> PAGE_SHIFT;
-
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index bb83dcbcb619..2762295ad85e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16900,6 +16900,8 @@ M:	Eric Farman <farman@linux.ibm.com>
+>   L:	linux-s390@vger.kernel.org
+>   L:	kvm@vger.kernel.org
+>   S:	Supported
+> +F:	arch/s390/include/asm/kvm_pci.h
+> +F:	arch/s390/kvm/pci*
+>   F:	drivers/vfio/pci/vfio_pci_zdev.c
+>   F:	include/uapi/linux/vfio_zdev.h
+>   
