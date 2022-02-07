@@ -2,149 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01EC44AC58A
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 17:30:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E2934AC65C
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 17:46:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346347AbiBGQ3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 11:29:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59878 "EHLO
+        id S237098AbiBGQoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 11:44:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1389593AbiBGQXn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 11:23:43 -0500
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam07on2076.outbound.protection.outlook.com [40.107.95.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CBCC0401CE;
-        Mon,  7 Feb 2022 08:23:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y8jMgFVifa0kLnOawb32rIA7mlg40HVuhdK4eIsBDfoheWGAwpiSIWxzFw3433Cok0AgLPabvLZvUXss5VeYUyBRmFQRPZyMC+ZdruCcOtase6q8sDIcJnmz8YKXYSDtdWQ6ECcqoXvOjwUn4Pq0iq0LiRpFBplb1We3SfjU6+SWsuFKYpUJUX1rSZyawgTSh5lo2r2a+mmYjlVIwEoC9RqLsogxFiFZJnlhJWDBoMEZnnuKstergW0pRWft10w7PSLFd6nfKM3eTRYNvfyCRcUrkdI+bBDXf+4YppzGzaUKiVDXaPxpFkcP0OvrKL0HcYypu6p1crw3pD0uFQpVSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=18Bk4b4SeaNbBpY5MVEtVCTcNBaCeCf1RZEApjr7YkY=;
- b=HUwKtG5l4SYLCgIc3W7DD3BQLpmVpN9dm1n3r435j+M7fPJjv3TiqnAMYm8AeXbbgBArddQNh8amuhoJJC8BLY6WwlmNyQcBvBBCX2zbDST4MbHRzduB1lyNSnow/NGCeNcfqNpXi7yQqyBEUhSPe/l85pwy0/0ejAXAsKpDXH/Sijd45AN7qaOdHNiX0W10rXzOhHdoIYx67cK55rh7JO3XdNoHmEvDaBA9NWucqs294uFuhnsVgIlxsjD3Pe+9lHzz/lSk8a2ZU3nH9Q2YHYbeJeFY3kyagMSTqqEiZrNPznvQSwltvf6/4wN63yiJB3W8nNYPRCrY6oimGfcNPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=18Bk4b4SeaNbBpY5MVEtVCTcNBaCeCf1RZEApjr7YkY=;
- b=2eYr1ArAqB0DbzigafK8JafoV8q2DlEKGWVdtGmMYEMSc7ZBmyWwFJjS+AyHe2ZVftyAJ9N2l688sCDtObMutdiU5aqFMcZtxtSvV4lK3M2bkFlcIf1ULBgyQx5dbSV9RezVhO+FGcQn6u+wTIKVRsXEFwU/1bbYPvZbAWRJsNE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by BN7PR12MB2787.namprd12.prod.outlook.com (2603:10b6:408:2b::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Mon, 7 Feb
- 2022 16:23:40 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::500e:b264:8e8c:1817]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::500e:b264:8e8c:1817%5]) with mapi id 15.20.4951.018; Mon, 7 Feb 2022
- 16:23:40 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        Liam Merwick <liam.merwick@oracle.com>
-Subject: Re: [PATCH v9 42/43] virt: sevguest: Add support to derive key
-To:     Borislav Petkov <bp@alien8.de>
-References: <20220128171804.569796-1-brijesh.singh@amd.com>
- <20220128171804.569796-43-brijesh.singh@amd.com> <YgDduR0mrptX5arB@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <1cb4fdf5-7c1e-6c8f-1db6-8c976d6437c2@amd.com>
-Date:   Mon, 7 Feb 2022 10:23:35 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-In-Reply-To: <YgDduR0mrptX5arB@zn.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR14CA0026.namprd14.prod.outlook.com
- (2603:10b6:208:23e::31) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        with ESMTP id S1387762AbiBGQdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 11:33:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 54A07C0401DC
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 08:33:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644251603;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=brX4GU+L1j81sGgh31BbcVQhnZMFjPf1oHc47AX/rUA=;
+        b=BRPULVVCkXMgOpBERBOaxks6RmGi6E9f/KD/OtEQVM2afrHFEq0Ug4X14CODqJtysxqudh
+        WM35kP+yv3UHdxxE4gxQwtVY/AVAayEY+mqccNiFLaOkbPx2CEMgV1W17/93hVzLW8mFYd
+        Kzj6cMCX95RUIZAPXWEP5MWL22r7D5U=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-594-2rZ33CIuMsKx-lK6Vt3anQ-1; Mon, 07 Feb 2022 11:33:22 -0500
+X-MC-Unique: 2rZ33CIuMsKx-lK6Vt3anQ-1
+Received: by mail-ed1-f71.google.com with SMTP id bq19-20020a056402215300b0040f276105a4so4567101edb.2
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 08:33:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=brX4GU+L1j81sGgh31BbcVQhnZMFjPf1oHc47AX/rUA=;
+        b=nY7rwewnzd8AGGGmkNbe11ecLWYbcEkImaNFMktqulXEwDkyZYxbnQD7b/4R+JWgMQ
+         KcXR/eb+QVDRja8l9xlj2XinFhwvycbO/xDy1XR0hx4r32MFj/EPDvHBWMrrMNpdKTEL
+         c/MmLsf+/k3KZgsmH7BrpYnhZQW+lSVFhXJOYmsDhK47NKy+30cTR/mmLxqwNErQDenU
+         mPpAzFhOL72VCwNfIEu6XoJjgdTKVhqsqrzT1o4xMxsFXJnq7U4ujwoVJGEtfpbau7K5
+         +peVO7EZ2cCtxgyvlz22jKDzaMTXkjAVcOlfNdTpj6Y+fLXXj9jyzq0gJlk8jY9oa5CZ
+         J4YQ==
+X-Gm-Message-State: AOAM531eJ9IQiYbZSSGmrgz4oGfqNCjBql8VSXpefx8GKpv6uMkChOJb
+        2BlZ6XyizBY35epH6nUkm6gQ8kvtvFqqR9eUZr3uE7hVNegvaAJC/mAka4bovoTq3kdsj3cwQtr
+        SSc12r3QeQMaw
+X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr392182ejc.447.1644251600674;
+        Mon, 07 Feb 2022 08:33:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxpJHeCGnmoiA+qPX2DbaRLqVYlmNdkTa1d7PbcO18dLqojD/hxPQPnb9EtNBsGdHKu+RDs5A==
+X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr392174ejc.447.1644251600413;
+        Mon, 07 Feb 2022 08:33:20 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id er16sm1298735edb.86.2022.02.07.08.33.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Feb 2022 08:33:19 -0800 (PST)
+Message-ID: <86c3b9d8-e9b7-250a-bb86-b99da294c1db@redhat.com>
+Date:   Mon, 7 Feb 2022 17:33:17 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e09c0cd2-67a9-408a-d273-08d9ea56336c
-X-MS-TrafficTypeDiagnostic: BN7PR12MB2787:EE_
-X-Microsoft-Antispam-PRVS: <BN7PR12MB27870AA734401087FC1C3E0CE52C9@BN7PR12MB2787.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:595;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: n0wOM+RLkUbmPQAq6nn80hH8YbRvE6VJ2KLkCw8o3eyF0eWClHeJC94BbqH5emgNLnE/1vFShfdlP23JZtf9kHILNAXuoCP1Sqdd55uzDD0OY7Zcet9jv00AKRTr/Qr+8XO7Q1CaxGRjQh3mAXnNXB4FAsbS6Pc5DAFF48fYCuEmOxxsU55jGh+W0Iah4k2KI0zCR8SQcMTA/wEI5u0GNCVMKMXfxUSE2dK65oKBQsVbohhihzFTuf34aY3SChUlJUzuMMx3Y12ILkiHboAZHOnLdulVU7RFpJjvEEl39ZAn6n6b0555HPWYCzE5UgnUTDUHiWmghxE5VbKkX2HsCubgu/RDakfWtaYfHmWevqfE0pnVF60EDODGa+285T7Dn3U8ZoYyt+JPpZi/B4eJm+wtMJZ+J/CMpmpgxTA2wsyQDaIZ33puUw2bEuihus3bIhUe1rfN0uBErXlbyU0f9hGMIXJfmjBF2jfq0Jwgr7O4yoxoWH5my+wjdPKMUYPEIVIM1a6TTxQbrIRcp/wmvEp7xyQbnJx/73VdCBRobCYHIufAl361Krx6D4eURBsZ8GJftDEIPrWb9lRjAEQ8XnF1YvmmGP9bEkQX5p9z+sIs51afcB5RG/uJGVvakiJdYqxX0mdVZOVVXvy9hL8B2XZXCMbQLCIi4PWIiDPi2Rmhsk3TIyO0RKZdisM+NkLuDwDXyuBVoxnTOiCiE6uh0gvjdgCYhMRwWXswQG+gHxE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(186003)(36756003)(26005)(316002)(6506007)(66556008)(6486002)(53546011)(6666004)(54906003)(31696002)(6916009)(86362001)(558084003)(2906002)(508600001)(66476007)(66946007)(4326008)(8936002)(2616005)(6512007)(8676002)(31686004)(38100700002)(44832011)(5660300002)(7406005)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MUhVMmNUcFpWV0YyVTJsdjVoSCtSaE42ZWFIVzd1bHNYejF4Z2xqQUgydmdh?=
- =?utf-8?B?bU9mN3NKU01vN3d1SFBDalFnaU5HL2E4dnZhNmc0NWNsaHlhdjFHQklrZStv?=
- =?utf-8?B?dE5IR3lBanFwMVFKL1o0ZDFBbldPQ2c0cUFOUGZIQVZjdGZjRCtJbWdSK0Nn?=
- =?utf-8?B?R00zZGdjU3d4RnB4enFZSFYrd2xRcGl0TkpqSE4yOVZxM0V4MElnOGRUcldF?=
- =?utf-8?B?S1FrVDdCN252QmJQTElld3JXUVFrUlpjK2swRktTdi9wRUoyc2wrRWtXTkpD?=
- =?utf-8?B?UzlDNTU3U0ZhRzBxZlR2YjhvYVFHUjhHQjVKeWdYb1dybTdLYWNUL2JJUEtx?=
- =?utf-8?B?ZGgwMnRRTlg2L1d2ZXZUQ1hmS3V0Rm9aR2V2STNkTGpyWFpLbEppclg1bG1E?=
- =?utf-8?B?R2xXNEtzS2xGYVkwMGJZdWJ2bm1qVGZBRk9EOG5DY2FDTU4yckZJT0RQWVNJ?=
- =?utf-8?B?ajh5WWtFSXJVZnZmMlhPQW9qMUVmd2VnRmE2YnNHY2I4SjNMbmFERFQzTERz?=
- =?utf-8?B?NzZqc1ZFSTE0QlNNOVFHSWNRbVhIV2h1YWhwL011YzhkTURMalJtR1FLbnJM?=
- =?utf-8?B?b0NTRmFWNjNtVDFqN2MwNnNZK2dPWnlERTVidmxiU2dpRWNiMFlWeXVXUGFF?=
- =?utf-8?B?aHR4VklmMklkL0Z3SzBxTjVDWitieWdrMmNjV3RnWlo0dlFzc1RuaUt5M3hZ?=
- =?utf-8?B?dzVEQTIzUGJ6THNlSWRKdHlHeUtOL25nNzQ2K0loQ1Q0b2tjZ1djaWlXSUdD?=
- =?utf-8?B?SmlCN2YySGhaejR3VjM5cUZ2YnpHVVYxcXNwOEI5eFhneEZOOENNb3kwa0dM?=
- =?utf-8?B?NThXV3drT09XZzZvTGFiVGduck5DSk9MV2JQdnNjZktrOHBtaHc3Y2Nodity?=
- =?utf-8?B?azlYRys0eitTalY1SmlFMWtBT3dMaktFZGlLWkVEYmlaUnNxWGkzVnZ0TUJN?=
- =?utf-8?B?WXZkRWw0a2FLWW54ZDNMQ0VNaGJhMC9tbXBEWklVUHFxbHZCVEUySHhFMjZH?=
- =?utf-8?B?eVpOYnBGamhHU2ZWZGhDRHYzME90ZE00alhxcWRVMlJsMmhhUkgwUWljc2hp?=
- =?utf-8?B?Z3Y1NlgxYnVjQ0RrQWg3ZW1QdnpzT09qZ3cxaWZTSTdoY0Z6Zjc3NFhzODlm?=
- =?utf-8?B?ejhMaWtrbXN5Q3dyNTJVSXJOYUNKa0cxS0tlZGFGY2VubVlrekFtRGpZc1NX?=
- =?utf-8?B?TDR3YitUZ3hMamQweEIzQlFoWExpa2RnNnh4bUcrYlUvL3g1ZXNhRlBtYVZ6?=
- =?utf-8?B?WjR2Ym92c0s4T2dOS1pLMEhiRGo1NytDQVA5SUhEMVUrVFRKdFlWT0RnRDE1?=
- =?utf-8?B?ZVkzQ3Y0MHN0TWdvUnpVZUN0cm1SSXI2SUNGbjR6Ym5QUnVKcTFzSWRmZUlz?=
- =?utf-8?B?SEZ6enI3WGZuT3h2YVY0SHNaMi92c0hjeVEwS2MzMlptaUsyNWVEU3NPdC81?=
- =?utf-8?B?ZW9iZjRDclRJY2xPWEFncTlmdklPT0RDT1hBMmN3eGlNTHEveU1MRFdLVzN2?=
- =?utf-8?B?N29jWDAvQk5SYys4WWh1VWZ0K0pMS2ZTV0wrMVJoTTJFejlHS0kvNGU3UDNP?=
- =?utf-8?B?YnhnODVoTko2SU9UeTFxNmhtdVJYdmxUeHNLRm5CSXVxcFMxdkJQRksxeEx6?=
- =?utf-8?B?cXNMNWtBVXpwa0x4V3FYZHhGK2JrZWE5dGJtMk9LM0xVd0RBWXg2R08zcXND?=
- =?utf-8?B?TmNEV3FZSjdsNGpOU0dVSDdFa2J2RXlQZmpqN1NLNVJpcHJjeldHQXYwTE1E?=
- =?utf-8?B?UlR1eW9NQkh4NGVrTGtreW9LZ2RVcC9OU3RRaFMySXZvYmE2bGp6SENUanRB?=
- =?utf-8?B?K0l1dVAwSFArUUU0cFhCbHZ0czdLdXZPaEZuZGUvdkVUK2g2dVQ0TndYQVpz?=
- =?utf-8?B?dU1HTFkwRmZ6c2k0bmNrM25zYWtrdkluRVZBWUtMbksvbFM2U0xhVDNjV1Ez?=
- =?utf-8?B?VDhBZFpxTUVZanJab05JbWYxK0dyWUFHNUROUnp3anhrcWxjMTB5Rm9HcXdz?=
- =?utf-8?B?bEF1K0NhSHBwVzFtNDdBRzdhcXlndlNjcVB4eFgwWmJZdTMwdWFCaDlRRDlm?=
- =?utf-8?B?aSs1bHdDK1NuSEo2RkY2STVjQTh3VVJxVnVhd2hsSi9tZzVCcUZKdjdzRHQv?=
- =?utf-8?B?RmptMUJZN2E3UmJPN2EwRWhIa0thRXU5bks0dU5CWk52UVVFd0QwN1M3WjYz?=
- =?utf-8?Q?RLI1QwT9kozEQLlog0r5kH4=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e09c0cd2-67a9-408a-d273-08d9ea56336c
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2022 16:23:40.2055
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Re2iV6TOled7fKAwlrp2b0qdb1MKkAHe0/XoE2yvg2NaahLKOUQKlXP7szs+yttksSjRwUGZtoPDoPU2LahMdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR12MB2787
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 2/7] KVM: nVMX: Keep KVM updates to PERF_GLOBAL_CTRL
+ ctrl bits across MSR write
+Content-Language: en-US
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20220204204705.3538240-1-oupton@google.com>
+ <20220204204705.3538240-3-oupton@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220204204705.3538240-3-oupton@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -152,11 +85,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2/4/22 21:47, Oliver Upton wrote:
+> Since commit 03a8871add95 ("KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL
+> VM-{Entry,Exit} control"), KVM has taken ownership of the "load
+> IA32_PERF_GLOBAL_CTRL" VMX entry/exit control bits. The ABI is that
+> these bits will be set in the IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS MSRs if
+> the guest's CPUID exposes a vPMU that supports the IA32_PERF_GLOBAL_CTRL
+> MSR (CPUID.0AH:EAX[7:0] > 1), and clear otherwise.
+> 
+> However, KVM will only do so if userspace sets the CPUID before writing
+> to the corresponding MSRs. Of course, there are no ordering requirements
+> between these ioctls. Uphold the ABI regardless of ordering by
+> reapplying KVMs tweaks to the VMX control MSRs after userspace has
+> written to them.
 
+Ok, this makes more sense.  Here you have KVM_SET_MSR before 
+KVM_SET_CPUID2, so KVM_SET_CPUID2 does to PERF_GLOBAL_CTRL controls what 
+it's already doing with BNDCFGS controls.  Is this correct?
 
-On 2/7/22 2:52 AM, Borislav Petkov wrote:
-> Those are allocated on stack, why are you clearing them?
+Paolo
 
-Yep, no need to explicitly clear it. I'll take it out in next rev.
+> Note that older kernels without commit c44d9b34701d ("KVM: x86: Invoke
+> vendor's vcpu_after_set_cpuid() after all common updates") still require
+> that the entry/exit controls be updated from kvm_pmu_refresh(). Leave
+> the benign call in place to allow for cleaner backporting and punt the
+> cleanup to a later change.
+> 
+> Fixes: 03a8871add95 ("KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL VM-{Entry,Exit} control")
+> Reported-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>   arch/x86/kvm/vmx/vmx.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d63d6dfbadbf..54ac382a0b73 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7242,6 +7242,8 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+>   			vmx->nested.msrs.exit_ctls_high &= ~VM_EXIT_CLEAR_BNDCFGS;
+>   		}
+>   	}
+> +
+> +	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
+>   }
+>   
+>   static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
 
-thanks
