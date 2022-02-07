@@ -2,234 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E10804AC43A
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 16:46:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F15D4AC43C
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 16:46:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245319AbiBGPpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 10:45:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53440 "EHLO
+        id S1385864AbiBGPpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 10:45:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236759AbiBGPig (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 10:38:36 -0500
-X-Greylist: delayed 303 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Feb 2022 07:38:32 PST
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 665C8C0401C1
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 07:38:32 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19DA411D4;
-        Mon,  7 Feb 2022 07:38:32 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5A133F70D;
-        Mon,  7 Feb 2022 07:38:27 -0800 (PST)
-Date:   Mon, 7 Feb 2022 15:38:42 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
-        miguel.luis@oracle.com, kernel-team@android.com
-Subject: Re: [PATCH v6 22/64] KVM: arm64: nv: Respect virtual HCR_EL2.TWX
- setting
-Message-ID: <YgE88h+ogENLHvLN@monolith.localdoman>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-23-maz@kernel.org>
- <Yf1I3w/xPjwM9IiO@monolith.localdoman>
+        with ESMTP id S1381422AbiBGPko (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 10:40:44 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6C2C0401CA;
+        Mon,  7 Feb 2022 07:40:43 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 217E5bUj009597;
+        Mon, 7 Feb 2022 15:40:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=95RuD2tXWyR+QAfVrYV3Qt/2Z/eamOXxsUZ+9wmapuA=;
+ b=RnK0fvo36LmgG8h+8s+Y+6culVIzGIPv7ASxYxRl1BrshbWnMTHR1M5VsYb9cIJEZ0YV
+ T5Vsnp/ILYLaYsRhpcoSuZubgExz+TE3rjds1EoUn+oRhgLovtfHyr0PBtO7Auf2AdUI
+ bH+nDd7ozF0aUbY4jzEOUPwgypbB+pRl8iJEHZpHGy4qV0jhL7zipH/PKfPyOGFYMRi5
+ ZWHtdPjs2q4dG23bfL0GTLx89JdQsQ3fTUPlFSSJWWDI1AWGwXgMs89tGlFNnzI4SbTF
+ ZZFI4jEvInErmxdabr+6w7+ur7ZjirSP7X7tCMZgstso6q7Qx7UjHraBiGJLVgHlRtF7 Iw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e22q0yukx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Feb 2022 15:40:43 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 217FXRHs005956;
+        Mon, 7 Feb 2022 15:40:43 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e22q0yuk7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Feb 2022 15:40:42 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 217FYTZf032444;
+        Mon, 7 Feb 2022 15:40:40 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3e1gv968jd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Feb 2022 15:40:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 217FebZ425952516
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Feb 2022 15:40:37 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31C3A42049;
+        Mon,  7 Feb 2022 15:40:37 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C90B142042;
+        Mon,  7 Feb 2022 15:40:36 +0000 (GMT)
+Received: from [9.145.9.42] (unknown [9.145.9.42])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Feb 2022 15:40:36 +0000 (GMT)
+Message-ID: <27bf3142-77a2-599b-d057-3efc6a1fd8f4@linux.ibm.com>
+Date:   Mon, 7 Feb 2022 16:40:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yf1I3w/xPjwM9IiO@monolith.localdoman>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v7 16/17] KVM: s390: pv: add
+ KVM_CAP_S390_PROT_REBOOT_ASYNC
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com
+References: <20220204155349.63238-1-imbrenda@linux.ibm.com>
+ <20220204155349.63238-17-imbrenda@linux.ibm.com>
+ <2b9b31bf-e45a-7006-c68e-6e143665640c@linux.ibm.com>
+ <20220207161939.1d382a02@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220207161939.1d382a02@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yWuybFJguXKOGib3S5z4HiXReHCgIA9j
+X-Proofpoint-ORIG-GUID: e9IBxAuoD-85CARyvFiN9QqTvKC4lMC1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-07_05,2022-02-07_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 mlxlogscore=999
+ clxscore=1015 adultscore=0 bulkscore=0 mlxscore=0 spamscore=0
+ impostorscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202070097
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Fri, Feb 04, 2022 at 03:40:15PM +0000, Alexandru Elisei wrote:
-> Hi Marc,
+On 2/7/22 16:19, Claudio Imbrenda wrote:
+> On Mon, 7 Feb 2022 15:37:48 +0100
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
-> On Fri, Jan 28, 2022 at 12:18:30PM +0000, Marc Zyngier wrote:
-> > From: Jintack Lim <jintack.lim@linaro.org>
-> > 
-> > Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
-> > they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
-> > 
-> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_nested.h |  2 ++
-> >  arch/arm64/kvm/Makefile             |  2 +-
-> >  arch/arm64/kvm/handle_exit.c        | 11 ++++++++++-
-> >  arch/arm64/kvm/nested.c             | 28 ++++++++++++++++++++++++++++
-> >  4 files changed, 41 insertions(+), 2 deletions(-)
-> >  create mode 100644 arch/arm64/kvm/nested.c
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index 5a85be6d8eb3..79d382fa02ea 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -65,4 +65,6 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
-> >  		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
-> >  }
-> >  
-> > +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
-> > +
-> >  #endif /* __ARM64_KVM_NESTED_H */
-> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > index b67c4ebd72b1..dbaf42ff65f1 100644
-> > --- a/arch/arm64/kvm/Makefile
-> > +++ b/arch/arm64/kvm/Makefile
-> > @@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
-> >  	 inject_fault.o va_layout.o handle_exit.o \
-> >  	 guest.o debug.o reset.o sys_regs.o \
-> >  	 vgic-sys-reg-v3.o fpsimd.o pmu.o pkvm.o \
-> > -	 arch_timer.o trng.o emulate-nested.o \
-> > +	 arch_timer.o trng.o emulate-nested.o nested.o \
-> >  	 vgic/vgic.o vgic/vgic-init.o \
-> >  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
-> >  	 vgic/vgic-v3.o vgic/vgic-v4.o \
-> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > index 0cedef6e0d80..a1b1bbf3d598 100644
-> > --- a/arch/arm64/kvm/handle_exit.c
-> > +++ b/arch/arm64/kvm/handle_exit.c
-> > @@ -119,7 +119,16 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
-> >   */
-> >  static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
-> >  {
-> > -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
-> > +	bool is_wfe = !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE);
-> > +
-> > +	if (vcpu_has_nv(vcpu)) {
-> > +		int ret = handle_wfx_nested(vcpu, is_wfe);
-> > +
-> > +		if (ret != -EINVAL)
-> > +			return ret;
+>> On 2/4/22 16:53, Claudio Imbrenda wrote:
+>>> Add KVM_CAP_S390_PROT_REBOOT_ASYNC to signal that the
+>>> KVM_PV_ASYNC_DISABLE and KVM_PV_ASYNC_DISABLE_PREPARE commands for the
+>>> KVM_S390_PV_COMMAND ioctl are available.
+>>>
+>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>> ---
+>>>    arch/s390/kvm/kvm-s390.c | 3 +++
+>>>    include/uapi/linux/kvm.h | 1 +
+>>>    2 files changed, 4 insertions(+)
+>>>
+>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>> index f7952cef1309..1e696202a569 100644
+>>> --- a/arch/s390/kvm/kvm-s390.c
+>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>> @@ -608,6 +608,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>>    	case KVM_CAP_S390_BPB:
+>>>    		r = test_facility(82);
+>>>    		break;
+>>> +	case KVM_CAP_S390_PROT_REBOOT_ASYNC:
+>>> +		r = lazy_destroy && is_prot_virt_host();
+>>
+>> While reboot might be the best use-case for the async disable I don't
+>> think we should name the capability this way.
+>>
+>> KVM_CAP_S390_PROTECTED_ASYNC_DESTR ?
 > 
-> I find this rather clunky. The common pattern is that a function returns
-> early when it encounters an error, but here this pattern is reversed:
-> -EINVAL means that handle_wfx_nested() failed in handling the WFx, so
-> proceed as usual; conversly, anything but -EINVAL means handle_wfx_nested()
-> was successful in handling WFx, so exit early from kvm_handle_wfx().
+> then maybe
 > 
-> That would be ok by itself, but if we dig deeper, handle_wfx_nested() ends up
-> calling kvm_inject_nested(), where -EINVAL is actually an error code. Granted,
-> that should never happen, because kvm_handle_wfx() first checks vcpu_has_nv(),
-> but still feels like something that could be improved.
-> 
-> Maybe changing handle_wfx_nested() like this would be better:
-> 
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -14,15 +14,18 @@
->   * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
->   * handle this.
->   */
-> -int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
-> +bool handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe, int *error)
->  {
->         u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
->  
-> +       *error = 0;
->         if (vcpu_is_el2(vcpu))
-> -               return -EINVAL;
-> +               return false;
->  
-> -       if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
-> -               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +       if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI))) {
-> +               *error = kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +               return true;
-> +       }
->  
-> -       return -EINVAL;
-> +       return false;
->  }
-> 
-> Now the return value means one thing only (did handle_wfx_nested() handle
-> the trap?) and we still capture the error code.
-> 
-> Or perhaps folding handle_wfx_nested() into kvm_handle_wfx() would be
-> preferable.
-> 
-> What do you think?
+> KVM_CAP_S390_PROTECTED_ASYNC_DISABLE ?
 
-Or kvm_handle_wtf() can be rewritten to use forward_traps() introduced in the patch after the
-next one (#24, "KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting"):
-
-static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
-{
-	bool is_wfe = !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE);
-
-	if (is_wfe && forward_traps(vcpu, HCR_TWE))
-		return 1;
-
-	if (!is_wfe && forward_traps(vcpu, HCR_TWI))
-		return 1;
-
-	[..]
-}
-
-Plenty of options to choose from.
-
-Thanks,
-Alex
+Sounds good to me
 
 > 
-> Thanks,
-> Alex
+>>
+>> It's a bit long but the initial capability didn't abbreviate the
+>> protected part so it is what it is.
+>>
+>>
+>>> +		break;
+>>>    	case KVM_CAP_S390_PROTECTED:
+>>>    		r = is_prot_virt_host();
+>>>    		break;
+>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>> index 7f574c87a6ba..c41c108f6b14 100644
+>>> --- a/include/uapi/linux/kvm.h
+>>> +++ b/include/uapi/linux/kvm.h
+>>> @@ -1134,6 +1134,7 @@ struct kvm_ppc_resize_hpt {
+>>>    #define KVM_CAP_VM_GPA_BITS 207
+>>>    #define KVM_CAP_XSAVE2 208
+>>>    #define KVM_CAP_SYS_ATTRIBUTES 209
+>>> +#define KVM_CAP_S390_PROT_REBOOT_ASYNC 215
+>>>    
+>>>    #ifdef KVM_CAP_IRQ_ROUTING
+>>>    
+>>>    
+>>
 > 
-> > +	}
-> > +
-> > +	if (is_wfe) {
-> >  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
-> >  		vcpu->stat.wfe_exit_stat++;
-> >  		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > new file mode 100644
-> > index 000000000000..5e1104f8e765
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -0,0 +1,28 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (C) 2017 - Columbia University and Linaro Ltd.
-> > + * Author: Jintack Lim <jintack.lim@linaro.org>
-> > + */
-> > +
-> > +#include <linux/kvm.h>
-> > +#include <linux/kvm_host.h>
-> > +
-> > +#include <asm/kvm_emulate.h>
-> > +
-> > +/*
-> > + * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-> > + * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
-> > + * handle this.
-> > + */
-> > +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
-> > +{
-> > +	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-> > +
-> > +	if (vcpu_is_el2(vcpu))
-> > +		return -EINVAL;
-> > +
-> > +	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
-> > +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> > +
-> > +	return -EINVAL;
-> > +}
-> > -- 
-> > 2.30.2
-> > 
+
