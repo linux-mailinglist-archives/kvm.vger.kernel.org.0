@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 760654ACBF0
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 23:17:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E91294ACC08
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 23:25:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244092AbiBGWRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 17:17:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45958 "EHLO
+        id S244458AbiBGWZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 17:25:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244082AbiBGWRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 17:17:23 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B915C0612A4
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 14:17:22 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id i17so15422709pfq.13
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 14:17:22 -0800 (PST)
+        with ESMTP id S244351AbiBGWZv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 17:25:51 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D2CC061A73
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 14:25:50 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id e28so15482989pfj.5
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 14:25:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=BhxzVjZr2SNzqHU8dl3WZkOg+9n73v4zh51iEiFYkNg=;
-        b=jx4XAzAUQTqRAztXU98sKZ6bOQXbAIjv4M+D3fDMo4P6/vN0Uag8uadVd5UIRITSeh
-         SRTu4nFI5Yv07DbbXV7RUSj6bsPNRQHWcVdnkkXb5VQ6AkMO5t9uq03nA8iKzIyl5wSd
-         W36GUSH5eXvPWu3HwO4lob7qsG6nNRF/1NE22gj3Q3n3gThgVFIt1Ti81f9TvZWiq+Nh
-         IhD6WCOWwMIp8kLcIoAXhOHts6QqnIgLuZkFygsKNqmpRumaq90YO7A2pbMs87+AF0d6
-         ONDi4uVJ4lkC9uNgXzRnEyJqIkHy6V9uilRDo4H2J9yqackqX1TRa3VmfGOZPv12ILK3
-         qaIQ==
+        bh=JKKByTaqxwBETFgifuJGqMvFg0/F2eEogOf15wsQKv0=;
+        b=NbyPzld53eTimR/fpMxmGI7Wm69fxft6mLphoK4914TdhrqdtbPZTrArO81lodDHt8
+         /l/YWsRIi6ka2wbOcEX2QpmraG46HaWq1GMspikF/Qsdzj+EDSaM3N2WzIQklIFhGdaa
+         o+ArZdNn28MtPMXmgZr2GndTWsaCVhi9Tudn5K4hN43y6EzoAFuvatiglo5mL+B1ZErB
+         BMMGuPR0gehBxGmRBeh2DwvHS6rxiKz1DJGDqBcj0L66D7/wDDIEwWkZbSMEaWXfd22n
+         x4l+YxcZw9f+IzFq/jar629/1uWsjJxs6PaLSRdcIbxgIAqtPQow9vioIIM2eHUBxXvW
+         LHtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BhxzVjZr2SNzqHU8dl3WZkOg+9n73v4zh51iEiFYkNg=;
-        b=OxH/BhPgbOeggv5OkPz+osy8Lxh7f8nfR5UK5k9ULsEe80Mcvo1OQqJaecXOKY0kXC
-         gnovtb9GYU08Kq+dGqoGdO81QUptaAhjgmnYJnjMtlIw1vRk62j5cSguHjoNLvRqUUEe
-         IxO/fyWbUmGk0Bxoo2yDqwvBqEJ5f5aQapsr37pGA/tRlC5aLgwQNVf2HYPUxDQiLFt7
-         Fn+YckMVuhRdFJuV6+w6uzSoaDhTjcMOzvig4jzYmsKTmAI/p2h0KnDJ2yT11wHRutcs
-         9JpHerCxC3kBVTQLDaFpwpv6wab4DWLx6d1baOjeRouMUXvsPdPYk2iFQhfou3Kk7K4V
-         QKRA==
-X-Gm-Message-State: AOAM532aW+m93EklxVU8fB3KeIIALV5DosTsb3m3kiLPCKOO8EGr/loy
-        jRdFexjT3DANTKZACUwLy1dGYQ==
-X-Google-Smtp-Source: ABdhPJyKz2osJT4TXap5I7JQMzStcQPXhLplRkSszv5PaYNO6kMp/V/NTEkRjX+m/WAowbKLQmkbwA==
-X-Received: by 2002:a63:6983:: with SMTP id e125mr1180405pgc.574.1644272241901;
-        Mon, 07 Feb 2022 14:17:21 -0800 (PST)
+        bh=JKKByTaqxwBETFgifuJGqMvFg0/F2eEogOf15wsQKv0=;
+        b=X5VXoq+1Vu1jxQP3NtSx27do0NiBSRkEAC3Obci4ZTnOI02LZqLS6PqIW+tvTyGnwN
+         q9S2yVUZX/O16cTCilWFxhbWqfd8KOC/a+3q9Gm3vW0YjRQM0u3dRtwm21HryoIBRtfH
+         f9vP409vI04MV4KJABy1s0a1Cd7XOJR0MYCthFY6v5VJo5uoBzeUZW0Wo5X799wVjP+u
+         boI5S5+f9A+TxlML00d1OzhEMuQbX80VdKoCe+IaG+ogDoCN+Wcg2bGbaB+3jsjEl9vp
+         PtxxgN7F0KkqfWfPiWnCU9pDXslkrGUS6a9d0DJ3YTzuIFsR54UwEfuLvT2AuoEy1T0E
+         GvEg==
+X-Gm-Message-State: AOAM531mjEc9uj/8cKevgOcRkQOSlDVilboCk9PjZKRQH144blFB8XYb
+        Tw8XuYwEDwlQWLbp9N7BlBLbyQ+QUV2rAA==
+X-Google-Smtp-Source: ABdhPJw2GiXbzYApnPpFCG3QBzOoEg1ES9DoDLuTdiofLWgz85dQUsRxQnQHdWtzQ5l4siviT6EH1w==
+X-Received: by 2002:a63:1517:: with SMTP id v23mr648351pgl.207.1644272750296;
+        Mon, 07 Feb 2022 14:25:50 -0800 (PST)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id j4sm13274215pfc.217.2022.02.07.14.17.20
+        by smtp.gmail.com with ESMTPSA id g2sm12989560pfj.83.2022.02.07.14.25.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 14:17:21 -0800 (PST)
-Date:   Mon, 7 Feb 2022 22:17:17 +0000
+        Mon, 07 Feb 2022 14:25:49 -0800 (PST)
+Date:   Mon, 7 Feb 2022 22:25:46 +0000
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         seanjc@google.com, vkuznets@redhat.com
-Subject: Re: [PATCH 11/23] KVM: MMU: do not recompute root level from
- kvm_mmu_role_regs
-Message-ID: <YgGabVGxzMw2lcMf@google.com>
+Subject: Re: [PATCH 13/23] KVM: MMU: remove
+ kvm_calc_shadow_root_page_role_common
+Message-ID: <YgGcagaLENvf3Y/t@google.com>
 References: <20220204115718.14934-1-pbonzini@redhat.com>
- <20220204115718.14934-12-pbonzini@redhat.com>
- <YgGY31hso29mbQ2E@google.com>
+ <20220204115718.14934-14-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YgGY31hso29mbQ2E@google.com>
+In-Reply-To: <20220204115718.14934-14-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,75 +72,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 07, 2022 at 10:10:39PM +0000, David Matlack wrote:
-> On Fri, Feb 04, 2022 at 06:57:06AM -0500, Paolo Bonzini wrote:
-> > The root_level can be found in the cpu_role (in fact the field
-> > is superfluous and could be removed, but one thing at a time).
-> > Since there is only one usage left of role_regs_to_root_level,
-> > inline it into kvm_calc_cpu_role.
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 23 ++++++++---------------
-> >  1 file changed, 8 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index f98444e1d834..74789295f922 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -253,19 +253,6 @@ static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
-> >  	return regs;
-> >  }
-> >  
-> > -static int role_regs_to_root_level(const struct kvm_mmu_role_regs *regs)
-> > -{
-> > -	if (!____is_cr0_pg(regs))
-> > -		return 0;
-> > -	else if (____is_efer_lma(regs))
-> > -		return ____is_cr4_la57(regs) ? PT64_ROOT_5LEVEL :
-> > -					       PT64_ROOT_4LEVEL;
-> > -	else if (____is_cr4_pae(regs))
-> > -		return PT32E_ROOT_LEVEL;
-> > -	else
-> > -		return PT32_ROOT_LEVEL;
-> > -}
-> > -
-> >  static inline bool kvm_available_flush_tlb_with_range(void)
-> >  {
-> >  	return kvm_x86_ops.tlb_remote_flush_with_range;
-> > @@ -4673,7 +4660,13 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
-> >  		role.base.smep_andnot_wp = ____is_cr4_smep(regs) && !____is_cr0_wp(regs);
-> >  		role.base.smap_andnot_wp = ____is_cr4_smap(regs) && !____is_cr0_wp(regs);
-> >  		role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
-> > -		role.base.level = role_regs_to_root_level(regs);
-> > +
-> > +		if (____is_efer_lma(regs))
-> > +			role.base.level = ____is_cr4_la57(regs) ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
-> > +		else if (____is_cr4_pae(regs))
-> > +			role.base.level = PT32E_ROOT_LEVEL;
-> > +		else
-> > +			role.base.level = PT32_ROOT_LEVEL;
+On Fri, Feb 04, 2022 at 06:57:08AM -0500, Paolo Bonzini wrote:
+> kvm_calc_shadow_root_page_role_common is the same as
+> kvm_calc_cpu_role except for the level, which is overwritten
+> afterwards in kvm_calc_shadow_mmu_root_page_role
+> and kvm_calc_shadow_npt_root_page_role.
 > 
-> Did you mean to drop the !CR0.PG case?
-
-Oh never mind I see the !CR0.PG case is handled above.
+> role.base.direct is already set correctly for the CPU role,
+> and CR0.PG=1 is required for VMRUN so it will also be
+> correct for nested NPT.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: David Matlack <dmatlack@google.com>
 
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 21 ++-------------------
+>  1 file changed, 2 insertions(+), 19 deletions(-)
 > 
-> >  
-> >  		role.ext.cr0_pg = 1;
-> >  		role.ext.cr4_pae = ____is_cr4_pae(regs);
-> > @@ -4766,7 +4759,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
-> >  	context->get_guest_pgd = get_cr3;
-> >  	context->get_pdptr = kvm_pdptr_read;
-> >  	context->inject_page_fault = kvm_inject_page_fault;
-> > -	context->root_level = role_regs_to_root_level(regs);
-> > +	context->root_level = cpu_role.base.level;
-> >  
-> >  	if (!is_cr0_pg(context))
-> >  		context->gva_to_gpa = nonpaging_gva_to_gpa;
-> > -- 
-> > 2.31.1
-> > 
-> > 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index d6b5d8c1c0dc..19abf1e4cee9 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4772,27 +4772,11 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
+>  	reset_tdp_shadow_zero_bits_mask(context);
+>  }
+>  
+> -static union kvm_mmu_role
+> -kvm_calc_shadow_root_page_role_common(struct kvm_vcpu *vcpu,
+> -				      const struct kvm_mmu_role_regs *regs)
+> -{
+> -	union kvm_mmu_role role = kvm_calc_mmu_role_common(vcpu, regs);
+> -
+> -	role.base.smep_andnot_wp = role.ext.cr4_smep && !____is_cr0_wp(regs);
+> -	role.base.smap_andnot_wp = role.ext.cr4_smap && !____is_cr0_wp(regs);
+> -	role.base.has_4_byte_gpte = ____is_cr0_pg(regs) && !____is_cr4_pae(regs);
+> -
+> -	return role;
+> -}
+> -
+>  static union kvm_mmu_role
+>  kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu,
+>  				   const struct kvm_mmu_role_regs *regs)
+>  {
+> -	union kvm_mmu_role role =
+> -		kvm_calc_shadow_root_page_role_common(vcpu, regs);
+> -
+> -	role.base.direct = !____is_cr0_pg(regs);
+> +	union kvm_mmu_role role = kvm_calc_cpu_role(vcpu, regs);
+>  
+>  	if (!____is_efer_lma(regs))
+>  		role.base.level = PT32E_ROOT_LEVEL;
+> @@ -4853,9 +4837,8 @@ kvm_calc_shadow_npt_root_page_role(struct kvm_vcpu *vcpu,
+>  				   const struct kvm_mmu_role_regs *regs)
+>  {
+>  	union kvm_mmu_role role =
+> -		kvm_calc_shadow_root_page_role_common(vcpu, regs);
+> +               kvm_calc_cpu_role(vcpu, regs);
+>  
+> -	role.base.direct = false;
+>  	role.base.level = kvm_mmu_get_tdp_level(vcpu);
+>  
+>  	return role;
+> -- 
+> 2.31.1
+> 
+> 
