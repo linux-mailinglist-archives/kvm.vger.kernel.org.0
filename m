@@ -2,82 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C9C14ACBC1
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 23:03:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 281284ACBDA
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 23:10:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243418AbiBGWD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 17:03:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39526 "EHLO
+        id S243675AbiBGWKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 17:10:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242008AbiBGWD5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 17:03:57 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DD2C061355
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 14:03:57 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id y5so14461740pfe.4
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 14:03:57 -0800 (PST)
+        with ESMTP id S230500AbiBGWKo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 17:10:44 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E116C061355
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 14:10:44 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id om7so1122675pjb.5
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 14:10:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=UPy7lygPxr90ipECLkuZI1hGfjCl5QQ8FuHy0YowhSc=;
-        b=RCgXhswVoMfKJgmEInLACfKtrGVLqOCKWZNQ41sxN5QDiS7VwL/G07y2oU0WB8ztNR
-         Y0S/kH1ShxVpYYabvAnlMUsDkJFODoyyY5dzhb1Fd7mnBLqXM9Rec01w4aj7PGNdeL5n
-         RWuK3IpF25Z9D8lhRsyEZAKgCsMiGAZNHpKo086hki4ByVDihSrUinUl2fJl0XC9tujL
-         PNBkTL6RuaWSjX1S5vLoYvoof4pfeRaDyEpdC+mVVVIu7XPHvEn4en4/Y4pIL4hV6rr1
-         Cdy78LZyRztbpdzjvMGH8T8h9AbVd0QzBozwz2j0qazz4F8EmAc5xBhZNFYgkPpM1Tn/
-         gMUA==
+        bh=G6eyJKmfFUAf01J78dlSIW81WrqdXWXhBcO7ghlDcmA=;
+        b=sKkGLjPzG0ZdullIrSblfCWKuBIrej5PizLx1i2qsH980wbmqxt87m/yEzS8GwLs1r
+         GpBtXo/uBEMAQWFyNhPUTJHGjK1BXW6BhmIpgOlyY7lg0VqBmCNP+FmDvYSobG6QKC7h
+         EyAbVBAfrarGbvoAxWACbeFf2ire1Wjo+L4d9dHlNFdRBDF9ymnK473SClAzMFMMYSaK
+         RaOSlWQZoQBVw6y2uZcLQsrAHEtfoj1BJr+/fn7H4gmWBGST+mtyzPX10xJexfKJ70/8
+         lsJNUUxI3VCqNoqmFvtAt6VCmXD70qbFQTRDmPly42D/kpiC+nLBc+WzwW1ss4RbgCTa
+         iIWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=UPy7lygPxr90ipECLkuZI1hGfjCl5QQ8FuHy0YowhSc=;
-        b=6H1usTj2zFk0SFDvNeTGFUdAK+W+Mz9aDaU1QrgTcbC0rdTwY3KGiRhlvgPngOiewF
-         BVBQTsWZzkeJoJm6/EaeIsBCPjTzLDHm1qOZoIziE5wbm2prtLBO3aJYDuhNb/DpSR9G
-         PRHURj+w3vD0+S8d3NWAUrHZF6We5QH2mSe1c9VLsQLZHy8HS07Ht+SlRdsbzU2XeDqI
-         o6omnP++Y2Hf8OTmBLYYbHfraLkQUdC4Ow7c3dxWZv9CkdKNK3bXTnJ4xIRtqPM5ae0E
-         dF6l24c/ovYCGOEBr0XJl+9t98DlTsXRzKnmStI9RZhnt2VgAIRPpPhXzbqqn6cSxPYM
-         Sbxg==
-X-Gm-Message-State: AOAM530XS4fyaJs+LNMvXOHFwx843a53tz7XB+3kiUm0isI1oDmeVH7C
-        RIuXxSloz1xh87RhngkfBdI5ew==
-X-Google-Smtp-Source: ABdhPJzbBC9XPXZx1a7sY7aumuFcnEQRXSeGjArZY3492Wqxxm+qGn6UVim4VyXN7pLekEvoM53jAg==
-X-Received: by 2002:a63:2c83:: with SMTP id s125mr1103589pgs.265.1644271436434;
-        Mon, 07 Feb 2022 14:03:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q2sm13779245pfj.94.2022.02.07.14.03.55
+        bh=G6eyJKmfFUAf01J78dlSIW81WrqdXWXhBcO7ghlDcmA=;
+        b=hnpTeFXLIKAPM2p/+byTxO2Xm+ZrDttk3H6G7eoKcOMLbWxFHwgLBsU5lELIOjEBS1
+         bIX5UBnQfAEOmoVCZyNOQUrmlFEanv/Kl/bDaFpdHeJPBsusWoQltLv57XenTj2EkEOE
+         4/PlJ+jG3mAOr9ZTQ7nl3at7p4rCN+Sir0dGh5Wo9YNvJBdybUwUCzFbeIcBVUKVNzM+
+         3MAo3T3v5AZZ904EJ12xmNV6vlKfJ5db1lh+ignxD7JipXhYfJ76gBLMH6UMaOK2cnhf
+         GIAqLUtD3Twv3HxQmpwVOLLBbWIC9xP8PwOqgFR5zusEiIsnwBkCHBgreHOAJYyCbMKI
+         xsMg==
+X-Gm-Message-State: AOAM533qeSfr5fY+yL5+vqPuI1tTJR4hEWBL0TFStwEiBxlwbQ+bJ5BT
+        pTdRPx2nOSnSPQS9ZEvK0OwmBg==
+X-Google-Smtp-Source: ABdhPJxB51iuOhrkdmc8x9jKC4OFpA+BCdGplAtgiK5P5F4x8sDSnX4s5Ux5HHNw1ECYAALxgHakVw==
+X-Received: by 2002:a17:90b:2251:: with SMTP id hk17mr1096502pjb.210.1644271843558;
+        Mon, 07 Feb 2022 14:10:43 -0800 (PST)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id p21sm207825pfo.97.2022.02.07.14.10.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 14:03:55 -0800 (PST)
-Date:   Mon, 7 Feb 2022 22:03:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Eric Biederman <ebiederm@xmission.com>,
-        kexec@lists.infradead.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 04/10] x86/sev: Cache AP Jump Table Address
-Message-ID: <YgGXSKAsi4aLxFMg@google.com>
-References: <20220127101044.13803-1-joro@8bytes.org>
- <20220127101044.13803-5-joro@8bytes.org>
+        Mon, 07 Feb 2022 14:10:42 -0800 (PST)
+Date:   Mon, 7 Feb 2022 22:10:39 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, vkuznets@redhat.com
+Subject: Re: [PATCH 11/23] KVM: MMU: do not recompute root level from
+ kvm_mmu_role_regs
+Message-ID: <YgGY31hso29mbQ2E@google.com>
+References: <20220204115718.14934-1-pbonzini@redhat.com>
+ <20220204115718.14934-12-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220127101044.13803-5-joro@8bytes.org>
+In-Reply-To: <20220204115718.14934-12-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -89,90 +72,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 27, 2022, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
+On Fri, Feb 04, 2022 at 06:57:06AM -0500, Paolo Bonzini wrote:
+> The root_level can be found in the cpu_role (in fact the field
+> is superfluous and could be removed, but one thing at a time).
+> Since there is only one usage left of role_regs_to_root_level,
+> inline it into kvm_calc_cpu_role.
 > 
-> Store the physical address of the AP jump table in kernel memory so
-> that it does not need to be fetched from the Hypervisor again.
-
-This doesn't explain why the kernel would retrieve the jump table more than once,
-e.g. at this point in the series, this can only ever be called once.
-
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kernel/sev.c | 28 +++++++++++++++-------------
->  1 file changed, 15 insertions(+), 13 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 23 ++++++++---------------
+>  1 file changed, 8 insertions(+), 15 deletions(-)
 > 
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 8a4317fa699a..969ef9855bb5 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -43,6 +43,9 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
->   */
->  static struct ghcb __initdata *boot_ghcb;
->  
-> +/* Cached AP jump table Address */
-> +static phys_addr_t jump_table_pa;
-> +
->  /* #VC handler runtime per-CPU data */
->  struct sev_es_runtime_data {
->  	struct ghcb ghcb_page;
-> @@ -523,12 +526,14 @@ void noinstr __sev_es_nmi_complete(void)
->  	__sev_put_ghcb(&state);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index f98444e1d834..74789295f922 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -253,19 +253,6 @@ static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+>  	return regs;
 >  }
 >  
-> -static u64 get_jump_table_addr(void)
-> +static phys_addr_t get_jump_table_addr(void)
-
-Not new, but I believe this can be tagged __init.
-
+> -static int role_regs_to_root_level(const struct kvm_mmu_role_regs *regs)
+> -{
+> -	if (!____is_cr0_pg(regs))
+> -		return 0;
+> -	else if (____is_efer_lma(regs))
+> -		return ____is_cr4_la57(regs) ? PT64_ROOT_5LEVEL :
+> -					       PT64_ROOT_4LEVEL;
+> -	else if (____is_cr4_pae(regs))
+> -		return PT32E_ROOT_LEVEL;
+> -	else
+> -		return PT32_ROOT_LEVEL;
+> -}
+> -
+>  static inline bool kvm_available_flush_tlb_with_range(void)
 >  {
->  	struct ghcb_state state;
->  	unsigned long flags;
->  	struct ghcb *ghcb;
-> -	u64 ret = 0;
+>  	return kvm_x86_ops.tlb_remote_flush_with_range;
+> @@ -4673,7 +4660,13 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+>  		role.base.smep_andnot_wp = ____is_cr4_smep(regs) && !____is_cr0_wp(regs);
+>  		role.base.smap_andnot_wp = ____is_cr4_smap(regs) && !____is_cr0_wp(regs);
+>  		role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
+> -		role.base.level = role_regs_to_root_level(regs);
 > +
-> +	if (jump_table_pa)
-> +		return jump_table_pa;
->  
->  	local_irq_save(flags);
->  
-> @@ -544,39 +549,36 @@ static u64 get_jump_table_addr(void)
->  
->  	if (ghcb_sw_exit_info_1_is_valid(ghcb) &&
->  	    ghcb_sw_exit_info_2_is_valid(ghcb))
-> -		ret = ghcb->save.sw_exit_info_2;
-> +		jump_table_pa = (phys_addr_t)ghcb->save.sw_exit_info_2;
->  
->  	__sev_put_ghcb(&state);
->  
->  	local_irq_restore(flags);
->  
-> -	return ret;
-> +	return jump_table_pa;
->  }
->  
->  int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+> +		if (____is_efer_lma(regs))
+> +			role.base.level = ____is_cr4_la57(regs) ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
+> +		else if (____is_cr4_pae(regs))
+> +			role.base.level = PT32E_ROOT_LEVEL;
+> +		else
+> +			role.base.level = PT32_ROOT_LEVEL;
 
-__init here too.
+Did you mean to drop the !CR0.PG case?
 
->  {
->  	u16 startup_cs, startup_ip;
-> -	phys_addr_t jump_table_pa;
-> -	u64 jump_table_addr;
->  	u16 __iomem *jump_table;
-> +	phys_addr_t pa;
 >  
-> -	jump_table_addr = get_jump_table_addr();
-> +	pa = get_jump_table_addr();
+>  		role.ext.cr0_pg = 1;
+>  		role.ext.cr4_pae = ____is_cr4_pae(regs);
+> @@ -4766,7 +4759,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
+>  	context->get_guest_pgd = get_cr3;
+>  	context->get_pdptr = kvm_pdptr_read;
+>  	context->inject_page_fault = kvm_inject_page_fault;
+> -	context->root_level = role_regs_to_root_level(regs);
+> +	context->root_level = cpu_role.base.level;
 >  
->  	/* On UP guests there is no jump table so this is not a failure */
-
-Does anything actually check that the jump table is valid for SMP guests?
-
-> -	if (!jump_table_addr)
-> +	if (!pa)
-
-Using '0' for "not valid" is funky because '0' isn't technically an illegal GPA,
-and because it means the address (or lack thereof) isn't cached on a single-vCPU
-guest.
+>  	if (!is_cr0_pg(context))
+>  		context->gva_to_gpa = nonpaging_gva_to_gpa;
+> -- 
+> 2.31.1
+> 
+> 
