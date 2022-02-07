@@ -2,83 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10A564ACBDD
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 23:12:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 760654ACBF0
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 23:17:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243748AbiBGWL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 17:11:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43406 "EHLO
+        id S244092AbiBGWRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 17:17:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238499AbiBGWL6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 17:11:58 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7ED6C061355
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 14:11:57 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id v15-20020a17090a4ecf00b001b82db48754so615000pjl.2
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 14:11:57 -0800 (PST)
+        with ESMTP id S244082AbiBGWRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 17:17:23 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B915C0612A4
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 14:17:22 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id i17so15422709pfq.13
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 14:17:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=iTzDr07nDR0Kl7lFwHuFFDUEMCGqC9FB/uZHfJ8d1Mw=;
-        b=IYp6uTWjHF7Eyy4PczCpkHeC9xff7BNFIgUZQKzLF6A5XC4d2aZTzFxbsdu7wbLLV+
-         8qnuGLKuJS6YV1HIEddyw1WBUHZINajA2y7bT6iItl4bHpP1y3IDp2m5DRlkgZSpXvBx
-         C3c+GD1fb7NhmNCLjgdjXmtW+E6jQ4/6qjaflz3A1pwwoWjAHIZebaoWxL5f/KCtHbRf
-         NAh8BCEcH96Xlbh6SqxxTpPe/NYIUSybli6KNHCMu3R7vj1otLza7HJFHJ7M71x203u1
-         2eVL46KcknHxwS6gm9Bb18RAjr7p/addt5Ap6SGO+3ThcgyH/nig+9ouMapWeIYw1Kp0
-         An7A==
+        bh=BhxzVjZr2SNzqHU8dl3WZkOg+9n73v4zh51iEiFYkNg=;
+        b=jx4XAzAUQTqRAztXU98sKZ6bOQXbAIjv4M+D3fDMo4P6/vN0Uag8uadVd5UIRITSeh
+         SRTu4nFI5Yv07DbbXV7RUSj6bsPNRQHWcVdnkkXb5VQ6AkMO5t9uq03nA8iKzIyl5wSd
+         W36GUSH5eXvPWu3HwO4lob7qsG6nNRF/1NE22gj3Q3n3gThgVFIt1Ti81f9TvZWiq+Nh
+         IhD6WCOWwMIp8kLcIoAXhOHts6QqnIgLuZkFygsKNqmpRumaq90YO7A2pbMs87+AF0d6
+         ONDi4uVJ4lkC9uNgXzRnEyJqIkHy6V9uilRDo4H2J9yqackqX1TRa3VmfGOZPv12ILK3
+         qaIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=iTzDr07nDR0Kl7lFwHuFFDUEMCGqC9FB/uZHfJ8d1Mw=;
-        b=7dKoHaRd4IBIU8P+6TMYiAQrcSjhCjT+vv5I0ioFOp/rqmX74xjrBHE55zJgNyzev6
-         QEwSW/heDj1iisu1V57izpT9K8a4TJiN4fMl6FknHcGw3YkBOCP2y6HQF4f+IsoY4YOl
-         7QmwL6uEQOA1rvcZKW2eFf3orFwt8q/nju7kfAlggU55lCwN+DhiCmU564ug0GGj0RK2
-         j8TxIANqPP4fnAeNNzSw84igvvSPJidEmSrxuP0ZBYqC6mYxYgSi3SVYb0lrL6Kl8ymP
-         9KwuJ2fBBjcpknWzugpal5znUMffRPi3ZaGu5EQM8+W/tjmo1l8WM+sHCdr323MI5/N0
-         6ElA==
-X-Gm-Message-State: AOAM531zobiomsDRJrJXnaKu0JjIG6Qg6eOLHU8kVFUB3hO2i+8GwRsx
-        g5CgI9HyQhPGjMxI9inV9Nct7w==
-X-Google-Smtp-Source: ABdhPJw45LFLi3Lo8mYXK0eLgPYlH0oh1NJlpAM43K6XMNbSYLI8CEbycgiys9Ieotpc3LkharP35w==
-X-Received: by 2002:a17:90b:1b52:: with SMTP id nv18mr1114781pjb.136.1644271917102;
-        Mon, 07 Feb 2022 14:11:57 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id iy13sm321808pjb.51.2022.02.07.14.11.56
+        bh=BhxzVjZr2SNzqHU8dl3WZkOg+9n73v4zh51iEiFYkNg=;
+        b=OxH/BhPgbOeggv5OkPz+osy8Lxh7f8nfR5UK5k9ULsEe80Mcvo1OQqJaecXOKY0kXC
+         gnovtb9GYU08Kq+dGqoGdO81QUptaAhjgmnYJnjMtlIw1vRk62j5cSguHjoNLvRqUUEe
+         IxO/fyWbUmGk0Bxoo2yDqwvBqEJ5f5aQapsr37pGA/tRlC5aLgwQNVf2HYPUxDQiLFt7
+         Fn+YckMVuhRdFJuV6+w6uzSoaDhTjcMOzvig4jzYmsKTmAI/p2h0KnDJ2yT11wHRutcs
+         9JpHerCxC3kBVTQLDaFpwpv6wab4DWLx6d1baOjeRouMUXvsPdPYk2iFQhfou3Kk7K4V
+         QKRA==
+X-Gm-Message-State: AOAM532aW+m93EklxVU8fB3KeIIALV5DosTsb3m3kiLPCKOO8EGr/loy
+        jRdFexjT3DANTKZACUwLy1dGYQ==
+X-Google-Smtp-Source: ABdhPJyKz2osJT4TXap5I7JQMzStcQPXhLplRkSszv5PaYNO6kMp/V/NTEkRjX+m/WAowbKLQmkbwA==
+X-Received: by 2002:a63:6983:: with SMTP id e125mr1180405pgc.574.1644272241901;
+        Mon, 07 Feb 2022 14:17:21 -0800 (PST)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id j4sm13274215pfc.217.2022.02.07.14.17.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 14:11:56 -0800 (PST)
-Date:   Mon, 7 Feb 2022 22:11:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Eric Biederman <ebiederm@xmission.com>,
-        kexec@lists.infradead.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 05/10] x86/sev: Setup code to park APs in the AP Jump
- Table
-Message-ID: <YgGZKdbr3RrzU+xk@google.com>
-References: <20220127101044.13803-1-joro@8bytes.org>
- <20220127101044.13803-6-joro@8bytes.org>
+        Mon, 07 Feb 2022 14:17:21 -0800 (PST)
+Date:   Mon, 7 Feb 2022 22:17:17 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, vkuznets@redhat.com
+Subject: Re: [PATCH 11/23] KVM: MMU: do not recompute root level from
+ kvm_mmu_role_regs
+Message-ID: <YgGabVGxzMw2lcMf@google.com>
+References: <20220204115718.14934-1-pbonzini@redhat.com>
+ <20220204115718.14934-12-pbonzini@redhat.com>
+ <YgGY31hso29mbQ2E@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220127101044.13803-6-joro@8bytes.org>
+In-Reply-To: <YgGY31hso29mbQ2E@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -90,72 +73,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 27, 2022, Joerg Roedel wrote:
-> +static int __init sev_setup_ap_jump_table(void)
+On Mon, Feb 07, 2022 at 10:10:39PM +0000, David Matlack wrote:
+> On Fri, Feb 04, 2022 at 06:57:06AM -0500, Paolo Bonzini wrote:
+> > The root_level can be found in the cpu_role (in fact the field
+> > is superfluous and could be removed, but one thing at a time).
+> > Since there is only one usage left of role_regs_to_root_level,
+> > inline it into kvm_calc_cpu_role.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 23 ++++++++---------------
+> >  1 file changed, 8 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index f98444e1d834..74789295f922 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -253,19 +253,6 @@ static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+> >  	return regs;
+> >  }
+> >  
+> > -static int role_regs_to_root_level(const struct kvm_mmu_role_regs *regs)
+> > -{
+> > -	if (!____is_cr0_pg(regs))
+> > -		return 0;
+> > -	else if (____is_efer_lma(regs))
+> > -		return ____is_cr4_la57(regs) ? PT64_ROOT_5LEVEL :
+> > -					       PT64_ROOT_4LEVEL;
+> > -	else if (____is_cr4_pae(regs))
+> > -		return PT32E_ROOT_LEVEL;
+> > -	else
+> > -		return PT32_ROOT_LEVEL;
+> > -}
+> > -
+> >  static inline bool kvm_available_flush_tlb_with_range(void)
+> >  {
+> >  	return kvm_x86_ops.tlb_remote_flush_with_range;
+> > @@ -4673,7 +4660,13 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+> >  		role.base.smep_andnot_wp = ____is_cr4_smep(regs) && !____is_cr0_wp(regs);
+> >  		role.base.smap_andnot_wp = ____is_cr4_smap(regs) && !____is_cr0_wp(regs);
+> >  		role.base.has_4_byte_gpte = !____is_cr4_pae(regs);
+> > -		role.base.level = role_regs_to_root_level(regs);
+> > +
+> > +		if (____is_efer_lma(regs))
+> > +			role.base.level = ____is_cr4_la57(regs) ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
+> > +		else if (____is_cr4_pae(regs))
+> > +			role.base.level = PT32E_ROOT_LEVEL;
+> > +		else
+> > +			role.base.level = PT32_ROOT_LEVEL;
+> 
+> Did you mean to drop the !CR0.PG case?
 
-This name is really confusing.  AFAICT, it's specific to SEV-ES, but used only
-"sev" for the namespace because sev_es_setup_ap_jump_table() already exists.
-I assume this variant is purely for parking/offlining vCPUs?  Adding that in the
-name would be helpful.
+Oh never mind I see the !CR0.PG case is handled above.
 
-The two flows are also very, very similar, but apparently do slightly different
-things.  Even more odd is that this version applies different sanity checks on
-the address than the existing code.  It should be fairly simple to extract a
-common helper.  That would likely help with naming problem too.
+Reviewed-by: David Matlack <dmatlack@google.com>
 
-> +{
-> +	size_t blob_size = rm_ap_jump_table_blob_end - rm_ap_jump_table_blob;
-> +	u16 startup_cs, startup_ip;
-> +	u16 __iomem *jump_table;
-> +	phys_addr_t pa;
-> +
-> +	if (!cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
-> +		return 0;
-> +
-> +	if (ghcb_info.vm_proto < 2) {
-> +		pr_warn("AP jump table parking requires at least GHCB protocol version 2\n");
-> +		return 0;
-> +	}
-> +
-> +	pa = get_jump_table_addr();
-> +
-> +	/* On UP guests there is no jump table so this is not a failure */
-> +	if (!pa)
-> +		return 0;
-> +
-> +	/* Check overflow and size for untrusted jump table address */
-> +	if (pa + PAGE_SIZE < pa || pa + PAGE_SIZE > SZ_4G) {
-> +		pr_info("AP jump table is above 4GB or address overflow - not enabling AP jump table parking\n");
-> +		return 0;
-> +	}
-> +
-> +	jump_table = ioremap_encrypted(pa, PAGE_SIZE);
-> +	if (WARN_ON(!jump_table))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Save reset vector to restore it later because the blob will
-> +	 * overwrite it.
-> +	 */
-> +	startup_ip = jump_table[0];
-> +	startup_cs = jump_table[1];
-> +
-> +	/* Install AP jump table Blob with real mode AP parking code */
-> +	memcpy_toio(jump_table, rm_ap_jump_table_blob, blob_size);
-> +
-> +	/* Setup AP jump table GDT */
-> +	sev_es_setup_ap_jump_table_data(jump_table, (u32)pa);
-> +
-> +	writew(startup_ip, &jump_table[0]);
-> +	writew(startup_cs, &jump_table[1]);
-> +
-> +	iounmap(jump_table);
-> +
-> +	pr_info("AP jump table Blob successfully set up\n");
-> +
-> +	/* Mark AP jump table blob as available */
-> +	sev_ap_jumptable_blob_installed = true;
-> +
-> +	return 0;
-> +}
-> +core_initcall(sev_setup_ap_jump_table);
+> 
+> >  
+> >  		role.ext.cr0_pg = 1;
+> >  		role.ext.cr4_pae = ____is_cr4_pae(regs);
+> > @@ -4766,7 +4759,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu,
+> >  	context->get_guest_pgd = get_cr3;
+> >  	context->get_pdptr = kvm_pdptr_read;
+> >  	context->inject_page_fault = kvm_inject_page_fault;
+> > -	context->root_level = role_regs_to_root_level(regs);
+> > +	context->root_level = cpu_role.base.level;
+> >  
+> >  	if (!is_cr0_pg(context))
+> >  		context->gva_to_gpa = nonpaging_gva_to_gpa;
+> > -- 
+> > 2.31.1
+> > 
+> > 
