@@ -2,68 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 134A04AC853
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 19:16:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 930904AC868
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 19:21:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238489AbiBGSL5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 13:11:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42862 "EHLO
+        id S234650AbiBGSTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 13:19:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240766AbiBGSGe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 13:06:34 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC6CC0401D9
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 10:06:33 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id e6so14327316pfc.7
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 10:06:33 -0800 (PST)
+        with ESMTP id S1344969AbiBGSOA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 13:14:00 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B040C0401D9
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 10:13:59 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id a8so14375549pfa.6
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 10:13:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=hy3GpyVEw/60S++NaKaGr5bmqwbdP+JQuuWqdHW03Jc=;
-        b=RQQsMOX37GnaDc3n36M3KMaCaFQ/XgqN0RD0xaMxohN0J9IYNAYTn3MzlPp2+TibyF
-         w3ljBPlMx71uFj5wDLdXcAZaRG9Pmp6q18ZClzgGdobKy1hxZVO6xTmagZkZ9Elf0Cvw
-         JUODXdELTF2T/bWf9KqA2HobTQbsgwVtsATkgXundUnJBk+bwkBgBZ6RNaav3TLkEcNT
-         R96zijXpWeDnf6aNyyIkXA0s2jY0EKBSeD34xn01Gpdv4nkFZdtg1uj768IXasaK/fvg
-         n1rSADchR/hz1FJZqGbsO3SIqUmAAgGE67DXBfHGeeX2ndn2Vz2oKI495dibQ2ESMXnx
-         eTjw==
+        bh=gELMWqQm1ylvlr8c0+U4NH+p+39jLDivrZdQ+7c9zxg=;
+        b=SS8lk/Gx4Nr1E3apckw8IQnjZwQYMvdDubxAco48TzU2DsQLgRrgiHnVigSDL1sWb0
+         v667QYOitDZOQD/ahbUB35rLmQayUrnfOhQ3LZa4XTvIoYANKNumGcDx6ewT9lxdx+fJ
+         2W5GV5AGq+VBul7muAf4pKsjYgxqD0zqOV4I5/EjO4WllKx+zaRnbz3ytpQdAp0waTyC
+         w1tcIPqhCXVIPpU828uVbQ4SGnrXFuuarI9npvs/l3yCSJgN1/Jqv8rNcyf4vDqQ4Www
+         bQwNJkuuZIX1DSGP9+qu3lKRABWSC9Cf1tE0df98U1nSASFizefBzbDCwAm8Sy4cd6CM
+         igKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=hy3GpyVEw/60S++NaKaGr5bmqwbdP+JQuuWqdHW03Jc=;
-        b=igBaX95T+gX8EIR/CaEfuYnxc8zmKXWqn4J41cPxj0zqX1hru5kdO8o60m9mVkZlwU
-         rhT7et1qTdFyldvV5JEYizhvaUZryIIekZ+9J9p97w5U6Ed033tr4vjFuJ/LSWo/aFtN
-         C6eWHvOBfzVK+dZHyyfqTAcY8AUjlMF70ZrSAI2Kfs3rLmaHgR7Qy7rTh9KZTBhaILaZ
-         zzY7hJd7C5BNFDTUOT3KbG/DCRnzBEqQBQ1mXgODy0SLajnawqzwTaaFCFB+thKKDLez
-         5fFDyqqr7ZjGulGGDOxQjA98AjBkmxm5QloD9oih+8qL0XKJ+sYKugn08qMYIC3YDD7N
-         JxsQ==
-X-Gm-Message-State: AOAM5302NoPXoXQ5l+vHHV4F7TnFaQtubZ4BJY1d92c/fPzZr9RbMAD2
-        bULQI8CNI001iMaudB3zTPgLFA==
-X-Google-Smtp-Source: ABdhPJzbNhmO/mE35rw+BM9GP8joClxHSvbbD+hXsinH7fwQ1DlW0/gwkYYqrZUBut0gafuBZQM8uA==
-X-Received: by 2002:a65:4547:: with SMTP id x7mr457760pgr.467.1644257193213;
-        Mon, 07 Feb 2022 10:06:33 -0800 (PST)
+        bh=gELMWqQm1ylvlr8c0+U4NH+p+39jLDivrZdQ+7c9zxg=;
+        b=fQ7bClzBjeQFCeUS/XywfuTGQjafgTtS74eiwfnxPbGUHIDgHKv4LTeEMZaQOWgHpD
+         tTjI2K8sKBGFqHtx1TMLjObGJ0TZkXlLD9YxnEmthqvHpPz/D93U002AixyUGKin1nTp
+         op4E8LU0ZAi4dd+CpLj+vK1KhFUnoQpsXpkDgypndhyOoU8H/sKtmhFamW4svOgEtIlS
+         /gQ5Px6ky1KTQxbfYUooNwL32aIIvI/ap4f9TdwYvX2jrT6gpXKQn4HeHlhQN+4dIH8j
+         Fhg8NFrmMRaueSFgqCGnIofqKs/vY0kKpNy63ZrA5k4eMTwyb/jla4IO5Eaype57kzfu
+         OF0Q==
+X-Gm-Message-State: AOAM531dkGdExSjCctUX9y+mAMa2CW+5bxV57cUqz/x+vexp7z4OQ+t0
+        +8mp7FQ0JjkerIFzztSyhvOn7Q==
+X-Google-Smtp-Source: ABdhPJx7XKboEu0OKmYC/1+vWKa9D+wqizv3XtDyygvGwPoEwp4dHATOfsMgYPnxY1+OUzztwZ5YYA==
+X-Received: by 2002:a63:6c89:: with SMTP id h131mr524778pgc.80.1644257638775;
+        Mon, 07 Feb 2022 10:13:58 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h6sm12755243pfc.35.2022.02.07.10.06.32
+        by smtp.gmail.com with ESMTPSA id f64sm12404538pfa.165.2022.02.07.10.13.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 10:06:32 -0800 (PST)
-Date:   Mon, 7 Feb 2022 18:06:29 +0000
+        Mon, 07 Feb 2022 10:13:58 -0800 (PST)
+Date:   Mon, 7 Feb 2022 18:13:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 4/7] KVM: nVMX: Add a quirk for KVM tweaks to VMX
- control MSRs
-Message-ID: <YgFfpTk/woy75TVj@google.com>
+Subject: Re: [PATCH v2 1/7] KVM: nVMX: Keep KVM updates to BNDCFGS ctrl bits
+ across MSR write
+Message-ID: <YgFhYi4pqh85/rlF@google.com>
 References: <20220204204705.3538240-1-oupton@google.com>
- <20220204204705.3538240-5-oupton@google.com>
+ <20220204204705.3538240-2-oupton@google.com>
+ <ce6e9ae4-2e5b-7078-5322-05b7a61079b4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220204204705.3538240-5-oupton@google.com>
+In-Reply-To: <ce6e9ae4-2e5b-7078-5322-05b7a61079b4@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,77 +76,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 04, 2022, Oliver Upton wrote:
-> KVM really has no business messing with the vCPU state. Nonetheless, it
-> has become ABI for KVM to adjust certain bits of the VMX entry/exit
-> control MSRs depending on the guest CPUID. Namely, the bits associated
-> with the IA32_PERF_GLOBAL_CTRL and IA32_BNDCFGS MSRs were conditionally
-> enabled if the guest CPUID allows for it.
+On Mon, Feb 07, 2022, Paolo Bonzini wrote:
+> On 2/4/22 21:46, Oliver Upton wrote:
+> > Since commit 5f76f6f5ff96 ("KVM: nVMX: Do not expose MPX VMX controls
+> > when guest MPX disabled"), KVM has taken ownership of the "load
+> > IA32_BNDCFGS" and "clear IA32_BNDCFGS" VMX entry/exit controls. The ABI
+> > is that these bits must be set in the IA32_VMX_TRUE_{ENTRY,EXIT}_CTLS
+> > MSRs if the guest's CPUID supports MPX, and clear otherwise.
+> > 
+> > However, KVM will only do so if userspace sets the CPUID before writing
+> > to the corresponding MSRs. Of course, there are no ordering requirements
+> > between these ioctls. Uphold the ABI regardless of ordering by
+> > reapplying KVMs tweaks to the VMX control MSRs after userspace has
+> > written to them.
 > 
-> Allow userspace to opt-out of changes to VMX control MSRs by adding a
-> new KVM quirk.
+> I don't understand this patch.  If you first write the CPUID and then the
+> MSR, the consistency is upheld by these checks:
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/x86/include/uapi/asm/kvm.h | 11 ++++++-----
->  arch/x86/kvm/vmx/vmx.c          |  3 +++
->  2 files changed, 9 insertions(+), 5 deletions(-)
+>         if (!is_bitwise_subset(data, supported, GENMASK_ULL(31, 0)))
+>                 return -EINVAL;
 > 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index bf6e96011dfe..acbab6a97fae 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -428,11 +428,12 @@ struct kvm_sync_regs {
->  	struct kvm_vcpu_events events;
->  };
->  
-> -#define KVM_X86_QUIRK_LINT0_REENABLED	   (1 << 0)
-> -#define KVM_X86_QUIRK_CD_NW_CLEARED	   (1 << 1)
-> -#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	   (1 << 2)
-> -#define KVM_X86_QUIRK_OUT_7E_INC_RIP	   (1 << 3)
-> -#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
-> +#define KVM_X86_QUIRK_LINT0_REENABLED		(1 << 0)
-> +#define KVM_X86_QUIRK_CD_NW_CLEARED		(1 << 1)
-> +#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE		(1 << 2)
-> +#define KVM_X86_QUIRK_OUT_7E_INC_RIP		(1 << 3)
-> +#define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT	(1 << 4)
-> +#define KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS	(1 << 5)
-
-I'd prefer we include msr_ia32_feature_control_valid_bits in this quirk, it should
-be relatively easy to do since most of the modifications stem from
-vmx_vcpu_after_set_cpuid().  vmx_setup_mce() is a bit odd, but IMO it's worth
-excising as much crud as we can.
-
->  #define KVM_STATE_NESTED_FORMAT_VMX	0
->  #define KVM_STATE_NESTED_FORMAT_SVM	1
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 395787b7e7ac..60b1b76782e1 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7231,6 +7231,9 @@ void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> +	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS))
-> +		return;
-
-
-Probably worth calling out that nested_vmx_cr_fixed1_bits_update() is intentionally
-exempt from this "rule":
-
-	case MSR_IA32_VMX_CR0_FIXED1:
-	case MSR_IA32_VMX_CR4_FIXED1:
-		/*
-		 * These MSRs are generated based on the vCPU's CPUID, so we
-		 * do not support restoring them directly.
-		 */
-		return -EINVAL;
-
-> +
->  	if (kvm_mpx_supported()) {
->  		bool mpx_enabled = guest_cpuid_has(vcpu, X86_FEATURE_MPX);
->  
-> -- 
-> 2.35.0.263.gb82422642f-goog
+>         if (!is_bitwise_subset(supported, data, GENMASK_ULL(63, 32)))
+>                 return -EINVAL;
 > 
+> If you're fixing a case where userspace first writes the MSR and then sets
+> CPUID, then I would expect that KVM_SET_CPUID2 redoes those checks and, if
+> they fail, it adjusts the MSRs.
+> 
+> The selftests confirm that I'm a bit confused, but in general
+> vmx_restore_control_msr is not the place where I was expecting the change.
+
+Do we even need this change?  The ABI is whatever it is, not what may or may not
+have been intended by a flawed, 3+ year old commit.   E.g. if there's a userspace
+that relies on being able to override KVM's tweaks by writing the MSRs after
+setting CPUID, then this commit will break the ABI for that userspace.  The quirk
+should be sufficient warning that KVM's behavior is funky.
