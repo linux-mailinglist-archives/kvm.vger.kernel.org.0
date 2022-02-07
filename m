@@ -2,493 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FBD24AC542
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 17:17:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 960394AC549
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 17:18:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241382AbiBGQQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 11:16:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41592 "EHLO
+        id S237463AbiBGQRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 11:17:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348696AbiBGQDA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 11:03:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E91C5C0401D3
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 08:02:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644249778;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5WIO5n6+3jqzKnCirxzx86dJnJZyXVHjiDs7Tj6xNnY=;
-        b=OBZ3btoJKhxTb6cZtOVtshcPNzmTpWFi1sfsYhUxyZwff+jC+uufFzwav/Z9DkLMd6mtLq
-        E5Altt/53vVCGEuC3XZmX0zdmCJv8NZUF3iuGsL+B+aDy5MKrYL5aO4HvZdZenBiQ8FD9I
-        GjZdBQcu3v5piFSZs+rxHW22q+uoK6Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-10-vZy_U4-_P6ay5ymHJ7brZQ-1; Mon, 07 Feb 2022 11:02:56 -0500
-X-MC-Unique: vZy_U4-_P6ay5ymHJ7brZQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F40219251A0;
-        Mon,  7 Feb 2022 16:02:53 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CCE5D8276B;
-        Mon,  7 Feb 2022 16:02:22 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Tony Luck <tony.luck@intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        David Airlie <airlied@linux.ie>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH RESEND 30/30] KVM: x86: get rid of KVM_REQ_GET_NESTED_STATE_PAGES
-Date:   Mon,  7 Feb 2022 17:54:47 +0200
-Message-Id: <20220207155447.840194-31-mlevitsk@redhat.com>
-In-Reply-To: <20220207155447.840194-1-mlevitsk@redhat.com>
-References: <20220207155447.840194-1-mlevitsk@redhat.com>
+        with ESMTP id S232653AbiBGQKE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 11:10:04 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3983C0401D1
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 08:10:02 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id y9so5685470pjf.1
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 08:10:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xiSBzPQnTG+yIHuJ7k7x6ADsNTF+1w12491gzVcMAFE=;
+        b=ZbB3crbAr+DzqHrDW5Wa8yEKGFB41seBarYw/+E5gPl3dirtURFGGzZ5zhYw3d1vg5
+         FdW1Gih98v5ar8dHJBsPRS7twDQgTBUtxRh3/aLC4PuerU5TfB9hvDDGxs+xE72BGbe8
+         vxo84b+Mkfy5EU/P6GHDHkw5M3Ukn9Kn1G8ZOlG4BGoNjSCXabmc0C3yMadA5vBZmddf
+         vU8HLzOLMQeRJTdxuj/Uzzqx62U4WyDC4oMoJM6mJEQ/NP2wOOiN/Q59NINXhQ0cdnJM
+         R4H9/dJBXlmZTjjEn/6KotsLQzQGNfMutC0lPaHyHoSpVj6AmKHbmSJVa2+pwlNVhEuQ
+         l6pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xiSBzPQnTG+yIHuJ7k7x6ADsNTF+1w12491gzVcMAFE=;
+        b=7D2z8Om0OfOCs5S6wzq5kMKIZ4LkL6Vnh1GsSRnqPfh1cC7tjt6ayPNmSjzCwBMQR1
+         lTPsf86fO2NDGhR33Iv8isWLwXwUy6gNJHkgVpQ6lFAqM5JE0WsqO51LOuFLzWxA/9SS
+         49VFshieF2brTABDjG58l/+LYRaYSV3EnOCDWEzoOcNCxVvQoNHJ2tsxytN9yMtLeN78
+         qGn+Cia/tNo/t+Hx336JVTtWVPUiMHLbvNInObr64i8CxdQTh9iC5JGw+QtqMHsFfspZ
+         Z4F4I8K6wKEibv3PsSL7GGYB/cuzKoAJpPDFFq9ln7Oot0vBe9DDSkxbwxqBVNqfkEH/
+         UQgg==
+X-Gm-Message-State: AOAM5339ZvUBl/j8/L+BI9LhRFyxf4+wUxGV7CGy0COF1zbL+GNhFFP5
+        zkvjlNMLCaj9CotdZfaVTXNshk/gbrHOxw==
+X-Google-Smtp-Source: ABdhPJwRrTS8wrHCH7GEaOUas2bOM2kxOBaDos9y+CXKADhOyp3DgXUB0Ig+/gcWE2Wba/Q7POrZhw==
+X-Received: by 2002:a17:90b:2251:: with SMTP id hk17mr19523346pjb.210.1644250202261;
+        Mon, 07 Feb 2022 08:10:02 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s32sm6788998pfw.80.2022.02.07.08.10.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Feb 2022 08:10:01 -0800 (PST)
+Date:   Mon, 7 Feb 2022 16:09:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, vkuznets@redhat.com
+Subject: Re: [PATCH 01/23] KVM: MMU: pass uses_nx directly to
+ reset_shadow_zero_bits_mask
+Message-ID: <YgFEVr9NM1vXdexg@google.com>
+References: <20220204115718.14934-1-pbonzini@redhat.com>
+ <20220204115718.14934-2-pbonzini@redhat.com>
+ <Yf1pk1EEBXj0O0/p@google.com>
+ <8081cbe5-6d12-9f99-9f0f-13c1d7617647@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8081cbe5-6d12-9f99-9f0f-13c1d7617647@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As it turned out this request isn't really needed,
-and it complicates the nested migration.
+On Sat, Feb 05, 2022, Paolo Bonzini wrote:
+> On 2/4/22 18:59, David Matlack wrote:
+> > > +	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
+> > 
+> > Out of curiousity, how does KVM mitigate iTLB multi-hit when shadowing
+> > NPT and the guest has not enabled EFER.NX?
+> 
+> You got me worried for a second but iTLB multihit is Intel-only, isn't it?
 
-In theory this patch can break userspace if
-userspace relies on updating KVM's memslots
-after setting nested state but there is little reason
-for it to rely on this.
-
-However this is undocumented and there is a good chance
-that no userspace relies on this, thus
-just try to remove this code.
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  5 +-
- arch/x86/kvm/hyperv.c           |  4 ++
- arch/x86/kvm/svm/nested.c       | 50 ++++-------------
- arch/x86/kvm/svm/svm.c          |  2 +-
- arch/x86/kvm/svm/svm.h          |  2 +-
- arch/x86/kvm/vmx/nested.c       | 99 +++++++++------------------------
- arch/x86/kvm/x86.c              |  6 --
- 7 files changed, 45 insertions(+), 123 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 446ee29e6cc99..fc2d5628ad930 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -92,7 +92,6 @@
- #define KVM_REQ_HV_EXIT			KVM_ARCH_REQ(21)
- #define KVM_REQ_HV_STIMER		KVM_ARCH_REQ(22)
- #define KVM_REQ_LOAD_EOI_EXITMAP	KVM_ARCH_REQ(23)
--#define KVM_REQ_GET_NESTED_STATE_PAGES	KVM_ARCH_REQ(24)
- #define KVM_REQ_APICV_UPDATE \
- 	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
-@@ -1519,12 +1518,14 @@ struct kvm_x86_nested_ops {
- 	int (*set_state)(struct kvm_vcpu *vcpu,
- 			 struct kvm_nested_state __user *user_kvm_nested_state,
- 			 struct kvm_nested_state *kvm_state);
--	bool (*get_nested_state_pages)(struct kvm_vcpu *vcpu);
- 	int (*write_log_dirty)(struct kvm_vcpu *vcpu, gpa_t l2_gpa);
- 
- 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
- 			    uint16_t *vmcs_version);
- 	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
-+
-+	bool (*get_evmcs_page)(struct kvm_vcpu *vcpu);
-+
- };
- 
- struct kvm_x86_init_ops {
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index dac41784f2b87..d297d102c0910 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1497,6 +1497,10 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
- 					    gfn_to_gpa(gfn) | KVM_MSR_ENABLED,
- 					    sizeof(struct hv_vp_assist_page)))
- 			return 1;
-+
-+		if (host && kvm_x86_ops.nested_ops->get_evmcs_page)
-+			if (!kvm_x86_ops.nested_ops->get_evmcs_page(vcpu))
-+				return 1;
- 		break;
- 	}
- 	case HV_X64_MSR_EOI:
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index a426d4d3dcd82..ac813ad83d784 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -670,7 +670,7 @@ static void nested_svm_copy_common_state(struct vmcb *from_vmcb, struct vmcb *to
- }
- 
- int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
--			 struct vmcb *vmcb12, bool from_vmrun)
-+			 struct vmcb *vmcb12)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	int ret;
-@@ -700,15 +700,13 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	nested_vmcb02_prepare_save(svm, vmcb12);
- 
- 	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
--				  nested_npt_enabled(svm), from_vmrun);
-+				  nested_npt_enabled(svm), true);
- 	if (ret)
- 		return ret;
- 
- 	if (!npt_enabled)
- 		vcpu->arch.mmu->inject_page_fault = svm_inject_page_fault_nested;
- 
--	if (!from_vmrun)
--		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
- 
- 	svm_set_gif(svm, true);
- 
-@@ -779,7 +777,7 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- 
- 	svm->nested.nested_run_pending = 1;
- 
--	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12, true))
-+	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12))
- 		goto out_exit_err;
- 
- 	if (nested_svm_vmrun_msrpm(svm))
-@@ -863,8 +861,6 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 	svm->nested.vmcb12_gpa = 0;
- 	WARN_ON_ONCE(svm->nested.nested_run_pending);
- 
--	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
--
- 	/* in case we halted in L2 */
- 	svm->vcpu.arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 
-@@ -1069,8 +1065,6 @@ void svm_leave_nested(struct kvm_vcpu *vcpu)
- 		nested_svm_uninit_mmu_context(vcpu);
- 		vmcb_mark_all_dirty(svm->vmcb);
- 	}
--
--	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
- }
- 
- static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
-@@ -1562,53 +1556,31 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	 */
- 
- 	ret = nested_svm_load_cr3(&svm->vcpu, vcpu->arch.cr3,
--				  nested_npt_enabled(svm), false);
-+				  nested_npt_enabled(svm), !vcpu->arch.pdptrs_from_userspace);
- 	if (WARN_ON_ONCE(ret))
- 		goto out_free;
- 
- 
--	kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
--	ret = 0;
--out_free:
--	kfree(save);
--	kfree(ctl);
--
--	return ret;
--}
--
--static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_svm *svm = to_svm(vcpu);
--
--	if (WARN_ON(!is_guest_mode(vcpu)))
--		return true;
--
--	if (!vcpu->arch.pdptrs_from_userspace &&
--	    !nested_npt_enabled(svm) && is_pae_paging(vcpu))
--		/*
--		 * Reload the guest's PDPTRs since after a migration
--		 * the guest CR3 might be restored prior to setting the nested
--		 * state which can lead to a load of wrong PDPTRs.
--		 */
--		if (CC(!load_pdptrs(vcpu, vcpu->arch.cr3)))
--			return false;
--
- 	if (!nested_svm_vmrun_msrpm(svm)) {
- 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
- 		vcpu->run->internal.suberror =
- 			KVM_INTERNAL_ERROR_EMULATION;
- 		vcpu->run->internal.ndata = 0;
--		return false;
-+		goto out_free;
- 	}
- 
--	return true;
-+	ret = 0;
-+out_free:
-+	kfree(save);
-+	kfree(ctl);
-+	return ret;
- }
- 
-+
- struct kvm_x86_nested_ops svm_nested_ops = {
- 	.leave_nested = svm_leave_nested,
- 	.check_events = svm_check_nested_events,
- 	.triple_fault = nested_svm_triple_fault,
--	.get_nested_state_pages = svm_get_nested_state_pages,
- 	.get_state = svm_get_nested_state,
- 	.set_state = svm_set_nested_state,
- };
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index afa4116ea938c..6d6421e0cadcd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4498,7 +4498,7 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 	vmcb12 = map.hva;
- 	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
- 	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
--	ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12, false);
-+	ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
- 
- 	if (ret)
- 		goto unmap_save;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index dd3671d77258b..e2eb91851e922 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -551,7 +551,7 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- }
- 
- int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
--			 u64 vmcb_gpa, struct vmcb *vmcb12, bool from_vmrun);
-+			 u64 vmcb_gpa, struct vmcb *vmcb12);
- void svm_leave_nested(struct kvm_vcpu *vcpu);
- void svm_free_nested(struct vcpu_svm *svm);
- int svm_allocate_nested(struct vcpu_svm *svm);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e89b32b1d9efb..19331f742662d 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -294,8 +294,6 @@ static void free_nested(struct kvm_vcpu *vcpu)
- 	if (!vmx->nested.vmxon && !vmx->nested.smm.vmxon)
- 		return;
- 
--	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
--
- 	vmx->nested.vmxon = false;
- 	vmx->nested.smm.vmxon = false;
- 	vmx->nested.vmxon_ptr = INVALID_GPA;
-@@ -2593,7 +2591,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 
- 	/* Shadow page tables on either EPT or shadow page tables. */
- 	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
--				from_vmentry, entry_failure_code))
-+				from_vmentry || !vcpu->arch.pdptrs_from_userspace,
-+				entry_failure_code))
- 		return -EINVAL;
- 
- 	/*
-@@ -3125,7 +3124,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
-+bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-@@ -3161,18 +3160,6 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	struct page *page;
- 	u64 hpa;
- 
--	if (!vcpu->arch.pdptrs_from_userspace &&
--	    !nested_cpu_has_ept(vmcs12) && is_pae_paging(vcpu)) {
--		/*
--		 * Reload the guest's PDPTRs since after a migration
--		 * the guest CR3 might be restored prior to setting the nested
--		 * state which can lead to a load of wrong PDPTRs.
--		 */
--		if (CC(!load_pdptrs(vcpu, vcpu->arch.cr3)))
--			return false;
--	}
--
--
- 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
- 		/*
- 		 * Translate L1 physical address to host physical
-@@ -3254,25 +3241,6 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
--{
--	if (!nested_get_evmcs_page(vcpu)) {
--		pr_debug_ratelimited("%s: enlightened vmptrld failed\n",
--				     __func__);
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror =
--			KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
--
--		return false;
--	}
--
--	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
--		return false;
--
--	return true;
--}
--
- static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
- {
- 	struct vmcs12 *vmcs12;
-@@ -3402,12 +3370,12 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 
- 	prepare_vmcs02_early(vmx, &vmx->vmcs01, vmcs12);
- 
--	if (from_vmentry) {
--		if (unlikely(!nested_get_vmcs12_pages(vcpu))) {
--			vmx_switch_vmcs(vcpu, &vmx->vmcs01);
--			return NVMX_VMENTRY_KVM_INTERNAL_ERROR;
--		}
-+	if (unlikely(!nested_get_vmcs12_pages(vcpu))) {
-+		vmx_switch_vmcs(vcpu, &vmx->vmcs01);
-+		return NVMX_VMENTRY_KVM_INTERNAL_ERROR;
-+	}
- 
-+	if (from_vmentry) {
- 		if (nested_vmx_check_vmentry_hw(vcpu)) {
- 			vmx_switch_vmcs(vcpu, &vmx->vmcs01);
- 			return NVMX_VMENTRY_VMFAIL;
-@@ -3429,24 +3397,14 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 		goto vmentry_fail_vmexit_guest_mode;
- 	}
- 
--	if (from_vmentry) {
--		failed_index = nested_vmx_load_msr(vcpu,
--						   vmcs12->vm_entry_msr_load_addr,
--						   vmcs12->vm_entry_msr_load_count);
--		if (failed_index) {
--			exit_reason.basic = EXIT_REASON_MSR_LOAD_FAIL;
--			vmcs12->exit_qualification = failed_index;
--			goto vmentry_fail_vmexit_guest_mode;
--		}
--	} else {
--		/*
--		 * The MMU is not initialized to point at the right entities yet and
--		 * "get pages" would need to read data from the guest (i.e. we will
--		 * need to perform gpa to hpa translation). Request a call
--		 * to nested_get_vmcs12_pages before the next VM-entry.  The MSRs
--		 * have already been set at vmentry time and should not be reset.
--		 */
--		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-+
-+	failed_index = nested_vmx_load_msr(vcpu,
-+					   vmcs12->vm_entry_msr_load_addr,
-+					   vmcs12->vm_entry_msr_load_count);
-+	if (failed_index) {
-+		exit_reason.basic = EXIT_REASON_MSR_LOAD_FAIL;
-+		vmcs12->exit_qualification = failed_index;
-+		goto vmentry_fail_vmexit_guest_mode;
- 	}
- 
- 	/*
-@@ -4516,16 +4474,6 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 	/* Similarly, triple faults in L2 should never escape. */
- 	WARN_ON_ONCE(kvm_check_request(KVM_REQ_TRIPLE_FAULT, vcpu));
- 
--	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
--		/*
--		 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
--		 * Enlightened VMCS after migration and we still need to
--		 * do that when something is forcing L2->L1 exit prior to
--		 * the first L2 run.
--		 */
--		(void)nested_get_evmcs_page(vcpu);
--	}
--
- 	/* Service pending TLB flush requests for L2 before switching to L1. */
- 	kvm_service_local_tlb_flush_requests(vcpu);
- 
-@@ -6382,14 +6330,17 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 
- 		set_current_vmptr(vmx, kvm_state->hdr.vmx.vmcs12_pa);
- 	} else if (kvm_state->flags & KVM_STATE_NESTED_EVMCS) {
-+
-+		vmx->nested.hv_evmcs_vmptr = EVMPTR_MAP_PENDING;
-+
- 		/*
- 		 * nested_vmx_handle_enlightened_vmptrld() cannot be called
--		 * directly from here as HV_X64_MSR_VP_ASSIST_PAGE may not be
--		 * restored yet. EVMCS will be mapped from
--		 * nested_get_vmcs12_pages().
-+		 * directly from here if HV_X64_MSR_VP_ASSIST_PAGE is not
-+		 * restored yet. EVMCS will be mapped when it is.
- 		 */
--		vmx->nested.hv_evmcs_vmptr = EVMPTR_MAP_PENDING;
--		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-+		if (kvm_hv_assist_page_enabled(vcpu))
-+			nested_get_evmcs_page(vcpu);
-+
- 	} else {
- 		return -EINVAL;
- 	}
-@@ -6811,8 +6762,8 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.triple_fault = nested_vmx_triple_fault,
- 	.get_state = vmx_get_nested_state,
- 	.set_state = vmx_set_nested_state,
--	.get_nested_state_pages = vmx_get_nested_state_pages,
- 	.write_log_dirty = nested_vmx_write_pml_buffer,
- 	.enable_evmcs = nested_enable_evmcs,
- 	.get_evmcs_version = nested_get_evmcs_version,
-+	.get_evmcs_page = nested_get_evmcs_page,
- };
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0ee2fbb068b17..48dd01fd7a1ec 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9897,12 +9897,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			r = -EIO;
- 			goto out;
- 		}
--		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
--			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
--				r = 0;
--				goto out;
--			}
--		}
- 		if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
- 			kvm_mmu_unload(vcpu);
- 		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
--- 
-2.26.3
-
+AFAIK, yes, big Core only.  arch/x86/kernel/cpu/common.c sets NO_ITLB_MULTIHIT
+for all AMD, Hygon, and Atom CPUs.
