@@ -2,76 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BBE64AC9F6
-	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 20:57:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1705C4ACA24
+	for <lists+kvm@lfdr.de>; Mon,  7 Feb 2022 21:11:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238178AbiBGTzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 14:55:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35784 "EHLO
+        id S241468AbiBGULM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 15:11:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241667AbiBGTvK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 14:51:10 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21C0C0401DA
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 11:51:09 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id e6so14815684pfc.7
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 11:51:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vzlzaB5S/veay9fPsYouwaa7Ye2duYzjZ7MsDyh1dr4=;
-        b=DWvVdPKojL+uX+8p3r/iCjkHgAERiMri1PzoB/Zo0kSnzI46zwpN2j6TOjDnLPvwVf
-         hAbDf2McKmU2wDKHc+DePunkStheTMA5WRL1xC6HZRU5UBDR2TbsJO1UPDT1jxnBUXMV
-         WhX37VktCtbWWXdlT+u9fYjz806AJFbK+zXU/1L6ZZeHcj0C/iES3inbmXTCs+1MTMjP
-         XZk9QIg6fRn7NLS2LC5rdI80mmJXYEW5tlbZbrl99GdkVMk8BOgyhLlPPL2DSq0BCxIN
-         yiN8vAxFu2y8FTQtM7uDKGpGPF0cehnZuJEoyK5Qk+/nuFvzXpsVX5Ozn1xE1xE7acTH
-         fPcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vzlzaB5S/veay9fPsYouwaa7Ye2duYzjZ7MsDyh1dr4=;
-        b=V3+4Tmr+px916ICHp+x2FMe0IXZTS4JGrKmUnfYYp3T8Tvv29XDkoxiKAw42WQUwHA
-         wIZy0JJLocM/u6O9AsGrsvmruVWxDK1CyF/RKq6R0lZS2t7MhnlGV30aotXbfZFaDdTd
-         oOxkvzRIGEomGRsD2XiJRcolhWpuHBpCH+9ZwoUrPbbmdg5V9wT6V24i2HLZBDlQqe+M
-         7+OnsvhCvCd3mfexrY4mGShuAtSuSdb5ynmp4mMIBih7W1O1pbHqBqgivw3nQbLCYzMf
-         r44Px21ilgYn3uuLw7i3ldw1j+coPsCwDzh7EJJ9VFUuu/Gl/wbXdgFU2LOS/hkE8PVL
-         iqzw==
-X-Gm-Message-State: AOAM531yR3zlpe3l4RSzlWd1OoON4f47m4p7BK4iwWtyUL4sejkOwdbx
-        OwucnsHnsqP4B/mGr71az0l58tOQDn1feg==
-X-Google-Smtp-Source: ABdhPJxckrgaXyzE7hXmoCqcM4bymTTt+24ecIBSNEEEv8MA5Bd9AJg0cUoNit9K9VB1eF832B7YIQ==
-X-Received: by 2002:a05:6a00:244e:: with SMTP id d14mr968685pfj.45.1644263469165;
-        Mon, 07 Feb 2022 11:51:09 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c18sm12636184pfp.181.2022.02.07.11.51.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 11:51:08 -0800 (PST)
-Date:   Mon, 7 Feb 2022 19:51:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        with ESMTP id S241431AbiBGUIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 15:08:25 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41743C0401DA;
+        Mon,  7 Feb 2022 12:08:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RAWxoFz5dJCMR/c/UKfYUz+vtpIyTyKjFTIEgVMd3Bx5MdyjNGNenT+7RAbSSbHM7Z5sZ1Ein4OPcVtGyoTKEgLXGmhDzP47yaC/xXRaUZyP/aY0vp2yO9LzfptadxOvgcFXdhD5860sNVF+DRTyZfLaVy6FG6ljnKSzYGwtjccYCUH0y1d4mz5+xXsSzhMYZh1A5hW5qj51lnrcEtVI855vSIzwIV+3dfyi3Z8PaiQEMbBZ6cMnGIuchLSvwULJFd/8iyjA++0/ZLoPzVzm0/UK2WvgFySHMxYaXxgf4p3MO7OrRCxtmv8HnpmPgIsDSwEM7Qf7P8Nhqn4LvURQcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fI/y7R/zPvuD+YoEFR7bb8ff/zjT72VcB2nkfMTIuqQ=;
+ b=Z+p+KudYXha38QIo755JNIPiwzeJkl5PPQistVumZ2nF/MHs3Vv8wR5B5j7HX4sPVjs4wzafKaqAi2XNzz/TyQRTYa5s8qBszMTXTy6vD23QJmp6GyVaMpL+/5vUrdmQOZrvpBloarVKsgvZMGUGfQMokOFdPi5Bq4xl/efClkL6o0mbZhAGWSAeWG4sCJjK6eOFxvvXNvUfFWN7LyVnnX9uLvjh43hjyYrhEpfcwE+MF7hWGVxrJEeG2trBGckIQ5fsuj2WDEarXwzcVvai22rB05aGA+USzOwLiPqrgtA1g6HejlV8377P1kNVffpGNvdIdFf9ZfKbgjoGk9sGoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fI/y7R/zPvuD+YoEFR7bb8ff/zjT72VcB2nkfMTIuqQ=;
+ b=CrrC8X4ymB+MZGO1JtdOgLFLcEALAcH+HYjPuVspJEZ8VmJaIkCMDCvhJitM8RvtjgmRykXqTmdU6C68WR03CDGTk5NJyiQSpd04EqzP2KULRpfuvmAPVRVhXs0TBoq0hhUfhvtPY5x5lAn7gXxCOahSzKxIUQVB0foV8VQjxww=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by DM5PR12MB1516.namprd12.prod.outlook.com (2603:10b6:4:5::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4951.11; Mon, 7 Feb 2022 20:08:22 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::500e:b264:8e8c:1817]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::500e:b264:8e8c:1817%5]) with mapi id 15.20.4951.018; Mon, 7 Feb 2022
+ 20:08:22 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Fix wrong privilege check for code segment
- in __load_segment_descriptor()
-Message-ID: <YgF4KX90nxxyaDcN@google.com>
-References: <cover.1642669684.git.houwenlong.hwl@antgroup.com>
- <ed8917d7bab80a1c1a130beae45c7d6ecdef47fc.1642669684.git.houwenlong.hwl@antgroup.com>
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: [PATCH v9 42/43] virt: sevguest: Add support to derive key
+To:     Dov Murik <dovmurik@linux.ibm.com>, Borislav Petkov <bp@alien8.de>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-43-brijesh.singh@amd.com> <YgDduR0mrptX5arB@zn.tnic>
+ <1cb4fdf5-7c1e-6c8f-1db6-8c976d6437c2@amd.com>
+ <ae1644a3-bd2c-6966-4ae3-e26abd77b77b@linux.ibm.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <20ba1ac2-83d1-6766-7821-c9c8184fb59b@amd.com>
+Date:   Mon, 7 Feb 2022 14:08:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <ae1644a3-bd2c-6966-4ae3-e26abd77b77b@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR17CA0022.namprd17.prod.outlook.com
+ (2603:10b6:610:53::32) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed8917d7bab80a1c1a130beae45c7d6ecdef47fc.1642669684.git.houwenlong.hwl@antgroup.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 48977732-48d3-4b6e-295f-08d9ea75971b
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1516:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1516C5D5BCC7A7785A469BF8E52C9@DM5PR12MB1516.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3vSbLnSwAq/0AqzYbK44uR+OmE016bx5/ti/8ICP+c5CAnRIhdMW+1TmxxuNqIFGAkVJJ4OKgM2dlrfI2yKxwniKsfKxTJIHsZCsSrZ9YtiLkhQg4MA9QIaTazN0/gEgo3kQwF/A85Du28EwpC45MTRt7awo0dn0vb2RTfd+PP26HoPTyYb4RKtvnfM/kwaB0dMJo2PGKIkCMXMPKSOjjVM3D17GbdloWQXsWf9qVZpE3o9X4jD7ykla7oaLK1ClG1NFUhRsz85siFFTLSjN07gvDytv9DFJGydiOxd29O3yYXh0JReGWuwzRUNJ3YgCucw3TAki/TKpjVAzjNlIWDBTgTTXPBxgdQok/nHtCvupn3fjl79JBG32HuDvXhO0zjoCbUQugEN7SE9Up3lFTtgjp0CU77T1i6XsHHtJUYU9fup6T5UIrahLGX9WTzMwAiRDcobYXl7sMrLg/7V0NymORZ9gPm/ITamSSaQc6T9SIO8C03Mos4sUKaKrF/IsFIS/7ERBlIonIOQ7vsKHZBABLoCxOXaRjN1VXiFaBElNAr2v2IB5jD5xJ1GGakcILTS1gHBvxpIjo7PQGCYTP3S1yYT4N8qGS42qZmtdBQtXDT+p1YAZsIVR68ORUZZi6QoRNLOCKyBZfg6tFwRnwaoYpC7dtXNJuCCLwzEWPhDO/Gjtrj20U530WDJPhQuZBhqmB8faAFC594ioUIjOIeqiK/CUZ8I1jdyJrgHjvcs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(38100700002)(6666004)(2906002)(53546011)(6512007)(7416002)(6486002)(8936002)(8676002)(66946007)(66476007)(66556008)(316002)(36756003)(54906003)(110136005)(44832011)(7406005)(508600001)(26005)(5660300002)(2616005)(4326008)(186003)(86362001)(31686004)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QzlwWHZQQnFQaTlZd2d2bGRGcUR2VVNKeXBwMm41Q3djN3V5Tkc3bFVPSS9l?=
+ =?utf-8?B?MmlzYnB2OHYwWE9wRlRBSC9sQk90WmVScmZWb0lGWGk5VzJ1YXAwcjNWaVd2?=
+ =?utf-8?B?MmVXbzF5RG9KOTlDSGtlZ1JNNFQrV3ZpeUZrMGJWTERlczRyeDc5QWllYlZx?=
+ =?utf-8?B?OTU2Wkh0MGg3cC8xNnlTVlQvRXUrS3ZDOXpmZ25HVUFTK3FDL1E4OVRIMkNo?=
+ =?utf-8?B?MjNlcnhvSWFNTVZVU3UwSWllVCttMjBvOTdDZFplSU1Ydk9VL0FKc1kxTXhp?=
+ =?utf-8?B?N2RSZytHMVMvNEJ0WGNGaXptNC9xL1ZJK3NzZy90RU1XVmQ1OGFoOENwcmRV?=
+ =?utf-8?B?QTZWOG9uUndDcUFYMkFheXJkcG1yMXk4aGRUcjNBL0djdzZ2UmRWTjBZR25z?=
+ =?utf-8?B?WTdWSGhmcHp4Mm05ZmYrblU1cWRhQ3kwZEFTWERBZ2JwaEtNYUVGbUdZd0Vy?=
+ =?utf-8?B?RWh0WjI1Ym04RThtbnJtTmx4NFF0bFlIaUJuWGpGOEsrVWk3V3M1ejdZem9V?=
+ =?utf-8?B?djdrNEFiNWVCd2FqYXk1R3FId1VrcElNZTFub0cvS2ZrVXdDd1JjMkJVM2I0?=
+ =?utf-8?B?SkJvZUlpMEhvWm9ualBwSC9qem14bkRhbS9JSElud1BqcEtNWXZBTGc3Q2JN?=
+ =?utf-8?B?K3ZidVRFRzRtRTVDa1p2OGV4c0Fkak81ZkFMVFk3c3cvQStPKzIyMEJJU2I1?=
+ =?utf-8?B?WEFaZUlvWU1lSG8wZm9BbFNCYjBMY0JSSXpqKzB0eklDUlE3T1VDWWhUMVBz?=
+ =?utf-8?B?V0VLb2pIYUd5TTFnM2pxSnJlUlozNkhZdG5Wd2tBOVppcnllakw0QVJ6ZVds?=
+ =?utf-8?B?SU1QSVN5aDk0OTdoNFc0YU4zekpoZERqZTZZdXhTa0FNdUZzTThHalpScHZm?=
+ =?utf-8?B?S3lxU1Z5bW1pd3V6Y2ZtV09xTnUzYnRYMnpmTjNvWjl6Sm0xeEo4a09SS2JH?=
+ =?utf-8?B?T1k1RDUwRlBadjVxVkJWTUdnWTlsbFNsUkpYVGtReWxhMXVVOCtoMTBmZzd1?=
+ =?utf-8?B?Zy95cmNONmxpWnpLZEFyMk5rU3pYVHp1c3NGbVBHc0RWcWhFOUZEM1oxenE1?=
+ =?utf-8?B?dzBqVTV1R3pqU0gzMmNPb25YbGdiWFVzVnlzNVJEWGg3L3I5ZGxVdkc0ajlP?=
+ =?utf-8?B?SGNhamhHMmRNTk1laHNFZGtQOUpuZ2xWMzNza2dBWjBXWkw5dnFhZGZzMjFo?=
+ =?utf-8?B?SVBOdTZCVkIyMkRLQlVwb3g4NEpyeERscnBFVTFhc2Q3TVF4bTErZ0pXdGtD?=
+ =?utf-8?B?V3hkL05ydmpXTVNoRWVHTSs0b2xOOHZkaGVwVE92TDNtajM0YndCbWM2UlY5?=
+ =?utf-8?B?SmdJamhZc1J0SHJubG9zZkJOcUxHemVGUFR5S3RLaXExWXAwR1lOdFJsdUFH?=
+ =?utf-8?B?cWVXMElEeXlkeGYrQzBFbFJydEpPcHpJbUZIUlNuRldiOFpScHd3WHBLTnBM?=
+ =?utf-8?B?Qm4ra0UzWDNvUUJWR3NpZENRcy94NDVhNlVsUm1QSTd4MWVLc05BZEF5L0NL?=
+ =?utf-8?B?NFVNSzVQc0xGU1A0WHBubms3UFBTN3FkMUNSbEg1dWVFeC9KdVlLWnJmNDkx?=
+ =?utf-8?B?Qjlkb0Zwd2JGMkxxc2Z1SVByNi9QRUUrcmRYaGgraDV6SzFiM1FQSkJCb3NP?=
+ =?utf-8?B?d0ttOXQ5eDZWdDhBN2U0dU9uUEVnWndkd0dTa2NqQk1VbVNmNFR4ZTREbzVT?=
+ =?utf-8?B?a3htd0FPbFdrSjJZMDhoYW9ZdHFnak9rbmN1eW93T2xzYU53OE5ZTjI0dFUz?=
+ =?utf-8?B?ejR3SGpiY1p5WTdSb25FRGxwNzVjY2JRNmdoTkc2YXkzTGhMMHl3REtYWkxR?=
+ =?utf-8?B?SkZvOW9KNVNIRnEycUs3VUxuR0ZSUFNKQ3hVL1NDZUFhYlFRaHFUa2V5NXpy?=
+ =?utf-8?B?WHF2VHprRTlOQjZqRGhpNnNzM1RlZzRBYVhwMm9FNHp5VTUvK1piWUZMZ0Ns?=
+ =?utf-8?B?NmFYampKVzc3RDJOYzl1Z0xYOHJjNDVoRkIwWGE4aS9zL2I1UmxXNWNwWHpu?=
+ =?utf-8?B?OHJwUksyTUprOGFIa0RPaGdXU3pycDNrTUtVazRQOUpleXhJdDRoTy9mcTli?=
+ =?utf-8?B?Z1doYjhNakp4Qm9VV1NVd05aYlRNUE1VaHdFeDBtRUdSK3dhL3NuamRvM2Qx?=
+ =?utf-8?B?dXBEdEdQWlFvUkZsZUx0MFo4Vlp1U0F4K0VyWi9obXpXc2wwVHlYNmYyejNZ?=
+ =?utf-8?Q?q/YS/PId2AEcAsmVO9wU9YQ=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48977732-48d3-4b6e-295f-08d9ea75971b
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2022 20:08:21.9348
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xbwIG5WhA9w4sRi6WUeloaqSUGhaq6CuI1kZ4jEhDFUucDagbjDpqMdoM3NKT6hhUpfiWmkuC2A2fwDq3wo4mg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1516
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,97 +152,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 20, 2022, Hou Wenlong wrote:
-> Code segment descriptor can be loaded by jmp/call/ret, iret
-> and int. The privilege checks are different between those
-> instructions above realmode. Although, the emulator has
-> use x86_transfer_type enumerate to differentiate them, but
-> it is not really used in __load_segment_descriptor(). Note,
-> far jump/call to call gate, task gate or task state segment
-> are not implemented in emulator.
+
+
+On 2/7/22 1:09 PM, Dov Murik wrote:
 > 
-> As for far jump/call to code segment, if DPL > CPL for conforming
-> code or (RPL > CPL or DPL != CPL) for non-conforming code, it
-> should trigger #GP. The current checks are ok.
 > 
-> As for far return, if RPL < CPL or DPL > RPL for conforming
-> code or DPL != RPL for non-conforming code, it should trigger #GP.
-> Outer level return is not implemented above virtual-8086 mode in
-> emulator. So it implies that RPL <= CPL, but the current checks
-> wouldn't trigger #GP if RPL < CPL.
+> On 07/02/2022 18:23, Brijesh Singh wrote:
+>>
+>>
+>> On 2/7/22 2:52 AM, Borislav Petkov wrote:
+>>> Those are allocated on stack, why are you clearing them?
+>>
+>> Yep, no need to explicitly clear it. I'll take it out in next rev.
+>>
 > 
-> As for code segment loading in task switch, if DPL > RPL for conforming
-> code or DPL != RPL for non-conforming code, it should trigger #TS. Since
-> segment selector is loaded before segment descriptor when load state from
-> tss, it implies that RPL = CPL, so the current checks are ok.
+> Wait, this is key material generated by PSP and passed to userspace.
+> Why leave copies of it floating around kernel memory?  I thought that's
+> the whole reason for these memzero_explicit() calls (maybe add a comment?).
 > 
-> The only problem in current implementation is mssing RPL < CPL check for
-> far return. However, change code to follow the manual is better.
+
+
+Ah, now I remember I added the memzero_explicit() to address your review 
+feedback :) In that patch version, we were using the kmalloc() to store 
+the response data; since then, we switched to stack. We will leak the 
+key outside when the stack is converted private-> shared; I don't know 
+if any of these are going to happen. I can add a comment and keep the 
+memzero_explicit() call.
+
+Boris, let me know if you are okay with it?
+
+
+> As an example, in arch/x86/crypto/aesni-intel_glue.c there are two calls
+> to memzero_explicit(), both on stack variables; the only reason for
+> these calls (as I understand it) is to avoid some future possible leak
+> of this sensitive data (keys, cipher context, etc.).  I'm sure there are
+> other examples in the kernel code.
 > 
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> ---
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  arch/x86/kvm/emulate.c | 30 ++++++++++++++++++++++--------
->  1 file changed, 22 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 864db6fbe8db..b7ce2a85e58e 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -1631,14 +1631,28 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
->  		if (!(seg_desc.type & 8))
->  			goto exception;
->  
-> -		if (seg_desc.type & 4) {
-> -			/* conforming */
-> -			if (dpl > cpl)
-> -				goto exception;
-> -		} else {
-> -			/* nonconforming */
-> -			if (rpl > cpl || dpl != cpl)
-> -				goto exception;
-
-A comment here would be mildly helpful, e.g.
-
-		/* RET can never return to an inner privilege level. */
-> +		if (transfer == X86_TRANSFER_RET && rpl < cpl)
-> +			goto exception;
-
-And then as a follow-up patch, I think we can/should move the unhandled outer
-privilege level logic here to make it easier to understand why the checks for RET
-are incomplete, e.g.
-
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index a885b53dc7cc..a7cecd7beb91 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -1631,8 +1631,15 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
-                if (!(seg_desc.type & 8))
-                        goto exception;
-
--               if (transfer == X86_TRANSFER_RET && rpl < cpl)
--                       goto exception;
-+               if (transfer == X86_TRANSFER_RET) {
-+                       /* RET can never return to an inner privilege level. */
-+                       if (rpl < cpl)
-+                               goto exception;
-+                       /* Outer-privilege level return is not implemented */
-+                       if (rpl > cpl)
-+                               return X86EMUL_UNHANDLEABLE;
-+               }
-+
-                if (transfer == X86_TRANSFER_RET || X86_TRANSFER_TASK_SWITCH) {
-                        if (seg_desc.type & 4) {
-                                /* conforming */
-@@ -2227,9 +2234,6 @@ static int em_ret_far(struct x86_emulate_ctxt *ctxt)
-        rc = emulate_pop(ctxt, &cs, ctxt->op_bytes);
-        if (rc != X86EMUL_CONTINUE)
-                return rc;
--       /* Outer-privilege level return is not implemented */
--       if (ctxt->mode >= X86EMUL_MODE_PROT16 && (cs & 3) > cpl)
--               return X86EMUL_UNHANDLEABLE;
-        rc = __load_segment_descriptor(ctxt, (u16)cs, VCPU_SREG_CS, cpl,
-                                       X86_TRANSFER_RET,
-                                       &new_desc);
