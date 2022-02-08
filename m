@@ -2,340 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B525C4AD67D
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 12:26:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCF134AD682
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 12:26:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239033AbiBHL0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 06:26:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44668 "EHLO
+        id S1357452AbiBHL0T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 06:26:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349291AbiBHJlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 04:41:45 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61746C03FEC0;
-        Tue,  8 Feb 2022 01:41:44 -0800 (PST)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2186nISK021385;
-        Tue, 8 Feb 2022 09:41:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cGAUHhHkpAzrJb5ixZgckyR9+lpUn48KaDM46WHxkUQ=;
- b=OABoHAQzqYlDjS0hBslU3+kz8w1sQ3HosjzYjHYSkiFYPkRD6NGQhbEeRDqHoEwWQ9RU
- 8Gyt0EThBI6BBOQfMD3nkLv385TmqUtEloSUlTAb1whOlOV3VHwanytxUij6Xn1f0DBf
- VfjFz0ZPdT58cHBwd3ZylU20VBt1PNhtLmEeG090Y+cdHcLqfdXuwkqUuguaKNn+Ab8W
- qQsxBcl4Q41WvoheyDUuV2exjOmVFJ7aG8MAB4HXpc+x3KsHdtMUuE0FKrLJ4uuFMJrW
- s7OCJjrunYxCBz3K6EOyjT4V/TRhDmzmwjEphwj5GRpG+u0K2Z/LKdOjJ1CaCkFLAOT7 Mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e3fm4qds2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 09:41:42 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2189dgfU013180;
-        Tue, 8 Feb 2022 09:41:41 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e3fm4qdrf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 09:41:41 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2189clVw018221;
-        Tue, 8 Feb 2022 09:41:39 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 3e1gv9b227-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 09:41:39 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2189fYwx35193340
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Feb 2022 09:41:34 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30CA642056;
-        Tue,  8 Feb 2022 09:41:34 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7700442052;
-        Tue,  8 Feb 2022 09:41:33 +0000 (GMT)
-Received: from [9.145.150.231] (unknown [9.145.150.231])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Feb 2022 09:41:33 +0000 (GMT)
-Message-ID: <b80c9fee-3b6c-51cb-b399-c5f334c92fcf@linux.ibm.com>
-Date:   Tue, 8 Feb 2022 10:41:33 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 01/11] s390/uaccess: Add copy_from/to_user_key
- functions
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-References: <20220207165930.1608621-1-scgl@linux.ibm.com>
- <20220207165930.1608621-2-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220207165930.1608621-2-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jzIv20Dpv3TK71FV7oDU1q5gkXGRdx2I
-X-Proofpoint-GUID: ClkEsWZKCa43gF0SkDozm-nPMc7pdPQ4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-08_02,2022-02-07_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- mlxlogscore=999 clxscore=1011 adultscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202080054
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S245719AbiBHJq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 04:46:28 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49401C03FEC0
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 01:46:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 09E9DB81995
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 09:46:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0B9C004E1;
+        Tue,  8 Feb 2022 09:46:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644313584;
+        bh=N2iwFt+9nu2+miw7Yd5yWcMLN1r1UbYEZrqOpFnZfVY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Tg7xQX2aFayXpgxebMRXN32qDsQLMRc5MalU2t91q1q7VDMd0YBdTLKrltFONY6qS
+         vHvy7FENHlTVkIwCJKTeBpfkBIMuOBD/J+l0bsgxjigeFXZMJuF+6HZt8l3TeyQvp0
+         wpxLQJmW7BPc9NRxx5cgd1Gk3jlHEjMrfuBdXg9WZXUz1JPIzaKnW26BTrd9vU2TTw
+         CGT2xxVM9XFgxO7Uf4hXcXKx7I9rN08k3pftUMqhM1FGr3icweYCN9hvvBvluB/s0P
+         JJQyhxXmkbHSBLbAbz0IhxMZyYnr5e+ejYopvsBH0DtySSmMQZtu4FQJn/YLGR7WWE
+         Yfs6vDtHrfysQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=billy-the-mountain.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nHN4o-006DrU-IX; Tue, 08 Feb 2022 09:46:22 +0000
+Date:   Tue, 08 Feb 2022 09:46:16 +0000
+Message-ID: <878ruld72v.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, pshier@google.com,
+        ricarkol@google.com, reijiw@google.com, jingzhangos@google.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        james.morse@arm.com, Alexandru.Elisei@arm.com,
+        suzuki.poulose@arm.com, Peter Maydell <peter.maydell@linaro.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+References: <YSVhV+UIMY12u2PW@google.com>
+        <87mtp5q3gx.wl-maz@kernel.org>
+        <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+        <87fsuxq049.wl-maz@kernel.org>
+        <20210825150713.5rpwzm4grfn7akcw@gator.home>
+        <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+        <877dg8ppnt.wl-maz@kernel.org>
+        <YSfiN3Xq1vUzHeap@google.com>
+        <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
+        <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+        <87ilyitt6e.wl-maz@kernel.org>
+        <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+        <87lf3drmvp.wl-maz@kernel.org>
+        <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+        <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+        <875yq88app.wl-maz@kernel.org>
+        <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, rananta@google.com, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/7/22 17:59, Janis Schoetterl-Glausch wrote:
-> Add copy_from/to_user_key functions, which perform storage key checking.
-> These functions can be used by KVM for emulating instructions that need
-> to be key checked.
-> These functions differ from their non _key counterparts in
-> include/linux/uaccess.h only in the additional key argument and must be
-> kept in sync with those.
+Huh, somewhat missed that email, apologies for the delay.
+
+On Tue, 25 Jan 2022 17:29:13 +0000,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> Since the existing uaccess implementation on s390 makes use of move
-> instructions that support having an additional access key supplied,
-> we can implement raw_copy_from/to_user_key by enhancing the
-> existing implementation.
+> Hi Marc,
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-
-
-> ---
->   arch/s390/include/asm/uaccess.h | 22 +++++++++
->   arch/s390/lib/uaccess.c         | 81 +++++++++++++++++++++++++--------
->   2 files changed, 85 insertions(+), 18 deletions(-)
+> On Tue, Jan 25, 2022 at 12:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > If I understand correctly, the original motivation for going with
+> > > pseudo-registers was to comply with QEMU, which uses KVM_GET_REG_LIST
+> > > and KVM_[GET|SET]_ONE_REG interface, but I'm guessing the VMMs doing
+> > > save/restore across migration might write the same values for every
+> > > vCPU.
+> >
+> > KVM currently restricts the vcpu features to be unified across vcpus,
+> > but that's only an implementation choice.
 > 
-> diff --git a/arch/s390/include/asm/uaccess.h b/arch/s390/include/asm/uaccess.h
-> index d74e26b48604..ba1bcb91af95 100644
-> --- a/arch/s390/include/asm/uaccess.h
-> +++ b/arch/s390/include/asm/uaccess.h
-> @@ -44,6 +44,28 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n);
->   #define INLINE_COPY_TO_USER
->   #endif
->   
-> +unsigned long __must_check
-> +_copy_from_user_key(void *to, const void __user *from, unsigned long n, unsigned long key);
-> +
-> +static __always_inline unsigned long __must_check
-> +copy_from_user_key(void *to, const void __user *from, unsigned long n, unsigned long key)
-> +{
-> +	if (likely(check_copy_size(to, n, false)))
-> +		n = _copy_from_user_key(to, from, n, key);
-> +	return n;
-> +}
-> +
-> +unsigned long __must_check
-> +_copy_to_user_key(void __user *to, const void *from, unsigned long n, unsigned long key);
-> +
-> +static __always_inline unsigned long __must_check
-> +copy_to_user_key(void __user *to, const void *from, unsigned long n, unsigned long key)
-> +{
-> +	if (likely(check_copy_size(from, n, true)))
-> +		n = _copy_to_user_key(to, from, n, key);
-> +	return n;
-> +}
-> +
->   int __put_user_bad(void) __attribute__((noreturn));
->   int __get_user_bad(void) __attribute__((noreturn));
->   
-> diff --git a/arch/s390/lib/uaccess.c b/arch/s390/lib/uaccess.c
-> index 8a5d21461889..b709239feb5d 100644
-> --- a/arch/s390/lib/uaccess.c
-> +++ b/arch/s390/lib/uaccess.c
-> @@ -59,11 +59,13 @@ static inline int copy_with_mvcos(void)
->   #endif
->   
->   static inline unsigned long copy_from_user_mvcos(void *x, const void __user *ptr,
-> -						 unsigned long size)
-> +						 unsigned long size, unsigned long key)
->   {
->   	unsigned long tmp1, tmp2;
->   	union oac spec = {
-> +		.oac2.key = key,
->   		.oac2.as = PSW_BITS_AS_SECONDARY,
-> +		.oac2.k = 1,
->   		.oac2.a = 1,
->   	};
->   
-> @@ -94,19 +96,19 @@ static inline unsigned long copy_from_user_mvcos(void *x, const void __user *ptr
->   }
->   
->   static inline unsigned long copy_from_user_mvcp(void *x, const void __user *ptr,
-> -						unsigned long size)
-> +						unsigned long size, unsigned long key)
->   {
->   	unsigned long tmp1, tmp2;
->   
->   	tmp1 = -256UL;
->   	asm volatile(
->   		"   sacf  0\n"
-> -		"0: mvcp  0(%0,%2),0(%1),%3\n"
-> +		"0: mvcp  0(%0,%2),0(%1),%[key]\n"
->   		"7: jz    5f\n"
->   		"1: algr  %0,%3\n"
->   		"   la    %1,256(%1)\n"
->   		"   la    %2,256(%2)\n"
-> -		"2: mvcp  0(%0,%2),0(%1),%3\n"
-> +		"2: mvcp  0(%0,%2),0(%1),%[key]\n"
->   		"8: jnz   1b\n"
->   		"   j     5f\n"
->   		"3: la    %4,255(%1)\n"	/* %4 = ptr + 255 */
-> @@ -115,7 +117,7 @@ static inline unsigned long copy_from_user_mvcp(void *x, const void __user *ptr,
->   		"   slgr  %4,%1\n"
->   		"   clgr  %0,%4\n"	/* copy crosses next page boundary? */
->   		"   jnh   6f\n"
-> -		"4: mvcp  0(%4,%2),0(%1),%3\n"
-> +		"4: mvcp  0(%4,%2),0(%1),%[key]\n"
->   		"9: slgr  %0,%4\n"
->   		"   j     6f\n"
->   		"5: slgr  %0,%0\n"
-> @@ -123,24 +125,49 @@ static inline unsigned long copy_from_user_mvcp(void *x, const void __user *ptr,
->   		EX_TABLE(0b,3b) EX_TABLE(2b,3b) EX_TABLE(4b,6b)
->   		EX_TABLE(7b,3b) EX_TABLE(8b,3b) EX_TABLE(9b,6b)
->   		: "+a" (size), "+a" (ptr), "+a" (x), "+a" (tmp1), "=a" (tmp2)
-> -		: : "cc", "memory");
-> +		: [key] "d" (key << 4)
-> +		: "cc", "memory");
->   	return size;
->   }
->   
-> -unsigned long raw_copy_from_user(void *to, const void __user *from, unsigned long n)
-> +static unsigned long raw_copy_from_user_key(void *to, const void __user *from,
-> +					    unsigned long n, unsigned long key)
->   {
->   	if (copy_with_mvcos())
-> -		return copy_from_user_mvcos(to, from, n);
-> -	return copy_from_user_mvcp(to, from, n);
-> +		return copy_from_user_mvcos(to, from, n, key);
-> +	return copy_from_user_mvcp(to, from, n, key);
-> +}
-> +
-> +unsigned long raw_copy_from_user(void *to, const void __user *from, unsigned long n)
-> +{
-> +	return raw_copy_from_user_key(to, from, n, 0);
->   }
->   EXPORT_SYMBOL(raw_copy_from_user);
->   
-> +unsigned long _copy_from_user_key(void *to, const void __user *from,
-> +				  unsigned long n, unsigned long key)
-> +{
-> +	unsigned long res = n;
-> +
-> +	might_fault();
-> +	if (!should_fail_usercopy()) {
-> +		instrument_copy_from_user(to, from, n);
-> +		res = raw_copy_from_user_key(to, from, n, key);
-> +	}
-> +	if (unlikely(res))
-> +		memset(to + (n - res), 0, res);
-> +	return res;
-> +}
-> +EXPORT_SYMBOL(_copy_from_user_key);
-> +
->   static inline unsigned long copy_to_user_mvcos(void __user *ptr, const void *x,
-> -					       unsigned long size)
-> +					       unsigned long size, unsigned long key)
->   {
->   	unsigned long tmp1, tmp2;
->   	union oac spec = {
-> +		.oac1.key = key,
->   		.oac1.as = PSW_BITS_AS_SECONDARY,
-> +		.oac1.k = 1,
->   		.oac1.a = 1,
->   	};
->   
-> @@ -171,19 +198,19 @@ static inline unsigned long copy_to_user_mvcos(void __user *ptr, const void *x,
->   }
->   
->   static inline unsigned long copy_to_user_mvcs(void __user *ptr, const void *x,
-> -					      unsigned long size)
-> +					      unsigned long size, unsigned long key)
->   {
->   	unsigned long tmp1, tmp2;
->   
->   	tmp1 = -256UL;
->   	asm volatile(
->   		"   sacf  0\n"
-> -		"0: mvcs  0(%0,%1),0(%2),%3\n"
-> +		"0: mvcs  0(%0,%1),0(%2),%[key]\n"
->   		"7: jz    5f\n"
->   		"1: algr  %0,%3\n"
->   		"   la    %1,256(%1)\n"
->   		"   la    %2,256(%2)\n"
-> -		"2: mvcs  0(%0,%1),0(%2),%3\n"
-> +		"2: mvcs  0(%0,%1),0(%2),%[key]\n"
->   		"8: jnz   1b\n"
->   		"   j     5f\n"
->   		"3: la    %4,255(%1)\n" /* %4 = ptr + 255 */
-> @@ -192,7 +219,7 @@ static inline unsigned long copy_to_user_mvcs(void __user *ptr, const void *x,
->   		"   slgr  %4,%1\n"
->   		"   clgr  %0,%4\n"	/* copy crosses next page boundary? */
->   		"   jnh   6f\n"
-> -		"4: mvcs  0(%4,%1),0(%2),%3\n"
-> +		"4: mvcs  0(%4,%1),0(%2),%[key]\n"
->   		"9: slgr  %0,%4\n"
->   		"   j     6f\n"
->   		"5: slgr  %0,%0\n"
-> @@ -200,18 +227,36 @@ static inline unsigned long copy_to_user_mvcs(void __user *ptr, const void *x,
->   		EX_TABLE(0b,3b) EX_TABLE(2b,3b) EX_TABLE(4b,6b)
->   		EX_TABLE(7b,3b) EX_TABLE(8b,3b) EX_TABLE(9b,6b)
->   		: "+a" (size), "+a" (ptr), "+a" (x), "+a" (tmp1), "=a" (tmp2)
-> -		: : "cc", "memory");
-> +		: [key] "d" (key << 4)
-> +		: "cc", "memory");
->   	return size;
->   }
->   
-> -unsigned long raw_copy_to_user(void __user *to, const void *from, unsigned long n)
-> +static unsigned long raw_copy_to_user_key(void __user *to, const void *from,
-> +					  unsigned long n, unsigned long key)
->   {
->   	if (copy_with_mvcos())
-> -		return copy_to_user_mvcos(to, from, n);
-> -	return copy_to_user_mvcs(to, from, n);
-> +		return copy_to_user_mvcos(to, from, n, key);
-> +	return copy_to_user_mvcs(to, from, n, key);
-> +}
-> +
-> +unsigned long raw_copy_to_user(void __user *to, const void *from, unsigned long n)
-> +{
-> +	return raw_copy_to_user_key(to, from, n, 0);
->   }
->   EXPORT_SYMBOL(raw_copy_to_user);
->   
-> +unsigned long _copy_to_user_key(void __user *to, const void *from,
-> +				unsigned long n, unsigned long key)
-> +{
-> +	might_fault();
-> +	if (should_fail_usercopy())
-> +		return n;
-> +	instrument_copy_to_user(to, from, n);
-> +	return raw_copy_to_user_key(to, from, n, key);
-> +}
-> +EXPORT_SYMBOL(_copy_to_user_key);
-> +
->   static inline unsigned long clear_user_mvcos(void __user *to, unsigned long size)
->   {
->   	unsigned long tmp1, tmp2;
+> But that implementation choice has become ABI, no? How could support
+> for asymmetry be added without requiring userspace opt-in or breaking
+> existing VMMs that depend on feature unification?
 
+Of course, you'd need some sort of advertising of this new behaviour.
+
+One thing I would like to add to the current state of thing is an
+indication of whether the effects of a sysreg being written from
+userspace are global or local to a vcpu. You'd need a new capability,
+and an extra flag added to the encoding of each register.
+
+> 
+> > The ARM architecture doesn't
+> > mandate that these registers are all the same, and it isn't impossible
+> > that we'd allow for the feature set to become per-vcpu at some point
+> > in time. So this argument doesn't really hold.
+> 
+> Accessing per-VM state N times is bound to increase VM blackout time
+> during migrations ~linearly as the number of vCPUs in a VM increases,
+> since a VM scoped lock is necessary to serialize guest accesses. It
+> could be tolerable at present scale, but seems like in the future it
+> could become a real problem.
+
+I don't disagree. But I doubt switching to a different API altogether
+is the solution to this.
+
+> 
+> > Furthermore, compatibility with QEMU's save/restore model is
+> > essential, and AFAICT, there is no open source alternative.
+> 
+> Agree fundamentally, but I believe it is entirely reasonable to
+> require a userspace change to adopt a new KVM feature. Otherwise, we
+> may be trying to shoehorn new features into existing UAPI that may not
+> be a precise fit..
+
+But the very purpose of this API is to support discoverability. If we
+can't support it, then we might as well declare the whole API
+deprecated and restart from scratch.
+
+No, I'm not seriously suggesting this :-/.
+
+> In order to cure the serialization mentioned above, two options are
+> top of mind: accessing the VM state with the VM FD or informing
+> userspace that a set of registers need only be written once for an
+> entire VM. If we add support for asymmetry later down the road, that
+> would become an opt-in such that userspace will do the access
+> per-vCPU.
+
+It is the latter that I'm suggesting.
+
+>
+> > A device means yet another configuration and migration API. Don't you
+> > think we have enough of those? The complexity of KVM/arm64 userspace
+> > API is already insane, and extremely fragile. Adding to it will be a
+> > validation nightmare (it already is, and I don't see anyone actively
+> > helping with it).
+> 
+> It seems equally fragile to introduce VM-wide serialization to vCPU
+> UAPI that we know is in the live migration critical path for _any_
+> VMM. Without requiring userspace changes for all the new widgets under
+> discussion we're effectively forcing VMMs to do something suboptimal.
+
+I'm perfectly happy with suboptimal to start with, and find ways to
+make it better once we have a clear path forward. I just don't want to
+conflate the two.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
