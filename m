@@ -2,132 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FE524AD14C
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 06:56:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 115534AD176
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 07:23:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244744AbiBHF4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 00:56:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52100 "EHLO
+        id S1345496AbiBHGW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 01:22:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233686AbiBHF4r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 00:56:47 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D74EC0401DC;
-        Mon,  7 Feb 2022 21:56:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644299806; x=1675835806;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/E3+XDZn+fI4PCSgbxMj37rovQtgfKS2C5AACs5xPYs=;
-  b=LcXFhytTuK1lXzVQrayUaKmUJ1JT7GIKTrP3IrPSSzSWIU0cD5Lg//fM
-   CGGzApENWyGG5nCrQ0ujueLyFxlX/S1S3JlS2wU0TAo6gjG8NnnjdTEf+
-   woAuO1dKLxIuDzTgRyi/Y7788cev91GUg3kFmJORtG4EeKuLgZ1eCbUn8
-   All7THtn60lNLN1wJ+EMkSTM/2fT8O40EZpEr37DqoDNNI7H976y6YnX0
-   IK1XDeTtx/9lTZVi3pYnQr4ezWN1DQt7Kng3er8VeT4C0QlYL7/5n+Pb3
-   N92FAiJ9eu3crH7HACbWkYSF1efoU40gz9BGhMvKbvPz3PCky6CATWU1w
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10251"; a="246468556"
-X-IronPort-AV: E=Sophos;i="5.88,351,1635231600"; 
-   d="scan'208";a="246468556"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2022 21:56:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,351,1635231600"; 
-   d="scan'208";a="678001282"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by fmsmga001.fm.intel.com with ESMTP; 07 Feb 2022 21:56:39 -0800
-Message-ID: <608192e0-136a-57fc-cb2c-3ebb42874788@linux.intel.com>
-Date:   Tue, 8 Feb 2022 13:55:29 +0800
+        with ESMTP id S237776AbiBHGW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 01:22:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6CB5FC0401EF
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 22:22:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644301375;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fRDBOVfVcNOf8BIjmzr0YOJnsNFeEuGkkwFhPyIAaS4=;
+        b=BS/GFYLoqJUXdyO4hhkfXNHVLLhL8yhjt+vvYuQV7EAlFMDumOAM/Pq57sk4hK6jaV6Ddq
+        ZuDeqta4aLHbNKBHKY8tcGtw9/fElDp5I5GKcMjQ2CULgGRwMnIgEikxW19y+9ipX0layu
+        Mn79bn364Dc4XwZVHCP3P5EYVQmtPOY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-292-_EC2-6w4PwSbpzoah0X7nA-1; Tue, 08 Feb 2022 01:22:52 -0500
+X-MC-Unique: _EC2-6w4PwSbpzoah0X7nA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C89601006AA0;
+        Tue,  8 Feb 2022 06:22:51 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B83A47A22E;
+        Tue,  8 Feb 2022 06:22:50 +0000 (UTC)
+Message-ID: <52d52c0b75572757e8a1a7504b13d42c4405745c.camel@redhat.com>
+Subject: Re: [PATCH 00/30] My patch queue
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+Date:   Tue, 08 Feb 2022 08:22:49 +0200
+In-Reply-To: <YgGQzVMdjHfcDGCQ@google.com>
+References: <20220207152847.836777-1-mlevitsk@redhat.com>
+         <YgGQzVMdjHfcDGCQ@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Cc:     baolu.lu@linux.intel.com, Christoph Hellwig <hch@infradead.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 02/14] driver core: Add dma_cleanup callback in
- bus_type
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jason Gunthorpe <jgg@nvidia.com>
-References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
- <20220104015644.2294354-3-baolu.lu@linux.intel.com>
- <YdQcpHrV7NwUv+qc@infradead.org> <20220104123911.GE2328285@nvidia.com>
- <YdRFyXWay/bdSSem@kroah.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-In-Reply-To: <YdRFyXWay/bdSSem@kroah.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Greg,
-
-On 1/4/22 9:04 PM, Greg Kroah-Hartman wrote:
-> On Tue, Jan 04, 2022 at 08:39:11AM -0400, Jason Gunthorpe wrote:
->> On Tue, Jan 04, 2022 at 02:08:36AM -0800, Christoph Hellwig wrote:
->>> All these bus callouts still looks horrible and just create tons of
->>> boilerplate code.
->>
->> Yes, Lu - Greg asked questions then didn't respond to their answers
->> meaning he accepts them, you should stick with the v4 version.
+On Mon, 2022-02-07 at 21:36 +0000, Sean Christopherson wrote:
+> On Mon, Feb 07, 2022, Maxim Levitsky wrote:
+> > This is set of various patches that are stuck in my patch queue.
+> > 
+> > KVM_REQ_GET_NESTED_STATE_PAGES patch is mostly RFC, but it does seem
+> > to work for me.
+> > 
+> > Read-only APIC ID is also somewhat RFC.
+> > 
+> > Some of these patches are preparation for support for nested AVIC
+> > which I almost done developing, and will start testing very soon.
 > 
-> Trying to catch up on emails from the break, that was way down my list
-> of things to get back to as it's messy and non-obvious.  I'll revisit it
-> again after 5.17-rc1 is out, this is too late for that merge window
-> anyway.
-
-In this series we want to add calls into the iommu subsystem during
-device driver binding/unbinding, so that the device DMA ownership
-conflict (kernel driver vs. user-space) could be detected and avoided
-before calling into device driver's .probe().
-
-In this v5 series, we implemented this in the affected buses (amba/
-platform/fsl-mc/pci) which are known to support assigning devices to
-user space through the vfio framework currently. And more buses are
-possible to be affected in the future if they also want to support
-device assignment. Christoph commented that this will create boilerplate
-code in various bus drivers.
-
-Back to v4 of this series (please refer to below link [1]), we added
-this call in the driver core if buses have provided the dma_configure()
-callback (please refer to below link [2]).
-
-Which would you prefer, or any other suggestions? We need your guide to
-move this series ahead. Please help to suggest.
-
-[1] 
-https://lore.kernel.org/linux-iommu/20211217063708.1740334-1-baolu.lu@linux.intel.com/
-[2] 
-https://lore.kernel.org/linux-iommu/20211217063708.1740334-3-baolu.lu@linux.intel.com/
+> Please split this up into smaller series and/or standalone patches.  At a glance,
+> this has 10+ different unrealted series/patches rolled into one, which makes
+> everything far more difficult to review.  
+> 
+True to be honest. I ended up with too many patches in my local patch queue,
+including some bugfixes which really should be send long ago, and I wanted
+to push all of this out to get some feedback before the tree is rebased again,
+and I'll get to rebase again and again :-)
 
 Best regards,
-baolu
+	Maxim Levitsky
+
