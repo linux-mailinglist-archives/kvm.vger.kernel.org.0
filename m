@@ -2,115 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C550C4AD67B
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 12:26:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C3AA4AD67F
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 12:26:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350156AbiBHL0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 06:26:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51618 "EHLO
+        id S1356875AbiBHL0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 06:26:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356116AbiBHKKd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 05:10:33 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13065C03FEC0;
-        Tue,  8 Feb 2022 02:10:33 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id on2so7366260pjb.4;
-        Tue, 08 Feb 2022 02:10:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=9N9L4dN/+O42RdNqPa0c7EN++tLooOLaX6Ua4iCm1C4=;
-        b=VJGmLXkLYWP/fkapKbAywvMBkmheSaOK6tSVXry4w3Yr1EhLO4aqKXvm8NEpUQonnn
-         MEYvTU1xSm5rEiqe1j3eoY7RKPZgqquIk104XEbE6h9v3+Hqhfj5xzn41B61JmbqLQQP
-         f0nFsENmOURm0q0Q/NP07syHvUoR/fYLL8tU7cochCk1AhVERMAh6Un/EXTnj+KzCGRT
-         +h15JezsAX81cnEGRKL0BQAlXTBEYJ4cZ3BK5eSzfKB7vJW3BHsVZHmj+1d1xkLBCdjP
-         yQ/0mxpuHpOSeQAg+atISm7ALk1kL2ikUfkPpSo18aqdw3Y33xUxaj4jcBj4UM9bS4pP
-         Ge7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=9N9L4dN/+O42RdNqPa0c7EN++tLooOLaX6Ua4iCm1C4=;
-        b=kZQDbZGoSfr1Kv/BsRydtZPHDnCNTz8K22UmQwE3jwfSzilqLEzOOjJrPPiVCPqExy
-         guJhK0V2DpLa/1MRNyz6CyURvCWR36QlUbugD9YbTARgt7uPRsT9F+h/ady4aUU5iYse
-         8Q+XhxKGhzalko0dJ05WzsW8pAHhKngs948+WPYQcVDnK6J3XJiv0CWgHfSA9IR2iasb
-         VnbE+h5nNUZ55ffRiBVkgxGr8hw7q9T3o2ojmxcdaox+huW+XJsDqiBqnkkglkokvwSG
-         D91iRM1I0riSeW/9jnIVitqgEoHCoRWDUS5uVMLtQT5baOmRuLzUFA0XzjFpZT8EK8gW
-         3z2A==
-X-Gm-Message-State: AOAM531JtDZVsvgqreJ5hrHlQhuRlIcg2vdYAGbLc8+ly+KSZs5Aq8UM
-        iq4z85JVsY3zoy+//1hoK+M=
-X-Google-Smtp-Source: ABdhPJzFsXTVieyXIcOacrZ2FFwAwXtK3QcXv+aWceASGOqhsu1d11Fvko4jLFVl4j9NpK+hQ/n/ng==
-X-Received: by 2002:a17:902:6b06:: with SMTP id o6mr3631677plk.162.1644315032532;
-        Tue, 08 Feb 2022 02:10:32 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id il18sm2337123pjb.27.2022.02.08.02.10.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Feb 2022 02:10:31 -0800 (PST)
-Message-ID: <4a8beb6d-1589-7f53-881f-8faaeb52f7ba@gmail.com>
-Date:   Tue, 8 Feb 2022 18:10:23 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
-Subject: Re: [PATCH kvm/queue v2 3/3] KVM: x86/pmu: Setup the
- {inte|amd}_event_mapping[] when hardware_setup
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S1346341AbiBHKv3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 05:51:29 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21A2C03FEC0;
+        Tue,  8 Feb 2022 02:51:27 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F0C0A1EC00F8;
+        Tue,  8 Feb 2022 11:51:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1644317482;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=yxZ0nR15n7mkZeUUipZpTNufPRwpkzb7/Yfx2nthKHw=;
+        b=T9Uwof1JPVAt8ASYSIUa3QaOxuvcwTqgS4A1/d8dSH3XsLJGSVDgzqkQEA3SpoBzGPKWbN
+        qK1A+0n4DUJlXw9Oy3UzYqF5LJ2Bi/mjDuQKYD5N5jE0WdXS382dpSohbyviT6xPIP402H
+        NxXMNHdzWIPMeDDmQa1BOpu9LiTkpxA=
+Date:   Tue, 8 Feb 2022 11:51:16 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Dov Murik <dovmurik@linux.ibm.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
-References: <20220117085307.93030-1-likexu@tencent.com>
- <20220117085307.93030-4-likexu@tencent.com>
- <13de6271-61bc-7138-15b3-9241508d94fa@redhat.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <13de6271-61bc-7138-15b3-9241508d94fa@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: [PATCH v9 42/43] virt: sevguest: Add support to derive key
+Message-ID: <YgJLJJiosIOHLWYz@zn.tnic>
+References: <20220128171804.569796-1-brijesh.singh@amd.com>
+ <20220128171804.569796-43-brijesh.singh@amd.com>
+ <YgDduR0mrptX5arB@zn.tnic>
+ <1cb4fdf5-7c1e-6c8f-1db6-8c976d6437c2@amd.com>
+ <ae1644a3-bd2c-6966-4ae3-e26abd77b77b@linux.ibm.com>
+ <20ba1ac2-83d1-6766-7821-c9c8184fb59b@amd.com>
+ <cd3ef9dd-cfc5-ac8c-d524-d8d4416f5cad@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cd3ef9dd-cfc5-ac8c-d524-d8d4416f5cad@linux.ibm.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/2/2022 8:28 pm, Paolo Bonzini wrote:
-> On 1/17/22 09:53, Like Xu wrote:
->> +
->> +    for (i = 0; i < PERF_COUNT_HW_MAX; i++) {
->> +        config = perf_get_hw_event_config(i) & 0xFFFFULL;
->> +
->> +        kernel_hw_events[i] = (struct kvm_event_hw_type_mapping){
->> +            .eventsel = config & ARCH_PERFMON_EVENTSEL_EVENT,
->> +            .unit_mask = (config & ARCH_PERFMON_EVENTSEL_UMASK) >> 8,
->> +            .event_type = i,
->> +        };
-> 
-> Should event_type be PERF_COUNT_HW_MAX if config is zero?
+On Tue, Feb 08, 2022 at 09:56:52AM +0200, Dov Murik wrote:
+> Just to be clear, I didn't mean necessarily "leak the key to the
+> untrusted host" (even if a page is converted back from private to
+> shared, it is encrypted, so host can't read its contents).  But even
+> *inside* the guest, when dealing with sensitive data like keys, we
+> should minimize the amount of copies that float around (I assume this is
+> the reason for most of the uses of memzero_explicit() in the kernel).
 
-Emm, we do not assume that the hardware event encoded with "eventsel=0 && 
-unit_mask=0"
-(in this case, config is zero) are illegal.
+I don't know about Brijesh but I understood you exactly as you mean it.
+And yap, I agree we should always clear such sensitive buffers.
 
-If perf core puts this encoded event into "enum perf_hw_id" table as this part 
-is out of the scope of
-KVM, we have to setup with a valid event_type value instead of PERF_COUNT_HW_MAX.
+-- 
+Regards/Gruss,
+    Boris.
 
-In this proposal, the returned perf_hw_id from kvm_x86_ops.pmu_ops->pmc_perf_hw_id()
-is only valid and used if "pmc->eventsel & 0xFFFFULL" is non-zero, otherwise the
-reprogram_gp_counter() will fall back to use PERF_TYPE_RAW type.
-
-Please let me know if you need more clarification on this change.
-
-> 
-> Thanks,
-> 
-> Paolo
-> 
+https://people.kernel.org/tglx/notes-about-netiquette
