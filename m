@@ -2,49 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1004ADB49
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 15:36:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A93374ADB6B
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 15:41:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378287AbiBHOgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 09:36:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38544 "EHLO
+        id S1351359AbiBHOll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 09:41:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378224AbiBHOgP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 09:36:15 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3D14C03FECE
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 06:36:14 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 634542B;
-        Tue,  8 Feb 2022 06:36:14 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 774753F73B;
-        Tue,  8 Feb 2022 06:36:11 -0800 (PST)
-Date:   Tue, 8 Feb 2022 14:36:26 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        with ESMTP id S1351489AbiBHOlk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 09:41:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3038C03FEDD
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 06:41:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4EE046125B
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 14:41:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B272DC004E1;
+        Tue,  8 Feb 2022 14:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644331296;
+        bh=+h0u0N03bHsQ0A+M4QKwabtt6GrHdxbl/EmS9Cvmiiw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pSTu4q6qit/DGC0R5ErSLYtEqOqdRpGaJTw41uvyS7SD4JGpxTQgpF+nn4U1duv+A
+         Um1mMi8eUNZOKJicLfzyO1zSz1d1iAXclOtZExKcQ8xSReuUlmxJI7/yVbW77RMozl
+         ewg35zk7UQqTpg1Y1QeW7ejAz2IzMWv3AebkZ5R0fawkFZG6amvxZJW+enjBk7bbyD
+         U4o4ga7tjGGQ7r4fHJbs53zNlsUPuimeziD47g19Up8bBSvGtDLOzxvifuWY5VxIvR
+         UX6FJht8lUIeARDQLAvBvhmheVel7NSc3Wm0oQ6j4yAwolJqY+rni544/AMyP7y8Hq
+         EPXhxm2j9lExQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nHRgT-006HlP-3v; Tue, 08 Feb 2022 14:41:34 +0000
+Date:   Tue, 08 Feb 2022 14:41:32 +0000
+Message-ID: <87a6f15skj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
-        miguel.luis@oracle.com, kernel-team@android.com
-Subject: Re: [PATCH v6 27/64] KVM: arm64: nv: Allow a sysreg to be hidden
- from userspace only
-Message-ID: <YgJ/rmfmKUVbUMtO@monolith.localdoman>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-28-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-28-maz@kernel.org>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+In-Reply-To: <20220118041923.3384602-1-reijiw@google.com>
+References: <20220118041923.3384602-1-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -53,104 +73,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Fri, Jan 28, 2022 at 12:18:35PM +0000, Marc Zyngier wrote:
-> So far, we never needed to distinguish between registers hidden
-> from userspace and being hidden from a guest (they are always
-> either visible to both, or hidden from both).
+On Tue, 18 Jan 2022 04:19:22 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> With NV, we have the ugly case of the EL{0,1}2 registers, which
-                                        ^^^^^^^^
-That might be easier to parse if it is rephrased to "EL02 and EL12
-registers".
-
-> are only a view on the EL{0,1} registers. It makes absolutely no
-> sense to expose them to userspace, since it already has the
-> canonical view.
+> KVM allows userspace to configure either all 32bit or 64bit vCPUs
+> for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
+> if the vcpu's register width is consistent with all other vCPUs'.
+> Since the checking is done even against vCPUs that are not initialized
+> (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
+> are erroneously treated as 64bit vCPU, which causes the function to
+> incorrectly detect a mixed-width VM.
 > 
-> Add a new visibility flag (REG_HIDDEN_USER) and a new helper that
-> checks for it and REG_HIDDEN when checking whether to expose
-> a sysreg to userspace. Subsequent patches will make use of it.
+> Introduce a new flag (el1_reg_width) in kvm_arch to indicates that
+> the guest needs to be configured with all 32bit or 64bit vCPUs,
+> and initialize it at the first KVM_ARM_VCPU_INIT for the guest.
+> Check vcpu's register width against the flag at the vcpu's
+> KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-The patch makes sense to me, the _EL02 and _EL12 are just aliases for the
-EL0 and EL1 registers, no sense in exposing both to userspace. And these
-registers also only make sense when the VCPU has the EL2 feature, which is
-not always the case:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
+> Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c |  6 +++---
->  arch/arm64/kvm/sys_regs.h | 12 +++++++++++-
->  2 files changed, 14 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 13 +++++++++++++
+>  arch/arm64/kvm/arm.c              | 30 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/reset.c            |  8 --------
+>  3 files changed, 43 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 31d739d59f67..0c9bbe5eee5e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3031,7 +3031,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  		return get_invariant_sys_reg(reg->id, uaddr);
->  
->  	/* Check for regs disabled by runtime config */
-> -	if (sysreg_hidden(vcpu, r))
-> +	if (sysreg_hidden_user(vcpu, r))
->  		return -ENOENT;
->  
->  	if (r->get_user)
-> @@ -3056,7 +3056,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  		return set_invariant_sys_reg(reg->id, uaddr);
->  
->  	/* Check for regs disabled by runtime config */
-> -	if (sysreg_hidden(vcpu, r))
-> +	if (sysreg_hidden_user(vcpu, r))
->  		return -ENOENT;
->  
->  	if (r->set_user)
-> @@ -3127,7 +3127,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
->  	if (!(rd->reg || rd->get_user))
->  		return 0;
->  
-> -	if (sysreg_hidden(vcpu, rd))
-> +	if (sysreg_hidden_user(vcpu, rd))
->  		return 0;
->  
->  	if (!copy_reg_to_user(rd, uind))
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index cc0cc95a0280..850629f083a3 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -78,7 +78,8 @@ struct sys_reg_desc {
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2a5f7f38006f..c02b7caf2c82 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -102,6 +102,12 @@ struct kvm_s2_mmu {
+>  struct kvm_arch_memory_slot {
 >  };
 >  
->  #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
-> -#define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
-> +#define REG_HIDDEN_USER		(1 << 1) /* hidden from userspace only */
-> +#define REG_RAZ			(1 << 2) /* RAZ from userspace and guest */
+> +enum kvm_el1_reg_width {
+> +	EL1_WIDTH_UNINITIALIZED = 0,
+> +	EL1_32BIT,
+> +	EL1_64BIT,
+> +};
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
 >  
->  static __printf(2, 3)
->  inline void print_sys_reg_msg(const struct sys_reg_params *p,
-> @@ -138,6 +139,15 @@ static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
->  	return r->visibility(vcpu, r) & REG_HIDDEN;
+> @@ -137,6 +143,13 @@ struct kvm_arch {
+>  
+>  	/* Memory Tagging Extension enabled for the guest */
+>  	bool mte_enabled;
+> +
+> +	/*
+> +	 * EL1 register width for the guest.
+> +	 * This is set at the first KVM_ARM_VCPU_INIT for the guest based
+> +	 * on whether the vcpu has KVM_ARM_VCPU_EL1_32BIT or not.
+> +	 */
+> +	enum kvm_el1_reg_width el1_reg_width;
+
+I really don't like that we need to keep track of yet another bit of
+state on top of the existing one. Duplicating state is a source of
+bugs, because you always end up checking the wrong one at the wrong
+time (and I have scars to prove it).
+
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e4727dc771bf..54ae8bf9d187 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1058,6 +1058,32 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>  	return -EINVAL;
 >  }
 >  
-> +static inline bool sysreg_hidden_user(const struct kvm_vcpu *vcpu,
-> +				      const struct sys_reg_desc *r)
+> +/*
+> + * A guest can have either all 32bit or 64bit vcpus only.
+
+That's not strictly true. All we are enforcing is that EL1 is either
+32 or 64bit.
+
+> + * Either one the guest has is indicated in kvm->arch.el1_reg_width.
+> + * Check if the vcpu's register width is consistent with
+> + * kvm->arch.el1_reg_width.  If kvm->arch.el1_reg_width is not set yet,
+> + * set it based on the vcpu's KVM_ARM_VCPU_EL1_32BIT configuration.
+> + */
+> +static int kvm_register_width_check_or_init(struct kvm_vcpu *vcpu)
 > +{
-> +	if (likely(!r->visibility))
-> +		return false;
+> +	bool is32bit;
+> +	bool allowed = true;
+> +	struct kvm *kvm = vcpu->kvm;
 > +
-> +	return r->visibility(vcpu, r) & (REG_HIDDEN | REG_HIDDEN_USER);
+> +	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (kvm->arch.el1_reg_width == EL1_WIDTH_UNINITIALIZED)
+> +		kvm->arch.el1_reg_width = is32bit ? EL1_32BIT : EL1_64BIT;
+> +	else
+> +		allowed = (is32bit == (kvm->arch.el1_reg_width == EL1_32BIT));
+> +
+> +	mutex_unlock(&kvm->lock);
+> +	return allowed ? 0 : -EINVAL;
 > +}
 > +
->  static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
->  					 const struct sys_reg_desc *r)
+>  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  			       const struct kvm_vcpu_init *init)
 >  {
-> -- 
-> 2.30.2
-> 
+> @@ -1097,6 +1123,10 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  
+>  	/* Now we know what it is, we can reset it. */
+>  	ret = kvm_reset_vcpu(vcpu);
+> +
+> +	if (!ret)
+> +		ret = kvm_register_width_check_or_init(vcpu);
+> +
+>  	if (ret) {
+>  		vcpu->arch.target = -1;
+>  		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 426bd7fbc3fd..dbf2939a6a96 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -168,9 +168,7 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+>  
+>  static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_vcpu *tmp;
+>  	bool is32bit;
+> -	int i;
+>  
+>  	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+>  	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
+> @@ -180,12 +178,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+>  	if (kvm_has_mte(vcpu->kvm) && is32bit)
+>  		return false;
+>  
+> -	/* Check that the vcpus are either all 32bit or all 64bit */
+> -	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> -		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
+> -			return false;
+> -	}
+> -
+
+In [1], I suggested another approach that didn't require extra state,
+and moved the existing checks under the kvm lock. What was wrong with
+that approach?
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/r/875yqqtn5q.wl-maz@kernel.org
+
+-- 
+Without deviation from the norm, progress is not possible.
