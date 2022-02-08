@@ -2,81 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BDA4A4ADFD6
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 18:44:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A4EF4ADFE0
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 18:49:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384371AbiBHRn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 12:43:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35474 "EHLO
+        id S1384389AbiBHRtE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 12:49:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352927AbiBHRn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 12:43:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D739AC061579
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 09:43:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644342205;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fTAtQQtX8ynRTOTjJerCkOOYhkWBiy04WDPWHFPH1vo=;
-        b=aPl86JgzO6XXTb5h7sUe0LlxzbCDYZ7sMK5BZbuWkiQoaUi6Mx6WaddB+hDKXe26p5iHiH
-        Vba/r9NNrkyfb+OK6NEhVSnAGvAetOip9cSI723PWq6biWU1tVkNhHM2oI7t743bCeAT7d
-        cA13QH1sjogH/o0hXjo9XwEdnRZzvhg=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-5xo_Akn_MtCviZqcf2ZK6w-1; Tue, 08 Feb 2022 12:43:24 -0500
-X-MC-Unique: 5xo_Akn_MtCviZqcf2ZK6w-1
-Received: by mail-oo1-f70.google.com with SMTP id n30-20020a4a611e000000b002e519f04f8cso11834639ooc.7
-        for <kvm@vger.kernel.org>; Tue, 08 Feb 2022 09:43:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=fTAtQQtX8ynRTOTjJerCkOOYhkWBiy04WDPWHFPH1vo=;
-        b=xgltzI9x5tB8lpGC2CDQMyXxs17JYBCumkTZ2QhDqRK4Rkb2g4TMIySjoZUMliedWs
-         MNms6kA+s9kRuMA3AwncQnX+yxZFHzgLT1QozUicaOkiZASJO7tN0gpEfyTXyBLrxPV/
-         TMIaRsUtfQ7gFpaNyuWAO7E6LOGFBGdCm97RagzTw0cp8+me9dIvSDdEMVZjO/KdtEvD
-         EH0MqU/X+IiTE5XkP0xeMYvWJ6N9OBH9NLcAkDDOlSOTtlFEqYEXcNTvKx6J9GgpyLR3
-         beP9f7WX6Q3zYIXCMTZlO6UTdjFUzx1myMoOSWpdiXbHy7HTi7W2qOto5SsXynlhrF5w
-         DTqA==
-X-Gm-Message-State: AOAM532L7OHHSG0T9cxEjh3zd9msvoldskGaxfu6fhenWe8nzkxWIz2J
-        7uz2ARtPIJL9+kvxFvgujN7DmM70xnOH31W1BCMYIA7vGGamHQ4HHcx4Z0gFafM6q7Ubx+Ci4T5
-        O6VtMOF/a/x0s
-X-Received: by 2002:a9d:7745:: with SMTP id t5mr2336033otl.254.1644342201839;
-        Tue, 08 Feb 2022 09:43:21 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwO9ltSzIoG91Af/O1KWvnxNeiLqj6JxqFTQKli+Ed+9vVShlH1mHu2H9ZNDPJSfzOIE9vpMQ==
-X-Received: by 2002:a9d:7745:: with SMTP id t5mr2336007otl.254.1644342201559;
-        Tue, 08 Feb 2022 09:43:21 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id 12sm6101166oaj.31.2022.02.08.09.43.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Feb 2022 09:43:21 -0800 (PST)
-Date:   Tue, 8 Feb 2022 10:43:19 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 24/30] vfio-pci/zdev: wire up group notifier
-Message-ID: <20220208104319.4861fb22.alex.williamson@redhat.com>
-In-Reply-To: <20220204211536.321475-25-mjrosato@linux.ibm.com>
-References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
-        <20220204211536.321475-25-mjrosato@linux.ibm.com>
-Organization: Red Hat
-MIME-Version: 1.0
+        with ESMTP id S234672AbiBHRtD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 12:49:03 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30903C061578
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 09:49:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C350E617CF
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 17:49:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37060C004E1;
+        Tue,  8 Feb 2022 17:49:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644342540;
+        bh=fiDA/ww0hH9Ihny0p1Mw46FtIdZcId1+1g9QAhPQmMQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ThxP1jgwknTX415K1izO5hWFXB3QTxYCPffGDOViUTzgffNYlps4PC96hjrk8rNYX
+         kPXzHQ7w/VGVhwJ8wny31enHFT4WCwLtBDdGPA6MvFOQvrN+t6uC5LWnq1aZ7bcXCb
+         RZqX5hBcrqaJgPezu2NYCzG59/kw0liK9v2vslhT2m3jsIZNoPcmqwpCRi0oTytQSG
+         0mH53xrRqSNfyp2QbovIBFfev4rUCgKxexdyAB5joNbtkYe+cPLJyhzhsFPQCPMp7b
+         z5UPlJow8XUsDNQmGt6RfkZj3r3+Xk5c+p7JZbDih2zS232alW7rH/3tqdjLcZziSH
+         7JlpPSXbwpWIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nHUbq-006L8W-8g; Tue, 08 Feb 2022 17:48:58 +0000
+Date:   Tue, 08 Feb 2022 17:48:57 +0000
+Message-ID: <878rul5jw6.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oupton@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, pshier@google.com,
+        ricarkol@google.com, reijiw@google.com, jingzhangos@google.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        james.morse@arm.com, Alexandru.Elisei@arm.com,
+        suzuki.poulose@arm.com, Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <YgKhMjGtBH+1nJCk@google.com>
+References: <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+        <87ilyitt6e.wl-maz@kernel.org>
+        <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+        <87lf3drmvp.wl-maz@kernel.org>
+        <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+        <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+        <875yq88app.wl-maz@kernel.org>
+        <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+        <878ruld72v.wl-maz@kernel.org>
+        <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
+        <YgKhMjGtBH+1nJCk@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, oupton@google.com, rananta@google.com, drjones@redhat.com, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,168 +80,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  4 Feb 2022 16:15:30 -0500
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> KVM zPCI passthrough device logic will need a reference to the associated
-> kvm guest that has access to the device.  Let's register a group notifier
-> for VFIO_GROUP_NOTIFY_SET_KVM to catch this information in order to create
-> an association between a kvm guest and the host zdev.
+On Tue, 08 Feb 2022 16:58:26 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_pci.h  |  2 ++
->  drivers/vfio/pci/vfio_pci_core.c |  2 ++
->  drivers/vfio/pci/vfio_pci_zdev.c | 46 ++++++++++++++++++++++++++++++++
->  include/linux/vfio_pci_core.h    | 10 +++++++
->  4 files changed, 60 insertions(+)
+> On Tue, Feb 08, 2022, Oliver Upton wrote:
+> > Hi Marc,
+> > 
+> > On Tue, Feb 8, 2022 at 1:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > > > KVM currently restricts the vcpu features to be unified across vcpus,
+> > > > > but that's only an implementation choice.
+> > > >
+> > > > But that implementation choice has become ABI, no? How could support
+> > > > for asymmetry be added without requiring userspace opt-in or breaking
+> > > > existing VMMs that depend on feature unification?
+> > >
+> > > Of course, you'd need some sort of advertising of this new behaviour.
+> > >
+> > > One thing I would like to add to the current state of thing is an
+> > > indication of whether the effects of a sysreg being written from
+> > > userspace are global or local to a vcpu. You'd need a new capability,
+> > > and an extra flag added to the encoding of each register.
+> > 
+> > Ah. I think that is a much more reasonable fit then. VMMs unaware of
+> > this can continue to migrate new bits (albeit at the cost of
+> > potentially higher lock contention for the per-VM stuff), and those
+> > that do can reap the benefits of writing such attributes exactly once.
 > 
-> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
-> index e4696f5592e1..16290b4cf2a6 100644
-> --- a/arch/s390/include/asm/kvm_pci.h
-> +++ b/arch/s390/include/asm/kvm_pci.h
-> @@ -16,6 +16,7 @@
->  #include <linux/kvm.h>
->  #include <linux/pci.h>
->  #include <linux/mutex.h>
-> +#include <linux/notifier.h>
->  #include <asm/pci_insn.h>
->  #include <asm/pci_dma.h>
->  
-> @@ -32,6 +33,7 @@ struct kvm_zdev {
->  	u64 rpcit_count;
->  	struct kvm_zdev_ioat ioat;
->  	struct zpci_fib fib;
-> +	struct notifier_block nb;
->  };
->  
->  int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index f948e6cd2993..fc57d4d0abbe 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -452,6 +452,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
->  
->  	vfio_pci_vf_token_user_add(vdev, -1);
->  	vfio_spapr_pci_eeh_release(vdev->pdev);
-> +	vfio_pci_zdev_release(vdev);
->  	vfio_pci_core_disable(vdev);
->  
->  	mutex_lock(&vdev->igate);
-> @@ -470,6 +471,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
->  void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
->  {
->  	vfio_pci_probe_mmaps(vdev);
-> +	vfio_pci_zdev_open(vdev);
->  	vfio_spapr_pci_eeh_open(vdev->pdev);
->  	vfio_pci_vf_token_user_add(vdev, 1);
->  }
+> But the "proper" usage is no different than adding support for
+> VM-scoped variants of KVM_{G,S}ET_ONE_REG and friends, and a
+> VM-scoped variant is conceptually a lot cleaner IMO.  And making
+> them truly VM-scoped means KVM can do things like support sysregs
+> that are immutable after vCPUs are created.
 
-If this handling were for a specific device, I think we'd be suggesting
-this is the point at which we cross over to a vendor variant making use
-of vfio-pci-core rather than hooking directly into the core code.  But
-this is meant to extend vfio-pci proper for the whole arch.  Is there a
-compromise in using #ifdefs in vfio_pci_ops to call into zpci specific
-code that implements these arch specific hooks and the core for
-everything else?  SPAPR code could probably converted similarly, it
-exists here for legacy reasons. [Cc Jason]
+It is different, because your approach requires you to update all the
+existing VMMs to find out which register is of which kind. Not to
+mention that global sysregs are an absolute oddity in the face of the
+architecture (there is none in the base architecture).
 
-Also, please note the DEVICE_FEATURE generalizations in the latest
-series from NVIDIA for mlx5 migration support:
+> So long as KVM defaults to '0' for all such registers, lack of
+> migration support in userspace that isn't aware of the new API,
+> i.e. doesn't do KVM_GET_REG_LIST at a VM-scope, is a nop because
+> said userspace also won't modify the registers in the first place.
 
-https://lore.kernel.org/all/20220207172216.206415-8-yishaih@nvidia.com/
+We want any VMM that correctly uses the API today to seamlessly be
+able to save/restore any new feature. QEMU does that, and it should
+continue to work no matter what new feature we add to the list.
 
-If this series were to go in via the s390 tree, I'd request a branch so
-that we can continue to work on this in vfio code as well.  Thanks,
+	M.
 
-Alex
-
-> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-> index ea4c0d2b0663..9f8284499111 100644
-> --- a/drivers/vfio/pci/vfio_pci_zdev.c
-> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
-> @@ -13,6 +13,7 @@
->  #include <linux/vfio_zdev.h>
->  #include <asm/pci_clp.h>
->  #include <asm/pci_io.h>
-> +#include <asm/kvm_pci.h>
->  
->  #include <linux/vfio_pci_core.h>
->  
-> @@ -136,3 +137,48 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->  
->  	return ret;
->  }
-> +
-> +static int vfio_pci_zdev_group_notifier(struct notifier_block *nb,
-> +					unsigned long action, void *data)
-> +{
-> +	struct kvm_zdev *kzdev = container_of(nb, struct kvm_zdev, nb);
-> +
-> +	if (action == VFIO_GROUP_NOTIFY_SET_KVM) {
-> +		if (!data || !kzdev->zdev)
-> +			return NOTIFY_DONE;
-> +		kzdev->kvm = data;
-> +	}
-> +
-> +	return NOTIFY_OK;
-> +}
-> +
-> +void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
-> +{
-> +	unsigned long events = VFIO_GROUP_NOTIFY_SET_KVM;
-> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
-> +
-> +	if (!zdev)
-> +		return;
-> +
-> +	if (kvm_s390_pci_dev_open(zdev))
-> +		return;
-> +
-> +	zdev->kzdev->nb.notifier_call = vfio_pci_zdev_group_notifier;
-> +
-> +	if (vfio_register_notifier(vdev->vdev.dev, VFIO_GROUP_NOTIFY,
-> +				   &events, &zdev->kzdev->nb))
-> +		kvm_s390_pci_dev_release(zdev);
-> +}
-> +
-> +void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
-> +{
-> +	struct zpci_dev *zdev = to_zpci(vdev->pdev);
-> +
-> +	if (!zdev || !zdev->kzdev)
-> +		return;
-> +
-> +	vfio_unregister_notifier(vdev->vdev.dev, VFIO_GROUP_NOTIFY,
-> +				 &zdev->kzdev->nb);
-> +
-> +	kvm_s390_pci_dev_release(zdev);
-> +}
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 5e2bca3b89db..05287f8ac855 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -198,12 +198,22 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
->  #ifdef CONFIG_VFIO_PCI_ZDEV
->  extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->  				       struct vfio_info_cap *caps);
-> +void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev);
-> +void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev);
->  #else
->  static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->  					      struct vfio_info_cap *caps)
->  {
->  	return -ENODEV;
->  }
-> +
-> +static inline void vfio_pci_zdev_open(struct vfio_pci_core_device *vdev)
-> +{
-> +}
-> +
-> +static inline void vfio_pci_zdev_release(struct vfio_pci_core_device *vdev)
-> +{
-> +}
->  #endif
->  
->  /* Will be exported for vfio pci drivers usage */
-
+-- 
+Without deviation from the norm, progress is not possible.
