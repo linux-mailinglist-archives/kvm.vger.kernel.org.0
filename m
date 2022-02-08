@@ -2,295 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98BB94ADB42
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 15:35:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFF744ADB4B
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 15:36:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378245AbiBHOfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 09:35:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37958 "EHLO
+        id S1378271AbiBHOgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 09:36:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378235AbiBHOfa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 09:35:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C1F41C03FEEF
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 06:35:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644330927;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mSRpjshv+kbhfh/GFUgZiARyP3KS+Ne997kfmQ3mHmo=;
-        b=OTjPg+wasgVc3x7treLC9iNCyjYssgbSGodNPTFO5ZyKUIs5EbY8nL5guXgAl3rFd/wq1W
-        tWHNsQZ/qy2Hvt4pvELRBzfB2OzJbg3GkUCrlhuBPnlM/P4Xt+MlymmORiK3ZNotVHIuUE
-        pWjThNHXidF3yqZ0Fit+V5Zc2XQNKkk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-641-p86_F2L_OamJatwilZ8pFg-1; Tue, 08 Feb 2022 09:35:24 -0500
-X-MC-Unique: p86_F2L_OamJatwilZ8pFg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9280814405;
-        Tue,  8 Feb 2022 14:35:21 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB0387C0C1;
-        Tue,  8 Feb 2022 14:35:15 +0000 (UTC)
-Message-ID: <b35376a91f31256035c361cfaa2456f67c7f797a.camel@redhat.com>
-Subject: Re: [PATCH v3 3/6] KVM: SVM: implement
- force_intercept_exceptions_mask
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Date:   Tue, 08 Feb 2022 16:35:14 +0200
-In-Reply-To: <YTELOvhj5lERBKeC@google.com>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
-         <20210811122927.900604-4-mlevitsk@redhat.com>
-         <73f3eff092ca9624ebd55bc02193b39f248c8877.camel@redhat.com>
-         <YTELOvhj5lERBKeC@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S229623AbiBHOgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 09:36:14 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4585EC03FECE;
+        Tue,  8 Feb 2022 06:36:13 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 218CJtMm015569;
+        Tue, 8 Feb 2022 14:36:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=AAYDtomxl4rPrxMotPaqAzwZrNgrhLQKSqm91wF27oM=;
+ b=byIzlnt/5EuFXf8lyfvAA6+xjfonfjsl9Hq3blTBV8NBq90YfpPfaiZ+tbtU3xHyp2Js
+ QTiTwDxIJXSKxl9RZlMAs9p629NUS4sxHqVuIosye8AtXzzeh/A8Tk4jDyrZSVNuyRY0
+ l3HMncSN92kCjm87wwA8OHfn31G8d434136bT3+L+jad7A5yyKG2ZqHJLAOMvjBT5PiB
+ xh7P8730dnwlbDbOMr00eWNxV6pJ+94WAIg8CUjldwKaXaa3D5ADQiTlFNJgHDMYBlG+
+ tRdZ8HhJqAftFrtRhdgkY5FgQqmPhonu7OUyoezqYlMUgfXDwVpbpdk8XBRx6P88quCE UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e236fje33-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Feb 2022 14:36:11 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 218EG9jS036875;
+        Tue, 8 Feb 2022 14:36:10 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e236fje2g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Feb 2022 14:36:10 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 218EWaAm015991;
+        Tue, 8 Feb 2022 14:36:08 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3e1gv9emuh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Feb 2022 14:36:08 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 218Ea44J38797596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Feb 2022 14:36:04 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 40864A4065;
+        Tue,  8 Feb 2022 14:36:04 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98FAFA405F;
+        Tue,  8 Feb 2022 14:36:03 +0000 (GMT)
+Received: from [9.171.95.210] (unknown [9.171.95.210])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Feb 2022 14:36:03 +0000 (GMT)
+Message-ID: <a3eea263-de38-e3d7-f188-93eb5148a73a@linux.ibm.com>
+Date:   Tue, 8 Feb 2022 15:36:01 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v2 02/11] KVM: s390: Honor storage keys when accessing
+ guest memory
+Content-Language: en-US
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20220207165930.1608621-1-scgl@linux.ibm.com>
+ <20220207165930.1608621-3-scgl@linux.ibm.com>
+ <21c30a11-1219-04bb-b0c9-8ac0baf0c506@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+In-Reply-To: <21c30a11-1219-04bb-b0c9-8ac0baf0c506@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vE8Pncz96lqpotYz099ue1F3O1_iYzUz
+X-Proofpoint-GUID: Qob6cUfGxOo6rBEK5spfRzPntwPNDMs8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-08_04,2022-02-07_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 adultscore=0 priorityscore=1501
+ mlxscore=0 phishscore=0 spamscore=0 malwarescore=0 impostorscore=0
+ bulkscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202080090
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-09-02 at 17:34 +0000, Sean Christopherson wrote:
-> On Wed, Aug 11, 2021, Maxim Levitsky wrote:
-> > On Wed, 2021-08-11 at 15:29 +0300, Maxim Levitsky wrote:
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index e45259177009..19f54b07161a 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -233,6 +233,8 @@ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
-> > >  #define MSRS_RANGE_SIZE 2048
-> > >  #define MSRS_IN_RANGE (MSRS_RANGE_SIZE * 8 / 2)
-> > >  
-> > > +static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code);
-> > > +
-> > >  u32 svm_msrpm_offset(u32 msr)
-> > >  {
-> > >  	u32 offset;
-> > > @@ -1153,6 +1155,22 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
-> > >  	}
-> > >  }
-> > >  
-> > > +static void svm_init_force_exceptions_intercepts(struct vcpu_svm *svm)
-> > > +{
-> > > +	int exc;
-> > > +
-> > > +	svm->force_intercept_exceptions_mask = force_intercept_exceptions_mask;
+On 2/8/22 15:02, Christian Borntraeger wrote:
+> Am 07.02.22 um 17:59 schrieb Janis Schoetterl-Glausch:
+>> Storage key checking had not been implemented for instructions emulated
+>> by KVM. Implement it by enhancing the functions used for guest access,
+>> in particular those making use of access_guest which has been renamed
+>> to access_guest_with_key.
+>> Accesses via access_guest_real should not be key checked.
+>>
+>> For actual accesses, key checking is done by
+>> copy_from/to_user_key (which internally uses MVCOS/MVCP/MVCS).
+>> In cases where accessibility is checked without an actual access,
+>> this is performed by getting the storage key and checking if the access
+>> key matches. In both cases, if applicable, storage and fetch protection
+>> override are honored.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 > 
-> Ah, the param is being snapshotted on vCPU creation, hence the writable module
-> param.  That works, though it'd be better to snapshot it on a per-VM basic, not
-> per-vCPU, and do so in common x86 code so that the param doesn't need to be
-> exported.
+> Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> 
+>> ---
+>>   arch/s390/include/asm/ctl_reg.h |   2 +
+>>   arch/s390/include/asm/page.h    |   2 +
+>>   arch/s390/kvm/gaccess.c         | 187 ++++++++++++++++++++++++++++++--
+>>   arch/s390/kvm/gaccess.h         |  77 +++++++++++--
+>>   arch/s390/kvm/intercept.c       |  12 +-
+>>   arch/s390/kvm/kvm-s390.c        |   4 +-
+>>   6 files changed, 253 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/arch/s390/include/asm/ctl_reg.h b/arch/s390/include/asm/ctl_reg.h
+>> index 04dc65f8901d..c800199a376b 100644
+>> --- a/arch/s390/include/asm/ctl_reg.h
+>> +++ b/arch/s390/include/asm/ctl_reg.h
+>> @@ -12,6 +12,8 @@
+>>     #define CR0_CLOCK_COMPARATOR_SIGN    BIT(63 - 10)
+>>   #define CR0_LOW_ADDRESS_PROTECTION    BIT(63 - 35)
+>> +#define CR0_FETCH_PROTECTION_OVERRIDE    BIT(63 - 38)
+>> +#define CR0_STORAGE_PROTECTION_OVERRIDE    BIT(63 - 39)
+>>   #define CR0_EMERGENCY_SIGNAL_SUBMASK    BIT(63 - 49)
+>>   #define CR0_EXTERNAL_CALL_SUBMASK    BIT(63 - 50)
+>>   #define CR0_CLOCK_COMPARATOR_SUBMASK    BIT(63 - 52)
+>> diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
+>> index d98d17a36c7b..cfc4d6fb2385 100644
+>> --- a/arch/s390/include/asm/page.h
+>> +++ b/arch/s390/include/asm/page.h
+>> @@ -20,6 +20,8 @@
+>>   #define PAGE_SIZE    _PAGE_SIZE
+>>   #define PAGE_MASK    _PAGE_MASK
+>>   #define PAGE_DEFAULT_ACC    0
+>> +/* storage-protection override */
+>> +#define PAGE_SPO_ACC        9
+>>   #define PAGE_DEFAULT_KEY    (PAGE_DEFAULT_ACC << 4)
+>>     #define HPAGE_SHIFT    20
+>> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+>> index 4460808c3b9a..7fca0cff4c12 100644
+>> --- a/arch/s390/kvm/gaccess.c
+>> +++ b/arch/s390/kvm/gaccess.c
+>> @@ -10,6 +10,7 @@
+>>   #include <linux/mm_types.h>
+>>   #include <linux/err.h>
+>>   #include <linux/pgtable.h>
+>> +#include <linux/bitfield.h>
+>>     #include <asm/gmap.h>
+>>   #include "kvm-s390.h"
+>> @@ -794,6 +795,79 @@ static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
+>>       return 1;
+>>   }
+>>   +static bool fetch_prot_override_applicable(struct kvm_vcpu *vcpu, enum gacc_mode mode,
+>> +                       union asce asce)
+>> +{
+>> +    psw_t *psw = &vcpu->arch.sie_block->gpsw;
+>> +    unsigned long override;
+>> +
+>> +    if (mode == GACC_FETCH || mode == GACC_IFETCH) {
+>> +        /* check if fetch protection override enabled */
+>> +        override = vcpu->arch.sie_block->gcr[0];
+>> +        override &= CR0_FETCH_PROTECTION_OVERRIDE;
+>> +        /* not applicable if subject to DAT && private space */
+>> +        override = override && !(psw_bits(*psw).dat && asce.p);
+>> +        return override;
+>> +    }
+>> +    return false;
+>> +}
+>> +
+>> +static bool fetch_prot_override_applies(unsigned long ga, unsigned int len)
+>> +{
+>> +    return ga < 2048 && ga + len <= 2048;
+>> +}
+>> +
+>> +static bool storage_prot_override_applicable(struct kvm_vcpu *vcpu)
+>> +{
+>> +    /* check if storage protection override enabled */
+>> +    return vcpu->arch.sie_block->gcr[0] & CR0_STORAGE_PROTECTION_OVERRIDE;
+>> +}
+>> +
+>> +static bool storage_prot_override_applies(u8 access_control)
+>> +{
+>> +    /* matches special storage protection override key (9) -> allow */
+>> +    return access_control == PAGE_SPO_ACC;
+>> +}
+>> +
 
-I have nothing against that.
+[...]
 
+>> +int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+>> +              void *data, unsigned long len, enum gacc_mode mode,
+>> +              u8 access_key)
+>>   {
+>>       psw_t *psw = &vcpu->arch.sie_block->gpsw;
+>>       unsigned long nr_pages, idx;
+>>       unsigned long gpa_array[2];
+>>       unsigned int fragment_len;
+>>       unsigned long *gpas;
+>> +    enum prot_type prot;
+>>       int need_ipte_lock;
+>>       union asce asce;
+>> +    bool try_storage_prot_override;
+>> +    bool try_fetch_prot_override;
 > 
-> > > +	for (exc = 0 ; exc < 32 ; exc++) {
-> 
-> for_each_set_bit()
-I used a helper function instead, IMHO a bit cleaner.
+> These are used only once, so we could get rid of those. On the other hands this
+> variant might be slightly more readable, so I am fine either way.
 
+I don't know if the compiler would manage to cache the calls across loop iterations,
+but then the functions just perform some checks so it shouldn't matter much.
+I'm inclined to keep it since it moves a bit of code out of the loop body, as you say,
+it might help a bit with readability, even if not much.
 > 
-> > > +		if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
-> > > +			continue;
-> > > +
-> > > +		/* Those are defined to have undefined behavior in the SVM spec */
-> > > +		if (exc != 2 && exc != 9)
 > 
-> Maybe add a pr_warn_once() to let the user know they done messed up?
-> 
-> And given that there are already intercepts with undefined behavior, it's probably
-> best to disallow intercepting anything we aren't 100% postive will be handled
-> correctly, e.g. intercepting vector 31 is nonsensical at this time.
+>>       int rc;
+>>         if (!len)
+>> @@ -904,16 +1022,47 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+>>           gpas = vmalloc(array_size(nr_pages, sizeof(unsigned long)));
+>>       if (!gpas)
+>>           return -ENOMEM;
+>> +    try_fetch_prot_override = fetch_prot_override_applicable(vcpu, mode, asce);
+>> +    try_storage_prot_override = storage_prot_override_applicable(vcpu);
+>>       need_ipte_lock = psw_bits(*psw).dat && !asce.r;
+>>       if (need_ipte_lock)
+>>           ipte_lock(vcpu);
+>> -    rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode);
+>> -    for (idx = 0; idx < nr_pages && !rc; idx++) {
+>> +    /*
+>> +     * Since we do the access further down ultimately via a move instruction
+>> +     * that does key checking and returns an error in case of a protection
+>> +     * violation, we don't need to do the check during address translation.
+>> +     * Skip it by passing access key 0, which matches any storage key,
+>> +     * obviating the need for any further checks. As a result the check is
+>> +     * handled entirely in hardware on access, we only need to take care to
+>> +     * forego key protection checking if fetch protection override applies or
+>> +     * retry with the special key 9 in case of storage protection override.
+>> +     */
+>> +    rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode, 0);
+>> +    if (rc)
+>> +        goto out_unlock;
+>> +    for (idx = 0; idx < nr_pages; idx++) {
+>>           fragment_len = min(PAGE_SIZE - offset_in_page(gpas[idx]), len);
+>> -        rc = access_guest_page(vcpu->kvm, mode, gpas[idx], data, fragment_len);
+>> +        if (try_fetch_prot_override && fetch_prot_override_applies(ga, fragment_len)) {
+>> +            rc = access_guest_page(vcpu->kvm, mode, gpas[idx],
+>> +                           data, fragment_len);
+>> +        } else {
+>> +            rc = access_guest_page_with_key(vcpu->kvm, mode, gpas[idx],
+>> +                            data, fragment_len, access_key);
+>> +        }
+>> +        if (rc == PGM_PROTECTION && try_storage_prot_override)
+>> +            rc = access_guest_page_with_key(vcpu->kvm, mode, gpas[idx],
+>> +                            data, fragment_len, PAGE_SPO_ACC);
+>> +        if (rc == PGM_PROTECTION)
+>> +            prot = PROT_TYPE_KEYC;
+>> +        if (rc)
+>> +            break;
+>>           len -= fragment_len;
+>>           data += fragment_len;
+>> +        ga = kvm_s390_logical_to_effective(vcpu, ga + fragment_len);
+>>       }
+>> +    if (rc > 0)
+>> +        rc = trans_exc(vcpu, rc, ga, ar, mode, prot);
+>> +out_unlock:
+>>       if (need_ipte_lock)
+>>           ipte_unlock(vcpu);
+>>       if (nr_pages > ARRAY_SIZE(gpa_array))
 
-Or I think I'll just drop this check altogether - this is a debug feature anyway.
-
-> 
-> > > +			continue;
-> > > +		set_exception_intercept(svm, exc);
-> 
-> ...
-> 
-> > > +static int gen_exc_interception(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	/*
-> > > +	 * Generic exception intercept handler which forwards a guest exception
-> > > +	 * as-is to the guest.
-> > > +	 * For exceptions that don't have a special intercept handler.
-> > > +	 *
-> > > +	 * Used only for 'force_intercept_exceptions_mask' KVM debug feature.
-> > > +	 */
-> > > +	struct vcpu_svm *svm = to_svm(vcpu);
-> > > +	int exc = svm->vmcb->control.exit_code - SVM_EXIT_EXCP_BASE;
-> > > +
-> > > +	/* SVM doesn't provide us with an error code for the #DF */
-> > > +	u32 err_code = exc == DF_VECTOR ? 0 : svm->vmcb->control.exit_info_1;
-> 
-> Might be better to handle this in the x86_exception_has_error_code() path to
-> avoid confusing readers with respect to exceptions that don't have an error code,
-> e.g.
-> 
-> 	else if (x86_exception_has_error_code(exc)) {
-> 		/* SVM doesn't provide the error code on #DF :-( */
-> 		if (exc == DF_VECTOR)
-> 			kvm_queue_exception_e(vcpu, exc, 0);
-> 		else
-> 			kvm_queue_exception_e(vcpu, exc, svm->vmcb->control.exit_info_1);
-> 	} else {
-> 		...
-> 	}
-> 
-> Alternatively, can we zero svm->vmcb->control.exit_info_1 on #DF to make it more
-> obvious that SVM leaves stale data in exit_info_1 (assuming that's true)?  E.g.
-> 
-> 	...
-> 
-> 	if (exc == TS_VECTOR) {
-> 		...
-> 	} else if (x86_exception_has_error_code(exc)) {
-> 		/* SVM doesn't provide the error code on #DF :-( */
-> 		if (exc == DF_VECTOR)
-> 			svm->vmcb->control.exit_info_1 = 0;
-> 
-> 		kvm_queue_exception_e(vcpu, exc, svm->vmcb->control.exit_info_1);
-> 	} else {
-> 		...
-> 	}
-
-Makes sense.
-
-> 
-> 		
-> > > +
-> > > +	if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
-> 
-> BIT(exc)
-I added a helper function in common x86 code for this.
-
-> 
-> > > +		return svm_handle_invalid_exit(vcpu, svm->vmcb->control.exit_code);
-> > > +
-> > > +	if (exc == TS_VECTOR) {
-> > > +		/*
-> > > +		 * SVM doesn't provide us with an error code to be able to
-> > > +		 * re-inject the #TS exception, so just disable its
-> > > +		 * intercept, and let the guest re-execute the instruction.
-> > > +		 */
-> > > +		vmcb_clr_intercept(&svm->vmcb01.ptr->control,
-> > > +				   INTERCEPT_EXCEPTION_OFFSET + TS_VECTOR);
-> 
-> Maybe just disallow intercepting #TS altogether?  Or does this fall into your
-> Win98 use case? :-)
-
-Win98 does indeed generate few #TS exceptions but so far I haven't noticed
-any issues related to task switches. Anyway I would like to intercept
-as much as possible since this is a debug feature. A single interception
-is still better that nothing.
-
-
-> 
-> > > +		recalc_intercepts(svm);
-> > > +	} else if (x86_exception_has_error_code(exc))
-> > > +		kvm_queue_exception_e(vcpu, exc, err_code);
-> > > +	else
-> > > +		kvm_queue_exception(vcpu, exc);
-> > > +	return 1;
-> > > +}
-> > > +
-> > >  static bool is_erratum_383(void)
-> > >  {
-> > >  	int err, i;
-> > > @@ -3065,6 +3131,10 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
-> > >  	[SVM_EXIT_WRITE_DR5]			= dr_interception,
-> > >  	[SVM_EXIT_WRITE_DR6]			= dr_interception,
-> > >  	[SVM_EXIT_WRITE_DR7]			= dr_interception,
-> > > +
-> > > +	[SVM_EXIT_EXCP_BASE ...
-> > > +	SVM_EXIT_EXCP_BASE + 31]		= gen_exc_interception,
-> 
-> This generates a Sparse warning due to the duplicate initializer.  IMO that's a
-> very good warning as I have zero idea how the compiler actually handles this
-> particular scenario, e.g. do later entries take priority, is it technically
-> "undefined" behavior, etc...
-> 
-> arch/x86/kvm/svm/svm.c:3065:10: warning: Initializer entry defined twice
-> arch/x86/kvm/svm/svm.c:3067:29:   also defined here
-> 
-> I don't have a clever solution though :-('
-
-Good catch. I thought that this would make sense but standards never make sense.
-I'll do this manually.
-
-> 
-> > > +
-> > >  	[SVM_EXIT_EXCP_BASE + DB_VECTOR]	= db_interception,
-> > >  	[SVM_EXIT_EXCP_BASE + BP_VECTOR]	= bp_interception,
-> > >  	[SVM_EXIT_EXCP_BASE + UD_VECTOR]	= ud_interception,
-> > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > > index 524d943f3efc..187ada7c5b03 100644
-> > > --- a/arch/x86/kvm/svm/svm.h
-> > > +++ b/arch/x86/kvm/svm/svm.h
-> > > @@ -196,6 +196,7 @@ struct vcpu_svm {
-> > >  	bool ghcb_sa_free;
-> > >  
-> > >  	bool guest_state_loaded;
-> > > +	u32 force_intercept_exceptions_mask;
-> > >  };
-> > >  
-> > >  struct svm_cpu_data {
-> > > @@ -351,8 +352,11 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
-> > >  	struct vmcb *vmcb = svm->vmcb01.ptr;
-> > >  
-> > >  	WARN_ON_ONCE(bit >= 32);
-> > > -	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-> > >  
-> > > +	if ((1 << bit) & svm->force_intercept_exceptions_mask)
-> 
-> BIT(bit)
-Fixed with helper function as well.
-
-> 
-> > > +		return;
-> > > +
-> > > +	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-> > >  	recalc_intercepts(svm);
-> > >  }
-
-
-Thanks for the review!
-Best regards,
-	Maxim Levitsky
-
+[...]
