@@ -2,234 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 696594AE0D6
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 19:33:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4263A4AE180
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 19:52:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353353AbiBHSdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 13:33:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59562 "EHLO
+        id S1385415AbiBHSvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 13:51:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237383AbiBHSdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 13:33:39 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9A7C061576;
-        Tue,  8 Feb 2022 10:33:38 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A39EC60C03;
-        Tue,  8 Feb 2022 18:33:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76393C004E1;
-        Tue,  8 Feb 2022 18:33:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644345217;
-        bh=LWHpc/GxLkbO/PPq5G6kWt1p0WFNGF+VMiaZ+R5OiWA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZBPy6ZDSXiJOPqw5n1PP34cWsRXUy6DL6ayWnXAD2JTdSLQn98nqP7iIgg4Bxv1yF
-         LcZ8d/VK9bSFPJW/2znOd3119fGcHY9yF0jrKfKdPxMfS5iMNWQbUCAf3JyqGePCEP
-         2fF3BbRinh1rvCdnFHYpUqMR3uROgrKOaOGwBLD2w8YVEWCewf9nIvoP5zv9j4gnMk
-         aQAgqLVRRvslF99zZpZvkQ8qCh5mphgPOuKZd6R0rnHtH6DnfYPGTkELg0DxhiYFyl
-         iLt2EQOL73kQ3yFfASHgJmdcLyEtT3VKD7dQo1Nks4iAJW0mQBeP+Uh4/x5hDpA9vA
-         7Lt3sjfIvCbQg==
-Date:   Tue, 8 Feb 2022 20:33:18 +0200
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     linux-api@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v4 00/12] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <YgK3buC2xes9/lLj@kernel.org>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
-MIME-Version: 1.0
+        with ESMTP id S1385388AbiBHSvp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 13:51:45 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2057.outbound.protection.outlook.com [40.107.223.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F14C0612C1;
+        Tue,  8 Feb 2022 10:51:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FGXNzfN/NTiWmxzB4Fe+8M+hDW9QjH+Pk0z+mIRNLLVFTzFPxI+usVdD9rQoFWQnEBAvxKwwmSzRSM9zQB8RKWI+UI4grCMr+GGtXGBL+JzkMSOXTSbaBo6/o1z5Lijnkna/YUg0T7anhraQz2U6aIw03fsKqWILmV1U3uz49BqHI3iX8rNYHsxP/4Kxx1MRA6Fto7YoRSucPCedcZnlO274RUCtTg/c0sKR514qr8PnqyU0rJ08f9Aw+q+F0j+M9ccOdR0CxiL3OOvfLBHwZN5Bh3EI1YW+zNY5AKXOy7GDyya9W2UzcG/GSPpG6GvqzwEYzP2UfyoGCFW+dZzQQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qt6VL/53xRCwC+Ij0Phq1k8ruOTxcZn6SGaeWuGkmV0=;
+ b=leaAzgOS5ds3y/rFlTtrQ+R8wFxiUW2Kh3+SO9t8r19Tyi9Jp2L7s0nU43yq/6bg/AoRLIOIKg/i/BKCjV0excbZtaUQRIuxTQCSBl+WvJX2VxJnsYZdJxgZ22Rc7L3GMpbpZwaMCshXiDLTHK35xvdh+tHtgRq0NmDGmNxCq/qz5OrpdI4Ds3tSCPZiGUZgqOkf5/0UJHLsLRVNhEymXx8eAM33R7gIJ680VZFobX8HqJDuUN6SMgi56BPWo6VxtuozYsT1KXHbRVeKVFKoZ5KCjmOAh0kKPjak+pK7t2uPmIO6+2rI+aNLktdJ9a2NRyK6p/ezWW2VcR266nHoZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qt6VL/53xRCwC+Ij0Phq1k8ruOTxcZn6SGaeWuGkmV0=;
+ b=HW694PkckygpSGOmnYuWnBg/Bib51mPTRbJYwV6Ulnobiz/m95Re8z1UW91Snohe5hbRjjZ4FaOEPStXm9AX6GYOfzA5JBIfWb2c0YZMAfOqdPw8JJ6UPX4W7QB+JtKw/gzS/Q+Vv44lsXRYd+Q8dBkQ/fupv2yyaWAXgzEO79zZRhuNg7FCPFr1MOpvCtMpeYaT9QVdXlFD0tjU4drJ4QGiaT2XLesXPoUbEmgdupFbjIPXAWTNqyHy9myjNb8/minuEJdNir4lgdpnqwvQShitdGQQVqtFZF4+SmGXnxPs6FT1nO/uPkEXuXwrCEN19Rk0+Z3PPUcZcPPGrTNRiA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Tue, 8 Feb
+ 2022 18:51:43 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.011; Tue, 8 Feb 2022
+ 18:51:43 +0000
+Date:   Tue, 8 Feb 2022 14:51:41 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 24/30] vfio-pci/zdev: wire up group notifier
+Message-ID: <20220208185141.GH4160@nvidia.com>
+References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
+ <20220204211536.321475-25-mjrosato@linux.ibm.com>
+ <20220208104319.4861fb22.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220208104319.4861fb22.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR10CA0018.namprd10.prod.outlook.com
+ (2603:10b6:208:120::31) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8d814342-e9b8-4685-c692-08d9eb340c4a
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:EE_
+X-Microsoft-Antispam-PRVS: <SA0PR12MB449540EAE3CE62DE2C9BE027C22D9@SA0PR12MB4495.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3ibOuPte++CMaSGBb9aCbpQU1H/ojJKMV+0QmeBlfMomWXZRNvg+Odml7T3S8+mZCyZmM85oFmucXjiD+g5+ufgHo26auzOGiLww93T0API6NUKl68xqyD7QpgBziahysQg125U+0CIErwD6WwVkO9YO5/DvDnYza5UDnqXmDZeRCGuehaS1W9SPyJcxY5JVasAXuLSEkkJUxTrp+xq9bohHLADgPTrMDhd5w2+GQXGOkGimxstIjsjIJTitUUsFKFTQhCwV2xH1GpU7IzHbRDqP/BoqZKSUNuv86sLEg1nIIyTVhTSw3vJ/MYtM2CTyQ7SVDiL6HYFPm4AhumEi2syC4c9BQcpGiWHdSWcTJAWHq4KcPYNwiTLGgkE0PqChBH9Op81J4cJ5U+0VzFnTO7i3knsJcWd2dfB/NJRM7YpMKmOdTbRoEtFo2RpAKl1aesZu4b8AGimdXzbNhl1Tx7eNxCl51KQk3+ylylQ3vv4htaxpXktJMY29oO3MKA+0G2nAmGLR/e/HSPnm0WVXOckD8kjjTED84B2DX967SqPjWY+dMrYPMKejBKFacj9+AjZGAex1RoVBr7zVHtgMbJJq69cfMGZTisKfSAtOOVGarUOcs6aHVsXSi9OdlxUjnb4EYAs3tyvWZN7ntsoxxaSIpX1YBdCvvte+D7IaovYRDpkqzRJdz6WS8m1gXJpjGWUXFv+4UDN2UPoUWtx8HK+AhMvShLLJyQfl6r9NE4g=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(38100700002)(186003)(26005)(6486002)(966005)(508600001)(6512007)(2616005)(83380400001)(7416002)(5660300002)(36756003)(33656002)(6916009)(66476007)(66946007)(6506007)(66556008)(86362001)(2906002)(8676002)(4326008)(8936002)(1076003)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?y/XwfOuGXHPhbHmsEiRvwaazJ6UbxMYsqRMusDgJC6kJ0yfR7cnau5AUYF5X?=
+ =?us-ascii?Q?SdgmY0f5CslqRhrem8sEmbieuMRxNAi1UT4CVe5dKkCbKYf04npnJ5Eeyl/A?=
+ =?us-ascii?Q?nq3tv7h8vNpmuVgqqGq8Zq1oSsjL4YhDj6E615mpCDZRwxpRCAFTHPoEU0Fu?=
+ =?us-ascii?Q?Dfet3w1i5L+qgmgMvmueMXTQu5s16xKIazP2J8RyYF5b7E94bykdxCt2m1z2?=
+ =?us-ascii?Q?aRNWSkOSs43Yq6M+3cxsO+Tl5W8JTx9/OYUMIYc45Vm+9VHGiPiaj8LNBDlI?=
+ =?us-ascii?Q?8qqAoqZFxt+XevbMV/dD16ljcUB23AHs7ZWnhmLo/UBjrKzKV/9luFuTpcY+?=
+ =?us-ascii?Q?rvIo+Tu+ivvlYNsppxtvGJfFcrFsTy2O3gzTEAlhuQZ+wgF1UDIzQc+hXeJ1?=
+ =?us-ascii?Q?QBB0WqAFHakUlunpycfBXhKL7J3RU36m1JpOEr4ENYSl1UvK4pQCi1K7oBIB?=
+ =?us-ascii?Q?FLu21OOOSvRRHTEr10UZLLBPBKmrWI3zOrExWUQXuju4HqLrIU3OjYKOAilO?=
+ =?us-ascii?Q?greoI9gAzKpIq4Qijz/5je8pr7EJ0qeX21/z7gV5U+8LSgDUEw98u6LtCZV1?=
+ =?us-ascii?Q?bpvgylLu07TnzgW5MZlnTAir2qiyfGqyV43eQMXNC1RsPUeP8W5Hm4JaPKUZ?=
+ =?us-ascii?Q?z4zio0HfOdTDaZwXFr1lD/07cBL+GsB5L5kfs0tjvjIbYeBoY3cyM6/cbUaN?=
+ =?us-ascii?Q?qZ4xMsXGShtfxEAzqm3hVEAYd6ROTjZXaSJq5SmCmg/r0WX8ojYrOvMIcM+p?=
+ =?us-ascii?Q?j5LTFQANOyAsf38luzowAjFAPgzc2cucbKKqej4c0iKQd9tEaTjhiZjtQTPu?=
+ =?us-ascii?Q?X8Mk7w876AuZ7rh7JRNOuRw+EI+W/BtGqg2MiFN2Tmp4WloG9pha9KhxZBbk?=
+ =?us-ascii?Q?Y0f6eI8KRNlVjLT1Sy2jquzmSCJfSO65GQZPEwF/a3XefevUZ+qHLEq1vONZ?=
+ =?us-ascii?Q?HbyEdXT9Lg/CP90qb3RdPetIPKF0KJmUrbm5jeX8XUKkzOXm3ufA7qKk8EDo?=
+ =?us-ascii?Q?QV+KnQQK8rDq/qRUPDmOyQTrTPhjCJBgC1q70JgviAbn43vh8YeCDByp1+mp?=
+ =?us-ascii?Q?SoGKITcOBg4eklLdjzb3Qu8kYPMxd/fkLDL9qyrE+vkdg9ecvc8JLnP/h+t/?=
+ =?us-ascii?Q?RheXKwipLBi4daoNJYL/DRegx1kDA3+D34207Vza5sqW2/rvUK4HdhdOqIOc?=
+ =?us-ascii?Q?7MOsFRJCdyXolyDGrQtyxLcHV440jK9XK1Tuz92Q8pKgq/dQz45kbGJ9HVDN?=
+ =?us-ascii?Q?fI0WCwJH5dY5EHHQFptFFc4Nd7NDhshVfsyeUlNmgBwlj7f9wXXBOedehubf?=
+ =?us-ascii?Q?5kWw5ohYXHxbhSTsQ2igkl3VzPphxHhAv9RhTHVzpyCgf2CfPoTYPDTFOF3r?=
+ =?us-ascii?Q?TEP0Lj/RB4WXeVklpEwk2HIVF1OGJ9cdGn65fnSxR4Wjmz4juryydCiOl6ks?=
+ =?us-ascii?Q?y9F/tFBg9effcHaoZxTSCq+gppXfYCgT32tE0DFrPPaCIOrn0esuwIYRHcEF?=
+ =?us-ascii?Q?ofeB8SaVN+fjvI/YKdMch7RZ7zyf5hbNY2CIdlUBsuqS47m8Ptcr27XklEGV?=
+ =?us-ascii?Q?92dOrr5VCDmKzmWYUaM=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d814342-e9b8-4685-c692-08d9eb340c4a
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2022 18:51:42.8876
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RcYLXCpTU3DqEpdPpzS9j8kcyJ+3tT6JzuzEbDwWxcNH+iJcEj9cxZtAshCmQNFF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-(addded linux-api)
+On Tue, Feb 08, 2022 at 10:43:19AM -0700, Alex Williamson wrote:
+> On Fri,  4 Feb 2022 16:15:30 -0500
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> 
+> > KVM zPCI passthrough device logic will need a reference to the associated
+> > kvm guest that has access to the device.  Let's register a group notifier
+> > for VFIO_GROUP_NOTIFY_SET_KVM to catch this information in order to create
+> > an association between a kvm guest and the host zdev.
+> > 
+> > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> >  arch/s390/include/asm/kvm_pci.h  |  2 ++
+> >  drivers/vfio/pci/vfio_pci_core.c |  2 ++
+> >  drivers/vfio/pci/vfio_pci_zdev.c | 46 ++++++++++++++++++++++++++++++++
+> >  include/linux/vfio_pci_core.h    | 10 +++++++
+> >  4 files changed, 60 insertions(+)
+> > 
+> > diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+> > index e4696f5592e1..16290b4cf2a6 100644
+> > +++ b/arch/s390/include/asm/kvm_pci.h
+> > @@ -16,6 +16,7 @@
+> >  #include <linux/kvm.h>
+> >  #include <linux/pci.h>
+> >  #include <linux/mutex.h>
+> > +#include <linux/notifier.h>
+> >  #include <asm/pci_insn.h>
+> >  #include <asm/pci_dma.h>
+> >  
+> > @@ -32,6 +33,7 @@ struct kvm_zdev {
+> >  	u64 rpcit_count;
+> >  	struct kvm_zdev_ioat ioat;
+> >  	struct zpci_fib fib;
+> > +	struct notifier_block nb;
+> >  };
+> >  
+> >  int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
+> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > index f948e6cd2993..fc57d4d0abbe 100644
+> > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > @@ -452,6 +452,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+> >  
+> >  	vfio_pci_vf_token_user_add(vdev, -1);
+> >  	vfio_spapr_pci_eeh_release(vdev->pdev);
+> > +	vfio_pci_zdev_release(vdev);
+> >  	vfio_pci_core_disable(vdev);
+> >  
+> >  	mutex_lock(&vdev->igate);
+> > @@ -470,6 +471,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
+> >  void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
+> >  {
+> >  	vfio_pci_probe_mmaps(vdev);
+> > +	vfio_pci_zdev_open(vdev);
+> >  	vfio_spapr_pci_eeh_open(vdev->pdev);
+> >  	vfio_pci_vf_token_user_add(vdev, 1);
+> >  }
+> 
+> If this handling were for a specific device, I think we'd be suggesting
+> this is the point at which we cross over to a vendor variant making use
+> of vfio-pci-core rather than hooking directly into the core code. 
 
-On Tue, Jan 18, 2022 at 09:21:09PM +0800, Chao Peng wrote:
-> This is the v4 of this series which try to implement the fd-based KVM
-> guest private memory. The patches are based on latest kvm/queue branch
-> commit:
-> 
->   fea31d169094 KVM: x86/pmu: Fix available_event_types check for
->                REF_CPU_CYCLES event
-> 
-> Introduction
-> ------------
-> In general this patch series introduce fd-based memslot which provides
-> guest memory through memory file descriptor fd[offset,size] instead of
-> hva/size. The fd can be created from a supported memory filesystem
-> like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
-> and the the memory backing store exchange callbacks when such memslot
-> gets created. At runtime KVM will call into callbacks provided by the
-> backing store to get the pfn with the fd+offset. Memory backing store
-> will also call into KVM callbacks when userspace fallocate/punch hole
-> on the fd to notify KVM to map/unmap secondary MMU page tables.
-> 
-> Comparing to existing hva-based memslot, this new type of memslot allows
-> guest memory unmapped from host userspace like QEMU and even the kernel
-> itself, therefore reduce attack surface and prevent bugs.
-> 
-> Based on this fd-based memslot, we can build guest private memory that
-> is going to be used in confidential computing environments such as Intel
-> TDX and AMD SEV. When supported, the memory backing store can provide
-> more enforcement on the fd and KVM can use a single memslot to hold both
-> the private and shared part of the guest memory. 
-> 
-> mm extension
-> ---------------------
-> Introduces new F_SEAL_INACCESSIBLE for shmem and new MFD_INACCESSIBLE
-> flag for memfd_create(), the file created with these flags cannot read(),
-> write() or mmap() etc via normal MMU operations. The file content can
-> only be used with the newly introduced memfile_notifier extension.
+Personally, I think it is wrong layering for VFIO to be aware of KVM
+like this. This marks the first time that VFIO core code itself is
+being made aware of the KVM linkage.
 
-It would be great to see man page draft for new ABI flags
+It copies the same kind of design the s390 specific mdev use of
+putting VFIO in charge of KVM functionality. If we are doing this we
+should just give up and admit that KVM is a first-class part of struct
+vfio_device and get rid of the notifier stuff too, at least for s390.
+
+Reading the patches and descriptions pretty much everything is boiling
+down to 'use vfio to tell the kvm architecture code to do something' -
+which I think needs to be handled through a KVM side ioctl.
+
+Or, at the very least, everything needs to be described in some way
+that makes it clear what is happening to userspace, without kvm,
+through these ioctls.
+
+This seems especially true now that it seems s390 PCI support is
+almost truely functional, with actual new userspace instructions to
+issue MMIO operations that work outside of KVM. 
+
+I'm not sure how this all fits together, but I would expect an outcome
+where DPDK could run on these new systems and not have to know
+anything more about s390 beyond using the proper MMIO instructions via
+some compilation time enablement.
+
+(I've been reviewing s390 patches updating rdma for a parallel set of
+stuff)
+
+> this is meant to extend vfio-pci proper for the whole arch.  Is there a
+> compromise in using #ifdefs in vfio_pci_ops to call into zpci specific
+> code that implements these arch specific hooks and the core for
+> everything else?  SPAPR code could probably converted similarly, it
+> exists here for legacy reasons. [Cc Jason]
+
+I'm not sure I get what you are suggesting? Where would these ifdefs
+be?
+
+> Also, please note the DEVICE_FEATURE generalizations in the latest
+> series from NVIDIA for mlx5 migration support:
  
-> The memfile_notifier extension provides two sets of callbacks for KVM to
-> interact with the memory backing store:
->   - memfile_notifier_ops: callbacks for memory backing store to notify
->     KVM when memory gets allocated/invalidated.
->   - memfile_pfn_ops: callbacks for KVM to call into memory backing store
->     to request memory pages for guest private memory.
-> 
-> memslot extension
-> -----------------
-> Add the private fd and the fd offset to existing 'shared' memslot so that
-> both private/shared guest memory can live in one single memslot. A page in
-> the memslot is either private or shared. A page is private only when it's
-> already allocated in the backing store fd, all the other cases it's treated
-> as shared, this includes those already mapped as shared as well as those
-> having not been mapped. This means the memory backing store is the place
-> which tells the truth of which page is private.
-> 
-> Private memory map/unmap and conversion
-> ---------------------------------------
-> Userspace's map/unmap operations are done by fallocate() ioctl on the
-> backing store fd.
->   - map: default fallocate() with mode=0.
->   - unmap: fallocate() with FALLOC_FL_PUNCH_HOLE.
-> The map/unmap will trigger above memfile_notifier_ops to let KVM map/unmap
-> secondary MMU page tables.
-> 
-> Test
-> ----
-> To test the new functionalities of this patch TDX patchset is needed.
-> Since TDX patchset has not been merged so I did two kinds of test:
-> 
-> -  Regresion test on kvm/queue (this patch)
->    Most new code are not covered. I only tested building and booting.
-> 
-> -  New Funational test on latest TDX code
->    The patch is rebased to latest TDX code and tested the new
->    funcationalities.
-> 
-> For TDX test please see below repos:
-> Linux: https://github.com/chao-p/linux/tree/privmem-v4.3
-> QEMU: https://github.com/chao-p/qemu/tree/privmem-v4
-> 
-> And an example QEMU command line:
-> -object tdx-guest,id=tdx \
-> -object memory-backend-memfd-private,id=ram1,size=2G \
-> -machine q35,kvm-type=tdx,pic=no,kernel_irqchip=split,memory-encryption=tdx,memory-backend=ram1
-> 
-> Changelog
-> ----------
-> v4:
->   - Decoupled the callbacks between KVM/mm from memfd and use new
->     name 'memfile_notifier'.
->   - Supported register multiple memslots to the same backing store.
->   - Added per-memslot pfn_ops instead of per-system.
->   - Reworked the invalidation part.
->   - Improved new KVM uAPIs (private memslot extension and memory
->     error) per Sean's suggestions.
->   - Addressed many other minor fixes for comments from v3.
-> v3:
->   - Added locking protection when calling
->     invalidate_page_range/fallocate callbacks.
->   - Changed memslot structure to keep use useraddr for shared memory.
->   - Re-organized F_SEAL_INACCESSIBLE and MEMFD_OPS.
->   - Added MFD_INACCESSIBLE flag to force F_SEAL_INACCESSIBLE.
->   - Commit message improvement.
->   - Many small fixes for comments from the last version.
-> 
-> Links of previous discussions
-> -----------------------------
-> [1] Original design proposal:
-> https://lkml.kernel.org/kvm/20210824005248.200037-1-seanjc@google.com/
-> [2] Updated proposal and RFC patch v1:
-> https://lkml.kernel.org/linux-fsdevel/20211111141352.26311-1-chao.p.peng@linux.intel.com/
-> [3] Patch v3: https://lkml.org/lkml/2021/12/23/283
-> 
-> Chao Peng (11):
->   mm/memfd: Introduce MFD_INACCESSIBLE flag
->   mm: Introduce memfile_notifier
->   mm/shmem: Support memfile_notifier
->   KVM: Extend the memslot to support fd-based private memory
->   KVM: Use kvm_userspace_memory_region_ext
->   KVM: Add KVM_EXIT_MEMORY_ERROR exit
->   KVM: Use memfile_pfn_ops to obtain pfn for private pages
->   KVM: Handle page fault for private memory
->   KVM: Register private memslot to memory backing store
->   KVM: Zap existing KVM mappings when pages changed in the private fd
->   KVM: Expose KVM_MEM_PRIVATE
-> 
-> Kirill A. Shutemov (1):
->   mm/shmem: Introduce F_SEAL_INACCESSIBLE
-> 
->  arch/x86/kvm/Kconfig             |   1 +
->  arch/x86/kvm/mmu/mmu.c           |  73 +++++++++++-
->  arch/x86/kvm/mmu/paging_tmpl.h   |  11 +-
->  arch/x86/kvm/x86.c               |  12 +-
->  include/linux/kvm_host.h         |  49 +++++++-
->  include/linux/memfile_notifier.h |  53 +++++++++
->  include/linux/shmem_fs.h         |   4 +
->  include/uapi/linux/fcntl.h       |   1 +
->  include/uapi/linux/kvm.h         |  17 +++
->  include/uapi/linux/memfd.h       |   1 +
->  mm/Kconfig                       |   4 +
->  mm/Makefile                      |   1 +
->  mm/memfd.c                       |  20 +++-
->  mm/memfile_notifier.c            |  99 ++++++++++++++++
->  mm/shmem.c                       | 121 +++++++++++++++++++-
->  virt/kvm/kvm_main.c              | 188 +++++++++++++++++++++++++++----
->  16 files changed, 614 insertions(+), 41 deletions(-)
->  create mode 100644 include/linux/memfile_notifier.h
->  create mode 100644 mm/memfile_notifier.c
-> 
-> -- 
-> 2.17.1
-> 
-> 
+> https://lore.kernel.org/all/20220207172216.206415-8-yishaih@nvidia.com/
 
--- 
-Sincerely yours,
-Mike.
+Yes, please don't implement a bunch of new FEATURE code without taking
+the cleanup patches for feature support from that series too.
+
+I can put them on a branch for you if you needed.
+
+Jason
