@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5476E4ADA06
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 14:36:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBA044ADA08
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 14:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350794AbiBHNgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 08:36:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34598 "EHLO
+        id S1352731AbiBHNgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 08:36:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357179AbiBHNgr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 08:36:47 -0500
+        with ESMTP id S230384AbiBHNgv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 08:36:51 -0500
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E219EC03FEF2;
-        Tue,  8 Feb 2022 05:36:42 -0800 (PST)
-Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JtP841F7bz67Mww;
-        Tue,  8 Feb 2022 21:32:36 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F9FC03FEDA;
+        Tue,  8 Feb 2022 05:36:51 -0800 (PST)
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JtP7942wcz685QH;
+        Tue,  8 Feb 2022 21:31:49 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 14:36:40 +0100
+ 15.1.2308.21; Tue, 8 Feb 2022 14:36:49 +0100
 Received: from A2006125610.china.huawei.com (10.202.227.178) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 13:36:34 +0000
+ 15.1.2308.21; Tue, 8 Feb 2022 13:36:42 +0000
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -33,9 +33,9 @@ CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
         <linuxarm@huawei.com>, <liulongfang@huawei.com>,
         <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [RFC v4 5/8] hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
-Date:   Tue, 8 Feb 2022 13:34:22 +0000
-Message-ID: <20220208133425.1096-6-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC v4 6/8] crypto: hisilicon/qm: Add helper to retrieve the PF qm data
+Date:   Tue, 8 Feb 2022 13:34:23 +0000
+Message-ID: <20220208133425.1096-7-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
 References: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
@@ -54,160 +54,136 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HiSilicon ACC VF device BAR2 region consists of both functional
-register space and migration control register space. From a
-security point of view, it's not advisable to export the migration
-control region to Guest.
-
-Hence, override the ioctl/read/write/mmap methods to hide the
-migration region and limit the access only to the functional register
-space.
+Provides a new interface to retrieve the PF QM data associated
+with a ACC VF dev. This makes use of the  pci_iov_get_pf_drvdata()
+to get PF drvdata safely. Introduces helpers to retrieve the ACC
+PF dev struct pci_driver pointers as this is an input into the
+pci_iov_get_pf_drvdata().
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/vfio/pci/hisi_acc_vfio_pci.c | 122 ++++++++++++++++++++++++++-
- 1 file changed, 118 insertions(+), 4 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c |  6 ++++
+ drivers/crypto/hisilicon/qm.c             | 38 +++++++++++++++++++++++
+ drivers/crypto/hisilicon/sec2/sec_main.c  |  6 ++++
+ drivers/crypto/hisilicon/zip/zip_main.c   |  6 ++++
+ include/linux/hisi_acc_qm.h               |  6 ++++
+ 5 files changed, 62 insertions(+)
 
-diff --git a/drivers/vfio/pci/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisi_acc_vfio_pci.c
-index 8b59e628110e..563ed2cc861f 100644
---- a/drivers/vfio/pci/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisi_acc_vfio_pci.c
-@@ -13,6 +13,120 @@
- #include <linux/vfio.h>
- #include <linux/vfio_pci_core.h>
- 
-+static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
-+					size_t count, loff_t *ppos,
-+					size_t *new_count)
-+{
-+	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
-+		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-+		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+
-+		/* Check if access is for migration control region */
-+		if (pos >= end)
-+			return -EINVAL;
-+
-+		*new_count = min(count, (size_t)(end - pos));
-+	}
-+
-+	return 0;
-+}
-+
-+static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
-+				  struct vm_area_struct *vma)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+	unsigned int index;
-+
-+	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
-+	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
-+		u64 req_len, pgoff, req_start;
-+		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+
-+		req_len = vma->vm_end - vma->vm_start;
-+		pgoff = vma->vm_pgoff &
-+			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-+		req_start = pgoff << PAGE_SHIFT;
-+
-+		if (req_start + req_len > end)
-+			return -EINVAL;
-+	}
-+
-+	return vfio_pci_core_mmap(core_vdev, vma);
-+}
-+
-+static ssize_t hisi_acc_vfio_pci_write(struct vfio_device *core_vdev,
-+				       const char __user *buf, size_t count,
-+				       loff_t *ppos)
-+{
-+	size_t new_count = count;
-+	int ret;
-+
-+	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
-+	if (ret)
-+		return ret;
-+
-+	return vfio_pci_core_write(core_vdev, buf, new_count, ppos);
-+}
-+
-+static ssize_t hisi_acc_vfio_pci_read(struct vfio_device *core_vdev,
-+				      char __user *buf, size_t count,
-+				      loff_t *ppos)
-+{
-+	size_t new_count = count;
-+	int ret;
-+
-+	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
-+	if (ret)
-+		return ret;
-+
-+	return vfio_pci_core_read(core_vdev, buf, new_count, ppos);
-+}
-+
-+static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-+				    unsigned long arg)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
-+		struct pci_dev *pdev = vdev->pdev;
-+		struct vfio_region_info info;
-+		unsigned long minsz;
-+
-+		minsz = offsetofend(struct vfio_region_info, offset);
-+
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (info.argsz < minsz)
-+			return -EINVAL;
-+
-+		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
-+			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
-+
-+			/*
-+			 * ACC VF dev BAR2 region consists of both functional
-+			 * register space and migration control register space.
-+			 * Report only the functional region to Guest.
-+			 */
-+			info.size = pci_resource_len(pdev, info.index) / 2;
-+
-+			info.flags = VFIO_REGION_INFO_FLAG_READ |
-+					VFIO_REGION_INFO_FLAG_WRITE |
-+					VFIO_REGION_INFO_FLAG_MMAP;
-+
-+			return copy_to_user((void __user *)arg, &info, minsz) ?
-+					    -EFAULT : 0;
-+		}
-+	}
-+	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-+}
-+
- static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
- {
- 	struct vfio_pci_core_device *vdev =
-@@ -32,10 +146,10 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
- 	.name = "hisi-acc-vfio-pci",
- 	.open_device = hisi_acc_vfio_pci_open_device,
- 	.close_device = vfio_pci_core_close_device,
--	.ioctl = vfio_pci_core_ioctl,
--	.read = vfio_pci_core_read,
--	.write = vfio_pci_core_write,
--	.mmap = vfio_pci_core_mmap,
-+	.ioctl = hisi_acc_vfio_pci_ioctl,
-+	.read = hisi_acc_vfio_pci_read,
-+	.write = hisi_acc_vfio_pci_write,
-+	.mmap = hisi_acc_vfio_pci_mmap,
- 	.request = vfio_pci_core_request,
- 	.match = vfio_pci_core_match,
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index ba4043447e53..80fb9ef8c571 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -1189,6 +1189,12 @@ static struct pci_driver hpre_pci_driver = {
+ 	.driver.pm		= &hpre_pm_ops,
  };
+ 
++struct pci_driver *hisi_hpre_get_pf_driver(void)
++{
++	return &hpre_pci_driver;
++}
++EXPORT_SYMBOL(hisi_hpre_get_pf_driver);
++
+ static void hpre_register_debugfs(void)
+ {
+ 	if (!debugfs_initialized())
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 8c29f9fba573..b2858a6f925a 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -5999,6 +5999,44 @@ void hisi_qm_put_dfx_access(struct hisi_qm *qm)
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_put_dfx_access);
+ 
++struct hisi_qm *hisi_qm_get_pf_qm(struct pci_dev *pdev)
++{
++	struct hisi_qm	*pf_qm;
++	struct pci_driver *(*fn)(void) = NULL;
++
++	if (!pdev->is_virtfn)
++		return NULL;
++
++	switch (pdev->device) {
++	case PCI_DEVICE_ID_HUAWEI_SEC_VF:
++		fn = symbol_get(hisi_sec_get_pf_driver);
++		break;
++	case PCI_DEVICE_ID_HUAWEI_HPRE_VF:
++		fn = symbol_get(hisi_hpre_get_pf_driver);
++		break;
++	case PCI_DEVICE_ID_HUAWEI_ZIP_VF:
++		fn = symbol_get(hisi_zip_get_pf_driver);
++		break;
++	default:
++		return NULL;
++	}
++
++	if (!fn)
++		return NULL;
++
++	pf_qm = pci_iov_get_pf_drvdata(pdev, fn());
++
++	if (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_VF)
++		symbol_put(hisi_sec_get_pf_driver);
++	else if (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_VF)
++		symbol_put(hisi_hpre_get_pf_driver);
++	else
++		symbol_put(hisi_zip_get_pf_driver);
++
++	return !IS_ERR(pf_qm) ? pf_qm : NULL;
++}
++EXPORT_SYMBOL_GPL(hisi_qm_get_pf_qm);
++
+ /**
+  * hisi_qm_pm_init() - Initialize qm runtime PM.
+  * @qm: pointer to accelerator device.
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index ab806fb481ac..d8fb5c2b3482 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -1087,6 +1087,12 @@ static struct pci_driver sec_pci_driver = {
+ 	.driver.pm = &sec_pm_ops,
+ };
+ 
++struct pci_driver *hisi_sec_get_pf_driver(void)
++{
++	return &sec_pci_driver;
++}
++EXPORT_SYMBOL(hisi_sec_get_pf_driver);
++
+ static void sec_register_debugfs(void)
+ {
+ 	if (!debugfs_initialized())
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index f4a517728385..b6ccc7e8f37e 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -1010,6 +1010,12 @@ static struct pci_driver hisi_zip_pci_driver = {
+ 	.driver.pm		= &hisi_zip_pm_ops,
+ };
+ 
++struct pci_driver *hisi_zip_get_pf_driver(void)
++{
++	return &hisi_zip_pci_driver;
++}
++EXPORT_SYMBOL(hisi_zip_get_pf_driver);
++
+ static void hisi_zip_register_debugfs(void)
+ {
+ 	if (!debugfs_initialized())
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index 8befb59c6fb3..6dbc5df2923b 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -476,4 +476,10 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
+ int hisi_qm_get_dfx_access(struct hisi_qm *qm);
+ void hisi_qm_put_dfx_access(struct hisi_qm *qm);
+ void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
++
++/* Used by VFIO ACC live migration driver */
++struct hisi_qm *hisi_qm_get_pf_qm(struct pci_dev *pdev);
++struct pci_driver *hisi_sec_get_pf_driver(void);
++struct pci_driver *hisi_hpre_get_pf_driver(void);
++struct pci_driver *hisi_zip_get_pf_driver(void);
+ #endif
 -- 
 2.17.1
 
