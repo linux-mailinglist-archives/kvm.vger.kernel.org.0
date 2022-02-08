@@ -2,132 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DFD84ADDDB
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 17:01:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B51084ADE50
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 17:26:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381557AbiBHQBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 11:01:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40416 "EHLO
+        id S1383210AbiBHQ03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 11:26:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379034AbiBHQBo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 11:01:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8CE7C061578
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 08:01:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644336102;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZCxf9PogYRxXOjDxxxMs4w2YeOFcdmHp0JN35V5WWMM=;
-        b=JZ/cNt+7ReGzuLZidZ0puC0BIxJjZ7i3teQWjgJ2NTZipsyP4Av/GJYxZ6e0TvFu4U30Rh
-        2iJAA+pcKRj925O2DM3EMT5FI1nf+KPt1MfL8wkY1wv57xkx6IFvFRy5mMBQRDulgGS8ML
-        zqsMoefjnqpJhEI2okeziMRuq3dOsYE=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-266-kvgNcv2-N6OIizU27SZ1AQ-1; Tue, 08 Feb 2022 11:01:41 -0500
-X-MC-Unique: kvgNcv2-N6OIizU27SZ1AQ-1
-Received: by mail-ed1-f70.google.com with SMTP id b26-20020a056402139a00b004094fddbbdfso9971190edv.12
-        for <kvm@vger.kernel.org>; Tue, 08 Feb 2022 08:01:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ZCxf9PogYRxXOjDxxxMs4w2YeOFcdmHp0JN35V5WWMM=;
-        b=rv68d55l/S/3KkMQrhbTaCQPCN9qkqanDCjf9lVIR2XGbh1lEp3WLyXJjYWBRqEfTp
-         vprdACXHgW8fI99Zjs8NWbT5IIdikEbiIPdMlV2TZQpEqY+wXBg3YZ3YHx66vcjMlICN
-         bbVtVrYetrinVJcXjp00E3vG8R1lpcMIWQZz3R2WlyWXVtpQ96aiyRdNess19JkRIPCd
-         PkKBGJrXtyrtGyV/8rkJ6AJr6L5BxNyqJQrJXFvDjSFAdaXy44ABNvxIq3yyJO2Lgj+T
-         e+b4O9cBtqDaFqXB+mmH7byx9sZTWHDxmnUyWsn/wnkJ8uDfWxCVdFO6xvMh5ODsnPXm
-         AQRA==
-X-Gm-Message-State: AOAM531U4YAjK8krBjeROx4k74z+XDS/FePtIojYaxyNCPZDb2Fvuqgm
-        e6s9PcRB72ANG3rifF16C8U+WeFB1B8mzAcwN895KeU5awK5MP7mjJOOj4dwZ/MilutPapHI+wK
-        OfrG5Ga09nCrqo3v6/2P6ACCK88Ln7s41uvXbomNw8lbd8soA8M5B3UovOapkZPez
-X-Received: by 2002:a17:907:608f:: with SMTP id ht15mr4322558ejc.484.1644336100054;
-        Tue, 08 Feb 2022 08:01:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyE51kdktw9gByitSD9Qv3Lh3HqeP4N1cUv6GdJop/VgdauVm1PnLwGj/f3FaQnKepRF60IDQ==
-X-Received: by 2002:a17:907:608f:: with SMTP id ht15mr4322507ejc.484.1644336099601;
-        Tue, 08 Feb 2022 08:01:39 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id ot38sm2553508ejb.131.2022.02.08.08.01.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Feb 2022 08:01:39 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
- memory from VM ioctl context
-In-Reply-To: <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
-References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
- <87ee4d9yp3.fsf@redhat.com>
- <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
-Date:   Tue, 08 Feb 2022 17:01:38 +0100
-Message-ID: <87bkzh9wkd.fsf@redhat.com>
+        with ESMTP id S236721AbiBHQ02 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 11:26:28 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4668C061576;
+        Tue,  8 Feb 2022 08:26:27 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 9CAFE1F387;
+        Tue,  8 Feb 2022 16:26:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1644337586; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=kAqNmKM6l8koUfFIjfYay6nGji+PyjtAuRn/sApRYCg=;
+        b=fkSVXB2YJoVIPvc/iVjce2eJzwZAl2gr+L4IS9q8DywrIuzbclc64q+LSiSEAKoM01NB4Z
+        CEzksViqoCBOP0xcEpDNH2o17oKODrSboer5jynSGxGnN4R0mm5FzuWcxQFq8PNfwRUWLU
+        NM3Dk1+Z+4wwr+s4MMvsIkjgyb1+rCA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1644337586;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=kAqNmKM6l8koUfFIjfYay6nGji+PyjtAuRn/sApRYCg=;
+        b=L9pTqfo44Qtv7LrRqjH68lSOsvdQSpIonmhBmSCcklW0zGqXfQSlf6RHMCVyWGGmQJdFNB
+        udz/yOMCSzb2v4Bg==
+Received: from vasant-suse.fritz.box (unknown [10.163.24.178])
+        by relay2.suse.de (Postfix) with ESMTP id 64B16A3B83;
+        Tue,  8 Feb 2022 16:26:26 +0000 (UTC)
+From:   Vasant Karasulli <vkarasulli@suse.de>
+To:     linux-kernel@vger.kernel.org
+Cc:     bp@alien8.de, jroedel@suse.de, kvm@vger.kernel.org, x86@kernel.org,
+        thomas.lendacky@amd.com, Vasant Karasulli <vkarasulli@suse.de>
+Subject: [PATCH v5 0/1] x86/test: Add a test for AMD SEV-ES #VC handling
+Date:   Tue,  8 Feb 2022 17:26:22 +0100
+Message-Id: <20220208162623.18368-1-vkarasulli@suse.de>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+Hello!
 
-> On Tue, 2022-02-08 at 16:15 +0100, Vitaly Kuznetsov wrote:
->> 
->> "hv-vapic" enables so-called "VP Assist" page and Enlightened VMCS GPA
->> sits there, it is used instead of VMPTRLD (which becomes unsupported)
->> 
->> Take a look at the newly introduced "hv-apicv"/"hv-avic" (the same
->> thing) in QEMU: 
->> 
->> commit e1f9a8e8c90ae54387922e33e5ac4fd759747d01
->> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Date:   Thu Sep 2 11:35:28 2021 +0200
->> 
->>     i386: Implement pseudo 'hv-avic' ('hv-apicv') enlightenment
->> 
->> when enabled, HV_APIC_ACCESS_RECOMMENDED is not set even with "hv-vapic"
->> (but HV_APIC_ACCESS_AVAILABLE remains). 
->> 
->
-> Cool, I didn't expect this. I thought that hv-vapic only enables the AutoEOI
-> deprecation bit.
->
-> This needs to be updated in hyperv.txt in qemu - it currently states that
-> hv-evmcs disables posted interrupts (that is APICv) 
+   This is the version 5 of the patch written to add a test for
+   AMD SEV-ES #VC handling. This version attempts to
+   address review comments to the previous version of the patch in 
+   https://lore.kernel.org/kvm/YNRgHbPVGpLaByjH@zn.tnic/.
+   
+   Following changes have been made to address the comments: 
+   1. Changed the subject to x86/test from x86.
+   2. In file arch/x86/Kconfig.debug enclosed the config AMD_SEV_TEST_VC
+      inside the guard X86_TESTS.
+   3. Renamed the test file to sev-test-vc.c to indicate that
+      file includes all the #VC handling related tests.
+   4. Memory barries are apparently not necessary and have been removed.
+ 
+Thanks,
+Vasant
 
-EVMCS disables (not only) posted interrupts feature for nested
-guests. To be precise, it disables the following:
+----------------------------------------------------------------------
+ arch/x86/Kbuild              |   2 +
+ arch/x86/Kconfig.debug       |  16 ++++
+ arch/x86/kernel/Makefile     |   7 ++
+ arch/x86/tests/Makefile      |   3 +
+ arch/x86/tests/sev-test-vc.c | 154 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 182 insertions(+)
+ create mode 100644 arch/x86/tests/Makefile
+ create mode 100644 arch/x86/tests/sev-test-vc.c
 
-#define EVMCS1_UNSUPPORTED_PINCTRL (PIN_BASED_POSTED_INTR | \
-                                    PIN_BASED_VMX_PREEMPTION_TIMER)
-#define EVMCS1_UNSUPPORTED_2NDEXEC                                      \
-        (SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |                         \
-         SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |                      \
-         SECONDARY_EXEC_APIC_REGISTER_VIRT |                            \
-         SECONDARY_EXEC_ENABLE_PML |                                    \
-         SECONDARY_EXEC_ENABLE_VMFUNC |                                 \
-         SECONDARY_EXEC_SHADOW_VMCS |                                   \
-         SECONDARY_EXEC_TSC_SCALING |                                   \
-         SECONDARY_EXEC_PAUSE_LOOP_EXITING)
-#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL                                  \
-        (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |                           \
-         VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
-#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
-#define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
 
-> and hv-avic only mentions AutoEOI feature.
-
-True, this is hidden in "The enlightenment allows to use Hyper-V SynIC
-with hardware APICv/AVIC enabled". Any suggestions on how to improve
-this are more than welcome!.
-
+base-commit: dfd42facf1e4ada021b939b4e19c935dcdd55566
+prerequisite-patch-id: 660950af15f9a972b1f71aa7702ebebe7dd9636b
+prerequisite-patch-id: 9635b44cd178a2ee20d83acbc7a07101fd7e81a3
+prerequisite-patch-id: 3a7cfa2a885ad20a9f325febcbe31ef53b41e0b1
+prerequisite-patch-id: 5e48ede5d4df9de5df3d483874b4aa1711b5dcf0
+prerequisite-patch-id: b66ebf185fceb6e8e98b466c974ed777f0200787
+prerequisite-patch-id: d5bde21908fbada516dc757e29c6ad70926ab5bf
+prerequisite-patch-id: ed38b7fc213fa66845dc25502f18b79e3dc907db
+prerequisite-patch-id: 053546f9741643d742f5149c8441f8484e1918d1
+prerequisite-patch-id: a20f9a6fd1ad2db0bae2550d5442d7275c481b01
+prerequisite-patch-id: bde103392dd4c0a5c360446dbc8d2e5f82671575
+prerequisite-patch-id: af44d5e0a6f51e1fe5cf6aef7d0be36e201663b4
+prerequisite-patch-id: 952ebde20c8c084f43523f8230ced76beae08b3e
+prerequisite-patch-id: 0b295c1545756626a9bca5bce8be4557742b7a56
+prerequisite-patch-id: 98bf6777201eeab52938c28de1090387d454ef55
+prerequisite-patch-id: d64628531375578e4bc6de3bcba1a3de658e28d8
+prerequisite-patch-id: 752ea9954abeb624b803ad86e4974769f97ddd6e
 -- 
-Vitaly
+2.32.0
 
