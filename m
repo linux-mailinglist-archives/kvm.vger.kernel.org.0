@@ -2,97 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB85D4AD7BE
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 12:46:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82B974AD7CD
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 12:49:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355886AbiBHLqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 06:46:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39282 "EHLO
+        id S1356888AbiBHLsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 06:48:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376339AbiBHLq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 06:46:29 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7119DF8E3FD;
-        Tue,  8 Feb 2022 03:33:43 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id eg42so21031686edb.7;
-        Tue, 08 Feb 2022 03:33:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=JfVdcw47d18nQG2rowWs40TfFKXN2zrXWEZ3tMD7/FA=;
-        b=jsMC8ZEI1cmNHLjEG9oQOhIA/hm25fdLrIfMO49qjprOh3w27zcmDJOYTpG9BoKW4D
-         We/EkQFRfwqVDO8uCTPW58cDVQRwb/CDMyvnVNiRI59VZx2ZFFuX/LzDPDkWJgRKI+oK
-         8b/G0v6OFT9Cx11Xq8rUQieH8nEoD7lG3ycrkMSGzKJLpTzBh8iiXqmTYtpeQwg4gdK4
-         QP2fK5GToK1G8nYKkQlbg0ZrxMB1FXWP75Gtg4B8T+zCIFiN7+o1HZH584LYFPUSFynZ
-         1XATRw9hfO7pax0hEhIMdtgBSNmoaKJypVQoJFvE8p7DHFMVIZ7PBkKwEDGV6ntMZgoz
-         AKDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=JfVdcw47d18nQG2rowWs40TfFKXN2zrXWEZ3tMD7/FA=;
-        b=q5QCyrGe18DyhRftbihiweZrFs9nnHXNnVXwaaJybQRQ078yYindA3KzSCjvLE3jBG
-         43ZV5hHMwwxuZGs/U0blrq/U0InjwutYqS24WRMtze2RjtGDsppz3FMibEiAqORxwIAI
-         VwYLNoLTqi8AfvuExXtUuRrpm7nozfIJl0JsWayvzPFz7r+75mUbMiwVysWMfKtj2yL5
-         27BAkQCpDkjAxiqnJXPhcl8sEBv1QMnRYGttG4Paklzeq/uNX2EqTogO4mXE/PFojPM0
-         LQMwpUMjhWlBUoaa7+yE4ClEiBd5nTmR8TVt1p2XiqXujoR/wOOS5GpvTxXCczdurT+y
-         HwvQ==
-X-Gm-Message-State: AOAM531DL6rQUJaNYoBVTcXW65MCHHbEpPLkn/MvAw46O3GX3EnHBL1g
-        FNNh9p9KU6R0caqKABi8SG8=
-X-Google-Smtp-Source: ABdhPJyYIr/gkhgvzV2Lhq6wiCw/Y3s61L6r61qau3wQGpfMzCAXSgnohQuv5o/Q1RwNzvl/w8SxMw==
-X-Received: by 2002:a05:6402:164a:: with SMTP id s10mr3996093edx.51.1644320013608;
-        Tue, 08 Feb 2022 03:33:33 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id p6sm742414ejf.11.2022.02.08.03.33.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Feb 2022 03:33:33 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <dd9305d6-1e3a-24f9-1d48-c5dac440112d@redhat.com>
-Date:   Tue, 8 Feb 2022 12:33:31 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH RESEND 07/30] KVM: x86: nSVM: deal with L1 hypervisor that
- intercepts interrupts but lets L2 control them
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Tony Luck <tony.luck@intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        with ESMTP id S1356765AbiBHLsG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 06:48:06 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1B6C02B65B;
+        Tue,  8 Feb 2022 03:36:17 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 10810B81852;
+        Tue,  8 Feb 2022 11:35:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 177FAC004E1;
+        Tue,  8 Feb 2022 11:35:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1644320146;
+        bh=oqAwa4TvaCnMLZq3Jlv14O8K41LAi+3ZANEnne9fz0M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=siGXsPr/vwToRWq39wEjRkdcljn1K5to7skGnrPV2dBflTsJ4s04w+5MYNHH2MLgU
+         exW8whDq9BB9MMZ9ZIuzeY4a4eV6YdYNMOUqiMg/11sTiO20Zd6MjjU3BQbvTdVQFl
+         OjZmXIupAGk46BOjC51jeLuv05KctkrjlzLJdQTE=
+Date:   Tue, 8 Feb 2022 12:35:43 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
         David Airlie <airlied@linux.ie>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
         Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>
-References: <20220207155447.840194-1-mlevitsk@redhat.com>
- <20220207155447.840194-8-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220207155447.840194-8-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 02/14] driver core: Add dma_cleanup callback in
+ bus_type
+Message-ID: <YgJVj/EmzjtR2SKk@kroah.com>
+References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
+ <20220104015644.2294354-3-baolu.lu@linux.intel.com>
+ <YdQcpHrV7NwUv+qc@infradead.org>
+ <20220104123911.GE2328285@nvidia.com>
+ <YdRFyXWay/bdSSem@kroah.com>
+ <608192e0-136a-57fc-cb2c-3ebb42874788@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <608192e0-136a-57fc-cb2c-3ebb42874788@linux.intel.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,93 +79,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/7/22 16:54, Maxim Levitsky wrote:
-> Fix a corner case in which the L1 hypervisor intercepts
-> interrupts (INTERCEPT_INTR) and either doesn't set
-> virtual interrupt masking (V_INTR_MASKING) or enters a
-> nested guest with EFLAGS.IF disabled prior to the entry.
+On Tue, Feb 08, 2022 at 01:55:29PM +0800, Lu Baolu wrote:
+> Hi Greg,
 > 
-> In this case, despite the fact that L1 intercepts the interrupts,
-> KVM still needs to set up an interrupt window to wait before
-> injecting the INTR vmexit.
+> On 1/4/22 9:04 PM, Greg Kroah-Hartman wrote:
+> > On Tue, Jan 04, 2022 at 08:39:11AM -0400, Jason Gunthorpe wrote:
+> > > On Tue, Jan 04, 2022 at 02:08:36AM -0800, Christoph Hellwig wrote:
+> > > > All these bus callouts still looks horrible and just create tons of
+> > > > boilerplate code.
+> > > 
+> > > Yes, Lu - Greg asked questions then didn't respond to their answers
+> > > meaning he accepts them, you should stick with the v4 version.
+> > 
+> > Trying to catch up on emails from the break, that was way down my list
+> > of things to get back to as it's messy and non-obvious.  I'll revisit it
+> > again after 5.17-rc1 is out, this is too late for that merge window
+> > anyway.
 > 
-> Currently the KVM instead enters an endless loop of 'req_immediate_exit'.
+> In this series we want to add calls into the iommu subsystem during
+> device driver binding/unbinding, so that the device DMA ownership
+> conflict (kernel driver vs. user-space) could be detected and avoided
+> before calling into device driver's .probe().
 > 
-> Exactly the same issue also happens for SMIs and NMI.
-> Fix this as well.
+> In this v5 series, we implemented this in the affected buses (amba/
+> platform/fsl-mc/pci) which are known to support assigning devices to
+> user space through the vfio framework currently. And more buses are
+> possible to be affected in the future if they also want to support
+> device assignment. Christoph commented that this will create boilerplate
+> code in various bus drivers.
 > 
-> Note that on VMX, this case is impossible as there is only
-> 'vmexit on external interrupts' execution control which either set,
-> in which case both host and guest's EFLAGS.IF
-> are ignored, or not set, in which case no VMexits are delivered.
+> Back to v4 of this series (please refer to below link [1]), we added
+> this call in the driver core if buses have provided the dma_configure()
+> callback (please refer to below link [2]).
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   arch/x86/kvm/svm/svm.c | 17 +++++++++++++----
->   1 file changed, 13 insertions(+), 4 deletions(-)
+> Which would you prefer, or any other suggestions? We need your guide to
+> move this series ahead. Please help to suggest.
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 9a4e299ed5673..22e614008cf59 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3372,11 +3372,13 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->   	if (svm->nested.nested_run_pending)
->   		return -EBUSY;
->   
-> +	if (svm_nmi_blocked(vcpu))
-> +		return 0;
-> +
->   	/* An NMI must not be injected into L2 if it's supposed to VM-Exit.  */
->   	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
->   		return -EBUSY;
-> -
-> -	return !svm_nmi_blocked(vcpu);
-> +	return 1;
->   }
->   
->   static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
-> @@ -3428,9 +3430,13 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
->   static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
-> +
->   	if (svm->nested.nested_run_pending)
->   		return -EBUSY;
->   
-> +	if (svm_interrupt_blocked(vcpu))
-> +		return 0;
-> +
->   	/*
->   	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
->   	 * e.g. if the IRQ arrived asynchronously after checking nested events.
-> @@ -3438,7 +3444,7 @@ static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->   	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_intr(svm))
->   		return -EBUSY;
->   
-> -	return !svm_interrupt_blocked(vcpu);
-> +	return 1;
->   }
->   
->   static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
-> @@ -4169,11 +4175,14 @@ static int svm_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->   	if (svm->nested.nested_run_pending)
->   		return -EBUSY;
->   
-> +	if (svm_smi_blocked(vcpu))
-> +		return 0;
-> +
->   	/* An SMI must not be injected into L2 if it's supposed to VM-Exit.  */
->   	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_smi(svm))
->   		return -EBUSY;
->   
-> -	return !svm_smi_blocked(vcpu);
-> +	return 1;
->   }
->   
->   static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+> [1] https://lore.kernel.org/linux-iommu/20211217063708.1740334-1-baolu.lu@linux.intel.com/
+> [2] https://lore.kernel.org/linux-iommu/20211217063708.1740334-3-baolu.lu@linux.intel.com/
 
-Can you prepare a testcase for at least the interrupt case?
+Let me look over the series again this afternooon.
 
-Thanks,
+thanks,
 
-Paolo
+greg k-h
