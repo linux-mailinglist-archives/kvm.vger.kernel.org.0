@@ -2,52 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F0FD4AD8F6
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 14:16:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DB5C4AD8FA
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 14:16:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350093AbiBHNQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 08:16:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53954 "EHLO
+        id S1347086AbiBHNQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 08:16:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356700AbiBHMWG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 07:22:06 -0500
+        with ESMTP id S1356834AbiBHMY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 07:24:27 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C9E4FC03FECE
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 04:22:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 95871C03FEC0
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 04:24:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644322924;
+        s=mimecast20190719; t=1644323065;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nbmEOQdTLOjowm+EP4V3yhFwqv57RIYTM/rSF0fgSNA=;
-        b=agFq3jiPEzQXx64jw7N7lf6GIz+dHR4TONsgmhtbtPZf6iKN3MgZngoTIc6v3M+LBvSRMf
-        Eo0OrWIDVsoQ/On4vDVx8UfSs9rLVVCoACDjXaJiwuYgo5hI2tFecTdE3wq4sATL0GvO5e
-        uHpFXeEbfXkbt74m2GzhQIrPJ174IiY=
+        bh=OmNk9x3t77ts5HOhyjEsKGS6qVWrt92aX3uBiIq4k1Y=;
+        b=NB6girQ7CODOoany7Zjll+I059oVrlmvvp3XLVQuQ6l94Uk77QIaY++Bmktu79plXex1Gf
+        uSwHUTNkp2VPeGNQv/z0aOXbkkfwncWpPUL10F/jNegrgNE70awjYCNu2tVHHQZQDqMN0S
+        QeoDSTjfNzQ9ll13P0+bW7vTUm8n/S0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-x6yvXJl3OdOO0MUAf2xEUg-1; Tue, 08 Feb 2022 07:22:03 -0500
-X-MC-Unique: x6yvXJl3OdOO0MUAf2xEUg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-635-cl1sK-SEMRGwiMugl2xPOw-1; Tue, 08 Feb 2022 07:24:22 -0500
+X-MC-Unique: cl1sK-SEMRGwiMugl2xPOw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43E3992510
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 12:22:02 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7ECE27CAF4;
-        Tue,  8 Feb 2022 12:22:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3B0C19251AB;
+        Tue,  8 Feb 2022 12:24:19 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EB102B44E;
+        Tue,  8 Feb 2022 12:24:09 +0000 (UTC)
+Message-ID: <f198aca18f64b2e788ee53d5a03e739abe6a6697.camel@redhat.com>
+Subject: Re: [PATCH RESEND 07/30] KVM: x86: nSVM: deal with L1 hypervisor
+ that intercepts interrupts but lets L2 control them
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 7/7] svm: add tests for case when L1 intercepts various hardware interrupts (an interrupt, SMI, NMI), but lets L2 control either EFLAG.IF or GIF
-Date:   Tue,  8 Feb 2022 14:21:48 +0200
-Message-Id: <20220208122148.912913-8-mlevitsk@redhat.com>
-In-Reply-To: <20220208122148.912913-1-mlevitsk@redhat.com>
-References: <20220208122148.912913-1-mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Tony Luck <tony.luck@intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        David Airlie <airlied@linux.ie>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Borislav Petkov <bp@alien8.de>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>
+Date:   Tue, 08 Feb 2022 14:24:08 +0200
+In-Reply-To: <0c20990f2543413f4a087b7918cff14db48bc774.camel@redhat.com>
+References: <20220207155447.840194-1-mlevitsk@redhat.com>
+         <20220207155447.840194-8-mlevitsk@redhat.com>
+         <dd9305d6-1e3a-24f9-1d48-c5dac440112d@redhat.com>
+         <0c20990f2543413f4a087b7918cff14db48bc774.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -58,245 +87,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- x86/svm.h       |  11 +++
- x86/svm_tests.c | 194 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 205 insertions(+)
+On Tue, 2022-02-08 at 13:55 +0200, Maxim Levitsky wrote:
+> On Tue, 2022-02-08 at 12:33 +0100, Paolo Bonzini wrote:
+> > On 2/7/22 16:54, Maxim Levitsky wrote:
+> > > Fix a corner case in which the L1 hypervisor intercepts
+> > > interrupts (INTERCEPT_INTR) and either doesn't set
+> > > virtual interrupt masking (V_INTR_MASKING) or enters a
+> > > nested guest with EFLAGS.IF disabled prior to the entry.
+> > > 
+> > > In this case, despite the fact that L1 intercepts the interrupts,
+> > > KVM still needs to set up an interrupt window to wait before
+> > > injecting the INTR vmexit.
+> > > 
+> > > Currently the KVM instead enters an endless loop of 'req_immediate_exit'.
+> > > 
+> > > Exactly the same issue also happens for SMIs and NMI.
+> > > Fix this as well.
+> > > 
+> > > Note that on VMX, this case is impossible as there is only
+> > > 'vmexit on external interrupts' execution control which either set,
+> > > in which case both host and guest's EFLAGS.IF
+> > > are ignored, or not set, in which case no VMexits are delivered.
+> > > 
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > ---
+> > >   arch/x86/kvm/svm/svm.c | 17 +++++++++++++----
+> > >   1 file changed, 13 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index 9a4e299ed5673..22e614008cf59 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -3372,11 +3372,13 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+> > >   	if (svm->nested.nested_run_pending)
+> > >   		return -EBUSY;
+> > >   
+> > > +	if (svm_nmi_blocked(vcpu))
+> > > +		return 0;
+> > > +
+> > >   	/* An NMI must not be injected into L2 if it's supposed to VM-Exit.  */
+> > >   	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
+> > >   		return -EBUSY;
+> > > -
+> > > -	return !svm_nmi_blocked(vcpu);
+> > > +	return 1;
+> > >   }
+> > >   
+> > >   static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
+> > > @@ -3428,9 +3430,13 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+> > >   static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+> > >   {
+> > >   	struct vcpu_svm *svm = to_svm(vcpu);
+> > > +
+> > >   	if (svm->nested.nested_run_pending)
+> > >   		return -EBUSY;
+> > >   
+> > > +	if (svm_interrupt_blocked(vcpu))
+> > > +		return 0;
+> > > +
+> > >   	/*
+> > >   	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
+> > >   	 * e.g. if the IRQ arrived asynchronously after checking nested events.
+> > > @@ -3438,7 +3444,7 @@ static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+> > >   	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_intr(svm))
+> > >   		return -EBUSY;
+> > >   
+> > > -	return !svm_interrupt_blocked(vcpu);
+> > > +	return 1;
+> > >   }
+> > >   
+> > >   static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
+> > > @@ -4169,11 +4175,14 @@ static int svm_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+> > >   	if (svm->nested.nested_run_pending)
+> > >   		return -EBUSY;
+> > >   
+> > > +	if (svm_smi_blocked(vcpu))
+> > > +		return 0;
+> > > +
+> > >   	/* An SMI must not be injected into L2 if it's supposed to VM-Exit.  */
+> > >   	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_smi(svm))
+> > >   		return -EBUSY;
+> > >   
+> > > -	return !svm_smi_blocked(vcpu);
+> > > +	return 1;
+> > >   }
+> > >   
+> > >   static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+> > 
+> > Can you prepare a testcase for at least the interrupt case?
+> 
+> Yep, I already wrote a kvm unit tests for all the cases, and I will send them very soon.
 
-diff --git a/x86/svm.h b/x86/svm.h
-index 58b9410..df1b1ac 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -426,6 +426,17 @@ void test_set_guest(test_guest_func func);
- extern struct vmcb *vmcb;
- extern struct svm_test svm_tests[];
- 
-+static inline void stgi(void)
-+{
-+    asm volatile ("stgi");
-+}
-+
-+static inline void clgi(void)
-+{
-+    asm volatile ("clgi");
-+}
-+
-+
- 
- #define SAVE_GPR_C                              \
-         "xchg %%rbx, regs+0x8\n\t"              \
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index b2ba283..ef8b5ee 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -3312,6 +3312,195 @@ static void svm_lbrv_nested_test2(void)
- 	check_lbr(&host_branch4_from, &host_branch4_to);
- }
- 
-+
-+// test that a nested guest which does enable INTR interception
-+// but doesn't enable virtual interrupt masking works
-+
-+static volatile int dummy_isr_recevied;
-+static void dummy_isr(isr_regs_t *regs)
-+{
-+	dummy_isr_recevied++;
-+	eoi();
-+}
-+
-+
-+static volatile int nmi_recevied;
-+static void dummy_nmi_handler(struct ex_regs *regs)
-+{
-+	nmi_recevied++;
-+}
-+
-+
-+static void svm_intr_intercept_mix_run_guest(volatile int *counter, int expected_vmexit)
-+{
-+	if (counter)
-+		*counter = 0;
-+
-+	sti();  // host IF value should not matter
-+	clgi(); // vmrun will set back GI to 1
-+
-+	svm_vmrun();
-+
-+	if (counter)
-+		report(!*counter, "No interrupt expected");
-+
-+	stgi();
-+
-+	if (counter)
-+		report(*counter == 1, "Interrupt is expected");
-+
-+	report (vmcb->control.exit_code == expected_vmexit, "Test expected VM exit");
-+	report(vmcb->save.rflags & X86_EFLAGS_IF, "Guest should have EFLAGS.IF set now");
-+	cli();
-+}
-+
-+
-+// subtest: test that enabling EFLAGS.IF is enought to trigger an interrupt
-+static void svm_intr_intercept_mix_if_guest(struct svm_test *test)
-+{
-+	asm volatile("nop;nop;nop;nop");
-+	report(!dummy_isr_recevied, "No interrupt expected");
-+	sti();
-+	asm volatile("nop");
-+	report(0, "must not reach here");
-+}
-+
-+static void svm_intr_intercept_mix_if(void)
-+{
-+	// make a physical interrupt to be pending
-+	handle_irq(0x55, dummy_isr);
-+
-+	vmcb->control.intercept |= (1 << INTERCEPT_INTR);
-+	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
-+	vmcb->save.rflags &= ~X86_EFLAGS_IF;
-+
-+	test_set_guest(svm_intr_intercept_mix_if_guest);
-+	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_FIXED | 0x55, 0);
-+	svm_intr_intercept_mix_run_guest(&dummy_isr_recevied, SVM_EXIT_INTR);
-+}
-+
-+
-+// subtest: test that a clever guest can trigger an interrupt by setting GIF
-+// if GIF is not intercepted
-+static void svm_intr_intercept_mix_gif_guest(struct svm_test *test)
-+{
-+
-+	asm volatile("nop;nop;nop;nop");
-+	report(!dummy_isr_recevied, "No interrupt expected");
-+
-+	// clear GIF and enable IF
-+	// that should still not cause VM exit
-+	clgi();
-+	sti();
-+	asm volatile("nop");
-+	report(!dummy_isr_recevied, "No interrupt expected");
-+
-+	stgi();
-+	asm volatile("nop");
-+	report(0, "must not reach here");
-+}
-+
-+static void svm_intr_intercept_mix_gif(void)
-+{
-+	handle_irq(0x55, dummy_isr);
-+
-+	vmcb->control.intercept |= (1 << INTERCEPT_INTR);
-+	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
-+	vmcb->save.rflags &= ~X86_EFLAGS_IF;
-+
-+	test_set_guest(svm_intr_intercept_mix_gif_guest);
-+	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_FIXED | 0x55, 0);
-+	svm_intr_intercept_mix_run_guest(&dummy_isr_recevied, SVM_EXIT_INTR);
-+}
-+
-+
-+
-+// subtest: test that a clever guest can trigger an interrupt by setting GIF
-+// if GIF is not intercepted and interrupt comes after guest
-+// started running
-+static void svm_intr_intercept_mix_gif_guest2(struct svm_test *test)
-+{
-+	asm volatile("nop;nop;nop;nop");
-+	report(!dummy_isr_recevied, "No interrupt expected");
-+
-+	clgi();
-+	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_FIXED | 0x55, 0);
-+	report(!dummy_isr_recevied, "No interrupt expected");
-+
-+	stgi();
-+	asm volatile("nop");
-+	report(0, "must not reach here");
-+}
-+
-+static void svm_intr_intercept_mix_gif2(void)
-+{
-+	handle_irq(0x55, dummy_isr);
-+
-+	vmcb->control.intercept |= (1 << INTERCEPT_INTR);
-+	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
-+	vmcb->save.rflags |= X86_EFLAGS_IF;
-+
-+	test_set_guest(svm_intr_intercept_mix_gif_guest2);
-+	svm_intr_intercept_mix_run_guest(&dummy_isr_recevied, SVM_EXIT_INTR);
-+}
-+
-+
-+// subtest: test that pending NMI will be handled when guest enables GIF
-+static void svm_intr_intercept_mix_nmi_guest(struct svm_test *test)
-+{
-+	asm volatile("nop;nop;nop;nop");
-+	report(!nmi_recevied, "No NMI expected");
-+	cli(); // should have no effect
-+
-+	clgi();
-+	asm volatile("nop");
-+	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI, 0);
-+	sti(); // should have no effect
-+	asm volatile("nop");
-+	report(!nmi_recevied, "No NMI expected");
-+
-+	stgi();
-+	asm volatile("nop");
-+	report(0, "must not reach here");
-+}
-+
-+static void svm_intr_intercept_mix_nmi(void)
-+{
-+	handle_exception(2, dummy_nmi_handler);
-+
-+	vmcb->control.intercept |= (1 << INTERCEPT_NMI);
-+	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
-+	vmcb->save.rflags |= X86_EFLAGS_IF;
-+
-+	test_set_guest(svm_intr_intercept_mix_nmi_guest);
-+	svm_intr_intercept_mix_run_guest(&nmi_recevied, SVM_EXIT_NMI);
-+}
-+
-+// test that pending SMI will be handled when guest enables GIF
-+// TODO: can't really count #SMIs so just test that guest doesn't hang
-+// and VMexits on SMI
-+static void svm_intr_intercept_mix_smi_guest(struct svm_test *test)
-+{
-+	asm volatile("nop;nop;nop;nop");
-+
-+	clgi();
-+	asm volatile("nop");
-+	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_SMI, 0);
-+	sti(); // should have no effect
-+	asm volatile("nop");
-+	stgi();
-+	asm volatile("nop");
-+	report(0, "must not reach here");
-+}
-+
-+static void svm_intr_intercept_mix_smi(void)
-+{
-+	vmcb->control.intercept |= (1 << INTERCEPT_SMI);
-+	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
-+	test_set_guest(svm_intr_intercept_mix_smi_guest);
-+	svm_intr_intercept_mix_run_guest(NULL, SVM_EXIT_SMI);
-+}
-+
- struct svm_test svm_tests[] = {
-     { "null", default_supported, default_prepare,
-       default_prepare_gif_clear, null_test,
-@@ -3439,5 +3628,10 @@ struct svm_test svm_tests[] = {
-     TEST(svm_lbrv_test2),
-     TEST(svm_lbrv_nested_test1),
-     TEST(svm_lbrv_nested_test2),
-+    TEST(svm_intr_intercept_mix_if),
-+    TEST(svm_intr_intercept_mix_gif),
-+    TEST(svm_intr_intercept_mix_gif2),
-+    TEST(svm_intr_intercept_mix_nmi),
-+    TEST(svm_intr_intercept_mix_smi),
-     { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
- };
--- 
-2.26.3
+Done.
+
+I also included tests for LBR virtualization which I think I already posted but I am not sure.
+
+Best regards,
+	Maxim Levitsky
+> 
+> Best regards,
+> 	Maxim Levitsky
+> > Thanks,
+> > 
+> > Paolo
+> > 
+
 
