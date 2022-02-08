@@ -2,65 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67B004ACEB9
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 03:14:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C93B84ACEED
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 03:30:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344634AbiBHCOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 21:14:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53332 "EHLO
+        id S1345934AbiBHC2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 21:28:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234335AbiBHCOu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 21:14:50 -0500
+        with ESMTP id S1345926AbiBHC2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 21:28:40 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE13CC06109E
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 18:14:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E690C0401E7
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 18:28:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644286488;
+        s=mimecast20190719; t=1644287317;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FzpbanrXZY9PE1o0RnSJx3xfnliEwEF23zGaJH7xZDI=;
-        b=B/eOs1WgKl8yQTUE9TxD95tJA9ydopzIMw7oNbNoy/Ep4IDC1E5l5y2iELgW8/s6TK/WYU
-        eZcAdtfJvGBJMqwSv+hwsgALN66ivugX60M/bqviBjUJSKICSNNpig37wIJzWamdgpLUji
-        5cYvY3LK87UBlYz6Arx+fN0KQ84qLCk=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ssfxozQsVXkPqd8hURrWGqEOTDmpelF59UyVKkS50EU=;
+        b=V/EIlirUbeFtlNY0PgW4YQTASMyQOj+54tRj6BAZxpJFs8W2mnND3+ZdsquMe6rZpHmVtW
+        QrzR8IpcHsRYZARfmefr1wg9uJzUQ+JEbHicmsyNiYgadwymrUJMYWyae5gOYQ0F7LPS+H
+        3hs/rF7BP1t0tJYc+aZMljsKdf1TLo0=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-203-ThgRIypkOriTGpsd_DLTlw-1; Mon, 07 Feb 2022 21:14:47 -0500
-X-MC-Unique: ThgRIypkOriTGpsd_DLTlw-1
-Received: by mail-lj1-f199.google.com with SMTP id bd23-20020a05651c169700b0023bc6f845beso5343149ljb.17
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 18:14:47 -0800 (PST)
+ us-mta-319-F7QB1qRpMKyT7tS8TlZJvg-1; Mon, 07 Feb 2022 21:28:36 -0500
+X-MC-Unique: F7QB1qRpMKyT7tS8TlZJvg-1
+Received: by mail-oo1-f69.google.com with SMTP id k16-20020a4aa5d0000000b002eaa82bf180so10310144oom.0
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 18:28:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FzpbanrXZY9PE1o0RnSJx3xfnliEwEF23zGaJH7xZDI=;
-        b=XapB318fcnU4hHO1lZAy4VOKH2E4/Bg9UGQelI7m5hNa4KO9zpAA8NkpauNTCpD7we
-         srtQVgrRGtCVwF0zFuhzNIS3Rk0yCHwNf/p7RZlCtEwuaz+sEhyMb+uZhGAdOha/2wmU
-         Oy0FQjakUbWswtxBEMxuyiGc5r+lhmvn72aqEMvDqIrbo1uC/G3B8JqR3KccKIofQ6Cq
-         muIUn39NncDWjJMpa3mJ5gZJnPOUIP46L/aPB7o+IoSdZ0uL2AYB2ExbMR2w66YwT9CB
-         p061o60gWscu9DjnaNMbVBXYWleSknWz7dnV2qi/rZ6tXctnes5O/AeuOTb0B0scJcng
-         NTVw==
-X-Gm-Message-State: AOAM531EdCyyBu14cTxxwYiOxdBmxYk5/f4il/oBbTmE2YLfXV0ge9C+
-        w2iXkLCV/20h4w6l6I3aDQJ5jtMbosConpxbOAuF0xahPf8YghhGVIm5Bh3CflfnrrY3LcZytiR
-        BJn6sWvMM/qIkYDuvi8zRiDtUNrOk
-X-Received: by 2002:a05:6512:3408:: with SMTP id i8mr1491828lfr.17.1644286486327;
-        Mon, 07 Feb 2022 18:14:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw2S6Av4hiQRTWs3XYWyGzxHic6+nQYtdwnU59heli15NyOGJSnX3n0bDXVBYHUqY/BUxPoIkqbw5yGsh7OC3c=
-X-Received: by 2002:a05:6512:3408:: with SMTP id i8mr1491818lfr.17.1644286486102;
- Mon, 07 Feb 2022 18:14:46 -0800 (PST)
-MIME-Version: 1.0
-References: <20220205081658.562208-1-leobras@redhat.com> <20220205081658.562208-2-leobras@redhat.com>
- <f2b0cac2-2f8a-60e8-616c-73825b3f62a6@redhat.com> <CAJ6HWG7DV-AeWyXxGwMMV61BejcCdpTc=U+4U6eY4gx4hfhP-g@mail.gmail.com>
- <8bf8ba96-94a8-663a-ccbf-ffeab087c370@redhat.com> <CAJ6HWG5sD06=ZMtrcSJ+O3ZH0xVeR7gC8+9o5hq+evXh43Vn_w@mail.gmail.com>
- <2b1d142e-e06c-3f38-32f5-d14de7dca289@redhat.com>
-In-Reply-To: <2b1d142e-e06c-3f38-32f5-d14de7dca289@redhat.com>
-From:   Leonardo Bras Soares Passos <leobras@redhat.com>
-Date:   Mon, 7 Feb 2022 23:14:34 -0300
-Message-ID: <CAJ6HWG7rq8jemuaixSSyG_nd=Qr1PAqfGKApz8nUamiLeT5RWA@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] x86/kvm/fpu: Mask guest fpstate->xfeatures with guest_supported_xcr0
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ssfxozQsVXkPqd8hURrWGqEOTDmpelF59UyVKkS50EU=;
+        b=uMvVh8K2xfHcpy1bOioHvFKn/gVVlKFo5CXEibaLcrL/oZIqTjk4RwCj0NNqHOP98c
+         MjtGp0EVXr5gluGGQFLYXeJcx6L8NaoOBPVGs31puT+1Kh7syba6FtueBJjgJpQzN9Ia
+         ydPALzc2H2/ZgqKoExhWrv0xbS6BDuKO8L/XD7F7Vw1I/SWvXFpUYwsW4qH5G7QqcktR
+         /hfCsAM14boBy0rqhVS2NA8uoPfZ6dUl6WXxPxVBedELlQ7/u8GuD1XtGhctnUtGmrcV
+         2h+yjnJjX89POovxgYM/d75Ix4nKfQEthBOj1eR5FzlJGK7an7Jfcj+0foJlG11YkMyr
+         HhtA==
+X-Gm-Message-State: AOAM531W8sXbf5HUqqV7AefYS2w+Igl5yGxoqF5fvfPn075bgYqYtsSv
+        pvhKpANoMOc6S7UR+42Fn34/c2jfMHW/jWLhA22+X297vkvwUe1FbcsRKK6yNBJ+opSdMCNwXUO
+        7PGElfYVkvzbb
+X-Received: by 2002:a05:6808:158f:: with SMTP id t15mr765194oiw.245.1644287313997;
+        Mon, 07 Feb 2022 18:28:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwKiOrDglYt2FuXCmTmQ1mgfMz6OLvLtfGvYuXOiUJqkP4WbrVQO9aFHbdfA1Qfwpp+yI+c3w==
+X-Received: by 2002:a05:6808:158f:: with SMTP id t15mr765182oiw.245.1644287313783;
+        Mon, 07 Feb 2022 18:28:33 -0800 (PST)
+Received: from localhost.localdomain ([2804:431:c7f0:b1af:f10e:1643:81f3:16df])
+        by smtp.gmail.com with ESMTPSA id y15sm4617016oof.37.2022.02.07.18.28.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Feb 2022 18:28:33 -0800 (PST)
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -68,12 +63,18 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Cc:     Leonardo Bras <leobras@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2 1/1] x86/kvm/fpu: Mask guest fpstate->xfeatures with guest_supported_xcr0
+Date:   Mon,  7 Feb 2022 23:28:10 -0300
+Message-Id: <20220208022809.575769-1-leobras@redhat.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,51 +82,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 7, 2022 at 7:59 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 2/7/22 23:45, Leonardo Bras Soares Passos wrote:
-> > On Mon, Feb 7, 2022 at 6:00 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 2/7/22 21:24, Leonardo Bras Soares Passos wrote:
-> >>>> With this patch,
-> >>>> we have to reason about the effect of calling KVM_SET_CPUID2 twice calls
-> >>>> back to back.  I think an "&=" would be wrong in that case.
-> >>>
-> >>> So, you suggest something like this ?
-> >>>
-> >>> vcpu->arch.guest_fpu.fpstate->xfeatures =
-> >>>          fpu_user_cfg.default_features & vcpu->arch.guest_supported_xcr0;
-> >>>
-> >>
-> >> Yes, but you need to change user_xfeatures instead of xfeatures.
-> >> KVM_GET_XSAVE and KVM_SET_XSAVE will take it into account automatically:
-> >>
-> >> - KVM_GET_XSAVE: fpu_copy_guest_fpstate_to_uabi -> __copy_xstate_to_uabi_buf
-> >>
-> >> - KVM_SET_XSAVE: fpu_copy_uabi_to_guest_fpstate ->
-> >> copy_uabi_from_kernel_to_xstate -> copy_uabi_to_xstate ->
-> >> validate_user_xstate_buffer
-> >
-> >
-> > Ok, I understand how this replaces patch 2/2, so no issue on that.
-> >
-> > About patch 1/2,  you suggest that instead of fixing what we save in
-> > the regs buffer, we fix only what we want to return to the user when
-> > they call KVM_GET_XSAVE, is that correct?
->
-> Yes, exactly.
+During host/guest switch (like in kvm_arch_vcpu_ioctl_run()), the kernel
+swaps the fpu between host/guest contexts, by using fpu_swap_kvm_fpstate().
 
-Thanks! I will update my patch and send a v2 shortly.
+When xsave feature is available, the fpu swap is done by:
+- xsave(s) instruction, with guest's fpstate->xfeatures as mask, is used
+  to store the current state of the fpu registers to a buffer.
+- xrstor(s) instruction, with (fpu_kernel_cfg.max_features &
+  XFEATURE_MASK_FPSTATE) as mask, is used to put the buffer into fpu regs.
 
-I got really curious while I was debugging this issue:
-- Is it ok that the cpu has other features enabled (like PKRU), while
-our vcpu does not have them?
-- Should guest OS always use the cpuid for checking features available?
-- Would it be better if we could have exactly the same fpu features
-enabled in the cpu, as we have in the vcpu?
-- Why do we xsave with a mask different from what we xrstor ?
+For xsave(s) the mask is used to limit what parts of the fpu regs will
+be copied to the buffer. Likewise on xrstor(s), the mask is used to
+limit what parts of the fpu regs will be changed.
 
->
-> Paolo
->
+The mask for xsave(s), the guest's fpstate->xfeatures, is defined on
+kvm_arch_vcpu_create(), which (in summary) sets it to all features
+supported by the cpu which are enabled on kernel config.
+
+This means that xsave(s) will save to guest buffer all the fpu regs
+contents the cpu has enabled when the guest is paused, even if they
+are not used.
+
+This would not be an issue, if xrstor(s) would also do that.
+
+xrstor(s)'s mask for host/guest swap is basically every valid feature
+contained in kernel config, except XFEATURE_MASK_PKRU.
+Accordingto kernel src, it is instead switched in switch_to() and
+flush_thread().
+
+Then, the following happens with a host supporting PKRU starts a
+guest that does not support it:
+1 - Host has XFEATURE_MASK_PKRU set. 1st switch to guest,
+2 - xsave(s) fpu regs to host fpustate (buffer has XFEATURE_MASK_PKRU)
+3 - xrstor(s) guest fpustate to fpu regs (fpu regs have XFEATURE_MASK_PKRU)
+4 - guest runs, then switch back to host,
+5 - xsave(s) fpu regs to guest fpstate (buffer now have XFEATURE_MASK_PKRU)
+6 - xrstor(s) host fpstate to fpu regs.
+7 - kvm_vcpu_ioctl_x86_get_xsave() copy guest fpstate to userspace (with
+    XFEATURE_MASK_PKRU, which should not be supported by guest vcpu)
+
+On 5, even though the guest does not support PKRU, it does have the flag
+set on guest fpstate, which is transferred to userspace via vcpu ioctl
+KVM_GET_XSAVE.
+
+This becomes a problem when the user decides on migrating the above guest
+to another machine that does not support PKRU:
+The new host restores guest's fpu regs to as they were before (xrstor(s)),
+but since the new host don't support PKRU, a general-protection exception
+ocurs in xrstor(s) and that crashes the guest.
+
+This can be solved by making the guest's fpstate->user_xfeatures only hold
+values compatible to guest_supported_xcr0. This way, on 7 the only flags
+copied to userspace will be the ones compatible to guest requirements,
+and thus there will be no issue during migration.
+
+As a bonus, will also fail if userspace tries to set fpu features
+that are not compatible to the guest configuration. (KVM_SET_XSAVE ioctl)
+
+Signed-off-by: Leonardo Bras <leobras@redhat.com>
+---
+ arch/x86/kvm/cpuid.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 28be02adc669..2337079445ba 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -296,6 +296,10 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.guest_supported_xcr0 =
+ 		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
+ 
++	/* Mask out features unsupported by guest */
++	vcpu->arch.guest_fpu.fpstate->user_xfeatures =
++		fpu_user_cfg.default_features & vcpu->arch.guest_supported_xcr0;
++
+ 	kvm_update_pv_runtime(vcpu);
+ 
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+-- 
+2.35.1
 
