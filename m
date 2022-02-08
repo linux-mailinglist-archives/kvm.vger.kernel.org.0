@@ -2,163 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C93B84ACEED
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 03:30:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A9394ACFC1
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 04:27:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345934AbiBHC2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 21:28:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58312 "EHLO
+        id S1346408AbiBHD1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 22:27:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345926AbiBHC2k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 21:28:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E690C0401E7
-        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 18:28:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644287317;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ssfxozQsVXkPqd8hURrWGqEOTDmpelF59UyVKkS50EU=;
-        b=V/EIlirUbeFtlNY0PgW4YQTASMyQOj+54tRj6BAZxpJFs8W2mnND3+ZdsquMe6rZpHmVtW
-        QrzR8IpcHsRYZARfmefr1wg9uJzUQ+JEbHicmsyNiYgadwymrUJMYWyae5gOYQ0F7LPS+H
-        3hs/rF7BP1t0tJYc+aZMljsKdf1TLo0=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-319-F7QB1qRpMKyT7tS8TlZJvg-1; Mon, 07 Feb 2022 21:28:36 -0500
-X-MC-Unique: F7QB1qRpMKyT7tS8TlZJvg-1
-Received: by mail-oo1-f69.google.com with SMTP id k16-20020a4aa5d0000000b002eaa82bf180so10310144oom.0
-        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 18:28:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ssfxozQsVXkPqd8hURrWGqEOTDmpelF59UyVKkS50EU=;
-        b=uMvVh8K2xfHcpy1bOioHvFKn/gVVlKFo5CXEibaLcrL/oZIqTjk4RwCj0NNqHOP98c
-         MjtGp0EVXr5gluGGQFLYXeJcx6L8NaoOBPVGs31puT+1Kh7syba6FtueBJjgJpQzN9Ia
-         ydPALzc2H2/ZgqKoExhWrv0xbS6BDuKO8L/XD7F7Vw1I/SWvXFpUYwsW4qH5G7QqcktR
-         /hfCsAM14boBy0rqhVS2NA8uoPfZ6dUl6WXxPxVBedELlQ7/u8GuD1XtGhctnUtGmrcV
-         2h+yjnJjX89POovxgYM/d75Ix4nKfQEthBOj1eR5FzlJGK7an7Jfcj+0foJlG11YkMyr
-         HhtA==
-X-Gm-Message-State: AOAM531W8sXbf5HUqqV7AefYS2w+Igl5yGxoqF5fvfPn075bgYqYtsSv
-        pvhKpANoMOc6S7UR+42Fn34/c2jfMHW/jWLhA22+X297vkvwUe1FbcsRKK6yNBJ+opSdMCNwXUO
-        7PGElfYVkvzbb
-X-Received: by 2002:a05:6808:158f:: with SMTP id t15mr765194oiw.245.1644287313997;
-        Mon, 07 Feb 2022 18:28:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwKiOrDglYt2FuXCmTmQ1mgfMz6OLvLtfGvYuXOiUJqkP4WbrVQO9aFHbdfA1Qfwpp+yI+c3w==
-X-Received: by 2002:a05:6808:158f:: with SMTP id t15mr765182oiw.245.1644287313783;
-        Mon, 07 Feb 2022 18:28:33 -0800 (PST)
-Received: from localhost.localdomain ([2804:431:c7f0:b1af:f10e:1643:81f3:16df])
-        by smtp.gmail.com with ESMTPSA id y15sm4617016oof.37.2022.02.07.18.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Feb 2022 18:28:33 -0800 (PST)
-From:   Leonardo Bras <leobras@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Cc:     Leonardo Bras <leobras@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] x86/kvm/fpu: Mask guest fpstate->xfeatures with guest_supported_xcr0
-Date:   Mon,  7 Feb 2022 23:28:10 -0300
-Message-Id: <20220208022809.575769-1-leobras@redhat.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S230356AbiBHD1K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 22:27:10 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5CAC043188;
+        Mon,  7 Feb 2022 19:27:10 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21812rME020077;
+        Tue, 8 Feb 2022 03:27:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Qq4f3rvSDeOM8mnrm2qT95b1d3QKIrpuIfb7jj8TN5A=;
+ b=kruQRmPmlhHxST7P9LmSG8yMu49V5RMWy5z9KkgalUnNmD6dgc+ho6x8kzK910llVxTl
+ HbZfL+jIAZTQ+U1HahEqgS7izBkOh+Pu33S8kQUf7ExoIi+YcfK4VQLRzcgxj0Om9iCH
+ uxiZQt1bYyIY1K20iaien34Ym2vJbgQnJ6K7Q+BxualDKoUiinZVz3FnB/E0OptT3KjW
+ 2zYABOC0KA72iWm882WNX1+TAXUyEUEzcXw8chePp4T+AorFlPRo6MQ1X4wlTgpMvh8e
+ 7mXnRlII1F3z2Tl/+Le87ZJoJ/+FOYdnVrpdEoXrmfGH/5Si1Mp6cx7O2PwsBoFlJ7fp 3g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e355aqt1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Feb 2022 03:27:08 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2183ODP5013230;
+        Tue, 8 Feb 2022 03:27:08 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e355aqt16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Feb 2022 03:27:07 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2183Nr7i003178;
+        Tue, 8 Feb 2022 03:27:06 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma02wdc.us.ibm.com with ESMTP id 3e2f8mwu2e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Feb 2022 03:27:06 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2183R5WA35258686
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Feb 2022 03:27:05 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65D0711206D;
+        Tue,  8 Feb 2022 03:27:05 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 366D7112067;
+        Tue,  8 Feb 2022 03:27:04 +0000 (GMT)
+Received: from [9.65.232.50] (unknown [9.65.232.50])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Feb 2022 03:27:04 +0000 (GMT)
+Message-ID: <145477fb-0408-d5c9-2366-139d44e2cc91@linux.ibm.com>
+Date:   Mon, 7 Feb 2022 22:27:03 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v17 14/15] s390/ap: notify drivers on config changed and
+ scan complete callbacks
+Content-Language: en-US
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
+ <20211021152332.70455-15-akrowiak@linux.ibm.com>
+ <20220204114359.4898b9c5.pasic@linux.ibm.com>
+ <573f8647-7479-3561-cd88-035b4db33e36@linux.ibm.com>
+ <20220208023835.1fc8c6dd.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20220208023835.1fc8c6dd.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YJtKL5PNxjd7yMLLjicEpJ69p5tbusLJ
+X-Proofpoint-ORIG-GUID: ck6l8VA0NqtyOwm_KW4pg6c9ASRMvRg_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-08_01,2022-02-07_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ suspectscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=999 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202080014
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-During host/guest switch (like in kvm_arch_vcpu_ioctl_run()), the kernel
-swaps the fpu between host/guest contexts, by using fpu_swap_kvm_fpstate().
 
-When xsave feature is available, the fpu swap is done by:
-- xsave(s) instruction, with guest's fpstate->xfeatures as mask, is used
-  to store the current state of the fpu registers to a buffer.
-- xrstor(s) instruction, with (fpu_kernel_cfg.max_features &
-  XFEATURE_MASK_FPSTATE) as mask, is used to put the buffer into fpu regs.
 
-For xsave(s) the mask is used to limit what parts of the fpu regs will
-be copied to the buffer. Likewise on xrstor(s), the mask is used to
-limit what parts of the fpu regs will be changed.
+On 2/7/22 20:38, Halil Pasic wrote:
+> On Mon, 7 Feb 2022 14:39:31 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>>> Back to the topic of locking: it looks to me that on this path you
+>>> do the filtering and thus the accesses to matrix_mdev->shadow_apcb,
+>>> matrix_mdev->matrix and matrix_dev->config_info some of which are
+>>> of type write whithout the matrix_dev->lock held. More precisely
+>>> only with the matrix_dev->guests_lock held in "read" mode.
+>>>
+>>> Did I misread the code? If not, how is that OK?
+>> You make a valid point, a struct rw_semaphore is not adequate for the
+>> purposes
+>> it is used in this patch series. It needs to be a mutex.
+>>
+> Good we agree that v17 is racy.
+>
+>> For v18 which is forthcoming probably this week, I've been reworking the
+>> locking
+>> based on your observation that the struct ap_guest is not necessary given we
+>> already have a list of the mediated devices which contain the KVM
+>> pointer. On the other
+> [..]
+>>> BTW I got delayed on my "locking rules" writeup. Sorry for that!
+>> No worries, I've been writing up a vfio-ap-locking.rst document to
+>> include with the next
+>> version of the patch series.
+> I'm looking forward to v18 including that document. I prefer not to
+> discuss what you wrote about the approach taken in v18 now. It is easier
+> to me when I have both the text stating the intended design, and the
+> code that is supposed to adhere to this design.
+>
+> Regards,
+> Halil
 
-The mask for xsave(s), the guest's fpstate->xfeatures, is defined on
-kvm_arch_vcpu_create(), which (in summary) sets it to all features
-supported by the cpu which are enabled on kernel config.
+Coming soon to a theater near you:)
 
-This means that xsave(s) will save to guest buffer all the fpu regs
-contents the cpu has enabled when the guest is paused, even if they
-are not used.
-
-This would not be an issue, if xrstor(s) would also do that.
-
-xrstor(s)'s mask for host/guest swap is basically every valid feature
-contained in kernel config, except XFEATURE_MASK_PKRU.
-Accordingto kernel src, it is instead switched in switch_to() and
-flush_thread().
-
-Then, the following happens with a host supporting PKRU starts a
-guest that does not support it:
-1 - Host has XFEATURE_MASK_PKRU set. 1st switch to guest,
-2 - xsave(s) fpu regs to host fpustate (buffer has XFEATURE_MASK_PKRU)
-3 - xrstor(s) guest fpustate to fpu regs (fpu regs have XFEATURE_MASK_PKRU)
-4 - guest runs, then switch back to host,
-5 - xsave(s) fpu regs to guest fpstate (buffer now have XFEATURE_MASK_PKRU)
-6 - xrstor(s) host fpstate to fpu regs.
-7 - kvm_vcpu_ioctl_x86_get_xsave() copy guest fpstate to userspace (with
-    XFEATURE_MASK_PKRU, which should not be supported by guest vcpu)
-
-On 5, even though the guest does not support PKRU, it does have the flag
-set on guest fpstate, which is transferred to userspace via vcpu ioctl
-KVM_GET_XSAVE.
-
-This becomes a problem when the user decides on migrating the above guest
-to another machine that does not support PKRU:
-The new host restores guest's fpu regs to as they were before (xrstor(s)),
-but since the new host don't support PKRU, a general-protection exception
-ocurs in xrstor(s) and that crashes the guest.
-
-This can be solved by making the guest's fpstate->user_xfeatures only hold
-values compatible to guest_supported_xcr0. This way, on 7 the only flags
-copied to userspace will be the ones compatible to guest requirements,
-and thus there will be no issue during migration.
-
-As a bonus, will also fail if userspace tries to set fpu features
-that are not compatible to the guest configuration. (KVM_SET_XSAVE ioctl)
-
-Signed-off-by: Leonardo Bras <leobras@redhat.com>
----
- arch/x86/kvm/cpuid.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 28be02adc669..2337079445ba 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -296,6 +296,10 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	vcpu->arch.guest_supported_xcr0 =
- 		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
- 
-+	/* Mask out features unsupported by guest */
-+	vcpu->arch.guest_fpu.fpstate->user_xfeatures =
-+		fpu_user_cfg.default_features & vcpu->arch.guest_supported_xcr0;
-+
- 	kvm_update_pv_runtime(vcpu);
- 
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
--- 
-2.35.1
+>
 
