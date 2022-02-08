@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF6FD4ADEC0
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 17:58:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45A034ADEE3
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 18:06:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345008AbiBHQ6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 11:58:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
+        id S1383696AbiBHRG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 12:06:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230391AbiBHQ6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 11:58:31 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E30C061578
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 08:58:30 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id w1so4769553plb.6
-        for <kvm@vger.kernel.org>; Tue, 08 Feb 2022 08:58:30 -0800 (PST)
+        with ESMTP id S241712AbiBHRG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 12:06:28 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C50C061576
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 09:06:27 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id g15-20020a17090a67cf00b001b7d5b6bedaso3473553pjm.4
+        for <kvm@vger.kernel.org>; Tue, 08 Feb 2022 09:06:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=BehLNzAs/zQ1lF/lRFmUiYEG0MqDcTlN+Zi4GMNO4po=;
-        b=gtD1WqxflWJB+W3B+2IPTB0tczwLG7fEAfX6erBc0MU5nljMZXr+E8SiEnTM4N+BFg
-         RjxyhEm/cmjmv0ervzymU069H+VhD045lnQ39rcRknECCnyaucw8K93VEVf8UoKDZSew
-         jdP2LEemYZcR5i2XXtiiLw/uLGKW8q/gojZST44XnLhBy+AmIOEsB1Iw9vJRMUTEWeLR
-         04asKhrQVyx/py9Gao6ECyqb62nkk/SpW8Cm42Mt4FPy1xSjZMUrEsAZmNS1hS0HcFd5
-         G+KT9JLD/hjAa7U929ByWGFWRp/jjxzZ8/OA5yppdq3NtjrTwzncuBmrOEXYNjpnmH68
-         H4Aw==
+        bh=LoDIVn3ps3QDMfn4s5pDjeHxnamculzSXR1qGxqJBOY=;
+        b=nhMz3QdCgfMXgktDsIIGLV2t8V1grYKysV+gVh7JP7bqwVjU9qJmzKTMZ29+63PwAW
+         rtqTED70bllYgBYK/Yw2XtgH82p/PMyMZt+VGHVrZ56b/7B94lb7eg/kV+trCncsKlxx
+         oWH25F3DZYpxEG5G4e2N/aisXSVVdYasKxuZJiGiCHegkU1LO3Rz7UPcawiR2nNS3jrr
+         6JfldqLX9or2AZtGZPDhfJnqS4qQDYwHfuysn007BHR2Q9HpHceLP84yA7l2IC42HYnK
+         +8ytFI04DLzLlKf4NfN8y5FCeIu8SncZg+KPuT6AygV0PA8Uv/7lzQuIm5RZ36dvZlMF
+         WTYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BehLNzAs/zQ1lF/lRFmUiYEG0MqDcTlN+Zi4GMNO4po=;
-        b=6ZlAfO9r4Gt9mMh0+yBulTLwvVD/X8Fof7KL9giBQgU27GyRHK9zaDZKxqZLUgBcBJ
-         clYE6rCI5KhPWbU6+pnSmVZOUNthaFSOzls3RezyDtWmGG7Aac/UnPNs5KAwJGOLDrJm
-         x/aJRQw/v2nKjeAyezM1IpEdWiJf7f642T1y8aAK5pXMRJ0YvGdLzV8O+isAmW94gfTV
-         trcUGtAw4Q/qshm5npjHLrOA7O9PwQW9SyYbLHj3BEIs0nJExwE4L0lIKyVgcv9rQ98p
-         cIMqecNQweooQl9A3vTtq2AGsSr44HGDwPRmvZW4pPPYIdwQPp1foNn/+mmb6unOlwCF
-         +Zmw==
-X-Gm-Message-State: AOAM530vq7CgtVu7LlEq/HqIP3TfQCZAx5bc7bEbDkL1BBVpGj8mhgOP
-        cZONscx9y0T9uGu5kx6LsRJNpg==
-X-Google-Smtp-Source: ABdhPJycqIE2rS7QGrW4hrzwOVH1TbvshmoHJyww4j5tVSIRNytldRpHF1r23ExSbwF4NMrAS2Xnog==
-X-Received: by 2002:a17:902:8f96:: with SMTP id z22mr5455290plo.2.1644339510071;
-        Tue, 08 Feb 2022 08:58:30 -0800 (PST)
+        bh=LoDIVn3ps3QDMfn4s5pDjeHxnamculzSXR1qGxqJBOY=;
+        b=5lFHdmdYhsnt9HpieBsj4E++2zUgLX7+PT3syswlr7snsRM1PpIebKZYaoznlEKe3y
+         sfx7Glt7wUkblIgSlIivunuXp3hk4e4j+NjbBuTFkce03wPjel7koUgDgdDRa0khksc1
+         NPDuDRbha038KKbp2Wq4kh1EcwH5pEIogBlLWgcemNt2bg0G9xBvstD1iQzim56yKLLf
+         pvwPXB2YYT1isso6ucG1uIJtzChOrj4i684gTFCsDWu+y6TQBVa8/toy0dZ+3ALQZ4xQ
+         gmY9G4tiHfMCjz2MEBv/3Mrv57bRbmPhtNfL62eYEwL4hthGtpvUM6Q0Y5ZHd16v/NaP
+         Z1dw==
+X-Gm-Message-State: AOAM532TYfOk3vo/Haj6WKDzotlY1yi7YoHiLXhIU7Qj4C+vugTa0QWo
+        h8Jv7ZHC9sbWknSeUWdP4fIMlA==
+X-Google-Smtp-Source: ABdhPJywOJWg5pcFJtajXypQ8nT3gQjRWmNu01AdTbevL+lrP7VgkehmNi2mwkxKZeqM3FlhBPjaqQ==
+X-Received: by 2002:a17:902:d3ca:: with SMTP id w10mr5624205plb.33.1644339986849;
+        Tue, 08 Feb 2022 09:06:26 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m20sm16957314pfk.215.2022.02.08.08.58.29
+        by smtp.gmail.com with ESMTPSA id h6sm17138993pfc.96.2022.02.08.09.06.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Feb 2022 08:58:29 -0800 (PST)
-Date:   Tue, 8 Feb 2022 16:58:26 +0000
+        Tue, 08 Feb 2022 09:06:26 -0800 (PST)
+Date:   Tue, 8 Feb 2022 17:06:22 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        kvmarm@lists.cs.columbia.edu, pshier@google.com,
-        ricarkol@google.com, reijiw@google.com, jingzhangos@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        james.morse@arm.com, Alexandru.Elisei@arm.com,
-        suzuki.poulose@arm.com, Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-Message-ID: <YgKhMjGtBH+1nJCk@google.com>
-References: <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
- <87ilyitt6e.wl-maz@kernel.org>
- <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
- <87lf3drmvp.wl-maz@kernel.org>
- <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
- <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
- <875yq88app.wl-maz@kernel.org>
- <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
- <878ruld72v.wl-maz@kernel.org>
- <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
+ memory from VM ioctl context
+Message-ID: <YgKjDm5OdSOKIdAo@google.com>
+References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
+ <87ee4d9yp3.fsf@redhat.com>
+ <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
+ <87bkzh9wkd.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
+In-Reply-To: <87bkzh9wkd.fsf@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,39 +74,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 08, 2022, Oliver Upton wrote:
-> Hi Marc,
+On Tue, Feb 08, 2022, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> > and hv-avic only mentions AutoEOI feature.
 > 
-> On Tue, Feb 8, 2022 at 1:46 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > > KVM currently restricts the vcpu features to be unified across vcpus,
-> > > > but that's only an implementation choice.
-> > >
-> > > But that implementation choice has become ABI, no? How could support
-> > > for asymmetry be added without requiring userspace opt-in or breaking
-> > > existing VMMs that depend on feature unification?
-> >
-> > Of course, you'd need some sort of advertising of this new behaviour.
-> >
-> > One thing I would like to add to the current state of thing is an
-> > indication of whether the effects of a sysreg being written from
-> > userspace are global or local to a vcpu. You'd need a new capability,
-> > and an extra flag added to the encoding of each register.
-> 
-> Ah. I think that is a much more reasonable fit then. VMMs unaware of
-> this can continue to migrate new bits (albeit at the cost of
-> potentially higher lock contention for the per-VM stuff), and those
-> that do can reap the benefits of writing such attributes exactly once.
+> True, this is hidden in "The enlightenment allows to use Hyper-V SynIC
+> with hardware APICv/AVIC enabled". Any suggestions on how to improve
+> this are more than welcome!.
 
-But the "proper" usage is no different than adding support for VM-scoped variants
-of KVM_{G,S}ET_ONE_REG and friends, and a VM-scoped variant is conceptually a lot
-cleaner IMO.  And making them truly VM-scoped means KVM can do things like support
-sysregs that are immutable after vCPUs are created.
+Specifically for the WARN, does this approach makes sense?
 
-So long as KVM defaults to '0' for all such registers, lack of migration support
-in userspace that isn't aware of the new API, i.e. doesn't do KVM_GET_REG_LIST at
-a VM-scope, is a nop because said userspace also won't modify the registers in the
-first place.  The only "unsolvable" problem that is avoided by usurping the per-vCPU
-ioctls is rollback to a userspace VMM that isn't aware of the per-VM ioctls, but it
-doesn't seem too onerous to tell userspace "don't use these unless your entire fleet
-has upgraded", especially since that requirement/advisement is true for the KVM side
-with respect to new registers regardless of how those registers are accessed.
+https://lore.kernel.org/all/YcTpJ369cRBN4W93@google.com
