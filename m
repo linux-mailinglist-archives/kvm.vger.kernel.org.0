@@ -2,315 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E54574ADCAC
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 16:31:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 154CD4ADCBB
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 16:34:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380423AbiBHPb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 10:31:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44730 "EHLO
+        id S239282AbiBHPe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 10:34:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235109AbiBHPbY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 10:31:24 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF6CC061576;
-        Tue,  8 Feb 2022 07:31:23 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 218EqCUJ030346;
-        Tue, 8 Feb 2022 15:31:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=gvyyKINqaBLLp5K2CamjLGmegRgbUw6aN1ff8DA3jAg=;
- b=l1/W7uGbFCsVuWJ1Omsz+cbRsecG384U+3fXiccDlUYUURu1hI+xQgheJ2FtrTzVJP7R
- fTVRU3kBonErm8ELnl++CWRV0M1mA5IOUOjVNGxy2mBzUQ4AdwUIiCdtuZz/IGHvjiY2
- LuvEllvZ3wfatQVYRdOC7DdhcO3tA1s8xt1XCEqvHldPiwImZpW4RqDfU+jGEJ/zdmMV
- PXkHk8o3sNiXaj9nULofELH3IVr652y+PTMrLH/U9R0SKgSEGCqwGQRPlUG5lVAYuBUq
- pvpgp318ivgjjKZ2Kf7ngfAZaOptH8jKumRVNzYzFDZU+3vb3ByEMgKIUs7S/XNnKoFj zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e22kqvubb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 15:31:22 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 218Eqeml010614;
-        Tue, 8 Feb 2022 15:31:21 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e22kqvuax-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 15:31:21 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 218FJ6en005541;
-        Tue, 8 Feb 2022 15:31:20 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3e1gva62dt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 15:31:19 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 218FVGxV30212496
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Feb 2022 15:31:16 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A91942054;
-        Tue,  8 Feb 2022 15:31:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E393C4204B;
-        Tue,  8 Feb 2022 15:31:15 +0000 (GMT)
-Received: from [9.145.76.86] (unknown [9.145.76.86])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Feb 2022 15:31:15 +0000 (GMT)
-Message-ID: <62c23e3a-8cc9-2072-6022-cb23dfa08ce7@linux.ibm.com>
-Date:   Tue, 8 Feb 2022 16:31:15 +0100
+        with ESMTP id S231469AbiBHPe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 10:34:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02B6CC061576
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 07:34:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644334465;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1Y3EJy6n/DsdzTGf9lL710fnSXTO377GHvERYvGo1WE=;
+        b=aoa8bYMm0+yf83xG1ixXxs1Id1Bm2vPQMuoXxiCjU4KDn9p06fJwcOycTk6Iz6CDhaeYU3
+        8aYif/NFqwT9jZJXudYan38utnW0wXvJlRrxidh9v42vKEvAyiBRFkYJFTYVkHlCn4k/jE
+        u+NOAjmQuK54H9QpO+cQyZCs8mBZOYw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-205-iiRkjq6WOpeFYqFokH1Z3w-1; Tue, 08 Feb 2022 10:34:24 -0500
+X-MC-Unique: iiRkjq6WOpeFYqFokH1Z3w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E046A84BA4D
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 15:34:22 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F413374E92;
+        Tue,  8 Feb 2022 15:34:21 +0000 (UTC)
+Message-ID: <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
+Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
+ memory from VM ioctl context
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Date:   Tue, 08 Feb 2022 17:34:20 +0200
+In-Reply-To: <87ee4d9yp3.fsf@redhat.com>
+References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
+         <87ee4d9yp3.fsf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com
-References: <20220208132709.48291-1-pmorel@linux.ibm.com>
- <20220208132709.48291-3-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v4 2/4] s390x: stsi: Define vm_is_kvm to be
- used in different tests
-In-Reply-To: <20220208132709.48291-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6fn6_kY5vmsV8KUBtkpRiCI4dMQQnq8K
-X-Proofpoint-ORIG-GUID: RY-IneJsww8Z8fhUvakcvhuNHRhzRm83
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-08_05,2022-02-07_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 suspectscore=0
- mlxlogscore=999 lowpriorityscore=0 adultscore=0 malwarescore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202080095
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/8/22 14:27, Pierre Morel wrote:
-> We need in several tests to check if the VM we are running in
-> is KVM.
-> Let's add the test.
-
-Several tests are in need of a way to check on which hypervisor and 
-virtualization level they are running on to be able to fence certain 
-tests. This patch adds functions that return true if a vm is running 
-under KVM, LPAR or generally as a level 2 guest.
-
+On Tue, 2022-02-08 at 16:15 +0100, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
 > 
-> To check the VM type we use the STSI 3.2.2 instruction, let's
-
-To check if we're running under KVM we...
-
-> define it's response structure in a central header.
-
-Since we already have a stsi test that defines the 3.2.2 structure let's 
-move the struct from the test into a new library header.
-
+> > [102140.117649] WARNING: CPU: 10 PID: 579353 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3161 mark_page_dirty_in_slot+0x6c/0x80 [kvm]
+> ...
+> > [102140.123834] Call Trace:
+> > [102140.123910]  <TASK>
+> > [102140.123976]  ? kvm_write_guest+0x114/0x120 [kvm]
+> > [102140.124183]  kvm_hv_invalidate_tsc_page+0x9e/0xf0 [kvm]
+> > [102140.124396]  kvm_arch_vm_ioctl+0xa26/0xc50 [kvm]
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   lib/s390x/stsi.h | 32 +++++++++++++++++++++++++++
->   lib/s390x/vm.c   | 56 ++++++++++++++++++++++++++++++++++++++++++++++--
->   lib/s390x/vm.h   |  3 +++
->   s390x/stsi.c     | 23 ++------------------
->   4 files changed, 91 insertions(+), 23 deletions(-)
->   create mode 100644 lib/s390x/stsi.h
+> ...
 > 
-> diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
-> new file mode 100644
-> index 00000000..9b40664f
-> --- /dev/null
-> +++ b/lib/s390x/stsi.h
-> @@ -0,0 +1,32 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * Structures used to Store System Information
-> + *
-> + * Copyright IBM Corp. 2022
-> + */
-> +
-> +#ifndef _S390X_STSI_H_
-> +#define _S390X_STSI_H_
-> +
-> +struct sysinfo_3_2_2 {
+> > This happens because kvm_hv_invalidate_tsc_page is called from kvm_vm_ioctl_set_clock
+> > which is a VM wide ioctl and thus doesn't have to be called with an active vCPU.
+> >  
+> > But as I see the warring states that guest memory writes must alway be done
+> > while a vCPU is active to allow the write to be recorded in its dirty track ring.
+> >  
+> > I _think_ it might be OK to drop this invalidation,
+> > and rely on the fact that kvm_hv_setup_tsc_page will update it,
+> > and it is called when vCPU0 processes KVM_REQ_CLOCK_UPDATE which is raised in the
+> > kvm_vm_ioctl_set_clock eventually.
+> >  
+> > Vitaly, any thoughts on this?
+> >  
+> 
+> TSC page (as well as SynIC pages) are supposed to be "overlay" pages
+> which are mapped over guest's memory but KVM doesn't do that and just
+> writes to guest's memory. This kind of works as Windows/Hyper-V guests
+> never disable these features and expecting the memory behind them to
+> stay intact.
+> 
+> Dirty tracking for active TSC page can be omited, I belive. Let me take
+> a look at this.
+> 
+> > For reference those are my HV flags:
+> >  
+> >     $cpu_flags: |
+> >         $cpu_flags,
+> >         hv_relaxed,hv_spinlocks=0x1fff,hv_vpindex,     # General HV features
+> >         hv_runtime,hv_time,hv-frequencies,             # Clock stuff        
+> >         hv_synic,hv_stimer,hv-stimer-direct,#hv-vapic, # APIC extensions
+> >         #hv-tlbflush,hv-ipi,                           # IPI extensions
+> >         hv-reenlightenment,                            # nested stuff
+> >  
+> >  
+> >  
+> > PS: unrelated question:
+> >  
+> > Vitaly, do you know why hv-evmcs needs hv-vapic?
+> >  
+> >  
+> > I know that they stuffed the eVMCS pointer to HV_X64_MSR_VP_ASSIST_PAGE,
+> >  
+> > But can't we set HV_APIC_ACCESS_AVAILABLE but not HV_APIC_ACCESS_RECOMMENDED
+> > so that guest would hopefully still know that HV assist page is available,
+> > but should not use it for APIC acceleration?
+> 
+> Yes,
+> 
+> "hv-vapic" enables so-called "VP Assist" page and Enlightened VMCS GPA
+> sits there, it is used instead of VMPTRLD (which becomes unsupported)
+> 
+> Take a look at the newly introduced "hv-apicv"/"hv-avic" (the same
+> thing) in QEMU: 
+> 
+> commit e1f9a8e8c90ae54387922e33e5ac4fd759747d01
+> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Date:   Thu Sep 2 11:35:28 2021 +0200
+> 
+>     i386: Implement pseudo 'hv-avic' ('hv-apicv') enlightenment
+> 
+> when enabled, HV_APIC_ACCESS_RECOMMENDED is not set even with "hv-vapic"
+> (but HV_APIC_ACCESS_AVAILABLE remains). 
+> 
 
-Any particular reason why you renamed this?
+Cool, I didn't expect this. I thought that hv-vapic only enables the AutoEOI
+deprecation bit.
 
-> +	uint8_t reserved[31];
-> +	uint8_t count;
-> +	struct {
-> +		uint8_t reserved2[4];
-> +		uint16_t total_cpus;
-> +		uint16_t conf_cpus;
-> +		uint16_t standby_cpus;
-> +		uint16_t reserved_cpus;
-> +		uint8_t name[8];
-> +		uint32_t caf;
-> +		uint8_t cpi[16];
-> +		uint8_t reserved5[3];
-> +		uint8_t ext_name_encoding;
-> +		uint32_t reserved3;
-> +		uint8_t uuid[16];
-> +	} vm[8];
-> +	uint8_t reserved4[1504];
-> +	uint8_t ext_names[8][256];
-> +};
-> +
-> +#endif  /* _S390X_STSI_H_ */
-> diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
-> index a5b92863..38886b76 100644
-> --- a/lib/s390x/vm.c
-> +++ b/lib/s390x/vm.c
-> @@ -12,6 +12,7 @@
->   #include <alloc_page.h>
->   #include <asm/arch_def.h>
->   #include "vm.h"
-> +#include "stsi.h"
->   
->   /**
->    * Detect whether we are running with TCG (instead of KVM)
-> @@ -26,9 +27,13 @@ bool vm_is_tcg(void)
->   	if (initialized)
->   		return is_tcg;
->   
-> -	buf = alloc_page();
-> -	if (!buf)
-> +	if (!vm_is_vm()) {
-> +		initialized = true;
->   		return false;
-> +	}
-> +
-> +	buf = alloc_page();
-> +	assert(buf);
->   
->   	if (stsi(buf, 1, 1, 1))
->   		goto out;
-> @@ -43,3 +48,50 @@ out:
->   	free_page(buf);
->   	return is_tcg;
->   }
-> +
-> +/**
-> + * Detect whether we are running with KVM
-> + */
-> +
-> +bool vm_is_kvm(void)
-> +{
-> +	/* EBCDIC for "KVM/" */
-> +	const uint8_t kvm_ebcdic[] = { 0xd2, 0xe5, 0xd4, 0x61 };
-> +	static bool initialized;
-> +	static bool is_kvm;
-> +	struct sysinfo_3_2_2 *stsi_322;
-> +
-> +	if (initialized)
-> +		return is_kvm;
-> +
-> +	if (!vm_is_vm() || vm_is_tcg()) {
-> +		initialized = true;
-> +		return is_kvm;
-> +	}
-> +
-> +	stsi_322 = alloc_page();
-> +	assert(stsi_322);
-> +
-> +	if (stsi(stsi_322, 3, 2, 2))
-> +		goto out;
-> +
-> +	/*
-> +	 * If the manufacturer string is "KVM/" in EBCDIC, then we
-> +	 * are on KVM.
-> +	 */
-> +	is_kvm = !memcmp(&stsi_322->vm[0].cpi, kvm_ebcdic, sizeof(kvm_ebcdic));
-> +	initialized = true;
-> +out:
-> +	free_page(stsi_322);
-> +	return is_kvm;
-> +}
-> +
-> +bool vm_is_lpar(void)
-> +{
-> +	return stsi_get_fc() == 2;
-> +}
-> +
-> +bool vm_is_vm(void)
-> +{
-> +	return stsi_get_fc() == 3;
+This needs to be updated in hyperv.txt in qemu - it currently states that
+hv-evmcs disables posted interrupts (that is APICv) and hv-avic
+only mentions AutoEOI feature.
 
-This would be true when running under z/VM, no?
-
-I.e. what you're testing here is that we're a level 2 guest and hence 
-the naming could be improved.
-
-Also: what if we're under VSIE where we would be > 3?
-
-> +}
-> diff --git a/lib/s390x/vm.h b/lib/s390x/vm.h
-> index 7abba0cc..3aaf76af 100644
-> --- a/lib/s390x/vm.h
-> +++ b/lib/s390x/vm.h
-> @@ -9,5 +9,8 @@
->   #define _S390X_VM_H_
->   
->   bool vm_is_tcg(void);
-> +bool vm_is_kvm(void);
-> +bool vm_is_vm(void);
-> +bool vm_is_lpar(void);
->   
->   #endif  /* _S390X_VM_H_ */
-> diff --git a/s390x/stsi.c b/s390x/stsi.c
-> index 391f8849..1ed045e2 100644
-> --- a/s390x/stsi.c
-> +++ b/s390x/stsi.c
-> @@ -13,27 +13,8 @@
->   #include <asm/asm-offsets.h>
->   #include <asm/interrupt.h>
->   #include <smp.h>
-> +#include "stsi.h"
-
-#include <stsi.h>
-
-We're not in the lib.
-
->   
-> -struct stsi_322 {
-> -	uint8_t reserved[31];
-> -	uint8_t count;
-> -	struct {
-> -		uint8_t reserved2[4];
-> -		uint16_t total_cpus;
-> -		uint16_t conf_cpus;
-> -		uint16_t standby_cpus;
-> -		uint16_t reserved_cpus;
-> -		uint8_t name[8];
-> -		uint32_t caf;
-> -		uint8_t cpi[16];
-> -		uint8_t reserved5[3];
-> -		uint8_t ext_name_encoding;
-> -		uint32_t reserved3;
-> -		uint8_t uuid[16];
-> -	} vm[8];
-> -	uint8_t reserved4[1504];
-> -	uint8_t ext_names[8][256];
-> -};
->   static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
->   
->   static void test_specs(void)
-> @@ -91,7 +72,7 @@ static void test_3_2_2(void)
->   	/* EBCDIC for "KVM/" */
->   	const uint8_t cpi_kvm[] = { 0xd2, 0xe5, 0xd4, 0x61 };
->   	const char vm_name_ext[] = "kvm-unit-test";
-> -	struct stsi_322 *data = (void *)pagebuf;
-> +	struct sysinfo_3_2_2 *data = (void *)pagebuf;
->   
->   	report_prefix_push("3.2.2");
->   
+Thanks!
+Best regards,
+	Maxim Levitsky
 
