@@ -2,142 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD63C4ACE16
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 02:47:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 735454ACE84
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 02:58:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233881AbiBHBr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Feb 2022 20:47:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33822 "EHLO
+        id S1344952AbiBHB6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Feb 2022 20:58:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344425AbiBHBjR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Feb 2022 20:39:17 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F890C061A73;
-        Mon,  7 Feb 2022 17:39:16 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21816aGl005365;
-        Tue, 8 Feb 2022 01:39:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=sVx6COLO4Sd9YlLY2EIXXK8MIIh+dQJ2YyW4Db5R0oo=;
- b=Lh/2WaDCeAnPBKpX0CWOjiYFqgsPuu7Mvci25KUObIjkXoEObWs30yepo8vy7NHDZygs
- Ciabd7lPC6rusSJ87kLB9/LRA3It2FNWdIhZx1OeVcc+Mrq++4w1KLQ3oGN+6p2G8vYW
- XEocB+k/NmlDEgIFH/+JLYkI2vKXy7RrEh01Jqu8HuBdsjwGA5a+2MQIdX16yMUNwr7o
- gPo0lOeQ7KvMbXeUTfGB+p8bJIFI563I0IYQLs6cD7DV7+18m8dJAmYQnjrG96Ew+Gja
- iyt7MZ4CdDcu4WHFc9GNN0nLZTdqGH9UX5FQAdQnamEktl3nRYQ1tecMx3VjH1Z7nY11 CQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e355ap16v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 01:39:14 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2181dDtS020804;
-        Tue, 8 Feb 2022 01:39:13 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e355ap169-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 01:39:13 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2181WWM7028456;
-        Tue, 8 Feb 2022 01:39:11 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3e1gv99jd6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Feb 2022 01:39:10 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2181T1ks43057468
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Feb 2022 01:29:01 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B85E711C04A;
-        Tue,  8 Feb 2022 01:39:04 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2380211C04C;
-        Tue,  8 Feb 2022 01:39:04 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.70.169])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue,  8 Feb 2022 01:39:04 +0000 (GMT)
-Date:   Tue, 8 Feb 2022 02:38:35 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v17 14/15] s390/ap: notify drivers on config changed and
- scan complete callbacks
-Message-ID: <20220208023835.1fc8c6dd.pasic@linux.ibm.com>
-In-Reply-To: <573f8647-7479-3561-cd88-035b4db33e36@linux.ibm.com>
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
-        <20211021152332.70455-15-akrowiak@linux.ibm.com>
-        <20220204114359.4898b9c5.pasic@linux.ibm.com>
-        <573f8647-7479-3561-cd88-035b4db33e36@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        with ESMTP id S235393AbiBHB61 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Feb 2022 20:58:27 -0500
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A54C061355
+        for <kvm@vger.kernel.org>; Mon,  7 Feb 2022 17:58:26 -0800 (PST)
+Received: by mail-ot1-x330.google.com with SMTP id x52-20020a05683040b400b0059ea92202daso12216359ott.7
+        for <kvm@vger.kernel.org>; Mon, 07 Feb 2022 17:58:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=763abjfJ+SdAaD/kize7T/3PS7RgLJsrH464pKF7rz4=;
+        b=E8i3wJQdqN+xoUV3XcnqXAAbbxJQLmcXKSsb3ZwEpwvUKPI4HpQe46RAnRorbEG5tF
+         /KBkrRgVwqVWbc6n9UhCtBQwAcCoith1izTA9Cr7uGFhVXCmWHwisH3TZXDN0oVzX69l
+         ZzV+8OS6+6hpNa8GWTyMvlsM1IUgk/1FYrIfGU9RhUmeUfKUNBMChzw0yg18dpR5R9Xd
+         ZtWTMiTJ1uutQrxjrvaEdPEzXDDSTbNMR4fmhjnLpIwZlaKUCpeqJ6bX3cvV6/v+oDeq
+         yz6AudTqIIjzu0pFE2338SkbpfivEZbOcMgfeeTynFTaqe6cF88OvLbW0h2TLZqX+qnY
+         omng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=763abjfJ+SdAaD/kize7T/3PS7RgLJsrH464pKF7rz4=;
+        b=mx+PdZJbT6X+wNhtT8zJFwjQqtXsUVvK4Kd4J4bI2INFg6+HgPJojt8FlyDszIvQZ7
+         ZuIaHxDpmXg4ekss7ZXwsyvIYmE/A57eH0II62rp4p1NngyDk+nMtPgtWaUZS5LuVE9W
+         c5PpQe5WE/14ZAKrNgh1N1paajr9YVIjJPUfdBTVxSm8jCJDCvbQD5wOzI5wyEvv4b1d
+         b/6OgsDBwLnSEWgTMJhLmTtO5u1lOgNdD5Y4KWuPY4Y4CPVzp2aYsbh/R7twUzD92NZv
+         TK0ZY1Agh0lZ83w64DppLC2UhSJnOEOq+rOvZRyO96uAiEZkyRwUDomeMTRoTjJTQPHq
+         2jgg==
+X-Gm-Message-State: AOAM530Dj/m6mrvAWoBbtMVzD7isyMR+sw0TWRxAOd+WNpArGAap6KDa
+        zWFORyQ8IIYOcgSrMpg+13VXlwNgWYVN1WPb94/nJA==
+X-Google-Smtp-Source: ABdhPJy48H6F1givxqObMkSesmcHas1J+460SqSSMIu267MI/HmJYzygo16v6/vCq51fjLHkyjmSAnAbWZ7XOy61NTA=
+X-Received: by 2002:a9d:6041:: with SMTP id v1mr1058648otj.35.1644285505833;
+ Mon, 07 Feb 2022 17:58:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Q35ZFvgSB15WKZ95VOoEEYhKvc2u_QRC
-X-Proofpoint-ORIG-GUID: i67ciEUarlaYDAk_fJb5-51AaOinIXHV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-07_07,2022-02-07_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- suspectscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 malwarescore=0
- priorityscore=1501 spamscore=0 mlxlogscore=999 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202080006
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220120125122.4633-1-varad.gautam@suse.com> <20220120125122.4633-3-varad.gautam@suse.com>
+ <CAA03e5FbSoRo9tXwJocBtZHEc7xisJ3gEFuOW0FPvchbL9X8PQ@mail.gmail.com>
+ <Yf0GO8EydyQSdZvu@suse.de> <CAA03e5HnyqZqDOyK8cbJgq_-zMPYEcrAuKr_CF8+=3DeykfV5A@mail.gmail.com>
+ <Yf1UqmkfirgX1Nl+@google.com> <CAA03e5G19K12UAt-1JLWXK2QEy2rSLDtzrj0LCv-DL1bYXOAsA@mail.gmail.com>
+ <YgGK8Fx3f2pIdtHg@google.com>
+In-Reply-To: <YgGK8Fx3f2pIdtHg@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Mon, 7 Feb 2022 17:58:14 -0800
+Message-ID: <CAA03e5HjdOjd0Vvk91v50M9FF71goxn9Ym2ZXv2XnSz7Mbcyzg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests 02/13] x86: AMD SEV-ES: Setup #VC exception
+ handler for AMD SEV-ES
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Joerg Roedel <jroedel@suse.de>,
+        Varad Gautam <varad.gautam@suse.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Zixuan Wang <zxwang42@gmail.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 7 Feb 2022 14:39:31 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> > Back to the topic of locking: it looks to me that on this path you
-> > do the filtering and thus the accesses to matrix_mdev->shadow_apcb,
-> > matrix_mdev->matrix and matrix_dev->config_info some of which are
-> > of type write whithout the matrix_dev->lock held. More precisely
-> > only with the matrix_dev->guests_lock held in "read" mode.
+On Mon, Feb 7, 2022 at 1:11 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Feb 04, 2022, Marc Orr wrote:
+> > On Fri, Feb 4, 2022 at 8:30 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Fri, Feb 04, 2022, Marc Orr wrote:
+> > > > On Fri, Feb 4, 2022 at 2:55 AM Joerg Roedel <jroedel@suse.de> wrote:
+> > > > >         3) The firmware #VC handler might use state which is not
+> > > > >            available anymore after ExitBootServices.
+> > > >
+> > > > Of all the issues listed, this one seems the most serious.
+> > > >
+> > > > >         4) If the firmware uses the kvm-unit-test GHCB after
+> > > > >            ExitBootServices, it has the get the GHCB address from the
+> > > > >            GHCB MSR, requiring an identity mapping.
+> > > > >            Moreover it requires to keep the address of the GHCB in the
+> > > > >            MSR at all times where a #VC could happen. This could be a
+> > > > >            problem when we start to add SEV-ES specific tests to the
+> > > > >            unit-tests, explcitily testing the MSR protocol.
+> > > >
+> > > > Ack. I'd think we could require tests to save/restore the GHCB MSR.
+> > > >
+> > > > > It is easy to violate this implicit protocol and breaking kvm-unit-tests
+> > > > > just by a new version of OVMF being used. I think that is not a very
+> > > > > robust approach and a separate #VC handler in the unit-test framework
+> > > > > makes sense even now.
+> > > >
+> > > > Thanks for the explanation! I hope we can keep the UEFI #VC handler
+> > > > working, because like I mentioned, I think this work can be used to
+> > > > test that code inside of UEFI. But I guess time will tell.
+> > > >
+> > > > Of all the points listed above, I think point #3 is the most
+> > > > concerning. The others seem like they can be managed.
+> > >
+> > >   5) Debug.  I don't want to have to reverse engineer assembly code to understand
+> > >      why a #VC handler isn't doing what I expect, or to a debug the exchanges
+> > >      between guest and host.
 > >
-> > Did I misread the code? If not, how is that OK?  
-> 
-> You make a valid point, a struct rw_semaphore is not adequate for the 
-> purposes
-> it is used in this patch series. It needs to be a mutex.
-> 
+> > Ack. But this can also be viewed as a benefit. Because the bug is
+> > probably something that should be followed up and fixed inside of
+> > UEFI.
+>
+> But how would we know it's a bug?  E.g. IMO, UEFI should be enlightened to _never_
+> take a #VC, at which point its #VC handle can be changed to panic and using such a
+> UEIF would cause KUT to fail.
 
-Good we agree that v17 is racy.
+Yeah. If we end up with enlightened UEFIs that skip handling some/all
+#VC exceptions, then using the UEFI #VC handler from kvm-unit-tests
+doesn't make any sense :-).
 
-> 
-> For v18 which is forthcoming probably this week, I've been reworking the 
-> locking
-> based on your observation that the struct ap_guest is not necessary given we
-> already have a list of the mediated devices which contain the KVM 
-> pointer. On the other
-
-[..]
-> 
+> > And that's my end goal. Can we reuse this work to test the #VC handler
+> > in the UEFI?
 > >
-> > BTW I got delayed on my "locking rules" writeup. Sorry for that!  
-> 
-> No worries, I've been writing up a vfio-ap-locking.rst document to 
-> include with the next
-> version of the patch series.
+> > This shouldn't be onerous. Because the #VC should follow the APM and
+> > GHCB specs. And both UEFI and kvm-unit-tests #VC handlers should be
+> > coded to those specs. If they're not, then one of them has a bug.
+> >
+> > > On Thu, Jan 20, 2022 at 4:52 AM Varad Gautam <varad.gautam@suse.com> wrote:
+> > > > If --amdsev-efi-vc is passed during ./configure, the tests will
+> > > > continue using the UEFI #VC handler.
+> > >
+> > > Why bother?  I would prefer we ditch the UEFI #VC handler entirely and not give
+> > > users the option to using anything but the built-in handler.  What do we gain
+> > > other than complexity?
+> >
+> > See above. If we keep the ability to run off the UEFI #VC handler then
+> > we can get continuous testing running inside of Google to verify the
+> > UEFI used to launch every SEV VM on Google cloud.
+>
+> I'm not super opposed to the idea, but I really do think that taking a #VC in
+> guest UEFI is a bug in and of itself.
 
-I'm looking forward to v18 including that document. I prefer not to
-discuss what you wrote about the approach taken in v18 now. It is easier
-to me when I have both the text stating the intended design, and the
-code that is supposed to adhere to this design.
-
-Regards,
-Halil
-
+Understood.
