@@ -2,59 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 154CD4ADCBB
-	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 16:34:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04A7E4ADCC5
+	for <lists+kvm@lfdr.de>; Tue,  8 Feb 2022 16:35:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239282AbiBHPe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 10:34:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46266 "EHLO
+        id S1380578AbiBHPfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 10:35:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231469AbiBHPe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 10:34:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02B6CC061576
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 07:34:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644334465;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Y3EJy6n/DsdzTGf9lL710fnSXTO377GHvERYvGo1WE=;
-        b=aoa8bYMm0+yf83xG1ixXxs1Id1Bm2vPQMuoXxiCjU4KDn9p06fJwcOycTk6Iz6CDhaeYU3
-        8aYif/NFqwT9jZJXudYan38utnW0wXvJlRrxidh9v42vKEvAyiBRFkYJFTYVkHlCn4k/jE
-        u+NOAjmQuK54H9QpO+cQyZCs8mBZOYw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-iiRkjq6WOpeFYqFokH1Z3w-1; Tue, 08 Feb 2022 10:34:24 -0500
-X-MC-Unique: iiRkjq6WOpeFYqFokH1Z3w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E046A84BA4D
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 15:34:22 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F413374E92;
-        Tue,  8 Feb 2022 15:34:21 +0000 (UTC)
-Message-ID: <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
-Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
- memory from VM ioctl context
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Date:   Tue, 08 Feb 2022 17:34:20 +0200
-In-Reply-To: <87ee4d9yp3.fsf@redhat.com>
-References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
-         <87ee4d9yp3.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S1380405AbiBHPez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 10:34:55 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 63703C06157A
+        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 07:34:54 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 28A122B;
+        Tue,  8 Feb 2022 07:34:54 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1959A3F73B;
+        Tue,  8 Feb 2022 07:34:50 -0800 (PST)
+Date:   Tue, 8 Feb 2022 15:35:06 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 28/64] KVM: arm64: nv: Emulate EL12 register accesses
+ from the virtual EL2
+Message-ID: <YgKNe+/CQdhkV6Ey@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-29-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-29-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,91 +53,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-02-08 at 16:15 +0100, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > [102140.117649] WARNING: CPU: 10 PID: 579353 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:3161 mark_page_dirty_in_slot+0x6c/0x80 [kvm]
-> ...
-> > [102140.123834] Call Trace:
-> > [102140.123910]  <TASK>
-> > [102140.123976]  ? kvm_write_guest+0x114/0x120 [kvm]
-> > [102140.124183]  kvm_hv_invalidate_tsc_page+0x9e/0xf0 [kvm]
-> > [102140.124396]  kvm_arch_vm_ioctl+0xa26/0xc50 [kvm]
-> 
-> ...
-> 
-> > This happens because kvm_hv_invalidate_tsc_page is called from kvm_vm_ioctl_set_clock
-> > which is a VM wide ioctl and thus doesn't have to be called with an active vCPU.
-> >  
-> > But as I see the warring states that guest memory writes must alway be done
-> > while a vCPU is active to allow the write to be recorded in its dirty track ring.
-> >  
-> > I _think_ it might be OK to drop this invalidation,
-> > and rely on the fact that kvm_hv_setup_tsc_page will update it,
-> > and it is called when vCPU0 processes KVM_REQ_CLOCK_UPDATE which is raised in the
-> > kvm_vm_ioctl_set_clock eventually.
-> >  
-> > Vitaly, any thoughts on this?
-> >  
-> 
-> TSC page (as well as SynIC pages) are supposed to be "overlay" pages
-> which are mapped over guest's memory but KVM doesn't do that and just
-> writes to guest's memory. This kind of works as Windows/Hyper-V guests
-> never disable these features and expecting the memory behind them to
-> stay intact.
-> 
-> Dirty tracking for active TSC page can be omited, I belive. Let me take
-> a look at this.
-> 
-> > For reference those are my HV flags:
-> >  
-> >     $cpu_flags: |
-> >         $cpu_flags,
-> >         hv_relaxed,hv_spinlocks=0x1fff,hv_vpindex,     # General HV features
-> >         hv_runtime,hv_time,hv-frequencies,             # Clock stuff        
-> >         hv_synic,hv_stimer,hv-stimer-direct,#hv-vapic, # APIC extensions
-> >         #hv-tlbflush,hv-ipi,                           # IPI extensions
-> >         hv-reenlightenment,                            # nested stuff
-> >  
-> >  
-> >  
-> > PS: unrelated question:
-> >  
-> > Vitaly, do you know why hv-evmcs needs hv-vapic?
-> >  
-> >  
-> > I know that they stuffed the eVMCS pointer to HV_X64_MSR_VP_ASSIST_PAGE,
-> >  
-> > But can't we set HV_APIC_ACCESS_AVAILABLE but not HV_APIC_ACCESS_RECOMMENDED
-> > so that guest would hopefully still know that HV assist page is available,
-> > but should not use it for APIC acceleration?
-> 
-> Yes,
-> 
-> "hv-vapic" enables so-called "VP Assist" page and Enlightened VMCS GPA
-> sits there, it is used instead of VMPTRLD (which becomes unsupported)
-> 
-> Take a look at the newly introduced "hv-apicv"/"hv-avic" (the same
-> thing) in QEMU: 
-> 
-> commit e1f9a8e8c90ae54387922e33e5ac4fd759747d01
-> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Date:   Thu Sep 2 11:35:28 2021 +0200
-> 
->     i386: Implement pseudo 'hv-avic' ('hv-apicv') enlightenment
-> 
-> when enabled, HV_APIC_ACCESS_RECOMMENDED is not set even with "hv-vapic"
-> (but HV_APIC_ACCESS_AVAILABLE remains). 
-> 
+Hi Marc,
 
-Cool, I didn't expect this. I thought that hv-vapic only enables the AutoEOI
-deprecation bit.
+On Fri, Jan 28, 2022 at 12:18:36PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
+> trap to EL2. Handle those traps just like we do for EL1 registers.
+> 
+> One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
+> virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
+> will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
+> bit.  Therefore, add a handler for it and don't treat it as a
+> non-trap-registers when preparing a shadow context.
+> 
+> These registers, being only a view on their EL1 counterpart, are
+> permanently hidden from userspace.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> [maz: EL12_REG(), register visibility]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 0c9bbe5eee5e..697bf0bca550 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1634,6 +1634,26 @@ static unsigned int el2_visibility(const struct kvm_vcpu *vcpu,
+>  	.val = v,				\
+>  }
+>  
+> +/*
+> + * EL{0,1}2 registers are the EL2 view on an EL0 or EL1 register when
+> + * HCR_EL2.E2H==1, and only in the sysreg table for convenience of
+> + * handling traps. Given that, they are always hidden from userspace.
+> + */
+> +static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+> +				    const struct sys_reg_desc *rd)
+> +{
+> +	return REG_HIDDEN_USER;
+> +}
+> +
+> +#define EL12_REG(name, acc, rst, v) {		\
+> +	SYS_DESC(SYS_##name##_EL12),		\
+> +	.access = acc,				\
+> +	.reset = rst,				\
+> +	.reg = name##_EL1,			\
+> +	.val = v,				\
+> +	.visibility = elx2_visibility,		\
+> +}
+> +
+>  /* sys_reg_desc initialiser for known cpufeature ID registers */
+>  #define ID_SANITISED(name) {			\
+>  	SYS_DESC(SYS_##name),			\
+> @@ -2194,6 +2214,23 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
+>  
+> +	EL12_REG(SCTLR, access_vm_reg, reset_val, 0x00C50078),
+> +	EL12_REG(CPACR, access_rw, reset_val, 0),
+> +	EL12_REG(TTBR0, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(TTBR1, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(TCR, access_vm_reg, reset_val, 0),
+> +	{ SYS_DESC(SYS_SPSR_EL12), access_spsr},
+> +	{ SYS_DESC(SYS_ELR_EL12), access_elr},
+> +	EL12_REG(AFSR0, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(AFSR1, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(ESR, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(FAR, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(MAIR, access_vm_reg, reset_unknown, 0),
+> +	EL12_REG(AMAIR, access_vm_reg, reset_amair_el1, 0),
+> +	EL12_REG(VBAR, access_rw, reset_val, 0),
+> +	EL12_REG(CONTEXTIDR, access_vm_reg, reset_val, 0),
+> +	EL12_REG(CNTKCTL, access_rw, reset_val, 0),
 
-This needs to be updated in hyperv.txt in qemu - it currently states that
-hv-evmcs disables posted interrupts (that is APICv) and hv-avic
-only mentions AutoEOI feature.
+Compared against Table D5-48 from ARM DDI 0487G.a (page D5-2768), everything
+looks correct to me:
 
-Thanks!
-Best regards,
-	Maxim Levitsky
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
+Thanks,
+Alex
+
+> +
+>  	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+>  };
+>  
+> -- 
+> 2.30.2
+> 
