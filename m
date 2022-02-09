@@ -2,73 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 730CF4AFF53
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 22:41:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5210E4AFF58
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 22:42:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233594AbiBIVlL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 16:41:11 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:51258 "EHLO
+        id S233688AbiBIVlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 16:41:45 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:52034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233590AbiBIVlI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 16:41:08 -0500
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECD92DD94E67
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 13:41:05 -0800 (PST)
-Received: by mail-ot1-x334.google.com with SMTP id o9-20020a9d7189000000b0059ee49b4f0fso2486286otj.2
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 13:41:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aHgHlx+I4QHtl3iX+6OuSr5CkYEtvnBUXLfXjTOaODE=;
-        b=aFLE3Sjwg9KjXg+ImFrILwTfJ8PL3XrJ4Z9i/cP4F+YFLmiLfYSp+6ZJegH1P6cHcz
-         vYJNw0Vna35dmxSydTmDg8r/FChAUI1cCoWELakZrbcmMgsUgqFr5YZPCM9B0L9L7602
-         Lybx5sq5KuYHnnFWdEiLbLuFNRS6N+xIoS72LpbXPx6Du4VTm4Sc5EteVlcRhG1y3y9Q
-         69ar3KOkGOpKpG7FBF60e3xliDh5xpVrjEgPUwh5LqlAhlH4l6rNUkjT1ESkaFgF8QeC
-         PyyDQFReN4T3EuAhZQpWljlNiUOLINnmcmNzQFm8V1K/wyknMkykuqJk7GyfN1Bm+mf6
-         zpqg==
+        with ESMTP id S233625AbiBIVll (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 16:41:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CD1A5DF28AD4
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 13:41:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644442903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vnKaJ3fYeFxAypTgfkLzFAKETIOGKeliSE47QqKxh2M=;
+        b=Iw5Z6eHCFm4Gz6L/AJzflTQEQ56xX0KQurAS1sUT8Su2D5YkNkyUZc6X2mNqSAeesadcXt
+        NEQPad0ZBkx8Xmfvh+mWDy0E2dX9qqAfgtrGXv/XMJaQQuKrIdd0v5YJQspGAw7ZitrO0I
+        RPaLqepiV4fodE1QaYg9JMKdvuiOWNk=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-64-yMKwfENKOLWDguWZALC83Q-1; Wed, 09 Feb 2022 16:41:42 -0500
+X-MC-Unique: yMKwfENKOLWDguWZALC83Q-1
+Received: by mail-io1-f71.google.com with SMTP id y124-20020a6bc882000000b0060fbfe14d03so2727825iof.2
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 13:41:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aHgHlx+I4QHtl3iX+6OuSr5CkYEtvnBUXLfXjTOaODE=;
-        b=6CoUKlrmm0kUTpmGdBAEsecl3rFBL1hGUU+lAJFmtpjyH0sLRDepuwL3pbQ+jrKDTu
-         oO1VNU+PQYU90JfoWPpTJHVLWQO0kiSxVHzccjOH9Ls7U8Ibecfxt9E5RIgkjeL2At0Z
-         DQOJz8qPOSNFo+0wBMpQB7DxyrQC7vH/76YlV2lRXxYJXwAvkaUKAQfcKFw3Rrmy7nr4
-         DwTDKLOT3tiaHxF0sRzM9nVjAAVVBNcQpYKVunQHhXmx2kaAKABxk4wLbVDHpV9Ao8eG
-         7pFMfigdXZWh85wAdW935d2ZYBlqmK1WbzoIPt/Az67GeYdx8zRUpfrboA+Cue9xOSHa
-         Ly8w==
-X-Gm-Message-State: AOAM531KdSATCj61I11rA75AO7Wizkj70nDGG8bUJ3jh79np3Rr8wboG
-        nurVzQ0stmy8dtLYzOGtkV1QUs0+/bMWMzIyuvUoDA==
-X-Google-Smtp-Source: ABdhPJyhcF730ksvNR2DpRX8vO6wF3Lmwu+B55F3OSAatSrYKYz+vfnugJ21Spp70ny8Akdj/QYtOH3Zu0KRER4fzz8=
-X-Received: by 2002:a9d:4e03:: with SMTP id p3mr1825652otf.299.1644442864980;
- Wed, 09 Feb 2022 13:41:04 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=vnKaJ3fYeFxAypTgfkLzFAKETIOGKeliSE47QqKxh2M=;
+        b=A/CVSYwJZDbpzmPMaQJ1n1wRMRdzVh2yAzxQsx/xjPL7fMHwxGYqCc0cvwcVVlKc9E
+         0LXsnoVFLUwjPWNMlKHnKg2GgYY35OD3SnghEg/oyqaEIVzbB8nSrYCuGNbz3sRphHCp
+         OTK9q+qAmdixpVMSF+fEOMZ/Fouj6Hh2bcLOgrB7Jqfp+Xgu4Ugaxj/GBWQFLy7FHocA
+         W40AYr02MWbyTCXDTfqnVTIKe85BumMvc/awK6YHZgjxkQhlU02lfW1+GD2TZA3nCe3k
+         6EiGldKMlWQC7jbW7r44XA9qM6YyuLPbtySUZXYGdLeZq25OYvjyWTTuUe83p2IZBCQm
+         S1cA==
+X-Gm-Message-State: AOAM533vOzZXijiCNllSy9axOumyOJyuJopNtMibgPQV406Smn+L5ilF
+        fSV+0SuYJZlsAs3hzixhD/slb67pl3XYDf8dzOM1J65S3G45vd5UcIRCsOyynu0dI4y1/vvfzX1
+        /ffHpIw5jJ2eF
+X-Received: by 2002:a5d:9151:: with SMTP id y17mr2084025ioq.38.1644442901149;
+        Wed, 09 Feb 2022 13:41:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzvob5cspw1EkMKIhhQ6npdyq3pXbPN3p0dVlPXKwvxH2DJtktWfnTq/mijkoSW585QW8ijsQ==
+X-Received: by 2002:a5d:9151:: with SMTP id y17mr2084013ioq.38.1644442900953;
+        Wed, 09 Feb 2022 13:41:40 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a6sm10552396iow.22.2022.02.09.13.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Feb 2022 13:41:40 -0800 (PST)
+Date:   Wed, 9 Feb 2022 14:41:37 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
+        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: Re: [RFC v4 5/8] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Message-ID: <20220209144137.3770d914.alex.williamson@redhat.com>
+In-Reply-To: <20220208133425.1096-6-shameerali.kolothum.thodi@huawei.com>
+References: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
+        <20220208133425.1096-6-shameerali.kolothum.thodi@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <2e96421f-44b5-c8b7-82f7-5a9a9040104b@amd.com> <20220202105158.7072-1-ravi.bangoria@amd.com>
- <CALMp9eQHfAgcW-J1YY=01ki4m_YVBBEz6D1T662p2BUp05ZcPQ@mail.gmail.com>
- <3c97e081-ae46-d92d-fe8f-58642d6b773e@amd.com> <CALMp9eS72bhP=hGJRzTwGxG9XrijEnGKnJ-pqtHxYG-5Shs+2g@mail.gmail.com>
- <9b890769-e769-83ed-c953-d25930b067ba@amd.com> <CALMp9eQ9K+CXHVZ1zSyw78n-agM2+NQ1xJ4niO-YxSkQCLcK-A@mail.gmail.com>
- <e58ca80c-b54c-48b3-fb0b-3e9497c877b7@gmail.com>
-In-Reply-To: <e58ca80c-b54c-48b3-fb0b-3e9497c877b7@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 9 Feb 2022 13:40:53 -0800
-Message-ID: <CALMp9eRuBwj9Sg60jg2ucWd-XoAcE_kXP5ULFgpkSHg88sOJZQ@mail.gmail.com>
-Subject: Re: [PATCH v2] perf/amd: Implement erratum #1292 workaround for F19h M00-0Fh
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Ravi Bangoria <ravi.bangoria@amd.com>, eranian@google.com,
-        santosh.shukla@amd.com, pbonzini@redhat.com, seanjc@google.com,
-        wanpengli@tencent.com, vkuznets@redhat.com, joro@8bytes.org,
-        peterz@infradead.org, mingo@redhat.com,
-        alexander.shishkin@linux.intel.com, tglx@linutronix.de,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        kvm@vger.kernel.org, x86@kernel.org,
-        linux-perf-users@vger.kernel.org, ananth.narayan@amd.com,
-        kim.phillips@amd.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,147 +83,173 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 9, 2022 at 2:19 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 4/2/2022 9:01 pm, Jim Mattson wrote:
-> > On Fri, Feb 4, 2022 at 1:33 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
-> >>
-> >>
-> >>
-> >> On 03-Feb-22 11:25 PM, Jim Mattson wrote:
-> >>> On Wed, Feb 2, 2022 at 9:18 PM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
-> >>>>
-> >>>> Hi Jim,
-> >>>>
-> >>>> On 03-Feb-22 9:39 AM, Jim Mattson wrote:
-> >>>>> On Wed, Feb 2, 2022 at 2:52 AM Ravi Bangoria <ravi.bangoria@amd.com> wrote:
-> >>>>>>
-> >>>>>> Perf counter may overcount for a list of Retire Based Events. Implement
-> >>>>>> workaround for Zen3 Family 19 Model 00-0F processors as suggested in
-> >>>>>> Revision Guide[1]:
-> >>>>>>
-> >>>>>>    To count the non-FP affected PMC events correctly:
-> >>>>>>      o Use Core::X86::Msr::PERF_CTL2 to count the events, and
-> >>>>>>      o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
-> >>>>>>      o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
-> >>>>>>
-> >>>>>> Note that the specified workaround applies only to counting events and
-> >>>>>> not to sampling events. Thus sampling event will continue functioning
-> >>>>>> as is.
-> >>>>>>
-> >>>>>> Although the issue exists on all previous Zen revisions, the workaround
-> >>>>>> is different and thus not included in this patch.
-> >>>>>>
-> >>>>>> This patch needs Like's patch[2] to make it work on kvm guest.
-> >>>>>
-> >>>>> IIUC, this patch along with Like's patch actually breaks PMU
-> >>>>> virtualization for a kvm guest.
-> >>>>>
-> >>>>> Suppose I have some code which counts event 0xC2 [Retired Branch
-> >>>>> Instructions] on PMC0 and event 0xC4 [Retired Taken Branch
-> >>>>> Instructions] on PMC1. I then divide PMC1 by PMC0 to see what
-> >>>>> percentage of my branch instructions are taken. On hardware that
-> >>>>> suffers from erratum 1292, both counters may overcount, but if the
-> >>>>> inaccuracy is small, then my final result may still be fairly close to
-> >>>>> reality.
-> >>>>>
-> >>>>> With these patches, if I run that same code in a kvm guest, it looks
-> >>>>> like one of those events will be counted on PMC2 and the other won't
-> >>>>> be counted at all. So, when I calculate the percentage of branch
-> >>>>> instructions taken, I either get 0 or infinity.
-> >>>>
-> >>>> Events get multiplexed internally. See below quick test I ran inside
-> >>>> guest. My host is running with my+Like's patch and guest is running
-> >>>> with only my patch.
-> >>>
-> >>> Your guest may be multiplexing the counters. The guest I posited does not.
-> >>
-> >> It would be helpful if you can provide an example.
-> >
-> > Perf on any current Linux distro (i.e. without your fix).
->
-> The patch for errata #1292 (like most hw issues or vulnerabilities) should be
-> applied to both the host and guest.
+On Tue, 8 Feb 2022 13:34:22 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-As I'm sure you are aware, guests are often not patched. For example,
-we have a lot of Debian-9 guests running on Milan, despite the fact
-that it has to be booted with "nopcid" due to a bug introduced on
-4.9-stable. We submitted the fix and notified Debian about a year ago,
-but they have not seen fit to cut a new kernel. Do you think they will
-cut a new kernel for this patch?
+> HiSilicon ACC VF device BAR2 region consists of both functional
+> register space and migration control register space. From a
+> security point of view, it's not advisable to export the migration
+> control region to Guest.
+> 
+> Hence, override the ioctl/read/write/mmap methods to hide the
+> migration region and limit the access only to the functional register
+> space.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/vfio/pci/hisi_acc_vfio_pci.c | 122 ++++++++++++++++++++++++++-
+>  1 file changed, 118 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> index 8b59e628110e..563ed2cc861f 100644
+> --- a/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> @@ -13,6 +13,120 @@
+>  #include <linux/vfio.h>
+>  #include <linux/vfio_pci_core.h>
+>  
+> +static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+> +					size_t count, loff_t *ppos,
+> +					size_t *new_count)
+> +{
+> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> +
+> +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
 
-> For non-patched guests on a patched host, the KVM-created perf_events
-> will be true for is_sampling_event() due to get_sample_period().
->
-> I think we (KVM) have a congenital defect in distinguishing whether guest
-> counters are used in counting mode or sampling mode, which is just
-> a different use of pure software.
+Be careful here, there are nested assignment use cases.  This can only
+survive one level of assignment before we've restricted more than we
+intended.  If migration support is dependent on PF access, can we use
+that to determine when to when to expose only half the BAR and when to
+expose the full BAR?
 
-I have no idea what you are saying. However, when kvm sees a guest
-counter used in sampling mode, it will just request a PERF_TYPE_RAW
-perf event with the INT bit set in 'config.' If it sees a guest
-counter used in counting mode, it will either request a PERF_TYPE_RAW
-perf event or a PERF_TYPE_HARDWARE perf event, depending on whether or
-not it finds the requested event in amd_event_mapping[].
+We should also follow the mlx5 lead to use a vendor sub-directory below
+drivers/vfio/pci/  Thanks,
 
-> >
-> >>> I hope that you are not saying that kvm's *thread-pinned* perf events
-> >>> are not being multiplexed at the host level, because that completely
-> >>> breaks PMU virtualization.
-> >>
-> >> IIUC, multiplexing happens inside the guest.
-> >
-> > I'm not sure that multiplexing is the answer. Extrapolation may
-> > introduce greater imprecision than the erratum.
->
-> If you run the same test on the patched host, the PMC2 will be
-> used in a multiplexing way. This is no different.
->
-> >
-> > If you count something like "instructions retired" three ways:
-> > 1) Unfixed counter
-> > 2) PMC2 with the fix
-> > 3) Multiplexed on PMC2 with the fix
-> >
-> > Is (3) always more accurate than (1)?
+Alex
 
-Since Ravi has gone dark, I will answer my own question.
+> +
+> +		/* Check if access is for migration control region */
+> +		if (pos >= end)
+> +			return -EINVAL;
+> +
+> +		*new_count = min(count, (size_t)(end - pos));
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
+> +				  struct vm_area_struct *vma)
+> +{
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> +	unsigned int index;
+> +
+> +	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+> +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +		u64 req_len, pgoff, req_start;
+> +		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> +
+> +		req_len = vma->vm_end - vma->vm_start;
+> +		pgoff = vma->vm_pgoff &
+> +			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> +		req_start = pgoff << PAGE_SHIFT;
+> +
+> +		if (req_start + req_len > end)
+> +			return -EINVAL;
+> +	}
+> +
+> +	return vfio_pci_core_mmap(core_vdev, vma);
+> +}
+> +
+> +static ssize_t hisi_acc_vfio_pci_write(struct vfio_device *core_vdev,
+> +				       const char __user *buf, size_t count,
+> +				       loff_t *ppos)
+> +{
+> +	size_t new_count = count;
+> +	int ret;
+> +
+> +	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return vfio_pci_core_write(core_vdev, buf, new_count, ppos);
+> +}
+> +
+> +static ssize_t hisi_acc_vfio_pci_read(struct vfio_device *core_vdev,
+> +				      char __user *buf, size_t count,
+> +				      loff_t *ppos)
+> +{
+> +	size_t new_count = count;
+> +	int ret;
+> +
+> +	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return vfio_pci_core_read(core_vdev, buf, new_count, ppos);
+> +}
+> +
+> +static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+> +				    unsigned long arg)
+> +{
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> +
+> +	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+> +		struct pci_dev *pdev = vdev->pdev;
+> +		struct vfio_region_info info;
+> +		unsigned long minsz;
+> +
+> +		minsz = offsetofend(struct vfio_region_info, offset);
+> +
+> +		if (copy_from_user(&info, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (info.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +
+> +			/*
+> +			 * ACC VF dev BAR2 region consists of both functional
+> +			 * register space and migration control register space.
+> +			 * Report only the functional region to Guest.
+> +			 */
+> +			info.size = pci_resource_len(pdev, info.index) / 2;
+> +
+> +			info.flags = VFIO_REGION_INFO_FLAG_READ |
+> +					VFIO_REGION_INFO_FLAG_WRITE |
+> +					VFIO_REGION_INFO_FLAG_MMAP;
+> +
+> +			return copy_to_user((void __user *)arg, &info, minsz) ?
+> +					    -EFAULT : 0;
+> +		}
+> +	}
+> +	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+> +}
+> +
+>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>  {
+>  	struct vfio_pci_core_device *vdev =
+> @@ -32,10 +146,10 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>  	.name = "hisi-acc-vfio-pci",
+>  	.open_device = hisi_acc_vfio_pci_open_device,
+>  	.close_device = vfio_pci_core_close_device,
+> -	.ioctl = vfio_pci_core_ioctl,
+> -	.read = vfio_pci_core_read,
+> -	.write = vfio_pci_core_write,
+> -	.mmap = vfio_pci_core_mmap,
+> +	.ioctl = hisi_acc_vfio_pci_ioctl,
+> +	.read = hisi_acc_vfio_pci_read,
+> +	.write = hisi_acc_vfio_pci_write,
+> +	.mmap = hisi_acc_vfio_pci_mmap,
+>  	.request = vfio_pci_core_request,
+>  	.match = vfio_pci_core_match,
+>  };
 
-For better reproducibility, I simplified his program to:
-
-int main() { return 0;}
-
-On an unpatched Milan host, I get instructions retired between 21911
-and 21915. I get branch instructions retired between 5565 and 5566. It
-does not matter if I count them separately or at the same time.
-
-After applying v3 of Ravi's patch, if I try to count these events at
-the same time, I get 36869 instructions retired and 4962 branch
-instructions on the first run. On subsequent runs, perf refuses to
-count both at the same time. I get branch instructions retired between
-5565 and 5567, but no instructions retired. Instead, perf tells me:
-
-Some events weren't counted. Try disabling the NMI watchdog:
-echo 0 > /proc/sys/kernel/nmi_watchdog
-perf stat ...
-echo 1 > /proc/sys/kernel/nmi_watchdog
-
-If I just count one thing at a time (on the patched kernel), I get
-between 21911 and 21916 instructions retired, and I get between 5565
-and 5566 branch instructions retired.
-
-I don't know under what circumstances the unfixed counters overcount
-or by how much. However, for this simple test case, the fixed PMC2
-yields the same results as any unfixed counter. Ravi's patch, however
-makes counting two of these events simultaneously either (a)
-impossible, or (b) highly inaccurate (from 10% under to 68% over).
-
-> The loss of accuracy is due to a reduction in the number of trustworthy counters,
-> not to these two workaround patches. Any multiplexing (whatever on the host or
-> the guest) will result in a loss of accuracy. Right ?
-
-Yes, that's my point. Fixing one inaccuracy by using a mechanism that
-introduces another inaccuracy only makes sense if the inaccuracy you
-are fixing is worse than the inaccuracy you are introducing. That does
-not appear to be the case here, but I am not privy to all of the
-details of this erratum.
