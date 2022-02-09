@@ -2,66 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67F0C4AFFE3
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 23:07:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 703DA4AFFF3
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 23:15:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234986AbiBIWHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 17:07:16 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:56880 "EHLO
+        id S235029AbiBIWNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 17:13:31 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230482AbiBIWHO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 17:07:14 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473C2DF28A5A
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 14:07:16 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id i21so5302595pfd.13
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 14:07:16 -0800 (PST)
+        with ESMTP id S230482AbiBIWNa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 17:13:30 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F1DC0F8699
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 14:13:32 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id y18so141623plb.11
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 14:13:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=BPvAh/EodqWOHe2tNUbnx1ARgdgM6FUi8nnsTpH0NdI=;
-        b=FycwgfLbLQ6uVp6WdK4GFvG2K1w4g3O8BXx6B/JDBSHIot956M9guxwOz4QQIV4mPE
-         zSqQTJBqcIvEHzUQ+G/woBxkHb+3FohvIATYtIMFKC7ynil85qQ7GyB+nLcQT0kQcFPz
-         lS/KKDzWOC2DT2gAm5uxRliL6GdpAaRKh/aBBJ7r0bHKqhIxPB+n467ihKh10uCVXZn4
-         uhuzz13axV/2wg9Tp+Jin/DLPe5RLElJb7NgDfaoQgXY3BufTogI7ezpLoAlFyleoXav
-         hPvwnaxkg2eb9uJyIuyYfMVq6Oiv7TY2v1nm5VvBZK9ecAa9OEiVe2Ji172jPivcnAZi
-         MpKQ==
+         :content-disposition:in-reply-to;
+        bh=Fx5b1qQwMlFVs21l/OX+krSp/uyB0q/jyfgtOYhq7dE=;
+        b=gBEeF6BpUfDehwTkVhoxki42M0jD+d2SYRr6MRurSmkaOqBYNiYhFzzkd6FV5TcBZu
+         3tBHQnb/hoBUkZh3ETyhokeD1Stsny6DlY/sSqk6MM8Ezr8zG4856oxqpBSfDvRMbQDj
+         d6YE+VRTxybzzUiiVaDavG6L263fQJxSgDpymFr9AdVDZdPzBhqY18G7T5MtUxVf4n8n
+         ObxuUFKf0kK/0FQki1M8PYWLtA3x55wE+f1+8EqVErr/3Edt2aTNqeoYAtdffwgvvZzQ
+         DdYeS/sMNmmFgdi+iWsuO0Ny1daPsfjQ5OTabfQSCVsI8YiSTWJBC277nrTYnChiyJaY
+         d1wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=BPvAh/EodqWOHe2tNUbnx1ARgdgM6FUi8nnsTpH0NdI=;
-        b=wLE4yaCj2os+nnZGsOmMJ+F2kUMprTeISrBBUbQxXwvR7TYjR9QQldr++TsaI0/RFw
-         xp3tT9EcGanTiFCqA80sOaBiPx/m+QzF0ub85IAo8J7ku981E4zOiRl/O4gr70lyYnxz
-         r52hJNiNuOAp4zxhJJcSHlFy5XhglYIQhfcwMBztAvaV+DK4gQJHwNjtUnMHi7Fg8FrS
-         m/osUuonGwZo5LgyoSbrha0j2l2dX+bzX+V07fgR/XRGYGUkPxvTl33z3vU0Cw8CRVww
-         TveJEIEsI0Dexb6VgiSkfLWKBp/og1cvJCmqD7XGlYy20dmF9b7zvQyAYqwzNRrhJ8oh
-         Q3Ew==
-X-Gm-Message-State: AOAM531Zmj4WwGZStGURdl0hy7DKYxUjvzC+Tdc455lgUXCHlt5AYpmY
-        9nYXtDX8Oh6iEVTieoLWv3wtxA==
-X-Google-Smtp-Source: ABdhPJwXjScvzlrmXXZn4qPmhKJVfITTp8bWYIkO4RwYLE5hfnD11dFed5b6MnSqdgiSUbCh0Lr2Pg==
-X-Received: by 2002:a63:f34e:: with SMTP id t14mr3645452pgj.622.1644444435507;
-        Wed, 09 Feb 2022 14:07:15 -0800 (PST)
+         :mime-version:content-disposition:in-reply-to;
+        bh=Fx5b1qQwMlFVs21l/OX+krSp/uyB0q/jyfgtOYhq7dE=;
+        b=BmCP9T4xTMHyBChNvxCj8Bhbm1LPNoS572ozdwsJiEi/gT8Yo5BMM7WAWdoP2izlCj
+         lK+VATR6e3avX0DxWGHg046XOCWsjh2kvVbXPXcYJgH4wWt9XBTr08ss9HVcKJ6qeOIc
+         WcWIwMEGuhAqY+t3rbN6ox1tBzrHBc0RYRqHwq/WchgR2CB+BuRnFRIU2nXlGzaTfCRQ
+         eaQ9r6E0TeKngNwTOcXiG8Uer45jAX2MvPHZZDWhunrFT8FtM0qRw5ez1e5E8DX18YRC
+         YI+uducs5Vy1ZaxP0txO3ONKedtN68/EosN/VSWJASDpJ0zbviPsivPrutKesAL1wOkV
+         xyTA==
+X-Gm-Message-State: AOAM5334vGmP2krc/owcikhwgT3AslfQgCH1noxZEv8x+l969blBKKCm
+        s2b8a6yx0kpNmtbgJNE2m5Jcgg==
+X-Google-Smtp-Source: ABdhPJyVWs179jhP3AmLib7RzOT6sQbU88hEXWZ2jFNwsTrIFheQfrVrkfxWLnT5HErIbA2UNXcT0Q==
+X-Received: by 2002:a17:902:8204:: with SMTP id x4mr4334931pln.18.1644444811938;
+        Wed, 09 Feb 2022 14:13:31 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j3sm15288799pgs.0.2022.02.09.14.07.14
+        by smtp.gmail.com with ESMTPSA id h25sm19265617pfn.208.2022.02.09.14.13.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 14:07:14 -0800 (PST)
-Date:   Wed, 9 Feb 2022 22:07:11 +0000
+        Wed, 09 Feb 2022 14:13:31 -0800 (PST)
+Date:   Wed, 9 Feb 2022 22:13:27 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] x86/emulator: Add some tests for
- lret instruction emulation
-Message-ID: <YgQ7D7AQrILRqWnt@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] x86/emulator: Add some tests for
+ ljmp instruction emulation
+Message-ID: <YgQ8hx8PZFkI+U5J@google.com>
 References: <cover.1644311445.git.houwenlong.hwl@antgroup.com>
- <006c75f53539958c1e5d5a0a5073566a5395414e.1644311445.git.houwenlong.hwl@antgroup.com>
+ <4d8a505095cc6106371462db2513fbbe000d8b4d.1644311445.git.houwenlong.hwl@antgroup.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <006c75f53539958c1e5d5a0a5073566a5395414e.1644311445.git.houwenlong.hwl@antgroup.com>
+In-Reply-To: <4d8a505095cc6106371462db2513fbbe000d8b4d.1644311445.git.houwenlong.hwl@antgroup.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,379 +71,165 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nit, "far ret" instead of "lret" in the shortlog.
-
 On Tue, Feb 08, 2022, Hou Wenlong wrote:
 > Per Intel's SDM on the "Instruction Set Reference", when
-> loading segment descriptor for far return, not-present segment
+> loading segment descriptor for ljmp, not-present segment
 > check should be after all type and privilege checks. However,
 > __load_segment_descriptor() in x86's emulator does not-present
 > segment check first, so it would trigger #NP instead of #GP
 > if type or privilege checks fail and the segment is not present.
 > 
-> And if RPL < CPL, it should trigger #GP, but the check is missing
-> in emulator.
-> 
-> So add some tests for lret instruction, and it will test
+> So add some tests for ljmp instruction, and it will test
 > those tests in hardware and emulator. Enable
 > kvm.force_emulation_prefix when try to test them in emulator.
-> 
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> ---
 
-Was this tested?  There are multiple compilation errors with gcc...
+Many of the same comments from patch 01 apply here.  A few more below.
 
-x86/emulator.c: In function ‘test_far_xfer’:
-x86/emulator.c:1034:10: error: format not a string literal and no format arguments [-Werror=format-security]
- 1034 |          far_xfer_error_code == t->error_code, t->msg);
-      |          ^~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [<builtin>: x86/emulator.o] Error 1
-
-x86/emulator.c: Assembler messages:
-x86/emulator.c:81: Error: incorrect register `%si' used with `q' suffix
-x86/emulator.c:83: Error: incorrect register `%si' used with `q' suffix
-make: *** [<builtin>: x86/emulator.o] Error 1
-
-> +static struct far_xfer_test_case far_ret_testcases[] = {
-> +	{0, DS_TYPE, 0, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "lret desc.type!=code && desc.p=0"},
-> +	{0, NON_CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "lret non-conforming && dpl!=rpl && desc.p=0"},
-> +	{0, CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "lret conforming && dpl>rpl && desc.p=0"},
-> +	{0, NON_CONFORM_CS_TYPE, 0, 0, false, NP_VECTOR, FIRST_SPARE_SEL, "lret desc.p=0"},
-> +	{0, NON_CONFORM_CS_TYPE, 3, 1, true, GP_VECTOR, FIRST_SPARE_SEL, "lret rpl<cpl"},
-
-Since the framework is responsible for specifying the selector and the expected
-error code is the same for all subtests that expect an exception, just drop the
-error code.  E.g. if the framework decides to use a different selector than these
-would need to be updated too, for no real benefit.
-
-It'd also be helpful to align everything.
-
-s/lret/far ret.  Actually to cut down on copy+paste, and because we need formatting
-anyways (see below), how moving the instruction name into the far_xfer_test?
-
-> +};
-> +
-> +static struct far_xfer_test far_ret_test = {
-> +	.insn = FAR_XFER_RET,
-> +	.testcases = &far_ret_testcases[0],
-> +	.nr_testcases = sizeof(far_ret_testcases) / sizeof(struct far_xfer_test_case),
-> +};
-> +
-> +#define TEST_FAR_RET_ASM(seg, prefix)		\
-> +	asm volatile("lea 1f(%%rip), %%rax\n\t" \
-> +		     "pushq %[asm_seg]\n\t"	\
-> +		     "pushq $2f\n\t"		\
-> +		      prefix "lretq\n\t"	\
-> +		     "1: addq $16, %%rsp\n\t"	\
-> +		     "2:"			\
-> +		     : : [asm_seg]"r"(seg)	\
-
-Because @seg is a u16, gcc emites "pushq SI".  Kinda dumb, but...
-
-@@ -72,7 +71,7 @@ static struct far_xfer_test far_ret_test = {
-                      prefix "lretq\n\t"        \
-                     "1: addq $16, %%rsp\n\t"   \
-                     "2:"                       \
--                    : : [asm_seg]"r"(seg)      \
-+                    : : [asm_seg]"r"((u64)seg) \
-                     : "eax", "memory");
-
-> +		     : "eax", "memory");
-> +
-> +static inline void test_far_ret_asm(uint16_t seg, bool force_emulation)
-> +{
-> +	if (force_emulation) {
-
-No need for braces.  Ah, the macro is missing ({ ... }) to force it to be evaluated
-as a single statement.  It should be.
-
-Side topic, a ternary operator would be nice, but I don't know how to force string
-concatentation for this case...
-
-#define TEST_FAR_RET_ASM(seg, prefix)		\
-({						\
-	asm volatile("lea 1f(%%rip), %%rax\n\t" \
-		     "pushq %[asm_seg]\n\t"	\
-		     "pushq $2f\n\t"		\
-		      prefix "lretq\n\t"	\
-		     "1: addq $16, %%rsp\n\t"	\
-		     "2:"			\
-		     : : [asm_seg]"r"((u64)seg)	\
-		     : "eax", "memory");	\
-})
-
-> +		TEST_FAR_RET_ASM(seg, KVM_FEP);
-> +	} else {
-> +		TEST_FAR_RET_ASM(seg, "");
-> +	}
-> +}
-
-This only has a single caller, just open code the macros in the case statements
-of __test_far_xfer().  (My apologies if I suggested this in the last version).
-
->  struct regs {
->  	u64 rax, rbx, rcx, rdx;
-> @@ -891,6 +951,74 @@ static void test_mov_dr(uint64_t *mem)
->  	report(rax == dr6_fixed_1, "mov_dr6");
+> @@ -1007,6 +1034,27 @@ static void test_far_xfer(bool force_emulation, struct far_xfer_test *test)
+>  	handle_exception(NP_VECTOR, 0);
 >  }
 >  
-> +static void far_xfer_exception_handler(struct ex_regs *regs)
-> +{
-> +	far_xfer_vector = regs->vector;
-> +	far_xfer_error_code = regs->error_code;
-> +	regs->rip = regs->rax;;
+> +static void test_ljmp(uint64_t *mem)
 
-Double semi-colon.
-
-> +}
-> +
-> +static void __test_far_xfer(enum far_xfer_insn insn, uint16_t seg,
-> +			    bool force_emulation)
-> +{
-> +	switch (insn) {
-> +	case FAR_XFER_RET:
-> +		test_far_ret_asm(seg, force_emulation);
-> +		break;
-> +	default:
-> +		report_fail("unknown instructions");
-
-It's worth spitting out the insn, it might save someone a few seconds/minutes, e.g.
-
-		report_fail("Unexpected insn enum = %d\n", insn);
-
-> +		break;
-> +	}
-> +}
-> +
-> +static void test_far_xfer(bool force_emulation, struct far_xfer_test *test)
-> +{
-> +	struct far_xfer_test_case *t;
-> +	uint16_t seg;
-> +	bool ign;
-> +	int i;
-> +
-> +	handle_exception(GP_VECTOR, far_xfer_exception_handler);
-> +	handle_exception(NP_VECTOR, far_xfer_exception_handler);
-> +
-> +	for (i = 0; i < test->nr_testcases; i++) {
-> +		t = &test->testcases[i];
-> +
-> +		seg = FIRST_SPARE_SEL | t->rpl;
-> +		gdt[seg / 8] = gdt[(t->usermode ? USER_CS64 : KERNEL_CS) / 8];
-> +		gdt[seg / 8].type = t->type;
-> +		gdt[seg / 8].dpl = t->dpl;
-> +		gdt[seg / 8].p = t->p;
-> +
-> +		far_xfer_vector = -1;
-> +		far_xfer_error_code = -1;
-> +
-> +		if (t->usermode)
-> +			run_in_user((usermode_func)__test_far_xfer, UD_VECTOR,
-> +				    test->insn, seg, force_emulation, 0, &ign);
-> +		else
-> +			__test_far_xfer(test->insn, seg, force_emulation);
-> +
-> +		report(far_xfer_vector == t->vector &&
-> +		       far_xfer_error_code == t->error_code, t->msg);
-
-To avoid having to specify the error code, just do:
-
-		       (far_xfer_vector < 0 || far_xfer_error_code == FIRST_SPARE_SEL),
-
-far_xfer_vector and t->vector need to be signed ints, but that's perfectly ok,
-vector fits in a u8.  Printing out the expecte vs. actual is also helpful for
-debug (pet peeve of mine in KUT...).  I doesn't have to be super fancy formatting,
-just enough so that the user doesn't have to modify the test to figure out what
-went wrong.
-
-And with the insn_name + msg + target (see below) formatting:
-
-
-		report(far_xfer_vector == t->vector &&
-		       (far_xfer_vector < 0 || far_xfer_error_code == FIRST_SPARE_SEL),
-		       "%s on %s, %s: wanted %d (%d), got %d (%d)",
-		       test->insn_name, force_emulation ? "emuator" : "hardware", t->msg,
-		       t->vector, t->vector < 0 ? -1 : FIRST_SPARE_SEL,
-		       far_xfer_vector, far_xfer_error_code);
-
-> +	}
-> +
-> +	handle_exception(GP_VECTOR, 0);
-> +	handle_exception(NP_VECTOR, 0);
-> +}
-> +
-> +static void test_lret(uint64_t *mem)
-
-test_far_ret()
+test_far_jmp(), the existing code is wrong ;-)
 
 > +{
-> +	printf("test lret in hw\n");
+> +	unsigned char *m = (unsigned char *)mem;
+> +	volatile int res = 1;
+> +
+> +	*(unsigned long**)m = &&jmpf;
+> +	asm volatile ("data16 mov %%cs, %0":"=m"(*(m + sizeof(unsigned long))));
+> +	asm volatile ("rex64 ljmp *%0"::"m"(*m));
+> +	res = 0;
+> +jmpf:
+> +	report(res, "ljmp");
 
-Rather than print this out before, just spit out the "target" in the report.
+It'd be helfup to explain what this is doing (took me a while to decipher...), e.g.
 
-> +	test_far_xfer(false, &far_ret_test);
-> +}
+	report(res, "far jmp, via emulated MMIO");
 
-All of the above (I think) feeback:
+And as a delta patch...
 
 ---
- x86/emulator.c | 57 +++++++++++++++++++++++++-------------------------
- 1 file changed, 28 insertions(+), 29 deletions(-)
+ x86/emulator.c | 55 ++++++++++++++++++++++++--------------------------
+ 1 file changed, 26 insertions(+), 29 deletions(-)
 
 diff --git a/x86/emulator.c b/x86/emulator.c
-index 2a35caf..d28e36c 100644
+index 4e7c6d1..110d10d 100644
 --- a/x86/emulator.c
 +++ b/x86/emulator.c
-@@ -21,7 +21,7 @@ static int exceptions;
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
- #define KVM_FEP_LENGTH 5
- static int fep_available = 1;
--static unsigned int far_xfer_vector = -1;
-+static int far_xfer_vector = -1;
- static unsigned int far_xfer_error_code = -1;
-
- struct far_xfer_test_case {
-@@ -30,8 +30,7 @@ struct far_xfer_test_case {
- 	uint16_t dpl;
- 	uint16_t p;
- 	bool usermode;
--	unsigned int vector;
--	unsigned int error_code;
-+	int vector;
- 	const char *msg;
+@@ -66,16 +66,17 @@ static struct far_xfer_test far_ret_test = {
  };
 
-@@ -41,6 +40,7 @@ enum far_xfer_insn {
-
- struct far_xfer_test {
- 	enum far_xfer_insn insn;
-+	const char *insn_name;
- 	struct far_xfer_test_case *testcases;
- 	unsigned int nr_testcases;
- };
-@@ -50,37 +50,31 @@ struct far_xfer_test {
- #define DS_TYPE			0x3
-
- static struct far_xfer_test_case far_ret_testcases[] = {
--	{0, DS_TYPE, 0, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "lret desc.type!=code && desc.p=0"},
--	{0, NON_CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "lret non-conforming && dpl!=rpl && desc.p=0"},
--	{0, CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "lret conforming && dpl>rpl && desc.p=0"},
--	{0, NON_CONFORM_CS_TYPE, 0, 0, false, NP_VECTOR, FIRST_SPARE_SEL, "lret desc.p=0"},
--	{0, NON_CONFORM_CS_TYPE, 3, 1, true, GP_VECTOR, FIRST_SPARE_SEL, "lret rpl<cpl"},
+ static struct far_xfer_test_case far_jmp_testcases[] = {
+-	{0, DS_TYPE, 0, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "ljmp desc.type!=code && desc.p=0"},
+-	{0, NON_CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "jmp non-conforming && dpl!=cpl && desc.p=0"},
+-	{3, NON_CONFORM_CS_TYPE, 0, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "ljmp conforming && rpl>cpl && desc.p=0"},
+-	{0, CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, FIRST_SPARE_SEL, "ljmp conforming && dpl>cpl && desc.p=0"},
+-	{0, NON_CONFORM_CS_TYPE, 0, 0, false, NP_VECTOR, FIRST_SPARE_SEL, "ljmp desc.p=0"},
+-	{3, CONFORM_CS_TYPE, 0, 1, true, -1, -1, "ljmp dpl<cpl"},
 +	{0, DS_TYPE,		 0, 0, false, GP_VECTOR, "desc.type!=code && desc.p=0"},
-+	{0, NON_CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, "non-conforming && dpl!=rpl && desc.p=0"},
-+	{0, CONFORM_CS_TYPE,     3, 0, false, GP_VECTOR, "conforming && dpl>rpl && desc.p=0"},
++	{0, NON_CONFORM_CS_TYPE, 3, 0, false, GP_VECTOR, "non-conforming && dpl!=cpl && desc.p=0"},
++	{3, NON_CONFORM_CS_TYPE, 0, 0, false, GP_VECTOR, "conforming && rpl>cpl && desc.p=0"},
++	{0, CONFORM_CS_TYPE,	 3, 0, false, GP_VECTOR, "conforming && dpl>cpl && desc.p=0"},
 +	{0, NON_CONFORM_CS_TYPE, 0, 0, false, NP_VECTOR, "desc.p=0"},
-+	{0, NON_CONFORM_CS_TYPE, 3, 1, true,  GP_VECTOR, "rpl<cpl"},
++	{3, CONFORM_CS_TYPE,	 0, 1, true, -1,	 "dpl<cpl"},
  };
 
- static struct far_xfer_test far_ret_test = {
- 	.insn = FAR_XFER_RET,
-+	.insn_name = "far ret",
- 	.testcases = &far_ret_testcases[0],
- 	.nr_testcases = sizeof(far_ret_testcases) / sizeof(struct far_xfer_test_case),
+ static struct far_xfer_test far_jmp_test = {
+ 	.insn = FAR_XFER_JMP,
++	.insn_name = "far jmp",
+ 	.testcases = &far_jmp_testcases[0],
+ 	.nr_testcases = sizeof(far_jmp_testcases) / sizeof(struct far_xfer_test_case),
  };
+@@ -95,23 +96,16 @@ static unsigned long *fep_jmp_buf_ptr = &fep_jmp_buf[0];
+ 		     : "eax", "memory");	\
+ })
 
- #define TEST_FAR_RET_ASM(seg, prefix)		\
-+({						\
- 	asm volatile("lea 1f(%%rip), %%rax\n\t" \
- 		     "pushq %[asm_seg]\n\t"	\
- 		     "pushq $2f\n\t"		\
- 		      prefix "lretq\n\t"	\
- 		     "1: addq $16, %%rsp\n\t"	\
- 		     "2:"			\
--		     : : [asm_seg]"r"(seg)	\
+-#define TEST_FAR_JMP_ASM(seg, prefix)		\
+-	*(uint16_t *)(&fep_jmp_buf[1]) = seg;	\
+-	asm volatile("lea 1f(%%rip), %%rax\n\t" \
+-		     "movq $1f, (%[mem])\n\t"	\
+-		      prefix "rex64 ljmp *(%[mem])\n\t"\
+-		     "1:"			\
+-		     : : [mem]"r"(fep_jmp_buf_ptr)\
 -		     : "eax", "memory");
 -
--static inline void test_far_ret_asm(uint16_t seg, bool force_emulation)
+-static inline void test_far_jmp_asm(uint16_t seg, bool force_emulation)
 -{
 -	if (force_emulation) {
--		TEST_FAR_RET_ASM(seg, KVM_FEP);
+-		TEST_FAR_JMP_ASM(seg, KVM_FEP);
 -	} else {
--		TEST_FAR_RET_ASM(seg, "");
+-		TEST_FAR_JMP_ASM(seg, "");
 -	}
 -}
-+		     : : [asm_seg]"r"((u64)seg)	\
-+		     : "eax", "memory");	\
++#define TEST_FAR_JMP_ASM(seg, prefix)			\
++({							\
++	*(uint16_t *)(&fep_jmp_buf[1]) = seg;		\
++	asm volatile("lea 1f(%%rip), %%rax\n\t"		\
++		     "movq $1f, (%[mem])\n\t"		\
++		      prefix "rex64 ljmp *(%[mem])\n\t"	\
++		     "1:"				\
++		     : : [mem]"r"(fep_jmp_buf_ptr)	\
++		     : "eax", "memory");		\
 +})
 
  struct regs {
  	u64 rax, rbx, rcx, rdx;
-@@ -959,7 +953,7 @@ static void far_xfer_exception_handler(struct ex_regs *regs)
- {
- 	far_xfer_vector = regs->vector;
- 	far_xfer_error_code = regs->error_code;
--	regs->rip = regs->rax;;
-+	regs->rip = regs->rax;
- }
-
- static void __test_far_xfer(enum far_xfer_insn insn, uint16_t seg,
-@@ -967,10 +961,13 @@ static void __test_far_xfer(enum far_xfer_insn insn, uint16_t seg,
- {
- 	switch (insn) {
- 	case FAR_XFER_RET:
--		test_far_ret_asm(seg, force_emulation);
+@@ -991,7 +985,10 @@ static void __test_far_xfer(enum far_xfer_insn insn, uint16_t seg,
+ 			TEST_FAR_RET_ASM(seg, "");
+ 		break;
+ 	case FAR_XFER_JMP:
+-		test_far_jmp_asm(seg, force_emulation);
 +		if (force_emulation)
-+			TEST_FAR_RET_ASM(seg, KVM_FEP);
++			TEST_FAR_JMP_ASM(seg, KVM_FEP);
 +		else
-+			TEST_FAR_RET_ASM(seg, "");
++			TEST_FAR_JMP_ASM(seg, "");
  		break;
  	default:
--		report_fail("unknown instructions");
-+		report_fail("Unexpected insn enum = %d\n", insn);
- 		break;
- 	}
- }
-@@ -1004,22 +1001,24 @@ static void test_far_xfer(bool force_emulation, struct far_xfer_test *test)
- 			__test_far_xfer(test->insn, seg, force_emulation);
-
- 		report(far_xfer_vector == t->vector &&
--		       far_xfer_error_code == t->error_code, "%s", t->msg);
-+		       (far_xfer_vector < 0 || far_xfer_error_code == FIRST_SPARE_SEL),
-+		       "%s on %s, %s: wanted %d (%d), got %d (%d)",
-+		       test->insn_name, force_emulation ? "emuator" : "hardware", t->msg,
-+		       t->vector, t->vector < 0 ? -1 : FIRST_SPARE_SEL,
-+		       far_xfer_vector, far_xfer_error_code);
- 	}
-
- 	handle_exception(GP_VECTOR, 0);
+ 		report_fail("Unexpected insn enum = %d\n", insn);
+@@ -1039,7 +1036,7 @@ static void test_far_xfer(bool force_emulation, struct far_xfer_test *test)
  	handle_exception(NP_VECTOR, 0);
  }
 
--static void test_lret(uint64_t *mem)
-+static void test_far_ret(uint64_t *mem)
+-static void test_ljmp(uint64_t *mem)
++static void test_far_jmp(uint64_t *mem)
  {
--	printf("test lret in hw\n");
- 	test_far_xfer(false, &far_ret_test);
+ 	unsigned char *m = (unsigned char *)mem;
+ 	volatile int res = 1;
+@@ -1049,12 +1046,12 @@ static void test_ljmp(uint64_t *mem)
+ 	asm volatile ("rex64 ljmp *%0"::"m"(*m));
+ 	res = 0;
+ jmpf:
+-	report(res, "far jmp, self-modifying code");
++	report(res, "far jmp, via emulated MMIO");
+
+ 	test_far_xfer(false, &far_jmp_test);
  }
 
--static void test_em_lret(uint64_t *mem)
-+static void test_em_far_ret(uint64_t *mem)
+-static void test_em_ljmp(uint64_t *mem)
++static void test_em_far_jmp(uint64_t *mem)
  {
--	printf("test lret in emulator\n");
- 	test_far_xfer(true, &far_ret_test);
+ 	test_far_xfer(true, &far_jmp_test);
  }
+@@ -1341,7 +1338,7 @@ int main(void)
 
-@@ -1297,7 +1296,7 @@ int main(void)
  	test_smsw(mem);
  	test_lmsw();
- 	test_ljmp(mem);
--	test_lret(mem);
-+	test_far_ret(mem);
+-	test_ljmp(mem);
++	test_far_jmp(mem);
+ 	test_far_ret(mem);
  	test_stringio();
  	test_incdecnotneg(mem);
- 	test_btc(mem);
-@@ -1322,7 +1321,7 @@ int main(void)
+@@ -1367,7 +1364,7 @@ int main(void)
  		test_smsw_reg(mem);
  		test_nop(mem);
  		test_mov_dr(mem);
--		test_em_lret(mem);
-+		test_em_far_ret(mem);
+-		test_em_ljmp(mem);
++		test_em_far_jmp(mem);
+ 		test_em_far_ret(mem);
  	} else {
  		report_skip("skipping register-only tests, "
- 			    "use kvm.force_emulation_prefix=1 to enable");
 
-base-commit: b56a1a58abfcc6abc16e782f13505f4495cf59e8
+base-commit: 57a0e341f906f09df1ce45ef7bf080e9737eeff2
 --
-
