@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 513BD4AF70D
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 17:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2F1E4AF713
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 17:45:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234828AbiBIQnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 11:43:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50928 "EHLO
+        id S236897AbiBIQo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 11:44:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231266AbiBIQnc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 11:43:32 -0500
+        with ESMTP id S231266AbiBIQoY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 11:44:24 -0500
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845E0C0613C9
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 08:43:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1691DC0613C9
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 08:44:27 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 157A121107;
-        Wed,  9 Feb 2022 16:43:34 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id C6EA5210F1;
+        Wed,  9 Feb 2022 16:44:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1644425014; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1644425065; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=WOJuf80urs5no18O+t0VxCeay6qVLC3ryVSG8Z8C/NA=;
-        b=VUkeQR0kq+lnBkAurXvs/VG7eB5Vvl160SkPW4VGr5ZQmeVZdOgiMlmDtqBIGfVNNj+/6Y
-        9WZq6TTQKYtqO5E2DYoLOSs/kd2jFYOSjY5Rk27yxv8lBLVocHepkqMdWbJMD9GIXaerC0
-        tWGYUgbxyvSs09NsNgm17fIX/to/Mcc=
+        bh=Wl+ynmVaQqcJIepUYCaFgBRs/67ZT/1qhPhhMxhNo9o=;
+        b=stZ/H+400CN8CMVPWfGnVZXnkpxzpoK84Y77wMhRekW1uzjKU54pX2pMcteaPalLGnww0D
+        5cj2Hv26GqdNc869YObaWZAXxYN3IHp3G3ymbcQckvLeHhGfAFE7kFNlEy1DHGycnQmM1S
+        7wMXbE40PFbPO3BmvHnpcd2agTT33EI=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7D47113D4F;
-        Wed,  9 Feb 2022 16:43:33 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 40ED513D4F;
+        Wed,  9 Feb 2022 16:44:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id nCvNGzXvA2J0NgAAMHmgww
-        (envelope-from <varad.gautam@suse.com>); Wed, 09 Feb 2022 16:43:33 +0000
+        id xAfMDWnvA2LfNgAAMHmgww
+        (envelope-from <varad.gautam@suse.com>); Wed, 09 Feb 2022 16:44:25 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, zxwang42@gmail.com, erdemaktas@google.com,
         rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
         Thomas.Lendacky@amd.com, jroedel@suse.de, bp@suse.de,
         varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH v2] x86/efi: Allow specifying AMD SEV/SEV-ES guest launch policy to run
-Date:   Wed,  9 Feb 2022 17:42:54 +0100
-Message-Id: <20220209164254.8664-1-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v2 00/10] Add #VC exception handling for AMD SEV-ES
+Date:   Wed,  9 Feb 2022 17:44:10 +0100
+Message-Id: <20220209164420.8894-1-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -59,91 +59,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make x86/efi/run check for AMDSEV envvar and set corresponding
-SEV/SEV-ES parameters on the qemu cmdline, to make it convenient
-to launch SEV/SEV-ES tests.
+For AMD SEV-ES, kvm-unit-tests currently rely on UEFI to set up a
+#VC exception handler. This leads to the following problems:
 
-Since the C-bit position depends on the runtime host, fetch it
-via cpuid before guest launch.
+1) The test's page table needs to map the firmware and the shared
+   GHCB used by the firmware.
+2) The firmware needs to keep its #VC handler in the current IDT
+   so that kvm-unit-tests can copy the #VC entry into its own IDT.
+3) The firmware #VC handler might use state which is not available
+   anymore after ExitBootServices.
+4) After ExitBootServices, the firmware needs to get the GHCB address
+   from the GHCB MSR if it needs to use the kvm-unit-test GHCB. This
+   requires keeping an identity mapping, and the GHCB address must be
+   in the MSR at all times where a #VC could happen.
 
-AMDSEV can be set to `sev` or `sev-es`.
+Problems 1) and 2) were temporarily mitigated via commits b114aa57ab
+("x86 AMD SEV-ES: Set up GHCB page") and 706ede1833 ("x86 AMD SEV-ES:
+Copy UEFI #VC IDT entry") respectively.
 
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
----
- x86/efi/README.md |  5 +++++
- x86/efi/run       | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+However, to make kvm-unit-tests reliable against 3) and 4), the tests
+must supply their own #VC handler [1][2].
 
-diff --git a/x86/efi/README.md b/x86/efi/README.md
-index a39f509..1222b30 100644
---- a/x86/efi/README.md
-+++ b/x86/efi/README.md
-@@ -30,6 +30,11 @@ the env variable `EFI_UEFI`:
- 
-     EFI_UEFI=/path/to/OVMF.fd ./x86/efi/run ./x86/msr.efi
- 
-+To run the tests under AMD SEV/SEV-ES, set env variable `AMDSEV=sev` or
-+`AMDSEV=sev-es`. This adds the desired guest policy to qemu command line.
-+
-+    AMDSEV=sev-es EFI_UEFI=/path/to/OVMF.fd ./x86/efi/run ./x86/amd_sev.efi
-+
- ## Code structure
- 
- ### Code from GNU-EFI
-diff --git a/x86/efi/run b/x86/efi/run
-index ac368a5..9bf0dc8 100755
---- a/x86/efi/run
-+++ b/x86/efi/run
-@@ -43,6 +43,43 @@ fi
- mkdir -p "$EFI_CASE_DIR"
- cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_BINARY"
- 
-+amdsev_opts=
-+if [ -n "$AMDSEV" ]; then
-+	# Guest policy bits, used to form QEMU command line.
-+	readonly AMDSEV_POLICY_NODBG=$(( 1 << 0 ))
-+	readonly AMDSEV_POLICY_ES=$(( 1 << 2 ))
-+
-+	gcc -x c -o getcbitpos - <<EOF
-+	/* CPUID Fn8000_001F_EBX bits 5:0 */
-+	int get_cbit_pos(void)
-+	{
-+		int ebx;
-+		__asm__("mov \$0x8000001f , %eax\n\t");
-+		__asm__("cpuid\n\t");
-+		__asm__("mov %%ebx, %0\n\t":"=r" (ebx));
-+		return (ebx & 0x3f);
-+	}
-+	int main(void)
-+	{
-+		return get_cbit_pos();
-+	}
-+EOF
-+
-+	cbitpos=$(./getcbitpos ; echo $?) || rm ./getcbitpos
-+	policy=
-+	if [ "$AMDSEV" = "sev" ]; then
-+		policy="$(( $AMDSEV_POLICY_NODBG ))"
-+	elif [ "$AMDSEV" = "sev-es" ]; then
-+		policy="$(( $AMDSEV_POLICY_NODBG | $AMDSEV_POLICY_ES ))"
-+	else
-+		echo "Cannot set AMDSEV policy. AMDSEV must be one of 'sev', 'sev-es'."
-+		exit 2
-+	fi
-+
-+	amdsev_opts="-object sev-guest,id=sev0,cbitpos=${cbitpos},reduced-phys-bits=1,policy=${policy} \
-+		     -machine memory-encryption=sev0"
-+fi
-+
- # Run test case with 256MiB QEMU memory. QEMU default memory size is 128MiB.
- # After UEFI boot up and we call `LibMemoryMap()`, the largest consecutive
- # memory region is ~42MiB. Although this is sufficient for many test cases to
-@@ -61,4 +98,5 @@ cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_BINARY"
- 	-nographic \
- 	-m 256 \
- 	"$@" \
-+	$amdsev_opts \
- 	-smp "$EFI_SMP"
+This series adds #VC exception processing from Linux into kvm-unit-tests,
+and makes it the default way of handling #VC exceptions.
+
+If --amdsev-efi-vc is passed during ./configure, the tests will continue
+using the UEFI #VC handler.
+
+[1] https://lore.kernel.org/all/Yf0GO8EydyQSdZvu@suse.de/
+[2] https://lore.kernel.org/all/YSA%2FsYhGgMU72tn+@google.com/
+
+v2:
+- Drop #VC processing code for RDTSC/RDTSCP and WBINVD (seanjc). KVM does
+  not trap RDTSC/RDTSCP, and the tests do not produce a WBINVD exit to be
+  handled.
+- Clarify the rationale for tests needing their own #VC handler (marcorr).
+
+Varad Gautam (10):
+  x86: AMD SEV-ES: Setup #VC exception handler for AMD SEV-ES
+  x86: Move svm.h to lib/x86/
+  lib: x86: Import insn decoder from Linux
+  x86: AMD SEV-ES: Pull related GHCB definitions and helpers from Linux
+  x86: AMD SEV-ES: Prepare for #VC processing
+  lib/x86: Move xsave helpers to lib/
+  x86: AMD SEV-ES: Handle CPUID #VC
+  x86: AMD SEV-ES: Handle MSR #VC
+  x86: AMD SEV-ES: Handle IOIO #VC
+  x86: AMD SEV-ES: Handle string IO for IOIO #VC
+
+ Makefile                   |    3 +
+ configure                  |   21 +
+ lib/x86/amd_sev.c          |   13 +-
+ lib/x86/amd_sev.h          |  107 +++
+ lib/x86/amd_sev_vc.c       |  468 +++++++++++
+ lib/x86/desc.c             |   15 +
+ lib/x86/desc.h             |    1 +
+ lib/x86/insn/inat-tables.c | 1566 ++++++++++++++++++++++++++++++++++++
+ lib/x86/insn/inat.c        |   86 ++
+ lib/x86/insn/inat.h        |  233 ++++++
+ lib/x86/insn/inat_types.h  |   18 +
+ lib/x86/insn/insn.c        |  778 ++++++++++++++++++
+ lib/x86/insn/insn.h        |  280 +++++++
+ lib/x86/setup.c            |    8 +
+ {x86 => lib/x86}/svm.h     |   37 +
+ lib/x86/xsave.c            |   37 +
+ lib/x86/xsave.h            |   16 +
+ x86/Makefile.common        |    4 +
+ x86/Makefile.x86_64        |    1 +
+ x86/svm.c                  |    2 +-
+ x86/svm_tests.c            |    2 +-
+ x86/xsave.c                |   43 +-
+ 22 files changed, 3687 insertions(+), 52 deletions(-)
+ create mode 100644 lib/x86/amd_sev_vc.c
+ create mode 100644 lib/x86/insn/inat-tables.c
+ create mode 100644 lib/x86/insn/inat.c
+ create mode 100644 lib/x86/insn/inat.h
+ create mode 100644 lib/x86/insn/inat_types.h
+ create mode 100644 lib/x86/insn/insn.c
+ create mode 100644 lib/x86/insn/insn.h
+ rename {x86 => lib/x86}/svm.h (93%)
+ create mode 100644 lib/x86/xsave.c
+ create mode 100644 lib/x86/xsave.h
+
 -- 
-2.34.1
+2.32.0
 
