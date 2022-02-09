@@ -2,259 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE09C4AE96E
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 06:43:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 395B54AEA62
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 07:31:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbiBIFmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 00:42:15 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:44484 "EHLO
+        id S232840AbiBIGbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 01:31:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232692AbiBIFdC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 00:33:02 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B4FC002B5D
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 21:32:57 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id t4-20020a17090a510400b001b8c4a6cd5dso1192832pjh.5
-        for <kvm@vger.kernel.org>; Tue, 08 Feb 2022 21:32:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=D7+YcMiVd9Hc5kLj7x+yGkNfQLVgsxIrCv5I0j/D974=;
-        b=T/1vFjr/klDZo5A5X5ggCsvek2MMTbk5/3/i0aHupQOIkDv86nwidKxw/tbeAw4R19
-         Tf1mQM82xZ4gsc6MAxi7PJemsCUcAWjT5AaDo5pBTyXIcNIhFanNPRxndhMgx3/04N+D
-         DDhg91V0jNUa5K0L4nbzVAGhBAS8G1c7dihUsmbTmbEqTLwf6vO7U7rI4Z5g9tJ1T9CI
-         Dh+fL1WOHq8aiEjwqYDP16LGjrmstu+zW7Uaf1XykxhMXWKDLSbs8gCpQoI/UHtsJrgJ
-         hASFrEqTdoNJBXQXGj0i+uxaW+qCqcT1+vm9ttrv/slQzgYTh0BXNwAVHh/tCk9f+lSc
-         sU5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=D7+YcMiVd9Hc5kLj7x+yGkNfQLVgsxIrCv5I0j/D974=;
-        b=aImNLKVZlc/GSyKLWk7m35VTqqWbjk0wPIeXNe389NkWvUvbNbWstgPVl3ajv7dyph
-         0efvFhvR6xFB1UACpQwk4aJ/0HBpxqXRNFOz6BDGjsLB5KLA+UfA5nhCm9yiuRYcbQP1
-         TgK6EEUK1u/rV+Ja5Ku+Q1T+6erAmbUO7o4YN7A8Dhp5b7RYn2j0C0LaGTrbb+mZF8gn
-         MEIdnRAVg3aPh+g8kabs4s8dnkRVoBzDc92iDlQWDe7TPc+T+mzBKQjWrE/vrVY0bIF1
-         2EGyKl3HDILXouDHl9lRbPZroWhmEiHVmmurGFozofCGf5EM9RGdeG0q16pfrVxUVnDO
-         YM5g==
-X-Gm-Message-State: AOAM533+TWs/UIc7yDGyWNdLCNl2t9t8bNDvf5RIeGI78ISPutFCgYsP
-        p2jbwChJTf98RmhCx9FyIbypUFCvfbEC/iySAqEGJg==
-X-Google-Smtp-Source: ABdhPJznT0fnJAY2aJA3dYTn4irEUJ2fBda+hZqSpZYoIBeH+8guaG7eqjsRvBe9hvrs6mGMqzYzGv9YSYlFZfRrQ9s=
-X-Received: by 2002:a17:902:bc83:: with SMTP id bb3mr573731plb.172.1644384772628;
- Tue, 08 Feb 2022 21:32:52 -0800 (PST)
+        with ESMTP id S235882AbiBIG3R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 01:29:17 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D23E02DFCD;
+        Tue,  8 Feb 2022 22:29:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644388161; x=1675924161;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IbT91/fqiVPksbSJc2NP8Q4PbHBMZvsgMb4CiiQxRiA=;
+  b=DJdHFjWBtGJ/YqwGur1PuMotboSXOX+CNlStHTy6u5LJ/A5+4+wVtMs5
+   ewMrup5CSeewEFRuDz15HjHoo22uTKuvFLmGzR6neh33ghivBB5AeQ4sW
+   odrCoAbYE0EaGDMEg3gfPgL+gNTRvfoSf1Qo7Tcmf9vgYFRjDxvhcgDFh
+   gA7TsO9StQK/ViRLxLdlaoG6TUbrsqedeoW0+e2nMIyKdlp44e+ERFxGl
+   gcht7GE+yu8ohOa7Jz7hFDzTqd2uu2OwRpXXUD1pI+C7rNZATFJi6T1d2
+   zxdh7vrFiy2qHKg0Tw1wSzTGeaPUJOSWGbeNOV0hs3qPzUnBRxy9/cSEs
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="312428037"
+X-IronPort-AV: E=Sophos;i="5.88,354,1635231600"; 
+   d="scan'208";a="312428037"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2022 22:29:14 -0800
+X-IronPort-AV: E=Sophos;i="5.88,354,1635231600"; 
+   d="scan'208";a="540958500"
+Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2022 22:29:12 -0800
+From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+Subject: [PATCH] KVM: x86: Fix emulation in writing cr8
+Date:   Wed,  9 Feb 2022 14:24:28 +0800
+Message-Id: <20220209062428.332295-1-zhenzhong.duan@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220118041923.3384602-1-reijiw@google.com> <87a6f15skj.wl-maz@kernel.org>
-In-Reply-To: <87a6f15skj.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 8 Feb 2022 21:32:36 -0800
-Message-ID: <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped
- for uninitialized vCPUs
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+In emulation of writing to cr8, one of the lowest four bits in TPR[3:0]
+is kept.
 
-On Tue, Feb 8, 2022 at 6:41 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 18 Jan 2022 04:19:22 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > KVM allows userspace to configure either all 32bit or 64bit vCPUs
-> > for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
-> > if the vcpu's register width is consistent with all other vCPUs'.
-> > Since the checking is done even against vCPUs that are not initialized
-> > (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
-> > are erroneously treated as 64bit vCPU, which causes the function to
-> > incorrectly detect a mixed-width VM.
-> >
-> > Introduce a new flag (el1_reg_width) in kvm_arch to indicates that
-> > the guest needs to be configured with all 32bit or 64bit vCPUs,
-> > and initialize it at the first KVM_ARM_VCPU_INIT for the guest.
-> > Check vcpu's register width against the flag at the vcpu's
-> > KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
-> >
-> > Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 13 +++++++++++++
-> >  arch/arm64/kvm/arm.c              | 30 ++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/reset.c            |  8 --------
-> >  3 files changed, 43 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 2a5f7f38006f..c02b7caf2c82 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -102,6 +102,12 @@ struct kvm_s2_mmu {
-> >  struct kvm_arch_memory_slot {
-> >  };
-> >
-> > +enum kvm_el1_reg_width {
-> > +     EL1_WIDTH_UNINITIALIZED = 0,
-> > +     EL1_32BIT,
-> > +     EL1_64BIT,
-> > +};
-> > +
-> >  struct kvm_arch {
-> >       struct kvm_s2_mmu mmu;
-> >
-> > @@ -137,6 +143,13 @@ struct kvm_arch {
-> >
-> >       /* Memory Tagging Extension enabled for the guest */
-> >       bool mte_enabled;
-> > +
-> > +     /*
-> > +      * EL1 register width for the guest.
-> > +      * This is set at the first KVM_ARM_VCPU_INIT for the guest based
-> > +      * on whether the vcpu has KVM_ARM_VCPU_EL1_32BIT or not.
-> > +      */
-> > +     enum kvm_el1_reg_width el1_reg_width;
->
-> I really don't like that we need to keep track of yet another bit of
-> state on top of the existing one. Duplicating state is a source of
-> bugs, because you always end up checking the wrong one at the wrong
-> time (and I have scars to prove it).
->
-> >  };
-> >
-> >  struct kvm_vcpu_fault_info {
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e4727dc771bf..54ae8bf9d187 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1058,6 +1058,32 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
-> >       return -EINVAL;
-> >  }
-> >
-> > +/*
-> > + * A guest can have either all 32bit or 64bit vcpus only.
->
-> That's not strictly true. All we are enforcing is that EL1 is either
-> 32 or 64bit.
+According to Intel SDM 10.8.6.1(baremetal scenario):
+"APIC.TPR[bits 7:4] = CR8[bits 3:0], APIC.TPR[bits 3:0] = 0";
 
-I will fix the comment.
+and SDM 28.3(use TPR shadow):
+"MOV to CR8. The instruction stores bits 3:0 of its source operand into
+bits 7:4 of VTPR; the remainder of VTPR (bits 3:0 and bits 31:8) are
+cleared.";
 
+so in KVM emulated scenario, clear TPR[3:0] to make a consistent behavior
+as in other scenarios.
 
->
-> > + * Either one the guest has is indicated in kvm->arch.el1_reg_width.
-> > + * Check if the vcpu's register width is consistent with
-> > + * kvm->arch.el1_reg_width.  If kvm->arch.el1_reg_width is not set yet,
-> > + * set it based on the vcpu's KVM_ARM_VCPU_EL1_32BIT configuration.
-> > + */
-> > +static int kvm_register_width_check_or_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +     bool is32bit;
-> > +     bool allowed = true;
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +
-> > +     is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +
-> > +     if (kvm->arch.el1_reg_width == EL1_WIDTH_UNINITIALIZED)
-> > +             kvm->arch.el1_reg_width = is32bit ? EL1_32BIT : EL1_64BIT;
-> > +     else
-> > +             allowed = (is32bit == (kvm->arch.el1_reg_width == EL1_32BIT));
-> > +
-> > +     mutex_unlock(&kvm->lock);
-> > +     return allowed ? 0 : -EINVAL;
-> > +}
-> > +
-> >  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >                              const struct kvm_vcpu_init *init)
-> >  {
-> > @@ -1097,6 +1123,10 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >
-> >       /* Now we know what it is, we can reset it. */
-> >       ret = kvm_reset_vcpu(vcpu);
-> > +
-> > +     if (!ret)
-> > +             ret = kvm_register_width_check_or_init(vcpu);
-> > +
-> >       if (ret) {
-> >               vcpu->arch.target = -1;
-> >               bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > index 426bd7fbc3fd..dbf2939a6a96 100644
-> > --- a/arch/arm64/kvm/reset.c
-> > +++ b/arch/arm64/kvm/reset.c
-> > @@ -168,9 +168,7 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
-> >
-> >  static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> >  {
-> > -     struct kvm_vcpu *tmp;
-> >       bool is32bit;
-> > -     int i;
-> >
-> >       is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
-> >       if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
-> > @@ -180,12 +178,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> >       if (kvm_has_mte(vcpu->kvm) && is32bit)
-> >               return false;
-> >
-> > -     /* Check that the vcpus are either all 32bit or all 64bit */
-> > -     kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> > -             if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
-> > -                     return false;
-> > -     }
-> > -
->
-> In [1], I suggested another approach that didn't require extra state,
-> and moved the existing checks under the kvm lock. What was wrong with
-> that approach?
+This doesn't impact evaluation and delivery of pending virtual interrupts
+because processor does not use the processor-priority sub-class to
+determine which interrupts to delivery and which to inhibit.
 
-With that approach, even for a vcpu that has a broken set of features,
-which leads kvm_reset_vcpu() to fail for the vcpu, the vcpu->arch.features
-are checked by other vCPUs' vcpu_allowed_register_width() until the
-vcpu->arch.target is set to -1.
-Due to this, I would think some or possibly all vCPUs' kvm_reset_vcpu()
-may or may not fail (e.g. if userspace tries to configure vCPU#0 with
-32bit EL1, and vCPU#1 and #2 with 64 bit EL1, KVM_ARM_VCPU_INIT
-for either vCPU#0, or both vCPU#1 and #2 should fail.  But, with that
-approach, it doesn't always work that way.  Instead, KVM_ARM_VCPU_INIT
-for all vCPUs could fail or KVM_ARM_VCPU_INIT for vCPU#0 and #1 could
-fail while the one for CPU#2 works).
-Also, even after the first KVM_RUN for vCPUs are already done,
-(the first) KVM_ARM_VCPU_INIT for another vCPU could cause the
-kvm_reset_vcpu() for those vCPUs to fail.
+Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+---
+ arch/x86/kvm/lapic.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-I would think those behaviors are odd, and I wanted to avoid them.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index d7e6fde82d25..306025db9959 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2242,10 +2242,7 @@ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
+ 
+ void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8)
+ {
+-	struct kvm_lapic *apic = vcpu->arch.apic;
+-
+-	apic_set_tpr(apic, ((cr8 & 0x0f) << 4)
+-		     | (kvm_lapic_get_reg(apic, APIC_TASKPRI) & 4));
++	apic_set_tpr(vcpu->arch.apic, (cr8 & 0x0f) << 4);
+ }
+ 
+ u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu)
+-- 
+2.25.1
 
-Thanks,
-Reiji
-
-
-
-
->
-> Thanks,
->
->         M.
->
-> [1] https://lore.kernel.org/r/875yqqtn5q.wl-maz@kernel.org
->
-> --
-> Without deviation from the norm, progress is not possible.
