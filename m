@@ -2,77 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BE6F4AEE12
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 10:37:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F5734AEE49
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 10:41:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236794AbiBIJcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 04:32:45 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35676 "EHLO
+        id S236246AbiBIJlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 04:41:40 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:50136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235057AbiBIJa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 04:30:59 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9ABE0C5BE8;
-        Wed,  9 Feb 2022 01:30:56 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id c5-20020a17090a1d0500b001b904a7046dso3003430pjd.1;
-        Wed, 09 Feb 2022 01:30:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=5JCf3O060kbSSop2cpb2bg0F0aVQnL4uVtK8Kp7eaR4=;
-        b=dmQKEbuyufICCzb0Ducdg3ed34C/sqo8nRJ8SWwTzGmkjieQnq+ZeeT7dPZRpfrcsD
-         T/+0l+4JDXlVvK6CZ2EkXNH8apkToMifh3sessYqh9jjU8zDXNWTNu2TPIoidk5Cgwl7
-         SmFxgujepAQ8eW6uiE+c7PpfXX7dJHmc1xwf7GcaUDV4bwiZbDKa8QBMSA2QNmDZtZd3
-         GQkl0NBeHp6PcLSwKRe5KcLwyVKpERlexruONsb5k2QjjP8fVWvSi02PVy3FSd/+k7JA
-         S4pGtGsak5HOr47b+JIWYsgG81/2T9WtbGBV7mJHpo4U1DjyDHHsXQdvlZaknjIa41Am
-         wSew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=5JCf3O060kbSSop2cpb2bg0F0aVQnL4uVtK8Kp7eaR4=;
-        b=x2OWa5uvUbTkqHzrO4h69pR02pGaWSeSnh2oDQaBsDpoRuwWqGPra6sNrvNEve5Yee
-         JSv64Tn/88QIBeNTLFaDqUPXBaoiIAINYWwp8OtecClBMB7uX/g+bg7lwRXbbNwMRheR
-         OAWVKhWKuukgBLnrpYJIeiaTd5ILIYGcw1JPfj2MHnXnPwcbFvZC+MFWOgnkLgZaxaaR
-         8v8URxQw3jLmnXrkwVzKa4RIfCwXZX4bQB9xaH36S8Olfr8fq3A2GwMWRR1R+WYKyKXQ
-         VpfVxoNbMgSgYLGPdKbeODlc3xpDt6l/+fohWqO+kptG7+0toHvBe2Ib16jRBmauTYHW
-         djlg==
-X-Gm-Message-State: AOAM532r3eAEF8j9EVlk6k/JcOU1QlJ/MoDuklECr4hfpkQAyyGfFqq4
-        OKXsXJbx1jV6pRFknNIGD+g=
-X-Google-Smtp-Source: ABdhPJzTrZWO2VNfOhplT+u4kBtvyPgCVdMGaBIGEABbveTXYSqVS6ytt0fRPBV1gli1C3tuNl66zg==
-X-Received: by 2002:a17:902:b215:: with SMTP id t21mr1255668plr.73.1644399004379;
-        Wed, 09 Feb 2022 01:30:04 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id md9sm5462893pjb.6.2022.02.09.01.30.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Feb 2022 01:30:04 -0800 (PST)
-Message-ID: <43e6dad3-dfdf-ba4a-cd95-99eca2538384@gmail.com>
-Date:   Wed, 9 Feb 2022 17:29:55 +0800
+        with ESMTP id S240356AbiBIJec (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 04:34:32 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3D1E05BA6F;
+        Wed,  9 Feb 2022 01:34:31 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2198vqhf012063;
+        Wed, 9 Feb 2022 09:34:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HH9xhkFjQ1nugdMdCXQbfnAWk9nKi8h0ee0AeB6zGyA=;
+ b=QquuRP7lHwiEdtO5XBL769aWD+oG3iEJ3M9EImyATu/lxpWyVVYe3fQdrQq1EfJs5ElI
+ nEne5DAjdDjtFOdkQypeL6OCDKJ2h7FAPc2qMRK6c4lPBHTilbb1iw6m6gmMcWTtAzfs
+ hn/c0ocUY1UPqJD6xi5RrtpMtxrySqCBWvgdqg4pkI5Hgq83C2Qu79MXQvXCkOLAsZQV
+ lsFTTgn86750Zr68MbnZ1/oZxnzvEBCYnbdi6PhXpUm3L+iZWk+LbUDvwfhWBJ2vhc5T
+ l0NiS4XmaRK4S3jVPMpum+74YYBlWmI6p9qJBWMJrPBZ+pIvP22LfOvCO9cr8NqB42Rt DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e4ajk8nj3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Feb 2022 09:34:30 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2199QDBs024667;
+        Wed, 9 Feb 2022 09:34:29 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e4ajk8nhk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Feb 2022 09:34:29 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2199H0Z1025227;
+        Wed, 9 Feb 2022 09:34:27 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3e1gv9kqjg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Feb 2022 09:34:26 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2199YLcu44237234
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Feb 2022 09:34:21 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 01E5AA4053;
+        Wed,  9 Feb 2022 09:34:21 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E05EA4051;
+        Wed,  9 Feb 2022 09:34:20 +0000 (GMT)
+Received: from [9.171.87.52] (unknown [9.171.87.52])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Feb 2022 09:34:19 +0000 (GMT)
+Message-ID: <29ac0e5c-f77b-04b2-bbf5-cf5a5ca78921@linux.ibm.com>
+Date:   Wed, 9 Feb 2022 10:34:19 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: x86/cpuid: Stop exposing unknown AMX Tile Palettes
- and accelerator units
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 05/11] KVM: s390: Add optional storage key checking to
+ MEMOP IOCTL
 Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220117065957.65335-1-likexu@tencent.com>
-Organization: Tencent
-In-Reply-To: <20220117065957.65335-1-likexu@tencent.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20220207165930.1608621-1-scgl@linux.ibm.com>
+ <20220207165930.1608621-6-scgl@linux.ibm.com>
+ <48d1678f-746c-dab6-5ec3-56397277f752@linux.ibm.com>
+ <71f07914-d0b2-e98b-22b2-bc05f04df2da@linux.ibm.com>
+ <6ea27647-fbbe-3962-03a0-8ca5340fc7fd@linux.ibm.com>
+In-Reply-To: <6ea27647-fbbe-3962-03a0-8ca5340fc7fd@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JGM9Zf2mFAzgHbvz4-cjin-y2c5Ym3v7
+X-Proofpoint-GUID: k8icOF-FvUBNOatk0Xme2-sWOtUNd3uB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-09_05,2022-02-09_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
+ priorityscore=1501 phishscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
+ malwarescore=0 lowpriorityscore=0 spamscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202090062
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,74 +107,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+CC Konstantin,
 
-KVM does not have much filtering in exposing the host cpuid (at least for Intel 
-PT and AMX),
-and innocent user spaces could be corrupted when unknown new bits are 
-accidentally exposed.
+I hope you can find the right people. Looks that my (and Janis) emaildid not make it to linux-s390 and kvm at vger lists.
+Message-ID: <6ea27647-fbbe-3962-03a0-8ca5340fc7fd@linux.ibm.com>
 
-Comments on code changes in this direction are welcome.
 
-+ https://lore.kernel.org/kvm/20220112041100.26769-1-likexu@tencent.com/
-
-On 17/1/2022 2:59 pm, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+Am 09.02.22 um 10:08 schrieb Christian Borntraeger:
 > 
-> Guest enablement of Intel AMX requires a good co-work from both host and
-> KVM, which means that KVM should take a more safer approach to avoid
-> the accidental inclusion of new unknown AMX features, even though it's
-> designed to be an extensible architecture.
 > 
-> Per current spec, Intel CPUID Leaf 1EH sub-leaf 1 and above are reserved,
-> other bits in leaves 0x1d and 0x1e marked as "Reserved=0" shall be strictly
-> limited by definition for reporeted KVM_GET_SUPPORTED_CPUID.
+> Am 09.02.22 um 09:49 schrieb Janis Schoetterl-Glausch:
+>> On 2/9/22 08:34, Christian Borntraeger wrote:
+>>> Am 07.02.22 um 17:59 schrieb Janis Schoetterl-Glausch:
+>>>> User space needs a mechanism to perform key checked accesses when
+>>>> emulating instructions.
+>>>>
+>>>> The key can be passed as an additional argument.
+>>>> Having an additional argument is flexible, as user space can
+>>>> pass the guest PSW's key, in order to make an access the same way the
+>>>> CPU would, or pass another key if necessary.
+>>>>
+>>>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>>>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>>> ---
+>>>>    arch/s390/kvm/kvm-s390.c | 49 +++++++++++++++++++++++++++++++---------
+>>>>    include/uapi/linux/kvm.h |  8 +++++--
+>>>>    2 files changed, 44 insertions(+), 13 deletions(-)
+>>>>
+>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>> index cf347e1a4f17..71e61fb3f0d9 100644
+>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>> @@ -32,6 +32,7 @@
+>>>>    #include <linux/sched/signal.h>
+>>>>    #include <linux/string.h>
+>>>>    #include <linux/pgtable.h>
+>>>> +#include <linux/bitfield.h>
+>>>>      #include <asm/asm-offsets.h>
+>>>>    #include <asm/lowcore.h>
+>>>> @@ -2359,6 +2360,11 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>>>>        return r;
+>>>>    }
+>>>>    +static bool access_key_invalid(u8 access_key)
+>>>> +{
+>>>> +    return access_key > 0xf;
+>>>> +}
+>>>> +
+>>>>    long kvm_arch_vm_ioctl(struct file *filp,
+>>>>                   unsigned int ioctl, unsigned long arg)
+>>>>    {
+>>>> @@ -4687,34 +4693,54 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
+>>>>                      struct kvm_s390_mem_op *mop)
+>>>>    {
+>>>>        void __user *uaddr = (void __user *)mop->buf;
+>>>> +    u8 access_key = 0, ar = 0;
+>>>>        void *tmpbuf = NULL;
+>>>> +    bool check_reserved;
+>>>>        int r = 0;
+>>>>        const u64 supported_flags = KVM_S390_MEMOP_F_INJECT_EXCEPTION
+>>>> -                    | KVM_S390_MEMOP_F_CHECK_ONLY;
+>>>> +                    | KVM_S390_MEMOP_F_CHECK_ONLY
+>>>> +                    | KVM_S390_MEMOP_F_SKEY_PROTECTION;
+>>>>    -    if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size)
+>>>> +    if (mop->flags & ~supported_flags || !mop->size)
+>>>>            return -EINVAL;
+>>>> -
+>>>>        if (mop->size > MEM_OP_MAX_SIZE)
+>>>>            return -E2BIG;
+>>>> -
+>>>>        if (kvm_s390_pv_cpu_is_protected(vcpu))
+>>>>            return -EINVAL;
+>>>> -
+>>>>        if (!(mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY)) {
+>>>>            tmpbuf = vmalloc(mop->size);
+>>>>            if (!tmpbuf)
+>>>>                return -ENOMEM;
+>>>>        }
+>>>> +    ar = mop->ar;
+>>>> +    mop->ar = 0;
+>>>
+>>> Why this assignment to 0?
+>>
+>> It's so the check of reserved below works like that, they're all part of the anonymous union.
 > 
-> Fixes: 690a757d610e ("kvm: x86: Add CPUID support for Intel AMX")
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->   arch/x86/kvm/cpuid.c | 12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
+> Ah, I see. This is ugly :-)
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index c55e57b30e81..3fde6610d314 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -661,7 +661,6 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
->   	case 0x17:
->   	case 0x18:
->   	case 0x1d:
-> -	case 0x1e:
->   	case 0x1f:
->   	case 0x8000001d:
->   		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> @@ -936,21 +935,26 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   		break;
->   	/* Intel AMX TILE */
->   	case 0x1d:
-> +		entry->ebx = entry->ecx = entry->edx = 0;
->   		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
-> -			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> +			entry->eax = 0;
->   			break;
->   		}
->   
-> +		entry->eax = min(entry->eax, 1u);
->   		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
->   			if (!do_host_cpuid(array, function, i))
->   				goto out;
->   		}
->   		break;
-> -	case 0x1e: /* TMUL information */
-> +	/* TMUL Information */
-> +	case 0x1e:
-> +		entry->eax = entry->ecx = entry->edx = 0;
->   		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
-> -			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> +			entry->ebx = 0;
->   			break;
->   		}
-> +		entry->ebx &= 0xffffffu;
->   		break;
->   	case KVM_CPUID_SIGNATURE: {
->   		const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
+>>>
+>>>> +    if (ar >= NUM_ACRS)
+>>>> +        return -EINVAL;
+>>>> +    if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
+>>>> +        access_key = mop->key;
+>>>> +        mop->key = 0;
+>>>
+>>> and this? I think we can leave mop unchanged.
+>>>
+>>> In fact, why do we add the ar and access_key variable?
+>>> This breaks the check from above (if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size))  into two checks
+>>> and it will create a memleak for tmpbuf.
+>>
+>> I can move the allocation down, goto out or get rid of the reserved check and keep everything as before.
+>> First is simpler, but second makes handling that case more explicit and might help in the future.
+> 
+> Maybe add a reserved_02 field in the anon struct and check this for being zero and get rid of the local variables?
+> 
+>> Patch 6 has the same issue in the vm ioctl handler.
+>>>
+>>> Simply use mop->key and mop->ar below and get rid of the local variables.
+>>> The structure has no concurrency and gcc will handle that just as the local variable.
+>>>
+>>> Other than that this looks good.
+>>
+>> [...]
+>>
