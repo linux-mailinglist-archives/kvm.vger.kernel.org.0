@@ -2,156 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A6554AF7F0
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:18:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D9134AF87F
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:29:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237442AbiBIRSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 12:18:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49156 "EHLO
+        id S237558AbiBIR3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 12:29:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231834AbiBIRSN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 12:18:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B440C0613C9
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:18:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644427095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ZHqCWeznLA/b2BCdTxSEDLYeb340DyvFnRih4TbEbVY=;
-        b=Q4ftzA7wkwg0nFRguJch4i4HAZ0ogCgns1JQIcnFSBQ+9V07qWAB3qidxEamqKNZESOXhN
-        OsdCyiYpqbVUP0Y40pIhcX8G6U6jcFpjXmop9JfQ9coi1EeRerNQOa0Qwb9589Th3ET0iK
-        E53QoT3HNvkxpToFnPM9mNfC7PdsQVU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-DAbkv6OBMeKGxFwilnpFow-1; Wed, 09 Feb 2022 12:18:14 -0500
-X-MC-Unique: DAbkv6OBMeKGxFwilnpFow-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 495A08143E5
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:18:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 18A937CD66
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:18:13 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] vmexit: add test toggling CR0.WP and CR4.PGE
-Date:   Wed,  9 Feb 2022 12:18:12 -0500
-Message-Id: <20220209171812.1785257-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232618AbiBIR3r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 12:29:47 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC4FC0613C9
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:29:50 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id a15-20020a17090ad80f00b001b8a1e1da50so2246983pjv.6
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 09:29:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=WsnRsbBsDc8gvMsvdV4tgXAMjf21efLQcPTqwxO95E0=;
+        b=D3AnBTU0cPC1us4Wn+1cAVWZeFLR3tj3rMzlI38++5guZFFFOmks8Y1n9loUxtrS3p
+         LQP3jEF5KPS880fGqbCTHCc+33mg96ygHysPBe4rM+nOYUOiso/yoGh/DdxQUNQFHVJH
+         1TepVJWFLxc9nEjuRZXXNPGx/LiKV43JmzLizxa0/oZbchs4HTZXKKT7Z7eSIO2RU62u
+         ZQXF7aZK5TCr9vRMKJ8P9986UsycAgSnfGFgu0AGsXAeaSCiebLjC40dyG+Fn62KB8nC
+         qHPDEpGhbRox1G4+V2vuuk40Qrgw4GOMdS2tirz0fuF5Am1g/A3Qnae0z+faw3iWXTuu
+         4XOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=WsnRsbBsDc8gvMsvdV4tgXAMjf21efLQcPTqwxO95E0=;
+        b=KxULayyG3mfL5e7elejuxnfnl+VKa6W/IhLJ5bHSCwm7fuj2YpK1A+DpOyk7HCikB3
+         poD7Ie4DyTzL4Kbm+AkVl8XigzBKphLQOBL3h948Hnmzhvg3aP7iefw+ask8um1+pcB9
+         Xri9uBXYUNh5oPdXPFBecTGHzZZPwV/aIPt3tg3lJXHs4Mb8pkB3ucyt5n8+DzEYihGn
+         oarBgFlPiMHuflrBbQwoLEww9pNEHFPQIZP0k5B/78XTEOiugAuqEiANLfGIS0HQiT3g
+         WtW+zzIfi3Ne4CNek2urpWmh8bQR01bNc2R+FKoEA5rw3UaDaxYTvtT6A36uNMs556W2
+         ms7w==
+X-Gm-Message-State: AOAM533M5aUtcoQqDWwx2iJnCUcA4kP7xxeXOy5hlTi0lo9JhYNt58J3
+        6xvfAXcBoP+Ye8Ffy6njDibZU86TcijJHr0=
+X-Google-Smtp-Source: ABdhPJyL3BnbpxwhULL+hHNm0LeGSwbknxKZbG2QUUDOKMRaXTAGE4AWup+eEjnRIswYbOHYJfoVNgi5BFuA/aw=
+X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
+ (user=daviddunn job=sendgmr) by 2002:a05:6a00:10c1:: with SMTP id
+ d1mr3401085pfu.84.1644427789571; Wed, 09 Feb 2022 09:29:49 -0800 (PST)
+Date:   Wed,  9 Feb 2022 17:29:42 +0000
+Message-Id: <20220209172945.1495014-1-daviddunn@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
+Subject: [PATCH v6 0/3] KVM: x86: Provide per VM capability for disabling PMU virtualization
+From:   David Dunn <daviddunn@google.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, jmattson@google.com, like.xu.linux@gmail.com,
+        kvm@vger.kernel.org, David Dunn <daviddunn@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CR0.WP changes the MMU permissions but does not cause a TLB flush;
-CR4.PGE is the opposite (at least as far as KVM as concerned).
+This patch set allows usermode to disable PMU virtualization on
+individual x86 VMs.  When disabled, the PMU is not advertised to
+or accessible from the guest.
 
-This makes both of them interesting from a performance perspective,
-so add new vmexit tests.
+v5: https://lore.kernel.org/kvm/20220123184541.993212-1-daviddunn@google.com/
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/access.c      |  3 +++
- x86/unittests.cfg | 12 ++++++++++++
- x86/vmexit.c      | 16 ++++++++++++++++
- 3 files changed, 31 insertions(+)
+v5 -> v6
+ * resolve minor conflicts that were queued after v5 was reviewed
 
-diff --git a/x86/access.c b/x86/access.c
-index 83c8221..21b4d74 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -251,6 +251,9 @@ static void set_cr0_wp(int wp)
- static void clear_user_mask(pt_element_t *ptep, int level, unsigned long virt)
- {
- 	*ptep &= ~PT_USER_MASK;
-+
-+	/* Flush to avoid spurious #PF */
-+	invlpg((void*)virt);
- }
- 
- static void set_user_mask(pt_element_t *ptep, int level, unsigned long virt)
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 62a6692..cef09d2 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -118,6 +118,18 @@ file = vmexit.flat
- groups = vmexit
- extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
- 
-+[vmexit_cr0_wp]
-+file = vmexit.flat
-+smp = 2
-+extra_params = -append 'toggle_cr0_wp'
-+groups = vmexit
-+
-+[vmexit_cr4_pge]
-+file = vmexit.flat
-+smp = 2
-+extra_params = -append 'toggle_cr4_pge'
-+groups = vmexit
-+
- [access]
- file = access_test.flat
- arch = x86_64
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 8cfb36b..4adec78 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -20,6 +20,7 @@ struct test {
- #define GOAL (1ull << 30)
- 
- static int nr_cpus;
-+static u64 cr4_shadow;
- 
- static void cpuid_test(void)
- {
-@@ -459,6 +460,18 @@ static void wr_ibpb_msr(void)
- 	wrmsr(MSR_IA32_PRED_CMD, 1);
- }
- 
-+static void toggle_cr0_wp(void)
-+{
-+	write_cr0(X86_CR0_PE|X86_CR0_PG);
-+	write_cr0(X86_CR0_PE|X86_CR0_WP|X86_CR0_PG);
-+}
-+
-+static void toggle_cr4_pge(void)
-+{
-+	write_cr4(cr4_shadow ^ X86_CR4_PGE);
-+	write_cr4(cr4_shadow);
-+}
-+
- static struct test tests[] = {
- 	{ cpuid_test, "cpuid", .parallel = 1,  },
- 	{ vmcall, "vmcall", .parallel = 1, },
-@@ -492,6 +505,8 @@ static struct test tests[] = {
- 	{ wr_ibpb_msr, "wr_ibpb_msr", has_ibpb, .parallel = 1 },
- 	{ wr_tsc_adjust_msr, "wr_tsc_adjust_msr", .parallel = 1 },
- 	{ rd_tsc_adjust_msr, "rd_tsc_adjust_msr", .parallel = 1 },
-+	{ toggle_cr0_wp, "toggle_cr0_wp" , .parallel = 1, },
-+	{ toggle_cr4_pge, "toggle_cr4_pge" , .parallel = 1, },
- 	{ NULL, "pci-mem", .parallel = 0, .next = pci_mem_next },
- 	{ NULL, "pci-io", .parallel = 0, .next = pci_io_next },
- };
-@@ -580,6 +595,7 @@ int main(int ac, char **av)
- 	int ret;
- 
- 	setup_vm();
-+	cr4_shadow = read_cr4();
- 	handle_irq(IPI_TEST_VECTOR, self_ipi_isr);
- 	nr_cpus = cpu_count();
- 
+v4 -> v5
+ * Remove automatic CPUID adjustment when PMU disabled [Like]
+ * Update documentation and changelog to reflect above.
+ * Update documentation to document arg[0] and return values.  [Like].
+
+David Dunn (3):
+  KVM: x86: Provide per VM capability for disabling PMU virtualization
+  KVM: selftests: Allow creation of selftest VM without vcpus
+  KVM: selftests: Verify disabling PMU virtualization via
+    KVM_CAP_CONFIG_PMU
+
+ Documentation/virt/kvm/api.rst                | 22 ++++++++++++
+ arch/x86/include/asm/kvm_host.h               |  1 +
+ arch/x86/kvm/svm/pmu.c                        |  2 +-
+ arch/x86/kvm/vmx/pmu_intel.c                  |  2 +-
+ arch/x86/kvm/x86.c                            | 12 +++++++
+ include/uapi/linux/kvm.h                      |  4 +++
+ tools/include/uapi/linux/kvm.h                |  4 +++
+ .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++++++----
+ .../kvm/x86_64/pmu_event_filter_test.c        | 35 +++++++++++++++++++
+ 10 files changed, 112 insertions(+), 8 deletions(-)
+
 -- 
-2.31.1
+2.35.0.263.gb82422642f-goog
 
