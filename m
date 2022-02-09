@@ -2,123 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FE9A4AFBF6
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 19:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCB434AFC17
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 19:55:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241024AbiBISv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 13:51:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43716 "EHLO
+        id S241071AbiBISyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 13:54:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241344AbiBISu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 13:50:59 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B160AC050CCC
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 10:47:39 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id g15-20020a9d6b0f000000b005a062b0dc12so2170407otp.4
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 10:47:39 -0800 (PST)
+        with ESMTP id S241082AbiBISyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 13:54:38 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD261C1DC14B
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 10:50:34 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id 10so3028920plj.1
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 10:50:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=k7inhu8PhMJK6yGxgiDvgZaOGdJa0rrk9ukESAEO+Jo=;
-        b=oMBnkAtbT2pyt87Qd+fh7ucVAOoZ03oqSs3/0kWtRhsWcb/tRHhTPKH2SMhVaiz4EC
-         nhpkIVwjaOl6FfTH/GasB2aGxssA6hfaiuHLEUkr4HckBGvY8Ipd2XYKEu8AKm/rWLVM
-         XCEJqZi4Ex/VQkRDsJCrJxP4vjp5UKrVTSxD+DRvRiwDuAgtfDA72GtJKVIfolZEkoaV
-         iWqFXkB+oBNa/El48FhJCRBdLvHrLaRMI8Jt1H4HYasV+oGfyRRArMg+UUK3tzw/UVwK
-         lYPOWzIXFkGJiRBMwcc4ZQeXJyJhVIhR4PvIVv9TDKwjqKF1P9qHHB/llsE0ZNV52pA7
-         KXVA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=kx4teeGsTxdOC1Dg3+JbRhwrBSaO2guC2PPNniJkznY=;
+        b=FgRJxSt2dxBWmhNeNCqHb64siqU8YTgLxiXBg8B5pSiKwRSRHGyHX/ccEP5CrFKzYh
+         rsWW570rsB9ApA3pHSbQ4/byjfSLPqU/PPCfVPVusMyAo6/XGnkjFSvNl8XL/p9aygl9
+         7m46PGz7pY1YpUAPV5D+qJrRhk9RbWFX6PSCg2tYHnn35oua2xK8XeZCyMjaapbotcDX
+         Tg0zNuJoPk9ZTt9IsW7CVct+yHWw/NOSVVGVd7k5fsbVK9I/On+qNZPTvDHlw1/ibSBU
+         cGyVcivuEBwE+zfTUllitg3BhN3LrqGOI1j7fvUwnPfHIAToMcrbJufzxBsQyDW3s+Rv
+         q/TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=k7inhu8PhMJK6yGxgiDvgZaOGdJa0rrk9ukESAEO+Jo=;
-        b=34XJStV69nPX1wJO4KjJfvhinjjy1ONoSDODz1i9VlyCx7ZgBWX4AenC6TYsK2z2eg
-         8VPAqRRniTtMxYrI1wYZi23Xgl4T7s5rL6mHmxo/tzwzSfJGkxptBShEpfzDwxwaFNXT
-         4xDKS517P5th9lKfZbdx8PUVFQoJoUHqwvdi6SpHdlRoxXJ0nKHdtRfxBhms0K1rG2Lc
-         en9EQYWbcIFt275Ha8y32mDsI2jdCJgvAFE50wum9VfWIAfmBnzsgM+zOO1NX41Pvysh
-         t6Ns5B/wG7ohlf/0ecrHllcxOiVxrtXKgjmkprrxocEIqeQlcWhENWC+OcrYjJdBMQHb
-         SVnA==
-X-Gm-Message-State: AOAM531a0nEC3BwZyjzfD4P0hMOg8KVvQ+BpVMk2jWJmQbezsetheDKc
-        ki2gkXxvfWNRtt0a5gFc6L2aCUq+04Bvd7Up7QVeTA==
-X-Google-Smtp-Source: ABdhPJxegeSwNRY/UzyVE3AOL7f4B2uatLSpPxfgyc7Lzsn5m1x7AZM7n0VXFCKbmLY3hSN9+3M3ZbZFH7gt2+xbxHY=
-X-Received: by 2002:a9d:4e03:: with SMTP id p3mr1530696otf.299.1644432458616;
- Wed, 09 Feb 2022 10:47:38 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=kx4teeGsTxdOC1Dg3+JbRhwrBSaO2guC2PPNniJkznY=;
+        b=RlaO3ukQ2fNhqbL7coTT5nr6DoINRI4ldASv3CcPpekGeazfc7Dp57XSVjjtgdQQA3
+         /4/GoslQumvurPH63WyJR67F+siMLOQcA0vyA6EAXFyvyrBpPyPGw97+yZq/lAg/qzOY
+         NTp/vSUWtSfO7zc9frvriRDtD+zaSIwqdTrrBGNq0DL7C7jSAGK1KhOtHkxSqcanu11y
+         iBIiPK/Cn71RhLw0NXvsPlpSN7OTIlGMvRDnIxGRuCKPmHimPy+Cgsxax4Nk6acj/auu
+         OGfxNRwA15Bv/M3JUZpL6KCjqCZM7Wt0LtgqC6j/Orn+A/sBT0g0nGJ/hnBsoBOhPo17
+         33Ag==
+X-Gm-Message-State: AOAM5330ecXFLhgPVl5k8jliJxuouvp9tPSBRpE78J58vaMtnEFNZpye
+        3rOJMA/zBtf8BtBTdWsh9m3Jkw==
+X-Google-Smtp-Source: ABdhPJx1b8RaBZmJ8u/66Dq6vtiJ5PkfUlU00AExJreoN16rQPc3KIHbej3FxXuRDHSOR0GObcJGdw==
+X-Received: by 2002:a17:903:2283:: with SMTP id b3mr3471150plh.0.1644432633928;
+        Wed, 09 Feb 2022 10:50:33 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k13sm22025862pfc.176.2022.02.09.10.50.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Feb 2022 10:50:33 -0800 (PST)
+Date:   Wed, 9 Feb 2022 18:50:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zhenzhong Duan <zhenzhong.duan@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org
+Subject: Re: [PATCH] KVM: x86: Fix emulation in writing cr8
+Message-ID: <YgQM9Y1AewuYFVzL@google.com>
+References: <20220209062428.332295-1-zhenzhong.duan@intel.com>
 MIME-Version: 1.0
-References: <20220117085307.93030-1-likexu@tencent.com> <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net> <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
-In-Reply-To: <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 9 Feb 2022 10:47:27 -0800
-Message-ID: <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Stephane Eranian <eranian@google.com>,
-        David Dunn <daviddunn@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220209062428.332295-1-zhenzhong.duan@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 9, 2022 at 7:41 AM Dave Hansen <dave.hansen@intel.com> wrote:
->
-> On 2/9/22 05:21, Peter Zijlstra wrote:
-> > On Wed, Feb 02, 2022 at 02:35:45PM -0800, Jim Mattson wrote:
-> >> 3) TDX is going to pull the rug out from under us anyway. When the TDX
-> >> module usurps control of the PMU, any active host counters are going
-> >> to stop counting. We are going to need a way of telling the host perf
-> >> subsystem what's happening, or other host perf clients are going to
-> >> get bogus data.
-> > That's not acceptible behaviour. I'm all for unilaterally killing any
-> > guest that does this.
->
-> I'm not sure where the "bogus data" comes or to what that refers
-> specifically.  But, the host does have some level of control:
+On Wed, Feb 09, 2022, Zhenzhong Duan wrote:
+> In emulation of writing to cr8, one of the lowest four bits in TPR[3:0]
+> is kept.
+> 
+> According to Intel SDM 10.8.6.1(baremetal scenario):
+> "APIC.TPR[bits 7:4] = CR8[bits 3:0], APIC.TPR[bits 3:0] = 0";
+> 
+> and SDM 28.3(use TPR shadow):
+> "MOV to CR8. The instruction stores bits 3:0 of its source operand into
+> bits 7:4 of VTPR; the remainder of VTPR (bits 3:0 and bits 31:8) are
+> cleared.";
+> 
+> so in KVM emulated scenario, clear TPR[3:0] to make a consistent behavior
+> as in other scenarios.
 
-I was referring to gaps in the collection of data that the host perf
-subsystem doesn't know about if ATTRIBUTES.PERFMON is set for a TDX
-guest. This can potentially be a problem if someone is trying to
-measure events per unit of time.
+AMD's APM agrees:
 
-> > The host VMM controls whether a guest TD can use the performance
-> > monitoring ISA using the TD=E2=80=99s ATTRIBUTES.PERFMON bit...
->
-> So, worst-case, we don't need to threaten to kill guests.  The host can
-> just deny access in the first place.
->
-> I'm not too picky about what the PMU does, but the TDX behavior didn't
-> seem *that* onerous to me.  The gory details are all in "On-TD
-> Performance Monitoring" here:
->
-> > https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-=
-module-1.0-public-spec-v0.931.pdf
->
-> My read on it is that TDX host _can_ cede the PMU to TDX guests if it
-> wants.  I assume the context-switching model Jim mentioned is along the
-> lines of what TDX is already doing on host<->guest transitions.
+  Task Priority Sub-class (TPS)—Bits 3 : 0. The TPS field indicates the current
+  sub-priority to be used when arbitrating lowest-priority messages. This field
+  is written with zero when TPR is written using the architectural CR8 register.
 
-Right. If ATTRIBUTES.PERFMON is set, then "perfmon state is
-context-switched by the Intel TDX module across TD entry and exit
-transitions." Furthermore, the VMM has no access to guest perfmon
-state.
+> This doesn't impact evaluation and delivery of pending virtual interrupts
+> because processor does not use the processor-priority sub-class to
+> determine which interrupts to delivery and which to inhibit.
 
-If you're saying that setting this bit is unacceptable, then perhaps
-the TDX folks need to redesign their in-guest PMU support.
+I believe hardware uses it to arbitrate lowest priority interrupts, but KVM just
+does a round-robin style delivery.
+
+> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+
+Probably worth:
+
+  Fixes: b93463aa59d6 ("KVM: Accelerated apic support")
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+> ---
+>  arch/x86/kvm/lapic.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index d7e6fde82d25..306025db9959 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2242,10 +2242,7 @@ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
+>  
+>  void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8)
+>  {
+> -	struct kvm_lapic *apic = vcpu->arch.apic;
+> -
+> -	apic_set_tpr(apic, ((cr8 & 0x0f) << 4)
+> -		     | (kvm_lapic_get_reg(apic, APIC_TASKPRI) & 4));
+> +	apic_set_tpr(vcpu->arch.apic, (cr8 & 0x0f) << 4);
+
+This appears to have been deliberate, but I've no idea what on earth it was
+trying to do.  Preserving only bit 2 is super weird.
+
+Author: Avi Kivity <avi@qumranet.com>
+Date:   Thu Oct 25 16:52:32 2007 +0200
+
+    KVM: Accelerated apic support
+
+    This adds a mechanism for exposing the virtual apic tpr to the guest, and a
+    protocol for letting the guest update the tpr without causing a vmexit if
+    conditions allow (e.g. there is no interrupt pending with a higher priority
+    than the new tpr).
+
+    Signed-off-by: Avi Kivity <avi@qumranet.com>
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 50c3f3a8dd3d..e7513bb98af1 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -815,7 +815,8 @@ void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8)
+
+        if (!apic)
+                return;
+-       apic_set_tpr(apic, ((cr8 & 0x0f) << 4));
++       apic_set_tpr(apic, ((cr8 & 0x0f) << 4)
++                    | (apic_get_reg(apic, APIC_TASKPRI) & 4));
+ }
+
+
