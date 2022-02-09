@@ -2,98 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01BE64AF7EB
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:16:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A6554AF7F0
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:18:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237966AbiBIRQM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 12:16:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48154 "EHLO
+        id S237442AbiBIRSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 12:18:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232023AbiBIRQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 12:16:09 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A862C05CB82
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:16:13 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id z13so5447507pfa.3
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 09:16:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OS/vYOaEcHltj8pU0RU1HWmOJM4B0kiaQM88fHj6Yl0=;
-        b=hmlScaG/MxxcGv/Ce3Q4Oi9usYARksWWYafzDMafamI2qghv/S0/M4+43akD8WMij2
-         efXyMsqUtMgbmaz06fwBdZIlcl4RcHgu0W4zBpPwECH/FmNeJsFmH1nNhiwLwO0kFnRd
-         3iYQgsDZT4n3wg9BplUVExDHt5mw2okNzzUyebjeCYcuCTB+TPqZr9JcO+vp4eLdIH2V
-         s6nzk6+CA+HLokzqv0s96cGozIqi0Su0pNUGwIeo4ehZX6IuMnjbY7ju6Kg/1al0JiuP
-         V9oiitH4w/5+6jSVY14WjRjYFTINblj83m87TfnsjlbkgXEXSRsthZ5rIrJF7/Mpig2t
-         ciUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OS/vYOaEcHltj8pU0RU1HWmOJM4B0kiaQM88fHj6Yl0=;
-        b=o3CEvkslE+UVoKfq4RYyoDts1UQhayQEwhlkNo2jEqhIsPN8oX1G2SbMc8gwkOLINz
-         JbBzihJm5auk7GDXam1IH0AqcPZrwVMiLt31TJeJljf1YxtqKlmO+MZWv3OnTxIsf8g/
-         DTeVowD/oUzF7tBYTlOArZW6UpZjZiM3tUErj3GEAm8wq0ut9wmF35cVKwNU9OHKtZR5
-         K2HDyiQmDQ/TuN4//aygAXHdHFYtz/jGIckhQu2o3qlYtALmu8hOdoVjuWTojR3F/DzN
-         UgcOqc6EOTxeY82/cVT+HaKMOmcu+/08s8F0j2PTeTSoo7Twh2G+6PcKBrOeAvGmYX0J
-         4TKA==
-X-Gm-Message-State: AOAM533hkpx4IkIM3uGpakYUff3LCwCtj8RqQ5vcG9RiUwxRPbuVZYsE
-        jhTxXkm+xUvsFYlachTKm8wZUA==
-X-Google-Smtp-Source: ABdhPJx8SCWRZTEmqxObdVShTYrZp66VDixB774iK68T4PYn/ZZtmlUWHXx0vQ8kdvJJiRwTXP0w4Q==
-X-Received: by 2002:a63:b207:: with SMTP id x7mr2638660pge.392.1644426972381;
-        Wed, 09 Feb 2022 09:16:12 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q1sm3926434pfs.112.2022.02.09.09.16.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 09:16:11 -0800 (PST)
-Date:   Wed, 9 Feb 2022 17:16:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
-Subject: Re: [PATCH 00/12] KVM: MMU: do not unload MMU roots on all role
- changes
-Message-ID: <YgP22CSj7GHYslYa@google.com>
-References: <20220209170020.1775368-1-pbonzini@redhat.com>
- <YgP04kJeEH0I+hIw@google.com>
- <fc3a4cdc-5a88-55a9-cfcc-fb7936484cc8@redhat.com>
+        with ESMTP id S231834AbiBIRSN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 12:18:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B440C0613C9
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:18:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644427095;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ZHqCWeznLA/b2BCdTxSEDLYeb340DyvFnRih4TbEbVY=;
+        b=Q4ftzA7wkwg0nFRguJch4i4HAZ0ogCgns1JQIcnFSBQ+9V07qWAB3qidxEamqKNZESOXhN
+        OsdCyiYpqbVUP0Y40pIhcX8G6U6jcFpjXmop9JfQ9coi1EeRerNQOa0Qwb9589Th3ET0iK
+        E53QoT3HNvkxpToFnPM9mNfC7PdsQVU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-618-DAbkv6OBMeKGxFwilnpFow-1; Wed, 09 Feb 2022 12:18:14 -0500
+X-MC-Unique: DAbkv6OBMeKGxFwilnpFow-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 495A08143E5
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:18:13 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18A937CD66
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:18:13 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] vmexit: add test toggling CR0.WP and CR4.PGE
+Date:   Wed,  9 Feb 2022 12:18:12 -0500
+Message-Id: <20220209171812.1785257-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc3a4cdc-5a88-55a9-cfcc-fb7936484cc8@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 09, 2022, Paolo Bonzini wrote:
-> On 2/9/22 18:07, Sean Christopherson wrote:
-> > On Wed, Feb 09, 2022, Paolo Bonzini wrote:
-> > > The TDP MMU has a performance regression compared to the legacy MMU
-> > > when CR0 changes often.  This was reported for the grsecurity kernel,
-> > > which uses CR0.WP to implement kernel W^X.  In that case, each change to
-> > > CR0.WP unloads the MMU and causes a lot of unnecessary work.  When running
-> > > nested, this can even cause the L1 to hardly make progress, as the L0
-> > > hypervisor it is overwhelmed by the amount of MMU work that is needed.
-> > 
-> > FWIW, my flushing/zapping series fixes this by doing the teardown in an async
-> > worker.  There's even a selftest for this exact case :-)
-> > 
-> > https://lore.kernel.org/all/20211223222318.1039223-1-seanjc@google.com
-> 
-> I'll check it out (it's next on my list as soon as I finally push
-> kvm/{master,next}, which in turn was blocked by this work).
+CR0.WP changes the MMU permissions but does not cause a TLB flush;
+CR4.PGE is the opposite (at least as far as KVM as concerned).
 
-No rush, I need to spin a new version (rebase, and hopefully drop unnecessarily
-complex be3havior).
+This makes both of them interesting from a performance perspective,
+so add new vmexit tests.
 
-> But not zapping the roots is even better
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/access.c      |  3 +++
+ x86/unittests.cfg | 12 ++++++++++++
+ x86/vmexit.c      | 16 ++++++++++++++++
+ 3 files changed, 31 insertions(+)
 
-No argument there :-)
+diff --git a/x86/access.c b/x86/access.c
+index 83c8221..21b4d74 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -251,6 +251,9 @@ static void set_cr0_wp(int wp)
+ static void clear_user_mask(pt_element_t *ptep, int level, unsigned long virt)
+ {
+ 	*ptep &= ~PT_USER_MASK;
++
++	/* Flush to avoid spurious #PF */
++	invlpg((void*)virt);
+ }
+ 
+ static void set_user_mask(pt_element_t *ptep, int level, unsigned long virt)
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 62a6692..cef09d2 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -118,6 +118,18 @@ file = vmexit.flat
+ groups = vmexit
+ extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
+ 
++[vmexit_cr0_wp]
++file = vmexit.flat
++smp = 2
++extra_params = -append 'toggle_cr0_wp'
++groups = vmexit
++
++[vmexit_cr4_pge]
++file = vmexit.flat
++smp = 2
++extra_params = -append 'toggle_cr4_pge'
++groups = vmexit
++
+ [access]
+ file = access_test.flat
+ arch = x86_64
+diff --git a/x86/vmexit.c b/x86/vmexit.c
+index 8cfb36b..4adec78 100644
+--- a/x86/vmexit.c
++++ b/x86/vmexit.c
+@@ -20,6 +20,7 @@ struct test {
+ #define GOAL (1ull << 30)
+ 
+ static int nr_cpus;
++static u64 cr4_shadow;
+ 
+ static void cpuid_test(void)
+ {
+@@ -459,6 +460,18 @@ static void wr_ibpb_msr(void)
+ 	wrmsr(MSR_IA32_PRED_CMD, 1);
+ }
+ 
++static void toggle_cr0_wp(void)
++{
++	write_cr0(X86_CR0_PE|X86_CR0_PG);
++	write_cr0(X86_CR0_PE|X86_CR0_WP|X86_CR0_PG);
++}
++
++static void toggle_cr4_pge(void)
++{
++	write_cr4(cr4_shadow ^ X86_CR4_PGE);
++	write_cr4(cr4_shadow);
++}
++
+ static struct test tests[] = {
+ 	{ cpuid_test, "cpuid", .parallel = 1,  },
+ 	{ vmcall, "vmcall", .parallel = 1, },
+@@ -492,6 +505,8 @@ static struct test tests[] = {
+ 	{ wr_ibpb_msr, "wr_ibpb_msr", has_ibpb, .parallel = 1 },
+ 	{ wr_tsc_adjust_msr, "wr_tsc_adjust_msr", .parallel = 1 },
+ 	{ rd_tsc_adjust_msr, "rd_tsc_adjust_msr", .parallel = 1 },
++	{ toggle_cr0_wp, "toggle_cr0_wp" , .parallel = 1, },
++	{ toggle_cr4_pge, "toggle_cr4_pge" , .parallel = 1, },
+ 	{ NULL, "pci-mem", .parallel = 0, .next = pci_mem_next },
+ 	{ NULL, "pci-io", .parallel = 0, .next = pci_io_next },
+ };
+@@ -580,6 +595,7 @@ int main(int ac, char **av)
+ 	int ret;
+ 
+ 	setup_vm();
++	cr4_shadow = read_cr4();
+ 	handle_irq(IPI_TEST_VECTOR, self_ipi_isr);
+ 	nr_cpus = cpu_count();
+ 
+-- 
+2.31.1
+
