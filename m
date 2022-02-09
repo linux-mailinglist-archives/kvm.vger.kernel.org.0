@@ -2,70 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0D6F4AFEB8
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 21:50:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05DE84AFED3
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 22:01:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232391AbiBIUtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 15:49:24 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:50534 "EHLO
+        id S232603AbiBIVAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 16:00:15 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:45042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232359AbiBIUtX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 15:49:23 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8955AC05CBA4
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 12:49:26 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id 10so3364737plj.1
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 12:49:26 -0800 (PST)
+        with ESMTP id S232556AbiBIVAK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 16:00:10 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29512C03C189
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 13:00:13 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id v5-20020a17090a4ec500b001b8b702df57so6450255pjl.2
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 13:00:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=usai5WVQErwk4Ew2fX/fOjUw6I8vvZIt0nVcprr1jB8=;
-        b=VqQ4AQV9kyt+0LUwBHfYIcCdy6HaR52lzHPXQid7Q9Se19pBiE9Mi/rh3L+BTrlcsA
-         3zhWV/p7cu/zpDWzo7seoNfyvraJeUxi6CYB6mkMUCbqqhUhq6m/rjbyx/IUrHKoVXof
-         lSkYyXL/SVmmvlJQ902YhuNCzptvPCHTOSwCPPsN8v87m068+MhEZHA/NU8a1bXJaf9P
-         uKu6stWAubyB61SmQAKl0PriItNTzKJNWLayosXH27IGEVSnYux3NhyrI5glY56g2pAl
-         uGtJ7pB8scL4hzREiHv7FcQjA7rxLGqS4qtNTCbZKzEmQmICwvLEIphJRmERaAHp85uu
-         QD5A==
+        bh=EQu/Hvwu+5JuPznaoKbB1EorddMM7fTfsGLmiQAYQZI=;
+        b=K+wmv2hyR2o8GJLwGQa4S1j9XHcyrLXv9yntJQKJagwDON8Q4/S+YXfDU2qt15cdj8
+         psPnt98ZiiT/D200xM9bDtrQ+CHf0LP229pyfFLh6cDD59cDrRPapKdmsU2YxPaifnKe
+         UaGx9jo1pxf2e2+/+N9hOIr/dkWmr15Shzpa6k9f4Q5YeeKsXXp6oTtNbBDJfvGrjCcc
+         7ErBHiYR8KOQT7AMrFSVpQGW5SF1pUvj1eAnhqQqGUr5z4Hqjk7npHA62tBUcPzdwSMt
+         0SNkAjeg+iyaUzwrsHebnzsx23Cz3DtSQfz/J8gUmuud0TgSB51o8R6BG0tYGhVtBjhk
+         Pleg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=usai5WVQErwk4Ew2fX/fOjUw6I8vvZIt0nVcprr1jB8=;
-        b=4j8moypQgpDbt80DoXRncaW24RRpI5pCOM7sNCnmhATQKhpwBCEgid3GKZtfh8Luvw
-         pqiVfyLsqZ7zdmQ16hKg0gbQRwCrT926OFK1kH5fsJqBjLDuB1r6s+O4IAS1B6dXRmbu
-         2rJtHeDqMuF8glhkaYkEJ+tSAP50LuZ1AfntqtPiPNKxXfIt5pYaasXsEdJRW1kdpeKL
-         7jT8RIiiKXjMDgC8QzSI2URg0qcJJQ62cPZNg6k5gVOYaNT8wubANthYV5RXLYVv6XC4
-         PKk6Q2W5KR7VqHCvRNN1aRQiJ+NVe2moEPBE7lza+xUoXuAbBlpIpcB7qt5EtB/0acBh
-         J10w==
-X-Gm-Message-State: AOAM5330YhAo9tVeBudN24zs+/5eie0jj3UhxnGTgJDGWyAgajuo4FQM
-        R/pnTDW+lgb+bvEV/e33KMKxAg==
-X-Google-Smtp-Source: ABdhPJw/3lEaJcN7mZhLmzhDeUcjhx87dXVoMvRWh5thi6wmzVXTU+ApsU/9c7brBYgoM6y2N1AWpQ==
-X-Received: by 2002:a17:90a:ab90:: with SMTP id n16mr5432152pjq.229.1644439765909;
-        Wed, 09 Feb 2022 12:49:25 -0800 (PST)
+        bh=EQu/Hvwu+5JuPznaoKbB1EorddMM7fTfsGLmiQAYQZI=;
+        b=o3iiEQUBQBLgnZX6lsQRhbaFUn50+WVs3wAwHMXKbpR1P3thqO044XrdkOYXbLqQor
+         Rty5X2fPvSwAQgC4wZswp9l3mCv5BtfJtbFwYd0i+kTf5w4AMl6SUCNkEcUWlpcnkTJZ
+         0h5hDHe71CBVQkpWpP0a4S73xOm6uXXeTxd09u6k7swWnzG07EA+sK3K/Plpsz38bDAe
+         Y7AMhKCjLoFI3gzL5n5AeOPdIhiuBkgF83T/jdZK+tYn1kNbFzFa8ZHJeheBcoHVB/i5
+         PCUdJGkhmpGM6ASi4MUCXRcce+brY9qrRAY4WQA06tLEBrIrcEH1bXKZreOIENPrejkP
+         jDXA==
+X-Gm-Message-State: AOAM533E2NWoH/r4Fl39Or92HIjBp/rQ2ee7iBN7i1ctvg5xcpU4RJ/R
+        a4dw8ZHAlTVPqFeKwt42jleWpQ==
+X-Google-Smtp-Source: ABdhPJx8Oyd3yTeg3mHyfIsOkM4zJW8IzZ3Jcigqxn2P7vwLLElRvREdwVT1CY7UdHpK6bQKXsj3bQ==
+X-Received: by 2002:a17:902:8c91:: with SMTP id t17mr4013103plo.89.1644440412425;
+        Wed, 09 Feb 2022 13:00:12 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j15sm22379244pfj.102.2022.02.09.12.49.25
+        by smtp.gmail.com with ESMTPSA id d8sm14043624pfj.179.2022.02.09.13.00.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 12:49:25 -0800 (PST)
-Date:   Wed, 9 Feb 2022 20:49:21 +0000
+        Wed, 09 Feb 2022 13:00:11 -0800 (PST)
+Date:   Wed, 9 Feb 2022 21:00:08 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
-        tglx@linutronix.de, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] KVM: Do compatibility checks on hotplugged CPUs
-Message-ID: <YgQo0SB59SCRUPQ3@google.com>
-References: <20220209074109.453116-1-chao.gao@intel.com>
- <20220209074109.453116-6-chao.gao@intel.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>,
+        David Dunn <daviddunn@google.com>
+Subject: Re: KVM: x86: Reconsider the current approach of vPMU
+Message-ID: <YgQrWHCNG/s4EWFf@google.com>
+References: <20220117085307.93030-1-likexu@tencent.com>
+ <20220117085307.93030-3-likexu@tencent.com>
+ <20220202144308.GB20638@worktop.programming.kicks-ass.net>
+ <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
+ <2db2ebbe-e552-b974-fc77-870d958465ba@gmail.com>
+ <YgPCm1WIt9dHuoEo@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220209074109.453116-6-chao.gao@intel.com>
+In-Reply-To: <YgPCm1WIt9dHuoEo@hirez.programming.kicks-ass.net>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,47 +82,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 09, 2022, Chao Gao wrote:
-> At init time, KVM does compatibility checks to ensure that all online
-> CPUs support hardware virtualization and a common set of features. But
-> KVM uses hotplugged CPUs without such compatibility checks. On Intel
-> CPUs, this leads to #GP if the hotplugged CPU doesn't support VMX or
-> vmentry failure if the hotplugged CPU doesn't meet minimal feature
-> requirements.
+On Wed, Feb 09, 2022, Peter Zijlstra wrote:
+> On Wed, Feb 09, 2022 at 04:10:48PM +0800, Like Xu wrote:
+> > On 3/2/2022 6:35 am, Jim Mattson wrote:
+> > > 3) TDX is going to pull the rug out from under us anyway. When the TDX
+> > > module usurps control of the PMU, any active host counters are going
+> > > to stop counting. We are going to need a way of telling the host perf
+> > 
+> > I presume that performance counters data of TDX guest is isolated for host,
+> > and host counters (from host perf agent) will not stop and keep counting
+> > only for TDX guests in debug mode.
 > 
-> Do compatibility checks when onlining a CPU and abort the online process
-> if the hotplugged CPU is incompatible with online CPUs.
+> Right, lots of people like profiling guests from the host. That allows
+> including all the other virt gunk that supports the guest.
 > 
-> CPU hotplug is disabled during hardware_enable_all() to prevent the corner
-> case as shown below. A hotplugged CPU marks itself online in
-> cpu_online_mask (1) and enables interrupt (2) before invoking callbacks
-> registered in ONLINE section (3). So, if hardware_enable_all() is invoked
-> on another CPU right after (2), then on_each_cpu() in hardware_enable_all()
-> invokes hardware_enable_nolock() on the hotplugged CPU before
-> kvm_online_cpu() is called. This makes the CPU escape from compatibility
-> checks, which is risky.
-> 
-> 	start_secondary { ...
-> 		set_cpu_online(smp_processor_id(), true); <- 1
-> 		...
-> 		local_irq_enable();  <- 2
-> 		...
-> 		cpu_startup_entry(CPUHP_AP_ONLINE_IDLE); <- 3
-> 	}
-> 
-> Keep compatibility checks at KVM init time. It can help to find
-> incompatibility issues earlier and refuse to load arch KVM module
-> (e.g., kvm-intel).
-> 
-> Loosen the WARN_ON in kvm_arch_check_processor_compat so that it
-> can be invoked from KVM's CPU hotplug callback (i.e., kvm_online_cpu).
-> 
-> Opportunistically, add a pr_err() for setup_vmcs_config() path in
-> vmx_check_processor_compatibility() so that each possible error path has
-> its own error message. Convert printk(KERN_ERR ... to pr_err to please
-> checkpatch.pl
-> 
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> ---
+> Guests must not unilaterally steal the PMU.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+The proposal is to add an option to allow userspace to gift the PMU to the guest,
+not to let the guest steal the PMU at will.  Off by default, certain capabilities
+required, etc... are all completely ok and desired, e.g. we also have use cases
+where we don't want to let the guest touch the PMU.
+
+David's response in the original thread[*] explains things far better than I can do.
+
+[*] https://lore.kernel.org/all/CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com
