@@ -2,144 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D37B4AFD45
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 20:26:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 027304AFD7F
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 20:31:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233501AbiBITYa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 14:24:30 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:40482 "EHLO
+        id S235171AbiBITay (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 14:30:54 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233828AbiBITYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 14:24:25 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3184AE00D0E8
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 11:24:25 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id k18so5745164wrg.11
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 11:24:25 -0800 (PST)
+        with ESMTP id S235129AbiBITav (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 14:30:51 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D066E016D9D
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 11:30:45 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id x193so3642826oix.0
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 11:30:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=6ruVJG7HncR2N0k4CIyXD71cI4+MqIoBGL55+c9rkl0=;
-        b=GpwsqEJGmeJNlJDm+BtsMicSlQhMnINXJWUKxAHh/wcRlEe/gCxWSLkUQXj0IKQOP1
-         pARJjQJnmjjYATq0E86iV722i7CmTzZgMxL281ND+XIinpdaNSIRERuFaorO1aVrLRBU
-         Udm+lv+WZ/cAKqV1rEJ9sVhJhypZ5rn2/DB8Afuwsubcj97UMPJXrr+gukNVAXAMblV9
-         XjVlieT2Wqt9TPcOmmR1WXvcPoWfoHUK7mCUUWDYslCAvkokP1oMKKnr4wQJ5qE7qRf9
-         zDMMhKC1pLQzw6RiXNl1+89KMO6DwZ06rGOkPSAzIEDI6kBSkFUN0I9ukaPiGly7TRVJ
-         Xl3g==
+        bh=udo96sXO56wK/1rXVVyyNGXKmUu/FDGQZPSLzL5BLp0=;
+        b=EXUI7Lg3XaAXYffEBZUy8dtUKnQhy8uj6DvNscesHGGYBhASi6E0GIM+uqHlM11z3j
+         aGPKpmtalc/eXIw4T9adj6+Uqbm1nj0EkFL/Vq3HEkTG+DX9mj1dXNCfsvj4rCi1L1EE
+         3q6TJKxY+zjm7KsvJaG7FeFMtatC/woV5savK6V8uzpnBmoe93T8Jya2aczCu1f+lpww
+         dxmCY8b7IWAtUHkeBDuJR9MIa/QkuP6HCo7bA3MS/AQTlYmQc+P6MPsoVAle7ko10lKN
+         GmPSVZZV0uBVQ7oMexvaDTFrqF44/FOAo0X9FT+qCmNrV8Va7YH/6RuYGlZ0MgRMIJND
+         m0dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=6ruVJG7HncR2N0k4CIyXD71cI4+MqIoBGL55+c9rkl0=;
-        b=Ht1UWXzc6IrXAcbdACUdv+ueSw9f+aDk3ZfdC4+9oX9GZ268D2SIPIz318RLqVxIUB
-         SiOAB2Ve+yhK1xJ/Z7FGPZyhtpP97lSAlrbSMKk0HXAnwqY8a+lsjk0TK1OPRdfLYY/q
-         OJsdtzYDAvBRYfjS4wSeAZ3lvWDI5XWzSIBtae1qu0dx1jjb4pYAS9eqHMsozxl3q+5G
-         ywP4gf6g09rObPi0Q0SX6sqcSlacL65dpSgccU10d4NaQXsbNYgBMjIkpoKCwgE/vpIV
-         QQMzbuHyug8oqxb2OnRaXfJNcnkpNwIyF0dER60IbNY/yjp1WvBeTaYbgYZmxiRQ/+PF
-         qzbw==
-X-Gm-Message-State: AOAM532+SuocdvVBIrhU8BCR8ALcbHwmhPhIlnjaU5ZXOHgT31brbIls
-        lqR9SkHn2cyJw5de+67rABVQVcRtJy6Hlo/wJuLCOg==
-X-Google-Smtp-Source: ABdhPJy2gu0tDC5WhYjHtQF6czHGKSOazQIK8LghHcIk5r+jBxkKau7i12HuAvABjkDaXo4YADzfuQ3fil8BbswFE98=
-X-Received: by 2002:adf:f50a:: with SMTP id q10mr3373731wro.252.1644434663498;
- Wed, 09 Feb 2022 11:24:23 -0800 (PST)
+        bh=udo96sXO56wK/1rXVVyyNGXKmUu/FDGQZPSLzL5BLp0=;
+        b=cUFK2m36sfHSBwyonLzp/kdTP5x7OgDalF2bexPYEGlsy+2Ry1dqAUgnZThLc4o9tB
+         2aSjXFKgtVaI2Bc+imW3Zj7+pJsb4Ha37MA6V+lglElwOTsQUbAvzGk+wBxv0YN7SIYy
+         mUTW0dZvgJy1o8v1FCVNM5Je4Ejw7KMakQfUK0y3+sABCm+q40HeZtBnp4uz9Ro6RJoR
+         raL+wBe7BK24n5E7++Q3T6EtH2A4oBHu5G089QPIgT/CknFgLpyrIUH3OZ8Z2raWZR3b
+         /POlAlYsA0MSKq27pAo+rI7img0M2EK5P1VEH4lMplOjVI7ZJMpsPeodQjo16HFD3fOC
+         CuaA==
+X-Gm-Message-State: AOAM533/UmzGS+O5XGgAMjRBtNN80drW21jj9MBJ4CYdFaqpwaQvD+We
+        JE2cV4FNWm9zQ/b4jL5WrHx1u1LDv68tiGBdBQka4ZpYsapctCED
+X-Google-Smtp-Source: ABdhPJw3idISQLewBGtwuj8yOwv4vTxXot9qcEiQpe/plBYQWcaqbqptHiJUan5olxRn+pLwu49kTzcDHQyFH+sTqFc=
+X-Received: by 2002:a05:6808:21a5:: with SMTP id be37mr2169181oib.339.1644435044469;
+ Wed, 09 Feb 2022 11:30:44 -0800 (PST)
 MIME-Version: 1.0
-References: <20220117085307.93030-1-likexu@tencent.com> <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net> <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
- <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com> <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
-In-Reply-To: <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
-From:   David Dunn <daviddunn@google.com>
-Date:   Wed, 9 Feb 2022 11:24:11 -0800
-Message-ID: <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+References: <20211130074221.93635-1-likexu@tencent.com> <20211130074221.93635-3-likexu@tencent.com>
+ <CALMp9eQG7eqq+u3igApsRDV=tt0LdjZzmD_dC8zw=gt=f5NjSA@mail.gmail.com> <7de112b2-e6d1-1f9d-a040-1c4cfee40b22@gmail.com>
+In-Reply-To: <7de112b2-e6d1-1f9d-a040-1c4cfee40b22@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 9 Feb 2022 11:30:33 -0800
+Message-ID: <CALMp9eTVxN34fCV8q53_38R2DxNdR9_1aSoRmF8gKt2yhOMndg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/6] KVM: x86/pmu: Refactoring find_arch_event() to pmc_perf_hw_id()
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        David Dunn <daviddunn@google.com>,
         Stephane Eranian <eranian@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dave,
-
-In my opinion, the right policy depends on what the host owner and
-guest owner are trying to achieve.
-
-If the PMU is being used to locate places where performance could be
-improved in the system, there are two sub scenarios:
-   - The host and guest are owned by same entity that is optimizing
-overall system.  In this case, the guest doesn't need PMU access and
-better information is provided by profiling the entire system from the
-host.
-   - The host and guest are owned by different entities.  In this
-case, profiling from the host can identify perf issues in the guest.
-But what action can be taken?  The host entity must communicate issues
-back to the guest owner through some sort of out-of-band information
-channel.  On the other hand, preempting the host PMU to give the guest
-a fully functional PMU serves this use case well.
-
-TDX and SGX (outside of debug mode) strongly assume different
-entities.  And Intel is doing this to reduce insight of the host into
-guest operations.  So in my opinion, preemption makes sense.
-
-There are also scenarios where the host owner is trying to identify
-systemwide impacts of guest actions.  For example, detecting memory
-bandwidth consumption or split locks.  In this case, host control
-without preemption is necessary.
-
-To address these various scenarios, it seems like the host needs to be
-able to have policy control on whether it is willing to have the PMU
-preempted by the guest.
-
-But I don't see what scenario is well served by the current situation
-in KVM.  Currently the guest will either be told it has no PMU (which
-is fine) or that it has full control of a PMU.  If the guest is told
-it has full control of the PMU, it actually doesn't.  But instead of
-losing counters on well defined events (from the guest perspective),
-they simply stop counting depending on what the host is doing with the
-PMU.
-
-On the other hand, if we flip it around the semantics are more clear.
-A guest will be told it has no PMU (which is fine) or that it has full
-control of the PMU.  If the guest is told that it has full control of
-the PMU, it does.  And the host (which is the thing that granted the
-full PMU to the guest) knows that events inside the guest are not
-being measured.  This results in all entities seeing something that
-can be reasoned about from their perspective.
-
-Thanks,
-
-Dave Dunn
-
-On Wed, Feb 9, 2022 at 10:57 AM Dave Hansen <dave.hansen@intel.com> wrote:
-
-> > I was referring to gaps in the collection of data that the host perf
-> > subsystem doesn't know about if ATTRIBUTES.PERFMON is set for a TDX
-> > guest. This can potentially be a problem if someone is trying to
-> > measure events per unit of time.
+On Wed, Feb 9, 2022 at 1:00 AM Like Xu <like.xu.linux@gmail.com> wrote:
 >
-> Ahh, that makes sense.
+> On 5/2/2022 9:55 am, Jim Mattson wrote:
+> >> +static unsigned int amd_pmc_perf_hw_id(struct kvm_pmc *pmc)
+> >>   {
+> >> +       u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
+> > On AMD, the event select is 12 bits.
 >
-> Does SGX cause problem for these people?  It can create some of the same
-> collection gaps:
+> Out of your carefulness, we already know this fact.
 >
->         performance monitoring activities are suppressed when entering
->         an opt-out (of performance monitoring) enclave.
+> This function to get the perf_hw_id by the last 16 bits still works because we
+> currently
+> do not have a 12-bits-select event defined in the amd_event_mapping[]. The
+> 12-bits-select
+> events (if any) will be programed in the type of PERF_TYPE_RAW.
+
+I beg to differ. It doesn't matter whether there are 12-bit event
+selects in amd_event_mapping[] or not. The fundamental problem is that
+the equality operation on event selects is broken, because it ignores
+the high 4 bits. Hence, we may actually find an entry in that table
+that we *think* is for the requested event, but instead it's for some
+other event with 0 in the high 4 bits. For example, if the guest
+requests event 0x1d0 (retired fused instructions), they will get event
+0xd0 instead. According to amd_event_mapping, event 0xd0 is "
+PERF_COUNT_HW_STALLED_CYCLES_FRONTEND." However, according to the
+Milan PPR, event 0xd0 doesn't exist. So, I don't actually know what
+we're counting.
+
+At the very least, we need a patch like the following (which I fully
+expect gmail to mangle):
+
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -210,7 +210,8 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
+        if (!allow_event)
+                return;
+
+-       if (!(eventsel & (ARCH_PERFMON_EVENTSEL_EDGE |
++       if (!(eventsel & ((0xFULL << 32) |
++                         ARCH_PERFMON_EVENTSEL_EDGE |
+                          ARCH_PERFMON_EVENTSEL_INV |
+                          ARCH_PERFMON_EVENTSEL_CMASK |
+                          HSW_IN_TX |
+
+By the way, the following events from amd_event_mapping[] are not
+listed in the Milan PPR:
+{ 0x7d, 0x07, PERF_COUNT_HW_CACHE_REFERENCES }
+{ 0x7e, 0x07, PERF_COUNT_HW_CACHE_MISSES }
+{ 0xd0, 0x00, PERF_COUNT_HW_STALLED_CYCLES_FRONTEND }
+{ 0xd1, 0x00, PERF_COUNT_HW_STALLED_CYCLES_BACKEND }
+
+Perhaps we should build a table based on amd_f17h_perfmon_event_map[]
+for newer AMD processors?
