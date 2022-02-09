@@ -2,260 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AB1D4AEB24
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 08:35:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67B664AEB4F
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 08:43:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238107AbiBIHfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 02:35:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
+        id S238866AbiBIHle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 02:41:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236104AbiBIHe4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 02:34:56 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9411CC0613CB;
-        Tue,  8 Feb 2022 23:34:59 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2193w1a5022063;
-        Wed, 9 Feb 2022 07:34:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Cb1L+DqHS9HWMzhnhSRYvz5l+d1Nxiaa1BkcVyOVlEc=;
- b=emKRJedHt1zWQ1lrNYkDXCx0FY8WL+vlUUjmEQ0TtUpHQ6CC3W4AQx3bj43CL7b4rm7r
- OPaj2jcY9HpoThhzqvUwrrKqGlbdW+zyscEYfpXBBuWOCOBbMUdf8EcquMofPfN7r6YG
- 22JPfN1Fyir0+7YzKry4/FprqKZhihBEoq3lKCEQm3ct9MdM+z0uWUpCkF73Vkr8Him9
- QdGOzAR08aUYWjiSlrsRkyVD30Tq9zpwfn38V5T02mhQzKZKcDQDEPF0ntm8iS0p0kS7
- hvZVnEcwwWDFTW0Twp88XFGAgxh8NhglaCMMY1xbeOR4fyLLGEJnRDCctUpgYjsLhP3w Kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e465wcmrr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Feb 2022 07:34:57 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2197RBma031994;
-        Wed, 9 Feb 2022 07:34:56 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e465wcmr0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Feb 2022 07:34:56 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2197D4uF013203;
-        Wed, 9 Feb 2022 07:34:54 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3e1gv9c9fu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Feb 2022 07:34:54 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2197Ynhu27984132
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Feb 2022 07:34:49 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2EB4E4C046;
-        Wed,  9 Feb 2022 07:34:49 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 826194C05A;
-        Wed,  9 Feb 2022 07:34:48 +0000 (GMT)
-Received: from [9.171.87.52] (unknown [9.171.87.52])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  9 Feb 2022 07:34:48 +0000 (GMT)
-Message-ID: <48d1678f-746c-dab6-5ec3-56397277f752@linux.ibm.com>
-Date:   Wed, 9 Feb 2022 08:34:48 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 05/11] KVM: s390: Add optional storage key checking to
- MEMOP IOCTL
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        with ESMTP id S232283AbiBIHlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 02:41:31 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D20C0613CB;
+        Tue,  8 Feb 2022 23:41:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644392495; x=1675928495;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ptt8R/RvwFaVk8njj6dZCgZ7G353iPS7PsxtHDnt7q4=;
+  b=Q1G4XrTJmgjUvRYOmGMMd5++rTE9xHuMR0IggqiL2/R0i9GlqR8pmTnN
+   ZOFZF8MC4mlJ92HZUd31PBouep2cmZjNYNCG8gox2HRuywErqHsy90aVh
+   o2NfMU2ugg3l5PGBzLxoGf3rNabjHAJUaSKJN7x/o2Mug5H12lTmNz0vn
+   3GQpk7B07A1INrBJm9SlmWSJkJkgNZkNWfSP7JCSeiYC6RY2BpkD4KGSY
+   UMHrshfBrkNgy765kxfqRirgH5BhYFE6DGOnxJtbtf08VmdXWy32MCggz
+   QuAjuZH0GDQM3IBfub0lIjuAm46lW/oemsJylS2o1OQaMbxsOFiwqYv5v
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="247980712"
+X-IronPort-AV: E=Sophos;i="5.88,355,1635231600"; 
+   d="scan'208";a="247980712"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2022 23:41:34 -0800
+X-IronPort-AV: E=Sophos;i="5.88,355,1635231600"; 
+   d="scan'208";a="540984524"
+Received: from hyperv-sh4.sh.intel.com ([10.239.48.22])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2022 23:41:21 -0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        kevin.tian@intel.com, tglx@linutronix.de
+Cc:     Chao Gao <chao.gao@intel.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-References: <20220207165930.1608621-1-scgl@linux.ibm.com>
- <20220207165930.1608621-6-scgl@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220207165930.1608621-6-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ud7NGynxqx2BwVmLnsC9nskIYKB9GfF9
-X-Proofpoint-GUID: XYa-efA6jbvwh8heDmEwNHzxKaCqZEj9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-09_04,2022-02-07_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 lowpriorityscore=0 mlxscore=0 bulkscore=0 adultscore=0
- suspectscore=0 impostorscore=0 clxscore=1015 phishscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202090051
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Garry <john.garry@huawei.com>,
+        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Ravi Bangoria <ravi.bangoria@linux.ibm.com>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Sumanth Korikkar <sumanthk@linux.ibm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Richter <tmricht@linux.ibm.com>,
+        Tom Zanussi <tom.zanussi@linux.intel.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Will Deacon <will@kernel.org>, x86@kernel.org
+Subject: [PATCH v3 0/5] Improve KVM's interaction with CPU hotplug
+Date:   Wed,  9 Feb 2022 15:41:01 +0800
+Message-Id: <20220209074109.453116-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 07.02.22 um 17:59 schrieb Janis Schoetterl-Glausch:
-> User space needs a mechanism to perform key checked accesses when
-> emulating instructions.
-> 
-> The key can be passed as an additional argument.
-> Having an additional argument is flexible, as user space can
-> pass the guest PSW's key, in order to make an access the same way the
-> CPU would, or pass another key if necessary.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   arch/s390/kvm/kvm-s390.c | 49 +++++++++++++++++++++++++++++++---------
->   include/uapi/linux/kvm.h |  8 +++++--
->   2 files changed, 44 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index cf347e1a4f17..71e61fb3f0d9 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -32,6 +32,7 @@
->   #include <linux/sched/signal.h>
->   #include <linux/string.h>
->   #include <linux/pgtable.h>
-> +#include <linux/bitfield.h>
->   
->   #include <asm/asm-offsets.h>
->   #include <asm/lowcore.h>
-> @@ -2359,6 +2360,11 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->   	return r;
->   }
->   
-> +static bool access_key_invalid(u8 access_key)
-> +{
-> +	return access_key > 0xf;
-> +}
-> +
->   long kvm_arch_vm_ioctl(struct file *filp,
->   		       unsigned int ioctl, unsigned long arg)
->   {
-> @@ -4687,34 +4693,54 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->   				  struct kvm_s390_mem_op *mop)
->   {
->   	void __user *uaddr = (void __user *)mop->buf;
-> +	u8 access_key = 0, ar = 0;
->   	void *tmpbuf = NULL;
-> +	bool check_reserved;
->   	int r = 0;
->   	const u64 supported_flags = KVM_S390_MEMOP_F_INJECT_EXCEPTION
-> -				    | KVM_S390_MEMOP_F_CHECK_ONLY;
-> +				    | KVM_S390_MEMOP_F_CHECK_ONLY
-> +				    | KVM_S390_MEMOP_F_SKEY_PROTECTION;
->   
-> -	if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size)
-> +	if (mop->flags & ~supported_flags || !mop->size)
->   		return -EINVAL;
-> -
->   	if (mop->size > MEM_OP_MAX_SIZE)
->   		return -E2BIG;
-> -
->   	if (kvm_s390_pv_cpu_is_protected(vcpu))
->   		return -EINVAL;
-> -
->   	if (!(mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY)) {
->   		tmpbuf = vmalloc(mop->size);
->   		if (!tmpbuf)
->   			return -ENOMEM;
->   	}
-> +	ar = mop->ar;
-> +	mop->ar = 0;
+Changes from v2->v3:
+ - rebased to the latest kvm/next branch. 
+ - patch 1: rename {svm,vmx}_check_processor_compat to follow the name
+	    convention
+ - patch 3: newly added to provide more information when hardware enabling
+	    fails
+ - patch 4: reset hardware_enable_failed if hardware enabling fails. And
+	    remove redundent kernel log.
+ - patch 5: add a pr_err() for setup_vmcs_config() path.
 
-Why this assignment to 0?
+Changes from v1->v2: (all comments/suggestions on v1 are from Sean, thanks)
+ - Merged v1's patch 2 into patch 1, and v1's patch 5 into patch 6.
+ - Use static_call for check_processor_compatibility().
+ - Generate patch 2 with "git revert" and do manual changes based on that.
+ - Loosen the WARN_ON() in kvm_arch_check_processor_compat() instead of
+   removing it.
+ - KVM always prevent incompatible CPUs from being brought up regardless of
+   running VMs.
+ - Use pr_warn instead of pr_info to emit logs when KVM finds offending
+   CPUs.
 
-> +	if (ar >= NUM_ACRS)
-> +		return -EINVAL;
-> +	if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
-> +		access_key = mop->key;
-> +		mop->key = 0;
+KVM registers its CPU hotplug callback to CPU starting section. And in the
+callback, KVM enables hardware virtualization on hotplugged CPUs if any VM
+is running on existing CPUs.
 
-and this? I think we can leave mop unchanged.
+There are two problems in the process:
+1. KVM doesn't do compatibility checks before enabling hardware
+virtualization on hotplugged CPUs. This may cause #GP if VMX isn't
+supported or vmentry failure if some in-use VMX features are missing on
+hotplugged CPUs. Both break running VMs.
+2. Callbacks in CPU STARTING section cannot fail. So, even if KVM finds
+some incompatible CPUs, its callback cannot block CPU hotplug.
 
-In fact, why do we add the ar and access_key variable?
-This breaks the check from above (if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size))  into two checks
-and it will create a memleak for tmpbuf.
+This series improves KVM's interaction with CPU hotplug to avoid
+incompatible CPUs breaking running VMs. Following changes are made:
 
-Simply use mop->key and mop->ar below and get rid of the local variables.
-The structure has no concurrency and gcc will handle that just as the local variable.
+1. move KVM's CPU hotplug callback to ONLINE section (suggested by Thomas)
+2. do compatibility checks on hotplugged CPUs.
+3. abort onlining incompatible CPUs
 
-Other than that this looks good.
-> +		if (access_key_invalid(access_key))
-> +			return -EINVAL;
-> +	}
-> +	/*
-> +	 * Check that reserved/unused == 0, but only for extensions,
-> +	 * so we stay backward compatible.
-> +	 * This gives us more design flexibility for future extensions, i.e.
-> +	 * we can add functionality without adding a flag.
-> +	 */
-> +	check_reserved = mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION;
-> +	if (check_reserved && memchr_inv(&mop->reserved, 0, sizeof(mop->reserved)))
-> +		return -EINVAL;
->   
->   	switch (mop->op) {
->   	case KVM_S390_MEMOP_LOGICAL_READ:
->   		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> -			r = check_gva_range(vcpu, mop->gaddr, mop->ar,
-> -					    mop->size, GACC_FETCH, 0);
-> +			r = check_gva_range(vcpu, mop->gaddr, ar, mop->size,
-> +					    GACC_FETCH, access_key);
->   			break;
->   		}
-> -		r = read_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
-> +		r = read_guest_with_key(vcpu, mop->gaddr, ar, tmpbuf,
-> +					mop->size, access_key);
->   		if (r == 0) {
->   			if (copy_to_user(uaddr, tmpbuf, mop->size))
->   				r = -EFAULT;
-> @@ -4722,15 +4748,16 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->   		break;
->   	case KVM_S390_MEMOP_LOGICAL_WRITE:
->   		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> -			r = check_gva_range(vcpu, mop->gaddr, mop->ar,
-> -					    mop->size, GACC_STORE, 0);
-> +			r = check_gva_range(vcpu, mop->gaddr, ar, mop->size,
-> +					    GACC_STORE, access_key);
->   			break;
->   		}
->   		if (copy_from_user(tmpbuf, uaddr, mop->size)) {
->   			r = -EFAULT;
->   			break;
->   		}
-> -		r = write_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
-> +		r = write_guest_with_key(vcpu, mop->gaddr, ar, tmpbuf,
-> +					 mop->size, access_key);
->   		break;
->   	}
->   
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index b46bcdb0cab1..5771b026fbc0 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -562,9 +562,12 @@ struct kvm_s390_mem_op {
->   	__u32 op;		/* type of operation */
->   	__u64 buf;		/* buffer in userspace */
->   	union {
-> -		__u8 ar;	/* the access register number */
-> +		struct {
-> +			__u8 ar;	/* the access register number */
-> +			__u8 key;	/* access key to use for storage key protection */
-> +		};
->   		__u32 sida_offset; /* offset into the sida */
-> -		__u8 reserved[32]; /* should be set to 0 */
-> +		__u8 reserved[32]; /* must be set to 0 */
->   	};
->   };
+This series is a follow-up to the discussion about KVM and CPU hotplug
+https://lore.kernel.org/lkml/3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com/T/
+
+Note: this series is tested only on Intel systems.
+
+Chao Gao (4):
+  KVM: x86: Move check_processor_compatibility from init ops to runtime
+    ops
+  Partially revert "KVM: Pass kvm_init()'s opaque param to additional
+    arch funcs"
+  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+  KVM: Do compatibility checks on hotplugged CPUs
+
+Sean Christopherson (1):
+  KVM: Provide more information in kernel log if hardware enabling fails
+
+ arch/arm64/kvm/arm.c               |  2 +-
+ arch/mips/kvm/mips.c               |  2 +-
+ arch/powerpc/kvm/powerpc.c         |  2 +-
+ arch/riscv/kvm/main.c              |  2 +-
+ arch/s390/kvm/kvm-s390.c           |  2 +-
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  2 +-
+ arch/x86/kvm/svm/svm.c             |  4 +-
+ arch/x86/kvm/vmx/evmcs.c           |  2 +-
+ arch/x86/kvm/vmx/evmcs.h           |  2 +-
+ arch/x86/kvm/vmx/vmx.c             | 22 +++++----
+ arch/x86/kvm/x86.c                 | 16 +++++--
+ include/linux/cpuhotplug.h         |  2 +-
+ include/linux/kvm_host.h           |  2 +-
+ virt/kvm/kvm_main.c                | 73 +++++++++++++++++++-----------
+ 15 files changed, 83 insertions(+), 53 deletions(-)
+
+-- 
+2.25.1
+
