@@ -2,85 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F3234B00CB
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 23:58:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA73F4B02F3
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:06:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236833AbiBIW6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 17:58:04 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:41326 "EHLO
+        id S230026AbiBJCCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 21:02:04 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:60212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236875AbiBIW6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 17:58:02 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31D6E04BEAF
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 14:57:54 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id om7so3521511pjb.5
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 14:57:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9hlT9vQoLsVUjhpXGLlm7SvL3xA/YnfAS42BSAPz/pE=;
-        b=r734V9jLiaYfgXN0U+a0+2HFTV0eBCXCPquFaY/jlvnSdXeYv8CNvRDh/k7nddphJt
-         i8MOmjleXPePA6uvYMQC2S8sulBSJ8DjBef7De+Qt/G30bc1Ij6Wau47EIQHjyvzr767
-         zEDwNvkCqLOmt1Jt+Z63JDDnSrNnXQyyR5s0gNfZKAqOn47bYilzIbNHWdbXFsYJhZkk
-         dz01b+CjCMs7TzyfXo9oORg+cwjc4++HwDCXGps1KqbJMfg7ozkyCtGABKVvSC3lFm1n
-         fC5HzenqA0xBzwiHiaG6eMG6VvXtSS42e9ELMj9likPB63B2zJzx7PaOerJbkPVJpUqw
-         I2kg==
+        with ESMTP id S234322AbiBJCAP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 21:00:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E812A2B6B0
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:45:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644457515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QqS6aRbHUDdzpsG8gLAbed/VgqomfvLKE7ZO5PCIOxw=;
+        b=EAWUge6OpYCxHvMymJyzXL0u6KeNKQUU7UmOf3hbi6wNGumwmhGn5JElsE2ja4BUF7CKTk
+        tWV90Y9Iz8kOCpJDBcOWk+GdTEN4/DxWQvUL0LMEPMqlwoZQT5MxIet6fgh4z1SXxc4awf
+        wo4tIlJ5A3FTplwCKy4zT8zvpt8Bozs=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-536-3WEcrkCfMKCNZPjs56I6dQ-1; Wed, 09 Feb 2022 18:44:43 -0500
+X-MC-Unique: 3WEcrkCfMKCNZPjs56I6dQ-1
+Received: by mail-il1-f197.google.com with SMTP id a3-20020a92d103000000b002bdfc5108dfso2701943ilb.9
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 15:44:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9hlT9vQoLsVUjhpXGLlm7SvL3xA/YnfAS42BSAPz/pE=;
-        b=STufeOwWFdKIHAxD6lA8KqFDuViGeaO1KQy/PyL54zIa1qDZ0JRM9yMsCa1KFHqlmv
-         8qEdvZ2M3bLCbKyPHiw0kaULrvSDM6RbFJRB3JtRtw4Tsg8sCYNSM7E5WMu3WXG0arjW
-         /Xk8yj5FWZH9aO3AEQElpEzlbL9iHxk2inmnwrmhZ2Cne0B+u8tRJp4FdTDrvgffp+zB
-         pQop0ZTHIv8hp7XSqKnJI3GhcReefs9xHjeivkMK6fDcgCUOB28P3YYuUOvmvzNO3Cjk
-         kbnGYYdodYiNz7/LYbMNjRLhrale+ECZWFxqzLRi3zkGc8wywi5H3hQ7xdRxfFHR2pAM
-         G9fA==
-X-Gm-Message-State: AOAM531AyyQKWoyfLiISjWk88LfWGfT6tcg7VJamuenSUCY4sfrvI10/
-        HPTlBWU/Bxr839MOGh/7+FDncQ==
-X-Google-Smtp-Source: ABdhPJzxCieXiOFBmRxLOPkMpJ+lVohhiFAWUBH7GcomfK6r/tS+mSnDhcBvuqYoUy/9VfU1Cv+eLg==
-X-Received: by 2002:a17:90b:3a82:: with SMTP id om2mr4731200pjb.167.1644447468162;
-        Wed, 09 Feb 2022 14:57:48 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id gk15sm269582pjb.3.2022.02.09.14.57.47
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=QqS6aRbHUDdzpsG8gLAbed/VgqomfvLKE7ZO5PCIOxw=;
+        b=DVcmGlsikx2IjO8P5CfUA6lrKkIJ5YZ0H0bOJTkiQ5Dv1wIZ+9Q+sSiQ5S7q3ojUnd
+         ucUTU51uDy45LZoAkwt2TxyH+/hA7VO8AKMGHBSEbjKuIPRMmR0/8lJctN82NmRqRChk
+         iSvMq6dqGURT2oYhzMnC1+lpED2CszqQJvi3AWFZqqDqHIqGMykYveGyabLRhDW3i2s2
+         zx8xIlUUo5kgj6bBR7B972tEnyqrtX6wswzR/1zjB6tO6j9qgjMwL5yzlaA2qvq34hkb
+         YojHy8cIHxOJqw279iXurskkx5n0Gu6ho2i5kAnC6QHKe3+qm+PG931Wiu+6ZvdKQ7gQ
+         0hxg==
+X-Gm-Message-State: AOAM533AeU2WNOjBdXUxdArbb3HjZDS8JI2YGkXd8FS2fX+xodZ9efdG
+        UcU9zY1fVx51E2pw0AbnJX/m5y4GR2GYVWqbY9aFRQrbRApOrNEGrAQpFL+vV0clYhReL49sj6m
+        +nvmuH6JQjdKI
+X-Received: by 2002:a05:6602:2209:: with SMTP id n9mr2470394ion.106.1644450283125;
+        Wed, 09 Feb 2022 15:44:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxT6HD2F4lnfPsmgFD3PhnkTPzmCmvBRL9NupZBHsvlbk18vuDpteUdQty0XS8Ul8opPEqcow==
+X-Received: by 2002:a05:6602:2209:: with SMTP id n9mr2470381ion.106.1644450282952;
+        Wed, 09 Feb 2022 15:44:42 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id w19sm10870685iov.16.2022.02.09.15.44.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 14:57:47 -0800 (PST)
-Date:   Wed, 9 Feb 2022 22:57:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        dmatlack@google.com, vkuznets@redhat.com
-Subject: Re: [PATCH 04/23] KVM: MMU: constify uses of struct kvm_mmu_role_regs
-Message-ID: <YgRG6GPX906Yy51b@google.com>
-References: <20220204115718.14934-1-pbonzini@redhat.com>
- <20220204115718.14934-5-pbonzini@redhat.com>
+        Wed, 09 Feb 2022 15:44:42 -0800 (PST)
+Date:   Wed, 9 Feb 2022 16:44:40 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
+        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: Re: [RFC v4 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220209164440.0d77284c.alex.williamson@redhat.com>
+In-Reply-To: <20220208133425.1096-8-shameerali.kolothum.thodi@huawei.com>
+References: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
+        <20220208133425.1096-8-shameerali.kolothum.thodi@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220204115718.14934-5-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 04, 2022, Paolo Bonzini wrote:
-> struct kvm_mmu_role_regs is computed just once and then accessed.  Use
-> const to enforce this.
+On Tue, 8 Feb 2022 13:34:24 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> +
+> +static struct hisi_acc_vf_migration_file *
+> +hisi_acc_vf_stop_copy(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> +{
+> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &hisi_acc_vdev->vf_dev->dev;
+> +	struct hisi_acc_vf_migration_file *migf;
+> +	int ret;
+> +
+> +	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
+> +		dev_info(dev, "QM device not ready, no data to transfer\n");
+> +		return 0;
+> +	}
 
-It's not new enforcement, just syntatic sugar (though it's tasty sugar).  All fields
-in struct kvm_mmu_role_regs are const specifically to prevent such a struct from
-being changed regardless of how a pointer was obtained.
+This return value looks suspicious and I think would cause a segfault
+in the calling code:
 
-struct kvm_mmu_role_regs {
-	const unsigned long cr0;
-	const unsigned long cr4;
-	const u64 efer;
-};
++		migf = hisi_acc_vf_stop_copy(hisi_acc_vdev);
++		if (IS_ERR(migf))
++			return ERR_CAST(migf);
++		get_file(migf->filp);
++		hisi_acc_vdev->saving_migf = migf;
++		return migf->filp;
+
+Thanks,
+Alex
+
