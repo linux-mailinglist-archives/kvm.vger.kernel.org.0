@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C346B4AFE5A
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 21:23:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0D6F4AFEB8
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 21:50:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231809AbiBIUXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 15:23:37 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:58422 "EHLO
+        id S232391AbiBIUtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 15:49:24 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:50534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbiBIUXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 15:23:31 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36839E040DDF
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 12:23:31 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id j4so3245516plj.8
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 12:23:31 -0800 (PST)
+        with ESMTP id S232359AbiBIUtX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 15:49:23 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8955AC05CBA4
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 12:49:26 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id 10so3364737plj.1
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 12:49:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=BC444T97s2pujBhj00jM3dxh/3fUj9wEYJS5P/gIz+E=;
-        b=sFp5qUWM2vyEC5/A9tYSp9ZS5lQan6sS/azO/u3vOsj50f8Me5GPqLoKQ3fHbJKE7P
-         15wOd0ax7k125I9/FZ2nfbtjt0pdoC764TbBbl5YRp3IpMmdk8n7r/kasMRd1gom8+I8
-         6ISpi1GV7PAPv5vDS/EkhpxaBsjbZDJIEyZL4Rp5SjSAU1ePJeDW5sIFfR8lggLErGxC
-         d6EA3mM4Z0n6Xz8455mEPpoV00rX7vTotPdupcM3o8n/SjWzDWe0aVWFHizC4KaxXT0B
-         kmoMwe1U1Q64adee51VBlTdlLmbcOUoLpRtOjUtvw0oKPewVLWHjOJ/E4G14g7e+L6gM
-         5KyQ==
+        bh=usai5WVQErwk4Ew2fX/fOjUw6I8vvZIt0nVcprr1jB8=;
+        b=VqQ4AQV9kyt+0LUwBHfYIcCdy6HaR52lzHPXQid7Q9Se19pBiE9Mi/rh3L+BTrlcsA
+         3zhWV/p7cu/zpDWzo7seoNfyvraJeUxi6CYB6mkMUCbqqhUhq6m/rjbyx/IUrHKoVXof
+         lSkYyXL/SVmmvlJQ902YhuNCzptvPCHTOSwCPPsN8v87m068+MhEZHA/NU8a1bXJaf9P
+         uKu6stWAubyB61SmQAKl0PriItNTzKJNWLayosXH27IGEVSnYux3NhyrI5glY56g2pAl
+         uGtJ7pB8scL4hzREiHv7FcQjA7rxLGqS4qtNTCbZKzEmQmICwvLEIphJRmERaAHp85uu
+         QD5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=BC444T97s2pujBhj00jM3dxh/3fUj9wEYJS5P/gIz+E=;
-        b=KpwY1AxZy8LrzC1jH9XKxy5zts4KKMcNq7pj8K8Famw2yxsthw8FrUxRArdPXoRSwk
-         HTXe4sOWUBut8pOyyuyWnzm+1GUcLfjFZzl2pZ11bsaOuKQ89zw0Ngkizdqu2ZUTGlcc
-         nhmJXnkBKrgNtdAKXvU4OZKtrf+Q7nxbKFOyRzR69ZfPT7zEESll3yhTkDrV0MBxNkPy
-         mPwnmUmOkjCJZBacHHvPJsP1EcWhy2DmZ3SCGz26xc+r579xq7XHLmT/c7RA+wbLfb6l
-         m6r5KGTvO4MP5IMUeDmp3gIre/k4+kxAGn8mZRnfpCAPTykj0Om6TWcFlWdjrTga3C7x
-         sS6g==
-X-Gm-Message-State: AOAM530RoPWNOFwOSe/se2I+6cNj6jRL+xmXMlTRB416ZjU+IVHjW9cD
-        b3CGqkQB683TwirTZBBdUIyggg==
-X-Google-Smtp-Source: ABdhPJy+8Drq/F1yUGaUW5cbnM1VdjpUk7MJa2Yx1nMb1G+NyLJQ5Q8TvuOsQ4zJX2xw5hWasJLQ0Q==
-X-Received: by 2002:a17:903:41cf:: with SMTP id u15mr2733349ple.91.1644438210785;
-        Wed, 09 Feb 2022 12:23:30 -0800 (PST)
+        bh=usai5WVQErwk4Ew2fX/fOjUw6I8vvZIt0nVcprr1jB8=;
+        b=4j8moypQgpDbt80DoXRncaW24RRpI5pCOM7sNCnmhATQKhpwBCEgid3GKZtfh8Luvw
+         pqiVfyLsqZ7zdmQ16hKg0gbQRwCrT926OFK1kH5fsJqBjLDuB1r6s+O4IAS1B6dXRmbu
+         2rJtHeDqMuF8glhkaYkEJ+tSAP50LuZ1AfntqtPiPNKxXfIt5pYaasXsEdJRW1kdpeKL
+         7jT8RIiiKXjMDgC8QzSI2URg0qcJJQ62cPZNg6k5gVOYaNT8wubANthYV5RXLYVv6XC4
+         PKk6Q2W5KR7VqHCvRNN1aRQiJ+NVe2moEPBE7lza+xUoXuAbBlpIpcB7qt5EtB/0acBh
+         J10w==
+X-Gm-Message-State: AOAM5330YhAo9tVeBudN24zs+/5eie0jj3UhxnGTgJDGWyAgajuo4FQM
+        R/pnTDW+lgb+bvEV/e33KMKxAg==
+X-Google-Smtp-Source: ABdhPJw/3lEaJcN7mZhLmzhDeUcjhx87dXVoMvRWh5thi6wmzVXTU+ApsU/9c7brBYgoM6y2N1AWpQ==
+X-Received: by 2002:a17:90a:ab90:: with SMTP id n16mr5432152pjq.229.1644439765909;
+        Wed, 09 Feb 2022 12:49:25 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d12sm14393021pgk.29.2022.02.09.12.23.29
+        by smtp.gmail.com with ESMTPSA id j15sm22379244pfj.102.2022.02.09.12.49.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 12:23:29 -0800 (PST)
-Date:   Wed, 9 Feb 2022 20:23:26 +0000
+        Wed, 09 Feb 2022 12:49:25 -0800 (PST)
+Date:   Wed, 9 Feb 2022 20:49:21 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
+        tglx@linutronix.de, Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 4/7] KVM: nVMX: Add a quirk for KVM tweaks to VMX
- control MSRs
-Message-ID: <YgQivlmPUlC4uRqo@google.com>
-References: <20220204204705.3538240-1-oupton@google.com>
- <20220204204705.3538240-5-oupton@google.com>
- <YgFfpTk/woy75TVj@google.com>
- <CAOQ_QshC=DKZNQ1OVjtx19nw3+ET46fmCVnU+VQFHUBQ3vgFqw@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/5] KVM: Do compatibility checks on hotplugged CPUs
+Message-ID: <YgQo0SB59SCRUPQ3@google.com>
+References: <20220209074109.453116-1-chao.gao@intel.com>
+ <20220209074109.453116-6-chao.gao@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOQ_QshC=DKZNQ1OVjtx19nw3+ET46fmCVnU+VQFHUBQ3vgFqw@mail.gmail.com>
+In-Reply-To: <20220209074109.453116-6-chao.gao@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,74 +77,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 08, 2022, Oliver Upton wrote:
-> On Mon, Feb 7, 2022 at 10:06 AM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Feb 09, 2022, Chao Gao wrote:
+> At init time, KVM does compatibility checks to ensure that all online
+> CPUs support hardware virtualization and a common set of features. But
+> KVM uses hotplugged CPUs without such compatibility checks. On Intel
+> CPUs, this leads to #GP if the hotplugged CPU doesn't support VMX or
+> vmentry failure if the hotplugged CPU doesn't meet minimal feature
+> requirements.
 > 
-> [...]
+> Do compatibility checks when onlining a CPU and abort the online process
+> if the hotplugged CPU is incompatible with online CPUs.
 > 
-> > > +#define KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS    (1 << 5)
-> >
-> > I'd prefer we include msr_ia32_feature_control_valid_bits in this quirk, it should
-> > be relatively easy to do since most of the modifications stem from
-> > vmx_vcpu_after_set_cpuid().  vmx_setup_mce() is a bit odd, but IMO it's worth
-> > excising as much crud as we can.
-> >
+> CPU hotplug is disabled during hardware_enable_all() to prevent the corner
+> case as shown below. A hotplugged CPU marks itself online in
+> cpu_online_mask (1) and enables interrupt (2) before invoking callbacks
+> registered in ONLINE section (3). So, if hardware_enable_all() is invoked
+> on another CPU right after (2), then on_each_cpu() in hardware_enable_all()
+> invokes hardware_enable_nolock() on the hotplugged CPU before
+> kvm_online_cpu() is called. This makes the CPU escape from compatibility
+> checks, which is risky.
 > 
-> Sure, this is a good opportunity to rip out the crud.
-> msr_ia32_feature_control_valid_bits is a bit messy, since the default
-> value does not contain all the bits we support. At least with
-> IA32_VM_TRUE_{ENTRY,EXIT}_CTLS we slim down the hardware values to get
-> the default value.
+> 	start_secondary { ...
+> 		set_cpu_online(smp_processor_id(), true); <- 1
+> 		...
+> 		local_irq_enable();  <- 2
+> 		...
+> 		cpu_startup_entry(CPUHP_AP_ONLINE_IDLE); <- 3
+> 	}
 > 
-> Not at all objecting, but it looks like we will need to populate some
-> bits in the default value of the IA32_FEAT_CTL mask, otherwise with
-> the quirk enabled guests could never set any of the bits in the MSR.
+> Keep compatibility checks at KVM init time. It can help to find
+> incompatibility issues earlier and refuse to load arch KVM module
+> (e.g., kvm-intel).
+> 
+> Loosen the WARN_ON in kvm_arch_check_processor_compat so that it
+> can be invoked from KVM's CPU hotplug callback (i.e., kvm_online_cpu).
+> 
+> Opportunistically, add a pr_err() for setup_vmcs_config() path in
+> vmx_check_processor_compatibility() so that each possible error path has
+> its own error message. Convert printk(KERN_ERR ... to pr_err to please
+> checkpatch.pl
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> ---
 
-I assume you mean "quirk disabled"?  Because quirks are on by default, i.e. KVM's
-default behavior will be to populate msr_ia32_feature_control_valid_bits based on
-CPUID updates.
-
-That said, after typing up what I had in mind, I don't think we need a quirk at all.
-The only weird part is that KVM doesn't allow host userspace to set the MSR without
-first setting CPUID.  That's trivial to fix and we can do so without impacting KVM's
-modeling of WRMSR from the guest.  Modeling WRMSR is no different than KVM enforcing
-CR4 bits based on CPUID.  The VMX MSRs are weird because they are technically
-independent of the non-virtualization support reported in CPUID, i.e. KVM is overstepping
-by manipulating the MSRs based on CPUID.
-
-I'll send this is a formal patch, obviously with KVM_SUPPORTED_FEATURE_CONTROL
-defined...
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d05b4955d14f..d50ae2de8b51 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1749,11 +1749,16 @@ bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
- }
-
- static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
--                                                uint64_t val)
-+                                                struct msr_data *msr)
- {
--       uint64_t valid_bits = to_vmx(vcpu)->msr_ia32_feature_control_valid_bits;
-+       uint64_t valid_bits;
-
--       return !(val & ~valid_bits);
-+       if (msr->host_initiated)
-+               valid_bits = KVM_SUPPORTED_FEATURE_CONTROL;
-+       else
-+               to_vmx(vcpu)->msr_ia32_feature_control_valid_bits;
-+
-+       return !(msr->data & ~valid_bits);
- }
-
- static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
-@@ -2146,7 +2151,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                vcpu->arch.mcg_ext_ctl = data;
-                break;
-        case MSR_IA32_FEAT_CTL:
--               if (!vmx_feature_control_msr_valid(vcpu, data) ||
-+               if (!vmx_feature_control_msr_valid(vcpu, msr_info) ||
-                    (to_vmx(vcpu)->msr_ia32_feature_control &
-                     FEAT_CTL_LOCKED && !msr_info->host_initiated))
-                        return 1;
+Reviewed-by: Sean Christopherson <seanjc@google.com>
