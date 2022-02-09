@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADAE74AF882
+	by mail.lfdr.de (Postfix) with ESMTP id A54FA4AF881
 	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:30:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238322AbiBIR3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 12:29:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58038 "EHLO
+        id S238321AbiBIR35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 12:29:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232618AbiBIR3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 12:29:53 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B564C05CB86
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:29:56 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id ay10-20020a17090b030a00b001b8a4029ba0so4236314pjb.5
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 09:29:56 -0800 (PST)
+        with ESMTP id S238324AbiBIR3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 12:29:55 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38195C0613C9
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:29:59 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id a15-20020a17090ad80f00b001b8a1e1da50so2247241pjv.6
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 09:29:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=cE6nPhqUrdzaQ7066nYi569JLAMVfUJ5DNprAL1or7c=;
-        b=LxvqmeRyjdn9uhoRdunTjzoeDd/+jD2yoE3Dg67uRUJpy7WeRNSJDVFpf7YTQOP37U
-         loLFD2syK4/T4k9JHDAoRDWwcR9LQiXCLMFTWTL9excgLqYO9m6MaaGE7HrrBGWUL6iS
-         1NkWjojK3KySrNFfg4FzdkmZpA1Vl/xRLjABoY+tr9q09+w9p3tvZRU4wR618XSnhdUy
-         59NCIf72SAJxgQaBTG2ubyT0aWoUzp5sZYU4KAQ1MPyQALU8pyQY3y6TEYxiWBiEjby3
-         bl+mZbA0+0tb3KR085MEAngB+VqocUVFFEsMt0bPjUFKrhJGG0SxgprUZymrC4ekCQ9i
-         MXdQ==
+        bh=8OBoX65iKSlGteJ8KRsRO0AoOHBHi+mvW0Rr+JlImC4=;
+        b=ZCL0lDmM040QdQ7x5ueHQEvbksPd0C2lX+TdG+eFbCZ5IUcF3N4Ret02g6XWp3235w
+         T4EjHtjZfojCMqHj1BAxziiH3bjfWrh5ldjhXGmC0JdCZg1i5LfF4mfusyz+wwICbq4s
+         7rT4v1P3LqHzpojuXgM5ZSZ2A87suns5c8Ui5ywNvx6AxBiuU+UO/X+Wn+UCCOAW7CI7
+         JNR1dPAcd45MmZA/mDR5q6qS/F3cj7YQBej/qJqF1fA17D4D+xnQB8DbBwDulmV/saSa
+         caYQ2Q7Q0cw+Q8ZCSA2W6qYVg0vw64q0O5J3kQ8mP5HJlW2ufhp+F+0B1TA8M8gKekbd
+         bhpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=cE6nPhqUrdzaQ7066nYi569JLAMVfUJ5DNprAL1or7c=;
-        b=mXQZJpqHzGmQV99fa61in8CBXJTW8vIpwuz5OkqBJ6aFp4tP/vJPXXaU59wGpgJdDU
-         HvsBGfeY7qazP9ZwIQTYmO2H7qjjmyfmBgL7nc5tVvL27WCy7M5PfhkkKhXo9UTRNf3s
-         rwJMMm/+kQYVbu8DIUR86lhuWZOZnLUMwk3zO6gLucRzxHLvfJ/rHlayubKh1iErT0SN
-         N/za4NMdQagcu7BETn3iIyPztelExYab4twSe/Afb4fb2Af8CrGI7QKwEvdE10glUbgr
-         tUeaM18BEGbJCx56BI2NYo+YsDz9jZF1KTeSwnPDAjruZPDHw0aD8cfzQXaQn2cm8CVQ
-         JQyw==
-X-Gm-Message-State: AOAM533Z0ZIpFNqoB6QwF0lkxlmqLNvnGuKoxpmCewDFyQP11a0EK+cv
-        mr/COhkrxSdE6vOE5XbUVLNlSA30mwZQGNk=
-X-Google-Smtp-Source: ABdhPJwXFc+eXwLS6S6SnOulElBTcAYiQHfaYFn8YwxFX2r/7x8cPSYtYX4P/0hs5Y6CcefBngtzprC+LlgEcsg=
+        bh=8OBoX65iKSlGteJ8KRsRO0AoOHBHi+mvW0Rr+JlImC4=;
+        b=kPYxeiLhCPp4opWbNiYamdNnGy0v/BictLCCR7oP+cbK/A/TiVCWMsU1Xgm1zZDfRj
+         G7CcYM6pe/AEuZXgjX1dBIS1DcKhfdzOBr9aFOGXaopTBjW8C8SUk1YkOmgpx4MOZyCc
+         Wabu999TrNtC1UGI1uY7mh4uoxKgSJfNsSudjafwcQnmsLvtrns99xsjgLCPjaQhQG8+
+         /SZjKySzmc+uR4CTPq/2UbdISkQ8tOoyCt+Wz7VFx5dD6kkHrcC+34f1zAbx0TWSqFuS
+         1oZNF1DSqUtvvGsOpzAZ48tBksKZpLKJRgu2RfVnVm2M+HuCrlhQs+pOBzMsuLAUm1ye
+         9Nnw==
+X-Gm-Message-State: AOAM531hTyLRRN3/HHwJKAUTzpMVyt/9E9BpRbgk1ozr3/9BOx1DaGKU
+        pInWM2ZDTsrb/tVi7xpUXKFGzyGSRi/5mgg=
+X-Google-Smtp-Source: ABdhPJyOqWL9wvZd7gKHbxQ4sw4iacst1JTwmFMj1U2lPBHujiT31uwKyrJN5ab+OUD2GFl1XFC303JBYwGWHJE=
 X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
- (user=daviddunn job=sendgmr) by 2002:a05:6a00:1d9f:: with SMTP id
- z31mr3075554pfw.38.1644427795727; Wed, 09 Feb 2022 09:29:55 -0800 (PST)
-Date:   Wed,  9 Feb 2022 17:29:44 +0000
+ (user=daviddunn job=sendgmr) by 2002:a17:902:f786:: with SMTP id
+ q6mr3101390pln.64.1644427798725; Wed, 09 Feb 2022 09:29:58 -0800 (PST)
+Date:   Wed,  9 Feb 2022 17:29:45 +0000
 In-Reply-To: <20220209172945.1495014-1-daviddunn@google.com>
-Message-Id: <20220209172945.1495014-3-daviddunn@google.com>
+Message-Id: <20220209172945.1495014-4-daviddunn@google.com>
 Mime-Version: 1.0
 References: <20220209172945.1495014-1-daviddunn@google.com>
 X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH v6 2/3] KVM: selftests: Allow creation of selftest VM without vcpus
+Subject: [PATCH v6 3/3] KVM: selftests: Verify disabling PMU virtualization
+ via KVM_CAP_CONFIG_PMU
 From:   David Dunn <daviddunn@google.com>
 To:     pbonzini@redhat.com
 Cc:     seanjc@google.com, jmattson@google.com, like.xu.linux@gmail.com,
@@ -66,83 +67,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Break out portion of vm_create_with_vcpus so that selftests can modify
-the VM prior to creating vcpus.
+On a VM with PMU disabled via KVM_CAP_PMU_CONFIG, the PMU will not be
+usable by the guest.  On Intel, this causes a #GP.  And on AMD, the
+counters no longer increment.
+
+KVM_CAP_PMU_CONFIG must be invoked on a VM prior to creating VCPUs.
 
 Signed-off-by: David Dunn <daviddunn@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  3 ++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++++++----
- 2 files changed, 32 insertions(+), 6 deletions(-)
+ .../kvm/x86_64/pmu_event_filter_test.c        | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 4ed6aa049a91..2bdf96f520aa 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -336,6 +336,9 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
- 				    uint32_t num_percpu_pages, void *guest_code,
- 				    uint32_t vcpuids[]);
- 
-+/* First phase of vm_create_with_vcpus, allows customization before vcpu add */
-+struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages);
-+
- /*
-  * Adds a vCPU with reasonable defaults (e.g. a stack)
-  *
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index d8cf851ab119..52f1f530564e 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -362,6 +362,34 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- 	return vm;
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+index c715adcbd487..7a4b99684d9d 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+@@ -325,6 +325,39 @@ static void test_not_member_allow_list(struct kvm_vm *vm)
+ 	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
  }
  
 +/*
-+ * VM Create without creating VCPUs
++ * Verify KVM_CAP_PMU_DISABLE prevents the use of the PMU.
 + *
-+ * Input Args:
-+ *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
-+ *   pages - pages of memory required for VM
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   Pointer to opaque structure that describes the created VM.
-+ *
-+ * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
++ * Note that KVM_CAP_PMU_CAPABILITY must be invoked prior to creating VCPUs.
 + */
-+struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages)
++static void test_pmu_config_disable(void (*guest_code)(void))
 +{
++	int r;
 +	struct kvm_vm *vm;
++	struct kvm_enable_cap cap = { 0 };
++	bool sane;
 +
-+	vm = vm_create(mode, pages, O_RDWR);
++	r = kvm_check_cap(KVM_CAP_PMU_CAPABILITY);
++	if ((r & KVM_CAP_PMU_DISABLE) == 0)
++		return;
 +
-+	kvm_vm_elf_load(vm, program_invocation_name);
++	vm = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
 +
-+#ifdef __x86_64__
-+	vm_create_irqchip(vm);
-+#endif
-+	return vm;
++	cap.cap = KVM_CAP_PMU_CAPABILITY;
++	cap.args[0] = KVM_CAP_PMU_DISABLE;
++	r = vm_enable_cap(vm, &cap);
++	TEST_ASSERT(r == 0, "Failed KVM_CAP_PMU_DISABLE.");
++
++	vm_vcpu_add_default(vm, VCPU_ID, guest_code);
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vm, VCPU_ID);
++
++	sane = sanity_check_pmu(vm);
++	TEST_ASSERT(!sane, "Guest should not be able to use disabled PMU.");
++
++	kvm_vm_free(vm);
 +}
 +
  /*
-  * VM Create with customized parameters
-  *
-@@ -412,13 +440,8 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
- 		    nr_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
+  * Check for a non-zero PMU version, at least one general-purpose
+  * counter per logical processor, an EBX bit vector of length greater
+@@ -430,5 +463,7 @@ int main(int argc, char *argv[])
  
- 	pages = vm_adjust_num_guest_pages(mode, pages);
--	vm = vm_create(mode, pages, O_RDWR);
--
--	kvm_vm_elf_load(vm, program_invocation_name);
+ 	kvm_vm_free(vm);
  
--#ifdef __x86_64__
--	vm_create_irqchip(vm);
--#endif
-+	vm = vm_create_without_vcpus(mode, pages);
- 
- 	for (i = 0; i < nr_vcpus; ++i) {
- 		uint32_t vcpuid = vcpuids ? vcpuids[i] : i;
++	test_pmu_config_disable(guest_code);
++
+ 	return 0;
+ }
 -- 
 2.35.0.263.gb82422642f-goog
 
