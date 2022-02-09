@@ -2,68 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00DB54AEDC4
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 10:15:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BE6F4AEE12
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 10:37:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231395AbiBIJPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 04:15:14 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:39284 "EHLO
+        id S236794AbiBIJcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 04:32:45 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230056AbiBIJPN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 04:15:13 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A992E00D0E1
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 01:15:07 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id z13so3238823pfa.3
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 01:15:07 -0800 (PST)
+        with ESMTP id S235057AbiBIJa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 04:30:59 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9ABE0C5BE8;
+        Wed,  9 Feb 2022 01:30:56 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id c5-20020a17090a1d0500b001b904a7046dso3003430pjd.1;
+        Wed, 09 Feb 2022 01:30:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:cc:from:organization:in-reply-to
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:organization:in-reply-to
          :content-transfer-encoding;
-        bh=eS24qNdegIWCdHUi8b2hejyGS+Oi29jL5tYMjfpE3SI=;
-        b=TtrsaU40achQzujy1rNECYWMBqDpsytYbX5mv0c/WYCrSh7Df2smiRbELWG99GGaku
-         P4rmxVMd6TOSSbnuHemBRH95HCVLvredGtjzAkKc3iIQQr85arjgELJSnKnYmDeSDLq0
-         Pqr3HrQaK1hC6ku0vpFD/Fp1OYZVV1+ANLCL/Y0OL4X9S95vqp7ZHTI27VR653n8J8Fx
-         d3YbMaIhYoRGYMPfzgageLQoJLbH8A0snx11xKUnPXsfkhdW5Eju+u+yg0tkOm35isyv
-         7wZ2/IMXWHHk1tfrEtLPT0giISYycggTuntP0I3QAPJwY9oNsH6rVYwxQ/CZlLMfHllI
-         3A4g==
+        bh=5JCf3O060kbSSop2cpb2bg0F0aVQnL4uVtK8Kp7eaR4=;
+        b=dmQKEbuyufICCzb0Ducdg3ed34C/sqo8nRJ8SWwTzGmkjieQnq+ZeeT7dPZRpfrcsD
+         T/+0l+4JDXlVvK6CZ2EkXNH8apkToMifh3sessYqh9jjU8zDXNWTNu2TPIoidk5Cgwl7
+         SmFxgujepAQ8eW6uiE+c7PpfXX7dJHmc1xwf7GcaUDV4bwiZbDKa8QBMSA2QNmDZtZd3
+         GQkl0NBeHp6PcLSwKRe5KcLwyVKpERlexruONsb5k2QjjP8fVWvSi02PVy3FSd/+k7JA
+         S4pGtGsak5HOr47b+JIWYsgG81/2T9WtbGBV7mJHpo4U1DjyDHHsXQdvlZaknjIa41Am
+         wSew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:cc:from:organization:in-reply-to
+         :content-language:from:to:cc:references:organization:in-reply-to
          :content-transfer-encoding;
-        bh=eS24qNdegIWCdHUi8b2hejyGS+Oi29jL5tYMjfpE3SI=;
-        b=TB4ggOkcmG0jicwMkpMQSMZzdvk+cVIWOJld7HpFw0GO8/4DaaVCA6DCHNZiKNQmzM
-         VzEZ9f+XDKoKwNk7g/e6d+W/qmYCTsdmjmTYRWhrdWv5dO47JWtsq+Wxt3mkBECiRJ6K
-         xtHGu9caHrFu8WZMxlx1DwilQL51upJnmtycgsIyzkCHQD8siUilHcKuP0now/ZPfWrO
-         oK2US8UCc6sg4lNidlbZ2kOdfTYc/skrRqQcW6V46JRkUU4jvMvcLxu1SryVH3eJgOef
-         dBVhNVKygqFZFVKVHNwSAvbzrhFxjIHBUZbXIUobmxlhkpCv+SQpjVsVfyrmEi/YRyRW
-         7+dw==
-X-Gm-Message-State: AOAM5320fV3qKwl18BO2kiOQCIJrIv7pqiclevTcMao1laNZabkuo0fd
-        tubwgquY2DNnhHZX+VfPdyYlpur5vd8U7n/y
-X-Google-Smtp-Source: ABdhPJw5UWH0anEoO2uEPvQY29O0uY8OHqH5jsXXXp7i9xHQQvi4zXUqhjJ8Kt5tQmCYKT/oXBXcxw==
-X-Received: by 2002:a63:5166:: with SMTP id r38mr1137257pgl.99.1644398073469;
-        Wed, 09 Feb 2022 01:14:33 -0800 (PST)
+        bh=5JCf3O060kbSSop2cpb2bg0F0aVQnL4uVtK8Kp7eaR4=;
+        b=x2OWa5uvUbTkqHzrO4h69pR02pGaWSeSnh2oDQaBsDpoRuwWqGPra6sNrvNEve5Yee
+         JSv64Tn/88QIBeNTLFaDqUPXBaoiIAINYWwp8OtecClBMB7uX/g+bg7lwRXbbNwMRheR
+         OAWVKhWKuukgBLnrpYJIeiaTd5ILIYGcw1JPfj2MHnXnPwcbFvZC+MFWOgnkLgZaxaaR
+         8v8URxQw3jLmnXrkwVzKa4RIfCwXZX4bQB9xaH36S8Olfr8fq3A2GwMWRR1R+WYKyKXQ
+         VpfVxoNbMgSgYLGPdKbeODlc3xpDt6l/+fohWqO+kptG7+0toHvBe2Ib16jRBmauTYHW
+         djlg==
+X-Gm-Message-State: AOAM532r3eAEF8j9EVlk6k/JcOU1QlJ/MoDuklECr4hfpkQAyyGfFqq4
+        OKXsXJbx1jV6pRFknNIGD+g=
+X-Google-Smtp-Source: ABdhPJzTrZWO2VNfOhplT+u4kBtvyPgCVdMGaBIGEABbveTXYSqVS6ytt0fRPBV1gli1C3tuNl66zg==
+X-Received: by 2002:a17:902:b215:: with SMTP id t21mr1255668plr.73.1644399004379;
+        Wed, 09 Feb 2022 01:30:04 -0800 (PST)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d10sm18714695pfl.16.2022.02.09.01.14.30
+        by smtp.gmail.com with ESMTPSA id md9sm5462893pjb.6.2022.02.09.01.30.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Feb 2022 01:14:33 -0800 (PST)
-Message-ID: <e2c18d80-7c4e-6a0a-d37e-3a585d53d3f2@gmail.com>
-Date:   Wed, 9 Feb 2022 17:14:24 +0800
+        Wed, 09 Feb 2022 01:30:04 -0800 (PST)
+Message-ID: <43e6dad3-dfdf-ba4a-cd95-99eca2538384@gmail.com>
+Date:   Wed, 9 Feb 2022 17:29:55 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.5.0
-Subject: Re: [PATCH v5 0/2] Enable legacy LBR support for guest
+Subject: Re: [PATCH] KVM: x86/cpuid: Stop exposing unknown AMX Tile Palettes
+ and accelerator units
 Content-Language: en-US
-To:     Yang Weijiang <weijiang.yang@intel.com>
-References: <20220122161201.73528-1-weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, ehabkost@redhat.com, mtosatti@redhat.com,
-        richard.henderson@linaro.org, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, likexu@tencent.com, wei.w.wang@intel.com
 From:   Like Xu <like.xu.linux@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220117065957.65335-1-likexu@tencent.com>
 Organization: Tencent
-In-Reply-To: <20220122161201.73528-1-weijiang.yang@intel.com>
+In-Reply-To: <20220117065957.65335-1-likexu@tencent.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -76,30 +80,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Weijiang,
+Hi,
 
-On 23/1/2022 12:11 am, Yang Weijiang wrote:
-> KVM legacy LBR patches have been merged in kernel 5.12, this patchset
-> is to expose the feature to guest from the perf capability MSR. Qemu can
-> add LBR format in cpu option to achieve it, e.g., -cpu host,lbr-fmt=0x5,
+KVM does not have much filtering in exposing the host cpuid (at least for Intel 
+PT and AMX),
+and innocent user spaces could be corrupted when unknown new bits are 
+accidentally exposed.
 
-Some older Intel CPUs may have lbr-fmt=LBR_FORMAT_32 (which is 0), would
-you help verify that KVM is supported on these platforms ? If so, how do we enable
-guest LBR form the QEMU side, w/ -cpu host,lbr-fmt=0x0 ?
+Comments on code changes in this direction are welcome.
 
-> the format should match host value in IA32_PERF_CAPABILITIES.
++ https://lore.kernel.org/kvm/20220112041100.26769-1-likexu@tencent.com/
+
+On 17/1/2022 2:59 pm, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> Note, KVM legacy LBR solution accelerates guest perf performace by LBR MSR
-> passthrough so it requires guest cpu model matches that of host's, i.e.,
-
-Would you help add live migration support across host/guest CPU models when
-hosts at both ends have the same number of LBR entries and the same lbr-fmt ?
-
-Thanks,
-Like Xu
-
-> only -cpu host is supported.
+> Guest enablement of Intel AMX requires a good co-work from both host and
+> KVM, which means that KVM should take a more safer approach to avoid
+> the accidental inclusion of new unknown AMX features, even though it's
+> designed to be an extensible architecture.
 > 
-> Change in v5:
-> 	1. This patchset is rebased on tip : 6621441db5
-> 	2. No functional change since v4.
+> Per current spec, Intel CPUID Leaf 1EH sub-leaf 1 and above are reserved,
+> other bits in leaves 0x1d and 0x1e marked as "Reserved=0" shall be strictly
+> limited by definition for reporeted KVM_GET_SUPPORTED_CPUID.
+> 
+> Fixes: 690a757d610e ("kvm: x86: Add CPUID support for Intel AMX")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>   arch/x86/kvm/cpuid.c | 12 ++++++++----
+>   1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index c55e57b30e81..3fde6610d314 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -661,7 +661,6 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
+>   	case 0x17:
+>   	case 0x18:
+>   	case 0x1d:
+> -	case 0x1e:
+>   	case 0x1f:
+>   	case 0x8000001d:
+>   		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> @@ -936,21 +935,26 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   		break;
+>   	/* Intel AMX TILE */
+>   	case 0x1d:
+> +		entry->ebx = entry->ecx = entry->edx = 0;
+>   		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+> -			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> +			entry->eax = 0;
+>   			break;
+>   		}
+>   
+> +		entry->eax = min(entry->eax, 1u);
+>   		for (i = 1, max_idx = entry->eax; i <= max_idx; ++i) {
+>   			if (!do_host_cpuid(array, function, i))
+>   				goto out;
+>   		}
+>   		break;
+> -	case 0x1e: /* TMUL information */
+> +	/* TMUL Information */
+> +	case 0x1e:
+> +		entry->eax = entry->ecx = entry->edx = 0;
+>   		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
+> -			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> +			entry->ebx = 0;
+>   			break;
+>   		}
+> +		entry->ebx &= 0xffffffu;
+>   		break;
+>   	case KVM_CPUID_SIGNATURE: {
+>   		const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
