@@ -2,71 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B42A84AF591
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 16:42:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A9A84AF676
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 17:23:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234668AbiBIPlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 10:41:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55516 "EHLO
+        id S236740AbiBIQWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 11:22:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236177AbiBIPld (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 10:41:33 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C930C05CB89;
-        Wed,  9 Feb 2022 07:41:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644421296; x=1675957296;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=nqAEzwP2CCzE4PuDlqHV3gy81D6zg7WpHFijeg3mZf8=;
-  b=DypwGKUp89RJcd+xcpeRpBJlKZ6nOVbGA5lwMshJ4hhMNS7DtsZB1/76
-   4v2AEKOHNFxfGIJCVRUG+nnFkaZTX/NLnHZY4kcC6LNGFANNrb+FAbER7
-   kz64AsnwnjbjpcTig4Qn06j+fvg9SLt2L1vUe4ZLEOBq8ML0fACpPNqCR
-   Zv3Tsk5rQmpCYmVd4SSizehLsoaMlwJp+5jd3yZWt6CEsK6wbJ5oSWXhn
-   M1SN04eFxrcYipYsEeuJ1XTSAcsLJE+lKYiLLTILJN9/Ed5u1RwkvjLEX
-   LpA6g1gvZHarXOGB8wapz9UfioYzCh6ln0OSoYd9OlckxNygr3dXi1K2a
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="335631969"
-X-IronPort-AV: E=Sophos;i="5.88,356,1635231600"; 
-   d="scan'208";a="335631969"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 07:41:02 -0800
-X-IronPort-AV: E=Sophos;i="5.88,356,1635231600"; 
-   d="scan'208";a="568271798"
-Received: from sanvery-mobl.amr.corp.intel.com (HELO [10.212.232.139]) ([10.212.232.139])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 07:41:02 -0800
-Message-ID: <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
-Date:   Wed, 9 Feb 2022 07:40:59 -0800
+        with ESMTP id S233355AbiBIQWt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 11:22:49 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351BBC061355
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 08:22:52 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id om7so2559086pjb.5
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 08:22:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Vm6ihdLtxN/Yq6rrgriB6HNCQ5Tc28Tp9D4Us+d0Q3A=;
+        b=b2psXUn/n2KAEtRMVJOg/NtPxnUzCuNQ3Qn4ZoNS4jxwOfkbnRkPA2fYQCRMXZIeNI
+         t7kewhZ+EZQAUdw78ofcLPFdaZODoW9mx5I5RdMlOwvwmGdcb2QsKIUr+ncReiZ5GgDu
+         ZB2CPk6JQx73YWjWAG00ZIEbKWp5QT0OYJQh7fvwlpwO0U6H3bhXVS+Oh/kSkW9yzhk7
+         IDMeUC5QUQIYZvgSlyOcUV2GSyI2voR2vhgDDwzzZSTASrmEAD+Ol/+CITnmSN2c0F7n
+         1yj39YJWm31gCg4Xyz33ybm3YH5gc/4/PK20DoL8RJuEwMwTZgk3fO/2aV3ot0v0LbXU
+         JnGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Vm6ihdLtxN/Yq6rrgriB6HNCQ5Tc28Tp9D4Us+d0Q3A=;
+        b=1rtYCh6Lkhz+vnPKW47W37s5xf7dsRY5pMWCbPlYHC6xn3BJx9PDOCNMpWL8jly7qf
+         XPbMh3vAaGNooF62YnThiURIgd5VMWVFvzz+jnOgfgsEhXfoZg1+C+gr0/oI4ROVLIaV
+         xPchQXYSJmnswlJM6KlZ86nfohZSlKSyaS7ICV4BRl2le+4+9NR85xhoty09oEOgyO5P
+         ZNlyiWcGFe91MErVEtcL6levM+gr0n6iNAf3heU+NeTopmE6ULGCY/0SXJaDPoQxHKh+
+         WoW4TyUdUg8nsA6uopxZNWqm129pitFado03a1aE1GbDOepAPwTAVDqz7nTwPI9bImlr
+         1IAA==
+X-Gm-Message-State: AOAM533kTKIS7YYkn2+GVwE6yEAzyfWsS/aJHkcfrOig9aD9DGv2P0dO
+        kVqx19TnFbjqA2sOi+XXjMvJgw==
+X-Google-Smtp-Source: ABdhPJxOBgPpyiVAIWoMeO0tnGVIVP4NnIgcMzIf2DOa4eeV4VfwhS3nIcoewPtD6GG+yivcAQP6JA==
+X-Received: by 2002:a17:90a:8b06:: with SMTP id y6mr3430580pjn.214.1644423771458;
+        Wed, 09 Feb 2022 08:22:51 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f8sm20757624pfe.204.2022.02.09.08.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Feb 2022 08:22:50 -0800 (PST)
+Date:   Wed, 9 Feb 2022 16:22:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
+ memory from VM ioctl context
+Message-ID: <YgPqV8EZFnENj41D@google.com>
+References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
+ <87ee4d9yp3.fsf@redhat.com>
+ <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
+ <87bkzh9wkd.fsf@redhat.com>
+ <YgKjDm5OdSOKIdAo@google.com>
+ <87wni48b11.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Stephane Eranian <eranian@google.com>,
-        David Dunn <daviddunn@google.com>
-References: <20220117085307.93030-1-likexu@tencent.com>
- <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-In-Reply-To: <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wni48b11.fsf@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,31 +76,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/9/22 05:21, Peter Zijlstra wrote:
-> On Wed, Feb 02, 2022 at 02:35:45PM -0800, Jim Mattson wrote:
->> 3) TDX is going to pull the rug out from under us anyway. When the TDX
->> module usurps control of the PMU, any active host counters are going
->> to stop counting. We are going to need a way of telling the host perf
->> subsystem what's happening, or other host perf clients are going to
->> get bogus data.
-> That's not acceptible behaviour. I'm all for unilaterally killing any
-> guest that does this.
+On Wed, Feb 09, 2022, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Tue, Feb 08, 2022, Vitaly Kuznetsov wrote:
+> >> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> >> > and hv-avic only mentions AutoEOI feature.
+> >> 
+> >> True, this is hidden in "The enlightenment allows to use Hyper-V SynIC
+> >> with hardware APICv/AVIC enabled". Any suggestions on how to improve
+> >> this are more than welcome!.
+> >
+> > Specifically for the WARN, does this approach makes sense?
+> >
+> > https://lore.kernel.org/all/YcTpJ369cRBN4W93@google.com
+> 
+> (Sorry for missing this dicsussion back in December)
+> 
+> It probably does but the patch just introduces
+> HV_TSC_PAGE_UPDATE_REQUIRED flag and drops kvm_write_guest() completely,
+> the flag is never reset and nothing ever gets written to guest's
+> memory. I suppose you've forgotten to commit a hunk :-)
 
-I'm not sure where the "bogus data" comes or to what that refers
-specifically.  But, the host does have some level of control:
+I don't think so, the idea is that kvm_hv_setup_tsc_page() handles the write.
 
-> The host VMM controls whether a guest TD can use the performance
-> monitoring ISA using the TD’s ATTRIBUTES.PERFMON bit...
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c194a8cbd25f..c1adc9efea28 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2848,7 +2848,7 @@ static void kvm_end_pvclock_update(struct kvm *kvm)
+>
+>  static void kvm_update_masterclock(struct kvm *kvm)
+>  {
+> -	kvm_hv_invalidate_tsc_page(kvm);
+> +	kvm_hv_request_tsc_page_update(kvm);
+>  	kvm_start_pvclock_update(kvm);
+>  	pvclock_update_vm_gtod_copy(kvm);
+>  	kvm_end_pvclock_update(kvm);
+> @@ -3060,8 +3060,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+>  				       offsetof(struct compat_vcpu_info, time));
+>  	if (vcpu->xen.vcpu_time_info_set)
+>  		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_time_info_cache, 0);
+> -	if (!v->vcpu_idx)
+> -		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+> +	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
 
-So, worst-case, we don't need to threaten to kill guests.  The host can
-just deny access in the first place.
+This change sends all vCPUs through the helper, not just vCPU 0.  Then the common
+helper checks HV_TSC_PAGE_UPDATE_REQUIRED under lock.
 
-I'm not too picky about what the PMU does, but the TDX behavior didn't
-seem *that* onerous to me.  The gory details are all in "On-TD
-Performance Monitoring" here:
+	if (!(hv->hv_tsc_page_status & HV_TSC_PAGE_UPDATE_REQUIRED))
+		goto out_unlock;
 
-> https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1.0-public-spec-v0.931.pdf
 
-My read on it is that TDX host _can_ cede the PMU to TDX guests if it
-wants.  I assume the context-switching model Jim mentioned is along the
-lines of what TDX is already doing on host<->guest transitions.
+	--- error checking ---
+
+	/* Write the struct entirely before the non-zero sequence.  */
+	smp_wmb();
+
+	hv->tsc_ref.tsc_sequence = tsc_seq;
+	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
+			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
+		goto out_err;
+
+	hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
+	goto out_unlock;
+
+out_err:
+	hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
+out_unlock:
+	mutex_unlock(&hv->hv_lock);
+
+
+If there are no errors, the kvm_write_guest() goes through and the status is
+"reset".  If there are errors, the status is set to BROKEN.
+
+Should I send an RFC to facilitate discussion?
