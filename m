@@ -2,152 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A9A84AF676
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 17:23:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEDCB4AF6F4
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 17:41:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236740AbiBIQWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 11:22:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
+        id S237353AbiBIQlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 11:41:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233355AbiBIQWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 11:22:49 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351BBC061355
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 08:22:52 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id om7so2559086pjb.5
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 08:22:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Vm6ihdLtxN/Yq6rrgriB6HNCQ5Tc28Tp9D4Us+d0Q3A=;
-        b=b2psXUn/n2KAEtRMVJOg/NtPxnUzCuNQ3Qn4ZoNS4jxwOfkbnRkPA2fYQCRMXZIeNI
-         t7kewhZ+EZQAUdw78ofcLPFdaZODoW9mx5I5RdMlOwvwmGdcb2QsKIUr+ncReiZ5GgDu
-         ZB2CPk6JQx73YWjWAG00ZIEbKWp5QT0OYJQh7fvwlpwO0U6H3bhXVS+Oh/kSkW9yzhk7
-         IDMeUC5QUQIYZvgSlyOcUV2GSyI2voR2vhgDDwzzZSTASrmEAD+Ol/+CITnmSN2c0F7n
-         1yj39YJWm31gCg4Xyz33ybm3YH5gc/4/PK20DoL8RJuEwMwTZgk3fO/2aV3ot0v0LbXU
-         JnGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Vm6ihdLtxN/Yq6rrgriB6HNCQ5Tc28Tp9D4Us+d0Q3A=;
-        b=1rtYCh6Lkhz+vnPKW47W37s5xf7dsRY5pMWCbPlYHC6xn3BJx9PDOCNMpWL8jly7qf
-         XPbMh3vAaGNooF62YnThiURIgd5VMWVFvzz+jnOgfgsEhXfoZg1+C+gr0/oI4ROVLIaV
-         xPchQXYSJmnswlJM6KlZ86nfohZSlKSyaS7ICV4BRl2le+4+9NR85xhoty09oEOgyO5P
-         ZNlyiWcGFe91MErVEtcL6levM+gr0n6iNAf3heU+NeTopmE6ULGCY/0SXJaDPoQxHKh+
-         WoW4TyUdUg8nsA6uopxZNWqm129pitFado03a1aE1GbDOepAPwTAVDqz7nTwPI9bImlr
-         1IAA==
-X-Gm-Message-State: AOAM533kTKIS7YYkn2+GVwE6yEAzyfWsS/aJHkcfrOig9aD9DGv2P0dO
-        kVqx19TnFbjqA2sOi+XXjMvJgw==
-X-Google-Smtp-Source: ABdhPJxOBgPpyiVAIWoMeO0tnGVIVP4NnIgcMzIf2DOa4eeV4VfwhS3nIcoewPtD6GG+yivcAQP6JA==
-X-Received: by 2002:a17:90a:8b06:: with SMTP id y6mr3430580pjn.214.1644423771458;
-        Wed, 09 Feb 2022 08:22:51 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f8sm20757624pfe.204.2022.02.09.08.22.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 08:22:50 -0800 (PST)
-Date:   Wed, 9 Feb 2022 16:22:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
- memory from VM ioctl context
-Message-ID: <YgPqV8EZFnENj41D@google.com>
-References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
- <87ee4d9yp3.fsf@redhat.com>
- <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
- <87bkzh9wkd.fsf@redhat.com>
- <YgKjDm5OdSOKIdAo@google.com>
- <87wni48b11.fsf@redhat.com>
+        with ESMTP id S235192AbiBIQlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 11:41:05 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5AC6C0612BE
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 08:41:07 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 975E3ED1;
+        Wed,  9 Feb 2022 08:41:07 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF7393F70D;
+        Wed,  9 Feb 2022 08:41:04 -0800 (PST)
+Date:   Wed, 9 Feb 2022 16:41:20 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 30/64] KVM: arm64: nv: Configure HCR_EL2 for nested
+ virtualization
+Message-ID: <YgPusNvs86N4WEiw@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-31-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87wni48b11.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220128121912.509006-31-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 09, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+Hi,
+
+On Fri, Jan 28, 2022 at 12:18:38PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
 > 
-> > On Tue, Feb 08, 2022, Vitaly Kuznetsov wrote:
-> >> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> >> > and hv-avic only mentions AutoEOI feature.
-> >> 
-> >> True, this is hidden in "The enlightenment allows to use Hyper-V SynIC
-> >> with hardware APICv/AVIC enabled". Any suggestions on how to improve
-> >> this are more than welcome!.
-> >
-> > Specifically for the WARN, does this approach makes sense?
-> >
-> > https://lore.kernel.org/all/YcTpJ369cRBN4W93@google.com
+> We enable nested virtualization by setting the HCR NV and NV1 bit.
 > 
-> (Sorry for missing this dicsussion back in December)
+> When the virtual E2H bit is set, we can support EL2 register accesses
+> via EL1 registers from the virtual EL2 by doing trap-and-emulate. A
+> better alternative, however, is to allow the virtual EL2 to access EL2
+> register states without trap. This can be easily achieved by not traping
+> EL1 registers since those registers already have EL2 register states.
 > 
-> It probably does but the patch just introduces
-> HV_TSC_PAGE_UPDATE_REQUIRED flag and drops kvm_write_guest() completely,
-> the flag is never reset and nothing ever gets written to guest's
-> memory. I suppose you've forgotten to commit a hunk :-)
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h |  1 +
+>  arch/arm64/kvm/hyp/vhe/switch.c  | 38 +++++++++++++++++++++++++++++---
+>  2 files changed, 36 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 748c2b068d4e..d913c3fb5665 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -87,6 +87,7 @@
+>  			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+>  			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+>  			 HCR_FMO | HCR_IMO | HCR_PTW )
+> +#define HCR_GUEST_NV_FILTER_FLAGS (HCR_ATA | HCR_API | HCR_APK)
+>  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+>  #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+>  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 1e6a00e7bfb3..28845f907cfc 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -35,9 +35,41 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  	u64 hcr = vcpu->arch.hcr_el2;
+>  	u64 val;
+>  
+> -	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
+> -	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
+> -		hcr |= HCR_TVM | HCR_TRVM;
+> +	if (is_hyp_ctxt(vcpu)) {
+> +		hcr |= HCR_NV;
+> +
+> +		if (!vcpu_el2_e2h_is_set(vcpu)) {
+> +			/*
+> +			 * For a guest hypervisor on v8.0, trap and emulate
 
-I don't think so, the idea is that kvm_hv_setup_tsc_page() handles the write.
+That's confusing, because FEAT_NV is available from v8.3 and newer.
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c194a8cbd25f..c1adc9efea28 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2848,7 +2848,7 @@ static void kvm_end_pvclock_update(struct kvm *kvm)
->
->  static void kvm_update_masterclock(struct kvm *kvm)
->  {
-> -	kvm_hv_invalidate_tsc_page(kvm);
-> +	kvm_hv_request_tsc_page_update(kvm);
->  	kvm_start_pvclock_update(kvm);
->  	pvclock_update_vm_gtod_copy(kvm);
->  	kvm_end_pvclock_update(kvm);
-> @@ -3060,8 +3060,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
->  				       offsetof(struct compat_vcpu_info, time));
->  	if (vcpu->xen.vcpu_time_info_set)
->  		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_time_info_cache, 0);
-> -	if (!v->vcpu_idx)
-> -		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-> +	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+> +			 * the EL1 virtual memory control register accesses.
+> +			 */
 
-This change sends all vCPUs through the helper, not just vCPU 0.  Then the common
-helper checks HV_TSC_PAGE_UPDATE_REQUIRED under lock.
+Wasn't the purpose of comment to explain why something is done instead of what
+something does? The bits are explained in the Arm ARM. How about something like
+this instead:
 
-	if (!(hv->hv_tsc_page_status & HV_TSC_PAGE_UPDATE_REQUIRED))
-		goto out_unlock;
+"A hypervisor running in non-VHE mode writes to EL1 the memory control registers
+when preparing to run a guest or the host at EL1. Since virtual EL2 is emulated
+on top of physical EL1, allowing the L1 guest hypervisor to access the registers
+directly would lead to the L1 guest inadvertently corrupting its own state.
 
+The NV1 bit is set to trap accesses to the registers which aren't controlled by
+the TVM and TRVM bits, and to change to translation table format used by the
+EL1&0 translation regime format to the EL2 translation regime format, which is
+what the L1 guest hypervisor running with E2H = 0 expects when it creates the
+tables".
 
-	--- error checking ---
+> +			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
+> +		} else {
+> +			/*
+> +			 * For a guest hypervisor on v8.1 (VHE), allow to
+> +			 * access the EL1 virtual memory control registers
+> +			 * natively. These accesses are to access EL2 register
+> +			 * states.
+> +			 * Note that we still need to respect the virtual
+> +			 * HCR_EL2 state.
+> +			 */
+> +			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
 
-	/* Write the struct entirely before the non-zero sequence.  */
-	smp_wmb();
+Nitpick: I think it would be better to name this variable virtual_hcr_el2,
+because vhcr_el2 looks like a valid register name.
 
-	hv->tsc_ref.tsc_sequence = tsc_seq;
-	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
-			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
-		goto out_err;
+Thanks,
+Alex
 
-	hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
-	goto out_unlock;
-
-out_err:
-	hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
-out_unlock:
-	mutex_unlock(&hv->hv_lock);
-
-
-If there are no errors, the kvm_write_guest() goes through and the status is
-"reset".  If there are errors, the status is set to BROKEN.
-
-Should I send an RFC to facilitate discussion?
+> +
+> +			vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
+> +
+> +			/*
+> +			 * We already set TVM to handle set/way cache maint
+> +			 * ops traps, this somewhat collides with the nested
+> +			 * virt trapping for nVHE. So turn this off for now
+> +			 * here, in the hope that VHE guests won't ever do this.
+> +			 * TODO: find out whether it's worth to support both
+> +			 * cases at the same time.
+> +			 */
+> +			hcr &= ~HCR_TVM;
+> +
+> +			hcr |= vhcr_el2 & (HCR_TVM | HCR_TRVM);
+> +		}
+> +	}
+>  
+>  	___activate_traps(vcpu, hcr);
+>  
+> -- 
+> 2.30.2
+> 
