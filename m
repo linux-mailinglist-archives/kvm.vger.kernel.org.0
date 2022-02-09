@@ -2,134 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A54FA4AF881
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:30:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EC054AF88B
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 18:30:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238321AbiBIR35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 12:29:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58148 "EHLO
+        id S238341AbiBIRaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 12:30:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238324AbiBIR3z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 12:29:55 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38195C0613C9
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:29:59 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id a15-20020a17090ad80f00b001b8a1e1da50so2247241pjv.6
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 09:29:59 -0800 (PST)
+        with ESMTP id S238325AbiBIRaV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 12:30:21 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B6A0C05CB82
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 09:30:23 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id k18so5267703wrg.11
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 09:30:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8OBoX65iKSlGteJ8KRsRO0AoOHBHi+mvW0Rr+JlImC4=;
-        b=ZCL0lDmM040QdQ7x5ueHQEvbksPd0C2lX+TdG+eFbCZ5IUcF3N4Ret02g6XWp3235w
-         T4EjHtjZfojCMqHj1BAxziiH3bjfWrh5ldjhXGmC0JdCZg1i5LfF4mfusyz+wwICbq4s
-         7rT4v1P3LqHzpojuXgM5ZSZ2A87suns5c8Ui5ywNvx6AxBiuU+UO/X+Wn+UCCOAW7CI7
-         JNR1dPAcd45MmZA/mDR5q6qS/F3cj7YQBej/qJqF1fA17D4D+xnQB8DbBwDulmV/saSa
-         caYQ2Q7Q0cw+Q8ZCSA2W6qYVg0vw64q0O5J3kQ8mP5HJlW2ufhp+F+0B1TA8M8gKekbd
-         bhpA==
+        bh=ehqoee1bftUz/gLrW1kXxKGubBl5XYT7H+4O2R4yTN8=;
+        b=VMjXDE+UO+gQWCOdpRAssrTMjmcChF0PkTsdA/pDVovwZVbHIhStx3JqiJ/a20KM4Z
+         MwMrRkmTmt+j33cqEWQkKmi1eO7h0GgfsU9MNpgfa/L7MOEWCorP7gKfV/D9CEzZU079
+         i48eTrcaUHLrmuRrdvGwn17XJEPvsMNG2zyh12JOAqSC2tbgGd4kcPBWQrrp1HcW8gBa
+         QqvZfTgsYwqSwT39ryMehGflmq3B5cyMPJzNCcSpPsfCWt8/7E7Hnylj5HdbVEcq68ZX
+         QLSr5kMCYnMhUgUhaGbal0MHlpi+Qz/5ioAiactY0Jr+3fT/omajQq45q214YCTd9/jF
+         FDUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=8OBoX65iKSlGteJ8KRsRO0AoOHBHi+mvW0Rr+JlImC4=;
-        b=kPYxeiLhCPp4opWbNiYamdNnGy0v/BictLCCR7oP+cbK/A/TiVCWMsU1Xgm1zZDfRj
-         G7CcYM6pe/AEuZXgjX1dBIS1DcKhfdzOBr9aFOGXaopTBjW8C8SUk1YkOmgpx4MOZyCc
-         Wabu999TrNtC1UGI1uY7mh4uoxKgSJfNsSudjafwcQnmsLvtrns99xsjgLCPjaQhQG8+
-         /SZjKySzmc+uR4CTPq/2UbdISkQ8tOoyCt+Wz7VFx5dD6kkHrcC+34f1zAbx0TWSqFuS
-         1oZNF1DSqUtvvGsOpzAZ48tBksKZpLKJRgu2RfVnVm2M+HuCrlhQs+pOBzMsuLAUm1ye
-         9Nnw==
-X-Gm-Message-State: AOAM531hTyLRRN3/HHwJKAUTzpMVyt/9E9BpRbgk1ozr3/9BOx1DaGKU
-        pInWM2ZDTsrb/tVi7xpUXKFGzyGSRi/5mgg=
-X-Google-Smtp-Source: ABdhPJyOqWL9wvZd7gKHbxQ4sw4iacst1JTwmFMj1U2lPBHujiT31uwKyrJN5ab+OUD2GFl1XFC303JBYwGWHJE=
-X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
- (user=daviddunn job=sendgmr) by 2002:a17:902:f786:: with SMTP id
- q6mr3101390pln.64.1644427798725; Wed, 09 Feb 2022 09:29:58 -0800 (PST)
-Date:   Wed,  9 Feb 2022 17:29:45 +0000
-In-Reply-To: <20220209172945.1495014-1-daviddunn@google.com>
-Message-Id: <20220209172945.1495014-4-daviddunn@google.com>
-Mime-Version: 1.0
-References: <20220209172945.1495014-1-daviddunn@google.com>
-X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH v6 3/3] KVM: selftests: Verify disabling PMU virtualization
- via KVM_CAP_CONFIG_PMU
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ehqoee1bftUz/gLrW1kXxKGubBl5XYT7H+4O2R4yTN8=;
+        b=PI+8jfBfI3Z5TU4fZhzn0eWcjGrwnrH99Yq6yCPn1jH9g9JVsUN77oXJyz8BiVAT6D
+         sEQs1JP+xh1dtTmYz3u5hAz1YhNgabIf9pNKycEI1Nyk29HnvXvY5uMmkUDIyj3nu7jE
+         qMjw5eHGyLn8kbqlV35OUk2Q+PYOPP8HQxEVRQlrFOAdLmGsWeFZyTY4zkGNEapRoOy+
+         Xb0/lgKy3otZuiQX4u5uzo47mEoT3RqzdvCibdsQi+xZHqG5PXrlHMy+Zg1OJ0Ppx2/+
+         T/dxb/IBJDIbiHETMBz48eQkqpSylNwjGpWgF8b8iGNbidlRTBUr8YqUqyqvxqTf/4je
+         gd3Q==
+X-Gm-Message-State: AOAM533NL7chPMAYU90EHohpOiMC/PjUozw8x2n6F9FCB1YoPBt2/Wvp
+        EtS3KNnBKROSj0Y9J3rxgr0qViNFIHRG5ChkmG8EkQ==
+X-Google-Smtp-Source: ABdhPJxcHlYmbzhD+PWuni/5H/29pARK10fgORVYSpw8hGMRlwOSJkVIKE/ZpZ51NnJKmYGamVUCtwVVKxJAadh6KaI=
+X-Received: by 2002:adf:ee81:: with SMTP id b1mr2877638wro.149.1644427821958;
+ Wed, 09 Feb 2022 09:30:21 -0800 (PST)
+MIME-Version: 1.0
+References: <20220123184541.993212-1-daviddunn@google.com> <20220123184541.993212-2-daviddunn@google.com>
+ <CALMp9eSuavLEJ0_jwuOgmSX+Y8iJLsJT0xkGfMZg6B7kGyDmBQ@mail.gmail.com> <09d8b472-000b-7150-f60d-ffb5706b164e@gmail.com>
+In-Reply-To: <09d8b472-000b-7150-f60d-ffb5706b164e@gmail.com>
 From:   David Dunn <daviddunn@google.com>
-To:     pbonzini@redhat.com
-Cc:     seanjc@google.com, jmattson@google.com, like.xu.linux@gmail.com,
-        kvm@vger.kernel.org, David Dunn <daviddunn@google.com>
+Date:   Wed, 9 Feb 2022 09:30:10 -0800
+Message-ID: <CABOYuvZubA+Et9hzVrF03xCsNeAG4cz68_qG6KgAmTVHBvPoXw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/3] KVM: x86: Provide per VM capability for disabling
+ PMU virtualization
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>, kvm@vger.kernel.org, seanjc@google.com,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a VM with PMU disabled via KVM_CAP_PMU_CONFIG, the PMU will not be
-usable by the guest.  On Intel, this causes a #GP.  And on AMD, the
-counters no longer increment.
+Thanks Like.
 
-KVM_CAP_PMU_CONFIG must be invoked on a VM prior to creating VCPUs.
+I just sent a new v6 series with these minor merge conflicts resolved.
 
-Signed-off-by: David Dunn <daviddunn@google.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+Dave
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index c715adcbd487..7a4b99684d9d 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -325,6 +325,39 @@ static void test_not_member_allow_list(struct kvm_vm *vm)
- 	TEST_ASSERT(!count, "Disallowed PMU Event is counting");
- }
- 
-+/*
-+ * Verify KVM_CAP_PMU_DISABLE prevents the use of the PMU.
-+ *
-+ * Note that KVM_CAP_PMU_CAPABILITY must be invoked prior to creating VCPUs.
-+ */
-+static void test_pmu_config_disable(void (*guest_code)(void))
-+{
-+	int r;
-+	struct kvm_vm *vm;
-+	struct kvm_enable_cap cap = { 0 };
-+	bool sane;
-+
-+	r = kvm_check_cap(KVM_CAP_PMU_CAPABILITY);
-+	if ((r & KVM_CAP_PMU_DISABLE) == 0)
-+		return;
-+
-+	vm = vm_create_without_vcpus(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES);
-+
-+	cap.cap = KVM_CAP_PMU_CAPABILITY;
-+	cap.args[0] = KVM_CAP_PMU_DISABLE;
-+	r = vm_enable_cap(vm, &cap);
-+	TEST_ASSERT(r == 0, "Failed KVM_CAP_PMU_DISABLE.");
-+
-+	vm_vcpu_add_default(vm, VCPU_ID, guest_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+
-+	sane = sanity_check_pmu(vm);
-+	TEST_ASSERT(!sane, "Guest should not be able to use disabled PMU.");
-+
-+	kvm_vm_free(vm);
-+}
-+
- /*
-  * Check for a non-zero PMU version, at least one general-purpose
-  * counter per logical processor, an EBX bit vector of length greater
-@@ -430,5 +463,7 @@ int main(int argc, char *argv[])
- 
- 	kvm_vm_free(vm);
- 
-+	test_pmu_config_disable(guest_code);
-+
- 	return 0;
- }
--- 
-2.35.0.263.gb82422642f-goog
-
+On Wed, Feb 9, 2022 at 2:33 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> cc LKML and full list of KVM reviewers.
+>
+> On 25/1/2022 2:39 am, Jim Mattson wrote:
+> > On Sun, Jan 23, 2022 at 10:45 AM David Dunn <daviddunn@google.com> wrote:
+> >>
+> >> KVM_CAP_PMU_DISABLE is used to disable PMU virtualization on individual
+> >> x86 VMs.  PMU configuration must be done prior to creating VCPUs.
+> >>
+> >> To enable future extension, KVM_CAP_PMU_CAPABILITY reports available
+> >> settings via bitmask when queried via check_extension.
+> >>
+> >> For VMs that have PMU virtualization disabled, usermode will need to
+> >> clear CPUID leaf 0xA to notify guests.
+> >>
+> >> Signed-off-by: David Dunn <daviddunn@google.com>
+> >
+> > Nit: The two references to CPUID leaf 0xA should be qualified as
+> > applying only to Intel VMs.
+> >
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
+> >
+>
+> Nit: It looks like we already have "#define KVM_CAP_SYS_ATTRIBUTES 209".
+>
+> Hope it helps a little:
+>
+> Reviewed-by: Like Xu <likexu@tencent.com>
