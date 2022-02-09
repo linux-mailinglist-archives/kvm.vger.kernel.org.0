@@ -2,299 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52F3E4AE70C
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 03:42:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F7714AE706
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 03:42:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238359AbiBIClc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Feb 2022 21:41:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39584 "EHLO
+        id S234839AbiBIClV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Feb 2022 21:41:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245130AbiBIC0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Feb 2022 21:26:42 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE1F2C06157B
-        for <kvm@vger.kernel.org>; Tue,  8 Feb 2022 18:26:38 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v4so881883pjh.2
-        for <kvm@vger.kernel.org>; Tue, 08 Feb 2022 18:26:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RETGvp9Tb/Fz8lE6Cy2ZeI6FXeLdHxtZ2zuXuM2JVTA=;
-        b=h0ORmwwfgrYhpl2k4woJ0UJwDxVUPCJCvj99KzAWB6eamY886SElIBC7JelHmAV5Op
-         EOn4cXtkpcYUT520QFUeViVAxjNmrhMWli50DvHmSVizwdMWYv+yuAntaB1IcRdwedqo
-         uLp+4jmOL5dS+MiuINOOSrI0OokQiPY37RgtfL2t8WxUJcVHxVj+49SlRHp/1bsIraMs
-         iPq0aGm2E2oZ85R9+VbWJfBeI8+qP6r7OZyZLseAfPF+5hKdrl0SulT1kicYESHM4W29
-         ARKqwNFPMeGyJNgkfUTxJg/KUCFFuIz/wz05/DxKYTBrhTJo0nIC5DPSMOuEfIvdGaIo
-         /mKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RETGvp9Tb/Fz8lE6Cy2ZeI6FXeLdHxtZ2zuXuM2JVTA=;
-        b=2Axo6BdNlxxCxTQLUTSwBDddh3vkHjAgBeeRI3xLGTg1Mq7QRK0INdswlA65Zrjd8f
-         VI81wLHM5MzPB4ZBAg9DWwDEVSy8Ri5xd5Z+PmkWG7JKTvS1VgGuLR21xnySm+R+SNOa
-         nA8sz/D/740qohzUN6rdITmQGKeKFo1N5FXWQnj+cvQub07cQmLdvK8HgV0uXQABX9pf
-         NewkdcpJt9UtPBHuOEHgd1b2VMczOkG9Ox8F5BDi9gm828pAcfaAAE7LMQBTYMCkRduM
-         1Sf57dYoJoQciXyoeWPqhSzn48ukUdQV1regdi8TCcg555owT7OtzW9Q+HqmO7gBTt9S
-         fUzw==
-X-Gm-Message-State: AOAM530TLQB0NLUEG2fE43P7dDA9Xeh4pQb4pdgMBUCDbQLLxbFozU61
-        B/WMfnnoXJDRHrkmQ8SBP11Eo2AxQzgjmKcAY1C5bQ==
-X-Google-Smtp-Source: ABdhPJzSlAUxv013+i3iF7UhDBr6xMrmqztdd1yDabdyguJJHcuzAwZQNttg/w0jY29TPb8/0IsD2MTC7JdUisUWmcg=
-X-Received: by 2002:a17:90b:3c6:: with SMTP id go6mr1007670pjb.230.1644373598101;
- Tue, 08 Feb 2022 18:26:38 -0800 (PST)
+        with ESMTP id S238188AbiBICjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Feb 2022 21:39:22 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam07on2067.outbound.protection.outlook.com [40.107.95.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78CC4C0612C1;
+        Tue,  8 Feb 2022 18:39:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hJR8RqZdhNgP6g2S9JNXy6Os9YHxuY4j/4Kv6fdwTkv1o6SnmFjfUILMob+UFzbY477RGoeEMb5H/n+jB/lXLOObndIErlYxSnEWeTwnZOWRce0x99x12Y8uKT6Uktjyu5OAM46xFvjABsQpM70rRF9HsW6fICxGzhI4nkXYoxiOtqzQX81oMnDDWOP2Xw6Jsvx9wwlmpEHihnL4H9MGTPa0IlJf5f8yqhHDxWRz3fwKJVOdxQ/1ZCVvmhZ2C1PYrdgr/QR90PfrKI0ewFFRWQWqYL+SfkgylqId47Tadhv1269bpUPBwTJfymmjbCOiue18CeLczcJS7Ngpbgn0iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fIUsMe8Yv7SUafm8LCbXILwkah7adCVu7OEnrx1R0y0=;
+ b=NGWHs2R+qqTx3ag6DioqB3x/G8rKsaIOr9o6MNji/6qR7qm1wRuue9gCkPTvmFFdBJNbmO7ZZJYuSTouuY70W+kBcZGQi9AOWjHViTYNir42S0eChdF4ljXtXK1rW84aS9GNCj4rMmZNXIcrd6jgbdCp97Qs4eOLc/CUqy5cu81OLu24ZksI7dr41DEIVHTbr1CR17fXUp64+Ker2wiy5y50MT07qB48OtJF1xvwrVQASTzq4hjFZwHG6eLszGRH1oqVsgRwb6ocvadcsmp+IF5Vi7YjjVrDuEIPwdcOYjHoj0n8KWk5aPgwWM/HaGJFigLXVNIk0ZYIvhfdsVN/hQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fIUsMe8Yv7SUafm8LCbXILwkah7adCVu7OEnrx1R0y0=;
+ b=Rs4uXoyBGZjwAy7BpXfu9iwAaKpJbH/aqnytDgOIQOH2YENz/Qq90BYvLVZ1T5mFLr9L28Wkex6YMi6odT5f+0Aah/X6q4hT37cOf66ms8PNcrNbqeL4o/ziU1nHxh7CyNgidih3FAdMikaire+QogWYNA3QVDRntrIxAuuuTekphKaasqJeVARwwLY1JO8t/2aCpyyfnflM7AIZiR2QylrsBmnSAnyY5qbePXifhVRM9aqClQryQzTbNX8x1sO0EGycseLi3SsluxshG5W89HbIkqGoka/dt1U/MF29Fvn95ttUE9SM7kDStoBLVVQvlWYaluUi9IIeRWiFDMjM6g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY4PR12MB1704.namprd12.prod.outlook.com (2603:10b6:903:11d::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Wed, 9 Feb
+ 2022 02:39:19 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.011; Wed, 9 Feb 2022
+ 02:39:19 +0000
+Date:   Tue, 8 Feb 2022 22:39:18 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V7 mlx5-next 14/15] vfio/mlx5: Use its own PCI reset_done
+ error handler
+Message-ID: <20220209023918.GO4160@nvidia.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+ <20220207172216.206415-15-yishaih@nvidia.com>
+ <20220208170801.39dab353.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220208170801.39dab353.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1P222CA0030.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::35) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com> <20220106042708.2869332-3-reijiw@google.com>
- <CA+EHjTxVe3baCwpde+QFYKvyUaUGu9F37t-=r8k32JcHBOY61Q@mail.gmail.com>
-In-Reply-To: <CA+EHjTxVe3baCwpde+QFYKvyUaUGu9F37t-=r8k32JcHBOY61Q@mail.gmail.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 8 Feb 2022 18:26:21 -0800
-Message-ID: <CAAeT=FxTUSsDA9WUBWGDwF563JSJpguM-fumab6aQdToy2sUfA@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-15.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7e2ba54b-527c-4f8e-5c16-08d9eb755f47
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1704:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1704C9D9EA94AE7A7CF64163C22E9@CY4PR12MB1704.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: I1iZnmXAOkfjFTPUNLAzLBxBnr6H5Xr6Fal8H8rgo3eVmjId5CXGFFo/wjj7bIOWKJMSOCxA94/aVA++s88Xujz/5iAuaUrPO0zykkT7AD5Ue7GtXjdyRecB6Z0otiIzuICmDnCszX3VGPWqtTQJ5eJ560WZ8x7EacXgA04fYxY0Q596JvPm0Ksy56YYVIFH25tUTqZCB9uWsXRNbNoCabAdlSFCjEL2C+3ffmekK/Wd8rjc1ogfyrYAnG1+WZrFAKgaB7v5W+CpAw+pqnAmbvK7vQ/z5A25Jg0buQdmvAHdvXXUOZfqD+4fiJnUxqedVF/l+kOl9NH0OHpeVz+Vhv2czW7LbnhPZoeV0DlWLsuSYg2J5oZCSqnXXGAz9Cm4Vl92TwdPis5yKwV312QhN7IICpnd60tJF1wktMeM2KFGlZx76i1FxCcXLRgbuWxR3j45wYaP1UQcbvNlwk1yDI40ANVG8bv0B61qLk5shEJmW3RA33lTxjlBWyztHFji50X6b7rOmaQ0hqmR19RTCBRTKtQGqXcx/75xdhaEpAWxicwZuSVkv6c7jKJEkE/Lq+xW2k/xp4XxzL+Oj2S2EQrXY1KW+4B9t2s1tKWbHwFKOOB7jGVCXHTfB1cquU+iSqylP39WweZVoEU/8kBMcQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(33656002)(8676002)(8936002)(508600001)(6486002)(26005)(66946007)(186003)(6512007)(316002)(1076003)(2616005)(6506007)(4326008)(66476007)(36756003)(2906002)(86362001)(4744005)(5660300002)(83380400001)(66556008)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?1zEVp6/1xp+kOG5sxRoFctjCB82kgs1ISSuNKY1euwEWXSGMUhOAmkFcTeEt?=
+ =?us-ascii?Q?CM8y7Yl77XpJvwOlJTI0irS+5UqsmSE51KjUir6/1xRwbhWeOKfio2u7OaIS?=
+ =?us-ascii?Q?mg6+ysUQcx44iEx/i52C1vuOAHRHVLcrwwYrlU2Nq1Ue2nPHCZwNC5qPqpmh?=
+ =?us-ascii?Q?sRsvaxP1tPpqNqNXU3a3TqcMNu1Qfq5jj/XKp0cnLiYZEpQJT9/PVpjAvXjx?=
+ =?us-ascii?Q?k1x+7ldOnVhzqk7oqZ0zQZx1oCTNgX8RkKUpVhqOOBv8bj4a+hkDhiGXYJg0?=
+ =?us-ascii?Q?bP5uGBq/1x6rgloTb8jR3Vn91TuY5S2nF1OEEWHo9y78vgpAK9AE8tgZLE5g?=
+ =?us-ascii?Q?UCxSx5lRtAc78Z/J/U8r7qWk5LahYBrAv8ht29jiHLVtRyV6WaC+ixOOtzL6?=
+ =?us-ascii?Q?/qDOn83Q+lMufO/xFUpXoPubLHTqpjRuCgw8RXqxSPq3NneL2vNWzrnF/R04?=
+ =?us-ascii?Q?+shxPbjg8QYGnaGsYCr6i1lnZ7/C9sJWjGWCMVRmwkbWJ8w7aeSJxCGNLojg?=
+ =?us-ascii?Q?vqxp2pYeJqomug/Twoyj6KS1sCCNuob2pUD1erm3eIVUv9+dM0yGMOj4LDr+?=
+ =?us-ascii?Q?3yWB357gHt13yutu+X4e8WSY8L5+0i0FYKw33gaGAq+JBOS/GAltOXJAIY9d?=
+ =?us-ascii?Q?IWtZvV5kSWM4422IPFTO3Qoks2vnh5Fz2nKM/6lc9xojTZ+tW56AQvQw/IXq?=
+ =?us-ascii?Q?aAEWxoJL0wd9QLOYp+CF+SScXPn+oGL75HW/kg0MicsxrzbTImBPro7rlBoL?=
+ =?us-ascii?Q?TMsYuGuMSkueGYpbRMfjHRK6zo/XyPsGwXMSHiOT91/Hzxs7+EPQiZmxSM2n?=
+ =?us-ascii?Q?4jp4gGbumChEZahpMZiAh28ge6NOTuODTnRCZSaRRhP+wab9vowq+UF1Y+gc?=
+ =?us-ascii?Q?UdaWcq4jaUG5uRhIcaMctcbZOeea1dyiHOJ+oS6r14WnvaE/4fMRI7Mx5oNj?=
+ =?us-ascii?Q?Hb4fOSxedzMlyWNb0w1IhcKlmlR0lIqQv2SnL2hd96x9QJ3qgimsFSJtwx1/?=
+ =?us-ascii?Q?FkQmyk0rK0PulLhCw5U1esBzz6Zrdd1qs9JYUnsRheH0NkL8RO2jHEVbj85f?=
+ =?us-ascii?Q?PDdil1fSaok5QkcfwjLQEsIoxJKVGk/tTsVuPZlNSk9c0ZhWYe/2ETNT2eYB?=
+ =?us-ascii?Q?KYcFrjNK2kv+X/ZLh6IFqoS5xdVzLnHITMBo0gxX8YQSDznlYc7T3hXijRnL?=
+ =?us-ascii?Q?8bel/NEigICJL9WyRPJ3y3eqE4siUsODWINnoq6TMnX57o+kfn0DDuZsDU+2?=
+ =?us-ascii?Q?Xd8Xt+bwn7yfoUAmrT6kMyiv1UWJV8ompcEDycLkonXgf1PK4bql8Q9nW/Z/?=
+ =?us-ascii?Q?BPU5NVpV40MyYIqcSWTassWOPYXldTmeqZRuqFQEiUlRp7P3aYd/Etv+3ANI?=
+ =?us-ascii?Q?KFQY+1zcSGuyTl5BKBeniFV3MAUECREpgOttyYJLPFxrtoFhsN+/UTy68qet?=
+ =?us-ascii?Q?KOgI9w3/aidEaLJkHSB6OTuTVmoy8qUkXqADRVxkaDupJkjAX2JZsrtoH2ME?=
+ =?us-ascii?Q?Csw3TRivkV6gZo1cfYrAgkX97m0ucdld9zs44k5exLCD/CusXjhvizfL6sRt?=
+ =?us-ascii?Q?UvyVOETmZZc6LWhxMGY=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e2ba54b-527c-4f8e-5c16-08d9eb755f47
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2022 02:39:19.3567
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FCKz4HW4A52f1Ne/3X4en/TkdcK0uoly1WhGJrBYpMuCqqb6mERTxNb3XajQmr7O
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1704
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Fuad,
+On Tue, Feb 08, 2022 at 05:08:01PM -0700, Alex Williamson wrote:
+> > @@ -477,10 +499,34 @@ static int mlx5vf_pci_get_device_state(struct vfio_device *vdev,
+> >  
+> >  	mutex_lock(&mvdev->state_mutex);
+> >  	*curr_state = mvdev->mig_state;
+> > -	mutex_unlock(&mvdev->state_mutex);
+> > +	mlx5vf_state_mutex_unlock(mvdev);
+> >  	return 0;
+> 
+> I still can't see why it wouldn't be a both fairly trivial to implement
+> and a usability improvement if the unlock wrapper returned -EAGAIN on a
+> deferred reset so we could avoid returning a stale state to the user
+> and a dead fd in the former case.  Thanks,
 
-Sorry for the late reply.
-I've noticed that I didn't reply to the comments in this mail.
+It simply is not useful - again, we always resolve this race that
+should never happen as though the two events happened consecutively,
+which is what would normally happen if we could use a simple mutex. We
+do not need to add any more complexity to deal with this already
+troublesome thing..
 
-On Mon, Jan 24, 2022 at 8:22 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Reiji,
->
-> On Thu, Jan 6, 2022 at 4:28 AM Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> > Use the saved ones when ID registers are read by the guest or
-> > userspace (via KVM_GET_ONE_REG).
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 16 ++++++++
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  arch/arm64/kvm/sys_regs.c         | 62 ++++++++++++++++++++++---------
-> >  3 files changed, 62 insertions(+), 17 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 2a5f7f38006f..c789a0137f58 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -102,6 +102,17 @@ struct kvm_s2_mmu {
-> >  struct kvm_arch_memory_slot {
-> >  };
-> >
-> > +/*
-> > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> > + * where 0<=crm<8, 0<=op2<8.
-> > + */
-> > +#define KVM_ARM_ID_REG_MAX_NUM 64
-> > +#define IDREG_IDX(id)          ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> > +#define is_id_reg(id)  \
-> > +       (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&        \
-> > +        sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 0 &&        \
-> > +        sys_reg_CRm(id) < 8)
-> > +
->
-> This is consistent with the Arm ARM "Table D12-2 System instruction
-> encodings for non-Debug System register accesses".
->
-> Minor nit, would it be better to have IDREG_IDX and is_id_reg in
-> arch/arm64/kvm/sys_regs.h, since other similar and related ones are
-> there?
-
-I will move is_id_reg in sys_regs.c as it is used only in the file.
-I will keep IDREG_IDX in arch/arm64/kvm/sys_regs.h as IDREG_IDX is
-used to get an index of kvm_arch.id_regs[], which is defined in
-kvm_host.h.
-
->
-> >  struct kvm_arch {
-> >         struct kvm_s2_mmu mmu;
-> >
-> > @@ -137,6 +148,9 @@ struct kvm_arch {
-> >
-> >         /* Memory Tagging Extension enabled for the guest */
-> >         bool mte_enabled;
-> > +
-> > +       /* ID registers for the guest. */
-> > +       u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
-> >  };
-> >
-> >  struct kvm_vcpu_fault_info {
-> > @@ -734,6 +748,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-> >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> >                                 struct kvm_arm_copy_mte_tags *copy_tags);
-> >
-> > +void set_default_id_regs(struct kvm *kvm);
-> > +
-> >  /* Guest/host FPSIMD coordination helpers */
-> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e4727dc771bf..5f497a0af254 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >         kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
-> >
-> >         set_default_spectre(kvm);
-> > +       set_default_id_regs(kvm);
-> >
-> >         return ret;
-> >  out_free_stage2_pgd:
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index e3ec1a44f94d..80dc62f98ef0 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -33,6 +33,8 @@
-> >
-> >  #include "trace.h"
-> >
-> > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
-> > +
-> >  /*
-> >   * All of this file is extremely similar to the ARM coproc.c, but the
-> >   * types are different. My gut feeling is that it should be pretty
-> > @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
-> >                           struct sys_reg_params *p,
-> >                           const struct sys_reg_desc *r)
-> >  {
-> > -       u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +       u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
-> >         u32 sr = reg_to_encoding(r);
-> >
-> >         if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-> > @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >         return true;
-> >  }
-> >
-> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> > -               struct sys_reg_desc const *r, bool raz)
-> > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >  {
-> > -       u32 id = reg_to_encoding(r);
-> > -       u64 val;
-> > -
-> > -       if (raz)
-> > -               return 0;
-> > -
-> > -       val = read_sanitised_ftr_reg(id);
-> > +       u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
-> >
-> >         switch (id) {
-> >         case SYS_ID_AA64PFR0_EL1:
-> > @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> >         return val;
-> >  }
-> >
-> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> > +                      struct sys_reg_desc const *r, bool raz)
-> > +{
-> > +       u32 id = reg_to_encoding(r);
-> > +
-> > +       return raz ? 0 : __read_id_reg(vcpu, id);
-> > +}
-> > +
-> >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-> >                                   const struct sys_reg_desc *r)
-> >  {
-> > @@ -1223,9 +1225,8 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >  /*
-> >   * cpufeature ID register user accessors
-> >   *
-> > - * For now, these registers are immutable for userspace, so no values
-> > - * are stored, and for set_id_reg() we don't allow the effective value
-> > - * to be changed.
-> > + * For now, these registers are immutable for userspace, so for set_id_reg()
-> > + * we don't allow the effective value to be changed.
-> >   */
-> >  static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> >                         const struct sys_reg_desc *rd, void __user *uaddr,
-> > @@ -1237,7 +1238,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> >         return reg_to_user(uaddr, &val, id);
-> >  }
-> >
-> > -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> > +static int __set_id_reg(struct kvm_vcpu *vcpu,
-> >                         const struct sys_reg_desc *rd, void __user *uaddr,
-> >                         bool raz)
->
-> Minor nit: why remove the const in this patch? This is required for a
-> future patch but not for this one.
-
-Thank you for catching this. I will fix this.
-
-Regards,
-Reiji
-
->
->
-> >  {
-> > @@ -1837,8 +1838,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
-> >         if (p->is_write) {
-> >                 return ignore_write(vcpu, p);
-> >         } else {
-> > -               u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > -               u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> > +               u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> > +               u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
-> >                 u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
-> >
-> >                 p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-> > @@ -2850,3 +2851,30 @@ void kvm_sys_reg_table_init(void)
-> >         /* Clear all higher bits. */
-> >         cache_levels &= (1 << (i*3))-1;
-> >  }
-> > +
-> > +/*
-> > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > + * with ID_SANITISED() to the host's sanitized value.
-> > + */
-> > +void set_default_id_regs(struct kvm *kvm)
-> > +{
-> > +       int i;
-> > +       u32 id;
-> > +       const struct sys_reg_desc *rd;
-> > +       u64 val;
-> > +
-> > +       for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > +               rd = &sys_reg_descs[i];
-> > +               if (rd->access != access_id_reg)
-> > +                       /* Not ID register, or hidden/reserved ID register */
-> > +                       continue;
-> > +
-> > +               id = reg_to_encoding(rd);
-> > +               if (WARN_ON_ONCE(!is_id_reg(id)))
-> > +                       /* Shouldn't happen */
-> > +                       continue;
-> > +
-> > +               val = read_sanitised_ftr_reg(id);
-> > +               kvm->arch.id_regs[IDREG_IDX(id)] = val;
-> > +       }
-> > +}
-> > --
-> > 2.34.1.448.ga2b2bfdf31-goog
-> >
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Jason
