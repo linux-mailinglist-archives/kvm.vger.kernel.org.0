@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB7E94AED42
-	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 09:53:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DDA74AED2E
+	for <lists+kvm@lfdr.de>; Wed,  9 Feb 2022 09:53:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238823AbiBIIxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 03:53:06 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:44042 "EHLO
+        id S242009AbiBIIxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 03:53:15 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:44406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240072AbiBIIxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 03:53:05 -0500
+        with ESMTP id S241143AbiBIIxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 03:53:10 -0500
 Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DEB5DF48F3D;
-        Wed,  9 Feb 2022 00:53:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CFBDF28A7A;
+        Wed,  9 Feb 2022 00:53:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644396780; x=1675932780;
+  t=1644396785; x=1675932785;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=miD0Yf9C+MQxqIFghTdlVvKVbagPjG3BXOKwIH4J4CM=;
-  b=nUv1FqocQ81NKMPgW55BTvWZ9k3LEx0TAEUC2b4bW4sDaDHQpcYnm/p6
-   pY4a2RBr5Hm92t9ZOJyfYEmHx1PQbENY5lPhhHf/B2obcA8yC4v0ocepV
-   wcea2VHcfC93hAC+l9uyilzCshwm+KYQfMxmnDmWSfsdq78keT5Nmxpn7
-   pgILqXpbrAqSCRaptQPsfMi/rLb9/52+rDaADinpgcwD2cXf5NtmltJpE
-   V73x63eX+EREn7Kzw0JcDcLX8yl1E+7mDNeqByKx2HITaLdTdgeUydQEn
-   elbyZNd9DP/22mWDXElDTkZXaOZOYsCu3ZkXHbSkljhYxoQ7/HDmi9YTZ
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="309903054"
+  bh=NDRPuOyBPlZxfUKuBy6kNTLDmbdhFCgmtwTRiLV6mak=;
+  b=SWnE/slGPk6P/GthsRYrCNjgxbu1TJEhuPP3pyLAg/SwiAJPUCraMHK1
+   aFqWZDvOU5FnYq0FaSr5btbshJooH/pmI3RSDb6NFcwkAhcGLJ7+Hv8AS
+   dTJT8dyJjJGMWsu9rbcxVKf5yHM1UDZr5V5QgicA1uNf5AbZ22Cb/8ZDz
+   +2gJBz3U13jvNN8cOit1hqZDZqiCs+PqJTKTkV14Pq7PWYX4rZP8qtTAm
+   qUcjs4Y6hJVYgFZAVRtZSSavcBanaeg3/UWVWjeAZzZ49+k1UV7v9f3bn
+   PAqKYXv++wUWE0YxwBYB62+HE2wCsSJkBuT/jK4pT6nWnCYl6tLtTnQSn
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="309903082"
 X-IronPort-AV: E=Sophos;i="5.88,355,1635231600"; 
-   d="scan'208";a="309903054"
+   d="scan'208";a="309903082"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 00:50:13 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 00:50:18 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,355,1635231600"; 
-   d="scan'208";a="568169401"
+   d="scan'208";a="568169446"
 Received: from ahunter-desktop.fi.intel.com ([10.237.72.92])
-  by orsmga001.jf.intel.com with ESMTP; 09 Feb 2022 00:50:09 -0800
+  by orsmga001.jf.intel.com with ESMTP; 09 Feb 2022 00:50:13 -0800
 From:   Adrian Hunter <adrian.hunter@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
@@ -49,9 +49,9 @@ Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH 09/11] perf intel-pt: Use CLOCK_PERF_HW_CLOCK_NS by default
-Date:   Wed,  9 Feb 2022 10:49:27 +0200
-Message-Id: <20220209084929.54331-10-adrian.hunter@intel.com>
+Subject: [PATCH 10/11] perf intel-pt: Add config variables for timing parameters
+Date:   Wed,  9 Feb 2022 10:49:28 +0200
+Message-Id: <20220209084929.54331-11-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220209084929.54331-1-adrian.hunter@intel.com>
 References: <20220209084929.54331-1-adrian.hunter@intel.com>
@@ -68,56 +68,198 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make CLOCK_PERF_HW_CLOCK_NS the default for Intel PT if it is supported.
-To allow that to be overridden, support also --no-clockid.
+Parameters needed to correctly interpret timing packets might be missing
+in a virtual machine because the CPUID leaf or MSR is not supported by the
+hypervisor / KVM.
+
+Add perf config variables to overcome that for max_nonturbo_ratio
+(missing from MSR_PLATFORM_INFO) and tsc_art_ratio (missing from CPUID leaf
+ 0x15), which were seen to be missing from QEMU / KVM.
 
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- tools/perf/arch/x86/util/intel-pt.c | 5 +++++
- tools/perf/util/clockid.c           | 1 +
- tools/perf/util/record.h            | 1 +
- 3 files changed, 7 insertions(+)
+ tools/perf/Documentation/perf-config.txt | 18 ++++++++
+ tools/perf/arch/x86/util/intel-pt.c      | 52 +++++++++++++++++++++++-
+ tools/perf/util/intel-pt.c               |  6 +++
+ tools/perf/util/intel-pt.h               |  5 +++
+ 4 files changed, 79 insertions(+), 2 deletions(-)
 
+diff --git a/tools/perf/Documentation/perf-config.txt b/tools/perf/Documentation/perf-config.txt
+index 0420e71698ee..3c4fc641fde7 100644
+--- a/tools/perf/Documentation/perf-config.txt
++++ b/tools/perf/Documentation/perf-config.txt
+@@ -709,7 +709,11 @@ stat.*::
+ 
+ intel-pt.*::
+ 
++	Variables that affect Intel PT.
++
+ 	intel-pt.cache-divisor::
++		If set, the decoder instruction cache size is based on DSO size
++		divided by this number.
+ 
+ 	intel-pt.mispred-all::
+ 		If set, Intel PT decoder will set the mispred flag on all
+@@ -721,6 +725,20 @@ intel-pt.*::
+ 		the maximum is exceeded there will be a "Never-ending loop"
+ 		error. The default is 100000.
+ 
++	intel-pt.max_nonturbo_ratio::
++		The kernel provides /sys/bus/event_source/devices/intel_pt/max_nonturbo_ratio
++		which can be zero in a virtual machine.  The decoder needs this
++		information to correctly interpret timing packets, so the value
++		can be provided by this variable in that case. Note in the absence
++		of VMCS TSC Scaling, this is probably the same as the host value.
++
++	intel-pt.tsc_art_ratio::
++		The kernel provides /sys/bus/event_source/devices/intel_pt/tsc_art_ratio
++		which can be 0:0 in a virtual machine.  The decoder needs this
++		information to correctly interpret timing packets, so the value
++		can be provided by this variable in that case. Note in the absence
++		of VMCS TSC Scaling, this is probably the same as the host value.
++
+ auxtrace.*::
+ 
+ 	auxtrace.dumpdir::
 diff --git a/tools/perf/arch/x86/util/intel-pt.c b/tools/perf/arch/x86/util/intel-pt.c
-index ce5dc70e392a..d5cdc53471ff 100644
+index d5cdc53471ff..6b48f7e38a1c 100644
 --- a/tools/perf/arch/x86/util/intel-pt.c
 +++ b/tools/perf/arch/x86/util/intel-pt.c
-@@ -926,6 +926,11 @@ static int intel_pt_recording_options(struct auxtrace_record *itr,
- 		evsel__reset_sample_bit(tracking_evsel, BRANCH_STACK);
- 	}
+@@ -24,6 +24,7 @@
+ #include "../../../util/parse-events.h"
+ #include "../../../util/pmu.h"
+ #include "../../../util/debug.h"
++#include "../../../util/config.h"
+ #include "../../../util/auxtrace.h"
+ #include "../../../util/perf_api_probe.h"
+ #include "../../../util/record.h"
+@@ -327,15 +328,60 @@ intel_pt_info_priv_size(struct auxtrace_record *itr, struct evlist *evlist)
+ 	return ptr->priv_size;
+ }
  
-+	if (!opts->use_clockid && !opts->no_clockid && perf_can_perf_clock_hw_clock_ns()) {
-+		opts->use_clockid = true;
-+		opts->clockid = CLOCK_PERF_HW_CLOCK_NS;
-+	}
++struct tsc_art_ratio {
++	u32 *n;
++	u32 *d;
++};
 +
- 	/*
- 	 * Warn the user when we do not have enough information to decode i.e.
- 	 * per-cpu with no sched_switch (except workload-only).
-diff --git a/tools/perf/util/clockid.c b/tools/perf/util/clockid.c
-index 380429725df1..e3500a254103 100644
---- a/tools/perf/util/clockid.c
-+++ b/tools/perf/util/clockid.c
-@@ -78,6 +78,7 @@ int parse_clockid(const struct option *opt, const char *str, int unset)
++static int intel_pt_tsc_art_ratio(const char *var, const char *value, void *data)
++{
++	if (!strcmp(var, "intel-pt.tsc_art_ratio")) {
++		struct tsc_art_ratio *r = data;
++
++		if (sscanf(value, "%u:%u", r->n, r->d) != 2)
++			return -EINVAL;
++	}
++	return 0;
++}
++
++void intel_pt_tsc_ctc_ratio_from_config(u32 *n, u32 *d)
++{
++	struct tsc_art_ratio data = { .n = n, .d = d };
++
++	*n = 0;
++	*d = 0;
++	perf_config(intel_pt_tsc_art_ratio, &data);
++}
++
+ static void intel_pt_tsc_ctc_ratio(u32 *n, u32 *d)
+ {
+ 	unsigned int eax = 0, ebx = 0, ecx = 0, edx = 0;
  
- 	if (unset) {
- 		opts->use_clockid = 0;
-+		opts->no_clockid = true;
- 		return 0;
+ 	__get_cpuid(0x15, &eax, &ebx, &ecx, &edx);
++	if (!eax || !ebx) {
++		intel_pt_tsc_ctc_ratio_from_config(n, d);
++		return;
++	}
+ 	*n = ebx;
+ 	*d = eax;
+ }
+ 
++static int intel_pt_max_nonturbo_ratio(const char *var, const char *value, void *data)
++{
++	if (!strcmp(var, "intel-pt.max_nonturbo_ratio")) {
++		unsigned int *max_nonturbo_ratio = data;
++
++		if (sscanf(value, "%u", max_nonturbo_ratio) != 1)
++			return -EINVAL;
++	}
++	return 0;
++}
++
++void intel_pt_max_nonturbo_ratio_from_config(unsigned int *max_non_turbo_ratio)
++{
++	perf_config(intel_pt_max_nonturbo_ratio, max_non_turbo_ratio);
++}
++
+ static int intel_pt_info_fill(struct auxtrace_record *itr,
+ 			      struct perf_session *session,
+ 			      struct perf_record_auxtrace_info *auxtrace_info,
+@@ -349,7 +395,7 @@ static int intel_pt_info_fill(struct auxtrace_record *itr,
+ 	bool cap_user_time_zero = false, per_cpu_mmaps;
+ 	u64 tsc_bit, mtc_bit, mtc_freq_bits, cyc_bit, noretcomp_bit;
+ 	u32 tsc_ctc_ratio_n, tsc_ctc_ratio_d;
+-	unsigned long max_non_turbo_ratio;
++	unsigned int max_non_turbo_ratio;
+ 	size_t filter_str_len;
+ 	const char *filter;
+ 	int event_trace;
+@@ -373,8 +419,10 @@ static int intel_pt_info_fill(struct auxtrace_record *itr,
+ 	intel_pt_tsc_ctc_ratio(&tsc_ctc_ratio_n, &tsc_ctc_ratio_d);
+ 
+ 	if (perf_pmu__scan_file(intel_pt_pmu, "max_nonturbo_ratio",
+-				"%lu", &max_non_turbo_ratio) != 1)
++				"%u", &max_non_turbo_ratio) != 1)
+ 		max_non_turbo_ratio = 0;
++	if (!max_non_turbo_ratio)
++		intel_pt_max_nonturbo_ratio_from_config(&max_non_turbo_ratio);
+ 	if (perf_pmu__scan_file(intel_pt_pmu, "caps/event_trace",
+ 				"%d", &event_trace) != 1)
+ 		event_trace = 0;
+diff --git a/tools/perf/util/intel-pt.c b/tools/perf/util/intel-pt.c
+index 10d47759a41e..6fa76b584537 100644
+--- a/tools/perf/util/intel-pt.c
++++ b/tools/perf/util/intel-pt.c
+@@ -3934,6 +3934,9 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
+ 				    INTEL_PT_CYC_BIT);
  	}
  
-diff --git a/tools/perf/util/record.h b/tools/perf/util/record.h
-index ef6c2715fdd9..20bcd4310146 100644
---- a/tools/perf/util/record.h
-+++ b/tools/perf/util/record.h
-@@ -67,6 +67,7 @@ struct record_opts {
- 	bool	      sample_transaction;
- 	int	      initial_delay;
- 	bool	      use_clockid;
-+	bool	      no_clockid;
- 	clockid_t     clockid;
- 	u64	      clockid_res_ns;
- 	int	      nr_cblocks;
++	if (!pt->tsc_ctc_ratio_n || !pt->tsc_ctc_ratio_d)
++		intel_pt_tsc_ctc_ratio_from_config(&pt->tsc_ctc_ratio_n, &pt->tsc_ctc_ratio_d);
++
+ 	if (intel_pt_has(auxtrace_info, INTEL_PT_MAX_NONTURBO_RATIO)) {
+ 		pt->max_non_turbo_ratio =
+ 			auxtrace_info->priv[INTEL_PT_MAX_NONTURBO_RATIO];
+@@ -3942,6 +3945,9 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
+ 				    INTEL_PT_MAX_NONTURBO_RATIO);
+ 	}
+ 
++	if (!pt->max_non_turbo_ratio)
++		intel_pt_max_nonturbo_ratio_from_config(&pt->max_non_turbo_ratio);
++
+ 	info = &auxtrace_info->priv[INTEL_PT_FILTER_STR_LEN] + 1;
+ 	info_end = (void *)auxtrace_info + auxtrace_info->header.size;
+ 
+diff --git a/tools/perf/util/intel-pt.h b/tools/perf/util/intel-pt.h
+index a2c4474641c0..99ac73f4a648 100644
+--- a/tools/perf/util/intel-pt.h
++++ b/tools/perf/util/intel-pt.h
+@@ -7,6 +7,8 @@
+ #ifndef INCLUDE__PERF_INTEL_PT_H__
+ #define INCLUDE__PERF_INTEL_PT_H__
+ 
++#include <linux/types.h>
++
+ #define INTEL_PT_PMU_NAME "intel_pt"
+ 
+ enum {
+@@ -44,4 +46,7 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
+ 
+ struct perf_event_attr *intel_pt_pmu_default_config(struct perf_pmu *pmu);
+ 
++void intel_pt_tsc_ctc_ratio_from_config(u32 *n, u32 *d);
++void intel_pt_max_nonturbo_ratio_from_config(unsigned int *max_non_turbo_ratio);
++
+ #endif
 -- 
 2.25.1
 
