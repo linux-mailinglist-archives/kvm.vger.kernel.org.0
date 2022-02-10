@@ -2,76 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D23A4B1327
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:42:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1CCF4B1338
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:42:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244568AbiBJQlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 11:41:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52104 "EHLO
+        id S244545AbiBJQkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 11:40:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244546AbiBJQlF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:41:05 -0500
+        with ESMTP id S244546AbiBJQky (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 11:40:54 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50404E96
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:41:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8DDDCE5D
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:40:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644511265;
+        s=mimecast20190719; t=1644511249;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0l/m87uQUmT5CdzB+3f+eMwCEX3CAuEYEJDghPjLWUg=;
-        b=NMjMQGbggT+lzmLB/lZs0MrWLMyA8eQ1JmUbDSckC+VcK07Vy8csoa74mcLr+2YjWJZHWa
-        nMO5DNesVx+HU2G+vA6BZrrbzSrWYJhjV4TDzi7LxiPSdZoh3hXjJQ8GB474vuAazu7A2/
-        XsV+f3rxWVRO5TVxxXi8jbjQkgTzNNU=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=30EUFe9ZMAk2o8E42dYwy3LHUtkFtK7cdn4oOH+aiTc=;
+        b=DeaeIRyMVb4mRSZFRQOerGdutbeSlgUpoRYm+Ha6l/6o2f5Rg8Eernc0eBt8W6Ytz95QLa
+        T78/EZijMj+pdfuYRjiq8AFm3iNwy6APf1+HjYkcKrSyYi70GPkiGDYGFTavK1wLG/iuXV
+        EG5SKvrShJbuYWDb4fd6r4BZdH+8m8Q=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-88-mnFfFRzCOY-eiArI8P8NFA-1; Thu, 10 Feb 2022 11:41:04 -0500
-X-MC-Unique: mnFfFRzCOY-eiArI8P8NFA-1
-Received: by mail-ed1-f71.google.com with SMTP id u24-20020a50d518000000b0040f8cef2463so3636860edi.21
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:41:03 -0800 (PST)
+ us-mta-500-laP22kF9NBaOqFLVJZhbLA-1; Thu, 10 Feb 2022 11:40:48 -0500
+X-MC-Unique: laP22kF9NBaOqFLVJZhbLA-1
+Received: by mail-ej1-f71.google.com with SMTP id hr36-20020a1709073fa400b006cd2c703959so2984518ejc.14
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:40:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=0l/m87uQUmT5CdzB+3f+eMwCEX3CAuEYEJDghPjLWUg=;
-        b=bHl/4/nOkICspjR9COcnVf1mMjZuBdd2wki0qyMyqgSEn6bj3zsRvcPAqFfs064jrw
-         op+6WYHnQ/XX/vcmCa/92GmZrx5gia04VLoBYdwGf6l6pQsdH/EUGDejLo0YUwdg/9xQ
-         jDfWrKxcHcmR9MMUlKrjV4SgXVQkNiSfRSILp54CRW11/inX2SVXeihBzDxgaoylV/EG
-         SwG5+qyCBqTtPbtNZkvE3RmcN8xFRLZmTRodxs9K0E3MhT7LEmeMPv5QduupEdYggr/F
-         ZbxvoG8TkWsFMaZSJcxc1flDJXB74Yw/trLOWCAWko2YIreE5fV217tS7I4pmfTiqmvm
-         Vmjw==
-X-Gm-Message-State: AOAM5310p/uW9RlFKtff5jfLl1ZnblDweZg3rS6B3nCwvpOXQvTCErIr
-        rV00npNNo5j7MGKEPmI2fMQbVQTMfzmk0v7kvKVJJS4IjrhUNwC7THrDnBu4zB7DDolptlq8HSm
-        IJ0YPA6sap3Cr
-X-Received: by 2002:a05:6402:4490:: with SMTP id er16mr9338800edb.453.1644511262947;
-        Thu, 10 Feb 2022 08:41:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyZECJ9IV0hUhjUbenMOOxBbaVN6c3Lw279B4RgPUaIqhBLIYpmJT4dWjQTktndy3A8BvGpTw==
-X-Received: by 2002:a05:6402:4490:: with SMTP id er16mr9338778edb.453.1644511262720;
-        Thu, 10 Feb 2022 08:41:02 -0800 (PST)
+        bh=30EUFe9ZMAk2o8E42dYwy3LHUtkFtK7cdn4oOH+aiTc=;
+        b=w+//PSOlxNQvzwOkVTUoOK/87CRG0GOjNQeC5zXvz2cAvpX+tOCFeHZMg1nESHesrk
+         XECHRVWXme4ZpsEKTnggFSpT8561MZqG7RW/HwOpjP6nAsF3dYFgmRB/kx02KKEEtt56
+         WAy0Ra7y0bczwcFZI6GomKNDbi5mtMFoziDaHj6PzPTN+6c9aRRsBoKo1Cwi+AIMtk7d
+         JuPLouquHrj8IaSyCzZUIZuHSOjCiNBh3+td6IqLsLlnNT95YOH2u4dH061uVGGreOG9
+         wHRZ/QWzobRpR7QljnF8/M3nFa73hk7UFU1AANjolCvP/6SjB+/w4cPSeLoBBonUS0rT
+         ux/g==
+X-Gm-Message-State: AOAM530dPo9riPJRsn72IIwnUX+izJiDRVnROpr0TgdHe16UyHeVYpng
+        Fx79cnDPJBvdLGxuwljUSTvFnghlydvaIdq2qPNgpTbM0RQ/AqvFC0WmwFL53o3Pg3eshL3Mjlo
+        1tSbmMdCzql9R
+X-Received: by 2002:a17:906:99c6:: with SMTP id s6mr7547453ejn.522.1644511246914;
+        Thu, 10 Feb 2022 08:40:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwYRgarg4MQSjsf/6d2XAuFlbPg+lsO2UEU8IjFLj5NbFvJtES92CmW7ZnePV8UnC/mde0BEg==
+X-Received: by 2002:a17:906:99c6:: with SMTP id s6mr7547437ejn.522.1644511246686;
+        Thu, 10 Feb 2022 08:40:46 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id f28sm2372477ejl.46.2022.02.10.08.40.42
+        by smtp.googlemail.com with ESMTPSA id i9sm8367958eda.35.2022.02.10.08.40.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 08:41:02 -0800 (PST)
-Message-ID: <14850b2d-f55f-712a-41fe-b6ee4a291de0@redhat.com>
-Date:   Thu, 10 Feb 2022 17:40:40 +0100
+        Thu, 10 Feb 2022 08:40:46 -0800 (PST)
+Message-ID: <98254cb1-cb10-ddfe-7ea7-ae71d9f63316@redhat.com>
+Date:   Thu, 10 Feb 2022 17:40:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH MANUALSEL 5.10 3/6] KVM: nVMX: Also filter
- MSR_IA32_VMX_TRUE_PINBASED_CTLS when eVMCS
+Subject: Re: [PATCH MANUALSEL 5.10 5/6] KVM: SVM: Don't kill SEV guest if SMAP
+ erratum triggers in usermode
 Content-Language: en-US
 To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, tglx@linutronix.de,
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Liam Merwick <liam.merwick@oracle.com>, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, kvm@vger.kernel.org
 References: <20220209185714.48936-1-sashal@kernel.org>
- <20220209185714.48936-3-sashal@kernel.org>
+ <20220209185714.48936-5-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220209185714.48936-3-sashal@kernel.org>
+In-Reply-To: <20220209185714.48936-5-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,42 +86,55 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2/9/22 19:57, Sasha Levin wrote:
-> From: Vitaly Kuznetsov <vkuznets@redhat.com>
+> From: Sean Christopherson <seanjc@google.com>
 > 
-> [ Upstream commit f80ae0ef089a09e8c18da43a382c3caac9a424a7 ]
+> [ Upstream commit cdf85e0c5dc766fc7fc779466280e454a6d04f87 ]
 
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Paolo
 
-> Similar to MSR_IA32_VMX_EXIT_CTLS/MSR_IA32_VMX_TRUE_EXIT_CTLS,
-> MSR_IA32_VMX_ENTRY_CTLS/MSR_IA32_VMX_TRUE_ENTRY_CTLS pair,
-> MSR_IA32_VMX_TRUE_PINBASED_CTLS needs to be filtered the same way
-> MSR_IA32_VMX_PINBASED_CTLS is currently filtered as guests may solely rely
-> on 'true' MSR data.
 > 
-> Note, none of the currently existing Windows/Hyper-V versions are known
-> to stumble upon the unfiltered MSR_IA32_VMX_TRUE_PINBASED_CTLS, the change
-> is aimed at making the filtering future proof.
+> Inject a #GP instead of synthesizing triple fault to try to avoid killing
+> the guest if emulation of an SEV guest fails due to encountering the SMAP
+> erratum.  The injected #GP may still be fatal to the guest, e.g. if the
+> userspace process is providing critical functionality, but KVM should
+> make every attempt to keep the guest alive.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Message-Id: <20220112170134.1904308-2-vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> Message-Id: <20220120010719.711476-10-seanjc@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Sasha Levin <sashal@kernel.org>
 > ---
->   arch/x86/kvm/vmx/evmcs.c | 1 +
->   1 file changed, 1 insertion(+)
+>   arch/x86/kvm/svm/svm.c | 16 +++++++++++++++-
+>   1 file changed, 15 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> index c0d6fee9225fe..5b68034ec5f9c 100644
-> --- a/arch/x86/kvm/vmx/evmcs.c
-> +++ b/arch/x86/kvm/vmx/evmcs.c
-> @@ -361,6 +361,7 @@ void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
->   	case MSR_IA32_VMX_PROCBASED_CTLS2:
->   		ctl_high &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
->   		break;
-> +	case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
->   	case MSR_IA32_VMX_PINBASED_CTLS:
->   		ctl_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
->   		break;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index fa543c355fbdb..d515c8e68314c 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4155,7 +4155,21 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int i
+>   			return true;
+>   
+>   		pr_err_ratelimited("KVM: SEV Guest triggered AMD Erratum 1096\n");
+> -		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+> +
+> +		/*
+> +		 * If the fault occurred in userspace, arbitrarily inject #GP
+> +		 * to avoid killing the guest and to hopefully avoid confusing
+> +		 * the guest kernel too much, e.g. injecting #PF would not be
+> +		 * coherent with respect to the guest's page tables.  Request
+> +		 * triple fault if the fault occurred in the kernel as there's
+> +		 * no fault that KVM can inject without confusing the guest.
+> +		 * In practice, the triple fault is moot as no sane SEV kernel
+> +		 * will execute from user memory while also running with SMAP=1.
+> +		 */
+> +		if (is_user)
+> +			kvm_inject_gp(vcpu, 0);
+> +		else
+> +			kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>   	}
+>   
+>   	return false;
 
