@@ -2,84 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECEAE4B178D
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 22:30:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC47A4B18D3
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 23:51:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344592AbiBJV2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 16:28:43 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45864 "EHLO
+        id S1345263AbiBJWuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 17:50:04 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243233AbiBJV2n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 16:28:43 -0500
-X-Greylist: delayed 1671 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Feb 2022 13:28:41 PST
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 399B7AF;
-        Thu, 10 Feb 2022 13:28:41 -0800 (PST)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1nIGYM-000368-37; Thu, 10 Feb 2022 22:00:34 +0100
-Message-ID: <4524b1c9-3a32-8a2d-b7b8-5c4e65df017b@maciej.szmigiero.name>
-Date:   Thu, 10 Feb 2022 22:00:28 +0100
+        with ESMTP id S238083AbiBJWuD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 17:50:03 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CEAB77
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 14:50:02 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id q11-20020a17090a304b00b001b94d25eaecso2538623pjl.4
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 14:50:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XkU5iLNArD+gSSsbOviCay34l6txBbFA8zH6dv+uNvw=;
+        b=YPaiEstUGXzuhD/Cg6vlfCuNXdeHpFm5v+9Bb7yfrNTAVUueaL3Tx0iJiwnN3f5t90
+         o54COLLM2Omp0pdH/gBHFkfd2Mc3EU1SHKIPFJR8OQM/a+J/4IOvEPtg68VdYYanZd/E
+         HoFuqxbKGMrXWg8uqSlH6em70kiQzKWC4mNDKcaRQB0sSx2cSYJn4Md2Yg2fsn0ZA2G2
+         jZXr2rO9MHu4kh+BTRzxBTalggjBRX6d74MEJciRH+/RlMbErgpUXYHFgaE8wVC4hWkj
+         Gf84g3ojYFR89mjYV3P/YSoymiT1DZ7/7B65zgR5y/niEpDcrTD+7Jqux9mkNkncTrzi
+         6Wjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XkU5iLNArD+gSSsbOviCay34l6txBbFA8zH6dv+uNvw=;
+        b=Difssx0kMtGZom+YIlVctwoNmPgy1VVgELWmeqdUynmy900kB3QRZflGEYUxOx2rhL
+         lc67tGrwmkDrEQw3lfA8yr7IyxFUVpPtXzcJHrDPhj81sDw5n0hC7W46jHlv5DuUkxVB
+         Lln87CD9PmEYETd5ylIUqmCj2Xr1XwoHwzgy3putVSY5O7+KuZyil95BOS7HMHaEIkcx
+         2jJrP2Kw5x63PH+BN1N4s4vcAji576Sfy/ZpEucq+mXt3T5MLb3Xh+ax7oeld8zTy12e
+         FLjFopQ2MZGajHNxwzzWtF466QH10fjRy0FA5ysz3Ag3Ga5UE0kFD7C17KxI4Nm5nF1H
+         q1ZA==
+X-Gm-Message-State: AOAM530xznEaUFri8C4n2eaqMn8tW+5ijV7tNgdkJleY59G+8RMfLl8E
+        1ESxTJ2X8QikL+A3pxp9hLUm2g==
+X-Google-Smtp-Source: ABdhPJzzbNPsKwKl0OnLYb9dCa4vgV+051VSPWXGr9kQVp9PSnpPfGQeV097gomnmYuBH4/z/wfuDA==
+X-Received: by 2002:a17:90b:1c0f:: with SMTP id oc15mr5128547pjb.70.1644533401368;
+        Thu, 10 Feb 2022 14:50:01 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id pi9sm3850809pjb.46.2022.02.10.14.50.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Feb 2022 14:50:00 -0800 (PST)
+Date:   Thu, 10 Feb 2022 22:49:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 01/12] KVM: x86: host-initiated EFER.LME write affects
+ the MMU
+Message-ID: <YgWWldQdqHBMdzA6@google.com>
+References: <20220209170020.1775368-1-pbonzini@redhat.com>
+ <20220209170020.1775368-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Michal Hocko <mhocko@suse.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kees Cook <keescook@chromium.org>, Willy Tarreau <w@1wt.eu>
-References: <1acaee7fa7ef7ab91e51f4417572b099caf2f400.1643405658.git.maciej.szmigiero@oracle.com>
- <YfRkivAI2P6urdfn@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH] KVM: x86: Fix rmap allocation for very large memslots
-In-Reply-To: <YfRkivAI2P6urdfn@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220209170020.1775368-2-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.01.2022 22:47, Sean Christopherson wrote:
-> On Fri, Jan 28, 2022, Maciej S. Szmigiero wrote:
->> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
->>
->> Commit 7661809d493b ("mm: don't allow oversized kvmalloc() calls") has
->> forbidden using kvmalloc() to make allocations larger than INT_MAX (2 GiB).
->>
->> Unfortunately, adding a memslot exceeding 1 TiB in size will result in rmap
->> code trying to make an allocation exceeding this limit.
->> Besides failing this allocation, such operation will also trigger a
->> WARN_ON_ONCE() added by the aforementioned commit.
->>
->> Since we probably still want to use kernel slab for small rmap allocations
->> let's only redirect such oversized allocations to vmalloc.
->>
->> A possible alternative would be to add some kind of a __GFP_LARGE flag to
->> skip the INT_MAX check behind kvmalloc(), however this will impact the
->> common kernel memory allocation code, not just KVM.
+On Wed, Feb 09, 2022, Paolo Bonzini wrote:
+> While the guest runs, EFER.LME cannot change unless CR0.PG is clear, and therefore
+> EFER.NX is the only bit that can affect the MMU role.  However, set_efer accepts
+> a host-initiated change to EFER.LME even with CR0.PG=1.  In that case, the
+> MMU has to be reset.
 > 
-> Paolo has a cleaner fix for this[1][2], but it appears to have stalled out somewhere.
-> 
-> Paolo???
-> 
-> [1] https://lore.kernel.org/all/20211015165519.135670-1-pbonzini@redhat.com
-> [2] https://lore.kernel.org/all/20211016064302.165220-1-pbonzini@redhat.com
+> Fixes: 11988499e62b ("KVM: x86: Skip EFER vs. guest CPUID checks for host-initiated writes")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-So, what we do here?
+Ugh, but KVM_SET_SREGS handles this... It's basically KVM's equivalent of VMX putting
+EFER in the VMCS, but then also allowing EFER in the load/store lists.
 
-Apparently the cleaner fix at [2] wasn't picked up despite Kees giving
-it his "Reviewed-by".
-
-Thanks,
-Maciej
+Reviewed-by: Sean Christopherson <seanjc@google.com>
