@@ -2,78 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF8354B18F4
-	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 00:02:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E2304B1904
+	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 00:07:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345352AbiBJXAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 18:00:48 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54074 "EHLO
+        id S1345413AbiBJXHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 18:07:20 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345289AbiBJXAp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 18:00:45 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33487115D
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 15:00:46 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id 10so3175091plj.1
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 15:00:46 -0800 (PST)
+        with ESMTP id S239716AbiBJXHS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 18:07:18 -0500
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5055655BB;
+        Thu, 10 Feb 2022 15:07:19 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id p14so7212026qtx.0;
+        Thu, 10 Feb 2022 15:07:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KEDi7BzApy9NyPhE3GwFUFpSbJpaoj+MohuY7q6ukn8=;
-        b=rC0MuFpLCGX/wILsiUuPi3U1gQg31caG4BiNWRkZyARysxxOUUv8Q3LNzjO+P+Nk4y
-         2r9JQXfBsPd5Ndy5bfdBm1UQStmdMFkUSa9ZuGJ2Jbx0vAGuMzkjBl0HVJzFfBHPzqRM
-         oZ/+2fopYX4+xZ4Xtf3ezO+u9pX9x2tJREvwE9mVekhs4fzaFfwcbbR6EsMgKcKm92Ly
-         1v5axtqmVRVRJoeblg4A+0nGSHgduY0/yBdo0gSsD1+AMMCbwQJzPItE4B27jVFD+YiP
-         khM8cU5635c5J+kXgZcI4na3T/UF9GRUHOmBq0MRvWfUXPam2Lf/Sjy+0aMjN2GYOj3v
-         L6sg==
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=sS42IV/IyJJJQe1oR3KUsg/jNaiYCRP226dHL2TKSfc=;
+        b=eocimBnfXPFWj8+E/eB1AYv5kSg66Mv6qkEhHGxwdqK6+dpi+peRet6nrjcRYlb1tJ
+         HLjsHeS4HoimMpuxEg6Q1KFwlnDiLHRIUxX6DAS8BAJyYe1Wb5ZRuGjIJMKR1q4x1tax
+         mR0v16h3AqcOHy0zSKKbFeKUUpHpXQKLT1K/LlXJmTYON2jCyhCt2CbAHCunDJet+SQf
+         qB3xSxKlgbKAtVXuJt2VZ7Ky2ByxUPWa//VI9ZAvnNBy9epN/zB3cnDTCxQ9bKhG9BuX
+         3+3BcwaBmibYIEse7pP1iJqUGgPQy06oSK9nozPDLkXHxtbCOZzb3pzwlcco0UUiQ3qe
+         mySw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KEDi7BzApy9NyPhE3GwFUFpSbJpaoj+MohuY7q6ukn8=;
-        b=KInk6mGQgLAHpsxmruA1mJX0Z4Y6jhLx9IBMguXZx3W+7bu4yAFfadITII9PC1edgP
-         8/dn0UvtHbl39DJSqIadLZEQYlc7486wKChL0rMG53vmnhFZtnvdwLi4S91Mt3dAnraO
-         OP1jOuOPawj2i1cfq43sAxqoa0fNisi96DFfkgGEwEuv8k3gTqaZ1blvsrUox9uIFaBC
-         cGAsxG4bwU+1jy7xxViLTIFvIKF84dYaU7WgXG9PAmI5ZGCW12cfTAIDF6TqUgFNMt+Q
-         Vg3XzzW46UWMhxrBsJeTCGY7HwvL5Huzb/waTTzt2U8uB705DfyDm5R13FJTxL21Wdrh
-         /iPA==
-X-Gm-Message-State: AOAM530T9Zd/QrPQVEHNkcYJM+micSU018IGeZT3GPppWtE/cRjz828K
-        RLksgfZ4cJZlkfK9zFCidOPowQ==
-X-Google-Smtp-Source: ABdhPJyn2Ky81FVl3Upy6x198Hz9a9Q7KTbh/uhEkowKvr9pyNxCLlAHzTTAPzh5pud+RCCDx1tcXg==
-X-Received: by 2002:a17:90b:3c6:: with SMTP id go6mr5136781pjb.230.1644534045516;
-        Thu, 10 Feb 2022 15:00:45 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q8sm26524792pfl.143.2022.02.10.15.00.44
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=sS42IV/IyJJJQe1oR3KUsg/jNaiYCRP226dHL2TKSfc=;
+        b=lk6t8MLwgU2dFFqPnJwRFF3vFOnCc7KeDA7EdJASpDozZmB0ue7q1Wr7QBzJ8fouGk
+         aPfiYoFK/4UF9xm7blwfJIwCLyxVTAKkEPxkcuG50WHLkU3WqSyBSbNOyqCflQklxPas
+         s6yFFJC22a/qVrh5yzNk+jDWP40XViZ+igg15GYl1Pbni3ZTUvS9N4qiAat1fF0Q1eE3
+         /B4k5Ryq00hCq9me7kLRkQAao2CrHDuUE/PiHBcLHnut8Feq4EG3ew61oKc2WwrMNH2A
+         tNhFicd6ayz4vcuzxdzgpvCYlo+Jam0wn+vdMTmFDL6wZn35Nq9kZNRpodxK/jAUO91V
+         7ETg==
+X-Gm-Message-State: AOAM5316ViZc0B6pYJGF7tq3pfuH8cfqM0uaq/Fes6fe0lvi/i9aSzs3
+        jsQXEwjcpsDt49w9oGyzC9A=
+X-Google-Smtp-Source: ABdhPJzsKhjH0E928PMWg14kbD+gJ7XaexanfTXEjOjfj8p4ucvwelQVCnWVujQwOdKeD0pnOszvBg==
+X-Received: by 2002:ac8:7f82:: with SMTP id z2mr6441488qtj.591.1644534438427;
+        Thu, 10 Feb 2022 15:07:18 -0800 (PST)
+Received: from localhost ([12.28.44.171])
+        by smtp.gmail.com with ESMTPSA id o13sm11924755qtv.36.2022.02.10.15.07.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 15:00:44 -0800 (PST)
-Date:   Thu, 10 Feb 2022 23:00:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
-Subject: Re: [PATCH 02/12] KVM: MMU: move MMU role accessors to header
-Message-ID: <YgWZGa9qNfc/GmA1@google.com>
-References: <20220209170020.1775368-1-pbonzini@redhat.com>
- <20220209170020.1775368-3-pbonzini@redhat.com>
+        Thu, 10 Feb 2022 15:07:17 -0800 (PST)
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Yury Norov <yury.norov@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Laight <David.Laight@aculab.com>,
+        Joe Perches <joe@perches.com>, Dennis Zhou <dennis@kernel.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH 07/49] KVM: x86: replace bitmap_weight with bitmap_empty where appropriate
+Date:   Thu, 10 Feb 2022 14:48:51 -0800
+Message-Id: <20220210224933.379149-8-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220210224933.379149-1-yury.norov@gmail.com>
+References: <20220210224933.379149-1-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220209170020.1775368-3-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 09, 2022, Paolo Bonzini wrote:
-> We will use is_cr0_pg to check whether a page fault can be delivered.
+In some places kvm/hyperv.c code calls bitmap_weight() to check if any bit
+of a given bitmap is set. It's better to use bitmap_empty() in that case
+because bitmap_empty() stops traversing the bitmap as soon as it finds
+first set bit, while bitmap_weight() counts all bits unconditionally.
 
-I strongly prefer we keep these MMU-only, the terse names were deemed safe
-specifically because they are encapsulated in mmu.c.  The async #PF case can use
-is_paging(vcpu).
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/hyperv.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 6e38a7d22e97..06c2a5603123 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -90,7 +90,7 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+ {
+ 	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
+ 	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
+-	int auto_eoi_old, auto_eoi_new;
++	bool auto_eoi_old, auto_eoi_new;
+ 
+ 	if (vector < HV_SYNIC_FIRST_VALID_VECTOR)
+ 		return;
+@@ -100,16 +100,16 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+ 	else
+ 		__clear_bit(vector, synic->vec_bitmap);
+ 
+-	auto_eoi_old = bitmap_weight(synic->auto_eoi_bitmap, 256);
++	auto_eoi_old = !bitmap_empty(synic->auto_eoi_bitmap, 256);
+ 
+ 	if (synic_has_vector_auto_eoi(synic, vector))
+ 		__set_bit(vector, synic->auto_eoi_bitmap);
+ 	else
+ 		__clear_bit(vector, synic->auto_eoi_bitmap);
+ 
+-	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
++	auto_eoi_new = !bitmap_empty(synic->auto_eoi_bitmap, 256);
+ 
+-	if (!!auto_eoi_old == !!auto_eoi_new)
++	if (auto_eoi_old == auto_eoi_new)
+ 		return;
+ 
+ 	down_write(&vcpu->kvm->arch.apicv_update_lock);
+-- 
+2.32.0
+
