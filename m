@@ -2,103 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39A0A4B0FAD
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 15:06:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A5074B0FB9
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 15:07:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242626AbiBJOGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 09:06:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58538 "EHLO
+        id S242635AbiBJOHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 09:07:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236127AbiBJOGo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 09:06:44 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EE51D6;
-        Thu, 10 Feb 2022 06:06:45 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21AD9JU5031297;
-        Thu, 10 Feb 2022 14:06:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=o1yaY9Ql4WkeRpyy6BnGItbolXBdLRxCv0AUy46J+Rw=;
- b=dwVDK71jMoW5eG7jiKO4D6hdyHYycdGWNjXrSinupMAVvoQAY03pmKES0HbAhZT2QUiN
- Hlm4TmvmJ/9AgcVg5MCOjlEHVjAoY2+tme94ujg/2izbFEsmdijz9z6Bev5bjnNhMJAA
- l8n4quLcMODCZNMbtywkLtG9bZK3o4IrPqHI+RVRx5v6UM5SIDG7J13ZU60DZNOvGcM4
- PUsvlUxJ/9NJokZgnTHkyfEgJTsI+DboKdOMeAU6WPYa7XZMT+UuSnJ8XmAoXgzHDYqP
- IDgHV/+Sm6hZ/mk6GDrx0dbu8TNp8WMiEBjbS6atAJrvYMLh4iEJju8taeUvqNARxlAk jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e5103d2qn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 14:06:43 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21ADaNkC016947;
-        Thu, 10 Feb 2022 14:06:43 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e5103d2pv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 14:06:43 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21ADwbpo021369;
-        Thu, 10 Feb 2022 14:06:41 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3e1gva0s0k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 14:06:40 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21ADuRQl50201078
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Feb 2022 13:56:27 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90F244C04A;
-        Thu, 10 Feb 2022 14:06:36 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B76D4C040;
-        Thu, 10 Feb 2022 14:06:35 +0000 (GMT)
-Received: from sig-9-145-10-197.uk.ibm.com (unknown [9.145.10.197])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Feb 2022 14:06:35 +0000 (GMT)
-Message-ID: <fc5cce270dc01d46a6a42f2d268166a0a952fcb3.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 24/30] vfio-pci/zdev: wire up group notifier
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-s390@vger.kernel.org, cohuck@redhat.com,
-        farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 10 Feb 2022 15:06:35 +0100
-In-Reply-To: <20220210130150.GF4160@nvidia.com>
-References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
-         <20220204211536.321475-25-mjrosato@linux.ibm.com>
-         <20220208104319.4861fb22.alex.williamson@redhat.com>
-         <20220208185141.GH4160@nvidia.com>
-         <20220208122624.43ad52ef.alex.williamson@redhat.com>
-         <438d8b1e-e149-35f1-a8c9-ed338eb97430@linux.ibm.com>
-         <20220208204041.GK4160@nvidia.com>
-         <13cf51210d125d48a47d55d9c6a20c93f5a2b78b.camel@linux.ibm.com>
-         <20220210130150.GF4160@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: n8fWkofsf2g7pMTkt4a2OCBQstY5uDaM
-X-Proofpoint-GUID: vWTb1Ty3NwUMCvH_25GHgF03gVWIaCpb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-10_06,2022-02-09_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- impostorscore=0 malwarescore=0 bulkscore=0 mlxlogscore=652 clxscore=1015
- phishscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202100078
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S233943AbiBJOHc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 09:07:32 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FFF1B3;
+        Thu, 10 Feb 2022 06:07:32 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1E1FEB82366;
+        Thu, 10 Feb 2022 14:07:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EDBAC004E1;
+        Thu, 10 Feb 2022 14:07:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644502049;
+        bh=BJ/i3ajwOc9GZf1TyHa/AtivYqVLgEzzhCyPgZ8Bhrg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=S9B2sKkLnTG5D1mJOEo2dP0z8Bes+M8CS518E2wgmB0lS1uCokWFhyX0BxdBn6lJg
+         Fx9zSTZHHfm297ZK0BrrzE2HjGlSwN87MNLAoTez19TmhPu0kVJsA8KFMjjb0y4x7r
+         rxYfwCmyBG94loxBZSFiiWycB6WQSqceIKDVDboLxaqi+4P8hRPaVO6VQbUYYi0oWQ
+         dCt67ItJvyDg9SCKXp1fcHzsE/hv+lF7lKPbZLqjKAjrLJszWZl+cKZNC9oICmpGO0
+         z3Vron5Yz9AbXF2Qs4l5o14ZQKqKIwHs5LI54zj7ERs4pnu70wlGCQfRmnHe0eDcvv
+         J/KGkVHEZApmQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nIA6Z-006v5o-J4; Thu, 10 Feb 2022 14:07:27 +0000
+Date:   Thu, 10 Feb 2022 14:07:27 +0000
+Message-ID: <87sfsq4xy8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>,
+        Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com,
+        tglx@linutronix.de, John Garry <john.garry@huawei.com>,
+        Will Deacon <will@kernel.org>, Qi Liu <liuqi115@huawei.com>,
+        Thomas Richter <tmricht@linux.ibm.com>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Hector Martin <marcan@marcan.st>,
+        Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/5] KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+In-Reply-To: <YgQdMRug21MJ926L@google.com>
+References: <20220209074109.453116-1-chao.gao@intel.com>
+        <20220209074109.453116-5-chao.gao@intel.com>
+        <YgQdMRug21MJ926L@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, chao.gao@intel.com, kvm@vger.kernel.org, pbonzini@redhat.com, kevin.tian@intel.com, tglx@linutronix.de, john.garry@huawei.com, will@kernel.org, liuqi115@huawei.com, tmricht@linux.ibm.com, zhangshaokun@hisilicon.com, marcan@marcan.st, ying.huang@intel.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -107,74 +73,261 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-02-10 at 09:01 -0400, Jason Gunthorpe wrote:
-> On Thu, Feb 10, 2022 at 12:15:58PM +0100, Niklas Schnelle wrote:
-> 
-> > In a KVM or z/VM guest the guest is informed that IOMMU translations
-> > need to be refreshed even for previously invalid IOVAs. With this the
-> > guest builds it's IOMMU translation tables as normal but then does a
-> > RPCIT for the IOVA range it touched. In the hypervisor we can then
-> > simply walk the translation tables, pin the guest pages and map them in
-> > the host IOMMU. Prior to this series this happened in QEMU which does
-> > the map via vfio-iommu-type1 from user-space. This works and will
-> > remain as a fallback. Sadly it is quite slow and has a large impact on
-> > performance as we need to do a lot of mapping operations as the DMA API
-> > of the guest goes through the virtual IOMMU. This series thus adds the
-> > same functionality but as a KVM intercept of RPCIT. Now I think this
-> > neatly fits into KVM, we're emulating an instruction after all and most
-> > of its work is KVM specific pinning of guest pages. Importantly all
-> > other handling like IOMMU domain attachment still goes through vfio-
-> > iommu-type1 and we just fast path the map/unmap operations.
-> 
-> So you create an iommu_domain and then hand it over to kvm which then
-> does map/unmap operations on it under the covers?
+On Wed, 09 Feb 2022 19:59:45 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+>=20
+> +Marc
 
-Yes
+Thanks for the heads up.
 
-> 
-> How does the page pinning work?
+>=20
+> On Wed, Feb 09, 2022, Chao Gao wrote:
+> > The CPU STARTING section doesn't allow callbacks to fail. Move KVM's
+> > hotplug callback to ONLINE section so that it can abort onlining a CPU =
+in
+> > certain cases to avoid potentially breaking VMs running on existing CPU=
+s.
+> > For example, when kvm fails to enable hardware virtualization on the
+> > hotplugged CPU.
+> >=20
+> > Place KVM's hotplug state before CPUHP_AP_SCHED_WAIT_EMPTY as it ensures
+> > when offlining a CPU, all user tasks and non-pinned kernel tasks have l=
+eft
+> > the CPU, i.e. there cannot be a vCPU task around. So, it is safe for KV=
+M's
+> > CPU offline callback to disable hardware virtualization at that point.
+> > Likewise, KVM's online callback can enable hardware virtualization befo=
+re
+> > any vCPU task gets a chance to run on hotplugged CPUs.
+> >=20
+> > KVM's CPU hotplug callbacks are renamed as well.
+> >=20
+> > Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> > Signed-off-by: Chao Gao <chao.gao@intel.com>
+> > ---
+> >  include/linux/cpuhotplug.h |  2 +-
+> >  virt/kvm/kvm_main.c        | 30 ++++++++++++++++++++++--------
+> >  2 files changed, 23 insertions(+), 9 deletions(-)
+> >=20
+> > diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> > index 773c83730906..14d354c8ce35 100644
+> > --- a/include/linux/cpuhotplug.h
+> > +++ b/include/linux/cpuhotplug.h
+> > @@ -182,7 +182,6 @@ enum cpuhp_state {
+> >  	CPUHP_AP_CSKY_TIMER_STARTING,
+> >  	CPUHP_AP_TI_GP_TIMER_STARTING,
+> >  	CPUHP_AP_HYPERV_TIMER_STARTING,
+> > -	CPUHP_AP_KVM_STARTING,
+> >  	CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
+> >  	CPUHP_AP_KVM_ARM_VGIC_STARTING,
+> >  	CPUHP_AP_KVM_ARM_TIMER_STARTING,
+>=20
+> This probably needs an ack from Marc.  IIUC, it changes the ordering
+> between generic KVM enabling hardware and KVM ARM doing its vGIC and
+> timer stuff.
 
-The pinning is done directly in the RPCIT interception handler pinning
-both the IOMMU tables and the guest pages mapped for DMA.
+Indeed, that's not great. Specially the part that enable interrupts
+before things are up and running on the CPU.
 
-> 
-> In the design we are trying to reach I would say this needs to be
-> modeled as a special iommu_domain that has this automatic map/unmap
-> behavior from following user pages. Creating it would specify the kvm
-> and the in-guest base address of the guest's page table. 
+But TBH, this area really deserves a good scrubbing, and I don't see
+why we need to keep these individual CPUHP notifiers. I wrote the
+patch below, thrown it at a test box, and nothing caught fire as I was
+fiddling with CPUs going up and down. It is thus obviously perfect.
+Feel free to take it as part of your series.
 
-Makes sense.
+Thanks,
 
-> Then the
-> magic kernel code you describe can operate on its own domain without
-> becoming confused with a normal map/unmap domain.
+	M.
 
-This sounds like an interesting idea. Looking at
-drivers/iommu/s390_iommu.c most of that is pretty trivial domain
-handling. I wonder if we could share this by marking the existing
-s390_iommu_domain type with kind of a "lent out to KVM" flag. Possibly
-by simply having a non-NULL pointer to a struct holding the guest base
-address and kvm etc? That way we can share the setup/tear down of the
-domain and of host IOMMU tables as well as aperture checks the same
-while also being able to keep the IOMMU API from interfering with the
-KVM RPCIT intercept and vice versa. I.e. while the domain is under
-control of KVM's RPCIT handling we make all IOMMU map/unmap fail.
+=46rom 57d80dbe5a10bc3b5bce748f637dea420ef960a1 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 10 Feb 2022 13:50:52 +0000
+Subject: [PATCH] KVM: arm64: Simplify the CPUHP logic
 
-To me this more direct involvement of IOMMU and KVM on s390x is also a
-direct consequence of it using special instructions. Naturally those
-instructions can be intercepted or run under hardware accelerated
-virtualization.
+For a number of historical reasons, the KVM/arm64 hotplug setup is pretty
+complicated, and we have two extra CPUHP notifiers for vGIC and timers.
 
-> 
-> It is like the HW nested translation other CPUs are doing, but instead
-> of HW nested, it is SW nested.
+It looks pretty pointless, and gets in the way of further changes.
+So let's just expose some helpers that can be called from the core
+CPUHP callback, and get rid of everything else.
 
-Yes very good analogy. Has any of that nested IOMMU translations work
-been merged yet? I know AMD had something in the works and nested
-translations have been around for the MMU for a while and are also used
-on s390x. We're definitely thinking about HW nested IOMMU translations
-too so any design we come up with would be able to deal with that too.
-Basically we would then execute RPCIT without leaving the hardware
-virtualization mode (SIE). We believe that that would require pinning
-all of guest memory though because HW can't really pin pages.
+This gives us the opportunity to drop a useless notifier entry,
+as well as tidy-up the timer enable/disable, which was a bit odd.
 
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arch_timer.c     | 27 ++++++++++-----------------
+ arch/arm64/kvm/arm.c            |  4 ++++
+ arch/arm64/kvm/vgic/vgic-init.c | 19 ++-----------------
+ include/kvm/arm_arch_timer.h    |  4 ++++
+ include/kvm/arm_vgic.h          |  4 ++++
+ include/linux/cpuhotplug.h      |  3 ---
+ 6 files changed, 24 insertions(+), 37 deletions(-)
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 6e542e2eae32..f9d14c6dc0b4 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -796,10 +796,18 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 	ptimer->host_timer_irq_flags =3D host_ptimer_irq_flags;
+ }
+=20
+-static void kvm_timer_init_interrupt(void *info)
++void kvm_timer_cpu_up(void)
+ {
+ 	enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+-	enable_percpu_irq(host_ptimer_irq, host_ptimer_irq_flags);
++	if (host_ptimer_irq)
++		enable_percpu_irq(host_ptimer_irq, host_ptimer_irq_flags);
++}
++
++void kvm_timer_cpu_down(void)
++{
++	disable_percpu_irq(host_vtimer_irq);
++	if (host_ptimer_irq)
++		disable_percpu_irq(host_ptimer_irq);
+ }
+=20
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+@@ -961,18 +969,6 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+ 	preempt_enable();
+ }
+=20
+-static int kvm_timer_starting_cpu(unsigned int cpu)
+-{
+-	kvm_timer_init_interrupt(NULL);
+-	return 0;
+-}
+-
+-static int kvm_timer_dying_cpu(unsigned int cpu)
+-{
+-	disable_percpu_irq(host_vtimer_irq);
+-	return 0;
+-}
+-
+ static int timer_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
+ {
+ 	if (vcpu)
+@@ -1170,9 +1166,6 @@ int kvm_timer_hyp_init(bool has_gic)
+ 		goto out_free_irq;
+ 	}
+=20
+-	cpuhp_setup_state(CPUHP_AP_KVM_ARM_TIMER_STARTING,
+-			  "kvm/arm/timer:starting", kvm_timer_starting_cpu,
+-			  kvm_timer_dying_cpu);
+ 	return 0;
+ out_free_irq:
+ 	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fefd5774ab55..6c9cb3fdd3af 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1600,6 +1600,8 @@ static void _kvm_arch_hardware_enable(void *discard)
+ {
+ 	if (!__this_cpu_read(kvm_arm_hardware_enabled)) {
+ 		cpu_hyp_reinit();
++		kvm_vgic_cpu_up();
++		kvm_timer_cpu_up();
+ 		__this_cpu_write(kvm_arm_hardware_enabled, 1);
+ 	}
+ }
+@@ -1613,6 +1615,8 @@ int kvm_arch_hardware_enable(void)
+ static void _kvm_arch_hardware_disable(void *discard)
+ {
+ 	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
++		kvm_timer_cpu_down();
++		kvm_vgic_cpu_down();
+ 		cpu_hyp_reset();
+ 		__this_cpu_write(kvm_arm_hardware_enabled, 0);
+ 	}
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-ini=
+t.c
+index fc00304fe7d8..60038a8516de 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -460,17 +460,15 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+=20
+ /* GENERIC PROBE */
+=20
+-static int vgic_init_cpu_starting(unsigned int cpu)
++void kvm_vgic_cpu_up(void)
+ {
+ 	enable_percpu_irq(kvm_vgic_global_state.maint_irq, 0);
+-	return 0;
+ }
+=20
+=20
+-static int vgic_init_cpu_dying(unsigned int cpu)
++void kvm_vgic_cpu_down(void)
+ {
+ 	disable_percpu_irq(kvm_vgic_global_state.maint_irq);
+-	return 0;
+ }
+=20
+ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+@@ -579,19 +577,6 @@ int kvm_vgic_hyp_init(void)
+ 		return ret;
+ 	}
+=20
+-	ret =3D cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
+-				"kvm/arm/vgic:starting",
+-				vgic_init_cpu_starting, vgic_init_cpu_dying);
+-	if (ret) {
+-		kvm_err("Cannot register vgic CPU notifier\n");
+-		goto out_free_irq;
+-	}
+-
+ 	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
+ 	return 0;
+-
+-out_free_irq:
+-	free_percpu_irq(kvm_vgic_global_state.maint_irq,
+-			kvm_get_running_vcpus());
+-	return ret;
+ }
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 51c19381108c..16a2f65fcfb4 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -106,4 +106,8 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+ u32 timer_get_ctl(struct arch_timer_context *ctxt);
+ u64 timer_get_cval(struct arch_timer_context *ctxt);
+=20
++/* CPU HP callbacks */
++void kvm_timer_cpu_up(void);
++void kvm_timer_cpu_down(void);
++
+ #endif
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index bb30a6803d9f..a2a0cca05a73 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -427,4 +427,8 @@ int vgic_v4_load(struct kvm_vcpu *vcpu);
+ void vgic_v4_commit(struct kvm_vcpu *vcpu);
+ int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+=20
++/* CPU HP callbacks */
++void kvm_vgic_cpu_up(void);
++void kvm_vgic_cpu_down(void);
++
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index 411a428ace4d..4345b8eafc03 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -183,9 +183,6 @@ enum cpuhp_state {
+ 	CPUHP_AP_TI_GP_TIMER_STARTING,
+ 	CPUHP_AP_HYPERV_TIMER_STARTING,
+ 	CPUHP_AP_KVM_STARTING,
+-	CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
+-	CPUHP_AP_KVM_ARM_VGIC_STARTING,
+-	CPUHP_AP_KVM_ARM_TIMER_STARTING,
+ 	/* Must be the last timer callback */
+ 	CPUHP_AP_DUMMY_TIMER_STARTING,
+ 	CPUHP_AP_ARM_XEN_STARTING,
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
