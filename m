@@ -2,76 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A30044B12E3
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:37:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CD634B12F8
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:37:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244324AbiBJQgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 11:36:55 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47154 "EHLO
+        id S244426AbiBJQhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 11:37:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244304AbiBJQgy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:36:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 17A9A1A8
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:55 -0800 (PST)
+        with ESMTP id S244354AbiBJQhC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 11:37:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C373EE5D
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:37:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644511014;
+        s=mimecast20190719; t=1644511020;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=C2hvu0iP1ozzImdwOawq7RtiNZp/sNLo/TZHQM9dTsg=;
-        b=BwlTkMZXpqsUSUb11xzLgJFbYp6LYoHDz9CJaBrt3ipzB1REf4FKQGcTjrriNhsA6K9LUG
-        5joyATGbZe3gXjhyd/8QikN7IilYG7Yps/f44cH6RmiZjw0miP7ESyClV3IJ5N5VmgvrJZ
-        a4A9H26JeyjtAuK3QJ6grkibsbwPQ4Q=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=5WySc1RlGnG8P3T39mlzj8E39X8bwgB3Tm12/xbTZl0=;
+        b=NId7yE6aA04Yiy24UCJluPWxQFM7DwUrXoDXtJn9vH8ls4N5NiucVb/k5A/z4+nyc76iWD
+        gGO65vEAgoZWNTDpfJSMEn5/8RNIC8coP95fLTcbrDJu6InGomKkbmI1FLjyCHT9rIvclX
+        bVmExAr3bNEXIKXO6Ji8G7LiiM1A9gE=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-332-lpSYaPbMODy6OkRbH4YrqA-1; Thu, 10 Feb 2022 11:36:53 -0500
-X-MC-Unique: lpSYaPbMODy6OkRbH4YrqA-1
-Received: by mail-ej1-f72.google.com with SMTP id o7-20020a170906860700b006cbe6deec1bso2962769ejx.22
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:52 -0800 (PST)
+ us-mta-45-T3vxYNVePRCg3K5atLMQtQ-1; Thu, 10 Feb 2022 11:36:59 -0500
+X-MC-Unique: T3vxYNVePRCg3K5atLMQtQ-1
+Received: by mail-ej1-f70.google.com with SMTP id k16-20020a17090632d000b006ae1cdb0f07so2979284ejk.16
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=C2hvu0iP1ozzImdwOawq7RtiNZp/sNLo/TZHQM9dTsg=;
-        b=l9mCDL1MsLy/FQPmq4zb0E9yKNGz7mEBD+WJ31gNZ2zrHhXguyI1NWzEdeJcGrYyEw
-         vBbc3CfrTAA5EewZb0hulZh89yR7EG7QWSiSMy4Xfxs2TH6JWtaOfm9j/mJnKk0PYP3i
-         cK5YaxrtW/sPaluyNsJ4KOOKl3SrxuZ1tGZiwh6BDnicwBd0GXBQ9SjQNrdGNFvy1SUZ
-         fA0heMIfKBViVygR5ekF0JPryKPgojlqQ1VWKXRICrc/RjyL6F6xHAd4fbkuBqkWSpdc
-         jbC+jwi4ELrORO9J0D+dqzYkGbcKdVQ1YbS0GgbPjdXGZ1+EDYs+xlERqa72GSvXHRxl
-         Nu+g==
-X-Gm-Message-State: AOAM532xuOn9HIiUwbi2seLVWitqBIfq1Z7LaQzQWiqfWo9rcsWv2rIa
-        cBb8Uamxb6+RezPU0m4pohzqgFyoSowoWxETB+YXiwtXdbRz+GgQQ+v5bSp6IxwtDKx96Sl1H+f
-        PIgDmX2NXKp8z
-X-Received: by 2002:a05:6402:348b:: with SMTP id v11mr9188563edc.58.1644511011944;
-        Thu, 10 Feb 2022 08:36:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzJfC1GU+5eGfGNQQxuYJPtmnQ9Njp+YLT1I+95acuMLcAIv38IH5OD1zORnBLD/pfnnJ+cWw==
-X-Received: by 2002:a05:6402:348b:: with SMTP id v11mr9188549edc.58.1644511011762;
-        Thu, 10 Feb 2022 08:36:51 -0800 (PST)
+        bh=5WySc1RlGnG8P3T39mlzj8E39X8bwgB3Tm12/xbTZl0=;
+        b=4Jwshh9RYt34ttxMjMAsofxpmyBcmSVOlBeQSp9d+BjE/Dyxcmmw1CJIz22Rtz8lb6
+         xvwJJjGhcALT5TLQ9zYaK+7raJJTtD4u45fvYlzk93VWudRMMd2oZpVmMPdJzt/7456+
+         fw/MZRxxPHRQo4GkEOKOLBJRJ1mrLLi5OCUYogNSMl/AO4AdIM2bH0Vo7ziuO4fL5xRX
+         urCuuuAQjmMOfLajyjjjI92Hc0kHaPBWFJLSEErY9akWXmqIUCozBhxMubULpMyajRjV
+         3JMHHlGahiwUKxz4Q76SRBgZ/+5Ufw8t1p34YP5hoOV90MqnO10BrmboGpKf+NTZhHuz
+         /LPg==
+X-Gm-Message-State: AOAM533n5Q8gVUXq2d2Xp3OE+fw+bR64ODQpDKKb10Tta2DvSrGFyYu8
+        A7NPVZ3Yta8iDRFqgFlUzg4o1WjnQaQnL2HpSoPo1ZDzp08/fiAHmNv1iRxjtzlHUVfzy0CpXLp
+        uzpMabDHZlSiD
+X-Received: by 2002:a17:906:73ce:: with SMTP id n14mr6827046ejl.312.1644511018362;
+        Thu, 10 Feb 2022 08:36:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxDLWA297hpVfTcfKzBU3jAjpUisYVnV/ULWs53msCQUuZNZ+de98gW+3zY9Ew60sUlgr8XXw==
+X-Received: by 2002:a17:906:73ce:: with SMTP id n14mr6827032ejl.312.1644511018158;
+        Thu, 10 Feb 2022 08:36:58 -0800 (PST)
 Received: from [192.168.10.118] ([93.56.170.240])
-        by smtp.googlemail.com with ESMTPSA id g19sm4365247ejd.62.2022.02.10.08.36.42
+        by smtp.googlemail.com with ESMTPSA id m17sm8783672edr.62.2022.02.10.08.36.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 08:36:50 -0800 (PST)
-Message-ID: <fd3ffa55-5421-fd18-9dc2-82805b694e14@redhat.com>
-Date:   Thu, 10 Feb 2022 17:33:21 +0100
+        Thu, 10 Feb 2022 08:36:57 -0800 (PST)
+Message-ID: <042c4562-3eb8-f141-a363-67ec1def8e2c@redhat.com>
+Date:   Thu, 10 Feb 2022 17:33:40 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH MANUALSEL 5.16 4/8] KVM: nVMX: WARN on any attempt to
- allocate shadow VMCS for vmcs02
+Subject: Re: [PATCH MANUALSEL 5.16 5/8] KVM: SVM: Don't kill SEV guest if SMAP
+ erratum triggers in usermode
 Content-Language: en-US
 To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>, tglx@linutronix.de,
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Liam Merwick <liam.merwick@oracle.com>, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, kvm@vger.kernel.org
 References: <20220209185635.48730-1-sashal@kernel.org>
- <20220209185635.48730-4-sashal@kernel.org>
+ <20220209185635.48730-5-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220209185635.48730-4-sashal@kernel.org>
+In-Reply-To: <20220209185635.48730-5-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -87,67 +88,52 @@ X-Mailing-List: kvm@vger.kernel.org
 On 2/9/22 19:56, Sasha Levin wrote:
 > From: Sean Christopherson <seanjc@google.com>
 > 
-> [ Upstream commit d6e656cd266cdcc95abd372c7faef05bee271d1a ]
+> [ Upstream commit cdf85e0c5dc766fc7fc779466280e454a6d04f87 ]
 > 
-> WARN if KVM attempts to allocate a shadow VMCS for vmcs02.  KVM emulates
-> VMCS shadowing but doesn't virtualize it, i.e. KVM should never allocate
-> a "real" shadow VMCS for L2.
-> 
-> The previous code WARNed but continued anyway with the allocation,
-> presumably in an attempt to avoid NULL pointer dereference.
-> However, alloc_vmcs (and hence alloc_shadow_vmcs) can fail, and
-> indeed the sole caller does:
-> 
-> 	if (enable_shadow_vmcs && !alloc_shadow_vmcs(vcpu))
-> 		goto out_shadow_vmcs;
-> 
-> which makes it not a useful attempt.
-> 
+> Inject a #GP instead of synthesizing triple fault to try to avoid killing
+> the guest if emulation of an SEV guest fails due to encountering the SMAP
+> erratum.  The injected #GP may still be fatal to the guest, e.g. if the
+> userspace process is providing critical functionality, but KVM should
+> make every attempt to keep the guest alive.
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Paolo
+
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20220125220527.2093146-1-seanjc@google.com>
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> Message-Id: <20220120010719.711476-10-seanjc@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Sasha Levin <sashal@kernel.org>
 > ---
->   arch/x86/kvm/vmx/nested.c | 22 ++++++++++++----------
->   1 file changed, 12 insertions(+), 10 deletions(-)
+>   arch/x86/kvm/svm/svm.c | 16 +++++++++++++++-
+>   1 file changed, 15 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index c605c2c01394b..9cd68e1fcf602 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4827,18 +4827,20 @@ static struct vmcs *alloc_shadow_vmcs(struct kvm_vcpu *vcpu)
->   	struct loaded_vmcs *loaded_vmcs = vmx->loaded_vmcs;
->   
->   	/*
-> -	 * We should allocate a shadow vmcs for vmcs01 only when L1
-> -	 * executes VMXON and free it when L1 executes VMXOFF.
-> -	 * As it is invalid to execute VMXON twice, we shouldn't reach
-> -	 * here when vmcs01 already have an allocated shadow vmcs.
-> +	 * KVM allocates a shadow VMCS only when L1 executes VMXON and frees it
-> +	 * when L1 executes VMXOFF or the vCPU is forced out of nested
-> +	 * operation.  VMXON faults if the CPU is already post-VMXON, so it
-> +	 * should be impossible to already have an allocated shadow VMCS.  KVM
-> +	 * doesn't support virtualization of VMCS shadowing, so vmcs01 should
-> +	 * always be the loaded VMCS.
->   	 */
-> -	WARN_ON(loaded_vmcs == &vmx->vmcs01 && loaded_vmcs->shadow_vmcs);
-> +	if (WARN_ON(loaded_vmcs != &vmx->vmcs01 || loaded_vmcs->shadow_vmcs))
-> +		return loaded_vmcs->shadow_vmcs;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3efada37272c0..d6a4acaa65742 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4530,7 +4530,21 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int i
+>   	is_user = svm_get_cpl(vcpu) == 3;
+>   	if (smap && (!smep || is_user)) {
+>   		pr_err_ratelimited("KVM: SEV Guest triggered AMD Erratum 1096\n");
+> -		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
 > +
-> +	loaded_vmcs->shadow_vmcs = alloc_vmcs(true);
-> +	if (loaded_vmcs->shadow_vmcs)
-> +		vmcs_clear(loaded_vmcs->shadow_vmcs);
+> +		/*
+> +		 * If the fault occurred in userspace, arbitrarily inject #GP
+> +		 * to avoid killing the guest and to hopefully avoid confusing
+> +		 * the guest kernel too much, e.g. injecting #PF would not be
+> +		 * coherent with respect to the guest's page tables.  Request
+> +		 * triple fault if the fault occurred in the kernel as there's
+> +		 * no fault that KVM can inject without confusing the guest.
+> +		 * In practice, the triple fault is moot as no sane SEV kernel
+> +		 * will execute from user memory while also running with SMAP=1.
+> +		 */
+> +		if (is_user)
+> +			kvm_inject_gp(vcpu, 0);
+> +		else
+> +			kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>   	}
 >   
-> -	if (!loaded_vmcs->shadow_vmcs) {
-> -		loaded_vmcs->shadow_vmcs = alloc_vmcs(true);
-> -		if (loaded_vmcs->shadow_vmcs)
-> -			vmcs_clear(loaded_vmcs->shadow_vmcs);
-> -	}
->   	return loaded_vmcs->shadow_vmcs;
->   }
->   
-
-NACK, it's just extra care but not particularly useful.
-
-Paolo
+>   	return false;
 
