@@ -2,63 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED2694B08EA
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 09:55:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84B034B0919
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 10:05:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238010AbiBJIzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 03:55:06 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53472 "EHLO
+        id S238199AbiBJJFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 04:05:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237979AbiBJIzF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 03:55:05 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58777D70;
-        Thu, 10 Feb 2022 00:55:07 -0800 (PST)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21A6upbF005990;
-        Thu, 10 Feb 2022 08:55:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=WNNG5xJ8og0zMSNoQK3u7DOQa3SSP9h6vLBCM/8Yjyg=;
- b=iwcTA9i9URSQ5vOAUAxn/2gf2yGsPBFWjMGkErSTHPim707KnkaZUjESK0ty6B87V7g/
- lqhtv6wGayPIJNdv497a/34QjJIYqmuO34k3gaC00/oOXBiDpFJCJMb5o+8xLeLgheKD
- 892wXyZlMl+RQ1HiAtTxYW+9WLnfitRZZ3Iq5d4Vqw+U9OI6UJ5OLL7GZFxn9zV5KrNo
- IRhjbV7GAe+Y0G7HG6s+c00MTID0e/IWwXYwyo6Or0v6ik9ItyXW30nsyeBlmf/fZf3l
- XA2V044eC65HzBq1wwKyy/BIt2tMhUtBPrpbFl/BcgcD+mwIJUuDH5SD75D8iE0yiySl eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e4kt2dkdq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 08:55:06 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21A8qG0I020546;
-        Thu, 10 Feb 2022 08:55:05 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e4kt2dkd9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 08:55:05 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21A8rwsW014538;
-        Thu, 10 Feb 2022 08:55:04 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3e1ggke3xy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 08:55:04 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21A8sx1044302728
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Feb 2022 08:54:59 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A3C73A4053;
-        Thu, 10 Feb 2022 08:54:59 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35497A4040;
-        Thu, 10 Feb 2022 08:54:59 +0000 (GMT)
-Received: from [9.145.86.5] (unknown [9.145.86.5])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Feb 2022 08:54:59 +0000 (GMT)
-Message-ID: <90950d7a-f86b-edb9-ca4b-12aeb2f59725@linux.ibm.com>
-Date:   Thu, 10 Feb 2022 09:54:58 +0100
+        with ESMTP id S238178AbiBJJFy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 04:05:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8E59D94
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 01:05:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644483950;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+VOVU28uEg+VeYFn6fPIKbXayXxxCm00kEtsj2qS9E4=;
+        b=jTp/p23Vv5gUusgY0y92mjkw2uNRRDuHI2KrQ97hGpcw8ZW+qUut7TAcITyvjOjV6EmEox
+        niRN459RkffzJWvA93ytB1rj98XSweSDHQ4X/YKjjXU7dm2VzW1HsXCaTGRcYbIFno1nAA
+        jq5v5N1kQ0w1fg+3gGxx0XlEeB14vpM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-39-YchlZrVOOW64mc47a5dvtg-1; Thu, 10 Feb 2022 04:05:49 -0500
+X-MC-Unique: YchlZrVOOW64mc47a5dvtg-1
+Received: by mail-wr1-f71.google.com with SMTP id b8-20020adfc748000000b001e333edbe40so2214142wrh.6
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 01:05:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=+VOVU28uEg+VeYFn6fPIKbXayXxxCm00kEtsj2qS9E4=;
+        b=5oYuvcFhznJGcOHXijk9mBGUko8cRIEnPzjv6zM6otL1nXdHfaELl7TLthD9XVS70q
+         ZJMUTqEHz4e8n0ZjYI86uCg4uiPuDShtF/g59ZrSSfK2j7Y4+5IMmzDjdwz4FLjDxaDd
+         fvnvcV9ILPdbdbS65ISkBSk78ATuAEktLjsmDnyUoi2ZMocUDiZMJc22XJXl9g4sZAce
+         wMCaoWnhepiIWo46bms3/TloTScAsWbtR3EAQ67SXYs+la8dgG3KIqoT+9y6EK1xd6Vf
+         p5ascSQwtmBtDTiVB53nWoYl59nv8UkmQcLzOnYyFZPNpbTbf7uP29fJJK4cW2t1gokB
+         /A5w==
+X-Gm-Message-State: AOAM531tP5vpMeEusHKeyNjwcNdXafcPGtgRfQ/tIuzzUfs0hVGDEn3o
+        1Dt0JAW444qYRtz43Sm6VlmCQxWNdqJ2gpDEa2od/VnP+wXxp0FjariLOh3GuHMIHWox2huJPhC
+        Mxx+dJXOURSBY
+X-Received: by 2002:a5d:5850:: with SMTP id i16mr5437644wrf.519.1644483948460;
+        Thu, 10 Feb 2022 01:05:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwyBtzTD1Ovs/rO1vUFtla6MQxgaKntQcwkuH+mF+pA1KP5W/+ccgvohdnShFgAliAOSiAYnw==
+X-Received: by 2002:a5d:5850:: with SMTP id i16mr5437623wrf.519.1644483948255;
+        Thu, 10 Feb 2022 01:05:48 -0800 (PST)
+Received: from [192.168.8.104] (tmo-098-218.customers.d1-online.com. [80.187.98.218])
+        by smtp.gmail.com with ESMTPSA id t1sm22134179wre.45.2022.02.10.01.05.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Feb 2022 01:05:47 -0800 (PST)
+Message-ID: <4281a418-317d-cfd5-3446-edb7c720d761@redhat.com>
+Date:   Thu, 10 Feb 2022 10:05:45 +0100
+MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
 Subject: Re: [PATCH] KVM: s390: MAINTAINERS: promote Claudio Imbrenda
@@ -66,49 +65,33 @@ Content-Language: en-US
 To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
         KVM <kvm@vger.kernel.org>
 Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Alexander Gordeev <agordeev@linux.ibm.com>
 References: <20220210085310.26388-1-borntraeger@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
 In-Reply-To: <20220210085310.26388-1-borntraeger@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QI00VFPnFXLwdEA9LMAdnCOb6hATQvI8
-X-Proofpoint-ORIG-GUID: rZTub_9x_jT0mWrA2zSyMQAQNK08vDO9
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-10_03,2022-02-09_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=897 malwarescore=0 lowpriorityscore=0 adultscore=0
- impostorscore=0 mlxscore=0 clxscore=1015 phishscore=0 bulkscore=0
- suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202100045
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/10/22 09:53, Christian Borntraeger wrote:
+On 10/02/2022 09.53, Christian Borntraeger wrote:
 > Claudio has volunteered to be more involved in the maintainership of
 > s390 KVM.
 > 
-
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-
 > Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 > ---
 >   MAINTAINERS | 2 +-
@@ -128,4 +111,6 @@ Acked-by: Janosch Frank <frankja@linux.ibm.com>
 >   L:	kvm@vger.kernel.org
 >   S:	Supported
 >   W:	http://www.ibm.com/developerworks/linux/linux390/
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
