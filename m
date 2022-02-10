@@ -2,274 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC8D4B0D6B
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 13:17:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A17C14B0DF3
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 13:56:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241491AbiBJMRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 07:17:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35156 "EHLO
+        id S241839AbiBJM4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 07:56:09 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232947AbiBJMRu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 07:17:50 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B29C281;
-        Thu, 10 Feb 2022 04:17:51 -0800 (PST)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21AAflnR017470;
-        Thu, 10 Feb 2022 12:17:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=5YcRJfGkBH4rizvB/yZqVaVrHOkP4Fpt+VzrsYU+4gw=;
- b=BzkwSrwhWAff3yTubooFxEA0EmxcKXpEXsysk8k2RrLyaQaGfpaI5xLyo6wvnsLSvTbS
- lRVpU0j8szaLgVzNsqBJ+heGuaBmypPDevvRO+WNZ/5sN26SNfIcu+3yfvi88JmFbPeT
- E7o0hlAMq3pMjI6sC6SLt9q0Ahls5jnwdI+S1dsoDtxmXY2PwwZxK0h86SVGst4QvNcP
- jWskNdjHQ1V7BQTMYNhfwC0yDe7NVK/sFFuhFrEvICRJnEFMCCSP8iC7OGcXcey9AsXQ
- ue6XL8whQFvmhK4kularssOPR66xw5LyoXTOz0C7OHoHLFBSnysB7VmZkjAnGYTCxPRR zw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3e3h28qrqm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Feb 2022 12:17:25 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 21ACGp3v167374;
-        Thu, 10 Feb 2022 12:17:24 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2172.outbound.protection.outlook.com [104.47.58.172])
-        by userp3020.oracle.com with ESMTP id 3e1jpv4q7e-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Feb 2022 12:17:23 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jwk5DIQ0++UsgGXpeucuXRMk40mzkFGDsLp6oLTds+qjQjfYPIoonU6kpYg/lWxPH0LpQtwW+ZLnhCS9dHrrVnraK2S/ziJC5xy6ZtHNzD5JxqxkCGGdcLUPqDE5MuW0+fnW6pM6LzcwcO83tyNPg4WUTeoR8UF//1VZy+7x4gA0q153BfWfrq9nJrZaCfPz3/OjiiSzeiqgM2rFhxDE8m9F5GVbauVLy1cljS0R4jGbeyhsHIiS2aUQBhhG/HIAYo3tFmmhM7NRlKJVze7hZVy85ILBmaVlSowpF4cEVmqJ+D1FsSd2kGKhHkKJ1vzm9I26RfOkZ60Ov5ogsEmcxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5YcRJfGkBH4rizvB/yZqVaVrHOkP4Fpt+VzrsYU+4gw=;
- b=dkphX2mnWLjFCoV3jcXhY7+hTXJKBqRlagUsu6+bbhIcgtWDbkWdwJRCEu7Pgzy5sBh+vSvMXS1c/bDebhbHdMUBbzx4jC8wuTesJxNbpOjMv0YMzv6VBQ/RqNmXqEg4dRepYgOGf983OxHY2ikIxRJZG1yz41Y9yjLs0JfAAX4le8Ek/Sh6fpgf2+Q/VBbWV9Deo9tfTemjJjSQTH3/ORFh/UxKcuwMOriWKzzRjdPVowJksNXEs29QLOpEqqgGnF4+Zg8YmdEsNYAWTPvBStQNm//coWKJtjKhGbYZldNTROjpY+ebN+ZcoG5HRzbgn+F0Kwh0OQ1cDsAJaWwhyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
+        with ESMTP id S234200AbiBJM4I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 07:56:08 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B191BD;
+        Thu, 10 Feb 2022 04:56:09 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id y8so7324522pfa.11;
+        Thu, 10 Feb 2022 04:56:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5YcRJfGkBH4rizvB/yZqVaVrHOkP4Fpt+VzrsYU+4gw=;
- b=i6Cpz7UKRxMQ0RYlnXPVro5Ceqhz2J4pI57q+uFYpE3jdv7FzXldmKb5mOm1F4iZrJvZFpvdvRmYI7/Zp/wPgKspdznr+EfGVBiQpffQ1Y105+68DiXwVdWQzdNlWMu7AES/a26n/A3NePgHOZ/1/Sn3fB9BRd0/nAjF834DYfE=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by DM6PR10MB2651.namprd10.prod.outlook.com (2603:10b6:5:b9::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Thu, 10 Feb
- 2022 12:17:22 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::4910:964a:4156:242a]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::4910:964a:4156:242a%5]) with mapi id 15.20.4975.011; Thu, 10 Feb 2022
- 12:17:22 +0000
-Message-ID: <97bdf580-c1ff-0f2e-989c-da73a2115e7b@oracle.com>
-Date:   Thu, 10 Feb 2022 12:17:14 +0000
-Subject: Re: [PATCH RFC 12/39] KVM: x86/xen: store virq when assigning evtchn
-Content-Language: en-US
-To:     "Woodhouse, David" <dwmw@amazon.co.uk>
-Cc:     "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190220201609.28290-1-joao.m.martins@oracle.com>
- <20190220201609.28290-13-joao.m.martins@oracle.com>
- <b750291466f3c89e0a393e48079c087704b217a5.camel@amazon.co.uk>
-From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <b750291466f3c89e0a393e48079c087704b217a5.camel@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LNXP265CA0069.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:5d::33) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=gVKJwu5ERjnZG+6nDLNO4990OulCMrqau9J8QnEaUak=;
+        b=jqyceszF7jyQsxmAF0DP4Y17pXPn7jQO2JQZ0z+nSfyH3FPKgnbkG+zVPNOXq5Fptg
+         BkU6WSrT+9gauHWAq0mnlzvwixsqtlAJkghd1nxQBfgMmx6szjsVrosQwBFb33UKgCee
+         EN9ElQKs8NwR8ndyXktqLoP9zn8gXpKWsafqdpsfFvtKQliM2pIUX3yeOFWp6NUU+s8Z
+         /4Exxn6Mz2f01p2S4SK9nJdIsFIqDeZ6oYjRHtBNcRpYJLH5sZ35EXbkRRou/I9L5WSo
+         ysSymDcaIDL54X8n7lRey0i8VeykGf31qt+HdP3tWMpT8cth0lJs3EEBGQuRtwevtY0c
+         BNbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=gVKJwu5ERjnZG+6nDLNO4990OulCMrqau9J8QnEaUak=;
+        b=amc7el1kwdm8hu3baHB+SmCh2Jn01t566NMSmxCrB6+ko/S0Re4NQi/4D2hWgWOhB/
+         2SilfdZd5wft6Hzkw1dAuQMpRbBHHNzkLxTGTJNlQfdJ06at5Ude+vWqkNOQT8oIchTp
+         qZh41x75VuRfMD6EQ1mT2SmRFDwkkG/BZ/B5jL3zDpvrKkVVsAzolpowM9EeIM3qvOhK
+         a1oTmbmY8VNGS3dznWZYxwvonRbB7rf8hvue7I3+BG2W9zHe4AMqCf+QGtaoacecREo0
+         9V6Ht4f9lSqd28Ao4BlE/xWOS/3jvkT8tqXcilyHJV+ZJ7jlN75wFyhtlfIKHFA3LoC3
+         zlOg==
+X-Gm-Message-State: AOAM531dkuVeJz19Mas/nHa2LP3bsPor5RNO18ZFQOTr0JktblRf2ufh
+        963L6wkOZ/gpgFdFT/Qu2d0=
+X-Google-Smtp-Source: ABdhPJxN5ItqmYGrMDr9Z3JwQkeo6Ly+mT8J3bXZF0BBgPdOhY106zoCEZHr54laiGx1AsQFA2TLGA==
+X-Received: by 2002:a05:6a02:18e:: with SMTP id bj14mr6227006pgb.352.1644497769066;
+        Thu, 10 Feb 2022 04:56:09 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id v17sm22423250pfm.10.2022.02.10.04.56.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Feb 2022 04:56:08 -0800 (PST)
+Message-ID: <76d94feb-3f9e-36da-5f5c-c9e047778b7e@gmail.com>
+Date:   Thu, 10 Feb 2022 20:55:57 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7f68d2bc-fdb8-4528-8762-08d9ec8f4a22
-X-MS-TrafficTypeDiagnostic: DM6PR10MB2651:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR10MB2651C5B2E3B043CADE692D73BB2F9@DM6PR10MB2651.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: h/X9Ikvyqs4kpj5XatYLANxIEa0dMTTtNAekHtrYwfxVzH/rJG2FoVyQRut1OM6qSJ9CsbFNnsVi1oDOLzkwN2em4skZN7VpABlBolvjLlMSoK4U1LVr7R2KYTWbxGWf9/DH28XBUEw90XfxcOpkHDY7nnkBtxALCcQgUm16IR3LoSbaPBh37sHWYrH+HvnYZDuOuVwGBYEZthVlpIc56g17IrGJvUu1ghk8LF3/zUFWPfWMgTnBLc+ddlgIDAxW1Wv2ADCJJM7wcAfBmf2t3RerwLPJpJ8frvUzugrbw8F9f5fYOyBRL7oh4tm5Jfn+1wx70cbZYqWXt60K4Ecg1nDgAaHaXgapKGawDIXhOtFZU5gB4zb1YHDDKNzAgDx14bUjkNcxOCww/Ash42KouC55WV/x66D48knm9U27u3XWUII7BmcYMDnCSm5NaZ1nPAUZSgrV6/a/v0apIySTsbLHEKhAEqla8GEujQ2VVCWDq7At201EJeO54qPso/GDAGD95vf0blpBRHMulTEep426kct/eRNrFJQZPoPZd3Pf9kJv+tsgADtLprrXOySkefklhjfjzBQJO8FILA5VnBhimKAbL2tIfts7lJuugOpAM4/a2NQxwmNPZ0X8/Jy4N9l+3VumHzMD9ZZAViOcImChyYRP3ec24JZSzIggY4BLdD/GWqn79q82Q1dDDwXUuSvH0ngw3HlCdit7f28igER8A/sQOEid2Gg+UrlN/nPw932mmH2B9eYRfshdUEOGqEB19jMLG9vf9kxUCAz9qxcCZ0fofO79Jbei/IiYMeM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(2616005)(31686004)(186003)(66946007)(26005)(6512007)(53546011)(6666004)(316002)(66574015)(86362001)(6506007)(2906002)(508600001)(38100700002)(8936002)(966005)(7416002)(6486002)(5660300002)(8676002)(66476007)(54906003)(6916009)(31696002)(4326008)(66556008)(83380400001)(36756003)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjAyMlFGZ0RaK24rbXJGcFZRZVgzNVNRYXEwc3BJVDV4Q2JxRFZUNkE1ZkhB?=
- =?utf-8?B?Mk1rU0R1cjFQcTJGZTdNQloxMEpoQjNzOSt0c0FkN1BVR3owZEtrZUdNbmhy?=
- =?utf-8?B?TUx5cmxWK2U0TmZOTkUzQmk2b1RBQ3BUZkVOdUI5N0JQNDdEUEVHZkFzRFVv?=
- =?utf-8?B?V1ErSlA4TDdWZm1Dd1FBT2QzV2RnQndTWm4zKzQvdklkUk5EN3h5N25EYzdF?=
- =?utf-8?B?ZTQ4ODBEdXdGZEsyZ0VCOWJGYmJoOGY0T0FKZU9EQkJHSGZ6QzBLSVZzWjBs?=
- =?utf-8?B?N3Z4OHlYTHhKOWtlZktxWGpGMlE0N1hSRUQzakhHenV3S0FkTFlyMlFkZ2tv?=
- =?utf-8?B?cFMxSVNOalQvUzh6M0hQcGtkcWR1Nk9ueC9jRmR0aHhXQnVlS1hvTzVyMStQ?=
- =?utf-8?B?NGxVQjRXOXdvYjV0eHRxNFNBN0VYdmRDZXYyOFdpdCt1SWZVU1czUXhRNk1Q?=
- =?utf-8?B?K3Vhcklpb0I0cldYTjZLTklJVlcxTGVrL05nYmZ0OEwrYWV1dUhOdkV0K2dS?=
- =?utf-8?B?Tjk5WUdKMHhYTk1wR3dXM1duOEp0bmFvVlAxWW4ySmJYcmthNFJQVnYySHow?=
- =?utf-8?B?NEYyQUtydkZpdG91bnduRkNERGxyTTNlY2xPakZEWWs4ZXZMU0dOaWkvMWg5?=
- =?utf-8?B?UGlUZzN0Q2JZZzdORFZMR2Y1Rm9vUDl6ZE03MFhoRjRrYU5NVHIybzdVWVR2?=
- =?utf-8?B?ZHlxdWpITHBjRndaNGZPdkE3aXovOUFiMDdIOGRKaWV1YUhqQ3BDSnM2a0ZL?=
- =?utf-8?B?aVV0MUVJenVFS0dCY2xxbHo0b0VZN05pdk1ya0p4Z3QrVGUxWFZLREJ5bzA1?=
- =?utf-8?B?L3dCMWdmVUVReTBOcnNxbFBTTzZUT3pDZWw1cEtVdWxEKzZiWHlmVTFRcjF5?=
- =?utf-8?B?UXVqY1dBVWxHYTdvRGZpeEE0RHd1WGhKM2NTcjZFV0hROHE2a0hTWjZUcWYr?=
- =?utf-8?B?Zy9FR2Z4LzlmcGZHV1FLOURVaUxHM012ajJweUxkWDY0eUFTeVlWMVZUR1Fu?=
- =?utf-8?B?VDQrZ2tYY3BydUdQNkNVb1pqVmlWREtiZXM5VzAwdkRjYU1LeWRxNURvQVM0?=
- =?utf-8?B?Wnd4dkhSdWFPNWJacHluOGxSeG1yOVdyQ3k3OElTZElCUDZaTDYwTko1anQx?=
- =?utf-8?B?U3RvT1R2Z2ZWQkdFRUdwcjhWaFhRbTlkVHVMN0xDdkhpYm5sSjBTOXRMNm14?=
- =?utf-8?B?NHRWWkFCV3lJMlYwQ0JHMGpRdFZqZThFdDZ6eEtqencwOGFLWHdHVE9YQW1L?=
- =?utf-8?B?Ui9CZ2Rlejd6YmI5cmc2clEwTTJsd3FhalJrSHZNZDR5eGlTNFpwMStiSzEv?=
- =?utf-8?B?Lzducm9sb3g2Wk1TcVFvVmFnSHU1K2RRQzJEamlLY3U1a1BVUUZuVWdtU1dR?=
- =?utf-8?B?UkRRZFJoZmtKdnJlYmtNNlE0T0l2NmRaUWlnWWcwOCtnUm5Da09xSnpKWUx6?=
- =?utf-8?B?SWIxUGFIYmFYS0ZaeDlvMmhUYkJ6Y2t3NFZYRzdicTN1cWFNTWdWeEVmZVVw?=
- =?utf-8?B?aHpJVmgvUVp3NURKU1htblYrS3ZlQzF0SCs5aUlza0UwbG9aQ1hla05uSEgz?=
- =?utf-8?B?UkhaM0FlK0gyUGpUekNZRXVjc2diS293bW1oVDZLa1BsQVdHWmYvMjNOUE0v?=
- =?utf-8?B?UHZjQzhibEswVTAxSlhRU0FFZk9KVjdsc0wvWjEzT2MvdVM0anlTajRVcVh2?=
- =?utf-8?B?R0RDNXpjVW54d09VNlNLQUEwVzdhZ2hiRHFpYUNRM1U1ZXVzc2N3NEtZUEs0?=
- =?utf-8?B?VWJGMyt0K1FsSEEvWTFWOHh0YVNDMEJXK2dHV1VxNTlqK0N1cVR6MUUxWlZx?=
- =?utf-8?B?dDIzcXR6THJFRkI4NnFLMlMvYmpRNDZtaUgwS1BQcUNiL0tJZmpIalVNV2ND?=
- =?utf-8?B?T1lERHhnT2h5NnBRcGk2OVBSVDJrL0hOTTllT28zUXpnLzhDSVZteUFBY1R3?=
- =?utf-8?B?TDlaeTh1OTBvaGhHOC82QWFhbGZlVHZsbXdOYTBLQm9scXZ5ampWc2k4S094?=
- =?utf-8?B?OTc2TWIrcTlOSFlVY3BKamw4bE1xbTE3ZnVxQ1FpV283MTRmU2pVbEtPTGpH?=
- =?utf-8?B?b2JlK0VDd3hvWEJhWWZiMjBhUFo3NHRpQWpwblQ4WFVHK2hQbUl4VG9Sbldk?=
- =?utf-8?B?bVJkait1WThYVWlGVXYwa1FLUStOckE2cjdOOVlKanMza1QwY1hNT3RCVGIy?=
- =?utf-8?B?NHA3eGxvOWtLV3VGVDFKdnV1dW5SMEdnNkJvbnU4QzF3MnZ0QlpINDBwdkE5?=
- =?utf-8?B?d2w1aVlRV2ErOFZPMnVaRm9JVmJRPT0=?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f68d2bc-fdb8-4528-8762-08d9ec8f4a22
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2022 12:17:22.0546
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iBy4UoJooi56juSOotMLfdC+Sld0vlEFt5hhrMWjtpKV7/eGZ3K1K9Fd/gaFlfuWyLAOo+u0Vf6qFIk96YUOd2Q5vkWaszIGBdfFKKonpFw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB2651
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10253 signatures=673431
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 phishscore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2202100067
-X-Proofpoint-ORIG-GUID: Z1V5abJm-r6-Zj7fxwpRZRLk0XXsJxHg
-X-Proofpoint-GUID: Z1V5abJm-r6-Zj7fxwpRZRLk0XXsJxHg
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.0
+Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
+ perfmon_event_map[] directly
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Dunn <daviddunn@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>
+References: <20220117085307.93030-1-likexu@tencent.com>
+ <20220117085307.93030-3-likexu@tencent.com>
+ <20220202144308.GB20638@worktop.programming.kicks-ass.net>
+ <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
+ <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
+ <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
+ <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
+ <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+In-Reply-To: <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/8/22 16:17, Woodhouse, David wrote:
-> On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
->> Enable virq offload to the hypervisor. The primary user for this is
->> the timer virq.
+On 10/2/2022 2:57 am, Dave Hansen wrote:
+> On 2/9/22 10:47, Jim Mattson wrote:
+>> On Wed, Feb 9, 2022 at 7:41 AM Dave Hansen <dave.hansen@intel.com> wrote:
+>>>
+>>> On 2/9/22 05:21, Peter Zijlstra wrote:
+>>>> On Wed, Feb 02, 2022 at 02:35:45PM -0800, Jim Mattson wrote:
+>>>>> 3) TDX is going to pull the rug out from under us anyway. When the TDX
+>>>>> module usurps control of the PMU, any active host counters are going
+>>>>> to stop counting. We are going to need a way of telling the host perf
+>>>>> subsystem what's happening, or other host perf clients are going to
+>>>>> get bogus data.
+>>>> That's not acceptible behaviour. I'm all for unilaterally killing any
+>>>> guest that does this.
+>>>
+>>> I'm not sure where the "bogus data" comes or to what that refers
+>>> specifically.  But, the host does have some level of control:
 >>
->> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+>> I was referring to gaps in the collection of data that the host perf
+>> subsystem doesn't know about if ATTRIBUTES.PERFMON is set for a TDX
+>> guest. This can potentially be a problem if someone is trying to
+>> measure events per unit of time.
 > 
-> ...
+> Ahh, that makes sense.
 > 
->> @@ -636,8 +654,11 @@ static int kvm_xen_eventfd_assign(struct kvm *kvm, struct idr *port_to_evt,
->>  			GFP_KERNEL);
->>  	mutex_unlock(port_lock);
->>  
->> -	if (ret >= 0)
->> +	if (ret >= 0) {
->> +		if (evtchnfd->type == XEN_EVTCHN_TYPE_VIRQ)
->> +			kvm_xen_set_virq(kvm, evtchnfd);
->>  		return 0;
->> +	}
->>  
->>  	if (ret == -ENOSPC)
->>  		ret = -EEXIST;
+> Does SGX cause problem for these people?  It can create some of the same
+> collection gaps:
+> 
+> 	performance monitoring activities are suppressed when entering
+> 	an opt-out (of performance monitoring) enclave.
+> 
+
+Are the end perf user aware of the collection gaps caused by the code running 
+under SGX?
+
+As far as I know there shouldn't be one yet, we may need a tool like "perf-kvm" 
+for SGX enclaves.
+
+>>>> The host VMM controls whether a guest TD can use the performance
+>>>> monitoring ISA using the TD’s ATTRIBUTES.PERFMON bit...
+>>>
+>>> So, worst-case, we don't need to threaten to kill guests.  The host can
+>>> just deny access in the first place.
+
+The KVM module parameter "enable_pmu" might be respected,
+together with a per-TD guest user space control option.
+
+>>>
+>>> I'm not too picky about what the PMU does, but the TDX behavior didn't
+>>> seem *that* onerous to me.  The gory details are all in "On-TD
+>>> Performance Monitoring" here:
+>>>
+>>>> https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1.0-public-spec-v0.931.pdf
+>>>
+>>> My read on it is that TDX host _can_ cede the PMU to TDX guests if it
+>>> wants.  I assume the context-switching model Jim mentioned is along the
+>>> lines of what TDX is already doing on host<->guest transitions.
 >>
-> 
-> So, I've spent a while vacillating about how best we should do this.
-> 
-> Since event channels are bidirectional, we essentially have *two*
-> number spaces for them.
-> 
-> We have the inbound events, in the KVM IRQ routing table (which 5.17
-> already supports for delivering PIRQs, based on my mangling of your
-> earlier patches).
-> 
-/me nods
+>> Right. If ATTRIBUTES.PERFMON is set, then "perfmon state is
+>> context-switched by the Intel TDX module across TD entry and exit
+>> transitions." Furthermore, the VMM has no access to guest perfmon
+>> state.
 
-> And then we have the *outbound* events, which the guest can invoke with
-> the EVTCHNOP_send hypercall. Those are either:
->  • IPI, raising the same port# on the guest
->  • Interdomain looped back to a different port# on the guest
->  • Interdomain triggering an eventfd.
+Even the guest TD is under off-TD debug and is untrusted ?
+
+I think we (host administrators) need to profile off-TD guests to locate
+performance bottlenecks with a holistic view, regardless of whether the
+ATTRIBUTES.PERFMON bit is cleared or not.
+
+Perhaps shared memory could be a way to pass guests performance data
+to the host if PMU activities are suppressed across TD entry and exit
+transitions for the guest TD is under off-TD debug and is untrusted.
+
+>>
+>> If you're saying that setting this bit is unacceptable, then perhaps
+>> the TDX folks need to redesign their in-guest PMU support.
 > 
-/me nods
+> It's fine with *me*, but I'm not too picky about the PMU.  But, it
+> sounded like Peter was pretty concerned about it.
 
-I am forgetting why you one do this on Xen:
+One protocol I've seen is that the (TD or normal) guest cannot compromise
+the host's availability to PMU resources (at least in the host runtime).
 
-* Interdomain looped back to a different port# on the guest
+It's pretty fine and expected that performance data within the trusted TDX guest
+should be logically isolated from host data (without artificial aggregation).
 
-> In the last case, that eventfd can be set up with IRQFD for direct
-> event channel delivery to a different KVM/Xen guest.
 > 
-> I've used your implemention, with an idr for the outbound port# space
-> intercepting EVTCHNOP_send for known ports and only letting userspace
-> see the hypercall if it's for a port# the kernel doesn't know. Looks a
-> bit like
-> https://git.infradead.org/users/dwmw2/linux.git/commitdiff/b4fbc49218a
+> In any case, if we (Linux folks) need a change, it's *possible* because
+> most of this policy is implemented in software in the TDX module.  It
+> would just be painful for the folks who came up with the existing mechanism.
 > 
-> 
-> But I *don't* want to do the VIRQ part shown above, "spotting" the VIRQ
-> in that outbound port# space and squirreling the information away into
-> the kvm_vcpu for when we need to deliver a timer event.
-> 
-> The VIRQ isn't part of the *outbound* port# space; it isn't a port to
-> which a Xen guest can use EVTCHNOP_send to send an event. 
 
-But it is still an event channel which port is unique regardless of port
-type/space hence (...)
-
-> If anything,
-> it would be part of the *inbound* port# space, in the KVM IRQ routing
-> table. So perhaps we could have a similar snippet in
-> kvm_xen_setup_evtchn() which spots a VIRQ and says "aha, now I know
-> where to deliver timer events for this vCPU".
-> 
-(...) The thinking at the time was mainly simplicity so our way of saying
-'offload the evtchn to KVM' was through the machinery that offloads the outbound
-part (using your terminology). I don't think even using XEN_EVENTFD as proposed
-here that that one could send an VIRQ via EVTCHNOP_send (I could be wrong as
-it has been a long time).
-
-Regardless, I think you have a good point to split the semantics and (...)
-
-> But... the IRQ routing table isn't really set up for that, and doesn't
-> have explicit *deletion*. The kvm_xen_setup_evtchn() function might get
-> called to translate into an updated table which is subsequently
-> *abandoned*, and it would never know. I suppose we could stash the GSI#
-> and then when we want to deliver it we look up that GSI# in the current
-> table and see if it's *stale* but that's getting nasty.
-> 
-> I suppose that's not insurmountable, but the other problem with
-> inferring it from *either* the inbound or outbound port# tables is that
-> the vCPU might not even *exist* at the time the table is set up (after
-> live update or live migration, as the vCPU threads all go off and do
-> their thing and *eventually* create their vCPUs, while the machine
-> itself is being restored on the main VMM thread.)
-> 
-> So I think I'm going to make the timer VIRQ (port#, priority) into an
-> explicit KVM_XEN_VCPU_ATTR_TYPE. 
-
-(...) thus this makes sense. Do you particularly care about
-VIRQ_DEBUG?
-
-> Along with the *actual* timer expiry,
-> which we need to extract/restore for LU/LM too, don't we?
-> /me nods
-
-I haven't thought that one well for Live Update / Live Migration, but
-I wonder if wouldn't be better to be instead a general 'xen state'
-attr type should you need more than just pending timers expiry. Albeit
-considering that the VMM has everything it needs (?), perhaps for Xen PV
-timer look to be the oddball missing, and we donºt need to go that extent.
+When the code to enable ATTRIBUTES.PERFMON appears in the mailing list,
+we can have more discussions in a very good time window.
