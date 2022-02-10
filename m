@@ -2,113 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA73F4B02F3
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5B8F4B025B
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 02:32:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbiBJCCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 21:02:04 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:60212 "EHLO
+        id S232939AbiBJBb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 20:31:57 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:38922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234322AbiBJCAP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 21:00:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E812A2B6B0
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:45:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644457515;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QqS6aRbHUDdzpsG8gLAbed/VgqomfvLKE7ZO5PCIOxw=;
-        b=EAWUge6OpYCxHvMymJyzXL0u6KeNKQUU7UmOf3hbi6wNGumwmhGn5JElsE2ja4BUF7CKTk
-        tWV90Y9Iz8kOCpJDBcOWk+GdTEN4/DxWQvUL0LMEPMqlwoZQT5MxIet6fgh4z1SXxc4awf
-        wo4tIlJ5A3FTplwCKy4zT8zvpt8Bozs=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-536-3WEcrkCfMKCNZPjs56I6dQ-1; Wed, 09 Feb 2022 18:44:43 -0500
-X-MC-Unique: 3WEcrkCfMKCNZPjs56I6dQ-1
-Received: by mail-il1-f197.google.com with SMTP id a3-20020a92d103000000b002bdfc5108dfso2701943ilb.9
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 15:44:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=QqS6aRbHUDdzpsG8gLAbed/VgqomfvLKE7ZO5PCIOxw=;
-        b=DVcmGlsikx2IjO8P5CfUA6lrKkIJ5YZ0H0bOJTkiQ5Dv1wIZ+9Q+sSiQ5S7q3ojUnd
-         ucUTU51uDy45LZoAkwt2TxyH+/hA7VO8AKMGHBSEbjKuIPRMmR0/8lJctN82NmRqRChk
-         iSvMq6dqGURT2oYhzMnC1+lpED2CszqQJvi3AWFZqqDqHIqGMykYveGyabLRhDW3i2s2
-         zx8xIlUUo5kgj6bBR7B972tEnyqrtX6wswzR/1zjB6tO6j9qgjMwL5yzlaA2qvq34hkb
-         YojHy8cIHxOJqw279iXurskkx5n0Gu6ho2i5kAnC6QHKe3+qm+PG931Wiu+6ZvdKQ7gQ
-         0hxg==
-X-Gm-Message-State: AOAM533AeU2WNOjBdXUxdArbb3HjZDS8JI2YGkXd8FS2fX+xodZ9efdG
-        UcU9zY1fVx51E2pw0AbnJX/m5y4GR2GYVWqbY9aFRQrbRApOrNEGrAQpFL+vV0clYhReL49sj6m
-        +nvmuH6JQjdKI
-X-Received: by 2002:a05:6602:2209:: with SMTP id n9mr2470394ion.106.1644450283125;
-        Wed, 09 Feb 2022 15:44:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxT6HD2F4lnfPsmgFD3PhnkTPzmCmvBRL9NupZBHsvlbk18vuDpteUdQty0XS8Ul8opPEqcow==
-X-Received: by 2002:a05:6602:2209:: with SMTP id n9mr2470381ion.106.1644450282952;
-        Wed, 09 Feb 2022 15:44:42 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id w19sm10870685iov.16.2022.02.09.15.44.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 15:44:42 -0800 (PST)
-Date:   Wed, 9 Feb 2022 16:44:40 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
-        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
-        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
-        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>
-Subject: Re: [RFC v4 7/8] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220209164440.0d77284c.alex.williamson@redhat.com>
-In-Reply-To: <20220208133425.1096-8-shameerali.kolothum.thodi@huawei.com>
-References: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
-        <20220208133425.1096-8-shameerali.kolothum.thodi@huawei.com>
-Organization: Red Hat
+        with ESMTP id S232736AbiBJBbq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 20:31:46 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B79BA6
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:31:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=FGDzU3a8ZgSo+EyChyw8OQoA90/x+KFn1Dqr157D384=; b=PUcZzppEKjiSSvOMPawtUumi1q
+        /pQpXFsRdgTigC1yrxlhef8IyQsCWVyiLbeAU+DsZxjSIF7seWLh45/BdWvrv9397W7r2XgU6CDy4
+        ZhKtfu/51xB8A+jEQ0wgbCQ44rysxln683yYvbm4V0rR0HHCBFNhdBNLsrUy6FsLB/Tkj029eeayX
+        DXsjNNTPqjtAPcdF215EZY1Ecb4nDUUdJoSFWogxzXDmbcnZgO6H/IeDvNNQ75MvzN72dskaa4cxt
+        tnDfPraM/XQ0QyAj8dwen2TD51NnBi3grm+xJRcg1yNqDg2n5AeP5iLFxsmE44D0EdmvZjHtc4tBv
+        KbaE+law==;
+Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nHxIy-008xl0-DA; Thu, 10 Feb 2022 00:27:24 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nHxIx-0019Cg-Ts; Thu, 10 Feb 2022 00:27:23 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+Subject: [PATCH v0 00/15] KVM: Add Xen event channel acceleration
+Date:   Thu, 10 Feb 2022 00:27:06 +0000
+Message-Id: <20220210002721.273608-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Feb 2022 13:34:24 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> +
-> +static struct hisi_acc_vf_migration_file *
-> +hisi_acc_vf_stop_copy(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-> +{
-> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> +	struct device *dev = &hisi_acc_vdev->vf_dev->dev;
-> +	struct hisi_acc_vf_migration_file *migf;
-> +	int ret;
-> +
-> +	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
-> +		dev_info(dev, "QM device not ready, no data to transfer\n");
-> +		return 0;
-> +	}
+This series adds event channel acceleration for Xen guests. In particular
+it allows guest vCPUs to send each other IPIs without having to bounce
+all the way out to the userspace VMM in order to do so. Likewise, the
+Xen singleshot timer is added, and a version of SCHEDOP_poll. Those
+major features are based on Joao and Boris' patches from 2019.
 
-This return value looks suspicious and I think would cause a segfault
-in the calling code:
+Cleaning up the event delivery into the vcpu_info involved using the new
+gfn_to_pfn_cache for that, and that means I ended up doing so for *all*
+the places the guest can have a pvclock. And the runstate too, having
+rediscovered a bugfix I'd been carrying in my internal tree that got
+forgotten upstream until today.
 
-+		migf = hisi_acc_vf_stop_copy(hisi_acc_vdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		hisi_acc_vdev->saving_migf = migf;
-+		return migf->filp;
+I'm calling this v0 because there's a little bit more work to be done
+on documentation and especially self tests for these, but it's basically
+ready for review and I wanted to post a version as a fixed point while
+I backport it to our environment and do some more testing with actual
+Xen guest VMs.
 
-Thanks,
-Alex
+With this, I think the Xen support is as complete as it needs to be for
+now. There were more patches in the original set from Oracle, which
+allowed the KVM host to act as a Xen dom0 and the Xen PV back end
+drivers (netback, blkback, etc.) to communicate via the KVM-emulated
+event channels as if it was running underneath true Xen. I haven't
+done anything to deliberately break those, although there's been a
+certain amount of refactoring as I've merged the other bits so far.
+But neither am I planning to pick those up and work on them any
+further. I'm OK with the VMM emulating those in userspace, with a
+VFIO shim to an underlying NIC or NVMe device.
+
+Boris Ostrovsky (1):
+      KVM: x86/xen: handle PV spinlocks slowpath
+
+David Woodhouse (11):
+      KVM: x86/xen: Fix runstate updates to be atomic when preempting vCPU
+      KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
+      KVM: x86: Use gfn_to_pfn_cache for pv_time
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_info
+      KVM: x86/xen: Use gfn_to_pfn_cache for vcpu_time_info
+      KVM: x86/xen: Make kvm_xen_set_evtchn() reusable from other places
+      KVM: x86/xen: Support direct injection of event channel events
+      KVM: x86/xen: Add KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+      KVM: x86/xen: Kernel acceleration for XENVER_version
+      KVM: x86/xen: Support per-vCPU event channel upcall via local APIC
+      KVM: x86/xen: Advertise and document KVM_XEN_HVM_CONFIG_EVTCHN_SEND
+
+Joao Martins (3):
+      KVM: x86/xen: intercept EVTCHNOP_send from guests
+      KVM: x86/xen: handle PV IPI vcpu yield
+      KVM: x86/xen: handle PV timers oneshot mode
+
+ Documentation/virt/kvm/api.rst                     |  129 ++-
+ arch/x86/include/asm/kvm_host.h                    |   22 +-
+ arch/x86/kvm/irq.c                                 |   11 +-
+ arch/x86/kvm/irq_comm.c                            |    2 +-
+ arch/x86/kvm/x86.c                                 |  123 +-
+ arch/x86/kvm/xen.c                                 | 1191 ++++++++++++++++----
+ arch/x86/kvm/xen.h                                 |   69 +-
+ include/linux/kvm_host.h                           |    3 +-
+ include/uapi/linux/kvm.h                           |   43 +
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |    6 +
+ 10 files changed, 1315 insertions(+), 284 deletions(-)
+
+
 
