@@ -2,177 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 817F04B023B
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 02:28:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA1E74B028C
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 02:57:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232321AbiBJB2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 20:28:30 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:55296 "EHLO
+        id S233554AbiBJB5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 20:57:34 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:33320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232518AbiBJB14 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 20:27:56 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0CF20199
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:27:47 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id c5-20020a17090a1d0500b001b904a7046dso5426294pjd.1
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 17:27:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Yudl84hMQxfLHFinLSXzC02VLhYOexhpsfOokm5q7zI=;
-        b=iFEW70mUyIL6xFZqNc3fyWHhA7kZK7m5jhoBEudtRgQuUlpyo3hymoFzHKr9RsO6/+
-         NdEDJ00DowKRMIYQeISCJHTZ4mbIR5iP+hFQL8F17u1pOwXluhTtTtioMNMC60aY7nzC
-         7FKKeheDXxy54qnX0IiS0kzvvEZufRLroLR5LVUPYKxeWFODnbwJ/93kvpDJyHV5RySB
-         /9C/1IZTvdzM15USHlH1Awi4btfqLsxH9U99a4mXqV4TC1gswlZYuX8r2dXAqZIlJLTS
-         6+/O9OH8A1wLHV0i58r75smombgDabG6r0Re34kGoX2hTQBvSKL632T9mRl6xQm7OhP3
-         xfhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Yudl84hMQxfLHFinLSXzC02VLhYOexhpsfOokm5q7zI=;
-        b=jyeSMyjDsD9WYuITdf3yOCPGX00POJ+Qfd08yq/VqyJLpfWLqy6pygRQmAlU6kRCaF
-         jd92OJJ9RF3Kc+fYj1tHnBKDkAx6iuWQdYc3apmSf/Nv9Ts9WdsQ9hOu1r5agDpItB8d
-         WPC4xIThHfAj4LOZu4KsR5WFBZ8/3tVs+HLq8GQcguC/y3YMit3urTbyNLGKSXnM9P2o
-         W0yIlStOLJyMPxf7SZlrL30WTqlxGK5Gr6Iqs2zB7DsfQTOylUA72vS8i8xw3fpLFn9d
-         Bx7GQU1NpmJIcM7wo3GEWqFsPMyY2DybYhw8eS8NHZFCI/skCZFOa9QWQkE76QCXnzY7
-         lCsw==
-X-Gm-Message-State: AOAM531LDaEkZ5A/xXWTRzffavQMIi0evD3UgH9pf8qiJ/5o/nI29GeX
-        jpf/PIBm5WWHBvx3JxzZlGHYHrdG2wUozA==
-X-Google-Smtp-Source: ABdhPJxrU1x5K4f/mXLdxnZ6HovUenwDypXBS9OnT3ytekHe8lLu1VHAQBCI4PBjKjp+rrZhlhUtiA==
-X-Received: by 2002:a17:902:6905:: with SMTP id j5mr4775844plk.145.1644453012311;
-        Wed, 09 Feb 2022 16:30:12 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i3sm5521002pgq.65.2022.02.09.16.30.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 16:30:11 -0800 (PST)
-Date:   Thu, 10 Feb 2022 00:30:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, vkuznets@redhat.com
-Subject: Re: [PATCH 01/23] KVM: MMU: pass uses_nx directly to
- reset_shadow_zero_bits_mask
-Message-ID: <YgRckLixnxa7hLqB@google.com>
-References: <20220204115718.14934-1-pbonzini@redhat.com>
- <20220204115718.14934-2-pbonzini@redhat.com>
- <Yf1pk1EEBXj0O0/p@google.com>
+        with ESMTP id S233672AbiBJB4N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 20:56:13 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D45E2AAB2
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:41:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644457283; x=1675993283;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zB6AoUKvVij7NWzZ9PeCjkUlZ2UWAt5KrXtxCVaMnF4=;
+  b=WUC8rRSu4D9Ae0p57X9VIAOrK6n7Z8oBPvA0XuK3j3O6QI9jIBIipKNK
+   KaFI2NBLV+4Ki3abk0yl848XPU7wINwOQhCHtJSZp0oT65xoA4fA1Buxu
+   U7u0MlNbAy0CZ5CgXwxJF88cOn+gWNf121iz4BBx2Ooe56EPRVekxusLl
+   JCKGnFUa8I0cgcI/2+wQsvWfVkOjgOvjL2ptFrDcywCyFjuNnY5UVEowu
+   SNFnnP+7xyuBxI2O7rXSZfrHZHCH4yfyaFe9F6VeXq3sHTOeZbTfSyYne
+   qRcFkAx6iVB0szky9MXvsUa7p3gTRLQFVpAVNdM3zf+qNhLUkiMfiUVHc
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="273921791"
+X-IronPort-AV: E=Sophos;i="5.88,357,1635231600"; 
+   d="scan'208";a="273921791"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 16:38:06 -0800
+X-IronPort-AV: E=Sophos;i="5.88,357,1635231600"; 
+   d="scan'208";a="541377323"
+Received: from yangweij-mobl.ccr.corp.intel.com (HELO [10.255.28.189]) ([10.255.28.189])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 16:38:01 -0800
+Message-ID: <d5e051cd-a4ff-6816-a279-92e97b57e7c8@intel.com>
+Date:   Thu, 10 Feb 2022 08:37:58 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yf1pk1EEBXj0O0/p@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v5 0/2] Enable legacy LBR support for guest
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     pbonzini@redhat.com, ehabkost@redhat.com, mtosatti@redhat.com,
+        richard.henderson@linaro.org, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, likexu@tencent.com, wei.w.wang@intel.com
+References: <20220122161201.73528-1-weijiang.yang@intel.com>
+ <e2c18d80-7c4e-6a0a-d37e-3a585d53d3f2@gmail.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <e2c18d80-7c4e-6a0a-d37e-3a585d53d3f2@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 04, 2022, David Matlack wrote:
-> On Fri, Feb 04, 2022 at 06:56:56AM -0500, Paolo Bonzini wrote:
-> > reset_shadow_zero_bits_mask has a very unintuitive way of deciding
-> > whether the shadow pages will use the NX bit.  The function is used in
-> > two cases, shadow paging and shadow NPT; shadow paging has a use for
-> > EFER.NX and needs to force it enabled, while shadow NPT only needs it
-> > depending on L1's setting.
-> > 
-> > The actual root problem here is that is_efer_nx, despite being part
-> > of the "base" role, only matches the format of the shadow pages in the
-> > NPT case.  For now, just remove the ugly variable initialization and move
-> > the call to reset_shadow_zero_bits_mask out of shadow_mmu_init_context.
-> > The parameter can then be removed after the root problem in the role
-> > is fixed.
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> 
-> (I agree this commit makes no functional change.)
 
-There may not be a functional change, but it drops an optimization and contributes
-to making future code/patches more fragile due to making it harder to understand
-the relationship between shadow_mmu_init_context() and __kvm_mmu_new_pgd().
+On 2/9/2022 5:14 PM, Like Xu wrote:
+> Hi Weijiang,
+>
+> On 23/1/2022 12:11 am, Yang Weijiang wrote:
+>> KVM legacy LBR patches have been merged in kernel 5.12, this patchset
+>> is to expose the feature to guest from the perf capability MSR. Qemu can
+>> add LBR format in cpu option to achieve it, e.g., -cpu host,lbr-fmt=0x5,
+>
+> Some older Intel CPUs may have lbr-fmt=LBR_FORMAT_32 (which is 0), would
+> you help verify that KVM is supported on these platforms ? If so, how 
+> do we enable
+> guest LBR form the QEMU side, w/ -cpu host,lbr-fmt=0x0 ?
 
-> > @@ -4829,8 +4820,6 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
-> >  
-> >  	reset_guest_paging_metadata(vcpu, context);
-> >  	context->shadow_root_level = new_role.base.level;
-> > -
-> > -	reset_shadow_zero_bits_mask(vcpu, context);
+Hi, Like, do you know which cpu model or platform so that I can have a 
+test on?
 
-This is guarded by:
-
-	if (new_role.as_u64 == context->mmu_role.as_u64)
-		return;
-
-> >  }
-> >  
-> >  static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
-> > @@ -4841,6 +4830,16 @@ static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
-> >  		kvm_calc_shadow_mmu_root_page_role(vcpu, regs, false);
-> >  
-> >  	shadow_mmu_init_context(vcpu, context, regs, new_role);
-> > +
-> > +	/*
-> > +	 * KVM uses NX when TDP is disabled to handle a variety of scenarios,
-> > +	 * notably for huge SPTEs if iTLB multi-hit mitigation is enabled and
-> > +	 * to generate correct permissions for CR0.WP=0/CR4.SMEP=1/EFER.NX=0.
-> > +	 * The iTLB multi-hit workaround can be toggled at any time, so assume
-> > +	 * NX can be used by any non-nested shadow MMU to avoid having to reset
-> > +	 * MMU contexts.  Note, KVM forces EFER.NX=1 when TDP is disabled.
-> > +	 */
-> > +	reset_shadow_zero_bits_mask(vcpu, context, true);
-
-Whereas this will compute the mask even if the role doesn't change.  I say that
-matters later on because then this sequence:
-
-	shadow_mmu_init_context(vcpu, context, &regs, new_role);
-	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
-	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
-
-becomes even more difficult to untangle.
-
-And looking at where this series ends up, I don't understand the purpose of this
-change.  Patch 18 essentially reverts this patch, and I see nothing in between
-that will break without the temporary change.   That patch becomes:
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 02e6d256805d..f9c96de1189d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4408,7 +4408,7 @@ static void reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
-         * NX can be used by any non-nested shadow MMU to avoid having to reset
-         * MMU contexts.  Note, KVM forces EFER.NX=1 when TDP is disabled.
-         */
--       bool uses_nx = is_efer_nx(context) || !tdp_enabled;
-+       bool uses_nx = context->mmu_role.efer_nx;
-
-        /* @amd adds a check on bit of SPTEs, which KVM shouldn't use anyways. */
-        bool is_amd = true;
-
-though it needs to update the comment as well.
-
-> >  }
-> >  
-> >  static union kvm_mmu_role
-> > @@ -4872,6 +4871,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
-> >  	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
-> >  
-> >  	shadow_mmu_init_context(vcpu, context, &regs, new_role);
-> > +	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
-> 
-> Out of curiousity, how does KVM mitigate iTLB multi-hit when shadowing
-> NPT and the guest has not enabled EFER.NX?
-> 
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_init_shadow_npt_mmu);
-> >  
-> > -- 
-> > 2.31.1
-> > 
-> > 
+>
+>> the format should match host value in IA32_PERF_CAPABILITIES.
+>>
+>> Note, KVM legacy LBR solution accelerates guest perf performace by 
+>> LBR MSR
+>> passthrough so it requires guest cpu model matches that of host's, i.e.,
+>
+> Would you help add live migration support across host/guest CPU models 
+> when
+> hosts at both ends have the same number of LBR entries and the same 
+> lbr-fmt ?
+Yes, I'm working on this part for Arch LBR, then enable it for legacy 
+LBR as well.
+>
+> Thanks,
+> Like Xu
+>
+>> only -cpu host is supported.
+>>
+>> Change in v5:
+>>     1. This patchset is rebased on tip : 6621441db5
+>>     2. No functional change since v4.
