@@ -2,68 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A85764B1331
+	by mail.lfdr.de (Postfix) with ESMTP id F3E1C4B1332
 	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:42:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244579AbiBJQlo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 11:41:44 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53432 "EHLO
+        id S244607AbiBJQmb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 11:42:31 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244598AbiBJQln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:41:43 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750C2E9B
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:41:35 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso9211390pjg.0
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:41:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=P8SobZ7+Miez6h7a1z0f3HTmOU821ryoP/w2sQxVLj0=;
-        b=SyWVZHe9lUOk6jRLGrByGXCzQAmeQ5q2MJUJv6Llvtov0IstRDmX334S0GyRR6Kx21
-         L6ry59dqB1nAJkQevI9Ze34rJS75twuJOISPVuGfKF1RccghtdUOrFxtemvos5qg0lcV
-         8TtvAL4JTsqHFfTLj99TVBOfn/m9gY+Ax6j32pZd+SPMIVimVQRe6Xdy9U12HddpY2iM
-         p3bB9Okx307COlO4MXeOJ+NiqszhajoL42LW2x/ZcANVJ/53wURl5dYAY4YjHNsji7e0
-         5knmUWoiHNG/a0Zy7ZgX3u5PrKfPg2MTSO2jaGKJ6jf5jmGQXPgMFBdIQDSRaAm80RRR
-         FbvA==
+        with ESMTP id S244609AbiBJQm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 11:42:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AF76BF14
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:42:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644511330;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RFYbvPlaBCYjn1T1X1uUdnxkO0hSwtQKlrbztUTQuqo=;
+        b=PoRf1898gaaSuPfJzLywxDAbQBtM+dI6Ww1iHBz0KV8oLEKEaIygOx5MIqoQi/LiDZCBmP
+        phaL2LPNRL41zdu8D79taFmBYh9a18d6isot+02wsXa0Ba5x2kiIN7lxAWfP0gUlw+B5Ei
+        j3tlGJLCXBI1C39FRm9B3HsLS1/9Vdk=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-523-57NaMD5tMOWVrmk52_zwHA-1; Thu, 10 Feb 2022 11:42:08 -0500
+X-MC-Unique: 57NaMD5tMOWVrmk52_zwHA-1
+Received: by mail-ed1-f71.google.com with SMTP id en7-20020a056402528700b00404aba0a6ffso3683941edb.5
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:42:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=P8SobZ7+Miez6h7a1z0f3HTmOU821ryoP/w2sQxVLj0=;
-        b=SoHoiY1GG6mM3CROhk8mOnc7XKJwroYbf5dkqOhUL0PshbMr0RAbqTRsfciQw1435E
-         748oO3py3FFFMU/FNiYV3rzDsosIY17qmJXfZSE4xdklTyBq1ityGl9FFA018aoHUq+V
-         bWw2WDKaVCEGt3tv8N7Sp+Cj66RDB2amzBIMJRB2P2QnxsmazYT+Dv6e799FTwKkUota
-         THuKJk6rieOZVDKkkhBabAB2AcWJ8mg9V/p04TQZ2bUgmoctxhOFuZ11JNyBziDyWOZT
-         ytRbLz6EihJWIBlyskVuRNDkVTU8c7QdcOde6boMynK24HlWDvQBRJKKNIXQk/NmbFW9
-         dChA==
-X-Gm-Message-State: AOAM530LHDOS57ea3p1JfE5wa56NebcAQ6JuIOmguBtkteWx77IBWYZE
-        sQiaobS5F8eDb6jgy6/yB1lx9A==
-X-Google-Smtp-Source: ABdhPJwSALI+MDCmbBoJhUIPIQ+Eowpr1HkleDSUpcBAPM2qSEatcmM7FYDpC1YDN4ACxyQP2sQ2SQ==
-X-Received: by 2002:a17:90a:5d82:: with SMTP id t2mr3639673pji.65.1644511294828;
-        Thu, 10 Feb 2022 08:41:34 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id n42sm23964644pfv.29.2022.02.10.08.41.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 08:41:34 -0800 (PST)
-Date:   Thu, 10 Feb 2022 16:41:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/3] x86/emulator: Add some tests for
- far jmp instruction emulation
-Message-ID: <YgVAOuWPJhqyLbZJ@google.com>
-References: <cover.1644481282.git.houwenlong.hwl@antgroup.com>
- <9c1d2125cb8680aff8a69e04461c4d84edb85760.1644481282.git.houwenlong.hwl@antgroup.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=RFYbvPlaBCYjn1T1X1uUdnxkO0hSwtQKlrbztUTQuqo=;
+        b=ZAEdrbON72YbaCnOR7mhpdIanJwbSMYEMy2bREK6S5KRtoAGMPuxfDwM7/PyuD/4pp
+         mvi/ULuWNIhpsPDofmVjwsBmb3oB8iPyoKiCKurpqMIyarKGIuHy00BBRKVnazcc2zlD
+         7A6vQAWpw3B86u9X1IG5rnQaleXAFX2TxGW9yrY/nGLVypH+o27In+GitWtWjyWQaU39
+         FFBsYOLIHFffRzSvO/Bcy9PAwi4fiOvP7Gy0JDhu6D6PpUVHoCPTqikQ3sl42BCRuU8R
+         JO9q9pKxMyp5jM2rchp5SJoQqDMwbV0JUx5oHsxaj48OSB10O6YI4pT8jZtZVGUWHzsq
+         6zJw==
+X-Gm-Message-State: AOAM531eyumeT6KkyeWVukiW/8mhh/sK3jVD8xlpHfBCTqoKjq/MZ7TC
+        sZSPhq0YRd8jMytFQAOEZHs9wkRGrk8L/at13JgBTtuNEtJkxUt0BlCHQTqdRlyjwCB8J4ZPn96
+        j3vEJztKbLQoU
+X-Received: by 2002:a05:6402:1488:: with SMTP id e8mr9445733edv.456.1644511327595;
+        Thu, 10 Feb 2022 08:42:07 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzxci+g4KdlhQJdPQsHLDQyganMyA0JZJT4R8y9CBHPnperKe1p+kKa70UagPWCt1bMc0BN2Q==
+X-Received: by 2002:a05:6402:1488:: with SMTP id e8mr9445705edv.456.1644511327370;
+        Thu, 10 Feb 2022 08:42:07 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id j2sm7138173ejc.223.2022.02.10.08.42.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Feb 2022 08:42:06 -0800 (PST)
+Message-ID: <0ed5a95c-39d7-1139-4234-83b1857504b4@redhat.com>
+Date:   Thu, 10 Feb 2022 17:41:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9c1d2125cb8680aff8a69e04461c4d84edb85760.1644481282.git.houwenlong.hwl@antgroup.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH MANUALSEL 5.10 5/6] KVM: SVM: Don't kill SEV guest if SMAP
+ erratum triggers in usermode
+Content-Language: en-US
+To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Liam Merwick <liam.merwick@oracle.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, kvm@vger.kernel.org
+References: <20220209185714.48936-1-sashal@kernel.org>
+ <20220209185714.48936-5-sashal@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220209185714.48936-5-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,63 +85,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 10, 2022, Hou Wenlong wrote:
-> @@ -76,6 +96,17 @@ static struct far_xfer_test far_ret_test = {
->  		     : "eax", "memory");	\
->  })
->  
-> +#define TEST_FAR_JMP_ASM(seg, prefix)		\
-> +({						\
-> +	*(uint16_t *)(&fep_jmp_buf[1]) = seg;	\
-> +	asm volatile("lea 1f(%%rip), %%rax\n\t" \
-> +		     "movq $1f, (%[mem])\n\t"	\
-> +		      prefix "rex64 ljmp *(%[mem])\n\t"\
-> +		     "1:"			\
-> +		     : : [mem]"r"(fep_jmp_buf_ptr)\
-> +		     : "eax", "memory");	\
+On 2/9/22 19:57, Sasha Levin wrote:
+> From: Sean Christopherson <seanjc@google.com>
+> 
+> [ Upstream commit cdf85e0c5dc766fc7fc779466280e454a6d04f87 ]
 
-Align the backslashes for a given macro, even though it means the two TEST_FAR_*_ASM
-macros won't share alignment.  This needs an -fPIC tweak for the movq too, but this
-one is easy since RAX already holds what we want.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-With the below fixup...
+Paolo
 
-Reviewed-and-tested-by: Sean Christopherson <seanjc@google.com>
-
----
- x86/emulator.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/x86/emulator.c b/x86/emulator.c
-index 22a5c9d..56a263e 100644
---- a/x86/emulator.c
-+++ b/x86/emulator.c
-@@ -97,15 +97,15 @@ static unsigned long *fep_jmp_buf_ptr = &fep_jmp_buf[0];
- 		     : "eax", "memory");	\
- })
-
--#define TEST_FAR_JMP_ASM(seg, prefix)		\
--({						\
--	*(uint16_t *)(&fep_jmp_buf[1]) = seg;	\
--	asm volatile("lea 1f(%%rip), %%rax\n\t" \
--		     "movq $1f, (%[mem])\n\t"	\
--		      prefix "rex64 ljmp *(%[mem])\n\t"\
--		     "1:"			\
--		     : : [mem]"r"(fep_jmp_buf_ptr)\
--		     : "eax", "memory");	\
-+#define TEST_FAR_JMP_ASM(seg, prefix)			\
-+({							\
-+	*(uint16_t *)(&fep_jmp_buf[1]) = seg;		\
-+	asm volatile("lea 1f(%%rip), %%rax\n\t"		\
-+		     "movq %%rax, (%[mem])\n\t"		\
-+		      prefix "rex64 ljmp *(%[mem])\n\t"	\
-+		     "1:"				\
-+		     : : [mem]"r"(fep_jmp_buf_ptr)	\
-+		     : "eax", "memory");		\
- })
-
- struct regs {
-
-base-commit: 6bd9c4b6a79ed51c0e3e6a997654f4a9feb9c377
---
+> Inject a #GP instead of synthesizing triple fault to try to avoid killing
+> the guest if emulation of an SEV guest fails due to encountering the SMAP
+> erratum.  The injected #GP may still be fatal to the guest, e.g. if the
+> userspace process is providing critical functionality, but KVM should
+> make every attempt to keep the guest alive.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> Message-Id: <20220120010719.711476-10-seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>   arch/x86/kvm/svm/svm.c | 16 +++++++++++++++-
+>   1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index fa543c355fbdb..d515c8e68314c 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4155,7 +4155,21 @@ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int i
+>   			return true;
+>   
+>   		pr_err_ratelimited("KVM: SEV Guest triggered AMD Erratum 1096\n");
+> -		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+> +
+> +		/*
+> +		 * If the fault occurred in userspace, arbitrarily inject #GP
+> +		 * to avoid killing the guest and to hopefully avoid confusing
+> +		 * the guest kernel too much, e.g. injecting #PF would not be
+> +		 * coherent with respect to the guest's page tables.  Request
+> +		 * triple fault if the fault occurred in the kernel as there's
+> +		 * no fault that KVM can inject without confusing the guest.
+> +		 * In practice, the triple fault is moot as no sane SEV kernel
+> +		 * will execute from user memory while also running with SMAP=1.
+> +		 */
+> +		if (is_user)
+> +			kvm_inject_gp(vcpu, 0);
+> +		else
+> +			kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>   	}
+>   
+>   	return false;
 
