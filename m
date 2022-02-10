@@ -2,130 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 764874B12EC
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:37:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6700F4B12D2
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:34:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244310AbiBJQgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 11:36:54 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47076 "EHLO
+        id S244217AbiBJQeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 11:34:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244285AbiBJQgw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:36:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75892137
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644511012;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H+SJ/8jiWh1yqA7v50jSrldDjAEMOLgFk+1GemkI9co=;
-        b=OjKQjdvqI66HIhFDk+UAt1Ynn64KThZp7Ni3mzqrJz7J18HxnNw45kSFYey1i2Ah+ZrQnn
-        h1FVFcobbqqV/eu9SDF3LihzchklrUTuhB3Zrm/G5k0AGUGJ2mKKLwqJ+3pnBXzkcEoPog
-        TBTJEwe1VX79vdnz0l2UQRdgfWEFdr8=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-564-B_Avj9H_OrG1GBkytmBSNg-1; Thu, 10 Feb 2022 11:36:51 -0500
-X-MC-Unique: B_Avj9H_OrG1GBkytmBSNg-1
-Received: by mail-ej1-f72.google.com with SMTP id qo24-20020a170907213800b006c7479720ddso3006612ejb.2
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=H+SJ/8jiWh1yqA7v50jSrldDjAEMOLgFk+1GemkI9co=;
-        b=aYWf40lEtV8k5igiTLURfHAPjd3I796gSEe8scdOeMLzaIHNV2Bl/Q6gHIItuxmXLc
-         qMabNSbPmZU/8LhcBiFTIa4DNed0PnCfgKFqy3kkcQZABFqqCV1Pf3j+VbVVLYI96YFZ
-         CQI488t0m9gbjv71ZVQ6CDQGR9Vnp3LfUoBaCRnaFEpMijs7LKGFVO2iHTpNf0j0LeiM
-         LB3nbrF01WnlIlJzarIKbQ/Rl9oxfGQQGaHrk2Tho7vXkM6Wse87wgppNkbUdXq++UI7
-         4ikuNFdH1ndhntYsiaWuK9d6Ye6zHTlPcA7BxDsF22UKYsAasAWBO51GUolFNT5fS1Vd
-         70tw==
-X-Gm-Message-State: AOAM532jUKhr7zOEap+ysx2lzaVeu8neKpg4SCAae0TaGVd/P0iKGQb1
-        68YGK0CSxKpXa53cD6cAMNpIam9Q8ZzBDOSJ1/MYpuJHDpayapnagu1Cwi258wQR5PKkq1yJrj8
-        0ZenQ27FSSD1N
-X-Received: by 2002:a17:907:7e92:: with SMTP id qb18mr7386259ejc.555.1644511010333;
-        Thu, 10 Feb 2022 08:36:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxj9sY5pMOYIOBuRdGDDcyfQz6bxkiuJax77x8qRDfWDnHYKBW8dd3yXbZ6EKAQ5L3qvK4moA==
-X-Received: by 2002:a17:907:7e92:: with SMTP id qb18mr7386243ejc.555.1644511010094;
-        Thu, 10 Feb 2022 08:36:50 -0800 (PST)
-Received: from [192.168.10.118] ([93.56.170.240])
-        by smtp.googlemail.com with ESMTPSA id cz12sm4919441edb.30.2022.02.10.08.36.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 08:36:49 -0800 (PST)
-Message-ID: <7d142721-bdbc-1d82-64b5-9df4368f1c67@redhat.com>
-Date:   Thu, 10 Feb 2022 17:33:48 +0100
+        with ESMTP id S240006AbiBJQd7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 11:33:59 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45121128;
+        Thu, 10 Feb 2022 08:34:00 -0800 (PST)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21AEbdii022529;
+        Thu, 10 Feb 2022 16:34:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=g57ywYNBpp/+DdoeErzjbSZAtuE4dkfFN3FYvJUBMLo=;
+ b=e3BEUzV/Q+OIQ9IK78Vhw7WFsPrTNzmsHbyX7sjyaNqBoz3XW+1TXYUytfiB5BQQCYdJ
+ 7CDIKQuzV9USdqMyN0uQZmmB5VdK9hlKJ2r0NNEmsRgqGvQfk8VGo76SqP3k5xzvtdmX
+ pEj29m9trfONCYq+oihGGbRgJ4KV2p4Cp3l6NLeDxrfX8XEAgvlW0arjAXmVW45befnK
+ uuUddOYns3FUXQgHhmoejUlxE1DOJHDJWjRHAcgREexO/l/1xFecKwjM2N1u2GPKl6Gy
+ DjVjtDwqHkeToGQojCjDVA/dTq++7DHf+ESXU6F6Xw9Nj/dvOqqqznqLxhAKr5ElQVII rg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e529ty34k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Feb 2022 16:33:59 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21AGT4CW026795;
+        Thu, 10 Feb 2022 16:33:59 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e529ty33n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Feb 2022 16:33:59 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21AGW5U3030786;
+        Thu, 10 Feb 2022 16:33:56 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3e1gv9t3gu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Feb 2022 16:33:56 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21AGXqd943319738
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Feb 2022 16:33:52 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 181EEAE056;
+        Thu, 10 Feb 2022 16:33:52 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76E26AE051;
+        Thu, 10 Feb 2022 16:33:51 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.14.149])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Feb 2022 16:33:51 +0000 (GMT)
+Date:   Thu, 10 Feb 2022 17:33:49 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH v3 05/10] KVM: s390: Add optional storage key checking
+ to MEMOP IOCTL
+Message-ID: <20220210173349.6f498780@p-imbrenda>
+In-Reply-To: <0310d3c8-7dd3-a840-9c54-f4de35a6b465@linux.ibm.com>
+References: <20220209170422.1910690-1-scgl@linux.ibm.com>
+        <20220209170422.1910690-6-scgl@linux.ibm.com>
+        <0310d3c8-7dd3-a840-9c54-f4de35a6b465@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH MANUALSEL 5.16 6/8] KVM: SVM: Explicitly require
- DECODEASSISTS to enable SEV support
-Content-Language: en-US
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Liam Merwick <liam.merwick@oracle.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, kvm@vger.kernel.org
-References: <20220209185635.48730-1-sashal@kernel.org>
- <20220209185635.48730-6-sashal@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220209185635.48730-6-sashal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GP2VuSzmwQqpB84fZ39mu2cFTb0ax_jE
+X-Proofpoint-ORIG-GUID: PWueAQtlKzcTV8T18jX_f4cwyS6WwUJe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-10_07,2022-02-09_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ adultscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 clxscore=1015
+ phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202100087
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/9/22 19:56, Sasha Levin wrote:
-> From: Sean Christopherson <seanjc@google.com>
-> 
-> [ Upstream commit c532f2903b69b775d27016511fbe29a14a098f95 ]
-> 
-> Add a sanity check on DECODEASSIST being support if SEV is supported, as
-> KVM cannot read guest private memory and thus relies on the CPU to
-> provide the instruction byte stream on #NPF for emulation.  The intent of
-> the check is to document the dependency, it should never fail in practice
-> as producing hardware that supports SEV but not DECODEASSISTS would be
-> non-sensical.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-> Message-Id: <20220120010719.711476-5-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->   arch/x86/kvm/svm/sev.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index be28831412209..932afd713a02c 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2099,8 +2099,13 @@ void __init sev_hardware_setup(void)
->   	if (!sev_enabled || !npt_enabled)
->   		goto out;
->   
-> -	/* Does the CPU support SEV? */
-> -	if (!boot_cpu_has(X86_FEATURE_SEV))
-> +	/*
-> +	 * SEV must obviously be supported in hardware.  Sanity check that the
-> +	 * CPU supports decode assists, which is mandatory for SEV guests to
-> +	 * support instruction emulation.
-> +	 */
-> +	if (!boot_cpu_has(X86_FEATURE_SEV) ||
-> +	    WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_DECODEASSISTS)))
->   		goto out;
->   
->   	/* Retrieve SEV CPUID information */
+On Thu, 10 Feb 2022 12:59:03 +0100
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-NACK
+> On 2/9/22 18:04, Janis Schoetterl-Glausch wrote:
+> > User space needs a mechanism to perform key checked accesses when
+> > emulating instructions.
+> > 
+> > The key can be passed as an additional argument.
+> > Having an additional argument is flexible, as user space can
+> > pass the guest PSW's key, in order to make an access the same way the
+> > CPU would, or pass another key if necessary.
+> > 
+> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> > Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > ---
+> >  arch/s390/kvm/kvm-s390.c | 30 ++++++++++++++++++++----------
+> >  include/uapi/linux/kvm.h |  6 +++++-
+> >  2 files changed, 25 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index cf347e1a4f17..85763ec7bc60 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -32,6 +32,7 @@
+> >  #include <linux/sched/signal.h>
+> >  #include <linux/string.h>
+> >  #include <linux/pgtable.h>
+> > +#include <linux/bitfield.h>
+> >  
+> >  #include <asm/asm-offsets.h>
+> >  #include <asm/lowcore.h>
+> > @@ -2359,6 +2360,11 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+> >  	return r;
+> >  }
+> >  
+> > +static bool access_key_invalid(u8 access_key)
+> > +{
+> > +	return access_key > 0xf;
+> > +}
+> > +
+> >  long kvm_arch_vm_ioctl(struct file *filp,
+> >  		       unsigned int ioctl, unsigned long arg)
+> >  {
+> > @@ -4690,17 +4696,19 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
+> >  	void *tmpbuf = NULL;
+> >  	int r = 0;
+> >  	const u64 supported_flags = KVM_S390_MEMOP_F_INJECT_EXCEPTION
+> > -				    | KVM_S390_MEMOP_F_CHECK_ONLY;
+> > +				    | KVM_S390_MEMOP_F_CHECK_ONLY
+> > +				    | KVM_S390_MEMOP_F_SKEY_PROTECTION;
+> >  
+> >  	if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size)
+> >  		return -EINVAL;
+> > -
+> >  	if (mop->size > MEM_OP_MAX_SIZE)
+> >  		return -E2BIG;
+> > -
+> >  	if (kvm_s390_pv_cpu_is_protected(vcpu))
+> >  		return -EINVAL;
+> > -
+> > +	if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
+> > +		if (access_key_invalid(mop->key))
+> > +			return -EINVAL;  
+> 
+> I got this wrong unfortunately, we need to explicitly default to key 0, i.e.
+> +       } else {
+> +               mop->key = 0;
+> Same for the vm memop.
+> Didn't have a test case for this, yet.
+
+you can keep my r-b once you fix this (and the spurious include)
+
+> > +	}>  	if (!(mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY)) {
+> >  		tmpbuf = vmalloc(mop->size);
+> >  		if (!tmpbuf)
+> > @@ -4710,11 +4718,12 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
+> >  	switch (mop->op) {
+> >  	case KVM_S390_MEMOP_LOGICAL_READ:
+> >  		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> > -			r = check_gva_range(vcpu, mop->gaddr, mop->ar,
+> > -					    mop->size, GACC_FETCH, 0);
+> > +			r = check_gva_range(vcpu, mop->gaddr, mop->ar, mop->size,
+> > +					    GACC_FETCH, mop->key);
+> >  			break;
+> >  		}
+> > -		r = read_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
+> > +		r = read_guest_with_key(vcpu, mop->gaddr, mop->ar, tmpbuf,
+> > +					mop->size, mop->key);
+> >  		if (r == 0) {
+> >  			if (copy_to_user(uaddr, tmpbuf, mop->size))
+> >  				r = -EFAULT;
+> > @@ -4722,15 +4731,16 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
+> >  		break;
+> >  	case KVM_S390_MEMOP_LOGICAL_WRITE:
+> >  		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> > -			r = check_gva_range(vcpu, mop->gaddr, mop->ar,
+> > -					    mop->size, GACC_STORE, 0);
+> > +			r = check_gva_range(vcpu, mop->gaddr, mop->ar, mop->size,
+> > +					    GACC_STORE, mop->key);
+> >  			break;
+> >  		}
+> >  		if (copy_from_user(tmpbuf, uaddr, mop->size)) {
+> >  			r = -EFAULT;
+> >  			break;
+> >  		}
+> > -		r = write_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
+> > +		r = write_guest_with_key(vcpu, mop->gaddr, mop->ar, tmpbuf,
+> > +					 mop->size, mop->key);
+> >  		break;
+> >  	}
+> >    
+> 
+> [...]
 
