@@ -2,211 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FEA54B0E6E
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 14:29:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D2CC4B0F01
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 14:45:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242219AbiBJN3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 08:29:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56240 "EHLO
+        id S242334AbiBJNoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 08:44:07 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240857AbiBJN3k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 08:29:40 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABC3BC3;
-        Thu, 10 Feb 2022 05:29:41 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id l19so4418441pfu.2;
-        Thu, 10 Feb 2022 05:29:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=D4vX7U/4/eXLGsQNCnlpueeNeyw5JqB5wZkzYgsrDaY=;
-        b=cdWfI91117NwJqR2B5SCbKzBpPGa0QqYE304JWlS+gWSx2MRXzFNgpzYxYRVygNSR0
-         5gxneyPL4wXXeSiGe5ZjaGdgC0Agz45cUL7AE6R7egCsgQFaoRbgt1XfgGNR0sE+NRg7
-         XI3QTDEQ7VaD7f9szxFGuEgnkA26wqmKxqt2hQ0s2GCgN9c8lOX4+eYHDMhR+BcGk75p
-         7PWe3ZSpGkVdrp5XqP+rrevoA+NWpkAkVUhcetY4zJ9oWqB4+g9emUBhBH1T+YCp/NHG
-         l+Vnk6N2In8N40vO6WCUpYkJjzPcGT740YopPpfTTmAx4/mgAFRaKxNTyaVC9oWui8z+
-         ThKQ==
+        with ESMTP id S239398AbiBJNoG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 08:44:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A90CAC59
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 05:44:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644500646;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HukbEX1iLYdDJ31wYXwYp+eLvMjQ3m0iy3Hcm3qunp0=;
+        b=hApsUZO972oQt8XDfm0xnjnTmnBywvzB9wbFVZ/9CIivlgIrJ7vs3qlO9uHrq2hSIQUm0N
+        0CRNNZDy46k/yLQw7CL04ezPNsiSaAADJlJIs8629+3O9eX3FV4LkhkAcr0xdsq02oOoQR
+        w9U+uo/26XFMnt4rO6OFe4Drr/lvJvw=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-226-lNJXc6OGP4S4AIB70CVCkQ-1; Thu, 10 Feb 2022 08:44:05 -0500
+X-MC-Unique: lNJXc6OGP4S4AIB70CVCkQ-1
+Received: by mail-ej1-f72.google.com with SMTP id hr36-20020a1709073fa400b006cd2c703959so2733684ejc.14
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 05:44:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=D4vX7U/4/eXLGsQNCnlpueeNeyw5JqB5wZkzYgsrDaY=;
-        b=kZ9rm07Anv3bZP8SjYFeiuKES2gUAyQPTP4p1BUNixmCYxCOde78A1jyPd0jpWTEEA
-         vYM5t1JDGSKykPVe+8PLytEQ62qPdnUcGst5nZGDikeu3dbpknLkfuPDHJ47VXq8Img7
-         sLI2EYRGHrshIChlfqfvqMegJ7RrbOgUWu3NT5Dy7wfFR6SgFlTE08DQZ8xN3hFUKkfx
-         VL2MkxhXuSO9+6i1LMu/NskvN7I8BI8VO+PQg9xRqy7e6xMMWzbRAuaApp0d1mmQ7Cym
-         w6HLZZhMat/He+GjilxzGb/j8qSQPfnvCvGWNyHUMh3Df10AMBwvBSUq0IpPlk4U5qXV
-         VBpg==
-X-Gm-Message-State: AOAM530ORk7TYZuWJqPm8Bqw5Vt+nrsuq6Qenvi0efWno6aZMbmJxuAB
-        VYFY0fQYru/w3dYYd7F1vQw=
-X-Google-Smtp-Source: ABdhPJxWec9KpRNekvo5nTr/pCTVA8G2AQMZvpiDFiJZ3w3craV2P/nFkbqiFd+Sx8fxuQiiVQQhWA==
-X-Received: by 2002:a62:506:: with SMTP id 6mr7475568pff.86.1644499780909;
-        Thu, 10 Feb 2022 05:29:40 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h19sm23240746pfh.40.2022.02.10.05.29.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 05:29:39 -0800 (PST)
-Message-ID: <9a8f5f15-05fa-c512-bb96-165581d307b9@gmail.com>
-Date:   Thu, 10 Feb 2022 21:29:27 +0800
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=HukbEX1iLYdDJ31wYXwYp+eLvMjQ3m0iy3Hcm3qunp0=;
+        b=O6324ZS9EfshZlcV0dNLTwVxqOwH3vSqNW9/mcgUKgutuuhHEAqpdAZYZU46qJevYT
+         1OzxUBWYOS5OoziQmjLn/EPU9NHhzVqX/v7Ium7evncjDNsLgPwBLAaiaF9yXBlDlh6B
+         VNWL91WXlAuQeju29d6PfVm9hTwNw7hc1+Ty0kt6x0W4pZz7++ftVhjo1tAPLYoqhgYh
+         A9BqK7IPueoteGt3uPW5rEsvdHRqKzBGei4VNJ2wsbs8fnNHfYUmtRC5d3euW8Ln6G2D
+         /TgLEy7ZImk+l94axaKjS9tPTf0oPFsEAnQ/cjkEW9wTbEuTJ9iErK8iym9c26F3EtAV
+         oyZg==
+X-Gm-Message-State: AOAM531Zimdh5t6Ktw+BvouEr9CgDne5wag+ebuNYX39/3W07iuw13SR
+        7qU5374u9ZpHzT6+MvuoxvEyMdr5Bvsga05zKowbEd3NxWZAJ6XXiI7IlhXsJYmIjDdefdeZzyn
+        jllae3m2j9lrkSDNyABzF+P4fYP8nA5coDeral54yuaUON9ikMtBUW6hpulQxXSPp
+X-Received: by 2002:a17:907:6eac:: with SMTP id sh44mr6541911ejc.473.1644500644067;
+        Thu, 10 Feb 2022 05:44:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwsG5F95b3qoXWmkcozPYH9cLsI1PgOknid3fLwBvijBOTGZzV34fwk4HK8AYgRtyjioqVrOA==
+X-Received: by 2002:a17:907:6eac:: with SMTP id sh44mr6541885ejc.473.1644500643710;
+        Thu, 10 Feb 2022 05:44:03 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n24sm4005377ejb.23.2022.02.10.05.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Feb 2022 05:44:02 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: warning in kvm_hv_invalidate_tsc_page due to writes to guest
+ memory from VM ioctl context
+In-Reply-To: <87tud87xnr.fsf@redhat.com>
+References: <190b5932de7c61905d11c92780095a2caaefec1c.camel@redhat.com>
+ <87ee4d9yp3.fsf@redhat.com>
+ <060ce89597cfbc85ecd300bdd5c40bb571a16993.camel@redhat.com>
+ <87bkzh9wkd.fsf@redhat.com> <YgKjDm5OdSOKIdAo@google.com>
+ <87wni48b11.fsf@redhat.com> <YgPqV8EZFnENj41D@google.com>
+ <87tud87xnr.fsf@redhat.com>
+Date:   Thu, 10 Feb 2022 14:44:02 +0100
+Message-ID: <87iltm96ql.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-Content-Language: en-US
-To:     David Dunn <daviddunn@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Stephane Eranian <eranian@google.com>,
-        Dave Hansen <dave.hansen@intel.com>
-References: <20220117085307.93030-1-likexu@tencent.com>
- <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
- <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
- <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
- <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
- <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/2/2022 3:24 am, David Dunn wrote:
-> Dave,
-> 
-> In my opinion, the right policy depends on what the host owner and
-> guest owner are trying to achieve.
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-And more, who is the arbiter of the final resource allocation
-and who is the consumer of performance data.
-
-This is not a one-shot deal to cede the PMU to the guest or not.
-
-> 
-> If the PMU is being used to locate places where performance could be
-> improved in the system, there are two sub scenarios:
->     - The host and guest are owned by same entity that is optimizing
-> overall system.  In this case, the guest doesn't need PMU access and
-> better information is provided by profiling the entire system from the
-> host.
-
-It's not only about who the entity is but more about capabilities:
-
-Can we profile the entire system including normal guests, and at the same time,
-some guest PMU featurs are still available ? Isn't that a better thing?
-
->     - The host and guest are owned by different entities.  In this
-> case, profiling from the host can identify perf issues in the guest.
-> But what action can be taken?  The host entity must communicate issues
-> back to the guest owner through some sort of out-of-band information
-
-Uh, I'd like to public my pv-PMU idea (via static guest physical memory) and
-web subscription model to share un-core and off-core performance data to
-trusted guests.
-
-> channel.  On the other hand, preempting the host PMU to give the guest
-> a fully functional PMU serves this use case well.
-
-The idea of "preempting PMU from the host" that requires KVM to prioritize
-the PMU over any user on the host, was marked as a dead end by PeterZ.
-
-We need to actively restrict host behavior from grabbing guest pmu
-and in that case, "a fully functional guest PMU" serves well.
-
-> 
-> TDX and SGX (outside of debug mode) strongly assume different
-> entities.  And Intel is doing this to reduce insight of the host into
-> guest operations.  So in my opinion, preemption makes sense.
-
-Just like the TDX guest uses pCPU resources, this is isolated from
-host world, but only if the host scheduler allows it to happen.
-
-> 
-> There are also scenarios where the host owner is trying to identify
-> systemwide impacts of guest actions.  For example, detecting memory
-> bandwidth consumption or split locks.  In this case, host control
-
-or auto numa balance, bla bla...
-
-> without preemption is necessary.
-
-I have some POC code that allows both guest and host PMUs to work
-at the same time for completely different consumers of performance data.
-
-> 
-> To address these various scenarios, it seems like the host needs to be
-> able to have policy control on whether it is willing to have the PMU
-> preempted by the guest.
-
-The policy is the perf scheduling. The order is:
-
-CPU-pinned
-Task-pinned
-CPU-flexible
-Task-flexible
-
-There is nothing special about KVM in the perf semantics, which is an art.
-
-> 
-> But I don't see what scenario is well served by the current situation
-> in KVM.  Currently the guest will either be told it has no PMU (which
-> is fine) or that it has full control of a PMU.  If the guest is told
-> it has full control of the PMU, it actually doesn't.  But instead of
-> losing counters on well defined events (from the guest perspective),
-> they simply stop counting depending on what the host is doing with the
-> PMU.
-
-I do understand your annoyance very well, just as I did at first.
-
-> 
-> On the other hand, if we flip it around the semantics are more clear.
-> A guest will be told it has no PMU (which is fine) or that it has full
-> control of the PMU.  If the guest is told that it has full control of
-> the PMU, it does.  And the host (which is the thing that granted the
-> full PMU to the guest) knows that events inside the guest are not
-> being measured.  This results in all entities seeing something that
-> can be reasoned about from their perspective.
-
-If my comments helps you deliver some interesting code for vPMU,
-I'm looking forward to it. :D
-
-> 
-> Thanks,
-> 
-> Dave Dunn
-> 
-> On Wed, Feb 9, 2022 at 10:57 AM Dave Hansen <dave.hansen@intel.com> wrote:
-> 
->>> I was referring to gaps in the collection of data that the host perf
->>> subsystem doesn't know about if ATTRIBUTES.PERFMON is set for a TDX
->>> guest. This can potentially be a problem if someone is trying to
->>> measure events per unit of time.
+> Sean Christopherson <seanjc@google.com> writes:
+>
+>> On Wed, Feb 09, 2022, Vitaly Kuznetsov wrote:
+>>> Sean Christopherson <seanjc@google.com> writes:
+>>> 
+>>> > On Tue, Feb 08, 2022, Vitaly Kuznetsov wrote:
+>>> >> Maxim Levitsky <mlevitsk@redhat.com> writes:
+>>> >> > and hv-avic only mentions AutoEOI feature.
+>>> >> 
+>>> >> True, this is hidden in "The enlightenment allows to use Hyper-V SynIC
+>>> >> with hardware APICv/AVIC enabled". Any suggestions on how to improve
+>>> >> this are more than welcome!.
+>>> >
+>>> > Specifically for the WARN, does this approach makes sense?
+>>> >
+>>> > https://lore.kernel.org/all/YcTpJ369cRBN4W93@google.com
+>>> 
+>>> (Sorry for missing this dicsussion back in December)
+>>> 
+>>> It probably does but the patch just introduces
+>>> HV_TSC_PAGE_UPDATE_REQUIRED flag and drops kvm_write_guest() completely,
+>>> the flag is never reset and nothing ever gets written to guest's
+>>> memory. I suppose you've forgotten to commit a hunk :-)
 >>
->> Ahh, that makes sense.
+>> I don't think so, the idea is that kvm_hv_setup_tsc_page() handles the write.
 >>
->> Does SGX cause problem for these people?  It can create some of the same
->> collection gaps:
->>
->>          performance monitoring activities are suppressed when entering
->>          an opt-out (of performance monitoring) enclave.
+
+...
+
+>
+> but I'll have to refresh my memory on the problematic migration scenario
+> when kvm_hv_invalidate_tsc_page() got introduced.
+
+I've smoke-tested your patch with both selftests and Win10+WSL2
+migration and nothing blew up. I, however, don't quite like the idea to
+make HV_TSC_PAGE_UPDATE_REQUIRED a bit flag which is orthogonal to all
+other HV_TSC_PAGE_ state machine states. E.g. we have the following in
+get_time_ref_counter():
+
+  if (hv->hv_tsc_page_status != HV_TSC_PAGE_SET)
+          return div_u64(get_kvmclock_ns(kvm), 100);
+
+the following in tsc_page_update_unsafe():
+
+  return (hv->hv_tsc_page_status != HV_TSC_PAGE_GUEST_CHANGED) &&
+          hv->hv_tsc_emulation_control;
+
+and the followin in what's now kvm_hv_request_tsc_page_update():
+
+  if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
+      hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
+      tsc_page_update_unsafe(hv))
+          goto out_unlock;
+
+and while I don't see how HV_TSC_PAGE_UPDATE_REQUIRED breaks any of
+these, it cetainly takes an extra effort to understand these checks as
+we're now comparing something more than just a state machine's state.
+Same goes to all assignments to hv->hv_tsc_page_status:
+HV_TSC_PAGE_UPDATE_REQUIRED gets implicitly overwritten (i.e. we're not
+just switching from state A to state B, we're also clearing the
+flag). Again, I don't see how is this incorrect, just unnecessary
+complicated (and that's what get me confused when I said you're missing
+something in your patch!). 
+
+In case making HV_TSC_PAGE_UPDATE_REQUIRED a real state (or, actually,
+several new states) is too cumbersome I'd suggest to explore two
+options:
+- adding helpers to set/check hv->hv_tsc_page_status and making
+HV_TSC_PAGE_UPDATE_REQUIRED clearing/masking explicit.
+- adding a boolean (e.g. "tsc_page_update_required") to 'struct kvm_hv'.
+
+-- 
+Vitaly
+
