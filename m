@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8324B143B
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 18:30:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 233FD4B1473
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 18:43:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239851AbiBJRae (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 12:30:34 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42010 "EHLO
+        id S245265AbiBJRnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 12:43:11 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238085AbiBJRad (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 12:30:33 -0500
+        with ESMTP id S238232AbiBJRnK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 12:43:10 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7B0692611
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 09:30:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1E8EB192
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 09:43:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644514232;
+        s=mimecast20190719; t=1644514990;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ipC35w792dvxJk0OyBY7gcESXN0lGemMDfsvs+ruGts=;
-        b=PgZS2bo76IOXJ8difk7giJt3uSk9LdmCy/+A1RhRkA0wsWyfdEFOSsQELauOYjNIkLQw21
-        0YJSzDEukXbzrNYb08R1z/GVH/lODYZtfyN32ZV5fx6aAAkLOG50rSqQ1+WThqWKJdnJvr
-        su56TS3SvDetOAMbKPTCyKbLQU5b8VQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=l/BBZqEoVfgrKabodXFBIfVfpq8FM92AHBedmxW/K9E=;
+        b=Ie9G2HPtAKVSAEIcfInoE5ALNo6uWflVIFlj+duFdB76nem09Ewr9yn5JvWhylDytu7INp
+        9dD+rjZPMVZkeiucrjC/nZF+tjuyCMdT64udZYcKoQZWzYHih36iHUTTKOrB952DegyqsJ
+        a2KuieNsqw+RhbDmH2ASzi5NySiAG9o=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-104-6NlaV0OiME6iZUrxvyypOw-1; Thu, 10 Feb 2022 12:30:31 -0500
-X-MC-Unique: 6NlaV0OiME6iZUrxvyypOw-1
-Received: by mail-ed1-f72.google.com with SMTP id dn20-20020a05640222f400b0040f8cdfb542so3736542edb.3
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 09:30:30 -0800 (PST)
+ us-mta-108-_j0yYoETN2m2Fj-rbjdS3g-1; Thu, 10 Feb 2022 12:43:04 -0500
+X-MC-Unique: _j0yYoETN2m2Fj-rbjdS3g-1
+Received: by mail-ej1-f69.google.com with SMTP id aj9-20020a1709069a4900b006cd205be806so3069737ejc.18
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 09:43:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=ipC35w792dvxJk0OyBY7gcESXN0lGemMDfsvs+ruGts=;
-        b=DvY5m5mOA52tLmLanSG8tta2sihKV7U4jIkaBtc6+UgIibuconOWILGDepLPoJs8TE
-         9e5sThZkSPnJfBgQfPunQwQquWihYD1BcRiOSYFDwcGvDwK8K7jb0LJtu3CproqayP4Z
-         ChxwN16QouFHKqUKAI3yzId3T2DwFjFGRRjgOSENAO+bRUUg06RsqJYjz5qzrY/GdIvd
-         Cu1TgdTYxZsSxwpWErpqyDfZtYX5W+ZAvu29F3s9LsmfUHWu5Uk82EqBQo3kmuhEa/hL
-         AHiYdS/yQwrxn9oiDL1juYY9RqTNbTaO0Kp4iE5b0ZGxoRLbByt8vgXWp/HjbnucJSVC
-         7X6A==
-X-Gm-Message-State: AOAM533/1cyZZDZPIEDF/8isC8Ji9XSsm9EQ1kL1ya+olpPJMlGqQNWU
-        qjpAXm4O0Yt24iW52RPSYirAr1d5eDsom12m/lLz3xUHFil+W87JWBcsibl20qeX+UiAIOvgpaP
-        KBT9nPFdjtdp4
-X-Received: by 2002:a05:6402:2708:: with SMTP id y8mr9445642edd.409.1644514229895;
-        Thu, 10 Feb 2022 09:30:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw+5gAesk8y5CJUhwsjQvRSPjVku04l37Bvzlnqcvt9dX9PJwsr+KeQ7sLPZ30dz1n51krz+w==
-X-Received: by 2002:a05:6402:2708:: with SMTP id y8mr9445622edd.409.1644514229627;
-        Thu, 10 Feb 2022 09:30:29 -0800 (PST)
+        bh=l/BBZqEoVfgrKabodXFBIfVfpq8FM92AHBedmxW/K9E=;
+        b=seCAJWqhH5LBO2ZIf6b4o/HCZ0tSu8F3XPtl6YOdiwLAr+hAVGEbpyKTdCOTWLfFFD
+         6ZKXR2g4xKB3qmjdGovSo7YTvqWqF++6SEcXbhgfzb1LGLMA9v6kjCudzdJLQlOoUQJH
+         QeKWpbw9b3tK4Ql1JSKn85Dus0l6TrpUC2nLXKyQigp0eF73fTxuG6gGEgKAAxbhb0G2
+         +6C1MeVutNSBOZwlMDw+W6mkfXHUbGLVTwiPjA3CSe9KazXmCQlkeYDMmuDvcsQEYnKZ
+         e9tJBWbQPnNpNWQ9Tb+lqxESOcG0F91RaKqiT++n7fEREXQE3TmB2VjlChunvBFU9Itn
+         rlkw==
+X-Gm-Message-State: AOAM532ssSaMwu4xd5heEyE5toZ32K2F/6jYG4mQEvChTFsc9xQk+Age
+        7H00Xwap19GYJH6SJaoMUcPRn+VG5vVsITJ6dcXX560+IHhKTna+b21bykme3zFh13ZBIBYjKIX
+        2fIJf4tMT+/jf
+X-Received: by 2002:a17:907:7292:: with SMTP id dt18mr6977860ejc.667.1644514982869;
+        Thu, 10 Feb 2022 09:43:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxKjfhznrr9laZMtcRaScaaUKLhriNA5xwcpXInITqCA6iv3CF/yPelg05zk1+mdpH7+t1itQ==
+X-Received: by 2002:a17:907:7292:: with SMTP id dt18mr6977851ejc.667.1644514982705;
+        Thu, 10 Feb 2022 09:43:02 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id yz13sm5164078ejb.209.2022.02.10.09.30.24
+        by smtp.googlemail.com with ESMTPSA id z22sm8979452edq.9.2022.02.10.09.43.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 09:30:28 -0800 (PST)
-Message-ID: <344042cf-099e-5e26-026a-c42d0825488e@redhat.com>
-Date:   Thu, 10 Feb 2022 18:30:19 +0100
+        Thu, 10 Feb 2022 09:43:01 -0800 (PST)
+Message-ID: <88d3f309-9424-9035-b2ef-88c5d7fb088f@redhat.com>
+Date:   Thu, 10 Feb 2022 18:43:00 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH 00/23] KVM: MMU: MMU role refactoring
+Subject: Re: [PATCH 07/23] KVM: MMU: remove kvm_mmu_calc_root_page_role
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com, vkuznets@redhat.com
 References: <20220204115718.14934-1-pbonzini@redhat.com>
- <YgGmgMMR0dBmjW86@google.com> <YgGq31edopd6RMts@google.com>
- <CALzav=d05sMd=ARkV+GMf9SkxKcg9c9n5ttb274M2fZrP27PDA@mail.gmail.com>
- <YgRmXDn7b8GQ+VzX@google.com>
- <40930834-8f54-4701-d3ec-f8287bc1333f@redhat.com>
- <YgVDfG1DvUdXnd2n@google.com>
+ <20220204115718.14934-8-pbonzini@redhat.com> <YgRgrCxLM0Ctfwrj@google.com>
+ <1e8c38eb-d66a-60e7-9432-eb70e7ec1dd4@redhat.com>
+ <YgVLkgwBRy+JXZiH@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YgVDfG1DvUdXnd2n@google.com>
+In-Reply-To: <YgVLkgwBRy+JXZiH@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -87,28 +83,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/10/22 17:55, Sean Christopherson wrote:
->> 	union kvm_mmu_page_role root_role;
->> 	union kvm_mmu_paging_mode cpu_mode;
->
-> I'd prefer to not use "paging mode", the SDM uses that terminology to refer to
-> the four paging modes.  My expectation given the name is that the union would
-> track only CR0.PG, EFER.LME, CR4.PAE, and CR4.PSE[*].
+On 2/10/22 18:29, Sean Christopherson wrote:
+> On Thu, Feb 10, 2022, Paolo Bonzini wrote:
+>> On 2/10/22 01:47, Sean Christopherson wrote:
+>>> The nested mess is likely easily solved, I don't see any obvious issue with swapping
+>>> the order.  But I still don't love the subtlety.  I do like shaving cycles, just
+>>> not the subtlety...
+>>
+>> Not so easily, but it's doable and it's essentially what I did in the other
+>> series (the one that reworks the root cache).
+> 
+> Sounds like I should reveiw that series first?
 
-Yeah, I had started with kvm_mmu_paging_flags, but cpu_flags was an even 
-worse method than kvm_mmu_paging_mode.
+Yeah, this one is still a nice step in the direction of guest pt walk 
+from shadow pt build(*), but with no immediate use for TDP MMU root reuse.
 
-Anyway, now that I have done _some_ replacement, it's a matter of sed -i 
-on the patch files once you or someone else come up with a good moniker.
-
-I take it that "root_role" passed your filter successfully.
+The original idea was to use the MMU role to decide whether to do 
+kvm_mmu_unload(), but that would have still been a bandaid---inefficient 
+and a bad idea overall.  Patches 6+7 of this series (once fixed, because 
+they were buggy as hell) turned out to be enough to tame the PGD cache 
+and remove kvm_mmu_unload() altogether from kvm_mmu_reset_context().
 
 Paolo
 
-> I'm out of ideas at the moment, I'll keep chewing on this while reviewing...
-> 
-> [*] Someone at Intel rewrote the SDM and eliminated Mode B, a.k.a. PSE 36-bit
-> physical paging, it's now just part of "32-bit paging".  But 5-level paging is
-> considered it's own paging mode?!?!  Lame.  I guess they really want to have
-> exactly four paging modes...
+(*) Your idea of detecting stale roots is quite easily implemented on 
+top of these, for example, because a root is stale if and only if the 
+root_role changes.
 
