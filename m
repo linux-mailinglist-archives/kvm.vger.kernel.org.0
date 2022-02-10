@@ -2,187 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA89B4B134A
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:43:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD0824B1366
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:48:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244628AbiBJQmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 11:42:53 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55396 "EHLO
+        id S243925AbiBJQsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 11:48:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244671AbiBJQmu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:42:50 -0500
+        with ESMTP id S244962AbiBJQsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 11:48:15 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 979EAE97
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:42:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 222469F
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:48:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644511355;
+        s=mimecast20190719; t=1644511695;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y4Ac6XF4HP0Mqen8lxd/lGplaxbe1LsFAya7FwhDOWs=;
-        b=FcMewjfRa9iO3+5wI/Zm2qJalj/8BUUHPvhVPsZA3fPbAsMuVeAFVFpHIWqOk/01v4j8Vj
-        YkxN3+QfHsSqzKlhTqqiJJdCxAOBhoRlW+mIHQMwQudqvlugQQmeF2kFfL+KveTwICnJqR
-        5yicqcAmZw+8dEcOSKnIqfXxkDkdH8M=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=53BPBlXQ9S5Ov+amkvoqYiyiQymDxhLzSDn632g3AnI=;
+        b=TqQCAEFvVu2MN5IrnUqyRUIB3OC6sQ2O+rt3S0dNNM7lkrQ2VaPcpFIFxlj3pgXymt4KoN
+        v55Oyao0ikkeC8Dg/5UycuK/kExBgqAZ4fCRQx4TWG/ufhAP9Izek0Dqkh4nz3I6bJ794d
+        bILgDDoUSdqX1LRzbAOI/KubtoxzN/g=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-480-8YJtJF9IOqOHNVb8CiBhFw-1; Thu, 10 Feb 2022 11:42:34 -0500
-X-MC-Unique: 8YJtJF9IOqOHNVb8CiBhFw-1
-Received: by mail-ed1-f72.google.com with SMTP id b26-20020a056402139a00b004094fddbbdfso3674985edv.12
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:42:34 -0800 (PST)
+ us-mta-634-LOwoeLqEN-K8l9KiD0h25g-1; Thu, 10 Feb 2022 11:48:14 -0500
+X-MC-Unique: LOwoeLqEN-K8l9KiD0h25g-1
+Received: by mail-oi1-f198.google.com with SMTP id q10-20020a056808200a00b002cefffffe5eso1485101oiw.11
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:48:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=y4Ac6XF4HP0Mqen8lxd/lGplaxbe1LsFAya7FwhDOWs=;
-        b=Dyv39EvQNVDyMxZw/TnQVYJLnzayWm+f43VQDQ/7t6ExCJkAusCBrMnjN8DtLGVWpz
-         W76vRM7xhdMg+jzmWsFcQWGqRCNmkH/cGP3Deoj8y/LR/nrIPicRM7hKBOKoPYPcZ4OQ
-         5EA+HRy5tbynicBGe4Jm1ZtfRUAxC8LBnYhrwXOdpGbl3HAfmFavxI0zw2LTMHa4qwbn
-         vbvKDijJuf3WUPg8W8whzkXIUQyh4K9CQtDx+H7w2s5O11iQLmJhRY3MmJ01SP2LvefG
-         N2QI01IgdxcdtNreXZJm+3VqiY4nWahwj8cF+0esigfFa8KuU4MXc/qbRjYo8qXiqo/2
-         ysvg==
-X-Gm-Message-State: AOAM532czu+gnhzw0lGyGrj22XoNiGpgvFioAY0B5PFx3epVHgOzfK6u
-        vvRUTRdS+5YXSU16k6B5wz8Tq+2zgdjDuJ7nf3enu6oVrHJi37vMj12Lft8bSZDTgwHe5DWC+Jb
-        bbvpZdAHyT/Pm
-X-Received: by 2002:a05:6402:124a:: with SMTP id l10mr8986538edw.237.1644511352886;
-        Thu, 10 Feb 2022 08:42:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzQ41LAYYSNrmAdji60FgHmRAuft1HoXk2n9c2tJe7U43nrjhJ21BvaTfpCiJXHRm9uyCJlcw==
-X-Received: by 2002:a05:6402:124a:: with SMTP id l10mr8986523edw.237.1644511352674;
-        Thu, 10 Feb 2022 08:42:32 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id h19sm5754121ejc.126.2022.02.10.08.42.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 08:42:32 -0800 (PST)
-Message-ID: <b1aa66c6-8a5d-d38f-175c-3320fe1d1854@redhat.com>
-Date:   Thu, 10 Feb 2022 17:42:30 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=53BPBlXQ9S5Ov+amkvoqYiyiQymDxhLzSDn632g3AnI=;
+        b=gwN6FhMQuB7LXBRMuR4hR48KXBrrcnXAOCkq5Jh0yLlzNjZPYIwQOEJ1w1FKqrfNsL
+         QKcN19u5AcDLMUxCdcbRHQ6kdO11BJ0HRODJOfWWnDIGVyDTmzhpEMUL0pM3Itf9Ezkq
+         PDybJQvQfu8XUeccfBEORiKrgjR0FvDbbMXRwaAa9+e7eErdgy64wxF29BoXRwgwBiBt
+         8d/Rpe0u8sCNqEN3rZ0/hA5yjrfkxU7YXRp3od0vpEwbmds2NPwReZ9ucrbfTfdygvRp
+         JGzzakGqkJgZ+4/mno0LsTdlL8xzlFRss4n3q8UNyozCtNNr+Sr3iPQtnlOVGWMBCz/L
+         XscA==
+X-Gm-Message-State: AOAM532P8XoRydNXtCP7EVzJulqEvlExwfO676pTg8uw6luuPDR20ANr
+        ZDCq7XO/kopswCiZUvcMlgasG/bChLkU0q3pKfucuNDb06T5n98m9R3hiNbi7O2Aqy2w0ZOSSbD
+        qF/UV7Cny1LcX
+X-Received: by 2002:a05:6870:12d7:: with SMTP id 23mr1060321oam.133.1644511693325;
+        Thu, 10 Feb 2022 08:48:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxwwaQd00a+1hW/QSYxWvHGo3F2y4/ysYql9KJVOGrs/Tngz3B2WZGdj9eeXOUi+BnYh8YJDA==
+X-Received: by 2002:a05:6870:12d7:: with SMTP id 23mr1060313oam.133.1644511693125;
+        Thu, 10 Feb 2022 08:48:13 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id el40sm9398252oab.22.2022.02.10.08.48.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Feb 2022 08:48:12 -0800 (PST)
+Date:   Thu, 10 Feb 2022 09:48:11 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V7 mlx5-next 14/15] vfio/mlx5: Use its own PCI
+ reset_done error handler
+Message-ID: <20220210094811.0f95fbd8.alex.williamson@redhat.com>
+In-Reply-To: <20220209023918.GO4160@nvidia.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+        <20220207172216.206415-15-yishaih@nvidia.com>
+        <20220208170801.39dab353.alex.williamson@redhat.com>
+        <20220209023918.GO4160@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH MANUALSEL 5.16 7/8] KVM: VMX: Set vmcs.PENDING_DBG.BS on
- #DB in STI/MOVSS blocking shadow
-Content-Language: en-US
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alexander Graf <graf@amazon.de>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, kvm@vger.kernel.org
-References: <20220209185635.48730-1-sashal@kernel.org>
- <20220209185635.48730-7-sashal@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220209185635.48730-7-sashal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/9/22 19:56, Sasha Levin wrote:
-> From: Sean Christopherson <seanjc@google.com>
-> 
-> [ Upstream commit b9bed78e2fa9571b7c983b20666efa0009030c71 ]
+On Tue, 8 Feb 2022 22:39:18 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> On Tue, Feb 08, 2022 at 05:08:01PM -0700, Alex Williamson wrote:
+> > > @@ -477,10 +499,34 @@ static int mlx5vf_pci_get_device_state(struct vfio_device *vdev,
+> > >  
+> > >  	mutex_lock(&mvdev->state_mutex);
+> > >  	*curr_state = mvdev->mig_state;
+> > > -	mutex_unlock(&mvdev->state_mutex);
+> > > +	mlx5vf_state_mutex_unlock(mvdev);
+> > >  	return 0;  
+> > 
+> > I still can't see why it wouldn't be a both fairly trivial to implement
+> > and a usability improvement if the unlock wrapper returned -EAGAIN on a
+> > deferred reset so we could avoid returning a stale state to the user
+> > and a dead fd in the former case.  Thanks,  
+> 
+> It simply is not useful - again, we always resolve this race that
+> should never happen as though the two events happened consecutively,
+> which is what would normally happen if we could use a simple mutex. We
+> do not need to add any more complexity to deal with this already
+> troublesome thing..
 
-Paolo
+So walk me through how this works with QEMU, it's easy to hand-wave
+userspace race and move on, but device reset can be triggered by guest
+behavior while migration is supposed to be transparent to the guest.
+These are essentially asynchronous threads where we're imposing a
+synchronization point or lots of double checking in userspace whether
+the device actually entered the state we think it did and if the
+returned FD is usable.
 
-> 
-> Set vmcs.GUEST_PENDING_DBG_EXCEPTIONS.BS, a.k.a. the pending single-step
-> breakpoint flag, when re-injecting a #DB with RFLAGS.TF=1, and STI or
-> MOVSS blocking is active.  Setting the flag is necessary to make VM-Entry
-> consistency checks happy, as VMX has an invariant that if RFLAGS.TF is
-> set and STI/MOVSS blocking is true, then the previous instruction must
-> have been STI or MOV/POP, and therefore a single-step #DB must be pending
-> since the RFLAGS.TF cannot have been set by the previous instruction,
-> i.e. the one instruction delay after setting RFLAGS.TF must have already
-> expired.
-> 
-> Normally, the CPU sets vmcs.GUEST_PENDING_DBG_EXCEPTIONS.BS appropriately
-> when recording guest state as part of a VM-Exit, but #DB VM-Exits
-> intentionally do not treat the #DB as "guest state" as interception of
-> the #DB effectively makes the #DB host-owned, thus KVM needs to manually
-> set PENDING_DBG.BS when forwarding/re-injecting the #DB to the guest.
-> 
-> Note, although this bug can be triggered by guest userspace, doing so
-> requires IOPL=3, and guest userspace running with IOPL=3 has full access
-> to all I/O ports (from the guest's perspective) and can crash/reboot the
-> guest any number of ways.  IOPL=3 is required because STI blocking kicks
-> in if and only if RFLAGS.IF is toggled 0=>1, and if CPL>IOPL, STI either
-> takes a #GP or modifies RFLAGS.VIF, not RFLAGS.IF.
-> 
-> MOVSS blocking can be initiated by userspace, but can be coincident with
-> a #DB if and only if DR7.GD=1 (General Detect enabled) and a MOV DR is
-> executed in the MOVSS shadow.  MOV DR #GPs at CPL>0, thus MOVSS blocking
-> is problematic only for CPL0 (and only if the guest is crazy enough to
-> access a DR in a MOVSS shadow).  All other sources of #DBs are either
-> suppressed by MOVSS blocking (single-step, code fetch, data, and I/O),
-> are mutually exclusive with MOVSS blocking (T-bit task switch), or are
-> already handled by KVM (ICEBP, a.k.a. INT1).
-> 
-> This bug was originally found by running tests[1] created for XSA-308[2].
-> Note that Xen's userspace test emits ICEBP in the MOVSS shadow, which is
-> presumably why the Xen bug was deemed to be an exploitable DOS from guest
-> userspace.  KVM already handles ICEBP by skipping the ICEBP instruction
-> and thus clears MOVSS blocking as a side effect of its "emulation".
-> 
-> [1] http://xenbits.xenproject.org/docs/xtf/xsa-308_2main_8c_source.html
-> [2] https://xenbits.xen.org/xsa/advisory-308.html
-> 
-> Reported-by: David Woodhouse <dwmw2@infradead.org>
-> Reported-by: Alexander Graf <graf@amazon.de>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20220120000624.655815-1-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->   arch/x86/kvm/vmx/vmx.c | 25 +++++++++++++++++++++++++
->   1 file changed, 25 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 7f4e6f625abcf..fe4a36c984460 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4811,8 +4811,33 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->   		dr6 = vmx_get_exit_qual(vcpu);
->   		if (!(vcpu->guest_debug &
->   		      (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))) {
-> +			/*
-> +			 * If the #DB was due to ICEBP, a.k.a. INT1, skip the
-> +			 * instruction.  ICEBP generates a trap-like #DB, but
-> +			 * despite its interception control being tied to #DB,
-> +			 * is an instruction intercept, i.e. the VM-Exit occurs
-> +			 * on the ICEBP itself.  Note, skipping ICEBP also
-> +			 * clears STI and MOVSS blocking.
-> +			 *
-> +			 * For all other #DBs, set vmcs.PENDING_DBG_EXCEPTIONS.BS
-> +			 * if single-step is enabled in RFLAGS and STI or MOVSS
-> +			 * blocking is active, as the CPU doesn't set the bit
-> +			 * on VM-Exit due to #DB interception.  VM-Entry has a
-> +			 * consistency check that a single-step #DB is pending
-> +			 * in this scenario as the previous instruction cannot
-> +			 * have toggled RFLAGS.TF 0=>1 (because STI and POP/MOV
-> +			 * don't modify RFLAGS), therefore the one instruction
-> +			 * delay when activating single-step breakpoints must
-> +			 * have already expired.  Note, the CPU sets/clears BS
-> +			 * as appropriate for all other VM-Exits types.
-> +			 */
->   			if (is_icebp(intr_info))
->   				WARN_ON(!skip_emulated_instruction(vcpu));
-> +			else if ((vmx_get_rflags(vcpu) & X86_EFLAGS_TF) &&
-> +				 (vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
-> +				  (GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS)))
-> +				vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS,
-> +					    vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS) | DR6_BS);
->   
->   			kvm_queue_exception_p(vcpu, DB_VECTOR, dr6);
->   			return 1;
+Specifically, I suspect we can trigger this race if the VM reboots as
+we're initiating a migration in the STOP_COPY phase, but that's maybe
+less interesting if we expect the VM to be halted before the device
+state is stepped.  More interesting might be how a PRE_COPY transition
+works relative to asynchronous VM resets triggering device resets.  Are
+we serializing all access to reset vs this DEVICE_FEATURE op or are we
+resorting to double checking the device state, and how do we plan to
+re-initiate migration states if a VM reset occurs during migration?
+Thanks,
+
+Alex
 
