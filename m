@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 399194B0317
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:09:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26D514B0268
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 02:32:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232179AbiBJCI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 21:08:56 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55296 "EHLO
+        id S232834AbiBJBbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 20:31:53 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:38510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235872AbiBJCIl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 21:08:41 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27799B07
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 18:08:35 -0800 (PST)
+        with ESMTP id S232684AbiBJBbn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 20:31:43 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37C81A0
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:31:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=EPVVj8e5VYc/sxbpTFSedbue+iktt5ulk1qYFSL0wR4=; b=gVCywl6q+o+dD7XBDboVDhrtd9
-        lrsCEzfo80qqxnVR1ty55VgUIabx91Z3RFKeF8lrhlOO/nBzq4VAmATUEE+GcOtktBgnIqmobOv1j
-        ncps3rDVEgRnj70ostGughl87Z+c3Aqt9fofiqATyM+7XFrkE2fH5Go4B15XsZymWI11kCEOzE7t3
-        wGwDpAqThAjHL/UhnjdOOnGJA8vXRfYdGsjigLO/KXgTcHpz84sJeH+pyzD9oHVYALPWM48UWFc1l
-        tRdGGj6Umc2begwfgIgiBUh2Q/DwtOQoumU9Iw7h9RLdYd5SmjPc2aPfS+VWhwo80gt63rZ0nbnRe
-        oogzri0A==;
+        bh=mELgNS1+ruG4c62o2IDV3AR0D1jff1f/1QgrgjYj/SU=; b=HpPbvpEj82nGjGCSz5U3QL1GSx
+        NaHsKsMUQCQIYxeEDJ4Kp1q+GU93U3C46iQplpu3n51tOuWutaGreZlG6nwlDqQK5qtrHjhTgHEBx
+        hpYh/HcYoSEfkB8b44m/7q2Dl6oZhCYUgi09ONVeVg9h08yomflxPyafYg18hVkJjCvsKIBSnY+DP
+        lQp293ZxPxSRJsYtG/ExQVq8eWVnYmPdIdvAbPuNM7CXi4ICUqquYRwK6/Sl/LZcCohYRe8d4b2K9
+        hpsfyHz37Pk6T+wqUJ4ovQKAH/oiPSe4KVLHR2i1JLdJn8viSlMJIjmr+bDoWCDXSQ7ssMoHjJMzL
+        GC759Ycw==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHxIy-008YWE-7w; Thu, 10 Feb 2022 00:27:24 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nHxIy-008xl2-FD; Thu, 10 Feb 2022 00:27:24 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHxIx-0019Co-Vc; Thu, 10 Feb 2022 00:27:23 +0000
+        id 1nHxIy-0019Ct-0G; Thu, 10 Feb 2022 00:27:24 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,16 +40,16 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v0 02/15] KVM: x86/xen: Use gfn_to_pfn_cache for runstate area
-Date:   Thu, 10 Feb 2022 00:27:08 +0000
-Message-Id: <20220210002721.273608-3-dwmw2@infradead.org>
+Subject: [PATCH v0 03/15] KVM: x86: Use gfn_to_pfn_cache for pv_time
+Date:   Thu, 10 Feb 2022 00:27:09 +0000
+Message-Id: <20220210002721.273608-4-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20220210002721.273608-1-dwmw2@infradead.org>
 References: <20220210002721.273608-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -62,261 +62,156 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
+Add a new kvm_setup_guest_pvclock() which parallels the existing
+kvm_setup_pvclock_page(). The latter will be removed once we convert
+all users to the gfn_to_pfn_cache version.
+
+Using the new cache, we can potentially let kvm_set_guest_paused() set
+the PVCLOCK_GUEST_STOPPED bit directly rather than having to delegate
+to the vCPU via KVM_REQ_CLOCK_UPDATE. But not yet.
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |   3 +-
- arch/x86/kvm/x86.c              |   1 +
- arch/x86/kvm/xen.c              | 111 ++++++++++++++++----------------
- arch/x86/kvm/xen.h              |   6 +-
- 4 files changed, 62 insertions(+), 59 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 +-
+ arch/x86/kvm/x86.c              | 76 +++++++++++++++++++++++++++------
+ 2 files changed, 64 insertions(+), 15 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6e7c545bc7ee..1e73053fd2bf 100644
+index 1e73053fd2bf..c64b80c07fdd 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -603,10 +603,9 @@ struct kvm_vcpu_xen {
- 	u32 current_runstate;
- 	bool vcpu_info_set;
- 	bool vcpu_time_info_set;
--	bool runstate_set;
- 	struct gfn_to_hva_cache vcpu_info_cache;
- 	struct gfn_to_hva_cache vcpu_time_info_cache;
--	struct gfn_to_hva_cache runstate_cache;
-+	struct gfn_to_pfn_cache runstate_cache;
- 	u64 last_steal;
- 	u64 runstate_entry_time;
- 	u64 runstate_times[4];
+@@ -747,8 +747,7 @@ struct kvm_vcpu_arch {
+ 	gpa_t time;
+ 	struct pvclock_vcpu_time_info hv_clock;
+ 	unsigned int hw_tsc_khz;
+-	struct gfn_to_hva_cache pv_time;
+-	bool pv_time_enabled;
++	struct gfn_to_pfn_cache pv_time;
+ 	/* set guest stopped flag in pvclock flags field */
+ 	bool pvclock_set_guest_stopped_request;
+ 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 74b53a16f38a..5d0191bf30b3 100644
+index 5d0191bf30b3..992baebf0a58 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -11195,6 +11195,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
- 	fpu_free_guest_fpstate(&vcpu->arch.guest_fpu);
+@@ -2209,14 +2209,14 @@ static void kvm_write_system_time(struct kvm_vcpu *vcpu, gpa_t system_time,
+ 	kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
  
-+	kvm_xen_destroy_vcpu(vcpu);
- 	kvm_hv_vcpu_uninit(vcpu);
- 	kvm_pmu_destroy(vcpu);
- 	kfree(vcpu->arch.mce_banks);
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 39b319f428bc..5d40d6521440 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -133,27 +133,37 @@ static void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
- void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- {
- 	struct kvm_vcpu_xen *vx = &v->arch.xen;
--	struct gfn_to_hva_cache *ghc = &vx->runstate_cache;
--	struct kvm_memslots *slots = kvm_memslots(v->kvm);
--	bool atomic = (state == RUNSTATE_runnable);
--	uint64_t state_entry_time;
--	int __user *user_state;
--	uint64_t __user *user_times;
-+	struct gfn_to_pfn_cache *gpc = &vx->runstate_cache;
-+	uint64_t *user_times;
-+	unsigned long flags;
-+	size_t user_len;
-+	int *user_state;
- 
- 	kvm_xen_update_runstate(v, state);
- 
--	if (!vx->runstate_set)
-+	if (!vx->runstate_cache.active)
- 		return;
- 
--	if (unlikely(slots->generation != ghc->generation || kvm_is_error_hva(ghc->hva)) &&
--	    kvm_gfn_to_hva_cache_init(v->kvm, ghc, ghc->gpa, ghc->len))
+ 	/* we verify if the enable bit is set... */
+-	vcpu->arch.pv_time_enabled = false;
+-	if (!(system_time & 1))
 -		return;
-+	if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode)
-+		user_len = sizeof(struct vcpu_runstate_info);
-+	else
-+		user_len = sizeof(struct compat_vcpu_runstate_info);
+-
+-	if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
+-				       &vcpu->arch.pv_time, system_time & ~1ULL,
+-				       sizeof(struct pvclock_vcpu_time_info)))
+-		vcpu->arch.pv_time_enabled = true;
++	if (system_time & 1) {
++		kvm_gfn_to_pfn_cache_init(vcpu->kvm, &vcpu->arch.pv_time, vcpu,
++					  false, true, system_time & ~1ULL,
++					  sizeof(struct pvclock_vcpu_time_info),
++					  false);
++	} else {
++		kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vcpu->arch.pv_time);
++	}
  
--	/* We made sure it fits in a single page */
--	BUG_ON(!ghc->memslot);
+ 	return;
+ }
+@@ -2919,6 +2919,56 @@ u64 get_kvmclock_ns(struct kvm *kvm)
+ 	return data.clock;
+ }
+ 
++static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
++				    struct gfn_to_pfn_cache *gpc,
++				    unsigned int offset)
++{
++	struct kvm_vcpu_arch *vcpu = &v->arch;
++	struct pvclock_vcpu_time_info *guest_hv_clock;
++	unsigned long flags;
++
 +	read_lock_irqsave(&gpc->lock, flags);
 +	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
-+					   user_len)) {
++					   offset + sizeof(*guest_hv_clock))) {
 +		read_unlock_irqrestore(&gpc->lock, flags);
- 
--	if (atomic)
--		pagefault_disable();
-+		/* When invoked from kvm_sched_out() we cannot sleep */
-+		if (state == RUNSTATE_runnable)
-+			return;
 +
 +		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa,
-+						 user_len, false))
++						 offset + sizeof(*guest_hv_clock),
++						 true))
 +			return;
 +
 +		read_lock_irqsave(&gpc->lock, flags);
 +	}
- 
- 	/*
- 	 * The only difference between 32-bit and 64-bit versions of the
-@@ -167,37 +177,32 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	 */
- 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) != 0);
- 	BUILD_BUG_ON(offsetof(struct compat_vcpu_runstate_info, state) != 0);
--	user_state = (int __user *)ghc->hva;
--
- 	BUILD_BUG_ON(sizeof(struct compat_vcpu_runstate_info) != 0x2c);
--
--	user_times = (uint64_t __user *)(ghc->hva +
--					 offsetof(struct compat_vcpu_runstate_info,
--						  state_entry_time));
- #ifdef CONFIG_X86_64
- 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state_entry_time) !=
- 		     offsetof(struct compat_vcpu_runstate_info, state_entry_time) + 4);
- 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, time) !=
- 		     offsetof(struct compat_vcpu_runstate_info, time) + 4);
--
--	if (v->kvm->arch.xen.long_mode)
--		user_times = (uint64_t __user *)(ghc->hva +
--						 offsetof(struct vcpu_runstate_info,
--							  state_entry_time));
- #endif
 +
-+	user_state = gpc->khva;
++	guest_hv_clock = (void *)(gpc->khva + offset);
 +
-+	if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode)
-+		user_times = gpc->khva + offsetof(struct vcpu_runstate_info,
-+						  state_entry_time);
-+	else
-+		user_times = gpc->khva + offsetof(struct compat_vcpu_runstate_info,
-+						  state_entry_time);
++	/*
++	 * This VCPU is paused, but it's legal for a guest to read another
++	 * VCPU's kvmclock, so we really have to follow the specification where
++	 * it says that version is odd if data is being modified, and even after
++	 * it is consistent.
++	 */
 +
- 	/*
- 	 * First write the updated state_entry_time to the guest area.
- 	 */
--	state_entry_time = vx->runstate_entry_time;
--	state_entry_time |= XEN_RUNSTATE_UPDATE;
--
- 	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, state_entry_time) !=
--		     sizeof(state_entry_time));
-+		     sizeof(user_times[0]));
- 	BUILD_BUG_ON(sizeof_field(struct compat_vcpu_runstate_info, state_entry_time) !=
--		     sizeof(state_entry_time));
-+		     sizeof(user_times[0]));
- 
--	if (__put_user(state_entry_time, user_times))
--		goto out;
-+	user_times[0] = vx->runstate_entry_time | XEN_RUNSTATE_UPDATE;
- 	smp_wmb();
- 
- 	/*
-@@ -209,8 +214,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	BUILD_BUG_ON(sizeof_field(struct compat_vcpu_runstate_info, state) !=
- 		     sizeof(vx->current_runstate));
- 
--	if (__put_user(vx->current_runstate, user_state))
--		goto out;
-+	*user_state = vx->current_runstate;
- 
- 	/*
- 	 * Write the actual runstate times immediately after the
-@@ -225,23 +229,19 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, time) !=
- 		     sizeof(vx->runstate_times));
- 
--	if (__copy_to_user(user_times + 1, vx->runstate_times, sizeof(vx->runstate_times)))
--		goto out;
-+	memcpy(user_times + 1, vx->runstate_times, sizeof(vx->runstate_times));
- 	smp_wmb();
- 
- 	/*
- 	 * Finally, clear the XEN_RUNSTATE_UPDATE bit in the guest's
- 	 * runstate_entry_time field.
- 	 */
--	state_entry_time &= ~XEN_RUNSTATE_UPDATE;
--	__put_user(state_entry_time, user_times);
-+	user_times[0] &= ~XEN_RUNSTATE_UPDATE;
- 	smp_wmb();
- 
-- out:
--	mark_page_dirty_in_slot(v->kvm, ghc->memslot, ghc->gpa >> PAGE_SHIFT);
++	guest_hv_clock->version = vcpu->hv_clock.version = (guest_hv_clock->version + 1) | 1;
++	smp_wmb();
++
++	/* retain PVCLOCK_GUEST_STOPPED if set in guest copy */
++	vcpu->hv_clock.flags |= (guest_hv_clock->flags & PVCLOCK_GUEST_STOPPED);
++
++	if (vcpu->pvclock_set_guest_stopped_request) {
++		vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
++		vcpu->pvclock_set_guest_stopped_request = false;
++	}
++
++	memcpy(guest_hv_clock, &vcpu->hv_clock, sizeof(*guest_hv_clock));
++	smp_wmb();
++
++	guest_hv_clock->version = ++vcpu->hv_clock.version;
 +	read_unlock_irqrestore(&gpc->lock, flags);
- 
--	if (atomic)
--		pagefault_enable();
-+	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
- }
- 
- int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
-@@ -504,24 +504,17 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 			break;
- 		}
- 		if (data->u.gpa == GPA_INVALID) {
--			vcpu->arch.xen.runstate_set = false;
-+			kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
-+						     &vcpu->arch.xen.runstate_cache);
- 			r = 0;
- 			break;
- 		}
- 
--		/* It must fit within a single page */
--		if ((data->u.gpa & ~PAGE_MASK) + sizeof(struct vcpu_runstate_info) > PAGE_SIZE) {
--			r = -EINVAL;
--			break;
--		}
--
--		r = kvm_gfn_to_hva_cache_init(vcpu->kvm,
-+		r = kvm_gfn_to_pfn_cache_init(vcpu->kvm,
- 					      &vcpu->arch.xen.runstate_cache,
--					      data->u.gpa,
--					      sizeof(struct vcpu_runstate_info));
--		if (!r) {
--			vcpu->arch.xen.runstate_set = true;
--		}
-+					      NULL, false, true, data->u.gpa,
-+					      sizeof(struct vcpu_runstate_info),
-+					      false);
- 		break;
- 
- 	case KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT:
-@@ -656,7 +649,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 			r = -EOPNOTSUPP;
- 			break;
- 		}
--		if (vcpu->arch.xen.runstate_set) {
-+		if (vcpu->arch.xen.runstate_cache.active) {
- 			data->u.gpa = vcpu->arch.xen.runstate_cache.gpa;
- 			r = 0;
- 		}
-@@ -1054,3 +1047,9 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
- 
- 	return 0;
- }
 +
-+void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
-+				     &vcpu->arch.xen.runstate_cache);
-+}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index adbcc9ed59db..54b2bf4c3001 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -23,7 +23,7 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data);
- int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc);
- void kvm_xen_init_vm(struct kvm *kvm);
- void kvm_xen_destroy_vm(struct kvm *kvm);
--
-+void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu);
- int kvm_xen_set_evtchn_fast(struct kvm_kernel_irq_routing_entry *e,
- 			    struct kvm *kvm);
- int kvm_xen_setup_evtchn(struct kvm *kvm,
-@@ -65,6 +65,10 @@ static inline void kvm_xen_destroy_vm(struct kvm *kvm)
- {
- }
- 
-+static inline void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
-+{
++	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
 +}
 +
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+ static void kvm_setup_pvclock_page(struct kvm_vcpu *v,
+ 				   struct gfn_to_hva_cache *cache,
+ 				   unsigned int offset)
+@@ -3064,8 +3114,8 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 
+ 	vcpu->hv_clock.flags = pvclock_flags;
+ 
+-	if (vcpu->pv_time_enabled)
+-		kvm_setup_pvclock_page(v, &vcpu->pv_time, 0);
++	if (vcpu->pv_time.active)
++		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0);
+ 	if (vcpu->xen.vcpu_info_set)
+ 		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_info_cache,
+ 				       offsetof(struct compat_vcpu_info, time));
+@@ -3259,7 +3309,7 @@ static int kvm_pv_enable_async_pf_int(struct kvm_vcpu *vcpu, u64 data)
+ 
+ static void kvmclock_reset(struct kvm_vcpu *vcpu)
  {
- 	return false;
+-	vcpu->arch.pv_time_enabled = false;
++	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vcpu->arch.pv_time);
+ 	vcpu->arch.time = 0;
+ }
+ 
+@@ -5058,7 +5108,7 @@ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
+  */
+ static int kvm_set_guest_paused(struct kvm_vcpu *vcpu)
+ {
+-	if (!vcpu->arch.pv_time_enabled)
++	if (!vcpu->arch.pv_time.active)
+ 		return -EINVAL;
+ 	vcpu->arch.pvclock_set_guest_stopped_request = true;
+ 	kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+@@ -6122,7 +6172,7 @@ static int kvm_arch_suspend_notifier(struct kvm *kvm)
+ 
+ 	mutex_lock(&kvm->lock);
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		if (!vcpu->arch.pv_time_enabled)
++		if (!vcpu->arch.pv_time.active)
+ 			continue;
+ 
+ 		ret = kvm_set_guest_paused(vcpu);
 -- 
 2.33.1
 
