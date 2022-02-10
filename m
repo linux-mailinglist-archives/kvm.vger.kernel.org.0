@@ -2,73 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF87D4B0AA4
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 11:32:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F23064B0C01
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 12:13:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239692AbiBJKby (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 05:31:54 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44878 "EHLO
+        id S240665AbiBJLNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 06:13:49 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239693AbiBJKbx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 05:31:53 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85917CEF
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 02:31:54 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1F519B824AA
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 10:31:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B70D4C004E1;
-        Thu, 10 Feb 2022 10:31:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644489111;
-        bh=N2HI8qSihMQX0nVOdnkUOKIzjezs+8DTSwDNJwrZaiA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=N2GOdPf8N1TAoDJOlHO6xu9cmv8KwBzvfYtPJace0dxvu8vZacBWTO0rNpBOP33GM
-         Fs2Cyct7TjzBaw7lHDw5XiHrxiyPAynMWNLWgiI6hd3ZayZc/9DZIonBwQE/ILfiJc
-         ojW1tN0zF6kwZoRA1XKyYIe/kjOJKDvlN7ubal5IjhwT/vTgl4YgKW59zMgrgMrJjN
-         S3OIFz+2a7yKuzkkahxIbdoSms/bCeRVxbFLdqwbcxHr7IifDpWQ9e7Jdaf2VzTneZ
-         4QMaD+ni0K1TRzkQ9pKgHGSnuvxRJI/Gs1ETqe3Ko7LdCgYRjnWq+sZeBHJhZmiOwu
-         v5dVEBhIKTfKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nI6jt-006sGC-EX; Thu, 10 Feb 2022 10:31:49 +0000
-Date:   Thu, 10 Feb 2022 10:31:48 +0000
-Message-ID: <87wni33td7.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S240640AbiBJLNs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 06:13:48 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9EACCA;
+        Thu, 10 Feb 2022 03:13:47 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21A9RwGA025128;
+        Thu, 10 Feb 2022 11:13:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=I0qEQmOq3NIOOeInTMv0rhTkCQgtkQo7LY1Gh4rd3J8=;
+ b=EncrcrEUeh0SiVr8ByuZ2SdPDkciRdh875gzIv/cQeuuWyLexiTMKEAczrpOw33Db3dC
+ BB6RsCtJXCBZcz6hiRmCZV7cm790bAZPrdWBpBooWTR9J1ELnQdLU7swxB9m8g6zVwEu
+ E4LxJS9pEzIgIxT3wWs2CIXexaNqx01gM8WPzROmsGy9hYn3vfT0SuTtv0GQ1M6kha6I
+ fzC4RXEd2/LTKS56oQFu9CTjRZtbVIt1tP0Yhda1p5d2xUhpo4rxoWQ/ZmDxVZCeH9Eo
+ w7AMk3X8nfh3moY0OkoFqKdb5JC4kTiNhPow7AcyCwy64u21gFfKMwbM2mEMA2oUjLdr ZQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e503qa91f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Feb 2022 11:13:47 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21AAtr5h011882;
+        Thu, 10 Feb 2022 11:13:46 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e503qa913-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Feb 2022 11:13:46 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21AB8WLb004121;
+        Thu, 10 Feb 2022 11:13:45 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3e1gv9y6rk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Feb 2022 11:13:44 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21ABDf5t46072134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Feb 2022 11:13:41 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9C22211C052;
+        Thu, 10 Feb 2022 11:13:41 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 26F0111C050;
+        Thu, 10 Feb 2022 11:13:41 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.14.149])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Feb 2022 11:13:41 +0000 (GMT)
+Date:   Thu, 10 Feb 2022 12:13:38 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
-In-Reply-To: <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
-References: <20220118041923.3384602-1-reijiw@google.com>
-        <87a6f15skj.wl-maz@kernel.org>
-        <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
-        <875ypo5jqi.wl-maz@kernel.org>
-        <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: MAINTAINERS: promote Claudio Imbrenda
+Message-ID: <20220210121338.4ce8c071@p-imbrenda>
+In-Reply-To: <20220210085310.26388-1-borntraeger@linux.ibm.com>
+References: <20220210085310.26388-1-borntraeger@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, jingzhangos@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bkRty1MNcdKNR-pHouvLndYFvsr65VaK
+X-Proofpoint-ORIG-GUID: YzF9idVAhblZBuh7a-9bG0SZF8vS4XK1
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-10_03,2022-02-09_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ mlxlogscore=921 priorityscore=1501 bulkscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 lowpriorityscore=0 suspectscore=0 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202100061
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,78 +100,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Feb 2022 05:31:49 +0000,
-Reiji Watanabe <reijiw@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Wed, Feb 9, 2022 at 4:04 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Hi Reiji,
-> >
-> > On Wed, 09 Feb 2022 05:32:36 +0000,
-> > Reiji Watanabe <reijiw@google.com> wrote:
-> > >
-> > > Hi Marc,
-> > >
-> > > On Tue, Feb 8, 2022 at 6:41 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > In [1], I suggested another approach that didn't require extra state,
-> > > > and moved the existing checks under the kvm lock. What was wrong with
-> > > > that approach?
-> > >
-> > > With that approach, even for a vcpu that has a broken set of features,
-> > > which leads kvm_reset_vcpu() to fail for the vcpu, the vcpu->arch.features
-> > > are checked by other vCPUs' vcpu_allowed_register_width() until the
-> > > vcpu->arch.target is set to -1.
-> > > Due to this, I would think some or possibly all vCPUs' kvm_reset_vcpu()
-> > > may or may not fail (e.g. if userspace tries to configure vCPU#0 with
-> > > 32bit EL1, and vCPU#1 and #2 with 64 bit EL1, KVM_ARM_VCPU_INIT
-> > > for either vCPU#0, or both vCPU#1 and #2 should fail.  But, with that
-> > > approach, it doesn't always work that way.  Instead, KVM_ARM_VCPU_INIT
-> > > for all vCPUs could fail or KVM_ARM_VCPU_INIT for vCPU#0 and #1 could
-> > > fail while the one for CPU#2 works).
-> > > Also, even after the first KVM_RUN for vCPUs are already done,
-> > > (the first) KVM_ARM_VCPU_INIT for another vCPU could cause the
-> > > kvm_reset_vcpu() for those vCPUs to fail.
-> > >
-> > > I would think those behaviors are odd, and I wanted to avoid them.
-> >
-> > OK, fair enough. But then you need to remove most of the uses of
-> > KVM_ARM_VCPU_EL1_32BIT so that it is only used as a userspace
-> > interface and
-> 
-> Yes, I will.
-> 
-> > maybe not carried as part of the vcpu feature flag anymore.
-> 
-> At the first call of kvm_reset_vcpu() for the guest, the new kvm
-> flag is not set yet. So, KVM_ARM_VCPU_EL1_32BIT will be needed
-> by the function (unless we pass the flag as an argument for the
-> function or by any other way).
+On Thu, 10 Feb 2022 09:53:10 +0100
+Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
 
-Which is why I said 'maybe'. It's not a big deal if the flags stays,
-but I don't want it evaluated further down the line. It is also pretty
-similar to HCR_EL2.RW, which we already test with vcpu_el1_is_32bit().
-
-Overall, we need to reduce that state to be as simple as possible.
-
+> Claudio has volunteered to be more involved in the maintainership of
+> s390 KVM.
 > 
-> > Also, we really should turn all these various bits in the kvm struct
-> > into a set of flags. I have a patch posted there[1] for this, feel
-> > free to pick it up.
+> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+
+Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Thank you for the suggestion. But, kvm->arch.el1_reg_width is not
-> a binary because it needs to indicate an uninitialized state.  So, it
-> won't fit perfectly with kvm->arch.flags, which is introduced by [1]
-> as it is. Of course it's feasible by using 2 bits of the flags though...
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f41088418aae..cde32aebb6ef 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10548,8 +10548,8 @@ F:	arch/riscv/kvm/
+>  KERNEL VIRTUAL MACHINE for s390 (KVM/s390)
+>  M:	Christian Borntraeger <borntraeger@linux.ibm.com>
+>  M:	Janosch Frank <frankja@linux.ibm.com>
+> +M:	Claudio Imbrenda <imbrenda@linux.ibm.com>
+>  R:	David Hildenbrand <david@redhat.com>
+> -R:	Claudio Imbrenda <imbrenda@linux.ibm.com>
+>  L:	kvm@vger.kernel.org
+>  S:	Supported
+>  W:	http://www.ibm.com/developerworks/linux/linux390/
 
-2 bits is what I had in mind (one bit to indicate that it has already
-been initialised, another to carry the actual width).
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
