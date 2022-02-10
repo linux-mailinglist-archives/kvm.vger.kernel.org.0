@@ -2,103 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D88CD4B164C
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 20:28:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DCF44B1655
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 20:31:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344003AbiBJT2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 14:28:44 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37632 "EHLO
+        id S231839AbiBJTbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 14:31:35 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343987AbiBJT2n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 14:28:43 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEA8D83
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 11:28:43 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v4so6092166pjh.2
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 11:28:43 -0800 (PST)
+        with ESMTP id S229568AbiBJTbd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 14:31:33 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67EE5E56
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 11:31:33 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id o2so12411829lfd.1
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 11:31:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MkCAJcsgDnZ4AMQg0YJZxLL5mg72sPEcPDTYT76wphA=;
-        b=VITXk2hMcSEjC+OZoOeI41UdOAsXXnSae+vIO1t5uiJUDG3f+W8Ujvo0MzRncXcGSg
-         USTmlZSg0keVqVzjOeEZQixEP8Pgeq2dITc6QO3lghqqFZQJxwqFTif5bEsHgDSzNkCQ
-         2eE8SKwMDCYSs2aXYXFc+5kXVC2grvOSWZ9IMP+RmFomSSXp/fpnKoid/djrG+9ci/6+
-         l5iMO0ARPss2aCLOgxxHGPRXtXwq90RSu87KgTi6DFizS3nL3ZLpvWb0tjEZ17BsVgSy
-         52BW03EP4lmL4Hg/sREOKFYcn0GlisUdJyuwbMTWxFOmIkab9YrI1eHTWrNQ6y6lfoL4
-         Hg0w==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YV7m43lW01+30L4cJfH2Iw5JSUBAH1SM73s9lnsoK9w=;
+        b=gbWeYOhQiRnb8jPf5HKGRvZVFiNwiCG5pDavy5zRNbcS57wGnNDd0yC/ZCOnk3dBo8
+         ekHOdjb6l33u41dM3bM/NlssICsWUEXWG8LoBqtJscR5zsQqxdbc33JyRj8/cy4nO8Bc
+         xBM8OFMuTrirsHKn1QhHi5jOoi51nBnQsk++Q1qqSnBEOISJEPgw1/Of9eM9pUEJiapc
+         jDp5kXnLRTysjPsIM5BJotH4tbsQSBcK4XVHWfEnXkFMNExPvzz/xR6Su2MSSv/L0Dkb
+         a9PnCFTEBccE8QxIa3ymNWv9Eutv0lyJlqlUhUmnH08aauiERZHsOMg6eelMRHlQghWi
+         zqwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MkCAJcsgDnZ4AMQg0YJZxLL5mg72sPEcPDTYT76wphA=;
-        b=Z/M6024N1z2axyT6GdLKmuvxn7+9LS/SyZfdnzSDvnhStRFSE48WAuL3iyX21627TV
-         Axh29E32R2i1Qy3zcoFj/GyLKsdFXd79IIC6N734QmtNuljlZ5aW7Yd2uwpqHBnvSw4E
-         BGTJRCNpl+gI0/GviGWUUjj2MRun4vDmHegxCcSBiEAxAFr8riblWfu4Ik3zCJupTjef
-         WEU9gQfdBEM0OEoEafQjPTuWIePeOUkw6oRSTBm8GEWu9/uUioxdPkx6MFvBJACjfLN1
-         OH97cNNA4/heiwo/WufjhFNwkAng7aLbWY9u4H46MZcnJAYAtpmyyvTLsHV1gPyGiOEB
-         1Mqg==
-X-Gm-Message-State: AOAM531yGM7ET4RjfNqhy9gRbYr4iXWpFKYOJUV5ORAqBML44pph28Tf
-        uzpGcYjd82SpEwPnSAaHMUc4Yg==
-X-Google-Smtp-Source: ABdhPJyGxrYzqC6mAoU/J4x4uF4c35ZsHYMs9x0CCV7EjCPecYGBzI+BZ67c1YA0cq2S+zuo8KoMXw==
-X-Received: by 2002:a17:903:1c8:: with SMTP id e8mr8819514plh.75.1644521323208;
-        Thu, 10 Feb 2022 11:28:43 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d8sm17720591pfj.179.2022.02.10.11.28.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 11:28:42 -0800 (PST)
-Date:   Thu, 10 Feb 2022 19:28:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 00/23] KVM: MMU: MMU role refactoring
-Message-ID: <YgVnZy6RzX7Vrfru@google.com>
-References: <20220204115718.14934-1-pbonzini@redhat.com>
- <YgGmgMMR0dBmjW86@google.com>
- <YgGq31edopd6RMts@google.com>
- <CALzav=d05sMd=ARkV+GMf9SkxKcg9c9n5ttb274M2fZrP27PDA@mail.gmail.com>
- <YgRmXDn7b8GQ+VzX@google.com>
- <40930834-8f54-4701-d3ec-f8287bc1333f@redhat.com>
- <YgVDfG1DvUdXnd2n@google.com>
- <344042cf-099e-5e26-026a-c42d0825488e@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YV7m43lW01+30L4cJfH2Iw5JSUBAH1SM73s9lnsoK9w=;
+        b=tY+j54AHSvp0rJYJYRz4u32QMyNSdFVHaecXeyJE9xVzmfGBV2HFhTk4VrKGR15kMx
+         6mAJXWEUn9ZTvf5nxmOsbrO/UwwmKHqyyCbP5B5LYvfc31tm7xBIVip249/bE7vvahwo
+         uZ4/96UcbohAuhvQiLqQk7gjURQZXfT97NHIqf2SKAYrVpVS1BGqdK2wTw1Ir2sV1lKg
+         FwMWJkhaQT8YlkRhHpZfQTcdZPUfQdc9CBaFIzCxzu7akDXAGAZuC1SlyPBLIFWuGSs+
+         iYCU2xxQMBVzYUuHL+6I2IffCGxa9c97D7st453LxWLNS/S0hy/KA40aTGchj4Jf1G54
+         pyIw==
+X-Gm-Message-State: AOAM5311/tJcI9HmNASW4DivZKHZFdEKMCX88b4LCUTIS5Jih4zULDUt
+        UU5w87uD/EPOC+MD+eWMp/ztGy/zGJHm4RFnW7Q=
+X-Google-Smtp-Source: ABdhPJyx6CUZeqEnp1CPbqshcBbV3uSIOGIIpzCGWxHlngrSN7TAikAv4oHo3jE88DLmxSgPvJjep6TxvDJT2UJ8E48=
+X-Received: by 2002:ac2:44ad:: with SMTP id c13mr6247450lfm.339.1644521491545;
+ Thu, 10 Feb 2022 11:31:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <344042cf-099e-5e26-026a-c42d0825488e@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
+ <YgVKmjBnAjITQcm+@google.com> <YgVPPCTJG7UFRkhQ@monolith.localdoman>
+In-Reply-To: <YgVPPCTJG7UFRkhQ@monolith.localdoman>
+From:   Zixuan Wang <zxwang42@gmail.com>
+Date:   Thu, 10 Feb 2022 11:30:55 -0800
+Message-ID: <CAEDJ5ZSR=rw_ALjBcLgeVz9H6TS67eWvZW2SvGTJV468WjgyKw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename --target-efi
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com,
+        Andrew Jones <drjones@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Zixuan Wang <zixuanwang@google.com>,
+        kvm list <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 10, 2022, Paolo Bonzini wrote:
-> On 2/10/22 17:55, Sean Christopherson wrote:
-> > > 	union kvm_mmu_page_role root_role;
-> > > 	union kvm_mmu_paging_mode cpu_mode;
-> > 
-> > I'd prefer to not use "paging mode", the SDM uses that terminology to refer to
-> > the four paging modes.  My expectation given the name is that the union would
-> > track only CR0.PG, EFER.LME, CR4.PAE, and CR4.PSE[*].
-> 
-> Yeah, I had started with kvm_mmu_paging_flags, but cpu_flags was an even
-> worse method than kvm_mmu_paging_mode.
+On Thu, Feb 10, 2022 at 11:05 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Thu, Feb 10, 2022 at 05:25:46PM +0000, Sean Christopherson wrote:
+> > On Thu, Feb 10, 2022, Alexandru Elisei wrote:
+> > > I renamed --target-efi to --efi-payload in the last patch because I felt it
+> > > looked rather confusing to do ./configure --target=qemu --target-efi when
+> > > configuring the tests. If the rename is not acceptable, I can think of a
+> > > few other options:
+> >
+> > I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
+> > seems like it would be sufficient.
+> >
+> > > 1. Rename --target to --vmm. That was actually the original name for the
+> > > option, but I changed it because I thought --target was more generic and
+> > > that --target=efi would be the way going forward to compile kvm-unit-tests
+> > > to run as an EFI payload. I realize now that separating the VMM from
+> > > compiling kvm-unit-tests to run as an EFI payload is better, as there can
+> > > be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
+> > > a test runner, so I think the impact on users should be minimal.
+> >
+> > Again irrespective of --target-efi, I think --target for the VMM is a potentially
+> > confusing name.  Target Triplet[*] and --target have specific meaning for the
+> > compiler, usurping that for something similar but slightly different is odd.
+>
+> Wouldn't that mean that --target-efi is equally confusing? Do you have
+> suggestions for other names?
 
-We could always do s/is_guest_mode/is_nested_mode or something to that effect.
-It would take some retraining, but I feel like we've been fighting the whole
-"guest mode" thing over and over.
+How about --config-efi for configure, and CONFIG_EFI for source code?
+I thought about this name when I was developing the initial patch, and
+Varad also proposed similar names in his initial patch series [1]:
+--efi and CONFIG_EFI.
 
-> Anyway, now that I have done _some_ replacement, it's a matter of sed -i on
-> the patch files once you or someone else come up with a good moniker.
-> 
-> I take it that "root_role" passed your filter successfully.
-
-Yep, works for me.  I almost suggested it, too, but decided I liked mmu_role
-marginally better.  I like root_role because it ties in with root_hpa and root_pga.
+[1] https://lore.kernel.org/kvm/20210819113400.26516-1-varad.gautam@suse.com/
