@@ -2,115 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84B034B0919
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 10:05:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 306044B096D
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 10:26:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238199AbiBJJFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 04:05:55 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39140 "EHLO
+        id S238487AbiBJJZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 04:25:17 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238178AbiBJJFy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 04:05:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8E59D94
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 01:05:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644483950;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+VOVU28uEg+VeYFn6fPIKbXayXxxCm00kEtsj2qS9E4=;
-        b=jTp/p23Vv5gUusgY0y92mjkw2uNRRDuHI2KrQ97hGpcw8ZW+qUut7TAcITyvjOjV6EmEox
-        niRN459RkffzJWvA93ytB1rj98XSweSDHQ4X/YKjjXU7dm2VzW1HsXCaTGRcYbIFno1nAA
-        jq5v5N1kQ0w1fg+3gGxx0XlEeB14vpM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-39-YchlZrVOOW64mc47a5dvtg-1; Thu, 10 Feb 2022 04:05:49 -0500
-X-MC-Unique: YchlZrVOOW64mc47a5dvtg-1
-Received: by mail-wr1-f71.google.com with SMTP id b8-20020adfc748000000b001e333edbe40so2214142wrh.6
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 01:05:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=+VOVU28uEg+VeYFn6fPIKbXayXxxCm00kEtsj2qS9E4=;
-        b=5oYuvcFhznJGcOHXijk9mBGUko8cRIEnPzjv6zM6otL1nXdHfaELl7TLthD9XVS70q
-         ZJMUTqEHz4e8n0ZjYI86uCg4uiPuDShtF/g59ZrSSfK2j7Y4+5IMmzDjdwz4FLjDxaDd
-         fvnvcV9ILPdbdbS65ISkBSk78ATuAEktLjsmDnyUoi2ZMocUDiZMJc22XJXl9g4sZAce
-         wMCaoWnhepiIWo46bms3/TloTScAsWbtR3EAQ67SXYs+la8dgG3KIqoT+9y6EK1xd6Vf
-         p5ascSQwtmBtDTiVB53nWoYl59nv8UkmQcLzOnYyFZPNpbTbf7uP29fJJK4cW2t1gokB
-         /A5w==
-X-Gm-Message-State: AOAM531tP5vpMeEusHKeyNjwcNdXafcPGtgRfQ/tIuzzUfs0hVGDEn3o
-        1Dt0JAW444qYRtz43Sm6VlmCQxWNdqJ2gpDEa2od/VnP+wXxp0FjariLOh3GuHMIHWox2huJPhC
-        Mxx+dJXOURSBY
-X-Received: by 2002:a5d:5850:: with SMTP id i16mr5437644wrf.519.1644483948460;
-        Thu, 10 Feb 2022 01:05:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwyBtzTD1Ovs/rO1vUFtla6MQxgaKntQcwkuH+mF+pA1KP5W/+ccgvohdnShFgAliAOSiAYnw==
-X-Received: by 2002:a5d:5850:: with SMTP id i16mr5437623wrf.519.1644483948255;
-        Thu, 10 Feb 2022 01:05:48 -0800 (PST)
-Received: from [192.168.8.104] (tmo-098-218.customers.d1-online.com. [80.187.98.218])
-        by smtp.gmail.com with ESMTPSA id t1sm22134179wre.45.2022.02.10.01.05.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 01:05:47 -0800 (PST)
-Message-ID: <4281a418-317d-cfd5-3446-edb7c720d761@redhat.com>
-Date:   Thu, 10 Feb 2022 10:05:45 +0100
+        with ESMTP id S229534AbiBJJZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 04:25:16 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB781089
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 01:25:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644485117; x=1676021117;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HnuANNfNcEZqDQj8+4XOgEpgRlsPsP9HBWkE3rnhch0=;
+  b=RVk4rvBklGeUyCDvP5d4gMe5WcNjBXpbyK1/kfaQBtB4bKYEYN+apw2s
+   3JN5Ul62SFxHStvbvre9kVG1BwPbw/JWV4JATtL9jXZEVpGrWKm9Xpfri
+   27lhF/tT8BHQeYk0gQbzfCRdc+2D24pV65mlw696LvQYSjlpgGixzxoWx
+   hB+HT/DlbcohFIcJ/lF9un+z+ILsySZFPNCJXUPct9M5zF1nMjaAvTg5x
+   myKvUVR9j6+hA1i6tP1zU0i90GYoc7YQceUykD/tNe7EJAVmdOEaPEXX3
+   CmkFrhy15GlIwqt7CIOhnuW1qZTy89sRtJ0ZYQd7AxSZEGDTyp9lGerL6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="249658689"
+X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
+   d="scan'208";a="249658689"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 01:25:17 -0800
+X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
+   d="scan'208";a="541530932"
+Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 01:25:16 -0800
+From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com
+Subject: [PATCH] x86 UEFI: Fix broken build for UEFI
+Date:   Thu, 10 Feb 2022 17:20:44 +0800
+Message-Id: <20220210092044.18808-1-zhenzhong.duan@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] KVM: s390: MAINTAINERS: promote Claudio Imbrenda
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        KVM <kvm@vger.kernel.org>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20220210085310.26388-1-borntraeger@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220210085310.26388-1-borntraeger@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/02/2022 09.53, Christian Borntraeger wrote:
-> Claudio has volunteered to be more involved in the maintainership of
-> s390 KVM.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> ---
->   MAINTAINERS | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f41088418aae..cde32aebb6ef 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -10548,8 +10548,8 @@ F:	arch/riscv/kvm/
->   KERNEL VIRTUAL MACHINE for s390 (KVM/s390)
->   M:	Christian Borntraeger <borntraeger@linux.ibm.com>
->   M:	Janosch Frank <frankja@linux.ibm.com>
-> +M:	Claudio Imbrenda <imbrenda@linux.ibm.com>
->   R:	David Hildenbrand <david@redhat.com>
-> -R:	Claudio Imbrenda <imbrenda@linux.ibm.com>
->   L:	kvm@vger.kernel.org
->   S:	Supported
->   W:	http://www.ibm.com/developerworks/linux/linux390/
+UEFI loads EFI applications to dynamic runtime addresses, so it requires
+all applications to be compiled as PIC (position independent code).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+The new introduced single-step #DB tests series bring some compile time
+absolute address, fixed it with RIP relative address.
+
+Fixes: 9734b4236294 ("x86/debug: Add framework for single-step #DB tests")
+Fixes: 6bfb9572ec04 ("x86/debug: Test IN instead of RDMSR for single-step #DB emulation test")
+Fixes: bc0dd8bdc627 ("x86/debug: Add single-step #DB + STI/MOVSS blocking tests")
+Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+---
+ x86/debug.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/x86/debug.c b/x86/debug.c
+index 20ff8ebacc16..13d1f9629e1d 100644
+--- a/x86/debug.c
++++ b/x86/debug.c
+@@ -145,7 +145,7 @@ static unsigned long singlestep_basic(void)
+ 		"and $~(1<<8),%%rax\n\t"
+ 		"1:push %%rax\n\t"
+ 		"popf\n\t"
+-		"lea 1b, %0\n\t"
++		"lea 1b(%%rip), %0\n\t"
+ 		: "=r" (start) : : "rax"
+ 	);
+ 	return start;
+@@ -186,7 +186,7 @@ static unsigned long singlestep_emulated_instructions(void)
+ 		"movl $0x3fd, %%edx\n\t"
+ 		"inb %%dx, %%al\n\t"
+ 		"popf\n\t"
+-		"lea 1b,%0\n\t"
++		"lea 1b(%%rip),%0\n\t"
+ 		: "=r" (start) : : "rax", "ebx", "ecx", "edx"
+ 	);
+ 	return start;
+@@ -223,7 +223,7 @@ static unsigned long singlestep_with_sti_blocking(void)
+ 		"1:and $~(1<<8),%%rax\n\t"
+ 		"push %%rax\n\t"
+ 		"popf\n\t"
+-		"lea 1b,%0\n\t"
++		"lea 1b(%%rip),%0\n\t"
+ 		: "=r" (start_rip) : : "rax"
+ 	);
+ 	return start_rip;
+@@ -259,7 +259,7 @@ static unsigned long singlestep_with_movss_blocking(void)
+ 		"and $~(1<<8),%%rax\n\t"
+ 		"1: push %%rax\n\t"
+ 		"popf\n\t"
+-		"lea 1b,%0\n\t"
++		"lea 1b(%%rip),%0\n\t"
+ 		: "=r" (start_rip) : : "rax"
+ 	);
+ 	return start_rip;
+@@ -302,7 +302,7 @@ static unsigned long singlestep_with_movss_blocking_and_icebp(void)
+ 		"1:and $~(1<<8),%%rax\n\t"
+ 		"push %%rax\n\t"
+ 		"popf\n\t"
+-		"lea 1b,%0\n\t"
++		"lea 1b(%%rip),%0\n\t"
+ 		: "=r" (start) : : "rax"
+ 	);
+ 	return start;
+@@ -346,7 +346,7 @@ static unsigned long singlestep_with_movss_blocking_and_dr7_gd(void)
+ 		"and $~(1<<8),%%rax\n\t"
+ 		"push %%rax\n\t"
+ 		"popf\n\t"
+-		"lea 1b,%0\n\t"
++		"lea 1b(%%rip),%0\n\t"
+ 		: "=r" (start_rip) : : "rax"
+ 	);
+ 	return start_rip;
+-- 
+2.25.1
 
