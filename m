@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 320664B12E2
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:37:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C457C4B12F2
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 17:37:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244287AbiBJQgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 11:36:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47060 "EHLO
+        id S244365AbiBJQhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 11:37:03 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244267AbiBJQgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:36:50 -0500
+        with ESMTP id S244333AbiBJQg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 11:36:57 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C744C24
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BCEFB128
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644511010;
+        s=mimecast20190719; t=1644511017;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/fQVdIUzzjQxIpql8Jx49HwHgnVddQNgjxM6PvOna24=;
-        b=HVwsSLH4Jtn0jhW+yX/J4apcsHaLVh9M/6N8Fkv5DZ8pOeuE3tXHqTRQgPUpUUbN7NbmoT
-        EaQmQBc5c6UMLRKzzQuClN7i9cLPrUKOMhEzfKy7rvw2BVtXL6d40H9cinGl6gMNNekAkG
-        QVlL1fSGZDcsDybDBiAJExs3n9VBPfM=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=f/F8usK/+OWwDrS2Mysaltt+CBSk5zwPQAlyY9XUelc=;
+        b=hzbZ4gH+B/KNdHVc+vdQDmCIfEqZRciDsOmNA1BVVFQe3qPScNcj/VbiWojBL4r5hacXNr
+        MwDm0eTnc2HI6hehwE7pug10Hehr9RlspLmktvYSQe7SO/ooljXFc2y8+i+BVjq/rZ56kp
+        ku7kWn+O8Ejo+FxdOJ5td4gW139knb4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-197-ygAUr_M8MSCeGFIssGldZw-1; Thu, 10 Feb 2022 11:36:49 -0500
-X-MC-Unique: ygAUr_M8MSCeGFIssGldZw-1
-Received: by mail-ed1-f69.google.com with SMTP id w3-20020a50c443000000b0040696821132so3625307edf.22
-        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:49 -0800 (PST)
+ us-mta-663-OdsUih-iOtynBe6HZjcFFg-1; Thu, 10 Feb 2022 11:36:57 -0500
+X-MC-Unique: OdsUih-iOtynBe6HZjcFFg-1
+Received: by mail-ej1-f72.google.com with SMTP id 13-20020a170906328d00b006982d0888a4so2967564ejw.9
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 08:36:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=/fQVdIUzzjQxIpql8Jx49HwHgnVddQNgjxM6PvOna24=;
-        b=lUpMukv0R2weSAfehUQI3JNAKzCUMyiDYM9B3K7fjUncaQPbdWVDi89SpVevCgOclR
-         BW9OGpyGis8fGxVHMrIRPA1g3S0SHpsd+fgPq1oFAwUEuwCgCUcBV0zNOdfXrlZWpgTW
-         pr4oFAW1YSwhIXS2IzuOQzSS6jVdGQUPep99RewAt2WMC0zAjIE6rJ630T2q2TKhk611
-         Ux5vBPFSVm9Lhwgon1s+l/7MTh8m2pfjbNeWN1wg8PiB+xkBcQD4EwEXi6xM8uNAnI+U
-         ++dxpOyDgSKyZHV/ucIJ97Ndci5TfjOhQSsBtQ93wltIEys/ZmRHzsjwq9RhK1Rn626z
-         33bQ==
-X-Gm-Message-State: AOAM5308N68wVg+J8Z22SUXfJNCuXDmk90eZfK5a9qbm0i1FcLja0doY
-        LYvEInm9AqWEw+wTm0m0c9+ccwqQ4G8nY6BFdRITP0At9W4LYLCwX9VN9nJHD/Si0u0CYrcAM3t
-        m7n15zHkWVY99
-X-Received: by 2002:a17:907:7244:: with SMTP id ds4mr7265205ejc.726.1644511008401;
-        Thu, 10 Feb 2022 08:36:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw6CN/+k3HOwVp0gN4FoNF8oTtdpf2diiDEjSfqTdMHbRz9eh1mpO7OJBm9xmaOP360bR4laQ==
-X-Received: by 2002:a17:907:7244:: with SMTP id ds4mr7265187ejc.726.1644511008170;
-        Thu, 10 Feb 2022 08:36:48 -0800 (PST)
+        bh=f/F8usK/+OWwDrS2Mysaltt+CBSk5zwPQAlyY9XUelc=;
+        b=XX2AW1mQz1GXV7Q1yXVHMs4wiaf5rA1mix+knP3bGdmlM/NM9jTZOpheRJRKBXDW/T
+         eo2KKltt1lFeMrSbG1ZdxJqzvPALCv/+LNH0jGOVmK/0sCBF0yM/1/FfWZKITe4vUH6M
+         ulm95LU43yL9SiOx4BXsRR9/j60gzqEFU9IYtgLiTvT3A+ilHKLrCF/DYChugwfEscha
+         AFAbQvyhn0EcuOu3mOpL8ut/CKjM9Z8j27v4fSBO5vlWtH1rQUas74042Ma/dFYg/Mme
+         v0iJCrUrLk4U7+5ToC0xNqpEWQRfGfYIq6RowqLaCmvHm2qmhYgyayktdMWr8N4NEE+c
+         wSRQ==
+X-Gm-Message-State: AOAM532mDVrwXCdOiIjtPvdeLLw5iCU/bxMFJ1gqstdBpeAkJuDcfoNl
+        yQdgLQmsUVQcfurjQJMSyxUCNgCiE9aVpY5VYwinXoOr89Ky0MQm9lGY+7+v4YmJfxaA7V9ilzn
+        yCA0T+26s7ZXx
+X-Received: by 2002:a17:906:2ed1:: with SMTP id s17mr7342457eji.174.1644511015574;
+        Thu, 10 Feb 2022 08:36:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzC0ul3dl+hcrAmDYZTPnQFJaDZrWBZxFPAbbw2BCoE9Jfu0NVY0ZSkzikKjxBe05mTUn5T4A==
+X-Received: by 2002:a17:906:2ed1:: with SMTP id s17mr7342447eji.174.1644511015370;
+        Thu, 10 Feb 2022 08:36:55 -0800 (PST)
 Received: from [192.168.10.118] ([93.56.170.240])
-        by smtp.googlemail.com with ESMTPSA id cz12sm4919434edb.30.2022.02.10.08.36.37
+        by smtp.googlemail.com with ESMTPSA id b17sm5678470ejd.34.2022.02.10.08.36.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 08:36:47 -0800 (PST)
-Message-ID: <d24f6c79-070a-846d-276f-9ab15d8fda3b@redhat.com>
-Date:   Thu, 10 Feb 2022 17:35:23 +0100
+        Thu, 10 Feb 2022 08:36:54 -0800 (PST)
+Message-ID: <52ec7622-efcf-dfd6-2560-3114f90f7618@redhat.com>
+Date:   Thu, 10 Feb 2022 17:35:37 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH MANUALSEL 5.4 2/2] KVM: nVMX: WARN on any attempt to
+Subject: Re: [PATCH MANUALSEL 5.10 4/6] KVM: nVMX: WARN on any attempt to
  allocate shadow VMCS for vmcs02
 Content-Language: en-US
 To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
@@ -68,10 +68,10 @@ To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
 Cc:     Sean Christopherson <seanjc@google.com>, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, kvm@vger.kernel.org
-References: <20220209185733.49157-1-sashal@kernel.org>
- <20220209185733.49157-2-sashal@kernel.org>
+References: <20220209185714.48936-1-sashal@kernel.org>
+ <20220209185714.48936-4-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220209185733.49157-2-sashal@kernel.org>
+In-Reply-To: <20220209185714.48936-4-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -112,10 +112,10 @@ On 2/9/22 19:57, Sasha Levin wrote:
 >   1 file changed, 12 insertions(+), 10 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 3041015b05f71..44e11f6db3efe 100644
+> index 0c2389d0fdafe..0734a98eaaad1 100644
 > --- a/arch/x86/kvm/vmx/nested.c
 > +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4360,18 +4360,20 @@ static struct vmcs *alloc_shadow_vmcs(struct kvm_vcpu *vcpu)
+> @@ -4786,18 +4786,20 @@ static struct vmcs *alloc_shadow_vmcs(struct kvm_vcpu *vcpu)
 >   	struct loaded_vmcs *loaded_vmcs = vmx->loaded_vmcs;
 >   
 >   	/*
