@@ -2,246 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C722D4B09C3
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 10:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD2FA4B09EE
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 10:50:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238932AbiBJJne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 04:43:34 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33376 "EHLO
+        id S239071AbiBJJtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 04:49:42 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237813AbiBJJne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 04:43:34 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FD5198;
-        Thu, 10 Feb 2022 01:43:35 -0800 (PST)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21A8e2lS017544;
-        Thu, 10 Feb 2022 09:43:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=c+MoOO0p48rgFA4we5XmAZ1Bj7IJq9T09FokDjoZ/Xc=;
- b=VosqYpcJd8gZ+blgKJc2p2ZhLEADSmWerpbHfI/Tu+ffXwBCI4XEm7pkXYKvkinwNkC0
- 4mKx2/bKG/PrTGrUxNUsjXj5zF92j27kuE0ja3HgMOsBMd/3GpdL9W4gvpcLrgLi3t/p
- 97B45rxws7j2/MKp/8/wr6S0eQjblkkiXar0n8kdedeSQnEf8ZEMsSWCJcTaj57saf/Q
- /pIVsXINiNLz7ILfT8FNF1WcpVcaKxxsJTwob4Yav161n6ltVeBAZyPjxdmHud+iXrEr
- GAiu2Qo0jirlkeAeaQwXA3t0vD8V2fvN/pNF91o0mRIKaW7ueFst0K3hhK9a1AcYLhRA mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e4kt2ep3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 09:43:33 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21A8imcl013862;
-        Thu, 10 Feb 2022 09:43:33 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e4kt2ep2r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 09:43:33 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21A9bwRx029214;
-        Thu, 10 Feb 2022 09:43:31 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04fra.de.ibm.com with ESMTP id 3e2ygqkh16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Feb 2022 09:43:31 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21A9hRCo44499210
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Feb 2022 09:43:27 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0F8652050;
-        Thu, 10 Feb 2022 09:43:27 +0000 (GMT)
-Received: from [9.171.15.77] (unknown [9.171.15.77])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B64B052052;
-        Thu, 10 Feb 2022 09:43:26 +0000 (GMT)
-Message-ID: <003e0e46-1dd5-7806-cab6-0d730ff923b9@linux.ibm.com>
-Date:   Thu, 10 Feb 2022 10:43:26 +0100
+        with ESMTP id S239035AbiBJJtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 04:49:41 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5A1B1BC;
+        Thu, 10 Feb 2022 01:49:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644486582; x=1676022582;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QD7diRDjosCEK96P8HtODobHDCAMfgamv9O2SqAn5T8=;
+  b=bXFLTH+d4CTCsHh/02B2eT8t8ffTPoVbEmFd8izEHiZtHvcOxnAWlaVj
+   i0Of0zNHqItzZXZ9PeumDwa5322GPzm3DZvCMTtYlrAQLqRyAaTC3LbXY
+   KWXR8hYiR/pKvu2b1d8H1fDHgtsOTlMMA6CQiCAKYamjSOtQlIjs1KTao
+   cxbDNsiXkBbZw+SE2P/cV0baMYf4A/DwH4L3GCusrPNUGM4AhDiSwJpoF
+   /atG3pnlOGbWqsJgqMm5grxnsmPlKjx+0CokkVP9At5TTWesNyh7t6uiY
+   Wv2+ydv2F2s75Nx2p3pfsPkbbyKVfv9wwtWZdO7EHLOMCaIDX9WloPaFs
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="312742027"
+X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
+   d="scan'208";a="312742027"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 01:49:42 -0800
+X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
+   d="scan'208";a="541538900"
+Received: from duan-server-s2600bt.bj.intel.com ([10.240.192.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 01:49:40 -0800
+From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com
+Subject: [PATCH v2] KVM: x86: Fix emulation in writing cr8
+Date:   Thu, 10 Feb 2022 17:45:06 +0800
+Message-Id: <20220210094506.20181-1-zhenzhong.duan@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 05/10] KVM: s390: Add optional storage key checking to
- MEMOP IOCTL
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-References: <20220209170422.1910690-1-scgl@linux.ibm.com>
- <20220209170422.1910690-6-scgl@linux.ibm.com>
- <c5d8e633-c0cd-91d4-723b-abf26c01fd6d@linux.ibm.com>
- <a384835f-e8f8-7940-af3b-2a7018fa7353@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <a384835f-e8f8-7940-af3b-2a7018fa7353@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: x86TmFy9WNU1K6Vynjnb-4A_Ba7OX5vD
-X-Proofpoint-ORIG-GUID: XzVe-eT19huoGUkVH-3-sbJSxkmc9t5E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-10_03,2022-02-09_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 malwarescore=0 lowpriorityscore=0 adultscore=0
- impostorscore=0 mlxscore=0 clxscore=1015 phishscore=0 bulkscore=0
- suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202100051
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+In emulation of writing to cr8, one of the lowest four bits in TPR[3:0]
+is kept.
 
+According to Intel SDM 10.8.6.1(baremetal scenario):
+"APIC.TPR[bits 7:4] = CR8[bits 3:0], APIC.TPR[bits 3:0] = 0";
 
-Am 10.02.22 um 10:40 schrieb Janis Schoetterl-Glausch:
-> On 2/10/22 10:29, Christian Borntraeger wrote:
->> Am 09.02.22 um 18:04 schrieb Janis Schoetterl-Glausch:
->>> User space needs a mechanism to perform key checked accesses when
->>> emulating instructions.
->>>
->>> The key can be passed as an additional argument.
->>> Having an additional argument is flexible, as user space can
->>> pass the guest PSW's key, in order to make an access the same way the
->>> CPU would, or pass another key if necessary.
->>>
->>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>
->> Claudio, Janosch, can you confirm that this is still valid?
->>
->>
->> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> Not @linux.ibm.com?
+and SDM 28.3(use TPR shadow):
+"MOV to CR8. The instruction stores bits 3:0 of its source operand into
+bits 7:4 of VTPR; the remainder of VTPR (bits 3:0 and bits 31:8) are
+cleared.";
 
-Yes, of course. Old habits...
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+and AMD's APM 16.6.4:
+"Task Priority Sub-class (TPS)-Bits 3 : 0. The TPS field indicates the
+current sub-priority to be used when arbitrating lowest-priority messages.
+This field is written with zero when TPR is written using the architectural
+CR8 register.";
 
->>
->> minor thing below
->>> ---
->>>    arch/s390/kvm/kvm-s390.c | 30 ++++++++++++++++++++----------
->>>    include/uapi/linux/kvm.h |  6 +++++-
->>>    2 files changed, 25 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>> index cf347e1a4f17..85763ec7bc60 100644
->>> --- a/arch/s390/kvm/kvm-s390.c
->>> +++ b/arch/s390/kvm/kvm-s390.c
->>> @@ -32,6 +32,7 @@
->>>    #include <linux/sched/signal.h>
->>>    #include <linux/string.h>
->>>    #include <linux/pgtable.h>
->>> +#include <linux/bitfield.h>
->>
->> do we still need that after the changes?
-> 
-> No, not since we moved the key out of the flags.
->>
->>>      #include <asm/asm-offsets.h>
->>>    #include <asm/lowcore.h>
->>> @@ -2359,6 +2360,11 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->>>        return r;
->>>    }
->>>    +static bool access_key_invalid(u8 access_key)
->>> +{
->>> +    return access_key > 0xf;
->>> +}
->>> +
->>>    long kvm_arch_vm_ioctl(struct file *filp,
->>>                   unsigned int ioctl, unsigned long arg)
->>>    {
->>> @@ -4690,17 +4696,19 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->>>        void *tmpbuf = NULL;
->>>        int r = 0;
->>>        const u64 supported_flags = KVM_S390_MEMOP_F_INJECT_EXCEPTION
->>> -                    | KVM_S390_MEMOP_F_CHECK_ONLY;
->>> +                    | KVM_S390_MEMOP_F_CHECK_ONLY
->>> +                    | KVM_S390_MEMOP_F_SKEY_PROTECTION;
->>>          if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size)
->>>            return -EINVAL;
->>> -
->>>        if (mop->size > MEM_OP_MAX_SIZE)
->>>            return -E2BIG;
->>> -
->>>        if (kvm_s390_pv_cpu_is_protected(vcpu))
->>>            return -EINVAL;
->>> -
->>> +    if (mop->flags & KVM_S390_MEMOP_F_SKEY_PROTECTION) {
->>> +        if (access_key_invalid(mop->key))
->>> +            return -EINVAL;
->>> +    }
->>>        if (!(mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY)) {
->>>            tmpbuf = vmalloc(mop->size);
->>>            if (!tmpbuf)
->>> @@ -4710,11 +4718,12 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->>>        switch (mop->op) {
->>>        case KVM_S390_MEMOP_LOGICAL_READ:
->>>            if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
->>> -            r = check_gva_range(vcpu, mop->gaddr, mop->ar,
->>> -                        mop->size, GACC_FETCH, 0);
->>> +            r = check_gva_range(vcpu, mop->gaddr, mop->ar, mop->size,
->>> +                        GACC_FETCH, mop->key);
->>>                break;
->>>            }
->>> -        r = read_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
->>> +        r = read_guest_with_key(vcpu, mop->gaddr, mop->ar, tmpbuf,
->>> +                    mop->size, mop->key);
->>>            if (r == 0) {
->>>                if (copy_to_user(uaddr, tmpbuf, mop->size))
->>>                    r = -EFAULT;
->>> @@ -4722,15 +4731,16 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->>>            break;
->>>        case KVM_S390_MEMOP_LOGICAL_WRITE:
->>>            if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
->>> -            r = check_gva_range(vcpu, mop->gaddr, mop->ar,
->>> -                        mop->size, GACC_STORE, 0);
->>> +            r = check_gva_range(vcpu, mop->gaddr, mop->ar, mop->size,
->>> +                        GACC_STORE, mop->key);
->>>                break;
->>>            }
->>>            if (copy_from_user(tmpbuf, uaddr, mop->size)) {
->>>                r = -EFAULT;
->>>                break;
->>>            }
->>> -        r = write_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
->>> +        r = write_guest_with_key(vcpu, mop->gaddr, mop->ar, tmpbuf,
->>> +                     mop->size, mop->key);
->>>            break;
->>>        }
->>>    diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>> index b46bcdb0cab1..44558cf4c52e 100644
->>> --- a/include/uapi/linux/kvm.h
->>> +++ b/include/uapi/linux/kvm.h
->>> @@ -562,7 +562,10 @@ struct kvm_s390_mem_op {
->>>        __u32 op;        /* type of operation */
->>>        __u64 buf;        /* buffer in userspace */
->>>        union {
->>> -        __u8 ar;    /* the access register number */
->>> +        struct {
->>> +            __u8 ar;    /* the access register number */
->>> +            __u8 key;    /* access key, ignored if flag unset */
->>> +        };
->>>            __u32 sida_offset; /* offset into the sida */
->>>            __u8 reserved[32]; /* should be set to 0 */
->>>        };
->>> @@ -575,6 +578,7 @@ struct kvm_s390_mem_op {
->>>    /* flags for kvm_s390_mem_op->flags */
->>>    #define KVM_S390_MEMOP_F_CHECK_ONLY        (1ULL << 0)
->>>    #define KVM_S390_MEMOP_F_INJECT_EXCEPTION    (1ULL << 1)
->>> +#define KVM_S390_MEMOP_F_SKEY_PROTECTION    (1ULL << 2)
->>>      /* for KVM_INTERRUPT */
->>>    struct kvm_interrupt {
-> 
+so in KVM emulated scenario, clear TPR[3:0] to make a consistent behavior
+as in other scenarios.
+
+This doesn't impact evaluation and delivery of pending virtual interrupts
+because processor does not use the processor-priority sub-class to
+determine which interrupts to delivery and which to inhibit.
+
+Sub-class is used by hardware to arbitrate lowest priority interrupts,
+but KVM just does a round-robin style delivery.
+
+Fixes: b93463aa59d6 ("KVM: Accelerated apic support")
+Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+---
+v2: Add Sean's comments and "Fixes:" to patch description
+
+ arch/x86/kvm/lapic.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index d7e6fde82d25..306025db9959 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2242,10 +2242,7 @@ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
+ 
+ void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8)
+ {
+-	struct kvm_lapic *apic = vcpu->arch.apic;
+-
+-	apic_set_tpr(apic, ((cr8 & 0x0f) << 4)
+-		     | (kvm_lapic_get_reg(apic, APIC_TASKPRI) & 4));
++	apic_set_tpr(vcpu->arch.apic, (cr8 & 0x0f) << 4);
+ }
+ 
+ u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu)
+-- 
+2.25.1
+
