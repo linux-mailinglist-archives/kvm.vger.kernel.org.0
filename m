@@ -2,348 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD3864B030F
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:09:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 817F04B023B
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 02:28:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbiBJCIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 21:08:52 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56188 "EHLO
+        id S232321AbiBJB2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 20:28:30 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:55296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231329AbiBJCIq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 21:08:46 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF688262
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 18:08:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=eBT2CqKCMBC53Y0I7CjLXvjtNTKCe8D0c69/7Tbfma8=; b=XK1fXQ/lecZKAJxrn3izfv309f
-        Z+jr5oEqAZbgORnHOG3rieSAv+/dd8rNAC3hVF8Rnzgt20DzFEXFUOS4Q0sldiGlWG35EO1k2MUYl
-        GknTGtWmKUjqhvE+xNhFkXzytsJIeSR3/0ntt0FcWU3lnCw78n7olnc3gos0eloTpz4VIr0FNr7xT
-        fBG7TdlKFgfSBmLZ3AVtx1qvZM7+Ak2YHSoev83wZG0S8plEghvHFtyAiiWzyro/IgElDVfxcqqqA
-        WQnsA7VyLjbyPHAjN1fhAYc7hd5MA25B7O3CBqB/iDoSXEu+aAoxrCB0ZTFnQAOqn6lGsOlqXPt/T
-        uV6MWqXw==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHxIy-008YWK-K2; Thu, 10 Feb 2022 00:27:24 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHxIy-0019Dr-9c; Thu, 10 Feb 2022 00:27:24 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v0 15/15] KVM: x86/xen: handle PV spinlocks slowpath
-Date:   Thu, 10 Feb 2022 00:27:21 +0000
-Message-Id: <20220210002721.273608-16-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20220210002721.273608-1-dwmw2@infradead.org>
-References: <20220210002721.273608-1-dwmw2@infradead.org>
+        with ESMTP id S232518AbiBJB14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 20:27:56 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0CF20199
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:27:47 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id c5-20020a17090a1d0500b001b904a7046dso5426294pjd.1
+        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 17:27:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Yudl84hMQxfLHFinLSXzC02VLhYOexhpsfOokm5q7zI=;
+        b=iFEW70mUyIL6xFZqNc3fyWHhA7kZK7m5jhoBEudtRgQuUlpyo3hymoFzHKr9RsO6/+
+         NdEDJ00DowKRMIYQeISCJHTZ4mbIR5iP+hFQL8F17u1pOwXluhTtTtioMNMC60aY7nzC
+         7FKKeheDXxy54qnX0IiS0kzvvEZufRLroLR5LVUPYKxeWFODnbwJ/93kvpDJyHV5RySB
+         /9C/1IZTvdzM15USHlH1Awi4btfqLsxH9U99a4mXqV4TC1gswlZYuX8r2dXAqZIlJLTS
+         6+/O9OH8A1wLHV0i58r75smombgDabG6r0Re34kGoX2hTQBvSKL632T9mRl6xQm7OhP3
+         xfhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Yudl84hMQxfLHFinLSXzC02VLhYOexhpsfOokm5q7zI=;
+        b=jyeSMyjDsD9WYuITdf3yOCPGX00POJ+Qfd08yq/VqyJLpfWLqy6pygRQmAlU6kRCaF
+         jd92OJJ9RF3Kc+fYj1tHnBKDkAx6iuWQdYc3apmSf/Nv9Ts9WdsQ9hOu1r5agDpItB8d
+         WPC4xIThHfAj4LOZu4KsR5WFBZ8/3tVs+HLq8GQcguC/y3YMit3urTbyNLGKSXnM9P2o
+         W0yIlStOLJyMPxf7SZlrL30WTqlxGK5Gr6Iqs2zB7DsfQTOylUA72vS8i8xw3fpLFn9d
+         Bx7GQU1NpmJIcM7wo3GEWqFsPMyY2DybYhw8eS8NHZFCI/skCZFOa9QWQkE76QCXnzY7
+         lCsw==
+X-Gm-Message-State: AOAM531LDaEkZ5A/xXWTRzffavQMIi0evD3UgH9pf8qiJ/5o/nI29GeX
+        jpf/PIBm5WWHBvx3JxzZlGHYHrdG2wUozA==
+X-Google-Smtp-Source: ABdhPJxrU1x5K4f/mXLdxnZ6HovUenwDypXBS9OnT3ytekHe8lLu1VHAQBCI4PBjKjp+rrZhlhUtiA==
+X-Received: by 2002:a17:902:6905:: with SMTP id j5mr4775844plk.145.1644453012311;
+        Wed, 09 Feb 2022 16:30:12 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id i3sm5521002pgq.65.2022.02.09.16.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Feb 2022 16:30:11 -0800 (PST)
+Date:   Thu, 10 Feb 2022 00:30:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, vkuznets@redhat.com
+Subject: Re: [PATCH 01/23] KVM: MMU: pass uses_nx directly to
+ reset_shadow_zero_bits_mask
+Message-ID: <YgRckLixnxa7hLqB@google.com>
+References: <20220204115718.14934-1-pbonzini@redhat.com>
+ <20220204115718.14934-2-pbonzini@redhat.com>
+ <Yf1pk1EEBXj0O0/p@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yf1pk1EEBXj0O0/p@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+On Fri, Feb 04, 2022, David Matlack wrote:
+> On Fri, Feb 04, 2022 at 06:56:56AM -0500, Paolo Bonzini wrote:
+> > reset_shadow_zero_bits_mask has a very unintuitive way of deciding
+> > whether the shadow pages will use the NX bit.  The function is used in
+> > two cases, shadow paging and shadow NPT; shadow paging has a use for
+> > EFER.NX and needs to force it enabled, while shadow NPT only needs it
+> > depending on L1's setting.
+> > 
+> > The actual root problem here is that is_efer_nx, despite being part
+> > of the "base" role, only matches the format of the shadow pages in the
+> > NPT case.  For now, just remove the ugly variable initialization and move
+> > the call to reset_shadow_zero_bits_mask out of shadow_mmu_init_context.
+> > The parameter can then be removed after the root problem in the role
+> > is fixed.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> 
+> (I agree this commit makes no functional change.)
 
-Add support for SCHEDOP_poll hypercall.
+There may not be a functional change, but it drops an optimization and contributes
+to making future code/patches more fragile due to making it harder to understand
+the relationship between shadow_mmu_init_context() and __kvm_mmu_new_pgd().
 
-This implementation is optimized for polling for a single channel, which
-is what Linux does. Polling for multiple channels is not especially
-efficient (and has not been tested).
+> > @@ -4829,8 +4820,6 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
+> >  
+> >  	reset_guest_paging_metadata(vcpu, context);
+> >  	context->shadow_root_level = new_role.base.level;
+> > -
+> > -	reset_shadow_zero_bits_mask(vcpu, context);
 
-PV spinlocks slow path uses this hypercall, and explicitly crash if it's
-not supported.
+This is guarded by:
 
-Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h               |   3 +
- arch/x86/kvm/x86.c                            |   2 +
- arch/x86/kvm/xen.c                            | 140 ++++++++++++++++++
- arch/x86/kvm/xen.h                            |   5 +
- .../selftests/kvm/x86_64/xen_shinfo_test.c    |   6 +
- 5 files changed, 156 insertions(+)
+	if (new_role.as_u64 == context->mmu_role.as_u64)
+		return;
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 50cbea89739b..7aa46b906fdc 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -613,6 +613,8 @@ struct kvm_vcpu_xen {
- 	u32 timer_virq;
- 	atomic_t timer_pending;
- 	struct hrtimer timer;
-+	int poll_evtchn;
-+	struct timer_list poll_timer;
- };
- 
- struct kvm_vcpu_arch {
-@@ -1027,6 +1029,7 @@ struct kvm_xen {
- 	u8 upcall_vector;
- 	struct gfn_to_pfn_cache shinfo_cache;
- 	struct idr evtchn_ports;
-+	unsigned long poll_mask[BITS_TO_LONGS(KVM_MAX_VCPUS)];
- };
- 
- enum kvm_irqchip_mode {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8ef276fed7fe..b43adb84d30b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11132,6 +11132,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.pending_external_vector = -1;
- 	vcpu->arch.preempted_in_kernel = false;
- 
-+	kvm_xen_init_vcpu(vcpu);
-+
- #if IS_ENABLED(CONFIG_HYPERV)
- 	vcpu->arch.hv_root_tdp = INVALID_PAGE;
- #endif
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 87706bcecaef..49059ca085b1 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -10,6 +10,7 @@
- #include "xen.h"
- #include "lapic.h"
- #include "hyperv.h"
-+#include "lapic.h"
- 
- #include <linux/eventfd.h>
- #include <linux/kvm_host.h>
-@@ -988,9 +989,133 @@ static int kvm_xen_hypercall_complete_userspace(struct kvm_vcpu *vcpu)
- 	return kvm_xen_hypercall_set_result(vcpu, run->xen.u.hcall.result);
- }
- 
-+static bool wait_pending_event(struct kvm_vcpu *vcpu, int nr_ports,
-+			       evtchn_port_t *ports)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct gfn_to_pfn_cache *gpc = &kvm->arch.xen.shinfo_cache;
-+	unsigned long *pending_bits;
-+	unsigned long flags;
-+	bool ret = true;
-+	int idx, i;
-+
-+	read_lock_irqsave(&gpc->lock, flags);
-+	idx = srcu_read_lock(&kvm->srcu);
-+	if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
-+		goto out_rcu;
-+
-+	ret = false;
-+	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode) {
-+		struct shared_info *shinfo = gpc->khva;
-+		pending_bits = (unsigned long *)&shinfo->evtchn_pending;
-+	} else {
-+		struct compat_shared_info *shinfo = gpc->khva;
-+		pending_bits = (unsigned long *)&shinfo->evtchn_pending;
-+	}
-+
-+	for (i = 0; i < nr_ports; i++) {
-+		if (test_bit(ports[i], pending_bits)) {
-+			ret = true;
-+			break;
-+		}
-+	}
-+
-+ out_rcu:
-+	srcu_read_unlock(&kvm->srcu, idx);
-+	read_unlock_irqrestore(&gpc->lock, flags);
-+
-+	return ret;
-+}
-+
-+static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, u64 param, u64 *r)
-+{
-+	int idx, i;
-+	struct sched_poll sched_poll;
-+	evtchn_port_t port, *ports;
-+	int ret = 0;
-+	gpa_t gpa;
-+
-+	idx = srcu_read_lock(&vcpu->kvm->srcu);
-+	gpa = kvm_mmu_gva_to_gpa_system(vcpu, param, NULL);
-+	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+
-+	if (!gpa || kvm_vcpu_read_guest(vcpu, gpa, &sched_poll,
-+					sizeof(sched_poll))) {
-+		*r = -EFAULT;
-+		return true;
-+	}
-+
-+	if (unlikely(sched_poll.nr_ports > 1)) {
-+		/* Xen (unofficially) limits number of pollers to 128 */
-+		if (sched_poll.nr_ports > 128)
-+			return -EINVAL;
-+
-+		ports = kmalloc_array(sched_poll.nr_ports,
-+				      sizeof(*ports), GFP_KERNEL);
-+		if (!ports)
-+			return -ENOMEM;
-+	} else
-+		ports = &port;
-+
-+	for (i = 0; i < sched_poll.nr_ports; i++) {
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		gpa = kvm_mmu_gva_to_gpa_system(vcpu,
-+						(gva_t)(sched_poll.ports + i),
-+						NULL);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+
-+		if (!gpa || kvm_vcpu_read_guest(vcpu, gpa,
-+						&ports[i], sizeof(port))) {
-+			ret = -EFAULT;
-+			goto out;
-+		}
-+	}
-+
-+	if (sched_poll.nr_ports == 1)
-+		vcpu->arch.xen.poll_evtchn = port;
-+	else
-+		vcpu->arch.xen.poll_evtchn = -1;
-+
-+	set_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.xen.poll_mask);
-+
-+	if (!wait_pending_event(vcpu, sched_poll.nr_ports, ports)) {
-+		vcpu->arch.mp_state = KVM_MP_STATE_HALTED;
-+
-+		if (sched_poll.timeout)
-+			mod_timer(&vcpu->arch.xen.poll_timer, jiffies + nsecs_to_jiffies(sched_poll.timeout));
-+
-+		kvm_vcpu_halt(vcpu);
-+
-+		if (sched_poll.timeout)
-+			del_timer(&vcpu->arch.xen.poll_timer);
-+	}
-+
-+	vcpu->arch.xen.poll_evtchn = 0;
-+
-+out:
-+	/* Really, this is only needed in case of timeout */
-+	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.xen.poll_mask);
-+
-+	if (unlikely(sched_poll.nr_ports > 1))
-+		kfree(ports);
-+	return ret;
-+}
-+
-+static void cancel_evtchn_poll(struct timer_list *t)
-+{
-+	struct kvm_vcpu *vcpu = from_timer(vcpu, t, arch.xen.poll_timer);
-+
-+	kvm_make_request(KVM_REQ_UNHALT, vcpu);
-+}
-+
- static bool kvm_xen_hcall_sched_op(struct kvm_vcpu *vcpu, int cmd, u64 param, u64 *r)
- {
- 	switch (cmd) {
-+	case SCHEDOP_poll:
-+		if ((vcpu->kvm->arch.xen_hvm_config.flags &
-+		     KVM_XEN_HVM_CONFIG_EVTCHN_SEND) && lapic_in_kernel(vcpu))
-+			return kvm_xen_schedop_poll(vcpu, param, r);
-+		fallthrough;
- 	case SCHEDOP_yield:
- 		kvm_vcpu_on_spin(vcpu, true);
- 		*r = 0;
-@@ -1152,6 +1277,17 @@ static inline int max_evtchn_port(struct kvm *kvm)
- 		return COMPAT_EVTCHN_2L_NR_CHANNELS;
- }
- 
-+static void kvm_xen_check_poller(struct kvm_vcpu *vcpu, int port)
-+{
-+	int poll_evtchn = vcpu->arch.xen.poll_evtchn;
-+
-+	if ((poll_evtchn == port || poll_evtchn == -1) &&
-+	    test_and_clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.xen.poll_mask)) {
-+		kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
-+		kvm_vcpu_kick(vcpu);
-+	}
-+}
-+
- /*
-  * The return value from this function is propagated to kvm_set_irq() API,
-  * so it returns:
-@@ -1219,6 +1355,7 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
- 		rc = 0; /* It was already raised */
- 	} else if (test_bit(xe->port, mask_bits)) {
- 		rc = -ENOTCONN; /* Masked */
-+		kvm_xen_check_poller(vcpu, xe->port);
- 	} else {
- 		rc = 1; /* Delivered to the bitmap in shared_info. */
- 		/* Now switch to the vCPU's vcpu_info to set the index and pending_sel */
-@@ -1628,6 +1765,8 @@ static bool kvm_xen_hcall_evtchn_send(struct kvm_vcpu *vcpu, u64 param, u64 *r)
- void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.xen.vcpu_id = vcpu->vcpu_idx;
-+	vcpu->arch.xen.poll_evtchn = 0;
-+	timer_setup(&vcpu->arch.xen.poll_timer, cancel_evtchn_poll, 0);
- }
- 
- void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
-@@ -1641,6 +1780,7 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
- 				     &vcpu->arch.xen.vcpu_info_cache);
- 	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
- 				     &vcpu->arch.xen.vcpu_time_info_cache);
-+	del_timer_sync(&vcpu->arch.xen.poll_timer);
- }
- 
- void kvm_xen_init_vm(struct kvm *kvm)
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 616fe751c8fc..eaddbeb2f923 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -24,6 +24,7 @@ int kvm_xen_hvm_evtchn_send(struct kvm *kvm, struct kvm_irq_routing_xen_evtchn *
- int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data);
- int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc);
- void kvm_xen_init_vm(struct kvm *kvm);
-+void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu);
- void kvm_xen_destroy_vm(struct kvm *kvm);
- void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu);
- void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu);
-@@ -83,6 +84,10 @@ static inline int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
- 	return 1;
- }
- 
-+static inline void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
-+{
-+}
-+
- static inline void kvm_xen_init_vm(struct kvm *kvm)
- {
- }
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 865e17146815..376c611443cd 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -233,6 +233,12 @@ int main(int argc, char *argv[])
- 		.flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
- 		.msr = XEN_HYPERCALL_MSR,
- 	};
-+
-+	/* Let the kernel know that we *will* use it for sending all
-+	 * event channels, which lets it intercept SCHEDOP_poll */
-+	if (xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_SEND)
-+		hvmc.flags |= KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
-+
- 	vm_ioctl(vm, KVM_XEN_HVM_CONFIG, &hvmc);
- 
- 	struct kvm_xen_hvm_attr lm = {
--- 
-2.33.1
+> >  }
+> >  
+> >  static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
+> > @@ -4841,6 +4830,16 @@ static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
+> >  		kvm_calc_shadow_mmu_root_page_role(vcpu, regs, false);
+> >  
+> >  	shadow_mmu_init_context(vcpu, context, regs, new_role);
+> > +
+> > +	/*
+> > +	 * KVM uses NX when TDP is disabled to handle a variety of scenarios,
+> > +	 * notably for huge SPTEs if iTLB multi-hit mitigation is enabled and
+> > +	 * to generate correct permissions for CR0.WP=0/CR4.SMEP=1/EFER.NX=0.
+> > +	 * The iTLB multi-hit workaround can be toggled at any time, so assume
+> > +	 * NX can be used by any non-nested shadow MMU to avoid having to reset
+> > +	 * MMU contexts.  Note, KVM forces EFER.NX=1 when TDP is disabled.
+> > +	 */
+> > +	reset_shadow_zero_bits_mask(vcpu, context, true);
 
+Whereas this will compute the mask even if the role doesn't change.  I say that
+matters later on because then this sequence:
+
+	shadow_mmu_init_context(vcpu, context, &regs, new_role);
+	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
+	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
+
+becomes even more difficult to untangle.
+
+And looking at where this series ends up, I don't understand the purpose of this
+change.  Patch 18 essentially reverts this patch, and I see nothing in between
+that will break without the temporary change.   That patch becomes:
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02e6d256805d..f9c96de1189d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4408,7 +4408,7 @@ static void reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
+         * NX can be used by any non-nested shadow MMU to avoid having to reset
+         * MMU contexts.  Note, KVM forces EFER.NX=1 when TDP is disabled.
+         */
+-       bool uses_nx = is_efer_nx(context) || !tdp_enabled;
++       bool uses_nx = context->mmu_role.efer_nx;
+
+        /* @amd adds a check on bit of SPTEs, which KVM shouldn't use anyways. */
+        bool is_amd = true;
+
+though it needs to update the comment as well.
+
+> >  }
+> >  
+> >  static union kvm_mmu_role
+> > @@ -4872,6 +4871,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+> >  	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
+> >  
+> >  	shadow_mmu_init_context(vcpu, context, &regs, new_role);
+> > +	reset_shadow_zero_bits_mask(vcpu, context, is_efer_nx(context));
+> 
+> Out of curiousity, how does KVM mitigate iTLB multi-hit when shadowing
+> NPT and the guest has not enabled EFER.NX?
+> 
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_init_shadow_npt_mmu);
+> >  
+> > -- 
+> > 2.31.1
+> > 
+> > 
