@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D0424B0310
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:09:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B67DC4B0307
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:09:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233609AbiBJCJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 21:09:03 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55262 "EHLO
+        id S231315AbiBJCIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 21:08:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235871AbiBJCIl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 21:08:41 -0500
+        with ESMTP id S235899AbiBJCIn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 21:08:43 -0500
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33A56286
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 18:08:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833C6B6B
+        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 18:08:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Iw9MIDIagznm07FHPCkl35WaGQDZFSqo3TgOuINQbc0=; b=B24qu5uKawiTz66GhrdWIFWDCe
-        RWffP8Wo373pyLreZKMFFVrF31BCx40boW3u0nCqVvdWMHGnlmFqU/F1xpygdPR9N7e9Qv2FJTlSQ
-        JqrZUcFtJlymCd8eQ/gd7HWO2p1MU1IPp7KFOdDXghhUu9nOHE2Lm633pvhedtf73wrh27PvTQXgt
-        KKZUomHUq1eGoHyHweQcNgPLXzFAoIAstWHeWucLRVwa3iJDY35TH2eV17FOvGunBJJfMk3w0Wvo/
-        /InS1rXcIrXME9nzLKGysdcwPMwk3nl3RFHn9WFEgdQBfotM5SjY60PKwrEvZD1SGlVZvPvmPRSib
-        TV1rb5pA==;
+        bh=TqNdvpCfmSXhqFJSoKVWx4TQwHdp3FSWSSRfSqxyXY0=; b=V7Nms1pwSXbtAyYom22/soVSvo
+        cohnmRSFlz1JwUS7vYiR58/ecKFcj+TZdv8CXnRU0Mf08TlvF9h/KcLFL+Emg1AkmyCFEDJ/9seX3
+        sZQ2r2m9dKBo4xhuWGJa6zdaG7GQxxSgOnFd2JemlLhOe3Mgxw3B7lK+A/S2MB3SD2sOhn5Obvhwb
+        +TXVx4SoShwtcV8VXu7vCeJwYfXs2WnJSGJj5uzoZvV1qqI/hmR0rfRK+xoLPxWizuZKeZFlVPq2B
+        u8TqXE/RoBdr1wrO2i5MpibWii8a0+6lk960hehwP3gC2LA1U5P5VhxFV/ar8H0dgxCaokCsYWYYP
+        RYzdq8fw==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHxIy-008YWF-DE; Thu, 10 Feb 2022 00:27:24 +0000
+        id 1nHxIy-008YWG-Dl; Thu, 10 Feb 2022 00:27:24 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHxIy-0019DI-4c; Thu, 10 Feb 2022 00:27:24 +0000
+        id 1nHxIy-0019DN-5U; Thu, 10 Feb 2022 00:27:24 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Metin Kaya <metikaya@amazon.co.uk>,
         Paul Durrant <pdurrant@amazon.co.uk>
-Subject: [PATCH v0 08/15] KVM: x86/xen: intercept EVTCHNOP_send from guests
-Date:   Thu, 10 Feb 2022 00:27:14 +0000
-Message-Id: <20220210002721.273608-9-dwmw2@infradead.org>
+Subject: [PATCH v0 09/15] KVM: x86/xen: handle PV IPI vcpu yield
+Date:   Thu, 10 Feb 2022 00:27:15 +0000
+Message-Id: <20220210002721.273608-10-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20220210002721.273608-1-dwmw2@infradead.org>
 References: <20220210002721.273608-1-dwmw2@infradead.org>
@@ -62,442 +62,60 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joao Martins <joao.m.martins@oracle.com>
 
-Userspace registers a sending @port to either deliver to an @eventfd
-or directly back to a local event channel port.
+Cooperative Linux guests after an IPI-many may yield vcpu if
+any of the IPI'd vcpus were preempted (i.e. runstate is 'runnable'.)
+Support SCHEDOP_yield for handling yield.
 
-After binding events the guest or host may wish to bind those
-events to a particular vcpu. This is usually done for unbound
-and and interdomain events. Update requests are handled via the
-KVM_XEN_EVTCHN_UPDATE flag.
-
-Unregistered ports are handled by the emulator.
-
-Co-developed-by: Ankur Arora <ankur.a.arora@oracle.com>
-Co-developed-By: David Woodhouse <dwmw@amazon.co.uk>
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |   1 +
- arch/x86/kvm/xen.c              | 273 ++++++++++++++++++++++++++++++--
- include/uapi/linux/kvm.h        |  27 ++++
- 3 files changed, 286 insertions(+), 15 deletions(-)
+ arch/x86/kvm/xen.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1c63296d3951..dca0842d6926 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1020,6 +1020,7 @@ struct kvm_xen {
- 	bool long_mode;
- 	u8 upcall_vector;
- 	struct gfn_to_pfn_cache shinfo_cache;
-+	struct idr evtchn_ports;
- };
- 
- enum kvm_irqchip_mode {
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 90fffca518f0..909c25521554 100644
+index 909c25521554..3df44c996d66 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -11,6 +11,7 @@
- #include "lapic.h"
- #include "hyperv.h"
- 
-+#include <linux/eventfd.h>
- #include <linux/kvm_host.h>
- #include <linux/sched/stat.h>
- 
-@@ -21,6 +22,9 @@
+@@ -19,6 +19,7 @@
+ #include <xen/interface/xen.h>
+ #include <xen/interface/vcpu.h>
+ #include <xen/interface/event_channel.h>
++#include <xen/interface/sched.h>
  
  #include "trace.h"
  
-+static int kvm_xen_setattr_evtchn(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
-+static bool kvm_xen_hcall_evtchn_send(struct kvm_vcpu *vcpu, u64 param, u64 *r);
-+
- DEFINE_STATIC_KEY_DEFERRED_FALSE(kvm_xen_enabled, HZ);
- 
- static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
-@@ -365,36 +369,44 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- {
- 	int r = -ENOENT;
- 
--	mutex_lock(&kvm->lock);
- 
- 	switch (data->type) {
- 	case KVM_XEN_ATTR_TYPE_LONG_MODE:
- 		if (!IS_ENABLED(CONFIG_64BIT) && data->u.long_mode) {
- 			r = -EINVAL;
- 		} else {
-+			mutex_lock(&kvm->lock);
- 			kvm->arch.xen.long_mode = !!data->u.long_mode;
-+			mutex_unlock(&kvm->lock);
- 			r = 0;
- 		}
- 		break;
- 
- 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
-+		mutex_lock(&kvm->lock);
- 		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
-+		mutex_unlock(&kvm->lock);
- 		break;
- 
- 	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
- 		if (data->u.vector && data->u.vector < 0x10)
- 			r = -EINVAL;
- 		else {
-+			mutex_lock(&kvm->lock);
- 			kvm->arch.xen.upcall_vector = data->u.vector;
-+			mutex_unlock(&kvm->lock);
- 			r = 0;
- 		}
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_EVTCHN:
-+		r = kvm_xen_setattr_evtchn(kvm, data);
-+		break;
-+
- 	default:
- 		break;
- 	}
- 
--	mutex_unlock(&kvm->lock);
- 	return r;
+@@ -800,6 +801,20 @@ static int kvm_xen_hypercall_complete_userspace(struct kvm_vcpu *vcpu)
+ 	return kvm_xen_hypercall_set_result(vcpu, run->xen.u.hcall.result);
  }
  
-@@ -772,18 +784,6 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
- 	return 0;
- }
- 
--void kvm_xen_init_vm(struct kvm *kvm)
--{
--}
--
--void kvm_xen_destroy_vm(struct kvm *kvm)
--{
--	kvm_gfn_to_pfn_cache_destroy(kvm, &kvm->arch.xen.shinfo_cache);
--
--	if (kvm->arch.xen_hvm_config.msr)
--		static_branch_slow_dec_deferred(&kvm_xen_enabled);
--}
--
- static int kvm_xen_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
- {
- 	kvm_rax_write(vcpu, result);
-@@ -803,7 +803,8 @@ static int kvm_xen_hypercall_complete_userspace(struct kvm_vcpu *vcpu)
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
- {
- 	bool longmode;
--	u64 input, params[6];
-+	u64 input, params[6], r = -ENOSYS;
-+	bool handled = false;
- 
- 	input = (u64)kvm_register_read(vcpu, VCPU_REGS_RAX);
- 
-@@ -834,6 +835,19 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
- 	trace_kvm_xen_hypercall(input, params[0], params[1], params[2],
- 				params[3], params[4], params[5]);
- 
-+	switch (input) {
-+	case __HYPERVISOR_event_channel_op:
-+		if (params[0] == EVTCHNOP_send)
-+			handled = kvm_xen_hcall_evtchn_send(vcpu, params[1], &r);
-+		break;
-+
++static bool kvm_xen_hcall_sched_op(struct kvm_vcpu *vcpu, int cmd, u64 param, u64 *r)
++{
++	switch (cmd) {
++	case SCHEDOP_yield:
++		kvm_vcpu_on_spin(vcpu, true);
++		*r = 0;
++		return true;
 +	default:
 +		break;
 +	}
 +
-+	if (handled)
-+		return kvm_xen_hypercall_set_result(vcpu, r);
-+
- 	vcpu->run->exit_reason = KVM_EXIT_XEN;
- 	vcpu->run->xen.type = KVM_EXIT_XEN_HCALL;
- 	vcpu->run->xen.u.hcall.longmode = longmode;
-@@ -1121,6 +1135,212 @@ int kvm_xen_hvm_evtchn_send(struct kvm *kvm, struct kvm_irq_routing_xen_evtchn *
- 	return ret;
- }
- 
-+/*
-+ * Support for *outbound* event channel events via the EVTCHNOP_send hypercall.
-+ */
-+struct evtchnfd {
-+	u32 send_port;
-+	u32 type;
-+	union {
-+		struct kvm_xen_evtchn port;
-+		struct {
-+			u32 port; /* zero */
-+			struct eventfd_ctx *ctx;
-+		} eventfd;
-+	} deliver;
-+};
-+
-+/*
-+ * Update target vCPU or priority for a registered sending channel.
-+ */
-+static int kvm_xen_eventfd_update(struct kvm *kvm,
-+				  struct kvm_xen_hvm_attr *data)
-+{
-+	u32 port = data->u.evtchn.send_port;
-+	struct evtchnfd *evtchnfd;
-+
-+	if (!port || port >= max_evtchn_port(kvm))
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+	evtchnfd = idr_find(&kvm->arch.xen.evtchn_ports, port);
-+	mutex_unlock(&kvm->lock);
-+
-+	if (!evtchnfd)
-+		return -ENOENT;
-+
-+	/* For an UPDATE, nothing may change except the priority/vcpu */
-+	if (evtchnfd->type != data->u.evtchn.type)
-+		return -EINVAL;
-+
-+	/*
-+	 * Port cannot change, and if it's zero that was an eventfd
-+	 * which can't be changed either.
-+	 */
-+	if (!evtchnfd->deliver.port.port ||
-+	    evtchnfd->deliver.port.port != data->u.evtchn.deliver.port.port)
-+		return -EINVAL;
-+
-+	/* We only support 2 level event channels for now */
-+	if (data->u.evtchn.deliver.port.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL)
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+	evtchnfd->deliver.port.priority = data->u.evtchn.deliver.port.priority;
-+	if (evtchnfd->deliver.port.vcpu_id != data->u.evtchn.deliver.port.vcpu) {
-+		evtchnfd->deliver.port.vcpu_id = data->u.evtchn.deliver.port.vcpu;
-+		evtchnfd->deliver.port.vcpu_idx = -1;
-+	}
-+	mutex_unlock(&kvm->lock);
-+	return 0;
++	return false;
 +}
 +
-+/*
-+ * Configure the target (eventfd or local port delivery) for sending on
-+ * a given event channel.
-+ */
-+static int kvm_xen_eventfd_assign(struct kvm *kvm,
-+				  struct kvm_xen_hvm_attr *data)
-+{
-+	u32 port = data->u.evtchn.send_port;
-+	struct eventfd_ctx *eventfd = NULL;
-+	struct evtchnfd *evtchnfd = NULL;
-+	int ret = -EINVAL;
-+
-+	if (!port || port >= max_evtchn_port(kvm))
-+		return -EINVAL;
-+
-+	evtchnfd = kzalloc(sizeof(struct evtchnfd), GFP_KERNEL);
-+	if (!evtchnfd)
-+		return -ENOMEM;
-+
-+	switch(data->u.evtchn.type) {
-+	case EVTCHNSTAT_ipi:
-+		/* IPI  must map back to the same port# */
-+		if (data->u.evtchn.deliver.port.port != data->u.evtchn.send_port)
-+			goto out; /* -EINVAL */
-+		break;
-+
-+	case EVTCHNSTAT_interdomain:
-+		if (data->u.evtchn.deliver.port.port) {
-+			if (data->u.evtchn.deliver.port.port >= max_evtchn_port(kvm))
-+				goto out; /* -EINVAL */
-+		} else {
-+			eventfd = eventfd_ctx_fdget(data->u.evtchn.deliver.eventfd.fd);
-+			if (IS_ERR(eventfd)) {
-+				ret = PTR_ERR(eventfd);
-+				goto out;
-+			}
-+		}
-+		break;
-+
-+	case EVTCHNSTAT_virq:
-+	case EVTCHNSTAT_closed:
-+	case EVTCHNSTAT_unbound:
-+	case EVTCHNSTAT_pirq:
-+	default: /* Unknown event channel type */
-+		goto out; /* -EINVAL */
-+	}
-+
-+	if (eventfd) {
-+		evtchnfd->deliver.eventfd.ctx = eventfd;
-+	} else {
-+		/* We only support 2 level event channels for now */
-+		if (data->u.evtchn.deliver.port.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL)
-+			goto out; /* -EINVAL; */
-+
-+		evtchnfd->deliver.port.port = data->u.evtchn.deliver.port.port;
-+		evtchnfd->deliver.port.vcpu_id = data->u.evtchn.deliver.port.vcpu;
-+		evtchnfd->deliver.port.vcpu_idx = -1;
-+		evtchnfd->deliver.port.priority = data->u.evtchn.deliver.port.priority;
-+	}
-+
-+	mutex_lock(&kvm->lock);
-+	ret = idr_alloc(&kvm->arch.xen.evtchn_ports, evtchnfd, port, port + 1,
-+			GFP_KERNEL);
-+	mutex_unlock(&kvm->lock);
-+
-+	if (ret >= 0)
-+		return 0;
-+
-+	if (ret == -ENOSPC)
-+		ret = -EEXIST;
-+out:
-+	if (eventfd)
-+		eventfd_ctx_put(eventfd);
-+	kfree(evtchnfd);
-+	return ret;
-+}
-+
-+static int kvm_xen_eventfd_deassign(struct kvm *kvm, u32 port)
-+{
-+	struct evtchnfd *evtchnfd;
-+
-+	mutex_lock(&kvm->lock);
-+	evtchnfd = idr_remove(&kvm->arch.xen.evtchn_ports, port);
-+	mutex_unlock(&kvm->lock);
-+
-+	if (!evtchnfd)
-+		return -ENOENT;
-+
-+	if (kvm)
-+		synchronize_srcu(&kvm->srcu);
-+	if (!evtchnfd->deliver.port.port)
-+		eventfd_ctx_put(evtchnfd->deliver.eventfd.ctx);
-+	kfree(evtchnfd);
-+	return 0;
-+}
-+
-+static int kvm_xen_setattr_evtchn(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
-+{
-+	u32 port = data->u.evtchn.send_port;
-+
-+	if (!port || port >= max_evtchn_port(kvm))
-+		return -EINVAL;
-+
-+	if (data->u.evtchn.flags == KVM_XEN_EVTCHN_DEASSIGN)
-+		return kvm_xen_eventfd_deassign(kvm, port);
-+	if (data->u.evtchn.flags == KVM_XEN_EVTCHN_UPDATE)
-+		return kvm_xen_eventfd_update(kvm, data);
-+	if (data->u.evtchn.flags)
-+		return -EINVAL;
-+
-+	return kvm_xen_eventfd_assign(kvm, data);
-+}
-+
-+static bool kvm_xen_hcall_evtchn_send(struct kvm_vcpu *vcpu, u64 param, u64 *r)
-+{
-+	struct evtchnfd *evtchnfd;
-+	struct evtchn_send send;
-+	gpa_t gpa;
-+	int idx;
-+
-+	idx = srcu_read_lock(&vcpu->kvm->srcu);
-+	gpa = kvm_mmu_gva_to_gpa_system(vcpu, param, NULL);
-+	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+
-+	if (!gpa || kvm_vcpu_read_guest(vcpu, gpa, &send, sizeof(send))) {
-+		*r = -EFAULT;
-+		return true;
-+	}
-+
-+	/* The evtchn_ports idr is protected by vcpu->kvm->srcu */
-+	evtchnfd = idr_find(&vcpu->kvm->arch.xen.evtchn_ports, send.port);
-+	if (!evtchnfd)
-+		return false;
-+
-+	if (evtchnfd->deliver.port.port) {
-+		int ret = kvm_xen_set_evtchn(&evtchnfd->deliver.port, vcpu->kvm);
-+		if (ret < 0 && ret != -ENOTCONN)
-+			return false;
-+	} else {
-+		eventfd_signal(evtchnfd->deliver.eventfd.ctx, 1);
-+	}
-+
-+	*r = 0;
-+	return true;
-+}
-+
- void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
+ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
  {
- 	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
-@@ -1130,3 +1350,26 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
- 	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
- 				     &vcpu->arch.xen.vcpu_time_info_cache);
- }
-+
-+void kvm_xen_init_vm(struct kvm *kvm)
-+{
-+	idr_init(&kvm->arch.xen.evtchn_ports);
-+}
-+
-+void kvm_xen_destroy_vm(struct kvm *kvm)
-+{
-+	struct evtchnfd *evtchnfd;
-+	int i;
-+
-+	kvm_gfn_to_pfn_cache_destroy(kvm, &kvm->arch.xen.shinfo_cache);
-+
-+	idr_for_each_entry(&kvm->arch.xen.evtchn_ports, evtchnfd, i) {
-+		if (!evtchnfd->deliver.port.port)
-+			eventfd_ctx_put(evtchnfd->deliver.eventfd.ctx);
-+		kfree(evtchnfd);
-+	}
-+	idr_destroy(&kvm->arch.xen.evtchn_ports);
-+
-+	if (kvm->arch.xen_hvm_config.msr)
-+		static_branch_slow_dec_deferred(&kvm_xen_enabled);
-+}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f82b503e26e2..c0d6f49e3fd8 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1679,6 +1679,31 @@ struct kvm_xen_hvm_attr {
- 		struct {
- 			__u64 gfn;
- 		} shared_info;
-+		struct {
-+			__u32 send_port;
-+			__u32 type; /* EVTCHNSTAT_ipi / EVTCHNSTAT_interdomain */
-+			__u32 flags;
-+#define KVM_XEN_EVTCHN_DEASSIGN		(1 << 0)
-+#define KVM_XEN_EVTCHN_UPDATE		(1 << 1)
-+			/*
-+			 * Events sent by the guest are either looped back to
-+			 * the guest itself (potentially on a different port#)
-+			 * or signalled via an eventfd.
-+			 */
-+			union {
-+				struct {
-+					__u32 port;
-+					__u32 vcpu;
-+					__u32 priority;
-+				} port;
-+				struct {
-+					__u32 port; /* Zero for eventfd */
-+					__s32 fd;
-+				} eventfd;
-+				__u32 padding[4];
-+			} deliver;
-+		} evtchn;
-+
- 		__u64 pad[8];
- 	} u;
- };
-@@ -1687,6 +1712,8 @@ struct kvm_xen_hvm_attr {
- #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
- #define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
- #define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x2
-+/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_EVTCHN_SEND */
-+#define KVM_XEN_ATTR_TYPE_EVTCHN		0x3
- 
- /* Per-vCPU Xen attributes */
- #define KVM_XEN_VCPU_GET_ATTR	_IOWR(KVMIO, 0xca, struct kvm_xen_vcpu_attr)
+ 	bool longmode;
+@@ -840,7 +855,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+ 		if (params[0] == EVTCHNOP_send)
+ 			handled = kvm_xen_hcall_evtchn_send(vcpu, params[1], &r);
+ 		break;
+-
++	case __HYPERVISOR_sched_op:
++		handled = kvm_xen_hcall_sched_op(vcpu, params[0], params[1], &r);
++		break;
+ 	default:
+ 		break;
+ 	}
 -- 
 2.33.1
 
