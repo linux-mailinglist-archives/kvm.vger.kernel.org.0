@@ -2,167 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 379F74B0A82
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 11:26:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF87D4B0AA4
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 11:32:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239566AbiBJK0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Feb 2022 05:26:13 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41502 "EHLO
+        id S239692AbiBJKby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Feb 2022 05:31:54 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238573AbiBJK0M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Feb 2022 05:26:12 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7FEB92;
-        Thu, 10 Feb 2022 02:26:14 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id 9so6529788pfx.12;
-        Thu, 10 Feb 2022 02:26:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=S3brhBb+bSmy7kWwrAStLjrdT1gd/LIODsFcqQLD4DQ=;
-        b=ThVMKztpRfKTy8XRFBBwfFFDavDQ1+6xwPwMrm1vPQRijO2IjB9rpgJn//wqkf1mjS
-         /JxYjQtcEbVGSfB/6vJlq4LhNEoTx6P32HyiCg0FaGyRSWdc48KPQewzRcGu2IUxdVZy
-         lShqP7Z7wY/ZYVOi4nMq7WTWJhMR26QoXBigUhKjIV0epqTjwnu6xkLWwuSDa/She12S
-         EDqTrUMpVykaH0vLzwOcqF0URLSFAW5WhqpC/uFo1bxO5xoAm2ZTz2RKFrMSmnCiRSVl
-         RBWfkvSMP2c8NmOdSsliBI4e4kylMZMnMbv9pcjLwm61KuonJNNYHdlnTXV+GobvYt9q
-         2pXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=S3brhBb+bSmy7kWwrAStLjrdT1gd/LIODsFcqQLD4DQ=;
-        b=jjCEjPZEZSNzeLJdyYYMW9na5XtjfAASYsDj9skkBDroyJPNo0SkTgddhHpi4B5nTK
-         c0sZiwU2i8rHcUfQXpAo4K4gVmTCiSOcJCSLlAFfjUo3rRpK5b497y4zKOtVYGM7TVHB
-         hrV3StLs3JwJXSd5gZ0c1NyPwn3mmpeSNkbYw89a17AxXwRGnSdqRjsrzHziIcWp8yHd
-         1OVf/2vsCvrXSG9npzcDofmVQcVV5MV+1OWXsKSEq3Z7ccwQaop4RphFR8yq8sdv575r
-         /3/ai0zD8wBX6WPf4xy+LgbN115Bd0Z+91U02AyneTSU/ILm3Bm1NgAWNInv6qN0q5/P
-         lpsw==
-X-Gm-Message-State: AOAM5324RNV1YrbWAvqVfeb/zMbOu3QGmQOCf4oLqY4By5vGEGbhJ70l
-        AsO4xask2THBj9Squ/tfr6Rw8qmXB4jkkGTOlKg=
-X-Google-Smtp-Source: ABdhPJwuxHSAEKlJLK7gS3sI6+I73ZHYogHHWMo136AeW6Lyw4akalgxs0AUePN0kRApMjNCmONxPA==
-X-Received: by 2002:a63:982:: with SMTP id 124mr5724006pgj.438.1644488773695;
-        Thu, 10 Feb 2022 02:26:13 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id w2sm6916757pfb.139.2022.02.10.02.26.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 02:26:13 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Distinguish EVENTSEL bitmasks for uniform event creation and filtering
-Date:   Thu, 10 Feb 2022 18:26:03 +0800
-Message-Id: <20220210102603.42764-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.35.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S239693AbiBJKbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Feb 2022 05:31:53 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85917CEF
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 02:31:54 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1F519B824AA
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 10:31:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B70D4C004E1;
+        Thu, 10 Feb 2022 10:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644489111;
+        bh=N2HI8qSihMQX0nVOdnkUOKIzjezs+8DTSwDNJwrZaiA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=N2GOdPf8N1TAoDJOlHO6xu9cmv8KwBzvfYtPJace0dxvu8vZacBWTO0rNpBOP33GM
+         Fs2Cyct7TjzBaw7lHDw5XiHrxiyPAynMWNLWgiI6hd3ZayZc/9DZIonBwQE/ILfiJc
+         ojW1tN0zF6kwZoRA1XKyYIe/kjOJKDvlN7ubal5IjhwT/vTgl4YgKW59zMgrgMrJjN
+         S3OIFz+2a7yKuzkkahxIbdoSms/bCeRVxbFLdqwbcxHr7IifDpWQ9e7Jdaf2VzTneZ
+         4QMaD+ni0K1TRzkQ9pKgHGSnuvxRJI/Gs1ETqe3Ko7LdCgYRjnWq+sZeBHJhZmiOwu
+         v5dVEBhIKTfKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nI6jt-006sGC-EX; Thu, 10 Feb 2022 10:31:49 +0000
+Date:   Thu, 10 Feb 2022 10:31:48 +0000
+Message-ID: <87wni33td7.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
+In-Reply-To: <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
+References: <20220118041923.3384602-1-reijiw@google.com>
+        <87a6f15skj.wl-maz@kernel.org>
+        <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
+        <875ypo5jqi.wl-maz@kernel.org>
+        <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com, jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Thu, 10 Feb 2022 05:31:49 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Feb 9, 2022 at 4:04 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Hi Reiji,
+> >
+> > On Wed, 09 Feb 2022 05:32:36 +0000,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On Tue, Feb 8, 2022 at 6:41 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > >
+> > > > In [1], I suggested another approach that didn't require extra state,
+> > > > and moved the existing checks under the kvm lock. What was wrong with
+> > > > that approach?
+> > >
+> > > With that approach, even for a vcpu that has a broken set of features,
+> > > which leads kvm_reset_vcpu() to fail for the vcpu, the vcpu->arch.features
+> > > are checked by other vCPUs' vcpu_allowed_register_width() until the
+> > > vcpu->arch.target is set to -1.
+> > > Due to this, I would think some or possibly all vCPUs' kvm_reset_vcpu()
+> > > may or may not fail (e.g. if userspace tries to configure vCPU#0 with
+> > > 32bit EL1, and vCPU#1 and #2 with 64 bit EL1, KVM_ARM_VCPU_INIT
+> > > for either vCPU#0, or both vCPU#1 and #2 should fail.  But, with that
+> > > approach, it doesn't always work that way.  Instead, KVM_ARM_VCPU_INIT
+> > > for all vCPUs could fail or KVM_ARM_VCPU_INIT for vCPU#0 and #1 could
+> > > fail while the one for CPU#2 works).
+> > > Also, even after the first KVM_RUN for vCPUs are already done,
+> > > (the first) KVM_ARM_VCPU_INIT for another vCPU could cause the
+> > > kvm_reset_vcpu() for those vCPUs to fail.
+> > >
+> > > I would think those behaviors are odd, and I wanted to avoid them.
+> >
+> > OK, fair enough. But then you need to remove most of the uses of
+> > KVM_ARM_VCPU_EL1_32BIT so that it is only used as a userspace
+> > interface and
+> 
+> Yes, I will.
+> 
+> > maybe not carried as part of the vcpu feature flag anymore.
+> 
+> At the first call of kvm_reset_vcpu() for the guest, the new kvm
+> flag is not set yet. So, KVM_ARM_VCPU_EL1_32BIT will be needed
+> by the function (unless we pass the flag as an argument for the
+> function or by any other way).
 
-The current usage of EVENTSEL_* macro is a mess in the KVM context. Partly
-because we have a conceptual ambiguity when choosing to create a RAW or
-HARDWARE event: when bits other than HARDWARE_EVENT_MASK are set,
-the pmc_reprogram_counter() will use the RAW type.
+Which is why I said 'maybe'. It's not a big deal if the flags stays,
+but I don't want it evaluated further down the line. It is also pretty
+similar to HCR_EL2.RW, which we already test with vcpu_el1_is_32bit().
 
-By introducing the new macro AMD64_EXTRA_EVENTSEL_EVENT to simplify,
-the following three issues can be addressed in one go:
+Overall, we need to reduce that state to be as simple as possible.
 
-- the 12 selection bits are used as comparison keys for allow or deny;
-- NON_HARDWARE_EVENT_MASK is only used to determine if a HARDWARE
-  event is programmed or not, a 12-bit selected event will be a RAW event;
-  (jmattson helped report this issue)
-- by reusing AMD64_RAW_EVENT_MASK, the extra 4 selection bits (if set) are
-  passed to the perf correctly and not filtered out by X86_RAW_EVENT_MASK;.
+> 
+> > Also, we really should turn all these various bits in the kvm struct
+> > into a set of flags. I have a patch posted there[1] for this, feel
+> > free to pick it up.
+> 
+> Thank you for the suggestion. But, kvm->arch.el1_reg_width is not
+> a binary because it needs to indicate an uninitialized state.  So, it
+> won't fit perfectly with kvm->arch.flags, which is introduced by [1]
+> as it is. Of course it's feasible by using 2 bits of the flags though...
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/include/asm/perf_event.h |  3 ++-
- arch/x86/kvm/pmu.c                | 11 ++++-------
- arch/x86/kvm/pmu.h                |  6 ++++++
- 3 files changed, 12 insertions(+), 8 deletions(-)
+2 bits is what I had in mind (one bit to indicate that it has already
+been initialised, another to carry the actual width).
 
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 8fc1b5003713..bd068fd19043 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -43,8 +43,9 @@
- #define AMD64_EVENTSEL_INT_CORE_SEL_MASK		\
- 	(0xFULL << AMD64_EVENTSEL_INT_CORE_SEL_SHIFT)
- 
-+#define AMD64_EXTRA_EVENTSEL_EVENT				(0x0FULL << 32)
- #define AMD64_EVENTSEL_EVENT	\
--	(ARCH_PERFMON_EVENTSEL_EVENT | (0x0FULL << 32))
-+	(ARCH_PERFMON_EVENTSEL_EVENT | AMD64_EXTRA_EVENTSEL_EVENT)
- #define INTEL_ARCH_EVENT_MASK	\
- 	(ARCH_PERFMON_EVENTSEL_UMASK | ARCH_PERFMON_EVENTSEL_EVENT)
- 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 2c98f3ee8df4..99426a8d7f18 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -198,7 +198,8 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
- 
- 	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
- 	if (filter) {
--		__u64 key = eventsel & AMD64_RAW_EVENT_MASK_NB;
-+		__u64 key = eventsel & (INTEL_ARCH_EVENT_MASK |
-+					AMD64_EXTRA_EVENTSEL_EVENT);
- 
- 		if (bsearch(&key, filter->events, filter->nevents,
- 			    sizeof(__u64), cmp_u64))
-@@ -209,18 +210,14 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
- 	if (!allow_event)
- 		return;
- 
--	if (!(eventsel & (ARCH_PERFMON_EVENTSEL_EDGE |
--			  ARCH_PERFMON_EVENTSEL_INV |
--			  ARCH_PERFMON_EVENTSEL_CMASK |
--			  HSW_IN_TX |
--			  HSW_IN_TX_CHECKPOINTED))) {
-+	if (!(eventsel & NON_HARDWARE_EVENT_MASK)) {
- 		config = kvm_x86_ops.pmu_ops->pmc_perf_hw_id(pmc);
- 		if (config != PERF_COUNT_HW_MAX)
- 			type = PERF_TYPE_HARDWARE;
- 	}
- 
- 	if (type == PERF_TYPE_RAW)
--		config = eventsel & X86_RAW_EVENT_MASK;
-+		config = eventsel & AMD64_RAW_EVENT_MASK;
- 
- 	if (pmc->current_config == eventsel && pmc_resume_counter(pmc))
- 		return;
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 7a7b8d5b775e..48d867e250bc 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -17,6 +17,12 @@
- 
- #define MAX_FIXED_COUNTERS	3
- 
-+#define KVM_ARCH_PERFMON_EVENTSEL_IGNORE \
-+	(ARCH_PERFMON_EVENTSEL_ANY | ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
-+
-+#define NON_HARDWARE_EVENT_MASK	(AMD64_EXTRA_EVENTSEL_EVENT | \
-+	 (X86_ALL_EVENT_FLAGS & ~KVM_ARCH_PERFMON_EVENTSEL_IGNORE))
-+
- struct kvm_event_hw_type_mapping {
- 	u8 eventsel;
- 	u8 unit_mask;
+Thanks,
+
+	M.
+
 -- 
-2.35.0
-
+Without deviation from the norm, progress is not possible.
