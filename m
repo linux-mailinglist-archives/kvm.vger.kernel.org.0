@@ -2,72 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 234D74B02A3
-	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 03:01:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D47544B0431
+	for <lists+kvm@lfdr.de>; Thu, 10 Feb 2022 05:05:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233934AbiBJB6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Feb 2022 20:58:46 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:60212 "EHLO
+        id S233022AbiBJEFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Feb 2022 23:05:37 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233915AbiBJB54 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Feb 2022 20:57:56 -0500
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CB92AA8A
-        for <kvm@vger.kernel.org>; Wed,  9 Feb 2022 17:37:00 -0800 (PST)
-Received: by mail-qv1-xf35.google.com with SMTP id k9so3489191qvv.9
-        for <kvm@vger.kernel.org>; Wed, 09 Feb 2022 17:37:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jIXSaB8xvY9E3Pj5RaMVht3zqZ9BnD/HDQ3wc2/KqUo=;
-        b=WdEa0kEtsZFGVVXPkdBFJi072XyN3Og2lEwLElheq0+LpHUZlc3OABduwfH+b46cUq
-         CAcSm2tBw7fJ9VwigOLightNC72EXnZ0l1/T5E5l+M4LZlGCZam7cfREjiyv/cUBSJIi
-         LrCUZ9UxkWyrtg2+uX6zFDyXXAXdAkELDO3SvGYqQKDdwS+nzFh/wzhcB2QEu+T9+94z
-         lJIzMXdXdpt7ModmsGoMdDofiM4XqYqXf+4WrxBwWDO3qZYKRT93E5BYZ/oET/cRM5kS
-         mKnlpzjbJAj69Eee4S2Hj4ATkTwD6XE4gpUtmTw4iEzdRJ+NIs71d/O3tOBMVvgVvKHb
-         t9Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jIXSaB8xvY9E3Pj5RaMVht3zqZ9BnD/HDQ3wc2/KqUo=;
-        b=S7i1Cq7QO8pHOYHeeoo8D3A7coBSrjT3tDs3heY8Kd/VHvzQ5QSKSHGFB6jB+Bfq1A
-         wKPxb60fLHdDU8+LzYV29qMUHx/+3iVeDTCqVOJD0bPmmZY8YiZ9xH+z+U8CUtvVKQHg
-         39X16iQ8hzzKV98oNrx4GiUVTgKH1mmb+iO8NGQYSpoq9d7B9SHGMGSq4iLFYaoGK/GX
-         EiGzH+SWFqunqSvo0dEdibHVLr4vsq0XKyvQvWPVkwnVN9a8c5LFhaEcJczxQfZOsLCV
-         ZlzoZh4QEC/aMC55L28iLHdPWpugW0EXgZG7aH8cXWvu+ZLp4odJ57tgUpiyMLaB71xE
-         TdCA==
-X-Gm-Message-State: AOAM531V41CaDnE8iK3amjHPAiefhh4Ygv3FuWB3j8G22EzJ3A59QAQL
-        RiCIrpHverAcg/DISk5TIuSdILvKFVk6RQ==
-X-Google-Smtp-Source: ABdhPJxm54Fh/75WZhWkTP2V0zd5dpthm24AqtRHufGYkhtFLZDthkRpQ5Pj4HbzT6cv45nhUpeb8g==
-X-Received: by 2002:a62:7c92:: with SMTP id x140mr4140320pfc.35.1644455521031;
-        Wed, 09 Feb 2022 17:12:01 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s14sm21252255pfk.65.2022.02.09.17.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 17:12:00 -0800 (PST)
-Date:   Thu, 10 Feb 2022 01:11:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 00/23] KVM: MMU: MMU role refactoring
-Message-ID: <YgRmXDn7b8GQ+VzX@google.com>
-References: <20220204115718.14934-1-pbonzini@redhat.com>
- <YgGmgMMR0dBmjW86@google.com>
- <YgGq31edopd6RMts@google.com>
- <CALzav=d05sMd=ARkV+GMf9SkxKcg9c9n5ttb274M2fZrP27PDA@mail.gmail.com>
+        with ESMTP id S232261AbiBJEFg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Feb 2022 23:05:36 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81C124587;
+        Wed,  9 Feb 2022 20:05:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RBBf2y7eCPOVTgLPhFZD03rPsP9qLpUoOxVRvfBx6FplxD8487Asb+bNWQD5gVqFu9DRShDrCNlgqfp7/kHkMktUrfD/IxgDvpUGPPc4RxsYXhLk0SuXLLfgNEeye9j0HRwTpfy+GHDqLiHVriCuM9Gq3Fa18vKngwox1vcoE4fJO2jYLgElYy9ELwcLM+M78XMclDY6G0DvSrXpd3TvJ0RZeFRez4P78BYbRgwlmtj0miQGHXixuivCA2euxE24+7c7wc6sPO9DE9DSsxIsou6G6Wf5dQV0de9Sy4G/frgfIwjgkkchRcsJB+oBGGhCQRteX0S/CHOAZ6XKKUda6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GPEbk0GEyGFK2OnX2YBloU7KJeBJZeL4uV68PeVQzXs=;
+ b=lbVs5TXnvjqzh3BFGN/F78yCXEoszNwdbnpPcYS7s1Ud6FTwc2Sy8N/RGCHWZQ1pNIx5SMgzZ6bI2Jc9jVDsZxqzPwFJAt6GYcGyHv/JdXM/j6Bhib6/yaNlAF1wVUKygSjw6Fagwn0kwy5rNXj6+2X2yBQA10ddknCST3qWOodTaxcbJ8tAguRRCr/C7aVB8gi7hDT0USWpitOnq5Vh0/bkdZP7EcMTBCWt9eIdxPpZv+dBPG4n5Y9KKqIHIlsV5/XWz5ay/Bx0a/O+/5lO5Ftia5TeFXdTFHewCS8sI+9kbNgePuJ5i0WUzfiQkkh29dy8KRql2G9blcmUGvQo6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GPEbk0GEyGFK2OnX2YBloU7KJeBJZeL4uV68PeVQzXs=;
+ b=Aiahy36VbP5JV+AClPTDTCCoY1ZDqS+20nVMMk0F8CvSYBDjEq8l6/qmLV11hE3uDi3YoDZkm1jXA6PYZkRPqEH2IMcWxnvAZsybOWKUUc30l7EPdCD0kh0NKqH9FPHI/pV+T+znDoXMEc6xC8Fdrz8PSzXHfA5Jm3IBboK0SQg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN2PR12MB3053.namprd12.prod.outlook.com (2603:10b6:208:c7::24)
+ by BYAPR12MB3174.namprd12.prod.outlook.com (2603:10b6:a03:133::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.18; Thu, 10 Feb
+ 2022 04:05:34 +0000
+Received: from MN2PR12MB3053.namprd12.prod.outlook.com
+ ([fe80::9117:ca88:805a:6d5b]) by MN2PR12MB3053.namprd12.prod.outlook.com
+ ([fe80::9117:ca88:805a:6d5b%4]) with mapi id 15.20.4975.012; Thu, 10 Feb 2022
+ 04:05:33 +0000
+Message-ID: <b775ab2d-c293-d8f0-a436-1ec19c6315d8@amd.com>
+Date:   Thu, 10 Feb 2022 09:35:14 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v3] perf/amd: Implement erratum #1292 workaround for F19h
+ M00-0Fh
+Content-Language: en-US
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     like.xu.linux@gmail.com, jmattson@google.com, eranian@google.com,
+        santosh.shukla@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        wanpengli@tencent.com, vkuznets@redhat.com, joro@8bytes.org,
+        mingo@redhat.com, alexander.shishkin@linux.intel.com,
+        tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-perf-users@vger.kernel.org, ananth.narayan@amd.com,
+        kim.phillips@amd.com, Ravi Bangoria <ravi.bangoria@amd.com>
+References: <fe53507b-9732-b47e-32e0-647a9bfc8a80@amd.com>
+ <20220203095841.7937-1-ravi.bangoria@amd.com>
+ <YgO4vn2w5kT43HGh@hirez.programming.kicks-ass.net>
+From:   Ravi Bangoria <ravi.bangoria@amd.com>
+In-Reply-To: <YgO4vn2w5kT43HGh@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BMXPR01CA0079.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:54::19) To MN2PR12MB3053.namprd12.prod.outlook.com
+ (2603:10b6:208:c7::24)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=d05sMd=ARkV+GMf9SkxKcg9c9n5ttb274M2fZrP27PDA@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 385bd1a9-22d0-4257-bd93-08d9ec4a9580
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3174:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3174F8A593588C1C94DD7D16E02F9@BYAPR12MB3174.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ragsX5YE8VIb06DY7+adPAAC2IESNQLUhhA5ed2HtgDjJkfKIrlO8RiVKbPHMAc4E7uRymdfAnvWEz0SJeSbQgy5T0NEVZwOa+oEvvbwmVEcR5OXDhqsSrDooKANlbAFcc4gRU1mSPi0adGraP20EzvBOdtzs8m4u8q+GalzV+/jAgbEhB7dHy+cfhJcvR616tPwwK8ty6b7NpRrnHuyEVAyHL/xHfuK4sLrepV/nt6Z3qs/ZkFOjAbEISyHO3PmiTaEgIbXagdy0OfuXuh2g8AMWXlZDIFk6P+G4x9gWtbvl2noh0kq+Zj7NGSqh5xkvUqW9HXBCKNKQjYia1tenYCMFrEQeKrrvGw3dgt/TNpnOFQNqJ6bEhUcgDb0d8dgTYShKnKRdRAI2kh2EwxhyGijG4w6i9ShooGQrlbuJEfqrK2LtUmzEAh2xp5WuJNO4TQGpB3708khsdumYSPaM4tshrLu7HxVYJnOHzwDKDDMDDBUzoLXs/1ySNjFSzHHjAPiY76IGlZ58k19Y/JONHKNoMKPK0plrCsznyKImNvMGjupKMVb7VNQ+5ZzACYo1VeCLNhWMXNGLuC2imiuzvQmksR5zg/t1Hs7z9WZEK6lKtqEBV2erhFtOAQ1KYFKOGlfVO1SZ1HhKaFdvzjXuEIGKlmxTiNjURFHgZ1/aE3ArGaE2JbExijRi8dYtS2DHczZZF6Yr2aaB73ncSx17x5rTgH628OjNTfwkuYOnt63KycJreMSF+0dlK5kFEC/ZvqDCqM1j7vDFKaCDY9VwqZxQUDqbD4CWnd0mcMSKfi+tbCdV0tbVfwCgr2U9mj3AcVT0+uUSgf050z8YorL2ohDuVe3Y0YltCno8WbpiXw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3053.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(316002)(4326008)(2616005)(66946007)(38100700002)(53546011)(6666004)(6506007)(2906002)(66556008)(66476007)(6916009)(508600001)(31696002)(6512007)(8676002)(36756003)(6486002)(8936002)(26005)(5660300002)(44832011)(31686004)(966005)(86362001)(7416002)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cks3S0pjRk8yc3NHTTdnYVFTaWIrWjZRVDJnOUZZYWFvckR5am5oZ2xmbXBE?=
+ =?utf-8?B?eHgvcTJKdnNlQjFaN2M2bFJENDNHdmdXdzhNSVljakRDSDlqc3FmcG9CNWZX?=
+ =?utf-8?B?amVrUzJJUUdFMXJqR0ZrR1dzaGlmclRScG5mVkVlOVAyYUcwN1BiY0tjbU9R?=
+ =?utf-8?B?MkxjQkZwZDBtU3R6S1hFdVpQMG5qVHpBbHN1TUdwYTB6UGdFS1RXL1F3a2t2?=
+ =?utf-8?B?Zmc2SVdxdHNUaFhQMUdjbktIcERtYjVIbVR3TGN6L0Nla0NLU0tUdGEzaTdP?=
+ =?utf-8?B?OUc2MmxFbVZKNzZjYjR2UmQzZTI3OGtBbngyL3B1N3hkMVdpbXAwWHMrSmZh?=
+ =?utf-8?B?R1RsQjkrMEFVcXNwSzhLMklHZjRoQ0xWb2NBbU1MbEZ0R2J2cUkza080TElY?=
+ =?utf-8?B?ZktiK1MyMTF2d1U5cDdMVkpZckxvVG1jamU3bTJYZXpsMUF5eGJ6MDVhd0dZ?=
+ =?utf-8?B?SXFtMFRwN2x2VjRtdVQrNFAvUXJZellWT00vazl3dmdKeXFVUVp5NzJSMWRD?=
+ =?utf-8?B?bEJZcmxzR2NWVXY2NlcyaS9YUk9mUitnOXhwd20wT2Yxd002TFRmd0duNVNK?=
+ =?utf-8?B?eWhEQURDMnpiMlR2T0dNaHRZTW9JQlpNMVArR25NT0padW9IYkd1Q2NLdGxs?=
+ =?utf-8?B?WTgwenRESGh3MFNnNGpjT3pHSVhJNTdjZFRzaU9GMnM0S1AzamJMaUZ2aHNj?=
+ =?utf-8?B?NWFocnYrbjhsa2RTbklKT1FIYVU3amJWTWNEOWtzN1pUT3dsRVBEOThzNk16?=
+ =?utf-8?B?VmhFenZLOThSczVKbllQMDdKSmVFLy9YUzBCUFZSZzR0VWpwOXdqYzNPQWt2?=
+ =?utf-8?B?Q1EyRzFLc3RJMndWMzEyeDMzZk1MRWJRREphRXNsNUhoSGR3Y2dCaEZVV2xP?=
+ =?utf-8?B?aXpuelIxTzhTUmV2NXdqNEhyaTFiWHFvNVZGVDVXMFNKMDlEN3pYV25TbWJm?=
+ =?utf-8?B?RGl0M1R6eW9uckVZK0RSRkhuVG41OXNMVGowZ2Q5Mzd5YnZYSjFONUp4SnIv?=
+ =?utf-8?B?QUVBMGxRTENja1E0b2tmZ29qWjN0b1oxK1BzSG0xQUxMaFpJdjlINUxKcnJL?=
+ =?utf-8?B?Z01PVmdXL3JpUi9UNFRJdFV3MjBVY0ZyZ0dyWVUzbU5jOVJpVDNJMjE0bFVQ?=
+ =?utf-8?B?Tk5IU1dZSlpJVDNrdHpvdUcwMFpXcUhOaWpCeEt0UHpWY1h2aXhPZ1I2d2VE?=
+ =?utf-8?B?S01DSUY0SEJneEIweEs4eGtQVnhsR3FibGhDY1Z1NVVWekJwT0RldkNjUDJ0?=
+ =?utf-8?B?a0pobTBlY3FzbHE4SDJuenhsNnNrSVE1eWRGT0pBekwyT3huR05YQ2Z4WGZG?=
+ =?utf-8?B?eUp0MTRib1krTWNFUEJTZmFFVE16MGl0OVN5Wk1sWWFDN0xLRjJRYTRBR1I1?=
+ =?utf-8?B?RTVFMlEyZytTVURxaVUwTVMvYWcyTWFtRFUzNnpvRmRhS2k1VVFQbG5FY2dV?=
+ =?utf-8?B?UlNqaFB4U1F3VXNWem0zN1JkUzZVRGFJZTgwU2lVWEh5bnhFUlFQVEs3blV0?=
+ =?utf-8?B?a0pFdGxURWFkaEtzUWJiOUtXY1NVdDdiQjFDSG5BVmRLVEV0S0pNQzVnU0Yw?=
+ =?utf-8?B?NFg0WFdYekRzdkdPaHVrWWlhTEFjMDBSMEdDb3NjczZOQzN1N0Y0RGNYT3Zz?=
+ =?utf-8?B?eDdldTMwNmdydW1rTkE0TTE4RVF5K2lMVmZBWmlsOFd0Q281RllaTEhyUFZn?=
+ =?utf-8?B?NmFKL1d6RUZ3c2pBbk84d0lySGZRRkFEbm9tZFBjQUlvSzJGVEx0M1lNWUxr?=
+ =?utf-8?B?KzBVRUhYbVRmT2NVa3EyaitKUE80S1NNN1psRUpQL1EzZHNVYXNtbEF0VzRO?=
+ =?utf-8?B?cjhQK3FVREZvOHpWTUsxdW41bE54MGhESWN3anZycjRlVURBc2gvOFBvVWx6?=
+ =?utf-8?B?Q2dVRlFHQTd6aG5NbWVsYlk0YjJsSWJRZEhmaHhML0RsVVB5cHZXcnhpOXRQ?=
+ =?utf-8?B?MEtlRDZUNG1oakZiWUFoNU43Z1ZEOEQzS2svOWxjejF4S3d3KzM1UkR6VGJl?=
+ =?utf-8?B?cEVnV1JBck5ORUtEOVhxeUI2ditFSE5SeS9kekhFN2JNenVjVlRYc0VldDdo?=
+ =?utf-8?B?Sk9lQzFEOWtrQVdWN1RwUkpYdVV0a1hOeDQvQzdHQXA3UzIrRWppeHprbDJI?=
+ =?utf-8?B?dlozMEVVdUNRK2dCdndTdXUzOGxpK3JmNXNPQzdwNGpaUU1DTkJtNWZLMXNt?=
+ =?utf-8?Q?GzVwIzaRSYRef7MCIn+jNKs=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 385bd1a9-22d0-4257-bd93-08d9ec4a9580
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3053.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2022 04:05:33.5237
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kaYblSdF16dDpWhD4q42Acxy8vu7hQgeTLoqLO+TjlWB75jBIuxObnaXNoknoverhTyC+UIicdV+oT6wDrZAnw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3174
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,176 +134,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 07, 2022, David Matlack wrote:
-> On Mon, Feb 7, 2022 at 3:27 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > What do you think about calling this the guest_role instead of cpu_role?
-> > > There is a bit of a precedent for using "guest" instead of "cpu" already
-> > > for this type of concept (e.g. guest_walker), and I find it more
-> > > intuitive.
-> >
-> > Haven't looked at the series yet, but I'd prefer not to use guest_role, it's
-> > too similar to is_guest_mode() and kvm_mmu_role.guest_mode.  E.g. we'd end up with
-> >
-> >   static union kvm_mmu_role kvm_calc_guest_role(struct kvm_vcpu *vcpu,
-> >                                               const struct kvm_mmu_role_regs *regs)
-> >   {
-> >         union kvm_mmu_role role = {0};
-> >
-> >         role.base.access = ACC_ALL;
-> >         role.base.smm = is_smm(vcpu);
-> >         role.base.guest_mode = is_guest_mode(vcpu);
-> >         role.base.direct = !____is_cr0_pg(regs);
-> >
-> >         ...
-> >   }
-> >
-> > and possibly
-> >
-> >         if (guest_role.guest_mode)
-> >                 ...
-> >
-> > which would be quite messy.  Maybe vcpu_role if cpu_role isn't intuitive?
+
+
+On 09-Feb-22 6:21 PM, Peter Zijlstra wrote:
+> On Thu, Feb 03, 2022 at 03:28:41PM +0530, Ravi Bangoria wrote:
+>> Perf counter may overcount for a list of Retire Based Events. Implement
+>> workaround for Zen3 Family 19 Model 00-0F processors as suggested in
+>> Revision Guide[1]:
+>>
+>>   To count the non-FP affected PMC events correctly:
+>>     o Use Core::X86::Msr::PERF_CTL2 to count the events, and
+>>     o Program Core::X86::Msr::PERF_CTL2[43] to 1b, and
+>>     o Program Core::X86::Msr::PERF_CTL2[20] to 0b.
+>>
+>> Note that the specified workaround applies only to counting events and
+>> not to sampling events. Thus sampling event will continue functioning
+>> as is.
+>>
+>> Although the issue exists on all previous Zen revisions, the workaround
+>> is different and thus not included in this patch.
+>>
+>> This patch needs Like's patch[2] to make it work on kvm guest.
+>>
+>> [1] https://bugzilla.kernel.org/attachment.cgi?id=298241
+>> [2] https://lore.kernel.org/lkml/20220117055703.52020-1-likexu@tencent.com
+>>
+>> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
 > 
-> I agree it's a little odd. But actually it's somewhat intuitive (the
-> guest is in guest-mode, i.e. we're running a nested guest).
-> 
-> Ok I'm stretching a little bit :). But if the trade-off is just
-> "guest_role.guest_mode" requires a clarifying comment, but the rest of
-> the code gets more readable (cpu_role is used a lot more than
-> role.guest_mode), it still might be worth it.
+> Thanks!
 
-It's not just guest_mode, we also have guest_mmu, e.g. we'd end up with
+Peter, On subsequent tests, I found that this 'fix' is still not
+optimal. Please drop this patch from your queue for now. Really
+sorry for the noise.
 
-	vcpu->arch.root_mmu.guest_role.base.level
-	vcpu->arch.guest_mmu.guest_role.base.level
-	vcpu->arch.nested_mmu.guest_role.base.level
-
-In a vacuum, I 100% agree that guest_role is better than cpu_role or vcpu_role,
-but the term "guest" has already been claimed for "L2" in far too many places.
-
-While we're behind the bikeshed... the resulting:
-
-	union kvm_mmu_role cpu_role;
-	union kvm_mmu_page_role mmu_role;
-
-is a mess.  Again, I really like "mmu_role" in a vacuum, but juxtaposed with
-	
-	union kvm_mmu_role cpu_role;
-
-it's super confusing, e.g. I expected
-
-	union kvm_mmu_role mmu_role;
-
-Nested EPT is a good example of complete confusion, because we compute kvm_mmu_role,
-compare it to cpu_role, then shove it into both cpu_role and mmu_ole.  It makes
-sense once you reason about what it's doing, but on the surface it's confusing.
-
-	struct kvm_mmu *context = &vcpu->arch.guest_mmu;
-	u8 level = vmx_eptp_page_walk_level(new_eptp);
-	union kvm_mmu_role new_role =
-		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
-						   execonly, level);
-
-	if (new_role.as_u64 != context->cpu_role.as_u64) {
-		/* EPT, and thus nested EPT, does not consume CR0, CR4, nor EFER. */
-		context->cpu_role.as_u64 = new_role.as_u64;
-		context->mmu_role.word = new_role.base.word;
-
-Mabye this?
-
-	union kvm_mmu_vcpu_role vcpu_role;
-	union kvm_mmu_page_role mmu_role;
-
-and some sample usage?
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d25f8cb2e62b..9f9b97c88738 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4836,13 +4836,16 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
- {
-        struct kvm_mmu *context = &vcpu->arch.guest_mmu;
-        u8 level = vmx_eptp_page_walk_level(new_eptp);
--       union kvm_mmu_role new_role =
-+       union kvm_mmu_vcpu_role new_role =
-                kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
-                                                   execonly, level);
-
--       if (new_role.as_u64 != context->cpu_role.as_u64) {
--               /* EPT, and thus nested EPT, does not consume CR0, CR4, nor EFER. */
--               context->cpu_role.as_u64 = new_role.as_u64;
-+       if (new_role.as_u64 != context->vcpu_role.as_u64) {
-+               /*
-+                * EPT, and thus nested EPT, does not consume CR0, CR4, nor
-+                * EFER, so the mmu_role is a strict subset of the vcpu_role.
-+               */
-+               context->vcpu_role.as_u64 = new_role.as_u64;
-                context->mmu_role.word = new_role.base.word;
-
-                context->page_fault = ept_page_fault;
-
-
-
-And while I'm on a soapbox....  am I the only one that absolutely detests the use
-of "context" and "g_context"?  I'd be all in favor of renaming those to "mmu"
-throughout the code as a prep to this series.
-
-I also think we should move the initializing of guest_mmu => mmu into the MMU
-helpers.  Pulling the mmu from guest_mmu but then relying on the caller to wire
-up guest_mmu => mmu so that e.g. kvm_mmu_new_pgd() works is gross and confused
-the heck out of me.  E.g.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d25f8cb2e62b..4e7fe9758ce8 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4794,7 +4794,7 @@ static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu,
- void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
-                             unsigned long cr4, u64 efer, gpa_t nested_cr3)
- {
--       struct kvm_mmu *context = &vcpu->arch.guest_mmu;
-+       struct kvm_mmu *mmu = &vcpu->arch.guest_mmu;
-        struct kvm_mmu_role_regs regs = {
-                .cr0 = cr0,
-                .cr4 = cr4 & ~X86_CR4_PKE,
-@@ -4806,6 +4806,8 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
-        mmu_role = cpu_role.base;
-        mmu_role.level = kvm_mmu_get_tdp_level(vcpu);
-
-+       vcpu->arch.mmu = &vcpu->arch.guest_mmu;
-+
-        shadow_mmu_init_context(vcpu, context, cpu_role, mmu_role);
-        kvm_mmu_new_pgd(vcpu, nested_cr3);
- }
-@@ -4834,12 +4836,14 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
-                             int huge_page_level, bool accessed_dirty,
-                             gpa_t new_eptp)
- {
--       struct kvm_mmu *context = &vcpu->arch.guest_mmu;
-+       struct kvm_mmu *mmu = &vcpu->arch.guest_mmu;
-        u8 level = vmx_eptp_page_walk_level(new_eptp);
-        union kvm_mmu_role new_role =
-                kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
-                                                   execonly, level);
-
-+       vcpu->arch.mmu = mmu;
-+
-        if (new_role.as_u64 != context->cpu_role.as_u64) {
-                /* EPT, and thus nested EPT, does not consume CR0, CR4, nor EFER. */
-                context->cpu_role.as_u64 = new_role.as_u64;
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 1218b5a342fc..d0f8eddb32be 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -98,8 +98,6 @@ static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
-
-        WARN_ON(mmu_is_nested(vcpu));
-
--       vcpu->arch.mmu = &vcpu->arch.guest_mmu;
--
-        /*
-         * The NPT format depends on L1's CR4 and EFER, which is in vmcb01.  Note,
-         * when called via KVM_SET_NESTED_STATE, that state may _not_ match current
-
-
-
+Thanks,
+Ravi
