@@ -2,90 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 051854B1DED
-	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 06:33:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E9D4B1E23
+	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 07:07:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234188AbiBKFc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Feb 2022 00:32:59 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56516 "EHLO
+        id S237546AbiBKGHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Feb 2022 01:07:37 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232291AbiBKFc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Feb 2022 00:32:57 -0500
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D6FFC2;
-        Thu, 10 Feb 2022 21:32:57 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id c6so21820248ybk.3;
-        Thu, 10 Feb 2022 21:32:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8U0RdmyBvYMlSjjVGSo29oUB6sKZ9Ib1qgyUq3axU1s=;
-        b=mlq3/lPCpacSw9Wok7V4785+SFzOSp4VQmDDp0GXG+Xae5/dVQB0sDJ0AaEE6HHZl/
-         n7AbDmgRrjIuNO4pDma68HPkiAfjkyYXhU0GNL0x0PbaUY0dSemFCgYysOoHhWnmeB8+
-         hbjkC0t8dR3+BovBYT2EYsLN4W62EIQqKjjgIbnuu7t7X63wg1SlpbSelbe7ChQN/vAW
-         G92VnQu7w/U8hd5rSCZEA3H1u+yIsOq32+YSAPX1ln1byP30TZPHtO2aEYSgZltcSLP2
-         Gzq4TIEa2S3qJOAUVlRPsl7WGA3tOu00USgPV8e3kMkdkxaETz7L7r3xZ9Uo0miDffMH
-         nBzw==
+        with ESMTP id S229493AbiBKGHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Feb 2022 01:07:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF302264F
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 22:07:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644559655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sOs06svCRskfevOs7wvSSDMydwtyNRGcYolT1X1xpFc=;
+        b=I/o9iMEOPZwQYD+v5XpbjHH1k4jZaI9uxLJpFaZSHjTVi0PjEUDN5FDhfxTRrjkbQ3Tl0/
+        dPYrUzle9J/b2RxJDPhw6coBWuqqwp/GIcijEx0coDIMAYVxEouGNW0kLoxgJjD2qLykFd
+        U1lDDnal0e8BgkFkiTNLbprLamejmd4=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-586-bD7SEfF_Oc-Kj6txYqOBfQ-1; Fri, 11 Feb 2022 01:07:34 -0500
+X-MC-Unique: bD7SEfF_Oc-Kj6txYqOBfQ-1
+Received: by mail-lf1-f69.google.com with SMTP id v24-20020a056512349800b0043f1c29459bso1871816lfr.2
+        for <kvm@vger.kernel.org>; Thu, 10 Feb 2022 22:07:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8U0RdmyBvYMlSjjVGSo29oUB6sKZ9Ib1qgyUq3axU1s=;
-        b=xTHvYsfNpdpqZZYeGujDZRLTnDPOzSwljMYcA+rfEUQLOgAH8GP5YCnDl3gJ9VV44j
-         ZpzfTF++ops2soZPI8sdUSjT3ufeJjdSM/wSmEbxH/mVtzNtDJnqVV5OhQLM7cEEA39E
-         CpcZEMVa4B8xGBH1Wur3baOP9Zuxs14/loNE/LM0vkepclg+pKrHIUDqGPueIiURLDhv
-         j1QsESavIgL/+go/58Q3NigJDkBtgwqyzL1+bIUIDtBK+SJsc3ti1jBI4yIc0+mMXfiz
-         I6OrKKu+/I7ykFkC/01MKBkeWTSijWBAw65DMTMKh+y1mK4VsW+cG1rRh/bXfJOxPwhF
-         Z6HA==
-X-Gm-Message-State: AOAM531ztx81w+J4f47Y6pUcZTwiYHlXFiKiF8UPCdigD+f3h2/uu8NM
-        9020r33Y8mo+TSYS4M/8wQkHXEOUpjuicARAFss=
-X-Google-Smtp-Source: ABdhPJyzlJsDeZdZNy7m8oPjzrRKU1aUU6XC5vS3tQ5d7HSSYJ9EXJIJJVFi7Z+uamL2iPSi6pZqDqIJAi11VndkRyg=
-X-Received: by 2002:a25:d088:: with SMTP id h130mr2847070ybg.691.1644557576709;
- Thu, 10 Feb 2022 21:32:56 -0800 (PST)
+        bh=sOs06svCRskfevOs7wvSSDMydwtyNRGcYolT1X1xpFc=;
+        b=PwJDy/uKA0euEPmSdVKx/zTMeA5Ftbcq7oI/zrWKnIJWsSeiCf1PoG9JSTd6EX35Ai
+         kCzWt9pTid24ZPX+3kZjSiMAJOi7SU5IeeYzmLhAovPUQepy7jPS7uWgkr8Yw5uxBXJL
+         733R+KG1xCsr9WJWm0Rg1nDBlRWgm25mXQ3hHmcyw8MgpXf1U3DWGt980eS/ieICmTHl
+         L+0ZgXXdq6kTbzB5sYrsiBySlzrlqYmd87rbywZ7faXD7W0/yjqxvTgO+pVS1mC2r/7J
+         a1CJGELl+iLjaAwrMNKRODTgVaMPEeG1f8/aF/aB7sV0ju3suRMd2bqmGg7qWSTwZpuq
+         hfhw==
+X-Gm-Message-State: AOAM530g7ma8VLY+JP85Hm6IecMJIg+Ohkt4kQuOrUhex3efELHBJku0
+        zHLPhLUL4CwT2FSnV9dIbN3xThyO5mItlyhOZFfRvOQUlrHE3UNSbyHRXPUEVUIVBEEmOz6J7rE
+        xsocvqH3A7k8PU2w4o3kp4kqKLcVG
+X-Received: by 2002:a05:6512:2606:: with SMTP id bt6mr147631lfb.187.1644559653310;
+        Thu, 10 Feb 2022 22:07:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxoWLii9XxRSj/jXk7N/fLFlqzjSP5PWx4yrCtcPB/EmY7s+7To2p8aZkqI47cuUUV+IBXyzuvMn1WIvmoFkZ8=
+X-Received: by 2002:a05:6512:2606:: with SMTP id bt6mr147608lfb.187.1644559653059;
+ Thu, 10 Feb 2022 22:07:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20211216021938.11752-1-jiangshanlai@gmail.com> <7fc9348d-5bee-b5b6-4457-6bde1e749422@redhat.com>
-In-Reply-To: <7fc9348d-5bee-b5b6-4457-6bde1e749422@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 11 Feb 2022 13:32:45 +0800
-Message-ID: <CANRm+CyHfgOyxyk7KPzYR714dQaakPrVbwSf_cyvBMo+vQcmAw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] KVM: x86: Fixes for kvm/queue
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+References: <20220208022809.575769-1-leobras@redhat.com>
+In-Reply-To: <20220208022809.575769-1-leobras@redhat.com>
+From:   Leonardo Bras Soares Passos <leobras@redhat.com>
+Date:   Fri, 11 Feb 2022 03:07:21 -0300
+Message-ID: <CAJ6HWG6mEssijXC63kTA+ARNG-xupcFsrU_JBibO2d33CTt8vA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] x86/kvm/fpu: Mask guest fpstate->xfeatures with guest_supported_xcr0
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Dec 2021 at 04:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 12/16/21 03:19, Lai Jiangshan wrote:
-> > From: Lai Jiangshan <laijs@linux.alibaba.com>
-> >
-> > Patch 1 and patch 2 are updated version of the original patches with
-> > the same title.  The original patches need to be dequeued.  (Paolo has
-> > sent the reverting patches to the mail list and done the work, but I
-> > haven't seen the original patches dequeued or reverted in the public
-> > kvm tree.  I need to learn a bit more how patches are managed in kvm
-> > tree.)
->
-> This cycle has been a bit more disorganized than usual, due to me taking
-> some time off and a very unusual amount of patches sent for -rc.
-> Usually kvm/queue is updated about once a week and kvm/next once every
-> 1-2 weeks.
+Just noticed I forgot to include the EXPORT_SYMBOL() so kvm can have
+access to fpu_user_cfg.
+Sorry about that.
 
-Maybe the patch "Revert "KVM: VMX: Save HOST_CR3 in
-vmx_prepare_switch_to_guest()"" is still missing in the latest
-kvm/queue, I saw the same warning.
+I will send a v3 shortly.
 
-    Wanpeng
+Best regards,
+Leo
+
