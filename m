@@ -2,173 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1DB44B2C12
-	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 18:51:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E823F4B2C2D
+	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 18:55:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352320AbiBKRuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Feb 2022 12:50:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42090 "EHLO
+        id S1352391AbiBKRxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Feb 2022 12:53:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352312AbiBKRuY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Feb 2022 12:50:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 672F8CD5
-        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 09:50:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644601820;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Hn1xDQoeiLpTSIhM8/h1rThLCr1DJa0iuo/gm7gs9Jo=;
-        b=ANWfXIrUdSd+Bx7iMEHdR9ZhOl/VbF3mxijdH75XxDCdLArBsrt3yDV336sB5+TaJc7k5o
-        TbYn+2p+yr6Ziabh7tDMv/ndk5coHY0OWpaSxwXj1nH8x2goBb4Os6SgO3SZVv8ZJvdYLE
-        4SIpptQqZdiXUinSukXs3qqPoj2FNDc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-465-X4GKVnc3P7iC5l6lSzo39A-1; Fri, 11 Feb 2022 12:50:19 -0500
-X-MC-Unique: X4GKVnc3P7iC5l6lSzo39A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64B6746860
-        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 17:50:18 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF55070D45;
-        Fri, 11 Feb 2022 17:49:59 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 8F6DC418853D; Fri, 11 Feb 2022 14:49:37 -0300 (-03)
-Date:   Fri, 11 Feb 2022 14:49:37 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Daniel Vacek <dvacek@redhat.com>
-Subject: [PATCH] KVM: x86: fix hardlockup due to LAPIC hrtimer period drift
-Message-ID: <YgahsSubOgFtyorl@fuller.cnet>
+        with ESMTP id S1344793AbiBKRxk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Feb 2022 12:53:40 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2957038F
+        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 09:53:39 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id t4-20020a17090a510400b001b8c4a6cd5dso9520565pjh.5
+        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 09:53:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GR8YI4ZUVVkcMkfN5n/I4ApVj24WcUZ3xy5k7vXwB3c=;
+        b=gfNgwwaZGmKRhsYpF5xWdH7KWoDCgT6PqXTPoVSQjk7Uae3en5i8wL5l01rY0Tmppo
+         PShnO2uaKQnjE7BV/+gSCyjo6arwMpRc+7lf+MFcK6/Z97uuQQ7rHBoMK/kMWYOvq1J8
+         pMeqVp0KU0AUdP+yoV+smm6RtZGp3buYqZYX77xk5t/LutQP591p5W/owIkKLg5GkkWM
+         CgELIjfJ3+ICoe+QZe6HDB93aGSRXXntjYV4HC7ujGvtn9JAPgr4di+yKiKoSnnvIzma
+         DZTKT2t0TWEkbfFZNgZDO5LLbpVuHN7j6DkwgMpu9yY5wpTM0mM8YwdMBZ0jNroOMc6P
+         nC/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GR8YI4ZUVVkcMkfN5n/I4ApVj24WcUZ3xy5k7vXwB3c=;
+        b=uKIuEIwWycC8smZJDW+/dXshaFm5Tm6FgyZA3P2xsZWd+/EmbQo6tS0AEyrw0eM/lr
+         2ANqxHEbtvehr9FXO2961GYy3qTx9OkSoKGkDs5ST5+5j2j7cH3ge4YpJ99JTa55pR9K
+         vPqx1AhRJlgRx66Tqc91AZ+4fQCmRGE7CBtmI/BswmH47z+OueTZ3aciHk3uVTDAlt4N
+         DbLgb9TOKv4gpZtIcrWCKnVZaD1F346X8O3suYe4cZr/iBEsEEJxzcnUyKIow7l9ED7A
+         pJHs8ku5xw8dPbJPnByuouHWml5+YgI9QfbSw99zjv3T/D1W39aguyuJ8eZbv3rPENTf
+         wYUQ==
+X-Gm-Message-State: AOAM533OhrgZVedthxtIKWTP8Hx4GmsIRlP1YdrM6hjdtoPhqWfiCqW8
+        ES6RBQY8fh/LvF/FBdg8a8GuCw==
+X-Google-Smtp-Source: ABdhPJzLlfDEU5PO8AgWctvqRPPpzE55qWjOXriCo0/5uHQks2oaJC2d9s8IO8ZGJr2xf8x7e0n8Hw==
+X-Received: by 2002:a17:90b:3a82:: with SMTP id om2mr1586423pjb.58.1644602018334;
+        Fri, 11 Feb 2022 09:53:38 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z13sm27643393pfe.20.2022.02.11.09.53.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Feb 2022 09:53:37 -0800 (PST)
+Date:   Fri, 11 Feb 2022 17:53:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
+Subject: Re: [PATCH 11/12] KVM: MMU: remove kvm_mmu_calc_root_page_role
+Message-ID: <Ygainod2tgZy1e3c@google.com>
+References: <20220209170020.1775368-1-pbonzini@redhat.com>
+ <20220209170020.1775368-12-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220209170020.1775368-12-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A hard lockup has been observed with long running KVM guests that
-use periodic timers:
+IMO, the shortlog is too literal and doesn't help understand the implications of
+the change.  I prefer something like:
 
-UPTIME: 723 days, 17:47:41
+  KVM: x86/mmu: Always use current mmu's role when loading new PGD
 
-PID: 514319  TASK: ffff99ed8d709070  CPU: 62  COMMAND: "CPU 0/KVM"
- #0 [ffff9a663fb08980] machine_kexec at ffffffff84065b24
- #1 [ffff9a663fb089e0] __crash_kexec at ffffffff84122342
- #2 [ffff9a663fb08ab0] panic at ffffffff84774972
- #3 [ffff9a663fb08b30] nmi_panic at ffffffff8409b6af
- #4 [ffff9a663fb08b40] watchdog_overflow_callback at ffffffff8414eb81
- #5 [ffff9a663fb08b58] __perf_event_overflow at ffffffff841a8277
- #6 [ffff9a663fb08b90] perf_event_overflow at ffffffff841b1a14
- #7 [ffff9a663fb08ba0] handle_pmi_common at ffffffff8400ac70
- #8 [ffff9a663fb08de0] intel_pmu_handle_irq at ffffffff8400af4f
- #9 [ffff9a663fb08e38] perf_event_nmi_handler at ffffffff84784031
-#10 [ffff9a663fb08e58] nmi_handle at ffffffff8478593c
-#11 [ffff9a663fb08eb0] do_nmi at ffffffff84785b5d
-#12 [ffff9a663fb08ef0] end_repeat_nmi at ffffffff84784d9c
-    [exception RIP: rb_erase+849]
-    RIP: ffffffff84389a91  RSP: ffff9a663fb03ec8  RFLAGS: 00000046
-    RAX: ffff9a663fb15f40  RBX: ffff9a8e3daa5610  RCX: 0000000000000000
-    RDX: ffff9a663fb15f40  RSI: ffff9a663fb159b0  RDI: ffff9a8e3daa5610
-    RBP: ffff9a663fb03ec8   R8: 0000000000000000   R9: 0000000000000000
-    R10: 00000000000000e0  R11: 0000000000000000  R12: ffff9a663fb159b0
-    R13: ffff9a663fb15960  R14: 0000000000000000  R15: ffff9a663fb15a98
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
---- <NMI exception stack> ---
-#13 [ffff9a663fb03ec8] rb_erase at ffffffff84389a91
-#14 [ffff9a663fb03ed0] timerqueue_del at ffffffff8438bfe4
-#15 [ffff9a663fb03ef0] __remove_hrtimer at ffffffff840ca08f
-#16 [ffff9a663fb03f20] __hrtimer_run_queues at ffffffff840ca5c5
-#17 [ffff9a663fb03f78] hrtimer_interrupt at ffffffff840cab4f
-#18 [ffff9a663fb03fc0] local_apic_timer_interrupt at ffffffff8405c60b
-#19 [ffff9a663fb03fd8] smp_apic_timer_interrupt at ffffffff847929d3
-#20 [ffff9a663fb03ff0] apic_timer_interrupt at ffffffff8478eefa
+On Wed, Feb 09, 2022, Paolo Bonzini wrote:
+> Since the guest PGD is now loaded after the MMU has been set up
+> completely, the desired role for a cache hit is simply the current
+> mmu_role.  There is no need to compute it again, so __kvm_mmu_new_pgd
+> can be folded in kvm_mmu_new_pgd.
+> 
+> For the !tdp_enabled case, it would also have been possible to use
+> the role that is already in vcpu->arch.mmu.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-apic_timer_fn rearms itself sufficient times to cause the 
-hardlockup detector to trigger.
+With a different shortlog and newline,
 
-The problem comes from how the hrtimer expiration time is advanced, 
-which does not match how the interrupts at separated in time:
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-Timer interrupt handlers get to execute a few microseconds after
-their deadline, while the exact period is added to the hrtimer
-expiration time. With large uptimes, this causes the hrtimer 
-expiration time to become much smaller than the actual
-timer interrupt base:
+>  arch/x86/kvm/mmu/mmu.c | 29 ++++-------------------------
+>  1 file changed, 4 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index df9e0a43513c..38b40ddcaad7 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -190,8 +190,6 @@ struct kmem_cache *mmu_page_header_cache;
+>  static struct percpu_counter kvm_total_used_mmu_pages;
+>  
+>  static void mmu_spte_set(u64 *sptep, u64 spte);
+> -static union kvm_mmu_page_role
+> -kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
+>  
+>  struct kvm_mmu_role_regs {
+>  	const unsigned long cr0;
+> @@ -4172,9 +4170,9 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+>  		return cached_root_find_and_replace(vcpu, new_pgd, new_role);
+>  }
+>  
+> -static void __kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+> -			      union kvm_mmu_page_role new_role)
+> +void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
+>  {
+> +	union kvm_mmu_page_role new_role = vcpu->arch.mmu->mmu_role.base;
 
+Newline needed.
 
-phys time		0		    P		        2P		    3P	...
-
-			|		    | 			|		    |
-			| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
-
-
-timer_int                 0.1		       P+0.2 	              P+0.3
-
-hrtimer_exp		  P		       2P		      3P		
-
-
-At timer_int at point 0.1:      hrtimer_exp = hrtimer_exp + period = P
-At timer_int at point P+0.2:    hrtimer_exp = hrtimer_exp + period = 2P
-At timer_int at point P+0.3:    hrtimer_exp = hrtimer_exp + period = 3P
-
-To confirm, printing the deltas of timer interrupt and timer
-expiration:
-
-
-      timer_int  hrtimer_exp
-
-      1.0e6      1.00006e6
-      1.00009e6  1.00006e6
-      1.00002e6  1.00006e6
-      1.0001e6   1.00006e6
-      1.00013e6  1.00006e6
-      1.0005e6   1.00006e6
-      1.01135e6  1.00006e6
- 991227.0        1.00006e6
-      1.00046e6  1.00006e6
-      1.00388e6  1.00006e6
-      1.01399e6  1.00006e6
-...
-
-To fix this, for the hrtimer expire value, force a minimum of "now - period".
-
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index baca9fa37a91..52ba848d6828 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2442,8 +2442,19 @@ static enum hrtimer_restart apic_timer_fn(struct hrtimer *data)
- 	apic_timer_expired(apic, true);
- 
- 	if (lapic_is_periodic(apic)) {
-+		ktime_t now, expires, leftlimit;
-+
- 		advance_periodic_target_expiration(apic);
- 		hrtimer_add_expires_ns(&ktimer->timer, ktimer->period);
-+
-+               /* Advance timer if its far behind */
-+		now = ktime_get();
-+		expires = hrtimer_get_expires(&ktimer->timer);
-+		leftlimit = ktime_sub_ns(now, ktimer->period);
-+
-+		if (ktimer->period > 0 && ktime_before(expires, leftlimit))
-+			hrtimer_set_expires(&ktimer->timer, leftlimit);
-+
- 		return HRTIMER_RESTART;
- 	} else
- 		return HRTIMER_NORESTART;
-
+>  	if (!fast_pgd_switch(vcpu, new_pgd, new_role)) {
+>  		/* kvm_mmu_ensure_valid_pgd will set up a new root.  */
+>  		return;
