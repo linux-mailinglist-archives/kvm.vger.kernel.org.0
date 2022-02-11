@@ -2,124 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A95F54B2114
-	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 10:09:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF1E4B215E
+	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 10:17:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348366AbiBKJJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Feb 2022 04:09:08 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52782 "EHLO
+        id S1348422AbiBKJRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Feb 2022 04:17:22 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348370AbiBKJJH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Feb 2022 04:09:07 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2060.outbound.protection.outlook.com [40.107.94.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 265E21024;
-        Fri, 11 Feb 2022 01:09:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gRZ5Jk/ThAqudJ/vKZycsWculex3jEAp9xp8MBT/StcZUFdF3JMfry4G4HhtTtu2jTVmc4feJSZ1kDgTY+rC2wLnaduNJahlMEU/5tsa4EZLp5JYDIdKxaI7C0NJ3Bu4+LwITmS/wEttok/fEu2nfZvhGvSC7wLuMCLDaUVLzQl3+BzpcYoW0WqVuQPN3d0cu/7ij+ootyN6J3Cedwl9bipJEMIvz/wnFePiGIKzRdvkxWbtsKugZ/N4hvBtyWe7yEyy4xHP/qCXRKaUK0RBuLumYPZi6oBwSbQ0PgN9IL4kagjab0K5KOAPzjZZQEpfDlvZiyc5G9x3gss2KPMu9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3UdfA+qVU2bvQXUeytNcqDVOtPYU4y5ETZpWjv0eDGo=;
- b=a9aKYpm5TidgaIflZvAlZNFb4o2bO2nh89g3gmGtJBzzzbNO72ltiG3p9acYpKS9YCeG2oY5RW+s5u3MrLsbl53ZSAoCJUj7WOJ2KSNoZFL8Rl6DAPS2p2kPsLoPHeBsfcT9J/KKGugT+D0bgfQgyYI+UBiKym4K/PcZi/ZgZrNY3Fl/eBN+5LENEqJbTH8rk9aRhKTm2PjD7Y0oyqrvepZkRv3IQTzVIaq3zpht9eNR4AtX0GA1uvT/EY06f/0Ot4YAyGAUU8blN+TNoBUuGEXThY3q5iWWQKs7Yjprh+805qJh0sPukiICIR86YWItzlyFLgHBBEo20RsKkbOuPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3UdfA+qVU2bvQXUeytNcqDVOtPYU4y5ETZpWjv0eDGo=;
- b=HNGS+J91FDdiHntFGagSFaejP7aErrsEcX49dBQZ5MvCYmwZggr579Dje0kpjKzTg/h7LvYMMPtAaW8UivGyU9oz/1FTiWmEUlMvYNwbAc39bz3NjV0rlTNyCPe8+DUDXm95JFyBBLeC7C2g+t7f33dbMGCnOsgm2K5HMiq+UUU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB2470.namprd12.prod.outlook.com (2603:10b6:4:b4::39) by
- MN2PR12MB3501.namprd12.prod.outlook.com (2603:10b6:208:c7::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4975.15; Fri, 11 Feb 2022 09:09:03 +0000
-Received: from DM5PR12MB2470.namprd12.prod.outlook.com
- ([fe80::19bf:2e9b:64c3:b04b]) by DM5PR12MB2470.namprd12.prod.outlook.com
- ([fe80::19bf:2e9b:64c3:b04b%7]) with mapi id 15.20.4975.011; Fri, 11 Feb 2022
- 09:09:02 +0000
-Message-ID: <9871bfc0-42e8-c485-687f-dd111224fbe6@amd.com>
-Date:   Fri, 11 Feb 2022 14:38:48 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Cc:     vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com,
-        seanjc@google.com
-Subject: Re: [PATCH 12/12] KVM: x86: do not unload MMU roots on all role
- changes
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20220209170020.1775368-1-pbonzini@redhat.com>
- <20220209170020.1775368-13-pbonzini@redhat.com>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20220209170020.1775368-13-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BMXPR01CA0048.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:b00:c::34) To DM5PR12MB2470.namprd12.prod.outlook.com
- (2603:10b6:4:b4::39)
+        with ESMTP id S237952AbiBKJRW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Feb 2022 04:17:22 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3BBE102D;
+        Fri, 11 Feb 2022 01:17:20 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21B8ciEo015018;
+        Fri, 11 Feb 2022 09:17:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=BepGLEN3A2hawUn04CXKRhRJv1ry5IbqIi7zt/wNAU8=;
+ b=O4q6xEeSFvGDsoiENhHdkGvPlKTM89FhIc7OwjdX5zOLpCIjooKPYNddQyX33lwrFbd5
+ ZTBaBiaP6wYsDCgW/2NTYvQFjOMhNti26hkYg/nOddD4Y64w5hurGLTUB1UqVOuDbFKL
+ PXCZZ3+R7tmXSO3/y+CBJiC3frqh3pomvRkyQ6D3c/dJXKTT9hlcxQxWVBuoF+qeqyUe
+ 5as+HjrDJ0MiF3Arpwfv0T/2pGrOdH7BpyPiCbO14SHH0uxS+PtG5oScXfDbBjeQdQf5
+ SaS/ig231ECgb+sRqGMbsuSVNeT1PnebCjBORs4BOK1j6zpscQlPlCMPmsBaBSynGoOt Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e5gt84dba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Feb 2022 09:17:20 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21B90FYu020099;
+        Fri, 11 Feb 2022 09:17:19 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e5gt84daj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Feb 2022 09:17:19 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21B990xj025512;
+        Fri, 11 Feb 2022 09:17:17 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3e1gva8099-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Feb 2022 09:17:17 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21B9HCXm39649560
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Feb 2022 09:17:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC7D0A4059;
+        Fri, 11 Feb 2022 09:17:12 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2780FA405E;
+        Fri, 11 Feb 2022 09:17:12 +0000 (GMT)
+Received: from [9.145.74.171] (unknown [9.145.74.171])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Feb 2022 09:17:12 +0000 (GMT)
+Message-ID: <95cd44de-f035-4371-812f-5d6bad68cd7b@linux.ibm.com>
+Date:   Fri, 11 Feb 2022 10:17:11 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f79853bf-e482-4ae4-3bec-08d9ed3e2509
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3501:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB3501AC8006A087876119320AE2309@MN2PR12MB3501.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zMIPpucnIbCg8R/gnL4JJBIC2/uzEPiWpLCXaXls04w6y1IdmpLpRau0yYRTyF+A5SmC1TOF6uIN73alLLxaOEjz7DPJaCM5O0UTJblgWINKneTI5RVvmtDBnaC7HUlpEu7r5fNVzRzL6gPTIjTl1zIw9Z5mRoNNlMmz9oW7BuzBQaQNNF92Q04sBSDS6lkrbBCjlXxFKnYQrz2AlfjH/l9Hn+jeZuuPXGLxbJcFog2PjmrFuod0+W2nRct9moN3M9X1ESoS0GejsuAFdWB4BA5AE14J3MIThJHDNiOV5h3TEaXo1vxwwNVBNV6oLL5GACs9gcXBSFyFRARlZPrtJVxFhWXpHZQTmAYQxXW5S0RBdloz5ylzl0dhuDMlrbNLIvvs0odwVba6FXLMgvr2381JqCxpQLEq0zh+H4zUsxj89JYNAEx+loFfTyriUEZbLX6bb7IegHogeSv58xoUNmlx0yJQKJBqdTndci0udA96d79Lm2pXWElztYHaLIYSAPfPqah3z1QlGScmeBVcfpcn+W9EnMss+skdq+KldsovvvvCBM+I0D/SJZRy4aJZJviEoJgkiCoRLXkJ7EbJG1pRWF0mQiCV19Hl788p+3Ixr+AEGWaUxSP4rxrKg907RayZ3w6BW+SwAPiCWLwbWYzI+2YNsNIuNP7zW6JmbpH3MGiYLwHPzMwWPZjlyXrRTMtT85Ii5X/y3s1LSKdh82g7unuS0d0i/jTodRPpNi4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB2470.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(316002)(8676002)(66476007)(66946007)(66556008)(4326008)(38100700002)(31686004)(6512007)(508600001)(31696002)(8936002)(5660300002)(2616005)(6486002)(36756003)(26005)(186003)(6506007)(53546011)(4744005)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YTFDYWJIT2w0b3I1dUF3SDJ1bW81R1QzZThWc2loSUQ1ZWdvV25TQkFoYkli?=
- =?utf-8?B?elN1dldTSUJpWUNUaVp6dTZNdS9TczlrOHVnMWZnRjdDUDBmOHcrWDVOUnEv?=
- =?utf-8?B?MVE5MHRKNEw1V3lQZGowdDBLalNlTlZhaC9WZlZETzl2QnJUUVIzUmN6c0dL?=
- =?utf-8?B?Uks0Nk5USFBlbm9zd2tSZzVNdE9sQjFVK1BZOXJtd1BacTV2MFBUSWJSckFV?=
- =?utf-8?B?N2RwK2N5ZmxkR0FJSmpzcENyR04weUM2Rit0aUJjTEg1S2FaTkVSbDFIVG5p?=
- =?utf-8?B?eFJENmhFZ3piYzNaTGhmQld0aTRkWDR0a3hiSExFNGt4NTJwZFZmZmxQaEtL?=
- =?utf-8?B?SnlndHFXUytzd1JTcG12eThqaDBlTnhpaDdTMkpFU1hQZ1lQVCsxOGltenhM?=
- =?utf-8?B?dmc5OC9aSFFXNGFjU2p4ZXh5VFMwaXJYdWVLeW1Ja3BjY3BiMWlTanc2YjBU?=
- =?utf-8?B?MjFNaUcyb3BGQktEWlczVDFHZGdDbFVQQXUyL09mYWRDamxlaU0xbU04QndB?=
- =?utf-8?B?blI3R3lLem5EZmJFZnR4SGYxT1ZVREpHTXo1a3IvU2owbDd6WTJuRkd0ZkpC?=
- =?utf-8?B?cnBEc2VCOUFzNzQ1cGJFa0tocEgwVDlobXJXbDBWR0w1YTlldEh3YmNjTyt3?=
- =?utf-8?B?WGU1dGIvMXBpckl6d0VoR3VmNjJGRW9SRi9pZmloaUdiQjZqZDJlVmE5a3N1?=
- =?utf-8?B?ZEkxaXM4QWVWU3d1WllGbUx4d3ZrZUpIQzFaQW12WkNmVnQrM3lLTlJRZm1t?=
- =?utf-8?B?YnJ2ZFQyZnVUeG14K3R6bXVySVI3eEl5TmZyNmhPaGw0bldhZVNFMHB5c09S?=
- =?utf-8?B?UnRxKzZtV0tnVEZVMnFJQzZlc1M0Z1F3aFNzOE1DeEU3aTVuZXpESnpQRHl5?=
- =?utf-8?B?SW5Pb0ZnNGhiVnFGck9FUnQrbm4rcVlZcFdWVWxhelpENzZGVk03emFCaTRE?=
- =?utf-8?B?ZjFLRWVsQ3JlbkJodldpdFRRa0ZoRktLNjhQODNLWEVyVXZWbVFSOEcvb3hM?=
- =?utf-8?B?RkVhL1MwamdzekVMWkY2WFNLWWhhQTc1MWRZN1d4Z1RzcnBBWWZJeVpyMmhB?=
- =?utf-8?B?MlU3ZEV6UThOVmEyLytyanlQSUlobDFFeWlvT3RhODM0a0ZvZ0laM2xPZnpM?=
- =?utf-8?B?Y1JmNkFxUzhWRnZnWGpRNGlETGF0dDV4RjRZMFU1WXhQZDlid2FaT1VyM1A4?=
- =?utf-8?B?aHRKTzVGdmpiaXVUbVlYRWRVdHUzMUpIOENPa0NuM0R6bFZ1eWZqVjJvVXBD?=
- =?utf-8?B?aU96eldiNzU1UUh0bTVRQjhpMkNtQjcya09VTVlzZlhCN0l4UnVKRHNndHYw?=
- =?utf-8?B?L1VXdmtHdWowa2g0MXd2N2ZnVVY2MCt0Q3o1c2haSFlZL3o2TUp2ZjRjVUY1?=
- =?utf-8?B?SlEvNnN2dTRjbDBBMExuV3RVa1BIUDhwUVhiaTE1cUdIR2x1Qmt6Nks2S3lZ?=
- =?utf-8?B?M3Z0QkQ2ZlZNbG8xQ1lSRE1STjUyMTdkbFFSQlFhTitYKzh4U3JUUUdLNExT?=
- =?utf-8?B?TDR5SFB2L3Y1dElXaDJzSVFNVnAxcDd2bGFhRTgzWTFDRVFoMFlEUVh3SEwv?=
- =?utf-8?B?WmNWeGlEVVQvQ3lHZmZLSzlzQ1RzOFNkZ29kUmh2aXp6YzlkUDVDTmJtZ3hE?=
- =?utf-8?B?TjdlZlE1VjNTS0lIYWgvUDhFNGdsdjJQUE1veS84Z2hFRGhzVzRxSXVYSVZr?=
- =?utf-8?B?MVBRUmNndjJPVXZ5OFJMWGhOUlF1RDZFWWdRZkkwQ1VlQlVvR1E2alR0VzB1?=
- =?utf-8?B?WXBkRWhCY0YyYnJ1cVEwOEh2aWVOdHBxbzNyTEw2ZzdWTnZTekdBWkswa1Ni?=
- =?utf-8?B?cXU5eTlKVXh1SERHVHlRRllBenFMRDcwZ2trMU02ZGxrV2g0SVZQN2NHaVNO?=
- =?utf-8?B?UVVTOW9UOTd0d2hrL1A5OGlKYnJHK2x0OGtCb1dWZ3NIU1NTKzRINHlsNm40?=
- =?utf-8?B?QTBBY0NKK293c3ZnTzhnd1lvWVRyQ0hLbmVvc01CRFgrWmsyUEQ5UXdpVjho?=
- =?utf-8?B?eUlKazUwNHdsU0U3WEhIdHBCYWJ2d1VDb3pUMzJTWVBBaE8wbU9iSDVNY3Vj?=
- =?utf-8?B?bThBS3RXZitHaXZydElzcnAxcG9aRTZ3c0NVdjFPZi9IM09paUVLbjhiQTll?=
- =?utf-8?B?RzJCNkhuajhUbGtvR0orNnZiNVI4VXVtQldDakJQMlh3bk0yY3JPQk1rb2Rp?=
- =?utf-8?Q?HvnH8Sf5wUltJYyXgXXxz6I=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f79853bf-e482-4ae4-3bec-08d9ed3e2509
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB2470.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2022 09:09:02.8502
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P/3GkiSsOQTqaZTj8POF7IZqrNxn8+i9Uyux1wn/sNBCtmWgVAVuKQC8XrtwEcqZkb5OsYfbNUOOopcIK0aGhg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3501
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20220209170422.1910690-1-scgl@linux.ibm.com>
+ <20220209170422.1910690-10-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v3 09/10] KVM: s390: Update api documentation for memop
+ ioctl
+In-Reply-To: <20220209170422.1910690-10-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5rSCGnlk0XX_Vi0IZ2nqSi2CuhLASZHe
+X-Proofpoint-ORIG-GUID: GZNDZloHbp0U3jss8-w8KJATKjPfIo8q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-11_03,2022-02-09_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202110051
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -127,26 +103,190 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/9/2022 10:30 PM, Paolo Bonzini wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0d3646535cc5..97c4f5fc291f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -873,8 +873,12 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
->  		kvm_async_pf_hash_reset(vcpu);
->  	}
->  
-> -	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
-> +	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS) {
-> +		/* Flush the TLB if CR0 is changed 1 -> 0.  */
+On 2/9/22 18:04, Janis Schoetterl-Glausch wrote:
+> Document all currently existing operations, flags and explain under
+> which circumstances they are available. Document the recently
+> introduced absolute operations and the storage key protection flag,
+> as well as the existing SIDA operations.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 
-                                      ^^ CR0.PG here ?
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-> +		if ((old_cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PG))
-> +			kvm_mmu_unload(vcpu);
->  		kvm_mmu_reset_context(vcpu);
-> +	}
+Minor nits below
 
-Regards
-Nikunj
+> ---
+>   Documentation/virt/kvm/api.rst | 112 ++++++++++++++++++++++++++-------
+>   include/uapi/linux/kvm.h       |   2 +-
+>   2 files changed, 91 insertions(+), 23 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a4267104db50..2d131af44576 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3683,15 +3683,17 @@ The fields in each entry are defined as follows:
+>   4.89 KVM_S390_MEM_OP
+>   --------------------
+>   
+> -:Capability: KVM_CAP_S390_MEM_OP
+> +:Capability: KVM_CAP_S390_MEM_OP, KVM_CAP_S390_PROTECTED, KVM_CAP_S390_MEM_OP_EXTENSION
+>   :Architectures: s390
+> -:Type: vcpu ioctl
+> +:Type: vm ioctl, vcpu ioctl
+>   :Parameters: struct kvm_s390_mem_op (in)
+>   :Returns: = 0 on success,
+>             < 0 on generic error (e.g. -EFAULT or -ENOMEM),
+>             > 0 if an exception occurred while walking the page tables
+>   
+> -Read or write data from/to the logical (virtual) memory of a VCPU.
+> +Read or write data from/to the VM's memory.
+> +The KVM_CAP_S390_MEM_OP_EXTENSION capability specifies what functionality is
+> +supported.
+>   
+>   Parameters are specified via the following structure::
+>   
+> @@ -3701,33 +3703,99 @@ Parameters are specified via the following structure::
+>   	__u32 size;		/* amount of bytes */
+>   	__u32 op;		/* type of operation */
+>   	__u64 buf;		/* buffer in userspace */
+> -	__u8 ar;		/* the access register number */
+> -	__u8 reserved[31];	/* should be set to 0 */
+> +	union {
+> +		struct {
+> +			__u8 ar;	/* the access register number */
+> +			__u8 key;	/* access key, ignored if flag unset */
+> +		};
+> +		__u32 sida_offset; /* offset into the sida */
+> +		__u8 reserved[32]; /* ignored */
+> +	};
+>     };
+>   
+> -The type of operation is specified in the "op" field. It is either
+> -KVM_S390_MEMOP_LOGICAL_READ for reading from logical memory space or
+> -KVM_S390_MEMOP_LOGICAL_WRITE for writing to logical memory space. The
+> -KVM_S390_MEMOP_F_CHECK_ONLY flag can be set in the "flags" field to check
+> -whether the corresponding memory access would create an access exception
+> -(without touching the data in the memory at the destination). In case an
+> -access exception occurred while walking the MMU tables of the guest, the
+> -ioctl returns a positive error number to indicate the type of exception.
+> -This exception is also raised directly at the corresponding VCPU if the
+> -flag KVM_S390_MEMOP_F_INJECT_EXCEPTION is set in the "flags" field.
+> -
+>   The start address of the memory region has to be specified in the "gaddr"
+>   field, and the length of the region in the "size" field (which must not
+>   be 0). The maximum value for "size" can be obtained by checking the
+>   KVM_CAP_S390_MEM_OP capability. "buf" is the buffer supplied by the
+>   userspace application where the read data should be written to for
+> -KVM_S390_MEMOP_LOGICAL_READ, or where the data that should be written is
+> -stored for a KVM_S390_MEMOP_LOGICAL_WRITE. When KVM_S390_MEMOP_F_CHECK_ONLY
+> -is specified, "buf" is unused and can be NULL. "ar" designates the access
+> -register number to be used; the valid range is 0..15.
+> +a read access, or where the data that should be written is stored for
+> +a write access.  The "reserved" field is meant for future extensions.
+> +Reserved and unused values are ignored. Future extension that add members must
+> +introduce new flags.
+> +
+> +The type of operation is specified in the "op" field. Flags modifying
+> +their behavior can be set in the "flags" field. Undefined flag bits must
+> +be set to 0.
+> +
+> +Possible operations are:
+> +  * ``KVM_S390_MEMOP_LOGICAL_READ``
+> +  * ``KVM_S390_MEMOP_LOGICAL_WRITE``
+> +  * ``KVM_S390_MEMOP_ABSOLUTE_READ``
+> +  * ``KVM_S390_MEMOP_ABSOLUTE_WRITE``
+> +  * ``KVM_S390_MEMOP_SIDA_READ``
+> +  * ``KVM_S390_MEMOP_SIDA_WRITE``
+> +
+> +Logical read/write:
+> +^^^^^^^^^^^^^^^^^^^
+> +
+> +Access logical memory, i.e. translate the given guest address to an absolute
+> +address given the state of the VCPU and use the absolute address as target of
+> +the access. "ar" designates the access register number to be used; the valid
+> +range is 0..15.
+> +Logical accesses are permitted for the VCPU ioctl only.
+> +Logical accesses are permitted for non secure guests only.
+
+s/secure/protected/
+
+> +
+> +Supported flags:
+> +  * ``KVM_S390_MEMOP_F_CHECK_ONLY``
+> +  * ``KVM_S390_MEMOP_F_INJECT_EXCEPTION``
+> +  * ``KVM_S390_MEMOP_F_SKEY_PROTECTION``
+> +
+> +The KVM_S390_MEMOP_F_CHECK_ONLY flag can be set to check whether the
+> +corresponding memory access would cause an access exception, without touching
+
+I think the comma needs to be removed.
+
+> +the data in memory at the destination.
+> +In this case, "buf" is unused and can be NULL.
+> +
+> +In case an access exception occurred during the access (or would occur
+> +in case of KVM_S390_MEMOP_F_CHECK_ONLY), the ioctl returns a positive
+> +error number indicating the type of exception. This exception is also
+> +raised directly at the corresponding VCPU if the flag
+> +KVM_S390_MEMOP_F_INJECT_EXCEPTION is set.
+> +
+> +If the KVM_S390_MEMOP_F_SKEY_PROTECTION flag is set, storage key
+> +protection is also in effect and may cause exceptions if accesses are
+> +prohibited given the access key passed in "key".
+> +KVM_S390_MEMOP_F_SKEY_PROTECTION is available if KVM_CAP_S390_MEM_OP_EXTENSION
+> +is > 0.
+> +
+> +Absolute read/write:
+> +^^^^^^^^^^^^^^^^^^^^
+> +
+> +Access absolute memory. This operation is intended to be used with the
+> +KVM_S390_MEMOP_F_SKEY_PROTECTION flag, to allow accessing memory and performing
+> +the checks required for storage key protection as one operation (as opposed to
+> +user space getting the storage keys, performing the checks, and accessing
+> +memory thereafter, which could lead to a delay between check and access).
+> +Absolute accesses are permitted for the VM ioctl if KVM_CAP_S390_MEM_OP_EXTENSION
+> +is > 0.
+> +Currently absolute accesses are not permitted for VCPU ioctls.
+> +Absolute accesses are permitted for non secure guests only.
+
+s/secure/protected/
+
+> +
+> +Supported flags:
+> +  * ``KVM_S390_MEMOP_F_CHECK_ONLY``
+> +  * ``KVM_S390_MEMOP_F_SKEY_PROTECTION``
+> +
+> +The semantics of the flags are as for logical accesses.
+> +
+> +SIDA read/write:
+> +^^^^^^^^^^^^^^^^
+> +
+> +Access the secure instruction data area which contains memory operands necessary
+> +for instruction emulation for secure guests.
+> +SIDA accesses are available if the KVM_CAP_S390_PROTECTED capability is available.
+> +SIDA accesses are permitted for the VCPU ioctl only.
+> +SIDA accesses are permitted for secure guests only.
+
+s/secure/protected/
+
+>   
+> -The "reserved" field is meant for future extensions. It is not used by
+> -KVM with the currently defined set of flags.
+> +No flags are supported.
+>   
+>   4.90 KVM_S390_GET_SKEYS
+>   -----------------------
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 26bff414f1a0..fd01fe04a183 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -567,7 +567,7 @@ struct kvm_s390_mem_op {
+>   			__u8 key;	/* access key, ignored if flag unset */
+>   		};
+>   		__u32 sida_offset; /* offset into the sida */
+> -		__u8 reserved[32]; /* should be set to 0 */
+> +		__u8 reserved[32]; /* ignored */
+>   	};
+>   };
+>   /* types for kvm_s390_mem_op->op */
 
