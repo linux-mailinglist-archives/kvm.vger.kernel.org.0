@@ -2,80 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 422D34B2AD9
-	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 17:46:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 758F44B2B02
+	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 17:54:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351707AbiBKQpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Feb 2022 11:45:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46390 "EHLO
+        id S1351793AbiBKQwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Feb 2022 11:52:46 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351697AbiBKQpc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Feb 2022 11:45:32 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BE0D67
-        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 08:45:31 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id q11-20020a17090a304b00b001b94d25eaecso4847186pjl.4
-        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 08:45:31 -0800 (PST)
+        with ESMTP id S237337AbiBKQwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Feb 2022 11:52:45 -0500
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EF4C8D;
+        Fri, 11 Feb 2022 08:52:43 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id u20so19858698ejx.3;
+        Fri, 11 Feb 2022 08:52:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dFXJ174/FHjksMgNtUqWugIkgOl10ic8u3Hye+5cX+c=;
-        b=YM/qktxwg58lxRejUqZuM+1MRPwM2m6VurqVzGgAbO1zxTIYMgnrhnBS9beXDliQsT
-         kpLM29GY0tvK1TzYqkcG5vnZtGcU2eTdVR3xdVhLMNL2g/Z11yxZdJv8qm9bx8s2HUoW
-         0yq2Ru37y0tDHpukzg7fJEAEF4sn92Uedeo4Xlu5PHLN/DENgNAWLy4o2eCm5jSEo3r4
-         ikqOw0QoSKLttaXbeUuGfs4L7BynQ6CXkgXNGDngpBZqv16B2VPKocCNOubZlZBEn9jS
-         2EuYpOpoIhw4fOR1kbDt/J/zwD8cOO2Puobt0Ew2nRNSlCEPg5eBYyi8fwxnq6slpJYO
-         Yd9g==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Y4J/n+96ksnx895qiPFgBhQkGHxGH5BwJo5HaJpHU78=;
+        b=OCNBYi7q/xXDuwkrYXNdTcqfcZidkgzB1YhFYsxZ3GH8QdoqUinJGZkYE/xh08VscO
+         9OzIV3pgOQySjYL7DIxqIxwM97G6x5lUn8yON2NXcjpHQcLT6Q7Ot3fpp1j9JGbkigQ0
+         JQ2md77ql9OixOus/16acgfyQDEBvNE7uz7MyttOKoHK869WfbL9a74a/AE8P6qXIyOS
+         l1xKr+H5Fh+nsgGKV92T5PWqRn/zCx9bxDJlilmoeMCz5EHHmNz0XWc/shJSxkmlLcIf
+         sEkToZ7tuptJ4xCqdmeRyW9h0yOXn8gHxtgS5eY8pgwUV3dCj0JMujxhLwQaLqZvZrJo
+         vhJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dFXJ174/FHjksMgNtUqWugIkgOl10ic8u3Hye+5cX+c=;
-        b=grP+SbX7NqkN5EPjQjn2VIsJSrkVySQrfQW6EZvH44fO4NmaR0i3pC/KEhU2Kc1Gp3
-         1f9SBDGA45ICX+H4JsUpNrRjX/uio1BYQTmb1FrFjtPg9DHRUUHKqn8ICFkfCqRsok0w
-         SofdUxuy/m4y/dtOt6mfkNZicwFbU2Uaj5iO23B4o7T4b8PapTdKwiUbPOIVbvCIZkEb
-         /bfxQ8EexREy1D3gXCYFmsbJ5s0epT2YfptFWQt2SkRGwXDMM/pjmkhhz/CnnicD9Et2
-         DLrxTQ5rAE63xdpjZt4e3MO/Xi1l0kE1jTLW494qCif7EWn4J50rPIPGInJV4T5muD1P
-         GlVg==
-X-Gm-Message-State: AOAM5302P+FJDvmsk6h/BdndQ/OdaOuiKJJc69wu0wLlKirCbs+n4LEN
-        1gdNnFwsLJ8dL1KowtZH67QBMgMxSmaybw==
-X-Google-Smtp-Source: ABdhPJzrzruCL6VeeZwq5YsFvJWqAM8TXVJ3XRvp97kLJM99sybRe+Gw+FFx8J8h7fW5UNTBuQyn+A==
-X-Received: by 2002:a17:90a:4a09:: with SMTP id e9mr1289939pjh.36.1644597930604;
-        Fri, 11 Feb 2022 08:45:30 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x1sm28587057pfh.167.2022.02.11.08.45.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 08:45:29 -0800 (PST)
-Date:   Fri, 11 Feb 2022 16:45:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mlevitsk@redhat.com
-Subject: Re: [PATCH 2/3] KVM: SVM: set IRR in svm_deliver_interrupt
-Message-ID: <YgaSpuhhJsQKLvfP@google.com>
-References: <20220211110117.2764381-1-pbonzini@redhat.com>
- <20220211110117.2764381-3-pbonzini@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Y4J/n+96ksnx895qiPFgBhQkGHxGH5BwJo5HaJpHU78=;
+        b=7MeG6vJMW9Nw3Nn1w1sCJufWrgKBOukApb0EMundcaVoHpSpHK0l6fkgHy7StAz+7M
+         DRofvDjYmd0IptiiCg66lf7eBRAezvlM4vp/N2UVXJt6aXg0FtUhnHN6QdBjEI+o/37j
+         D7PXO65oHoyDY+VYwkHFy3rnMT3uYOjPpuUUZKB1F5HCFNCI6QhxwIgTNUb2YRuHS8fi
+         oxgYTvK4a6AjUu4ZU0yRgVA/D5scvg/6+Dt0V2l5TzszHXOt+PnCwWc0DqOMxy5Gbfvh
+         +L0AovgVWmU2izIyy32tnqIkUF0nT4ZcLIXe2eP4njSrXdHVWI3/aXQn1YmO8xsZS+sX
+         Dg/g==
+X-Gm-Message-State: AOAM5312+q+a2Y7XYZCtOBgkoJJKBb5gqn5LjBqSW51la9rvieMmUk6u
+        Wqx7INxgoI/+uF3R3kMXTBA=
+X-Google-Smtp-Source: ABdhPJzb0/on9AFZt0CrwvuCleMb47XrwH/E0zRGC9xrP+u7ouMizlnOQYIAHplU0JS1NXheGqedGw==
+X-Received: by 2002:a17:906:bc4c:: with SMTP id s12mr2115465ejv.675.1644598362140;
+        Fri, 11 Feb 2022 08:52:42 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id i23sm4204216edr.74.2022.02.11.08.52.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Feb 2022 08:52:41 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <ad47de2b-84b6-aaca-2a01-ae4fd8248cad@redhat.com>
+Date:   Fri, 11 Feb 2022 17:52:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220211110117.2764381-3-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 06/12] KVM: MMU: rename kvm_mmu_reload
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
+References: <20220209170020.1775368-1-pbonzini@redhat.com>
+ <20220209170020.1775368-7-pbonzini@redhat.com> <YgWtdUotsoBOOtXz@google.com>
+ <4e05cfc5-55bb-1273-5309-46ed4fe52fed@redhat.com>
+ <YgaLwvo2Gl565H3/@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YgaLwvo2Gl565H3/@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 11, 2022, Paolo Bonzini wrote:
-> SVM has to set IRR for both the AVIC and the software-LAPIC case,
-> so pull it up to the common function that handles both configurations.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+On 2/11/22 17:16, Sean Christopherson wrote:
+> The other nuance that I want to avoid is the implication that KVM is checking for
+> a valid root because it doesn't trust what has happened before, i.e. that the call
+> is there as a safeguard.  That's misleading for the most common path, vcpu_enter_guest(),
+> because when the helper does do some work, it's usually because KVM deliberately
+> invalidated the root.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Fair enough.
+
+>> I also thought of "establish_valid_root", but it has the opposite
+>> problem---it does not convey well, if at all, that the root could be valid
+>> already.
+> 
+> Heh, I agree that "establish" would imply the root is always invalid, but amusingly
+> "establish" is listed as a synonym for "ensure" on the few sites of checked. Yay English.
+
+Well, synonyms rarely have a perfectly matching meaning.
+
+> Can we put this on the backburner for now?
+
+Yes, of course.
+
+Paolo
+
+> IMO, KVM_REQ_MMU_RELOAD is far more
+> misleading than kvm_mmu_reload(), and I posted a series to remedy that (though I
+> need to check if it's still viable since you vetoed adding the check for a pending
+> request in the page fault handler).
+> 
+> https://lore.kernel.org/all/20211209060552.2956723-1-seanjc@google.com
+
