@@ -2,145 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E0564B287B
-	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 15:56:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C26094B29A8
+	for <lists+kvm@lfdr.de>; Fri, 11 Feb 2022 17:07:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351104AbiBKOzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Feb 2022 09:55:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49270 "EHLO
+        id S1350210AbiBKQGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Feb 2022 11:06:07 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349983AbiBKOz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Feb 2022 09:55:29 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2721A131;
-        Fri, 11 Feb 2022 06:55:28 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1DF131EC03E3;
-        Fri, 11 Feb 2022 15:55:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1644591322;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=cDkjTWDqKQNWnc/zCRpQ/YG8Cct/yEFoBc7JQrQMptw=;
-        b=JuSz00olsVVdWRlZ0j1y2KYv7/pjY9O+lx/jUcm2MLE2qjB8yQXePonn3SHNbDbdw+b92L
-        q8/zE+9levcBrHllOIfG1/b/etAeXOIKwIAZRBCVMm3S1h+8pWO4OEjcSOBWWsX7cIz4NS
-        tl3iyhz39QI5sYRgPGS35NyMFJC7+oI=
-Date:   Fri, 11 Feb 2022 15:55:23 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v10 21/45] x86/mm: Add support to validate memory when
- changing C-bit
-Message-ID: <YgZ427v95xcdOKSC@zn.tnic>
-References: <20220209181039.1262882-1-brijesh.singh@amd.com>
- <20220209181039.1262882-22-brijesh.singh@amd.com>
+        with ESMTP id S1350104AbiBKQGG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Feb 2022 11:06:06 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7831721F;
+        Fri, 11 Feb 2022 08:06:04 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id da4so17164383edb.4;
+        Fri, 11 Feb 2022 08:06:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3Nvd1S4LyyfGcKGyWJQAtm0zoyG/g+vMhgrQ69JVjA8=;
+        b=njXXlzotE3kdWn0eZuJWxBX9/ISQ28oiOEq8KWzpZXdAWMcrN6dktqQGGRmLFSYBEj
+         3pA7Ew0SZXLdlfAWmj1CFmEbTHMVrbFHD+OveX5v1sZphHey/j8ylt17+eXV6phfTT06
+         oNoGogx/rWmsNXhABo80DVMZxu909IC5kohBe/uhiqa+cbKEsc0s6LhL7mfqePwUSJSZ
+         eHJBm/XPJ5DR+smLjh0G7b7dzJFAzBWxMwgzUPeIr9FgA9J8TQLoq0ThOaov6uDiKv8k
+         zF4He85tn88tbGDjivGCG7f5Vq5Sb3K4DY2gy1fXToFdUUYVDH1sf8DEgvZk+9AiVbUD
+         xlTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3Nvd1S4LyyfGcKGyWJQAtm0zoyG/g+vMhgrQ69JVjA8=;
+        b=b/M3DJeX93zxXuQdxVi2hmKQbz6vQXjaWyeEVegfIWADi9Oa+nKszhk0lbk5e15I6+
+         t8W6xJm+38FCzDwfpsabb4/MvHOiqIJLFhOtJ6F0m8bVG66tYI/Z2I1RH169jlVFL4eO
+         cc64MpKEKcJX7nU7JLANsfyt4Xjph4oq0G3l9KZTH57OXUvc/Zd6ohG0hS84sfr0hC8s
+         tZjfamw2yMhRG83IeDQi7wOVmAuN97qZa65NW6ht9ud37pICuqmfKidj8TPrrSpVke+v
+         KaNk+2cjUiWLtyTzT4ccDmSM7tFw7DYCP3q+Gru8EFtirNXjA5k0aiMKP4gN4T8ZnE+f
+         z/GA==
+X-Gm-Message-State: AOAM532/Nsum5HkEli6hgUgjQ8fvLMuAoUlu6mdihX+hFOYrZrv/Ins9
+        0CMRu0ql4bAtprzRBCXX2EU=
+X-Google-Smtp-Source: ABdhPJyEDA1O7niJEvWoGb1/npjoAerKbkLOG7rwxIa/571ClMdTcO73hl7lyq5hDiyVfL4Y6YFL2w==
+X-Received: by 2002:a05:6402:1e8b:: with SMTP id f11mr2755602edf.322.1644595562909;
+        Fri, 11 Feb 2022 08:06:02 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id h16sm8097198ejj.56.2022.02.11.08.06.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Feb 2022 08:06:02 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <7ccb16e5-579e-b3d9-cedc-305152ef9b8f@redhat.com>
+Date:   Fri, 11 Feb 2022 17:06:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220209181039.1262882-22-brijesh.singh@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [RFC PATCH 4/6] KVM: X86: Introduce role.level_promoted
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20211210092508.7185-1-jiangshanlai@gmail.com>
+ <20211210092508.7185-5-jiangshanlai@gmail.com> <YdTGuoh2vYPsRcu+@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YdTGuoh2vYPsRcu+@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ Kirill.
+On 1/4/22 23:14, Sean Christopherson wrote:
+> Alternatively, should we mark passthrough shadow pages as direct=1?  That would
+> naturally handle this code, and for things like reexecute_instruction()'s usage
+> of kvm_mmu_unprotect_page(), I don't think passthrough shadow pages should be
+> considered indirect, e.g. zapping them won't help and the shadow page can't become
+> unsync.
 
-On Wed, Feb 09, 2022 at 12:10:15PM -0600, Brijesh Singh wrote:
-> @@ -2012,8 +2013,22 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
->  	 */
->  	cpa_flush(&cpa, !this_cpu_has(X86_FEATURE_SME_COHERENT));
->  
-> +	/*
-> +	 * To maintain the security guarantees of SEV-SNP guests, make sure
-> +	 * to invalidate the memory before clearing the encryption attribute.
-> +	 */
-> +	if (!enc)
-> +		snp_set_memory_shared(addr, numpages);
-> +
->  	ret = __change_page_attr_set_clr(&cpa, 1);
->  
-> +	/*
-> +	 * Now that memory is mapped encrypted in the page table, validate it
-> +	 * so that it is consistent with the above page state.
-> +	 */
-> +	if (!ret && enc)
-> +		snp_set_memory_private(addr, numpages);
-> +
->  	/*
->  	 * After changing the encryption attribute, we need to flush TLBs again
->  	 * in case any speculative TLB caching occurred (but no need to flush
-> -- 
+So the main difference between direct and passthrough shadow pages is that
+passthrough pages can have indirect children.  A direct page maps the
+page at sp->gfn, while a passthrough page maps the page _table_ at
+sp->gfn.
 
-Right, as tglx rightfully points out here:
+Is this correct?
 
-https://lore.kernel.org/r/875ypyvz07.ffs@tglx
+If so, I think there is a difference between a passthrough page that
+maps a level-2 page from level-4, and a passthrough page that maps a
+level-3 page from level-4.  This means that a single bit in the role
+is not enough.
 
-this piece of code needs careful coordinated design so that it is clean
-for both SEV and TDX.
+One way to handle this could be to have a single field "direct_levels"
+that subsumes both "direct" and "passthrough".  direct && !passthrough
+would correspond to "direct_levels == level", while !direct && !passthrough
+would correspond to "direct_levels == 0".
 
-First, as we've said here:
-
-https://lore.kernel.org/r/1d77e91c-e151-7846-6cd4-6264236ca5ae@intel.com
-
-we'd need generic functions which turn a pgprot into an encrypted or
-decrypted pgprot on both SEV and TDX so we could do:
-
-cc_pgprot_enc()
-cc_pgprot_dec()
-
-which does the required conversion on each guest type.
-
-Also, I think adding required functions to x86_platform.guest. is a very
-nice way to solve the ugly if (guest_type) querying all over the place.
-
-Also, I was thinking of sme_me_mask and the corresponding
-tdx_shared_mask I threw into the mix here:
-
-https://lore.kernel.org/r/YgFIaJ8ijgQQ04Nv@zn.tnic
-
-and we should simply add those without ifdeffery but unconditionally.
-
-Simply have them always present. They will have !0 values on the
-respective guest types and 0 otherwise. This should simplify a lot of
-code and another unconditionally present u64 won't be the end of the
-world.
-
-Any other aspect I'm missing?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Paolo
