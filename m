@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 317DF4B328F
-	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 03:04:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87D2E4B33DC
+	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 09:39:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229983AbiBLCEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Feb 2022 21:04:44 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:43234 "EHLO
+        id S232733AbiBLIjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Feb 2022 03:39:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229953AbiBLCEo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Feb 2022 21:04:44 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90AED43
-        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 18:04:41 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id iy10-20020a17090b16ca00b001b8a7ed5b2cso9342183pjb.7
-        for <kvm@vger.kernel.org>; Fri, 11 Feb 2022 18:04:41 -0800 (PST)
+        with ESMTP id S232647AbiBLIjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Feb 2022 03:39:23 -0500
+Received: from mail-oo1-xc2f.google.com (mail-oo1-xc2f.google.com [IPv6:2607:f8b0:4864:20::c2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213E82613A
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 00:39:20 -0800 (PST)
+Received: by mail-oo1-xc2f.google.com with SMTP id t75-20020a4a3e4e000000b002e9c0821d78so13191518oot.4
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 00:39:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=dqxH8bcog2YzaxGtar+l+aJQd5MITcKEqzeP4VYU478=;
-        b=e80CC8jNfE0ZQ3SflyvIN0CQDUgcaXAUPwIVmewJ2WJVkdpx83IXoE1Vu344oL7YHx
-         vuwLOyq1KO4mkvTy81T66+HfUf5s7ycYNcOgGVMK0AFWSJlqhhPYZK5N/zVulAVOrNcL
-         pBfaIILuSxTjipErpSQRUY09xAskm8iX7K3K6PbXtQoc1xKKGqtE09fCEWSyROJJxrAw
-         9cPPU4IQRQMfzmWKYqwdct5p8AsgyT4pry+ScR9m8CW+jO1BD00rCpsTTjtqdOZBZaH6
-         FBpDgPEJSYYabMrBgJ4VtdC8gPRazh4Oq9Sj63lNJRASR+OLPq1ACwZNG94eRHVuAhX3
-         +VBw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=knbguSrX3xagYUpZD20aO/zcWDU1J9IHxC/2QTmVdh0=;
+        b=QTnl6TjaqYf1gXjMYo2qS5Xy0BQjvXfZTfbKa9AmzM0Amqr3YLk2VXin504ONCvS4c
+         D71CiHvHMQkMBc4NFA40dBjG6HaiGxlTqyD0jgv9VsVSErXQX2ezpCgwzAb1d/O+TQlR
+         tN0M7EElLBsyjeEJCaLZoqBQhJ/hthGxULgvKNce6noV8UYJe24ndI4FMdxlV/NLqxUM
+         yxgiPwY7bWqL2Jfinf0P4erYgY1JUON6gMKKtJYqcb22eoYuoHgtRWijmu0lwVTz5r4m
+         bQRNMj0TI4O2OWCtLkj1bAqtcLZaLDMaIThdAKUvgWYh9rdv/P5EehSVP9yJSC4wb/U/
+         3Lwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=dqxH8bcog2YzaxGtar+l+aJQd5MITcKEqzeP4VYU478=;
-        b=4LJCG6RiQ+d2bZSFeWEgGMzRQ+1xghtTYk3MEv+txfxdR8Nl2gfUS/9Kr4L4Gmi4oa
-         5kz3i+xc4WjKN817HYUYG+ba/7W/dclHypDD9fWlIm/FVCUiwilojJgAszHOFOMTnbCT
-         7WrjhrJ1ai29H6qAEjZhjFOpQuUf0f+JVK4STJ5KqnYlShJdo89q+2hVkmAbYYmJFHGx
-         OxC0Cqp2SZ5yg441pT54QmYWLNgi4phi/991KdTS+uBvsfmVUEDRiEsd7kxxSZ+gtbdC
-         AnD3axsowD+ZUk3Cc1oNtAyKZFiO3kkjfadkWD3+M8x4fqLG5XXXhEL0FKgGdtXO4JnZ
-         JDiA==
-X-Gm-Message-State: AOAM533GTqqr7IQdZlsqlxpwQGNAjABsPr/6eTnyLhc5Fja9BBt7956p
-        NAjc9LdB6F4Ugocbaa/0LzNztxMCwoo=
-X-Google-Smtp-Source: ABdhPJwB6qFSdCwIiIrxg071RkM1ieospL6IqsWQPA8QD5F9aHGyiX64MDF1E8jHji6ydpKjl9eKZEhVW54=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a63:5424:: with SMTP id i36mr3549027pgb.413.1644631481139;
- Fri, 11 Feb 2022 18:04:41 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 12 Feb 2022 02:04:37 +0000
-Message-Id: <20220212020437.506451-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH] KVM: Don't actually set a request when evicting vCPUs for GFN
- cache invd
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Woodhouse <dwmw@amazon.co.uk>,
-        Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=knbguSrX3xagYUpZD20aO/zcWDU1J9IHxC/2QTmVdh0=;
+        b=n5ItgqMjcmPT1Anx63Cd073T4bHmOB3Q11nF1RTvIkOzCu5nMdlrTcYkRHxqnKEYsM
+         6ZngjHpGYet3hy8BX9Lx/DuCs6m93dnI/lWTycLs4xaOjv9So/jRwE1QWbGxPlAHiNKL
+         AfleL8EIH7GYk92ChB7d2zfcjG4srq+2/ZUfs8LKxLhdFTlUOx1+xNPwz3T4VXDjsC/d
+         OwJqijJH98FSprLUjERggMgN9iAzUeVVbdoI8JLvgpdyJNR5o5br3wIsECghD5+6mCEn
+         5nHWf6B0yyrlsp6A5mAN+OcNxpBNYyBZaujDJj9UaKJ1RbV2Fk/DcQNmoLW525eca1WV
+         BzNw==
+X-Gm-Message-State: AOAM532PpkaFbWZ4bDHce6/F9dzMrfLX06Apl4SBOA3WePCobZSNg15Q
+        F2pMdYFTBpOgSaxmZLFP6Ff7e6TIefItnDNULXUECA==
+X-Google-Smtp-Source: ABdhPJyns7ddLPUyPQCSMDyfKbEyJqJSYRTCQnSQAozx4Oxa7MiPTV/AB9Nyf62p7APdboNF7lqfYKu1g/ZHT3BaAeQ=
+X-Received: by 2002:a05:6870:f812:: with SMTP id fr18mr1245704oab.129.1644655159211;
+ Sat, 12 Feb 2022 00:39:19 -0800 (PST)
+MIME-Version: 1.0
+References: <20211118130320.95997-1-likexu@tencent.com>
+In-Reply-To: <20211118130320.95997-1-likexu@tencent.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Sat, 12 Feb 2022 00:39:08 -0800
+Message-ID: <CALMp9eTONaviuz-NnPUP2=MEOb8ZBkZ7u_ZQBWBUne-i6cRUkA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/pmu: Fix reserved bits for AMD PerfEvtSeln register
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,207 +71,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't actually set a request bit in vcpu->requests when making a request
-purely to force a vCPU to exit the guest.  Logging the request but not
-actually consuming it causes the vCPU to get stuck in an infinite loop
-during KVM_RUN because KVM sees a pending request and bails from VM-Enter
-to service the request.
+On Thu, Nov 18, 2021 at 5:03 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> From: Like Xu <likexu@tencent.com>
+>
+> If we run the following perf command in an AMD Milan guest:
+>
+>   perf stat \
+>   -e cpu/event=0x1d0/ \
+>   -e cpu/event=0x1c7/ \
+>   -e cpu/umask=0x1f,event=0x18e/ \
+>   -e cpu/umask=0x7,event=0x18e/ \
+>   -e cpu/umask=0x18,event=0x18e/ \
+>   ./workload
+>
+> dmesg will report a #GP warning from an unchecked MSR access
+> error on MSR_F15H_PERF_CTLx.
+>
+> This is because according to APM (Revision: 4.03) Figure 13-7,
+> the bits [35:32] of AMD PerfEvtSeln register is a part of the
+> event select encoding, which extends the EVENT_SELECT field
+> from 8 bits to 12 bits.
+>
+> Opportunistically update pmu->reserved_bits for reserved bit 19.
+>
+> Reported-by: Jim Mattson <jmattson@google.com>
+> Fixes: ca724305a2b0 ("KVM: x86/vPMU: Implement AMD vPMU code for KVM")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/svm/pmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index 871c426ec389..b4095dfeeee6 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -281,7 +281,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+>                 pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
+>
+>         pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
+> -       pmu->reserved_bits = 0xffffffff00200000ull;
+> +       pmu->reserved_bits = 0xfffffff000280000ull;
 
-Opportunistically rename gfn_to_pfn_cache_invalidate_start()'s wake_vcpus
-to evict_vcpus, the purpose of the request is to get vCPUs out of guest
-mode, it specifically is supposed to avoid waking vCPUs that are blocking.
+Bits 40 and 41 are guest mode and host mode. They cannot be reserved
+if the guest supports nested SVM.
 
-Opportunistically rename KVM_REQ_GPC_INVALIDATE to be more specific as to
-what it wants to accomplish, and to genericize the name so that it can
-used for similar but unrelated scenarios, should they arise in the future.
-Add a comment and documentation to explain why the "no action" request
-exists.
-
-Add compile-time assertions to help detect improper usage.  Use the inner
-assertless helper in the one s390 path that makes requests without a
-hardcoded request.
-
-Fixes: 982ed0de4753 ("KVM: Reinstate gfn_to_pfn_cache with invalidation support")
-Cc: David Woodhouse <dwmw@amazon.co.uk>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-This code badly needs a selftest, any triggering of the related code would
-hang the target vCPU, i.e. this is likely getting zero coverage.  Found by
-inspection when resolving a conflict and trying to opportunistically type
-of documentation for KVM_REQ_GPC_INVALIDATE.
-
-Verified by hacking gfn_to_pfn_cache_invalidate_start() to unconditionally
-send a request to all vCPUs.
-
- Documentation/virt/kvm/vcpu-requests.rst | 10 +++++++++
- arch/s390/kvm/kvm-s390.c                 |  2 +-
- include/linux/kvm_host.h                 | 27 ++++++++++++++++++++++--
- virt/kvm/kvm_main.c                      |  3 ++-
- virt/kvm/pfncache.c                      | 18 ++++++++++------
- 5 files changed, 49 insertions(+), 11 deletions(-)
-
-diff --git a/Documentation/virt/kvm/vcpu-requests.rst b/Documentation/virt/kvm/vcpu-requests.rst
-index ad2915ef7020..f3d38e8a1fb3 100644
---- a/Documentation/virt/kvm/vcpu-requests.rst
-+++ b/Documentation/virt/kvm/vcpu-requests.rst
-@@ -136,6 +136,16 @@ KVM_REQ_UNHALT
-   such as a pending signal, which does not indicate the VCPU's halt
-   emulation should stop, and therefore does not make the request.
- 
-+KVM_REQ_OUTSIDE_GUEST_MODE
-+
-+  This "request" ensures the target vCPU has exited guest mode prior to the
-+  sender of the request continuing on.  No action needs be taken by the target,
-+  and so no request is actually logged for the target.  This request is similar
-+  to a "kick", but unlike a kick it guarantees the vCPU has actually exited
-+  guest mode.  A kick only guarantees the vCPU will exit at some point in the
-+  future, e.g. a previous kick may have started the process, but there's no
-+  guarantee the to-be-kicked vCPU has fully exited guest mode.
-+
- KVM_REQUEST_MASK
- ----------------
- 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 577f1ead6a51..54b7e0017208 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -3371,7 +3371,7 @@ void exit_sie(struct kvm_vcpu *vcpu)
- /* Kick a guest cpu out of SIE to process a request synchronously */
- void kvm_s390_sync_request(int req, struct kvm_vcpu *vcpu)
- {
--	kvm_make_request(req, vcpu);
-+	__kvm_make_request(req, vcpu);
- 	kvm_s390_vcpu_request(vcpu);
- }
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f11039944c08..a67670201888 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -148,6 +148,7 @@ static inline bool is_error_page(struct page *page)
- #define KVM_REQUEST_MASK           GENMASK(7,0)
- #define KVM_REQUEST_NO_WAKEUP      BIT(8)
- #define KVM_REQUEST_WAIT           BIT(9)
-+#define KVM_REQUEST_NO_ACTION      BIT(10)
- /*
-  * Architecture-independent vcpu->requests bit members
-  * Bits 4-7 are reserved for more arch-independent bits.
-@@ -157,9 +158,18 @@ static inline bool is_error_page(struct page *page)
- #define KVM_REQ_UNBLOCK           2
- #define KVM_REQ_UNHALT            3
- #define KVM_REQ_VM_DEAD           (4 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
--#define KVM_REQ_GPC_INVALIDATE    (5 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQUEST_ARCH_BASE     8
- 
-+/*
-+ * KVM_REQ_OUTSIDE_GUEST_MODE exists is purely as way to force the vCPU to
-+ * OUTSIDE_GUEST_MODE.  KVM_REQ_OUTSIDE_GUEST_MODE differs from a vCPU "kick"
-+ * in that it ensures the vCPU has reached OUTSIDE_GUEST_MODE before continuing
-+ * on.  A kick only guarantees that the vCPU is on its way out, e.g. a previous
-+ * kick may have set vcpu->mode to EXITING_GUEST_MODE, and so there's no
-+ * guarantee the vCPU received an IPI and has actually exited guest mode.
-+ */
-+#define KVM_REQ_OUTSIDE_GUEST_MODE	(KVM_REQUEST_NO_ACTION | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+
- #define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
- 	BUILD_BUG_ON((unsigned)(nr) >= (sizeof_field(struct kvm_vcpu, requests) * 8) - KVM_REQUEST_ARCH_BASE); \
- 	(unsigned)(((nr) + KVM_REQUEST_ARCH_BASE) | (flags)); \
-@@ -1986,7 +1996,7 @@ static inline int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args)
- 
- void kvm_arch_irq_routing_update(struct kvm *kvm);
- 
--static inline void kvm_make_request(int req, struct kvm_vcpu *vcpu)
-+static inline void __kvm_make_request(int req, struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * Ensure the rest of the request is published to kvm_check_request's
-@@ -1996,6 +2006,19 @@ static inline void kvm_make_request(int req, struct kvm_vcpu *vcpu)
- 	set_bit(req & KVM_REQUEST_MASK, (void *)&vcpu->requests);
- }
- 
-+static __always_inline void kvm_make_request(int req, struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Request that don't require vCPU action should never be logged in
-+	 * vcpu->requests.  The vCPU won't clear the request, so it will stay
-+	 * logged indefinitely and prevent the vCPU from entering the guest.
-+	 */
-+	BUILD_BUG_ON(!__builtin_constant_p(req) ||
-+		     (req & KVM_REQUEST_NO_ACTION));
-+
-+	__kvm_make_request(req, vcpu);
-+}
-+
- static inline bool kvm_request_pending(struct kvm_vcpu *vcpu)
- {
- 	return READ_ONCE(vcpu->requests);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 58d31da8a2f7..90ada92ff031 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -252,7 +252,8 @@ static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
- {
- 	int cpu;
- 
--	kvm_make_request(req, vcpu);
-+	if (likely(!(req & KVM_REQUEST_NO_ACTION)))
-+		__kvm_make_request(req, vcpu);
- 
- 	if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
- 		return;
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index ce878f4be4da..5c21f81e5491 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -27,7 +27,7 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
- {
- 	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
- 	struct gfn_to_pfn_cache *gpc;
--	bool wake_vcpus = false;
-+	bool evict_vcpus = false;
- 
- 	spin_lock(&kvm->gpc_lock);
- 	list_for_each_entry(gpc, &kvm->gpc_list, list) {
-@@ -40,11 +40,11 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
- 
- 			/*
- 			 * If a guest vCPU could be using the physical address,
--			 * it needs to be woken.
-+			 * it needs to be forced out of guest mode.
- 			 */
- 			if (gpc->guest_uses_pa) {
--				if (!wake_vcpus) {
--					wake_vcpus = true;
-+				if (!evict_vcpus) {
-+					evict_vcpus = true;
- 					bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
- 				}
- 				__set_bit(gpc->vcpu->vcpu_idx, vcpu_bitmap);
-@@ -67,14 +67,18 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
- 	}
- 	spin_unlock(&kvm->gpc_lock);
- 
--	if (wake_vcpus) {
--		unsigned int req = KVM_REQ_GPC_INVALIDATE;
-+	if (evict_vcpus) {
-+		/*
-+		 * KVM needs to ensure the vCPU is fully out of guest context
-+		 * before allowing the invalidation to continue.
-+		 */
-+		unsigned int req = KVM_REQ_OUTSIDE_GUEST_MODE;
- 		bool called;
- 
- 		/*
- 		 * If the OOM reaper is active, then all vCPUs should have
- 		 * been stopped already, so perform the request without
--		 * KVM_REQUEST_WAIT and be sad if any needed to be woken.
-+		 * KVM_REQUEST_WAIT and be sad if any needed to be IPI'd.
- 		 */
- 		if (!may_block)
- 			req &= ~KVM_REQUEST_WAIT;
-
-base-commit: 66fa226c131fb89287f8f7d004a46e39a859fbf6
--- 
-2.35.1.265.g69c8d7142f-goog
-
+>         pmu->version = 1;
+>         /* not applicable to AMD; but clean them to prevent any fall out */
+>         pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
+> --
+> 2.33.1
+>
