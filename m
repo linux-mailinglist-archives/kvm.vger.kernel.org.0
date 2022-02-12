@@ -2,121 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB06C4B386F
-	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 23:47:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DE2D4B3878
+	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 00:03:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232224AbiBLWr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Feb 2022 17:47:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58398 "EHLO
+        id S231432AbiBLXDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Feb 2022 18:03:17 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbiBLWr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Feb 2022 17:47:27 -0500
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C2923BD9
-        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 14:47:23 -0800 (PST)
-Received: by mail-il1-f198.google.com with SMTP id p8-20020a056e02144800b002be41f4c3d2so8350261ilo.15
-        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 14:47:23 -0800 (PST)
+        with ESMTP id S230007AbiBLXDQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Feb 2022 18:03:16 -0500
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DEA5F8CA
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 15:03:12 -0800 (PST)
+Received: by mail-oi1-x22e.google.com with SMTP id i5so13658773oih.1
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 15:03:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XnHCuAZT9IuQAR1S+WE0f0q7JyEoS/WTPeScnfuUCPw=;
+        b=sZvLtQgoAtugSeclQAoTOLIMWb0Cca+JuhbpYqS5m+TCzPf1Eehf7P1T8dsTIuIhh2
+         QNr1bYzE89pt0eCtqIZaDuUHiOnGu1DMnuZL1XraKP+2kGacZLEqEwhFQ1z/1hBm2Cun
+         mVHzGg+KJjKpztWGpWx/NB5YJhdTjii/Uh8RBywNk35qBjwSQgrP/a8JV6Ms8lWB1kfN
+         LIYkbnrvgNvfSff84Q6BVsdb8zp5vezenrYqwUNNnSxGU+8cZpmHtcurAyrRAZ2l+SMd
+         ixhVtpsiBWo68UzVdH7ZUx+td0Hawyd2sunO2Ws/pkOvUKjbel4nXQMzyAVpUu9p5UM6
+         PRjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=P2jL7sQj/TjQng7PKMAkeDTbtim/XRQtA01kz0TN724=;
-        b=gBzJg6ToWUEZMxHMcNeDjSJTl/kT5suD1Bmv4Yg71x6AgZN1LjgmBYEm/K05Sr3MDY
-         EfVBGjMfrm4T4SRtDNpF3VGkv+QKLqMXca87oP1akM0+S9Kh3p35dF+pVKGECSist+o+
-         QuXbnRADw7jv1pPWpqvpJqnCYDWMicepph2T+x0HveDPPvpQrEpZZt9mkCeNnEgpXTc5
-         DRMuurA0/JGLgZ53R//GTBkQXjzKKNoqx8cW+QvV5f+rPH2dOIO32jaQ2e+31eocFjqS
-         AhDjtkVxpXfHEnvFAqaudkmTFkcWTTjNXpbNAmFtMGvlWFoK+m87hIDgi9iwYHtL4sqo
-         HVpQ==
-X-Gm-Message-State: AOAM532WsEGKUKjbcgrm1+vrt1ctuV/FmQQWT1CMKCF7HMDowkHJpDvl
-        yz0IsoeWvBWFBYXCHY6oM/ja2otEt79x/RuzlghvJPs9OxF2
-X-Google-Smtp-Source: ABdhPJzYFI6mQUpc72tbVCAcFfNBWcmMCEo8fuxfc/6Lc9bJZ0i5JB6ueuzKE6M7SySVfHYDwJiwU1JMb7DLEwuxIqpE+Z3hbmYP
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XnHCuAZT9IuQAR1S+WE0f0q7JyEoS/WTPeScnfuUCPw=;
+        b=FRkQ4g1XKep/XaV4m6Qe2AeVt5g38FchcUchi7VbLHrNWZy2BWysjDM3Zzr12OxLy0
+         HtqVD6xn1Yz6DjgH3t/ZCHKVPOrCm/qYga4OOmI6tDU4LlKKNnJZeWkBPaTbWFgjyLyv
+         KwzLn07jfj1LZzyNg3JG7JQ8SVX2kh7cA5ipsG/1zt/2rOU30bDgex6falmMCApGJX8D
+         UYMf+FmnSvqcmf4LDkGHeVMwIV7swu+NosZ4gu+INXSwiyb4RmhL0r+lZPyennRlA6U0
+         MABG1fa7e6ttH+MPcPlT8FwlnDCUAUZlTvJowecYXypZA2JlhL1fYMQEcMnpAvcS8rcP
+         NtIA==
+X-Gm-Message-State: AOAM5318SWmMC4TaL+ny2AIrkULeBEDVPeteZ+jhJoG32+XSVNcOQxwR
+        tjBHZaDLg5QNTKGL0cyeWCjGVeml0HQOXFbB87Wnzw==
+X-Google-Smtp-Source: ABdhPJyAN8uJ7v/Yx2P/1viLF0mH/GyUBV9Vr/j2DWPJXWn+azjMMGhFXsldGGW6gyGb9cEHv88vZtNgNgP0Yg8l2Zs=
+X-Received: by 2002:a05:6808:1a0b:: with SMTP id bk11mr2893601oib.49.1644706991731;
+ Sat, 12 Feb 2022 15:03:11 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a92:bd08:: with SMTP id c8mr4213452ile.110.1644706042783;
- Sat, 12 Feb 2022 14:47:22 -0800 (PST)
-Date:   Sat, 12 Feb 2022 14:47:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000070ac6505d7d9f7a8@google.com>
-Subject: [syzbot] kernel BUG in vhost_get_vq_desc
-From:   syzbot <syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com>
-To:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
+References: <20220209164420.8894-1-varad.gautam@suse.com> <20220209164420.8894-10-varad.gautam@suse.com>
+In-Reply-To: <20220209164420.8894-10-varad.gautam@suse.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Sat, 12 Feb 2022 15:03:00 -0800
+Message-ID: <CAA03e5E+ohvN87AFQc8=gL=BVQnJqdLD5HrBWOtQnG9brioPww@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 09/10] x86: AMD SEV-ES: Handle IOIO #VC
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Zixuan Wang <zxwang42@gmail.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Joerg Roedel <jroedel@suse.de>, bp@suse.de
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Wed, Feb 9, 2022 at 8:44 AM Varad Gautam <varad.gautam@suse.com> wrote:
+>
+> Using Linux's IOIO #VC processing logic.
+>
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> ---
+>  lib/x86/amd_sev_vc.c | 146 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 146 insertions(+)
+>
+> diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
+> index 401cb29..88c95e1 100644
+> --- a/lib/x86/amd_sev_vc.c
+> +++ b/lib/x86/amd_sev_vc.c
+> @@ -172,6 +172,149 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+>         return ret;
+>  }
+>
+> +#define IOIO_TYPE_STR  BIT(2)
+> +#define IOIO_TYPE_IN   1
+> +#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
+> +#define IOIO_TYPE_OUT  0
+> +#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
+> +
+> +#define IOIO_REP       BIT(3)
+> +
+> +#define IOIO_ADDR_64   BIT(9)
+> +#define IOIO_ADDR_32   BIT(8)
+> +#define IOIO_ADDR_16   BIT(7)
+> +
+> +#define IOIO_DATA_32   BIT(6)
+> +#define IOIO_DATA_16   BIT(5)
+> +#define IOIO_DATA_8    BIT(4)
+> +
+> +#define IOIO_SEG_ES    (0 << 10)
+> +#define IOIO_SEG_DS    (3 << 10)
+> +
+> +static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
+> +{
+> +       struct insn *insn = &ctxt->insn;
+> +       *exitinfo = 0;
+> +
+> +       switch (insn->opcode.bytes[0]) {
+> +       /* INS opcodes */
+> +       case 0x6c:
+> +       case 0x6d:
+> +               *exitinfo |= IOIO_TYPE_INS;
+> +               *exitinfo |= IOIO_SEG_ES;
+> +               *exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
+> +               break;
+> +
+> +       /* OUTS opcodes */
+> +       case 0x6e:
+> +       case 0x6f:
+> +               *exitinfo |= IOIO_TYPE_OUTS;
+> +               *exitinfo |= IOIO_SEG_DS;
+> +               *exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
+> +               break;
+> +
+> +       /* IN immediate opcodes */
+> +       case 0xe4:
+> +       case 0xe5:
+> +               *exitinfo |= IOIO_TYPE_IN;
+> +               *exitinfo |= (u8)insn->immediate.value << 16;
+> +               break;
+> +
+> +       /* OUT immediate opcodes */
+> +       case 0xe6:
+> +       case 0xe7:
+> +               *exitinfo |= IOIO_TYPE_OUT;
+> +               *exitinfo |= (u8)insn->immediate.value << 16;
+> +               break;
+> +
+> +       /* IN register opcodes */
+> +       case 0xec:
+> +       case 0xed:
+> +               *exitinfo |= IOIO_TYPE_IN;
+> +               *exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
+> +               break;
+> +
+> +       /* OUT register opcodes */
+> +       case 0xee:
+> +       case 0xef:
+> +               *exitinfo |= IOIO_TYPE_OUT;
+> +               *exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
+> +               break;
+> +
+> +       default:
+> +               return ES_DECODE_FAILED;
+> +       }
+> +
+> +       switch (insn->opcode.bytes[0]) {
+> +       case 0x6c:
+> +       case 0x6e:
+> +       case 0xe4:
+> +       case 0xe6:
+> +       case 0xec:
+> +       case 0xee:
+> +               /* Single byte opcodes */
+> +               *exitinfo |= IOIO_DATA_8;
+> +               break;
+> +       default:
+> +               /* Length determined by instruction parsing */
+> +               *exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
+> +                                                    : IOIO_DATA_32;
+> +       }
+> +       switch (insn->addr_bytes) {
+> +       case 2:
+> +               *exitinfo |= IOIO_ADDR_16;
+> +               break;
+> +       case 4:
+> +               *exitinfo |= IOIO_ADDR_32;
+> +               break;
+> +       case 8:
+> +               *exitinfo |= IOIO_ADDR_64;
+> +               break;
+> +       }
+> +
+> +       if (insn_has_rep_prefix(insn))
+> +               *exitinfo |= IOIO_REP;
+> +
+> +       return ES_OK;
+> +}
+> +
+> +static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+> +{
+> +       struct ex_regs *regs = ctxt->regs;
+> +       u64 exit_info_1;
+> +       enum es_result ret;
+> +
+> +       ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
+> +       if (ret != ES_OK)
+> +               return ret;
+> +
+> +       if (exit_info_1 & IOIO_TYPE_STR) {
+> +               ret = ES_VMM_ERROR;
+> +       } else {
+> +               /* IN/OUT into/from rAX */
+> +
+> +               int bits = (exit_info_1 & 0x70) >> 1;
+> +               u64 rax = 0;
+> +
+> +               if (!(exit_info_1 & IOIO_TYPE_IN))
+> +                       rax = lower_bits(regs->rax, bits);
+> +
+> +               ghcb_set_rax(ghcb, rax);
+> +
+> +               ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
+> +               if (ret != ES_OK)
+> +                       return ret;
+> +
+> +               if (exit_info_1 & IOIO_TYPE_IN) {
+> +                       if (!ghcb_rax_is_valid(ghcb))
+> +                               return ES_VMM_ERROR;
+> +                       regs->rax = lower_bits(ghcb->save.rax, bits);
+> +               }
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+>  static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+>                                          struct ghcb *ghcb,
+>                                          unsigned long exit_code)
+> @@ -185,6 +328,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+>         case SVM_EXIT_MSR:
+>                 result = vc_handle_msr(ghcb, ctxt);
+>                 break;
+> +       case SVM_EXIT_IOIO:
+> +               result = vc_handle_ioio(ghcb, ctxt);
+> +               break;
+>         default:
+>                 /*
+>                  * Unexpected #VC exception
+> --
+> 2.32.0
+>
 
-syzbot found the following issue on:
-
-HEAD commit:    83e396641110 Merge tag 'soc-fixes-5.17-1' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1282df74700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5707221760c00a20
-dashboard link: https://syzkaller.appspot.com/bug?extid=3140b17cb44a7b174008
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-kernel BUG at drivers/vhost/vhost.c:2335!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 9449 Comm: vhost-9447 Not tainted 5.17.0-rc3-syzkaller-00247-g83e396641110 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
-Code: 00 00 00 48 c7 c6 00 ac 9c 8a 48 c7 c7 28 27 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 77 23 29 fd e9 74 ff ff ff e8 bd 3f a3 fa <0f> 0b e8 b6 3f a3 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
-RSP: 0018:ffffc9000f527b88 EFLAGS: 00010212
-
-RAX: 0000000000000133 RBX: 0000000000000001 RCX: ffffc9000ef65000
-RDX: 0000000000040000 RSI: ffffffff86d46e33 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff86d45f2c R11: 0000000000000000 R12: ffff88802bac4d68
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88802bac4bb0
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6c74f8a718 CR3: 000000002bb11000 CR4: 00000000003526e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
- vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
-Code: 00 00 00 48 c7 c6 00 ac 9c 8a 48 c7 c7 28 27 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 77 23 29 fd e9 74 ff ff ff e8 bd 3f a3 fa <0f> 0b e8 b6 3f a3 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
-RSP: 0018:ffffc9000f527b88 EFLAGS: 00010212
-
-RAX: 0000000000000133 RBX: 0000000000000001 RCX: ffffc9000ef65000
-RDX: 0000000000040000 RSI: ffffffff86d46e33 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff86d45f2c R11: 0000000000000000 R12: ffff88802bac4d68
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88802bac4bb0
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6c7679a1b8 CR3: 000000002bb11000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Reviewed-by: Marc Orr <marcorr@google.com>
