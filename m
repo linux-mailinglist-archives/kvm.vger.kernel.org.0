@@ -2,53 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B99E4B385A
-	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 23:20:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB06C4B386F
+	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 23:47:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbiBLWUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Feb 2022 17:20:48 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38712 "EHLO
+        id S232224AbiBLWr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Feb 2022 17:47:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbiBLWUr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Feb 2022 17:20:47 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530D460A82;
-        Sat, 12 Feb 2022 14:20:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 16C6AB80884;
-        Sat, 12 Feb 2022 22:20:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0796C340E7;
-        Sat, 12 Feb 2022 22:20:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644704439;
-        bh=F1YLPckivmEhBO2oiSxCtRmozC2yZVGz2536YwqxQ04=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rscvcH2lIKlArWYx4p2Vz560lptLce9KzRL8lG/ZXmp/BVIH4JQUACGG+RA8jqOHm
-         OD0ImzMWykMtz/j++BXSd2QJqhmouCsD/0oUOKnAxbRTU7eafvXvvdjPsG/HWq56nJ
-         8diyVCeNBSwmkRdVsAQPEFVU55/9+LyxgBkWypuxIOxMFrABIek4oN/vi6eWVx50d9
-         wxpzdxPR4hfG+/CgHhY4ptgRW1WKwm5FKHNLjmi4tpNT3Q/D5rsg0iPNvu9vt8AGsC
-         oOJGMwoENeutavXYNqX5K7y5/0rxGh/CKTC1dRkCcYC25I6hwYJYsk82PMvDEQSmqZ
-         NAfgWTUtIjEgQ==
-Date:   Sat, 12 Feb 2022 17:20:38 -0500
-From:   Sasha Levin <sashal@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH MANUALSEL 5.16 1/8] KVM: eventfd: Fix false positive RCU
- usage warning
-Message-ID: <YggytmXTEsXqYw5C@sashalap>
-References: <20220209185635.48730-1-sashal@kernel.org>
- <6f3d4ed7-f3c1-7c06-d5cf-1bd824731e43@redhat.com>
+        with ESMTP id S229930AbiBLWr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Feb 2022 17:47:27 -0500
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C2923BD9
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 14:47:23 -0800 (PST)
+Received: by mail-il1-f198.google.com with SMTP id p8-20020a056e02144800b002be41f4c3d2so8350261ilo.15
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 14:47:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=P2jL7sQj/TjQng7PKMAkeDTbtim/XRQtA01kz0TN724=;
+        b=gBzJg6ToWUEZMxHMcNeDjSJTl/kT5suD1Bmv4Yg71x6AgZN1LjgmBYEm/K05Sr3MDY
+         EfVBGjMfrm4T4SRtDNpF3VGkv+QKLqMXca87oP1akM0+S9Kh3p35dF+pVKGECSist+o+
+         QuXbnRADw7jv1pPWpqvpJqnCYDWMicepph2T+x0HveDPPvpQrEpZZt9mkCeNnEgpXTc5
+         DRMuurA0/JGLgZ53R//GTBkQXjzKKNoqx8cW+QvV5f+rPH2dOIO32jaQ2e+31eocFjqS
+         AhDjtkVxpXfHEnvFAqaudkmTFkcWTTjNXpbNAmFtMGvlWFoK+m87hIDgi9iwYHtL4sqo
+         HVpQ==
+X-Gm-Message-State: AOAM532WsEGKUKjbcgrm1+vrt1ctuV/FmQQWT1CMKCF7HMDowkHJpDvl
+        yz0IsoeWvBWFBYXCHY6oM/ja2otEt79x/RuzlghvJPs9OxF2
+X-Google-Smtp-Source: ABdhPJzYFI6mQUpc72tbVCAcFfNBWcmMCEo8fuxfc/6Lc9bJZ0i5JB6ueuzKE6M7SySVfHYDwJiwU1JMb7DLEwuxIqpE+Z3hbmYP
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <6f3d4ed7-f3c1-7c06-d5cf-1bd824731e43@redhat.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Received: by 2002:a92:bd08:: with SMTP id c8mr4213452ile.110.1644706042783;
+ Sat, 12 Feb 2022 14:47:22 -0800 (PST)
+Date:   Sat, 12 Feb 2022 14:47:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000070ac6505d7d9f7a8@google.com>
+Subject: [syzbot] kernel BUG in vhost_get_vq_desc
+From:   syzbot <syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com>
+To:     jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mst@redhat.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,16 +53,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 10, 2022 at 05:41:03PM +0100, Paolo Bonzini wrote:
->On 2/9/22 19:56, Sasha Levin wrote:
->>From: Hou Wenlong <houwenlong93@linux.alibaba.com>
->>
->>[ Upstream commit 6a0c61703e3a5d67845a4b275e1d9d7bc1b5aad7 ]
->
->Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Hello,
 
-I've queued up all the ones you've acked, thanks!
+syzbot found the following issue on:
 
--- 
-Thanks,
-Sasha
+HEAD commit:    83e396641110 Merge tag 'soc-fixes-5.17-1' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1282df74700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5707221760c00a20
+dashboard link: https://syzkaller.appspot.com/bug?extid=3140b17cb44a7b174008
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+kernel BUG at drivers/vhost/vhost.c:2335!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 9449 Comm: vhost-9447 Not tainted 5.17.0-rc3-syzkaller-00247-g83e396641110 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
+Code: 00 00 00 48 c7 c6 00 ac 9c 8a 48 c7 c7 28 27 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 77 23 29 fd e9 74 ff ff ff e8 bd 3f a3 fa <0f> 0b e8 b6 3f a3 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
+RSP: 0018:ffffc9000f527b88 EFLAGS: 00010212
+
+RAX: 0000000000000133 RBX: 0000000000000001 RCX: ffffc9000ef65000
+RDX: 0000000000040000 RSI: ffffffff86d46e33 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+R10: ffffffff86d45f2c R11: 0000000000000000 R12: ffff88802bac4d68
+R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88802bac4bb0
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6c74f8a718 CR3: 000000002bb11000 CR4: 00000000003526e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
+ vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
+ kthread+0x2e9/0x3a0 kernel/kthread.c:377
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
+Code: 00 00 00 48 c7 c6 00 ac 9c 8a 48 c7 c7 28 27 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 77 23 29 fd e9 74 ff ff ff e8 bd 3f a3 fa <0f> 0b e8 b6 3f a3 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
+RSP: 0018:ffffc9000f527b88 EFLAGS: 00010212
+
+RAX: 0000000000000133 RBX: 0000000000000001 RCX: ffffc9000ef65000
+RDX: 0000000000040000 RSI: ffffffff86d46e33 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+R10: ffffffff86d45f2c R11: 0000000000000000 R12: ffff88802bac4d68
+R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88802bac4bb0
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6c7679a1b8 CR3: 000000002bb11000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
