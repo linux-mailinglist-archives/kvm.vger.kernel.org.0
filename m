@@ -2,70 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A4C34B38A8
-	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 00:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E68D64B38B4
+	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 00:46:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232565AbiBLXcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Feb 2022 18:32:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46150 "EHLO
+        id S232623AbiBLXqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Feb 2022 18:46:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232296AbiBLXcu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Feb 2022 18:32:50 -0500
+        with ESMTP id S230168AbiBLXqL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Feb 2022 18:46:11 -0500
 Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A1DD5FF27
-        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 15:32:46 -0800 (PST)
-Received: by mail-oo1-xc29.google.com with SMTP id o128-20020a4a4486000000b003181707ed40so14894830ooa.11
-        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 15:32:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB43E5FF2E
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 15:46:06 -0800 (PST)
+Received: by mail-oo1-xc29.google.com with SMTP id o128-20020a4a4486000000b003181707ed40so14918360ooa.11
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 15:46:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=vmaSptng9jreS1XXMbr6KSYdnJ6+9nuFAm8sfmi6BQE=;
-        b=T84POPRan5/lU9yCOzviw+LOlorxyZIrfQqfsOAJjsfkEiSLm3LpMSQRs5ae6Lb7Jc
-         82X+0xh8ZABAho8YYHYlBDZrqbP3TZakeCnsoXgGif18g42KJ0RhHwKTEy8LlnSrPhIi
-         nf9tzZLJCIhxR29e8hXScHtnxc9j8tUZCc1snPxjqIJKEf+Ys7wRfT+aauvGD9lGUTZF
-         tm8Yj8MEWokKzwZOx2QYeHswuo2pARy2IEpF/OCkZdQwmPTa741IiZoIB67ZYQAo8XJQ
-         VP1irJOvWdLwQ37BYLmwoDgEyDFvZYKRFuhxup4qsKOGjYzGyDSLh1/3VrwgJYi7Dfg9
-         +AHw==
+        bh=/AuSp8ivg7WSvQzgIOUag+vQH/4aNu10op8mIwRLJA8=;
+        b=NuuQiuhdYCj58R+uAgFQxEEpqNvH01CX9GbQSym/6zNyPelJv5JmimHH3Uy1FR9Z16
+         v6L8eYHrYrRs7ezYv9Sp62q/cnL/Gef4vaoQwQcI7i2oy8CYDirDivdZ824+fSpc9dQp
+         eSKUwKW6wFmxaZUFQLvKXdb99hH7JA1wFuUJ0ttj5XSibuKndasHqN40ZF3+8BLhLfE+
+         Uba+oSiJli8LwRCdbM56TcPMTjclN7E2OzDTvBuNo2GdHVGQ/y13Awush+k6CiefK+LU
+         ZjvNgbgNbl5NGyUc/6U/2WMtJXN4o+R+sO1UeHNtI0D/uPM3UJPLFYgAxdZwauquMMkg
+         iAgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=vmaSptng9jreS1XXMbr6KSYdnJ6+9nuFAm8sfmi6BQE=;
-        b=7ZZj3XxzPseFysvIJUAF++rIBKXwfjB1UwNUvjGfS8f98AqFTic0xKH5muuKWwfPma
-         E3z7kefdJf4uKCN1D7K12EPK//6/7osFvelGo1/7ZSBk1pkjYbQyXQdS5vTAbfPadIkA
-         /tht6JSYIYZrwdVTgdJ+vYZ5RFNa6mCSumJSry4BPGfVXgZepxMwVuN8RM7k8eDB3xed
-         KbYvhuXD2XO/4eHfYMYx45lG4X0ssatP65OiE8Cf4f07QGxg8rWxiVTL2jRXGsvbaiZF
-         GEgiLcYHRAyrT+SGXn73Q43jBdlwjXV9yACEC8wCPq8tDLB6Qu9hOclzxD93+11q24Mi
-         nufA==
-X-Gm-Message-State: AOAM531tg2WCSZgjwhV8Nj2+CcwL7j76YUzATAdl/15Feg8X0yXMb8yK
-        TYlNFQWHkusfZwR1ngkCPaPC6dwSI0cuBguctWBM7w==
-X-Google-Smtp-Source: ABdhPJyoQOtsaws9OAJx+h1f1VrsgKqQm5BCWA6ItvT/d8OJ70TWXOyhJMtmV5Ssp7XFZApO052VF/6vooyEZ0RrDK0=
-X-Received: by 2002:a05:6871:581:: with SMTP id u1mr2068039oan.139.1644708765547;
- Sat, 12 Feb 2022 15:32:45 -0800 (PST)
+        bh=/AuSp8ivg7WSvQzgIOUag+vQH/4aNu10op8mIwRLJA8=;
+        b=QqqfHM4VqpjZCYmbSmYvG8rlfjqmlM10oWIksyCaMCZKEHk+kIWp5r2F7TTHj+YaAD
+         5mfteoEhzBtnNCs7Jj94DDb11AjLAsLaoSe/tBIt/5QGWKpy84c3UJJa2k/XN3po+SM8
+         PaQmV4GlatIkNjOzT2AREAyNDq87uhiGvtic8FBzUYmDatXhMuM+TxQpcQ5Dz8xhsWGN
+         E1hIMPZo+Eun0sMFU1X/j3S5P6daRoYvhYCa+Ss1F/sGYMx5Qz6/GNRThpWRMTxDFiW4
+         2fCTWlbekp27yUWmw73sH8leMMD/wMv8Qixw+nS26I3cFhicm+zAgO4OlUJB6NBQYEzC
+         1DGA==
+X-Gm-Message-State: AOAM533I4Y21AiE/pWrPA7C/2FLVLE73hTroE5YdbGXfpM+z03lEaUwA
+        jVmDgR6HCbUQF5rOO3JSaI/L6BJOfoVZoFUR8gDQcQ==
+X-Google-Smtp-Source: ABdhPJzKSTstMyKd4/f5iVPVmRnGOfOcXyfH371JrIwGJ7TbLnKEaoKZFtnWBnTZ+D0g15Y8VG4RsbcSYLuxQmSkuF4=
+X-Received: by 2002:a05:6871:581:: with SMTP id u1mr2077984oan.139.1644709566075;
+ Sat, 12 Feb 2022 15:46:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20220117085307.93030-1-likexu@tencent.com> <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net> <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
- <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com> <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
-In-Reply-To: <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
+References: <20211116105038.683627-1-pbonzini@redhat.com>
+In-Reply-To: <20211116105038.683627-1-pbonzini@redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Sat, 12 Feb 2022 15:32:34 -0800
-Message-ID: <CALMp9eRX3nTLs4gcy3wnSUSOPO7xzDpMvDLGauue9o0PwBAmbA@mail.gmail.com>
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Stephane Eranian <eranian@google.com>,
-        David Dunn <daviddunn@google.com>
+Date:   Sat, 12 Feb 2022 15:45:55 -0800
+Message-ID: <CALMp9eRF59cXP1+ceTwsYVa8ny3NF_TOPqpprhH7veVzTCD2HQ@mail.gmail.com>
+Subject: Re: [PATCH kvm-unit-tests] pmu: fix conditions for emulation test
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -78,12 +64,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 9, 2022 at 10:57 AM Dave Hansen <dave.hansen@intel.com> wrote:
+On Tue, Nov 16, 2021 at 2:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+...
+> However, the pmu_emulation test does not really need nmi_watchdog=0;
+> it is only needed by the PMU counters test because Linux reserves one
+> counter if nmi_watchdog=1, but the pmu_emulation test does not
+> allocate all counters in the same way.  By removing the counters
+> tests from pmu_emulation, the check on nmi_watchdog=0 can be
+> removed.
 
-> Does SGX cause problem for these people?  It can create some of the same
-> collection gaps:
->
->         performance monitoring activities are suppressed when entering
->         an opt-out (of performance monitoring) enclave.
-
-There's our precedent!
+If Linux reserves a counter, shouldn't KVM_GET_SUPPORTED_CPUID remove
+that counter from the available set reported in CPUID.0AH? On Intel,
+that is. On AMD, we're just SOL.
