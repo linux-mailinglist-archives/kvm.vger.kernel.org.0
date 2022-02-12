@@ -2,123 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87D2E4B33DC
-	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 09:39:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A653D4B3433
+	for <lists+kvm@lfdr.de>; Sat, 12 Feb 2022 11:26:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232733AbiBLIjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Feb 2022 03:39:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52098 "EHLO
+        id S233390AbiBLK0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Feb 2022 05:26:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232647AbiBLIjX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Feb 2022 03:39:23 -0500
-Received: from mail-oo1-xc2f.google.com (mail-oo1-xc2f.google.com [IPv6:2607:f8b0:4864:20::c2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213E82613A
-        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 00:39:20 -0800 (PST)
-Received: by mail-oo1-xc2f.google.com with SMTP id t75-20020a4a3e4e000000b002e9c0821d78so13191518oot.4
-        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 00:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=knbguSrX3xagYUpZD20aO/zcWDU1J9IHxC/2QTmVdh0=;
-        b=QTnl6TjaqYf1gXjMYo2qS5Xy0BQjvXfZTfbKa9AmzM0Amqr3YLk2VXin504ONCvS4c
-         D71CiHvHMQkMBc4NFA40dBjG6HaiGxlTqyD0jgv9VsVSErXQX2ezpCgwzAb1d/O+TQlR
-         tN0M7EElLBsyjeEJCaLZoqBQhJ/hthGxULgvKNce6noV8UYJe24ndI4FMdxlV/NLqxUM
-         yxgiPwY7bWqL2Jfinf0P4erYgY1JUON6gMKKtJYqcb22eoYuoHgtRWijmu0lwVTz5r4m
-         bQRNMj0TI4O2OWCtLkj1bAqtcLZaLDMaIThdAKUvgWYh9rdv/P5EehSVP9yJSC4wb/U/
-         3Lwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=knbguSrX3xagYUpZD20aO/zcWDU1J9IHxC/2QTmVdh0=;
-        b=n5ItgqMjcmPT1Anx63Cd073T4bHmOB3Q11nF1RTvIkOzCu5nMdlrTcYkRHxqnKEYsM
-         6ZngjHpGYet3hy8BX9Lx/DuCs6m93dnI/lWTycLs4xaOjv9So/jRwE1QWbGxPlAHiNKL
-         AfleL8EIH7GYk92ChB7d2zfcjG4srq+2/ZUfs8LKxLhdFTlUOx1+xNPwz3T4VXDjsC/d
-         OwJqijJH98FSprLUjERggMgN9iAzUeVVbdoI8JLvgpdyJNR5o5br3wIsECghD5+6mCEn
-         5nHWf6B0yyrlsp6A5mAN+OcNxpBNYyBZaujDJj9UaKJ1RbV2Fk/DcQNmoLW525eca1WV
-         BzNw==
-X-Gm-Message-State: AOAM532PpkaFbWZ4bDHce6/F9dzMrfLX06Apl4SBOA3WePCobZSNg15Q
-        F2pMdYFTBpOgSaxmZLFP6Ff7e6TIefItnDNULXUECA==
-X-Google-Smtp-Source: ABdhPJyns7ddLPUyPQCSMDyfKbEyJqJSYRTCQnSQAozx4Oxa7MiPTV/AB9Nyf62p7APdboNF7lqfYKu1g/ZHT3BaAeQ=
-X-Received: by 2002:a05:6870:f812:: with SMTP id fr18mr1245704oab.129.1644655159211;
- Sat, 12 Feb 2022 00:39:19 -0800 (PST)
-MIME-Version: 1.0
-References: <20211118130320.95997-1-likexu@tencent.com>
-In-Reply-To: <20211118130320.95997-1-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Sat, 12 Feb 2022 00:39:08 -0800
-Message-ID: <CALMp9eTONaviuz-NnPUP2=MEOb8ZBkZ7u_ZQBWBUne-i6cRUkA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Fix reserved bits for AMD PerfEvtSeln register
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        with ESMTP id S230224AbiBLK0o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Feb 2022 05:26:44 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4839E22B15
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 02:26:41 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DF31F60B6A
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 10:26:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 48F47C340F3
+        for <kvm@vger.kernel.org>; Sat, 12 Feb 2022 10:26:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644661600;
+        bh=Yzw/3OcmCre/osNVpgR2DClOgBp6fL3E6yvY/Lq0qXI=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=aBJUtsb2cgIcHS5iHPtWbPZCZ55u9mOV18/UkMdH88aFxroulKV+tN7ajQ7SnBW82
+         Yn225eD+aJHIGbSbUgvu8EeEsQBM1KhK5yzsTPoP2MdWqfcFNdZilyxhm/LpsMyjdg
+         AhKXCD8DbXThEj2UGFqz8fIHCrKF7oyqRC/8h6HlC6Mxhdta23UdIPiftpaq3dTQq8
+         zEkZrMEpvWOdpcuYbneM/ltohskt6jOIdCR4Kn08C+5NfTu3YwYFj1x3i/FYejh5u7
+         yLyEcDIrKraJySgx6U9QI282yb17r+y0FML2G5Y6Yg+GSkXqZO78tl3npxsZdf9CHB
+         6W5YtB7JNI+xQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 37ACAC05FD2; Sat, 12 Feb 2022 10:26:40 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
+Date:   Sat, 12 Feb 2022 10:26:39 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: devzero@web.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-199727-28872-5PPusjrYyW@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
+References: <bug-199727-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 5:03 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> If we run the following perf command in an AMD Milan guest:
->
->   perf stat \
->   -e cpu/event=0x1d0/ \
->   -e cpu/event=0x1c7/ \
->   -e cpu/umask=0x1f,event=0x18e/ \
->   -e cpu/umask=0x7,event=0x18e/ \
->   -e cpu/umask=0x18,event=0x18e/ \
->   ./workload
->
-> dmesg will report a #GP warning from an unchecked MSR access
-> error on MSR_F15H_PERF_CTLx.
->
-> This is because according to APM (Revision: 4.03) Figure 13-7,
-> the bits [35:32] of AMD PerfEvtSeln register is a part of the
-> event select encoding, which extends the EVENT_SELECT field
-> from 8 bits to 12 bits.
->
-> Opportunistically update pmu->reserved_bits for reserved bit 19.
->
-> Reported-by: Jim Mattson <jmattson@google.com>
-> Fixes: ca724305a2b0 ("KVM: x86/vPMU: Implement AMD vPMU code for KVM")
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  arch/x86/kvm/svm/pmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 871c426ec389..b4095dfeeee6 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -281,7 +281,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->                 pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
->
->         pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
-> -       pmu->reserved_bits = 0xffffffff00200000ull;
-> +       pmu->reserved_bits = 0xfffffff000280000ull;
+https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
 
-Bits 40 and 41 are guest mode and host mode. They cannot be reserved
-if the guest supports nested SVM.
+--- Comment #9 from Roland Kletzing (devzero@web.de) ---
+https://qemu-devel.nongnu.narkive.com/I59Sm5TH/lock-contention-in-qemu
+<snip>
+I find the timeslice of vCPU thread in QEMU/KVM is unstable when there
+are lots of read requests (for example, read 4KB each time (8GB in
+total) from one file) from Guest OS. I also find that this phenomenon
+may be caused by lock contention in QEMU layer. I find this problem
+under following workload.
+<snip>
+Yes, there is a way to reduce jitter caused by the QEMU global mutex:
 
->         pmu->version = 1;
->         /* not applicable to AMD; but clean them to prevent any fall out */
->         pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
-> --
-> 2.33.1
->
+qemu -object iothread,id=3Diothread0 \
+-drive if=3Dnone,id=3Ddrive0,file=3Dtest.img,format=3Draw,cache=3Dnone \
+-device virtio-blk-pci,iothread=3Diothread0,drive=3Ddrive0
+
+Now the ioeventfd and thread pool completions will be processed in
+iothread0 instead of the QEMU main loop thread. This thread does not
+take the QEMU global mutex so vcpu execution is not hindered.
+
+This feature is called virtio-blk dataplane.
+<snip>
+
+
+i tried "virtio scsi single" with "aio=3Dthreads" and "iothread=3D1" in pro=
+xmox,
+and after that, even with totally heavy read/write io inside 2 VMs (located=
+ on
+the same spinning hdd on top of zfs lz4 + zstd dataset and qcow) and severe
+write starvation (some ioping  >>30s), even while live migrating both vm di=
+sks
+in parallel to another zfs dataset on the same hdd, i get absolutely NO jit=
+ter
+in ping anymore. ping to both VMs is constantly at <0.2ms=20
+
+from the kvm pid:
+-object iothread,id=3Diothread-virtioscsi0=20=20
+-device
+virtio-scsi-pci,id=3Dvirtioscsi0,bus=3Dpci.3,addr=3D0x1,iothread=3Diothread=
+-virtioscsi0=20
+-drive
+file=3D/hddpool/vms-files-lz4/images/116/vm-116-disk-3.qcow2,if=3Dnone,id=
+=3Ddrive-scsi0,cache=3Dwriteback,aio=3Dthreads,format=3Dqcow2,detect-zeroes=
+=3Don=20
+-device
+scsi-hd,bus=3Dvirtioscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-s=
+csi0,id=3Dscsi0,bootindex=3D100
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
