@@ -2,67 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA3964B3A11
-	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 09:08:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB7684B3A1C
+	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 09:27:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbiBMIIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Feb 2022 03:08:15 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43134 "EHLO
+        id S234380AbiBMI1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Feb 2022 03:27:33 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbiBMIIO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Feb 2022 03:08:14 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7A95E763;
-        Sun, 13 Feb 2022 00:08:07 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id w10so4042054edd.11;
-        Sun, 13 Feb 2022 00:08:07 -0800 (PST)
+        with ESMTP id S229555AbiBMI1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Feb 2022 03:27:33 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F775E77A
+        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 00:27:28 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id 9-20020a170902c20900b0014dc0faf52fso4841457pll.14
+        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 00:27:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=iSzoE/dBtyasT2BnJpIwUu2rMSPkqh/hGHEQuNqLzdk=;
-        b=C+WZ+eH1c/+ZuI4bD3UmYtajl4ZhNZQkoGDJ2ebynTyte6r48567RNcKVOXLCLKJSF
-         bj64exCerPJDd0ksl1zgJU+3iNaYQ4Y7Qn+vuIiDWFkDIFRGDIXXvMHHhjG/bjp2g21G
-         okS825jPbfmVMoSR4nqId8nzfiSYLWa4cItItHI0jGpNG4ZWSNchk6lw+6OD/vA9pyay
-         g06o1Y7d1Bhqc/KlTC4OT/9Ts/13WeRNAE1yAVb7Ln00gWGxBGWHozj9jaPam0Sqk96N
-         dwaydeg87xKdS6QFjiF5hPtn3WCZ1I1pdwHdvKd11aVHk1MicLYJykTC3E3oRpVhuVMh
-         ZO/g==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=az/IM13vdigg1dA8yh55P3qX2v782bmFgi/cg6GI8pI=;
+        b=I9NkeOuGpnBJTo8lfQpRM9LciV+cZWVgIapqj1ZIB77XacEHXTGODJksw8cK5upFX4
+         mwqwkrVAVueAHs70s+01H3LcaP+baB0NFczd3ozsxXogIWwbyIWMr2dX0PCreqEao2L8
+         nIYvBBRO1bVfvAMgRnnCaEKbnpahCGRGYTr9MnQmYUlM7DAqtWpX8+jokgQyvQWmxNWX
+         mrZJwUYfdPW64WrZGk75wsjm3zcg2InHb8QEk/W/48GlDBm3YPc3mshpCejW5EtC5iis
+         IhJWPgvfZihdqTRwNYK69/MXSsfuh55qR1hRaz1wvnBtRI1l4YuLjZCx5EqOaEGKtA8h
+         Ikrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=iSzoE/dBtyasT2BnJpIwUu2rMSPkqh/hGHEQuNqLzdk=;
-        b=n23kJr545kbUWfE8czSsRfCmpq/g09dlfamH0at7utKwBLqY1BU67ikENdoLM1uVw3
-         o7uWoGFmSPQ2BX4vshF3vOexKupHz1ejV5A9rzHtoYa1iZBBzD7mdq0LwuKtufTyZa92
-         FRtozETOqvz7EfHFs1XfR5hNVyANiKcUoceks98JC4T8rIx8OBtGFjSJQ8jBllJ/ZiRQ
-         fNSOzSZVeiDrVHahbkX0aD0x55UdtsFnHUpU1Rae3hIDufqIyZwFlj1obsNOrOOX3qbH
-         2r1/2zwCRfPRws2ddJyqNc7GwlUv8QXHDRzIZ20kYc1jrVCviVTJHb+OgLllcwTd+V97
-         AgUA==
-X-Gm-Message-State: AOAM530gD/AnVteg9j3U/gh+8mdSfaJuACelItO3ez7OJ53TX3qXWuhg
-        LhzRaXAGzUI/TZ2bZ2Gf5b3GypaIsEHYoZeBqDU=
-X-Google-Smtp-Source: ABdhPJzLqPBFQal2aP5BT6oi145eP2/7IczCOA0LLdKUGL9EEmrD1ozn8DsEoMlfahZwIh9pCr721fC2WkWr4h6Bah8=
-X-Received: by 2002:a05:6402:1c8f:: with SMTP id cy15mr8632318edb.130.1644739686394;
- Sun, 13 Feb 2022 00:08:06 -0800 (PST)
-MIME-Version: 1.0
-References: <d3e6a461-5b37-ecfb-d63c-d35af27f2682@molgen.mpg.de>
-In-Reply-To: <d3e6a461-5b37-ecfb-d63c-d35af27f2682@molgen.mpg.de>
-From:   Zhouyi Zhou <zhouzhouyi@gmail.com>
-Date:   Sun, 13 Feb 2022 16:07:55 +0800
-Message-ID: <CAABZP2yOA2n-xux8uUC72vVYc14JfCawoOzp_pnTGDvY8cRSnw@mail.gmail.com>
-Subject: Re: Set environment variable `KVM` makes build fail
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        rcu <rcu@vger.kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=az/IM13vdigg1dA8yh55P3qX2v782bmFgi/cg6GI8pI=;
+        b=rqRzT0LJiDy7NA9GyGifNc/3+B1FpukDrvfU0Sa2KnQdHTKDOcPKB9ksNo3GcMqRf4
+         xMiS6dCoQ9xCLfEbpbDE2B6ZVSWpRpSPl3MeBPMhzmKPZwVc/FCfSa5xiU0t6Oe+yx3S
+         KlnQ38b5rracY7/dgDImqNyEJ9Bqzd1YgCtoZZahlVUWckkC8Ui90cpqCnBZ817GJ9cx
+         KAJ/vM5zCocCXPGTJHGuIhIh8qRsnzPpYWLAgJKI3HaoiODyeg12QZ1fqd/gDkg3QowO
+         ubJFutuuk5m8QUziFplEzDOykKqUedKQ67vZw+nX9yc/oxqU4crLD/KFeTz/MJYHfFD3
+         4rXQ==
+X-Gm-Message-State: AOAM532RYfr66xThC98/UbX5qAFxT2oIkytDc+apuwJzPDeofccqU31r
+        hnfCiZwCneb5Sj+Jc5tUmXa/RoawBzVv1m9EKxI8DV9bT4ovv5DrzNo9thZjTwPuVRtDkEFCOAk
+        t4ByYb3QDw6Ad9iloXkMmq91YwTnrAPz+9sgblwcReqAehY1cBtVTDW/MzuBAcBs=
+X-Google-Smtp-Source: ABdhPJzeQIA6OPUbSCIbupFhvTwztOmzItdrGn6PzyM+UzpYH+vu9TzQ8WBzZZB8KUnRIJncudFge0M+S58rxA==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:90b:507:: with SMTP id
+ r7mr8645135pjz.78.1644740847265; Sun, 13 Feb 2022 00:27:27 -0800 (PST)
+Date:   Sun, 13 Feb 2022 00:27:14 -0800
+Message-Id: <20220213082714.636061-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [kvm-unit-tests PATCH] x86/pmu: Set appropriate expectations for
+ reference cycles
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>, Jacob Xu <jacobhxu@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,53 +63,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Paul
+Per the SDM, reference cycles (as a general purpose event) are
+currently implemented using the core crystal clock, TSC, or bus
+clock. Therefore, it's unreasonable to expect reference cycles for the
+measured loop to fall within some constant multiples of the number of
+loop iterations, unless those bounds are set so wide as to be
+pointless.
 
-Thank you for your trust in me.
+The bounds initially established when this test was written were
+broadened in commit 4779578b24b3 ("make PMU test to pass on more cpu
+types"), but even the new bounds are too narrow to accommodate a
+2.6GHz Ice Lake, with the TSC frequency at 104 times the reference
+cycle (for this implementation, the core crystal clock) frequency.
 
-I think the following patch has a good explanation of what happened ;-)
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/=
-tools/testing/selftests/rcutorture/bin/torture.sh?id=3Da7d89cfb8e1269cb6d22=
-453adba56b8d0218589f
-"The torture-test scripting's long-standing use of KVM as the
-environment variable tracking the pathname of the rcutorture directory
-now conflicts with allmodconfig builds due to the
-virt/kvm/Makefile.kvm file's use of this as a makefile variable"
+Restore the initial (tighter) bounds, calculate the ratio of TSC
+frequency to reference cycle frequency, and then scale the bounds
+accordingly.
 
-Thanks
-Zhouyi
+Tested on several generations of Xeon E5 parts: Ice Lake, Cascade
+Lake, Skylake, Broadwell, and Haswell.
 
-On Sun, Feb 13, 2022 at 2:03 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
->
-> Dear Linux folks,
->
->
-> Playing with rcutorture
-> (`tools/testing/selftests/rcutorture/bin/torture.sh`), a Linux kernel
-> build failed, because the script sets and exports the environment
-> variable `KVM`. I was able to reproduce that manually (on x86_64):
->
->      $ make defconfig
->      $ scripts/config -m KVM
->      $ scripts/config -m KVM_INTEL
->      $ scripts/config -d KVM_AMD
->      $ scripts/config -d KVM_XEN
->      $ scripts/config -d KVM_MMU_AUDIT
->      $ export KVM=3DXXX
->      $ make arch/x86/kvm/kvm.o
->      [=E2=80=A6]
->        LINK    /dev/shm/linux-kvm/tools/objtool/objtool
->      make[2]: *** No rule to make target 'arch/x86/kvm/XXX/kvm_main.o',
-> needed by 'arch/x86/kvm/kvm.o'.  Stop.
->      make[1]: *** [scripts/Makefile.build:550: arch/x86/kvm] Error 2
->      make: *** [Makefile:1831: arch/x86] Error 2
->
-> The directory `arch/x86/kvm/XXX` is created somehow.
->
-> Is that expected? Do you know what is going on? I wasn=E2=80=99t able to
-> reproduce this with other variables like `SND_HDA` for example.
->
->
-> Kind regards,
->
-> Paul
+Opportunistically fixed a spelling error and a commented-out printf
+format string.
+
+Fixes: 4779578b24b3 ("make PMU test to pass on more cpu types")
+Reported-by: Jacob Xu <jacobhxu@gmail.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ x86/pmu.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 53 insertions(+), 3 deletions(-)
+
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 92206ad0548f..f2e4d44d3a97 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -86,8 +86,8 @@ struct pmu_event {
+ } gp_events[] = {
+ 	{"core cycles", 0x003c, 1*N, 50*N},
+ 	{"instructions", 0x00c0, 10*N, 10.2*N},
+-	{"ref cycles", 0x013c, 0.1*N, 30*N},
+-	{"llc refference", 0x4f2e, 1, 2*N},
++	{"ref cycles", 0x013c, 1*N, 30*N},
++	{"llc references", 0x4f2e, 1, 2*N},
+ 	{"llc misses", 0x412e, 1, 1*N},
+ 	{"branches", 0x00c4, 1*N, 1.1*N},
+ 	{"branch misses", 0x00c5, 0, 0.1*N},
+@@ -223,7 +223,7 @@ static void measure(pmu_counter_t *evt, int count)
+ 
+ static bool verify_event(uint64_t count, struct pmu_event *e)
+ {
+-	// printf("%lld >= %lld <= %lld\n", e->min, count, e->max);
++	// printf("%d <= %ld <= %d\n", e->min, count, e->max);
+ 	return count >= e->min  && count <= e->max;
+ 
+ }
+@@ -605,6 +605,54 @@ static void  check_gp_counters_write_width(void)
+ 	}
+ }
+ 
++/*
++ * Per the SDM, reference cycles are currently implemented using the
++ * core crystal clock, TSC, or bus clock. Calibrate to the TSC
++ * frequency to set reasonable expectations.
++ */
++static void set_ref_cycle_expectations(void)
++{
++	pmu_counter_t cnt = {
++		.ctr = MSR_IA32_PERFCTR0,
++		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[2].unit_sel,
++		.count = 0,
++	};
++	uint64_t tsc_delta;
++	uint64_t t0, t1, t2, t3;
++
++	if (!eax.split.num_counters || (ebx.full & (1 << 2)))
++		return;
++
++	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
++
++	t0 = fenced_rdtsc();
++	start_event(&cnt);
++	t1 = fenced_rdtsc();
++
++	/*
++	 * This loop has to run long enough to dominate the VM-exit
++	 * costs for playing with the PMU MSRs on start and stop.
++	 *
++	 * On a 2.6GHz Ice Lake, with the TSC frequency at 104 times
++	 * the core crystal clock, this function calculated a guest
++	 * TSC : ref cycles ratio of around 105 with ECX initialized
++	 * to one billion.
++	 */
++	asm volatile("loop ." : "+c"((int){1000000000ull}));
++
++	t2 = fenced_rdtsc();
++	stop_event(&cnt);
++	t3 = fenced_rdtsc();
++
++	tsc_delta = ((t2 - t1) + (t3 - t0)) / 2;
++
++	if (!tsc_delta)
++		return;
++
++	gp_events[2].min = (gp_events[2].min * cnt.count) / tsc_delta;
++	gp_events[2].max = (gp_events[2].max * cnt.count) / tsc_delta;
++}
++
+ int main(int ac, char **av)
+ {
+ 	struct cpuid id = cpuid(10);
+@@ -627,6 +675,8 @@ int main(int ac, char **av)
+ 		return report_summary();
+ 	}
+ 
++	set_ref_cycle_expectations();
++
+ 	printf("PMU version:         %d\n", eax.split.version_id);
+ 	printf("GP counters:         %d\n", eax.split.num_counters);
+ 	printf("GP counter width:    %d\n", eax.split.bit_width);
+-- 
+2.35.1.265.g69c8d7142f-goog
+
