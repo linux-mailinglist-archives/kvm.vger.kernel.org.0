@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B59FD4B3ACB
-	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 11:23:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7FA24B3AF3
+	for <lists+kvm@lfdr.de>; Sun, 13 Feb 2022 11:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234940AbiBMKXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Feb 2022 05:23:04 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46634 "EHLO
+        id S235175AbiBMKqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Feb 2022 05:46:11 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbiBMKXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Feb 2022 05:23:04 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A127F5D197
-        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 02:22:58 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4AC67B80977
-        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 10:22:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7ED5C004E1;
-        Sun, 13 Feb 2022 10:22:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644747775;
-        bh=qVPXummkbgn66HB7C9DZJnL9F7+cvb3dt9lBQTxDi7w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=B1TFU1LLS2aenZT4B3QimSep5+igrgjdm3tdaUlIhoobOPGQ321QimM+Peq1u5L10
-         xEz6c4p4lMaqOXm0pGnGgZN4oCJm2MG1e2thS9CWjMzulWd4gOTlBbsfPC9+6TONdH
-         PCqpnQUjetA86kwKcykmLVs3ZqBDzTPOoQgiOO/A41G0m/Qqccsnm57tHAihqyYhny
-         O12/tTzM0Chd2pOrs3pxYWt/TpJuiPS+cYTmkDSL17+CilthH25PXL8a2AfEZj/86r
-         ZB1AgLoKpEotiH0XqCmcpCdrjyocLWf4MpBNkUUEvizkujNhqBR0VdIuwM4tOd+jgH
-         E6+bcGju4Y60A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1nJC1t-007THY-Ko; Sun, 13 Feb 2022 10:22:53 +0000
-Date:   Sun, 13 Feb 2022 10:22:53 +0000
-Message-ID: <87iltjxdz6.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Akihiko Odaki <akihiko.odaki@gmail.com>
-Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        with ESMTP id S229834AbiBMKqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Feb 2022 05:46:09 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFE5F5DE40
+        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 02:46:02 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id p9so1854005wra.12
+        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 02:46:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PQcF8Y+i7eV4kkrW2kf6trBLdlKoGxKPY/8Iaq1QQj4=;
+        b=ecFXnrWY3adlMoX/kiqi9gvnmpbdmuDKmYvskGDXFo65y6coRh75wuFfZ0jVKJpeTo
+         Xly8qDiRP2rzciOZEsD5CXU+3bYqfg3dXJBZT29arqtSrAXd0xyhT6b1d+DyW0/w5Njc
+         1qsPzNoaYLqfVSkhCj7BVQFPJ0W9U0ug6rDn/VieJSBS2vCiihQpvqZeM7Kiw0a4ldhV
+         VsK/3Po+9waC/y+qqk+Hp9zRT0u7s6d/kw0iSyDkF6oNwlwOMGOVI+IMNKRiJOUgudBK
+         veLvX5PS0pxfMqVbFHpbDkb/oFhI+XWf8KOXMIut1esDuAoKOcGaNEz8J+Unb4zskHzP
+         l0MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PQcF8Y+i7eV4kkrW2kf6trBLdlKoGxKPY/8Iaq1QQj4=;
+        b=2RX2GCQ4utrjGRieLL3LtKcgzQhxPIm6apFlCq2VC0//PI2uQKcxz/AM5IIRwcfjr+
+         58FxsL75QGP5IMOCwyAFnaGo1Fep01CujlIT4XGbLx/ELgCXCuTxf5OgpYb68zGgXa0b
+         SD+3eHLiEUrToM6c5AbxnD8MZcPada5WdGxnW1XvLEZ+lzkCkrvVt1+OfoVyBKkOBzNl
+         fKKa9dz5pmRejTQN4PINi0jzB+jgYuoete7tAd/QUFCxziQd3650qAjPnajDCIM+T5/r
+         pTZdD6/qLLbgW99NpN/Zysxw0VeD3OW2WFdrAT+f8O4i5w/zYG1+hzsZKafNj5uIPZD7
+         zLew==
+X-Gm-Message-State: AOAM5322v29Up2JBP8dOy19IgIDJy0DapgbZo3OJYe3RxWC3x7lMxjDB
+        2fu4a9IKVSfbZPd6fypXAYJywTU2EkC0Tj7Pyt0HcQ==
+X-Google-Smtp-Source: ABdhPJyNontRdkRP4Jo3hktzFuN0UpoTAZKFoEiu6aBmNtZv1VP2RcJJIIDNzITalzofGnN/carqm1dtedUo76JYQgA=
+X-Received: by 2002:a5d:62c4:: with SMTP id o4mr7463092wrv.319.1644749161346;
+ Sun, 13 Feb 2022 02:46:01 -0800 (PST)
+MIME-Version: 1.0
+References: <20220120123630.267975-1-peter.maydell@linaro.org>
+ <20220120123630.267975-19-peter.maydell@linaro.org> <3f4f5e98-fcb8-bf4d-e464-6ad365af92f8@gmail.com>
+ <87iltjxdz6.wl-maz@kernel.org>
+In-Reply-To: <87iltjxdz6.wl-maz@kernel.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Sun, 13 Feb 2022 10:45:50 +0000
+Message-ID: <CAFEAcA9yR4=PNCGJk6iMEq0EHejwwt-gQJfvByEk-EN6ER5o_g@mail.gmail.com>
+Subject: Re: [PULL 18/38] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Akihiko Odaki <akihiko.odaki@gmail.com>, qemu-devel@nongnu.org,
         Andrew Jones <drjones@redhat.com>,
         Eric Auger <eric.auger@redhat.com>,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         kernel-team@android.com, Alexander Graf <agraf@csgraf.de>
-Subject: Re: [PULL 18/38] hw/arm/virt: Honor highmem setting when computing the memory map
-In-Reply-To: <3f4f5e98-fcb8-bf4d-e464-6ad365af92f8@gmail.com>
-References: <20220120123630.267975-1-peter.maydell@linaro.org>
-        <20220120123630.267975-19-peter.maydell@linaro.org>
-        <3f4f5e98-fcb8-bf4d-e464-6ad365af92f8@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: akihiko.odaki@gmail.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, drjones@redhat.com, eric.auger@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, agraf@csgraf.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -69,118 +70,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[+ Alex for HVF]
+On Sun, 13 Feb 2022 at 10:22, Marc Zyngier <maz@kernel.org> wrote:
+>
+> [+ Alex for HVF]
+>
+> On Sun, 13 Feb 2022 05:05:33 +0000,
+> Akihiko Odaki <akihiko.odaki@gmail.com> wrote:
+> > Hi,
+> > This breaks in a case where highmem is disabled but can have more than
+> > 4 GiB of RAM. M1 (Apple Silicon) actually can have 36-bit PA with HVF,
+> > which is not enough for highmem MMIO but is enough to contain 32 GiB
+> > of RAM.
+>
+> Funny. The whole point of this series is to make it all work correctly
+> on M1.
+>
+> > Where the magic number of 4 GiB / 32-bit came from?
+>
+> Not exactly a magic number. From QEMU's docs/system/arm/virt.rst:
+>
+> <quote>
+> highmem
+>   Set ``on``/``off`` to enable/disable placing devices and RAM in physical
+>   address space above 32 bits. The default is ``on`` for machine types
+>   later than ``virt-2.12``.
+> </quote>
+>
+> TL;DR: Removing the bogus 'highmem=off' option from your command-line
+> should get you going with large memory spaces, up to the IPA limit.
 
-On Sun, 13 Feb 2022 05:05:33 +0000,
-Akihiko Odaki <akihiko.odaki@gmail.com> wrote:
-> 
-> On 2022/01/20 21:36, Peter Maydell wrote:
-> > From: Marc Zyngier <maz@kernel.org>
-> > 
-> > Even when the VM is configured with highmem=off, the highest_gpa
-> > field includes devices that are above the 4GiB limit.
-> > Similarily, nothing seem to check that the memory is within
-> > the limit set by the highmem=off option.
-> > 
-> > This leads to failures in virt_kvm_type() on systems that have
-> > a crippled IPA range, as the reported IPA space is larger than
-> > what it should be.
-> > 
-> > Instead, honor the user-specified limit to only use the devices
-> > at the lowest end of the spectrum, and fail if we have memory
-> > crossing the 4GiB limit.
-> > 
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Message-id: 20220114140741.1358263-4-maz@kernel.org
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> >   hw/arm/virt.c | 10 +++++++---
-> >   1 file changed, 7 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 62bdce1eb4b..3b839ba78ba 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1670,7 +1670,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
-> >   static void virt_set_memmap(VirtMachineState *vms)
-> >   {
-> >       MachineState *ms = MACHINE(vms);
-> > -    hwaddr base, device_memory_base, device_memory_size;
-> > +    hwaddr base, device_memory_base, device_memory_size, memtop;
-> >       int i;
-> >         vms->memmap = extended_memmap;
-> > @@ -1697,7 +1697,11 @@ static void virt_set_memmap(VirtMachineState *vms)
-> >       device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
-> >         /* Base address of the high IO region */
-> > -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
-> > +    memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
-> > +    if (!vms->highmem && memtop > 4 * GiB) {
-> > +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> >       if (base < device_memory_base) {
-> >           error_report("maxmem/slots too huge");
-> >           exit(EXIT_FAILURE);
-> > @@ -1714,7 +1718,7 @@ static void virt_set_memmap(VirtMachineState *vms)
-> >           vms->memmap[i].size = size;
-> >           base += size;
-> >       }
-> > -    vms->highest_gpa = base - 1;
-> > +    vms->highest_gpa = (vms->highmem ? base : memtop) - 1;
-> >       if (device_memory_size > 0) {
-> >           ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
-> >           ms->device_memory->base = device_memory_base;
-> 
-> Hi,
-> This breaks in a case where highmem is disabled but can have more than
-> 4 GiB of RAM. M1 (Apple Silicon) actually can have 36-bit PA with HVF,
-> which is not enough for highmem MMIO but is enough to contain 32 GiB
-> of RAM.
+Yep. I've tested this with hvf, and we now correctly:
+ * refuse to put RAM above 32-bits if you asked for a 32-bit
+   IPA space with highmem=off
+ * use the full 36-bit address space if you don't say highmem=off
+   on an M1
 
-Funny. The whole point of this series is to make it all work correctly
-on M1.
+Note that there is a macos bug where if you don't say highmem=off
+on an M1 Pro then you'll get a macos kernel panic. M1 non-Pro is fine.
 
-> Where the magic number of 4 GiB / 32-bit came from?
-
-Not exactly a magic number. From QEMU's docs/system/arm/virt.rst:
-
-<quote>
-highmem
-  Set ``on``/``off`` to enable/disable placing devices and RAM in physical
-  address space above 32 bits. The default is ``on`` for machine types
-  later than ``virt-2.12``.
-</quote>
-
-TL;DR: Removing the bogus 'highmem=off' option from your command-line
-should get you going with large memory spaces, up to the IPA limit.
-
-The fact that you could run with 32GB of RAM while mandating that the
-guest IPA space was limited to 32bit was nothing but a bug, further
-"exploited" by HVF to allow disabling the highhmem devices which are
-out of reach given the HW limitations (see [1] for details on the
-discussion, specially around patch 3).
-
-This is now fixed, and has been extended to work with any IPA size
-(including 36bit machines such as M1).
-
-> I also don't quite understand what failures virt_kvm_type() had.
-
-QEMU works by first computing the memory map and passing the required
-IPA limit to KVM as part of the VM type. By failing to take into
-account the initial limit requirements to the IPA space (either via a
-command-line option such as 'highmem', or by using the value provided
-by KVM itself), QEMU would try to create a VM that cannot run on the
-HW, and KVM would simply return an error.
-
-All of this is documented as part of the KVM/arm64 API [2]. And with
-this fixed, QEMU is able to correctly drive KVM on M1.
-
-	M.
-
-[1] https://lore.kernel.org/all/20210822144441.1290891-1-maz@kernel.org
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/virt/kvm/api.rst#n138
-
--- 
-Without deviation from the norm, progress is not possible.
+thanks
+-- PMM
