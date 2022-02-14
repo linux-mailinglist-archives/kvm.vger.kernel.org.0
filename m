@@ -2,191 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 343384B55F1
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 17:20:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 774CD4B564A
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 17:32:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356291AbiBNQUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 11:20:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:32966 "EHLO
+        id S1356410AbiBNQcU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 11:32:20 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356275AbiBNQUH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 11:20:07 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18D695FF0B
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 08:19:59 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FEDA13D5;
-        Mon, 14 Feb 2022 08:19:58 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E07AD3F70D;
-        Mon, 14 Feb 2022 08:19:56 -0800 (PST)
-Date:   Mon, 14 Feb 2022 16:20:13 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
-        maz@kernel.org
-Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses
- for the initrd
-Message-ID: <YgqBPSV+CMyzfNlv@monolith.localdoman>
-References: <20220214120506.30617-1-alexandru.elisei@arm.com>
- <20220214135226.joxzj2tgg244wl6n@gator>
- <YgphzKLQLb5pMYoP@monolith.localdoman>
- <20220214142444.saeogrpgpx6kaamm@gator>
+        with ESMTP id S240481AbiBNQcT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 11:32:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D0D4B85D
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 08:32:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644856329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2zbjp4EoPUVr+XpeuhFNTpQtAmtutDQ9QIqPvVEgDCA=;
+        b=L8jOTMlYoHQV/OgKgOudVri02temdw3ibHTJ6VKZBsF5YGmp/bow1tsUnZghOelhilkjBU
+        KU6KGQc27fzaGsjLmhpBxMxsZNEZp8A2d3JScXCEykHo84yWrXOK3ulCNSMiwJWGIIXeyn
+        nHe2akgIj5qCZCS+ZANLQpa7hmfYjGg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-131-9SLfs1omNBC9Vh1jpj07Gg-1; Mon, 14 Feb 2022 11:32:07 -0500
+X-MC-Unique: 9SLfs1omNBC9Vh1jpj07Gg-1
+Received: by mail-wm1-f70.google.com with SMTP id i188-20020a1c3bc5000000b0037bb9f6feeeso3572710wma.5
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 08:32:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=2zbjp4EoPUVr+XpeuhFNTpQtAmtutDQ9QIqPvVEgDCA=;
+        b=WmPUHo+s99NsSAxGUPuki0Hfrl/xowREPCJ9J8z7R73KOUZRfGn/SAd4tQu8Om8BPS
+         /xKbwRw0nL7JG0oFrXr5Y/Pqerd++sUdEhnp/1jd2LMalgNRe9aD/YDXMksNNOBC9h0b
+         1vM6tWB02Yq9IBndAtze0E6mnIHmtxDiU4KUlLdAkHi+uECtqqKGI+TTkwDx5bTaQ3N6
+         4VDkN8onOQUm7kbKnSGo94L8uUgQQzxB5ddiwjXbd/vV+hVG43c7wlqgtYxP13/C+5aG
+         SGrS9N8E0wDwGBqPGQYx/iEch6DvrKUOct03Qu3Nni086NAMGcQAZB+geHUPdTFzSMpk
+         DGzw==
+X-Gm-Message-State: AOAM532hCf6Br5LYPQGuIb4GPM4rt2vWs9Up95IWRPaJ9Lj7ATwLvdua
+        gmBis61Qz/l2AU4Ud2SwuY1c2JDZ0Jyg4mVLP1MGbV3U3G3/MW/q6u0cg3rzSuiBy/ZCUgAVMfW
+        olnXeulbMsvbd
+X-Received: by 2002:a05:600c:2058:: with SMTP id p24mr133682wmg.3.1644856325995;
+        Mon, 14 Feb 2022 08:32:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxNqQekQHEpWPSjnIk8qAR9HJzoLsSqG3czYQnv4XY0+vcQA9+siecLZVMV8XQ6tFZn6++xYg==
+X-Received: by 2002:a05:600c:2058:: with SMTP id p24mr133663wmg.3.1644856325742;
+        Mon, 14 Feb 2022 08:32:05 -0800 (PST)
+Received: from ?IPV6:2003:cb:c707:5400:d8a3:8885:3275:4529? (p200300cbc7075400d8a3888532754529.dip0.t-ipconnect.de. [2003:cb:c707:5400:d8a3:8885:3275:4529])
+        by smtp.gmail.com with ESMTPSA id c5sm22809753wrq.102.2022.02.14.08.32.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Feb 2022 08:32:05 -0800 (PST)
+Message-ID: <2743ef0f-c73c-5a55-067b-6068c23334f3@redhat.com>
+Date:   Mon, 14 Feb 2022 17:32:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220214142444.saeogrpgpx6kaamm@gator>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Content-Language: en-US
+To:     Igor Mammedov <imammedo@redhat.com>
+Cc:     Ani Sinha <ani@anisinha.ca>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <alpine.DEB.2.22.394.2202141048390.13781@anisinha-lenovo>
+ <20220214133634.248d7de0@redhat.com>
+ <b9771171-8d28-b46b-4474-687a8fed0abd@redhat.com>
+ <20220214165515.226a1955@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: 9 TiB vm memory creation
+In-Reply-To: <20220214165515.226a1955@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+>>>
+>>> With KVM enabled it bails out with:
+>>>    qemu-system-x86_64: kvm_set_user_memory_region: KVM_SET_USER_MEMORY_REGION failed, slot=1, start=0x100000000, size=0x8ff40000000: Invalid argument
+>>>
+>>> all of that on a host with 32G of RAM/no swap.
+>>>
+>>>   
+>>
+>> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+>>
+>> ~8 TiB (7,999999)
+> 
+> so essentially that's the our max for initial RAM
+> (ignoring initial RAM slots before 4Gb)
+> 
+> Are you aware of any attempts to make it larger?
 
-(CC'ing Marc, he know more about 32 bit guest support than me)
+Not really, I think for now only s390x had applicable machines where
+you'd have that much memory on a single NUMA node.
 
-On Mon, Feb 14, 2022 at 03:24:44PM +0100, Andrew Jones wrote:
-> On Mon, Feb 14, 2022 at 02:06:04PM +0000, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > On Mon, Feb 14, 2022 at 02:52:26PM +0100, Andrew Jones wrote:
-> > > On Mon, Feb 14, 2022 at 12:05:06PM +0000, Alexandru Elisei wrote:
-> > > > The "linux,initrd-start" and "linux,initrd-end" properties encode the start
-> > > > and end address of the initrd. The size of the address is encoded in the
-> > > > root node #address-cells property and can be 1 cell (32 bits) or 2 cells
-> > > > (64 bits). Add support for parsing a 64 bit address.
-> > > > 
-> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > ---
-> > > >  lib/devicetree.c | 18 +++++++++++++-----
-> > > >  1 file changed, 13 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/lib/devicetree.c b/lib/devicetree.c
-> > > > index 409d18bedbba..7cf64309a912 100644
-> > > > --- a/lib/devicetree.c
-> > > > +++ b/lib/devicetree.c
-> > > > @@ -288,7 +288,7 @@ int dt_get_default_console_node(void)
-> > > >  int dt_get_initrd(const char **initrd, u32 *size)
-> > > >  {
-> > > >  	const struct fdt_property *prop;
-> > > > -	const char *start, *end;
-> > > > +	u64 start, end;
-> > > >  	int node, len;
-> > > >  	u32 *data;
-> > > >  
-> > > > @@ -303,7 +303,11 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > > >  	if (!prop)
-> > > >  		return len;
-> > > >  	data = (u32 *)prop->data;
-> > > > -	start = (const char *)(unsigned long)fdt32_to_cpu(*data);
-> > > > +	start = fdt32_to_cpu(*data);
-> > > > +	if (len == 8) {
-> > > > +		data++;
-> > > > +		start = (start << 32) | fdt32_to_cpu(*data);
-> > > > +	}
-> > > >  
-> > > >  	prop = fdt_get_property(fdt, node, "linux,initrd-end", &len);
-> > > >  	if (!prop) {
-> > > > @@ -311,10 +315,14 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > > >  		return len;
-> > > >  	}
-> > > >  	data = (u32 *)prop->data;
-> > > > -	end = (const char *)(unsigned long)fdt32_to_cpu(*data);
-> > > > +	end = fdt32_to_cpu(*data);
-> > > > +	if (len == 8) {
-> > > > +		data++;
-> > > > +		end = (end << 32) | fdt32_to_cpu(*data);
-> > > > +	}
-> > > >  
-> > > > -	*initrd = start;
-> > > > -	*size = (unsigned long)end - (unsigned long)start;
-> > > > +	*initrd = (char *)start;
-> > > > +	*size = end - start;
-> > > >  
-> > > >  	return 0;
-> > > >  }
-> > > > -- 
-> > > > 2.35.1
-> > > >
-> > > 
-> > > I added this patch on
-> > 
-> > Thanks for the quick reply!
-> > 
-> > > 
-> > > diff --git a/lib/devicetree.c b/lib/devicetree.c
-> > > index 7cf64309a912..fa8399a7513d 100644
-> > > --- a/lib/devicetree.c
-> > > +++ b/lib/devicetree.c
-> > > @@ -305,6 +305,7 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > >         data = (u32 *)prop->data;
-> > >         start = fdt32_to_cpu(*data);
-> > >         if (len == 8) {
-> > > +               assert(sizeof(long) == 8);
-> > 
-> > I'm sketchy about arm with LPAE, but wouldn't it be legal to have here a 64
-> > bit address, even if the architecture is 32 bits? Or was the assert added
-> > more because kvm-unit-tests doesn't support LPAE on arm?
 > 
-> It's possible, but only if we choose to manage it. We're (I'm) lazy and
-> require physical addresses to fit in the pointers, at least for the test
-> framework. Of course a unit test can feel free to play around with larger
-> physical addresses if it wants to.
-> 
-> > 
-> > >                 data++;
-> > >                 start = (start << 32) | fdt32_to_cpu(*data);
-> > >         }
-> > > @@ -321,7 +322,7 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > >                 end = (end << 32) | fdt32_to_cpu(*data);
-> > >         }
-> > >  
-> > > -       *initrd = (char *)start;
-> > > +       *initrd = (char *)(unsigned long)start;
-> > 
-> > My bad here, I forgot to test on arm. Tested your fix and the compilation
-> > error goes away.
-> 
-> I'm actually kicking myself a bit for the hasty fix, because the assert
-> would be better done at the end and written something like this
-> 
->  assert(sizeof(long) == 8 || !(end >> 32));
-> 
-> I'm not sure it's worth adding another patch on top for that now, though.
-> By the lack of new 32-bit arm unit tests getting submitted, I'm not even
-> sure it's worth maintaining 32-bit arm at all...
+> But can we use extra pc-dimm devices for additional memory (with 8TiB limit)
+> as that will use another memslot?
 
-As far as I know, 32 bit guests are still very much supported and
-maintained for KVM, so I think it would still be very useful to have the
-tests.
+I remember that was the workaround for now for some extremely large VMs
+where you'd want a single NUMA node or a lot of memory for a single NUMA
+node.
 
+> 
+> 
+>>
+>> In QEMU, we have
+>>
+>> static hwaddr kvm_max_slot_size = ~0;
+>>
+>> And only s390x sets
+>>
+>> kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
+>>
+>> with
+>>
+>> #define KVM_SLOT_MAX_BYTES (4UL * TiB)
+> in QEMU default value is:
+>   static hwaddr kvm_max_slot_size = ~0
+> it is kernel side that's failing
+
+... and kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES) works around the
+kernel limitation for s390x in user space.
+
+I feel like the right thing would be to look into increasing the limit
+in the kernel, and bail out if the kernel doesn't support it. Would
+require a new kernel for starting gigantic VMs with a single large
+memory backend, but then, it's a new use case.
+
+-- 
 Thanks,
-Alex
 
-> 
-> Thanks,
-> drew
-> 
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > >         *size = end - start;
-> > >  
-> > >         return 0;
-> > > 
-> > > 
-> > > To fix compilation on 32-bit arm.
-> > > 
-> > > 
-> > > And now merged through misc/queue.
-> > > 
-> > > Thanks,
-> > > drew
-> > > 
-> > 
-> 
+David / dhildenb
+
