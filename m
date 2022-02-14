@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 796B44B425F
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 08:03:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7F5B4B425A
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 08:03:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241053AbiBNHAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 02:00:40 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53146 "EHLO
+        id S241036AbiBNHAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 02:00:48 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241044AbiBNHAi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 02:00:38 -0500
+        with ESMTP id S233654AbiBNHAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 02:00:47 -0500
 Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AEA58386
-        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 23:00:30 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id bj11-20020a17090b088b00b001b8ba3e7ce7so13501308pjb.2
-        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 23:00:30 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B1C575F7
+        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 23:00:40 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id 62-20020a17090a09c400b001b80b0742b0so10289663pjo.8
+        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 23:00:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=bOvKI1kPCaNNGWhIjOWMoR69tGeqR4WLISP2Q7llMqI=;
-        b=csOB7hi1VBA/oFDOyjQMZYQFqlg8l/OnmxylmJhek12832NT8JhFn5Phv7C6mUHwbp
-         AKruxmYtN8nVv4ced2ng2XspMYt/cavaRDSE9kd8AsUuTGyjGmcIqUzihAgLo9HcDuB6
-         BKZZ4iza/sROO2ChnPsyCtEyqhIstwciWY1Bs1iz9w93e+WCzWDG9+wgT9g3NrJi2m5o
-         2mXJwZC6t+JxapfS4ExaBSlUMRQEj9sBcrQlQl75AxtlYa/XH9WUCCSZVc9vt/uzSogG
-         YSlwNIZ0jXx8QSNce60sNbxG5PzHlTEWVEqjb7+D4psXrlSiEDExSYtKX1EolSUDlfmc
-         EYWA==
+        bh=zPnMHKVlqcgDQB6kXKJ7+KuQAdNLH0y013yuxCMh/uc=;
+        b=jAMpDPE2rwLv0xUEZh0rf99E5rltD6fSrYSdLKH9MDqodxvRCPt1zuOb6B9b1nSoMA
+         LOc7lWlmOcHkEb3/SBDlw6Q7xWUkfRgOZ1/NqJWEvzc5aDDmO8WA4sfAwP6macnQqeyH
+         r6q9dAjHDQScFr8QtjWa/2fYmOShpUA+EwsRzEeG57GB3ibYFUFWOAF6mvoXUDAVkyA5
+         qdH+/5VtcQPN2f26W69X4y+bwUZEa/LdHQgNuUtcEPiB3ZcsOsInUXYrSf0CqniMr8OB
+         g3UniLutFzrP920Ugjw95OH7nvWvChiNn1a4eZS9a7keu0rnuQTJxjcx3A2k/2SX70Ay
+         xBiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=bOvKI1kPCaNNGWhIjOWMoR69tGeqR4WLISP2Q7llMqI=;
-        b=gJ0DfWcyosagYV3wekFbAnV9sAUUUrwL8DRl6IPOcRUUtBQdXKQu3gZabpg3M/XDBb
-         3vfuTUyv7zkCGyXfrU4KBucrlFNys0v+wGYdJlCDxyrxW7eD/Dr00PE4/tLKMH84CZ/+
-         2J0UADAQK5XIoNvArHu7XfYSuT5r8wY19mjQJSMsDXp3KEppf28/CExOM0l+xAQ/D2W6
-         z4k+7GxioqgGTTYVoPSw2YEbCdR+hblRKMUafl9OoIc9ugBkDqo6Q/u57g2GIbwstPZU
-         a4BU01OtxJg1ZZzQbu71XOOgHPmAdvf7E12eawBPOdK3M8cheJnGvrdAKK76vckn67vj
-         lkfg==
-X-Gm-Message-State: AOAM531nlkr3RAwnbnDpccTk7Hx8uKPGRwAEg0LkAmhZIXWN7RAYYpa0
-        msZ+Lzg/6RlvlpxoRrpRnv41xlw0ark=
-X-Google-Smtp-Source: ABdhPJx0j283c3uteG5vU/Wm7GzzzV9S4GvLk6zEMwainkGx3b9r3oXjbaFonEE5MPqvOlYgJbXjZ0p1T3E=
+        bh=zPnMHKVlqcgDQB6kXKJ7+KuQAdNLH0y013yuxCMh/uc=;
+        b=JrxyFRz5BNtg2W7dlEHksds377XyrOJDqfSW42TPl93gweDLASbCc+k8Cgpm3o2L+n
+         2DYB+r8cycaQKPDaXgrMESK0vwe0xUgZBGuNgk0nwhtVJ76JVLxkMzr0OqXlES7cWaNW
+         Vb8hBognW8HoA3K+OzIvdekv/u8w5erx5o9oP8Bb4kRdigE/s8JFHNlk0WBE7MsE3sSj
+         5F4NQiBJXJs7+aqJ+2IRVLRWPpaWcftV1oSq3Y7HoxtPPhZj5WJaCiWTE+fIcUlDlyF9
+         Ms7j735fi8X4EzYUsx8/VYMXbkJeB3rF0prvdBkMSgpPl6eGKFTdn7CCjtJ2PKQTk9YV
+         +DSQ==
+X-Gm-Message-State: AOAM530BUUNxotg0u/AtoHJxemwlP9VZAKCOVbZy067NHqJBy+FY04U4
+        S48z6KRWDz6CIqnEYpkJ6rEP9SQHcog=
+X-Google-Smtp-Source: ABdhPJyJ0YhcLpxpXD9Q6qbj2a2Z8CEceYHauRoXxBka/sS6SnTbMSEqpjKMgS7gdS6Ry14yGjGjZ3cqwj8=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:aa7:9ad0:: with SMTP id x16mr12998774pfp.55.1644822030158;
- Sun, 13 Feb 2022 23:00:30 -0800 (PST)
-Date:   Sun, 13 Feb 2022 22:57:32 -0800
+ (user=reijiw job=sendgmr) by 2002:a17:903:11d0:: with SMTP id
+ q16mr12831689plh.134.1644822040248; Sun, 13 Feb 2022 23:00:40 -0800 (PST)
+Date:   Sun, 13 Feb 2022 22:57:33 -0800
 In-Reply-To: <20220214065746.1230608-1-reijiw@google.com>
-Message-Id: <20220214065746.1230608-14-reijiw@google.com>
+Message-Id: <20220214065746.1230608-15-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220214065746.1230608-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH v5 13/27] KVM: arm64: Make MVFR1_EL1 writable
+Subject: [PATCH v5 14/27] KVM: arm64: Make ID registers without id_reg_info writable
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -79,80 +79,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds id_reg_info for MVFR1_EL1 to make it writable
-by userspace.
-
-There are only a few valid combinations of values that can be set
-for FPHP and SIMDHP fields according to Arm ARM.  Return an error
-when userspace tries to set those fields to values that don't match
-any of the valid combinations.
+Make ID registers that don't have id_reg_info writable.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 90e6a85d4e31..fea7b49018b2 100644
+index fea7b49018b2..9d7041a10b41 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -654,6 +654,36 @@ static int validate_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	return 0;
- }
+@@ -1909,11 +1909,8 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
+ 		/* The value is same as the current value. Nothing to do. */
+ 		return 0;
  
-+static int validate_mvfr1_el1(struct kvm_vcpu *vcpu,
-+			      const struct id_reg_info *id_reg, u64 val)
-+{
-+	unsigned int fphp, simdhp;
-+	struct fphp_simdhp {
-+		unsigned int fphp;
-+		unsigned int simdhp;
-+	};
-+	/* Permitted fphp/simdhp value combinations according to Arm ARM */
-+	struct fphp_simdhp valid_fphp_simdhp[3] = {{0, 0}, {2, 1}, {3, 2}};
-+	int i;
-+	bool is_valid_fphp_simdhp = false;
-+
-+	fphp = cpuid_feature_extract_unsigned_field(val, MVFR1_FPHP_SHIFT);
-+	simdhp = cpuid_feature_extract_unsigned_field(val, MVFR1_SIMDHP_SHIFT);
-+
-+	for (i = 0; i < ARRAY_SIZE(valid_fphp_simdhp); i++) {
-+		if (valid_fphp_simdhp[i].fphp == fphp &&
-+		    valid_fphp_simdhp[i].simdhp == simdhp) {
-+			is_valid_fphp_simdhp = true;
-+			break;
-+		}
-+	}
-+
-+	if (!is_valid_fphp_simdhp)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
- {
- 	u64 limit = id_reg->vcpu_limit_val;
-@@ -816,6 +846,11 @@ static struct id_reg_info id_dfr0_el1_info = {
- 	.vcpu_mask = vcpu_mask_id_dfr0_el1,
- };
+-	/*
+-	 * Don't allow to modify the register's value if the register is raz,
+-	 * or the reg doesn't have the id_reg_info.
+-	 */
+-	if (raz || !GET_ID_REG_INFO(encoding))
++	/* Don't allow to modify the register's value if the register is raz. */
++	if (raz)
+ 		return -EINVAL;
  
-+static struct id_reg_info mvfr1_el1_info = {
-+	.sys_reg = SYS_MVFR1_EL1,
-+	.validate = validate_mvfr1_el1,
-+};
-+
- /*
-  * An ID register that needs special handling to control the value for the
-  * guest must have its own id_reg_info in id_reg_info_table.
-@@ -826,6 +861,7 @@ static struct id_reg_info id_dfr0_el1_info = {
- #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
- static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
- 	[IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
-+	[IDREG_IDX(SYS_MVFR1_EL1)] = &mvfr1_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
+ 	/*
 -- 
 2.35.1.265.g69c8d7142f-goog
 
