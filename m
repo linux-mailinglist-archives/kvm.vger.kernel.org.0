@@ -2,67 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EB8C4B5B46
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 21:52:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F7D54B5B60
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 21:52:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbiBNUqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 15:46:19 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:38284 "EHLO
+        id S229506AbiBNUqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 15:46:06 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:38168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbiBNUp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 15:45:56 -0500
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 788F3245FED
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 12:44:03 -0800 (PST)
-Received: by mail-oi1-x22a.google.com with SMTP id 13so594193oiz.12
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 12:44:03 -0800 (PST)
+        with ESMTP id S229638AbiBNUps (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 15:45:48 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF67F244C02
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 12:43:45 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id i21so29791779pfd.13
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 12:43:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=lUDAX0UaDPTHJ9u8BBzfbhja83Bgj8HqOrB2yYnjOXM=;
-        b=VFULTseLnwoWoQSLrikwObkqrgWEDJsgEoShox8nAP9wuMRLYLSmINgZVPuS4zJCYq
-         AY+rJI2tTabEed97CNniygA5XGKmOrXxLL+dqf5LJsVaIMA+QxlQKmlOxLVW3MPyEQOW
-         ZtZ4oDJOQLly/BilNjT4JcO3Qc4hVnFdspg2L6GzChP02kiowqdnpSk3qcJBLKZzsP0E
-         LQOUETeZSPr1OgoOyaK1JtHOTBP1ihk0bK5wukpFaWyN8SjOlX96peTYbEzeUHuSIcP3
-         kErjTwCsp+aGM83fy1ZyKBkFtKkFORMEFCjsOWRHwsOb1sx0pkSNSAWQmxneJL40R6Rz
-         fXKQ==
+        bh=1d4G3ltacawLzlsweBJouqYDICtB6/Cf7SnoFyAV6b0=;
+        b=ThCgTlzeYkVo8V4+htWP3OIXG6UeFVavSGIK/3BIik8Uz2wVU1rEqaLWRA3Lfz9Z+1
+         TXgqdf4BrMZ5UpEI/Ere/mZEu8ZV4/GBYpVYNY/i+Rt+rbKLt8wvKCYZ4MXNv6G6A6Ow
+         GJshDzZv8NrBjDBGy7d8VMiFeL/JjHr6viGYOeQxRiWI3Qt4x3jBdTdbOpszYeCO9BMc
+         0OCxt/klexnVqQAG4DL6yDyNjDzAIzBiBO0WWHh1u6iZyqrKE2/0R76HugNf8iGWQjsN
+         LB680ik500n7ko1Drqv+apJQ6Pd9kon4cuHgIY7EtNm6BVtkGqv/gIUQzIf19VZ0mrEP
+         o7Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=lUDAX0UaDPTHJ9u8BBzfbhja83Bgj8HqOrB2yYnjOXM=;
-        b=pHS35SKSeZiv0s9Uzebg3JMraPd/vPPrAaUcZdWDUG3WnCJtsohvY70KFQEurq37J/
-         CiNV6sc6qq1cEp31nmYZPQs7ERl85IqL4VNv23ZAvYU5Nwh2Yh8xqu/wpuFDB+8vPm9w
-         lU9cpfYjfRr1WmhFO1x69J6XHsOztnZX4Vd/sow9QfC2xVOlnjvGdY07lEPd+ZYsuKha
-         w6hpF1gdBkOZ048t8yLHTNttqJPcXFuQADHogw2LMXJgEpQKH5dXYzE6tIoBAjLVy4kH
-         ab5hEjxqfyliHKlWeK0OqaEobYcuMQUCvDJ9KhG8u28ZR+fLRn+vw61MbLMGdtlrVSXi
-         i/HA==
-X-Gm-Message-State: AOAM5330PgIU8tZRqnXIY1fr9uaQ6fukjgv8WONKpfhJUkLRnb8dbQXl
-        rdJUPDm6cXiHVpLhUBEIfve6xreTRGQN8g==
-X-Google-Smtp-Source: ABdhPJxxpY4/tEbGo0g+V8BNk8kQ7NowXtqTBM2bOEDe8a9owPVdSth3Obtc2+mwubfJzK+qB57Q9Q==
-X-Received: by 2002:a17:90a:1b2c:b0:1b8:ab57:309f with SMTP id q41-20020a17090a1b2c00b001b8ab57309fmr248913pjq.48.1644866647585;
-        Mon, 14 Feb 2022 11:24:07 -0800 (PST)
+        bh=1d4G3ltacawLzlsweBJouqYDICtB6/Cf7SnoFyAV6b0=;
+        b=3yIiTKsHENifpT68JJupSEPTse5EdQvi8kLUVpKy2+hWxD/ZDczB9mi7hcMlmoWl12
+         EJIdWpDIM9qn0+y7pzeUJj885aovuA18zoB06aIl1hkTV/isnswF0niY/XcSJKMA0wt7
+         ouHBCRpqUYu2HERqyd/XKBs8yaeKN354GxowB2zXC6GpsBbUamfcTGHxonN7+U/T+NVH
+         kZ+PTl9BdC3vnjNfCob+R2cV0GprdhrfFGN6rUYLBX75U7D1InyQeN4FifsY3F/Cp+Fb
+         6NAi3h0qymR4pkia7AwgJGyX4CmuH/8pUZMnfDXBxpsOcls6cCXy4jynVaMGxX8r5/4+
+         aCyQ==
+X-Gm-Message-State: AOAM5308ho+7byyuWHHzAPVQ1o+cqFO/FZdlD+tj2nKVABLay8lz+tYo
+        5P8nKdQgNLAKB3unDD08H1IB+59HcrIMwQ==
+X-Google-Smtp-Source: ABdhPJyqMv5AoXUSZYH/3diz6Ivnv8bZlX4Xh7iBZPxGExucJBTW36MNBhspp1/3yYbfp4QnvfEJ3g==
+X-Received: by 2002:a17:903:2309:: with SMTP id d9mr549600plh.74.1644869222243;
+        Mon, 14 Feb 2022 12:07:02 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id nn16sm15099137pjb.2.2022.02.14.11.24.06
+        by smtp.gmail.com with ESMTPSA id mg24sm14494069pjb.4.2022.02.14.12.07.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Feb 2022 11:24:06 -0800 (PST)
-Date:   Mon, 14 Feb 2022 19:24:03 +0000
+        Mon, 14 Feb 2022 12:07:01 -0800 (PST)
+Date:   Mon, 14 Feb 2022 20:06:57 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
-Subject: Re: [PATCH 12/12] KVM: x86: do not unload MMU roots on all role
- changes
-Message-ID: <YgqsU8j80M1ZpWPx@google.com>
-References: <20220209170020.1775368-1-pbonzini@redhat.com>
- <20220209170020.1775368-13-pbonzini@redhat.com>
- <YgavcP/jb5njjKKn@google.com>
- <5f42d1ef-f6b7-c339-32b9-f4cf48c21841@redhat.com>
+To:     David Dunn <daviddunn@google.com>
+Cc:     pbonzini@redhat.com, jmattson@google.com, like.xu.linux@gmail.com,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v6 2/3] KVM: selftests: Allow creation of selftest VM
+ without vcpus
+Message-ID: <Ygq2YWwS5XcDGD2j@google.com>
+References: <20220209172945.1495014-1-daviddunn@google.com>
+ <20220209172945.1495014-3-daviddunn@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5f42d1ef-f6b7-c339-32b9-f4cf48c21841@redhat.com>
+In-Reply-To: <20220209172945.1495014-3-daviddunn@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,90 +72,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 14, 2022, Paolo Bonzini wrote:
-> On 2/11/22 19:48, Sean Christopherson wrote:
-> > On Wed, Feb 09, 2022, Paolo Bonzini wrote:
-> > > @@ -5045,8 +5046,8 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >   void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
-> > >   {
-> > > -	kvm_mmu_unload(vcpu);
-> > >   	kvm_init_mmu(vcpu);
-> > > +	kvm_mmu_new_pgd(vcpu, vcpu->arch.cr3);
-> > 
-> > This is too risky IMO, there are far more flows than just MOV CR0/CR4 that are
-> > affected, e.g. SMM transitions, KVM_SET_SREG, etc...
+Shortlog and new function name are a bit confusing.  The framework already supports
+creating VMs without vCPUs, what it doesn't provide is a helper to load the guest
+code and do the other "default" stuff.
+
+That said, the framework is such an absolute mess that I'm fine going with
+vm_create_without_vcpus() for now, carving out a more appropriate name will be an
+exercise in futility without a large-scale renaming and refactoring of the other
+crud.
+
+So just a different shortlog I supposed, though even that seems doomed to be
+contradictory.  Maybe something like this?
+
+  KVM: selftests: Carve out helper to create "default" VM without vCPUs
+
+Default in quotes because the selftests already have a goofy interpretation of
+"default".
+
+On Wed, Feb 09, 2022, David Dunn wrote:
+> Break out portion of vm_create_with_vcpus so that selftests can modify
+> the VM prior to creating vcpus.
 > 
-> SMM exit does flush the TLB because RSM clears CR0.PG (I did check this :)).
-> SMM re-entry then does not need to flush.  But I don't think SMM exit should
-> flush the TLB *for non-SMM roles*.
-
-I'm not concerned about the TLB flush aspects so much as the addition of
-kvm_mmu_new_pgd() in new paths.
-
-> For KVM_SET_SREGS I'm not sure if it should flush the TLB, but I agree it is
-> certainly safer to keep it that way.
+> Signed-off-by: David Dunn <daviddunn@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++++++----
+>  2 files changed, 32 insertions(+), 6 deletions(-)
 > 
-> > Given that kvm_post_set_cr{0,4}() and kvm_vcpu_reset() explicitly handle CR0.PG
-> > and CR4.SMEP toggling, I highly doubt the other flows are correct in all instances.
-> > The call to kvm_mmu_new_pgd() is also
-> 
-> *white noise*
-> 
-> > To minimize risk, we should leave kvm_mmu_reset_context() as is (rename it if
-> > necessary) and instead add a new helper to handle kvm_post_set_cr{0,4}().  In
-> > the future we can/should work on avoiding unload in all paths, but again, future
-> > problem.
-> 
-> I disagree on this.  There aren't many calls to kvm_mmu_reset_context.
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 4ed6aa049a91..2bdf96f520aa 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -336,6 +336,9 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
+>  				    uint32_t num_percpu_pages, void *guest_code,
+>  				    uint32_t vcpuids[]);
+>  
+> +/* First phase of vm_create_with_vcpus, allows customization before vcpu add */
 
-All the more reason to do things incrementally.  I have no objection to allowing
-all flows to reuse a cached (or current) root, I'm objecting to converting them
-all in a single patch.  
+Eh, drop the comment, the association is obvious from the code, and it's just one
+more thing that needs to be updated when this stuff finally gets cleaned up.
 
-> > > -	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
-> > > +	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS) {
-> > > +		/* Flush the TLB if CR0 is changed 1 -> 0.  */
-> > > +		if ((old_cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PG))
-> > > +			kvm_mmu_unload(vcpu);
-> > 
-> > Calling kvm_mmu_unload() instead of requesting a flush isn't coherent with respect
-> > to the comment, or with SMEP handling.  And the SMEP handling isn't coherent with
-> > respect to the changelog.  Please elaborate :-)
-> 
-> Yep, will do (the CR0.PG=0 case is similar to the CR0.PCIDE=0 case below).
-
-Oh, you're freeing all roots to ensure a future MOV CR3 with NO_FLUSH and PCIDE=1
-can't reuse a stale root.  That's necessary if and only if the MMU is shadowing
-the guest, non-nested TDP MMUs just need to flush the guest's TLB.  The same is
-true for the PCIDE case, i.e. we could optimize that too, though the main motivation
-would be to clarify why all roots are unloaded.
-
-> Using kvm_mmu_unload() avoids loading a cached root just to throw it away
-> immediately after,
-
-The shadow paging case will throw it away, but not the non-nested TDP MMU case?
-
-> but I can change this to a new KVM_REQ_MMU_UPDATE_ROOT flag that does
-> 
-> 	kvm_mmu_new_pgd(vcpu, vcpu->arch.cr3);
-
-I don't think that's necessary, I was just confused by the discrepancy.
-
-> By the way, I have a possibly stupid question.  In kvm_set_cr3 (called e.g.
-> from emulator_set_cr()) there is
-> 
->  	if (cr3 != kvm_read_cr3(vcpu))
-> 		kvm_mmu_new_pgd(vcpu, cr3);
-> 
-> What makes this work if mmu_is_nested(vcpu)?
-
-Hmm, nothing.  VMX is "broken" anyways because it will kick out to userspace with
-X86EMUL_UNHANDLEABLE due to the CR3 intercept check.  SVM is also broken in that
-it doesn't check INTERCEPT_CR3_WRITE, e.g. will do the wrong thing even if L1 wants
-to intercept CR3 accesses.
-
-> Should this also have an "if (... & !tdp_enabled)"?
-
-Yes?  That should avoid the nested mess.  This patch also needs to handle CR0 and
-CR4 modifications if L2 is active, e.g. if L1 choose not to intercept CR0/CR4.
-kvm_post_set_cr_reinit_mmu() would be a lovely landing spot for that check :-D
+> +struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages);
+> +
+>  /*
+>   * Adds a vCPU with reasonable defaults (e.g. a stack)
+>   *
