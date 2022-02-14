@@ -2,255 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A4CC4B5B97
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 22:01:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EB8C4B5B46
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 21:52:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230062AbiBNU46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 15:56:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44282 "EHLO
+        id S229524AbiBNUqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 15:46:19 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:38284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229826AbiBNU4v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 15:56:51 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061611168DB;
-        Mon, 14 Feb 2022 12:56:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qF3mQyzXIw4yFXYkZPEPrA0PWwJ7RcPwYhM0AUTAnus=; b=PsZuw3wpVi/kYcT7x/9yyLlMAK
-        2G6m7yrxSA2JNulbJh3e/e5jzl2Z1nTHq+YKn1g2TtK9Q323I1NzMvUNycbnTs8jJySANSigCNMmc
-        /3dgaU22RerZRLElO2bEbsmoWbOrUG4tRs+MF7UW4/fxvzp0ZFceAvOo4MZovmtt6is3CMFxqS06f
-        oo7VubLf0E2YluIbBWmHi/bjB35IPAPy0Gmn6diKxNis5XSUK4+Z4119JP5rcbkq3XBTavRzfZ4kG
-        f9QtRtXyUB2zBxmWJdpiFhCAfh9ogsc+mVVkXQjlfgEfNfuMr4sigQbtAjH2WD7maFFjrL7ODg4w3
-        x07PMy4w==;
-Received: from [2001:871:43:aaee:b926:4c25:a48b:f0] (helo=dynamic-pd01.res.v6.highway.a1.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nJgQk-00GcPG-Q4; Mon, 14 Feb 2022 18:50:35 +0000
-Message-ID: <1ccae064f72a8aee55a628ad66d6b80c71b1b4ff.camel@infradead.org>
-Subject: Re: [PATCH] KVM: Don't actually set a request when evicting vCPUs
- for GFN cache invd
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Mon, 14 Feb 2022 18:50:29 +0000
-In-Reply-To: <YgqN87rqc/vogbFE@google.com>
-References: <d79aacb5-9069-4647-9332-86f7d74b747a@email.android.com>
-         <YgqN87rqc/vogbFE@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-qw7E3BBXSVcFyLff2m16"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S229480AbiBNUp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 15:45:56 -0500
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 788F3245FED
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 12:44:03 -0800 (PST)
+Received: by mail-oi1-x22a.google.com with SMTP id 13so594193oiz.12
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 12:44:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=lUDAX0UaDPTHJ9u8BBzfbhja83Bgj8HqOrB2yYnjOXM=;
+        b=VFULTseLnwoWoQSLrikwObkqrgWEDJsgEoShox8nAP9wuMRLYLSmINgZVPuS4zJCYq
+         AY+rJI2tTabEed97CNniygA5XGKmOrXxLL+dqf5LJsVaIMA+QxlQKmlOxLVW3MPyEQOW
+         ZtZ4oDJOQLly/BilNjT4JcO3Qc4hVnFdspg2L6GzChP02kiowqdnpSk3qcJBLKZzsP0E
+         LQOUETeZSPr1OgoOyaK1JtHOTBP1ihk0bK5wukpFaWyN8SjOlX96peTYbEzeUHuSIcP3
+         kErjTwCsp+aGM83fy1ZyKBkFtKkFORMEFCjsOWRHwsOb1sx0pkSNSAWQmxneJL40R6Rz
+         fXKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=lUDAX0UaDPTHJ9u8BBzfbhja83Bgj8HqOrB2yYnjOXM=;
+        b=pHS35SKSeZiv0s9Uzebg3JMraPd/vPPrAaUcZdWDUG3WnCJtsohvY70KFQEurq37J/
+         CiNV6sc6qq1cEp31nmYZPQs7ERl85IqL4VNv23ZAvYU5Nwh2Yh8xqu/wpuFDB+8vPm9w
+         lU9cpfYjfRr1WmhFO1x69J6XHsOztnZX4Vd/sow9QfC2xVOlnjvGdY07lEPd+ZYsuKha
+         w6hpF1gdBkOZ048t8yLHTNttqJPcXFuQADHogw2LMXJgEpQKH5dXYzE6tIoBAjLVy4kH
+         ab5hEjxqfyliHKlWeK0OqaEobYcuMQUCvDJ9KhG8u28ZR+fLRn+vw61MbLMGdtlrVSXi
+         i/HA==
+X-Gm-Message-State: AOAM5330PgIU8tZRqnXIY1fr9uaQ6fukjgv8WONKpfhJUkLRnb8dbQXl
+        rdJUPDm6cXiHVpLhUBEIfve6xreTRGQN8g==
+X-Google-Smtp-Source: ABdhPJxxpY4/tEbGo0g+V8BNk8kQ7NowXtqTBM2bOEDe8a9owPVdSth3Obtc2+mwubfJzK+qB57Q9Q==
+X-Received: by 2002:a17:90a:1b2c:b0:1b8:ab57:309f with SMTP id q41-20020a17090a1b2c00b001b8ab57309fmr248913pjq.48.1644866647585;
+        Mon, 14 Feb 2022 11:24:07 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id nn16sm15099137pjb.2.2022.02.14.11.24.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Feb 2022 11:24:06 -0800 (PST)
+Date:   Mon, 14 Feb 2022 19:24:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
+Subject: Re: [PATCH 12/12] KVM: x86: do not unload MMU roots on all role
+ changes
+Message-ID: <YgqsU8j80M1ZpWPx@google.com>
+References: <20220209170020.1775368-1-pbonzini@redhat.com>
+ <20220209170020.1775368-13-pbonzini@redhat.com>
+ <YgavcP/jb5njjKKn@google.com>
+ <5f42d1ef-f6b7-c339-32b9-f4cf48c21841@redhat.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f42d1ef-f6b7-c339-32b9-f4cf48c21841@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 14, 2022, Paolo Bonzini wrote:
+> On 2/11/22 19:48, Sean Christopherson wrote:
+> > On Wed, Feb 09, 2022, Paolo Bonzini wrote:
+> > > @@ -5045,8 +5046,8 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > >   void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+> > >   {
+> > > -	kvm_mmu_unload(vcpu);
+> > >   	kvm_init_mmu(vcpu);
+> > > +	kvm_mmu_new_pgd(vcpu, vcpu->arch.cr3);
+> > 
+> > This is too risky IMO, there are far more flows than just MOV CR0/CR4 that are
+> > affected, e.g. SMM transitions, KVM_SET_SREG, etc...
+> 
+> SMM exit does flush the TLB because RSM clears CR0.PG (I did check this :)).
+> SMM re-entry then does not need to flush.  But I don't think SMM exit should
+> flush the TLB *for non-SMM roles*.
 
---=-qw7E3BBXSVcFyLff2m16
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I'm not concerned about the TLB flush aspects so much as the addition of
+kvm_mmu_new_pgd() in new paths.
 
-On Mon, 2022-02-14 at 17:14 +0000, Sean Christopherson wrote:
-> On Sat, Feb 12, 2022, Woodhouse, David wrote:
-> > (Apologies if this is HTML but I'm half-way to Austria and the laptop i=
-s
-> > buried somewhere in the car, and access to work email with sane email a=
-pps is
-> > difficult.)
-> >=20
-> > On 12 Feb 2022 03:05, Sean Christopherson <seanjc@google.com> wrote:
-> >=20
-> > Don't actually set a request bit in vcpu->requests when making a reques=
-t
-> > purely to force a vCPU to exit the guest.  Logging the request but not
-> > actually consuming it causes the vCPU to get stuck in an infinite loop
-> > during KVM_RUN because KVM sees a pending request and bails from VM-Ent=
-er
-> > to service the request.
-> >=20
-> >=20
-> > Right, but there is no extant code which does this. The guest_uses_pa f=
-lag is
-> > unused.
->=20
-> Grr.  A WARN or something would have been nice to have.  Oh well.
+> For KVM_SET_SREGS I'm not sure if it should flush the TLB, but I agree it is
+> certainly safer to keep it that way.
+> 
+> > Given that kvm_post_set_cr{0,4}() and kvm_vcpu_reset() explicitly handle CR0.PG
+> > and CR4.SMEP toggling, I highly doubt the other flows are correct in all instances.
+> > The call to kvm_mmu_new_pgd() is also
+> 
+> *white noise*
+> 
+> > To minimize risk, we should leave kvm_mmu_reset_context() as is (rename it if
+> > necessary) and instead add a new helper to handle kvm_post_set_cr{0,4}().  In
+> > the future we can/should work on avoiding unload in all paths, but again, future
+> > problem.
+> 
+> I disagree on this.  There aren't many calls to kvm_mmu_reset_context.
 
-I don't think it was clear yet what the 'wrong' behaviour would we that
-we should warn about, since we really hadn't finished defining the
-'correct' usage :)
+All the more reason to do things incrementally.  I have no objection to allowing
+all flows to reuse a cached (or current) root, I'm objecting to converting them
+all in a single patch.  
 
-> > The series came with a proof-of-concept that attempted using it for
-> > fixing nesting UAFs but it was just that =E2=80=94 a proof of concept t=
-o demonstrate
-> > that the new design of GPC was sufficient to address that problem.
-> >=20
-> > IIRC, said proof of concept did also actually consume the req in questi=
-on,
->=20
-> It did.  I saw that, but obviously didn't connect the dots to guest_uses_=
-pa.
->=20
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9826,6 +9826,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->=20
->                 if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, v=
-cpu))
->                         static_call(kvm_x86_update_cpu_dirty_logging)(vcp=
-u);
-> +               if (kvm_check_request(KVM_REQ_GPC_INVALIDATE, vcpu))
-> +                       ; /* Nothing to do. It just wanted to wake us */
->=20
+> > > -	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
+> > > +	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS) {
+> > > +		/* Flush the TLB if CR0 is changed 1 -> 0.  */
+> > > +		if ((old_cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PG))
+> > > +			kvm_mmu_unload(vcpu);
+> > 
+> > Calling kvm_mmu_unload() instead of requesting a flush isn't coherent with respect
+> > to the comment, or with SMEP handling.  And the SMEP handling isn't coherent with
+> > respect to the changelog.  Please elaborate :-)
+> 
+> Yep, will do (the CR0.PG=0 case is similar to the CR0.PCIDE=0 case below).
 
-Right. That's a later iteration. I originally *did* actually use it to
-trigger an action, IIRC, but Paolo suggested we do it differently.
+Oh, you're freeing all roots to ensure a future MOV CR3 with NO_FLUSH and PCIDE=1
+can't reuse a stale root.  That's necessary if and only if the MMU is shadowing
+the guest, non-nested TDP MMUs just need to flush the guest's TLB.  The same is
+true for the PCIDE case, i.e. we could optimize that too, though the main motivation
+would be to clarify why all roots are unloaded.
 
-I also pondered having each GPC able to raise a specific request, and
-set the KVM_REQ_xxx bit in the GPC itself. That just made the loop in
-invalidate_start() a bit more complex though because of the way that it
-wakes the vCPUs after it's done its iteration and collected them in a
-cpumask. So it seemed like premature deoptimisation; we can add that in
-future if we really do need it, and looks like we're going in the
-opposite direction.
+> Using kvm_mmu_unload() avoids loading a cached root just to throw it away
+> immediately after,
 
-> > and one of the existing test cases did exercise it with an additional m=
-map
-> > torture added? Of course until we have kernel code that *does* this, it=
-'s
-> > hard to exercise it from userspace :)
->=20
-> Indeed.  I'll send a new version with a different changelog, that way we'=
-re not
-> leaving a trap for developers and each architecture doesn't need to manua=
-lly handle
-> the request.
+The shadow paging case will throw it away, but not the non-nested TDP MMU case?
 
-Ack, thanks.
+> but I can change this to a new KVM_REQ_MMU_UPDATE_ROOT flag that does
+> 
+> 	kvm_mmu_new_pgd(vcpu, vcpu->arch.cr3);
 
---=-qw7E3BBXSVcFyLff2m16
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+I don't think that's necessary, I was just confused by the discrepancy.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjE0MTg1MDI5WjAvBgkqhkiG9w0BCQQxIgQgklpe7fWN
-Gr8mzTbMIYAIhvMSbAV8+77S6eVPsIhcQPgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBVD+lFSG3MESe2RMuYwyCcv0f3EqEb9WbJ
-pZiZRMluwgbfuK9Htoe0ctSh3Ad005rOnEHhLP3LygV+i3IIoEs7Oeumk9m7lge7UtsPhzNrEiTL
-B24xWQBY3j9RuggsKm1UhFg8wFEIAhammwiEK495/xSrF6Kw1FNf4fe5RVasFXr17czuHQeWx2km
-c6WNelWyPyjSCH5ZGHoD6fhWFJsPE/Gl1Ig0czDl4fwKtURww3ax0zUQrwQ6ZMiC+lGtDvQ/248x
-piw03353YvzQrQys6Q/tWGqCQVz8cwwWx0RicuyRp0JkCgAYRkjbDs4TE3oFkjujcLE2g+rdbTvK
-PtnbhKX0EusPBrNO1g32s+I9LiJI+VGIk4GTRPkj3VDqlJpuLQ+7sxX/mZ/gZ2ConLHV0RSXfPiM
-5E3Mp6SH+gWbP1pSFX0QR5XBpENHs+vKBJVZg85rv0kwPnkHUXTJXqBFiFcQxZX4JUTxNSfZ9Irs
-qMOPpU/QprdZAGl89e3sN9hnQUSgVVJmGdkBqQnsQ1qD/xZTbArx4KVYVnIlqwombw2y6/7kDJuS
-HoC3VM/6KpxPC87LGelWJTqvnujpL9M8oFSRGhtYqZUmZdx42urJgv5nTGRWXM8mE/z1/0lgiIFN
-cDp1F2+gV++A6AwRdNoOLfJImTKogD7ogSEBkpp5OwAAAAAAAA==
+> By the way, I have a possibly stupid question.  In kvm_set_cr3 (called e.g.
+> from emulator_set_cr()) there is
+> 
+>  	if (cr3 != kvm_read_cr3(vcpu))
+> 		kvm_mmu_new_pgd(vcpu, cr3);
+> 
+> What makes this work if mmu_is_nested(vcpu)?
 
+Hmm, nothing.  VMX is "broken" anyways because it will kick out to userspace with
+X86EMUL_UNHANDLEABLE due to the CR3 intercept check.  SVM is also broken in that
+it doesn't check INTERCEPT_CR3_WRITE, e.g. will do the wrong thing even if L1 wants
+to intercept CR3 accesses.
 
---=-qw7E3BBXSVcFyLff2m16--
+> Should this also have an "if (... & !tdp_enabled)"?
 
+Yes?  That should avoid the nested mess.  This patch also needs to handle CR0 and
+CR4 modifications if L2 is active, e.g. if L1 choose not to intercept CR0/CR4.
+kvm_post_set_cr_reinit_mmu() would be a lovely landing spot for that check :-D
