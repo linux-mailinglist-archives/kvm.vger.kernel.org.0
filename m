@@ -2,105 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F19114B42AF
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 08:19:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D60D44B431E
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 08:53:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241299AbiBNHPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 02:15:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35342 "EHLO
+        id S236130AbiBNHxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 02:53:35 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241269AbiBNHPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 02:15:45 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0872C58E73
-        for <kvm@vger.kernel.org>; Sun, 13 Feb 2022 23:15:38 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nJVZ0-0006l6-Nq; Mon, 14 Feb 2022 08:14:22 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nJVYf-00GV12-4n; Mon, 14 Feb 2022 08:14:00 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nJVYd-002oWn-E1; Mon, 14 Feb 2022 08:13:59 +0100
-Date:   Mon, 14 Feb 2022 08:13:51 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jiri Slaby <jirislaby@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        linux-phy@lists.infradead.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
-        linux-gpio@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Guenter Roeck <groeck@chromium.org>, linux-spi@vger.kernel.org,
-        Lee Jones <lee.jones@linaro.org>,
-        openipmi-developer@lists.sourceforge.net,
-        Peter Korsgaard <peter@korsgaard.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        kvm@vger.kernel.org, Kamal Dasu <kdasu.kdev@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Benson Leung <bleung@chromium.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>, netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Oleksij Rempel <linux@rempel-privat.de>,
-        linux-renesas-soc@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v2 1/2] platform: make platform_get_irq_optional()
- optional
-Message-ID: <20220214071351.pcvstrzkwqyrg536@pengutronix.de>
-References: <20220212201631.12648-1-s.shtylyov@omp.ru>
- <20220212201631.12648-2-s.shtylyov@omp.ru>
+        with ESMTP id S231537AbiBNHxe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 02:53:34 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F205B3CB;
+        Sun, 13 Feb 2022 23:53:26 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21E7JZNs012533;
+        Mon, 14 Feb 2022 07:53:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mh1IZLP6bfXG93wC3OvGri09qFDydygL9MBZFqRC8KM=;
+ b=pmwQQS6oWucKrkw5jMSwATYK0rfY2EJDiNpGNOr+DOCeoWX3ePNYKrYuRP8F/hJzGwFq
+ FLkOumzO6fZROBipxLaVMTQx0w9+w17jcA448YmJPNxTayecEOUCiqhzYjl401JLShLk
+ 5wkKZKmaJiVDRRHtJJjIgX8hSm7dOzgr38sauvrq5eGqjMmniFdz5d5ekKoJkxdSKgvs
+ o4az+x2IXMO/IGD/D7jOcKnHFzKTKrdBxuQ26pawk2RrmiU6PehkKwXhLrNxZInRqG1T
+ MTKV+cyQyU1gkJyOwjRcN41/c9QlEkshBTThHQ6oHbT9XZ2HHp3WEoxfQer4xKW9pvev cg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7c4dq3a3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Feb 2022 07:53:25 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21E7pobn024114;
+        Mon, 14 Feb 2022 07:53:25 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7c4dq39t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Feb 2022 07:53:25 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21E7jiPX027153;
+        Mon, 14 Feb 2022 07:53:23 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3e64h99vhd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Feb 2022 07:53:23 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21E7rKor44827074
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Feb 2022 07:53:20 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8BF33A405B;
+        Mon, 14 Feb 2022 07:53:20 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 22086A4054;
+        Mon, 14 Feb 2022 07:53:20 +0000 (GMT)
+Received: from [9.171.42.254] (unknown [9.171.42.254])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 14 Feb 2022 07:53:20 +0000 (GMT)
+Message-ID: <755f1838-8edf-64bc-0f0b-1ca53adbf8fe@linux.ibm.com>
+Date:   Mon, 14 Feb 2022 08:55:33 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="r3c6abkz2rpak4yl"
-Content-Disposition: inline
-In-Reply-To: <20220212201631.12648-2-s.shtylyov@omp.ru>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v4 2/4] s390x: stsi: Define vm_is_kvm to be
+ used in different tests
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
+References: <20220208132709.48291-1-pmorel@linux.ibm.com>
+ <20220208132709.48291-3-pmorel@linux.ibm.com>
+ <ea550ac540d29fdf76eb104d05a7016a95f8373b.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <ea550ac540d29fdf76eb104d05a7016a95f8373b.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: z4BqGaJOESoo4THHxLFh_TgXIayDoxMZ
+X-Proofpoint-ORIG-GUID: IQg1g-bPpS4NMPFnIYa96GX-kG2uYVU7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-14_01,2022-02-11_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ adultscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202140046
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -108,68 +97,122 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---r3c6abkz2rpak4yl
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 12, 2022 at 11:16:30PM +0300, Sergey Shtylyov wrote:
-> This patch is based on the former Andy Shevchenko's patch:
->=20
-> https://lore.kernel.org/lkml/20210331144526.19439-1-andriy.shevchenko@lin=
-ux.intel.com/
->=20
-> Currently platform_get_irq_optional() returns an error code even if IRQ
-> resource simply has not been found.  It prevents the callers from being
-> error code agnostic in their error handling:
->=20
-> 	ret =3D platform_get_irq_optional(...);
-> 	if (ret < 0 && ret !=3D -ENXIO)
-> 		return ret; // respect deferred probe
-> 	if (ret > 0)
-> 		...we get an IRQ...
->=20
-> All other *_optional() APIs seem to return 0 or NULL in case an optional
-> resource is not available.  Let's follow this good example, so that the
-> callers would look like:
->=20
-> 	ret =3D platform_get_irq_optional(...);
-> 	if (ret < 0)
-> 		return ret;
-> 	if (ret > 0)
-> 		...we get an IRQ...
->=20
-> Reported-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+On 2/8/22 16:35, Nico Boehr wrote:
+> On Tue, 2022-02-08 at 14:27 +0100, Pierre Morel wrote:
+>> We need in several tests to check if the VM we are running in
+>> is KVM.
+>> Let's add the test.
+>>
+>> To check the VM type we use the STSI 3.2.2 instruction, let's
+>> define it's response structure in a central header.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> 
+>> ---
+>>   lib/s390x/stsi.h | 32 +++++++++++++++++++++++++++
+>>   lib/s390x/vm.c   | 56
+>> ++++++++++++++++++++++++++++++++++++++++++++++--
+>>   lib/s390x/vm.h   |  3 +++
+>>   s390x/stsi.c     | 23 ++------------------
+>>   4 files changed, 91 insertions(+), 23 deletions(-)
+>>   create mode 100644 lib/s390x/stsi.h
+>>
+>> diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
+>> new file mode 100644
+>> index 00000000..9b40664f
+>> --- /dev/null
+>> +++ b/lib/s390x/stsi.h
+>> @@ -0,0 +1,32 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> 
+> This was taken from stsi.c which is GPL 2 only, so this probably should
+> be as well.
+> 
+>> diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
+>> index a5b92863..38886b76 100644
+>> --- a/lib/s390x/vm.c
+>> +++ b/lib/s390x/vm.c
+>> @@ -12,6 +12,7 @@
+>>   #include <alloc_page.h>
+>>   #include <asm/arch_def.h>
+>>   #include "vm.h"
+>> +#include "stsi.h"
+>>   
+>>   /**
+>>    * Detect whether we are running with TCG (instead of KVM)
+>> @@ -26,9 +27,13 @@ bool vm_is_tcg(void)
+>>          if (initialized)
+>>                  return is_tcg;
+>>   
+>> -       buf = alloc_page();
+>> -       if (!buf)
+>> +       if (!vm_is_vm()) {
+>> +               initialized = true;
+>>                  return false;
+>> diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
+>> index a5b92863..38886b76 100644
+>> --- a/lib/s390x/vm.c
+>> +++ b/lib/s390x/vm.c
+>> @@ -12,6 +12,7 @@
+>>   #include <alloc_page.h>
+>>   #include <asm/arch_def.h>
+>>   #include "vm.h"
+>> +#include "stsi.h"
+>>   
+>>   /**
+>>    * Detect whether we are running with TCG (instead of KVM)
+>> @@ -26,9 +27,13 @@ bool vm_is_tcg(void)
+>>          if (initialized)
+>>                  return is_tcg;
+>>   
+>> -       buf = alloc_page();
+>> -       if (!buf)
+>> +       if (!vm_is_vm()) {
+>> +               initialized = true;
+>>                  return false;
+> 
+> I would personally prefer return is_tcg here to make it obvious we're
+> relying on the previous initalization to false for subsequent calls.
 
-While this patch is better than v1, I still don't like it for the
-reasons discussed for v1. (i.e. 0 isn't usable as a dummy value which I
-consider the real advantage for the other _get_optional() functions.)
+OK
 
-Apart from that, I think the subject is badly chosen. With "Make
-somefunc() optional" I would expect that you introduce a Kconfig symbol
-that results in the function not being available when disabled.
+> 
+>> +       }
+>> +
+>> +       buf = alloc_page();
+>> +       assert(buf);
+>>   
+>>          if (stsi(buf, 1, 1, 1))
+>>                  goto out;
+>> @@ -43,3 +48,50 @@ out:
+>>          free_page(buf);
+>>          return is_tcg;
+>>   }
+>> +
+>> +/**
+>> + * Detect whether we are running with KVM
+>> + */
+>> +
+> 
+> No newline here.
 
-Best regards
-Uwe
+ok
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+> 
+>> +bool vm_is_kvm(void)
+>> +{
+>> +       /* EBCDIC for "KVM/" */
+>> +       const uint8_t kvm_ebcdic[] = { 0xd2, 0xe5, 0xd4, 0x61 };
+>> +       static bool initialized;
+>> +       static bool is_kvm;
+> 
+> Might make sense to initizalize these to false to make it consistent
+> with vm_is_tcg().
+> 
 
---r3c6abkz2rpak4yl
-Content-Type: application/pgp-signature; name="signature.asc"
+OK
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmIKASwACgkQwfwUeK3K
-7Ak1DAf/fgLBIz9p8Vx2hzG+I8aYoNMAmPLmUfMeIR1DWaBc26HTbyTBn6pFRiPZ
-rztM2uc+royoY44/mp4H89WkPzZ0/v3AlRkdqI8UBny0ZKRbNtMfzL6f7wyVik5C
-rxqc7EgXLRk2/0IxTohA6bwj7Vczei9NwYndm+QrxDHjmY5Dq95rdvxv9+8iaa9y
-gLQ2x91x4bybaKnKVe36f5JfLeMhS9kLuCx82Wi1yqPK4UQQ6R/+QEE0zGS8QNHP
-vMasmLHge9XqVx/c0SuPcLVZ/uRatkzzuqf1rY75peyQp4YpDDdkhkTws4kcVC22
-lVFz9FjvbtVS4nxvPxNwZAnvq9sPaQ==
-=UfDO
------END PGP SIGNATURE-----
-
---r3c6abkz2rpak4yl--
+-- 
+Pierre Morel
+IBM Lab Boeblingen
