@@ -2,232 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9F094B50F3
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 14:04:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63C7A4B513D
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 14:11:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242087AbiBNNEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 08:04:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52304 "EHLO
+        id S1353932AbiBNNL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 08:11:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353867AbiBNNEo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 08:04:44 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051B54E398;
-        Mon, 14 Feb 2022 05:04:36 -0800 (PST)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21ECpd7T011255;
-        Mon, 14 Feb 2022 13:04:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FMWzaTJXRrGBJi1FUbvAo3f2Gs05BJSDjHdhP6H1xuw=;
- b=rbfWZj3WkMgLOSPVbwn4tzx8sXpT5XtEPmGOzPWHgHiDpPMcOoMA5Y7pSW4dcJrEvjlJ
- r1BvZh9HnFgK8xZzi34eihWI3/RW80g/TJTDvzDa53C6oj066VwCZY9NjVEcxuVG5UDV
- XpsfsTNOHPAvQatWiLTDQW8fqmWTTWUHKZ3Y8ej/offPqPxYlBmuLNGTMPKF6y7LEi2/
- kAmQ5kk8KrxKwMcZW62d0l4CpD4Vik+D5sOxbbHXCroPDmAyZvkYopJZs/fcMGT8l8JS
- 0JYahynCW+SdNoAez4RpZcx7eU8e3tC0vUxCf33R2afq8qBRzEZpDbEyS46q3sBo3PZX pA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e6thxkdf8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 13:04:36 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21ECfEh0015734;
-        Mon, 14 Feb 2022 13:04:35 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e6thxkden-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 13:04:35 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21ED3lSx029719;
-        Mon, 14 Feb 2022 13:04:34 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3e64h9nhr4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 13:04:33 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21ED4TrF43319602
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Feb 2022 13:04:29 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F1D40A4065;
-        Mon, 14 Feb 2022 13:04:28 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB271A4062;
-        Mon, 14 Feb 2022 13:04:27 +0000 (GMT)
-Received: from [9.171.42.254] (unknown [9.171.42.254])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Feb 2022 13:04:27 +0000 (GMT)
-Message-ID: <0fce8189-8a02-16d2-6f37-7e435c6b8024@linux.ibm.com>
-Date:   Mon, 14 Feb 2022 14:06:40 +0100
+        with ESMTP id S241177AbiBNNL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 08:11:27 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2043.outbound.protection.outlook.com [40.107.220.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0566CCD3;
+        Mon, 14 Feb 2022 05:11:20 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m6hIRx8tSXBBaE95AoYMomvDRoeyI6Bzdxn1+6wmucnlfiEy6USOYDq7u8VKvMpujLHGecVtfBCPl6aHM0D3L7NC5QST81f0jaBRMkSWlZI3qGcE4QXtuKvwD6+s+wdKO9Un1X1rFp695g8ReJfOlfYq+IU46HByEh8wGDHHPgq1iYKfW3AeGYCfJKvhQzPbanNHXNkZP8mxp0WOmAb0B2AtUNuiPU2hHLcowX/S69dTIexpPULOgITqDGN7LIOl9ksJaD2rzSG9Y9gM3vznO+FM0cyyy4NSsfCXZShJjnfElPumFjC+5NY1eHzMk1GuqdR0OVkOeQjlfGneZUrqzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Rcms/YUKb8ALQ5IrLcuMPAkKLbobmzKSFDyf4NIZXnc=;
+ b=gO20NaVWEeAjNmKmBseARsgiPXAMXUdz3RDJ1pYM8eoDw9DXl9cwoOuF+zRdeDcEXrn8UQyVYfHcOOJ7ymSKszDhQw8hqP4DWcdpibmgLaoQmQ9uIic4ZvqEGNBk2ZuyGs8EZpXwN0mjqa/h4lrin/2ej8iiDb/w1nAOlPNQa3lTBYa+zMzvTlv9QqsH13ZNVJr46L9QJgszAd5ats4Q+zgDJFSPdWp4bc3m4bNKXjd0NcjYi1i5Wgunz7PMM/7ymM+AMVubwmd7Miz/BcuDbtX1fdAwvqxTO0P9A9T35Fokpp5mNb7zPcUxB7hZe/m4Cl6nKkXPxzAsUwf1yg9spw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Rcms/YUKb8ALQ5IrLcuMPAkKLbobmzKSFDyf4NIZXnc=;
+ b=sO6LadfU2OBg2F8RYoIoj7foIKzFb6SkDEnALC5ZT3GbWejVBOQZEC0x5nsmXQDzmeLu0EwUV/xsZafL2qiFfe/nGHhdmcNvAaMb444KTjyRgQ4MjoQYuX0WrbV4MHM2NcIWxCFa03ekAYZDXcxsZrIhwo0shEfHS1wAeEulQ5n3LYxhYTorXO2ROYylVxGzkEDzi/zNJXwcW1vk0grfqZXoTNkR2mBh67/rnfwsOaclSwYkBCJHBlNBElO25OwGclFsuPYyS8h2GSDDh5aTrAN390pPkrBGkb1XrYKc04LznUGrsV1q3dBEF+0AUOoAq0e0mvRWHpibnz2xRpjPNQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB4762.namprd12.prod.outlook.com (2603:10b6:5:7b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.18; Mon, 14 Feb
+ 2022 13:11:18 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.019; Mon, 14 Feb 2022
+ 13:11:18 +0000
+Date:   Mon, 14 Feb 2022 09:11:17 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 07/14] PCI: Add driver dma ownership management
+Message-ID: <20220214131117.GW4160@nvidia.com>
+References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
+ <20220104015644.2294354-8-baolu.lu@linux.intel.com>
+ <Ygoo/lCt/G6tWDz9@kroah.com>
+ <20220214123842.GT4160@nvidia.com>
+ <YgpQOmBA7QJJu+2E@kroah.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YgpQOmBA7QJJu+2E@kroah.com>
+X-ClientProxiedBy: BL1PR13CA0320.namprd13.prod.outlook.com
+ (2603:10b6:208:2c1::25) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v3 18/30] KVM: s390: mechanism to enable guest zPCI
- Interpretation
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
- <20220204211536.321475-19-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220204211536.321475-19-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wvX9Z-lcXqz_-Jolf_8p63MTrlG8QPsK
-X-Proofpoint-ORIG-GUID: jrjA06zhDR9356g7ZVOFpCzNqlvEQbgl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-14_06,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
- malwarescore=0 phishscore=0 suspectscore=0 spamscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 23f6ab3c-7206-4d9e-492b-08d9efbb7cbd
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4762:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB47620B69302CD0C8D84BE328C2339@DM6PR12MB4762.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ddCfqyE+9Kdgb/tJyDMzaFq76npJ+aXFqhAxDQ6iT0oMrYSMMrngoj8ZfI9Sao3xCa+Z6vcVNtgcC4ir/aGP2KgFIB9rkJB8Qf2/vLuQbYCa7nsfnBb9J/2s2/dwdhADiSUEroxhxPoFkBbIsPPDi5Z98E8vj4b4R5TY5TvgzhqWuqbksvMRSIkHCHThfaFYelp6s31UkpuwdmzmZqV4FoHiiMR1pLLlNaN+rX2ecxAT5OTCUHr/fnRskoK/eXk+wyt2sxH37er3ku+p1+DlrnH64wDCdbBvjq9sYiIfgQiBJzTxv1z8LBa4AikpaXw6JhT1phOH+hOrljBy5yjGHvMF9UDel/68mA0BU6hqmiNwUXpkwO72YA/g2LtU0cnwL56SDVHLfsAPRK0u9uxpKJ28/Z2od9IWkxzRtpP1/G5W0SgTqVyD/L7JGWkQxNy5pPqyhWARncLJjdGfXBQ8+MqCH/wQAA4Bs/MKBk2ko0xfDLJ3jomMoU9E6Rb2QoCMS+Vpo63lPfuACfqwoFaWHo1Q6dhVEr4zlq8tnxr2Sn2I+yUs8Lnv1vP9AXSoZnCoFU91iU7siYNfvAgpEr4n6Y3Er8q6ua5UXNalQkHxIp4sU7doL79ns1Sw4mhizMCl7U32PqR6VtbwcnghPD2cRQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(6506007)(26005)(38100700002)(36756003)(186003)(6512007)(83380400001)(86362001)(4326008)(2906002)(8676002)(7416002)(8936002)(508600001)(316002)(2616005)(66946007)(66556008)(66476007)(6486002)(54906003)(1076003)(6916009)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Gg9PGY4oy1GomsZ+ItMhTRhs+gdVPDWRI/Y/hGpTy3j3SV3MLcRdjIhhMXM4?=
+ =?us-ascii?Q?U9tMoSMcRZXABFss0x6aryJeTm4vzLE7Al6jlQ2nAOS3eJSMJp8Ywm+OjSQK?=
+ =?us-ascii?Q?Gw15yAx22vHF2HpbLeujlGsg8l8B3W1yw5IhQ6mXAPVflU6HPWuejWiPSD1i?=
+ =?us-ascii?Q?v0pmCM+d3AGALPyLI6QR4VgXHkht6A+eKijjAbBXfvJ2j3brGjQytT17scYg?=
+ =?us-ascii?Q?rNBn4eS8ahhSXTdPZllB1ksEePRp7SYVOwRHDTTnMbUlyOH4kcy4uPCE0+H7?=
+ =?us-ascii?Q?poHXTvfej8Zqt7IbSKknkhheul5BaezIdVg0szPwQXg6oh+6igUmEeiqgimS?=
+ =?us-ascii?Q?WyklCuSwjqa8s7eDy481qBZs6VSafS5SikFSxodpjBwYrfHThohFtxdwgv5Y?=
+ =?us-ascii?Q?wTGe2bO/3dlovvDHKS4lt1lfDU0RH07+UNSiaLcQzH0ZYbtJ+9QwAkOL2Yep?=
+ =?us-ascii?Q?+tk9Tjag+JCS7753L+RVAV35mSUrVP1DpWGd/hlc0xhWoibyWmyZI3AJjZvs?=
+ =?us-ascii?Q?aVnpeykuJ760mHykw4pqMrW9eEN1jSj9PIxKF4s21pB/7aXpMj2k2E7j7iZ0?=
+ =?us-ascii?Q?obw9YzE8lC9YpSW1sMb7B3sBTnDxkep00YZRxoJuL0n2A9TEWmNwRgRyxaWg?=
+ =?us-ascii?Q?Madq6nM3qgVFKMww6YVukBviWfik/0lGKdGT5c5PDQc3b9szVuB1hGCqFs1F?=
+ =?us-ascii?Q?oG8mReEK4yU1dXPGb9i/G6+pzM4KsF5ljzyGpK2MyjN2tyXST/svHAArEPAX?=
+ =?us-ascii?Q?zSAfpdRDJ5/dLyut+dJMJ63ZQptbqMnGVjDlHsYqn7h3Yv0ZI4FA9emr6eDI?=
+ =?us-ascii?Q?9KuQSv6o9/Uz/XfdwNPQ5kVov7mGLcGOescT6ogbaLnBdjvqc14+Dobg8EgL?=
+ =?us-ascii?Q?H0oayR+J7RBUeoqPV+dcpYeIUJ7qRZJT5uavtAYoz5de47wnAA7bU9oeDqER?=
+ =?us-ascii?Q?GMgHpJks1fCmkX9p0/lMNJ31b7b8vlhRcPFlNie2/UvR5Qvn3ISLbKSkOFCL?=
+ =?us-ascii?Q?eGy5uhdao5xXwLmUC+gJ29LAe5/3i4SD+Ag17DfpQvhfO+CL+IwEoDRck/GQ?=
+ =?us-ascii?Q?jsBx33LEQIsN2eOLjPqec/m+rC0zAlTA2Y7wB12u4dXJ5d38DQ3cSB5uiniM?=
+ =?us-ascii?Q?DhcW7iCzRJzd6hOS3jNTEx+NrzKrhEbLDDk4uBZKA7junpZeFHyCZ1xech3w?=
+ =?us-ascii?Q?zHSJgT092DhW0VyBx5WnTpqnj1b4V4TFL1oAyDIbYnzXObELj2R+O6nLYmIA?=
+ =?us-ascii?Q?JAE6YDycIDWqDCILyWwH9jvUbva2DmXGbwBAEoQvAs5MdxPghruT5WjpyAfT?=
+ =?us-ascii?Q?7HUCSsJHip8pESaAHq75Wkth73VRdJCFcl7HFZV+bQkRpiDnvDWLpZZPLaEF?=
+ =?us-ascii?Q?9AOfW+WGNGSLw3U8j7gpBMUfVGAJcLvjIMerLYwLcmlOcwIuuwODh2M7HCO/?=
+ =?us-ascii?Q?eQfd49P4oHIRupwnqpry+vv5p3kQn5T0vBEVNDwRiOpyY/dy6T2ai5ACIqm7?=
+ =?us-ascii?Q?ytT3g4jTtijanZ+Jg/xqE23uuwpFmSzpQQi87eRzTtBbu7jyC6az6exNlVgj?=
+ =?us-ascii?Q?P42ExSPcCkaV/wkBIrs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23f6ab3c-7206-4d9e-492b-08d9efbb7cbd
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2022 13:11:18.2369
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OeyYaivzys/sKaIRFJKLuyzs1L9NhK3QPt7K9q7dw8wDrrq2tTEloI7yEFdt/Emr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4762
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2/4/22 22:15, Matthew Rosato wrote:
-> The guest must have access to certain facilities in order to allow
-> interpretive execution of zPCI instructions and adapter event
-> notifications.  However, there are some cases where a guest might
-> disable interpretation -- provide a mechanism via which we can defer
-> enabling the associated zPCI interpretation facilities until the guest
-> indicates it wishes to use them.
+On Mon, Feb 14, 2022 at 01:51:06PM +0100, Greg Kroah-Hartman wrote:
+> On Mon, Feb 14, 2022 at 08:38:42AM -0400, Jason Gunthorpe wrote:
+> > On Mon, Feb 14, 2022 at 11:03:42AM +0100, Greg Kroah-Hartman wrote:
+> > > On Tue, Jan 04, 2022 at 09:56:37AM +0800, Lu Baolu wrote:
+> > > > Multiple PCI devices may be placed in the same IOMMU group because
+> > > > they cannot be isolated from each other. These devices must either be
+> > > > entirely under kernel control or userspace control, never a mixture. This
+> > > > checks and sets DMA ownership during driver binding, and release the
+> > > > ownership during driver unbinding.
+> > > > 
+> > > > The device driver may set a new flag (no_kernel_api_dma) to skip calling
+> > > > iommu_device_use_dma_api() during the binding process. For instance, the
+> > > > userspace framework drivers (vfio etc.) which need to manually claim
+> > > > their own dma ownership when assigning the device to userspace.
+> > > > 
+> > > > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> > > >  include/linux/pci.h      |  5 +++++
+> > > >  drivers/pci/pci-driver.c | 21 +++++++++++++++++++++
+> > > >  2 files changed, 26 insertions(+)
+> > > > 
+> > > > diff --git a/include/linux/pci.h b/include/linux/pci.h
+> > > > index 18a75c8e615c..d29a990e3f02 100644
+> > > > +++ b/include/linux/pci.h
+> > > > @@ -882,6 +882,10 @@ struct module;
+> > > >   *              created once it is bound to the driver.
+> > > >   * @driver:	Driver model structure.
+> > > >   * @dynids:	List of dynamically added device IDs.
+> > > > + * @no_kernel_api_dma: Device driver doesn't use kernel DMA API for DMA.
+> > > > + *		Drivers which don't require DMA or want to manually claim the
+> > > > + *		owner type (e.g. userspace driver frameworks) could set this
+> > > > + *		flag.
+> > > 
+> > > Again with the bikeshedding, but this name is a bit odd.  Of course it's
+> > > in the kernel, this is all kernel code, so you can drop that.  And
+> > > again, "negative" flags are rough.  So maybe just "prevent_dma"?
+> > 
+> > That is misleading too, it is not that DMA is prevented, but that the
+> > kernel's dma_api has not been setup.
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> "has not been" or "will not be"?
 
-Didn't you forget my ACK?
+"has not been" as that action was supposed to happen before probe(),
+but the flag skips it.
 
+A driver that sets this flag can still decide to enable the dma API on
+its own. eg tegra drivers do this.
 
-Acked-by: Pierre Morel <pmorel@linux.ibm.com>
+> What you want to prevent is the iommu core claiming the device
+> automatically, right?  So how about "prevent_iommu_dma"?
 
-> ---
->   arch/s390/include/asm/kvm_host.h |  4 ++++
->   arch/s390/kvm/kvm-s390.c         | 40 ++++++++++++++++++++++++++++++++
->   arch/s390/kvm/kvm-s390.h         | 10 ++++++++
->   3 files changed, 54 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index b468d3a2215e..bf61ab05f98c 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -252,7 +252,10 @@ struct kvm_s390_sie_block {
->   #define ECB2_IEP	0x20
->   #define ECB2_PFMFI	0x08
->   #define ECB2_ESCA	0x04
-> +#define ECB2_ZPCI_LSI	0x02
->   	__u8    ecb2;                   /* 0x0062 */
-> +#define ECB3_AISI	0x20
-> +#define ECB3_AISII	0x10
->   #define ECB3_DEA 0x08
->   #define ECB3_AES 0x04
->   #define ECB3_RI  0x01
-> @@ -938,6 +941,7 @@ struct kvm_arch{
->   	int use_cmma;
->   	int use_pfmfi;
->   	int use_skf;
-> +	int use_zpci_interp;
->   	int user_cpu_state_ctrl;
->   	int user_sigp;
->   	int user_stsi;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 24837d6050dc..208b09d08385 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -1029,6 +1029,44 @@ static int kvm_s390_vm_set_crypto(struct kvm *kvm, struct kvm_device_attr *attr)
->   	return 0;
->   }
->   
-> +static void kvm_s390_vcpu_pci_setup(struct kvm_vcpu *vcpu)
-> +{
-> +	/* Only set the ECB bits after guest requests zPCI interpretation */
-> +	if (!vcpu->kvm->arch.use_zpci_interp)
-> +		return;
-> +
-> +	vcpu->arch.sie_block->ecb2 |= ECB2_ZPCI_LSI;
-> +	vcpu->arch.sie_block->ecb3 |= ECB3_AISII + ECB3_AISI;
-> +}
-> +
-> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
-> +
-> +	/*
-> +	 * If host is configured for PCI and the necessary facilities are
-> +	 * available, turn on interpretation for the life of this guest
-> +	 */
-> +	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV) || !sclp.has_zpci_lsi ||
-> +	    !sclp.has_aisii || !sclp.has_aeni || !sclp.has_aisi)
-> +		return;
-> +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	kvm->arch.use_zpci_interp = 1;
-> +
-> +	kvm_s390_vcpu_block_all(kvm);
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		kvm_s390_vcpu_pci_setup(vcpu);
-> +		kvm_s390_sync_request(KVM_REQ_VSIE_RESTART, vcpu);
-> +	}
-> +
-> +	kvm_s390_vcpu_unblock_all(kvm);
-> +	mutex_unlock(&kvm->lock);
-> +}
-> +
->   static void kvm_s390_sync_request_broadcast(struct kvm *kvm, int req)
->   {
->   	unsigned long cx;
-> @@ -3236,6 +3274,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
->   
->   	kvm_s390_vcpu_crypto_setup(vcpu);
->   
-> +	kvm_s390_vcpu_pci_setup(vcpu);
-> +
->   	mutex_lock(&vcpu->kvm->lock);
->   	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
->   		rc = kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 098831e815e6..14bb2539f837 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -496,6 +496,16 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
->    */
->   void kvm_s390_vcpu_crypto_reset_all(struct kvm *kvm);
->   
-> +/**
-> + * kvm_s390_vcpu_pci_enable_interp
-> + *
-> + * Set the associated PCI attributes for each vcpu to allow for zPCI Load/Store
-> + * interpretation as well as adapter interruption forwarding.
-> + *
-> + * @kvm: the KVM guest
-> + */
-> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm);
-> +
->   /**
->    * diag9c_forwarding_hz
->    *
-> 
+"claim" is not a good description. iommu always "claims" the device -
+eg sets a domain, sets the dev and bus parameters, etc.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+This really is only about setting up the in-kernel dma api, eg
+allowing dma_map_sg()/etc to work.
+
+dma api is just one way to operate the iommu, there are others too.
+
+Think of this flag as 
+  false = the driver is going to use the dma api (most common)
+  true = the driver will decide how to use the iommu by itself
+
+Does it help think of a clearer name?
+
+Jason
