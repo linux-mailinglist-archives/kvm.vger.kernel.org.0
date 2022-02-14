@@ -2,184 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C23A34B4E35
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 12:27:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51FAF4B4D11
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 12:11:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351096AbiBNLYu convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 14 Feb 2022 06:24:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52632 "EHLO
+        id S1349179AbiBNKtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 05:49:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351226AbiBNLX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 06:23:59 -0500
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6AAC7E0AA;
-        Mon, 14 Feb 2022 02:59:32 -0800 (PST)
-Received: by mail-qv1-f50.google.com with SMTP id a19so14432712qvm.4;
-        Mon, 14 Feb 2022 02:59:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3zUaM8opKL0LG20PPLjLO0sGhx6OMEFs8RjHjfjsiY4=;
-        b=tzYW5L5xOK2xjgIhwKD7wo4utCRQktTYnmyF5KtC7nyd4QwxINuVYG0oZDuj2UWxgT
-         v/aCYx8fYJ460CRM8cqFGhvZWVTV32Txdva7EilCtR5KuJUaUdqVVS7A7bSNU3h32VJ+
-         2pJ2Y3tGDfNi2ZOUy2aWpZT0nVb7NeQpDeHk76U1HFWgRfZgnwSl3z8nfQ4JYELBC7w+
-         anK5B90Xh4HPCL5PMFl7xyPXyFTTOvibl637EXBhEt2cmJo4/fZJ0Y71K7/l41QRDnHU
-         eA/djqj4anfQA78O8QEI0s/RYo5qs13hiZUR71hMLnibfSqINLjWfOOnZb42aq7YUf4q
-         CRrQ==
-X-Gm-Message-State: AOAM531hvoqH7tmhpaGYLCsoe+Zw1pr4CRNoNkqjMA02M0yksh9tEj9K
-        nnVGq0KJ/mQRARxLUWcaA+SwQIlmvrkhXw==
-X-Google-Smtp-Source: ABdhPJwrRq7LQh4v5o0CPVNGHtwumDUPKtYShp4qDGuprC6H2gTwWZ7lqh2fqI8sviBIFGzuhsrVZw==
-X-Received: by 2002:a1f:9092:: with SMTP id s140mr849683vkd.38.1644829287597;
-        Mon, 14 Feb 2022 01:01:27 -0800 (PST)
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com. [209.85.221.171])
-        by smtp.gmail.com with ESMTPSA id o2sm1719696vke.47.2022.02.14.01.01.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Feb 2022 01:01:27 -0800 (PST)
-Received: by mail-vk1-f171.google.com with SMTP id bj24so2718190vkb.8;
-        Mon, 14 Feb 2022 01:01:26 -0800 (PST)
-X-Received: by 2002:a1f:7307:: with SMTP id o7mr818150vkc.0.1644829286141;
- Mon, 14 Feb 2022 01:01:26 -0800 (PST)
-MIME-Version: 1.0
-References: <20220212201631.12648-1-s.shtylyov@omp.ru> <20220212201631.12648-2-s.shtylyov@omp.ru>
- <20220214071351.pcvstrzkwqyrg536@pengutronix.de>
-In-Reply-To: <20220214071351.pcvstrzkwqyrg536@pengutronix.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Mon, 14 Feb 2022 10:01:14 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWi8gno_FBbc=AwsdRtDJik8_bANjQrrRtUOOBRjFN=KA@mail.gmail.com>
-Message-ID: <CAMuHMdWi8gno_FBbc=AwsdRtDJik8_bANjQrrRtUOOBRjFN=KA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] platform: make platform_get_irq_optional() optional
-To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jiri Slaby <jirislaby@kernel.org>, linux-iio@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>, alsa-devel@alsa-project.org,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        linux-phy@lists.infradead.org,
-        Thierry Reding <thierry.reding@gmail.com>,
-        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
-        linux-gpio@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Guenter Roeck <groeck@chromium.org>, linux-spi@vger.kernel.org,
-        Lee Jones <lee.jones@linaro.org>,
-        openipmi-developer@lists.sourceforge.net,
-        Peter Korsgaard <peter@korsgaard.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        kvm@vger.kernel.org, Kamal Dasu <kdasu.kdev@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-serial@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        platform-driver-x86@vger.kernel.org, linux-pwm@vger.kernel.org,
-        Zha Qipeng <qipeng.zha@intel.com>,
-        Corey Minyard <minyard@acm.org>, linux-pm@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Mark Gross <markgross@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
+        with ESMTP id S1349119AbiBNKtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 05:49:17 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28AADBF94E;
+        Mon, 14 Feb 2022 02:12:22 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B937961027;
+        Mon, 14 Feb 2022 10:12:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66D3CC340E9;
+        Mon, 14 Feb 2022 10:12:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1644833541;
+        bh=4e6jacegMudm5QOO5r4b8aXUbKWQ/KZagciGyXk0tFQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dWgOCaq9LwmLUWtMT7HPrs1K+hIb25M6y5lmPLlGADQIWn+ktjprZPDD4AHsRsFdP
+         22C5wQvlEiUCP2TIBNNZG0gJ+dQ4/5WAaA8UbkTfOuU3UVef1Kj4DZOkHgKPZU6q51
+         6mKzlynGQpisdWw3qFqtDq7e6e382gjSAm2McVts=
+Date:   Mon, 14 Feb 2022 10:59:50 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Benson Leung <bleung@chromium.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Mun Yew Tham <mun.yew.tham@intel.com>,
-        Eric Auger <eric.auger@redhat.com>, netdev@vger.kernel.org,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
-        Joakim Zhang <qiangqing.zhang@nxp.com>,
-        Oleksij Rempel <linux@rempel-privat.de>,
-        linux-renesas-soc@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        Brian Norris <computersforpeace@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 04/14] driver core: platform: Add driver dma ownership
+ management
+Message-ID: <YgooFjSWLTSapuIs@kroah.com>
+References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
+ <20220104015644.2294354-5-baolu.lu@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220104015644.2294354-5-baolu.lu@linux.intel.com>
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Uwe,
+On Tue, Jan 04, 2022 at 09:56:34AM +0800, Lu Baolu wrote:
+> Multiple platform devices may be placed in the same IOMMU group because
+> they cannot be isolated from each other. These devices must either be
+> entirely under kernel control or userspace control, never a mixture. This
+> checks and sets DMA ownership during driver binding, and release the
+> ownership during driver unbinding.
+> 
+> The device driver may set a new flag (no_kernel_api_dma) to skip calling
+> iommu_device_use_dma_api() during the binding process. For instance, the
+> userspace framework drivers (vfio etc.) which need to manually claim
+> their own dma ownership when assigning the device to userspace.
+> 
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  include/linux/platform_device.h |  1 +
+>  drivers/base/platform.c         | 20 ++++++++++++++++++++
+>  2 files changed, 21 insertions(+)
+> 
+> diff --git a/include/linux/platform_device.h b/include/linux/platform_device.h
+> index 17fde717df68..8f0eaafcef47 100644
+> --- a/include/linux/platform_device.h
+> +++ b/include/linux/platform_device.h
+> @@ -210,6 +210,7 @@ struct platform_driver {
+>  	struct device_driver driver;
+>  	const struct platform_device_id *id_table;
+>  	bool prevent_deferred_probe;
+> +	bool no_kernel_api_dma;
+>  };
+>  
+>  #define to_platform_driver(drv)	(container_of((drv), struct platform_driver, \
+> diff --git a/drivers/base/platform.c b/drivers/base/platform.c
+> index b4d36b46ab2e..d5171e44d903 100644
+> --- a/drivers/base/platform.c
+> +++ b/drivers/base/platform.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/property.h>
+>  #include <linux/kmemleak.h>
+>  #include <linux/types.h>
+> +#include <linux/iommu.h>
+>  
+>  #include "base.h"
+>  #include "power/power.h"
+> @@ -1451,9 +1452,16 @@ static void platform_shutdown(struct device *_dev)
+>  
+>  static int platform_dma_configure(struct device *dev)
+>  {
+> +	struct platform_driver *drv = to_platform_driver(dev->driver);
+>  	enum dev_dma_attr attr;
+>  	int ret = 0;
+>  
+> +	if (!drv->no_kernel_api_dma) {
+> +		ret = iommu_device_use_dma_api(dev);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	if (dev->of_node) {
+>  		ret = of_dma_configure(dev, dev->of_node, true);
+>  	} else if (has_acpi_companion(dev)) {
+> @@ -1461,9 +1469,20 @@ static int platform_dma_configure(struct device *dev)
+>  		ret = acpi_dma_configure(dev, attr);
+>  	}
+>  
+> +	if (ret && !drv->no_kernel_api_dma)
+> +		iommu_device_unuse_dma_api(dev);
 
-On Mon, Feb 14, 2022 at 8:29 AM Uwe Kleine-König
-<u.kleine-koenig@pengutronix.de> wrote:
-> On Sat, Feb 12, 2022 at 11:16:30PM +0300, Sergey Shtylyov wrote:
-> > This patch is based on the former Andy Shevchenko's patch:
-> >
-> > https://lore.kernel.org/lkml/20210331144526.19439-1-andriy.shevchenko@linux.intel.com/
-> >
-> > Currently platform_get_irq_optional() returns an error code even if IRQ
-> > resource simply has not been found.  It prevents the callers from being
-> > error code agnostic in their error handling:
-> >
-> >       ret = platform_get_irq_optional(...);
-> >       if (ret < 0 && ret != -ENXIO)
-> >               return ret; // respect deferred probe
-> >       if (ret > 0)
-> >               ...we get an IRQ...
-> >
-> > All other *_optional() APIs seem to return 0 or NULL in case an optional
-> > resource is not available.  Let's follow this good example, so that the
-> > callers would look like:
-> >
-> >       ret = platform_get_irq_optional(...);
-> >       if (ret < 0)
-> >               return ret;
-> >       if (ret > 0)
-> >               ...we get an IRQ...
-> >
-> > Reported-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> > Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->
-> While this patch is better than v1, I still don't like it for the
-> reasons discussed for v1. (i.e. 0 isn't usable as a dummy value which I
-> consider the real advantage for the other _get_optional() functions.)
+So you are now going to call this for every platform driver _unless_
+they set this flag?
 
-IMHO the real advantage is the simplified error handling, which is the
-area where most of the current bugs are. So I applaud the core change.
+And having "negative" flags is rough to parse at times.  Yes, we have
+"prevent_deferred_probe" already here, so maybe keep this in the same
+nameing scheme and use "prevent_dma_api"?
 
-Also IMHO, the dummy value handling is a red herring.  Contrary to
-optional clocks and resets, a missing optional interrupt does not
-always mean there is nothing to do: in case of polling, something
-else must definitely be done.  So even if request_irq() would accept
-a dummy interrupt zero and just do nothing, it would give the false
-impression that that is all there is to do, while an actual check
-for zero with polling code handling may still need to be present,
-thus leading to more not less bugs.
+And it would be good to document this somewhere as to what this means.
 
-> Apart from that, I think the subject is badly chosen. With "Make
-> somefunc() optional" I would expect that you introduce a Kconfig symbol
-> that results in the function not being available when disabled.
+thanks,
 
-Agreed.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+greg k-h
