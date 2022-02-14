@@ -2,254 +2,343 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A81B24B5DF4
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 23:56:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6793E4B5E7F
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 01:00:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232037AbiBNW4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 17:56:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47496 "EHLO
+        id S232294AbiBOAAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 19:00:31 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232033AbiBNW4G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 17:56:06 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CD52181A6D
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 14:55:58 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id p190-20020a4a2fc7000000b0031820de484aso21090541oop.9
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 14:55:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=spvxDtlt5+ktYj36AIdEZJqVu99chNyMvvg7tUj6aEI=;
-        b=ZxoPU7z8gw60MenkYz/71ZB8IHJtK55kzry17nNMiOoPCBbB9a9GpJmtQk2u9HzxXf
-         ttPOzToK6CQosy3TFNr8UhA7rjlORwnVoYMiEMSi1OoEBwPVAneoJTttniuFw1QDZui4
-         14lUz+fltfC6tGSZLL8QD9hr2aFjbC2CHde7IXMf68Xczu+1WE2YA6+kE/axfu/CfQEj
-         rQfI4PyMKspBhtc2tNuFE+zbTpmD36Cx37Zkha3QiGVFea07BIjEaR+dDWa56p/JanNo
-         3uFJlj9qz1ND+9frWgWXzDaR4UUJpyZQxQdiJYYKB3QZdyd14KhttSLPuhZSbG7yE5qS
-         iOeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=spvxDtlt5+ktYj36AIdEZJqVu99chNyMvvg7tUj6aEI=;
-        b=jgRXrSog08b8bkHOFY3wrqQViEm4y6+hFU3qOTri43yIff0MgnuxMKjYj0dm9nZ5W3
-         l38aC0/MvVQmhsX/O6KWFrwqWEZaHQxtU3j48r6+uLuCJzeILxQ+oGgehJtTcUF6EpL9
-         0JqtOpC2RVEbYMx4Meh/2WrYN7k+dmPs7AYEJeuCsVHi7ruXP0slnpUZQnN+qip6ONkh
-         eIr3cE4LuoKwByaIZAaXQ3XbUwZ1/LVMDc62NhnhCgPMe/oGEjNUGx2KSLUH2O8rn0tn
-         vdzn3mpflSNAmy0vNBUIlps1yu3HY38LM7pM2l35u/eoV3nGQ7h9pInL0cW2XCDVI606
-         x/Tw==
-X-Gm-Message-State: AOAM532GX4PCP7g6e5mLHwFvIiEnMzHAXnCNTQwBMeQmQ+JcJ7To/U1G
-        M3INc7bOt6ATYnVa3T9tALIIF0XqLsGAg0O2FagTLJrMLKphcA==
-X-Google-Smtp-Source: ABdhPJxxa4N11anClftEoIwDrshqyvafuilNJDSgQQlBcWlv0kKPstz9WgCkoy1RZuqUyJT5Cyk6X3FOr/zwxeUvJZ8=
-X-Received: by 2002:a4a:ddc1:: with SMTP id i1mr351889oov.96.1644879357011;
- Mon, 14 Feb 2022 14:55:57 -0800 (PST)
+        with ESMTP id S229636AbiBOAA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 19:00:29 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B9C403C6;
+        Mon, 14 Feb 2022 16:00:20 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21ENX1hJ019774;
+        Tue, 15 Feb 2022 00:00:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=J3faY/DanDPihzvBOoFhm5o0uGb8lNbKSjixyKz24a4=;
+ b=L7zjsXdU/behPiYfhjaJAek8StavL1GWqgnWXH0syp0IDMa9Y102WfcykzxTWW/zF/YH
+ C4vdUvAhAOZAy5MXbEJUwaETY7BiSuBp5DLCM3YIWrO7vEXHEQEm6DrorpORCutA+c0T
+ iPKWryhByoEqtVoeQd854InTcEdYYtw/8XGHXy97eEBJWpXazFjH1bxVqAwi47s1qudc
+ 7Kf9TlBdHw/l03N5nhfJ5C+NH9Mk7jN36E5dNpUfKQ/E0gNYWDj96XPHk5cG5B01Ec30
+ 0SIM7QxnI/qAaJdr9sJLNXOr/iypOB8IzOnbybUhnYhb/mjEgC35qerxUjk958kUFgrI BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e785tg9x7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 00:00:19 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21F00JVI028653;
+        Tue, 15 Feb 2022 00:00:19 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e785tg9wc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 00:00:19 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21ENwH1c005203;
+        Tue, 15 Feb 2022 00:00:17 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3e645jhxhj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 00:00:16 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21F00D7i27132324
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Feb 2022 00:00:13 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 81E8AA405B;
+        Tue, 15 Feb 2022 00:00:13 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E561EA4059;
+        Tue, 15 Feb 2022 00:00:12 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.2.54])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Feb 2022 00:00:12 +0000 (GMT)
+Date:   Mon, 14 Feb 2022 16:30:53 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH v4 01/10] s390/uaccess: Add copy_from/to_user_key
+ functions
+Message-ID: <20220214163053.13e71683@p-imbrenda>
+In-Reply-To: <20220211182215.2730017-2-scgl@linux.ibm.com>
+References: <20220211182215.2730017-1-scgl@linux.ibm.com>
+        <20220211182215.2730017-2-scgl@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20220117085307.93030-1-likexu@tencent.com> <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
- <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com> <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
- <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com> <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
- <7b5012d8-6ae1-7cde-a381-e82685dfed4f@linux.intel.com> <CALMp9eTOaWxQPfdwMSAn-OYAHKPLcuCyse7BpsSOM35vg5d0Jg@mail.gmail.com>
- <e06db1a5-1b67-28ac-ee4c-34ece5857b1f@linux.intel.com> <CALMp9eSjDro169JjTXyCZn=Rf3PT0uHhdNXEifiXGYQK-Zn8LA@mail.gmail.com>
- <d86ba87b-d98a-53a0-b2cd-5bf77b97b592@linux.intel.com> <CABOYuvZ9SZAWeRkrhhhpMM4XwzMzXv9A1WDpc6z8SUBquf0SFQ@mail.gmail.com>
- <6afcec02-fb44-7b72-e527-6517a94855d4@linux.intel.com> <CALMp9eQ79Cnh1aqNGLR8n5MQuHTwuf=DMjJ2cTb9uXu94GGhEA@mail.gmail.com>
- <2180ea93-5f05-b1c1-7253-e3707da29f8c@linux.intel.com> <CALMp9eQiaXtF3S0QZ=2_SWavFnv6zFHqf_zFXBrxXb9pVYh0nQ@mail.gmail.com>
- <8d9149b5-e56f-b397-1527-9f21a26ad95b@linux.intel.com>
-In-Reply-To: <8d9149b5-e56f-b397-1527-9f21a26ad95b@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 14 Feb 2022 14:55:46 -0800
-Message-ID: <CALMp9eTqNyG-ke1Aq72hn0CVXER63SgVPamzXria76PmqiZvJQ@mail.gmail.com>
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-To:     "Liang, Kan" <kan.liang@linux.intel.com>
-Cc:     David Dunn <daviddunn@google.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Stephane Eranian <eranian@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BwgqTVATgoIpAz9oIa5f680-uma8_m3g
+X-Proofpoint-ORIG-GUID: B4tDmq-WKFrCwUYYxoj8b0-6O0b6sOi3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ malwarescore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ impostorscore=0 priorityscore=1501 bulkscore=0 suspectscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202140134
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 1:55 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
->
->
->
-> On 2/12/2022 6:31 PM, Jim Mattson wrote:
-> > On Fri, Feb 11, 2022 at 1:47 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
-> >>
-> >>
-> >>
-> >> On 2/11/2022 1:08 PM, Jim Mattson wrote:
-> >>> On Fri, Feb 11, 2022 at 6:11 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
-> >>>>
-> >>>>
-> >>>>
-> >>>> On 2/10/2022 2:55 PM, David Dunn wrote:
-> >>>>> Kan,
-> >>>>>
-> >>>>> On Thu, Feb 10, 2022 at 11:46 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
-> >>>>>
-> >>>>>> No, we don't, at least for Linux. Because the host own everything. It
-> >>>>>> doesn't need the MSR to tell which one is in use. We track it in an SW way.
-> >>>>>>
-> >>>>>> For the new request from the guest to own a counter, I guess maybe it is
-> >>>>>> worth implementing it. But yes, the existing/legacy guest never check
-> >>>>>> the MSR.
-> >>>>>
-> >>>>> This is the expectation of all software that uses the PMU in every
-> >>>>> guest.  It isn't just the Linux perf system.
-> >>>>>
-> >>>>> The KVM vPMU model we have today results in the PMU utilizing software
-> >>>>> simply not working properly in a guest.  The only case that can
-> >>>>> consistently "work" today is not giving the guest a PMU at all.
-> >>>>>
-> >>>>> And that's why you are hearing requests to gift the entire PMU to the
-> >>>>> guest while it is running. All existing PMU software knows about the
-> >>>>> various constraints on exactly how each MSR must be used to get sane
-> >>>>> data.  And by gifting the entire PMU it allows that software to work
-> >>>>> properly.  But that has to be controlled by policy at host level such
-> >>>>> that the owner of the host knows that they are not going to have PMU
-> >>>>> visibility into guests that have control of PMU.
-> >>>>>
-> >>>>
-> >>>> I think here is how a guest event works today with KVM and perf subsystem.
-> >>>>        - Guest create an event A
-> >>>>        - The guest kernel assigns a guest counter M to event A, and config
-> >>>> the related MSRs of the guest counter M.
-> >>>>        - KVM intercepts the MSR access and create a host event B. (The
-> >>>> host event B is based on the settings of the guest counter M. As I said,
-> >>>> at least for Linux, some SW config impacts the counter assignment. KVM
-> >>>> never knows it. Event B can only be a similar event to A.)
-> >>>>        - Linux perf subsystem assigns a physical counter N to a host event
-> >>>> B according to event B's constraint. (N may not be the same as M,
-> >>>> because A and B may have different event constraints)
-> >>>>
-> >>>> As you can see, even the entire PMU is given to the guest, we still
-> >>>> cannot guarantee that the physical counter M can be assigned to the
-> >>>> guest event A.
-> >>>
-> >>> All we know about the guest is that it has programmed virtual counter
-> >>> M. It seems obvious to me that we can satisfy that request by giving
-> >>> it physical counter M. If, for whatever reason, we give it physical
-> >>> counter N isntead, and M and N are not completely fungible, then we
-> >>> have failed.
-> >>>
-> >>>> How to fix it? The only thing I can imagine is "passthrough". Let KVM
-> >>>> directly assign the counter M to guest. So, to me, this policy sounds
-> >>>> like let KVM replace the perf to control the whole PMU resources, and we
-> >>>> will handover them to our guest then. Is it what we want?
-> >>>
-> >>> We want PMU virtualization to work. There are at least two ways of doing that:
-> >>> 1) Cede the entire PMU to the guest while it's running.
-> >>
-> >> So the guest will take over the control of the entire PMUs while it's
-> >> running. I know someone wants to do system-wide monitoring. This case
-> >> will be failed.
-> >
-> > We have system-wide monitoring for fleet efficiency, but since there's
-> > nothing we can do about the efficiency of the guest (and those cycles
-> > are paid for by the customer, anyway), I don't think our efficiency
-> > experts lose any important insights if guest cycles are a blind spot.
->
-> Others, e.g., NMI watchdog, also occupy a performance counter. I think
-> the NMI watchdog is enabled by default at least for the current Linux
-> kernel. You have to disable all such cases in the host when the guest is
-> running.
+On Fri, 11 Feb 2022 19:22:06 +0100
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-It doesn't actually make any sense to run the NMI watchdog while in
-the guest, does it?
+> Add copy_from/to_user_key functions, which perform storage key checking.
+> These functions can be used by KVM for emulating instructions that need
+> to be key checked.
+> These functions differ from their non _key counterparts in
+> include/linux/uaccess.h only in the additional key argument and must be
+> kept in sync with those.
+> 
+> Since the existing uaccess implementation on s390 makes use of move
+> instructions that support having an additional access key supplied,
+> we can implement raw_copy_from/to_user_key by enhancing the
+> existing implementation.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Acked-by: Heiko Carstens <hca@linux.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
-> >
-> >> I'm not sure whether you can fully trust the guest. If malware runs in
-> >> the guest, I don't know whether it will harm the entire system. I'm not
-> >> a security expert, but it sounds dangerous.
-> >> Hope the administrators know what they are doing when choosing this policy.
-> >
-> > Virtual machines are inherently dangerous. :-)
-> >
-> > Despite our concerns about PMU side-channels, Intel is constantly
-> > reminding us that no such attacks are yet known. We would probably
-> > restrict some events to guests that occupy an entire socket, just to
-> > be safe.
-> >
-> > Note that on the flip side, TDX and SEV are all about catering to
-> > guests that don't trust the host. Those customers probably don't want
-> > the host to be able to use the PMU to snoop on guest activity.
-> >
-> >>> 2) Introduce a new "ultimate" priority level in the host perf
-> >>> subsystem. Only KVM can request events at the ultimate priority, and
-> >>> these requests supersede any other requests.
-> >>
-> >> The "ultimate" priority level doesn't help in the above case. The
-> >> counter M may not bring the precise which guest requests. I remember you
-> >> called it "broken".
-> >
-> > Ideally, ultimate priority also comes with the ability to request
-> > specific counters.
-> >
-> >> KVM can fails the case, but KVM cannot notify the guest. The guest still
-> >> see wrong result.
-> >>
-> >>>
-> >>> Other solutions are welcome.
-> >>
-> >> I don't have a perfect solution to achieve all your requirements. Based
-> >> on my understanding, the guest has to be compromised by either
-> >> tolerating some errors or dropping some features (e.g., some special
-> >> events). With that, we may consider the above "ultimate" priority level
-> >> policy. The default policy would be the same as the current
-> >> implementation, where the host perf treats all the users, including the
-> >> guest, equally. The administrators can set the "ultimate" priority level
-> >> policy, which may let the KVM/guest pin/own some regular counters via
-> >> perf subsystem. That's just my personal opinion for your reference.
-> >
-> > I disagree. The guest does not have to be compromised. For a proof of
-> > concept, see VMware ESXi. Probably Microsoft Hyper-V as well, though I
-> > haven't checked.
->
-> As far as I know, VMware ESXi has its own VMkernel, which can owns the
-> entire HW PMUs.  The KVM is part of the Linux kernel. The HW PMUs should
-> be shared among components/users. I think the cases are different.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Architecturally, ESXi is not very different from Linux. The VMkernel
-is a posix-compliant kernel, and VMware's "vmm" is comparable to kvm.
+> ---
+>  arch/s390/include/asm/uaccess.h | 22 +++++++++
+>  arch/s390/lib/uaccess.c         | 81 +++++++++++++++++++++++++--------
+>  2 files changed, 85 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/uaccess.h b/arch/s390/include/asm/uaccess.h
+> index d74e26b48604..ba1bcb91af95 100644
+> --- a/arch/s390/include/asm/uaccess.h
+> +++ b/arch/s390/include/asm/uaccess.h
+> @@ -44,6 +44,28 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n);
+>  #define INLINE_COPY_TO_USER
+>  #endif
+>  
+> +unsigned long __must_check
+> +_copy_from_user_key(void *to, const void __user *from, unsigned long n, unsigned long key);
+> +
+> +static __always_inline unsigned long __must_check
+> +copy_from_user_key(void *to, const void __user *from, unsigned long n, unsigned long key)
+> +{
+> +	if (likely(check_copy_size(to, n, false)))
+> +		n = _copy_from_user_key(to, from, n, key);
+> +	return n;
+> +}
+> +
+> +unsigned long __must_check
+> +_copy_to_user_key(void __user *to, const void *from, unsigned long n, unsigned long key);
+> +
+> +static __always_inline unsigned long __must_check
+> +copy_to_user_key(void __user *to, const void *from, unsigned long n, unsigned long key)
+> +{
+> +	if (likely(check_copy_size(from, n, true)))
+> +		n = _copy_to_user_key(to, from, n, key);
+> +	return n;
+> +}
+> +
+>  int __put_user_bad(void) __attribute__((noreturn));
+>  int __get_user_bad(void) __attribute__((noreturn));
+>  
+> diff --git a/arch/s390/lib/uaccess.c b/arch/s390/lib/uaccess.c
+> index 8a5d21461889..b709239feb5d 100644
+> --- a/arch/s390/lib/uaccess.c
+> +++ b/arch/s390/lib/uaccess.c
+> @@ -59,11 +59,13 @@ static inline int copy_with_mvcos(void)
+>  #endif
+>  
+>  static inline unsigned long copy_from_user_mvcos(void *x, const void __user *ptr,
+> -						 unsigned long size)
+> +						 unsigned long size, unsigned long key)
+>  {
+>  	unsigned long tmp1, tmp2;
+>  	union oac spec = {
+> +		.oac2.key = key,
+>  		.oac2.as = PSW_BITS_AS_SECONDARY,
+> +		.oac2.k = 1,
+>  		.oac2.a = 1,
+>  	};
+>  
+> @@ -94,19 +96,19 @@ static inline unsigned long copy_from_user_mvcos(void *x, const void __user *ptr
+>  }
+>  
+>  static inline unsigned long copy_from_user_mvcp(void *x, const void __user *ptr,
+> -						unsigned long size)
+> +						unsigned long size, unsigned long key)
+>  {
+>  	unsigned long tmp1, tmp2;
+>  
+>  	tmp1 = -256UL;
+>  	asm volatile(
+>  		"   sacf  0\n"
+> -		"0: mvcp  0(%0,%2),0(%1),%3\n"
+> +		"0: mvcp  0(%0,%2),0(%1),%[key]\n"
+>  		"7: jz    5f\n"
+>  		"1: algr  %0,%3\n"
+>  		"   la    %1,256(%1)\n"
+>  		"   la    %2,256(%2)\n"
+> -		"2: mvcp  0(%0,%2),0(%1),%3\n"
+> +		"2: mvcp  0(%0,%2),0(%1),%[key]\n"
+>  		"8: jnz   1b\n"
+>  		"   j     5f\n"
+>  		"3: la    %4,255(%1)\n"	/* %4 = ptr + 255 */
+> @@ -115,7 +117,7 @@ static inline unsigned long copy_from_user_mvcp(void *x, const void __user *ptr,
+>  		"   slgr  %4,%1\n"
+>  		"   clgr  %0,%4\n"	/* copy crosses next page boundary? */
+>  		"   jnh   6f\n"
+> -		"4: mvcp  0(%4,%2),0(%1),%3\n"
+> +		"4: mvcp  0(%4,%2),0(%1),%[key]\n"
+>  		"9: slgr  %0,%4\n"
+>  		"   j     6f\n"
+>  		"5: slgr  %0,%0\n"
+> @@ -123,24 +125,49 @@ static inline unsigned long copy_from_user_mvcp(void *x, const void __user *ptr,
+>  		EX_TABLE(0b,3b) EX_TABLE(2b,3b) EX_TABLE(4b,6b)
+>  		EX_TABLE(7b,3b) EX_TABLE(8b,3b) EX_TABLE(9b,6b)
+>  		: "+a" (size), "+a" (ptr), "+a" (x), "+a" (tmp1), "=a" (tmp2)
+> -		: : "cc", "memory");
+> +		: [key] "d" (key << 4)
+> +		: "cc", "memory");
+>  	return size;
+>  }
+>  
+> -unsigned long raw_copy_from_user(void *to, const void __user *from, unsigned long n)
+> +static unsigned long raw_copy_from_user_key(void *to, const void __user *from,
+> +					    unsigned long n, unsigned long key)
+>  {
+>  	if (copy_with_mvcos())
+> -		return copy_from_user_mvcos(to, from, n);
+> -	return copy_from_user_mvcp(to, from, n);
+> +		return copy_from_user_mvcos(to, from, n, key);
+> +	return copy_from_user_mvcp(to, from, n, key);
+> +}
+> +
+> +unsigned long raw_copy_from_user(void *to, const void __user *from, unsigned long n)
+> +{
+> +	return raw_copy_from_user_key(to, from, n, 0);
+>  }
+>  EXPORT_SYMBOL(raw_copy_from_user);
+>  
+> +unsigned long _copy_from_user_key(void *to, const void __user *from,
+> +				  unsigned long n, unsigned long key)
+> +{
+> +	unsigned long res = n;
+> +
+> +	might_fault();
+> +	if (!should_fail_usercopy()) {
+> +		instrument_copy_from_user(to, from, n);
+> +		res = raw_copy_from_user_key(to, from, n, key);
+> +	}
+> +	if (unlikely(res))
+> +		memset(to + (n - res), 0, res);
+> +	return res;
+> +}
+> +EXPORT_SYMBOL(_copy_from_user_key);
+> +
+>  static inline unsigned long copy_to_user_mvcos(void __user *ptr, const void *x,
+> -					       unsigned long size)
+> +					       unsigned long size, unsigned long key)
+>  {
+>  	unsigned long tmp1, tmp2;
+>  	union oac spec = {
+> +		.oac1.key = key,
+>  		.oac1.as = PSW_BITS_AS_SECONDARY,
+> +		.oac1.k = 1,
+>  		.oac1.a = 1,
+>  	};
+>  
+> @@ -171,19 +198,19 @@ static inline unsigned long copy_to_user_mvcos(void __user *ptr, const void *x,
+>  }
+>  
+>  static inline unsigned long copy_to_user_mvcs(void __user *ptr, const void *x,
+> -					      unsigned long size)
+> +					      unsigned long size, unsigned long key)
+>  {
+>  	unsigned long tmp1, tmp2;
+>  
+>  	tmp1 = -256UL;
+>  	asm volatile(
+>  		"   sacf  0\n"
+> -		"0: mvcs  0(%0,%1),0(%2),%3\n"
+> +		"0: mvcs  0(%0,%1),0(%2),%[key]\n"
+>  		"7: jz    5f\n"
+>  		"1: algr  %0,%3\n"
+>  		"   la    %1,256(%1)\n"
+>  		"   la    %2,256(%2)\n"
+> -		"2: mvcs  0(%0,%1),0(%2),%3\n"
+> +		"2: mvcs  0(%0,%1),0(%2),%[key]\n"
+>  		"8: jnz   1b\n"
+>  		"   j     5f\n"
+>  		"3: la    %4,255(%1)\n" /* %4 = ptr + 255 */
+> @@ -192,7 +219,7 @@ static inline unsigned long copy_to_user_mvcs(void __user *ptr, const void *x,
+>  		"   slgr  %4,%1\n"
+>  		"   clgr  %0,%4\n"	/* copy crosses next page boundary? */
+>  		"   jnh   6f\n"
+> -		"4: mvcs  0(%4,%1),0(%2),%3\n"
+> +		"4: mvcs  0(%4,%1),0(%2),%[key]\n"
+>  		"9: slgr  %0,%4\n"
+>  		"   j     6f\n"
+>  		"5: slgr  %0,%0\n"
+> @@ -200,18 +227,36 @@ static inline unsigned long copy_to_user_mvcs(void __user *ptr, const void *x,
+>  		EX_TABLE(0b,3b) EX_TABLE(2b,3b) EX_TABLE(4b,6b)
+>  		EX_TABLE(7b,3b) EX_TABLE(8b,3b) EX_TABLE(9b,6b)
+>  		: "+a" (size), "+a" (ptr), "+a" (x), "+a" (tmp1), "=a" (tmp2)
+> -		: : "cc", "memory");
+> +		: [key] "d" (key << 4)
+> +		: "cc", "memory");
+>  	return size;
+>  }
+>  
+> -unsigned long raw_copy_to_user(void __user *to, const void *from, unsigned long n)
+> +static unsigned long raw_copy_to_user_key(void __user *to, const void *from,
+> +					  unsigned long n, unsigned long key)
+>  {
+>  	if (copy_with_mvcos())
+> -		return copy_to_user_mvcos(to, from, n);
+> -	return copy_to_user_mvcs(to, from, n);
+> +		return copy_to_user_mvcos(to, from, n, key);
+> +	return copy_to_user_mvcs(to, from, n, key);
+> +}
+> +
+> +unsigned long raw_copy_to_user(void __user *to, const void *from, unsigned long n)
+> +{
+> +	return raw_copy_to_user_key(to, from, n, 0);
+>  }
+>  EXPORT_SYMBOL(raw_copy_to_user);
+>  
+> +unsigned long _copy_to_user_key(void __user *to, const void *from,
+> +				unsigned long n, unsigned long key)
+> +{
+> +	might_fault();
+> +	if (should_fail_usercopy())
+> +		return n;
+> +	instrument_copy_to_user(to, from, n);
+> +	return raw_copy_to_user_key(to, from, n, key);
+> +}
+> +EXPORT_SYMBOL(_copy_to_user_key);
+> +
+>  static inline unsigned long clear_user_mvcos(void __user *to, unsigned long size)
+>  {
+>  	unsigned long tmp1, tmp2;
 
-> Also, from what I searched on the VMware website, they still encounter
-> the case that a guest VM may not get a performance monitoring counter.
-> It looks like their solution is to let guest OS check the availability
-> of the counter, which is similar to the solution I mentioned (Use
-> GLOBAL_INUSE MSR).
->
-> "If an ESXi host's BIOS uses a performance counter or if Fault Tolerance
-> is enabled, some virtual performance counters might not be available for
-> the virtual machine to use."
-
-I'm perfectly happy to give up PMCs on Linux under those same conditions.
-
-> https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.vm_admin.doc/GUID-F920A3C7-3B42-4E78-8EA7-961E49AF479D.html
->
-> "In general, if a physical CPU PMC is in use, the corresponding virtual
-> CPU PMC is not functional and is unavailable for use by the guest. Guest
-> OS software detects unavailable general purpose PMCs by checking for a
-> non-zero event select MSR value when a virtual machine powers on."
->
-> https://kb.vmware.com/s/article/2030221
->
-Linux, at least, doesn't do that. Maybe Windows does.
-
-> Thanks,
-> Kan
->
