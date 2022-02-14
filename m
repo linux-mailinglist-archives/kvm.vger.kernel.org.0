@@ -2,99 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA4584B5C36
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 22:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 279674B5CDE
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 22:34:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbiBNVEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 16:04:44 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48434 "EHLO
+        id S231435AbiBNVcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 16:32:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbiBNVEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 16:04:43 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF5F102424;
-        Mon, 14 Feb 2022 13:04:31 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21EImFUe028128;
-        Mon, 14 Feb 2022 20:35:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=mXYKnZfSJ5LwXHDMeSusxqhwm2d5zqHQa8VU39II2RQ=;
- b=aPwd+tSDXQsh6ZD3uFnRUW7e7qzqrkpChRCDfYhreZ4p/w6Uzc8h0RadJBecjwHMOuWL
- Ul5FXXmYzkJjgNXg72RYDXLdh1PA5qCAjBsTOrg/9r1m0NV+vC1fUQ/gv8A1CL05qHtD
- sC/nrA05ILoHUaBp777wrYF+sKM+3WfQm3FjDWqqSegaBUV+s/iY5XJ5jzsWNWx+26KT
- wxPhGJmbrkJ6bQSMvVlZsaL/ozoJaPxPPdf092DYdZpCRvlVKtkbR/t60U0FdmiH5u4k
- f5N/KOI5Qqu7eeIlk9ut7+OJEXcwxbqZKFmgHAssSQK/FYErStbFi70xscNJ+FBTucS3 kA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e779vvytu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 20:35:46 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21EKVaKK001437;
-        Mon, 14 Feb 2022 20:35:46 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e779vvytc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 20:35:46 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21EKI01S006767;
-        Mon, 14 Feb 2022 20:35:45 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02wdc.us.ibm.com with ESMTP id 3e64ha89tf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 20:35:45 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21EKZifq32047502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Feb 2022 20:35:44 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62A30BE058;
-        Mon, 14 Feb 2022 20:35:44 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D545BE053;
-        Mon, 14 Feb 2022 20:35:42 +0000 (GMT)
-Received: from [9.211.32.53] (unknown [9.211.32.53])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Feb 2022 20:35:42 +0000 (GMT)
-Message-ID: <34251cd7-7e07-f571-2790-cb1cd001813a@linux.ibm.com>
-Date:   Mon, 14 Feb 2022 15:35:41 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 17/30] KVM: s390: pci: enable host forwarding of
- Adapter Event Notifications
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
- <20220204211536.321475-18-mjrosato@linux.ibm.com>
- <7ecb4a93-5a41-a9e2-0a01-9eccabfa85ad@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <7ecb4a93-5a41-a9e2-0a01-9eccabfa85ad@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AsBaDGoJZj8JsE4eTjoKePt5zonErCD9
-X-Proofpoint-ORIG-GUID: q6wGkMeUsa3t7RTCpoM6oSHknnmNFNmu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
- impostorscore=0 spamscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140118
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S231266AbiBNVay (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 16:30:54 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E325F151D39
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 13:30:45 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id g19-20020a17090a579300b001b9d80f3714so253280pji.7
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 13:30:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=hXpR7noM0Gaf4lClru7xk5v15uSEtIVKl1a1cXA9M1M=;
+        b=opM0a70jMwKyYNCL/4+x4SLQVInaJjIS5wWZAnkGWH1MLUq+29JMkUmXFK2n0lixNI
+         +i6H4pkYR6kn30Pnx/JuMlka/FLU9zI649GHIjICoCXFHhxt+1AnoQwWPgw2gy6eVm2j
+         Ex7+LBWXPi92Hk7fyjGaZ5qgC7FFBLYugv41ZB/SnEz74chNWc6SozlJbjaJ2CIkz+kQ
+         b8mktDR2AjDIGXtRbPvfcp2uRkw8ktdw0ohTHFuawITSEtczKc1u9bSWXKYhOdGEwTq/
+         3PXGUO2Ym2mOqOKmrT96Jr+T4FRMLYilAYV1UtJMedqSMqnbRX0lgXHYqT4nyAVUioLL
+         EEGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=hXpR7noM0Gaf4lClru7xk5v15uSEtIVKl1a1cXA9M1M=;
+        b=q5GEgvUSFO3J8A3VnvKrmFBhGRVqVeWlw2W1sHxcW0niSRAdR7PB/NkkCHsXhoTu4p
+         U5M1Cet24XdEQ0fHGICVhfwWd67nLbNWeCi533Aa5p55gWHUdzeaoTh4T2+5D2fSpcAj
+         ke9rWLUynItbI/PuUqF0hiadd9HPe9z2nV4LF+mMbkEgveb3Cb0PtQ4O7STPNXT4sR2i
+         K5wZE9yCALsLFJTNXdu5rLkkASd1NDoYgKTWVeMMWu4eEFZji07rJNIhSdcqgy6evRrb
+         Wo3jF+t1gKpWewwwq/bBtcy+xbJjg/Yf27vQcokzNsp523Y+aX/CqYDvNxnqfw+tLn0J
+         LR3Q==
+X-Gm-Message-State: AOAM531KhRameikCCTGCP2Hg37bV9//JQotE9gc5+1Y4go5TtEgNsh9j
+        ZGxg/gfFX6GaoeeRPAvybU1kyEgmcT+SposKbm3UeJhxVO+eEp+Qxhs1Xks7dCBl9HgvIprp2Rb
+        24HAOn1mZRPrZUP0jSlhdWZBypSybafG5C9QlaQkfrg+Fk1rNQsfqIQiG1Vm8z79d1OUd
+X-Google-Smtp-Source: ABdhPJy+D656uQyI/3L91U07uspkl0qIpUo4Z7HGSV9v5/PzmJo4qsMI+BHnu8zi2sn2WdC/XABVj6fH2cpzkcwH
+X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
+ (user=aaronlewis job=sendgmr) by 2002:aa7:99c9:: with SMTP id
+ v9mr1110426pfi.8.1644874245257; Mon, 14 Feb 2022 13:30:45 -0800 (PST)
+Date:   Mon, 14 Feb 2022 21:29:51 +0000
+Message-Id: <20220214212950.1776943-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [PATCH] KVM: x86: Add KVM_CAP_ENABLE_CAP to x86
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,37 +63,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/14/22 7:59 AM, Pierre Morel wrote:
-> 
-> 
-> On 2/4/22 22:15, Matthew Rosato wrote:
-...
->> +static void aen_process_gait(u8 isc)
->> +{
->> +    bool found = false, first = true;
->> +    union zpci_sic_iib iib = {{0}};
->> +    unsigned long si, flags;
->> +
->> +    spin_lock_irqsave(&aift->gait_lock, flags);
->> +
->> +    if (!aift->gait) {
->> +        spin_unlock_irqrestore(&aift->gait_lock, flags);
->> +        return;
->> +    }
->> +
->> +    for (si = 0;;) {
->> +        /* Scan adapter summary indicator bit vector */
->> +        si = airq_iv_scan(aift->sbv, si, airq_iv_end(aift->sbv));
->> +        if (si == -1UL) {
->> +            if (first || found) {
->> +                /* Reenable interrupts. */
->> +                if (zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, isc,
->> +                              &iib))
->> +                    break;
-> 
-> I thought we agreed that the test is not useful here.
+Add the capability KVM_CAP_ENABLE_CAP to x86 so userspace can ensure
+KVM_ENABLE_CAP is available on a vcpu before using it.
 
-Oops, you are correct -- it looks like I simply failed to apply any of 
-your suggestions from that particular email, must have marked it 'done' 
-on accident -- sorry about that.  I've gone ahead and made these changes 
-already on my in-progress v4 branch.  Thanks for pointing it out.
+Fixes: 5c919412fe61 ("kvm/x86: Hyper-V synthetic interrupt controller")
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+---
+ Documentation/virt/kvm/api.rst | 2 +-
+ arch/x86/kvm/x86.c             | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index a4267104db50..3b4da6c7b25f 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1394,7 +1394,7 @@ documentation when it pops into existence).
+ -------------------
+ 
+ :Capability: KVM_CAP_ENABLE_CAP
+-:Architectures: mips, ppc, s390
++:Architectures: mips, ppc, s390, x86
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_enable_cap (in)
+ :Returns: 0 on success; -1 on error
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7131d735b1ef..757da29e98f3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4233,6 +4233,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_EXIT_ON_EMULATION_FAILURE:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_SYS_ATTRIBUTES:
++	case KVM_CAP_ENABLE_CAP:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+-- 
+2.35.1.265.g69c8d7142f-goog
+
