@@ -2,305 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C7964B50D8
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 13:57:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A78154B50F0
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 14:03:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351111AbiBNM5o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 07:57:44 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48052 "EHLO
+        id S1353797AbiBNNDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 08:03:25 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236723AbiBNM5n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 07:57:43 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDF94B873;
-        Mon, 14 Feb 2022 04:57:35 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21EBwJbv012473;
-        Mon, 14 Feb 2022 12:57:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=id2abh3WmQzXvMFNXByz0iFAdS1n1wujjaD/McLnorA=;
- b=Bl8JTG7aehpY1fmpY2NSpyDugy4MeJevlOUPVfz6cc6UQ/r7p5rFvmnB2GhPrPDZUZcm
- 0spZtl5N+FNBO5hKwV1m+zCNTU5j8i38ZJvFOq2FCeFb92lV4DjLliFiGuMopsbJT+/J
- tpElngGtExQUE4yPxVTVjFaU5QjQtAAWBydRpXzJAwcKOhq9/wF01qEGTL7aRLCj72Gy
- UTB+f76hblHedddp3kCL7ACtfshk2huv5hWBFaX6NCj9pkYXMDVhQSxgoaw59D0pDBF+
- aOwu6r6UjHCtDJnSt0td9BGSiNwyluyMB8LeKNae2AXpz2oqOsclZo5/EQTWCDud8L+y mQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7c4dwpnw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 12:57:34 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21ECT2aO035399;
-        Mon, 14 Feb 2022 12:57:33 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7c4dwpnb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 12:57:33 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21ECu737024641;
-        Mon, 14 Feb 2022 12:57:31 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3e64h9nd45-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 12:57:31 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21ECvQIB40567072
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Feb 2022 12:57:26 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5BCAA4054;
-        Mon, 14 Feb 2022 12:57:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07499A405C;
-        Mon, 14 Feb 2022 12:57:25 +0000 (GMT)
-Received: from [9.171.42.254] (unknown [9.171.42.254])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Feb 2022 12:57:24 +0000 (GMT)
-Message-ID: <7ecb4a93-5a41-a9e2-0a01-9eccabfa85ad@linux.ibm.com>
-Date:   Mon, 14 Feb 2022 13:59:37 +0100
+        with ESMTP id S1349874AbiBNNDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 08:03:24 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C9454D609;
+        Mon, 14 Feb 2022 05:03:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dwNbZIWdbdN3vtZuI1zJEWIJM/UtuJSmdhElUHw38/INdTpQhzO+GNR/gnFSzzW9iJ7lMomowvfTlU84Yz4wy+798CBANLp5+zxBs9rWrOwk0XXCMVAMOtwOf8vvE/rLzKdVcQEU8MuKkzIV+p1rSHcq75q5fkiFD1T62ilCkAOr7Yazekw77SGu77WTpmjh0eywVpo0kCiTHd42oyrfSxBB6f867huhPKe8U+IXT7ra3zzOjiRrF7BI8Z7KMdzZvm/preKSiAR5sTJjEBt3W/QDUIRrWeFkYZNi1TAf5H99Wfi/Mzx0rXT883w6OX8+3JFFi0DKVztYorCmqHJKdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s10pw3Q0IJYajsmJnBuOXdvlhULZIGQsbnb9tziWXNw=;
+ b=GGQJB8KtUQ8f0RCxT6dDawlGd2fI27jWkFNluUTaHwmOLiUeTdlFwvjwQP1YlCyw+sAgfczQC6xR0S3tt40ymTyZ4aZR/evLB9lgX5VBGsoPOdcUT416A63lqG0PlIunR4tIBM8MPc23z+Rjc8feSyoykfVHvNXvjXvkJfYlgusNQpfVuKqVzE1BAIM1naBeB+Z2KGNsRpMB6WBcFBDQwJkeeeD+ewbWHPRMv2iLGcQpwtDsaXcDB1A9/wMDWeve9D+5VB9/OIj2b48+v944MOaD6+dplEczISo04ydLyJi/ZnLYWwV7DgeoiTFZFiakfVCYI0dyj8hrSUe2UNtv1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s10pw3Q0IJYajsmJnBuOXdvlhULZIGQsbnb9tziWXNw=;
+ b=IBtJGLqgbKlmjEq9LIC9W0nrcZwjd9rm7KcFP77lx06ja9qvPZM73iNIQH3uQFZIlSFk8gax/46fZcFop2R1jtABxBIWc8TXu7zjrrCdI05hNpuwx8vawBxr8sKHQgrPV0aVtgXm9/YSXX+vWL2W0Z/oLIkenCTc/OTooMRodyYeW37GopirogJE2nj8IWoHccwVE5dipkctje2VLQGRtQVHKFGFfyDoW7owPX9RYkKfm2MVyYIOLAHPhbPR06bmANOUP7kHilBqGLSfr+XuGfqHSi9cfJqlsTAbTK0LbHJ2Yaehyzzx10jJrgX4bax7RYfaw4i5EwMPA0OKpkVbyg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MWHPR1201MB0176.namprd12.prod.outlook.com (2603:10b6:301:59::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.17; Mon, 14 Feb
+ 2022 13:03:14 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.019; Mon, 14 Feb 2022
+ 13:03:14 +0000
+Date:   Mon, 14 Feb 2022 09:03:13 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Will Deacon <will@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for
+ multi-device groups
+Message-ID: <20220214130313.GV4160@nvidia.com>
+References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
+ <20220106022053.2406748-4-baolu.lu@linux.intel.com>
+ <Ygo/eCRFnraY01WA@8bytes.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ygo/eCRFnraY01WA@8bytes.org>
+X-ClientProxiedBy: BL0PR05CA0026.namprd05.prod.outlook.com
+ (2603:10b6:208:91::36) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v3 17/30] KVM: s390: pci: enable host forwarding of
- Adapter Event Notifications
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
- <20220204211536.321475-18-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20220204211536.321475-18-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uB7gIWlhauDnt5kyHZjhgV0hYTjlvEx0
-X-Proofpoint-ORIG-GUID: Vj0sal7BBnc96eMnWyH2mY3fkc5Wd6qn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-14_05,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- adultscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
- suspectscore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3b50d104-5963-4828-7220-08d9efba5c8d
+X-MS-TrafficTypeDiagnostic: MWHPR1201MB0176:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR1201MB0176D2AF00154CA6A7C0A641C2339@MWHPR1201MB0176.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZhvP8dPL/Pk0UHHeP79p6Cca0eWEBi8ajZ+CjLpiacw0zar3eNlmJRVEkzlSiepr0/nmZ4oQyuVutpt6OqGLRuN1Z0pbSm371hUECxUaq8RWuFRt/4/RR90yVxOlsVv2Lvo/bqd/u1I5/SiCMWT4q1Bjj2lQ3IBj1KxpPOaJTPEmvL4vygR41S2kIArUO21eAwFkO3ptPFdfNx3M7jlg76oFaYbY+taqSl8hlXFsBFJ32c/4ZanwYkhWCrwLE2GJsN8+D0DfAh7RAU005XJjjJS4C1SMMEcq69wJkWsxfmNl5zLotywi8B2MlfTV8SC24FnEIe8cTlEgJRnWo7E42gpdMyz0DQKmDAGLuhbHHranpRAy0+GAc+oP63TEkChTgQFzNpFwHQ9mKeXgLury0/SQqaqXp+CGkhE8BdoLrdc+mMpkjN1DSIvevsbHQubKFy0girT0xjL1ZNTmYeMAjuMvM6TrnhyM/B81Kjq8GYG1CjoyWVxG/NznUh1nZjY7W8CH7hMrRbSgrD3X3yCA0cuenyUyvu1uDVGP30If0Ou1D+p94EhcVPAZjnOvxRdj6p30gAmkpFJU94JfcWwNIYG3QZHy/0RHQZ36u1rsdR8bGCNoiQngqyv/96n+845ZEheTpBCazLtuq/5cfqByFA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(36756003)(66946007)(316002)(38100700002)(2616005)(6486002)(66556008)(66476007)(4326008)(6916009)(33656002)(186003)(1076003)(26005)(7416002)(86362001)(6512007)(2906002)(54906003)(508600001)(83380400001)(5660300002)(8936002)(6506007)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gjn2Fuanha/kowFyaDapXzkvWlR2Oh74FKgb4jdsVqrkiQ1/EqMalkZKArKX?=
+ =?us-ascii?Q?1Ikxwc4cAPHq2O4tbbtG+66ih21pUobwOYf2i6p0VdK5uPPHlLVcH1D6T5Yb?=
+ =?us-ascii?Q?XgnNwKKybnu5Ki6Y5NReY1H/z+6gOzsAAUeeYGzo9pA/kYw+hq6e7iUxQ/yo?=
+ =?us-ascii?Q?TxlwZsx9UdtIC7p37ImWJigAU8SQnM8ca58Wcf/S2axHQxVyrEykcz6y2sWD?=
+ =?us-ascii?Q?VvsFu5uTbJ0LjFS+auiiQZqlHdVj/apaMJBSTLaDRpACf/vohfawW/cYIihc?=
+ =?us-ascii?Q?X75F7s/+v0WTE8b++e2GU9VcaNxHN4IAOfXzCbonTl7G8B4ckHCHaa3e755e?=
+ =?us-ascii?Q?g78gec4UxvyWRrttnSpoFTdHcfgBY/+ZIUTEXjRcC6ZAym1UqocIbtQdWoU9?=
+ =?us-ascii?Q?nqQy+rRdLIepSoMNq4gV5eophcfTQnw3m92o/91A2y5YwRsmR1difIkvtf3b?=
+ =?us-ascii?Q?PGYWaF6YSyOcoUeBHMmsPooEoN98KVt6pAuR32pNbQHxyAjRZL3tc6X+LilF?=
+ =?us-ascii?Q?A5kFIe76684SLuIxPjTan/lrsMfOJ6I/0z3EGcLGTrvj87NEr0r70/GlBaFd?=
+ =?us-ascii?Q?ZZyu/dZQj9rZ2hqvpIPp56ep38iAXC/nzq8aKiYhxyRQWRR9ZvnQn0jKpuK3?=
+ =?us-ascii?Q?izx1axuuxvECUPIbDy2mvqLTl1qnBC2M5VTGs5dCkAlqxuXpp2GA6CJ/OkDH?=
+ =?us-ascii?Q?tVXealtWZs3B51c7cCbiwMVoFcVcXSE1TvJFPT6MkrYkdYg9Z1CB2NlqQ7VG?=
+ =?us-ascii?Q?2weBVWfa9iIXy5Iy7lDZtxdoxL+qjSmQrNVNn+wBLaoE1eFZ0wsCykNNWTPD?=
+ =?us-ascii?Q?a2LaGD0yYzEf1hGCoZoxsyVcdGyHbJSnMWZoZyrkw3N36MXfHG5O/iMjwvDh?=
+ =?us-ascii?Q?Lqd8jRGWG4Y4KQMRw3gQZY/9RA0k/00d7OzV6P5GB0Ik+53pYzRP/4juPDJW?=
+ =?us-ascii?Q?Q1k55aUGyhVmWyfcOB/UgzUBjNNgmeW9HLsAc+OwcHKisVnJPSzCxfmBpcop?=
+ =?us-ascii?Q?IH9LQYii9GDte7CHSpQoKRzPCLShQPvA7Fo4HnaH5velh7Iw0sLTai3yfpSP?=
+ =?us-ascii?Q?+O1Cv0oA7eSh4+3JFAKnMPDRx3CGWoiQqvx910H+r2ra8KTYpOdsBqQ5qfnb?=
+ =?us-ascii?Q?mA9Ql/M/W5E43Ed/8Npm+sM8/jeSC9Sy/3nIu40mIrI0egbjw5EPc36+bFOI?=
+ =?us-ascii?Q?FueMt936fVFrwzHdh0F1oD4zntzy0c6mvjjv2htD1QSfobyCTCc8cmgVqAMP?=
+ =?us-ascii?Q?Mr6kDxezhcdBiSSL5A33F5LAgbskWSH2KYdzmev8LVi1qJgpFXFDph0sO76p?=
+ =?us-ascii?Q?tQNfg16MHqCuFqU+SAjHQ53kmRkQXW8NbrR/GVGhN8lVfhex+cwPQMeBGGiY?=
+ =?us-ascii?Q?ngkejyvnslESjbdw9XO/txph844MNK3Hx3xxCAGMzkwNtG/F45/skMCGgMyo?=
+ =?us-ascii?Q?l9izFV5kTJqLVpUwWxukQECsuAvCr5tJWMyQe390tKJbZdKHBAVLGVN9Lwa/?=
+ =?us-ascii?Q?iUB87ZmeG+l15bRi1ONK5b3IwRjWnn3RwmSLZx3n+8txaAm4kWqLZb/g4cqP?=
+ =?us-ascii?Q?WMqPFD1AavpjL9i7ye0=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b50d104-5963-4828-7220-08d9efba5c8d
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2022 13:03:14.7708
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 76+iU8LkpLRhe6gkXH0Kx1LeSMLIgEuiXmbuyE3KOh58YGIPRtBU34YkFf1RX2rm
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0176
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 14, 2022 at 12:39:36PM +0100, Joerg Roedel wrote:
 
+> This extends iommu_attach_device() to behave as iommu_attach_group(),
+> changing the domain for the whole group. 
 
-On 2/4/22 22:15, Matthew Rosato wrote:
-> In cases where interrupts are not forwarded to the guest via firmware,
-> KVM is responsible for ensuring delivery.  When an interrupt presents
-> with the forwarding bit, we must process the forwarding tables until
-> all interrupts are delivered.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_host.h |  1 +
->   arch/s390/include/asm/tpi.h      | 13 ++++++
->   arch/s390/kvm/interrupt.c        | 77 +++++++++++++++++++++++++++++++-
->   arch/s390/kvm/kvm-s390.c         |  3 +-
->   arch/s390/kvm/pci.h              | 10 +++++
->   5 files changed, 102 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index a22c9266ea05..b468d3a2215e 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -757,6 +757,7 @@ struct kvm_vm_stat {
->   	u64 inject_pfault_done;
->   	u64 inject_service_signal;
->   	u64 inject_virtio;
-> +	u64 aen_forward;
->   };
->   
->   struct kvm_arch_memory_slot {
-> diff --git a/arch/s390/include/asm/tpi.h b/arch/s390/include/asm/tpi.h
-> index 1ac538b8cbf5..f76e5fdff23a 100644
-> --- a/arch/s390/include/asm/tpi.h
-> +++ b/arch/s390/include/asm/tpi.h
-> @@ -19,6 +19,19 @@ struct tpi_info {
->   	u32 :12;
->   } __packed __aligned(4);
->   
-> +/* I/O-Interruption Code as stored by TPI for an Adapter I/O */
-> +struct tpi_adapter_info {
-> +	u32 aism:8;
-> +	u32 :22;
-> +	u32 error:1;
-> +	u32 forward:1;
-> +	u32 reserved;
-> +	u32 adapter_IO:1;
-> +	u32 directed_irq:1;
-> +	u32 isc:3;
-> +	u32 :27;
-> +} __packed __aligned(4);
-> +
->   #endif /* __ASSEMBLY__ */
->   
->   #endif /* _ASM_S390_TPI_H */
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 5e638f7c86f8..74a549d3d1e4 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -3271,11 +3271,86 @@ int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc)
->   }
->   EXPORT_SYMBOL_GPL(kvm_s390_gisc_unregister);
->   
-> +static void aen_host_forward(unsigned long si)
-> +{
-> +	struct kvm_s390_gisa_interrupt *gi;
-> +	struct zpci_gaite *gaite;
-> +	struct kvm *kvm;
-> +
-> +	gaite = (struct zpci_gaite *)aift->gait +
-> +		(si * sizeof(struct zpci_gaite));
-> +	if (gaite->count == 0)
-> +		return;
-> +	if (gaite->aisb != 0)
-> +		set_bit_inv(gaite->aisbo, (unsigned long *)gaite->aisb);
-> +
-> +	kvm = kvm_s390_pci_si_to_kvm(aift, si);
-> +	if (kvm == 0)
-> +		return;
-> +	gi = &kvm->arch.gisa_int;
-> +
-> +	if (!(gi->origin->g1.simm & AIS_MODE_MASK(gaite->gisc)) ||
-> +	    !(gi->origin->g1.nimm & AIS_MODE_MASK(gaite->gisc))) {
-> +		gisa_set_ipm_gisc(gi->origin, gaite->gisc);
-> +		if (hrtimer_active(&gi->timer))
-> +			hrtimer_cancel(&gi->timer);
-> +		hrtimer_start(&gi->timer, 0, HRTIMER_MODE_REL);
-> +		kvm->stat.aen_forward++;
-> +	}
-> +}
-> +
-> +static void aen_process_gait(u8 isc)
-> +{
-> +	bool found = false, first = true;
-> +	union zpci_sic_iib iib = {{0}};
-> +	unsigned long si, flags;
-> +
-> +	spin_lock_irqsave(&aift->gait_lock, flags);
-> +
-> +	if (!aift->gait) {
-> +		spin_unlock_irqrestore(&aift->gait_lock, flags);
-> +		return;
-> +	}
-> +
-> +	for (si = 0;;) {
-> +		/* Scan adapter summary indicator bit vector */
-> +		si = airq_iv_scan(aift->sbv, si, airq_iv_end(aift->sbv));
-> +		if (si == -1UL) {
-> +			if (first || found) {
-> +				/* Reenable interrupts. */
-> +				if (zpci_set_irq_ctrl(SIC_IRQ_MODE_SINGLE, isc,
-> +						      &iib))
-> +					break;
+Of course, the only action to take is to change the domain of a
+group..
 
-I thought we agreed that the test is not useful here.
+> Wouldn't it be better to scrap the iommu_attach_device() interface
+> instead and only rely on iommu_attach_group()? This way it is clear
+> that a call changes the whole group.
 
-> +				first = found = false;
-> +			} else {
-> +				/* Interrupts on and all bits processed */
-> +				break;
-> +			}
-> +			found = false;
-> +			si = 0;
+From an API design perspective drivers should never touch groups -
+they have struct devices, they should have a clean struct device based
+API.
 
-and about a comment here.
-"rescan after re-enabling interrupts"
-would make things clear
+Groups should disappear into an internal implementation detail, not be
+so prominent in the API.
 
-> +			continue;
-> +		}
-> +		found = true;
-> +		aen_host_forward(si);
-> +	}
-> +
-> +	spin_unlock_irqrestore(&aift->gait_lock, flags);
-> +}
-> +
->   static void gib_alert_irq_handler(struct airq_struct *airq,
->   				  struct tpi_info *tpi_info)
->   {
-> +	struct tpi_adapter_info *info = (struct tpi_adapter_info *)tpi_info;
-> +
->   	inc_irq_stat(IRQIO_GAL);
-> -	process_gib_alert_list();
-> +
-> +	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV) &&
-> +	    (info->forward || info->error)) {
-> +		aen_process_gait(info->isc);
-> +		if (info->aism != 0)
-> +			process_gib_alert_list();
-> +	} else
-> +		process_gib_alert_list();
+> IIUC this work is heading towards allowing multiple domains in one group
+> as long as the group is owned by one entity.
 
-Here we need braces.
+No, it isn't. This work is only about properly arbitrating which
+single domain is attached to an entire group.
 
->   }
->   
->   static struct airq_struct gib_alert_irq = {
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index dd4f4bfb326b..24837d6050dc 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -65,7 +65,8 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
->   	STATS_DESC_COUNTER(VM, inject_float_mchk),
->   	STATS_DESC_COUNTER(VM, inject_pfault_done),
->   	STATS_DESC_COUNTER(VM, inject_service_signal),
-> -	STATS_DESC_COUNTER(VM, inject_virtio)
-> +	STATS_DESC_COUNTER(VM, inject_virtio),
-> +	STATS_DESC_COUNTER(VM, aen_forward)
->   };
->   
->   const struct kvm_stats_header kvm_vm_stats_header = {
-> diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
-> index 53e9968707c8..4d3db58beb74 100644
-> --- a/arch/s390/kvm/pci.h
-> +++ b/arch/s390/kvm/pci.h
-> @@ -12,6 +12,7 @@
->   
->   #include <linux/pci.h>
->   #include <linux/mutex.h>
-> +#include <linux/kvm_host.h>
->   #include <asm/airq.h>
->   #include <asm/kvm_pci.h>
->   
-> @@ -34,6 +35,15 @@ struct zpci_aift {
->   
->   extern struct zpci_aift *aift;
->   
-> +static inline struct kvm *kvm_s390_pci_si_to_kvm(struct zpci_aift *aift,
-> +						 unsigned long si)
-> +{
-> +	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV) || aift->kzdev == 0 ||
-> +	    aift->kzdev[si] == 0)
-> +		return 0;
-> +	return aift->kzdev[si]->kvm;
-> +};
-> +
->   int kvm_s390_pci_aen_init(u8 nisc);
->   void kvm_s390_pci_aen_exit(void);
->   
-> 
+> 	1) Introduce a concept of a sub-group (or whatever we want to
+> 	   call it), which groups devices together which must be in the
+> 	   same domain because they use the same request ID and thus
+> 	   look all the same to the IOMMU.
+>
+> 	2) Keep todays IOMMU groups to group devices together which can
+> 	   bypass the IOMMU when talking to each other, like
+> 	   multi-function devices and devices behind a no-ACS bridge.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+We've talked about all these details before and nobody has thought
+they are important enough to implement. This distinction is not the
+goal of this series.
+
+I think if someone did want to do this there is room in the API to
+allow the distinction between 1 (must share) and 2 (sharing is
+insecure). eg by checking owner and blocking mixing user/kernel. 
+
+This is another reason to stick with the device centric API as if we
+did someday want multi-domain groups then the device input is still
+the correct input and the iommu code can figure out what sub-groups or
+whatever transparently.
+
+Jason
