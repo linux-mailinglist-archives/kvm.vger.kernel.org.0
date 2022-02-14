@@ -2,123 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5DB64B50AF
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 13:52:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB5C74B50DB
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 13:58:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349561AbiBNMvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 07:51:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43622 "EHLO
+        id S1353753AbiBNM5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 07:57:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353545AbiBNMvU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 07:51:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B44294BFF9;
-        Mon, 14 Feb 2022 04:51:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5DB35B80E93;
-        Mon, 14 Feb 2022 12:51:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A28C340E9;
-        Mon, 14 Feb 2022 12:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1644843070;
-        bh=TkH843aPv2SgHccKM/nUUYpuR+MzBdCS4gHh0VUBkhw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BwvDPt7gQJU6g5Spk3nR+RG/8Vl1+tMEIbgU5LyuCNwfAryzMulCZkxVQ6J47xhDa
-         tzvuHwALsFwlgBOC9sRRtMrr35eLPMWekVRT1WGWAo1iEDaMmczITPTX0ojw3AlvpR
-         Kr2e80JxIU7D2vsrTNEKIUEcc9CPtG+T/Tfb/GZQ=
-Date:   Mon, 14 Feb 2022 13:51:06 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 07/14] PCI: Add driver dma ownership management
-Message-ID: <YgpQOmBA7QJJu+2E@kroah.com>
-References: <20220104015644.2294354-1-baolu.lu@linux.intel.com>
- <20220104015644.2294354-8-baolu.lu@linux.intel.com>
- <Ygoo/lCt/G6tWDz9@kroah.com>
- <20220214123842.GT4160@nvidia.com>
+        with ESMTP id S1353737AbiBNM5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 07:57:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23FAB4BFDF
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 04:57:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644843459;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oXbXKwNefXUMxjvIv7PZR4ufdZvetqDxpNnWNZX3Q9w=;
+        b=Cnt0Bq9sos2VKs4n7o3qVXMk5dcas0z612GkrnDAFWUoijRK9EPo5fZGOg4TXDYgjQ54p8
+        nnIDfdSLG0cL0hzXrKl0xnIMsqBOApABM8+Jw+YI9jgBzp2/Qz9zl+n21Plafu4He1KjlT
+        DOqSfr4ahfbE3l2BQ/5VnpzryZROhvQ=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-526-DsNK_9QFOSmwNcU9LgU42g-1; Mon, 14 Feb 2022 07:57:38 -0500
+X-MC-Unique: DsNK_9QFOSmwNcU9LgU42g-1
+Received: by mail-ej1-f70.google.com with SMTP id la22-20020a170907781600b006a7884de505so5799928ejc.7
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 04:57:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=oXbXKwNefXUMxjvIv7PZR4ufdZvetqDxpNnWNZX3Q9w=;
+        b=5Q8o/0DGU20Ec8M3gVFF8Ay9V3Xw8jexS2BXN9w8W4ZqkuYQqULtw1Bav36kycmf9m
+         iWpwDkUFI7YJbsZQlyhsM2fCXsrk1iY4+NVlSCER9uYylzKXU6CN98gHIfqpdK9KzLKf
+         HpkjnM5UPuMqB6NqtaYtgtd2atOs8rFeuuKNeKflxkRX0kwPY3lrxgFZDWzEttMZ6es5
+         mzJAXK4mlTdByhoXTmH+Vqv1K1+rk8qPcsYQoDta+wgs2QSUW6hozG408pRjZl36XHlL
+         5u9eGV2EAkQKTr/acYXq9/2F0lGF8Gl8WwUshdZQ6FGnHyEESdwv0oL/z4GwJQpqw7QK
+         Yf+w==
+X-Gm-Message-State: AOAM530ls4SaF/voqZVfvgogB8hPN+euWd/0UX1+rkU84/i6elBIejfO
+        rKsEDq1zhDtTLzg6olxJBeDgdiV4ECGBw1TU+iqLJNy8XbKjg/cd8a9mNK9aAcnUnvgSfkBslVb
+        ctVyJI7RQLMWY
+X-Received: by 2002:a05:6402:3489:: with SMTP id v9mr15115246edc.249.1644843456846;
+        Mon, 14 Feb 2022 04:57:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyU5DkSABeMnnwGxALr4cUufpghJY/IkWE1R3VTtIBjGPU4fKsIkDZmUYsm4G8pEfV5YGtv9A==
+X-Received: by 2002:a05:6402:3489:: with SMTP id v9mr15115232edc.249.1644843456718;
+        Mon, 14 Feb 2022 04:57:36 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id p5sm8932228ejr.105.2022.02.14.04.57.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Feb 2022 04:57:36 -0800 (PST)
+Message-ID: <a3008754-86a8-88d6-df7f-a2770b0a2c93@redhat.com>
+Date:   Mon, 14 Feb 2022 13:57:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220214123842.GT4160@nvidia.com>
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2] KVM: SEV: Allow SEV intra-host migration of VM with
+ mirrors
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Orr <marcorr@google.com>, linux-kernel@vger.kernel.org
+References: <20220211193634.3183388-1-pgonda@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220211193634.3183388-1-pgonda@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 08:38:42AM -0400, Jason Gunthorpe wrote:
-> On Mon, Feb 14, 2022 at 11:03:42AM +0100, Greg Kroah-Hartman wrote:
-> > On Tue, Jan 04, 2022 at 09:56:37AM +0800, Lu Baolu wrote:
-> > > Multiple PCI devices may be placed in the same IOMMU group because
-> > > they cannot be isolated from each other. These devices must either be
-> > > entirely under kernel control or userspace control, never a mixture. This
-> > > checks and sets DMA ownership during driver binding, and release the
-> > > ownership during driver unbinding.
-> > > 
-> > > The device driver may set a new flag (no_kernel_api_dma) to skip calling
-> > > iommu_device_use_dma_api() during the binding process. For instance, the
-> > > userspace framework drivers (vfio etc.) which need to manually claim
-> > > their own dma ownership when assigning the device to userspace.
-> > > 
-> > > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> > >  include/linux/pci.h      |  5 +++++
-> > >  drivers/pci/pci-driver.c | 21 +++++++++++++++++++++
-> > >  2 files changed, 26 insertions(+)
-> > > 
-> > > diff --git a/include/linux/pci.h b/include/linux/pci.h
-> > > index 18a75c8e615c..d29a990e3f02 100644
-> > > +++ b/include/linux/pci.h
-> > > @@ -882,6 +882,10 @@ struct module;
-> > >   *              created once it is bound to the driver.
-> > >   * @driver:	Driver model structure.
-> > >   * @dynids:	List of dynamically added device IDs.
-> > > + * @no_kernel_api_dma: Device driver doesn't use kernel DMA API for DMA.
-> > > + *		Drivers which don't require DMA or want to manually claim the
-> > > + *		owner type (e.g. userspace driver frameworks) could set this
-> > > + *		flag.
-> > 
-> > Again with the bikeshedding, but this name is a bit odd.  Of course it's
-> > in the kernel, this is all kernel code, so you can drop that.  And
-> > again, "negative" flags are rough.  So maybe just "prevent_dma"?
-> 
-> That is misleading too, it is not that DMA is prevented, but that the
-> kernel's dma_api has not been setup.
+On 2/11/22 20:36, Peter Gonda wrote:
+> +	list_cut_before(&dst->mirror_vms, &src->mirror_vms, &src->mirror_vms);
+> +	list_for_each_entry_safe(mirror, tmp, &dst->mirror_vms,
+> +				 mirror_entry) {
 
-"has not been" or "will not be"?
+Is list_for_each_entry_safe actually necessary here?  (It would be if 
+you used list_add/list_del instead of list_cut_before).
 
-What you want to prevent is the iommu core claiming the device
-automatically, right?  So how about "prevent_iommu_dma"?
+> +		kvm_get_kvm(dst_kvm);
+> +		kvm_put_kvm(src_kvm);
+> +		mirror->enc_context_owner = dst_kvm;
+> +	}
 
-naming is hard,
+Thanks,
 
-greg k-h
+Paolo
+
