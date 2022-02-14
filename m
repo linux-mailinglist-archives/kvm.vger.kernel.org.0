@@ -2,189 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A78154B50F0
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 14:03:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9F094B50F3
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 14:04:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353797AbiBNNDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 08:03:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50986 "EHLO
+        id S242087AbiBNNEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 08:04:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349874AbiBNNDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 08:03:24 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C9454D609;
-        Mon, 14 Feb 2022 05:03:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dwNbZIWdbdN3vtZuI1zJEWIJM/UtuJSmdhElUHw38/INdTpQhzO+GNR/gnFSzzW9iJ7lMomowvfTlU84Yz4wy+798CBANLp5+zxBs9rWrOwk0XXCMVAMOtwOf8vvE/rLzKdVcQEU8MuKkzIV+p1rSHcq75q5fkiFD1T62ilCkAOr7Yazekw77SGu77WTpmjh0eywVpo0kCiTHd42oyrfSxBB6f867huhPKe8U+IXT7ra3zzOjiRrF7BI8Z7KMdzZvm/preKSiAR5sTJjEBt3W/QDUIRrWeFkYZNi1TAf5H99Wfi/Mzx0rXT883w6OX8+3JFFi0DKVztYorCmqHJKdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s10pw3Q0IJYajsmJnBuOXdvlhULZIGQsbnb9tziWXNw=;
- b=GGQJB8KtUQ8f0RCxT6dDawlGd2fI27jWkFNluUTaHwmOLiUeTdlFwvjwQP1YlCyw+sAgfczQC6xR0S3tt40ymTyZ4aZR/evLB9lgX5VBGsoPOdcUT416A63lqG0PlIunR4tIBM8MPc23z+Rjc8feSyoykfVHvNXvjXvkJfYlgusNQpfVuKqVzE1BAIM1naBeB+Z2KGNsRpMB6WBcFBDQwJkeeeD+ewbWHPRMv2iLGcQpwtDsaXcDB1A9/wMDWeve9D+5VB9/OIj2b48+v944MOaD6+dplEczISo04ydLyJi/ZnLYWwV7DgeoiTFZFiakfVCYI0dyj8hrSUe2UNtv1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s10pw3Q0IJYajsmJnBuOXdvlhULZIGQsbnb9tziWXNw=;
- b=IBtJGLqgbKlmjEq9LIC9W0nrcZwjd9rm7KcFP77lx06ja9qvPZM73iNIQH3uQFZIlSFk8gax/46fZcFop2R1jtABxBIWc8TXu7zjrrCdI05hNpuwx8vawBxr8sKHQgrPV0aVtgXm9/YSXX+vWL2W0Z/oLIkenCTc/OTooMRodyYeW37GopirogJE2nj8IWoHccwVE5dipkctje2VLQGRtQVHKFGFfyDoW7owPX9RYkKfm2MVyYIOLAHPhbPR06bmANOUP7kHilBqGLSfr+XuGfqHSi9cfJqlsTAbTK0LbHJ2Yaehyzzx10jJrgX4bax7RYfaw4i5EwMPA0OKpkVbyg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MWHPR1201MB0176.namprd12.prod.outlook.com (2603:10b6:301:59::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.17; Mon, 14 Feb
- 2022 13:03:14 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.019; Mon, 14 Feb 2022
- 13:03:14 +0000
-Date:   Mon, 14 Feb 2022 09:03:13 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Will Deacon <will@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for
- multi-device groups
-Message-ID: <20220214130313.GV4160@nvidia.com>
-References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
- <20220106022053.2406748-4-baolu.lu@linux.intel.com>
- <Ygo/eCRFnraY01WA@8bytes.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ygo/eCRFnraY01WA@8bytes.org>
-X-ClientProxiedBy: BL0PR05CA0026.namprd05.prod.outlook.com
- (2603:10b6:208:91::36) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S1353867AbiBNNEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 08:04:44 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051B54E398;
+        Mon, 14 Feb 2022 05:04:36 -0800 (PST)
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21ECpd7T011255;
+        Mon, 14 Feb 2022 13:04:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FMWzaTJXRrGBJi1FUbvAo3f2Gs05BJSDjHdhP6H1xuw=;
+ b=rbfWZj3WkMgLOSPVbwn4tzx8sXpT5XtEPmGOzPWHgHiDpPMcOoMA5Y7pSW4dcJrEvjlJ
+ r1BvZh9HnFgK8xZzi34eihWI3/RW80g/TJTDvzDa53C6oj066VwCZY9NjVEcxuVG5UDV
+ XpsfsTNOHPAvQatWiLTDQW8fqmWTTWUHKZ3Y8ej/offPqPxYlBmuLNGTMPKF6y7LEi2/
+ kAmQ5kk8KrxKwMcZW62d0l4CpD4Vik+D5sOxbbHXCroPDmAyZvkYopJZs/fcMGT8l8JS
+ 0JYahynCW+SdNoAez4RpZcx7eU8e3tC0vUxCf33R2afq8qBRzEZpDbEyS46q3sBo3PZX pA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e6thxkdf8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Feb 2022 13:04:36 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21ECfEh0015734;
+        Mon, 14 Feb 2022 13:04:35 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e6thxkden-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Feb 2022 13:04:35 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21ED3lSx029719;
+        Mon, 14 Feb 2022 13:04:34 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3e64h9nhr4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Feb 2022 13:04:33 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21ED4TrF43319602
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Feb 2022 13:04:29 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F1D40A4065;
+        Mon, 14 Feb 2022 13:04:28 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB271A4062;
+        Mon, 14 Feb 2022 13:04:27 +0000 (GMT)
+Received: from [9.171.42.254] (unknown [9.171.42.254])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 14 Feb 2022 13:04:27 +0000 (GMT)
+Message-ID: <0fce8189-8a02-16d2-6f37-7e435c6b8024@linux.ibm.com>
+Date:   Mon, 14 Feb 2022 14:06:40 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3b50d104-5963-4828-7220-08d9efba5c8d
-X-MS-TrafficTypeDiagnostic: MWHPR1201MB0176:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR1201MB0176D2AF00154CA6A7C0A641C2339@MWHPR1201MB0176.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZhvP8dPL/Pk0UHHeP79p6Cca0eWEBi8ajZ+CjLpiacw0zar3eNlmJRVEkzlSiepr0/nmZ4oQyuVutpt6OqGLRuN1Z0pbSm371hUECxUaq8RWuFRt/4/RR90yVxOlsVv2Lvo/bqd/u1I5/SiCMWT4q1Bjj2lQ3IBj1KxpPOaJTPEmvL4vygR41S2kIArUO21eAwFkO3ptPFdfNx3M7jlg76oFaYbY+taqSl8hlXFsBFJ32c/4ZanwYkhWCrwLE2GJsN8+D0DfAh7RAU005XJjjJS4C1SMMEcq69wJkWsxfmNl5zLotywi8B2MlfTV8SC24FnEIe8cTlEgJRnWo7E42gpdMyz0DQKmDAGLuhbHHranpRAy0+GAc+oP63TEkChTgQFzNpFwHQ9mKeXgLury0/SQqaqXp+CGkhE8BdoLrdc+mMpkjN1DSIvevsbHQubKFy0girT0xjL1ZNTmYeMAjuMvM6TrnhyM/B81Kjq8GYG1CjoyWVxG/NznUh1nZjY7W8CH7hMrRbSgrD3X3yCA0cuenyUyvu1uDVGP30If0Ou1D+p94EhcVPAZjnOvxRdj6p30gAmkpFJU94JfcWwNIYG3QZHy/0RHQZ36u1rsdR8bGCNoiQngqyv/96n+845ZEheTpBCazLtuq/5cfqByFA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(36756003)(66946007)(316002)(38100700002)(2616005)(6486002)(66556008)(66476007)(4326008)(6916009)(33656002)(186003)(1076003)(26005)(7416002)(86362001)(6512007)(2906002)(54906003)(508600001)(83380400001)(5660300002)(8936002)(6506007)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gjn2Fuanha/kowFyaDapXzkvWlR2Oh74FKgb4jdsVqrkiQ1/EqMalkZKArKX?=
- =?us-ascii?Q?1Ikxwc4cAPHq2O4tbbtG+66ih21pUobwOYf2i6p0VdK5uPPHlLVcH1D6T5Yb?=
- =?us-ascii?Q?XgnNwKKybnu5Ki6Y5NReY1H/z+6gOzsAAUeeYGzo9pA/kYw+hq6e7iUxQ/yo?=
- =?us-ascii?Q?TxlwZsx9UdtIC7p37ImWJigAU8SQnM8ca58Wcf/S2axHQxVyrEykcz6y2sWD?=
- =?us-ascii?Q?VvsFu5uTbJ0LjFS+auiiQZqlHdVj/apaMJBSTLaDRpACf/vohfawW/cYIihc?=
- =?us-ascii?Q?X75F7s/+v0WTE8b++e2GU9VcaNxHN4IAOfXzCbonTl7G8B4ckHCHaa3e755e?=
- =?us-ascii?Q?g78gec4UxvyWRrttnSpoFTdHcfgBY/+ZIUTEXjRcC6ZAym1UqocIbtQdWoU9?=
- =?us-ascii?Q?nqQy+rRdLIepSoMNq4gV5eophcfTQnw3m92o/91A2y5YwRsmR1difIkvtf3b?=
- =?us-ascii?Q?PGYWaF6YSyOcoUeBHMmsPooEoN98KVt6pAuR32pNbQHxyAjRZL3tc6X+LilF?=
- =?us-ascii?Q?A5kFIe76684SLuIxPjTan/lrsMfOJ6I/0z3EGcLGTrvj87NEr0r70/GlBaFd?=
- =?us-ascii?Q?ZZyu/dZQj9rZ2hqvpIPp56ep38iAXC/nzq8aKiYhxyRQWRR9ZvnQn0jKpuK3?=
- =?us-ascii?Q?izx1axuuxvECUPIbDy2mvqLTl1qnBC2M5VTGs5dCkAlqxuXpp2GA6CJ/OkDH?=
- =?us-ascii?Q?tVXealtWZs3B51c7cCbiwMVoFcVcXSE1TvJFPT6MkrYkdYg9Z1CB2NlqQ7VG?=
- =?us-ascii?Q?2weBVWfa9iIXy5Iy7lDZtxdoxL+qjSmQrNVNn+wBLaoE1eFZ0wsCykNNWTPD?=
- =?us-ascii?Q?a2LaGD0yYzEf1hGCoZoxsyVcdGyHbJSnMWZoZyrkw3N36MXfHG5O/iMjwvDh?=
- =?us-ascii?Q?Lqd8jRGWG4Y4KQMRw3gQZY/9RA0k/00d7OzV6P5GB0Ik+53pYzRP/4juPDJW?=
- =?us-ascii?Q?Q1k55aUGyhVmWyfcOB/UgzUBjNNgmeW9HLsAc+OwcHKisVnJPSzCxfmBpcop?=
- =?us-ascii?Q?IH9LQYii9GDte7CHSpQoKRzPCLShQPvA7Fo4HnaH5velh7Iw0sLTai3yfpSP?=
- =?us-ascii?Q?+O1Cv0oA7eSh4+3JFAKnMPDRx3CGWoiQqvx910H+r2ra8KTYpOdsBqQ5qfnb?=
- =?us-ascii?Q?mA9Ql/M/W5E43Ed/8Npm+sM8/jeSC9Sy/3nIu40mIrI0egbjw5EPc36+bFOI?=
- =?us-ascii?Q?FueMt936fVFrwzHdh0F1oD4zntzy0c6mvjjv2htD1QSfobyCTCc8cmgVqAMP?=
- =?us-ascii?Q?Mr6kDxezhcdBiSSL5A33F5LAgbskWSH2KYdzmev8LVi1qJgpFXFDph0sO76p?=
- =?us-ascii?Q?tQNfg16MHqCuFqU+SAjHQ53kmRkQXW8NbrR/GVGhN8lVfhex+cwPQMeBGGiY?=
- =?us-ascii?Q?ngkejyvnslESjbdw9XO/txph844MNK3Hx3xxCAGMzkwNtG/F45/skMCGgMyo?=
- =?us-ascii?Q?l9izFV5kTJqLVpUwWxukQECsuAvCr5tJWMyQe390tKJbZdKHBAVLGVN9Lwa/?=
- =?us-ascii?Q?iUB87ZmeG+l15bRi1ONK5b3IwRjWnn3RwmSLZx3n+8txaAm4kWqLZb/g4cqP?=
- =?us-ascii?Q?WMqPFD1AavpjL9i7ye0=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b50d104-5963-4828-7220-08d9efba5c8d
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2022 13:03:14.7708
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 76+iU8LkpLRhe6gkXH0Kx1LeSMLIgEuiXmbuyE3KOh58YGIPRtBU34YkFf1RX2rm
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0176
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v3 18/30] KVM: s390: mechanism to enable guest zPCI
+ Interpretation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220204211536.321475-1-mjrosato@linux.ibm.com>
+ <20220204211536.321475-19-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220204211536.321475-19-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wvX9Z-lcXqz_-Jolf_8p63MTrlG8QPsK
+X-Proofpoint-ORIG-GUID: jrjA06zhDR9356g7ZVOFpCzNqlvEQbgl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-14_06,2022-02-14_03,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
+ malwarescore=0 phishscore=0 suspectscore=0 spamscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202140076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 12:39:36PM +0100, Joerg Roedel wrote:
 
-> This extends iommu_attach_device() to behave as iommu_attach_group(),
-> changing the domain for the whole group. 
 
-Of course, the only action to take is to change the domain of a
-group..
+On 2/4/22 22:15, Matthew Rosato wrote:
+> The guest must have access to certain facilities in order to allow
+> interpretive execution of zPCI instructions and adapter event
+> notifications.  However, there are some cases where a guest might
+> disable interpretation -- provide a mechanism via which we can defer
+> enabling the associated zPCI interpretation facilities until the guest
+> indicates it wishes to use them.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-> Wouldn't it be better to scrap the iommu_attach_device() interface
-> instead and only rely on iommu_attach_group()? This way it is clear
-> that a call changes the whole group.
+Didn't you forget my ACK?
 
-From an API design perspective drivers should never touch groups -
-they have struct devices, they should have a clean struct device based
-API.
 
-Groups should disappear into an internal implementation detail, not be
-so prominent in the API.
+Acked-by: Pierre Morel <pmorel@linux.ibm.com>
 
-> IIUC this work is heading towards allowing multiple domains in one group
-> as long as the group is owned by one entity.
+> ---
+>   arch/s390/include/asm/kvm_host.h |  4 ++++
+>   arch/s390/kvm/kvm-s390.c         | 40 ++++++++++++++++++++++++++++++++
+>   arch/s390/kvm/kvm-s390.h         | 10 ++++++++
+>   3 files changed, 54 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index b468d3a2215e..bf61ab05f98c 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -252,7 +252,10 @@ struct kvm_s390_sie_block {
+>   #define ECB2_IEP	0x20
+>   #define ECB2_PFMFI	0x08
+>   #define ECB2_ESCA	0x04
+> +#define ECB2_ZPCI_LSI	0x02
+>   	__u8    ecb2;                   /* 0x0062 */
+> +#define ECB3_AISI	0x20
+> +#define ECB3_AISII	0x10
+>   #define ECB3_DEA 0x08
+>   #define ECB3_AES 0x04
+>   #define ECB3_RI  0x01
+> @@ -938,6 +941,7 @@ struct kvm_arch{
+>   	int use_cmma;
+>   	int use_pfmfi;
+>   	int use_skf;
+> +	int use_zpci_interp;
+>   	int user_cpu_state_ctrl;
+>   	int user_sigp;
+>   	int user_stsi;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 24837d6050dc..208b09d08385 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1029,6 +1029,44 @@ static int kvm_s390_vm_set_crypto(struct kvm *kvm, struct kvm_device_attr *attr)
+>   	return 0;
+>   }
+>   
+> +static void kvm_s390_vcpu_pci_setup(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Only set the ECB bits after guest requests zPCI interpretation */
+> +	if (!vcpu->kvm->arch.use_zpci_interp)
+> +		return;
+> +
+> +	vcpu->arch.sie_block->ecb2 |= ECB2_ZPCI_LSI;
+> +	vcpu->arch.sie_block->ecb3 |= ECB3_AISII + ECB3_AISI;
+> +}
+> +
+> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+> +
+> +	/*
+> +	 * If host is configured for PCI and the necessary facilities are
+> +	 * available, turn on interpretation for the life of this guest
+> +	 */
+> +	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV) || !sclp.has_zpci_lsi ||
+> +	    !sclp.has_aisii || !sclp.has_aeni || !sclp.has_aisi)
+> +		return;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	kvm->arch.use_zpci_interp = 1;
+> +
+> +	kvm_s390_vcpu_block_all(kvm);
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		kvm_s390_vcpu_pci_setup(vcpu);
+> +		kvm_s390_sync_request(KVM_REQ_VSIE_RESTART, vcpu);
+> +	}
+> +
+> +	kvm_s390_vcpu_unblock_all(kvm);
+> +	mutex_unlock(&kvm->lock);
+> +}
+> +
+>   static void kvm_s390_sync_request_broadcast(struct kvm *kvm, int req)
+>   {
+>   	unsigned long cx;
+> @@ -3236,6 +3274,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>   
+>   	kvm_s390_vcpu_crypto_setup(vcpu);
+>   
+> +	kvm_s390_vcpu_pci_setup(vcpu);
+> +
+>   	mutex_lock(&vcpu->kvm->lock);
+>   	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>   		rc = kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 098831e815e6..14bb2539f837 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -496,6 +496,16 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
+>    */
+>   void kvm_s390_vcpu_crypto_reset_all(struct kvm *kvm);
+>   
+> +/**
+> + * kvm_s390_vcpu_pci_enable_interp
+> + *
+> + * Set the associated PCI attributes for each vcpu to allow for zPCI Load/Store
+> + * interpretation as well as adapter interruption forwarding.
+> + *
+> + * @kvm: the KVM guest
+> + */
+> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm);
+> +
+>   /**
+>    * diag9c_forwarding_hz
+>    *
+> 
 
-No, it isn't. This work is only about properly arbitrating which
-single domain is attached to an entire group.
-
-> 	1) Introduce a concept of a sub-group (or whatever we want to
-> 	   call it), which groups devices together which must be in the
-> 	   same domain because they use the same request ID and thus
-> 	   look all the same to the IOMMU.
->
-> 	2) Keep todays IOMMU groups to group devices together which can
-> 	   bypass the IOMMU when talking to each other, like
-> 	   multi-function devices and devices behind a no-ACS bridge.
-
-We've talked about all these details before and nobody has thought
-they are important enough to implement. This distinction is not the
-goal of this series.
-
-I think if someone did want to do this there is room in the API to
-allow the distinction between 1 (must share) and 2 (sharing is
-insecure). eg by checking owner and blocking mixing user/kernel. 
-
-This is another reason to stick with the device centric API as if we
-did someday want multi-domain groups then the device input is still
-the correct input and the iommu code can figure out what sub-groups or
-whatever transparently.
-
-Jason
+-- 
+Pierre Morel
+IBM Lab Boeblingen
