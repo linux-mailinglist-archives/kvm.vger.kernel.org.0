@@ -2,37 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 811124B5789
-	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 17:58:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C73824B57B9
+	for <lists+kvm@lfdr.de>; Mon, 14 Feb 2022 18:02:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356769AbiBNQ6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 11:58:36 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37274 "EHLO
+        id S1356823AbiBNRBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 12:01:53 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233182AbiBNQ6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 11:58:35 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DA24265163
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 08:58:27 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA5AE13D5;
-        Mon, 14 Feb 2022 08:58:27 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37F813F70D;
-        Mon, 14 Feb 2022 08:58:26 -0800 (PST)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andre.przywara@arm.com, pierre.gondois@arm.com
-Subject: [PATCH kvmtool 3/3] arm: pci: Generate "msi-parent" property only with a MSI controller
-Date:   Mon, 14 Feb 2022 16:58:30 +0000
-Message-Id: <20220214165830.69207-4-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220214165830.69207-1-alexandru.elisei@arm.com>
-References: <20220214165830.69207-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        with ESMTP id S1356817AbiBNRBw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 12:01:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE566516B
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 09:01:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6839C614D7
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 17:01:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDC2EC340E9;
+        Mon, 14 Feb 2022 17:01:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644858102;
+        bh=0+3Ex+XIT7mX8myuhw3FAYBB86mQMA7ZpDe8F9/k+ks=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=rdDhHCIi+Roq/+MawL0K4vi2/9qTW6whO0DlGLQhA8vo/k+bZ73lTPNWKThB9FekU
+         pQQPArUcG0UO1vYC7LfEkMo1mhlGRK6s2h8y4kW9pDglVa5PCc8yKL1zP1r0Wc2umU
+         HiSa9nA3vcfKVtMtWD5605J1UMjwIQmYE705LpQiyG3rUnScv2SFqwn99JKiWk2Teq
+         qEhZwRngp/xMhWRmNdbxGHwCwRoTgogTlyeq0hXUuDFQy2ogihB02ogOztD++D2jVB
+         OrHdQJn4+i81EhAPosNFF2tdg7fbnamGyILu2+uy/j+x7DBTAN+r5ppufRC/g3kes+
+         qve+JArm0m2Nw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nJejM-007q9G-Sq; Mon, 14 Feb 2022 17:01:40 +0000
+Date:   Mon, 14 Feb 2022 17:01:40 +0000
+Message-ID: <87k0dx4c23.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Andrew Jones <drjones@redhat.com>, pbonzini@redhat.com,
+        thuth@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses for the initrd
+In-Reply-To: <YgqBPSV+CMyzfNlv@monolith.localdoman>
+References: <20220214120506.30617-1-alexandru.elisei@arm.com>
+        <20220214135226.joxzj2tgg244wl6n@gator>
+        <YgphzKLQLb5pMYoP@monolith.localdoman>
+        <20220214142444.saeogrpgpx6kaamm@gator>
+        <YgqBPSV+CMyzfNlv@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, drjones@redhat.com, pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -41,81 +68,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "msi-parent" PCI root complex property describes the MSI parent of the
-root complex. When the VM is created with a GICv2 or GICv3 irqchip
-(--irqchip=gicv3 or --irqchip=gicv2), there is no MSI controller present on
-the system and the corresponding phandle is not generated, leaving the
-"msi-parent" property to point to a non-existing phandle. Skip creating the
-"msi-parent" property when no MSI controller exists.
+Hi all,
 
-Reported-by: Pierre Gondois <pierre.gondois@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/fdt.c                    | 2 +-
- arm/include/arm-common/pci.h | 3 ++-
- arm/pci.c                    | 8 ++++++--
- 3 files changed, 9 insertions(+), 4 deletions(-)
+On Mon, 14 Feb 2022 16:20:13 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Drew,
+> 
+> (CC'ing Marc, he know more about 32 bit guest support than me)
+> 
+> On Mon, Feb 14, 2022 at 03:24:44PM +0100, Andrew Jones wrote:
+> > On Mon, Feb 14, 2022 at 02:06:04PM +0000, Alexandru Elisei wrote:
+> > > Hi Drew,
+> > > 
+> > > On Mon, Feb 14, 2022 at 02:52:26PM +0100, Andrew Jones wrote:
+> > > > On Mon, Feb 14, 2022 at 12:05:06PM +0000, Alexandru Elisei wrote:
+> > > > > The "linux,initrd-start" and "linux,initrd-end" properties encode the start
+> > > > > and end address of the initrd. The size of the address is encoded in the
+> > > > > root node #address-cells property and can be 1 cell (32 bits) or 2 cells
+> > > > > (64 bits). Add support for parsing a 64 bit address.
+> > > > > 
+> > > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > > ---
+> > > > >  lib/devicetree.c | 18 +++++++++++++-----
+> > > > >  1 file changed, 13 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/lib/devicetree.c b/lib/devicetree.c
+> > > > > index 409d18bedbba..7cf64309a912 100644
+> > > > > --- a/lib/devicetree.c
+> > > > > +++ b/lib/devicetree.c
+> > > > > @@ -288,7 +288,7 @@ int dt_get_default_console_node(void)
+> > > > >  int dt_get_initrd(const char **initrd, u32 *size)
+> > > > >  {
+> > > > >  	const struct fdt_property *prop;
+> > > > > -	const char *start, *end;
+> > > > > +	u64 start, end;
+> > > > >  	int node, len;
+> > > > >  	u32 *data;
+> > > > >  
+> > > > > @@ -303,7 +303,11 @@ int dt_get_initrd(const char **initrd, u32 *size)
+> > > > >  	if (!prop)
+> > > > >  		return len;
+> > > > >  	data = (u32 *)prop->data;
+> > > > > -	start = (const char *)(unsigned long)fdt32_to_cpu(*data);
+> > > > > +	start = fdt32_to_cpu(*data);
+> > > > > +	if (len == 8) {
+> > > > > +		data++;
+> > > > > +		start = (start << 32) | fdt32_to_cpu(*data);
+> > > > > +	}
+> > > > >  
+> > > > >  	prop = fdt_get_property(fdt, node, "linux,initrd-end", &len);
+> > > > >  	if (!prop) {
+> > > > > @@ -311,10 +315,14 @@ int dt_get_initrd(const char **initrd, u32 *size)
+> > > > >  		return len;
+> > > > >  	}
+> > > > >  	data = (u32 *)prop->data;
+> > > > > -	end = (const char *)(unsigned long)fdt32_to_cpu(*data);
+> > > > > +	end = fdt32_to_cpu(*data);
+> > > > > +	if (len == 8) {
+> > > > > +		data++;
+> > > > > +		end = (end << 32) | fdt32_to_cpu(*data);
+> > > > > +	}
+> > > > >  
+> > > > > -	*initrd = start;
+> > > > > -	*size = (unsigned long)end - (unsigned long)start;
+> > > > > +	*initrd = (char *)start;
+> > > > > +	*size = end - start;
+> > > > >  
+> > > > >  	return 0;
+> > > > >  }
+> > > > > -- 
+> > > > > 2.35.1
+> > > > >
+> > > > 
+> > > > I added this patch on
+> > > 
+> > > Thanks for the quick reply!
+> > > 
+> > > > 
+> > > > diff --git a/lib/devicetree.c b/lib/devicetree.c
+> > > > index 7cf64309a912..fa8399a7513d 100644
+> > > > --- a/lib/devicetree.c
+> > > > +++ b/lib/devicetree.c
+> > > > @@ -305,6 +305,7 @@ int dt_get_initrd(const char **initrd, u32 *size)
+> > > >         data = (u32 *)prop->data;
+> > > >         start = fdt32_to_cpu(*data);
+> > > >         if (len == 8) {
+> > > > +               assert(sizeof(long) == 8);
+> > > 
+> > > I'm sketchy about arm with LPAE, but wouldn't it be legal to have here a 64
+> > > bit address, even if the architecture is 32 bits? Or was the assert added
+> > > more because kvm-unit-tests doesn't support LPAE on arm?
+> > 
+> > It's possible, but only if we choose to manage it. We're (I'm) lazy and
+> > require physical addresses to fit in the pointers, at least for the test
+> > framework. Of course a unit test can feel free to play around with larger
+> > physical addresses if it wants to.
+> > 
+> > > 
+> > > >                 data++;
+> > > >                 start = (start << 32) | fdt32_to_cpu(*data);
+> > > >         }
+> > > > @@ -321,7 +322,7 @@ int dt_get_initrd(const char **initrd, u32 *size)
+> > > >                 end = (end << 32) | fdt32_to_cpu(*data);
+> > > >         }
+> > > >  
+> > > > -       *initrd = (char *)start;
+> > > > +       *initrd = (char *)(unsigned long)start;
+> > > 
+> > > My bad here, I forgot to test on arm. Tested your fix and the compilation
+> > > error goes away.
+> > 
+> > I'm actually kicking myself a bit for the hasty fix, because the assert
+> > would be better done at the end and written something like this
+> > 
+> >  assert(sizeof(long) == 8 || !(end >> 32));
+> > 
+> > I'm not sure it's worth adding another patch on top for that now, though.
+> > By the lack of new 32-bit arm unit tests getting submitted, I'm not even
+> > sure it's worth maintaining 32-bit arm at all...
+> 
+> As far as I know, 32 bit guests are still very much supported and
+> maintained for KVM, so I think it would still be very useful to have the
+> tests.
 
-diff --git a/arm/fdt.c b/arm/fdt.c
-index 635de7f27fa5..286ccadf1311 100644
---- a/arm/fdt.c
-+++ b/arm/fdt.c
-@@ -190,7 +190,7 @@ static int setup_fdt(struct kvm *kvm)
- 	}
- 
- 	/* PCI host controller */
--	pci__generate_fdt_nodes(fdt);
-+	pci__generate_fdt_nodes(fdt, kvm);
- 
- 	/* PSCI firmware */
- 	_FDT(fdt_begin_node(fdt, "psci"));
-diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
-index 9008a0ed072e..afa7f7f42bcb 100644
---- a/arm/include/arm-common/pci.h
-+++ b/arm/include/arm-common/pci.h
-@@ -1,6 +1,7 @@
- #ifndef ARM_COMMON__PCI_H
- #define ARM_COMMON__PCI_H
- 
--void pci__generate_fdt_nodes(void *fdt);
-+struct kvm;
-+void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm);
- 
- #endif /* ARM_COMMON__PCI_H */
-diff --git a/arm/pci.c b/arm/pci.c
-index e44e45343c6a..5bd82d438807 100644
---- a/arm/pci.c
-+++ b/arm/pci.c
-@@ -6,6 +6,7 @@
- #include "kvm/util.h"
- 
- #include "arm-common/pci.h"
-+#include "arm-common/gic.h"
- 
- /*
-  * An entry in the interrupt-map table looks like:
-@@ -24,8 +25,9 @@ struct of_interrupt_map_entry {
- 	struct of_gic_irq		gic_irq;
- } __attribute__((packed));
- 
--void pci__generate_fdt_nodes(void *fdt)
-+void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
-+	enum irqchip_type irqchip = kvm->cfg.arch.irqchip;
- 	struct device_header *dev_hdr;
- 	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
- 	unsigned nentries = 0;
-@@ -68,7 +70,9 @@ void pci__generate_fdt_nodes(void *fdt)
- 	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
- 	_FDT(fdt_property(fdt, "reg", &cfg_reg_prop, sizeof(cfg_reg_prop)));
- 	_FDT(fdt_property(fdt, "ranges", ranges, sizeof(ranges)));
--	_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
-+
-+	if (irqchip == IRQCHIP_GICV2M || irqchip == IRQCHIP_GICV3_ITS)
-+		_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
- 
- 	/* Generate the interrupt map ... */
- 	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
+I can't force people to write additional tests (or even start writing
+the first one), but I'd like to reaffirm that AArch32 support still is
+a first class citizen when it comes to KVM/arm64.
+
+It has been tremendously useful even in the very recent past to debug
+issues that were plaguing bare metal Linux, and i don't plan to get
+rid of it anytime soon (TBH, it is too small to even be noticeable).
+
+Thanks,
+
+	M.
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
