@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F15B4B836E
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 09:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9D694B8365
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 09:55:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231803AbiBPIyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 03:54:22 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:48608 "EHLO
+        id S231810AbiBPIyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 03:54:23 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:48720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231783AbiBPIyS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 03:54:18 -0500
+        with ESMTP id S231795AbiBPIyU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 03:54:20 -0500
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7303918B17C
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 00:54:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8832ABD05
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 00:54:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645001647; x=1676537647;
+  t=1645001648; x=1676537648;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=eKxh2JCpd5Vqvqfr9C/TBksQqPRHO62E7J80Y06qmuI=;
-  b=b7lbaXvo5WQ+vHWhmD55dLDuVb/WX/rc1MmrX3n8X947h9RwRfrSFLsb
-   FjOY4TUHARTGlSb6jFsN6tY7bTWZasdjemaAMZI0+C69ann2QWxAVJhGq
-   A5zF0l/GcuXyLuJPbd8DMGn0LjyVABwhzix7Mcrh5YDPmOdWp6FFiLS+I
-   7QDeJpsfItJcEI3TFwO8Bdb0PfpfFlIAeEa310yINIrqef7yE6Ym681+U
-   H3UbKcLgKc5Gu2x2vLUuPLRVxd7pYVlJ4KLV7hP7VC1uoZn6A7sCRlp1d
-   hhVDDJszJw5iDnglvo4+NO2K15hWbQfqSR5k9TBo/qNcbnT5gq2e8GUK8
+  bh=2hjc6Pok40xB2Li4GkMnvzkMlmAWKbYNYxRDyWlF/w0=;
+  b=lHYYviXeOXNUROytHXK7Si0yjHyN8f94SzEg1R/SXyPv4YAFonEfgBpM
+   Lblo6SXs0mgQ3wYapLSqyR66jGBCU6r7CsceU44s2BCMwaNvALBbw47tq
+   jwVVFL2cQnLfceHKilrSi79u0gPQmPxm6wkOKjb0KoWjN4+3ZUdBTHSS8
+   YGYZiSvTy256cMus29ciS2cbK/8DmVAM7M4SD3am9NU4rYqXasRj5EPFE
+   Vv3T+Qgekts+GFd98Yt1/6XqJM4HDWWSQ1pKP9ojDRKnI+VmCreDEvplh
+   EKyVygm0PbtRGOGazKrk4CYdHDdlKO/K0X2JbGgwu5PcwYNMvjDKoqPHn
    A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="275135801"
+X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="275135806"
 X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
-   d="scan'208";a="275135801"
+   d="scan'208";a="275135806"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 00:54:07 -0800
 X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
-   d="scan'208";a="633418284"
+   d="scan'208";a="633418289"
 Received: from embargo.jf.intel.com ([10.165.9.183])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 00:54:06 -0800
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 00:54:07 -0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, ehabkost@redhat.com, mtosatti@redhat.com,
         seanjc@google.com, richard.henderson@linaro.org,
         like.xu.linux@gmail.com, wei.w.wang@intel.com,
         qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH 5/8] target/i386: Add XSAVES support for Arch LBR
-Date:   Tue, 15 Feb 2022 14:52:55 -0500
-Message-Id: <20220215195258.29149-6-weijiang.yang@intel.com>
+Subject: [PATCH 6/8] target/i386: Add MSR access interface for Arch LBR
+Date:   Tue, 15 Feb 2022 14:52:56 -0500
+Message-Id: <20220215195258.29149-7-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220215195258.29149-1-weijiang.yang@intel.com>
 References: <20220215195258.29149-1-weijiang.yang@intel.com>
@@ -61,101 +61,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Define Arch LBR bit in XSS and save/restore structure
-for XSAVE area size calculation.
+In the first generation of Arch LBR, the max support
+Arch LBR depth is 32, both host and guest use the value
+to set depth MSR. This can simplify the implementation
+of patch given the side-effect of mismatch of host/guest
+depth MSR: XRSTORS will reset all recording MSRs to 0s
+if the saved depth mismatches MSR_ARCH_LBR_DEPTH.
+
+In most of the cases Arch LBR is not in active status,
+so check the control bit before save/restore the big
+chunck of Arch LBR MSRs.
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- target/i386/cpu.c |  6 +++++-
- target/i386/cpu.h | 23 +++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 1 deletion(-)
+ target/i386/cpu.h     | 10 +++++++
+ target/i386/kvm/kvm.c | 67 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 77 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 496e906233..e505c926b2 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1414,7 +1414,7 @@ static const X86RegisterInfo32 x86_reg_info_32[CPU_NB_REGS32] = {
- #undef REGISTER
- 
- /* CPUID feature bits available in XSS */
--#define CPUID_XSTATE_XSS_MASK    (0)
-+#define CPUID_XSTATE_XSS_MASK    (XSTATE_ARCH_LBR_MASK)
- 
- ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
-     [XSTATE_FP_BIT] = {
-@@ -1448,6 +1448,10 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
-     [XSTATE_PKRU_BIT] =
-           { .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_PKU,
-             .size = sizeof(XSavePKRU) },
-+    [XSTATE_ARCH_LBR_BIT] = {
-+            .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_ARCH_LBR,
-+            .offset = 0 /*supervisor mode component, offset = 0 */,
-+            .size = sizeof(XSavesArchLBR) },
-     [XSTATE_XTILE_CFG_BIT] = {
-         .feature = FEAT_7_0_EDX, .bits = CPUID_7_0_EDX_AMX_TILE,
-         .size = sizeof(XSaveXTILECFG),
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 1d17196a0b..07b198539b 100644
+index 07b198539b..0cadd37c47 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -541,6 +541,7 @@ typedef enum X86Seg {
- #define XSTATE_ZMM_Hi256_BIT            6
- #define XSTATE_Hi16_ZMM_BIT             7
- #define XSTATE_PKRU_BIT                 9
-+#define XSTATE_ARCH_LBR_BIT             15
- #define XSTATE_XTILE_CFG_BIT            17
- #define XSTATE_XTILE_DATA_BIT           18
+@@ -388,6 +388,11 @@ typedef enum X86Seg {
+ #define MSR_IA32_TSX_CTRL		0x122
+ #define MSR_IA32_TSCDEADLINE            0x6e0
+ #define MSR_IA32_PKRS                   0x6e1
++#define MSR_ARCH_LBR_CTL                0x000014ce
++#define MSR_ARCH_LBR_DEPTH              0x000014cf
++#define MSR_ARCH_LBR_FROM_0             0x00001500
++#define MSR_ARCH_LBR_TO_0               0x00001600
++#define MSR_ARCH_LBR_INFO_0             0x00001200
  
-@@ -553,6 +554,7 @@ typedef enum X86Seg {
- #define XSTATE_ZMM_Hi256_MASK           (1ULL << XSTATE_ZMM_Hi256_BIT)
- #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
- #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
-+#define XSTATE_ARCH_LBR_MASK            (1ULL << XSTATE_ARCH_LBR_BIT)
- #define XSTATE_XTILE_CFG_MASK           (1ULL << XSTATE_XTILE_CFG_BIT)
- #define XSTATE_XTILE_DATA_MASK          (1ULL << XSTATE_XTILE_DATA_BIT)
- #define XFEATURE_XTILE_MASK             (XSTATE_XTILE_CFG_MASK \
-@@ -867,6 +869,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
- /* TSX Suspend Load Address Tracking instruction */
- #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
-+/* Architectural LBRs */
-+#define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
- /* AVX512_FP16 instruction */
- #define CPUID_7_0_EDX_AVX512_FP16       (1U << 23)
- /* AMX tile (two-dimensional register) */
-@@ -1386,6 +1390,24 @@ typedef struct XSaveXTILEDATA {
-     uint8_t xtiledata[8][1024];
- } XSaveXTILEDATA;
+ #define FEATURE_CONTROL_LOCKED                    (1<<0)
+ #define FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX  (1ULL << 1)
+@@ -1659,6 +1664,11 @@ typedef struct CPUX86State {
+     uint64_t msr_xfd;
+     uint64_t msr_xfd_err;
  
-+typedef struct {
-+       uint64_t from;
-+       uint64_t to;
-+       uint64_t info;
-+} LBR_ENTRY;
-+
-+#define ARCH_LBR_NR_ENTRIES            32
-+
-+/* Ext. save area 19: Supervisor mode Arch LBR state */
-+typedef struct XSavesArchLBR {
-+    uint64_t lbr_ctl;
-+    uint64_t lbr_depth;
-+    uint64_t ler_from;
-+    uint64_t ler_to;
-+    uint64_t ler_info;
++    /* Per-VCPU Arch LBR MSRs */
++    uint64_t msr_lbr_ctl;
++    uint64_t msr_lbr_depth;
 +    LBR_ENTRY lbr_records[ARCH_LBR_NR_ENTRIES];
-+} XSavesArchLBR;
 +
- QEMU_BUILD_BUG_ON(sizeof(XSaveAVX) != 0x100);
- QEMU_BUILD_BUG_ON(sizeof(XSaveBNDREG) != 0x40);
- QEMU_BUILD_BUG_ON(sizeof(XSaveBNDCSR) != 0x40);
-@@ -1395,6 +1417,7 @@ QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
- QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
- QEMU_BUILD_BUG_ON(sizeof(XSaveXTILECFG) != 0x40);
- QEMU_BUILD_BUG_ON(sizeof(XSaveXTILEDATA) != 0x2000);
-+QEMU_BUILD_BUG_ON(sizeof(XSavesArchLBR) != 0x328);
+     /* exception/interrupt handling */
+     int error_code;
+     int exception_is_int;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 764d110e0f..974ff3c0a5 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -3273,6 +3273,38 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+                               env->msr_xfd_err);
+         }
  
- typedef struct ExtSaveArea {
-     uint32_t feature, bits;
++        if (kvm_enabled() && cpu->enable_pmu &&
++            (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_ARCH_LBR)) {
++            uint64_t depth;
++            int i, ret;
++
++            /*
++             * Only migrate Arch LBR states when: 1) Arch LBR is enabled
++             * for migrated vcpu. 2) the host Arch LBR depth equals that
++             * of source guest's, this is to avoid mismatch of guest/host
++             * config for the msr hence avoid unexpected misbehavior.
++             */
++            ret = kvm_get_one_msr(cpu, MSR_ARCH_LBR_DEPTH, &depth);
++
++            if (ret == 1 && (env->msr_lbr_ctl & 0x1) && !!depth &&
++                depth == env->msr_lbr_depth) {
++                kvm_msr_entry_add(cpu, MSR_ARCH_LBR_CTL, env->msr_lbr_ctl);
++                kvm_msr_entry_add(cpu, MSR_ARCH_LBR_DEPTH, env->msr_lbr_depth);
++
++                for (i = 0; i < ARCH_LBR_NR_ENTRIES; i++) {
++                    if (!env->lbr_records[i].from) {
++                        continue;
++                    }
++                    kvm_msr_entry_add(cpu, MSR_ARCH_LBR_FROM_0 + i,
++                                      env->lbr_records[i].from);
++                    kvm_msr_entry_add(cpu, MSR_ARCH_LBR_TO_0 + i,
++                                      env->lbr_records[i].to);
++                    kvm_msr_entry_add(cpu, MSR_ARCH_LBR_INFO_0 + i,
++                                      env->lbr_records[i].info);
++                }
++            }
++        }
++
+         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
+          *       kvm_put_msr_feature_control. */
+     }
+@@ -3670,6 +3702,26 @@ static int kvm_get_msrs(X86CPU *cpu)
+         kvm_msr_entry_add(cpu, MSR_IA32_XFD_ERR, 0);
+     }
+ 
++    if (kvm_enabled() && cpu->enable_pmu &&
++        (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_ARCH_LBR)) {
++        uint64_t ctl, depth;
++        int i, ret2;
++
++        ret = kvm_get_one_msr(cpu, MSR_ARCH_LBR_CTL, &ctl);
++        ret2 = kvm_get_one_msr(cpu, MSR_ARCH_LBR_DEPTH, &depth);
++        if (ret == 1 && ret2 == 1 && (ctl & 0x1) &&
++            depth == ARCH_LBR_NR_ENTRIES) {
++            kvm_msr_entry_add(cpu, MSR_ARCH_LBR_CTL, 0);
++            kvm_msr_entry_add(cpu, MSR_ARCH_LBR_DEPTH, 0);
++
++            for (i = 0; i < ARCH_LBR_NR_ENTRIES; i++) {
++                kvm_msr_entry_add(cpu, MSR_ARCH_LBR_FROM_0 + i, 0);
++                kvm_msr_entry_add(cpu, MSR_ARCH_LBR_TO_0 + i, 0);
++                kvm_msr_entry_add(cpu, MSR_ARCH_LBR_INFO_0 + i, 0);
++            }
++        }
++    }
++
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
+     if (ret < 0) {
+         return ret;
+@@ -3972,6 +4024,21 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_IA32_XFD_ERR:
+             env->msr_xfd_err = msrs[i].data;
+             break;
++        case MSR_ARCH_LBR_CTL:
++            env->msr_lbr_ctl = msrs[i].data;
++            break;
++        case MSR_ARCH_LBR_DEPTH:
++            env->msr_lbr_depth = msrs[i].data;
++            break;
++        case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
++            env->lbr_records[index - MSR_ARCH_LBR_FROM_0].from = msrs[i].data;
++            break;
++        case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
++            env->lbr_records[index - MSR_ARCH_LBR_TO_0].to = msrs[i].data;
++            break;
++        case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
++            env->lbr_records[index - MSR_ARCH_LBR_INFO_0].info = msrs[i].data;
++            break;
+         }
+     }
+ 
 -- 
 2.27.0
 
