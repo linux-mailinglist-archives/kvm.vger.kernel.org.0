@@ -2,93 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC7404B6AE1
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 12:31:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FB914B6B50
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 12:42:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237171AbiBOLbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 06:31:22 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52162 "EHLO
+        id S237181AbiBOLml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 06:42:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:32984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237168AbiBOLbV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 06:31:21 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 991E4108771
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 03:31:12 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21FAfkg9034440
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 11:31:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=eFesICNuIeUiqTlCzorgSgJpwynUdztDpPaJRZ6WQfQ=;
- b=Ycfqe7lZN+JI7BFifa3An29+9pnJ+N/AvR73ejmV2s57zI0mZ0P3AbwzmaY83VOejiMh
- id5fZRvoptM7NoareP3dvxF1jcyHnnyYx5gvjMhSYK3xE+GlII4/Ks1JAXcPnNkpqPGA
- 3OBd/i5PKFJg6usSU5AQVUPOL4ZBYzao8NrFu47Rybcdz8SQuprE8gmn+UscCPAasdVI
- GFAimBqUp8gGxIppyOkUQOhUqxxNVjUvF4iJ0RTpRWEWhyOwVMi/10UmjfV4dg+RXd4S
- R/C4ktCBGkd7cmGkqEABoG7O+nL54nYN48aMuJnW9fZuzRjmhvG0KUwIlgo8tIV8PDQY lA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e8an6176g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 11:31:12 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21FBGrrC006833
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 11:31:11 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e8an6175m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 11:31:11 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21FBC4m5032752;
-        Tue, 15 Feb 2022 11:31:09 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3e64h9n9c3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 11:31:09 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21FBV6RP39059948
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Feb 2022 11:31:06 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1157A11C04C;
-        Tue, 15 Feb 2022 11:31:06 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA8AB11C04A;
-        Tue, 15 Feb 2022 11:31:05 +0000 (GMT)
-Received: from [9.145.18.32] (unknown [9.145.18.32])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Feb 2022 11:31:05 +0000 (GMT)
-Message-ID: <30d689f7-4929-d299-2b2b-a52d363f6be3@linux.ibm.com>
-Date:   Tue, 15 Feb 2022 12:31:05 +0100
+        with ESMTP id S235794AbiBOLml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 06:42:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0417B192B6
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 03:42:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644925349;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PjnbuWeKFhqOoYjM7TShoqpYbBMxPZgJhbxy0whFK08=;
+        b=fpCmS37z13ExeF2hiZZ1sR1Bv8RmHkabQe3rRQ2WrISp2cdBwtz5z/2icJ1FzP6Et9L0oE
+        7qB6x4vu6gbRqo8MY+rze0vuTn7cusmlhh7azLet/zFptKn5X/XRC+oJaVW9HgLsQ3kU9a
+        fDMEciWpqLpuC+x+rRZ5xFmmnmJ3LvA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-552-9DORiPrYM9eHzq4RyOV0Vw-1; Tue, 15 Feb 2022 06:42:28 -0500
+X-MC-Unique: 9DORiPrYM9eHzq4RyOV0Vw-1
+Received: by mail-wr1-f71.google.com with SMTP id s5-20020adfbc05000000b001e7af4f2231so126243wrg.3
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 03:42:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=PjnbuWeKFhqOoYjM7TShoqpYbBMxPZgJhbxy0whFK08=;
+        b=w5TExDRi7HnR4mctMKfENkQdTOvzlggVkmVEhd8s6DgDaOiNK24ZgOtAHIREjAdviE
+         lfx4YrGSJRtJ9AVS4yACdD3F7jB9xGiBg7n1V4gQ1iZCSnJtr4V/er2rI3+bllxxMGNE
+         keojD2koHJ3HdBAkoz1q6XsEik2oeJ7DIzeJqWnMHHV2iSh7p8NBvq/Cgq7oVcW8mt0y
+         /otRU4p3SwEcu4f8zuvyHTVKlDCNmfu3bkkywn/chqiVg3SHWSWqVi5bd47OusSKbKoQ
+         GLVmFa7vVhkkfUwdYuqrO8pxiACADBXtK+EHWl4DeHIesGlJSJNai++adrgk2y/TBrUu
+         Dj7g==
+X-Gm-Message-State: AOAM533mF8qros6KRM80ujLvNgyv5wfrZUV6IByAQlgF7s8DefN9+jrA
+        w53VLxA6qjJWtBVsv/uKSd5VYAlsh1v0jweewvSb87kiTETEgymgHHlK0GMICbIYAc/XD0D9v5E
+        Yzt2V13LyZdxL
+X-Received: by 2002:a7b:ca56:0:b0:37c:321e:9947 with SMTP id m22-20020a7bca56000000b0037c321e9947mr2752181wml.14.1644925347641;
+        Tue, 15 Feb 2022 03:42:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxoBwAwhuNEUS135wctuAV6IRl4SdvK7l5cFBUZJc6WBHpZGx/EhPB4rfRNzOYOBK5c9+C7kA==
+X-Received: by 2002:a7b:ca56:0:b0:37c:321e:9947 with SMTP id m22-20020a7bca56000000b0037c321e9947mr2752161wml.14.1644925347419;
+        Tue, 15 Feb 2022 03:42:27 -0800 (PST)
+Received: from ?IPV6:2003:cb:c70e:3700:9260:2fb2:742d:da3e? (p200300cbc70e370092602fb2742dda3e.dip0.t-ipconnect.de. [2003:cb:c70e:3700:9260:2fb2:742d:da3e])
+        by smtp.gmail.com with ESMTPSA id j10sm9472254wmq.20.2022.02.15.03.42.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Feb 2022 03:42:27 -0800 (PST)
+Message-ID: <e85b6271-5510-959b-efdc-7ba318f114bc@redhat.com>
+Date:   Tue, 15 Feb 2022 12:42:26 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH v2 6/6] s390x: uv-host: use CPU indexes
- instead of addresses
+ Thunderbird/91.4.0
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        nrb@linux.ibm.com, scgl@linux.ibm.com
-References: <20220204130855.39520-1-imbrenda@linux.ibm.com>
- <20220204130855.39520-7-imbrenda@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20220204130855.39520-7-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Kameron Lutes <kalutes@google.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, virtio-dev@lists.oasis-open.org,
+        kvm@vger.kernel.org
+Cc:     Suleiman Souhlal <suleiman@chromium.org>,
+        Charles William Dick <cwd@google.com>,
+        David Stevens <stevensd@chromium.org>
+References: <20220214195908.4070138-1-kalutes@google.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH] Virtio-balloon: add user space API for sizing
+In-Reply-To: <20220214195908.4070138-1-kalutes@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: yyHdLhE0e1GEqyWKSjIqCbWNkTJeXf94
-X-Proofpoint-GUID: 59VH1jwn0Kyltu_qhNYw03fx5DllsDQh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-15_04,2022-02-14_04,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 bulkscore=0 adultscore=0 clxscore=1015
- spamscore=0 malwarescore=0 impostorscore=0 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2202150065
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,11 +87,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2/4/22 14:08, Claudio Imbrenda wrote:
-> Adapt the test to the new semantics of the smp_* functions, and use CPU
-> indexes instead of addresses.
+On 14.02.22 20:59, Kameron Lutes wrote:
+> This new linux API will allow user space applications to directly
+> control the size of the virtio-balloon. This is useful in
+> situations where the guest must quickly respond to drastically
+> increased memory pressure and cannot wait for the host to adjust
+> the balloon's size.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> Under the current wording of the Virtio spec, guest driven
+> behavior such as this is permitted:
+> 
+> VIRTIO Version 1.1 Section 5.5.6
+> "The device is driven either by the receipt of a configuration
+> change notification, or by changing guest memory needs, such as
+> performing memory compaction or responding to out of memory
+> conditions."
+
+Not quite. num_pages is determined by the hypervisor only and the guest
+is not expected to change it, and if it does, it's ignored.
+
+5.5.6 does not indicate at all that the guest may change it or that it
+would have any effect. num_pages is examined only, actual is updated by
+the driver.
+
+5.5.6.1 documents what's allowed, e.g.,
+
+  The driver SHOULD supply pages to the balloon when num_pages is
+  greater than the actual number of pages in the balloon.
+
+  The driver MAY use pages from the balloon when num_pages is less than
+  the actual number of pages in the balloon.
+
+and special handling for VIRTIO_BALLOON_F_DEFLATE_ON_OOM.
+
+Especially, we have
+
+  The driver MUST update actual after changing the number of pages in
+  the balloon.
+
+  The driver MAY update actual once after multiple inflate and deflate
+  operations.
+
+That's also why QEMU never syncs back the num_pages value from the guest
+when writing the config.
+
+
+Current spec does not allow for what you propose.
+
+
+> 
+> The intended use case for this API is one where the host
+> communicates a deflation limit to the guest. The guest may then
+> choose to respond to memory pressure by deflating its balloon down
+> to the guest's allowable limit.
+
+It would be good to have a full proposal and a proper spec update. I'd
+assume you'd want separate values for soft vs. hard num_values -- if
+that's what we really want.
+
+BUT
+
+There seems to be recent interest in handling memory pressure in a
+better way (although how to really detect "serious memory pressure" vs
+"ordinary reclaim" in Linux is still to be figured out). There is
+already a discussion going on how that could happen. Adding random user
+space toggles might not be the best idea. We might want a single
+mechanism to achieve that.
+
+https://lists.oasis-open.org/archives/virtio-comment/202201/msg00139.html
+
+-- 
+Thanks,
+
+David / dhildenb
+
