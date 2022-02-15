@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B08464B85B1
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 11:31:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A11F4B8596
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 11:30:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230281AbiBPK1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 05:27:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49810 "EHLO
+        id S233007AbiBPK1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 05:27:37 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232849AbiBPK1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 05:27:04 -0500
+        with ESMTP id S232879AbiBPK1H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 05:27:07 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8DF1210AFA;
-        Wed, 16 Feb 2022 02:26:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF13D212897;
+        Wed, 16 Feb 2022 02:26:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645007212; x=1676543212;
+  t=1645007215; x=1676543215;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bLG50OWlg8x+9sP9Tb1iADErNwTwvBlYlKoh5jCbzNY=;
-  b=Xsccs67cDZsdXA1+xFhcetNEfIw5oAZQ4MEhz4D//5JqYSlj6k/bvLsf
-   N6ATV9lkFg4cPw4EuAVEJ0N4sWhXBb/PpBczzI17C0nenFVV52fORAmse
-   0EXRCEUbzXNRUF4U5fz+4NbfJwmhgu5h39cJ0i9c+r01vkYKw6VcpjSu0
-   QUT0oZucv3bMPXZRz4On8xlPTgluQkBalJnmBjAk5FpcHfb6Ckwuophr0
-   FvyYtFkLRDN1FAgKt1q7j90Yc2oUCOS1AVrVOv3Fl7DEN9Apbc+M26n55
-   hoI5gdf5le5eKKBiGXAy/06VDi2UjaABSc46NJRK+u0MSyqwA1QNdplD2
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="250312475"
+  bh=Ie0tCkuCmIT++Q1x3wLM6OpLH0d8phwb7tCfdjlxfP0=;
+  b=CrmxyiSuzJ6bU/HTKQcGqjp8PSIFRWgxNyi+JEN5cO4YQxKuNBKLRaUP
+   vrDDr36cCTGdv8eQzEhTW1H5fOX1AxbJILMXxv5PBvq137iDmvfdtj7zV
+   H5jnRE40SavUlGwmcVzIYXw5uezitHVQcKWbdahjhue/9jEG9byQJ9WTJ
+   6OKm+AvhwDAl3zm/iAJ6rwlHXADecW/rkj36LdnFNvjrcNVzgawl2NZ1x
+   FZ+QgBaKL/MqIUNVTDw9hwnHMkvjCMGoh91tHOIyuDMcGDBL9BMMp2rIG
+   PzB2A41woFn0PmDCU47xUMLboyZnpEgJYHYf38eiaYn3+0/mTLDh4srP8
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="250312477"
 X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
-   d="scan'208";a="250312475"
+   d="scan'208";a="250312477"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 02:26:51 -0800
 X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
-   d="scan'208";a="498708601"
+   d="scan'208";a="498708603"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 02:26:50 -0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
         like.xu.linux@gmail.com, vkuznets@redhat.com, wei.w.wang@intel.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v9 09/17] KVM: x86/pmu: Refactor code to support guest Arch LBR
-Date:   Tue, 15 Feb 2022 16:25:36 -0500
-Message-Id: <20220215212544.51666-10-weijiang.yang@intel.com>
+Cc:     Like Xu <like.xu@linux.intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v9 10/17] KVM: x86: Refine the matching and clearing logic for supported_xss
+Date:   Tue, 15 Feb 2022 16:25:37 -0500
+Message-Id: <20220215212544.51666-11-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220215212544.51666-1-weijiang.yang@intel.com>
 References: <20220215212544.51666-1-weijiang.yang@intel.com>
@@ -61,126 +61,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Take account of Arch LBR when do sanity checks before program
-vPMU for guest. Pass through Arch LBR recording MSRs to guest
-to gain better performance. Note, Arch LBR and Legacy LBR support
-are mutually exclusive, i.e., they're not both available on one
-platform.
+From: Like Xu <like.xu@linux.intel.com>
 
-Co-developed-by: Like Xu <like.xu@linux.intel.com>
+Refine the code path of the existing clearing of supported_xss in this way:
+initialize the supported_xss with the filter of KVM_SUPPORTED_XSS mask and
+update its value in a bit clear manner (rather than bit setting).
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 37 +++++++++++++++++++++++++++++-------
- arch/x86/kvm/vmx/vmx.c       |  3 +++
- 2 files changed, 33 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 5 +++--
+ arch/x86/kvm/x86.c     | 6 +++++-
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index e419a8c1ad0d..3f1ffc928e36 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -170,12 +170,16 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
- 
- bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
- {
-+	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-+		return guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
-+
- 	/*
- 	 * As a first step, a guest could only enable LBR feature if its
- 	 * cpu model is the same as the host because the LBR registers
- 	 * would be pass-through to the guest and they're model specific.
- 	 */
--	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
-+	return !boot_cpu_has(X86_FEATURE_ARCH_LBR) &&
-+		boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
- }
- 
- bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
-@@ -193,12 +197,19 @@ static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
- 	if (!intel_pmu_lbr_is_enabled(vcpu))
- 		return ret;
- 
--	ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS) ||
--		(index >= records->from && index < records->from + records->nr) ||
--		(index >= records->to && index < records->to + records->nr);
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-+		ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS);
-+
-+	if (!ret) {
-+		ret = (index >= records->from &&
-+		       index < records->from + records->nr) ||
-+		      (index >= records->to &&
-+		       index < records->to + records->nr);
-+	}
- 
- 	if (!ret && records->info)
--		ret = (index >= records->info && index < records->info + records->nr);
-+		ret = (index >= records->info &&
-+		       index < records->info + records->nr);
- 
- 	return ret;
- }
-@@ -738,6 +749,9 @@ static void vmx_update_intercept_for_lbr_msrs(struct kvm_vcpu *vcpu, bool set)
- 			vmx_set_intercept_for_msr(vcpu, lbr->info + i, MSR_TYPE_RW, set);
- 	}
- 
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-+		return;
-+
- 	vmx_set_intercept_for_msr(vcpu, MSR_LBR_SELECT, MSR_TYPE_RW, set);
- 	vmx_set_intercept_for_msr(vcpu, MSR_LBR_TOS, MSR_TYPE_RW, set);
- }
-@@ -778,10 +792,13 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
-+	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
-+		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
-+		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
- 
- 	if (!lbr_desc->event) {
- 		vmx_disable_lbr_msrs_passthrough(vcpu);
--		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
-+		if (lbr_enable)
- 			goto warn;
- 		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
- 			goto warn;
-@@ -798,13 +815,19 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
- 	return;
- 
- warn:
-+	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-+		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
- 	pr_warn_ratelimited("kvm: vcpu-%d: fail to passthrough LBR.\n",
- 		vcpu->vcpu_id);
- }
- 
- static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
- {
--	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
-+	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
-+		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
-+		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
-+
-+	if (!lbr_enable)
- 		intel_pmu_release_guest_lbr_event(vcpu);
- }
- 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7b6eb87ff6ad..62188f2ab2d4 100644
+index 62188f2ab2d4..da2a16c0b8d1 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -578,6 +578,9 @@ static bool is_valid_passthrough_msr(u32 msr)
- 	case MSR_LBR_NHM_TO ... MSR_LBR_NHM_TO + 31:
- 	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
- 	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
-+	case MSR_ARCH_LBR_FROM_0 ... MSR_ARCH_LBR_FROM_0 + 31:
-+	case MSR_ARCH_LBR_TO_0 ... MSR_ARCH_LBR_TO_0 + 31:
-+	case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
- 		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
- 		return true;
- 	}
+@@ -7434,9 +7434,10 @@ static __init void vmx_set_cpu_caps(void)
+ 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
+ 
+ 	/* CPUID 0xD.1 */
+-	supported_xss = 0;
+-	if (!cpu_has_vmx_xsaves())
++	if (!cpu_has_vmx_xsaves()) {
+ 		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
++		supported_xss = 0;
++	}
+ 
+ 	/* CPUID 0x80000001 and 0x7 (RDPID) */
+ 	if (!cpu_has_vmx_rdtscp()) {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5d8a0364a3cc..fb1a62eedd86 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -223,6 +223,8 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
+ 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+ 				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
+ 
++#define KVM_SUPPORTED_XSS     0
++
+ u64 __read_mostly host_efer;
+ EXPORT_SYMBOL_GPL(host_efer);
+ 
+@@ -11522,8 +11524,10 @@ int kvm_arch_hardware_setup(void *opaque)
+ 
+ 	rdmsrl_safe(MSR_EFER, &host_efer);
+ 
+-	if (boot_cpu_has(X86_FEATURE_XSAVES))
++	if (boot_cpu_has(X86_FEATURE_XSAVES)) {
+ 		rdmsrl(MSR_IA32_XSS, host_xss);
++		supported_xss = host_xss & KVM_SUPPORTED_XSS;
++	}
+ 
+ 	r = ops->hardware_setup();
+ 	if (r != 0)
 -- 
 2.27.0
 
