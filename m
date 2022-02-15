@@ -2,140 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 650214B65C9
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 09:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F914B6601
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 09:27:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235303AbiBOISC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 03:18:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49128 "EHLO
+        id S235462AbiBOI1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 03:27:16 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234021AbiBOIR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 03:17:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1826783026
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 00:17:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644913066;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qBRCXHWRsfZFbcnR2e9NrL7AfQRDhw152q44tl2KQ8s=;
-        b=Y1xO7kg9Qr2af+N7Hp06mbB9WXFDgiecc97+xiLCmbxubK6heOz+XnHJFvCkJ0AnQtEysd
-        Y9u7fmSnt6d8bQC88bmYIh6jDE+y1agnuh7tYapVT0nr2OuP3K0acMoIlQ26eELtmaum91
-        xLR/vSHxDXKYOHsfPQEbDvGp+ri3SHs=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-596-iOGAqJ1YOHu9J2KRLIO2kA-1; Tue, 15 Feb 2022 03:17:44 -0500
-X-MC-Unique: iOGAqJ1YOHu9J2KRLIO2kA-1
-Received: by mail-ej1-f71.google.com with SMTP id r18-20020a17090609d200b006a6e943d09eso6945600eje.20
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 00:17:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=qBRCXHWRsfZFbcnR2e9NrL7AfQRDhw152q44tl2KQ8s=;
-        b=ifnZ+e7JJIbfYrfQ8neDBd3QycsHPK9kroVdAAQ6YJbdTtziFW/aOJ1TPdcC0tPKp6
-         kx3a9MqexUpZp1XW8auYVNAj5hs/SmJxceWHCKqEI3ymRKqJIY+P0H25IQr/hDz2eF34
-         mKQnycGbTUBojC/QN7XB4TcFYm/eScJR3k4K0yHbdh3XQAgR3hasnWmdW/jVlbyzKAvC
-         uJS16IWugtdGlfuiUsMuQ1hVVOsOqqMHr159DjjMGtG09JkZw9A+JodYZq8K1cYfJz3e
-         emo/AtrNSFqfJ8T/sZKCqaHR4MrGCnqdm4mB+S3QEtL/b4H2CjQ6pd+i3+DGuULoJcdd
-         ZO2Q==
-X-Gm-Message-State: AOAM532vCcyW/Zm0BRWjTIWSigJZuOazMc/s3r+gWM2sskho5hou/NGx
-        0Z1e/2J6PG2JeHsF9oZLjQ+0FGqRWeX9hZqQjrBA/McQ2DHPNnB4X/SOWoVRlMgmG2Z4KetMlav
-        nzG2TZCk7sx0f
-X-Received: by 2002:a17:907:7da4:: with SMTP id oz36mr2014404ejc.59.1644913063043;
-        Tue, 15 Feb 2022 00:17:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw0DBXR1suAHvRGqXKUZ95AhNDbs3i7VJv4d2ibsn4zgLflwzJnWhNFJ9gXWskAS/wWxF17bg==
-X-Received: by 2002:a17:907:7da4:: with SMTP id oz36mr2014392ejc.59.1644913062759;
-        Tue, 15 Feb 2022 00:17:42 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id j6sm16739438edl.98.2022.02.15.00.17.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 00:17:42 -0800 (PST)
-Message-ID: <29e1edc7-9f9f-0663-997f-3416269b6a89@redhat.com>
-Date:   Tue, 15 Feb 2022 09:17:30 +0100
+        with ESMTP id S230153AbiBOI1O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 03:27:14 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D551C939BA;
+        Tue, 15 Feb 2022 00:27:04 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21F8C57A003254;
+        Tue, 15 Feb 2022 08:27:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tmBRkERBzCfyVlBh3FxcRcHs8XKgerdrttIxVybYdnE=;
+ b=hPJVDEi14PmP0Xf9SNvV8P0FqOcgZzO+Q5kpKv1oNcn7Yfi/fCf5B/lRIqfSZ2PYIYEk
+ V2vLm8EzzUvRDDWrQ4xfF6noe65IOm3ZYKk+avz9F/D5xckKVTDaXseEK3gBZnrYB27i
+ N1FQD55O7Q1NGo1bgSV6k1q5V79ZHOCE7mHaDbNwB2dfK1ow/FEA1EGXdL1mpOvgN+/H
+ r8fcgSF0Yj9Ex7Xm25jv1waO/GHfCCdjBK1gGlXzYyQBr6jIEYjAOO4HkppevY3yInjT
+ 9l0nLyDh6Tlv7tM8LgLmldObpCl01wCgQAUlcjTM9MguyXOSzFbSrs+Tm1WPGDqxlgrr 4g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e88f1g9ep-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 08:27:03 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21F8D11J005300;
+        Tue, 15 Feb 2022 08:27:03 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e88f1g9ea-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 08:27:03 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21F8IIjN020099;
+        Tue, 15 Feb 2022 08:27:01 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3e64h9vepd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 08:27:01 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21F8GbGv32833934
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Feb 2022 08:16:37 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 41E8DA405B;
+        Tue, 15 Feb 2022 08:26:58 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D121CA4060;
+        Tue, 15 Feb 2022 08:26:57 +0000 (GMT)
+Received: from [9.171.31.140] (unknown [9.171.31.140])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Feb 2022 08:26:57 +0000 (GMT)
+Message-ID: <920663f6-637d-e442-62a9-4a3ac9ab12d6@linux.ibm.com>
+Date:   Tue, 15 Feb 2022 09:29:10 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 12/12] KVM: x86: do not unload MMU roots on all role
- changes
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v4 3/4] s390x: topology: Check the Perform
+ Topology Function
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com, dmatlack@google.com
-References: <20220209170020.1775368-1-pbonzini@redhat.com>
- <20220209170020.1775368-13-pbonzini@redhat.com> <YgavcP/jb5njjKKn@google.com>
- <5f42d1ef-f6b7-c339-32b9-f4cf48c21841@redhat.com>
- <YgqsU8j80M1ZpWPx@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YgqsU8j80M1ZpWPx@google.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
+References: <20220208132709.48291-1-pmorel@linux.ibm.com>
+ <20220208132709.48291-4-pmorel@linux.ibm.com>
+ <8dd704d23f8a14907ed2a7f28ec3ac52685ab96c.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <8dd704d23f8a14907ed2a7f28ec3ac52685ab96c.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RLanaPzyZO3yTKkDTE9Kev6I-xegC9AT
+X-Proofpoint-ORIG-GUID: gqdYcKAYOVxNPRpX6zOXDgOjNJGlL46Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-15_03,2022-02-14_04,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 adultscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 mlxlogscore=999
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202150045
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/14/22 20:24, Sean Christopherson wrote:
-> On Mon, Feb 14, 2022, Paolo Bonzini wrote:
->> On 2/11/22 19:48, Sean Christopherson wrote:
->>> On Wed, Feb 09, 2022, Paolo Bonzini wrote:
->>>> -	kvm_mmu_unload(vcpu);
->>>>    	kvm_init_mmu(vcpu);
->>>> +	kvm_mmu_new_pgd(vcpu, vcpu->arch.cr3);
->>>
->>> This is too risky IMO, there are far more flows than just MOV CR0/CR4 that are
->>> affected, e.g. SMM transitions, KVM_SET_SREG, etc...
->
-> I'm not concerned about the TLB flush aspects so much as the addition of
-> kvm_mmu_new_pgd() in new paths.
 
-Okay, yeah those are more complex and the existing ones are broken too.
 
->>>> -	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
->>>> +	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS) {
->>>> +		/* Flush the TLB if CR0 is changed 1 -> 0.  */
->>>> +		if ((old_cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PG))
->>>> +			kvm_mmu_unload(vcpu);
->>>
->>> Calling kvm_mmu_unload() instead of requesting a flush isn't coherent with respect
->>> to the comment, or with SMEP handling.  And the SMEP handling isn't coherent with
->>> respect to the changelog.  Please elaborate :-)
+On 2/9/22 12:37, Nico Boehr wrote:
+> On Tue, 2022-02-08 at 14:27 +0100, Pierre Morel wrote:
+>> We check the PTF instruction.
+> 
+> You could test some very basic things as well:
+> 
+> - you get a privileged pgm int in problem state,
+> - reserved bits in first operand cause specification pgm int,
+> - reserved FC values result in a specification pgm int,
+> - second operand is ignored.
+> 
 >>
->> Yep, will do (the CR0.PG=0 case is similar to the CR0.PCIDE=0 case below).
-> 
-> Oh, you're freeing all roots to ensure a future MOV CR3 with NO_FLUSH and PCIDE=1
-> can't reuse a stale root.  That's necessary if and only if the MMU is shadowing
-> the guest, non-nested TDP MMUs just need to flush the guest's TLB.  The same is
-> true for the PCIDE case, i.e. we could optimize that too, though the main motivation
-> would be to clarify why all roots are unloaded.
-
-Yes.  Clarifying all this should be done before the big change to 
-kvm_mmu_reset_context().
-
->> Using kvm_mmu_unload() avoids loading a cached root just to throw it away
->> immediately after,
-> 
-> The shadow paging case will throw it away, but not the non-nested TDP MMU case?
-
-Yes, the TDP case is okay since the role is the same.  kvm_init_mmu() is 
-enough.
-
->> but I can change this to a new KVM_REQ_MMU_UPDATE_ROOT flag that does
+>> - We do not expect to support vertical polarization.
 >>
->> 	kvm_mmu_new_pgd(vcpu, vcpu->arch.cr3);
+>> - We do not expect the Modified Topology Change Report to be
+> [...]
 > 
-> I don't think that's necessary, I was just confused by the discrepancy.
+> Forgive me if I'm missing something, but why _Modified_ Topology Change
+> Report?
 
-It may not be necessary but it is clearer IMO.  Let me post a new patch.
+This does only exist in my mind the real name is indeed only Topology 
+change report.
 
-Paolo
+> 
+>> diff --git a/s390x/topology.c b/s390x/topology.c
+>> new file mode 100644
+>> index 00000000..a1f9ce51
+>> --- /dev/null
+>> +++ b/s390x/topology.c
+> 
+> [...]
+> 
+>> +static int ptf(unsigned long fc, unsigned long *rc)
+>> +{
+>> +       int cc;
+>> +
+>> +       asm volatile(
+>> +               "       .insn   rre,0xb9a20000,%1,0\n"
+>> +               "       ipm     %0\n"
+>> +               "       srl     %0,28\n"
+>> +               : "=d" (cc), "+d" (fc)
+>> +               : "d" (fc)
+> 
+> Why list fc here again?
+> 
+> 
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
