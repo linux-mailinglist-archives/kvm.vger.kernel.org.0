@@ -2,105 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADBD54B6CBE
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 13:53:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62EEC4B6CC0
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 13:54:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233998AbiBOMxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 07:53:19 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33308 "EHLO
+        id S237968AbiBOMzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 07:55:03 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232760AbiBOMxP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 07:53:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CE15205C1
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 04:53:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644929585;
+        with ESMTP id S232760AbiBOMzC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 07:55:02 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B6F434A2;
+        Tue, 15 Feb 2022 04:54:52 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-221-104.088.067.pools.vodafone-ip.de [88.67.221.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B93571EC0535;
+        Tue, 15 Feb 2022 13:54:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1644929686;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=k3LaYVmXlDDI4cCdjtUd/PNJ1ur2w6Wmc9rP2novD74=;
-        b=U7n7meQ4/+s/QkYtPpLJ6/U9tNx3ymTb2y8A4NbPKk7ldxc1ebjbAU1+CcJqqMa58aac73
-        ZeLOQmXPbWkPECtzACH01igo83xUA3cB0Y5B7su6uQdVL7QCoM8K9oPFdvsocGNEbVCBq7
-        pc4gCkqjSVQeWDpHXAyTy+Q84nEHRns=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-637-McQozc2jNUK4VAcMQvEkPA-1; Tue, 15 Feb 2022 07:53:03 -0500
-X-MC-Unique: McQozc2jNUK4VAcMQvEkPA-1
-Received: by mail-ej1-f69.google.com with SMTP id sa22-20020a1709076d1600b006ce78cacb85so2376199ejc.2
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 04:53:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=k3LaYVmXlDDI4cCdjtUd/PNJ1ur2w6Wmc9rP2novD74=;
-        b=NzMhWpDMthI7hox+XrgBJ5kXn7ksh8uqjZbDnj1hFBtKSaKM1trgderB00yQkj2+US
-         DEYv/ytMqR40wVqFyxrSBzd3+kF7di+7LWgsaz8Dc4Vm/vtC26RfzrJs6aoIM3hLy149
-         DL1DKfzsUo3rRkiXn0DcJnKyHVfa+NcQBsaaZRzNKd4LuKAzETSEtbqQkdOT2wD+1Bh4
-         2Vt+RDxCiogaGDeI/OIUl3zXGkBCQUUJiXH/0jLAGEytCl/Yu3BqKBvEYRdoxeoFv1lY
-         dWdenzb0QZRsjnaAXP6i+IrnccbRWrTqWtmh+JHpF25HsZdO1UsXdSkhGdG5mzTI64dP
-         ta6g==
-X-Gm-Message-State: AOAM532+0Dc2N7FypLuJazQY3WH4zCEPT4tEpUyt/PlQOEf2U37ktemi
-        FEgrkO4KuKyQziCT7wi2Qaq4WjqS+czfL467XMrjPk2Uguv/RL+VYoj8lHEr3aOtbkkvL93Xy/S
-        xYO6oHXWwShhS
-X-Received: by 2002:a17:907:2d08:: with SMTP id gs8mr2968438ejc.106.1644929582845;
-        Tue, 15 Feb 2022 04:53:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzFXKUrgCdrDtZ6C8DaK/lbWSixiyPDRl8e5+HHXCtoljbyEz+QJO6Le4dOJMjK4J9yRtBjew==
-X-Received: by 2002:a17:907:2d08:: with SMTP id gs8mr2968428ejc.106.1644929582661;
-        Tue, 15 Feb 2022 04:53:02 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id q19sm10241696ejm.74.2022.02.15.04.53.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 04:53:02 -0800 (PST)
-Date:   Tue, 15 Feb 2022 13:53:00 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
-        thuth@redhat.com, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses
- for the initrd
-Message-ID: <20220215125300.6b5ff3luxikc4jhd@gator>
-References: <20220214120506.30617-1-alexandru.elisei@arm.com>
- <20220214135226.joxzj2tgg244wl6n@gator>
- <YgphzKLQLb5pMYoP@monolith.localdoman>
- <20220214142444.saeogrpgpx6kaamm@gator>
- <YgqBPSV+CMyzfNlv@monolith.localdoman>
- <87k0dx4c23.wl-maz@kernel.org>
- <20220215073212.fp5lh4gfxk7clwwc@gator>
- <Ygt7PbS6zW9H1By4@monolith.localdoman>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=lpJF0DPW1QUFslGQlkPrAV/yjkWVm5bvn5fjtUyMI5I=;
+        b=hPdzK/P8wr/BQRHcNE7GCCG73SydOg0ztOwVWavDyYXP1xHLStzPoPF9L7G1/xyKJb03rd
+        XQccaz/cSgNE76wjLP5r28HUq3WX/Wn3loTq/NL5I5SeP/lnt6u3H+pBlrNdIsElFhr/GB
+        zzZ7ZiihZWxpZpJEaEE33jXMPf+JrV0=
+Date:   Tue, 15 Feb 2022 13:54:48 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v10 21/45] x86/mm: Add support to validate memory when
+ changing C-bit
+Message-ID: <YguimA5Au4t2A4oj@zn.tnic>
+References: <20220209181039.1262882-1-brijesh.singh@amd.com>
+ <20220209181039.1262882-22-brijesh.singh@amd.com>
+ <YgZ427v95xcdOKSC@zn.tnic>
+ <0242e383-5406-7504-ff3d-cf2e8dfaf8a3@amd.com>
+ <Ygj2Wx6jtNEEmbh9@zn.tnic>
+ <20220215124331.i4vgww733fv5owrx@box.shutemov.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Ygt7PbS6zW9H1By4@monolith.localdoman>
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220215124331.i4vgww733fv5owrx@box.shutemov.name>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 10:07:16AM +0000, Alexandru Elisei wrote:
+On Tue, Feb 15, 2022 at 03:43:31PM +0300, Kirill A. Shutemov wrote:
+> I don't think it works. TDX and SME/SEV has opposite polarity of the mask.
+> SME/SEV has to clear the mask to share the page. TDX has to set it.
 > 
-> I've started working on the next iteration of the kvmtool test
-> runner support series, I'll do my best to make sure kvmtool wll be able to run
-> the tests when kvm-unit-tests has been configured with --arch=arm.
->
+> Making a single global mask only increases confusion.
 
-Excellent!
+Didn't you read the rest of the thread with Tom's suggestion? I think
+there's a merit in having a cc_vendor or so which explicitly states what
+type of HV the kernel runs on...
 
-BTW, I went ahead an pushed a patch to misc/queue to improve the initrd
-address stuff
+-- 
+Regards/Gruss,
+    Boris.
 
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/6f8f74ed2d9953830a3c74669f25439d9ad68dec
-
-It may be necessary for you if kvmtool shares its fdt creation between
-aarch64 and aarch32 guests, emitting 8 byte initrd addresses for both,
-even though the aarch32 guest puts the fdt below 4G.
-
-Thanks,
-drew
-
+https://people.kernel.org/tglx/notes-about-netiquette
