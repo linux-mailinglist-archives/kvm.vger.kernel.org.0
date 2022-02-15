@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC72B4B5F88
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 01:51:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 870E54B5F82
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 01:51:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbiBOAwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 19:52:00 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49046 "EHLO
+        id S231760AbiBOAve (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 19:51:34 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232433AbiBOAv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 19:51:26 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5287C1451C1;
-        Mon, 14 Feb 2022 16:51:05 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21ENSvV6003201;
-        Tue, 15 Feb 2022 00:51:02 GMT
+        with ESMTP id S232821AbiBOAvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 19:51:24 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F2014236B;
+        Mon, 14 Feb 2022 16:51:03 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21EMXJls007767;
+        Tue, 15 Feb 2022 00:51:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=AmsSE3nC4UClOY1jYZ52LkQpg1P/K6ExubPsUSNbQ7c=;
- b=R6fkOfY33pFkSLBy3TlwKGqVM//6pcWi0F3CzZGuHN97xXZobuMTBgIzxE9DZymFkTAd
- NzggBO0If6H0pXTmzXlTW/ra/B52lhynJBrZLzleargeURRXPf82i+pl1UalCNEalkdz
- aOnN30jEqB1Lu8D2Bq4T3ofmHY602gD6ZpfS3hnFSTZ6xfGd7iSxzlYJrnrI7XzNZ2Tb
- SRj2n2w2hAghpgQ8EuBaw7twox4U2EatcCAlfdM4hJGJP3W+8jmneVJrMU7+jx+vNdUd
- kxs4KRSFChT1BPpGulCH8/OTUR0IH1uJ/iQtPCITEGWnq9SgjG97eQQTaACB+0/qiVCh JQ== 
+ bh=PLpqwep6i+Gp1Ek4suSt8STpT/vRb1zUQIzJcoKVXh0=;
+ b=f2BqSQHLoHWbcNQOrBByQMxWZtiNpx1MIuf+WYEL0lwN/5lHXvmPgdgd9+UXR4SUoK2G
+ AGL7KiD2ACjmbx6oc+SOsJLxQQ4bFaV5JXp3uS/U2RQH9tbOfkV/YkSvJiZprOSscPzM
+ 7e4lgeuEZkRlGDa1fw4E1R4+5nWzzqexOfZqIPOJ/jZG/8sNsecYLEwzYOuIEqAvjQK+
+ GVbl7PJT+oArWM5YQl1wRuuaNqJzfWUJUOYsyP81izjYZD9ne9PrKnlodIMOcywy+sik
+ 4gvMaEzqZ2+9ARrZRDkynZGrcFYlkRZPGSvc+WX9m3z080wXYyDI522fLpIRO+goJ549 1Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7dvmm4pb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 00:51:02 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21F0ouv8001281;
-        Tue, 15 Feb 2022 00:51:01 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7dvmm4p2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 00:51:01 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21F0g5IN026423;
-        Tue, 15 Feb 2022 00:51:00 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02wdc.us.ibm.com with ESMTP id 3e64hacpmp-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e78m10ked-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 15 Feb 2022 00:51:00 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21F0isrL015435;
+        Tue, 15 Feb 2022 00:51:00 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e78m10ke5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 00:51:00 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21F0hC1N030190;
+        Tue, 15 Feb 2022 00:50:58 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01wdc.us.ibm.com with ESMTP id 3e64hacqvy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 00:50:58 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21F0ovI728639496
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21F0owMB15991048
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Feb 2022 00:50:57 GMT
+        Tue, 15 Feb 2022 00:50:58 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BC0C12405E;
+        by IMSVA (Postfix) with ESMTP id 1FAB1124054;
+        Tue, 15 Feb 2022 00:50:58 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 61A3D12406B;
         Tue, 15 Feb 2022 00:50:57 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8277B124052;
-        Tue, 15 Feb 2022 00:50:56 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.160.92.58])
         by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Feb 2022 00:50:56 +0000 (GMT)
+        Tue, 15 Feb 2022 00:50:57 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -65,24 +65,24 @@ Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
         pasic@linux.ibm.com, alex.williamson@redhat.com,
         kwankhede@nvidia.com, fiuczy@linux.ibm.com,
         Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v18 16/18] s390/vfio-ap: update docs to include dynamic config support
-Date:   Mon, 14 Feb 2022 19:50:38 -0500
-Message-Id: <20220215005040.52697-17-akrowiak@linux.ibm.com>
+Subject: [PATCH v18 17/18] s390/Docs: new doc describing lock usage by the vfio_ap device driver
+Date:   Mon, 14 Feb 2022 19:50:39 -0500
+Message-Id: <20220215005040.52697-18-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220215005040.52697-1-akrowiak@linux.ibm.com>
 References: <20220215005040.52697-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fuS_et5GpMe2iD0eSQinvIZPToWuNdyu
-X-Proofpoint-ORIG-GUID: yawh1KEfVaRX9ukHPaj7hwkGUVIatejj
+X-Proofpoint-GUID: sn0_rc0yXATrYsSCGklNtnjtwAQlX-R9
+X-Proofpoint-ORIG-GUID: Ebyk5VMggyqM9vm7jJuyvAvSk9HA3SRv
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- impostorscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
- adultscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ mlxscore=0 phishscore=0 impostorscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 bulkscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2201110000 definitions=main-2202150001
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
@@ -94,776 +94,411 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the documentation in vfio-ap.rst to include information about the
-AP dynamic configuration support (e.g., hot plug of adapters, domains
-and control domains via the matrix mediated device's sysfs assignment
-attributes). This patch also makes a few minor tweaks to make corrections
-and clarifications.
+Introduces a new document describing the locks used by the vfio_ap device
+driver and how to use them so as to avoid lockdep reports and deadlock
+situations.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 ---
- Documentation/s390/vfio-ap.rst | 492 +++++++++++++++++++++++----------
- 1 file changed, 346 insertions(+), 146 deletions(-)
+ Documentation/s390/vfio-ap-locking.rst | 389 +++++++++++++++++++++++++
+ 1 file changed, 389 insertions(+)
+ create mode 100644 Documentation/s390/vfio-ap-locking.rst
 
-diff --git a/Documentation/s390/vfio-ap.rst b/Documentation/s390/vfio-ap.rst
-index f57ae621f33e..f4b8748ab9a8 100644
---- a/Documentation/s390/vfio-ap.rst
-+++ b/Documentation/s390/vfio-ap.rst
-@@ -123,27 +123,24 @@ Let's now take a look at how AP instructions executed on a guest are interpreted
- by the hardware.
- 
- A satellite control block called the Crypto Control Block (CRYCB) is attached to
--our main hardware virtualization control block. The CRYCB contains three fields
--to identify the adapters, usage domains and control domains assigned to the KVM
--guest:
-+our main hardware virtualization control block. The CRYCB contains an AP Control
-+Block (APCB) that has three fields to identify the adapters, usage domains and
-+control domains assigned to the KVM guest:
- 
- * The AP Mask (APM) field is a bit mask that identifies the AP adapters assigned
--  to the KVM guest. Each bit in the mask, from left to right (i.e. from most
--  significant to least significant bit in big endian order), corresponds to
-+  to the KVM guest. Each bit in the mask, from left to right, corresponds to
-   an APID from 0-255. If a bit is set, the corresponding adapter is valid for
-   use by the KVM guest.
- 
- * The AP Queue Mask (AQM) field is a bit mask identifying the AP usage domains
--  assigned to the KVM guest. Each bit in the mask, from left to right (i.e. from
--  most significant to least significant bit in big endian order), corresponds to
--  an AP queue index (APQI) from 0-255. If a bit is set, the corresponding queue
--  is valid for use by the KVM guest.
-+  assigned to the KVM guest. Each bit in the mask, from left to right,
-+  corresponds to an AP queue index (APQI) from 0-255. If a bit is set, the
-+  corresponding queue is valid for use by the KVM guest.
- 
- * The AP Domain Mask field is a bit mask that identifies the AP control domains
-   assigned to the KVM guest. The ADM bit mask controls which domains can be
-   changed by an AP command-request message sent to a usage domain from the
--  guest. Each bit in the mask, from left to right (i.e. from most significant to
--  least significant bit in big endian order), corresponds to a domain from
-+  guest. Each bit in the mask, from left to right, corresponds to a domain from
-   0-255. If a bit is set, the corresponding domain can be modified by an AP
-   command-request message sent to a usage domain.
- 
-@@ -151,10 +148,10 @@ If you recall from the description of an AP Queue, AP instructions include
- an APQN to identify the AP queue to which an AP command-request message is to be
- sent (NQAP and PQAP instructions), or from which a command-reply message is to
- be received (DQAP instruction). The validity of an APQN is defined by the matrix
--calculated from the APM and AQM; it is the cross product of all assigned adapter
--numbers (APM) with all assigned queue indexes (AQM). For example, if adapters 1
--and 2 and usage domains 5 and 6 are assigned to a guest, the APQNs (1,5), (1,6),
--(2,5) and (2,6) will be valid for the guest.
-+calculated from the APM and AQM; it is the Cartesian product of all assigned
-+adapter numbers (APM) with all assigned queue indexes (AQM). For example, if
-+adapters 1 and 2 and usage domains 5 and 6 are assigned to a guest, the APQNs
-+(1,5), (1,6), (2,5) and (2,6) will be valid for the guest.
- 
- The APQNs can provide secure key functionality - i.e., a private key is stored
- on the adapter card for each of its domains - so each APQN must be assigned to
-@@ -192,7 +189,7 @@ The design introduces three new objects:
- 
- 1. AP matrix device
- 2. VFIO AP device driver (vfio_ap.ko)
--3. VFIO AP mediated matrix pass-through device
-+3. VFIO AP mediated pass-through device
- 
- The VFIO AP device driver
- -------------------------
-@@ -200,12 +197,13 @@ The VFIO AP (vfio_ap) device driver serves the following purposes:
- 
- 1. Provides the interfaces to secure APQNs for exclusive use of KVM guests.
- 
--2. Sets up the VFIO mediated device interfaces to manage a mediated matrix
-+2. Sets up the VFIO mediated device interfaces to manage a vfio_ap mediated
-    device and creates the sysfs interfaces for assigning adapters, usage
-    domains, and control domains comprising the matrix for a KVM guest.
- 
--3. Configures the APM, AQM and ADM in the CRYCB referenced by a KVM guest's
--   SIE state description to grant the guest access to a matrix of AP devices
-+3. Configures the APM, AQM and ADM in the APCB contained in the CRYCB referenced
-+   by a KVM guest's SIE state description to grant the guest access to a matrix
-+   of AP devices
- 
- Reserve APQNs for exclusive use of KVM guests
- ---------------------------------------------
-@@ -235,10 +233,10 @@ reserved::
-   |                  |       8 probe        |                  |
-   +--------^---------+                      +--^--^------------+
-   6 edit   |                                   |  |
--    apmask |     +-----------------------------+  | 9 mdev create
-+    apmask |     +-----------------------------+  | 11 mdev create
-     aqmask |     |           1 modprobe           |
-   +--------+-----+---+           +----------------+-+         +----------------+
--  |                  |           |                  |8 create |     mediated   |
-+  |                  |           |                  |10 create|     mediated   |
-   |      admin       |           | VFIO device core |--------->     matrix     |
-   |                  +           |                  |         |     device     |
-   +------+-+---------+           +--------^---------+         +--------^-------+
-@@ -246,14 +244,14 @@ reserved::
- 	 | | 9 create vfio_ap-passthrough |                            |
- 	 | +------------------------------+                            |
- 	 +-------------------------------------------------------------+
--		     10  assign adapter/domain/control domain
-+		     12  assign adapter/domain/control domain
- 
- The process for reserving an AP queue for use by a KVM guest is:
- 
- 1. The administrator loads the vfio_ap device driver
- 2. The vfio-ap driver during its initialization will register a single 'matrix'
-    device with the device core. This will serve as the parent device for
--   all mediated matrix devices used to configure an AP matrix for a guest.
-+   all vfio_ap mediated devices used to configure an AP matrix for a guest.
- 3. The /sys/devices/vfio_ap/matrix device is created by the device core
- 4. The vfio_ap device driver will register with the AP bus for AP queue devices
-    of type 10 and higher (CEX4 and newer). The driver will provide the vfio_ap
-@@ -269,24 +267,24 @@ The process for reserving an AP queue for use by a KVM guest is:
-    default zcrypt cex4queue driver.
- 8. The AP bus probes the vfio_ap device driver to bind the queues reserved for
-    it.
--9. The administrator creates a passthrough type mediated matrix device to be
-+9. The administrator creates a passthrough type vfio_ap mediated device to be
-    used by a guest
- 10. The administrator assigns the adapters, usage domains and control domains
-     to be exclusively used by a guest.
- 
- Set up the VFIO mediated device interfaces
- ------------------------------------------
--The VFIO AP device driver utilizes the common interface of the VFIO mediated
-+The VFIO AP device driver utilizes the common interfaces of the VFIO mediated
- device core driver to:
- 
--* Register an AP mediated bus driver to add a mediated matrix device to and
-+* Register an AP mediated bus driver to add a vfio_ap mediated device to and
-   remove it from a VFIO group.
--* Create and destroy a mediated matrix device
--* Add a mediated matrix device to and remove it from the AP mediated bus driver
--* Add a mediated matrix device to and remove it from an IOMMU group
-+* Create and destroy a vfio_ap mediated device
-+* Add a vfio_ap mediated device to and remove it from the AP mediated bus driver
-+* Add a vfio_ap mediated device to and remove it from an IOMMU group
- 
- The following high-level block diagram shows the main components and interfaces
--of the VFIO AP mediated matrix device driver::
-+of the VFIO AP mediated device driver::
- 
-    +-------------+
-    |             |
-@@ -343,7 +341,7 @@ matrix device.
- 	* device_api:
- 	    the mediated device type's API
- 	* available_instances:
--	    the number of mediated matrix passthrough devices
-+	    the number of vfio_ap mediated passthrough devices
- 	    that can be created
- 	* device_api:
- 	    specifies the VFIO API
-@@ -351,29 +349,37 @@ matrix device.
-     This attribute group identifies the user-defined sysfs attributes of the
-     mediated device. When a device is registered with the VFIO mediated device
-     framework, the sysfs attribute files identified in the 'mdev_attr_groups'
--    structure will be created in the mediated matrix device's directory. The
--    sysfs attributes for a mediated matrix device are:
-+    structure will be created in the vfio_ap mediated device's directory. The
-+    sysfs attributes for a vfio_ap mediated device are:
- 
-     assign_adapter / unassign_adapter:
-       Write-only attributes for assigning/unassigning an AP adapter to/from the
--      mediated matrix device. To assign/unassign an adapter, the APID of the
--      adapter is echoed to the respective attribute file.
-+      vfio_ap mediated device. To assign/unassign an adapter, the APID of the
-+      adapter is echoed into the respective attribute file.
-     assign_domain / unassign_domain:
-       Write-only attributes for assigning/unassigning an AP usage domain to/from
--      the mediated matrix device. To assign/unassign a domain, the domain
--      number of the usage domain is echoed to the respective attribute
-+      the vfio_ap mediated device. To assign/unassign a domain, the domain
-+      number of the usage domain is echoed into the respective attribute
-       file.
-     matrix:
--      A read-only file for displaying the APQNs derived from the cross product
--      of the adapter and domain numbers assigned to the mediated matrix device.
-+      A read-only file for displaying the APQNs derived from the Cartesian
-+      product of the adapter and domain numbers assigned to the vfio_ap mediated
-+      device.
-+    guest_matrix:
-+      A read-only file for displaying the APQNs derived from the Cartesian
-+      product of the adapter and domain numbers assigned to the APM and AQM
-+      fields respectively of the KVM guest's CRYCB. This may differ from the
-+      the APQNs assigned to the vfio_ap mediated device if any APQN does not
-+      reference a queue device bound to the vfio_ap device driver (i.e., the
-+      queue is not in the host's AP configuration).
-     assign_control_domain / unassign_control_domain:
-       Write-only attributes for assigning/unassigning an AP control domain
--      to/from the mediated matrix device. To assign/unassign a control domain,
--      the ID of the domain to be assigned/unassigned is echoed to the respective
--      attribute file.
-+      to/from the vfio_ap mediated device. To assign/unassign a control domain,
-+      the ID of the domain to be assigned/unassigned is echoed into the
-+      respective attribute file.
-     control_domains:
-       A read-only file for displaying the control domain numbers assigned to the
--      mediated matrix device.
-+      vfio_ap mediated device.
- 
- * functions:
- 
-@@ -383,45 +389,75 @@ matrix device.
-     * Store the reference to the KVM structure for the guest using the mdev
-     * Store the AP matrix configuration for the adapters, domains, and control
-       domains assigned via the corresponding sysfs attributes files
-+    * Store the AP matrix configuration for the adapters, domains and control
-+      domains available to a guest. A guest may not be provided access to APQNs
-+      referencing queue devices that do not exist, or are not bound to the
-+      vfio_ap device driver.
- 
-   remove:
--    deallocates the mediated matrix device's ap_matrix_mdev structure. This will
--    be allowed only if a running guest is not using the mdev.
-+    deallocates the vfio_ap mediated device's ap_matrix_mdev structure.
-+    This will be allowed only if a running guest is not using the mdev.
- 
- * callback interfaces
- 
--  open:
-+  open_device:
-     The vfio_ap driver uses this callback to register a
--    VFIO_GROUP_NOTIFY_SET_KVM notifier callback function for the mdev matrix
--    device. The open is invoked when QEMU connects the VFIO iommu group
--    for the mdev matrix device to the MDEV bus. Access to the KVM structure used
--    to configure the KVM guest is provided via this callback. The KVM structure,
--    is used to configure the guest's access to the AP matrix defined via the
--    mediated matrix device's sysfs attribute files.
--  release:
-+    VFIO_GROUP_NOTIFY_SET_KVM notifier callback function for the matrix mdev
-+    devices. The open_device callback is invoked by userspace to connect the
-+    VFIO iommu group for the matrix mdev device to the MDEV bus. Access to the
-+    KVM structure used to configure the KVM guest is provided via this callback.
-+    The KVM structure, is used to configure the guest's access to the AP matrix
-+    defined via the vfio_ap mediated device's sysfs attribute files.
+diff --git a/Documentation/s390/vfio-ap-locking.rst b/Documentation/s390/vfio-ap-locking.rst
+new file mode 100644
+index 000000000000..10abbb6d6089
+--- /dev/null
++++ b/Documentation/s390/vfio-ap-locking.rst
+@@ -0,0 +1,389 @@
++======================
++VFIO AP Locks Overview
++======================
++This document describes the locks that are pertinent to the secure operation
++of the vfio_ap device driver. Throughout this document, the following variables
++will be used to denote instances of the structures herein described:
 +
-+  close_device:
-     unregisters the VFIO_GROUP_NOTIFY_SET_KVM notifier callback function for the
--    mdev matrix device and deconfigures the guest's AP matrix.
-+    matrix mdev device and deconfigures the guest's AP matrix.
- 
--Configure the APM, AQM and ADM in the CRYCB
---------------------------------------------
--Configuring the AP matrix for a KVM guest will be performed when the
-+  ioctl:
-+    this callback handles the VFIO_DEVICE_GET_INFO and VFIO_DEVICE_RESET ioctls
-+    defined by the vfio framework.
++struct ap_matrix_dev *matrix_dev;
++struct ap_matrix_mdev *matrix_mdev;
++struct kvm *kvm;
 +
-+Configure the guest's AP resources
-+----------------------------------
-+Configuring the AP resources for a KVM guest will be performed when the
- VFIO_GROUP_NOTIFY_SET_KVM notifier callback is invoked. The notifier
--function is called when QEMU connects to KVM. The guest's AP matrix is
--configured via it's CRYCB by:
-+function is called when userspace connects to KVM. The guest's AP resources are
-+configured via it's APCB by:
- 
- * Setting the bits in the APM corresponding to the APIDs assigned to the
--  mediated matrix device via its 'assign_adapter' interface.
-+  vfio_ap mediated device via its 'assign_adapter' interface.
- * Setting the bits in the AQM corresponding to the domains assigned to the
--  mediated matrix device via its 'assign_domain' interface.
-+  vfio_ap mediated device via its 'assign_domain' interface.
- * Setting the bits in the ADM corresponding to the domain dIDs assigned to the
--  mediated matrix device via its 'assign_control_domains' interface.
-+  vfio_ap mediated device via its 'assign_control_domains' interface.
++The Matrix Devices Lock (drivers/s390/crypto/vfio_ap_private.h)
++--------------------------------------------------------------
 +
-+The linux device model precludes passing a device through to a KVM guest that
-+is not bound to the device driver facilitating its pass-through. Consequently,
-+an APQN that does not reference a queue device bound to the vfio_ap device
-+driver will not be assigned to a KVM guest's matrix. The AP architecture,
-+however, does not provide a means to filter individual APQNs from the guest's
-+matrix, so the adapters, domains and control domains assigned to vfio_ap
-+mediated device via its sysfs 'assign_adapter', 'assign_domain' and
-+'assign_control_domain' interfaces will be filtered before providing the AP
-+configuration to a guest:
++struct ap_matrix_dev {
++	...
++	struct list_head mdev_list;
++	struct mutex mdevs_lock;
++	...
++}
 +
-+* The APIDs of the adapters, the APQIs of the domains and the domain numbers of
-+  the control domains assigned to the matrix mdev that are not also assigned to
-+  the host's AP configuration will be filtered.
++The Matrix Devices Lock (matrix_dev->mdevs_lock) is implemented as a global
++mutex contained within the single instance of struct ap_matrix_dev. This lock
++controls access to all fields contained within each matrix_mdev instance under
++the control of the vfio_ap device driver (matrix_dev->mdev_list). This lock must
++be held while reading from, writing to or using the data from a field contained
++within a matrix_mdev instance representing one of the vfio_ap device driver's
++mediated devices.
 +
-+* Each APQN derived from the Cartesian product of the APIDs and APQIs assigned
-+  to the vfio_ap mdev is examined and if any one of them does not reference a
-+  queue device bound to the vfio_ap device driver, the adapter will not be
-+  plugged into the guest (i.e., the bit corresponding to its APID will not be
-+  set in the APM of the guest's APCB).
- 
- The CPU model features for AP
- -----------------------------
--The AP stack relies on the presence of the AP instructions as well as two
--facilities: The AP Facilities Test (APFT) facility; and the AP Query
--Configuration Information (QCI) facility. These features/facilities are made
--available to a KVM guest via the following CPU model features:
-+The AP stack relies on the presence of the AP instructions as well as three
-+facilities: The AP Facilities Test (APFT) facility; the AP Query
-+Configuration Information (QCI) facility; and the AP Queue Interruption Control
-+facility. These features/facilities are made available to a KVM guest via the
-+following CPU model features:
- 
- 1. ap: Indicates whether the AP instructions are installed on the guest. This
-    feature will be enabled by KVM only if the AP instructions are installed
-@@ -435,24 +471,28 @@ available to a KVM guest via the following CPU model features:
-    can be made available to the guest only if it is available on the host (i.e.,
-    facility bit 12 is set).
- 
-+4. apqi: Indicates AP Queue Interruption Control faclity is available on the
-+   guest. This facility can be made available to the guest only if it is
-+   available on the host (i.e., facility bit 65 is set).
++The KVM Lock (include/linux/kvm_host.h)
++---------------------------------------
 +
- Note: If the user chooses to specify a CPU model different than the 'host'
- model to QEMU, the CPU model features and facilities need to be turned on
- explicitly; for example::
- 
--     /usr/bin/qemu-system-s390x ... -cpu z13,ap=on,apqci=on,apft=on
-+     /usr/bin/qemu-system-s390x ... -cpu z13,ap=on,apqci=on,apft=on,apqi=on
- 
- A guest can be precluded from using AP features/facilities by turning them off
- explicitly; for example::
- 
--     /usr/bin/qemu-system-s390x ... -cpu host,ap=off,apqci=off,apft=off
-+     /usr/bin/qemu-system-s390x ... -cpu host,ap=off,apqci=off,apft=off,apqi=off
- 
- Note: If the APFT facility is turned off (apft=off) for the guest, the guest
--will not see any AP devices. The zcrypt device drivers that register for type 10
--and newer AP devices - i.e., the cex4card and cex4queue device drivers - need
--the APFT facility to ascertain the facilities installed on a given AP device. If
--the APFT facility is not installed on the guest, then the probe of device
--drivers will fail since only type 10 and newer devices can be configured for
--guest use.
-+will not see any AP devices. The zcrypt device drivers on the guest that
-+register for type 10 and newer AP devices - i.e., the cex4card and cex4queue
-+device drivers - need the APFT facility to ascertain the facilities installed on
-+a given AP device. If the APFT facility is not installed on the guest, then no
-+adapter or domain devices will get created by the AP bus running on the
-+guest because only type 10 and newer devices can be configured for guest use.
- 
- Example
- =======
-@@ -471,7 +511,7 @@ CARD.DOMAIN TYPE  MODE
- 05.00ab     CEX5C CCA-Coproc
- 06          CEX5A Accelerator
- 06.0004     CEX5A Accelerator
--06.00ab     CEX5C CCA-Coproc
-+06.00ab     CEX5A Accelerator
- =========== ===== ============
- 
- Guest2
-@@ -479,9 +519,9 @@ Guest2
- =========== ===== ============
- CARD.DOMAIN TYPE  MODE
- =========== ===== ============
--05          CEX5A Accelerator
--05.0047     CEX5A Accelerator
--05.00ff     CEX5A Accelerator
-+05          CEX5C CCA-Coproc
-+05.0047     CEX5C CCA-Coproc
-+05.00ff     CEX5C CCA-Coproc
- =========== ===== ============
- 
- Guest3
-@@ -529,40 +569,56 @@ These are the steps:
- 
- 2. Secure the AP queues to be used by the three guests so that the host can not
-    access them. To secure them, there are two sysfs files that specify
--   bitmasks marking a subset of the APQN range as 'usable by the default AP
--   queue device drivers' or 'not usable by the default device drivers' and thus
--   available for use by the vfio_ap device driver'. The location of the sysfs
--   files containing the masks are::
-+   bitmasks marking a subset of the APQN range as usable only by the default AP
-+   queue device drivers. All remaining APQNs are available for use by
-+   any other device driver. The vfio_ap device driver is currently the only
-+   non-default device driver. The location of the sysfs files containing the
-+   masks are::
- 
-      /sys/bus/ap/apmask
-      /sys/bus/ap/aqmask
- 
-    The 'apmask' is a 256-bit mask that identifies a set of AP adapter IDs
--   (APID). Each bit in the mask, from left to right (i.e., from most significant
--   to least significant bit in big endian order), corresponds to an APID from
--   0-255. If a bit is set, the APID is marked as usable only by the default AP
--   queue device drivers; otherwise, the APID is usable by the vfio_ap
--   device driver.
-+   (APID). Each bit in the mask, from left to right, corresponds to an APID from
-+   0-255. If a bit is set, the APID belongs to the subset of APQNs marked as
-+   available only to the default AP queue device drivers.
- 
-    The 'aqmask' is a 256-bit mask that identifies a set of AP queue indexes
--   (APQI). Each bit in the mask, from left to right (i.e., from most significant
--   to least significant bit in big endian order), corresponds to an APQI from
--   0-255. If a bit is set, the APQI is marked as usable only by the default AP
--   queue device drivers; otherwise, the APQI is usable by the vfio_ap device
--   driver.
-+   (APQI). Each bit in the mask, from left to right, corresponds to an APQI from
-+   0-255. If a bit is set, the APQI belongs to the subset of APQNs marked as
-+   available only to the default AP queue device drivers.
++struct kvm {
++	...
++	struct mutex lock;
++	...
++}
 +
-+   The Cartesian product of the APIDs corresponding to the bits set in the
-+   apmask and the APQIs corresponding to the bits set in the aqmask comprise
-+   the subset of APQNs that can be used only by the host default device drivers.
-+   All other APQNs are available to the non-default device drivers such as the
-+   vfio_ap driver.
++The KVM Lock (kvm->lock) controls access to the state data for a KVM guest. This
++lock must be held by the vfio_ap device driver while one or more AP adapters,
++domains or control domains are being plugged into or unplugged from the guest.
 +
-+   Take, for example, the following masks::
++The vfio_ap device driver registers a function to be notified when the pointer
++to the kvm instance has been set. The KVM pointer is passed to the handler by
++the notifier and is stored in the in the matrix_mdev instance
++(matrix_mdev->kvm = kvm) containing the state of the mediated device that has
++been passed through to the KVM guest.
 +
-+      apmask:
-+      0x7d00000000000000000000000000000000000000000000000000000000000000
- 
--   Take, for example, the following mask::
-+      aqmask:
-+      0x8000000000000000000000000000000000000000000000000000000000000000
- 
--      0x7dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-+   The masks indicate:
- 
--    It indicates:
-+   * Adapters 1, 2, 3, 4, 5, and 7 are available for use by the host default
-+     device drivers.
- 
--      1, 2, 3, 4, 5, and 7-255 belong to the default drivers' pool, and 0 and 6
--      belong to the vfio_ap device driver's pool.
-+   * Domain 0 is available for use by the host default device drivers
++The Guests Lock (drivers/s390/crypto/vfio_ap_private.h)
++-----------------------------------------------------------
 +
-+   * The subset of APQNs available for use only by the default host device
-+     drivers are:
++struct ap_matrix_dev {
++	...
++	struct list_head mdev_list;
++	struct mutex guests_lock;
++	...
++}
 +
-+     (1,0), (2,0), (3,0), (4.0), (5,0) and (7,0)
++The Guests Lock (matrix_dev->guests_lock) controls access to the
++matrix_mdev instances (matrix_dev->mdev_list) that represent mediated devices
++that hold the state for the mediated devices that have been passed through to a
++KVM guest. This lock must be held:
 +
-+   * All other APQNs are available for use by the non-default device drivers.
- 
-    The APQN of each AP queue device assigned to the linux host is checked by the
--   AP bus against the set of APQNs derived from the cross product of APIDs
--   and APQIs marked as usable only by the default AP queue device drivers. If a
-+   AP bus against the set of APQNs derived from the Cartesian product of APIDs
-+   and APQIs marked as available to the default AP queue device drivers. If a
-    match is detected,  only the default AP queue device drivers will be probed;
-    otherwise, the vfio_ap device driver will be probed.
- 
-@@ -579,8 +635,7 @@ These are the steps:
- 
- 	   0x4100000000000000000000000000000000000000000000000000000000000000
- 
--	Keep in mind that the mask reads from left to right (i.e., most
--	significant to least significant bit in big endian order), so the mask
-+	Keep in mind that the mask reads from left to right, so the mask
- 	above identifies device numbers 1 and 7 (01000001).
- 
- 	If the string is longer than the mask, the operation is terminated with
-@@ -626,11 +681,22 @@ These are the steps:
- 	    default drivers pool:    adapter 0-15, domain 1
- 	    alternate drivers pool:  adapter 16-255, domains 0, 2-255
- 
-+   Note ***:
-+   Changing a mask such that one or more APQNs will be taken from a vfio_ap
-+   mediated device (see below) will fail with an error (EBUSY). A message
-+   is logged to the kernel ring buffer which can be viewed with the 'dmesg'
-+   command. The output identifies each APQN flagged as 'in use' and identifies
-+   the vfio_ap mediated device to which it is assigned; for example:
++1. To control access to the KVM pointer (matrix_mdev->kvm) while the vfio_ap
++   device driver is using it to plug/unplug AP devices passed through to the KVM
++   guest.
 +
-+   Userspace may not re-assign queue 05.0054 already assigned to 62177883-f1bb-47f0-914d-32a22e3a8804
-+   Userspace may not re-assign queue 04.0054 already assigned to cef03c3c-903d-4ecc-9a83-40694cb8aee4
++2. To add matrix_mdev instances to or remove them from matrix_dev->mdev_list.
++   This is necessary to ensure the proper locking order when the list is perused
++   to find an ap_matrix_mdev instance for the purpose of plugging/unplugging
++   AP devices passed through to a KVM guest.
 +
- Securing the APQNs for our example
- ----------------------------------
-    To secure the AP queues 05.0004, 05.0047, 05.00ab, 05.00ff, 06.0004, 06.0047,
-    06.00ab, and 06.00ff for use by the vfio_ap device driver, the corresponding
--   APQNs can either be removed from the default masks::
-+   APQNs can be removed from the default masks using either of the following
-+   commands::
- 
-       echo -5,-6 > /sys/bus/ap/apmask
- 
-@@ -683,7 +749,7 @@ Securing the APQNs for our example
- 
-      /sys/devices/vfio_ap/matrix/
-      --- [mdev_supported_types]
--     ------ [vfio_ap-passthrough] (passthrough mediated matrix device type)
-+     ------ [vfio_ap-passthrough] (passthrough vfio_ap mediated device type)
-      --------- create
-      --------- [devices]
- 
-@@ -734,6 +800,9 @@ Securing the APQNs for our example
-      ----------------unassign_control_domain
-      ----------------unassign_domain
- 
-+   Note *****: The vfio_ap mdevs do not persist across reboots unless the
-+               mdevctl tool is used to create and persist them.
++   For example, when a queue device is removed from the vfio_ap device driver,
++   if the adapter is passed through to a KVM guest, it will have to be
++   unplugged. In order to figure out whether the adapter is passed through,
++   the matrix_mdev object to which the queue is assigned will have to be
++   found. The KVM pointer (matrix_mdev->kvm) can then be used to determine if
++   the mediated device is passed through (matrix_mdev->kvm != NULL) and if so,
++   to unplug the adapter.
 +
- 4. The administrator now needs to configure the matrixes for the mediated
-    devices $uuid1 (for Guest1), $uuid2 (for Guest2) and $uuid3 (for Guest3).
- 
-@@ -755,6 +824,10 @@ Securing the APQNs for our example
- 
- 	 cat matrix
- 
-+   To display the matrix that is or will be assigned to Guest1::
++It is not necessary to take the Guests Lock to access the KVM pointer if the
++pointer is not used to plug/unplug devices passed through to the KVM guest;
++however, in this case, the Matrix Devices Lock (matrix_dev->mdevs_lock) must be
++held in order to access the KVM pointer since it set and cleared under the
++protection of the Matrix Devices Lock. A case in point is the function that
++handles interception of the PQAP(AQIC) instruction sub-function. This handler
++needs to access the KVM pointer only for the purposes of setting or clearing IRQ
++resources, so only the matrix_dev->mdevs_lock needs to be held.
 +
-+	 cat guest_matrix
++The PQAP Hook Lock (arch/s390/include/asm/kvm_host.h)
++-----------------------------------------------------
 +
-    This is how the matrix is configured for Guest2::
- 
-       echo 5 > assign_adapter
-@@ -774,17 +847,24 @@ Securing the APQNs for our example
-      higher than the maximum is specified, the operation will terminate with
-      an error (ENODEV).
- 
--   * All APQNs that can be derived from the adapter ID and the IDs of
--     the previously assigned domains must be bound to the vfio_ap device
--     driver. If no domains have yet been assigned, then there must be at least
--     one APQN with the specified APID bound to the vfio_ap driver. If no such
--     APQNs are bound to the driver, the operation will terminate with an
--     error (EADDRNOTAVAIL).
-+     Note: The maximum adapter number can be obtained via the sysfs
-+	   /sys/bus/ap/ap_max_adapter_id attribute file.
++typedef int (*crypto_hook)(struct kvm_vcpu *vcpu);
 +
-+   * Each APQN derived from the Cartesian product of the APID of the adapter
-+     being assigned and the APQIs of the domains previously assigned:
- 
--     No APQN that can be derived from the adapter ID and the IDs of the
--     previously assigned domains can be assigned to another mediated matrix
--     device. If an APQN is assigned to another mediated matrix device, the
--     operation will terminate with an error (EADDRINUSE).
-+     - Must only be available to the vfio_ap device driver as specified in the
-+       sysfs /sys/bus/ap/apmask and /sys/bus/ap/aqmask attribute files. If even
-+       one APQN is reserved for use by the host device driver, the operation
-+       will terminate with an error (EADDRNOTAVAIL).
++struct kvm_s390_crypto {
++	...
++	struct rw_semaphore pqap_hook_rwsem;
++	crypto_hook *pqap_hook;
++	...
++};
 +
-+     - Must NOT be assigned to another vfio_ap mediated device. If even one APQN
-+       is assigned to another vfio_ap mediated device, the operation will
-+       terminate with an error (EBUSY).
++The PQAP Hook Lock is a r/w semaphore that controls access to the function
++pointer of the handler (*kvm->arch.crypto.pqap_hook) to invoke when the
++PQAP(AQIC) instruction sub-function is intercepted by the host. The lock must be
++held in write mode when pqap_hook value is set, and in read mode when the
++pqap_hook function is called.
 +
-+     - Must NOT be assigned while the sysfs /sys/bus/ap/apmask and
-+       sys/bus/ap/aqmask attribute files are being edited or the operation may
-+       terminate with an error (EBUSY).
- 
-    In order to successfully assign a domain:
- 
-@@ -793,41 +873,50 @@ Securing the APQNs for our example
-      higher than the maximum is specified, the operation will terminate with
-      an error (ENODEV).
- 
--   * All APQNs that can be derived from the domain ID and the IDs of
--     the previously assigned adapters must be bound to the vfio_ap device
--     driver. If no domains have yet been assigned, then there must be at least
--     one APQN with the specified APQI bound to the vfio_ap driver. If no such
--     APQNs are bound to the driver, the operation will terminate with an
--     error (EADDRNOTAVAIL).
-+     Note: The maximum domain number can be obtained via the sysfs
-+	   /sys/bus/ap/ap_max_domain_id attribute file.
++Locking Order
++-------------
 +
-+    * Each APQN derived from the Cartesian product of the APQI of the domain
-+      being assigned and the APIDs of the adapters previously assigned:
- 
--     No APQN that can be derived from the domain ID and the IDs of the
--     previously assigned adapters can be assigned to another mediated matrix
--     device. If an APQN is assigned to another mediated matrix device, the
--     operation will terminate with an error (EADDRINUSE).
-+     - Must only be available to the vfio_ap device driver as specified in the
-+       sysfs /sys/bus/ap/apmask and /sys/bus/ap/aqmask attribute files. If even
-+       one APQN is reserved for use by the host device driver, the operation
-+       will terminate with an error (EADDRNOTAVAIL).
- 
--   In order to successfully assign a control domain, the domain number
--   specified must represent a value from 0 up to the maximum domain number
--   configured for the system. If a control domain number higher than the maximum
--   is specified, the operation will terminate with an error (ENODEV).
-+     - Must NOT be assigned to another vfio_ap mediated device. If even one APQN
-+       is assigned to another vfio_ap mediated device, the operation will
-+       terminate with an error (EBUSY).
++If the various locks are not taken in the proper order, it could potentially
++result in a lockdep splat. The proper order for taking locks depends upon
++the operation taking place, but in general the Guests Lock
++(matrix_dev->guests_lock) must be taken outside of the KVM Lock (kvm->lock)
++which in turn must be taken outside of the Matrix Devices Lock
++(matrix_dev->mdevs_lock).
 +
-+     - Must NOT be assigned while the sysfs /sys/bus/ap/apmask and
-+       sys/bus/ap/aqmask attribute files are being edited or the operation may
-+       terminate with an error (EBUSY).
++The following describes the various operations under which the various locks are
++taken, the purpose for taking them and the order in which they must be taken.
 +
-+   In order to successfully assign a control domain:
++* Operations: Setting or clearing the KVM pointer (matrix_mdev->kvm):
 +
-+   * The domain number specified must represent a value from 0 up to the maximum
-+     domain number configured for the system. If a control domain number higher
-+     than the maximum is specified, the operation will terminate with an
-+     error (ENODEV).
- 
- 5. Start Guest1::
- 
--     /usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on \
-+     /usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on,apqi=on \
- 	-device vfio-ap,sysfsdev=/sys/devices/vfio_ap/matrix/$uuid1 ...
- 
- 7. Start Guest2::
- 
--     /usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on \
-+     /usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on,apqi=on \
- 	-device vfio-ap,sysfsdev=/sys/devices/vfio_ap/matrix/$uuid2 ...
- 
- 7. Start Guest3::
- 
--     /usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on \
-+     /usr/bin/qemu-system-s390x ... -cpu host,ap=on,apqci=on,apft=on,apqi=on \
- 	-device vfio-ap,sysfsdev=/sys/devices/vfio_ap/matrix/$uuid3 ...
- 
--When the guest is shut down, the mediated matrix devices may be removed.
-+When the guest is shut down, the vfio_ap mediated devices may be removed.
- 
--Using our example again, to remove the mediated matrix device $uuid1::
-+Using our example again, to remove the vfio_ap mediated device $uuid1::
- 
-    /sys/devices/vfio_ap/matrix/
-       --- [mdev_supported_types]
-@@ -840,26 +929,137 @@ Using our example again, to remove the mediated matrix device $uuid1::
- 
-    echo 1 > remove
- 
--This will remove all of the mdev matrix device's sysfs structures including
--the mdev device itself. To recreate and reconfigure the mdev matrix device,
-+This will remove all of the matrix mdev device's sysfs structures including
-+the mdev device itself. To recreate and reconfigure the matrix mdev device,
- all of the steps starting with step 3 will have to be performed again. Note
--that the remove will fail if a guest using the mdev is still running.
-+that the remove will fail if a guest using the vfio_ap mdev is still running.
- 
--It is not necessary to remove an mdev matrix device, but one may want to
-+It is not necessary to remove a vfio_ap mdev, but one may want to
- remove it if no guest will use it during the remaining lifetime of the linux
--host. If the mdev matrix device is removed, one may want to also reconfigure
-+host. If the vfio_ap mdev is removed, one may want to also reconfigure
- the pool of adapters and queues reserved for use by the default drivers.
- 
-+Hot plug/unplug support:
-+================
-+An adapter, domain or control domain may be hot plugged into a running KVM
-+guest by assigning it to the vfio_ap mediated device being used by the guest if
-+the following conditions are met:
++  1. PQAP Hook Lock (kvm->arch.crypto.pqap_hook_rwsem):
 +
-+* The adapter, domain or control domain must also be assigned to the host's
-+  AP configuration.
++	This semaphore must be held in write mode while setting or clearing the
++	reference to the function pointer (kvm->arch.crypt.pqap_hook) to call
++	when the PQAP(AQIC) instruction sub-function is intercepted by the host.
++	The function pointer is set when the KVM pointer is being set and
++	cleared when the KVM pointer is being cleared.
 +
-+* Each APQN derived from the Cartesian product comprised of the APID of the
-+  adapter being assigned and the APQIs of the domains assigned must reference a
-+  queue device bound to the vfio_ap device driver.
++  2.Guests Lock (matrix_dev->guests_lock):
 +
-+* To hot plug a domain, each APQN derived from the Cartesian product
-+  comprised of the APQI of the domain being assigned and the APIDs of the
-+  adapters assigned must reference a queue device bound to the vfio_ap device
-+  driver.
++	This mutex must be held while accessing the KVM pointer
++	(matrix_mdev->kvm) to plug/unplug AP devices passed through to the
++	KVM guest
 +
-+An adapter, domain or control domain may be hot unplugged from a running KVM
-+guest by unassigning it from the vfio_ap mediated device being used by the
-+guest.
++  3. KVM Lock (kvm->lock):
 +
-+Over-provisioning of AP queues for a KVM guest:
-+==============================================
-+Over-provisioning is defined herein as the assignment of adapters or domains to
-+a vfio_ap mediated device that do not reference AP devices in the host's AP
-+configuration. The idea here is that when the adapter or domain becomes
-+available, it will be automatically hot-plugged into the KVM guest using
-+the vfio_ap mediated device to which it is assigned as long as each new APQN
-+resulting from plugging it in references a queue device bound to the vfio_ap
-+device driver.
++	This mutex must be held while the AP devices passed through to the KVM
++	guest are plugged/unplugged.
 +
- Limitations
- ===========
--* The KVM/kernel interfaces do not provide a way to prevent restoring an APQN
--  to the default drivers pool of a queue that is still assigned to a mediated
--  device in use by a guest. It is incumbent upon the administrator to
--  ensure there is no mediated device in use by a guest to which the APQN is
--  assigned lest the host be given access to the private data of the AP queue
--  device such as a private key configured specifically for the guest.
-+Live guest migration is not supported for guests using AP devices without
-+intervention by a system administrator. Before a KVM guest can be migrated,
-+the vfio_ap mediated device must be removed. Unfortunately, it can not be
-+removed manually (i.e., echo 1 > /sys/devices/vfio_ap/matrix/$UUID/remove) while
-+the mdev is in use by a KVM guest. If the guest is being emulated by QEMU,
-+its mdev can be hot unplugged from the guest in one of two ways:
++  4. Matrix Devices Lock (matrix_dev->mdevs_lock)
 +
-+1. If the KVM guest was started with libvirt, you can hot unplug the mdev via
-+   the following commands:
++	This lock must be held to prevent access to the matrix_mdev state
++	while writing/reading state values during the operation.
 +
-+      virsh detach-device <guestname> <path-to-device-xml>
++* Operations: Assign or unassign an adapter, domain or control domain of a
++	      mediated device under the control of the vfio_ap device driver:
 +
-+      For example, to hot unplug mdev 62177883-f1bb-47f0-914d-32a22e3a8804 from
-+      the guest named 'my-guest':
++  1. Guests Lock (matrix_dev->guests_lock):
 +
-+         virsh detach-device my-guest ~/config/my-guest-hostdev.xml
++	This mutex must be held while accessing the KVM pointer
++	(matrix_dev->kvm) to plug/unplug AP devices passed through to the
++	KVM guest as a result of the assignment/unassignment operation.
++	Assignment of an AP device may result in additional queue devices
++	or control domains being plugged into the guest. Similarly, unassignment
++	may result in unplugging queue devices or control domains from the
++	guest
 +
-+            The contents of my-guest-hostdev.xml:
++  3. KVM Lock (matrix_mdev->kvm->lock):
 +
-+            <hostdev mode='subsystem' type='mdev' managed='no' model='vfio-ap'>
-+              <source>
-+                <address uuid='62177883-f1bb-47f0-914d-32a22e3a8804'/>
-+              </source>
-+            </hostdev>
++	This mutex must be held while the AP devices passed through to the KVM
++	guest are plugged in or unplugged.
 +
++  4. Matrix Devices Lock (matrix_dev->mdevs_lock)
 +
-+      virsh qemu-monitor-command <guest-name> --hmp "device-del <device-id>"
++	This lock must be held to prevent access to the matrix_mdev state
++	while writing/reading state values during the operation. For example, to
++	determine which AP devices need to be plugged/unplugged, the lock
++	must be held to prevent other operations from changing the data used
++	to construct the guest's AP configuration.
 +
-+      For example, to hot unplug the vfio_ap mediated device identified on the
-+      qemu command line with 'id=hostdev0' from the guest named 'my-guest':
++* Operations: Probe or remove an AP queue device:
 +
-+         virsh qemu-monitor-command my-guest --hmp "device_del hostdev0"
++  When a queue device is bound to the vfio_ap device driver, the driver's probe
++  callback is invoked. Similarly, when a queue device is unbound from the
++  driver it's remove callback is invoked. The probe and remove functions will
++  take locks in the following order:
 +
-+2. A vfio_ap mediated device can be hot unplugged by attaching the qemu monitor
-+   to the guest and using the following qemu monitor command:
++  1. Guests Lock (matrix_dev->guests_lock):
 +
-+      (QEMU) device-del id=<device-id>
++	This mutex must be held for the duration of this operation.
 +
-+      For example, to hot unplug the vfio_ap mediated device that was specified
-+      on the qemu command line with 'id=hostdev0' when the guest was started:
++	At the time of the operation, the vfio_ap device driver will only have
++	the APQN of the queue being probed or removed, so the
++	matrix_dev->mdevs_list must be perused to locate the matrix_mdev
++	instance to which the queue is assigned. The Guests Lock must be held
++	during this time to prevent the list from being changed while processing
++	the probe/remove.
 +
-+         (QEMU) device-del id=hostdev0
++	Once the matrix_mdev is found, the operation must determine whether the
++	mediated device is passed through to a guest (matrix_mdev->kvm != NULL),
++	then use the KVM pointer to perform the plug/unplug operation. Here
++	again, the lock must be held to prevent other operations from accessing
++	the KVM pointer for the same purpose.
 +
-+After live migration of the KVM guest completes, an AP configuration can be
-+restored to the KVM guest by hot plugging a vfio_ap mediated device on the target
-+system into the guest in one of two ways:
++  2. KVM Lock (kvm->lock):
 +
-+1. If the KVM guest was started with libvirt, you can hot plug a matrix mediated
-+   device into the guest via the following virsh commands:
++	This mutex must be held while the AP devices passed through to the KVM
++	guest are plugged in or unplugged to prevent other operations from
++	accessing the guest's state while it is in flux.
 +
-+   virsh attach-device <guestname> <path-to-device-xml>
++  3. Matrix Devices Lock (matrix_dev->mdevs_lock)
 +
-+      For example, to hot plug mdev 62177883-f1bb-47f0-914d-32a22e3a8804 into
-+      the guest named 'my-guest':
++	This lock must be held to prevent access to the matrix_mdev state
++	while writing/reading state values during the operation, such as the
++	masks used to construct the KVM guest's AP configuration.
 +
-+         virsh attach-device my-guest ~/config/my-guest-hostdev.xml
++* Operations: Probe or remove a mediated device:
 +
-+            The contents of my-guest-hostdev.xml:
++  1. Guests Lock (matrix_dev->guests_lock):
 +
-+            <hostdev mode='subsystem' type='mdev' managed='no' model='vfio-ap'>
-+              <source>
-+                <address uuid='62177883-f1bb-47f0-914d-32a22e3a8804'/>
-+              </source>
-+            </hostdev>
++	This mutex must be held while adding the matrix_mdev to the
++	matrix_dev->mdev_list during the probe operation or when removing it
++	from the list during the remove operation. This is to prevent access by
++	other functions that must traverse the list to find a matrix_mdev for
++	the purpose of plugging/unplugging AP devices passed through to a KVM
++	guest (i.e., probe/remove queue callbacks), while the list is being
++	modified.
 +
++  2. Matrix Devices Lock (matrix_dev->mdevs_lock)
 +
-+   virsh qemu-monitor-command <guest-name> --hmp \
-+   "device_add vfio-ap,sysfsdev=<path-to-mdev>,id=<device-id>"
++	This lock must be held to prevent access to the matrix_mdev state
++	while writing/reading state values during the probe or remove operations
++	such as initializing the hashtable of queue devices
++	(matrix_mdev->qtable.queues) assigned to the matrix_mdev.
 +
-+      For example, to hot plug the vfio_ap mediated device
-+      62177883-f1bb-47f0-914d-32a22e3a8804 into the guest named 'my-guest' with
-+      device-id hostdev0:
++* Operation: Handle interception of the PQAP(AQIC) instruction sub-function:
 +
-+      virsh qemu-monitor-command my-guest --hmp \
-+      "device_add vfio-ap,\
-+      sysfsdev=/sys/devices/vfio_ap/matrix/62177883-f1bb-47f0-914d-32a22e3a8804,\
-+      id=hostdev0"
++  1. PQAP Hook Lock (kvm->arch.crypto.pqap_hook_rwsem)
 +
-+2. A vfio_ap mediated device can be hot plugged by attaching the qemu monitor
-+   to the guest and using the following qemu monitor command:
++	This semaphore must be held in read mode while retrieving the function
++	pointer (kvm->arch.crypto.pqap_hook) and executing the function that
++	handles the interception of the PQAP(AQIC) instruction sub-function by
++	the host.
 +
-+      (qemu) device_add "vfio-ap,sysfsdev=<path-to-mdev>,id=<device-id>"
- 
--* Dynamically modifying the AP matrix for a running guest (which would amount to
--  hot(un)plug of AP devices for the guest) is currently not supported
-+      For example, to plug the vfio_ap mediated device
-+      62177883-f1bb-47f0-914d-32a22e3a8804 into the guest with the device-id
-+      hostdev0:
- 
--* Live guest migration is not supported for guests using AP devices.
-+         (QEMU) device-add "vfio-ap,\
-+         sysfsdev=/sys/devices/vfio_ap/matrix/62177883-f1bb-47f0-914d-32a22e3a8804,\
-+         id=hostdev0"
++  2. Matrix Devices Lock (matrix_dev->mdevs_lock)
++
++	This lock must be held to prevent access to the matrix_mdev state
++	while writing/reading state values during the execution of the
++	PQAP(AQIC) instruction sub-function interception handler. For example,
++	the handler must iterate over the matrix_mdev->qtable.queues hashtable
++	to find the vfio_ap_queue object representing the queue for which
++	interrupts are being enabled or disabled.
++
++  Note: It is not necessary to take the Guests Lock (matrix_dev->guests_lock)
++	or the KVM Lock (matrix_mdev->kvm->lock) because the KVM pointer
++	will not be accessed to plug/unplug AP devices passed through to the
++	guest; it will only be used to allocate or free resources for processing
++	interrupts.
++
++* Operation: Handle AP configuration changed notification:
++
++  The vfio_ap device driver registers a callback function to be notified when
++  the AP bus detects that the host's AP configuration has changed. This can
++  occur due to the addition or removal of AP adapters, domains or control
++  domains via an SE or HMC connected to a DPM enabled LPAR. The objective of the
++  handler is to remove the queues no longer accessible via the host in bulk
++  rather than one queue at a time via the driver's queue device remove callback.
++  The locks and the order in which they must be taken by this operation are:
++
++ 1. Guests Lock (matrix_dev->guests_lock):
++
++	This mutex must be held for the duration of the operation to:
++
++	* Iterate over the matrix_dev->mdev_list to find each matrix_mdev from
++	  which a queue device to be removed is assigned and prevent other
++	  operations from modifying the list while processing the affected
++	  matrix_mdev instances.
++
++	* Prevent other operations from acquiring access to the KVM pointer in
++	  each affected matrix_mdev instance (matrix_mdev->kvm) for the purpose
++	  of plugging/unplugging AP devices passed through to the KVM guest via
++	  that instance.
++
++2. KVM Lock (kvm->lock):
++
++	This mutex must be held for each affected matrix_mdev instance while
++	the AP devices passed through to the KVM guest are unplugged to prevent
++	other operations from accessing the guest's state while it is in flux.
++
++	Note: This lock must be re-acquired for each matrix_mdev instance.
++
++  3. Matrix Devices Lock (matrix_dev->mdevs_lock)
++
++	This lock must be held for each affected matrix_mdev to prevent access
++	to the matrix_mdev state while writing/reading state values during the
++	operation, such as the masks used to construct the KVM guest's AP
++	configuration.
++
++	Note: This lock must be re-acquired for each matrix_mdev instance.
++
++Operation: Handle AP bus scan complete notification:
++
++  The vfio_ap device driver registers a callback function to be notified when
++  the AP bus scan completes after detecting the addition or removal of AP
++  adapters, domains or control domains. The objective of the handler is t
++  add the new queues accessible via the host in bulk rather than one queue
++  at a time via the driver's queue device probe callback. The locks and the
++  order in which they must be taken by this operation are:
++
++  1. Guests Lock (matrix_dev->guests_lock):
++
++	This mutex must be held for the duration of the operation to:
++
++	* Iterate over the matrix_dev->mdev_list to find each matrix_mdev to
++	  which a queue device added is assigned and prevent other operations
++	  from modifying the list while processing each affected matrix_mdev
++	  object.
++
++	* Prevent other operations from acquiring access to the KVM pointer in
++	  each affected matrix_mdev instance (matrix_mdev->kvm) for the purpose
++	  of plugging/unplugging AP devices passed through to the KVM guest via
++	  that instance.
++
++  2. KVM Lock (kvm->lock):
++
++	This mutex must be held for each affected matrix_mdev instance while
++	the AP devices passed through to the KVM guest are plugged in to prevent
++	other operations from accessing the guest's state while it is in flux.
++
++	Note: This lock must be re-acquired for each matrix_mdev instance.
++
++  3. Matrix Devices Lock (matrix_dev->mdevs_lock):
++
++	This lock must be held for each affected matrix_mdev to prevent access
++	to the matrix_mdev state while writing/reading state values during the
++	operation, such as the masks used to construct the KVM guest's AP
++	configuration.
++
++	Note: This lock must be re-acquired for each matrix_mdev instance.
++
++Operation: Handle resource in use query:
++
++  The vfio_ap device driver registers a callback function with the AP bus to be
++  called when changes to the bus's sysfs /sys/bus/ap/apmask or
++  /sys/bus/ap/aqmask attributes would result in one or more AP queue devices
++  getting unbound from the vfio_ap device driver to verify none of them are in
++  use by the driver (i.e., assigned to a matrix_mdev instance). If this function
++  is called while an adapter or domain is also being assigned to a mediated
++  device, this could result in a deadlock; for example:
++
++  1. A system administrator assigns an adapter to a mediated device under the
++     control of the vfio_ap device driver. The driver will need to first take
++     the matrix_dev->guests_lock to potentially hot plug the adapter into
++     the KVM guest.
++  2. At the same time, a system administrator sets a bit in the sysfs
++     /sys/bus/ap/ap_mask attribute. To complete the operation, the AP bus
++     must:
++     a. Take the ap_perms_mutex lock to update the object storing the values
++        for the /sys/bus/ap/ap_mask attribute.
++     b. Call the vfio_ap device driver's in-use callback to verify that no
++        queues now being reserved for the default zcrypt drivers are
++        in use by the vfio_ap device driver. To do the verification, the in-use
++        callback function takes the matrix_dev->guests_lock, but has to wait
++        because it is already held by the operation in 1 above.
++  3. The vfio_ap device driver calls an AP bus function to verify that the
++     new queues resulting from the assignment of the adapter in step 1 are
++     not reserved for the default zcrypt device driver. This AP bus function
++     tries to take the ap_perms_mutex lock but gets stuck waiting for the
++     it due to step 2a above.
++
++    Consequently, we have the following deadlock situation:
++
++    matrix_dev->guests_lock locked (1)
++    ap_perms_mutex lock locked (2a)
++    Waiting for matrix_dev->lock (2b) which is currently held (1)
++    Waiting for ap_perms_mutex lock (3) which is currently held (2a)
++
++  To prevent the deadlock scenario, the in_use operation will take the
++  required locks using the mutex_trylock() function and if the lock can not be
++  acquired will terminate and return -EBUSY to indicate the driver is busy
++  processing another request.
++
++  The locks required to respond to the handle resource in use query and the
++  order in which they must be taken are:
++
++  1. Guests Lock (matrix_dev->guests_lock):
++
++  This mutex must be held for the duration of the operation to iterate over the
++  matrix_dev->mdev_list to determine whether any of the queues to be unbound
++  are assigned to a matrix_mdev instance.
++
++  2. Matrix Devices Lock (matrix_dev->mdevs_lock):
++
++  This mutex must be held for the duration of the operation to ensure that the
++  AP configuration of each matrix_mdev instance does not change while verifying
++  that none of the queue devices to be removed from the vfio_ap driver are
++  assigned to it.
 -- 
 2.31.1
 
