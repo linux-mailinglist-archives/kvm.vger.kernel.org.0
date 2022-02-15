@@ -2,282 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A49D4B6D3F
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 14:18:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E55C94B6DFA
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 14:47:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238210AbiBONSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 08:18:53 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56468 "EHLO
+        id S238414AbiBONr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 08:47:58 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232192AbiBONSw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 08:18:52 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1778D10A8;
-        Tue, 15 Feb 2022 05:18:42 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21FD1o3U021874;
-        Tue, 15 Feb 2022 13:18:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Y/mj7jLB8eOdqAaE1qPvldlmkX/RYMfvzjuJ1uwyWlA=;
- b=fUCfl6DDGzHLFp490ckK+1ANlaagkuWe7+aGK+QOow9kY6oK1OJjdG3gTnkesJFWtgn2
- jJjkXRKlSK8AKLXqIOJnjIv9YCgKIYWf2eA7BdvZ7APjr1AwdtdTDk8ieEM2X3aE/6G7
- evwzTUMyzzj7XTpUCx1o0WLW/7skS3SFRQhbKikNLitxS8hoVtfakAWDP9LzE1FR3PDP
- 2+UW5PalvdXN1nQM7fQJTqHiddtM3SHsh5rXurLlPeDkmwgtL0XSN9aBtGBZ1Q2nf9LG
- DaGtKoAoplkc4gEX7heQGjdzdxzMXWGXC2gb33ek0CBLV4BZgygXNV3OWaf2cBbqIhNr tw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e86tfrxhu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 13:18:41 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21FCOQkI018121;
-        Tue, 15 Feb 2022 13:18:41 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e86tfrxha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 13:18:41 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21FDI0lK000350;
-        Tue, 15 Feb 2022 13:18:39 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3e64h9x4cr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 13:18:39 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21FDIYZN48562448
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Feb 2022 13:18:34 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5118DA405B;
-        Tue, 15 Feb 2022 13:18:34 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAE76A4054;
-        Tue, 15 Feb 2022 13:18:33 +0000 (GMT)
-Received: from [9.145.49.62] (unknown [9.145.49.62])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Feb 2022 13:18:33 +0000 (GMT)
-Message-ID: <d6e0af70-9ac3-bdd6-3517-cbf21cf86e2c@linux.ibm.com>
-Date:   Tue, 15 Feb 2022 14:18:33 +0100
+        with ESMTP id S238408AbiBONr5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 08:47:57 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2071.outbound.protection.outlook.com [40.107.244.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0987DF2F;
+        Tue, 15 Feb 2022 05:47:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EHkNrCrT7hM+A4rMxWxjyjgCtWFFSnMIn1kX6MM1rVk5x6PAF+Fufpam1Ujii377/6ZW9KptP0vG+jCnBK7HOuqDeuA0C3AtmcsoSYUFKim/u8QADYh/eh45icmjYjGzgt/tczPWOu4fEfSGnMcyBw2pp4SIMFhoQp7jhE6c1BLtaZ5YIqLuxsatQcwgrkZ5nCR8xgSNXJYGrhI+sX0pwKm78g1SzG/XjsNMfA8nMJG2OXKL1SNO+JX06z2rGLRzltPiODTDHWAoav0PgefxsxDk8MIbzrO89WZgxI4EM1f/pevk3eQeZeEvZC6pF9ES5cggOYoVM0diwiOSkSA2Sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/0i2YyEsaZexMhSHlFSOMsKg54H1gW8mUVTSgPXHuW0=;
+ b=mn/WtPtnH3mCT/lqK0ML/pqHHlzPe+aUvILzmQDormNFZS+rcm5FhIO/STsmuzKPkq00t15yGCrToXrLRIUn3W95h5h9GqEGLIii7TLSJhHfLZ6EAIAo8NZUEQsVnpe9q088iEeJEM17oY7MsuCa7s36HL/UBlpwGXx6tgOojh42SFRqcWg/P+6j5ilZyZhLSsmoNG1Sp5BxyrE2YITBFf92dUgVldBZdLKHKaBNPZYy0u3/vHlvSmn3miJkNNmcOFgOgC2UPhttjv5xidMwe9D67OnFQ7Hjnkj/S+67hYyAGmhYV5BQzM+h7o8bvrAWwPiKq5CFZHRPaRmqHv7n5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/0i2YyEsaZexMhSHlFSOMsKg54H1gW8mUVTSgPXHuW0=;
+ b=JF6gWnA+VS1sImXwd6il5E/7hrttgMMhWqD1wQxHYxVhTc0LJ8qg09lA3xcvFHQnKFTtCpItfmrKJsA2wpE1jd8/BOfZrKjvUAiR8iLVpDz177UEsLk4NvyjPRpHT8o4yZBZ8VKI0SA2JAgltnA+4rXwBaq23LxzkgnFSrRxfKBVb+h0oPts/WXaxEBbwj9kIkfL7QA+o/r1ZCrOv/DYUriCFAEErebvIPfliJMR08oLaqI0UwLnmfdrZlHNe7fk1n9YwTlTZxRugFXM+257UXUL2+qcCkO7T6UJlbfPagViwldnXw0hQ6OVu+wMTR85AAKwwOayY5e4GrWi4EsVvw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16)
+ by BN8PR12MB3075.namprd12.prod.outlook.com (2603:10b6:408:67::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.14; Tue, 15 Feb
+ 2022 13:47:46 +0000
+Received: from CH2PR12MB4181.namprd12.prod.outlook.com
+ ([fe80::287d:b5f6:ed76:64ba]) by CH2PR12MB4181.namprd12.prod.outlook.com
+ ([fe80::287d:b5f6:ed76:64ba%4]) with mapi id 15.20.4975.019; Tue, 15 Feb 2022
+ 13:47:45 +0000
+Date:   Tue, 15 Feb 2022 09:47:44 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Stuart Yoder <stuyoder@gmail.com>, rafael@kernel.org,
+        David Airlie <airlied@linux.ie>, linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>, Ashok Raj <ashok.raj@intel.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+Subject: Re: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for
+ multi-device groups
+Message-ID: <20220215134744.GO4160@nvidia.com>
+References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
+ <20220106022053.2406748-4-baolu.lu@linux.intel.com>
+ <Ygo/eCRFnraY01WA@8bytes.org>
+ <20220214130313.GV4160@nvidia.com>
+ <Ygppub+Wjq6mQEAX@8bytes.org>
+ <08e90a61-8491-acf1-ab0f-f93f97366d24@arm.com>
+ <20220214154626.GF4160@nvidia.com>
+ <YgtrJVI9wGMFdPWk@8bytes.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YgtrJVI9wGMFdPWk@8bytes.org>
+X-ClientProxiedBy: BL1PR13CA0231.namprd13.prod.outlook.com
+ (2603:10b6:208:2bf::26) To CH2PR12MB4181.namprd12.prod.outlook.com
+ (2603:10b6:610:a8::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 1/1] KVM: s390: pv: make use of ultravisor AIV support
-Content-Language: en-US
-To:     Michael Mueller <mimu@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220209152217.1793281-1-mimu@linux.ibm.com>
- <20220209152217.1793281-2-mimu@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20220209152217.1793281-2-mimu@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: l6OVTrbGSjY6SJpltKWa9KY--7DMSqgt
-X-Proofpoint-ORIG-GUID: U7SnPpatJSD4iU8hl3f34cRnry11IQEo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-15_04,2022-02-14_04,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 adultscore=0 phishscore=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 mlxlogscore=999 clxscore=1015 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2202150075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 45576e2c-84fd-441b-4903-08d9f089bf0f
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3075:EE_
+X-Microsoft-Antispam-PRVS: <BN8PR12MB30753A160B147531D43DEF10C2349@BN8PR12MB3075.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 88+o1ITyl5PajuDBs1xV4gOfWT7cnaf1D5g+rl2CknpqUuWroAREoJyCu/nTmHdIri61OqFxj2CRCLP9DxKNi/FdFwofnBP8D9JSy3DxU0UoJ1S7/HvZJlDhTy8gA1H33Ul/3YU307yV+2zy4Pro6ZTExcmtML3u7NJbfEDR5+EDcmWdjhMkUHmC5JpaLzpYctyJgM2SKRFinTnMipy7Qlkqd8L2tEPRzGf+drcABF5t5nh7vnaA9FkQxMGw5pAsd0GTCqjREtHvgU/uk20+OC8Nm4eICAu7c3PlvURwYcGHXgr8t+TwOj4f8w8Z3s7glSTlJbiRHlPH7LEG7dpqR9goG+/xeZqnBu0iWR+Oa3RcYxPnjXa+qOG9xjblP2pdSn+DqFXcqx+7fLE612YwJ0smx7CRyc/kI9G2/Hsz42lf2hETr9oq2EoQC3zrUDHhU67Pb01HzSnnA/IA28D/uq/e5FHkfEy80X1mg0Vwbcpx2XYfYfT/5mynsTAbCd8cKMpmUkM1a500Tbl55Tg5HSY9+/NGN3bth8z7ODfnBYkMD9C64wt12VxJCVYnLnwF8oWYzlM8DMMqrPWoUS81yHnvj/QYqdsC1Uy7lZujL6okOtcUnflCM5JYvVYBe+6JgsctCCsK8Y9jFOccmXHtag==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(6512007)(1076003)(186003)(2616005)(508600001)(26005)(66946007)(5660300002)(54906003)(38100700002)(33656002)(6916009)(6486002)(7416002)(66476007)(8936002)(36756003)(316002)(83380400001)(86362001)(4326008)(8676002)(2906002)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?buzFBb8FjC2tWGSoMlyOBJ27qvuRGWMavDZF8U5YvRUV+huYFPTvfmgOWie3?=
+ =?us-ascii?Q?P0S3nLS0rgUic7nplMzs1eWmxqAC3wo2qc6pAgMk+RaSNZpfSe9KZv+h/si4?=
+ =?us-ascii?Q?sNBGtRr7PzevPpg2hqg2mVoZyOe8neX623oBDNOVhNDjUSXbBujs9MzgatqW?=
+ =?us-ascii?Q?Gfgqt8cJAdRr089k3uCtNCDqY/LWLCDpx8OwHMAYJ/RGsgUd27IzbaIyXZIF?=
+ =?us-ascii?Q?MFcvNagJb8HAnl/B3cVftw6VXN/rNJWk8AUzrUaLKyl8nQhgBg1WuAqtoN9Y?=
+ =?us-ascii?Q?yNkkprrZPf8BEi1HxQVRqCeYqqZea7tjhpN5dN5NsdYkEoMqlI3tN7w4Cy1L?=
+ =?us-ascii?Q?POH7Ux44Seefa89FKrr1h+tf3NqTNWrrylK+MMHopILDtHDNd0a74UE5DWfK?=
+ =?us-ascii?Q?KJSELpkjhKLgE3kWmwzqQnBC4JyaJpnALFm6/vc34hVJsh6+mtNrDlsYmNUu?=
+ =?us-ascii?Q?2+KV94YIlfOYeMdo/LNZtP+3taZEYNgFhZOSudluiKY00yANu1GDZhMijCfj?=
+ =?us-ascii?Q?tL/wfabheboVsaw1v/0DSZPiemryNNmKi/eD1Le1XA+uWMo6SVE/x+7j88N1?=
+ =?us-ascii?Q?osQnFoz5xeMQ9fx53gmVzWmoi4FEqMPfGB7Dsdj7hu5n559z6UaTur+AjkbD?=
+ =?us-ascii?Q?YVQhZwuhUc7TiaoylsMp4GwGecHY5NV63dIXvV9uaSGTIJST/V0Oy3DyBzVL?=
+ =?us-ascii?Q?YDgj5p+CHYBdJXqIjP8IFPRmxJtHxzbktUwAW/RVnPoe5IxAalNh9NKYxTtf?=
+ =?us-ascii?Q?vWZPC9xt1H6LAdADZowG/BkGzpm+PjS9E3j6m3aUfUESh4EvyzsmS6lIomOJ?=
+ =?us-ascii?Q?179Qvo3Jx7oB6i2lxYS2i3/NHvILUe5m4Rr4yS4wT74t17d4a8hnY2YZXPoR?=
+ =?us-ascii?Q?JP9jlAVWb2DU3RPEYeLdjaXD3XVa8dcD9V+eu3wMjLrIccSjQdcWRM8lZupn?=
+ =?us-ascii?Q?vzJKqDvTNj+KsYJxI/93HObpZeVozSYyJZaPoKR9WRs83OvbQx7zp2JCKYhd?=
+ =?us-ascii?Q?PpESLHNjYdT/AQQ/NUvKc9FGRhp9gMZBfAiyCQMx2lG3Z4kGtG3GIOx6D8z2?=
+ =?us-ascii?Q?VlKAP559wKTbYniFP0OgZwPyHQ1F2xf7ZrDIrHvSZJDdF07M71dxNCtthIQ5?=
+ =?us-ascii?Q?BEuj28Yjvr4uVtMXLmfyBBTB9m9iDyZ4wnm5k4IGMS/1lXRdOsICm5WTqQbz?=
+ =?us-ascii?Q?MLn5CcXMXmhLVzUH040qxD7afIC10ZaMAp1UW60g7VD0sRUtvaUUZHNsjV+Q?=
+ =?us-ascii?Q?uM2uoFRGBW+HK0VR90eYFXG8nbrZ0YfKmHvirW7cXRPSo2YCRQvMSLSDRx7v?=
+ =?us-ascii?Q?UsiNbT+76HTnWoywnk6w5u8WQSlmCab3ZJNz7+Frhp5uuJU9efRFMcigxZAI?=
+ =?us-ascii?Q?zOyq/VvYukCaOHgrk04di8s0oBl5foejL8PMvlk/6IaPWf5ACrYwDdEKZ8ak?=
+ =?us-ascii?Q?gIgCpuY/YVFFEYCOgaUvg3Q0o/pomo61aH2A8rxeqLWhgHSackDwtAL6yOtN?=
+ =?us-ascii?Q?+dbWzqDSnwzAF4oxsP5/bn5qtd6w2SvohT6Q59jrT/L8cW2b7D5NiCVjmRO1?=
+ =?us-ascii?Q?7pYGC77UmyDTNKiWJbs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45576e2c-84fd-441b-4903-08d9f089bf0f
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4181.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2022 13:47:45.8458
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: srIr/UHAkXtnAdozCxcpPB1v9pUwsjSfL6kw8VQIZ6gtpKxwh4ByINPnRUgvG9sx
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3075
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/9/22 16:22, Michael Mueller wrote:
-> This patch enables the ultravisor adapter interruption vitualization
-> support indicated by UV feature BIT_UV_FEAT_AIV. This allows ISC
-> interruption injection directly into the GISA IPM for PV kvm guests.
+On Tue, Feb 15, 2022 at 09:58:13AM +0100, Joerg Roedel wrote:
+> On Mon, Feb 14, 2022 at 11:46:26AM -0400, Jason Gunthorpe wrote:
+> > On Mon, Feb 14, 2022 at 03:18:31PM +0000, Robin Murphy wrote:
+> > 
+> > > Arguably, iommu_attach_device() could be renamed something like
+> > > iommu_attach_group_for_dev(), since that's effectively the semantic that all
+> > > the existing API users want anyway (even VFIO at the high level - the group
+> > > is the means for the user to assign their GPU/NIC/whatever device to their
+> > > process, not the end in itself). That's just a lot more churn.
+> > 
+> > Right
 > 
-> Hardware that does not support this feature will continue to use the
-> UV interruption interception method to deliver ISC interruptions to
-> PV kvm guests. For this purpose, the ECA_AIV bit for all guest cpus
-> will be cleared and the GISA will be disabled during PV CPU setup.
-> 
-> In addition a check in __inject_io() has been removed. That reduces the
-> required instructions for interruption handling for PV and traditional
-> kvm guests.
-> 
-> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+> Okay, good point. I can live with an iommu_attach_group_for_dev()
+> interface, it is still better than making iommu_attach_device() silently
+> operate on whole groups.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+I think this is what Lu's series currently does, it just doesn't do
+the rename churn as Robin noted. Lu, why not add a note like Robin
+explained to the kdoc so it is clear this api impacts the whole group?
 
-> ---
->   arch/s390/include/asm/uv.h |  1 +
->   arch/s390/kvm/interrupt.c  | 54 +++++++++++++++++++++++++++++++++-----
->   arch/s390/kvm/kvm-s390.c   | 11 +++++---
->   arch/s390/kvm/kvm-s390.h   | 11 ++++++++
->   4 files changed, 68 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 86218382d29c..a2d376b8bce3 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -80,6 +80,7 @@ enum uv_cmds_inst {
->   
->   enum uv_feat_ind {
->   	BIT_UV_FEAT_MISC = 0,
-> +	BIT_UV_FEAT_AIV = 1,
->   };
->   
->   struct uv_cb_header {
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index db933c252dbc..9b30beac904d 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -1901,13 +1901,12 @@ static int __inject_io(struct kvm *kvm, struct kvm_s390_interrupt_info *inti)
->   	isc = int_word_to_isc(inti->io.io_int_word);
->   
->   	/*
-> -	 * Do not make use of gisa in protected mode. We do not use the lock
-> -	 * checking variant as this is just a performance optimization and we
-> -	 * do not hold the lock here. This is ok as the code will pick
-> -	 * interrupts from both "lists" for delivery.
-> +	 * We do not use the lock checking variant as this is just a
-> +	 * performance optimization and we do not hold the lock here.
-> +	 * This is ok as the code will pick interrupts from both "lists"
-> +	 * for delivery.
->   	 */
-> -	if (!kvm_s390_pv_get_handle(kvm) &&
-> -	    gi->origin && inti->type & KVM_S390_INT_IO_AI_MASK) {
-> +	if (gi->origin && inti->type & KVM_S390_INT_IO_AI_MASK) {
->   		VM_EVENT(kvm, 4, "%s isc %1u", "inject: I/O (AI/gisa)", isc);
->   		gisa_set_ipm_gisc(gi->origin, isc);
->   		kfree(inti);
-> @@ -3171,9 +3170,33 @@ void kvm_s390_gisa_init(struct kvm *kvm)
->   	VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
->   }
->   
-> +void kvm_s390_gisa_enable(struct kvm *kvm)
-> +{
-> +	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
-> +	u32 gisa_desc;
-> +
-> +	if (gi->origin)
-> +		return;
-> +	kvm_s390_gisa_init(kvm);
-> +	gisa_desc = kvm_s390_get_gisa_desc(kvm);
-> +	if (!gisa_desc)
-> +		return;
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		mutex_lock(&vcpu->mutex);
-> +		vcpu->arch.sie_block->gd = gisa_desc;
-> +		vcpu->arch.sie_block->eca |= ECA_AIV;
-> +		VCPU_EVENT(vcpu, 3, "AIV gisa format-%u enabled for cpu %03u",
-> +			   vcpu->arch.sie_block->gd & 0x3, vcpu->vcpu_id);
-> +		mutex_unlock(&vcpu->mutex);
-> +	}
-> +}
-> +
->   void kvm_s390_gisa_destroy(struct kvm *kvm)
->   {
->   	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-> +	struct kvm_s390_gisa *gisa = gi->origin;
->   
->   	if (!gi->origin)
->   		return;
-> @@ -3184,6 +3207,25 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
->   		cpu_relax();
->   	hrtimer_cancel(&gi->timer);
->   	gi->origin = NULL;
-> +	VM_EVENT(kvm, 3, "gisa 0x%pK destroyed", gisa);
-> +}
-> +
-> +void kvm_s390_gisa_disable(struct kvm *kvm)
-> +{
-> +	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
-> +
-> +	if (!gi->origin)
-> +		return;
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		mutex_lock(&vcpu->mutex);
-> +		vcpu->arch.sie_block->eca &= ~ECA_AIV;
-> +		vcpu->arch.sie_block->gd = 0U;
-> +		mutex_unlock(&vcpu->mutex);
-> +		VCPU_EVENT(vcpu, 3, "AIV disabled for cpu %03u", vcpu->vcpu_id);
-> +	}
-> +	kvm_s390_gisa_destroy(kvm);
->   }
->   
->   /**
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 577f1ead6a51..c83330f98ff0 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2194,6 +2194,9 @@ static int kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rcp, u16 *rrcp)
->   		}
->   		mutex_unlock(&vcpu->mutex);
->   	}
-> +	/* Ensure that we re-enable gisa if the non-PV guest used it but the PV guest did not. */
-> +	if (use_gisa)
-> +		kvm_s390_gisa_enable(kvm);
->   	return ret;
->   }
->   
-> @@ -2205,6 +2208,10 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->   
->   	struct kvm_vcpu *vcpu;
->   
-> +	/* Disable the GISA if the ultravisor does not support AIV. */
-> +	if (!test_bit_inv(BIT_UV_FEAT_AIV, &uv_info.uv_feature_indications))
-> +		kvm_s390_gisa_disable(kvm);
-> +
->   	kvm_for_each_vcpu(i, vcpu, kvm) {
->   		mutex_lock(&vcpu->mutex);
->   		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
-> @@ -3263,9 +3270,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   
->   	vcpu->arch.sie_block->icpua = vcpu->vcpu_id;
->   	spin_lock_init(&vcpu->arch.local_int.lock);
-> -	vcpu->arch.sie_block->gd = (u32)(u64)vcpu->kvm->arch.gisa_int.origin;
-> -	if (vcpu->arch.sie_block->gd && sclp.has_gisaf)
-> -		vcpu->arch.sie_block->gd |= GISA_FORMAT1;
-> +	vcpu->arch.sie_block->gd = kvm_s390_get_gisa_desc(vcpu->kvm);
->   	seqcount_init(&vcpu->arch.cputm_seqcount);
->   
->   	vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 098831e815e6..4ba8fc30d87a 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -231,6 +231,15 @@ static inline unsigned long kvm_s390_get_gfn_end(struct kvm_memslots *slots)
->   	return ms->base_gfn + ms->npages;
->   }
->   
-> +static inline u32 kvm_s390_get_gisa_desc(struct kvm *kvm)
-> +{
-> +	u32 gd = (u32)(u64)kvm->arch.gisa_int.origin;
-> +
-> +	if (gd && sclp.has_gisaf)
-> +		gd |= GISA_FORMAT1;
-> +	return gd;
-> +}
-> +
->   /* implemented in pv.c */
->   int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
->   int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
-> @@ -450,6 +459,8 @@ int kvm_s390_get_irq_state(struct kvm_vcpu *vcpu,
->   void kvm_s390_gisa_init(struct kvm *kvm);
->   void kvm_s390_gisa_clear(struct kvm *kvm);
->   void kvm_s390_gisa_destroy(struct kvm *kvm);
-> +void kvm_s390_gisa_disable(struct kvm *kvm);
-> +void kvm_s390_gisa_enable(struct kvm *kvm);
->   int kvm_s390_gib_init(u8 nisc);
->   void kvm_s390_gib_destroy(void);
->   
+There is no argument that the internal operation of the iommu layer
+should always be using groups - we are just presenting a simplified
+API toward drivers.
 
+Jason
