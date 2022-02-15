@@ -2,162 +2,281 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA3944B717A
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 17:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D83CE4B7138
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 17:40:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239729AbiBOPyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 10:54:12 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52148 "EHLO
+        id S241053AbiBOP4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 10:56:21 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiBOPyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 10:54:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 20FC29E540
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 07:54:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644940440;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YNlBcghVIbXcjbdtG1zkQAj56teK/2eSJvPlxSHmjnA=;
-        b=JXb44A3VwoYT2uCOHM+9NvIgKNSjnTEAcrXjM/STpZhQahbGUoxkBDqviDLwHC6E96vuxq
-        xMbzF2fgFVNr1IYepyMY66rnR+MIBxKFdnv8jN8WNS+/Zh0/JL6HWpNXTxveHyZ2tU2kYZ
-        of6PlEtH+QqYL37mPAfW0R8QAz7LAog=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-209-XD0qOKU0Nk6ce3IRq3EURQ-1; Tue, 15 Feb 2022 10:53:59 -0500
-X-MC-Unique: XD0qOKU0Nk6ce3IRq3EURQ-1
-Received: by mail-ed1-f70.google.com with SMTP id o8-20020a056402438800b00410b9609a62so78348edc.3
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 07:53:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YNlBcghVIbXcjbdtG1zkQAj56teK/2eSJvPlxSHmjnA=;
-        b=F5FaD515wONo9DLRusHmoKoLJY1otfs2EzF+mV29DRjBnGI83KhoYlxEEKXstlx8H0
-         QfcMLdr+z6Wd1QRrnJzk8BuydLFoslg/khCzQhdXubdOyk2xycCbobtYdJu1FXI5dnga
-         2qyE2eCmMosKbYHhAwgBaYYbhBmU4Ry2PKmQq5tUACFYCEsWX09Lr5J/yhm5VZfMfAqw
-         4kesPS0WlPLco6Ceh/tLrdx3zANhrIc9E6FbixAZosmAM1cM5y59UR5nrCknAcRfYPdc
-         JKuryOmEU4CpbIX3mEfXTsa/+MJpTBgE+gQuyAEWSHnpSmcGcoBDl/57GU4qOK639GNq
-         xrxw==
-X-Gm-Message-State: AOAM533aAOhg44RYmkLBZ3uUoeFWpkl7t0hMrVFWCBdS/PRN8KKgKvsH
-        0kHlsUBQirCrlTqAs0NFcN8qpoGmKNpIWF0Q8oGxW1fztwq9AF9AHHx+GzmkDNOyUeETpq6y3ii
-        wReI+DFivCG8S
-X-Received: by 2002:a17:906:7a43:: with SMTP id i3mr3427403ejo.29.1644940436547;
-        Tue, 15 Feb 2022 07:53:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw7Ctv27R5bcugasYl/d033ryaYnKxqBpvltKrcvwV/bfqkNXFoCim4i9DPb/SUeRkW99XEUA==
-X-Received: by 2002:a17:906:7a43:: with SMTP id i3mr3427387ejo.29.1644940436307;
-        Tue, 15 Feb 2022 07:53:56 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id s3sm59600edd.82.2022.02.15.07.53.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 07:53:55 -0800 (PST)
-Date:   Tue, 15 Feb 2022 16:53:53 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
-        thuth@redhat.com, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses
- for the initrd
-Message-ID: <20220215155353.t5hj7t3i43dj5mkw@gator>
-References: <20220214135226.joxzj2tgg244wl6n@gator>
- <YgphzKLQLb5pMYoP@monolith.localdoman>
- <20220214142444.saeogrpgpx6kaamm@gator>
- <YgqBPSV+CMyzfNlv@monolith.localdoman>
- <87k0dx4c23.wl-maz@kernel.org>
- <20220215073212.fp5lh4gfxk7clwwc@gator>
- <Ygt7PbS6zW9H1By4@monolith.localdoman>
- <20220215125300.6b5ff3luxikc4jhd@gator>
- <Ygu1q6r4oalKzn0H@monolith.localdoman>
- <YgvFGDEeMKqNldp1@monolith.localdoman>
-MIME-Version: 1.0
+        with ESMTP id S239731AbiBOP4T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 10:56:19 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2050.outbound.protection.outlook.com [40.107.92.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412B99E57A;
+        Tue, 15 Feb 2022 07:56:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JTX0kKSs60Pnecxb2/PTG95Y7QbFn/09PMJvPwI8ZTaNTRakLYQpsNZXplaQ/D1bvcKFk6RPPGtsm96B+XLhfs0pmnu+C6ZWWHKt5hTisXsQFa+Du+MKO0+CJKQ+4Dglm6SzriJYUtIdXy1XVqQui157yZG3vtsetkQEqTk41Qa8VvUH7n8avI/asvoRFGGlmwvMf5mSMUNWMsO/H5wt5rFoEG6hV9AUrKwuiAUOI9nthysokOYN1/B4M+osTX0hinQheFt13UN6Dzj2w6qkiKTM5oQbLOpUazrA0ax3R3+HJUkYX1LW/pPQMhLnqYbbcfuh/nXUnwpWVRwwFsI7Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JULRuBXTDT2NSj8/68Dvu12VImVPZwhhvXTRAjqfIgc=;
+ b=CknymNw/o75Pcn6uq56TBp+LdPMj87Tp2PvDHDwlKvnBDLHCs7qkCmjC8iZfOt/0q5wpbsl/c2UQxhGTiGntCcoLw7Oeciz+iTmrK0sHbGcGHzKJH6NwxAMtQyzZCl+priVIoiqs3i/Z+S/9CFxa1Hd3J2ZfYyoo+iAAtx34qpXJSrKLaY8gaFvwDczQ+bkPpHKNDP2HEn+x5zoWIuS3/F9nXSLMY9k1iI1rX5GcnFuICNMGSBKnqMXgQbCmr7Gw7le67pfECwovqEAqB8rkC3gqNBGQvgEau2duGHGtwYD9ReqGYj5lFGemfDbamWCtS/vGi/pp01AcaFQWT2xs7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JULRuBXTDT2NSj8/68Dvu12VImVPZwhhvXTRAjqfIgc=;
+ b=Kz9fYNqv6kKeqjAavbU3V365mdVjjSRfhQOabZBZkYd+vx40YkCde1yqMvRQiZy3UC2d1QQd6rne0zBJhtM9bkh2diSnpC+khqk0TGu9iapIqQ6XvohtGlrOUzhsLjS0C2nn/ISYLQwcRe93iXxHgY578p4lBKSe8mqaDIHRcZAS0won5qtn4L2EYxv9kFNMdjxxXtiZ86oapFajTL9GR/UCoJa4TLxnpYZl138n1eQECb7A80RXc/6UQ5ZY2BH4l8rI+XBnzmkYl9/lvoNyCVq2elgJMSw8UcHmCJAhD2YFuN3O9JJpvMYRzkT3GueS/lXWB/hkPOZQEMtN+JIAGw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16)
+ by BN6PR1201MB2466.namprd12.prod.outlook.com (2603:10b6:404:b0::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.14; Tue, 15 Feb
+ 2022 15:56:03 +0000
+Received: from CH2PR12MB4181.namprd12.prod.outlook.com
+ ([fe80::287d:b5f6:ed76:64ba]) by CH2PR12MB4181.namprd12.prod.outlook.com
+ ([fe80::287d:b5f6:ed76:64ba%4]) with mapi id 15.20.4975.019; Tue, 15 Feb 2022
+ 15:56:03 +0000
+Date:   Tue, 15 Feb 2022 11:56:02 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH V7 mlx5-next 09/15] vfio: Extend the device migration
+ protocol with RUNNING_P2P
+Message-ID: <20220215155602.GB1046125@nvidia.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+ <20220207172216.206415-10-yishaih@nvidia.com>
+ <BN9PR11MB5276D169554630B8345DB7598C349@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YgvFGDEeMKqNldp1@monolith.localdoman>
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB5276D169554630B8345DB7598C349@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0261.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::26) To CH2PR12MB4181.namprd12.prod.outlook.com
+ (2603:10b6:610:a8::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e4afdd80-c1db-4a99-e871-08d9f09bab1e
+X-MS-TrafficTypeDiagnostic: BN6PR1201MB2466:EE_
+X-Microsoft-Antispam-PRVS: <BN6PR1201MB246615D212491BF17FA77C1BC2349@BN6PR1201MB2466.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qjTNLQSGtl/oPX98AQGQRBDfmJNrBcd9bUY1Pwj1ba57NgskZqXybOIOywFNlZNr5QAVOoKiOp3oiXGKn+VfG/PbFioOiAU+Im78hteRGClh3W+YzzSVNRiWsR8uIjg+oJOuzkrb0qX6a89CQYKfy8nRPlkpBV7meiua1UgN1UIADn0i3TW21QCmlOjPoAudXO0r8JCzz62lYztmF19Mp4MkibyY4l2ebQnZhoQJPZ38cDATCwCVcjUdN+dapwK2EgL9W7GPH1PGOEjMUGXzObWfSFheIqHIcqp+kZ0Uo3RKb88VDup2rAgbIVFulDYjc4YbvkCQCe7rTKd5a5NxiKgMNwAIFQ0+LuWYn7YKkfGiEGvQ9NqNSSIJVb7pG3/qhvwQxx8WjCsJNlL8rGXkDvwMVp2wHHfPgrKtgUioMheOkCR4cR+Ii5PuyN3yby9aVSvEcSQfq1q+DANdHVU2G7LFjd3o6HHo6ES5NREWHuNzDR1NoWd1kImtpXNFO7pzZxV+HOims/C2ob6t3MhjG0+0akvo7gkXXeU4FTO3/ofWd0dKRKCpcwYibHxGhQ/qf8ZxHYA8879OjUAAH0N+zPXvoeI8cc5GLIBHABFBBcoFHTib1mV0lw5pX6cxFMNLZymlnhHqXRUBc0xhgHfr/A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(83380400001)(38100700002)(8936002)(6486002)(508600001)(5660300002)(66946007)(8676002)(6916009)(66476007)(66556008)(54906003)(316002)(26005)(186003)(4326008)(2906002)(2616005)(1076003)(6512007)(6506007)(86362001)(33656002)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xaRLavEEre+H7JQUZuI23q5YgvVOZ7G8tTdaBENjMi0/wx5I9wlL3C7jmye5?=
+ =?us-ascii?Q?mHsb7h51R96FLIL2q+PfJTBeOJvuqIu++DEoR73SvXhApC36jY91mYKz3BNK?=
+ =?us-ascii?Q?gnxBBO1ibXbiXMj43n9yA4Mlua2JdghcsIJ46gc1KRUKUfc03ezx6GKabICs?=
+ =?us-ascii?Q?+eiI6uLL0Y9pUyFKBKYhXT/IBc4QZ45EwGvbbHdvAEnAveuhBbDVjaVn/51W?=
+ =?us-ascii?Q?aJtrW4h6drtApUKcRniTGlKjtJGOi+NwVElGyO351354qk835U6b7jY0ar26?=
+ =?us-ascii?Q?t0t0vq6Ac/6kwihCdOy3ajlQ60KjKab0LL/KfcrXlhBUO7Tv556QsPCn4bWT?=
+ =?us-ascii?Q?UnaBbPeins1m1eUdnffXusok+8TYt6IP+6h/6/ZQ2Saq6g0UhfGzdp5tFchR?=
+ =?us-ascii?Q?RNAl3gZKJqyfpDM3krIZQpbjevdnn+G1pfuStRUABEySjky+XjNmodvdRMC8?=
+ =?us-ascii?Q?A1NPDsZX6CPY+dFwTBvtpKUVUMO7k+hoaXNZZ5wXoUiQQiYx83gvw/X9m3JY?=
+ =?us-ascii?Q?qNJyG/P6C17nk4ofSt451sbGps+CJxC9Hboh5oB6oTzQqZ92r2st3aXjpFYw?=
+ =?us-ascii?Q?+LjFP1rWTaFd8InE3RFWKkp3zYF2AeWip/E+26mHnHKrZeAHjh6RZvVhq/1u?=
+ =?us-ascii?Q?PiKYf5TKvS141iesxfSZI48wKGXO8QBb+lYZvqBmKYCdJVAcxll/0X/kCW24?=
+ =?us-ascii?Q?df8F+3bIvKOQ7vMrqCOfe1KjbTGCDdnfjK+g4+ZallpAN7xE0nwQy1CCVD+1?=
+ =?us-ascii?Q?tZAzzBAXPJHmZZCYgApOc36iEdIZ2xhXe5anMY/vOI5yOYsACHI8vRV5l1OL?=
+ =?us-ascii?Q?Fwep/2rcEGjk/Ev6RShEWrqKzW8qLBlP/2yjOfm1KJP+zaPhtRwJSSECI2aj?=
+ =?us-ascii?Q?ZBu8IIgv9mIzlTsYSzNqiXK87QDK1i+1In95WLSQjqoBVQvevWu7CsPKCj8v?=
+ =?us-ascii?Q?6ROJtzbiFM23Fi6rKjqaDlJQHwOhY6E+aHNHqCrTOdTwAlDGXhlVzWgATJjD?=
+ =?us-ascii?Q?iExP/gqOjuZBaKryoCiRjzf3PMtbCZy69Okc0YGtYrY4h6ryYtwaGOK6eIH/?=
+ =?us-ascii?Q?dX39wbeJhgq7u2JUtU2jM7PF/1ym+UN2VYnc4N+sLSb4FPmLYxGydQrfMb3e?=
+ =?us-ascii?Q?ic/csc23mtNaDyl07Pxq/2Z6x/OK2ZICtia9dkwDfmDXAwcQaFJfupcoRlHZ?=
+ =?us-ascii?Q?c1Wb6ewa9BAPT/+w4t7zoDWPPJjdmv7Y9aKSGvemRXU2ttYr9FVAB9PCwuBe?=
+ =?us-ascii?Q?2bKcnnHzQQEvzsV6f1pvKqXitA/7TfKMPmzyo63xJPvg6p5tR+7y/e41o7eC?=
+ =?us-ascii?Q?GGZDaHR0uU9/SSO8k7/T8aO6Tq98LgZGqhMxC0AeFk42b842NSFSOANzIwWj?=
+ =?us-ascii?Q?7jhdxNm6taNTfw1Env/ZD5TVLt0c9tpd/agVqTBSX3d5h+UR1Bh3nr16Q5yC?=
+ =?us-ascii?Q?YZnUlL/OM5GTOuM6fwi/x/zUfM0wndsYTitLbPCaXnN+tJu//hG4ze5R5OOo?=
+ =?us-ascii?Q?+we5qggfj9VJewHfaCPx04h9WOH1wY6B71aAjU1EBFKs5Fg8SZcZtkS/VV0d?=
+ =?us-ascii?Q?Ul4+ub5+4DF2BgQ8lps=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4afdd80-c1db-4a99-e871-08d9f09bab1e
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4181.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2022 15:56:03.2893
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fxwX/41INSAF0myux8qa7hE41Ka5WNO+vo7sHXaA/A9WCLz4SU18rVKBxw4q7+Bj
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2466
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 03:22:00PM +0000, Alexandru Elisei wrote:
-> Hi Drew,
+On Tue, Feb 15, 2022 at 10:18:11AM +0000, Tian, Kevin wrote:
+> > From: Yishai Hadas <yishaih@nvidia.com>
+> > Sent: Tuesday, February 8, 2022 1:22 AM
+> > 
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > 
+> > The RUNNING_P2P state is designed to support multiple devices in the same
+> > VM that are doing P2P transactions between themselves. When in
+> > RUNNING_P2P
+> > the device must be able to accept incoming P2P transactions but should not
+> > generate outgoing transactions.
 > 
-> On Tue, Feb 15, 2022 at 02:16:32PM +0000, Alexandru Elisei wrote:
-> > Hi Drew,
+> outgoing 'P2P' transactions.
+
+Yes
+
+> > As an optional extension to the mandatory states it is defined as
+> > inbetween STOP and RUNNING:
+> >    STOP -> RUNNING_P2P -> RUNNING -> RUNNING_P2P -> STOP
 > > 
-> > On Tue, Feb 15, 2022 at 01:53:00PM +0100, Andrew Jones wrote:
-> > > On Tue, Feb 15, 2022 at 10:07:16AM +0000, Alexandru Elisei wrote:
-> > > > 
-> > > > I've started working on the next iteration of the kvmtool test
-> > > > runner support series, I'll do my best to make sure kvmtool wll be able to run
-> > > > the tests when kvm-unit-tests has been configured with --arch=arm.
-> > > >
-> > > 
-> > > Excellent!
-> > > 
-> > > BTW, I went ahead an pushed a patch to misc/queue to improve the initrd
-> > > address stuff
-> > > 
-> > > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/6f8f74ed2d9953830a3c74669f25439d9ad68dec
-> > > 
-> > > It may be necessary for you if kvmtool shares its fdt creation between
-> > > aarch64 and aarch32 guests, emitting 8 byte initrd addresses for both,
-> > > even though the aarch32 guest puts the fdt below 4G.
-> > 
-> > While trying your patch (it works, but with the caveat below), I remembered that
-> > kvmtool is not able to run kvm-unit-tests for arm. That's because the code is
-> > not relocatable (like it is for arm64) and the text address is hardcoded in the
-> > makefile.
-> > 
-> > In past, to run the arm tests with kvmtool, I was doing this change:
-> > 
-> > diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> > index 3a4cc6b26234..6c580b067413 100644
-> > --- a/arm/Makefile.arm
-> > +++ b/arm/Makefile.arm
-> > @@ -14,7 +14,7 @@ CFLAGS += $(machine)
-> >  CFLAGS += -mcpu=$(PROCESSOR)
-> >  CFLAGS += -mno-unaligned-access
-> >  
-> > -arch_LDFLAGS = -Ttext=40010000
-> > +arch_LDFLAGS = -Ttext=80008000
-> >  
-> >  define arch_elf_check =
-> >  endef
-> > 
-> > Any suggestions how to fix that? One way would be to change the LDFLAGS based on
-> > $TARGET. Another way would be to make the arm tests relocatable, I tried to do
-> > that in the past but I couldn't make any progress.
-> > 
-> > Separate from that, I also tried to run the 32 bit arm tests with run_tests.sh.
-> > The runner uses qemu-system-arm (because $ARCH_NAME is arm in
-> > scripts/arch-run.bash::search_qemu_binary()), but uses kvm as the accelerator
-> > (because /dev/kvm exists in scrips/arch-run.bash::kvm_available()). This fails
-> > with the error:
-> > 
-> > qemu-system-arm: -accel kvm: invalid accelerator kvm
-> > 
-> > I don't think that's supposed to happen, as kvm_available() specifically returns
-> > true if $HOST = aarch64 and $ARCH = arm. Any suggestions?
+> > For drivers that are unable to support RUNNING_P2P the core code silently
+> > merges RUNNING_P2P and RUNNING together. Drivers that support this will
 > 
-> I managed to run the arm tests on an arm64 machine using qemu-system-aarch64
-> (instead of qemu-system-arm)
+> It would be clearer if following message could be also reflected here:
+> 
+>   + * The optional states cannot be used with SET_STATE if the device does not
+>   + * support them. The user can discover if these states are supported by using
+>   + * VFIO_DEVICE_FEATURE_MIGRATION. 
+> 
+> Otherwise the original context reads like RUNNING_P2P can be used as
+> end state even if the underlying driver doesn't support it then makes me
+> wonder what is the point of the new capability bit.
 
-Yup
+You've read it right. Lets just add a simple "Unless driver support is
+present the new state cannot be used in SET_STATE"
 
-> and passing -cpu host,aarch64=off. I'll try to make
-> this into a patch.
+> >  	*next_fsm = vfio_from_fsm_table[cur_fsm][new_fsm];
+> > +	while ((state_flags_table[*next_fsm] & device->migration_flags) !=
+> > +			state_flags_table[*next_fsm])
+> > +		*next_fsm = vfio_from_fsm_table[*next_fsm][new_fsm];
+> > +
+> 
+> A comment highlighting the silent merging of unsupported states would
+> be informative here.
 
-The '-cpu host,aarch64=off' part should already be getting added for you
-by the arm/run script. Hmm, it just occurred to me that your kvmtool work
-may not be using arm/run. Anyway, arm/run may serve as inspiration.
+	/*
+	 * Arcs touching optional and unsupported states are skipped over. The
+	 * driver will instead  see an arc from the original state to the next
+	 * logical state, as per the above comment.
+	 */
 
-Thanks,
-drew
+> Defining RUNNING_P2P in above way implies that RUNNING_P2P inherits 
+> all behaviors in RUNNING except blocking outbound P2P:
+> 	* generate interrupts and DMAs
+> 	* respond to MMIO
+> 	* all vfio regions are functional
+> 	* device may advance its internal state
+> 	* drain and block outstanding P2P requests
 
+Correct.
+
+The device must be able to recieve and process any MMIO P2P
+transaction during this state.
+
+We discussed and left interrupts as allowed behavior.
+
+> I think this is not the intended behavior when NDMA was being discussed
+> in previous threads, as above definition suggests the user could continue
+> to submit new requests after outstanding P2P requests are completed given
+> all vfio regions are functional when the device is in RUNNING_P2P.
+
+It is the desired behavior. The device must internally stop generating
+DMA from new work, it cannot rely on external things not poking it
+with MMIO, because the whole point of the state is that MMIO P2P is
+still allowed to happen.
+
+What gets confusing is that in normal cases I wouldn't expect any P2P
+activity to trigger a new work submission.
+
+Probably, since many devices can't implement this, we will end up with
+devices providing a weaker version where they do RUNNING_P2P but this
+relies on the VM operating the device "sanely" without programming P2P
+work submission. It is similar to your notion that migration requires
+guest co-operation in the vPRI case.
+
+I don't like it, and better devices really should avoid requiring
+guest co-operation, but it seems like where things are going.
+
+> Though just a naming thing, possibly what we really require is a STOPPING_P2P
+> state which indicates the device is moving to the STOP (or STOPPED)
+> state.
+
+No, I've deliberately avoided STOP because this isn't anything like
+STOP. It is RUNNING with one restriction.
+
+> In this state the device is functional but vfio regions are not so the user still
+> needs to restrict device access:
+
+The device is not functional in STOP. STOP means the device does not
+provide working MMIO. Ie mlx5 devices will discard all writes and
+read all 0's when in STOP.
+
+The point of RUNNING_P2P is to allow the device to continue to recieve
+all MMIO while halting generation of MMIO to other devices.
+
+> In virtualization this means Qemu must stop vCPU first before entering
+> STOPPING_P2P for a device.
+
+This is already the case. RUNNING/STOP here does not refer to the
+vCPU, it refers to this device.
+
+> Back to your earlier suggestion on reusing RUNNING_P2P to cover vPRI 
+> usage via a new capability bit [1]:
+> 
+>     "A cap like "running_p2p returns an event fd, doesn't finish until the
+>     VCPU does stuff, and stops pri as well as p2p" might be all that is
+>     required here (and not an actual new state)"
+> 
+> vPRI requires a RUNNING semantics. A new capability bit can change 
+> the behaviors listed above for STOPPING_P2P to below:
+> 	* both P2P and vPRI requests should be drained and blocked;
+> 	* all vfio regions are functional (with a RUNNING behavior) so
+> 	  vCPUs can continue running to help drain vPRI requests;
+> 	* an eventfd is returned for the user to poll-wait the completion
+> 	  of state transition;
+
+vPRI draining is not STOP either. If the device is expected to provide
+working MMIO it is not STOP by definition.
+
+> One additional requirement in driver side is to dynamically mediate the 
+> fast path and queue any new request which may trigger vPRI or P2P
+> before moving out of RUNNING_P2P. If moving to STOP_COPY, then
+> queued requests will also be included as device state to be replayed
+> in the resuming path.
+
+This could make sense. I don't know how you dynamically mediate
+though, or how you will trap ENQCMD..
+
+> Does above sound a reasonable understanding of this FSM mechanism? 
+
+Other than mis-using the STOP label, it is close yes.
+
+> > + * The optional states cannot be used with SET_STATE if the device does not
+> > + * support them. The user can disocver if these states are supported by
+> 
+> 'disocver' -> 'discover'
+
+Yep, thanks
+
+Jason
