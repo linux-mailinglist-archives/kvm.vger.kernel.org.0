@@ -2,73 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A0C84B7888
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 21:52:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB454B76B7
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 21:49:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243567AbiBOTTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 14:19:43 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53730 "EHLO
+        id S243872AbiBOUCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 15:02:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243543AbiBOTTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 14:19:42 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B536A109A7C;
-        Tue, 15 Feb 2022 11:19:32 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6F1F0B8124E;
-        Tue, 15 Feb 2022 19:19:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26A39C340EB;
-        Tue, 15 Feb 2022 19:19:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644952770;
-        bh=SjgUfYoAHJ6QtTcEN+ytJZZA0fhHscUqgcUoynC6xqo=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=QrDVQINQri2lHJQ57nfla/VkEJapkU6x5DQa0P6GefF5jJbhX5LtruP3A1xqA9JJ7
-         tj5CSYNCqpCmAH2A+5sDIbBqHSnnKstr/ldfe9FFmN0dpcnhqcQuZfq/y68o9X0yHD
-         mp75CSr8HzLV0RhZxorOQFB8cqFdYPDHDzBBtFKcsAzH/N5RxoGXdpqyhajdWWYYhZ
-         YHVTiYlSbBBUY48J3Q9EbW4bfnA3P3IbVAqGLiJPwvCxaIlhy/N5sj/E4/2kVPSQ8z
-         Re78ateq1IJCmxRSQDBGy7gnVITUA+o/dPLSUM6eB4HkjrdDOhJfq8FPbZ6guisG/R
-         fK/OBUVb2W+zg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14E75E6BBD2;
-        Tue, 15 Feb 2022 19:19:30 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 5.17-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20220215172131.3777266-1-pbonzini@redhat.com>
-References: <20220215172131.3777266-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20220215172131.3777266-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 710c476514313c74045c41c0571bb5178fd16e3d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c5d9ae265b105d9a67575fb67bd4650a6fc08e25
-Message-Id: <164495277007.28413.17972421364914635918.pr-tracker-bot@kernel.org>
-Date:   Tue, 15 Feb 2022 19:19:30 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S242579AbiBOUCA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 15:02:00 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98F170841
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 12:01:49 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id h3-20020a628303000000b004e12f44a262so73376pfe.21
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 12:01:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=gS/ERe3WRO4rfo0NAdQNzCh6xwJFNrVc+tXRpZc72B0=;
+        b=PeEQUHkdRVE/+y9FFhq2qXiZJjgkF9eoXd/DIqSXbLxw8kxoPnfZHnsd10YSTSB5vv
+         5uGymYgyzeGkuJnUZJPg+mpHLfLyXPW3Ky+jgJX0HDqSE0iSnKF2cldytE21s6IaEDOX
+         Bwm6nVi+2PdjcBVTpCbGH0gB7ne1nzHGeuslRzAqtVph9Ed9IMsViF27MvakDan/9z0v
+         iUKmUQWokvCUgjr925bgKHXioxgo5O9O0YR51mOmVO5OGrH2nyMj7y6F98Nw5Bb3dFJb
+         8DHMaDqgvVPlvRJ7BfoiLWZJI93XX3Z80OY4YYozBmUDJJd2P1Lo8xtfAUkncRErwwBl
+         mlxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=gS/ERe3WRO4rfo0NAdQNzCh6xwJFNrVc+tXRpZc72B0=;
+        b=gCuloqI+6N0pyTZTH/jCWJwxt1hHYpFREgMp3jAQILXwhRwmKCPcwZQHapK+Z687xD
+         uKYvqdrwlLSbyt+K09hE6jekTQZYyAedeD+vgBEYAF+/nfycJ5FSA2ZvpoR5mRHINVTC
+         +lhM2P6n8vUmUPEQyyUKdNbdlTuo/JvxRN0nbC3EW7QM/oFhPlzGkxpsOs0hYzDdL7/4
+         a+JbVnGpASwCDDg4jXrEolV8I8omtDbmX5PP+MPYv0qI4OcyKIuNnfyWJ5DHgNbMQ6/J
+         TuxSzrKG6E1p8pvqJRdr54Z1m/VbbQWhb66xDSP1cYIeMWRa6ztI2a6IsCI9bngDZgcP
+         LjUA==
+X-Gm-Message-State: AOAM531jF0u3RJ+Th41IoW7qNW5q9bLnPBLt0ZVMpQIixrfHnxNB3xYv
+        kNwKh+bw1RMuxHtHub5+2kvi5aKaignq/hLYr4pK36iMvRLu2AtDMfuq0MSa44Wz4isC9ZfUUfa
+        AF/qixRmEwlwi0JUE7jOsc8I9+TgAt80ShXQX4axfuiYfGIte96IKfLand6nwl7M=
+X-Google-Smtp-Source: ABdhPJwPAIX1URlb7pELYvrTT2UZ4Dgkj0LyK3oF3vcLPQhLyP6ONx13bQ4cUN1nGBu/G8nrqCt/kd6ixjrHUQ==
+X-Received: from romanton.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:43ef])
+ (user=romanton job=sendgmr) by 2002:a17:902:da86:: with SMTP id
+ j6mr422270plx.157.1644955309273; Tue, 15 Feb 2022 12:01:49 -0800 (PST)
+Date:   Tue, 15 Feb 2022 20:01:17 +0000
+Message-Id: <20220215200116.4022789-1-romanton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [PATCH v2] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in always
+ catchup mode
+From:   Anton Romanov <romanton@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     mtosatti@redhat.com, Anton Romanov <romanton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Tue, 15 Feb 2022 12:21:31 -0500:
+If vcpu has tsc_always_catchup set each request updates pvclock data.
+KVM_HC_CLOCK_PAIRING consumers such as ptp_kvm_x86 rely on tsc read on
+host's side and do hypercall inside pvclock_read_retry loop leading to
+infinite loop in such situation.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+v2:
+    Added warn
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c5d9ae265b105d9a67575fb67bd4650a6fc08e25
+Signed-off-by: Anton Romanov <romanton@google.com>
+---
+ arch/x86/kvm/x86.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Thank you!
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7131d735b1ef..aaafb46a6048 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8945,6 +8945,15 @@ static int kvm_pv_clock_pairing(struct kvm_vcpu *vcpu, gpa_t paddr,
+ 	if (!kvm_get_walltime_and_clockread(&ts, &cycle))
+ 		return -KVM_EOPNOTSUPP;
+ 
++	/*
++	 * When tsc is in permanent catchup mode guests won't be able to use
++	 * pvclock_read_retry loop to get consistent view of pvclock
++	 */
++	if (vcpu->arch.tsc_always_catchup) {
++		pr_warn_ratelimited("KVM_HC_CLOCK_PAIRING not supported if vcpu is in tsc catchup mode\n");
++		return -KVM_EOPNOTSUPP;
++	}
++
+ 	clock_pairing.sec = ts.tv_sec;
+ 	clock_pairing.nsec = ts.tv_nsec;
+ 	clock_pairing.tsc = kvm_read_l1_tsc(vcpu, cycle);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.35.1.265.g69c8d7142f-goog
+
