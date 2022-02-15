@@ -2,210 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 011254B6997
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 11:42:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29E5F4B69A1
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 11:44:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236626AbiBOKmN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 05:42:13 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59382 "EHLO
+        id S236659AbiBOKoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 05:44:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235841AbiBOKmL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 05:42:11 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4519A9B5;
-        Tue, 15 Feb 2022 02:42:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644921720; x=1676457720;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IBy6APy3QlFaP1vtBp9ldo3MPlY2Q43YIKA3dU2mE5A=;
-  b=YpMVTylPXYiyW4QmDGadg0MH/V0d8LdiqLvPZDcVvTB4bAW/3nYDEg1v
-   sB4nv5mlgotEeinnKYCXakYwNV6es6YQWrTL5eEDnbt5qGyKVWfrL/a3V
-   zFN572p0wm/b5FYdZt6XtJDivuOWc24DWIdvumRgm0zfrR3JPlTX5tDzj
-   vj4Y3BChAkmHUVWayB/SIn1Z39KVQFW+7VkEgPl6+XwSCXict13lwB5GG
-   5wChvtga09PT7Rm/pOs+qbz+RaRN/ABlyU2q8VbVspXg+kGkGmdTxXHNu
-   8iJU2H3OPppVXfNp3chTIQpRSjbJLEpZoCfDlak+WiuTNX1j4J4mzFPH0
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10258"; a="237728360"
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="237728360"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 02:42:00 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="570761894"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga001.jf.intel.com with ESMTP; 15 Feb 2022 02:41:59 -0800
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 15 Feb 2022 02:41:59 -0800
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 15 Feb 2022 02:41:59 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Tue, 15 Feb 2022 02:41:59 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Tue, 15 Feb 2022 02:41:58 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V1SMkV0mZq6hX19xMz4DHIxSFilbItuy78DwArzm3PkkW01u0UZN19eOGFIogwLwiQboZDE5CrRgqkQ42LfQ88KFukeoa/54uw8Z/4nAHaFAVx/ANi8pn3TfimUKiqnJDdKHJiBpR+5nrWXbELltsKjAkX7O6yNnT8Za/PZlakOALLWqlU55wXgbRmZ3WqITxfcZklwWC+yaBsImfKvgGEEXwwqV6QpW4iDl9vLR/F/Qr7awsFd8uVQKcDLelXLAL/2FjLLXEn2VAuZ7Yz0N5RsjHdjx9IPpZd+QN8VKexCaVyXl0dVxkNJp7rWMz2F6hvB5sQ1F9TFHvZyhQzjKIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mjhP+lhXdKXHugnpBR/V+G2Bz5n2ARTmFHFwoCQysu4=;
- b=W0tKJszQ/pPX7f56D5hxgVLTdR4I/1wWzEW1xBbcYG5cPnSW9FnptRMKx7G3ItLkM8396guAlPO1gKwMYI/CztDsMXrvsm/bvNaj44/V2TeY576IgedyBCzmgwjOcvDfxmSp6h2uaCBkQrtDuKDr6q9aBmwsud2uRND+4OjVFqO0lBTGPd2Frmr796QEHunIvfrkJ4ZT13Tc3ttgyxaLlSthSw9yN8rlD/K8GDe1t/4YQ1UCW+t3Eni0wcoxsP8vLG8CIUxvBfVS0IR9c3u2mtIyx+D0SCKi+7D7cG7/wnfLmQ0CuRzvUmoSR9Me+kOgqgAh2beHdnvqTnpbuKidOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DM6PR11MB3228.namprd11.prod.outlook.com (2603:10b6:5:5a::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.11; Tue, 15 Feb
- 2022 10:41:57 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::f514:7aae:315b:4d8d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::f514:7aae:315b:4d8d%4]) with mapi id 15.20.4975.019; Tue, 15 Feb 2022
- 10:41:57 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Yishai Hadas <yishaih@nvidia.com>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "saeedm@nvidia.com" <saeedm@nvidia.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "leonro@nvidia.com" <leonro@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>
-Subject: RE: [PATCH V7 mlx5-next 08/15] vfio: Define device migration protocol
- v2
-Thread-Topic: [PATCH V7 mlx5-next 08/15] vfio: Define device migration
- protocol v2
-Thread-Index: AQHYHEd8WrQ75CuCwEmQ+4nXbJWyQ6yKWZwAgAAploCACfA7AA==
-Date:   Tue, 15 Feb 2022 10:41:56 +0000
-Message-ID: <BN9PR11MB5276BD03F292902A803FA0E58C349@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220207172216.206415-1-yishaih@nvidia.com>
- <20220207172216.206415-9-yishaih@nvidia.com>
- <20220208170754.01d05a1d.alex.williamson@redhat.com>
- <20220209023645.GN4160@nvidia.com>
-In-Reply-To: <20220209023645.GN4160@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bb6c0c7e-751d-4570-6be3-08d9f06fca01
-x-ms-traffictypediagnostic: DM6PR11MB3228:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <DM6PR11MB322820E53EF54282729D47DB8C349@DM6PR11MB3228.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xrb+rrhHpPGfdk0JvNvpJFdqjVXncl/PUZlKP6ne6MrppcuydzXEanKweZ0hEUHLYHs0jChxnH0rZFfLfGM9KGdLCOrhrXgOHmfoBiAcg8Gi1FIjlbEkLgZt9/XHQ3kUOyKURUQFXZOqnMufrL3mSWtfVTENt6fSS/ioI43ttYR0zj9qd7GTwcxTvpvz83zbch+SoG5tHA6L+vpwx8g9cboDQAO0iz4B+f5i2xUtmosoXnW+BnfRRLnyVRgeaY21hL1GGVRbDDthKF4q9+HBC/YnJgbXULTvoRXEGy1Vua4WbCve+8UcTp1Sr1Y9fL/hU6whhSB7BUwKjmkJ5LBStc+OkyYQKkzg+FX3z4Ax8x0A4Q+caj5VMbE9O94lu2Nx/OxNZFezvljlCk6VWdey3wmDWN42eEx0Ei567GQXlmVJD87EQKD160d1lOiUe60+xCVZbJl0Gn9SBvoBNpmK/OOIqhN3xk1MAKNW8HASbfYvkxLtDK/UmYxVidabZFzJwwXJUTQKmpbg2wpasxR5Vo9Ds2ki6jUOATWBPthE0jU/IsrelZOf1HjFlmCIinDaZLcd5vON7SgH/rYq2k1nij4NWNPAWMBKs05/XxkQJ1pCNkIgKEjDIzm3qmAhfSiWr6SwzNR7GvQQtl1AQ4/LwjX0G21bYlNgOtKXNmQO0yzRW0l5iu2VwppIPT4qPOOF5cmB3IAU93YkHfFlUNLWEg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(2906002)(9686003)(26005)(7416002)(186003)(5660300002)(55016003)(38070700005)(7696005)(508600001)(38100700002)(33656002)(54906003)(110136005)(4326008)(8676002)(82960400001)(64756008)(86362001)(8936002)(6506007)(66446008)(76116006)(66946007)(71200400001)(316002)(83380400001)(52536014)(122000001)(66476007)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rNAZiVoNhjzoG3WvhRMcGGqq7cdEPT12cuTcnjzNP93EtPyqrAaFxQO5IgSv?=
- =?us-ascii?Q?e3dasX/30LsKTVlgYE9ByZJ2uEVoir2EGwSdUJumnVZPBf90IzAg9rz93ZmB?=
- =?us-ascii?Q?C+YwIg4vpLAcU9aQfodQTlGFB+fU6kuf05zDidqyLhKNekGQGGmVyzsSgn/l?=
- =?us-ascii?Q?4oq8cHXrHnDVFSbnopMPccO2JVbD9f3Y7q2Go8Kq+x9427rEF6LgVh7ol/GH?=
- =?us-ascii?Q?MUXsjtOWaSK0K/qqn6099ODowGPdHRE/js9SvBpQEHdrkferwKlwlDXpZ3bh?=
- =?us-ascii?Q?wPO6q0cOPfvv5i1uMCljgnGWdINkBHHbQ0QfCSN3gWrGXbuhTU7Tw2k+BJbD?=
- =?us-ascii?Q?Biv2NAi2vId25EyI7UiDYgjuZzfZWpMtvJbYCPUJ4ykqn56l1ZSeu+p/OqCF?=
- =?us-ascii?Q?PVv8zb+iLQteVaaiKlKZBfSAkoOLR0pX2JXzWAtkN2r0qz3N3/QrIdo0wi1r?=
- =?us-ascii?Q?Hr1fPkpEE7T9APsg5yg3DGUDSOAipKPDXlfWvNoWeeNVhnvZKLFLN9b07XMz?=
- =?us-ascii?Q?hPofsjhzkfGmpuHbopYe31/Y9cwPn+b34NhFV5SWG+/LWSrTESZUOJ0aVgeV?=
- =?us-ascii?Q?g4CVU9haFDmo4jK7iE6rI82C2+zSe6c6UCKEyRIdn1FZwOKId0QqZvpxyOr+?=
- =?us-ascii?Q?PRTRa1wSJLTckJ3186dpuBfpLmhkTUyhs8kXjdfFB6R3PfREUexMt3qurR0x?=
- =?us-ascii?Q?rG+IyiP6yCI9CE3sfo7DBqDd8aw4J9pSIh7LN+hcrOgdiz/8ZEx8uizMgis/?=
- =?us-ascii?Q?Cdp+/aSGrOScwa91rIqg+3KfOi2bn431di53ZhgCxiUzFeI8mLib1TpBGynG?=
- =?us-ascii?Q?bE3xJg/hQMRyoGL/DxEcZfnH5/UAqZQAGXp2H4bRiW1lgGp8jMeumUBR5r/5?=
- =?us-ascii?Q?bITBDktWYpqmE0Ddm8cs1gpWGtEbKp2282D7Mg5fA6oKHmD3ZYD5PsOKsT6A?=
- =?us-ascii?Q?IrcWYdUcXeaZdaHO1qeDNg840jI+o2ggN4NPW2YbNitQvn7V6cqpmWGmlY8e?=
- =?us-ascii?Q?NujI6/1xzPFjK59cTUnP7Z60/hqXmE48gr3KnwX1yAxHZ/H4QanHayuWiV2r?=
- =?us-ascii?Q?lKrfSpcUQT5oqlj4UVZzL/LGHulQFq2KLkC8+ml1512OzEtj3OtBGnFAsyyR?=
- =?us-ascii?Q?CSTFUl+BkIuJyyQhctR84JKITtOQMYK5lo/lymt8Gl8wtWGa82CCoTvkGIuw?=
- =?us-ascii?Q?olfIddiwsND3/z+wgiaPcS3tV/txUd9/0djtOgZBEzXUrE9uQtb50jB5g6sn?=
- =?us-ascii?Q?wZaVa3rYCIVa6rGE7n/Xc4bsL8ZcvfImUumILvHT8StsIcf8gVDjmxzTFKoA?=
- =?us-ascii?Q?64oZYMoV3u2ezwFRUREziDNblXV7ZXVtGCl76nw2D+dDZXnH+l1WHWznqGK4?=
- =?us-ascii?Q?tW/pNSHLSJtxbgyH/v85bKadJ/UYDUn4ggrPivcdm+CwhSeW2lEuTCyTbcPe?=
- =?us-ascii?Q?Uv7ERW7sZuHSO3Oy/Qj+B/tswyxsa50jxQm/Tzddvr7cY8882jNVF144Fehc?=
- =?us-ascii?Q?I7vr2AScobeaupeQ0np3LsMBbiJN4Oc6iaA4sQgSUw7HCSttPF4Ntg8oqMwa?=
- =?us-ascii?Q?YX4dSQ5XUB4/pAtwdn7IfgyQ0yfcXJFCCxKaszxY8WLU2IZlZ7bH+MIXQC1F?=
- =?us-ascii?Q?bQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S236656AbiBOKog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 05:44:36 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DAF5AFF6D;
+        Tue, 15 Feb 2022 02:44:27 -0800 (PST)
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21F9koSq030804;
+        Tue, 15 Feb 2022 10:44:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ApbsUm8LyiDcrYV2wCG5TSa6MePfAKjm2G880xZijoM=;
+ b=OK/zqhu9Qyu5yOP35tYMvURNm4mmPkoRw5WCSQ0V492AN/x5CLOkqU+qxaFKXQOgh3aa
+ 6OEJmFS100dgM/QtNyHry8Qf/TeD4vZ4eUCg4xGvKH1yTYyUL5OOmXv0SZLeC23VuvMm
+ f66E9CHNzbYNqxd1sClJfyu5q1ctC2fEKQ39Qfz9lXkf09gMxkp0SJ86jHNNUS4DQPnS
+ Xg5jUfPVGaEWlXjabcIT6RKHTtR2pzYdox6gqlQILXI/MAFboPAqr2+80MCmgqCw0/1P
+ ywG1FyNt+hReuJb1arBGsWa553U8/JZuzK9P+lg6POnw5sMjZ+laWGmUCxijZZIjlFKg DQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e89uased3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 10:44:26 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21FAiQd3024351;
+        Tue, 15 Feb 2022 10:44:26 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e89uasecn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 10:44:26 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21FAgQJD006226;
+        Tue, 15 Feb 2022 10:44:24 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3e645jp67y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 10:44:23 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21FAiKGY38666580
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Feb 2022 10:44:20 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B41F242041;
+        Tue, 15 Feb 2022 10:44:20 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4D5C942045;
+        Tue, 15 Feb 2022 10:44:20 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.31.140])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Feb 2022 10:44:20 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com,
+        nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 0/1] s390x: stsi: Define vm_is_kvm to be used in different tests
+Date:   Tue, 15 Feb 2022 11:46:31 +0100
+Message-Id: <20220215104632.47796-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb6c0c7e-751d-4570-6be3-08d9f06fca01
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2022 10:41:56.9200
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6gV4v0duTCjXujj/QeOLGRpQSpMjiYpRcMz+RjWq/SvDpbigO+ZBehQ2NPWBchlrVXvT19NA+Fh4Q5TIWpgqNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3228
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2YjdB0l4sCgv71Dh8AqJdYVAxClUOEuk
+X-Proofpoint-ORIG-GUID: jqTZY5aLOFKsbcK3zm-tajm6RfS5hncS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-15_03,2022-02-14_04,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 clxscore=1015 suspectscore=0 spamscore=0 adultscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 impostorscore=0
+ mlxlogscore=521 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202150059
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Wednesday, February 9, 2022 10:37 AM
->=20
-> > >  /* -------- API for Type1 VFIO IOMMU -------- */
-> > >
-> > >  /**
-> >
-> > Otherwise, I'm still not sure how userspace handles the fact that it
-> > can't know how much data will be read from the device and how important
-> > that is.  There's no replacement of that feature from the v1 protocol
-> > here.
->=20
-> I'm not sure this was part of the v1 protocol either. Yes it had a
-> pending_bytes, but I don't think it was actually expected to be 100%
-> accurate. Computing this value accurately is potentially quite
-> expensive, I would prefer we not enforce this on an implementation
-> without a reason, and qemu currently doesn't make use of it.
->=20
-> The ioctl from the precopy patch is probably the best approach, I
-> think it would be fine to allow that for stop copy as well, but also
-> don't see a usage right now.
->=20
-> It is not something that needs decision now, it is very easy to detect
-> if an ioctl is supported on the data_fd at runtime to add new things
-> here when needed.
->=20
+Several tests are in need of a way to check on which hypervisor
+and virtualization level they are running on to be able to fence
+certain tests. This patch adds functions that return true if a
+vm is running under KVM, LPAR or generally as a level 2 guest.
+ 
+To check if we're running under KVM we use the STSI 3.2.2
+instruction, let's define it's response structure in a central
+header.
 
-Another interesting thing (not an immediate concern on this series)
-is how to handle devices which may have long time (e.g. due to=20
-draining outstanding requests, even w/o vPRI) to enter the STOP=20
-state. that time is not as deterministic as pending bytes thus cannot
-be reported back to the user before the operation is actually done.
+Pierre Morel (1):
+  s390x: stsi: Define vm_is_kvm to be used in different tests
 
-Similarly to what we discussed for vPRI an eventfd will be beneficial=20
-so the user can timeout-wait on it, but it also needs an arc to create=20
-the eventfd between RUNNING->STOP...
+ lib/s390x/stsi.h | 32 ++++++++++++++++++++++++++++
+ lib/s390x/vm.c   | 55 ++++++++++++++++++++++++++++++++++++++++++++++--
+ lib/s390x/vm.h   |  3 +++
+ s390x/stsi.c     | 23 ++------------------
+ 4 files changed, 90 insertions(+), 23 deletions(-)
+ create mode 100644 lib/s390x/stsi.h
 
-Thanks
-Kevin
+-- 
+2.27.0
+
