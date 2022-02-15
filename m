@@ -2,148 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1017D4B667A
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 09:48:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95C884B66BC
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 09:58:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234785AbiBOIsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 03:48:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59578 "EHLO
+        id S234133AbiBOI6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 03:58:31 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbiBOIsW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 03:48:22 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E541133ED;
-        Tue, 15 Feb 2022 00:48:13 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21F8KOPF014556;
-        Tue, 15 Feb 2022 08:48:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7icf5qekzQOC/6fq3IRbMa9wpegyw5IO/3M29FyNHJA=;
- b=HhHYr+cdpYY7T4IS53QSBPmByGpLBGZIrcN0MZKj5q1ovcXEHzv9wwXJNfuPUJDLDIuQ
- 7i1dwgRMK+h11DlM9l929pYTEORfcjs2bZSkl5nDz4nTVsFihoDRnTtLMMOWfNMtT1vr
- 6zPEXfLXYHdxpVGMylen6luVux5/hSsmNUTvoh2NV0BXdRNRUycHcCgJO/Ycz2qjll6i
- UPbhXs2B5eKCv1+32s3mTVDQmul9UP8koeLtD5XQZxOvLIXE2RxDfQzAmaAPWnMAuHjF
- JOd4M10p8DTvJd2XU3qwkcMqK3HtjoY6AUN3khu2gQhqunlufuMazENK9q4hEOFQn1CP IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e8621by82-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 08:48:13 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21F8jV3X008118;
-        Tue, 15 Feb 2022 08:48:12 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e8621by7a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 08:48:12 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21F8m0Xm008751;
-        Tue, 15 Feb 2022 08:48:10 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3e64h9kfjc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 08:48:09 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21F8bj0s43188554
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Feb 2022 08:37:45 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E39DA4062;
-        Tue, 15 Feb 2022 08:48:05 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 09231A405B;
-        Tue, 15 Feb 2022 08:48:05 +0000 (GMT)
-Received: from [9.171.31.140] (unknown [9.171.31.140])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Feb 2022 08:48:04 +0000 (GMT)
-Message-ID: <c2dfd5c7-2602-e780-1f2b-402bff3c7c00@linux.ibm.com>
-Date:   Tue, 15 Feb 2022 09:50:18 +0100
+        with ESMTP id S229997AbiBOI6a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 03:58:30 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586B41133F5;
+        Tue, 15 Feb 2022 00:58:20 -0800 (PST)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 8935936D; Tue, 15 Feb 2022 09:58:18 +0100 (CET)
+Date:   Tue, 15 Feb 2022 09:58:13 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Stuart Yoder <stuyoder@gmail.com>, rafael@kernel.org,
+        David Airlie <airlied@linux.ie>, linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>, Ashok Raj <ashok.raj@intel.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>
+Subject: Re: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for
+ multi-device groups
+Message-ID: <YgtrJVI9wGMFdPWk@8bytes.org>
+References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
+ <20220106022053.2406748-4-baolu.lu@linux.intel.com>
+ <Ygo/eCRFnraY01WA@8bytes.org>
+ <20220214130313.GV4160@nvidia.com>
+ <Ygppub+Wjq6mQEAX@8bytes.org>
+ <08e90a61-8491-acf1-ab0f-f93f97366d24@arm.com>
+ <20220214154626.GF4160@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH v4 3/4] s390x: topology: Check the Perform
- Topology Function
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
-References: <20220208132709.48291-1-pmorel@linux.ibm.com>
- <20220208132709.48291-4-pmorel@linux.ibm.com>
- <8dd704d23f8a14907ed2a7f28ec3ac52685ab96c.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <8dd704d23f8a14907ed2a7f28ec3ac52685ab96c.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: loO3vzq5FJ_9T2aSDtv8MdkKkxAqkRLG
-X-Proofpoint-GUID: R--7QuiyHB5CQlqseQB4hwlbvrH6LHpL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-15_03,2022-02-14_04,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- bulkscore=0 spamscore=0 mlxscore=0 phishscore=0 impostorscore=0
- mlxlogscore=999 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202150048
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220214154626.GF4160@nvidia.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 14, 2022 at 11:46:26AM -0400, Jason Gunthorpe wrote:
+> On Mon, Feb 14, 2022 at 03:18:31PM +0000, Robin Murphy wrote:
+> 
+> > Arguably, iommu_attach_device() could be renamed something like
+> > iommu_attach_group_for_dev(), since that's effectively the semantic that all
+> > the existing API users want anyway (even VFIO at the high level - the group
+> > is the means for the user to assign their GPU/NIC/whatever device to their
+> > process, not the end in itself). That's just a lot more churn.
+> 
+> Right
 
+Okay, good point. I can live with an iommu_attach_group_for_dev()
+interface, it is still better than making iommu_attach_device() silently
+operate on whole groups.
 
-On 2/9/22 12:37, Nico Boehr wrote:
-> On Tue, 2022-02-08 at 14:27 +0100, Pierre Morel wrote:
->> We check the PTF instruction.
+> VFIO needs them because its uAPI is tied, but even so we keep talking
+> about ways to narrow the amount of group API it consumes.
 > 
-> You could test some very basic things as well:
-> 
-> - you get a privileged pgm int in problem state,
-> - reserved bits in first operand cause specification pgm int,
-> - reserved FC values result in a specification pgm int,
-> - second operand is ignored.
+> We should not set the recommended/good kAPI based on VFIOs uAPI
+> design.
 
-Which second operand?
+Agree here too. The current way groups are implemented can be turned
+into a VFIO specific interface to keep its semantics and kABI. But the
+IOMMU core code still needs the concept of alias groups.
 
-> 
->>
->> - We do not expect to support vertical polarization.
->>
->> - We do not expect the Modified Topology Change Report to be
-> [...]
-> 
-> Forgive me if I'm missing something, but why _Modified_ Topology Change
-> Report?
-> 
->> diff --git a/s390x/topology.c b/s390x/topology.c
->> new file mode 100644
->> index 00000000..a1f9ce51
->> --- /dev/null
->> +++ b/s390x/topology.c
-> 
-> [...]
-> 
->> +static int ptf(unsigned long fc, unsigned long *rc)
->> +{
->> +       int cc;
->> +
->> +       asm volatile(
->> +               "       .insn   rre,0xb9a20000,%1,0\n"
->> +               "       ipm     %0\n"
->> +               "       srl     %0,28\n"
->> +               : "=d" (cc), "+d" (fc)
->> +               : "d" (fc)
-> 
-> Why list fc here again?
-> 
-> 
+Regards,
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+	Joerg
