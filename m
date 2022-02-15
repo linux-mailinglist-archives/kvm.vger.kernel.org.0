@@ -2,210 +2,438 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B17A74B6A07
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 11:59:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55A434B6A56
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 12:10:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236799AbiBOK7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 05:59:13 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34010 "EHLO
+        id S236939AbiBOLKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 06:10:14 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236785AbiBOK7L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 05:59:11 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065CDDD973;
-        Tue, 15 Feb 2022 02:59:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644922742; x=1676458742;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=0jQo1ZsnwFWu0vvlQPA7wAfy0LnhmDZsxi8pSQps/Qk=;
-  b=fdR7SF46Y0Q4Ck9i553aX0+yNLPcjnnD/yQQS8VysCFNR+hEondDTJvQ
-   yt7TYjuYDE8q8s172JLmXVEfx10muQBbnbLyuT5vDv18jdZazmkvTtR+r
-   wqbO2ewbFpfiXrEbkPBkSQw1ExNToeYnusqxK+MVTPA65Lvv5/+4iW67I
-   yDbLZU6hhG4WsBzg8xiCKcd1XpraJC5VNLK4TOitDJMpqfBpVnQ7wbeJO
-   shYwVGeB0+FMjjUnuG9XwQ1W3DXkIA6GVNOAiW//ZmKoVYYPeuxdJWhGG
-   6pHETBDqFbbBKdvl+B6ooi5yK7pejLEpAz4mN/U8LmUZSJhyo6ULU+UlN
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10258"; a="230954868"
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="230954868"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 02:59:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="775777834"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Feb 2022 02:59:00 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 15 Feb 2022 02:59:00 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Tue, 15 Feb 2022 02:59:00 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Tue, 15 Feb 2022 02:59:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wc5GDlbO0jT1X6UqgwhaY0P2HZKUfLz5plxXYRtGK4/rnFg8DocFTlny3ICZezagb0OM3cgoy6qgOEfXkZ/6+MryF9LUyFreaRmmFfcV7C7jbVh14Fe6w3ooqVxskNIGdxfZdhBrjqKHjCnk03WRkccQ//PXJFxIaVOuOGos9ACznyrQA7aLkwoyqDxrwGJ2aM7EM9xR/kK8d1mtn6swFmOvCe5767/afdEx6+VmwvfyEr1/7BBiz9SptY8y6sQ90ezXeo61+F1MxmCLSNKK92WAeIF+woqZA54flQSXV13uQ3ANuHWxADbX/V228e8ndR5cYhB1i8oXRoQ1B8CNDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0jQo1ZsnwFWu0vvlQPA7wAfy0LnhmDZsxi8pSQps/Qk=;
- b=GpnzCKbTw9Z4aZU/dbKPRZFxuoruxrSw9fdjRNpJnshWxVUJUaf113NGz3rpOf3YA65fwqoiMrOivjAo+nMXlkr5ldRtjDK9Br//u1K6Kw4CtZbtef/mThbJDUHVzgfJyq19KpSllZU5uiM3Xd6DoWsF5mB6yTrT3tio0Drqs4xNxCu2KklERSjYUBPILFk6ICI4C/q6UkLHc7HL4YTnKskxDFMa04jTzBA2UiazjAbiFqcD1rV8CdqFaWPSvOPtApiQdsgyG3KCQ8Ih44e5hi7282YFmP424iBoIjPpL4oE448GMsvR5twXenGIy9kxoIzwGQ9jc8u6nOGhkTJQow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SA0PR11MB4528.namprd11.prod.outlook.com (2603:10b6:806:99::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.18; Tue, 15 Feb
- 2022 10:58:58 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::f514:7aae:315b:4d8d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::f514:7aae:315b:4d8d%4]) with mapi id 15.20.4975.019; Tue, 15 Feb 2022
- 10:58:58 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Yishai Hadas <yishaih@nvidia.com>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "saeedm@nvidia.com" <saeedm@nvidia.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "leonro@nvidia.com" <leonro@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>
-Subject: RE: [PATCH V7 mlx5-next 08/15] vfio: Define device migration protocol
- v2
-Thread-Topic: [PATCH V7 mlx5-next 08/15] vfio: Define device migration
- protocol v2
-Thread-Index: AQHYHEd8WrQ75CuCwEmQ+4nXbJWyQ6yKWZwAgAAploCACfA7AIAAB9xw
-Date:   Tue, 15 Feb 2022 10:58:58 +0000
-Message-ID: <BN9PR11MB5276C361E686DCAFA8A078788C349@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220207172216.206415-1-yishaih@nvidia.com>
- <20220207172216.206415-9-yishaih@nvidia.com>
- <20220208170754.01d05a1d.alex.williamson@redhat.com>
- <20220209023645.GN4160@nvidia.com> 
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8cae3b3b-330f-4670-455e-08d9f0722ae5
-x-ms-traffictypediagnostic: SA0PR11MB4528:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <SA0PR11MB4528E468E799186D534981808C349@SA0PR11MB4528.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5ZrwlqPa2gHi4ztvPhGMkIQONaj04Pcb4H2bL/nHNCf6dzMskSjcBQ/yiGm2DzPPP0LLUPWdsCTFqL4pkSEDhJsm3Q8LsCGSc2gi0/MHAAywU5KgUr0o8JjwaeNt++bz6tMSn+f8i+hyH0YlvOKIWn8TPB2Lc1cJvOE08/YaHW71BciCGAV5cci9o2c/qshLCZVonKuNt+EAZSecAxcV4I27SmQHyC6MqF/kEJVM5ch7nFu2iziKJR2N6lPhNv8gWcJxndHTS2spa1fIJO2if6ak2JUjxpJYcnPIQNFn1jWSL0sj/H9z+mHlLlS98QFrBkSxTclMtq4c4TqQGvsXnWDeeqYIy0NDQe5whhiBZ6ab2FOmcobho8robfx61KjnmxmbqMsLH1L5zcIP0mpIRPy74tzRPYXlMSXA5K2whSHr6Ox+1nInP0hMTm1K649THxh2aghmnm4CzvB3PttBU/t47LvuVY4yBq4RGgyFm+a4w1hI4fqZ50k+P3Mn5pfTRkiIXD5i69IZz035g4aaRw+i8/vIxJUIXl3Ezfd1GOHgmkgtqZRPx8CMWigoLFCutmL529JOSBzFLpZ1SBRyJqhCzAF8hIqBCwSqUabC0qXNuw3xTvrkb5d1tyN5QEh4dTarTR5EUe1ooHW8kw2QLISI2xxyxd6iAb8fhYyCEYCs63k2g9uV+a/mpxl1HLlkyDPaFDshPbr7SoVSoodcFg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(5660300002)(508600001)(71200400001)(2906002)(6506007)(38070700005)(55016003)(7416002)(7696005)(33656002)(316002)(26005)(66946007)(82960400001)(9686003)(54906003)(4326008)(83380400001)(66556008)(122000001)(110136005)(86362001)(38100700002)(52536014)(8936002)(76116006)(8676002)(66476007)(64756008)(186003)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OVN1ZnNPSXMydVdmWkN5eXduZHFnTzZIdlBCM3NvWTk3MzBJU1NLeWthdTFu?=
- =?utf-8?B?RmRLK2xMOVprMXZCQi85RlYrenAxMmJFbE8wVS95eDAvbUZJV0lySTArYWc1?=
- =?utf-8?B?d2VnbGxxR2tOdVNIRFRlRWwxVElGRHRzaVc3NUowcDRWZU9ETlA1Q2ZBNXRp?=
- =?utf-8?B?Z3p5ckNIY09Mbno1TzZ2QU1DRUhVRE1lU3NLZ1NvUHlhQzRlZ05IQ2RnbXBu?=
- =?utf-8?B?a0Y0YXBCcCtucWVEV3orNmlPblI1aytwTjZROTEwSzV4T2dTcUovb3JQK0kw?=
- =?utf-8?B?Y2RXbnZsZjlMZEFETFBPSUM1ZlZOZnVXSDQ1cnB2ak1PQlNYUC9ESUhpcXUv?=
- =?utf-8?B?ZkZWZ1ZUSmtRcXlWditMaE52VzlFTndlMndtU25LSXN3QXZlWXZJNW9DMyt4?=
- =?utf-8?B?WU1GOC9mRFBYMDYyUktCSWl3K2VKSXFnSUtoaE8yaW5iYkxHRU5PZjR1dnV2?=
- =?utf-8?B?U082T3FyOWVONjRVdzZXbFBQdHhqQ1VoaTB6OVZuL21td1RCektBTWpxa2Fj?=
- =?utf-8?B?Z2dmRzNDQWl1Uk5LTzdNTUdIdSttV2IrTzBpNGM4TEJiRUN3Y3ZneHVsTzZa?=
- =?utf-8?B?bWtPU21mTEFMejJTWUdsYWh2alB3RmRYSHlXVEZoQjE4VHRCMnQ2RHJJRStk?=
- =?utf-8?B?clJ0Z25MN2tXVmVYMzVaYWpPMzhLRDc2VFFJM05BTThMRVhPaUdhSVVHa2xp?=
- =?utf-8?B?N1FrK0tYckpZT0xsMmRXbHFLazByUkF6b3paaXdnRDRzaDdaV24yUW5QR0x1?=
- =?utf-8?B?elIzUzZEUmZ5Zm5zS1ZjdXJjR0VrbmZWeDM4QkE2T09lcWIxQ1Q0MzFwcDZO?=
- =?utf-8?B?VSszcTBKODJNbXkveko2VzNWVEVVcmNwM094czJFcXhHejhSMitaakRZaE9h?=
- =?utf-8?B?b0hJdE43YTdlYlZWRFBWMitXNmNLODFPRExGclJsY0FLdjlkTWQ4eTRXT2M0?=
- =?utf-8?B?emZVQjBTMGFFTHIxZGsrNWUyMEp4NlRIejl5NThnWFl2VXhuc3BNckk1eUhI?=
- =?utf-8?B?ejRlRitTYUtqM1F2NlM0Vk1ZbWNNSHpZWHE3T2o5U1A0YU5jajV2V3k4dkFa?=
- =?utf-8?B?OEU3L2RnNnhhWkcwdGhKUmFvREx1UWRPOVZVUTEwT0NjU29tK2pIdTBsTGJx?=
- =?utf-8?B?UFRlN0pkbksrcUVDcjkySmppMGE3RHJ2cFZQVnN1Yjc4MFVYYzR0Y2ZyVUhB?=
- =?utf-8?B?eG42cHlJVS90TE45bFAzbTVub0RGdFRYZi9FWnJZT0pidHhmYlV2c1FIVS9B?=
- =?utf-8?B?U2NDMnZXY1U4MHFrV25hQjJXaWdyUUluSHN1V2gvUzBXM3Y5bUY4UTIwdXdL?=
- =?utf-8?B?RTQvK1VGRmhtd2YxSk9zZmtqTTN4K2RKOXBCY3c1ZDkrZ3lVck5rL3B6YnM1?=
- =?utf-8?B?dDc2Nkd0U0dOU3ZBUG5TdGUwNnRsUFIrdFdNUHNRVHJINW1Tc1B1UkJyRGZx?=
- =?utf-8?B?L1dNYm1Ubk1UOGJkU2tBMW5MY3NLdlQ3TDdzbURmMUFnT2RFQ1RiSld5RjV0?=
- =?utf-8?B?a3VIUXBpZ1VxVDdDdHc3UEJxL0pOTStPV0Y3THRrQUxLeG83VXlSZHlkYkg4?=
- =?utf-8?B?ekUwUjlZQzZ3V1JwYXVaeWltMkE1aUpLc3BKL21tZ0J0MUVsOGh0Smduemd4?=
- =?utf-8?B?Zld6elI3ZXpiUmxpSGlPVktqTEplYWNEL0RmZmxMRDZjRVJ1aTYxVTZuVGhD?=
- =?utf-8?B?RUtyUFFyclpyVEI5VEVHc2paVlNwdWJ3UEI5MUNKUGo0ZlZ0N2tMVHVzS2hl?=
- =?utf-8?B?YlN6dDJvT1BFc1FsTDVzOGNJL01ScmsydW5LcVJzR0Z0WktLenV1QXduRERw?=
- =?utf-8?B?TmsrZmFHN3ozdE5WY2o0NmpRejN0RFJWRWdaMWxNTE1Ta2xXdHRWYjZlZGtQ?=
- =?utf-8?B?Z2Z6aVBXNWFlWHVLS2J5NU5IazI1cStHNnE2SjMzQlV0dDIwaDJGSk5XNXpW?=
- =?utf-8?B?WkJMUUNEdmZXK2tBUEdvNGtmMTQ2czhMTU9TeDVKTzk5UEV6M1NzMlpITmk5?=
- =?utf-8?B?RXRlbHUxNGMzQWtDcXdlSTZ3ZTdGaUtrNU04eXo3cDVSYjNOYXB5TndHZmJE?=
- =?utf-8?B?L1FvaVMwUDdYaTc5bXVKYXh2YmV5dFo2YkF1TTQ3U0srQWFyZ1dNUW1EVU1Y?=
- =?utf-8?B?NDVkQnI4akpoR3hiN3VzZzZYYmV5dkxUMFZTZUZXVFlPNksrRzBhZDEwN3J4?=
- =?utf-8?B?bVE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S235732AbiBOLKN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 06:10:13 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809F9107ABF
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 03:10:03 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21FAc6I1020979
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 11:10:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9RPlZtMfsueHEc1nyJlpPuQBxnoOsEG8Yuli3AM+g6c=;
+ b=kiFcG8AbJBsvaUT06F1CkgttFgoMuIiwWXsCY88qfbhRqQ60/QqkGHtO7Ai14Y32A7or
+ OQx8C4dPA5WSwu2u4Ll4cHyEsjX+SU6tDLfzyHr++J/xK8Xfbhl+JrTu6IGdnFqhztT3
+ FeqPNLc7pWEcviHMdyC3RMF3id9EBKue4rGc5gPR+01tFI0i4hGqKmJf/ANyjjFgatje
+ o5krJZKDmkVaCmm+XFh4uxA8YT/du9SLHi0og4ejV91ULHJvorrZacESV3BXTKm114LM
+ N4xQ239xevPnFdtX6xPsN4JKzmIvtH2lEyQGE1yaFU0C3Nhx4bZz1NR4YmIhourrKxkP +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e8a2msjnu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 11:10:02 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21FAeoaA029442
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 11:10:02 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e8a2msjn4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 11:10:02 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21FB85r6028029;
+        Tue, 15 Feb 2022 11:10:00 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3e64h9n4j0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Feb 2022 11:10:00 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21FB9sJT43057586
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Feb 2022 11:09:54 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 173DD11D0E5;
+        Tue, 15 Feb 2022 11:09:54 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BC20811D0DD;
+        Tue, 15 Feb 2022 11:09:53 +0000 (GMT)
+Received: from [9.145.18.32] (unknown [9.145.18.32])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Feb 2022 11:09:53 +0000 (GMT)
+Message-ID: <698c33f2-7549-3420-ce97-d15c86b4dc02@linux.ibm.com>
+Date:   Tue, 15 Feb 2022 12:09:53 +0100
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8cae3b3b-330f-4670-455e-08d9f0722ae5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2022 10:58:58.4992
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nkwYK4CRHAZXl2RhjAUzv8z5isnwpbFnVT5hNsx5rj5YAu/iCtS1uiIjfO1cS3TrBsQp9urJMd/NFh8IdHbZSw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4528
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v2 2/6] lib: s390x: smp: refactor smp
+ functions to accept indexes
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        nrb@linux.ibm.com, scgl@linux.ibm.com
+References: <20220204130855.39520-1-imbrenda@linux.ibm.com>
+ <20220204130855.39520-3-imbrenda@linux.ibm.com>
+From:   Steffen Eiden <seiden@linux.ibm.com>
+Organization: IBM
+In-Reply-To: <20220204130855.39520-3-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ajwf62b8ZxHftf4Wwb7cEQ4C0kqFovXN
+X-Proofpoint-GUID: 3B3so0gi5XwKYMxm-GlS5HCDMWfbunIU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-15_04,2022-02-14_04,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 bulkscore=0 mlxscore=0 impostorscore=0 phishscore=0
+ malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202150063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBUaWFuLCBLZXZpbg0KPiBTZW50OiBUdWVzZGF5LCBGZWJydWFyeSAxNSwgMjAyMiA2
-OjQyIFBNDQo+IA0KPiA+IEZyb206IEphc29uIEd1bnRob3JwZSA8amdnQG52aWRpYS5jb20+DQo+
-ID4gU2VudDogV2VkbmVzZGF5LCBGZWJydWFyeSA5LCAyMDIyIDEwOjM3IEFNDQo+ID4NCj4gPiA+
-ID4gIC8qIC0tLS0tLS0tIEFQSSBmb3IgVHlwZTEgVkZJTyBJT01NVSAtLS0tLS0tLSAqLw0KPiA+
-ID4gPg0KPiA+ID4gPiAgLyoqDQo+ID4gPg0KPiA+ID4gT3RoZXJ3aXNlLCBJJ20gc3RpbGwgbm90
-IHN1cmUgaG93IHVzZXJzcGFjZSBoYW5kbGVzIHRoZSBmYWN0IHRoYXQgaXQNCj4gPiA+IGNhbid0
-IGtub3cgaG93IG11Y2ggZGF0YSB3aWxsIGJlIHJlYWQgZnJvbSB0aGUgZGV2aWNlIGFuZCBob3cN
-Cj4gaW1wb3J0YW50DQo+ID4gPiB0aGF0IGlzLiAgVGhlcmUncyBubyByZXBsYWNlbWVudCBvZiB0
-aGF0IGZlYXR1cmUgZnJvbSB0aGUgdjEgcHJvdG9jb2wNCj4gPiA+IGhlcmUuDQo+ID4NCj4gPiBJ
-J20gbm90IHN1cmUgdGhpcyB3YXMgcGFydCBvZiB0aGUgdjEgcHJvdG9jb2wgZWl0aGVyLiBZZXMg
-aXQgaGFkIGENCj4gPiBwZW5kaW5nX2J5dGVzLCBidXQgSSBkb24ndCB0aGluayBpdCB3YXMgYWN0
-dWFsbHkgZXhwZWN0ZWQgdG8gYmUgMTAwJQ0KPiA+IGFjY3VyYXRlLiBDb21wdXRpbmcgdGhpcyB2
-YWx1ZSBhY2N1cmF0ZWx5IGlzIHBvdGVudGlhbGx5IHF1aXRlDQo+ID4gZXhwZW5zaXZlLCBJIHdv
-dWxkIHByZWZlciB3ZSBub3QgZW5mb3JjZSB0aGlzIG9uIGFuIGltcGxlbWVudGF0aW9uDQo+ID4g
-d2l0aG91dCBhIHJlYXNvbiwgYW5kIHFlbXUgY3VycmVudGx5IGRvZXNuJ3QgbWFrZSB1c2Ugb2Yg
-aXQuDQo+ID4NCj4gPiBUaGUgaW9jdGwgZnJvbSB0aGUgcHJlY29weSBwYXRjaCBpcyBwcm9iYWJs
-eSB0aGUgYmVzdCBhcHByb2FjaCwgSQ0KPiA+IHRoaW5rIGl0IHdvdWxkIGJlIGZpbmUgdG8gYWxs
-b3cgdGhhdCBmb3Igc3RvcCBjb3B5IGFzIHdlbGwsIGJ1dCBhbHNvDQo+ID4gZG9uJ3Qgc2VlIGEg
-dXNhZ2UgcmlnaHQgbm93Lg0KPiA+DQo+ID4gSXQgaXMgbm90IHNvbWV0aGluZyB0aGF0IG5lZWRz
-IGRlY2lzaW9uIG5vdywgaXQgaXMgdmVyeSBlYXN5IHRvIGRldGVjdA0KPiA+IGlmIGFuIGlvY3Rs
-IGlzIHN1cHBvcnRlZCBvbiB0aGUgZGF0YV9mZCBhdCBydW50aW1lIHRvIGFkZCBuZXcgdGhpbmdz
-DQo+ID4gaGVyZSB3aGVuIG5lZWRlZC4NCj4gPg0KPiANCj4gQW5vdGhlciBpbnRlcmVzdGluZyB0
-aGluZyAobm90IGFuIGltbWVkaWF0ZSBjb25jZXJuIG9uIHRoaXMgc2VyaWVzKQ0KPiBpcyBob3cg
-dG8gaGFuZGxlIGRldmljZXMgd2hpY2ggbWF5IGhhdmUgbG9uZyB0aW1lIChlLmcuIGR1ZSB0bw0K
-PiBkcmFpbmluZyBvdXRzdGFuZGluZyByZXF1ZXN0cywgZXZlbiB3L28gdlBSSSkgdG8gZW50ZXIg
-dGhlIFNUT1ANCj4gc3RhdGUuIHRoYXQgdGltZSBpcyBub3QgYXMgZGV0ZXJtaW5pc3RpYyBhcyBw
-ZW5kaW5nIGJ5dGVzIHRodXMgY2Fubm90DQo+IGJlIHJlcG9ydGVkIGJhY2sgdG8gdGhlIHVzZXIg
-YmVmb3JlIHRoZSBvcGVyYXRpb24gaXMgYWN0dWFsbHkgZG9uZS4NCj4gDQo+IFNpbWlsYXJseSB0
-byB3aGF0IHdlIGRpc2N1c3NlZCBmb3IgdlBSSSBhbiBldmVudGZkIHdpbGwgYmUgYmVuZWZpY2lh
-bA0KPiBzbyB0aGUgdXNlciBjYW4gdGltZW91dC13YWl0IG9uIGl0LCBidXQgaXQgYWxzbyBuZWVk
-cyBhbiBhcmMgdG8gY3JlYXRlDQo+IHRoZSBldmVudGZkIGJldHdlZW4gUlVOTklORy0+U1RPUC4u
-Lg0KPiANCg0KdHlwZSB0b28gZmFzdC4gaXQgZG9lc27igJl0IG5lZWQgYSBuZXcgYXJjLiBKdXN0
-IGEgbmV3IGNhcGFiaWxpdHkgdG8gc2F5DQp0aGF0IFNUT1AgcmV0dXJucyBhbiBldmVudCBmZCBm
-b3IgdGhlIHVzZXIgdG8gd2FpdCBmb3IgY29tcGxldGlvbiwNCndoZW4gc3VwcG9ydGluZyBzdWNo
-IGRldmljZXMgaXMgcmVxdWlyZWQuIPCfmIoNCg0KVGhhbmtzDQpLZXZpbg0K
+
+
+On 2/4/22 14:08, Claudio Imbrenda wrote:
+> Refactor all the smp_* functions to accept CPU indexes instead of CPU
+> addresses.
+> 
+> Add SIGP wrappers to use indexes instead of addresses. Raw SIGP calls
+> using addresses are still possible.
+> 
+> Add a few other useful functions to deal with CPU indexes.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   lib/s390x/smp.h |  20 ++++---
+>   lib/s390x/smp.c | 148 ++++++++++++++++++++++++++++--------------------
+>   2 files changed, 99 insertions(+), 69 deletions(-)
+> 
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index a2609f11..1e69a7de 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -37,15 +37,19 @@ struct cpu_status {
+>   
+>   int smp_query_num_cpus(void);
+>   struct cpu *smp_cpu_from_addr(uint16_t addr);
+> -bool smp_cpu_stopped(uint16_t addr);
+> -bool smp_sense_running_status(uint16_t addr);
+> -int smp_cpu_restart(uint16_t addr);
+> -int smp_cpu_start(uint16_t addr, struct psw psw);
+> -int smp_cpu_stop(uint16_t addr);
+> -int smp_cpu_stop_store_status(uint16_t addr);
+> -int smp_cpu_destroy(uint16_t addr);
+> -int smp_cpu_setup(uint16_t addr, struct psw psw);
+> +struct cpu *smp_cpu_from_idx(uint16_t idx);
+> +uint16_t smp_cpu_addr(uint16_t idx);
+> +bool smp_cpu_stopped(uint16_t idx);
+> +bool smp_sense_running_status(uint16_t idx);
+> +int smp_cpu_restart(uint16_t idx);
+> +int smp_cpu_start(uint16_t idx, struct psw psw);
+> +int smp_cpu_stop(uint16_t idx);
+> +int smp_cpu_stop_store_status(uint16_t idx);
+> +int smp_cpu_destroy(uint16_t idx);
+> +int smp_cpu_setup(uint16_t idx, struct psw psw);
+>   void smp_teardown(void);
+>   void smp_setup(void);
+> +int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status);
+> +int smp_sigp_retry(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status);
+>   
+>   #endif
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index eae742d2..dde79274 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -29,11 +29,28 @@ static struct spinlock lock;
+>   
+>   extern void smp_cpu_setup_state(void);
+>   
+> +static void check_idx(uint16_t idx)
+> +{
+> +	assert(idx < smp_query_num_cpus());
+> +}
+> +
+>   int smp_query_num_cpus(void)
+>   {
+>   	return sclp_get_cpu_num();
+>   }
+>   
+> +int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
+> +{
+> +	check_idx(idx);
+> +	return sigp(cpus[idx].addr, order, parm, status);
+> +}
+> +
+> +int smp_sigp_retry(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *status)
+> +{
+> +	check_idx(idx);
+> +	return sigp_retry(cpus[idx].addr, order, parm, status);
+> +}
+> +
+>   struct cpu *smp_cpu_from_addr(uint16_t addr)
+>   {
+>   	int i, num = smp_query_num_cpus();
+> @@ -45,174 +62,183 @@ struct cpu *smp_cpu_from_addr(uint16_t addr)
+>   	return NULL;
+>   } >
+> -bool smp_cpu_stopped(uint16_t addr)
+> +struct cpu *smp_cpu_from_idx(uint16_t idx)
+> +{
+> +	check_idx(idx);
+> +	return &cpus[idx];
+> +}
+> +
+> +uint16_t smp_cpu_addr(uint16_t idx)
+> +{
+> +	check_idx(idx);
+> +	return cpus[idx].addr;
+> +}
+> +
+> +bool smp_cpu_stopped(uint16_t idx)
+>   {
+>   	uint32_t status;
+>   
+> -	if (sigp(addr, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
+> +	if (smp_sigp(idx, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
+>   		return false;
+>   	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
+>   }
+>   
+> -bool smp_sense_running_status(uint16_t addr)
+> +bool smp_sense_running_status(uint16_t idx)
+>   {
+> -	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
+> +	if (smp_sigp(idx, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
+>   		return true;
+>   	/* Status stored condition code is equivalent to cpu not running. */
+>   	return false;
+>   }
+>   
+> -static int smp_cpu_stop_nolock(uint16_t addr, bool store)
+> +static int smp_cpu_stop_nolock(uint16_t idx, bool store)
+>   {
+> -	struct cpu *cpu;
+>   	uint8_t order = store ? SIGP_STOP_AND_STORE_STATUS : SIGP_STOP;
+>   
+> -	cpu = smp_cpu_from_addr(addr);
+> -	if (!cpu || addr == cpus[0].addr)
+> +	/* refuse to work on the boot CPU */
+> +	if (idx == 0)
+>   		return -1;
+>   
+> -	if (sigp_retry(addr, order, 0, NULL))
+> +	if (smp_sigp_retry(idx, order, 0, NULL))
+>   		return -1;
+>   
+> -	while (!smp_cpu_stopped(addr))
+> +	while (!smp_cpu_stopped(idx))
+>   		mb();
+> -	cpu->active = false;
+> +	/* idx has been already checked by the smp_* functions called above */
+> +	cpus[idx].active = false;
+>   	return 0;
+>   }
+>   
+> -int smp_cpu_stop(uint16_t addr)
+> +int smp_cpu_stop(uint16_t idx)
+>   {
+>   	int rc;
+>   
+>   	spin_lock(&lock);
+> -	rc = smp_cpu_stop_nolock(addr, false);
+> +	rc = smp_cpu_stop_nolock(idx, false);
+>   	spin_unlock(&lock);
+>   	return rc;
+>   }
+>   
+> -int smp_cpu_stop_store_status(uint16_t addr)
+> +int smp_cpu_stop_store_status(uint16_t idx)
+>   {
+>   	int rc;
+>   
+>   	spin_lock(&lock);
+> -	rc = smp_cpu_stop_nolock(addr, true);
+> +	rc = smp_cpu_stop_nolock(idx, true);
+>   	spin_unlock(&lock);
+>   	return rc;
+>   }
+>   
+> -static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
+> +static int smp_cpu_restart_nolock(uint16_t idx, struct psw *psw)
+>   {
+>   	int rc;
+> -	struct cpu *cpu = smp_cpu_from_addr(addr);
+>   
+> -	if (!cpu)
+> -		return -1;
+> +	check_idx(idx);
+>   	if (psw) {
+> -		cpu->lowcore->restart_new_psw.mask = psw->mask;
+> -		cpu->lowcore->restart_new_psw.addr = psw->addr;
+> +		cpus[idx].lowcore->restart_new_psw.mask = psw->mask;
+> +		cpus[idx].lowcore->restart_new_psw.addr = psw->addr;
+>   	}
+>   	/*
+>   	 * Stop the cpu, so we don't have a race between a running cpu
+>   	 * and the restart in the test that checks if the cpu is
+>   	 * running after the restart.
+>   	 */
+> -	smp_cpu_stop_nolock(addr, false);
+> -	rc = sigp(addr, SIGP_RESTART, 0, NULL);
+> +	smp_cpu_stop_nolock(idx, false);
+> +	rc = sigp(cpus[idx].addr, SIGP_RESTART, 0, NULL);
+
+What about using the smp wrapper 'smp_sigp(idx, SIGP_RESTART, 0, NULL)' 
+here as well?
+
+
+>   	if (rc)
+>   		return rc;
+>   	/*
+>   	 * The order has been accepted, but the actual restart may not
+>   	 * have been performed yet, so wait until the cpu is running.
+>   	 */
+> -	while (smp_cpu_stopped(addr))
+> +	while (smp_cpu_stopped(idx))
+>   		mb();
+> -	cpu->active = true;
+> +	cpus[idx].active = true;
+>   	return 0;
+>   }
+>   
+> -int smp_cpu_restart(uint16_t addr)
+> +int smp_cpu_restart(uint16_t idx)
+>   {
+>   	int rc;
+>   
+>   	spin_lock(&lock);
+> -	rc = smp_cpu_restart_nolock(addr, NULL);
+> +	rc = smp_cpu_restart_nolock(idx, NULL);
+>   	spin_unlock(&lock);
+>   	return rc;
+>   }
+>   
+> -int smp_cpu_start(uint16_t addr, struct psw psw)
+> +int smp_cpu_start(uint16_t idx, struct psw psw)
+>   {
+>   	int rc;
+>   
+>   	spin_lock(&lock);
+> -	rc = smp_cpu_restart_nolock(addr, &psw);
+> +	rc = smp_cpu_restart_nolock(idx, &psw);
+>   	spin_unlock(&lock);
+>   	return rc;
+>   }
+>   
+> -int smp_cpu_destroy(uint16_t addr)
+> +int smp_cpu_destroy(uint16_t idx)
+>   {
+> -	struct cpu *cpu;
+>   	int rc;
+>   
+>   	spin_lock(&lock);
+> -	rc = smp_cpu_stop_nolock(addr, false);
+> +	rc = smp_cpu_stop_nolock(idx, false);
+>   	if (!rc) {
+> -		cpu = smp_cpu_from_addr(addr);
+> -		free_pages(cpu->lowcore);
+> -		free_pages(cpu->stack);
+> -		cpu->lowcore = (void *)-1UL;
+> -		cpu->stack = (void *)-1UL;
+> +		free_pages(cpus[idx].lowcore);
+> +		free_pages(cpus[idx].stack);
+> +		cpus[idx].lowcore = (void *)-1UL;
+> +		cpus[idx].stack = (void *)-1UL;
+>   	}
+>   	spin_unlock(&lock);
+>   	return rc;
+>   }
+>   
+> -int smp_cpu_setup(uint16_t addr, struct psw psw)
+> +static int smp_cpu_setup_nolock(uint16_t idx, struct psw psw)
+>   {
+>   	struct lowcore *lc;
+> -	struct cpu *cpu;
+> -	int rc = -1;
+> -
+> -	spin_lock(&lock);
+> -
+> -	if (!cpus)
+> -		goto out;
+>   
+> -	cpu = smp_cpu_from_addr(addr);
+> -
+> -	if (!cpu || cpu->active)
+> -		goto out;
+> +	if (cpus[idx].active)
+> +		return -1;
+>   
+> -	sigp_retry(cpu->addr, SIGP_INITIAL_CPU_RESET, 0, NULL);
+> +	sigp_retry(cpus[idx].addr, SIGP_INITIAL_CPU_RESET, 0, NULL);
+
+You may want to use the smp wrapper 'smp_sigp_retry' here.
+
+>   
+>   	lc = alloc_pages_flags(1, AREA_DMA31);
+> -	cpu->lowcore = lc;
+> -	memset(lc, 0, PAGE_SIZE * 2);
+> -	sigp_retry(cpu->addr, SIGP_SET_PREFIX, (unsigned long )lc, NULL);
+> +	cpus[idx].lowcore = lc;
+> +	sigp_retry(cpus[idx].addr, SIGP_SET_PREFIX, (unsigned long )lc, NULL);
+smp_sigp_retry
+
+>   
+>   	/* Copy all exception psws. */
+>   	memcpy(lc, cpus[0].lowcore, 512);
+>   
+>   	/* Setup stack */
+> -	cpu->stack = (uint64_t *)alloc_pages(2);
+> +	cpus[idx].stack = (uint64_t *)alloc_pages(2);
+>   
+>   	/* Start without DAT and any other mask bits. */
+> -	cpu->lowcore->sw_int_psw.mask = psw.mask;
+> -	cpu->lowcore->sw_int_psw.addr = psw.addr;
+> -	cpu->lowcore->sw_int_grs[14] = psw.addr;
+> -	cpu->lowcore->sw_int_grs[15] = (uint64_t)cpu->stack + (PAGE_SIZE * 4);
+> +	lc->sw_int_psw.mask = psw.mask;
+> +	lc->sw_int_psw.addr = psw.addr;
+> +	lc->sw_int_grs[14] = psw.addr;
+> +	lc->sw_int_grs[15] = (uint64_t)cpus[idx].stack + (PAGE_SIZE * 4);
+>   	lc->restart_new_psw.mask = PSW_MASK_64;
+>   	lc->restart_new_psw.addr = (uint64_t)smp_cpu_setup_state;
+>   	lc->sw_int_crs[0] = BIT_ULL(CTL0_AFP);
+>   
+>   	/* Start processing */
+> -	smp_cpu_restart_nolock(addr, NULL);
+> +	smp_cpu_restart_nolock(idx, NULL);
+>   	/* Wait until the cpu has finished setup and started the provided psw */
+>   	while (lc->restart_new_psw.addr != psw.addr)
+>   		mb();
+> -	rc = 0;
+> -out:
+> +
+> +	return 0;
+> +}
+> +
+> +int smp_cpu_setup(uint16_t idx, struct psw psw)
+> +{
+> +	int rc = -1;
+> +
+> +	spin_lock(&lock);
+> +	if (cpus) {
+> +		check_idx(idx);
+> +		rc = smp_cpu_setup_nolock(idx, psw);
+> +	}
+>   	spin_unlock(&lock);
+>   	return rc;
+>   }
+> 
+
+With my nits fixed:
+
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
