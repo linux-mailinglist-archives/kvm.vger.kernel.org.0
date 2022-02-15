@@ -2,92 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06A254B6778
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 10:23:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6F264B6788
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 10:26:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235834AbiBOJXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 04:23:32 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38540 "EHLO
+        id S235809AbiBOJ03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 04:26:29 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233932AbiBOJXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 04:23:31 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D90AC3DA69;
-        Tue, 15 Feb 2022 01:23:21 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21F8BD2T020405;
-        Tue, 15 Feb 2022 09:23:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=v61IXX80zQXs7K1gQg/jhLYIWkOL7EzOxuh7BknpY7Y=;
- b=YH6k4xpAB3LMka1wTzvRNSLSxcYqYj5qTfPb1Pv8J64XfK13t09/n1H/36HHEyM2tj8a
- l5Kb7m9gb3M7AAEt+vXAjyAZBLPHqvTNGwU/nz1mlKuihSEWhZZACfHeowG+KE6bqrOl
- zzC8SgSgpChPnH3zu84VHZGEt8gl9TEsAMoGu7nZQbDAa58ERDp+elg8k/RbdxhnHj+j
- 3MzHNy0tWx5QJjmiMKlysZ6E2DnWx6eQJPTWBRHAiZAoPxp/j4n9AtAuezkrD4EIDBqn
- CIKLDPFxmy5M0twrKB4Nbm3MGM6dnV5Vuzmo4ninDbu6pOQ1Z/1Mlg9hzDQ7jlCdbbPf CQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e85tew2tk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 09:23:21 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21F8vnHI027976;
-        Tue, 15 Feb 2022 09:23:21 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e85tew2sy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 09:23:20 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21F9MJMP014903;
-        Tue, 15 Feb 2022 09:23:18 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3e64h9vvru-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Feb 2022 09:23:18 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21F9NFP148169380
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Feb 2022 09:23:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17188A405F;
-        Tue, 15 Feb 2022 09:23:15 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B1BDA4060;
-        Tue, 15 Feb 2022 09:23:14 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.2.54])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Feb 2022 09:23:14 +0000 (GMT)
-Date:   Tue, 15 Feb 2022 10:23:12 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: kvm: Check whether SIDA memop fails for
- normal guests
-Message-ID: <20220215102312.330e8220@p-imbrenda>
-In-Reply-To: <20220215074824.188440-1-thuth@redhat.com>
-References: <20220215074824.188440-1-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
+        with ESMTP id S235723AbiBOJ02 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 04:26:28 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 165A16CA5F
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 01:26:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BD96BB817FF
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 09:26:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80FA3C340EB;
+        Tue, 15 Feb 2022 09:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644917176;
+        bh=0uA3b2nBSvB9TDUlYCZYfa1MOzWgdhJfA6Y88K472C8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Tk6QOzGCeaR90RWCs7wzkf9EhmfnPW++2dJD7jKPQ32oSv7NxqR5mHG7DF/dBBJsq
+         YMwhZtswNQjJGMAai7Hdm9WoNWFOdNz4pLu2w3ki0l1CUHfIULNsY2Guankd3BEvFP
+         dbr/ngv2epJIqa7yvx036Zf5TwzVGo9Vz+hpV1S5csDGrLtgCE81S5Kg5W39XkjU18
+         b/uwc6qsNBwmBlJp2jSsu6WwmAFoG3Z6jk1bzM7Nhlg0PbH1F02OBxMp+i22IfXQd8
+         UE8oNm3rgiVnqvgWDYFkwlkKRpPGmNqd6pU0w/9q3HxbsMM6gXuI/RguvMtJzezwOQ
+         ihTcUR+VC0ddA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nJu6A-0080CN-43; Tue, 15 Feb 2022 09:26:14 +0000
+Date:   Tue, 15 Feb 2022 09:26:13 +0000
+Message-ID: <87fsok4h1m.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
+        thuth@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses for the initrd
+In-Reply-To: <20220215073212.fp5lh4gfxk7clwwc@gator>
+References: <20220214120506.30617-1-alexandru.elisei@arm.com>
+        <20220214135226.joxzj2tgg244wl6n@gator>
+        <YgphzKLQLb5pMYoP@monolith.localdoman>
+        <20220214142444.saeogrpgpx6kaamm@gator>
+        <YgqBPSV+CMyzfNlv@monolith.localdoman>
+        <87k0dx4c23.wl-maz@kernel.org>
+        <20220215073212.fp5lh4gfxk7clwwc@gator>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Y0PgVOt7ge_HS87ivnQe0eDdrDGmI1vI
-X-Proofpoint-ORIG-GUID: d5EjyeNEubM4HY1w4HRueE3z17T4SNH7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-15_03,2022-02-14_04,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- adultscore=0 malwarescore=0 suspectscore=0 impostorscore=0 mlxscore=0
- priorityscore=1501 clxscore=1011 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202150052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: drjones@redhat.com, alexandru.elisei@arm.com, pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -96,49 +70,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Feb 2022 08:48:24 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> Commit 2c212e1baedc ("KVM: s390: Return error on SIDA memop on normal
-> guest") fixed the behavior of the SIDA memops for normal guests. It
-> would be nice to have a way to test whether the current kernel has
-> the fix applied or not. Thus add a check to the KVM selftests for
-> these two memops.
+On Tue, 15 Feb 2022 07:32:12 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-looks rather straightforward
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  tools/testing/selftests/kvm/s390x/memop.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+> On Mon, Feb 14, 2022 at 05:01:40PM +0000, Marc Zyngier wrote:
+> > Hi all,
+> > 
+> > On Mon, 14 Feb 2022 16:20:13 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi Drew,
+> > > 
+> > > (CC'ing Marc, he know more about 32 bit guest support than me)
+> > > 
+> > > On Mon, Feb 14, 2022 at 03:24:44PM +0100, Andrew Jones wrote:
+> > > > I'm not sure it's worth adding another patch on top for that now, though.
+> > > > By the lack of new 32-bit arm unit tests getting submitted, I'm not even
+> > > > sure it's worth maintaining 32-bit arm at all...
+> > > 
+> > > As far as I know, 32 bit guests are still very much supported and
+> > > maintained for KVM, so I think it would still be very useful to have the
+> > > tests.
+> > 
+> > I can't force people to write additional tests (or even start writing
+> > the first one), but I'd like to reaffirm that AArch32 support still is
+> > a first class citizen when it comes to KVM/arm64.
+> > 
+> > It has been tremendously useful even in the very recent past to debug
+> > issues that were plaguing bare metal Linux, and i don't plan to get
+> > rid of it anytime soon (TBH, it is too small to even be noticeable).
+> >
 > 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index 9f49ead380ab..d19c3ffdea3f 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -160,6 +160,21 @@ int main(int argc, char *argv[])
->  	run->psw_mask &= ~(3UL << (63 - 17));   /* Disable AR mode */
->  	vcpu_run(vm, VCPU_ID);                  /* Run to sync new state */
->  
-> +	/* Check that the SIDA calls are rejected for non-protected guests */
-> +	ksmo.gaddr = 0;
-> +	ksmo.flags = 0;
-> +	ksmo.size = 8;
-> +	ksmo.op = KVM_S390_MEMOP_SIDA_READ;
-> +	ksmo.buf = (uintptr_t)mem1;
-> +	ksmo.sida_offset = 0x1c0;
-> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-> +	TEST_ASSERT(rv == -1 && errno == EINVAL,
-> +		    "ioctl does not reject SIDA_READ in non-protected mode");
-> +	ksmo.op = KVM_S390_MEMOP_SIDA_WRITE;
-> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-> +	TEST_ASSERT(rv == -1 && errno == EINVAL,
-> +		    "ioctl does not reject SIDA_WRITE in non-protected mode");
-> +
->  	kvm_vm_free(vm);
->  
->  	return 0;
+> OK, let's keep 32-bit arm support in kvm-unit-tests, at least as long as
+> we can find hardware to test it with (I still have access to a mustang).
 
+That HW will be with us for a *very* long time, given how popular
+things like A53 and A72 have been (and still are).
+
+> Does kvmtool support launching AArch32 guests? If so, then I suppose we
+> should also test kvmtool + 32-bit arm kvm-unit-tests.
+
+It does. Passing --aarch32 as a parameter results in AArch32 EL1 being
+selected. The only thing that doesn't work with kvmtool and this flag
+is the kvmtool-provided init when booting a 32bit kernel directly (we
+only carry a 64bit version). This should not affect unit tests, which
+are standalone.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
