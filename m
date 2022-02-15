@@ -2,136 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E91E84B6C86
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 13:44:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADBD54B6CBE
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 13:53:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237934AbiBOMoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 07:44:00 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56260 "EHLO
+        id S233998AbiBOMxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 07:53:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237903AbiBOMn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 07:43:28 -0500
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8569B1111BB
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 04:42:40 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id b9so12441854lfv.7
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 04:42:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bZ/hPvhB6l/GT98IyjxTlesdblulBOqx0t8aw3A0jHw=;
-        b=uJNVxw9rQQ9Ric3MtAGmVVmQ9e9tx8jQSgqxtiLH6Tj9yRS0M5phMpCdbQO2CuS6Lo
-         2HGd2G5RWhNEhynYJ75YmyD3ubNHBr+EmixSyhOVAAc1UFQlJYdRqEZ9tyVhySlGZVE7
-         dAd0xOczoO+SD/q/GWS5j625mh91rbBwm1JR6GZHaUA/Ox9usN2kusbueTAnKHUJ6kjf
-         fk7v8g69zom2gOxNIPReCCZP0/wysVgPU1aXmkvq6tMliKexaCj588lYYxM2fkBbdADt
-         T+UPbUVFQeVZzDNCmcWzvU9c5LGMxOlCAWo3RDuQeVVxuK30MNLWblvyBbxH/cfOpYTh
-         OVaw==
+        with ESMTP id S232760AbiBOMxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 07:53:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CE15205C1
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 04:53:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644929585;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k3LaYVmXlDDI4cCdjtUd/PNJ1ur2w6Wmc9rP2novD74=;
+        b=U7n7meQ4/+s/QkYtPpLJ6/U9tNx3ymTb2y8A4NbPKk7ldxc1ebjbAU1+CcJqqMa58aac73
+        ZeLOQmXPbWkPECtzACH01igo83xUA3cB0Y5B7su6uQdVL7QCoM8K9oPFdvsocGNEbVCBq7
+        pc4gCkqjSVQeWDpHXAyTy+Q84nEHRns=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-637-McQozc2jNUK4VAcMQvEkPA-1; Tue, 15 Feb 2022 07:53:03 -0500
+X-MC-Unique: McQozc2jNUK4VAcMQvEkPA-1
+Received: by mail-ej1-f69.google.com with SMTP id sa22-20020a1709076d1600b006ce78cacb85so2376199ejc.2
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 04:53:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=bZ/hPvhB6l/GT98IyjxTlesdblulBOqx0t8aw3A0jHw=;
-        b=t676rl1jMf5aX2nNHziowFTTFYzNkiMPg41dUOW9EGTSfpNW8njxWdjMHW4ZvOIAco
-         3ambiup4gz0q7palH7Aos2toEkosJKZBV7YKBRdhlrnfIeIWG71AnWMTRxUlNvGIWLUu
-         vYbelE9kSjCYr9aaJ5FbFD26RUSv5J2y/im/UE+sCHNJQZ67XU0Kg7R3K/sjrJIYJ+xY
-         RlfZqiCwPe95MJo/oP5jdTN6+iA6kXk9gNTCf3cXkPR+OALKmYb5vP+9NTb9lwn13YM0
-         RhGdLcxyR8A0hee2I+0OSLtZ3UGS5XFOc8n4fH4v9YfBsD6xmKa5KXBXbQJgPVdrfrgR
-         BIJw==
-X-Gm-Message-State: AOAM533K1/cr2EurQtgLxyuU7YMOGT0N1PSI0ZYvB4OBVCxJBZnlgcfn
-        GtpTLKGUoK/XF5oUxLMTHaLhaA==
-X-Google-Smtp-Source: ABdhPJxentoESgiyNbBHAOr5c+HaAA+la7EJnNo75HfMC7ZWYPBFxfJ60zcCmBwrME44zYZL66IF7A==
-X-Received: by 2002:a19:6549:: with SMTP id c9mr3066138lfj.150.1644928958898;
-        Tue, 15 Feb 2022 04:42:38 -0800 (PST)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id bf10sm4394566ljb.130.2022.02.15.04.42.37
+        bh=k3LaYVmXlDDI4cCdjtUd/PNJ1ur2w6Wmc9rP2novD74=;
+        b=NzMhWpDMthI7hox+XrgBJ5kXn7ksh8uqjZbDnj1hFBtKSaKM1trgderB00yQkj2+US
+         DEYv/ytMqR40wVqFyxrSBzd3+kF7di+7LWgsaz8Dc4Vm/vtC26RfzrJs6aoIM3hLy149
+         DL1DKfzsUo3rRkiXn0DcJnKyHVfa+NcQBsaaZRzNKd4LuKAzETSEtbqQkdOT2wD+1Bh4
+         2Vt+RDxCiogaGDeI/OIUl3zXGkBCQUUJiXH/0jLAGEytCl/Yu3BqKBvEYRdoxeoFv1lY
+         dWdenzb0QZRsjnaAXP6i+IrnccbRWrTqWtmh+JHpF25HsZdO1UsXdSkhGdG5mzTI64dP
+         ta6g==
+X-Gm-Message-State: AOAM532+0Dc2N7FypLuJazQY3WH4zCEPT4tEpUyt/PlQOEf2U37ktemi
+        FEgrkO4KuKyQziCT7wi2Qaq4WjqS+czfL467XMrjPk2Uguv/RL+VYoj8lHEr3aOtbkkvL93Xy/S
+        xYO6oHXWwShhS
+X-Received: by 2002:a17:907:2d08:: with SMTP id gs8mr2968438ejc.106.1644929582845;
+        Tue, 15 Feb 2022 04:53:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzFXKUrgCdrDtZ6C8DaK/lbWSixiyPDRl8e5+HHXCtoljbyEz+QJO6Le4dOJMjK4J9yRtBjew==
+X-Received: by 2002:a17:907:2d08:: with SMTP id gs8mr2968428ejc.106.1644929582661;
+        Tue, 15 Feb 2022 04:53:02 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id q19sm10241696ejm.74.2022.02.15.04.53.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 04:42:37 -0800 (PST)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 6DD81103F44; Tue, 15 Feb 2022 15:43:31 +0300 (+03)
-Date:   Tue, 15 Feb 2022 15:43:31 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        brijesh.ksingh@gmail.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v10 21/45] x86/mm: Add support to validate memory when
- changing C-bit
-Message-ID: <20220215124331.i4vgww733fv5owrx@box.shutemov.name>
-References: <20220209181039.1262882-1-brijesh.singh@amd.com>
- <20220209181039.1262882-22-brijesh.singh@amd.com>
- <YgZ427v95xcdOKSC@zn.tnic>
- <0242e383-5406-7504-ff3d-cf2e8dfaf8a3@amd.com>
- <Ygj2Wx6jtNEEmbh9@zn.tnic>
+        Tue, 15 Feb 2022 04:53:02 -0800 (PST)
+Date:   Tue, 15 Feb 2022 13:53:00 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
+        thuth@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses
+ for the initrd
+Message-ID: <20220215125300.6b5ff3luxikc4jhd@gator>
+References: <20220214120506.30617-1-alexandru.elisei@arm.com>
+ <20220214135226.joxzj2tgg244wl6n@gator>
+ <YgphzKLQLb5pMYoP@monolith.localdoman>
+ <20220214142444.saeogrpgpx6kaamm@gator>
+ <YgqBPSV+CMyzfNlv@monolith.localdoman>
+ <87k0dx4c23.wl-maz@kernel.org>
+ <20220215073212.fp5lh4gfxk7clwwc@gator>
+ <Ygt7PbS6zW9H1By4@monolith.localdoman>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ygj2Wx6jtNEEmbh9@zn.tnic>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Ygt7PbS6zW9H1By4@monolith.localdoman>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 13, 2022 at 01:15:23PM +0100, Borislav Petkov wrote:
-> On Fri, Feb 11, 2022 at 11:27:54AM -0600, Brijesh Singh wrote:
-> > > Simply have them always present. They will have !0 values on the
-> > > respective guest types and 0 otherwise. This should simplify a lot of
-> > > code and another unconditionally present u64 won't be the end of the
-> > > world.
-> > >
-> > > Any other aspect I'm missing?
-> > 
-> > I think that's mostly about it. IIUC, the recommendation is to define a
-> > new callback in x86_platform_op. The callback will be invoked
-> > unconditionally; The default implementation for this callback is NOP;
-> > The TDX and SEV will override with the platform specific implementation.
-> > I think we may able to handle everything in one callback hook but having
-> > pre and post will be a more desirable. Here is why I am thinking so:
-> > 
-> > * On SNP, the page must be invalidated before clearing the _PAGE_ENC
-> > from the page table attribute
-> > 
-> > * On SNP, the page must be validated after setting the _PAGE_ENC in the
-> > page table attribute.
+On Tue, Feb 15, 2022 at 10:07:16AM +0000, Alexandru Elisei wrote:
 > 
-> Right, we could have a pre- and post- callback, if that would make
-> things simpler/clearer.
-> 
-> Also, in thinking further about the encryption mask, we could make it a
-> *single*, *global* variable called cc_mask which each guest type sets it
-> as it wants to.
+> I've started working on the next iteration of the kvmtool test
+> runner support series, I'll do my best to make sure kvmtool wll be able to run
+> the tests when kvm-unit-tests has been configured with --arch=arm.
+>
 
-I don't think it works. TDX and SME/SEV has opposite polarity of the mask.
-SME/SEV has to clear the mask to share the page. TDX has to set it.
+Excellent!
 
-Making a single global mask only increases confusion.
+BTW, I went ahead an pushed a patch to misc/queue to improve the initrd
+address stuff
 
--- 
- Kirill A. Shutemov
+https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/6f8f74ed2d9953830a3c74669f25439d9ad68dec
+
+It may be necessary for you if kvmtool shares its fdt creation between
+aarch64 and aarch32 guests, emitting 8 byte initrd addresses for both,
+even though the aarch32 guest puts the fdt below 4G.
+
+Thanks,
+drew
+
