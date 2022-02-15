@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBD594B6022
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 02:49:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76ED74B6023
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 02:49:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233110AbiBOBt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Feb 2022 20:49:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34860 "EHLO
+        id S233104AbiBOBt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Feb 2022 20:49:29 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230207AbiBOBtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Feb 2022 20:49:25 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4472D1342E9
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 17:49:16 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 62-20020a17090a09c400b001b80b0742b0so12031337pjo.8
-        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 17:49:16 -0800 (PST)
+        with ESMTP id S233105AbiBOBt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Feb 2022 20:49:28 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAA0B0C6E
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 17:49:20 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id i7-20020a626d07000000b004e07b61362bso9761391pfc.6
+        for <kvm@vger.kernel.org>; Mon, 14 Feb 2022 17:49:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=2bCcqviidJObjCJ6gSL+JgamR6NeyUOSKoZiJNILybI=;
-        b=RZfYfN/6BdUkZA/MkOcyj1lbzADlzT+Qw3vSTUjOnEgspEh8K2QDVdCmjddW7Hoei5
-         5WRnXhYHoKjUW0lzAS2FF7R3SvAtWAUfwxWUhqqR7+jXoYM5vbMblI8rSygs4/ds+GwO
-         4Mf7qvos8E1VBbZ8cxZ1SCufIh3rxFD5wAg/dYXjF9PGmiPbh2ryoR1DKrvwIHlFaO8v
-         tRprHr2QhFH0BmSsNft1G7Ss/lFZfLQ7Pm380kpIqkHtBRGXyg+Ylu5MuPhlR8pMSTc7
-         3jdIXnPLm9HKfBqlaIFzw/nu343JM8jA77r4WKcBclnPDWNqZF3tLlxd8pXSm2Ec2Pr+
-         84lw==
+        bh=xzoDSSbA/Oh693FmOYSmCVHVw6XaqoDwmTTizxvQuKY=;
+        b=gFogC119QdTcru7OVz6dZpP9yDX6QfoK4Jz1/wFvkUWkmrSrH0wzhX9tf/i0OW9d8j
+         Q2pEMee9VKalXZvYqIgtfRQ3oDDeRue8NkLUrN7saw3C+Y3ZFsJW1VzZcqcOukpXxClK
+         3kM6mbP9qh0NFqk5mnL80xwaoklQzx1BGzYmXcvFHUoQYeMuJ0NKRpRH8KvwPUNPJikh
+         jkjInpIpnYxaAqHh6rn+pv3Bj5x4QNpd5qk+9cT5zvyOC8Aw/YCpwen0CpSGBmliZFd1
+         CjROSIfx17AZFJ/O+lASfn2foNGIgWVKGb1WG1iWRTapl7TNRcphqyPtJP4X8L2A+xJr
+         yA8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=2bCcqviidJObjCJ6gSL+JgamR6NeyUOSKoZiJNILybI=;
-        b=y1EOybEXTY00xzGb1/0bctJSH/uB7O1fYj/5a5J7+qPvGzJeL6rVQ5G+iw7aFN/+hu
-         lDY1OQQDPlKP9okhUJEkUz4Jov4m+ioDPB+xoOrPEyyW7bg+ZmWRo2809kf/id9MgseJ
-         FhZBr/K5g20lb6oGETPjUob5Q8OR1ZeFJ9qvfQdGSeEdHycCFC2FqX3LoeHNgzt3swnS
-         n8cwCqV1mnzfBKFoyEmw9Ld8m+owCOOPGjz0664tw4ksZQ3uzJDaT52Qm7ET7bJSMY3A
-         uqAElHcL5xBuHNW52kAjgKymCpmMXJjKVQ061msx6iTJuNey3DfiG55/e9gbxu6L9v43
-         ihBA==
-X-Gm-Message-State: AOAM530eEVcFPb4onRkA8KmhlMdCAJKyoTih/5RATjGTU41pzLzdfzaK
-        5bNGbnSjGDT/QMz9n47KHIgPfonRpQF1BRM=
-X-Google-Smtp-Source: ABdhPJwg9x54scGJY86/xs05kF7AW1HYCG88ECIX+Mp1TgpGWjQ0xpmM/PMDOhz3rVfllrRUEFh1AWuxlPrrqB0=
+        bh=xzoDSSbA/Oh693FmOYSmCVHVw6XaqoDwmTTizxvQuKY=;
+        b=VH4cosg5VV13gw76vPh0VyasCJIm3ZsKm2Xta5+OYXrNssDU2HvWtBEX6zYps/xw/1
+         1KLhBPGLjTJzPVadQImrAwFBgqbNgBRpS4/tm43ZsIGJftbSgyrNHZmok5kAjC7XXIFs
+         JfzEaPjJBa4MD/qIcuvZxiakdNZP98V9xGaFBEF2tdCZOXKbnTHcaL7HhdOHN49/atui
+         gtkUZg9jWh/TDVA2KBo4tTpegYiEcsUXN4LhBmpWqLh8eiX/UI/5X+DABl1r0yRlW/Gu
+         XFpo4jNXN17LAnNRDwZx+Ato5PTKpy+FnoF1JJ8mKO+lGLfbuWKWlBX6V8lZwB7EBbXg
+         3U+A==
+X-Gm-Message-State: AOAM5338gHFclsBHq+kq/pXCSgV1UWXHfY1NoJiB58tvXD4vcJg9bWga
+        w+ay/8XrqMhuLas1+XSoU0sQjy4Ex27P1+I=
+X-Google-Smtp-Source: ABdhPJwgTOKXtP8H4nCEuAXVjtMgDM/xBvf/qRrbqigne9VJFVyS9CaI1KZn+NNzcMIS1BA7FiZtvb6RAnOoMpM=
 X-Received: from daviddunn-glinux.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:782])
- (user=daviddunn job=sendgmr) by 2002:aa7:8b13:: with SMTP id
- f19mr1987743pfd.62.1644889755606; Mon, 14 Feb 2022 17:49:15 -0800 (PST)
-Date:   Tue, 15 Feb 2022 01:48:04 +0000
+ (user=daviddunn job=sendgmr) by 2002:a17:90a:a50f:b0:1b8:e6ad:f63c with SMTP
+ id a15-20020a17090aa50f00b001b8e6adf63cmr229335pjq.1.1644889759054; Mon, 14
+ Feb 2022 17:49:19 -0800 (PST)
+Date:   Tue, 15 Feb 2022 01:48:05 +0000
 In-Reply-To: <20220215014806.4102669-1-daviddunn@google.com>
-Message-Id: <20220215014806.4102669-2-daviddunn@google.com>
+Message-Id: <20220215014806.4102669-3-daviddunn@google.com>
 Mime-Version: 1.0
 References: <20220215014806.4102669-1-daviddunn@google.com>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH v7 1/3] KVM: x86: Provide per VM capability for disabling PMU virtualization
+Subject: [PATCH v7 2/3] KVM: selftests: Carve out helper to create "default"
+ VM without vCPUs
 From:   David Dunn <daviddunn@google.com>
 To:     pbonzini@redhat.com
 Cc:     seanjc@google.com, jmattson@google.com, like.xu.linux@gmail.com,
@@ -66,185 +68,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new capability, KVM_CAP_PMU_CAPABILITY, that takes a bitmask of
-settings/features to allow userspace to configure PMU virtualization on
-a per-VM basis.  For now, support a single flag, KVM_CAP_PMU_DISABLE,
-to allow disabling PMU virtualization for a VM even when KVM is configured
-with enable_pmu=true a module level.
-
-To keep KVM simple, disallow changing VM's PMU configuration after vCPUs
-have been created.
+Carve out portion of vm_create_default so that selftests can modify
+a "default" VM prior to creating vcpus.
 
 Signed-off-by: David Dunn <daviddunn@google.com>
 ---
- Documentation/virt/kvm/api.rst  | 22 ++++++++++++++++++++++
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/svm/pmu.c          |  2 +-
- arch/x86/kvm/vmx/pmu_intel.c    |  2 +-
- arch/x86/kvm/x86.c              | 17 +++++++++++++++++
- include/uapi/linux/kvm.h        |  3 +++
- tools/include/uapi/linux/kvm.h  |  3 +++
- 7 files changed, 48 insertions(+), 2 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++++++----
+ 2 files changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a4267104db50..df836965b347 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7561,3 +7561,25 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
- of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
- the hypercalls whose corresponding bit is in the argument, and return
- ENOSYS for the others.
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 4ed6aa049a91..f987cf7c0d2e 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -336,6 +336,9 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
+ 				    uint32_t num_percpu_pages, void *guest_code,
+ 				    uint32_t vcpuids[]);
+ 
++/* Create a default VM without any vcpus. */
++struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages);
 +
-+8.35 KVM_CAP_PMU_CAPABILITY
-+---------------------------
+ /*
+  * Adds a vCPU with reasonable defaults (e.g. a stack)
+  *
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index d8cf851ab119..5aea7734cfe3 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -362,6 +362,34 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 	return vm;
+ }
+ 
++/*
++ * Default VM creation without creating VCPUs
++ *
++ * Input Args:
++ *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
++ *   pages - pages of memory required for VM
++ *
++ * Output Args: None
++ *
++ * Return:
++ *   Pointer to opaque structure that describes the created VM.
++ *
++ * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
++ */
++struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages)
++{
++	struct kvm_vm *vm;
 +
-+:Capability KVM_CAP_PMU_CAPABILITY
-+:Architectures: x86
-+:Type: vm
-+:Parameters: arg[0] is bitmask of PMU virtualization capabilities.
-+:Returns 0 on success, -EINVAL when arg[0] contains invalid bits
++	vm = vm_create(mode, pages, O_RDWR);
 +
-+This capability alters PMU virtualization in KVM.
++	kvm_vm_elf_load(vm, program_invocation_name);
 +
-+Calling KVM_CHECK_EXTENSION for this capability returns a bitmask of
-+PMU virtualization capabilities that can be adjusted on a VM.
++#ifdef __x86_64__
++	vm_create_irqchip(vm);
++#endif
++	return vm;
++}
 +
-+The argument to KVM_ENABLE_CAP is also a bitmask and selects specific
-+PMU virtualization capabilities to be applied to the VM.  This can
-+only be invoked on a VM prior to the creation of VCPUs.
-+
-+At this time, KVM_CAP_PMU_DISABLE is the only capability.  Setting
-+this capability will disable PMU virtualization for that VM.  Usermode
-+should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 10815b672a26..61e9050a3488 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1233,6 +1233,7 @@ struct kvm_arch {
- 	hpa_t	hv_root_tdp;
- 	spinlock_t hv_root_tdp_lock;
- #endif
-+	bool enable_pmu;
- };
+ /*
+  * VM Create with customized parameters
+  *
+@@ -412,13 +440,8 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
+ 		    nr_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
  
- struct kvm_vm_stat {
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 5aa45f13b16d..d4de52409335 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -101,7 +101,7 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- {
- 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+ 	pages = vm_adjust_num_guest_pages(mode, pages);
+-	vm = vm_create(mode, pages, O_RDWR);
+-
+-	kvm_vm_elf_load(vm, program_invocation_name);
  
--	if (!enable_pmu)
-+	if (!vcpu->kvm->arch.enable_pmu)
- 		return NULL;
+-#ifdef __x86_64__
+-	vm_create_irqchip(vm);
+-#endif
++	vm = vm_create_without_vcpus(mode, pages);
  
- 	switch (msr) {
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 03fab48b149c..4e5b1eeeb77c 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -487,7 +487,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->reserved_bits = 0xffffffff00200000ull;
- 
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
--	if (!entry || !enable_pmu)
-+	if (!entry || !vcpu->kvm->arch.enable_pmu)
- 		return;
- 	eax.full = entry->eax;
- 	edx.full = entry->edx;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index eaa3b5b89c5e..0803a1388bbf 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -110,6 +110,8 @@ static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
- 
- #define KVM_EXIT_HYPERCALL_VALID_MASK (1 << KVM_HC_MAP_GPA_RANGE)
- 
-+#define KVM_CAP_PMU_VALID_MASK KVM_CAP_PMU_DISABLE
-+
- #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
-                                     KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
- 
-@@ -4331,6 +4333,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		if (r < sizeof(struct kvm_xsave))
- 			r = sizeof(struct kvm_xsave);
- 		break;
-+	case KVM_CAP_PMU_CAPABILITY:
-+		r = enable_pmu ? KVM_CAP_PMU_VALID_MASK : 0;
-+		break;
- 	}
- 	default:
- 		break;
-@@ -6005,6 +6010,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.exit_on_emulation_error = cap->args[0];
- 		r = 0;
- 		break;
-+	case KVM_CAP_PMU_CAPABILITY:
-+		r = -EINVAL;
-+		if (!enable_pmu || (cap->args[0] & ~KVM_CAP_PMU_VALID_MASK))
-+			break;
-+		mutex_lock(&kvm->lock);
-+		if (!kvm->created_vcpus) {
-+			kvm->arch.enable_pmu = !(cap->args[0] & KVM_CAP_PMU_DISABLE);
-+			r = 0;
-+		}
-+		mutex_unlock(&kvm->lock);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -11591,6 +11607,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
- 
- 	kvm->arch.guest_can_read_msr_platform_info = true;
-+	kvm->arch.enable_pmu = enable_pmu;
- 
- #if IS_ENABLED(CONFIG_HYPERV)
- 	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 5191b57e1562..3d6046295755 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1134,6 +1134,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_GPA_BITS 207
- #define KVM_CAP_XSAVE2 208
- #define KVM_CAP_SYS_ATTRIBUTES 209
-+#define KVM_CAP_PMU_CAPABILITY 210
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1970,6 +1971,8 @@ struct kvm_dirty_gfn {
- #define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
- #define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
- 
-+#define KVM_CAP_PMU_DISABLE                    (1 << 0)
-+
- /**
-  * struct kvm_stats_header - Header of per vm/vcpu binary statistics data.
-  * @flags: Some extra information for header, always 0 for now.
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 5191b57e1562..3d6046295755 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1134,6 +1134,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_GPA_BITS 207
- #define KVM_CAP_XSAVE2 208
- #define KVM_CAP_SYS_ATTRIBUTES 209
-+#define KVM_CAP_PMU_CAPABILITY 210
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1970,6 +1971,8 @@ struct kvm_dirty_gfn {
- #define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
- #define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
- 
-+#define KVM_CAP_PMU_DISABLE                    (1 << 0)
-+
- /**
-  * struct kvm_stats_header - Header of per vm/vcpu binary statistics data.
-  * @flags: Some extra information for header, always 0 for now.
+ 	for (i = 0; i < nr_vcpus; ++i) {
+ 		uint32_t vcpuid = vcpuids ? vcpuids[i] : i;
 -- 
 2.35.1.265.g69c8d7142f-goog
 
