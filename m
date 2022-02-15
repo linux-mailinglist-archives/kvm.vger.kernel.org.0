@@ -2,201 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F7E94B68CF
-	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 11:07:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B2E04B6907
+	for <lists+kvm@lfdr.de>; Tue, 15 Feb 2022 11:16:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236298AbiBOKHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 05:07:15 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43012 "EHLO
+        id S236413AbiBOKQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 05:16:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235480AbiBOKHN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 05:07:13 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4E027E5B5
-        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 02:07:03 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 717F81063;
-        Tue, 15 Feb 2022 02:07:03 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 759063F66F;
-        Tue, 15 Feb 2022 02:07:01 -0800 (PST)
-Date:   Tue, 15 Feb 2022 10:07:16 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
-        thuth@redhat.com, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] lib/devicetree: Support 64 bit addresses
- for the initrd
-Message-ID: <Ygt7PbS6zW9H1By4@monolith.localdoman>
-References: <20220214120506.30617-1-alexandru.elisei@arm.com>
- <20220214135226.joxzj2tgg244wl6n@gator>
- <YgphzKLQLb5pMYoP@monolith.localdoman>
- <20220214142444.saeogrpgpx6kaamm@gator>
- <YgqBPSV+CMyzfNlv@monolith.localdoman>
- <87k0dx4c23.wl-maz@kernel.org>
- <20220215073212.fp5lh4gfxk7clwwc@gator>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220215073212.fp5lh4gfxk7clwwc@gator>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234049AbiBOKQo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 05:16:44 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A61F27;
+        Tue, 15 Feb 2022 02:16:34 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id x11so1128214pll.10;
+        Tue, 15 Feb 2022 02:16:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=q3kUX6Dxx4EW1Q5ZjF1J+bSGyjInRYAGr/XgVtEwU/Y=;
+        b=nPxTeFWWAv6mE/U4pkG4JwVAvqL0RRxxC40zcSM1FXMQvl8Rd4YmBff77YkqcJ++Uv
+         x/qBLXXvsyhWtJYHp2m7R4tR2dheXwRNYXchhMSu9uUyoD9oXDWLOR6auGughQAxNDhT
+         bKYqfj/mIEmYG3VyZQTaZN0b+6o/PIUdIFUCIK0xJ/7DnLxA5FvISyfvDNqU8P1gM9Co
+         ox4Dflr9IDvhmKcFeuMPA8PQg8BOLpls2pFzxJpxoSN285yXNJxNJPg7B7psUkPSHNK9
+         EY21opk6aBnTEO482iaVMAVdXRXOLEK8INAZZSCrYrpRWm3U7hJ8xhJSXDCwm5pnnpby
+         cgdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=q3kUX6Dxx4EW1Q5ZjF1J+bSGyjInRYAGr/XgVtEwU/Y=;
+        b=4lX6SMjMCnPuPsryeX0LOl4s0go+vN9eKT0gzYLdxSY6CyRLIibC3zAjoNbVXz6ima
+         1vkgOzsB72sUhzvPrO+Q1RNiR/I2vXCxeXaC/Sd2xI0A7Ji+vC6XJgekQ4uh91DtkVIB
+         nYFUo7rYcCBl3dNKVz8FLVuxmr5wJGs8CbF4/Ntnp+YRCloT1ZZ88tSVaeXUWTFfa5Fo
+         66/TJOjPFEmbiYrj99ByVhz+JAQDcg5F8wTgQeVZqICJ+gAKrtX+MGG8c41lMq/lEIvm
+         sPTvD/KnFT5Z29kgaUMI06rUXys1yop7Z19PNMSEzbkImq5uZMC3cfmHrdqlypr5eV8Y
+         a9yw==
+X-Gm-Message-State: AOAM533vKzJOiDJUMKI4JeYL7l0MWzddNS8Op+uv9LvzGcJUIX/9wWin
+        eIfqwSdeRKzPy7i7RRiVMh+jGqGDZkM=
+X-Google-Smtp-Source: ABdhPJzXLDtNDf6vXkKZ56LqEbeTEAdpk8VCEhQoieBRwJ8b41W4LvBIvkDnb1/Bl+VdPfI/6yB+2w==
+X-Received: by 2002:a17:902:e889:: with SMTP id w9mr3350383plg.95.1644920193562;
+        Tue, 15 Feb 2022 02:16:33 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.114])
+        by smtp.googlemail.com with ESMTPSA id gk15sm17798302pjb.3.2022.02.15.02.16.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 15 Feb 2022 02:16:33 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: Fix lockdep false negative during host resume
+Date:   Tue, 15 Feb 2022 02:15:42 -0800
+Message-Id: <1644920142-81249-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+From: Wanpeng Li <wanpengli@tencent.com>
 
-On Tue, Feb 15, 2022 at 08:32:12AM +0100, Andrew Jones wrote:
-> On Mon, Feb 14, 2022 at 05:01:40PM +0000, Marc Zyngier wrote:
-> > Hi all,
-> > 
-> > On Mon, 14 Feb 2022 16:20:13 +0000,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > Hi Drew,
-> > > 
-> > > (CC'ing Marc, he know more about 32 bit guest support than me)
-> > > 
-> > > On Mon, Feb 14, 2022 at 03:24:44PM +0100, Andrew Jones wrote:
-> > > > On Mon, Feb 14, 2022 at 02:06:04PM +0000, Alexandru Elisei wrote:
-> > > > > Hi Drew,
-> > > > > 
-> > > > > On Mon, Feb 14, 2022 at 02:52:26PM +0100, Andrew Jones wrote:
-> > > > > > On Mon, Feb 14, 2022 at 12:05:06PM +0000, Alexandru Elisei wrote:
-> > > > > > > The "linux,initrd-start" and "linux,initrd-end" properties encode the start
-> > > > > > > and end address of the initrd. The size of the address is encoded in the
-> > > > > > > root node #address-cells property and can be 1 cell (32 bits) or 2 cells
-> > > > > > > (64 bits). Add support for parsing a 64 bit address.
-> > > > > > > 
-> > > > > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > > > > ---
-> > > > > > >  lib/devicetree.c | 18 +++++++++++++-----
-> > > > > > >  1 file changed, 13 insertions(+), 5 deletions(-)
-> > > > > > > 
-> > > > > > > diff --git a/lib/devicetree.c b/lib/devicetree.c
-> > > > > > > index 409d18bedbba..7cf64309a912 100644
-> > > > > > > --- a/lib/devicetree.c
-> > > > > > > +++ b/lib/devicetree.c
-> > > > > > > @@ -288,7 +288,7 @@ int dt_get_default_console_node(void)
-> > > > > > >  int dt_get_initrd(const char **initrd, u32 *size)
-> > > > > > >  {
-> > > > > > >  	const struct fdt_property *prop;
-> > > > > > > -	const char *start, *end;
-> > > > > > > +	u64 start, end;
-> > > > > > >  	int node, len;
-> > > > > > >  	u32 *data;
-> > > > > > >  
-> > > > > > > @@ -303,7 +303,11 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > > > > > >  	if (!prop)
-> > > > > > >  		return len;
-> > > > > > >  	data = (u32 *)prop->data;
-> > > > > > > -	start = (const char *)(unsigned long)fdt32_to_cpu(*data);
-> > > > > > > +	start = fdt32_to_cpu(*data);
-> > > > > > > +	if (len == 8) {
-> > > > > > > +		data++;
-> > > > > > > +		start = (start << 32) | fdt32_to_cpu(*data);
-> > > > > > > +	}
-> > > > > > >  
-> > > > > > >  	prop = fdt_get_property(fdt, node, "linux,initrd-end", &len);
-> > > > > > >  	if (!prop) {
-> > > > > > > @@ -311,10 +315,14 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > > > > > >  		return len;
-> > > > > > >  	}
-> > > > > > >  	data = (u32 *)prop->data;
-> > > > > > > -	end = (const char *)(unsigned long)fdt32_to_cpu(*data);
-> > > > > > > +	end = fdt32_to_cpu(*data);
-> > > > > > > +	if (len == 8) {
-> > > > > > > +		data++;
-> > > > > > > +		end = (end << 32) | fdt32_to_cpu(*data);
-> > > > > > > +	}
-> > > > > > >  
-> > > > > > > -	*initrd = start;
-> > > > > > > -	*size = (unsigned long)end - (unsigned long)start;
-> > > > > > > +	*initrd = (char *)start;
-> > > > > > > +	*size = end - start;
-> > > > > > >  
-> > > > > > >  	return 0;
-> > > > > > >  }
-> > > > > > > -- 
-> > > > > > > 2.35.1
-> > > > > > >
-> > > > > > 
-> > > > > > I added this patch on
-> > > > > 
-> > > > > Thanks for the quick reply!
-> > > > > 
-> > > > > > 
-> > > > > > diff --git a/lib/devicetree.c b/lib/devicetree.c
-> > > > > > index 7cf64309a912..fa8399a7513d 100644
-> > > > > > --- a/lib/devicetree.c
-> > > > > > +++ b/lib/devicetree.c
-> > > > > > @@ -305,6 +305,7 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > > > > >         data = (u32 *)prop->data;
-> > > > > >         start = fdt32_to_cpu(*data);
-> > > > > >         if (len == 8) {
-> > > > > > +               assert(sizeof(long) == 8);
-> > > > > 
-> > > > > I'm sketchy about arm with LPAE, but wouldn't it be legal to have here a 64
-> > > > > bit address, even if the architecture is 32 bits? Or was the assert added
-> > > > > more because kvm-unit-tests doesn't support LPAE on arm?
-> > > > 
-> > > > It's possible, but only if we choose to manage it. We're (I'm) lazy and
-> > > > require physical addresses to fit in the pointers, at least for the test
-> > > > framework. Of course a unit test can feel free to play around with larger
-> > > > physical addresses if it wants to.
-> > > > 
-> > > > > 
-> > > > > >                 data++;
-> > > > > >                 start = (start << 32) | fdt32_to_cpu(*data);
-> > > > > >         }
-> > > > > > @@ -321,7 +322,7 @@ int dt_get_initrd(const char **initrd, u32 *size)
-> > > > > >                 end = (end << 32) | fdt32_to_cpu(*data);
-> > > > > >         }
-> > > > > >  
-> > > > > > -       *initrd = (char *)start;
-> > > > > > +       *initrd = (char *)(unsigned long)start;
-> > > > > 
-> > > > > My bad here, I forgot to test on arm. Tested your fix and the compilation
-> > > > > error goes away.
-> > > > 
-> > > > I'm actually kicking myself a bit for the hasty fix, because the assert
-> > > > would be better done at the end and written something like this
-> > > > 
-> > > >  assert(sizeof(long) == 8 || !(end >> 32));
-> > > > 
-> > > > I'm not sure it's worth adding another patch on top for that now, though.
-> > > > By the lack of new 32-bit arm unit tests getting submitted, I'm not even
-> > > > sure it's worth maintaining 32-bit arm at all...
-> > > 
-> > > As far as I know, 32 bit guests are still very much supported and
-> > > maintained for KVM, so I think it would still be very useful to have the
-> > > tests.
-> > 
-> > I can't force people to write additional tests (or even start writing
-> > the first one), but I'd like to reaffirm that AArch32 support still is
-> > a first class citizen when it comes to KVM/arm64.
-> > 
-> > It has been tremendously useful even in the very recent past to debug
-> > issues that were plaguing bare metal Linux, and i don't plan to get
-> > rid of it anytime soon (TBH, it is too small to even be noticeable).
-> >
-> 
-> OK, let's keep 32-bit arm support in kvm-unit-tests, at least as long as
-> we can find hardware to test it with (I still have access to a mustang).
-> 
-> Does kvmtool support launching AArch32 guests? If so, then I suppose we
-> should also test kvmtool + 32-bit arm kvm-unit-tests.
+I saw the below splatting after the host suspended and resumed.
 
-It does indeed support AArch32 guests (via the --aarch32 command line option,
-like Marc said). I usually run the 32 bit tests with kvmtool when testing.
+   WARNING: CPU: 0 PID: 2943 at kvm/arch/x86/kvm/../../../virt/kvm/kvm_main.c:5531 kvm_resume+0x2c/0x30 [kvm]
+   CPU: 0 PID: 2943 Comm: step_after_susp Tainted: G        W IOE     5.17.0-rc3+ #4
+   RIP: 0010:kvm_resume+0x2c/0x30 [kvm]
+   Call Trace:
+    <TASK>
+    syscore_resume+0x90/0x340
+    suspend_devices_and_enter+0xaee/0xe90
+    pm_suspend.cold+0x36b/0x3c2
+    state_store+0x82/0xf0
+    kernfs_fop_write_iter+0x1b6/0x260
+    new_sync_write+0x258/0x370
+    vfs_write+0x33f/0x510
+    ksys_write+0xc9/0x160
+    do_syscall_64+0x3b/0xc0
+    entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-I've started working on the next iteration of the kvmtool test
-runner support series, I'll do my best to make sure kvmtool wll be able to run
-the tests when kvm-unit-tests has been configured with --arch=arm.
+lockdep_is_held() can return -1 when lockdep is disabled which triggers
+this warning. Let's use lockdep_assert_not_held() which can detect 
+incorrect calls while holding a lock and it also avoids false negatives
+when lockdep is disabled.
 
-Thanks,
-Alex
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 83c57bcc6eb6..3f861f33bfe0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5528,7 +5528,7 @@ static void kvm_resume(void)
+ {
+ 	if (kvm_usage_count) {
+ #ifdef CONFIG_LOCKDEP
+-		WARN_ON(lockdep_is_held(&kvm_count_lock));
++		lockdep_assert_not_held(&kvm_count_lock);
+ #endif
+ 		hardware_enable_nolock(NULL);
+ 	}
+-- 
+2.25.1
+
