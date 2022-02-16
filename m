@@ -2,134 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 979AD4B8599
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 11:30:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 881384B8621
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 11:48:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230253AbiBPK1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 05:27:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50700 "EHLO
+        id S230251AbiBPKs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 05:48:27 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232902AbiBPK1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 05:27:12 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C797212E22;
-        Wed, 16 Feb 2022 02:26:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645007217; x=1676543217;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tOG0HGFswSqrhB0EjQg7576eejc092m+g6ZKmtluB4I=;
-  b=nGhJIKJlfsEfmsZZFCk121fQdy8L4foDLaA+plhH5z2+i1p8fh7/mIlb
-   HfD+4zE9uCUZFdDbicg2kifwUa4v0m7i1Xm4nu9FY68JJ5zwY7IoHouWL
-   ECqcpGgd/ZBbpyt9NhjnuoyaM8LHFflJI6ttyiesqRet/zhS8zKBKwUNK
-   lniBUAXT8OtkK15LM3geZf+8ULczGIYhXV+qzfmaaJVYmS68uZv118YTZ
-   BF2hy+DvMiJ01qo7fZQKOC/ce2wBGFsmhGwAI38rUwZVzN4HSgL/lLimb
-   zC+31910dNGxpDwL6cMTy4e9uBPJvXUAOMSuu8lWhiaLGPYfL483QgVWo
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="250312483"
-X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
-   d="scan'208";a="250312483"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 02:26:51 -0800
-X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
-   d="scan'208";a="498708646"
-Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 02:26:51 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        like.xu.linux@gmail.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v9 17/17] KVM: x86/cpuid: Advertise Arch LBR feature in CPUID
-Date:   Tue, 15 Feb 2022 16:25:44 -0500
-Message-Id: <20220215212544.51666-18-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220215212544.51666-1-weijiang.yang@intel.com>
-References: <20220215212544.51666-1-weijiang.yang@intel.com>
+        with ESMTP id S229455AbiBPKs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 05:48:26 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49C30C51
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 02:48:14 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B1ECD6E;
+        Wed, 16 Feb 2022 02:48:14 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 951D93F66F;
+        Wed, 16 Feb 2022 02:48:12 -0800 (PST)
+Date:   Wed, 16 Feb 2022 10:48:35 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Muchun Song <songmuchun@bytedance.com>
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Subject: Re: [PATCH kvmtool 2/2] kvm tools: avoid printing [Firmware Bug]:
+ CPUx: APIC id mismatch. Firmware: x APIC: x
+Message-ID: <YgzWg2rY859qq4wh@monolith.localdoman>
+References: <20220216043834.39938-1-songmuchun@bytedance.com>
+ <20220216043834.39938-2-songmuchun@bytedance.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220216043834.39938-2-songmuchun@bytedance.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add Arch LBR feature bit in CPU cap-mask to expose the feature.
-Only max LBR depth is supported for guest, and it's consistent
-with host Arch LBR settings.
+Hi,
 
-Co-developed-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/kvm/cpuid.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+Would you mind rewording the commit subject to:
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8cd864411a1c..285628887734 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -102,6 +102,16 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
- 		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
- 			return -EINVAL;
- 	}
-+	best = cpuid_entry2_find(entries, nent, 0x1c, 0);
-+	if (best) {
-+		unsigned int eax, ebx, ecx, edx;
-+
-+		/* Reject user-space CPUID if depth is different from host's.*/
-+		cpuid_count(0x1c, 0, &eax, &ebx, &ecx, &edx);
-+
-+		if ((best->eax & 0xff) != BIT(fls(eax & 0xff) - 1))
-+			return -EINVAL;
-+	}
- 
- 	/*
- 	 * Exposing dynamic xfeatures to the guest requires additional
-@@ -600,7 +610,7 @@ void kvm_set_cpu_caps(void)
- 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
- 		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
- 		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
--		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16)
-+		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(ARCH_LBR)
- 	);
- 
- 	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
-@@ -1023,6 +1033,27 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 				goto out;
- 		}
- 		break;
-+	/* Architectural LBR */
-+	case 0x1c: {
-+		u32 lbr_depth_mask = entry->eax & 0xff;
-+
-+		if (!lbr_depth_mask ||
-+		    !kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
-+			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-+			break;
-+		}
-+		/*
-+		 * KVM only exposes the maximum supported depth, which is the
-+		 * fixed value used on the host side.
-+		 * KVM doesn't allow VMM userspace to adjust LBR depth because
-+		 * guest LBR emulation depends on the configuration of host LBR
-+		 * driver.
-+		 */
-+		lbr_depth_mask = BIT((fls(lbr_depth_mask) - 1));
-+		entry->eax &= ~0xff;
-+		entry->eax |= lbr_depth_mask;
-+		break;
-+	}
- 	/* Intel AMX TILE */
- 	case 0x1d:
- 		if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
--- 
-2.27.0
+x86: Set the correct APIC ID
 
+On Wed, Feb 16, 2022 at 12:38:34PM +0800, Muchun Song wrote:
+> When I boot kernel, the dmesg will print the following message:
+  ^^^^^^^^^^^^^^^^^^
+
+Would you mind replacing that with "When kvmtool boots a kernel, [..]"?
+
+> 
+>   [Firmware Bug]: CPU1: APIC id mismatch. Firmware: 1 APIC: 30
+> 
+> Fix this by setting up correct initial_apicid to cpu_id.
+
+Thank you for fixing this. I've always wanted to fix that error, but I didn't
+know enough about the x86 architecture.
+
+> 
+> Signed-off-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>  x86/cpuid.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/x86/cpuid.c b/x86/cpuid.c
+> index c3b67d9..aa213d5 100644
+> --- a/x86/cpuid.c
+> +++ b/x86/cpuid.c
+> @@ -8,7 +8,7 @@
+>  
+>  #define	MAX_KVM_CPUID_ENTRIES		100
+>  
+> -static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
+> +static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid, int cpu_id)
+>  {
+>  	unsigned int signature[3];
+>  	unsigned int i;
+> @@ -28,6 +28,8 @@ static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
+>  			entry->edx = signature[2];
+>  			break;
+>  		case 1:
+> +			entry->ebx &= ~(0xff << 24);
+> +			entry->ebx |= cpu_id << 24;
+>  			/* Set X86_FEATURE_HYPERVISOR */
+>  			if (entry->index == 0)
+>  				entry->ecx |= (1 << 31);
+> @@ -80,7 +82,7 @@ void kvm_cpu__setup_cpuid(struct kvm_cpu *vcpu)
+>  	if (ioctl(vcpu->kvm->sys_fd, KVM_GET_SUPPORTED_CPUID, kvm_cpuid) < 0)
+>  		die_perror("KVM_GET_SUPPORTED_CPUID failed");
+>  
+> -	filter_cpuid(kvm_cpuid);
+> +	filter_cpuid(kvm_cpuid, vcpu->cpu_id);
+
+Tested it and it works:
+
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
+
+>  
+>  	if (ioctl(vcpu->vcpu_fd, KVM_SET_CPUID2, kvm_cpuid) < 0)
+>  		die_perror("KVM_SET_CPUID2 failed");
+> -- 
+> 2.11.0
+> 
