@@ -2,154 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6662C4B7E8F
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 04:49:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48ABB4B7F8C
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 05:39:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344320AbiBPDeO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 22:34:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56820 "EHLO
+        id S241361AbiBPEjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 23:39:02 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiBPDeN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 22:34:13 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5EEDFFF80;
-        Tue, 15 Feb 2022 19:34:00 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id v5-20020a17090a4ec500b001b8b702df57so5275490pjl.2;
-        Tue, 15 Feb 2022 19:34:00 -0800 (PST)
+        with ESMTP id S233161AbiBPEjA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 23:39:00 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EC0F1EBB
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 20:38:48 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id q132so1088753pgq.7
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 20:38:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=o3EVlHksdajQdBfBvOiLN/f2i7KYfXPDyLB3952Q0qQ=;
-        b=EYLoXrRP1U8WrAtVCvcbnscubeOoT5RgzL0LBTetgsbKfnRNVg9OdwKH4jL3n7lR01
-         6H35vMmStPRQMi/Pnx0Rvw6GfuusBdvj24zFnsvdNmMJl78PWncMzsGA7JkuUoxkrSDt
-         6QkAW+UZEM6k2s1PthPUSQpRa0d/bIiAjZv4tk0i0SmEfhuvJKVQCit0YNdRwZcVETcO
-         sfrC9oqLCWhXIAs6OT5cvBFNtlr+bvOFFphOMgUdkjk4eOxjX7/MmpSmJkpP3wof4Fbc
-         pTMjl3utfb5ptBcH01kYzqaCG/drYmDPSYbfIgu205Y69198d7ZrmDBPy9jOjTA2dgzQ
-         IGzw==
+        bh=42gb/Pacce5pVrRpUMhRyEAX/Pkf6R9/qxHTc+LWHsg=;
+        b=zeBU+pWKUUW8WUcvEvZAP3xj+Sbc9C/n+HN8aqrmTeGfVM4Ydx41pb/ISmkCiaCABi
+         r1FKKd/dPcMm0aLXGmqyUq75PZoOrYjWLbCB138Ee1C2Cj1a0dm48d2IRiUknxPZzxzF
+         YJS9Jod7zIJOqaQPAHKziiqbIxLfZJzLzwpnyPiUZKY82V8pkINCTazlTNayCPwqI++8
+         U7zOdvcY3C2vQX6UYF0RVtNwWwG6+TcGrrU1iN+13fPWC8Ygj5jCE3ZnPjI1vCZ8s7rr
+         vIfF7i+B4+19rG3CNq2CNIIg14iKdZgchv+Xv62PWldtf5++fE6NCq8Edq44NLBPoaj5
+         XZvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=o3EVlHksdajQdBfBvOiLN/f2i7KYfXPDyLB3952Q0qQ=;
-        b=J52IoHrbOs4OAblQKoexJt91Goj/r+vQ1Rk8JanxpNErfPzdxFugeP02Awzg84/CWa
-         GCHCWrkieCAJYE0ylgEih5ac5kRZSjZD+p+pE4WL/Bi/7EJmR28v6BFuWhWeV+3XyJ8z
-         aFbBceaLzGNrC36/Zk9e+3ZpoO0wUD8C82j/cGSf1XFM0qrRY7A8fFZi7C42qxSwcv1y
-         hjbhL9+dPPz2OuOd/o+DVsJa5IgNcSzKjvo5YAQth7/ZQusm2L0T5iQTr7sai2mbVZ5u
-         gtHAUFQLSZCvanWmgMildDwjBbx/w5ulr9YxolmILEQdZgsYpHNG7BBkzpxgWmHPXoC3
-         cZ4g==
-X-Gm-Message-State: AOAM533Hb9tb5yNdy85RM7J6m7FOjPaMjetrib6TJ9gzEpmDcFaYBEQy
-        dO9WhKljyqX7Ca8P/2LjezU=
-X-Google-Smtp-Source: ABdhPJx4u+Z0346VExNtDaIoM0mAg46d1IU9We7nCATZ+NWU5xquU9tessa0U139em/s75ZmQ5duIQ==
-X-Received: by 2002:a17:902:e9c5:b0:14d:8c80:dbf2 with SMTP id 5-20020a170902e9c500b0014d8c80dbf2mr662723plk.154.1644982435884;
-        Tue, 15 Feb 2022 19:33:55 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id s15sm3824604pgn.30.2022.02.15.19.33.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 19:33:55 -0800 (PST)
-Message-ID: <810c3148-1791-de57-27c0-d1ac5ed35fb8@gmail.com>
-Date:   Wed, 16 Feb 2022 11:33:32 +0800
+        bh=42gb/Pacce5pVrRpUMhRyEAX/Pkf6R9/qxHTc+LWHsg=;
+        b=kfBVzSKflLR/Z04lSMFQolkTWZW/idmION+uBJ+43yxg4zIhJlk3QntEY6WAMaKMUf
+         2KrorSnBAyTt5xInwwGDy00XrtLTZVfizwI4CppHzpackSge/MXq3B8c346iCj1Gw4c/
+         J65Hit/pvIHo1ryUqR7RO3l+zk0mDV8w0tx+c39j0vAwtbGlmP5MLKK+g+X7lRgCuQHU
+         1zVBGmGJ28DtEk0m6efx15P8z2yLwYzZ197JMyjKFsN3p3HuUtPkiDE1dQXk9oRENvMv
+         jT1Ch8Io5TcCqKPFHA7HvwqnKNiBwO1V7U5u5NmjUpEpRh+XhBwrj8S4esr2Je5YNgEK
+         MIBg==
+X-Gm-Message-State: AOAM531z1vbzbhw4xrfPfRyR/ciVg+rKbw+YY8vhy2FzQGNdKfiEWGKH
+        YjLdhGQFaavkGOYXhyQKkhClWg==
+X-Google-Smtp-Source: ABdhPJxoLZ4tLLPsmBxZh3bz+6KHXmcFoNQq6UyYdcyGhyb6KGH2uOqoKyZ1DeVZa0fFZg2h5CtwbA==
+X-Received: by 2002:a62:5347:0:b0:4e0:2ea8:9f6c with SMTP id h68-20020a625347000000b004e02ea89f6cmr1382032pfb.61.1644986328297;
+        Tue, 15 Feb 2022 20:38:48 -0800 (PST)
+Received: from FVFYT0MHHV2J.tiktokcdn.com ([139.177.225.233])
+        by smtp.gmail.com with ESMTPSA id lk8sm9115190pjb.47.2022.02.15.20.38.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Feb 2022 20:38:48 -0800 (PST)
+From:   Muchun Song <songmuchun@bytedance.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com
+Cc:     kvm@vger.kernel.org, Muchun Song <songmuchun@bytedance.com>
+Subject: [PATCH kvmtool 1/2] kvm tools: fix initialization of irq mptable
+Date:   Wed, 16 Feb 2022 12:38:33 +0800
+Message-Id: <20220216043834.39938-1-songmuchun@bytedance.com>
+X-Mailer: git-send-email 2.32.0 (Apple Git-132)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: KVM: x86: Reconsider the current approach of vPMU
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Dunn <daviddunn@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <20220117085307.93030-1-likexu@tencent.com>
- <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <2db2ebbe-e552-b974-fc77-870d958465ba@gmail.com>
- <YgPCm1WIt9dHuoEo@hirez.programming.kicks-ass.net>
- <YgQrWHCNG/s4EWFf@google.com>
- <39b64c56-bc8d-272d-da92-5aa29e54cdaf@gmail.com>
- <YgVHawnQWuSAk+C1@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <YgVHawnQWuSAk+C1@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/2/2022 1:12 am, Sean Christopherson wrote:
-> On Thu, Feb 10, 2022, Like Xu wrote:
->> On 10/2/2022 5:00 am, Sean Christopherson wrote:
->>> On Wed, Feb 09, 2022, Peter Zijlstra wrote:
->>>> Guests must not unilaterally steal the PMU.
->>>
->>> The proposal is to add an option to allow userspace to gift the PMU to the guest,
->>
->> Please define the verb "gift" in more details.
-> 
-> Add a knob that allows host userspace to control toggle between host perf having
-> sole ownership of the PMU, versus ownership of the PMU being "gifted" to KVM guests
-> upon VM-Entry and returned back to the host at VM-Exit.
+When dev_hdr->dev_num is greater one, the initialization of last_addr
+is wrong.  Fix it.
 
-For the vm-entry/exit level of granularity, we're able to do it without the host 
-perf knob.
-For the guest power-on/off level of granularity, perf does not compromise with KVM.
+Fixes: f83cd16 ("kvm tools: irq: replace the x86 irq rbtree with the PCI device tree")
+Signed-off-by: Muchun Song <songmuchun@bytedance.com>
+---
+ x86/mptable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> IIUC, it's the same idea as PT's PT_MODE_HOST_GUEST mode, just applied to the PMU.
-
-TBH, I don't like the design of PT_MODE_HOST_GUEST, it breaks the flexibility.
-I would prefer to see a transition in the use of PT to the existing vPMU approach.
-
-> 
-> By default, the host would have sole ownership, and access to the knob would be
-> restricted appropriately.  KVM would disallow creation any VM that requires
-> joint ownership, e.g. launching a TDX guest would require the knob to be enabled.
-
-The knob implies a per-pCPU control granularity (internal or explicit), for 
-scalability.
-
-But again, regardless of whether the (TDX) guest has pmu enabled or not, the host
-needs to use pmu (to profile host, non-TDX guest) without giving it away easily
-at runtime (via knob).
-
-We should not destroy the kind of hybrid usage, but going in a legacy direction,
-complementing the lack of guest pmu functionality with emulation or
-full context switching per the vm-entry/exit level of granularity.
-
-> 
->> How do we balance the performance data collection needs of the
->> 'hypervisor user space' and the 'system-wide profiler user space' ?
-> 
-> If host userspace enables the knob and transitions into a joint ownership mode,
-> then host userspace is explicitly acknowledging that it will no longer be able
-> to profile KVM guests.
-
-AFAI, most cloud provider don't want to lose this flexibility as it leaves
-hundreds of "profile KVM guests" cases with nowhere to land.
-
-> 
-> Balancing between host and guest then gets factored into VM placement, e.g. VMs
-> that need or are paying for access to the PMU can only land on systems that are
-> configured for joint ownership.  If profiling the guest from the host is important,
-> then place those guests only on hosts with sole ownership.
-
-If the host user space does not reclaim PMU (triumph through prioritization) 
-from the
-guest (controlling this behavior is like controlling VMs placement), then the 
-guest's
-PMU functionality has nothing to lose, which is complete.
+diff --git a/x86/mptable.c b/x86/mptable.c
+index a984de9..f13cf0f 100644
+--- a/x86/mptable.c
++++ b/x86/mptable.c
+@@ -184,7 +184,7 @@ int mptable__init(struct kvm *kvm)
+ 		mpc_intsrc = last_addr;
+ 		mptable_add_irq_src(mpc_intsrc, pcibusid, srcbusirq, ioapicid, pci_hdr->irq_line);
+ 
+-		last_addr = (void *)&mpc_intsrc[dev_hdr->dev_num];
++		last_addr = (void *)&mpc_intsrc[1];
+ 		nentries++;
+ 		dev_hdr = device__next_dev(dev_hdr);
+ 	}
+-- 
+2.11.0
 
