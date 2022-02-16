@@ -2,62 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 787004B902C
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 19:27:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D2E04B9149
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 20:37:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237631AbiBPS1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 13:27:37 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35444 "EHLO
+        id S233665AbiBPThi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 14:37:38 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233767AbiBPS1f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 13:27:35 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63300C114A
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 10:27:23 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id b9-20020a63e709000000b00362f44b02aeso1623772pgi.17
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 10:27:23 -0800 (PST)
+        with ESMTP id S230187AbiBPThh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 14:37:37 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD17EC1C8A
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 11:37:24 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id a8so1593235ejc.8
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 11:37:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=q1VzyPg+DxccSNbFyULTSdM4axXZfBuDbxHMjgb5aP4=;
-        b=tSSE6KJK9/pXPxtp2B12po9OJZA2dihexUKG8OAt6wnZqpiPMRE9NHw4mRkReC0hrd
-         SspQgDl4QE7E9myL/WDgE8xvd54pGDlQ8a5c/wzTV+woj06v6LJxSodbkPWYCj5LoNzj
-         XBa8BhzXLqKQKbhGaKjeTuEIVZiIX3BPE8zLxPxshKlO2W+IsfDgqjLMrh5Xp1Qt8OkN
-         NE5ZSFVlqTB+vtZLGY3X9FWeTor7qx2BGby+yKlJvP9OOrhFjA5wNJ9v+41/w1wAwy0l
-         fRlYwMZorhXbaEqsgQKr/zi+W8o68dSOmGsaMG9NX20n8oiqNVF4ckDEk9Wz3hl5c4Tv
-         orsQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mRg5i9FxBCuyu7j5+LZOCq98UGmFvnJVRmxunwhbq/g=;
+        b=eUIvgz7x9myH0OIKWZ9CMO7ztlHpipKLwppJwkxGJw8MAKEgbRikaFuMPovigUSvof
+         0dmXc6KHzxzyYD/bmkWodfzarqDJDoUw5laPAkTRSQsLG6UtThvJ/r7U6mFLpf4vLGHg
+         K2LOYSQc1VJJJHQecTQO3pkfScqtGC4egP350zfINuBWDLizpUGpurDK/U8ZxLLvjdpJ
+         5V0nasEgcXF2XMquY1nOVX8sKmo8SQfATNjlpsYiqEmwQR/kZYmUy0jJQ3HpPvlsYYol
+         4WgjkoD/BDQ6jY0E0pA9mMH3M0f7dlFTvzwWcjJc9czAXRL/7YJAMzMsPN6LlxxpDvkW
+         S2Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=q1VzyPg+DxccSNbFyULTSdM4axXZfBuDbxHMjgb5aP4=;
-        b=pMhcBtXfrqUKzzC6lJmW07szj5uI/s3f40aKktn+YMpWEryJmHXkVGI8QdC4EwLFuI
-         Q34O3k9paO/YlZbRP9X3s6+/qZlKKqoKrUTVZCE8Zzk6sLQxtU9duT26ar+tjD4tJ5jR
-         ckjqpcaUSpfkkOcMbfMnPAeeK8R8fxOto23jLBmc8VnNQkBUWtWZ0cXrK1pkdcWAscpi
-         nTop1Ro39czUa1MGTzjhMRQg6aoF4uYyY0HHbJDiIvzDrHIJqOw0SKZ8b9YDZFFxrZZP
-         AyB5hHH7q2R9MOd/wxAFGN6NKfdXoFrW8eY+XdtK5LOZ2IH16p3q+KBqCJWlfXIccO4G
-         vzOA==
-X-Gm-Message-State: AOAM531VxoqPzV/symDzk9nXRvq+R9C7CYYykoJC8qsEFLrGuHaKj3no
-        2S3YIW9fyky6oXoYQXis/oNx/G+zW1pAYPOUP+cWGvNH0v0F63l8Oxu3JY/+75rN2ZIKjglGaoU
-        mQ2dfcIqjlUzK00PBxEF/o4dwkRG3PYalirrow6BFJZRgrgHZ1pSEpjtuNbatIDU=
-X-Google-Smtp-Source: ABdhPJwAOUYg71OO8R71FjgaQVO5ooGTPZf5MALWhQbr4h/hSWSZXI498nNa1j8/iDoC2fhnxE7f+1MzqvTaLQ==
-X-Received: from romanton.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:43ef])
- (user=romanton job=sendgmr) by 2002:a17:90a:7f93:b0:1b9:ef73:b2df with SMTP
- id m19-20020a17090a7f9300b001b9ef73b2dfmr88504pjl.0.1645036042252; Wed, 16
- Feb 2022 10:27:22 -0800 (PST)
-Date:   Wed, 16 Feb 2022 18:26:54 +0000
-Message-Id: <20220216182653.506850-1-romanton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH v3] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in always
- catchup mode
-From:   Anton Romanov <romanton@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     mtosatti@redhat.com, vkuznets@redhat.com,
-        Anton Romanov <romanton@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mRg5i9FxBCuyu7j5+LZOCq98UGmFvnJVRmxunwhbq/g=;
+        b=1hEF7UaOFG3Md2O7W+I8oIViNQuZeouac3yMNCQqKzpEq37Izlj0rMU+j+mW4YRDIL
+         kNYyK6qDWHNEQKuUBO4Oi7+Ie4fT8/UEFy5KkRzD76ohb0HnwsBfioK7SzYs4/AKCg4j
+         fiQoBxWd2WjqjfeAISJo7SFPdz8hTFt2HxrxyBg3s0Bp57V9Dtouh0D1ClVawCDBUVar
+         6vgRiILKZLNDQDk3Py+lKMZ3DrFUrx7fx/hVKGyipMtJEbBfW/hekg+SnpLvAhWbe4+i
+         7mr8y7qulLtrQHEtsIErWnUKM+ddRhhXkUVONsamQ7tzl19NytA8tlv43k8fNIgIibRV
+         kdlg==
+X-Gm-Message-State: AOAM530zq7mbmbe6pSFHJzQHtNbUwnVWwTbYweiw+RYK3qiuANCH5rQr
+        vQBCxsa3OKsuaK13f1D55HSOyyDWO9ir8UPWBw8ySg==
+X-Google-Smtp-Source: ABdhPJwPrMhC4KjCIlJeigopCpNBlxWvgbEbPbtKAGIiCsTsJAwvC/BZelt3mClFZjyWgh1l5eSgsyn0rI+Nz5yzWaU=
+X-Received: by 2002:a17:906:5cb:b0:6cf:954:d84d with SMTP id
+ t11-20020a17090605cb00b006cf0954d84dmr3772227ejt.560.1645040243121; Wed, 16
+ Feb 2022 11:37:23 -0800 (PST)
+MIME-Version: 1.0
+References: <20220203010051.2813563-1-dmatlack@google.com> <20220203010051.2813563-7-dmatlack@google.com>
+In-Reply-To: <20220203010051.2813563-7-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 16 Feb 2022 11:37:11 -0800
+Message-ID: <CANgfPd-5HM7+etr=TCEACMSSgrZo3vV8LmA5JbJw4x8Q5VnLmw@mail.gmail.com>
+Subject: Re: [PATCH 06/23] KVM: x86/mmu: Separate shadow MMU sp allocation
+ from initialization
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        leksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Feiner <pfeiner@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        kvm <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,40 +78,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If vcpu has tsc_always_catchup set each request updates pvclock data.
-KVM_HC_CLOCK_PAIRING consumers such as ptp_kvm_x86 rely on tsc read on
-host's side and do hypercall inside pvclock_read_retry loop leading to
-infinite loop in such situation.
+On Wed, Feb 2, 2022 at 5:02 PM David Matlack <dmatlack@google.com> wrote:
+>
+> Separate the code that allocates a new shadow page from the vCPU caches
+> from the code that initializes it. This is in preparation for creating
+> new shadow pages from VM ioctls for eager page splitting, where we do
+> not have access to the vCPU caches.
+>
+> No functional change intended.
+>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 44 +++++++++++++++++++++---------------------
+>  1 file changed, 22 insertions(+), 22 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 49f82addf4b5..d4f90a10b652 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1718,7 +1718,7 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+>         mmu_spte_clear_no_track(parent_pte);
+>  }
+>
+> -static struct kvm_mmu_page *kvm_mmu_alloc_sp(struct kvm_vcpu *vcpu, int direct)
+> +static struct kvm_mmu_page *kvm_mmu_alloc_sp(struct kvm_vcpu *vcpu, bool direct)
+>  {
+>         struct kvm_mmu_page *sp;
+>
+> @@ -1726,16 +1726,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_sp(struct kvm_vcpu *vcpu, int direct)
+>         sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+>         if (!direct)
+>                 sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+> -       set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
 
-v3:
-    Removed warn
-    Changed return code to KVM_EFAULT
-v2:
-    Added warn
+I'd be inclined to leave this in the allocation function instead of
+moving it to the init function. It might not be any less code, but if
+you're doing the sp -> page link here, you might as well do the page
+-> sp link too.
 
-Signed-off-by: Anton Romanov <romanton@google.com>
----
- arch/x86/kvm/x86.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7131d735b1ef..d0b31b115922 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8945,6 +8945,13 @@ static int kvm_pv_clock_pairing(struct kvm_vcpu *vcpu, gpa_t paddr,
- 	if (!kvm_get_walltime_and_clockread(&ts, &cycle))
- 		return -KVM_EOPNOTSUPP;
- 
-+	/*
-+	 * When tsc is in permanent catchup mode guests won't be able to use
-+	 * pvclock_read_retry loop to get consistent view of pvclock
-+	 */
-+	if (vcpu->arch.tsc_always_catchup)
-+		return -KVM_EFAULT;
-+
- 	clock_pairing.sec = ts.tv_sec;
- 	clock_pairing.nsec = ts.tv_nsec;
- 	clock_pairing.tsc = kvm_read_l1_tsc(vcpu, cycle);
--- 
-2.35.1.265.g69c8d7142f-goog
-
+>
+>
+> -       /*
+> -        * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+> -        * depends on valid pages being added to the head of the list.  See
+> -        * comments in kvm_zap_obsolete_pages().
+> -        */
+> -       sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
+> -       list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
+> -       kvm_mod_used_mmu_pages(vcpu->kvm, +1);
+>         return sp;
+>  }
+>
+> @@ -2144,27 +2135,34 @@ static struct kvm_mmu_page *kvm_mmu_get_existing_sp(struct kvm_vcpu *vcpu,
+>         return sp;
+>  }
+>
+> -static struct kvm_mmu_page *kvm_mmu_create_sp(struct kvm_vcpu *vcpu,
+> -                                             struct kvm_memory_slot *slot,
+> -                                             gfn_t gfn,
+> -                                             union kvm_mmu_page_role role)
+> +
+> +static void kvm_mmu_init_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+> +                           struct kvm_memory_slot *slot, gfn_t gfn,
+> +                           union kvm_mmu_page_role role)
+>  {
+> -       struct kvm_mmu_page *sp;
+>         struct hlist_head *sp_list;
+>
+> -       ++vcpu->kvm->stat.mmu_cache_miss;
+> +       ++kvm->stat.mmu_cache_miss;
+> +
+> +       set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+>
+> -       sp = kvm_mmu_alloc_sp(vcpu, role.direct);
+>         sp->gfn = gfn;
+>         sp->role = role;
+> +       sp->mmu_valid_gen = kvm->arch.mmu_valid_gen;
+>
+> -       sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+> +       /*
+> +        * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+> +        * depends on valid pages being added to the head of the list.  See
+> +        * comments in kvm_zap_obsolete_pages().
+> +        */
+> +       list_add(&sp->link, &kvm->arch.active_mmu_pages);
+> +       kvm_mod_used_mmu_pages(kvm, 1);
+> +
+> +       sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+>         hlist_add_head(&sp->hash_link, sp_list);
+>
+>         if (!role.direct)
+> -               account_shadowed(vcpu->kvm, slot, sp);
+> -
+> -       return sp;
+> +               account_shadowed(kvm, slot, sp);
+>  }
+>
+>  static struct kvm_mmu_page *kvm_mmu_get_sp(struct kvm_vcpu *vcpu, gfn_t gfn,
+> @@ -2179,8 +2177,10 @@ static struct kvm_mmu_page *kvm_mmu_get_sp(struct kvm_vcpu *vcpu, gfn_t gfn,
+>                 goto out;
+>
+>         created = true;
+> +       sp = kvm_mmu_alloc_sp(vcpu, role.direct);
+> +
+>         slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> -       sp = kvm_mmu_create_sp(vcpu, slot, gfn, role);
+> +       kvm_mmu_init_sp(vcpu->kvm, sp, slot, gfn, role);
+>
+>  out:
+>         trace_kvm_mmu_get_page(sp, created);
+> --
+> 2.35.0.rc2.247.g8bbb082509-goog
+>
