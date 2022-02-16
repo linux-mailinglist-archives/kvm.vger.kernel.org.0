@@ -2,81 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 405264B8FE0
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 19:10:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 787004B902C
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 19:27:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237450AbiBPSKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 13:10:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49532 "EHLO
+        id S237631AbiBPS1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 13:27:37 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237439AbiBPSKa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 13:10:30 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8F52A4A26
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 10:10:17 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id u47-20020a4a9732000000b00316d0257de0so3398104ooi.7
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 10:10:17 -0800 (PST)
+        with ESMTP id S233767AbiBPS1f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 13:27:35 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63300C114A
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 10:27:23 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id b9-20020a63e709000000b00362f44b02aeso1623772pgi.17
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 10:27:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zVC5cj0z6rMQpOyPOmFfrF76NsP0MR7V60Bxrd230h8=;
-        b=q8IQlHrCXptsSphCoGIR7Lz/Qw8ySxmbDGAVRO4mPP3/HsDpbPi0dH6R3rZYb7CTbj
-         ou7qsm3xMtjsRpCI7hDfZe5dyYBshj3mDeWQC7MGXKrucSIYTX76I/w6j9ZQoglE3qxn
-         gGBRb9lbvPw3ptllWGR3TWspruFJMRtoFGJ/U0db7bpKlTWzSez5629Z3SueBg9xkBMJ
-         +GtzU0/ZCH0ySgTz3rqladIHD+XSurzIcGCEmkvvsTVYnbieK23gTzKm6ccFvlyYnoiR
-         CHg3CgJHqqg/TT5WbA3KtwepYNaqP3kJN84qNyLMIe8KnoTBReIZInqK3NGQm+bbHuW7
-         Y3wg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=q1VzyPg+DxccSNbFyULTSdM4axXZfBuDbxHMjgb5aP4=;
+        b=tSSE6KJK9/pXPxtp2B12po9OJZA2dihexUKG8OAt6wnZqpiPMRE9NHw4mRkReC0hrd
+         SspQgDl4QE7E9myL/WDgE8xvd54pGDlQ8a5c/wzTV+woj06v6LJxSodbkPWYCj5LoNzj
+         XBa8BhzXLqKQKbhGaKjeTuEIVZiIX3BPE8zLxPxshKlO2W+IsfDgqjLMrh5Xp1Qt8OkN
+         NE5ZSFVlqTB+vtZLGY3X9FWeTor7qx2BGby+yKlJvP9OOrhFjA5wNJ9v+41/w1wAwy0l
+         fRlYwMZorhXbaEqsgQKr/zi+W8o68dSOmGsaMG9NX20n8oiqNVF4ckDEk9Wz3hl5c4Tv
+         orsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zVC5cj0z6rMQpOyPOmFfrF76NsP0MR7V60Bxrd230h8=;
-        b=THBCT2FCFP9xyaiosNp2YWygFL9ScwGhh7UO/mbqffHtEM7Fm9mMS4E4yI7SDvtKqF
-         EcgqoK0FxwyDgk1VH0BuPhaXSWqfwzQ6J3Dm2y076Nbj6r2/4+0y/VPkXUJqES18x4hB
-         hlX8ebIeej2BMQj6S9suTvF9pjpumZr418jeJXHXhqXPeAf600iNWnAqtDX2aBjSN4xq
-         Y48MpP63g7qZJGB/9Z0S/PbdEdfcc2YiuKInkQc4B6ClUp2QW3Y7GRqO68ka3u4uqqpY
-         C/lBnJf9uw4EM296NiEPuqrq/Y5Ipk+dYhJViynw7Mjq3/2yrk+x7aFxxWS6Z483dKIA
-         LHQA==
-X-Gm-Message-State: AOAM531QEZPiwgIB69mBH4N5e1qXMEOxwVSPOLHBdTQS92QgY1r1wFRR
-        R69KYEYvuK4JDNelYG4O7R9B3Y2mYFJo5tZ+DYzYdw==
-X-Google-Smtp-Source: ABdhPJx+8UjiPN1CieY4Xi5pUk7u/5mk2xIt09T8qbul+0tYqHo1/KGJJDhsJ9CEW8caQBqx6OCrmVhxg6tElA76mdM=
-X-Received: by 2002:a4a:5596:0:b0:2dd:bb93:8800 with SMTP id
- e144-20020a4a5596000000b002ddbb938800mr1290780oob.85.1645035016433; Wed, 16
- Feb 2022 10:10:16 -0800 (PST)
-MIME-Version: 1.0
-References: <20220117085307.93030-1-likexu@tencent.com> <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
- <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com> <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
- <7b5012d8-6ae1-7cde-a381-e82685dfed4f@linux.intel.com> <CALMp9eTOaWxQPfdwMSAn-OYAHKPLcuCyse7BpsSOM35vg5d0Jg@mail.gmail.com>
- <e06db1a5-1b67-28ac-ee4c-34ece5857b1f@linux.intel.com> <CALMp9eSjDro169JjTXyCZn=Rf3PT0uHhdNXEifiXGYQK-Zn8LA@mail.gmail.com>
- <d86ba87b-d98a-53a0-b2cd-5bf77b97b592@linux.intel.com> <CABOYuvZ9SZAWeRkrhhhpMM4XwzMzXv9A1WDpc6z8SUBquf0SFQ@mail.gmail.com>
- <6afcec02-fb44-7b72-e527-6517a94855d4@linux.intel.com> <CALMp9eQ79Cnh1aqNGLR8n5MQuHTwuf=DMjJ2cTb9uXu94GGhEA@mail.gmail.com>
- <2180ea93-5f05-b1c1-7253-e3707da29f8c@linux.intel.com> <CALMp9eQiaXtF3S0QZ=2_SWavFnv6zFHqf_zFXBrxXb9pVYh0nQ@mail.gmail.com>
- <8d9149b5-e56f-b397-1527-9f21a26ad95b@linux.intel.com> <CALMp9eTqNyG-ke1Aq72hn0CVXER63SgVPamzXria76PmqiZvJQ@mail.gmail.com>
- <31cd6e81-fd74-daa1-8518-8a8dfc6174d0@gmail.com>
-In-Reply-To: <31cd6e81-fd74-daa1-8518-8a8dfc6174d0@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 16 Feb 2022 10:10:05 -0800
-Message-ID: <CALMp9eTrKmtP4BHxBNvyG9+bhOAd1jofx0rQz0rF=MtaoShb=w@mail.gmail.com>
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     "Liang, Kan" <kan.liang@linux.intel.com>,
-        David Dunn <daviddunn@google.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Stephane Eranian <eranian@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=q1VzyPg+DxccSNbFyULTSdM4axXZfBuDbxHMjgb5aP4=;
+        b=pMhcBtXfrqUKzzC6lJmW07szj5uI/s3f40aKktn+YMpWEryJmHXkVGI8QdC4EwLFuI
+         Q34O3k9paO/YlZbRP9X3s6+/qZlKKqoKrUTVZCE8Zzk6sLQxtU9duT26ar+tjD4tJ5jR
+         ckjqpcaUSpfkkOcMbfMnPAeeK8R8fxOto23jLBmc8VnNQkBUWtWZ0cXrK1pkdcWAscpi
+         nTop1Ro39czUa1MGTzjhMRQg6aoF4uYyY0HHbJDiIvzDrHIJqOw0SKZ8b9YDZFFxrZZP
+         AyB5hHH7q2R9MOd/wxAFGN6NKfdXoFrW8eY+XdtK5LOZ2IH16p3q+KBqCJWlfXIccO4G
+         vzOA==
+X-Gm-Message-State: AOAM531VxoqPzV/symDzk9nXRvq+R9C7CYYykoJC8qsEFLrGuHaKj3no
+        2S3YIW9fyky6oXoYQXis/oNx/G+zW1pAYPOUP+cWGvNH0v0F63l8Oxu3JY/+75rN2ZIKjglGaoU
+        mQ2dfcIqjlUzK00PBxEF/o4dwkRG3PYalirrow6BFJZRgrgHZ1pSEpjtuNbatIDU=
+X-Google-Smtp-Source: ABdhPJwAOUYg71OO8R71FjgaQVO5ooGTPZf5MALWhQbr4h/hSWSZXI498nNa1j8/iDoC2fhnxE7f+1MzqvTaLQ==
+X-Received: from romanton.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:43ef])
+ (user=romanton job=sendgmr) by 2002:a17:90a:7f93:b0:1b9:ef73:b2df with SMTP
+ id m19-20020a17090a7f9300b001b9ef73b2dfmr88504pjl.0.1645036042252; Wed, 16
+ Feb 2022 10:27:22 -0800 (PST)
+Date:   Wed, 16 Feb 2022 18:26:54 +0000
+Message-Id: <20220216182653.506850-1-romanton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [PATCH v3] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in always
+ catchup mode
+From:   Anton Romanov <romanton@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     mtosatti@redhat.com, vkuznets@redhat.com,
+        Anton Romanov <romanton@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,20 +65,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 11:36 PM Like Xu <like.xu.linux@gmail.com> wrote:
+If vcpu has tsc_always_catchup set each request updates pvclock data.
+KVM_HC_CLOCK_PAIRING consumers such as ptp_kvm_x86 rely on tsc read on
+host's side and do hypercall inside pvclock_read_retry loop leading to
+infinite loop in such situation.
 
-> Hardware resources will always be limited (the good news is that
-> the number of counters will increase in the future), and when we have
-> a common need for the same hardware, we should prioritize overall
-> fairness over a GUEST-first strategy.
+v3:
+    Removed warn
+    Changed return code to KVM_EFAULT
+v2:
+    Added warn
 
-The bad news about the new counters on Intel is that they are less
-capable than the existing counters. SInce there is no bitmask for GP
-counters in CPUID.0AH, if you give 4 counters to the guest, then the
-host is stuck using the less capable counters.
+Signed-off-by: Anton Romanov <romanton@google.com>
+---
+ arch/x86/kvm/x86.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Overall fairness is definitely not what we want. See the other thread,
-which has a proposal for a more configurable perf subsystem that
-should meet your needs as well as ours.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7131d735b1ef..d0b31b115922 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8945,6 +8945,13 @@ static int kvm_pv_clock_pairing(struct kvm_vcpu *vcpu, gpa_t paddr,
+ 	if (!kvm_get_walltime_and_clockread(&ts, &cycle))
+ 		return -KVM_EOPNOTSUPP;
+ 
++	/*
++	 * When tsc is in permanent catchup mode guests won't be able to use
++	 * pvclock_read_retry loop to get consistent view of pvclock
++	 */
++	if (vcpu->arch.tsc_always_catchup)
++		return -KVM_EFAULT;
++
+ 	clock_pairing.sec = ts.tv_sec;
+ 	clock_pairing.nsec = ts.tv_nsec;
+ 	clock_pairing.tsc = kvm_read_l1_tsc(vcpu, cycle);
+-- 
+2.35.1.265.g69c8d7142f-goog
 
-Can we move all of this discussion to the other thread, BTW?
