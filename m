@@ -2,198 +2,412 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13A094B9441
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 23:59:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 781FC4B94B5
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 00:48:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238032AbiBPXAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 18:00:08 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44804 "EHLO
+        id S238633AbiBPXs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 18:48:27 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbiBPXAH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 18:00:07 -0500
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam08on2069.outbound.protection.outlook.com [40.107.102.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5EA2A0D69;
-        Wed, 16 Feb 2022 14:59:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RQmapvYEmN1RmNgLHo6JL4N16A6Ytu4W20MGRxT6gUKuALyPVSdaOsl4tEA3FKyYLFeg1DLJCppDqM6gXKSCmDzTLu35piPFpC9KAvzWGuI927r+tMbfRys6/s5ENC8IfmnKtrEGpJuTjjirut4l+zN3Y0Jq+OquMi1fQlkxXiDnU9rZTmOk8Q2NHoYDsVmmxBjh9s3RFbzKWF+G8kMxNDDVhkR+outO6dgi2YCO2NchuyqyON0R9cQUKR+8eTj9qC3GwSmeU3WGUjMXOIqJxN8fqJBIG170v6/fv2QouBJl1omgU4JDvD61xhRSyCs4XsEoFcckIZgalhroVtjvPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5+BjxXUzhX9by+B2NbtMJ72ACB6YvWqdpQejX7pBOeo=;
- b=KMQeRhqIbzS/LK7DZMAdiBU+YEiX/pNxm5laqrCVqfoD1N11ueNodNBWMhb9dPCh2oR/X9XoqNFUjW/TA1KpEKv/WeEjurVew1kvrmNIj6OHxYyIwKk4sHJzNTMh1NPlcMJj/5FZInx0TluyEGbHydY+SAVQyRNGNIGfAsFdqqs56qwwdNCjrSEq2MHAHXQpEJsTxjMUfDTJqlWpGDWrlj7CdrP8BcRpOafP/nWEXv8Ef6Wi69ylfVtExZzxaWWzN8UBZaLH/0sRjWvVHuLopgTbbrURKcetgTpgFY9n9z93w2aQRfAIKg5/v6dXbKhdg8vheceBt1XZSY083E+gMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5+BjxXUzhX9by+B2NbtMJ72ACB6YvWqdpQejX7pBOeo=;
- b=lxjZNP7i+jXt8YIVOWwnyp6FH50Khdm7R/vIE+H89Q6N/qyYTd44MgZixQ/ARmiMW6Pc/PXZS7x8ajNJjrZk+rRtVM9LyW621HZ4ZX7M2sNOqbR3lwa0s/a1uu82okgK/xtiHqPqY4hbs8M1ppFYiBi5abKA2O6Ao+q4+Sw8l6A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- MWHPR12MB1679.namprd12.prod.outlook.com (2603:10b6:301:f::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4995.14; Wed, 16 Feb 2022 22:59:50 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::74f0:93a2:5654:588c]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::74f0:93a2:5654:588c%5]) with mapi id 15.20.4975.015; Wed, 16 Feb 2022
- 22:59:50 +0000
-Message-ID: <5dd76348-f89c-58d9-1f6b-a6031b984330@amd.com>
-Date:   Thu, 17 Feb 2022 05:59:37 +0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH v6] KVM: SVM: Allow AVIC support on system w/ physical
- APIC ID > 255
-Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, mlevitsk@redhat.com, pbonzini@redhat.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, peterz@infradead.org, hpa@zytor.com,
-        jon.grimm@amd.com, wei.huang2@amd.com, terry.bowman@amd.com,
-        stable@vger.kernel.org
-References: <20220211000851.185799-1-suravee.suthikulpanit@amd.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <20220211000851.185799-1-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HK2PR02CA0152.apcprd02.prod.outlook.com
- (2603:1096:201:1f::12) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+        with ESMTP id S232174AbiBPXsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 18:48:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5F32258479
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 15:48:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645055291;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3yxXnQ8NcQVI3R2VSTCwUm2NlS2NbQO6IZlz6uxtttI=;
+        b=h6aE7CfpklfKg+4oUOgIerIrtD5QYfok3NxuSkirylWpNhnrJjmxUgmuorPszqR0mVyaw1
+        7VJ4HtVIvXDhE3OrJbR0oIElFQ6x3oe00c706hE4c0Yl9dyPbYBoKx9NeoFpLzPevSelyk
+        GWF0Isosp7SEH3vZLQdQul3DTq3OsM4=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-315-O-yefNZ-MfuRgtGRlILj_w-1; Wed, 16 Feb 2022 18:48:09 -0500
+X-MC-Unique: O-yefNZ-MfuRgtGRlILj_w-1
+Received: by mail-oi1-f200.google.com with SMTP id r15-20020a056808210f00b002d0d8b35b4eso1544093oiw.23
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 15:48:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=3yxXnQ8NcQVI3R2VSTCwUm2NlS2NbQO6IZlz6uxtttI=;
+        b=v+UBlK9HgS/Poxh60EIhEVICOGQle9gF/9SLT2872+oUe+RUBFiZTZDQDpgDCc+/nJ
+         5QemjQNcqrKEvqqDXEUC/4wUEp+5eJVYNdMMbcYcWTKBXu+tZ9mjToNhXLtF3ENXbjZ/
+         ABNYg8Nj/nM5Yt5Iewhrd11kkBE3ZKRr6hZlPXdlx7bd8mahr3Tpu9xNo9kmmj7R2dw9
+         lkg1iYumzOdcI0dk/FGLTzAyDi1sgZeI0OVYJtxrTcT9wQq3UCuia/NHPF1lDsgXnbe8
+         FOnBFVhFWYYcUVe37nKWEDqSRr6S3/M1bkT/JJ8Vrebj8Plusc99I9pdoY7nzaY+xp5e
+         HRzQ==
+X-Gm-Message-State: AOAM530VqFB1dTIAJEdOhG0qYA8TKSDxv++BYCNebb2C90biPiV6Xmvg
+        U6XL1WwH0YDQFtAwCfobG3LpQCzs6iOh73/D0T5c1fAcsNseNN+kgJq/vu+Yi3CJmcgxDiqpzqV
+        IXc1ld3Drr70e
+X-Received: by 2002:a05:6870:4248:b0:d2:c3a4:5b4c with SMTP id v8-20020a056870424800b000d2c3a45b4cmr1378277oac.40.1645055288807;
+        Wed, 16 Feb 2022 15:48:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwHwiwa7LUVi3R9fBV+IMF/WBh/f8giV2tlCFrpwtq5zY75nHBLPRui6wwyxbqkuInjx2yxSw==
+X-Received: by 2002:a05:6870:4248:b0:d2:c3a4:5b4c with SMTP id v8-20020a056870424800b000d2c3a45b4cmr1378267oac.40.1645055288418;
+        Wed, 16 Feb 2022 15:48:08 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id x1sm15614544oto.38.2022.02.16.15.48.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Feb 2022 15:48:07 -0800 (PST)
+Date:   Wed, 16 Feb 2022 16:48:06 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Abhishek Sahu <abhsahu@nvidia.com>
+Cc:     <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 1/5] vfio/pci: register vfio-pci driver with
+ runtime PM framework
+Message-ID: <20220216164806.0d391821.alex.williamson@redhat.com>
+In-Reply-To: <20220124181726.19174-2-abhsahu@nvidia.com>
+References: <20220124181726.19174-1-abhsahu@nvidia.com>
+        <20220124181726.19174-2-abhsahu@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bdc0077a-ec75-4f46-8989-08d9f1a00932
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1679:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR12MB1679AB74FA166916A0E1FF5BF3359@MWHPR12MB1679.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7E8XM2fyD6C4kQsPeTIQ5M+1uBQYQ0fabWBCVRdT8OJsj/O04fhciBDBP2fBlVcxXk+wCA3lwkoyKxQ4eiD9ObQExvUBxA9JUfZN/xkH3MRxtwwunOPmjo/P+EmIWcOMxbg+B7o15y5y95FeSq/sp7xm7LUlAR2mvlp+WpM/ZHIbBZWN3mYXZpk3k9L1jc7oKEbyQnxF1M6xQWPsHXlZmWu+jcW98WGs4zF1OYvXpGGNyNRppIeV+79bJWxYzDFRv/1xSHRpgGxW9nrtE8I1gUsckm23lnlCu0miQX4Gd6EY43ZqsSKzAOm6R/uUHkhlj4jhg3W9vSwwx08ZwRyX4giyUh8/hyBXoHJw1dj0NmkFX7G7b9s8blDVbJ1p9TMg6xzWnX54Zr4wJLyvp60wSXIO2coZykLaQPxK+nUFi0/ulGgjhi7mBWWeKfkvPq3Fx990ycTvnE5zXWq0r5XuoCRizGPQbNWOrn9J5OqkhpWM/tSBxliiUhVWwAdaNXP/iQTiojh86ODnGd8VvIX8TPoQxgLrT+zthQroKlJD2DB9u6DvE5y9jZfmXnmIa6qUD7hTtj9tAKUfFfi/90a5Ut/wHXxSIg2+vR3iG8UGp7nDQQnVh3fQITTYGWn8HmW+hN0cNKy1zhkNKN9ZiiA6aYJTjnE7YABslNv45xSGg+AUzvR26vcCiQQfxNhY88tmdpDSpvpR/MYEOGs8/SqXKkXKZlhbMd7I1GuLd2ZAgjk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(316002)(8936002)(53546011)(66476007)(36756003)(31696002)(8676002)(86362001)(66556008)(2906002)(4326008)(6666004)(7416002)(83380400001)(66946007)(186003)(6506007)(26005)(508600001)(2616005)(6512007)(31686004)(38100700002)(6486002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MjF6MjM4cy9tZWNJbGQ2SW0rVU9sVlhHMXlSYmEyZ1VFS0ZJbVBXL0NsU2Z5?=
- =?utf-8?B?N0t6b2FWVFR4UTNRZUR1RnYzamNGeFZnYWlEbDFRbHd3U0o3c0dsQkovUi9l?=
- =?utf-8?B?MFFUVzF5YnoxWHJqdEtVQTFBamY3SWplR2FaVjVwUEhxUXFFQWxvSXdacDlH?=
- =?utf-8?B?NEFJNlBlRTJFM0JuNHZDci9PdGpTeVJ5Tzd4c0RYRkYxZmpzWmluUlVuMVdN?=
- =?utf-8?B?eWdMeVgyYlVLSkVqbENnMFIzTGlzUG90a1dOZnZra1VwWUc0ZTl2SVFmV04r?=
- =?utf-8?B?YktIdnptdUVDRGt4eDQ4UEhxVkRaaVNCUVVnQmVCZTFRVm4xanJabFkySjhH?=
- =?utf-8?B?NlBidDZsaW5sNTlucmhxUG5pNkFFL3J1T3NiRmovTlowQnVXR0F5T1QxeUxY?=
- =?utf-8?B?cTZkQWkySmFaRUdxSmdaQWNLaS9IQlVDU0VQbzRhTzZMdFpQUEhBZ3dxSWp5?=
- =?utf-8?B?bWhsdWhaWWZjZXQyT3k1MUxuNnF5RGN3aUZINWxxaGFzblNISmZLNFdKa2RS?=
- =?utf-8?B?Z01ZOWx2bUQ5Y0JkMENnNlZMMzd1OFl4YnpCVkt1VERuRlR3cXI2aGVyMmor?=
- =?utf-8?B?anhOeklvUzA2cjdJeFIzUElXS2RDMTQ1RlRzTjF0ai90VnBTSHpDcVQ0Z0gx?=
- =?utf-8?B?UXBIU1gwUFp5Y2FneGRPZDlHTXhVV2p0ck5kbFR2TTdyT2JmTmlDMUN3TWNs?=
- =?utf-8?B?aVd4WXN5RjV0RktQYnlKZkY0bnk0T2hJTzByV1lMdHRRRkxYUlo0R0srYjNE?=
- =?utf-8?B?MGNIZ2wvMVVPQ0pIM1lNaUpjWXNqa2dTTCtMVVJXRWZrTGJ0WHRxRnZhQ2FV?=
- =?utf-8?B?V0VpRXlIQVp6V01jZ3FzWDFCVUJ5dnJmZmpMMGRnNXgvODFUbUI5bFdwM3Er?=
- =?utf-8?B?S29hdkdNRE90eHg2eXpYMTVRcTlHMjd5SHdFcldIQXptV0Y1TWplM1h4ZC83?=
- =?utf-8?B?NjBNU0dtZEVGMFhVcU13MzFiSFBXWlNaazhtdEhNSENMdFprTmtISWY3ZWlX?=
- =?utf-8?B?R1dWNWZLcVVnL2ZkYlFLcmRhR1FTcjhBYk5yb2tWS2xLelVySmJFQXZUNExU?=
- =?utf-8?B?eStvOVo3MkQrMjNTYWhINEVIUVkzRFYzRkFzT25YK055WTJOQ3NGY2Y5NENl?=
- =?utf-8?B?TXgvOFFmbjQ3QTVhNUFEUkpmNWd0bGQ1dW5rODBHUjhyRUhEUXU5ZWdJU2Zn?=
- =?utf-8?B?S2ZLM3lVSVlEcjBpWTRHSkZ3MldjT2phQmxib0lVZ1ptRlZHd3VYRElRZ1FJ?=
- =?utf-8?B?WVAxUUZOZlo4S2FwY0s2TUxyU0o5OWxrZG5UeUtXODNFdEhaaTE2MkxDaVBn?=
- =?utf-8?B?bHlJUllqaGd4ajl2VjVLS1JGOWdHU1c1cXhYVUJGcVNzV1IxWEVTZi95NS9v?=
- =?utf-8?B?V0NjRlRJVVZ5eERpd04wZHd1Q2xkOGRYZm1xWWNWRmxjU2RSTFRWOVQ1WU8r?=
- =?utf-8?B?czB4YzVLdkdoVGFITENLQ3QvSTRRNmlvay9PVHZxTnlDVDQzK1VtWVp5MHpa?=
- =?utf-8?B?YXFxREQyMEpPSkttNk1hZ0xVQ2NzQVJwTURZUkh5cVI0Sko4NXVSMFVxRTFW?=
- =?utf-8?B?bmNJOU85RVhRZEJlQ0tUUGxYQk9oY2d6LzNLakNwNHpCSE1IUUVtd1dtUUR6?=
- =?utf-8?B?MWkwdGUrUzFITEVLay9SWHZvWm4xclJGQXB4aktCU1NFUmsxaHlxZnNxM3Ex?=
- =?utf-8?B?ZVhISHZHNXpvZFlVYlk3OXdoUVVubk9hUjZxdXovRk5uWU9Yd3RDYU95WTND?=
- =?utf-8?B?UUx0d0RLVTQwK1lPTlVZMHZBRVgxeStMYXUwaGI5ZVErK09Bclh0Z25MeXh2?=
- =?utf-8?B?U3lUOWY1Mk9mWE85a0IwdGc2VENRc1RwQkpjLzdxWk8rOVJod1VVK2xBQmZV?=
- =?utf-8?B?cHdRZDBTWGUxaklPcWRXTDhsWGNjTVhzM0pFaXNqSVBwSFIxTS9XVWxLVUJP?=
- =?utf-8?B?OVRKYkNBaFV3Y0RQV1F0QnlTVlIzNjVVdEF4SFMweFJiYnpuR05Ja3FPcEUy?=
- =?utf-8?B?N3ZiSWV4V1E3bDNsK2FPZXZPbWhWUEQvTUNBSjlReXhEOWdBenkvaDE5WkM1?=
- =?utf-8?B?RGhwZHJVWEJHMnVkTnJaY0tZT0IwU3ZpWUhnWFp4K3dFcXlzbXhINHBWV092?=
- =?utf-8?B?ODJ0Y3czdnk5VFg0SmV6S1FQaVcwRGF5eFpvUW93emM0RGhNeGQ4QTFCT2xy?=
- =?utf-8?Q?2BwfrjoJ97jWCp4espMwSNg=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdc0077a-ec75-4f46-8989-08d9f1a00932
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2022 22:59:50.5847
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qmS/omZuPsJ11zJbB0ITIJCw/J6cMEgBMB2B5l+69rR3awnXGm0dEnk56ra2jkoiwjDMryoqm/eemAVBzOCotw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1679
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+On Mon, 24 Jan 2022 23:47:22 +0530
+Abhishek Sahu <abhsahu@nvidia.com> wrote:
 
-Do you have any other concerns regarding this patch?
-
-Regards,
-Suravee
-
-On 2/11/2022 7:08 AM, Suravee Suthikulpanit wrote:
-> Expand KVM's mask for the AVIC host physical ID to the full 12 bits defined
-> by the architecture.  The number of bits consumed by hardware is model
-> specific, e.g. early CPUs ignored bits 11:8, but there is no way for KVM
-> to enumerate the "true" size.  So, KVM must allow using all bits, else it
-> risks rejecting completely legal x2APIC IDs on newer CPUs.
+> Currently, there is very limited power management support
+> available in the upstream vfio-pci driver. If there is no user of vfio-pci
+> device, then the PCI device will be moved into D3Hot state by writing
+> directly into PCI PM registers. This D3Hot state help in saving power
+> but we can achieve zero power consumption if we go into the D3cold state.
+> The D3cold state cannot be possible with native PCI PM. It requires
+> interaction with platform firmware which is system-specific.
+> To go into low power states (including D3cold), the runtime PM framework
+> can be used which internally interacts with PCI and platform firmware and
+> puts the device into the lowest possible D-States.
 > 
-> This means KVM relies on hardware to not assign x2APIC IDs that exceed the
-> "true" width of the field, but presumably hardware is smart enough to tie
-> the width to the max x2APIC ID.  KVM also relies on hardware to support at
-> least 8 bits, as the legacy xAPIC ID is writable by software.  But, those
-> assumptions are unavoidable due to the lack of any way to enumerate the
-> "true" width.
+> This patch registers vfio-pci driver with the runtime PM framework.
 > 
-> Cc: stable@vger.kernel.org
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Fixes: 44a95dae1d22 ("KVM: x86: Detect and Initialize AVIC support")
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> 1. The PCI core framework takes care of most of the runtime PM
+>    related things. For enabling the runtime PM, the PCI driver needs to
+>    decrement the usage count and needs to register the runtime
+>    suspend/resume callbacks. For vfio-pci based driver, these callback
+>    routines can be stubbed in this patch since the vfio-pci driver
+>    is not doing the PCI device initialization. All the config state
+>    saving, and PCI power management related things will be done by
+>    PCI core framework itself inside its runtime suspend/resume callbacks.
+> 
+> 2. Inside pci_reset_bus(), all the devices in bus/slot will be moved
+>    out of D0 state. This state change to D0 can happen directly without
+>    going through the runtime PM framework. So if runtime PM is enabled,
+>    then pm_runtime_resume() makes the runtime state active. Since the PCI
+>    device power state is already D0, so it should return early when it
+>    tries to change the state with pci_set_power_state(). Then
+>    pm_request_idle() can be used which will internally check for
+>    device usage count and will move the device again into the low power
+>    state.
+> 
+> 3. Inside vfio_pci_core_disable(), the device usage count always needs
+>    to be decremented which was incremented in vfio_pci_core_enable().
+> 
+> 4. Since the runtime PM framework will provide the same functionality,
+>    so directly writing into PCI PM config register can be replaced with
+>    the use of runtime PM routines. Also, the use of runtime PM can help
+>    us in more power saving.
+> 
+>    In the systems which do not support D3Cold,
+> 
+>    With the existing implementation:
+> 
+>    // PCI device
+>    # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
+>    D3hot
+>    // upstream bridge
+>    # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
+>    D0
+> 
+>    With runtime PM:
+> 
+>    // PCI device
+>    # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
+>    D3hot
+>    // upstream bridge
+>    # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
+>    D3hot
+> 
+>    So, with runtime PM, the upstream bridge or root port will also go
+>    into lower power state which is not possible with existing
+>    implementation.
+> 
+>    In the systems which support D3Cold,
+> 
+>    // PCI device
+>    # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
+>    D3hot
+>    // upstream bridge
+>    # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
+>    D0
+> 
+>    With runtime PM:
+> 
+>    // PCI device
+>    # cat /sys/bus/pci/devices/0000\:01\:00.0/power_state
+>    D3cold
+>    // upstream bridge
+>    # cat /sys/bus/pci/devices/0000\:00\:01.0/power_state
+>    D3cold
+> 
+>    So, with runtime PM, both the PCI device and upstream bridge will
+>    go into D3cold state.
+> 
+> 5. If 'disable_idle_d3' module parameter is set, then also the runtime
+>    PM will be enabled, but in this case, the usage count should not be
+>    decremented.
+> 
+> 6. vfio_pci_dev_set_try_reset() return value is unused now, so this
+>    function return type can be changed to void.
+> 
+> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
 > ---
->   arch/x86/kvm/svm/avic.c | 7 +------
->   arch/x86/kvm/svm/svm.h  | 2 +-
->   2 files changed, 2 insertions(+), 7 deletions(-)
+>  drivers/vfio/pci/vfio_pci.c      |  3 +
+>  drivers/vfio/pci/vfio_pci_core.c | 95 +++++++++++++++++++++++---------
+>  include/linux/vfio_pci_core.h    |  4 ++
+>  3 files changed, 75 insertions(+), 27 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 90364d02f22a..e4cfd8bf4f24 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -974,17 +974,12 @@ avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
->   void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->   {
->   	u64 entry;
-> -	/* ID = 0xff (broadcast), ID > 0xff (reserved) */
->   	int h_physical_id = kvm_cpu_get_apicid(cpu);
->   	struct vcpu_svm *svm = to_svm(vcpu);
->   
->   	lockdep_assert_preemption_disabled();
->   
-> -	/*
-> -	 * Since the host physical APIC id is 8 bits,
-> -	 * we can support host APIC ID upto 255.
-> -	 */
-> -	if (WARN_ON(h_physical_id > AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
-> +	if (WARN_ON(h_physical_id & ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
->   		return;
->   
->   	/*
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 47ef8f4a9358..cede59cd8999 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -565,7 +565,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
->   #define AVIC_LOGICAL_ID_ENTRY_VALID_BIT			31
->   #define AVIC_LOGICAL_ID_ENTRY_VALID_MASK		(1 << 31)
->   
-> -#define AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK	(0xFFULL)
-> +#define AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK	GENMASK_ULL(11, 0)
->   #define AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK	(0xFFFFFFFFFFULL << 12)
->   #define AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK		(1ULL << 62)
->   #define AVIC_PHYSICAL_ID_ENTRY_VALID_MASK		(1ULL << 63)
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index a5ce92beb655..c8695baf3b54 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -193,6 +193,9 @@ static struct pci_driver vfio_pci_driver = {
+>  	.remove			= vfio_pci_remove,
+>  	.sriov_configure	= vfio_pci_sriov_configure,
+>  	.err_handler		= &vfio_pci_core_err_handlers,
+> +#if defined(CONFIG_PM)
+> +	.driver.pm              = &vfio_pci_core_pm_ops,
+> +#endif
+>  };
+>  
+>  static void __init vfio_pci_fill_ids(void)
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index f948e6cd2993..c6e4fe9088c3 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -152,7 +152,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+>  }
+>  
+>  struct vfio_pci_group_info;
+> -static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
+> +static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
+>  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+>  				      struct vfio_pci_group_info *groups);
+>  
+> @@ -245,7 +245,11 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+>  	u16 cmd;
+>  	u8 msix_pos;
+>  
+> -	vfio_pci_set_power_state(vdev, PCI_D0);
+> +	if (!disable_idle_d3) {
+> +		ret = pm_runtime_resume_and_get(&pdev->dev);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+
+Sorry for the delay in review, I'm a novice in pm runtime, but I
+haven't forgotten about the remainder of this series.
+
+I think we're removing the unconditional wake here because we now wake
+the device in the core registration function below, but I think there
+might be a subtle dependency here on the fix to always wake devices in
+the disable function as well, otherwise I'm afraid the power state of a
+device released in D3hot could leak to the next user here.
+
+>  
+>  	/* Don't allow our initial saved state to include busmaster */
+>  	pci_clear_master(pdev);
+> @@ -405,8 +409,11 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+>  out:
+>  	pci_disable_device(pdev);
+>  
+> -	if (!vfio_pci_dev_set_try_reset(vdev->vdev.dev_set) && !disable_idle_d3)
+> -		vfio_pci_set_power_state(vdev, PCI_D3hot);
+> +	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
+> +
+> +	/* Put the pm-runtime usage counter acquired during enable */
+> +	if (!disable_idle_d3)
+> +		pm_runtime_put(&pdev->dev);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_pci_core_disable);
+>  
+> @@ -1847,19 +1854,20 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+>  
+>  	vfio_pci_probe_power_state(vdev);
+>  
+> -	if (!disable_idle_d3) {
+> -		/*
+> -		 * pci-core sets the device power state to an unknown value at
+> -		 * bootup and after being removed from a driver.  The only
+> -		 * transition it allows from this unknown state is to D0, which
+> -		 * typically happens when a driver calls pci_enable_device().
+> -		 * We're not ready to enable the device yet, but we do want to
+> -		 * be able to get to D3.  Therefore first do a D0 transition
+> -		 * before going to D3.
+> -		 */
+> -		vfio_pci_set_power_state(vdev, PCI_D0);
+> -		vfio_pci_set_power_state(vdev, PCI_D3hot);
+> -	}
+> +	/*
+> +	 * pci-core sets the device power state to an unknown value at
+> +	 * bootup and after being removed from a driver.  The only
+> +	 * transition it allows from this unknown state is to D0, which
+> +	 * typically happens when a driver calls pci_enable_device().
+> +	 * We're not ready to enable the device yet, but we do want to
+> +	 * be able to get to D3.  Therefore first do a D0 transition
+> +	 * before enabling runtime PM.
+> +	 */
+> +	vfio_pci_set_power_state(vdev, PCI_D0);
+> +	pm_runtime_allow(&pdev->dev);
+> +
+> +	if (!disable_idle_d3)
+> +		pm_runtime_put(&pdev->dev);
+
+I could use some enlightenment here.  pm_runtime_allow() only does
+something if power.runtime_allow is false, in which case it sets that
+value to true and decrements power.usage_count.  runtime_allow is
+enabled by default in pm_runtime_init(), but pci_pm_init() calls
+pm_runtime_forbid() which does the reverse of pm_runtime_allow().  So
+do I understand correctly that PCI devices are probed with
+runtime_allow = false and a usage_count of 2?
+
+>  
+>  	ret = vfio_register_group_dev(&vdev->vdev);
+>  	if (ret)
+> @@ -1868,7 +1876,9 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+>  
+>  out_power:
+>  	if (!disable_idle_d3)
+> -		vfio_pci_set_power_state(vdev, PCI_D0);
+> +		pm_runtime_get_noresume(&pdev->dev);
+> +
+> +	pm_runtime_forbid(&pdev->dev);
+>  out_vf:
+>  	vfio_pci_vf_uninit(vdev);
+>  	return ret;
+> @@ -1887,7 +1897,9 @@ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
+>  	vfio_pci_vga_uninit(vdev);
+>  
+>  	if (!disable_idle_d3)
+> -		vfio_pci_set_power_state(vdev, PCI_D0);
+> +		pm_runtime_get_noresume(&pdev->dev);
+> +
+> +	pm_runtime_forbid(&pdev->dev);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_pci_core_unregister_device);
+>  
+> @@ -2093,33 +2105,62 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
+>   *  - At least one of the affected devices is marked dirty via
+>   *    needs_reset (such as by lack of FLR support)
+>   * Then attempt to perform that bus or slot reset.
+> - * Returns true if the dev_set was reset.
+>   */
+> -static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
+> +static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
+>  {
+>  	struct vfio_pci_core_device *cur;
+>  	struct pci_dev *pdev;
+>  	int ret;
+>  
+>  	if (!vfio_pci_dev_set_needs_reset(dev_set))
+> -		return false;
+> +		return;
+>  
+>  	pdev = vfio_pci_dev_set_resettable(dev_set);
+>  	if (!pdev)
+> -		return false;
+> +		return;
+>  
+>  	ret = pci_reset_bus(pdev);
+>  	if (ret)
+> -		return false;
+> +		return;
+>  
+>  	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
+>  		cur->needs_reset = false;
+> -		if (!disable_idle_d3)
+> -			vfio_pci_set_power_state(cur, PCI_D3hot);
+> +		if (!disable_idle_d3) {
+> +			/*
+> +			 * Inside pci_reset_bus(), all the devices in bus/slot
+> +			 * will be moved out of D0 state. This state change to
+
+s/out of/into/?
+
+> +			 * D0 can happen directly without going through the
+> +			 * runtime PM framework. pm_runtime_resume() will
+> +			 * help make the runtime state as active and then
+> +			 * pm_request_idle() can be used which will
+> +			 * internally check for device usage count and will
+> +			 * move the device again into the low power state.
+> +			 */
+> +			pm_runtime_resume(&pdev->dev);
+> +			pm_request_idle(&pdev->dev);
+> +		}
+>  	}
+> -	return true;
+>  }
+>  
+> +#ifdef CONFIG_PM
+> +static int vfio_pci_core_runtime_suspend(struct device *dev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int vfio_pci_core_runtime_resume(struct device *dev)
+> +{
+> +	return 0;
+> +}
+> +
+> +const struct dev_pm_ops vfio_pci_core_pm_ops = {
+> +	SET_RUNTIME_PM_OPS(vfio_pci_core_runtime_suspend,
+> +			   vfio_pci_core_runtime_resume,
+> +			   NULL)
+> +};
+> +EXPORT_SYMBOL_GPL(vfio_pci_core_pm_ops);
+> +#endif
+
+It looks like the vfio_pci_core_pm_ops implementation should all be
+moved to where we implement D3cold support, it's not necessary to
+implement stubs for any of the functionality of this patch.  Thanks,
+
+Alex
+
+> +
+>  void vfio_pci_core_set_params(bool is_nointxmask, bool is_disable_vga,
+>  			      bool is_disable_idle_d3)
+>  {
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index ef9a44b6cf5d..aafe09c9fa64 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -231,6 +231,10 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev);
+>  void vfio_pci_core_disable(struct vfio_pci_core_device *vdev);
+>  void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev);
+>  
+> +#ifdef CONFIG_PM
+> +extern const struct dev_pm_ops vfio_pci_core_pm_ops;
+> +#endif
+> +
+>  static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+>  {
+>  	return (pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA;
+
