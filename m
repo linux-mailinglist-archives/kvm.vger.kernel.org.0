@@ -2,118 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A8394B86D3
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 12:38:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C5E54B86F8
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 12:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231784AbiBPLiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 06:38:16 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34630 "EHLO
+        id S232210AbiBPLqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 06:46:00 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbiBPLiP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 06:38:15 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6284766AFD
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 03:38:02 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id v8-20020a17090a634800b001bb78857ccdso3852293pjs.1
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 03:38:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=XVqbnjLYjeH1rc7fjv6cX2lZtkgpQ8GkwHWH0GF7qrk=;
-        b=rOIF8zbR8HK9HJpDFP7k4gIjN/EnQq3RavPFLIWmtwnMnD3/0knaLBymq+wL7i1291
-         WfkuAM2Np8vsBN6nszZC24SceImGwz6fd8wmx2Bjt6TBQ8XzfeakMnTsdUbFwqMfh13m
-         GLbsISNcnZjenqBNlGXK87833AepzExvffTz+0xypytG4oOdVQF097lJ1FyyExM48mOQ
-         z6GHYcmwc0IY/CXaAzkDkkKdZ7xyKA/IRcGpojx4og8rdmabHTczuo2zRjZEwzSfSy5r
-         8Mq9r7qmI1xJIH23s2unqRKwlzjdRb48i0Oth45I37N4RaKdLZnqbmCAK85WSrgsbqch
-         /5hg==
+        with ESMTP id S232174AbiBPLp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 06:45:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 31443B822B
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 03:45:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645011946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WP90pIk7jEBwCs42OYImo884m3Sc20R1f26ph5uJrT8=;
+        b=JN67/N93b5tx/pBdpDZnU5JXONcgaENMKl/1nus0i6kr8CBGUpneSqchktvCIvy/frzRVK
+        jPxNkP6EmGpGNsveT+IboK70BVPr6kujT5VJWB4XxXmgfmg4ghzAswum4TVWEQxr9gzMGQ
+        uKfXORmX5eGtEsDARBb0CEM8ZMU04xk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-373-iAQLpVeVMYynOtahJw2fDg-1; Wed, 16 Feb 2022 06:45:45 -0500
+X-MC-Unique: iAQLpVeVMYynOtahJw2fDg-1
+Received: by mail-ed1-f72.google.com with SMTP id cr7-20020a056402222700b0040f59dae606so1390596edb.11
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 03:45:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XVqbnjLYjeH1rc7fjv6cX2lZtkgpQ8GkwHWH0GF7qrk=;
-        b=R32BBFBMIlernBirppBWBk92+Glm16ADLHDFl0i+V7bmCdxfUSULVy2f7D0WPJ0Mrm
-         Q8pDKG2C67QSVGP99ZQpYwApDKIX0C+jNQWPQ9MAOfZG49FLI0AN7ETQ3s2/LGkIdE49
-         /BSJGzer7VfKyKUq+AFtfjQs5XnOOxdsmzG9hK5Xc6nmdx/t7t7WDH9RtcP6dn8GefWN
-         SK0JLch06vYvxAlFPH1pUPz5AeYvyeo4WOlZrRAhL1LpjUbijSreS1d58cTcUrEZ+mlj
-         Qihn4s9zqO9xKbo6dbfINdRozvulZ9Lhog7Wyg/z6FStrtDpR1NCZtuh1zPpqcEl9cNO
-         qpIQ==
-X-Gm-Message-State: AOAM533y1be6qvdxIw1/K0avTOixEddxYwdbkysJDUIurj4KlCP0X/ts
-        5zfhgu5eLhlzrYJXy1AhyQb8sQ==
-X-Google-Smtp-Source: ABdhPJweicWY1RRMSLzaOq+LFnlPrYlBuTWGm3p7RYY8VojheTr5PTFgTvBGSc934LYJoaQHDzxOsw==
-X-Received: by 2002:a17:90a:a78c:b0:1b8:b769:62d0 with SMTP id f12-20020a17090aa78c00b001b8b76962d0mr1207077pjq.227.1645011481947;
-        Wed, 16 Feb 2022 03:38:01 -0800 (PST)
-Received: from FVFYT0MHHV2J.tiktokcdn.com ([139.177.225.233])
-        by smtp.gmail.com with ESMTPSA id z21sm5248228pgv.21.2022.02.16.03.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 03:38:01 -0800 (PST)
-From:   Muchun Song <songmuchun@bytedance.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        alexandru.elisei@arm.com
-Cc:     kvm@vger.kernel.org, Muchun Song <songmuchun@bytedance.com>
-Subject: [PATCH kvmtool v2 2/2] x86: Set the correct APIC ID
-Date:   Wed, 16 Feb 2022 19:37:35 +0800
-Message-Id: <20220216113735.52240-2-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
-In-Reply-To: <20220216113735.52240-1-songmuchun@bytedance.com>
-References: <20220216113735.52240-1-songmuchun@bytedance.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WP90pIk7jEBwCs42OYImo884m3Sc20R1f26ph5uJrT8=;
+        b=2TvIWwV7dqVHio8yUn/RlyCBFBWb7wI0FCejhLh5PlhovXCNTXnE5xz90k8pK4J1tD
+         4COz9YMc+W481D5LttXNATpNjspwr/bz4y7AqAoA+xOQ7mj7pV+Y8ht+0/9nVa9EGL+2
+         1iyGXO0fFtYSdgMtftkIa/sT2GiRRyGXLsgDf1ddqvVL1cX0N+XdgUPjzR1O57Y5za8x
+         pgi0Pn8xMdZxc8YQ0mO+yG/GLhk9hfCj3KUUucngy+Bu5M1RtBTlmfmaoET0N998alzB
+         O77rTvsDmKOWqU4wFtF2pbrCgSPe3IrUuIOtGrrqY/I0JtuO3yIwALYL3tesgtQNKTJO
+         addA==
+X-Gm-Message-State: AOAM5323Petp2chfktRqn10fdiTw9nUsFjg0DIurIanlHZhJDSiOuJ39
+        MS1Mx4Z2lsnJKhBmBvpqEEty2Wf8NVVOJOgm+J6y4cLdyLbCwJlasQ1Rl+EiGVCpXvCnjapUuxQ
+        JhH/5UeRvTlYN
+X-Received: by 2002:aa7:d8d8:0:b0:3f5:9041:2450 with SMTP id k24-20020aa7d8d8000000b003f590412450mr2610137eds.322.1645011943875;
+        Wed, 16 Feb 2022 03:45:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzkaJn52bD+L6Qtxp/FoVpy6ltuid1x9L0SwoLrXz5wehaYTP1E8b2cWzjlZw8g9RYGxeTLVg==
+X-Received: by 2002:aa7:d8d8:0:b0:3f5:9041:2450 with SMTP id k24-20020aa7d8d8000000b003f590412450mr2610107eds.322.1645011943624;
+        Wed, 16 Feb 2022 03:45:43 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id s1sm1467429edt.49.2022.02.16.03.45.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Feb 2022 03:45:42 -0800 (PST)
+Message-ID: <9b1d925c-1e6a-8a06-ada5-941adb5b349f@redhat.com>
+Date:   Wed, 16 Feb 2022 12:45:41 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 1/1] x86/kvm/fpu: Mask guest fpstate->xfeatures with
+ guest_supported_xcr0
+Content-Language: en-US
+To:     Leonardo Bras Soares Passos <leobras@redhat.com>
+Cc:     David Edmondson <david.edmondson@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220211060742.34083-1-leobras@redhat.com>
+ <5fd84e2f-8ebc-9a4c-64bf-8d6a2c146629@redhat.com>
+ <cunsfslpyvh.fsf@oracle.com>
+ <6bee793c-f7fc-2ede-0405-7a5d7968b175@redhat.com>
+ <CAJ6HWG6RB6NS8vx0vWdgRhO54B+NqHyBvpg7dRjd_78TRnJ9eg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAJ6HWG6RB6NS8vx0vWdgRhO54B+NqHyBvpg7dRjd_78TRnJ9eg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When kvmtool boots a kernel, the dmesg will print the following message:
+On 2/16/22 08:48, Leonardo Bras Soares Passos wrote:
+> On Mon, Feb 14, 2022 at 6:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On top of this patch, we can even replace vcpu->arch.guest_supported_xcr0
+>> with vcpu->arch.guest_fpu.fpstate->user_xfeatures. Probably with local
+>> variables or wrapper functions though, so as to keep the code readable.
+> 
+> You mean another patch (#2) removing guest_supported_xcr0 field from
+> kvm_vcpu_arch ?
+> (and introducing something like kvm_guest_supported_xcr() ?)
 
-  [Firmware Bug]: CPU1: APIC id mismatch. Firmware: 1 APIC: 30
+Yes, introducing both kvm_guest_supported_xcr0() that just reads 
+user_xfeatures, and kvm_guest_supported_xfd() as below.
 
-Fix this by setting up correct initial_apicid to cpu_id.
+>> For example:
+>>
+>> static inline u64 kvm_guest_supported_xfd()
+>> {
+>>          u64 guest_supported_xcr0 = vcpu->arch.guest_fpu.fpstate->user_xfeatures;
+>>
+>>          return guest_supported_xcr0 & XFEATURE_MASK_USER_DYNAMIC;
+>> }
+> 
+> Not sure If I get the above.
+> Are you suggesting also removing fpstate->xfd and use a wrapper instead?
+> Or is the above just an example?
+> (s/xfd/xcr0/ & s/XFEATURE_MASK_USER_DYNAMIC/XFEATURE_MASK_USER_SUPPORTED/ )
 
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-v2:
-- Rework subject and commit log.
+The above is an example of how even "indirect" uses as 
+guest_supported_xcr0 can be changed to a function.
 
- x86/cpuid.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+>> Also, already in this patch fpstate_realloc should do
+>>
+>>           newfps->user_xfeatures = curfps->user_xfeatures | xfeatures;
+>>
+>> only if !guest_fpu.  In other words, the user_xfeatures of the guest FPU
+>> should be controlled exclusively by KVM_SET_CPUID2.
+> 
+> Just to check, you suggest adding this on patch #2 ?
+> (I am failing to see how would that impact on #1)
 
-diff --git a/x86/cpuid.c b/x86/cpuid.c
-index c3b67d9..aa213d5 100644
---- a/x86/cpuid.c
-+++ b/x86/cpuid.c
-@@ -8,7 +8,7 @@
- 
- #define	MAX_KVM_CPUID_ENTRIES		100
- 
--static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
-+static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid, int cpu_id)
- {
- 	unsigned int signature[3];
- 	unsigned int i;
-@@ -28,6 +28,8 @@ static void filter_cpuid(struct kvm_cpuid2 *kvm_cpuid)
- 			entry->edx = signature[2];
- 			break;
- 		case 1:
-+			entry->ebx &= ~(0xff << 24);
-+			entry->ebx |= cpu_id << 24;
- 			/* Set X86_FEATURE_HYPERVISOR */
- 			if (entry->index == 0)
- 				entry->ecx |= (1 << 31);
-@@ -80,7 +82,7 @@ void kvm_cpu__setup_cpuid(struct kvm_cpu *vcpu)
- 	if (ioctl(vcpu->kvm->sys_fd, KVM_GET_SUPPORTED_CPUID, kvm_cpuid) < 0)
- 		die_perror("KVM_GET_SUPPORTED_CPUID failed");
- 
--	filter_cpuid(kvm_cpuid);
-+	filter_cpuid(kvm_cpuid, vcpu->cpu_id);
- 
- 	if (ioctl(vcpu->vcpu_fd, KVM_SET_CPUID2, kvm_cpuid) < 0)
- 		die_perror("KVM_SET_CPUID2 failed");
--- 
-2.11.0
+In patch 1.  Since KVM_SET_CPUID2 now changes newfps->user_xfeatures, it 
+should be the only place where it's changed, and arch_prctl() should not 
+change it anymore.
+
+Paolo
 
