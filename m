@@ -2,106 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6F494B7FE0
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 06:09:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C7B34B80BE
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 07:33:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245411AbiBPFJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 00:09:13 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48708 "EHLO
+        id S229678AbiBPGeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 01:34:03 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234289AbiBPFJM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 00:09:12 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D02F955C;
-        Tue, 15 Feb 2022 21:09:01 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id q132so1142519pgq.7;
-        Tue, 15 Feb 2022 21:09:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=ed0DvBP+K1f3QF5Ewx4kaCIp7iK5SB0WDtzvGvgXR8Y=;
-        b=Tavmo/STkPM87v5QvmnaIJA9uwaiGi094499+s5845fdSfeqBajvmQp2MnCGYsM/gp
-         6pTatN8kwqiRx8xgMDpt34sdD2tn8PWJ6P6aWd2HB6wxhOqX4IeQmgx5giXhSURu3HNr
-         CgWvDx1McGECUfzE23JM7X+2AXOQ7RWo/eNWYU/8+VEYeMKENQ1iPm5T5s7HCkpZd9cO
-         tuAEhaCW7GPrHBA+jHv79k1GivJwU+46Hu9QvF4EiNgUjSviPDZ933a//HqAfgazd4Z9
-         pm7y+aezZsCjEREXf9gAIJLqa/43UtKHRgI87qBkJVcGOjpyLaOg+sTV99eA1HXy1vJy
-         p39w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=ed0DvBP+K1f3QF5Ewx4kaCIp7iK5SB0WDtzvGvgXR8Y=;
-        b=4y3uAflFV93NETNdUOurf+gTqKy9j4wfDwPteSbqCgYDcdFM7Mt+cjyvbWaQyVyUST
-         QXEtoELb6SgCsn5L/OBBEwRA3tQ1MfSZTbhHcGpDqP4XG06Du76KAqYBTuBuvITfAtRz
-         slEmaf91hLtu+TEvd+f+nspUPWYI5afjb8DrhoZRBuZityjy9+PlCSzkMcu1Cqrw4Qb3
-         0M5TvCmr5u5iYfWe1iESoJZ4pPjDjUCCLKxG8TgF2yXGVno5/5ZNI/Gkp/3uATn1tcHN
-         MIyDLCfRu32ARAFMxb8/r/wMs4esUBJWGd9l074+SE00skf7Uv7wNsVSBIQVRptKiWFx
-         uzsQ==
-X-Gm-Message-State: AOAM532hJt8qE135isvWOTQyZOZuyulVUyZxbn6S9KGlynY2dlhuqmh5
-        8qrLUn7Hbakxh/B9UrIz0TI=
-X-Google-Smtp-Source: ABdhPJzkqudfNEvGNM4ofBoq97r0Ol89SosLVDk+DXzSa8YLZpX3vbRrSSyDLNOUFg9K8+6G4xvThA==
-X-Received: by 2002:a63:9dc3:0:b0:373:5fac:6063 with SMTP id i186-20020a639dc3000000b003735fac6063mr852210pgd.531.1644988140627;
-        Tue, 15 Feb 2022 21:09:00 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 13sm28423111pfx.122.2022.02.15.21.08.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 21:09:00 -0800 (PST)
-Message-ID: <ca93d33d-a25c-ac04-5b4c-b60380cd4e97@gmail.com>
-Date:   Wed, 16 Feb 2022 13:08:49 +0800
+        with ESMTP id S229448AbiBPGeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 01:34:02 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869611F3F17;
+        Tue, 15 Feb 2022 22:33:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644993222; x=1676529222;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xhIOhZqbmXasqsL4PSTwgu2wa99Ybi4SJBWDqbME8bE=;
+  b=I1wTLM0qxsO/BxklghI8gVX5h6l3XbgRtsJ0N/wMlsTdCjHA/PFa4Z2m
+   39gMta86brLFdK4h01VjVAyY2hhtMjL8/0yqD6TnrtVA3ZyauaQRYv8Up
+   tt8TQaYYHH4rexpLXVd7bsEp8DtuLBi482DTFmuUCWvk9B36vQ7qiaBgc
+   RWWCMih41HO2wzR6VXL2mSrBmVsMi2ufcgxLrx424iDT18tRuVgrKTo+1
+   jQYddPyZtEtt+kdIWiJbN/H6wO93Rwud2p8/q8fdDh5SAJQdV/yXfRBOh
+   32ItmAyZO2uY4xBeP+p6yAAB48tDY4lmdsOgXlyA07BjV+VhKkMVTwDtb
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="249366366"
+X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
+   d="scan'208";a="249366366"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 22:29:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
+   d="scan'208";a="681371490"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by fmsmga001.fm.intel.com with ESMTP; 15 Feb 2022 22:29:29 -0800
+Message-ID: <69f26767-66d6-12df-1754-45ee1932d513@linux.intel.com>
+Date:   Wed, 16 Feb 2022 14:28:09 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
- perfmon_event_map[] directly
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Cc:     baolu.lu@linux.intel.com, Stuart Yoder <stuyoder@gmail.com>,
+        rafael@kernel.org, David Airlie <airlied@linux.ie>,
+        linux-pci@vger.kernel.org,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Will Deacon <will@kernel.org>, Ashok Raj <ashok.raj@intel.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v1 3/8] iommu: Extend iommu_at[de]tach_device() for
+ multi-device groups
 Content-Language: en-US
-To:     "Liang, Kan" <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Dave Hansen <dave.hansen@intel.com>
-References: <20220117085307.93030-1-likexu@tencent.com>
- <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
- <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
- <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
- <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
- <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
- <7b5012d8-6ae1-7cde-a381-e82685dfed4f@linux.intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <7b5012d8-6ae1-7cde-a381-e82685dfed4f@linux.intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, Joerg Roedel <joro@8bytes.org>
+References: <20220106022053.2406748-1-baolu.lu@linux.intel.com>
+ <20220106022053.2406748-4-baolu.lu@linux.intel.com>
+ <Ygo/eCRFnraY01WA@8bytes.org> <20220214130313.GV4160@nvidia.com>
+ <Ygppub+Wjq6mQEAX@8bytes.org> <08e90a61-8491-acf1-ab0f-f93f97366d24@arm.com>
+ <20220214154626.GF4160@nvidia.com> <YgtrJVI9wGMFdPWk@8bytes.org>
+ <20220215134744.GO4160@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+In-Reply-To: <20220215134744.GO4160@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/2/2022 11:34 pm, Liang, Kan wrote:
-> For the current perf subsystem, a PMU should be shared among different users via 
-> the multiplexing mechanism if the resource is limited. No one has full control 
-> of a PMU for lifetime. A user can only have the PMU in its given period.
+On 2/15/22 9:47 PM, Jason Gunthorpe via iommu wrote:
+> On Tue, Feb 15, 2022 at 09:58:13AM +0100, Joerg Roedel wrote:
+>> On Mon, Feb 14, 2022 at 11:46:26AM -0400, Jason Gunthorpe wrote:
+>>> On Mon, Feb 14, 2022 at 03:18:31PM +0000, Robin Murphy wrote:
+>>>
+>>>> Arguably, iommu_attach_device() could be renamed something like
+>>>> iommu_attach_group_for_dev(), since that's effectively the semantic that all
+>>>> the existing API users want anyway (even VFIO at the high level - the group
+>>>> is the means for the user to assign their GPU/NIC/whatever device to their
+>>>> process, not the end in itself). That's just a lot more churn.
+>>>
+>>> Right
+>>
+>> Okay, good point. I can live with an iommu_attach_group_for_dev()
+>> interface, it is still better than making iommu_attach_device() silently
+>> operate on whole groups.
+> 
+> I think this is what Lu's series currently does, it just doesn't do
+> the rename churn as Robin noted. Lu, why not add a note like Robin
+> explained to the kdoc so it is clear this api impacts the whole group?
 
-Off-topic, does perf has knobs to disable the default multiplexing mechanism
-for individual tasks and enforce a first-come, first-served policy for same 
-priority ?
+I feel that the debate here is not about API name, but how should
+iommu_attach/detach_device() be implemented and used.
 
-The reported perf data from the multiplexing mechanism may even mislead
-the conclusions of subsequent statistically based performance analysis.
+It seems everyone agrees that for device assignment (where the I/O
+address is owned by the user-space application), the iommu_group-based
+APIs should always be used. Otherwise, the isolation and protection are
+not guaranteed.
+
+For kernel DMA (where the I/O address space is owned by the kernel
+drivers), the device driver oriented interface should meet below
+expectations:
+
+  - the concept of iommu_group should be transparent to the device
+    drivers;
+  - but internally, iommu core only allows a single domain to attach to
+    a group.
+
+If the device driver uses default domain, the above expectations are
+naturally met. But when the driver wants to attach its own domain, the
+problem arises.
+
+This series tries to use the DMA ownership mechanism to solve this. The
+devices drivers explicitly declare that
+
+  - I know that the device I am driving shares the iommu_group with
+    others;
+  - Other device drivers with the same awareness can only be bound to the
+    devices in the shared group;
+  - We can sync with each other so that only a shared domain could be
+    attached to the devices in the group.
+
+Another proposal (as suggested by Joerg) is to introduce the concept of
+"sub-group". An iommu group could have one or multiple sub-groups with
+non-aliased devices sitting in different sub-groups and use different
+domains.
+
+Above are what I get so far. If there's any misunderstanding, please
+help to correct.
+
+Best regards,
+baolu
