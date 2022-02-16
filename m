@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38D6B4B8194
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 08:31:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46C104B81B6
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 08:42:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbiBPHbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 02:31:15 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:46520 "EHLO
+        id S230237AbiBPHha (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 02:37:30 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:45550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230074AbiBPHbO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 02:31:14 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBF2D0B73;
-        Tue, 15 Feb 2022 23:31:02 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id e17so1473637pfv.5;
-        Tue, 15 Feb 2022 23:31:02 -0800 (PST)
+        with ESMTP id S230230AbiBPHh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 02:37:28 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCA8172245;
+        Tue, 15 Feb 2022 23:37:03 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id y5so1487142pfe.4;
+        Tue, 15 Feb 2022 23:37:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=QO04mi9P51FCKMM2/J+pZrM97cQ38QT9y3ElCPNBoIU=;
-        b=Krtl4kWCMaa1gpG+fVCvZCIctsIF8KiO6YsiP/PZ4FfvuqFNpp2gfhbHXS2+D1vmf0
-         Jyfoa0AGYzOFBhdyi/aEgJ7ac7WR6LVYEkeNCbyuheUKFJGHNf7qqRZ9ytqz5AW0esYb
-         tnqp2P1TFXL1u6sg+sMmx0JOnsJCm5mCr43mnYb1/zmSw5Xs9xD2EtInyAJkubOQqo1z
-         yqLiuSC4ZwVMh3LIK62E2BOBWmPcvb+RSm8B4wOo29ww5j7P8ktLyQNDYkT4fmjCQRFb
-         9n/yDtwzF4gumykY2dOSO+Z4j5DkWIXlir6mn2t606XK3KSahrGE/PMTxYChsAhLCkG2
-         K5XQ==
+        bh=f/G+kYI2OuePvFBo1DtcigDSjDvYkrk+4RWm2cD8DXA=;
+        b=OxkO/SRkZ6TDPnVy4Ui8dfo/jiWtfA7IxZbePmC2i3gBL15DNDAhlkCctCqfaCkY4P
+         kwal+kjAf54UxJ1H/7+gMgN0M7SUHkmiJFrMLINSfBe/YYB5ba+1yFTTtRw5WUh6m9kO
+         8fgDmHeOcplQgV8VyalghErNS277EIMl8mTJaD6LHpXxgmXu6Cs72cC4lABiI9Q6dIK7
+         mYTmvHU+A94sIUwYlccLYhRjaKxLdc1hkiprtVe0XM+SxxNT0qGMuCjCBsuIf+tgVMZe
+         P5QQBmQsGbkaQ8Z0DpIX6z3By+GfMYLmb4a1udp87Sb+PrD/Np88SXsup87NtZMkL4qP
+         v82w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=QO04mi9P51FCKMM2/J+pZrM97cQ38QT9y3ElCPNBoIU=;
-        b=5vtEEW/BaeEOZGLqClNJyCpcbURWOgv+hfUtSGHf8LngsPQSkPp6tIoP7MCV/McNn3
-         6x9Qs/KpvL7opJ80vgZg/byGeWaRbhGMCrfFBBNVVLG/H287di0b2xHD3rFVvVTfdeXH
-         jHUeFwFTcMn9ghFphf+sHjfQXL/gT52+4ybWkg81CjkoMiy5QRT1FNTW6sUg5/IUyA9S
-         mQGwjmFRIxbqxGEB3FRgO2BLbWvKVC9YXJDHL9Of9GtzinMn18s1waeJaApsejKiwtKb
-         alB+YNepSDb0dC9bykA8eycYUdHiUC3vvG89AUwpWu8q/cLKLEKpDZDHVkKu7TBD7j7E
-         Nzpg==
-X-Gm-Message-State: AOAM532IHeNgjzet2Q+LVtF0+2WYS33z0QiklOb/2+yujfb+AhT9+fEJ
-        c3Gm0lOrWtma1f8b4vG2XnI=
-X-Google-Smtp-Source: ABdhPJwIRsEcqXMKzVOyLThBX92p4pM7DgDFeAIIYkSKAJNoLimBwAoIMmosMRyIkby+VsH/8c33kQ==
-X-Received: by 2002:a05:6a00:26e0:b0:4e1:7131:de2b with SMTP id p32-20020a056a0026e000b004e17131de2bmr1828821pfw.20.1644996661875;
-        Tue, 15 Feb 2022 23:31:01 -0800 (PST)
+        bh=f/G+kYI2OuePvFBo1DtcigDSjDvYkrk+4RWm2cD8DXA=;
+        b=paUd87LxSauiGmzuslxz1+UFjI9998WIuNjhKH3kjQQipZRBopamwCVm0RJs/lyVo3
+         YuWujvCUSUuLTlYGHKkijqhrlTZg6NLOcFnHSPgTIJz6qpVCqsYMEVso1Died7xIuFys
+         xKijYeXg7MiFG2IeVBxjVWGR4Y2lxnD2w4QMMIP6CH/C8LrjQ+SYfuaY6Gi7edhct7v3
+         1oYbgOeEYjlaTDO5l3jfQ23bxYdZjpmhgx5P1bm5mVXL17g0OKzG4HovqfC1UGPEhVuy
+         9Ow/JRN4iZWcJHgaWT6yyzHJMjVj+EJLJx5mJd+P+K/4dfz+CP8Sg6Y4sl7RY/tvo/aP
+         yJ4g==
+X-Gm-Message-State: AOAM5310PYKhKSrJc03PoZ/qCpw0k9rzeFdRk1AeV6ASACGQhI50nz1G
+        eTZq0bXEU7pcFCbbSwIkdCY=
+X-Google-Smtp-Source: ABdhPJz6zV5nextbckSU6TqcYcbY2yenjIeRUfN9K9qVjjDrKvT+TnZvo4fbLx6HM5u9QuUsdTIA1A==
+X-Received: by 2002:a62:63c2:0:b0:4e1:604:f07 with SMTP id x185-20020a6263c2000000b004e106040f07mr1691503pfb.56.1644997012214;
+        Tue, 15 Feb 2022 23:36:52 -0800 (PST)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id c11sm43169808pfv.76.2022.02.15.23.30.57
+        by smtp.gmail.com with ESMTPSA id my18sm19889970pjb.57.2022.02.15.23.36.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 23:31:01 -0800 (PST)
-Message-ID: <ceb56bc2-e154-2e37-863c-b075ee174d5e@gmail.com>
-Date:   Wed, 16 Feb 2022 15:30:50 +0800
+        Tue, 15 Feb 2022 23:36:51 -0800 (PST)
+Message-ID: <31cd6e81-fd74-daa1-8518-8a8dfc6174d0@gmail.com>
+Date:   Wed, 16 Feb 2022 15:36:42 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.0
 Subject: Re: [PATCH kvm/queue v2 2/3] perf: x86/core: Add interface to query
  perfmon_event_map[] directly
 Content-Language: en-US
-To:     "Liang, Kan" <kan.liang@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>
+To:     Jim Mattson <jmattson@google.com>,
+        "Liang, Kan" <kan.liang@linux.intel.com>
 Cc:     David Dunn <daviddunn@google.com>,
         Dave Hansen <dave.hansen@intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -67,13 +67,9 @@ Cc:     David Dunn <daviddunn@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Stephane Eranian <eranian@google.com>
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Stephane Eranian <eranian@google.com>
 References: <20220117085307.93030-1-likexu@tencent.com>
- <20220117085307.93030-3-likexu@tencent.com>
- <20220202144308.GB20638@worktop.programming.kicks-ass.net>
- <CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com>
- <YgO/3usazae9rCEh@hirez.programming.kicks-ass.net>
- <69c0fc41-a5bd-fea9-43f6-4724368baf66@intel.com>
  <CALMp9eS=1U7T39L-vL_cTXTNN2Li8epjtAPoP_+Hwefe9d+teQ@mail.gmail.com>
  <67a731dd-53ba-0eb8-377f-9707e5c9be1b@intel.com>
  <CABOYuvbPL0DeEgV4gsC+v786xfBAo3T6+7XQr7cVVzbaoFoEAg@mail.gmail.com>
@@ -82,11 +78,18 @@ References: <20220117085307.93030-1-likexu@tencent.com>
  <e06db1a5-1b67-28ac-ee4c-34ece5857b1f@linux.intel.com>
  <CALMp9eSjDro169JjTXyCZn=Rf3PT0uHhdNXEifiXGYQK-Zn8LA@mail.gmail.com>
  <d86ba87b-d98a-53a0-b2cd-5bf77b97b592@linux.intel.com>
+ <CABOYuvZ9SZAWeRkrhhhpMM4XwzMzXv9A1WDpc6z8SUBquf0SFQ@mail.gmail.com>
+ <6afcec02-fb44-7b72-e527-6517a94855d4@linux.intel.com>
+ <CALMp9eQ79Cnh1aqNGLR8n5MQuHTwuf=DMjJ2cTb9uXu94GGhEA@mail.gmail.com>
+ <2180ea93-5f05-b1c1-7253-e3707da29f8c@linux.intel.com>
+ <CALMp9eQiaXtF3S0QZ=2_SWavFnv6zFHqf_zFXBrxXb9pVYh0nQ@mail.gmail.com>
+ <8d9149b5-e56f-b397-1527-9f21a26ad95b@linux.intel.com>
+ <CALMp9eTqNyG-ke1Aq72hn0CVXER63SgVPamzXria76PmqiZvJQ@mail.gmail.com>
 From:   Like Xu <like.xu.linux@gmail.com>
 Organization: Tencent
-In-Reply-To: <d86ba87b-d98a-53a0-b2cd-5bf77b97b592@linux.intel.com>
+In-Reply-To: <CALMp9eTqNyG-ke1Aq72hn0CVXER63SgVPamzXria76PmqiZvJQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -97,244 +100,243 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/2/2022 3:46 am, Liang, Kan wrote:
-> 
-> 
-> On 2/10/2022 2:16 PM, Jim Mattson wrote:
->> On Thu, Feb 10, 2022 at 10:30 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
->>>
->>>
->>>
->>> On 2/10/2022 11:34 AM, Jim Mattson wrote:
->>>> On Thu, Feb 10, 2022 at 7:34 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
->>>>>
->>>>>
->>>>>
->>>>> On 2/9/2022 2:24 PM, David Dunn wrote:
->>>>>> Dave,
->>>>>>
->>>>>> In my opinion, the right policy depends on what the host owner and
->>>>>> guest owner are trying to achieve.
->>>>>>
->>>>>> If the PMU is being used to locate places where performance could be
->>>>>> improved in the system, there are two sub scenarios:
->>>>>>       - The host and guest are owned by same entity that is optimizing
->>>>>> overall system.  In this case, the guest doesn't need PMU access and
->>>>>> better information is provided by profiling the entire system from the
->>>>>> host.
->>>>>>       - The host and guest are owned by different entities.  In this
->>>>>> case, profiling from the host can identify perf issues in the guest.
->>>>>> But what action can be taken?  The host entity must communicate issues
->>>>>> back to the guest owner through some sort of out-of-band information
->>>>>> channel.  On the other hand, preempting the host PMU to give the guest
->>>>>> a fully functional PMU serves this use case well.
->>>>>>
->>>>>> TDX and SGX (outside of debug mode) strongly assume different
->>>>>> entities.  And Intel is doing this to reduce insight of the host into
->>>>>> guest operations.  So in my opinion, preemption makes sense.
->>>>>>
->>>>>> There are also scenarios where the host owner is trying to identify
->>>>>> systemwide impacts of guest actions.  For example, detecting memory
->>>>>> bandwidth consumption or split locks.  In this case, host control
->>>>>> without preemption is necessary.
->>>>>>
->>>>>> To address these various scenarios, it seems like the host needs to be
->>>>>> able to have policy control on whether it is willing to have the PMU
->>>>>> preempted by the guest.
->>>>>>
->>>>>> But I don't see what scenario is well served by the current situation
->>>>>> in KVM.  Currently the guest will either be told it has no PMU (which
->>>>>> is fine) or that it has full control of a PMU.  If the guest is told
->>>>>> it has full control of the PMU, it actually doesn't.  But instead of
->>>>>> losing counters on well defined events (from the guest perspective),
->>>>>> they simply stop counting depending on what the host is doing with the
->>>>>> PMU.
->>>>>
->>>>> For the current perf subsystem, a PMU should be shared among different
->>>>> users via the multiplexing mechanism if the resource is limited. No one
->>>>> has full control of a PMU for lifetime. A user can only have the PMU in
->>>>> its given period. I think the user can understand how long it runs via
->>>>> total_time_enabled and total_time_running.
->>>>
->>>> For most clients, yes. For kvm, no. KVM currently tosses
->>>> total_time_enabled and total_time_running in the bitbucket. It could
->>>> extrapolate, but that would result in loss of precision. Some guest
->>>> uses of the PMU would not be able to cope (e.g.
->>>> https://github.com/rr-debugger/rr).
->>>>
->>>>> For a guest, it should rely on the host to tell whether the PMU resource
->>>>> is available. But unfortunately, I don't think we have such a
->>>>> notification mechanism in KVM. The guest has the wrong impression that
->>>>> the guest can have full control of the PMU.
->>>>
->>>> That is the only impression that the architectural specification
->>>> allows the guest to have. On Intel, we can mask off individual fixed
->>>> counters, and we can reduce the number of GP counters, but AMD offers
->>>> us no such freedom. Whatever resources we advertise to the guest must
-
-The future may look a little better, with more and more server
-hardware being designed with virtualization requirement in mind.
-
->>>> be available for its use whenever it wants. Otherwise, PMU
->>>> virtualization is simply broken.
-
-YES for "simply broken" but no for "available whenever it wants"
-If there is no host (core) pmu user, the guest pmu is fully and architecturally 
-available.
-
-If there is no perf agent on host (like watchdog),
-current guest pmu is working fine except for some emulated instructions.
-
->>>>
->>>>> In my opinion, we should add the notification mechanism in KVM. When the
->>>>> PMU resource is limited, the guest can know whether it's multiplexing or
->>>>> can choose to reschedule the event.
-
-Eventually, we moved the topic to an open discussion and I am relieved.
-
-The total_time_enabled and total_time_running of the perf_events
-created by KVM are quite unreliable and invisible to the guest, and
-we may need to clearly define what they reallt mean, for example
-when profiling the SGX applications.
-
-The elephant in the vPMU room at the moment is that the guest has
-no way of knowing if the physical pmc on the back end of the vPMC
-is being multiplexed, even though the KVM is able to know.
-
-One way to mitigate this is to allow perf to not apply a multiplexing
-policy (sys knob), for example with a first-come, first-served policy.
-In this case, each user of the same priority of PMC is fair, and KVM
-goes first to request hardware when the guest uses vPMC, or requests
-re-sched to another pCPU, and only fails in the worst case.
-
->>>>
->>>> That sounds like a paravirtual perf mechanism, rather than PMU
->>>> virtualization. Are you suggesting that we not try to virtualize the
->>>> PMU? Unfortunately, PMU virtualization is what we have customers
->>>> clamoring for. No one is interested in a paravirtual perf mechanism.
->>>> For example, when will VTune in the guest know how to use your
->>>> proposed paravirtual interface?
->>>
->>> OK. If KVM cannot notify the guest, maybe guest can query the usage of
->>> counters before using a counter. There is a IA32_PERF_GLOBAL_INUSE MSR
->>> introduced with Arch perfmon v4. The MSR provides an "InUse" bit for
->>> each counters. But it cannot guarantee that the counter can always be
->>> owned by the guest unless the host treats the guest as a super-user and
->>> agrees to not touch its counter. This should only works for the Intel
->>> platforms.
+On 15/2/2022 6:55 am, Jim Mattson wrote:
+> On Mon, Feb 14, 2022 at 1:55 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
 >>
->> Simple question: Do all existing guests (Windows and Linux are my
->> primary interest) query that MSR today? If not, then this proposal is
->> DOA.
 >>
-> 
-> No, we don't, at least for Linux. Because the host own everything. It doesn't 
-> need the MSR to tell which one is in use. We track it in an SW way.
-
-Indeed, "the host own everything", which is also the
-starting point for the host perf when it received the changes.
-
-> 
-> For the new request from the guest to own a counter, I guess maybe it is worth 
-> implementing it. But yes, the existing/legacy guest never check the MSR.
-
-We probably need an X86 generic notification solution for the worst case.
-
-> 
-> 
->>>>
->>>>> But seems the notification mechanism may not work for TDX case?
-
-Shared memory can be used for communication between the host and
-the guest, if it's allowed by the TDX guest.
-
->>>>>>
->>>>>> On the other hand, if we flip it around the semantics are more clear.
->>>>>> A guest will be told it has no PMU (which is fine) or that it has full
->>>>>> control of the PMU.  If the guest is told that it has full control of
->>>>>> the PMU, it does.  And the host (which is the thing that granted the
->>>>>> full PMU to the guest) knows that events inside the guest are not
->>>>>> being measured.  This results in all entities seeing something that
->>>>>> can be reasoned about from their perspective.
->>>>>>
->>>>>
->>>>> I assume that this is for the TDX case (where the notification mechanism
->>>>>     doesn't work). The host still control all the PMU resources. The TDX
->>>>> guest is treated as a super-user who can 'own' a PMU. The admin in the
->>>>> host can configure/change the owned PMUs of the TDX. Personally, I think
->>>>> it makes sense. But please keep in mind that the counters are not
->>>>> identical. There are some special events that can only run on a specific
->>>>> counter. If the special counter is assigned to TDX, other entities can
->>>>> never run some events. We should let other entities know if it happens.
->>>>> Or we should never let non-host entities own the special counter.
->>>>
->>>> Right; the counters are not fungible. Ideally, when the guest requests
->>>> a particular counter, that is the counter it gets. If it is given a
->>>> different counter, the counter it is given must provide the same
->>>> behavior as the requested counter for the event in question.
->>>
->>> Ideally, Yes, but sometimes KVM/host may not know whether they can use
->>> another counter to replace the requested counter, because KVM/host
->>> cannot retrieve the event constraint information from guest.
 >>
->> In that case, don't do it. When the guest asks for a specific counter,
->> give the guest that counter. This isn't rocket science.
->>
-> 
-> Sounds like the guest can own everything if they want. Maybe it makes sense from 
-> the virtualization's perspective. But it sounds too aggressive to me. :)
-
-Until Perterz changes his will, upstream may not see this kind of change.
-(I actually used to like this design too).
-
-> 
-> Thanks,
-> Kan
-> 
-> 
->>> For example, we have Precise Distribution (PDist) feature enabled only
->>> for the GP counter 0 on SPR. Perf uses the precise_level 3 (a SW
->>> variable) to indicate the feature. For the KVM/host, they never know
->>> whether the guest apply the PDist feature.
-
-Yes, just check what we did on PEBS, which is Acked-by PeterZ.
-
->>>
->>> I have a patch that forces the perf scheduler starts from the regular
->>> counters, which may mitigates the issue, but cannot fix it. (I will post
->>> the patch separately.)
->>>
->>> Or we should never let the guest own the special counters. Although the
->>> guest has to lose some special events, I guess the host may more likely
->>> be willing to let the guest own a regular counter.
-
-AMD seems to do this, but it's just another disable-pmu compromise.
-
->>>
->>>
->>> Thanks,
->>> Kan
->>>
+>> On 2/12/2022 6:31 PM, Jim Mattson wrote:
+>>> On Fri, Feb 11, 2022 at 1:47 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
 >>>>
->>>>>
->>>>> Thanks,
->>>>> Kan
->>>>>
->>>>>> Thanks,
+>>>>
+>>>>
+>>>> On 2/11/2022 1:08 PM, Jim Mattson wrote:
+>>>>> On Fri, Feb 11, 2022 at 6:11 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
 >>>>>>
->>>>>> Dave Dunn
 >>>>>>
->>>>>> On Wed, Feb 9, 2022 at 10:57 AM Dave Hansen <dave.hansen@intel.com> wrote:
 >>>>>>
->>>>>>>> I was referring to gaps in the collection of data that the host perf
->>>>>>>> subsystem doesn't know about if ATTRIBUTES.PERFMON is set for a TDX
->>>>>>>> guest. This can potentially be a problem if someone is trying to
->>>>>>>> measure events per unit of time.
+>>>>>> On 2/10/2022 2:55 PM, David Dunn wrote:
+>>>>>>> Kan,
 >>>>>>>
->>>>>>> Ahh, that makes sense.
+>>>>>>> On Thu, Feb 10, 2022 at 11:46 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
 >>>>>>>
->>>>>>> Does SGX cause problem for these people?  It can create some of the same
->>>>>>> collection gaps:
+>>>>>>>> No, we don't, at least for Linux. Because the host own everything. It
+>>>>>>>> doesn't need the MSR to tell which one is in use. We track it in an SW way.
+>>>>>>>>
+>>>>>>>> For the new request from the guest to own a counter, I guess maybe it is
+>>>>>>>> worth implementing it. But yes, the existing/legacy guest never check
+>>>>>>>> the MSR.
 >>>>>>>
->>>>>>>            performance monitoring activities are suppressed when entering
->>>>>>>            an opt-out (of performance monitoring) enclave.
+>>>>>>> This is the expectation of all software that uses the PMU in every
+>>>>>>> guest.  It isn't just the Linux perf system.
+
+Hardware resources will always be limited (the good news is that
+the number of counters will increase in the future), and when we have
+a common need for the same hardware, we should prioritize overall
+fairness over a GUEST-first strategy.
+
+>>>>>>>
+>>>>>>> The KVM vPMU model we have today results in the PMU utilizing software
+>>>>>>> simply not working properly in a guest.  The only case that can
+>>>>>>> consistently "work" today is not giving the guest a PMU at all.
+
+Actually I'd be more interested to check the exact "not working properly" usage.
+
+>>>>>>>
+>>>>>>> And that's why you are hearing requests to gift the entire PMU to the
+>>>>>>> guest while it is running. All existing PMU software knows about the
+>>>>>>> various constraints on exactly how each MSR must be used to get sane
+>>>>>>> data.  And by gifting the entire PMU it allows that software to work
+>>>>>>> properly.  But that has to be controlled by policy at host level such
+>>>>>>> that the owner of the host knows that they are not going to have PMU
+>>>>>>> visibility into guests that have control of PMU.
+
+Don't forget that the perf subsystem manages uncore-pmu and
+other profiling resources as well. Making host perf visible to some
+resources and invisible to others would require big effort and it
+would be very unmaintainable as the pmu hardware resources
+become more and more numerous.
+
+IMO, there is no future in having host perf get special for KVM.
+
+>>>>>>>
+>>>>>>
+>>>>>> I think here is how a guest event works today with KVM and perf subsystem.
+>>>>>>         - Guest create an event A
+>>>>>>         - The guest kernel assigns a guest counter M to event A, and config
+>>>>>> the related MSRs of the guest counter M.
+>>>>>>         - KVM intercepts the MSR access and create a host event B. (The
+>>>>>> host event B is based on the settings of the guest counter M. As I said,
+>>>>>> at least for Linux, some SW config impacts the counter assignment. KVM
+>>>>>> never knows it. Event B can only be a similar event to A.)
+>>>>>>         - Linux perf subsystem assigns a physical counter N to a host event
+>>>>>> B according to event B's constraint. (N may not be the same as M,
+>>>>>> because A and B may have different event constraints)
+
+There is also the priority availability of previous scheduling policies.
+This cross-mapping is relatively common and normal in the real world.
+
+>>>>>>
+>>>>>> As you can see, even the entire PMU is given to the guest, we still
+>>>>>> cannot guarantee that the physical counter M can be assigned to the
+>>>>>> guest event A.
+>>>>>
+>>>>> All we know about the guest is that it has programmed virtual counter
+>>>>> M. It seems obvious to me that we can satisfy that request by giving
+>>>>> it physical counter M. If, for whatever reason, we give it physical
+>>>>> counter N isntead, and M and N are not completely fungible, then we
+>>>>> have failed.
+
+Only host perf has the global perspective to derive interchangeability,
+which is a reasonable and flexible design.
+
+>>>>>
+>>>>>> How to fix it? The only thing I can imagine is "passthrough". Let KVM
+>>>>>> directly assign the counter M to guest. So, to me, this policy sounds
+>>>>>> like let KVM replace the perf to control the whole PMU resources, and we
+>>>>>> will handover them to our guest then. Is it what we want?
+
+I would prefer to see more code on this idea, as I am very unsure
+of my code practice based on the current hardware interface, and
+the TDX PMU enablement work might be a good starting point.
+
+>>>>>
+>>>>> We want PMU virtualization to work. There are at least two ways of doing that:
+>>>>> 1) Cede the entire PMU to the guest while it's running.
+>>>>
+>>>> So the guest will take over the control of the entire PMUs while it's
+>>>> running. I know someone wants to do system-wide monitoring. This case
+>>>> will be failed.
+
+I think from the vm-entry/exit level of granularity, we can do it
+even if someone wants to do system-wide monitoring, and the
+hard part is the sharing, synchronization and filtering of perf data.
+
+>>>
+>>> We have system-wide monitoring for fleet efficiency, but since there's
+>>> nothing we can do about the efficiency of the guest (and those cycles
+>>> are paid for by the customer, anyway), I don't think our efficiency
+>>> experts lose any important insights if guest cycles are a blind spot.
+
+Visibility of (non-tdx/sev) guest performance data helps with global optimal
+solutions, such as memory migration and malicious attack detection, and
+there are too many other PMU use cases that ignore the vm-entry boundary.
+
+>>
+>> Others, e.g., NMI watchdog, also occupy a performance counter. I think
+>> the NMI watchdog is enabled by default at least for the current Linux
+>> kernel. You have to disable all such cases in the host when the guest is
+>> running.
+> 
+> It doesn't actually make any sense to run the NMI watchdog while in
+> the guest, does it?
+
+I wouldn't think so, AFAI a lot of guest vendor images run the NMI watchdog.
+
+> 
+>>>
+>>>> I'm not sure whether you can fully trust the guest. If malware runs in
+>>>> the guest, I don't know whether it will harm the entire system. I'm not
+>>>> a security expert, but it sounds dangerous.
+>>>> Hope the administrators know what they are doing when choosing this policy.
+
+We always consider the security attack surface when choosing which
+pmu features can be virtualized. Until someone gives us a negative answer,
+then we quietly and urgently fix it. We already have the module parameter
+for vPMU, and the per-vm parameters are in the air.
+
+>>>
+>>> Virtual machines are inherently dangerous. :-)
+
+Without a specific context, any hardware or software stack is inherently dangerous.
+
+>>>
+>>> Despite our concerns about PMU side-channels, Intel is constantly
+>>> reminding us that no such attacks are yet known. We would probably
+>>> restrict some events to guests that occupy an entire socket, just to
+>>> be safe.
+
+The socket level performance data should not be available for current guests.
+
+>>>
+>>> Note that on the flip side, TDX and SEV are all about catering to
+>>> guests that don't trust the host. Those customers probably don't want
+>>> the host to be able to use the PMU to snoop on guest activity.
+
+Of course, for non-tdx/sev guests, we (upstream) should not prevent the PMU
+from being used to snoop on guest activity. How it is used is a matter for
+the administrators, but usability or feasibility is a technical consideration.
+
+>>>
+>>>>> 2) Introduce a new "ultimate" priority level in the host perf
+>>>>> subsystem. Only KVM can request events at the ultimate priority, and
+>>>>> these requests supersede any other requests.
+>>>>
+>>>> The "ultimate" priority level doesn't help in the above case. The
+>>>> counter M may not bring the precise which guest requests. I remember you
+>>>> called it "broken".
+>>>
+>>> Ideally, ultimate priority also comes with the ability to request
+>>> specific counters.
+
+We need to relay the vcpu's specific needs for counters of different
+capabilities to the host perf so that it can make the right decisions.
+
+>>>
+>>>> KVM can fails the case, but KVM cannot notify the guest. The guest still
+>>>> see wrong result.
+
+Indeed, the pain point is "KVM cannot notify the guest.", or we need to
+remove all the "reasons for notification" one by one.
+
+>>>>
+>>>>>
+>>>>> Other solutions are welcome.
+>>>>
+>>>> I don't have a perfect solution to achieve all your requirements. Based
+>>>> on my understanding, the guest has to be compromised by either
+>>>> tolerating some errors or dropping some features (e.g., some special
+>>>> events). With that, we may consider the above "ultimate" priority level
+>>>> policy. The default policy would be the same as the current
+>>>> implementation, where the host perf treats all the users, including the
+>>>> guest, equally. The administrators can set the "ultimate" priority level
+>>>> policy, which may let the KVM/guest pin/own some regular counters via
+>>>> perf subsystem. That's just my personal opinion for your reference.
+>>>
+>>> I disagree. The guest does not have to be compromised. For a proof of
+>>> concept, see VMware ESXi. Probably Microsoft Hyper-V as well, though I
+>>> haven't checked.
+>>
+>> As far as I know, VMware ESXi has its own VMkernel, which can owns the
+>> entire HW PMUs.  The KVM is part of the Linux kernel. The HW PMUs should
+>> be shared among components/users. I think the cases are different.
+> 
+> Architecturally, ESXi is not very different from Linux. The VMkernel
+> is a posix-compliant kernel, and VMware's "vmm" is comparable to kvm.
+> 
+>> Also, from what I searched on the VMware website, they still encounter
+>> the case that a guest VM may not get a performance monitoring counter.
+>> It looks like their solution is to let guest OS check the availability
+>> of the counter, which is similar to the solution I mentioned (Use
+>> GLOBAL_INUSE MSR).
+>>
+>> "If an ESXi host's BIOS uses a performance counter or if Fault Tolerance
+>> is enabled, some virtual performance counters might not be available for
+>> the virtual machine to use."
+> 
+> I'm perfectly happy to give up PMCs on Linux under those same conditions.
+> 
+>> https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.vm_admin.doc/GUID-F920A3C7-3B42-4E78-8EA7-961E49AF479D.html
+>>
+>> "In general, if a physical CPU PMC is in use, the corresponding virtual
+>> CPU PMC is not functional and is unavailable for use by the guest. Guest
+>> OS software detects unavailable general purpose PMCs by checking for a
+>> non-zero event select MSR value when a virtual machine powers on."
+>>
+>> https://kb.vmware.com/s/article/2030221
+>>
+> Linux, at least, doesn't do that. Maybe Windows does.
+> 
+>> Thanks,
+>> Kan
+>>
