@@ -2,62 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 410DD4B7EA6
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 04:49:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 981824B7EDD
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 04:50:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344161AbiBPDQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Feb 2022 22:16:47 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59104 "EHLO
+        id S1344183AbiBPDR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Feb 2022 22:17:57 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244696AbiBPDQp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Feb 2022 22:16:45 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCFCDA185;
-        Tue, 15 Feb 2022 19:16:33 -0800 (PST)
+        with ESMTP id S237453AbiBPDRz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Feb 2022 22:17:55 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DCFF94FE;
+        Tue, 15 Feb 2022 19:17:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644981393; x=1676517393;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=CXIRvtzJsiu2gcoHHl+uHSkuWDGrmc7HzH3aUUMVke4=;
-  b=B1KzLwfZuCE8wqQWezao27+0XWS8eCZSUvLe15iXDwp0gaUp1uhMtx6x
-   gjRKcgwJXwYKHAsoKO9DsQWKUbP0W1LR+kIao3vJiCNBHmGVRp+pX1hl7
-   1Z1n0d4z+1gavQpPc30O9M5SLsazni8xXixbQMAXtY9rab1h5rGV4wBcQ
-   13ZjaOs1Q5IMHhT625rFomeSvrmxXsNc/vRSvg8oa01zfONss97O4Ph01
-   XYddUtlZmHykcjs8g0pZjD3SdA8Yoel7u9HwXGRHotrJ018K26ZrgeDpx
-   mms9sPN7m2quLh9gAAulpNy5Im/HSTLAyYU9s6HQWkYlw44T7kKTsrRHW
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="249344574"
+  t=1644981460; x=1676517460;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=iHljoFHe5KrjjeCCFHLiF0DZrB1WVO55PLmk4gFiWeY=;
+  b=UlCbsGRfJ7neO2WyipWELJdR3itVEwz2b84aeIUQvDdMD7OVtf3cWqrQ
+   HjOCBNPXlRH4csryv4KbhvQgiqyiLNPsxzTRHO3DByZhlZ+vACqatjK0M
+   6ireZxNvKO+mou656oQhATqdvptNL66kZr6SkHSzkhBHZlbZOl0kUBej4
+   fGJEf0zCNpR2T5X0Yd3U2NBpF9bvULAXfXdDTnDyg5+V4kKTU+vN/BHeS
+   4GrUfEjQYaVUw5Eh19aAFDnWXtw6+d0FINfaOTY3+nbBGmhqSweeMAcSm
+   YMNO3uke4eCGmnt1ov6BRNSwKXQc/t44tLWKjh/K/oYyZHXl5SN/dx/Aw
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="230476944"
 X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="249344574"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 19:16:31 -0800
+   d="scan'208";a="230476944"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 19:17:40 -0800
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="773798338"
-Received: from hyperv-sh4.sh.intel.com ([10.239.48.22])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 19:16:21 -0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     seanjc@google.com, maz@kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, kevin.tian@intel.com, tglx@linutronix.de
-Cc:     Chao Gao <chao.gao@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 6/6] KVM: Do compatibility checks on hotplugged CPUs
-Date:   Wed, 16 Feb 2022 11:15:21 +0800
-Message-Id: <20220216031528.92558-7-chao.gao@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220216031528.92558-1-chao.gao@intel.com>
-References: <20220216031528.92558-1-chao.gao@intel.com>
+   d="scan'208";a="544656499"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by orsmga008.jf.intel.com with ESMTP; 15 Feb 2022 19:17:39 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 15 Feb 2022 19:17:39 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20 via Frontend Transport; Tue, 15 Feb 2022 19:17:39 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.20; Tue, 15 Feb 2022 19:17:39 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hj3jOnUgKzhwYOPP4x6x85T0ZSly5Zds5tfbZAvaKmK2w9lAOUiWHsFoTopiRsJNntXTQnQ9Is8A37XUNzcNK3uvSnqciQmr6oPbkSaSqh18d96hvNesHsgs2+HTskHNornI3sEydKFonaadV69kXTu2+122SA88Et+gegbrYz0SAXglN4BkFijQ0e842VQYtVeYTjvXpkUwW0NqDpUg9J05ZJLfLu8ShOXSVJo7kQwg1Iz8LgFcbsnuNYi7Ztg11s99pGRb28OA22MNPFi2I4CDlOEHj36VRWxAL/jBkoFNW3rjAuC6w1lTK5m2FZ1+o9B01IuArnd2dk8ptcyH4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NPPrMPxKNDUHNxCGPvYBYmzfjjbBONApOT4vz0VI7V4=;
+ b=Q//3bJG7UMv/8qOsbBa7tVuSOQct3wJuVlzght1Tmp+1y8XMfonLpEsuNj6iZAyuUwY+d63ttk95R5TILiIou/Xvbdrwujts9Lm1+3zxjGz1l/1FJqSt+l3SAcygYxZntf8WjiRoOMjq/VGXhNc/4ZxLNvc11uXrWMw83u+d2+euiEkRYNo8GdayKLG1lCkhHziv6vdlh26DzcafpVxFXV2efqLJPOodPad3bAAcI6RNObukzxuRBIfUxqgpyjpzegeYuJa4Dr30O1Tjwd/c7aIt9AyHsvYVkyqkA5StfUh/RmoMZ4ouz4u46lRp6m0OPtYFv/a54vtVsrR+g3vPRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM6PR11MB3372.namprd11.prod.outlook.com (2603:10b6:5:8::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4975.18; Wed, 16 Feb 2022 03:17:37 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::f514:7aae:315b:4d8d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::f514:7aae:315b:4d8d%3]) with mapi id 15.20.4995.016; Wed, 16 Feb 2022
+ 03:17:36 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: RE: [PATCH V7 mlx5-next 08/15] vfio: Define device migration protocol
+ v2
+Thread-Topic: [PATCH V7 mlx5-next 08/15] vfio: Define device migration
+ protocol v2
+Thread-Index: AQHYHEd8WrQ75CuCwEmQ+4nXbJWyQ6yKWZwAgAAploCACfA7AIAAX2SAgAC4ipA=
+Date:   Wed, 16 Feb 2022 03:17:36 +0000
+Message-ID: <BN9PR11MB527610A23D8271F45F72C1728C359@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+ <20220207172216.206415-9-yishaih@nvidia.com>
+ <20220208170754.01d05a1d.alex.williamson@redhat.com>
+ <20220209023645.GN4160@nvidia.com>
+ <BN9PR11MB5276BD03F292902A803FA0E58C349@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220215160419.GC1046125@nvidia.com>
+In-Reply-To: <20220215160419.GC1046125@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a24e10cd-f80d-4cb6-228b-08d9f0fae1c1
+x-ms-traffictypediagnostic: DM6PR11MB3372:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <DM6PR11MB337278E8B8B44E15A45C5B5B8C359@DM6PR11MB3372.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uxD95CVhBqW7qLgPHRH1J3UdbYXAQQf4fwIAFX9erJgFRt8MQyJmKEgRzq+TMJn7Zyc6Nz/ryvRr5fRIP1QzhuMEe59jSpNK5TwfIXl4a8ljXsfa0HW+xN4VDBDXq+bXdQUnv8462DRq4iKU6+R46WazlcxzUDqbmPxek6POzewmIzILB06DWbvUIfndwMbvLeQafoTK7aHy0CyAc6HgDuIaagDh9vOzEaOrJCnEOWdc8D2lU8t4D2OEaIlv1ucH+Lz0VDwjn9Zkz2PBUnEX+1PkhSSqEHGu3uponUfEFkLh/LaZa6gLPUfnC5xKsZW7+Kkk9jJ53uXrVLyisqDMrTQWl3QI5iSORj84psaiN6nOrhz54gAEo1jjOeBIualm22hoDGY173Is+qAaF9SNIw24Yr8xim/1YSbLWLCua59F4LWGBvO/jRnnsistwFsXuXSUXfOTMsViINVbpO1nbE31TSrKjQJSJkBYR/8vZ9f49kqR7zt5/7eljm7zUzWhNZPexiXfC8g8i+twW6GuWBjHdAhILzp3dj6K8vll7nRLdhtOblYsJ1a3/CK8W1K7Fv3PfHrOlr7p00arCvr5R99Ndp3e6DkxPIfNMmYeUoUZMDWRTDvtZhjEG/5C3+pbYdOvJAGSVkpMLF4oEqLSTG74P5F2cY8qWlzUCPl7oEI2zVypx5Wm3iZM28Rw3NYsKTn0N6u0WzNueVf7CORZ6w==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(55016003)(38070700005)(5660300002)(33656002)(66946007)(186003)(8936002)(52536014)(7416002)(2906002)(76116006)(66476007)(26005)(66556008)(66446008)(4326008)(8676002)(122000001)(82960400001)(64756008)(38100700002)(508600001)(316002)(54906003)(6916009)(9686003)(7696005)(6506007)(83380400001)(71200400001)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?j7jUbRiQTrf3/2Db3+L2pQ8z96A1JU0j5ODfedRg22+0uq2/9t0nTjVYVLMo?=
+ =?us-ascii?Q?UepBIVxX7epo5JBRdJjTBwx1kM5Xp9AkEz+cNsVLhCooIJDjewiSDVpVjpxs?=
+ =?us-ascii?Q?Neue4doDeBcniCt1Nc+jhRb7EQvaTJLEUHiDNIUrQxvb7vP/+95WwJa60PsW?=
+ =?us-ascii?Q?oTKV6yxBufExtrzQ8Q4IGrEMn6bZnpEt/fdNNKXDw6kUOOVs8+9rZQEsQaVQ?=
+ =?us-ascii?Q?y4iPRlCMbU5eXnbjsBAdELQFLtmMGN9I6cqo1HMpZakmKw6WA3WLqLgvc7dI?=
+ =?us-ascii?Q?InqIUqqtf3RYFuPntXH1vQ/B118PNCU7P534EVrMTVun1p8KDMFJ2mwhtM16?=
+ =?us-ascii?Q?K+1Yk40jl53rJ6nZtlGC3CrATvgeNQhqx9hXZaYjmbXzM19OwvaTctA+0V7x?=
+ =?us-ascii?Q?Y7aa86wx4JaDeVvSXBmscoegqJ8sCAoWfBn9eNJ/FnmIg1jz9qL7sTZKgLGF?=
+ =?us-ascii?Q?hEKhwaPUIbAc/+92v7Srgp/JGi9TqYllhbLqWJsTJo1qPWqtCdqMen0wJQ7u?=
+ =?us-ascii?Q?PGS3jKtO1w7nePUOfeH6inUGzD8IoGCs9Ok/MLhm/Cp59FoaLrKxiWk+uMRQ?=
+ =?us-ascii?Q?GISYK08SwX1VTD3nOBd3JcTCk/b0C4xWD7nbForSfND2pzmn6aYmg4vU5pEJ?=
+ =?us-ascii?Q?nG2CymR+cBVs8g9W+I4BUt3Eedzqza8eG8UnI4SCwm6pwUxIfqroeXHn6kpn?=
+ =?us-ascii?Q?Wy/qO9wyBqyVXFK9ywvi+XmJeRmFQAvrsUa5IZrySSjQCYdnrrX/Qy+awZkj?=
+ =?us-ascii?Q?mNBs0nCWcOVePx5Hyf2deCHiCadzBYu4ItBEz/yy50BbNvLnc2CuccX2lbRK?=
+ =?us-ascii?Q?WkgY+872lWnV1Xn4OKFtUE0iVpWNwzRH8fGMIkn6qpNKdBbWRIEQncn7BIiG?=
+ =?us-ascii?Q?5LDznCOvFrMkYj7umk+DJG7TgsgT/ZYPmL7GgA8NkC829Jw/LNRlOR7E5593?=
+ =?us-ascii?Q?jnT0CkATkBZXMcXIXypbn2agS6FF6hX0rZV0JlPAxONDiUU8l7p9LiwJ73d0?=
+ =?us-ascii?Q?XmlLMCwVwr9Rvdtne9QFQ5Y8BM2V0UpB4X7eieTix/cfKj8bmne45OeyY3op?=
+ =?us-ascii?Q?dDHAE2G7qJuh1QwBfaxh3oO6KGXLXJ92DAWgykn1sv630pOGvIX3OmnMuK6a?=
+ =?us-ascii?Q?t80T+/y96C5wOfj5q4I8b0vj57WupZOPercGu/9z80DwOvTbvF/TT1W7op0t?=
+ =?us-ascii?Q?8afj5MQvKnb5jiAfCIUd9FVhxbba2lZZH1nvbqc5Q9cDT0LqjM4e2/lRr3jH?=
+ =?us-ascii?Q?NMQiwU8YwT1b0vuE1S68s3uWJzwQQJQNC8MbLc00MD6KEUyPxyZeiw8pb9uE?=
+ =?us-ascii?Q?KSKGyxEUsbAsDguQ+fXVCkqNAEqYIGXgnvNLZXq6MffduzkV9Zs2Fspzlerg?=
+ =?us-ascii?Q?ZIdZMWJpHfnSbAs0HibC/rirkpOtKwwi7MJ/dagzJc7dq+VSvhTgjjWbmEgq?=
+ =?us-ascii?Q?2D5xa7YjMDsc7gq1hAnsoqqWfcM23iWBD0yXOZGMJn9vFXvyRjhqT+WIUInR?=
+ =?us-ascii?Q?XOccVrf3KdUd0ImZXZwLiLTpS0ihVcQmLfU0r5HyR9camxpgMS8u59jEBAmu?=
+ =?us-ascii?Q?KUQyIbq5xSZL04wLjjQoguMytJm/6SGLr3dlE6eeeHL91mo5nMoOi69gKlzM?=
+ =?us-ascii?Q?lx/ANvxI6xPHHyUwRTvHZn0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a24e10cd-f80d-4cb6-228b-08d9f0fae1c1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2022 03:17:36.8251
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hZc9kHd2g+KuPk32kV1+zYwoQyvxuEI0m0mLREkUjdrwsbCsXgDtmwLAz+UEsIsT7hxDIDg83Ph32FuJCays+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3372
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,150 +167,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At init time, KVM does compatibility checks to ensure that all online
-CPUs support hardware virtualization and a common set of features. But
-KVM uses hotplugged CPUs without such compatibility checks. On Intel
-CPUs, this leads to #GP if the hotplugged CPU doesn't support VMX or
-vmentry failure if the hotplugged CPU doesn't meet minimal feature
-requirements.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Wednesday, February 16, 2022 12:04 AM
+>=20
+> On Tue, Feb 15, 2022 at 10:41:56AM +0000, Tian, Kevin wrote:
+> > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > Sent: Wednesday, February 9, 2022 10:37 AM
+> > >
+> > > > >  /* -------- API for Type1 VFIO IOMMU -------- */
+> > > > >
+> > > > >  /**
+> > > >
+> > > > Otherwise, I'm still not sure how userspace handles the fact that i=
+t
+> > > > can't know how much data will be read from the device and how
+> important
+> > > > that is.  There's no replacement of that feature from the v1 protoc=
+ol
+> > > > here.
+> > >
+> > > I'm not sure this was part of the v1 protocol either. Yes it had a
+> > > pending_bytes, but I don't think it was actually expected to be 100%
+> > > accurate. Computing this value accurately is potentially quite
+> > > expensive, I would prefer we not enforce this on an implementation
+> > > without a reason, and qemu currently doesn't make use of it.
+> > >
+> > > The ioctl from the precopy patch is probably the best approach, I
+> > > think it would be fine to allow that for stop copy as well, but also
+> > > don't see a usage right now.
+> > >
+> > > It is not something that needs decision now, it is very easy to detec=
+t
+> > > if an ioctl is supported on the data_fd at runtime to add new things
+> > > here when needed.
+> > >
+> >
+> > Another interesting thing (not an immediate concern on this series)
+> > is how to handle devices which may have long time (e.g. due to
+> > draining outstanding requests, even w/o vPRI) to enter the STOP
+> > state. that time is not as deterministic as pending bytes thus cannot
+> > be reported back to the user before the operation is actually done.
+>=20
+> Well, it is not deterministic at all..
+>=20
+> I suppose you have to do as Alex says and try to estimate how much
+> time the stop phase of migration will take and grant only the
+> remaining time from the SLA to the guest to finish its PRI flushing,
 
-Do compatibility checks when onlining a CPU and abort the online process
-if the hotplugged CPU is incompatible with online CPUs.
+Let's separate it from PRI stuff thus no guest operation.
 
-CPU hotplug is disabled during hardware_enable_all() to prevent the corner
-case as shown below. A hotplugged CPU marks itself online in
-cpu_online_mask (1) and enables interrupt (2) before invoking callbacks
-registered in ONLINE section (3). So, if hardware_enable_all() is invoked
-on another CPU right after (2), then on_each_cpu() in hardware_enable_all()
-invokes hardware_enable_nolock() on the hotplugged CPU before
-kvm_online_cpu() is called. This makes the CPU escape from compatibility
-checks, which is risky.
+It's a simple story that vCPUs have been stopped and Qemu requests
+state transition from RUNNING to STOP on a device which needs
+migration driver to drain outstanding requests before being stopped.
 
-	start_secondary { ...
-		set_cpu_online(smp_processor_id(), true); <- 1
-		...
-		local_irq_enable();  <- 2
-		...
-		cpu_startup_entry(CPUHP_AP_ONLINE_IDLE); <- 3
-	}
+those requests don't rely on vCPUs but still take time to complete
+(thus may break SLA) and are invisible to migration driver (directly
+submitted by the guest thus cannot be estimated). So the only means=20
+is for user to wait on a fd with a timeout (based on whatever SLA) and
+if expires then aborts migration (may retry later).
 
-Keep compatibility checks at KVM init time. It can help to find
-incompatibility issues earlier and refuse to load arch KVM module
-(e.g., kvm-intel).
+I'm not sure whether we want to leverage the new arc for vPRI or
+just allow changing the STOP behavior to return a eventfd for an=20
+async transition.
 
-Loosen the WARN_ON in kvm_arch_check_processor_compat so that it
-can be invoked from KVM's CPU hotplug callback (i.e., kvm_online_cpu).
-
-Opportunistically, add a pr_err() for setup_vmcs_config() path in
-vmx_check_processor_compatibility() so that each possible error path has
-its own error message. Convert printk(KERN_ERR ... to pr_err to please
-checkpatch.pl
-
-Signed-off-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 10 ++++++----
- arch/x86/kvm/x86.c     | 11 +++++++++--
- virt/kvm/kvm_main.c    | 18 +++++++++++++++++-
- 3 files changed, 32 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5e1b40e5ad87..9eb7e5dab46d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7122,20 +7122,22 @@ static int vmx_check_processor_compatibility(void)
- {
- 	struct vmcs_config vmcs_conf;
- 	struct vmx_capability vmx_cap;
-+	int cpu = smp_processor_id();
- 
- 	if (!this_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
- 	    !this_cpu_has(X86_FEATURE_VMX)) {
--		pr_err("kvm: VMX is disabled on CPU %d\n", smp_processor_id());
-+		pr_err("kvm: VMX is disabled on CPU %d\n", cpu);
- 		return -EIO;
- 	}
- 
--	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
-+	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0) {
-+		pr_err("kvm: failed to setup vmcs config on CPU %d\n", cpu);
- 		return -EIO;
-+	}
- 	if (nested)
- 		nested_vmx_setup_ctls_msrs(&vmcs_conf.nested, vmx_cap.ept);
- 	if (memcmp(&vmcs_config, &vmcs_conf, sizeof(struct vmcs_config)) != 0) {
--		printk(KERN_ERR "kvm: CPU %d feature inconsistency!\n",
--				smp_processor_id());
-+		pr_err("kvm: CPU %d feature inconsistency!\n", cpu);
- 		return -EIO;
- 	}
- 	return 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ffb88f0b7265..c30e3cdb0a30 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11511,9 +11511,16 @@ void kvm_arch_hardware_unsetup(void)
- 
- int kvm_arch_check_processor_compat(void)
- {
--	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
-+	int cpu = smp_processor_id();
-+	struct cpuinfo_x86 *c = &cpu_data(cpu);
- 
--	WARN_ON(!irqs_disabled());
-+	/*
-+	 * Compatibility checks are done when loading KVM or in KVM's CPU
-+	 * hotplug callback. It ensures all online CPUs are compatible to run
-+	 * vCPUs. For other cases, compatibility checks are unnecessary or
-+	 * even problematic. Try to detect improper usages here.
-+	 */
-+	WARN_ON(!irqs_disabled() && cpu_active(cpu));
- 
- 	if (__cr4_reserved_bits(cpu_has, c) !=
- 	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index bd60f8278867..330a5a62f043 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4855,7 +4855,11 @@ static void hardware_enable_nolock(void *caller_name)
- 
- static int kvm_online_cpu(unsigned int cpu)
- {
--	int ret = 0;
-+	int ret;
-+
-+	ret = kvm_arch_check_processor_compat();
-+	if (ret)
-+		return ret;
- 
- 	raw_spin_lock(&kvm_count_lock);
- 	/*
-@@ -4915,6 +4919,17 @@ static int hardware_enable_all(void)
- {
- 	int r = 0;
- 
-+	/*
-+	 * During onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
-+	 * is called. on_each_cpu() between them includes the CPU. As a result,
-+	 * hardware_enable_nolock() may get invoked before kvm_online_cpu().
-+	 * This would enable hardware virtualization on that cpu without
-+	 * compatibility checks, which can potentially crash system or break
-+	 * running VMs.
-+	 *
-+	 * Disable CPU hotplug to prevent this case from happening.
-+	 */
-+	cpus_read_lock();
- 	raw_spin_lock(&kvm_count_lock);
- 
- 	kvm_usage_count++;
-@@ -4929,6 +4944,7 @@ static int hardware_enable_all(void)
- 	}
- 
- 	raw_spin_unlock(&kvm_count_lock);
-+	cpus_read_unlock();
- 
- 	return r;
- }
--- 
-2.25.1
-
+Thanks
+Kevin
