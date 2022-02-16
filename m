@@ -2,93 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 237694B81EE
-	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 08:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 283524B81E8
+	for <lists+kvm@lfdr.de>; Wed, 16 Feb 2022 08:49:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230510AbiBPHsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 02:48:06 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:55020 "EHLO
+        id S230459AbiBPHsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 02:48:32 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:58106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230518AbiBPHsE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 02:48:04 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E5FF1E8C;
-        Tue, 15 Feb 2022 23:47:47 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id w1so1382588plb.6;
-        Tue, 15 Feb 2022 23:47:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=JNZGxYeAs+ebgnSneE63ZkZJqPvz5hHBdDJ16ah7/no=;
-        b=g0pxtZ/LcPE/VkC8NIHWOab7GsA5PlzOOmyV0w7a3vIHjWyb+39GnPx/hDjBkDBJv1
-         oCq9SFr8D3NiXQ+XXjsuY3ut8UXvHUcVG7XSWrugbzw3z+qiEFEGzsf4m32fsVLFMsao
-         IbPmYF7IL0c0bhrK6M+keI8w4/FYNfbJf+t2bkwkoZ67JsOO0AYezhuD3JEMNnaWqJ6O
-         DdiCG1lItb583sciYzG00ZcoQcR2IwdtKUB04Hk0GWNlGYOo8DcrM0pLF/NnVvqZuDj2
-         NmlM6UKM1H5tMErGp3bYHH+6P9ENkBrwkbAQB9fhTuBrC5ORqN+QvraPPAWzfY92GTl4
-         VTXQ==
+        with ESMTP id S230446AbiBPHsa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 02:48:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 214136AA6D
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 23:48:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644997696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yHZYsT5ix1DYMi+Zf0P6MnA53EdR4cjFb5WjbXBThys=;
+        b=FZcp3srALKjmoIFOfSL7ik9BKYp3YdzAJ84yBzitjZgjZPfVN6SiJsHSimmiiq8hBmNyLF
+        6OdmMZ/uNnCFzwqDMo8Ah77day9wKhBHIeYFXq+8DIuuo3j4OpsdBtxcZletGk1qnGKAZS
+        MCq1QU2ml3aQQQG0smq79mNRahLA0Cw=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-54-9hK2rMFsPCyuM_e7Mby00w-1; Wed, 16 Feb 2022 02:48:15 -0500
+X-MC-Unique: 9hK2rMFsPCyuM_e7Mby00w-1
+Received: by mail-lf1-f71.google.com with SMTP id u24-20020a05651220d800b0043f923edd9eso442387lfr.18
+        for <kvm@vger.kernel.org>; Tue, 15 Feb 2022 23:48:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=JNZGxYeAs+ebgnSneE63ZkZJqPvz5hHBdDJ16ah7/no=;
-        b=DrotAgNwdpxwlidpHxREdo7sLweiXdyj8xPB3uZsA2FN1h/82Rrq7opQhL5/J2H+2D
-         NIOD3WMNdUFZPAqzkZs6EjAZv8aEAqM9qPfc7BhzwgIS+v0ZSF4qGH2VoV69PnLSrSU2
-         pZ3DdLGompUX3Z5bwKKeJsjqHp4uxkQBdVec2ghjdA9YjIph1agN/ukxtLpGaTwScAJn
-         deRAcqrAMJtrR2JuY3URYizjsmVYuw59nzpoD27aX1J0oljK7p0RvbRocGf7H+3yhLbD
-         67+wFZ8EulIRiftBJt7o/VPr+hw52BRUdsKnIHQNJpK+eBXR0QqvDnSv3NmK7ah3ySrE
-         quug==
-X-Gm-Message-State: AOAM532HQMfwvISpHebOuaY+06Kyx7hAvBSMBZtuvOiSOuxDdhciDLXF
-        HhPGFVSz3RsbkNhhQsOYPPrj8/PHJSt7gQac
-X-Google-Smtp-Source: ABdhPJzJDV20aZH2aZdkxUCNUDkxJ7owWjX/WIshNLFlpi4S0dP/BWhdLksIrzEUf6K5EWhLO3YLKA==
-X-Received: by 2002:a17:902:f082:b0:14e:e477:5125 with SMTP id p2-20020a170902f08200b0014ee4775125mr1396673pla.104.1644997662542;
-        Tue, 15 Feb 2022 23:47:42 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id p27sm6704232pfh.98.2022.02.15.23.47.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 23:47:42 -0800 (PST)
-Message-ID: <dc14c98c-e35a-95c0-83dd-13b5f7cffc03@gmail.com>
-Date:   Wed, 16 Feb 2022 15:47:33 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yHZYsT5ix1DYMi+Zf0P6MnA53EdR4cjFb5WjbXBThys=;
+        b=r76SJwOUJ7hqxzSFYmNb4380zEXm0/SClh2a5FvWC39ksZ85d8CYmIcSAzq+c+IVku
+         dN9wMHkIXLmD86aNlkUAuYzP2KbBzbuhYU4ZQ3RtZYFxjDds8NsH1MAdrlrEiFAIdPgk
+         ULSzybvKO4Poai6OhJl96v1dQAfit03pn/nIjavuutVRrNLVow8yTsvv7OeXLqbprlYQ
+         BdM5C4TkG4yvynzBXZk+1ZZSFFxqX6yddjLzQeTtEwUaVDVyLC+2Rxjfl/kQ3iDq1nDZ
+         KQAZcFo8JFBdM9zVxLnKMjUuVIb1dAITD9GFAeXlvICKU3PKjBYGbYzn/QOmPa23xLy5
+         WuUw==
+X-Gm-Message-State: AOAM5307PrTpAVfd8JKzQqF45XbKqYpgkhMayzVX5gZbSWD8JWofeemZ
+        sHM5mMzPUsZq2JXMIfAfbyljUzw6aandwyqBp4+ygZq33GPovlXLvcXGiyoaEZHzha1EBSEk3Kl
+        xzuS8R59EIuj5OgyXeH4WMB3llmSF
+X-Received: by 2002:a19:761a:0:b0:43c:79ae:6aef with SMTP id c26-20020a19761a000000b0043c79ae6aefmr1154794lff.630.1644997693748;
+        Tue, 15 Feb 2022 23:48:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzllVwf8xyUIv+2iLLWS6Qj/Jdq4aMgi9FUbytGUO2dDIeLl24XOTc73Yb/RVau2um+auQDQ4sK5y6MgMa7+QY=
+X-Received: by 2002:a19:761a:0:b0:43c:79ae:6aef with SMTP id
+ c26-20020a19761a000000b0043c79ae6aefmr1154776lff.630.1644997693558; Tue, 15
+ Feb 2022 23:48:13 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [PATCH] KVM: x86/pmu: Fix reserved bits for AMD PerfEvtSeln
- register
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+References: <20220211060742.34083-1-leobras@redhat.com> <5fd84e2f-8ebc-9a4c-64bf-8d6a2c146629@redhat.com>
+ <cunsfslpyvh.fsf@oracle.com> <6bee793c-f7fc-2ede-0405-7a5d7968b175@redhat.com>
+In-Reply-To: <6bee793c-f7fc-2ede-0405-7a5d7968b175@redhat.com>
+From:   Leonardo Bras Soares Passos <leobras@redhat.com>
+Date:   Wed, 16 Feb 2022 04:48:02 -0300
+Message-ID: <CAJ6HWG6RB6NS8vx0vWdgRhO54B+NqHyBvpg7dRjd_78TRnJ9eg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/1] x86/kvm/fpu: Mask guest fpstate->xfeatures with guest_supported_xcr0
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Edmondson <david.edmondson@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211118130320.95997-1-likexu@tencent.com>
- <CALMp9eTONaviuz-NnPUP2=MEOb8ZBkZ7u_ZQBWBUne-i6cRUkA@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-In-Reply-To: <CALMp9eTONaviuz-NnPUP2=MEOb8ZBkZ7u_ZQBWBUne-i6cRUkA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/2/2022 4:39 pm, Jim Mattson wrote:
->> -       pmu->reserved_bits = 0xffffffff00200000ull;
->> +       pmu->reserved_bits = 0xfffffff000280000ull;
-> Bits 40 and 41 are guest mode and host mode. They cannot be reserved
-> if the guest supports nested SVM.
-> 
+Hello Paolo, thanks for the feedback!
 
-Indeed, we need (some hands) to do more pmu tests on nested SVM.
+On Mon, Feb 14, 2022 at 6:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 2/14/22 10:43, David Edmondson wrote:
+> > Sorry if this is a daft question:
+> >
+> > In what situations will there be bits set in
+> > vcpu->arch.guest_supported_xcr0 that are not set in
+> > vcpu->arch.guest_fpu.fpstate->xfeatures ?
+> >
+> > guest_supported_xcr0 is filtered based on supported_xcr0, which I would
+> > expect to weed out all bits that are not set in ->xfeatures.
+>
+> Good point, so we can do just
+>
+>         vcpu->arch.guest_fpu.fpstate->user_xfeatures =
+>                 vcpu->arch.guest_supported_xcr0;
+
+Updated for v4.
+
+>
+> On top of this patch, we can even replace vcpu->arch.guest_supported_xcr0
+> with vcpu->arch.guest_fpu.fpstate->user_xfeatures. Probably with local
+> variables or wrapper functions though, so as to keep the code readable.
+
+You mean another patch (#2) removing guest_supported_xcr0 field from
+kvm_vcpu_arch ?
+(and introducing something like kvm_guest_supported_xcr() ?)
+
+> For example:
+>
+> static inline u64 kvm_guest_supported_xfd()
+> {
+>         u64 guest_supported_xcr0 = vcpu->arch.guest_fpu.fpstate->user_xfeatures;
+>
+>         return guest_supported_xcr0 & XFEATURE_MASK_USER_DYNAMIC;
+> }
+
+Not sure If I get the above.
+Are you suggesting also removing fpstate->xfd and use a wrapper instead?
+Or is the above just an example?
+(s/xfd/xcr0/ & s/XFEATURE_MASK_USER_DYNAMIC/XFEATURE_MASK_USER_SUPPORTED/ )
+
+>
+> Also, already in this patch fpstate_realloc should do
+>
+>          newfps->user_xfeatures = curfps->user_xfeatures | xfeatures;
+>
+> only if !guest_fpu.  In other words, the user_xfeatures of the guest FPU
+> should be controlled exclusively by KVM_SET_CPUID2.
+
+Just to check, you suggest adding this on patch #2 ?
+(I am failing to see how would that impact on #1)
+
+>
+> Thanks,
+>
+> Paolo
+>
+
+Thank you!
+
+Best regards,
+Leo
+
