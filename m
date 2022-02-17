@@ -2,134 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 399C84BA5D7
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 17:30:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E72B94BA5CB
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 17:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243155AbiBQQ1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 11:27:48 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60262 "EHLO
+        id S241912AbiBQQ3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 11:29:35 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243126AbiBQQ1n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 11:27:43 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7339A9A3
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 08:27:28 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id i21so87906pfd.13
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 08:27:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=piQ+AaR3KsfxzywPotTriUaX9sZGJi9bo2vWFUyvr+0=;
-        b=IPuPL/0GHf/dpxy+pzB1u+LDafPWP5/f3U69d43m2A8ZhtxqSNBInKUNYTpgDJxJaI
-         rB8GPWIc9laFMpliQ7+tggGm74Pcyl7hm0OYnLzGXnzkhe0g+7Sz3Q0e0/BjItPp9FP2
-         pGUChT73yGVtNTV42H+nZ23BFXyYlu4wVLjtDg8u3gimuQhw7BPKW1sFM76PDu4ZxVL5
-         fCEE6OejQcqsf3w9UbMbh1lxtvPh1TVQnu8Mld/r6wz60coKHFm3rWqWx4v7vt0kqGXe
-         C/suJdIg2fkTVDIWZh3drthWdIL6fP+tvqckzRX71tjhQTKwO4IRs/sNbO2ljhNCuZrx
-         pc2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=piQ+AaR3KsfxzywPotTriUaX9sZGJi9bo2vWFUyvr+0=;
-        b=bjZPO037yebs22ia4HpohZKhe220a+xzQqWOJi5nCM5VsVfSjndrQuqSVxM18YRgDj
-         fOKZPxX82hm8fvm2uptqd8HyPmIo+YtXhTSa2FaiOn+MRl1ME1PnlFcFFnZiqj7yHk/W
-         6bFs5BpkBYoo2tzWukZX4lIfjrybmyvLtBXYuuVBHHp0iseShs4I6JjbKIOZGNg/aun1
-         ArSwnFv4XZWKiXmPkNLt/9EOf1LmRgw0+mlmO8WXcF1geuE7xL0zvvSdJQ5RLdlpUWTj
-         UdI7sRjRnJG5NEHCpqOa1P8Vq+MQk9sjEQttM124WmDbP30yOM7rxNd0qw/MUCmFIM+R
-         l03Q==
-X-Gm-Message-State: AOAM533W61kxp34RWl14/IRuWSHMFhMDkfHoL8mf+uFgqNcPYT8aK1Ae
-        e+GN2EvqwEcx2ECUe01IQrWUZhkrBzRbbkwSwSA=
-X-Google-Smtp-Source: ABdhPJytgt0YENDw9hnPicJYfG/fGeOktmqueccgIcnX0IbjzMVWRrB8maZaYXhIJGUxmc/PUTjf5n8/8JwUFPVTbDQ=
-X-Received: by 2002:a05:6a00:1a8d:b0:4e1:cde3:7bf7 with SMTP id
- e13-20020a056a001a8d00b004e1cde37bf7mr2489791pfv.52.1645115248071; Thu, 17
- Feb 2022 08:27:28 -0800 (PST)
+        with ESMTP id S239068AbiBQQ3c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 11:29:32 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CAAC5B8238
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 08:29:00 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCB3D113E;
+        Thu, 17 Feb 2022 08:28:54 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 896CA3F718;
+        Thu, 17 Feb 2022 08:28:51 -0800 (PST)
+Date:   Thu, 17 Feb 2022 16:29:06 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+        miguel.luis@oracle.com, kernel-team@android.com
+Subject: Re: [PATCH v6 37/64] KVM: arm64: nv: Restrict S2 RD/WR permissions
+ to match the guest's
+Message-ID: <Yg530gxERUq0M3ZO@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-38-maz@kernel.org>
 MIME-Version: 1.0
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <CACGkMEvtENvpubmZY3UKptD-T=c9+JJV1kRm-ZPhP08xOJv2fQ@mail.gmail.com>
- <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com> <20220217141227.sk7hfng7raq6xvuh@sgarzare-redhat>
-In-Reply-To: <20220217141227.sk7hfng7raq6xvuh@sgarzare-redhat>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Thu, 17 Feb 2022 16:27:16 +0000
-Message-ID: <CAJSP0QVVehjYpFodccZsQUew_LM6Yz5rfdFDSAvP1-+vHKwLgA@mail.gmail.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        John Snow <jsnow@redhat.com>, Sergio Lopez <slp@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Alex Agache <aagch@amazon.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-38-maz@kernel.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 17 Feb 2022 at 14:12, Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Mon, Feb 14, 2022 at 02:01:52PM +0000, Stefan Hajnoczi wrote:
-> >On Mon, 14 Feb 2022 at 07:11, Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> On Fri, Jan 28, 2022 at 11:47 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >> >
-> >> > Dear QEMU, KVM, and rust-vmm communities,
-> >> > QEMU will apply for Google Summer of Code 2022
-> >> > (https://summerofcode.withgoogle.com/) and has been accepted into
-> >> > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-> >> > submit internship project ideas for QEMU, KVM, and rust-vmm!
-> >> >
-> >> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> >> > be a mentor. It's a great way to give back and you get to work with
-> >> > people who are just starting out in open source.
-> >> >
-> >> > Please reply to this email by February 21st with your project ideas.
-> >> >
-> >> > Good project ideas are suitable for remote work by a competent
-> >> > programmer who is not yet familiar with the codebase. In
-> >> > addition, they are:
-> >> > - Well-defined - the scope is clear
-> >> > - Self-contained - there are few dependencies
-> >> > - Uncontroversial - they are acceptable to the community
-> >> > - Incremental - they produce deliverables along the way
-> >> >
-> >> > Feel free to post ideas even if you are unable to mentor the project.
-> >> > It doesn't hurt to share the idea!
-> >>
-> >> Implementing the VIRTIO_F_IN_ORDER feature for both Qemu and kernel
-> >> (vhost/virtio drivers) would be an interesting idea.
-> >>
-> >> It satisfies all the points above since it's supported by virtio spec.
-> >>
-> >> (Unfortunately, I won't have time in the mentoring)
-> >
-> >Thanks for this idea. As a stretch goal we could add implementing the
-> >packed virtqueue layout in Linux vhost, QEMU's libvhost-user, and/or
-> >QEMU's virtio qtest code.
-> >
-> >Stefano: Thank you for volunteering to mentor the project. Please
-> >write a project description (see template below) and I will add this
-> >idea:
-> >
->
-> I wrote a description of the project below. Let me know if there is
-> anything to change.
+Hi,
 
-Thanks, I have added the idea:
-https://wiki.qemu.org/Google_Summer_of_Code_2022#VIRTIO_F_IN_ORDER_support_for_virtio_devices
+On Fri, Jan 28, 2022 at 12:18:45PM +0000, Marc Zyngier wrote:
+> When mapping a page in a shadow stage-2, special care must be
+> taken not to be more permissive than the guest is (writable or
+> readable page when the guest hasn't set that permission).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 15 +++++++++++++++
+>  arch/arm64/kvm/mmu.c                | 14 +++++++++++++-
+>  arch/arm64/kvm/nested.c             |  2 +-
+>  3 files changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 4fad4d3848ce..f4b846d09d86 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -97,6 +97,21 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
+>  	return trans->esr;
+>  }
+>  
+> +static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
+> +{
+> +	return trans->readable;
+> +}
+> +
+> +static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
+> +{
+> +	return trans->writable;
+> +}
+> +
+> +static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
+> +{
+> +	return !(trans->upper_attr & BIT(54));
+> +}
+> +
+>  extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+>  			      struct kvm_s2_trans *result);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 36f7ecb4f81b..7c56e1522d3c 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1247,6 +1247,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (exec_fault && device)
+>  		return -ENOEXEC;
+>  
+> +	/*
+> +	 * Potentially reduce shadow S2 permissions to match the guest's own
+> +	 * S2. For exec faults, we'd only reach this point if the guest
+> +	 * actually allowed it (see kvm_s2_handle_perm_fault).
+> +	 */
+> +	if (kvm_is_shadow_s2_fault(vcpu)) {
+> +		writable &= kvm_s2_trans_writable(nested);
 
-Stefan
+I was a bit confused about writable being true when write_fault is false. After
+some digging, it turns out that hva_to_pfn() oportunistically makes writable
+true, even for read faults.
+
+> +		if (!kvm_s2_trans_readable(nested))
+> +			prot &= ~KVM_PGTABLE_PROT_R;
+
+The local variable "prot" is initialized to KVM_PGTABLE_PROT_R, so this check
+makes sense.
+
+> +	}
+> +
+>  	spin_lock(&kvm->mmu_lock);
+>  	pgt = vcpu->arch.hw_mmu->pgt;
+>  	if (mmu_notifier_retry(kvm, mmu_seq))
+> @@ -1285,7 +1296,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  	if (device)
+>  		prot |= KVM_PGTABLE_PROT_DEVICE;
+> -	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC) &&
+> +		 kvm_s2_trans_executable(nested))
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
+>  	/*
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 0a9708f776fc..a74ffb1d2064 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -481,7 +481,7 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
+>  		return 0;
+>  
+>  	if (kvm_vcpu_trap_is_iabt(vcpu)) {
+> -		forward_fault = (trans->upper_attr & BIT(54));
+> +		forward_fault = !kvm_s2_trans_executable(trans);
+>  	} else {
+>  		bool write_fault = kvm_is_write_fault(vcpu);
+
+The patch looks good to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
