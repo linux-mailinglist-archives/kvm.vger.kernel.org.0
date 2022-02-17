@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3CB84B9526
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 01:56:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A86484B952D
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 01:57:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbiBQA4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Feb 2022 19:56:40 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52052 "EHLO
+        id S229969AbiBQA5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Feb 2022 19:57:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiBQA4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Feb 2022 19:56:40 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B822F6150
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 16:56:26 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id y18so3328903plb.11
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 16:56:26 -0800 (PST)
+        with ESMTP id S229947AbiBQA5R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Feb 2022 19:57:17 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 554CC1D334
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 16:57:00 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id z4so3552657pgh.12
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 16:57:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=raL6J9eMru9YQU6SpJHo/L0yRIYy/dAOHaeiYNsGiWw=;
-        b=IcTKRsnHT0VQJlo359RNywDz4qq+ZAhT8od+JBNFm5i1a85JpFQ/CYB53dxzJUEPh/
-         AHQQb9huwiT48dQrCS61KeGGe/8AjZhFRScgfFED7n5/+jbFWMMnayULdvxUpQUBntO3
-         mLDgLIcKBpAHOcZiwCSVOyuxkx172LxKciO154TCKiZolxpO/DnnzIAzJTyWq3W7oLBe
-         gRw9Uyro91oljBvEx//biq+2ebM5E1yJaA1RH5Ge3b0asIjwtSr/1YYyl1x4uzd51YeT
-         yAbX4OzolS12rwfRphXT8iHBx1ZgRhkAFLvRb4pxn54OzNGsGQe+sQqg+WT0BMf1Em/J
-         rntw==
+        bh=Uh62l1WKRs9l6xKPdkb4nPHzt/03HxUwoKzq8r1A1Ns=;
+        b=Sm9AFd++LJ9LAAX6P8/7ps7kYTUh6U60C8vGQE2bNAH1SdhdWVnjNCcUQvqoNVPX+r
+         Tf/eZX+PV43INXpPB0qWz+ImQI3q9OjZTjVLSbdK71zdUjb0W+MprCPvAeh9jbp4rzDW
+         FXaAvyGYScwBi2JiFWc/Ty5P8kAdBod8KWclfQ9myPqSVef/AbueFxZ4kdwJYtyvMCDG
+         ZYu82XC43QUovdRXsA/EudHdAv5iQ1AD2MTfYdAP8fQScZPg8o+/uisfAbstSpN/3f7k
+         jJZub8wRk2wFGR37vrUe20hbyYLQFg+h4ExdXBJLM7UDmNPimXV9hMDipSzUmxZfajTg
+         9Fgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=raL6J9eMru9YQU6SpJHo/L0yRIYy/dAOHaeiYNsGiWw=;
-        b=lSDOT7ZX2oHwkQuW/WwMUkhveEt932seFtWyOZZ8zaKV+EK8wD2rnUiy+LvCkeotwI
-         JQpF7o0t06puHNPqbL8YMdiVX4mGU+55qoDzXNMQ1jU9xQ5Y11tf1VPe3RIpkCk8zrNh
-         UVsoJdQkbvzgf/kfPZWWJOcDLRAbKenFl31IIivxQShEXJIrSiVDazaWUyOXFkMj6Mrk
-         sSjLS4/y3g/baQYNg5IyfxAcnra9KvPucKH5xwV+0hEPxolfCqZ09cf9uaciTrzWIh+R
-         BiCg8iu72GaMU5cgK+8EEFOIr1tlDTYLitq/aqLo+jEvgeLLDklhK2e7P+/MNi3FBJTS
-         tLQQ==
-X-Gm-Message-State: AOAM530rgS99ftWJ45r05mAv/8EsjNxbXk640z402aUzyaoIDo3v4VDG
-        3tuW51I+K6t9AG4aLo5t1EBrhw==
-X-Google-Smtp-Source: ABdhPJx8ctxoCH30q8YO05rtWT5A0mv5YYIvWd3904Fops0JxOfOhSsJVBwb3qR5miJhFNQ63Fkd3A==
-X-Received: by 2002:a17:902:db07:b0:14f:3f88:1b96 with SMTP id m7-20020a170902db0700b0014f3f881b96mr559846plx.123.1645059386060;
-        Wed, 16 Feb 2022 16:56:26 -0800 (PST)
+        bh=Uh62l1WKRs9l6xKPdkb4nPHzt/03HxUwoKzq8r1A1Ns=;
+        b=Ba3fgQlAwEj1b4ZflQ/TC3BkdiYsUrFP1wg2Kxx2VjbFSot7NEO3vXJvqejDeXcWP/
+         HGNCm5R96wURBidg4+ts/x5GkWN7NESz9UzQCc73bH9rwvpoE4nwtN0X9sDVxxQtttPh
+         PLjg3W5vaL2Nx3cSyAPOo3eUX1KB7/Mvu3atT/X+mYwbuvDXUgbFwSHklMn7054gr4X4
+         E8+oBNcroOW7Il/kJYFbrCVQsUP5hahzNU3DO3XwhC7QpJ0k6/1884QjvfCBiMkAaB/J
+         g1Ap1S2a65GrDhKbuZ6hV2DkPmxCwpP1UkszcIKEdtGsPqPrLk7mCeLWqqn3php0cj7d
+         Ydeg==
+X-Gm-Message-State: AOAM533U8VIClyWE9ogD/kygSbnO6s3jSCCZxwe5R4rc63n9uFRY7leF
+        j8zuGDOlePoTCZlcYyT2ZMSmZQ==
+X-Google-Smtp-Source: ABdhPJzT0Z+0U66TzQAWZDlTw0MvVyYwMUyAH2k/FryBqolm+w1Er04XrvUexYvFSU98kXqC/1UxNA==
+X-Received: by 2002:a63:10c:0:b0:36c:6dd0:44af with SMTP id 12-20020a63010c000000b0036c6dd044afmr475564pgb.41.1645059419690;
+        Wed, 16 Feb 2022 16:56:59 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id mm15sm223373pjb.46.2022.02.16.16.56.25
+        by smtp.gmail.com with ESMTPSA id q94sm226627pja.27.2022.02.16.16.56.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 16:56:25 -0800 (PST)
-Date:   Thu, 17 Feb 2022 00:56:21 +0000
+        Wed, 16 Feb 2022 16:56:59 -0800 (PST)
+Date:   Thu, 17 Feb 2022 00:56:55 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Cathy Avery <cavery@redhat.com>
 Cc:     kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests v3 PATCH 1/3] vmx: Cleanup test_vmx_vmlaunch to
- generate clearer and more consolidated test reports
-Message-ID: <Yg2dNU3wlmYEz+F9@google.com>
+Subject: Re: [kvm-unit-tests v3 PATCH 2/3] vmx: Explicitly setup a dummy EPTP
+ in EPT accessed and dirty flag test
+Message-ID: <Yg2dVwqT8R1/+LzP@google.com>
 References: <20220216170149.25792-1-cavery@redhat.com>
- <20220216170149.25792-2-cavery@redhat.com>
+ <20220216170149.25792-3-cavery@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220216170149.25792-2-cavery@redhat.com>
+In-Reply-To: <20220216170149.25792-3-cavery@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,35 +72,11 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Feb 16, 2022, Cathy Avery wrote:
-> In cases when xerror is 0 ( the test is not expected to error ) and
-> the test does error we get a confusing test result as the vmlaunch status
-> is based on !xerror:
-> 
-> FAIL: Enable-EPT enabled; EPT page walk length 24: vmlaunch succeeds
-> 
-> This patch also eliminates the double call to report per launch and
-> clarifies the failure messages. New format suggested by seanjc@google.com
+> test_ept_eptp is not explicitly calling setup_dummy_ept() to initialize
+> EPTP to a good starting value resulting in test failures when it is called
+> in isolation or when EPTP has been changed by some previous test.
 > 
 > Signed-off-by: Cathy Avery <cavery@redhat.com>
 > ---
->  x86/vmx_tests.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 3d57ed6..0dab98e 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -3392,14 +3392,21 @@ static void test_vmx_vmlaunch(u32 xerror)
->  	bool success = vmlaunch_succeeds();
->  	u32 vmx_inst_err;
->  
-> -	report(success == !xerror, "vmlaunch %s",
-> -	       !xerror ? "succeeds" : "fails");
-> -	if (!success && xerror) {
-> -		vmx_inst_err = vmcs_read(VMX_INST_ERROR);
-> +	if (!success)
-> +	vmx_inst_err = vmcs_read(VMX_INST_ERROR);
-
-Needs to be indended.  With that fixed,
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
