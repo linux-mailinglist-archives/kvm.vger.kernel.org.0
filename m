@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B84E4BAB8C
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 22:07:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F5DD4BAB6C
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 22:07:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244713AbiBQVEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 16:04:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37800 "EHLO
+        id S244544AbiBQVET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 16:04:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243861AbiBQVEH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 16:04:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E13001017EF
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 13:03:52 -0800 (PST)
+        with ESMTP id S244105AbiBQVEG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 16:04:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DDB9D163D79
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 13:03:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645131832;
+        s=mimecast20190719; t=1645131831;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=31iQ22wsRKZ1WzBCnkFcq5Zu4wTNEFOLwesoT4L8SYI=;
-        b=f/uW3t5OXRRjvebnvWVYum4H5z4BhvPeiE4TMcj8NWf0dJeLseCNGmyAfMlyHv2ujGhoE/
-        g4qVWICoRi5Bx8/YVDPXWyM7M8bNUJFuRn5T0diecrytoYHsghlHciU95vgzbxMBS4OmXg
-        iELZbs8kCf5O7/hisQ+Xl+BsxdIkTS8=
+        bh=ZgAtpSiEllHqyj81dALZNFNhaF5xNC1SM5IGKvMVmio=;
+        b=I2JV7n1eNr76gM1hfi85dzEOT8MtM+DvVI/YTsiCaLI05f3492Rx4IrH2S9zq715fCVZ0x
+        L8PgJ/wG6fTPYVSruZEkEyDltLSJ4TTTUGtBTjPrKx1zajTHnBmRB9o2Awdnr8TZ0YHJya
+        vJHVHB0/Q0ClL8Dnx/vsLKBVni6//Lc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-128-cb2CIOjkPdSQLWPCg5vjOw-1; Thu, 17 Feb 2022 16:03:48 -0500
-X-MC-Unique: cb2CIOjkPdSQLWPCg5vjOw-1
+ us-mta-121-9h1SdD80Nu6TLhpGroVYYg-1; Thu, 17 Feb 2022 16:03:49 -0500
+X-MC-Unique: 9h1SdD80Nu6TLhpGroVYYg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD001801AC5;
-        Thu, 17 Feb 2022 21:03:47 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 329692F4A;
+        Thu, 17 Feb 2022 21:03:48 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E3936AB9D;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D7EAF6AB90;
         Thu, 17 Feb 2022 21:03:47 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com
-Subject: [PATCH v2 13/18] KVM: x86: reset and reinitialize the MMU in __set_sregs_common
-Date:   Thu, 17 Feb 2022 16:03:35 -0500
-Message-Id: <20220217210340.312449-14-pbonzini@redhat.com>
+Subject: [PATCH v2 14/18] KVM: x86/mmu: avoid indirect call for get_cr3
+Date:   Thu, 17 Feb 2022 16:03:36 -0500
+Message-Id: <20220217210340.312449-15-pbonzini@redhat.com>
 In-Reply-To: <20220217210340.312449-1-pbonzini@redhat.com>
 References: <20220217210340.312449-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -50,7 +50,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,117 +58,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do a full unload of the MMU in KVM_SET_SREGS and KVM_SEST_REGS2, in
-preparation for not doing so in kvm_mmu_reset_context.  There is no
-need to delay the reset until after the return, so do it directly in
-the __set_sregs_common function and remove the mmu_reset_needed output
-parameter.
+Most of the time, calls to get_guest_pgd result in calling
+kvm_read_cr3 (the exception is only nested TDP).  Hardcode
+the default instead of using the get_cr3 function, avoiding
+a retpoline if they are enabled.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/x86.c | 32 +++++++++++++-------------------
- 1 file changed, 13 insertions(+), 19 deletions(-)
+ arch/x86/kvm/mmu.h             | 13 +++++++++++++
+ arch/x86/kvm/mmu/mmu.c         | 15 +++++----------
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ arch/x86/kvm/x86.c             |  2 +-
+ 4 files changed, 20 insertions(+), 12 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 1d0c1904d69a..1808d6814ddb 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -116,6 +116,19 @@ static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
+ 					  vcpu->arch.mmu->shadow_root_level);
+ }
+ 
++static inline gpa_t __kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
++{
++	if (!mmu->get_guest_pgd)
++		return kvm_read_cr3(vcpu);
++	else
++		return mmu->get_guest_pgd(vcpu);
++}
++
++static inline gpa_t kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu)
++{
++	return __kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
++}
++
+ struct kvm_page_fault {
+ 	/* arguments to kvm_mmu_do_page_fault.  */
+ 	const gpa_t addr;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4e8e3e9530ca..d422d0d2adf8 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3451,7 +3451,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	unsigned i;
+ 	int r;
+ 
+-	root_pgd = mmu->get_guest_pgd(vcpu);
++	root_pgd = kvm_mmu_get_guest_pgd(vcpu);
+ 	root_gfn = root_pgd >> PAGE_SHIFT;
+ 
+ 	if (mmu_check_root(vcpu, root_gfn))
+@@ -3881,7 +3881,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	arch.token = (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
+ 	arch.gfn = gfn;
+ 	arch.direct_map = vcpu->arch.mmu->direct_map;
+-	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
++	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu);
+ 
+ 	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
+ 				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
+@@ -4230,11 +4230,6 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_new_pgd);
+ 
+-static unsigned long get_cr3(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_read_cr3(vcpu);
+-}
+-
+ static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+ 			   unsigned int access)
+ {
+@@ -4789,7 +4784,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+ 	context->invlpg = NULL;
+ 	context->shadow_root_level = kvm_mmu_get_tdp_level(vcpu);
+ 	context->direct_map = true;
+-	context->get_guest_pgd = get_cr3;
++	context->get_guest_pgd = NULL; /* use kvm_read_cr3 */
+ 	context->get_pdptr = kvm_pdptr_read;
+ 	context->inject_page_fault = kvm_inject_page_fault;
+ 	context->root_level = role_regs_to_root_level(&regs);
+@@ -4964,7 +4959,7 @@ static void init_kvm_softmmu(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_init_shadow_mmu(vcpu, &regs);
+ 
+-	context->get_guest_pgd     = get_cr3;
++	context->get_guest_pgd	   = NULL; /* use kvm_read_cr3 */
+ 	context->get_pdptr         = kvm_pdptr_read;
+ 	context->inject_page_fault = kvm_inject_page_fault;
+ }
+@@ -4996,7 +4991,7 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	g_context->mmu_role.as_u64 = new_role.as_u64;
+-	g_context->get_guest_pgd     = get_cr3;
++	g_context->get_guest_pgd     = NULL; /* use kvm_read_cr3 */
+ 	g_context->get_pdptr         = kvm_pdptr_read;
+ 	g_context->inject_page_fault = kvm_inject_page_fault;
+ 	g_context->root_level        = new_role.base.level;
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 346f3bad3cb9..1a85aba837b2 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -362,7 +362,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	trace_kvm_mmu_pagetable_walk(addr, access);
+ retry_walk:
+ 	walker->level = mmu->root_level;
+-	pte           = mmu->get_guest_pgd(vcpu);
++	pte           = __kvm_mmu_get_guest_pgd(vcpu, mmu);
+ 	have_ad       = PT_HAVE_ACCESSED_DIRTY(mmu);
+ 
+ #if PTTYPE == 64
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6aefd7ac7039..f10878aa5b20 100644
+index f10878aa5b20..adcee7c305ca 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10730,7 +10730,7 @@ static bool kvm_is_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- }
+@@ -12161,7 +12161,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ 		return;
  
- static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
--		int *mmu_reset_needed, bool update_pdptrs)
-+			      int update_pdptrs)
- {
- 	struct msr_data apic_base_msr;
- 	int idx;
-@@ -10755,29 +10755,31 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
- 	static_call(kvm_x86_set_gdt)(vcpu, &dt);
+ 	if (!vcpu->arch.mmu->direct_map &&
+-	      work->arch.cr3 != vcpu->arch.mmu->get_guest_pgd(vcpu))
++	      work->arch.cr3 != kvm_mmu_get_guest_pgd(vcpu))
+ 		return;
  
- 	vcpu->arch.cr2 = sregs->cr2;
--	*mmu_reset_needed |= kvm_read_cr3(vcpu) != sregs->cr3;
-+
-+	if (vcpu->arch.efer != sregs->efer ||
-+	    kvm_read_cr0(vcpu) != sregs->cr0 ||
-+	    vcpu->arch.cr3 != sregs->cr3 || !update_pdptrs ||
-+	    kvm_read_cr4(vcpu) != sregs->cr4)
-+		kvm_mmu_unload(vcpu);
-+
- 	vcpu->arch.cr3 = sregs->cr3;
- 	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
- 	static_call_cond(kvm_x86_post_set_cr3)(vcpu, sregs->cr3);
- 
- 	kvm_set_cr8(vcpu, sregs->cr8);
- 
--	*mmu_reset_needed |= vcpu->arch.efer != sregs->efer;
- 	static_call(kvm_x86_set_efer)(vcpu, sregs->efer);
- 
--	*mmu_reset_needed |= kvm_read_cr0(vcpu) != sregs->cr0;
- 	static_call(kvm_x86_set_cr0)(vcpu, sregs->cr0);
- 	vcpu->arch.cr0 = sregs->cr0;
- 
--	*mmu_reset_needed |= kvm_read_cr4(vcpu) != sregs->cr4;
- 	static_call(kvm_x86_set_cr4)(vcpu, sregs->cr4);
- 
-+	kvm_init_mmu(vcpu);
- 	if (update_pdptrs) {
- 		idx = srcu_read_lock(&vcpu->kvm->srcu);
--		if (is_pae_paging(vcpu)) {
-+		if (is_pae_paging(vcpu))
- 			load_pdptrs(vcpu, kvm_read_cr3(vcpu));
--			*mmu_reset_needed = 1;
--		}
- 		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	}
- 
-@@ -10805,15 +10807,11 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
- static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- {
- 	int pending_vec, max_bits;
--	int mmu_reset_needed = 0;
--	int ret = __set_sregs_common(vcpu, sregs, &mmu_reset_needed, true);
-+	int ret = __set_sregs_common(vcpu, sregs, true);
- 
- 	if (ret)
- 		return ret;
- 
--	if (mmu_reset_needed)
--		kvm_mmu_reset_context(vcpu);
--
- 	max_bits = KVM_NR_INTERRUPTS;
- 	pending_vec = find_first_bit(
- 		(const unsigned long *)sregs->interrupt_bitmap, max_bits);
-@@ -10828,7 +10826,6 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 
- static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
- {
--	int mmu_reset_needed = 0;
- 	bool valid_pdptrs = sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
- 	bool pae = (sregs2->cr0 & X86_CR0_PG) && (sregs2->cr4 & X86_CR4_PAE) &&
- 		!(sregs2->efer & EFER_LMA);
-@@ -10840,8 +10837,7 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
- 	if (valid_pdptrs && (!pae || vcpu->arch.guest_state_protected))
- 		return -EINVAL;
- 
--	ret = __set_sregs_common(vcpu, (struct kvm_sregs *)sregs2,
--				 &mmu_reset_needed, !valid_pdptrs);
-+	ret = __set_sregs_common(vcpu, (struct kvm_sregs *)sregs2, !valid_pdptrs);
- 	if (ret)
- 		return ret;
- 
-@@ -10850,11 +10846,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
- 			kvm_pdptr_write(vcpu, i, sregs2->pdptrs[i]);
- 
- 		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
--		mmu_reset_needed = 1;
- 		vcpu->arch.pdptrs_from_userspace = true;
-+		/* kvm_mmu_reload will be called on the next entry.  */
- 	}
--	if (mmu_reset_needed)
--		kvm_mmu_reset_context(vcpu);
- 	return 0;
- }
- 
+ 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
 -- 
 2.31.1
 
