@@ -2,63 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D41A4BA2CF
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:21:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 821E24BA30B
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:34:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241841AbiBQOVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 09:21:40 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35356 "EHLO
+        id S241109AbiBQOen (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 09:34:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241830AbiBQOVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:21:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 596722B165B
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:21:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645107681;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=4O0+CQbK6wk9fkyoPo8Iv9tdOs7BtuKcNBkdCn4J6FQ=;
-        b=Y85TTGtgqZma5QeRdlpyZQAfNT/cuL1GltT2g3u7MbkGAVy7eqIVrp4ngOnjRcEIO/g1lc
-        0Xw+xE6CbpByIfFuT+nHEM0Xw1Gh76mjmZjKXLwrccyfnYgAXEvFvKub32xKFJd6ssnFbe
-        jokDqpVPELYjmIzYsYHdlHw0h0tq8lA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-446-yQ5WYX7IOua0JuB1Exikhw-1; Thu, 17 Feb 2022 09:21:17 -0500
-X-MC-Unique: yQ5WYX7IOua0JuB1Exikhw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5A862F4F;
-        Thu, 17 Feb 2022 14:21:02 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.132])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B3470D40;
-        Thu, 17 Feb 2022 14:20:22 +0000 (UTC)
-Date:   Thu, 17 Feb 2022 14:20:20 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     qemu-s390x@nongnu.org, thuth@redhat.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com, ehabkost@redhat.com, kvm@vger.kernel.org,
-        david@redhat.com, eblake@redhat.com, cohuck@redhat.com,
-        richard.henderson@linaro.org, qemu-devel@nongnu.org,
-        armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
-        mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com
-Subject: Re: [PATCH v6 08/11] s390x: topology: Adding drawers to CPU topology
-Message-ID: <Yg5ZpEisMK1uWqQH@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220217134125.132150-1-pmorel@linux.ibm.com>
- <20220217134125.132150-9-pmorel@linux.ibm.com>
+        with ESMTP id S234277AbiBQOen (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 09:34:43 -0500
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB8FB0D3B
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:34:28 -0800 (PST)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-2d68d519a33so32604307b3.7
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:34:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=49LFxUiFxKOUzkWf8fuZxLiIVO2LF4tYGtZO7DQutPk=;
+        b=NwjX1tSy/LF3MUmU7BQKrfxOiVZsUdVkytN8GInhnipKZrLmADEmMvvj8SkSfqGUwW
+         bJZ2UHD7aBqqMN4XTKUs3DR9KNSeuRXTt93+e6TD7dFXLNSdHbXT948n/DrYFZA1Jhuc
+         CUAohx/NkmoyLga0JgphN1tR083q5Ty2irsDGzs/v3SNSn2EYdSEQbTYEYl+R8gU+Y9h
+         y+qOg/VUQFrr5VIBAFUV6NIay2pprrFL+irdP70ot3+0At0p1LHjP1ccfGyQ7BXNUt5i
+         YE8lH65+Sm5FQLxHFp0bUTYS94jjc7mab8GiC0RY1RtWn+oNTagKNee/KX07b+FmMWGu
+         Rx/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=49LFxUiFxKOUzkWf8fuZxLiIVO2LF4tYGtZO7DQutPk=;
+        b=LjQgxjR4dr1dyh0wnYj0Kcf6eWi95pe9iZxHUhn0hGpIPfFFTyKwuOo2pmVeM1QHjL
+         opAHtdQYTTAn0JsLa0gezhXH389C5rbxXwi0cevMayJtGo2l889AcUvzj8TM4apb0A1L
+         BMbwZS4GK3kY/gdlYr80q/5Ezh3T87DZhwrh0SVqcl67xEfcbi/Ssc7t8dDxxMZHm1KE
+         DysgB5lxIkLHl5NOYL5z2uiyYfXeZx4cZWb9vvBQ2Ztps6mk5CgHReau82C8L5Rip/L2
+         dSBkJIYxfO2yyFHiuHyicYHYGFzkAhFsWW6phMre4zd7CWDrB+esIsSUK0zVN0zXww+X
+         TNfA==
+X-Gm-Message-State: AOAM533RVMskxTLhHHMiqbwZL9Y/XfgDwX9TT35Az4szWvVSf5FwWPCl
+        B1k9/Em6cHDZcN2wTnKLvqcz8P1AUJiCfnWJQNWMqOMS+gd6/A==
+X-Google-Smtp-Source: ABdhPJyIkRYAlxtDSkXAXM9gsY6QUry1r5Zdx2nb46GQMqcX2XtlFC/PJ80AjWP1ADrQ4/8HHffwiTcNe52wpyvTR2Q=
+X-Received: by 2002:a81:4fc3:0:b0:2d0:e6ca:b3ac with SMTP id
+ d186-20020a814fc3000000b002d0e6cab3acmr2845757ywb.222.1645108467176; Thu, 17
+ Feb 2022 06:34:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220217134125.132150-9-pmorel@linux.ibm.com>
-User-Agent: Mutt/2.1.5 (2021-12-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+References: <20220207051202.577951-1-manali.shukla@amd.com>
+ <20220207051202.577951-2-manali.shukla@amd.com> <YgqtwRwYbJD5f9nA@google.com> <e9eba920-9522-6a56-4293-b60c0f1b77ed@amd.com>
+In-Reply-To: <e9eba920-9522-6a56-4293-b60c0f1b77ed@amd.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Thu, 17 Feb 2022 14:34:16 +0000
+Message-ID: <CAAAPnDH2LXkYkHpV+JTEmEF8PAGRP+wq7hR2nJpt53rO7bb-NA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] x86: Add routines to set/clear
+ PT_USER_MASK for all pages
+To:     "Shukla, Manali" <mashukla@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Manali Shukla <manali.shukla@amd.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,235 +69,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 02:41:22PM +0100, Pierre Morel wrote:
-> S390 CPU topology may have up to 5 topology containers.
-> The first container above the cores is level 2, the sockets,
-> and the level 3, containing sockets are the books.
-> 
-> We introduce here the drawers, drawers is the level containing books.
-> 
-> Let's add drawers, level4, containers to the CPU topology.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  hw/core/machine-smp.c      | 33 ++++++++++++++++++++++++++-------
->  hw/core/machine.c          |  2 ++
->  hw/s390x/s390-virtio-ccw.c |  1 +
->  include/hw/boards.h        |  4 ++++
->  qapi/machine.json          |  7 ++++++-
->  softmmu/vl.c               |  3 +++
->  6 files changed, 42 insertions(+), 8 deletions(-)
+On Thu, Feb 17, 2022 at 3:55 AM Shukla, Manali <mashukla@amd.com> wrote:
+>
+>
+>
+> On 2/15/2022 1:00 AM, Sean Christopherson wrote:
+> > On Mon, Feb 07, 2022, Manali Shukla wrote:
+> >> Add following 2 routines :
+> >> 1) set_user_mask_all() - set PT_USER_MASK for all the levels of page tables
+> >> 2) clear_user_mask_all - clear PT_USER_MASK for all the levels of page tables
+> >>
+> >> commit 916635a813e975600335c6c47250881b7a328971
+> >> (nSVM: Add test for NPT reserved bit and #NPF error code behavior)
+> >> clears PT_USER_MASK for all svm testcases. Any tests that requires
+> >> usermode access will fail after this commit.
+> >
+> > Gah, I took the easy route and it burned us.  I would rather we start breaking up
+> > the nSVM and nVMX monoliths, e.g. add a separate NPT test and clear the USER flag
+> > only in that test, not the "common" nSVM test.
+>
+> Yeah. I agree. I will try to set/clear User flag in svm_npt_rsvd_bits_test() and
+> set User flag by default for all the test cases by calling setup_vm()
+> and use walk_pte() to set/clear User flag in svm_npt_rsvd_bits_test().
+>
+> Walk_pte() routine uses start address and length to walk over the memory
+> region where flag needs to be set/clear. So start address and length need to be
+> figured out to use this routine.
 
-Needs to update -smp args in qemu-options.hx too.
+For the start address and length you can use 'stext' and 'etext' to
+compute those.  There's an example in access.c set_cr4_smep(),
+however, it uses walk_ptes() as opposed to walk_pte() (similar, but
+different).
 
-> 
-> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
-> index d7aa39d540..26150c748f 100644
-> --- a/hw/core/machine-smp.c
-> +++ b/hw/core/machine-smp.c
-> @@ -31,6 +31,10 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->      GString *s = g_string_new(NULL);
->  
-> +    if (mc->smp_props.drawers_supported) {
-> +        g_string_append_printf(s, " * drawers (%u)", ms->smp.drawers);
-> +    }
-> +
->      if (mc->smp_props.books_supported) {
->          g_string_append_printf(s, " * books (%u)", ms->smp.books);
->      }
-> @@ -77,6 +81,7 @@ void machine_parse_smp_config(MachineState *ms,
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->      unsigned cpus    = config->has_cpus ? config->cpus : 0;
-> +    unsigned drawers = config->has_drawers ? config->drawers : 0;
->      unsigned books   = config->has_books ? config->books : 0;
->      unsigned sockets = config->has_sockets ? config->sockets : 0;
->      unsigned dies    = config->has_dies ? config->dies : 0;
-> @@ -90,6 +95,7 @@ void machine_parse_smp_config(MachineState *ms,
->       * explicit configuration like "cpus=0" is not allowed.
->       */
->      if ((config->has_cpus && config->cpus == 0) ||
-> +        (config->has_drawers && config->drawers == 0) ||
->          (config->has_books && config->books == 0) ||
->          (config->has_sockets && config->sockets == 0) ||
->          (config->has_dies && config->dies == 0) ||
-> @@ -124,6 +130,13 @@ void machine_parse_smp_config(MachineState *ms,
->  
->      books = books > 0 ? books : 1;
->  
-> +    if (!mc->smp_props.drawers_supported && drawers > 1) {
-> +        error_setg(errp, "drawers not supported by this machine's CPU topology");
-> +        return;
-> +    }
-> +
-> +    drawers = drawers > 0 ? drawers : 1;
-> +
->      /* compute missing values based on the provided ones */
->      if (cpus == 0 && maxcpus == 0) {
->          sockets = sockets > 0 ? sockets : 1;
-> @@ -137,34 +150,40 @@ void machine_parse_smp_config(MachineState *ms,
->              if (sockets == 0) {
->                  cores = cores > 0 ? cores : 1;
->                  threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (books * dies * clusters * cores * threads);
-> +                sockets = maxcpus /
-> +                          (drawers * books * dies * clusters * cores * threads);
->              } else if (cores == 0) {
->                  threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (books * sockets * dies * clusters * threads);
-> +                cores = maxcpus /
-> +                        (drawers * books * sockets * dies * clusters * threads);
->              }
->          } else {
->              /* prefer cores over sockets since 6.2 */
->              if (cores == 0) {
->                  sockets = sockets > 0 ? sockets : 1;
->                  threads = threads > 0 ? threads : 1;
-> -                cores = maxcpus / (books * sockets * dies * clusters * threads);
-> +                cores = maxcpus /
-> +                        (drawers * books * sockets * dies * clusters * threads);
->              } else if (sockets == 0) {
->                  threads = threads > 0 ? threads : 1;
-> -                sockets = maxcpus / (books * dies * clusters * cores * threads);
-> +                sockets = maxcpus /
-> +                         (drawers * books * dies * clusters * cores * threads);
->              }
->          }
->  
->          /* try to calculate omitted threads at last */
->          if (threads == 0) {
-> -            threads = maxcpus / (books * sockets * dies * clusters * cores);
-> +            threads = maxcpus /
-> +                      (drawers * books * sockets * dies * clusters * cores);
->          }
->      }
->  
-> -    maxcpus = maxcpus > 0 ? maxcpus : books * sockets * dies *
-> +    maxcpus = maxcpus > 0 ? maxcpus : drawers * books * sockets * dies *
->                                        clusters * cores * threads;
->      cpus = cpus > 0 ? cpus : maxcpus;
->  
->      ms->smp.cpus = cpus;
-> +    ms->smp.drawers = drawers;
->      ms->smp.books = books;
->      ms->smp.sockets = sockets;
->      ms->smp.dies = dies;
-> @@ -174,7 +193,7 @@ void machine_parse_smp_config(MachineState *ms,
->      ms->smp.max_cpus = maxcpus;
->  
->      /* sanity-check of the computed topology */
-> -    if (books * sockets * dies * clusters * cores * threads != maxcpus) {
-> +    if (drawers * books * sockets * dies * clusters * cores * threads != maxcpus) {
->          g_autofree char *topo_msg = cpu_hierarchy_to_string(ms);
->          error_setg(errp, "Invalid CPU topology: "
->                     "product of the hierarchy must match maxcpus: "
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index b8c624d2bf..1db55e36c8 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -743,6 +743,7 @@ static void machine_get_smp(Object *obj, Visitor *v, const char *name,
->      MachineState *ms = MACHINE(obj);
->      SMPConfiguration *config = &(SMPConfiguration){
->          .has_cpus = true, .cpus = ms->smp.cpus,
-> +        .has_drawers = true, .drawers = ms->smp.drawers,
->          .has_books = true, .books = ms->smp.books,
->          .has_sockets = true, .sockets = ms->smp.sockets,
->          .has_dies = true, .dies = ms->smp.dies,
-> @@ -936,6 +937,7 @@ static void machine_initfn(Object *obj)
->      /* default to mc->default_cpus */
->      ms->smp.cpus = mc->default_cpus;
->      ms->smp.max_cpus = mc->default_cpus;
-> +    ms->smp.drawers = 1;
->      ms->smp.books = 1;
->      ms->smp.sockets = 1;
->      ms->smp.dies = 1;
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 193883fba3..03829e90b3 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -667,6 +667,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      nc->nmi_monitor_handler = s390_nmi;
->      mc->default_ram_id = "s390.ram";
->      mc->smp_props.books_supported = true;
-> +    mc->smp_props.drawers_supported = true;
->  }
->  
->  static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index bc0f7f22dc..abc5556c50 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -131,12 +131,14 @@ typedef struct {
->   * @dies_supported - whether dies are supported by the machine
->   * @clusters_supported - whether clusters are supported by the machine
->   * @books_supported - whether books are supported by the machine
-> + * @drawers_supported - whether drawers are supported by the machine
->   */
->  typedef struct {
->      bool prefer_sockets;
->      bool dies_supported;
->      bool clusters_supported;
->      bool books_supported;
-> +    bool drawers_supported;
->  } SMPCompatProps;
->  
->  /**
-> @@ -301,6 +303,7 @@ typedef struct DeviceMemoryState {
->  /**
->   * CpuTopology:
->   * @cpus: the number of present logical processors on the machine
-> + * @drawers: the number of drawers on the machine
->   * @books: the number of books on the machine
->   * @sockets: the number of sockets on the machine
->   * @dies: the number of dies in one socket
-> @@ -311,6 +314,7 @@ typedef struct DeviceMemoryState {
->   */
->  typedef struct CpuTopology {
->      unsigned int cpus;
-> +    unsigned int drawers;
->      unsigned int books;
->      unsigned int sockets;
->      unsigned int dies;
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 73206f811a..fa6bde5617 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -866,13 +866,14 @@
->  # a CPU is being hotplugged.
->  #
->  # @node-id: NUMA node ID the CPU belongs to
-> +# @drawer-id: drawer number within node/board the CPU belongs to
->  # @book-id: book number within node/board the CPU belongs to
->  # @socket-id: socket number within node/board the CPU belongs to
-
-So the lack of change here implies that 'socket-id' is unique
-across multiple  books/drawers. Is that correct, as its differnt
-from semantics for die-id/core-id/thread-id which are scoped
-to within the next level of the topology ?
-
->  # @die-id: die number within socket the CPU belongs to (since 4.1)
->  # @core-id: core number within die the CPU belongs to
->  # @thread-id: thread number within core the CPU belongs to
->  #
-> -# Note: currently there are 6 properties that could be present
-> +# Note: currently there are 7 properties that could be present
->  #       but management should be prepared to pass through other
->  #       properties with device_add command to allow for future
->  #       interface extension. This also requires the filed names to be kept in
-> @@ -882,6 +883,7 @@
->  ##
->  { 'struct': 'CpuInstanceProperties',
->    'data': { '*node-id': 'int',
-> +            '*drawer-id': 'int',
->              '*book-id': 'int',
->              '*socket-id': 'int',
->              '*die-id': 'int',
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+>
+> I will work on this.
+>
+> >
+> > If we don't do that, this should really use walk_pte() instead of adding yet
+> > another PTE walker.
+>
+> -Manali
