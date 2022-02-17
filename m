@@ -2,135 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8F824BA788
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:53:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 856214BA78A
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:55:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242295AbiBQRwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 12:52:44 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54144 "EHLO
+        id S243922AbiBQRy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 12:54:59 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233011AbiBQRwm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 12:52:42 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B807AB2D6A
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:52:27 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id c6so8320628edk.12
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:52:27 -0800 (PST)
+        with ESMTP id S240805AbiBQRy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 12:54:58 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3342B1676
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:54:43 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id e79so4584567iof.13
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:54:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0GezYuBq/IBk84/vSXTIhXk7J6MIx3mjFhk6IwFvMpk=;
-        b=jLaab6MwwT20QXD4svGT4lr1ununpN2FDzfw5Fd5zN6NacnaFxdFx/32vEkC4NW6jk
-         zkbeWhtkY5i4CnmhFXMqOwvr9CBReUqYHQbYGVZbhPq6jiJlHLszzydv65qpfQA8QTFQ
-         Y7aSWHzgC/8dvePLHMdKg2l7ChiAxPHDx/4ma3gbp0nMUq8yjIv5s0G8VjLd4DYc6WPQ
-         KM2yKtixtMjDh9EIEP951hwb2dfs6Fg7EaTAx08VPJ9u8rKWgdwOspobpOFkMRCFkFLx
-         RC2gp1VeFZCE101Ix5JhDVANbO5Xa4/rrGhBgwkRxIPjZiR64PxNPl8TFZxBZGLN+aSy
-         Agtw==
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=e5+j39i13fFYZEoD3DCwP8XttAEX4sDat27MGjT25cA=;
+        b=WfLn02BFrCw1wY2L0Idi3skV3nRf6FNMvdRR1KwMO4frJ+Z3I3V1WuMy+CRlyxdIu2
+         L15JTX+C5MHZS4esxx//5VzgfkFgyDlVvvAoZP8lAblXyoGhoCNsFP6fu8Ivjgux6HfE
+         cawsUNnrWE7tEiNMW1Hl8eq2eejTilBwdVWlo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=0GezYuBq/IBk84/vSXTIhXk7J6MIx3mjFhk6IwFvMpk=;
-        b=CnYm+MlTjhx8tO0ypaRODfj07kXbQvhvD3F7P9UrEJRfiVbjj+qugiIcqr4wEC3dO9
-         d4v7xo4D7DKL8KcspklSjJuurjOnuEC9zRGUNoOubhmHIsN9jsWZXb7ubSHmlBS4Kzje
-         YdWDLOoYOO4HHV+lOlgs6LsEx+1TNrxx6c+1eykuZNtriH/njTC60dBxuCR9+NupHYJJ
-         r2aS42ZbWfkcaokMfjt+f9sTVxC0uYmG/EJu9s6c5XtYWsugUHXcxw/z5QC+iUY0CMhz
-         FRM8hC51b6zJD+9d2vL2gZSFNBmxzWgiPq9KjAz7TC6QLpo3dPwCvRnn8EM5IVqkQF4J
-         dkZQ==
-X-Gm-Message-State: AOAM533K3VwqCC2tVKTkTXfwdhNZnM3WRyFyF4buk/BibGwut90P6VxG
-        sL1rHCQiObP+ZOsx+Ihb0JI=
-X-Google-Smtp-Source: ABdhPJzI200juUtGBf/k8LHDGffRyefuo8jxOX3KLk/VDR0ORMo5x7f5QIrkpeZ3jz6H/ybWZB20vQ==
-X-Received: by 2002:a05:6402:18:b0:410:86cd:9dce with SMTP id d24-20020a056402001800b0041086cd9dcemr3830314edu.70.1645120346234;
-        Thu, 17 Feb 2022 09:52:26 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id b5sm3717367edz.13.2022.02.17.09.52.25
+        bh=e5+j39i13fFYZEoD3DCwP8XttAEX4sDat27MGjT25cA=;
+        b=rYocZQQGEPDgRhQtZjE64t/KiT2PyN4RtiXd0DQ8uS8GvVDxdYgrfAoFmkZFsrW59m
+         Zofwg9VqfFXGdZJzY7w3iysbwjtp0BB11RQNvkZqxsi9++3r8w8PocSfluXZz32U+xV4
+         oMSi/ZQ7ZxpTp4smTJRMAWvC8QXW8+Gf8PrdSBRXGErUZwp4SLBmuFg3UOuLGuDSv7FT
+         8lD9QRdgeerD7svV67ygNNvnwq2A/xZbNpWHOe19VNYUWaiGToCdz0CqZpop5Ur3uI/L
+         QZmOxW5mF35WaH+wHWd7Gm7Ki9XNPNDza3kmouwMMT/Tw1Yb5rKuhM88BBFjnO00V2qm
+         2DEQ==
+X-Gm-Message-State: AOAM531gfPwTEnijeqyr70Vi2abBDUEneIR0gq+MY3iXTObUxa6TUZZu
+        jG6PkSDBpUZhsqC/ZtapSEsWsw==
+X-Google-Smtp-Source: ABdhPJxSu1A/OTw4VzSbhU1MEBNMeS2u06JBywtGIaM6G4sX/h2cM7wD49LlSZPRoVsAthdhGIigeg==
+X-Received: by 2002:a02:6a0f:0:b0:30e:e62e:1148 with SMTP id l15-20020a026a0f000000b0030ee62e1148mr2694652jac.316.1645120482467;
+        Thu, 17 Feb 2022 09:54:42 -0800 (PST)
+Received: from [192.168.1.128] ([71.205.29.0])
+        by smtp.gmail.com with ESMTPSA id e15sm2251575iov.53.2022.02.17.09.54.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 09:52:25 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <f7dc638d-0de1-baa8-d883-fd8435ae13f2@redhat.com>
-Date:   Thu, 17 Feb 2022 18:52:25 +0100
+        Thu, 17 Feb 2022 09:54:42 -0800 (PST)
+Subject: Re: [PATCH 2/2] KVM: s390: selftests: Test vm and vcpu memop with
+ keys
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <20220211182215.2730017-11-scgl@linux.ibm.com>
+ <20220217145336.1794778-1-scgl@linux.ibm.com>
+ <20220217145336.1794778-3-scgl@linux.ibm.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <7d0b5b03-21f4-0402-779a-788d4bd58071@linuxfoundation.org>
+Date:   Thu, 17 Feb 2022 10:54:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+In-Reply-To: <20220217145336.1794778-3-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Stefan Hajnoczi <stefanha@gmail.com>,
-        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>
-Cc:     Mark Kanda <mark.kanda@oracle.com>
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/28/22 16:47, Stefan Hajnoczi wrote:
-> Dear QEMU, KVM, and rust-vmm communities,
-> QEMU will apply for Google Summer of Code 2022
-> (https://summerofcode.withgoogle.com/) and has been accepted into
-> Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-> submit internship project ideas for QEMU, KVM, and rust-vmm!
-> 
-> If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> be a mentor. It's a great way to give back and you get to work with
-> people who are just starting out in open source.
-> 
-> Please reply to this email by February 21st with your project ideas.
-
-I would like to co-mentor one or more projects about adding more 
-statistics to Mark Kanda's newly-born introspectable statistics 
-subsystem in QEMU 
-(https://patchew.org/QEMU/20220215150433.2310711-1-mark.kanda@oracle.com/), 
-for example integrating "info blockstats"; and/or, to add matching 
-functionality to libvirt.
-
-However, I will only be available for co-mentoring unfortunately.
-
-Paolo
-
-> Good project ideas are suitable for remote work by a competent
-> programmer who is not yet familiar with the codebase. In
-> addition, they are:
-> - Well-defined - the scope is clear
-> - Self-contained - there are few dependencies
-> - Uncontroversial - they are acceptable to the community
-> - Incremental - they produce deliverables along the way
-> 
-> Feel free to post ideas even if you are unable to mentor the project.
-> It doesn't hurt to share the idea!
-> 
-> I will review project ideas and keep you up-to-date on QEMU's
-> acceptance into GSoC.
-> 
-> Internship program details:
-> - Paid, remote work open source internships
-> - GSoC projects are 175 or 350 hours, Outreachy projects are 30
-> hrs/week for 12 weeks
-> - Mentored by volunteers from QEMU, KVM, and rust-vmm
-> - Mentors typically spend at least 5 hours per week during the coding period
-> 
-> Changes since last year: GSoC now has 175 or 350 hour project sizes
-> instead of 12 week full-time projects. GSoC will accept applicants who
-> are not students, before it was limited to students.
-> 
-> For more background on QEMU internships, check out this video:
-> https://www.youtube.com/watch?v=xNVCX7YMUL8
-> 
-> Please let me know if you have any questions!
-> 
-> Stefan
+On 2/17/22 7:53 AM, Janis Schoetterl-Glausch wrote:
+> Test storage key checking for both vm and vcpu MEM_OP ioctls.
+> Test both error and non error conditions.
 > 
 
+This patch seems to combine restructuring the code and new code.
+e,g test_errors() was added in the last patch, only to be redone
+in this patch with test_errors split into test_common_errors()
+
+Doing restructure in a separate patch and then adding new code
+makes it easier to review and also keep them simpler patches.
+
+Please split the code in these two patches to just do restructure
+and then add new code.
+
+I also would like to have good reasons to change existing code and
+make them into macros.
+  
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>   tools/testing/selftests/kvm/s390x/memop.c | 342 +++++++++++++++++++++-
+>   1 file changed, 328 insertions(+), 14 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+> index 4510418d73e6..bc12a9238967 100644
+> --- a/tools/testing/selftests/kvm/s390x/memop.c
+> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> @@ -201,6 +201,8 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
+>   #define PAGE_SHIFT 12
+>   #define PAGE_SIZE (1ULL << PAGE_SHIFT)
+>   #define PAGE_MASK (~(PAGE_SIZE - 1))
+> +#define CR0_FETCH_PROTECTION_OVERRIDE	(1UL << (63 - 38))
+> +#define CR0_STORAGE_PROTECTION_OVERRIDE	(1UL << (63 - 39))
+>   
+>   #define ASSERT_MEM_EQ(p1, p2, size) \
+>   	TEST_ASSERT(!memcmp(p1, p2, size), "Memory contents do not match!")
+> @@ -235,6 +237,11 @@ static struct test_default test_default_init(void *guest_code)
+>   	return t;
+>   }
+>   
+> +static vm_vaddr_t test_vaddr_alloc(struct test_vcpu vm, size_t size, vm_vaddr_t vaddr_min)
+> +{
+> +	return vm_vaddr_alloc(vm.vm, size, vaddr_min);
+> +}
+> +
+
+What is the value of adding a new routine that simply calls another?
+Do you see this routine changing in the future to do more?
+
+thanks,
+-- Shuah
