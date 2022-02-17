@@ -2,248 +2,377 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F53F4BA001
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 13:22:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26D2C4BA04A
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 13:40:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240365AbiBQMWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 07:22:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55464 "EHLO
+        id S240498AbiBQMlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 07:41:07 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240372AbiBQMWL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 07:22:11 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2070.outbound.protection.outlook.com [40.107.237.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1451A1D9657;
-        Thu, 17 Feb 2022 04:21:56 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QvwFSf4L6NylwrLhBw7YS39Ga2n+08qq4G5UNHLhAOML5R+W0PzLdBwcl4/8Z5RVEXD3o+ttL7Mzyb83iInY6/mB20MKIt+bt8fBB3ZmXi0IUMtFZy71b8PkuCUxqCvt7vJkEektI3c6AzqGj+82XIkX/4YUlgSlLJmKZGQxKMoOHNt7/xSUzCvDUX74047rK2BSCAZhZIfrawgmaL4tlHBia6EM7p4863rgj0ZgWc7soVkRTDpKvRF9dy3p+Dqb1N+DG/GlxY8W7UdEBPjtICRStmFpHi2a40Iqq1/mzCzXkXAALRAy4IHq1v5TQu5wtXUvMZeTqnz8oSu+oY4GpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zbul8SlZoyULh/7AZW6F4+X/7Sr4ZclfduAXJB1lLt4=;
- b=VmvuIG5cySYyDghpmNTpR7lAQHUxEbp9SCeqRzQ2STAR7y4FesaR/7n6+/FjHtwhppREfh0ZoHXkYWrkKvYNFrT4kJHX99hny2v6h/KCKA6Aqwi+yNnu0RtiJTBS2KzG+mGrRGduEkBygbHMxO5MVhmn3hdVAQ7eC8sAEpYwalLfWG53d83/fiaaZ22gYjr/Pvy1xxhAhywG70EJ2hbRpC3UJ871snVgNxDgDJeiU8eZKk2rPhkJRUrUs7h7rGxOFI0DLNf4rNCepsYm62kT+9MFO6w7qqD9GOBVwweIuCV/BmnJ3Lkm2bNtVga/zmYceG9Fe1CDv+QLMYyZAXnaDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.238) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zbul8SlZoyULh/7AZW6F4+X/7Sr4ZclfduAXJB1lLt4=;
- b=T/VmiBqj+pJC1J0cXvL6G03tL0SCiox9lwLKfFdvgPF4ClH6xfe5OxuRCXiO+mCb9jKgBMds9q4qCuISgN4wHYPqXCm7AUfJs1SkOAFEa0PcDc9kn56wAzU5yNCN+Ad45iYXLpCXCtPyZpqWR1w3CWUKl4Zrljt6CM0nOdkNzAqZN3VM66oFMLZEAXQgnZrp3apLafGw2W4QQq3CJKrZ37h0oT1MDIjzYwht3lIVi071t0QJRNbufj7m1SBZngAj5Y+Sr+pacTwX6eR+aNoVEql1J/TTpTxlKfrNelR4cOMxiTvD0S/lLWQQrgEKRmt9XsNCleRU0/1DZDTPTJaL6A==
-Received: from DS7PR03CA0085.namprd03.prod.outlook.com (2603:10b6:5:3bb::30)
- by DM6PR12MB3916.namprd12.prod.outlook.com (2603:10b6:5:1ca::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16; Thu, 17 Feb
- 2022 12:21:53 +0000
-Received: from DM6NAM11FT036.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3bb:cafe::e) by DS7PR03CA0085.outlook.office365.com
- (2603:10b6:5:3bb::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16 via Frontend
- Transport; Thu, 17 Feb 2022 12:21:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.238; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (12.22.5.238) by
- DM6NAM11FT036.mail.protection.outlook.com (10.13.172.64) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4995.15 via Frontend Transport; Thu, 17 Feb 2022 12:21:53 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by DRHQMAIL105.nvidia.com
- (10.27.9.14) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 17 Feb
- 2022 12:21:34 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.9; Thu, 17 Feb 2022
- 04:21:33 -0800
-Received: from nvidia-Inspiron-15-7510.nvidia.com (10.127.8.9) by
- mail.nvidia.com (10.129.68.8) with Microsoft SMTP Server id 15.2.986.9 via
- Frontend Transport; Thu, 17 Feb 2022 04:21:29 -0800
-From:   Abhishek Sahu <abhsahu@nvidia.com>
-To:     <kvm@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhen Lei <thunder.leizhen@huawei.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        <linux-kernel@vger.kernel.org>, Abhishek Sahu <abhsahu@nvidia.com>
-Subject: [PATCH v3 2/2] vfio/pci: wake-up devices around reset functions
-Date:   Thu, 17 Feb 2022 17:51:07 +0530
-Message-ID: <20220217122107.22434-3-abhsahu@nvidia.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220217122107.22434-1-abhsahu@nvidia.com>
-References: <20220217122107.22434-1-abhsahu@nvidia.com>
-X-NVConfidentiality: public
+        with ESMTP id S240488AbiBQMlG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 07:41:06 -0500
+X-Greylist: delayed 451 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 17 Feb 2022 04:40:52 PST
+Received: from wnew2-smtp.messagingengine.com (wnew2-smtp.messagingengine.com [64.147.123.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B5A326A2C1;
+        Thu, 17 Feb 2022 04:40:52 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.west.internal (Postfix) with ESMTP id 9B9912B00220;
+        Thu, 17 Feb 2022 07:33:17 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Thu, 17 Feb 2022 07:33:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm3; bh=jJAvTOP7DGVsKlnoRNy0hAex2AFIzRV/iOCzuW
+        6+yeY=; b=hgaPpn4DeJWqY6HlpXxhuFMDj2Nd8g1/jrrnDKbfgGuiIzw3m5k8O+
+        LkR4s9fE9o9Ze7knvpTs5AajB9rHPjLWfNmfox1DE463gupahqmIblOacIDCI6Ez
+        Vl2qpwuLMMeXsbb/AJU3zwx9mRIJfbymTuAyDLm5xawr+JpyzDLQ9HoVkpFXKJgj
+        OzqauBFiOz2FdKsRfe/gB6YMILcCe4seIGxL4Q00xFGHeFYrRxevqYBixjoSlqFT
+        B5tyaXvgCPC630gwtDSWKPwuzE4KK6YkX8QBD4Dv15cWekBMTycKfGzsEWEq8RBI
+        QR2H1PZpnOK/hPxGkEtHQ6ur48UeRpIA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=jJAvTOP7DGVsKlnoR
+        Ny0hAex2AFIzRV/iOCzuW6+yeY=; b=f6jMRqyFzz1WLJjPGriGZQPPXj4bRGKiY
+        TzBBBmYGL5kt8IOI/nS7SxgqzywCWptKfYihaw5wjnsAWsN0cOiDd8YXzS5OFw3o
+        nBtoBWjMDORAQ8Yw1j9A0qM3opr7uHF6zrKj/WScu2wEM9eBF7mIQcluWBTuDB3r
+        Wjj66ls1hCO39Y7plvkxbHxiavZV7W14Zvgb01iBjL5J9TvZ8g4GaF+Uxryy2B/m
+        /oR2x/9Djl/Q8EoKnmr6/RUXle8+xlqnt/29i7lxVGNgKlX16216XLH3hIbPtFZd
+        DrgUXc1UJFJQpsXSdM7nYurBsghzmZnwC5madTPCGf1Ic26bK3KJg==
+X-ME-Sender: <xms:jEAOYo6Vya71ZKCLmeiiBYcMnf_muIwMaGSUOD4x8a-Dsm90ZqJxgA>
+    <xme:jEAOYp5dENM6cjoePMMURjr1H9NRh-zeCjkERkGZn7ln4Ro63eGBRt6XY5Rq7zfas
+    naQZO_VuoLUuA>
+X-ME-Received: <xmr:jEAOYncoHNvMZz1vKw_Xdjkifnr8MOu43OIsyuxMHI91YKnEOqD94jPlacK7G9IR52BgSCumb-cviU7-FKXAR1tZ9UcMkXtV>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrjeekgdegtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
+    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuheejgf
+    ffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrd
+    gtohhm
+X-ME-Proxy: <xmx:jEAOYtKQ71utQDsogGpqlTGTEd5lXDkxD4CscBzVNQQSgHPRGGXudA>
+    <xmx:jEAOYsIZ-TrBIFEjUxI1h6QCIVuj8MK1pQZqowb11mJQCxqIbf048Q>
+    <xmx:jEAOYuzf8mS6sk99w97iPeGngR0ISZpvWaQamwKd0_iEPfiqzRh6UA>
+    <xmx:jUAOYh6Sa0BKWJ8ey7y7FlNipdSG6WxfOSp5WvxLYZApikSXjEFBTD-soAI>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 17 Feb 2022 07:33:15 -0500 (EST)
+Date:   Thu, 17 Feb 2022 13:33:13 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Steffen Eiden <seiden@linux.ibm.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/3] drivers/s390/char: Add Ultravisor io device
+Message-ID: <Yg5AiTWYl8y842Nt@kroah.com>
+References: <20220217113717.46624-1-seiden@linux.ibm.com>
+ <20220217113717.46624-2-seiden@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ac969d76-57d5-47af-97ae-08d9f21014db
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3916:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3916F883A89025488D0CB871CC369@DM6PR12MB3916.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fUHKHnpB4h4VV9S7u3DEcd4NbWY97hw3ltYTicXrHYfn5NyO8eX4saUJLl0XbzE/q7++m/X1wA6UE8aeYdiUAfXOxUDEaQEZymX62aRWeMCguUWwFtTONNBUOPcID7L5O6E1VMhDPiSDfTsJAN31HFW5S4ExW1t+fe43BuxSAUZDMXP4qtKYjUqZEW2Ew2QcVFZg4ohxhA54TSoCa/U0Iv4B5DlY3MDvgeO4nQ9QCNP4ox47ECe0gjWHSqiPW/baD+VX32sb64i56jDi6jkft5bbIOT7Qnet/ZFdx5Uyxljr2FvI71S6pJosLiVIFkiErdbNz6h4U+NG76DMiEfoMWEqRAhuVmJgKSSyUQz/TMGZ7zWoykw4CSWjiCMfrru42YRTKbRVWSPtFiH92uDuuJLsHYfgrkeEAzFt+WymQMrfMDJhmiUVJDtlgcSb2uCsI4OUN+Gkk6X+UqDbhaDLlL/aYWfPpoj9AzDJdxoM6IQUdoLXiJG0WzScV0L7t67oJbFiyqnCZuGPaHVyucPVErMFpG3rl6z1Bf6dEB0DtBZPFYHsBsbZUhviAL6/jAciiyGBdL/6308SURMrnJ8zPHaMBUF9+LuCuLg7aGVQCj8OeTdKpDTrURVwRahnoCGzcGSyzRQqOPOhC1kpnFeKET9SP5aSw1tZ+eb+0VWZ2EI9UqVpCo6H+8s8fpKRvoNW/qi+vHKv5Vf9NCpdHu3UaQ==
-X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(46966006)(40470700004)(36840700001)(36860700001)(83380400001)(7696005)(2616005)(36756003)(107886003)(5660300002)(47076005)(186003)(26005)(1076003)(336012)(426003)(2906002)(81166007)(8936002)(316002)(356005)(8676002)(6666004)(4326008)(40460700003)(54906003)(110136005)(86362001)(70586007)(70206006)(508600001)(82310400004)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 12:21:53.1407
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac969d76-57d5-47af-97ae-08d9f21014db
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT036.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3916
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220217113717.46624-2-seiden@linux.ibm.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If 'vfio_pci_core_device::needs_pm_restore' is set (PCI device does
-not have No_Soft_Reset bit set in its PMCSR config register), then the
-current PCI state will be saved locally in
-'vfio_pci_core_device::pm_save' during D0->D3hot transition and same
-will be restored back during D3hot->D0 transition. For reset-related
-functionalities, vfio driver uses PCI reset API's. These
-API's internally change the PCI power state back to D0 first if
-the device power state is non-D0. This state change to D0 will happen
-without the involvement of vfio driver.
+On Thu, Feb 17, 2022 at 06:37:15AM -0500, Steffen Eiden wrote:
+> This patch adds a new miscdevice to expose some Ultravisor functions
+> to userspace. Userspace can send IOCTLis to the uvdevice that will then
+> emit a corresponding Ultravisor Call and hands the result over to
+> userspace. The uvdevice is available if the Ultravisor Call facility is
+> present.
+> 
+> Userspace is now able to call the Query Ultravisor Information
+> Ultravisor Command through the uvdevice.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>  MAINTAINERS                           |   2 +
+>  arch/s390/include/uapi/asm/uvdevice.h |  27 +++++
+>  drivers/s390/char/Kconfig             |   9 ++
+>  drivers/s390/char/Makefile            |   1 +
+>  drivers/s390/char/uvdevice.c          | 162 ++++++++++++++++++++++++++
+>  5 files changed, 201 insertions(+)
+>  create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
+>  create mode 100644 drivers/s390/char/uvdevice.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5250298d2817..c7d8d0fe48cf 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10457,9 +10457,11 @@ F:	Documentation/virt/kvm/s390*
+>  F:	arch/s390/include/asm/gmap.h
+>  F:	arch/s390/include/asm/kvm*
+>  F:	arch/s390/include/uapi/asm/kvm*
+> +F:	arch/s390/include/uapi/asm/uvdevice.h
+>  F:	arch/s390/kernel/uv.c
+>  F:	arch/s390/kvm/
+>  F:	arch/s390/mm/gmap.c
+> +F:	drivers/s390/char/uvdevice.c
+>  F:	tools/testing/selftests/kvm/*/s390x/
+>  F:	tools/testing/selftests/kvm/s390x/
+>  
+> diff --git a/arch/s390/include/uapi/asm/uvdevice.h b/arch/s390/include/uapi/asm/uvdevice.h
+> new file mode 100644
+> index 000000000000..f2e4984a6e2e
+> --- /dev/null
+> +++ b/arch/s390/include/uapi/asm/uvdevice.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+> +#ifndef __S390X_ASM_UVDEVICE_H
+> +#define __S390X_ASM_UVDEVICE_H
+> +
+> +#include <linux/types.h>
+> +
+> +struct uvio_ioctl_cb {
+> +	__u32 flags;			/* Currently no flags defined, must be zero */
+> +	__u16 uv_rc;			/* UV header rc value */
+> +	__u16 uv_rrc;			/* UV header rrc value */
+> +	__u64 argument_addr;		/* Userspace address of uvio argument */
+> +	__u32 argument_len;
+> +	__u8  reserved14[0x40 - 0x14];	/* must be zero */
+> +};
+> +
+> +#define UVIO_QUI_MAX_LEN		0x8000
+> +
+> +#define UVIO_DEVICE_NAME "uv"
+> +#define UVIO_TYPE_UVC 'u'
+> +
+> +#define UVIO_IOCTL_QUI _IOWR(UVIO_TYPE_UVC, 0x01, struct uvio_ioctl_cb)
+> +
+> +#endif  /* __S390X_ASM_UVDEVICE_H */
+> diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
+> index 6cc4b19acf85..933c0d0062d6 100644
+> --- a/drivers/s390/char/Kconfig
+> +++ b/drivers/s390/char/Kconfig
+> @@ -184,3 +184,12 @@ config S390_VMUR
+>  	depends on S390
+>  	help
+>  	  Character device driver for z/VM reader, puncher and printer.
+> +
+> +config UV_UAPI
+> +	def_tristate m
+> +	prompt "Ultravisor userspace API"
+> +	depends on PROTECTED_VIRTUALIZATION_GUEST
+> +	help
+> +	  Selecting exposes parts of the UV interface to userspace
+> +	  by providing a misc character device. Using IOCTLs one
+> +	  can interact with the UV.
+> diff --git a/drivers/s390/char/Makefile b/drivers/s390/char/Makefile
+> index c6fdb81a068a..b5c83092210e 100644
+> --- a/drivers/s390/char/Makefile
+> +++ b/drivers/s390/char/Makefile
+> @@ -48,6 +48,7 @@ obj-$(CONFIG_MONREADER) += monreader.o
+>  obj-$(CONFIG_MONWRITER) += monwriter.o
+>  obj-$(CONFIG_S390_VMUR) += vmur.o
+>  obj-$(CONFIG_CRASH_DUMP) += sclp_sdias.o zcore.o
+> +obj-$(CONFIG_UV_UAPI) += uvdevice.o
+>  
+>  hmcdrv-objs := hmcdrv_mod.o hmcdrv_dev.o hmcdrv_ftp.o hmcdrv_cache.o diag_ftp.o sclp_ftp.o
+>  obj-$(CONFIG_HMC_DRV) += hmcdrv.o
+> diff --git a/drivers/s390/char/uvdevice.c b/drivers/s390/char/uvdevice.c
+> new file mode 100644
+> index 000000000000..e8efcbf0e7ab
+> --- /dev/null
+> +++ b/drivers/s390/char/uvdevice.c
+> @@ -0,0 +1,162 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + *  Copyright IBM Corp. 2022
+> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
+> + */
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt ".\n"
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/types.h>
+> +#include <linux/stddef.h>
+> +#include <linux/vmalloc.h>
+> +#include <linux/slab.h>
+> +
+> +#include <asm/uvdevice.h>
+> +#include <asm/uv.h>
+> +
+> +/**
+> + * uvio_qui() - Perform a Query Ultravisor Information UVC.
+> + *
+> + * uv_ioctl: ioctl control block
+> + *
+> + * uvio_qui() does a Query Ultravisor Information (QUI) Ultravisor Call.
+> + * It creates the uvc qui request and sends it to the Ultravisor. After that
+> + * it copies the response to userspace and fills the rc and rrc of uv_ioctl
+> + * uv_call with the response values of the Ultravisor.
+> + *
+> + * Create the UVC structure, send the UVC to UV and write the response in the ioctl struct.
+> + *
+> + * Return: 0 on success or a negative error code on error.
+> + */
+> +static int uvio_qui(struct uvio_ioctl_cb *uv_ioctl)
+> +{
+> +	u8 __user *user_buf_addr = (__user u8 *)uv_ioctl->argument_addr;
+> +	size_t user_buf_len = uv_ioctl->argument_len;
+> +	struct uv_cb_header *uvcb_qui = NULL;
+> +	int ret;
+> +
+> +	/*
+> +	 * Do not check for a too small buffer. If userspace provides a buffer
+> +	 * that is too small the Ultravisor will complain.
+> +	 */
+> +	ret = -EINVAL;
+> +	if (!user_buf_len || user_buf_len > UVIO_QUI_MAX_LEN)
+> +		goto out;
+> +	ret = -ENOMEM;
+> +	uvcb_qui = kvzalloc(user_buf_len, GFP_KERNEL);
+> +	if (!uvcb_qui)
+> +		goto out;
+> +	uvcb_qui->len = user_buf_len;
+> +	uvcb_qui->cmd = UVC_CMD_QUI;
+> +
+> +	uv_call(0, (u64)uvcb_qui);
+> +
+> +	ret = -EFAULT;
+> +	if (copy_to_user(user_buf_addr, uvcb_qui, uvcb_qui->len))
+> +		goto out;
+> +	uv_ioctl->uv_rc = uvcb_qui->rc;
+> +	uv_ioctl->uv_rrc = uvcb_qui->rrc;
+> +
+> +	ret = 0;
+> +out:
+> +	kvfree(uvcb_qui);
+> +	return ret;
+> +}
+> +
+> +static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp)
+> +{
+> +	u64 sum = 0;
+> +	u64 i;
+> +
+> +	if (copy_from_user(ioctl, argp, sizeof(*ioctl)))
+> +		return -EFAULT;
+> +	if (ioctl->flags != 0)
+> +		return -EINVAL;
+> +	for (i = 0; i < ARRAY_SIZE(ioctl->reserved14); i++)
+> +		sum += ioctl->reserved14[i];
+> +	if (sum)
+> +		return -EINVAL;
 
-Let's consider the following example:
+So you can have -1, 1, -1, 1, and so on and cause this to be an
+incorrect check.  Just test for 0 and bail out early please.
 
-1. The device is in D3hot.
-2. User invokes VFIO_DEVICE_RESET ioctl.
-3. pci_try_reset_function() will be called which internally
-   invokes pci_dev_save_and_disable().
-4. pci_set_power_state(dev, PCI_D0) will be called first.
-5. pci_save_state() will happen then.
 
-Now, for the devices which has NoSoftRst-, the pci_set_power_state()
-can trigger soft reset and the original PCI config state will be lost
-at step (4) and this state cannot be restored again. This original PCI
-state can include any setting which is performed by SBIOS or host
-linux kernel (for example LTR, ASPM L1 substates, etc.). When this
-soft reset will be triggered, then all these settings will be reset,
-and the device state saved at step (5) will also have this setting
-cleared so it cannot be restored. Since the vfio driver only exposes
-limited PCI capabilities to its user, so the vfio driver user also
-won't have the option to save and restore these capabilities state
-either and these original settings will be permanently lost.
 
-For pci_reset_bus() also, we can have the above situation.
-The other functions/devices can be in D3hot and the reset will change
-the power state of all devices to D0 without the involvement of vfio
-driver.
+> +
+> +	return 0;
+> +}
+> +
+> +static int uvio_dev_open(struct inode *inode, struct file *filp)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int uvio_dev_close(struct inode *inodep, struct file *filp)
+> +{
+> +	return 0;
+> +}
 
-So, before calling any reset-related API's, we need to make sure that
-the device state is D0. This is mainly to preserve the state around
-soft reset.
+If open/close do nothing, no need to provide it at all, just drop them.
 
-For vfio_pci_core_disable(), we use __pci_reset_function_locked()
-which internally can use pci_pm_reset() for the function reset.
-pci_pm_reset() requires the device power state to be in D0, otherwise
-it returns error.
+> +
+> +/*
+> + * IOCTL entry point for the Ultravisor device.
+> + */
+> +static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+> +{
+> +	void __user *argp = (void __user *)arg;
+> +	struct uvio_ioctl_cb *uv_ioctl;
+> +	long ret;
+> +
+> +	ret = -ENOMEM;
+> +	uv_ioctl = vzalloc(sizeof(*uv_ioctl));
+> +	if (!uv_ioctl)
+> +		goto out;
+> +
+> +	switch (cmd) {
+> +	case UVIO_IOCTL_QUI:
+> +		ret = uvio_copy_and_check_ioctl(uv_ioctl, argp);
+> +		if (ret)
+> +			goto out;
+> +		ret = uvio_qui(uv_ioctl);
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
 
-This patch changes the device power state to D0 by invoking
-vfio_pci_set_power_state() explicitly before calling any reset related
-API's.
+Wrong error value :(
 
-Fixes: 51ef3a004b1e ("vfio/pci: Restore device state on PM transition")
-Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 48 ++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+> +		break;
+> +	}
+> +	if (ret)
+> +		goto out;
+> +
+> +	if (copy_to_user(argp, uv_ioctl, sizeof(*uv_ioctl)))
+> +		ret = -EFAULT;
+> +
+> + out:
+> +	vfree(uv_ioctl);
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations uvio_dev_fops = {
+> +	.owner = THIS_MODULE,
+> +	.unlocked_ioctl = uvio_ioctl,
+> +	.open = uvio_dev_open,
+> +	.release = uvio_dev_close,
+> +	.llseek = no_llseek,
+> +};
+> +
+> +static struct miscdevice uvio_dev_miscdev = {
+> +	.minor = MISC_DYNAMIC_MINOR,
+> +	.name = UVIO_DEVICE_NAME,
+> +	.fops = &uvio_dev_fops,
+> +};
+> +
+> +static void __exit uvio_dev_exit(void)
+> +{
+> +	misc_deregister(&uvio_dev_miscdev);
+> +}
+> +
+> +static int __init uvio_dev_init(void)
+> +{
+> +	if (!test_facility(158))
+> +		return -ENXIO;
+> +	return misc_register(&uvio_dev_miscdev);
+> +}
+> +
+> +module_init(uvio_dev_init);
+> +module_exit(uvio_dev_exit);
+> +
+> +MODULE_AUTHOR("IBM Corporation");
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Ultravisor UAPI driver");
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 87b288affc13..2e6409cc11ad 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -335,6 +335,17 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- 	/* For needs_reset */
- 	lockdep_assert_held(&vdev->vdev.dev_set->lock);
- 
-+	/*
-+	 * This function can be invoked while the power state is non-D0.
-+	 * This function calls __pci_reset_function_locked() which internally
-+	 * can use pci_pm_reset() for the function reset. pci_pm_reset() will
-+	 * fail if the power state is non-D0. Also, for the devices which
-+	 * have NoSoftRst-, the reset function can cause the PCI config space
-+	 * reset without restoring the original state (saved locally in
-+	 * 'vdev->pm_save').
-+	 */
-+	vfio_pci_set_power_state(vdev, PCI_D0);
-+
- 	/* Stop the device from further DMA */
- 	pci_clear_master(pdev);
- 
-@@ -934,6 +945,19 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
- 			return -EINVAL;
- 
- 		vfio_pci_zap_and_down_write_memory_lock(vdev);
-+
-+		/*
-+		 * This function can be invoked while the power state is non-D0.
-+		 * If pci_try_reset_function() has been called while the power
-+		 * state is non-D0, then pci_try_reset_function() will
-+		 * internally set the power state to D0 without vfio driver
-+		 * involvement. For the devices which have NoSoftRst-, the
-+		 * reset function can cause the PCI config space reset without
-+		 * restoring the original state (saved locally in
-+		 * 'vdev->pm_save').
-+		 */
-+		vfio_pci_set_power_state(vdev, PCI_D0);
-+
- 		ret = pci_try_reset_function(vdev->pdev);
- 		up_write(&vdev->memory_lock);
- 
-@@ -2068,6 +2092,18 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
- 	}
- 	cur_mem = NULL;
- 
-+	/*
-+	 * The pci_reset_bus() will reset all the devices in the bus.
-+	 * The power state can be non-D0 for some of the devices in the bus.
-+	 * For these devices, the pci_reset_bus() will internally set
-+	 * the power state to D0 without vfio driver involvement.
-+	 * For the devices which have NoSoftRst-, the reset function can
-+	 * cause the PCI config space reset without restoring the original
-+	 * state (saved locally in 'vdev->pm_save').
-+	 */
-+	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
-+		vfio_pci_set_power_state(cur, PCI_D0);
-+
- 	ret = pci_reset_bus(pdev);
- 
- err_undo:
-@@ -2121,6 +2157,18 @@ static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
- 	if (!pdev)
- 		return false;
- 
-+	/*
-+	 * The pci_reset_bus() will reset all the devices in the bus.
-+	 * The power state can be non-D0 for some of the devices in the bus.
-+	 * For these devices, the pci_reset_bus() will internally set
-+	 * the power state to D0 without vfio driver involvement.
-+	 * For the devices which have NoSoftRst-, the reset function can
-+	 * cause the PCI config space reset without restoring the original
-+	 * state (saved locally in 'vdev->pm_save').
-+	 */
-+	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
-+		vfio_pci_set_power_state(cur, PCI_D0);
-+
- 	ret = pci_reset_bus(pdev);
- 	if (ret)
- 		return false;
--- 
-2.17.1
+Nothing to cause this to automatically be loaded when the "hardware" is
+present?
 
+thanks,
+
+greg k-h
