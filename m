@@ -2,130 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 856214BA78A
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:55:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E42A4BA7B0
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 19:08:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243922AbiBQRy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 12:54:59 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59086 "EHLO
+        id S244018AbiBQSIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 13:08:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240805AbiBQRy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 12:54:58 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3342B1676
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:54:43 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id e79so4584567iof.13
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:54:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=e5+j39i13fFYZEoD3DCwP8XttAEX4sDat27MGjT25cA=;
-        b=WfLn02BFrCw1wY2L0Idi3skV3nRf6FNMvdRR1KwMO4frJ+Z3I3V1WuMy+CRlyxdIu2
-         L15JTX+C5MHZS4esxx//5VzgfkFgyDlVvvAoZP8lAblXyoGhoCNsFP6fu8Ivjgux6HfE
-         cawsUNnrWE7tEiNMW1Hl8eq2eejTilBwdVWlo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=e5+j39i13fFYZEoD3DCwP8XttAEX4sDat27MGjT25cA=;
-        b=rYocZQQGEPDgRhQtZjE64t/KiT2PyN4RtiXd0DQ8uS8GvVDxdYgrfAoFmkZFsrW59m
-         Zofwg9VqfFXGdZJzY7w3iysbwjtp0BB11RQNvkZqxsi9++3r8w8PocSfluXZz32U+xV4
-         oMSi/ZQ7ZxpTp4smTJRMAWvC8QXW8+Gf8PrdSBRXGErUZwp4SLBmuFg3UOuLGuDSv7FT
-         8lD9QRdgeerD7svV67ygNNvnwq2A/xZbNpWHOe19VNYUWaiGToCdz0CqZpop5Ur3uI/L
-         QZmOxW5mF35WaH+wHWd7Gm7Ki9XNPNDza3kmouwMMT/Tw1Yb5rKuhM88BBFjnO00V2qm
-         2DEQ==
-X-Gm-Message-State: AOAM531gfPwTEnijeqyr70Vi2abBDUEneIR0gq+MY3iXTObUxa6TUZZu
-        jG6PkSDBpUZhsqC/ZtapSEsWsw==
-X-Google-Smtp-Source: ABdhPJxSu1A/OTw4VzSbhU1MEBNMeS2u06JBywtGIaM6G4sX/h2cM7wD49LlSZPRoVsAthdhGIigeg==
-X-Received: by 2002:a02:6a0f:0:b0:30e:e62e:1148 with SMTP id l15-20020a026a0f000000b0030ee62e1148mr2694652jac.316.1645120482467;
-        Thu, 17 Feb 2022 09:54:42 -0800 (PST)
-Received: from [192.168.1.128] ([71.205.29.0])
-        by smtp.gmail.com with ESMTPSA id e15sm2251575iov.53.2022.02.17.09.54.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 09:54:42 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: s390: selftests: Test vm and vcpu memop with
- keys
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20220211182215.2730017-11-scgl@linux.ibm.com>
- <20220217145336.1794778-1-scgl@linux.ibm.com>
- <20220217145336.1794778-3-scgl@linux.ibm.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <7d0b5b03-21f4-0402-779a-788d4bd58071@linuxfoundation.org>
-Date:   Thu, 17 Feb 2022 10:54:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        with ESMTP id S243991AbiBQSIw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 13:08:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 27A2F15F0BF
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 10:08:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645121317;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/mzReXLZLc6tMkB5b5vqNxs8KSSNOnaDt2HEPY2pWPQ=;
+        b=BxCzK7XJazYVz/UOP79rGfKECAzDvGZ4Km3/sNr3TjKGR8eVmEgpdo3r7rhjHXyegfKaNP
+        y1bfW9ORDAGJ22vqAZdVIRxMDr3fyqiDoK/otp45TOcnfrmtw+eYfpfcfjuWKPS6dve1+u
+        OFy+pZIhaSGTLV4SKjnu1X/Iri8oqmc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-190-OWoCh0mEM6yrXXK5RTYhJw-1; Thu, 17 Feb 2022 13:08:33 -0500
+X-MC-Unique: OWoCh0mEM6yrXXK5RTYhJw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73D602F4C;
+        Thu, 17 Feb 2022 18:08:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A3688276C;
+        Thu, 17 Feb 2022 18:08:32 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com
+Subject: [PATCH v3 0/6] kvm: x86: better handling of optional kvm_x86_ops
+Date:   Thu, 17 Feb 2022 13:08:25 -0500
+Message-Id: <20220217180831.288210-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20220217145336.1794778-3-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/22 7:53 AM, Janis Schoetterl-Glausch wrote:
-> Test storage key checking for both vm and vcpu MEM_OP ioctls.
-> Test both error and non error conditions.
-> 
+This series is really two changes:
 
-This patch seems to combine restructuring the code and new code.
-e,g test_errors() was added in the last patch, only to be redone
-in this patch with test_errors split into test_common_errors()
+- patch 1 remove a kvm_x86_ops callback.
 
-Doing restructure in a separate patch and then adding new code
-makes it easier to review and also keep them simpler patches.
+- patch 2 to 5 clean up optional kvm_x86_ops so that they are marked
+  in kvm-x86-ops.h and the non-optional ones WARN if used incorrectly.
+  As an additional outcome of the review, a few more uses of
+  static_call_cond are introduced.
 
-Please split the code in these two patches to just do restructure
-and then add new code.
+- patch 6 allows to NULL a few kvm_x86_ops that return a value, by
+  using __static_call_ret0.
 
-I also would like to have good reasons to change existing code and
-make them into macros.
-  
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->   tools/testing/selftests/kvm/s390x/memop.c | 342 +++++++++++++++++++++-
->   1 file changed, 328 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index 4510418d73e6..bc12a9238967 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -201,6 +201,8 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
->   #define PAGE_SHIFT 12
->   #define PAGE_SIZE (1ULL << PAGE_SHIFT)
->   #define PAGE_MASK (~(PAGE_SIZE - 1))
-> +#define CR0_FETCH_PROTECTION_OVERRIDE	(1UL << (63 - 38))
-> +#define CR0_STORAGE_PROTECTION_OVERRIDE	(1UL << (63 - 39))
->   
->   #define ASSERT_MEM_EQ(p1, p2, size) \
->   	TEST_ASSERT(!memcmp(p1, p2, size), "Memory contents do not match!")
-> @@ -235,6 +237,11 @@ static struct test_default test_default_init(void *guest_code)
->   	return t;
->   }
->   
-> +static vm_vaddr_t test_vaddr_alloc(struct test_vcpu vm, size_t size, vm_vaddr_t vaddr_min)
-> +{
-> +	return vm_vaddr_alloc(vm.vm, size, vaddr_min);
-> +}
-> +
+v1->v2:
+- use KVM_X86_OP_OPTIONAL and KVM_X86_OP_OPTIONAL_RET0
+- mark load_eoi_exitmap and set_virtual_apic_mode as optional
+- fix module compilation of KVM
 
-What is the value of adding a new routine that simply calls another?
-Do you see this routine changing in the future to do more?
+v2->v3:
+- new patch 1 to remove .has_accelerated_tpr
+- do not expand KVM_X86_OP_OPTIONAL in KVM_X86_OP
+- cosmetic changes to comments
 
-thanks,
--- Shuah
+Paolo Bonzini (6):
+  KVM: x86: return 1 unconditionally for availability of KVM_CAP_VAPIC
+  KVM: x86: use static_call_cond for optional callbacks
+  KVM: x86: remove KVM_X86_OP_NULL and mark optional kvm_x86_ops
+  KVM: x86: warn on incorrectly NULL members of kvm_x86_ops
+  KVM: x86: make several AVIC callbacks optional
+  KVM: x86: allow defining return-0 static calls
+
+ arch/x86/include/asm/kvm-x86-ops.h | 104 +++++++++++++++--------------
+ arch/x86/include/asm/kvm_host.h    |  14 ++--
+ arch/x86/kvm/lapic.c               |  24 +++----
+ arch/x86/kvm/svm/avic.c            |  23 -------
+ arch/x86/kvm/svm/svm.c             |  30 ---------
+ arch/x86/kvm/svm/svm.h             |   1 -
+ arch/x86/kvm/vmx/vmx.c             |   6 --
+ arch/x86/kvm/x86.c                 |  20 ++----
+ kernel/static_call.c               |   1 +
+ 9 files changed, 81 insertions(+), 142 deletions(-)
+
+-- 
+2.31.1
+
