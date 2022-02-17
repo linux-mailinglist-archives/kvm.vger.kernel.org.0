@@ -2,69 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81BF94BA4CD
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:46:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29C2F4BA4CE
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:48:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233955AbiBQPqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 10:46:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50182 "EHLO
+        id S235037AbiBQPsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 10:48:21 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232620AbiBQPqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 10:46:48 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18ABC1D301
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:46:31 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso9851036pjg.0
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:46:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=R8nS4Mx2FHk1MUuQsgL8zH9kBiDqg58ofDKGwuFcemo=;
-        b=tUPRDvgS4AVmwyqulVD1NDgkSAhVDYTNgzKpbGhpBbiIMIHbk+jluPOfTgFA3G+Fr3
-         Gj77cKwnKySWVu21B/TWidDQbkOY1bj2g8GA7spzPxMxxSBeBv9oAeLQHv5nhpU8/afB
-         xOO+tDCDw5N44Q7TlSqs2i80dddk4lHOrT0TfxJm6VMoFZsdXJoGen8EZ5HM9R6a3nmy
-         MSzWLGdXNN0hSGOodvXAVQLQ5lAyWqCesriHYenwNfdRwB3bM3h8AO2AGiUGbgpOgFLJ
-         YEgC/3Dk4YKmiX7s6fyU9v43XMXzz9KHkv02xQ85Ss8oXhjV85j9GxaMBhrMahm0Q/vh
-         mvSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R8nS4Mx2FHk1MUuQsgL8zH9kBiDqg58ofDKGwuFcemo=;
-        b=B0WDnJ6gv3BIsXtdg63m1qHGTnQA0+398eIIoXU6G6LckP8ryjtM8g8oTM0bZwNKIh
-         o4nRAZ3UQrSC4HnF4pvh8h30XPBnk0hXrmYvY01KSdhvbeTQd7iQnx+cALf0l7AtrI0x
-         CFhnfDAO/trvURDnnTxowdHKmwSHZBraAVzJbE9Q/4BeY+NzzMx+Bsm0QRb/MDjc5O7a
-         4LQFNpOepvDahTbRzYsWz0LLxLYdIexFT4RfuJMNGCTOMf32sSqtmh8Rn7adXQPa2PK9
-         0hpeYFOXPYElPWbyBdzHrTrLxfT94sCtG2VpS18xJN3Ol7HhewnJkWVskkoqfAh+7z/V
-         2Q8Q==
-X-Gm-Message-State: AOAM530PnvpqlTkWAdVpxzbWhoDTZohKSTAwPqgJKl+c5tguWr16bzYC
-        P8jnJ06EvqPMxNPqN9IqgnhCFQ==
-X-Google-Smtp-Source: ABdhPJw0aucahcHgpIYhfz8KAXF+4TiftaBBzxl6Q6pMLUyxJ2nJrw22Chio8XxiycPIM0Ke5T4fAA==
-X-Received: by 2002:a17:90a:6585:b0:1b9:75ee:dd14 with SMTP id k5-20020a17090a658500b001b975eedd14mr7896029pjj.102.1645112790556;
-        Thu, 17 Feb 2022 07:46:30 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x7sm8194227pgr.87.2022.02.17.07.46.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 07:46:29 -0800 (PST)
-Date:   Thu, 17 Feb 2022 15:46:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Dunn <daviddunn@google.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, like.xu.linux@gmail.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v7 2/3] KVM: selftests: Carve out helper to create
- "default" VM without vCPUs
-Message-ID: <Yg5t0lnc/oAHmFrB@google.com>
-References: <20220215014806.4102669-1-daviddunn@google.com>
- <20220215014806.4102669-3-daviddunn@google.com>
+        with ESMTP id S232620AbiBQPsU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 10:48:20 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204D3154703
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:48:06 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HFGigJ022028;
+        Thu, 17 Feb 2022 15:48:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZHu1I0Fve4PD/cqbRLsOPgjn7ra0gfIaU/IZ95v16JM=;
+ b=R5wBSzgG/9v+l0NAxZ+znMjXUWCeQU47c4cJbJdEVeHOwBB0EJtzD8Ex+aE1Sf+bx/bi
+ mM3YtY1T5FhpbOJOVP1a7IWOrKHxmG4Gjqv6LU73RurgSSDCwl1SQl57U2IRwQkYFFOS
+ L/FrAYHGN9YQNwJxSITc/3ZB+KX3jCiHEY0JqpBrgsvwLkOZs3/IsHxqOyeVvTIXOP4I
+ 5rixJpJmI1dXT4qpoerNl1n4+mvHUogdKw6GOFZE69pStBFR78iqITPSwUEMxKdUfvlX
+ UUirhauP8hv9ri9poFFNWGzovq7ATLE7XYqD8e45JozQZ1VND0rFfLahsIq1HlwnyoHu jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e9rv6grb0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 15:48:00 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HFWpt9031676;
+        Thu, 17 Feb 2022 15:47:59 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3e9rv6gra8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 15:47:59 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HFXSr1029413;
+        Thu, 17 Feb 2022 15:47:58 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3e645kc0nr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 15:47:57 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HFlstN39584140
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Feb 2022 15:47:54 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71DA2A405C;
+        Thu, 17 Feb 2022 15:47:54 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48DF8A4054;
+        Thu, 17 Feb 2022 15:47:53 +0000 (GMT)
+Received: from [9.171.42.121] (unknown [9.171.42.121])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Feb 2022 15:47:53 +0000 (GMT)
+Message-ID: <dc5a7de1-3703-52d6-6bdd-9eb68070534f@linux.ibm.com>
+Date:   Thu, 17 Feb 2022 16:50:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220215014806.4102669-3-daviddunn@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v6 08/11] s390x: topology: Adding drawers to CPU topology
+Content-Language: en-US
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     qemu-s390x@nongnu.org, thuth@redhat.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com, ehabkost@redhat.com, kvm@vger.kernel.org,
+        david@redhat.com, eblake@redhat.com, cohuck@redhat.com,
+        richard.henderson@linaro.org, qemu-devel@nongnu.org,
+        armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+References: <20220217134125.132150-1-pmorel@linux.ibm.com>
+ <20220217134125.132150-9-pmorel@linux.ibm.com> <Yg5ZpEisMK1uWqQH@redhat.com>
+ <acc9b68e-a456-2136-0371-b815c8585a08@linux.ibm.com>
+ <Yg5qnlQrcZPemm+C@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <Yg5qnlQrcZPemm+C@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YmBLo7g9xhqGWn7MjL2v_ymLgpZltSrE
+X-Proofpoint-ORIG-GUID: 0A_OJpU_ppn6syMiJbMYtDjmoI8BsGaC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-17_06,2022-02-17_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=999 impostorscore=0 priorityscore=1501 phishscore=0
+ malwarescore=0 bulkscore=0 suspectscore=0 clxscore=1015 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202170069
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,89 +100,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 15, 2022, David Dunn wrote:
-> Carve out portion of vm_create_default so that selftests can modify
-> a "default" VM prior to creating vcpus.
-> 
-> Signed-off-by: David Dunn <daviddunn@google.com>
-> ---
->  .../selftests/kvm/include/kvm_util_base.h     |  3 ++
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++++++----
->  2 files changed, 32 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 4ed6aa049a91..f987cf7c0d2e 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -336,6 +336,9 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
->  				    uint32_t num_percpu_pages, void *guest_code,
->  				    uint32_t vcpuids[]);
->  
-> +/* Create a default VM without any vcpus. */
-> +struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages);
-> +
->  /*
->   * Adds a vCPU with reasonable defaults (e.g. a stack)
->   *
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index d8cf851ab119..5aea7734cfe3 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -362,6 +362,34 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  	return vm;
->  }
->  
-> +/*
-> + * Default VM creation without creating VCPUs
-> + *
-> + * Input Args:
-> + *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
-> + *   pages - pages of memory required for VM
-> + *
-> + * Output Args: None
-> + *
-> + * Return:
-> + *   Pointer to opaque structure that describes the created VM.
-> + *
-> + * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
-> + */
 
-I vote to omit this function comment.  Most of the existing comments in kvm_util.c
-are a waste of space, and (no offence) this is no different.  And I'm planning on
-deleting most of the existing boilerplate comments that don't provide any insight :-)
 
-> +struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages)
-> +{
-> +	struct kvm_vm *vm;
-> +
-> +	vm = vm_create(mode, pages, O_RDWR);
-> +
-> +	kvm_vm_elf_load(vm, program_invocation_name);
-> +
-> +#ifdef __x86_64__
-> +	vm_create_irqchip(vm);
-> +#endif
-> +	return vm;
-> +}
-> +
->  /*
->   * VM Create with customized parameters
->   *
-> @@ -412,13 +440,8 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
->  		    nr_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
->  
->  	pages = vm_adjust_num_guest_pages(mode, pages);
-> -	vm = vm_create(mode, pages, O_RDWR);
-> -
-> -	kvm_vm_elf_load(vm, program_invocation_name);
->  
-> -#ifdef __x86_64__
-> -	vm_create_irqchip(vm);
-> -#endif
-> +	vm = vm_create_without_vcpus(mode, pages);
->  
->  	for (i = 0; i < nr_vcpus; ++i) {
->  		uint32_t vcpuid = vcpuids ? vcpuids[i] : i;
-> -- 
-> 2.35.1.265.g69c8d7142f-goog
+On 2/17/22 16:32, Daniel P. Berrangé wrote:
+> On Thu, Feb 17, 2022 at 04:30:06PM +0100, Pierre Morel wrote:
+>>
+>>
+>> On 2/17/22 15:20, Daniel P. Berrangé wrote:
+>>> On Thu, Feb 17, 2022 at 02:41:22PM +0100, Pierre Morel wrote:
+>>>> S390 CPU topology may have up to 5 topology containers.
+>>>> The first container above the cores is level 2, the sockets,
+>>>> and the level 3, containing sockets are the books.
+>>>>
+>>>> We introduce here the drawers, drawers is the level containing books.
+>>>>
+>>>> Let's add drawers, level4, containers to the CPU topology.
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> ---
+>>>>    hw/core/machine-smp.c      | 33 ++++++++++++++++++++++++++-------
+>>>>    hw/core/machine.c          |  2 ++
+>>>>    hw/s390x/s390-virtio-ccw.c |  1 +
+>>>>    include/hw/boards.h        |  4 ++++
+>>>>    qapi/machine.json          |  7 ++++++-
+>>>>    softmmu/vl.c               |  3 +++
+>>>>    6 files changed, 42 insertions(+), 8 deletions(-)
+>>>
+>>> Needs to update -smp args in qemu-options.hx too.
+>>>
+>>
+>> Oh, right!
+>>
+>> Thanks
+>>
+>>>>
+>>
+>> ...snip...
+>>
+>>>> index 73206f811a..fa6bde5617 100644
+>>>> --- a/qapi/machine.json
+>>>> +++ b/qapi/machine.json
+>>>> @@ -866,13 +866,14 @@
+>>>>    # a CPU is being hotplugged.
+>>>>    #
+>>>>    # @node-id: NUMA node ID the CPU belongs to
+>>>> +# @drawer-id: drawer number within node/board the CPU belongs to
+>>>>    # @book-id: book number within node/board the CPU belongs to
+>>>>    # @socket-id: socket number within node/board the CPU belongs to
+>>>
+>>> So the lack of change here implies that 'socket-id' is unique
+>>> across multiple  books/drawers. Is that correct, as its differnt
+>>> from semantics for die-id/core-id/thread-id which are scoped
+>>> to within the next level of the topology ?
+>>
+>> Hum, no I forgot to update and it needs a change.
+>> What about
+>>
+>> # @book-id: book number within node/board/drawer the CPU belongs to
+>> # @socket-id: socket number within node/board/book the CPU belongs to
+>>
+>> ?
 > 
+> Probably   drawer/node/board    and book/node/board to keep a
+> low -> high topology ordering
+
+Yes, thanks,
+
+Regards,
+Pierre
+
+> 
+> Regards,
+> Daniel
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
