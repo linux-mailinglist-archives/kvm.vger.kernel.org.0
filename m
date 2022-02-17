@@ -2,84 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B48D04BA31E
+	by mail.lfdr.de (Postfix) with ESMTP id 08ABC4BA31C
 	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:36:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241955AbiBQOfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 09:35:54 -0500
+        id S241978AbiBQOf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 09:35:56 -0500
 Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241943AbiBQOfm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:35:42 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18ADB2B1A93
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:35:26 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HDcfWw011645
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:25 GMT
+        with ESMTP id S241940AbiBQOfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 09:35:41 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022CA2B1A90
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:35:23 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HE7TR8010158
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=BmXeoe+uH1HMgRC9yAA/cQHXPqRQdkSHiCAErU+CdQw=;
- b=ivbt8v2pKxrCbpMDVD50HgD75Gi99Ef9zyuDPxnQA3nX8BV1gl171Kt4hfwLuYkzSwW2
- o3IPm38Wy+7Th5lLTHoZFFTH9gTdSELRG0SDi90RscYFVsZ6FiWPyUmUXUJf3KTnCmh8
- UvvPNmn2fUke9/YJTkD320oAboMOYomNf7FfJgwmtjgf7RO+iz1QC/wIbpFrrmbxBGae
- NZyC6F7dVC04d86RfVC/hoTeNwcYFuPx0Tj9rgNnF+2d1JEMBPsuTuuLHwV2383TDZCM
- SMF2PyJuqyNER7EYYmWjFWqJUrEp+vPE30MG/Ug3nKu4AhosLzVRVsJRfLxY8sbUtFqp Lw== 
+ bh=RTBZaDYxeAD5VWqLKKDRMxuu2kUA4TkH2/89S7Yu9eg=;
+ b=i+WhT3saLpquXJzEULVXV6J9o76qIk1ilpIUeenyGf79cPdectRp9doMlSlGFCG+5Jka
+ ZjJWXc0fAecBzQDBZ5BQsDJUgaefUQW6pzbGEu/P/9oydWN1T4WltnOwvYkGAU+geF5S
+ fN13jgA58ZNk2ElYvQLUsj+eJj1RXnwTNigRtUXNDcBlnJ3RomGPEoywp5d2RGQcaYoz
+ PXY5TAJKaahJo9+ucZy9A8OZFHWobVIRuBtUSvONSeJpmQr/2fwOIJBblZM3kZVpUwvm
+ C7QrKmynkV3z1iu+e7R0cuu6yhdzKD+zG5qTpSy1JacP3pB39gzt3dwsu+At5+hDfrax 6A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9p59k66x-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9p7xtpq2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:25 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HDf7DP024047
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:25 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9p59k65x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Feb 2022 14:35:25 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HEXOTT032271;
-        Thu, 17 Feb 2022 14:35:22 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3e64hak97w-1
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:22 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HEGnGM013063
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:22 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9p7xtppd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 17 Feb 2022 14:35:22 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HEXN3Y032225;
+        Thu, 17 Feb 2022 14:35:20 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3e64ha93wx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 14:35:20 +0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HEZHjK16122198
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HEZHBN44958032
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 17 Feb 2022 14:35:17 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E20CD42041;
-        Thu, 17 Feb 2022 14:35:16 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 5B18B4203F;
+        Thu, 17 Feb 2022 14:35:17 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A2284203F;
-        Thu, 17 Feb 2022 14:35:16 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 024F84204B;
+        Thu, 17 Feb 2022 14:35:17 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.2.54])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
         Thu, 17 Feb 2022 14:35:16 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com, Nico Boehr <nrb@linux.ibm.com>,
-        Steffen Eiden <seiden@linux.ibm.com>
-Subject: [kvm-unit-tests GIT PULL 8/9] s390x: skrf: use CPU indexes instead of addresses
-Date:   Thu, 17 Feb 2022 15:35:03 +0100
-Message-Id: <20220217143504.232688-9-imbrenda@linux.ibm.com>
+        thuth@redhat.com, Pierre Morel <pmorel@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 9/9] s390x: stsi: Define vm_is_kvm to be used in different tests
+Date:   Thu, 17 Feb 2022 15:35:04 +0100
+Message-Id: <20220217143504.232688-10-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220217143504.232688-1-imbrenda@linux.ibm.com>
 References: <20220217143504.232688-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wu-ZEGyPNqZTuvNKQAIJGiFglr4wt5Cp
-X-Proofpoint-ORIG-GUID: a38bvgG8Meaj9Ux6eCDM8-OPoBtx4zq2
+X-Proofpoint-GUID: QTH1JDd5WQwcwtLwgoyTagHy57fRxl1z
+X-Proofpoint-ORIG-GUID: Trm-cL_VgUTRpF6-74lJcTONNf4S0JKw
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-17_05,2022-02-17_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=964 phishscore=0
- spamscore=0 malwarescore=0 suspectscore=0 impostorscore=0 mlxscore=0
- adultscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 mlxscore=0 phishscore=0 adultscore=0
+ impostorscore=0 mlxlogscore=839 clxscore=1015 suspectscore=0
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2201110000 definitions=main-2202170066
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
@@ -91,29 +90,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adapt the test to the new semantics of the smp_* functions, and use CPU
-indexes instead of addresses.
+From: Pierre Morel <pmorel@linux.ibm.com>
 
+Several tests are in need of a way to check on which hypervisor
+and virtualization level they are running on to be able to fence
+certain tests. This patch adds functions that return true if a
+vm is running under KVM, LPAR or generally as a level 2 guest.
+
+To check if we're running under KVM we use the STSI 3.2.2
+instruction, let's define it's response structure in a central
+header.
+
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- s390x/skrf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ lib/s390x/stsi.h | 32 ++++++++++++++++++++++++++++++
+ lib/s390x/vm.h   |  2 ++
+ lib/s390x/vm.c   | 51 ++++++++++++++++++++++++++++++++++++++++++++++--
+ s390x/stsi.c     | 23 ++--------------------
+ 4 files changed, 85 insertions(+), 23 deletions(-)
+ create mode 100644 lib/s390x/stsi.h
 
-diff --git a/s390x/skrf.c b/s390x/skrf.c
-index ca4efbf1..b9a2e902 100644
---- a/s390x/skrf.c
-+++ b/s390x/skrf.c
-@@ -176,7 +176,7 @@ static void test_exception_ext_new(void)
- 	wait_for_flag();
- 	set_flag(0);
+diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
+new file mode 100644
+index 00000000..bebc492d
+--- /dev/null
++++ b/lib/s390x/stsi.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Structures used to Store System Information
++ *
++ * Copyright IBM Corp. 2022
++ */
++
++#ifndef _S390X_STSI_H_
++#define _S390X_STSI_H_
++
++struct sysinfo_3_2_2 {
++	uint8_t reserved[31];
++	uint8_t count;
++	struct {
++		uint8_t reserved2[4];
++		uint16_t total_cpus;
++		uint16_t conf_cpus;
++		uint16_t standby_cpus;
++		uint16_t reserved_cpus;
++		uint8_t name[8];
++		uint32_t caf;
++		uint8_t cpi[16];
++		uint8_t reserved5[3];
++		uint8_t ext_name_encoding;
++		uint32_t reserved3;
++		uint8_t uuid[16];
++	} vm[8];
++	uint8_t reserved4[1504];
++	uint8_t ext_names[8][256];
++};
++
++#endif  /* _S390X_STSI_H_ */
+diff --git a/lib/s390x/vm.h b/lib/s390x/vm.h
+index 7abba0cc..4456b48c 100644
+--- a/lib/s390x/vm.h
++++ b/lib/s390x/vm.h
+@@ -9,5 +9,7 @@
+ #define _S390X_VM_H_
  
--	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
-+	smp_sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
- 	wait_for_flag();
- 	smp_cpu_stop(1);
- 	report_prefix_pop();
+ bool vm_is_tcg(void);
++bool vm_is_kvm(void);
++bool vm_is_lpar(void);
+ 
+ #endif  /* _S390X_VM_H_ */
+diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
+index a5b92863..33fb1c45 100644
+--- a/lib/s390x/vm.c
++++ b/lib/s390x/vm.c
+@@ -12,6 +12,7 @@
+ #include <alloc_page.h>
+ #include <asm/arch_def.h>
+ #include "vm.h"
++#include "stsi.h"
+ 
+ /**
+  * Detect whether we are running with TCG (instead of KVM)
+@@ -26,9 +27,13 @@ bool vm_is_tcg(void)
+ 	if (initialized)
+ 		return is_tcg;
+ 
++	if (stsi_get_fc() != 3) {
++		initialized = true;
++		return is_tcg;
++	}
++
+ 	buf = alloc_page();
+-	if (!buf)
+-		return false;
++	assert(buf);
+ 
+ 	if (stsi(buf, 1, 1, 1))
+ 		goto out;
+@@ -43,3 +48,45 @@ out:
+ 	free_page(buf);
+ 	return is_tcg;
+ }
++
++/**
++ * Detect whether we are running with KVM
++ */
++bool vm_is_kvm(void)
++{
++	/* EBCDIC for "KVM/" */
++	const uint8_t kvm_ebcdic[] = { 0xd2, 0xe5, 0xd4, 0x61 };
++	static bool initialized;
++	static bool is_kvm;
++	struct sysinfo_3_2_2 *stsi_322;
++
++	if (initialized)
++		return is_kvm;
++
++	if (stsi_get_fc() != 3 || vm_is_tcg()) {
++		initialized = true;
++		return is_kvm;
++	}
++
++	stsi_322 = alloc_page();
++	assert(stsi_322);
++
++	if (stsi(stsi_322, 3, 2, 2))
++		goto out;
++
++	/*
++	 * If the manufacturer string is "KVM/" in EBCDIC, then we
++	 * are on KVM.
++	 */
++	is_kvm = !memcmp(&stsi_322->vm[0].cpi, kvm_ebcdic, sizeof(kvm_ebcdic));
++	initialized = true;
++out:
++	free_page(stsi_322);
++	return is_kvm;
++}
++
++bool vm_is_lpar(void)
++{
++	return stsi_get_fc() == 2;
++}
++
+diff --git a/s390x/stsi.c b/s390x/stsi.c
+index 391f8849..dccc53e7 100644
+--- a/s390x/stsi.c
++++ b/s390x/stsi.c
+@@ -13,27 +13,8 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/interrupt.h>
+ #include <smp.h>
++#include <stsi.h>
+ 
+-struct stsi_322 {
+-	uint8_t reserved[31];
+-	uint8_t count;
+-	struct {
+-		uint8_t reserved2[4];
+-		uint16_t total_cpus;
+-		uint16_t conf_cpus;
+-		uint16_t standby_cpus;
+-		uint16_t reserved_cpus;
+-		uint8_t name[8];
+-		uint32_t caf;
+-		uint8_t cpi[16];
+-		uint8_t reserved5[3];
+-		uint8_t ext_name_encoding;
+-		uint32_t reserved3;
+-		uint8_t uuid[16];
+-	} vm[8];
+-	uint8_t reserved4[1504];
+-	uint8_t ext_names[8][256];
+-};
+ static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
+ 
+ static void test_specs(void)
+@@ -91,7 +72,7 @@ static void test_3_2_2(void)
+ 	/* EBCDIC for "KVM/" */
+ 	const uint8_t cpi_kvm[] = { 0xd2, 0xe5, 0xd4, 0x61 };
+ 	const char vm_name_ext[] = "kvm-unit-test";
+-	struct stsi_322 *data = (void *)pagebuf;
++	struct sysinfo_3_2_2 *data = (void *)pagebuf;
+ 
+ 	report_prefix_push("3.2.2");
+ 
 -- 
 2.34.1
 
