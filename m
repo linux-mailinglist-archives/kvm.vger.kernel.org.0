@@ -2,55 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21F4C4BAB70
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 22:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B2424BAD16
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 00:12:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244766AbiBQVE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 16:04:27 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38318 "EHLO
+        id S229745AbiBQXNJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 18:13:09 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:59142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244229AbiBQVEL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 16:04:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41E71D1080
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 13:03:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645131834;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mUS9+xPfstqadLkqJ3LrklUPZUjyiG4wtcGNmDoEiYw=;
-        b=GENKnGurh3XErsaAhB38smM7kFfVwBxMm1JEhSxm0bPdwxVSPyZsNBTnWTW35HTj2oTGiA
-        Nd6I0Tfv7HyfhtBPZuz4nd3BC+DhyHgdyGkF3BK5k6wk2Fmw8XEzHJTgPJgm8UFZeSdxZ+
-        zYdp+Mjz1/nLQTAyZ+2S43EN2ivfSdk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-311-gP4HMt8lMwyQIBWXz0nXDg-1; Thu, 17 Feb 2022 16:03:51 -0500
-X-MC-Unique: gP4HMt8lMwyQIBWXz0nXDg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E48C01091DA0;
-        Thu, 17 Feb 2022 21:03:49 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 95C486AB90;
-        Thu, 17 Feb 2022 21:03:49 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com
-Subject: [PATCH v2 18/18] KVM: x86: do not unload MMU roots on all role changes
-Date:   Thu, 17 Feb 2022 16:03:40 -0500
-Message-Id: <20220217210340.312449-19-pbonzini@redhat.com>
-In-Reply-To: <20220217210340.312449-1-pbonzini@redhat.com>
-References: <20220217210340.312449-1-pbonzini@redhat.com>
+        with ESMTP id S229506AbiBQXNI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 18:13:08 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA7113294D
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 15:12:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645139565; x=1676675565;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=4drnSv8QYVuvNNyAm9hEzkUtF2mEcKzJVJkuUi0eOEk=;
+  b=FiJylxbILseIaGfJYPkdMyjx9qUPmJ6m97gE1xvhs1d/ChlzaCxn+V+Y
+   hLMSM0fyjC6Y2mGk5R5mAQYfxyQ3Nattw7YH6bALFmfll1VQuvwD3Kr+V
+   gNWqwjQnqNlUJ0/SjDVlPKsvShjwHQ0IPAzjySVZKotBwGck1fxMMPSlC
+   v4FD0fRJPqvIw2dazvGZTKIxPHxkYCD+PZM5rBBX674+4Df3nV8ZDuYgd
+   BnYR9+UYrFf2V5II/uPMXOaykcrsxC4F2XVa8MqNPkJAtUZSOGFus7rus
+   nJLOEB0Uhpe6K7/kEa8RnoGNH788hVvnEFiaqjuk+H+V0z58xG5PmhU8D
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="314263824"
+X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
+   d="scan'208";a="314263824"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 15:12:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
+   d="scan'208";a="503749843"
+Received: from lkp-server01.sh.intel.com (HELO 6f05bf9e3301) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 17 Feb 2022 15:12:06 -0800
+Received: from kbuild by 6f05bf9e3301 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nKpwT-0000is-Om; Thu, 17 Feb 2022 23:12:05 +0000
+Date:   Fri, 18 Feb 2022 07:12:00 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Leonardo Bras <leobras@redhat.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:master 22/22] arch/x86/kvm/x86.c:992:19: error: unused function
+ 'kvm_guest_supported_xfd'
+Message-ID: <202202180700.dnGoHs4Z-lkp@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,78 +64,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_mmu_reset_context is called on all role changes and right now it
-calls kvm_mmu_unload.  With the legacy MMU this is a relatively cheap
-operation; the previous PGDs remains in the hash table and is picked
-up immediately on the next page fault.  With the TDP MMU, however, the
-roots are thrown away for good and a full rebuild of the page tables is
-necessary, which is many times more expensive.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
+head:   988896bb61827345c6d074dd5f2af1b7b008193f
+commit: 988896bb61827345c6d074dd5f2af1b7b008193f [22/22] x86/kvm/fpu: Remove kvm_vcpu_arch.guest_supported_xcr0
+config: i386-randconfig-a002 (https://download.01.org/0day-ci/archive/20220218/202202180700.dnGoHs4Z-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=988896bb61827345c6d074dd5f2af1b7b008193f
+        git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+        git fetch --no-tags kvm master
+        git checkout 988896bb61827345c6d074dd5f2af1b7b008193f
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-Fortunately, throwing away the roots is not necessary except when
-the manual says a TLB flush is required:
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-- changing CR0.PG from 1 to 0 (because it flushes the TLB according to
-  the x86 architecture specification)
+All errors (new ones prefixed by >>):
 
-- changing CPUID (which changes the interpretation of page tables in
-  ways not reflected by the role).
+>> arch/x86/kvm/x86.c:992:19: error: unused function 'kvm_guest_supported_xfd' [-Werror,-Wunused-function]
+   static inline u64 kvm_guest_supported_xfd(struct kvm_vcpu *vcpu)
+                     ^
+   arch/x86/kvm/x86.c:2364:19: error: unused function 'gtod_is_based_on_tsc' [-Werror,-Wunused-function]
+   static inline int gtod_is_based_on_tsc(int mode)
+                     ^
+   2 errors generated.
 
-- changing CR4.SMEP from 0 to 1 (not doing so actually breaks access.c)
 
-Except for these cases, once the MMU has updated the CPU/MMU roles
-and metadata it is enough to force-reload the current value of CR3.
-KVM will look up the cached roots for an entry with the right role and
-PGD, and only if the cache misses a new root will be created.
+vim +/kvm_guest_supported_xfd +992 arch/x86/kvm/x86.c
 
-Measuring with vmexit.flat from kvm-unit-tests shows the following
-improvement:
+   991	
+ > 992	static inline u64 kvm_guest_supported_xfd(struct kvm_vcpu *vcpu)
+   993	{
+   994		return kvm_guest_supported_xcr0(vcpu) & XFEATURE_MASK_USER_DYNAMIC;
+   995	}
+   996	
 
-             TDP         legacy       shadow
-   before    46754       5096         5150
-   after     4879        4875         5006
-
-which is for very small page tables.  The impact is however much larger
-when running as an L1 hypervisor, because the new page tables cause
-extra work for L0 to shadow them.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c44b5114f947..913cc7229bf4 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5043,8 +5043,8 @@ EXPORT_SYMBOL_GPL(kvm_init_mmu);
- void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	/*
--	 * Invalidate all MMU roles to force them to reinitialize as CPUID
--	 * information is factored into reserved bit calculations.
-+	 * Invalidate all MMU roles and roots to force them to reinitialize,
-+	 * as CPUID information is factored into reserved bit calculations.
- 	 *
- 	 * Correctly handling multiple vCPU models with respect to paging and
- 	 * physical address properties) in a single VM would require tracking
-@@ -5057,6 +5057,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	vcpu->arch.root_mmu.mmu_role.ext.valid = 0;
- 	vcpu->arch.guest_mmu.mmu_role.ext.valid = 0;
- 	vcpu->arch.nested_mmu.mmu_role.ext.valid = 0;
-+	kvm_mmu_unload(vcpu);
- 	kvm_mmu_reset_context(vcpu);
- 
- 	/*
-@@ -5068,8 +5069,8 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 
- void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
- {
--	kvm_mmu_unload(vcpu);
- 	kvm_init_mmu(vcpu);
-+	kvm_make_request(KVM_REQ_MMU_UPDATE_ROOT, vcpu);
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_reset_context);
- 
--- 
-2.31.1
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
