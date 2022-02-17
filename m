@@ -2,75 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 876784BA6D5
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:17:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 507914BA6E3
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:17:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235563AbiBQRRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 12:17:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40674 "EHLO
+        id S243659AbiBQRRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 12:17:48 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231609AbiBQRRG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 12:17:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 294C61A82A
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:16:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645118209;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qWdOG1LFieVFuqokyux4dhfLVcdCZyJ43J8Lt+eLPYA=;
-        b=hA/1VN5uVufbEI8WmYVTqmuijAU/IuHoJGNkRGG8ZieXyWvVSMhGu9uPqOvmNN5c7udBrg
-        yJTfOgKTU6MLPw1sRo85Gc0WzYBx5f9hM+1nBTA2WXoG8u9yDdqaEoosoflYTT+jkKJvqc
-        x+YzTvfCr33J/Gb2DeO/kKb3srR4eHw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-498-IsHkkAY8POWhEclkRMqUqA-1; Thu, 17 Feb 2022 12:16:48 -0500
-X-MC-Unique: IsHkkAY8POWhEclkRMqUqA-1
-Received: by mail-ej1-f69.google.com with SMTP id m4-20020a170906160400b006be3f85906eso1796087ejd.23
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:16:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=qWdOG1LFieVFuqokyux4dhfLVcdCZyJ43J8Lt+eLPYA=;
-        b=Wm7Un43XKmKw8jNxSTiEPdHmQy7C736k1BIQaDWqh/MU9POeXCmE2qo/wn0lzz3Lxf
-         C9jxOsPgk9VMxnkVS09QuNwu9Uf+4yag8jl5Fm2aiJO9Wqgye69SpEgFD8l6D5MG5zHk
-         iDbXbwLO9cAftf1LtEvZ355O4hUGR57LUgZU4mIwJJFnpZTs9C+knnv2t83A8tupCXEM
-         EJrzMphgri3hNu8Q3FJdwmassEizJ3w6UkKMNby2xVkOP+OmLFHbD1nD5VLidkzk4cBw
-         3t0PhO2lWDJYAkt9rq/IuGswcSR65NXZRdCR/jodu5FEWgGb/NkqPC1jSaSLEBaax4jD
-         NWyA==
-X-Gm-Message-State: AOAM532CosGlokXQqyHmFu4kwHFcp91cZpIbEuo4lEHtfENbpTsG3Jg9
-        UwOEeS+ffehPskkYEdf66okq5ZRiEzJW3YZRNQbWSudiTvYr2CKxesuGtz/DGcW/F/HKkk/cL7/
-        yIq/3U3LJZON9
-X-Received: by 2002:a17:906:9256:b0:6a9:dfca:78d8 with SMTP id c22-20020a170906925600b006a9dfca78d8mr3245966ejx.330.1645118206915;
-        Thu, 17 Feb 2022 09:16:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwxp/SHuklUJKrKEUXLfcrxOp3gahuzH5cchAv88Bk1ptBWbT312MI/tMfpIYAbQ1Ai9T13eQ==
-X-Received: by 2002:a17:906:9256:b0:6a9:dfca:78d8 with SMTP id c22-20020a170906925600b006a9dfca78d8mr3245952ejx.330.1645118206736;
-        Thu, 17 Feb 2022 09:16:46 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z12sm3839844edb.77.2022.02.17.09.16.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 09:16:46 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anton Romanov <romanton@google.com>, mtosatti@redhat.com,
-        kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in
- always catchup mode
-In-Reply-To: <de6a1b73-c623-4776-2f14-b00917b7d22a@redhat.com>
-References: <20220215200116.4022789-1-romanton@google.com>
- <87zgmqq4ox.fsf@redhat.com> <Yg5sl9aWzVJKAMKc@google.com>
- <87pmnlpj8u.fsf@redhat.com>
- <de6a1b73-c623-4776-2f14-b00917b7d22a@redhat.com>
-Date:   Thu, 17 Feb 2022 18:16:45 +0100
-Message-ID: <87mtippg5e.fsf@redhat.com>
+        with ESMTP id S243645AbiBQRRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 12:17:46 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9075178383;
+        Thu, 17 Feb 2022 09:17:30 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HGGrAt003469;
+        Thu, 17 Feb 2022 17:17:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=Qxz0J4QCA6eNo6kquHEm8yB4dNzQPLzloNtL2uOeJ5M=;
+ b=AjINcr6khqnQQzCmJrR9kQ6MjTsYIfpAzr8FF245nsqe99WPI50+GniGtiJfi3hYlfmc
+ bz1iXr/rJvpCR/ACtjq68mYIqURxor6wI/CI9xhuPEPoau6bM+XzXwtqblcXZOX6AVeI
+ hXFeEvYyBjMvsXTf0ylz+Y4NUuCqyHfBfoC+oTyMd6a8nh8su5wPVQfnT02XBcfszbhn
+ qN3QDqqIx4WtjqZzRXihkW1Ur0yAkFadBo51DNaG9KKw8iMyqODST4sNSGVzc47bgUEB
+ j8TmIZ50fCUDX8Z6J7ZefI/hfXzXMd1Eb9/Znxu4zsxzIsNSFi8s+OCaYylXSJBpInQx bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9srchjy1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 17:17:29 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HGlOlA023566;
+        Thu, 17 Feb 2022 17:17:28 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9srchjxj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 17:17:28 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HHDUY8017724;
+        Thu, 17 Feb 2022 17:17:26 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3e645kcs6a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 17:17:26 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HHHNBV45679074
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Feb 2022 17:17:23 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 800D911C058;
+        Thu, 17 Feb 2022 17:17:23 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 047F411C04C;
+        Thu, 17 Feb 2022 17:17:23 +0000 (GMT)
+Received: from li-ca45c2cc-336f-11b2-a85c-c6e71de567f1.ibm.com (unknown [9.171.39.95])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Feb 2022 17:17:22 +0000 (GMT)
+Message-ID: <f0bf737abf480d6d16af6e5335bb195061f3d076.camel@linux.ibm.com>
+Subject: Re: [PATCH v7 1/1] s390x: KVM: guest support for topology function
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
+        seiden@linux.ibm.com
+Date:   Thu, 17 Feb 2022 18:17:22 +0100
+In-Reply-To: <20220217095923.114489-2-pmorel@linux.ibm.com>
+References: <20220217095923.114489-1-pmorel@linux.ibm.com>
+         <20220217095923.114489-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9umTdp9cN2hw7OnVg_QrGqtZjtULIZjm
+X-Proofpoint-GUID: 6wb6VG9BZsk6lNyzV_ZBY-1J54bjUaL4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-17_06,2022-02-17_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 suspectscore=0
+ malwarescore=0 clxscore=1011 phishscore=0 lowpriorityscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202170078
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,19 +95,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Thu, 2022-02-17 at 10:59 +0100, Pierre Morel wrote:
+[...]
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 2296b1ff1e02..af7ea8488fa2 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+[...]
+>  
+> -void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> +/**
+> + * kvm_s390_vcpu_set_mtcr
+> + * @vcp: the virtual CPU
+> + *
+> + * Is only relevant if the topology facility is present.
+> + *
+> + * Updates the Multiprocessor Topology-Change-Report to signal
+> + * the guest with a topology change.
+> + */
+> +static void kvm_s390_vcpu_set_mtcr(struct kvm_vcpu *vcpu)
+>  {
+> +       struct esca_block *esca = vcpu->kvm->arch.sca;
 
-> On 2/17/22 17:09, Vitaly Kuznetsov wrote:
-...
->> (but I still mildly dislike using 'EOPNOTSUPP' for a temporary condition
->> on the host).
->
-> It's not temporary, always-catchup is set on KVM_SET_TSC_KHZ and never 
-> goes away.
+utility is at the same offset for the bsca and the esca, still
+wondering whether it is a good idea to assume esca here... 
 
-Even if the guest is migrated (back) to the host which supports TSC
-scaling?
+[...]
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 098831e815e6..af04ffbfd587 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -503,4 +503,29 @@ void kvm_s390_vcpu_crypto_reset_all(struct kvm
+> *kvm);
+>   */
+>  extern unsigned int diag9c_forwarding_hz;
+>  
+> +#define S390_KVM_TOPOLOGY_NEW_CPU -1
+> +/**
+> + * kvm_s390_topology_changed
+> + * @vcpu: the virtual CPU
+> + *
+> + * If the topology facility is present, checks if the CPU toplogy
+> + * viewed by the guest changed due to load balancing or CPU hotplug.
+> + */
+> +static inline bool kvm_s390_topology_changed(struct kvm_vcpu *vcpu)
+> +{
+> +       if (!test_kvm_facility(vcpu->kvm, 11))
+> +               return false;
+> +
+> +       /* A new vCPU has been hotplugged */
+> +       if (vcpu->arch.prev_cpu == S390_KVM_TOPOLOGY_NEW_CPU)
+> +               return true;
+> +
+> +       /* The real CPU backing up the vCPU moved to another socket
+> */
+> +       if (topology_physical_package_id(vcpu->cpu) !=
+> +           topology_physical_package_id(vcpu->arch.prev_cpu))
+> +               return true;
 
--- 
-Vitaly
-
+Why is it OK to look just at the physical package ID here? What if the
+vcpu for example moves to a different book, which has a core with the
+same physical package ID?
