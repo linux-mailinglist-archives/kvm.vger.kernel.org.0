@@ -2,531 +2,346 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C69314BA3B2
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:54:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 445484BA3F5
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:05:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242191AbiBQOyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 09:54:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58488 "EHLO
+        id S242315AbiBQPFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 10:05:30 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242161AbiBQOyE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:54:04 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818141F4678;
-        Thu, 17 Feb 2022 06:53:45 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HElAP3013519;
-        Thu, 17 Feb 2022 14:53:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=JBzYUsoDJqyAEEpEi9/LjvkEBajjqj97iTMVtM3JcAk=;
- b=B25mx9TNAC4nvn9nQIWeXYciaiGYrch7TCNsYq1JUtA719iH2+sZ6HPrXI+6z0zvuuhx
- q4VrQT2pXy/P6tauQbYzpeSmtqQNSrxKpKx71i47HWuywsdUQePi+HQ5sYIcuAvnUM4i
- hAPtBt8SdiLfxGh5zMzLkV3C9WoRR3Yl7xQB2Mc1vs9zjT0EXFlfT8kGCC2Ri7sL0pyp
- qimKiqQaCCSpnPGFYgyinkt2IxNEr/WXcXFkKQ15C+Z7grulZU9pZ8wq2iKwed9f6ztz
- 0IrEUpu38l0MVq7oh0E6phVAH/RImKOsSh+439YFYEf0/rsa+bPGVW425bg0wGgc9APi 5A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9reb84hm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Feb 2022 14:53:44 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HElInR014027;
-        Thu, 17 Feb 2022 14:53:44 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9reb84h2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Feb 2022 14:53:44 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HEjSQ9021953;
-        Thu, 17 Feb 2022 14:53:42 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3e64hakf61-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Feb 2022 14:53:42 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HErdSK29163862
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Feb 2022 14:53:39 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34DAB4C04A;
-        Thu, 17 Feb 2022 14:53:39 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFE244C052;
-        Thu, 17 Feb 2022 14:53:38 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Feb 2022 14:53:38 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: s390: selftests: Test vm and vcpu memop with keys
-Date:   Thu, 17 Feb 2022 15:53:36 +0100
-Message-Id: <20220217145336.1794778-3-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220217145336.1794778-1-scgl@linux.ibm.com>
-References: <20220211182215.2730017-11-scgl@linux.ibm.com>
- <20220217145336.1794778-1-scgl@linux.ibm.com>
+        with ESMTP id S242307AbiBQPFV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 10:05:21 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54DF4181A6E
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:05:06 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id az26-20020a05600c601a00b0037c078db59cso4269684wmb.4
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:05:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=D/03XibBchYyDQEKiqzuUpnTX3XMKwI9ay4R6S/T1Co=;
+        b=k0DDGrdSPYNqMbIq5mYbgRekNCX9UbT37xG1e3W217dxggMlah9Uv4iLaklwG4ukuy
+         OkjwbEJKun8WtE3cRlAfDdwKie7LMlEmPp8tRViY+3piKrjxpWBhyZpY7Z7b0x7hLAN7
+         GzRSECz3eMCRmui8WRG2iGNWmRJs2gbBkuFbUwUJERRQkfYz869rQ+FB5qO/5xHWXa+V
+         xUyMnw+Cj7PYkbXPNZ6hq8J4nEtO4ZSfvwfCsplaFGySZGwuAVc1+l3i+RqxTDqAtpVf
+         ++bAEmpP4T36P9u/t3v6nQRJOVLWcY7kmm6fWAXyx+tZyO3YBOXsYzcDXHOnWXcWTKHQ
+         Qj9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=D/03XibBchYyDQEKiqzuUpnTX3XMKwI9ay4R6S/T1Co=;
+        b=lD8KJzK0x5oGxq53iG95Vp3jMyCV7/02a9HF786uOW7lIgUZR1cRbw/EuuW3iSndiX
+         vEMwJsTpMwLO9tiHtImITQyJn0DvZWcMSe7W8o3gV41cyoB20rfnJGYnn/6ehg58Ldto
+         d4iHevd35kgedEmlWuwIqMO8byWMTU5BbUkAZ50tC51uRkOlVXMKCX8rXMfBnuXDCrPV
+         o2fZvpcxFelU22D4XaSY8/NTT0ciYwEaeK4XCszvOUARu8inVy0xHW1UPvAd+aq8NIO0
+         a43w8qoeilv4lL5DCRGdhaGWLRfXS4wQNkmZiemB9HQu0jlHhKoiM6oSR4ZW/HzNRLQh
+         Hizw==
+X-Gm-Message-State: AOAM530VRVJZ071OaMQpwvzepnq4JggP9FFSdkOmk268w6TswEJkkXzi
+        8rTme1BZxRVGOcFr6lScrE5QMQ==
+X-Google-Smtp-Source: ABdhPJxbtk1JKRQtHDmGnZPBvcNsTxw4iFSh0IfrUIrfkH/cfLLp9gnNMe2Z152Ll9mkdr27SmLp5w==
+X-Received: by 2002:a05:600c:204a:b0:37b:bcbd:47b1 with SMTP id p10-20020a05600c204a00b0037bbcbd47b1mr3029257wmg.103.1645110304676;
+        Thu, 17 Feb 2022 07:05:04 -0800 (PST)
+Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
+        by smtp.gmail.com with ESMTPSA id p2sm1500153wmc.33.2022.02.17.07.05.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Feb 2022 07:05:04 -0800 (PST)
+Date:   Thu, 17 Feb 2022 15:05:02 +0000
+From:   Sebastian Ene <sebastianene@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, qperret@google.com,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool] aarch64: Add stolen time support
+Message-ID: <Yg5kHg9jJyDRioS6@google.com>
+References: <Yg0jcO32I+zFz/0s@google.com>
+ <6dcb9ce8090a34105be012965f3eadc4@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: JY9GzMPjno930pNy9lcHh25yzAu4GTvz
-X-Proofpoint-GUID: rVbEwmsFIwHvynCKG5gazuIvKMG70r6i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-17_05,2022-02-17_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 mlxscore=0 clxscore=1015 malwarescore=0 phishscore=0
- spamscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2202170066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6dcb9ce8090a34105be012965f3eadc4@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test storage key checking for both vm and vcpu MEM_OP ioctls.
-Test both error and non error conditions.
+On Wed, Feb 16, 2022 at 04:59:10PM +0000, Marc Zyngier wrote:
+> Hi Sebastian,
+> 
+> Thanks for looking into this. A few comments below.
+> 
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/memop.c | 342 +++++++++++++++++++++-
- 1 file changed, 328 insertions(+), 14 deletions(-)
+Hello Marc,
 
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-index 4510418d73e6..bc12a9238967 100644
---- a/tools/testing/selftests/kvm/s390x/memop.c
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -201,6 +201,8 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
- #define PAGE_SHIFT 12
- #define PAGE_SIZE (1ULL << PAGE_SHIFT)
- #define PAGE_MASK (~(PAGE_SIZE - 1))
-+#define CR0_FETCH_PROTECTION_OVERRIDE	(1UL << (63 - 38))
-+#define CR0_STORAGE_PROTECTION_OVERRIDE	(1UL << (63 - 39))
- 
- #define ASSERT_MEM_EQ(p1, p2, size) \
- 	TEST_ASSERT(!memcmp(p1, p2, size), "Memory contents do not match!")
-@@ -235,6 +237,11 @@ static struct test_default test_default_init(void *guest_code)
- 	return t;
- }
- 
-+static vm_vaddr_t test_vaddr_alloc(struct test_vcpu vm, size_t size, vm_vaddr_t vaddr_min)
-+{
-+	return vm_vaddr_alloc(vm.vm, size, vaddr_min);
-+}
-+
- static void test_vm_free(struct test_vcpu vm)
- {
- 	kvm_vm_free(vm.vm);
-@@ -257,6 +264,8 @@ enum stage {
- 	STAGE_INITED,
- 	/* Guest did nothing */
- 	STAGE_IDLED,
-+	/* Guest set storage keys (specifics up to test case) */
-+	STAGE_SKEYS_SET,
- 	/* Guest copied memory (locations up to test case) */
- 	STAGE_COPIED,
- };
-@@ -276,6 +285,20 @@ enum stage {
- 	ASSERT_MEM_EQ(mem1, mem2, __size);					\
- })
- 
-+#define DEFAULT_READ(copy_cpu, mop_cpu, mop_target_p, size, ...)		\
-+({										\
-+	struct test_vcpu __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
-+	enum mop_target __target = (mop_target_p);				\
-+	uint32_t __size = (size);						\
-+										\
-+	prepare_mem12();							\
-+	CHECK_N_DO(MOP, __mop_cpu, __target, WRITE, mem1, __size,		\
-+			GADDR_V(mem1));						\
-+	HOST_SYNC(__copy_cpu, STAGE_COPIED);					\
-+	CHECK_N_DO(MOP, __mop_cpu, __target, READ, mem2, __size, ##__VA_ARGS__);\
-+	ASSERT_MEM_EQ(mem1, mem2, __size);					\
-+})
-+
- static void guest_copy(void)
- {
- 	GUEST_SYNC(STAGE_INITED);
-@@ -294,6 +317,269 @@ static void test_copy(void)
- 	test_vm_free(t.vm);
- }
- 
-+static void set_storage_key_range(void *addr, size_t len, uint8_t key)
-+{
-+	uintptr_t _addr, abs, i;
-+	int not_mapped = 0;
-+
-+	_addr = (uintptr_t)addr;
-+	for (i = _addr & PAGE_MASK; i < _addr + len; i += PAGE_SIZE) {
-+		abs = i;
-+		asm volatile (
-+			       "lra	%[abs], 0(0,%[abs])\n"
-+			"	jz	0f\n"
-+			"	llill	%[not_mapped],1\n"
-+			"	j	1f\n"
-+			"0:	sske	%[key], %[abs]\n"
-+			"1:"
-+			: [abs] "+&a" (abs), [not_mapped] "+r" (not_mapped)
-+			: [key] "r" (key)
-+			: "cc"
-+		);
-+		GUEST_ASSERT_EQ(not_mapped, 0);
-+	}
-+}
-+
-+static void guest_copy_key(void)
-+{
-+	set_storage_key_range(mem1, sizeof(mem1), 0x90);
-+	set_storage_key_range(mem2, sizeof(mem2), 0x90);
-+	GUEST_SYNC(STAGE_SKEYS_SET);
-+
-+	for (;;) {
-+		memcpy(&mem2, &mem1, sizeof(mem2));
-+		GUEST_SYNC(STAGE_COPIED);
-+	}
-+}
-+
-+static void test_copy_key(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key);
-+
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vm, no key */
-+	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, t.size);
-+
-+	/* vm/vcpu, machting key or key 0 */
-+	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size, KEY(0));
-+	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size, KEY(9));
-+	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, t.size, KEY(0));
-+	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, t.size, KEY(9));
-+	/*
-+	 * There used to be different code paths for key handling depending on
-+	 * if the region crossed a page boundary.
-+	 * There currently are not, but the more tests the merrier.
-+	 */
-+	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, 1, KEY(0));
-+	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, 1, KEY(9));
-+	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, 1, KEY(0));
-+	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, 1, KEY(9));
-+
-+	/* vm/vcpu, mismatching keys on read, but no fetch protection */
-+	DEFAULT_READ(t.vcpu, t.vcpu, LOGICAL, t.size, GADDR_V(mem2), KEY(2));
-+	DEFAULT_READ(t.vcpu, t.vm, ABSOLUTE, t.size, GADDR_V(mem1), KEY(2));
-+
-+	test_vm_free(t.vm);
-+}
-+
-+static void guest_copy_key_fetch_prot(void)
-+{
-+	/*
-+	 * For some reason combining the first sync with override enablement
-+	 * results in an exception when calling HOST_SYNC.
-+	 */
-+	GUEST_SYNC(STAGE_INITED);
-+	/* Storage protection override applies to both store and fetch. */
-+	set_storage_key_range(mem1, sizeof(mem1), 0x98);
-+	set_storage_key_range(mem2, sizeof(mem2), 0x98);
-+	GUEST_SYNC(STAGE_SKEYS_SET);
-+
-+	for (;;) {
-+		memcpy(&mem2, &mem1, sizeof(mem2));
-+		GUEST_SYNC(STAGE_COPIED);
-+	}
-+}
-+
-+static void test_copy_key_storage_prot_override(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	t.run->s.regs.crs[0] |= CR0_STORAGE_PROTECTION_OVERRIDE;
-+	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vcpu, mismatching keys, storage protection override in effect */
-+	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size, KEY(2));
-+
-+	test_vm_free(t.vm);
-+}
-+
-+static void test_copy_key_fetch_prot(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vm/vcpu, matching key, fetch protection in effect */
-+	DEFAULT_READ(t.vcpu, t.vcpu, LOGICAL, t.size, GADDR_V(mem2), KEY(9));
-+	DEFAULT_READ(t.vcpu, t.vm, ABSOLUTE, t.size, GADDR_V(mem2), KEY(9));
-+
-+	test_vm_free(t.vm);
-+}
-+
-+#define ERR_PROT_MOP(...)							\
-+({										\
-+	int rv;									\
-+										\
-+	rv = ERR_MOP(__VA_ARGS__);						\
-+	TEST_ASSERT(rv == 4, "Should result in protection exception");		\
-+})
-+
-+static void test_errors_key(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vm/vcpu, mismatching keys, fetch protection in effect */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+
-+	test_vm_free(t.vm);
-+}
-+
-+static void test_errors_key_storage_prot_override(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	t.run->s.regs.crs[0] |= CR0_STORAGE_PROTECTION_OVERRIDE;
-+	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vm, mismatching keys, storage protection override not applicable to vm */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+
-+	test_vm_free(t.vm);
-+}
-+
-+const uint64_t last_page_addr = -PAGE_SIZE;
-+
-+static void guest_copy_key_fetch_prot_override(void)
-+{
-+	int i;
-+	char *page_0 = 0;
-+
-+	GUEST_SYNC(STAGE_INITED);
-+	set_storage_key_range(0, PAGE_SIZE, 0x18);
-+	set_storage_key_range((void *)last_page_addr, PAGE_SIZE, 0x0);
-+	asm volatile ("sske %[key],%[addr]\n" :: [addr] "r"(0), [key] "r"(0x18) : "cc");
-+	GUEST_SYNC(STAGE_SKEYS_SET);
-+
-+	for (;;) {
-+		for (i = 0; i < PAGE_SIZE; i++)
-+			page_0[i] = mem1[i];
-+		GUEST_SYNC(STAGE_COPIED);
-+	}
-+}
-+
-+static void test_copy_key_fetch_prot_override(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot_override);
-+	vm_vaddr_t guest_0_page, guest_last_page;
-+
-+	guest_0_page = test_vaddr_alloc(t.vm, PAGE_SIZE, 0);
-+	guest_last_page = test_vaddr_alloc(t.vm, PAGE_SIZE, last_page_addr);
-+	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
-+		print_skip("did not allocate guest pages at required positions");
-+		goto out;
-+	}
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	t.run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
-+	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vcpu, mismatching keys on fetch, fetch protection override applies */
-+	prepare_mem12();
-+	MOP(t.vcpu, LOGICAL, WRITE, mem1, PAGE_SIZE, GADDR_V(mem1));
-+	HOST_SYNC(t.vcpu, STAGE_COPIED);
-+	CHECK_N_DO(MOP, t.vcpu, LOGICAL, READ, mem2, 2048, GADDR_V(guest_0_page), KEY(2));
-+	ASSERT_MEM_EQ(mem1, mem2, 2048);
-+
-+	/*
-+	 * vcpu, mismatching keys on fetch, fetch protection override applies,
-+	 * wraparound
-+	 */
-+	prepare_mem12();
-+	MOP(t.vcpu, LOGICAL, WRITE, mem1, 2 * PAGE_SIZE, GADDR_V(guest_last_page));
-+	HOST_SYNC(t.vcpu, STAGE_COPIED);
-+	CHECK_N_DO(MOP, t.vcpu, LOGICAL, READ, mem2, PAGE_SIZE + 2048,
-+			GADDR_V(guest_last_page), KEY(2));
-+	ASSERT_MEM_EQ(mem1, mem2, 2048);
-+
-+out:
-+	test_vm_free(t.vm);
-+}
-+
-+static void test_errors_key_fetch_prot_override_not_enabled(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot_override);
-+	vm_vaddr_t guest_0_page, guest_last_page;
-+
-+	guest_0_page = test_vaddr_alloc(t.vm, PAGE_SIZE, 0);
-+	guest_last_page = test_vaddr_alloc(t.vm, PAGE_SIZE, last_page_addr);
-+	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
-+		print_skip("did not allocate guest pages at required positions");
-+		goto out;
-+	}
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/* vcpu, mismatching keys on fetch, fetch protection override not enabled */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, 2048, GADDR_V(0), KEY(2));
-+
-+out:
-+	test_vm_free(t.vm);
-+}
-+
-+static void test_errors_key_fetch_prot_override_enabled(void)
-+{
-+	struct test_default t = test_default_init(guest_copy_key_fetch_prot_override);
-+	vm_vaddr_t guest_0_page, guest_last_page;
-+
-+	guest_0_page = test_vaddr_alloc(t.vm, PAGE_SIZE, 0);
-+	guest_last_page = test_vaddr_alloc(t.vm, PAGE_SIZE, last_page_addr);
-+	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
-+		print_skip("did not allocate guest pages at required positions");
-+		goto out;
-+	}
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+	t.run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
-+	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
-+	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
-+
-+	/*
-+	 * vcpu, mismatching keys on fetch,
-+	 * fetch protection override does not apply because memory range acceeded
-+	 */
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, 2048 + 1, GADDR_V(0), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, PAGE_SIZE + 2048 + 1,
-+				 GADDR_V(guest_last_page), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, 2048, GADDR(0), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, 2048, GADDR_V(guest_0_page), KEY(2));
-+
-+out:
-+	test_vm_free(t.vm);
-+}
-+
- static void guest_idle(void)
- {
- 	GUEST_SYNC(STAGE_INITED);
-@@ -301,38 +587,53 @@ static void guest_idle(void)
- 		GUEST_SYNC(STAGE_IDLED);
- }
- 
--static void test_errors(void)
-+static void _test_errors_common(struct test_vcpu vcpu, enum mop_target target, int size)
- {
--	struct test_default t = test_default_init(guest_idle);
- 	int rv;
- 
--	HOST_SYNC(t.vcpu, STAGE_INITED);
--
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, -1, GADDR_V(mem1));
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, -1, GADDR_V(mem1));
- 	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
- 
- 	/* Zero size: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, 0, GADDR_V(mem1));
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, 0, GADDR_V(mem1));
- 	TEST_ASSERT(rv == -1 && (errno == EINVAL || errno == ENOMEM),
- 		    "ioctl allows 0 as size");
- 
- 	/* Bad flags: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR_V(mem1), SET_FLAGS(-1));
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR_V(mem1), SET_FLAGS(-1));
- 	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags");
- 
--	/* Bad operation: */
--	rv = ERR_MOP(t.vcpu, INVALID, WRITE, mem1, t.size, GADDR_V(mem1));
--	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
--
- 	/* Bad guest address: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR((void *)~0xfffUL), CHECK_ONLY);
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR((void *)~0xfffUL), CHECK_ONLY);
- 	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
- 
- 	/* Bad host address: */
--	rv = ERR_MOP(t.vcpu, LOGICAL, WRITE, 0, t.size, GADDR_V(mem1));
-+	rv = ERR_MOP(vcpu, target, WRITE, 0, size, GADDR_V(mem1));
- 	TEST_ASSERT(rv == -1 && errno == EFAULT,
- 		    "ioctl does not report bad host memory address");
- 
-+	/* Bad key: */
-+	rv = ERR_MOP(vcpu, target, WRITE, mem1, size, GADDR_V(mem1), KEY(17));
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows invalid key");
-+}
-+
-+static void test_errors(void)
-+{
-+	struct test_default t = test_default_init(guest_idle);
-+	int rv;
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+
-+	_test_errors_common(t.vcpu, LOGICAL, t.size);
-+	_test_errors_common(t.vm, ABSOLUTE, t.size);
-+
-+	/* Bad operation: */
-+	rv = ERR_MOP(t.vcpu, INVALID, WRITE, mem1, t.size, GADDR_V(mem1));
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
-+	/* virtual addresses are not translated when passing INVALID */
-+	rv = ERR_MOP(t.vm, INVALID, WRITE, mem1, PAGE_SIZE, GADDR(0));
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
-+
- 	/* Bad access register: */
- 	t.run->psw_mask &= ~(3UL << (63 - 17));
- 	t.run->psw_mask |= 1UL << (63 - 17);  /* Enable AR mode */
-@@ -355,17 +656,30 @@ static void test_errors(void)
- 
- int main(int argc, char *argv[])
- {
--	int memop_cap;
-+	int memop_cap, extension_cap;
- 
- 	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
- 
- 	memop_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP);
-+	extension_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP_EXTENSION);
- 	if (!memop_cap) {
- 		print_skip("CAP_S390_MEM_OP not supported");
- 		exit(KSFT_SKIP);
- 	}
- 
- 	test_copy();
-+	if (extension_cap > 0) {
-+		test_copy_key();
-+		test_copy_key_storage_prot_override();
-+		test_copy_key_fetch_prot();
-+		test_copy_key_fetch_prot_override();
-+		test_errors_key();
-+		test_errors_key_storage_prot_override();
-+		test_errors_key_fetch_prot_override_not_enabled();
-+		test_errors_key_fetch_prot_override_enabled();
-+	} else {
-+		print_skip("storage key memop extension not supported");
-+	}
- 	test_errors();
- 
- 	return 0;
--- 
-2.32.0
+Thanks for taking the time to review my patch.
 
+> On 2022-02-16 16:16, Sebastian Ene wrote:
+> > This patch add support for stolen time by sharing a memory region
+> > with the guest which will be used by the hypervisor to store the stolen
+> > time information. The exact format of the structure stored by the
+> > hypervisor is described in the ARM DEN0057A document.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  Makefile                          |  3 +-
+> >  arm/aarch64/arm-cpu.c             |  2 +
+> >  arm/aarch64/include/kvm/pvtime.h  |  6 +++
+> >  arm/aarch64/pvtime.c              | 83 +++++++++++++++++++++++++++++++
+> >  arm/include/arm-common/kvm-arch.h |  6 +++
+> >  arm/kvm-cpu.c                     | 14 +++---
+> >  6 files changed, 106 insertions(+), 8 deletions(-)
+> >  create mode 100644 arm/aarch64/include/kvm/pvtime.h
+> >  create mode 100644 arm/aarch64/pvtime.c
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index f251147..282ae99 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+> >  	OBJS		+= arm/aarch64/arm-cpu.o
+> >  	OBJS		+= arm/aarch64/kvm-cpu.o
+> >  	OBJS		+= arm/aarch64/kvm.o
+> > +	OBJS		+= arm/aarch64/pvtime.o
+> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+> > 
+> > @@ -582,4 +583,4 @@ ifneq ($(MAKECMDGOALS),clean)
+> > 
+> >  KVMTOOLS-VERSION-FILE:
+> >  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
+> > -endif
+> > \ No newline at end of file
+> > +endif
+> 
+> Spurious change?
+> 
+
+Right, ACK I will revert this change.
+
+> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> > index d7572b7..80bf83a 100644
+> > --- a/arm/aarch64/arm-cpu.c
+> > +++ b/arm/aarch64/arm-cpu.c
+> > @@ -2,6 +2,7 @@
+> >  #include "kvm/kvm.h"
+> >  #include "kvm/kvm-cpu.h"
+> >  #include "kvm/util.h"
+> > +#include "kvm/pvtime.h"
+> > 
+> >  #include "arm-common/gic.h"
+> >  #include "arm-common/timer.h"
+> > @@ -22,6 +23,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm
+> > *kvm)
+> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+> >  {
+> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> > +	pvtime__setup_vcpu(vcpu);
+> >  	return 0;
+> >  }
+> > 
+> > diff --git a/arm/aarch64/include/kvm/pvtime.h
+> > b/arm/aarch64/include/kvm/pvtime.h
+> > new file mode 100644
+> > index 0000000..c31f019
+> > --- /dev/null
+> > +++ b/arm/aarch64/include/kvm/pvtime.h
+> > @@ -0,0 +1,6 @@
+> > +#ifndef KVM__PVTIME_H
+> > +#define KVM__PVTIME_H
+> > +
+> > +void pvtime__setup_vcpu(struct kvm_cpu *vcpu);
+> > +
+> > +#endif /* KVM__PVTIME_H */
+> 
+> How about sticking this in kvm-cpu-arch.h instead? A whole new include file
+> for just a prototype isn't totally warranted.
+>
+
+I think that's a good ideea, I will do this.
+
+> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> > new file mode 100644
+> > index 0000000..eb92388
+> > --- /dev/null
+> > +++ b/arm/aarch64/pvtime.c
+> > @@ -0,0 +1,83 @@
+> > +#include "kvm/kvm.h"
+> > +#include "kvm/kvm-cpu.h"
+> > +#include "kvm/util.h"
+> > +#include "kvm/pvtime.h"
+> > +
+> > +#include <linux/byteorder.h>
+> > +#include <linux/types.h>
+> > +
+> > +struct pvtime_data_priv {
+> > +	bool	is_supported;
+> > +	char	*usr_mem;
+> > +};
+> > +
+> > +static struct pvtime_data_priv pvtime_data = {
+> > +	.is_supported	= true,
+> > +	.usr_mem	= NULL
+> > +};
+> > +
+> > +static int pvtime__aloc_region(struct kvm *kvm)
+> 
+> s/aloc/alloc/ ?
+> 
+
+I will fix the typo.
+
+> > +{
+> > +	char *mem;
+> > +	int ret = 0;
+> > +
+> > +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
+> > +		   MAP_ANON_NORESERVE, -1, 0);
+> > +	if (mem == MAP_FAILED)
+> > +		return -ENOMEM;
+> > +
+> > +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
+> > +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
+> > +	if (ret) {
+> > +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
+> > +		return ret;
+> > +	}
+> > +
+> > +	pvtime_data.usr_mem = mem;
+> > +	return ret;
+> > +}
+> > +
+> > +static int pvtime__teardown_region(struct kvm *kvm)
+> > +{
+> > +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
+> > +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
+> > +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
+> > +	pvtime_data.usr_mem = NULL;
+> > +	return 0;
+> > +}
+> > +
+> > +void pvtime__setup_vcpu(struct kvm_cpu *vcpu)
+> > +{
+> > +	int ret;
+> > +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
+> > +		AARCH64_PVTIME_SIZE;
+> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
+> > +	};
+> > +
+> > +	if (!pvtime_data.is_supported)
+> > +		return;
+> > +
+> > +	if (!pvtime_data.usr_mem) {
+> > +		ret = pvtime__aloc_region(vcpu->kvm);
+> > +		if (ret)
+> > +			goto out_err_alloc;
+> > +	}
+> > +
+> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
+> > +	if (ret)
+> > +		goto out_err_attr;
+> 
+> You should check for the stolen time capability before allocating and
+> mapping
+> the memory.
+> 
+
+Good catch ! I will do this, thanks.
+
+> > +
+> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
+> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
+> > +	if (!ret)
+> > +		return;
+> > +
+> > +out_err_attr:
+> > +	pvtime__teardown_region(vcpu->kvm);
+> > +out_err_alloc:
+> > +	pvtime_data.is_supported = false;
+> > +}
+> > +
+> > +dev_exit(pvtime__teardown_region);
+> > diff --git a/arm/include/arm-common/kvm-arch.h
+> > b/arm/include/arm-common/kvm-arch.h
+> > index c645ac0..7b683d6 100644
+> > --- a/arm/include/arm-common/kvm-arch.h
+> > +++ b/arm/include/arm-common/kvm-arch.h
+> > @@ -54,6 +54,12 @@
+> >  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
+> >  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+> > 
+> > +#define AARCH64_PVTIME_IPA_MAX_SIZE		(0x10000)
+> 
+> SZ_64K?
+>
+
+I will update the `AARCH64_PVTIME_IPA_MAX_SIZE` defintion with `SZ_64K`.
+
+> > +#define AARCH64_PROTECTED_VM_FW_MAX_SIZE	(0x200000)
+> 
+> This definitely looks like something that shouldn't be there. Yet.
+> 
+
+I agree, I will remove it for the moment.
+
+> > +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
+> > +					 AARCH64_PROTECTED_VM_FW_MAX_SIZE - \
+> > +					 AARCH64_PVTIME_IPA_MAX_SIZE)
+> > +#define AARCH64_PVTIME_SIZE		(64)
+> > 
+> >  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+> >  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
+> > diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> > index 6a2408c..84ac1e9 100644
+> > --- a/arm/kvm-cpu.c
+> > +++ b/arm/kvm-cpu.c
+> > @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm
+> > *kvm, unsigned long cpu_id)
+> >  			die("Unable to find matching target");
+> >  	}
+> > 
+> > +	/* Populate the vcpu structure. */
+> > +	vcpu->kvm		= kvm;
+> > +	vcpu->cpu_id		= cpu_id;
+> > +	vcpu->cpu_type		= vcpu_init.target;
+> > +	vcpu->cpu_compatible	= target->compatible;
+> > +	vcpu->is_running	= true;
+> > +
+> >  	if (err || target->init(vcpu))
+> >  		die("Unable to initialise vcpu");
+> > 
+> > @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm
+> > *kvm, unsigned long cpu_id)
+> >  		vcpu->ring = (void *)vcpu->kvm_run +
+> >  			     (coalesced_offset * PAGE_SIZE);
+> > 
+> > -	/* Populate the vcpu structure. */
+> > -	vcpu->kvm		= kvm;
+> > -	vcpu->cpu_id		= cpu_id;
+> > -	vcpu->cpu_type		= vcpu_init.target;
+> > -	vcpu->cpu_compatible	= target->compatible;
+> > -	vcpu->is_running	= true;
+> > -
+> 
+> What is the reason for moving these assignments around?
+> 
+
+The setup of the pvtime is done during the vcpu initialisation and I
+need to access the kvm structure during that time.
+
+> >  	if (kvm_cpu__configure_features(vcpu))
+> >  		die("Unable to configure requested vcpu features");
+> 
+> Thanks,
+> 
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
