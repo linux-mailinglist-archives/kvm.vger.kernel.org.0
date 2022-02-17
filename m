@@ -2,78 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30E064BA35D
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:44:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F5D74BA365
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:46:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232351AbiBQOoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 09:44:30 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47488 "EHLO
+        id S242036AbiBQOqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 09:46:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242017AbiBQOo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:44:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3C9D420D343
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:44:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645109049;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5AOSZZQwsMAv3mqXU3sTGoNdYgPHCwU2yhN0Q1Wj6mo=;
-        b=F891a5MAAmLmQGtRIegv1dJq1jOUn9Oltpa24I1ETdzt/lTvHHYnKPDc6QXIjZ3xSCw5VD
-        BUta1cpYlq2qrbNPwKbJRnh69/lRsDf759Y//swQ1osK1lAsH7tneYAvSM8yZpsEdMo9Nu
-        mW1wLdyfdHpuTks+8P9YS3GSkvSfU4A=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-580-xjbzobfAMiqQZ0g8nQNO0A-1; Thu, 17 Feb 2022 09:44:06 -0500
-X-MC-Unique: xjbzobfAMiqQZ0g8nQNO0A-1
-Received: by mail-ej1-f71.google.com with SMTP id kw5-20020a170907770500b006ba314a753eso1593183ejc.21
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:44:06 -0800 (PST)
+        with ESMTP id S233769AbiBQOql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 09:46:41 -0500
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F171813D46
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:46:26 -0800 (PST)
+Received: by mail-yb1-xb2b.google.com with SMTP id 124so13448168ybn.11
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:46:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=b+lg+SpabOofLGFb+LiWtbCjp+/6//uhjOi4ITbKN9U=;
+        b=gUwrF07BLzthi2PO767WPBFhcHESA5aYRgxQUrnq0U/5nYLmLPt/l/eS+Sa66C1nCV
+         UHZfpI8ugZjzZ3M8MA5+75Xu2jlXRsh47zlxXtUzHWtKhCLHOmec9ifcolD//nPuxm/9
+         y7slvryMnL2E3P+CfmetrA192Fe4DAYI+XY5bmY7fVCnFii8peoV5+Q32eHehKNw3xkL
+         ahMjNJrUJYfEYY1jcUBTUgkh+scV1A9eeUvGmVgP04qXMntk53IL9oEQjDKuyyesB/I0
+         faxJPPOEkrMqC1IobKi3EZZaVyqbPYO2iduFgm0B0VnxdDLjMLWru6/OuQURBJPm0ykw
+         CCNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5AOSZZQwsMAv3mqXU3sTGoNdYgPHCwU2yhN0Q1Wj6mo=;
-        b=CmyyW62g63PyCfcKcHjsUhPVsoBA9J1NQSLTvoA/Qg12a96Lah3K8Whctbg+OKOwf4
-         K2ZEzLIW9er4Q6thI324dZydTCkA2m3z00KkJfACxc1acmuZDZTZ3M7M1ZWJ+oA+htf4
-         xJAG3fmGR5jBzWLtlYeBocVB+NH1opn/8ou72ttxAXqb27bA6O6+kbyKh/MFBmb8lpJT
-         2YcIk6OzbRXalfY3GGTrSF1eWjjiK6pzMXgnd5P6J/ZmaWG36Xs/BZgwlvUHwFtncwTS
-         /vSIfY62D4gyK0+uSzDv1dUiyt537YAj42P5AlLEvH2ks2pTeKcHTq4CsEMTYNqakyyW
-         +R+g==
-X-Gm-Message-State: AOAM530SzSIqaRu1z6YxYfr4B3JPrvvANFi2TxHnnvWvy1cIDg8zeJt+
-        k2jb4YtpSVW1/stx6zImFKaQYBlhWCnswH9chMPRN/0ytAhBDTqKLEUqyT9JDopMrnpbOF8fUnt
-        btmwCVaTm0KXr
-X-Received: by 2002:a17:906:e244:b0:6cd:24e3:ab8b with SMTP id gq4-20020a170906e24400b006cd24e3ab8bmr2509838ejb.633.1645109045125;
-        Thu, 17 Feb 2022 06:44:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyzkXZ6FVMVz3IA89TXOB2qtSPbmhOXQ7dKmyG1xOA/FqXMwa63W7Abyi7SFi6gpfpOWrgoHQ==
-X-Received: by 2002:a17:906:e244:b0:6cd:24e3:ab8b with SMTP id gq4-20020a170906e24400b006cd24e3ab8bmr2509827ejb.633.1645109044940;
-        Thu, 17 Feb 2022 06:44:04 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id z6sm1261759ejd.96.2022.02.17.06.44.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 06:44:04 -0800 (PST)
-Message-ID: <4be28ff3-55e2-dedf-5654-b0c36779fffe@redhat.com>
-Date:   Thu, 17 Feb 2022 15:44:02 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=b+lg+SpabOofLGFb+LiWtbCjp+/6//uhjOi4ITbKN9U=;
+        b=Phmjit+V1R6Jwwnna/I3GBrpaA+UCTD75nkAF5bqgnfpOrfLNLDQWEIxCLKS+PzTOh
+         X7RerIgRmX+0YXx4Ep8zXEnImgvGeId+n8R2dVH49dfLqtsrDB1H2/P61ty03A9DSrgf
+         iqQL2fYxmCVHcfr/DT6a6F6ip/n7d3xYy92kHi6V6cT2zASI4rX11jYyP3ulFX69u5Ax
+         lTQJgxptwcrHVhVunTi7b5XFgHPYpQFsDYwNlSLz82k4IdeoPaRSfD43RIQbyW+5fWGd
+         cQf170E+ti2IhDHUkxczBVXoR4tOxRKC6SYlJEaZxf+Cf2x1oTvu6fNxhd9uqpTrL4mZ
+         Lrmg==
+X-Gm-Message-State: AOAM531husD6WDKrWB/4EY6hBlh5D9E1Nbgf+XkmVSCbXlTDxfQ0wYPL
+        e827vp92I0B+qbeP2VRZ5jdjipVtwrPukFbxMpx3tA==
+X-Google-Smtp-Source: ABdhPJzfTKgh0s/ThfKGKF3qHxwikIsXZdbjz7YUWisdldaWLBVCQwpKInY82EGd2v+ZEPLtKkkY7JrIB2y3Y9PKhxQ=
+X-Received: by 2002:a25:5145:0:b0:61d:ad99:6e5a with SMTP id
+ f66-20020a255145000000b0061dad996e5amr2732776ybb.228.1645109185430; Thu, 17
+ Feb 2022 06:46:25 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [kvm-unit-tests GIT PULL 0/9] s390x: smp lib improvements and
- more
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com
-References: <20220217143504.232688-1-imbrenda@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220217143504.232688-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20220207051202.577951-1-manali.shukla@amd.com>
+ <20220207051202.577951-4-manali.shukla@amd.com> <CAAAPnDH6y6pFG+Mw_JCYYi9rome0d0+Q4UTLK3KoBzREvkJwqw@mail.gmail.com>
+ <18489ffd-c3bc-2f0c-38cf-9faa74cf3363@amd.com>
+In-Reply-To: <18489ffd-c3bc-2f0c-38cf-9faa74cf3363@amd.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Thu, 17 Feb 2022 14:46:14 +0000
+Message-ID: <CAAAPnDGHivqTYPqKf0B0Ej8JDQ5Npm45aN5ibSdN-bafDuhiPA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 3/3] x86: nSVM: Add an exception test
+ framework and tests
+To:     "Shukla, Manali" <mashukla@amd.com>
+Cc:     Manali Shukla <manali.shukla@amd.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org, seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,60 +69,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/22 15:34, Claudio Imbrenda wrote:
-> Hi Paolo,
-> 
-> please merge the following changes:
-> * SMP lib improvements to increase correctness of SMP tests
-> * fix some tests so that each test has a unique output line
-> * add a few function to detect the hypervisor
-> * rename some macros to bring them in line with the kernel
-> 
-> MERGE:
-> https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/25
-> 
-> PIPELINE:
-> https://gitlab.com/imbrenda/kvm-unit-tests/-/pipelines/473371669
-> 
-> PULL:
-> https://gitlab.com/imbrenda/kvm-unit-tests.git s390x-next-20220217
-> 
-> Christian Borntraeger (1):
->    s390x/cpumodel: give each test a unique output line
-> 
-> Claudio Imbrenda (6):
->    s390x: firq: fix running in PV
->    lib: s390x: smp: guarantee that boot CPU has index 0
->    lib: s390x: smp: refactor smp functions to accept indexes
->    s390x: smp: use CPU indexes instead of addresses
->    s390x: firq: use CPU indexes instead of addresses
->    s390x: skrf: use CPU indexes instead of addresses
-> 
-> Janosch Frank (1):
->    s390x: uv: Fix UVC cmd prepare reset name
-> 
-> Pierre Morel (1):
->    s390x: stsi: Define vm_is_kvm to be used in different tests
-> 
->   lib/s390x/asm/uv.h  |   4 +-
->   lib/s390x/smp.h     |  20 +++--
->   lib/s390x/stsi.h    |  32 ++++++++
->   lib/s390x/vm.h      |   2 +
->   lib/s390x/smp.c     | 173 +++++++++++++++++++++++++++-----------------
->   lib/s390x/vm.c      |  51 ++++++++++++-
->   s390x/cpumodel.c    |   5 +-
->   s390x/firq.c        |  26 ++-----
->   s390x/skrf.c        |   2 +-
->   s390x/smp.c         |  22 +++---
->   s390x/stsi.c        |  23 +-----
->   s390x/uv-guest.c    |   2 +-
->   s390x/uv-host.c     |   2 +-
->   s390x/unittests.cfg |  18 ++++-
->   14 files changed, 243 insertions(+), 139 deletions(-)
->   create mode 100644 lib/s390x/stsi.h
-> 
+> >> +};
+> >
+> > If you set and clear PT_USER_MASK in svm_l2_ac_test() before calling
+> > into userspace you can remove init_test and uninit_test from the
+> > framework all together.  That will simplify the code.
+> >
+> If clear user mask is called after userspace code, when #AC exception is
+> intercepted by L1, the control directly goes to L1 and it does not reach
+> clear_user_mask_all() function (called after user space code function run_in_user()).
+>
+> That is why I have added init_test and uninit_test function
+>
 
-Merged, thanks.
+Ah, that makes sense.  Though IIUC, you are now moving the set/clear
+elsewhere, right?  If so, it seems like init_test() and uninit_test()
+are no longer needed.
 
-Paolo
-
+> > Further, it would be nice to then hoist this framework and the one in
+> > vmx into a common x86 file, but looking at this that may be something
+> > to think about in the future.  There would have to be wrappers when
+> > interacting with the vmc{s,b} and macros at the very least.
+> >
