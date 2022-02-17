@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14FAB4B9FA7
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 13:06:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B089A4B9FBF
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 13:09:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240193AbiBQMFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 07:05:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60544 "EHLO
+        id S240263AbiBQMIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 07:08:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232390AbiBQMFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 07:05:22 -0500
+        with ESMTP id S240256AbiBQMIh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 07:08:37 -0500
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0919D62D3;
-        Thu, 17 Feb 2022 04:05:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31256378;
+        Thu, 17 Feb 2022 04:08:20 -0800 (PST)
 Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HBYsxI021431;
-        Thu, 17 Feb 2022 12:04:11 GMT
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HBjht2021438;
+        Thu, 17 Feb 2022 12:07:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : references : date : in-reply-to : message-id : content-type :
  mime-version; s=corp-2021-07-09;
- bh=sQ054MwiNb+s2lx2goKJuQPgQAVhwl/q+XGiVtkK9iY=;
- b=MFRHdmwHncKR8Trng1CuoaQCjqa0I16FWPL1rm7Vg2slxqeaIf+irzY/4RMSzWuJEWzE
- xuMBVFNiKfjHfauLAApm/d9+XUmrFXZVtOxZaE0ZyGG7lR5HGdRF+L+3Xdd1nvfjJVWX
- Y7z0gTOJZbRbpU4u7B1rahTwgdRFILsziMgAkXB1nOXB9mF2B9PFi1T75qg+dqAdA8Z0
- evanAXt2t9XsqtHNBNBzIUwju/aoLIoCQa46dkPXxrLcM75WdznnDnC14XZPHyCdfr4l
- HB1+kWkDZG0pXLi8Gw6lrutSWe8fqWqQT6pLYM2sKI2wieUN6urdYj85yliT2BaJKdPc kg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3e8n3fd5wj-1
+ bh=nKpPv/o/oIGYZJ/IhGUMA9JZVd1tqItJCW+GQKKHDV0=;
+ b=njHQUQrSZXusS7QUiosIjAWKRHZEl5zehsUCc8XGNmm9OJwkF4KauSsXwXUPmco/nA02
+ d/exocelk2sKC9rb857nQsmVlSlLG5aNQHaQO1oHvGV7KrN2++cPYEhPo24Mw3ZbRtzU
+ LeekSThp+omaoaiOxeLefNUqlixKm5TQJCjyc+tAZOOJzcalZTUhOicNLg6XvW7mSOqK
+ 8/fwA5ojAvfW/6t+2uXYIGpLKYObkedRCbmvjgV8ACiwfieing20VyVoqHOpwfSzeOnW
+ bH+PFANNQxLlS70+OzGh6HwGbEI7MqCSV52PMf81xeJt9XWyubC/n9BH6ahovO/7eWiO KQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3e8n3fd6a7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Feb 2022 12:04:10 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 21HC1Kcl033234;
-        Thu, 17 Feb 2022 12:04:07 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
-        by userp3030.oracle.com with ESMTP id 3e8nkyxke6-1
+        Thu, 17 Feb 2022 12:07:42 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 21HC0dLs163585;
+        Thu, 17 Feb 2022 12:07:41 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2172.outbound.protection.outlook.com [104.47.58.172])
+        by aserp3030.oracle.com with ESMTP id 3e9brc9wc6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Feb 2022 12:04:07 +0000
+        Thu, 17 Feb 2022 12:07:41 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d6ETUAeM9iaOz0AX0Mo4qYuH+rm4BGWB1HkVLxyaGGb6q70RoiApQ5MyEeM9+aFT3hO2gxBrOn3KZxV0VWlb7gydCUrDqgwg1WGE7flVJ6y0OR5qtsp57V2XjAe+CSMmFNydIJ+CudQvh200egoc/91R1gtp3tHadWCC4pTebs9bsW8aKawsG7V69Lxq7gFhKzB6Wu6PZTNjUbD9wwTse4CokVqMeCbkynUeGhRSHWH6WVQzUrGCmAZ8BDsroT4WLobDGp8mUvxeEXmWE3ArqIXSRG447b+fBDu8zJeS8ZCMYA6JKGRkY3LeiQvHFMzEyUBYOa2ip7Me68CRtnQoXA==
+ b=QrbhRyfg8ydOc/n/tKYM/WbMb4Kpu1qDmdsfG+pUxB8Bh20WDuUIlGmDKvrcOQ3HqplPsLOrFK/Ig3jwauFwOpUUXcqhEaSj+1WYVw9XP55xUMODmMO6N4+Gd9cPNkEkXtaBThuKkvKAoT+tCZKTX952CmmBIER2WnZ5QwPzPIVOvjPp9walEtOsS2ebFoQ2cARE93V+N7Jg1nzudWG15J0iV0gi4brzl1Uzawi92MeVBBo+kHD7XdNqZZ6SmwhHnkKZy9lLAJT9s4GhNMM6J0h4sXMrelxVqBAH73FBdnIYzm+I0nyBHCx/UJAoTa/CoEi8uor2XQYCQgUcbdSrIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sQ054MwiNb+s2lx2goKJuQPgQAVhwl/q+XGiVtkK9iY=;
- b=QxmEUUmk/CAHqnvXiG7q7bMQC8EOENZNKLCTv5IsAMFahWT8RIFQnlEszNiVex7wDQfaHhIon/gENTYLTUrUv8WitpvSsutpaEn1FIaFgt++16VD1OisicVFG7f/UImTQzSH9inHWpoGxY1wjb0x964s6r3YNfs7Qt0PpIV08I9qWiBemix85g7FJOg67otWHxKN//O6hPDc1mOFMrHeYPKjtu0n87QVVTV9FmY+r9gvABUHt8Yu6AuF1LC5E1QF/GS5P0M//et4U2Moup8iN+1cNK7i+mMYD7TGE3PtH8ynxz5OxXvtd0HleANHVBgniuZA6/z7XSjLfXHDbfZjsw==
+ bh=nKpPv/o/oIGYZJ/IhGUMA9JZVd1tqItJCW+GQKKHDV0=;
+ b=fyUqixjJW1z22J9fggaBChQSPNxxtgeBJRmA5zwD6ghLGel/xIWTJwm+95ds8Gb8jYvrpjFYR5Yt/7zvfXkh8F1v2tCz0WHRhie/xdnrpCtTwscb/kkZTwJUlS1cwqvh0LANBbwIVo8fEbgYKNXMbK4bNh0+5Q1n1n/UdfOPYCgwAzucfURm1AMe6NFPiTaDiBpxnwI2J9KW2CSpGsiHm36MxdCieKs6GjuGIS/5CTrlViP1kKJisVPEwbrGK7IgL795bR+cUsElGe+INFot74JTLFwBnH+yM+hEP9DH7r5Xa8EAurIyKlpnuCMtDC9/e8aVzMo0TuG1UKUB6lhOxA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sQ054MwiNb+s2lx2goKJuQPgQAVhwl/q+XGiVtkK9iY=;
- b=Ozc7H9OSp3qM+lP37hpsjvmZQMQz2nBNxrxn0Wjuxqj1PVSLqOlDTPlUUGauQ/g0CXxcNpZIscQHpUR9bMuDdpl5nxWK5KbRI+RvbeIesN5MHUTKkSKDWVjYlAcGQiFcFLa2+FKH4z3wogWWy7C6NmAlIRo38TYJtN6URhtSwdg=
+ bh=nKpPv/o/oIGYZJ/IhGUMA9JZVd1tqItJCW+GQKKHDV0=;
+ b=oFgA5oLiOF90qIyJ9GeKjGU7I3jMnH+vc1mZ2i86lMj+kxHYn+Y6RFdt9cUbhnpg4g5J11VoP8BfRsVPZMqmsFYd6cNXd3XXFtfPNOxrDUX28FDscoJLY6xHC0J0KjfozfCA4kWDBGEGf/XFnoMSxz53/4pDKiPFMi5jTc2lem4=
 Received: from DS7PR10MB4926.namprd10.prod.outlook.com (2603:10b6:5:3ac::20)
  by MN2PR10MB3533.namprd10.prod.outlook.com (2603:10b6:208:118::32) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.15; Thu, 17 Feb
- 2022 12:04:05 +0000
+ 2022 12:07:39 +0000
 Received: from DS7PR10MB4926.namprd10.prod.outlook.com
  ([fe80::e429:a820:ef6e:98d9]) by DS7PR10MB4926.namprd10.prod.outlook.com
  ([fe80::e429:a820:ef6e:98d9%6]) with mapi id 15.20.4995.017; Thu, 17 Feb 2022
- 12:04:05 +0000
+ 12:07:39 +0000
 From:   David Edmondson <david.edmondson@oracle.com>
 To:     Leonardo Bras <leobras@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -78,78 +78,78 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         David Gilbert <dgilbert@redhat.com>,
         Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] x86/kvm/fpu: Remove
- kvm_vcpu_arch.guest_supported_xcr0
+Subject: Re: [PATCH v4 1/2] x86/kvm/fpu: Mask guest fpstate->xfeatures with
+ guest_supported_xcr0
 References: <20220217053028.96432-1-leobras@redhat.com>
-        <20220217053028.96432-3-leobras@redhat.com>
-Date:   Thu, 17 Feb 2022 12:03:57 +0000
-In-Reply-To: <20220217053028.96432-3-leobras@redhat.com> (Leonardo Bras's
-        message of "Thu, 17 Feb 2022 02:30:30 -0300")
-Message-ID: <cunsfshpumq.fsf@oracle.com>
+        <20220217053028.96432-2-leobras@redhat.com>
+Date:   Thu, 17 Feb 2022 12:07:32 +0000
+In-Reply-To: <20220217053028.96432-2-leobras@redhat.com> (Leonardo Bras's
+        message of "Thu, 17 Feb 2022 02:30:29 -0300")
+Message-ID: <cunmtippugr.fsf@oracle.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/29.0.50 (gnu/linux)
 Content-Type: text/plain
-X-ClientProxiedBy: LO2P265CA0254.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:8a::26) To DS7PR10MB4926.namprd10.prod.outlook.com
+X-ClientProxiedBy: LO4P123CA0232.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a6::21) To DS7PR10MB4926.namprd10.prod.outlook.com
  (2603:10b6:5:3ac::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a06df6e7-bf32-40e5-80fb-08d9f20d97f2
+X-MS-Office365-Filtering-Correlation-Id: f2ff970e-ec1c-4656-7e08-08d9f20e17b2
 X-MS-TrafficTypeDiagnostic: MN2PR10MB3533:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR10MB35338F12790E29E540C637E888369@MN2PR10MB3533.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <MN2PR10MB3533F1E51A1F190427AF2F3288369@MN2PR10MB3533.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PX+A647wQ1x0UGjI25w6P4ONAoorBlGDDxIw4VIzOlv1QckG/gOriS6TGXjAJFTZ+T8zci9o7iLZVIjIhe2xfUvKO6OMowvE6Jv62Fj1/THxjJ3uM71t9H9VaU+IDDyFRRDE6WvbDbnJKoGz7U2Juyt1vw1kmZnKzssRqNJcjndNxX0InMPLCz18WJKgYL9kE7byt2JlZrM/BQ40CcRHcnBSvebTara9fM2R3/EuqOWQP8xKKr5Af1VjTyiZIFvTjctD1O4/Mvr8xmAuVtTAMQB4H9WnH2VOTGUJ2ZIWPmbExY6s2UH060C2321W1SiMXFGgVKMtQjDf9o73nINEBMxKrCI+V3bPi2bPa43/UGb2FYe999SxMgPfwq4KJwH2lzdlcl6zRMj3dN1KDjfbKILs9wnY/iK+2Ix0iPxDpg8RF49auAkVXNHijRE5BztLP58frX1+yDEV/bOTtt9lhfeyRvxMf5jrKMjHYq0w+24aMB4NY2GN1EhG457YULsLW53GJJwStmfdzojadtm12GLdJzyeblvjyG0Ycbz/wBN8bVUorxgcvzSpMbyUNST4ipMJOKpfIdKW1Xldy8bHi7GOONm9kxcyC4eQPqq12/YB0nnC2/euLjFfzNLMBPTi7YsYJKa0NSglQg27xSau5xrLfX40sUhamGUSYtipBCEiqQcHNtmTEyeTXhKbW4cg
+X-Microsoft-Antispam-Message-Info: sw7+vLA31CpI/dvgnumKJ0ltZpDQSGhI/kp5bVf7Ny0iPBLQB+cuUHIbBsSlB3WJ/bx8QFm/ckeeJt+0yNAwI0OkHp5RZsOIeINoCUFkPygcodPzx+bZDRrARIS143aS5oeWDb706mu6STZ9GFFr6MwIdBFvq0T0MO9sMm5Z44NdcKfAamgF3lpW9AJ3HJNKMv1Z3yXjgdHvKTHg0RlHLZNEAyj3/NBb+7iLHuDv0C8HuodJ3TrM9REOgOrm0/dTfWgxP7wktEK+Lo/NgazCjXGMIRlDkvLLH5LIHyCcW1b4JZRmOAx/iVLIz3BJ3sVEF07+i59ikMvBx5oAibaF+9PUgCFfNr4NSSmHaYKDBLwUyDoLGdWixIBRHP/PNduL6ldVc6O9Q2xcdZVa3tlW3g/TWACzzpWk0Vqzis/HGLdclOgRPDLG1GY7ekBnUTFY+Uyv0T/Mc2Q7J/nhiohkLlME0TvC9Ai+8uzUM/YzXbjuCXVNONDsI4+oNhVhhAdPmDx/t2nI62mBVilx3ngXbAZagBtRgl4myR8T0q3lW7PKlFAspepYvdyBUuaABKWxHoCfq/Z/LQgM4LCt5LCb7aJs5AB9D2JFKDuL804n46MSf2AYCRqjXg2zenQ0nvhhKuiqHf5ZNWDJ6RIQjxI1WlDVCK4BrayXL7PDvRuwdDh3CbGaVJH5noM513ohUQXH3wfs87FUoSIm0n6BDZYmnA==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB4926.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(186003)(83380400001)(6512007)(6506007)(52116002)(66476007)(2906002)(38100700002)(36756003)(66946007)(66556008)(8936002)(6666004)(86362001)(7416002)(44832011)(5660300002)(2616005)(8676002)(6916009)(6486002)(316002)(508600001)(4326008)(54906003)(4226005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QetsVFfcR8VoiT6iHwQilRA/E+vktq8+4PC5f/tVVDQFYMcq+n5F3RfgjypY?=
- =?us-ascii?Q?L2jZFS4J4PDRpV811kv8L8VlHvBMj0ayJmK927yI0zBA0lOg6lg5nuiDDAF9?=
- =?us-ascii?Q?nhzOoISQpPzRCbhZ3ygM/sB0UsmkZuHUDQ+7R+dYUk951m4VTc7nslj2CLIe?=
- =?us-ascii?Q?5E+qMq1ovwHtK+YgNCwLYDzPXa8rVTZRJJaGwThinXQ9ELProUIhuELyqftY?=
- =?us-ascii?Q?uzkzYHtsfvXFz+ZqVcqBa7YIhaf56Quc0V9e3M0qKVk3c6sUHhCbEfA1EjGA?=
- =?us-ascii?Q?tPLdjhtj9gxGR6E215k9hFR+ocopVwbjFT5evFeaY6gVYAa+8i0yX8CijVWU?=
- =?us-ascii?Q?RzQhgX+fVputnyCuvffuOYqhjcSwaGCet5aWAI/F4rCnvmJB1cuVuk/eX3W4?=
- =?us-ascii?Q?1VwCHSdYkjKKGDN4YXHqJLYOVIg4JYvjUMSI8Ev0pEVLrmY3/6cAu96n5TcD?=
- =?us-ascii?Q?CbZU9T8go7GAp1SfBUou5fdLLoicTc1FLH+xGMX8mnLqNmK58/idvS3ssnQf?=
- =?us-ascii?Q?Xs5or5dVWz1Z++oqz6l7IYtdjEk+MhzpLk6DRWXPsRpwFbWWdQE0zTVzp1ML?=
- =?us-ascii?Q?u1zrcy37PaM+Xid24LJkqIkoL+72MotqwYczAVUr9aL0vtLZj+fXjwS089b+?=
- =?us-ascii?Q?M+U5jH6SZNdBylOefD1Vdesc8nCPtRY9x5JapgpmzuWssTSYXrH+Cfy/1KQ7?=
- =?us-ascii?Q?d1jXEuIYu9rJor1bFhCiMbeYEE+XCBoRltD049z8T34k+QlLhcRskhDARVBa?=
- =?us-ascii?Q?7s5F7J0VnnN0y/SUzUlIH3czJEvdcfB+QOafOTLITosk/YC+rPZ71f68GN1k?=
- =?us-ascii?Q?X3i52+f7hWHZKMAyNfeucuXJM1mxyQpTuiPLbJ+M4ObyNijCQt+3g1nXWXgd?=
- =?us-ascii?Q?CW3Gio0LSvwJPLApscrDlkVFpUNpyc0r4hpFCrv/UV0J9g7VsnsvpSgPGs6g?=
- =?us-ascii?Q?qulLhVY3z1xZL9OpM7A4uwD12kmcol5KshpAuzTPYdH2uSXtVgxdY9LTBYeT?=
- =?us-ascii?Q?Jn7bWl6r/swK61Hk7Xx8cmRRkxDgbGZ4ttFliy1J7aTKk8H7n0J9A14WC2hy?=
- =?us-ascii?Q?2n2v6+hLHndiynkYyvwkW19uIgI165rS1KS/oZ8STo8ev5+pv+DwzwEEBNLL?=
- =?us-ascii?Q?1/Zr+FdoMFC17TTCwWpwmYYBxM2AQrpCTFc+FJwkgYCxcyQFWU2NjfWp6AvQ?=
- =?us-ascii?Q?LCBXqcm7ZN4Tt3UOT6GpRZ8lQGvaGuuLC84mbA9kzHAiwanyc6lN2WIq8GGj?=
- =?us-ascii?Q?skcncZ6hE4Uf5YnvCac80OwmHTMtL+rSWwGp2a2jcY4mamsiV0o0zOpvTdXl?=
- =?us-ascii?Q?5iRlSm4a/M0FylDbPV4jTt4j+pZ1suumIfE6W6cKYjD2LcRWDKtHJK44lTwl?=
- =?us-ascii?Q?UP457oP3N66kyrEq+n10O/oAuhG7BY+dCqZainBgRCO8A1bAOUfREo5K4kp0?=
- =?us-ascii?Q?FmKgaXbiC9r8ReStq1Jh7w7Z0YX/3YfqA2xD43nKxtcXhAjQadxpt1u8uGNv?=
- =?us-ascii?Q?XLo/2Ox9TIOULoulVHIZq85ryWMjuyAiCLPlCBeq4sN9ZwALWWmYNmmNmp8y?=
- =?us-ascii?Q?B00Q5It8w7a+p0clwqmVp3Y3hOQETmB12I2vr9WmW86uj5+vRxueIp4m50f2?=
- =?us-ascii?Q?HkPAQSR5X6XbkkQrh6+hg3YzTpXtWJEko4dMa9kRFndq2RNXTWpaiNCDivMk?=
- =?us-ascii?Q?UPRlDh1sH6EbGgdyA6oWZJegY/e6B3V5VJAV13sxUYPLCpwy?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YXdbABjnHPd+yjw1eWNlOUYfrD4z1K3SMBIEiFBi9BzxFyIZwP2Tn90ZlvS1?=
+ =?us-ascii?Q?+qwddDeHLYJnvt2+DXBPk/lQkZckMNyyRjC3nK7XbZaHtYFwCRUxp+UvMJ9S?=
+ =?us-ascii?Q?c7ix5WI/ufzo2Oe8TrTj/VUveOEnfXoby8p9F9RaWqjWQIw21rMcy9wLxvNV?=
+ =?us-ascii?Q?3wCB//fQ5zksxbbb75ZbPmEcWOoAbnUhbDlvkXJSFioUwsbXyR+eZeoXdjoG?=
+ =?us-ascii?Q?El06AHy3dCQ12cy4sg2RBCeB6FrB84aa2LNMb1zw7JWEuDdTuBOx3v2GmvfY?=
+ =?us-ascii?Q?Z9nABw9MO3ePV5UnUdnsFm8JXTsHNgvGjQCcgvlEPM/x7kjQwbT2CtI8ccUY?=
+ =?us-ascii?Q?beZ5kp8BGrqiD90MVtKOR8CeHP/fUYyDa0ZIYwVPhPoK01dqBDkIfqmxR0sE?=
+ =?us-ascii?Q?nvp+1cbwfeYps4QawqPd/pb5mQA1wJxCp6Ypn3miHa2upyCfOPXUkYfvyFCU?=
+ =?us-ascii?Q?NObHQgNJkgNvsqBtYZOPswwYDePJ3xHuLqDo8IMKglKc1CRs4u093W5lB2s3?=
+ =?us-ascii?Q?HqLrRsK2DlIchEH3agJ2QqLsm+aAnEyNowHtWeAN/23wMIAz3Kr4JMgxI8/I?=
+ =?us-ascii?Q?hRkHP0FtCO9B25U4EjKLs9w4zzFAI85H4rZ1pdQATCOrMophTJR55UlN0Gu6?=
+ =?us-ascii?Q?Jt7j4fpoYVtCNNUNmR5kkSrKrsnhmrRJgAF8vXOHIM+KUKliwhjZPepQuOvH?=
+ =?us-ascii?Q?EyhjlyKYtOfNrbdk2r9PQ5/hBh2mo32VWT+MA3w4oQvVcf0U8agywv/4eypb?=
+ =?us-ascii?Q?ULRMdd6hjECSr0yaxfMgp5cjo2TLFpkIneK1Mrs0CbnrxoTPqNgsblWC9gu8?=
+ =?us-ascii?Q?rseMDwXMI+1zAYmW41mTBlsOMgqZNwP2frxqnsomN3VVQOB3TrDJyq+5elsV?=
+ =?us-ascii?Q?E9FaHIa3QWui/TkMCSBA6JcMvBmTzCraZVbkHPbl5CwlBlgsIo0omt29rnZF?=
+ =?us-ascii?Q?2TPKF0AMAuamiY6XXItWQp/1X2XQVSs8OAFsT14Q+1BT6G3vcLpeRsQ456tW?=
+ =?us-ascii?Q?aO2EBwB90cVgc/mSlZoTTh1C/uFVRX8/wRWVCgZzLRzUXRoceju3/5qRCUh3?=
+ =?us-ascii?Q?SNXUwiXz/pYpAbQys/ReUH4RF8ws4ymuOkaB5MiWmMtMpOH61qYFLa6do0Rc?=
+ =?us-ascii?Q?OEce7ojV0I09Nw/wN6xCztJ9wOHNAKcIhCUgBEZPmDKDlTBnQNGwMVBLH4N5?=
+ =?us-ascii?Q?0lRLowdOaNK1SE5OQa2Ng8KFhAOOm2ZgbpbJWbUEfVMU8CHvi8WY/jpMHNWV?=
+ =?us-ascii?Q?RAVr5sTcceiWWytPYP5YZOgFuAzczQujlNX3BuAeyJtnOp1Nmjy3t0v99HMV?=
+ =?us-ascii?Q?CCuWDkHrwKHnMcm8r2nYXihzIh3lN4X4df1r6vgcsDJiOirEKlKyTn9x5x3+?=
+ =?us-ascii?Q?hteeiv8IY2+fWldc5sUQjZxDWOzavd3EKKXjSBXfhcPZL26zyhQ9FedHTAVi?=
+ =?us-ascii?Q?BfYZKEMn/Cck9MU6EjVn+7X6XVO7ezPlLn09jNRSXHTmiebLUU1C978i7NZE?=
+ =?us-ascii?Q?rHZ4+4qQjlfuTa+WjVOyRW1cV+r8oRuHgzh9yfrbcT2UmB3S3ldMmw6IvllI?=
+ =?us-ascii?Q?VLJpXr2kWHqVN6cVRnKR1IWZxNdP7meajYtVjxpG81GFQcpSdOT52eo4Bgf4?=
+ =?us-ascii?Q?/hCXzpT9QehIa23jXuuTazmerYKSef0Yd0Z3F/YYizKNM2h5ekOp0rVe9bHU?=
+ =?us-ascii?Q?EBVvPZt0MQV1a5m8WCsNqYy8QdY3NUax2AXCh849zLQpwvao?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a06df6e7-bf32-40e5-80fb-08d9f20d97f2
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2ff970e-ec1c-4656-7e08-08d9f20e17b2
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB4926.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 12:04:05.0509
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 12:07:39.1923
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MO+HffFpeoYJy57JB3JjQphWx8uxHCY6/0+mavYwMj7fPPwSPVTfe3qBGAEtssH8XAZ8f2aHthKv8t6/5bmWe/tqX9DoEAy3km1GcsBA224=
+X-MS-Exchange-CrossTenant-UserPrincipalName: yjJT4ljho7+EpqFSPvfJeUH+BYrf9tBFF/okj4s0tlk87P76Sztp8SVrzfyKOTBWt9h3B+7MXmMKXONvGGdBl/znFTUSH0GWZdkxVGB36Bc=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB3533
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10260 signatures=675971
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 adultscore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 spamscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
  definitions=main-2202170054
-X-Proofpoint-GUID: 8D5OvBL2gJCOcv0BfxusiPG_wN6XtcWE
-X-Proofpoint-ORIG-GUID: 8D5OvBL2gJCOcv0BfxusiPG_wN6XtcWE
+X-Proofpoint-GUID: 29Npygn_LMhsaU-a3UmgljZjRHiERJmW
+X-Proofpoint-ORIG-GUID: 29Npygn_LMhsaU-a3UmgljZjRHiERJmW
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -160,129 +160,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday, 2022-02-17 at 02:30:30 -03, Leonardo Bras wrote:
+The single line summary is now out of date - there's no new masking.
 
-> kvm_vcpu_arch currently contains the guest supported features in both
-> guest_supported_xcr0 and guest_fpu.fpstate->user_xfeatures field.
+On Thursday, 2022-02-17 at 02:30:29 -03, Leonardo Bras wrote:
+
+> During host/guest switch (like in kvm_arch_vcpu_ioctl_run()), the kernel
+> swaps the fpu between host/guest contexts, by using fpu_swap_kvm_fpstate().
 >
-> Currently both fields are set to the same value in
-> kvm_vcpu_after_set_cpuid() and are not changed anywhere else after that.
+> When xsave feature is available, the fpu swap is done by:
+> - xsave(s) instruction, with guest's fpstate->xfeatures as mask, is used
+>   to store the current state of the fpu registers to a buffer.
+> - xrstor(s) instruction, with (fpu_kernel_cfg.max_features &
+>   XFEATURE_MASK_FPSTATE) as mask, is used to put the buffer into fpu regs.
 >
-> Since it's not good to keep duplicated data, remove guest_supported_xcr0.
+> For xsave(s) the mask is used to limit what parts of the fpu regs will
+> be copied to the buffer. Likewise on xrstor(s), the mask is used to
+> limit what parts of the fpu regs will be changed.
 >
-> To keep the code more readable, introduce kvm_guest_supported_xcr()
-> and kvm_guest_supported_xfd() to replace the previous usages of
-> guest_supported_xcr0.
+> The mask for xsave(s), the guest's fpstate->xfeatures, is defined on
+> kvm_arch_vcpu_create(), which (in summary) sets it to all features
+> supported by the cpu which are enabled on kernel config.
+>
+> This means that xsave(s) will save to guest buffer all the fpu regs
+> contents the cpu has enabled when the guest is paused, even if they
+> are not used.
+>
+> This would not be an issue, if xrstor(s) would also do that.
+>
+> xrstor(s)'s mask for host/guest swap is basically every valid feature
+> contained in kernel config, except XFEATURE_MASK_PKRU.
+> Accordingto kernel src, it is instead switched in switch_to() and
+> flush_thread().
+>
+> Then, the following happens with a host supporting PKRU starts a
+> guest that does not support it:
+> 1 - Host has XFEATURE_MASK_PKRU set. 1st switch to guest,
+> 2 - xsave(s) fpu regs to host fpustate (buffer has XFEATURE_MASK_PKRU)
+> 3 - xrstor(s) guest fpustate to fpu regs (fpu regs have XFEATURE_MASK_PKRU)
+> 4 - guest runs, then switch back to host,
+> 5 - xsave(s) fpu regs to guest fpstate (buffer now have XFEATURE_MASK_PKRU)
+> 6 - xrstor(s) host fpstate to fpu regs.
+> 7 - kvm_vcpu_ioctl_x86_get_xsave() copy guest fpstate to userspace (with
+>     XFEATURE_MASK_PKRU, which should not be supported by guest vcpu)
+>
+> On 5, even though the guest does not support PKRU, it does have the flag
+> set on guest fpstate, which is transferred to userspace via vcpu ioctl
+> KVM_GET_XSAVE.
+>
+> This becomes a problem when the user decides on migrating the above guest
+> to another machine that does not support PKRU:
+> The new host restores guest's fpu regs to as they were before (xrstor(s)),
+> but since the new host don't support PKRU, a general-protection exception
+> ocurs in xrstor(s) and that crashes the guest.
+>
+> This can be solved by making the guest's fpstate->user_xfeatures hold
+> a copy of guest_supported_xcr0. This way, on 7 the only flags copied to
+> userspace will be the ones compatible to guest requirements, and thus
+> there will be no issue during migration.
+>
+> As a bonus, it will also fail if userspace tries to set fpu features
+> that are not compatible to the guest configuration. (KVM_SET_XSAVE ioctl)
+>
+> Also, since kvm_vcpu_after_set_cpuid() now sets fpstate->user_xfeatures,
+> there is not need to set it in kvm_check_cpuid(). So, change
+> fpstate_realloc() so it does not touch fpstate->user_xfeatures if a
+> non-NULL guest_fpu is passed, which is the case when kvm_check_cpuid()
+> calls it.
 >
 > Signed-off-by: Leonardo Bras <leobras@redhat.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  1 -
->  arch/x86/kvm/cpuid.c            |  5 +++--
->  arch/x86/kvm/x86.c              | 20 +++++++++++++++-----
->  3 files changed, 18 insertions(+), 8 deletions(-)
+>  arch/x86/kernel/fpu/xstate.c | 5 ++++-
+>  arch/x86/kvm/cpuid.c         | 2 ++
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6dcccb304775..ec9830d2aabf 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -703,7 +703,6 @@ struct kvm_vcpu_arch {
->  	struct fpu_guest guest_fpu;
+> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> index 02b3ddaf4f75..7c7824ae7862 100644
+> --- a/arch/x86/kernel/fpu/xstate.c
+> +++ b/arch/x86/kernel/fpu/xstate.c
+> @@ -1558,7 +1558,10 @@ static int fpstate_realloc(u64 xfeatures, unsigned int ksize,
+>  		fpregs_restore_userregs();
 >
->  	u64 xcr0;
-> -	u64 guest_supported_xcr0;
+>  	newfps->xfeatures = curfps->xfeatures | xfeatures;
+> -	newfps->user_xfeatures = curfps->user_xfeatures | xfeatures;
+> +
+> +	if (!guest_fpu)
+> +		newfps->user_xfeatures = curfps->user_xfeatures | xfeatures;
+> +
+>  	newfps->xfd = curfps->xfd & ~xfeatures;
 >
->  	struct kvm_pio_request pio;
->  	void *pio_data;
+>  	/* Do the final updates within the locked region */
 > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 71125291c578..b8f8d268d058 100644
+> index 494d4d351859..71125291c578 100644
 > --- a/arch/x86/kvm/cpuid.c
 > +++ b/arch/x86/kvm/cpuid.c
-> @@ -282,6 +282,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_lapic *apic = vcpu->arch.apic;
->  	struct kvm_cpuid_entry2 *best;
-> +	u64 guest_supported_xcr0;
-
-The intermediate variable seems unnecessary.
-
->
->  	best = kvm_find_cpuid_entry(vcpu, 1, 0);
->  	if (best && apic) {
-> @@ -293,10 +294,10 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  		kvm_apic_set_version(vcpu);
->  	}
->
-> -	vcpu->arch.guest_supported_xcr0 =
-> +	guest_supported_xcr0 =
+> @@ -296,6 +296,8 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.guest_supported_xcr0 =
 >  		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
 >
-> -	vcpu->arch.guest_fpu.fpstate->user_xfeatures = vcpu->arch.guest_supported_xcr0;
-> +	vcpu->arch.guest_fpu.fpstate->user_xfeatures = guest_supported_xcr0;
->
+> +	vcpu->arch.guest_fpu.fpstate->user_xfeatures = vcpu->arch.guest_supported_xcr0;
+> +
 >  	kvm_update_pv_runtime(vcpu);
 >
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 641044db415d..92177e2ff664 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -984,6 +984,18 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvm_load_host_xsave_state);
->
-> +static inline u64 kvm_guest_supported_xcr(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 guest_supported_xcr0 = vcpu->arch.guest_fpu.fpstate->user_xfeatures;
-
-...and here.
-
-> +
-> +	return guest_supported_xcr0;
-> +}
-> +
-> +static inline u64 kvm_guest_supported_xfd(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_guest_supported_xcr(vcpu) & XFEATURE_MASK_USER_DYNAMIC;
-> +}
-> +
->  static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->  {
->  	u64 xcr0 = xcr;
-> @@ -1003,7 +1015,7 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->  	 * saving.  However, xcr0 bit 0 is always set, even if the
->  	 * emulated CPU does not support XSAVE (see kvm_vcpu_reset()).
->  	 */
-> -	valid_bits = vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FP;
-> +	valid_bits = kvm_guest_supported_xcr(vcpu) | XFEATURE_MASK_FP;
->  	if (xcr0 & ~valid_bits)
->  		return 1;
->
-> @@ -3706,8 +3718,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
->  			return 1;
->
-> -		if (data & ~(XFEATURE_MASK_USER_DYNAMIC &
-> -			     vcpu->arch.guest_supported_xcr0))
-> +		if (data & ~(kvm_guest_supported_xfd(vcpu)))
-
-Brackets could be removed...
-
->  			return 1;
->
->  		fpu_update_guest_xfd(&vcpu->arch.guest_fpu, data);
-> @@ -3717,8 +3728,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
->  			return 1;
->
-> -		if (data & ~(XFEATURE_MASK_USER_DYNAMIC &
-> -			     vcpu->arch.guest_supported_xcr0))
-> +		if (data & ~(kvm_guest_supported_xfd(vcpu)))
-
-...and here.
-
->  			return 1;
->
->  		vcpu->arch.guest_fpu.xfd_err = data;
+>  	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
 
 dme.
 -- 
-But he said, leave me alone, I'm a family man.
+All those lines and circles, to me, a mystery.
