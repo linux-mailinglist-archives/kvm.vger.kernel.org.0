@@ -2,66 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 821E24BA30B
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:34:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44FAF4BA314
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:35:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241109AbiBQOen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 09:34:43 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40760 "EHLO
+        id S241772AbiBQOf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 09:35:59 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234277AbiBQOen (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:34:43 -0500
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB8FB0D3B
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:34:28 -0800 (PST)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-2d68d519a33so32604307b3.7
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:34:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=49LFxUiFxKOUzkWf8fuZxLiIVO2LF4tYGtZO7DQutPk=;
-        b=NwjX1tSy/LF3MUmU7BQKrfxOiVZsUdVkytN8GInhnipKZrLmADEmMvvj8SkSfqGUwW
-         bJZ2UHD7aBqqMN4XTKUs3DR9KNSeuRXTt93+e6TD7dFXLNSdHbXT948n/DrYFZA1Jhuc
-         CUAohx/NkmoyLga0JgphN1tR083q5Ty2irsDGzs/v3SNSn2EYdSEQbTYEYl+R8gU+Y9h
-         y+qOg/VUQFrr5VIBAFUV6NIay2pprrFL+irdP70ot3+0At0p1LHjP1ccfGyQ7BXNUt5i
-         YE8lH65+Sm5FQLxHFp0bUTYS94jjc7mab8GiC0RY1RtWn+oNTagKNee/KX07b+FmMWGu
-         Rx/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=49LFxUiFxKOUzkWf8fuZxLiIVO2LF4tYGtZO7DQutPk=;
-        b=LjQgxjR4dr1dyh0wnYj0Kcf6eWi95pe9iZxHUhn0hGpIPfFFTyKwuOo2pmVeM1QHjL
-         opAHtdQYTTAn0JsLa0gezhXH389C5rbxXwi0cevMayJtGo2l889AcUvzj8TM4apb0A1L
-         BMbwZS4GK3kY/gdlYr80q/5Ezh3T87DZhwrh0SVqcl67xEfcbi/Ssc7t8dDxxMZHm1KE
-         DysgB5lxIkLHl5NOYL5z2uiyYfXeZx4cZWb9vvBQ2Ztps6mk5CgHReau82C8L5Rip/L2
-         dSBkJIYxfO2yyFHiuHyicYHYGFzkAhFsWW6phMre4zd7CWDrB+esIsSUK0zVN0zXww+X
-         TNfA==
-X-Gm-Message-State: AOAM533RVMskxTLhHHMiqbwZL9Y/XfgDwX9TT35Az4szWvVSf5FwWPCl
-        B1k9/Em6cHDZcN2wTnKLvqcz8P1AUJiCfnWJQNWMqOMS+gd6/A==
-X-Google-Smtp-Source: ABdhPJyIkRYAlxtDSkXAXM9gsY6QUry1r5Zdx2nb46GQMqcX2XtlFC/PJ80AjWP1ADrQ4/8HHffwiTcNe52wpyvTR2Q=
-X-Received: by 2002:a81:4fc3:0:b0:2d0:e6ca:b3ac with SMTP id
- d186-20020a814fc3000000b002d0e6cab3acmr2845757ywb.222.1645108467176; Thu, 17
- Feb 2022 06:34:27 -0800 (PST)
+        with ESMTP id S241939AbiBQOfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 09:35:41 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2152B1A92
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:35:24 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HC9K2Z005478
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=10fAhm8dXrpq2JyUULON8gI1QP3F+MYegBwrxAsZ368=;
+ b=l1O1ALwqDAupZrL79UD+VLSr2Zn5P7linD5qlkRUQBbJ27LCeWjfQKY7y9WXbd2wc34N
+ v0gTxCM4JPxU9GnVrPT0/v+BbhSctQ6QMqm3O0bTBsE9XpTGjf6dATCN3g1hXDZRDR/1
+ uOBGwlSBaueIoB6PDm7uIAWVArBTYZKtnGMnqxLu6GKemhlrOLoSmVIAKokhMCl8ztAW
+ m3GQOYEG/bnHmrdTBgSw4EW3N6zVhx0yindgZ+m+nYSDOLgL12mb6jukFVHAUcST5OCO
+ scUMdlas2/vLgI+F0auTbQ8S/+2uXEKQbXls47Ir0hfatakGR1j+26fYbNOY0Etnlh7W /Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9nr5kst8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:24 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HCWhuY022080
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 14:35:24 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9nr5ksse-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 14:35:24 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HEXIGW022246;
+        Thu, 17 Feb 2022 14:35:21 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 3e64hah582-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 14:35:21 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HEZD4g37552428
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Feb 2022 14:35:13 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 260CB42041;
+        Thu, 17 Feb 2022 14:35:13 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9FE14204B;
+        Thu, 17 Feb 2022 14:35:12 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.2.54])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Feb 2022 14:35:12 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        thuth@redhat.com
+Subject: [kvm-unit-tests GIT PULL 0/9] s390x: smp lib improvements and more
+Date:   Thu, 17 Feb 2022 15:34:55 +0100
+Message-Id: <20220217143504.232688-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LHrNqM6u76ZdZRwqHSNOvj2inYcbYiEQ
+X-Proofpoint-GUID: jFaVlgSdPNdpsd8ErI1FJ2dfd5Nf3Fnh
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <20220207051202.577951-1-manali.shukla@amd.com>
- <20220207051202.577951-2-manali.shukla@amd.com> <YgqtwRwYbJD5f9nA@google.com> <e9eba920-9522-6a56-4293-b60c0f1b77ed@amd.com>
-In-Reply-To: <e9eba920-9522-6a56-4293-b60c0f1b77ed@amd.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Thu, 17 Feb 2022 14:34:16 +0000
-Message-ID: <CAAAPnDH2LXkYkHpV+JTEmEF8PAGRP+wq7hR2nJpt53rO7bb-NA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] x86: Add routines to set/clear
- PT_USER_MASK for all pages
-To:     "Shukla, Manali" <mashukla@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Manali Shukla <manali.shukla@amd.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-17_05,2022-02-17_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 phishscore=0
+ adultscore=0 mlxlogscore=907 priorityscore=1501 mlxscore=0 bulkscore=0
+ malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202170066
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,43 +88,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 3:55 AM Shukla, Manali <mashukla@amd.com> wrote:
->
->
->
-> On 2/15/2022 1:00 AM, Sean Christopherson wrote:
-> > On Mon, Feb 07, 2022, Manali Shukla wrote:
-> >> Add following 2 routines :
-> >> 1) set_user_mask_all() - set PT_USER_MASK for all the levels of page tables
-> >> 2) clear_user_mask_all - clear PT_USER_MASK for all the levels of page tables
-> >>
-> >> commit 916635a813e975600335c6c47250881b7a328971
-> >> (nSVM: Add test for NPT reserved bit and #NPF error code behavior)
-> >> clears PT_USER_MASK for all svm testcases. Any tests that requires
-> >> usermode access will fail after this commit.
-> >
-> > Gah, I took the easy route and it burned us.  I would rather we start breaking up
-> > the nSVM and nVMX monoliths, e.g. add a separate NPT test and clear the USER flag
-> > only in that test, not the "common" nSVM test.
->
-> Yeah. I agree. I will try to set/clear User flag in svm_npt_rsvd_bits_test() and
-> set User flag by default for all the test cases by calling setup_vm()
-> and use walk_pte() to set/clear User flag in svm_npt_rsvd_bits_test().
->
-> Walk_pte() routine uses start address and length to walk over the memory
-> region where flag needs to be set/clear. So start address and length need to be
-> figured out to use this routine.
+Hi Paolo,
 
-For the start address and length you can use 'stext' and 'etext' to
-compute those.  There's an example in access.c set_cr4_smep(),
-however, it uses walk_ptes() as opposed to walk_pte() (similar, but
-different).
+please merge the following changes:
+* SMP lib improvements to increase correctness of SMP tests
+* fix some tests so that each test has a unique output line
+* add a few function to detect the hypervisor
+* rename some macros to bring them in line with the kernel
 
->
-> I will work on this.
->
-> >
-> > If we don't do that, this should really use walk_pte() instead of adding yet
-> > another PTE walker.
->
-> -Manali
+MERGE:
+https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/25
+
+PIPELINE:
+https://gitlab.com/imbrenda/kvm-unit-tests/-/pipelines/473371669
+
+PULL:
+https://gitlab.com/imbrenda/kvm-unit-tests.git s390x-next-20220217
+
+Christian Borntraeger (1):
+  s390x/cpumodel: give each test a unique output line
+
+Claudio Imbrenda (6):
+  s390x: firq: fix running in PV
+  lib: s390x: smp: guarantee that boot CPU has index 0
+  lib: s390x: smp: refactor smp functions to accept indexes
+  s390x: smp: use CPU indexes instead of addresses
+  s390x: firq: use CPU indexes instead of addresses
+  s390x: skrf: use CPU indexes instead of addresses
+
+Janosch Frank (1):
+  s390x: uv: Fix UVC cmd prepare reset name
+
+Pierre Morel (1):
+  s390x: stsi: Define vm_is_kvm to be used in different tests
+
+ lib/s390x/asm/uv.h  |   4 +-
+ lib/s390x/smp.h     |  20 +++--
+ lib/s390x/stsi.h    |  32 ++++++++
+ lib/s390x/vm.h      |   2 +
+ lib/s390x/smp.c     | 173 +++++++++++++++++++++++++++-----------------
+ lib/s390x/vm.c      |  51 ++++++++++++-
+ s390x/cpumodel.c    |   5 +-
+ s390x/firq.c        |  26 ++-----
+ s390x/skrf.c        |   2 +-
+ s390x/smp.c         |  22 +++---
+ s390x/stsi.c        |  23 +-----
+ s390x/uv-guest.c    |   2 +-
+ s390x/uv-host.c     |   2 +-
+ s390x/unittests.cfg |  18 ++++-
+ 14 files changed, 243 insertions(+), 139 deletions(-)
+ create mode 100644 lib/s390x/stsi.h
+
+-- 
+2.34.1
+
