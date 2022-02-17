@@ -2,84 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9610E4BA2A7
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:14:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D41A4BA2CF
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:21:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241462AbiBQOM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 09:12:57 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46526 "EHLO
+        id S241841AbiBQOVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 09:21:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240064AbiBQOMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:12:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64F2D2905BA
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:12:39 -0800 (PST)
+        with ESMTP id S241830AbiBQOVi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 09:21:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 596722B165B
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:21:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645107159;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/cZXGNior+ZsJ3e+PrQnLgahobz9IXWhoV+xYGtogyM=;
-        b=QTfQNWcIM8GgnTr1SmR1Cp8igBefLXlJZU6C4hbufpj2QqNWIqFvbFMqsH2jS2AUa4yJna
-        zElbv62TxgPFlWR0MOPUUTO63VxRMRrBZMKrd684Gx73wJH+NjPC2jLiGY0OCknozXjwEk
-        KuSrRsVBStRlaXE9gwc5qO4WJiOjTIA=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        s=mimecast20190719; t=1645107681;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=4O0+CQbK6wk9fkyoPo8Iv9tdOs7BtuKcNBkdCn4J6FQ=;
+        b=Y85TTGtgqZma5QeRdlpyZQAfNT/cuL1GltT2g3u7MbkGAVy7eqIVrp4ngOnjRcEIO/g1lc
+        0Xw+xE6CbpByIfFuT+nHEM0Xw1Gh76mjmZjKXLwrccyfnYgAXEvFvKub32xKFJd6ssnFbe
+        jokDqpVPELYjmIzYsYHdlHw0h0tq8lA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-333-OIB9AQ86O4GRo0GTNF_RVw-1; Thu, 17 Feb 2022 09:12:35 -0500
-X-MC-Unique: OIB9AQ86O4GRo0GTNF_RVw-1
-Received: by mail-qv1-f72.google.com with SMTP id g2-20020a0562141cc200b004123b0abe18so5427791qvd.2
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:12:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/cZXGNior+ZsJ3e+PrQnLgahobz9IXWhoV+xYGtogyM=;
-        b=h2S4Ak0n79oiO8UCeq307j0R9xwLnLHx62XZVOgyd+NONoyUm5rkbb3xRKQV61sQAA
-         6/4cUfCtumE0AeT+ZSRM0QrygCZyenQmyhg4nPsg1pmoBDgKwi/HfJxKj6s3BGiuR5xD
-         NVwYNHeB5Czg8SeRCrTiT9lcBNy/KOviWBJ9ZknPd6sRJYqKArDvpWpUb1YasP0OQq+L
-         vTpqD4ePfYb4Gphqe1YwRIaxrrjBhsdabTZ+doF0ANi1NALwwuMKCuzrwdVn+riSgjTI
-         aXCSTABFj35jSqCMdQZzxRe7jzQ/+Hk9wLhUhdR3pjPRN2ucNbEPjYUOPIv7LEuj3c1F
-         AaFw==
-X-Gm-Message-State: AOAM531mYI5rZvg6mbFoyrMJ3136PySGHXC+rjBHPYk4qCKBSLNiNIBg
-        QODvA3Yv5KemT0vfSbu5X5p8esukRrdsgB4jsXVAHhOEZuv26UxXjI6GBJQMh6dhFRydbUqTOE4
-        1NJUNP2a5Myq+
-X-Received: by 2002:ae9:f80f:0:b0:60d:dca9:d021 with SMTP id x15-20020ae9f80f000000b0060ddca9d021mr1278465qkh.53.1645107155359;
-        Thu, 17 Feb 2022 06:12:35 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxQ28xbd3gosVH54yFSb3YNcBcISrsFM0+HMmhcisfzw8nknVsLJomqhc3vG1UlAdRabcvprw==
-X-Received: by 2002:ae9:f80f:0:b0:60d:dca9:d021 with SMTP id x15-20020ae9f80f000000b0060ddca9d021mr1278449qkh.53.1645107155086;
-        Thu, 17 Feb 2022 06:12:35 -0800 (PST)
-Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
-        by smtp.gmail.com with ESMTPSA id h21sm1706611qtm.23.2022.02.17.06.12.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 06:12:34 -0800 (PST)
-Date:   Thu, 17 Feb 2022 15:12:27 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        John Snow <jsnow@redhat.com>, Sergio Lopez <slp@redhat.com>,
-        "Florescu, Andreea" <fandree@amazon.com>,
-        Alex Agache <aagch@amazon.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-Message-ID: <20220217141227.sk7hfng7raq6xvuh@sgarzare-redhat>
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
- <CACGkMEvtENvpubmZY3UKptD-T=c9+JJV1kRm-ZPhP08xOJv2fQ@mail.gmail.com>
- <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com>
+ us-mta-446-yQ5WYX7IOua0JuB1Exikhw-1; Thu, 17 Feb 2022 09:21:17 -0500
+X-MC-Unique: yQ5WYX7IOua0JuB1Exikhw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5A862F4F;
+        Thu, 17 Feb 2022 14:21:02 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B3470D40;
+        Thu, 17 Feb 2022 14:20:22 +0000 (UTC)
+Date:   Thu, 17 Feb 2022 14:20:20 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     qemu-s390x@nongnu.org, thuth@redhat.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com, ehabkost@redhat.com, kvm@vger.kernel.org,
+        david@redhat.com, eblake@redhat.com, cohuck@redhat.com,
+        richard.henderson@linaro.org, qemu-devel@nongnu.org,
+        armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+Subject: Re: [PATCH v6 08/11] s390x: topology: Adding drawers to CPU topology
+Message-ID: <Yg5ZpEisMK1uWqQH@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220217134125.132150-1-pmorel@linux.ibm.com>
+ <20220217134125.132150-9-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com>
+In-Reply-To: <20220217134125.132150-9-pmorel@linux.ibm.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -90,96 +66,235 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 02:01:52PM +0000, Stefan Hajnoczi wrote:
->On Mon, 14 Feb 2022 at 07:11, Jason Wang <jasowang@redhat.com> wrote:
->>
->> On Fri, Jan 28, 2022 at 11:47 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> >
->> > Dear QEMU, KVM, and rust-vmm communities,
->> > QEMU will apply for Google Summer of Code 2022
->> > (https://summerofcode.withgoogle.com/) and has been accepted into
->> > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
->> > submit internship project ideas for QEMU, KVM, and rust-vmm!
->> >
->> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
->> > be a mentor. It's a great way to give back and you get to work with
->> > people who are just starting out in open source.
->> >
->> > Please reply to this email by February 21st with your project ideas.
->> >
->> > Good project ideas are suitable for remote work by a competent
->> > programmer who is not yet familiar with the codebase. In
->> > addition, they are:
->> > - Well-defined - the scope is clear
->> > - Self-contained - there are few dependencies
->> > - Uncontroversial - they are acceptable to the community
->> > - Incremental - they produce deliverables along the way
->> >
->> > Feel free to post ideas even if you are unable to mentor the project.
->> > It doesn't hurt to share the idea!
->>
->> Implementing the VIRTIO_F_IN_ORDER feature for both Qemu and kernel
->> (vhost/virtio drivers) would be an interesting idea.
->>
->> It satisfies all the points above since it's supported by virtio spec.
->>
->> (Unfortunately, I won't have time in the mentoring)
->
->Thanks for this idea. As a stretch goal we could add implementing the
->packed virtqueue layout in Linux vhost, QEMU's libvhost-user, and/or
->QEMU's virtio qtest code.
->
->Stefano: Thank you for volunteering to mentor the project. Please
->write a project description (see template below) and I will add this
->idea:
->
+On Thu, Feb 17, 2022 at 02:41:22PM +0100, Pierre Morel wrote:
+> S390 CPU topology may have up to 5 topology containers.
+> The first container above the cores is level 2, the sockets,
+> and the level 3, containing sockets are the books.
+> 
+> We introduce here the drawers, drawers is the level containing books.
+> 
+> Let's add drawers, level4, containers to the CPU topology.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/core/machine-smp.c      | 33 ++++++++++++++++++++++++++-------
+>  hw/core/machine.c          |  2 ++
+>  hw/s390x/s390-virtio-ccw.c |  1 +
+>  include/hw/boards.h        |  4 ++++
+>  qapi/machine.json          |  7 ++++++-
+>  softmmu/vl.c               |  3 +++
+>  6 files changed, 42 insertions(+), 8 deletions(-)
 
-I wrote a description of the project below. Let me know if there is 
-anything to change.
+Needs to update -smp args in qemu-options.hx too.
 
-Thanks,
-Stefano
+> 
+> diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+> index d7aa39d540..26150c748f 100644
+> --- a/hw/core/machine-smp.c
+> +++ b/hw/core/machine-smp.c
+> @@ -31,6 +31,10 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>      GString *s = g_string_new(NULL);
+>  
+> +    if (mc->smp_props.drawers_supported) {
+> +        g_string_append_printf(s, " * drawers (%u)", ms->smp.drawers);
+> +    }
+> +
+>      if (mc->smp_props.books_supported) {
+>          g_string_append_printf(s, " * books (%u)", ms->smp.books);
+>      }
+> @@ -77,6 +81,7 @@ void machine_parse_smp_config(MachineState *ms,
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>      unsigned cpus    = config->has_cpus ? config->cpus : 0;
+> +    unsigned drawers = config->has_drawers ? config->drawers : 0;
+>      unsigned books   = config->has_books ? config->books : 0;
+>      unsigned sockets = config->has_sockets ? config->sockets : 0;
+>      unsigned dies    = config->has_dies ? config->dies : 0;
+> @@ -90,6 +95,7 @@ void machine_parse_smp_config(MachineState *ms,
+>       * explicit configuration like "cpus=0" is not allowed.
+>       */
+>      if ((config->has_cpus && config->cpus == 0) ||
+> +        (config->has_drawers && config->drawers == 0) ||
+>          (config->has_books && config->books == 0) ||
+>          (config->has_sockets && config->sockets == 0) ||
+>          (config->has_dies && config->dies == 0) ||
+> @@ -124,6 +130,13 @@ void machine_parse_smp_config(MachineState *ms,
+>  
+>      books = books > 0 ? books : 1;
+>  
+> +    if (!mc->smp_props.drawers_supported && drawers > 1) {
+> +        error_setg(errp, "drawers not supported by this machine's CPU topology");
+> +        return;
+> +    }
+> +
+> +    drawers = drawers > 0 ? drawers : 1;
+> +
+>      /* compute missing values based on the provided ones */
+>      if (cpus == 0 && maxcpus == 0) {
+>          sockets = sockets > 0 ? sockets : 1;
+> @@ -137,34 +150,40 @@ void machine_parse_smp_config(MachineState *ms,
+>              if (sockets == 0) {
+>                  cores = cores > 0 ? cores : 1;
+>                  threads = threads > 0 ? threads : 1;
+> -                sockets = maxcpus / (books * dies * clusters * cores * threads);
+> +                sockets = maxcpus /
+> +                          (drawers * books * dies * clusters * cores * threads);
+>              } else if (cores == 0) {
+>                  threads = threads > 0 ? threads : 1;
+> -                cores = maxcpus / (books * sockets * dies * clusters * threads);
+> +                cores = maxcpus /
+> +                        (drawers * books * sockets * dies * clusters * threads);
+>              }
+>          } else {
+>              /* prefer cores over sockets since 6.2 */
+>              if (cores == 0) {
+>                  sockets = sockets > 0 ? sockets : 1;
+>                  threads = threads > 0 ? threads : 1;
+> -                cores = maxcpus / (books * sockets * dies * clusters * threads);
+> +                cores = maxcpus /
+> +                        (drawers * books * sockets * dies * clusters * threads);
+>              } else if (sockets == 0) {
+>                  threads = threads > 0 ? threads : 1;
+> -                sockets = maxcpus / (books * dies * clusters * cores * threads);
+> +                sockets = maxcpus /
+> +                         (drawers * books * dies * clusters * cores * threads);
+>              }
+>          }
+>  
+>          /* try to calculate omitted threads at last */
+>          if (threads == 0) {
+> -            threads = maxcpus / (books * sockets * dies * clusters * cores);
+> +            threads = maxcpus /
+> +                      (drawers * books * sockets * dies * clusters * cores);
+>          }
+>      }
+>  
+> -    maxcpus = maxcpus > 0 ? maxcpus : books * sockets * dies *
+> +    maxcpus = maxcpus > 0 ? maxcpus : drawers * books * sockets * dies *
+>                                        clusters * cores * threads;
+>      cpus = cpus > 0 ? cpus : maxcpus;
+>  
+>      ms->smp.cpus = cpus;
+> +    ms->smp.drawers = drawers;
+>      ms->smp.books = books;
+>      ms->smp.sockets = sockets;
+>      ms->smp.dies = dies;
+> @@ -174,7 +193,7 @@ void machine_parse_smp_config(MachineState *ms,
+>      ms->smp.max_cpus = maxcpus;
+>  
+>      /* sanity-check of the computed topology */
+> -    if (books * sockets * dies * clusters * cores * threads != maxcpus) {
+> +    if (drawers * books * sockets * dies * clusters * cores * threads != maxcpus) {
+>          g_autofree char *topo_msg = cpu_hierarchy_to_string(ms);
+>          error_setg(errp, "Invalid CPU topology: "
+>                     "product of the hierarchy must match maxcpus: "
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index b8c624d2bf..1db55e36c8 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -743,6 +743,7 @@ static void machine_get_smp(Object *obj, Visitor *v, const char *name,
+>      MachineState *ms = MACHINE(obj);
+>      SMPConfiguration *config = &(SMPConfiguration){
+>          .has_cpus = true, .cpus = ms->smp.cpus,
+> +        .has_drawers = true, .drawers = ms->smp.drawers,
+>          .has_books = true, .books = ms->smp.books,
+>          .has_sockets = true, .sockets = ms->smp.sockets,
+>          .has_dies = true, .dies = ms->smp.dies,
+> @@ -936,6 +937,7 @@ static void machine_initfn(Object *obj)
+>      /* default to mc->default_cpus */
+>      ms->smp.cpus = mc->default_cpus;
+>      ms->smp.max_cpus = mc->default_cpus;
+> +    ms->smp.drawers = 1;
+>      ms->smp.books = 1;
+>      ms->smp.sockets = 1;
+>      ms->smp.dies = 1;
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 193883fba3..03829e90b3 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -667,6 +667,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      nc->nmi_monitor_handler = s390_nmi;
+>      mc->default_ram_id = "s390.ram";
+>      mc->smp_props.books_supported = true;
+> +    mc->smp_props.drawers_supported = true;
+>  }
+>  
+>  static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index bc0f7f22dc..abc5556c50 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -131,12 +131,14 @@ typedef struct {
+>   * @dies_supported - whether dies are supported by the machine
+>   * @clusters_supported - whether clusters are supported by the machine
+>   * @books_supported - whether books are supported by the machine
+> + * @drawers_supported - whether drawers are supported by the machine
+>   */
+>  typedef struct {
+>      bool prefer_sockets;
+>      bool dies_supported;
+>      bool clusters_supported;
+>      bool books_supported;
+> +    bool drawers_supported;
+>  } SMPCompatProps;
+>  
+>  /**
+> @@ -301,6 +303,7 @@ typedef struct DeviceMemoryState {
+>  /**
+>   * CpuTopology:
+>   * @cpus: the number of present logical processors on the machine
+> + * @drawers: the number of drawers on the machine
+>   * @books: the number of books on the machine
+>   * @sockets: the number of sockets on the machine
+>   * @dies: the number of dies in one socket
+> @@ -311,6 +314,7 @@ typedef struct DeviceMemoryState {
+>   */
+>  typedef struct CpuTopology {
+>      unsigned int cpus;
+> +    unsigned int drawers;
+>      unsigned int books;
+>      unsigned int sockets;
+>      unsigned int dies;
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index 73206f811a..fa6bde5617 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -866,13 +866,14 @@
+>  # a CPU is being hotplugged.
+>  #
+>  # @node-id: NUMA node ID the CPU belongs to
+> +# @drawer-id: drawer number within node/board the CPU belongs to
+>  # @book-id: book number within node/board the CPU belongs to
+>  # @socket-id: socket number within node/board the CPU belongs to
 
+So the lack of change here implies that 'socket-id' is unique
+across multiple  books/drawers. Is that correct, as its differnt
+from semantics for die-id/core-id/thread-id which are scoped
+to within the next level of the topology ?
 
+>  # @die-id: die number within socket the CPU belongs to (since 4.1)
+>  # @core-id: core number within die the CPU belongs to
+>  # @thread-id: thread number within core the CPU belongs to
+>  #
+> -# Note: currently there are 6 properties that could be present
+> +# Note: currently there are 7 properties that could be present
+>  #       but management should be prepared to pass through other
+>  #       properties with device_add command to allow for future
+>  #       interface extension. This also requires the filed names to be kept in
+> @@ -882,6 +883,7 @@
+>  ##
+>  { 'struct': 'CpuInstanceProperties',
+>    'data': { '*node-id': 'int',
+> +            '*drawer-id': 'int',
+>              '*book-id': 'int',
+>              '*socket-id': 'int',
+>              '*die-id': 'int',
 
-=== VIRTIO_F_IN_ORDER support for virtio devices ===
-
-'''Summary:''' Implement VIRTIO_F_IN_ORDER feature for QEMU and Linux
-(vhost/virtio drivers)
-
-The VIRTIO spec defines a feature bit (VIRTIO_F_IN_ORDER) that devices
-and drivers can negotiate when they are able to use descriptors in the
-same order in which they have been made available.
-
-This feature could allow to simplify the implementation and develop
-optimizations to increase performance. For example, when
-VIRTIO_F_IN_ORDER is negotiated, it may be easier to create batch of
-buffers and reduce the amount of notification needed between devices
-and drivers.
-
-Currently the devices and drivers available on Linux and QEMU do not
-support this feature. An implementation is available in DPDK for the
-virtio-net driver.
-
-The project could start with implementation for a single device/driver
-in QEMU and Linux, then generalize it into the virtio core for split
-and packed virtqueue layouts.
-
-If time allows we could develop the support for packed virtqueue layout
-in Linux vhost, QEMU's libvhost-user, and/or QEMU's virtio qtest code.
-
-'''Links:'''
-* [https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html VIRTIO spec 1.1]
-** [https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-470009 "In-order use of descriptors" section for split virtqueues]
-* [https://github.com/oasis-tcs/virtio-spec Source code for the VIRTIO spec]
-* [https://mails.dpdk.org/archives/dev/2018-July/106069.html Patches that introduced VIRTIO_F_IN_ORDER in DPDK]
-* [https://lists.oasis-open.org/archives/virtio/201803/msg00048.html Patch that introduced VIRTIO_F_IN_ORDER in VIRTIO spec]
-* [https://patchew.org/QEMU/1533833677-27512-1-git-send-email-i.maximets@samsung.com/ Incomplete implementation proposed for QEMU]
-
-'''Details:'''
-* Skill level: intermediate
-* Language: C
-* Mentor: Stefano Garzarella <sgarzare@redhat.com>
-** IRC/Matrix nick: sgarzare (OFTC/matrix.org)
-* Suggested by: Jason Wang <jasowang@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
