@@ -2,261 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0E1F4BA4B1
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:43:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81BF94BA4CD
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:46:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236791AbiBQPnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 10:43:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41500 "EHLO
+        id S233955AbiBQPqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 10:46:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232562AbiBQPnN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 10:43:13 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6F41D4925A
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:42:58 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AC8212FC;
-        Thu, 17 Feb 2022 07:42:58 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E6823F70D;
-        Thu, 17 Feb 2022 07:42:56 -0800 (PST)
-Date:   Thu, 17 Feb 2022 15:43:15 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sebastian Ene <sebastianene@google.com>
-Cc:     kvm@vger.kernel.org, qperret@google.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool v2] aarch64: Add stolen time support
-Message-ID: <Yg5tE3TqgwWRFypB@monolith.localdoman>
-References: <Yg5lBZKsSoPNmVkT@google.com>
+        with ESMTP id S232620AbiBQPqs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 10:46:48 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18ABC1D301
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:46:31 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso9851036pjg.0
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:46:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=R8nS4Mx2FHk1MUuQsgL8zH9kBiDqg58ofDKGwuFcemo=;
+        b=tUPRDvgS4AVmwyqulVD1NDgkSAhVDYTNgzKpbGhpBbiIMIHbk+jluPOfTgFA3G+Fr3
+         Gj77cKwnKySWVu21B/TWidDQbkOY1bj2g8GA7spzPxMxxSBeBv9oAeLQHv5nhpU8/afB
+         xOO+tDCDw5N44Q7TlSqs2i80dddk4lHOrT0TfxJm6VMoFZsdXJoGen8EZ5HM9R6a3nmy
+         MSzWLGdXNN0hSGOodvXAVQLQ5lAyWqCesriHYenwNfdRwB3bM3h8AO2AGiUGbgpOgFLJ
+         YEgC/3Dk4YKmiX7s6fyU9v43XMXzz9KHkv02xQ85Ss8oXhjV85j9GxaMBhrMahm0Q/vh
+         mvSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=R8nS4Mx2FHk1MUuQsgL8zH9kBiDqg58ofDKGwuFcemo=;
+        b=B0WDnJ6gv3BIsXtdg63m1qHGTnQA0+398eIIoXU6G6LckP8ryjtM8g8oTM0bZwNKIh
+         o4nRAZ3UQrSC4HnF4pvh8h30XPBnk0hXrmYvY01KSdhvbeTQd7iQnx+cALf0l7AtrI0x
+         CFhnfDAO/trvURDnnTxowdHKmwSHZBraAVzJbE9Q/4BeY+NzzMx+Bsm0QRb/MDjc5O7a
+         4LQFNpOepvDahTbRzYsWz0LLxLYdIexFT4RfuJMNGCTOMf32sSqtmh8Rn7adXQPa2PK9
+         0hpeYFOXPYElPWbyBdzHrTrLxfT94sCtG2VpS18xJN3Ol7HhewnJkWVskkoqfAh+7z/V
+         2Q8Q==
+X-Gm-Message-State: AOAM530PnvpqlTkWAdVpxzbWhoDTZohKSTAwPqgJKl+c5tguWr16bzYC
+        P8jnJ06EvqPMxNPqN9IqgnhCFQ==
+X-Google-Smtp-Source: ABdhPJw0aucahcHgpIYhfz8KAXF+4TiftaBBzxl6Q6pMLUyxJ2nJrw22Chio8XxiycPIM0Ke5T4fAA==
+X-Received: by 2002:a17:90a:6585:b0:1b9:75ee:dd14 with SMTP id k5-20020a17090a658500b001b975eedd14mr7896029pjj.102.1645112790556;
+        Thu, 17 Feb 2022 07:46:30 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x7sm8194227pgr.87.2022.02.17.07.46.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Feb 2022 07:46:29 -0800 (PST)
+Date:   Thu, 17 Feb 2022 15:46:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Dunn <daviddunn@google.com>
+Cc:     pbonzini@redhat.com, jmattson@google.com, like.xu.linux@gmail.com,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v7 2/3] KVM: selftests: Carve out helper to create
+ "default" VM without vCPUs
+Message-ID: <Yg5t0lnc/oAHmFrB@google.com>
+References: <20220215014806.4102669-1-daviddunn@google.com>
+ <20220215014806.4102669-3-daviddunn@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yg5lBZKsSoPNmVkT@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220215014806.4102669-3-daviddunn@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-Some general comments while I familiarize myself with the stolen time spec.
-
-On Thu, Feb 17, 2022 at 03:08:53PM +0000, Sebastian Ene wrote:
-> This patch adds support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
+On Tue, Feb 15, 2022, David Dunn wrote:
+> Carve out portion of vm_create_default so that selftests can modify
+> a "default" VM prior to creating vcpus.
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> Signed-off-by: David Dunn <daviddunn@google.com>
 > ---
-
-It is customary to describe the changes you have made from the previous version,
-to make it easier for the people who want to review your code.
-
->  Makefile                               |  1 +
->  arm/aarch64/arm-cpu.c                  |  1 +
->  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
->  arm/aarch64/pvtime.c                   | 84 ++++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h      |  4 ++
->  arm/kvm-cpu.c                          | 14 ++---
->  6 files changed, 98 insertions(+), 7 deletions(-)
->  create mode 100644 arm/aarch64/pvtime.c
+>  .../selftests/kvm/include/kvm_util_base.h     |  3 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++++++----
+>  2 files changed, 32 insertions(+), 6 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index f251147..e9121dc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 4ed6aa049a91..f987cf7c0d2e 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -336,6 +336,9 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
+>  				    uint32_t num_percpu_pages, void *guest_code,
+>  				    uint32_t vcpuids[]);
 >  
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..326fb20 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> +	kvm_cpu__setup_pvtime(vcpu);
->  	return 0;
+> +/* Create a default VM without any vcpus. */
+> +struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages);
+> +
+>  /*
+>   * Adds a vCPU with reasonable defaults (e.g. a stack)
+>   *
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index d8cf851ab119..5aea7734cfe3 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -362,6 +362,34 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+>  	return vm;
 >  }
 >  
-> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> index 8dfb82e..b57d6e6 100644
-> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,6 @@
->  
->  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
->  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
->  
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..c09fd89
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,84 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +struct pvtime_data_priv {
-> +	bool	is_supported;
-> +	char	*usr_mem;
-> +};
-> +
-> +static struct pvtime_data_priv pvtime_data = {
-> +	.is_supported	= true,
-> +	.usr_mem	= NULL
-> +};
-> +
-> +static int pvtime__alloc_region(struct kvm *kvm)
+> +/*
+> + * Default VM creation without creating VCPUs
+> + *
+> + * Input Args:
+> + *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
+> + *   pages - pages of memory required for VM
+> + *
+> + * Output Args: None
+> + *
+> + * Return:
+> + *   Pointer to opaque structure that describes the created VM.
+> + *
+> + * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
+> + */
+
+I vote to omit this function comment.  Most of the existing comments in kvm_util.c
+are a waste of space, and (no offence) this is no different.  And I'm planning on
+deleting most of the existing boilerplate comments that don't provide any insight :-)
+
+> +struct kvm_vm *vm_create_without_vcpus(enum vm_guest_mode mode, uint64_t pages)
 > +{
-> +	char *mem;
-> +	int ret = 0;
+> +	struct kvm_vm *vm;
 > +
-> +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -ENOMEM;
+> +	vm = vm_create(mode, pages, O_RDWR);
 > +
-> +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
-> +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
-> +	if (ret) {
-> +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> +		return ret;
-> +	}
+> +	kvm_vm_elf_load(vm, program_invocation_name);
 > +
-> +	pvtime_data.usr_mem = mem;
-> +	return ret;
+> +#ifdef __x86_64__
+> +	vm_create_irqchip(vm);
+> +#endif
+> +	return vm;
 > +}
 > +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	if (pvtime_data.usr_mem == NULL)
-> +		return 0;
-> +
-> +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
-> +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
-> +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> +	pvtime_data.usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> +{
-> +	int ret;
-> +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
-> +		AARCH64_PVTIME_SIZE;
-> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> +	};
-> +
-> +	if (!pvtime_data.is_supported)
-> +		return;
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> +	if (ret)
-> +		goto out_err;
-> +
-> +	if (!pvtime_data.usr_mem) {
-> +		ret = pvtime__alloc_region(vcpu->kvm);
-> +		if (ret)
-> +			goto out_err;
-> +	}
-> +
-> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> +	if (!ret)
-> +		return;
-> +
-> +	pvtime__teardown_region(vcpu->kvm);
-> +out_err:
-> +	pvtime_data.is_supported = false;
-> +}
-> +
-> +dev_exit(pvtime__teardown_region);
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index c645ac0..865bd68 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -54,6 +54,10 @@
->  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
->  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+>  /*
+>   * VM Create with customized parameters
+>   *
+> @@ -412,13 +440,8 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
+>  		    nr_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
 >  
-> +#define AARCH64_PVTIME_IPA_MAX_SIZE	SZ_64K
-> +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
-> +					 AARCH64_PVTIME_IPA_MAX_SIZE)
-
-This overlaps with the ARM_PCI_MMIO_AREA. If you want to change the memory
-layout for a guest, there's a handy ASCII map at the top of this file.  That
-should also be updated to reflect the modified layout.
-
-Why do you want to put it below RAM? Is there a requirement to have it there or
-was the location chosen for other reasons?
-
-> +#define AARCH64_PVTIME_SIZE		(64)
-
-This looks like something that should go in pvtime.c, as it's not relevant to
-the memory layout.
-
->  
->  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
->  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index 6a2408c..84ac1e9 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
->  			die("Unable to find matching target");
->  	}
->  
-> +	/* Populate the vcpu structure. */
-> +	vcpu->kvm		= kvm;
-> +	vcpu->cpu_id		= cpu_id;
-> +	vcpu->cpu_type		= vcpu_init.target;
-> +	vcpu->cpu_compatible	= target->compatible;
-> +	vcpu->is_running	= true;
-> +
->  	if (err || target->init(vcpu))
->  		die("Unable to initialise vcpu");
->  
-> @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
->  		vcpu->ring = (void *)vcpu->kvm_run +
->  			     (coalesced_offset * PAGE_SIZE);
->  
-> -	/* Populate the vcpu structure. */
-> -	vcpu->kvm		= kvm;
-> -	vcpu->cpu_id		= cpu_id;
-> -	vcpu->cpu_type		= vcpu_init.target;
-> -	vcpu->cpu_compatible	= target->compatible;
-> -	vcpu->is_running	= true;
+>  	pages = vm_adjust_num_guest_pages(mode, pages);
+> -	vm = vm_create(mode, pages, O_RDWR);
 > -
-
-Why this change?
-
-Thanks,
-Alex
-
->  	if (kvm_cpu__configure_features(vcpu))
->  		die("Unable to configure requested vcpu features");
+> -	kvm_vm_elf_load(vm, program_invocation_name);
 >  
+> -#ifdef __x86_64__
+> -	vm_create_irqchip(vm);
+> -#endif
+> +	vm = vm_create_without_vcpus(mode, pages);
+>  
+>  	for (i = 0; i < nr_vcpus; ++i) {
+>  		uint32_t vcpuid = vcpuids ? vcpuids[i] : i;
 > -- 
 > 2.35.1.265.g69c8d7142f-goog
 > 
