@@ -2,110 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED05A4BA6CB
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:14:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 734D74BA6D1
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243614AbiBQROq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 12:14:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35370 "EHLO
+        id S236933AbiBQRQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 12:16:18 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243612AbiBQROp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 12:14:45 -0500
+        with ESMTP id S231609AbiBQRQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 12:16:15 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE15829C11C
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:14:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A8B0B29C120
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:15:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645118069;
+        s=mimecast20190719; t=1645118158;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ySllJiCMAwsjkuMx220zAOxJL394IVe/OENqIOoj1Ko=;
-        b=XFU5cr8oDDrDJ5rVeWqCxmP5KWRKYEk4/DpqrCtEKE+5umr7yOYXuNaMHiADTvramIaLSb
-        60mhDTDNMRqzNq796xfcxPaSMw3MJQHqJgfe704Wmx86W5krAb/ZF6l0h5YE8693j6B13E
-        RAPY61s1eoaXi/+6xBT5CKVNY8qO/rA=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=vK764Lcwway8Tvw3MqNXFsVBTl99kT8sKodI/qvZ50Q=;
+        b=DjoYVZ6nsXlJy3G3NDkTSzxCOVzb6RW61KqIEpQht5a6gh2WZYsLGqe3AsYsSsV+xZiE7d
+        sI+OqteidJZmr6p6xU6u9omjlgnUYhtcCcVDcYHPAWc9NXCtFHgJ9JFyrEnSowOU2iu9gh
+        e0E2UcXk+AgUJMZuPllQO6X5XhtR9vU=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-247-SVGs6POOOXyVQBnb9Yrmig-1; Thu, 17 Feb 2022 12:14:27 -0500
-X-MC-Unique: SVGs6POOOXyVQBnb9Yrmig-1
-Received: by mail-ej1-f70.google.com with SMTP id v2-20020a170906292200b006a94a27f903so1821989ejd.8
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:14:27 -0800 (PST)
+ us-mta-499-BHb6KmBhO6S7c7ykZAhGuQ-1; Thu, 17 Feb 2022 12:15:57 -0500
+X-MC-Unique: BHb6KmBhO6S7c7ykZAhGuQ-1
+Received: by mail-io1-f71.google.com with SMTP id d194-20020a6bcdcb000000b0063a4e3b9da6so2613153iog.6
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:15:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ySllJiCMAwsjkuMx220zAOxJL394IVe/OENqIOoj1Ko=;
-        b=yUwLgnPmiSZM9wYn1GW312avTSA6Yw9hDWes2yBVFqRQrxZ9wMu/426UKmDE/ufSPw
-         DZ+q4WFYR7KdaTlfEMKofhe8dVdy5c3RGuon58SA8zQfv2CDcYI/pw1gJGpflKBDjZFc
-         brra+FsWA8G3RrOeR/v/exHV3mhcldtbNLGUng/pzPhERD5A0acv+IsFh2kpAGonm6uB
-         JvvumDrwdcOMoiqIk0kuQZIomlJRcPzYfv+Q8XlSo3IdYiJ7sLJOBw9NrBrHq35fKk3r
-         v4/tbWiNUAb/zstUrcTr8APm+ivYRGQJZf4d1ygsSS/JOk9z2Ny1HRcJDsmWCPtb79FY
-         +6BA==
-X-Gm-Message-State: AOAM5324fznQ/Y8jOjZRS9o0jdg0LoF9lI3qOn9YwDe6y80fDZVJX+tl
-        l87bTSkmeNSVJiZWbn6ABtYMYaVK5Yjfn0281tTnpIcSSlOVX3jNZQ+kDCtHfHrzWNlxHnn5G38
-        oIX8RAsvd79PT
-X-Received: by 2002:a05:6402:42cb:b0:410:678d:61d with SMTP id i11-20020a05640242cb00b00410678d061dmr3757937edc.123.1645118066248;
-        Thu, 17 Feb 2022 09:14:26 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzlFC9NsD76Yn6hapmFTVoreXyoZKxWzktvzRuShycjqRli8lkrss4IaFOHIrw3/9/zMRpVhg==
-X-Received: by 2002:a05:6402:42cb:b0:410:678d:61d with SMTP id i11-20020a05640242cb00b00410678d061dmr3757923edc.123.1645118066052;
-        Thu, 17 Feb 2022 09:14:26 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id u23sm1062871edo.64.2022.02.17.09.14.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 09:14:25 -0800 (PST)
-Message-ID: <de6a1b73-c623-4776-2f14-b00917b7d22a@redhat.com>
-Date:   Thu, 17 Feb 2022 18:14:20 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=vK764Lcwway8Tvw3MqNXFsVBTl99kT8sKodI/qvZ50Q=;
+        b=lRJG/fQXn1w62s6b4fKeGABSb3ORTOCtrnjvNW2O+G/OUomnWPnpZ6x05v6veC9asc
+         MiwG9TdLtOVJtWVoEsUH28lfAqUmXtkIS2JQ7ye57w3q9osXpRgVNLae2I3z4uRQpGwJ
+         FVU8FuAyh86QsDcNrmcCe82jfCQzw8QqejW+FfVDtT+86VBlag3KYtdsOPrLjSN91xha
+         CV2YxOVuj35qxQWsVh5iU8ltV+T9982UeuIHp1IZmhBMS5yt+LbQSqq1gAgW8FcpkBIK
+         HrUtRtrhsEw2VHwJQxkNJNY69JNKqxVixlcQfKCix1FXh21zQksZ6s4icEdHhdPjqBZj
+         0i+w==
+X-Gm-Message-State: AOAM531fW/AZKLA8QoeUWqpPtx0FegQqg7/XKGFV7Di+7Bek5B8XlKww
+        qu7upMH4ypSiMge+9+aA+u1c5LQeL3WvLG4khNUeCYHlRUefd99/sorhMf7fb54oQLxONtYp9JX
+        R6d6COxl/PfEU
+X-Received: by 2002:a6b:c84f:0:b0:637:d023:4cc8 with SMTP id y76-20020a6bc84f000000b00637d0234cc8mr2557795iof.215.1645118156885;
+        Thu, 17 Feb 2022 09:15:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy6CJylLowRlY5qgrihQ8i0FkpuKzcystck5XFkiKaJ3yLL2prCoiA4Yqva8IVPc1yVFdWf8g==
+X-Received: by 2002:a6b:c84f:0:b0:637:d023:4cc8 with SMTP id y76-20020a6bc84f000000b00637d0234cc8mr2557776iof.215.1645118156640;
+        Thu, 17 Feb 2022 09:15:56 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y7sm2094197ila.7.2022.02.17.09.15.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Feb 2022 09:15:56 -0800 (PST)
+Date:   Thu, 17 Feb 2022 10:15:54 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>,
+        <ashok.raj@intel.com>, <kevin.tian@intel.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH V7 mlx5-next 15/15] vfio: Extend the device migration
+ protocol with PRE_COPY
+Message-ID: <20220217101554.26f05eb1.alex.williamson@redhat.com>
+In-Reply-To: <20220207172216.206415-16-yishaih@nvidia.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+        <20220207172216.206415-16-yishaih@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in
- always catchup mode
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Anton Romanov <romanton@google.com>, mtosatti@redhat.com,
-        kvm@vger.kernel.org
-References: <20220215200116.4022789-1-romanton@google.com>
- <87zgmqq4ox.fsf@redhat.com> <Yg5sl9aWzVJKAMKc@google.com>
- <87pmnlpj8u.fsf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87pmnlpj8u.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/22 17:09, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
->> On Wed, Feb 16, 2022, Vitaly Kuznetsov wrote:
-> 
-> ...
->>
->>> Also, EOPNOTSUPP makes it sound like the hypercall is unsupported, I'd
->>> suggest changing this to KVM_EFAULT.
->>
->> Eh, it's consistent with the above check though, where KVM returns KVM_EOPNOTSUPP
->> due to the vclock mode being incompatible.  This is more or less the same, it's
->> just a different "mode".  KVM_EFAULT suggests that the guest did something wrong
->> and/or that the guest can remedy the problem in someway, e.g. by providing a
->> different address.  This issue is purely in the host's domain.
-> 
-> Ack, Paolo's already made the change back to KVM_EOPNOTSUPP upon commit
-> (but I still mildly dislike using 'EOPNOTSUPP' for a temporary condition
-> on the host).
+On Mon, 7 Feb 2022 19:22:16 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-It's not temporary, always-catchup is set on KVM_SET_TSC_KHZ and never 
-goes away.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> The optional PRE_COPY states open the saving data transfer FD before
+> reaching STOP_COPY and allows the device to dirty track internal state
+> changes with the general idea to reduce the volume of data transferred
+> in the STOP_COPY stage.
+> 
+> While in PRE_COPY the device remains RUNNING, but the saving FD is open.
+> 
+> Only if the device also supports RUNNING_P2P can it support PRE_COPY_P2P,
+> which halts P2P transfers while continuing the saving FD.
+> 
+> PRE_COPY, with P2P support, requires the driver to implement 7 new arcs
+> and exists as an optional FSM branch between RUNNING and STOP_COPY:
+>     RUNNING -> PRE_COPY -> PRE_COPY_P2P -> STOP_COPY
+> 
+> A new ioctl VFIO_DEVICE_MIG_PRECOPY is provided to allow userspace to
+> query the progress of the precopy operation in the driver with the idea it
+> will judge to move to STOP_COPY at least once the initial data set is
+> transferred, and possibly after the dirty size has shrunk appropriately.
+> 
+> We think there may also be merit in future extensions to the
+> VFIO_DEVICE_MIG_PRECOPY ioctl to also command the device to throttle the
+> rate it generates internal dirty state.
+> 
+> Compared to the v1 clarification, STOP_COPY -> PRE_COPY is made optional
+> and to be defined in future. While making the whole PRE_COPY feature
+> optional eliminates the concern from mlx5, this is still a complicated arc
+> to implement and seems prudent to leave it closed until a proper use case
+> is developed. We also split the pending_bytes report into the initial and
+> sustaining values, and define the protocol to get an event via poll() for
+> new dirty data during PRE_COPY.
 
-Paolo
+I feel obligated to ask, is PRE_COPY support essentially RFC at this
+point since we have no proposed in-kernel users?
+
+It seems like we're winding down comments on the remainder of the
+series and I feel ok with where it's headed and the options we have
+available for future extensions.  Pre-copy seems like an important gap
+to fill and I think this patch shows that a future extension could
+allow it, but with the scrutiny not to add unused code to the kernel,
+I'm not sure there's a valid justification to add it now.  Thanks,
+
+Alex
+
+PS - Why is this a stand-alone ioctl rather than a DEVICE_FEATURE?
 
