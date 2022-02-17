@@ -2,106 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83B8A4BA562
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 17:06:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FDB74BA570
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 17:10:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242918AbiBQQGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 11:06:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38988 "EHLO
+        id S242970AbiBQQJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 11:09:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236186AbiBQQGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 11:06:05 -0500
+        with ESMTP id S242786AbiBQQJl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 11:09:41 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C853C29C123
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 08:05:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B9321187458
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 08:09:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645113949;
+        s=mimecast20190719; t=1645114165;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=q8C5mBTF/zQPiu7mRTQ0V1X+3+5OQ4DWAsdzOSei6/I=;
-        b=aGz2r9CCvL3gZau+oayAHsiZRDKFYl+/YH2rMg8Af1bYpwO+pGw5HG0+aoUkzh7CPERB+L
-        okQVUHw8A8ynOUC/zj2yk2GU/lX5a73K4hWAB0/tD13Y/7NYKzHRgOgr47l8sAf2/gUPxg
-        Y2jkWKsLnjc61e+stCJWWumlZoVpdpk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=SzsIICnJywRwDGtCimtdQ57/2TMMRpaCW8tMVXcExCo=;
+        b=S67ktMEL/23OXs8EKd4fhHpItrGLLru3JwTJnRp/Enq2TH9vn+4LIuLnvviszhHDtbTxNe
+        Q6xulHg59NakTibL+DbrBaKck+kWjyyDTqUPF0mx2e3tSXtaz6zy7JS2U1GuOhzy6BYDM0
+        tydSpBfLJT6iHJVNkK5b63rj81PU3/c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-661-IH-zet-PPmyFWJ1sapNwrQ-1; Thu, 17 Feb 2022 11:05:48 -0500
-X-MC-Unique: IH-zet-PPmyFWJ1sapNwrQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s22-20020adf9796000000b001e7e75ab581so2447425wrb.23
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 08:05:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=q8C5mBTF/zQPiu7mRTQ0V1X+3+5OQ4DWAsdzOSei6/I=;
-        b=wFUNV8C9JgIxIhT9bvSJM9cSxxosyYIFnkLrzjQmpiWtTZG5fC/dw9FU54K0ahh/1V
-         F3LrTE85FUS81AqGgDgymRTseH2uV0JoffWY1fMSSacqz+K0RD7jCPJYIh0H3xe+YX/D
-         Pl0aBF+m9rHCXp1uwlk1BtrswNE6z/AAWRKDEdF2VGaMzua27OFLitwmNyXbHZgRm/eW
-         eHvVFpzMqe8cmVy9bFu2VXEXu380h4wdbv92WgPEhNMrsQc1uS6WACAvRjaWtA37Wnpt
-         vIJZkBOEF1PCvs8Ke6A4aX8187CACmxsScegr7o9ZDzbtSbgzEqAHBAs/SjSODPWynlO
-         qRdg==
-X-Gm-Message-State: AOAM532txwZk9YCpIVNi0hOgDCPwiqCfTjA6eCZuwstEtrAjOUX9HKTm
-        0C8uF2HmxHWsdejucPKzM9xZgzn65BCnUok1eFuUVsMgepAQBqupxE9tgakYgIgZJDYjNhUpGz6
-        Hwd8SZ7/+mTnR
-X-Received: by 2002:adf:e78a:0:b0:1e6:3524:e135 with SMTP id n10-20020adfe78a000000b001e63524e135mr2961068wrm.601.1645113947653;
-        Thu, 17 Feb 2022 08:05:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzVqs24c8i2D8Lt4f9Z4iNheHvxgXvMVn69Wevb7xDbVFxS55ujEEr2K1D18VYZWPyWeX53MQ==
-X-Received: by 2002:adf:e78a:0:b0:1e6:3524:e135 with SMTP id n10-20020adfe78a000000b001e63524e135mr2961045wrm.601.1645113947428;
-        Thu, 17 Feb 2022 08:05:47 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id c17sm1579430wmh.31.2022.02.17.08.05.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 08:05:46 -0800 (PST)
-Message-ID: <3113f00a-e910-2dfb-479f-268566445630@redhat.com>
-Date:   Thu, 17 Feb 2022 17:05:45 +0100
+ us-mta-575-ppNmokpTNwOqEowRjqlAyw-1; Thu, 17 Feb 2022 11:09:22 -0500
+X-MC-Unique: ppNmokpTNwOqEowRjqlAyw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A5A01091DA2;
+        Thu, 17 Feb 2022 16:09:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.112.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 09AFB70F55;
+        Thu, 17 Feb 2022 16:08:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 880AA21A4A18; Thu, 17 Feb 2022 17:08:54 +0100 (CET)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, lvivier@redhat.com,
+        thuth@redhat.com, mtosatti@redhat.com,
+        richard.henderson@linaro.org, pbonzini@redhat.com,
+        armbru@redhat.com, eblake@redhat.com, wangyanan55@huawei.com,
+        f4bug@amsat.org, marcel.apfelbaum@gmail.com, eduardo@habkost.net,
+        valery.vdovin.s@gmail.com, den@openvz.org,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Subject: Re: [PATCH v17] qapi: introduce 'x-query-x86-cpuid' QMP command.
+References: <20220121163943.2720015-1-vsementsov@virtuozzo.com>
+        <8cfa9b17-e420-0ca6-4e50-ccf2dfd538bb@virtuozzo.com>
+Date:   Thu, 17 Feb 2022 17:08:54 +0100
+In-Reply-To: <8cfa9b17-e420-0ca6-4e50-ccf2dfd538bb@virtuozzo.com> (Vladimir
+        Sementsov-Ogievskiy's message of "Thu, 17 Feb 2022 18:39:21 +0300")
+Message-ID: <87mtipscfd.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3] KVM: Move VM's worker kthreads back to the original
- cgroup before exiting.
-Content-Language: en-US
-To:     kernel test robot <lkp@intel.com>,
-        Vipin Sharma <vipinsh@google.com>, seanjc@google.com
-Cc:     kbuild-all@lists.01.org, mkoutny@suse.com, tj@kernel.org,
-        lizefan.x@bytedance.com, hannes@cmpxchg.org, dmatlack@google.com,
-        jiangshanlai@gmail.com, kvm@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220217061616.3303271-1-vipinsh@google.com>
- <202202172046.GuW8pHQc-lkp@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <202202172046.GuW8pHQc-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/22 13:34, kernel test robot wrote:
->> 5859		reattach_err = cgroup_attach_task_all(current->real_parent, current);
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-This needs to be within rcu_dereference().
+> Ping :) Any hope that we will merge it one day?)
 
-Paolo
-
->    5860		if (reattach_err) {
->    5861			kvm_err("%s: cgroup_attach_task_all failed on reattach with err %d\n",
->    5862				__func__, reattach_err);
->    5863		}
->    5864		return err;
->    5865	}
->    5866	
-> 
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
-> 
+Up to the x86 CPU maintainers: Paolo & Marcelo.
 
