@@ -2,65 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B4034BAA3D
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 20:50:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18AA24BAAC6
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 21:21:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245470AbiBQTsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 14:48:35 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50862 "EHLO
+        id S1343491AbiBQUVz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 15:21:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245520AbiBQTsa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 14:48:30 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D17D02612C;
-        Thu, 17 Feb 2022 11:48:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645127290; x=1676663290;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kVVoUac+9++cZ9L6mpXFpdsjVJethaHpin9YxElk0ak=;
-  b=AzlqY0sIJScikXaRTPV8Ph69ToeuY1FNz2zGLtT0l6FGZALYJKiaCgKd
-   RaIah6K9tsTL6TPD1I96FWS5f4xk0A66BkTRwX6/P7Y292OXKvJP5p7Nz
-   Fi/UZWNxepCra20TPeN+Uy9XIIgSO7Ob6bY4qo6sQNovvYD3L90pLVGNg
-   6wV0sYYGIlW7Jpk+KIvT0t7OcSsQlf+zq9P86lwnQy8MZ4Bt8LscLthDC
-   by0NC4QzPYyiwQsTLAJG4Baz9B2Ld9foi+O91Ny/l9e5YyiU0Sn8CnH2Y
-   vFs5cmrxIM8S5oE6Q1irMReVbjyls22k//h95b5CEwmCamrGL6GOyRX9F
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="251159224"
-X-IronPort-AV: E=Sophos;i="5.88,376,1635231600"; 
-   d="scan'208";a="251159224"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 11:48:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,376,1635231600"; 
-   d="scan'208";a="704977976"
-Received: from lkp-server01.sh.intel.com (HELO 6f05bf9e3301) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 17 Feb 2022 11:48:07 -0800
-Received: from kbuild by 6f05bf9e3301 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nKmkz-0000XV-Ct; Thu, 17 Feb 2022 19:48:01 +0000
-Date:   Fri, 18 Feb 2022 03:47:28 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
-        seanjc@google.com
-Cc:     kbuild-all@lists.01.org, mkoutny@suse.com, tj@kernel.org,
-        lizefan.x@bytedance.com, hannes@cmpxchg.org, dmatlack@google.com,
-        jiangshanlai@gmail.com, kvm@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH v3] KVM: Move VM's worker kthreads back to the original
- cgroup before exiting.
-Message-ID: <202202180218.msk1UR5R-lkp@intel.com>
-References: <20220217061616.3303271-1-vipinsh@google.com>
+        with ESMTP id S245757AbiBQUVx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 15:21:53 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6706411C32
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 12:21:37 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id y5so624050pfe.4
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 12:21:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:subject:in-reply-to:content-transfer-encoding;
+        bh=J+kkJEgtKVKfZWSWuqwk05pdmtbCDQvsRGxh7snwGnI=;
+        b=h7FWftArjaHElOVGGHKgY40qeoYxYzPPBTvceI6yG+1vgWXPzGQI522y+69W8hdAjv
+         lROKGkrewyEYZdQ2veyqb048ObAc1YlQfOJvxFMCcCRAlI3wHg6fEjREIXUaebmV/GKe
+         76/S+jQiMWFcNYJVL7vqixjuU7Zh5XYdJupoUOPWyux1LKquiu4qug7wOPhqAX9uY9HW
+         vLTHANz2iRkPHYDFwqIXAJYqAOBWNDSOrLeOMfeJBRYTZCSlZaxzQ5fZAidEgKVfn6fN
+         gOzrFzf13UXqWelkbD//g0yQQUn3XmoyVf6SCu8gVI0mECgRk7x9lTMMWyTgg1krJEot
+         zDVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=J+kkJEgtKVKfZWSWuqwk05pdmtbCDQvsRGxh7snwGnI=;
+        b=N6FVwof0XFjvP9tF6p2zWVdCFIuDkZsyKDs6OCViKAi1rC+EMu6qJMC3aTssOfHnT3
+         qTZ6K042qw5g02x3ql4DSDOMY6vU7uO/yW77sFf5Ge1dUs9WsOHGJDpZHaycysH8RKSZ
+         EuYnCylaRw8UhVetGAo8BiVcaUori97Ow75UxnuGQDZBBAjKkpi3WZcmG7naIUpsKnr/
+         a2A/9Up8rbOwWlbWag2525dOTLAomKWuuHMIKSI9bMoe9qDl1qDUOxrz0p291IldPhNP
+         d/wf7LLpFXuwPJfK/cAr7wevRu+gUojXCG4NfyGpEcsXocU0a4c+7SH2VMp9G7CX8j/H
+         X0Hg==
+X-Gm-Message-State: AOAM531q0qVaeDSxstRxPToccCz3yRHT+ERzx8FPVqgwW1PiyL94rCyY
+        Hh2kAz/9HC26ctgwEL7C0aJdog==
+X-Google-Smtp-Source: ABdhPJzQicmY1LsxlAXt7Nu8jPmDKZmHtBAbJ7a0NHzf+nhxMBMTRhziuc3NyshtcAhItPBQ8prW6Q==
+X-Received: by 2002:a05:6a00:16d3:b0:4cb:51e2:1923 with SMTP id l19-20020a056a0016d300b004cb51e21923mr4402640pfc.7.1645129296888;
+        Thu, 17 Feb 2022 12:21:36 -0800 (PST)
+Received: from [192.168.254.17] ([50.39.160.154])
+        by smtp.gmail.com with ESMTPSA id r13sm3859043pgb.22.2022.02.17.12.21.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Feb 2022 12:21:36 -0800 (PST)
+Message-ID: <db8a9edd-533e-3502-aed1-e084d6b55e48@linaro.org>
+Date:   Thu, 17 Feb 2022 12:21:35 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220217061616.3303271-1-vipinsh@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+8112db3ab20e70d50c31@syzkaller.appspotmail.com
+References: <20220125220358.2091737-1-seanjc@google.com>
+From:   Tadeusz Struk <tadeusz.struk@linaro.org>
+Subject: Re: [PATCH] KVM: x86: Forcibly leave nested virt when SMM state is
+ toggled
+In-Reply-To: <20220125220358.2091737-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,113 +79,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vipin,
+On 1/25/22 14:03, Sean Christopherson wrote:
+> Forcibly leave nested virtualization operation if userspace toggles SMM
+> state via KVM_SET_VCPU_EVENTS or KVM_SYNC_X86_EVENTS.  If userspace
+> forces the vCPU out of SMM while it's post-VMXON and then injects an SMI,
+> vmx_enter_smm() will overwrite vmx->nested.smm.vmxon and end up with both
+> vmxon=false and smm.vmxon=false, but all other nVMX state allocated.
+> 
+> Don't attempt to gracefully handle the transition as (a) most transitions
+> are nonsencial, e.g. forcing SMM while L2 is running, (b) there isn't
+> sufficient information to handle all transitions, e.g. SVM wants access
+> to the SMRAM save state, and (c) KVM_SET_VCPU_EVENTS must precede
+> KVM_SET_NESTED_STATE during state restore as the latter disallows putting
+> the vCPU into L2 if SMM is active, and disallows tagging the vCPU as
+> being post-VMXON in SMM if SMM is not active.
+> 
+> Abuse of KVM_SET_VCPU_EVENTS manifests as a WARN and memory leak in nVMX
+> due to failure to free vmcs01's shadow VMCS, but the bug goes far beyond
+> just a memory leak, e.g. toggling SMM on while L2 is active puts the vCPU
+> in an architecturally impossible state.
+> 
+>    WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
+>    WARNING: CPU: 0 PID: 3606 at free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
+>    Modules linked in:
+>    CPU: 1 PID: 3606 Comm: syz-executor725 Not tainted 5.17.0-rc1-syzkaller #0
+>    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+>    RIP: 0010:free_loaded_vmcs arch/x86/kvm/vmx/vmx.c:2665 [inline]
+>    RIP: 0010:free_loaded_vmcs+0x158/0x1a0 arch/x86/kvm/vmx/vmx.c:2656
+>    Code: <0f> 0b eb b3 e8 8f 4d 9f 00 e9 f7 fe ff ff 48 89 df e8 92 4d 9f 00
+>    Call Trace:
+>     <TASK>
+>     kvm_arch_vcpu_destroy+0x72/0x2f0 arch/x86/kvm/x86.c:11123
+>     kvm_vcpu_destroy arch/x86/kvm/../../../virt/kvm/kvm_main.c:441 [inline]
+>     kvm_destroy_vcpus+0x11f/0x290 arch/x86/kvm/../../../virt/kvm/kvm_main.c:460
+>     kvm_free_vcpus arch/x86/kvm/x86.c:11564 [inline]
+>     kvm_arch_destroy_vm+0x2e8/0x470 arch/x86/kvm/x86.c:11676
+>     kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1217 [inline]
+>     kvm_put_kvm+0x4fa/0xb00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1250
+>     kvm_vm_release+0x3f/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1273
+>     __fput+0x286/0x9f0 fs/file_table.c:311
+>     task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+>     exit_task_work include/linux/task_work.h:32 [inline]
+>     do_exit+0xb29/0x2a30 kernel/exit.c:806
+>     do_group_exit+0xd2/0x2f0 kernel/exit.c:935
+>     get_signal+0x4b0/0x28c0 kernel/signal.c:2862
+>     arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:868
+>     handle_signal_work kernel/entry/common.c:148 [inline]
+>     exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+>     exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:207
+>     __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+>     syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
+>     do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+>     entry_SYSCALL_64_after_hwframe+0x44/0xae
+>     </TASK>
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+8112db3ab20e70d50c31@syzkaller.appspotmail.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Thank you for the patch! Perhaps something to improve:
+Sean,
+I can reliably reproduce my original issue [1] that this supposed to fix
+on 5.17-rc4, with the same reproducer [2]. Here is a screen dump [3].
+Maybe we do still need my patch. It fixed the issue.
 
-[auto build test WARNING on db6e7adf8de9b3b99a9856acb73870cc3a70e3ca]
+[1] https://lore.kernel.org/all/3789ab35-6ede-34e8-b2d0-f50f4e0f1f15@linaro.org/
+[2] https://syzkaller.appspot.com/text?tag=ReproC&x=173085bdb00000
+[3] https://termbin.com/fkm8f
 
-url:    https://github.com/0day-ci/linux/commits/Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroup-before-exiting/20220217-141723
-base:   db6e7adf8de9b3b99a9856acb73870cc3a70e3ca
-config: arm64-randconfig-s032-20220217 (https://download.01.org/0day-ci/archive/20220218/202202180218.msk1UR5R-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 11.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/1abffef71ef85b6fb8f1296e6ef38febc4f2b007
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroup-before-exiting/20220217-141723
-        git checkout 1abffef71ef85b6fb8f1296e6ef38febc4f2b007
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c: note: in included file:
-   include/linux/kvm_host.h:1877:54: sparse: sparse: array of flexible structures
-   include/linux/kvm_host.h:1879:56: sparse: sparse: array of flexible structures
->> arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct task_struct *from @@     got struct task_struct [noderef] __rcu *real_parent @@
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse:     expected struct task_struct *from
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse:     got struct task_struct [noderef] __rcu *real_parent
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_change_pte' - different lock contexts for basic block
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_invalidate_range_start' - different lock contexts for basic block
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_invalidate_range_end' - different lock contexts for basic block
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_clear_flush_young' - different lock contexts for basic block
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_clear_young' - different lock contexts for basic block
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_test_young' - different lock contexts for basic block
-   arch/arm64/kvm/../../../virt/kvm/kvm_main.c:2522:9: sparse: sparse: context imbalance in 'hva_to_pfn_remapped' - unexpected unlock
-
-vim +5859 arch/arm64/kvm/../../../virt/kvm/kvm_main.c
-
-  5805	
-  5806	static int kvm_vm_worker_thread(void *context)
-  5807	{
-  5808		/*
-  5809		 * The init_context is allocated on the stack of the parent thread, so
-  5810		 * we have to locally copy anything that is needed beyond initialization
-  5811		 */
-  5812		struct kvm_vm_worker_thread_context *init_context = context;
-  5813		struct kvm *kvm = init_context->kvm;
-  5814		kvm_vm_thread_fn_t thread_fn = init_context->thread_fn;
-  5815		uintptr_t data = init_context->data;
-  5816		int err, reattach_err;
-  5817	
-  5818		err = kthread_park(current);
-  5819		/* kthread_park(current) is never supposed to return an error */
-  5820		WARN_ON(err != 0);
-  5821		if (err)
-  5822			goto init_complete;
-  5823	
-  5824		err = cgroup_attach_task_all(init_context->parent, current);
-  5825		if (err) {
-  5826			kvm_err("%s: cgroup_attach_task_all failed with err %d\n",
-  5827				__func__, err);
-  5828			goto init_complete;
-  5829		}
-  5830	
-  5831		set_user_nice(current, task_nice(init_context->parent));
-  5832	
-  5833	init_complete:
-  5834		init_context->err = err;
-  5835		complete(&init_context->init_done);
-  5836		init_context = NULL;
-  5837	
-  5838		if (err)
-  5839			goto out;
-  5840	
-  5841		/* Wait to be woken up by the spawner before proceeding. */
-  5842		kthread_parkme();
-  5843	
-  5844		if (!kthread_should_stop())
-  5845			err = thread_fn(kvm, data);
-  5846	
-  5847	out:
-  5848		/*
-  5849		 * Move kthread back to its original cgroup to prevent it lingering in
-  5850		 * the cgroup of the VM process, after the latter finishes its
-  5851		 * execution.
-  5852		 *
-  5853		 * kthread_stop() waits on the 'exited' completion condition which is
-  5854		 * set in exit_mm(), via mm_release(), in do_exit(). However, the
-  5855		 * kthread is removed from the cgroup in the cgroup_exit() which is
-  5856		 * called after the exit_mm(). This causes the kthread_stop() to return
-  5857		 * before the kthread actually quits the cgroup.
-  5858		 */
-> 5859		reattach_err = cgroup_attach_task_all(current->real_parent, current);
-  5860		if (reattach_err) {
-  5861			kvm_err("%s: cgroup_attach_task_all failed on reattach with err %d\n",
-  5862				__func__, reattach_err);
-  5863		}
-  5864		return err;
-  5865	}
-  5866	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+-- 
+Thanks,
+Tadeusz
