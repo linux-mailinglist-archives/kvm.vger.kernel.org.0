@@ -2,129 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 517D44BA4A5
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:41:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0E1F4BA4B1
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 16:43:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235550AbiBQPld (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 10:41:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34136 "EHLO
+        id S236791AbiBQPnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 10:43:14 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238291AbiBQPlb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 10:41:31 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2AE82B2E38
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:41:16 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id 75so5357321pgb.4
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:41:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GSlLfplsOOLuMoTCJXa0hQO7aoEhUgFZ0UfAir+9mn8=;
-        b=Qzlxkk2BG4nIhKCKMXUoICWJGooUZN3uSuhjUrJI3t624YVIs5S58N9h8iyHTBuMBD
-         uHVutlgvrd5r/gQ5+joSeFf/3uxsaog4MYgDe1f2Oh1tIT8QAYyTqA5C0YWrquyRMCK8
-         xq12DNfyH2thhs0d3aYZUWWyrRw2NGpm5ZK/r9lX83nIYnusxiI2y9XCZODif1XiX9Yc
-         UCGz9ujVdfPXoeJpp5NbFOKxq1+jhG9d6QUViSURCT+X7Xjox96jnCugatu4xoxbce2C
-         v44eJqoKN6kQVyC4oH6r9sXbxkY74eHdJJ1h9ePxiuRxRhLl7NIpkQYqemdFBOHX8xOr
-         BYaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GSlLfplsOOLuMoTCJXa0hQO7aoEhUgFZ0UfAir+9mn8=;
-        b=jBwWRkjQ9b0tkIQNZnRycJ++CSRkDL2Xew51ED0m3C7R1wtRhySsYDMeyoGfLIKMzH
-         FtMG5f2CYLcPYV1uA2NR8HVRH/XDuGz2f3HJX176PVNphzk4GsAUNCOJloPdQNeXH2gb
-         pifcgo/q2sV0v9DHGYgYJoE1l2GeQ+pTUGbovnZHsElGolBv6pIHpiHtqTgTFRdXDTkc
-         hM9bYN47uqMOMW5wZ92r3a/yfiXDtrcdrL3xJQ0eMHJU+y/P3n3oYkqusrNWuxzNUFoI
-         HCX6n4tsOKTZA2Dlg+bTXWQzrxjRUe28Y+mVBWX3Ll3qPKJyYilG2Hk0kRFBeMxqUQ3T
-         Qy8g==
-X-Gm-Message-State: AOAM530zRApNul0JHd4UMUPkUnj8ZJ4SORlDfX9nh7ai4rbr8I1nh/wS
-        TMZXiKw/BQom4UiNUO4Wkksf6/2qQbjgAA==
-X-Google-Smtp-Source: ABdhPJxeLXpOjVMZmx3Lyht9qoLvfiyVlO+cz4Vz+eeIWdoPmpXonzJaxJcliV2S/nyEiFxhzjQ3NA==
-X-Received: by 2002:a65:4c4c:0:b0:35e:3c81:5b7f with SMTP id l12-20020a654c4c000000b0035e3c815b7fmr2953268pgr.162.1645112476195;
-        Thu, 17 Feb 2022 07:41:16 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l8sm9079910pgt.77.2022.02.17.07.41.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 07:41:15 -0800 (PST)
-Date:   Thu, 17 Feb 2022 15:41:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Anton Romanov <romanton@google.com>, mtosatti@redhat.com,
-        kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH v2] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in
- always catchup mode
-Message-ID: <Yg5sl9aWzVJKAMKc@google.com>
-References: <20220215200116.4022789-1-romanton@google.com>
- <87zgmqq4ox.fsf@redhat.com>
+        with ESMTP id S232562AbiBQPnN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 10:43:13 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6F41D4925A
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 07:42:58 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AC8212FC;
+        Thu, 17 Feb 2022 07:42:58 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E6823F70D;
+        Thu, 17 Feb 2022 07:42:56 -0800 (PST)
+Date:   Thu, 17 Feb 2022 15:43:15 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Sebastian Ene <sebastianene@google.com>
+Cc:     kvm@vger.kernel.org, qperret@google.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool v2] aarch64: Add stolen time support
+Message-ID: <Yg5tE3TqgwWRFypB@monolith.localdoman>
+References: <Yg5lBZKsSoPNmVkT@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87zgmqq4ox.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Yg5lBZKsSoPNmVkT@google.com>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 16, 2022, Vitaly Kuznetsov wrote:
-> Anton Romanov <romanton@google.com> writes:
+Hi,
+
+Some general comments while I familiarize myself with the stolen time spec.
+
+On Thu, Feb 17, 2022 at 03:08:53PM +0000, Sebastian Ene wrote:
+> This patch adds support for stolen time by sharing a memory region
+> with the guest which will be used by the hypervisor to store the stolen
+> time information. The exact format of the structure stored by the
+> hypervisor is described in the ARM DEN0057A document.
 > 
-> > If vcpu has tsc_always_catchup set each request updates pvclock data.
-> > KVM_HC_CLOCK_PAIRING consumers such as ptp_kvm_x86 rely on tsc read on
-> > host's side and do hypercall inside pvclock_read_retry loop leading to
-> > infinite loop in such situation.
-> >
-> > v2:
-> >     Added warn
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
 
-Versioning info goes in the "ignored" section, not the changelog.
+It is customary to describe the changes you have made from the previous version,
+to make it easier for the people who want to review your code.
 
-> > Signed-off-by: Anton Romanov <romanton@google.com>
-> > ---
-
-This part is ignored by git.  Versioning info, and/or any commentary that doesn't
-belong in the changelog, for a patch goes here.
-
-> >  arch/x86/kvm/x86.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 7131d735b1ef..aaafb46a6048 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8945,6 +8945,15 @@ static int kvm_pv_clock_pairing(struct kvm_vcpu *vcpu, gpa_t paddr,
-> >  	if (!kvm_get_walltime_and_clockread(&ts, &cycle))
-> >  		return -KVM_EOPNOTSUPP;
-> >  
-> > +	/*
-> > +	 * When tsc is in permanent catchup mode guests won't be able to use
-> > +	 * pvclock_read_retry loop to get consistent view of pvclock
-> > +	 */
-> > +	if (vcpu->arch.tsc_always_catchup) {
-> > +		pr_warn_ratelimited("KVM_HC_CLOCK_PAIRING not supported if vcpu is in tsc catchup mode\n");
-> > +		return -KVM_EOPNOTSUPP;
+>  Makefile                               |  1 +
+>  arm/aarch64/arm-cpu.c                  |  1 +
+>  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
+>  arm/aarch64/pvtime.c                   | 84 ++++++++++++++++++++++++++
+>  arm/include/arm-common/kvm-arch.h      |  4 ++
+>  arm/kvm-cpu.c                          | 14 ++---
+>  6 files changed, 98 insertions(+), 7 deletions(-)
+>  create mode 100644 arm/aarch64/pvtime.c
 > 
-> I'm not sure this warn is a good idea. It is guest triggerable and
-> 'tsc_always_catchup' is not a bug, it is a perfectly valid situation in
-> the configuration when TSC scaling is unavailable. Even ratelimited,
-> it's not nice when guests can pollute host's logs.
+> diff --git a/Makefile b/Makefile
+> index f251147..e9121dc 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+>  	OBJS		+= arm/aarch64/arm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm-cpu.o
+>  	OBJS		+= arm/aarch64/kvm.o
+> +	OBJS		+= arm/aarch64/pvtime.o
+>  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+>  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+>  
+> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> index d7572b7..326fb20 100644
+> --- a/arm/aarch64/arm-cpu.c
+> +++ b/arm/aarch64/arm-cpu.c
+> @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+>  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+>  {
+>  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> +	kvm_cpu__setup_pvtime(vcpu);
+>  	return 0;
+>  }
+>  
+> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> index 8dfb82e..b57d6e6 100644
+> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> @@ -19,5 +19,6 @@
+>  
+>  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+>  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
+> +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
+>  
+>  #endif /* KVM__KVM_CPU_ARCH_H */
+> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> new file mode 100644
+> index 0000000..c09fd89
+> --- /dev/null
+> +++ b/arm/aarch64/pvtime.c
+> @@ -0,0 +1,84 @@
+> +#include "kvm/kvm.h"
+> +#include "kvm/kvm-cpu.h"
+> +#include "kvm/util.h"
+> +
+> +#include <linux/byteorder.h>
+> +#include <linux/types.h>
+> +
+> +struct pvtime_data_priv {
+> +	bool	is_supported;
+> +	char	*usr_mem;
+> +};
+> +
+> +static struct pvtime_data_priv pvtime_data = {
+> +	.is_supported	= true,
+> +	.usr_mem	= NULL
+> +};
+> +
+> +static int pvtime__alloc_region(struct kvm *kvm)
+> +{
+> +	char *mem;
+> +	int ret = 0;
+> +
+> +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
+> +		   MAP_ANON_NORESERVE, -1, 0);
+> +	if (mem == MAP_FAILED)
+> +		return -ENOMEM;
+> +
+> +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
+> +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
+> +	if (ret) {
+> +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
+> +		return ret;
+> +	}
+> +
+> +	pvtime_data.usr_mem = mem;
+> +	return ret;
+> +}
+> +
+> +static int pvtime__teardown_region(struct kvm *kvm)
+> +{
+> +	if (pvtime_data.usr_mem == NULL)
+> +		return 0;
+> +
+> +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
+> +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
+> +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
+> +	pvtime_data.usr_mem = NULL;
+> +	return 0;
+> +}
+> +
+> +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> +{
+> +	int ret;
+> +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
+> +		AARCH64_PVTIME_SIZE;
+> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
+> +	};
+> +
+> +	if (!pvtime_data.is_supported)
+> +		return;
+> +
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
+> +	if (ret)
+> +		goto out_err;
+> +
+> +	if (!pvtime_data.usr_mem) {
+> +		ret = pvtime__alloc_region(vcpu->kvm);
+> +		if (ret)
+> +			goto out_err;
+> +	}
+> +
+> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
+> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
+> +	if (!ret)
+> +		return;
+> +
+> +	pvtime__teardown_region(vcpu->kvm);
+> +out_err:
+> +	pvtime_data.is_supported = false;
+> +}
+> +
+> +dev_exit(pvtime__teardown_region);
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index c645ac0..865bd68 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -54,6 +54,10 @@
+>  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
+>  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+>  
+> +#define AARCH64_PVTIME_IPA_MAX_SIZE	SZ_64K
+> +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
+> +					 AARCH64_PVTIME_IPA_MAX_SIZE)
 
-Agreed.  And if we want to alert the user/admin, it'd probably be better do so on
-tsc_always_catchup first being set.  Doubt it's worth it though, assuming my other
-patch to prevent KVM from setting tsc_always_catchup=true on non-ancient hardware
-without userspace interaction gets merged.
+This overlaps with the ARM_PCI_MMIO_AREA. If you want to change the memory
+layout for a guest, there's a handy ASCII map at the top of this file.  That
+should also be updated to reflect the modified layout.
 
-> Also, EOPNOTSUPP makes it sound like the hypercall is unsupported, I'd
-> suggest changing this to KVM_EFAULT.
+Why do you want to put it below RAM? Is there a requirement to have it there or
+was the location chosen for other reasons?
 
-Eh, it's consistent with the above check though, where KVM returns KVM_EOPNOTSUPP
-due to the vclock mode being incompatible.  This is more or less the same, it's
-just a different "mode".  KVM_EFAULT suggests that the guest did something wrong
-and/or that the guest can remedy the problem in someway, e.g. by providing a
-different address.  This issue is purely in the host's domain.
+> +#define AARCH64_PVTIME_SIZE		(64)
+
+This looks like something that should go in pvtime.c, as it's not relevant to
+the memory layout.
+
+>  
+>  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+>  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
+> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> index 6a2408c..84ac1e9 100644
+> --- a/arm/kvm-cpu.c
+> +++ b/arm/kvm-cpu.c
+> @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+>  			die("Unable to find matching target");
+>  	}
+>  
+> +	/* Populate the vcpu structure. */
+> +	vcpu->kvm		= kvm;
+> +	vcpu->cpu_id		= cpu_id;
+> +	vcpu->cpu_type		= vcpu_init.target;
+> +	vcpu->cpu_compatible	= target->compatible;
+> +	vcpu->is_running	= true;
+> +
+>  	if (err || target->init(vcpu))
+>  		die("Unable to initialise vcpu");
+>  
+> @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+>  		vcpu->ring = (void *)vcpu->kvm_run +
+>  			     (coalesced_offset * PAGE_SIZE);
+>  
+> -	/* Populate the vcpu structure. */
+> -	vcpu->kvm		= kvm;
+> -	vcpu->cpu_id		= cpu_id;
+> -	vcpu->cpu_type		= vcpu_init.target;
+> -	vcpu->cpu_compatible	= target->compatible;
+> -	vcpu->is_running	= true;
+> -
+
+Why this change?
+
+Thanks,
+Alex
+
+>  	if (kvm_cpu__configure_features(vcpu))
+>  		die("Unable to configure requested vcpu features");
+>  
+> -- 
+> 2.35.1.265.g69c8d7142f-goog
+> 
