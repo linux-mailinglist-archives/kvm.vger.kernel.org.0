@@ -2,292 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 959084BAD1E
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 00:15:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3F6C4BAE4E
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 01:21:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbiBQXP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 18:15:26 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:42706 "EHLO
+        id S230083AbiBRAVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 19:21:39 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbiBQXPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 18:15:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A06832B7605
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 15:15:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645139664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cbnvbc3fsHmXHX+qkuLBQ8KJ8n5Rlnoh3IJADqcgMiQ=;
-        b=jQxrL1PNcaWa+pMoSQOT5ljOIgdrfdDIRwdVDDDFcfh6vXnDpLeGt4AAVOIAN+k5qvaaRY
-        gQ4+QLlImvzwV346tRftI/UsPNn3wZnGm0QFvL0ApWOTBdFc/3X6+qk7KYGxAVtQAPxtRY
-        CoRbLmeUaO/sj+tngfINqBDUdFLvb+Y=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-619-Qm_2f1oqP5KSkCoSU5eEaQ-1; Thu, 17 Feb 2022 18:14:23 -0500
-X-MC-Unique: Qm_2f1oqP5KSkCoSU5eEaQ-1
-Received: by mail-il1-f198.google.com with SMTP id p16-20020a927410000000b002be8797ac0bso2899517ilc.7
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 15:14:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=cbnvbc3fsHmXHX+qkuLBQ8KJ8n5Rlnoh3IJADqcgMiQ=;
-        b=vGsJRHl7yHddUyzBoGn0RyHrSXv/WQoNXi+D1/X/A9oyhMQw3+jGLQ4X5Sm+nG+Ug6
-         eyV/pm+wdQ6rUMjqoEHge6fcTNjYilX+tNXaxLwg2f9TZUb4YNQZevxVDnNg3bXNduPV
-         0ovTFSzrB9gCE+8fjlN5HpFphqMWwKg6zVKAf/FMLz9dAoEyRUyZtDPP+W/PXb+ybJG4
-         F38KkIIviuDA/YU7rPAiSnRp2HmPF5uhOY/HNOeoE2wS46fpPqZhyHTva8+xEQ3RuV1N
-         JQKJ7L8rl69/Rc9hnnE9DR1aGfjYteYe9uB6PDUqLA8v+sUwLYtGAsdzBYhI1ADMXjbi
-         TzOw==
-X-Gm-Message-State: AOAM531lOH3JHzDa9BMoGfRpud25KS+NARqNF4TCK9pQqHt7J4sc1UoK
-        pTCvU77us5G4GFOJgRb4M45YTfHZG6+P6yvQG4if+4gLqRTxoxjC43fMm2USOJvYfRJ5QxSUaQv
-        TuQsgv+TD+TXt
-X-Received: by 2002:a05:6638:12d6:b0:314:3e89:58db with SMTP id v22-20020a05663812d600b003143e8958dbmr3325376jas.216.1645139662316;
-        Thu, 17 Feb 2022 15:14:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzYE3q8jS5VDryDylvqVHq+LTf5McaTWOUTQOMzTPWtDASW3mAJ36djui+NZWt45ANx653jKA==
-X-Received: by 2002:a05:6638:12d6:b0:314:3e89:58db with SMTP id v22-20020a05663812d600b003143e8958dbmr3325360jas.216.1645139661966;
-        Thu, 17 Feb 2022 15:14:21 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id j14sm2565897ilc.62.2022.02.17.15.14.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 15:14:21 -0800 (PST)
-Date:   Thu, 17 Feb 2022 16:14:20 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Abhishek Sahu <abhsahu@nvidia.com>
-Cc:     <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhen Lei <thunder.leizhen@huawei.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 4/5] vfio/pci: Invalidate mmaps and block the
- access in D3hot power state
-Message-ID: <20220217161420.7232eab6.alex.williamson@redhat.com>
-In-Reply-To: <20220124181726.19174-5-abhsahu@nvidia.com>
-References: <20220124181726.19174-1-abhsahu@nvidia.com>
-        <20220124181726.19174-5-abhsahu@nvidia.com>
-Organization: Red Hat
+        with ESMTP id S230061AbiBRAVi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 19:21:38 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6366150;
+        Thu, 17 Feb 2022 16:21:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645143683; x=1676679683;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=N32BdLCCicYvF88PVJV2JjNN97uAJo3pxS97Q2b1+KM=;
+  b=JebK25hjQclsv7jqSHiEE0DjhouD4qt1Hlweeh/N3JaaLPvOya/WDJl3
+   c2PnjKG1mJU6qLzaGAmlHipha9jFsT95Yg/4DMrb/NXTXgaR110a6iTsC
+   I8UBubYHZRc7skItWk8OucBwc0SYrc+cZxM1teB+tUxmS7XaEnnKjPz0R
+   tiosmwmc/T2cXlMHRA7YINkMxoRrRF17Mds1pXK9dWUcBmY2zjn1AYr2H
+   6llKIJQL8NOTTbuV7UzINeTx2ik026zG72tzcPOd1+4t7yyEP9JIFLQya
+   RsAY4lSZ02S62N1y8PDSqYcW4/KuivP+Yahwn6QOn7gU6P+3w2LYXcKRi
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="248595414"
+X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
+   d="scan'208";a="248595414"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 15:23:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
+   d="scan'208";a="777665220"
+Received: from lkp-server01.sh.intel.com (HELO 6f05bf9e3301) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 17 Feb 2022 15:23:06 -0800
+Received: from kbuild by 6f05bf9e3301 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nKq78-0000jQ-2C; Thu, 17 Feb 2022 23:23:06 +0000
+Date:   Fri, 18 Feb 2022 07:22:54 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
+        seanjc@google.com
+Cc:     kbuild-all@lists.01.org, mkoutny@suse.com, tj@kernel.org,
+        lizefan.x@bytedance.com, hannes@cmpxchg.org, dmatlack@google.com,
+        jiangshanlai@gmail.com, kvm@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH v3] KVM: Move VM's worker kthreads back to the original
+ cgroup before exiting.
+Message-ID: <202202180730.AAgeOZkF-lkp@intel.com>
+References: <20220217061616.3303271-1-vipinsh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220217061616.3303271-1-vipinsh@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Jan 2022 23:47:25 +0530
-Abhishek Sahu <abhsahu@nvidia.com> wrote:
+Hi Vipin,
 
-> According to [PCIe v5 5.3.1.4.1] for D3hot state
-> 
->  "Configuration and Message requests are the only TLPs accepted by a
->   Function in the D3Hot state. All other received Requests must be
->   handled as Unsupported Requests, and all received Completions may
->   optionally be handled as Unexpected Completions."
-> 
-> Currently, if the vfio PCI device has been put into D3hot state and if
-> user makes non-config related read/write request in D3hot state, these
-> requests will be forwarded to the host and this access may cause
-> issues on a few systems.
-> 
-> This patch leverages the memory-disable support added in commit
-> 'abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on
-> disabled memory")' to generate page fault on mmap access and
-> return error for the direct read/write. If the device is D3hot state,
-> then the error needs to be returned for all kinds of BAR
-> related access (memory, IO and ROM). Also, the power related structure
-> fields need to be protected so we can use the same 'memory_lock' to
-> protect these fields also. For the few cases, this 'memory_lock' will be
-> already acquired by callers so introduce a separate function
-> vfio_pci_set_power_state_locked(). The original
-> vfio_pci_set_power_state() now contains the code to do the locking
-> related operations.
-> 
-> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 47 +++++++++++++++++++++++++-------
->  drivers/vfio/pci/vfio_pci_rdwr.c | 20 ++++++++++----
->  2 files changed, 51 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index ee2fb8af57fa..38440d48973f 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -201,11 +201,12 @@ static void vfio_pci_probe_power_state(struct vfio_pci_core_device *vdev)
->  }
->  
->  /*
-> - * pci_set_power_state() wrapper handling devices which perform a soft reset on
-> - * D3->D0 transition.  Save state prior to D0/1/2->D3, stash it on the vdev,
-> - * restore when returned to D0.  Saved separately from pci_saved_state for use
-> - * by PM capability emulation and separately from pci_dev internal saved state
-> - * to avoid it being overwritten and consumed around other resets.
-> + * vfio_pci_set_power_state_locked() wrapper handling devices which perform a
-> + * soft reset on D3->D0 transition.  Save state prior to D0/1/2->D3, stash it
-> + * on the vdev, restore when returned to D0.  Saved separately from
-> + * pci_saved_state for use by PM capability emulation and separately from
-> + * pci_dev internal saved state to avoid it being overwritten and consumed
-> + * around other resets.
->   *
->   * There are few cases where the PCI power state can be changed to D0
->   * without the involvement of this API. So, cache the power state locally
-> @@ -215,7 +216,8 @@ static void vfio_pci_probe_power_state(struct vfio_pci_core_device *vdev)
->   * The memory taken for saving this PCI state needs to be freed to
->   * prevent memory leak.
->   */
-> -int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t state)
-> +static int vfio_pci_set_power_state_locked(struct vfio_pci_core_device *vdev,
-> +					   pci_power_t state)
->  {
->  	struct pci_dev *pdev = vdev->pdev;
->  	bool needs_restore = false, needs_save = false;
-> @@ -260,6 +262,26 @@ int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t stat
->  	return ret;
->  }
->  
-> +/*
-> + * vfio_pci_set_power_state() takes all the required locks to protect
-> + * the access of power related variables and then invokes
-> + * vfio_pci_set_power_state_locked().
-> + */
-> +int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev,
-> +			     pci_power_t state)
-> +{
-> +	int ret;
-> +
-> +	if (state >= PCI_D3hot)
-> +		vfio_pci_zap_and_down_write_memory_lock(vdev);
-> +	else
-> +		down_write(&vdev->memory_lock);
-> +
-> +	ret = vfio_pci_set_power_state_locked(vdev, state);
-> +	up_write(&vdev->memory_lock);
-> +	return ret;
-> +}
-> +
->  int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  {
->  	struct pci_dev *pdev = vdev->pdev;
-> @@ -354,7 +376,7 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  	 * in running the logic needed for D0 power state. The subsequent
->  	 * runtime PM API's will put the device into the low power state again.
->  	 */
-> -	vfio_pci_set_power_state(vdev, PCI_D0);
-> +	vfio_pci_set_power_state_locked(vdev, PCI_D0);
->  
->  	/* Stop the device from further DMA */
->  	pci_clear_master(pdev);
-> @@ -967,7 +989,7 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
->  		 * interaction. Update the power state in vfio driver to perform
->  		 * the logic needed for D0 power state.
->  		 */
-> -		vfio_pci_set_power_state(vdev, PCI_D0);
-> +		vfio_pci_set_power_state_locked(vdev, PCI_D0);
->  		up_write(&vdev->memory_lock);
->  
->  		return ret;
-> @@ -1453,6 +1475,11 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
->  		goto up_out;
->  	}
->  
-> +	if (vdev->power_state >= PCI_D3hot) {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto up_out;
-> +	}
-> +
->  	/*
->  	 * We populate the whole vma on fault, so we need to test whether
->  	 * the vma has already been mapped, such as for concurrent faults
-> @@ -1902,7 +1929,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
->  	 * be able to get to D3.  Therefore first do a D0 transition
->  	 * before enabling runtime PM.
->  	 */
-> -	vfio_pci_set_power_state(vdev, PCI_D0);
-> +	vfio_pci_set_power_state_locked(vdev, PCI_D0);
->  	pm_runtime_allow(&pdev->dev);
->  
->  	if (!disable_idle_d3)
-> @@ -2117,7 +2144,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->  		 * interaction. Update the power state in vfio driver to perform
->  		 * the logic needed for D0 power state.
->  		 */
-> -		vfio_pci_set_power_state(cur, PCI_D0);
-> +		vfio_pci_set_power_state_locked(cur, PCI_D0);
->  		if (cur == cur_mem)
->  			is_mem = false;
->  		if (cur == cur_vma)
-> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-> index 57d3b2cbbd8e..e97ba14c4aa0 100644
-> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
-> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-> @@ -41,8 +41,13 @@
->  static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
->  			bool test_mem, u##size val, void __iomem *io)	\
->  {									\
-> +	down_read(&vdev->memory_lock);					\
-> +	if (vdev->power_state >= PCI_D3hot) {				\
-> +		up_read(&vdev->memory_lock);				\
-> +		return -EIO;						\
-> +	}								\
-> +									\
+Thank you for the patch! Perhaps something to improve:
 
-The reason that we only set test_mem for MMIO BARs is that systems are
-generally more lenient about probing unresponsive I/O port space to
-support legacy use cases.  Have you found cases where access to an I/O
-port BAR when the device is either in D3hot+ or I/O port is disabled in
-the command register triggers a system fault?  If not it seems we could
-roll the power_state check into __vfio_pci_memory_enabled(), if so then
-we probably need to improve our coverage of access to disabled I/O port
-BARs beyond only the power_state check.  Thanks,
+[auto build test WARNING on db6e7adf8de9b3b99a9856acb73870cc3a70e3ca]
 
-Alex
+url:    https://github.com/0day-ci/linux/commits/Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroup-before-exiting/20220217-141723
+base:   db6e7adf8de9b3b99a9856acb73870cc3a70e3ca
+config: x86_64-rhel-8.3-kselftests (https://download.01.org/0day-ci/archive/20220218/202202180730.AAgeOZkF-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-dirty
+        # https://github.com/0day-ci/linux/commit/1abffef71ef85b6fb8f1296e6ef38febc4f2b007
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroup-before-exiting/20220217-141723
+        git checkout 1abffef71ef85b6fb8f1296e6ef38febc4f2b007
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
->  	if (test_mem) {							\
-> -		down_read(&vdev->memory_lock);				\
->  		if (!__vfio_pci_memory_enabled(vdev)) {			\
->  			up_read(&vdev->memory_lock);			\
->  			return -EIO;					\
-> @@ -51,8 +56,7 @@ static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
->  									\
->  	vfio_iowrite##size(val, io);					\
->  									\
-> -	if (test_mem)							\
-> -		up_read(&vdev->memory_lock);				\
-> +	up_read(&vdev->memory_lock);					\
->  									\
->  	return 0;							\
->  }
-> @@ -68,8 +72,13 @@ VFIO_IOWRITE(64)
->  static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
->  			bool test_mem, u##size *val, void __iomem *io)	\
->  {									\
-> +	down_read(&vdev->memory_lock);					\
-> +	if (vdev->power_state >= PCI_D3hot) {				\
-> +		up_read(&vdev->memory_lock);				\
-> +		return -EIO;						\
-> +	}								\
-> +									\
->  	if (test_mem) {							\
-> -		down_read(&vdev->memory_lock);				\
->  		if (!__vfio_pci_memory_enabled(vdev)) {			\
->  			up_read(&vdev->memory_lock);			\
->  			return -EIO;					\
-> @@ -78,8 +87,7 @@ static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
->  									\
->  	*val = vfio_ioread##size(io);					\
->  									\
-> -	if (test_mem)							\
-> -		up_read(&vdev->memory_lock);				\
-> +	up_read(&vdev->memory_lock);					\
->  									\
->  	return 0;							\
->  }
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
+
+sparse warnings: (new ones prefixed by >>)
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c: note: in included file:
+   include/linux/kvm_host.h:1877:54: sparse: sparse: array of flexible structures
+   include/linux/kvm_host.h:1879:56: sparse: sparse: array of flexible structures
+>> arch/x86/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct task_struct *from @@     got struct task_struct [noderef] __rcu *real_parent @@
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse:     expected struct task_struct *from
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse:     got struct task_struct [noderef] __rcu *real_parent
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_change_pte' - different lock contexts for basic block
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_invalidate_range_start' - different lock contexts for basic block
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_invalidate_range_end' - different lock contexts for basic block
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_clear_flush_young' - different lock contexts for basic block
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_clear_young' - different lock contexts for basic block
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_test_young' - different lock contexts for basic block
+   arch/x86/kvm/../../../virt/kvm/kvm_main.c:2522:9: sparse: sparse: context imbalance in 'hva_to_pfn_remapped' - unexpected unlock
+
+vim +5859 arch/x86/kvm/../../../virt/kvm/kvm_main.c
+
+  5805	
+  5806	static int kvm_vm_worker_thread(void *context)
+  5807	{
+  5808		/*
+  5809		 * The init_context is allocated on the stack of the parent thread, so
+  5810		 * we have to locally copy anything that is needed beyond initialization
+  5811		 */
+  5812		struct kvm_vm_worker_thread_context *init_context = context;
+  5813		struct kvm *kvm = init_context->kvm;
+  5814		kvm_vm_thread_fn_t thread_fn = init_context->thread_fn;
+  5815		uintptr_t data = init_context->data;
+  5816		int err, reattach_err;
+  5817	
+  5818		err = kthread_park(current);
+  5819		/* kthread_park(current) is never supposed to return an error */
+  5820		WARN_ON(err != 0);
+  5821		if (err)
+  5822			goto init_complete;
+  5823	
+  5824		err = cgroup_attach_task_all(init_context->parent, current);
+  5825		if (err) {
+  5826			kvm_err("%s: cgroup_attach_task_all failed with err %d\n",
+  5827				__func__, err);
+  5828			goto init_complete;
+  5829		}
+  5830	
+  5831		set_user_nice(current, task_nice(init_context->parent));
+  5832	
+  5833	init_complete:
+  5834		init_context->err = err;
+  5835		complete(&init_context->init_done);
+  5836		init_context = NULL;
+  5837	
+  5838		if (err)
+  5839			goto out;
+  5840	
+  5841		/* Wait to be woken up by the spawner before proceeding. */
+  5842		kthread_parkme();
+  5843	
+  5844		if (!kthread_should_stop())
+  5845			err = thread_fn(kvm, data);
+  5846	
+  5847	out:
+  5848		/*
+  5849		 * Move kthread back to its original cgroup to prevent it lingering in
+  5850		 * the cgroup of the VM process, after the latter finishes its
+  5851		 * execution.
+  5852		 *
+  5853		 * kthread_stop() waits on the 'exited' completion condition which is
+  5854		 * set in exit_mm(), via mm_release(), in do_exit(). However, the
+  5855		 * kthread is removed from the cgroup in the cgroup_exit() which is
+  5856		 * called after the exit_mm(). This causes the kthread_stop() to return
+  5857		 * before the kthread actually quits the cgroup.
+  5858		 */
+> 5859		reattach_err = cgroup_attach_task_all(current->real_parent, current);
+  5860		if (reattach_err) {
+  5861			kvm_err("%s: cgroup_attach_task_all failed on reattach with err %d\n",
+  5862				__func__, reattach_err);
+  5863		}
+  5864		return err;
+  5865	}
+  5866	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
