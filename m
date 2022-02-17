@@ -2,35 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 751514B9D1F
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 11:28:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD4114B9EF8
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 12:37:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234924AbiBQK2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 05:28:37 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44438 "EHLO
+        id S239933AbiBQLhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 06:37:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231827AbiBQK2f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 05:28:35 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3FFAC91356
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 02:28:18 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C3B3D6E;
-        Thu, 17 Feb 2022 02:28:18 -0800 (PST)
-Received: from Q2TWYV475D.emea.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DAE83F718;
-        Thu, 17 Feb 2022 02:28:17 -0800 (PST)
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, pbonzini@redhat.com, thuth@redhat.com
-Cc:     jade.alglave@arm.com, Nikos Nikoleris <nikos.nikoleris@arm.com>
-Subject: [kvm-unit-tests PATCH] configure: arm: Fixes to build and run tests on Apple Silicon
-Date:   Thu, 17 Feb 2022 10:28:06 +0000
-Message-Id: <20220217102806.28749-1-nikos.nikoleris@arm.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+        with ESMTP id S239924AbiBQLhm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 06:37:42 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83E01B78C;
+        Thu, 17 Feb 2022 03:37:27 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21HABvwT000795;
+        Thu, 17 Feb 2022 11:37:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : subject :
+ date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=jgMzF4Ni0eGA4OONPUhvtPkYyU4OFQyeFoXgK5Tg20U=;
+ b=tGE8je2ID/YxryhRGpHw3J7Ym8YUcRI89XA1FEREeC5uRS3ACPd8/zToo1oZvRWKu2/b
+ OstLyWhu7eNCAcn2h458OWLbMHuEtzI6TepslUOb2G8WdrOYLQZcB7rgCXX6+PZdv5dh
+ 8POzQOUyfKFpShblPwbJ9pLzESJ6jCcABL1s2QJJZyz8QLxJfKm+0kLWAJt2yjscfrHe
+ +vkx6EAn8zDooKGLfq3A2LLli7J0Om1ShVqQ43zxXwr/T7nYUei/rdaejVyqTnpnZVmE
+ s1rCUCyPDUamb5s1m2VdzLEZrgaMg209GDJSzs/4xpOoNZBn5E2TtSwcO9yquAyMcxFJ 1g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9m1ntcv8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 11:37:24 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21HBLLjF004332;
+        Thu, 17 Feb 2022 11:37:24 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3e9m1ntcua-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 11:37:24 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21HBZnDa028358;
+        Thu, 17 Feb 2022 11:37:22 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3e64h9y5dp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 11:37:22 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21HBbJVp35258876
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Feb 2022 11:37:19 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 595775204E;
+        Thu, 17 Feb 2022 11:37:19 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.12.92])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 225035207A;
+        Thu, 17 Feb 2022 11:37:18 +0000 (GMT)
+From:   Steffen Eiden <seiden@linux.ibm.com>
+To:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH 0/3] s390: Ultravisor device
+Date:   Thu, 17 Feb 2022 06:37:14 -0500
+Message-Id: <20220217113717.46624-1-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Zidn7y2A38B8FfZYnNEis0TV6ue8XLMG
+X-Proofpoint-ORIG-GUID: TwY6zA9qN2bj8on8Z4-ELGKhwyJ5UhIJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-17_04,2022-02-17_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 impostorscore=0
+ mlxscore=0 suspectscore=0 adultscore=0 bulkscore=0 clxscore=1011
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202170051
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -39,54 +91,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On MacOS:
+This series adds an Ultravisor(UV) device letting the userspace send some
+Ultravisor calls to the UV. Currently two calls are supported.
+Query Ultravisor Information (QUI) and
+Receive Attestation Measurement (Attest[ation]).
 
-$> uname -m
+The UV device is implemented as a miscdevice accepting only IOCTLs.
+The IOCTL cmd specifies the UV call and the IOCTL arg the request
+and response data depending on the UV call.
+The device driver writes the UV response in the ioctl argument data.
 
-returns:
+The 'uvdevice' does no checks on the request beside faulty userspace
+addresses, if sizes are in a sane range before allocating in kernel space,
+and other tests that prevent the system from corruption.
+Especially, no checks are made, that will be performed by the UV anyway
+(E.g. 'invalid command' in case of attestation on unsupported hardware).
+These errors are reported back to Userspace using the UV return code
+field.
 
-arm64
+Steffen Eiden (3):
+  drivers/s390/char: Add Ultravisor io device
+  drivers/s390/char: Add Ultravisor attestation to uvdevice
+  selftests: drivers/s390x: Add uvdevice tests
 
-To unify how we handle the achitecture detection across different
-systems, sed it to aarch64 which is what's typically reported on
-Linux.
+ MAINTAINERS                                   |   3 +
+ arch/s390/include/asm/uv.h                    |  23 +-
+ arch/s390/include/uapi/asm/uvdevice.h         |  46 +++
+ drivers/s390/char/Kconfig                     |   9 +
+ drivers/s390/char/Makefile                    |   1 +
+ drivers/s390/char/uvdevice.c                  | 325 ++++++++++++++++++
+ tools/testing/selftests/Makefile              |   1 +
+ tools/testing/selftests/drivers/.gitignore    |   1 +
+ .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
+ .../selftests/drivers/s390x/uvdevice/config   |   1 +
+ .../drivers/s390x/uvdevice/test_uvdevice.c    | 280 +++++++++++++++
+ 11 files changed, 711 insertions(+), 1 deletion(-)
+ create mode 100644 arch/s390/include/uapi/asm/uvdevice.h
+ create mode 100644 drivers/s390/char/uvdevice.c
+ create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
+ create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
+ create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
 
-In addition, when HVF is the acceleration method on aarch64, make sure
-we select the right processor when invoking qemu.
-
-Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
----
- arm/run   | 3 +++
- configure | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/arm/run b/arm/run
-index 2153bd3..0629b69 100755
---- a/arm/run
-+++ b/arm/run
-@@ -27,6 +27,9 @@ if [ "$ACCEL" = "kvm" ]; then
- 	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
- 		M+=',gic-version=host'
- 	fi
-+fi
-+
-+if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
- 	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
- 		processor="host"
- 		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-diff --git a/configure b/configure
-index 2d9c3e0..ff840c1 100755
---- a/configure
-+++ b/configure
-@@ -14,7 +14,7 @@ objcopy=objcopy
- objdump=objdump
- ar=ar
- addr2line=addr2line
--arch=$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')
-+arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
- host=$arch
- cross_prefix=
- endian=""
 -- 
-2.32.0 (Apple Git-132)
+2.25.1
 
