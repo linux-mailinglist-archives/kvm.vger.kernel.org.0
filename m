@@ -2,201 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2BA14B9852
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 06:33:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6245A4B9913
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 07:16:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234306AbiBQFcX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 00:32:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44360 "EHLO
+        id S235497AbiBQGQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 01:16:36 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234297AbiBQFcV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 00:32:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18D46A6516
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 21:32:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645075926;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ixaC+WveNvHaDkBhw3sVXdx9/WgsexXW9FNcptE03U=;
-        b=TG9h3pRAp1iLNw7rbW2i2S5prYavXzXoc98FHrAzr/KPVoXlTumNq8uTYzD/yFNqTTOR8W
-        1pI58GiFhSYZG+Zov4vmQipDs6nv3UDIy9nxvcg5pxCh6Xi+t6TOrcBer5XcG158UiL3DT
-        U8kbmu4Opy9QdMGUHjfN1LXsa8YTqck=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-JjrRhZbwPsumkp3bjsUBaQ-1; Thu, 17 Feb 2022 00:31:24 -0500
-X-MC-Unique: JjrRhZbwPsumkp3bjsUBaQ-1
-Received: by mail-oi1-f197.google.com with SMTP id ay31-20020a056808301f00b002d06e828c00so1905679oib.2
-        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 21:31:24 -0800 (PST)
+        with ESMTP id S235318AbiBQGQf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 01:16:35 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDAA2A2286
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 22:16:21 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id s10-20020a17090a948a00b001b96be201f6so2810447pjo.4
+        for <kvm@vger.kernel.org>; Wed, 16 Feb 2022 22:16:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=+ImC79Dcr6MPcSexLv46tRLEGOitgoCcctAfOPO5qjY=;
+        b=YNCjCeuT5YwOr8Vwll+nu+pLmG5IRCsOmwtIXVBSpZ9mO3kW7DRPbjJPbhz36fdUtf
+         Y+5Z2xT0WVGttuPyK/7l91ZtKqwGZar8SyzqEtQ1kYlfu6yDD1CA1q0W6WuMCHCbX+By
+         jFkNLehZQjKpcbJqc/Bbr4VeR55M+Q8TCVdKl3jAodvkAXAELlXZEA4U/5QOslMZQDI0
+         /x4Iq4ezjYggiFwXGZ4j0ZVduynMWRU+TnVpaqNXcXC81Vo+azZa4t6v23aNJBQpkmJr
+         EHNBQD6OWHFtMqqBfQgg+NJysxYuTnbJMOjqK8qCstomIvIxxiTsK9eWe8ya3vqYxkLE
+         Fpwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2ixaC+WveNvHaDkBhw3sVXdx9/WgsexXW9FNcptE03U=;
-        b=TlrHwN9Imq0KtY8VlKDfMr8RCu23+7UZN5QdkIh2LLHFk5we/mpqvJI6VEC3689X/t
-         75dP8b1Ar4x/O1i2Y2gbFA2DQuCG6xQeAbTkIpZDhNbf0SKnM494cVPfC89X4Qdzct9z
-         5fQ/RC6uXs0gxjsz7WY9BGS/0eJ1XeOOVh8s1D+/+aMwTT/SQPYgKTY4UN4JWR8FVUSJ
-         s4Ll4GZaKEQ4RPPNFwidnQBW9rVK1W7QOGZ/z0hTNfUC5TMZ5YFzvqr5v7N3SldvMyZI
-         6acCaIjy5cU3zlHbmJ3DNwqT+1Cc117iSCA5YdzFR1pKhlKAJ2wxX7I/jPohJgHaUKE9
-         ZSOg==
-X-Gm-Message-State: AOAM531uyhDgNL9lIdZwDQcV18nbwENaDqtTmw+QdNgunn/GstZ2f72+
-        pg3O9HnyecUnuN1c1mLsTYkC0fPshOV2ug9JREDAEYG5u2NIDdZ/zCSl+4BW0XzvjZDs6KFchAM
-        vCHWpTvE1HPhw
-X-Received: by 2002:a05:6870:a894:b0:d3:cc7:ac28 with SMTP id eb20-20020a056870a89400b000d30cc7ac28mr491728oab.207.1645075883501;
-        Wed, 16 Feb 2022 21:31:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwgOyeDMwJ516sad84JIJ6nVrFCyP8MKFMYWt+0bMrbpBDX1hyXK+FtkMWoj/raLhQWyulXow==
-X-Received: by 2002:a05:6870:a894:b0:d3:cc7:ac28 with SMTP id eb20-20020a056870a89400b000d30cc7ac28mr491718oab.207.1645075883290;
-        Wed, 16 Feb 2022 21:31:23 -0800 (PST)
-Received: from LeoBras.redhat.com ([2804:431:c7f1:c12c:38a3:24a6:f679:3afd])
-        by smtp.gmail.com with ESMTPSA id cm18sm8571688oab.7.2022.02.16.21.31.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 21:31:22 -0800 (PST)
-From:   Leonardo Bras <leobras@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        David Gilbert <dgilbert@redhat.com>,
-        Peter Xu <peterx@redhat.com>
-Cc:     Leonardo Bras <leobras@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 2/2] x86/kvm/fpu: Remove kvm_vcpu_arch.guest_supported_xcr0
-Date:   Thu, 17 Feb 2022 02:30:30 -0300
-Message-Id: <20220217053028.96432-3-leobras@redhat.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220217053028.96432-1-leobras@redhat.com>
-References: <20220217053028.96432-1-leobras@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=+ImC79Dcr6MPcSexLv46tRLEGOitgoCcctAfOPO5qjY=;
+        b=Uya5wK0wvLRdlG9bh+I83zp5cw5hsCEmnoHsMQGI0g78Xvj+sOx18qOKDiLhVkUP1h
+         YeW/Mm8eITZsYcFdXKmVvK8vrp3jDdSrsQrH6O1hu0eZHMmHe5Ia9SuuR0iTYAOSMOPA
+         L0CKT/0oP3Fc4xTSSq14LJ1L5xEP/Z5ux6UjHrEoCUFBPas5Sj93b5a7SWKlw0CkdvkV
+         4dgALHfeFKf9uuKR2vtSRhElS0uikUAAJkxQtMZY5Mh7FnbuF2ng9jW9NhSb2xmy0yCm
+         pyBs330l+v6KS2BcS/YxOm+/xXEFsTCXryQq2qtgWgcDoWQ9j9HVeJYc5HYm8c6ILz42
+         oGLw==
+X-Gm-Message-State: AOAM533y6Vxm31TVGF1vvXg5hEdi9DxmfKz8082cFpboPOaQURDf2HbE
+        nBQ5w+HX3+6uzz9oOnXcRGk2zQC6tca7
+X-Google-Smtp-Source: ABdhPJxklgUIr46F4p0ISbx+SjpyDWWTjEIrYfiou9Y+av2WQ/seEA4Ut6+gzzQTPT+ONtwGkBNgQGE/S22T
+X-Received: from vipinsh.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:36b0])
+ (user=vipinsh job=sendgmr) by 2002:a17:902:a585:b0:14d:58ef:65 with SMTP id
+ az5-20020a170902a58500b0014d58ef0065mr1504289plb.139.1645078580734; Wed, 16
+ Feb 2022 22:16:20 -0800 (PST)
+Date:   Thu, 17 Feb 2022 06:16:16 +0000
+Message-Id: <20220217061616.3303271-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [PATCH v3] KVM: Move VM's worker kthreads back to the original cgroup
+ before exiting.
+From:   Vipin Sharma <vipinsh@google.com>
+To:     pbonzini@redhat.com, seanjc@google.com
+Cc:     mkoutny@suse.com, tj@kernel.org, lizefan.x@bytedance.com,
+        hannes@cmpxchg.org, dmatlack@google.com, jiangshanlai@gmail.com,
+        kvm@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_vcpu_arch currently contains the guest supported features in both
-guest_supported_xcr0 and guest_fpu.fpstate->user_xfeatures field.
+VM worker kthreads can linger in the VM process's cgroup for sometime
+after KVM terminates the VM process.
 
-Currently both fields are set to the same value in
-kvm_vcpu_after_set_cpuid() and are not changed anywhere else after that.
+KVM terminates the worker kthreads by calling kthread_stop() which waits
+on the 'exited' completion, triggered by exit_mm(), via mm_release(), in
+do_exit() during the kthread's exit.  However, these kthreads are
+removed from the cgroup using the cgroup_exit() which happens after the
+exit_mm(). Therefore, a VM process can terminate in between the
+exit_mm() and cgroup_exit() calls, leaving only worker kthreads in the
+cgroup.
 
-Since it's not good to keep duplicated data, remove guest_supported_xcr0.
+Moving worker kthreads back to the original cgroup (kthreadd_task's
+cgroup) makes sure that the cgroup is empty as soon as the main VM
+process is terminated.
 
-To keep the code more readable, introduce kvm_guest_supported_xcr()
-and kvm_guest_supported_xfd() to replace the previous usages of
-guest_supported_xcr0.
-
-Signed-off-by: Leonardo Bras <leobras@redhat.com>
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/cpuid.c            |  5 +++--
- arch/x86/kvm/x86.c              | 20 +++++++++++++++-----
- 3 files changed, 18 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6dcccb304775..ec9830d2aabf 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -703,7 +703,6 @@ struct kvm_vcpu_arch {
- 	struct fpu_guest guest_fpu;
+v3:
+- Use 'current->real_parent' (kthreadd_task) in the
+  cgroup_attach_task_all() call.
+- Revert cgroup APIs changes in v2. Now, patch does not touch cgroup
+  APIs.
+- Update commit and comment message
+
+v2: https://lore.kernel.org/lkml/20211222225350.1912249-1-vipinsh@google.com/
+- Use kthreadd_task in the cgroup API to avoid build issue.
+
+v1: https://lore.kernel.org/lkml/20211214050708.4040200-1-vipinsh@google.com/
+
+ virt/kvm/kvm_main.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 83c57bcc6eb6..2c9dcfffb606 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5813,7 +5813,7 @@ static int kvm_vm_worker_thread(void *context)
+ 	struct kvm *kvm = init_context->kvm;
+ 	kvm_vm_thread_fn_t thread_fn = init_context->thread_fn;
+ 	uintptr_t data = init_context->data;
+-	int err;
++	int err, reattach_err;
  
- 	u64 xcr0;
--	u64 guest_supported_xcr0;
+ 	err = kthread_park(current);
+ 	/* kthread_park(current) is never supposed to return an error */
+@@ -5836,7 +5836,7 @@ static int kvm_vm_worker_thread(void *context)
+ 	init_context = NULL;
  
- 	struct kvm_pio_request pio;
- 	void *pio_data;
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 71125291c578..b8f8d268d058 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -282,6 +282,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	struct kvm_cpuid_entry2 *best;
-+	u64 guest_supported_xcr0;
+ 	if (err)
+-		return err;
++		goto out;
  
- 	best = kvm_find_cpuid_entry(vcpu, 1, 0);
- 	if (best && apic) {
-@@ -293,10 +294,10 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		kvm_apic_set_version(vcpu);
- 	}
+ 	/* Wait to be woken up by the spawner before proceeding. */
+ 	kthread_parkme();
+@@ -5844,6 +5844,23 @@ static int kvm_vm_worker_thread(void *context)
+ 	if (!kthread_should_stop())
+ 		err = thread_fn(kvm, data);
  
--	vcpu->arch.guest_supported_xcr0 =
-+	guest_supported_xcr0 =
- 		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
- 
--	vcpu->arch.guest_fpu.fpstate->user_xfeatures = vcpu->arch.guest_supported_xcr0;
-+	vcpu->arch.guest_fpu.fpstate->user_xfeatures = guest_supported_xcr0;
- 
- 	kvm_update_pv_runtime(vcpu);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 641044db415d..92177e2ff664 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -984,6 +984,18 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
++out:
++	/*
++	 * Move kthread back to its original cgroup to prevent it lingering in
++	 * the cgroup of the VM process, after the latter finishes its
++	 * execution.
++	 *
++	 * kthread_stop() waits on the 'exited' completion condition which is
++	 * set in exit_mm(), via mm_release(), in do_exit(). However, the
++	 * kthread is removed from the cgroup in the cgroup_exit() which is
++	 * called after the exit_mm(). This causes the kthread_stop() to return
++	 * before the kthread actually quits the cgroup.
++	 */
++	reattach_err = cgroup_attach_task_all(current->real_parent, current);
++	if (reattach_err) {
++		kvm_err("%s: cgroup_attach_task_all failed on reattach with err %d\n",
++			__func__, reattach_err);
++	}
+ 	return err;
  }
- EXPORT_SYMBOL_GPL(kvm_load_host_xsave_state);
  
-+static inline u64 kvm_guest_supported_xcr(struct kvm_vcpu *vcpu)
-+{
-+	u64 guest_supported_xcr0 = vcpu->arch.guest_fpu.fpstate->user_xfeatures;
-+
-+	return guest_supported_xcr0;
-+}
-+
-+static inline u64 kvm_guest_supported_xfd(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_guest_supported_xcr(vcpu) & XFEATURE_MASK_USER_DYNAMIC;
-+}
-+
- static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
- {
- 	u64 xcr0 = xcr;
-@@ -1003,7 +1015,7 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
- 	 * saving.  However, xcr0 bit 0 is always set, even if the
- 	 * emulated CPU does not support XSAVE (see kvm_vcpu_reset()).
- 	 */
--	valid_bits = vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FP;
-+	valid_bits = kvm_guest_supported_xcr(vcpu) | XFEATURE_MASK_FP;
- 	if (xcr0 & ~valid_bits)
- 		return 1;
- 
-@@ -3706,8 +3718,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
- 			return 1;
- 
--		if (data & ~(XFEATURE_MASK_USER_DYNAMIC &
--			     vcpu->arch.guest_supported_xcr0))
-+		if (data & ~(kvm_guest_supported_xfd(vcpu)))
- 			return 1;
- 
- 		fpu_update_guest_xfd(&vcpu->arch.guest_fpu, data);
-@@ -3717,8 +3728,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_XFD))
- 			return 1;
- 
--		if (data & ~(XFEATURE_MASK_USER_DYNAMIC &
--			     vcpu->arch.guest_supported_xcr0))
-+		if (data & ~(kvm_guest_supported_xfd(vcpu)))
- 			return 1;
- 
- 		vcpu->arch.guest_fpu.xfd_err = data;
+
+base-commit: db6e7adf8de9b3b99a9856acb73870cc3a70e3ca
 -- 
-2.35.1
+2.35.1.265.g69c8d7142f-goog
 
