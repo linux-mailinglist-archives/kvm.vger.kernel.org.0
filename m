@@ -2,117 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E83C4B9FE8
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 13:15:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 144CE4B9FFC
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 13:21:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240318AbiBQMOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 07:14:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59600 "EHLO
+        id S240353AbiBQMWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 07:22:03 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239609AbiBQMOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 07:14:45 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E2A40D21F7
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 04:14:30 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ACD50113E;
-        Thu, 17 Feb 2022 04:14:30 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD1BD3F66F;
-        Thu, 17 Feb 2022 04:14:28 -0800 (PST)
-Date:   Thu, 17 Feb 2022 12:14:47 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Thomas Huth <thuth@redhat.com>, Zixuan Wang <zxwang42@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        kvm list <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename
- --target-efi
-Message-ID: <Yg48KawN1+u+sL53@monolith.localdoman>
-References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
- <YgVKmjBnAjITQcm+@google.com>
- <YgVPPCTJG7UFRkhQ@monolith.localdoman>
- <CAEDJ5ZSR=rw_ALjBcLgeVz9H6TS67eWvZW2SvGTJV468WjgyKw@mail.gmail.com>
- <YgVpJDIfUVzVvFdx@google.com>
- <CAEDJ5ZRkuCbmPzZXz0x2XUXqjKoi+O+Uq_SNkNW_We2mSv4aRg@mail.gmail.com>
- <f326daff-8384-4666-fc5e-6b7b509f6fe8@redhat.com>
- <YgaMqwbWts3vQ6fD@google.com>
+        with ESMTP id S240347AbiBQMWB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 07:22:01 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2073.outbound.protection.outlook.com [40.107.92.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C619EBB95;
+        Thu, 17 Feb 2022 04:21:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iZbIWOlqwdS0/XmNaQHHU4JyzeN54vgkPxKqTSVnuJfvzGUkeffnqfPEUqb1NurYG2o2o0YT1mlRjjz/k7tiJ5MMMBFiG69lHoOrrnYvh36jrP5OooqQ0qOKT6EPHxHVk/YRuyKlxhgb44GHaPgq/vduOX+OjR2eThqznPHAZO5rxWum2UegWagJUHSOY5fiq38DxT2nAExVIYrAaG+3HrfFecWZBCbe86uYD5GxtpE66uzhMmaWkKl9ksHcQH4KikgZHjt+Sg9SXtItp6UYhIQoFs0h86Y0cbQuiqsVZVufFCQ1vg7FT+2DM9Z85/pjCgw8etKFvd/yXFafzSJ+Ng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jmm2OblzqgIcV0xjJONbBYsEprzhXANKD8088Wzjoec=;
+ b=VrowiRfOnr5ihfw4a8RUgdXX3CPB9wVwxL3vMCi/5n86euFRM7jzTVezotc+dIl7H5gxkQzrSlh/6NyxInQC2V76DatJb3Y1RfT5w4RTK5WN5O1GDgvXkSJy9KsL8bEdFVVAIiSuEyHCaRS46fL/i6r26m7Kbpnk76Zp41SMiPtDQyuMpc44ityZ9aOyN67o2HUKheKxk8JEBpTM1R325fpuUWTlygq0A2Y7ebgZhwMfYXL5qXmWl6z3z4ogB33k+w2NSp235vQZpi1c9M1fasAOH4+AMenO7AfcN2ruTyMWAaXRmGXabDEEtxKwZUUt31vr1+SmQ2il4GlF/TSxqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.236) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jmm2OblzqgIcV0xjJONbBYsEprzhXANKD8088Wzjoec=;
+ b=okeXyI/fXaHB2B4KyhM4jGZCOwFSIHhQ6pv4jFkGm4ZRW0YYIXR5OFGiWOy5QMA7aa9Fxgx7Q2Uh0f5Gshmg26x+iPcUljyF5s6+A52uaNZga1y98pYt1TGt6PgNbotKySd5AUwNIYlzNoyy5MrvF+imKIElon7sZl7tNRhYsbTkFpe9MinxBPHNRb1gBFGTkLSseb3lAQqUXrQUUbi8FgF2K/r/TXNZ1oNPuBmS9znY/LEEOXFm3cE4uIyxBH28YDE1/rEiO7xh+bZXsI0qrLe0mkPJ1aDNHZb2dJTMJlW6ggR+ynIQRbGARhAuCuOag/gR9gJIsRWxAnab8WCKTQ==
+Received: from DM5PR04CA0043.namprd04.prod.outlook.com (2603:10b6:3:12b::29)
+ by DM4PR12MB5915.namprd12.prod.outlook.com (2603:10b6:8:68::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.17; Thu, 17 Feb
+ 2022 12:21:46 +0000
+Received: from DM6NAM11FT045.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:12b:cafe::53) by DM5PR04CA0043.outlook.office365.com
+ (2603:10b6:3:12b::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.14 via Frontend
+ Transport; Thu, 17 Feb 2022 12:21:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.236; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (12.22.5.236) by
+ DM6NAM11FT045.mail.protection.outlook.com (10.13.173.123) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4995.15 via Frontend Transport; Thu, 17 Feb 2022 12:21:45 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by DRHQMAIL109.nvidia.com
+ (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 17 Feb
+ 2022 12:21:25 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.9; Thu, 17 Feb 2022
+ 04:21:24 -0800
+Received: from nvidia-Inspiron-15-7510.nvidia.com (10.127.8.9) by
+ mail.nvidia.com (10.129.68.8) with Microsoft SMTP Server id 15.2.986.9 via
+ Frontend Transport; Thu, 17 Feb 2022 04:21:21 -0800
+From:   Abhishek Sahu <abhsahu@nvidia.com>
+To:     <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        <linux-kernel@vger.kernel.org>, Abhishek Sahu <abhsahu@nvidia.com>
+Subject: [PATCH v3 0/2] vfio/pci: fixes related with power management
+Date:   Thu, 17 Feb 2022 17:51:05 +0530
+Message-ID: <20220217122107.22434-1-abhsahu@nvidia.com>
+X-Mailer: git-send-email 2.17.1
+X-NVConfidentiality: public
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YgaMqwbWts3vQ6fD@google.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 51326077-b708-4497-94c3-08d9f2101036
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5915:EE_
+X-Microsoft-Antispam-PRVS: <DM4PR12MB59158B603675DF2F66C6978CCC369@DM4PR12MB5915.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wNsaJMXpQOkuE2sAWV2lAoo80bGFUnN0zhSBXvV2oo7IM7tCNpQxWUNjWTLnlmJJMNM46j4IbRAVFjmwbx3I78KFvOCHGRFVvO+zEChJk0usNNnO8Wjz9D6LHBj+SR8XWVRFyeuFhFLh2hFNeYnS2KTTMIHIDlc+BoCRuoxwK3A515GwU1T5Ep0LjxwCKGmUljO2OfGdQyZiqLbtidy5OBp/I6f+poCuQT1OiEYwQ+ZCuH3l6pTbRzWPR90hxLmso7QZfX4GnkUcxHmqU+XQ+xj3QD1Nywasm2mkVhSGAhaQHWD//ZTe5wnZHEwQvQQYAOj1KfKE8M27BkAUGAOd3djN9S8JEh/lkkvenpuSe0EJx/VobJWHyhoIA1bBjdwfzGi2WIYOq7s+UWKQQ0Ess9Z7HnYWaI4aCO7ePlRy4bT2Z85bTD9yOctecbYjx++EWPGJ5Se4K4cqFQn5oyAptxRhaksRnt0O4j/JnuJn/C1RNpyQHgCc+lxHZP2ghtikFF0FjDx2FMEVBnAV/uLseFPIW5vaTwEipgPdbddfhA55FQaVzUr77jogQNB/KjBVdJp9zyDC/OR/DonufrIoiABVxzbfXSUgFKAPm7TIvT6arJm8yA/RM7fDfR896h1sCSmk36CKd+ZJ+uYDUmZsAtAJyuWExA4/+FXV2EETxq5zC4i9NA9ojCebaw5NrhTCkMFr0dS2kt9lzENQDbXc47+vjNztUvJLt5O31U1ZK0/Bpy0tGRavwqZd0B0GdBh+DUerS687uZ9MniAM1x+p37iUmLlxlOAJXquSSpYUHk0=
+X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(36840700001)(46966006)(36756003)(2906002)(7696005)(86362001)(356005)(8936002)(81166007)(54906003)(83380400001)(5660300002)(107886003)(6666004)(2616005)(40460700003)(110136005)(70586007)(336012)(426003)(1076003)(316002)(47076005)(70206006)(8676002)(966005)(508600001)(26005)(4326008)(82310400004)(186003)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 12:21:45.3640
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51326077-b708-4497-94c3-08d9f2101036
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT045.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5915
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+The commit 51ef3a004b1e ("vfio/pci: Restore device state on PM
+transition") added a wrapper function vfio_pci_probe_power_state().
+For the devices which do not have No_Soft_Reset bit set in its
+PMCSR config register, inside this function, the current PCI state
+will be saved locally in 'vfio_pci_core_device::pm_save' during
+D0->D3hot transition and same will be restored back during D3hot->D0
+transition. We have few IOCTLs and internal functions in vfio-pci
+driver which can be invoked when the device power state is non-D0.
+This patch series fixes issues around reset-related API's if reset
+is invoked in the D3hot state.
 
-On Fri, Feb 11, 2022 at 04:19:55PM +0000, Sean Christopherson wrote:
-> On Fri, Feb 11, 2022, Thomas Huth wrote:
-> > On 10/02/2022 20.48, Zixuan Wang wrote:
-> > > On Thu, Feb 10, 2022 at 11:36 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > On Thu, Feb 10, 2022, Zixuan Wang wrote:
-> > > > > On Thu, Feb 10, 2022 at 11:05 AM Alexandru Elisei
-> > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > > 
-> > > > > > Hi,
-> > > > > > 
-> > > > > > On Thu, Feb 10, 2022 at 05:25:46PM +0000, Sean Christopherson wrote:
-> > > > > > > On Thu, Feb 10, 2022, Alexandru Elisei wrote:
-> > > > > > > > I renamed --target-efi to --efi-payload in the last patch because I felt it
-> > > > > > > > looked rather confusing to do ./configure --target=qemu --target-efi when
-> > > > > > > > configuring the tests. If the rename is not acceptable, I can think of a
-> > > > > > > > few other options:
-> > > > > > > 
-> > > > > > > I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
-> > > > > > > seems like it would be sufficient.
-> > > > > > > 
-> > > > > > > > 1. Rename --target to --vmm. That was actually the original name for the
-> > > > > > > > option, but I changed it because I thought --target was more generic and
-> > > > > > > > that --target=efi would be the way going forward to compile kvm-unit-tests
-> > > > > > > > to run as an EFI payload. I realize now that separating the VMM from
-> > > > > > > > compiling kvm-unit-tests to run as an EFI payload is better, as there can
-> > > > > > > > be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
-> > > > > > > > a test runner, so I think the impact on users should be minimal.
-> > > > > > > 
-> > > > > > > Again irrespective of --target-efi, I think --target for the VMM is a potentially
-> > > > > > > confusing name.  Target Triplet[*] and --target have specific meaning for the
-> > > > > > > compiler, usurping that for something similar but slightly different is odd.
-> > > > > > 
-> > > > > > Wouldn't that mean that --target-efi is equally confusing? Do you have
-> > > > > > suggestions for other names?
-> > > > > 
-> > > > > How about --config-efi for configure, and CONFIG_EFI for source code?
-> > > > > I thought about this name when I was developing the initial patch, and
-> > > > > Varad also proposed similar names in his initial patch series [1]:
-> > > > > --efi and CONFIG_EFI.
-> > > > 
-> > > > I don't mind CONFIG_EFI for the source, that provides a nice hint that it's a
-> > > > configure option and is familiar for kernel developers.  But for the actually
-> > > > option, why require more typing?  I really don't see any benefit of --config-efi
-> > > > over --efi.
-> > > 
-> > > I agree, --efi looks better than --target-efi or --config-efi.
-> > 
-> > <bikeshedding>
-> > Or maybe --enable-efi ... since configure scripts normally take
-> > "--enable-..." or "--disable-..." parameters for stuff like this?
-> > </bikeshedding>
-> 
-> I don't hate it :-)  It'll also future-proof things if we ever make UEFI the
-> default for x86.
+* Changes in v3
 
-Thank you all for the feedback.
+- Split the changes into 2 patches.
+- Updated comments and commit message according to updated changes.
+- Added code to wakeup devices for vfio_pci_dev_set_try_reset().
 
-I'll respin the series and rename --target-efi to --enable-efi.
+* Changes in v2
 
-Thanks,
-Alex
+- Add the Fixes tag and sent this patch independently.
+- Invoke vfio_pci_set_power_state() before invoking reset related API's.
+- Removed saving of power state locally.
+- Removed warning before 'kfree(vdev->pm_save)'.
+- Updated comments and commit message according to updated changes.
+
+* v1 of this patch was sent in
+https://lore.kernel.org/lkml/20220124181726.19174-4-abhsahu@nvidia.com/
+
+Abhishek Sahu (2):
+  vfio/pci: fix memory leak during D3hot to D0 transition
+  vfio/pci: wake-up devices around reset functions
+
+ drivers/vfio/pci/vfio_pci_core.c | 61 ++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
+
+-- 
+2.17.1
+
