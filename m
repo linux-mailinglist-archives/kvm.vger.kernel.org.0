@@ -2,129 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76C1F4BA1D5
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 14:47:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9610E4BA2A7
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 15:14:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241446AbiBQNru (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 08:47:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36270 "EHLO
+        id S241462AbiBQOM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 09:12:57 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241431AbiBQNrt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 08:47:49 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE2AC7C33;
-        Thu, 17 Feb 2022 05:47:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645105655; x=1676641655;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=00jU+EOCM+jaTdG7EhL3AgRMsoum/qW8+F9FVekDncc=;
-  b=Y+GDxmtjn9iv1O3+8XGGFByZ3j5rF8sny/cDr1GM85e5pif9DNtlsJ4H
-   XYQBG95z6aMsKqtdheJrNOIZvhJ/udJigVA0anXjKXfWuN0HJZ1UOjV3E
-   8UcXVe7GRtTf4CIm20F4TbCtvnOgo8+jWzOkUvpdvd5ObrPrklNMfi34I
-   l3wrLee+IKrRxiAmcxUOAkOaVI7R20yN/MuxJkTipep9Uoec2OI2s/1Rf
-   ILYbYqNn+yGCh+SBEnxnKgvs7JmiuJ1mzynWVdb/xhn8cnE3ZsDq6Kusg
-   36VF3fOrmjvYqSLIdlfC3rCemBp5ktgcyypNwF0KoQWlNVuJeGfTb1nVN
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10260"; a="251073528"
-X-IronPort-AV: E=Sophos;i="5.88,375,1635231600"; 
-   d="scan'208";a="251073528"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 05:47:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,375,1635231600"; 
-   d="scan'208";a="503514098"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga002.jf.intel.com with ESMTP; 17 Feb 2022 05:47:27 -0800
-Date:   Thu, 17 Feb 2022 21:47:05 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Mike Rapoport <rppt@kernel.org>
-Cc:     linux-api@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        with ESMTP id S240064AbiBQOMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 09:12:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64F2D2905BA
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:12:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645107159;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/cZXGNior+ZsJ3e+PrQnLgahobz9IXWhoV+xYGtogyM=;
+        b=QTfQNWcIM8GgnTr1SmR1Cp8igBefLXlJZU6C4hbufpj2QqNWIqFvbFMqsH2jS2AUa4yJna
+        zElbv62TxgPFlWR0MOPUUTO63VxRMRrBZMKrd684Gx73wJH+NjPC2jLiGY0OCknozXjwEk
+        KuSrRsVBStRlaXE9gwc5qO4WJiOjTIA=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-333-OIB9AQ86O4GRo0GTNF_RVw-1; Thu, 17 Feb 2022 09:12:35 -0500
+X-MC-Unique: OIB9AQ86O4GRo0GTNF_RVw-1
+Received: by mail-qv1-f72.google.com with SMTP id g2-20020a0562141cc200b004123b0abe18so5427791qvd.2
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 06:12:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/cZXGNior+ZsJ3e+PrQnLgahobz9IXWhoV+xYGtogyM=;
+        b=h2S4Ak0n79oiO8UCeq307j0R9xwLnLHx62XZVOgyd+NONoyUm5rkbb3xRKQV61sQAA
+         6/4cUfCtumE0AeT+ZSRM0QrygCZyenQmyhg4nPsg1pmoBDgKwi/HfJxKj6s3BGiuR5xD
+         NVwYNHeB5Czg8SeRCrTiT9lcBNy/KOviWBJ9ZknPd6sRJYqKArDvpWpUb1YasP0OQq+L
+         vTpqD4ePfYb4Gphqe1YwRIaxrrjBhsdabTZ+doF0ANi1NALwwuMKCuzrwdVn+riSgjTI
+         aXCSTABFj35jSqCMdQZzxRe7jzQ/+Hk9wLhUhdR3pjPRN2ucNbEPjYUOPIv7LEuj3c1F
+         AaFw==
+X-Gm-Message-State: AOAM531mYI5rZvg6mbFoyrMJ3136PySGHXC+rjBHPYk4qCKBSLNiNIBg
+        QODvA3Yv5KemT0vfSbu5X5p8esukRrdsgB4jsXVAHhOEZuv26UxXjI6GBJQMh6dhFRydbUqTOE4
+        1NJUNP2a5Myq+
+X-Received: by 2002:ae9:f80f:0:b0:60d:dca9:d021 with SMTP id x15-20020ae9f80f000000b0060ddca9d021mr1278465qkh.53.1645107155359;
+        Thu, 17 Feb 2022 06:12:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxQ28xbd3gosVH54yFSb3YNcBcISrsFM0+HMmhcisfzw8nknVsLJomqhc3vG1UlAdRabcvprw==
+X-Received: by 2002:ae9:f80f:0:b0:60d:dca9:d021 with SMTP id x15-20020ae9f80f000000b0060ddca9d021mr1278449qkh.53.1645107155086;
+        Thu, 17 Feb 2022 06:12:35 -0800 (PST)
+Received: from sgarzare-redhat (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
+        by smtp.gmail.com with ESMTPSA id h21sm1706611qtm.23.2022.02.17.06.12.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Feb 2022 06:12:34 -0800 (PST)
+Date:   Thu, 17 Feb 2022 15:12:27 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com
-Subject: Re: [PATCH v4 00/12] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220217134705.GB33836@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220118132121.31388-1-chao.p.peng@linux.intel.com>
- <YgK3buC2xes9/lLj@kernel.org>
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        John Snow <jsnow@redhat.com>, Sergio Lopez <slp@redhat.com>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Alex Agache <aagch@amazon.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+Message-ID: <20220217141227.sk7hfng7raq6xvuh@sgarzare-redhat>
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+ <CACGkMEvtENvpubmZY3UKptD-T=c9+JJV1kRm-ZPhP08xOJv2fQ@mail.gmail.com>
+ <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <YgK3buC2xes9/lLj@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 08, 2022 at 08:33:18PM +0200, Mike Rapoport wrote:
-> (addded linux-api)
-> 
-> On Tue, Jan 18, 2022 at 09:21:09PM +0800, Chao Peng wrote:
-> > This is the v4 of this series which try to implement the fd-based KVM
-> > guest private memory. The patches are based on latest kvm/queue branch
-> > commit:
-> > 
-> >   fea31d169094 KVM: x86/pmu: Fix available_event_types check for
-> >                REF_CPU_CYCLES event
-> > 
-> > Introduction
-> > ------------
-> > In general this patch series introduce fd-based memslot which provides
-> > guest memory through memory file descriptor fd[offset,size] instead of
-> > hva/size. The fd can be created from a supported memory filesystem
-> > like tmpfs/hugetlbfs etc. which we refer as memory backing store. KVM
-> > and the the memory backing store exchange callbacks when such memslot
-> > gets created. At runtime KVM will call into callbacks provided by the
-> > backing store to get the pfn with the fd+offset. Memory backing store
-> > will also call into KVM callbacks when userspace fallocate/punch hole
-> > on the fd to notify KVM to map/unmap secondary MMU page tables.
-> > 
-> > Comparing to existing hva-based memslot, this new type of memslot allows
-> > guest memory unmapped from host userspace like QEMU and even the kernel
-> > itself, therefore reduce attack surface and prevent bugs.
-> > 
-> > Based on this fd-based memslot, we can build guest private memory that
-> > is going to be used in confidential computing environments such as Intel
-> > TDX and AMD SEV. When supported, the memory backing store can provide
-> > more enforcement on the fd and KVM can use a single memslot to hold both
-> > the private and shared part of the guest memory. 
-> > 
-> > mm extension
-> > ---------------------
-> > Introduces new F_SEAL_INACCESSIBLE for shmem and new MFD_INACCESSIBLE
-> > flag for memfd_create(), the file created with these flags cannot read(),
-> > write() or mmap() etc via normal MMU operations. The file content can
-> > only be used with the newly introduced memfile_notifier extension.
-> 
-> It would be great to see man page draft for new ABI flags
+On Mon, Feb 14, 2022 at 02:01:52PM +0000, Stefan Hajnoczi wrote:
+>On Mon, 14 Feb 2022 at 07:11, Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On Fri, Jan 28, 2022 at 11:47 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> >
+>> > Dear QEMU, KVM, and rust-vmm communities,
+>> > QEMU will apply for Google Summer of Code 2022
+>> > (https://summerofcode.withgoogle.com/) and has been accepted into
+>> > Outreachy May-August 2022 (https://www.outreachy.org/). You can now
+>> > submit internship project ideas for QEMU, KVM, and rust-vmm!
+>> >
+>> > If you have experience contributing to QEMU, KVM, or rust-vmm you can
+>> > be a mentor. It's a great way to give back and you get to work with
+>> > people who are just starting out in open source.
+>> >
+>> > Please reply to this email by February 21st with your project ideas.
+>> >
+>> > Good project ideas are suitable for remote work by a competent
+>> > programmer who is not yet familiar with the codebase. In
+>> > addition, they are:
+>> > - Well-defined - the scope is clear
+>> > - Self-contained - there are few dependencies
+>> > - Uncontroversial - they are acceptable to the community
+>> > - Incremental - they produce deliverables along the way
+>> >
+>> > Feel free to post ideas even if you are unable to mentor the project.
+>> > It doesn't hurt to share the idea!
+>>
+>> Implementing the VIRTIO_F_IN_ORDER feature for both Qemu and kernel
+>> (vhost/virtio drivers) would be an interesting idea.
+>>
+>> It satisfies all the points above since it's supported by virtio spec.
+>>
+>> (Unfortunately, I won't have time in the mentoring)
+>
+>Thanks for this idea. As a stretch goal we could add implementing the
+>packed virtqueue layout in Linux vhost, QEMU's libvhost-user, and/or
+>QEMU's virtio qtest code.
+>
+>Stefano: Thank you for volunteering to mentor the project. Please
+>write a project description (see template below) and I will add this
+>idea:
+>
 
-Yes I can provide the man page.
+I wrote a description of the project below. Let me know if there is 
+anything to change.
 
 Thanks,
-Chao
+Stefano
+
+
+
+=== VIRTIO_F_IN_ORDER support for virtio devices ===
+
+'''Summary:''' Implement VIRTIO_F_IN_ORDER feature for QEMU and Linux
+(vhost/virtio drivers)
+
+The VIRTIO spec defines a feature bit (VIRTIO_F_IN_ORDER) that devices
+and drivers can negotiate when they are able to use descriptors in the
+same order in which they have been made available.
+
+This feature could allow to simplify the implementation and develop
+optimizations to increase performance. For example, when
+VIRTIO_F_IN_ORDER is negotiated, it may be easier to create batch of
+buffers and reduce the amount of notification needed between devices
+and drivers.
+
+Currently the devices and drivers available on Linux and QEMU do not
+support this feature. An implementation is available in DPDK for the
+virtio-net driver.
+
+The project could start with implementation for a single device/driver
+in QEMU and Linux, then generalize it into the virtio core for split
+and packed virtqueue layouts.
+
+If time allows we could develop the support for packed virtqueue layout
+in Linux vhost, QEMU's libvhost-user, and/or QEMU's virtio qtest code.
+
+'''Links:'''
+* [https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html VIRTIO spec 1.1]
+** [https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-470009 "In-order use of descriptors" section for split virtqueues]
+* [https://github.com/oasis-tcs/virtio-spec Source code for the VIRTIO spec]
+* [https://mails.dpdk.org/archives/dev/2018-July/106069.html Patches that introduced VIRTIO_F_IN_ORDER in DPDK]
+* [https://lists.oasis-open.org/archives/virtio/201803/msg00048.html Patch that introduced VIRTIO_F_IN_ORDER in VIRTIO spec]
+* [https://patchew.org/QEMU/1533833677-27512-1-git-send-email-i.maximets@samsung.com/ Incomplete implementation proposed for QEMU]
+
+'''Details:'''
+* Skill level: intermediate
+* Language: C
+* Mentor: Stefano Garzarella <sgarzare@redhat.com>
+** IRC/Matrix nick: sgarzare (OFTC/matrix.org)
+* Suggested by: Jason Wang <jasowang@redhat.com>
+
