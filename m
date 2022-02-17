@@ -2,104 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A58B4BA754
-	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:40:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD5E4BA777
+	for <lists+kvm@lfdr.de>; Thu, 17 Feb 2022 18:50:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242731AbiBQRjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 12:39:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39022 "EHLO
+        id S242905AbiBQRuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 12:50:02 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236986AbiBQRjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 12:39:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8BD06584
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:39:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645119557;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LwAXZjwbccWIhWsV1uTmYFUWMD/hhH8A5AMszxACjGY=;
-        b=OZz2OCVbSte7tVTZSnsJQS+5GfGpyJiFWLaXi5xJCtlCrI+QmgsCpx6acTIH7qOgiuSklx
-        zyVVTI9EzrbireZHJuUB3LHJxuVw5X7bKqVufDYaBAG+wXy5iyv9GOpz42F3dzojNCeTTx
-        /TzOoWKlby8NqxuV9aUaCXQAat7fb7A=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-34-Yci31mHCMEmgBo5Jw6C7xQ-1; Thu, 17 Feb 2022 12:39:15 -0500
-X-MC-Unique: Yci31mHCMEmgBo5Jw6C7xQ-1
-Received: by mail-ed1-f72.google.com with SMTP id b26-20020a056402139a00b004094fddbbdfso3975146edv.12
-        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:39:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+        with ESMTP id S229945AbiBQRuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 12:50:00 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC79291FB8
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:49:45 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id qx21so9006894ejb.13
+        for <kvm@vger.kernel.org>; Thu, 17 Feb 2022 09:49:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=LwAXZjwbccWIhWsV1uTmYFUWMD/hhH8A5AMszxACjGY=;
-        b=jmN1ACn9Nm0lEYDZjx+7QlPBAugH8uX1+a1k+rNASCAfJ7LRo5o1FkCVMxGhS5x1IK
-         X1x25DO/RdW1xq6B776NTDyLlJQvI78vnQgAtEA/gfR61yJtFC4PZMhhp3qud2ta4jq2
-         bZpT4ZfWPzF7tIlBSsSO+eDRIw9pkQHXfMHznxdTD4r/QQperHxhXsWTa5oSX13z0lHr
-         UuS8Pa4du/WSRy6075d7h67tItTshCcP98a0kUpkX86ro2xaSxeECJgwTub7KobkZwV/
-         HlO3tntV0U14O/VzT8O7m1+7ALXQRsHIjCPUgKFj+f5IJ9dpO2fjxX1DDrfXWngJbvn3
-         bWPw==
-X-Gm-Message-State: AOAM5311wf3j2oTCbK+VBoK1j0YgqU4Zw+agk5T38XCvzwn9Dv2HMong
-        7nTAhydVSmzcPXr4X6VJ2/Z44L8Un6rPuFYRLIEELIkdwLlNJuUXuG2ttf5sgKuokbwRITtV9W3
-        UeiQ7zp7rNyQe
-X-Received: by 2002:a05:6402:4311:b0:408:71a7:13aa with SMTP id m17-20020a056402431100b0040871a713aamr3756813edc.54.1645119554467;
-        Thu, 17 Feb 2022 09:39:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy9w+kmHeZbG1Fh98dvBnKddnsjDg1zQp/97Jljcnw6E+HYDtdeVtbTk1VuyJNGudOo4R5V7w==
-X-Received: by 2002:a05:6402:4311:b0:408:71a7:13aa with SMTP id m17-20020a056402431100b0040871a713aamr3756794edc.54.1645119554270;
-        Thu, 17 Feb 2022 09:39:14 -0800 (PST)
+        bh=U77EXb6P2PtDodk5/5hyfXkd24Ya40Da3QojNfYunrw=;
+        b=YGzMBRKrNxMZWXwKhwPndObfL6uz2mVs+GS+AmhLTReAHVJThRycO3+J2ymoCV3ziw
+         weL2Xu0OviFQdsgYnBzk7IiTB3wGXYiJpr3r6xFzJzI5P34RM1MtWCtIgg4SLT3AtfCs
+         1hP8cEHnXFLItmw2eYJPQo2j9EfRttmrctuMf5rS/3nbOLNDEOXRPNoEjKA84VVtqXLJ
+         n5A7taHrhhifWbKv2hDc66tBc3DLz0OG+RFEWY4W4HxgS7JVHUWiwQGq5gTb52w4n1oL
+         EpRZCjGW50A/tSpxEof3CRgw99fhBzIWLvuDDVYxKVfheVsGbOTH1zu8IVwLE4U4JLlb
+         y14Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=U77EXb6P2PtDodk5/5hyfXkd24Ya40Da3QojNfYunrw=;
+        b=HW24Xy0iMkFN71XroCI6E6JixO8NX7gl+FQBfAo8OIsqvE5cdd3YoNBYhThmzZbsPr
+         vFUHywP14tE1fBuASJq5Y3L7WxnDfQez3tSLFPy/Y1ZIbKKZXHmyAL+jN02B5lv5EHF0
+         bPUY/nQ1Ar/V37fBoEC662Bd1G0LjwRpRGbotzUxHk7MSGQDG30Df423i8XAkspCKCAm
+         gd+f3v1tDW3zUG5TURDPPO6qUUrfnly+32bPjMy4aeBLSdTaiQq0CQiR30Cl6sWFcZ7r
+         K8mANaUVgdXawdHIuIwvQThpJ4doiKrkonkbjULKIPxD70hmy3Cr7YBkXc4YOW7+sUmq
+         mREw==
+X-Gm-Message-State: AOAM532/vOvPpsUQmM+EtkAqe7kPMm6n+XdEGPg604A1AcuXLwBBbveW
+        bZ9J+7TNK2Xf3t+ntWqJ6XM=
+X-Google-Smtp-Source: ABdhPJyzry0GzvmLnbxW8zBbfXHv2gdbIhYSWS/devZZZeKhhu+4F7eTOSTM7IGINwIE0Dp6TIkvVw==
+X-Received: by 2002:a17:906:1e13:b0:6ce:e50c:2a9c with SMTP id g19-20020a1709061e1300b006cee50c2a9cmr3198839ejj.546.1645120184451;
+        Thu, 17 Feb 2022 09:49:44 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id r5sm1378089ejy.51.2022.02.17.09.39.13
+        by smtp.googlemail.com with ESMTPSA id m11sm3754607edc.110.2022.02.17.09.49.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 09:39:13 -0800 (PST)
-Message-ID: <6a177da7-254d-a4a2-8dc3-c7b36d8e0622@redhat.com>
-Date:   Thu, 17 Feb 2022 18:39:11 +0100
+        Thu, 17 Feb 2022 09:49:44 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <70c04ba7-d617-580d-deaa-97018192e8a6@redhat.com>
+Date:   Thu, 17 Feb 2022 18:49:38 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH v2] kvm: x86: Disable KVM_HC_CLOCK_PAIRING if tsc is in
- always catchup mode
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
 Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Anton Romanov <romanton@google.com>, mtosatti@redhat.com,
-        kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-References: <20220215200116.4022789-1-romanton@google.com>
- <87zgmqq4ox.fsf@redhat.com> <Yg5sl9aWzVJKAMKc@google.com>
- <87pmnlpj8u.fsf@redhat.com> <de6a1b73-c623-4776-2f14-b00917b7d22a@redhat.com>
- <87mtippg5e.fsf@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Sergio Lopez <slp@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        John Snow <jsnow@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Alex Agache <aagch@amazon.com>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Stefano Garzarella <sgarzare@redhat.com>
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+ <CACGkMEvtENvpubmZY3UKptD-T=c9+JJV1kRm-ZPhP08xOJv2fQ@mail.gmail.com>
+ <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87mtippg5e.fsf@redhat.com>
+In-Reply-To: <CAJSP0QX6JgCG7UdqaY=G8rc64ZqE912UzM7pQkSMBfzGywHaHg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/22 18:16, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 2/17/22 17:09, Vitaly Kuznetsov wrote:
-> ...
->>> (but I still mildly dislike using 'EOPNOTSUPP' for a temporary condition
->>> on the host).
->>
->> It's not temporary, always-catchup is set on KVM_SET_TSC_KHZ and never
->> goes away.
-> 
-> Even if the guest is migrated (back) to the host which supports TSC
-> scaling?
+On 2/14/22 15:01, Stefan Hajnoczi wrote:
+> Thanks for this idea. As a stretch goal we could add implementing the
+> packed virtqueue layout in Linux vhost, QEMU's libvhost-user, and/or
+> QEMU's virtio qtest code.
 
-Ah right, in that case no.  But this hypercall does not have a CPUID 
-bit, so the supported status can change on migration anyway.
+Why not have a separate project for packed virtqueue layout?
 
 Paolo
-
