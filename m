@@ -2,215 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EC3C4BBE60
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 18:27:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CAE84BBE6A
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 18:29:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238584AbiBRR1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 12:27:42 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50308 "EHLO
+        id S238563AbiBRR2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 12:28:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238607AbiBRRZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 12:25:45 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D7232B5BB7;
-        Fri, 18 Feb 2022 09:25:28 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21IGmNxr011958;
-        Fri, 18 Feb 2022 17:25:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BgJF4+iBfRUdTv+ZkZ/QvT1Df8l0FdeC+4KjBvugA/Y=;
- b=sdyYdin9aZ8m/rOPZ9jB7L4C6Oqk0aR2cYxOvxhMs2WSp8Nlyf9xv8quel/RJmC2vCfF
- th7wVk45vIPuIos1IHvCRKAtdysbrzf/RAIa6Plam6mNOuWOoNbFOSF10N2zSkkD6Z+h
- 8bx81LQ2sXZCU0aJU7Q21pJzfd9krHqFKQS2W16qrrBQ96m7CaD8jRIkPgn3HDjKxZPF
- 5el1b35ZV5UY1oClH8WJXOc4pt9tLj2hVWu1U8LSS2GOKF1MDPtNm7F5qJ4bSsrKr1/4
- Uh4NYXa4FofEba5lbHOM0mval2CLe4d5VtaSWkcMCcjltN8XrUAjQpLEocKX90avaWXN RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eafa4rxma-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 17:25:27 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21IGrTf1040071;
-        Fri, 18 Feb 2022 17:25:27 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eafa4rxkw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 17:25:27 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21IHERBG015590;
-        Fri, 18 Feb 2022 17:25:25 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3e64hagx1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 17:25:25 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21IHPHx837683630
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Feb 2022 17:25:18 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D657DA4053;
-        Fri, 18 Feb 2022 17:25:17 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F4AFA4055;
-        Fri, 18 Feb 2022 17:25:17 +0000 (GMT)
-Received: from [9.171.47.189] (unknown [9.171.47.189])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Feb 2022 17:25:17 +0000 (GMT)
-Message-ID: <aecc2b93-3e07-be78-81a2-594d2bc6b64a@linux.ibm.com>
-Date:   Fri, 18 Feb 2022 18:27:31 +0100
+        with ESMTP id S235558AbiBRR2M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 12:28:12 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644D82AF939
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 09:27:55 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id n19-20020a17090ade9300b001b9892a7bf9so12934242pjv.5
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 09:27:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/t3SG5e2UzbrVHasx9SNleS+3lFpsgqmvZDXnUvzgQo=;
+        b=Q8s/VU7jz2rbgZI1SOmrSjXqOrQVsYAw/xwu/uePGl2AhiYMXNdl/C+OmRWVUYPGtz
+         rMp18KffJoqK0s8KXS3xCoaIv/Qq3Wmi8aJ7rKTwSWEVP4rTbO24fr3wDl7Q7n+xvYSD
+         N8cEPLmd253gm4qBU/9LVsToAvfXpASjxU9NXbzae+P13yqAMQKhKVSulGSqKk3gSp/P
+         B2XXPsGI9+XpsTebbZ6p7fSuQAbipxQPvbPgl7IsDWW8ySgTNpAH/jJCQ7HBQQ+bB6Zz
+         D89TXPjjXbVwgKlhxwxIWii4+Qbg81feT23aG1Ub6F+2XjrmyIoZxjLrBwXt86hH9eCL
+         CuUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/t3SG5e2UzbrVHasx9SNleS+3lFpsgqmvZDXnUvzgQo=;
+        b=Hd4fOHRmIE4lTD0gfWWvX4kdLdpz2TRHh6AJd5SKM4EB4VM8BD6awj20ypPIGB631h
+         oLCu0dxREMzblvw1Qjl6iPEMVRo3aMU+MctDeYuWcDdy5GzuBWqtEr6SBY8t3vIwibUE
+         v/Bhr2mmyB0TArCg6yDEGDUaFXoNORxWaoa0oZ8NNoPxwfXWPDsCTQlrhew18hdUqg7g
+         H8DM6mBUt3DjDT2UyB9HrywMU5wDc451LVcrz/Re/arZ2By4tVaPpVejmd52cW+KDu0w
+         wurotCqkC5KWeIMoCtCHiafkrNaYnjCpYj+EZTg9svbsjTGxRXtTBAXWs7/tIDHy8xiR
+         +FOg==
+X-Gm-Message-State: AOAM533dGNn4A8AHHRlK/Oyta4bSrZiV86Bz2daQzvPfe2tWWrj1ehnm
+        ukicrx4/V7t9iRriWlbNwLCbzaoHzND9Sw==
+X-Google-Smtp-Source: ABdhPJyVZlQUClYR9tuRl+TP+12xfhaorPEjMMrKolb4M8RD99xCw6DgyJn/90y0JYAaxnidUOF2gQ==
+X-Received: by 2002:a17:90a:d58a:b0:1b9:fe1e:403c with SMTP id v10-20020a17090ad58a00b001b9fe1e403cmr9349995pju.124.1645205274670;
+        Fri, 18 Feb 2022 09:27:54 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s24sm11598555pgq.51.2022.02.18.09.27.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Feb 2022 09:27:53 -0800 (PST)
+Date:   Fri, 18 Feb 2022 17:27:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 06/18] KVM: x86/mmu: do not consult levels when
+ freeing roots
+Message-ID: <Yg/XFj//AH48rJL3@google.com>
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+ <20220217210340.312449-7-pbonzini@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v7 1/1] s390x: KVM: guest support for topology function
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com
-References: <20220217095923.114489-1-pmorel@linux.ibm.com>
- <20220217095923.114489-2-pmorel@linux.ibm.com>
- <f0bf737abf480d6d16af6e5335bb195061f3d076.camel@linux.ibm.com>
- <97af6268-ff7a-cfb6-5ea4-217b5162cfe7@linux.ibm.com>
- <b9828696-f5d4-dd72-9b0e-a27b1480b799@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b9828696-f5d4-dd72-9b0e-a27b1480b799@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CAR3S1WKxESgA-1ZYFZnNLQCkDaN0mTc
-X-Proofpoint-GUID: PzHFCpBiNEmoOHiwfismNQcd8iD5lvdO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-18_07,2022-02-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- phishscore=0 priorityscore=1501 mlxlogscore=999 malwarescore=0
- suspectscore=0 clxscore=1015 spamscore=0 adultscore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202180109
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220217210340.312449-7-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Feb 17, 2022, Paolo Bonzini wrote:
+> Right now, PGD caching requires a complicated dance of first computing
+> the MMU role and passing it to __kvm_mmu_new_pgd(), and then separately calling
 
+Wrap at ~75 chars.  I'm starting to wonder if you role 5x d20 when deciding what
+line number you wrap at :-)
 
-On 2/18/22 15:28, Janosch Frank wrote:
-> On 2/18/22 14:13, Pierre Morel wrote:
->>
->>
->> On 2/17/22 18:17, Nico Boehr wrote:
->>> On Thu, 2022-02-17 at 10:59 +0100, Pierre Morel wrote:
->>> [...]
->>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>>> index 2296b1ff1e02..af7ea8488fa2 100644
->>>> --- a/arch/s390/kvm/kvm-s390.c
->>>> +++ b/arch/s390/kvm/kvm-s390.c
->>> [...]
+> kvm_init_mmu().
 > 
-> Why is there no interface to clear the SCA_UTILITY_MTCR on a subsystem 
-> reset?
+> Part of this is due to kvm_mmu_free_roots using mmu->root_level and
+> mmu->shadow_root_level to distinguish whether the page table uses a single
+> root or 4 PAE roots.  Because kvm_init_mmu() can overwrite mmu->root_level,
+> kvm_mmu_free_roots() must be called before kvm_init_mmu().
+> 
+> However, even after kvm_init_mmu() there is a way to detect whether the
+> page table may hold PAE roots, as root.hpa isn't backed by a shadow when
+> it points at PAE roots.  Using this method results in simpler code, and
+> is one less obstacle in moving all calls to __kvm_mmu_new_pgd() after the
+> MMU has been initialized.
 
-Right, I had one in my first version based on interception but I forgot 
-to implement an equivalent for KVM as I modified the implementation for 
-interpretation.
-I will add this.
+I think it's worth adding a blurb about 5-level nNPT.  Something like
 
+  Note, this is technically wrong when KVM is using shadowing 4-level NPT
+  in L1 with 5-level NPT in L0, as the PDPTEs are not used in that case
+  and mmu->root.hpa will not be backed by a shadow page.  But the PDPTEs
+  will be '0' so processing them does no harm, not too mention that that
+  particular nNPT case is completely broken in KVM and this code will
+  need to be reworked to correctly handle 5=>4-level nNPT no matter what.
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a478667d7561..e1578f71feae 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3240,12 +3240,15 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  	struct kvm *kvm = vcpu->kvm;
+>  	int i;
+>  	LIST_HEAD(invalid_list);
+> -	bool free_active_root = roots_to_free & KVM_MMU_ROOT_CURRENT;
+> +	bool free_active_root;
+>  
+>  	BUILD_BUG_ON(KVM_MMU_NUM_PREV_ROOTS >= BITS_PER_LONG);
+>  
+>  	/* Before acquiring the MMU lock, see if we need to do any real work. */
+> -	if (!(free_active_root && VALID_PAGE(mmu->root.hpa))) {
+> +	free_active_root = (roots_to_free & KVM_MMU_ROOT_CURRENT)
+> +		&& VALID_PAGE(mmu->root.hpa);
+
+Pretty please, put the && on the first line and align the indentation.
+
+	free_active_root = (roots_to_free & KVM_MMU_ROOT_CURRENT) &&
+			   VALID_PAGE(mmu->root.hpa);
+
+With that,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+> +
+> +	if (!free_active_root) {
+>  		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+>  			if ((roots_to_free & KVM_MMU_ROOT_PREVIOUS(i)) &&
+>  			    VALID_PAGE(mmu->prev_roots[i].hpa))
+> @@ -3263,8 +3266,7 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  					   &invalid_list);
+>  
+>  	if (free_active_root) {
+> -		if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
+> -		    (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
+> +		if (to_shadow_page(mmu->root.hpa)) {
+>  			mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
+>  		} else if (mmu->pae_root) {
+>  			for (i = 0; i < 4; ++i) {
+> -- 
+> 2.31.1
 > 
 > 
->>>> -void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>>> +/**
->>>> + * kvm_s390_vcpu_set_mtcr
->>>> + * @vcp: the virtual CPU
->>>> + *
->>>> + * Is only relevant if the topology facility is present.
->>>> + *
->>>> + * Updates the Multiprocessor Topology-Change-Report to signal
->>>> + * the guest with a topology change.
->>>> + */
->>>> +static void kvm_s390_vcpu_set_mtcr(struct kvm_vcpu *vcpu)
->>>>    {
->>>> +       struct esca_block *esca = vcpu->kvm->arch.sca;
->>>
->>> utility is at the same offset for the bsca and the esca, still
->>> wondering whether it is a good idea to assume esca here...
->>
->> We can take bsca to be coherent with the include file where we define
->> ESCA_UTILITY_MTCR inside the bsca.
->> And we can rename the define to SCA_UTILITY_MTCR as it is common for
->> both BSCA and ESCA the (E) is too much.
-> 
-> Yes and maybe add a comment that it's at the same offset for esca so 
-> there won't come up further questions in the future.
-
-OK
-
-> 
->>
->>>
->>> [...]
->>>> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
->>>> index 098831e815e6..af04ffbfd587 100644
->>>> --- a/arch/s390/kvm/kvm-s390.h
->>>> +++ b/arch/s390/kvm/kvm-s390.h
->>>> @@ -503,4 +503,29 @@ void kvm_s390_vcpu_crypto_reset_all(struct kvm
->>>> *kvm);
->>>>     */
->>>>    extern unsigned int diag9c_forwarding_hz;
->>>> +#define S390_KVM_TOPOLOGY_NEW_CPU -1
->>>> +/**
->>>> + * kvm_s390_topology_changed
->>>> + * @vcpu: the virtual CPU
->>>> + *
->>>> + * If the topology facility is present, checks if the CPU toplogy
->>>> + * viewed by the guest changed due to load balancing or CPU hotplug.
->>>> + */
->>>> +static inline bool kvm_s390_topology_changed(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +       if (!test_kvm_facility(vcpu->kvm, 11))
->>>> +               return false;
->>>> +
->>>> +       /* A new vCPU has been hotplugged */
->>>> +       if (vcpu->arch.prev_cpu == S390_KVM_TOPOLOGY_NEW_CPU)
->>>> +               return true;
->>>> +
->>>> +       /* The real CPU backing up the vCPU moved to another socket
->>>> */
->>>> +       if (topology_physical_package_id(vcpu->cpu) !=
->>>> +           topology_physical_package_id(vcpu->arch.prev_cpu))
->>>> +               return true;
->>>
->>> Why is it OK to look just at the physical package ID here? What if the
->>> vcpu for example moves to a different book, which has a core with the
->>> same physical package ID?
-> 
-> I'll need to look up stsi 15* output to understand this.
-> But the architecture states that any change to the stsi 15 output sets 
-> the change bit so I'd guess Nico is correct.
->
-
-Yes, Nico is correct, as I already answered, however it is not any 
-change of stsi(15) but a change of stsi(15.1.2) output which sets the 
-change bit.
-However the socket identifier is relative to the book and not unique for 
-the all system.
-The solution given by Heiko is, of course, the most elegant so I will 
-use it.
-
-Thanks,
-
-regards,
-Pierre
-
-> 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
