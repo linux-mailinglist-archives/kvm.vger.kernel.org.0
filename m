@@ -2,129 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE4034BC19B
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 22:15:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 337414BC198
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 22:14:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239664AbiBRVPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 16:15:47 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40260 "EHLO
+        id S239575AbiBRVPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 16:15:05 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239653AbiBRVPo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 16:15:44 -0500
-X-Greylist: delayed 605 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Feb 2022 13:15:26 PST
-Received: from relay68.bu.edu (relay68.bu.edu [128.197.228.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B9423D5D2
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:15:26 -0800 (PST)
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated bits=0)
-        by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 21IL3g24031480
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 18 Feb 2022 16:03:50 -0500
-Date:   Fri, 18 Feb 2022 16:03:42 -0500
-From:   Alexander Bulekov <alxndr@bu.edu>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        "Florescu, Andreea" <fandree@amazon.com>, hreitz@redhat.com,
-        Alex Agache <aagch@amazon.com>,
-        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>, bdas@redhat.com,
-        darren.kenny@oracle.com
-Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
-Message-ID: <20220218210323.hw2kkid25l7jczjo@mozz.bu.edu>
-References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+        with ESMTP id S238215AbiBRVPE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 16:15:04 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C00E231913
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:14:46 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id r7so3659029iot.3
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:14:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=9OJSdScnlbqpsx7gaJ1EijvzjcTEFHzFZ0fM3gifr4w=;
+        b=dUgNSlLWGXT4unbLz8g8o5jQ8/MxeQtzYmmIDBsG5micBWdhRpq+Ji2CN//xHH3X9D
+         ZPhzKJTYpnIUKT1ylKeEpOe5VjddgiFhQBLqss/osdPBItEIgO5P1t3Gluoy01xUy9rg
+         S+entrnn5pscyIAFXpJCrQBlzm9RYt9upIgu8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9OJSdScnlbqpsx7gaJ1EijvzjcTEFHzFZ0fM3gifr4w=;
+        b=G+iIsCTjtS6WLtPvpNTHwEJ+h4pfDxsfuqqUqdSfldlvNHk8feIFjKYuv0+zkenSDq
+         8ceXhwvPzKOKiM8MrB17IZi8fQlGaTNp1z7bBKsO/mpbtVPYVN6i8qvT2MlKl2IPq0O7
+         DoBzl3qkCR+YYCYsAZQPpv1/KKnbIX5L4SDcFcBU64w3jTUf4kUDvQODx0GpirtKDK1D
+         W0TuMCtZNKyaoRxmz6EQzYWBLJ9+JdAZAXd2eUlCcM+ImXQ+JaTw4cxr52gtWks8oTp3
+         iOla/rWETnc61Mtk/cSTV5Ebj+b7/ZdECQpOZ0MA2I/J7IFw6/jm9QAhaJEVkcu0DG7K
+         dycw==
+X-Gm-Message-State: AOAM530SySJLAcN+nW7zC9Z/+bo0P5hBpzPXkQfZ5c0pxcSF3B166VM6
+        PUUEGF4aCaCJivXze+KEgpCBHA==
+X-Google-Smtp-Source: ABdhPJy0+aMr8b7NsG7Xs0Tk4hWTZWPnjtQrNL2yG6p6Z6xUkLKb0IpxDzj5q62nEtwY0m/d1hG3wA==
+X-Received: by 2002:a02:9529:0:b0:314:5808:5de2 with SMTP id y38-20020a029529000000b0031458085de2mr6401382jah.68.1645218885917;
+        Fri, 18 Feb 2022 13:14:45 -0800 (PST)
+Received: from [192.168.1.128] ([71.205.29.0])
+        by smtp.gmail.com with ESMTPSA id m4sm4166132iln.48.2022.02.18.13.14.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Feb 2022 13:14:45 -0800 (PST)
+Subject: Re: [PATCH 2/2] KVM: s390: selftests: Test vm and vcpu memop with
+ keys
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <20220211182215.2730017-11-scgl@linux.ibm.com>
+ <20220217145336.1794778-1-scgl@linux.ibm.com>
+ <20220217145336.1794778-3-scgl@linux.ibm.com>
+ <7d0b5b03-21f4-0402-779a-788d4bd58071@linuxfoundation.org>
+ <2af9c3a9-e5a1-484b-9c1e-693a25993cdb@linux.ibm.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <eb5c437a-032b-f710-4254-beed32088456@linuxfoundation.org>
+Date:   Fri, 18 Feb 2022 14:14:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <2af9c3a9-e5a1-484b-9c1e-693a25993cdb@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 220128 1547, Stefan Hajnoczi wrote:
-> Dear QEMU, KVM, and rust-vmm communities,
-> QEMU will apply for Google Summer of Code 2022
-> (https://summerofcode.withgoogle.com/) and has been accepted into
-> Outreachy May-August 2022 (https://www.outreachy.org/). You can now
-> submit internship project ideas for QEMU, KVM, and rust-vmm!
+On 2/18/22 5:14 AM, Janis Schoetterl-Glausch wrote:
+> On 2/17/22 18:54, Shuah Khan wrote:
+>> On 2/17/22 7:53 AM, Janis Schoetterl-Glausch wrote:
+>>> Test storage key checking for both vm and vcpu MEM_OP ioctls.
+>>> Test both error and non error conditions.
+>>>
+>>
+>> This patch seems to combine restructuring the code and new code.
+>> e,g test_errors() was added in the last patch, only to be redone
+>> in this patch with test_errors split into test_common_errors()
+>>
+>> Doing restructure in a separate patch and then adding new code
+>> makes it easier to review and also keep them simpler patches.
+>>
+>> Please split the code in these two patches to just do restructure
+>> and then add new code.
+>>
+>> I also would like to have good reasons to change existing code and
+>> make them into macros.
+>>   
+>>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>> ---
+>>>    tools/testing/selftests/kvm/s390x/memop.c | 342 +++++++++++++++++++++-
+>>>    1 file changed, 328 insertions(+), 14 deletions(-)
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+>>> index 4510418d73e6..bc12a9238967 100644
+>>> --- a/tools/testing/selftests/kvm/s390x/memop.c
+>>> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+>>> @@ -201,6 +201,8 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
+>>>    #define PAGE_SHIFT 12
+>>>    #define PAGE_SIZE (1ULL << PAGE_SHIFT)
+>>>    #define PAGE_MASK (~(PAGE_SIZE - 1))
+>>> +#define CR0_FETCH_PROTECTION_OVERRIDE    (1UL << (63 - 38))
+>>> +#define CR0_STORAGE_PROTECTION_OVERRIDE    (1UL << (63 - 39))
+>>>      #define ASSERT_MEM_EQ(p1, p2, size) \
+>>>        TEST_ASSERT(!memcmp(p1, p2, size), "Memory contents do not match!")
+>>> @@ -235,6 +237,11 @@ static struct test_default test_default_init(void *guest_code)
+>>>        return t;
+>>>    }
+>>>    +static vm_vaddr_t test_vaddr_alloc(struct test_vcpu vm, size_t size, vm_vaddr_t vaddr_min)
+>>> +{
+>>> +    return vm_vaddr_alloc(vm.vm, size, vaddr_min);
+>>> +}
+>>> +
+>>
+>> What is the value of adding a new routine that simply calls another?
 > 
-> If you have experience contributing to QEMU, KVM, or rust-vmm you can
-> be a mentor. It's a great way to give back and you get to work with
-> people who are just starting out in open source.
+> I just found the vm.vm confusing/ugly and wanted to hide it,
+> I'm not married to that idea, tho.
 > 
-> Please reply to this email by February 21st with your project ideas.
+>> Do you see this routine changing in the future to do more?
 > 
-> Good project ideas are suitable for remote work by a competent
-> programmer who is not yet familiar with the codebase. In
-> addition, they are:
-> - Well-defined - the scope is clear
-> - Self-contained - there are few dependencies
-> - Uncontroversial - they are acceptable to the community
-> - Incremental - they produce deliverables along the way
-> 
-> Feel free to post ideas even if you are unable to mentor the project.
-> It doesn't hurt to share the idea!
+> No.
+>>
 
-Here are two fuzzing-related ideas:
 
-Summary: Implement rapid guest-initiated snapshot/restore functionality (for
-Fuzzing).
+Let's drop it the new routine then.
 
-Description:
-Many recent fuzzing projects rely on snapshot/restore functionality
-[1,2,3,4,5]. For example tests/fuzzers that target large targets, such as OS
-kernels and browsers benefit from full-VM snapshots, where solutions such as
-manual state-cleanup and fork-servers are insufficient. 
-Many of the existing solutions are based on QEMU, however there is currently no
-upstream-solution. Furthermore, hypervisors, such as Xen have already
-incorporated support for snapshot-fuzzing.
-In this project, you will implement a virtual-device for snapshot fuzzing,
-following a spec agreed-upon by the community.  The device will implement
-standard fuzzing APIs that allow fuzzing using engines, such as libFuzzer and
-AFL++. The simple APIs exposed by the device will allow fuzzer developers to
-build custom harnesses in the VM to request snapshots, memory/device/register
-restores, request new inputs, and report coverage.
+thanks,
+-- Shuah
 
-[1] https://arxiv.org/pdf/2111.03013.pdf
-[2] https://blog.mozilla.org/attack-and-defense/2021/01/27/effectively-fuzzing-the-ipc-layer-in-firefox/
-[3] https://www.usenix.org/system/files/sec20-song.pdf
-[4] https://github.com/intel/kernel-fuzzer-for-xen-project
-[5] https://github.com/quarkslab/rewind
-
-Skill level: Intermediate with interest and experience in fuzzing.
-Language/Skills: C
-Topic/Skill Areas: Fuzzing, OS/Systems/Drivers
-
-Summary: Implement a coverage-guided fuzzer for QEMU images
-
-Description:
-QEMU has a qcow2 fuzzer (see tests/image-fuzzer). However, this fuzzer is not
-coverage-guided, and is limited to qcow2 images. Furthermore, it does not run
-on OSS-Fuzz. In some contexts, qemu-img is expected to handle untrusted disk
-images. As such, it is important to effectively fuzz this code.
-Your task will be to create a coverage-guided fuzzer for image formats
-supported by QEMU. Beyond basic image-parsing code, the fuzzer should be able
-to find bugs in image-conversion code.  Combined with a corpus of QEMU images,
-the fuzzer harness will need less information about image layout.
-
-Skill level: Intermediate
-Language/Skills: C
-Topic/Skill Areas: Fuzzing, libFuzzer/AFL
-
-Thanks
--Alex
