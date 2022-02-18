@@ -2,177 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3F6C4BAE4E
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 01:21:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DD1E4BADDE
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 01:05:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbiBRAVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Feb 2022 19:21:39 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35634 "EHLO
+        id S229783AbiBRADe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Feb 2022 19:03:34 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:35108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbiBRAVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Feb 2022 19:21:38 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6366150;
-        Thu, 17 Feb 2022 16:21:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645143683; x=1676679683;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=N32BdLCCicYvF88PVJV2JjNN97uAJo3pxS97Q2b1+KM=;
-  b=JebK25hjQclsv7jqSHiEE0DjhouD4qt1Hlweeh/N3JaaLPvOya/WDJl3
-   c2PnjKG1mJU6qLzaGAmlHipha9jFsT95Yg/4DMrb/NXTXgaR110a6iTsC
-   I8UBubYHZRc7skItWk8OucBwc0SYrc+cZxM1teB+tUxmS7XaEnnKjPz0R
-   tiosmwmc/T2cXlMHRA7YINkMxoRrRF17Mds1pXK9dWUcBmY2zjn1AYr2H
-   6llKIJQL8NOTTbuV7UzINeTx2ik026zG72tzcPOd1+4t7yyEP9JIFLQya
-   RsAY4lSZ02S62N1y8PDSqYcW4/KuivP+Yahwn6QOn7gU6P+3w2LYXcKRi
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="248595414"
-X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
-   d="scan'208";a="248595414"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 15:23:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
-   d="scan'208";a="777665220"
-Received: from lkp-server01.sh.intel.com (HELO 6f05bf9e3301) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Feb 2022 15:23:06 -0800
-Received: from kbuild by 6f05bf9e3301 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nKq78-0000jQ-2C; Thu, 17 Feb 2022 23:23:06 +0000
-Date:   Fri, 18 Feb 2022 07:22:54 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
-        seanjc@google.com
-Cc:     kbuild-all@lists.01.org, mkoutny@suse.com, tj@kernel.org,
-        lizefan.x@bytedance.com, hannes@cmpxchg.org, dmatlack@google.com,
-        jiangshanlai@gmail.com, kvm@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH v3] KVM: Move VM's worker kthreads back to the original
- cgroup before exiting.
-Message-ID: <202202180730.AAgeOZkF-lkp@intel.com>
-References: <20220217061616.3303271-1-vipinsh@google.com>
-MIME-Version: 1.0
+        with ESMTP id S229893AbiBRADc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Feb 2022 19:03:32 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6248415A38;
+        Thu, 17 Feb 2022 16:03:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MF0OojIi0DHgEdAXVzKq+Gk4yGwdA8fP/9m8oWMQbQ3vum9u647b1oupAwEWiDZCp84H2h04aZvQduTOtYIblz3vOOSqRN4dk8AMo6lyEeLXc9+pizDB+5XIK76O3+Pi4Mezde8kr1ZBlw75YKKD7qredYgF+ctU4IOXkEJ618xYFyIzKID8EM2vT5yqf040mJYZr7C4tiHlNMDajL1s9H40kyTIeoNFpBnWizpV3Pwm4hcgpdHur71ggtZcOZHs3bmPSNlz7DP8/CWiAMDCfHs2qnkajLk9GA/xPI4IxHEkqSBJLOmeBpkFsjY9X5oRYDi+2R8pl54Mc2GHGyPWjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HS8PWxY/fjuT2svUrLbwj/FhdkvC0bIpEav5owJfP9w=;
+ b=akm7clyahuQh0/2RbgQmZpW4HwDKFkfG3p6qT890W+Us0v9efOpLOsXKSbDkzvFjgLXN3kyPRpr6EUF2viSxjKbzE5+oz17omZ7FpIqBUSNpoE5KIAcMLdYAB8G9Md5+AOdvK0x3tMQxiQA2gZ/VV30PcH18ZXS5dASRK5QczLGUB7NztNOzSG67md02OpYUq7dn9ymbrNtHkzi06myE7/VE0kln1EvW7hfTppL/ZTJV5+KqSNL8LkTdn8RXiEoS/mCNBjnNFNRmupQCju1lg0HCnz0WRJ6pnPDTwVJYvb1h0MSE66IiuLIyMWLdB7UREsh5ErXLUkkg1XuRqGGq1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HS8PWxY/fjuT2svUrLbwj/FhdkvC0bIpEav5owJfP9w=;
+ b=hu/ffBdUbh6PWDhajjjOtYrqvK7ZVhNkw8evwiZqqw2sSL+KvpbMXmaJQtc3TPYem4q+g8bAlaUtRVfnZeWGH+4Tv3QCLXfxIzNHLGlzUJIGDB74WEWSNrGpknpfcJ+fbC5QrmxjPwtZMI3C3tjUXyA9E7p/tyJE0dHQQWc9gx//GgrDAAxYptqE0PXTZ+YfZrTXzFpbUm7FS8waOqVK1LULO0BF/TMdWP2CUgzWq5qv8r1RcuQiLD3T/uU35LaF5qyhuAsEFohH1CVCOtMtHA6ftcN7pALpVjdwNM81OnmrRx4QDUz160rYQdXHDZsQrB+idCwvh9Ss5ZjUqffoxg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (52.135.49.15) by
+ BY5PR12MB4273.namprd12.prod.outlook.com (10.255.126.144) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4995.15; Fri, 18 Feb 2022 00:03:08 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%5]) with mapi id 15.20.4995.018; Fri, 18 Feb 2022
+ 00:03:08 +0000
+Date:   Thu, 17 Feb 2022 20:03:06 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        ashok.raj@intel.com, kevin.tian@intel.com,
+        shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V7 mlx5-next 15/15] vfio: Extend the device migration
+ protocol with PRE_COPY
+Message-ID: <20220218000306.GM4160@nvidia.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+ <20220207172216.206415-16-yishaih@nvidia.com>
+ <20220217101554.26f05eb1.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220217061616.3303271-1-vipinsh@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220217101554.26f05eb1.alex.williamson@redhat.com>
+X-ClientProxiedBy: BLAPR03CA0035.namprd03.prod.outlook.com
+ (2603:10b6:208:32d::10) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e393ada6-d783-448a-96f0-08d9f2720b5f
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4273:EE_
+X-Microsoft-Antispam-PRVS: <BY5PR12MB427360BBAD62BFFFBCE885B9C2379@BY5PR12MB4273.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZoX+1wNg3cEKyD1zL1tzyTFzrdgafxLvrnSP5bVscI9v4jNOGjjNPKWcJQVSvEmFOCZ3P2WeQYvmU+By6sEBORxVWd8Hsi2kw90aSFvxJmDwxAnOwi4XkOAsjHY0P2T4IS26FcnZIfdT8/G0sJPnUDVASUCgo/foFaaKYfiqwrrJd5GEpuXhn2kbHxl0zxC62NtBQ0Y2nbI6UoSgAXZfk9U9jtKn5nel07mZq/u8aIr+dgt+6DkWN9zqmQSGdjfuLVQ14vnh3oXThJ9afq7ZvtAGNtN3hxUxQBJsVN6MzejMNobnKxwHGDFLFju0ez3S/W6s/FEwZPM/TiNoowDwp39EJxmrQPYniJL2W7ZS4QjpjsEMpm+RvMw24pq+qLkt4PyDyh2EUonKtQCboRDGxx/AGP//PBbyPJ4HiPWr2KVOuXSsBqZjfzNMmlYPtmTTpMh4jOePnm+A7+vsYVIFzkwpBaaawpBCNdHUGeGqnN+jihnR2lilIr/MYrGTR8IxKcAePeGayxLaJxP6xjbl7SJ9gzsnW1d2uYhWmapCEk89CDp32uzNvpd6PgJfNqSsDzhZs69WexzOEjSUOLTgSAehNV+78GMStrgXacS3aFKQHraRy5Kt/C4V4o0uXyqrH82lcDrAgTp2BPBVmzDE4A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(6486002)(508600001)(186003)(26005)(2616005)(36756003)(5660300002)(8936002)(6512007)(66946007)(316002)(1076003)(66556008)(2906002)(4326008)(6916009)(66476007)(38100700002)(86362001)(8676002)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zYXdrCUqeQsxfbfTJUKjpBY5icyTYER858BGI09YMtFNrK0q62G/zhYFRKpK?=
+ =?us-ascii?Q?/85AK6xVw3llwrO5NKBpUBOZbEPyYhFiAwb1fS0YteTlbcRP8/EIUS/DgRby?=
+ =?us-ascii?Q?psutQDrCe7JG1r/CsBVQ5znb+H2UHc/6tGMaYF99WcQQxXx2nyj2gNmxD3tp?=
+ =?us-ascii?Q?sdeukA+XGkjUEj6TQWewfpYj++b6zlKZQ2vR39T+Jg96o5RBPUHvOFXq5Rn2?=
+ =?us-ascii?Q?Dxkpu7lsX4kHzyRWIKZmkb/rSMVNPsGpYCQuikJMJa3SrCy3GL/tRtIEBW2U?=
+ =?us-ascii?Q?rYeNC8T5hJwJq2BEJbN+n0jR67dn/qvUpyQg4CF9C0/M7ynx0k1k7s5smW5g?=
+ =?us-ascii?Q?Lu7V75TvANjLxQ7TGaSe/xcxN6PRvs4bCuH4bqCvdFp/FQxbHxrEU8dqlH02?=
+ =?us-ascii?Q?zklDvm2BG5wfE6VJfp7BIp23C79t0LNWrxwHw0vy2xCDuHTz5MNsLFgeZa4u?=
+ =?us-ascii?Q?yfvH5MgaZXzCUmewsPm2LcJ1flKVicKlDeEIIvImQy1pFHvtLgU2OyXCxCef?=
+ =?us-ascii?Q?tdUwLGWWZ6KbTsRj8OtwDjuBM34s7jt90wo87B/CY/qZD+gW8f3yVkTIxx6L?=
+ =?us-ascii?Q?tMP5KSx+Qcb35HgwQCTgm6+Ovo+6152Dg3iV6nD+00VfY3LlC4fpczX1+v98?=
+ =?us-ascii?Q?W1V+ZE7rcKAvottwFQmV0SgxnuCr9lPpd13aWaiAlqQ4KMpYRR+j/ruWss7J?=
+ =?us-ascii?Q?cfzx+fWCfEXJBqAXmOJPNqvOIq3TyVoB4e13EszakvTvGbMhc7Cej9rgwaGa?=
+ =?us-ascii?Q?LggNdhFCV67wS8umEMJJgCUaslXXGxHktHc4EAFuNWI+V0cORju7WvKbJLcz?=
+ =?us-ascii?Q?PdeOZRe11i1YPPvuHbQcgimNdWC7ILz8ZRjOCTDRlTVL5f1CC20RXmAV4XL1?=
+ =?us-ascii?Q?13BgaL4coJQmnsVaYEbbxb1Ry89A6N6Xpp/d6O3WBDGPeN5s5/ZlK3C4V5nq?=
+ =?us-ascii?Q?1EQ4rzWuVhgWPN8rJRRBls6EZTF0C88IFzP/CIYnFYqu2hTjVGhIPA8LKOFF?=
+ =?us-ascii?Q?P3z5OinkPmzQMEGjOwkJsdU/q0oXjsCl34O3zkwaYrZ7ungtwz1WQGlX2jjZ?=
+ =?us-ascii?Q?mlKIzaEfLGl9VDsKF58FuGmLU1pDcLrK42IrbD8yR3IPIxW3Tnr91YVfICN4?=
+ =?us-ascii?Q?VppcUcot9610dYXeXSLGdY9TvT1d+KU1wu5Ow4KrRhQfo9rrI4fI5uEEiN1o?=
+ =?us-ascii?Q?kPlnnVI2ZXlC4MIJB47PF2GBl6B6Kti3L1xcAnBQxYFAKqzFenDJ8XJnkuPL?=
+ =?us-ascii?Q?CqL4Z9lzl6FJ2ien5C4EK5yJATE1WqjZcfDnf+tfJt4UEd/3NCl+RjFKgSIv?=
+ =?us-ascii?Q?/6FjnUcxXvG7Mdq521V8rNyd1SfB+HqL8sLHROWw2ReGcQZvc+So4pFxPvzu?=
+ =?us-ascii?Q?ThM8OZeulmdEASfeoAsedLr4BNv/IfX5aq62m3VGmQBuXlmyA4HJXov2TnoO?=
+ =?us-ascii?Q?Zy4Duh2BrFuFt6sV0+NMjRth1TVFEcwimRLoJ8Y3mhj8dmGI2JX65eTawhLe?=
+ =?us-ascii?Q?NTKdJHbWFmxIaLhl+pfNxVPxlfwKlYsmF2ZW6AvRAT9ZzYcczA+LRAAHIyKt?=
+ =?us-ascii?Q?rytfoNF6vs49N5kUKPs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e393ada6-d783-448a-96f0-08d9f2720b5f
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2022 00:03:08.5017
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9QlXYI6ACPVmoF1b3iVyiyBXULfkJlR775HjbK8hPT0VtYwOT7zvbGQ9Pkvv3oxZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4273
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vipin,
+On Thu, Feb 17, 2022 at 10:15:54AM -0700, Alex Williamson wrote:
 
-Thank you for the patch! Perhaps something to improve:
+> I feel obligated to ask, is PRE_COPY support essentially RFC at this
+> point since we have no proposed in-kernel users?
 
-[auto build test WARNING on db6e7adf8de9b3b99a9856acb73870cc3a70e3ca]
+Yes, it is included here because the kernel in v1 had PRE_COPY, so it
+seemed essential to show how this could continue to look to evaluate
+v2.
 
-url:    https://github.com/0day-ci/linux/commits/Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroup-before-exiting/20220217-141723
-base:   db6e7adf8de9b3b99a9856acb73870cc3a70e3ca
-config: x86_64-rhel-8.3-kselftests (https://download.01.org/0day-ci/archive/20220218/202202180730.AAgeOZkF-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/1abffef71ef85b6fb8f1296e6ef38febc4f2b007
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroup-before-exiting/20220217-141723
-        git checkout 1abffef71ef85b6fb8f1296e6ef38febc4f2b007
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash
+NVIDIA has an out of tree driver that implemented PRE_COPY in the v1
+protocol, and we have some future plan to use it in a in-tree driver.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+> It seems like we're winding down comments on the remainder of the
+> series and I feel ok with where it's headed and the options we have
+> available for future extensions.  
 
+Thanks, it was a lot of work for everyone to get here!
 
-sparse warnings: (new ones prefixed by >>)
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c: note: in included file:
-   include/linux/kvm_host.h:1877:54: sparse: sparse: array of flexible structures
-   include/linux/kvm_host.h:1879:56: sparse: sparse: array of flexible structures
->> arch/x86/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct task_struct *from @@     got struct task_struct [noderef] __rcu *real_parent @@
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse:     expected struct task_struct *from
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:5859:54: sparse:     got struct task_struct [noderef] __rcu *real_parent
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_change_pte' - different lock contexts for basic block
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_invalidate_range_start' - different lock contexts for basic block
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_invalidate_range_end' - different lock contexts for basic block
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_clear_flush_young' - different lock contexts for basic block
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_clear_young' - different lock contexts for basic block
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:538:9: sparse: sparse: context imbalance in 'kvm_mmu_notifier_test_young' - different lock contexts for basic block
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c:2522:9: sparse: sparse: context imbalance in 'hva_to_pfn_remapped' - unexpected unlock
+Yishai has all the revisions from Kevin included, he will sent it on
+Sunday. Based on this Leon will make a formal PR next week so it can
+go into linux-next through your tree. We have to stay co-ordinated
+with our netdev driver branch..
 
-vim +5859 arch/x86/kvm/../../../virt/kvm/kvm_main.c
+I will ping the acc team and make it priority to review their next
+vresion. Let's try to include their driver as well.
 
-  5805	
-  5806	static int kvm_vm_worker_thread(void *context)
-  5807	{
-  5808		/*
-  5809		 * The init_context is allocated on the stack of the parent thread, so
-  5810		 * we have to locally copy anything that is needed beyond initialization
-  5811		 */
-  5812		struct kvm_vm_worker_thread_context *init_context = context;
-  5813		struct kvm *kvm = init_context->kvm;
-  5814		kvm_vm_thread_fn_t thread_fn = init_context->thread_fn;
-  5815		uintptr_t data = init_context->data;
-  5816		int err, reattach_err;
-  5817	
-  5818		err = kthread_park(current);
-  5819		/* kthread_park(current) is never supposed to return an error */
-  5820		WARN_ON(err != 0);
-  5821		if (err)
-  5822			goto init_complete;
-  5823	
-  5824		err = cgroup_attach_task_all(init_context->parent, current);
-  5825		if (err) {
-  5826			kvm_err("%s: cgroup_attach_task_all failed with err %d\n",
-  5827				__func__, err);
-  5828			goto init_complete;
-  5829		}
-  5830	
-  5831		set_user_nice(current, task_nice(init_context->parent));
-  5832	
-  5833	init_complete:
-  5834		init_context->err = err;
-  5835		complete(&init_context->init_done);
-  5836		init_context = NULL;
-  5837	
-  5838		if (err)
-  5839			goto out;
-  5840	
-  5841		/* Wait to be woken up by the spawner before proceeding. */
-  5842		kthread_parkme();
-  5843	
-  5844		if (!kthread_should_stop())
-  5845			err = thread_fn(kvm, data);
-  5846	
-  5847	out:
-  5848		/*
-  5849		 * Move kthread back to its original cgroup to prevent it lingering in
-  5850		 * the cgroup of the VM process, after the latter finishes its
-  5851		 * execution.
-  5852		 *
-  5853		 * kthread_stop() waits on the 'exited' completion condition which is
-  5854		 * set in exit_mm(), via mm_release(), in do_exit(). However, the
-  5855		 * kthread is removed from the cgroup in the cgroup_exit() which is
-  5856		 * called after the exit_mm(). This causes the kthread_stop() to return
-  5857		 * before the kthread actually quits the cgroup.
-  5858		 */
-> 5859		reattach_err = cgroup_attach_task_all(current->real_parent, current);
-  5860		if (reattach_err) {
-  5861			kvm_err("%s: cgroup_attach_task_all failed on reattach with err %d\n",
-  5862				__func__, reattach_err);
-  5863		}
-  5864		return err;
-  5865	}
-  5866	
+We'll start to make a more review ready qemu series.
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+> PS - Why is this a stand-alone ioctl rather than a DEVICE_FEATURE?
+
+You asked for the ioctl to be on the data_fd, so there is no
+DEVICE_FEATURE infrastructure and I think it doesn't make sense to put
+a multiplexor there. We have lots of ioctl numbers and don't want this
+to be complicated for performance.
+
+Thanks,
+Jason
