@@ -2,320 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C06B74BBA5E
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 15:03:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D36884BBA66
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 15:06:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235911AbiBRODd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 09:03:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51816 "EHLO
+        id S235453AbiBROGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 09:06:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231172AbiBRODc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 09:03:32 -0500
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 115CE173B33
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 06:03:15 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id p9so14743719wra.12
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 06:03:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vGCgEB2EWkLQKUMYKQNwxkOP/Yb7el6dtXFMGwKacLA=;
-        b=rm5ZfC4muyEsvYz5oGesAtl+TwTSHzGYN/qFHp5rJ/YiflwZ8t3Do6yRA2fMWzhbcC
-         5DW8POqrMPoQvzxbZvJZyoXBy3mkFpvGC4Mt0VCLEVbVvcI+MW8Tdf5N0ltaQa+YO1Q7
-         PvaRRhei9Npd7uqwx/yFwZXExQssjpl+iu+itXPkL3u0lkhXz7Ee786bBz501NjRqZFg
-         wUAWgRzjqnqQOwO8muCc1TWiPRUiz1NQHrqH0jzyBMCq5N4Iv/liBGqe25JgW6yOZPju
-         EdzEXa5e/WVSTaolGxd3cdo5WoYDdyYnM8k1Op6PFYiNWehrV41RlXJ/ARwI7DEAnLKk
-         dGYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vGCgEB2EWkLQKUMYKQNwxkOP/Yb7el6dtXFMGwKacLA=;
-        b=lqyb8DGar6ptnnLvIl4F0cgjeU8QULvDayl+O+azAULOb5OJrKSRbjhV7t7Yne7eRN
-         JOvITbo4DfEhHC+OMnl9PfdWWO2nnKAV3kUDJgRl3RJLy4RBg18N2PCthMf165TWK0DI
-         kXMGPFI3rfsylXKu/vrrML9pRZ0EGmkaQwUb7q7t9WWfPNCw02BnHv+e0C+wxvNHy5jE
-         y0I+hhtclm5GbZ70kTG3b4aCgitKgu1hj3Shj8chnpEpsi9pDRufzCTU3pBChnCe9CoZ
-         qpga20rSPOFkjUjdENhe6q4BuKUrEsAKsOtXf2igM417z5uyuN4yYKVjm8kxGl7uC30D
-         Hw1g==
-X-Gm-Message-State: AOAM531t4+d3r/ZG85xoNMsr1q70IaGRWuqMio0LFn9F3h53Od8gto9W
-        W62AeEwb1Q2tl7vw38h75STn8w==
-X-Google-Smtp-Source: ABdhPJxcA2yASEx5/GK9YR96JJftsm/aMdoMqXug8OhXaru+n5yM4+f2mpHywje/xZl0AJ2T9TzKwQ==
-X-Received: by 2002:a05:6000:1541:b0:1e8:30f7:b3f0 with SMTP id 1-20020a056000154100b001e830f7b3f0mr6136243wry.578.1645192993441;
-        Fri, 18 Feb 2022 06:03:13 -0800 (PST)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id x10sm4206731wmj.17.2022.02.18.06.03.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 06:03:13 -0800 (PST)
-Date:   Fri, 18 Feb 2022 14:03:11 +0000
-From:   Sebastian Ene <sebastianene@google.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, qperret@google.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool v2] aarch64: Add stolen time support
-Message-ID: <Yg+nHwSMmIXGoHjO@google.com>
-References: <Yg5lBZKsSoPNmVkT@google.com>
- <Yg5tE3TqgwWRFypB@monolith.localdoman>
-MIME-Version: 1.0
+        with ESMTP id S234223AbiBROGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 09:06:40 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 385061A6A6D;
+        Fri, 18 Feb 2022 06:06:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n76pgRFU/e+Hk6CCNmBXCeZnyvGlqiaZkZHYQly3qnOK637J9gLV6/3QjmGFygTCCNGtsIYz5Hf3BLhY2IyL9GMuDo2EW9HZ7ai/4OjZ58RIdNtyfsgqy0sUxC7qH7y9c2ZYQ6wbRJ3Ujy3MOjBE4cPLRubBnXZ3zguH/WLXteeXsutypXZy6g/IrBMd4iDlochRZ6KUd6NE9Jagt3HcUe1LSNZhzZmo7dZt2mX3hcAPzkPeekDb3vHVuL/OOKJOG8RQ883M8V3GBiTdDeoBqb9jiUDZpKrN+eMQo26gzzqxA5NgnuKHf0BsCfiSihB+dvyXlvfbqCjZbtpem/xeng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TjmjNV6n2ajws89g2hYoNYGmr1iLKwYQK8HAeANBEDk=;
+ b=m1TMU65Y5s+oEpfyCREU/5l150R1rteZNE5Sg+/AFFhXS40McuR3z/nF8gwv+Nuf2QQCnTJGDucGwBv80L/3kYsrPfq+MJxyPhbgJK8vL6sXfvhubJdMf0oNTKEaZSIzvcnwFTHvRIIvIH6NiUzYq0A6IsJNLKVAjX8pdeIJcjYcj4yCJ+2AXOC0829IPeJqx9zBcn2cD3076I9Um22ngdTcL9s/xxlNqnE+ZAN14BjL39eQtbA97TikRFK6G40+RMpbRaoopfrGn67bsCT2dmxSVQBPuq4kwIaepcqIFWs056l4OJLU0WLbahmHf4Qn9Xnw6oBphzx+fgAFQb0nAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TjmjNV6n2ajws89g2hYoNYGmr1iLKwYQK8HAeANBEDk=;
+ b=mA4YJaA8e0oc1XaM9abQmjRVQOGqjtDpII7w71t/D4jGm8l/AWCCvIiQmnsyxuA3CD1jlkRiTglnIf61Rlb6grYNEdeM1dmQYPNsKuU+PPWgedgOtMrW1vpba53NixdI/PB23wIurNyQfd8lD4tU2ufYvZHka7m1DKXgw7keI6ZhRLMBfgzin7jds4QMlNLlNTWLQfnQ2TsgYgM3ZwiMDuFHLkpSdFzfU09qerX/p4PcAHPyS9F1xmq/dVZ1K9lmzPPVQdPpGJHbb5qRFoc1nV0mUZQJlNgZnR5fy7/rWh6MabPzy1GumqrRrtZH1s/BrqQheLaRaGgcdgPkvkZ7PQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BL0PR12MB2450.namprd12.prod.outlook.com (2603:10b6:207:4d::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16; Fri, 18 Feb
+ 2022 14:06:20 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%5]) with mapi id 15.20.4995.024; Fri, 18 Feb 2022
+ 14:06:20 +0000
+Date:   Fri, 18 Feb 2022 10:06:18 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH V7 mlx5-next 15/15] vfio: Extend the device migration
+ protocol with PRE_COPY
+Message-ID: <20220218140618.GO4160@nvidia.com>
+References: <20220207172216.206415-1-yishaih@nvidia.com>
+ <20220207172216.206415-16-yishaih@nvidia.com>
+ <BN9PR11MB527683AAB1D4CA76EB16ACF68C379@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yg5tE3TqgwWRFypB@monolith.localdoman>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB527683AAB1D4CA76EB16ACF68C379@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR16CA0004.namprd16.prod.outlook.com
+ (2603:10b6:208:134::17) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9ebca669-7750-42df-1326-08d9f2e7d69e
+X-MS-TrafficTypeDiagnostic: BL0PR12MB2450:EE_
+X-Microsoft-Antispam-PRVS: <BL0PR12MB2450253E9F5A699CBA6A4E09C2379@BL0PR12MB2450.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZL5uMozRLEUczP9NRqMFjB97bCD7UpoXnzvFRC4Mgg9bnYYVp7lTrF+1xtRfBYFYZtqTPNOEULiezHyINe4M6bsbjHoIU+76AhQxMReMzExXR+LRzQoTKqaJvbGbmGx9v55r79ucXQGi3c/xhL/F1HYx+xAKlR5jrn/IDzwp3F6EkDU6/bCuznczP2VsNV1E2hm9up0NM5zJBNEyhoYagO2gNlJ0UjQnE3csh5Kk08frGHGtIYb0zSV8V5GlKS3Bh1Ic1JiyJKIuNyvhlzFkRSWHahFudnLt96ATLNJ4lgRWPfWGxR6GTvwC8usOSHNCQrLJF1ZjuCKMTSzLOimVOrkEg7g+6CakZgWBldkE1Pw8N0PxwJG2ToZK52dtL17fO0fiK2vaet2EqQOZcSPcLTD4GvT7YXYod+PBnRZ3OzVWOFqQNwKSbyZ5O5SDg0c4pTfjz6In5GPRFyHBVKvQ3YJJ+6y5D/MHXmIwA9Oxef1CcdNQJ0r88vWWmiPbv9jqyzfOJg6VkuHrXk4El0ELcdW1rwSu5SEyzniTdcOIWtdEmEZWviFPPVnLXcbrtRcWsugieqKnaBJZUmEC5jJXt3tL3QNIdbRevDCDBc4a2Q50yItWql6E5b61h4PxXVUvwmB8f8U52l1eWRvZUHwMHw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6486002)(508600001)(8936002)(1076003)(2616005)(186003)(26005)(66946007)(38100700002)(54906003)(33656002)(316002)(2906002)(83380400001)(6916009)(5660300002)(66556008)(8676002)(4326008)(36756003)(66476007)(6506007)(86362001)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hBGVKL3sEt8Yyz7eeJVCyev58um9mCVWH9ysft6fk73jIAlgJpurSa8kJelZ?=
+ =?us-ascii?Q?SFwuYwOZxg+QFjyJNuNyNtTBSixKqV16IC38/worKbFz3q8aKoPElfEyhGR3?=
+ =?us-ascii?Q?cYj05gA4zq3xjwHU6WghUJWWfEyWKzHbxsJXQIJIQcwVvtUSdEf65oGfu2r7?=
+ =?us-ascii?Q?JBRD4zE/GA3vnoMU/q6x+GBIEa1K197GsRXSf09P5WLlS2RvRFUCo6+7VePr?=
+ =?us-ascii?Q?Oj/yCJSBW2xEDiHB4sOK+Q0W/9LwmDdNoJWPY/ZO91B/aM2rEkCz2nFFOjNz?=
+ =?us-ascii?Q?/tst80APCBGCAZTUT4IlQaRLzr4MetiBNfhqVZzw0Sd795SSAId3/pGdMSZX?=
+ =?us-ascii?Q?PkCjHpP/bW8KSYbWdNmRsWevPbQiPGVX6Aj2SekF0Saqf+T1G791idNHp/dk?=
+ =?us-ascii?Q?L4TqeshorgPN3zoFRLT0yfSFLacfdLbCc1Yu78OVzdwTuXkTXWNi7Iudr7s7?=
+ =?us-ascii?Q?ckbzkqxqsX6SiO+5PlvzUvWvIDjVCpdhZjySKesACaQ+oxQkY6ZcoFmzuGPQ?=
+ =?us-ascii?Q?tQlb3A/Q1pPMPBYQ9Jp09pgrC3ghLwypw1XbOn03wiFKE0rxZjyMyIAxkNB5?=
+ =?us-ascii?Q?sULizUmLToxxmWSIOi5L5QU9l4f0SLsS1T1Y/98SNdB0YyjoHAtu1qWwtT85?=
+ =?us-ascii?Q?m8M7aTwVCcPsZT76KDkgr34OFFXCvi/PN6kS9lxy6TEMjTg8szQQR014MVl8?=
+ =?us-ascii?Q?WsithoXG3K7bDpnv23dVxBsmVmasIVrr2UnsixEICyw59fWP1jUMcXQTMOgf?=
+ =?us-ascii?Q?IMYwRl2KLkazgRSFn/PNho9F+8ifCGreMBZBgxAtJzbMV8qbwfQ6FbNb3hFa?=
+ =?us-ascii?Q?0eZGASefywWlj3vgOa9PnWnjrGFgE53YiVzDdLSvUWcE8cTilLm8CeMy/Ck2?=
+ =?us-ascii?Q?jP6uLpYtOIPDjpn6TGHGAEhSysMTGwFbw80iCSbf0AoBMoS5VDr+Vrr9JTEC?=
+ =?us-ascii?Q?wKPb2zg+s/Kdt/9pyDVIBPGb/pbwA+rhhZkC0Mj3A1+RvV+2W8B80gSc0Y6w?=
+ =?us-ascii?Q?EjP43Z8/9EDuE4RiQ3qUta8VSLKcOoEM8+aPSuSi/bgsRSRQEvg9UxHdXWIN?=
+ =?us-ascii?Q?bhIGPrMMJhdgl2ZEXTgOGB4ckIG9wqoT1YOmtQ7KFj1c6zUGHQSIQKKSmaC3?=
+ =?us-ascii?Q?/NZY35N3OxERLo6ZTKVH8VAcoIMsNr8dAJjfQzP/bq3jW5GTb1xdxGElIp54?=
+ =?us-ascii?Q?NxIOACUmfQVtcbxhLUxQHQ0bsQzFkD/QHdGSYtOuHP7PpcOcprMJUeX+FW2t?=
+ =?us-ascii?Q?k14PlJQU0rOJOe2sPXril78GKGlSE/UFKX8EzEZTja1ukOGOEQOZ7H5TgzSe?=
+ =?us-ascii?Q?ycHUUITtN1kL7A+E8QeBJgN/v4tuc5NBdDvP0EpwG3IhVe38RN25Ww8Snek4?=
+ =?us-ascii?Q?B0sLTziUUH8D+TUmAtSEH1BIIi4JYn880Wal72NCzfjmG9vnMiYWoYrlJe3D?=
+ =?us-ascii?Q?qcJiD/1jVqtT733M5/R1HViOobnBx5lhJVjLiy1Fuicpj758jmBo25g+YElk?=
+ =?us-ascii?Q?NbilriBauw/fitZM7GpiqpLnMWX7dARD8zwTLE7AmZvYD+4+JcOTbw5Lvr77?=
+ =?us-ascii?Q?3jZaTi+T2Ur8llaAIlA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ebca669-7750-42df-1326-08d9f2e7d69e
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2022 14:06:20.4980
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tZc4ZKMi6zIK4vuYm38165Ldxd0YihqSPwX9LPAV0PFRwhANwWKQTDvJVMKjz5Ma
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2450
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 03:43:15PM +0000, Alexandru Elisei wrote:
-> Hi,
-> 
-> Some general comments while I familiarize myself with the stolen time spec.
-> 
-> On Thu, Feb 17, 2022 at 03:08:53PM +0000, Sebastian Ene wrote:
-> > This patch adds support for stolen time by sharing a memory region
-> > with the guest which will be used by the hypervisor to store the stolen
-> > time information. The exact format of the structure stored by the
-> > hypervisor is described in the ARM DEN0057A document.
+On Fri, Feb 18, 2022 at 08:01:47AM +0000, Tian, Kevin wrote:
+ 
+> > A new ioctl VFIO_DEVICE_MIG_PRECOPY is provided to allow userspace to
+> > query the progress of the precopy operation in the driver with the idea it
+> > will judge to move to STOP_COPY at least once the initial data set is
+> > transferred, and possibly after the dirty size has shrunk appropriately.
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> 
-> It is customary to describe the changes you have made from the previous version,
-> to make it easier for the people who want to review your code.
-> 
-
-Hello,
-
-Thanks for the feedback. I will include the changelog in the next
-patches.
-
-> >  Makefile                               |  1 +
-> >  arm/aarch64/arm-cpu.c                  |  1 +
-> >  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
-> >  arm/aarch64/pvtime.c                   | 84 ++++++++++++++++++++++++++
-> >  arm/include/arm-common/kvm-arch.h      |  4 ++
-> >  arm/kvm-cpu.c                          | 14 ++---
-> >  6 files changed, 98 insertions(+), 7 deletions(-)
-> >  create mode 100644 arm/aarch64/pvtime.c
+> > We think there may also be merit in future extensions to the
+> > VFIO_DEVICE_MIG_PRECOPY ioctl to also command the device to throttle the
+> > rate it generates internal dirty state.
 > > 
-> > diff --git a/Makefile b/Makefile
-> > index f251147..e9121dc 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
-> >  	OBJS		+= arm/aarch64/arm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm-cpu.o
-> >  	OBJS		+= arm/aarch64/kvm.o
-> > +	OBJS		+= arm/aarch64/pvtime.o
-> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
-> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> >  
-> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> > index d7572b7..326fb20 100644
-> > --- a/arm/aarch64/arm-cpu.c
-> > +++ b/arm/aarch64/arm-cpu.c
-> > @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-> >  {
-> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> > +	kvm_cpu__setup_pvtime(vcpu);
-> >  	return 0;
-> >  }
-> >  
-> > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > index 8dfb82e..b57d6e6 100644
-> > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> > @@ -19,5 +19,6 @@
-> >  
-> >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
-> >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> >  
-> >  #endif /* KVM__KVM_CPU_ARCH_H */
-> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> > new file mode 100644
-> > index 0000000..c09fd89
-> > --- /dev/null
-> > +++ b/arm/aarch64/pvtime.c
-> > @@ -0,0 +1,84 @@
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/kvm-cpu.h"
-> > +#include "kvm/util.h"
-> > +
-> > +#include <linux/byteorder.h>
-> > +#include <linux/types.h>
-> > +
-> > +struct pvtime_data_priv {
-> > +	bool	is_supported;
-> > +	char	*usr_mem;
-> > +};
-> > +
-> > +static struct pvtime_data_priv pvtime_data = {
-> > +	.is_supported	= true,
-> > +	.usr_mem	= NULL
-> > +};
-> > +
-> > +static int pvtime__alloc_region(struct kvm *kvm)
-> > +{
-> > +	char *mem;
-> > +	int ret = 0;
-> > +
-> > +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
-> > +		   MAP_ANON_NORESERVE, -1, 0);
-> > +	if (mem == MAP_FAILED)
-> > +		return -ENOMEM;
-> > +
-> > +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
-> > +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
-> > +	if (ret) {
-> > +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> > +		return ret;
-> > +	}
-> > +
-> > +	pvtime_data.usr_mem = mem;
-> > +	return ret;
-> > +}
-> > +
-> > +static int pvtime__teardown_region(struct kvm *kvm)
-> > +{
-> > +	if (pvtime_data.usr_mem == NULL)
-> > +		return 0;
-> > +
-> > +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
-> > +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
-> > +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> > +	pvtime_data.usr_mem = NULL;
-> > +	return 0;
-> > +}
-> > +
-> > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> > +{
-> > +	int ret;
-> > +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
-> > +		AARCH64_PVTIME_SIZE;
-> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> > +	};
-> > +
-> > +	if (!pvtime_data.is_supported)
-> > +		return;
-> > +
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> > +	if (ret)
-> > +		goto out_err;
-> > +
-> > +	if (!pvtime_data.usr_mem) {
-> > +		ret = pvtime__alloc_region(vcpu->kvm);
-> > +		if (ret)
-> > +			goto out_err;
-> > +	}
-> > +
-> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> > +	if (!ret)
-> > +		return;
-> > +
-> > +	pvtime__teardown_region(vcpu->kvm);
-> > +out_err:
-> > +	pvtime_data.is_supported = false;
-> > +}
-> > +
-> > +dev_exit(pvtime__teardown_region);
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index c645ac0..865bd68 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -54,6 +54,10 @@
-> >  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
-> >  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
-> >  
-> > +#define AARCH64_PVTIME_IPA_MAX_SIZE	SZ_64K
-> > +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
-> > +					 AARCH64_PVTIME_IPA_MAX_SIZE)
+> > Compared to the v1 clarification, STOP_COPY -> PRE_COPY is made optional
 > 
-> This overlaps with the ARM_PCI_MMIO_AREA. If you want to change the memory
-> layout for a guest, there's a handy ASCII map at the top of this file.  That
-> should also be updated to reflect the modified layout.
+> essentially it's *BLOCKED* per following context.
 
-Right, when pvtime is supported it ovelaps that region. While this
-feature is supported only for arm64, does it make sense to update the ASCII
-map in this header which is arm-common ? Also, probably it makes sense to move
-all of the definitions to pvtime.c ? What do you think ?
+Yes I suppose now that we have the cap bits not the arc discovery this
+isn't worded well
+
+> > and to be defined in future. While making the whole PRE_COPY feature
+> > optional eliminates the concern from mlx5, this is still a complicated arc
+> > to implement and seems prudent to leave it closed until a proper use case
+> 
+> Can you shed some light on the complexity here?
+
+It is with the data_fd, once a driver enters STOP_COPY it should stuff
+its final state into the data_fd. If this is aborted back to PRE_COPY
+then the data_fd needs to return to streaming changes. Managing this
+transition is not trivial - it is something that has to be signaled to
+the receiver.
+
+There is also something of a race here where the data_fd can reach
+end-of-stream and then the user can do STOP_COPY->PRE_COPY and
+continue stuffing data. This makes the construction of the data stream
+framing "interesting" as there is no longer a possible in-band end of
+stream marker. See the other discussion about async operation why this
+is not ideal.
+
+Basically, it is behavior current qemu doesn't trigger that requires
+significant complexity and testing in any driver to support
+properly. No driver proposed
+
+> Could a driver pretend supporting PRE_COPY by simply returning both 
+> initial_bytes and dirty_bytes as ZERO?
+
+I think so, yes.
+
+> and even if the driver doesn't support the base arc (STOP_COPY->
+> PRE_COPY_P2P) what about the combination arc (STOP_COPY->STOP->
+> RUNNING_P2P->PRE_COPY_P2P)?
+
+Userspace can walk through this sequence on its own, but it cannot be
+part of the FSM because it violates the construction rules. The
+data_fd is open in two places.
+
+> current FSM already allows STOP->RUNNING_P2P->PRE_COPY_P2P and in
+> concept STOP_COPY and STOP have exact same device behavior.
+
+This is allowed because it follows the FSM rules. The data_fd is the
+key difference.
+
+> with that combination arc the interim transition from STOP_COPY to
+> STOP will terminate the current data stream and RUNNING_P2P to
+> PRE_COPY_P2P will return a new data fd. This does violate the definition
+> about transition between three 'saving group' of states, which says
+> moving between them does not terminate or otherwise affect the
+> associated fd.
+
+Right, and because this happens the VMM wuld have to terminate the
+resuming session as well. Remember the output of a single saving
+data_fd can be sent to a single receiving resuming data_fd - they
+cannot be spliced.
+
+> > is developed. We also split the pending_bytes report into the initial and
+> > sustaining values, and define the protocol to get an event via poll() for
+> 
+> I guess this split must have been aligned in earlier discussion but it's still
+> useful if some words can be put here for the motivation. Otherwise one 
+> could easily ask why not treating the 1st read of pending_bytes as the 
+> initial size.
+
+As everything is estimates the approach allows the estimate to be
+refined as we go along. PRE_COPY can stop at any time, but knowing
+some initial mandatory stage has passed is somewhat consistent with
+how qemu seems to treat this.
+
+> > @@ -1596,25 +1596,59 @@ int vfio_mig_get_next_state(struct vfio_device
+> > *device,
+> >  	 *         RUNNING -> STOP
+> >  	 *         STOP -> RUNNING
+> 
+> The comment for above should be updated too, which currently says:
+> 
+> 	 * Without P2P the driver must implement:
+> 
+> and also move it to the end as it talks about the arcs when neither
+> P2P nor PRECOPY is supported.
+
+Yes
+
+> > + * PRE_COPY_P2P -> RUNNING_P2P
+> >   * RUNNING -> RUNNING_P2P
+> >   * STOP -> RUNNING_P2P
+> >   *   While in RUNNING_P2P the device is partially running in the P2P
+> > quiescent
+> >   *   state defined below.
+> >   *
+> > + *   The PRE_COPY arc will terminate a data transfer session.
+> 
+> PRE_COPY_P2P
+
+Yes
 
 > 
-> Why do you want to put it below RAM? Is there a requirement to have it there or
-> was the location chosen for other reasons?
->
-
-I don't have a strong argument for this placement but I am open to
-suggestions if you would like to move it somewhere else. For example, we
-are placing pvtime in the same region in crosvm.
-
-> > +#define AARCH64_PVTIME_SIZE		(64)
+> > + *
+> > + * RUNNING -> PRE_COPY
+> > + * RUNNING_P2P -> PRE_COPY_P2P
+> >   * STOP -> STOP_COPY
+> > - *   This arc begin the process of saving the device state and will return a
+> > - *   new data_fd.
+> > + *   PRE_COPY, PRE_COPY_P2P and STOP_COPY form the "saving group" of
+> > states
+> > + *   which share a data transfer session. Moving between these states alters
+> > + *   what is streamed in session, but does not terminate or otherwise effect
 > 
-> This looks like something that should go in pvtime.c, as it's not relevant to
-> the memory layout.
->
+> 'effect' -> 'affect'?
 
-I agree, I will move this. Thanks.
+yes
 
-> >  
-> >  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
-> >  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-> > diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> > index 6a2408c..84ac1e9 100644
-> > --- a/arm/kvm-cpu.c
-> > +++ b/arm/kvm-cpu.c
-> > @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >  			die("Unable to find matching target");
-> >  	}
-> >  
-> > +	/* Populate the vcpu structure. */
-> > +	vcpu->kvm		= kvm;
-> > +	vcpu->cpu_id		= cpu_id;
-> > +	vcpu->cpu_type		= vcpu_init.target;
-> > +	vcpu->cpu_compatible	= target->compatible;
-> > +	vcpu->is_running	= true;
-> > +
-> >  	if (err || target->init(vcpu))
-> >  		die("Unable to initialise vcpu");
-> >  
-> > @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >  		vcpu->ring = (void *)vcpu->kvm_run +
-> >  			     (coalesced_offset * PAGE_SIZE);
-> >  
-> > -	/* Populate the vcpu structure. */
-> > -	vcpu->kvm		= kvm;
-> > -	vcpu->cpu_id		= cpu_id;
-> > -	vcpu->cpu_type		= vcpu_init.target;
-> > -	vcpu->cpu_compatible	= target->compatible;
-> > -	vcpu->is_running	= true;
-> > -
+> > @@ -959,6 +1007,8 @@ struct vfio_device_feature_mig_state {
+> >   * above FSM arcs. As there are multiple paths through the FSM arcs the
+> > path
+> >   * should be selected based on the following rules:
+> >   *   - Select the shortest path.
+> > + *   - The path cannot have saving group states as interior arcs, only
+> > + *     starting/end states.
 > 
-> Why this change?
->
+> what about PRECOPY->PRECOPY_P2P->STOP_COPY? In this case
+> PRECOPY_P2P is used as interior arc.
 
-I will add a comment to describe why I moved this. During pvtime setup,
-in vcpu initialization I need to access the kvm structure from the vcpu.
+It isn't an interior arc because there are only two arcs :) But yes,
+it is bit unclear.
 
-> Thanks,
-> Alex
+> and if we disallow a non-saving-group state as interior arc when both 
+> start and end states are saving-group states (e.g. 
+> STOP_COPY->STOP->RUNNING_P2P->PRE_COPY_P2P as I asked in
+> the start) then it might be another rule to be specified...
+
+This isn't a shortest path.
+
+> > @@ -972,6 +1022,9 @@ struct vfio_device_feature_mig_state {
+> >   * support them. The user can disocver if these states are supported by using
+> >   * VFIO_DEVICE_FEATURE_MIGRATION. By using combination transitions the
+> > user can
+> >   * avoid knowing about these optional states if the kernel driver supports
+> > them.
+> > + *
+> > + * Arcs touching PRE_COPY and PRE_COPY_P2P are removed if support for
+> > PRE_COPY
+> > + * is not present.
 > 
+> why adding this sentence particularly for PRE_COPY? Isn't it already
+> explained by last paragraph for optional states?
 
-Thanks for the review,
-Sebastian
+Well, I thought it was clarifying about how the optionality is
+constructed.
 
-> >  	if (kvm_cpu__configure_features(vcpu))
-> >  		die("Unable to configure requested vcpu features");
-> >  
-> > -- 
-> > 2.35.1.265.g69c8d7142f-goog
-> > 
+> > + * Drivers should attempt to return estimates so that initial_bytes +
+> > + * dirty_bytes matches the amount of data an immediate transition to
+> > STOP_COPY
+> > + * will require to be streamed.
+> 
+> I didn't understand this requirement. In an immediate transition to
+> STOP_COPY I expect the amount of data covers the entire device
+> state, i.e. initial_bytes. dirty_bytes are dynamic and iteratively returned
+> then why we need set some expectation on the sum of 
+> initial+round1_dity+round2_dirty+... 
+
+"will require to be streamed" means additional data from this point
+forward, not including anything already sent.
+
+It turns into the estimate of how long STOP_COPY will take.
+
+Jason
