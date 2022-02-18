@@ -2,102 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA12A4BBFC9
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 19:47:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CC794BC068
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 20:44:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239348AbiBRSrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 13:47:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40990 "EHLO
+        id S237743AbiBRTok (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 14:44:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231462AbiBRSrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 13:47:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48B4D12AC3
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 10:46:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645210011;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j4AtUKdetjfbUWDMIVmKhaD+IokO5XwjAf4ZeGwgD5o=;
-        b=E5hDTvi1kINeQjElv13278gp3KAhL6LJtTMG6mWLSPUwiiybVDm1F7bV4XoSpabUMMlzzQ
-        nZwmZumZ1A6CDZng6lmj9HCMavv0/TKEvN2e8Ni2wpsvRKV/yS0KB9rljh06W+sx/G9uPT
-        0PfYd+dEA3505YdikZN9IyjD+rcn07s=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-sLBLRU7XONClf3f08lamNA-1; Fri, 18 Feb 2022 13:46:49 -0500
-X-MC-Unique: sLBLRU7XONClf3f08lamNA-1
-Received: by mail-ed1-f70.google.com with SMTP id s7-20020a508dc7000000b0040f29ccd65aso6046137edh.1
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 10:46:49 -0800 (PST)
+        with ESMTP id S237094AbiBRToj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 14:44:39 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AEEE15C64D
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 11:44:21 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id o6so5814797ljp.3
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 11:44:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=11A+0Eks+jC0w/1uVoE5SKsP/3nLc9GXz9ehFpzmcvU=;
+        b=o2Hn+YBOZ4FU7alTHvEiw9RlAdYkxmj0LIODdDaUfF/tro0MWTyR1gBXXpXYY7y84V
+         nJUiRT8aJ4z08sVZxugLzKx5rOFeZ7f5OFH/o2k2ZddipGgbXnCyknFTYJLc1DWyZgdX
+         M5+4YxgK3tuP5h8aH/8Nrl8D74/NgKHUa2owk2TCsvczfRpTi+z5/bRwcSPj3C8L/LMu
+         NN0nLu6BMT3H3hAkajmNxu8fQ6Oqlf83bKR4AajYHsCA5WCR3nMbbUyGysuxR47Y/RAW
+         OHvtmGt20gaErKcM2wYvbRZUpyQ3KrscWM3rI40/0zflQTPaeuzSwS0B3mn8ppPnelII
+         JJ6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=j4AtUKdetjfbUWDMIVmKhaD+IokO5XwjAf4ZeGwgD5o=;
-        b=0aOAZCPX84hByabLgyFOXreM6V1+rgfJhRH2zWaUt7qDJP2ryHkJfxgMGGjM1Dqhao
-         DBuwGa1EqYp1PXE1dpmFZcEB/V0Rgh+gYDt771P+a2zS8h9Au9rr55LOV9JkD/oH3JKA
-         B8hmtLNu1yNE+tT4szf9qU/CqdliqnOh8SS/KO1X8JQcEnip7hBr/DJXXUbq6W1zd3ig
-         hQ2qOjppl/8oKbjGnNjvmkhYorK99HbE+VDCG6oVJMDfJBthxP4FoF7PoZhMjKmqcTxD
-         TF2tOZ/hEzfmccUjeCaWauzFQdVHuO7S+T8uD1Vo5grrNCfXxL53r7uIbBCWrlW5FMJh
-         bRxQ==
-X-Gm-Message-State: AOAM530QmBsJoG4mlLF/3G2i0EHEEedsXYMxngGWd9tMa0wvh7qUeuDY
-        HUAYK41ATfbVRRt/SRuYulcpY99LnCjLVclS9j0brxls/n0gDrOOIYyLNoJsB6zPhrq0Wi0SFdh
-        3ylod9FFkF3Ro
-X-Received: by 2002:a50:c082:0:b0:402:c2dd:5567 with SMTP id k2-20020a50c082000000b00402c2dd5567mr9769567edf.113.1645210008656;
-        Fri, 18 Feb 2022 10:46:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxqzh/mZWjIeLwSt0SDcmglddr5v+ON2zOTKVj74G+ah3yUrrEbyn4yp0hjVEDGrhAorl500Q==
-X-Received: by 2002:a50:c082:0:b0:402:c2dd:5567 with SMTP id k2-20020a50c082000000b00402c2dd5567mr9769554edf.113.1645210008412;
-        Fri, 18 Feb 2022 10:46:48 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id j9sm2491562ejo.106.2022.02.18.10.46.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Feb 2022 10:46:47 -0800 (PST)
-Message-ID: <219937f8-6b49-47db-4ecf-f354b110da1c@redhat.com>
-Date:   Fri, 18 Feb 2022 19:46:39 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=11A+0Eks+jC0w/1uVoE5SKsP/3nLc9GXz9ehFpzmcvU=;
+        b=AQTHKnEAtmX2axS5xDY3Mx/YBNP2O8HzUaMmF9UBQXZYtQzlZPyG8hA3LnslDUgeg/
+         EL5vqkzlpgDo3gQBP3ow3wVjsL5CCTdfHIuBEUCKxAdS+4Atim3rOQFin1bWlephkgWu
+         q2TRjRFxjXa4IgHukx1vFJZBQ335czzWoOw5LAsrmGbJ2TBYnX6jkKPM68vAlB6AAOxN
+         KDqEWLqEpdL5UP2qUaL+6VWVLZvGcC7/MgelTrTDMlPkn5kfoykUA6g5/OW5XYjhQigE
+         k60Tqp4fQ6f309TKm/UWfr94ybLowYzlv3XBbvBoAqPQQw42b9VdCpN4EZ6x+2Vxgvq5
+         Jrkw==
+X-Gm-Message-State: AOAM5306IXzKJ39xiOQfbM1cOicmDqwhWwNujD+rB61wQxf2Do+Xhatc
+        P0hGgKX+rYDhHmF+3Wpt1836DKlBDz5tmH2ei8JPY/tWNLPCvw==
+X-Google-Smtp-Source: ABdhPJyBor1AykngqiuumCK477PW9cyrK+7gTKgyyObnORVL5QLiZVwG6IFJ2mEjqJEIwbDP77+GoKIg5ZZAr4GZ0+s=
+X-Received: by 2002:a2e:8941:0:b0:244:8a87:f760 with SMTP id
+ b1-20020a2e8941000000b002448a87f760mr6804241ljk.369.1645213459498; Fri, 18
+ Feb 2022 11:44:19 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 07/18] KVM: x86/mmu: Do not use guest root level in
- audit
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>
-References: <20220217210340.312449-1-pbonzini@redhat.com>
- <20220217210340.312449-8-pbonzini@redhat.com> <Yg/nc1jjtUD2fhOR@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yg/nc1jjtUD2fhOR@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220218100910.35767-1-pbonzini@redhat.com>
+In-Reply-To: <20220218100910.35767-1-pbonzini@redhat.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 18 Feb 2022 12:44:07 -0700
+Message-ID: <CAMkAt6rS-YrrSoYSU_9AukoTfrAy5awNFw3dkbCrFNoq0b3fWw@mail.gmail.com>
+Subject: Re: [PATCH] selftests: KVM: add sev_migrate_tests on machines without SEV-ES
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/18/22 19:37, Sean Christopherson wrote:
-> Since I keep bringing it up...
-> 
-> From: Sean Christopherson<seanjc@google.com>
-> Date: Fri, 18 Feb 2022 09:43:05 -0800
-> Subject: [PATCH] KVM: x86/mmu: Remove MMU auditing
-> 
-> Remove mmu_audit.c and all its collateral, the auditing code has suffered
-> severe bitrot, ironically partly due to shadow paging being more stable
-> and thus not benefiting as much from auditing, but mostly due to TDP
-> supplanting shadow paging for non-nested guests and shadowing of nested
-> TDP not heavily stressing the logic that is being audited.
-> 
-> Signed-off-by: Sean Christopherson<seanjc@google.com>
+On Fri, Feb 18, 2022 at 3:09 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> I managed to get hold of a machine that has SEV but not SEV-ES, and
+> sev_migrate_tests fails because sev_vm_create(true) returns ENOTTY.
+> Fix this, and while at it also return KSFT_SKIP on machines that do
+> not have SEV at all, instead of returning 0.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Queued, thanks. O:-)
+Tested-by: Peter Gonda <pgonda@google.com>
 
-Paolo
 
+>
+> +#define X86_FEATURE_SEV (1 << 1)
+> +#define X86_FEATURE_SEV_ES (1 << 3)
+
+These conflict with these names but have different values:
+https://elixir.bootlin.com/linux/latest/source/arch/x86/include/asm/cpufeatures.h#L402.
+Is that normal in selftests or should we go with another name?
+> +
+>  int main(int argc, char *argv[])
+>  {
+> +       struct kvm_cpuid_entry2 *cpuid;
+> +
+> +       if (!kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM) &&
+> +           !kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
+> +               print_skip("Capabilities not available");
+> +               exit(KSFT_SKIP);
+> +       }
+> +
+> +       cpuid = kvm_get_supported_cpuid_entry(0x80000000);
+> +       if (cpuid->eax < 0x8000001f) {
+> +               print_skip("AMD memory encryption not available");
+> +               exit(KSFT_SKIP);
+> +       }
+> +       cpuid = kvm_get_supported_cpuid_entry(0x8000001f);
+> +       if (!(cpuid->eax & X86_FEATURE_SEV)) {
+> +               print_skip("AMD SEV not available");
+> +               exit(KSFT_SKIP);
+> +       }
+> +       have_sev_es = !!(cpuid->eax & X86_FEATURE_SEV_ES);
+> +
+>         if (kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM)) {
+>                 test_sev_migrate_from(/* es= */ false);
+> -               test_sev_migrate_from(/* es= */ true);
+> +               if (have_sev_es)
+> +                       test_sev_migrate_from(/* es= */ true);
+>                 test_sev_migrate_locking();
+>                 test_sev_migrate_parameters();
+>                 if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM))
+> @@ -405,7 +440,8 @@ int main(int argc, char *argv[])
+>         }
+>         if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
+>                 test_sev_mirror(/* es= */ false);
+> -               test_sev_mirror(/* es= */ true);
+> +               if (have_sev_es)
+> +                       test_sev_mirror(/* es= */ true);
+>                 test_sev_mirror_parameters();
+>         }
+>         return 0;
+> --
+> 2.31.1
+>
