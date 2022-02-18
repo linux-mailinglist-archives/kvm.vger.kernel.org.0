@@ -2,139 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 909E64BB858
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 12:39:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4A834BB863
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 12:40:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234944AbiBRLjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 06:39:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46238 "EHLO
+        id S234698AbiBRLke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 06:40:34 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234886AbiBRLjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 06:39:00 -0500
+        with ESMTP id S234996AbiBRLk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 06:40:28 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0608231903
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 03:37:34 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 535AF60F3
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 03:39:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645184253;
+        s=mimecast20190719; t=1645184389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kRz2HhmPOJqUdEguD6ineI0jgT8YXoXhvMfK4d0/iRk=;
-        b=iZ8JXWnJegYuprPViiFj2S44PQ5iqRXJGJHJRk8YfDqhz7va0cVkg6kWlG4cwcBN6x2pCA
-        9fazozbtoSl1s2Rhbqr0EH5/lxR42g1nYTgNTZkz85TOWE3VsRg/zbtTgvTKxOBhsXjZgi
-        V3ZipINj24mTyr6QYckhe1LKrV7RcMo=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=u6oPFlqZUUf9Ilo74KAr7+ULBewI1p3jLa6moAZI9Uo=;
+        b=OXz2W3bhYu5nRB6oiomQWOexEMP2iMiqIFWV6SYrTy2+oaW3p/AOylF29b3mDqkDXeZZ46
+        YcoH3ucOfA4aem6txqF8y0yBZhYTHd+kyNJkhAEAnX69T8WDp8vu8rEGUA7POeLXbzmAnk
+        idjerrEb5Fo6vb9nY8PIXQJi/4ZRj+U=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-204-PtD2ndtRPBuM21nQcZxq1g-1; Fri, 18 Feb 2022 06:37:32 -0500
-X-MC-Unique: PtD2ndtRPBuM21nQcZxq1g-1
-Received: by mail-ed1-f69.google.com with SMTP id j9-20020a056402238900b004128085d906so4495645eda.19
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 03:37:32 -0800 (PST)
+ us-mta-230-Kz3yBH8mM6KikIH69V-D6A-1; Fri, 18 Feb 2022 06:39:47 -0500
+X-MC-Unique: Kz3yBH8mM6KikIH69V-D6A-1
+Received: by mail-wm1-f70.google.com with SMTP id n26-20020a05600c3b9a00b0037c524e6d97so2732176wms.9
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 03:39:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kRz2HhmPOJqUdEguD6ineI0jgT8YXoXhvMfK4d0/iRk=;
-        b=EMqWpWz3Upd9suItMMjhKj7b0dau2/UNvE5leSS258/8FWdyrjKOwyUYX+OjyVDEv0
-         RloCer3LqC2ssWBVqTcXXnCepKJnvxtNfpPU6XzxW8orCRWqUnj+M8fasydn/htSWd1j
-         wGAe9VsWNcC2PD+S2IjCM3G5MD2DX64tk7ig+5b+9OE2GvkW6JJQFakXEeWfIePvm0jI
-         JsnSxyTpzEkDypKTq/wCRzwvDca/LLRft05UIYEYt5+sl48SMnpjyXyM86pPb8akz24H
-         fNs7uNhlh8ZcVaOmkChybyFYiRlIIf6sh4fZqu44pfDU/7i0m+GdsZDEJtNq5gfvnJVv
-         /ehg==
-X-Gm-Message-State: AOAM530FgW6+vTbs2CLvg+kPjGeEdf/at2in6qtw5kZA4/my9CqNEr9o
-        wfKMYcQAjZN9uuCyUzWMUklQuQeruDhiBNrXLKWiENj90rwR0nDyA6f9oaGjkrBIShYDOIPzI4Y
-        9myvO8YYZwDs8
-X-Received: by 2002:a17:906:f293:b0:6b6:bc93:f01f with SMTP id gu19-20020a170906f29300b006b6bc93f01fmr5656032ejb.743.1645184251241;
-        Fri, 18 Feb 2022 03:37:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyumwEeTQqcko1h2tOqCFdEjZvTGldy8JfDmmW/0pXvLQMU7H6ovgQWyZGrpbpB4r5tpsNPFQ==
-X-Received: by 2002:a17:906:f293:b0:6b6:bc93:f01f with SMTP id gu19-20020a170906f29300b006b6bc93f01fmr5656019ejb.743.1645184251001;
-        Fri, 18 Feb 2022 03:37:31 -0800 (PST)
-Received: from redhat.com ([2.55.156.211])
-        by smtp.gmail.com with ESMTPSA id z18sm2209291ejl.78.2022.02.18.03.37.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 03:37:30 -0800 (PST)
-Date:   Fri, 18 Feb 2022 06:37:26 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     syzbot <syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com>
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [syzbot] kernel BUG in vhost_get_vq_desc
-Message-ID: <20220218063352-mutt-send-email-mst@kernel.org>
-References: <00000000000070ac6505d7d9f7a8@google.com>
- <0000000000003b07b305d840b30f@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=u6oPFlqZUUf9Ilo74KAr7+ULBewI1p3jLa6moAZI9Uo=;
+        b=DT/wNKSTg2r/l6MJV5+hkke/z1BqD/6GbqoATd2vBNtEXPJzC4tke+uJ8tUl0U9dXc
+         V5Nfo5xD5iuIwkMN8DcojxiHZ6nzrcPDFDaZsAJ2vO80pA/SNjEdcYzqX6QjJ2za/Yab
+         7mOLu6NSKAwEWXQ7hY/iZfYc1bPLIeKB0ysox4/w9j/RDmsrHQWW2NDA0Jq7ozo2A26a
+         A1563mafP1ZFDpS/Fg9eTciXHUzuhpul9tKmqlO0n+uz7GtIydSJcx2F/C8hrpS0kOZc
+         4z4DnnR3Aw0Pp99xJTftXeSgoasS1PV11WE+qnT9SkADBNIT2mSNiKR6FrLw9td5ENqn
+         3COg==
+X-Gm-Message-State: AOAM530vHJ8LJDm48HiuS61L41EsL6GXKzbwBMDU1TP96GQbFV+f/MCh
+        2fGhhEa+CtF8uLqDJk/joEDWy5+sTS1OeXNMgycmD54CGIQXWowwh/GOUkJvDHg5KqsjIpuu95V
+        gTjAsvIs7TwbN
+X-Received: by 2002:a5d:6d85:0:b0:1e2:f9f9:ab97 with SMTP id l5-20020a5d6d85000000b001e2f9f9ab97mr5649467wrs.469.1645184386292;
+        Fri, 18 Feb 2022 03:39:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwGK/FyLZfrD5HIi49gEBBhO4Pe3orBzg+nmlIsf6SrirbQns/xRDOAPKkpjRc47sEkm+NhlA==
+X-Received: by 2002:a5d:6d85:0:b0:1e2:f9f9:ab97 with SMTP id l5-20020a5d6d85000000b001e2f9f9ab97mr5649455wrs.469.1645184386090;
+        Fri, 18 Feb 2022 03:39:46 -0800 (PST)
+Received: from [192.168.0.5] (ip4-95-82-160-17.cust.nbox.cz. [95.82.160.17])
+        by smtp.gmail.com with ESMTPSA id p16sm4322038wmq.18.2022.02.18.03.39.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Feb 2022 03:39:45 -0800 (PST)
+Message-ID: <bf97384a-2244-c997-ba75-e3680d576401@redhat.com>
+Date:   Fri, 18 Feb 2022 12:39:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000003b07b305d840b30f@google.com>
-X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: Call for GSoC and Outreachy project ideas for summer 2022
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>,
+        qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>
+Cc:     Mark Kanda <mark.kanda@oracle.com>
+References: <CAJSP0QX7O_auRgTKFjHkBbkBK=B3Z-59S6ZZi10tzFTv1_1hkQ@mail.gmail.com>
+ <f7dc638d-0de1-baa8-d883-fd8435ae13f2@redhat.com>
+From:   =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
+In-Reply-To: <f7dc638d-0de1-baa8-d883-fd8435ae13f2@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 05:21:20PM -0800, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
+On 2/17/22 18:52, Paolo Bonzini wrote:
+> On 1/28/22 16:47, Stefan Hajnoczi wrote:
+>> Dear QEMU, KVM, and rust-vmm communities,
+>> QEMU will apply for Google Summer of Code 2022
+>> (https://summerofcode.withgoogle.com/) and has been accepted into
+>> Outreachy May-August 2022 (https://www.outreachy.org/). You can now
+>> submit internship project ideas for QEMU, KVM, and rust-vmm!
+>>
+>> If you have experience contributing to QEMU, KVM, or rust-vmm you can
+>> be a mentor. It's a great way to give back and you get to work with
+>> people who are just starting out in open source.
+>>
+>> Please reply to this email by February 21st with your project ideas.
 > 
-> HEAD commit:    f71077a4d84b Merge tag 'mmc-v5.17-rc1-2' of git://git.kern..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=104c04ca700000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=a78b064590b9f912
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3140b17cb44a7b174008
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1362e232700000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11373a6c700000
+> I would like to co-mentor one or more projects about adding more
+> statistics to Mark Kanda's newly-born introspectable statistics
+> subsystem in QEMU
+> (https://patchew.org/QEMU/20220215150433.2310711-1-mark.kanda@oracle.com/),
+> for example integrating "info blockstats"; and/or, to add matching
+> functionality to libvirt.
 > 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+3140b17cb44a7b174008@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> kernel BUG at drivers/vhost/vhost.c:2335!
-> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-> CPU: 1 PID: 3597 Comm: vhost-3596 Not tainted 5.17.0-rc4-syzkaller-00054-gf71077a4d84b #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
-> Code: 00 00 00 48 c7 c6 20 2c 9d 8a 48 c7 c7 98 a6 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 b7 59 28 fd e9 74 ff ff ff e8 5d c8 a1 fa <0f> 0b e8 56 c8 a1 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
-> RSP: 0018:ffffc90001d1fb88 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-> RDX: ffff8880234b0000 RSI: ffffffff86d715c3 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-> R10: ffffffff86d706bc R11: 0000000000000000 R12: ffff888072c24d68
-> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff888072c24bb0
-> FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000002 CR3: 000000007902c000 CR4: 00000000003506e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  vhost_vsock_handle_tx_kick+0x277/0xa20 drivers/vhost/vsock.c:522
->  vhost_worker+0x23d/0x3d0 drivers/vhost/vhost.c:372
->  kthread+0x2e9/0x3a0 kernel/kthread.c:377
->  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+> However, I will only be available for co-mentoring unfortunately.
 
-I don't see how this can trigger normally so I'm assuming
-another case of use after free.
+I'm happy to offer my helping hand in this. I mean the libvirt part,
+since I am a libvirt developer.
 
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:vhost_get_vq_desc+0x1d43/0x22c0 drivers/vhost/vhost.c:2335
-> Code: 00 00 00 48 c7 c6 20 2c 9d 8a 48 c7 c7 98 a6 8e 8d 48 89 ca 48 c1 e1 04 48 01 d9 e8 b7 59 28 fd e9 74 ff ff ff e8 5d c8 a1 fa <0f> 0b e8 56 c8 a1 fa 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df
-> RSP: 0018:ffffc90001d1fb88 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-> RDX: ffff8880234b0000 RSI: ffffffff86d715c3 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-> R10: ffffffff86d706bc R11: 0000000000000000 R12: ffff888072c24d68
-> R13: 0000000000000000 R14: dffffc0000000000 R15: ffff888072c24bb0
-> FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000002 CR3: 000000007902c000 CR4: 00000000003506e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+I believe this will be listed in QEMU's ideas list, right?
+
+Michal
 
