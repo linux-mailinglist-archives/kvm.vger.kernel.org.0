@@ -2,77 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EB114BC2DD
-	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 00:30:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECACE4BC319
+	for <lists+kvm@lfdr.de>; Sat, 19 Feb 2022 00:57:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbiBRX3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 18:29:06 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47966 "EHLO
+        id S240249AbiBRX5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 18:57:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbiBRX3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 18:29:05 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA86B220DC
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:28:46 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id t11so3641937ioi.7
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:28:46 -0800 (PST)
+        with ESMTP id S235407AbiBRX5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 18:57:42 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8395A8A305
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:57:25 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id s16so9140323pgs.13
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 15:57:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=WdyRbSqxjRN1Kn8UJVUm0MbimiQX+217FfELPaU3/mo=;
-        b=So2XH78/2595kAYYKMXPWI9MBLaanBtHaVGj+8tMhL2jAiQtdtMjFgn2Wt6CDsh/u3
-         TR34w2Vl+WqieKRHoe0bR0w2XuiMfdnv3LrzFE+B6Vcs0jGSHaHGs51Oii2MuvHVZrFh
-         I/IZ0LRqi7EEW7qvKWvYWPRgRj8BzKHB4vSDM=
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RDMp4k3c0UgW7Xo+ygoRLLYEkiKw3xZ8wcdtVyJ0vL4=;
+        b=aLwMZPFKdGqQqiVIoUumDK/EfPQcSCX0ubaVlaDy+i8xaLI8jwmhPi8oKXzG/HRo6/
+         uTtDas0XVNazaKieivDWatWIrHVsRM7qY2zgKVy0M7hmmI35w8ME10D+lAW7qhBhgGWP
+         m+Dxvh9JAYfefpU8QTlZLwRIQzg+Zqk6WfUILdcrnePSxhuIw7Wuu3BzQuqdZj2soCxT
+         le2wK7AQWoZCB1thij/Uvz/M1nKCdVCj3UmXrDJncVU8hP2APjZg9vH2EXUGShQt1+G7
+         yXD5IzD/ksPazA7+ePtbV2DiU1zEG9t3ITh9g1CRkPlQSe7xemzEN/853j5Vhgzi4+rC
+         gEDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WdyRbSqxjRN1Kn8UJVUm0MbimiQX+217FfELPaU3/mo=;
-        b=nPJJy/Wzf0QZx/BzDcgt0pyzIBOnTVf7KXxJ2IYFjE+ofIylJwfLoP3XbgclpIMRE6
-         04bsdxDWqOECUI/SgaEMSIRLPGSjYtnM/Pzzq4NPrtfrZ/xzCcTolGCc39yzmhlmYjGj
-         VnXWxR+nm/XD6AqKgtt9zHnlA6RgJdL8C71iEGhzofpHG5pTN5Mi80WtE3qAng1crd6j
-         agfALM+Dg7wL1FhjrCw3lO40Ofa9/6X2b+GaGjBqbE9PxN4jTsr3PTE7d2MrFSO+NRkJ
-         JYVOE0FPMd40vgUQ8wvPRI8+c7QJKCWXoqZEoqStQE7q5wnjvP4PrV4EL6Fe4DV6wQo+
-         As6Q==
-X-Gm-Message-State: AOAM533959XlNI2tK/XAt43drfxJEC35uu6jyrphWlH1OF0L/OGQCo3O
-        l4d+GSM1UfFPrPWBQHQA641v5w==
-X-Google-Smtp-Source: ABdhPJxmcycqlgoMN58L6oxhcMc4rumhOI+6qqD7jI8B6nrdWJoKhQN+KJXjBlbPEIJq21Mo9AC9CQ==
-X-Received: by 2002:a02:cc55:0:b0:311:bd14:fe74 with SMTP id i21-20020a02cc55000000b00311bd14fe74mr6960161jaq.84.1645226926133;
-        Fri, 18 Feb 2022 15:28:46 -0800 (PST)
-Received: from [192.168.1.128] ([71.205.29.0])
-        by smtp.gmail.com with ESMTPSA id m14sm3821705ioj.34.2022.02.18.15.28.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Feb 2022 15:28:45 -0800 (PST)
-Subject: Re: [PATCH 3/3] selftests: drivers/s390x: Add uvdevice tests
-To:     Steffen Eiden <seiden@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20220217113717.46624-1-seiden@linux.ibm.com>
- <20220217113717.46624-4-seiden@linux.ibm.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <e624fe39-51e2-cfd0-fcdc-d04080272386@linuxfoundation.org>
-Date:   Fri, 18 Feb 2022 16:28:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RDMp4k3c0UgW7Xo+ygoRLLYEkiKw3xZ8wcdtVyJ0vL4=;
+        b=ajrJhMhbcu7iTJ64smV1KOH96bXbExZ6cpfXOrDCeKTvwK4IOSAhZW+RWgT80MGZ15
+         9nzBlEbYfbnDivtkitRwUmjgcedWp6Ze1EJfHq4rsrZC5U7uC/lbtF8nAcHBtDZqpw/t
+         XXN4WcI2O53oElp5wLtMAiEDxdqQ3v6zoL8Nrp/ijmscJVn03r1BbdtymE5rqBuMw/le
+         pJCtGez/cNfSGyGubOZWP57YGfGD5hj5cipN1Mn6TlJm6Zy9PG/lionSi5fGOsTu4W54
+         QdPIyHIeAZKEmYBGW0UxTEpUN4xfDGubK4EKa5Zu3sR56Jg6nyz/bnPrlFZN0AWl6fAn
+         gfnA==
+X-Gm-Message-State: AOAM532g/yh7ZDJnJ5naMJZvp1t6GtoLw29Plr68Hikfp2U6gsanoipO
+        O6TBPXL61HxaB2YRim39pVdmVg==
+X-Google-Smtp-Source: ABdhPJwmiG0Fo0cO3tyL7yYnQBUJyceU6pggtmEI9bajV5eb9gMQ2wDCIYtv2DhRFZL26muKP4+sVg==
+X-Received: by 2002:a63:ce44:0:b0:36c:d02:1f52 with SMTP id r4-20020a63ce44000000b0036c0d021f52mr8132996pgi.142.1645228644714;
+        Fri, 18 Feb 2022 15:57:24 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j12sm11424343pgf.63.2022.02.18.15.57.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Feb 2022 15:57:23 -0800 (PST)
+Date:   Fri, 18 Feb 2022 23:57:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 17/18] KVM: x86: flush TLB separately from MMU reset
+Message-ID: <YhAyX+Bc3x4+ZMTG@google.com>
+References: <20220217210340.312449-1-pbonzini@redhat.com>
+ <20220217210340.312449-18-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20220217113717.46624-4-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220217210340.312449-18-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,398 +70,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/22 4:37 AM, Steffen Eiden wrote:
-> Adds some selftests to test ioctl error paths of the uv-uapi.
+On Thu, Feb 17, 2022, Paolo Bonzini wrote:
+> For both CR0 and CR4, disassociate the TLB flush logic from the
+> MMU role logic.  Instead  of relying on kvm_mmu_reset_context() being
+> a superset of various TLB flushes (which is not necessarily going to
+> be the case in the future), always call it if the role changes
+> but also set the various TLB flush requests according to what is
+> in the manual.
 > 
-
-Please add information on how to run this test and example output.
-
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   MAINTAINERS                                   |   1 +
->   tools/testing/selftests/Makefile              |   1 +
->   tools/testing/selftests/drivers/.gitignore    |   1 +
->   .../selftests/drivers/s390x/uvdevice/Makefile |  22 ++
->   .../selftests/drivers/s390x/uvdevice/config   |   1 +
->   .../drivers/s390x/uvdevice/test_uvdevice.c    | 280 ++++++++++++++++++
->   6 files changed, 306 insertions(+)
->   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/Makefile
->   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/config
->   create mode 100644 tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index c7d8d0fe48cf..c6a0311c3fa8 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -10462,6 +10462,7 @@ F:	arch/s390/kernel/uv.c
->   F:	arch/s390/kvm/
->   F:	arch/s390/mm/gmap.c
->   F:	drivers/s390/char/uvdevice.c
-> +F:	tools/testing/selftests/drivers/s390x/uvdevice/
->   F:	tools/testing/selftests/kvm/*/s390x/
->   F:	tools/testing/selftests/kvm/s390x/
->   
-> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-> index c852eb40c4f7..3b8abaee9271 100644
-> --- a/tools/testing/selftests/Makefile
-> +++ b/tools/testing/selftests/Makefile
-> @@ -9,6 +9,7 @@ TARGETS += core
->   TARGETS += cpufreq
->   TARGETS += cpu-hotplug
->   TARGETS += drivers/dma-buf
-> +TARGETS += drivers/s390x/uvdevice
->   TARGETS += efivarfs
->   TARGETS += exec
->   TARGETS += filesystems
-> diff --git a/tools/testing/selftests/drivers/.gitignore b/tools/testing/selftests/drivers/.gitignore
-> index ca74f2e1c719..09e23b5afa96 100644
-> --- a/tools/testing/selftests/drivers/.gitignore
-> +++ b/tools/testing/selftests/drivers/.gitignore
-> @@ -1,2 +1,3 @@
->   # SPDX-License-Identifier: GPL-2.0-only
->   /dma-buf/udmabuf
-> +/s390x/uvdevice/test_uvdevice
-> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/Makefile b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
-> new file mode 100644
-> index 000000000000..5e701d2708d4
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/Makefile
-> @@ -0,0 +1,22 @@
-> +include ../../../../../build/Build.include
+
+Code is good, a few nits on comments.
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+> @@ -1057,28 +1064,41 @@ EXPORT_SYMBOL_GPL(kvm_is_valid_cr4);
+>  
+>  void kvm_post_set_cr4(struct kvm_vcpu *vcpu, unsigned long old_cr4, unsigned long cr4)
+>  {
+> +	if ((cr4 ^ old_cr4) & KVM_MMU_CR4_ROLE_BITS)
+> +		kvm_mmu_reset_context(vcpu);
 > +
-> +UNAME_M := $(shell uname -m)
+>  	/*
+> -	 * If any role bit is changed, the MMU needs to be reset.
+> -	 *
+> -	 * If CR4.PCIDE is changed 1 -> 0, the guest TLB must be flushed.
+>  	 * If CR4.PCIDE is changed 0 -> 1, there is no need to flush the TLB
+>  	 * according to the SDM; however, stale prev_roots could be reused
+>  	 * incorrectly in the future after a MOV to CR3 with NOFLUSH=1, so we
+> -	 * free them all.  KVM_REQ_MMU_RELOAD is fit for the both cases; it
+> -	 * is slow, but changing CR4.PCIDE is a rare case.
+> -	 *
+> -	 * If CR4.PGE is changed, the guest TLB must be flushed.
+> -	 *
+> -	 * Note: resetting MMU is a superset of KVM_REQ_MMU_RELOAD and
+> -	 * KVM_REQ_MMU_RELOAD is a superset of KVM_REQ_TLB_FLUSH_GUEST, hence
+> -	 * the usage of "else if".
+> +	 * free them all.  This is *not* a superset of KVM_REQ_TLB_FLUSH_GUEST
+> +	 * or KVM_REQ_TLB_FLUSH_CURRENT, because the hardware TLB is not flushed,
+> +	 * so fall through.
+>  	 */
+> -	if ((cr4 ^ old_cr4) & KVM_MMU_CR4_ROLE_BITS)
+> -		kvm_mmu_reset_context(vcpu);
+> -	else if ((cr4 ^ old_cr4) & X86_CR4_PCIDE)
+> +	if (!tdp_enabled &&
+> +	    (cr4 & X86_CR4_PCIDE) && !(old_cr4 & X86_CR4_PCIDE))
+>  		kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+> -	else if ((cr4 ^ old_cr4) & X86_CR4_PGE)
+> -		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 > +
-> +ifneq ($(UNAME_M),s390x)
-> +nothing:
-> +.PHONY: all clean run_tests install
-> +.SILENT:
-> +else
+> +	/*
+> +	 * The TLB has to be flushed for all PCIDs on:
+> +	 * - CR4.PCIDE changed from 1 to 0
+
+Uber nit, grammatically this should use "a ... change", not "changed".  And I
+think it's worth calling out that the flush is architecturally required.
+Something like this, though I don't like using "conditions" to describe the
+cases (can't think of a bette word, obviously).
+
+	/*
+	 * A TLB flush for all PCIDs is architecturally required if any of the
+	 * following conditions is true:
+	 * - CR4.PCIDE is changed from 1 to 0
+	 * - CR4.PGE is toggled
+	 */
+
+> +	 * - any change to CR4.PGE
+> +	 *
+> +	 * This is a superset of KVM_REQ_TLB_FLUSH_CURRENT.
+> +	 */
+> +	if (((cr4 ^ old_cr4) & X86_CR4_PGE) ||
+> +	    (!(cr4 & X86_CR4_PCIDE) && (old_cr4 & X86_CR4_PCIDE)))
+> +		 kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 > +
-> +TEST_GEN_PROGS := test_uvdevice
+> +	/*
+> +	 * The TLB has to be flushed for the current PCID on:
+> +	 * - CR4.SMEP changed from 0 to 1
+> +	 * - any change to CR4.PAE
+> +	 */
+
+Same nit plus "architecturally required" feedback fo rthis one.
+
+> +	else if (((cr4 ^ old_cr4) & X86_CR4_PAE) ||
+> +		 ((cr4 & X86_CR4_SMEP) && !(old_cr4 & X86_CR4_SMEP)))
+> +		 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
 > +
-> +top_srcdir ?= ../../../../../..
-> +KSFT_KHDR_INSTALL := 1
-> +khdr_dir = $(top_srcdir)/usr/include
-> +LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
-> +
-> +CFLAGS += -Wall -Werror -static -I$(khdr_dir) -I$(LINUX_TOOL_ARCH_INCLUDE)
-> +
-> +include ../../../lib.mk
-> +
-> +endif
-> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/config b/tools/testing/selftests/drivers/s390x/uvdevice/config
-> new file mode 100644
-> index 000000000000..f28a04b99eff
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/config
-> @@ -0,0 +1 @@
-> +CONFIG_S390_UV_UAPI=y
-> diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-> new file mode 100644
-> index 000000000000..f23663bcab03
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-> @@ -0,0 +1,280 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + *  selftest for the Ultravisor UAPI device
-> + *
-> + *  Copyright IBM Corp. 2022
-> + *  Author(s): Steffen Eiden <seiden@linux.ibm.com>
-> + */
-> +
-> +#include <stdint.h>
-> +#include <fcntl.h>
-> +#include <errno.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/mman.h>
-> +
-> +#include <asm/uvdevice.h>
-> +
-> +#include "../../../kselftest_harness.h"
-> +
-> +#define BUFFER_SIZE 0x200
-> +FIXTURE(uvio_fixture) {
-> +	int uv_fd;
-> +	struct uvio_ioctl_cb uvio_ioctl;
-> +	uint8_t buffer[BUFFER_SIZE];
-> +	__u64 fault_page;
-> +};
-> +
-> +FIXTURE_VARIANT(uvio_fixture) {
-> +	unsigned long ioctl_cmd;
-> +	uint32_t arg_size;
-> +};
-> +
-> +FIXTURE_VARIANT_ADD(uvio_fixture, qui) {
-> +	.ioctl_cmd = UVIO_IOCTL_QUI,
-> +	.arg_size = BUFFER_SIZE,
-> +};
-> +
-> +FIXTURE_VARIANT_ADD(uvio_fixture, att) {
-> +	.ioctl_cmd = UVIO_IOCTL_ATT,
-> +	.arg_size = sizeof(struct uvio_attest),
-> +};
-> +
-> +FIXTURE_SETUP(uvio_fixture)
-> +{
-> +	self->uv_fd = open("/dev/uv", O_RDWR);
-> +
-> +	self->uvio_ioctl.argument_addr = (__u64)self->buffer;
-> +	self->uvio_ioctl.argument_len = variant->arg_size;
-> +	self->fault_page =
-> +		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
-> +}
-> +
-> +FIXTURE_TEARDOWN(uvio_fixture)
-> +{
-> +	if (self->uv_fd)
-> +		close(self->uv_fd);
-> +	munmap((void *)self->fault_page, (size_t)getpagesize());
-> +}
-> +
-> +TEST_F(uvio_fixture, fault_ioctl_arg)
-> +{
-> +	int rc, errno_cache;
-> +
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, NULL);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EFAULT);
-> +
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, self->fault_page);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EFAULT);
-> +}
-> +
-> +TEST_F(uvio_fixture, fault_uvio_arg)
-> +{
-> +	int rc, errno_cache;
-> +
-> +	self->uvio_ioctl.argument_addr = 0;
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EFAULT);
-> +
-> +	self->uvio_ioctl.argument_addr = self->fault_page;
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EFAULT);
-> +}
-> +
-> +/*
-> + * Test to verify that IOCTLs with invalid values in the ioctl_control block
-> + * are rejected.
-> + */
-> +TEST_F(uvio_fixture, inval_ioctl_cb)
-> +{
-> +	int rc, errno_cache;
-> +
-> +	self->uvio_ioctl.argument_len = 0;
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EINVAL);
-> +
-> +	self->uvio_ioctl.argument_len = (uint32_t)-1;
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EINVAL);
-> +	self->uvio_ioctl.argument_len = variant->arg_size;
-> +
-> +	self->uvio_ioctl.flags = (uint32_t)-1;
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EINVAL);
-> +	self->uvio_ioctl.flags = 0;
-> +
-> +	memset(self->uvio_ioctl.reserved14, 0xff, sizeof(self->uvio_ioctl.reserved14));
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EINVAL);
-> +
-> +	memset(&self->uvio_ioctl, 0x11, sizeof(self->uvio_ioctl));
-> +	rc = ioctl(self->uv_fd, variant->ioctl_cmd, &self->uvio_ioctl);
-> +	ASSERT_EQ(rc, -1);
-> +}
-> +
-> +TEST_F(uvio_fixture, inval_ioctl_cmd)
-> +{
-> +	int rc, errno_cache;
-> +	uint8_t nr = _IOC_NR(variant->ioctl_cmd);
-> +	unsigned long cmds[] = {
-> +		_IOWR('a', nr, struct uvio_ioctl_cb),
-> +		_IOWR(UVIO_TYPE_UVC, nr, int),
-> +		_IO(UVIO_TYPE_UVC, nr),
-> +		_IOR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
-> +		_IOW(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb),
-> +	};
-> +
-> +	for (size_t i = 0; i < ARRAY_SIZE(cmds); i++) {
-> +		rc = ioctl(self->uv_fd, cmds[i], &self->uvio_ioctl);
-> +		errno_cache = errno;
-> +		ASSERT_EQ(rc, -1);
-> +		ASSERT_EQ(errno_cache, EINVAL);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_post_set_cr4);
+>  
+> @@ -11323,15 +11343,17 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	static_call(kvm_x86_update_exception_bitmap)(vcpu);
+>  
+>  	/*
+> -	 * Reset the MMU context if paging was enabled prior to INIT (which is
+> +	 * A TLB flush is needed if paging was enabled prior to INIT (which is
+
+I appreciate the cleverness in changing only a single like, but I think both
+pieces warrant a mention.  How 'bout this, to squeak by with two lines?
+
+	/*
+	 * Reset the MMU and flush the TLB if paging was enabled (INIT only, as
+	 * CR0 is currently guaranteed to be '0' prior to RESET).  Unlike the
+
+>  	 * implied if CR0.PG=1 as CR0 will be '0' prior to RESET).  Unlike the
+>  	 * standard CR0/CR4/EFER modification paths, only CR0.PG needs to be
+>  	 * checked because it is unconditionally cleared on INIT and all other
+>  	 * paging related bits are ignored if paging is disabled, i.e. CR0.WP,
+>  	 * CR4, and EFER changes are all irrelevant if CR0.PG was '0'.
+>  	 */
+> -	if (old_cr0 & X86_CR0_PG)
+> +	if (old_cr0 & X86_CR0_PG) {
+> +		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+>  		kvm_mmu_reset_context(vcpu);
 > +	}
-> +}
-> +
-> +struct test_attest_buffer {
-> +	uint8_t arcb[0x180];
-> +	uint8_t meas[64];
-> +	uint8_t add[32];
-> +};
-> +
-> +FIXTURE(attest_fixture) {
-> +	int uv_fd;
-> +	struct uvio_ioctl_cb uvio_ioctl;
-> +	struct uvio_attest uvio_attest;
-> +	struct test_attest_buffer attest_buffer;
-> +	__u64 fault_page;
-> +};
-> +
-> +FIXTURE_SETUP(attest_fixture)
-> +{
-> +	self->uv_fd = open("/dev/uv", O_RDWR);
-
-So each test opne and closes the devuce. Can this file stay open
-for the duraction of the test run and close it in main() after
-test exits?
-
-> +
-> +	self->uvio_ioctl.argument_addr = (__u64)&self->uvio_attest;
-> +	self->uvio_ioctl.argument_len = sizeof(self->uvio_attest);
-> +
-> +	self->uvio_attest.arcb_addr = (__u64)&self->attest_buffer.arcb;
-> +	self->uvio_attest.arcb_len = sizeof(self->attest_buffer.arcb);
-> +
-> +	self->uvio_attest.meas_addr = (__u64)&self->attest_buffer.meas;
-> +	self->uvio_attest.meas_len = sizeof(self->attest_buffer.meas);
-> +
-> +	self->uvio_attest.add_data_addr = (__u64)&self->attest_buffer.add;
-> +	self->uvio_attest.add_data_len = sizeof(self->attest_buffer.add);
-> +	self->fault_page =
-> +		(__u64)mmap(NULL, (size_t)getpagesize(), PROT_NONE, MAP_ANONYMOUS, -1, 0);
-> +}
-> +
-> +FIXTURE_TEARDOWN(attest_fixture)
-> +{
-> +	if (self->uv_fd)
-> +		close(self->uv_fd);
-> +	munmap((void *)self->fault_page, (size_t)getpagesize());
-> +}
-> +
-> +static void att_inval_sizes_test(uint32_t *size, uint32_t max_size, bool test_zero,
-> +				 struct __test_metadata *_metadata,
-> +				 FIXTURE_DATA(attest_fixture) *self)
-> +{
-> +	int rc, errno_cache;
-> +	uint32_t tmp = *size;
-> +
-> +	if (test_zero) {
-> +		*size = 0;
-> +		rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-> +		errno_cache = errno;
-> +		ASSERT_EQ(rc, -1);
-> +		ASSERT_EQ(errno_cache, EINVAL);
-> +	}
-> +	*size = max_size + 1;
-> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EINVAL);
-> +	*size = tmp;
-> +}
-> +
-> +/*
-> + * Test to verify that attestation IOCTLs with invalid values in the UVIO
-> + * attestation control block are rejected.
-> + */
-> +TEST_F(attest_fixture, att_inval_request)
-> +{
-> +	int rc, errno_cache;
-> +
-> +	att_inval_sizes_test(&self->uvio_attest.add_data_len, UVIO_ATT_ADDITIONAL_MAX_LEN,
-> +			     false, _metadata, self);
-> +	att_inval_sizes_test(&self->uvio_attest.meas_len, UVIO_ATT_MEASUREMENT_MAX_LEN,
-> +			     true, _metadata, self);
-> +	att_inval_sizes_test(&self->uvio_attest.arcb_len, UVIO_ATT_ARCB_MAX_LEN,
-> +			     true, _metadata, self);
-> +
-> +	self->uvio_attest.reserved136 = (uint16_t)-1;
-> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EINVAL);
-> +
-> +	memset(&self->uvio_attest, 0x11, sizeof(self->uvio_attest));
-> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-> +	ASSERT_EQ(rc, -1);
-> +}
-> +
-> +static void att_inval_addr_test(__u64 *addr, struct __test_metadata *_metadata,
-> +				FIXTURE_DATA(attest_fixture) *self)
-> +{
-> +	int rc, errno_cache;
-> +	__u64 tmp = *addr;
-> +
-> +	*addr = 0;
-> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EFAULT);
-> +	*addr = self->fault_page;
-> +	rc = ioctl(self->uv_fd, UVIO_IOCTL_ATT, &self->uvio_ioctl);
-> +	errno_cache = errno;
-> +	ASSERT_EQ(rc, -1);
-> +	ASSERT_EQ(errno_cache, EFAULT);
-> +	*addr = tmp;
-> +}
-> +
-> +TEST_F(attest_fixture, att_inval_addr)
-> +{
-> +	att_inval_addr_test(&self->uvio_attest.arcb_addr, _metadata, self);
-> +	att_inval_addr_test(&self->uvio_attest.add_data_addr, _metadata, self);
-> +	att_inval_addr_test(&self->uvio_attest.meas_addr, _metadata, self);
-> +}
-> +
-> +static void __attribute__((constructor)) __constructor_order_last(void)
-> +{
-> +	if (!__constructor_order)
-> +		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	int fd = open("/dev/uv", O_RDWR);
-> +
-> +	if (fd < 0) {
-> +		ksft_exit_skip("No uv-device.\n");
-
-Please add information on which confg options need to be enabled
-to run this test - CONFIG_S390_UV_UAPI?
-
-Also add a check and skip when run by non-root if this test requires
-root privileges.
-
-> +		ksft_exit(KSFT_SKIP);
-
-You don't need this - ksft_exit_skip() calls exit(KSFT_SKIP)
-
-
-> +	}
-> +	close(fd);
-
-Closing the file before test inocation?
-
-> +	return test_harness_run(argc, argv);
-> +}
-> 
-
-thanks,
--- Shuah
+>  
+>  	/*
+>  	 * Intel's SDM states that all TLB entries are flushed on INIT.  AMD's
+> -- 
+> 2.31.1
