@@ -2,52 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 800784BB66E
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 11:10:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 021414BB6B1
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 11:17:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233926AbiBRKJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 05:09:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60548 "EHLO
+        id S231474AbiBRKRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 05:17:44 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233923AbiBRKJh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 05:09:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 455E83EAA0
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 02:09:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645178960;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XHsrA51tA3vT398QL9pL8+F4Xpr1TIdT6DiOmwJYGxM=;
-        b=G7+QkW1EnKaJuls15YRbyjbps9D1+LX0AdRMrUL0TmACIyJVolFkFks9fiLgI8+OjzWkqi
-        fQ5KSfp8lMWxJ3wVFRo2A8b6GNnaUURQFY8fU/7eT4Pf9E7QW5VWdiMU8RWIK+iqvV+MB8
-        DIuQpTGVYuRl6LkvV6iLOJgDizebhnU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-595-645u8sAxP-aLt-X_BIJBKQ-1; Fri, 18 Feb 2022 05:09:12 -0500
-X-MC-Unique: 645u8sAxP-aLt-X_BIJBKQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D93A1006AA3;
-        Fri, 18 Feb 2022 10:09:11 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F3131106222E;
-        Fri, 18 Feb 2022 10:09:10 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pgonda@google.com
-Subject: [PATCH] selftests: KVM: add sev_migrate_tests on machines without SEV-ES
-Date:   Fri, 18 Feb 2022 05:09:10 -0500
-Message-Id: <20220218100910.35767-1-pbonzini@redhat.com>
+        with ESMTP id S234007AbiBRKRl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 05:17:41 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85E2F5433
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 02:17:23 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id j2so18721689ybu.0
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 02:17:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Iyy5NDpqyWYMvwDNnRCQYWfvKM6GZvR51fujVV6RFrs=;
+        b=i3vFnj30bfPYmDOKbVR++ln/B2wxebX0RvLUuYBE5RBi9Ffd+vU4uWK4dUmWSnkY2Z
+         3ue2wPXNtiRL0cCemvzPb5jV6GuqQ4KmIOk4wnE4Qg84fJsUWu0s9iCHOMT6lyFJryS2
+         gN5Ax3F2GovUh2eAQVgwDyNQPHmKjogA+5cmY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Iyy5NDpqyWYMvwDNnRCQYWfvKM6GZvR51fujVV6RFrs=;
+        b=X6HHz8pVBagmddMwgb5kEI6QGUxAAvnAGKYy8Dh7dzNr3orb2hj+AuIZ5/sz6UGykw
+         QObCw5ijMq4s7f/wMT/Jet5HY2sG35VxXKYF7D5FRU+8OmLOFwu8R6cjsKnDz9MaW/qs
+         3yuMC1d18nwPhs+KoEE8fCulsftpo/6M4xpNgHKuZHMgZ8hlJ4izfJ2Xr0XgUYV/uPoz
+         jLURReDVQw37WkcfFtFQSDIN7TQU3oJPWYrCKITD1tX55YQylFGDjPBhhc3V9UQ9MtxK
+         HzfW4xsmncgEkuIz7IMWNvlD8rPiu+B7mFWV2T9GBJAWfWMn82uCLCW+HKgRy+Dwk2bP
+         ZPNg==
+X-Gm-Message-State: AOAM532Cgqkkt3lmfdUfnKpaG1Q7SUj5IDXCMe24m0JKgs6UeqFfRIA+
+        Y1/hkQHtk21hfHN7s//7zrhFj4OdexibkwcYKSN2yg==
+X-Google-Smtp-Source: ABdhPJyCoXyY9OiZrukbFFfVcGF7PFDFU+nJDGRxtxAWinTEDCkHxTXuhe7uiSaf4Brj9mb5hjCDOg/9eFE3HtRRkbM=
+X-Received: by 2002:a25:5206:0:b0:61d:fcd7:fa74 with SMTP id
+ g6-20020a255206000000b0061dfcd7fa74mr6611554ybb.534.1645179442571; Fri, 18
+ Feb 2022 02:17:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+From:   David Stevens <stevensd@chromium.org>
+Date:   Fri, 18 Feb 2022 19:17:12 +0900
+Message-ID: <CAD=HUj7QkS8Yh6-AF_wj0FSubsyxsb9JfTbaVHJmRyXw+gepUg@mail.gmail.com>
+Subject: VFIO_IOMMU_TYPE1 inefficiencies for certain use cases
+To:     alex.williamson@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -55,165 +57,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I managed to get hold of a machine that has SEV but not SEV-ES, and
-sev_migrate_tests fails because sev_vm_create(true) returns ENOTTY.
-Fix this, and while at it also return KSFT_SKIP on machines that do
-not have SEV at all, instead of returning 0.
+Hi all,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .../selftests/kvm/x86_64/sev_migrate_tests.c  | 78 ++++++++++++++-----
- 1 file changed, 57 insertions(+), 21 deletions(-)
+I'm working on a consumer virtualization project that uses VFIO for
+passthrough devices. However, the way it's using them is a little
+unusual, and that results in some pretty significant inefficiencies in
+the vfio_iommu_type1 implementation. Before going ahead and trying to
+address the problems myself, I'm hoping to get some guidance about
+what sort of changes might be able to be merged upstream.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-index 2e5a42cb470b..d1dc1acf997c 100644
---- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-+++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-@@ -21,6 +21,8 @@
- #define NR_LOCK_TESTING_THREADS 3
- #define NR_LOCK_TESTING_ITERATIONS 10000
- 
-+bool have_sev_es;
-+
- static int __sev_ioctl(int vm_fd, int cmd_id, void *data, __u32 *fw_error)
- {
- 	struct kvm_sev_cmd cmd = {
-@@ -172,10 +174,18 @@ static void test_sev_migrate_parameters(void)
- 		*sev_es_vm_no_vmsa;
- 	int ret;
- 
--	sev_vm = sev_vm_create(/* es= */ false);
--	sev_es_vm = sev_vm_create(/* es= */ true);
- 	vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
- 	vm_no_sev = aux_vm_create(true);
-+	ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "Migrations require SEV enabled. ret %d, errno: %d\n", ret,
-+		    errno);
-+
-+	if (!have_sev_es)
-+		goto out;
-+
-+	sev_vm = sev_vm_create(/* es= */ false);
-+	sev_es_vm = sev_vm_create(/* es= */ true);
- 	sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
- 	sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
- 	vm_vcpu_add(sev_es_vm_no_vmsa, 1);
-@@ -204,14 +214,10 @@ static void test_sev_migrate_parameters(void)
- 		"SEV-ES migrations require UPDATE_VMSA. ret %d, errno: %d\n",
- 		ret, errno);
- 
--	ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
--	TEST_ASSERT(ret == -1 && errno == EINVAL,
--		    "Migrations require SEV enabled. ret %d, errno: %d\n", ret,
--		    errno);
--
- 	kvm_vm_free(sev_vm);
- 	kvm_vm_free(sev_es_vm);
- 	kvm_vm_free(sev_es_vm_no_vmsa);
-+out:
- 	kvm_vm_free(vm_no_vcpu);
- 	kvm_vm_free(vm_no_sev);
- }
-@@ -300,7 +306,6 @@ static void test_sev_mirror_parameters(void)
- 	int ret;
- 
- 	sev_vm = sev_vm_create(/* es= */ false);
--	sev_es_vm = sev_vm_create(/* es= */ true);
- 	vm_with_vcpu = aux_vm_create(true);
- 	vm_no_vcpu = aux_vm_create(false);
- 
-@@ -310,6 +315,21 @@ static void test_sev_mirror_parameters(void)
- 		"Should not be able copy context to self. ret: %d, errno: %d\n",
- 		ret, errno);
- 
-+	ret = __sev_mirror_create(vm_no_vcpu->fd, vm_with_vcpu->fd);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "Copy context requires SEV enabled. ret %d, errno: %d\n", ret,
-+		    errno);
-+
-+	ret = __sev_mirror_create(vm_with_vcpu->fd, sev_vm->fd);
-+	TEST_ASSERT(
-+		ret == -1 && errno == EINVAL,
-+		"SEV copy context requires no vCPUS on the destination. ret: %d, errno: %d\n",
-+		ret, errno);
-+
-+	if (!have_sev_es)
-+		goto out;
-+
-+	sev_es_vm = sev_vm_create(/* es= */ true);
- 	ret = __sev_mirror_create(sev_vm->fd, sev_es_vm->fd);
- 	TEST_ASSERT(
- 		ret == -1 && errno == EINVAL,
-@@ -322,19 +342,10 @@ static void test_sev_mirror_parameters(void)
- 		"Should not be able copy context to SEV-ES enabled VM. ret: %d, errno: %d\n",
- 		ret, errno);
- 
--	ret = __sev_mirror_create(vm_no_vcpu->fd, vm_with_vcpu->fd);
--	TEST_ASSERT(ret == -1 && errno == EINVAL,
--		    "Copy context requires SEV enabled. ret %d, errno: %d\n", ret,
--		    errno);
--
--	ret = __sev_mirror_create(vm_with_vcpu->fd, sev_vm->fd);
--	TEST_ASSERT(
--		ret == -1 && errno == EINVAL,
--		"SEV copy context requires no vCPUS on the destination. ret: %d, errno: %d\n",
--		ret, errno);
-+	kvm_vm_free(sev_es_vm);
- 
-+out:
- 	kvm_vm_free(sev_vm);
--	kvm_vm_free(sev_es_vm);
- 	kvm_vm_free(vm_with_vcpu);
- 	kvm_vm_free(vm_no_vcpu);
- }
-@@ -393,11 +404,35 @@ static void test_sev_move_copy(void)
- 	kvm_vm_free(sev_vm);
- }
- 
-+#define X86_FEATURE_SEV (1 << 1)
-+#define X86_FEATURE_SEV_ES (1 << 3)
-+
- int main(int argc, char *argv[])
- {
-+	struct kvm_cpuid_entry2 *cpuid;
-+
-+	if (!kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM) &&
-+	    !kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
-+		print_skip("Capabilities not available");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	cpuid = kvm_get_supported_cpuid_entry(0x80000000);
-+	if (cpuid->eax < 0x8000001f) {
-+		print_skip("AMD memory encryption not available");
-+		exit(KSFT_SKIP);
-+	}
-+	cpuid = kvm_get_supported_cpuid_entry(0x8000001f);
-+	if (!(cpuid->eax & X86_FEATURE_SEV)) {
-+		print_skip("AMD SEV not available");
-+		exit(KSFT_SKIP);
-+	}
-+	have_sev_es = !!(cpuid->eax & X86_FEATURE_SEV_ES);
-+
- 	if (kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM)) {
- 		test_sev_migrate_from(/* es= */ false);
--		test_sev_migrate_from(/* es= */ true);
-+		if (have_sev_es)
-+			test_sev_migrate_from(/* es= */ true);
- 		test_sev_migrate_locking();
- 		test_sev_migrate_parameters();
- 		if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM))
-@@ -405,7 +440,8 @@ int main(int argc, char *argv[])
- 	}
- 	if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
- 		test_sev_mirror(/* es= */ false);
--		test_sev_mirror(/* es= */ true);
-+		if (have_sev_es)
-+			test_sev_mirror(/* es= */ true);
- 		test_sev_mirror_parameters();
- 	}
- 	return 0;
--- 
-2.31.1
+The usage pattern that is not well supported by VFIO is many small,
+dynamic mappings. We have this pattern because we are using
+virtio-iommu to isolate some untrusted passthrough devices within the
+guest, and also because for the rest of the passthrough devices we're
+using coIOMMU [1] to support overcommit of memory in the host by not
+pinning all of the guest's memory. Both of these rely on using
+VFIO_IOMMU_MAP_DMA at the page granularity. This results in a lot of
+metadata overhead from the struct vfio_dma. At 80 bytes of metadata
+per page (actually 128 due to rounding in kmalloc), 1-2% of total
+system memory can end up being used for VFIO metadata.
 
+First, is this sort of use case something that upstream wants to address?
+
+If it's something that is worth addressing, here are two possible
+approaches I've thought of. I haven't implemented either yet, so there
+might be details I'm missing, or the API changes or maintenance costs
+might not be acceptable. Both are a little bit different from
+VFIO_TYPE1_IOMMU, so they would probably require at least a
+VFIO_TYPE1v3_IOMMU type.
+
+1) Add an alternative xarray implementation for vfio_iommu.dma_list
+that maintains the iova -> vaddr mapping at the page granularity. Most
+of the metadata in struct vfio_dma can be packed into the extra bits
+in the vaddr. The two exceptions are vfio_dma.task and
+vfio_dma.pfn_list. The lack of space for vfio_dma.task could be
+addressed by requiring that all mappings have the same task. Without
+vfio_dma.pfn_list, we would lose the refcount maintained by struct
+vfio_pfn, which means every call to vfio_iommu_type1_pin_pages would
+require re-pinning the page. This might be a bit more inefficient,
+although it seems like it should be okay from a correctness
+standpoint.
+
+One downside of this approach is that it is only more memory efficient
+than the rbtree if the mapping is quite dense, since a struct xa_node
+is quite a bit larger than a struct vfio_dma. This would help the most
+problematic coIOMMU cases, but it would still leave certain
+virtio-iommu cases unaddressed. Also, although most of the struct
+vfio_dma metadata could be packed into the xarray today, that might no
+longer be the case if more metadata was added in the future.
+
+2) A second alternative would be to drop the VFIO metadata altogether
+and basically directly expose the iommu APIs (with the required
+locking/validation). This would be incompatible with mediated devices,
+and it wouldn't be able to support the various bells and whistles of
+the VFIO api. However, I think the core mapping/unmapping logic could
+still be shared between the normal struct vfio_dma tree and this
+approach. Personally, I'm a little more in favor of this one, since it
+completely avoids VFIO memory overhead in both of my use cases.
+
+Do either of those approaches sound like something that might work? If
+neither is okay, are there any suggestions for approaches to take?
+
+Thanks,
+David
+
+[1] https://www.usenix.org/conference/atc20/presentation/tian
