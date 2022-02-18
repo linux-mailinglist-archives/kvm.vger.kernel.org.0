@@ -2,74 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 575804BB5DA
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 10:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 800784BB66E
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 11:10:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233720AbiBRJoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 04:44:08 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52938 "EHLO
+        id S233926AbiBRKJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 05:09:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232251AbiBRJoH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 04:44:07 -0500
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 471C4237F5;
-        Fri, 18 Feb 2022 01:43:51 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id qx21so13588790ejb.13;
-        Fri, 18 Feb 2022 01:43:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8gzRpoadSXSxB0BIzDqVsAXWUfQOc0XeG3vY2OHWrw4=;
-        b=XKfx6RWsxF0BE8FESNVpCImccET2T6xMYcSKtsrB0C7zVJBx63CTl5dDyu6HffnIMC
-         gG6909iMibiElPgOTMVG2Fy4NGAhwdOWHxVzrY4JHhNi/ezqp28SzsSQwOQf/iqxkaDK
-         xUWAtzZdl75P4LhJy9WtWq2Den344zuoVkJHwQEnZxRTP1iAS1A/eh5hhQmi4IjqdabV
-         4/bthYoCatA5SfUM/entbQh8OIirTCDXJQdE5yK6ShuioF0HDmKej7MIVeLGVI8saJrp
-         0qFrsIwwbubqVQaOoAp+olFiICrwvJHYOI1bX8+EfgxnzaCu9W7nZNvowEusykvXCvHU
-         OXxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8gzRpoadSXSxB0BIzDqVsAXWUfQOc0XeG3vY2OHWrw4=;
-        b=6NfmG//2PbBmOwlJNgfATOR4NC1/Ja+LheIb6sLnShHxxRPjc9uTF8RDmJORJoSdMb
-         VB/QMebJvYhaET1kjx/P/iJRoZDQaYO5U0ltf3OWxiEYyKFHRmI5ABEKS/Vdvw4lPim4
-         98QXD3JWfOlecWVteYlA/pHI4ruP4cwRBlQ7q0rRUZBHVdGoz50UpHGhHrMVrVh2kMq2
-         AxiTSZv1l9G26PpAmj0JU4woKU+4DMBo3NxV0wTD8F6r41FEsdWSGI9sb6+ldyXTTc2x
-         rBJgTo3YOZot1UZ/4wDLD7MwMti3MJXtdiqb3Qs8izUiclYuJEendtBjslZdZ2f4jAWZ
-         CV9w==
-X-Gm-Message-State: AOAM530GdvDH6ioj7wuM3MRjrED225CHgbNZz7O/lgcLmSkbxt3QP9XZ
-        JdIR+7hMT+QuDYcflOu9bSNOHiLcJGY=
-X-Google-Smtp-Source: ABdhPJy+9t1giFT+NiQvcNipEOFTkMK7WctZSrFXg32Fjh4JpcNBg7jYgNyMstxgvwVGTDCf8KJZ8Q==
-X-Received: by 2002:a17:906:c211:b0:6ce:e221:4c21 with SMTP id d17-20020a170906c21100b006cee2214c21mr5610629ejz.691.1645177429712;
-        Fri, 18 Feb 2022 01:43:49 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id gq1sm2072372ejb.58.2022.02.18.01.43.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Feb 2022 01:43:49 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <bfe385f9-b075-12e7-43c3-7957bf1b54bc@redhat.com>
-Date:   Fri, 18 Feb 2022 10:43:48 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2] KVM: SEV: Allow SEV intra-host migration of VM with
- mirrors
-Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Orr <marcorr@google.com>, linux-kernel@vger.kernel.org
-References: <20220211193634.3183388-1-pgonda@google.com>
+        with ESMTP id S233923AbiBRKJh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 05:09:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 455E83EAA0
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 02:09:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645178960;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XHsrA51tA3vT398QL9pL8+F4Xpr1TIdT6DiOmwJYGxM=;
+        b=G7+QkW1EnKaJuls15YRbyjbps9D1+LX0AdRMrUL0TmACIyJVolFkFks9fiLgI8+OjzWkqi
+        fQ5KSfp8lMWxJ3wVFRo2A8b6GNnaUURQFY8fU/7eT4Pf9E7QW5VWdiMU8RWIK+iqvV+MB8
+        DIuQpTGVYuRl6LkvV6iLOJgDizebhnU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-595-645u8sAxP-aLt-X_BIJBKQ-1; Fri, 18 Feb 2022 05:09:12 -0500
+X-MC-Unique: 645u8sAxP-aLt-X_BIJBKQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D93A1006AA3;
+        Fri, 18 Feb 2022 10:09:11 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F3131106222E;
+        Fri, 18 Feb 2022 10:09:10 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220211193634.3183388-1-pgonda@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pgonda@google.com
+Subject: [PATCH] selftests: KVM: add sev_migrate_tests on machines without SEV-ES
+Date:   Fri, 18 Feb 2022 05:09:10 -0500
+Message-Id: <20220218100910.35767-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,15 +55,165 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/11/22 20:36, Peter Gonda wrote:
-> -	WARN_ON(sev->num_mirrored_vms);
-> +	WARN_ON(!list_empty(&sev->mirror_vms));
->   
->   	if (!sev_guest(kvm))
->   		return;
-> @@ -2049,11 +2071,9 @@ void sev_vm_destroy(struct kvm *kvm)
+I managed to get hold of a machine that has SEV but not SEV-ES, and
+sev_migrate_tests fails because sev_vm_create(true) returns ENOTTY.
+Fix this, and while at it also return KSFT_SKIP on machines that do
+not have SEV at all, instead of returning 0.
 
-Note, the WARN must now be moved after "if (!sev_guest(kvm))" (before, 
-num_mirrored_vms was initialized to 0).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  | 78 ++++++++++++++-----
+ 1 file changed, 57 insertions(+), 21 deletions(-)
 
-Paolo
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+index 2e5a42cb470b..d1dc1acf997c 100644
+--- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
++++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+@@ -21,6 +21,8 @@
+ #define NR_LOCK_TESTING_THREADS 3
+ #define NR_LOCK_TESTING_ITERATIONS 10000
+ 
++bool have_sev_es;
++
+ static int __sev_ioctl(int vm_fd, int cmd_id, void *data, __u32 *fw_error)
+ {
+ 	struct kvm_sev_cmd cmd = {
+@@ -172,10 +174,18 @@ static void test_sev_migrate_parameters(void)
+ 		*sev_es_vm_no_vmsa;
+ 	int ret;
+ 
+-	sev_vm = sev_vm_create(/* es= */ false);
+-	sev_es_vm = sev_vm_create(/* es= */ true);
+ 	vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+ 	vm_no_sev = aux_vm_create(true);
++	ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "Migrations require SEV enabled. ret %d, errno: %d\n", ret,
++		    errno);
++
++	if (!have_sev_es)
++		goto out;
++
++	sev_vm = sev_vm_create(/* es= */ false);
++	sev_es_vm = sev_vm_create(/* es= */ true);
+ 	sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+ 	sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
+ 	vm_vcpu_add(sev_es_vm_no_vmsa, 1);
+@@ -204,14 +214,10 @@ static void test_sev_migrate_parameters(void)
+ 		"SEV-ES migrations require UPDATE_VMSA. ret %d, errno: %d\n",
+ 		ret, errno);
+ 
+-	ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
+-	TEST_ASSERT(ret == -1 && errno == EINVAL,
+-		    "Migrations require SEV enabled. ret %d, errno: %d\n", ret,
+-		    errno);
+-
+ 	kvm_vm_free(sev_vm);
+ 	kvm_vm_free(sev_es_vm);
+ 	kvm_vm_free(sev_es_vm_no_vmsa);
++out:
+ 	kvm_vm_free(vm_no_vcpu);
+ 	kvm_vm_free(vm_no_sev);
+ }
+@@ -300,7 +306,6 @@ static void test_sev_mirror_parameters(void)
+ 	int ret;
+ 
+ 	sev_vm = sev_vm_create(/* es= */ false);
+-	sev_es_vm = sev_vm_create(/* es= */ true);
+ 	vm_with_vcpu = aux_vm_create(true);
+ 	vm_no_vcpu = aux_vm_create(false);
+ 
+@@ -310,6 +315,21 @@ static void test_sev_mirror_parameters(void)
+ 		"Should not be able copy context to self. ret: %d, errno: %d\n",
+ 		ret, errno);
+ 
++	ret = __sev_mirror_create(vm_no_vcpu->fd, vm_with_vcpu->fd);
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "Copy context requires SEV enabled. ret %d, errno: %d\n", ret,
++		    errno);
++
++	ret = __sev_mirror_create(vm_with_vcpu->fd, sev_vm->fd);
++	TEST_ASSERT(
++		ret == -1 && errno == EINVAL,
++		"SEV copy context requires no vCPUS on the destination. ret: %d, errno: %d\n",
++		ret, errno);
++
++	if (!have_sev_es)
++		goto out;
++
++	sev_es_vm = sev_vm_create(/* es= */ true);
+ 	ret = __sev_mirror_create(sev_vm->fd, sev_es_vm->fd);
+ 	TEST_ASSERT(
+ 		ret == -1 && errno == EINVAL,
+@@ -322,19 +342,10 @@ static void test_sev_mirror_parameters(void)
+ 		"Should not be able copy context to SEV-ES enabled VM. ret: %d, errno: %d\n",
+ 		ret, errno);
+ 
+-	ret = __sev_mirror_create(vm_no_vcpu->fd, vm_with_vcpu->fd);
+-	TEST_ASSERT(ret == -1 && errno == EINVAL,
+-		    "Copy context requires SEV enabled. ret %d, errno: %d\n", ret,
+-		    errno);
+-
+-	ret = __sev_mirror_create(vm_with_vcpu->fd, sev_vm->fd);
+-	TEST_ASSERT(
+-		ret == -1 && errno == EINVAL,
+-		"SEV copy context requires no vCPUS on the destination. ret: %d, errno: %d\n",
+-		ret, errno);
++	kvm_vm_free(sev_es_vm);
+ 
++out:
+ 	kvm_vm_free(sev_vm);
+-	kvm_vm_free(sev_es_vm);
+ 	kvm_vm_free(vm_with_vcpu);
+ 	kvm_vm_free(vm_no_vcpu);
+ }
+@@ -393,11 +404,35 @@ static void test_sev_move_copy(void)
+ 	kvm_vm_free(sev_vm);
+ }
+ 
++#define X86_FEATURE_SEV (1 << 1)
++#define X86_FEATURE_SEV_ES (1 << 3)
++
+ int main(int argc, char *argv[])
+ {
++	struct kvm_cpuid_entry2 *cpuid;
++
++	if (!kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM) &&
++	    !kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
++		print_skip("Capabilities not available");
++		exit(KSFT_SKIP);
++	}
++
++	cpuid = kvm_get_supported_cpuid_entry(0x80000000);
++	if (cpuid->eax < 0x8000001f) {
++		print_skip("AMD memory encryption not available");
++		exit(KSFT_SKIP);
++	}
++	cpuid = kvm_get_supported_cpuid_entry(0x8000001f);
++	if (!(cpuid->eax & X86_FEATURE_SEV)) {
++		print_skip("AMD SEV not available");
++		exit(KSFT_SKIP);
++	}
++	have_sev_es = !!(cpuid->eax & X86_FEATURE_SEV_ES);
++
+ 	if (kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM)) {
+ 		test_sev_migrate_from(/* es= */ false);
+-		test_sev_migrate_from(/* es= */ true);
++		if (have_sev_es)
++			test_sev_migrate_from(/* es= */ true);
+ 		test_sev_migrate_locking();
+ 		test_sev_migrate_parameters();
+ 		if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM))
+@@ -405,7 +440,8 @@ int main(int argc, char *argv[])
+ 	}
+ 	if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
+ 		test_sev_mirror(/* es= */ false);
+-		test_sev_mirror(/* es= */ true);
++		if (have_sev_es)
++			test_sev_mirror(/* es= */ true);
+ 		test_sev_mirror_parameters();
+ 	}
+ 	return 0;
+-- 
+2.31.1
+
