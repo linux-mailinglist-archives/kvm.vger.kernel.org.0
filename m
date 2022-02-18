@@ -2,95 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC6844BB9DB
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 14:11:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C06B74BBA5E
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 15:03:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235653AbiBRNLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 08:11:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45388 "EHLO
+        id S235911AbiBRODd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 09:03:33 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232732AbiBRNLp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 08:11:45 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A731114;
-        Fri, 18 Feb 2022 05:11:26 -0800 (PST)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21IBjnl4023165;
-        Fri, 18 Feb 2022 13:11:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fKVhjSYiibOSJq3O1/0+08AGxNO1ENinWHGINOwzLAI=;
- b=UmLyn9OTB05CuXlcFjUk1noxE46hfmlexfrWWxOLa6cfId/rCcRdpu0aG50PJQWkYwxM
- VbG/HulVOAtTBwTAFrNrNdLhrHixejzqGGCGOAFJFWRxPg93jLqQy2AuSP0joz6u/StZ
- g5D+9V9VIGJkw+/Ere5bXzDDFn6DtQlJkhifWhltDEjDsrHj/rv6cjX/Z/DVa9dCfTDh
- dhCnsm8n8qHWPbgMvH946dwOr1rNLuG1fR4fjdNiPXl1v4jlxd0Td6mhh/eOhVTQwRWV
- J55UJ4VgbIFihKp0vkz/kV3mX38cFXMyuQmGBlsF8kJr3GHXqmijKtVOcTnkmbk20sAb BQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3eaavastxd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 13:11:25 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21ID7is3021648;
-        Fri, 18 Feb 2022 13:11:25 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3eaavastwr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 13:11:25 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21ID43aw001236;
-        Fri, 18 Feb 2022 13:11:23 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3e64hat64x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 13:11:23 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21IDBKI936569346
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Feb 2022 13:11:20 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E453A406F;
-        Fri, 18 Feb 2022 13:11:20 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B50B0A405B;
-        Fri, 18 Feb 2022 13:11:19 +0000 (GMT)
-Received: from [9.171.47.189] (unknown [9.171.47.189])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Feb 2022 13:11:19 +0000 (GMT)
-Message-ID: <97af6268-ff7a-cfb6-5ea4-217b5162cfe7@linux.ibm.com>
-Date:   Fri, 18 Feb 2022 14:13:34 +0100
+        with ESMTP id S231172AbiBRODc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 09:03:32 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 115CE173B33
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 06:03:15 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id p9so14743719wra.12
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 06:03:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vGCgEB2EWkLQKUMYKQNwxkOP/Yb7el6dtXFMGwKacLA=;
+        b=rm5ZfC4muyEsvYz5oGesAtl+TwTSHzGYN/qFHp5rJ/YiflwZ8t3Do6yRA2fMWzhbcC
+         5DW8POqrMPoQvzxbZvJZyoXBy3mkFpvGC4Mt0VCLEVbVvcI+MW8Tdf5N0ltaQa+YO1Q7
+         PvaRRhei9Npd7uqwx/yFwZXExQssjpl+iu+itXPkL3u0lkhXz7Ee786bBz501NjRqZFg
+         wUAWgRzjqnqQOwO8muCc1TWiPRUiz1NQHrqH0jzyBMCq5N4Iv/liBGqe25JgW6yOZPju
+         EdzEXa5e/WVSTaolGxd3cdo5WoYDdyYnM8k1Op6PFYiNWehrV41RlXJ/ARwI7DEAnLKk
+         dGYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vGCgEB2EWkLQKUMYKQNwxkOP/Yb7el6dtXFMGwKacLA=;
+        b=lqyb8DGar6ptnnLvIl4F0cgjeU8QULvDayl+O+azAULOb5OJrKSRbjhV7t7Yne7eRN
+         JOvITbo4DfEhHC+OMnl9PfdWWO2nnKAV3kUDJgRl3RJLy4RBg18N2PCthMf165TWK0DI
+         kXMGPFI3rfsylXKu/vrrML9pRZ0EGmkaQwUb7q7t9WWfPNCw02BnHv+e0C+wxvNHy5jE
+         y0I+hhtclm5GbZ70kTG3b4aCgitKgu1hj3Shj8chnpEpsi9pDRufzCTU3pBChnCe9CoZ
+         qpga20rSPOFkjUjdENhe6q4BuKUrEsAKsOtXf2igM417z5uyuN4yYKVjm8kxGl7uC30D
+         Hw1g==
+X-Gm-Message-State: AOAM531t4+d3r/ZG85xoNMsr1q70IaGRWuqMio0LFn9F3h53Od8gto9W
+        W62AeEwb1Q2tl7vw38h75STn8w==
+X-Google-Smtp-Source: ABdhPJxcA2yASEx5/GK9YR96JJftsm/aMdoMqXug8OhXaru+n5yM4+f2mpHywje/xZl0AJ2T9TzKwQ==
+X-Received: by 2002:a05:6000:1541:b0:1e8:30f7:b3f0 with SMTP id 1-20020a056000154100b001e830f7b3f0mr6136243wry.578.1645192993441;
+        Fri, 18 Feb 2022 06:03:13 -0800 (PST)
+Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
+        by smtp.gmail.com with ESMTPSA id x10sm4206731wmj.17.2022.02.18.06.03.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Feb 2022 06:03:13 -0800 (PST)
+Date:   Fri, 18 Feb 2022 14:03:11 +0000
+From:   Sebastian Ene <sebastianene@google.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, qperret@google.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool v2] aarch64: Add stolen time support
+Message-ID: <Yg+nHwSMmIXGoHjO@google.com>
+References: <Yg5lBZKsSoPNmVkT@google.com>
+ <Yg5tE3TqgwWRFypB@monolith.localdoman>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v7 1/1] s390x: KVM: guest support for topology function
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, wintera@linux.ibm.com,
-        seiden@linux.ibm.com
-References: <20220217095923.114489-1-pmorel@linux.ibm.com>
- <20220217095923.114489-2-pmorel@linux.ibm.com>
- <f0bf737abf480d6d16af6e5335bb195061f3d076.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <f0bf737abf480d6d16af6e5335bb195061f3d076.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: A1Lyg0RSc8DoD6mcQzOuGGxpckvcaM-_
-X-Proofpoint-ORIG-GUID: GzAtew3Zeqc2gdxdBdVVz4intC7a5M2X
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-18_05,2022-02-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202180085
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yg5tE3TqgwWRFypB@monolith.localdoman>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,93 +72,250 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2/17/22 18:17, Nico Boehr wrote:
-> On Thu, 2022-02-17 at 10:59 +0100, Pierre Morel wrote:
-> [...]
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 2296b1ff1e02..af7ea8488fa2 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
-> [...]
->>   
->> -void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->> +/**
->> + * kvm_s390_vcpu_set_mtcr
->> + * @vcp: the virtual CPU
->> + *
->> + * Is only relevant if the topology facility is present.
->> + *
->> + * Updates the Multiprocessor Topology-Change-Report to signal
->> + * the guest with a topology change.
->> + */
->> +static void kvm_s390_vcpu_set_mtcr(struct kvm_vcpu *vcpu)
->>   {
->> +       struct esca_block *esca = vcpu->kvm->arch.sca;
+On Thu, Feb 17, 2022 at 03:43:15PM +0000, Alexandru Elisei wrote:
+> Hi,
 > 
-> utility is at the same offset for the bsca and the esca, still
-> wondering whether it is a good idea to assume esca here...
-
-We can take bsca to be coherent with the include file where we define 
-ESCA_UTILITY_MTCR inside the bsca.
-And we can rename the define to SCA_UTILITY_MTCR as it is common for 
-both BSCA and ESCA the (E) is too much.
-
+> Some general comments while I familiarize myself with the stolen time spec.
 > 
-> [...]
->> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
->> index 098831e815e6..af04ffbfd587 100644
->> --- a/arch/s390/kvm/kvm-s390.h
->> +++ b/arch/s390/kvm/kvm-s390.h
->> @@ -503,4 +503,29 @@ void kvm_s390_vcpu_crypto_reset_all(struct kvm
->> *kvm);
->>    */
->>   extern unsigned int diag9c_forwarding_hz;
->>   
->> +#define S390_KVM_TOPOLOGY_NEW_CPU -1
->> +/**
->> + * kvm_s390_topology_changed
->> + * @vcpu: the virtual CPU
->> + *
->> + * If the topology facility is present, checks if the CPU toplogy
->> + * viewed by the guest changed due to load balancing or CPU hotplug.
->> + */
->> +static inline bool kvm_s390_topology_changed(struct kvm_vcpu *vcpu)
->> +{
->> +       if (!test_kvm_facility(vcpu->kvm, 11))
->> +               return false;
->> +
->> +       /* A new vCPU has been hotplugged */
->> +       if (vcpu->arch.prev_cpu == S390_KVM_TOPOLOGY_NEW_CPU)
->> +               return true;
->> +
->> +       /* The real CPU backing up the vCPU moved to another socket
->> */
->> +       if (topology_physical_package_id(vcpu->cpu) !=
->> +           topology_physical_package_id(vcpu->arch.prev_cpu))
->> +               return true;
+> On Thu, Feb 17, 2022 at 03:08:53PM +0000, Sebastian Ene wrote:
+> > This patch adds support for stolen time by sharing a memory region
+> > with the guest which will be used by the hypervisor to store the stolen
+> > time information. The exact format of the structure stored by the
+> > hypervisor is described in the ARM DEN0057A document.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
 > 
-> Why is it OK to look just at the physical package ID here? What if the
-> vcpu for example moves to a different book, which has a core with the
-> same physical package ID?
+> It is customary to describe the changes you have made from the previous version,
+> to make it easier for the people who want to review your code.
 > 
 
-You are right, we should look at the drawer and book id too.
-Something like that I think:
+Hello,
 
-         if ((topology_physical_package_id(vcpu->cpu) !=
-              topology_physical_package_id(vcpu->arch.prev_cpu)) ||
-             (topology_book_id(vcpu->cpu) !=
-              topology_book_id(vcpu->arch.prev_cpu)) ||
-             (topology_drawer_id(vcpu->cpu) !=
-              topology_drawer_id(vcpu->arch.prev_cpu)))
-                 return true;
+Thanks for the feedback. I will include the changelog in the next
+patches.
 
+> >  Makefile                               |  1 +
+> >  arm/aarch64/arm-cpu.c                  |  1 +
+> >  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
+> >  arm/aarch64/pvtime.c                   | 84 ++++++++++++++++++++++++++
+> >  arm/include/arm-common/kvm-arch.h      |  4 ++
+> >  arm/kvm-cpu.c                          | 14 ++---
+> >  6 files changed, 98 insertions(+), 7 deletions(-)
+> >  create mode 100644 arm/aarch64/pvtime.c
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index f251147..e9121dc 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
+> >  	OBJS		+= arm/aarch64/arm-cpu.o
+> >  	OBJS		+= arm/aarch64/kvm-cpu.o
+> >  	OBJS		+= arm/aarch64/kvm.o
+> > +	OBJS		+= arm/aarch64/pvtime.o
+> >  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
+> >  
+> > diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+> > index d7572b7..326fb20 100644
+> > --- a/arm/aarch64/arm-cpu.c
+> > +++ b/arm/aarch64/arm-cpu.c
+> > @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> >  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+> >  {
+> >  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
+> > +	kvm_cpu__setup_pvtime(vcpu);
+> >  	return 0;
+> >  }
+> >  
+> > diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> > index 8dfb82e..b57d6e6 100644
+> > --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> > +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+> > @@ -19,5 +19,6 @@
+> >  
+> >  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+> >  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
+> > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
+> >  
+> >  #endif /* KVM__KVM_CPU_ARCH_H */
+> > diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+> > new file mode 100644
+> > index 0000000..c09fd89
+> > --- /dev/null
+> > +++ b/arm/aarch64/pvtime.c
+> > @@ -0,0 +1,84 @@
+> > +#include "kvm/kvm.h"
+> > +#include "kvm/kvm-cpu.h"
+> > +#include "kvm/util.h"
+> > +
+> > +#include <linux/byteorder.h>
+> > +#include <linux/types.h>
+> > +
+> > +struct pvtime_data_priv {
+> > +	bool	is_supported;
+> > +	char	*usr_mem;
+> > +};
+> > +
+> > +static struct pvtime_data_priv pvtime_data = {
+> > +	.is_supported	= true,
+> > +	.usr_mem	= NULL
+> > +};
+> > +
+> > +static int pvtime__alloc_region(struct kvm *kvm)
+> > +{
+> > +	char *mem;
+> > +	int ret = 0;
+> > +
+> > +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
+> > +		   MAP_ANON_NORESERVE, -1, 0);
+> > +	if (mem == MAP_FAILED)
+> > +		return -ENOMEM;
+> > +
+> > +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
+> > +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
+> > +	if (ret) {
+> > +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
+> > +		return ret;
+> > +	}
+> > +
+> > +	pvtime_data.usr_mem = mem;
+> > +	return ret;
+> > +}
+> > +
+> > +static int pvtime__teardown_region(struct kvm *kvm)
+> > +{
+> > +	if (pvtime_data.usr_mem == NULL)
+> > +		return 0;
+> > +
+> > +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
+> > +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
+> > +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
+> > +	pvtime_data.usr_mem = NULL;
+> > +	return 0;
+> > +}
+> > +
+> > +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+> > +{
+> > +	int ret;
+> > +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
+> > +		AARCH64_PVTIME_SIZE;
+> > +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+> > +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+> > +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
+> > +	};
+> > +
+> > +	if (!pvtime_data.is_supported)
+> > +		return;
+> > +
+> > +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
+> > +	if (ret)
+> > +		goto out_err;
+> > +
+> > +	if (!pvtime_data.usr_mem) {
+> > +		ret = pvtime__alloc_region(vcpu->kvm);
+> > +		if (ret)
+> > +			goto out_err;
+> > +	}
+> > +
+> > +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
+> > +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
+> > +	if (!ret)
+> > +		return;
+> > +
+> > +	pvtime__teardown_region(vcpu->kvm);
+> > +out_err:
+> > +	pvtime_data.is_supported = false;
+> > +}
+> > +
+> > +dev_exit(pvtime__teardown_region);
+> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> > index c645ac0..865bd68 100644
+> > --- a/arm/include/arm-common/kvm-arch.h
+> > +++ b/arm/include/arm-common/kvm-arch.h
+> > @@ -54,6 +54,10 @@
+> >  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
+> >  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+> >  
+> > +#define AARCH64_PVTIME_IPA_MAX_SIZE	SZ_64K
+> > +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
+> > +					 AARCH64_PVTIME_IPA_MAX_SIZE)
+> 
+> This overlaps with the ARM_PCI_MMIO_AREA. If you want to change the memory
+> layout for a guest, there's a handy ASCII map at the top of this file.  That
+> should also be updated to reflect the modified layout.
 
-Thanks,
-regards,
-Pierre
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Right, when pvtime is supported it ovelaps that region. While this
+feature is supported only for arm64, does it make sense to update the ASCII
+map in this header which is arm-common ? Also, probably it makes sense to move
+all of the definitions to pvtime.c ? What do you think ?
+
+> 
+> Why do you want to put it below RAM? Is there a requirement to have it there or
+> was the location chosen for other reasons?
+>
+
+I don't have a strong argument for this placement but I am open to
+suggestions if you would like to move it somewhere else. For example, we
+are placing pvtime in the same region in crosvm.
+
+> > +#define AARCH64_PVTIME_SIZE		(64)
+> 
+> This looks like something that should go in pvtime.c, as it's not relevant to
+> the memory layout.
+>
+
+I agree, I will move this. Thanks.
+
+> >  
+> >  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+> >  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
+> > diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> > index 6a2408c..84ac1e9 100644
+> > --- a/arm/kvm-cpu.c
+> > +++ b/arm/kvm-cpu.c
+> > @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+> >  			die("Unable to find matching target");
+> >  	}
+> >  
+> > +	/* Populate the vcpu structure. */
+> > +	vcpu->kvm		= kvm;
+> > +	vcpu->cpu_id		= cpu_id;
+> > +	vcpu->cpu_type		= vcpu_init.target;
+> > +	vcpu->cpu_compatible	= target->compatible;
+> > +	vcpu->is_running	= true;
+> > +
+> >  	if (err || target->init(vcpu))
+> >  		die("Unable to initialise vcpu");
+> >  
+> > @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+> >  		vcpu->ring = (void *)vcpu->kvm_run +
+> >  			     (coalesced_offset * PAGE_SIZE);
+> >  
+> > -	/* Populate the vcpu structure. */
+> > -	vcpu->kvm		= kvm;
+> > -	vcpu->cpu_id		= cpu_id;
+> > -	vcpu->cpu_type		= vcpu_init.target;
+> > -	vcpu->cpu_compatible	= target->compatible;
+> > -	vcpu->is_running	= true;
+> > -
+> 
+> Why this change?
+>
+
+I will add a comment to describe why I moved this. During pvtime setup,
+in vcpu initialization I need to access the kvm structure from the vcpu.
+
+> Thanks,
+> Alex
+> 
+
+Thanks for the review,
+Sebastian
+
+> >  	if (kvm_cpu__configure_features(vcpu))
+> >  		die("Unable to configure requested vcpu features");
+> >  
+> > -- 
+> > 2.35.1.265.g69c8d7142f-goog
+> > 
