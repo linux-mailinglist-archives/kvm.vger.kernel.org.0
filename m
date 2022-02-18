@@ -2,132 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 940374BBE05
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 18:08:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1048F4BBDFE
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 18:06:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238171AbiBRRIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 12:08:32 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46950 "EHLO
+        id S238153AbiBRRGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 12:06:49 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236698AbiBRRIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 12:08:31 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B771D3669A
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 09:08:12 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id u16so2753817pfg.12
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 09:08:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ll9T055JzV/wdZpn69fyeh7rHkmZmXKfJNyyV9dc/Ag=;
-        b=FoT4ywa0lsi4Q3P6AqAntiw3MSb+cD6KgA9QQiR5TUcijEoS6W3qURgnIevv5OZtYs
-         /zCj/fKUri1RFOIsQAG8t3gKjMm5wGapBoVzmo31uNAuMOeb6V1wm61wvb0EHVqbCVy6
-         OgInI7BUjeUEvAwuhDO1Bb1iQayrDDodwGSNabdj1/BpZJgbsY5fPP5T1hY2sskXD909
-         Ywg0fpbMi0q7eGjILGfYuKFR0IzMd28wkSRsUiUNonMg1buTyUP5J0SWhu7/HUBwatPd
-         y3/DGYFrSpanixG8KhIdvaQXdSYZWKj4tmI/i89WSXT4qi4c3J2ypX2flom2r1IrQk1W
-         BjSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ll9T055JzV/wdZpn69fyeh7rHkmZmXKfJNyyV9dc/Ag=;
-        b=Ji0WAnmwGE/v8dT1ZR7Mm+JZUFcz0Bzy++ZLyzRinu5ry8mlp0S/nYrrQjeHKk2RfZ
-         Y4p+O9M6dB4//VljKo6wnBu0RLdo5KOE4DNuThD8TnXvk2aSnGNI6TL22aN+inRKzvQd
-         VwnAhsY7f+BEeNtytMj3RX2mkutNXRugf1WrUav8+IemY6KhS/U2FZHZ3ecuFLrvQPDn
-         nctxyYGPUCESCiHu/GleFlC7Nfzwgo2HOSPDn7Rv0MZd0AYXk1mLrVPuU+4rT4CrA/pl
-         XvVBrQHQWQHo+TeLltUz8Kd3r7VHg5kuqlzH+9IFEc5sE82AAnoNN6afEkIMgJrdzSQr
-         //Hw==
-X-Gm-Message-State: AOAM532QQxCUrQchkizlAAusWdHsqUepz5MsOJsYfjMlwChuPCPeE3Yx
-        KGKrnh/Fwzw/ZqCxO0XUC3dH88zgazrIAw==
-X-Google-Smtp-Source: ABdhPJw/DQfbXN1JM/YyP1jNU/eCsVFHl7l0+hZi656gcs+xQh6y73X/pDa10jfoz87JL3QLjF3d5g==
-X-Received: by 2002:a05:6a00:8d5:b0:4e1:77c9:def8 with SMTP id s21-20020a056a0008d500b004e177c9def8mr8713738pfu.55.1645204091920;
-        Fri, 18 Feb 2022 09:08:11 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m126sm9994947pga.94.2022.02.18.09.08.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 09:08:11 -0800 (PST)
-Date:   Fri, 18 Feb 2022 17:08:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2 01/18] KVM: x86: host-initiated EFER.LME write affects
- the MMU
-Message-ID: <Yg/Sd3UE2aCNimGj@google.com>
-References: <20220217210340.312449-1-pbonzini@redhat.com>
- <20220217210340.312449-2-pbonzini@redhat.com>
+        with ESMTP id S238148AbiBRRGr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 12:06:47 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9544F54;
+        Fri, 18 Feb 2022 09:06:25 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21IGcTtv036408;
+        Fri, 18 Feb 2022 17:06:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=uyireqeUxx+W1eVB2rdg/kA4tqDlfRnSBxG00YgQGz8=;
+ b=XcxmcJStXwjoyTg5Hnr4tfbppqolTmzKLrOXo8MSW748JGsX6xQV7dRjAY2zdZ7xcnqg
+ aw0tScSJfhsmcp1jYfiw11qCQGEGgSGFQ+4zm504V79aVEK2aPmdmkC/yADTr6GFUHw8
+ +nxACHWwZW94VbMkNeprZjgaxGKx4dU+Icr1i/VFPC6wh/SyNAbannCX2XMEIDB30eC/
+ BqbCbtLT5TbRQHf/UKuZqgPIZm+VxH4bKPWFkO9KhpUvWYPxvl1qzjkH3LtiO5HzvCnw
+ dLH/fdQTgfI39aAWzchVIfHIrOopBfegx/ofreMxCyEiC+3lMvjiTtdraoEqvHECD+uz aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eaexx8thh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Feb 2022 17:06:25 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21IGdKri038207;
+        Fri, 18 Feb 2022 17:06:25 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eaexx8tgm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Feb 2022 17:06:24 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21IH3uqO013656;
+        Fri, 18 Feb 2022 17:06:22 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3e645kkkb6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Feb 2022 17:06:22 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21IH6JG740894916
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 18 Feb 2022 17:06:19 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11DD0A404D;
+        Fri, 18 Feb 2022 17:06:19 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 59F6FA4051;
+        Fri, 18 Feb 2022 17:06:18 +0000 (GMT)
+Received: from [9.171.47.189] (unknown [9.171.47.189])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 18 Feb 2022 17:06:18 +0000 (GMT)
+Message-ID: <96fe20ac-bea0-7eee-cfb5-198a906e5399@linux.ibm.com>
+Date:   Fri, 18 Feb 2022 18:08:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220217210340.312449-2-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v7 1/1] s390x: KVM: guest support for topology function
+Content-Language: en-US
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
+        gor@linux.ibm.com, wintera@linux.ibm.com, seiden@linux.ibm.com
+References: <20220217095923.114489-1-pmorel@linux.ibm.com>
+ <20220217095923.114489-2-pmorel@linux.ibm.com>
+ <f0bf737abf480d6d16af6e5335bb195061f3d076.camel@linux.ibm.com>
+ <97af6268-ff7a-cfb6-5ea4-217b5162cfe7@linux.ibm.com>
+ <Yg+23xh7DDSRHFxK@osiris>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <Yg+23xh7DDSRHFxK@osiris>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IfpfTVUfv_1JqyrBaifEhsDRus0ke-EX
+X-Proofpoint-ORIG-GUID: CE2b7bsqyAYz6ALk1vfk_x_DvWs5WNqZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-18_07,2022-02-18_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ mlxlogscore=993 spamscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 mlxscore=0 suspectscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202180109
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The shortlog doesn't come remotely close to saying what this patch does, it's
-simply a statement.
 
-  KVM: x86: Reset the MMU context if host userspace toggles EFER.LME
 
-On Thu, Feb 17, 2022, Paolo Bonzini wrote:
-> While the guest runs, EFER.LME cannot change unless CR0.PG is clear, and therefore
-> EFER.NX is the only bit that can affect the MMU role.  However, set_efer accepts
-> a host-initiated change to EFER.LME even with CR0.PG=1.  In that case, the
-> MMU has to be reset.
-
-Wrap at ~75 please.
-
-> Fixes: 11988499e62b ("KVM: x86: Skip EFER vs. guest CPUID checks for host-initiated writes")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-
-With nits addressed,
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  arch/x86/kvm/mmu.h | 1 +
->  arch/x86/kvm/x86.c | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+On 2/18/22 16:10, Heiko Carstens wrote:
+>>>> +       /* The real CPU backing up the vCPU moved to another socket
+>>>> */
+>>>> +       if (topology_physical_package_id(vcpu->cpu) !=
+>>>> +           topology_physical_package_id(vcpu->arch.prev_cpu))
+>>>> +               return true;
+>>>
+>>> Why is it OK to look just at the physical package ID here? What if the
+>>> vcpu for example moves to a different book, which has a core with the
+>>> same physical package ID?
+>>>
+>>
+>> You are right, we should look at the drawer and book id too.
+>> Something like that I think:
+>>
+>>          if ((topology_physical_package_id(vcpu->cpu) !=
+>>               topology_physical_package_id(vcpu->arch.prev_cpu)) ||
+>>              (topology_book_id(vcpu->cpu) !=
+>>               topology_book_id(vcpu->arch.prev_cpu)) ||
+>>              (topology_drawer_id(vcpu->cpu) !=
+>>               topology_drawer_id(vcpu->arch.prev_cpu)))
+>>                  return true;
 > 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 51faa2c76ca5..a5a50cfeffff 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -48,6 +48,7 @@
->  			       X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE)
->  
->  #define KVM_MMU_CR0_ROLE_BITS (X86_CR0_PG | X86_CR0_WP)
-> +#define KVM_MMU_EFER_ROLE_BITS (EFER_LME | EFER_NX)
->  
->  static __always_inline u64 rsvd_bits(int s, int e)
->  {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d3da64106685..99a58c25f5c2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1647,7 +1647,7 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	}
->  
->  	/* Update reserved bits */
-
-This comment needs to be dropped, toggling EFER.LME affects more than just reserved
-bits.
-
-> -	if ((efer ^ old_efer) & EFER_NX)
-> +	if ((efer ^ old_efer) & KVM_MMU_EFER_ROLE_BITS)
->  		kvm_mmu_reset_context(vcpu);
->  
->  	return 0;
-> -- 
-> 2.31.1
+> You only need to check if prev_cpu is present in topology_core_cpumask(cpu).
 > 
-> 
+
+Yes, thanks.
+
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
