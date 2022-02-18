@@ -2,143 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 337414BC198
-	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 22:14:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 423444BC248
+	for <lists+kvm@lfdr.de>; Fri, 18 Feb 2022 22:45:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239575AbiBRVPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Feb 2022 16:15:05 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37474 "EHLO
+        id S239991AbiBRVpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Feb 2022 16:45:52 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238215AbiBRVPE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Feb 2022 16:15:04 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C00E231913
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:14:46 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id r7so3659029iot.3
-        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:14:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9OJSdScnlbqpsx7gaJ1EijvzjcTEFHzFZ0fM3gifr4w=;
-        b=dUgNSlLWGXT4unbLz8g8o5jQ8/MxeQtzYmmIDBsG5micBWdhRpq+Ji2CN//xHH3X9D
-         ZPhzKJTYpnIUKT1ylKeEpOe5VjddgiFhQBLqss/osdPBItEIgO5P1t3Gluoy01xUy9rg
-         S+entrnn5pscyIAFXpJCrQBlzm9RYt9upIgu8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9OJSdScnlbqpsx7gaJ1EijvzjcTEFHzFZ0fM3gifr4w=;
-        b=G+iIsCTjtS6WLtPvpNTHwEJ+h4pfDxsfuqqUqdSfldlvNHk8feIFjKYuv0+zkenSDq
-         8ceXhwvPzKOKiM8MrB17IZi8fQlGaTNp1z7bBKsO/mpbtVPYVN6i8qvT2MlKl2IPq0O7
-         DoBzl3qkCR+YYCYsAZQPpv1/KKnbIX5L4SDcFcBU64w3jTUf4kUDvQODx0GpirtKDK1D
-         W0TuMCtZNKyaoRxmz6EQzYWBLJ9+JdAZAXd2eUlCcM+ImXQ+JaTw4cxr52gtWks8oTp3
-         iOla/rWETnc61Mtk/cSTV5Ebj+b7/ZdECQpOZ0MA2I/J7IFw6/jm9QAhaJEVkcu0DG7K
-         dycw==
-X-Gm-Message-State: AOAM530SySJLAcN+nW7zC9Z/+bo0P5hBpzPXkQfZ5c0pxcSF3B166VM6
-        PUUEGF4aCaCJivXze+KEgpCBHA==
-X-Google-Smtp-Source: ABdhPJy0+aMr8b7NsG7Xs0Tk4hWTZWPnjtQrNL2yG6p6Z6xUkLKb0IpxDzj5q62nEtwY0m/d1hG3wA==
-X-Received: by 2002:a02:9529:0:b0:314:5808:5de2 with SMTP id y38-20020a029529000000b0031458085de2mr6401382jah.68.1645218885917;
-        Fri, 18 Feb 2022 13:14:45 -0800 (PST)
-Received: from [192.168.1.128] ([71.205.29.0])
-        by smtp.gmail.com with ESMTPSA id m4sm4166132iln.48.2022.02.18.13.14.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Feb 2022 13:14:45 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: s390: selftests: Test vm and vcpu memop with
- keys
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20220211182215.2730017-11-scgl@linux.ibm.com>
- <20220217145336.1794778-1-scgl@linux.ibm.com>
- <20220217145336.1794778-3-scgl@linux.ibm.com>
- <7d0b5b03-21f4-0402-779a-788d4bd58071@linuxfoundation.org>
- <2af9c3a9-e5a1-484b-9c1e-693a25993cdb@linux.ibm.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <eb5c437a-032b-f710-4254-beed32088456@linuxfoundation.org>
-Date:   Fri, 18 Feb 2022 14:14:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        with ESMTP id S235827AbiBRVpv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Feb 2022 16:45:51 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 829A425598
+        for <kvm@vger.kernel.org>; Fri, 18 Feb 2022 13:45:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=de+V2e39uuha1Oc0Rjqsv9bzjSmv/vzpy6jz4ccjv24=; b=bK2FfeBoQJvZkOWsNZ2OdiQnOC
+        lW6k0SS2LaXZd3iwsrvfysegbwsvxHMNf45R66V9takyflY8wlmKXX4yxMRRYUDDUHxNV69+5dN0R
+        n0Nf/z5H/DJpwtIjVkySCgzdjXkjWztkW2qgrZEIwkN5EYuzf9MIxu+fzrMz29hCocaj08VXUdpPK
+        x9MeYCqlUvYnM+z5Ea2aHDTrBlryQFN7apEqmk5EKUmRWCcLMCL0sVgSdHEiIBc6sJ3M3K/pbHXFo
+        UQK+mUTkbum4M91cRdr+McOHnTIffjfZGbpH6k4QusuOSrm5lhyk2hST7G1Bh8t+tQjKQk43ELlcI
+        OmrnBvzw==;
+Received: from [2001:871:43:aaee:a4a4:c75:bc12:c634] (helo=dynamic-pd01.res.v6.highway.a1.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nLB41-00GyJL-98; Fri, 18 Feb 2022 21:45:17 +0000
+Message-ID: <78bdc903b4d325902cde091afa20e9772373bff9.camel@infradead.org>
+Subject: Re: [PATCH v0 02/15] KVM: x86/xen: Use gfn_to_pfn_cache for
+ runstate area
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>,
+        Paul Durrant <pdurrant@amazon.co.uk>
+Date:   Fri, 18 Feb 2022 22:45:15 +0100
+In-Reply-To: <Yg/6FoL9dH1/lTOS@google.com>
+References: <20220210002721.273608-1-dwmw2@infradead.org>
+         <20220210002721.273608-3-dwmw2@infradead.org> <Yg/6FoL9dH1/lTOS@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-AN9F1f9N8cci6wFQSjj7"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-In-Reply-To: <2af9c3a9-e5a1-484b-9c1e-693a25993cdb@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/18/22 5:14 AM, Janis Schoetterl-Glausch wrote:
-> On 2/17/22 18:54, Shuah Khan wrote:
->> On 2/17/22 7:53 AM, Janis Schoetterl-Glausch wrote:
->>> Test storage key checking for both vm and vcpu MEM_OP ioctls.
->>> Test both error and non error conditions.
->>>
->>
->> This patch seems to combine restructuring the code and new code.
->> e,g test_errors() was added in the last patch, only to be redone
->> in this patch with test_errors split into test_common_errors()
->>
->> Doing restructure in a separate patch and then adding new code
->> makes it easier to review and also keep them simpler patches.
->>
->> Please split the code in these two patches to just do restructure
->> and then add new code.
->>
->> I also would like to have good reasons to change existing code and
->> make them into macros.
->>   
->>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->>> ---
->>>    tools/testing/selftests/kvm/s390x/memop.c | 342 +++++++++++++++++++++-
->>>    1 file changed, 328 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
->>> index 4510418d73e6..bc12a9238967 100644
->>> --- a/tools/testing/selftests/kvm/s390x/memop.c
->>> +++ b/tools/testing/selftests/kvm/s390x/memop.c
->>> @@ -201,6 +201,8 @@ static int err_memop_ioctl(struct test_vcpu vcpu, struct kvm_s390_mem_op *ksmo)
->>>    #define PAGE_SHIFT 12
->>>    #define PAGE_SIZE (1ULL << PAGE_SHIFT)
->>>    #define PAGE_MASK (~(PAGE_SIZE - 1))
->>> +#define CR0_FETCH_PROTECTION_OVERRIDE    (1UL << (63 - 38))
->>> +#define CR0_STORAGE_PROTECTION_OVERRIDE    (1UL << (63 - 39))
->>>      #define ASSERT_MEM_EQ(p1, p2, size) \
->>>        TEST_ASSERT(!memcmp(p1, p2, size), "Memory contents do not match!")
->>> @@ -235,6 +237,11 @@ static struct test_default test_default_init(void *guest_code)
->>>        return t;
->>>    }
->>>    +static vm_vaddr_t test_vaddr_alloc(struct test_vcpu vm, size_t size, vm_vaddr_t vaddr_min)
->>> +{
->>> +    return vm_vaddr_alloc(vm.vm, size, vaddr_min);
->>> +}
->>> +
->>
->> What is the value of adding a new routine that simply calls another?
-> 
-> I just found the vm.vm confusing/ugly and wanted to hide it,
-> I'm not married to that idea, tho.
-> 
->> Do you see this routine changing in the future to do more?
-> 
-> No.
->>
+
+--=-AN9F1f9N8cci6wFQSjj7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 2022-02-18 at 19:57 +0000, Sean Christopherson wrote:
+> On Thu, Feb 10, 2022, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+>=20
+> RFC, or lazy? :-D
+>=20
+
+The important parts are in place. It needs me to finish the self tests
+but you don't need that to start heckling it, and I realised after I'd
+posted it that I also hadn't finished the save/restore of pending
+oneshot timers, which is now implemented in the version at
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xen-evt=
+chn-kernel
+
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > ---
+> > -		r =3D kvm_gfn_to_hva_cache_init(vcpu->kvm,
+> > +		r =3D kvm_gfn_to_pfn_cache_init(vcpu->kvm,
+> >  					      &vcpu->arch.xen.runstate_cache,
+> > -					      data->u.gpa,
+> > -					      sizeof(struct vcpu_runstate_info));
+> > -		if (!r) {
+> > -			vcpu->arch.xen.runstate_set =3D true;
+> > -		}
+> > +					      NULL, false, true, data->u.gpa,
+> > +					      sizeof(struct vcpu_runstate_info),
+> > +					      false);
+>=20
+> Now that I'm all too aware of the subtle importants of @guest_uses_pa and
+> @kernel_map, before the pfn cache code gains more users, can you slot thi=
+s in at
+> the beginning of the series?  It'd be quite easy to mess up and pass "fal=
+se, false"
+> and completely mishandle cases where the PFN is mapped into the guest.
+
+Looks good to me; I'll roll it in. Thanks.
 
 
-Let's drop it the new routine then.
+--=-AN9F1f9N8cci6wFQSjj7
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-thanks,
--- Shuah
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjE4MjE0NTE1WjAvBgkqhkiG9w0BCQQxIgQgNMOX5zD1
+ni8KKDJ2Y2Txia3vNEkYFhASJ3KU/psOkY8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCuLYyzvHAaZkINBgTn3uoFjOmz/tPd2jqr
+il7UiXcoPfkmfAmkJoQU8w9WcQtId3T9KAezUl0TY2pUYUaND4mgMnJqXQXKebYlM5ubdZnWXUBm
+MBa9c64IkvUkl+z7D1c4+Ie14+l93oOrVgIhTuOw+tAjX7y5kgdKv0kCzTRVwQkctbrNwacftcoL
+XD0yDhGLq0EJA77CuxOlhNacy/Q/ddn9K3KuFdgHy54vtmMzdy5lzusOxqrLHZDdhHZyiXdfHcte
+4uBuRsoNAK8HHR3k4mlFCOzH9ZoXK1f3MZVw1hq5nj5HVVS6z10Td6G9UJ37Pco1YETbL93W0b0M
+I51Wz2bVL6UqJdwdpVt4xJBXfYFme39DxfPS4Z+xRxBC9zb1MQXNT6Yew8adkuNWTK0KJamf0dT2
+zTu+7rTkNo05TyL2vQAByP7nvPNPruduxQHCe8347PGeoBlqXSDXwHUjoDn6/svymZbPio50Kcqq
+UoyS7iBbJFmnJRRiP+DKlzuyXlF51hNqrsF5zqByYlVI8r7vUW8jQPt4BstPTwMM+BPb3Qvq48w+
+GBkHEWBFae5DJc71SrrR2QOO/JmkxnG9/iAEfvH3k9Ei1xrYaw66opfQh2uTRPrhmy9HS+KhEejS
+Quwil6bdJLC9hHIeel7t9FFJpPFVTFYd7QWwBmuyiwAAAAAAAA==
+
+
+--=-AN9F1f9N8cci6wFQSjj7--
 
